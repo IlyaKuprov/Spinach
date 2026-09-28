@@ -4,25 +4,24 @@
 
 ## Purpose
 
-Gives Matlab a good smack every time MDCS gets its kni- ckers in a twist. Syntax: smack() This function shuts down the parallel pool, clears the workspace, clears the GPUs, and makes sure there are no crashed MDCS jobs left over. This function should only be used from the command line.
+Resets Matlab state after problems with MDCS (Matlab Distributed Computing Server). This function is intended for use from the command line only.
 
 ## Physical / mathematical content
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+This is a Matlab environment-recovery utility; it does not perform a physical calculation.
 
 ## Numerical / algorithmic content
 
+No numerical calculation is performed. The function deletes the current parallel pool and jobs on the `Processes` cluster, closes open file handles, clears the workspace, and resets available GPUs.
+
+## Parameters / inputs
+
+None.
+
+## Outputs
+
+No return value. Matlab state is cleared and any available GPU devices are reset.
+
 ## Implementation structure
 
-- Gives Matlab a good smack every time MDCS gets its kni-
-- ckers in a twist. Syntax:
-- smack()
-- This function shuts down the parallel pool, clears the
-- workspace, clears the GPUs, and makes sure there are no
-- crashed MDCS jobs left over. This function should only
-- be used from the command line.
-- Kill the parallel pool
-- Clear out crashed jobs
-- Close all handles
-- Clear the workspace
-- Reset all GPUs
+The function deletes `gcp('nocreate')`, deletes jobs from `parcluster('Processes')`, calls `fclose('all')` and `clear('all')`, then resets each device returned by `gpuDeviceCount`.

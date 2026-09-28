@@ -4,41 +4,18 @@
 
 ## Purpose
 
-Attempts to convert a traceless symmetric 3x3 interaction matrix into axiality, rhombicity and three Euler angles. The transformation is un- stable and should be avoided if at all possible: it is always best to just publish the 3x3 matrix as recommended by IUPAC. Syntax: [ax,rh,angles]=tsm2param(M)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+Converts a traceless symmetric 3x3 interaction matrix to axiality, rhombicity, and Euler angles. The source warns that this conversion is unstable and recommends publishing the 3x3 matrix instead, citing IUPAC.
 
 ## Parameters / inputs
 
-- M -3x3 matrix or its five independent elements in the
-- order of [Mxx, Mxy, Mxz, Myy, Myz]
+- `M` — a 3x3 matrix or five independent elements ordered `[Mxx, Mxy, Mxz, Myy, Myz]`. For five elements, the matrix is assembled symmetrically with `Mzz = -Mxx - Myy`.
 
 ## Outputs
 
-- ax -axiality, Mehring order of eigenvalues
-- rh -rhombicity, Mehring order of eigenvalues
-- angles -Euler angles (one of the eight equivalent
-- sets), radians
-- Note: Mehring convention has Z as the largest eigenvalue, and X as
-- the smallest eigenvalue, this includes signs.
+- `ax` — axiality: `2*DZ - (DX + DY)`.
+- `rh` — rhombicity: `DY - DX`.
+- `angles` — Euler angles in radians, one of eight equivalent sets.
 
-## Implementation structure
+Eigenvalues use Mehring ordering: `DZ` is the largest and `DX` the smallest, including signs; `DY` is the remaining eigenvalue. The eigenvectors are ordered X, Y, Z, adjusted to have positive determinant, and passed to `dcm2euler`. The source defines a consistency-checking helper, but the call to it is commented out.
 
-- Attempts to convert a traceless symmetric 3x3 interaction matrix into
-- axiality, rhombicity and three Euler angles. The transformation is un-
-- stable and should be avoided if at all possible: it is always best to
-- just publish the 3x3 matrix as recommended by IUPAC. Syntax:
-- [ax,rh,angles]=tsm2param(M)
-- M - 3x3 matrix or its five independent elements in the
-- order of [Mxx, Mxy, Mxz, Myy, Myz]
-- ax - axiality, Mehring order of eigenvalues
-- rh - rhombicity, Mehring order of eigenvalues
-- angles - Euler angles (one of the eight equivalent
-- sets), radians
-- Note: Mehring convention has Z as the largest eigenvalue, and X as
+[Source](https://spindynamics.org/wiki/index.php?title=tsm2param.m)

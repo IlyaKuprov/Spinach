@@ -4,33 +4,19 @@
 
 ## Purpose
 
-Finds out which substance hosts the specified spins; throws an error if there is more than one. Syntax: subst=which_subst(spin_system,spins)
+Returns the number of the substance containing all specified spins. Raises an error if the spins cross chemical boundaries or do not belong to any substance.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- `spin_system`: spin system whose `chem.parts` lists the spins in each substance and whose `comp.nspins` gives the total spin count.
+- `spins`: a list of distinct positive integer spin numbers, each no greater than the total spin count.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `subst`: a positive integer identifying the substance.
 
-- spins -a list of positive integers
+## Behavior
 
-## Outputs
+The function validates `spins`, finds the substance containing them, and checks that every specified spin belongs to that substance. It raises an error for invalid, repeated, or out-of-range spin numbers; spins absent from all substances; or spins crossing chemical boundaries.
 
-- subst -a positive integer
-
-## Implementation structure
-
-- Finds out which substance hosts the specified spins;
-- throws an error if there is more than one. Syntax:
-- subst=which_subst(spin_system,spins)
-- spins -a list of positive integers
-- subst -a positive integer
-- Check consistency
-- Find the substances hosting specified spins
-- Only one substance is permitted
-- Get substance number
-- Confirm that all spins are in the same substance
-- Consistency enforcement
-- I swear to you that to think too much is
+Source: <https://spindynamics.org/wiki/index.php?title=which_subst.m>

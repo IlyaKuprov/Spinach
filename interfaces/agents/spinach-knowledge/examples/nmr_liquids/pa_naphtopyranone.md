@@ -4,28 +4,17 @@
 
 ## Purpose
 
-NMR spectrum of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one, magnetic parameters from: Calculation time: seconds
+Simulates the NMR spectrum of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one. The magnetic parameters are taken from [the cited source](http://dx.doi.org/10.1016/j.saa.2010.11.015). The MATLAB example comments estimate a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Describes the liquid-state proton spin system using chemical shifts and scalar couplings from the cited magnetic parameters.
+- Uses an IK-2 Liouville-space basis for the simulation.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Simulates a liquid-state acquisition, apodises the FID, Fourier-transforms it, and plots the spectrum.
 
 ## Implementation structure
 
-- NMR spectrum of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one,
-- magnetic parameters from:
-- Calculation time: seconds
-- Magnetic induction
-- Spin system
-- Chemical shifts
-- Scalar couplings
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+- Defines the spin-system parameters and IK-2 basis, then runs acquisition and the apodisation/transform/plot sequence.

@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Divides an RCV sparse matrix by a numeric scalar. Syntax: A=rdivide(A,k)
+Divides an RCV sparse matrix by a numeric scalar.
 
-## Physical / mathematical content
+## Mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+The operation divides each stored value of `A` by `k`, leaving the sparse structure and dimensions unchanged.
 
 ## Numerical / algorithmic content
+
+The function requires `A` to be an RCV object and `k` to be a numeric scalar, then replaces `A.val` with `A.val/k`.
 
 ## Parameters / inputs
 
@@ -23,12 +25,5 @@ Divides an RCV sparse matrix by a numeric scalar. Syntax: A=rdivide(A,k)
 
 ## Implementation structure
 
-- Divides an RCV sparse matrix by a numeric scalar. Syntax:
-- A=rdivide(A,k)
-- A -RCV sparse matrix
-- k -numeric scalar
-- Check consistency
-- Divide stored values by the scalar
-- Consistency enforcement
-- Главное памятник поставить, а голуби сами прилетят.
-- Святослав Вернидубович Кривич
+- Check that the first argument is RCV and the divisor is a numeric scalar.
+- Divide the stored value array by the scalar and return the modified RCV object.

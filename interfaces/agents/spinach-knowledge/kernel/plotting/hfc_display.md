@@ -4,13 +4,16 @@
 
 ## Purpose
 
-Draws hyperfine tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A unit sphere in a Cartesian space is scaled by abs(Axx) in the x direction, abs(Ayy) in the y direction and abs(Azz) in the z direction, where Axx, Ayy, Azz are the eigenvalues of the HFC ten- sor in units of milliTesla. 2. A set of axes is drawn inside the sphere with a red axis for a positive eige
+Displays selected atoms' hyperfine tensors in a 3D molecular figure. `options.style` selects ellipsoid or spherical-harmonic surfaces; the default is `harmonics`.
 
 ## Physical / mathematical content
 
+- For ellipsoids, the tensor's principal values set the axis lengths and its eigenvectors set their directions; plotted principal-axis colours distinguish positive and negative values.
+
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+- The function draws the molecular geometry, selects requested atoms, and plots their hyperfine tensors using the chosen style. `options.kill_iso` can remove the isotropic tensor component before plotting.
+- Tensor diagonalisation is used to orient and scale ellipsoids; this is a visualization step, not a spectral or stationary-state calculation.
 
 ## Syntax
 
@@ -20,39 +23,11 @@ hfc_display(props,atoms,scaling,conmatrix,options)
 
 ## Parameters / inputs
 
-- props -output of gparse.m function
-- atoms -a cell array of element symbols
-- or a vector of integers, indica-
-- ting the atoms for which hyper-
-- fine tensors should be visuali-
-- sed, e.g. {'C','H'} or [1 2 5]
-- scaling -a factor to scale the tensors
-- by for visualisation
-- conmatrix -binary connectivity matrix, 1
-- if a pair of atoms should be
-- connected by a bond. If an em-
-- pty vector is supplied, 1.6
-- Angstrom cutoff distance is used
-- options.style -'ellipsoids' or 'harmonics'
-- options.kill_iso -set to true() to eliminate the
-- isotropic parts of tensors be-
-- fore plotting
-- options.numbers -set to true() to display atom
-- numbers
-- options.symbols -set to false() to not display
-- atom symbols
-
-## Implementation structure
-
-- Draws hyperfine tensors and their eigensystems. Two styles are
-- implemented:
-- A. Ellipsoids (symmetric tensors only):
-- 1. A unit sphere in a Cartesian space is scaled by
-- abs(Axx) in the x direction, abs(Ayy) in the y
-- direction and abs(Azz) in the z direction, where
-- Axx, Ayy, Azz are the eigenvalues of the HFC ten-
-- sor in units of milliTesla.
-- 2. A set of axes is drawn inside the sphere with a
-- red axis for a positive eigenvalue, and a blue
-- axis for a negative one.
-- 3. The sphere is translated to the point of corres-
+- `props` - output of `gparse.m`
+- `atoms` - cell array of element symbols or a vector of atom indices, e.g. `{'C','H'}` or `[1 2 5]`
+- `scaling` - positive real scalar factor for scaling the tensors in the visualization
+- `conmatrix` - binary connectivity matrix; if empty, a 1.6 Å distance cutoff is used
+- `options.style` - `ellipsoids` or `harmonics` (default: `harmonics`)
+- `options.kill_iso` - set true to remove isotropic tensor components before plotting (default: false)
+- `options.numbers` - set true to display atom numbers (default: false)
+- `options.symbols` - set false to hide atom symbols (default: true)

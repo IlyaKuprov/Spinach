@@ -4,16 +4,17 @@
 
 ## Purpose
 
-Singlet-singlet RYDMR experiment using the full kinetics superoper- ator -computes the singlet yield of a radical pair recombination reaction. Syntax: A=rydmr(spin_system,parameters,H,R,K) where H is the Hamiltonian commutation superoperator in zero ex- ternal field, R is the relaxation superoperator and K is the che- mical kinetics superoperator. Parameters: parameters.tol -BICG solver tolerance, 1e-2 is generally g
+Computes the fractional singlet yield for radical-pair recombination in a singlet-singlet RYDMR experiment.
 
 ## Physical / mathematical content
 
-- Spin-chemistry experiment implementations. These routines couple spin evolution to chemical kinetics, radical-pair recombination, exchange, and spin-selective reaction channels.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- Constructs and normalizes a two-electron singlet state. The source forms the kinetics Liouvillian `L=H+1i*R+1i*K` from the supplied Hamiltonian, relaxation, and chemical-kinetics superoperators.
+- Computes the yield from the singlet projection of the linear-system solution, weighted by the first radical-pair reaction rate.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Solves the source-defined Liouville-space linear system with BICG, using `parameters.tol` as the solver tolerance; the source says `1e-2` is generally a good value. This is a stationary yield calculation, not a time-domain propagation.
+- The code can move the calculation to the GPU when enabled and gathers the result for output.
 
 ## Outputs
 
@@ -21,15 +22,5 @@ Singlet-singlet RYDMR experiment using the full kinetics superoper- ator -comput
 
 ## Implementation structure
 
-- Singlet-singlet RYDMR experiment using the full kinetics superoper-
-- ator -computes the singlet yield of a radical pair recombination
-- reaction. Syntax:
-- A=rydmr(spin_system,parameters,H,R,K)
-- where H is the Hamiltonian commutation superoperator in zero ex-
-- ternal field, R is the relaxation superoperator and K is the che-
-- mical kinetics superoperator. Parameters:
-- parameters.tol - BICG solver tolerance,
-- 1e-2 is generally good
-- A -fractional singlet yield
-- Check consistency
-- Get the two-electron singlet state
+- Checks the dimensions of `H`, `R`, and `K` and the tolerance parameter.
+- Builds the singlet state and Liouvillian, obtains the BICG solution, evaluates the fractional yield, and returns it.

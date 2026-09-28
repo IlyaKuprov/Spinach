@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Computes a Hermitian conjugate of a matrix in a tensor train representation. Syntax: ttrain=ctranspose(ttrain)
+Computes the Hermitian transpose of a matrix represented as a tensor train.
 
-## Physical / mathematical content
+## Input
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `ttrain` — tensor-train representation of a matrix.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `ttrain` — tensor train representing the Hermitian conjugate of the input matrix.
 
-- ttrain -tensor train representation of a matrix
+## Algorithm
 
-## Outputs
-
-- ttrain -Hermitian conjugate of the input tensor train
-
-## Implementation structure
-
-- Computes a Hermitian conjugate of a matrix in a tensor train
-- representation. Syntax:
-- ttrain=ctranspose(ttrain)
-- ttrain -tensor train representation of a matrix
-- ttrain -Hermitian conjugate of the input tensor train
-- Read tensor sizes and ranks
-- Swap the middle dimensions of all cores
-- Conjugate the result
-- What gives the artist real prestige is his imitators.
-- Igor Stravinsky
-- #NGRUM
+For every core, the function swaps the two physical matrix dimensions using the permutation `[1 3 2 4]`, then complex-conjugates the tensor train, including its coefficients.

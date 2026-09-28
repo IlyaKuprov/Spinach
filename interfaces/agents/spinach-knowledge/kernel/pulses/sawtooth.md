@@ -4,36 +4,20 @@
 
 ## Purpose
 
-Returns a saw-tooth waveform. Syntax: waveform=sawtooth(amplitude,frequency,time_grid)
+Returns a sawtooth waveform evaluated at the supplied time points.
 
-## Physical / mathematical content
+## Algorithm
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+For each time `t`, the function evaluates `amplitude*(2*frequency*mod(t,1/frequency)-1)`. The waveform rises linearly from `-amplitude` to just below `amplitude` during each period `1/frequency`, then resets; the result has the same shape as `time_grid`.
 
 ## Parameters / inputs
 
-- amplitude -amplitude at the tooth top
-- frequency -waveform frequency in teeth per second
-- time_grid -grid of time points, seconds
+- `amplitude` — finite real scalar setting the magnitude at the tooth top.
+- `frequency` — positive finite real frequency, in teeth per second.
+- `time_grid` — finite real array of time points, in seconds.
 
-## Outputs
+## Output
 
-- waveform -waveform array of the same shape
-- as the time_grid input
+- `waveform` — sawtooth values with the same shape as `time_grid`.
 
-## Implementation structure
-
-- Returns a saw-tooth waveform. Syntax:
-- waveform=sawtooth(amplitude,frequency,time_grid)
-- amplitude - amplitude at the tooth top
-- frequency - waveform frequency in teeth per second
-- time_grid - grid of time points, seconds
-- waveform - waveform array of the same shape
-- as the time_grid input
-- Check consistency
-- Compute the waveform
-- Consistency enforcement
-- They're all aristocrats, that's true... because they know that there's
-- no such thing as a lousy job -only lousy men who don't care to do it.
+[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=sawtooth.m)

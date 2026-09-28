@@ -4,38 +4,27 @@
 
 ## Purpose
 
-Performs arbitrary-order finite-difference differentiation of a user-supplied row or column vector. Uses central finite-differe- nce stencils in the middle and sided stencils of the same order of accuracy on the sides. Syntax: dx=fdvec(x,npoints,order)
-
-## Physical / mathematical content
-
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+Computes the specified derivative of a row or column vector using finite differences. Interior elements use a centered stencil; elements near either end use sided stencils with the same number of points.
 
 ## Parameters / inputs
 
-- x -column or row vector to be differentiated
-- npoints -number of points in the finite difference
-- stencil
-- order -order of the derivative required
+- `x` — numeric row or column vector to differentiate.
+- `npoints` — number of points in each finite-difference stencil; must be a positive odd integer.
+- `order` — derivative order; must be a positive integer smaller than `npoints`.
 
 ## Outputs
 
-- dx -column or row vector with the derivative
+- `dx` — derivative values in a vector with the same shape as `x`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Performs arbitrary-order finite-difference differentiation of a
-- user-supplied row or column vector. Uses central finite-differe-
-- nce stencils in the middle and sided stencils of the same order
-- of accuracy on the sides. Syntax:
-- dx=fdvec(x,npoints,order)
-- x -column or row vector to be differentiated
-- npoints -number of points in the finite difference
-- stencil
-- order -order of the derivative required
-- dx -column or row vector with the derivative
-- Check consistency
-- Preallocate the answer
+- Coefficients are computed by `fdweights` for unit-spaced sample positions. No spacing parameter is supplied, so the result is a derivative with respect to the sample index.
+- The first `(npoints-1)/2` elements use weights evaluated at their positions within the first `npoints` samples. The corresponding elements at the right end use reversed weights with a factor of `(-1)^order`.
+- Interior elements use a centered, symmetric `npoints`-point stencil.
+
+## Validation
+
+- `x` must be a numeric vector. The implementation also checks that it has at least three elements, although its error message says “more than three elements.”
+- `npoints` and `order` must satisfy the integer, positivity, odd-stencil and derivative-order constraints above. The implementation does not separately check that `npoints` is no larger than the length of `x`.
+
+Source reference: <https://spindynamics.org/wiki/index.php?title=fdvec.m>

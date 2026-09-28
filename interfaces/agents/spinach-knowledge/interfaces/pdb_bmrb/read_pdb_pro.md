@@ -4,46 +4,23 @@
 
 ## Purpose
 
-Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom identifiers and Cartesian coordinates. Syntax: [aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)
-
-## Physical / mathematical content
-
-- PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
-
-## Numerical / algorithmic content
+Reads a PDB file and returns residue numbers, residue types, PDB atom identifiers, Cartesian coordinates, and PDB atom serial numbers.
 
 ## Parameters / inputs
 
-- pdb_file_name -a character string with the file name
-- mod_id -the number of model that should be
-- read from the pdb file
+- `pdb_file_name` — character string naming the PDB file.
+- `mod_id` — model number to read; must be a finite positive integer. Use `1` for a file without `MODEL` records.
 
 ## Outputs
 
-- aa_num -nspins x 1 vector giving the number of
-- the amino acid to which each spin belongs
-- aa_typ -nspins x 1 cell array of strings giving
-- the PDB identifier of the amino acid to
-- which each spin belongs (e.g. 'TYR')
-- pdb_id -nspins x 1 cell array of strings giving
-- the PDB identifier of the protein atom
-- type to which each spin belongs (e.g. 'HE2')
-- coords -nspins x 1 cell array of 3-vectors giving
-- Cartesian coordinates of each spin in Angstrom
-- pdb_ser -nspins x 1 vector giving the PDB atom serial
-- number of each spin
+All outputs have matching entries for lines accepted by the parser:
+
+- `aa_num` — residue number for each atom.
+- `aa_typ` — cell array of residue identifiers (for example, `'TYR'`), converted to uppercase.
+- `pdb_id` — cell array of PDB atom identifiers (for example, `'HE2'`).
+- `coords` — cell array of three-element Cartesian coordinate vectors in angstroms.
+- `pdb_ser` — PDB atom serial number for each atom.
 
 ## Implementation structure
 
-- Reads the a PDB file and returns amino acid numbers, amino acid types,
-- PDB atom identifiers and Cartesian coordinates. Syntax:
-- [aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)
-- pdb_file_name -a character string with the file name
-- mod_id -the number of model that should be
-- read from the pdb file
-- aa_num -nspins x 1 vector giving the number of
-- the amino acid to which each spin belongs
-- aa_typ -nspins x 1 cell array of strings giving
-- the PDB identifier of the amino acid to
-- which each spin belongs (e.g. 'TYR')
-- pdb_id -nspins x 1 cell array of strings giving
+The function scans for a matching `MODEL` record. If the file has no `MODEL` records and `mod_id` is `1`, it rewinds and reads the file as a single model. If a requested model is absent, the scan reaches end of file and no records are parsed; the function does not raise a separate not-found error. The parser then applies a space-delimited `ATOM`-record field layout, expecting the atom serial number, atom name, residue name, residue number, coordinates, and three further numeric fields; parsing stops at `ENDMDL` or end of file. Outputs are converted to column vectors, and the file is closed before return.

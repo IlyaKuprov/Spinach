@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Electric field gradient tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A unit sphere in a Cartesian space is scaled by abs(Axx) in the x direction, abs(Ayy) in the y direction and abs(Azz) in the z direction, where Axx, Ayy, Azz are the eigenvalues of the CST ten- sor in units of ppm. 2. A set of axes is drawn inside the sphere with a red axis for a positive eig
-
-## Physical / mathematical content
+Plots electric-field-gradient (EFG) or nuclear-quadrupole-interaction (NQI) tensors for selected atoms on the molecular geometry, using ellipsoids or spherical harmonics.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+For each selected nucleus, the routine uses its NQI tensor when present, otherwise its EFG tensor, and errors if neither is available. The default `harmonics` style converts the tensor to irreducible spherical-tensor coefficients and evaluates the spherical-harmonic surface. The `ellipsoids` style diagonalizes a symmetric tensor, scales a sampled unit sphere by its eigenvalues, rotates it by the eigenvectors, and translates it to the atom. Surface sign is coloured red for positive and blue for negative values. With `kill_iso=true`, the isotropic component, `trace(efg)/3`, is subtracted before plotting.
 
 ## Syntax
 
@@ -20,39 +18,15 @@ efg_display(props,atoms,scaling,conmatrix,options)
 
 ## Parameters / inputs
 
-- props -output of c2spinach or gparse
-- atoms -a cell array of element symbols
-- or a vector of integers, indica-
-- ting the atoms for which EFG
-- tensors should be visualised,
-- e.g. {'N','O'} or [1 2 5]
-- scaling -a factor to scale the tensors
-- by for visualisation
-- conmatrix -binary connectivity matrix, 1
-- if a pair of atoms should be
-- connected by a bond. If an em-
-- pty vector is supplied, 1.6
-- Angstrom cutoff distance is used
-- options.style -'ellipsoids' or 'harmonics'
-- options.kill_iso -set to true() to eliminate the
-- isotropic parts of tensors be-
-- fore plotting
-- options.numbers -set to true() to display atom
-- numbers
-- options.symbols -set to false() to not display
-- atom symbols
+- `props` — structure from `c2spinach` or `gparse`, with molecular geometry and symbols and per-atom `nqi` or `efg` data.
+- `atoms` — cell array of element symbols or vector of atom indices to display (for example, `{'N','O'}` or `[1 2 5]`).
+- `scaling` — positive real factor applied to the tensor surfaces and axes.
+- `conmatrix` — binary connectivity matrix; an empty value uses the 1.6 Å bond-distance cutoff described by the source.
+- `options.style` — `'ellipsoids'` or `'harmonics'`; default is `'harmonics'`.
+- `options.kill_iso` — remove the isotropic tensor component before plotting; default is `false`.
+- `options.numbers` — show atom numbers; default is `false`.
+- `options.symbols` — show atom symbols; default is `true`.
 
-## Implementation structure
+## Outputs
 
-- Electric field gradient tensors and their eigensystems. Two
-- styles are implemented:
-- A. Ellipsoids (symmetric tensors only):
-- 1. A unit sphere in a Cartesian space is scaled by
-- abs(Axx) in the x direction, abs(Ayy) in the y
-- direction and abs(Azz) in the z direction, where
-- Axx, Ayy, Azz are the eigenvalues of the CST ten-
-- sor in units of ppm.
-- 2. A set of axes is drawn inside the sphere with a
-- red axis for a positive eigenvalue, and a blue
-- axis for a negative one.
-- 3. The sphere is translated to the point of corres-
+Updates the current figure with the molecular geometry, selected tensors, and requested atom labels; no MATLAB output arguments are returned.

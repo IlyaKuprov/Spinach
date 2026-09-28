@@ -1,32 +1,16 @@
 # examples/dnp_liq/odnp_liquid_2.m
 
 - Signature: `odnp_liquid_2()`
+- Calculation time: seconds
 
 ## Purpose
 
-Overhauser type DNP in liquid phase at room temperature, after a perfect inversion pulse on the electron ESR signal. The simulation uses Redfield theory to account for the dipolar cross-relaxation. Calculation time: seconds
+Simulates liquid-state Overhauser DNP after a nominal 180-degree electron inversion pulse, then follows the electron and two proton longitudinal signals as they relax and exchange polarisation. No continuous microwave drive is applied during the evolution.
 
-## Physical / mathematical content
+## Spin system and preparation
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The model is the same three-spin geometry as `odnp_liquid_1`: two protons and one electron at 3.4 T, with the nuclei at (0, 0, 0) and (0, 2, 0) Å and the electron at (0, 0, 1.5) Å. It uses explicit Zeeman tensors, a complete sphten-liouv basis, Redfield relaxation, Di Bari equilibrium, secular relaxation retention, 298 K, and a 10 ps correlation time. From the thermal-equilibrium state, the script applies `step` with the electron `Lx` operator and an angle of pi radians, and passes the resulting state as `rho0` to the simulation.
 
-## Numerical / algorithmic content
+## Evolution and output
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Overhauser type DNP in liquid phase at room temperature, after a perfect
-- inversion pulse on the electron ESR signal. The simulation uses Redfield
-- theory to account for the dipolar cross-relaxation.
-- Calculation time: seconds
-- Spin system
-- Zeeman interactions
-- Coordinates (Angstrom)
-- Basis set
-- Relaxation theory
-- Spinach housekeeping
-- Isotropic thermal equilibrium
-- Electron control operator
+The ESR-context `liquid` calculation calls `dnp_time_dep` with zero microwave power and offset, a 1 μs time step, and 1000 steps. The plots show the real electron longitudinal signal and the two proton longitudinal signals over 0–1000 μs.

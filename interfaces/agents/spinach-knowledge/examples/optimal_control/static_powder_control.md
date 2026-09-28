@@ -4,32 +4,21 @@
 
 ## Purpose
 
-Optimal control optimisation for a pulse that is designed to set deuterium magnetisation in a -CD3 group of alanine up for perfect rephasing 100 microseconds after the pulse is finished. The system is a powder (100 orientations) with a B1 dist- ribution (from 46 to 54 kHz per channel) and transmitter offset error within 1 kHz of the chemical shift. Goodwin's very efficient version of the GRAPE Hessian al- gorithm is 
+Optimise a pulse that prepares deuterium magnetisation in alanine's -CD3 group for rephasing 100 microseconds after the pulse. The optimisation covers a 100-orientation powder, RF power levels from 46 to 54 kHz, and transmitter offsets from -1 to 1 kHz. It uses Goodwin's GRAPE Hessian algorithm because the propagator dimensions are small, yielding a spin echo.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- A 600 MHz magnet and an alanine -CD3 deuterium nuclear quadrupole interaction define the spin system.
+- The initial deuterium `Lz` state and target `Lx` state are normalised. Deuterium `Lx` and `Ly` operators control the pulse; `Lz` supplies the offset operator.
+- The optimisation includes powder orientations, five RF power levels, and five transmitter offsets.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- The pulse has 100 slices of 2 microseconds each. `fmaxnewton` optimises a random two-channel waveform guess using `grape_xy`, the `goodwin` method, a 100-iteration limit, a 100-microsecond dead time, and `NS` and `SNS` penalties.
+- A parallel loop tests the optimised pulse across the powder drifts and compares its echo with an ideal free induction decay. The signals are exponentially apodised and Fourier transformed for comparison.
 
 ## Implementation structure
 
-- Optimal control optimisation for a pulse that is designed
-- to set deuterium magnetisation in a -CD3 group of alanine
-- up for perfect rephasing 100 microseconds after the pulse
-- is finished.
-- The system is a powder (100 orientations) with a B1 dist-
-- ribution (from 46 to 54 kHz per channel) and transmitter
-- offset error within 1 kHz of the chemical shift.
-- Goodwin's very efficient version of the GRAPE Hessian al-
-- gorithm is used because propagator dimensions are small;
-- it yields a sophisticated kind of spin echo.
-- Calculation time: minutes
-- 600 MHz magnet
+- Create the deuterium spin system and powder drift Liouvillians, then configure and run the pulse optimisation.
+- Apply the resulting pulse in a test calculation, plot the time-domain echo, and compare the Fourier transforms of the optimised half-echo and ideal free induction decay.
+- Calculation time: minutes.

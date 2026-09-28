@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Simulation of XiX DNP contact time dependence in the steady state with electron-proton distance ensembles. Calculation time: minutes.
+Calculates steady-state proton polarisation versus XiX contact time, averaged over an electron–proton distance distribution.
 
-## Physical / mathematical content
+## Model and distance average
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The source uses a trityl electron–proton pair at 1.2142 T and 80 K. Three Gauss–Legendre distance nodes span 3.5–20 Å. For each distance it updates the pair coordinates and the orientation-dependent proton T1 rate via `r1n_dnp`; the model also specifies T2 rates, diagonal relaxation retention and `dibari` equilibrium. The spin system uses the full spherical-tensor Liouville basis with no basis approximation. The distance average applies the quadrature weights multiplied by the radial `r^2` Jacobian.
 
-## Numerical / algorithmic content
+## XiX scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of XiX DNP contact time dependence in the
-- steady state with electron-proton distance ensembles.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance ensemble
-- XiX loop count
+The experiment detects proton `Lz` on an 800-point two-angle spherical powder grid. It computes steady state for 1–64 XiX loops, using 48 ns pulses and an inverted second-pulse phase; the contact time is twice the loop count times the pulse duration. The source sets an 18 MHz electron nutation frequency, −13 MHz added shift, +61 MHz electron offset, and 153 μs shot spacing less total pulse duration. Each case uses `powder(...,@xixdnp_steady,...,'esr')`. The distance-averaged real proton expectation value is plotted against total contact time and saved as `xix_q_con_time_ensemble_r.fig`.

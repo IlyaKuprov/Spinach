@@ -4,27 +4,8 @@
 
 ## Purpose
 
-INADEQUATE spectrum of a three-spin system with J-coupling between two spins only. The sequence selects double-quantum coherence from coupled 13C pairs and converts it back for detection. Calculation time: seconds
+INADEQUATE spectrum of a three-spin system with J-coupling between two spins only. The sequence selects double-quantum coherence from coupled 13C pairs and converts it back for detection. Calculation time: seconds.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- INADEQUATE spectrum of a three-spin system with J-coupling between
-- two spins only. The sequence selects double-quantum coherence
-- from coupled 13C pairs and converts it back for detection.
-- Calculation time: seconds
-- Magnet field
-- Spin system and interactions
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Processing
-- Plotting
+The model contains three 13C spins at 9.4 T, with chemical shifts 10, 15, and 20 ppm and a single non-zero coupling, J(1,2) = 55 Hz. Spinach simulates the one-dimensional INADEQUATE experiment with J = 55 Hz; an exponential window is applied before zero-filled Fourier transformation.

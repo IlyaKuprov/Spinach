@@ -4,37 +4,14 @@
 
 ## Purpose
 
-Converts full width at half-maximum (FWHM) of an NMR signal into an approximation of the R2 rate. Syntax: r2rate=fwhm2rlx(fwhm)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Approximates the transverse relaxation rate `R2` from an NMR signal's full width at half-maximum, assuming a Lorentzian line shape. The result should be treated as an upper bound: FWHM is not a reliable measure of transverse relaxation by itself.
 
 ## Parameters / inputs
 
-- fwhm -full width at half-maximum, Hz
+- `fwhm`: positive real value or array of linewidths in Hz.
 
-## Outputs
+## Output
 
-- r2rate -approximate R2 relaxation rate, Hz
-- Note: FWHM is not a reliable measure of the transverse
-- relaxation rate. The value obtained from this
-- function should be treated as an upper bound.
-- Note: Lorentzian line shape is assumed.
+- `r2rate`: approximate `R2` rate in Hz, calculated as `pi * fwhm`.
 
-## Implementation structure
-
-- Converts full width at half-maximum (FWHM) of an NMR
-- signal into an approximation of the R2 rate. Syntax:
-- r2rate=fwhm2rlx(fwhm)
-- fwhm -full width at half-maximum, Hz
-- r2rate -approximate R2 relaxation rate, Hz
-- Note: FWHM is not a reliable measure of the transverse
-- relaxation rate. The value obtained from this
-- function should be treated as an upper bound.
-- Note: Lorentzian line shape is assumed.
-- Check consistency
-- Run the conversion
-- Consistency enforcement
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=fwhm2rlx.m)

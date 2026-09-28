@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Runs one Spinach regression test by identifier substring. Syntax: result=run_test(test_id)
+Runs one regression test selected by a unique substring of its identifier or name.
 
 ## Physical / mathematical content
 
@@ -12,16 +12,13 @@ Runs one Spinach regression test by identifier substring. Syntax: result=run_tes
 
 ## Parameters / inputs
 
-- test_id -test identifier or unique substring from list_tests()
+- `test_id` — non-empty row character vector; must match exactly one test identifier or name.
 
 ## Outputs
 
-- result -single test result structure
+- `result` — result structure for the selected test. If the test fails, `run_tests` throws an error and no result is returned.
 
 ## Implementation structure
 
-- Runs one Spinach regression test by identifier substring. Syntax:
-- result=run_test(test_id)
-- test_id -test identifier or unique substring from list_tests()
-- result -single test result structure
-- Run one matching test verbosely
+- Validates `test_id`, adds the test library directory to the MATLAB path, and checks for exactly one substring match in the test manifest.
+- Calls `run_tests` with that pattern, verbose output enabled, and stop-on-first-failure enabled.

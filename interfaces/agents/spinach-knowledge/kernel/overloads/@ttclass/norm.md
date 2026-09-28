@@ -4,40 +4,28 @@
 
 ## Purpose
 
-Computes the norm of the matrix represented by a tensor train. Syntax: ttnorm=norm(ttrain,norm_type)
+Computes the norm of the matrix represented by a tensor train. Only the Frobenius norm is available; the 1-norm, infinity norm and 2-norm raise errors.
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+For `norm_type='fro'`, the function packs the train, orthogonalises it with `ttort(ttrain,-1)`, and computes `abs(ttrain.coeff)*norm(ttrain.cores{1,1}(:),2)`.
 
 ## Numerical / algorithmic content
 
+The result is the Frobenius norm obtained from the packed, orthogonalised representation and the Euclidean norm of its first core.
+
 ## Parameters / inputs
 
-- ttrain -a tensor train representation of a matrix
+- ttrain - a tensor train representation of a matrix
 - norm_type:
-- norm_type=1 not available for ttclass
-- norm_type=inf not available for ttclass
-- norm_type=2 not available for ttclass
-- norm_type='fro' returns the Frobenius norm
+  - `1`, `inf`, and `2` are not available for ttclass
+  - `'fro'` returns the Frobenius norm
 
 ## Outputs
 
-- ttnorm -a positive real number
-- Note: only Frobenius norm is currently available for tensor trains;
-- other norm types raise errors.
+- ttnorm - a nonnegative real number
 
 ## Implementation structure
 
-- Computes the norm of the matrix represented by a tensor train. Syntax:
-- ttnorm=norm(ttrain,norm_type)
-- ttrain -a tensor train representation of a matrix
-- norm_type:
-- norm_type=1 not available for ttclass
-- norm_type=inf not available for ttclass
-- norm_type=2 not available for ttclass
-- norm_type='fro' returns the Frobenius norm
-- ttnorm -a positive real number
-- Note: only Frobenius norm is currently available for tensor trains;
-- other norm types raise errors.
-- Compute the norm
+- For `'fro'`, call `pack`, then `ttort` with direction `-1`, and evaluate the scaled 2-norm of the first core.
+- Raise an error for the unsupported 1-, infinity-, and 2-norm cases.

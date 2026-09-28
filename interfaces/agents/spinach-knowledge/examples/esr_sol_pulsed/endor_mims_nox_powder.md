@@ -8,24 +8,16 @@ Mims ENDOR simulation for a nitroxide radical powder. Ideal hard pulses are assu
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The spin system contains an electron and 14N at 3.5 T. The electron g matrix has diagonal values 2.01045, 2.00641, and 2.00211; the source specifies an electron–nitrogen coupling matrix.
+- Powder averaging uses `rep_2ang_12800pts_sph`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The sequence uses 128 points, a 3e8 sweep parameter, a 100 ns interpulse delay, and 512-point zero filling.
+- The signal is mean-subtracted, exponentially apodised with parameter 6, then Fourier transformed and FFT-shifted.
 
 ## Implementation structure
 
-- Mims ENDOR simulation for a nitroxide radical powder. Ideal
-- hard pulses are assumed.
-- Calculation time: seconds.
-- Isotopes
-- Magnet field
-- Interactions
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Crude apodisation
+- Create the spin system in the `sphten-liouv` basis without approximation, with trajectory-level SSR disabled.
+- Run `powder` with `@endor_mims` in the `esr` context.
+- Plot the real spectrum against nuclear frequency in MHz.

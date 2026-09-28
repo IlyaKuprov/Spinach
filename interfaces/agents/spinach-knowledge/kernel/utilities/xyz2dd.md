@@ -2,47 +2,23 @@
 
 - Signature: `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,isotope2)`
 
-## Purpose
+Converts two spin coordinates and their isotope specifications into a dipolar coupling constant, three Euler angles, and, if requested, a dipolar interaction tensor.
 
-Converts coordinate specification of the dipolar interaction into the dipolar interaction constant, three Euler angles, and the dipolar interaction matrix. Syntax: [d,alp,bet,gam,m]=xyz2dd(r1,r2,isotope1,isotope2)
+## Inputs
 
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- r1,2 -3-element vectors of spin coordinates
-- in Angstroms
-- isotope1,2 -isotope specification strings, e.g.
-- '13C'.
+- `r1`, `r2`: Three-element real coordinate vectors of the same dimensions, in ångströms. The coordinates must differ.
+- `isotope1`, `isotope2`: Isotope specification character strings, such as `'13C'`.
 
 ## Outputs
 
-- d -dipolar coupling constant, rad/s
-- alp -alpha Euler angle, radians
-- bet -beta Euler angle, radians
-- gam -gamma Euler angle, radians
-- M -dipolar interaction tensor, rad/s
-- N.B. Euler angles are not uniquely defined for the orientati-
-- on of axial interactions (gamma angle can be anything).
-- N.B. free-particle magnetogyric ratios are used, use xyz2hfc.m
-- if you have electrons in the system.
+- `d`: Dipolar coupling constant, in rad/s.
+- `alp`, `bet`, `gam`: Euler angles, in radians. For this axial interaction, the angles are not unique; the function sets `gam=0`.
+- `M`: Dipolar interaction tensor, in rad/s, computed when requested as a fifth output.
 
-## Implementation structure
+## Calculation
 
-- Converts coordinate specification of the dipolar interaction
-- into the dipolar interaction constant, three Euler angles,
-- and the dipolar interaction matrix. Syntax:
-- [d,alp,bet,gam,m]=xyz2dd(r1,r2,isotope1,isotope2)
-- r1,2 -3-element vectors of spin coordinates
-- in Angstroms
-- isotope1,2 -isotope specification strings, e.g.
-- '13C'.
-- d -dipolar coupling constant, rad/s
-- alp -alpha Euler angle, radians
-- bet -beta Euler angle, radians
-- gam -gamma Euler angle, radians
+The function uses the separation `distance=norm(r2-r1,2)` and unit direction `ort=(r2-r1)/distance`. It computes `d` from the product of the isotope magnetogyric ratios returned by `spin`, `hbar`, `mu0`, and the inverse cube of the separation converted from ångströms to metres. The direction determines `alp` and `bet`; `gam` is set to zero. When requested, the tensor is `M=d*(eye(3)-3*ort(:)*ort(:)')`, then symmetrized and made traceless to remove rounding errors.
+
+Free-particle magnetogyric ratios are used. For systems containing electrons, use `xyz2hfc.m` instead.
+
+[Source page](https://spindynamics.org/wiki/index.php?title=xyz2dd.m)

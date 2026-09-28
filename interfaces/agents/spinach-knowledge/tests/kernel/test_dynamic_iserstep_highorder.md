@@ -4,32 +4,14 @@
 
 ## Purpose
 
-Tests nonlinear high-order iserstep branches. Syntax: result=test_dynamic_iserstep_highorder()
-
-## Physical / mathematical content
+Regression test of high-order `iserstep` branches on a one-proton Zeeman-Hilbert fixture with a coherent 2×2 density matrix and a nonlinear, non-commuting Hamiltonian.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Uses `dt=5e-3`; the zero-time `LG4A` result is checked against the input state at `1e-15` tolerance.
+- Compares `LG4A`, `RKMK4`, `RKMK-DP5`, `RKMK-DP8`, and `RKMK-RKF45` with a reference formed from two `RKMK-DP8` half-steps; branch comparison tolerances range from `5e-8` to `5e-10`.
+- Checks trace and Hermiticity to `1e-12`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks zero-step handling, nonlinear generator execution, and
-- agreement of high-order Lie and RKMK branches against a refined DP8
-- reference on a compact Hilbert-space problem.
-
-## Implementation structure
-
-- Tests nonlinear high-order iserstep branches. Syntax:
-- result=test_dynamic_iserstep_highorder()
-- result -regression test result with explanatory messages
-- The test checks zero-step handling, nonlinear generator execution, and
-- agreement of high-order Lie and RKMK branches against a refined DP8
-- reference on a compact Hilbert-space problem.
-- Announce the test target
-- State the nonlinear Lie-step target of the test
-- Build a one-proton Hilbert-space spin system
-- Build a Hermitian density matrix with non-zero coherences
-- Define a mildly nonlinear, non-commuting Hamiltonian field
-- Check the explicit zero-time shortcut in LG4A
+- `result` — regression-test result with explanatory messages.

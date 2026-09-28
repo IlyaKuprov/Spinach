@@ -4,28 +4,12 @@
 
 ## Purpose
 
-HMQC spectrum of strychnine with natural content of 13C isotope. Calculation time: minutes
+Simulates an HMQC spectrum of strychnine at natural 13C abundance. Calculation time: minutes.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HMQC spectrum of strychnine with natural content of 13C isotope.
-- Calculation time: minutes
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Loads the `13C`/`1H` strychnine spin system and sets the magnetic field to 5.9, with `greedy` enabled and a proximity cutoff of 4.0.
+- Uses a `sphten-liouv` basis with `IK-2` approximation, scalar-coupling connectivity, and proximity level 1.
+- Sets J to 140, sweeps to `[10000 3000]`, offsets to `[4000 1000]`, acquisition points to `[256 256]`, and zero filling to `[512 512]`; uses ppm axes and decouples `13C` in F2 and `1H` in F1.
+- Generates `13C` isotopomers with `dilute`, simulates each with `liquid(...,@hmqc,...,'nmr')` in a `parfor` loop, applies cosine apodisation in both dimensions, and sums the shifted 2D Fourier transforms.
+- Plots the magnitude spectrum with `plot_2d`.

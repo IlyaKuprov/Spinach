@@ -4,31 +4,23 @@
 
 ## Purpose
 
-A template file for the "magic pulse" optimisations. The term refers to a family of broadband NMR pulses that are tolerant to resonance offsets and power calibration errors: Consider a 13C 90-degree excitation pulse in a 28.18 Tesla magnet. The pulse must uniformly excite a bandwidth of around 200 ppm (60 kHz) and must be short enough for the worst-case 13C-1H J-coupling (ca. 200 Hz) to be negligible. The latter requ
+A template for optimising a broadband ¹³C 90-degree “magic pulse” that tolerates resonance offsets and RF power calibration errors. See [the cited magic-pulse paper](http://dx.doi.org/10.1016/j.jmr.2005.12.010).
+
+At 28.18 T, the pulse is intended to excite approximately 200 ppm (60 kHz) uniformly. To make the worst-case ¹³C–¹H J-coupling (about 200 Hz) negligible, its duration is capped at `1/(100*J) = 50 µs`. The required transfers are `{Lz → Lx, Ly → Ly, Lx → −Lz}`; the anticipated nutation-frequency range across the RF coil is 50–70 kHz. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The example models 100 non-interacting ¹³C spins at equally spaced chemical shifts from −100 to +100 ppm. It uses a spherical-tensor Liouville-space basis with `IK-2` approximation, proximity level 1, and scalar-coupling connectivity. The `Lx`, `Ly`, and `Lz` starting states are normalised before optimisation; their targets are `−Lz`, `Ly`, and `Lx`, respectively.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Cartesian RF controls use the `Lx` and `Ly` operators, mapped to the ¹³C channel. The pulse has 40 intervals of 1 µs each, with ten power levels spanning `2π × 50–70 kHz`.
+- GRAPE optimisation calls `fmaxnewton` with `@grape_xy` and the `lbfgs` method. The initial guess is a `2 × 40` array of `1/4`; penalties `NS` and `SNS` have weights `0.01` and `10.0`, and the iteration limit is 200. Requested plots are `xy_controls`, `robustness`, and `spectrogram`.
+- The optimised profile is scaled by the mean power level and simulated as an XY-shaped pulse using `expv-pwc`. A ¹³C free induction decay is acquired with a 70,000 Hz sweep, 2,048 points, and 16,384-point zero filling; Gaussian apodisation with parameter 10 precedes the Fourier transform. The real spectrum is plotted on an inverted ppm axis.
+- For comparison, the script simulates and plots a conventional hard pulse at zero offset, phase `π/2`, power `2π × 60 kHz`, duration `4.2 µs`, rank 3, and `expv` propagation, using the same acquisition and spectral processing.
 
 ## Implementation structure
 
-- A template file for the "magic pulse" optimisations. The term refers to
-- a family of broadband NMR pulses that are tolerant to resonance offsets
-- and power calibration errors:
-- Consider a 13C 90-degree excitation pulse in a 28.18 Tesla magnet. The
-- pulse must uniformly excite a bandwidth of around 200 ppm (60 kHz) and
-- must be short enough for the worst-case 13C-1H J-coupling (ca. 200 Hz)
-- to be negligible. The latter requirement caps the duration at 1/100*J
-- = 50 us. The pulse must accomplish the following transfers: {Lz -> Lx,
-- Ly -> Ly, Lx -> -Lz}. A realistically achievable nutation frequency is
-- between 50 kHz and 70 kHz across the RF coil.
-- Calculation time: minutes.
-- Set the magnetic field
+The function sets up the spin system and basis, constructs states and control operators, configures the optimisation, extracts the Cartesian waveform, and compares simulated spectra from the optimised and conventional pulses.
+
+Source contacts: ilya.kuprov@weizmann.ac.il; david.goodwin@inano.au.dk.

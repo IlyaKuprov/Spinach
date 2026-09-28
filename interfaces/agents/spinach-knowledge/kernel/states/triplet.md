@@ -4,40 +4,25 @@
 
 ## Purpose
 
-Returns the components of the two-spin triplet state; both particles must be spin-1/2. Syntax: [Tp,T0,Tm]=triplet(spin_system,spin_a,spin_b)
+Returns the three components of the two-spin triplet state for two distinct spin-1/2 particles. Syntax: `[TU,T0,TD]=triplet(spin_system,spin_a,spin_b)`.
 
 ## Physical / mathematical content
 
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
+The routine constructs the triplet projectors from identity and spin operators on the selected pair: `TU=EE/4+(ZE+EZ)/2+ZZ`, `T0=EE/4+XX+YY-ZZ`, and `TD=EE/4-(ZE+EZ)/2+ZZ`. Here the component operators are formed using `state` with `E`, `Lx`, `Ly`, and `Lz`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Checks that the spin indices are distinct positive integers within the system and that both selected spins have multiplicity 2, then builds the three component operators and triplet states.
 
 ## Parameters / inputs
 
-- spin_a -the number of the first spin in the
-- triplet state
-- spin_b -the number of the second spin in the
-- triplet state
+- `spin_a` - number of the first spin in the triplet state.
+- `spin_b` - number of the second spin in the triplet state.
 
 ## Outputs
 
-- TU,T0,TD -density matrices (Hilbert space) or
-- state vectors (Liouville space) of
-- TU, T0, and TD projections
+- `TU`, `T0`, `TD` - density matrices in Hilbert space or state vectors in Liouville space for the three triplet projections.
 
 ## Implementation structure
 
-- Returns the components of the two-spin triplet state; both particles
-- must be spin-1/2. Syntax:
-- [Tp,T0,Tm]=triplet(spin_system,spin_a,spin_b)
-- spin_a -the number of the first spin in the
-- triplet state
-- spin_b -the number of the second spin in the
-- TU,T0,TD -density matrices (Hilbert space) or
-- state vectors (Liouville space) of
-- TU, T0, and TD projections
-- Check consistency
-- Build the component operators
-- Build the triplet states
+- Enforces input consistency, constructs the pair operators, then returns the up, middle, and down triplet components.

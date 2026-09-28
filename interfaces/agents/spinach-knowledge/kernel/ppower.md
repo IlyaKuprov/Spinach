@@ -4,37 +4,24 @@
 
 ## Purpose
 
-Computes integer propagator powers via an efficient powers-of-two based strategy. Syntax: P=ppower(spin_system,P,N)
+Raises the propagator matrix `P` to a non-negative integer power `N`. The implementation processes the binary digits of `N`, multiplying only the powers corresponding to set bits.
 
-## Physical / mathematical content
+## Mathematical and numerical behaviour
 
-## Numerical / algorithmic content
+For `N=0`, the result is the identity matrix; for `N=1`, the input propagator is returned unchanged. For larger powers, repeated squaring builds the required powers of `P`, and an accumulator combines the terms selected by the binary expansion of `N`. Each accumulator multiplication and required squaring is passed through `clean_up` with `spin_system.tols.prop_chop`. Sparse inputs use a sparse identity; otherwise the identity is created with the input matrix's numeric type.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system object
-- P -propagator matrix
-- N -non-negative integer propagator power
+- `spin_system` — Spinach spin system structure; it must contain a non-negative real scalar `spin_system.tols.prop_chop`.
+- `P` — square numeric propagator matrix.
+- `N` — non-negative real integer power, supplied as a scalar. Non-integer numeric inputs are limited to `flintmax` before conversion to `uint64`.
 
-## Outputs
+## Output
 
-- P -propagator matrix raised to the power of N
-- Note: the algorithm expands N into binary powers, squares P succes-
-- sively, and multiplies only the active powers into the result.
-- This avoids explicit repeated multiplication. Propagator pow-
-- ers are cleaned up using spin_system.tols.prop_chop.
+- `P` — propagator matrix raised to the power `N`; the zero-power result is an identity matrix.
 
-## Implementation structure
+The routine checks the spin-system tolerance, matrix shape, and power argument before computing (except that the implementation's `N=1` shortcut follows those checks).
 
-- Computes integer propagator powers via an efficient powers-of-two
-- based strategy. Syntax:
-- P=ppower(spin_system,P,N)
-- spin_system -Spinach spin system object
-- P -propagator matrix
-- N -non-negative integer propagator power
-- P -propagator matrix raised to the power of N
-- Note: the algorithm expands N into binary powers, squares P succes-
-- sively, and multiplies only the active powers into the result.
-- This avoids explicit repeated multiplication. Propagator pow-
-- ers are cleaned up using spin_system.tols.prop_chop.
-- Check consistency
+## Reference
+
+[Spin Dynamics Wiki: `ppower.m`](https://spindynamics.org/wiki/index.php?title=ppower.m)

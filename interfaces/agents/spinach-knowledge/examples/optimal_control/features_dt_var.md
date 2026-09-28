@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is Z-magneti- sation on 19F. There are six control channels, the time slice duration is not uniform, and there is a distribution over control powers. Calculation time: minutes.
+Demonstrates optimal-control pulse design with nonuniform time slices and RF-power robustness. It optimises a shaped pulse for the stated state-transfer task and checks the result by propagating the pulse.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The spin system contains 1H, 13C, and 19F channels, with x- and y-phase controls on each nucleus. The objective includes a state-norm (SNS) penalty and is evaluated over five RF-power levels.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The 50 pulse slices have nonuniform durations. The source uses the lbfgs method with grape_xy gradients through fmaxnewton, and then validates the optimised waveform with shaped_pulse_xy.
 
 ## Implementation structure
 
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is Z-magneti-
-- sation on 19F. There are six control channels, the time slice duration
-- is not uniform, and there is a distribution over control powers.
-- Calculation time: minutes.
-- Magnetic field
-- Spin system
-- Chemical shifts, ppm
-- Scalar couplings, Hz (literature values)
-- Basis set
-- Spinach housekeeping
+The code constructs and normalises the initial and target states, generates an initial control guess, and optimises six x/y controls over the five-point RF-power ensemble with an SNS penalty. It then rescales and propagates the waveform using shaped_pulse_xy and reports the fidelity. The pulse has 50 nonuniform time slices.

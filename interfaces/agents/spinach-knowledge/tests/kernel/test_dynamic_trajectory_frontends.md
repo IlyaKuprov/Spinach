@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Tests trajectory-analysis dynamic front-end kernels. Syntax: result=test_dynamic_trajectory_frontends()
+Regression tests for dynamic-trajectory comparison frontends.
 
-## Physical / mathematical content
+## Tests
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Constructs test trajectory data directly from `unit_state()` and `state()` calls; the suite does not propagate dynamics.
+- Checks trajectory views for coherence order, per-spin components, and level populations, including explicit time-axis handling.
+- Checks `trajsimil()` on the constructed trajectories.
 
 ## Outputs
 
 - result -regression test result with explanatory messages
 - The test exercises trajan() plotting branches and trajsimil() scoring
 - branches on a compact two-spin spherical-tensor trajectory.
-
-## Implementation structure
-
-- Tests trajectory-analysis dynamic front-end kernels. Syntax:
-- result=test_dynamic_trajectory_frontends()
-- result -regression test result with explanatory messages
-- The test exercises trajan() plotting branches and trajsimil() scoring
-- branches on a compact two-spin spherical-tensor trajectory.
-- Announce the test target
-- State the dynamic trajectory target of the test
-- Force invisible figures during plotting checks
-- Build the trajectory used by plotting and similarity checks
-- Check all trajan() property branches
-- Check all trajsimil() scoring families
-- Check correlation-order analysis with an explicit time axis

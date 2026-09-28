@@ -4,33 +4,25 @@
 
 ## Purpose
 
-Kronecker symbol. Syntax: d=krondelta(a,b)
+Return the Kronecker delta for two integer arguments.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function implements the discrete equality indicator: it is one when the arguments are equal and zero otherwise, returned as a logical value.
 
 ## Numerical / algorithmic content
 
+The arguments are checked as real integer scalars. Equality determines the Boolean result.
+
 ## Parameters / inputs
 
-- a -an integer number
-- b -an integer number
+- `a` - real integer scalar.
+- `b` - real integer scalar.
 
 ## Outputs
 
-- d -a logical number
+- `d` - logical scalar, true when `a` equals `b` and false otherwise.
 
 ## Implementation structure
 
-- Kronecker symbol. Syntax:
-- d=krondelta(a,b)
-- a -an integer number
-- b -an integer number
-- d -a logical number
-- Check consistency
-- Compute the answer
-- Consistency enforcement
-- Die ganzen Zahlen hat der liebe Gott gemacht,
-- alles andere ist Menschenwerk.
-- Leopold Kronecker
+After input validation, the function assigns `true()` if `a==b` and `false()` otherwise.

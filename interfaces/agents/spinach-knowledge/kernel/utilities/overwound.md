@@ -4,44 +4,21 @@
 
 ## Purpose
 
-Checks if a Fokker-Planck state vector has any spatial frequencies that its spatial grid is dangerously close to misrepresenting due to insufficient point count. Syntax: overwound(rho,spc_dim,spn_dim)
+Checks whether a Fokker–Planck state vector contains spatial frequencies that its grid is dangerously close to misrepresenting because it has too few points.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `rho` — Fokker–Planck state vector or a bookshelf stack of state vectors. It must be a numeric array with `prod([spn_dim spc_dim])` rows; its columns form the stack.
+- `spc_dim` — spatial dimensions `[X Y Z]`, specified as three positive integers.
+- `spn_dim` — spin dimension, specified as a positive integer.
 
-## Numerical / algorithmic content
+## Diagnostics
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The function checks input consistency, then examines each spatial dimension whose point count exceeds one. An examined dimension with fewer than 10 points produces an error requesting a higher point count in that dimension. Otherwise, the function applies `fft` and `fftshift` along that dimension, sums the absolute Fourier amplitudes over the remaining dimensions and stack, and plots the result. Each plot has a spatial-frequency axis relative to the Nyquist limit, running from `-1` to `1`, and a population-density axis in arbitrary units. Output consists of figures and diagnostic messages to the console; the function has no return value.
 
-## Parameters / inputs
+For spatial dynamics such as diffusion and flow with finite-difference derivative operators, set the spatial grid point count to several times the minimum Nyquist value.
 
-- rho -Fokker-Planck state vector or
-- a bookshelf stack thereof
-- spc_dim -spatial dimensions of the Fokker-
-- Planck problem, [X Y Z]
-- spn_dim -spin dimension of the Fokker-
-- Planck problem
-- Output:
-- figures and diagnostic messages to the console
-- Note: if you are running spatial dynamics, such as diffusion and
-- and flow, with finite difference derivative operators, the
-- spatial grid point count shuld be set to several times the
-- minimum Nyquist value.
+## Reference
 
-## Implementation structure
-
-- Checks if a Fokker-Planck state vector has any spatial frequencies
-- that its spatial grid is dangerously close to misrepresenting due
-- to insufficient point count. Syntax:
-- overwound(rho,spc_dim,spn_dim)
-- rho -Fokker-Planck state vector or
-- a bookshelf stack thereof
-- spc_dim -spatial dimensions of the Fokker-
-- Planck problem, [X Y Z]
-- spn_dim -spin dimension of the Fokker-
-- Planck problem
-- Output:
-- figures and diagnostic messages to the console
+- [Spin Dynamics: overwound.m](https://spindynamics.org/wiki/index.php?title=overwound.m)
+- Contact: ilya.kuprov@weizmann.ac.il

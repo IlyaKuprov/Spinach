@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Nuclear overhauser effect in a heteronuclear two-spin system in the short correlation time case. Calculation time: seconds
+Nuclear Overhauser effect in a heteronuclear two-spin system in the short correlation time case. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- The model contains one proton and one carbon-13 spin, separated by 1.03 Å, with zero isotropic Zeeman offsets. Redfield relaxation uses a 100 ps correlation time, 298 K, and the Di Bari equilibrium convention.
+- The initial density operator is thermal equilibrium with the proton spin inverted. The calculation tracks the longitudinal magnetization of both spins, showing their NOE relaxation response.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The calculation uses the full spherical-tensor Liouville basis (no basis approximation) and retains the Redfield relaxation terms with the kite selection.
+- The relaxation-only evolution is sampled every 0.01 s for 400 intervals, covering 0–4 s.
 
 ## Implementation structure
 
-- Nuclear overhauser effect in a heteronuclear two-spin system in
-- the short correlation time case.
-- Calculation time: seconds
-- Set the spin system
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Spinach housekeeping
-- Build the relaxation superoperator
-- Get thermal equilibrium state
-- Start in a state with proton spin inverted
-- Compute the evolution trajectory
+- Create the H-1/C-13 system at 14.1 T, construct the basis and Redfield superoperator, and calculate thermal equilibrium.
+- Invert the proton's `Lz` component, then call multichannel evolution with both spins' `Lz` operators as detection channels; plot and label the proton and carbon longitudinal signals.

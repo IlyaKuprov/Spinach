@@ -4,33 +4,25 @@
 
 ## Purpose
 
-Prints atomic coordinate summary for a Spinach system. Syntax: summary_coordinates(spin_system,header)
+Prints a table of the atomic coordinates stored in the spin-system structure.
 
 ## Physical / mathematical content
 
+For each spin, the table reports the three coordinate components from `spin_system.inter.coordinates`, together with the spin index, isotope, and label. The function reports stored coordinates; it does not compute them.
+
 ## Numerical / algorithmic content
+
+After checking that `spin_system` is a structure and `header` is a character string, the function sends the heading and table through `report`. It iterates over `spin_system.comp.nspins`; coordinate components are formatted to three decimal places.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- spin_system - Spinach spin system description object
+- header - a string of text to precede the summary
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints to the console or to the user-specified output via `report.m`.
 
 ## Implementation structure
 
-- Prints atomic coordinate summary for a Spinach system. Syntax:
-- summary_coordinates(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the coordinate table
-- Consistency enforcement
-- If I asked the public what they wanted, they would
-- say "a faster horse".
-- Henry Ford
+The routine validates its two inputs, prints the column headings, then emits one row per spin using its isotope, three stored coordinate components, and label.

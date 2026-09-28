@@ -4,30 +4,13 @@
 
 ## Purpose
 
-Blicharski's relaxation theory invariants, as given by Equations 20-21 in http://doi.org/10.1515/zna-1972-1012, with an error and a typo corrected in Equation 21. Syntax: [Lsq,Dsq]=blinv(A) where A is the interaction matrix. This function is not sensitive to the trace of the matrix. Parameters: A -a real 3x3 matrix
+Compute Blicharski's relaxation-theory invariants from the interaction matrix `A`, following Equations 20-21 in http://doi.org/10.1515/zna-1972-1012. The source notes that an error and a typo in Equation 21 have been corrected and that the function is insensitive to the trace of `A`.
 
-## Physical / mathematical content
+## Parameters / inputs
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+- `A` - real 3-by-3 interaction matrix.
 
 ## Outputs
 
-- Lsq -first rank invariant
-- Dsq -second rank invariant
-
-## Implementation structure
-
-- Blicharski's relaxation theory invariants, as given by Equations
-- 20-21 in http://doi.org/10.1515/zna-1972-1012, with an error and
-- a typo corrected in Equation 21. Syntax:
-- [Lsq,Dsq]=blinv(A)
-- where A is the interaction matrix. This function is not sensitive
-- to the trace of the matrix. Parameters:
-- A - a real 3x3 matrix
-- Lsq - first rank invariant
-- Dsq - second rank invariant
-- Check consistency
-- First rank invariant
-- Second rank invariant
+- `Lsq` - first-rank invariant, calculated as `(A12-A21)^2+(A13-A31)^2+(A23-A32)^2`.
+- `Dsq` - second-rank invariant, calculated as `A11^2+A22^2+A33^2-A11*A22-A11*A33-A22*A33+(3/4)*((A12+A21)^2+(A13+A31)^2+(A23+A32)^2)`.

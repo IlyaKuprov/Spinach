@@ -4,35 +4,26 @@
 
 ## Purpose
 
-This subroutine packs all trains from the addition buffer into a single tensor train, but does not perform the recom- pression. Normally you should not call it directly, use ttclass/shrink.m instead. Syntax: ttout=pack(tt)
+Packs the trains in the addition buffer into one tensor train without recompressing it. The source advises using `ttclass/shrink.m` rather than calling this function directly in normal use.
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+The output combines the buffered summands into a single train whose bond dimensions are the sums of the corresponding ranks. The coefficients are incorporated into the first core; no recompression is performed.
 
 ## Numerical / algorithmic content
 
+If there is only one buffered train, the function returns the input unchanged. Otherwise it allocates cores for the summed ranks and copies the buffered cores into the corresponding rank blocks.
+
 ## Parameters / inputs
 
-- tt -tensor train object with unprocessed additions
+- tt - tensor train object with unprocessed additions
 
 ## Outputs
 
-- ttout -tensor train with additions buffer absorbed
-- into the cores of the tensor, but not re-
-- compressed
+- ttout - tensor train with the additions buffer absorbed into its cores, but not recompressed
 
 ## Implementation structure
 
-- This subroutine packs all trains from the addition buffer
-- into a single tensor train, but does not perform the recom-
-- pression. Normally you should not call it directly, use
-- ttclass/shrink.m instead. Syntax:
-- ttout=pack(tt)
-- tt - tensor train object with unprocessed additions
-- ttout -tensor train with additions buffer absorbed
-- into the cores of the tensor, but not re-
-- compressed
-- Read tensor ranks and dimensions
-- Fast return if possible
-- Total rank of all summands
+- Read the train sizes and ranks; return immediately when there is one train.
+- Sum the ranks across buffered trains and allocate the combined cores.
+- Collect the buffered trains into the single output train.

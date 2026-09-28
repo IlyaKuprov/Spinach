@@ -45,5 +45,5 @@ Two-pulse echo-detected frequency-swept experiment, static or under magic angle 
 
 - The elements of the rotor stack must commute with the `Lz` operator of the pulsed spin, as they do for an electron under the `'esr'` assumption set, because the carrier offset is applied as a separate propagator and only the pulse propagators are rebuilt at each carrier offset.
 - The rotor stack is a table of the Hamiltonian against the rotor phase; its resolution should match the time step at the fastest spinning rate used, `parameters.max_rank` of the context function of about `1/(2*abs(rate)*timestep)` at that rate. A finer stack costs propagators without gaining accuracy beyond the time step, a coarser one loses rotor phase resolution; at slower rates consecutive steps reuse elements.
-- The sequence is not restricted to electrons: `parameters.spins` names the spin that is pulsed and whose coherence pathway is selected, so a nuclear two-pulse echo is obtained by naming the nucleus.
+- `parameters.spins` selects the pulsed spin; it need not be an electron, but the supplied Hamiltonian stack must satisfy the commutation condition above.
 - Used by `examples/esr_sol_pulsed/mas_diamond_p1.m` through `singlerot()` in the `zeeman-hilb` formalism.

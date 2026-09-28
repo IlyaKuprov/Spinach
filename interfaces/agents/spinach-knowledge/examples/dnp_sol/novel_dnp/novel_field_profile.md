@@ -4,27 +4,18 @@
 
 ## Purpose
 
-Field profile of a NOVEL DNP experiment. <I_z> on 1H after a 0.25 us contact time is calculated as a function of electron pulse amplitude and offset. Further information in: Calculation time: seconds.
+Calculates the field profile of a NOVEL DNP experiment: the proton (I_z) expectation value after a 0.25 μs contact period, as a function of electron-pulse resonance offset. The source cites [doi:10.1063/1.5000528](https://doi.org/10.1063/1.5000528) and estimates the calculation time as seconds.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- The system contains one electron and two protons at 0.34 T and 80 K, with the same trityl-like electron g-tensor and proton Zeeman guesses as the companion NOVEL examples. The source specifies coordinates ([0,0,0]), ([0,3.5,0]), and ([2.475,2.475,0]).
+- Each simulated contact sequence has 250 steps of 1 ns, a fixed electron nutation frequency of 14.48 MHz, and a `rep_2ang_100pts_sph` powder grid.
+- The scan evaluates 71 offsets from -35 to +35 MHz, added to a -3.3 MHz reference point. At each offset the plotted datum is the final proton (I_z) expectation value.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Uses a full Zeeman-Hilbert basis and the `noveldnp` sequence through `powder` in ESR mode. A `parfor` loop independently simulates each microwave offset; the script then plots the real final-time signal against offset in MHz. Output is hushed during the calculation.
 
 ## Implementation structure
 
-- Field profile of a NOVEL DNP experiment. <I_z> on 1H after a
-- 0.25 us contact time is calculated as a function of electron
-- pulse amplitude and offset. Further information in:
-- Calculation time: seconds.
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Hush the output
-- Basis set
-- Spinach housekeeping
+The function builds the electron/two-proton system and basis, configures proton detection and the NOVEL pulse, time-step, and powder-grid parameters, loops over the frequency offsets while setting each local parameter structure's offset, extracts the final signal point, and plots the field profile.

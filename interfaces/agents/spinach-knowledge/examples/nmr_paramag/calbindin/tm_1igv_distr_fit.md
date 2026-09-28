@@ -4,22 +4,10 @@
 
 ## Purpose
 
-Inverse problem for the unpaired electron density distribution. Experimental data from Gottfried Ott- ing (Australian National University).
+Reconstructs a spatial distribution of unpaired-electron density from experimental pseudocontact shifts (PCS). The source credits the experimental data to Gottfried Otting (Australian National University).
 
-## Physical / mathematical content
+## Numerical and implementation details
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+The script loads the processed 1IGV PDB, PCS coordinates and measurements from `tm_1igv_pcs.mat`, and susceptibility tensor `chi` from `tm_1igv_chi_eff.mat`. It configures `ipcs` with equation `kuprov`, a box centred at [3.5, 17.0, 16.1] with size [7, 7, 7], margins 50, confinement [1, 3], sharpening 2000, the measured PCS and coordinates, and GPU execution enabled.
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Inverse problem for the unpaired electron density
-- distribution. Experimental data from Gottfried Ott-
-- ing (Australian National University).
-- Load the pdb file
-- Load experimental data
-- Load susceptibility tensor
-- Inverse solver parameters
-- Iteratively refine the grid
-- Get the new susceptibility tensor
+It refines the source-density grid at 64, 128, 256 and 384, passing regularization value 0.34 and carrying each reconstructed cube forward as the next guess. Finally it obtains an updated susceptibility tensor with `chi_eff`, displays it and saves it to `tm_1igv_chi_eff.mat`.

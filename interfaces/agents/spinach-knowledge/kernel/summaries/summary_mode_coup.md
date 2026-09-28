@@ -4,33 +4,25 @@
 
 ## Purpose
 
-Prints bosonic mode coupling summary for a Spinach system. This covers mode-mode exchange couplings, cross-Kerr couplings, spin- mode exchange couplings, longitudinal and radiation pressure couplings, and dispersive couplings. Syntax: summary_mode_coup(spin_system,header)
+Prints the bosonic-mode coupling terms stored in a Spinach spin system.
 
 ## Physical / mathematical content
 
+The table distinguishes mode-mode exchange, cross-Kerr, longitudinal, and dispersive couplings. Longitudinal entries involving only component types C, V, and T are labelled radiation-pressure couplings; other longitudinal entries retain the longitudinal label. Spin-mode exchange is included in the documented scope, but this routine reports entries from the mode-coupling matrices shown below.
+
 ## Numerical / algorithmic content
+
+The function scans the exchange, Kerr, longitudinal, and dispersive coupling arrays for nonempty entries. Each amplitude is divided by `2*pi` and displayed in Hz. It checks that `spin_system` is a structure and `header` is a character string.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- spin_system - Spinach spin system description object
+- header - a string of text to precede the summary
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints a coupling table through `report.m` to the console or user-specified output.
 
 ## Implementation structure
 
-- Prints bosonic mode coupling summary for a Spinach system. This
-- covers mode-mode exchange couplings, cross-Kerr couplings, spin-
-- mode exchange couplings, longitudinal and radiation pressure
-- couplings, and dispersive couplings. Syntax:
-- summary_mode_coup(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the summary table
-- Print exchange couplings
+After input validation and table headings, the routine loops over nonempty entries in each coupling array and prints the component indices, coupling type, and amplitude in Hz.

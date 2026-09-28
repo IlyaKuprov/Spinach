@@ -4,28 +4,18 @@
 
 ## Purpose
 
-GRAPE Hessian test against finite-differenced gradients.
+Check the analytical Cartesian GRAPE Hessian against finite-differenced gradients.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The test checks selected Hessian columns for a five-interval Cartesian waveform in the `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms.
 
 ## Numerical / algorithmic content
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+Each numerical column is formed by a centered difference of GRAPE gradients with increment `sqrt(eps('double'))`. The leftmost, middle, and rightmost columns are checked using a relative 1-norm tolerance of `1e-6`, scaled by the corresponding numerical column norm.
 
 ## Implementation structure
 
-- GRAPE Hessian test against finite-differenced gradients.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Spinach housekeeping
-- Random guess and finite diff increment
-- Call GRAPE and request analytical Hessian
-- Leftmost Hessian column
-- Rightmost Hessian column
-- Middle Hessian column
+- Configure the rectangular-integrator, Newton-method GRAPE control system and obtain the analytical Hessian from `grape_xy`.
+- Perturb waveform coordinates 1, 3, and 10 in turn, evaluate gradients at both perturbed waveforms, and form the corresponding numerical Hessian columns.
+- Compare those columns with the analytical Hessian and raise an error if any comparison exceeds tolerance.

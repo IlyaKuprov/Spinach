@@ -4,27 +4,18 @@
 
 ## Purpose
 
-Hartmann-Hahn matching condition test for a cross-polarisation experiment between a proton and a 15N nucleus. The experiment is run with low power on the 15N nucleus, showing matching con- dition reflections with the opposite phase. Calculation time: seconds
+Sweeps proton spin-lock power to test the Hartmann–Hahn matching condition for ¹H–¹⁵N cross-polarisation with a low-power ¹⁵N spin lock. The source describes matching-condition reflections with opposite phase and estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
+The two-spin model uses the specified isotropic shifts and coordinates under a 10 kHz MAS rate. The simulation starts from ¹H transverse magnetisation, scans ¹H power from 0 to 30 kHz while holding ¹⁵N power at 1 kHz, and records the final ¹⁵N signal.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The full `sphten-liouv` basis is used. With MAS axis `[sqrt(2/3) 0 sqrt(1/3)]`, fifty power points are evaluated in a `parfor` loop with `singlerot` and `@cp_contact_hard`; each run uses `max_rank=3`, the `rep_2ang_200pts_oct` grid, and ten 40 μs steps. The plotted signal is the real part of the final FID point.
 
 ## Implementation structure
 
-- Hartmann-Hahn matching condition test for a cross-polarisation
-- experiment between a proton and a 15N nucleus. The experiment
-- is run with low power on the 15N nucleus, showing matching con-
-- dition reflections with the opposite phase.
-- Calculation time: seconds
-- System specification
-- Interactions
-- Basis set
-- Spinach housekeeping
-- Relevant operators
-- Power levels
-- Experiment parameters
+- Defines the two-spin model and constructs the basis and transverse operators.
+- Sets MAS and CP parameters, the ¹H initial state, ¹⁵N coil, time grid, and powder grid.
+- Performs the parallel proton-power sweep with the ¹⁵N power fixed at 1 kHz, then plots the ¹⁵N signal.

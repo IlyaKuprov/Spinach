@@ -4,33 +4,17 @@
 
 ## Purpose
 
-Prints permutation-symmetry summary for a Spinach system. Syntax: summary_symmetry(spin_system,header)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Prints the permutation-symmetry groups and their associated spins from a Spinach system.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- `spin_system` - Spinach spin system structure.
+- `header` - character string printed before the table.
 
-## Outputs
+## Output
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+No MATLAB output argument; writes the header and table through `report`.
 
-## Implementation structure
+## Behavior
 
-- Prints permutation-symmetry summary for a Spinach system. Syntax:
-- summary_symmetry(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the symmetry table
-- Consistency enforcement
-- He was clumsy to the point of hamfistedness. After
-- 20 attempts he was asked to stop taking the driving
-- test, having crashed the car, with the frazzled exa-
+The function checks that `spin_system` is a structure and `header` is a character string. It iterates over `spin_system.comp.sym_spins` and prints each corresponding entry from `spin_system.comp.sym_group` alongside its spin list.

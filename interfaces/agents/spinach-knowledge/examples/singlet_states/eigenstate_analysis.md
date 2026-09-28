@@ -8,24 +8,12 @@ Stationary state analysis for the spin system of allyl pyruvate, finding out whi
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+For allyl pyruvate at 14.1 T, the analysis tests which part of the singlet state on spins 3 and 4 commutes with the drift Hamiltonian, then repeats with a 2850 offset and a 1 kHz 1H spin-lock.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+Each pass diagonalizes the Hermitian Hamiltonian, removes noncommuting and unit components from the singlet state, projects out the normalized Lz–Lz component, and reports the remaining norms.
 
 ## Implementation structure
 
-- Stationary state analysis for the spin system of allyl pyruvate,
-- finding out which component of the singlet state commutes with
-- the drift Hamiltonian.
-- Get the spin system from Anu's fits
-- Set the magnet
-- Spinach housekeeping
-- Pick out the required 13C isotopomer
-- Generate the basis
-- Get isotropic Hamiltonian
-- Tidy up rounding errors
-- Get the singlet state
-- Report the norm
+The code builds a 1H/13C spin system from `allyl_pyruvate`, selects the fourth single-13C isotopomer, uses an unapproximated `zeeman-hilb` basis and isotropic NMR Hamiltonian, then repeats the analysis after a 2850 offset and a `2*pi*1000` 1H `Lx` term.

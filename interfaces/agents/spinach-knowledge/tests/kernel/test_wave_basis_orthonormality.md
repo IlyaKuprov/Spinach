@@ -4,27 +4,20 @@
 
 ## Purpose
 
-Tests waveform basis orthonormality. Syntax: result=test_wave_basis_orthonormality()
+Tests that the sine, cosine, and Legendre waveform bases returned by Spinach have orthonormal columns, as required by pulse optimisation.
 
 ## Physical / mathematical content
 
+Orthonormal basis columns give independent waveform coefficients.
+
 ## Numerical / algorithmic content
+
+For each basis, the test constructs `B=wave_basis(basis_type,5,32)` and checks that its Gram matrix `B'*B` equals `eye(5)` within absolute and relative tolerances of `1e-12`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks that sine, cosine, and Legendre waveform bases returned
-- by Spinach have orthonormal columns, as required by pulse optimisation.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests waveform basis orthonormality. Syntax:
-- result=test_wave_basis_orthonormality()
-- result -regression test result with explanatory messages
-- The test checks that sine, cosine, and Legendre waveform bases returned
-- by Spinach have orthonormal columns, as required by pulse optimisation.
-- Announce the test target
-- State the numerical target of the test
-- Check all supported basis families
-- Build a small waveform basis
-- Check orthonormality of columns
+The test announces its target, creates a regression test result, then checks the `sine_waves`, `cosine_waves`, and `legendre` bases in a loop.

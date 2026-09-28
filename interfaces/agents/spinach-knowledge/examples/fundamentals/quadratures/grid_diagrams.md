@@ -4,24 +4,18 @@
 
 ## Purpose
 
-Spherical grid diagrams for IK's book.
+Create six spherical-grid diagrams for a book, with each panel labelled by grid type and point count.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The function visualizes nodes on the unit sphere; it does not perform a quadrature-accuracy comparison. Cartesian plotting coordinates are formed from the spherical angles betas and gammas.
 
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The six displayed sets are a Fibonacci sequence grid (643 points), an icosahedral grid (642), an octahedral Stoll grid (678), a repulsion grid (620), an Igloo grid (616), and the rank-41 Lebedev grid (590).
 
 ## Implementation structure
 
-- Spherical grid diagrams for IK's book.
-- Plotting logistics
-- Number sequence grid example -Fibonacci
-- Polyhedron subdivision grid -icosahedral
-- Polyhedron subdivision grid -octahedral
-- Optimisation grid -repulsion
-- Natual world inspiration grid -Igloo
-- "You are all wankers" -Vyacheslav Lebedev
+- Create a compact 2-by-3 tiled figure.
+- Generate or load each named grid, map angular coordinates to Cartesian sphere coordinates where needed, and plot the points with grid_plot.
+- Add the grid labels and point counts shown in the panels.

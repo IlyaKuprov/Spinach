@@ -2,27 +2,8 @@
 
 - Signature: `gslice()`
 
-## Purpose
+Prompts for a Gaussian relaxed-geometry scan log and a text file containing the Gaussian input header. For each `-- Stationary point found.` flag, it selects the nearest preceding `Standard orientation:` block and uses its atomic numbers and coordinates.
 
-Slices a Gaussian geometry scan log into property calculation inputs at the energy minimum geometries. The function asks for the log and for a text file containing the property calcula- tion header. Some paths are hard-coded; edit as appropriate.
+The function writes numbered `g16_input_N.gjf` files and a `compute.bat` script in the current directory. The batch file runs the inputs with Gaussian 16 and contains hard-coded Windows paths (`C:\G16W` and `C:\Temp`); edit these for the local installation. The function takes no arguments and returns no MATLAB outputs.
 
-## Physical / mathematical content
-
-- Gaussian interfaces. These parse quantum-chemistry output into spin Hamiltonian ingredients such as hyperfine, shielding, or exchange parameters.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Slices a Gaussian geometry scan log into property calculation
-- inputs at the energy minimum geometries. The function asks for
-- the log and for a text file containing the property calcula-
-- tion header. Some paths are hard-coded; edit as appropriate.
-- Assign atomic symbols
-- Read the log file
-- Locate and the stationary point reports
-- Locate standard orientation entry points
-- Locate standard orientation end points
-- Read the standard orientations
-- Get the header
-- Write the inputs
+[Source documentation](https://spindynamics.org/wiki/index.php?title=gslice.m)

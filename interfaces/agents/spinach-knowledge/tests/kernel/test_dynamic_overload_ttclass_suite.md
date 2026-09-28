@@ -2,33 +2,4 @@
 
 - Signature: `result=test_dynamic_overload_ttclass_suite()`
 
-## Purpose
-
-Tests dynamic dispatch of tensor-train class overloads. Syntax: result=test_dynamic_overload_ttclass_suite()
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test exercises ttclass object operations against exact dense
-- references on one-core and two-core tensor trains.
-
-## Implementation structure
-
-- Tests dynamic dispatch of tensor-train class overloads. Syntax:
-- result=test_dynamic_overload_ttclass_suite()
-- result -regression test result with explanatory messages
-- The test exercises ttclass object operations against exact dense
-- references on one-core and two-core tensor trains.
-- Announce the test target
-- State the overload target of the test
-- Build one-core tensor trains and dense references
-- Exercise constructor, full, size, sizes, ranks, numel, and subsref dispatch
-- Exercise addition, subtraction, scalar multiplication, and scalar division
-- Exercise matrix, vector, and tensor-train multiplication dispatch
-- Exercise conjugation, transposition, trace, diagonal, sum, and mean dispatch
+Regression test comparing `ttclass` overloads with dense references for deterministic one- and two-core tensor trains. Covers construction, shape and indexing, arithmetic, multiplication and inner products, complex operations, reductions, and vectorisation. Also checks packing, orthogonalisation, truncation, shrinkage, AMEn summation and scalar solving, `save_anyway` round-trip, random-rank construction, and rejection of a non-tensor right-hand side by `mldivide`. Returns a test result with explanatory messages.

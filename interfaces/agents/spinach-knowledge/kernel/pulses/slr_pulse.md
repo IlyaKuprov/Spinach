@@ -4,61 +4,31 @@
 
 ## Purpose
 
-Shinnar-Le Roux linear-phase selective excitation pulse. Syntax: [Cx,Cy,durs,amps,phis]=slr_pulse(npts,dur,tbw,flip_angle,pass_rip,stop_rip)
+Designs a Shinnar-Le Roux (SLR) linear-phase selective excitation pulse and returns its X/Y controls, slice durations, RF amplitudes, and phases.
 
-## Physical / mathematical content
+## Design
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The beta polynomial is obtained by continuous weighted least squares in a linear-phase cosine basis. The complementary minimum-phase alpha polynomial and RF waveform are obtained by the inverse SLR transform. The ripple arguments enter the excitation-pulse transform and the transition-width estimate of Pauly et al.; they are design targets, not guaranteed minimax error bounds. For flip angles below `pi/2`, they do not specify angle-independent magnetisation error bounds. The output controls are calibrated for Spinach propagation under `exp(-1i*H*t)` and may be passed directly to `shaped_pulse_xy()`.
 
 ## Parameters / inputs
 
-- npts -even number of piecewise-constant pulse slices
-- dur -total pulse duration, seconds
-- tbw -time-bandwidth product, defined as the pulse
-- duration times the nominal full passband width
-- flip_angle -on-resonance flip angle between zero and pi/2,
-- radians
-- pass_rip -90-degree excitation passband ripple target used
-- in the prototype design, dimensionless
-- stop_rip -90-degree excitation stopband ripple target used
-- in the prototype design, dimensionless
+- `npts` - even number of piecewise-constant pulse slices
+- `dur` - total pulse duration, seconds
+- `tbw` - time-bandwidth product, defined as pulse duration times the nominal full passband width
+- `flip_angle` - on-resonance flip angle between zero and `pi/2`, radians
+- `pass_rip` - dimensionless 90-degree excitation passband ripple target used in the prototype design
+- `stop_rip` - dimensionless 90-degree excitation stopband ripple target used in the prototype design
 
 ## Outputs
 
-- Cx -X control amplitudes, rad/s, 1 x npts row vector
-- Cy -Y control amplitudes, rad/s, 1 x npts row vector
-- durs -pulse slice durations, seconds, 1 x npts row vector
-- amps -RF amplitudes, rad/s, 1 x npts row vector
-- phis -RF phases, radians, 1 x npts row vector
-- The beta polynomial is obtained by continuous weighted least squares
-- in a linear-phase cosine basis. The complementary minimum-phase alpha
-- polynomial and the RF waveform are then obtained by the inverse SLR
-- transform. The ripple arguments enter the excitation-pulse transform
-- and the transition-width estimate of Pauly et al.; they are design
-- targets rather than guaranteed minimax error bounds.
-- For flip angles below pi/2, they do not specify angle-independent
-- magnetisation error bounds.
-- The output controls are calibrated for Spinach propagation under
-- exp(-1i*H*t) and may be passed directly to shaped_pulse_xy().
-- J. Pauly, P. Le Roux, D. Nishimura, and A. Macovski,
-- IEEE Transactions on Medical Imaging 10(1), 53-65 (1991),
+- `Cx` - X control amplitudes, rad/s, 1 x npts row vector
+- `Cy` - Y control amplitudes, rad/s, 1 x npts row vector
+- `durs` - pulse slice durations, seconds, 1 x npts row vector
+- `amps` - RF amplitudes, rad/s, 1 x npts row vector
+- `phis` - RF phases, radians, 1 x npts row vector
 
-## Implementation structure
+## Reference
 
-- Shinnar-Le Roux linear-phase selective excitation pulse. Syntax:
-- [Cx,Cy,durs,amps,phis]=slr_pulse(npts,dur,tbw,flip_angle,pass_rip,stop_rip)
-- npts -even number of piecewise-constant pulse slices
-- dur -total pulse duration, seconds
-- tbw -time-bandwidth product, defined as the pulse
-- duration times the nominal full passband width
-- flip_angle -on-resonance flip angle between zero and pi/2,
-- radians
-- pass_rip -90-degree excitation passband ripple target used
-- in the prototype design, dimensionless
-- stop_rip -90-degree excitation stopband ripple target used
-- Cx -X control amplitudes, rad/s, 1 x npts row vector
+J. Pauly, P. Le Roux, D. Nishimura, and A. Macovski, *IEEE Transactions on Medical Imaging* 10(1), 53-65 (1991), https://doi.org/10.1109/42.75611
+
+Source Wiki page: https://spindynamics.org/wiki/index.php?title=slr_pulse.m

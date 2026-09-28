@@ -4,28 +4,8 @@
 
 ## Purpose
 
-A simple COLOC pulse sequence example for a two-spin 1H-13C system with a long-range J-coupling. Calculation time: seconds.
+A two-spin ¹H–¹³C COLOC pulse-sequence example with a long-range coupling; the source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- A simple COLOC pulse sequence example for a two-spin
-- 1H-13C system with a long-range J-coupling.
-- Calculation time: seconds.
-- Magnet field
-- Spin system
-- Interactions
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- Fourier transform
+The system is set to 11.7 T with shifts 4.0 and 75.0, a ¹H–¹³C scalar coupling of 5.0, and a zero self-coupling entry for spin 2. With the full sphten-Liouville basis, it simulates `liquid(...,@coloc,...,'nmr')` using delta2 = 30e-3, offsets [2250 5000], sweeps [5000 12000], and 256 × 256 points (zero-filled to 512 × 512). The FID receives cosine apodisation, then a two-dimensional Fourier transform; the plotted spectrum is its magnitude (axis units: ppm).

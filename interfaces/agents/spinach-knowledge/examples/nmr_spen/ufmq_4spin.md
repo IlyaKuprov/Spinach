@@ -4,28 +4,14 @@
 
 ## Purpose
 
-4Q ultrafast MaxQ NMR spectrum for a coupled four-spin system in the presence of realistic diffusion. Calculation time: hours, much faster on GPU
+Simulates a 4Q ultrafast MaxQ NMR spectrum for four coupled spins with diffusion. The source estimates hours of calculation, much faster on GPU. Authors: Maria Grazia Concilio, Ilya Kuprov, and Jean-Nicolas Dumez.
 
-## Physical / mathematical content
+## Model and sequence
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The 14.1 T system has four 1H spins with shifts 0.50, 0.35, 0.15, and 0. The listed 3J couplings are 8.0 Hz between successive spins; the listed 4J couplings are 3.0 Hz for pairs (1,3) and (2,4); the 5J coupling between spins 1 and 4 is 2.0 Hz. The example selects coherence order +4 and uses an untruncated sphten-liouv basis.
 
-## Numerical / algorithmic content
+The sample length is 0.015 m with 500 points, zero flow, and diffusion coefficient 18e-10 m^2/s. Initial and detection phantoms are uniform. The imaging call uses ufmq with 120 points, 50 loops, a 6e-6 s dwell time, and a 0.041 s delay; the acquisition gradient is computed from the maximum k value. Encoding uses 500 pulse points, 40 WURST cycles, Te=0.015 s, BW=15000 Hz, Ge=0.023 T/m, and a WURST chirp.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Processing
 
-## Implementation structure
-
-- 4Q ultrafast MaxQ NMR spectrum for a coupled four-spin
-- system in the presence of realistic diffusion.
-- Calculation time: hours, much faster on GPU
-- Magnetic field
-- Chemical shifts
-- 3J couplings
-- 4J couplings
-- 5J couplings
-- Coherence selection
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
+The example plots the k-space echo data, Fourier transforms the conventional dimension, and plots the resulting spectrum in ppm.

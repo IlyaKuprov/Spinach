@@ -4,37 +4,25 @@
 
 ## Purpose
 
-Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)
-
-## Physical / mathematical content
+Compares an observed array with a reference array using absolute and relative tolerances, and records the check in the test result.
 
 ## Numerical / algorithmic content
 
+- Sparse inputs are converted to full arrays and the values to double vectors. Arrays must have matching dimensions and finite values.
+- The error is the Euclidean norm of the vector difference. The allowed limit is `abs_tol+rel_tol*max(1,norm(reference,2))`. A size mismatch, non-finite input or comparison, or error above the limit is recorded as a failure.
+
 ## Parameters / inputs
 
-- result -test result structure
-- label -check label
-- observed -value produced by Spinach
-- reference -independently known right answer
-- abs_tol -absolute tolerance
-- rel_tol -relative tolerance
-- why -explanation of the right answer
+- `result` - scalar test-result structure with `messages` and `failures` fields.
+- `label` - non-empty character-row check label.
+- `observed`, `reference` - numeric or logical arrays to compare.
+- `abs_tol`, `rel_tol` - non-negative real numeric scalar tolerances.
+- `why` - non-empty character-row explanation included in the result message.
 
 ## Outputs
 
-- result -updated test result structure
+- `result` - updated with a PASS or FAIL message; failures are appended to `failures`.
 
 ## Implementation structure
 
-- Adds a numerical regression check with tolerances and explanation. Syntax:
-- result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)
-- result -test result structure
-- label -check label
-- observed -value produced by Spinach
-- reference -independently known right answer
-- abs_tol -absolute tolerance
-- rel_tol -relative tolerance
-- why -explanation of the right answer
-- result -updated test result structure
-- Convert sparse arrays for norm evaluation
-- Check dimensions first
+- Validates inputs, records the comparison outcome, then calls `test_record` so the completed check is retained for the test runner.

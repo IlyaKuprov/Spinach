@@ -12,8 +12,7 @@ House style settings for Matlab figures; a product of much experience with acade
 
 ## Parameters / inputs
 
-- varargin -same arguments as those accepted by
-- Matlab's zlabel function
+- `varargin` — same arguments as those accepted by Matlab's `zlabel` function.
 
 ## Outputs
 
@@ -21,15 +20,7 @@ House style settings for Matlab figures; a product of much experience with acade
 
 ## Implementation structure
 
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- kzlabel(varargin)
-- varargin -same arguments as those accepted by
-- Matlab's zlabel function
-- creates or updates the current axis system
-- Display the label using LaTeX
-- Switch tick labels to LaTeX
-- In an age of crybabies and professional victims,
-- Rupert stood out like a saint in hell.
-- Taki Theodoracopulos,
-- about Rupert Hambro
+- Calls `zlabel` with the supplied arguments and the `latex` interpreter.
+- Sets the current axes tick-label interpreter to `latex` and its font size to 12.
+
+[Source reference](https://spindynamics.org/wiki/index.php?title=kzlabel.m)

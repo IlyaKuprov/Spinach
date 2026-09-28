@@ -4,63 +4,27 @@
 
 ## Purpose
 
-First draft of the magnetohydrodynamics context for microfluidic simu- lations. Generates evolution generators and passes them on to the pul- se sequence function, which should be supplied as a handle. Syntax: answer=meshflow(spin_system,pulse_sequence,parameters)
+First draft of the magnetohydrodynamics context for microfluidic simulations. It assembles evolution generators and passes them to a pulse-sequence function handle.
 
-## Physical / mathematical content
+## Inputs
 
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- `spin_system` must include mesh indexing and Voronoi tessellation information.
+- `pulse_sequence` is a function handle. Pulse sequences that ship with Spinach are in the experiments directory.
+- `parameters` must provide Hamiltonian, relaxation, and kinetics phantoms, plus initial-state and detection-state phantoms:
+  - `H_ph` and `H_op`; `R_ph` and `R_op`; `K_ph` and `K_op`. Each phantom is a collection of spatial maps with the sample voxel-grid dimensions. `R_op` entries are relaxation superoperators.
+  - `rho0_ph` and `rho0_st` specify spatial maps and corresponding spin states for the initial condition. `coil_ph` and `coil_st` specify detection maps and spin states; detection phantoms allow different voxels to be detected at different angles and sensitivities. Spin states are obtained from `state()`.
+  - Additional `parameters` subfields may be required by the pulse sequence.
 
-## Numerical / algorithmic content
+## Processing
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Consistency checks are performed by `grumble` before generator construction. The function builds the Hamiltonian (`H`), relaxation superoperator (`R`), and kinetics superoperator (`K`) from their phantoms, and constructs the spatial flow/diffusion generator (`F`) and dummy gradient generator (`G`). It forms `parameters.rho0` and `parameters.coil` by summing Kronecker products of each spatial phantom map with its corresponding spin state.
 
-## Parameters / inputs
+The spatial dimension is `spc_dim`, the number of Voronoi cells (`spin_system.mesh.vor.ncells`); the spin dimension is `spn_dim`, the number of rows in `spin_system.bas.basis`. The total Fokker–Planck dimension is `spc_dim*spn_dim`. The function stores `spc_dim` and `spn_dim` in `parameters`. If polyadic support is disabled, `H`, `R`, `K`, `G`, and `F` are inflated.
 
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- The following phantoms must be specified: hamiltonian, relaxation, ki-
-- netics, initial condition, detection state. Operator phantoms must be
-- specified in the following way:
-- parameters.R_ph={Ph1,Ph2,...,PhN}
-- parameters.R_op={R1,R2,...,RN}
-- where PhN have the same dimension as the sample voxel grid and RN are
-- relaxation superoperators. Likewise for the following:
-- parameters.K_ph, parameters.K_op
-- parameters.H_ph, parameters.H_op
-- The initial condition phantom reflects the fact that different voxels
-- might start off in a different spin state. It must be specified in the
-- following way:
-- parameters.rho0_ph={Ph1,Ph2,...,PhN}
-- parameters.rho0_st={rho1,rho2,...,rhoN}
-- where PhN have the same dimension as the sample voxel grid and rhoN are
-- spin states obtained from state() function.
-- The detection state phantom reflects the fact that different voxels mi-
-- ght be detected at different angles and with different sensitivity. It
-- must be specified in the following way:
-- parameters.coil_ph={Ph1,Ph2,...,PhN}
-- parameters.coil_st={rho1,rho2,...,rhoN}
-- where PhN have the same dimension as the sample voxel grid and rhoN are
-- spin states obtained from state() function.
-- parameters.* -additional subfields may be required by your
-- pulse sequence -check its documentation page
+The pulse sequence is called with `spin_system`, `parameters`, `H`, `R`, `K`, `G`, and `F`.
 
-## Outputs
+## Output
 
-- This function returns whatever the pulse sequence returns.
+Returns whatever the pulse sequence returns.
 
-## Implementation structure
-
-- First draft of the magnetohydrodynamics context for microfluidic simu-
-- lations. Generates evolution generators and passes them on to the pul-
-- se sequence function, which should be supplied as a handle. Syntax:
-- answer=meshflow(spin_system,pulse_sequence,parameters)
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- The following phantoms must be specified: hamiltonian, relaxation, ki-
-- netics, initial condition, detection state. Operator phantoms must be
-- specified in the following way:
-- parameters.R_ph={Ph1,Ph2,...,PhN}
-- parameters.R_op={R1,R2,...,RN}
+Source: https://spindynamics.org/wiki/index.php?title=meshflow.m

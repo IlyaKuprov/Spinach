@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Overtone Z-detection 10B magic angle spinning NMR spectrum. The sample is spinning in the JEOL direction. Parameters from Nghia Duong and Yusuke Nishiyama. The simulation focuses on the most intense of the five overtone spinning sidebands. Calculation time: hours
+Simulates an overtone Z-detection `10B` MAS NMR spectrum, with the sample spinning in the JEOL direction. The source credits parameters to Nghia Duong and Yusuke Nishiyama and focuses on the most intense of the five overtone spinning sidebands. It estimates hours of calculation time.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
+The `10B` system is at 16.4 T, with quadrupole parameters 0.7 MHz, asymmetry 0, and spin 3. Diagonal damping relaxation is used at rate 50, and the code disables trajectory-level options.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Overtone Z-detection 10B magic angle spinning NMR spectrum.
-- The sample is spinning in the JEOL direction. Parameters from
-- Nghia Duong and Yusuke Nishiyama. The simulation focuses on
-- the most intense of the five overtone spinning sidebands.
-- Calculation time: hours
-- System specification
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+The sequence setup uses rank 12, a 70 kHz spinning rate, grid `rep_2ang_800pts_sph`, and a −141 to −139 kHz sweep with 256 points and 256-point zero-fill. The initial state and receiver are both `10B` `Lz`; the simulation uses `singlerot` with `overtone_a`.

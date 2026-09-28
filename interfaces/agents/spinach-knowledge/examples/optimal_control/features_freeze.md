@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is Z-magneti- sation on 19F. There are six control channels. A freeze condition is specified -there are two periods in the control sequence that the optimisation is not allowed to touch. The waveform is optimised with 
+Demonstrates pulse optimisation with selected waveform samples held fixed while the remaining samples are adjusted. The example studies state-to-state transfer in a scalar-coupled hydrofluorocarbon spin system, transferring Z magnetisation from ¹H to ¹⁹F, and evaluates the final transfer fidelity.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The control problem includes offset and RF-power sampling. Two pulse-sample ranges, 30–40 and 70–80, are frozen during optimisation; the other samples remain available to the optimiser.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The pulse is optimised with Newton–Raphson GRAPE while enforcing the frozen-sample constraints. Starting from a random pulse, the optimisation typically reaches a fidelity of 0.999999, indicating near-unity transfer. The script then simulates the resulting waveform and reports its final fidelity. The source sets up six control channels.
 
 ## Implementation structure
 
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is Z-magneti-
-- sation on 19F. There are six control channels.
-- A freeze condition is specified -there are two periods in the control
-- sequence that the optimisation is not allowed to touch.
-- The waveform is optimised with the Newton-Raphson GRAPE algorithm desc-
-- ribed in
-- with point-by-point variation and a penalty on the waveform exceeding
-- a user-specified power threshold. The initial guess is a random pulse;
-- the optimisation typically achieves a fidelity of 0.999999.
-- Calculation time: minutes.
+The MATLAB code constructs the spin system, initial and target states, and controls; defines the frozen ranges; performs pulse optimisation over the offset and power sampling; and runs a final fidelity simulation. Source reference: http://dx.doi.org/10.1063/1.4949534

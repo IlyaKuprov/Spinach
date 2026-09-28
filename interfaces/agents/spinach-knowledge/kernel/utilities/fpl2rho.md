@@ -8,8 +8,7 @@ Returns the average of the spin state vector across the spatial dimensions of th
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- Reshapes each column of the Fokker-Planck state vector to separate spin and spatial dimensions, averages across the spatial dimension, and squeezes the result.
 
 ## Numerical / algorithmic content
 

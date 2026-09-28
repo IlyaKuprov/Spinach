@@ -4,29 +4,20 @@
 
 ## Purpose
 
-Tests the two-spin scalar-coupling Hamiltonian. Syntax: result=test_scalar_coupling_hamiltonian()
+Checks the isotropic scalar-coupling Hamiltonian for two protons with a 10 Hz coupling.
 
 ## Physical / mathematical content
 
+For isotropic coupling J, the test checks the rotationally invariant Hamiltonian `2*pi*J*(Ix*Sx+Iy*Sy+Iz*Sz)`, expressed in rad/s.
+
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Builds the two-proton Zeeman-Hilbert spin system with zero chemical shifts and a 10 Hz scalar coupling. It constructs the Hamiltonian under the NMR assumption, forms the explicit spin-operator reference, and compares the matrices using absolute and relative tolerances of `1e-9` and `1e-12`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks that an isotropic scalar coupling J produces the textbook
-- Hamiltonian 2*pi*J*(Ix*Sx+Iy*Sy+Iz*Sz).
+`result` is the regression-test record, including the comparison result and explanatory messages.
 
 ## Implementation structure
 
-- Tests the two-spin scalar-coupling Hamiltonian. Syntax:
-- result=test_scalar_coupling_hamiltonian()
-- result -regression test result with explanatory messages
-- The test checks that an isotropic scalar coupling J produces the textbook
-- Hamiltonian 2*pi*J*(Ix*Sx+Iy*Sy+Iz*Sz).
-- Announce the test target
-- State the Hamiltonian target of the test
-- Build a two-proton Hilbert-space spin system with a 10 Hz J coupling
-- Build Spinach and textbook Hamiltonians
-- Check the scalar-coupling Hamiltonian
+The test builds the spin system and coupling operators, forms the textbook reference Hamiltonian, and checks it against Spinach's Hamiltonian.

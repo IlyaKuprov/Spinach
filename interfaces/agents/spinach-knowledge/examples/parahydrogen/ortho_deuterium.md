@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Ortho-deuteration simulation for acrylonitrile in Figure 1 of the paper by Natterer, Greve, and Bargon: Simulation time: seconds
+Simulates the ortho-deuteration spectrum of acrylonitrile shown in Figure 1 of the paper by Natterer, Greve, and Bargon ([doi:10.1016/S0009-2614(98)00784-2](https://doi.org/10.1016/S0009-2614(98)00784-2)). The source describes the calculation as taking seconds.
 
 ## Physical / mathematical content
 
-- Parahydrogen examples. The physical motif is highly non-Boltzmann singlet order imported from para-H2 and converted into observable nuclear magnetisation through hydrogenation, exchange, or catalytic transfer processes.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The five-spin product contains three protons and two deuterons. The model uses the 4.697 T field labelled “Bargon's magnet” and scalar couplings specified for the deuterated product. In the Zeeman Hilbert-space basis, `deut_pair` constructs the deuteron singlet and five quintet states; their sum is used as the initial density operator for acquisition of the deuterium signal.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+A liquid-state acquisition applies a `pi/4` y pulse and simulates 1024 points over a 120 ppm sweep with an offset of 50 ppm. The FID is exponentially apodised (factor 6), zero-filled to 4096 points, Fourier transformed, and plotted.
 
 ## Implementation structure
 
-- Ortho-deuteration simulation for acrylonitrile in Figure 1 of
-- the paper by Natterer, Greve, and Bargon:
-- Simulation time: seconds
-- Bargon's magnet
-- Deuteration product
-- Hilbert space
-- Spinach housekeeping
-- Continuous deuteration
-- Singlet and quintet on deuterium
-- Experiment parameters
-- Simulation
-- Apodisation and sign flip
+The script defines the five isotopes and their scalar shifts and couplings, selects the Zeeman Hilbert formalism with no basis approximation, enables continuous deuteration, builds the singlet/quintet initial state, and sets the deuterium coil and pulse operators before acquisition and processing.

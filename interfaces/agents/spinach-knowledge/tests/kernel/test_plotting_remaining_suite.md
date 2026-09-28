@@ -3,33 +3,12 @@
 - Signature: `result=test_plotting_remaining_suite()`
 
 ## Purpose
+Regression-tests remaining plotting helpers with invisible figures, without image comparison.
 
-Tests remaining Spinach plotting helper gaps under offscreen graphics. Syntax: result=test_plotting_remaining_suite()
+## Coverage
+- Checks Fourier, FFT/IFFT and 1D axes; colour maps, contour spacing, 2D cropping and 3D zoom.
+- Checks graphics objects from molecular, cylindrical-grid, ultrafast and tensor plots.
+- Tests file-driven 2D integration and validation errors for `slice_2d` and `write_movie`. The mouse-driven slice loop is skipped; MP4 generation runs only if `SPINACH_RUN_SLOW_PLOTTING=1`.
 
-## Physical / mathematical content
-
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test exercises deterministic axis, contour, cropping, molecular,
-- tensor-display, ultrafast, and guarded interactive plotting helpers under
-- invisible figures without relying on image comparison.
-
-## Implementation structure
-
-- Tests remaining Spinach plotting helper gaps under offscreen graphics. Syntax:
-- result=test_plotting_remaining_suite()
-- result -regression test result with explanatory messages
-- The test exercises deterministic axis, contour, cropping, molecular,
-- tensor-display, ultrafast, and guarded interactive plotting helpers under
-- invisible figures without relying on image comparison.
-- Announce the test target
-- State the remaining plotting-helper target of the test
-- Force invisible figures during the test
-- Build a minimal spin-system structure used by plotting routines
-- Exercise deterministic one-dimensional and transform axes
-- Exercise colour maps, contour levels, cropping, and volume zooming
+## Output
+`result`: regression result with explanatory messages. Figure visibility and warning state are restored.

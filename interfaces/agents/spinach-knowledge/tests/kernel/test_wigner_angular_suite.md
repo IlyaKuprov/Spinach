@@ -4,30 +4,22 @@
 
 ## Purpose
 
-Tests angular-momentum coefficient and spherical-function helpers. Syntax: result=test_wigner_angular_suite()
+Tests Clebsch-Gordan coefficients, Wigner symbols and matrices, and spherical harmonics against elementary values.
 
 ## Physical / mathematical content
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- The spin-half coupling checks give the `|1,0>` triplet and `|0,0>` singlet coefficients for `|alpha beta>` as `1/sqrt(2)` in the tested Spinach convention; forbidden projections return zero.
+- The suite checks the `(1 1 0; 0 0 0)` Wigner 3j value `-1/sqrt(3)`, two Wigner 6j values, the rank-one Wigner matrix at `beta=pi/2`, identity at zero Euler angles, and Wigner-matrix unitarity.
+- It checks `Y_0^0=1/sqrt(4*pi)` and `Y_1^0=sqrt(3/(4*pi))*cos(theta)`.
 
 ## Numerical / algorithmic content
 
+- The test evaluates each helper and compares its result with the specified scalar or matrix reference using `test_close`; unitarity is checked against the 5-by-5 identity matrix.
+
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks Clebsch-Gordan coefficients, Wigner symbols, Wigner D
-- matrices, and spherical harmonics against elementary exact values.
+- `result` - regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests angular-momentum coefficient and spherical-function helpers. Syntax:
-- result=test_wigner_angular_suite()
-- result -regression test result with explanatory messages
-- The test checks Clebsch-Gordan coefficients, Wigner symbols, Wigner D
-- matrices, and spherical harmonics against elementary exact values.
-- Announce the test target
-- State the angular target of the test
-- Coupling two spin-half particles gives triplet and singlet M=0 amplitudes of 1/sqrt(2)
-- Wigner 3j values follow from the relation to Clebsch-Gordan coefficients
-- Wigner D matrices are unitary representations and reduce to identity for zero rotation
-- Spherical harmonics have elementary normalised values
+- Creates the regression result for `kernel/wigner_angular_suite`, then checks Clebsch-Gordan coefficients, Wigner 3j and 6j symbols, Wigner D matrices, and spherical harmonics.

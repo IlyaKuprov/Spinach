@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Returns the index of the nearest spin to the one speci- fied. Only spins for which Cartesian coordinates are available are considered. Syntax: k=nearest_spin(spin_system,n)
+Returns the index of the nearest spin to the one specified. Only spins for which Cartesian coordinates are available are considered. Syntax: k=nearest_spin(spin_system,n)
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Finds the closest other spin to spin `n` using the spins’ Cartesian coordinates.
 
 ## Numerical / algorithmic content
+
+- Scans other spins with available coordinates and compares Euclidean 2-norm distances; it excludes `n` and errors if no other spin has coordinates.
 
 ## Parameters / inputs
 
@@ -23,15 +25,4 @@ Returns the index of the nearest spin to the one speci- fied. Only spins for whi
 
 ## Implementation structure
 
-- Returns the index of the nearest spin to the one speci-
-- fied. Only spins for which Cartesian coordinates are
-- available are considered. Syntax:
-- k=nearest_spin(spin_system,n)
-- n -index of the spin in question
-- k -index of the nearest spin
-- d -distance to the nearest spin, Angstrom
-- Check consistency
-- Starting point
-- Find the nearest spin
-- Catch pathological cases
-- Consistency enforcement
+- Validates that `n` is an existing positive-integer spin index with coordinates, then retains the smallest distance among eligible spins and returns its index and distance.

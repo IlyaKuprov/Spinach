@@ -4,33 +4,17 @@
 
 ## Purpose
 
-Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax: summary_rlx_t1_t2(spin_system,header)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Prints a table of the stored R1 and R2 relaxation rates for each spin.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- `spin_system` - Spinach spin system structure.
+- `header` - character string printed before the table.
 
-## Outputs
+## Output
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+No MATLAB output argument; writes the header and table through `report`.
 
-## Implementation structure
+## Behavior
 
-- Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax:
-- summary_rlx_t1_t2(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the relaxation-rate table
-- Consistency enforcement
-- Whether you are more afraid of the forces of
-- order or the forces of chaos is generally a
-- matter of disposition.
+The function checks that `spin_system` is a structure and `header` is a character string. It prints one row per spin with its index, isotope, R1 rate, R2 rate, and label. Scalar numeric rates are shown in signed scientific notation; nonscalar numeric rates are labelled “anisotropic”, and nonnumeric rates are labelled “orientation”.

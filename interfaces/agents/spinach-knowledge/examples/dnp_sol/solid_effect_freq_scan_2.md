@@ -4,27 +4,14 @@
 
 ## Purpose
 
-A scan through the microwave frequency range in a steady state DNP experiment for a single 15N labelled urea mole- cule at a specific orientation and a specific distance from a single electron. Laboratory frame DNP simulation is carried out with state space restriction to four-spin orders and a Weizmann DNP relaxation superoperator accounting for T1 and T2 and di- polar relaxation processes. Powder average calculatio
+Computes a powder-averaged, laboratory-frame DNP steady state for a 15N-labelled urea molecule at a specified distance from one electron, scanning two microwave-frequency windows. The source estimates a calculation time of hours.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The spin system contains one electron, two 15N nuclei, and four 1H nuclei at the coordinates defined in the source, in a 3.4 T field. It uses the `sphten-liouv` formalism, `IK-0` approximation, four-spin-order inter-level restriction, and projections [-2, -1, 0, +1, +2]. The secular Weizmann relaxation model has zero equilibrium state and temperature 4.2; electron/nuclear rates and the 7-by-7 distance-dependent R1d and R2d matrices are explicitly assigned in the source.
 
-## Numerical / algorithmic content
+The electron is driven at 100 kHz. The scan concatenates 100 points from 144.0–145.5 MHz with 100 points from 14.0–15.5 MHz. Powder averaging uses the `rep_2ang_100pts_sph` grid, the `lvn-backs` method, and the ESR context in a call to `powder` with `dnp_freq_scan`.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Outputs
 
-## Implementation structure
-
-- A scan through the microwave frequency range in a steady
-- state DNP experiment for a single 15N labelled urea mole-
-- cule at a specific orientation and a specific distance
-- from a single electron.
-- Laboratory frame DNP simulation is carried out with state
-- space restriction to four-spin orders and a Weizmann DNP
-- relaxation superoperator accounting for T1 and T2 and di-
-- polar relaxation processes. Powder average calculation.
-- Calculation time: hours
-- Magnetic field
-- Spin system
-- Basis set
+The source plots the real longitudinal 1H and 15N expectation values against each frequency window, using the two columns of the result for the respective nuclear observables.

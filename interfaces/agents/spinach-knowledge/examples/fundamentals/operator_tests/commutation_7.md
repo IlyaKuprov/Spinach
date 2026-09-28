@@ -4,25 +4,16 @@
 
 ## Purpose
 
-Expansion relations for operator basis transforms.
+Tests operator expansions between Zeeman, bosonic, IST, single-transition, and bosonic-monomial bases.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The script reconstructs each of five Zeeman-level projectors from IST coefficients, each of six bosonic-level projectors from bosonic-monomial (BM) coefficients, and three bosonic products (`CA`, `ACCA`, and `CCAAA`) from IST coefficients. It also expands a random complex 7-by-7 matrix in the single-transition basis and a random complex bosonic matrix in the BM basis.
 
 ## Numerical / algorithmic content
 
+The fixed reconstruction tolerance is `1e-10` for the projector and product expansions and the single-transition basis. The random bosonic matrix is checked using relative Frobenius error with threshold `1e-8`. Failed reconstructions raise errors.
+
 ## Implementation structure
 
-- Expansion relations for operator basis transforms.
-- Accuracy threshold
-- Test IST expansion of Zeeman level projectors
-- Build known Zeeman projector
-- Obtain IST expansion.
-- Reconstruct operator from IST terms
-- Report IST expansion failures
-- Test BM expansion of bosonic level projectors
-- Build known bosonic projector
-- Obtain BM expansion.
-- Reconstruct operator from BM terms
-- Report BM expansion failures
+Projector coefficients come from `enlev2ist` and `enlev2bm`; product coefficients come from `bos2ist`; and the random bosonic matrix uses `oper2bm`. Each expansion is reconstructed in its corresponding operator basis and compared with the original matrix.

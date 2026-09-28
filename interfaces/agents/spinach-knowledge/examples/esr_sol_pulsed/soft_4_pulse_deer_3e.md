@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Four-pulse DEER simulation for a three-electron system. Soft pulses are simulated using the Fokker-Planck formalism. Calculation time: hours
+Simulates four-pulse DEER for a three-electron system with soft pulses using the Fokker–Planck formalism. The source notes a calculation time of hours.
 
-## Physical / mathematical content
+## Model and numerical setup
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- Uses three electron spins at coordinates (in Å) `[0,0,0]`, `[20,0,0]`, and `[0,0,20]`, with specified anisotropic Zeeman tensors and Euler angles. The magnetic field is `0.3451805`; spin-orbit corrections to dipole–dipole couplings are enabled with `sys.enable={'sodd'}`.
+- Builds a `sphten-liouv` basis with no approximation and disables `trajlevel`. The initial state is `Lz` and the detection state is `L+` for electron spins.
+- Uses the `rep_2ang_6400pts_sph` grid and matrix-exponential propagation. EPR settings include a `-4e8` offset, `3e9` sweep, 256 points, and 2048-point zero filling, with a `GHz-labframe` axis.
 
-## Numerical / algorithmic content
+## Pulse sequence and output
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Four-pulse DEER simulation for a three-electron system. Soft
-- pulses are simulated using the Fokker-Planck formalism.
-- Calculation time: hours
-- Magnet field
-- Isotopes
-- Zeeman interactions
-- Spin-orbit corrections
-- to the DD couplings
-- Coordinates (Angstrom)
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
+- Specifies four rank-2 pulses with durations `[20,40,50,40]` ns, phases of `π/2`, and angular-frequency powers of `2π × 8 MHz`. Pulse frequencies are `[9.720,9.720,10.255,9.720]` GHz.
+- Sets the first-to-second pulse gap to `0.5` µs, the second-to-fourth pulse gap to `1.5` µs, 100 steps for the third pulse, and a 120 ns echo window sampled at 240 points.
+- Runs the simulation and plotting through `deer_4p_soft_diag(spin_system,parameters)`.

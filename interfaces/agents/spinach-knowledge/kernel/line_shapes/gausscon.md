@@ -4,39 +4,23 @@
 
 ## Purpose
 
-Normalised Gaussian function in magnetic resonance notation and its convolution with a triangular function. Syntax: y=gausscon(offs,ampl,fwhm,x)
+Evaluates a Gaussian line shape or its convolution with a triangular distribution.
 
 ## Physical / mathematical content
 
-- Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
+A scalar `offs` gives a Gaussian centered at that offset. Three offsets specify the vertices of a triangular distribution whose convolution with the Gaussian is evaluated. `ampl` scales the resulting values.
 
 ## Numerical / algorithmic content
 
+The Gaussian standard deviation is obtained from `fwhm`. For three offsets, the routine sorts them and evaluates the convolution using Gaussian values and error-function integrals; repeated vertices are handled as limiting cases.
+
 ## Parameters / inputs
 
-- offs -peak offset from zero -when this is a scalar,
-- a Gaussian is returned; when this is a vector
-- with three elements, a convolution with a tri-
-- angular function is returned.
-- ampl -amplitude multiplier, scalar
-- fwhm -full width at half-maximum, scalar
-- x -argument, array of any dimension
+- `offs` - finite real scalar or three-element vector of offsets.
+- `ampl` - finite real scalar amplitude multiplier.
+- `fwhm` - finite positive real full width at half maximum.
+- `x` - array of finite real argument values.
 
 ## Outputs
 
-- y -an array of values, same size as x
-
-## Implementation structure
-
-- Normalised Gaussian function in magnetic resonance notation and
-- its convolution with a triangular function. Syntax:
-- y=gausscon(offs,ampl,fwhm,x)
-- offs -peak offset from zero -when this is a scalar,
-- a Gaussian is returned; when this is a vector
-- with three elements, a convolution with a tri-
-- angular function is returned.
-- ampl -amplitude multiplier, scalar
-- fwhm -full width at half-maximum, scalar
-- x -argument, array of any dimension
-- y -an array of values, same size as x
-- Check consistency
+- `y` - array of values with the same size as `x`.

@@ -4,31 +4,20 @@
 
 ## Purpose
 
-Transposes a tensor without complex conjugation. Syntax: ttrain=transpose(ttrain)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
+Transpose the matrix represented by a tensor train without complex conjugation.
 
 ## Parameters / inputs
 
-- ttrain -tensor train representation of a matrix
+- `ttrain` — tensor-train representation of a matrix.
 
 ## Outputs
 
-- ttrain -transpose of the input tensor train
+- `ttrain` — tensor train representing the transpose of the input matrix.
 
-## Implementation structure
+## Implementation
 
-- Transposes a tensor without complex conjugation. Syntax:
-- ttrain=transpose(ttrain)
-- ttrain -tensor train representation of a matrix
-- ttrain -transpose of the input tensor train
-- Read tensor sizes and ranks
-- Swap the middle dimensions of all cores
-- "Public welfare" is the welfare of those who do not earn
-- it; those who do, are entitled to no welfare.
-- Ayn Rand, "Atlas Shrugged"
-- #NGRUM
+For each core in each train, the function permutes the core dimensions with `[1 3 2 4]`, swapping the row and column physical dimensions while leaving the bond dimensions unchanged. This is a non-conjugating transpose.
+
+## Source
+
+D. Savostyanov and I. Kuprov, [`ttclass/transpose.m`](https://spindynamics.org/wiki/index.php?title=ttclass/transpose.m).

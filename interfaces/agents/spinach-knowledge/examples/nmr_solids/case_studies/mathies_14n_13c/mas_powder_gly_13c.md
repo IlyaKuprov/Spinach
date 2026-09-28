@@ -7,11 +7,9 @@
 13C MAS spectrum of glycine powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism and a spherical grid. The field dependence of the line shape of 13CA due to the presence of the quadrupolar 14N nucleus is shown. The calcula- tion is performed in the rotating frame with respect to 13C and the laboratory frame with respect to 14N. Calculation time: seconds.
 
 ## Physical / mathematical content
-
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+- Simulates glycine’s ¹³C magic-angle-spinning powder spectrum, assuming ¹H decoupling, with the Fokker–Planck MAS formalism and a spherical orientation grid.
+- Retains ¹³Cα and quadrupolar ¹⁴N from CASTEP data to examine the ¹⁴N interaction’s effect on the ¹³Cα line shape at 4.7, 9.4, and 14.1 T.
+- Acquires the ¹³C signal at 10 kHz spinning, then applies exponential apodisation and a zero-filled Fourier transform to plot the spectra.
 
 ## Numerical / algorithmic content
 

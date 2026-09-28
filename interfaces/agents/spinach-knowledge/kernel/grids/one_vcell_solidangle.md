@@ -4,41 +4,23 @@
 
 ## Purpose
 
-Solid angle of a convex spherical polygon as described in
-
-## Physical / mathematical content
-
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
-
-## Syntax
-
-```matlab
-A=one_vcell_solidangle(v,centre)
-```
+Computes the solid angle, in radians, of a convex spherical polygon using the method described at https://doi.org/10.1109/TBME.1983.325207.
 
 ## Parameters / inputs
 
-- v -(3 x n) matrix of unit vectors giving
-- the coordinates of each vertex
-- centre -centre vertex coordinates, optional
+- `v`: `3 x n` matrix whose columns are unit vectors giving the polygon vertices.
+- `centre`: optional unit-vector coordinates of a centre vertex, supplied as a three-element column vector.
 
-## Outputs
+## Output
 
-- S -the solid angle, radians
+- `S`: solid angle in radians.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Solid angle of a convex spherical polygon as described in
-- A=one_vcell_solidangle(v,centre)
-- v -(3 x n) matrix of unit vectors giving
-- the coordinates of each vertex
-- centre -centre vertex coordinates, optional
-- S -the solid angle, radians
-- Check consistency
-- Straightforward math
-- Consistency enforcement
-- Being a mathematician is a bit like being a manic
-- depressive: you spend your life alternating between
-- giddy elation and black despair.
+The function triangulates the polygon using either the first vertex or, when supplied, `centre`. For each triangle `T`, it calculates `atan2(det(T), 1 + sum of the cyclic pairwise column dot products)` and returns twice the sum of those values. When `centre` is supplied, the vertex sequence is closed by appending its first column.
+
+Inputs must be finite, real, correctly shaped, and unit length within `1e-6`.
+
+## Source link
+
+https://spindynamics.org/wiki/index.php?title=one_vcell_solidangle.m

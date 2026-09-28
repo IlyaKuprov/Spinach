@@ -4,27 +4,10 @@
 
 ## Purpose
 
-A test of Equation 3 in http://dx.doi.org/10.1002/chem.200902300
+Tests the invariant identity associated with Equation 3 in [doi:10.1002/chem.200902300](http://dx.doi.org/10.1002/chem.200902300), for randomly generated rhombic and axial eigenvalue sets.
 
-## Physical / mathematical content
+## Checks
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+For 100 random symmetric matrices, the code forms axiality `Ax=2*D3-(D1+D2)` and rhombicity `Rh=D1-D2` from shuffled eigenvalues. It compares `(Ax^2+3*Rh^2)/6` with the equivalent eigenvalue expression; the absolute difference must be at most 10⁻⁶.
 
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-
-## Implementation structure
-
-- A test of Equation 3 in http://dx.doi.org/10.1002/chem.200902300
-- Rhombic test
-- Random symmetric matrix
-- Eigenvalues
-- Axiality and rhombicity
-- Standard relaxation theory invariant
-- Neat eigenvalue form
-- Difference and diagnostics
-- Successful completion message
-- Axial test
-- Random axial eigenvalues
-- Zero trace
+A second 100-case loop constructs zero-trace axial eigenvalues, shuffles them, and compares `(D1-D2)^2` with `D1^2+D2^2+D3^2-D1*D2-D1*D3-D2*D3`, again with an absolute tolerance of 10⁻⁶.

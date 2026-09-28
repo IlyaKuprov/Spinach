@@ -4,28 +4,14 @@
 
 ## Purpose
 
-2D PRESS example. Three independent spin systems are localised in three spots of a 2D sample. The spots are slectively excited and their NMR spectra recorded. The followng are the frequencies to excite the three substances: parameters.rf_frq_list={-120e3 -100e3} -substance A parameters.rf_frq_list={-80e3 -10e3} -substance B parameters.rf_frq_list={+30e3 +100e3} -substance C Simulation time: minutes, faster with a Tes
+Demonstrates 2D PRESS localisation and spectral readout for three spin-pair components placed at separate positions in a 2D sample. Runtime is estimated in minutes, faster with a Tesla V100 GPU.
 
-## Physical / mathematical content
+## Spin systems and sample
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The 3.0 T model has six protons in three scalar-coupled pairs, with chemical-shift values `{-3,+3}`, `{-2,+2}`, and `{-1,+1}`, and pair couplings 10, 20, and 30. It uses the `sphten-liouv` formalism, `IK-2` approximation, proximity level 1, and scalar-coupling connectivity. The sample dimensions are `[0.30 0.25] m` on a `[108 90]` grid. Three circular density masks are centred at grid coordinates (15,15), (30,40), and (70,80), each with radius 10 points.
 
-## Numerical / algorithmic content
+## PRESS acquisition and output
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The image size is `[101 105]`; the selection-gradient amplitudes are `[25 25] mT/m`. Two RF pulses have phase `pi/2`, amplitude `2*pi*5000`, and durations `0.5e-4` and `1.0e-4 s`; the executed frequency list is `{-120e3 -100e3}` and maximum ranks are `{3 3}`. The source comments list scan settings of {-120,-100} kHz for A, {-80,-10} kHz for B, and {+30,+100} kHz for C.
 
-## Implementation structure
-
-- 2D PRESS example. Three independent spin systems are localised
-- in three spots of a 2D sample. The spots are slectively excited
-- and their NMR spectra recorded. The followng are the frequencies
-- to excite the three substances:
-- parameters.rf_frq_list={-120e3 -100e3} -substance A
-- parameters.rf_frq_list={-80e3 -10e3} -substance B
-- parameters.rf_frq_list={+30e3 +100e3} -substance C
-- Simulation time: minutes, faster with a Tesla V100 GPU.
-- Magnetic induction
-- Spin systems
-- Basis set
-- Disable path tracing
+The example plots the combined sample phantom and active-volume diagnostic, runs the 2D PRESS sequence, applies square-cosine apodisation, and plots the magnitude Fourier-transformed spectrum.

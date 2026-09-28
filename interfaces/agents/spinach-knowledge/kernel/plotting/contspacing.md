@@ -4,56 +4,29 @@
 
 ## Purpose
 
-Non-linear adaptive contour spacing. Useful for NMR data where small cross-peaks must be adequately contoured next to large diagonal peaks.
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Computes adaptive positive and/or negative contour levels for spectra, allowing small cross-peaks to be contoured alongside large diagonal peaks.
 
 ## Syntax
 
 ```matlab
-[all_conts,pos_conts,neg_conts]=...
-contspacing(smax,smin,delta,k,signs,ncont)
+[all_conts,pos_conts,neg_conts]=contspacing(smax,smin,delta,k,signs,ncont)
 ```
 
 ## Parameters / inputs
 
-- smax -global maximum intensity in the spectrum
-- smin -global minimum intensity in the spectrum
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the contours above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive conto-
-- urs and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the contour
-- spacing function: k=1 corresponds to linear spacing and
-- k>1 bends the spacing curve to increase the sampling den-
-- sity near the baseline. A reasonable value is 2.
-- signs -can be set to 'positive', 'negative' or 'both' -this
-- will cause the corresponding contours to be returned.
-- ncont -the number of contours, a reasonable value is 20
+- `smax` — global maximum spectrum intensity.
+- `smin` — global minimum spectrum intensity.
+- `delta` — four contour fractions: `[positive_min positive_max negative_min negative_max]`; each lies in [0,1], with each minimum no greater than its maximum. A suggested value is `[0.02 0.2 0.02 0.2]`.
+- `k` — positive integer curvature exponent; `k=1` gives linear spacing, while `k>1` increases sampling density near the baseline. A suggested value is 2.
+- `signs` — `'positive'`, `'negative'`, or `'both'`.
+- `ncont` — positive integer number of levels per requested sign; a suggested value is 20.
+
+## Numerical / algorithmic content
+
+For `t=linspace(0,1,ncont)`, positive levels are `smax*(delta(1)+(delta(2)-delta(1))*t.^k)`, and negative levels are `smin*(delta(3)+(delta(4)-delta(3))*t.^k)`. A sign-specific output is empty if that sign is not requested or its corresponding extremum does not have that sign. `all_conts` concatenates the negative levels in reverse order with the positive levels. Inputs are checked for finite real scalar extrema, valid fractions, a positive integer `k` and `ncont`, and one of the three supported `signs` values.
 
 ## Outputs
 
-- all_conts -all contour levels, a row vector
-- pos_conts -positive contour levels, a row vector
-- neg_conts -negative contour levels, a row vector
-- Note: the following functions are used to get contour levels
-- pos_conts=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-- neg_conts=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
-
-## Implementation structure
-
-- Non-linear adaptive contour spacing. Useful for NMR data where small
-- cross-peaks must be adequately contoured next to large diagonal peaks.
-- [all_conts,pos_conts,neg_conts]=...
-- contspacing(smax,smin,delta,k,signs,ncont)
-- smax -global maximum intensity in the spectrum
-- smin -global minimum intensity in the spectrum
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the contours above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive conto-
-- urs and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the contour
+- `all_conts` — requested contour levels, negative levels first in ascending order, followed by positive levels.
+- `pos_conts` — positive contour levels, or empty.
+- `neg_conts` — negative contour levels, or empty.

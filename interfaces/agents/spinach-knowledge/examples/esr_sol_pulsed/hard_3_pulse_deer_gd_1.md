@@ -4,29 +4,19 @@
 
 ## Purpose
 
-Gadolinium(III) DEER experiment at W-band using ideal pulses. Set to reproduce Figure 2b from the paper by Otting and co-authors: The calculation is done by brute-force time propagation and grid pow- der averaging. Central transitions are used on both gadolinium ions. Note: gadolinium spin echo is very sharp and difficult to catch in simulations because they do not include zero-field splitting distributions found in 
+Gadolinium(III) DEER experiment at W-band using ideal pulses. Set to reproduce Figure 2b from Otting and co-authors: http://dx.doi.org/10.1021/ja204415w. The calculation uses brute-force time propagation and grid powder averaging, with central transitions on both gadolinium ions. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- The system contains two `E8` spins at [0.00, 0.00, 0.00] and [60.50, 0.00, 0.00], with each zero-field-splitting matrix diag(1e8, 1e8, -2e8), at a 3.5 T magnetic field; the isotropic electron g-factor is 2.002319.
+- The source notes that simulated gadolinium spin echoes are difficult to catch without the zero-field-splitting distributions found experimentally. Flip-flop terms in the inter-electron dipolar interaction are switched off using `deer-zz` to mimic slightly different experimental pulse frequencies.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The sequence uses a 100 ns step, 80 steps, and the `rep_2ang_1600pts_sph` powder grid. Its spectrum settings are a 1e10 sweep parameter and 1024 steps.
+- Three pulse FIDs receive exponential apodisation with parameter 6 before FFTs using four times the spectrum step count.
 
 ## Implementation structure
 
-- Gadolinium(III) DEER experiment at W-band using ideal pulses. Set to
-- reproduce Figure 2b from the paper by Otting and co-authors:
-- The calculation is done by brute-force time propagation and grid pow-
-- der averaging. Central transitions are used on both gadolinium ions.
-- Note: gadolinium spin echo is very sharp and difficult to catch in
-- simulations because they do not include zero-field splitting
-- distributions found in experimental systems.
-- Note: flip-flop terms in the inter-electron dipolar interaction are
-- switched off ('deer-zz') to mimic the effects of slightly dif-
-- ferent pulse frequencies in the experiment.
-- Calculation time: minutes.
-- Spin system properties
+- Create the spin system in the `zeeman-hilb` basis without approximation; run `powder` with `@deer_3p_hard_deer` in the `deer-zz` context.
+- Plot the frequency-swept spectrum, probe and pump excitation profiles, and the negative imaginary DEER trace.

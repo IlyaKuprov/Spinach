@@ -4,44 +4,22 @@
 
 ## Purpose
 
-Automated relaxation theory analysis. Prints longitudinal and transverse relaxation rates and times for all spins in the system. Syntax: [r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)
-
-## Physical / mathematical content
+Analyses the spin system relaxation model, reports longitudinal and transverse relaxation rates and times for every spin, and returns the relaxation superoperator.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The routine builds `R` with `relaxation`, optionally at the supplied orientation. For each spin it evaluates the decay rate of its `Lz` state and `L+` state from the corresponding normalized quadratic form with `R`; it returns the rates in Hz and their reciprocals as relaxation times in seconds. Dynamic frequency shifts are dropped.
 
 ## Parameters / inputs
 
-- euler_angles -optional euler angles for situations
-- when relaxation properties are orien-
-- tation-dependent
+- `euler_angles` — optional real three-element Euler-angle vector for orientation-dependent relaxation properties.
 
 ## Outputs
 
-- r1 -a vector of longitudinal relaxation rates
-- for each spin
-- r2 -a vector of transverse relaxation rates
-- for each spin
-- t1 -a vector of longitudinal relaxation times
-- for each spin
-- t2 -a vector of transverse relaxation times
-- for each spin
-- R -complete relaxation superoperator
-- Note: dynamic frequency shifts are dropped.
+- `r1` — vector of longitudinal relaxation rates, in Hz, one per spin.
+- `r2` — vector of transverse relaxation rates, in Hz, one per spin.
+- `t1` — vector of longitudinal relaxation times, in seconds, one per spin.
+- `t2` — vector of transverse relaxation times, in seconds, one per spin.
+- `R` — complete relaxation superoperator.
 
-## Implementation structure
-
-- Automated relaxation theory analysis. Prints longitudinal
-- and transverse relaxation rates and times for all spins in
-- the system. Syntax:
-- [r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)
-- euler_angles -optional euler angles for situations
-- when relaxation properties are orien-
-- tation-dependent
-- r1 -a vector of longitudinal relaxation rates
-- for each spin
-- r2 -a vector of transverse relaxation rates
-- t1 -a vector of longitudinal relaxation times
-- t2 -a vector of transverse relaxation times
+The function requires Liouville-space formalism.

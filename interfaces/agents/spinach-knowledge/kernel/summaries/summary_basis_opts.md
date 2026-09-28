@@ -4,32 +4,24 @@
 
 ## Purpose
 
-Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system)
+Prints a summary of the basis-set options for a Spinach system. Syntax: `summary_basis_opts(spin_system)`.
 
 ## Physical / mathematical content
 
+Reports the selected basis formalism. For `sphten-liouv`, it also reports the configured approximation and its correlation-level, connectivity, proximity-cutoff, and interaction-cutoff settings as applicable.
+
 ## Numerical / algorithmic content
+
+The approximation report distinguishes `IK-0`, `IK-1`, `IK-2`, `IK-DNP`, `IK-SBS`, and `none`; the source defines a separate report for each option.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
+- `spin_system` - Spinach spin system description object.
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints through `report.m` to the console or the user-specified output.
 
 ## Implementation structure
 
-- Prints basis-set option summary for a Spinach system. Syntax:
-- summary_basis_opts(spin_system)
-- spin_system -Spinach spin system description object
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Report the formalism
-- Report the approximation
-- Consistency enforcement
-- According to a trade legend, Uhlenbeck and Goudsmit (students of
-- Ehrenfest when they stumbled upon the concept of spin) presented
-- it to Ehrenfest and said, in effect "here's our theory, but don't
+- Checks that the input is a structure and reports one of the supported formalisms: Zeeman wavefunction, Zeeman Hilbert-space matrix, Zeeman Liouville-space matrix, or spherical-tensor Liouville-space matrix. For `sphten-liouv`, reports the configured approximation: `IK-0` sets an intra-substance correlation order; `IK-1` and `IK-2` report interaction-graph and proximity criteria; `IK-DNP` reports electron/electron-nuclear/nuclear correlation levels; `IK-SBS` reports boson-boson, spin-boson, and spin-spin levels; `none` reports a complete basis on all spins. Relevant interaction cutoffs and proximity distances are printed from the system settings.

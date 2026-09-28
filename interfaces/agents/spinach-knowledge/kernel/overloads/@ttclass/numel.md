@@ -4,36 +4,26 @@
 
 ## Purpose
 
-Number of elements in the matrix represented by a tensor train. Syntax: n=numel(tt)
+Returns the number of elements in the matrix represented by a tensor train. The count may exceed the range that a MATLAB double can represent exactly for large spin systems.
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+The implementation first checks that the input is a `ttclass` object, then multiplies the dimensions returned by `sizes(tt)` using native `int64` arithmetic. It raises an error if the result exceeds `flintmax`, otherwise returns the count as a double.
 
 ## Numerical / algorithmic content
 
+The representability check uses MATLAB's `flintmax`; the dimension product is formed with `prod(...,'native')` on `int64` values.
+
 ## Parameters / inputs
 
-- tt -tensor train object
+- tt - tensor train object
 
 ## Outputs
 
-- n -an integer
-- Note: for large spin systems, the result may be too large
-- to be represented exactly as a double.
+- n - an integer-valued double; an error is raised if the count exceeds MATLAB's `flintmax`
 
 ## Implementation structure
 
-- Number of elements in the matrix represented by a tensor
-- train. Syntax:
-- n=numel(tt)
-- tt -tensor train object
-- n -an integer
-- Note: for large spin systems, the result may be too large
-- to be represented exactly as a double.
-- Check consistency
-- Compute the number of elements exactly
-- Check for overflow
-- Return a double
-- Consistency enforcement
-- If it had been possible to build the tower of Babel without
+- Validate that `tt` is a `ttclass` object.
+- Compute the product of its sizes in `int64` arithmetic.
+- Check against `flintmax` and convert the result to double.

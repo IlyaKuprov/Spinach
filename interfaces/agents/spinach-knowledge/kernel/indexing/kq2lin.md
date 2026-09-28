@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts k,q indexing of matrices into their linear serpentine indexing. In base 1 indexing convention: (1,1)(1,2)(1,3) (1)(3)(6) (2,1)(2,2)(2,3) <=> (2)(5)(8) (3,1)(3,2)(3,3) (4)(7)(9) and in base 0 indexing convention: (0,0)(0,1)(0,2) (0)(2)(5) (1,0)(1,1)(1,2) <=> (1)(4)(7) (2,0)(2,1)(2,2) (3)(6)(8)
+Maps paired row and column indices to the single linear index assigned by Spinach's serpentine ordering of an N-by-N matrix. The convention is selectable: base 1 indices range from 1 to N; base 0 indices range from 0 to N-1. For a 3-by-3 matrix, the base-1 map is `[1 3 6; 2 5 8; 4 7 9]`, and the base-0 map is that map minus 1.
 
 ## Physical / mathematical content
 
-- Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
+This is an indexing conversion; it does not alter matrix values or represent a physical operation.
 
 ## Numerical / algorithmic content
+
+The function obtains the map from `serpentine(N,idx_base)` and looks up each (K,Q) pair. For base 0, it adds 1 to K and Q for MATLAB array indexing; the returned map values remain zero-based.
 
 ## Syntax
 
@@ -20,29 +22,11 @@ I=kq2lin(N,K,Q,idx_base)
 
 ## Parameters / inputs
 
-- N -matrix dimension, a scalar
-- K -first index, positive integer
-- array of any size
-- Q -second index, positive integer
-- array of the same size as K
-- idx_base -indexing base, 0 or 1
+- `N` - scalar real integer matrix dimension; it must be at least `idx_base`.
+- `K` - real integer row indices, in an array of any size.
+- `Q` - real integer column indices, with the same size as `K`.
+- `idx_base` - indexing base, either 0 or 1. Every index must lie between `idx_base` and `N-1+idx_base`.
 
 ## Outputs
 
-- I -linear serpentine index, an ar-
-- ray of the same size as inputs
-
-## Implementation structure
-
-- Converts k,q indexing of matrices into their linear
-- serpentine indexing. In base 1 indexing convention:
-- (1,1)(1,2)(1,3) (1)(3)(6)
-- (2,1)(2,2)(2,3) <=> (2)(5)(8)
-- (3,1)(3,2)(3,3) (4)(7)(9)
-- and in base 0 indexing convention:
-- (0,0)(0,1)(0,2) (0)(2)(5)
-- (1,0)(1,1)(1,2) <=> (1)(4)(7)
-- (2,0)(2,1)(2,2) (3)(6)(8)
-- I=kq2lin(N,K,Q,idx_base)
-- N -matrix dimension, a scalar
-- K -first index, positive integer
+- `I` - linear serpentine indices, with the same size as the input index arrays.

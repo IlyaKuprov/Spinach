@@ -4,30 +4,16 @@
 
 ## Purpose
 
-Double angle spinning spectrum of N-acetylvaline 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The cal- culation includes the second-order quadrupolar shift and the third-order lineshape. Time-domain detection. Note: slower spinning rates and larger NQIs require larger ranks and spherical grids. At the moment the spinning frequencies are set artificially too high to reduce the simulation time in t
+Double angle spinning spectrum of N-acetylvaline 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The calculation includes the second-order quadrupolar shift and the third-order lineshape. Time-domain detection. Note: slower spinning rates and larger NQIs require larger ranks and spherical grids. At the moment the spinning frequencies are set artificially too high to reduce the simulation time in this example. Calculation time: seconds
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+This 14N double-angle-spinning example models the quadrupolar interaction with `eeqq2nqi(3.21e6,0.27,1,[0 0 0])` at 14.1 T. The source describes the target as the 14N nucleus of N-acetylvaline and notes second-order quadrupolar shift and third-order lineshape contributions.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The source calls `doublerot` with `acquire` in the lab frame, using the 1D Fokker–Planck treatment, outer/inner rates of 1 and 5 MHz and ranks 7 and 4. It uses the `rep_2ang_100pts_oct` grid and disables `trajlevel`; diagonal damping is 2 kHz. The time-domain signal has 256 points over a 100 kHz sweep and is zero-filled to 1024 before Fourier transformation.
 
 ## Implementation structure
 
-- Double angle spinning spectrum of N-acetylvaline 14N nucleus
-- using 1D Fokker-Planck equation and a spherical grid. The cal-
-- culation includes the second-order quadrupolar shift and the
-- third-order lineshape. Time-domain detection.
-- Note: slower spinning rates and larger NQIs require larger
-- ranks and spherical grids. At the moment the spinning
-- frequencies are set artificially too high to reduce
-- the simulation time in this example.
-- Calculation time: seconds
-- System specification
-- Relaxation theory
-- Basis set
+Builds the single-spin quadrupolar system and basis, sets DOR and acquisition parameters, acquires the time-domain signal, Fourier transforms it, and plots the real spectrum.

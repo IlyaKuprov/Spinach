@@ -4,33 +4,15 @@
 
 ## Purpose
 
-Tests difficult dynamic coverage for includes, integrity, and MEX helpers. Syntax: result=test_dynamic_integrity_includes_mex_suite()
+Regression coverage for dynamic include execution, integrity helpers, and MEX helpers.
 
-## Physical / mathematical content
+## Coverage
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-
-## Numerical / algorithmic content
+- Exercises host-specific `autoexec` behavior, GPU guard scripts, direct include dispatch, existential checks, and parallel-profiler includes.
+- Tests serial and asynchronous Redfield-integral includes against a one-dimensional fixture.
+- Uses read-only integrity probes and temporary-directory fixtures for mutating integrity and MEX helpers.
+- The test avoids modifying production tests, production code, shipped build outputs, or repository state.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test uses direct include execution, read-only integrity probes, and
-- temporary-directory fixtures for mutating integrity and MEX helpers. It
-- avoids touching production tests, production code, shipped build outputs,
-- and repository state.
-
-## Implementation structure
-
-- Tests difficult dynamic coverage for includes, integrity, and MEX helpers. Syntax:
-- result=test_dynamic_integrity_includes_mex_suite()
-- result -regression test result with explanatory messages
-- The test uses direct include execution, read-only integrity probes, and
-- temporary-directory fixtures for mutating integrity and MEX helpers. It
-- avoids touching production tests, production code, shipped build outputs,
-- and repository state.
-- Announce the test target
-- State the integrity/include/MEX target of the test
-- Locate canonical Spinach subtrees
-- Exercise host overrides and GPU guard includes
-- Start a temporary pool for the pool-dependent include paths
+- `result` — regression-test result with explanatory messages.

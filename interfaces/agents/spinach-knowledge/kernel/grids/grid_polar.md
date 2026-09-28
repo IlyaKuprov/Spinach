@@ -4,44 +4,21 @@
 
 ## Purpose
 
-Generates a balanced polar grid in which the density of points does not increase towards the centre. Syntax: [phi,r,L]=grid_polar(ncircles,rmax)
-
-## Physical / mathematical content
-
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Generates a balanced polar grid whose point density does not increase towards the centre.
 
 ## Parameters / inputs
 
-- ncircles -number of radial circles
-- in the grid, an integer
-- rmax -maximum radius that the
-- grid must reach
+- `ncircles`: Number of radial circles; an integer greater than one.
+- `rmax`: Maximum grid radius; a positive real number.
 
 ## Outputs
 
-- phi -a column vector of polar
-- phi angles, radians
-- rmax -a coluim vector of radii
-- L -sparse Laplacian operator
-- acting on functions defined
-- as vector of values in the
-- same order as the grid
+- `phi`: Column vector of polar angles in radians.
+- `r`: Column vector of radii.
+- `L`: Sparse Laplacian operator acting on values ordered as the grid; constructed when requested.
 
-## Implementation structure
+## Implementation
 
-- Generates a balanced polar grid in which the density of
-- points does not increase towards the centre. Syntax:
-- [phi,r,L]=grid_polar(ncircles,rmax)
-- ncircles -number of radial circles
-- in the grid, an integer
-- rmax -maximum radius that the
-- grid must reach
-- phi -a column vector of polar
-- phi angles, radians
-- rmax -a coluim vector of radii
-- L -sparse Laplacian operator
-- acting on functions defined
+The radii are evenly spaced from zero to `rmax`. Each successive circle is assigned more angular grid points. When `L` is requested, the function triangulates the Cartesian coordinates, weights connected vertices by inverse squared distance, and normalizes the resulting Laplacian.
+
+[Source documentation](https://spindynamics.org/wiki/index.php?title=grid_polar.m)

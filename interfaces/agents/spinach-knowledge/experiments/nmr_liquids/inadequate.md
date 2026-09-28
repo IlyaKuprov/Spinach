@@ -4,15 +4,11 @@
 
 ## Purpose
 
-INADEQUATE pulse sequence. Selects double-quantum coherence from coupled carbon pairs, then converts it back into observable single- quantum magnetisation. At natural abundance 13C, this produces only 13C pair subspectra. Implemented as described in:
+INADEQUATE selects double-quantum coherence from coupled carbon pairs and converts it back into observable single-quantum magnetisation. At natural-abundance 13C, this gives 13C pair subspectra. The implementation is described in [the cited paper](https://doi.org/10.1021/ja00534a056); use `dilute.m` to generate carbon-pair isotopomers.
 
-## Physical / mathematical content
+## Sequence and signal
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The sequence uses J-coupling evolution and pulses to create and select double-quantum coherence, then converts the selected coherence back to detectable single-quantum magnetisation for the FID. The supplied Hamiltonian, relaxation, and kinetics operators are combined for propagation.
 
 ## Syntax
 
@@ -22,29 +18,15 @@ fid=inadequate(spin_system,parameters,H,R,K)
 
 ## Parameters / inputs
 
-- parameters.sweep sweep width in Hz
-- parameters.npoints number of points in the fid
-- parameters.spins active nuclei, e.g. {'13C'}
-- parameters.decouple nuclei to decouple, e.g. {'1H'}
-- parameters.J working J-coupling in Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- Output:
-- fid -free induction decay
-- Note: use dilute.m to generate carbon pair isotopomers.
+- `parameters.sweep`: sweep width, Hz.
+- `parameters.npoints`: number of FID points.
+- `parameters.spins`: active nuclei, e.g. `{'13C'}`.
+- `parameters.decouple`: nuclei to decouple, e.g. `{'1H'}`.
+- `parameters.J`: working J-coupling, Hz.
+- `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function.
 
-## Implementation structure
+## Output
 
-- INADEQUATE pulse sequence. Selects double-quantum coherence from
-- coupled carbon pairs, then converts it back into observable single-
-- quantum magnetisation. At natural abundance 13C, this produces only
-- 13C pair subspectra. Implemented as described in:
-- fid=inadequate(spin_system,parameters,H,R,K)
-- parameters.sweep sweep width in Hz
-- parameters.npoints number of points in the fid
-- parameters.spins active nuclei, e.g. {'13C'}
-- parameters.decouple nuclei to decouple, e.g. {'1H'}
-- parameters.J working J-coupling in Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
+- `fid`: free induction decay.
+
+[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inadequate.m).

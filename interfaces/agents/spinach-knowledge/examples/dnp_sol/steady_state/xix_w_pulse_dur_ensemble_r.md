@@ -4,27 +4,12 @@
 
 ## Purpose
 
-2D parameter scan of XiX DNP in the steady state with electron-proton distance ensemble. Calculation time: hours.
+Computes the steady-state proton signal for a XiX DNP experiment over electron-pulse duration and microwave offset, averaged over an electron–proton distance ensemble. The source estimates a runtime of hours.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The W-band model uses one electron and one proton at 80 K, with the trityl electron g tensor and a proton shift. Three Gauss–Legendre distance nodes are generated over 3.5–20 (in the source's distance units); at each node the proton relaxation rate is evaluated using `r1n_dnp`. A spherical powder average calls `xixdnp_steady` with a 20 MHz electron nutation frequency, 800-point grid, and a 360 ns contact block.
 
-## Numerical / algorithmic content
+## Scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- 2D parameter scan of XiX DNP in the steady state with
-- electron-proton distance ensemble.
-- Calculation time: hours.
-- W-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance ensemble
-- Electron pulse duration grid, s
+For each distance, the script calculates 200 pulse durations from 2 to 21 ns and 101 microwave offsets from −230 to 205 MHz. It combines the resulting proton (I_z) signals with the quadrature weights and the (r^2) radial Jacobian, then plots signal versus pulse duration and offset. The figure is saved as `xix_w_pulse_dur_ensemble_r.fig`.

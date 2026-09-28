@@ -8,11 +8,11 @@ COMSOL 2D mesh data import, cropping and preprocessing for Spinach. Syntax: mesh
 
 ## Physical / mathematical content
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+Imports a two-dimensional COMSOL mesh and vertex-centred flow velocities into a Spinach mesh object, then crops the mesh, inactivates specified vertices, computes a Voronoi tessellation, and prepares plotting data.
 
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Calls `comsol_mesh`, `comsol_velo`, `mesh_crop`, `mesh_inact`, `mesh_vorn`, and `mesh_preplot` in that order.
 
 ## Parameters / inputs
 
@@ -44,15 +44,4 @@ COMSOL 2D mesh data import, cropping and preprocessing for Spinach. Syntax: mesh
 
 ## Implementation structure
 
-- COMSOL 2D mesh data import, cropping and preprocessing for
-- Spinach. Syntax:
-- mesh=comsol_import(comsol)
-- comsol.mesh_file -name of an ASCII file with
-- vertex coordinates and edge
-- index produced by COMSOL
-- comsol.velo_file -name of an ASCII file with
-- vertex-centred flow veloci-
-- ties produced by COMSOL
-- comsol.crop -{[xmin xmax],[ymin ymax]}
-- region of the mesh to retain
-- comsol.inactivate -a row vector with mesh vertex
+Validates the COMSOL input structure and required fields, then imports the mesh and velocities, crops the region, inactivates specified vertices, computes the Voronoi tessellation, and prepares plotting data.

@@ -4,60 +4,32 @@
 
 ## Purpose
 
-Soft pulse followed by acquisition. The soft pulse is simulated using the Fokker-Planck formalism. Syntax: fid=sp_acquire(spin_system,parameters,H,R,K)
-
-## Physical / mathematical content
-
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+Applies a soft pulse and then acquires the free induction decay. The soft pulse is simulated using the Fokker–Planck formalism.
 
 ## Numerical / algorithmic content
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The routine moves the system into the adjoint representation if needed, forms `L=H+1i*R+1i*K`, and constructs the X and Y pulse operators for `parameters.spins{1}`. It subtracts `parameters.offset` from `parameters.pulse_frq`, passes the adjusted frequency and pulse settings to `shaped_pulse_af`, then calls `acquire` to produce the FID.
 
 ## Parameters / inputs
 
-- parameters.pulse_frq -frequency of the soft pulse,
-- relative to the frequency of
-- the current rotating frame, Hz
-- parameters.pulse_phi -phase of the soft pulse, rad
-- parameters.pulse_pwr -power of the soft pulse, rad/s
-- parameters.pulse_dur -duration of the sof pulse, s
-- parameters.pulse_rnk -Fokker-Planck cut-off rank,
-- a small integer: start with 2
-- and increase until the answer
-- stops changing
-- parameters.offset -transmitter / receiver offset
-- for the time domain pulses and
-- detection, relative to the cur-
-- rent rotating frame, Hz
-- parameters.sweep -sweep width for time domain
-- detection, Hz
-- parameters.npoints -number of points in the free
-- induction decay
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.method -soft puse propagation method,
-- 'expv' for Krylov propagation,
-- 'expm' for exponential propa-
-- gation, 'evolution' for Spin-
-- ach evolution function
+- `parameters.pulse_frq` — soft-pulse frequency relative to the current rotating frame, Hz
+- `parameters.pulse_phi` — soft-pulse phase, rad
+- `parameters.pulse_pwr` — soft-pulse power, rad/s
+- `parameters.pulse_dur` — soft-pulse duration, s
+- `parameters.pulse_rnk` — Fokker–Planck cut-off rank; start with 2 and increase until the answer stops changing
+- `parameters.offset` — transmitter/receiver offset
+- `parameters.sweep` — sweep width for time-domain detection, Hz
+- `parameters.npoints` — number of points in the FID
+- `parameters.rho0` — initial state
+- `parameters.coil` — detection state
+- `parameters.method` — soft-pulse propagation method: `expv`, `expm`, or `evolution`
+- `parameters.spins` — working spins; the pulse operators use the first specified spin
+- `H`, `R`, `K` — Hamiltonian, relaxation, and kinetics matrices, respectively, received from the context function
 
 ## Outputs
 
-- fid -dynamics of the coil state as a function of time
+- `fid` — dynamics of the coil state as a function of time
 
-## Implementation structure
+## Reference
 
-- Soft pulse followed by acquisition. The soft pulse is simulated
-- using the Fokker-Planck formalism. Syntax:
-- fid=sp_acquire(spin_system,parameters,H,R,K)
-- parameters.pulse_frq -frequency of the soft pulse,
-- relative to the frequency of
-- the current rotating frame, Hz
-- parameters.pulse_phi -phase of the soft pulse, rad
-- parameters.pulse_pwr -power of the soft pulse, rad/s
-- parameters.pulse_dur -duration of the sof pulse, s
-- parameters.pulse_rnk -Fokker-Planck cut-off rank,
-- a small integer: start with 2
-- and increase until the answer
+- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=sp_acquire.m)

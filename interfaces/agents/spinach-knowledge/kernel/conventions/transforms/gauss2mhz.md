@@ -4,29 +4,19 @@
 
 ## Purpose
 
-Converts hyperfine couplings from Gauss to MHz (linear frequency). The Gauss specification may be defined as "the magnetic field at which the electron frequency is equal to the frequency provided". Syntax: hfc_mhz=gauss2mhz(hfc_gauss,g) Arrays of any dimensions are supported. Parameters: hfc_gauss -an array of values in Gauss g -electron g-factor; if this parameter is skipped, free electron g-factor is used for conve
+Converts hyperfine couplings from gauss to MHz (linear frequency). Here, a gauss value can be specified as the magnetic field at which the electron frequency equals the frequency provided.
 
-## Physical / mathematical content
+## Parameters / inputs
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+- `hfc_gauss`: real numeric array of hyperfine couplings in gauss; arrays of any dimensions are supported.
+- `g`: optional real scalar electron g-factor. If omitted, the free-electron value `2.0023193043622` is used.
 
-## Numerical / algorithmic content
+## Output
 
-## Outputs
+- `hfc_mhz`: array of values in MHz, with the same shape as `hfc_gauss`.
 
-- hfc_mhz -an array of values in MHz
+## Conversion
 
-## Implementation structure
+The conversion uses `hfc_mhz = 1e-10 * g * muB * hfc_gauss / (hbar * 2*pi)`, with the Bohr magneton and reduced Planck constant in SI units.
 
-- Converts hyperfine couplings from Gauss to MHz (linear
-- frequency). The Gauss specification may be defined as
-- "the magnetic field at which the electron frequency is
-- equal to the frequency provided". Syntax:
-- hfc_mhz=gauss2mhz(hfc_gauss,g)
-- Arrays of any dimensions are supported. Parameters:
-- hfc_gauss -an array of values in Gauss
-- g -electron g-factor; if this parameter
-- is skipped, free electron g-factor is
-- used for conversion
-- hfc_mhz -an array of values in MHz
-- Set the defaults
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=gauss2mhz.m)

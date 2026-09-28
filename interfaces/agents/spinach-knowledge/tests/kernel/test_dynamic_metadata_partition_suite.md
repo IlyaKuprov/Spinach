@@ -4,33 +4,16 @@
 
 ## Purpose
 
-Tests deterministic metadata, hashing, and partition helpers. Syntax: result=test_dynamic_metadata_partition_suite()
+Regression checks for parallel-state metadata and dynamic hashing, transfer-matrix, graph-component, and disabled-helper behavior.
 
-## Physical / mathematical content
+## Coverage
 
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-
-## Numerical / algorithmic content
-
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+- Checks that `poolsize()` returns a nonnegative integer and `isworkernode()` is false on the MATLAB client.
+- Checks stable 32-character hexadecimal `md5_hash` output, sensitivity to changed data and full versus sparse matrices, and stable first-occurrence removal of duplicate sparse rows by `unihash`.
+- Checks `transfermat` recovery of a 2×2 matrix from linearly complete overdetermined samples at `1e-14` tolerance.
+- Checks `scomponents` on a directed graph with components `{1,2}` and `{3}`.
+- With tracking or zero-track elimination disabled, checks that `path_trace` and `zte` return the scalar placeholder `1`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks hashing stability, duplicate-row removal, parallel-state
-- metadata, transfer matrices, graph components, and safe partition exits.
-
-## Implementation structure
-
-- Tests deterministic metadata, hashing, and partition helpers. Syntax:
-- result=test_dynamic_metadata_partition_suite()
-- result -regression test result with explanatory messages
-- The test checks hashing stability, duplicate-row removal, parallel-state
-- metadata, transfer matrices, graph components, and safe partition exits.
-- Announce the test target
-- State the metadata and partition target of the test
-- Check parallel-state metadata on the MATLAB client
-- Check MD5 hash stability and object-type sensitivity
-- Check stable duplicate-row removal through hash-table identity
-- Check least-squares transfer matrix recovery from overdetermined samples
-- Check strongly connected components on a two-component directed graph
+- `result` — regression-test result with explanatory messages.

@@ -4,30 +4,20 @@
 
 ## Purpose
 
-Tests sparse, tensor-product, and simple graph utilities. Syntax: result=test_sparse_tensor_graph_suite()
+Checks sparse-format conversion, Kronecker-product operations, subgraph pruning, permutation-group metadata, tuple enumeration, connectivity, and bin packing.
 
 ## Physical / mathematical content
 
+Not applicable; this is a utility regression suite.
+
 ## Numerical / algorithmic content
+
+The test converts a 3-by-3 sparse logical matrix to one-based CSR row pointers and indices, and checks `kronm` and `kronm_new` against explicit Kronecker-product action on an 8-by-2 matrix. It checks that `prune_subgraphs` keeps maximal rows, verifies a small permutation-group table, and compares enumeration of `[1 2]` with `[3 4 5]` to the six expected tuples. It also checks the connectivity matrix for four points at Euclidean cutoff `0.75`, and verifies greedy bin packing of sizes `[4 2 1 5 3]` at capacity `5` into four bins.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks small sparse-format transforms, Kronecker-matrix action,
-- graph pruning, permutation group metadata, tuple enumeration, connectivity,
-- and simple bin packing against explicit references.
+`result` is the regression-test record with explanatory messages.
 
 ## Implementation structure
 
-- Tests sparse, tensor-product, and simple graph utilities. Syntax:
-- result=test_sparse_tensor_graph_suite()
-- result -regression test result with explanatory messages
-- The test checks small sparse-format transforms, Kronecker-matrix action,
-- graph pruning, permutation group metadata, tuple enumeration, connectivity,
-- and simple bin packing against explicit references.
-- Announce the test target
-- State the utility target of the test
-- Check sparse logical matrix conversion to partial CSR indexing
-- Check Kronecker-matrix multiplication without opening the product
-- Check subgraph pruning removes strict subsets while preserving maximal rows
-- Check a small permutation group table
+Runs each utility on a small explicit fixture and compares its output with the expected indices, matrices, tuples, or bins.

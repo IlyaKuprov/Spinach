@@ -4,28 +4,14 @@
 
 ## Purpose
 
-Creates a tickless boxed frame around the current axes using ordinary line objects that live in the same data space as the plot. This is needed for spectrograms be- cause Matlab has dumb plotting defaults. Syntax: kbox()
+Creates a tickless frame around the current axes using a line overlay in data coordinates. It draws a rectangle in 2D and the 12 edges of the axis-limit box in 3D.
 
 ## Physical / mathematical content
 
 ## Numerical / algorithmic content
 
+- The overlay follows the axes limits, line width, and colour; listeners update it when relevant axes properties or children change. It is excluded from autoscaling and placed above the other axes children.
+
 ## Outputs
 
-- creates or updates a tickless axis box
-- in the current axes
-
-## Implementation structure
-
-- Creates a tickless boxed frame around the current axes
-- using ordinary line objects that live in the same data
-- space as the plot. This is needed for spectrograms be-
-- cause Matlab has dumb plotting defaults. Syntax:
-- kbox()
-- creates or updates a tickless axis box
-- in the current axes
-- Get the current axis object
-- Remove any previous Spinach box overlay
-- Delete orphaned overlay axes from the rejected implementation
-- Create the box line in the plot axes
-- Exclude the box line from autoscaling
+- Creates or updates one box overlay in the current axes; returns no output.

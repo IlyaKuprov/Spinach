@@ -4,29 +4,12 @@
 
 ## Purpose
 
-Field dependence of the decay rate of a micelle-confined triplet-born benzophenone ketyl / alkyl radical pair, computed with Redfield theory and with the lifetime-shifted Nakajima-Zwanzig kernel. The high-field decay of micellar pairs is relaxation-controlled: the T+/-states drain into the reactive S/T0 subspace at rates set by spectral densities of the anisotropic hyperfine modulation. Contact recombination at 1e9 H
+Compare Redfield and lifetime-shifted Nakajima-Zwanzig (NZ) predictions for the field-dependent decay rate of a micelle-confined, triplet-born benzophenone ketyl/alkyl radical pair. The source describes high-field decay as relaxation-controlled: anisotropic hyperfine modulation transfers population from the T+/- states into the reactive S/T0 subspace. The reported decay rate is the slowest eigenmode of the pair Liouvillian.
 
-## Physical / mathematical content
+## Setup
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The calculation uses fields `0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.4, 0.7, 1.0, 1.34 T`, contact recombination rate `1e9 Hz`, and rotational correlation time `0.7 ns`. The source comments place its scalar lifetime-shift parameter near `0.35` and identify the SDS supercage systems of Sakaguchi, Hayashi, and Nagakura as the experimental context. It calculates both theories at every field and plots the two decay-rate curves.
 
-## Numerical / algorithmic content
+## Reference
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-
-## Implementation structure
-
-- Field dependence of the decay rate of a micelle-confined triplet-born
-- benzophenone ketyl / alkyl radical pair, computed with Redfield theory
-- and with the lifetime-shifted Nakajima-Zwanzig kernel. The high-field
-- decay of micellar pairs is relaxation-controlled: the T+/-states drain
-- into the reactive S/T0 subspace at rates set by spectral densities of
-- the anisotropic hyperfine modulation. Contact recombination at 1e9 Hz
-- against a supercage correlation time of 0.7 ns puts the scalar lifetime
-- shift at k*tau_c near 0.35, and the two theories separate. The observed
-- decay rate is the slowest eigenmode of the pair Liouvillian. Parameters
-- are representative of the SDS supercage systems of Sakaguchi, Hayashi,
-- and Nagakura:
-- Calculation time: minutes
+- [DOI: 10.1246/bcsj.57.322](https://doi.org/10.1246/bcsj.57.322)

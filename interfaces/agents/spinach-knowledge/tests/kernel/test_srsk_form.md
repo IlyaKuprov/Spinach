@@ -4,15 +4,15 @@
 
 ## Purpose
 
-SRSK formalism refusal and supported fast-source relaxation.
+Tests SRSK formalism restrictions and supported source relaxation.
 
 ## Physical / mathematical content
 
-A rapidly relaxing nitrogen source produces the expected proton scalar-relaxation rates in spherical-tensor Liouville space.
+A rapidly relaxing 14N source broadens its scalar-coupled proton in spherical-tensor Liouville space. The test checks the Abragam longitudinal and transverse rates of the additive SRSK contribution.
 
 ## Numerical / algorithmic content
 
-Checks explicit unsupported Zeeman requests across retention/equilibrium choices and preserves Zeeman Lindblad and spherical SRSK controls.
+Checks that Zeeman Liouville SRSK is explicitly refused across lab-frame, secular, and diagonal retention and zero, IME, and dibari equilibrium choices, including when extended T1/T2 is requested. Separately checks a Zeeman Lindblad control without SRSK and the supported spherical-tensor Liouville SRSK contribution on longitudinal and complex transverse proton states.
 
 ## Syntax
 
@@ -20,12 +20,12 @@ Checks explicit unsupported Zeeman requests across retention/equilibrium choices
 
 ## Parameters / inputs
 
-None. The test constructs its own bounded physical fixtures.
+None. The test constructs its own spin-system fixtures.
 
 ## Outputs
 
-`result` is the regression record of checks, messages, and failures; the test runner determines its final status.
+`result` is a regression test result with explanatory messages.
 
 ## Header notes
 
-The regression is registered in `test_manifest` and is not an optimisation or performance benchmark.
+Contact: talos@spindynamics.org.

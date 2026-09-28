@@ -4,35 +4,30 @@
 
 ## Purpose
 
-Returns a unit operator in the current formalism and basis. The operator has dimension equal to the basis size in sphten-liouv formalism, the dimension equal to the product of all spin multi- plicities in zeeman-hilb and zeeman-wavef formalisms, and the dimension of square of the product of all spin multiplicities in zeeman-liouv formalism. Syntax: A=unit_oper(spin_system)
+Returns a sparse identity operator with dimensions appropriate to the current formalism and basis.
 
 ## Physical / mathematical content
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+- In `sphten-liouv`, the dimension is the number of rows in `spin_system.bas.basis`.
+- In `zeeman-hilb` and `zeeman-wavef`, the dimension is the product of the spin multiplicities.
+- In `zeeman-liouv`, the dimension is the square of that product.
 
 ## Numerical / algorithmic content
 
+- Constructs the sparse identity matrix with `speye`.
+
 ## Parameters / inputs
 
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
+- `spin_system` — Spinach data object containing basis information; call `basis.m` first.
 
 ## Outputs
 
-- A -a sparse unit matrix of appropriate
-- dimension
+- `A` — Sparse identity matrix of the appropriate dimension.
 
 ## Implementation structure
 
-- Returns a unit operator in the current formalism and basis. The
-- operator has dimension equal to the basis size in sphten-liouv
-- formalism, the dimension equal to the product of all spin multi-
-- plicities in zeeman-hilb and zeeman-wavef formalisms, and the
-- dimension of square of the product of all spin multiplicities in
-- zeeman-liouv formalism. Syntax:
-- A=unit_oper(spin_system)
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
-- A -a sparse unit matrix of appropriate
-- dimension
-- Check consistency
+- Checks that `spin_system.bas.formalism` is present, then selects the dimension by formalism. An unknown formalism raises an error.
+
+## Reference
+
+- https://spindynamics.org/wiki/index.php?title=unit_oper.m

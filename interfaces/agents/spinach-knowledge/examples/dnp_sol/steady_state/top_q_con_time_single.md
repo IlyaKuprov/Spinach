@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Simulation of TOP DNP contact time dependence in the steady state. Calculation time: hours.
+Calculates proton longitudinal expectation versus total TOP DNP contact time for two fixed irradiation parameter sets at a fixed electron-proton separation. The source comments estimate the calculation takes hours.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The model is an electron-proton pair at 3.5 Å in a Q-band field (1.2142 T), with spin temperature 80 K, trityl electron g principal values [2.00319, 2.00319, 2.00258], and proton shift [0, 0, 5] ppm. It uses distance- and orientation-dependent proton relaxation through `r1n_dnp`, the full sphten-liouv basis, diagonal relaxation, dibari equilibrium, and the `rep_2ang_800pts_sph` powder grid.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of TOP DNP contact time dependence in the
-- steady state.
-- Calculation time: hours.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Relaxation rates, distance and ori. dep. R1n
-- Basis set
-- Propagator accuracy
+For loop counts 1–256, the script uses 10 ns pulses and 14 ns delays and runs two steady-state calculations per count with `powder`, `@topdnp_steady`, and `esr` mode. Set A uses 18 MHz irradiation, 95 MHz electron offset, and shot spacing 102 μs minus the pulse-train duration; set B uses 33 MHz, 92 MHz, and 153 μs minus that duration. The plot compares proton Iz expectation against total contact time and is saved as `top_q_con_time_single.fig`.

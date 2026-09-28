@@ -8,23 +8,12 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
+This static 15N–1H cross-polarisation model has eight protons positioned around one 15N; the source describes the proton bath as scattered on a 2 Å-radius sphere. The simulation starts from the anisotropic equilibrium requested by `parameters.needs={'aniso_eq'}` at 298 K and observes the 15N response while both nuclei are irradiated in the doubly rotating frame.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The calculation uses the sphten-liouv formalism with the IK-0 reduced basis, `inter_level=4`, and `sys.enable={'greedy'}` (the source comments that this example needs a GPU). The hard-contact pulse simulation is powder averaged on `rep_2ang_100pts_sph`; it uses 100 intervals of 10 μs and 50 kHz irradiation on both channels.
 
 ## Implementation structure
 
-- Cross-polarisation experiment in the doubly rotating frame. A single
-- nitrogen-15 in a bath of 8 protons scattered on a 2 Angstrom radius
-- sphere around it. Static powder simulation in a reduced (up to, and
-- including four-spin correlations) Liouville space.
-- Calculation time: minutes on a Tesla A100, much longer on CPU.
-- System specification
-- Interactions
-- Basis set
-- This needs a GPU
-- Spinach housekeeping
-- Experiment parameters
-- Simulation
+Builds the nine-spin system and fourth-level interaction-space basis, defines the two-channel RF and 15N detection operators, then calls `powder` with `cp_contact_hard` and plots the real 15N response versus cumulative contact time.

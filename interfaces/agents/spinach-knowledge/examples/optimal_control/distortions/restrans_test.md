@@ -4,17 +4,8 @@
 
 ## Purpose
 
-Resonator transform test. Sends a square pulse into a simple resonator model and plots the time-domain response.
+Tests the resonator transform by sending a square pulse through a simple resonator model and plotting the time-domain response.
 
-## Physical / mathematical content
+## Method
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Resonator transform test. Sends a square pulse into a simple
-- resonator model and plots the time-domain response.
-- Get a pulse shape
-- Get a figure going
+Generates a random 51-sample, two-component pulse and zeros the first and last three samples. It then simulates the response for ¹H and ¹⁵N at 14.1 T, using a 1 μs slice duration, Q factor 50, and piecewise-constant modelling with 100 points. The circuit resonance frequencies are 2π × 600 MHz for ¹H and 2π × 60 MHz for ¹⁵N.

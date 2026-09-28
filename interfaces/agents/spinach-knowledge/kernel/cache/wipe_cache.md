@@ -4,36 +4,24 @@
 
 ## Purpose
 
-Forces a wipe of the Spinach cache folder. Syntax: wipe_cache(spin_system)
+Forces a wipe of the Spinach cache folder.
 
 ## Physical / mathematical content
 
-- Cache-management utilities. These files maintain Spinach temporary or persistent cache state used to avoid repeated expensive construction of large operators or metadata.
-
 ## Numerical / algorithmic content
+
+- Sets `spin_system.tols.cache_mem` to zero and calls `cacheman(spin_system)`.
 
 ## Parameters / inputs
 
-- spin_system -Spinach object with information (stored
-- in spin_system.sys.scratch) about the
-- cache folder location, use bootstrap()
-- to get the default object
-- Output:
-- an attempt is made to delete all all Spinach-specific
-- files in spin_system.sys.scratch; this would fail qui-
-- etly if file system permissions are insufficient
+- `spin_system` — Spinach object with the cache folder location in `spin_system.sys.scratch`. If omitted, `bootstrap('hush')` supplies the default object.
+
+## Output
+
+- Attempts to delete all Spinach-specific files in `spin_system.sys.scratch`; this may fail quietly if file system permissions are insufficient.
 
 ## Implementation structure
 
-- Forces a wipe of the Spinach cache folder. Syntax:
-- wipe_cache(spin_system)
-- spin_system -Spinach object with information (stored
-- in spin_system.sys.scratch) about the
-- cache folder location, use bootstrap()
-- to get the default object
-- Output:
-- an attempt is made to delete all all Spinach-specific
-- files in spin_system.sys.scratch; this would fail qui-
-- etly if file system permissions are insufficient
-- Defaults for command line calls
-- Check consistency
+- Checks that `spin_system.sys.scratch` is specified and that the folder exists, then reports the requested cache wipe before invoking cache management.
+
+<https://spindynamics.org/wiki/index.php?title=wipe_cache.m>

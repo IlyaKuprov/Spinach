@@ -4,29 +4,26 @@
 
 ## Purpose
 
-Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator()
+Tests that `operator()` maps human-readable labels to the correct one-spin Hilbert-space angular momentum matrices.
 
-## Physical / mathematical content
+## Test setup
 
-## Numerical / algorithmic content
+- Builds a one-proton (`1H`) spin system with zero magnetic field and zero scalar Zeeman interaction.
+- Uses the `zeeman-hilb` formalism with no approximation.
+- Obtains spin-half reference matrices from `pauli(2)`.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Checks
 
-## Outputs
+Each `operator()` result is compared with its reference matrix using `test_close` with both tolerances set to `1e-15`:
 
-- result -regression test result with explanatory messages
-- The test checks that operator() builds the correct one-spin Hilbert-space
-- angular momentum matrices from human-readable labels.
+| Label | Reference matrix |
+| --- | --- |
+| `Lx` | `S.x` |
+| `Ly` | `S.y` |
+| `Lz` | `S.z` |
+| `L+` | `S.p` (raising operator) |
+| `L-` | `S.m` (lowering operator) |
 
-## Implementation structure
+## Output
 
-- Tests Hilbert-space operator generation. Syntax:
-- result=test_hilbert_operator()
-- result -regression test result with explanatory messages
-- The test checks that operator() builds the correct one-spin Hilbert-space
-- angular momentum matrices from human-readable labels.
-- Announce the test target
-- State the physical target of the test
-- Build a one-proton Hilbert-space spin system
-- Textbook spin-half reference matrices
-- Check label-to-matrix mapping
+- `result` — regression test result with explanatory messages.

@@ -4,30 +4,16 @@
 
 ## Purpose
 
-Returns true if the particle is an electron. Syntax: verdict=iselectron(spin_spec)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Tests whether a Spinach particle specification denotes an electron. The function checks that `spin_spec` is a character string and a valid Spinach particle specification, then returns true when its first character is `E` and false otherwise.
 
 ## Parameters / inputs
 
-- spin_spec -a Spinach particle specification
+- `spin_spec` - a character string containing a Spinach particle specification.
 
 ## Outputs
 
-- verdict -true for an electron, false otherwise
+- `verdict` - true if the first character of `spin_spec` is `E`, false otherwise.
 
-## Implementation structure
+## Source
 
-- Returns true if the particle is an electron. Syntax:
-- verdict=iselectron(spin_spec)
-- spin_spec -a Spinach particle specification
-- verdict -true for an electron, false otherwise
-- Check consistency
-- A simple matching check
-- Consistency enforcement
-- Лучше умереть героем чем жить пидорасом.
-- Евгений Пригожин
+[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=iselectron.m)

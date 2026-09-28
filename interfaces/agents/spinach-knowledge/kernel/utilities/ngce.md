@@ -4,56 +4,32 @@
 
 ## Purpose
 
-Numerical integral route to the Redfield relaxation superopera- tor. Syntax: [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
+Computes a Redfield relaxation superoperator by numerical integration along a molecular-dynamics (MD) trajectory.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-
-## Parameters / inputs
-
-- H0 -static laboratory frame Hamiltonian commutation su-
-- peroperator acting in the background, a matrix
-- H1 -stochastic part (zero mean) of the laboratory frame
-- Hamiltonian commutation superoperator, a cell array
-- of matrices, one for each step of the MD trajectory.
-- dt -time step of the MD trajectory, seconds
-- tau_est -H1 autocorrelation time estimate for internal
-- safety control, seconds
-- reg -optional overall relaxation rate, this is added to
-- every eigenvalue of the resulting matrix to prevent
-- very small relaxation rates (e.g. singlets) from
-- jumping into positive due to integration accuracy
-- limits and then causing problems
+- `spin_system` — Spinach system object used for reporting, propagation, tolerances, and unit-state operators.
+- `H0` — static laboratory-frame Hamiltonian commutation superoperator acting in the background; a matrix.
+- `H1` — zero-mean stochastic part of the laboratory-frame Hamiltonian commutation superoperator; a cell array of matrices, one per MD trajectory step.
+- `dt` — MD trajectory time step, in seconds.
+- `tau_est` — estimate of the `H1` autocorrelation time, in seconds, used for internal safety checks.
+- `reg` — optional overall relaxation rate. When nonzero, it is subtracted through `unit_oper(spin_system)` to prevent very small relaxation rates, such as singlet rates, from becoming positive because of integration accuracy limits.
 
 ## Outputs
 
-- R -laboratory frame relaxation superoperator
-- dR -standard deviation of the mean of R, element by element
-- Note: enough trajectory points must be present to converge
-- the ensemble averages and Redfield's integral.
-- Note: the result is returned in the LABORATORY FRAME -eli-
-- minating non-secular terms is user's responsibility.
+- `R` — laboratory-frame relaxation superoperator.
+- `dR` — element-by-element standard deviation of the mean of `R`, calculated when a second output is requested.
 
-## Implementation structure
+## Numerical method and checks
 
-- Numerical integral route to the Redfield relaxation superopera-
-- tor. Syntax:
-- [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
-- H0 -static laboratory frame Hamiltonian commutation su-
-- peroperator acting in the background, a matrix
-- H1 -stochastic part (zero mean) of the laboratory frame
-- Hamiltonian commutation superoperator, a cell array
-- of matrices, one for each step of the MD trajectory.
-- dt -time step of the MD trajectory, seconds
-- tau_est -H1 autocorrelation time estimate for internal
-- safety control, seconds
-- reg -optional overall relaxation rate, this is added to
+The routine estimates the shortest coherent-dynamics period as `2*pi/normest(H0)`. It requires at least 50 trajectory points per `H0` period, at least 10 points per `tau_est`, and a trajectory duration of at least `200*tau_est`; otherwise it raises an error. Enough trajectory points must be available to converge both the ensemble averages and Redfield's integral.
+
+The correlation-time integration uses `5*ceil(tau_est/dt)` steps. Propagators are generated from `H0` and `dt` and cleaned using `spin_system.tols.prop_chop`. The trajectory is divided into complete, non-overlapping stripes of this length. A `parfor` loop applies the trapezium rule to each stripe's integral, with intermediate terms cleaned using `spin_system.tols.liouv_zero`. Each stripe contribution is restricted to its real symmetric, trace-preserving part before the contributions are averaged into `R`. When requested, `dR` is obtained from the element-by-element variance across stripes. After optional regularisation, the unit-state projector is used again so that the unit state is not damped.
+
+`R` is returned in the **laboratory frame**. Eliminating non-secular terms is the user's responsibility.
+
+## Reference and contacts
+
+- <https://spindynamics.org/wiki/index.php?title=ngce.m>
+- ilya.kuprov@weizmann.ac.il
+- jpresteg@uga.edu

@@ -8,9 +8,11 @@ Returns a unit object of the same type as whatever is supplied.
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Returns an identity matrix or tensor-train representation for a square matrix.
 
 ## Numerical / algorithmic content
+
+For a tensor-train input, the function checks that each core has matching row and column mode sizes, creates an identity matrix for each core, and constructs `ttclass(1,core,0)`. For a sparse square matrix it returns `speye(size(A))`; for a dense square matrix it returns `eye(size(A))`. Other inputs, including tensor trains that do not represent square matrices, raise an error.
 
 ## Syntax
 
@@ -20,24 +22,8 @@ A=unit_like(A)
 
 ## Parameters / inputs
 
-- A -a full or sparse square matrix, or a tensor train
-- representation of a square matrix
+- `A` — a full or sparse square matrix, or a tensor-train representation of a square matrix.
 
 ## Outputs
 
-- A -a unit matrix in the same format
-
-## Implementation structure
-
-- Returns a unit object of the same type as whatever is supplied.
-- A=unit_like(A)
-- A -a full or sparse square matrix, or a tensor train
-- representation of a square matrix
-- A -a unit matrix in the same format
-- Unit tensor train of the same topology
-- Unit sparse matrix of the same dimension
-- Unit dense matrix of the same dimension
-- Complain and bomb out
-- Briefly stated, the Gell-Mann Amnesia effect is as follows. You open the
-- newspaper to an article on some subject you know well. You read the arti-
-- cle and see the journalist has absolutely no understanding of either the
+- `A` — a unit matrix in the same format.

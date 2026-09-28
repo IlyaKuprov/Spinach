@@ -4,43 +4,28 @@
 
 ## Purpose
 
-Bosonic mode dissipation superoperator. Builds thermalised GKSL dissipators for the amplitude damping and the pure dephasing of the bosonic modes declared in inter.modes, using the amplitude damping rates and the pure dephasing rates ingested by create.m and the Bose-Einstein thermal occupation numbers computed from the physical mode frequencies, meaning the sum of the declared carrier and the declared frequency wher
+Builds the Liouville-space relaxation superoperator for dissipative bosonic modes described in `spin_system.inter.modes`. It includes thermal amplitude damping and number-operator pure dephasing for modes of types `C`, `V`, and `T`.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+For each mode, the implementation uses cooling and heating terms with coefficients `kappa*(1+nbar)` and `kappa*nbar`, respectively, plus pure dephasing with coefficient `2*gamma_phi`. Here `nbar` is the Bose-Einstein occupation at the mode's physical frequency. At zero temperature it is set to zero; the spin relaxation convention equating zero temperature with the high-temperature limit does not apply to these bosonic modes.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+For a damped mode at positive temperature, the physical frequency is the declared carrier plus the mode frequency when the carrier is positive, and otherwise the absolute value of the declared mode frequency. A frequency below `2*pi*spin_system.tols.inter_cutoff` causes an error because its thermal occupation is undefined. The superoperator is accumulated from left- and right-action ladder-operator superoperators; modes with both rates zero are skipped.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- with bosonic mode information present
+- `spin_system` - Spinach system structure containing bosonic mode information in `inter.modes` (including the damping and dephasing rates), relaxation temperature in `rlx.temperature`, and tolerances. The required formalism is `zeeman-liouv` or `sphten-liouv`; damping and dephasing rates are in s^-1.
 
 ## Outputs
 
-- R -bosonic mode dissipation superoperator
-- Note: the dissipators are kappa*(1+nbar)*D[a], kappa*nbar*D[c],
-- and 2*gamma_phi*D[n], where D[x] is the GKSL dissipator of
-- the operator x, built from ladder operators truncated to
-- the level count of each mode. The Spinach convention of
-- zero temperature meaning the high-temperature limit is not
-- applicable to bosonic modes: zero temperature here produces
-- zero thermal occupation numbers.
+- `R` - bosonic-mode dissipation superoperator. The implemented terms are `kappa*(1+nbar)*D[a]`, `kappa*nbar*D[c]`, and `2*gamma_phi*D[n]`, with ladder operators truncated to each mode's declared level count.
 
 ## Implementation structure
 
-- Bosonic mode dissipation superoperator. Builds thermalised GKSL
-- dissipators for the amplitude damping and the pure dephasing of
-- the bosonic modes declared in inter.modes, using the amplitude
-- damping rates and the pure dephasing rates ingested by create.m
-- and the Bose-Einstein thermal occupation numbers computed from
-- the physical mode frequencies, meaning the sum of the declared
-- carrier and the declared frequency where inter.modes.carriers
-- is present, and the system temperature. Syntax:
-- R=rlx_modes(spin_system)
-- spin_system -Spinach spin system description object
-- with bosonic mode information present
-- R -bosonic mode dissipation superoperator
+The function validates the mode information, Liouville-space formalism, and temperature field, preallocates `R`, and visits the bosonic modes. For each active mode it reports the damping and dephasing rates and the occupation number, constructs the needed left/right ladder-operator superoperators, and adds the cooling, heating (when `nbar>0`), and dephasing (when `gamma_phi>0`) contributions.
+
+## Reference
+
+[Spin Dynamics Wiki: rlx_modes.m](https://spindynamics.org/wiki/index.php?title=rlx_modes.m)

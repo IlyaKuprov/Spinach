@@ -4,32 +4,24 @@
 
 ## Purpose
 
-Tests Shinnar-Le Roux selective excitation pulse design. Syntax: result=test_slr_pulse()
+Tests Shinnar–Le Roux (SLR) selective-excitation pulse design, waveform consistency, excitation profile, production-path propagation, and input validation.
 
 ## Physical / mathematical content
 
+The representative design uses 64 samples over `4 ms`, time-bandwidth product `4`, a `pi/2` flip angle, and passband and stopband ripple targets of `0.01`. Independent spin-half propagation checks that the `pi/2` waveform maps `Lz` to `-Ly`, and that a `pi/6` waveform maps `Lz` to `cos(pi/6)*Lz-sin(pi/6)*Ly`.
+
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The test checks waveform dimensions and finiteness, duration sum, and consistency between Cartesian and polar controls. A `16,385`-point Cayley–Klein frequency sweep checks unitarity error below `2e-12` and the target passband/stopband bounds. It also propagates the generated waveform through `shaped_pulse_xy` using `expm-pwc` and compares with `-Ly` at relative and absolute tolerances of `1e-10` each. Invalid designs are checked for rejection, including 63 samples, zero duration, ripple `1`, flip angle `pi`, and an infeasible 8-sample design with time-bandwidth product `0.1`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks waveform units and shape, independent two-level
-- propagation, excitation profile selectivity, production-path shaped
-- pulse propagation, and representative input validation failures.
+`result` is the regression-test record with explanatory messages.
 
 ## Implementation structure
 
-- Tests Shinnar-Le Roux selective excitation pulse design. Syntax:
-- result=test_slr_pulse()
-- result -regression test result with explanatory messages
-- The test checks waveform units and shape, independent two-level
-- propagation, excitation profile selectivity, production-path shaped
-- pulse propagation, and representative input validation failures.
-- Announce the test target
-- State the selective pulse target of the test
-- Define a representative selective excitation design
-- Generate the production waveform
-- Check the output dimensions and finiteness
-- Check Cartesian and polar coordinate consistency
+Generates an SLR waveform, checks its controls, propagates independent spin-half reference cases, evaluates the excitation profile, tests the production shaped-pulse path, and exercises invalid inputs.
+
+## Header notes
+
+The source header credits Ilya Kuprov (`ilya.kuprov@weizmann.ac.il`).

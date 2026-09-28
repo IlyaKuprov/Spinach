@@ -4,37 +4,26 @@
 
 ## Purpose
 
-Frequency axis for FFT with optional zero-filling. Syntax: [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
+Returns unshifted and FFT-shifted frequency axes and their frequency resolution for a time-domain acquisition with optional zero filling.
 
-## Physical / mathematical content
+## Syntax
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+```matlab
+[f_shift,f,df]=fft_freq_axis(npts,dt,zf)
+```
 
 ## Parameters / inputs
 
-- npts -number of acquired time-domain points
-- dt -time step between points
-- zf -zero-fill length added to time domain
+- `npts` — number of acquired time-domain points; integer greater than 1.
+- `dt` — time step between points; positive real scalar.
+- `zf` — number of zero-fill points added to the acquired points; non-negative integer. Defaults to 0 when omitted.
+
+## Numerical / algorithmic content
+
+The transform length is `nfft=npts+zf`, the sampling frequency is `1/dt`, and the frequency resolution is `df=1/(dt*nfft)`. The unshifted axis `f` contains bins from 0 to `(nfft-1)*df`. The shifted axis is `(-floor(nfft/2):ceil(nfft/2)-1)*df`, matching the ordering produced by `fftshift`. The function validates the point count, time step, and zero-fill length.
 
 ## Outputs
 
-- f_shift -frequency axis for fftshift(fft(...))
-- f -frequency axis for fft(...)
-- df -frequency resolution
-
-## Implementation structure
-
-- Frequency axis for FFT with optional zero-filling. Syntax:
-- [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
-- npts -number of acquired time-domain points
-- dt -time step between points
-- zf -zero-fill length added to time domain
-- f_shift -frequency axis for fftshift(fft(...))
-- f -frequency axis for fft(...)
-- df -frequency resolution
-- Set default zero-fill
-- Check consistency
-- FFT length
-- Sampling frequency
+- `f_shift` — frequency axis for data after `fftshift(fft(...))`.
+- `f` — frequency axis for `fft(...)`.
+- `df` — frequency resolution.

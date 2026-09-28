@@ -6,7 +6,7 @@
 
 Builds a P1-centre spin system with one nitrogen nucleus and eighteen 13C neighbours. The electron and nitrogen parameters match diamond_p1.m. Carbon hyperfine tensors and site assignments are based on R. C. Barklie and J. Guven, *J. Phys. C: Solid State Phys.* **14**, 3621–3631 (1981), doi:10.1088/0022-3719/14/25/009; A. Cox, M. E. Newton, and J. M. Baker, *J. Phys.: Condens. Matter* **6**, 551–563 (1994), doi:10.1088/0953-8984/6/2/012; and C. V. Peaker et al., *Diamond Relat. Mater.* **70**, 118–123 (2016), doi:10.1016/j.diamond.2016.10.013.
 
-The four experimentally assigned sites are labelled G1_C1, G2_C3, G4_C5, and G8_C2 (G1-C1 and G2-C3 from the Cox assignments; G2's sign follows Peaker; G4-C5 and G8-C2 assignments follow Peaker). The other fourteen sites carry _calc labels and use Peaker et al.'s Table 4 values.
+Five sites have literature-based labels and assignments: G1_C1, G2_C3, G4_C5, G8_C2, and G14_C4. G1_C1 and G2_C3 use the Cox et al. Table 2 assignments; the sign for G2_C3 and the assignments of G4_C5, G8_C2, and G14_C4 follow Peaker et al. The remaining thirteen sites carry _calc labels and use Peaker et al.'s Table 4 values.
 
 ## Physical / mathematical content
 

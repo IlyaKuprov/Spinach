@@ -6,18 +6,11 @@
 
 Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user-supplied shaped pulse from a given initial state and projects the result onto the given final state. The fidelity is returned, along with its gradient and Hessian with respect to amplitudes of all control operators at every time step of the shaped pulse. Uses Liouville-space or wavefunction formalisms.
 
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
 ## Numerical / algorithmic content
 
-- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, both in `optimcon` setup and direct `grape_liouv` calls. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The method restriction applies regardless of output count, and any four-output request with a state-vector keyhole is refused.
-- Zero fidelities and gradients are returned as valid values, including for auxiliary costates used by `grape_coop`. Initial-guess checks remain in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions.
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The fidelity and its derivatives are propagated through the pulse sequence; both rectangular (piecewise-constant) and trapezium (piecewise-linear) integrators are supported.
+- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, both in `optimcon` setup and direct `grape_liouv` calls. First-order `lbfgs`/`rbfgs` keyhole methods and empty schedules remain available; no algorithm is substituted. A four-output Hessian request with keyholes is refused.
+- Zero fidelities and gradients are valid, including for auxiliary costates used by `grape_coop`. Initial-guess checks belong in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions. Hessians are unavailable for piecewise-linear integration, stroboscopic steady states, nonempty keyhole schedules, or trajectory cost terms.
 
 ## Parameters / inputs
 

@@ -8,10 +8,12 @@ Test of the invariance of the thermal equilibrium state under the thermalised re
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The model is a four-19F spin system at 9.4 T with damp relaxation, a 40 K temperature, and a damping rate of 5.0. The source tests both `sphten-liouv` and `zeeman-liouv` with full (`labframe`) relaxation retention.
 
 ## Numerical / algorithmic content
 
-- Uses full (`labframe`) relaxation retention in both Liouville formalisms. For this damp-only model, damping is added after retention, so the generator is unchanged from the former diagonal setting; Zeeman diagonal retention is not supported.
+For each formalism, the script computes the equilibrium state and relaxation superoperator, then thermalises the latter using both the Dibari-Levitt method (`dibari`) and the inhomogeneous master equation method (`IME`). In each case it checks `norm(Rt*rho_eq,2)` against `1e-9`.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Implementation structure
+
+Constructs the basis and equilibrium state, builds relaxation, applies each thermalisation method, and verifies that the resulting superoperator annihilates the equilibrium state to the stated tolerance.

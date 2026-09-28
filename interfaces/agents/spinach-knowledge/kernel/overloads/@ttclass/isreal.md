@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Returns TRUE for real-valued tensor train objects. Syntax: answer=isreal(tt)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Tests whether a tensor-train object's stored coefficients and core arrays are real-valued.
 
 ## Numerical / algorithmic content
+
+The function first checks all entries of `tt.coeff`. If they are real, it checks the core array for every train and returns early when a non-real core is found. A non-`ttclass` input raises an error.
 
 ## Parameters / inputs
 
@@ -18,20 +16,8 @@ Returns TRUE for real-valued tensor train objects. Syntax: answer=isreal(tt)
 
 ## Outputs
 
-- answer -logical true when all coefficients and core
-- elements of the tensor train are real
+- answer -logical true when all coefficients and core elements of the tensor train are real
 
 ## Implementation structure
 
-- Returns TRUE for real-valued tensor train objects. Syntax:
-- answer=isreal(tt)
-- tt -tensor train object
-- answer -logical true when all coefficients and core
-- elements of the tensor train are real
-- Non-empty tensor trains should return true()
-- Check coefficient first
-- If the coefficients are real, check the cores
-- Complain and bomb out
-- Democracy is a pathetic belief in the collective wisdom
-- of individual ignorance.
-- H.L. Mencken
+The coefficient check uses `all(isreal(tt.coeff))`; core checks use `isreal` on each stored core. Core traversal is skipped if a coefficient is non-real.

@@ -4,50 +4,32 @@
 
 ## Purpose
 
-Time-domain spin dynamics under microwave irradiation. Syntax: answer=dnp_time_dep(spin_system,parameters,H,R,K)
+Propagate a time-dependent spin state under microwave irradiation and return its projection onto the requested detection coil state(s) at every time step.
 
-## Physical / mathematical content
+## Method
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+After converting to the Liouville representation when needed, the function adds the microwave power term `mw_pwr*mw_oper` and the frequency-offset term `-mw_off*ez_oper` to `H`. It calls `evolution` with the combined generator `H + 1i*R + 1i*K`, initial state `rho0`, coil state(s), time step, and number of steps, using multichannel output. The accepted formalisms are `sphten-liouv` and `zeeman-liouv`.
 
 ## Parameters / inputs
 
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.mw_off -microwave frequency offset
-- from free electron,rad/s
-- parameters.rho0 -thermal equilibrium state
-- parameters.coil -coil state vector or a hori-
-- zontal stack thereof
-- parameters.mw_oper -microwave irradiation operator
-- parameters.ez_oper -Lz operator on the electrons
-- parameters.dt -time step, seconds
-- parameters.nsteps -number of time steps
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.mw_pwr` — microwave power, in rad/s.
+- `parameters.mw_off` — microwave frequency offset from the free electron, in rad/s.
+- `parameters.rho0` — thermal-equilibrium initial state.
+- `parameters.coil` — coil state vector or horizontal stack of coil states.
+- `parameters.mw_oper` — microwave-irradiation operator.
+- `parameters.ez_oper` — electron `Lz` operator.
+- `parameters.dt` — time step, in seconds.
+- `parameters.nsteps` — number of time steps.
+- `H` — Hamiltonian matrix supplied by the context function.
+- `R` — relaxation superoperator supplied by the context function.
+- `K` — kinetics superoperator supplied by the context function.
 
-## Outputs
+## Output
 
-- answer -a matrix of projections of the trajectory on
-- each of the coils provided at each time step
-- Note: the relaxation superoperator must be thermalised for this
-- type of calculation.
+- `answer` — matrix of projections of the trajectory onto each supplied coil state at each time step.
 
-## Implementation structure
+## Note
 
-- Time-domain spin dynamics under microwave irradiation. Syntax:
-- answer=dnp_time_dep(spin_system,parameters,H,R,K)
-- parameters.mw_pwr - microwave power, rad/s
-- parameters.mw_off - microwave frequency offset
-- from free electron,rad/s
-- parameters.rho0 - thermal equilibrium state
-- parameters.coil - coil state vector or a hori-
-- zontal stack thereof
-- parameters.mw_oper - microwave irradiation operator
-- parameters.ez_oper - Lz operator on the electrons
-- parameters.dt - time step, seconds
-- parameters.nsteps - number of time steps
+The relaxation superoperator must be thermalised for the selected type of calculation.
+
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=dnp_time_dep.m>

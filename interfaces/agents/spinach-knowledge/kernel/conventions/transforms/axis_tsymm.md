@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Roughly averages an interaction tensor with respect to the rotation around a user-specified axis. Syntax: T=axis_tsymm(T,a)
+Approximately average a real interaction tensor over rotations about a specified axis.
 
 ## Physical / mathematical content
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+For each sampled rotation matrix `R` about axis `a`, the tensor is transformed as `R*T*R'`. The output `A` is the mean of these transformed tensors.
 
 ## Numerical / algorithmic content
+
+The function samples 360 rotations, at angles `pi*n/180` for `n=1:360`, and divides their sum by 360.
 
 ## Parameters / inputs
 
@@ -24,15 +26,4 @@ Roughly averages an interaction tensor with respect to the rotation around a use
 
 ## Implementation structure
 
-- Roughly averages an interaction tensor with respect to the
-- rotation around a user-specified axis. Syntax:
-- T=axis_tsymm(T,a)
-- T -3x3 real interaction tensor
-- a -3x1 real vector specifying the rotation axis
-- A -3x3 real interaction tensor averaged over
-- the rotation around the specified axis
-- Check consistency
-- Preallocate average
-- Loop over the full rotation
-- Compute the average
-- Consistency enforcement
+The function checks that `a` is a real, nonzero 3x1 numeric vector and `T` is a real 3x3 numeric matrix. It initializes a 3x3 zero matrix, accumulates the rotated tensors using `anax2dcm`, then computes their average.

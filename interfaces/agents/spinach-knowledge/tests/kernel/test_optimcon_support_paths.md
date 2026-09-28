@@ -4,32 +4,15 @@
 
 ## Purpose
 
-Tests small optimal-control support paths. Syntax: result=test_optimcon_support_paths()
+Regression-tests small optimal-control support paths: penalties, trapezium-product derivatives, objective collection, and line-search helpers.
 
-## Physical / mathematical content
+## Checks
 
-## Numerical / algorithmic content
+- A minimal quiet Spinach object supports the low-level calls. `penalty()` is checked for zero value, gradient, and Hessian with no penalty; closed-form norm-square and bounded spillout values, gradients, and Hessians; a derivative norm-square gradient against centred finite differences; and Cartesian amplitude spillout value and gradient against radial references, with its Hessian checked by finite differences.
+- `trapdiff()` left- and right-edge derivative matrices are compared with centred finite differences of a small matrix exponential.
+- `objeval()` is checked at value, gradient, and Hessian levels against a two-channel objective that subtracts a penalty-like component. The test also checks the corresponding call counters.
+- `alpha_conds()` checks monotonic, Armijo, and strong Wolfe curvature acceptance. `cubic_interp()` is checked against a cubic with a halfway maximum. `bracketing()` must accept a short ascent step on a concave quadratic; `sectioning()` must recover its maximum, zero gradient, and successful exit flag.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+## Output
 
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test covers penalty functions, trapezium-product derivatives,
-- objective-function collection, and small line-search helper paths.
-
-## Implementation structure
-
-- Tests small optimal-control support paths. Syntax:
-- result=test_optimcon_support_paths()
-- result -regression test result with explanatory messages
-- The test covers penalty functions, trapezium-product derivatives,
-- objective-function collection, and small line-search helper paths.
-- Announce the test target
-- State the support-path target of the test
-- Make a minimal quiet Spinach object for low-level helper calls
-- Check the no-penalty path
-- Check the norm-square penalty against its closed form
-- Check the spillout penalty against explicit clipping residuals
-- Check the derivative norm-square gradient by finite differences
+- `result` is a regression-test result with explanatory messages.

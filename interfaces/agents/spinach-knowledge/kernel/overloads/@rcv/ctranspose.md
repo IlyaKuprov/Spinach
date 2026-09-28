@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Returns the conjugate transpose of an RCV sparse matrix. Syntax: A=ctranspose(A)
+Returns the conjugate transpose of an RCV sparse matrix while retaining its RCV representation.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+For a complex matrix, the conjugate transpose swaps row and column indices and complex-conjugates each stored value.
 
 ## Numerical / algorithmic content
+
+The operation updates the stored coordinate arrays and dimension metadata directly; it does not first materialize a full matrix.
 
 ## Parameters / inputs
 
@@ -22,15 +24,6 @@ Returns the conjugate transpose of an RCV sparse matrix. Syntax: A=ctranspose(A)
 
 ## Implementation structure
 
-- Returns the conjugate transpose of an RCV sparse matrix. Syntax:
-- A=ctranspose(A)
-- A -an RCV sparse matrix
-- Check consistency
-- Efficiently swap rows and columns
-- Update row and column dimension information
-- Conjugate values
-- Consistency enforcement
-- At the Tower of London we remembered in
-- our prayers the elephant kept there by
-- James I, which, poor creature, was never
-- given anything to drink but wine.
+- Requires A to be an RCV object.
+- Swaps row and column coordinate arrays and swaps numRows with numCols.
+- Replaces the value array with its complex conjugate.

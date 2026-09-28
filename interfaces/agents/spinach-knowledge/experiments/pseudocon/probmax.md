@@ -4,36 +4,17 @@
 
 ## Purpose
 
-Finds the maximum point of a 3D probability density in a cube. Syntax: [x,y,z]=probmax(probden,ranges)
-
-## Physical / mathematical content
-
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
+Returns the coordinates of the maximum value in a three-dimensional probability-density array, using the coordinate bounds in `ranges`.
 
 ## Numerical / algorithmic content
 
+The routine builds one coordinate grid per dimension with `linspace` and `ndgrid`, matching each grid length to the corresponding dimension of `probden`. It locates the maximum array value and returns the coordinates at its linear index.
+
 ## Parameters / inputs
 
-- probden -probability density cube with dimensions
-- ordered as [X Y Z]
-- ranges -six-element vector giving axis extents
-- as [xmin xmax ymin ymax zmin zmax]
+- `probden` — real three-dimensional probability-density array, with dimensions ordered `[X Y Z]`.
+- `ranges` — six-element vector `[xmin xmax ymin ymax zmin zmax]` defining the coordinate bounds.
 
 ## Outputs
 
-- [x,y,z] -maximum point coordinates
-
-## Implementation structure
-
-- Finds the maximum point of a 3D probability density in a
-- cube. Syntax:
-- [x,y,z]=probmax(probden,ranges)
-- probden -probability density cube with dimensions
-- ordered as [X Y Z]
-- ranges -six-element vector giving axis extents
-- as [xmin xmax ymin ymax zmin zmax]
-- [x,y,z] -maximum point coordinates
-- Check consistency
-- Get coordinate arrays
-- Get the max
-- Get maximum coordinates
+- `x`, `y`, `z` — coordinates of the maximum point.

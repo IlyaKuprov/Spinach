@@ -2,41 +2,10 @@
 
 - Signature: `spinach2hiper(file_name,amp,phi,off,dt)`
 
-## Purpose
+Exports phase-modulated optimal-control waveforms for Graham Smith's HiPER instrument to `file_name.csv`.
 
-Exports phase-modulated optimal control waveforms into the format expected by Graham Smith's HiPER instrument. Syntax: spinach2hiper(file_name,amp,phi,off,dt)
+`file_name` is a character string without the extension. `amp` and `phi` are equal-length finite real vectors (amplitudes and phases in radians); `off` is a finite real transmitter offset in Hz; and `dt` is a positive finite real slice duration in seconds.
 
-## Physical / mathematical content
+The CSV columns are `time_ns` (slice start times from zero, spaced by `dt*10^9` ns), `freq_MHz` (`off*10^-6`), `phase_deg` (phase converted to degrees and wrapped to [0,360]), and `amplitude`.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- file_name -CSV file name, a character string
-- without the extension
-- amp -a vector of amplitudes
-- phi -a vector of phases in radians
-- off -transmitter offset in Hz
-- dt -waveform slice duration, seconds
-
-## Outputs
-
-- this function writes a file
-- Note: in practice, try both positive and negative pha-
-- ses -some instruments count phases clockwise,
-- others counterclockwise.
-
-## Implementation structure
-
-- Exports phase-modulated optimal control waveforms into the
-- format expected by Graham Smith's HiPER instrument. Syntax:
-- spinach2hiper(file_name,amp,phi,off,dt)
-- file_name -CSV file name, a character string
-- without the extension
-- amp -a vector of amplitudes
-- phi -a vector of phases in radians
-- off -transmitter offset in Hz
-- dt -waveform slice duration, seconds
-- this function writes a file
-- Note: in practice, try both positive and negative pha-
-- ses -some instruments count phases clockwise,
+[Spinach documentation](https://spindynamics.org/wiki/index.php?title=spinach2hiper.m)

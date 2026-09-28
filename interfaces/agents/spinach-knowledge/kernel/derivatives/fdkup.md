@@ -4,48 +4,25 @@
 
 ## Purpose
 
-Returns a finite difference representation of the Kuprov operator: K[rho]=-(1/3)*Trace(Hessian[rho]*chi) with the number of stencil points in the finite difference approxi- mation specified by user. The resulting operator is a sparse matrix designed to act on the vectorisation of rho. The dimensions of rho are assumed to be ordered as [X Y Z]. For further information, see K=fdkup(npoints,extents,chi,nstenc)
+Returns a finite-difference representation of the Kuprov operator, acting on a three-dimensional array `rho` with axes ordered `[X Y Z]`:
 
-## Physical / mathematical content
+`K[rho] = -(1/3) * Trace(Hessian[rho] * chi)`
 
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+The number of stencil points is specified by the user. For further information, see [the cited paper](http://dx.doi.org/10.1039/C4CP03106G).
 
 ## Parameters / inputs
 
-- npoints -a three-element vector specifying the dimensions
-- of the 3D cube of data that the operator will be
-- acting on, in Angstroms. The dimensions are assu-
-- med to be ordered as [X Y Z].
-- chi -the electron magnetic susceptibility tensor in
-- cubic Angstroms, a symmetric 3x3 matrix.
-- extents -a three-element vector specifying axis extents
-- in Angstroms. The dimensions are assumed to be
-- ordered as [X Y Z].
-- nstenc -number of finite-difference stencil points for
-- the finite-difference approximation. Periodic
-- boundary conditions are used.
+- `npoints` — Three positive integer grid dimensions, ordered `[X Y Z]`. Each dimension must be at least `nstenc`.
+- `extents` — Three positive axis extents in Angstroms, ordered `[X Y Z]`.
+- `chi` — Real symmetric 3×3 electron magnetic susceptibility tensor in cubic Angstroms.
+- `nstenc` — Odd integer number of finite-difference stencil points, at least 3. Periodic boundary conditions are used.
 
 ## Outputs
 
-- K -a sparse matrix designed to act on the vectori-
-- zation of the array. The dimensions are assumed
-- to be ordered as [X Y Z].
+- `K` — Sparse matrix acting on the vectorisation of `rho`, whose dimensions are ordered `[X Y Z]`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Returns a finite difference representation of the Kuprov operator:
-- K[rho]=-(1/3)*Trace(Hessian[rho]*chi)
-- with the number of stencil points in the finite difference approxi-
-- mation specified by user. The resulting operator is a sparse matrix
-- designed to act on the vectorisation of rho. The dimensions of rho
-- are assumed to be ordered as [X Y Z]. For further information, see
-- K=fdkup(npoints,extents,chi,nstenc)
-- npoints - a three-element vector specifying the dimensions
-- of the 3D cube of data that the operator will be
-- acting on, in Angstroms. The dimensions are assu-
-- med to be ordered as [X Y Z].
-- chi - the electron magnetic susceptibility tensor in
+The implementation constructs finite-difference second-derivative operators for all Cartesian axis pairs. Each operator is scaled by the grid-point counts divided by the corresponding axis extents, then weighted by the matching component of `chi` and summed with the factor `-1/3`.
+
+[Spinach documentation](https://spindynamics.org/wiki/index.php?title=fdkup.m)

@@ -4,28 +4,12 @@
 
 ## Purpose
 
-Magnetic field sweep cross effect DNP experiment -steady-state proton magnetisation under microwave iradiation as a function of the applied magnetic field. A powder average calculation. Calculation time: hours
+Calculates the steady-state proton magnetisation under microwave irradiation for a powder-averaged cross-effect DNP system as a function of magnetic-field offset. The source estimates hours to run.
 
-## Physical / mathematical content
+## Model
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+At 18.78 T, the four-spin system is `E,E,14N,1H`. It includes anisotropic g tensors for both electrons, a `^14N` quadrupolar tensor, electron–nitrogen and electron–electron couplings, and the specified spin coordinates. Relaxation uses the `t1_t2` model with diagonal retention, zero equilibrium, and temperature 10 K. The full sphten-Liouville basis is used.
 
-## Numerical / algorithmic content
+## Calculation
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Magnetic field sweep cross effect DNP experiment -steady-state proton
-- magnetisation under microwave iradiation as a function of the applied
-- magnetic field. A powder average calculation.
-- Calculation time: hours
-- Magnetic field
-- Spin system
-- Electron g-tensors
-- 14N quadrupolar tensor
-- Coordinates (Angstrom)
-- Hyperfine couplings
-- Exchange coupling
-- Basis set
+The script sets 10 MHz microwave power, sweeps 256 field offsets from −0.08 to +0.04 T, and powder-averages on `rep_2ang_1600pts_sph`. It calls `powder` with `dnp_field_scan` in ESR mode and plots the real proton `Lz` expectation against magnetic-field offset. The configured powder method is `backslash`.

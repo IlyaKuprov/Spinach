@@ -4,33 +4,20 @@
 
 ## Purpose
 
-The transpose of an RCV sparse matrix. Syntax: A=transpose(A)
+Return the transpose of an RCV sparse matrix.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
-
-## Numerical / algorithmic content
+Transposition exchanges the row and column indices and swaps the matrix dimensions.
 
 ## Parameters / inputs
 
-- A -an RCV sparse matrix
+- `A` - RCV sparse matrix.
 
 ## Outputs
 
-- A -transposed RCV matrix
+- `A` - transposed RCV sparse matrix.
 
 ## Implementation structure
 
-- The transpose of an RCV sparse matrix. Syntax:
-- A=transpose(A)
-- A -an RCV sparse matrix
-- A -transposed RCV matrix
-- Check consistency
-- Efficiently swap rows and columns
-- Update row and column dimension information
-- Consistency enforcement
-- Я Шойгу. Значит, объясняю. Если вы такой хороший хозяин, что у вас
-- котёнок умудрился свалиться в мусоропровод, то, во-первых, не надо
-- прыгать и вопить "Барсик, милый, сука, держись!" Потому что держаться там
-- не за что. Не надо пытаться пробить мусоропровод кувалдой, глухой
+After checking that the input is an `rcv` object, the function swaps its `row` and `col` arrays and its `numRows` and `numCols` metadata. Stored values are unchanged.

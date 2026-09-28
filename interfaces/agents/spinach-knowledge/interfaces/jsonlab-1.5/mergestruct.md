@@ -4,11 +4,11 @@
 
 ## Purpose
 
-No descriptive header was found. The best immediate identifier is `s=mergestruct(s1,s2)`, and the implementation details below should be used to infer its role.
+Merge two scalar MATLAB structs, combining their fields.
 
 ## Physical / mathematical content
 
-- JSONLab vendored utilities. The main content is data serialisation, structure walking, option parsing, and text/binary JSON handling rather than spin physics.
+- The result starts with `s1`; fields from `s2` are then assigned, so `s2` values replace matching fields from `s1`.
 
 ## Numerical / algorithmic content
 

@@ -4,28 +4,8 @@
 
 ## Purpose
 
-Test of internal consistency for state and operator generation across the three formalisms supported by Spinach. Two-and four-spin states are tested.
+Test construction of two-spin singlet/triplet and four-spin product states in Spinach's Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville formalisms.
 
-## Physical / mathematical content
+## Method
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Test of internal consistency for state and operator
-- generation across the three formalisms supported by
-- Spinach. Two-and four-spin states are tested.
-- Magnet field
-- Set the spin system
-- Loop over the formalisms
-- Basis set
-- Hush the logs
-- Spinach housekeeping
-- Unit state from Spinach
-- Two-spin singlet-triplet state sum test
-- Four-spin singlet-triplet state sum test
+The script creates four `1H` spins at 14.1 T with zero Zeeman interactions and iterates over the three formalisms. For every ordered pair of distinct spins, it checks that the pair singlet plus the three triplets equals Spinach's two-spin unit state. It then checks, for every permutation of the four spins, that the 16 products formed from pair singlet/triplet states sum to the four-spin unit state. Each L1-norm residual must be at most `1e-6`; a failure raises an error, otherwise the script reports success for that formalism.

@@ -4,29 +4,20 @@
 
 ## Purpose
 
-Tests Hilbert-space state generation. Syntax: result=test_hilbert_state()
+Tests that `state()` returns the expected Hilbert-space density matrices for a one-spin system.
 
-## Physical / mathematical content
+## Test setup
 
-## Numerical / algorithmic content
+Creates a one-proton (`1H`) spin system with zero magnetic field (`sys.magnet=0`), zero scalar Zeeman interaction, `zeeman-hilb` formalism, and no basis approximation. Reference spin-half matrices are obtained from `S=pauli(2)`.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Assertions
 
-## Outputs
+Each comparison uses `test_close` with absolute and relative tolerances of `1e-15`:
 
-- result -regression test result with explanatory messages
-- The test checks that state() returns the expected density matrices in
-- Hilbert space for a one-spin system.
+- `state(spin_system,'Lz',1)` equals `S.z` (longitudinal magnetisation).
+- `state(spin_system,'Lx',1)` equals `S.x` (transverse in-phase density matrix).
+- `state(spin_system,'E',1)` equals `S.u` (unit density matrix).
 
-## Implementation structure
+## Output
 
-- Tests Hilbert-space state generation. Syntax:
-- result=test_hilbert_state()
-- result -regression test result with explanatory messages
-- The test checks that state() returns the expected density matrices in
-- Hilbert space for a one-spin system.
-- Announce the test target
-- State the physical target of the test
-- Build a one-proton Hilbert-space spin system
-- Textbook spin-half reference matrices
-- Check density matrices generated from state labels
+`result` is a regression test result with explanatory messages, created for `kernel/hilbert_state` and updated by the three comparisons.

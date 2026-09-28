@@ -4,37 +4,33 @@
 
 ## Purpose
 
-Lorentzian spectral density function for rotational diffusion at the user-specified frequency. Syntax: J=spden(L,D,omega)
+Computes the Lorentzian spectral density for rotational diffusion at the specified frequency.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The correlation time and spectral density are
+
+- `tau_c=1/(L*(L+1)*D)`
+- `J=(tau_c/(2*L+1))/(1+(tau_c*omega)^2)`
 
 ## Numerical / algorithmic content
 
+The function checks the inputs, calculates `tau_c`, then calculates `J`.
+
 ## Parameters / inputs
 
-- L -spherical rank, use 2 for common NMR
-- mechanisms such as dipolar relaxation
-- D -rotational diffusion coefficient, s^{-1}
-- omega -frequency, rad/s
+- `L` — spherical rank; a positive real integer. Use 2 for common NMR mechanisms such as dipolar relaxation.
+- `D` — rotational diffusion coefficient in s⁻¹; a positive real scalar.
+- `omega` — frequency in rad/s; a real scalar.
 
 ## Outputs
 
-- J -spectral density function value
+- `J` — spectral density function value.
 
 ## Implementation structure
 
-- Lorentzian spectral density function for rotational
-- diffusion at the user-specified frequency. Syntax:
-- J=spden(L,D,omega)
-- L -spherical rank, use 2 for common NMR
-- mechanisms such as dipolar relaxation
-- D -rotational diffusion coefficient, s^{-1}
-- omega -frequency, rad/s
-- J -spectral density function value
-- Check consistency
-- Get the correlation time
-- Get the spectral density
-- Consistency enforcement
+Input consistency is enforced by the local `grumble` function.
+
+Source: <https://spindynamics.org/wiki/index.php?title=spden.m>
+
+ilya.kuprov@weizmann.ac.il

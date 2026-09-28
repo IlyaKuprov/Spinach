@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Horizontal concatenation for RCV sparse matrices. Syntax: A=horzcat(A,B)
+Horizontally concatenates RCV sparse matrices in the order supplied, producing a matrix with the common row count and the sum of their column counts.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+The output places each input matrix in a consecutive column block; row indices are preserved and column indices are offset by the widths of preceding blocks.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The variadic implementation accepts the input sequence as varargin. If any input is GPU-resident, all inputs are moved to GPU before their coordinate and value arrays are concatenated.
 
 ## Parameters / inputs
 
@@ -25,15 +25,7 @@ Horizontal concatenation for RCV sparse matrices. Syntax: A=horzcat(A,B)
 
 ## Implementation structure
 
-- Horizontal concatenation for RCV sparse matrices. Syntax:
-- A=horzcat(A,B)
-- A -left RCV sparse matrix
-- B -right RCV sparse matrix
-- A -RCV sparse matrix
-- Check consistency
-- Align locations
-- Shift column indices
-- Concatenate RCV arrays
-- Update column count
-- Consistency enforcement
-- The back half of your forties is a cursed age. It's not
+- Requires every input to be an RCV object and all row counts to match.
+- Moves all operands to GPU if at least one input is GPU-resident.
+- Offsets each input's column indices by the cumulative column count.
+- Concatenates the row, adjusted column, and value arrays; sets numCols to the sum of input column counts.

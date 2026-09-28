@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Nuclear overhauser effect in a homonuclear two-spin system in the long correlation time case. Calculation time: seconds
+Nuclear overhauser effect in a homonuclear two-spin system in the long correlation time case. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- The model is a pair of proton spins separated by 2.00 Å, with zero isotropic Zeeman offsets. Redfield relaxation uses a 1 ns correlation time, 298 K, and the Di Bari equilibrium convention.
+- One proton's longitudinal magnetization is inverted from thermal equilibrium. The two detected longitudinal components show the relaxation-mediated NOE response in the long-correlation-time regime.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The full spherical-tensor Liouville basis is used without a basis approximation; the Redfield superoperator retains the kite-selected terms.
+- Multichannel relaxation evolution is sampled at 0.01 s intervals for 1000 intervals, spanning 0–10 s.
 
 ## Implementation structure
 
-- Nuclear overhauser effect in a homonuclear two-spin system in
-- the long correlation time case.
-- Calculation time: seconds
-- Set the spin system
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Spinach housekeeping
-- Build the relaxation superoperator
-- Get thermal equilibrium state
-- Start in a state with one spin inverted
-- Compute the evolution trajectory
+- Build the two-proton system at 14.1 T, form its basis and Redfield relaxation superoperator, then calculate equilibrium.
+- Invert spin 1, propagate with both proton `Lz` operators as observation channels, and plot the longitudinal magnetizations labelled Proton A and Proton B.

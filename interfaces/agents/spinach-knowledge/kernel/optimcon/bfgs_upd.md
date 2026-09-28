@@ -4,18 +4,11 @@
 
 ## Purpose
 
-Performs a one-step BFGS Hessian update for maximisation using the argument and gradient increments from the previous step.
+Performs one dense BFGS update for maximisation. `H` approximates the negative Hessian of the objective, and `dg` is the gradient increment between steps.
 
-## Physical / mathematical content
+## Algorithm
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- This routine performs a single dense BFGS Hessian update for a maximisation problem. The sign conventions matter: the stored matrix approximates the negative Hessian so that solving H\g yields an ascent direction.
-- The curvature test rejects bad secant pairs when dg^T dx does not have the sign and magnitude expected for locally concave behaviour. That protects the update from producing indefinite or numerically meaningless curvature models.
-
-## Numerical / algorithmic content
-
-- If no valid curvature information exists yet, the code scales an identity matrix using y^T y / y^T dx, a standard quasi-Newton initialisation that roughly matches curvature along the first accepted step.
+The update uses the sign-adjusted gradient increment `-dg`. A curvature safeguard rejects pairs that are non-finite or do not satisfy the required negative-curvature test on `dg' * dx`. If `H` is empty and the pair is rejected, the routine returns an identity matrix; if a supplied `H` is paired with a rejected step, it is symmetrised and returned unchanged. For an empty `H` with an accepted pair, a scaled identity initializes the approximation before the BFGS update.
 
 ## Syntax
 
@@ -23,34 +16,12 @@ Performs a one-step BFGS Hessian update for maximisation using the argument and 
 H=bfgs_upd(H,dx,dg)
 ```
 
-## Parameters / inputs
+## Inputs
 
-- H -current BFGS approximation to the Hessian
-- matrix corresponding to the *negative*
-- Hessian of the objective; use [] on the
-- first call
-- dx -increment in arguments between the current
-- and the previous step
-- dg -increment in gradients between the current
-- and the previous step
+- `H` — current approximation to the negative Hessian, or `[]` on the first call.
+- `dx` — argument increment between the current and previous steps.
+- `dg` — gradient increment between the current and previous steps.
 
-## Outputs
+## Output
 
-- H -updated BFGS approximation to the Hessian
-- matrix corresponding to the *negative*
-- Hessian of the objective
-
-## Implementation structure
-
-- Performs a one-step BFGS Hessian update for maximisation using
-- the argument and gradient increments from the previous step.
-- H=bfgs_upd(H,dx,dg)
-- H -current BFGS approximation to the Hessian
-- matrix corresponding to the *negative*
-- Hessian of the objective; use [] on the
-- first call
-- dx -increment in arguments between the current
-- and the previous step
-- dg -increment in gradients between the current
-- H -updated BFGS approximation to the Hessian
-- Hessian of the objective
+- `H` — updated BFGS approximation to the negative Hessian.

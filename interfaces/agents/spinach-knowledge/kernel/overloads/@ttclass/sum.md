@@ -4,37 +4,21 @@
 
 ## Purpose
 
-Sum of elements of a tensor train representation of a matrix. Syntax: answer=sum(ttrain,dim)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
-
-## Numerical / algorithmic content
+Sum the elements of a tensor-train matrix along its row or column dimension.
 
 ## Parameters / inputs
 
-- ttrain -tensor train object representing
-- a matrix
-- dim -summation dimension, 1 or 2
+- `ttrain` — tensor train representing a matrix.
+- `dim` — summation dimension, 1 or 2; when omitted, the first non-singleton dimension is selected, matching MATLAB's matrix behavior.
 
 ## Outputs
 
-- answer -tensor train or flat representation
-- of the summation result
+- `answer` — tensor train representing the summation result, or its full scalar value when all resulting modes are singleton.
 
-## Implementation structure
+## Implementation
 
-- Sum of elements of a tensor train representation of
-- a matrix. Syntax:
-- answer=sum(ttrain,dim)
-- ttrain -tensor train object representing
-- a matrix
-- dim -summation dimension, 1 or 2
-- answer -tensor train or flat representation
-- of the summation result
-- Get sizes and ranks
-- If all dimensions are singleton, return a scalar immediately
-- In dim is omitted, choose first non-singleton dimension
-- (this mimics the Matlab behaviour for matices)
+If all physical dimensions are singleton, the function immediately returns `full(ttrain)`. Otherwise, it creates an auxiliary train with the same coefficients and zero tolerances, sums each core over the selected physical dimension, and reshapes that mode to size one while retaining the other physical dimension and the TT ranks. If the resulting train has only singleton modes, it is converted to a scalar with `full`.
+
+## Source
+
+D. Savostyanov and I. Kuprov, [`ttclass/sum.m`](https://spindynamics.org/wiki/index.php?title=ttclass/sum.m).

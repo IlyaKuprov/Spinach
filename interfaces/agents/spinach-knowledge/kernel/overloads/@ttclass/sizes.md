@@ -4,34 +4,20 @@
 
 ## Purpose
 
-Returns mode sizes (physical dimensions of each core) of a tensor train. Syntax: modesizes=sizes(tt)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
+Return the physical row and column dimensions for each core of a tensor train.
 
 ## Parameters / inputs
 
-- tt -tensor train object
+- `tt` — tensor train object.
 
 ## Outputs
 
-- modesizes -ncores by 2 array of physical dimensions
-- of tensor train cores
+- `modesizes` — an `ncores`-by-2 array; each row contains the second and third dimensions of the corresponding core in the first train.
 
-## Implementation structure
+## Implementation
 
-- Returns mode sizes (physical dimensions of each core) of
-- a tensor train. Syntax:
-- modesizes=sizes(tt)
-- tt -tensor train object
-- modesizes -ncores by 2 array of physical dimensions
-- of tensor train cores
-- Determine the number of cores
-- Preallocate the answer
-- Fill in the answer
-- Computer models are no different from fashion models: seductive,
-- unreliable, easily corrupted, and they lead sensible people to
-- make fools of themselves.
+The function obtains the number of cores from `tt.cores`, allocates the output array, and fills each row from `size(tt.cores{k,1},2)` and `size(tt.cores{k,1},3)`.
+
+## Source
+
+D. Savostyanov and I. Kuprov, [`ttclass/sizes.m`](https://spindynamics.org/wiki/index.php?title=ttclass/sizes.m).

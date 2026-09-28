@@ -4,34 +4,25 @@
 
 ## Purpose
 
-Prints bosonic mode parameter summary for a Spinach system. Syntax: summary_modes(spin_system,header)
+Prints a parameter summary for bosonic modes represented in a Spinach spin system.
 
 ## Physical / mathematical content
 
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The table includes modes whose component type is C, V, or T, labelled as cavity, phonon, or transmon, respectively. It reports each mode's isotope, multiplicity, frequency, anharmonicity, damping, and dephasing values.
 
 ## Numerical / algorithmic content
 
+The listed frequency, anharmonicity, damping, and dephasing fields are divided by `2*pi` and printed in Hz. The function checks that `spin_system` is a structure and `header` is a character string.
+
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- spin_system - Spinach spin system description object
+- header - a string of text to precede the summary
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints the mode table through `report.m` to the console or user-specified output.
 
 ## Implementation structure
 
-- Prints bosonic mode parameter summary for a Spinach system. Syntax:
-- summary_modes(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the summary table
-- Translate the type letter into a word
-- Do the printing in Hz
-- Consistency enforcement
+After validation and table headings, the function iterates over the spin-system components, selects types C, V, and T, maps those type codes to labels, and prints the stored mode parameters.

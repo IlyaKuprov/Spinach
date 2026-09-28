@@ -8,16 +8,16 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 
 ## Physical / mathematical content
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- Propagates Hilbert-space density matrices under drift and waveform-weighted control operators, and evaluates overlap-based fidelity with the target state.
+- Supports piecewise-constant `rectangle` intervals and piecewise-linear `trapezium` intervals; the latter uses an Iserles-Nørsett product-quadrature generator.
+- Fidelity can be evaluated at the terminal node or averaged over pulse nodes; configured trajectory-penalty operators are also averaged over those nodes.
 
 ## Numerical / algorithmic content
 
 Zero fidelities and gradients are returned as valid values, including for auxiliary costates used by `grape_coop`. Initial-guess checks remain in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- The routine precomputes interval propagators, applies them in a forward state sweep, and uses a backward costate sweep to form waveform derivatives.
+- Hessians are available only with the `rectangle` integrator and `newton` or `goodwin` methods; trajectory cost terms do not support Hessians.
 
 ## Parameters / inputs
 

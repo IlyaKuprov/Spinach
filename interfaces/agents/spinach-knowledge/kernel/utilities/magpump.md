@@ -8,9 +8,11 @@ Adds phenomenological pumping terms to the relaxation superoperator to enable ap
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Adds phenomenological pumping terms to a relaxation superoperator for approximate CIDNP, PHIP, and DNP simulations.
 
 ## Numerical / algorithmic content
+
+- Updates the first column of `R` by adding `rate*rho`; the supported formalism is `sphten-liouv`, and the pumped state must have zero unit-state component.
 
 ## Syntax
 
@@ -35,15 +37,4 @@ R=magpump(spin_system,R,rho,rate)
 
 ## Implementation structure
 
-- Adds phenomenological pumping terms to the relaxation superoperator
-- to enable approximate simulation of CIDNP, PHIP and DNP type effects.
-- R=magpump(spin_system,R,rho,rate)
-- R -relaxation superoperator, from relaxation()
-- rho -the state to be pumped, from state()
-- rate -pumping rate, Hz
-- R -modified relaxation superoperator
-- Note: for the pumping to work correctly, the unit state population
-- (first element) in the state vector that R will be acting on
-- must be set to 1.
-- Note: this function is only available in sphten-liouv formalism, and
-- may be called repeatedly if multiple states are pumped.
+- Checks the matrix, state vector, finite scalar rate, formalism, and unit-state component, then performs the first-column update. Repeated calls can add multiple pumped states.

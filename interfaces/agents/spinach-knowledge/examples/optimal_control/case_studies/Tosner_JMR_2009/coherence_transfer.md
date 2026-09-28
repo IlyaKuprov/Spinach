@@ -4,15 +4,12 @@
 
 ## Purpose
 
-The first optimal control example from A heteronuclear two-spin system (1H–13C) with an scalar and both nuclei set on resonance; the goal is to trans- fer transverse magnetisation from proton to carbon: Hx → Cx over a fixed evolution period T = 1/J.
+This first optimal-control example, associated with http://dx.doi.org/10.1016/j.jmr.2008.11.020, uses an on-resonance heteronuclear two-spin system (1H–13C) with a 140 Hz scalar coupling. The goal is to transfer transverse magnetisation from proton to carbon (Hx → Cx) over a fixed period T = 1/J.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- The initial and target states are normalised proton and carbon Lx states, respectively. The controls use Lx and Ly operators on each nucleus, alongside the NMR drift Hamiltonian.
+- The pulse spans 150 equal time steps totalling 1/J. The control structure specifies `lbfgs` as the optimiser, a maximum of 200 iterations, power levels `2*pi*linspace(10,1000,10)`, and an `NS` penalty with weight 0.01. Optimisation calls `fmaxnewton` with `@grape_xy`.
 
 ## Numerical / algorithmic content
 
@@ -20,15 +17,6 @@ The first optimal control example from A heteronuclear two-spin system (1H–13C
 
 ## Implementation structure
 
-- The first optimal control example from
-- A heteronuclear two-spin system (1H–13C) with an scalar
-- and both nuclei set on resonance; the goal is to trans-
-- fer transverse magnetisation from proton to carbon:
-- Hx → Cx
-- over a fixed evolution period T = 1/J.
-- Magnetic field, Tesla
-- Chemical shifts, ppm
-- Scalar coupling, Hz
-- Basis set
-- Spinach housekeeping
-- Initial state: Lx on proton (spin 1)
+- Set the magnetic field to 14.1 T, both chemical shifts to 0 ppm, and the 1H–13C scalar coupling to 140 Hz.
+- Create the spin system with the `sphten-liouv` formalism and `none` approximation; construct and normalise the proton Lx initial state and carbon Lx target state.
+- Configure the drift and four control operators, generate a random 4-by-150 initial guess divided by 10, and run the optimisation. Requested plots are `xy_controls`, `spectrogram`, and `robustness`.

@@ -4,38 +4,21 @@
 
 ## Purpose
 
-Converts fractional crystallographic coordinates to Cartesian coordinates. Syntax: [XYZ,va,vb,vc]=frac2cart(a,b,c,alpha,beta,gamma,ABC)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Converts fractional crystallographic coordinates to Cartesian coordinates for a unit cell described by three lengths and three angles.
 
 ## Parameters / inputs
 
-- a,b,c -three unit cell dimensions
-- alp,bet,gam -three unit cell angles, degrees
-- ABC -fractional atomic coordinates as
-- Nx3 array of numbers
+- `a,b,c`: positive real scalar unit-cell dimensions.
+- `alp,bet,gam`: real scalar unit-cell angles in degrees.
+- `ABC`: real `N x 3` array of fractional coordinates.
 
 ## Outputs
 
-- XYZ -Cartesian atomic coordinates as
-- Nx3 array of numbers
-- va, vb, vc -primitive lattice vectors
+- `XYZ`: `N x 3` Cartesian coordinates, in units consistent with the unit-cell dimensions.
+- `va,vb,vc`: primitive lattice vectors, returned as the columns of the cell transformation matrix.
 
-## Implementation structure
+## Method
 
-- Converts fractional crystallographic coordinates to Cartesian
-- coordinates. Syntax:
-- [XYZ,va,vb,vc]=frac2cart(a,b,c,alpha,beta,gamma,ABC)
-- a,b,c -three unit cell dimensions
-- alp,bet,gam -three unit cell angles, degrees
-- ABC -fractional atomic coordinates as
-- Nx3 array of numbers
-- XYZ -Cartesian atomic coordinates as
-- va, vb, vc -primitive lattice vectors
-- Check consistency
-- Compute the transformation matrix
-- Apply the transformation matrix
+The function constructs the triclinic-cell transformation matrix from the lengths and angle cosines/sines, applies it to each coordinate row, and returns its three columns as the lattice vectors.
+
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=frac2cart.m)

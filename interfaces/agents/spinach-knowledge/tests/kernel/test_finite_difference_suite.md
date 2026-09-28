@@ -4,37 +4,22 @@
 
 ## Purpose
 
-Tests finite-difference and spectral differentiation helpers. Syntax: result=test_finite_difference_suite()
+Checks finite-difference and spectral-differentiation helpers against exact or analytically known cases.
 
 ## Physical / mathematical content
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The suite tests numerical derivative identities, including finite-difference and Fourier differentiation, periodic operators, and directional derivatives of a commuting matrix exponential. It is a helper regression suite rather than acquired-spectrum processing.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+- Checks interpolation and first- and second-derivative finite-difference weights, finite-difference matrices, Fourier differentiation, Laplacians, FFT differentiation kernels, pseudomodulation, and matrix-exponential directional derivatives.
+- Three-point centred weights at zero reproduce the exact interpolation and derivative coefficients; a five-point wall matrix differentiates quadratics on a unit grid; a seven-point, cubic Savitzky-Golay derivative recovers a cubic exactly.
+- Periodic finite-difference and Laplacian matrices annihilate constants. The suite also checks Savitzky-Golay window constraints and pseudomodulation axis conventions.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks finite-difference weights, finite-difference matrices,
-- Fourier differentiation, Laplacians, FFT differentiation kernels,
-- pseudomodulation, and matrix-exponential directional derivatives
-- against exact simple cases.
+`result` is the regression-test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests finite-difference and spectral differentiation helpers. Syntax:
-- result=test_finite_difference_suite()
-- result -regression test result with explanatory messages
-- The test checks finite-difference weights, finite-difference matrices,
-- Fourier differentiation, Laplacians, FFT differentiation kernels,
-- pseudomodulation, and matrix-exponential directional derivatives
-- against exact simple cases.
-- Announce the test target
-- State the differentiation target of the test
-- Three-point centred finite-difference weights at zero are exact and familiar
-- Five-point wall finite-difference matrix differentiates quadratics exactly on a unit grid
-- Savitzky-Golay differentiation recovers a cubic exactly on a uniform grid
+The test initializes a regression result and evaluates each helper against an exact or closed-form reference, ending with zeroth- and first-directional-derivative checks for a commuting matrix exponential.

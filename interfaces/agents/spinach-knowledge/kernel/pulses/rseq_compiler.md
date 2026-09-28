@@ -1,54 +1,28 @@
 # kernel/pulses/rseq_compiler.m
 
-- Signature: `[P,T]=rseq_compiler(spin_system,L,Sx,Sy,pulse_phi,...`
+- Signature: `[P,T]=rseq_compiler(spin_system,L,Sx,Sy,pulse_phi,pulse_amp,pulse_dur,element_type)`
 
 ## Purpose
 
-R sequence compiler. Uses the fact that R-sequences are very repetitive to pre-compile the minimal number of pulse propa- gators. Syntax: [P,T]=rseq_compiler(spin_system,L,Sx,Sy,pulse_phi,... pulse_amp,pulse_dur,element_type)
+Compiles the distinct pulse propagators needed by an R-sequence, reusing a propagator wherever the phase (and, for composite pulses, the phase-duration pair) repeats.
 
-## Physical / mathematical content
+## Algorithm
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+For `'180_pulse'`, the function finds the unique values in `pulse_phi` and builds one propagator for each phase from `L+pulse_amp*(Sx*cos(phi)+Sy*sin(phi))`, using the single pulse duration. For `'90270_pulse'`, it pairs the alternating durations with the phases, finds unique phase-duration rows, and builds one propagator for each row.
 
 ## Parameters / inputs
 
-- L -background Liouvillian
-- Sx,Sy -Cartesian spin operators pertaining to
-- the spins affected by the pulses
-- pulse_phi -the sequence of pulse phases, radians
-- pulse_amp -RF nutation frequency in rad/s, a scalar
-- because R-sequences are phase-modulated
-- pulse_dur -duration of the pulses in the sequence
-- element, a vector with the length mat-
-- ching the number of pulses in the sequ-
-- ence element (seconds)
-- element_type -R element needs to be an inversion
-- pulse; common ones are:
-- '180_pulse' : simple inversion pulse
-- '90270_pulse' : composite inversion pulse
+- `spin_system` — Spinach system description used by `propagator`.
+- `L` — background Liouvillian.
+- `Sx`, `Sy` — Cartesian spin operators for the spins affected by the pulses; the source requires Hermitian matrices.
+- `pulse_phi` — phase sequence, in radians.
+- `pulse_amp` — scalar RF nutation frequency, in radians per second.
+- `pulse_dur` — pulse duration in seconds; scalar for `'180_pulse'`, or two durations for `'90270_pulse'`.
+- `element_type` — `'180_pulse'` for simple inversion pulses or `'90270_pulse'` for composite inversion pulses.
 
 ## Outputs
 
-- P -unique propagators, a cell array of matrices
-- T -an index array of the same dimension as pulse_phi,
-- specifying which propagator is to be used at which
-- slice of the phase sequence
+- `P` — cell array of unique propagator matrices.
+- `T` — index array with the same dimensions as `pulse_phi`, indicating which entry of `P` to use at each phase-sequence slice.
 
-## Implementation structure
-
-- R sequence compiler. Uses the fact that R-sequences are very
-- repetitive to pre-compile the minimal number of pulse propa-
-- gators. Syntax:
-- [P,T]=rseq_compiler(spin_system,L,Sx,Sy,pulse_phi,...
-- pulse_amp,pulse_dur,element_type)
-- L -background Liouvillian
-- Sx,Sy -Cartesian spin operators pertaining to
-- the spins affected by the pulses
-- pulse_phi -the sequence of pulse phases, radians
-- pulse_amp -RF nutation frequency in rad/s, a scalar
-- because R-sequences are phase-modulated
-- pulse_dur -duration of the pulses in the sequence
+[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=rseq_compiler.m)

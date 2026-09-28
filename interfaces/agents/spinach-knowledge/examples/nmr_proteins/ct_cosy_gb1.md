@@ -8,24 +8,13 @@ Constant-time COSY experiment simulation for the GB1 protein. Simulation time: m
 
 ## Physical / mathematical content
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Imports GB1 backbone data and removes 13C and 15N spins, treating the protein as unlabelled for this proton experiment.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Simulates a two-dimensional proton COSY FID with `ct_cosy`, applies squared-cosine apodisation in both dimensions, then zero-fills, Fourier-transforms, shifts, and plots the magnitude spectrum.
 
 ## Implementation structure
 
-- Constant-time COSY experiment simulation for the
-- GB1 protein.
-- Simulation time: minutes, faster with a Tesla A100 GPU.
-- Protein data import
-- Magnet field
-- Tolerances
-- Basis set
-- Algorithmic options
-- Sequence parameters
-- Spinach housekeeping
-- Kill carbons and nitrogens (protein assumed unlabelled)
-- Build the basis
+- Imports `2N9K.pdb` and `2N9K.bmrb`, sets a 14.1 T field and interaction tolerances, and builds an IK-1 `sphten-liouv` basis.
+- Uses a 2400 Hz offset, 9000 Hz sweeps, 256 × 256 acquisition points, and 512 × 512 zero filling; plots the result in ppm.

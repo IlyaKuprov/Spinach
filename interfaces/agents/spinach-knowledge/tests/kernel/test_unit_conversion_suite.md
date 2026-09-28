@@ -4,30 +4,25 @@
 
 ## Purpose
 
-Tests scalar unit-conversion functions. Syntax: result=test_unit_conversion_suite()
+Tests scalar unit-conversion functions used in magnetic resonance.
 
 ## Physical / mathematical content
 
+The suite checks Hartree to J/mol, inverse-centimetre to Hz, field/frequency, and Lorentzian linewidth to R2 conversions. It uses `1 Hartree = 2625499.62 J/mol`, `1 cm^-1 = 100*c Hz`, and `R2 = pi*FWHM`.
+
 ## Numerical / algorithmic content
+
+The tests compare each conversion with values calculated from its defining constants using `test_close`, and check that `hz2icm` and `mhz2gauss` invert their corresponding forward conversions.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks physically defined unit conversions used across magnetic
-- resonance: Hartree to J/mol, cm^-1 to Hz, field/frequency conversions,
-- and Lorentzian linewidth to R2.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests scalar unit-conversion functions. Syntax:
-- result=test_unit_conversion_suite()
-- result -regression test result with explanatory messages
-- The test checks physically defined unit conversions used across magnetic
-- resonance: Hartree to J/mol, cm^-1 to Hz, field/frequency conversions,
-- and Lorentzian linewidth to R2.
-- Announce the test target
-- State the conversion target of the test
-- Check Hartree energy conversion
-- Check inverse-centimetre and frequency conversion
-- Check electron-field hyperfine conversions
-- Check milliTesla to Hz conversion
+- Announce the unit-conversion test and initialize its result.
+- Check Hartree energy conversion with inputs `[0 1 2.5]`.
+- Check inverse-centimetre to Hz conversion and its inverse with inputs `[0 1 12.5]`.
+- Check Gauss to MHz conversion and its inverse with inputs `[0 10 25]`, using the electron g-factor, Bohr magneton, and reduced Planck constant.
+- Check milliTesla to Hz conversion with inputs `[0 1 3.5]`.
+- Check Lorentzian full width at half maximum to R2 conversion with inputs `[1 2.5 10]`.

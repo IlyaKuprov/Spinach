@@ -4,29 +4,17 @@
 
 ## Purpose
 
-Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluati- on, the serial path. This include is called from within the rel- axation.m theory blocks and follows the notation used in IK's paper: with the difference that the numerical quadrature method propo- sed there has been superceded by the much faster auxiliary mat- rix method described in: The calling theory block must set rlx_onshell (true selects the back
+This serial include evaluates Bloch-Wangsness-Redfield and Nakajima-Zwanzig relaxation integrals from the `relaxation.m` theory blocks. It is used when `relaxation.m` is not at the top of the parallelisation call stack; otherwise the asynchronous include is used. The implementation follows the notation of [the cited paper](http://dx.doi.org/10.1016/j.jmr.2010.12.004) and uses the faster auxiliary-matrix integral method described in [the second cited paper](http://dx.doi.org/10.1063/1.4928978).
 
-## Physical / mathematical content
+## Theory parameters
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `rlx_onshell`: true selects the back-rotated kernel, which reduces to Redfield theory at zero shift; false selects the Nakajima-Zwanzig resolvent kernel.
+- `rlx_shift`: the Laplace evaluation point, in Hz. Redfield theory is the on-shell form at zero shift.
 
-## Numerical / algorithmic content
+## Algorithm
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The code sums over spherical-rank projection pairs and correlation-function exponentials, applies chemical-species state masks, evaluates the integrals with `expmint`, and accumulates the result in `R`.
 
-## Implementation structure
+## Source documentation
 
-- Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluati-
-- on, the serial path. This include is called from within the rel-
-- axation.m theory blocks and follows the notation used in IK's
-- paper:
-- with the difference that the numerical quadrature method propo-
-- sed there has been superceded by the much faster auxiliary mat-
-- rix method described in:
-- The calling theory block must set rlx_onshell (true selects the
-- back-rotated kernel that reduces to Redfield theory at zero
-- shift, false the resolvent kernel of Nakajima-Zwanzig theory)
-- and rlx_shift (the Laplace evaluation point, Hz); Redfield the-
-- ory is the on-shell form at zero shift.
+https://spindynamics.org/wiki/index.php?title=redfield_integral_serial.m

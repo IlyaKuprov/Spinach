@@ -4,34 +4,16 @@
 
 ## Purpose
 
-Dot product of TT representations of matrices. Syntax: c=dot(a,b)
+Computes the inner product of two tensor-train representations of numerical arrays.
 
-## Physical / mathematical content
+## Inputs
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `a`, `b` — tensor-train objects with matching mode sizes and the same number of cores.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `c` — inner product of `a` and `b`.
 
-- a,b -tensor train objects representing numerical
-- arrays of consistent dimensions and having
-- the same internal topology
+## Algorithm
 
-## Outputs
-
-- c -inner product of a and b
-
-## Implementation structure
-
-- Dot product of TT representations of matrices. Syntax:
-- c=dot(a,b)
-- a,b -tensor train objects representing numerical
-- arrays of consistent dimensions and having
-- the same internal topology
-- c -inner product of a and b
-- Check consistency
-- Compute the product
-- Consistency enforcement
-- Any product that needs a manual to work is broken.
-- Elon Musk
+The function checks that both inputs are tensor trains with compatible sizes, then evaluates the product as `ctranspose(a)*b`.

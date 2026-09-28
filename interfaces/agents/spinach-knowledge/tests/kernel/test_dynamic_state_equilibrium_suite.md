@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Tests thermal equilibrium state construction paths. Syntax: result=test_dynamic_state_equilibrium_suite()
+Regression tests for equilibrium-state construction.
 
-## Physical / mathematical content
+## Tests
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Compares `equilibrium()` with the explicitly normalized Boltzmann matrix `expm(-beta*H)/trace(expm(-beta*H))`.
+- Checks the Liouville-space state representation.
+- Compares the Euler-angle Hamiltonian route `equilibrium(spin_h,H,Q,euler_angles)` with the equivalent call using the pre-oriented Hamiltonian, `equilibrium(spin_h,H_oriented)`.
 
 ## Outputs
 
 - result -regression test result with explanatory messages
 - The test checks Hilbert-space, Zeeman-Liouville, and oriented-Hamiltonian
 - thermal equilibrium construction against direct Boltzmann references.
-
-## Implementation structure
-
-- Tests thermal equilibrium state construction paths. Syntax:
-- result=test_dynamic_state_equilibrium_suite()
-- result -regression test result with explanatory messages
-- The test checks Hilbert-space, Zeeman-Liouville, and oriented-Hamiltonian
-- thermal equilibrium construction against direct Boltzmann references.
-- Announce the test target
-- State the equilibrium-constructor target of the test
-- Build a one-spin Hilbert-space system with finite temperature
-- Set an explicit non-degenerate Hamiltonian in angular frequency units
-- Compare Hilbert-space equilibrium to the direct Boltzmann density matrix
-- Build the matching Zeeman-Liouville system
-- Compare left-product Liouville equilibrium to the vectorised density matrix

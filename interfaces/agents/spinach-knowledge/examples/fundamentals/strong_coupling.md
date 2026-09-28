@@ -8,24 +8,12 @@ A garden variety strongly coupled two-spin system.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Models two 1H spins at 5.9 T with scalar shifts 1.0 and 1.5 and a scalar coupling of 7.0, retaining the full spin dynamics in the spherical-tensor Liouville formalism.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+Simulates a liquid-state acquisition with 1024 points, a 300 Hz sweep and offset, applies exponential apodisation with parameter 10, zero-fills to 4096 points, and Fourier-transforms the FID for plotting.
 
 ## Implementation structure
 
-- A garden variety strongly coupled two-spin system.
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Scalar couplings
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Creates the system and basis, configures a 1H acquisition with raising-operator initial state and receiver, runs the liquid simulation, processes the FID, and plots the real spectrum.

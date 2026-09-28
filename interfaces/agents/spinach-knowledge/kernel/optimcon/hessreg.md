@@ -4,42 +4,22 @@
 
 ## Purpose
 
-RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,data]=hessreg(spin_system,H,g,data)
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+Regularises a real symmetric Newton-Raphson Hessian using rational function optimisation (RFO), shifting its spectrum as needed to obtain a better-conditioned Hessian.
 
 ## Parameters / inputs
 
-- H -Hessian matrix to be regularised
-- g -gradient computed at the same point as H
-- data -diagnostic data structure
+- `spin_system` — Spinach system object; regularisation settings are read from `spin_system.control`.
+- `H` — real symmetric Hessian matrix.
+- `g` — real column gradient with the same number of elements as the dimension of `H`.
+- `data` — diagnostic structure whose `data.count.rfo` field is incremented for each RFO iteration.
 
 ## Outputs
 
-- H -regularised Hessian
-- data -updated diagnostic data structure with
-- data.count.rfo incremented by the number
-- of RFO iterations taken
+- `H` — regularised Hessian. If it is already positive definite and below the configured condition-number limit, the input Hessian is returned unchanged.
+- `data` — diagnostic structure with the RFO iteration count updated.
 
-## Implementation structure
+## Implementation
 
-- RFO regularisation for Newton-Raphson Hessian and gradient
-- pairs. Syntax:
-- [H,data]=hessreg(spin_system,H,g,data)
-- H -Hessian matrix to be regularised
-- g -gradient computed at the same point as H
-- data -diagnostic data structure
-- H -regularised Hessian
-- data -updated diagnostic data structure with
-- data.count.rfo incremented by the number
-- of RFO iterations taken
-- Check consistency
-- Set shorthands
+The routine uses `reg_alpha`, `reg_phi`, `reg_max_iter`, and `reg_max_cond` from `spin_system.control`. Each iteration forms the augmented RFO Hessian, shifts by its lowest eigenvalue when needed, and checks the resulting Hessian's condition number. It symmetrises the final result and warns if the target condition number was not reached.
+
+[Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=hessreg.m)

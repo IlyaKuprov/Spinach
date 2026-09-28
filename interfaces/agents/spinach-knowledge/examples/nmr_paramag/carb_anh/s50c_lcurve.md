@@ -4,26 +4,16 @@
 
 ## Purpose
 
-L-curves for the S50C mutant dataset for human carbonic anhydrase II. The system and the method are described in: A step-by-step tutorial is available here:
+Computes an L-curve for the S50C carbonic anhydrase II PCS reconstruction. The source cites the [method paper](http://dx.doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
 ## Physical / mathematical content
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+Examines the trade-off between PCS fit error and density regularisation in the distributed inverse problem.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+Sets `parameters.gpu=true()` and evaluates 30 logarithmically spaced values `10.^linspace(-2,2,30)` in a `parfor` loop. Each call uses `ipcs(parameters,64,lam(n))`; the routine collects error and regularisation values, divides the latter by `lam(n)`, and calls `lcurve(lam,err,reg,'log')`.
 
 ## Implementation structure
 
-- L-curves for the S50C mutant dataset for human carbonic anhydrase
-- II. The system and the method are described in:
-- A step-by-step tutorial is available here:
-- Load experimental data
-- Load susceptibility tensor
-- Solver parameters
-- Regularisation parameter array
-- Result arrays
-- Run a parallel loop
-- L-curve analysis
+Loads PCS and coordinates from `s50c_expt.mat` and `chi` from `s50c_chi_eff.mat`. The solver uses equation `kuprov`, box centre `[-27.4 13.3 18.8]`, box size `[50.0 50.0 50.0]`, confinement `[2.0 12.0]`, and sharpening `0.0`; it displays the suggested smoothing parameter.

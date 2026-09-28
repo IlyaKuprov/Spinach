@@ -4,23 +4,19 @@
 
 ## Purpose
 
-Computes the transpose of a matrix in a polyadic representa- tion. Syntax: p=transpose(p)
+Returns the ordinary transpose of a polyadic matrix representation; it does not take the complex conjugate.
 
 ## Physical / mathematical content
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
+For a product of matrices, transposition reverses factor order: `(AB)^T = B^T A^T`. The polyadic representation applies this to each core and reverses the boundary-factor chains.
 
 ## Numerical / algorithmic content
 
+The operation transforms the stored factors directly rather than expanding the represented matrix.
+
 ## Implementation structure
 
-- Computes the transpose of a matrix in a polyadic representa-
-- tion. Syntax:
-- p=transpose(p)
-- Transpose every core
-- Process prefix and suffix
-- Frantic orthodoxy is never rooted in faith
-- but in doubt. It is when we are unsure that
-- we are doubly sure.
-- Reinhold Niebuhr
-- #NHEAD #NGRUM
+- Transposes each matrix in every core.
+- Forms the new prefix from the reversed old suffix, transposing each factor.
+- Forms the new suffix from the reversed old prefix, transposing each factor.
+- Stores the two transformed boundary chains on p.

@@ -4,35 +4,25 @@
 
 ## Purpose
 
-Zeroes out the diagonal of a 2D spectrum using the brush with the specified dimensions. Syntax: spec=killdiag(spec,brush_dim)
+Zero a brush-width band around the diagonal of a two-dimensional spectrum.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+This utility masks matrix values; it does not interpret them beyond their placement in a 2D spectrum.
 
 ## Numerical / algorithmic content
 
+For each column, the diagonal row is mapped proportionally from the column index to the row dimension. The rows within the requested brush width are set to zero, with the interval clipped at the matrix boundaries. This mapping also handles rectangular matrices.
+
 ## Parameters / inputs
 
-- spec -2D matrix representing a spectrum
-- brush_dim -the width of the band to zero out
-- around the diagonal, points
+- `spec` - numeric matrix representing a 2D spectrum.
+- `brush_dim` - positive real integer no larger than either matrix dimension; specifies the number of rows in the band to mask at each column.
 
 ## Outputs
 
-- spec -2D matrix representing a spectrum
+- `spec` - the input matrix with the diagonal band zeroed.
 
 ## Implementation structure
 
-- Zeroes out the diagonal of a 2D spectrum using the brush
-- with the specified dimensions. Syntax:
-- spec=killdiag(spec,brush_dim)
-- spec -2D matrix representing a spectrum
-- brush_dim -the width of the band to zero out
-- around the diagonal, points
-- Check consistency
-- Loop over the column index
-- Find the row index
-- Find the row index extents
-- Avoid array boundaries
-- Zero the elements
+After validation, the routine visits each column, calculates the corresponding diagonal row and brush interval, clips the interval to valid row indices, and assigns zero to those entries.

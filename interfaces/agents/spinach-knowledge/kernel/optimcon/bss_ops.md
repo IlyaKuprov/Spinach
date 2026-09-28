@@ -4,44 +4,28 @@
 
 ## Purpose
 
-Bloch-Siegert response operators for the optimal control module. For each control channel, returns the operator whose coefficient in every time slice of a GRAPE optimisation is the square of the physical con- trol amplitude on that channel. The operator collects the second-order Bloch-Siegert frequency shifts of every spin in the system: B=sum_n (gamma_n/gamma_c)^2*[1/(2*(omega_n+omega_c)) +(foreign isotopes only) 1/
+Builds one Bloch–Siegert response operator for each optimal-control channel. Its coefficient in each GRAPE time slice is the square of that channel's physical control amplitude. For spin `n) and channel `c`, the second-order frequency-shift coefficient is
 
-## Physical / mathematical content
+```
+(gamma_n/gamma_c)^2 * [1/(2*(omega_n+omega_c)) + 1/(2*(omega_n-omega_c))]
+```
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The second term is included only for spins whose isotope differs from the channel isotope. Thus an on-channel spin receives only the never-resonant term; a foreign-isotope spin receives both terms. The coefficient multiplies that spin's longitudinal operator. The signed frequencies `omega_n` and `omega_c` are the spin's laboratory-frame Zeeman frequency and the channel carrier frequency, respectively.
 
-## Numerical / algorithmic content
+## Syntax
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+```matlab
+resp_ops=bss_ops(spin_system,channels,carrier_frq)
+```
 
-## Parameters / inputs
+## Inputs
 
-- channels -cell array of isotope strings, one per
-- control operator, e.g. {'1H','1H'} for
-- an X,Y control operator pair
-- carrier_frq -row vector of signed carrier frequencies
-- (rad/s), one per control operator; for a
-- transmitter on resonance this is the value
-- of inter.basefrqs for the channel isotope
+- `spin_system` — Spinach spin-system structure.
+- `channels` — cell array of isotope strings, one per control channel (for example, `{'1H','1H'}` for an X/Y pair).
+- `carrier_frq` — row vector of signed carrier frequencies in rad/s, one per channel. For an on-resonance transmitter, use the corresponding `spin_system.inter.basefrqs` value.
 
-## Outputs
+## Output
 
-- resp_ops -cell array of Bloch-Siegert response ope-
-- rators, one per control operator, in the
-- formalism of the spin system provided
+- `resp_ops` — cell array of Bloch–Siegert response operators, one per channel, in the spin-system formalism.
 
-## Implementation structure
-
-- Bloch-Siegert response operators for the optimal control module. For
-- each control channel, returns the operator whose coefficient in every
-- time slice of a GRAPE optimisation is the square of the physical con-
-- trol amplitude on that channel. The operator collects the second-order
-- Bloch-Siegert frequency shifts of every spin in the system:
-- B=sum_n (gamma_n/gamma_c)^2*[1/(2*(omega_n+omega_c))
-- +(foreign isotopes only) 1/(2*(omega_n-omega_c))]*Lz_n
-- where omega_n are signed laboratory frame Zeeman frequencies from
-- spin_system.inter.basefrqs and omega_c is the signed carrier frequen-
-- cy of the channel. Spins belonging to the isotope that the channel
-- addresses receive only the never-resonant term because their resonant
-- term is the control operator itself, which GRAPE propagates exactly.
+The routine requires each channel isotope to be present in the spin system and rejects zero carriers and degenerate frequency denominators.

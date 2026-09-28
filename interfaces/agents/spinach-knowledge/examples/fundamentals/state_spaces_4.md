@@ -4,28 +4,10 @@
 
 ## Purpose
 
-Trajectory analysis for a MAS simulation of isotopically labelled glycine powder, starting from L+ on protons. Calculation time: hours, faster on a GPU.
+Calculate and analyse a magic-angle-spinning (MAS) trajectory for an isotopically labelled glycine powder, starting from proton L+ magnetisation. The source estimates hours of calculation time and notes that a GPU can make it faster.
 
-## Physical / mathematical content
+## Method
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+The script reads `../standard_systems/glycine.log` with `gparse`/`g2spinach`, specifying 1H, 13C, and 15N and the shift values `[31.5 182.1 264.5]`. It uses a 14.1 T field, the `sphten-liouv` formalism, no basis approximation, longitudinal `{15N,13C}`, and `sys.tols.krylov_tol=1000`. MAS parameters are rate 2000 Hz, axis `[1 1 1]`, `max_rank=17`, sweep `1e5`, 64 points, offset 15000, 13C detection, and grid `rep_2ang_200pts_sph`. The initial state and coil are both proton L+.
 
-## Numerical / algorithmic content
-
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- Trajectory analysis for a MAS simulation of isotopically labelled
-- glycine powder, starting from L+ on protons.
-- Calculation time: hours, faster on a GPU.
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Force Krylov propagation
-- This needs a GPU
-- sys.enable={'gpu'};
-- Spinach housekeeping
-- Experiment setup
-- Get the trajectory
+`singlerot` generates the trajectory; `fpl2rho` averages over rotor phase before `trajan` plots correlation order. The `sys.enable={'gpu'}` line is commented out, so this script does not enable GPU execution as written.

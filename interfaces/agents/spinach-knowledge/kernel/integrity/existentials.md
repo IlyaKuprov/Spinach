@@ -4,25 +4,24 @@
 
 ## Purpose
 
-Kernel integrity control. Checks for collisions between Spinach functions and anything else that the user may have installed or written in the current Matlab instance. Also checks for any fi- les that are not visible to Matlab because the corresponding di- rectory is not on the path. Collisions of function names and path problems are the most fre- quent support topic at the forum.
+Checks the Matlab environment and Spinach path during startup. It returns immediately on parallel workers. On the client, it checks the Matlab release and required toolboxes, then detects function-name collisions and Spinach files that are not visible on the Matlab path.
 
 ## Physical / mathematical content
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+This is an environment-integrity check; it does not model a physical system.
 
 ## Numerical / algorithmic content
 
+No numerical calculation is performed. The routine compares each discovered Spinach file with the location returned by Matlab's `which`.
+
+## Parameters / inputs
+
+None.
+
+## Outputs
+
+No return value. It displays startup-check progress and raises an error if a prerequisite, path entry, or collision check fails.
+
 ## Implementation structure
 
-- Kernel integrity control. Checks for collisions between Spinach
-- functions and anything else that the user may have installed or
-- written in the current Matlab instance. Also checks for any fi-
-- les that are not visible to Matlab because the corresponding di-
-- rectory is not on the path.
-- Collisions of function names and path problems are the most fre-
-- quent support topic at the forum.
-- Do not run inside parallel pools
-- Inform the user
-- ##########################################
-- NO, IT WILL NOT MAGICALLY START WORKING %
-- IF YOU COMMENT ANY OF THIS OUT %
+The routine requires Matlab R2026a or later and the Parallel Computing, Deep Learning, Reinforcement Learning, Optimisation, Statistics and Machine Learning, and Mapping toolboxes. It scans `.m` files under `kernel`, `interfaces`, `experiments`, and `etc`. A same-named file outside Spinach is reported as a collision, except for overloads; a Spinach file that `which` cannot find is reported as a path setup problem.

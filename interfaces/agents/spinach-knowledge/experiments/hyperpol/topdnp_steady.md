@@ -4,17 +4,15 @@
 
 ## Purpose
 
-Time-optimised pulsed DNP experiment from: (a steady state version). Syntax (call from powder context): dnp=topdnp_steady(spin_system,parameters,H,R,K)
+A steady-state implementation of the time-optimised pulsed DNP experiment (https://doi.org/10.1126/sciadv.aav6909), called from a powder context.
 
 ## Physical / mathematical content
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+For each microwave offset, the function adds rotating-frame and +X irradiation terms to `L=H+1i*R+1i*K`, then forms the TOP DNP pulse-and-delay propagator. It computes the detected coil overlap at steady state.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The function repeats the cleaned TOP DNP block propagator `nloops` times, applies the shot-spacing delay, and obtains the steady state with `steady(...,'newton')`.
 
 ## Parameters / inputs
 
@@ -45,15 +43,4 @@ Time-optimised pulsed DNP experiment from: (a steady state version). Syntax (cal
 
 ## Implementation structure
 
-- Time-optimised pulsed DNP experiment from:
-- (a steady state version). Syntax (call from powder context):
-- dnp=topdnp_steady(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from
-- context function
-- R -relaxation superoperator, received
-- from context function, must be ther-
-- malised to some finite temperature
-- K -kinetics superoperator, received
-- from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
+The function validates inputs, constructs electron operators, loops over resonance offsets, and computes each offset's steady-state signal; propagators may be exponentiated on the GPU when enabled.

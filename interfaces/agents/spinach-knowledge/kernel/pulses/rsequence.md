@@ -1,65 +1,29 @@
 # kernel/pulses/rsequence.m
 
-- Signature: `[phases,pulse_amp,pulse_dur]=rsequence(n_rotor_periods,n_blocks_per_period,...`
+- Signature: `[phases,pulse_amp,pulse_dur]=rsequence(n_rotor_periods,n_blocks_per_period,phase_factor,n_cycle_repeats,mas_rate,element_type,supercycle_type)`
 
 ## Purpose
 
-R-sequences described in Malcolm Levitt's review: Nomenclature is based on the following notation RN_{n}^{\nu}. Syntax: [phases,pulse_amp,pulse_dur]=rsequence(n_rotor_periods,n_blocks_per_period,... phase_factor,n_cycle_repeats,mas_rate,... element_type,supercycle_type)
+Generates pulse phases, RF amplitude, and pulse durations for an R-sequence. The source cites Malcolm Levitt's review and uses the notation `RN_{n}^{nu}`.
 
-## Physical / mathematical content
+## Algorithm
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+The rotor period is `1/mas_rate`; one R element lasts `n_rotor_periods/(mas_rate*n_blocks_per_period)`. For `'180_pulse'`, the function sets `pulse_amp=pi/r_element_dur`, uses that full duration, and alternates phases according to `(-1)^q*pi*phase_factor/n_blocks_per_period`. For `'90270_pulse'`, it sets `pulse_amp=2*pi/r_element_dur`, splits the element into durations `r_element_dur/4` and `3*r_element_dur/4`, and gives the second pulse in each pair a phase offset of `pi`. It then applies the requested supercycle and repeats the resulting phase sequence `n_cycle_repeats` times.
 
 ## Parameters / inputs
 
-- n_rotor_periods -"small n" symmetry number, gives number of
-- rotor periods required in the R symmetry
-- n_blocks_per_period -"capital n" symmetry number, gives the number of
-- R elements contained within the R symmetry
-- phase_factor -"nu" to calculate the alternating phase in the
-- R sequence:
-- 180*nu/N = 180*phase_factor/n_blocks_per_period
-- n_cycle_repeats -number of times the full R sequence is applied
-- mas_rate -rotor spinning rate, Hz
-- element_type -R element needs to be an inversion pulse. Common
-- R elements are:
-- '180_pulse' : simple inversion pulse
-- '90270_pulse' : composite inversion pulse
-- supercycle_type -The R sequence can be repeated multiple
-- times in combination with supercycles, for
-- improved performance, removal of undesired
-- higher order terms. If the he unmodified R
-- is denoted [phase], this can either be in-
-- verted, [-phase], or have an overall phase
-- added to it, [phase]_addph.
-- Common supercycles are:
-- 'hetero_single_quantum'
-- [phase]_0:[-phase]_0:[phase]_120:[-phase]_120:[phase]_240:[-phase]_240
-- 'homo_double_quantum_nucycle'
-- [phase]_0:[-phase]_0
-- 'homo_double_quantum_nupicycle'
-- [phase]_0:[-phase]_0:[-phase]_180:[phase]_180
-- Output:
-- phases -the sequence of pulse phases, radians
-- pulse_amp -RF nutation frequency in rad/s, a scalar because
-- R-sequences are phase-modulated
-- pulse_dur -duration of the pulses in the sequence element,
-- a vector with the length matching the number of
-- pulses in the sequence element (seconds)
+- `n_rotor_periods` — “small n” symmetry number: rotor periods required in the R symmetry; positive integer.
+- `n_blocks_per_period` — “capital N” symmetry number: R elements in the R symmetry; positive integer.
+- `phase_factor` — “nu” phase factor; the alternating phase increment is `pi*phase_factor/n_blocks_per_period` radians (equivalently `180*phase_factor/n_blocks_per_period` degrees).
+- `n_cycle_repeats` — positive integer number of times to apply the full sequence.
+- `mas_rate` — rotor spinning rate, in Hz.
+- `element_type` — `'180_pulse'` (simple inversion) or `'90270_pulse'` (composite inversion).
+- `supercycle_type` — `'hetero_single_quantum'`, `'homo_double_quantum_nucycle'`, or `'homo_double_quantum_nupicycle'`. Their phase patterns are respectively `[phase]_0:[-phase]_0:[phase]_120:[-phase]_120:[phase]_240:[-phase]_240`, `[phase]_0:[-phase]_0`, and `[phase]_0:[-phase]_0:[-phase]_180:[phase]_180`.
 
-## Implementation structure
+## Outputs
 
-- R-sequences described in Malcolm Levitt's review:
-- Nomenclature is based on the following notation RN_{n}^{\nu}. Syntax:
-- [phases,pulse_amp,pulse_dur]=rsequence(n_rotor_periods,n_blocks_per_period,...
-- phase_factor,n_cycle_repeats,mas_rate,...
-- element_type,supercycle_type)
-- n_rotor_periods - "small n" symmetry number, gives number of
-- rotor periods required in the R symmetry
-- n_blocks_per_period - "capital n" symmetry number, gives the number of
-- R elements contained within the R symmetry
-- phase_factor - "nu" to calculate the alternating phase in the
-- R sequence:
-- 180*nu/N = 180*phase_factor/n_blocks_per_period
+- `phases` — pulse phase sequence, in radians.
+- `pulse_amp` — scalar RF nutation frequency, in radians per second.
+- `pulse_dur` — pulse duration(s) for the sequence element, in seconds; a scalar for `'180_pulse'`, two durations for `'90270_pulse'`.
+
+For background, see [Malcolm Levitt's review](https://doi.org/10.1002/9780470034590.emrstm0551) and the [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=rsequence.m).

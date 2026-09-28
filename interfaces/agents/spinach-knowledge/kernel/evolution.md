@@ -8,13 +8,12 @@ Time evolution function. Performs all types of time propagation with automatic t
 
 ## Physical / mathematical content
 
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+- Supports Hilbert-space density-matrix, Liouville-space state-vector, and wavefunction propagation, with trajectory-level state-space restriction.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+- Polyadic generators are forwarded to `krylov()`. In the Liouville-space `final` path, smaller subspaces use an exponential propagator and large subspaces use Krylov propagation; the `krylov` enable/disable settings can affect this choice.
+- Hilbert-space final-state and observable calculations support parallel execution; the source reports tests through 128 cores and says parallel trajectory calculation did not appear beneficial because of inter-thread communication.
 
 ## Parameters / inputs
 
@@ -90,25 +89,5 @@ Time evolution function. Performs all types of time propagation with automatic t
 
 ## Outputs
 
-- answer -a vector, a matrix, a channels-by-time-by-states array,
-- or a cell array of matrices, depending on the options
-- set during the call
-- Calculation of final states and observables in Hilbert space is parallel-
-- ized and tested all the way to 128-core (16 nodes, 8 cores each) configu-
-- rations. Parallelization of the trajectory calculation does not appear to
-- yield any benefits due to large amount of inter-thread communication. See
-
-## Implementation structure
-
-- Time evolution function. Performs all types of time propagation with
-- automatic trajectory level state space restriction. Syntax:
-- answer=evolution(spin_system,L,coil,rho,timestep,...
-- nsteps,output,destination)
-- For Liouville space calculations:
-- L -the Liouvillian to be used during evolution. If L
-- is assembled manually from Hamiltonian commutation
-- superoperator H, relaxation superoperator R, and
-- kinetics superoperator K, use L=H+1i*R+1i*K.
-- rho -the initial state vector or a horizontal stack thereof
-- output -a string giving the type of evolution that is required
-- 'final' -returns the final state vector or a horizontal
+- `answer` is a vector, matrix, channels-by-time-by-states array, or cell array of matrices, depending on the selected output and formalism.
+- The source reports Hilbert-space parallel tests through 128 cores and notes trajectory parallelization did not appear beneficial because of inter-thread communication ([10.1063/1.3679656](https://doi.org/10.1063/1.3679656)).

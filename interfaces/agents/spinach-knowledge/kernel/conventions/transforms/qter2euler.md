@@ -4,13 +4,7 @@
 
 ## Purpose
 
-Converts a unit quaternion in the active convention into Euler angles (ZYZ active convention), matching euler2dcm.m function.
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Converts a quaternion in the active convention to Euler angles in the ZYZ active convention, matching `euler2dcm.m`.
 
 ## Syntax
 
@@ -20,31 +14,14 @@ Converts a unit quaternion in the active convention into Euler angles (ZYZ activ
 
 ## Parameters / inputs
 
-- q -structure with four fields q.u, q.i, q.j, q.k giving
-- the four components of the quaternion; each field may
-- be a column vector, in which case the conversion is
-- performed elementwise
+- `q` — structure with fields `q.u`, `q.i`, `q.j`, and `q.k` containing the four quaternion components. Each field must be a real scalar or column vector; the fields must have the same number of elements. Vector inputs are converted elementwise. Quaternion norms must be significantly nonzero.
 
 ## Outputs
 
-- alpha,beta,gamma -Euler angles in radians (ZYZ active
-- convention), same shape as the qua-
-- ternion component fields
-- Note: Euler angles are not unique; the angles returned sa-
-- tisfy euler2dcm(alpha,beta,gamma)=qter2dcm(q) with
-- beta in the [0,pi] interval.
+- `alpha`, `beta`, `gamma` — Euler angles in radians (ZYZ active convention), with the same shape as the quaternion component fields. Euler angles are not unique; the returned angles satisfy `euler2dcm(alpha,beta,gamma)=qter2dcm(q)`, with `beta` in `[0,pi]`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Converts a unit quaternion in the active convention into Euler
-- angles (ZYZ active convention), matching euler2dcm.m function.
-- [alpha,beta,gamma]=qter2euler(q)
-- q -structure with four fields q.u, q.i, q.j, q.k giving
-- the four components of the quaternion; each field may
-- be a column vector, in which case the conversion is
-- performed elementwise
-- alpha,beta,gamma -Euler angles in radians (ZYZ active
-- convention), same shape as the qua-
-- ternion component fields
-- Note: Euler angles are not unique; the angles returned sa-
-- tisfy euler2dcm(alpha,beta,gamma)=qter2dcm(q) with
+The function normalizes each quaternion before computing the angles. It calculates `sum_ag=2*atan2(q.k,q.u)` and `dif_ga=2*atan2(q.i,q.j)`, then sets `beta=2*atan2(sqrt(q.i.^2+q.j.^2),sqrt(q.u.^2+q.k.^2))`, `alpha=(sum_ag-dif_ga)/2`, and `gamma=(sum_ag+dif_ga)/2`.
+
+[Source documentation](https://spindynamics.org/wiki/index.php?title=qter2euler.m).

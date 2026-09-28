@@ -4,33 +4,20 @@
 
 ## Purpose
 
-Plots the sparsity pattern of an RCV matrix. Syntax: spy(A)
+Display the nonzero pattern of an RCV sparse matrix using MATLAB's `spy`.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
-
-## Numerical / algorithmic content
+The plotted pattern corresponds to the row and column indices stored in the RCV matrix.
 
 ## Parameters / inputs
 
-- A -RCV sparse matrix
+- `A` - RCV sparse matrix.
 
 ## Outputs
 
-- produces a sparsity plot
+A MATLAB sparsity plot; the function does not return a matrix.
 
 ## Implementation structure
 
-- Plots the sparsity pattern of an RCV matrix. Syntax:
-- spy(A)
-- A -RCV sparse matrix
-- produces a sparsity plot
-- Check consistency
-- Delegate to MATLAB
-- Consistency enforcement
-- Downloaded a virus for Linux lately and unpacked it. Tried to run it as
-- root, didn't work. Googled for 2 hours, found out that, instead of
-- /usr/local/bin, the virus unpacked to /usr/bin for which the user malware
-- doesn't have any write permissions, therefore the virus couldn't create a
-- process file. Found patched .configure and .make files on some Chinese
+The function checks that `A` is an `rcv` object, converts it to MATLAB sparse form with `sparse(A)`, and passes that matrix to MATLAB's `spy`.

@@ -1,51 +1,28 @@
 # kernel/pulses/bloch_siegert.m
 
-- Signature: `[ctrl_opers,...`
+- Signature: `[ctrl_opers,ctrl_coefs]=bloch_siegert(spin_system,ctrl_opers,ctrl_coefs)`
 
 ## Purpose
 
-Applies Bloch-Siegert corrections to Cartesian control pulses. Takes control operators and their amplitude arrays and returns augmented arrays with the Bloch-Siegert response operator of each control chan- nel appended as a virtual channel whose coefficient vector is the square of the corresponding control amplitude vector. The output arguments are ready for the shaped_pulse_xy function, which then propagates the sys
+Adds the Bloch–Siegert response channel for each Cartesian control channel. The function obtains the response operators from the channel isotopes and carrier frequencies stored in `spin_system.control`, then appends each operator and the element-wise square of its matching control-amplitude vector to the input cell arrays.
 
-## Physical / mathematical content
+## Inputs
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- spin_system -Spinach spin system object containing the
-- Bloch-Siegert settings added by optimcon()
-- ctrl_opers -a cell array of control operators, one per
-- control channel
-- ctrl_coefs -a cell array of control coefficient vectors
-- in rad/s, one vector per control channel
+- `spin_system` — Spinach system structure with Bloch–Siegert corrections enabled by `optimcon()`, plus its control-channel isotopes, channel indices, and carrier frequencies.
+- `ctrl_opers` — cell array with one square numeric control operator per control channel.
+- `ctrl_coefs` — cell array with one real vector of control coefficients (in rad/s) per channel. All coefficient vectors must have the same length.
 
 ## Outputs
 
-- ctrl_opers -an augmented cell array of control opera-
-- tors, with the response operator of each
-- channel appended
-- ctrl_coefs -an augmented cell array of coefficient vec-
-- tors, with the squared amplitude vector of
-- each channel appended
-- Note: the augmented arrays are only valid for the piecewise-constant
-- propagation methods of shaped_pulse_xy; piecewise-linear methods
-- would interpolate the squared coefficients, which does not cor-
-- respond to the square of the interpolated control amplitude.
+- `ctrl_opers` — the input operators followed by their corresponding Bloch–Siegert response operators.
+- `ctrl_coefs` — the input coefficient vectors followed by their element-wise squares, in the same channel order.
 
-## Implementation structure
+## Use and constraints
 
-- Applies Bloch-Siegert corrections to Cartesian control pulses. Takes
-- control operators and their amplitude arrays and returns augmented
-- arrays with the Bloch-Siegert response operator of each control chan-
-- nel appended as a virtual channel whose coefficient vector is the
-- square of the corresponding control amplitude vector. The output
-- arguments are ready for the shaped_pulse_xy function, which then
-- propagates the system under the same slice generators that the GRAPE
-- engines use when Bloch-Siegert corrections are enabled. Syntax:
-- [ctrl_opers,...
-- ctrl_coefs]=bloch_siegert(spin_system,ctrl_opers,...
-- ctrl_coefs)
-- spin_system -Spinach spin system object containing the
+The augmented arrays are intended for the piecewise-constant propagation methods of `shaped_pulse_xy`. They are not valid for piecewise-linear interpolation: interpolating squared coefficients is not equivalent to squaring the interpolated control amplitude.
+
+`optimcon()` keeps response operators on parallel workers; this routine rebuilds them with `bss_ops` from the channel isotopes and carrier frequencies in the returned control structure. Do not edit those settings after `optimcon()` has run, because the optimiser would then use operators built from different settings than those used by the pulse calculation.
+
+## Reference
+
+[Spin Dynamics Wiki: `bloch_siegert.m`](https://spindynamics.org/wiki/index.php?title=bloch_siegert.m)

@@ -4,42 +4,20 @@
 
 ## Purpose
 
-Calculates finite difference weights for numerical derivatives, including order 0, which amounts to interpolation. Syntax: w=fdweights(target_point,grid_points,max_order)
-
-## Physical / mathematical content
-
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Calculates finite-difference weights for numerical derivatives at `target_point` using values at `grid_points`. Derivative order 0 gives interpolation weights.
 
 ## Parameters / inputs
 
-- target_point -the point at which the derivative
-- is required
-- grid_points -the points at which the function
-- is given
-- max_order -maximum derivative order
+- `target_point`: point at which the derivative is required.
+- `grid_points`: points at which the function is given, sorted in ascending order.
+- `max_order`: maximum derivative order; an integer smaller than the number of grid points.
 
-## Outputs
+## Output
 
-- w -finite difference coefficient array
-- with the coefficients for the succes-
-- sive derivatives in rows
+- `w`: finite-difference coefficient array with one column per grid point. Row `k+1` contains the weights for derivative order `k`, from 0 through `max_order`.
 
-## Implementation structure
+## Validation and algorithm
 
-- Calculates finite difference weights for numerical derivatives,
-- including order 0, which amounts to interpolation. Syntax:
-- w=fdweights(target_point,grid_points,max_order)
-- target_point -the point at which the derivative
-- is required
-- grid_points -the points at which the function
-- is given
-- max_order -maximum derivative order
-- w -finite difference coefficient array
-- with the coefficients for the succes-
-- sive derivatives in rows
-- Check consistency
+The inputs must be real and numeric. `target_point` must be a scalar within the range of `grid_points`, and `grid_points` must be a vector sorted in ascending order. The routine initializes the order-0 weight for the first point, then adds grid points one at a time, updating the weights for all derivative orders up to `max_order`.
+
+[Source reference](https://spindynamics.org/wiki/index.php?title=fdweights.m)

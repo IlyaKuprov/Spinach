@@ -4,29 +4,20 @@
 
 ## Purpose
 
-Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian()
+Checks the sign and units of a one-proton Zeeman Hamiltonian in the Spinach NMR rotating-frame convention.
 
 ## Physical / mathematical content
 
+- For a positive 1 ppm chemical shift, the rotating-frame Hamiltonian contribution is `-2*pi*nu*Lz`.
+
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Constructs a one-proton system at `14.1` T, computes `nu` with `ppm2hz(1,sys.magnet,'1H')`, and compares `hamiltonian(assume(spin_system,'nmr'))` with `-2*pi*nu*operator(spin_system,'Lz',1)` using absolute and relative tolerances `1e-6` and `1e-12`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks Spinach's NMR convention for a positive chemical shift:
-- the rotating-frame Hamiltonian contribution is -2*pi*nu*Lz.
+- `result` - regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests the one-spin Zeeman Hamiltonian. Syntax:
-- result=test_zeeman_hamiltonian()
-- result -regression test result with explanatory messages
-- The test checks Spinach's NMR convention for a positive chemical shift:
-- the rotating-frame Hamiltonian contribution is -2*pi*nu*Lz.
-- Announce the test target
-- State the Hamiltonian target of the test
-- Build a one-proton Hilbert-space spin system with a 1 ppm shift
-- Build Spinach and reference Hamiltonians
-- Check the physical frequency and sign convention
+- Defines the proton isotope, scalar shift, `zeeman-hilb` formalism, and `none` approximation; builds the test spin system, forms the observed and reference Hamiltonians, and records their comparison with `test_close`.

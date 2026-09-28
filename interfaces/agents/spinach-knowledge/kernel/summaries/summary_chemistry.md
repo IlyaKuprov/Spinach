@@ -4,32 +4,24 @@
 
 ## Purpose
 
-Prints chemical subsystem and exchange summary for a Spinach system. Syntax: summary_chemistry(spin_system)
+Prints a summary of chemical subsystems and exchange in a Spinach system. Syntax: `summary_chemistry(spin_system)`.
 
 ## Physical / mathematical content
 
+When the system has multiple chemical subsystems, reports which spins belong to each subsystem and, when present, the inter-subsystem first-order reaction rates. If `chem.flux_rate` is present and nonzero, reports its point-to-point flux rates.
+
 ## Numerical / algorithmic content
+
+Lists nonzero off-diagonal entries of the reaction-rate matrix and nonzero entries of the flux-rate matrix.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
+- `spin_system` - Spinach spin system description object.
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints through `report.m` to the console or the user-specified output.
 
 ## Implementation structure
 
-- Prints chemical subsystem and exchange summary for a Spinach system. Syntax:
-- summary_chemistry(spin_system)
-- spin_system -Spinach spin system description object
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Report multiple chemical subsystems
-- Report spin system partitioning
-- Report first-order reaction rates
-- Report flux rates if specified
-- Consistency enforcement
-- Always code as if the guy who ends up maintaining
+- Checks that the input is a structure, reports subsystem membership when there is more than one chemical subsystem, then reports available reaction rates and flux rates.

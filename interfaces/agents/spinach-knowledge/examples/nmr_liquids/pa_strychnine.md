@@ -4,29 +4,16 @@
 
 ## Purpose
 
-1H NMR spectrum of strychnine including an accurate model of line widths via Redfield superoperator. Calculation time: seconds
+Simulates the ¹H NMR spectrum of strychnine, including a Redfield-superoperator model of line widths. The source estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Uses a Redfield relaxation superoperator to model line broadening in the liquid-state spin system.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Acquires the liquid-state FID, applies exponential apodisation, Fourier-transforms it, and plots the real spectrum.
 
 ## Implementation structure
 
-- 1H NMR spectrum of strychnine including an accurate model of
-- line widths via Redfield superoperator.
-- Calculation time: seconds
-- Read spin system properties
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+- Configures the strychnine spin system and Redfield relaxation, then performs acquisition and signal processing.

@@ -4,41 +4,20 @@
 
 ## Purpose
 
-Mesh preprocessing for drawing. Creates edge, triangle, and rectangle data structures needed for fast plotting later.
+Prepares mesh geometry arrays for plotting, including its Voronoi cells.
 
-## Physical / mathematical content
+## Behavior
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Syntax
-
-```matlab
-mesh=mesh_preplot(mesh)
-```
+Using the mesh coordinates and connectivity, the routine builds coordinate arrays for edges, triangles, and rectangles, then constructs the boundary arrays for the Voronoi cells. NaN separators distinguish separate plotted segments, and each Voronoi boundary is closed by returning to its first vertex. The arrays are stored under `mesh.plot` for subsequent plotting.
 
 ## Parameters / inputs
 
-- mesh -Spinach mesh object
+- `mesh`: Spinach mesh object containing indexing data and a Voronoi tessellation in `mesh.vor`.
 
-## Outputs
+## Output
 
-- mesh -updated mesh object
+- `mesh`: updated mesh object with `plot.edg_a`, `plot.edg_b`, `plot.tri_a`, `plot.tri_b`, `plot.rec_a`, `plot.rec_b`, `plot.vor_a`, and `plot.vor_b` arrays.
 
-## Implementation structure
+## Source
 
-- Mesh preprocessing for drawing. Creates edge, triangle, and
-- rectangle data structures needed for fast plotting later.
-- mesh=mesh_preplot(mesh)
-- mesh -Spinach mesh object
-- mesh -updated mesh object
-- Check consistency
-- Prepare edge array for plotting
-- Prepare triangle array for plotting
-- Prepare rectangle array for plotting
-- Prepare Voronoi cell array for plotting
-- Consistency enforcement
-- Life is a tragedy for those who feel,
+[Spinach Wiki: mesh_preplot.m](https://spindynamics.org/wiki/index.php?title=mesh_preplot.m)

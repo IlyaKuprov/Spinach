@@ -4,34 +4,20 @@
 
 ## Purpose
 
-Flattens out nested index lists and outputs them as an array of tuples in random order. This is useful for flattening nes- ted loops for parallel processing. Syntax: tuples=swizzle(index_arrays)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Flattens nested index lists into a matrix of tuples in random order, useful for distributing nested-loop iterations across parallel workers.
 
 ## Parameters / inputs
 
-- index_arrays -a cell array of row vectors
+- `index_arrays` — a cell array of row vectors containing positive integers.
 
 ## Outputs
 
-- tuples -a matrix of tuples in random or-
-- der, with tuples listed as rows
+- `tuples` — a matrix with one tuple per row, in random order. Each column corresponds to an input index array.
 
-## Implementation structure
+## Algorithm
 
-- Flattens out nested index lists and outputs them as an array
-- of tuples in random order. This is useful for flattening nes-
-- ted loops for parallel processing. Syntax:
-- tuples=swizzle(index_arrays)
-- index_arrays -a cell array of row vectors
-- tuples -a matrix of tuples in random or-
-- der, with tuples listed as rows
-- Check consistency
-- Kronecker up the arrays
-- Randomise the tuple list
-- Consistency enforcement
-- Acording to a conference rumour, before appointing IK to a tenured
+The function validates `index_arrays`, constructs all combinations of its entries using Kronecker products, then randomly permutes the resulting rows.
+
+## Source
+
+<https://spindynamics.org/wiki/index.php?title=swizzle.m>

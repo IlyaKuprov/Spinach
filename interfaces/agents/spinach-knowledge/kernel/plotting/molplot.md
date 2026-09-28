@@ -12,12 +12,8 @@ Plots a stick representation of a molecule from Cartesian coordinates supplied. 
 
 ## Parameters / inputs
 
-- xyz -Cartesian coordinates, as Nx3 matrix, in
-- Angstroms
-- conmatrix -NxN connectivity matrix indicating chemical
-- bonds that should be drawn as sticks. If an
-- empty vector is supplied, 1.6 Angstrom cut-
-- off distance is used
+- `xyz` — Cartesian coordinates as an N-by-3 matrix, in Angstroms.
+- `conmatrix` — N-by-N connectivity matrix indicating bonds to draw as sticks. If empty, connectivity is computed with `conmat(xyz,1.6)`, using a 1.6 Angstrom cutoff.
 
 ## Outputs
 
@@ -25,15 +21,8 @@ Plots a stick representation of a molecule from Cartesian coordinates supplied. 
 
 ## Implementation structure
 
-- Plots a stick representation of a molecule from Cartesian coordinates
-- supplied. Syntax:
-- molplot(xyz,conmatrix)
-- xyz -Cartesian coordinates, as Nx3 matrix, in
-- Angstroms
-- conmatrix -NxN connectivity matrix indicating chemical
-- bonds that should be drawn as sticks. If an
-- empty vector is supplied, 1.6 Angstrom cut-
-- off distance is used
-- this function creates a figure
-- Check consistency
-- Get the connectivity matrix
+- Validates that `xyz` is an N-by-3 coordinate array and that `conmatrix`, when supplied, is a logical square matrix with one row per atom.
+- If `conmatrix` is empty, obtains it from `conmat(xyz,1.6)`.
+- Builds NaN-separated coordinate arrays for each connected atom pair and draws the sticks with `plot3` in grey.
+
+[Source reference](https://spindynamics.org/wiki/index.php?title=molplot.m)

@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Slice selection example using a one-dimensional sample and a shaped slice selection pulse in the presence of diffusion and flow. Calculation time: seconds. Ahmed Allami Ilya Kuprov
+Shows 1D slice selection with a Gaussian-shaped RF pulse while diffusion and flow are present. The source estimates seconds of runtime.
 
-## Physical / mathematical content
+## Model and sequence
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model is one `1H` at 5.9 T with zero chemical shift, diagonal T1/T2 relaxation, zero equilibrium, and rates `r1 = 30`, `r2 = 70`. It uses the `sphten-liouv` formalism without a basis approximation. The 0.30 m sample has 500 points; slice-selection and readout gradient amplitudes are each `30 mT/m`.
 
-## Numerical / algorithmic content
+The 50-step RF pulse has total duration `0.5e-4 s`, frequency `+100 kHz`, phase `pi/2`, and a Gaussian amplitude profile scaled by `2*pi*20000`. The source sets the flow field to `1e-2` and diffusion to `5e-6`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Computation and output
 
-## Implementation structure
+The pulse sequence is evaluated with `imaging(spin_system,@slice_select_1d,parameters)`. The signal receives square-sine apodisation and a real, shifted Fourier transform before plotting as a 1D profile.
 
-- Slice selection example using a one-dimensional sample and
-- a shaped slice selection pulse in the presence of diffusion
-- and flow.
-- Calculation time: seconds.
-- Ahmed Allami
-- Ilya Kuprov
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Relaxation model
-- Basis set
-- Spinach housekeeping
+## Attribution
+
+Ahmed Allami; Ilya Kuprov.

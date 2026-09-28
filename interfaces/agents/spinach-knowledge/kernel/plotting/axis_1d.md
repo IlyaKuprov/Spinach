@@ -8,42 +8,23 @@ Generates axis ticks for plotting 1D spectra. Syntax: [ax,ax_label]=axis_1d(spin
 
 ## Physical / mathematical content
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+A one-dimensional spectrum axis expressed in the requested frequency, field, g-tensor, or digitisation units.
 
 ## Numerical / algorithmic content
 
+The function constructs the Hz axis with `ft_axis(offset,sweep,zerofill)` for a sweep width (requiring `offset`), or with `linspace(sweep(1),sweep(2),zerofill)` for two increasing endpoints (with no `offset`). It converts the resulting axis to the requested units and returns the axis and plot label; it does not perform an FFT or apodisation.
+
 ## Parameters / inputs
 
-- parameters.sweep -either a one-element array giving the sweep width
-- in Hz, or a two-element array giving the spectral
-- extents in Hz around the offset.
-- parameters.zerofill -the number of points in the NMR spectrum after
-- zerofilling and Fourier transform
-- parameters.offset -offset of the spectrum centre point relative to
-- the magnet frequency, Hz
-- parameters.axis_units -a character string with the units in which the
-- axis ticks should be returned: 'ppm', 'Gauss',
-- 'mT', 'Hz', 'kHz', 'MHz','MHz-labframe', 'GHz',
-- 'GHz-labframe', 'gtensor', 'points'
-- parameters.spins -the spin involved, e.g. {'1H'}
+- `sweep` — one real numeric value for sweep width in Hz, or two increasing real numeric endpoints in Hz.
+- `zerofill` — positive integer number of points in the axis.
+- `offset` — spectrum centre offset relative to the magnet frequency, in Hz; required for a one-value sweep and not supplied for a two-endpoint sweep.
+- `axis_units` — one of `ppm`, `Gauss`, `mT`, `Hz`, `kHz`, `MHz`, `MHz-labframe`, `GHz`, `GHz-labframe`, `gtensor`, or `points`.
+- `spins` — one-element cell array naming an isotope present in the spin system, such as `{'1H'}`.
 
 ## Outputs
 
-- axis -a row vector of axis tick values
-- ax_label -axis label for displaying on the plot
-- Note: magnetic field units use the free electron g-tensor for conversion.
+- `ax` — row vector of axis values.
+- `ax_label` — label for the selected axis units and spin.
 
-## Implementation structure
-
-- Generates axis ticks for plotting 1D spectra. Syntax:
-- [ax,ax_label]=axis_1d(spin_system,parameters)
-- parameters.sweep - either a one-element array giving the sweep width
-- in Hz, or a two-element array giving the spectral
-- extents in Hz around the offset.
-- parameters.zerofill -the number of points in the NMR spectrum after
-- zerofilling and Fourier transform
-- parameters.offset -offset of the spectrum centre point relative to
-- the magnet frequency, Hz
-- parameters.axis_units -a character string with the units in which the
-- axis ticks should be returned: 'ppm', 'Gauss',
-- 'mT', 'Hz', 'kHz', 'MHz','MHz-labframe', 'GHz',
+Magnetic-field units use the free-electron g-tensor for conversion.

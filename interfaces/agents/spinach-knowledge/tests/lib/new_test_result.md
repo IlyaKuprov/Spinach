@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Initialises a regression-test result structure for subsequent checks.
 
 ## Parameters / inputs
 
-- id -stable test identifier
-- name -short human-readable test name
-- purpose -one-sentence purpose statement
+- `id` - non-empty character-row test identifier.
+- `name` - non-empty character-row test name.
+- `purpose` - character-row purpose text; it may be empty.
 
 ## Outputs
 
-- result -test result structure
+- `result` - structure containing the supplied `id`, `name`, and `purpose`; status `RUNNING`; elapsed time `0`; empty `messages` and `failures` cells; and an empty `error` string.
 
 ## Implementation structure
 
-- Creates a regression test result structure. Syntax:
-- result=new_test_result(id,name,purpose)
-- id -stable test identifier
-- name -short human-readable test name
-- purpose -one-sentence purpose statement
-- result -test result structure
-- Build the result structure
+- Validates the three inputs, then initializes the result fields. Invalid `id` or `name` values, or a non-character or non-row `purpose`, raise an error.

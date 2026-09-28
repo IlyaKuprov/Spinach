@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Retained bosonic interactions, dissipation, and assumption lifecycle after particle removal.
+Tests that particle removal preserves retained bosonic interactions and dissipation, resets derived mode assumptions, and permits spin-only rebuilding after the final mode is removed.
 
 ## Physical / mathematical content
 
-Hamiltonians and mode dissipators must match independently reconstructed retained systems, including noncommuting and complex couplings.
+Hamiltonians and mode dissipators are compared with independently reconstructed retained systems. The fixtures exercise noncommuting mode terms, complex transverse operators, spin-one quadratic terms, pair couplings, first and second spin-modulation derivatives, and mode decay.
 
 ## Numerical / algorithmic content
 
-Exercises spin/mode deletion, logical and simultaneous selections, no-op removal, mode-only retained systems, pair channels, and nested first/second spin-modulation derivatives. Checks that labframe, cavity, and spin-phonon strengths are discarded and rebuilt for C, V, and T particles. Final-mode removal from unassumed and previously assumed systems is compared with independently created spin-only systems under nmr/esr assumptions and both retention options in exact Hilbert and Zeeman-Liouville formalisms.
+Exercises spin and mode deletion, logical and simultaneous selections, no-op removal, and mode-only retained systems. Compares retained Hamiltonians in exact Zeeman-Hilbert and Zeeman-Liouville formalisms, and finite-temperature dissipators in Liouville space. For C, V, and T modes, checks that removing a spin discards derived mode strengths under `labframe`, `cavity`, and `spin-phonon` assumptions, then compares rebuilt Hamiltonians with independent systems. Final-mode removal from unassumed and previously assumed systems is compared with independently created spin-only systems under `nmr` and `esr` assumptions, using default, `zeeman`, and `couplings` retention in both formalisms.
 
 ## Syntax
 
@@ -25,7 +25,3 @@ None. The test constructs its own bounded physical fixtures.
 ## Outputs
 
 `result` is the regression record of checks, messages, and failures; the test runner determines its final status.
-
-## Header notes
-
-The regression is registered in `test_manifest` and is not an optimisation or performance benchmark.

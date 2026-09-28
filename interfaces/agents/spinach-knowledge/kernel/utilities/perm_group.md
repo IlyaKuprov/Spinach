@@ -4,50 +4,31 @@
 
 ## Purpose
 
-Permutation group database. Returns complete data for permutation groups. The following group names are available: S2, S3, S4, S4A, S5, S6, S6A, S8A. The options ending in A are the largest real-valued-character Abelian subgroups. Syntax: group=perm_group(group_name)
+Returns the stored permutation-group data for the supported groups S2, S3, S4, S4A, S5, S6, S6A, and S8A. The A-suffixed options are the largest real-valued-character Abelian subgroups.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- group_name -character string specifying the name
-- group, e.g. 'S5'
+- `group_name` — character string naming the group, for example `'S5'`.
 
 ## Outputs
 
-- group.name -long name of the group
-- group.order -number of elements in the group
-- group.nclasses -number of classes in the group
-- group.class_sizes -a row vector giving number of elements
-- in each class
-- group.class -a cell array of matrices giving the ele-
-- ments belonging to each class. The ele-
-- ments are given as row vectors of permu-
-- tation strings stacked vertically into
-- a matrix.
-- group.n_irreps -number of irreducible representations in
-- the group
-- group.irrep_dims -a row vector giving dimensions of irre-
-- ducible representation
-- group.class_characters -a matrix of characters for each irredu-
-- cible representation (in rows) of each
-- class (in columns).
+- `group.name` — long group name.
+- `group.order` — number of elements.
+- `group.nclasses` — number of conjugacy classes.
+- `group.class_sizes` — row vector giving the number of elements in each class.
+- `group.class` — cell array of matrices containing the permutation rows for each class.
+- `group.n_irreps` — number of irreducible representations.
+- `group.irrep_dims` — row vector of irreducible-representation dimensions.
+- `group.class_characters` — character matrix, with irreducible representations in rows and classes in columns.
+- `group.elements` — class matrices concatenated into one matrix.
+- `group.characters` — class characters expanded to the individual elements in each class.
+
+An unsupported group name raises an error.
 
 ## Implementation structure
 
-- Permutation group database. Returns complete data for permutation
-- groups. The following group names are available: S2, S3, S4,
-- S4A, S5, S6, S6A, S8A. The options ending in A are the
-- largest real-valued-character Abelian subgroups. Syntax:
-- group=perm_group(group_name)
-- group_name -character string specifying the name
-- group, e.g. 'S5'
-- group.name -long name of the group
-- group.order -number of elements in the group
-- group.nclasses -number of classes in the group
-- group.class_sizes -a row vector giving number of elements
-- in each class
+The function selects the stored data for the requested group, then forms the full element list from the class matrices and expands the class-character columns across the elements in their respective classes.
+
+## Reference
+
+- <https://spindynamics.org/wiki/index.php?title=perm_group.m>

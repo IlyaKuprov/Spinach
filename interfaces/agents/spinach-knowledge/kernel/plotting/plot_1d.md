@@ -10,7 +10,7 @@
 
 ## Numerical / algorithmic content
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+- When `parameters.derivative` is enabled, differentiates the spectrum using `fdvec(spectrum,5,1)`.
 
 ## Parameters / inputs
 
@@ -37,15 +37,8 @@
 
 ## Implementation structure
 
-- 1D plotting utility. Syntax:
-- plot_1d(spin_system,spectrum,parameters,varargin)
-- spectrum a column vector containing the
-- spectrum
-- parameters.sweep sweep width, Hz
-- parameters.spins spin species, e.g. {'1H'}
-- parameters.offset transmitter offset, Hz
-- parameters.axis_units axis units ('ppm','Gauss',
-- 'mT','Hz','kHz','MHz',
-- 'MHz-labframe','GHz','GHz-labframe',
-- 'gtensor','points')
-- parameters.derivative if set to 1, the spectrum is
+- Applies defaults and validates the inputs, then obtains the plotting axis and label from `axis_1d`.
+- If the spectrum is complex, recursively plots its real and imaginary components and adds a legend. Otherwise, optionally differentiates it, plots it with the supplied `varargin`, and sets tight/padded limits, a box, and grid.
+- Reverses the x-axis when `parameters.invert_axis` is enabled.
+
+[Source reference](https://spindynamics.org/wiki/index.php?title=plot_1d.m)

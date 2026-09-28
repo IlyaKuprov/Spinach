@@ -4,46 +4,24 @@
 
 ## Purpose
 
-Calculates a BFGS approximation to the Newton-Raphson search direction for maximising a function using past gradients to build a serviceable substitute to a Hessian. Unlike LBFGS, the pseudo-Hessian matrix is formed explicitly. Syntax: H=bfgs(dx_hist,dg_hist,g)
+Constructs a dense BFGS approximation to the negative Hessian of an objective being maximised. The resulting ascent direction is obtained by solving `H\g`.
 
-## Physical / mathematical content
+## Algorithm
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+History columns are considered from newest to oldest. The routine rejects non-finite or insufficient-curvature step/gradient pairs, initializes the matrix scale from the first retained pair, and applies the BFGS updates to the remaining valid pairs. If no pair survives the curvature checks, it returns the identity matrix. This is a full-matrix BFGS approximation, not a limited-memory update.
 
-## Numerical / algorithmic content
+## Syntax
 
-## Parameters / inputs
+```matlab
+H=bfgs(dx_hist,dg_hist,g)
+```
 
-- dx_hist -history of x increments, a stack
-- of column vectors, from the latest
-- to the earliest
-- dg_hist -history of gradient increments,
-- a stack of column vectors, from
-- the latest to the earliest
-- g -current gradient (used for sizing)
+## Inputs
 
-## Outputs
+- `dx_hist` — history of argument increments, with one column per pair, newest first.
+- `dg_hist` — corresponding gradient increments, in the same column order.
+- `g` — current gradient column vector; its length determines the matrix dimension.
 
-- H -BFGS approximation to the Hessian
-- matrix corresponding to the *nega-
-- tive* Hessian of the objective.
-- The corresponding ascent directi-
-- on is obtained as: direction=H\g
+## Output
 
-## Implementation structure
-
-- Calculates a BFGS approximation to the Newton-Raphson search
-- direction for maximising a function using past gradients to
-- build a serviceable substitute to a Hessian. Unlike LBFGS,
-- the pseudo-Hessian matrix is formed explicitly. Syntax:
-- H=bfgs(dx_hist,dg_hist,g)
-- dx_hist -history of x increments, a stack
-- of column vectors, from the latest
-- to the earliest
-- dg_hist -history of gradient increments,
-- a stack of column vectors, from
-- the latest to the earliest
-- g -current gradient (used for sizing)
+- `H` — dense BFGS approximation to the negative objective Hessian; use `H\g` for the corresponding Newton-like ascent direction.

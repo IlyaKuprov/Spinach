@@ -4,66 +4,28 @@
 
 ## Purpose
 
-Fits experimental PCS data using the distributed paramagnetc centre model described in
-
-## Physical / mathematical content
-
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-
-## Numerical / algorithmic content
-
-## Syntax
-
-```matlab
-[mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=...
-ilpcs(nxyz,expt_pcs,ranks,mguess)
-```
+Fits experimental pseudocontact shifts (PCS) to the distributed paramagnetic-centre multipole model described in [10.1039/C6CP05437D](https://doi.org/10.1039/C6CP05437D).
 
 ## Parameters / inputs
 
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is to be evaluated, in Angstroms.
-- expt_pcs -a column vector of experimental pseudocontact shifts
-- in ppm
-- ranks -row of multipole expansion ranks to be used in the
-- fitting procedure
-- mguess -guess value for the paramagnetic centre position,
-- a three-element vector in Angstrom
-- Output:
-- mxyz -optimized paramagnetic centre coordinates as [x y z],
-- in Angstroms.
-- chi -optimized magnetic susceptibility tensor in cubic
-- Angstroms.
-- Ilm -{[],[]} cell array of numbers corresponding to the
-- multipole moments defined in the paper cited above:
-- for L=0, Ilm=N/2/sqrt(pi)
-- for L=1, Ilm=[real(I11) I10 imag(I11)]
-- for L=2, Ilm=[real(I22) real(I21) I20 imag(I21) imag(I22)]
-- et cetera.
-- pred_pcs -predicted pseudocontact shift (in ppm) at each of
-- the nuclei.
-- chi -optimized magnetic susceptibility tensor in cubic
-- Angstroms.
-- s_mxyz -standard deviations of paramagnetic centre
-- coordinates as [x y z], in Angstroms.
-- s_chi -standard deviations of magnetic susceptibility
-- tensor elements in cubic Angstroms.
-- s_Ilm -standard deviations of the multipole moments, arranged
-- in the same order as the moments themselves.
-- Note: a good initial guess for the paramagnetic centre location is
-- essential for a successful fit.
+- `nxyz` — N-by-3 nuclear coordinates in Å at which the PCS values are evaluated.
+- `expt_pcs` — real column vector of experimental PCS values in ppm, with one value per coordinate row.
+- `ranks` — row vector of unique non-negative integer multipole ranks, starting with 0. The rank-0 moment is fixed by normalisation, not fitted.
+- `mguess` — real three-element row vector giving the initial paramagnetic-centre coordinates in Å. A good initial guess is important for successful fitting.
 
-## Implementation structure
+## Outputs
 
-- Fits experimental PCS data using the distributed paramagnetc centre
-- model described in
-- [mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=...
-- ilpcs(nxyz,expt_pcs,ranks,mguess)
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is to be evaluated, in Angstroms.
-- expt_pcs -a column vector of experimental pseudocontact shifts
-- in ppm
-- ranks -row of multipole expansion ranks to be used in the
-- fitting procedure
-- mguess -guess value for the paramagnetic centre position,
-- a three-element vector in Angstrom
+- `mxyz` — fitted paramagnetic-centre coordinates [x y z] in Å.
+- `chi` — fitted magnetic-susceptibility tensor in Å^3.
+- `Ilm` — cell array of fitted multipole moments corresponding to `ranks`; the moment components are packed in the ordering defined in the cited paper (for example, rank 0 is `N/2/sqrt(pi)`).
+- `pred_pcs` — fitted PCS values in ppm at the input coordinates.
+- `s_mxyz`, `s_chi`, `s_Ilm` — estimated standard deviations for the centre coordinates, susceptibility tensor elements, and multipole moments, respectively. These are calculated when one of these later outputs is requested.
+
+## Method
+
+The routine minimises the sum of squared residuals between `expt_pcs` and predictions from `lpcs`, varying the centre coordinates, five independent elements of the traceless susceptibility tensor, and the non-fixed multipole components. It uses `fminunc` with central finite differences and parallel evaluation enabled. If uncertainty outputs are requested, it estimates the residual Jacobian at the fitted point and uses it to calculate parameter standard deviations.
+
+## References
+
+- [10.1039/C6CP05437D](https://doi.org/10.1039/C6CP05437D)
+- [Spin Dynamics Wiki: ilpcs.m](https://spindynamics.org/wiki/index.php?title=ilpcs.m)

@@ -4,34 +4,28 @@
 
 ## Purpose
 
-Converts a secular relaxation superoperator into the Redfield kite form by dropping all non-longitudinal cross-relaxation pro- cesses. Useful when the relaxation superoperator is huge, but TROSY-like effects are negligible. Syntax: R=sec2kite(spin_system,R)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-
-## Numerical / algorithmic content
+Converts a secular relaxation superoperator into Redfield kite form by dropping all non-longitudinal cross-relaxation processes. Useful when the relaxation superoperator is huge but TROSY-like effects are negligible.
 
 ## Parameters / inputs
 
-- R -relaxation superoperator
+- `spin_system` — spin system; its basis is used to identify longitudinal product states.
+- `R` — relaxation superoperator.
 
 ## Outputs
 
-- R -relaxation superoperator
+- `R` — relaxation superoperator retaining self-relaxation and longitudinal cross-relaxation terms.
 
-## Implementation structure
+## Method
 
-- Converts a secular relaxation superoperator into the Redfield
-- kite form by dropping all non-longitudinal cross-relaxation pro-
-- cesses. Useful when the relaxation superoperator is huge, but
-- TROSY-like effects are negligible. Syntax:
-- R=sec2kite(spin_system,R)
-- R -relaxation superoperator
-- Check consistency
-- Get nonzero count
-- Compile the index of all longitudinal product states in the basis
-- Convert R to XYZ format
-- Zero all rates except self-relaxation and longitudinal cross-relaxation terms
-- Recompose the relaxation superoperator and get nonzero count
+The function identifies longitudinal product states from `spin_system.bas.basis`, then retains matrix entries whose row and column both correspond to longitudinal product states, as well as all diagonal entries. Other entries are set to zero. It reports the number of nonzero entries before and after conversion.
+
+## Requirements and caveats
+
+- Requires the `sphten-liouv` formalism and a numeric, square `R`.
+- Cannot proceed if `norm(R*unit_state(spin_system),2)>1e-10`; this is treated as an indication that `R` has been thermalised.
+- Non-longitudinal cross-relaxation processes are discarded, so use this conversion when TROSY-like effects are negligible.
+
+## Contact and reference
+
+- ilya.kuprov@weizmann.ac.il
+- <https://spindynamics.org/wiki/index.php?title=sec2kite.m>

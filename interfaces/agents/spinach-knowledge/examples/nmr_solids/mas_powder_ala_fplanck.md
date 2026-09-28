@@ -4,29 +4,12 @@
 
 ## Purpose
 
-13C MAS spectrum of alanine powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism and a spherical grid. Calculation time: minutes
+Calculates the `13C` MAS spectrum of alanine powder, assuming `1H` decoupling, with the Fokker–Planck MAS formalism and a spherical grid. The source estimates minutes.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system and magnetic parameters are read from the PCM-DFT alanine calculation at `../standard_systems/alanine.log`; the field is 14.1 T. The basis selects the `15N` longitudinal subspace with projection +1. The MAS rate is 2 kHz about `[1 1 1]`, with maximum rank 17 and grid `rep_2ang_100pts_sph`. Acquisition is for `13C` with no decoupling channel specified.
 
-## Numerical / algorithmic content
+## Implementation
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 13C MAS spectrum of alanine powder (assuming decoupling of 1H),
-- computed using the Fokker-Planck MAS formalism and a spherical
-- grid.
-- Calculation time: minutes
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
+The function builds the spin system with `g2spinach`, calls `singlerot` with `@acquire`, applies exponential apodisation (6), zero-fills the 256-point FID to 1024 points, Fourier transforms it, and plots the real spectrum. The configured sweep is 50 kHz and offset is 15 kHz.

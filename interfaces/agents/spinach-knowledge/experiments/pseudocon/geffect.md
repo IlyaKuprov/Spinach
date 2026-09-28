@@ -4,44 +4,22 @@
 
 ## Purpose
 
-Effective g-tensor for the user-specified Kramers doublet, computed as described in
-
-## Physical / mathematical content
-
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-
-## Syntax
-
-```matlab
-g=geffect(spin_system,states)
-```
+Computes the effective g-tensor for a user-selected Kramers doublet, following [Equations 61 and 62](https://doi.org/10.1063/1.4793736).
 
 ## Parameters / inputs
 
-- states -the numbers of the states to use
-- (numbered sequentially from the
-- lowest to the highest energy)
+- `spin_system` — Spinach spin system.
+- `states` — indices of the selected states, numbered in ascending energy order from the lowest-energy state.
 
 ## Outputs
 
-- g -3x3 g-tensor matrix in Bohr mag-
-- neton units
+- `g` — 3-by-3 g-tensor matrix in Bohr magneton units.
 
-## Implementation structure
+## Method
 
-- Effective g-tensor for the user-specified Kramers
-- doublet, computed as described in
-- g=geffect(spin_system,states)
-- states -the numbers of the states to use
-- (numbered sequentially from the
-- lowest to the highest energy)
-- g -3x3 g-tensor matrix in Bohr mag-
-- neton units
-- Check consistency
-- Get the g-tensor for each spin
-- Get Sx, Sy, Sz operators for each spin
-- Get magnetic moment operators
+The routine obtains each spin's g-tensor and constructs its spin operators and the total magnetic-moment components. It builds and symmetrises the lab-frame Hamiltonian at orientation `[0 0 0]`, diagonalises it, sorts the eigenstates by ascending energy, and selects `states`. The magnetic-moment operators are projected into that selected subspace; the matrix `G` is assembled using Equation 61, and the returned tensor is `real(sqrtm(G))).
+
+## References
+
+- [10.1063/1.4793736](https://doi.org/10.1063/1.4793736)
+- [Spin Dynamics Wiki: geffect.m](https://spindynamics.org/wiki/index.php?title=geffect.m)

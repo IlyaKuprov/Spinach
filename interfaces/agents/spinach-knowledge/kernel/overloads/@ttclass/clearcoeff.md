@@ -4,34 +4,16 @@
 
 ## Purpose
 
-Absorbs physical coefficients into tensor train cores without changing the value represented by the tensor train. Syntax: tt=clearcoeff(tt)
+Distributes each tensor-train coefficient across its cores and sets the coefficient to one, without changing the represented tensor train.
 
-## Physical / mathematical content
+## Input
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `tt` — tensor train object.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `tt` — tensor train object with each coefficient distributed into its cores and the coefficient array set to one.
 
-- tt -tensor train object
+## Algorithm
 
-## Outputs
-
-- tt -tensor train object with each coefficient distributed
-- into its cores and the coefficient array set to one
-
-## Implementation structure
-
-- Absorbs physical coefficients into tensor train cores without
-- changing the value represented by the tensor train. Syntax:
-- tt=clearcoeff(tt)
-- tt -tensor train object
-- tt -tensor train object with each coefficient distributed
-- into its cores and the coefficient array set to one
-- Get the number of cores and trains
-- Loop over the trains in the buffer
-- Scale the coefficient
-- Apply it to cores
-- Erase the coefficient
-- "Moral outrage is a middle-class luxury."
+For each train, the function takes the `ncores`-th root of its coefficient, multiplies every core in that train by this factor, then sets that train's coefficient to one.

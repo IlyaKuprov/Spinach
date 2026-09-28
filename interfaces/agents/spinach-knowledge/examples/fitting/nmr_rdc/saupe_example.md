@@ -4,25 +4,16 @@
 
 ## Purpose
 
-Extracting Saupe order matrix from NH RDC data. Experimental measurements kindly provided by Andras Boeszoermenyi, Thibault Viennet, and Hari Arthanari.
+Extracts a Saupe order matrix from NH residual dipolar coupling (RDC) data. The experimental measurements are credited to Andras Boeszoermenyi, Thibault Viennet, and Hari Arthanari.
 
-## Physical / mathematical content
+## Physical and mathematical content
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
+The workflow uses NH RDC measurements and the corresponding atom coordinates from a PDB structure to fit the Saupe order matrix. It then back-calculates RDCs from the fitted matrix for comparison with the input data.
 
-## Numerical / algorithmic content
+## Numerical and algorithmic content
+
+The script reads the structure and RDC data, builds an isotope table, matches measured couplings to the relevant atom coordinates, and calls the RDC fitting routine. It plots the calculated and measured values.
 
 ## Implementation structure
 
-- Extracting Saupe order matrix from NH RDC data. Experimental
-- measurements kindly provided by Andras Boeszoermenyi, Thibault
-- Viennet, and Hari Arthanari.
-- Read the PDB file
-- Read RDC data
-- Make isotope table
-- Match up RDCs with coordinates
-- Locate both atoms
-- Extract coordinates
-- Call RDC fitter
-- Back-calculate RDCs
-- Do the plotting
+The function reads the PDB and RDC inputs, maps each coupling to its pair of atoms and extracts their coordinates, fits the Saupe matrix, back-calculates the couplings, and produces the plots.

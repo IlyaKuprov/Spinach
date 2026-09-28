@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Adds corresponding fields of two structures. Nested structu- res are processed recursively. Syntax: str3=plus(str1,str2)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Add corresponding fields of two structures, recursively adding nested structures.
 
 ## Parameters / inputs
 
-- str1, str2 -input structures, must have the same topology
+- `str1`, `str2` - structures with the same field names and count at each nested level.
 
 ## Outputs
 
-- str3 -output structure
+- `str3` - structure containing the elementwise result of adding corresponding fields.
 
 ## Implementation structure
 
-- Adds corresponding fields of two structures. Nested structu-
-- res are processed recursively. Syntax:
-- str3=plus(str1,str2)
-- str1, str2 -input structures, must have the same topology
-- str3 -output structure
-- Decide how to proceed
-- Get the field names
-- Check topology
-- Loop over field names
-- Recursive call for each field name
-- Complain and bomb out
-- He was the sort of person who stood on mountaintops during
+The function checks that both operands are structures and have matching field topology. It then applies `+` recursively to corresponding fields; a topology mismatch raises an error.

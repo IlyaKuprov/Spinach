@@ -4,17 +4,15 @@
 
 ## Purpose
 
-Transmitter and probe distortion kernel of a 400 MHz Bruker spectrometer fitted with a 4 mm Phoenix MAS probe, estimated from an oscilloscope recording of an eight-block XiX wave- form on the 87Rb channel. The wall clock record is heterodyned into the rotating frame, the carrier frequency is refined from the residual phase drift accumulated within each XiX half-block, the remaining constant phase is removed, and the 
+Transmitter and probe distortion kernel of a 400 MHz Bruker spectrometer fitted with a 4 mm Phoenix MAS probe, estimated from an oscilloscope recording of an eight-block XiX waveform on the 87Rb channel. The wall clock record is heterodyned into the rotating frame, the carrier frequency is refined from the residual phase drift accumulated within each XiX half-block, the remaining constant phase is removed, and the FIR kernel is obtained by linear least squares from the ideal and measured waveforms.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- The ideal XiX waveform alternates sign every half-block and is zero after the eighth block. A 40-tap FIR kernel is estimated from the ideal and measured waveforms and normalised to unit DC response.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- The oscilloscope record is heterodyned at a refined carrier frequency, phase-corrected, amplitude-normalised, and resampled onto a 100 ns kernel grid. The kernel and its zero-filled Fourier magnitude response are plotted.
 
 ## Implementation structure
 

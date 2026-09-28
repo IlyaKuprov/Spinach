@@ -4,32 +4,16 @@
 
 ## Purpose
 
-A simple shorthand for the anticommutator of two matrices. Syntax: C=acomm(A,B)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Computes the matrix anticommutator `C = A*B + B*A`.
 
 ## Parameters / inputs
 
-- A,B -square matrices
+- `A`, `B` - numeric square matrices of the same dimensions.
 
-## Outputs
+## Output
 
-- C -a square matrix
+- `C` - square matrix, computed as `A*B + B*A`.
 
-## Implementation structure
+## Behavior
 
-- A simple shorthand for the anticommutator of two
-- matrices. Syntax:
-- C=acomm(A,B)
-- A,B -square matrices
-- C -a square matrix
-- Check consistency
-- Do the deed
-- Consistency enforcement
-- Enough of all this academic chatter, back
-- again to devilry!
-- Mephisto
+The function validates that both inputs are numeric square matrices with equal dimensions, then computes the anticommutator.

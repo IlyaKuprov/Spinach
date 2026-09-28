@@ -4,16 +4,16 @@
 
 ## Purpose
 
-Slice selection in 3D followed by phase-encoded imaging of the resulting slice. This simulation fills up a sys- tem with eight H200 GPUs and 4 TB of RAM. Simulation time: you hope and pray this even starts; if it does, then hours.
+Slice selection in 3D followed by phase-encoded imaging of the resulting slice. This simulation fills up a system with eight H200 GPUs and 4 TB of RAM. Simulation time: you hope and pray this even starts; if it does, then hours.
 
 ## Physical / mathematical content
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The calculation models three-dimensional slice selection and phase-encoded imaging of the selected slice, using a single-proton spin system with T1/T2 relaxation.
+- The phase-encoded acquisition is displayed in both k-space and reconstructed real-space image form.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The script constructs the 3D slice-selective sequence, calls `phase_enc_3d` for phase encoding, then plots the k-space data and reconstructed image.
 
 ## Implementation structure
 

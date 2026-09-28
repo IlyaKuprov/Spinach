@@ -4,28 +4,16 @@
 
 ## Purpose
 
-PASADENA experiment simulation for the parahydrogenation of styrene into ethylbenzene. Set to reproduce the top trace of Fig 5 in Calculation time: seconds
+Simulates a PASADENA spectrum for parahydrogenation of styrene to ethylbenzene, with the stated aim of reproducing the top trace of Figure 5 ([doi:10.1039/b914188j](https://doi.org/10.1039/b914188j)). The source gives a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Parahydrogen examples. The physical motif is highly non-Boltzmann singlet order imported from para-H2 and converted into observable nuclear magnetisation through hydrogenation, exchange, or catalytic transfer processes.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model contains ten proton spins at 7.05 T, with chemical shifts and scalar couplings assigned to the product. It uses the spherical-tensor Liouville formalism, an IK-2 basis approximation connected through scalar couplings, and permutation symmetries `S3` for spins 1–3 and `S2` for spins 4–5. The initial state is the `Lz` product on spins 1 and 4.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+A liquid-state acquisition simulates a proton FID with a `-pi/4` pulse, 500 ppm offset, 1000 ppm sweep, 1024 points, and 8192-point zero filling. Gaussian apodisation (parameter 10) precedes the Fourier transform and spectrum plot.
 
 ## Implementation structure
 
-- PASADENA experiment simulation for the parahydrogenation of styrene
-- into ethylbenzene. Set to reproduce the top trace of Fig 5 in
-- Calculation time: seconds
-- Spin system
-- Magnetic field
-- Chemical shifts
-- Scalar couplings
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+The script defines the ten isotopes, field, shifts, and scalar couplings; constructs the symmetry-reduced basis; sets the proton acquisition parameters; and calls `liquid` with `hp_acquire` before processing the FID.

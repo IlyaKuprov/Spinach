@@ -8,14 +8,10 @@ Overtone DANTE experiment with frequency-domain acquisition.
 
 ## Physical / mathematical content
 
-- Overtone experiment implementations. These routines excite or detect high-order quadrupolar transitions and therefore combine non-secular quadrupolar terms, MAS or field effects, and specialised detection pathways.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
-
+The routine calculates the overtone reference frequency as `-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`, forms `L=H+1i*R+1i*K`, and extends `parameters.Lx` across `parameters.spc_dim` spatial dimensions.
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
+The function checks its inputs and rejects a pulse that does not fit in a rotor cycle. It constructs pulse and free-evolution propagators, combines them into one cycle, applies that cycle `parameters.n_periods*parameters.pulse_num` times with `multiprop`, and calls `overtone_a` for acquisition.
 ## Syntax
 
 ```matlab
@@ -26,17 +22,12 @@ spectrum=overtone_dante(spin_system,parameters,H,R,K)
 
 - parameters.pulse_dur -duration of the pulse, seconds
 - parameters.pulse_amp -amplitude of the pulse, rad/s
-- parameters.pulse_num -number of pulses within the
-- rotor period
-- parameters.n_periods -number of rotor periods that the
-- sequence is active for
-- parameters.spins -overtone-active nucleus, specified
-- as a single-element cell array
+- parameters.pulse_num -number of pulses within the rotor period
+- parameters.n_periods -number of rotor periods that the sequence is active for
+- parameters.spins -overtone-active nucleus, specified as a single-element cell array
 - parameters.spc_dim -Fokker-Planck spatial dimension
-- parameters.Lx -X Zeeman operator on the
-- quadrupolar nucleus
-- parameters.rf_frq -pulse frequency offset from the
-- overtone frequency, Hz
+- parameters.Lx -X Zeeman operator on the quadrupolar nucleus
+- parameters.rf_frq -pulse frequency offset from the overtone frequency, Hz
 - parameters.rate -rotor frequency in Hz
 - parameters.sweep -acquisition sweep range, Hz
 - parameters.npoints -number of acquisition points
@@ -52,15 +43,4 @@ spectrum=overtone_dante(spin_system,parameters,H,R,K)
 
 ## Implementation structure
 
-- Overtone DANTE experiment with frequency-domain acquisition.
-- spectrum=overtone_dante(spin_system,parameters,H,R,K)
-- parameters.pulse_dur -duration of the pulse, seconds
-- parameters.pulse_amp -amplitude of the pulse, rad/s
-- parameters.pulse_num -number of pulses within the
-- rotor period
-- parameters.n_periods -number of rotor periods that the
-- sequence is active for
-- parameters.spins -overtone-active nucleus, specified
-- as a single-element cell array
-- parameters.spc_dim -Fokker-Planck spatial dimension
-- parameters.Lx -X Zeeman operator on the
+After validation, the routine builds the Liouvillian and spatially extended pulse operator, constructs the DANTE pulse train from the pulse and free-evolution propagators, propagates `parameters.rho0`, and delegates spectral acquisition to `overtone_a`.

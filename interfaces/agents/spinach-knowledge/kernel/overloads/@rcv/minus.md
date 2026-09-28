@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Subtracts one RCV object from another. Syntax: A=minus(A,B)
+Computes `A-B` for two RCV operands by negating `B` and delegating the addition to `plus`.
 
-## Physical / mathematical content
+## Mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+The operation is subtraction of the right operand from the left operand; this function implements it as `A=plus(A,(-1)*B)`.
 
 ## Numerical / algorithmic content
+
+The function calls its consistency check before dispatching to scalar multiplication and `plus`. The check raises an error only when neither operand is an RCV object.
 
 ## Parameters / inputs
 
@@ -23,15 +25,5 @@ Subtracts one RCV object from another. Syntax: A=minus(A,B)
 
 ## Implementation structure
 
-- Subtracts one RCV object from another. Syntax:
-- A=minus(A,B)
-- A -left operand
-- B -right operand
-- A -result A-B as an RCV sparse matrix
-- Check consistency
-- Just call plus
-- Consistency enforcement
-- "My cat had been suffering from severe illness over the past month
-- or so. This had meant that he had needed increasingly hands-on
-- care. Due to a terminal diagnosis the decision to put him to
-- sleep was made; that took place on Monday 11th April.
+- Run the local input check.
+- Replace `A` with `plus(A,(-1)*B)` and return the result.

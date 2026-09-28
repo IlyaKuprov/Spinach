@@ -4,28 +4,11 @@
 
 ## Purpose
 
-HMBC spectrum of camphor with natural content of 13C isotope. Coordinates, shielding anisotropies and J-couplings computed witt DFT. Calculation time: seconds
+Simulates a liquid-state HMBC spectrum of camphor at natural 13C abundance using coordinates, shielding anisotropies, and J-couplings from a vacuum DFT calculation. The source notes a calculation time of seconds.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HMBC spectrum of camphor with natural content of 13C isotope.
-- Coordinates, shielding anisotropies and J-couplings computed
-- witt DFT.
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
+- Imports the camphor spin system from `../standard_systems/camphor.log` using `gparse` and `g2spinach`; sets the magnetic field to 14.1 T.
+- Uses the `greedy` option, a proximity cutoff of 4.0, and an IK-2 basis with `scalar_couplings` connectivity and proximity level 1.
+- Sets `J=140`, `delta_b=60e-3`, sweeps of `[40000 1500]` Hz, offsets of `[18000 900]` Hz, a `[128 128]` point grid, and `[512 512]` zero filling for `{'13C','1H'}`.
+- Generates 13C isotopomers with `dilute`, simulates each with `liquid(...,@hmbc,...,'nmr')` in a `parfor` loop, applies cosine apodisation in both dimensions, and sums the shifted 2D Fourier transforms before plotting the magnitude spectrum.

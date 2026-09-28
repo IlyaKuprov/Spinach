@@ -8,23 +8,12 @@ An example of the M2S sequence for a two-spin system. Calculation time: seconds
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+A two-spin 13C system at 9.4 T has scalar Zeeman shifts of 0.03 and -0.03 and a scalar coupling of 55; the M2S sequence converts initial longitudinal magnetisation toward singlet order.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Using the sphten-liouv formalism with no basis approximation, the example builds the NMR Hamiltonian and 13C Lx and Ly operators, then calls `m2s` with parameters 55 and 6.0.
 
 ## Implementation structure
 
-- An example of the M2S sequence for a two-spin system.
-- Calculation time: seconds
-- Spin system and interactions
-- Basis set
-- Spinach housekeeping
-- Hamiltonian
-- Pulse operators
-- Start with longitudinal magnetisation
-- Detect singlet state
-- Call the M2S sequence
-- Display the singlet population
+The function creates and bases the spin system, sets `rho0` to Lz on both spins, defines `singlet(spin_system,1,2)` as the detector, and displays its overlap with the propagated state as the singlet population.

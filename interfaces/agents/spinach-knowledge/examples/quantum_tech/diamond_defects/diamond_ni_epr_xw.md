@@ -8,23 +8,15 @@ Field-swept powder EPR spectra of Ni defects in diamond at X and W bands. Calcul
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+The example builds the diamond Ni NE1 centre with orientation `111` and simulates its electron-spin EPR response. It computes powder field sweeps at X and W microwave bands and plots the two spectra side by side.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Spinach uses the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`). The field-sweep calculation uses the spherical orientation grid `rep_2ang_100pts_sph`, 2048 field points, and an RSPT order of `Inf`. The common line width is `1e-4 T`; integration tolerance is `1e-4` and transition-moment tolerance is `0.1`.
 
 ## Implementation structure
 
-- Field-swept powder EPR spectra of Ni defects
-- in diamond at X and W bands.
-- Calculation time: seconds.
-- Set Ni NE1 centre model parameters.
-- Build the spin system
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- EPR sim parameters
-- Set X-band parameters
-- Run the X-band simulation
-- Plot the X-band spectrum
+- Set the NE1 centre and `111` orientation, then build the spin system with `diamond_ni`.
+- Set the magnet field to 1 T, construct the Zeeman Hilbert basis, and run Spinach housekeeping.
+- Simulate X band at 9.5 GHz over 0.30–0.36 T and W band at 94 GHz over 3.1–3.4 T using `fieldsweep`.
+- Plot each spectrum against its returned magnetic-field axis.

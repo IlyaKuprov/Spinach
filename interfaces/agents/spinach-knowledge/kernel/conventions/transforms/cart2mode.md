@@ -4,14 +4,13 @@
 
 ## Purpose
 
-Converts Cartesian derivatives of spin Hamiltonian parameters, as produced by electronic structure theory packages, into the derivatives with respect to dimensionless mode coordinates that the bosonic mode specification interface of create.m expects in inter.modes.coupling_mod and inter.modes.zeeman_mod fields. The dimensionless coordinate of each mode is (a+a')/sqrt(2), and the Cartesian displacement that it produce
-
+Converts Cartesian derivatives of spin Hamiltonian parameters into derivatives with respect to dimensionless normal-mode coordinates for `inter.modes.coupling_mod` and `inter.modes.zeeman_mod` in the bosonic mode specification used by `create.m`.
 ## Physical / mathematical content
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
+The dimensionless coordinate of a mode is `(a+a')/sqrt(2)`. For a Cartesian degree of freedom with mass `m`, its displacement per unit mode coordinate is the mass-weighted eigenvector component times `sqrt(hbar/(m*omega))`, where `omega=2*pi*frqs`. First derivatives are contracted with one displacement vector; second derivatives are contracted with two, one for each mode.
 ## Numerical / algorithmic content
 
+Atomic masses are expanded over their three Cartesian degrees of freedom and converted from unified atomic mass units to kilograms. The code computes displacement scales in Angstrom, then sums the Cartesian derivative array against one scale vector for first order or two scale vectors for second order. It validates finite real inputs, positive masses and frequencies, matching dimensions, and unit-normalised eigenvector columns.
 ## Parameters / inputs
 
 - cart_derivs -first derivatives of an interaction with
@@ -49,15 +48,4 @@ Converts Cartesian derivatives of spin Hamiltonian parameters, as produced by el
 
 ## Implementation structure
 
-- Converts Cartesian derivatives of spin Hamiltonian parameters,
-- as produced by electronic structure theory packages, into the
-- derivatives with respect to dimensionless mode coordinates that
-- the bosonic mode specification interface of create.m expects in
-- inter.modes.coupling_mod and inter.modes.zeeman_mod fields. The
-- dimensionless coordinate of each mode is (a+a')/sqrt(2), and the
-- Cartesian displacement that it produces on a degree of freedom
-- with mass m is scaled by sqrt(hbar/(m*omega)), where omega is
-- the angular frequency of the mode. Syntax:
-- mode_derivs=cart2mode(cart_derivs,eigvecs,masses,frqs)
-- cart_derivs -first derivatives of an interaction with
-- respect to Cartesian displacements, in Hz
+The main function calls the local `grumble` validator, constructs the zero-point displacement scale vectors, and contracts them with `cart_derivs`. The local validator enforces the distinct eigenvector and frequency shapes required for first- and second-order conversion.

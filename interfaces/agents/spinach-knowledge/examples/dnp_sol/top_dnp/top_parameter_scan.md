@@ -4,27 +4,16 @@
 
 ## Purpose
 
-2D parameter scan of a TOP DNP experiment. <I_z> after a set contact time is calculated as a function of electron pulse amplitude and offset. Further information in: Calculation time: minutes (a large powder grid is needed).
+Maps the final proton (I_z) value after a fixed-contact-time TOP DNP sequence against electron nutation frequency and microwave resonance offset. The source estimates minutes for the powder-averaged scan.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The Q-band model contains one electron and two protons at 80 K. Each TOP simulation uses 10 ns pulses, 14 ns delays, 300 blocks, and a 400-point spherical powder grid. The script calls `topdnp` for each point and records the final contact-curve value.
 
-## Numerical / algorithmic content
+## Scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The electron nutation frequency spans 10–50 MHz at 30 points; the 120 offsets span −100 to 100 MHz, with an additional −13 MHz reference shift in the sequence offset. A contour plot is updated across the offset loop.
 
-## Implementation structure
+## Reference
 
-- 2D parameter scan of a TOP DNP experiment. <I_z> after a set
-- contact time is calculated as a function of electron pulse
-- amplitude and offset. Further information in:
-- Calculation time: minutes (a large powder grid is needed).
-- Q-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Basis set
-- Spinach housekeeping
-- Detection state
+[Redrouthu et al., *Science Advances* (2019), DOI: 10.1126/sciadv.aav6909](https://doi.org/10.1126/sciadv.aav6909).

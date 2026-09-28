@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Directional derivative test for Cartesian GRAPE with Bloch-Siegert corrections.
+Checks directional derivatives of Cartesian GRAPE with Bloch–Siegert corrections by comparing the analytical gradient with central finite differences at the first, last, and midpoint waveform samples.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The test system has `sys.magnet=10.2` and isotopes `{'1H','1H','13C','13C'}`. The scalar Zeeman values are `{1.5,2.0,30.0,40.0}`; the nonzero scalar couplings are 1–2: `7.0`, 1–3: `150`, 2–4: `150`, and 3–4: `50`. It starts from the normalized singlet of spins 1 and 2 and targets normalized `Lz` on spin 4. Cartesian `Lx/Ly` controls use channels `[1,1,2,2]`, with transmitter offsets `{1050,5285}`; the rectangular integrator uses 100 pulse intervals of `1.5e-4` each, power levels `2*pi*500`, and `max_iter=1000`. Bloch–Siegert corrections are enabled for `{'1H','13C'}.
 
 ## Numerical / algorithmic content
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+A random control waveform is evaluated with `grape_xy`. Its analytical gradient is compared at the left edge, right edge, and midpoint with central differences using `h=1e-5`. Each relative error must be below `5e-6`; the script reports individual test outcomes and errors if any check fails.
 
 ## Implementation structure
 
-- Directional derivative test for Cartesian GRAPE with Bloch-Siegert
-- corrections.
-- Set the magnetic field
-- Set isotopes
-- Set interactions
-- Set basis
-- Run Spinach housekeeping
-- Build and normalise initial state
-- Build and normalise target state
-- Get control operators
-- Get offset and shift operators
-- Build drift Hamiltonian
+The script creates and optimizes the spin system and control configuration, forms the random waveform, and computes the analytical gradient once. It perturbs one waveform sample at a time in both directions, reevaluates fidelity with `grape_xy`, and checks the three selected positions.

@@ -8,11 +8,11 @@ Parallelization test: multi-threaded evaluation of observables in Hilbert space 
 
 ## Physical / mathematical content
 
-- Benchmark examples. These files stress-test Spinach performance, scaling, and numerical throughput on representative spin-dynamics workloads, so runtime, memory pressure, and solver/pathway choices are part of the intended content.
+- Uses a 12-proton spin system in the Zeeman Hilbert-space formalism.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Propagates the initial transverse magnetisation for 1,000 steps while varying the parallel-pool size up to the available core count.
 
 ## Implementation structure
 

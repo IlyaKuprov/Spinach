@@ -4,32 +4,18 @@
 
 ## Purpose
 
-House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kcolourbar(x)
+Creates or updates the colour bar for the current axes and sets its label. Syntax: `kcolourbar(x)`.
 
 ## Physical / mathematical content
 
 ## Numerical / algorithmic content
 
+- Sets the colour-bar tick-label interpreter to `latex` and its font size to 12; sets the label interpreter to `latex` and its font size to 13.
+
 ## Parameters / inputs
 
-- x -a character string
+- `x` - optional character array used as the label; defaults to `''`. A non-character input raises an error.
 
 ## Outputs
 
-- creates or updates the colour bar
-- in the current axis system
-
-## Implementation structure
-
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- kcolourbar(x)
-- x -a character string
-- creates or updates the colour bar
-- in the current axis system
-- Default is empty string
-- Check consistency
-- Ticks to LaTeX
-- Label to LaTex
-- Consistency enforcement
-- I've often remarked that identity politics is the product of
+- Creates or updates the colour bar in the current axes; returns no output.

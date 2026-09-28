@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts L,M indexing of spin states into linear indexing. In the linear indexing convention, spin states are listed in the order of increasing L rank, and, within ranks, in the order of decreasing M projection. Zero base counting is used: (L=0,M=0) -> I=0 (L=1,M=1) -> I=1 (L=1,M=0) -> I=2, et cetera...
+Converts total angular momentum rank `L` and projection `M` to the zero-based linear index of a spin state. Within each rank, projections are ordered from `L` down to `-L`; for example, (0,0) maps to 0, (1,1) to 1, and (1,0) to 2.
 
 ## Physical / mathematical content
 
-- Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
+The zero-based index is `I=L^2+L-M`. The allowed projection condition is `abs(M)<=L`, with `L>=0`.
 
 ## Numerical / algorithmic content
+
+The implementation applies that element-wise formula after checking that `L` and `M` are real integer arrays of equal size, and that the rank and projection bounds are satisfied.
 
 ## Syntax
 
@@ -20,25 +22,9 @@ I=lm2lin(L,M)
 
 ## Parameters / inputs
 
-- L -ranks of the spin states
-- M -projections of the spin states
+- `L` - non-negative integer ranks of the spin states.
+- `M` - integer projections with `abs(M)<=L`; must have the same size as `L`.
 
 ## Outputs
 
-- I -linear indices of spin states, with
-- I=0 corresponding to L=0, M=0.
-
-## Implementation structure
-
-- Converts L,M indexing of spin states into linear indexing. In
-- the linear indexing convention, spin states are listed in the
-- order of increasing L rank, and, within ranks, in the order of
-- decreasing M projection. Zero base counting is used:
-- (L=0,M=0) -> I=0
-- (L=1,M=1) -> I=1
-- (L=1,M=0) -> I=2, et cetera...
-- I=lm2lin(L,M)
-- L -ranks of the spin states
-- M -projections of the spin states
-- I -linear indices of spin states, with
-- I=0 corresponding to L=0, M=0.
+- `I` - zero-based linear indices of spin states; `I=0` corresponds to `L=0, M=0`.

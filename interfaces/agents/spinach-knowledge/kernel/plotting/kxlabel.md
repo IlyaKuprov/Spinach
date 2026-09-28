@@ -29,7 +29,3 @@ House style settings for Matlab figures; a product of much experience with acade
 - creates or updates the current axis system
 - Display the label using LaTeX
 - Switch tick labels to LaTeX
-- МОСКВА, 14 мая 2021 -РИА Новости: Полиция задержала жителя
-- подмосковных Химок, бросившего телевизор в Вечный огонь, он
-- был в состоянии наркотического опьянения.
-- #NGRUM

@@ -4,38 +4,24 @@
 
 ## Purpose
 
-Stretches arrays into vectors -useful for situations when the stand- ard (:) syntax is not available. Syntax: A=vec(A)
+Stretches arrays into vectors -useful for situations when the standard (:) syntax is not available. Syntax: A=vec(A)
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Reshapes numeric arrays or tensor-train cores as vectors.
 
 ## Numerical / algorithmic content
 
+For a `ttclass` input, each core of each train is reshaped to a column-like core, preserving the order used by tensor-train Kronecker products. Other inputs are reshaped to a column vector with `reshape(A,[numel(A) 1])`.
+
 ## Parameters / inputs
 
-- A -numeric or ttclass array
+- `A` — numeric array or `ttclass` array.
 
 ## Outputs
 
-- A -numeric or ttclass array
-- WARNING: for tensor trains this operation proceeds by stretching eve-
-- ry core of the tensor train. the result is not the same as
-- column-wise matrix stretching (it is an element permutation
-- away from it), but the resulting order of elements is consi-
-- stent with tensor train Kronecker product operation output.
+- `A` — numeric or `ttclass` array.
 
-## Implementation structure
+## Note
 
-- Stretches arrays into vectors -useful for situations when the stand-
-- ard (:) syntax is not available. Syntax:
-- A=vec(A)
-- A -numeric or ttclass array
-- WARNING: for tensor trains this operation proceeds by stretching eve-
-- ry core of the tensor train. the result is not the same as
-- column-wise matrix stretching (it is an element permutation
-- away from it), but the resulting order of elements is consi-
-- stent with tensor train Kronecker product operation output.
-- Decide how to proceed
-- Read tensor train sizes and ranks
-- Reshape the cores
+For tensor trains, stretching each core does not give the same element order as column-wise stretching the full matrix; it differs by an element permutation, while remaining consistent with tensor-train Kronecker-product output.

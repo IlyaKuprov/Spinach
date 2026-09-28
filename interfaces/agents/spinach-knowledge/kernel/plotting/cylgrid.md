@@ -4,33 +4,18 @@
 
 ## Purpose
 
-Draws a cylindrical grid with 10% spacing added around the indicated data extent values. Syntax: cylgrid(zmin,zmax,rmax)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Draws a labelled cylindrical grid around the supplied data extent, with a 10% margin in radius and along the z range.
 
 ## Parameters / inputs
 
-- zmin -lower bound on the Z axis
-- zmax -upper bound on the Z axis
-- rmax -upper bound on the radius
+- `zmin` — lower bound on the z axis; finite real scalar and less than `zmax`.
+- `zmax` — upper bound on the z axis; finite real scalar and greater than `zmin`.
+- `rmax` — upper bound on the radius; positive finite real scalar.
+
+## Numerical / algorithmic content
+
+The grid adds radial and axial gaps equal to 10% of `rmax` and `zmax-zmin`, respectively. It draws spokes every 30 degrees, concentric circles, and z-axis tick marks and labels, then sets the current axes to a perspective view without default ticks.
 
 ## Outputs
 
-- this function updates the current figure
-
-## Implementation structure
-
-- Draws a cylindrical grid with 10% spacing added around
-- the indicated data extent values. Syntax:
-- cylgrid(zmin,zmax,rmax)
-- zmin -lower bound on the Z axis
-- zmax -upper bound on the Z axis
-- rmax -upper bound on the radius
-- this function updates the current figure
-- Check consistency
-- Get the extent gaps
-- Draw the spokes
-- Draw the circles
-- Set axis extents
+Updates the current figure; the function does not return MATLAB outputs.

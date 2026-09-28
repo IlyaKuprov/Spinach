@@ -4,31 +4,16 @@
 
 ## Purpose
 
-15N-labelled methylaziridine NOESY, including the effects of the scalar relaxation of the first kind, caused by the modulation of J-coupling by the nitrogen centre inversion process. The calcula- tion illustrates the effect described in: Calculation time: minutes
+Simulates a NOESY experiment for 15N-labelled methylaziridine, including scalar relaxation of the first kind from nitrogen-centre inversion modulating J-couplings. The source describes the effect in [the cited study](http://dx.doi.org/10.1002/ange.201410271) and gives a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The eight-spin model contains seven protons and one 15N nucleus at 11.75 T. Vacuum-DFT shielding tensors and scalar couplings are supplied; isotropic shifts are adjusted to the listed experimental values. Cartesian coordinates are in angstroms. The calculation combines Redfield relaxation and SRFK, with zero equilibrium, kite retention, a 25 ps correlation time, SRFK correlation parameters `[1.0 1e-3]`, and modulation depths 15 for couplings `(1,5)`, `(2,5)`, and `(3,5)`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The simulation uses an `sphten-liouv` basis with IK-2 approximation, scalar-coupling connectivity, and proximity level 3. Inter-spin and proximity cutoffs are 2.0 and 4.0, respectively, and Krylov propagation is disabled. `liquid` runs the `noesy` sequence with 2.0 s mixing time, 500 Hz offset, 1400 Hz sweeps in both dimensions, 256 points per dimension, and zero-filling to 1024 per dimension. Cosine apodisation is applied to both components of the FID before the two-dimensional Fourier transforms and plotting.
 
 ## Implementation structure
 
-- 15N-labelled methylaziridine NOESY, including the effects of the
-- scalar relaxation of the first kind, caused by the modulation of
-- J-coupling by the nitrogen centre inversion process. The calcula-
-- tion illustrates the effect described in:
-- Calculation time: minutes
-- Magnet induction
-- Isotopes
-- Absolute shielding (vacuum DFT)
-- Assign isotropic components from the experiment
-- Scalar couplings (vacuum DFT)
-- Coordinates (Angstrom, vacuum DFT)
-- Algorithmic options
+The script defines the eight isotopes, shielding matrices, experimental shifts, couplings, and coordinates, then configures the basis and both relaxation mechanisms. It sets the 1H pulse-sequence parameters and initial `Lz` state, runs `liquid(spin_system,@noesy,...)`, apodises the cosine and sine FIDs, transforms each component along F2, combines them as the states signal, transforms along F1, and plots the negative real spectrum.

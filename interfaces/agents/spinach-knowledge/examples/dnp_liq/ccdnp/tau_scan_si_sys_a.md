@@ -1,32 +1,18 @@
 # examples/dnp_liq/ccdnp/tau_scan_si_sys_a.m
 
 - Signature: `tau_scan_si_sys_a()`
+- Reference: [Concilio et al., Journal of Magnetic Resonance 2021, 106940](https://doi.org/10.1016/j.jmr.2021.106940)
+- Calculation time: seconds
 
 ## Purpose
 
-Steady state nuclear magnetisation as a function of microwave frequency offset and the rotational correlation time in a DNP experiment with two electrons connected by exchange coupling, both coupled to a nucleus by dipolar couplings. Further particulars in: Calculation time: seconds
+Computes and plots steady-state (^1mathrm{H}) DNP as a function of microwave-frequency offset and rotational correlation time for a three-spin system (one proton and two electrons). This variant uses the system-A electron Zeeman tensors and electron–electron exchange parameters from the cited example.
 
-## Physical / mathematical content
+## Physical model
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- The two electrons are exchange-coupled (scalar coupling set to (6.2	imes10^6)); the electron Zeeman tensors are anisotropic, and coordinates specify the electron–proton geometry used for the anisotropic hyperfine interactions.
+- Relaxation uses Redfield theory with secular retention, zero equilibrium polarization, and temperature 298 K. The relaxation integration tolerance is set to (10^{-10}).
 
-## Numerical / algorithmic content
+## Calculation
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Steady state nuclear magnetisation as a function of microwave frequency
-- offset and the rotational correlation time in a DNP experiment with two
-- electrons connected by exchange coupling, both coupled to a nucleus by
-- dipolar couplings. Further particulars in:
-- Calculation time: seconds
-- Magnetic field, Tesla
-- Spin system
-- Zeeman interactions
-- Exchange coupling
-- Coordinates for anisotropic HF
-- Basis set
-- Relaxation theory
+For each of 128 correlation times from 50 to 500 ps, the script constructs the Spinach system and basis, then runs a steady-state liquid-state DNP frequency scan with `dnp_freq_scan`. It uses 512 microwave offsets from -10 to 30 MHz, normalizes the proton signal by its isotropic thermal-equilibrium reference, and plots the real signal against offset and correlation time. The correlation-time sweep is parallelized with `parfor`.

@@ -4,38 +4,21 @@
 
 ## Purpose
 
-Computes Gauss-Legendre points and weights in [a,b] interval with accuracy order n. Syntax: [x,w]=gaussleg(a,b,n)
-
-## Physical / mathematical content
-
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-
-## Numerical / algorithmic content
+Computes Gauss-Legendre points and weights on the interval `[a,b]`. The requested accuracy order `n` produces `n+1` points.
 
 ## Parameters / inputs
 
-- a -left edge of the interval
-- b -right edge of the interval
-- n -accuracy order, the number of points in the
-- resulting grid will be n+1.
+- `a` — finite real scalar left endpoint, with `a < b`.
+- `b` — finite real scalar right endpoint.
+- `n` — positive real integer accuracy order; values above 40 are rejected.
 
 ## Outputs
 
-- x -Gauss-Legendre points
-- w -Gauss-Legendre weights
+- `x` — Gauss-Legendre points on `[a,b]`, sorted in ascending order.
+- `w` — corresponding Gauss-Legendre weights, reordered with `x`.
 
-## Implementation structure
+## Method
 
-- Computes Gauss-Legendre points and weights in [a,b] interval
-- with accuracy order n. Syntax:
-- [x,w]=gaussleg(a,b,n)
-- a -left edge of the interval
-- b -right edge of the interval
-- n -accuracy order, the number of points in the
-- resulting grid will be n+1.
-- x -Gauss-Legendre points
-- w -Gauss-Legendre weights
-- Check consistency
-- Initial guess for the nodes in [-1 1]
-- Newton-Raphson refinement
+The routine initializes nodes in `[-1,1]`, refines them by Newton-Raphson iteration, computes the weights, maps the nodes to `[a,b]`, and sorts the points and their weights together.
+
+Source reference: <https://spindynamics.org/wiki/index.php?title=gaussleg.m>

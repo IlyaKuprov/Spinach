@@ -10,8 +10,6 @@ Object Pretending It is a Unit Matrix (OPIUM). Syntax: M=opium(dim,coeff)
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
 ## Parameters / inputs
 
 - dim -dimension of the unit matrix

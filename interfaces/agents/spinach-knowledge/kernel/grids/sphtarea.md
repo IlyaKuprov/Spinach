@@ -4,37 +4,19 @@
 
 ## Purpose
 
-Area of the curvilinear triangle on the unit sphere defined by the vertex coordinates supplied. Syntax: S=sphtarea(r1,r2,r3,sflag)
+Compute the area of a curvilinear triangle on the unit sphere from its three vertex coordinates.
 
-## Physical / mathematical content
+## Inputs
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
+- `r1`, `r2`, `r3`: three-element real unit vectors giving the Cartesian coordinates of the vertices. Each pairwise arc length must not exceed `pi/2`.
+- `sflag`: `'signed'` accounts for surface-normal direction; `'unsigned'` returns a nonnegative area and is the default.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `S`: spherical triangle surface area.
 
-- r1,r2,r3 -three-element unit vectors with Cartesian
-- coordinates of triangle vertices
-- sflag -'signed' would take into account surface
-- normal direction, 'unsigned' (default)
-- would always return a positive area
+## Method
 
-## Outputs
+The function reshapes the vertices into columns and computes `S=2*atan2(det([r1 r2 r3]),dot(r1,r2)+dot(r2,r3)+dot(r3,r1)+1)`. For `'unsigned'`, it returns `abs(S)`.
 
-- S -spherical triangle surface area
-
-## Implementation structure
-
-- Area of the curvilinear triangle on the unit sphere defined
-- by the vertex coordinates supplied. Syntax:
-- S=sphtarea(r1,r2,r3,sflag)
-- r1,r2,r3 -three-element unit vectors with Cartesian
-- coordinates of triangle vertices
-- sflag -'signed' would take into account surface
-- normal direction, 'unsigned' (default)
-- would always return a positive area
-- S -spherical triangle surface area
-- Default to unsigned area
-- Check consistency
-- Stretch the vectors
+Source link: <https://spindynamics.org/wiki/index.php?title=sphtarea.m>

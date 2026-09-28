@@ -8,10 +8,6 @@ Generates Hilbert space density matrices and Liouville space state vectors from 
 
 ## Physical / mathematical content
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
 ## Parameters / inputs
 
 - 1. If states is a string and spins is a string
@@ -59,18 +55,3 @@ Generates Hilbert space density matrices and Liouville space state vectors from 
 
 - rho -a Hilbert space density matrix or a Liouville
 - space state vector
-
-## Implementation structure
-
-- Generates Hilbert space density matrices and Liouville space state
-- vectors from their human-readable descriptions. Syntax:
-- rho=state(spin_system,states,spins,method)
-- 1. If states is a string and spins is a string
-- states='Lz'; spins='13C';
-- the function returns the sum of the corresponding single-spin densi-
-- ty matrices (Hilbert space) or state vectors (Liouville space) on
-- all spins of that type. Valid labels for states in this type of call
-- are 'E' (identity), 'Lz', 'Lx', 'Ly', 'L+', 'L-', 'Tl,m' (irreduci-
-- ble spherical tensor, l and m are integers), 'CTx', 'CTy', 'CTz',
-- 'CT+','CT-' (central transition operators in the Zeeman basis). Va-
-- lid labels for spins are standard isotope names, as well as 'elect-

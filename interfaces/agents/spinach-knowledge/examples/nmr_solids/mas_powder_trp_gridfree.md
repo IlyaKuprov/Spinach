@@ -4,30 +4,21 @@
 
 ## Purpose
 
-13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. Isotro- pic chemical shifts come from the experimental data. Coordinates and CSAs are estimated with DFT. A polyadic representation of the evolution generator is used, further particulars here: Calculation time: hours on a Tesla V100 GPU, much longer on CPU
+13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. Isotropic chemical shifts come from experimental data; coordinates and CSAs are estimated with DFT. The evolution generator uses a polyadic representation; see [the cited paper](https://doi.org/10.1126/sciadv.aaw8962) for further particulars. Calculation time: hours on a Tesla V100 GPU, much longer on CPU.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Models the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling; isotropic shifts are experimental, coordinates and CSAs are estimated with DFT.
+- Uses grid-free Fokker-Planck MAS dynamics with a polyadic evolution generator; the example cites [the supporting paper](https://doi.org/10.1126/sciadv.aaw8962).
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Computes and sums grid-free FIDs for the two unit-cell molecules, then applies exponential apodisation and Fourier transformation.
 
 ## Implementation structure
 
-- 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H),
-- computed using the grid-free Fokker-Planck MAS formalism. Isotro-
-- pic chemical shifts come from the experimental data. Coordinates
-- and CSAs are estimated with DFT. A polyadic representation of the
-- evolution generator is used, further particulars here:
-- Calculation time: hours on a Tesla V100 GPU,
-- much longer on CPU
-- % First molecule in the unit cell
-- Spin system properties (DFT calculation)
-- Magnet field
-- First conformation
-- Basis set
+- Imports the tryptophan spin system from `trp_xray.out`, maps C and N to `13C` and `15N`, and sets the field to 9.4 T.
+- Applies the first molecule's experimental isotropic shifts to the DFT Zeeman tensors, then uses an `sphten-liouv`/`IK-0` basis with longitudinal `15N`, `+1` projections, interaction level 3, and `greedy`/`polyadic` algorithms.
+- Configures a 14 kHz rotor rate, `[1 1 1]` axis, NMR assumptions, maximum rank 11, 100 kHz sweep, 2048 points, and 8192-point zero filling; calculates the first molecule's FID with `gridfree`.
+- Reimports the spin system for the second molecule, applies its experimental shifts, enables `greedy`, `polyadic`, and `gpu`, and adds its grid-free FID to the first.
+- Applies exponential apodisation with parameter 6, Fourier transforms the summed FID, and plots the real spectrum.

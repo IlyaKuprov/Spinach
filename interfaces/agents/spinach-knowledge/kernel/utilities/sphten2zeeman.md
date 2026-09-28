@@ -4,40 +4,28 @@
 
 ## Purpose
 
-Returns a matrix that converts state vectors written in the spherical tensor basis set used by Spinach into state vectors written in the Zeeman basis set in Liouville space. Syntax: P=sphten2zeeman(spin_system)
+Constructs a projector that converts state vectors from Spinach’s spherical-tensor basis to the Zeeman basis in Liouville space. For a state vector `rho_sphten`, the corresponding vector is `rho_zeeman = P * rho_sphten`.
 
-## Physical / mathematical content
+## Mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- For each source basis row, the function forms the Kronecker product of the corresponding per-spin irreducible spherical-tensor matrices, divides the resulting vectorized matrix by its 2-norm, and scales it by `sqrt(prod(spin_system.comp.mults))`. These factors account for the source and destination basis normalizations.
+- `P` is sparse, with `prod(spin_system.comp.mults.^2)` rows and one column per row of `spin_system.bas.basis`. It need not be square.
+- The input must use the `sphten-liouv` formalism.
 
 ## Parameters / inputs
 
-- spin_system -main Spinach data structure using
-- sphten-liouv formalism and inclu-
-- ding basis set information
+- `spin_system` — Spinach data structure using the `sphten-liouv` formalism and containing basis-set information.
 
 ## Outputs
 
-- P -projector matrix that is to be used in the fol-
-- lowing way:
-- rho_zeeman=P*rho_sphten
-- Note: the projector need not be square and may be huge.
+- `P` — projector matrix mapping spherical-tensor-basis state vectors to Zeeman-basis state vectors: `rho_zeeman = P * rho_sphten`. It may be large and need not be square.
 
 ## Implementation structure
 
-- Returns a matrix that converts state vectors written in the
-- spherical tensor basis set used by Spinach into state vectors
-- written in the Zeeman basis set in Liouville space. Syntax:
-- P=sphten2zeeman(spin_system)
-- spin_system -main Spinach data structure using
-- sphten-liouv formalism and inclu-
-- ding basis set information
-- P -projector matrix that is to be used in the fol-
-- lowing way:
-- rho_zeeman=P*rho_sphten
-- Note: the projector need not be square and may be huge.
-- Check consistency
+- Preallocates a sparse projector with one column for each basis-set row.
+- Builds each column from the tensor product of per-spin spherical-tensor matrices, applies the normalization factors, and fills the columns in a `parfor` loop.
+- Rejects spin systems whose formalism is not `sphten-liouv`.
+
+## References
+
+- [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=sphten2zeeman.m)

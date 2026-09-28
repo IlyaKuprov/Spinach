@@ -8,11 +8,11 @@ Computes matrix exponential integrals of the following general type: Integrate[e
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Evaluates the matrix integral of `exp(-1i*A*t)*B*exp(1i*C*t)` over `0 <= t <= T`, with Hermitian `A`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- For nonzero `T` and nonzero `B`, forms an auxiliary block matrix, computes its matrix exponential, and extracts the integral. Returns a sparse zero matrix when `T` is zero or `B` has no nonzero entries.
 
 ## Parameters / inputs
 

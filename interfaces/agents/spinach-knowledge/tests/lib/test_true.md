@@ -4,31 +4,20 @@
 
 ## Purpose
 
-Adds a logical regression check with a clear message. Syntax: result=test_true(result,label,condition,why)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Records a logical regression check and returns its updated test-result structure. The function also provides a `passed` output when requested.
 
 ## Parameters / inputs
 
-- result -test result structure
-- label -check label
-- condition -logical pass/fail condition
-- why -explanation of the right answer
+- `result` - scalar test-result structure with `messages` and `failures` fields.
+- `label` - non-empty character-row check label.
+- `condition` - logical or numeric condition; only a nonzero scalar passes.
+- `why` - non-empty character-row explanation included in the result message.
 
 ## Outputs
 
-- result -updated test result structure
+- `result` - updated with a PASS or FAIL message; failures are appended to `failures`.
+- `passed` - optional logical scalar indicating whether the condition passed.
 
 ## Implementation structure
 
-- Adds a logical regression check with a clear message. Syntax:
-- result=test_true(result,label,condition,why)
-- result -test result structure
-- label -check label
-- condition -logical pass/fail condition
-- why -explanation of the right answer
-- result -updated test result structure
-- Check the condition
-- Record the pass message
+- Validates the inputs, evaluates whether `condition` is a nonzero scalar, records the outcome, and calls `test_record` for the runner's catch path.

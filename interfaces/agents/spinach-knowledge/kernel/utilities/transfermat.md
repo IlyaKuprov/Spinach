@@ -4,37 +4,29 @@
 
 ## Purpose
 
-Transfer matrix calculation for linear filters. Syntax: T=transfermat(amp_inps,amp_outs)
+Calculates the transfer matrix for linear filters from paired amplifier input and output vectors.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The matrix `T` maps the input vectors to the output vectors in the least-squares sense: `amp_outs = T*amp_inps`.
 
 ## Numerical / algorithmic content
 
+The routine checks the input dimensions and obtains the least-squares transfer matrix using MATLAB right matrix division (the source describes this as an SVD pseudoinverse).
+
 ## Parameters / inputs
 
-- amp_inps -a matrix with amplifier input vectors as columns
-- amp_outs -a matrix with amplifier output vectors as columns
+- `amp_inps` — matrix whose columns are amplifier input vectors.
+- `amp_outs` — matrix whose columns are the corresponding amplifier output vectors.
 
 ## Outputs
 
-- T -the transfer matrix, such that amp_outs=T*amp_inps
-- in the least squares sense
-- Note: the number of input-output vector pairs should be bigger than
-- the number of elements in those vectors.
+- `T` — transfer matrix satisfying `amp_outs = T*amp_inps` in the least-squares sense.
+
+- Note: the number of input-output vector pairs should be bigger than the number of elements in those vectors.
 
 ## Implementation structure
 
-- Transfer matrix calculation for linear filters. Syntax:
-- T=transfermat(amp_inps,amp_outs)
-- amp_inps -a matrix with amplifier input vectors as columns
-- amp_outs -a matrix with amplifier output vectors as columns
-- T -the transfer matrix, such that amp_outs=T*amp_inps
-- in the least squares sense
-- Note: the number of input-output vector pairs should be bigger than
-- the number of elements in those vectors.
-- Check consistency
-- Run the SVD pseudoinverse
-- Consistency enforcement
-- A good friend will always stab you in the front.
+- Checks consistency of the input matrices.
+- Runs the least-squares solve with `T=amp_outs/amp_inps`.
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=transfermat.m>

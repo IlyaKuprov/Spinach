@@ -4,30 +4,24 @@
 
 ## Purpose
 
-Kernel integrity control. Checks Spinach distribution .m files for any modifications that the user did since downloading Spi- nach. The function prints the list of files that have changed in any way since the internal database has been rearmed. The purpose is to catch local modifications that the user may have made and forgotten about, that are causing some unintend- ed consequences elsewhere in Spinach. Syntax: snif
+Compares Spinach `.m` files with the integrity baseline recorded in `smells.mat` by `rearm`. It reports files whose names or contents no longer match that baseline.
 
 ## Physical / mathematical content
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+This is a source-integrity utility; it does not model a physical system.
 
 ## Numerical / algorithmic content
 
+For each included file, the routine hashes its filename and contents, then checks whether the resulting value is present in the saved `smells` list.
+
 ## Parameters / inputs
 
-- action -'none' prints the names of fishy files to
-- the console, 'open' opens them
+- `action` — `'none'` prints the names of flagged files; `'open'` opens them in the editor. The default is `'none'`.
+
+## Outputs
+
+No return value. Flagged files are reported as `smells fishy`; if all checks pass, the function prints the comment and code line counts and an all-clear message.
 
 ## Implementation structure
 
-- Kernel integrity control. Checks Spinach distribution .m files
-- for any modifications that the user did since downloading Spi-
-- nach. The function prints the list of files that have changed
-- in any way since the internal database has been rearmed.
-- The purpose is to catch local modifications that the user may
-- have made and forgotten about, that are causing some unintend-
-- ed consequences elsewhere in Spinach. Syntax:
-- sniff(action)
-- action -'none' prints the names of fishy files to
-- the console, 'open' opens them
-- Default is to take no action
-- Check consistency
+The function loads `smells.mat` and scans `.m` files under `kernel`, `interfaces`, `experiments`, and `etc`, applying the exception list. It ignores blank and comment lines when counting code and comment lines.

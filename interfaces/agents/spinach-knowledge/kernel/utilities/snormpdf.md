@@ -4,37 +4,34 @@
 
 ## Purpose
 
-Azzalini's skew normal distribution. Syntax: p=snormpdf(x,mu,sigma,alpha)
+Compute Azzalini's skew normal probability density.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- `p=2*normpdf(x,mu,sigma).*normcdf(alpha*x,alpha*mu,sigma)` (Equation 2 in http://www.jstor.org/stable/4615982).
+- `mu` is the expectation value of the normal distribution.
 
 ## Numerical / algorithmic content
 
+- Evaluates the density elementwise for `x`.
+
 ## Parameters / inputs
 
-- x -an array of real numbers
-- mu -expectation value of the normal distribution
-- sigma -standard deviation of the normal distribution
-- alpha -skew factor, a real number
+- `x` — an array of real numbers.
+- `mu` — expectation value of the normal distribution; a real scalar.
+- `sigma` — standard deviation of the normal distribution; a positive real scalar.
+- `alpha` — skew factor; a real scalar.
 
 ## Outputs
 
-- p -an array of probability densities,
-- same shape as x
+- `p` — an array of probability densities with the same shape as `x`.
 
 ## Implementation structure
 
-- Azzalini's skew normal distribution. Syntax:
-- p=snormpdf(x,mu,sigma,alpha)
-- x -an array of real numbers
-- mu -expectation value of the normal distribution
-- sigma -standard deviation of the normal distribution
-- alpha -skew factor, a real number
-- p -an array of probability densities,
-- same shape as x
-- Check consistency
+- Checks input consistency, then evaluates the density formula.
+- Source: https://spindynamics.org/wiki/index.php?title=snormpdf.m
+- Contact: ilya.kuprov@weizmann.ac.il
+
 - Equation 2 in http://www.jstor.org/stable/4615982
-- Consistency enforcement
-- The smallest minority on earth is the individual. Those who deny
+
+<https://spindynamics.org/wiki/index.php?title=snormpdf.m>

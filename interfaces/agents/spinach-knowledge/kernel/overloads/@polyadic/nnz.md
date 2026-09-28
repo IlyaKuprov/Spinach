@@ -8,17 +8,17 @@ Number of non-zeroes in all kernels of the polyadic. Syntax: answer=nnz(p)
 
 ## Physical / mathematical content
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
+Counts nonzeros in each core factor and every prefix and suffix factor by summing their `nnz` values.
 
 ## Numerical / algorithmic content
 
 ## Parameters / inputs
 
-- p -a polyadic object
+- p: a polyadic object
 
 ## Outputs
 
-- answer -an integer number
+- answer: an integer number
 
 ## Implementation structure
 
@@ -30,7 +30,3 @@ Number of non-zeroes in all kernels of the polyadic. Syntax: answer=nnz(p)
 - Loop over cores
 - Loop over prefix
 - Loop over suffix
-- Borderline Probability Disorder: afflicted individuals may
-- dismiss the potential importance of results with P=0.06,
-- while unquestioningly accepting the importance of results
-- with P=0.05 (see also: significosis).

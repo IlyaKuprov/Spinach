@@ -4,29 +4,24 @@
 
 ## Purpose
 
-1H saturation-recovery experiment on strychnine at 250 MHz. Calculation time: minutes
+Simulate a 1H saturation-recovery experiment on strychnine at 250 MHz. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Loads the strychnine 1H spin system with `strychnine({'1H'})` and sets the magnetic induction to `5.9`.
+- Uses Redfield relaxation with `inter.equilibrium='dibari'`, `inter.rlx_keep='kite'`, correlation time `200e-12`, and temperature `298`.
+- Uses the `sphten-liouv` formalism with `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Sets the proximity cutoff to `5.0` and enables `greedy` parallelisation.
+- Configures the 1H sequence with offset `1250`, sweep `2500`, `4096` points, maximum delay `0.5`, and `10` delays. The axis is in `ppm` and is inverted.
+- Runs `liquid(spin_system,@sat_rec,parameters,'nmr')`, applies exponential apodisation with parameter `6`, then Fourier-transforms and centers the result with `fftshift(fft(fids,[],1))`.
+- Plots the real part of the spectra with `plot_1d`.
 
 ## Implementation structure
 
-- 1H saturation-recovery experiment on strychnine at 250 MHz.
-- Calculation time: minutes
-- Read spin system properties
-- Magnetic induction
-- Maximum distance to consider
-- Greedy parallelisation
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+1. Read strychnine spin-system properties and set the magnet, proximity cutoff, and parallelisation option.
+2. Set relaxation parameters and the basis; construct the spin system with `create` and `basis`.
+3. Set sequence parameters and run the saturation-recovery simulation.
+4. Apodise the FIDs, Fourier-transform them, and plot the real spectra.

@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Tests orientation() and average() on small exact cases. Syntax: result=test_orientation_average_suite()
+Regression-tests two exact limiting cases for `orientation()` and `average()`.
 
 ## Physical / mathematical content
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+At zero Euler angles, the Wigner rotation is the identity, so the orientation contraction retains the diagonal rotational components. With zero positive- and negative-frequency Hamiltonian components, first-order averaging returns the unmodulated component `H0`.
 
 ## Numerical / algorithmic content
 
+The test builds a synthetic rank-one rotational basis of sparse 2×2 matrices and compares `orientation(Q,[0 0 0])` with the sum of its three diagonal components. It then constructs a quiet one-proton spin system, sets `Hp` and `Hm` to zero, and compares `average(spin_system,Hp,H0,Hm,2*pi*1000,'ah_first_order')` with `H0`. Both comparisons use absolute and relative tolerances of `1e-14`.
+
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks the zero-Euler-angle orientation contraction against an
-- explicit diagonal Wigner sum and verifies that first-order average
-- Hamiltonian theory leaves an unmodulated Hamiltonian unchanged.
-
-## Implementation structure
-
-- Tests orientation() and average() on small exact cases. Syntax:
-- result=test_orientation_average_suite()
-- result -regression test result with explanatory messages
-- The test checks the zero-Euler-angle orientation contraction against an
-- explicit diagonal Wigner sum and verifies that first-order average
-- Hamiltonian theory leaves an unmodulated Hamiltonian unchanged.
-- Announce the test target
-- State the rotational-kernel target of the test
-- Build a synthetic rank-one rotational basis
-- Contract the zero-orientation Hamiltonian
-- Check the zero-angle Wigner identity path
-- Build a quiet spin system for average() diagnostics
+- `result` — regression-test result containing the outcomes and explanatory messages for the zero-Euler-orientation and unmodulated-average checks.

@@ -4,28 +4,11 @@
 
 ## Purpose
 
-HMBC of cyprinol with natrual abundance of 13C isotope. Calculation time: seconds
+Simulates an HMBC spectrum of cyprinol at natural-abundance 13C. The source notes a calculation time of seconds.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HMBC of cyprinol with natrual abundance of 13C isotope.
-- Calculation time: seconds
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Loads the cyprinol spin system and sets the magnetic field to 11.7, with greedy mode and a proximity cutoff of 4.0.
+- Uses the `sphten-liouv` basis with `IK-1` approximation, inter-level 3, proximity level 1, and scalar-coupling connectivity.
+- Sets `J=150`, `delta_b=60e-3`, sweeps `[12000 2500]`, offsets `[5000 1250]`, 128 points and 512 zero-filled points in each dimension, and axes for `13C` and `1H` in ppm.
+- Generates 13C isotopomers with `dilute`, simulates each using `liquid(...,@hmbc,...,'nmr')` in a parallel loop, applies cosine apodisation, and sums the shifted two-dimensional Fourier transforms before plotting the spectrum magnitude.

@@ -8,23 +8,15 @@ Field-swept powder EPR spectra of a P1 centre in diamond at X and W bands. Calcu
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+The example builds the P1 centre with orientation `111` and `14N`, then calculates electron-spin powder EPR spectra at X and W bands.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Spinach uses the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`) with powder averaging on `rep_2ang_100pts_sph`. The field sweeps have 1024 points and RSPT order `Inf`; the line width is `1e-4 T`, integration tolerance is `1.0`, and transition-moment tolerance is `0.1`.
 
 ## Implementation structure
 
-- Field-swept powder EPR spectra of a P1 centre
-- in diamond at X and W bands.
-- Calculation time: seconds.
-- Set P1 model parameters.
-- Build the spin system.
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- Set common EPR parameters
-- Set X-band parameters
-- Run the X-band simulation
-- Plot the X-band spectrum
+- Set the P1 orientation and nitrogen isotope, then build the model with `diamond_p1`.
+- Set the magnet field to 1 T, construct the Zeeman Hilbert basis, and run Spinach housekeeping.
+- Run X-band `fieldsweep` at 9.5 GHz over 0.33–0.35 T and W-band `fieldsweep` at 94 GHz over 3.348–3.36 T.
+- Plot both spectra against their returned magnetic-field axes.

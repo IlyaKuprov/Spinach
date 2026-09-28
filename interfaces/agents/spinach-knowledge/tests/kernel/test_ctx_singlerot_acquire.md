@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Tests the single-rotor context with acquire(). Syntax: result=test_ctx_singlerot_acquire()
+Exercises `singlerot()` with `acquire()` for a compact anisotropic one-spin MAS calculation, including rotor-space projection.
 
 ## Physical / mathematical content
 
+The fixture has one anisotropic `1H` spin at 14.1 T, Zeeman principal values `[-2 -2 4]`, and zero Euler angles. It uses the `sphten-liouv` formalism, no approximation, and projection `+1`.
+
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The acquisition uses `rho0=coil=L+`, zero offset, 2000 Hz sweep, three points, rotor rate 1000, axis `[1 1 1]`, `max_rank=1`, and the `single_crystal` grid at orientation `[0 0 0]`. The test calls `singlerot(spin_system,@acquire,parameters,`nmr`)`.
 
-## Outputs
+## Checks
 
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- singlerot() and checks the returned time-domain trace for basic
-- physical and dimensional invariants.
-
-## Implementation structure
-
-- Tests the single-rotor context with acquire(). Syntax:
-- result=test_ctx_singlerot_acquire()
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- singlerot() and checks the returned time-domain trace for basic
-- physical and dimensional invariants.
-- Announce the test target
-- State the single-rotor target of the test
-- Build a one-spin anisotropic Liouville-space system
-- Set up a tiny MAS acquisition
-- Run the production single-rotor context
-- Check the number of acquired points
+The FID must contain three finite samples. Its first value must equal the initial coil overlap within absolute and relative tolerance `1e-12`.

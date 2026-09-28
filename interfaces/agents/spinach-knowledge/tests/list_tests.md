@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Lists Spinach regression tests. Syntax: manifest=list_tests(varargin)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Returns and prints the available Spinach regression tests, optionally filtered by a substring.
 
 ## Parameters / inputs
 
-- varargin -optional name-value pair 'pattern', string
+- `varargin` - optional name-value pair `pattern`, a substring searched in test identifiers and names.
 
 ## Outputs
 
-- manifest -structure array with test identifiers and names
+- `manifest` - structure array of test identifiers and names after filtering.
 
 ## Implementation structure
 
-- Lists Spinach regression tests. Syntax:
-- manifest=list_tests(varargin)
-- varargin -optional name-value pair 'pattern', string
-- manifest -structure array with test identifiers and names
-- Add the test library to the path
-- Parse options
-- Apply substring filter
-- Print the list
+- Adds the test library to the path, parses options with `test_options`, obtains the test entries from `test_manifest`, filters on `id` or `name` when `pattern` is non-empty, and prints each remaining identifier and name as a tab-separated line.

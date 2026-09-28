@@ -4,28 +4,10 @@
 
 ## Purpose
 
-Nitroxide spin label DEER experiment at X-band. Two nitroxide radicals are positioned at a distance of 25 Angstroms. The numerical calculation is done by brute-force time propaga- tion and numerical powder averaging, including g-factor orien- tation effects on the dipolar coupling. Nitroxide g-tensor is from http://dx.doi.org/10.1063/1.1697233 Calculation time: seconds
+Calculates a three-pulse DEER trace for two nitroxide radicals separated by 25 Å at X-band. The model uses brute-force time propagation and numerical powder averaging, including the orientation dependence of the dipolar interaction through the anisotropic g tensors.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The two electron spins are simulated at 0.33 T with the nitroxide g-tensor principal values and orientations specified in the source. The calculation uses a Zeeman Hilbert-space basis, a 3,200-point spherical powder grid, and 100 time steps of 10 ns. The resulting DEER trace is plotted against time in microseconds. The source estimates a run time of seconds.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Nitroxide spin label DEER experiment at X-band. Two nitroxide radicals
-- are positioned at a distance of 25 Angstroms.
-- The numerical calculation is done by brute-force time propaga-
-- tion and numerical powder averaging, including g-factor orien-
-- tation effects on the dipolar coupling. Nitroxide g-tensor is
-- from http://dx.doi.org/10.1063/1.1697233
-- Calculation time: seconds
-- Spin system properties
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Pulse sequence
+Nitroxide g-tensor reference: http://dx.doi.org/10.1063/1.1697233

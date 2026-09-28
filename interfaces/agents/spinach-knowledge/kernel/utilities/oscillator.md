@@ -4,43 +4,28 @@
 
 ## Purpose
 
-Harmonic oscillator infrastructure in 1D. Syntax: [H_oscl,X_oscl,xgrid]=oscillator(parameters)
+Construct a one-dimensional harmonic oscillator Hamiltonian, coordinate operator, and coordinate grid. Gravitation acts along the X axis; finite-difference derivative operators are used.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- `parameters.frc_cnst` — force constant, N/m; a positive real scalar.
+- `parameters.par_mass` — particle mass, kg; a positive real scalar.
+- `parameters.grv_cnst` — gravitational acceleration, m/s^2; a real scalar.
+- `parameters.n_points` — number of discretization points; a positive integer scalar.
+- `parameters.box_size` — oscillator box size, m; a positive real scalar.
 
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-
-## Parameters / inputs
-
-- parameters.frc_cnst -force constant, N/m
-- parameters.par_mass -particle mass, kg
-- parameters.grv_cnst -gravitational acceleration. m/s^2
-- parameters.n_points -number of discretization points
-- parameters.box_size -oscillator box size, m
+All five fields are required and checked by `grumble`.
 
 ## Outputs
 
-- H_oscl -oscillator Hamiltonian, Joules
-- X_oscl -oscillator X operator, m
-- xgrid -X coordinate grid, m
-- Note: gravitation is directed along the X axis. Finite difference
-- derivative operators are used.
+- `H_oscl` — oscillator Hamiltonian, Joules with `hbar=1`. The reduced Planck constant is set to 1 J*s in the kinetic energy term, so the Hamiltonian is also the generator of time evolution in rad/s, as in `expm(-1i*H_oscl*t)`.
+- `X_oscl` — oscillator X operator, m.
+- `xgrid` — X coordinate grid, m.
 
-## Implementation structure
+## Construction
 
-- Harmonic oscillator infrastructure in 1D. Syntax:
-- [H_oscl,X_oscl,xgrid]=oscillator(parameters)
-- parameters.frc_cnst -force constant, N/m
-- parameters.par_mass -particle mass, kg
-- parameters.grv_cnst -gravitational acceleration. m/s^2
-- parameters.n_points -number of discretization points
-- parameters.box_size -oscillator box size, m
-- H_oscl - oscillator Hamiltonian, Joules
-- X_oscl - oscillator X operator, m
-- xgrid - X coordinate grid, m
-- Note: gravitation is directed along the X axis. Finite difference
-- derivative operators are used.
+The coordinate grid is `linspace(-parameters.box_size/2,parameters.box_size/2,parameters.n_points)'`, and `X_oscl` is its diagonal operator, constructed with `spdiags`. The second-derivative operator is `((parameters.n_points-1)/parameters.box_size)^2*fdmat(parameters.n_points,5,2)`; its first and last rows and columns are set to zero for boundary handling. The Hamiltonian combines kinetic, harmonic, and gravitational terms:
+
+`H_oscl=-(1/(2*parameters.par_mass))*d2_dx2+(parameters.frc_cnst/2)*X_oscl^2+parameters.par_mass*parameters.grv_cnst*X_oscl`.
+
+Source contact: ilya.kuprov@weizmann.ac.il. [Function reference](https://spindynamics.org/wiki/index.php?title=oscillator.m).

@@ -4,32 +4,24 @@
 
 ## Purpose
 
-Tests offscreen execution of Spinach plotting helpers. Syntax: result=test_plotting_helpers_offscreen()
+Tests offscreen execution of Spinach plotting helpers under invisible figures, without relying on image comparison.
 
 ## Physical / mathematical content
 
+The test uses deterministic one-, two-, and three-dimensional spectra, MRI image data, a signed volume, and a compact mesh with heterogeneous Voronoi cells.
+
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Checks plotted data and frequency-axis sizes, graphics object counts and properties, figure dimensions, Voronoi plotting arrays, concentration-plot connectivity, and cap and side-wall areas.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test exercises plotting helpers under invisible figures, and checks
-- graphics object creation, axis sizes, returned data arrays, and figure
-- helper side effects without relying on image comparison.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests offscreen execution of Spinach plotting helpers. Syntax:
-- result=test_plotting_helpers_offscreen()
-- result -regression test result with explanatory messages
-- The test exercises plotting helpers under invisible figures, and checks
-- graphics object creation, axis sizes, returned data arrays, and figure
-- helper side effects without relying on image comparison.
-- Announce the test target
-- State the plotting-helper target of the test
-- Force invisible figures during the test
-- Build a minimal spin-system structure used only by plotting routines
-- Exercise house-style figure helpers
-- Exercise one-dimensional spectral plotting
+- Announce the test target and initialize the regression result.
+- Force invisible figures during the test, restoring figure visibility during cleanup.
+- Build a minimal spin-system structure used by the plotting routines.
+- Exercise house-style figure helpers and one-, two-, and three-dimensional spectral plotting.
+- Exercise MRI, volume, COMSOL mesh, and concentration plotting utilities.

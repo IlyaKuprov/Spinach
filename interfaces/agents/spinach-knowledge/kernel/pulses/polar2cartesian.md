@@ -4,13 +4,8 @@
 
 ## Purpose
 
-Converts [RF_amplitude, RF_phase] representation of a pulse waveform and the derivatives of any function with respect to those amplitudes and pha- ses into the [RF_x, RF_y] representation and the derivatives of the func- tion with respect to those X and Y RF values. Syntax: [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
+Converts the `[RF_amplitude, RF_phase]` representation of a pulse waveform, and derivatives of any function with respect to those amplitudes and phases, into the `[RF_x, RF_y]` representation and the corresponding derivatives of the function with respect to the X and Y RF values.
 
-## Physical / mathematical content
-
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
 
 ## Parameters / inputs
 
@@ -45,18 +40,3 @@ Converts [RF_amplitude, RF_phase] representation of a pulse waveform and the der
 - with respect to the waveform amplitudes along Y and X
 - Dyy -optional matrix of second derivatives of a scalar function
 - with respect to the waveform amplitudes along Y
-
-## Implementation structure
-
-- Converts [RF_amplitude, RF_phase] representation of a pulse waveform and
-- the derivatives of any function with respect to those amplitudes and pha-
-- ses into the [RF_x, RF_y] representation and the derivatives of the func-
-- tion with respect to those X and Y RF values. Syntax:
-- [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
-- r -vector of waveform amplitudes
-- p -vector of waveform phases
-- Dr -optional vector of derivatives of some scalar function
-- with respect to the waveform amplitudes.
-- Dp -optional vector of derivatives of some scalar function
-- with respect to the waveform phases.
-- Drr -matrix of second derivatives of the function with respect

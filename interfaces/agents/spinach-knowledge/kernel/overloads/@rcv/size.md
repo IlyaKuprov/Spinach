@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) [s,ncols]=size(A)
+Returns the dimensions of an RCV sparse matrix in MATLAB-style one-output, dimension-query, or two-output form.
 
-## Physical / mathematical content
+## Mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+With one output and no dimension index, `size` returns `[numRows numCols]`. With a dimension index, it returns the corresponding row or column count for dimensions 1 and 2, and `1` for any other positive integer dimension. With two outputs and no dimension index, it returns the row and column counts separately.
 
 ## Numerical / algorithmic content
+
+The function requires an RCV input and, when supplied, a positive integer scalar dimension index. The two-output form cannot be combined with a dimension query.
 
 ## Parameters / inputs
 
@@ -25,18 +27,6 @@ Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) [s,ncols]=size(A
 
 ## Implementation structure
 
-- Returns the size of an RCV sparse matrix. Syntax:
-- s=size(A,dim)
-- [s,ncols]=size(A)
-- A -RCV sparse matrix
-- dim -optional dimension index
-- s -size vector, dimension length, or number
-- of rows in the two-output form
-- ncols -number of columns in the two-output form
-- Check consistency
-- Refuse two outputs with a dimension query
-- Mimic Matlab
-- Consistency enforcement
-- I did not succeed in life by intelligence. I succeeded
-- because I have a long attention span.
-- Charlie Munger
+- Validate the RCV input and optional dimension index.
+- Reject a dimension query when two outputs are requested.
+- Return `[numRows numCols]`, the selected dimension length (or `1` beyond dimension 2), or the separate row and column counts according to the requested form.

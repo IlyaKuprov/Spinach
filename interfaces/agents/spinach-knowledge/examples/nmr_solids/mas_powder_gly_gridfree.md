@@ -4,29 +4,18 @@
 
 ## Purpose
 
-13C MAS spectrum of glycine powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. All magnetic parameters are estimated from a DFT calculation. Calculation time: minutes
+Calculates the glycine powder `13C` MAS spectrum using grid-free Fokker–Planck formalism. The spin-system parameters are generated from the glycine PCM-DFT log; the script explicitly sets the field to 14.1 T. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `g2spinach` reads the glycine log for `13C` and `15N`; the simulation observes `13C` and uses a longitudinal `15N` subspace.
+- The basis uses no approximation and projection +1. Interaction and proximity cutoffs are 5.0 and 4.0; the header assumes `1H` decoupling and the script sets `parameters.decouple={}`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Grid-free acquisition uses a 2000 Hz rotor rate, axis `[1 1 1]`, and maximum rank 23.
+- The FID has 256 points over a `5e4` sweep, zero-filled to 1024 with offset 17000; exponential apodisation parameter 6 is applied before Fourier transformation.
 
 ## Implementation structure
 
-- 13C MAS spectrum of glycine powder (assuming decoupling of 1H),
-- computed using the grid-free Fokker-Planck MAS formalism. All
-- magnetic parameters are estimated from a DFT calculation.
-- Calculation time: minutes
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
+- Parse the glycine DFT log, set the field and basis options, configure the experiment, call `gridfree(spin_system,@acquire,parameters,'nmr')`, apodise, Fourier transform, and plot.

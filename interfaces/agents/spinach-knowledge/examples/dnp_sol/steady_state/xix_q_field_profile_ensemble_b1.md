@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Simulation of XiX DNP field profile in the steady state with electron Rabi frequency ensemble averaging. Calculation time: minutes.
+Simulates a steady-state XiX DNP field profile at Q band, averaged over an ensemble of electron Rabi frequencies. The source estimates a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The system contains an electron and a proton at a 3.5 Å separation in a 1.2142 T magnetic field, with a trityl electron g-tensor, an estimated proton chemical shift, and a temperature of 80 K. It uses `t1_t2` relaxation, including a proton longitudinal relaxation rate supplied by `r1n_dnp` that depends on orientation through `bet`. The detected observable is proton `Lz`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The script creates the spin system in an unrestricted `sphten-liouv` basis. It evaluates `xixdnp_steady` through `powder` on the `rep_2ang_800pts_sph` grid for 201 electron microwave offsets from −100 to 100 MHz. Each calculation uses 36 XiX blocks, 48 ns pulses, an inverted second-pulse phase, and the specified shot spacing. Five Gauss–Legendre points span electron nutation frequencies of 10–20 MHz; their weighted results are combined into an ensemble-averaged profile.
 
 ## Implementation structure
 
-- Simulation of XiX DNP field profile in the steady state
-- with electron Rabi frequency ensemble averaging.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Relaxation rates, distance and ori. dep. R1n
-- Basis set
-- Algorithmic options
+After configuring the spin system, relaxation, and experiment parameters, the function loops over the B1 quadrature points and runs the steady-state powder simulation at each point. It plots the real part of the averaged proton `Lz` expectation value against microwave resonance offset and saves `xix_q_field_profile_ensemble_b1.fig`.

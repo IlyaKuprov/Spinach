@@ -4,70 +4,26 @@
 
 ## Purpose
 
-Sets case-specific assumptions for various simulation contexts. This function determines the behaviour of the Hamiltonian generation func- tion and should be called before the Hamiltonian is requested. The function text is self-explanatory -interaction strength parameters are set in each section according to the physical requirements of of each specific simulation context. Syntax: spin_system=assume(spin_system,assum
-
-## Physical / mathematical content
-
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
-
-## Numerical / algorithmic content
+Selects the interaction-term approximations for a simulation context and stores them in `spin_system.inter.assumptions`. Call it before requesting the Hamiltonian.
 
 ## Parameters / inputs
 
-- assumptions -'nmr' for high-field NMR)
-- 'esr' for electron rotating frame ESR
-- 'deer' for DEER spectroscopy
-- 'deer-zz' for DEER spectroscopy with electron
-- flip-flop terms removed
-- 'labframe' for full laboratory frame simulation
-- with all Hamiltonian terms retained;
-- bosonic modes are allowed and stay in
-- the laboratory frame with all of their
-- interaction terms retained
-- 'qnmr' for quadrupolar NMR with numerical
-- rotating frames: spin-1/2 particles
-- will be in the rotating frame but
-- spin>1/2 particles initially in the
-- laboratory frame
-- 'cavity' for cavity QED: spins and bosonic
-- modes in a common rotating frame with
-- the rotating wave approximation, mode
-- energies to be built as detunings from
-- the carrier frequency, exchange terms
-- keeping flip-flop components only,
-- anharmonicity, Kerr, and dispersive
-- terms in full; longitudinal and modu-
-- lation terms are disallowed because
-- they average out
-- 'spin-phonon' for spins in their usual rotating
-- frames with bosonic modes in the la-
-- boratory frame: electron and nuclear
-- terms as in the 'esr' set, electron-
-- mode exchange terms dropped as non-
-- secular, mode-mode and nucleus-mode
-- exchange terms retained in full,
-- longitudinal, dispersive, and modula-
-- tion terms and all diagonal mode
-- terms retained
-- retention -'zeeman' drops all spin-spin interactions
-- 'couplings' drops all Zeeman interactions
+- `spin_system` - spin-system structure to configure.
+- `assumptions` - character string selecting the approximation set:
+  - `nmr` - high-field NMR.
+  - `esr` - electron rotating-frame ESR; `deer` uses the same set for DEER.
+  - `deer-zz` - DEER with electron flip-flop terms removed.
+  - `labframe` - full laboratory-frame Hamiltonian; bosonic modes and their interaction terms also remain in the laboratory frame.
+  - `qnmr` - quadrupolar NMR with numerical rotating frames: spin-1/2 particles are in the rotating frame, while higher-spin particles start in the laboratory frame.
+  - `cavity` - cavity QED: spins and bosonic modes share a rotating frame and the rotating-wave approximation. Mode energies are detunings from the carrier; exchange terms keep flip-flop components, while anharmonicity, Kerr, and dispersive terms are retained in full. Longitudinal and modulation terms are omitted as averaging out.
+  - `spin-phonon` - spins use their usual rotating frames and bosonic modes stay in the laboratory frame. Electron and nuclear terms follow the ESR set; electron-mode exchange is omitted as non-secular, while mode-mode and nucleus-mode exchange, longitudinal, dispersive, modulation, and diagonal-mode terms are retained.
+  - `se_dnp_h+`, `se_dnp_h-`, and `se_dnp_h0` - respectively select the positive-, negative-, and zero-frequency components of the solid-effect DNP Hamiltonian. They retain the corresponding `EzNp`/`EzNm`/`EzNz` electron-nuclear terms and `T(L,+1)`/`T(L,-1)`/secular inter-nuclear terms; inter-electron, giant-spin, quadratic, and Zeeman interactions are ignored.
+- `retention` - optional spin-only retention mask. `zeeman` drops spin-spin interactions; `couplings` drops Zeeman interactions. These retention options are undefined for systems containing bosonic modes.
 
 ## Outputs
 
-- the function updates the spin_system object
+- Updated `spin_system`, with the selected interaction strengths configured.
 
-## Implementation structure
+## Reference
 
-- Sets case-specific assumptions for various simulation contexts. This
-- function determines the behaviour of the Hamiltonian generation func-
-- tion and should be called before the Hamiltonian is requested. The
-- function text is self-explanatory -interaction strength parameters
-- are set in each section according to the physical requirements of
-- of each specific simulation context. Syntax:
-- spin_system=assume(spin_system,assumptions,retention)
-- assumptions -'nmr' for high-field NMR)
-- 'esr' for electron rotating frame ESR
-- 'deer' for DEER spectroscopy
-- 'deer-zz' for DEER spectroscopy with electron
-- flip-flop terms removed
+[Spin Dynamics Wiki: assume.m](https://spindynamics.org/wiki/index.php?title=assume.m)

@@ -6,12 +6,6 @@
 
 A plot of a typical random walk on a sphere.
 
-## Physical / mathematical content
-
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-
-## Numerical / algorithmic content
-
 ## Implementation structure
 
 - A plot of a typical random walk on a sphere.

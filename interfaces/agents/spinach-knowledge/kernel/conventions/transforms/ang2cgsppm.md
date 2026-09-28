@@ -4,13 +4,16 @@
 
 ## Purpose
 
-Converts magnetic susceptibility from the Angstrom^3 units required by Spinach pseudocontact shift functionality into the cgs-ppm (aka cm^3/mol) units quoted by quantum chemist- ry packages. Syntax: cgsppm=ang2cgsppm(ang)
+Converts magnetic susceptibility from the cubic-angstrom units required by Spinach pseudocontact-shift functionality to the cgs-ppm (cm^3/mol) units quoted by quantum chemistry packages.
 
 ## Physical / mathematical content
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+- Conversion: `cgsppm = 6.02214129e23 * ang / (4*pi*1e18)`.
 
 ## Numerical / algorithmic content
+
+- The calculation applies the conversion factor to the input array.
+- The input must be numeric; otherwise, the function raises an error.
 
 ## Parameters / inputs
 
@@ -22,15 +25,4 @@ Converts magnetic susceptibility from the Angstrom^3 units required by Spinach p
 
 ## Implementation structure
 
-- Converts magnetic susceptibility from the Angstrom^3 units
-- required by Spinach pseudocontact shift functionality into
-- the cgs-ppm (aka cm^3/mol) units quoted by quantum chemist-
-- ry packages. Syntax:
-- cgsppm=ang2cgsppm(ang)
-- ang -an array of values in cubic Angstrom
-- cgsppm -an array of values in cgs-ppm
-- Check consistency
-- Do the calculation
-- Consistency enforcement
-- No artist tolerates reality.
-- Friedrich Nietzsche
+- Checks that `ang` is numeric, then calculates `cgsppm` using the conversion formula.

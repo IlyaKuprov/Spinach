@@ -4,60 +4,23 @@
 
 ## Purpose
 
-Ultrafast COSY pulse sequence. Syntax: fid=spencosy(spin_system,parameters,H,R,K,G,F)
+Ultrafast COSY pulse sequence with spatial encoding and gradient readout.
 
-## Physical / mathematical content
+## Parameters
 
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- `parameters.dims`: sample size in metres; `parameters.npts`: number of spin packets; `parameters.spins`: nuclei on which the sequence runs.
+- `parameters.rho0`: initial state; `parameters.coil`: detection state.
+- `parameters.deltat`: acquisition timestep; `parameters.npoints`: acquired points per gradient readout; `parameters.nloops`: loops, each comprising a positive and a negative readout.
+- `parameters.Ga`: acquisition gradient in T/m; `parameters.Ge`: encoding gradient in T/m.
+- `parameters.pulsenpoints`: pulse-shape points; `parameters.nWURST`: pulse smoothing factor; `parameters.Te`: pulse duration; `parameters.BW`: pulse bandwidth.
+- `parameters.Gp`: coherence-selection gradient in T/m; `parameters.Tp`: its duration.
+- `parameters.D`: diffusion constant in `m^2/s` (listed in the source header; not accessed directly in this function).
+- `H`, `R`, `K`, `G`, `F`: Fokker–Planck Hamiltonian, relaxation, kinetics, gradient, and diffusion/flow operators, respectively. These last five inputs are built automatically by the imaging context function.
 
-## Numerical / algorithmic content
+## Sequence and output
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The function forms `L=H+F+1i*R+1i*K` and applies an initial `pi/2` pulse. It then applies two WURST chirp pulses with opposite encoding gradients, followed by a second `pi/2` pulse bracketed by coherence-selection gradients. After prephasing, it propagates alternating-gradient readout loops and detects `coil'*rho` at each point. The output `fid` is the UFCOSY free induction decay, an array of size `parameters.npoints` by `parameters.nloops`. Loop bodies run in parallel; propagators and states move to a GPU when GPU execution is enabled.
 
-## Parameters / inputs
+The function requires `sphten-liouv` formalism. It checks that `H`, `R`, `K`, and `F` are equal-sized matrices and that `G` is a cell array.
 
-- parameters.dims size of the sample in m
-- parameters.npts number of spin packets
-- parameters.spins nuclei on which the sequence runs
-- parameters.deltat timestep for acquisition
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
-- parameters.Ga acquisition gradient in T/m
-- parameters.pulsenpoints number of points in the pulse shape
-- parameters.nWURST smoothing factor for the pulse
-- parameters.Te duration of the pulse
-- parameters.BW bandwidth of the pulse
-- parameters.Ge encoding gradient in T/m
-- parameters.Gp coherence selection gradient in T/m
-- parameters.Tp duration of the coherence selection gradient
-- parameters.D diffusion constant, m^2/s
-- H Fokker-Planck Hamiltonian
-- R Fokker-Planck relaxation superoperator
-- K Fokker-Planck kinetics superoperator
-- G Fokker-Planck gradient superoperators
-- F Fokker-Planck diffusion and flow superoperator
-
-## Outputs
-
-- fid UFCOSY free induction decay
-- Note: the last five parameters are built automatically by the imaging
-- context function.
-
-## Implementation structure
-
-- Ultrafast COSY pulse sequence. Syntax:
-- fid=spencosy(spin_system,parameters,H,R,K,G,F)
-- parameters.dims size of the sample in m
-- parameters.npts number of spin packets
-- parameters.spins nuclei on which the sequence runs
-- parameters.deltat timestep for acquisition
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
-- parameters.Ga acquisition gradient in T/m
-- parameters.pulsenpoints number of points in the pulse shape
+Authors: jeannicolas.dumez@cnrs.fr; ilya.kuprov@weizmann.ac.il; ludmilla.guduff@cnrs.fr. [Spinach documentation](https://spindynamics.org/wiki/index.php?title=spencosy.m).

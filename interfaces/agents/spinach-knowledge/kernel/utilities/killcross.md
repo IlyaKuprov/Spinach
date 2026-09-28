@@ -4,36 +4,26 @@
 
 ## Purpose
 
-Zeroes the specified rows and columns of a matrix. Syntax: M=killcross(M,f1idx,f2idx)
+Set selected columns and rows of a matrix to zero.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+A matrix utility; it makes no assumptions about the matrix's physical interpretation.
 
 ## Numerical / algorithmic content
 
+The entries in columns `f1idx` and rows `f2idx` are assigned zero. Column and row selections are applied directly to the input matrix.
+
 ## Parameters / inputs
 
-- M -a matrix
-- f1idx -numbers of the columns that
-- should be zeroed
-- f2idx -numbers of the rows that
-- should be zeroed
+- `M` - numeric matrix.
+- `f1idx` - unique positive integer indices of columns to zero.
+- `f2idx` - unique positive integer indices of rows to zero.
 
 ## Outputs
 
-- M -a matrix
+- `M` - the matrix with the selected rows and columns set to zero.
 
 ## Implementation structure
 
-- Zeroes the specified rows and columns of a matrix. Syntax:
-- M=killcross(M,f1idx,f2idx)
-- M -a matrix
-- f1idx -numbers of the columns that
-- should be zeroed
-- f2idx -numbers of the rows that
-- Check consistency
-- Wipe the indices
-- Consistency enforcement
-- A narcissist is someone better-looking than you are.
-- Gore Vidal
+After checking that the matrix is two-dimensional and that each index list contains unique in-range positive integers, the routine zeros `M(f2idx,:)` and `M(:,f1idx)`.

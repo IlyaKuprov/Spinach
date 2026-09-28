@@ -4,30 +4,25 @@
 
 ## Purpose
 
-Removes the specified particles (spins or bosonic modes) from the spin_system structure and updates it accordingly. Syntax: spin_system=kill_spin(spin_system,hit_list)
+Remove selected particles from a Spinach `spin_system` and update particle-indexed composition, interaction, relaxation, mode, and chemistry data.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The routine edits the unified particle list and the associated data structures. It does not perform a spin-dynamics calculation.
 
 ## Numerical / algorithmic content
 
-Retained bosonic-mode frequencies, carriers, anharmonicities, damping, and dephasing follow the new particle numbering. Pair channels and mode-pair modulation entries are reindexed on both particle axes; the nested spin tensor and field derivative blocks are also reindexed, with interactions involving removed particles discarded. Mode assumption strengths are cleared even when modes remain. When no C, V, or T particles remain, the mode container is discarded, permitting ordinary spin-only assumptions and retention options. Rebuild the basis and assumptions after removal.
+Selected entries are removed from particle-indexed arrays and matrices, and the remaining indices are compacted. Particle-indexed bosonic-mode parameters and pair channels are updated; nested modulation data are reindexed and entries involving removed particles are discarded. If no C, V, or T particle remains, the mode container is removed. Basis, connectivity, symmetry, and assumption data are invalidated or removed and must be rebuilt before subsequent calculations. Removing particles is rejected if it would leave fewer than two radical-pair electrons while radical-pair rates are present.
 
 ## Parameters / inputs
 
-- spin_system -primary Spinach data structure
-- hit_list -a vector of integers or a logical
-- vector giving the particle numbers
-- to be removed from the system
+- `spin_system` - Spinach data structure whose particles are to be removed.
+- `hit_list` - positive integer particle indices, or a logical mask with one element per particle.
 
 ## Outputs
 
-- spin_system - the data structure with the indicated particles (spins or bosonic modes) and dependent information (basis, assumptions) removed
-- Notes: basis, connectivity, symmetry, and assumption information
-- is destroyed by this function; you would need to call the
-- basis.m and assume.m functions again.
+- `spin_system` - updated data structure. Basis, connectivity, symmetry, and assumption information is not retained as valid data.
 
-## Header notes
+## Implementation structure
 
-hit_list selects unified particle indices by an integer or logical vector. Removing particles invalidates basis and assumption information; rebuild both before subsequent calculations.
+The function first validates the index list or mask, then removes the selected entries from composition and particle-indexed fields. It updates mode, relaxation, kinetics, and radical-pair bookkeeping, and removes derived basis/connectivity/symmetry/assumption information that is no longer valid.

@@ -8,25 +8,16 @@ CT HSQC spectrum of strychnine with natural content of 13C isotope. Calculation 
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Two-dimensional constant-time HSQC of strychnine, simulated for 13C and 1H spins. The spin system is generated with the `13C` and `1H` isotopes, then diluted over 13C isotopomers.
+- The FID is apodised with squared-cosine windows; positive and negative components are combined as a States signal before Fourier transformation in both dimensions.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Uses a sphten-liouv basis with IK-2 approximation, scalar-coupling connectivity, proximity level 1, and greedy algorithmic settings with `prox_cutoff=4.0`. The calculation is parallelised over 13C isotopomers with `parfor`; no GPU execution is present in this example.
+- Sequence settings are `J=140`, sweep `[10000 3000]`, offset `[4000 1000]`, `npoints=[256 256]`, and `zerofill=[512 512]`; the F2 13C channel is decoupled.
 
 ## Implementation structure
 
-- CT HSQC spectrum of strychnine with natural content of 13C isotope.
-- Calculation time: hours.
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Set the strychnine spin system to 5.9 T and construct the selected basis.
+- Generate and iterate over 13C isotopomers in parallel, building each basis and simulating CT-HSQC.
+- Apodise positive and negative FIDs, form the States signal, Fourier transform both dimensions, and plot the real spectrum.

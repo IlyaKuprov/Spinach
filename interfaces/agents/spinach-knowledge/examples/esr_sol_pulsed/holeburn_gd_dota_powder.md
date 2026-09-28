@@ -4,29 +4,10 @@
 
 ## Purpose
 
-A hole burning simulation for a gadolinium ion. The soft pulse is simulated using Fokker-Planck formalism. Zero-field splitting dis- ribution is sampled using the statistical parameters reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005). A numerical powder grid and numerical second-order rotating frame transformation are used. Note: non-central transition Gd(III) holes are very shallow. Calc
+Simulates Gd(III) spectral hole burning with a soft pulse. It samples a zero-field-splitting (ZFS) distribution, performs powder averaging, and uses a numerical second-order rotating-frame transformation.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+For each weighted ZFS sample returned by `zfs_sampling(30,5,1e-2)`, the script builds an `E8` system at 3.5 T in a spherical-tensor Liouville basis. It computes spectra with the pulse power set first to zero and then to `2π × 10⁷ rad s⁻¹`, using a 50 ns, rank-2 pulse at −0.5 GHz. Both signals are apodised and Fourier transformed, then accumulated with the sample weights for plotting. The source notes that non-central Gd(III) transition holes are very shallow; estimated run time is minutes.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- A hole burning simulation for a gadolinium ion. The soft pulse is
-- simulated using Fokker-Planck formalism. Zero-field splitting dis-
-- ribution is sampled using the statistical parameters reported in
-- Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005).
-- A numerical powder grid and numerical second-order rotating frame
-- transformation are used.
-- Note: non-central transition Gd(III) holes are very shallow.
-- Calculation time: minutes
-- Initialize the spectra
-- Get the sampling
-- Get the figure going
-- Loop over ZFS distribution
+The ZFS-distribution parameters are taken from Fig. 5 of Raitsimring et al., *Applied Magnetic Resonance* **28**, 281–295 (2005).

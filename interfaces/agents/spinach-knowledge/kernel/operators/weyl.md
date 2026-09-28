@@ -4,45 +4,29 @@
 
 ## Purpose
 
-Weyl boson operators (sparse, see below for normalisa- tion convention) for a bosonic mode with a user-speci- fied population number truncation. Syntax: A=weyl(nlevels)
+Construct sparse Weyl boson operators for a bosonic mode truncated to a specified number of population levels.
 
 ## Physical / mathematical content
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The operators obey `A.c*A.a=A.n`, `[A.n,A.c]=A.c`, `[A.n,A.a]=-A.a`, and `[A.a,A.c]=A.u`, except at the truncation edge state, where the `[A.a,A.c]` element is `1-nlevels`. This exception is unavoidable for finite truncation.
 
 ## Numerical / algorithmic content
 
+The operators are constructed as sparse `nlevels`-by-`nlevels` matrices and declared complex at build time to avoid expensive reallocations later.
+
 ## Parameters / inputs
 
-- nlevels -an integer specifying the
-- number of population levels
+- `nlevels` — a positive integer specifying the number of population levels.
 
 ## Outputs
 
-- A.u -unit operator
-- A.c -creation operator
-- A.a -annihilation operator
-- A.n -population number operator
-- Note: the matrices are normalised to obey the following
-- relations for all energy level counts
-- A.c*A.a=A.n, [A.n,A.c]=A.c
-- [A.n,A.a]=-A.a, [A.a,A.c]=A.u
-- except for the edge state at which [A.a,A.c] ele-
-- ment is (1-nlevels), this is unavoidable.
-- Note: arrays are declared complex at build time to avoid
-- expensive reallocation operations later on.
+- `A.u` — unit operator.
+- `A.c` — creation operator.
+- `A.a` — annihilation operator.
+- `A.n` — population number operator.
 
 ## Implementation structure
 
-- Weyl boson operators (sparse, see below for normalisa-
-- tion convention) for a bosonic mode with a user-speci-
-- fied population number truncation. Syntax:
-- A=weyl(nlevels)
-- nlevels -an integer specifying the
-- number of population levels
-- A.u -unit operator
-- A.c -creation operator
-- A.a -annihilation operator
-- A.n -population number operator
-- Note: the matrices are normalised to obey the following
-- relations for all energy level counts
+The function validates `nlevels`, then constructs the creation operator on the lower diagonal, the population number operator on the main diagonal, the annihilation operator on the upper diagonal, and the unit operator as a sparse identity matrix.
+
+<https://spindynamics.org/wiki/index.php?title=weyl.m>

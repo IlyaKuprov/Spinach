@@ -4,39 +4,18 @@
 
 ## Purpose
 
-Computes pseudocontact shift from a point electron centre at the nuclear coordinates supplied. Syntax: pred_pcs=ppcs(nxyz,mxyz,chi)
+Computes the pseudocontact shift, in ppm, at each nuclear coordinate in `nxyz` for a point susceptibility centre at `sxyz`.
 
 ## Physical / mathematical content
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-
-## Numerical / algorithmic content
+The susceptibility tensor `chi` is supplied as a real `3x3` matrix or as five components ordered `[chi(1,1) chi(1,2) chi(1,3) chi(2,2) chi(2,3)]`. For five components, the routine constructs a symmetric traceless tensor, with `chi(3,3)=-chi(1,1)-chi(2,2)`. Coordinates are taken relative to `sxyz`; the PCS is evaluated with an `l=2` spherical-harmonic expansion proportional to `r^-3` and converted to ppm.
 
 ## Parameters / inputs
 
-- chi -magnetic susceptibility tensor in cubic Angstroms
-- as a 3x3 matrix, or its five unique components
-- ordered as
-- [chi(1,1) chi(1,2) chi(1,3) chi(2,2) chi(2,3)]
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is to be evaluated, in Angstroms.
-- sxyz -susceptibility centre coordinates as [x y z], in
-- Angstroms.
-- Output:
-- pcs -predicted pseudocontact shift (in ppm) at each of
-- the nuclei.
+- `nxyz` — real nuclear coordinates, one `[x y z]` row per nucleus, in Angstroms.
+- `sxyz` — real `[x y z]` susceptibility-centre coordinate in Angstroms.
+- `chi` — real `3x3` susceptibility tensor in cubic Angstroms, or the five components listed above.
 
-## Implementation structure
+## Output
 
-- Computes pseudocontact shift from a point electron centre at the
-- nuclear coordinates supplied. Syntax:
-- pred_pcs=ppcs(nxyz,mxyz,chi)
-- chi -magnetic susceptibility tensor in cubic Angstroms
-- as a 3x3 matrix, or its five unique components
-- ordered as
-- [chi(1,1) chi(1,2) chi(1,3) chi(2,2) chi(2,3)]
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is to be evaluated, in Angstroms.
-- sxyz -susceptibility centre coordinates as [x y z], in
-- Angstroms.
-- Output:
+- `pcs` — predicted pseudocontact shift in ppm at each nucleus.

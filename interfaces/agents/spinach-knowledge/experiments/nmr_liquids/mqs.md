@@ -4,52 +4,31 @@
 
 ## Purpose
 
-2D multiple-quantum NMR pulse sequence from:
+Two-dimensional multiple-quantum NMR using the non-refocused multiple-quantum / MaxQ variant. Use `mqs_refocus.m` when post-mixing refocusing is required. The source cites [this paper](https://doi.org/10.1002/cphc.201800667) and [this communication](https://doi.org/10.1039/d1cc03079e).
 
-## Physical / mathematical content
+## Sequence and signal
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The function should be called through `liquid.m`, which supplies `H`, `R`, and `K`. It applies a 90-degree pulse, two evolution periods separated by a 180-degree pulse, and selects the requested multiple-quantum coherence order. The selected state is evolved in F1, mixed with the configured flip angle, and directly acquired in F2. The output is a 2D magnitude-mode FID.
 
 ## Syntax
 
 ```matlab
 fid=mqs(spin_system,parameters,H,R,K)
-This function should be invoked through liquid.m context,
-which would provide H, R, and K.
 ```
 
 ## Parameters / inputs
 
-- parameters.sweep [F1 F2] sweep widths (Hz)
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins working spins, e.g. {'1H','1H'}
-- parameters.angle flip angle, radians
-- parameters.delay J-coupling evolution delay, seconds
-- parameters.mqorder coherence order to select
-- parameters.rho0 initial state
-- parameters.coil detection state
+- `parameters.sweep`: [F1 F2] sweep widths, Hz.
+- `parameters.npoints`: [F1 F2] numbers of points.
+- `parameters.spins`: working spins, e.g. `{'1H','1H'}`.
+- `parameters.angle`: flip angle, radians.
+- `parameters.delay`: J-coupling evolution delay, seconds.
+- `parameters.mqorder`: coherence order to select.
+- `parameters.rho0`: initial state.
+- `parameters.coil`: detection state.
 
-## Outputs
+## Output
 
-- fid -2D magnitude-mode free induction decay
-- Note: this is the non-refocused multiple-quantum/MaxQ variant.
-- Use mqs_refocus.m when post-mixing refocusing is required.
+- `fid`: 2D magnitude-mode free induction decay.
 
-## Implementation structure
-
-- 2D multiple-quantum NMR pulse sequence from:
-- fid=mqs(spin_system,parameters,H,R,K)
-- This function should be invoked through liquid.m context,
-- which would provide H, R, and K.
-- parameters.sweep [F1 F2] sweep widths (Hz)
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins working spins, e.g. {'1H','1H'}
-- parameters.angle flip angle, radians
-- parameters.delay J-coupling evolution delay, seconds
-- parameters.mqorder coherence order to select
-- parameters.rho0 initial state
-- parameters.coil detection state
+[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=mqs.m).

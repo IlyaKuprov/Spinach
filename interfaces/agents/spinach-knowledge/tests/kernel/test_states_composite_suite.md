@@ -4,33 +4,25 @@
 
 ## Purpose
 
-Tests composite state generators in kernel/states. Syntax: result=test_states_composite_suite()
+Tests composite state generators in `kernel/states`. The state helper functions must produce the expected density operators and partner-state descriptors.
 
 ## Physical / mathematical content
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- Constructs two-spin singlet and triplet projectors from wavefunctions in the Zeeman product basis: `alpha`, `beta`, `sing=(ab-ba)/sqrt(2)`, and `trip_zero=(ab+ba)/sqrt(2)`.
+- Checks that `four_spin_states(...,'S(x)S')` gives the tensor product of singlet projectors on spins 1–2 and 3–4.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Uses one-, two-, four-, and three-proton test spin systems in the `zeeman-hilb` formalism; the one-proton unit-state test also uses `zeeman-liouv`.
+- Compares generated states with explicit reference matrices or vectors using `test_close`. Checks partner-state descriptor order with `test_true`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks unit-state normalisation, two-spin singlet/triplet
-- projectors, four-spin product states, and partner-state enumeration.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests composite state generators in kernel/states. Syntax:
-- result=test_states_composite_suite()
-- result -regression test result with explanatory messages
-- The test checks unit-state normalisation, two-spin singlet/triplet
-- projectors, four-spin product states, and partner-state enumeration.
-- Announce the test target
-- State the state-generation target of the test
-- Build a one-proton Hilbert-space spin system
-- Check the Hilbert-space thermodynamic unit state
-- Check the Zeeman-Liouville unit vector normalisation
-- Build a two-proton Hilbert-space spin system
-- Textbook two-spin wavefunctions in the Zeeman product basis
+1. Check that the one-proton Hilbert-space `unit_state` is the `2`-by-`2` identity and that its Zeeman-Liouville counterpart is the normalised vectorised identity.
+2. Check the two-proton singlet, triplet-up, triplet-zero, and triplet-down projectors against projectors built from product-basis wavefunctions.
+3. Check the four-proton `S(x)S` state against `kron(singlet_pair,singlet_pair)`.
+4. With spin 2 fixed at `L+`, enumerate spins 1 and 3 over `E` and `Lz`. Check the descriptor order and compare each partner-state element with a direct `state()` call.

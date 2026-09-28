@@ -4,42 +4,29 @@
 
 ## Purpose
 
-Writes a log message to the console or an ACSII file. The message includes the call stack of the function that produced it. Syntax: report(spin_system,report_string)
+Prints a character message with a prefix derived from the call stack. A one-argument call errors; an empty `spin_system` selects standard output. Setting `spin_system.sys.output='hush'` suppresses the call, and otherwise the message is written with a trailing newline to the configured output destination.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+This is an output utility; it does not perform spin dynamics or numerical calculations.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The function removes known uninformative stack entries, labels parallel-worker stack entries as `parfor/spmd`, reverses and joins the remaining caller names, removes the final three-character suffix, and pads the prefix to 50 characters. Longer prefixes are shortened to 50 characters with a leading ellipsis. It then prepends the prefix and writes the result with `fprintf`; impossible write errors are suppressed.
 
 ## Parameters / inputs
 
-- report_string -a character string
+- `spin_system` - system structure with `sys.output` set to `'hush'` or a file identifier; an empty value defaults to output identifier 1.
+- `report_string` - character array to report; non-character input errors.
 
 ## Outputs
 
-- this function prints the message to the console or to the
-- destination specified in spin_system.sys.output
-- Note: a newline symbol at the end of the string is not neces-
-- sary -it is added by the function.
-- Note: all output produced by this function may be silenced
-- by setting sys.output='hush' in the Spinach input
-- stream or by setting spin_system.sys.output='hush'
-- at any point during the calculation.
+No value is returned. The message is printed to the configured destination, unless output is hushed.
 
 ## Implementation structure
 
-- Writes a log message to the console or an ACSII file. The message
-- includes the call stack of the function that produced it. Syntax:
-- report(spin_system,report_string)
-- report_string -a character string
-- this function prints the message to the console or to the
-- destination specified in spin_system.sys.output
-- Note: a newline symbol at the end of the string is not neces-
-- sary -it is added by the function.
-- Note: all output produced by this function may be silenced
-- by setting sys.output='hush' in the Spinach input
-- stream or by setting spin_system.sys.output='hush'
-- at any point during the calculation.
+Validation requires `spin_system.sys.output` and a character `report_string`. With output enabled, the function builds the call-stack prefix and writes `[prefix ]  report_string` followed by a newline. Errors from the final `fprintf` are caught and ignored.
+
+## Reference
+
+[Spin Dynamics Wiki: report.m](https://spindynamics.org/wiki/index.php?title=report.m)

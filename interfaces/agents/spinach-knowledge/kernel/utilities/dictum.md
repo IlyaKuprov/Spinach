@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Overrides default assumptions about interaction terms surviving rotating frame transformations. Syntax: spin_system=dictum(spin_system,spins,strength)
+Overrides default assumptions about which interaction terms survive rotating-frame transformations.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+One spin selects a Zeeman interaction assumption; two spins select a coupling assumption.
 
 ## Numerical / algorithmic content
+
+Numeric spin indices update the specified spin or pair. Isotope strings select matching spins in the system: one isotope updates each matching Zeeman assumption, while two isotopes update coupling assumptions for matching pairs. Coupling updates are written in both index orders. The function reports the previous and new assumptions.
 
 ## Parameters / inputs
 
@@ -37,15 +39,6 @@ Overrides default assumptions about interaction terms surviving rotating frame t
 
 ## Implementation structure
 
-- Overrides default assumptions about interaction terms surviving
-- rotating frame transformations. Syntax:
-- spin_system=dictum(spin_system,spins,strength)
-- spin_system -Spinach spin system information
-- object coming out of assume.m
-- spins -a vector with one or two numbers
-- or a cell array with one or two
-- strings, e.g. [2 4] or {'1H'},
-- where one element would cause
-- Zeeman interaction assumptions
-- to be modified, and two elements
-- would cause coupling assumptions
+The function checks that `assume()` has supplied Zeeman and coupling strength information, that `strength` is a character string, and that `spins` contains one or two valid spin indices or isotope strings. It then updates the selected entries in `spin_system.inter.zeeman.strength` or `spin_system.inter.coupling.strength`.
+
+Source reference: <https://spindynamics.org/wiki/index.php?title=dictum.m>

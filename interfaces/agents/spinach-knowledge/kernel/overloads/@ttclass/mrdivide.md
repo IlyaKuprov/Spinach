@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Divides a tensor train object by a scalar. Syntax: c=mrdivide(a,b)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Divides a tensor-train object by a scalar.
 
 ## Numerical / algorithmic content
+
+For a `ttclass` first argument and scalar second argument, the function divides the stored coefficients by the scalar and divides the tolerances by its absolute value. The core arrays are unchanged. Other input combinations raise an error.
 
 ## Parameters / inputs
 
@@ -19,18 +17,4 @@ Divides a tensor train object by a scalar. Syntax: c=mrdivide(a,b)
 
 ## Outputs
 
-- c -tensor train object
-
-## Implementation structure
-
-- Divides a tensor train object by a scalar. Syntax:
-- c=mrdivide(a,b)
-- a -tensor train object
-- b -a scalar
-- c -tensor train object
-- Division of tensor train by a scalar
-- Divide the coefficients and update the tolerances
-- Complain and bomb out
-- It is dangerous to be right in matters on which the established
-- authorities are wrong.
-- Voltaire
+- a -the tensor train object after division

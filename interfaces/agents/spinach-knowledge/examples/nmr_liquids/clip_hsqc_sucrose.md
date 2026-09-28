@@ -4,29 +4,10 @@
 
 ## Purpose
 
-CLIP-HSQC spectrum of sucrose with natural content of 13C isotope. Coordinates, shielding anisotropies and J-couplings computed with DFT, isotropic chemical shifts taken from experimental data. Calculation time: minutes
+Simulates and plots a natural-abundance ¹³C CLIP-HSQC spectrum of sucrose. The source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The molecular spin system comes from `../standard_systems/sucrose.log` via `g2spinach` with min_j = 3.0 and no_xyz = 0. Coordinates, shielding anisotropies, and couplings are DFT-derived in the source; selected isotropic shifts are replaced with experimental values. At 14.1 T, the code removes spins [20–23, 31–34], constructs an IK-2 scalar-coupling basis (proximity level 1; cutoff 4.0), and generates ¹³C isotopomers using `dilute`.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- CLIP-HSQC spectrum of sucrose with natural content of 13C isotope.
-- Coordinates, shielding anisotropies and J-couplings computed with
-- DFT, isotropic chemical shifts taken from experimental data.
-- Calculation time: minutes
-- Read the spin system properties (vacuum DFT calculation)
-- Set the isotropic parts of shielding tensors to experimental values
-- Set the field strength
-- Basis set
-- Algorithmic options
-- Sequence parameters
-- Create the spin system structure
-- Remove fast exchanging and uncoupled spins from the simulation
+Each isotopomer is simulated with `liquid(...,@clip_hsqc,...,'nmr')` in parallel. Parameters are J = 140, sweep [8000 2000], offset [12000 2700], 256 × 256 acquired points, and 512 × 512 zero filling on the ¹³C and ¹H axes (axis units: ppm). Cosine-squared apodisation is applied to the positive and negative FIDs; the code Fourier transforms the direct dimension, combines them as a States signal, transforms the indirect dimension, and plots the real spectrum.

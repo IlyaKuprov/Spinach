@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Optimal control optimisation of a pulse performing magnetisa- tion transfer from H(N) to C(O) in a typical protein backbone spin system (literature data for shifts and couplings) with a range of pulse powers emulating B1 inhomogeneity and a range of offsets to account for imperfect transmitter placement. The dynamics includes dissipative terms in the drift generator: C(O) and N(H) are set to have rapid transverse rel
+Demonstrates optimal-control pulse optimisation with a dissipative drift and robustness to offset and RF-power variation. The pulse is optimised with LBFGS-GRAPE and then evaluated in the specified model.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The spin dynamics include a dissipative drift. The objective is evaluated over offset and power ensembles, and includes an RF-amplitude penalty.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The source configures 500 pulse slices and uses the lbfgs method with GRAPE derivatives (fmaxnewton with grape_xy). This is a limited-memory quasi-Newton optimisation.
 
 ## Implementation structure
 
-- Optimal control optimisation of a pulse performing magnetisa-
-- tion transfer from H(N) to C(O) in a typical protein backbone
-- spin system (literature data for shifts and couplings) with a
-- range of pulse powers emulating B1 inhomogeneity and a range
-- of offsets to account for imperfect transmitter placement.
-- The dynamics includes dissipative terms in the drift generator:
-- C(O) and N(H) are set to have rapid transverse relaxation. Four-
-- spin correlation approximation is used, wherein five-spin and
-- higher correlations are dropped from the basis set.
-- The waveform is optimized with LBFGS-GRAPE algorithm with point-
-- by-point variation and a penalty on the waveform amplitude.
-- Calculation time: hours.
+The script builds the spin system and control operators, specifies offset and power ensembles, optimises the 500-slice waveform with the amplitude penalty, and reports the resulting performance.

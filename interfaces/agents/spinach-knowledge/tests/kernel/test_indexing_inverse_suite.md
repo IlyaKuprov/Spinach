@@ -2,31 +2,13 @@
 
 - Signature: `result=test_indexing_inverse_suite()`
 
-## Purpose
+## Checks
 
-Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite()
+- Compares `serpentine(4,1)` with the base-one table `[1 3 6 10; 2 5 9 13; 4 8 12 15; 7 11 14 16]` and `serpentine(4,0)` with that table minus one.
+- Checks `kq2lin` against both 4×4 tables and checks that `lin2kq` recovers every row and column index, using `1:4` for base one and `0:3` for base zero.
+- For every `(L,M)` with `L=0:5` and `M` descending from `L` to `-L`, checks that `lm2lin` produces consecutive zero-based indices in that order and that `lin2lm` recovers both coordinates.
+- For every `(L,M,N)` with `L=0:3` and both `M` and `N` descending from `L` to `-L`, checks that `lmn2lin` produces consecutive one-based indices in that order and that `lin2lmn` recovers all three coordinates.
 
-## Physical / mathematical content
+## Output
 
-## Numerical / algorithmic content
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test checks serpentine matrix indexing, spin-state L,M indexing,
-- and Wigner-function L,M,N indexing over complete low-rank domains.
-
-## Implementation structure
-
-- Tests indexing helper inverses. Syntax:
-- result=test_indexing_inverse_suite()
-- result -regression test result with explanatory messages
-- The test checks serpentine matrix indexing, spin-state L,M indexing,
-- and Wigner-function L,M,N indexing over complete low-rank domains.
-- Announce the test target
-- State the indexing target of the test
-- Check the documented base-one serpentine matrix
-- Check the documented base-zero serpentine matrix
-- Check k,q to linear and back in base-one indexing
-- Check k,q to linear and back in base-zero indexing
-- Build a complete low-rank L,M domain in documented order
+- `result` — regression test result with explanatory messages.

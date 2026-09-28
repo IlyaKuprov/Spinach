@@ -4,34 +4,16 @@
 
 ## Purpose
 
-Tests the grid-free Fokker-Planck context with acquire(). Syntax: result=test_ctx_gridfree_acquire()
+Exercises `gridfree()` with `acquire()` on a compact anisotropic one-spin MAS model. The test targets the grid-free Fokker–Planck context and its SLE-space projection.
 
 ## Physical / mathematical content
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+The one-spin Zeeman tensor has principal values `[-2 -2 4]` and zero Euler angles. The test uses the `sphten-liouv` formalism, no approximation, and projection `+1`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+At 14.1 T, the acquisition starts from and detects `L+` on `1H`, with zero offset, 2000 Hz sweep, three points, rotor rate 1000, axis `[1 1 1]`, and `max_rank=2`. It calls `gridfree(spin_system,@acquire,parameters,`nmr`)`.
 
-## Outputs
+## Checks
 
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- gridfree() and checks the returned time-domain trace for basic physical
-- and dimensional invariants.
-
-## Implementation structure
-
-- Tests the grid-free Fokker-Planck context with acquire(). Syntax:
-- result=test_ctx_gridfree_acquire()
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- gridfree() and checks the returned time-domain trace for basic physical
-- and dimensional invariants.
-- Announce the test target
-- State the grid-free target of the test
-- Build a one-spin anisotropic Liouville-space system
-- Set up a tiny grid-free acquisition
-- Run the production grid-free context
-- Check the number of acquired points
+The test verifies the output length is three, the first FID value equals `coil'*rho0` within absolute and relative tolerance `1e-12`, and all samples are finite.

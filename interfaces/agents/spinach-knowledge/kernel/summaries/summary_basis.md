@@ -4,30 +4,24 @@
 
 ## Purpose
 
-Prints basis-set state summary for a Spinach system. Syntax: summary_basis(spin_system)
+Prints a summary of the basis set for a Spinach system. Syntax: `summary_basis(spin_system)`.
 
 ## Physical / mathematical content
 
+For each reported basis state, lists the irreducible spherical-tensor quantum-number pairs `(L,M)` for each spin.
+
 ## Numerical / algorithmic content
+
+Reports the basis dimension and its percentage of the full state space. If the number of basis states exceeds `spin_system.tols.basis_hush`, detailed state labels are suppressed.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
+- `spin_system` - Spinach spin system description object.
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints through `report.m` to the console or the user-specified output.
 
 ## Implementation structure
 
-- Prints basis-set state summary for a Spinach system. Syntax:
-- summary_basis(spin_system)
-- spin_system -Spinach spin system description object
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Get the basis dimension
-- Consistency enforcement
-- Linux is only free if your time has no value.
-- Jamie Zawinski
+- Checks that the input is a structure, gets the basis dimension, conditionally reports each basis state's `(L,M)` labels, then reports the dimension and percentage of the full state space.

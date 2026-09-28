@@ -4,30 +4,12 @@
 
 ## Purpose
 
-Theoretical HN(CO)CA of human ubiquitin. It is assumed that only the backbone is 13C,15N-labelled. Calculation time: minutes, faster with a Tesla A100 GPU.
+Theoretical HN(CO)CA of human ubiquitin, assuming only the backbone is 13C,15N-labelled. The source gives a calculation time of minutes and notes that a Tesla A100 GPU can make it faster.
 
-## Physical / mathematical content
+## Setup and acquisition
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example imports `1D3Z.pdb` / `1D3Z.bmrb` with the backbone-minimal selection at 14.1 T. It uses inter/proximal cutoffs 2.0/4.0 and an IK-1 sphten-liouv basis with scalar-coupling connectivity and inter/proximal levels 4/1; greedy optimization is enabled and Krylov propagation disabled. Spins are `15N`, `13C`, and `1H`; delays [2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3] s; offsets [-7100, 8450, 4850]; sweeps [2500, 4500, 3000]; points [64, 64, 64]; zero-fill sizes [256, 256, 256]; axes are in ppm.
 
-## Numerical / algorithmic content
+## Processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- Theoretical HN(CO)CA of human ubiquitin. It is assumed that
-- only the backbone is 13C,15N-labelled.
-- Calculation time: minutes, faster with a Tesla A100 GPU.
-- Protein data import
-- Magnet field
-- Tolerances
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+The `liquid` simulation uses `@hncoca`. All four phase-cycle FIDs receive squared-cosine apodisation. Conjugate phase-cycle components are combined in the F3 and F2 transforms, then F1 is transformed; the real 3D spectrum is plotted with a negative sign.

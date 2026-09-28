@@ -6,15 +6,6 @@
 
 Returns the thermal equilibrium state at the current temperature. If the anisotropic part and the orientation parameters are not given, uses the isotropic Hamiltonian, otherwise uses the full Hamiltonian at the speci- fied orientation. Syntax: rho=equilibrium(spin_system,I,Q,euler_angles)
 
-## Physical / mathematical content
-
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
 ## Parameters / inputs
 
 - I -isotropic part of the Hamiltonian left side pro-
@@ -43,18 +34,3 @@ Returns the thermal equilibrium state at the current temperature. If the anisotr
 - I and Q must be 'labframe'.
 - WARNING: spin system ground states are commonly degenerate; absolute
 - zero temperatures are not supported.
-
-## Implementation structure
-
-- Returns the thermal equilibrium state at the current temperature. If the
-- anisotropic part and the orientation parameters are not given, uses the
-- isotropic Hamiltonian, otherwise uses the full Hamiltonian at the speci-
-- fied orientation. Syntax:
-- rho=equilibrium(spin_system,I,Q,euler_angles)
-- I -isotropic part of the Hamiltonian left side pro-
-- duct superoperator (in Liouville space) or Hamil-
-- tonian (in Hilbert space). If this argument is
-- omitted, the Hamiltonian is built here and used
-- to compute the thermal equilibrium state.
-- Q -irreducible components of the anisotropic part
-- of the Hamiltonian left side product superopera-

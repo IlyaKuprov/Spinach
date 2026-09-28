@@ -4,40 +4,24 @@
 
 ## Purpose
 
-Converts Euler angles (ZYZ active convention) into a unit quaternion in the active convention, matching euler2dcm.m function. Syntax: q=euler2qter(alpha,beta,gamma) OR q=euler2qter([alpha beta gamma])
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Converts ZYZ active Euler angles to a unit quaternion in the active convention, matching the rotation represented by `euler2dcm`. Call with three angles, `q=euler2qter(alpha,beta,gamma)`, or one three-element vector, `q=euler2qter([alpha beta gamma])`.
 
 ## Parameters / inputs
 
-- alpha,beta,gamma -Euler angles in radians (ZYZ active
-- convention), scalars or column vec-
-- tors of equal length
+- `alpha,beta,gamma`: Euler angles in radians; each may be a real scalar or an equal-length column vector.
 
-## Outputs
+## Output
 
-- q -structure with four fields q.u, q.i, q.j, q.k giving
-- the four components of the quaternion; for column
-- vector inputs each field is a column vector
-- Note: the quaternion returned represents the same rotation
-- as euler2dcm(alpha,beta,gamma); it is converted into
-- that matrix by qter2dcm.m function.
+- `q`: structure with fields `u`, `i`, `j`, and `k`, containing the four quaternion components. For vector inputs, each field is a column vector. The quaternion converts to the corresponding rotation matrix with `qter2dcm`.
 
-## Implementation structure
+## Quaternion components
 
-- Converts Euler angles (ZYZ active convention) into a unit
-- quaternion in the active convention, matching euler2dcm.m
-- function. Syntax:
-- q=euler2qter(alpha,beta,gamma)
-- q=euler2qter([alpha beta gamma])
-- alpha,beta,gamma -Euler angles in radians (ZYZ active
-- convention), scalars or column vec-
-- tors of equal length
-- q -structure with four fields q.u, q.i, q.j, q.k giving
-- the four components of the quaternion; for column
-- vector inputs each field is a column vector
-- Note: the quaternion returned represents the same rotation
+`q.u = cos(beta/2) cos((alpha+gamma)/2)`
+
+`q.i = sin(beta/2) sin((gamma-alpha)/2)`
+
+`q.j = sin(beta/2) cos((gamma-alpha)/2)`
+
+`q.k = cos(beta/2) sin((alpha+gamma)/2)`
+
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=euler2qter.m)

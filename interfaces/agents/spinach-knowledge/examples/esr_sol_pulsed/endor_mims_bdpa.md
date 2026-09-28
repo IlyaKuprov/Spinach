@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Mims ENDOR pulse sequence on BDPA with ideal electron pulses, reproducing Figure 10 from Calculation time: hours, much faster on GPU
+Mims ENDOR simulation on BDPA with ideal electron pulses, set to reproduce Figure 10 of [the cited paper](https://doi.org/10.1007/s00723-020-01269-z). The source estimates hours of calculation time and notes that a GPU can accelerate it.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
+- The spin system contains one electron and two protons. The example uses a powder calculation for the Mims ENDOR sequence.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Mims ENDOR pulse sequence on BDPA with ideal electron pulses,
-- reproducing Figure 10 from
-- Calculation time: hours, much faster on GPU
-- Isotopes
-- Magnet field
-- Interactions
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Plotting
+- It sweeps 100 nuclear frequencies from 138 to 148 MHz with a 50 μs nuclear pulse, then plots absolute intensity against nuclear frequency in MHz.

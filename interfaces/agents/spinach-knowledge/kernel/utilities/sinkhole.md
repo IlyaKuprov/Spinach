@@ -4,35 +4,24 @@
 
 ## Purpose
 
-Turns the specified states into sinkholes --any population reaching them will be summed up and stored forever in a frozen state. This is useful for state space restriction diagnostics. Syntax: L=sinkhole(spin_system,L,states)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+Turns the specified states into sinkholes: population reaching them is summed up and stored forever in a frozen state. This is useful for state space restriction diagnostics.
 
 ## Numerical / algorithmic content
 
+- Checks input consistency, then sets the columns of `L` corresponding to `states` to zero.
+
 ## Parameters / inputs
 
-- L -Liovillian matrix
-- states -a vector of integers specifying the
-- numbers of the states to be set up
-- as sinkholes
-- Output:
-- L -updated Liouvillian matrix
-- Note: this functionality is only available in sphten-liouv formalism.
+- `spin_system` — spin system; its basis and formalism are used for consistency checks.
+- `L` — Liouvillian matrix; must be square and match the dimension of the basis set.
+- `states` — vector of positive integers specifying the states to be set up as sinkholes; indices must not exceed the state space dimension.
 
-## Implementation structure
+## Output
 
-- Turns the specified states into sinkholes --any population reaching
-- them will be summed up and stored forever in a frozen state. This is
-- useful for state space restriction diagnostics. Syntax:
-- L=sinkhole(spin_system,L,states)
-- L -Liovillian matrix
-- states -a vector of integers specifying the
-- numbers of the states to be set up
-- as sinkholes
-- Output:
-- L -updated Liouvillian matrix
-- Note: this functionality is only available in sphten-liouv formalism.
-- Check consistency
+- `L` — updated Liouvillian matrix.
+
+## Note
+
+This functionality is only available in `sphten-liouv` formalism.
+
+[Source documentation](https://spindynamics.org/wiki/index.php?title=sinkhole.m)

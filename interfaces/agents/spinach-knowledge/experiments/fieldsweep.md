@@ -4,59 +4,42 @@
 
 ## Purpose
 
-Field swept powder EPR spectra. A rough implementation with ex- pensive eigenfields algorithm, an explicit spherical grid, and a hard-coded Lorentzian line shape. Syntax: [b_axis,spec]=fieldsweep(spin_system,parameters)
+Compute field-swept powder EPR spectra using an expensive eigenfields algorithm, an explicit spherical grid, and a hard-coded Lorentzian line shape.
 
 ## Physical / mathematical content
 
+- The specified spin couples to the microwave field. `parameters.mw_freq` sets the microwave frequency; `parameters.fwhm` sets the Lorentzian full width at half maximum.
+- The magnetic field in `sys.magnet` must be set to 1 Tesla, irrespective of the sweep window.
+
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- The initial spherical grid supplies orientations whose convex hull defines triangles for powder integration. A non-symmetric grid helps avoid transition degeneracies.
+- Eigenfields are calculated asynchronously at grid vertices. Triangle contributions are evaluated with a recursive Voitlander integrator and summed to form the spectrum.
+- The peak-position tolerance is set to one quarter of a field-axis grid interval.
 
 ## Parameters / inputs
 
-- parameters.grid -initial spherical grid, ideally
-- a non-symmetric one to avoid
-- transition degeneracies, a good
-- start is
-- 'rep_2ang_100pts_sph'
-- parameters.spins -a one-element cell array speci-
-- fying the spin that is coupled
-- couple to the microwave field,
-- e.g. {'E'}
-- parameters.mw_freq -microwave frequency, Hz
-- parameters.fwhm -Lorentzian line FWHM, Tesla
-- parameters.window -field sweep window in Tesla,
-- as a vector [Bmin Bmax]
-- parameters.npoints -number of points in the sweep
-- parameters.tm_tol -relative transition moment to-
-- lerance, 0.01 is a good start
-- parameters.rspt_order -perturbation theory order for
-- eigenfields calculation, 2 is
-- a good start; specify Inf for
-- exact diagonalisation
-- parameters.int_tol -powder integration tolerance,
-- a balance between speed and
-- integration accuracy
+- `parameters.grid` — initial spherical grid, ideally non-symmetric to avoid transition degeneracies; `'rep_2ang_100pts_sph'` is a good starting point.
+- `parameters.spins` — one-element cell array identifying the spin coupled to the microwave field, e.g. `{'E'}`.
+- `parameters.mw_freq` — microwave frequency, Hz.
+- `parameters.fwhm` — Lorentzian line FWHM, Tesla.
+- `parameters.window` — field sweep window in Tesla, `[Bmin Bmax]`.
+- `parameters.npoints` — number of points in the sweep.
+- `parameters.tm_tol` — relative transition-moment tolerance; 0.01 is a good starting point.
+- `parameters.rspt_order` — perturbation-theory order for eigenfields calculation; 2 is a good starting point, or specify `Inf` for exact diagonalisation.
+- `parameters.int_tol` — powder-integration tolerance, balancing speed and integration accuracy.
 
 ## Outputs
 
-- b_axis -magnetic field axis for plotting
-- spec -field-swept EPR spectrum
-- Note: irrespective of the actual sweep extents, the magnetic field
-- in sys.magnet should be set to 1 Tesla.
-- Note: this experiment should be called directly without a context.
+- `spec` — field-swept EPR spectrum.
+- `parameters` — updated parameters structure containing the magnetic field axis for plotting in `parameters.b_axis`.
 
 ## Implementation structure
 
-- Field swept powder EPR spectra. A rough implementation with ex-
-- pensive eigenfields algorithm, an explicit spherical grid, and
-- a hard-coded Lorentzian line shape. Syntax:
-- [b_axis,spec]=fieldsweep(spin_system,parameters)
-- parameters.grid - initial spherical grid, ideally
-- a non-symmetric one to avoid
-- transition degeneracies, a good
-- start is
-- 'rep_2ang_100pts_sph'
-- parameters.spins - a one-element cell array speci-
-- fying the spin that is coupled
-- couple to the microwave field,
+- The experiment checks its inputs, constructs the Hamiltonians and microwave operator, and loads the specified spherical grid.
+- It computes orientation-dependent eigenfields at grid vertices, integrates over convex-hull triangles, and sums their contributions.
+- Call this experiment directly, without a context.
+
+ilya.kuprov@weizmann.ac.il
+
+<https://spindynamics.org/wiki/index.php?title=fieldsweep.m>

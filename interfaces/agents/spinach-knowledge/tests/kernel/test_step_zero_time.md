@@ -4,29 +4,18 @@
 
 ## Purpose
 
-Tests zero-duration propagation. Syntax: result=test_step_zero_time()
-
-## Physical / mathematical content
+Tests zero-duration propagation: a propagator over zero time must leave the density matrix unchanged.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+A one-proton Hilbert-space spin system is constructed. The test sets `rho=S.x+2*S.z` and `H=3*S.x+5*S.z`, then calls `step(spin_system,H,rho,0)`. It compares the propagated state with `rho` using `test_close` with absolute and relative tolerances of `1e-15`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks the identity limit of the propagator: a zero time step
-- must leave the density matrix exactly unchanged.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests zero-duration propagation. Syntax:
-- result=test_step_zero_time()
-- result -regression test result with explanatory messages
-- The test checks the identity limit of the propagator: a zero time step
-- must leave the density matrix exactly unchanged.
-- Announce the test target
-- State the propagation target of the test
-- Build a one-proton Hilbert-space spin system
-- Propagate an arbitrary Hermitian density matrix for zero time
-- Check the identity limit
+- Announce and register the zero-duration propagation test.
+- Build a one-proton spin system with `zeeman-hilb` formalism and no approximation.
+- Propagate the density matrix for zero time and check the identity limit.

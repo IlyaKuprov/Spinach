@@ -4,31 +4,18 @@
 
 ## Purpose
 
-Reproduction of BADCOP-style selective decoupling logic from Coote et al. with Bloch-Siegert corrections enabled in the optimiser and simulator BADCOP1, BADCOP2, and BADCOP3 are designed and validated
+Reproduces the BADCOP-style selective-decoupling designs from [Coote et al.](https://doi.org/10.1038/s41467-018-05400-4), with Bloch-Siegert corrections enabled during design and validation. BADCOP1, BADCOP2, and BADCOP3 are designed and evaluated. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- The model is a single (^{13}mathrm{C}) spin at 18.8 T, with zero scalar offset and a 53.2 ppm carrier. It builds correlated state-to-state targets over C-alpha and CO offset grids, C-beta inversion bands, and, for BADCOP2/3 only, C-beta preservation points outside the inversion band. The stated duration, RF ceilings, contraction factor, inversion bands, and carrier are taken from Table 1, the paper text, and Supplementary Figure 5.
+- The paper parameters are `alpha_scale=0.91` and `pulse_dur=1e-3` s. The three designs use RF ceilings of 5.94, 4.87, and 7.22 kHz and C-beta inversion bands of 5–37, 28–35, and 10–45 ppm, respectively. The latter two also target preservation outside their inversion bands.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The C-alpha grid is 40–72 ppm (100 points), the CO grid 165–185 ppm (30 points), each C-beta inversion grid has 60 points, and preservation points are selected from an 80-point 5–80 ppm grid. The 1 ms pulse has 200 slices. L-BFGS runs for at most 200 iterations with the `rho_ens` ensemble correlation and BSS enabled.
+- Adapted and unadapted pulses are separately optimized and then propagated with BSS physics on a 251-point 0–200 ppm validation grid; the plotted profiles compare final (M_Z), with the inversion-band boundaries marked.
 
 ## Implementation structure
 
-- Reproduction of BADCOP-style selective decoupling logic from Coote et al.
-- with Bloch-Siegert corrections enabled in the optimiser and simulator
-- BADCOP1, BADCOP2, and BADCOP3 are designed and validated
-- Magnetic field corresponding to 800 MHz 1H
-- Single-spin carbon model
-- Basis set
-- Spinach housekeeping
-- Relevant operators and states
-- Drift Hamiltonian
-- Shared paper parameters
-- Build all three variants from Table 1
-- Design and evaluate each variant
+- Set the single-spin model and sphten-liouv basis; construct operators, normalized states, and drift Hamiltonian; define shared paper parameters and the three variants; assemble offset-correlated targets and optimize BSS-aware pulses; optimize comparison pulses without BSS correction; validate both on the dense offset grid and plot the magnetization profiles.

@@ -4,29 +4,20 @@
 
 ## Purpose
 
-Tests unit and coordinate transform helpers. Syntax: result=test_transform_units_coordinates_suite()
+Tests unit and coordinate transform helpers, including physical constants, inverse unit conversions, crystallographic coordinates, and ISO spherical coordinates.
 
 ## Physical / mathematical content
 
+The test checks Hartree-to-joule, inverse-centimetre-to-hertz, susceptibility, chemical-shift, electron field-frequency, and Lorentzian linewidth-to-relaxation-rate conversions. It also checks fractional-to-Cartesian coordinates for an orthorhombic unit cell and the ISO spherical-coordinate convention on Cartesian axes.
+
 ## Numerical / algorithmic content
+
+The conversion tests compare results with constants or reference expressions and check inverse maps. The coordinate tests compare transformed coordinates, primitive vectors, radii, inclinations, and azimuths with reference values.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks scalar physical constants, inverse unit conversions,
-- crystallographic coordinate conversion, and ISO spherical coordinates.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests unit and coordinate transform helpers. Syntax:
-- result=test_transform_units_coordinates_suite()
-- result -regression test result with explanatory messages
-- The test checks scalar physical constants, inverse unit conversions,
-- crystallographic coordinate conversion, and ISO spherical coordinates.
-- Announce the test target
-- State the conversion target of the test
-- Check Hartree energy conversion
-- Check inverse-centimetre and Hz conversions
-- Check Angstrom^3 and cgs-ppm susceptibility conversion
-- Check chemical shift and frequency conversion including isotope sign
-- Check electron field-frequency conversions
+The function announces the test target, creates a test result, then records individual checks with `test_close`.

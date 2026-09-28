@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Cross-polarization experiment between protons and 14N overtone transition in glycine under MAS. Glycine quadrupolar tensor da- ta comes from the paper by O'Dell and Ratcliffe: Hartmann-Hahn condition profile with a rough powder grid, as a function of spinning rate and 1H RF power. Calculation time: hours
+Computes a glycine 14N-overtone/proton cross-polarisation Hartmann–Hahn profile as a function of spinning rate and 1H RF power under MAS. The source estimates a calculation time of hours and credits Ilya Kuprov, M. Carravetta, and M. Concistre.
 
 ## Physical / mathematical content
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The source attributes the glycine quadrupolar tensor data to O'Dell and Ratcliffe ([DOI](http://dx.doi.org/10.1016/j.cplett.2011.08.030)). It models 14N and 1H at 14.10220742 T, with a 14N quadrupolar tensor specified by 1.18 MHz and η=0.53 and a 1H shift of 32.4. Relaxation is damped at rate 1000; the sphten-liouv basis is used without approximation. The calculation evaluates the 14N overtone signal.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The source scans 50 proton RF powers from 10 to 200 kHz and 50 spinning rates from 20 to 90 kHz, using a 200-point octahedral powder grid and rank 5. For each pair it sets the MAS rate to the negative spinning rate, adjusts the nitrogen RF frequency to `8e3-2*rate`, and sweeps ±4 kHz around that frequency. The RF duration is 100 μs; spectra use 256 points and are reduced to summed real intensity for the 2D map.
 
 ## Implementation structure
 
-- Cross-polarization experiment between protons and 14N overtone
-- transition in glycine under MAS. Glycine quadrupolar tensor da-
-- ta comes from the paper by O'Dell and Ratcliffe:
-- Hartmann-Hahn condition profile with a rough powder grid, as
-- a function of spinning rate and 1H RF power.
-- Calculation time: hours
-- System specification
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Magic angle
-- Spectrum setup
+A `parfor` loop evaluates all RF-power/spinning-rate pairs with `singlerot` and `@overtone_cp`. The resulting intensity matrix is plotted against 1H nutation frequency and sample spinning rate, both in kHz.

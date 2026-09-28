@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Returns TRUE for non-empty tensor train objects. Syntax: answer=ismatrix(tt)
+Tests whether the input is a non-empty tensor-train object.
 
-## Physical / mathematical content
+## Input
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `tt` — object to test.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `answer` — logical true when `tt` is a `ttclass` object with non-empty cores; logical false otherwise.
 
-- tt -tensor train object
+## Behavior
 
-## Outputs
-
-- answer -logical true for non-empty tensor train objects
-
-## Implementation structure
-
-- Returns TRUE for non-empty tensor train objects. Syntax:
-- answer=ismatrix(tt)
-- tt -tensor train object
-- answer -logical true for non-empty tensor train objects
-- Non-empty tensor trains should return true()
-- The stronger the house, the greater the immigration.
-- The Law of Three Little Pigs
-- #NGRUM
+The function checks the object's class and whether its `cores` property is non-empty.

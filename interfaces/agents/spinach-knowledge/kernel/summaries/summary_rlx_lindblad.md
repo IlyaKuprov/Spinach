@@ -4,33 +4,25 @@
 
 ## Purpose
 
-Prints Lindblad relaxation-rate summary for a Spinach system. Syntax: summary_rlx_lindblad(spin_system,header)
+Prints per-spin Lindblad relaxation-rate values stored in a Spinach spin system.
 
 ## Physical / mathematical content
 
+The table lists each spin's isotope, stored R1 and R2 rates, and label. The function reports these fields; it does not calculate the rates.
+
 ## Numerical / algorithmic content
+
+The routine iterates over `spin_system.comp.nspins` and reads `spin_system.rlx.lind_r1_rates` and `lind_r2_rates` for the corresponding spin. It checks that `spin_system` is a structure and `header` is a character string.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- spin_system - Spinach spin system description object
+- header - a string of text to precede the summary
 
 ## Outputs
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+- Prints the rate table through `report.m` to the console or user-specified output.
 
 ## Implementation structure
 
-- Prints Lindblad relaxation-rate summary for a Spinach system. Syntax:
-- summary_rlx_lindblad(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the relaxation-rate table
-- Consistency enforcement
-- Tay's Law: the tendency for artificial intelligence
-- systems to become racist, sexist, anti-semitic, ho-
-- mophobic, and transphobic when given unrestricted
+After validation and table headings, one row per spin is emitted with its index, isotope, stored R1 and R2 values, and label.

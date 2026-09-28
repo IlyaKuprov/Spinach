@@ -4,50 +4,21 @@
 
 ## Purpose
 
-Amplifier compression distortion model. Applies a saturating root-sigmoidal distortion to the waveform amplitude: y=x/(1+(x/a)^s)^(1/s) Treats odd channels of multi-channel waveform as X and even ones as Y components; the autodiff Jacobian is returned for the vectorisation of the input array. Syntax: [w,J]=amp_root(w,sat_lvls,s)
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Models amplifier compression by applying a saturating root-sigmoidal function to the radial amplitude of each X/Y waveform pair. For amplitude `r` and saturation level `a`, the output amplitude is `r/(1+(r/a)^s)^(1/s)`. The X and Y components are scaled together, preserving their direction.
 
 ## Parameters / inputs
 
-- w -waveform in rad/s nutation frequency units,
-- one time slice per column, and rows arran-
-- ged as XYXY... with respect to in-phase and
-- quadrature parts on each control channel
-- sat_lvls -saturation levels beyond which the amplifi-
-- er cannot go, one value per X,Y pair in w,
-- giving the maximum output sqrt(X^2+Y^2)
-- s -a vector of positive integers (one value per
-- X,Y pair in w) regulating the sharpness of
-- the transition from linear to saturating be-
-- haviour, a good starting choice is 4
+- `w`: Real waveform in rad/s nutation-frequency units. Each column is one time slice; rows are ordered X, Y, X, Y, and so on.
+- `sat_lvls`: Finite positive real saturation levels, one per X/Y pair. Each gives the limiting output amplitude `sqrt(X^2+Y^2)` for its pair.
+- `s`: Positive integer sharpness parameters, one per X/Y pair. A starting choice is `4`.
 
 ## Outputs
 
-- w -distorted waveform in the same units and
-- layout as the input
-- J -distortion Jacobian matrix with respect to
-- the vectorisation of the input, sparse
+- `w`: Distorted waveform with the same units and layout as the input.
+- `J`: Sparse Jacobian of the distorted waveform with respect to MATLAB's vectorisation of the input, returned when requested.
 
-## Implementation structure
+## Implementation
 
-- Amplifier compression distortion model. Applies a saturating
-- root-sigmoidal distortion to the waveform amplitude:
-- y=x/(1+(x/a)^s)^(1/s)
-- Treats odd channels of multi-channel waveform as X and even
-- ones as Y components; the autodiff Jacobian is returned for
-- the vectorisation of the input array. Syntax:
-- [w,J]=amp_root(w,sat_lvls,s)
-- w -waveform in rad/s nutation frequency units,
-- one time slice per column, and rows arran-
-- ged as XYXY... with respect to in-phase and
-- quadrature parts on each control channel
-- sat_lvls -saturation levels beyond which the amplifi-
+The function checks that `w` is a real numeric array with an even number of rows and that `sat_lvls` and `s` have one valid element per X/Y pair. It processes each pair at each time point independently. At zero amplitude, the scale is `1` and the curvature term is `0`; otherwise, it computes the radial scale and applies it to both Cartesian components. When `J` is requested, it assembles a sparse matrix from the corresponding 2-by-2 Cartesian Jacobian blocks. GPU-resident block values are gathered before sparse assembly.
+
+[Spinach reference](https://spindynamics.org/wiki/index.php?title=amp_root.m)

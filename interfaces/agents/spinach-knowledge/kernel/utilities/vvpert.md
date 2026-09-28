@@ -4,51 +4,23 @@
 
 ## Purpose
 
-Van Vleck perturbation theory, following Shavitt and Redmon, but excluding the quasi-degenerate split. Syntax: [Ep,G]=vvpert(E0,H1,order)
+Computes Van Vleck perturbation theory following Shavitt and Redmon, excluding the quasi-degenerate split.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Parameters / inputs
-
-- E0 -eigenvalues of H0, a column vector of real
-- numbers
-- H1 -perturbation, written in the basis that di-
-- agonalises H0
-- order -order of perturbation theory to be used; numerical
-- artefacts appear beyond about 10-12 for typical
-- problems
+- `E0` — eigenvalues of `H0`, as a real column vector.
+- `H1` — perturbation in the basis that diagonalises `H0`; must be finite and Hermitian.
+- `order` — positive integer specifying the perturbation order. Numerical artefacts typically appear beyond order 10–12.
 
 ## Outputs
 
-- Ep -eigenvalues of H0+H1 to the specified order,
-- a column vector of reals, not necessarily
-- sorted in the same way as the input
-- G -Van Vleck transformation generator, such that
-- expm(G) is a square unitary matrix with eigen-
-- vectors in columns, in the same order as the
-- eigenvalues in Ep
-- Notes: there must be no degeneracies in H0; H1 must be Hermitian,
-- the theory only converges when norm(H1,2) is much smaller
-- than the smallest energy gap in H0; complexity is cubic
-- both in the order and in the matrix dimension.
+- `Ep` — real column vector of eigenvalues of `H0+H1` to the specified order; not necessarily sorted in the same way as `E0`.
+- `G` — Van Vleck transformation generator. `expm(G)` is a square unitary matrix whose columns are eigenvectors in the order of `Ep`.
 
-## Implementation structure
+## Notes
 
-- Van Vleck perturbation theory, following Shavitt and Redmon, but
-- excluding the quasi-degenerate split. Syntax:
-- [Ep,G]=vvpert(E0,H1,order)
-- E0 -eigenvalues of H0, a column vector of real
-- numbers
-- H1 -perturbation, written in the basis that di-
-- agonalises H0
-- order -order of perturbation theory to be used; numerical
-- artefacts appear beyond about 10-12 for typical
-- problems
-- Ep -eigenvalues of H0+H1 to the specified order,
-- a column vector of reals, not necessarily
+`H0` must have no degenerate energy levels. The theory converges only when `norm(H1,2)` is much smaller than the smallest energy gap in `H0`. Computational complexity is cubic in both `order` and matrix dimension.
+
+Source: <https://spindynamics.org/wiki/index.php?title=vvpert.m>
+
+Contact: ilya.kuprov@weizmann.ac.il

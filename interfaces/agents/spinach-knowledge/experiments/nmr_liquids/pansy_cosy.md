@@ -4,55 +4,24 @@
 
 ## Purpose
 
-Magnitude mode PANSY-COSY pulse sequence from:
+Magnitude-mode PANSY-COSY. The source cites [10.1021/ja0634876](https://doi.org/10.1021/ja0634876) and [10.1016/j.pnmrs.2021.03.001](https://doi.org/10.1016/j.pnmrs.2021.03.001).
 
-## Physical / mathematical content
+## Sequence and output
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+The routine forms `L = H + 1i*R + 1i*K` and starts from `Lz` magnetization on the first working spin. It creates positive- and negative-phase first-pulse branches, selects +1 coherence, evolves in F1, then applies the second pulse to the first and second spins. Subtracting the branches removes axial peaks. Detection on the first and second spins gives:
 
-## Numerical / algorithmic content
+- `fid.aa`: magnitude-mode COSY FID on F1,F1 nuclei.
+- `fid.ab`: magnitude-mode COSY FID on F1,F2 nuclei.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Decoupling either working nucleus is not supported. This is the magnitude-mode analytical-pathway version; gradient echo/anti-echo PANSY-COSY variants are separate pulse-sequence functions. The routine requires `sphten-liouv` formalism.
 
-## Syntax
+## Inputs
 
-```matlab
-fid=pansy_cosy(spin_system,parameters,H,R,K)
-```
+- `parameters.spins`: two working nuclei, e.g. `{'1H','13C'}`.
+- `parameters.sweep`: two positive sweep widths in Hz.
+- `parameters.npoints`: two positive integer point counts.
+- `H`, `R`, and `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator from the context function; the matrices must have matching dimensions.
 
-## Parameters / inputs
+## Reference link
 
-- parameters.spins -nuclei on which the sequence runs,
-- e.g. {'1H','13C'}
-- parameters.sweep -a vector with two sweep widths in Hz
-- parameters.npoints -a vector of integers specifying
-- point count in each dimension
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.aa -magnitude mode COSY FID on F1,F1 nuclei
-- fid.ab -magnitude mode COSY FID on F1,F2 nuclei
-- Note: decoupling with respect to either of the working nuclei
-- is impossible in this pulse sequence.
-- Note: this is the magnitude-mode analytical-pathway version.
-- Gradient echo/anti-echo PANSY-COSY variants should be
-- implemented as separate pulse sequence functions.
-- Andrew Porter
-
-## Implementation structure
-
-- Magnitude mode PANSY-COSY pulse sequence from:
-- fid=pansy_cosy(spin_system,parameters,H,R,K)
-- parameters.spins -nuclei on which the sequence runs,
-- e.g. {'1H','13C'}
-- parameters.sweep -a vector with two sweep widths in Hz
-- parameters.npoints -a vector of integers specifying
-- point count in each dimension
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid.aa -magnitude mode COSY FID on F1,F1 nuclei
-- fid.ab -magnitude mode COSY FID on F1,F2 nuclei
+[Spinach Wiki: pansy_cosy.m](https://spindynamics.org/wiki/index.php?title=pansy_cosy.m)

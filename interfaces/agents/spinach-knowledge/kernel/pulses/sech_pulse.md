@@ -1,52 +1,36 @@
 # kernel/pulses/sech_pulse.m
 
-- Signature: `[Cx,Cy,time_grid,amps,phis]=...`
+- Signature: `[Cx,Cy,time_grid,amps,phis]=sech_pulse(peak_amp,freq_mod,phase_mod,dur,npts)`
 
 ## Purpose
 
-Hyperbolic secant pulse in Cartesian and amplitude-phase representation. Syntax: [Cx,Cy,time_grid,amps,phis]=... sech_pulse(peak_ampl,freq_mod,phase_mod,dur,npts)
+Constructs a hyperbolic-secant RF pulse and returns its Cartesian and amplitude-phase representations.
 
-## Physical / mathematical content
+## Algorithm
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+The time grid is `linspace(-dur/2,dur/2,npts)`, centred on zero. The amplitude and phase are `peak_amp*sech(freq_mod*time_grid)` and `phase_mod*log(cosh(freq_mod*time_grid))`; `polar2cartesian` converts them to `Cx` and `Cy`.
 
 ## Parameters / inputs
 
-- peak_amp -peak amplitude, rad/s
-- freq_mod -frequency modulation parameter, rad/s
-- phase_mod -phase modulation parameter, dimless
-- dur -pulse duration, seconds
-- npts -number of digitisation points
+- `peak_amp` — peak amplitude, in radians per second.
+- `freq_mod` — frequency-modulation parameter, in radians per second.
+- `phase_mod` — dimensionless phase-modulation parameter.
+- `dur` — pulse duration, in seconds; must be positive.
+- `npts` — number of digitisation points; must be a positive integer.
 
 ## Outputs
 
-- Cx -a vector of coefficients in front of Sx
-- spin operator at each time slice, rad/s
-- Cy -a vector of coefficients in front of Sy
-- spin operator at each time slice, rad/s
-- time_grid -a vector of time grid points, seconds
-- amps -a vector of pulse amplitudes at each ti-
-- me slice, rad/s
-- phis -a vector of pulse phases at each time
-- slice (phi=0 at t=0 in the centre), rad
-- Example:
-- [Cx,Cy,time_grid]=sech_pulse(1,672,5,10.24e-3,1000);
-- plot(time_grid,[Cx; Cy]); kgrid; xlim tight;
-- kxlabel('time, seconds'); kylabel('amplitude, rad/s');
+- `Cx`, `Cy` — coefficients of the `Sx` and `Sy` spin operators at each time slice, in radians per second.
+- `time_grid` — pulse time points, in seconds.
+- `amps` — pulse amplitudes, in radians per second.
+- `phis` — pulse phases, in radians; the phase is zero at the centre (`t=0`).
 
-## Implementation structure
+## Example
 
-- Hyperbolic secant pulse in Cartesian and amplitude-phase
-- representation. Syntax:
-- [Cx,Cy,time_grid,amps,phis]=...
-- sech_pulse(peak_ampl,freq_mod,phase_mod,dur,npts)
-- peak_amp -peak amplitude, rad/s
-- freq_mod -frequency modulation parameter, rad/s
-- phase_mod -phase modulation parameter, dimless
-- dur -pulse duration, seconds
-- npts -number of digitisation points
-- Cx -a vector of coefficients in front of Sx
-- spin operator at each time slice, rad/s
-- Cy -a vector of coefficients in front of Sy
+```matlab
+[Cx,Cy,time_grid]=sech_pulse(1,672,5,10.24e-3,1000);
+plot(time_grid,[Cx; Cy]); kgrid; xlim tight;
+kxlabel('time, seconds'); kylabel('amplitude, rad/s');
+```
+
+[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=sech_pulse.m)

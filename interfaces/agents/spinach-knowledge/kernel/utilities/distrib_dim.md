@@ -8,11 +8,11 @@ Distributes an array in the user-specified dimension for parallel processing usi
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- This function partitions a numerical array along a requested dimension; no physical model is specified.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Uses `spmd` and `codistributor1d(dim)` to partition `A` across workers along dimension `dim`, returning a distributed array.
 
 ## Parameters / inputs
 

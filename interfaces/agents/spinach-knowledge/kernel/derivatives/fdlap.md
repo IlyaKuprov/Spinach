@@ -4,47 +4,24 @@
 
 ## Purpose
 
-Returns a finite-difference representation of the Laplacian for an array with a user-specified finite difference stencil size. The re- sulting operator is a sparse matrix designed to act on the vectori- sation of the array. The dimensions of the array are assumed to be ordered as [X Y Z]. Syntax: L=fdlap(npoints,extents,nstenc)
-
-## Physical / mathematical content
-
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+Constructs a sparse finite-difference Laplacian for a vectorized 1D, 2D, or 3D array whose dimensions are ordered as `[X Y Z]`. The finite-difference approximation uses periodic boundary conditions.
 
 ## Parameters / inputs
 
-- dims -a one-element, two-element, or three-element
-- vector specifying the number of discretisation
-- points in each dimension of the 1D, 2D, or 3D
-- array of data that the operator will be acting
-- on, ordered as [X Y Z].
-- extents -a one-element, two-element, or three-element
-- vector specifying the size of each dimension
-- of the array, ordered as [X Y Z].
-- nstenc -number of finite-difference stencil points for
-- the finite-difference approximation; periodic
-- boundary conditions are used
+- `dims`: One-, two-, or three-element vector of positive integers giving the number of discretization points along each dimension, ordered as `[X Y Z]`.
+- `extents`: Corresponding one-, two-, or three-element vector of positive real sizes, ordered as `[X Y Z]`.
+- `nstenc`: Number of finite-difference stencil points; it must be an odd integer of at least 3, and every value in `dims` must be at least `nstenc`.
 
-## Outputs
+## Output
 
-- L -a sparse matrix designed to act on the vectori-
-- zation of the array. The dimensions are assumed
-- to be ordered as [X Y Z].
+- `L`: Sparse Laplacian matrix acting on the vectorization of the array.
 
-## Implementation structure
+## Construction
 
-- Returns a finite-difference representation of the Laplacian for an
-- array with a user-specified finite difference stencil size. The re-
-- sulting operator is a sparse matrix designed to act on the vectori-
-- sation of the array. The dimensions of the array are assumed to be
-- ordered as [X Y Z]. Syntax:
-- L=fdlap(npoints,extents,nstenc)
-- dims - a one-element, two-element, or three-element
-- vector specifying the number of discretisation
-- points in each dimension of the 1D, 2D, or 3D
-- array of data that the operator will be acting
-- on, ordered as [X Y Z].
-- extents - a one-element, two-element, or three-element
+For each dimension, `fdlap` obtains a second-derivative matrix using `fdmat(dims(i),nstenc,2)` and scales it by `(dims(i)/extents(i))^2`. In 1D, `L` is the scaled matrix `Dxx`. In 2D and 3D, `L` is the sum of the scaled second-derivative matrices expanded along the other dimensions with Kronecker products and sparse identity matrices (`speye`). The X dimension is the innermost factor, followed by Y and then Z.
+
+The function checks that `dims` contains positive integers, `extents` contains positive real values, and the stencil satisfies the size and parity requirements. It rejects numbers of spatial dimensions other than one, two, or three.
+
+## Reference
+
+- [Spinach `fdlap.m` documentation](https://spindynamics.org/wiki/index.php?title=fdlap.m).

@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Kronecker product of two matrices in a tensor train format. Syntax: c=kron(a,b)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Constructs the Kronecker product of two tensor-train matrix representations, core by core.
 
 ## Numerical / algorithmic content
+
+Both operands are shrunk before their sizes and ranks are read. The operation requires the same number of cores, forms each output core from the Kronecker product of reshaped operand cores, multiplies the coefficients, and sets the output tolerance from the operand coefficients and tolerances.
 
 ## Parameters / inputs
 
@@ -18,24 +16,8 @@ Kronecker product of two matrices in a tensor train format. Syntax: c=kron(a,b)
 
 ## Outputs
 
-- c -a tensor trin object
-- WARNING: the result is not the same as the flat matrix Kronecker pro-
-- duct (it is a row and column permutation away from it), but
-- the resulting order of elements is consistent with the out-
-- put of the tensor train vectorization (ttclass/vec) operati-
-- on output.
+- c -a tensor train object
 
-## Implementation structure
+## Ordering caveat
 
-- Kronecker product of two matrices in a tensor train format. Syntax:
-- c=kron(a,b)
-- a,b -tensor train objects
-- c -a tensor trin object
-- WARNING: the result is not the same as the flat matrix Kronecker pro-
-- duct (it is a row and column permutation away from it), but
-- the resulting order of elements is consistent with the out-
-- put of the tensor train vectorization (ttclass/vec) operati-
-- on output.
-- Shrink a and b before going any further
-- Read sizes and ranks of the operands
-- Check consistency
+The result is not ordered like the flat matrix Kronecker product: it differs by a row and column permutation. Its element order is consistent with the output of `ttclass/vec`.

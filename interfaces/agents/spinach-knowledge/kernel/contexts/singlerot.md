@@ -4,16 +4,17 @@
 
 ## Purpose
 
-Single angle spinning context. In Liouville space, this wrapper builds the Fokker-Planck evolution generator that includes the spin Hamiltoni- an commutation superoperator, applicable dissipators (relaxation, kine- tics), and the rotor turning generator. In Hilbert space, this wrapper builds the stack of spin Hamiltonians, one for each rotor phase. Those are handed over to the pulse sequence, which the user must supp
+Single-angle spinning context. In Liouville space, it passes a Fokker–Planck evolution generator to a user-supplied pulse-sequence function. In Hilbert space, it passes a stack of spin Hamiltonians, one for each rotor phase.
 
 ## Physical / mathematical content
 
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- The Hamiltonian at each rotor phase combines an isotropic term with orientation-dependent terms rotated using Wigner matrices. The rotor phases number `2*parameters.max_rank+1`.
+- In Liouville space, the enlarged rotor-phase and spin space includes a rotor-turning generator proportional to `2*pi*parameters.rate`, alongside relaxation and kinetics generators projected into that space.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- The code evaluates the pulse sequence at each orientation in the spherical grid, using a parallel powder loop unless serial execution is requested.
+- For Liouville-space formalisms, the pulse sequence receives the assembled Fokker–Planck generator; for Hilbert-space formalisms, it receives the Hamiltonian stack. The result is either a grid-weighted sum or a cell array of orientation-specific results, according to `parameters.sum_up`.
 
 ## Parameters / inputs
 
@@ -85,15 +86,5 @@ Single angle spinning context. In Liouville space, this wrapper builds the Fokke
 
 ## Implementation structure
 
-- Single angle spinning context. In Liouville space, this wrapper builds
-- the Fokker-Planck evolution generator that includes the spin Hamiltoni-
-- an commutation superoperator, applicable dissipators (relaxation, kine-
-- tics), and the rotor turning generator. In Hilbert space, this wrapper
-- builds the stack of spin Hamiltonians, one for each rotor phase. Those
-- are handed over to the pulse sequence, which the user must supply as a
-- function handle. Syntax:
-- [answer,sph_grid]=singlerot(spin_system,pulse_sequence,...
-- parameters,assumptions)
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
+- The main function applies defaults, validates inputs, constructs the Hamiltonian components and dissipators, and loads the spherical grid. It then prepares formalism-specific rotor-phase operators and calls the pulse sequence for each grid orientation.
+- Local `defaults` and `grumble` functions set optional fields and enforce input constraints, respectively.

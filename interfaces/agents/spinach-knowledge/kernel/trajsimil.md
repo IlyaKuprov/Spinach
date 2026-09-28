@@ -4,61 +4,21 @@
 
 ## Purpose
 
-Computes trajectory similarity scores. Returns a function representing "similarity" of the two state space trajectories at different points in time. See http://dx.doi.org/10.1016/j.jmr.2013.02.012 for further infor- mation. Syntax: score=trajsimil(spin_system,trajectory_1,trajectory_2,scorefcn)
-
-## Physical / mathematical content
-
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-
-## Numerical / algorithmic content
-
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+Compares two state-space trajectories at corresponding time points and returns a similarity-score vector. For further information, see [the JMR article](http://dx.doi.org/10.1016/j.jmr.2013.02.012).
 
 ## Parameters / inputs
 
-- trajectory_1,2 -spin system trajectories, supplied as nstates
-- x nsteps matrices.
-- scorefcn -similarity scoring method; possibilities are:
-- 'RSP' -running scalar product. Computes
-- scalar products between the cor-
-- responding vectors of the trajec-
-- tories.
-- 'RDN' -running difference norm. The two
-- trajectories are subtracted and
-- difference 2-norms returned.
-- 'SG-' -prefix that turns on state grou-
-- ping. T(l,m) and T(l,-m) states
-- of each spin (standalone or in
-- direct products with other ope-
-- rators)will be considered equva-
-- lent.
-- 'BSG-' -prefix that turns on broad state
-- grouping. All states of a given
-- spin (standalone or in direct
-- products with other operators)
-- will be considered equivalent.
-- The possible combinations are: 'RSP','RDN',
-- 'SG-RSP','SG-RDN','BSG-RSP','BSG-RDN'.
-- State grouping consists in summing the absolute squares of the coeffi-
-- cients to be grouped and taking the square root. The trajectories would
-- usually come out of the evolution.m or krylov.m run from a given star-
-- ting point under a given Liouvillian.
-- Output:
-- score -the similarity score vector, one element
-- per time slice
-- Note: SG and BSG options require sphten-liouv formalism.
+- `spin_system` - Spinach system whose basis and formalism define the trajectory states.
+- `trajectory_1`, `trajectory_2` - equal-size numeric trajectory matrices, with basis states in rows and time points in columns; their row count must match the basis size.
+- `scorefcn` - one of `'RSP'`, `'RDN'`, or a grouped form: `'SG-RSP'`, `'SG-RDN'`, `'BSG-RSP'`, or `'BSG-RDN'`.
+  - `RSP` computes the column-wise scalar product with `dot`.
+  - `RDN` computes `1 - norm(trajectory_1(:,k)-trajectory_2(:,k),2)/2` for each time point `k`.
+  - The `SG-` prefix groups `T(l,m)` and `T(l,-m)` states as equivalent; `BSG-` groups all non-identity states of each spin. For grouped scores, corresponding grouped contributions are formed by summing coefficient absolute-squares and taking the square root.
 
-## Implementation structure
+## Output
 
-- Computes trajectory similarity scores. Returns a function representing
-- "similarity" of the two state space trajectories at different points in
-- time. See http://dx.doi.org/10.1016/j.jmr.2013.02.012 for further infor-
-- mation. Syntax:
-- score=trajsimil(spin_system,trajectory_1,trajectory_2,scorefcn)
-- trajectory_1,2 -spin system trajectories, supplied as nstates
-- x nsteps matrices.
-- scorefcn -similarity scoring method; possibilities are:
-- 'RSP' -running scalar product. Computes
-- scalar products between the cor-
-- responding vectors of the trajec-
-- tories.
+- `score` - one similarity score per time point.
+
+## Behavior
+
+The function checks that the trajectories have equal size and match the basis row count. Ungrouped scoring requires `sphten-liouv` or `zeeman-liouv` formalism; the `SG-` and `BSG-` options require `sphten-liouv`.

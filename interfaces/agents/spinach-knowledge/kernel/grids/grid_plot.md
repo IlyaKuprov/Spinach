@@ -4,45 +4,21 @@
 
 ## Purpose
 
-Spherical quadrature grid plotter. Takes a cloud of points on a sphere and plots its Voronoi tessellation. Syntax: grid_plot(x,y,z,vorn,c,options)
-
-## Physical / mathematical content
-
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Plots the Voronoi tessellation of a cloud of points on a sphere.
 
 ## Parameters / inputs
 
-- x,y,z -column vectors containing Cartesian
-- coordinates of grid points
-- c -values to be mapped into the colour
-- of each tessellation face, white if
-- this input is left empty
-- vorn -Voronoi tessellation; if this is not
-- provided, it will be computed
-- options.dots -the default (true) puts black
-- dots at centres of tessellati-
-- on faces
+- `x`, `y`, `z`: Column vectors of Cartesian grid-point coordinates; they must be real, finite, numeric, and the same size.
+- `vorn`: Cell array of Voronoi tessera. If omitted or empty, it is computed with `voronoisphere`.
+- `c`: Tessellation-face colour. If omitted or empty, faces are white; a character value names a colour, while numeric values are applied by face index.
+- `options.dots`: Whether to plot black dots at grid points; defaults to `true`.
 
 ## Outputs
 
-- this function plots a figure
+- Plots a figure; returns no value.
 
 ## Implementation structure
 
-- Spherical quadrature grid plotter. Takes a cloud of points
-- on a sphere and plots its Voronoi tessellation. Syntax:
-- grid_plot(x,y,z,vorn,c,options)
-- x,y,z -column vectors containing Cartesian
-- coordinates of grid points
-- c -values to be mapped into the colour
-- of each tessellation face, white if
-- this input is left empty
-- vorn -Voronoi tessellation; if this is not
-- provided, it will be computed
-- options.dots -the default (true) puts black
-- dots at centres of tessellati-
+The function plots the optional centre dots and draws each tessellation face with `patch`. It sets square axes, a camera position, and plot limits, and hides tick marks.
+
+Source: <https://spindynamics.org/wiki/index.php?title=grid_plot.m>

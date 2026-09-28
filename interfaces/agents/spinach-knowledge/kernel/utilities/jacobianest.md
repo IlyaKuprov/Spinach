@@ -4,45 +4,26 @@
 
 ## Purpose
 
-Estimate of the Jacobian matrix of a vector valued function of n variables. Syntax: [jac,err] = jacobianest(fun,x0)
+Estimate the Jacobian of a vector-valued function at `x0`, together with an entry-wise error estimate.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+A general numerical differentiation utility; it does not encode a spin-system model.
 
 ## Numerical / algorithmic content
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+For each element of `x0`, the routine evaluates centered finite differences over a geometrically decreasing sequence of 26 step sizes. Romberg extrapolation cancels the leading second- and fourth-order error terms; after trimming the three largest- and smallest-step estimates, the estimate with the smallest predicted error is selected.
 
 ## Parameters / inputs
 
-- fun -(vector valued) analytical function to differentiate.
-- fun must be a function of the vector or array x0.
-- x0 -vector location at which to differentiate fun
-- If x0 is an nxm array, then fun is assumed to be
-- a function of n*m variables.
+- `fun` - function handle accepting the vector or array `x0` and returning a vector-valued result.
+- `x0` - numeric vector or array; each of its `numel(x0)` elements is treated as an independent variable.
 
 ## Outputs
 
-- jac -array of first partial derivatives of fun.
-- Assuming that x0 is a vector of length p
-- and fun returns a vector of length n, then
-- jac will be an array of size (n,p)
-- err -vector of error estimates corresponding to
-- each partial derivative in jac.
-- John D'Errico
+- `jac` - Jacobian array with one row per element of `fun(x0)` after linearisation and one column per element of `x0`.
+- `err` - estimated error for each corresponding Jacobian entry; it has the same size as `jac`.
 
 ## Implementation structure
 
-- Estimate of the Jacobian matrix of a vector valued
-- function of n variables. Syntax:
-- [jac,err] = jacobianest(fun,x0)
-- fun -(vector valued) analytical function to differentiate.
-- fun must be a function of the vector or array x0.
-- x0 -vector location at which to differentiate fun
-- If x0 is an nxm array, then fun is assumed to be
-- a function of n*m variables.
-- jac -array of first partial derivatives of fun.
-- Assuming that x0 is a vector of length p
-- and fun returns a vector of length n, then
-- jac will be an array of size (n,p)
+The result at the centre point determines the output dimension. Each input coordinate is perturbed in both directions, the finite-difference estimates are extrapolated, and the selected derivative and error estimate are stored in the corresponding Jacobian column.

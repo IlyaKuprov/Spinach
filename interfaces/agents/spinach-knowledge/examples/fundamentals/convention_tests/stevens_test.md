@@ -4,25 +4,8 @@
 
 ## Purpose
 
-Tests of Spinach Stevens operator function against explicit expressions from the literature.
+Tests Spinach's Stevens-operator matrices against explicit expressions from the literature, and checks the rank-2 operators against irreducible spherical tensor (IST) expressions.
 
-## Physical / mathematical content
+## Method and checks
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Tests of Spinach Stevens operator function against
-- explicit expressions from the literature.
-- Spin and multiplicity
-- Spinach results, rank 6
-- Explicit formulae, rank 6
-- Differences, rank 6
-- Spinach results, rank 4
-- Explicit formulae, rank 4
-- Differences, rank 4
-- Spinach results, rank 2
-- Explicit formulae, rank 2
-- Differences, rank 2
+With spin quantum number 12 (multiplicity 25), the test compares every component q=−k,…,k for ranks k=6, 4, and 2, using explicit expressions built from the spin operators. The 1-norm of the rank-wise residual vector must be at most 10⁻⁴, 10⁻⁷, and 10⁻¹², respectively. It then compares the five rank-2 Stevens matrices with the corresponding IST combinations; the residual-vector 1-norm must be at most 10⁻¹⁰.

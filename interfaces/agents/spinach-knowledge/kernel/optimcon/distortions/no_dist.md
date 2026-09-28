@@ -4,35 +4,21 @@
 
 ## Purpose
 
-A distortion function that applies no distortion and therefore has a unit Jacobian. Syntax: [w,J]=no_dist(w)
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-
-## Numerical / algorithmic content
+Returns the waveform unchanged. If a second output is requested, it returns the unit Jacobian for the vectorised waveform.
 
 ## Parameters / inputs
 
-- w -waveform, a numerical array
+- `w` — a numerical waveform array. The function requires its elements to be real.
 
 ## Outputs
 
-- w -the same waveform as the input
-- J -a sparse unit matrix with the dimension mat-
-- ching the vectorisation of the input
+- `w` — the input waveform, unchanged.
+- `J` — if requested, a sparse identity matrix of size `numel(w)` by `numel(w)`.
 
-## Implementation structure
+## Implementation
 
-- A distortion function that applies no distortion and therefore
-- has a unit Jacobian. Syntax:
-- [w,J]=no_dist(w)
-- w -waveform, a numerical array
-- w -the same waveform as the input
-- J -a sparse unit matrix with the dimension mat-
-- ching the vectorisation of the input
-- Check consistency
-- Return a unit Jacobian if asked
-- Consistency enforcement
-- If I only knew how I could get mathematicians interested in
-- transformation groups and the treatment of differential equ-
+The function checks that `w` is numeric and real, raising an error otherwise. It constructs `J` with `speye(numel(w))` only when a second output is requested.
+
+## Reference
+
+- [Spinach documentation for `no_dist.m`](https://spindynamics.org/wiki/index.php?title=no_dist.m)

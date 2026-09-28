@@ -4,28 +4,8 @@
 
 ## Purpose
 
-Powder averaged W-band pulsed ESR spectrum of Gd(III) DOTA complex. Ideal pulse with a large numerical powder grid is used, along with the numerical second-order rotating frame transformation. Calculation time: minutes
+Simulates a powder-averaged W-band pulsed ESR spectrum of a Gd(III) DOTA complex, using an ideal pulse and a numerical second-order rotating-frame transformation.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder averaged W-band pulsed ESR spectrum of Gd(III) DOTA
-- complex. Ideal pulse with a large numerical powder grid is
-- used, along with the numerical second-order rotating frame
-- transformation.
-- Calculation time: minutes
-- Spin system properties
-- Magnet field
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+The model is a single `E8` spin at 9.40 T, with an isotropic g value of 1.9918 and an axial ZFS tensor. The script uses a Zeeman Liouville basis and averages the lab-frame acquisition over a 12,800-point spherical powder grid. The acquisition spans 6 GHz around a 1.5 GHz offset with 4,096 points, zero-filled to 16,384; the apodised signal is Fourier transformed and plotted. The source estimates a run time of minutes.

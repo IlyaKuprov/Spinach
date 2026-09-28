@@ -4,45 +4,21 @@
 
 ## Purpose
 
-Triangular spherical quadrature grids, as per Appendix A.6 of (http://dx.doi.org/10.1016/j.jmr.2014.05.009). Syntax: [alps,bets,gams,whts,vorn]=grid_trian(type,n)
+Generate triangular spherical quadrature grids as described in [Appendix A.6](http://dx.doi.org/10.1016/j.jmr.2014.05.009).
 
-## Physical / mathematical content
+## Parameters
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- type -'asg', 'sophe', or 'stoll'
-- n -point count parameter
+- `type` — character string selecting `'asg'`, `'sophe'`, or `'stoll'`.
+- `n` — positive integer point-count parameter.
 
 ## Outputs
 
-- alps -alpha Euler angles of the grid (radians),
-- zeros because these are two-angle grids
-- bets -beta Euler angles of the grid (radians)
-- gams -gamma Euler angles of the grid (radians)
-- whts -Voronoi tessellation body angle weights
-- vorn -a cell array of matrices containing the
-- coordinates of the vertices of the Voro-
-- noi polyhedra
-- If no outputs are requested, a schematic is drawn.
+- `alps` — alpha Euler angles in radians; all zero because these are two-angle grids.
+- `bets` — beta Euler angles in radians.
+- `gams` — gamma Euler angles in radians.
+- `whts` — Voronoi tessellation body-angle weights, divided by `4*pi`.
+- `vorn` — cell array of matrices containing Voronoi-polyhedron vertex coordinates.
 
-## Implementation structure
+## Method
 
-- Triangular spherical quadrature grids, as per Appendix A.6 of
-- (http://dx.doi.org/10.1016/j.jmr.2014.05.009). Syntax:
-- [alps,bets,gams,whts,vorn]=grid_trian(type,n)
-- type -'asg', 'sophe', or 'stoll'
-- n -point count parameter
-- alps -alpha Euler angles of the grid (radians),
-- zeros because these are two-angle grids
-- bets -beta Euler angles of the grid (radians)
-- gams -gamma Euler angles of the grid (radians)
-- whts -Voronoi tessellation body angle weights
-- vorn -a cell array of matrices containing the
-- coordinates of the vertices of the Voro-
+Each grid is built from points in the first octant and extended by reflection to the sphere. The `'stoll'` construction averages three SOPHE-derived octant point sets. The `'sophe'` and `'stoll'` constructions explicitly add pole points. Voronoi tessellation and weights are computed when more than three outputs are requested or when no outputs are requested. With no outputs, the function draws a grid schematic.

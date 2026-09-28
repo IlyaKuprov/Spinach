@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Tests powder averaging against explicit weighted summation. Syntax: result=test_ctx_powder_average()
+Checks that `powder()` returns the grid-weighted sum of its per-orientation acquisition traces.
 
 ## Physical / mathematical content
 
+The model is one anisotropic `1H` spin at 14.1 T, with Zeeman principal values `[-2 -2 4]` and zero Euler angles.
+
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The test uses `sphten-liouv`, no approximation, projection `+1`, grid `leb_2ang_rank_5`, zero offset, 2000 Hz sweep, three points, and `serial=true`. Both `rho0` and `coil` are `L+`. It first runs the averaged `powder()` calculation, then sets `sum_up=false` to obtain individual orientation traces and explicitly accumulates them with `sph_grid.weights`.
 
-## Outputs
+## Check
 
-- result -regression test result with explanatory messages
-- The test asks powder() for individual orientation traces and checks that
-- the default powder average is the same weighted sum.
-
-## Implementation structure
-
-- Tests powder averaging against explicit weighted summation. Syntax:
-- result=test_ctx_powder_average()
-- result -regression test result with explanatory messages
-- The test asks powder() for individual orientation traces and checks that
-- the default powder average is the same weighted sum.
-- Announce the test target
-- State the powder-averaging target of the test
-- Build a one-spin anisotropic Liouville-space system
-- Set up a tiny powder acquisition
-- Run the averaged powder calculation
-- Run the per-orientation powder calculation
-- Assemble the independent weighted sum
+The default powder FID must equal the explicit weighted sum to absolute and relative tolerance `1e-12`.

@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Solves a linear system with tensor train objects. Syntax: x=mldivide(A,y)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Computes a tensor-train solution to a linear system using the AMEn solver.
 
 ## Numerical / algorithmic content
+
+The implementation shrinks the operands, forms the symmetrised system `(A'*A)*x=A'*y), and calls `amensolve` with tolerance `1e-6`. This is a least-squares normal-equation solve, not a direct unsymmetrised solve.
 
 ## Parameters / inputs
 
@@ -20,20 +18,3 @@ Solves a linear system with tensor train objects. Syntax: x=mldivide(A,y)
 ## Outputs
 
 - x -ttclass vector
-- Note: the AMEn-solve algorithm is applied to symmetrised
-- system (A'*A)*x=A'*y
-
-## Implementation structure
-
-- Solves a linear system with tensor train objects. Syntax:
-- x=mldivide(A,y)
-- A -ttclass matrix
-- y -ttclass vector
-- x -ttclass vector
-- Note: the AMEn-solve algorithm is applied to symmetrised
-- system (A'*A)*x=A'*y
-- Shrink the operands
-- Form a symmetrised system
-- Solve it with AMEn algorithm
-- Complain and bomb out
-- The penalty for success is to be bored by the people

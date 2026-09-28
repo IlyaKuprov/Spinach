@@ -4,21 +4,8 @@
 
 ## Purpose
 
-Internal consistency test for the state vectors and matrices in each of the three formalisms supported by Spinach.
+Check that the generated Cartesian spin states have consistent norms across Spinach's Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville formalisms.
 
-## Physical / mathematical content
+## Method
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Internal consistency test for the state vectors and matrices
-- in each of the three formalisms supported by Spinach.
-- System specification
-- Preallocate the answer
-- Compute norm differences
-- Display the answers
+The test builds a two-spin system (`1H` and `235U`) at 14.1 T, with Zeeman scalars 2.5 and 1.0 and a scalar coupling of 10. In each formalism, it constructs the x, y, and z states for both spins and compares their norms within each set. It fails if any pairwise norm difference exceeds `1e-6`; otherwise it reports that the internal norm consistency test passed.

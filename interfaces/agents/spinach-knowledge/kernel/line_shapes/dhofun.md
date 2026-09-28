@@ -4,43 +4,22 @@
 
 ## Purpose
 
-Normalised damped harmonic oscillator response function in mag- netic resonance notation. This is the standard shape of a phonon band: a resonance at the natural frequency of the oscillator, br- oadened by damping, and vanishing quadratically at zero frequen- cy, which a Lorentzian centred at the same place does not do. In the weak damping limit the function tends to a Lorentzian of the same width. Evaluation uses fr
+Evaluates the normalized damped-harmonic-oscillator response at positive frequencies. It peaks at the undamped natural frequency and goes to zero quadratically as frequency approaches zero.
 
 ## Physical / mathematical content
 
-- Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
+The response models a damped oscillator band. In the weak-damping limit it approaches a Lorentzian; `fwhm` is the full width at half maximum for all damping values.
 
 ## Numerical / algorithmic content
 
+Non-positive entries of `x` return zero. The formula is evaluated using frequencies scaled by `nat_freq` to avoid intermediate overflow in single precision.
+
 ## Parameters / inputs
 
-- x -argument values, a real array of any dimension;
-- the function is zero at non-positive arguments
-- nat_freq -natural frequency of the undamped oscillator, a
-- positive real scalar, in the same units as x; the
-- maximum of the function sits exactly here
-- fwhm -damping rate of the oscillator, a positive real
-- scalar, in the same units as x; for this respon-
-- se function it is exactly the full width at half-
-- maximum, at any damping
+- `x` - real numeric array of any dimension, in frequency units.
+- `nat_freq` - finite positive real scalar, the natural frequency of the undamped oscillator, in the same units as `x`.
+- `fwhm` - finite positive real scalar, the oscillator damping rate and full width at half maximum, in the same units as `x`.
 
 ## Outputs
 
-- y -function values at the points specified in x, an
-- array of the same size and type as x, normalised
-- to unit integral over positive arguments
-
-## Implementation structure
-
-- Normalised damped harmonic oscillator response function in mag-
-- netic resonance notation. This is the standard shape of a phonon
-- band: a resonance at the natural frequency of the oscillator, br-
-- oadened by damping, and vanishing quadratically at zero frequen-
-- cy, which a Lorentzian centred at the same place does not do. In
-- the weak damping limit the function tends to a Lorentzian of the
-- same width. Evaluation uses frequencies scaled by nat_freq to
-- avoid intermediate overflow in single precision. Syntax:
-- y=dhofun(x,nat_freq,fwhm)
-- x -argument values, a real array of any dimension;
-- the function is zero at non-positive arguments
-- nat_freq -natural frequency of the undamped oscillator, a
+- `y` - response values with the same size and type as `x`, normalized to unit integral over positive frequencies.

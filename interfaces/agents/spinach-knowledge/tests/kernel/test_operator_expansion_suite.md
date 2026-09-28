@@ -4,30 +4,12 @@
 
 ## Purpose
 
-Tests operator expansion and conversion helpers. Syntax: result=test_operator_expansion_suite()
+Regression test for operator expansion, conversion, allocation, and selected tensor and relaxation helpers. Returns a test result with explanatory messages.
 
-## Physical / mathematical content
+## Checks
 
-## Numerical / algorithmic content
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test checks that irreducible spherical tensor and bosonic monomial
-- expansion helpers reconstruct explicit matrices, and that operator-sized
-- allocation helpers return the correct formalism dimensions.
-
-## Implementation structure
-
-- Tests operator expansion and conversion helpers. Syntax:
-- result=test_operator_expansion_suite()
-- result -regression test result with explanatory messages
-- The test checks that irreducible spherical tensor and bosonic monomial
-- expansion helpers reconstruct explicit matrices, and that operator-sized
-- allocation helpers return the correct formalism dimensions.
-- Announce the test target
-- State the expansion target of the test
-- Check Hilbert-to-Liouville vectorisation identities on a non-diagonal matrix
-- Check IST expansion of a generic spin-one matrix
-- Check spin and boson energy-level counting conventions in IST expansions
-- Check central-transition and boson-product IST expansion wrappers
+- Verifies `hilb2liouv` left and right conversions against Kronecker products and its state-vector conversion against column stacking for a non-diagonal matrix.
+- Reconstructs a generic spin-one matrix from `oper2ist` coefficients. Checks that `enlev2ist` selects the bottom spin level or top boson level, and that `ct2ist` and `bos2ist` reconstruct their respective central-transition and creation–annihilation–number operator products.
+- Reconstructs a finite oscillator matrix and a population projector from `oper2bm` and `enlev2bm` coefficients. Local reconstruction helpers combine coefficients with the complete `irr_sph_ten` or `boson_mono` basis using zero-based state indices.
+- For one spin, checks `unit_oper` and empty `mprealloc` matrix dimensions in Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville formalisms; the last uses the current basis size.
+- For two spins in Hilbert space, checks the rank-two, zero-projection `twospinist` tensor against an explicit operator combination. Checks that `lindbladian` gives the requested negative decay rate for a diagonal jump process.

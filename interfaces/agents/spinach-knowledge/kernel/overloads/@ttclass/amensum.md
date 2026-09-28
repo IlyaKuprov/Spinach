@@ -4,40 +4,26 @@
 
 ## Purpose
 
-Sums buffered tensor trains in a single tensor train using AMEn algorithm. Syntax: y=amensum(x,tol,opts)
+Compress a sum of buffered rank-one tensor trains into one tensor train using an AMEn iteration.
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
+The input represents a CP-format sum: each core has rank one across the buffered trains. The routine currently handles this case; buffered sums of general tensor trains are not implemented.
 
 ## Parameters / inputs
 
-- x -ttclass with buffered rank-one tensors
-- tol -relative tolerance parameter, e.g. 1e-10
-- The opts field is optional:
-- opts.max_swp -maximum number of iterations
-- opts.init_guess_rank -rank of the initial guess
-- opts.enrichment_rank -rank of the enrichment
-- opts.verb -verbosity switch
+- `x` - `ttclass` containing buffered rank-one tensor trains.
+- `tol` - relative tolerance used for convergence and SVD truncation (the source suggests `1e-10`).
+- `opts` - optional options structure:
+  - `max_swp` - maximum iteration count (default `100`).
+  - `init_guess_rank` - rank of the random initial guess (default `2`).
+  - `enrichment_rank` - rank of residual enrichment (default `4`; zero disables enrichment).
+  - `verb` - verbosity switch (default `0`).
 
 ## Outputs
 
-- y -ttclass with a single tensor train, such
-- that |x-y|<tol*|x| in Frobenius norm
+- `y` - one `ttclass` tensor train, with the documented target `|x-y| < tol*|x|` in Frobenius norm.
 
 ## Implementation structure
 
-- Sums buffered tensor trains in a single tensor train using
-- AMEn algorithm. Syntax:
-- y=amensum(x,tol,opts)
-- x -ttclass with buffered rank-one tensors
-- tol -relative tolerance parameter, e.g. 1e-10
-- The opts field is optional:
-- opts.max_swp -maximum number of iterations
-- opts.init_guess_rank -rank of the initial guess
-- opts.enrichment_rank -rank of the enrichment
-- opts.verb -verbosity switch
-- y -ttclass with a single tensor train, such
-- that |x-y|<tol*|x| in Frobenius norm
+The routine initializes a random tensor train, updates its cores by alternating local projections of the buffered rank-one terms, and truncates intermediate cores by SVD. Optional residual enrichment augments the approximation. Iteration stops when the largest relative core change is below `tol` or `max_swp` is reached. Non-rank-one buffered input currently raises an error.

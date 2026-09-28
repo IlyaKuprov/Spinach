@@ -4,30 +4,14 @@
 
 ## Purpose
 
-Tests dynamic dispatch of cheap cell, struct, and double overloads. Syntax: result=test_dynamic_overload_cell_struct_suite()
+Regression test for dynamic dispatch of cell, struct, and double overloads against explicit references built from small deterministic objects. The result contains explanatory messages.
 
-## Physical / mathematical content
+## Tests
 
-## Numerical / algorithmic content
+- Checks cell addition and subtraction, including numeric–cell operations and direct `plus()` and `minus()` calls.
+- Checks cell element-wise scaling and left and right matrix multiplication, including direct `times()` and `mtimes()` calls.
+- Checks cell utilities: `totsum` of sparse entries, `complex`, `inflate` of numeric entries, and `blkdiag` with preserved diagonal blocks and empty off-diagonal cells.
+- Checks recursive struct addition and scalar multiplication across top-level numeric fields, nested numeric fields, and nested cells, including direct method-name dispatch.
+- Checks that `inflate` leaves a dense double array unchanged.
 
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test exercises object-operation dispatch for cell arithmetic,
-- cell multiplication, cell utility overloads, recursive structure
-- arithmetic, and the double inflate no-op.
-
-## Implementation structure
-
-- Tests dynamic dispatch of cheap cell, struct, and double overloads. Syntax:
-- result=test_dynamic_overload_cell_struct_suite()
-- result -regression test result with explanatory messages
-- The test exercises object-operation dispatch for cell arithmetic,
-- cell multiplication, cell utility overloads, recursive structure
-- arithmetic, and the double inflate no-op.
-- Announce the test target
-- State the overload target of the test
-- Build deterministic matrix operands
-- Exercise cell plus and minus through operator dispatch
-- Exercise numeric-cell plus and minus dispatch
-- Exercise direct method-name dispatch for coverage tracking
+Numeric comparisons use absolute and relative tolerances of `1e-15`.

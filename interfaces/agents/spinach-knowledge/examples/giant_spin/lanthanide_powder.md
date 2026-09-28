@@ -8,26 +8,8 @@ Powder spectrum of Gd(III) with ZFS up to 4th spherical rank using the giant spi
 
 ## Physical / mathematical content
 
-- Giant-spin examples. The effective model treats lanthanides or high-spin centres using crystal-field / Stevens-operator Hamiltonians, Zeeman splitting, and magnetisation dynamics.
+This is a single effective Gd(III) giant spin (E8) with isotropic Zeeman scalar 1.9918 and giant-spin terms through rank 4. The source sets the rank-1 and rank-3 coefficient arrays to zero; the rank-2 array is [0, 0, -4.65e8, 0, 0], and the rank-4 array is [-2.00e5, 0, 0, 0, 3.34e6, 0, 0, 0, -2.00e5]. All four giant-spin Euler-angle arrays are [0, 0, 0].
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Powder spectrum of Gd(III) with ZFS up to 4th spherical rank
-- using the giant spin Hamiltonian formalism in a sweepable 400
-- MHz NMR magnet and microwaves at 263.2 GHz. Odd ranks are zero
-- because a zero-field Hamiltonian must be even under time rever-
-- sal. The 4th rank terms are converted from the Stevens parame-
-- ters b40=4e-4 cm^-1 and b44=-2e-4 cm^-1 reported for Gd(III)
-- in tetragonal BaTiO3 by Rimai and deMars:
-- Calculation time: seconds.
-- Spin system properties
-- Field sweep
-- Basis set
-- Spinach housekeeping
-- Experiment parameters
-- Run the simulation in the high-T approximation
-- Plotting
+The calculation uses a 1 T magnet and the zeeman-hilb basis with no approximation. It samples orientations on rep_2ang_100pts_sph, uses 263.2 GHz microwaves, linewidth parameter 2e-4, int_tol 10.0 and tm_tol 0.1, and sweeps 4096 points over [9.32, 9.56] T with rspt_order set to Inf. The initial state is the negative E8 Lz operator; fieldsweep computes the spectrum, which is plotted against its returned field axis.

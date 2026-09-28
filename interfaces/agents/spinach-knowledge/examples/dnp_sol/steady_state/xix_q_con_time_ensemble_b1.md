@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Simulation of XiX DNP contact time dependence in the steady state with electron Rabi frequency ensemble. Calculation time: hours.
+Calculates steady-state proton polarisation versus XiX contact time while averaging over an ensemble of electron microwave-field (Rabi-frequency) values.
 
-## Physical / mathematical content
+## Model and ensemble
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The source models a trityl electron–proton pair at 1.2142 T and 80 K, with 3.5 nm separation and orientation-dependent proton relaxation from `r1n_dnp`. It uses T1/T2 relaxation, diagonal relaxation terms and the `dibari` equilibrium, with the full spherical-tensor Liouville basis and no basis approximation. Five Gauss–Legendre nodes span microwave-field values of 10–20 MHz; their weights are used to average the calculated proton signal.
 
-## Numerical / algorithmic content
+## XiX scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of XiX DNP contact time dependence in the
-- steady state with electron Rabi frequency ensemble.
-- Calculation time: hours.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+The experiment detects proton `Lz` on an 800-point two-angle spherical powder grid. It scans 1–64 XiX loops using 48 ns pulses (the second pulse has inverted phase); the contact time is twice the loop count times the pulse duration. For each field node and loop count, the steady state is computed with `powder(...,@xixdnp_steady,...,'esr')`. The source sets 153 μs shot spacing minus the total pulse duration, and uses −13 MHz added shift and +61 MHz electron offset. The field-weighted real proton expectation value is plotted against contact time and saved as `xix_q_con_time_ensemble_b1.fig`.

@@ -4,24 +4,16 @@
 
 ## Purpose
 
-Delicate action and commutation tests for Hilbert-Liouville conversion and Stevens operators.
+Tests Hilbert-to-Liouville operator actions and the first-rank Stevens-to-Pauli mapping.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+For random complex 6-by-6 matrices `H` and `R`, the script checks that the left, right, commutator, and anticommutator Liouville operators generated from `H` act on the vectorized `R` as `H*R`, `R*H`, `H*R-R*H`, and `H*R+R*H`. It also compares first-rank Stevens operators with the Pauli Cartesian operators at multiplicities 2, 3, 5, and 8.
 
 ## Numerical / algorithmic content
 
+All action and operator-mapping residuals use the fixed threshold `1e-10`. Liouville action residuals are measured with the vector 2-norm; Stevens/Pauli differences use the Frobenius norm. A residual above threshold raises an error.
+
 ## Implementation structure
 
-- Delicate action and commutation tests for Hilbert-Liouville
-- conversion and Stevens operators.
-- Accuracy threshold
-- Test Hilbert-Liouville conversion identities
-- Build Hilbert-space products for vectorization checks
-- Compare left, right, commutator and anticommutator actions
-- Report Hilbert-Liouville conversion failures
-- Test first-rank Stevens operators against Pauli operators
-- Build Stevens and Pauli operators
-- Compare first-rank operators
-- Report first-rank Stevens failures
+The first test builds the four Liouville representations and compares their action on `hilb2liouv(R,'statevec')` with explicitly formed Hilbert-space products. The second loops over multiplicities, obtains the Pauli and rank-1 Stevens operators, and checks `O_10=L.z`, `O_11=L.x`, and `O_1m1=L.y` before reporting success.

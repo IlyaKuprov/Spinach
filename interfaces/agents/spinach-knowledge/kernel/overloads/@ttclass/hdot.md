@@ -4,35 +4,16 @@
 
 ## Purpose
 
-Hadamard dot product between two tensor train matrices. Syntax: c=hdot(a,b)
+Computes the Hadamard dot product of two tensor-train matrices.
 
-## Physical / mathematical content
+## Inputs
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `a`, `b` — tensor-train objects representing arrays with the same dimensions and internal topology.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `c` — scalar Hadamard dot product of `a` and `b`.
 
-- a,b -tensor train objects representing numerical
-- arrays of the same dimensions and having
-- the same internal topology
+## Behavior
 
-## Outputs
-
-- c -Hadamard product of a and b, a scalar
-
-## Implementation structure
-
-- Hadamard dot product between two tensor train matrices. Syntax:
-- c=hdot(a,b)
-- a,b -tensor train objects representing numerical
-- arrays of the same dimensions and having
-- the same internal topology
-- c -Hadamard product of a and b, a scalar
-- Check consistency
-- Read topology and initialize the answer
-- Loop over TT buffers
-- Multiply coefficients
-- Loop over TT cores and compute dot product
-- Add to the total
+The function requires both inputs to be `ttclass` objects with the same number of cores and matching mode sizes. For each pair of train-buffer entries, it reshapes corresponding core data, forms `core_a' * core_b` while iterating over cores, and adds the resulting `x` to `c`.

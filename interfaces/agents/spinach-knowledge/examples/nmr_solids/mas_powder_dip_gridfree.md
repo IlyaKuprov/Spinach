@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Powder magic angle spinning spectrum of a pair of dipole-coupled proton spins using grid-free Fokker-Planck equation formalism. Calculation time: minutes
+Computes a powder MAS spectrum for two dipole-coupled protons with the grid-free Fokker–Planck method. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The system has two `1H` spins, isotropic Zeeman shifts 5.0 and -2.0, coordinates `[0 0 0]` and `[0 3.9 0.1]`, and a 14.1 T field.
+- The rotor axis is `[1 1 1]` at 1000 Hz. The initial state and detected operator are both `L+` on `1H`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the spherical-tensor Liouville-space basis with no approximation and projection +1; maximum rank is 15.
+- The grid-free acquisition returns 512 points over a `2e4` sweep, zero-filled to 4096. The code applies exponential apodisation parameter 6 before Fourier transformation.
 
 ## Implementation structure
 
-- Powder magic angle spinning spectrum of a pair of dipole-coupled
-- proton spins using grid-free Fokker-Planck equation formalism.
-- Calculation time: minutes
-- System specification
-- Basis set
-- Spinach housekeeping
-- Parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+- Define the two-spin system and basis, build the Spinach system, configure acquisition and MAS parameters, run `gridfree(spin_system,@acquire,parameters,'nmr')`, apodise, Fourier transform, and plot.

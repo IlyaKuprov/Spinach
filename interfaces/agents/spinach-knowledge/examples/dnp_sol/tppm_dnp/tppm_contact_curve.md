@@ -4,27 +4,12 @@
 
 ## Purpose
 
-The transformation of -E_z into I_z during the contact time of the TPPM DNP experiment. Further information in: Calculation time: seconds
+Plots the proton (I_z) expectation value during the contact period of a TPPM DNP experiment. The source estimates a runtime of seconds.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The Q-band model has one electron and two protons at 80 K. It uses 33 MHz electron nutation frequency, 16 ns pulses, 250 TPPM blocks, and a second-pulse phase of 120°. The microwave offset is ((-13+4)) MHz relative to the sequence reference. A 400-point spherical powder average calls `xixdnp` with the sequence parameters configured for this TPPM example; the resulting proton signal is plotted against contact time.
 
-## Numerical / algorithmic content
+## Reference
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- The transformation of -E_z into I_z during the contact time
-- of the TPPM DNP experiment. Further information in:
-- Calculation time: seconds
-- Q-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Basis set
-- Spinach housekeeping
-- Detection state
-- Experiment parameters
+[Redrouthu et al., DOI: 10.1063/5.0153053](https://doi.org/10.1063/5.0153053).

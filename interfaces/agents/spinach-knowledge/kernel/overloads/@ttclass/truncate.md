@@ -8,23 +8,20 @@ Performs right-to-left SVD recompression for a tensor train. This should not be 
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- Right-to-left SVD recompression of a single tensor train.
 
 ## Numerical / algorithmic content
 
-The absolute Frobenius tolerance is converted to relative accuracy using the magnitude of the global coefficient, so negative and complex coefficients retain their phase without changing the error budget. Use `shrink` for public compression; it handles zero coefficients before truncation.
+The relative approximation accuracy is `tt.tolerance(1,1)/abs(tt.coeff(1,1))/sqrt(tt.ncores)`. The routine sweeps over cores from right to left, truncates each SVD using `frob_chop`, then normalizes the first core and transfers that norm to `ttout.coeff`.
 
 ## Parameters / inputs
 
-- tt -a tensor train object with tt.ntrains=1
-- and orthogonalised left-to-right
+- `tt` — a single tensor train (`tt.ntrains=1`), orthogonalised left-to-right.
+- Approximation tolerance in Frobenius norm is read from `tt.tolerance`.
 
 ## Outputs
 
-- ttout -a tensor train object, orthogonalised
-- right-to-left
-- Note: approximation tolerance (in Frobenius norm) is read from
-- tt.tolerance property.
+- `ttout` — the tensor train, orthogonalised right-to-left.
 
 ## Header notes
 

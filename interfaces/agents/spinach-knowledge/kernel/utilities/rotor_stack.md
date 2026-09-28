@@ -4,60 +4,30 @@
 
 ## Purpose
 
-Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for the traditional style calculation of MAS dynamics. Syntax: L=rotor_stack(spin_system,parameters,assumptions)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-The explicit `assumptions` argument governs Hamiltonian construction and numerical rotating-frame transformations alike, independently of any prior `assume` call on the input object. Nonempty `parameters.rframes` requires laboratory-frame assumptions on the transformed spins. Numerical frames on the carrier-free `se_dnp_h+`, `se_dnp_h-`, and `se_dnp_h0` components are not implemented; empty-frame component stacks remain valid.
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Returns a rotor stack of Liouvillians or Hamiltonians for traditional-style calculations of magic-angle spinning (MAS) dynamics. Syntax: `L=rotor_stack(spin_system,parameters,assumptions)`.
 
 ## Parameters / inputs
 
-- parameters.axis -spinning axis, given as a normalized
-- 3-element vector
-- parameters.offset -a cell array giving transmitter off-
-- sets in Hz on each of the spins listed
-- in parameters.spins array
-- parameters.spins -a cell array giving the spins that
-- the offsets refer to, e.g. {'1H','13C'}
-- parameters.max_rank -maximum harmonic rank to retain in
-- the solution (increase till conver-
-- gence is achieved, approximately
-- equal to the number of spinning si-
-- debands in the spectrum)
-- parameters.rframes -rotating frame specification, e.g.
-- {{'13C',2},{'14N,3}} requests second
-- order rotating frame transformation
-- with respect to carbon-13 and third
-- order rotating frame transformation
-- with respect to nitrogen-14. When
-- this option is used, the assumptions
-- on the respective spins should be
-- laboratory frame.
-- parameters.orientation -the orientation of the spin system
-- at rotor phase zero, a vector of
-- three Euler angles in radians.
-- parameters.masframe -the frame in which the rotations
-- are applied. The possibilities are:
-- 'magnet' -the initial orientation in the lab frame
-- (three-angle powder grids will be required)
-- 'rotor' -the initial orientation in the rotor frame
-- (two-angle powder grids will be required)
-- assumptions -assumption set to be used in generating the
-- Hamiltonian and numerical rotating-frame validation, regardless of the input object's prior assumptions. The transformed spins must remain in the laboratory frame under this set; already-rotating spins are rejected by `rotframe`. See `assume.m`.
+- `parameters.axis`: Spinning axis as a normalized three-element row vector.
+- `parameters.offset`: Transmitter offsets in Hz, corresponding element by element to `parameters.spins`. The header comment calls this a cell array; the executable validation instead rejects nonnumeric values and requires a nonempty numeric array of the same length as `parameters.spins`. The validation’s error text describes the array as real.
+- `parameters.spins`: Nonempty cell array of spin identifiers that the offsets refer to, for example `{'1H','13C'}`. Each identifier must refer to a spin present in the system.
+- `parameters.max_rank`: Maximum harmonic rank retained in the solution, approximately equal to the number of spinning sidebands in the spectrum. Increase it until the result converges. The implementation constructs `2*parameters.max_rank+1` rotor ticks.
+- `parameters.rframes`: Cell array of numerical rotating-frame specifications. For example, `{{'13C',2},{'14N',3}}` requests a second-order transformation for carbon-13 and a third-order transformation for nitrogen-14. Use an empty cell array when no such transformations are needed.
+- `parameters.orientation`: Initial orientation of the spin system at rotor phase zero, as three Euler angles in radians.
+- `parameters.masframe`: Frame in which rotations are applied. `'magnet'` specifies an initial orientation in the laboratory frame and requires three-angle powder grids; `'rotor'` specifies an initial orientation in the rotor frame and requires two-angle powder grids.
+- `assumptions`: Assumption set used to generate the Hamiltonian and validate numerical rotating frames, regardless of prior assumptions on the input object. It is passed to `assume` before Hamiltonian construction. Spins named in `parameters.rframes` must remain in the laboratory frame under this set; `rotframe` rejects already-rotating spins. See `assume.m`.
+
+## Numerical-frame caveats
+
+Numerical frames on the carrier-free `se_dnp_h+`, `se_dnp_h-`, and `se_dnp_h0` components are not implemented. Component stacks with empty `parameters.rframes` remain valid.
 
 ## Outputs
 
-- L -a cell array of Hamiltonian or Liouvillian matrices,
-- one for each tick of the rotor.
-- rotor_phases -rotor phases at each tick, radians
-- Note: relaxation and chemical kinetics are not included.
+- `L`: Cell array of Hamiltonian or Liouvillian matrices, one per rotor tick.
+- `rotor_phases`: Rotor phase at each tick, in radians.
 
-## Header notes
+Relaxation and chemical kinetics are not included.
 
-The spinning axis is a normalised three-vector; transmitter offsets are in hertz for the entries in parameters.spins. Increase the retained harmonic rank until the requested rotor-stack result is converged.
+Contact: `ilya.kuprov@weizmann.ac.il`
+
+<https://spindynamics.org/wiki/index.php?title=rotor_stack.m>

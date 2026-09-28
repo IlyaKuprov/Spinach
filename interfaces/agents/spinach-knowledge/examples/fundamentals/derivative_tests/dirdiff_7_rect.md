@@ -4,28 +4,14 @@
 
 ## Purpose
 
-Directional derivative test for the phase-modulated GRAPE module, with an ensemble of chained linear and non-linear instrumental distortions of the waveform.
+Checks directional derivatives returned by phase-modulated GRAPE for a rectangular pulse and an ensemble of chained waveform distortions.
 
-## Physical / mathematical content
+## Setup
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The test runs with sphten-liouv, zeeman-liouv, and zeeman-hilb. For each formalism it builds the system with dirdiff_test_system and sets a 13C control channel, channel map [1;1], drift H, controls Lx and Ly, initial states Sx, Sy, Sz, and targets −Sz, Sy, Sx. The power levels are 2*pi*linspace(50e3,70e3,10); GRAPE uses lbfgs, up to 1000 iterations, and the rectangle integrator.
 
-## Numerical / algorithmic content
+There are five pulse intervals, each 12.8e-6 s, with unit amplitudes. Two distortion chains are applied: firf(w,[0.9 0.1i]) → spf(w,0.2) → szf(w,0.2) → amp_root(w,2*pi*20e3,4), and the reverse ordering szf(w,0.2) → spf(w,0.2) → amp_root(w,2*pi*20e3,4) → firf(w,[0.9 0.1i]).
 
-## Implementation structure
+## Derivative check
 
-- Directional derivative test for the phase-modulated GRAPE
-- module, with an ensemble of chained linear and non-linear
-- instrumental distortions of the waveform.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Define an ensemble of distortion chains
-- Set the interval grid
-- Spinach housekeeping
-- Random phases and finite diff increment
-- Call GRAPE and request analytical gradient
+For a random five-sample phase vector randn(1,5)/3, the code obtains the analytical gradient from grape_phase and estimates derivatives with centered finite differences using h=sqrt(eps('double')). It checks samples 1, 5, and 3 (left edge, right edge, and midpoint). Each must satisfy abs(grad_anl-grad_num)/abs(grad_num)<1e-6; a failed comparison raises an error identifying the formalism and sample position.

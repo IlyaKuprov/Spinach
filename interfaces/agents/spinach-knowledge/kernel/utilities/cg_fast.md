@@ -4,43 +4,20 @@
 
 ## Purpose
 
-Clebsch-Gordan coefficient: the coefficient in front of Y(L,M) spheri- cal harmonic in the expansion of the product of Y(L1,M1) and Y(L2,M2) spherical harmonics. In the more general sense, the coefficient refers to the expansion coefficient of |L,M> angular momentum or spin state in the product basis of |L1,M1>|L2,M2> states. Syntax: cg=cg_fast(L,M,L1,M1,L2,M2)
+Computes the Clebsch-Gordan coefficient of `Y(L,M)` in the product expansion of `Y(L1,M1)` and `Y(L2,M2)`. Equivalently, it gives the expansion coefficient of the angular-momentum or spin state `|L,M>` in the product basis `|L1,M1>|L2,M2>`.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+Only combinations allowed by the selection rules for spherical harmonics or spin states are admissible. The function returns zero for inadmissible indices.
 
 ## Numerical / algorithmic content
 
+Staged zero tests reject inadmissible combinations before a log-factorial summation evaluates the coefficient. The double-precision result is accurate to about `1e-3` up to about `L=20`; for higher ranks, `clebsch_gordan.m` provides a slower machine-precision implementation.
+
 ## Parameters / inputs
 
-- L,M,L1,M1,L2,M2 -integer or half-integer indices of
-- the angular momentum or spin states
+- `L, M, L1, M1, L2, M2` — integer or half-integer indices of the angular-momentum or spin states
 
 ## Outputs
 
-- cg -floating-point (double precision)
-- Clebsch-Gordan coefficient
-- Note: only some combinations of L,M,L1,M1,L2,M2 are allowed by the pro-
-- perties of spherical harmonics and spin states. If inadmissible
-- indices are supplied, zero is returned.
-- Note: CG coefficient calculation in double-precision arithmetic is not
-- a trivial matter for high ranks. This function produces fast ans-
-- wers with an accuracy of about 1e-3 up to about L=20. A slower
-- machine precision implementation for higher ranks is available
-- in clebsch_gordan.m function.
-
-## Implementation structure
-
-- Clebsch-Gordan coefficient: the coefficient in front of Y(L,M) spheri-
-- cal harmonic in the expansion of the product of Y(L1,M1) and Y(L2,M2)
-- spherical harmonics. In the more general sense, the coefficient refers
-- to the expansion coefficient of |L,M> angular momentum or spin state
-- in the product basis of |L1,M1>|L2,M2> states. Syntax:
-- cg=cg_fast(L,M,L1,M1,L2,M2)
-- L,M,L1,M1,L2,M2 -integer or half-integer indices of
-- the angular momentum or spin states
-- cg -floating-point (double precision)
-- Clebsch-Gordan coefficient
-- Note: only some combinations of L,M,L1,M1,L2,M2 are allowed by the pro-
-- perties of spherical harmonics and spin states. If inadmissible
+- `cg` — double-precision floating-point Clebsch-Gordan coefficient

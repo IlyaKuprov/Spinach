@@ -4,40 +4,18 @@
 
 ## Purpose
 
-Linear least squares fitter for residual dipolar couplings. Iso- tope pairs are arbitrary heteronuclear; multiple isotope pairs may be supplied at the same time. Syntax: S=rdc_fit(isotopes,xyz,rdc)
-
-## Physical / mathematical content
-
-- Residual-dipolar-coupling experiment and analysis routines. These files use partial ordering, Saupe tensors, and molecular-frame geometry to connect internuclear vectors with observed couplings.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+Fits a Saupe order matrix to residual dipolar coupling (RDC) measurements by linear least squares. Heteronuclear isotope pairs may differ between observations.
 
 ## Numerical / algorithmic content
 
+For each pair, the routine obtains the dipolar coupling tensor from `xyz2dd` and extracts its rank-2 spherical-tensor components. It solves the linear least-squares system with the `2*pi*rdc` data vector, scales the solution by `3/2`, and converts the fitted components to a real `3x3` matrix.
+
 ## Parameters / inputs
 
-- isotopes -N x 2 cell array of strings with Spinach
-- isotope specifications, e.g. '13C'
-- xyz -N x 2 cell array of 3-element vectors
-- with Cartesian coordinates in Angstrom
-- rdc -N x 1 vector with residual dipolar coup-
-- lings in Hz
+- `isotopes` — `N x 2` cell array of Spinach isotope-specification strings (for example, `'13C'`); the two isotopes in each pair must differ.
+- `xyz` — `N x 2` cell array containing the two Cartesian coordinate vectors for each pair, in Angstroms.
+- `rdc` — `N x 1` vector of residual dipolar couplings in Hz.
 
-## Outputs
+## Output
 
-- S -Saupe order matrix, a symmetric real
-- dimensionless 3x3 matrix
-
-## Implementation structure
-
-- Linear least squares fitter for residual dipolar couplings. Iso-
-- tope pairs are arbitrary heteronuclear; multiple isotope pairs
-- may be supplied at the same time. Syntax:
-- S=rdc_fit(isotopes,xyz,rdc)
-- isotopes -N x 2 cell array of strings with Spinach
-- isotope specifications, e.g. '13C'
-- xyz -N x 2 cell array of 3-element vectors
-- with Cartesian coordinates in Angstrom
-- rdc -N x 1 vector with residual dipolar coup-
-- lings in Hz
-- S -Saupe order matrix, a symmetric real
-- dimensionless 3x3 matrix
+- `S` — real, symmetric, dimensionless `3x3` Saupe order matrix.

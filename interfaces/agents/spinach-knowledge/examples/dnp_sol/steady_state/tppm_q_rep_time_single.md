@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Simulation of TPPM DNP repetition time scan in the steady state. Calculation time: seconds.
+Calculates the steady-state proton polarisation produced by a two-spin trityl–proton model under TPPM microwave irradiation, scanning the pulse repetition interval and plotting the detected proton `Lz` expectation value.
 
-## Physical / mathematical content
+## Physical and numerical model
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The model uses an electron and a proton at a 1.2142 T Q-band field, with trityl principal g values [2.00319, 2.00319, 2.00258], an 80 K spin temperature, and a 3.5 Å electron–nuclear separation. The relaxation model uses T1/T2 rates, including a distance- and orientation-dependent proton rate from `r1n_dnp`; the equilibrium is set to `dibari`, and only diagonal relaxation terms are retained. The spin system is represented in the full spherical-tensor Liouville formalism (`sphten-liouv`, no basis approximation).
 
-## Numerical / algorithmic content
+## Experiment and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of TPPM DNP repetition time scan in the
-- steady state.
-- Calculation time: seconds.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+The experiment detects proton `Lz`, uses an 800-point two-angle powder grid, and evaluates 30 logarithmically spaced repetition times from 10 μs to about 2 ms. Each point is computed by `powder(...,@xixdnp_steady,...,'esr')` with the source's TPPM pulse settings (including 120° second-pulse phase, −13 MHz added shift, and +2 MHz electron offset). The plotted real proton expectation value is saved as `tppm_q_rep_time_single.fig`.

@@ -4,32 +4,25 @@
 
 ## Purpose
 
-Counts non-zero elements in all cores of a tensor train. Syntax: answer=nnz(ttrain)
+Counts nonzero entries across the cores of a tensor train.
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+For each core, MATLAB `nnz` counts its nonzero entries; the function sums those counts over all cores. It does not expand the represented tensor.
 
 ## Numerical / algorithmic content
 
+The implementation applies `nnz` to each cell in `ttrain.cores`, then sums the resulting counts.
+
 ## Parameters / inputs
 
-- ttrain -tensor train object
+- ttrain - tensor train object
 
 ## Outputs
 
-- answer -number of non-zero elements in all tensor train cores
+- answer - number of nonzero elements across all tensor train cores
 
 ## Implementation structure
 
-- Counts non-zero elements in all cores of a tensor train. Syntax:
-- answer=nnz(ttrain)
-- ttrain -tensor train object
-- answer -number of non-zero elements in all tensor train cores
-- Count the non-zeros
-- Men have always been and forever would remain silly victims of lies and
-- self-deceit in politics, until they learn to see, behind any moral, re-
-- ligious, political or social statements, proclamations and promises the
-- interests of specific social classes.
-- Vladimir Lenin
-- #NGRUM
+- Apply `nnz` to every core with `cellfun`.
+- Sum the per-core counts.

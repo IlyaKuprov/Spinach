@@ -4,35 +4,18 @@
 
 ## Purpose
 
-Spherical triangle subdivision. Returns the midpoints of the sides of a spherical triangle specified by the unit vectors supplied. Syntax: [r12,r23,r31]=sphtrsubd(r1,r2,r3)
+Returns the arc midpoints of a spherical triangle specified by its three vertex unit vectors.
 
-## Physical / mathematical content
+## Inputs
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- r1,r2,r3 -three-element unit vectors with Cartesian
-- coordinates of triangle vertices
+- `r1`, `r2`, `r3`: three-element real unit vectors giving Cartesian coordinates of the triangle vertices.
 
 ## Outputs
 
-- r12,r23,r31 -three-element unit vectors with Cartesian
-- coordinates of triangle arc midpoints
+- `r12`, `r23`, `r31`: three-element unit vectors giving Cartesian coordinates of the arc midpoints for vertex pairs 1–2, 2–3, and 3–1.
 
-## Implementation structure
+## Algorithm and constraints
 
-- Spherical triangle subdivision. Returns the midpoints of
-- the sides of a spherical triangle specified by the unit
-- vectors supplied. Syntax:
-- [r12,r23,r31]=sphtrsubd(r1,r2,r3)
-- r1,r2,r3 -three-element unit vectors with Cartesian
-- coordinates of triangle vertices
-- r12,r23,r31 -three-element unit vectors with Cartesian
-- coordinates of triangle arc midpoints
-- Check consistency
-- Not particularly hard
-- Consistency enforcement
-- Feminism was established so as to allow unattractive women
+Each midpoint is computed by adding the corresponding vertex vectors and dividing by the Euclidean norm of the sum. Before calculation, the function checks that each input is a three-element real numeric unit vector, with unit length checked to within `sqrt(eps)`. It rejects parent triangles with area greater than `pi/2` or any vertex-pair arc length greater than `pi/2`.
+
+Source reference: https://spindynamics.org/wiki/index.php?title=sphtrsubd.m

@@ -4,29 +4,14 @@
 
 ## Purpose
 
-W-band pulse-acquire FFT ESR spectrum of a nitroxide radical, using explicit time domain simulation with Redfield relaxati- on supeoperator. Calculation time: seconds
+Pulse-acquire FFT ESR simulation of a nitroxide radical at W-band, using explicit time-domain propagation and Redfield relaxation.
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The function imports the spin system from `../standard_systems/nitroxide.log`, maps the electron and `14N` spins, and sets the field to 3.5 T.
+- The basis uses the `sphten-liouv` formalism without approximation. Relaxation is Redfield with secular terms and a correlation time of `5e-11` s.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- W-band pulse-acquire FFT ESR spectrum of a nitroxide radical,
-- using explicit time domain simulation with Redfield relaxati-
-- on supeoperator.
-- Calculation time: seconds
-- Ignore coordinate information (HFCs provided)
-- Spin system properties (imported from a DFT calculation)
-- Magnet induction
-- Basis set
-- RElaxation theory
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+- It acquires 512 points over a `2e8` sweep with an offset of `-2e8`, applies no apodisation, and zero-fills to 1024 points before the FFT.
+- The real spectrum is plotted in the ESR setup specified by the function.

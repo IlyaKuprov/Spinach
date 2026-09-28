@@ -4,41 +4,22 @@
 
 ## Purpose
 
-Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resolution. Syntax: [spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Crops a two-dimensional spectrum to user-specified frequency-axis ranges in ppm while preserving the digital resolution and updating the axis parameters for the retained points.
 
 ## Parameters / inputs
 
-- spec -2D matrix containing the spectrum
-- crop_ranges -cropping bounds, supplied in the following
-- format: {[f1_min f1_max],[f2_min f2_max]}
-- The following subfields are required in the parameters structure:
-- parameters.sweep -one or two sweep widths, Hz
-- parameters.spins -cell array with one ot two character
-- strings specifying the working spins.
-- parameters.offset -one or two transmitter offsets, Hz
+- `spin_system` — Spinach spin-system structure, used to convert frequency axes to ppm.
+- `spec` — two-dimensional matrix containing the spectrum.
+- `parameters.sweep` — one or two sweep widths in Hz.
+- `parameters.spins` — cell array containing one or two working-spin isotope names; a single spin is used for both dimensions.
+- `parameters.offset` — one or two transmitter offsets in Hz.
+- `crop_ranges` — two-element cell array, `{[f1_min f1_max],[f2_min f2_max]}`; each pair gives ascending ppm bounds within its spectrum axis.
+
+## Numerical / algorithmic content
+
+The routine constructs each axis with `ft_axis`, converts it to ppm using the isotope gyromagnetic ratio and the spin-system magnetic field, and selects the array indices bracketing the requested ranges. Bounds outside the available axes are rejected. The returned `parameters.zerofill`, `parameters.sweep`, and `parameters.offset` are recalculated from the retained points and their original digital resolution.
 
 ## Outputs
 
-- spec -2D matrix containing the cropped spectrum
-- parameters -the updated parameters structure; the new
-- offset, sweep, and zerofill reproduce the
-- retained axis points on the ft_axis grid
-
-## Implementation structure
-
-- Crops 2D spectra to user-specified ranges (in ppm), respecting the
-- digital resolution. Syntax:
-- [spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)
-- spec -2D matrix containing the spectrum
-- crop_ranges -cropping bounds, supplied in the following
-- format: {[f1_min f1_max],[f2_min f2_max]}
-- The following subfields are required in the parameters structure:
-- parameters.sweep - one or two sweep widths, Hz
-- parameters.spins - cell array with one ot two character
-- strings specifying the working spins.
-- parameters.offset - one or two transmitter offsets, Hz
-- spec -2D matrix containing the cropped spectrum
+- `spec` — cropped two-dimensional spectrum.
+- `parameters` — updated parameters; the new offset, sweep, and zerofill reproduce the retained axis points on the `ft_axis` grid.

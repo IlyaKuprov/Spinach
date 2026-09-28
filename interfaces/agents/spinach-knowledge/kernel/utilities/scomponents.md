@@ -4,13 +4,7 @@
 
 ## Purpose
 
-Strongly connected components of a graph, David Gleich's imple- mentation of Tarjan's algorithm:
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Finds the strongly connected components of a graph using David Gleich's implementation of Tarjan's algorithm. Reference: http://dx.doi.org/10.1137/0201010
 
 ## Syntax
 
@@ -20,26 +14,16 @@ sci=scomponents(A)
 
 ## Parameters / inputs
 
-- A -a logical square matrix with 1 for the
-- connected nodes in the graph
+- `A` — a square logical matrix with 1 for connected nodes in the graph. The function rejects inputs that are not square logical matrices.
 
 ## Outputs
 
-- sci -a column vector with integers that spe-
-- cify the strongly conected component
-- that each node of the graph belongs to
+- `sci` — a column vector of integers specifying the strongly connected component to which each graph node belongs.
 
 ## Implementation structure
 
-- Strongly connected components of a graph, David Gleich's imple-
-- mentation of Tarjan's algorithm:
-- sci=scomponents(A)
-- A - a logical square matrix with 1 for the
-- connected nodes in the graph
-- sci - a column vector with integers that spe-
-- cify the strongly conected component
-- that each node of the graph belongs to
-- Check consistency
-- Get the CSR indices
-- Run Tarjan's algorithm
-- Consistency enforcement
+The function checks the input with `grumble(A)`, obtains CSR indices with `[rp,ci]=sparse2csr(sparse(A))`, and runs Tarjan's algorithm. Component numbers start at 1 and are assigned as components are found.
+
+Contacts: dgleich@purdue.edu; ilya.kuprov@weizmann.ac.il
+
+<https://spindynamics.org/wiki/index.php?title=scomponents.m>

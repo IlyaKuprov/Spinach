@@ -4,21 +4,8 @@
 
 ## Purpose
 
-Internal consistency of Blicharski invariants and their polarisation relationships with inner products of irre- ducible spherical tensor coefficients, second rank.
+Checks rank-2 Blicharski invariants against the corresponding spherical-tensor coefficient products, for individual tensors and a cross-product of two tensors.
 
-## Physical / mathematical content
+## Checks
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Internal consistency of Blicharski invariants and their
-- polarisation relationships with inner products of irre-
-- ducible spherical tensor coefficients, second rank.
-- Random tensors
-- Spherical expansions
-- Blicharski invariants
-- Blicharski against Phi products, rank 2 self
-- Blicharski against Phi product, rank 2 cross
+The test draws two random 3×3 tensors, converts each to spherical coefficients with `mat2sphten`, and obtains the self-invariants with `blinv` and the cross-invariant with `blprod`. It compares the rank-2 coefficient expressions with (2/3) times each self-invariant and with (2/3) times the cross-invariant. Every residual must be no larger than 10 eps; otherwise the corresponding test fails.

@@ -4,40 +4,27 @@
 
 ## Purpose
 
-FIR convolution kernel estimation from input and output signal samples. Syntax: h=kernelest(x,y,ker_len,method,align,lambda)
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-
-## Numerical / algorithmic content
-
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+Estimate an FIR convolution kernel from input and output signal samples on the same uniform grid.
 
 ## Parameters / inputs
 
-- x -input samples on a uniform grid
-- y -output samples on the same grid
-- ker_len -kernel length (number of taps)
-- method -'backslash' (default) | 'pinv' | 'svd' | 'tikh'
-- align -'causal' (default) or 'same' output alignment
-- lambda -Tikhonov parameter for 'tikh' (optional)
+- `x` — numeric vector of input samples.
+- `y` — numeric vector of output samples, with the same length as `x`.
+- `ker_len` — positive integer kernel length, in taps.
+- `method` — solution method: `'backslash'` (default), `'pinv'`, `'svd'`, or `'tikh'`.
+- `align` — output alignment: `'causal'` (default) or `'same'`.
+- `lambda` — positive real scalar Tikhonov parameter for `'tikh'`; defaults to `1e-6`.
 
-## Outputs
+## Output
 
-- h -estimated convolution kernel
+- `h` — estimated convolution kernel.
 
-## Implementation structure
+## Numerical method
 
-- FIR convolution kernel estimation from input and output signal
-- samples. Syntax:
-- h=kernelest(x,y,ker_len,method,align,lambda)
-- x -input samples on a uniform grid
-- y -output samples on the same grid
-- ker_len -kernel length (number of taps)
-- method -'backslash' (default) | 'pinv' | 'svd' | 'tikh'
-- align -'causal' (default) or 'same' output alignment
-- lambda -Tikhonov parameter for 'tikh' (optional)
-- h -estimated convolution kernel
-- Set the defaults
-- Check consistency
+The function builds a Toeplitz convolution matrix from `x`, then selects either its first `numel(x)` rows for `'causal'` alignment or a central block starting at `floor(ker_len/2)+1` for `'same'` alignment. It solves the resulting system with MATLAB backslash, a pseudoinverse, a truncated-SVD pseudoinverse, or Tikhonov regularisation, according to `method`. The truncated-SVD method discards singular values at or below `max(size(sys_mat))*eps(max(s_vals))`; the Tikhonov method solves `(sys_mat'*sys_mat+lambda*eye(ker_len))*h=sys_mat'*y`.
+
+The function checks input types, sample counts, kernel length, and `lambda`, and rejects unknown methods or alignment choices.
+
+## Reference
+
+- [Spinach documentation for `kernelest.m`](https://spindynamics.org/wiki/index.php?title=kernelest.m)

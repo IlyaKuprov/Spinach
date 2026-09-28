@@ -8,13 +8,11 @@ TPPM DNP and its special case X-inverse-X (XiX) DNP experiment from (https://doi
 
 ## Physical / mathematical content
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+At each microwave offset, the function builds phase-dependent pulse and delay propagators from `L=H+1i*R+1i*K`, then computes the steady-state detected signal.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The steady-state density is obtained with `steady(...,'newton')`; the function evaluates the coil overlap for each requested resonance offset.
 
 ## Parameters / inputs
 
@@ -46,15 +44,4 @@ TPPM DNP and its special case X-inverse-X (XiX) DNP experiment from (https://doi
 
 ## Implementation structure
 
-- TPPM DNP and its special case X-inverse-X (XiX) DNP experiment
-- from (https://doi.org/10.1021/jacs.1c09900), steady state ver-
-- sion. Call from powder context. Syntax:
-- dnp=xixdnp_steady(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from
-- context function
-- R -relaxation superoperator, received
-- from context function, must be ther-
-- malised to some finite temperature
-- K -kinetics superoperator, received
-- from context function
-- parameters.irr_powers -microwave amplitude (aka electron
+The function validates inputs, constructs electron control operators, loops over `el_offs`, cleans the propagators, solves for the steady state, and stores `parameters.coil'*rho` in `dnp`.

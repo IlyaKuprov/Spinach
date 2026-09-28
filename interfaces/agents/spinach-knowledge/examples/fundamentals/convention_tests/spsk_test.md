@@ -4,19 +4,8 @@
 
 ## Purpose
 
-Test of the span-skew interaction convention.
+Checks the span-skew interaction convention implemented by `spsk2mat` against direct rotation of a diagonal tensor.
 
-## Physical / mathematical content
+## Method and check
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Test of the span-skew interaction convention.
-- Eigenvalues
-- Euler angles
-- Manual construction
-- Spinach construction
-- Difference
+The test draws three separated eigenvalues (`xx=rand()`, `yy=rand()+3`, and `zz=rand()+6`) and random Euler angles. It constructs `AM=R*diag([xx yy zz])*R'` directly, then computes the isotropic value, span, and skew parameters used by `spsk2mat` to form `AS`. The 1-norm of `AM-AS` must be below 10⁻⁶.

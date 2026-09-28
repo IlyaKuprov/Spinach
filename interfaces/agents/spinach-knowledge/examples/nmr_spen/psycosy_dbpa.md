@@ -8,24 +8,13 @@ PSYCOSY of DBPA (dibromopropionic acid) ring. Calculation time: minutes on NVidi
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The source defines a four-1H DBPA spin system at 14.1 T, with chemical shifts 4.49, 3.9, 3.7, and 4.2 ppm and nonzero scalar couplings of 11.3, 10.1, and 4.3 Hz. It models a 15 mm sample with 100 spatial points.
+- It runs `@psycosy` through Spinach's imaging function. The 2D acquisition uses 512 points per dimension, zero-filled to 1024, with a 600 Hz sweep and 2460 Hz offset; sequence settings include a 25 ms mixing time, 0.01 T/m gradient, and a 20° saltire chirp (15 ms pulse, 10 kHz sweep, 50 ms gradient duration).
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The simulated 2D FID is square-sine apodised along both dimensions and transformed by a 2D FFT. The script plots the magnitude of that spectrum.
 
 ## Implementation structure
 
-- PSYCOSY of DBPA (dibromopropionic acid) ring.
-- Calculation time: minutes on NVidia Tesla A100, much longer on CPU
-- Magnet
-- Spin system
-- Interactions
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Sample geometry
-- Diffusion and flow
-- Relaxation phantom
-- Initial and detection state phantoms
+- Creates the spin system and basis, sets sequence parameters, runs imaging, and processes and plots the spectrum.

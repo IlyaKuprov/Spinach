@@ -26,4 +26,4 @@ Draws an academic journal style letter label in the top left corner of the curre
 
 ## Internal Spinach / MATLAB structure cues
 
-- The grumbler requires `letter_label` to be a one-element character string.
+- The `grumble` helper requires `letter_label` to be a one-element character string.

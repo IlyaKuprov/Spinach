@@ -8,7 +8,7 @@ Truncates SVD decomposition to the user-specified threshold in the Frobenius nor
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Chooses a retained rank from singular-value vector `s` so the discarded tail has Frobenius norm below the requested tolerance `tol`.
 
 ## Numerical / algorithmic content
 
@@ -24,15 +24,4 @@ Truncates SVD decomposition to the user-specified threshold in the Frobenius nor
 
 ## Implementation structure
 
-- Truncates SVD decomposition to the user-specified threshold
-- in the Frobenius norm. Syntax:
-- r=frob_chop(s,tol)
-- s -a vector of singular values for a matrix,
-- in descending order
-- tol -truncation threshold
-- r -the number of singular values to keep
-- Remove tiny negative round-off artefacts
-- Check consistency
-- Project any remaining tiny negative round-off to zero
-- Find the cutting point
-- Treat the zero case
+- Converts `s` to a real column vector, zeros numerical noise below `numel(s)*eps*max(abs(s))`, and clamps remaining negative entries to zero. It accumulates squared singular values from the smallest upward, then returns the number retained so the discarded tail remains below `tol`; returns `0` if no singular values need retaining.

@@ -4,29 +4,22 @@
 
 ## Purpose
 
-A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using Fokker-Planck formalism. Zero-field split- ting distribution is sampled using the statistical parameters reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005). Powder average simulation with a third-order numerical rotating frame transformation. Calculation time: hours
+Simulates a soft-pulse spectrum of a gadolinium ion using the Fokker–Planck formalism, powder averaging, and a third-order numerical rotating-frame transformation. The zero-field-splitting (ZFS) distribution is sampled using statistical parameters reported in Figure 5 of Raitsimring et al., App. Mag. Res. 28, 281–295 (2005). Calculation time: hours.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Models an `E8` electron spin with `sys.magnet=3.5`, scalar Zeeman parameter `2.002319`, and a ZFS tensor constructed from each sampled pair of `D` and `E` values.
+- Uses a spherical powder grid (`rep_2ang_400pts_sph`), an `Lz` initial state, and an `L+` detection state. The rotating-frame setting is `{{'E8',3}}`.
+- Applies a rank-2 soft pulse with phase `-pi/2`, frequency `-0.5e9`, duration `50 ns`, and power `2*pi*0.02e9`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Obtains ZFS samples and weights with `zfs_sampling(30,5,1e-4)` and runs `powder(spin_system,@sp_acquire,parameters,'labframe')` for each sample.
+- Applies exponential apodisation to each acquired FID, Fourier-transforms it with 2048-point zero filling, and adds the result to the spectrum weighted by its ZFS sampling weight.
+- Uses a sweep of `0.8e10`, 512 acquisition points, a GHz plot axis, and the `expm` propagation method.
 
 ## Implementation structure
 
-- A soft pulse simulation for a gadolinium ion. The soft pulse
-- is simulated using Fokker-Planck formalism. Zero-field split-
-- ting distribution is sampled using the statistical parameters
-- reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28,
-- 281-295 (2005). Powder average simulation with a third-order
-- numerical rotating frame transformation.
-- Calculation time: hours
-- Preallocate the spectrum
-- Get the sampling
-- Get the figure going
-- Loop over ZFS distribution
-- Spin system parameters
+1. Preallocates a complex 2048-point spectrum, obtains the ZFS samples, and opens a figure.
+2. For each sample, builds a spherical-tensor Liouville-space spin system without basis approximation, sets the acquisition and soft-pulse parameters, and simulates powder-averaged acquisition.
+3. Apodises and Fourier-transforms the FID, accumulates the weighted spectrum, and plots its real part after each iteration.

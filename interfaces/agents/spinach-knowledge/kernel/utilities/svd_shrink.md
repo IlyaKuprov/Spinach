@@ -4,35 +4,21 @@
 
 ## Purpose
 
-Generates sets of vector-covector pairs for the parallel implementation of the time propagation algorithm described in [vec,cov]=svd_shrink(spin_system,rho,tol)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Generates vector-covector pairs for the parallel implementation of the time propagation algorithm described in Equation 9 of http://dx.doi.org/10.1063/1.3679656.
 
 ## Parameters / inputs
 
-- rho -density matrix
-- tol -singluar value drop tolerance
+- `spin_system` — spin system used to report the number of dropped pairs.
+- `rho` — density matrix; must be a numeric square matrix.
+- `tol` — singular value drop tolerance; must be a finite, non-negative real scalar.
 
 ## Outputs
 
-- vec -vectors as columns of a matrix
-- cov -covectors as columns of a matrix
+- `vec` — vectors as columns of a matrix.
+- `cov` — covectors as columns of a matrix.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Generates sets of vector-covector pairs for the parallel
-- implementation of the time propagation algorithm described in
-- [vec,cov]=svd_shrink(spin_system,rho,tol)
-- rho - density matrix
-- tol - singluar value drop tolerance
-- vec - vectors as columns of a matrix
-- cov - covectors as columns of a matrix
-- Check consistency
-- Run the singular value decomposition
-- Get the drop mask
-- Update the user
-- Eliminate small singular values
+The function computes the singular value decomposition of `full(rho)`, then removes columns associated with singular values strictly below `tol`. It reports the number of dropped vector-covector pairs. Each retained vector and covector column is multiplied by the square root of its corresponding singular value, spreading that coefficient across the pair. With MATLAB's complex-conjugate transpose, the retained factors reconstruct the truncated density matrix as `vec*cov'`.
+
+Source documentation: https://spindynamics.org/wiki/index.php?title=svd_shrink.m

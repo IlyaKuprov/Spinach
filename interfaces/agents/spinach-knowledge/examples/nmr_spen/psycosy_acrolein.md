@@ -8,24 +8,13 @@ PSYCOSY of Acrolein. Calculation time: hours, faster on a GPU.
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The source specifies a five-proton acrolein spin system at 14.1 T, including chemical shifts and scalar couplings.
+- The FID is simulated with the `@psycosy` sequence through the imaging function.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The simulated FID is apodised with square-sine windows in both dimensions, then transformed with a 2D FFT. The plotted result is the magnitude spectrum.
 
 ## Implementation structure
 
-- PSYCOSY of Acrolein.
-- Calculation time: hours, faster on a GPU.
-- Magnet
-- Spin system
-- Interactions
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Sample geometry
-- Diffusion and flow
-- Relaxation phantom
-- Initial and detection state phantoms
+- Defines the spin system, basis, and sequence parameters; runs imaging with `@psycosy`; applies apodisation and plots the 2D Fourier spectrum.

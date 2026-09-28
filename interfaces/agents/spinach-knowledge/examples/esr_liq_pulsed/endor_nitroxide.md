@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Mims ENDOR on a 15N-labelled nitroxide radical in liquid state. Magnetic parameters taken from a DFT calculation. Calculation time: seconds
+Simulates Mims ENDOR of a 15N-labelled nitroxide radical in the liquid state using magnetic parameters from a DFT calculation. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin-system parameters are imported from the supplied nitroxide Gaussian output, with the nitrogen isotope mapped as 15N. Coordinate data are ignored because hyperfine couplings are provided; the calculation detects the electron channel and uses the Mims ENDOR sequence.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The sequence uses `tau=100e-9` s, 512 points over a 100 MHz sweep, and zero filling to 4096. It subtracts the mean, applies Kaiser apodisation (parameter 6), Fourier transforms, and plots the spectrum magnitude.
 
 ## Implementation structure
 
-- Mims ENDOR on a 15N-labelled nitroxide radical in liquid
-- state. Magnetic parameters taken from a DFT calculation.
-- Calculation time: seconds
-- Ignore coordinate information (HFCs provided)
-- Read the spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Disable path tracing (small system)
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Crude apodisation
+It parses the DFT data with `gparse` and `g2spinach`, builds the full sphten-liouv basis with path tracing disabled, calls `liquid` with `@endor_mims`, then processes and plots the FID on the nuclear-frequency axis.

@@ -4,60 +4,30 @@
 
 ## Purpose
 
-A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with multiple control po- wer levels, multiple resonance offsets, multistate transfers, ensemb- les of drift Liouvillians, etc. Syntax: [traj_data,fidelity,... gradient,hessian]=ensemble(waveform,spin_system)
+A parallel wrapper around GRAPE for ensemble optimal control optimisation. It handles multiple control power levels, resonance offsets, multistate transfers, and ensembles of drift Liouvillians.
 
 ## Physical / mathematical content
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+GRAPE propagates fidelity derivatives through a piecewise-constant pulse sequence for gradient-based optimisation of waveform samples.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Parallel execution distributes ensemble cases across workers. The per-case propagation and derivative calculations run in `ens_block.m`; each worker sums its gradients, Hessians, and trajectories before the results are collected. This matters for large Spinach operators arising from basis expansion or powder or spatial lifting.
 
 ## Parameters / inputs
 
-- waveform -control coefficients for each control operator, rad/s
+- `waveform` — control coefficients for each control operator, in rad/s.
+- `spin_system` — spin system containing the ensemble control problem prepared by `optimcon.m`.
 
 ## Outputs
 
-- traj_data -trajectory data for subsequent diagnostic plotting
-- fidelity -figure of merit for the overlap of the current state
-- of the system and the desired state(s). When penalty
-- methods are specified, fidelity is returned as an ar-
-- ray separating the penalties from the simulation
-- fidelity.
-- gradient -gradient of the fidelity with respect to the control
-- sequence. When penalty methods are specified, gradi-
-- ent is returned as an array separating penalty gra-
-- dients from the fidelity gradient.
-- hessian -Hessian of the fidelity with respect to the control
-- sequence. When penalty methods are specified, gradi-
-- ent is returned as an array separating penalty Hes-
-- sians from the fidelity Hessian.
-- Note: the ensemble cases enumerated in spin_system.control.catalog
-- are processed in the contiguous per-worker blocks assigned by
-- optimcon.m in spin_system.control.worker_cases. Each worker
-- holds the common frozen problem and the drift generators of its
-- own block, published by optimcon.m as pool constants; the per-
-- case physics runs in ens_block.m on each worker, so only the
-- waveform and the live control fields travel at each objective
-- evaluation, and the gradient, the Hessian, and averaged trajec-
-- tories are summed on the workers. This function must be called
-- from the client, on the pool that was open when optimcon.m ran:
-- a worker holds only its own block.
+- `traj_data` — trajectory data for diagnostic plotting. Trajectories are returned in catalog order, or as an ensemble average when the `average` trajectory option is selected.
+- `fidelity` — ensemble-averaged figure of merit for overlap between the current and desired state(s). With penalty methods, an array separates penalties from simulation fidelity.
+- `gradient` — ensemble-averaged fidelity gradient with respect to the control sequence. With penalty methods, an array separates penalty gradients from the fidelity gradient.
+- `hessian` — ensemble-averaged fidelity Hessian with respect to the control sequence. With penalty methods, an array separates penalty Hessians from the fidelity Hessian.
 
-## Implementation structure
+## Ensemble worker data flow
 
-- A parallel wrapper around GRAPE that enables ensemble optimal control
-- optimisations. This function handles systems with multiple control po-
-- wer levels, multiple resonance offsets, multistate transfers, ensemb-
-- les of drift Liouvillians, etc. Syntax:
-- [traj_data,fidelity,...
-- gradient,hessian]=ensemble(waveform,spin_system)
-- waveform -control coefficients for each control operator, rad/s
-- traj_data -trajectory data for subsequent diagnostic plotting
-- fidelity -figure of merit for the overlap of the current state
-- of the system and the desired state(s). When penalty
-- methods are specified, fidelity is returned as an ar-
-- ray separating the penalties from the simulation
+Cases in `spin_system.control.catalog` are assigned contiguous per-worker blocks by `optimcon.m` in `spin_system.control.worker_cases`. Each worker holds the common frozen problem and its block's drift generators as pool constants. At each objective evaluation, only the waveform and live control fields travel to the workers; per-case physics runs in `ens_block.m`. Call `ensemble` from the client using the same pool that was open when `optimcon.m` ran, because each worker holds only its own block.
+
+[Source documentation](https://spindynamics.org/wiki/index.php?title=ensemble.m)

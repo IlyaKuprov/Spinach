@@ -4,77 +4,27 @@
 
 ## Purpose
 
-Single-crystal interface to pulse sequences. Generates a Liouvillian superoperator and passes it on to the pulse sequence function, which should be supplied as a handle. Syntax: answer=crystal(spin_system,pulse_sequence,parameters,assumptions)
-
-## Physical / mathematical content
-
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Builds the Hamiltonian and relaxation/kinetics inputs for a single-crystal orientation, then calls the supplied pulse-sequence function handle. The orientation is specified by three Euler angles.
 
 ## Parameters / inputs
 
-- pulse_sequence -a function handle to one of the pulse se-
-- quences located in the experiments folder
-- assumptions -a string that would be passed to assume.m
-- when the Hamiltonian is built
-- parameters.spins -a cell array giving the spins that
-- the pulse sequence involves, e.g.
-- {'1H','13C'}
-- parameters.offset -a cell array giving transmitter off-
-- sets in Hz on each of the spins listed
-- in parameters.spins array
-- parameters.orientation -a row vector of the three Euler angles
-- (in radians) giving the orientation of
-- the system relative to the input orien-
-- tation.
-- parameters.rframes -rotating frame specification, e.g.
-- {{'13C',2},{'14N,3}} requests second
-- order rotating frame transformation
-- with respect to carbon-13 and third
-- order rotating frame transformation
-- with respect to nitrogen-14. When
-- this option is used, the assumptions
-- on the respective spins should be
-- laboratory frame.
-- parameters.needs -a cell array of strings specifying additional
-- information required by the sequence:
-- 'zeeman_op' -Zeeman part of the Hamiltonian
-- in the laboratory frame, to be placed into
-- parameters.hzeeman and sent to pulse sequence
-- 'aniso_eq' -thermal equilibrium is recomputed
-- using the full anisotropic Hamiltonian at the
-- current orientation, and sent to the pulse
-- sequence in parameters.rho0 subfield
-- parameters.* -additional subfields may be required by your
-- pulse sequence -check its documentation page
-- The parameters structure is passed to the pulse sequence with the follo-
-- wing additional parameters set:
-- parameters.spc_dim -matrix dimension for the spatial
-- dynamics subspace (1 in this case)
-- parameters.spn_dim -matrix dimension for the spin
-- dynamics subspace
+- `pulse_sequence` — function handle for a pulse sequence in the experiments directory.
+- `assumptions` — string passed to `assume.m` when the Hamiltonian is built.
+- `parameters.spins` — cell array of spin species used by the pulse sequence, for example `{'1H','13C'}`.
+- `parameters.offset` — transmitter offsets in Hz, one per spin in `parameters.spins`.
+- `parameters.orientation` — row vector of three Euler angles in radians, specifying the system orientation relative to the input orientation.
+- `parameters.rframes` — rotating-frame specification. The source gives `{{'13C',2},{'14N,3}}` as an example of second-order carbon-13 and third-order nitrogen-14 transformations. When used, the assumptions for those spins should be in the laboratory frame.
+- `parameters.needs` — cell array of additional sequence requirements:
+  - `'zeeman_op'` requests the laboratory-frame Zeeman Hamiltonian in `parameters.hzeeman`.
+  - `'aniso_eq'` requests thermal equilibrium recomputed from the full anisotropic Hamiltonian at the current orientation and supplied as `parameters.rho0`.
+- Other `parameters` subfields may be required by the pulse sequence; consult its documentation.
 
-## Outputs
+The wrapper also sets `parameters.spc_dim` to 1 and `parameters.spn_dim` to the spin-dynamics matrix dimension before calling the sequence.
 
-- this function returns whatever it is that the pulse sequence returns
-- Note: arbitrary order rotating frame transformation is supported, inc-
-- luding infinite order. See the header of rotframe.m for further
-- information.
+## Output
 
-## Implementation structure
+Returns whatever the pulse sequence returns.
 
-- Single-crystal interface to pulse sequences. Generates a Liouvillian
-- superoperator and passes it on to the pulse sequence function, which
-- should be supplied as a handle. Syntax:
-- answer=crystal(spin_system,pulse_sequence,parameters,assumptions)
-- pulse_sequence -a function handle to one of the pulse se-
-- quences located in the experiments folder
-- assumptions -a string that would be passed to assume.m
-- when the Hamiltonian is built
-- parameters.spins -a cell array giving the spins that
-- the pulse sequence involves, e.g.
-- {'1H','13C'}
-- parameters.offset -a cell array giving transmitter off-
+## Note
+
+Arbitrary-order rotating-frame transformations, including infinite order, are supported. See the header of `rotframe.m` for details.

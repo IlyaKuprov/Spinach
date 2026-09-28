@@ -4,11 +4,11 @@
 
 ## Purpose
 
-Acquisition irradiation through Hilbert formalism admission.
+Acquisition proton irradiation through Hilbert formalism admission.
 
 ## Physical / mathematical content
 
-A phase-shifted soft pulse and noncommuting heteronuclear irradiation must agree with native Liouville dynamics.
+A phase-shifted soft pulse and noncommuting proton irradiation in a 1H-13C system must agree with native Liouville dynamics.
 
 ## Numerical / algorithmic content
 
@@ -20,7 +20,7 @@ Checks operator conversion, nonzero signals and irradiation effects, zero/absent
 
 ## Parameters / inputs
 
-None. The test constructs its own bounded physical fixtures.
+None. The test constructs its own physical system.
 
 ## Outputs
 
@@ -28,4 +28,4 @@ None. The test constructs its own bounded physical fixtures.
 
 ## Header notes
 
-The regression is registered in `test_manifest` and is not an optimisation or performance benchmark.
+Optional operator caching is not enabled.

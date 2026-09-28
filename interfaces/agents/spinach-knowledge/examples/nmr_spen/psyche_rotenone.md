@@ -8,24 +8,14 @@ PSYCHE pure-shift NMR spectrum of rotenone. Calculation time: hours, faster on a
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The source defines a proton spin system for rotenone at 11.7 T, with chemical shifts and scalar couplings specified explicitly.
+- The imaging simulation calls the `@psyche` sequence. It sets a 15 mm sample, a 1H initial/detection state, and saltire-chirp pulse parameters; diffusion is set to zero.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The two acquisition dimensions use sweeps of 100 and 5000 Hz, with 32 and 2048 points and zero fills of 128 and 8192 points, respectively.
+- The code extracts a pure-shift FID from the imaging output, applies Gaussian apodisation (parameter 6), then computes a 2D Fourier spectrum and a 1D projected spectrum.
 
 ## Implementation structure
 
-- PSYCHE pure-shift NMR spectrum of rotenone.
-- Calculation time: hours, faster on a GPU.
-- Magnetic induction
-- Spin system
-- Interactions
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Saltire chirp parameters
-- Coherent evolution timesteps
-- Sample parameters
+- Constructs the spin system and basis, configures the sample and pulse sequence, runs imaging, and processes and plots the resulting spectra.

@@ -4,44 +4,31 @@
 
 ## Purpose
 
-Saturation-recovery pulse sequence with analytical saturation (just the unit state as the initial condition). Syntax: fids=sat_rec(spin_system,parameters,H,R,K)
-
-## Physical / mathematical content
+Computes a saturation-recovery pulse sequence with analytical saturation, using the unit state as the initial condition.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine composes `L=H+1i*R+1i*K`, starts from `unit_state(spin_system)`, and propagates a trajectory over `parameters.n_delays` equally spaced relaxation periods spanning `parameters.max_delay`. It applies a 90-degree pulse about the source-defined `Ly` operator to each trajectory state, then acquires an FID for each state using the detection state on `parameters.spins{1}`, dwell time `1/parameters.sweep`, and `parameters.npoints-1` intervals. The FIDs are returned as columns.
 
 ## Parameters / inputs
 
-- parameters.sweep spectrum sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.max_delay longest relaxation delay
-- parameters.n_delays number of relaxation delays to run
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.sweep` — spectrum sweep width, Hz
+- `parameters.npoints` — number of points in each FID
+- `parameters.spins` — nuclei on which the sequence runs, specified as {'1H'}, {'13C'}, etc.
+- `parameters.max_delay` — longest relaxation delay
+- `parameters.n_delays` — number of relaxation delays to run
+- `H` — Hamiltonian matrix, received from the context function
+- `R` — relaxation superoperator, received from the context function; it must be thermalised
+- `K` — kinetics superoperator, received from the context function
 
 ## Outputs
 
-- fids -free induction decays for each delay starting from zero,
-- a matrix with individual FIDs in columns
-- Note: the relaxation superoperator must be thermalised.
-- Zak El-Machachi
+- `fids` — free induction decays for each delay starting from zero, with individual FIDs in columns
 
-## Implementation structure
+## Credit
 
-- Saturation-recovery pulse sequence with analytical saturation (just
-- the unit state as the initial condition). Syntax:
-- fids=sat_rec(spin_system,parameters,H,R,K)
-- parameters.sweep spectrum sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.max_delay longest relaxation delay
-- parameters.n_delays number of relaxation delays to run
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+Zak El-Machachi
+
+## Reference
+
+- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=sat_rec.m)

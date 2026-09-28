@@ -8,9 +8,11 @@ Merges multiple sys and inter structures into one. Useful for setting up chemica
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Combines `sys` and `inter` structures for multiple subsystems, including supported interaction groups and chemical-process specifications.
 
 ## Numerical / algorithmic content
+
+- Concatenates extensive subsystem data, offsets spin-index lists by preceding subsystem spin counts, and combines supported square coupling arrays block-diagonally. Shared values must agree across subsystems; inconsistent or unhandled fields cause errors.
 
 ## Parameters / inputs
 
@@ -37,15 +39,6 @@ Merges multiple sys and inter structures into one. Useful for setting up chemica
 
 ## Implementation structure
 
-- Merges multiple sys and inter structures into one. Useful for
-- setting up chemical kinetics simulations where the molecules
-- come from different DFT calculations. Syntax:
-- [sys,inter]=merge_inp(sys_parts,inter_parts)
-- sys_parts -a cell array of sys structures
-- to be merged
-- inter_parts -a cell array of inter structures
-- sys -resulting sys structure
-- inter -resulting inter structure
-- Note: extensive fields are concatenated with spin and chemical
-- subsystem indices offset as appropriate; non-extensive
-- fields (magnet, temperature, relaxation settings, etc.)
+- Validates paired, non-empty row cell arrays and counts the spins in each subsystem.
+- Merges common fields, per-spin arrays, coordinates, coupling blocks, spin-index lists, and supported nested groups with field-specific handlers.
+- Rejects partial nested groups, unequal shared values, and any unhandled fields.

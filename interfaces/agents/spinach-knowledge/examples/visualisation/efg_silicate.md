@@ -4,17 +4,8 @@
 
 ## Purpose
 
-Example of electric field gradient tensor visualisation for an aluminosilicate solid. CASTEP log is parsed.
+Convert the CASTEP-derived `alsilicate.magres` data with `c2spinach`, then visualise the electric-field-gradient tensor for aluminium in an aluminosilicate solid.
 
-## Physical / mathematical content
+## Implementation
 
-- Visualisation examples. These scripts expose tensor geometry: principal axes, shielding/hyperfine/EFG ellipsoids, molecular frames, and the relationship between tensor eigenstructure and observable anisotropy.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Example of electric field gradient tensor visualisation for
-- an aluminosilicate solid. CASTEP log is parsed.
-- Import CASTEP data
-- Do the visualisation
+The script creates two views with `efg_display`: ellipsoids and spherical harmonics. Each call selects `Al` and uses the source parameter `100`.

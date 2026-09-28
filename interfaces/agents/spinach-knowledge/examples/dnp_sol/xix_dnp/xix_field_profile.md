@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Field profile of a XiX DNP experiment. <I_z> after a fixed contact time is calculated as a function of electron pulse amplitude and offset. Further information in: Calculation time: minutes (a large powder grid is needed)
+Profiles the proton (I_z) signal at the end of a fixed XiX DNP contact as microwave resonance offset is varied. Further information: https://doi.org/10.1021/jacs.1c09900. Calculation time: minutes for the large powder grid. In this implementation the electron nutation frequency is fixed at 17.8 MHz; only offset is swept.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The spin system is a trityl electron and two protons with anisotropic Zeeman interactions, specified coordinates, and spin temperature 80 K. The signal is the real final point of the calculated proton longitudinal-polarization contact curve.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The script evaluates 120 offsets from -150 to +150 MHz, adding a -13 MHz reference point to the simulated offset. Each point uses 150 XiX blocks of 48 ns pulses and the `rep_2ang_1600pts_sph` powder grid; independent offsets are evaluated with `parfor`.
 
 ## Implementation structure
 
-- Field profile of a XiX DNP experiment. <I_z> after a fixed
-- contact time is calculated as a function of electron pulse
-- amplitude and offset. Further information in:
-- Calculation time: minutes (a large powder grid is needed)
-- Q-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Hush the output
-- Basis set
-- Spinach housekeeping
+After constructing the full Zeeman–Hilbert basis and proton (L_z) detector, it calls `powder` with `@xixdnp` for each offset and plots the last contact-curve value against the unshifted offset axis.

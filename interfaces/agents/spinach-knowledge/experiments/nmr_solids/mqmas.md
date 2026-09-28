@@ -4,51 +4,29 @@
 
 ## Purpose
 
-Rotor-synchronous MQMAS pulse sequence. Syntax: fid=mqmas(spin_system,parameters,H,R,K) This function should normally be called using singlerot.m context that would provide H, R, and K.
-
-## Physical / mathematical content
-
-- Solid-state pulse sequence implementations. The core ingredients are anisotropic Hamiltonians, rotor synchronisation, cross-polarisation, recoupling/decoupling, and powder or rotor-stack propagation.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Rotor-synchronous MQMAS pulse sequence for a 2D amplitude-mode free induction decay. Call it from the `singlerot.m` context, which supplies `H`, `R`, and `K`. See <https://spindynamics.org/wiki/index.php?title=mqmas.m>.
 
 ## Parameters / inputs
 
-- parameters.pulse_dur -duration of each pulse, a two-
-- element vector, seconds
-- parameters.pulse_amp -amplitude of each pulse, a two-
-- element vector, rad/s
-- parameters.mq_order -MQMAS coherence order
-- parameters.rho0 -initial condition, usually Lz
-- parameters.coil -detection state, usually L+
-- + the parameters required by the singlerot.m
-- context function that will provide H, R, and K
+- `spin_system`: Spinach spin system.
+- `H`, `R`, `K`: Numeric square matrices of equal size, supplied by `singlerot.m`.
+- `parameters.spins`: Cell array containing one isotope string present in the spin system; selects the active spin.
+- `parameters.pulse_dur`: Durations of the two pulses, in seconds; a two-element vector of non-negative real numbers.
+- `parameters.pulse_amp`: Amplitudes of the two pulses, in rad/s; a two-element vector of real numbers.
+- `parameters.mq_order`: Integer MQMAS coherence order.
+- `parameters.rho0`: Initial condition, usually `Lz`.
+- `parameters.coil`: Detection state, usually `L+`.
+- `parameters.spc_dim`: Positive integer spatial problem dimension.
+- `parameters.npoints`: Two-element vector of positive integers specifying the point counts in the indirect and direct dimensions.
+- `parameters.rate`: Non-zero real MAS rate.
+- `parameters.sweep`: Positive real sweep width; must equal `abs(parameters.rate)`. Both dimensions are sampled stroboscopically at this sweep width, relative to the rotor period.
+- `parameters.decouple`: Cell array of isotope strings to decouple, or an empty cell array. Listed isotopes must be present in the system; analytical decoupling requires the `sphten-liouv` formalism.
+- Other parameters required by the `singlerot.m` context.
 
 ## Outputs
 
-- fid -2D amplitude mode free induction decay
+- `fid`: 2D amplitude-mode free induction decay.
 
-## Header notes
+## Implementation summary
 
-- parameters.sweep should be a positive real scalar
-- equal to abs(parameters.rate), this is because
-- this pulse sequence is stroboscopic with respect
-- to the rotor period; both dimensions are sampled
-- at that sweep width
-
-## Implementation structure
-
-- Rotor-synchronous MQMAS pulse sequence. Syntax:
-- fid=mqmas(spin_system,parameters,H,R,K)
-- This function should normally be called using singlerot.m context
-- that would provide H, R, and K.
-- parameters.pulse_dur -duration of each pulse, a two-
-- element vector, seconds
-- parameters.pulse_amp -amplitude of each pulse, a two-
-- element vector, rad/s
-- parameters.mq_order -MQMAS coherence order
-- parameters.rho0 -initial condition, usually Lz
-- parameters.coil -detection state, usually L+
-- + the parameters required by the singlerot.m
+The sequence forms `L=H+1i*R+1i*K`, applies decoupling, and runs the first pulse before selecting `parameters.mq_order` coherence. It evolves the indirect dimension at intervals of `1/abs(parameters.rate)`, runs the second pulse, selects `+1` coherence, and evolves the direct dimension while detecting with `parameters.coil`.

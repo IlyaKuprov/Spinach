@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Simulation of TOP DNP contact time dependence in the steady state with electron Rabi frequency ensemble. Calculation time: hours.
+Calculates the proton longitudinal expectation value after TOP DNP steady-state simulations as a function of total contact time, averaging separately over two electron-Rabi-frequency distributions.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The model contains an electron and a proton at 3.5 Å in a Q-band field (1.2142 T), with an 80 K spin temperature. The electron Zeeman tensor is specified by principal values [2.00319, 2.00319, 2.00258]; the proton uses a [0, 0, 5] ppm shift. It uses the full sphten-liouv basis, diagonal relaxation superoperators, and dibari equilibrium. The powder grid is `rep_2ang_800pts_sph`.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of TOP DNP contact time dependence in the
-- steady state with electron Rabi frequency ensemble.
-- Calculation time: hours.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+For each ensemble, the script samples five B1 values by Gaussian quadrature: 10–20 MHz and 25–35 MHz. It evaluates loop counts 1 through 256, using 10 ns pulses separated by 14 ns delays and ensemble-specific electron offsets (95 MHz and 92 MHz). At each point it calls `powder` with `@topdnp_steady` and the `esr` mode, then takes the quadrature-weighted B1 average. The output plot compares the proton Iz expectation versus total contact time for the two ensembles and is saved as `top_q_con_time_ensemble_b1.fig`.

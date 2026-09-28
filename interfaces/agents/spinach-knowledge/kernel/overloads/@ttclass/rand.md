@@ -4,34 +4,27 @@
 
 ## Purpose
 
-Generates a tensor train representation of a matrix with random tensor train cores, same physical index topology as the tensor train supplied, and user-specified bond ranks. Syntax: tt=rand(tt,ttrank)
+Generates a tensor train with random cores, retaining the supplied train's physical dimensions and using the requested bond rank for internal bonds (except that a one-core train has boundary ranks 1).
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+The generated cores have the same physical index dimensions as the input. The result has coefficient 1 and tolerance 0.
 
 ## Numerical / algorithmic content
 
+Each core is filled with MATLAB `rand`. For multiple cores, the first and last ranks are 1 and each internal bond has rank `ttrank`.
+
 ## Parameters / inputs
 
-- tt -a tensor train object
-- ttrank -bond rank, a positive integer
+- tt - a tensor train object
+- ttrank - bond rank, a positive real integer
 
 ## Outputs
 
-- tt -a tensor train object
+- tt - a tensor train object
 
 ## Implementation structure
 
-- Generates a tensor train representation of a matrix with random
-- tensor train cores, same physical index topology as the tensor
-- train supplied, and user-specified bond ranks. Syntax:
-- tt=rand(tt,ttrank)
-- tt -a tensor train object
-- ttrank -bond rank, a positive integer
-- Check consistency
-- Read tensor train sizes
-- Reallocate cores
-- Fill the cores with random elements
-- Unit coefficient and zero tolerance
-- Consistency enforcement
+- Validate the object and rank input.
+- Read the physical sizes, allocate the cores, and fill them with random values.
+- Set the coefficient to 1 and tolerance to 0.

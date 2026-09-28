@@ -4,44 +4,25 @@
 
 ## Purpose
 
-Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-indefinite output). Syntax: [x,err,reg]=tikhoind(K,D,y,lam)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+Computes an unconstrained, sign-indefinite Tikhonov-regularised solution of `K*x=y`.
 
 ## Parameters / inputs
 
-- K -kernel matrix, may be complex, may be non-square
-- D -regularisation matrix
-- y -a column vector, may be complex
-- lam -Tikhonov regularisation parameter
+- `K` — kernel matrix; may be complex or non-square.
+- `D` — regularisation matrix.
+- `y` — column vector; may be complex.
+- `lam` — nonnegative real scalar Tikhonov regularisation parameter.
 
 ## Outputs
 
-- x -a real vector, a minimum of
-- norm(K*x-y,2)^2+lambda*norm(D*x,2)^2
-- err -error signal norm(K*x-y,2)^2
-- reg -regularisation signal norm(D*x,2)^2
-- Note: for best numerical performance, scale K to have approxima-
-- tely unit 2-norm, and y to have approximately unit 1-norm.
-- Note: see tikhonov.m for the positive-constraned solver.
+- `x` — solution minimising `norm(K*x-y,2)^2 + lam*norm(D*x,2)^2` as computed by the normal equations. The source describes `x` as real, but the implementation does not enforce this; complex inputs may produce a complex solution.
+- `err` — squared residual norm, `norm(K*x-y,2)^2`.
+- `reg` — squared regularisation norm, `norm(D*x,2)^2`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Analytical Tikhonov regularised solution to K*x=y without any
-- constraints (sign-indefinite output). Syntax:
-- [x,err,reg]=tikhoind(K,D,y,lam)
-- K -kernel matrix, may be complex, may be non-square
-- D -regularisation matrix
-- y -a column vector, may be complex
-- lam -Tikhonov regularisation parameter
-- x -a real vector, a minimum of
-- norm(K*x-y,2)^2+lambda*norm(D*x,2)^2
-- err -error signal norm(K*x-y,2)^2
-- reg -regularisation signal norm(D*x,2)^2
-- Note: for best numerical performance, scale K to have approxima-
+The solution is computed as `x = (K'*K + lam*(D'*D)) \ (K'*y)`. For best numerical performance, scale `K` to have approximately unit 2-norm and `y` to have approximately unit 1-norm. See `tikhonov.m` for the positive-constrained solver.
+
+The implementation checks that all inputs are numeric, that `size(K,1) == size(y,1)`, and that `lam` is a nonnegative real scalar. It computes `err` and `reg` only when those outputs are requested. The source does not explicitly check the dimensions of `D` or enforce that `y` is a column vector.
+
+<https://spindynamics.org/wiki/index.php?title=tikhoind.m>

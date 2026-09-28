@@ -8,26 +8,12 @@
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example simulates a 13C-detected, 1H-decoupled HOESY experiment. It obtains the camphor spin system and interactions from the supplied DFT output, applies Redfield relaxation, and sums the simulated signal over 13C isotopomers.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+It uses an IK-2 sphten-liouv basis with scalar-coupling connectivity and proximity level 3. Each isotopomer is simulated with a 0.5 s mixing time; cosine apodisation and two Fourier transforms produce the 2D spectrum.
 
 ## Implementation structure
 
-- 13C{1H} HOESY spectrum of camphor with natural content of 13C isotope.
-- Coordinates, shielding anisotropies and J-couplings computed with DFT.
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Generate isotopomers
-- Preallocate the answer
+The script reads camphor data via `gparse`/`g2spinach`, sets a 14.1 T field and Redfield parameters (correlation time 50e-12 s, 298 K), then dilutes the system for 13C and runs a `parfor` loop. Acquisition uses sweeps [1800 9000] Hz, offsets [900 4500] Hz, 128 points per dimension and 512-point zero filling. The result is plotted with positive display polarity.

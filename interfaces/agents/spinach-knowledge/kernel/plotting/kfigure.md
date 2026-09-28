@@ -4,19 +4,18 @@
 
 ## Purpose
 
-Resets the stupid ass figure defaults in R2025a and later back to sensible values.
+Sets four MATLAB root figure defaults to pre-R2025a values, creates a figure with the supplied arguments, and returns its handle.
 
 ## Physical / mathematical content
 
 ## Numerical / algorithmic content
 
-## Implementation structure
+- Sets `DefaultFigurePosition` to `[680 458 560 420]`, `DefaultFigureWindowStyle` to `normal`, `DefaultFigureMenuBar` to `figure`, and `DefaultFigureToolbar` to `figure` on `groot` before calling `figure`.
 
-- Resets the stupid ass figure defaults in R2025a
-- and later back to sensible values.
-- Reset to pre-R2025a settings
-- Create and return a handle
-- #NGRUM #NHEAD
-- The most common error of a smart engineer is to
-- optimize a thing that should not exist.
-- Elon Musk
+## Parameters / inputs
+
+- `varargin` - arguments forwarded to MATLAB's `figure` function
+
+## Outputs
+
+- `handle` - handle returned by `figure(varargin{:})`

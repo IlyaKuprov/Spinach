@@ -8,11 +8,11 @@ DPFGSE signal suppression, based on Equation 3 from the paper by Stott et al. (h
 
 ## Physical / mathematical content
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
+The sequence starts with a hard proton 90-degree pulse, then applies two selective soft pulses interleaved with hard 180-degree pulses and pairs of gradient periods. Evolution uses `L=H+F+1i*R+1i*K`, with gradient periods adding `parameters.g_amp(1)*G{1}` or `parameters.g_amp(2)*G{1}`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Hard pulses and gradient periods propagate the state with `step`; selective pulses use `shaped_pulse_af` with the `'expv'` method and frequencies shifted by `parameters.offset`. The FID is computed by `evolution` from `parameters.coil` at intervals of `1/parameters.sweep`.
 
 ## Parameters / inputs
 
@@ -36,15 +36,4 @@ DPFGSE signal suppression, based on Equation 3 from the paper by Stott et al. (h
 
 ## Implementation structure
 
-- DPFGSE signal suppression, based on Equation 3 from the paper by
-- Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Syntax:
-- fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)
-- parameters.g_amp -amplitudes of the two gradients, T/m
-- parameters.g_dur -gradient duration, seconds
-- parameters.rf_frq_list -soft pulse parameters that will
-- parameters.rf_amp_list be passed to shaped_pulse_af
-- parameters.rf_dur_list function
-- parameters.rf_phi
-- parameters.max_rank
-- parameters.sweep -detection sweep width, Hz
-- parameters.npoints -number of points in the fid
+The function validates required fields with the local `grumble` helper, constructs proton `Lx` and `Ly` operators across the spatial grid, and applies the pulse–gradient sequence to `parameters.rho0`. It then returns the coil-observed FID.

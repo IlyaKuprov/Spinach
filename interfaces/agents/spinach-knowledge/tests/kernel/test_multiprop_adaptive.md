@@ -4,32 +4,15 @@
 
 ## Purpose
 
-Tests adaptive repeated propagator application. Syntax: result=test_multiprop_adaptive()
-
-## Physical / mathematical content
+Tests adaptive repeated propagator application by comparing `multiprop()` with explicit matrix-power references. Returns a regression test result with explanatory messages.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Checks binary adaptive squaring for non-normal sparse and diagonal sparse propagators acting on state vectors, and for a square Liouville-space vector stack. These states propagate by left multiplication, `P^N*rho`.
+- Checks that zero propagator applications leave the state unchanged and that a one-dimensional wavefunction follows the vector branch.
+- Checks Hilbert-space density-matrix propagation for unitary, sparse non-unitary, and diagonal sparse propagators against `P^N*rho*(P^N)'`.
+- Checks that `prop_chop` removes small elements generated during propagator squaring, and that row vectors are rejected as invalid Spinach state vectors.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks binary adaptive squaring in multiprop() against explicit
-- matrix-power references for state vectors and density matrices, and
-- verifies clean-up after propagator squaring.
-
-## Implementation structure
-
-- Tests adaptive repeated propagator application. Syntax:
-- result=test_multiprop_adaptive()
-- result -regression test result with explanatory messages
-- The test checks binary adaptive squaring in multiprop() against explicit
-- matrix-power references for state vectors and density matrices, and
-- verifies clean-up after propagator squaring.
-- Announce the test target
-- State the propagation target of the test
-- Build the minimum Spinach system fields required by clean_up()
-- Define a non-normal sparse propagator and a state vector
-- Compare state-vector propagation with an explicit matrix power
-- Define a diagonal sparse propagator and a state vector
+- `result` — regression test result with explanatory messages.

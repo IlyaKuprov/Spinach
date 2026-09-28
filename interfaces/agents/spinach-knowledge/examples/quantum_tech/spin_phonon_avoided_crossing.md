@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Avoided crossing between an electron spin transition and a quantised phonon mode in the resonant spin-phonon exchange model. The phonon is requested with the V# particle syntax. Calculation time: seconds
+Shows the avoided crossing between an electron-spin transition and a quantised phonon mode in a resonant spin–phonon exchange model. The phonon is requested with the `V#` particle syntax. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+- The one-excitation spin–phonon doublet is diagonalised while the spin–phonon detuning is swept. Resonant exchange splits the dressed levels; the minimum gap is checked against the coupling-derived value.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+- The `zeeman-hilb` model uses no basis approximation. The code isolates the one-quantum manifold, diagonalises the projected Hamiltonian at 121 detunings, and plots the two dressed energies.
 
 ## Implementation structure
 
-- Avoided crossing between an electron spin transition and a
-- quantised phonon mode in the resonant spin-phonon exchange
-- model. The phonon is requested with the V# particle syntax.
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Resonant phonon mode in the rotating frame
-- Formalism and basis
-- Spinach housekeeping
-- Exchange Hamiltonian, 'cavity' is the set that keeps spin-mode exchange
-- Spin operator
-- Coupling parameters
+- The system is `{'E','V3'}`, with the phonon at zero rotating-frame frequency and exchange coupling `4e6`. The detuning grid is `2*pi*linspace(-20e6,20e6,121)`; the resonant gap is validated against `2*g/(2*pi*1e6)` in MHz.

@@ -4,23 +4,8 @@
 
 ## Purpose
 
-Probability density sloshing around a harmonic oscillator in the presence of a gravitational pull twards the left. Calculation time: seconds.
+Shows a wavefunction evolving in a harmonic oscillator with a nonzero gravitational term (250 m/s² in the source). The source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Diffusion examples. The dominant mathematics is diffusion or advection-diffusion PDE propagation, sometimes with additional spin phase accumulation under gradients.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Probability density sloshing around a harmonic oscillator
-- in the presence of a gravitational pull twards the left.
-- Calculation time: seconds.
-- Set oscillator parameters
-- Get the Hamiltonian
-- Get the initial state
-- Get the propagator
-- Run the evolution
+The oscillator uses force constant 2e3 N/m, mass 1 kg, a 2 m box, and 100 grid points. Its initial state is exp(−50(xgrid−0.1)²). After obtaining the Hamiltonian and grid from `oscillator`, the example forms `expm(−1i*H*0.001)` and applies this propagator 1000 times. The animation plots abs(psi)+xgrid² and the xgrid² reference curve at each iteration.

@@ -4,29 +4,11 @@
 
 ## Purpose
 
-Prints console banners. This is an internal function of the kernel, user calls are discouraged. Syntax: banner(spin_system,identifier)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Internal kernel helper that prints a named console banner through Spinach's reporting mechanism. User calls are discouraged.
 
 ## Parameters / inputs
 
-- identifier -a character string with the banner name,
-- see function text
+- `spin_system` - Spinach spin-system structure passed to `report`.
+- `identifier` - character string selecting one of the supported banners: `version_banner`, `spin_system_banner`, `basis_banner`, `sequence_banner`, `optimcon`, or `optimisation`.
 
-## Implementation structure
-
-- Prints console banners. This is an internal function of
-- the kernel, user calls are discouraged. Syntax:
-- banner(spin_system,identifier)
-- identifier -a character string with the banner name,
-- see function text
-- Check consistency
-- Print the banner
-- Consistency enforcement
-- The free man will ask neither what his country can do
-- for him, nor what he can do for his country.
-- Milton Friedman
+The version banner prints the Spinach v2.13 label and links to the author list, documentation, and book; the other identifiers print section headings for the spin system, basis set, pulse sequence, optimal control, or optimisation. An unknown identifier raises an error.

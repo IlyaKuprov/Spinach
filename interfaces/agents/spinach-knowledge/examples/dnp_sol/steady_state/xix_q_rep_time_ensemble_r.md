@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Simulation of XiX DNP repetition time scan in the steady state with distributions in electron-proton distance. Calculation time: minutes.
+Calculates steady-state XiX DNP proton signal versus repetition time, averaged over electron–proton distance. The source estimates a calculation time of minutes.
 
-## Physical / mathematical content
+## Physical and numerical setup
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The spin system is an electron–proton pair at 80 K and 1.2142 T. Three Gauss–Legendre nodes cover distances from 3.5 to 20 Å; the electron nutation frequency is fixed at 18 MHz. Thirty repetition times are logarithmically spaced from 10 μs to 1 ms. The XiX train has 36 blocks with 48 ns pulses and a fixed microwave offset of −39 MHz.
 
-## Numerical / algorithmic content
+## Calculation and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of XiX DNP repetition time scan in the steady
-- state with distributions in electron-proton distance.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance ensemble
-- Log spacing for rep. time
+At each distance the source updates the coordinates and the distance-/orientation-dependent nuclear relaxation, then evaluates the steady state with `powder(...,@xixdnp_steady,...,'esr')`. It averages over distance quadrature weights including the radial (r^2) Jacobian, plots the real proton (I_z) expectation versus repetition time, and saves `xix_q_rep_time_ensemble_r.fig`.

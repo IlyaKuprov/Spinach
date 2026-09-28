@@ -4,49 +4,21 @@
 
 ## Purpose
 
-Rayleigh-Schrodinger perturbation theory to arbitrary order, Eqs 2.21-2.23 from Stefan Stoll's PhD thesis, with the typo fixed in the numerator of Eq 2.21. Syntax: [Ep,Vp]=rspert(E0,H1,order)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Computes Rayleigh-Schrodinger perturbation theory to the specified order, following Eqs. 2.21–2.23 of Stefan Stoll’s PhD thesis, with the typo in the numerator of Eq. 2.21 corrected.
 
 ## Parameters / inputs
 
-- E0 -eigenvalues of H0, a column vector of real
-- numbers
-- H1 -perturbation, written in the basis that di-
-- agonalises H0
-- order -order of perturbation theory to be used, 6
-- is the sensible maximum
+- `E0` — Real column vector of eigenvalues of `H0`.
+- `H1` — Hermitian perturbation written in the eigenbasis of `H0`.
+- `order` — Positive integer specifying the perturbation order. Sixth order is the sensible maximum.
 
 ## Outputs
 
-- Ep -eigenvalues of H0+H1 to the specified order,
-- a vector of reals, not necessarily sorted in
-- the same way as the input
-- Vp -normalised eigenvectors of H0+H1 to the spe-
-- cified order in perturbation theory, a squa-
-- re unitary matrix with eigenvectors in cols
-- in the same order as the eigenvalues in Ep
-- Notes: there must be no degeneracies in H0; H1 must be Hermitian,
-- the theory only converges when norm(H1,2) is much smaller
-- than the smallest energy gap in H0; numerical artefacts
-- appear beyond sixth order; complexity is linear in the or-
-- der and cubic in the matrix dimension.
+- `Ep` — Real vector of eigenvalues of `H0+H1` to the specified order. Its entries are not necessarily sorted in the same way as the input.
+- `Vp` — Normalized eigenvectors of `H0+H1` to the specified order, returned as a square unitary matrix. Its columns correspond, in order, to the eigenvalues in `Ep`.
 
-## Implementation structure
+## Notes
 
-- Rayleigh-Schrodinger perturbation theory to arbitrary order, Eqs
-- 2.21-2.23 from Stefan Stoll's PhD thesis, with the typo fixed in
-- the numerator of Eq 2.21. Syntax:
-- [Ep,Vp]=rspert(E0,H1,order)
-- E0 -eigenvalues of H0, a column vector of real
-- numbers
-- H1 -perturbation, written in the basis that di-
-- agonalises H0
-- order -order of perturbation theory to be used, 6
-- is the sensible maximum
-- Ep -eigenvalues of H0+H1 to the specified order,
-- a vector of reals, not necessarily sorted in
+`H0` must have no degenerate energy levels. The perturbation theory converges only when `norm(H1,2)` is much smaller than the smallest energy gap in `H0`. Numerical artifacts appear beyond sixth order. Computational complexity is linear in `order` and cubic in the matrix dimension.
+
+Source: [rspert.m](https://spindynamics.org/wiki/index.php?title=rspert.m). Contact: ilya.kuprov@weizmann.ac.il.

@@ -4,29 +4,12 @@
 
 ## Purpose
 
-Powder magic angle spinning spectrum of a pair of anisotropically shielded protons using a Fokker-Planck theory based formalism. Calculation time: seconds
+Calculates the powder MAS spectrum of a pair of anisotropically shielded protons using a Fokker–Planck-based formalism. The source estimates seconds.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The system has two `1H` spins at 14.1 T, with shielding eigenvalue sets `[-2 -2 4]-5` and `[-1 -3 4]+5` and zero Euler angles. The MAS rate is 500 Hz about `[1 1 1]`, with maximum rank 17 and grid `leb_2ang_rank_17`. Acquisition is for `1H`.
 
-## Numerical / algorithmic content
+## Implementation
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a pair of anisotropically shielded
-- protons using a Fokker-Planck theory based formalism.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodization
-- Fourier transform
-- Plotting
+The function calls `singlerot` with `@acquire`, applies exponential apodisation (6), zero-fills the 512-point FID to 4096 points, Fourier transforms, and plots the real spectrum. The sweep is 20 kHz and the axis units are ppm.

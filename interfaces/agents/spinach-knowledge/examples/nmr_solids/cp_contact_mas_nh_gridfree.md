@@ -4,27 +4,19 @@
 
 ## Purpose
 
-Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15 and a single proton. Spinning powder simulation starting from the thermal equilibrium using the grid-free version of the Fok- ker-Planck formalism. Calculation time: minutes with a Tesla A100 GPU, much longer otherwise.
+Simulates ¹H→¹⁵N cross-polarisation in the doubly rotating frame for a single proton–nitrogen pair. The grid-free Fokker–Planck calculation starts from thermal equilibrium and averages a spinning powder. The source estimates minutes on a Tesla A100 GPU and substantially longer on a CPU.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
+The two-spin system has zero isotropic Zeeman shifts, a 1.05 Å internuclear separation, and temperature 298 K. The experiment applies spin-lock fields to ¹H and ¹⁵N during magic-angle spinning; the rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`. The detected observable is the ¹⁵N transverse magnetisation.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The source uses the full `sphten-liouv` basis (`bas.approximation='none'`) and calls `gridfree` with `@cp_contact_hard`. It requests `iso_eq`, uses 100 time steps of 10 μs, and sets `max_rank=42`. The spin-lock powers are 50 kHz on ¹H and 40 kHz on ¹⁵N; the rotor rate is 10 kHz. A source comment says a GPU is needed and shows `sys.enable={'gpu'}` as a commented-out line, so the script does not explicitly enable that option.
 
 ## Implementation structure
 
-- Cross-polarisation experiment in the doubly rotating frame. A single
-- nitrogen-15 and a single proton. Spinning powder simulation starting
-- from the thermal equilibrium using the grid-free version of the Fok-
-- ker-Planck formalism.
-- Calculation time: minutes with a Tesla A100 GPU,
-- much longer otherwise.
-- System specification
-- Interactions
-- Basis set
-- This needs a GPU
-- sys.enable={'gpu'};
-- Spinach housekeeping
+- Defines the ¹⁵N–¹H pair, isotropic shifts, internuclear coordinates, and temperature.
+- Builds the Spinach system and the transverse operators used for irradiation and detection.
+- Sets MAS axis, rank, RF powers, equilibrium requirement, and time grid.
+- Runs the grid-free CP simulation and plots the real ¹⁵N signal versus accumulated time.

@@ -4,50 +4,22 @@
 
 ## Purpose
 
-Adiabatic elimination in Liouville space, implements Section 6.1 of Kuprov's book. Syntax: [L,R]=adelim(spin_system,L,fast_idx,slow_idx)
+Perform adiabatic elimination in Liouville space, following Section 6.1 of Kuprov's book.
 
-## Physical / mathematical content
+## Mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+The input basis is partitioned into fast and slow indices. The function forms the four Liouvillian blocks `L00`, `L01`, `L10`, and `L11`; it returns the slow block `L=L00` and the additional relaxation superoperator `R=1i*L01*(L11\L10)`. The fast subsystem is expected to be dissipative.
 
 ## Parameters / inputs
 
-- L -Liouvillian in a Liouville space formalism,
-- fast subbsystem must be dissipative
-- fast_idx -a vector of integers specifying which
-- states in the basis involve the fast
-- subsystem in any way
-- slow_idx -a vector of integers specifying which
-- states in the basis only involve the
-- slow subsystem
+- `spin_system` - Spinach spin-system structure; the supported formalisms are `sphten-liouv` and `zeeman-liouv`.
+- `L` - square Liouvillian in the selected Liouville-space formalism.
+- `fast_idx` - indices of basis states involving the fast subsystem.
+- `slow_idx` - indices involving only the slow subsystem. In `sphten-liouv`, basis states can be attributed to individual spins; in `zeeman-liouv`, the caller must provide index sets meaningful in the Zeeman basis.
+
+The fast and slow index sets must be disjoint and together cover the Liouvillian basis.
 
 ## Outputs
 
-- L -projection of the original Liouvillian
-- into the slow subspace, inheriting any
-- coherent and dissipative dynamics that
-- the user previously had there
-- R -the extra relaxation superoperator on-
-- ce the fast subspace is adiabatically
-- eliminated
-- Note: in sphten-liouv the basis states are attributable to
-- individual spins; in zeeman-liouv the caller must
-- supply index sets that are meaningful in the Zeeman
-- basis of Liouville space.
-
-## Implementation structure
-
-- Adiabatic elimination in Liouville space, implements
-- Section 6.1 of Kuprov's book. Syntax:
-- [L,R]=adelim(spin_system,L,fast_idx,slow_idx)
-- L -Liouvillian in a Liouville space formalism,
-- fast subbsystem must be dissipative
-- fast_idx -a vector of integers specifying which
-- states in the basis involve the fast
-- subsystem in any way
-- slow_idx -a vector of integers specifying which
-- states in the basis only involve the
-- slow subsystem
-- L -projection of the original Liouvillian
+- `L` - projection of the original Liouvillian into the slow subspace, retaining its existing coherent and dissipative dynamics.
+- `R` - additional relaxation superoperator from eliminating the fast subspace.

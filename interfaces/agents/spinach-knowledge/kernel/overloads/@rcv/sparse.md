@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts an RCV sparse matrix into a Matlab sparse matrix. Syntax: A=sparse(A)
+Converts an RCV sparse-matrix object to a MATLAB sparse matrix of the same dimensions.
 
-## Physical / mathematical content
+## Mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+The conversion preserves the matrix represented by the stored row indices, column indices, and values. An RCV object with no stored entries is converted to an empty sparse matrix with its specified dimensions.
 
 ## Numerical / algorithmic content
+
+The function requires an RCV input. For a nonempty object, it passes the stored entry arrays and dimensions to MATLAB’s `sparse` constructor; for an empty object, it uses `spalloc` with zero allocated entries.
 
 ## Parameters / inputs
 
@@ -22,15 +24,6 @@ Converts an RCV sparse matrix into a Matlab sparse matrix. Syntax: A=sparse(A)
 
 ## Implementation structure
 
-- Converts an RCV sparse matrix into a Matlab sparse
-- matrix. Syntax:
-- A=sparse(A)
-- A -RCV sparse matrix
-- A -Matlab sparse matrix
-- Check consistency
-- Check if empty
-- Empty matrix of a specified size
-- Call Matlab's sparse matrix constructor
-- Consistency enforcement
-- Working 16 hours a day, 7 days a week, 52 weeks
-- in a year, and people still calling me lucky.
+- Check that the input is RCV.
+- If it has no stored entries, create a zero-allocation sparse matrix with the recorded dimensions.
+- Otherwise, construct the MATLAB sparse matrix from the stored row, column, and value arrays and the recorded dimensions.

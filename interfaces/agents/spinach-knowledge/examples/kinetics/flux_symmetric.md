@@ -4,26 +4,16 @@
 
 ## Purpose
 
-Two-spin symmetric magnetization flux problem. Calculation time: seconds.
+Simulates a two-site symmetric intermolecular magnetization-flux problem for two `1H` environments at 14.1 T, with scalar offsets 0 and 3. Both directional flux rates are 2000. The source lists a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model sets equal directional intermolecular flux rates and computes the resulting liquid-state NMR signal.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+Uses the sphten-liouv formalism with no basis approximation, acquires the signal, applies exponential apodisation with parameter 6, and Fourier-transforms the zero-filled FID.
 
 ## Implementation structure
 
-- Two-spin symmetric magnetization flux problem.
-- Calculation time: seconds.
-- System specification
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Specifies the two-spin flux system, constructs the Spinach basis, sets acquisition parameters, simulates the FID, and plots its Fourier-transformed spectrum.

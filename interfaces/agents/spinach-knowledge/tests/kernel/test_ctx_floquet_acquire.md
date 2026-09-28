@@ -4,34 +4,16 @@
 
 ## Purpose
 
-Tests the Floquet context with acquire(). Syntax: result=test_ctx_floquet_acquire()
+Runs a three-point anisotropic one-spin MAS acquisition through `floquet()` and `acquire()` to exercise the Floquet-context route.
 
 ## Physical / mathematical content
 
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
+The test uses an anisotropic Zeeman tensor with principal values `[-2 -2 4]` and zero Euler angles. Floquet propagation represents the periodic rotor-driven dynamics in the Floquet space.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The one-spin `1H` system is built at 14.1 T in the `sphten-liouv` formalism with no approximation and projection `+1`. The acquisition uses `rho0=coil=L+`, zero offset, 2000 Hz sweep, three points, rotor rate 1000, axis `[1 1 1]`, `max_rank=1`, and grid `leb_2ang_rank_5`. The test calls `floquet(spin_system,@acquire,parameters,'nmr')`.
 
-## Outputs
+## Checks
 
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- floquet() and checks the returned time-domain trace for basic physical
-- and dimensional invariants.
-
-## Implementation structure
-
-- Tests the Floquet context with acquire(). Syntax:
-- result=test_ctx_floquet_acquire()
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- floquet() and checks the returned time-domain trace for basic physical
-- and dimensional invariants.
-- Announce the test target
-- State the Floquet-context target of the test
-- Build a one-spin anisotropic Liouville-space system
-- Set up a tiny Floquet acquisition
-- Run the production Floquet context
-- Check the number of acquired points
+The test requires three output points, compares the first point with the initial coil overlap to absolute and relative tolerance `1e-12`, and verifies every FID sample is finite.

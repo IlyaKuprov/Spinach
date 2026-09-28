@@ -4,48 +4,24 @@
 
 ## Purpose
 
-Chemical kinetics superoperator. Syntax: K=kinetics(spin_system)
+Builds the chemical-reaction and magnetization-flux kinetics superoperator from the chemical settings in `spin_system.chem`.
 
 ## Physical / mathematical content
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+Reaction rates transfer basis-state populations between source and destination spin systems. Optional magnetization fluxes transfer single-spin orders and handle multi-spin orders according to the selected intramolecular or intermolecular model. Optional radical-pair recombination adds singlet/triplet kinetics using the selected `rp_theory` model.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The routine assembles sparse transitions from the configured reaction rates, checks compatibility of the source and destination basis subspaces, and adds the configured flux and radical-pair terms. Chemical reactions and magnetization-flux handling require the `sphten-liouv` formalism; radical-pair recombination accepts `sphten-liouv` or `zeeman-liouv`.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- produced as described in the spin system
-- and basis specification sections, of the
-- of the online manual. All adjustable pa-
-- rameters are described in the chemical
-- kinetics parameters section.
+- `spin_system` - Spinach spin-system description, including the chemical reaction rates, magnetization flux settings, and (when enabled) radical-pair theory and rates.
 
 ## Outputs
 
-- K -kinetics superoperator. If a Liouvillian is
-- assembled manually, this dissipative super-
-- operator must enter as 1i*K, for example
-- L=H+1i*R+1i*K
-- Note: a large variety of chemical reaction models is supported,
-- see the chemical kinetics parameters section of the onli-
-- ne manual.
-- Note: Spinach context functions include relaxation and kinetics
-- superoperators into the total Liovillian automatically.
+- `K` - chemical kinetics superoperator. When assembling a Liouvillian manually, include it as `1i*K`, for example `L=H+1i*R+1i*K`. Spinach context functions include kinetics automatically.
 
 ## Implementation structure
 
-- Chemical kinetics superoperator. Syntax:
-- K=kinetics(spin_system)
-- spin_system - Spinach spin system description object
-- produced as described in the spin system
-- and basis specification sections, of the
-- of the online manual. All adjustable pa-
-- rameters are described in the chemical
-- kinetics parameters section.
-- K - kinetics superoperator. If a Liouvillian is
-- assembled manually, this dissipative super-
-- operator must enter as 1i*K, for example
-- L=H+1i*R+1i*K
+The routine initializes a sparse superoperator, adds configured chemical-reaction transitions, processes magnetization fluxes when present, and then adds the selected radical-pair recombination model when enabled.

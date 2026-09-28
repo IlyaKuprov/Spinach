@@ -4,27 +4,14 @@
 
 ## Purpose
 
-Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with two anisotropically shielded nuclei. Spinach relaxation theory mo- dule automatically accounts for all cross-correlations (CSA-CSA cross- correlation is present in this case). Calculation time: seconds
+Construct and display the complete Redfield relaxation superoperator for an anisotropically shielded `1H`–`13C` pair. The source notes that the CSA–CSA cross-correlation contribution is present and that the Spinach relaxation module accounts for the cross-correlations. Calculation time: seconds.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Field: `14.1 T`; shielding principal-value rows (ppm): `[7 15 -22]` and `[11 18 -29]`.
+- Shielding Euler-angle rows: `[pi/5 pi/3 pi/11]` and `[pi/6 pi/7 pi/15]`.
+- Redfield relaxation uses `tau_c={2e-9}`, zero equilibrium, and `labframe` retention. The basis is `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+## Calculation
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Complete Bloch-Redfield-Wangsness relaxation superoperator in a system
-- with two anisotropically shielded nuclei. Spinach relaxation theory mo-
-- dule automatically accounts for all cross-correlations (CSA-CSA cross-
-- correlation is present in this case).
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
+The function creates and bases the system, evaluates `relaxation(spin_system)`, and prints the full superoperator. The source defines no dipolar coupling or coordinates for this example.

@@ -4,42 +4,23 @@
 
 ## Purpose
 
-The cheapest norm for various representations of matrices. CUDA stores matrices by rows, Matlab by columns, and polyadic objects can only multiply vectors, in which case Algorithm 2.4 from Hig- ham and Tisseur's paper: is used. Syntax: n=cheap_norm(A,t,itmax)
+Returns the least expensive supported norm for the representation of `A`: the infinity norm for GPU arrays, the 1-norm for other non-polyadic arrays, and a lower-bound 1-norm estimate for polyadic objects.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function selects a norm calculation appropriate to the array representation. For polyadic objects, it estimates the 1-norm using probe vectors and the iterative method in Algorithm 2.4 of Higham and Tisseur's paper ([DOI](https://doi.org/10.1137/S0895479899356080)).
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+GPU arrays return `norm(A,inf)`; non-polyadic CPU arrays return `norm(A,1)`. For polyadic inputs, the estimator uses matrix-vector and adjoint products to update a lower bound on the 1-norm. The number of probe columns `t` is limited by the number of columns of `A`.
 
 ## Parameters / inputs
 
-- A -a matrix, or a polyadic representation thereof
-- t -(optional) number of probe columns in the poly-
-- adic norm estimator, defaults to 1
-- itmax -(optional) maximum number of estimator iterati-
-- ons, defaults to 5
+- `A` — a matrix or polyadic representation
+- `t` — optional number of probe columns for the polyadic estimator; defaults to 1
+- `itmax` — optional maximum number of estimator iterations; defaults to 5
 
 ## Outputs
 
-- n -infinity-norm for GPU arrays, 1-norm for CPU arrays,
-- and a lower-bound 1-norm estimate for polyadics
-- Note: some norms are vastly more expensive than others, this
-- function uses the cheapest ones available.
-
-## Implementation structure
-
-- The cheapest norm for various representations of matrices. CUDA
-- stores matrices by rows, Matlab by columns, and polyadic objects
-- can only multiply vectors, in which case Algorithm 2.4 from Hig-
-- ham and Tisseur's paper:
-- is used. Syntax:
-- n=cheap_norm(A,t,itmax)
-- A -a matrix, or a polyadic representation thereof
-- t -(optional) number of probe columns in the poly-
-- adic norm estimator, defaults to 1
-- itmax -(optional) maximum number of estimator iterati-
-- ons, defaults to 5
-- n -infinity-norm for GPU arrays, 1-norm for CPU arrays,
+- `n` — infinity norm for GPU arrays, 1-norm for other non-polyadic arrays, or a lower-bound 1-norm estimate for polyadic objects
+- The function uses the least expensive of these supported norm calculations.

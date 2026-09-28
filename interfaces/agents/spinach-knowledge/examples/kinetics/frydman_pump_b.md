@@ -4,27 +4,18 @@
 
 ## Purpose
 
-Lucio Frydman's water exchange based spin-lock pump, Figure 9 from https://doi.org/10.1016/j.jmr.2021.107083 Calculation time: seconds
+Lucio Frydman's water-exchange spin-lock pump, Figure 9 from https://doi.org/10.1016/j.jmr.2021.107083. The script simulates ten repeated pump cycles and plots peptide H, N, and carbonyl-C Z/X trajectories; the source estimates seconds.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
+The spin system contains peptide H, N, Cα, and C′ plus 100 water protons. The source assigns H–N and N–C′ couplings of −45 and 8 Hz, respectively, and builds intermolecular exchange with NH–water and water-pool rates of 1000 and 10⁴ Hz. The diagonal T1 and T2 values are equal: 0.2722 s for peptide H, 0.8 s for N, 2 s for Cα and C′, and 0.2994 s for each water proton; equilibrium is isotropic at 298 K.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Each cycle applies 90° forward flips, two CP periods (11 ms and 53 ms), reverse flips, and a crusher. The two CP stages use 11 and 53 points. Separate effective Hamiltonians are formed for the CP periods, and `evolution` generates their trajectories.
 
 ## Implementation structure
 
-- Lucio Frydman's water exchange based spin-lock pump, Figure 9
-- from https://doi.org/10.1016/j.jmr.2021.107083
-- Calculation time: seconds
-- Number of water protons
-- Magnet field
-- Core spin system
-- Add water protons
-- Chemical shifts
-- Scalar couplings
-- Estimated relaxation times, seconds
-- Relaxation theory
-- Basis set
+- Uses B₀ = 11.7 T, the H/N/C channels, and a 100-proton water pool.
+- Sets `parameters.nloops=10`; CP durations are [11, 53] ms with [11, 53] points.
+- Computes and plots H, N, and carbonyl-C Z/X expectation values against time.

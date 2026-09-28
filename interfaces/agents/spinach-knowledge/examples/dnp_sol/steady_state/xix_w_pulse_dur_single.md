@@ -4,27 +4,12 @@
 
 ## Purpose
 
-2D parameter scan of XiX DNP in the steady state. Calculation time: hours.
+Calculates the steady-state proton signal for a XiX DNP experiment as a two-dimensional scan of electron-pulse duration and microwave offset. The source estimates a runtime of hours.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The W-band, 80 K model contains one trityl electron and one proton separated by 3.5 distance units. Proton relaxation is distance-dependent through `r1n_dnp`. The script forms the spin system in the untruncated Zeeman Liouville basis, detects proton (I_z), and evaluates the steady state with `xixdnp_steady` using an 800-point spherical powder grid. Each contact block is 360 ns and the shot spacing is 167 μs minus that contact time.
 
-## Numerical / algorithmic content
+## Scan and output
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- 2D parameter scan of XiX DNP in the steady state.
-- Calculation time: hours.
-- W-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Electron pulse duration grid, s
+The calculation covers 200 pulse durations from 2 to 21 ns and 101 microwave offsets from −230 to 205 MHz, at 20 MHz electron nutation frequency. The plot is updated after each duration and saved as `xix_w_pulse_dur_single.fig`.

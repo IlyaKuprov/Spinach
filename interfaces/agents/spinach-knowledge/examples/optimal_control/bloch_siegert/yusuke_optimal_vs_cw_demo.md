@@ -1,34 +1,24 @@
 # examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m
 
 - Signature: `yusuke_optimal_vs_cw_demo()`
+- Status: historical documentation. The corresponding `.m` file is absent from the current checkout; this description is based on `b4f03f29^:examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m` and does not establish current behavior.
 
 ## Purpose
 
-Bloch-Siegert-aware phase optimisation compared to a simple constant- phase low-power cycle. This is the control-side companion to yusuke_14n_broadening_demo.m: the task is a reduced-model surrogate for low-power offset-tolerant decoupling, formulated as an identity cycle that should preserve magnetisation across offset and B1 distributions. The "non-optimal pulse" is a constant-phase X pulse with the same RF amplitu
+The historical example optimises a Bloch–Siegert-aware, phase-modulated low-power waveform against a constant-phase X-pulse baseline. It is a reduced single-spin identity-cycle surrogate intended to preserve magnetisation over offset and RF-amplitude (B1) variation. The header describes it as a control-side companion to `yusuke_14n_broadening_demo.m`; it is explicitly not a full QJF/MAS quadrupolar simulation.
 
-## Physical / mathematical content
+## Historical setup and numerics
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- Random seed: `rng(1)`.
+- Field: `sys.magnet=18.8` T, corresponding to 800 MHz for (^1)H.
+- Model: one (^ {13})C spin, zero isotropic Zeeman coupling, and the full spherical-tensor Liouville basis (`formalism='sphten-liouv'`, `approximation='none'`). The identity-cycle states are normalised (S_x), (S_y), and (S_z).
+- Header context: 70 kHz MAS, (t_psim10) μs, and (
+u_{14N}) in the 15–23 kHz range. These are motivating 14N-decoupling conditions, not a simulated quadrupolar 14N system.
+- RF and pulse: nominal RF 20 kHz; 10 equal elements of 10 μs each (100 μs total). The constant-phase reference is a 4π X pulse. The phase-only optimiser uses L-BFGS, up to 40 iterations, with Bloch–Siegert corrections enabled (`control.bsiegert=true()`); amplitudes are held fixed.
+- Optimisation training grid: seven offsets from −12 to +12 kHz and B1 scales [0.95, 1.00, 1.05]. Evaluation grid: 61 offsets from −20 to +20 kHz and nine B1 scales from 0.90 to 1.10.
 
-## Numerical / algorithmic content
+The objective evaluates preservation of the three Cartesian basis states; the code also evaluates offset and B1 profiles for the optimised and constant-phase waveforms and plots phase/profile comparisons. The source contains no prose conclusion or fixed numerical result; this page therefore makes no claim that either waveform wins over the evaluation grid.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Source and citation status
 
-## Implementation structure
-
-- Bloch-Siegert-aware phase optimisation compared to a simple constant-
-- phase low-power cycle. This is the control-side companion to
-- yusuke_14n_broadening_demo.m: the task is a reduced-model surrogate for
-- low-power offset-tolerant decoupling, formulated as an identity cycle
-- that should preserve magnetisation across offset and B1 distributions.
-- The "non-optimal pulse" is a constant-phase X pulse with the same RF
-- amplitude and total duration. It behaves like a simple CW-style cycle:
-- acceptable near the design point, but poor once offset and B1 errors
-- are included. The "optimal pulse" is a phase-modulated waveform
-- optimised with Bloch-Siegert corrections enabled.
-- Magnetic field corresponding to 800 MHz 1H
-- Single-spin surrogate model
+The historical header says the numerical regime is inspired by “the 14N decoupling papers” but gives no bibliographic citation. No paper citation or DOI is supplied by the source. The file's author line is `aditya.dev@weizmann.ac.il`.

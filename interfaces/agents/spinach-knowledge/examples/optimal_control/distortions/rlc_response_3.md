@@ -4,31 +4,8 @@
 
 ## Purpose
 
-Probe circuit response effect on the accuracy of the deu- terium pre-phasing pulse designed to set deuterium magne- tisation in a -CD3 group of alanine up for rephasing 100 microseconds after the pulse is finished. The system is assumed to be a powder (100 orientations) with a B1 distribution (from 40 to 60 kHz per channel). Piecewise-linear GRAPE pulse is used. Calculation time: minutes
+Probes how circuit response affects a deuterium pre-phasing pulse for the CD₃ group of alanine, intended to set the deuterium magnetisation for rephasing 100 μs after the pulse. The ensemble is a powder of 100 orientations with a B₁ distribution from 40 to 60 kHz per channel. It uses a piecewise-linear GRAPE pulse. Calculation time: minutes.
 
-## Physical / mathematical content
+## Method
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Probe circuit response effect on the accuracy of the deu-
-- terium pre-phasing pulse designed to set deuterium magne-
-- tisation in a -CD3 group of alanine up for rephasing 100
-- microseconds after the pulse is finished.
-- The system is assumed to be a powder (100 orientations)
-- with a B1 distribution (from 40 to 60 kHz per channel).
-- Piecewise-linear GRAPE pulse is used.
-- Calculation time: minutes
-- 600 MHz magnet
-- Isotopes
-- Alanine CD3 NQI parameters
-- Basis set
+The deuterium pulse uses LBFGS with at most 100 iterations and 75 slices of 2 μs each. Its piecewise-linear waveform is passed through the resonator-response calculation for a probe circuit with Q = 200; the example assumes a 600 MHz magnet.

@@ -8,26 +8,17 @@ Hari Arthanari's Double TROSY effect. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Uses a four-spin system comprising two `1H`, one `19F`, and one `13C` spin, selected from a parsed DFT calculation with their coordinates, chemical-shift tensors, and scalar J-couplings.
+- Uses Redfield relaxation with the secular terms retained, zero equilibrium, and a correlation time of `20e-9` s. The magnetic field is `14.1` T.
+- Compares the calculated `13C` spectra before and after clearing the coordinates of both protons for a run labeled in the source as having no proton DD.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the `sphten-liouv` basis formalism with no basis approximation.
+- Initializes and detects `13C` `L+` coherence, with no decoupling. Acquisition uses an offset of `26800`, a sweep of `500`, and `2048` points; the chemical-shift axis is in ppm and inverted.
+- Applies Gaussian apodisation with parameter `6`, then computes `fftshift(fft(fid,16384))`. Plots the real spectra in two panels.
 
 ## Implementation structure
 
-- Hari Arthanari's Double TROSY effect.
-- Calculation time: seconds.
-- Magnet field
-- Read 3-fluorotyrosine DFT calculation
-- Extract coordinates and CSAs
-- Extract J-couplings
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Sequence parameters -13C
-- Simulation
-- Apodisation
+- Parses `../standard_systems/4_fluoro_phe.out` using `gparse` and `g2spinach`, then selects DFT spin indices `[10 20 19 8]`.
+- Creates the spin system and basis, runs `liquid` acquisition, and plots the full spectrum. It then clears the two proton coordinates, rebuilds the spin system, repeats acquisition and processing, and plots the comparison spectrum.

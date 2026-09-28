@@ -4,28 +4,24 @@
 
 ## Purpose
 
-Liquid state magnetic field effect simulation on a radical pair with four nuclei using exponential recombination ki- netics model. Calculation time: seconds
+Simulate the liquid-state magnetic-field effect on singlet recombination yield for a radical pair with four nuclei, using an exponential recombination kinetics model. The source estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- The system contains two electrons and four `1H` nuclei: `{'E','E','1H','1H','1H','1H'}`. Both electron Zeeman scalar values are `2.002`; the nuclear entries are zero.
+- The scalar coupling matrix is constructed as `num2cell(mt2hz([...]/2))`. Its nonzero symmetric entries couple electron 1 to nuclei 3 and 4 with values `0.195`, and electron 2 to nuclei 5 and 6 with values `-1.3` and `0.2`, respectively, before the division by two and `mt2hz` conversion.
+- The kinetics rates are `[0.176 0.880 1.76 3.52 8.8 17.6 35.2 52.8]*1e6`. The field sweep is `1e-3*(0:0.01:5)`, and the electron indices are `[1 2]`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Set `sys.magnet=1` for the field sweep. Use the `sphten-liouv` basis with `bas.approximation='none'`, `bas.projections={0}`, and `S2` permutation symmetry for spins `[3 4]`.
+- Set `parameters.spins={'E'}` and request `parameters.needs={'zeeman_op'}`. Disable ZTE with `sys.disable={'zte'}`.
+- Create the spin system, apply the basis, and calculate `M=liquid(spin_system,@rydmr_exp,parameters,'labframe')`.
 
 ## Implementation structure
 
-- Liquid state magnetic field effect simulation on a radical
-- pair with four nuclei using exponential recombination ki-
-- netics model.
-- Calculation time: seconds
-- Unit magnet (field sweep)
-- System specification
-- Basis set
-- Fields and kinetics parameters
-- Disable ZTE
-- Spinach housekeeping
-- Simulation
-- Plot the answer
+1. Define the magnet setting, isotopes, Zeeman values, and scalar couplings.
+2. Configure the basis, field sweep, kinetics rates, and electron indices.
+3. Disable ZTE, then call `create` and `basis`.
+4. Run `liquid` with `@rydmr_exp` in the lab frame.
+5. Plot `M` against `parameters.fields` as a red line, with axes labelled `magnetic field, Tesla` and `singlet recombination yield`.

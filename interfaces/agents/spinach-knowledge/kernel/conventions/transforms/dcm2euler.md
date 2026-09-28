@@ -7,12 +7,10 @@
 Converts directional cosine matrix into Euler angles, ZYZ active convention (rotating the object rather than the axes). Syntax: [alpha,beta,gamma]=dcm2euler(dcm) OR angles=dcm2euler(dcm)
 
 ## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+The input is a 3×3 directional cosine matrix representing a rotation. The output uses the ZYZ active Euler-angle convention, which rotates the object rather than the axes. For an imperfect input matrix, the function obtains the nearest proper rotation in the Frobenius norm before extracting its angles.
 
 ## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+The function builds a 4×4 Davenport matrix from the input DCM and takes the eigenvector associated with its largest eigenvalue as the quaternion of the nearest proper rotation. It converts that quaternion to Euler angles with `qter2euler`, wraps alpha and gamma using `mod(angle,2*pi)`, and checks the result by reconstructing a DCM. If the reconstruction differs from the input by more than `1e-2` in the matrix 1-norm, it displays both matrices and raises an error.
 
 ## Parameters / inputs
 
@@ -37,16 +35,4 @@ Converts directional cosine matrix into Euler angles, ZYZ active convention (rot
 - extracted from the corresponding quaternion.
 
 ## Implementation structure
-
-- Converts directional cosine matrix into Euler angles, ZYZ active
-- convention (rotating the object rather than the axes). Syntax:
-- [alpha,beta,gamma]=dcm2euler(dcm)
-- angles=dcm2euler(dcm)
-- dcm -directional cosine matrix
-- alpha, beta, gamma -Euler angles in ZYZ active con-
-- vention, radians
-- angles -a row vector of Euler angles in
-- ZYZ active convention, ordered
-- as alpha, beta, gamma, in radians
-- Note: the problem of recovering Euler angles from a DCM is, in
-- general, ill-posed. This function is a product of consi-
+The function first validates that `dcm` is a real, finite 3×3 numeric matrix. Orthogonality and determinant deviations above `1e-6` produce warnings; deviations above `1e-2` produce errors. It then constructs the Davenport matrix, selects its dominant eigenvector, converts the resulting quaternion to ZYZ active Euler angles, wraps alpha and gamma, and checks the reconstructed DCM. With one or no requested outputs it returns `[alpha beta gamma]` as a row vector; with three outputs it returns the angles separately. Any other number of requested outputs raises an error.

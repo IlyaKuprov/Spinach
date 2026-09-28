@@ -4,20 +4,15 @@
 
 ## Purpose
 
-Four-pulse DEER/PELDOR pulse sequence. The sequence uses soft pulses computed with the Fokker-Planck formalism. Syntax: echo_stack=deer_4p_soft_deer(spin_system,parameters,H,R,K)
+Simulates the four-pulse DEER/PELDOR sequence and returns `echo_stack`, an echo sampled over the third-pulse-position interval.
 
 ## Physical / mathematical content
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The function converts to Liouville representation as needed, forms `L = H + 1i*R + 1i*K`, then applies the four shaped pulses and free-evolution intervals specified by the parameters. It samples the second echo around its expected position to form the echo stack.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+Soft pulses are propagated with `shaped_pulse_af`, and free intervals with `evolution`; the propagation method is selected by `parameters.method`.
 
 ## Parameters / inputs
 
@@ -70,18 +65,3 @@ Four-pulse DEER/PELDOR pulse sequence. The sequence uses soft pulses computed wi
 - ration is recommended.
 - Note: the time in the DEER trace refers to the third pulse inser-
 - tion point, after end of the second pulse.
-
-## Implementation structure
-
-- Four-pulse DEER/PELDOR pulse sequence. The sequence uses soft
-- pulses computed with the Fokker-Planck formalism. Syntax:
-- echo_stack=deer_4p_soft_deer(spin_system,parameters,H,R,K)
-- parameters.pulse_frq -frequencies for the four
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the four
-- pulses, rad/s
-- parameters.pulse_dur -durations for the four
-- pulses, seconds
-- parameters.pulse_phi -initial phases for the four
-- pulses, radians
-- parameters.pulse_rnk -Fokker-Planck ranks for the

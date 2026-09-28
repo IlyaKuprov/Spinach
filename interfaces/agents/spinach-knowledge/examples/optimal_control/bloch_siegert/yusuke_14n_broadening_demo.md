@@ -2,27 +2,14 @@
 
 - Signature: `yusuke_14n_broadening_demo()`
 
-## Purpose
+## Status
 
-Reduced effective-model illustration of the trade-off discussed by Nehra, Agarwal, and Nishiyama for 14N decoupling under 1H detection. The example is intentionally qualitative rather than quantitative: it shows why low-power CW decoupling is narrowband, why increasing the 14N RF field produces a Bloch-Siegert shift on the observed 1H resonance, and why B1 inhomogeneity turns that shift into broadening. The "offset-t
+Historical example: the MATLAB source was removed in commit `b4f03f29`. This note describes the source at its parent revision; the example is not available at the current source path and should not be treated as a runnable current demo.
 
-## Physical / mathematical content
+## Purpose and model
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
+The deleted script is a qualitative reduced-model illustration, inspired by work of Nehra, Agarwal, and Nishiyama on (^{14}mathrm N) decoupling under (^{1}mathrm H) detection. It contrasts narrowband low-power CW decoupling, higher-power CW decoupling, and a hypothetical low-power offset-tolerant profile. The latter is a design target, not a pulse computed by optimal control. The source explicitly recommends replacing its effective coefficients with a more detailed Hamiltonian model for quantitative work.
 
-## Numerical / algorithmic content
+At 18.8 T (approximately 800 MHz for (^{1}mathrm H)), it represents three (^{14}mathrm N) sites at −18, 0, and +18 kHz, with weights 0.30, 0.40, and 0.30, and samples a Gaussian (B_1)-scale distribution from 0.85 to 1.15. Its illustrative RF settings are 8 kHz and 20 kHz for low- and high-power CW, and 12 kHz for the offset-tolerant trace. Hand-defined response profiles determine residual broadening; a quadratic effective Bloch–Siegert shift is averaged over the (B_1) distribution and removed at its mean to show the residual line broadening.
 
-## Implementation structure
-
-- Reduced effective-model illustration of the trade-off discussed by
-- Nehra, Agarwal, and Nishiyama for 14N decoupling under 1H detection.
-- The example is intentionally qualitative rather than quantitative:
-- it shows why low-power CW decoupling is narrowband, why increasing
-- the 14N RF field produces a Bloch-Siegert shift on the observed 1H
-- resonance, and why B1 inhomogeneity turns that shift into broadening.
-- The "offset-tolerant low-power" trace represents the design goal of
-- Bloch-Siegert-aware robust optimal control or low-power amplitude-
-- modulated decoupling. Replace the effective coefficients below with a
-- more detailed Hamiltonian model for quantitative work.
-- Magnetic field corresponding to 800 MHz 1H
-- Three inequivalent 14N sites around the decoupler carrier
+The script plots decoupling efficiency against (^{14}mathrm N) offset and normalized predicted proton lines, and prints mean efficiencies and FWHM values. Its intended qualitative point is that a Bloch–Siegert shift becomes broadening when dispersed by (B_1) inhomogeneity. It is an analytic toy model, not a full quadrupolar/MAS calculation or a quantitative prediction. The source supplies author names but no full bibliographic citation; no additional citation details are inferred here.

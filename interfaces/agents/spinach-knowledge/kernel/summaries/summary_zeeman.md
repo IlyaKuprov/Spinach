@@ -4,33 +4,17 @@
 
 ## Purpose
 
-Prints Zeeman interaction tensor summary for a Spinach system. Syntax: summary_zeeman(spin_system,header)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Prints a summary of the Zeeman interaction matrices stored in a Spinach system.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
+- `spin_system` - Spinach spin system structure.
+- `header` - character string printed before the table.
 
-## Outputs
+## Output
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+No MATLAB output argument; writes through `report`.
 
-## Implementation structure
+## Behavior
 
-- Prints Zeeman interaction tensor summary for a Spinach system. Syntax:
-- summary_zeeman(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the summary table
-- Get the isotropic part
-- Get the first and second rank parts
-- Do the printing
-- Print the break line
+The function checks the inputs, then processes each nonempty Zeeman matrix. For each, it reports the spin index, isotope, multiplicity (2S+1), matrix, isotropic part (trace/3), and the matrix 2-norms of the rank-1 and rank-2 components. It obtains those components with `mat2sphten` and `sphten2mat`, and prints the third row of the original matrix as well.

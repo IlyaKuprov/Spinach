@@ -4,38 +4,24 @@
 
 ## Purpose
 
-Searches Spinach distribution folders for any functions that do not conform to the house style. Opens the first one and complains to the console. Syntax: exorcise(mode)
+Scans Spinach source files for violations of the repository's house style and opens the first offending file before reporting an error.
 
 ## Physical / mathematical content
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+This is a source-integrity utility; it does not perform a physical or numerical calculation.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The scan checks file formatting and documentation, MATLAB syntax, and several coding conventions. In `online` mode it also checks that each documented Wiki page is available; `offline` mode skips that network check.
 
 ## Parameters / inputs
 
-- mode -'online' checks the documentation
-- Wiki for the corresponding page; 'offline'
-- skips the Wiki check
-- Any user contribution that this function has something to
-- say about will either be brought under the house style, or
-- rejected back to the user, depending on the amount of work
-- involved. Always run this function before a commit if you
-- have write access to Spinach repository.
+- `mode` — `'online'` checks the corresponding documentation Wiki page; `'offline'` skips the Wiki check.
+
+## Outputs
+
+No return value. The function reports scan progress and success; on the first detected violation it opens the file in the editor and raises an error.
 
 ## Implementation structure
 
-- Searches Spinach distribution folders for any functions that
-- do not conform to the house style. Opens the first one and
-- complains to the console. Syntax:
-- exorcise(mode)
-- mode -'online' checks the documentation
-- Wiki for the corresponding page; 'offline'
-- skips the Wiki check
-- Any user contribution that this function has something to
-- say about will either be brought under the house style, or
-- rejected back to the user, depending on the amount of work
-- involved. Always run this function before a commit if you
-- have write access to Spinach repository.
+It visits `.m` files under `kernel`, `interfaces`, `experiments`, and `etc` in randomized order, excluding the `jsonlab-1.5` foreign-package directory. Checks include required headers and `grumble` validation, whitespace and tab rules, MATLAB's `checkcode`, explicit norm types, portable path separators, a top-level `otherwise` in each `switch`, and use of `report` rather than `disp` when `spin_system` is available.

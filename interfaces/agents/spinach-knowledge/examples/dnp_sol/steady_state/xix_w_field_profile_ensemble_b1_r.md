@@ -4,27 +4,20 @@
 
 ## Purpose
 
-Simulation of XiX DNP field profile in the steady state with averaging over electron-proton distance and electron Rabi frequency ensemble. Calculation time: minutes.
+Simulation of a steady-state XiX DNP field profile averaged over electron–proton distance and electron Rabi frequency. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- Models an electron–proton pair at 3.4 T and 80 K, with a trityl electron g-tensor and a proton chemical-shift guess. Distance- and orientation-dependent proton relaxation is supplied by `r1n_dnp`; the detected observable is proton `Lz`.
+- Computes the XiX DNP response across microwave resonance offsets from −300 to 300 MHz, then averages over the B1 distribution and the distance distribution. The distance average includes the radial Jacobian factor r².
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Uses a full `sphten-liouv` basis, a spherical powder grid, and `powder(...,@xixdnp_steady,...,'esr')` to calculate the steady-state response for each distance and electron nutation frequency.
+- Samples three distances from 3.5 to 20 Å and five B1 frequencies from 10 to 20 MHz using Gauss–Legendre points and weights. The field profile contains 201 microwave-offset points.
 
 ## Implementation structure
 
-- Simulation of XiX DNP field profile in the steady state with
-- averaging over electron-proton distance and electron Rabi
-- frequency ensemble.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance and B1 ensemble, Gauss-Legendre points
+- Sets the magnet field, electron and proton interactions, temperature, basis, propagator tolerance, and simulation options.
+- For each distance, sets Cartesian spin coordinates and relaxation rates, creates the spin system, and configures proton detection and XiX experiment parameters, including 18 ns pulses, 10 blocks, and a phase-inverted second pulse.
+- For each B1 value, runs the powder-averaged steady-state simulation; then integrates over B1 and distance, plots the real proton `Lz` expectation value against microwave offset, and saves `xix_w_field_profile_ensemble_b1_r.fig`.

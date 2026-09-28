@@ -8,26 +8,24 @@ Adds prefix matrices to a polyadic. Anything the polyadic multiplies will subseq
 
 ## Physical / mathematical content
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
+For nonscalar `a`, the matrix is prepended to the polyadic prefix buffer, so subsequent multiplication applies it from the left; a scalar is absorbed into the first core of each term.
 
 ## Numerical / algorithmic content
 
 ## Parameters / inputs
 
-- a -prefix matrix
-- p -polyadic object
+- `a`: prefix matrix (which may itself be a polyadic)
+- `p`: polyadic object
 
 ## Outputs
 
-- p -polyadic object
+- `p`: polyadic object
 - Note: a prefix can be a polyadic itself.
 
 ## Implementation structure
 
-- Adds prefix matrices to a polyadic. Anything the polyadic
-- multiplies will subsequently be multiplied by the prefix
-- matrices. Syntax:
-- p=prefix(a,p)
+- Checks dimensions for a nonscalar prefix matrix and prepends it to `p.prefix`.
+- For scalar `a`, multiplies it into the first core of every term.
 - a - prefix matrix
 - p - polyadic object
 - Note: a prefix can be a polyadic itself.

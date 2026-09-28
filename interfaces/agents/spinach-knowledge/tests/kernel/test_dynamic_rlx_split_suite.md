@@ -6,27 +6,13 @@
 
 Tests relaxation-superoperator component splitting. Syntax: result=test_dynamic_rlx_split_suite()
 
-## Physical / mathematical content
 
-## Numerical / algorithmic content
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks that rlx_split() separates single-spin longitudinal,
-- single-spin transverse, and multi-spin relaxation blocks without overlap.
-
+- `result` — regression test result with explanatory messages.
 ## Implementation structure
 
-- Tests relaxation-superoperator component splitting. Syntax:
-- result=test_dynamic_rlx_split_suite()
-- result -regression test result with explanatory messages
-- The test checks that rlx_split() separates single-spin longitudinal,
-- single-spin transverse, and multi-spin relaxation blocks without overlap.
-- Announce the test target
-- State the relaxation-splitting target of the test
-- Build a two-spin spherical-tensor Liouville basis
-- Interpret the basis using the same documented state categories
-- Build a diagonal relaxation matrix with a zero unit-state element
-- Build the mathematically expected non-overlapping blocks
-- Split the relaxation superoperator with the production helper
+- Build a two-spin spherical-tensor Liouville basis and classify the single-spin longitudinal, single-spin transverse, and multi-spin components.
+- Construct a diagonal relaxation matrix with its unit-state element set to zero, then build the expected longitudinal, transverse, and mixed blocks from the state-category masks.
+- Call `rlx_split()`, compare each returned block with its reference, and verify that the blocks reconstruct the original matrix.

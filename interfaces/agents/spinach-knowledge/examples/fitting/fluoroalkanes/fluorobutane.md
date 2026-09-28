@@ -4,28 +4,12 @@
 
 ## Purpose
 
-Fitting of 1H NMR spectrum of 2-fluoropentane with respect to J-couplings. See our paper for further details: Calculation time: hours
+Fit experimental ^1H and ^19F NMR spectra by optimising J-couplings and separate spectral scale factors. The source comments describe this as fitting the ^1H NMR spectrum of **2-fluoropentane**, although the function and data files are named `fluorobutane`. See https://doi.org/doi/10.1021/acs.joc.4c00670 for further details. Calculation time: hours.
 
-## Physical / mathematical content
+## Workflow
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Fitting of 1H NMR spectrum of 2-fluoropentane with respect
-- to J-couplings. See our paper for further details:
-- Calculation time: hours
-- Load experimental data
-- Normalise the data
-- Concatenate spectral intervals
-- Set the guess
-- Set optimiser options
-- Get the figure going
-- Run the optimisation
-- Display the result
-- Least squares error function
+- Load the fluorine spectrum and two proton spectral intervals from `fluorobutane_fluorine.mat` and `fluorobutane_proton.mat`. Normalise each by its integrated intensity, with a factor of two for the second proton interval, then concatenate the proton intervals and axes.
+- Starting from an 11-parameter guess, use `fminsearch` with `MaxIter=5000` and `MaxFunEvals=Inf` to minimise the summed squared real-spectrum residuals. Nine parameters specify J-couplings; `A` and `B` scale the simulated ^1H and ^19F spectra independently.
+- In each objective evaluation, construct a Spinach system containing nine ^1H spins and one ^19F spin at 11.7464 T. The fixed chemical shifts are 0.982 ppm (far CH3), 1.333 ppm (near CH3), 4.6075 ppm (CHF), 1.5949 and 1.6890 ppm (CH2), and −173.184 ppm (^19F). Model the two methyl groups with `S3` permutation symmetry in the unapproximated `zeeman-hilb` formalism.
+- Simulate separate ^1H and ^19F acquisitions with `liquid(...,@acquire,...,'nmr')`, Gaussian-apodise each FID with width 6.0, zero-fill and Fourier-transform it, generate a ppm axis, and interpolate the result onto the experimental axis using `pchip`. The ^1H acquisition uses a 2000 Hz sweep, 4096 points and 32768-point zero fill; the ^19F acquisition uses a 250 Hz sweep, 512 points and 2048-point zero fill.
+- Set proton-spectrum indices `3770:3820` to zero in both experiment and simulation before calculating the residual. Plot experimental and simulated proton and fluorine regions during fitting, print the trial parameters, and display the optimised parameters on completion.

@@ -4,63 +4,31 @@
 
 ## Purpose
 
-Eigensystem of sparse Hamiltonians to user-specified order in RSPT with careful handling of diagonal dominance and an opti- on to do exact diagonalisation (expensive). The function also returns eigenvalue derivatives and transition moments between eigenvectors under a user-specified operator. Parametrisation matches use cases in field-swept EPR spectroscopy. Syntax: [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+Computes the eigensystem of a sparse Hamiltonian to a specified order of Rayleigh–Schrödinger perturbation theory (RSPT), with handling of diagonal dominance, or by exact diagonalisation. The parameterisation supports field-swept EPR spectroscopy. Optional outputs provide energy derivatives, transition moments and level populations.
 
 ## Parameters / inputs
 
-- Hz -laboratory frame Hamiltonian, containing only
-- Zeeman terms at 1 Tesla
-- Hc -laboratory frame Hamiltonian, containing all
-- spin-spin couplings, but no Zeeman terms
-- Hmw -observable operator without the amplitude pre-
-- factor (2-norm should be around 1)
-- B -magnetic field, Tesla
-- parameters.rspt_order -perturbation theory order to use
-- to account for the off-diagonal
-- part of the Hamiltonian, Inf for
-- exact diagonalisation
-- parameters.rho0 -[optional] when a matrix, sets a user-
-- specified thermal equilibrium state;
-- when a function handle f(B,alp,bet,gam)
-- sets the function to call to obtain
-- the thermal equilibrium at each orien-
-- tation and magnetic field; if not pro-
-- vided, the thermal equilibrium is com-
-- puted at the current temperature, ori-
-- entation, and magnetic field
+- `Hz` — laboratory-frame Hamiltonian containing only Zeeman terms at 1 Tesla.
+- `Hc` — laboratory-frame Hamiltonian containing spin–spin couplings but no Zeeman terms.
+- `Hmw` — observable operator without its amplitude prefactor; its 2-norm should be around 1.
+- `B` — magnetic field in Tesla.
+- `parameters.rspt_order` — order used to account for the off-diagonal Hamiltonian. Supported perturbative orders are `1`, `2`, `3` and `4`; `Inf` selects exact diagonalisation, which is expensive.
+- `parameters.rho0` — optional equilibrium-state matrix, or a function handle `f(B,alp,bet,gam)` evaluated at the magnetic field and the three entries of `parameters.orientation`. If omitted, equilibrium is computed for the current temperature, orientation and magnetic field.
 
 ## Outputs
 
-- E -a column vector of energies, sorted in ascen-
-- ding order (rad/s)
-- V -a matrix with eigenvectors in columns, sorted
-- left to right in the same order as the energies
-- dE -a column vector of dE/dB derivatives, sorted in
-- the same order as the energies
-- T -a matrix of transition moments under Hmw
-- LP -a column vector of energy level populations, sor-
-- ted in the same order as the energies
+- `E` — column vector of energies in ascending order, in rad/s.
+- `V` — eigenvectors in columns, ordered to match `E`.
+- `dE` — column vector of `dE/dB` derivatives, ordered to match `E`.
+- `T` — matrix of squared magnitudes of transition moments under `Hmw`: `abs(V'*Hmw*V).^2`.
+- `LP` — column vector of level populations, ordered to match `E`.
 
-## Implementation structure
+## Numerical / algorithmic details
 
-- Eigensystem of sparse Hamiltonians to user-specified order in
-- RSPT with careful handling of diagonal dominance and an opti-
-- on to do exact diagonalisation (expensive). The function also
-- returns eigenvalue derivatives and transition moments between
-- eigenvectors under a user-specified operator. Parametrisation
-- matches use cases in field-swept EPR spectroscopy. Syntax:
-- [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)
-- Hz - laboratory frame Hamiltonian, containing only
-- Zeeman terms at 1 Tesla
-- Hc - laboratory frame Hamiltonian, containing all
-- spin-spin couplings, but no Zeeman terms
-- Hmw - observable operator without the amplitude pre-
+The Hamiltonian is `B*Hz+Hc` and is symmetrized before calculation. For perturbative orders, its diagonal and off-diagonal parts are passed separately to `rspert`; exact diagonalisation uses `eig`. If irreducible-representation projectors are present, both Hamiltonian components and the observable are projected and symmetrized before recursive eigensystem calculations. The resulting eigenvectors are projected back to the original basis, and all energies and eigenvectors are sorted together. Optional `dE`, `T` and `LP` outputs are then calculated in the original basis. Derivatives use the Hellmann–Feynman expression `real(diag(V'*Hz*V))`; populations use `real(diag(V'*rho0*V))`.
+
+`parameters.rspt_order` is required. The Hamiltonian components and observable must be numeric square matrices, and `B` must be a real scalar.
+
+Contact: ilya.kuprov@weizmann.ac.il
+
+<https://spindynamics.org/wiki/index.php?title=rspt_eig.m>

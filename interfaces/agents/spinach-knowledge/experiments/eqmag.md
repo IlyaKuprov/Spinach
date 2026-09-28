@@ -4,37 +4,14 @@
 
 ## Purpose
 
-Computes the molar magnetization vector at the thermal equilibrium at the temperature specified in inter.temperature and magnetic field spe- cified in sys.magnet (assumed to be along the Z-axis), averaged over system orientations using the spherical grid specified. Syntax: magn=eqmag(spin_system,parameters)
+Compute the thermal-equilibrium molar magnetization vector at `inter.temperature` and `sys.magnet`, with the magnetic field assumed to lie along Z. Average the result over molecular orientations on the spherical grid named by `parameters.grid`.
 
-## Physical / mathematical content
+## Calculation and output
 
-## Numerical / algorithmic content
+For each grid orientation, the function rotates each spin's g-tensor, constructs the magnetic-moment operators, forms and trace-normalizes the equilibrium density matrix, and accumulates weighted expectation values. The orientation loop uses `parfor`. The return value is a real 1-by-3 vector `[Mx My Mz]` in `Na*mu_bohr`.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Requirements and convention
 
-## Parameters / inputs
-
-- parameters.grid -spherical grid for averaging
-
-## Outputs
-
-- magn -molar magnetization vector [Mx My Mz] in [Na*mu_bohr]
-- Note: the use of bas.formalism='zeeman-hilb' is required.
-- Note: Spinach uses NMR convention for the exchange coupling: exchange
-- interaction term in the Hamiltonian is 2*pi*J*(LxSx+LySy+LzSz)
-- where J is in Hz.
-
-## Implementation structure
-
-- Computes the molar magnetization vector at the thermal equilibrium at
-- the temperature specified in inter.temperature and magnetic field spe-
-- cified in sys.magnet (assumed to be along the Z-axis), averaged over
-- system orientations using the spherical grid specified. Syntax:
-- magn=eqmag(spin_system,parameters)
-- parameters.grid -spherical grid for averaging
-- magn -molar magnetization vector [Mx My Mz] in [Na*mu_bohr]
-- Note: the use of bas.formalism='zeeman-hilb' is required.
-- Note: Spinach uses NMR convention for the exchange coupling: exchange
-- interaction term in the Hamiltonian is 2*pi*J*(LxSx+LySy+LzSz)
-- where J is in Hz.
-- Check consistency
+- `spin_system.bas.formalism` must be `zeeman-hilb`.
+- `parameters.grid` must be a nonempty character string naming a spherical averaging grid.
+- Spinach uses the exchange Hamiltonian term `2*pi*J*(LxSx+LySy+LzSz)`, with `J` in Hz.

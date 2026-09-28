@@ -4,25 +4,16 @@
 
 ## Purpose
 
-Reinstates GPU arithmetic setting to the previous state after the start_disallow_gpu command had been issued.
+Restore GPU availability after `start_disallow_gpu.m` when GPU use had been enabled before that include ran.
 
-## Physical / mathematical content
+## Behaviour
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+The include errors if `user_wanted_gpu` is absent. If it is true, the include appends `'gpu'` to `spin_system.sys.enable`; otherwise it leaves the GPU setting unchanged.
 
-## Numerical / algorithmic content
+## Source comment attribution
 
-## Implementation structure
+Юлий Ким, "Истерическая перестроечная", 1988.
 
-- Reinstates GPU arithmetic setting to the previous state after
-- the start_disallow_gpu command had been issued.
-- Check that a disallow command had been called
-- Return GPU policy to its previous state
-- Юлий Ким, "Истерическая
-- перестроечная", 1988
-- Ну ребята, всё ребята,
-- Нету хода нам назад,
-- Оборвалися канаты,
-- Тормоза не тормозят.
-- Вышла фига из кармана,
-- Тут же рухнули мосты,
+## Source documentation
+
+https://spindynamics.org/wiki/index.php?title=end_disallow_gpu.m

@@ -8,24 +8,14 @@ PSYCHE pure-shift NMR spectrum of strychnine. Calculation time: hours, faster on
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The source defines the strychnine proton spin system by its isotope, chemical-shift, and scalar-coupling data.
+- The imaging simulation calls the `@psyche` sequence and sets sample, 1H state, and saltire-chirp parameters. The diffusion coefficient is set to zero.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The sequence produces a two-dimensional imaging FID. The code reconstructs the pure-shift FID from its first acquisition chunk, applies Gaussian apodisation, and Fourier-transforms both the full FID and the pure-shift projection.
+- The script plots the magnitude of the 2D spectrum and the imaginary part of the 1D projection.
 
 ## Implementation structure
 
-- PSYCHE pure-shift NMR spectrum of strychnine.
-- Calculation time: hours, faster on a GPU.
-- Strychnine spin system
-- Move shifts into spectral window
-- Magnetic induction
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Saltire chirp parameters
-- Coherent evolution timesteps
-- Sample parameters
+- Builds the spin system and basis, configures sequence parameters, runs imaging with `@psyche`, and performs the FID reconstruction and spectral processing.

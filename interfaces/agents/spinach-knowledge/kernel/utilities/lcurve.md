@@ -8,12 +8,11 @@ L-curve analysis function. Syntax: lam_opt=lcurve(lam,err,reg,mode)
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Plots the trade-off between least-squares error and regularisation functional and estimates the parameter at the L-curve maximum-curvature corner.
 
 ## Numerical / algorithmic content
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+- Resamples quintic splines of the log10 error and regularisation values at 1000 points, then estimates curvature using finite differences in the requested `log` or `linear` coordinates. The maximum is searched away from stencil edges and must lie inside the sampled range.
 
 ## Parameters / inputs
 
@@ -47,15 +46,6 @@ L-curve analysis function. Syntax: lam_opt=lcurve(lam,err,reg,mode)
 
 ## Implementation structure
 
-- L-curve analysis function. Syntax:
-- lam_opt=lcurve(lam,err,reg,mode)
-- lam -row vector of regularisation parameters, must
-- be positive and in ascending order
-- err -row vector of least squares errors, must be
-- positive and increasing with lam
-- reg -row vector of regularisation functional values,
-- must be positive and decreasing with lam. This
-- is the regularisation functional itself, not the
-- penalty term of the error functional: when the
-- optimiser reports lam*||L*x||^2, divide it by lam
-- once before calling this function
+- Validates equal-length positive row vectors, at least six increasing `lam` values, and `mode` (`log` or `linear`); non-monotone error or regularisation values trigger a warning.
+- Plots the L-curve and curvature, returns the parameter at the interior curvature maximum, and errors when the corner lies near a sampled-range edge.
+- Requires MATLAB Curve Fitting Toolbox.

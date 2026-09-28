@@ -14,7 +14,7 @@ A slice generator is the drift plus the amplitude-weighted control operators. Pr
 
 `expv-pwc` and `expv-pwl` use `step` for the state; these action-exponential methods are usually preferable for one or two outputs. `expm-pwc` and `expm-pwl` construct explicit slice propagators and are usually preferable for three outputs. `evol-pwc` and `evol-pwl` call `evolution`; choose them only for a specific reason.
 
-For all six methods in `zeeman-hilb`, the third output is the one-sided ordered product of slice propagators. Requesting it with `expv-*` or `evol-*` explicitly constructs those propagators without changing the selected two-sided state-propagation method. Propagator accumulation uses the configured clean-up tolerance. GPU arithmetic is selected by `'gpu'` in `spin_system.sys.enable`; returned states, trajectories, and propagators are gathered to host memory.
+In `zeeman-hilb`, all six methods return the one-sided ordered product of slice propagators. For `expv-*` and `evol-*`, requesting `P` explicitly builds these slice propagators while leaving the selected two-sided state-propagation method unchanged. Propagator accumulation uses the configured clean-up tolerance. GPU arithmetic is selected by `'gpu'` in `spin_system.sys.enable`; returned states, trajectories, and propagators are gathered to host memory.
 
 ## Syntax
 

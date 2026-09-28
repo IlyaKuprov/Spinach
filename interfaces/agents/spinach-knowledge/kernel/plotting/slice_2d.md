@@ -4,58 +4,39 @@
 
 ## Purpose
 
-Contour plotting utility with non-linear adaptive contour spacing and 1D slice extraction using mouse. Syntax: slice_2d(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Plot a 2D NMR spectrum with non-linear adaptive contour spacing and use mouse input to extract and display 1D slices.
 
 ## Parameters / inputs
 
-- spectrum -a real matrix containing the 2D NMR spectrum
-- parameters.sweep -one or two sweep widths, Hz
-- parameters.spins -cell array with one ot two character
-- strings specifying the working spins
-- parameters.offset -one or two transmitter offsets, Hz
-- parameters.zerofill -one or two point counts in F1 and F2
-- parameters.axis_units -axis units ('ppm','Hz','Gauss')
-- ncont -the number of contours, a reasonable value is 20
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the contours above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive conto-
-- urs and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the contour
-- spacing function: k=1 corresponds to linear spacing and
-- k>1 bends the spacing curve to increase the sampling den-
-- sity near the baseline. A reasonable value is 2.
-- ncol -number of colours in the colour map; around 256 is fine
-- m -the curvature of the colour map: m=1 corresponds to a li-
-- near colour ramp into the red for positive contours, and
-- into the blue for negative contours. A reasonable value
-- for high-contrast plotting is 6.
-- signs -can be set to 'positive', 'negative' or 'both' -this
-- will cause the corresponding contours to be plotted.
+- `spin_system` — spin system used by the plotting routines; working spins must be isotopes present in the system.
+- `spectrum` — numeric matrix containing the 2D NMR spectrum, described as real in the source documentation.
+- `parameters.sweep` — one or two sweep widths, in Hz.
+- `parameters.spins` — cell array of one or two character strings specifying the working spins.
+- `parameters.offset` — one or two transmitter offsets, in Hz. If absent, zero offsets are assumed.
+- `parameters.zerofill` — one or two positive integer point counts in F1 and F2.
+- `parameters.axis_units` — character string specifying axis units (`'ppm'`, `'Hz'`, or `'Gauss'` in the source documentation). If absent, `'ppm'` is assumed.
+- `ncont` — positive integer number of contours; 20 is suggested.
+- `delta` — four real values between 0 and 1 specifying contour elevations relative to the spectrum intensity. The first pair applies to positive contours and the second to negative contours; `[0.02 0.2 0.02 0.2]` is a suggested starting value.
+- `k` — positive integer controlling contour-spacing curvature. `k=1` gives linear spacing; values above 1 increase sampling density near the baseline. A suggested value is 2.
+- `ncol` — positive integer number of colours in the colour map; about 256 is suggested.
+- `m` — positive integer controlling colour-map curvature. `m=1` gives a linear ramp toward red for positive contours and blue for negative contours; 6 is suggested for high-contrast plotting.
+- `signs` — character string specifying `'positive'`, `'negative'`, or `'both'` contours.
+
+## Physical / mathematical content
+
+The source documents these contour-level expressions, where `smin` and `smax` are computed from the spectrum matrix:
+
+- `cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);`
+- `cont_levs_neg=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);`
+
+## Numerical / algorithmic content
+
+The function applies defaults and checks its inputs, then duplicates single spin, offset, and sweep entries for homonuclear 2D sequences. It calls `plot_2d` for the contour plot. For each mouse-selected point, it constructs F1 and F2 axis grids, uses spline `griddedInterpolant` interpolation to compute two traces, and displays them with `plot_1d` as F1 and F2 slices. Both slice plots use the minimum and maximum values of `spectrum` as their vertical limits. The mouse-selection loop continues indefinitely.
 
 ## Outputs
 
-- this function creates a figure
-- Note: the following functions are used to compute contour levels:
-- cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-- cont_levs_neg=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
-- where smin and smax are computed from the spectrum matrix.
+The function creates a figure containing the 2D spectrum and two 1D slice plots; it has no return value.
 
-## Implementation structure
+## Source link
 
-- Contour plotting utility with non-linear adaptive contour spacing and
-- 1D slice extraction using mouse. Syntax:
-- slice_2d(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)
-- spectrum -a real matrix containing the 2D NMR spectrum
-- parameters.sweep - one or two sweep widths, Hz
-- parameters.spins - cell array with one ot two character
-- strings specifying the working spins
-- parameters.offset - one or two transmitter offsets, Hz
-- parameters.zerofill - one or two point counts in F1 and F2
-- parameters.axis_units - axis units ('ppm','Hz','Gauss')
-- ncont -the number of contours, a reasonable value is 20
-- delta -minimum and maximum elevation (as a fraction of the
+<https://spindynamics.org/wiki/index.php?title=slice_2d.m>

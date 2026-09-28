@@ -4,46 +4,24 @@
 
 ## Purpose
 
-Returns a cell array of drift Liouvillians suitable for the control.drifts variable in ensemble control optimisations.
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-
-## Numerical / algorithmic content
+Returns a cell array of drift Liouvillians for `control.drifts` in ensemble control optimisations.
 
 ## Syntax
 
 ```matlab
-[drifts,spc_dim]=drifts(spin_system,context,parameters)
+[drifts,spc_dim]=drifts(spin_system,context,parameters,assumptions)
 ```
 
 ## Parameters / inputs
 
-- context -a function handle to Spinach context
-- responsible for handling the ensemble
-- parameters -parameters required by the context
-- assumptions -assumptions required by the context
+- `spin_system` — Spinach spin system.
+- `context` — function handle to the Spinach context responsible for the ensemble, such as `@powder` or `@singlerot`.
+- `parameters` — parameters required by the context. The function sets `parameters.sum_up=0` to disable ensemble summation.
+- `assumptions` — assumptions required by the context, supplied as a character string.
 
 ## Outputs
 
-- drifts -a cell array of Liouvillians format-
-- ted as {{La},{Lb},...}, one per en-
-- semble member
-- spc_dim -dimension of the classical dynamics
-- subspace (e.g. rotor grid in MAS)
+- `drifts` — cell array of Liouvillians formatted as `{{La},{Lb},...}`, one per ensemble member. Each drift combines `H+1i*R+1i*K` and includes the hydrodynamics term, when present.
+- `spc_dim` — dimension of the classical dynamics subspace (e.g. the rotor grid in MAS).
 
-## Implementation structure
-
-- Returns a cell array of drift Liouvillians suitable for the
-- control.drifts variable in ensemble control optimisations.
-- [drifts,spc_dim]=drifts(spin_system,context,parameters)
-- context -a function handle to Spinach context
-- responsible for handling the ensemble
-- parameters -parameters required by the context
-- assumptions -assumptions required by the context
-- drifts -a cell array of Liouvillians format-
-- ted as {{La},{Lb},...}, one per en-
-- semble member
-- spc_dim -dimension of the classical dynamics
-- subspace (e.g. rotor grid in MAS)
+<https://spindynamics.org/wiki/index.php?title=drifts.m>

@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Diffusion attenuation during soft pulses in a simplified model sequence of the Zangger-Sterk pure shift iDOSY with fitting using a modified ver- sion of the Stejskal Tanner equation, as described in: Calculation time: seconds on NVidia Tesla A100, much longer on CPU
+Models diffusion attenuation during soft pulses in a simplified Zangger–Sterk pure-shift iDOSY sequence. It simulates signal over a gradient-amplitude series and fits a modified Stejskal–Tanner form, including a fitted gradient shift. The method is described in [the cited JMR paper](https://doi.org/10.1016/j.jmr.2019.02.010). The source estimates seconds on an NVIDIA Tesla A100 and longer on CPU.
 
-## Physical / mathematical content
+## Model and sequence
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
+The model is one 1H spin at 11.7426 T with a 4.6 ppm shift, sample length 15 mm, 4000 spatial points, and a 7-point periodic derivative stencil. The reference diffusion coefficient is 18×10⁻¹⁰ m²/s. The soft pulse shape is `gaussian_1000.pk`, sampled at 100 points, with duration 45 ms and phase π; transmitter offset is 2500 Hz. The gradient duration is 2 ms, diffusion delay 100 ms, and Zangger–Sterk gradient amplitude 0.0053 T/m.
 
-## Numerical / algorithmic content
+## Simulation and fit
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Diffusion attenuation during soft pulses in a simplified model sequence
-- of the Zangger-Sterk pure shift iDOSY with fitting using a modified ver-
-- sion of the Stejskal Tanner equation, as described in:
-- Calculation time: seconds on NVidia Tesla A100, much longer on CPU
-- Magnetic field
-- Isotopes
-- Chemical shift
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sample geometry
-- Diffusion coefficient
+Twenty imaging simulations use gradient amplitudes from 0.01 to 0.40 T/m. The normalised intensities are fitted to `A exp[-D·C·(g-g₀)²]`, where the code's Stejskal–Tanner factor C uses the spin, gradient duration, and diffusion delay. The report gives fitted D (scaled by 10⁻¹⁰) and fitted gradient shift g₀. The simulation supplies no relaxation phantom or relaxation operator, and the initial 1H `Lz` state has white spatial margins.

@@ -4,51 +4,21 @@
 
 ## Purpose
 
-Zero track elimination function. Inspects the first few steps in the system trajectory and drops the states that did not get populated to a user-specified tolerance. Syntax: projector=zte(spin_system,L,rho,nstates)
+Zero track elimination inspects the first few steps of a trajectory and removes states that remain below the drop tolerance. If `nstates` is specified, it instead keeps the states with the greatest trajectory weight.
 
-## Physical / mathematical content
+## Inputs and output
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+- `L`: Liouvillian used for time propagation.
+- `rho`: initial state vector used for time propagation.
+- `nstates` (optional): number of states to keep, irrespective of the tolerance-based selection. It must be a positive integer no greater than the state-space dimension.
+- `projector`: projector into the reduced space. Use `L_reduced=P'*L*P` and `rho_reduced=P'*rho`, with `P=projector`.
 
-## Numerical / algorithmic content
+`L` and `rho` must be numeric; `L` must be square, and `rho` must be a single column state vector with matching dimension. Zero track elimination is available only for the `zeeman-liouv` and `sphten-liouv` formalisms.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Algorithm and notes
 
-## Parameters / inputs
+The function chooses a time step of `1/cheap_norm(L)` (or a unit time step if this is infinite), then propagates up to `spin_system.tols.zte_nsteps` trajectory points using the Krylov-based `step` function. It stops early when the number of states whose maximum sampled amplitude exceeds `spin_system.tols.zte_tol` stops changing. Without `nstates`, it drops states whose maximum sampled amplitude is below that tolerance; with `nstates`, it retains the specified number of states with the largest maximum sampled amplitudes.
 
-- L -the Liouvillian to be used for time
-- propagation
-- rho -the initial state to be used for
-- time propagation
-- nstates -if this parameter is specified, only
-- nstates most populated states are kept,
-- irrespective of the tolerance parameter
-- Output:
-- projector -projector matrix into the reduced space,
-- to be used as follows:
-- L_reduced=P'*L*P
-- rho_reduced=P'*rho;
-- Note: default tolerance may be altered by setting sys.tols.zte_tol
-- variable before calling create.m
-- Note: further information on how this function works is available
-- in IK's JMR paper on the subject
-- Note: if tiny interactions or nearly equivalent spins are present,
-- it is best to disable zero track elimination by adding 'zte'
-- to the sys.disable cell array.
+The default tolerance may be changed by setting `sys.tols.zte_tol` before calling `create.m`. The basis is left unchanged if zero track elimination is disabled, the state vector has too few zeros under `spin_system.tols.zte_maxden`, or its 1-norm is below `spin_system.tols.zte_tol`. If tiny interactions or nearly equivalent spins are present, disable zero track elimination by adding `'zte'` to `sys.disable`.
 
-## Implementation structure
-
-- Zero track elimination function. Inspects the first few steps in the
-- system trajectory and drops the states that did not get populated to
-- a user-specified tolerance. Syntax:
-- projector=zte(spin_system,L,rho,nstates)
-- L -the Liouvillian to be used for time
-- propagation
-- rho -the initial state to be used for
-- time propagation
-- nstates -if this parameter is specified, only
-- nstates most populated states are kept,
-- irrespective of the tolerance parameter
-- Output:
+Further information is available in IK's JMR paper: http://dx.doi.org/10.1016/j.jmr.2008.08.008. See also <https://spindynamics.org/wiki/index.php?title=zte.m>.

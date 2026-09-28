@@ -4,34 +4,16 @@
 
 ## Purpose
 
-Prints Weizmann DNP relaxation-rate summary for a Spinach system. Syntax: summary_rlx_weiz(spin_system)
-
-## Physical / mathematical content
-
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-
-## Numerical / algorithmic content
+Prints the Weizmann DNP relaxation-rate fields already stored in a Spinach system; it does not calculate the rates.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system description object
+- `spin_system` - Spinach spin system structure containing the Weizmann relaxation fields.
 
-## Outputs
+## Output
 
-- this function prints to the console or to the user-specified
-- output via report.m function
+No MATLAB output argument; writes through `report`. The report gives electron and nuclear R1 and R2 rates in Hz, followed by each nonzero inter-nuclear dipolar R1 and R2 entry with its row and column indices, also in Hz.
 
-## Implementation structure
+## Behavior
 
-- Prints Weizmann DNP relaxation-rate summary for a Spinach system. Syntax:
-- summary_rlx_weiz(spin_system)
-- spin_system -Spinach spin system description object
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the relaxation-rate table
-- Consistency enforcement
-- The human subjects had not been willing participants,
-- but throughout the history of science, what laboratory
-- animal had happily sacrificed its life for the greater
-- benefit of knowledge? In his research, Erasmus had come
+The function checks that `spin_system` is a structure, prints a Weizmann DNP heading, reads the rates from `spin_system.rlx.weiz_r1e`, `weiz_r2e`, `weiz_r1n`, `weiz_r2n`, `weiz_r1d`, and `weiz_r2d`, then prints a closing separator.

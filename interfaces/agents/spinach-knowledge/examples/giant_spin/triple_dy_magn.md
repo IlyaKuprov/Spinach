@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Simulation of a finite-speed magnetic field sweep experiment for a single crystal of a triple-Dy triangular complex in a micro-SQUID, see Figure S24 in the Supplementary Information of Ligand field parameters and g-tensor for the J=15/2 ground term were computed using the SINGLE_ANISO routine in MOLCAS. Calculation time: hours
+Simulates a finite-speed magnetic-field sweep of a single crystal of a triangular triple-Dy complex in a micro-SQUID, corresponding to Figure S24 in the Supplementary Information of the cited study (doi:10.1002/chem.201703842; https://doi.org/10.1002/chem.201703842). The ligand-field parameters and ground-term g-tensor were computed with SINGLE_ANISO in MOLCAS. The stated calculation time is hours.
 
 ## Physical / mathematical content
 
-- Giant-spin examples. The effective model treats lanthanides or high-spin centres using crystal-field / Stevens-operator Hamiltonians, Zeeman splitting, and magnetisation dynamics.
+Models three J=15/2 dysprosium centres in a triangular arrangement. Rotated g-tensors, molecular coordinates, exchange coupling of 0.0063 cm⁻¹ (converted to Hz using the NMR convention), and spin–orbit corrections to dipole–dipole couplings define the interactions. Rank-2, -4, and -6 Stevens ligand-field coefficients are converted to spherical tensors, rotated into the molecular frame, and assigned to all three centres with their respective triangular orientations.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Uses an unrestricted Zeeman Hilbert-space basis at 0.03 K. `fieldscan_magn` calculates the z-magnetisation over 5,000 points from 0 to 1 T for a 10⁻⁵ s sweep, orientation [0, π/2, 0], and 64 states. The system magnet setting is 1 T.
 
 ## Implementation structure
 
-- Simulation of a finite-speed magnetic field sweep experiment for a
-- single crystal of a triple-Dy triangular complex in a micro-SQUID,
-- see Figure S24 in the Supplementary Information of
-- Ligand field parameters and g-tensor for the J=15/2 ground term were
-- computed using the SINGLE_ANISO routine in MOLCAS.
-- Calculation time: hours
-- Three J=15/2 dysprosium atoms
-- g-tensor eigenvalues
-- Spin-orbit corrections
-- to the DD couplings
-- g-tensor eigenvectors
-- g-tensor matrix
+The `triple_dy_magn()` function builds the tensors and interactions, creates the Spinach spin system and basis, runs `fieldscan_magn`, and plots magnetisation against magnetic field.

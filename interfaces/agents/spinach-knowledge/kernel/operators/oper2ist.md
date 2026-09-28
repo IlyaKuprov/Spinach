@@ -4,39 +4,27 @@
 
 ## Purpose
 
-Irreducible spherical tensor operator expansion of a user- specified square matrix. Syntax: [states,coeffs]=oper2ist(A)
+Expands a square operator in the irreducible spherical tensor basis for a single spin.
 
 ## Physical / mathematical content
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The tensor basis is generated for a spin multiplicity of `size(A,1)`. Returned `states` follow the Spinach IST basis indexing convention; use `lin2lm` to convert them to L,M spherical-tensor indices.
 
 ## Numerical / algorithmic content
 
+For each tensor `X` from `irr_sph_ten(size(A,1))`, the coefficient is computed as `hdot(X,A)/hdot(X,X)` and converted to a full value. Terms with coefficient magnitude at most `10*eps('double')` are removed.
+
 ## Parameters / inputs
 
-- A -a square matrix
+- A - numeric square matrix to expand.
 
 ## Outputs
 
-- states -states, in the Spinach IST basis index-
-- ing convention, that contribute to the
-- operator in question; use lin2lm() fun-
-- ction to convert to L,M spherical tens-
-- or indices
-- coeffs -coefficients with which the ISTs enter
-- the linear combination
+- states - IST basis indices corresponding to retained terms.
+- coeffs - coefficients of the corresponding irreducible spherical tensors in the expansion.
 
 ## Implementation structure
 
-- Irreducible spherical tensor operator expansion of a user-
-- specified square matrix. Syntax:
-- [states,coeffs]=oper2ist(A)
-- A -a square matrix
-- states -states, in the Spinach IST basis index-
-- ing convention, that contribute to the
-- operator in question; use lin2lm() fun-
-- ction to convert to L,M spherical tens-
-- or indices
-- coeffs -coefficients with which the ISTs enter
-- the linear combination
-- Check consistency
+1. Check that `A` is a numeric square matrix.
+2. Generate the single-spin irreducible spherical tensor basis with `irr_sph_ten`.
+3. Compute each normalized inner-product coefficient, then return only terms above the numerical cutoff with their basis indices.

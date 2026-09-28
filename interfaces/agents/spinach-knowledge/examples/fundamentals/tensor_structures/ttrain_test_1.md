@@ -4,19 +4,18 @@
 
 ## Purpose
 
-A simple test of ttclass object arithmetic.
+Checks `ttclass` arithmetic by evaluating `P*P+3*P` for a tensor train representing a three-factor Kronecker product, then comparing its materialised result with the same calculation on the explicit dense matrix.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+- The factors are `A=magic(5)`, a random `20x20` matrix `B`, and `C=1i*rand(15)`; each is normalised by its matrix 2-norm.
+- `P=ttclass(1,{A;B;C},0)` represents `kron(A,kron(B,C))`. The tested expression is ordinary matrix multiplication and addition, not a spin-system calculation.
 
 ## Numerical / algorithmic content
 
+- The tensor-train expression is converted with `full` and compared with the dense result using the one-norm criterion `norm(P_TT-P_US,1)<100*eps('double')`.
+
 ## Implementation structure
 
-- A simple test of ttclass object arithmetic.
-- Create a bunch of matrices
-- Make their Kronecker product
-- Compute a function in TT
-- Compute the usual way
-- Compare results
+- Generate and normalise the three matrices, then create the tensor-train object.
+- Evaluate the polynomial in `P` through `ttclass`, evaluate it again after forming the dense Kronecker product, and compare the results.

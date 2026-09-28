@@ -12,7 +12,7 @@ Noncommuting spin-half controls and population projections test supported gradie
 
 ## Numerical / algorithmic content
 
-Checks setup and direct-engine refusals, requested four-output Hessian refusals under first-order methods, retained method identities, first-order keyholes, empty schedules, and supported Hilbert counterparts.
+Checks setup and direct-engine refusals, including dissipative Newton keyhole setup refusals in both Liouville formalisms, requested four-output Hessian refusals under first-order methods, retained method identities, first-order keyholes, empty schedules, and supported Hilbert counterparts.
 
 ## Syntax
 
@@ -28,4 +28,4 @@ None. The test constructs its own bounded physical fixtures.
 
 ## Header notes
 
-The regression is registered in `test_manifest` and is not an optimisation or performance benchmark.
+The regression tests supported boundaries of keyhole optimal control; it is not an optimisation or performance benchmark.

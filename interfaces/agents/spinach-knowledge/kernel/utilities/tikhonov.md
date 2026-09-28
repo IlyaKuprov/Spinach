@@ -4,54 +4,28 @@
 
 ## Purpose
 
-Tikhonov regularised solution to K*x=y with a positivity const- raint on x using regularised Newton-Raphson method. Syntax: [x,err,reg]=tikhonov(K,D,KtK,DtD,H,y,lambda)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+Find a nonnegative, real Tikhonov-regularised solution to `K*x=y` by minimising `norm(K*x-y,2)^2+lambda*norm(D*x,2)^2` subject to `x>=0`. The kernel and data may be complex.
 
 ## Parameters / inputs
 
-- K -kernel matrix, may be complex, may be non-square
-- D -regularisation matrix, leave empty to use finite
-- difference second derivative matrix
-- KtK -K'*K, for repeated calls it may be faster to pre-
-- compute this quantity, leave empty otherwise
-- DtD -D'*D, for repeated calls it may be faster to pre-
-- compute this quantity, leave empty otherwise
-- H -Tikhonov Hessian 2*real(KtK+lambda*DtD), for re-
-- peated calls it may be faster to precompute this
-- quantity, leave empty otherwise
-- y -a column vector, may be complex
-- lambda -Tikhonov regularisation parameter
+- `K`: Kernel matrix; may be complex or non-square.
+- `D`: Regularisation matrix. Leave empty to use `fdmat(size(K,2),5,2,'wall')`, a finite-difference second-derivative matrix.
+- `KtK`: Precomputed `K'*K`; leave empty to compute it. Supplying it can speed up repeated calls.
+- `DtD`: Precomputed `D'*D`; leave empty to compute it. Supplying it can speed up repeated calls.
+- `H`: Precomputed Tikhonov Hessian `2*real(KtK+lambda*DtD)`; leave empty to compute it. Supplying it can speed up repeated calls.
+- `y`: Column vector; may be complex.
+- `lambda`: Nonnegative real scalar Tikhonov regularisation parameter.
 
 ## Outputs
 
-- x -a real vector, a minimum (subject to positivity)
-- of norm(K*x-y,2)^2+lambda*norm(D*x,2)^2
-- err -error signal norm(K*x-y,2)^2
-- reg -regularisation signal norm(D*x,2)^2
-- Note: for best numerical performance, scale K to have approxima-
-- tely unit 2-norm, and y to have approximately unit 1-norm.
-- Note: see tikhoind.m for the indeterminate solver.
+- `x`: Real, nonnegative vector minimising the regularised objective subject to the positivity constraint.
+- `err`: Squared residual norm `norm(K*x-y,2)^2`.
+- `reg`: Squared regularisation norm `norm(D*x,2)^2`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Tikhonov regularised solution to K*x=y with a positivity const-
-- raint on x using regularised Newton-Raphson method. Syntax:
-- [x,err,reg]=tikhonov(K,D,KtK,DtD,H,y,lambda)
-- K -kernel matrix, may be complex, may be non-square
-- D -regularisation matrix, leave empty to use finite
-- difference second derivative matrix
-- KtK -K'*K, for repeated calls it may be faster to pre-
-- compute this quantity, leave empty otherwise
-- DtD -D'*D, for repeated calls it may be faster to pre-
-- H -Tikhonov Hessian 2*real(KtK+lambda*DtD), for re-
-- peated calls it may be faster to precompute this
-- quantity, leave empty otherwise
+The function uses `fmincon` with its interior-point algorithm, an initial vector of ones, lower bounds of zero, and upper bounds of infinity. It supplies the objective gradient `2*real(KtK*x-K'*y+lambda*DtD*x)` and the Hessian `H`. The optimisation is configured for at most 100 iterations, with an unlimited number of function evaluations and iteration-level display.
+
+For best numerical performance, scale `K` to approximately unit 2-norm and `y` to approximately unit 1-norm. See `tikhoind.m` for the indeterminate solver.
+
+Source reference: https://spindynamics.org/wiki/index.php?title=tikhonov.m

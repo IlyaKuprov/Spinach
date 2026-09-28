@@ -4,42 +4,18 @@
 
 ## Purpose
 
-Converts Cartesian coordinates of a pair of nuclei and an order matrix into residual dipolar coupling; only hetero- nuclear spin pairs are supported. Syntax: rdc=xyz2rdc(spin_a,spin_b,xyz_a,xyz_b,chi)
+Computes the weak heteronuclear residual dipolar coupling for two spins from their Cartesian coordinates and an order specification.
 
 ## Physical / mathematical content
 
-- Residual-dipolar-coupling experiment and analysis routines. These files use partial ordering, Saupe tensors, and molecular-frame geometry to connect internuclear vectors with observed couplings.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-
-## Numerical / algorithmic content
+For the supported `saupe` option, the routine obtains the dipolar coupling tensor `D` in rad/s using `xyz2dd` and evaluates `rdc=(2/3)*trace(S*D)/(2*pi)`, returning Hz. The Saupe matrix `S` is real, symmetric, traceless, and dimensionless.
 
 ## Parameters / inputs
 
-- spin_a, spin_b -character strings indicating spin
-- type, for example '13C'
-- xyz_a, xyz_b -three-element vectors specifying
-- Cartesian coordinates of the two
-- spins in Angstroms
-- order_spec -{S,'saupe'} uses Saupe order mat-
-- rix, S is a traceless symmetric
-- 3x3 matrix, dimensionless
+- `spin_a`, `spin_b` — character strings specifying the two different isotope types (for example, `'13C'`).
+- `xyz_a`, `xyz_b` — three-element Cartesian coordinate vectors for the two spins, in Angstroms.
+- `order_spec` — cell array `{S,'saupe'}`, where `S` is the Saupe order matrix.
 
-## Outputs
+## Output
 
-- rdc -residual dipolar coupling in the
-- heteronuclear case, Hz
-
-## Implementation structure
-
-- Converts Cartesian coordinates of a pair of nuclei and an
-- order matrix into residual dipolar coupling; only hetero-
-- nuclear spin pairs are supported. Syntax:
-- rdc=xyz2rdc(spin_a,spin_b,xyz_a,xyz_b,chi)
-- spin_a, spin_b -character strings indicating spin
-- type, for example '13C'
-- xyz_a, xyz_b -three-element vectors specifying
-- Cartesian coordinates of the two
-- spins in Angstroms
-- order_spec -{S,'saupe'} uses Saupe order mat-
-- rix, S is a traceless symmetric
-- 3x3 matrix, dimensionless
+- `rdc` — weak heteronuclear residual dipolar coupling in Hz.

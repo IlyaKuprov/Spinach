@@ -7,8 +7,7 @@
 Converts the Josephson and charging energies of a transmon into the Duffing oscillator frequency and anharmonicity expected by the bosonic mode specification interface of create.m using the asymptotic transmon expressions (Koch et al., https://doi.org/ 10.1103/PhysRevA.76.042319): frq=sqrt(8*ej*ec)-ec, anharm=-ec
 
 ## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+- The function maps Josephson energy `ej` and charging energy `ec` to the Duffing transition frequency `sqrt(8*ej.*ec)-ec` and anharmonicity `-ec`.
 - The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
 
 ## Numerical / algorithmic content
@@ -39,16 +38,6 @@ Converts the Josephson and charging energies of a transmon into the Duffing osci
 - ratio is smaller than 20.
 
 ## Implementation structure
-
-- Converts the Josephson and charging energies of a transmon into
-- the Duffing oscillator frequency and anharmonicity expected by
-- the bosonic mode specification interface of create.m using the
-- asymptotic transmon expressions (Koch et al., https://doi.org/
-- 10.1103/PhysRevA.76.042319):
-- frq=sqrt(8*ej*ec)-ec, anharm=-ec
-- [frq,anharm]=ejec2duffing(ej,ec)
-- ej -Josephson energies in Hz (energy over the
-- Planck constant), an array of positive
-- real numbers
-- ec -charging energies in Hz (energy over the
-- real numbers of the same size as ej
+- Requires `ej` and `ec` to be real, finite, positive arrays of the same size.
+- Computes `frq=sqrt(8*ej.*ec)-ec` and `anharm=-ec` elementwise.
+- Warns when any `ej./ec` ratio is below 20.

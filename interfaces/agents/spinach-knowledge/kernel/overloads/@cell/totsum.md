@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A sum across all dimensions of a cell array. Syntax: S=totsum(A)
+Elementwise sum of the numeric arrays in a cell array. Syntax: S=totsum(A)
 
 ## Physical / mathematical content
 
@@ -16,21 +16,14 @@ A sum across all dimensions of a cell array. Syntax: S=totsum(A)
 
 ## Outputs
 
-- S -the sum of all elements in A
+- S -the elementwise sum of the numeric arrays in A
 - Notes: if all elements of A are sparse, a sparse result
 - will be returned.
 
 ## Implementation structure
 
-- A sum across all dimensions of a cell array. Syntax:
-- S=totsum(A)
-- A -a cell array of numerical objects
-- S -the sum of all elements in A
-- will be returned.
 - Check consistency
 - Check array type
-- Run the addition
-- Run sparse matrix addition
-- Run full matrix addition
-- Consistency enforcement
-- The idea that global warming is the most important
+- Collect nonzeros and construct a sparse result when all entries are sparse
+- Run full matrix addition otherwise
+- Enforce numeric-array consistency

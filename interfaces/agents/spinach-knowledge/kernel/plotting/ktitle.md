@@ -30,6 +30,3 @@ House style settings for Matlab figures; a product of much experience with acade
 - Check consistency
 - Bold title rendered by LaTeX
 - Consistency enforcement
-- 3:58 Признав иных, я вслед за тем в одном
-- Узнал того, кто от великой доли
-- Отрекся в малодушии своем.

@@ -4,29 +4,12 @@
 
 ## Purpose
 
-Tests exponential FID apodisation. Syntax: result=test_apodisation_exp_window()
+Tests exponential FID apodisation, including the first-point halving convention.
 
-## Physical / mathematical content
+## Test
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The test creates a four-point constant FID with `fid=ones(4,1)` and applies `apodisation(spin_system,fid,{{'exp',1}})`. It compares the output with `exp(-linspace(0,1,4)).'`, with the first reference point divided by two, using absolute and relative tolerances of `1e-15`.
 
-## Numerical / algorithmic content
+## Output
 
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test checks the explicit exponential window and the NMR Fourier
-- convention that halves the first point of each active FID dimension.
-
-## Implementation structure
-
-- Tests exponential FID apodisation. Syntax:
-- result=test_apodisation_exp_window()
-- result -regression test result with explanatory messages
-- The test checks the explicit exponential window and the NMR Fourier
-- convention that halves the first point of each active FID dimension.
-- Announce the test target
-- State the processing target of the test
-- Build a minimal reporting object and a constant FID
-- Apply an exponential window
-- Check the explicit window
+- `result` — regression test result with explanatory messages.

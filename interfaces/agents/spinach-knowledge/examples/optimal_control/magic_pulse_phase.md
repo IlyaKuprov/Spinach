@@ -4,31 +4,28 @@
 
 ## Purpose
 
-A template file for the "magic pulse" optimisations. The term refers to a family of broadband NMR pulses that are tolerant to resonance offsets and power calibration errors: Consider a 13C 90-degree excitation pulse in a 28.18 Tesla magnet. The pulse must uniformly excite a bandwidth of around 200 ppm (60 kHz) and must be short enough for the worst-case 13C-1H J-coupling (ca. 200 Hz) to be negligible. The latter requ
+A template for optimising a broadband ¹³C 90-degree excitation pulse that tolerates resonance offsets and RF power calibration errors. The example targets a 28.18 T magnet, approximately 200 ppm (60 kHz) of excitation bandwidth, and negligible effects from a worst-case ¹³C–¹H J-coupling of about 200 Hz. The source comment states a duration limit of 1/(100J) = 50 µs, whereas the implemented pulse has 60 intervals of 1 µs each (60 µs total); the code and comment therefore do not agree. The desired transfers are {Lz → Lx, Ly → Ly, Lx → −Lz}, with RF nutation frequencies from 50 to 70 kHz across the coil. Estimated calculation time: minutes.
+
+- Reference: http://dx.doi.org/10.1016/j.jmr.2005.12.010
+- Source contacts: ilya.kuprov@weizmann.ac.il; david.goodwin@inano.au.dk
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- The ensemble comprises 100 non-interacting ¹³C spins at equally spaced chemical shifts from −100 to +100 ppm. The `sphten-liouv` formalism with `IK-2`, proximity level 1, and `scalar_couplings` connectivity retains complete single-spin bases while ignoring multi-spin orders in this case.
+- Normalised `Lx`, `Ly`, and `Lz` states define three simultaneous transfers: `Lx → −Lz`, `Ly → Ly`, and `Lz → Lx`. The control operators are `Lx` and `Ly`; the drift Hamiltonian is obtained under the `nmr` assumption.
+- Phase samples are optimised by `fmaxnewton(spin_system,@grape_phase,guess)` with `control.method='lbfgs'` and a 200-iteration limit. The amplitude profile remains fixed at ones; robustness is sampled at ten RF power levels from 50 to 70 kHz, expressed as angular frequencies by multiplication by `2*pi`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Both control operators map to the ¹³C channel through `control.channels=[1; 1]`. The pulse grid is `1e-6*ones(1,60)`, and the initial phase guess is `(pi/5)*randn(1,60)`. Plotting options are `phi_controls`, `xy_controls`, `robustness`, and `spectrogram`.
+- After optimisation, `polar2cartesian` converts the phase profile and an amplitude profile of `mean(control.pwr_levels)*control.amplitudes` into Cartesian controls. `shaped_pulse_xy` simulates their action on an initial `Lz` state using `expv-pwc`.
+- The resulting state is acquired on ¹³C with an `L+` detection state, no decoupling, zero offset, a 70,000 Hz sweep, 2,048 points, 16,384-point zero filling, a ppm axis, and axis inversion. The FID receives Gaussian apodisation with parameter 10 before its shifted Fourier transform.
+- For comparison, a conventional hard pulse is simulated from `Lz` using zero pulse frequency, phase `pi/2`, power `2*pi*60e3`, duration `4.2e-6`, rank 3, and the `expv` method. Its FID receives the same apodisation and Fourier transform. The real spectra are plotted in separate subplots.
 
 ## Implementation structure
 
-- A template file for the "magic pulse" optimisations. The term refers to
-- a family of broadband NMR pulses that are tolerant to resonance offsets
-- and power calibration errors:
-- Consider a 13C 90-degree excitation pulse in a 28.18 Tesla magnet. The
-- pulse must uniformly excite a bandwidth of around 200 ppm (60 kHz) and
-- must be short enough for the worst-case 13C-1H J-coupling (ca. 200 Hz)
-- to be negligible. The latter requirement caps the duration at 1/100*J
-- = 50 us. The pulse must accomplish the following transfers: {Lz -> Lx,
-- Ly -> Ly, Lx -> -Lz}. A realistically achievable nutation frequency is
-- between 50 kHz and 70 kHz across the RF coil.
-- Calculation time: minutes.
-- Set the magnetic field
+1. Set the magnetic field and construct the 100-spin chemical-shift ensemble; create the Spinach system and basis.
+2. Prepare and normalise the three spin states, then obtain control operators and the drift Hamiltonian.
+3. Configure fixed-amplitude, phase-only control and run LBFGS GRAPE optimisation through `fmaxnewton` and `grape_phase`.
+4. Convert the optimised pulse to Cartesian controls, simulate it, acquire and process its spectrum, and plot the result.
+5. Acquire and process a conventional hard-pulse spectrum for comparison.

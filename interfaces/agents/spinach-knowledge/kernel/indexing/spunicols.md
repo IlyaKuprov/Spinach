@@ -4,32 +4,24 @@
 
 ## Purpose
 
-Sparse matrix unique-column utility. Syntax: A=spunicols(A)
+Returns a sparse matrix containing one copy of each distinct column of the input matrix.
 
 ## Physical / mathematical content
 
-- Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
+This utility operates on matrix columns; it does not model a physical system.
 
 ## Numerical / algorithmic content
 
+The function transposes `A`, applies Matlab's `unique(...,'rows')` to the rows, then transposes the result back. Duplicate columns are therefore retained only once.
+
 ## Parameters / inputs
 
-- A -sparse real double matrix
+- `A` — a sparse, real, double matrix.
 
 ## Outputs
 
-- A -sparse real double matrix containing
-- unique columns of the input matrix
-- This file is a Matlab fallback for the compiled MEX function.
+- `A` — a sparse real double matrix containing the unique columns of the input.
 
 ## Implementation structure
 
-- Sparse matrix unique-column utility. Syntax:
-- A=spunicols(A)
-- A -sparse real double matrix
-- A -sparse real double matrix containing
-- unique columns of the input matrix
-- This file is a Matlab fallback for the compiled MEX function.
-- Check consistency
-- Return Matlab reference unique columns
-- Consistency enforcement
+The input is checked for consistency, then the Matlab fallback computes `unique(A.','rows').'`. The file serves as the reference implementation for the compiled MEX function.

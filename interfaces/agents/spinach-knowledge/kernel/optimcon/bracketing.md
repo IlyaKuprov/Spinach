@@ -4,56 +4,34 @@
 
 ## Purpose
 
-Expands a trial step into a bracket that contains an acceptable line search point, or accepts the step directly if the Wolfe tests are met before sectioning becomes necessary.
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-
-## Numerical / algorithmic content
+Expands a trial step to find a bracket containing an acceptable line-search point, or accepts the step if the Wolfe tests are met before sectioning is needed.
 
 ## Syntax
 
 ```matlab
-[A,B,alpha,fx,gfx,next_act,data]=...
-bracketing(cost_function,alpha,dir,x_0,fx_0,...
-gfx_0,data,spin_system)
+[a,b,alpha,fx,gfx,next_act,data]=bracketing(cost_function,alpha,dir,x_0,...
+                                              fx_0,gfx_0,data,spin_system)
 ```
 
-## Parameters / inputs
+## Inputs
 
-- cost_function -objective function handle
-- alpha -initial trial step length
-- dir -search direction vector
-- x_0 -current optimisation vector
-- fx_0 -objective value at x_0
-- gfx_0 -gradient at x_0
-- data -optimisation workspace structure
-- spin_system -Spinach data structure with
-- line search settings
+- `cost_function` — objective-function handle.
+- `alpha` — initial trial step length.
+- `dir` — search direction.
+- `x_0` — current optimisation vector.
+- `fx_0` — objective value at `x_0`.
+- `gfx_0` — gradient at `x_0`.
+- `data` — optimisation workspace passed to and updated by the objective evaluation.
+- `spin_system` — Spinach data structure containing line-search settings and any frozen-coordinate mask.
 
 ## Outputs
 
-- A -lower bracket point structure
-- B -upper bracket point structure
-- alpha -accepted step length when found
-- fx -objective value at accepted step
-- gfx -gradient at accepted step
-- next_act -continuation tag, either
-- 'sectioning' or 'none'
-- data -updated optimisation workspace
+- `a`, `b` — lower and upper bracket-point structures.
+- `alpha` — current step length; it is the accepted length when the Wolfe conditions are met.
+- `fx`, `gfx` — objective value and gradient at the current trial point.
+- `next_act` — continuation tag: `'sectioning'` when sectioning should follow, or `'none'` when no further line-search stage is needed.
+- `data` — updated optimisation workspace.
 
-## Implementation structure
+## Algorithm
 
-- Expands a trial step into a bracket that contains an acceptable
-- line search point, or accepts the step directly if the Wolfe
-- tests are met before sectioning becomes necessary.
-- [A,B,alpha,fx,gfx,next_act,data]=...
-- bracketing(cost_function,alpha,dir,x_0,fx_0,...
-- gfx_0,data,spin_system)
-- cost_function -objective function handle
-- alpha -initial trial step length
-- dir -search direction vector
-- x_0 -current optimisation vector
-- fx_0 -objective value at x_0
-- gfx_0 -gradient at x_0
+Frozen coordinates are removed from the search direction and initial gradient when a freeze mask is present. The routine evaluates trial points while expanding or tightening the bracket, and uses cubic interpolation within the bracket to select subsequent trial steps.

@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Bloch-Siegert shift compensation functionality demo. The script optimises a 90-degree pulse (Lz -> Lx) for a sing- le spin on resonance. As the control power is increased, Bloch-Siegert shift starts to reduce the fidelity unless it is correctly accounted for. Calculation time: minutes.
+Bloch-Siegert shift compensation demo. It optimises a 90-degree pulse taking (L_z) to (L_x) for a single on-resonance (^{1}mathrm{H}) spin, then compares performance with and without Bloch-Siegert (BSS) correction as control power varies. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- The source sets `sys.magnet=14.1`, one `1H` isotope, and zero scalar coupling. It builds normalized (L_z) initial and (L_x) target states. The example illustrates how an unaccounted Bloch-Siegert shift can reduce pulse fidelity at higher control power.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The optimizer uses L-BFGS (`max_iter=500`, `tol_x=1e-4`) and a 50-slice GRAPE-XY pulse; each slice duration is set to `(pi/100)/control.pwr_levels`. It sweeps 20 powers from (10^{-3}) to 1 times the proton Zeeman frequency, using the same random initial guess for each comparison. At each power, one pulse is designed with BSS disabled and one with BSS enabled; both are evaluated using the BSS-enabled setting, and terminal infidelity is plotted against relative control power.
 
 ## Implementation structure
 
-- Bloch-Siegert shift compensation functionality demo. The
-- script optimises a 90-degree pulse (Lz -> Lx) for a sing-
-- le spin on resonance. As the control power is increased,
-- Bloch-Siegert shift starts to reduce the fidelity unless
-- it is correctly accounted for.
-- Calculation time: minutes.
-- Set magnetic field
-- Set isotopes
-- Set interactions
-- Set basis
-- Run Spinach housekeeping
-- Build and normalise the initial state (Lz)
+- Create the one-spin system and sphten-liouv basis; build and normalize the initial and target states; obtain the (L_x)/(L_y) control operators and drift Hamiltonian; configure the optimizer; sweep power, optimize both BSS settings, evaluate both pulses under BSS, and plot the two infidelity curves.

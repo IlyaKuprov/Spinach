@@ -1,30 +1,15 @@
 # examples/dnp_liq/jdnp/fig_2_tau_and_field_traject.m
 
 - Signature: `fig_2_tau_and_field_traject()`
+- Reference: [Physical Chemistry Chemical Physics, DOI: 10.1039/D1CP04186J](https://doi.org/10.1039/d1cp04186j)
+- Calculation time: seconds (per source comment)
 
 ## Purpose
 
-Time evolution plot for JDNP: proton polarisation as a function of time for specific external fields and rotational correlation times. The inter-electron exchange coupling is set to the match- ing condition at each field. Further details in: Calculation time: seconds, line-by-line plotting
+Plots time-dependent proton DNP for six static fields and four rotational correlation times using the spin system from `system_specification()`.
 
-## Physical / mathematical content
+## Calculation
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
+At each field (0.5, 3.4, 7.0, 11.7, 14.1, and 23.5 T), the script sets the microwave offset from the trityl and free-electron frequencies and sets the electron–electron scalar coupling to the sum of the isotropic electron and proton Zeeman frequencies. For each correlation time (300, 400, 500, and 600 ps), it constructs the Spinach system and basis, forms the ESR Hamiltonian plus relaxation superoperator and microwave terms, and propagates the thermal-equilibrium state while observing proton (L_z).
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Time evolution plot for JDNP: proton polarisation as a function
-- of time for specific external fields and rotational correlation
-- times. The inter-electron exchange coupling is set to the match-
-- ing condition at each field. Further details in:
-- Calculation time: seconds, line-by-line plotting
-- Load the spin system
-- Experiment parameters
-- Magnetic field grid, Tesla
-- Correlation time grid, seconds
-- Get a figure going
-- Loop over the field grid
-- Set magnet field
+The 200 ms trajectories use 1 ms time steps. The proton signal is normalized by its equilibrium expectation value and plotted in a separate field panel, with one curve per correlation time.

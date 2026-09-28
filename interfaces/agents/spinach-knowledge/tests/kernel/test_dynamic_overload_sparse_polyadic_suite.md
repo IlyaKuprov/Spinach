@@ -4,31 +4,11 @@
 
 ## Purpose
 
-Tests dynamic dispatch of sparse, polyadic, and OPIUM overloads. Syntax: result=test_dynamic_overload_sparse_polyadic_suite()
-
-## Physical / mathematical content
+Regression test for dynamic dispatch of `rcv`, `polyadic`, and `opium` overloads against small deterministic dense references. Returns a test result with explanatory messages.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test exercises object-operation dispatch for rcv, polyadic,
-- and opium objects using small deterministic dense references.
-
-## Implementation structure
-
-- Tests dynamic dispatch of sparse, polyadic, and OPIUM overloads. Syntax:
-- result=test_dynamic_overload_sparse_polyadic_suite()
-- result -regression test result with explanatory messages
-- The test exercises object-operation dispatch for rcv, polyadic,
-- and opium objects using small deterministic dense references.
-- Announce the test target
-- State the overload target of the test
-- Build deterministic sparse operands
-- Exercise RCV construction, conversion, and size dispatch
-- Exercise RCV arithmetic dispatch
-- Exercise direct RCV method-name dispatch for coverage tracking
-- Exercise RCV matrix product and transposition dispatch
+- Constructs `rcv` objects from deterministic sparse matrices and checks conversion, dimensions, arithmetic, direct method-name dispatch, matrix products, transpose and conjugate transpose, concatenation, and CPU `gather` against matrix references. It also checks that `spy` creates a figure with plotting set offscreen.
+- Constructs deterministic `polyadic` objects and compares their opened values with explicit sums of Kronecker products. Checks validation, dimensions, structural predicates, arithmetic, vector multiplication, direct dispatch, sparse prefix and suffix multiplication, Kronecker products, transpose and conjugate transpose, `simplify`, and `inflate`.
+- Checks `opium` dimensions, full and sparse conversion, scalar and matrix multiplication, Kronecker products, and structural predicates against identity-matrix references.
+- Uses absolute and relative tolerances of `1e-15` for value comparisons and zero tolerances for dimension comparisons. GPU upload and `gather` checks for `rcv` and `polyadic` run only when a usable GPU is available; otherwise, the result records skip messages.

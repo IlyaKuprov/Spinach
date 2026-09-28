@@ -4,32 +4,16 @@
 
 ## Purpose
 
-An example of inversion recovery experiment simulation for a strychnine spin system. Calculation time: minutes.
+Simulates inversion-recovery proton spectra for the strychnine spin system at six recovery delays. The source estimates the calculation time in minutes.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system is loaded with `strychnine({'1H'})` and set to 14.1 T. Redfield relaxation uses `dibari` equilibrium, kite retention, temperature 298, and a 200 ps correlation time. The script sets a proximity cutoff of 4.0. The basis uses `sphten-liouv`, IK-2 approximation, scalar-coupling connectivity, and proximity level 3; Krylov propagation is disabled.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+For each delay in `[0.01, 0.1, 0.5, 1, 5, 10]` seconds, the equilibrium state is inverted with a 180-degree `Ly` pulse, allowed to recover under the rotating-frame NMR Hamiltonian plus `1i*relaxation`, and tipped by a 90-degree `Ly` pulse. The script acquires a proton FID with sweep width 6500, 8192 points, offset 2800 Hz, and zero-fills to 65536 points. It applies exponential apodisation with parameter 5, Fourier transforms the signal, and plots the real spectrum.
 
 ## Implementation structure
 
-- An example of inversion recovery experiment simulation
-- for a strychnine spin system.
-- Calculation time: minutes.
-- Read the spin system properties
-- Magnet field
-- Disable Krylov propagation
-- Basis set
-- Relaxation theory parameters
-- Proximity cut-off
-- Spinach housekeeping
-- Aquisition parameters
-- Set up different recovery delays
+The code builds the strychnine spin system and selected basis, sets acquisition parameters, computes `rho_eq` and an `L+` proton detection coil, then forms the rotating-frame Liouvillian. A six-iteration loop applies the inversion, recovery evolution, read pulse, and acquisition; each result is apodised, transformed, and drawn in one panel of a 2-by-3 figure labelled by recovery delay.

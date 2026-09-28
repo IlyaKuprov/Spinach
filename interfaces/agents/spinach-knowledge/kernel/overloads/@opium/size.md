@@ -22,15 +22,5 @@ The size of the matrix represented by the OPIUM. Syntax: answer=size(op,dim)
 
 ## Implementation structure
 
-- The size of the matrix represented by the OPIUM. Syntax:
-- answer=size(op,dim)
-- op -an opium object
-- dim -optional, dimension whose
-- size is required
-- answer -a vector with one or two elements
-- Check consistency
-- Compose the answer
-- Consistency enforcement
-- Treason doth never prosper: what's the reason?
-- Why, if it prosper, none dare call it treason.
-- John Harrington
+- Check that the requested dimension, if given, is 1 or 2
+- Return the OPIUM object's dimensions in the requested output form

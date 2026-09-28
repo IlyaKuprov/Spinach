@@ -8,16 +8,14 @@ Finds a local maximum of a function of several variables using Newton and quasi-
 
 ## Physical / mathematical content
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+- Maximises a user-supplied objective using the method selected in `spin_system.control.method`: LBFGS, regularised BFGS (RBFGS), regularised Newton, or regularised Newton with Goodwin acceleration.
+- Search directions use only unfrozen coordinates; after direction construction, the routine applies a line search to select the step.
 
 ## Numerical / algorithmic content
 
 - All four methods check only the initial assembled gradient on unfrozen coordinates before constructing a search direction. A norm below `1e-6` is rejected before any Hessian regularisation or solve; the objective value and trajectory shape are not inspected by this guard. This is an optimiser-level check, not a restriction on individual GRAPE contributions.
 - Newton and Goodwin request an objective, gradient, and Hessian every iteration. LBFGS and RBFGS request the initial objective and gradient, then reuse line-search gradients. The initial checks use these existing evaluations. With `max_iter=0`, only the objective is evaluated and the initial-guess guard is not applied.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+- If the computed direction is not an ascent direction on unfrozen coordinates, the routine falls back to the projected gradient before bracketing and sectioning the line search.
 
 ## Parameters / inputs
 

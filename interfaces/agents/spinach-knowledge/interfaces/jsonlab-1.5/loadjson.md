@@ -4,7 +4,7 @@
 
 ## Purpose
 
-No descriptive header was found. The best immediate identifier is `data = loadjson(fname,varargin)`, and the implementation details below should be used to infer its role.
+Parse a JSON (JavaScript Object Notation) file or string.
 
 ## Physical / mathematical content
 

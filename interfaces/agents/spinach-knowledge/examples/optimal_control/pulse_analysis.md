@@ -8,14 +8,13 @@ An example of spectrogram analysis for a quadratic chirp pulse; adapted from Mat
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
+- The signal is a superposition of two quadratic chirps: one sweeps from 100 to 200 Hz and the other from 200 to 100 Hz over one second.
 
 ## Numerical / algorithmic content
 
+- Samples the signal at 1000 Hz over a two-second time vector.
+- Computes a spectrogram with a 100-sample window, 80-sample overlap, 100 frequency points, and a −50 dB minimum threshold.
+
 ## Implementation structure
 
-- An example of spectrogram analysis for a quadratic chirp
-- pulse; adapted from Matlab example set.
-- Calculation time: seconds.
-- Quadratic chirp superposition
-- Do the plotting
+- Plots the signal amplitude versus time and its spectrogram versus time and frequency in two subplots.

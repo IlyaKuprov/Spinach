@@ -8,11 +8,11 @@
 
 ## Physical / mathematical content
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+Each Voronoi cell is rendered as a vertical bar over its two-dimensional polygon, extending from zero to the cell concentration. Optional local observables determine the bar colour in HSV space.
 
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Draws cells only when `abs(conc) > 1e-3*diff(spin_sys.mesh.z)`. When observables are supplied, phase wraps into hue, amplitude scales saturation relative to its maximum, and the longitudinal observable sets value over its range. Zero amplitude gives zero saturation; a constant longitudinal observable gives full value.
 
 ## Parameters / inputs
 
@@ -37,15 +37,4 @@
 
 ## Implementation structure
 
-- 2D microfluidic concentration plotting function. Uses mesh
-- tessellation information to plot concentrations as vertical
-- bars. This function should be called after mesh_plot() has
-- drawn the mesh. Syntax:
-- conc_plot(spin_system,conc,obs)
-- spin_system -Spinach spin system object containing
-- mesh and tessellation information
-- conc -concentrations as a column vector with
-- the same number of elements as the num-
-- ber of Voronoi cells; these will deter-
-- mine bar heights
-- obs -up to three observables as columns of
+Validates the mesh, Voronoi data, concentration vector, and any supplied observables. Preallocates vertices, face indices, and colours, then constructs and draws separate flat-coloured patches for bar tops, bottoms, and side walls.

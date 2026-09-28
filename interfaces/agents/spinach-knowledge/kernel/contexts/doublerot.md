@@ -4,42 +4,31 @@
 
 ## Purpose
 
-Double angle spinning context. In Liouville space, this wrapper builds the Fokker-Planck evolution generator and passes it on to the pulse se- quence function, which should be supplied as a handle. In Hilbert space, this wrapper builds the stack of spin Hamiltonians, one for each pair of rotor phases on the two-rotor phase grid, and hands that stack to the pulse sequence. Syntax: [answer,sph_grid]=doublerot(spin_syst
+Implements the double-angle-spinning context. In Liouville space it builds the Fokker–Planck evolution generator; in Hilbert space it builds a stack of spin Hamiltonians, one for each pair of rotor phases on the two-rotor phase grid. It passes the generator or Hamiltonian stack to the supplied pulse-sequence function handle.
 
-## Physical / mathematical content
+## Parameters / inputs
 
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- `pulse_sequence` — function handle for a pulse sequence in the experiments directory.
+- `assumptions` — string passed to `assume.m` when the Hamiltonian is built.
+- `parameters.rate_outer`, `parameters.rate_inner` — outer and inner rotor spinning rates in Hz.
+- `parameters.axis_outer`, `parameters.axis_inner` — normalized three-element vectors specifying the outer and inner rotor axes.
+- `parameters.rank_outer`, `parameters.rank_inner` — maximum harmonic ranks retained for the outer and inner rotors. Increase them until convergence; the source notes that the rank is approximately the number of spinning sidebands in the spectrum.
+- `parameters.rframes` — rotating-frame specification; see the header of `rotframe.m`. When used, the assumptions for the affected spins should be in the laboratory frame.
+- `parameters.grid` — spherical-grid file name from the kernel `grids` directory. Use a two-angle grid in Liouville space and a three-angle grid in Hilbert space.
+- `parameters.needs` — cell array of sequence requirements. `'iso_eq'` requests the thermal-equilibrium state of the isotropic Hamiltonian in `parameters.rho0`.
+- `parameters.serial` — when true, disables automatic parallelisation.
+- `parameters.sum_up` — defaults to 1 and returns the powder average; set to 0 to return each orientation's result in a cell array.
+- Other `parameters` subfields may be required by the pulse sequence; consult its documentation.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The wrapper sets `parameters.spc_dim` to the rotor-trajectory space dimension and `parameters.spn_dim` to the spin-dynamics matrix dimension before calling the sequence.
 
 ## Outputs
 
-- answer -the poweder average or a cell array ofwhatever it is
-- that the pulse sequence returns
-- sph_grid -spherical grid used ithe calculation
-- Note: arbitrary order rotating frame transformation is supported, inc-
-- luding infinite order. See the header of rotframe.m for further
-- information.
-- Note: the state projector assumes a powder --single crystal DOR is not
-- currently supported.
-- Note: the function supports parallel processing via Matlab's Distri-
-- buted Computing Toolbox -different system orientations are eva-
-- luated on different labs.
+- `answer` — the weighted powder average, or, when `parameters.sum_up` is 0, the pulse-sequence outputs for individual orientations.
+- `sph_grid` — the spherical grid used in the calculation.
 
-## Implementation structure
+## Notes
 
-- Double angle spinning context. In Liouville space, this wrapper builds
-- the Fokker-Planck evolution generator and passes it on to the pulse se-
-- quence function, which should be supplied as a handle. In Hilbert space,
-- this wrapper builds the stack of spin Hamiltonians, one for each pair of
-- rotor phases on the two-rotor phase grid, and hands that stack to the
-- pulse sequence. Syntax:
-- [answer,sph_grid]=doublerot(spin_system,pulse_sequence,...
-- parameters,assumptions)
-- where pulse sequence is a function handle to one of the pulse sequences
-- located in the experiments directory, assumptions is a string that would
-- be passed to assume.m when the Hamiltonian is built and parameters is a
-- structure with the following subfields:
+- Arbitrary-order rotating-frame transformations, including infinite order, are supported; see the header of `rotframe.m`.
+- The state projector assumes a powder; single-crystal DOR is not currently supported.
+- Parallel processing through MATLAB's Distributed Computing Toolbox is supported, with system orientations evaluated in parallel.

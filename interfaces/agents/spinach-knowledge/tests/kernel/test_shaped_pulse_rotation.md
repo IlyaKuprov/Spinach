@@ -4,30 +4,24 @@
 
 ## Purpose
 
-Tests a one-slice Cartesian shaped pulse. Syntax: result=test_shaped_pulse_rotation()
+Verifies that a one-slice Cartesian X pulse reproduces the hard-pulse rotation limit.
 
 ## Physical / mathematical content
 
+A rectangular X pulse with amplitude `1 rad/s` and duration `pi s` has flip angle `pi` radians, so it must invert `Lz` to `-Lz`.
+
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The test uses a one-proton Hilbert-space system with zero drift and controls `{Lx,Ly}`. It applies one slice with amplitudes `{1,0}` and duration `pi` using `shaped_pulse_xy` with the `expm-pwc` method, then compares the result with `-Lz` at absolute and relative tolerances of `1e-14`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test applies one rectangular X pulse slice with amplitude 1 rad/s and
-- duration pi seconds; the net flip angle is pi, so Lz must invert.
+`result` is the regression-test record, including the rotation comparison and explanatory messages.
 
 ## Implementation structure
 
-- Tests a one-slice Cartesian shaped pulse. Syntax:
-- result=test_shaped_pulse_rotation()
-- result -regression test result with explanatory messages
-- The test applies one rectangular X pulse slice with amplitude 1 rad/s and
-- duration pi seconds; the net flip angle is pi, so Lz must invert.
-- Announce the test target
-- State the pulse target of the test
-- Build a one-proton Hilbert-space spin system
-- Define drift, controls, and one pi pulse slice
-- Apply the shaped pulse
-- Check the physical rotation result
+Constructs the spin system and Cartesian controls, applies the shaped pulse, and checks the expected state inversion.
+
+## Header notes
+
+The source header credits Ilya Kuprov (`ilya.kuprov@weizmann.ac.il`).

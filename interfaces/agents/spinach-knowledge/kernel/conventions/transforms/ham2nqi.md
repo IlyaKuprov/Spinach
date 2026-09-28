@@ -4,44 +4,19 @@
 
 ## Purpose
 
-Converts a single-spin Hamiltonian back into the Zeeman and quadrupolar interaction parameters that had been used to generate it. Syntax: [omega,Q]=ham2nqi(H)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
-
-## Numerical / algorithmic content
+Decomposes a single-spin Hamiltonian in the Zeeman basis into its Zeeman and quadrupolar parameters. The Hamiltonian must be Hermitian and traceless and contain no terms beyond quadratic order; otherwise the function errors.
 
 ## Parameters / inputs
 
-- H -single-spin Hamiltonian written in
-- the Zeeman basis for a spin of any
-- multiplicity
+- `H`: single-spin Hamiltonian matrix for a spin of any multiplicity.
 
 ## Outputs
 
-- omega -Larmor frequencies, rad/s
-- Q -symmetric traceless quadrupolar
-- coupling tensor, rad/s
-- The outputs are returned such that:
-- H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz +
-- + [Sx Sy Sz]*Q*[Sx Sy Sz].';
-- An error is produced if the Hamilonian contains
-- any terms (for example, cubic) beyond those, or
-- if it is not Hermitian and traceless.
+- `omega`: three Larmor-frequency components in rad/s.
+- `Q`: symmetric traceless quadrupolar coupling tensor in rad/s. For spin-1/2, `Q` is zero.
 
-## Implementation structure
+The parameters are returned so that
 
-- Converts a single-spin Hamiltonian back into the
-- Zeeman and quadrupolar interaction parameters that
-- had been used to generate it. Syntax:
-- [omega,Q]=ham2nqi(H)
-- H -single-spin Hamiltonian written in
-- the Zeeman basis for a spin of any
-- multiplicity
-- omega -Larmor frequencies, rad/s
-- Q -symmetric traceless quadrupolar
-- coupling tensor, rad/s
-- The outputs are returned such that:
-- H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz +
+`H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz + [Sx Sy Sz]*Q*[Sx Sy Sz].'`
+
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ham2nqi.m)

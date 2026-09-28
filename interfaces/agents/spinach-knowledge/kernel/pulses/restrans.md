@@ -4,61 +4,24 @@
 
 ## Purpose
 
-RLC circuit response calculation -converts a waveform from the ideal shape emitted by the instrument into the shape that comes out of the RLC circuit of the probe. Syntax: [X,Y,dt]=restrans(X_user,Y_user,dt_user,... omega,Q,model,up_factor)
+Models the RLC circuit response of a probe, converting an ideal in-phase and out-of-phase pulse waveform into the waveform after the circuit response.
 
-## Physical / mathematical content
+## Algorithm
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+The input is interpolated onto a finer time grid: `pwc` treats the supplied samples as slice midpoints and uses nearest-neighbour interpolation; `pwl` and `pwl_tsc` treat them as slice edges and use linear interpolation. The function forms the carrier-modulated input, applies a second-order RLC transfer function, demodulates and low-pass filters the output, then downsamples according to `up_factor`. For `pwl_tsc`, it also shifts the output time grid by `2*Q/omega`. With no output arguments, it produces diagnostic plots.
 
 ## Parameters / inputs
 
-- X_user -in-phase part of the rotating frame
-- pulse waveform, a column vector of
-- real numbers
-- Y_user -out-of-phase part of the rotating
-- frame pulse waveform, a column vec-
-- tor of real numbers
-- dt_user -time slice duration, seconds
-- omega -RLC circuit resonance frequency in
-- radians per second, a real number
-- Q -RLC circuit quality factor, a real
-- positive number
-- model -input signal model, use 'pwc' for
-- piecewise-constant, and 'pwl' for
-- piecewise-linear input; time shift
-- compensation for piecewise-linear
-- is requested by 'pwl_tsc'
-- up_factor -the output waveform will have more
-- discretisation points than the in-
-- put waveform by this factor, about
-- 100 is a safe guess
+- `X_user`, `Y_user` — real column vectors for the in-phase and out-of-phase rotating-frame waveform components; they must have the same length.
+- `dt_user` — finite positive input slice duration, in seconds; it must not be less than `pi/omega`.
+- `omega` — finite positive scalar RLC resonance frequency, in radians per second.
+- `Q` — finite positive scalar RLC quality factor.
+- `model` — `'pwc'` (piecewise-constant), `'pwl'` (piecewise-linear), or `'pwl_tsc'` (piecewise-linear with time-shift compensation).
+- `up_factor` — finite positive integer controlling output waveform discretisation relative to the input; the source describes about 100 as a safe guess.
 
 ## Outputs
 
-- X -in-phase part of the rotating frame
-- pulse waveform distorted by the RLC
-- response, a column vector of real
-- numbers
-- Y -out-of-phase part of the rotating
-- frame pulse waveform distorted by
-- the RLC response, a column vector
-- of real numbers
-- dt -slice duration in the distorted wave-
-- form, seconds
+- `X`, `Y` — in-phase and out-of-phase rotating-frame components after the RLC response.
+- `dt` — output slice duration, in seconds.
 
-## Implementation structure
-
-- RLC circuit response calculation -converts a waveform from the
-- ideal shape emitted by the instrument into the shape that comes
-- out of the RLC circuit of the probe. Syntax:
-- [X,Y,dt]=restrans(X_user,Y_user,dt_user,...
-- omega,Q,model,up_factor)
-- X_user -in-phase part of the rotating frame
-- pulse waveform, a column vector of
-- real numbers
-- Y_user -out-of-phase part of the rotating
-- frame pulse waveform, a column vec-
-- tor of real numbers
-- dt_user -time slice duration, seconds
+[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=restrans.m)

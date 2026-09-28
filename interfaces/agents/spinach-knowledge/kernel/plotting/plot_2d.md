@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Contour plotting utility with non-linear adaptive contour spacing. The function is useful for NMR data where small cross-peaks must be adequa- tely contoured next to large diagonal peaks. Syntax: [axis_f1,axis_f2,spectrum]=plot_2d(spin_system,spectrum,... parameters,ncont,delta,... k,ncol,m,signs)
+Plots 2D NMR spectra using non-linear adaptive contour spacing to show small cross-peaks alongside large diagonal peaks. Syntax: see the signature above.
 
 ## Physical / mathematical content
 
@@ -12,53 +12,28 @@ Contour plotting utility with non-linear adaptive contour spacing. The function 
 
 ## Parameters / inputs
 
-- spectrum -a real matrix containing the 2D NMR spectrum
-- parameters.sweep -one or two sweep widths, Hz
-- parameters.spins -cell array with one ot two character
-- strings specifying the working spins
-- parameters.offset -one or two transmitter offsets, Hz
-- parameters.axis_units -axis units ('ppm','Hz','Gauss')
-- ncont -the number of contours, a reasonable value is 20
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the contours above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive conto-
-- urs and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the contour
-- spacing function: k=1 corresponds to linear spacing and
-- k>1 bends the spacing curve to increase the sampling den-
-- sity near the baseline. A reasonable value is 2.
-- ncol -number of colours in the colour map; around 256 is fine
-- m -the curvature of the colour map: m=1 corresponds to a li-
-- near colour ramp into the red for positive contours, and
-- into the blue for negative contours. A reasonable value
-- for high-contrast plotting is 6.
-- signs -can be set to 'positive', 'negative' or 'both' -this
-- will cause the corresponding contours to be plotted.
+- `spectrum` — real matrix containing the 2D NMR spectrum.
+- `parameters.sweep` — one or two sweep widths, Hz.
+- `parameters.spins` — cell array with one or two character strings specifying the working spins.
+- `parameters.offset` — one or two transmitter offsets, Hz.
+- `parameters.axis_units` — `ppm`, `Gauss`, `Hz`, `kHz`, `MHz`, or `points`.
+- `ncont` — number of contours (20 is a reasonable value).
+- `delta` — minimum and maximum contour elevations as fractions of total intensity; the first pair applies to positive contours and the second to negative contours. A suggested starting value is `[0.02 0.2 0.02 0.2]`.
+- `k` — controls contour-spacing curvature: 1 is linear; values above 1 increase sampling near the baseline. A reasonable value is 2.
+- `ncol` — number of colors in the color map (around 256).
+- `m` — color-map curvature: 1 gives a linear red ramp for positive contours and blue for negative contours; 6 is a reasonable high-contrast value.
+- `signs` — `positive`, `negative`, or `both`, selecting which contours to plot.
 
 ## Outputs
 
-- a figure is drawn and the following parameters returned
-- axis_f1, axis_f2 -F1 and F2 axis ticks for external
-- plotting utilities
-- spectrum -2D spectrum array for external
-- plotting utilities
-- Note: the following functions are used to compute contour levels:
-- cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-- cont_levs_neg=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
-- where smin and smax are computed from the spectrum matrix.
+- Returns `axis_f1` and `axis_f2` ticks and the 2D `spectrum` for external plotting utilities.
+- Complex spectra are shown as real and imaginary panels side by side. If a panel is all zero, it has no contours; the function draws empty axes with the correct ranges and labels the panel “all-zero spectrum”.
 
 ## Implementation structure
 
-- Contour plotting utility with non-linear adaptive contour spacing. The
-- function is useful for NMR data where small cross-peaks must be adequa-
-- tely contoured next to large diagonal peaks. Syntax:
-- [axis_f1,axis_f2,spectrum]=plot_2d(spin_system,spectrum,...
-- parameters,ncont,delta,...
-- k,ncol,m,signs)
-- spectrum -a real matrix containing the 2D NMR spectrum
-- parameters.sweep - one or two sweep widths, Hz
-- parameters.spins - cell array with one ot two character
-- strings specifying the working spins
-- parameters.offset - one or two transmitter offsets, Hz
-- parameters.axis_units - axis units ('ppm','Hz','Gauss')
+- Applies defaults and validates inputs; for complex data, recursively plots the real and imaginary parts side by side.
+- Computes positive and negative contour levels with `contspacing`, constructs axes from sweep widths and offsets, and converts axes to the requested units.
+- Transposes the spectrum for plotting, draws its contours (or empty axes for an all-zero panel), applies the color map, and reverses both axes.
+- Draws the color bar unless `colorbar` is listed in `spin_system.sys.disable`.
+
+[Source reference](https://spindynamics.org/wiki/index.php?title=plot_2d.m)

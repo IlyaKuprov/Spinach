@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Simulation of nutation frequency dependence of TOP DNP field profiles in the steady state with electron-proton distance and electron Rabi frequency ensembles. Calculation time: minutes
+Builds steady-state TOP DNP field profiles across six selected nutation frequencies while averaging over electron-proton distance and B1 distributions. The source comments estimate the calculation takes minutes.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The model is an electron-proton pair at Q-band (1.2142 T), with spin temperature 80 K, trityl electron g principal values [2.00319, 2.00319, 2.00258], and proton shift [0, 0, 5] ppm. Three Gauss-Legendre distance nodes span 3.5–20 Å, and the five B1 nodes span 0.2ν–1.2ν for each selected nutation frequency ν. The script evaluates ten microwave offsets from 88 to 97 MHz, with 300 TOP DNP blocks, 10 ns pulses, 14 ns delays, and shot spacing set to 153 μs minus the pulse-train duration. Distance-dependent proton relaxation uses `r1n_dnp`; the calculation uses the full sphten-liouv basis, diagonal relaxation, dibari equilibrium, and `rep_2ang_800pts_sph` powder grid.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Simulation of nutation frequency dependence of TOP DNP
-- field profiles in the steady state with electron-proton
-- distance and electron Rabi frequency ensembles.
-- Calculation time: minutes
-- Nutation frequencies, Hz
-- Get the figure started
-- Plot the curves
-- Save results
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
+For each ν in [6.8, 9.6, 13.5, 17.5, 25, 36] MHz, the local function `top_field_profile_b1_r` evaluates the steady state with `powder` and `@topdnp_steady` in `esr` mode. It averages over B1 quadrature weights and over distance using the radial Jacobian r², then adds a curve to the 3-D plot. The figure is saved as `top_q_nutation_ensemble_b1_r.fig`.

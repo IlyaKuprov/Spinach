@@ -29,7 +29,3 @@ House style settings for Matlab figures; a product of much experience with acade
 - leg_obj -Matlab figure legend object
 - Display the legend using LaTeX
 - Make legend box translucent
-- It was awesome -my first tabloid story. If you're going to
-- have a tabloid story written about you, it might as well be
-- with Johnny Depp.
-- Christina Ricci, about newspapers

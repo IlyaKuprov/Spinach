@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Simulation of XiX DNP field profile in the steady state with electron-proton distance ensemble averaging. Calculation time: minutes.
+Simulate a steady-state XiX DNP microwave-offset profile at Q-band, averaged over an electron–proton distance ensemble. The source estimates a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The system contains an electron and a proton at 80 K in a 1.2142 T field. It uses a trityl electron g-tensor, a proton Zeeman shift, and an electron–proton separation varied across the ensemble. The `t1_t2` relaxation model includes a proton longitudinal relaxation rate calculated by `r1n_dnp` as a function of distance and orientation. The final distance average uses the Gauss–Legendre weights and an `r²` Jacobian, normalized by the sum of those weights.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Three Gauss–Legendre points span distances from 3.5 to 20. For each distance, the function creates a Spinach system in the `sphten-liouv` basis without basis approximation, detects proton `Lz`, and calls `powder(spin_system,@xixdnp_steady,parameters,'esr')`. The microwave resonance offsets comprise 201 points from −100 to 100 MHz. Powder averaging uses the `rep_2ang_800pts_sph` grid.
 
 ## Implementation structure
 
-- Simulation of XiX DNP field profile in the steady state
-- with electron-proton distance ensemble averaging.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance ensemble, Gauss-Legendre points
-- Microwave resonance offsets, Hz
+The XiX settings specify an 18 MHz electron nutation frequency, 48 ns pulse duration, 36 blocks, an inverted second-pulse phase of `pi`, and a −13 MHz additional shift. Shot spacing is calculated as `204e-6 - 2*nloops*pulse_dur`. After distance averaging, the function plots the real proton `Lz` expectation value against microwave resonance offset in MHz and saves `xix_q_field_profile_ensemble_r.fig`.

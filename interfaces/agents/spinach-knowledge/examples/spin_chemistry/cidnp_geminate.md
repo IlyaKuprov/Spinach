@@ -8,12 +8,12 @@ A basic example of the geminate CIDNP effect simulation. Calculation time: secon
 
 ## Physical / mathematical content
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- At 14.1 T the system contains two electron spins and one 1H spin, with g factors `2.0023`, `2.0024`, and `1.0`. The electron pair has a singlet initial state and couples to the proton with `J=1e7`; recombination uses Haberkorn theory with rates `[1e7 0]`.
+- The model duplicates the state space into reactant and product sectors; the reaction superoperator removes population from reactants and transfers it to products, where no further dynamics are assumed.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- It evolves the assembled Liouvillian for `1e-6 s` and reports the proton `Lz` magnetisation in the reactant and product sectors separately.
 
 ## Implementation structure
 

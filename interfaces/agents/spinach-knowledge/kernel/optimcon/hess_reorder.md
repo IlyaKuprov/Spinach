@@ -4,36 +4,20 @@
 
 ## Purpose
 
-The waveforms on different channels are assumed to be stored in the rows of the input array. The Hessian elements correspond to the ele- ments of the waveform array ordered as: [X1 Y1 Z1 X2 Y2 Z2 ... Xn Yn Zn] where X,Y,Z are different control channels and the index enumerates the time discretization points. Gradient dimensions and element or- der are the same as the input waveform dimensions and element order. Eleme
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-
-## Numerical / algorithmic content
+Reorders a Hessian whose variables are laid out control-channel first and time-point second to the matching time-point-first, control-channel-second ordering. This converts the ordering `[X1 Y1 Z1 X2 Y2 Z2 ...]` to `[X1 X2 ... Y1 Y2 ... Z1 Z2 ...]` for control channels X, Y, Z.
 
 ## Parameters / inputs
 
-- hess -the old Hessian matrix to be reordered, curre-
-- ntly ordered K first then N.
-- K -the first ordered variable of the old Hessian,
-- number of control channels in the example above.
-- N -the second ordered variable of the old Hessian,
-- number of time points in the example above.
-- Output:
-- hess -reordered Hessian with N first then K.
+- `hess` — square `(K*N)	imes(K*N)` Hessian in control-channel-first ordering.
+- `K` — positive integer number of control channels.
+- `N` — positive integer number of time points.
 
-## Implementation structure
+## Output
 
-- The waveforms on different channels are assumed to be stored in the
-- rows of the input array. The Hessian elements correspond to the ele-
-- ments of the waveform array ordered as:
-- [X1 Y1 Z1 X2 Y2 Z2 ... Xn Yn Zn]
-- where X,Y,Z are different control channels and the index enumerates
-- the time discretization points. Gradient dimensions and element or-
-- der are the same as the input waveform dimensions and element order.
-- Elements of the Hessian are reordered as to correspond to the wavef-
-- orm array:
-- [X1 X2 ... Xn Y1 Y2 ... Yn Z1 Z2 ... Zn]
-- interchanging the order from controls then time point to time point
-- then controls, or vice versa. Syntax:
+- `hess` — the same Hessian reordered to time-point-first ordering.
+
+## Implementation
+
+The function reshapes the matrix to `[K N K N]`, permutes both variable axes with `[2 1 4 3]`, then reshapes it back to `[N*K N*K]`.
+
+[Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=hess_reorder.m)

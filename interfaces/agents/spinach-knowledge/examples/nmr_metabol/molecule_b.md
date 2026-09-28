@@ -4,26 +4,16 @@
 
 ## Purpose
 
-1H NMR spectrum of a molecule from the GISSMO database. Calculation time: seconds
+Simulate a 1H NMR spectrum of a molecule from the GISSMO database. Calculation time: seconds.
 
-## Physical / mathematical content
+## Implementation
 
-- Metabolomics NMR examples. These files apply liquid-state NMR simulation workflows to small-molecule mixtures, spectral assignment, concentration inference, and database-style metabolite spin-system definitions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Import the GISSMO dataset with `gissmo2spinach('molecule_b.xml',1)`.
+- Build the Spinach basis using `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level 1.
+- Create the spin system and basis with `create` and `basis`.
+- Set both the initial state and detection coil to `state(spin_system,'L+','1H')`; use no decoupling.
+- Set offset to 3500, sweep to 5000, acquisition points to 4096, zero filling to 16536, axis units to `ppm`, and axis inversion to 1.
+- Acquire the liquid-state NMR FID with `liquid(spin_system,@acquire,parameters,'nmr')`, apply Gaussian apodisation with parameter 10, and compute `fftshift(fft(fid,parameters.zerofill))`.
+- Plot the real spectrum with `plot_1d`.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H NMR spectrum of a molecule from the GISSMO database.
-- Calculation time: seconds
-- Import GISSMO dataset
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Source attribution: ilya.kuprov@weizmann.ac.il

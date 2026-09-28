@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Gathers an RCV sparse matrix from GPU. Syntax: A=gather(A)
+Moves an RCV sparse matrix's stored arrays from GPU to CPU memory when it is GPU-resident.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+Gathering changes the location of the row indices, column indices, and values, not the represented sparse matrix.
 
 ## Numerical / algorithmic content
+
+If A.isGPU is true, gather is applied to A.row, A.col, and A.val, and the flag is set to false. A CPU-resident input is left unchanged.
 
 ## Parameters / inputs
 
@@ -22,14 +24,6 @@ Gathers an RCV sparse matrix from GPU. Syntax: A=gather(A)
 
 ## Implementation structure
 
-- Gathers an RCV sparse matrix from GPU. Syntax:
-- A=gather(A)
-- A -an RCV sparse matrix
-- A -the same matrix with data stored on the CPU
-- Check consistency
-- Gather to CPU
-- Consistency enforcement
-- Aerie, I've noticed the unfortunate fact that you live
-- by one of the great lessons of history that nothing is
-- often a good thing to do and a clever thing to say.
-- Edwin Odesseiron, in Baldur's Gate 2
+- Requires A to be an RCV object.
+- Gathers the row, column, and value arrays only when A.isGPU is true.
+- Clears A.isGPU after transferring those arrays.

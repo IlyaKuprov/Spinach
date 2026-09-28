@@ -4,30 +4,18 @@
 
 ## Purpose
 
-Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm()
+Tests Hilbert-space propagation against matrix exponentiation.
 
 ## Physical / mathematical content
 
+- Checks the Spinach sign convention for density-matrix evolution: `rho(t)=exp(-iHt) rho(0) exp(+iHt)`.
+
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Builds a one-proton spin system in the `zeeman-hilb` formalism with no approximation.
+- Sets `H=2*pi*123*S.z`, `rho=S.x+0.25*S.y`, and `dt=2.5e-3` using `S=pauli(2)`.
+- Computes `P=expm(-1i*H*dt)` and compares `step(spin_system,H,rho,dt)` with `P*rho*P'` using absolute and relative tolerances of `1e-13`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks the Spinach sign convention for density-matrix evolution:
-- rho(t)=exp(-iHt) rho(0) exp(+iHt).
-
-## Implementation structure
-
-- Tests Hilbert-space propagation against matrix exponentiation. Syntax:
-- result=test_step_matches_expm()
-- result -regression test result with explanatory messages
-- The test checks the Spinach sign convention for density-matrix evolution:
-- rho(t)=exp(-iHt) rho(0) exp(+iHt).
-- Announce the test target
-- State the propagation target of the test
-- Build a one-proton Hilbert-space spin system
-- Define a Hamiltonian and an initial density matrix
-- Build the independent exact propagator
-- Check exact finite-dimensional propagation
+- `result` - regression test result with explanatory messages.

@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Fitting of 2,2,3,3-tetrafluoroglucose NOESY with respect to the reaction rates in a chemical exchange problem and the rotational correlation time within Redfield theory. Calculation time: minutes (iteration count is limited in this example file)
+Fits the 2,2,3,3-tetrafluoroglucose NOESY spectrum with respect to chemical-exchange reaction rates and the rotational correlation time in Redfield theory. The source describes a calculation time of minutes and notes that the iteration count is limited in this example.
 
-## Physical / mathematical content
+## Physical and mathematical content
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model combines chemical exchange with Redfield relaxation and rotational motion. A trial parameter vector determines the spin-system and sequence settings used to simulate the NOESY data; the calculated and experimental spectra are compared in a least-squares fit.
 
-## Numerical / algorithmic content
+## Numerical and algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The script optimises an initial guess, simulates the signal, applies apodisation, forms the indirect-dimension States signal, and performs the F2 and F1 Fourier transforms before taking the real spectrum. It processes the experimental spectrum and evaluates the least-squares error. Plotting includes cosmetic SVD denoising and a theory-versus-experiment display.
 
 ## Implementation structure
 
-- Fitting of 2,2,3,3-tetrafluoroglucose NOESY with respect to the
-- reaction rates in a chemical exchange problem and the rotational
-- correlation time within Redfield theory.
-- Calculation time: minutes (iteration count is limited
-- in this example file)
-- Get a figure going
-- Set the initial guess
-- Set optimiser options
-- Run the optimisation
-- Display the result
-- Hush up Spinach
-- Magnet field
+The top-level function sets up the figure, initial guess and optimiser, then calls a local error function. That function configures the Redfield spin system and sequence, runs the simulation, processes both simulated and experimental data, computes and displays the objective and parameters, and plots the comparison.

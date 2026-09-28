@@ -4,27 +4,16 @@
 
 ## Purpose
 
-A spin echo experiment under a gradient in the presence of diffusion and flow. Calculation time: seconds. Ahmed Allami Ilya Kuprov
+Simulates a 1D spin echo under a gradient, with diffusion and flow. The source estimates seconds of runtime.
 
-## Physical / mathematical content
+## Model and sequence
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
+The system is one `1H` at 5.9 T with chemical-shift value 1.0, using the `sphten-liouv` formalism without a basis approximation. The sample is 0.30 m long with 100 points. The gradient amplitude is `5e-6`, each gradient step lasts `2e-4 s`, and there are 200 gradient steps. The initial and detection state phantoms are uniform; the flow field is set to one and diffusion to `1e-6`.
 
-## Numerical / algorithmic content
+## Computation and output
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The echo is calculated with `imaging(spin_system,@spin_echo,parameters)`. The plotted real echo signal uses a time axis from 0 through 400 gradient-step intervals, labelled in seconds; the figure labels the vertical axis as echo intensity in arbitrary units.
 
-## Implementation structure
+## Attribution
 
-- A spin echo experiment under a gradient in the
-- presence of diffusion and flow.
-- Calculation time: seconds.
-- Ahmed Allami
-- Ilya Kuprov
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Sample geometry
+Ahmed Allami; Ilya Kuprov.

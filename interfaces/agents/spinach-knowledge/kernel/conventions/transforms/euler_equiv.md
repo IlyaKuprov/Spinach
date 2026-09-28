@@ -4,41 +4,19 @@
 
 ## Purpose
 
-Checks whether two ZYZ active Euler angle sets specify the same rotation. Syntax: answer=euler_equiv(eulers_a,eulers_b,tol)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Tests whether two ZYZ active Euler-angle sets represent the same rotation to within an angular tolerance. Euler angles are not unique, so the function compares their rotations, not the angle triples themselves.
 
 ## Parameters / inputs
 
-- eulers_a -first Euler angle set [alpha beta gamma],
-- radians, ZYZ active convention
-- eulers_b -second Euler angle set [alpha beta gamma],
-- radians, ZYZ active convention
-- tol -non-negative angular tolerance, radians
+- `eulers_a`, `eulers_b`: real, finite three-element Euler-angle vectors `[alpha beta gamma]` in radians, using the ZYZ active convention.
+- `tol`: finite, non-negative scalar tolerance in radians.
 
-## Outputs
+## Output
 
-- answer -true if the relative rotation angle between
-- the two rotations is not greater than tol
-- Note: Euler angles are not unique, and so this function compares
-- the rotations produced by euler2dcm(), not the angles
-- themselves.
+- `answer`: true if the relative rotation angle is less than or equal to `tol`.
 
-## Implementation structure
+## Method
 
-- Checks whether two ZYZ active Euler angle sets specify the same
-- rotation. Syntax:
-- answer=euler_equiv(eulers_a,eulers_b,tol)
-- eulers_a -first Euler angle set [alpha beta gamma],
-- radians, ZYZ active convention
-- eulers_b -second Euler angle set [alpha beta gamma],
-- tol -non-negative angular tolerance, radians
-- answer -true if the relative rotation angle between
-- the two rotations is not greater than tol
-- Note: Euler angles are not unique, and so this function compares
-- the rotations produced by euler2dcm(), not the angles
-- themselves.
+The function obtains direction-cosine matrices with `euler2dcm`, forms the relative rotation `dcm_b*dcm_a'`, and compares its geodesic angle on SO(3) to `tol`.
+
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=euler_equiv.m)

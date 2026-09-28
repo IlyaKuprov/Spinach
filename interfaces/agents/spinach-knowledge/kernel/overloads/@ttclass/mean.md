@@ -4,14 +4,11 @@
 
 ## Purpose
 
-Mean of elements of a tensor train representation of a matrix. Syntax: answer=mean(ttrain,dim)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+Computes the mean of a tensor-train matrix representation along dimension 1 or 2.
 
 ## Numerical / algorithmic content
+
+If all mode sizes are one, the function returns the scalar value immediately. When `dim` is omitted, it selects the first non-singleton matrix dimension. Otherwise, it sums the corresponding mode of each core and divides by that mode's size. Only `dim=1` and `dim=2` are accepted; the result is converted to a scalar if all output modes are singleton.
 
 ## Parameters / inputs
 
@@ -20,20 +17,4 @@ Mean of elements of a tensor train representation of a matrix. Syntax: answer=me
 
 ## Outputs
 
-- answer -the mean value computed along the speci-
-- fied dimension
-
-## Implementation structure
-
-- Mean of elements of a tensor train representation of a
-- matrix. Syntax:
-- answer=mean(ttrain,dim)
-- ttrain -a tensor train representation of a matrix
-- dim -dimension to operate on (dim=1 or dim=2)
-- answer -the mean value computed along the speci-
-- fied dimension
-- Get sizes and ranks
-- If all dimensions are singleton, return a scalar immediately
-- In dim is omitted, choose first non-singleton dimension
-- (this mimics the Matlab behaviour for matices)
-- Make an auxiliary tensor train
+- answer -the mean value computed along the specified dimension

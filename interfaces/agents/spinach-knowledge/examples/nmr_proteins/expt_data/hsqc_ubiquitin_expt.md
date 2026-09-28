@@ -4,26 +4,18 @@
 
 ## Purpose
 
-Experimental HSQC spectrum of human ubiquitin. Donghan Lee (Max Planck Institute) Ilya Kuprov (University of Southampton)
+Processes and plots an experimental HSQC spectrum of human ubiquitin.
 
 ## Physical / mathematical content
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Displays a two-dimensional 15N and 1H spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Applies a phase factor and cosine apodisation to positive and negative FIDs, Fourier-transforms and combines them into a States signal, then Fourier-transforms, flips, and plots the spectrum.
 
 ## Implementation structure
 
-- Experimental HSQC spectrum of human ubiquitin.
 - Donghan Lee (Max Planck Institute)
 - Ilya Kuprov (University of Southampton)
-- Load the file
-- Phasing
-- Apodisation
-- F2 Fourier transform
-- Form States signal
-- F1 Fourier transform
-- Plotting
+- Loads `hsqc_ubiquitin_expt.mat`, sets the magnetic field to 11.7395 T, zero filling to [1024 1024], sweeps to [2000 4000] Hz, and offsets to [-5870 3753] Hz; plots in ppm.

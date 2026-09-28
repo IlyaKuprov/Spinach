@@ -4,43 +4,28 @@
 
 ## Purpose
 
-Returns arbitrary-order central finite-difference differentiation matrices (sparse) with unit grid point spacing. Syntax: D=fdmat(dim,nstenc,order,boundary)
-
-## Physical / mathematical content
-
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+Returns a sparse, arbitrary-order finite-difference differentiation matrix for unit grid point spacing.
 
 ## Parameters / inputs
 
-- dim -dimension of the column vector to be
-- differentiated
-- nstenc -number of points in the finite diffe-
-- rence stencil
-- order -order of the derivative required
-- boundary -'wall' fills the edges with sided
-- finite difference schemes, 'pbc'
-- assumes periodic boundaries. The
-- default is 'pbc'.
+- `dim` — dimension of the column vector to be differentiated; must be an integer of at least 3.
+- `nstenc` — number of points in the finite-difference stencil; must be a positive odd integer.
+- `order` — derivative order; must be a positive integer smaller than `nstenc`.
+- `boundary` — `'wall'` uses sided finite-difference schemes at the edges; `'pbc'` assumes periodic boundaries. Defaults to `'pbc'` and must be a character string.
 
 ## Outputs
 
-- D -finite difference differentiation matrix
+- `D` — sparse finite-difference differentiation matrix of size `dim` by `dim`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Returns arbitrary-order central finite-difference differentiation
-- matrices (sparse) with unit grid point spacing. Syntax:
-- D=fdmat(dim,nstenc,order,boundary)
-- dim -dimension of the column vector to be
-- differentiated
-- nstenc -number of points in the finite diffe-
-- rence stencil
-- order -order of the derivative required
-- boundary -'wall' fills the edges with sided
-- finite difference schemes, 'pbc'
-- assumes periodic boundaries. The
-- default is 'pbc'.
+The matrix is preallocated with space for `dim*nstenc` entries. Finite-difference coefficients are obtained from `fdweights`.
+
+- For `'wall'`, the first `(nstenc-1)/2` rows use sided stencils spanning the first `nstenc` grid points. The corresponding rows at the opposite edge use the reversed coefficients, multiplied by `(-1)^order`. Interior rows use a centered stencil.
+- For `'pbc'`, every row uses the same centered-stencil coefficients. Column indices wrap around the matrix using modulo indexing.
+
+An unrecognized boundary type raises an error.
+
+## Link
+
+- <https://spindynamics.org/wiki/index.php?title=fdmat.m>

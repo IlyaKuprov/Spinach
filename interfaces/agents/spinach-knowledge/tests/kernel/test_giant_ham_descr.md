@@ -4,31 +4,20 @@
 
 ## Purpose
 
-Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham_descr()
+Checks that the giant-spin Hamiltonian descriptor route agrees with direct spherical-tensor assembly for high-rank terms.
 
 ## Physical / mathematical content
 
+The test builds a compact giant-spin system with tensor coefficients and Euler angles, then compares the descriptor-generated Hamiltonian with a direct spherical-tensor reference after orientation. It exercises complete and secular giant-spin terms and a separate assumption-specific case.
+
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The local test helper constructs the spin system, applies the requested Hamiltonian assumption, assembles the production Hamiltonian and orientation contribution, and compares it with the direct tensor sum. The spherical-tensor projection loop contracts coefficient components and adds each operator contribution.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks that high-rank giant spin Hamiltonian terms assembled
-- through the descriptor route match direct spherical-tensor assembly.
+`result` is the regression-test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests the giant spin Hamiltonian descriptor route. Syntax:
-- result=test_giant_ham_descr()
-- result -regression test result with explanatory messages
-- The test checks that high-rank giant spin Hamiltonian terms assembled
-- through the descriptor route match direct spherical-tensor assembly.
-- Announce the test target
-- State the Hamiltonian target of the test
-- Check complete giant spin terms
-- Check secular giant spin terms
-- Checks one giant spin Hamiltonian assumption
-- Build a compact high-rank giant spin system
-- Apply the requested Hamiltonian assumption
+The top-level test calls a local case helper for complete and secular giant-spin terms and for the `deer-zz` secular case. The helper evaluates the descriptor route and independently summed spherical-tensor contributions, including the Hermitisation convention used by orientation assembly.

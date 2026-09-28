@@ -4,27 +4,14 @@
 
 ## Purpose
 
-Simulation of NOVEL DNP repetition time scan in the steady state. Calculation time: minutes.
+Calculates steady-state NOVEL DNP proton signal versus repetition time for a single electron–proton pair. It compares cases without and with a flipback pulse; the source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The X-band model uses a 0.34 T field, trityl g values [2.00319, 2.00319, 2.00258], spin temperature 80, and an electron–proton separation of 3.5 Å. It uses the `sphten-liouv` formalism without basis approximation, propagator chop tolerance 10^-12, and `t1_t2` relaxation with diagonal retention and DiBari equilibrium. The nuclear R1 rate is computed through a distance- and orientation-dependent `r1n_dnp` function handle.
 
-## Numerical / algorithmic content
+The microwave nutation frequency is 15 MHz; the contact pulse is 500 ns, a NOVEL flip-pulse setting is enabled, the added shift is -3.3 MHz, and electron offset is zero. Thirty logarithmically spaced repetition times span 10^-4–10^-2 s. At each point the source runs powder-averaged steady-state calculations on the `rep_2ang_800pts_sph` grid for both flipback conditions, using `noveldnp_steady` with the ESR context.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Output
 
-## Implementation structure
-
-- Simulation of NOVEL DNP repetition time scan in the
-- steady state.
-- Calculation time: minutes.
-- X-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+The figure plots the real proton longitudinal expectation value versus repetition time in milliseconds for the two flipback conditions and saves it as `novel_x_rep_time_single.fig`.

@@ -4,30 +4,12 @@
 
 ## Purpose
 
-NMR spectrum of 17O enriched water inside a fullerene cage. A rather exotic combination of quadrupolar relaxation on the oxygen and H-O scalar coupling is driving proton relaxation in this case. 17O quad- rupolar parameters in gaseous (assumed to be) water are coming from Calculation time: seconds
+Simulates the NMR spectrum of `17O`-enriched water inside a fullerene cage. The example describes proton relaxation arising from oxygen quadrupolar relaxation together with H–O scalar coupling; the gaseous-water `17O` quadrupolar parameters are cited to [Table III](http://dx.doi.org/10.1063/1.1672122). Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The system is two protons and one `17O` nucleus at `14.1 T`. The two proton–oxygen scalar couplings are `80 Hz` each, and the proton–proton coupling is set to `0 Hz`. The oxygen has spin `5/2` and quadrupolar parameters `9.82e6` and asymmetry `0.407`. Redfield relaxation uses zero equilibrium, secular retention, and correlation time `1e-13 s`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- NMR spectrum of 17O enriched water inside a fullerene cage. A rather
-- exotic combination of quadrupolar relaxation on the oxygen and H-O
-- scalar coupling is driving proton relaxation in this case. 17O quad-
-- rupolar parameters in gaseous (assumed to be) water are coming from
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis specification
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Fourier transform
+The calculation uses the `sphten-liouv` basis with no approximation. It simulates a proton acquisition with `liquid` and `acquire`, using `L+` for the initial state and receiver, zero offset, a `500 Hz` sweep, `512` points, `2048` zero-fill points, and an axis in hertz. The free-induction signal is Fourier transformed with `fftshift(fft(fid,2048))` and plotted with `plot_1d`.

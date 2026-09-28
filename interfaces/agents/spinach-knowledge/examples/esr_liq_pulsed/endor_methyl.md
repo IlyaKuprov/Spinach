@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Mims ENDOR spectrum of a methyl radical in liquid state. Magnetic parameters taken from a DFT calculation. Calculation time: seconds
+Simulates a Mims ENDOR spectrum of the liquid-state methyl radical using magnetic parameters from a DFT calculation. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model has three equivalent protons coupled to an electron, with an `S3`-symmetric basis for the proton spins. It detects the electron channel; the example does not specify a relaxation model.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The sequence uses `tau=100e-9` s, 512 points over a 120 MHz sweep, and zero filling to 4096. It subtracts the mean, applies Kaiser apodisation (parameter 6), Fourier transforms, and plots the spectrum magnitude.
 
 ## Implementation structure
 
-- Mims ENDOR spectrum of a methyl radical in liquid state.
-- Magnetic parameters taken from a DFT calculation.
-- Calculation time: seconds
-- Magnet field
-- Spin system and interactions
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Crude apodisation
-- Fourier transform
-- Plotting
+It constructs the full sphten-liouv basis, calls `liquid` with `@endor_mims`, and processes the FID before plotting against the nuclear-frequency axis.

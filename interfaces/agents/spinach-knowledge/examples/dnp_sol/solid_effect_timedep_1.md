@@ -4,28 +4,14 @@
 
 ## Purpose
 
-A simulation of solid effect DNP for a tilted linear chain of three protons positioned at distances 7, 10 and 14 Angstrom from electron located at the origin. Weizmann DNP relaxation model is used with second order Krylov-Bogolyubov average Hamiltonian theory. Calculation time: seconds
+Simulates solid-effect DNP dynamics for an electron coupled to a linear chain of three protons at 7, 10, and 14 Å. The chain is tilted by the rotation generated from Euler angles [pi/6, pi/7, pi/8]. The source reports a runtime of seconds.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+The calculation uses a 3.4 T field and Weizmann relaxation with secular retention, IME equilibrium, temperature 4.2, and explicitly specified electron/nuclear relaxation rates. Distance-dependent rates are zero except for symmetric 0.1 entries between adjacent proton pairs 1–2 and 2–3. The basis is `sphten-liouv`, with no approximation and projections [-2, -1, 0, 1, 2].
 
-## Numerical / algorithmic content
+A 250 kHz microwave power and 144.76 MHz nuclear frequency are used. The solid-effect calculation selects `kb_second_order` theory and uses 0.01 s time steps for 1000 steps. It first requests time dependence, then requests a steady state.
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Outputs
 
-## Implementation structure
-
-- A simulation of solid effect DNP for a tilted linear chain of three
-- protons positioned at distances 7, 10 and 14 Angstrom from electron
-- located at the origin. Weizmann DNP relaxation model is used with
-- second order Krylov-Bogolyubov average Hamiltonian theory.
-- Calculation time: seconds
-- Magnetic field
-- Spin system
-- Relaxation theory
-- Microwave power and offset
-- Basis set
-- Spinach housekeeping
-- Experiment parameters
+The time-domain plots show the real longitudinal expectation value of the electron and of each proton, with logarithmic time axes. The steady-state result is then printed as real `Tr(Sz*rho)` values for all spins.

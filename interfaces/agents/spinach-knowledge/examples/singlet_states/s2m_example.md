@@ -8,12 +8,12 @@ An example of the S2M sequence for a two-spin system. Calculation time: seconds
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- The model is a pair of 13C spins with scalar coupling 55 Hz and opposite Zeeman offsets, 0.03 and -0.03. The initial state is the two-spin singlet; the detected observable is total longitudinal magnetisation.
+- The example calls the S2M sequence to convert the singlet-state preparation into a state whose longitudinal magnetisation is read out.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The system is represented in the sphten-liouv formalism with no basis approximation. The example constructs the NMR Hamiltonian and 13C Lx/Ly pulse operators, then calls `s2m` with the singlet initial state and parameters 55 and 6.0. It reports the overlap of the resulting state with the all-spin Lz detection state.
 
 ## Implementation structure
 

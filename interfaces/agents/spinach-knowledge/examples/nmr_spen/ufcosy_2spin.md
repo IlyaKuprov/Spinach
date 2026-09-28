@@ -8,23 +8,13 @@ Ultrafast COSY for a coupled two-spin system. Calculation time: minutes on NVidi
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
+- The source defines two 1H spins at 14.0 T with a 10 Hz scalar coupling. It models a 15 mm sample with 500 spatial points; the diffusion coefficient and flow are set to zero.
+- The imaging simulation uses `@spencosy` with encoding and coherence selection. It acquires 512 points over 128 loops at 0.5 μs dwell; sequence settings include `pulsenpoints=1000`, `nWURST=40`, `Te=15 ms`, and `BW=10 kHz`, with `Ga=0.50`, `Ge=0.01`, and `Gp=0.47 T/m` and `Tp=1 ms`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The script Fourier-transforms the FID along its second dimension, then displays the magnitude as a contour plot.
 
 ## Implementation structure
 
-- Ultrafast COSY for a coupled two-spin system.
-- Calculation time: minutes on NVidia Tesla A100, much longer on CPU
-- Jean-Nicolas Dumez
-- Ludmilla Guduff
-- Interactions
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sample geometry
-- Relaxation phantom
-- Initial and detection state phantoms
-- Diffusion and flow
+- Builds the spin system and basis, configures the sample and sequence, runs imaging, and processes and plots the result.

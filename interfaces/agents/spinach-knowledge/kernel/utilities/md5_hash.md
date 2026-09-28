@@ -8,9 +8,11 @@ MD5 hash of any Matlab object as a hex string. Identical sparse and full matrice
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Produces a hexadecimal MD5 digest of serialized MATLAB object bytes. Objects with different serializations, including sparse and full matrices, can have different hashes.
 
 ## Numerical / algorithmic content
+
+- Computes MD5 over the byte stream returned by `serializeToBytes` and renders each digest byte as two hexadecimal digits.
 
 ## Parameters / inputs
 
@@ -22,15 +24,4 @@ MD5 hash of any Matlab object as a hex string. Identical sparse and full matrice
 
 ## Implementation structure
 
-- MD5 hash of any Matlab object as a hex string. Identical sparse
-- and full matrices return different hashes. Syntax:
-- hashstr=md5_hash(A)
-- A -Matlab object of any type
-- hashstr -hexadecimal character string
-- Make a bytestream
-- Compute MD5 hash
-- Convert into a hex string
-- The basic principle of the new education is to be that dunces and
-- idlers must not be made to feel inferior to intelligent and indus-
-- trious pupils. That would be "undemocratic". These differences be-
-- tween pupils -for there are obviously and nakedly individual dif-
+- Serializes `A`, computes its MD5 digest, and converts the digest bytes to a hexadecimal character string.

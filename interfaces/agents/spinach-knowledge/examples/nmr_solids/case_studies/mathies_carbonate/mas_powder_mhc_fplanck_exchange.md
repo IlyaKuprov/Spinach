@@ -4,28 +4,10 @@
 
 ## Purpose
 
-Water protons in the unit cell of monohydrocalcite, inc- luding position exchange and MAS. Further details in: Calculation time: seconds.
+Simulates MAS proton NMR for water protons in monohydrocalcite with position exchange between two reaction endpoints. The source cites https://doi.org/10.1038/s41467-023-44381-x and reports seconds of runtime.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Water protons in the unit cell of monohydrocalcite, inc-
-- luding position exchange and MAS. Further details in:
-- Calculation time: seconds.
-- 400 MHz NMR
-- Read CASTEP file
-- Drop C, O, and Ca atoms
-- Two reaction endpoints with two protons
-- each, swapped by the reaction
-- Convert shielding tensors into shift using the
-- parametrisation of Huang et al. ACIE 2021
-- Get coordinates
-- Chemical kinetics endpoints
+- Reads `mhc.magres`, removes C, O, and Ca, and forms two endpoints from the proton sites at positions 1 and 4, swapped between endpoints. Their concentrations are `[1 1]`; the two-state exchange-rate matrix uses 2,000 Hz.
+- Uses a 9.4 T field (labelled 400 MHz NMR in the source), the Huang et al. ACIE 2021 shielding-to-shift parametrisation, an `sphten-liouv` basis with no approximation, and the selected Cartesian coordinates.
+- Acquisition settings are MAS rate 10,000 Hz, axis `[1 1 1]`, maximum rank 13, grid `rep_2ang_100pts_sph`, sweep `1/(5e-6)` Hz, 512 points, and 1024-point zero filling. The source uses `singlerot` with `@acquire`, exponential apodisation (6), and a Fourier transform.

@@ -8,10 +8,15 @@ Z magnetization of the sample as a function of magnetic field in a finite-speed 
 
 ## Physical / mathematical content
 
+
+- At the specified orientation, constructs the z magnetic-moment operator from the rotated g tensors and spin operators.
+- Initializes the density operator at the first field and evaluates magnetization with `hdot(rho,mz)`.
+
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+
+- Creates a linearly spaced magnetic-field grid and adjusts the Zeeman Hamiltonian across the sweep.
+- If `parameters.nstates` is supplied, the requested eigenstates are used to form an active-space projection; the magnetization observable is the real part of `hdot(rho,mz)`.
 
 ## Parameters / inputs
 
@@ -35,15 +40,6 @@ Z magnetization of the sample as a function of magnetic field in a finite-speed 
 
 ## Implementation structure
 
-- Z magnetization of the sample as a function of magnetic field in a
-- finite-speed magnetic field sweep experiment. Syntax:
-- [fields,z_magn]=fieldscan_magn(spin_system,parameters)
-- parameters.fields -two-element vector in Tesla,
-- ordered as [from to]
-- parameters.npoints -number of points in the scan
-- parameters.orientation -system orientation, three-
-- element vector containing
-- Euler angles in radians,
-- ordered as [alp bet gam]
-- parameters.sweep_time -sweep time, seconds
-- parameters.nstates -(optional) number of lowest energy
+
+- Validates the `zeeman-hilb` setup and sweep inputs, then constructs the field grid and orientation-dependent magnetic-moment operator.
+- Initializes the density operator, optionally forms an active-space projection, and evaluates the magnetization observable in the acquisition loop.

@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Optimisation of slice durations in a composite inversion pulse with specified amplitudes, phases, and a constrain- ed overall duration. The initial guess is 270(-x)360(x)90(y)270(-y)360(y)90(x) [Fig. 3] from https://doi.org/10.1016/0022-2364(83)90133-6 --the optimisation demonstrates that a slightly better pulse of the same power and duration exists. Calculation time: minutes.
+Optimises the durations of six pulse slices subject to a fixed total duration, then compares the resulting frequency-domain spectra. The durations are constrained to be nonnegative. The starting composite pulse is `270(-x)360(x)90(y)270(-y)360(y)90(x)` from Fig. 3 of <https://doi.org/10.1016/0022-2364(83)90133-6>; the example seeks a slightly improved pulse at the same power and total duration.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The waveform is represented by six consecutive pulse segments whose durations are the optimisation variables; the total pulse duration is held fixed. The example models 100 non-interacting spins equally spaced across the affected spectral range, 25 kHz either side. It propagates the pulse sequence, acquires signals, and compares their Fourier-transformed spectra.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The objective gradient is computed with tgrape. MATLAB fmincon uses an L-BFGS approximation while adjusting the six constrained durations.
 
 ## Implementation structure
 
-- Optimisation of slice durations in a composite inversion
-- pulse with specified amplitudes, phases, and a constrain-
-- ed overall duration. The initial guess is
-- 270(-x)360(x)90(y)270(-y)360(y)90(x) [Fig. 3]
-- from https://doi.org/10.1016/0022-2364(83)90133-6 --the
-- optimisation demonstrates that a slightly better pulse of
-- the same power and duration exists.
-- Calculation time: minutes.
-- Set the magnetic field
-- Put 100 non-interacting spins at equal intervals over the area
-- that needs to be affected by the pulse (25 kHz either side)
-- Select a basis set -IK-2 keeps complete basis on each
+The script defines the pulse and duration constraints, evaluates the objective and tgrape gradients in fmincon, propagates the optimised pulses, acquires and Fourier-transforms the signals, and prints the resulting slice durations. The sum of the six nonnegative durations is fixed.

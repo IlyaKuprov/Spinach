@@ -2,37 +2,18 @@
 
 - Signature: `[r,theta,phi] = xyz2sph(x,y,z)`
 
-## Purpose
+Converts Cartesian coordinates to spherical coordinates using the ISO convention.
 
-Converts Cartesian coordinates [x y z] into spherical coordinates according to the ISO convention. Syntax: [r,theta,phi] = xyz2sph(x,y,z)
+## Inputs
 
-## Physical / mathematical content
+- `x`, `y`, `z`: arrays of Cartesian X, Y, and Z coordinates. All must be numeric, real, and the same size.
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+## Outputs and conversion
 
-## Numerical / algorithmic content
+- `r`: radius, `sqrt(x.^2+y.^2+z.^2)`; documented range `0 <= r < Inf`.
+- `theta`: inclination, `acos(z./r)`; documented range `0 <= theta <= pi`.
+- `phi`: azimuth, `mod(atan2(y,x),2*pi)`; range `0 <= phi < 2*pi`.
 
-## Parameters / inputs
+The formulas operate elementwise. At the origin, `theta` evaluates to `NaN` because `r` is zero.
 
-- x,y,z -arrays of X, Y and Z coordinates
-
-## Outputs
-
-- r -array of radii
-- theta -array of inclinations
-- phi -array of azimuth values
-
-## Implementation structure
-
-- Converts Cartesian coordinates [x y z] into spherical
-- coordinates according to the ISO convention. Syntax:
-- [r,theta,phi] = xyz2sph(x,y,z)
-- x,y,z -arrays of X, Y and Z coordinates
-- r -array of radii
-- theta -array of inclinations
-- phi -array of azimuth values
-- Check consistency
-- Radius 0 <= r < Inf
-- Inclination 0 <= theta <= pi
-- Azimuth 0 <= phi < 2*pi
-- Consistency enforcement
+[Source](https://spindynamics.org/wiki/index.php?title=xyz2sph.m)

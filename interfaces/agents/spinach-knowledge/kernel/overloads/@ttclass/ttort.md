@@ -8,39 +8,23 @@ Performs TT-orthogonalisation for a tensor train (or for each tensor train in a 
 
 ## Physical / mathematical content
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Tensor-train orthogonalisation, applied to one train or to each train in a buffered sum.
 
 ## Numerical / algorithmic content
 
+The routine sweeps through the cores using QR decompositions. `direct=+1` orthogonalises left-to-right; `direct=-1` orthogonalises right-to-left. When `lognrm` is requested, it also normalises each buffered train and returns the natural logarithm of its norm.
+
 ## Parameters / inputs
 
-- direct=+1 -gives left-to-right orthogonality,
-- direct=-1 -gives right-to-left orthogonality
-- tt -tensor train object, possibly with buffered sums
+- `tt` — tensor-train object, possibly with buffered sums.
+- `direct=+1` — left-to-right orthogonality.
+- `direct=-1` — right-to-left orthogonality.
 
 ## Outputs
 
-- tt -tensor train object with all terms in the buffe-
-- red sum has all of them orthogonalised in the
-- direction requested
-- lognrm -if this output is present, all buffered trains
-- are also normalized, and natural logs of their
-- norms returned in the vector lognrm. Use this
-- option if the tensor norm is likely to exceed
-- realmax()=1.7977e+308.
-- Note: normally you should not call this subroutine directly.
+- `tt` — tensor-train object with all terms in each buffered sum orthogonalised in the requested direction.
+- `lognrm` — when requested, vector of natural logarithms of the norms of the buffered trains; use this option if a tensor norm may exceed `realmax()=1.7977e+308`.
 
-## Implementation structure
+## Header notes
 
-- Performs TT-orthogonalisation for a tensor train (or for each tensor
-- train in a buffered sum). Syntax:
-- [tt,lognrm]=ttort(tt,direct)
-- direct=+1 -gives left-to-right orthogonality,
-- direct=-1 -gives right-to-left orthogonality
-- tt -tensor train object, possibly with buffered sums
-- tt -tensor train object with all terms in the buffe-
-- red sum has all of them orthogonalised in the
-- direction requested
-- lognrm -if this output is present, all buffered trains
-- are also normalized, and natural logs of their
-- norms returned in the vector lognrm. Use this
+Normally, this subroutine should not be called directly.

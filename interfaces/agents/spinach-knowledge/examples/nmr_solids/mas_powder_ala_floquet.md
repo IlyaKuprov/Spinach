@@ -4,29 +4,12 @@
 
 ## Purpose
 
-13C MAS spectrum of alanine powder (assuming decoupling of 1H), computed using the Floquet MAS formalism. Calculation time: minutes
+Calculates the `13C` MAS spectrum of alanine powder, assuming `1H` decoupling, with the Floquet MAS formalism. The source estimates minutes.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system and magnetic parameters are read from the PCM-DFT alanine calculation at `../standard_systems/alanine.log`; the field is set to 14.1 T. The calculation selects the `15N` longitudinal subspace with projection +1, and uses a MAS rate of 2 kHz about `[1 1 1]`, maximum rank 17, and the `rep_2ang_100pts_sph` grid. Acquisition is for `13C` with no decoupling channel specified.
 
-## Numerical / algorithmic content
+## Implementation
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 13C MAS spectrum of alanine powder (assuming decoupling of 1H),
-- computed using the Floquet MAS formalism.
-- Calculation time: minutes
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
+The function constructs the spin system with `g2spinach`, runs `floquet` with `@acquire`, applies exponential apodisation (6), zero-fills the 256-point FID to 1024 points, Fourier transforms it, and plots the real spectrum. The configured sweep is 50 kHz and offset is 15 kHz.

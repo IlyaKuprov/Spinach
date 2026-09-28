@@ -4,44 +4,28 @@
 
 ## Purpose
 
-Tolerances and fundamental constants. Sets various accuracy cut-offs, constants and tolerances used by Spinach kernel. Syntax: spin_system=tolerances(spin_system,sys)
+Sets numerical accuracy cut-offs and fundamental constants used by the Spinach kernel. The routine transfers tolerance settings from `sys.tols` into `spin_system.tols`; direct calls and modifications are discouraged, and accuracy settings should normally be supplied through `sys.tols` in the input preparation.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+This function configures numerical tolerances and constants; it does not construct interaction tensors or spin-dynamics propagators.
 
 ## Numerical / algorithmic content
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+After checking input consistency, the function applies user-specified tolerance fields, supplies defaults, handles the enabled paranoia options, reports the selected values, and rejects unrecognized tolerance options.
 
 ## Parameters / inputs
 
-- spin_system -Spinach system description object
-- sys -system specification object described
-- in the input preparation section of
-- the manual
+- `spin_system` — Spinach system description object.
+- `sys` — system specification object described in the input preparation section of the manual.
 
 ## Outputs
 
-- spin_system -updated system description object
-- sys -system specification structure with
-- the tolerance substructure parsed out
-- Notes: direct calls and modifications to this function are discouraged:
-- the accuracy settings should be modified by setting the sys.tols
-- structure, see the input preparation manual.
+- `spin_system` — updated system description object.
+- `sys` — system specification structure with the tolerance substructure parsed out.
 
 ## Implementation structure
 
-- Tolerances and fundamental constants. Sets various accuracy cut-offs,
-- constants and tolerances used by Spinach kernel. Syntax:
-- spin_system=tolerances(spin_system,sys)
-- spin_system - Spinach system description object
-- sys - system specification object described
-- in the input preparation section of
-- the manual
-- spin_system - updated system description object
-- sys - system specification structure with
-- the tolerance substructure parsed out
-- the accuracy settings should be modified by setting the sys.tols
-- structure, see the input preparation manual.
+- Checks consistency with `grumble`.
+- Reads configured tolerances from `sys.tols`, applies defaults and paranoia settings, and reports the resulting values.
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=tolerances.m>

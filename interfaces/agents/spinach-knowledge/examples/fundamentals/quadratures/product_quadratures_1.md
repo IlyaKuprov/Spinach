@@ -4,30 +4,18 @@
 
 ## Purpose
 
-Accuracy test for Lie-group product quadratures as a function of discretisation step in the E1000B Veshtort-Griffin pulse. Calculation time: seconds
+Tests the accuracy of Lie-group product quadratures as the time-grid spacing changes during an E1000B Veshtort–Griffin pulse.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- The model contains 31 `1H` spins at 14.1 T, with Zeeman shifts linearly spaced from -4 to 4 and 10 Hz scalar couplings between adjacent spins. The basis is `sphten-liouv` with the IK-2 approximation, scalar-coupling connectivity, and proximity level 1.
+- The pulse lasts 10 ms. The initial density operator is `Lz` on `1H`, and the control operator is `Lx` on `1H`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- A 2000-point, three-Hamiltonian-step calculation supplies the reference. The benchmark compares left-point, midpoint, two-point Lie-group, and three-point Lie-group propagation (LP, MP, LG-2, LG-4) at 100, 200, ..., 1000 grid points, recording relative state errors.
 
 ## Implementation structure
 
-- Accuracy test for Lie-group product quadratures as a function of
-- discretisation step in the E1000B Veshtort-Griffin pulse.
-- Calculation time: seconds
-- Magnetic field
-- Isotopes
-- Zeeman interactions
-- Couplings
-- Basis set
-- Spinach housekeeping
-- Assumptions
-- Hamiltonian superoperator
-- Control operator
+- Generates the E1000B pulse with `vg_pulse`, forms the reference, and runs the benchmark cases in a `parfor` loop. The figure shows pulse amplitude and relative error versus time-grid size on log-log axes.
+- The source estimates a runtime of seconds.

@@ -4,18 +4,17 @@
 
 ## Purpose
 
-Hamiltonian operator or superoperator and its rotational decomposi- tion. Descriptor and operator generation are parallelised. Syntax: [I,Q]=hamiltonian(spin_system,operator_type)
+Hamiltonian operator or superoperator and its rotational decomposition. Descriptor and operator generation are parallelised. Syntax: [I,Q]=hamiltonian(spin_system,operator_type)
 
 ## Physical / mathematical content
 
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+- Quadrupolar interactions are represented by second-rank anisotropic components.
 
 ## Numerical / algorithmic content
 
-- With `ham_cache` enabled, the cache identity includes the giant-spin coefficients and retention strengths, so full and Zeeman-only requests do not reuse each other's anisotropic Hamiltonian.
+- With `ham_cache` enabled, the cache hash includes the Hamiltonian descriptor, operator type, isotope and basis hashes, and giant-spin data; when modes are present, it also includes mode data and base frequencies.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- Descriptor and operator generation are parallelised; sparse-matrix assembly includes measures to reduce memory use.
 
 ## Parameters / inputs
 

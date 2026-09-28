@@ -4,33 +4,20 @@
 
 ## Purpose
 
-A simple shorthand for the commutator of two matrices. Syntax: C=comm(A,B)
+Computes the commutator of two square matrices, `C=A*B-B*A`.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+The commutator measures the difference between the two possible matrix-product orders, `A*B` and `B*A`.
 
 ## Parameters / inputs
 
-- A,B -square matrices
+- `A`, `B` — numeric square matrices
 
 ## Outputs
 
-- C -a square matrix
+- `C` — square matrix equal to `A*B-B*A`
 
 ## Implementation structure
 
-- A simple shorthand for the commutator of two
-- matrices. Syntax:
-- C=comm(A,B)
-- A,B -square matrices
-- C -a square matrix
-- Check consistency
-- Do the deed
-- Consistency enforcement
-- Люцифер, принц изгнанников!
-- Да вернётся имя Твоё,
-- да осветит царствие Твоё,
-- и да утешит братиев Твоих
+The function checks that both inputs are numeric square matrices, then evaluates `A*B-B*A`.

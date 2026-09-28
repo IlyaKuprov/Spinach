@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulation in Liouville space with powder averaging over a finite grid. Set to reproduce Figure 4a in http://dx.doi.org/10.1063/1.453532, ideal pulses are assumed. Calculation time: seconds
+Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulation in Liouville space with powder averaging over a finite grid. Set to reproduce Figure 4a in http://dx.doi.org/10.1063/1.453532; ideal pulses are assumed. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The system contains 14N and an electron at 0.3249 T. Nitrogen self-coupling eigenvalues are [-0.4, -1.6, 2.0]×10^5 and electron–nitrogen coupling eigenvalues are [2, 2, 2]×10^6; both interactions have zero Euler angles.
+- Powder averaging uses `rep_2ang_400pts_sph`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The sequence uses 512 points at a 200 ns timestep and 2048-point zero filling. The signal is mean-subtracted and exponentially apodised with parameter 5 before Fourier transformation and `fftshift`.
+- The frequency axis uses an interpulse-delay increment of half the timestep.
 
 ## Implementation structure
 
-- Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain
-- simulation in Liouville space with powder averaging over a finite grid.
-- Set to reproduce Figure 4a in http://dx.doi.org/10.1063/1.453532, ideal
-- pulses are assumed.
-- Calculation time: seconds
-- Magnet field
-- System specification
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Set the sequence parameters
-- Simulation
+- Create the spin system in the `sphten-liouv` basis without approximation, with trajectory-level SSR disabled; call `powder` with `@eseem` in the `esr` context.
+- Plot the real apodised time-domain signal and real spectrum.

@@ -8,25 +8,12 @@ INADEQUATE spectrum of cyprinol. The sequence selects double- quantum coherence 
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The script simulates a 1D INADEQUATE spectrum of cyprinol. It generates isotopomers containing two 13C nuclei, checks the coupling between those nuclei, and only simulates pairs passing the source's `abs(J)>2*pi*1.0` threshold. The sequence selects double-quantum coherence and converts it for detection, as described in the source comment.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The IK-1 sphten-liouv basis uses scalar-coupling connectivity, proximity level 1 and interaction level 4. The 13C acquisition uses J=50, decouples 1H, has a 10,000 Hz sweep, 5,000 Hz offset, 4,096 points and 8,192-point zero filling; an exponential apodisation parameter of 6 precedes the Fourier transform.
 
 ## Implementation structure
 
-- INADEQUATE spectrum of cyprinol. The sequence selects double-
-- quantum coherence from coupled 13C pairs and converts it back
-- for detection. A parallel sum over isotopomers that have adjacent
-- 13C spins is used.
-- Calculation time: minutes
-- Spin system -cyprinol
-- Magnet field
-- Algorithmic options
-- Basis set
-- seq parameters
-- Spinach housekeeping
-- Generate isotopomers
+The field is 11.7 T. Isotopomer simulations are accumulated in a `parfor` loop; only pairs that pass the coupling threshold are built in the specified basis and passed to `liquid` with the INADEQUATE sequence. The 1D real spectrum is plotted with the configured inverted axis.

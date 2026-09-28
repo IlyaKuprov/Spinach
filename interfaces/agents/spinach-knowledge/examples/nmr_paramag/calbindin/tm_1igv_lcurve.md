@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Inverse problem for the unpaired electron density distribution. Experimental data from Gottfried Ott- ing (Australian National University).
+Selects a smoothing parameter for reconstructing unpaired-electron density from experimental PCS data. The source credits the data to Gottfried Otting (Australian National University).
 
-## Physical / mathematical content
+## Numerical and implementation details
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+The script loads the processed 1IGV PDB, PCS measurements and coordinates, and effective susceptibility tensor. It configures the `kuprov` inverse model with the same box centre [3.5, 17.0, 16.1], box size [7, 7, 7], margins 50 and confinement [1, 3] used by the companion density fit; sharpening is set to zero and GPU execution is enabled.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-
-## Implementation structure
-
-- Inverse problem for the unpaired electron density
-- distribution. Experimental data from Gottfried Ott-
-- ing (Australian National University).
-- Load the pdb file
-- Load experimental data
-- Load susceptibility tensor
-- Inverse solver parameters
-- Regularisation parameter array
-- Result arrays
-- Run a parallel loop
-- L-curve analysis
+It tests 15 values `10.^linspace(-1.5,1.0,15)`. A parallel loop calls `ipcs` on a 128-point grid for each value, records error and regularization, and divides the latter by the parameter. `lcurve(...,'log')` then supplies and prints the suggested smoothing parameter.

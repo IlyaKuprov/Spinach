@@ -4,42 +4,19 @@
 
 ## Purpose
 
-Returns a Fourier spectral representation of the Laplacian acting on a 3D data array. Syntax: L=fourlap(npoints,extents)
+Constructs the Fourier spectral Laplacian for data on a periodic grid. The documentation describes three axes ordered `[X Y Z]`; the implementation also has one- and two-dimensional branches.
 
-## Physical / mathematical content
+## Inputs
 
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `npoints` - documented as positive integer grid-point counts ordered by axis; the implementation has branches for one, two, or three entries.
+- `extents` - documented as positive real axis extents ordered `[X Y Z]`. The code checks positivity and reality but does not check that the input lengths match.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `L` - Laplacian matrix acting on the vectorized data array. Each axis uses a second-derivative matrix from `fourdif()` scaled by `(2*pi/extents(i))^2`; the multidimensional cases combine these with Kronecker sums.
 
-- npoints -a three-element vector specifying the number of
-- discretization points in each dimension of the
-- 3D cube of data that the operator will be acting
-- on, ordered as [X Y Z].
-- extents -a three-element vector specifying axis extents,
-- ordered as [X Y Z].
+The documented boundary conditions are periodic.
 
-## Outputs
+## Documentation
 
-- L -Fourier spectral Laplacian, a sparse matrix designed to act
-- on the vectorization of the 3D data array. The dimensions of
-- the data array are assumed to be ordered as [X Y Z].
-- Note: periodic boundary conditions.
-
-## Implementation structure
-
-- Returns a Fourier spectral representation of the Laplacian acting
-- on a 3D data array. Syntax:
-- L=fourlap(npoints,extents)
-- npoints - a three-element vector specifying the number of
-- discretization points in each dimension of the
-- 3D cube of data that the operator will be acting
-- on, ordered as [X Y Z].
-- extents - a three-element vector specifying axis extents,
-- ordered as [X Y Z].
-- L -Fourier spectral Laplacian, a sparse matrix designed to act
-- on the vectorization of the 3D data array. The dimensions of
-- the data array are assumed to be ordered as [X Y Z].
+- [Spinach Wiki documentation](https://spindynamics.org/wiki/index.php?title=fourlap.m)

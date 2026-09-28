@@ -4,27 +4,8 @@
 
 ## Purpose
 
-2D parameter scan of a BEAM DNP experiment. <I_z> after a set contact time is calculated as a function of electron pulse amplitude and offset. Further information in: Calculation time: minutes (a large powder grid is needed).
+Maps the final proton `I_z` signal from a BEAM DNP contact over microwave resonance offset and electron nutation frequency. The associated experiment is described in [Science Advances](https://doi.org/10.1126/sciadv.abq0536); the source estimates minutes for the large powder-grid calculation.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- 2D parameter scan of a BEAM DNP experiment. <I_z> after a set
-- contact time is calculated as a function of electron pulse
-- amplitude and offset. Further information in:
-- Calculation time: minutes (a large powder grid is needed).
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Basis set
-- Spinach housekeeping
-- Detection state
+The X-band model (0.3483 T) contains an electron and two protons, with trityl g-tensor values, proton Zeeman estimates, Cartesian coordinates, and spin temperature 80 K. The BEAM sequence uses 20.0/28.7 ns pulses, 165 blocks, proton `Lz` detection, and `rep_2ang_800pts_sph` powder averaging. The script sweeps 120 offsets from −60 to +60 MHz (adding the −3.3 MHz reference) and 30 electron nutation frequencies from 20 to 40 MHz. For each offset, a `parfor` loop runs the powder calculation over nutation frequency and stores the last contact-curve point; the two-dimensional result is plotted as contours.

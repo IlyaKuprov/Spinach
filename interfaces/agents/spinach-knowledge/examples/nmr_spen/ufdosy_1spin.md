@@ -8,24 +8,13 @@ Ultrafast DOSY for one spin. Calculation time: seconds on NVidia Tesla A100, muc
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
+- The source defines one 1H spin at 14.1 T with a 7.0 ppm shift. The sample is 15 mm long with 3000 spatial points; diffusion is set to 8e-10 m^2/s and flow to zero. Spatial differentiation uses the source setting `parameters.deriv={'period',7}`.
+- The imaging simulation calls the `@spendosy` sequence and specifies the acquisition and encoding gradients in the source.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+- The script Fourier-transforms the FID along the spatial axis, then plots the magnitude against chemical shift and displacement coordinates derived from the acquisition and gradient parameters.
 
 ## Implementation structure
 
-- Ultrafast DOSY for one spin.
-- Calculation time: seconds on NVidia Tesla A100, much longer on CPU
-- Ludmilla Guduff
-- Jean-Nicolas Dumez
-- Spin system
-- Interactions
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Assumptions
-- Sample geometry
-- Relaxation phantom
+- Builds the spin system and basis, configures sample, diffusion, acquisition, and encoding parameters, runs imaging, and transforms and plots the result.

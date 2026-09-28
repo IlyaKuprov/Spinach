@@ -8,32 +8,21 @@ Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax: resu
 
 ## Physical / mathematical content
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- Addition of two spin-`1/2` systems produces one singlet and one triplet. The tests check their multiplicities, projector completeness, and orthonormality.
+- A two-level Hermitian system provides reference second-order Rayleigh–Schrödinger and Van Vleck energy shifts. A four-level Hermitian system provides an exact-diagonalisation reference for eighth-order Van Vleck energies.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+- Checks that Rayleigh–Schrödinger eigenvectors are column-normalised and that second- and eighth-order Van Vleck generators are anti-Hermitian.
+- Tests analytical Tikhonov inversion with identity data and regularisation matrices: for regularisation parameter `1/2`, the solution is `fit_rhs/(1+reg_param)`. It also checks the reported squared fit error `norm(K*x-y,2)^2` and regularisation signal `norm(D*x,2)^2`.
+- Recovers a linear transfer matrix from a full-row-rank set of input/output vector pairs.
+- Compares a finite-difference Jacobian with analytical derivatives and checks that its error estimates are finite and non-negative.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks spin-addition projectors, Rayleigh-Schrödinger
-- and Van Vleck perturbation theory, analytical Tikhonov inversion,
-- transfer matrices, and finite-difference Jacobian estimation.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax:
-- result=test_linear_perturbation_suite()
-- result -regression test result with explanatory messages
-- The test checks spin-addition projectors, Rayleigh-Schrödinger
-- and Van Vleck perturbation theory, analytical Tikhonov inversion,
-- transfer matrices, and finite-difference Jacobian estimation.
-- Announce the test target
-- State the utility target of the test
-- Check spin-half addition into singlet and triplet irreducible blocks
-- Check second-order perturbation energy shifts for a two-level system
-- Check Van Vleck perturbation theory on the same two-level system
-- Check higher-order Van Vleck perturbation theory against diagonalisation
+- Creates a test result for `kernel/linear_perturbation_suite` and records comparisons using `test_close` and `test_true`.
+- Exercises `add_spins`, `rspert`, `vvpert`, `tikhoind`, `transfermat`, and `jacobianest` on small reference cases.

@@ -4,29 +4,14 @@
 
 ## Purpose
 
-Pulse-acquire FFT ESR version of the EasySpin Fremy salt test file, with acknowledgements to Stefan Stoll. The Spinach simulation is run using explicit time propagation in Liouville space with Redfield relaxation superoperator. Set to reproduce Figure 3a from Calculation time: seconds
+Pulse-acquire FFT ESR simulation of Fremy salt, adapted from an EasySpin test file with acknowledgements to Stefan Stoll. The example is set to reproduce Figure 3a of [the cited paper](https://doi.org/10.1209/epl/i2004-10459-y).
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The spin system contains an electron and `14N`, with anisotropic electron Zeeman and electron–nitrogen coupling tensors.
+- The simulation uses explicit time propagation with a Redfield relaxation superoperator, secular terms, and a correlation time of `8e-10` s.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Pulse-acquire FFT ESR version of the EasySpin Fremy salt test
-- file, with acknowledgements to Stefan Stoll.
-- The Spinach simulation is run using explicit time propagation
-- in Liouville space with Redfield relaxation superoperator.
-- Set to reproduce Figure 3a from
-- Calculation time: seconds
-- General layout
-- Basis set
-- Interactions
-- Relaxation superoperator
-- Spinach housekeeping
-- Experiment parameters
+- At a 0.33 T field, the function acquires an ESR FID with 512 points, applies no apodisation, and Fourier-transforms with 1024-point zero filling.
+- It plots the real spectrum with first-derivative display and an inverted frequency axis.

@@ -4,34 +4,25 @@
 
 ## Purpose
 
-Equilibrates linear chemical kinetics and returns a vector of equilibrium concentrations. Syntax: c=equilibrate(K,c0)
+Computes the equilibrium concentration vector for linear kinetics described by `dc/dt=K*c`.
 
 ## Physical / mathematical content
 
+The model conserves total concentration: the columns of `K` must sum to zero, and the returned state has the same total concentration as `c0`.
+
 ## Numerical / algorithmic content
+
+The equilibrium satisfies `K*c=0` and `sum(c)=sum(c0)`. Independent reaction components are solved recursively. For each connected component, the rate matrix is rescaled by its largest absolute entry, and the steady-state and mass-conservation equations are assembled into one linear system. The routine checks the system's condition number before solving.
 
 ## Parameters / inputs
 
-- K -reaction rate matrix corresponding to
-- dc/dt=K*c, where c is the concentration
-- vector
-- c0 -vector of initial concentrations
+- `K` — a real square reaction-rate matrix for `dc/dt=K*c`; its column sums must be zero to within `10*eps('double')`.
+- `c0` — a non-negative real column vector of initial concentrations, with length equal to the dimension of `K`.
 
 ## Outputs
 
-- c -vector of equilibrium concentrations
+- `c` — the equilibrium concentration vector.
 
 ## Implementation structure
 
-- Equilibrates linear chemical kinetics and returns a vector of
-- equilibrium concentrations. Syntax:
-- c=equilibrate(K,c0)
-- K -reaction rate matrix corresponding to
-- dc/dt=K*c, where c is the concentration
-- vector
-- c0 -vector of initial concentrations
-- c -vector of equilibrium concentrations
-- Check consistency
-- Shortcut for zero concentrations
-- Recursive calls for independent reactions
-- Assemble the steady state system
+After input validation, zero initial concentration is returned directly. Otherwise the code separates independent reactions, normalizes each rate scale, forms the stacked constraints `[ones; K]*c=[sum(c0); zeros]`, and solves if the condition number does not exceed `1/sqrt(eps('double'))`.

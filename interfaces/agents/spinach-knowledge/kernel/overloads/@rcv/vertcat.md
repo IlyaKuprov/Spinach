@@ -4,36 +4,20 @@
 
 ## Purpose
 
-Vertical concatenation for RCV sparse matrices. Syntax: A=vertcat(A,B)
+Vertically concatenate RCV sparse matrices in top-to-bottom order.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The inputs must have matching column counts. Concatenation offsets each input's row indices by the number of rows already appended.
 
 ## Parameters / inputs
 
-- A -top RCV matrix
-- B -bottom RCV matrix
+- One or more RCV sparse matrices, supplied in top-to-bottom order; all must have the same number of columns.
 
 ## Outputs
 
-- A -concatenated RCV sparse matrix
+- `A` - RCV sparse matrix containing the input rows in order.
 
 ## Implementation structure
 
-- Vertical concatenation for RCV sparse matrices. Syntax:
-- A=vertcat(A,B)
-- A -top RCV matrix
-- B -bottom RCV matrix
-- A -concatenated RCV sparse matrix
-- Check consistency
-- Align locations
-- Shift row indices
-- Concatenate indices
-- Update row count in the result
-- Consistency enforcement
-- Frankly speaking, my dear Karl, I do not like this modern word, which all
+The function checks the input types and column counts. If any input is on the GPU, it converts all inputs to GPU arrays. It then offsets and concatenates the row, column, and value arrays and sets the result's row count to the sum of the input row counts.

@@ -1,57 +1,27 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m
 
 - Signature: `drifts=mqmas_drifts(spin_system,parameters)`
+- Status: historical documentation. The corresponding `.m` file is absent from the current checkout; this description is based on `3975f139^:examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m` and does not establish current behavior.
 
-## Purpose
+## Purpose and output
 
-Drift Hamiltonians of a quadrupolar nucleus under magic angle spinning, resolved in rotor phase, for every combination of a two-angle powder grid orientation and an initial rotor phase. The Hamiltonian is taken to second order in the rotating frame of the nucleus, and is held constant within each rotor phase tick. Syntax: drifts=mqmas_drifts(spin_system,parameters) Parameters: parameters.spins - the nucleus, a cell array with one isotope string, e.g. {'27Al'} parameters.axis - spinning axis, a normalised row vector with three elements parameters.grid - two-angle powder grid name; the grid must have uniform weights because the ensemble average in optimcon is unweighted parameters.n_ticks - rotor phase ticks per rotor period parameters.n_phases - number of initial rotor phases, must be a divisor of parameters.n_ticks parameters.n_slices - number of ticks in the pulse Outputs: drifts - cell array over the ensemble, grid orientations in the outer index and initial rotor phases in the inner index; each element is a cell array of n_slices Hamiltonian matrices, one per tick of the pulse Note: the crystallite orientation uses all three Euler angles of the grid, as in singlerot.m; two-angle grids keep the azimuth in the third angle and have zero first angles, which the rotor phase then supplies. The spin system must carry laboratory frame assumptions, call assume() first.
+The historical function builds drift Hamiltonians for a quadrupolar nucleus under magic-angle spinning, resolved for each powder-grid orientation and each initial rotor phase. It uses the second-order rotating-frame Hamiltonian and holds each Hamiltonian constant over its rotor-phase tick.
 
-## Physical / mathematical content
+The output `drifts` is a cell array over the ensemble: grid orientations are in the outer index and initial rotor phases in the inner index. Each element is a cell array of `parameters.n_slices` Hamiltonian matrices, one per pulse tick.
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## Inputs and constraints
 
-## Numerical / algorithmic content
+- `parameters.spins`: a one-element cell array containing an isotope string present in the spin system (the source gives `{'27Al'}` as an example).
+- `parameters.axis`: normalised three-element row vector specifying the spinning axis.
+- `parameters.grid`: two-angle powder-grid name. Its weights must be uniform; the historical implementation checks deviations from the first weight against (10^{-12}), because the ensemble average is unweighted.
+- `parameters.n_ticks`: positive integer number of rotor-phase ticks per rotor period.
+- `parameters.n_phases`: number of initial rotor phases; it must divide `n_ticks`.
+- `parameters.n_slices`: positive integer number of rotor ticks in the pulse.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The caller must supply a spin system with laboratory-frame assumptions already set (the source says to call `assume()` first). The grid is loaded from Spinach's `kernel/grids` directory.
 
-## Parameters / inputs
+## Historical construction
 
-- parameters.spins -the nucleus, a cell array with one
-- isotope string, e.g. {'27Al'}
-- parameters.axis -spinning axis, a normalised row
-- vector with three elements
-- parameters.grid -two-angle powder grid name; the grid
-- must have uniform weights because the
-- ensemble average in optimcon is unweighted
-- parameters.n_ticks -rotor phase ticks per rotor period
-- parameters.n_phases -number of initial rotor phases, must
-- be a divisor of parameters.n_ticks
-- parameters.n_slices -number of ticks in the pulse
+Tick phases are sampled at midpoints, (2pi(k-1/2)/n_{ticks}). The source composes the crystallite, rotor-axis, and rotor-phase Wigner rotations, adds the rotated anisotropic tensor components to the isotropic Hamiltonian, symmetrises the result, and applies the second-order rotating-frame transformation. For a given initial rotor phase, the slice sequence is selected by a cyclic shift of `n_ticks/n_phases` ticks. Orientations are evaluated with `parfor`.
 
-## Outputs
-
-- drifts -cell array over the ensemble, grid orientations in
-- the outer index and initial rotor phases in the in-
-- ner index; each element is a cell array of n_slices
-- Hamiltonian matrices, one per tick of the pulse
-- Note: the crystallite orientation uses all three Euler angles of the
-- grid, as in singlerot.m; two-angle grids keep the azimuth in
-- the third angle and have zero first angles, which the rotor
-- phase then supplies. The spin system must carry laboratory
-- frame assumptions, call assume() first.
-
-## Implementation structure
-
-- Drift Hamiltonians of a quadrupolar nucleus under magic angle spin-
-- ning, resolved in rotor phase, for every combination of a two-angle
-- powder grid orientation and an initial rotor phase. The Hamiltonian
-- is taken to second order in the rotating frame of the nucleus, and
-- is held constant within each rotor phase tick. Syntax:
-- drifts=mqmas_drifts(spin_system,parameters)
-- parameters.spins -the nucleus, a cell array with one
-- isotope string, e.g. {'27Al'}
-- parameters.axis -spinning axis, a normalised row
-- vector with three elements
-- parameters.grid -two-angle powder grid name; the grid
-- must have uniform weights because the
+For two-angle grids, the source uses all three Euler angles: the azimuth is in the third angle, the first two are zero, and the rotor phase supplies the remaining rotation. The function's path places it in the `Smelko_ChemRxiv_2026` case-study directory, but the historical source itself supplies no article title, DOI, or bibliographic citation. It ends with the attribution “Everything should be made as simple as possible, but not simpler.” — Albert Einstein.

@@ -2,31 +2,4 @@
 
 - Signature: `result=test_dynamic_parse_text_reporting_suite()`
 
-## Purpose
-
-Tests deterministic parsing, text, and safe reporting utilities. Syntax: result=test_dynamic_parse_text_reporting_suite()
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test checks operator-specification parsing, isotope predicates,
-- label lookup, silent reporting calls, and polyadic text diagnostics.
-
-## Implementation structure
-
-- Tests deterministic parsing, text, and safe reporting utilities. Syntax:
-- result=test_dynamic_parse_text_reporting_suite()
-- result -regression test result with explanatory messages
-- The test checks operator-specification parsing, isotope predicates,
-- label lookup, silent reporting calls, and polyadic text diagnostics.
-- Announce the test target
-- State the utility target of the test
-- Build a small spin-system descriptor for parsing helpers
-- Check isotope and spin-label parsing into single-spin opspecs
-- Check product-operator parsing and Lx expansion coefficients
-- Check label lookup against a unique label list
-- Check electron and nucleus isotope predicates
+Regression checks for operator-specification parsing, isotope predicates, label lookup, and text reporting. The suite exercises `human2opspec` selection and product-operator coefficients, `idxof` label lookup, and electron/nucleus classification. It checks that `report`, `banner`, and `summary_coordinates` are silent in hush mode, and that `polinfo` reports the shape of a polyadic product and its matrix-core sizes. These are described as test checks, not as verified passing results.

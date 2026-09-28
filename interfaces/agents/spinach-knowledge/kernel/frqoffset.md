@@ -4,44 +4,20 @@
 
 ## Purpose
 
-Adds omega*Lz Larmor frequency offsets to the Hamiltonian; this is useful in liquid state NMR experiments. Syntax: H=frqoffset(spin_system,H,parameters)
+Adds Larmor-frequency offsets to selected spins in a Hamiltonian or commutation superoperator; this is useful in liquid-state NMR.
 
 ## Physical / mathematical content
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- For each selected spin, adds `2*pi*offset*Lz(spin)` to `H`; `offset` is given in Hz.
+- The transformation is approximate. Use `rotframe.m` or `intrep.m` for a rigorous treatment of second-order effects.
 
 ## Parameters / inputs
 
-- H -Hamiltonian operator or commutati-
-- on superoperator
-- parameters.spins -a cell array giving the spins that
-- the offsets should be applied to,
-- e.g. {'1H','13C'}
-- parameters.offset -a vector of offsets (in Hz) on
-- each of the spins listed in the
-- parameters.spins array
+- `parameters.spins` — cell array of spin labels to which offsets are applied (for example, `{'1H','13C'}`).
+- `parameters.offset` — vector of offsets in Hz, one for each listed spin. If multiple channels refer to the same spin, their offsets must agree.
 
 ## Outputs
 
-- H -Hamiltonian operator or commutati-
-- on superoperator
-- Note: offset transformation of this kind is an approximati-
-- on, use rotframe.m or intrep.m if a rigorous treat-
-- ment of second order effects is required.
+- `H` — the Hamiltonian operator or commutation superoperator with the offsets added.
 
-## Implementation structure
-
-- Adds omega*Lz Larmor frequency offsets to the Hamiltonian;
-- this is useful in liquid state NMR experiments. Syntax:
-- H=frqoffset(spin_system,H,parameters)
-- H -Hamiltonian operator or commutati-
-- on superoperator
-- parameters.spins -a cell array giving the spins that
-- the offsets should be applied to,
-- e.g. {'1H','13C'}
-- parameters.offset -a vector of offsets (in Hz) on
-- each of the spins listed in the
-- parameters.spins array
-- Note: offset transformation of this kind is an approximati-
+<https://spindynamics.org/wiki/index.php?title=frqoffset.m>

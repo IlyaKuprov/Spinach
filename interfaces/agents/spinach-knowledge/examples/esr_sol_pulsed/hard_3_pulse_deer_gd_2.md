@@ -4,28 +4,12 @@
 
 ## Purpose
 
-Gadolinium(III) DEER experiment. The calculation is done by brute- force time propagation and powder averaging. Outermost ZFS transi- tion is excited by the probe pulse and the central transition is excited by the pump pulse. The pulses are assumed to be ideal. Note: gadolinium spin echo is very sharp and difficult to catch in simulations because they do not include zero-field splitting distributions found in experim
+Simulates a three-pulse DEER experiment on a pair of Gd(III) centres. The probe pulse excites an outer ZFS transition and the pump pulse excites the central transition; both are treated as hard pulses. The calculation uses brute-force time propagation and powder averaging.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Two `E8` spins are placed 30 Å apart at 3.5 T. Each has an axial ZFS tensor with principal values proportional to `[1, 1, -2]`; their orientations differ.
+- The script constructs the probe and pump transition operators, sets a 100-step trace with 20 ns steps, and averages over the 1,600-point spherical grid.
+- It apodises the hard-pulse, probe, and pump signals, Fourier transforms them for excitation-profile plots, and plots the DEER time trace.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Gadolinium(III) DEER experiment. The calculation is done by brute-
-- force time propagation and powder averaging. Outermost ZFS transi-
-- tion is excited by the probe pulse and the central transition is
-- excited by the pump pulse. The pulses are assumed to be ideal.
-- Note: gadolinium spin echo is very sharp and difficult to catch in
-- simulations because they do not include zero-field splitting
-- distributions found in experimental systems.
-- Calculation time: minutes.
-- Spin system properties
-- Basis set
-- Spinach housekeeping
-- Probe pulse operator -bottom transition
+The source notes that the Gd spin echo can be very sharp; the simulation omits the ZFS distributions present in experimental systems. Estimated calculation time: minutes.

@@ -8,7 +8,7 @@ Exponential drop function. Produces an exponential fall-off from a specified val
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Constructs a sampled exponential decay curve that starts at `from` and reaches `to` at `duration`, using `drop_rate` and `npoints` samples.
 
 ## Numerical / algorithmic content
 

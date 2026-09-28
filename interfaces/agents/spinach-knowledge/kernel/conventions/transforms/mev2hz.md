@@ -4,29 +4,30 @@
 
 ## Purpose
 
-Converts meV energy units used in solid state physics and phonon spectroscopy into Hz units preferred in magnetic resonance. Syntax: hz=mev2hz(mev) Arrays of any dimensions are supported. Parameters: mev -an array of values in milli-electronvolts
+Converts energy values from millielectronvolts (meV) to frequency in hertz (Hz).
 
 ## Physical / mathematical content
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Using `E=h*nu` and the exact electronvolt-to-joule conversion, `hz=(1e-3*1.602176634e-19/6.62607015e-34)*mev`.
 
 ## Numerical / algorithmic content
 
+The conversion is a constant elementwise scaling; there are no optional arguments or defaults.
+
+## Syntax
+
+```matlab
+hz=mev2hz(mev)
+```
+
+## Parameters / inputs
+
+- `mev` — a real numeric array of any dimensions, containing energies in meV.
+
 ## Outputs
 
-- hz -an array of values in Hz
+- `hz` — an array of frequencies in Hz with the same dimensions as `mev`.
 
 ## Implementation structure
 
-- Converts meV energy units used in solid state physics and
-- phonon spectroscopy into Hz units preferred in magnetic
-- resonance. Syntax:
-- hz=mev2hz(mev)
-- Arrays of any dimensions are supported. Parameters:
-- mev -an array of values in milli-electronvolts
-- hz -an array of values in Hz
-- Check consistency
-- Run the conversion
-- Consistency enforcement
-- O God, I could be bounded in a nutshell, and count
-- myself a king of infinite space, were it not that I
+The function checks that the input is numeric and real, then applies the conversion factor.

@@ -4,32 +4,25 @@
 
 ## Purpose
 
-Calculates (Q{1}(x)Q{2}(x)...(x)Q{n})*M without opening Kronecker products. Syntax: M=kronm(Q,M)
+Apply the Kronecker product of the matrices in `Q` to `M` without constructing the full Kronecker-product matrix.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+This is a matrix-free implementation of a tensor-product linear transformation.
 
 ## Numerical / algorithmic content
 
+The input matrix is reshaped into the column dimensions of the factors, with its column count as a trailing dimension. The routine contracts each factor with the corresponding tensor dimension using `tensorprod`, then flattens the resulting row dimensions. The factor order corresponds to `Q{1} kron Q{2} kron ... kron Q{n}` acting on each column of `M`.
+
 ## Parameters / inputs
 
-- Q -cell array of Kronecker terms
-- M -a vector or a matrix of appropriate dimension
-- Output:
-- M -a vector or a matrix of appropriate dimension
+- `Q` - cell array of matrix factors.
+- `M` - numeric vector or matrix with a row dimension compatible with the Kronecker-product factors.
+
+## Outputs
+
+- `M` - full vector or matrix after applying the Kronecker-product operator; one output column is returned for each input column.
 
 ## Implementation structure
 
-- Calculates (Q{1}(x)Q{2}(x)...(x)Q{n})*M without opening
-- Kronecker products. Syntax:
-- M=kronm(Q,M)
-- Q - cell array of Kronecker terms
-- M - a vector or a matrix of appropriate dimension
-- Output:
-- Check consistency
-- Dimension statistics
-- Row and column counts in Q
-- Fold up implicit dimensions of M
-- Run the products
-- Contract each implicit dimension
+The factors' row and column sizes define the tensor dimensions. Each factor is contracted with its assigned dimension, and the resulting tensor is reshaped to the output matrix.

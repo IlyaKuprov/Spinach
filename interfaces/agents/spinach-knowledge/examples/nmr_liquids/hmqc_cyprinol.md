@@ -4,28 +4,11 @@
 
 ## Purpose
 
-HMQC spectrum of cyprinol with natural abundance of 13C isotope. Calculation time: seconds
+Simulates an HMQC spectrum of cyprinol at natural 13C abundance. The source notes a calculation time of seconds.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HMQC spectrum of cyprinol with natural abundance of 13C isotope.
-- Calculation time: seconds
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Loads the cyprinol spin system and sets the magnetic field to 11.7. Uses the greedy option, proximity cutoff 4.0, interaction cutoff 5.0, and an IK-1 spherical-tensor Liouville basis with scalar-coupling connectivity.
+- Sets `J=150`, sweeps `[12000 2500]`, offsets `[5000 1250]`, 128 points and 512-point zero filling in each dimension, with spins `{'13C','1H'}` and ppm axes. Decouples 1H in F1 and 13C in F2.
+- Generates 13C isotopomers with `dilute`, simulates each using `liquid(...,@hmqc,...,'nmr')` in a `parfor` loop, applies cosine apodisation, and sums their shifted two-dimensional Fourier transforms.
+- Plots the absolute spectrum with `plot_2d`.

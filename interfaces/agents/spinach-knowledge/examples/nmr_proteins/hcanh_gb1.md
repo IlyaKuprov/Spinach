@@ -8,24 +8,13 @@ Simulated H(CA)NH spectrum of GB1 protein. It is assumed that only the backbone 
 
 ## Physical / mathematical content
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Imports GB1 data with the `backbone-minimal` selection for a three-dimensional 1H, 15N, 1H experiment.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Simulates four FID components with `hcanh`, applies squared-cosine apodisation, Fourier-transforms F3 and F2 while combining positive and negative components, then Fourier-transforms F1 and plots the real spectrum.
 
 ## Implementation structure
 
-- Simulated H(CA)NH spectrum of GB1 protein. It is assumed that
-- only the backbone is 13C,15N-labelled.
-- Calculation time: minutes, faster with a Tesla A100 GPU.
-- Protein data import
-- Magnet field
-- Tolerances
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+- Imports `2N9K.pdb` and `2N9K.bmrb`, sets a 14.1 T field and interaction tolerances, and builds an IK-1 `sphten-liouv` basis.
+- Sets sweeps to [6000 3000 6000] Hz, offsets to [4200 -7200 4200] Hz, acquisition points to [128 128 128], and zero filling to [256 256 256]; plots in ppm.

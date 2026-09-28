@@ -4,44 +4,28 @@
 
 ## Purpose
 
-Liouvillian path tracing. Treats the user-supplied Liouvillian as the adjacency matrix of a graph, computes the weakly connect- ed subgraphs of that graph and returns a cell array of project- ors into independently evolving populated subspaces. Syntax: projectors=path_trace(spin_system,L,rho)
+`path_trace` treats the supplied Liouvillian as a graph adjacency matrix, finds its weakly connected subgraphs, and returns projectors into independently evolving populated subspaces.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Parameters / inputs
-
-- L -Hamiltonian or Liouvillian matrix
-- rho -the initial state (source state screening)
-- or the detection state (destination state
-- screening); pass [] to disable screening
+- `spin_system` — supplies run settings, tolerances, and basis formalism.
+- `L` — Hamiltonian or Liouvillian matrix.
+- `rho` — initial state for source-state screening or detection state for destination-state screening. Pass `[]` to disable population screening.
 
 ## Outputs
 
-- projectors -a cell array of projectors into independently
-- evolving populated subspaces. The projectors
-- are to be used as follows:
-- L_reduced=P'*L*P; (for matrices)
-- rho_reduced=P'*rho; (for state vectors)
-- Note: further information on how this function works is availa-
-- ble in our papers on this subject
+`projectors` is a cell array of projectors. For a projector `P`, use `L_reduced=P'*L*P` for matrices and `rho_reduced=P'*rho` for state vectors.
 
-## Implementation structure
+## Algorithm and run conditions
 
-- Liouvillian path tracing. Treats the user-supplied Liouvillian
-- as the adjacency matrix of a graph, computes the weakly connect-
-- ed subgraphs of that graph and returns a cell array of project-
-- ors into independently evolving populated subspaces. Syntax:
-- projectors=path_trace(spin_system,L,rho)
-- L - Hamiltonian or Liouvillian matrix
-- rho - the initial state (source state screening)
-- or the detection state (destination state
-- screening); pass [] to disable screening
-- projectors -a cell array of projectors into independently
-- evolving populated subspaces. The projectors
-- are to be used as follows:
+The function requires numeric `L` and `rho`, a square `L`, and, when `rho` is nonempty, matching dimensions between the columns of `L` and the rows of `rho`. If `pt` is in `spin_system.sys.disable`, or if `size(L,2)<spin_system.tols.merge_dim`, it skips path tracing and returns the unit projector `{1}`.
+
+Otherwise, it forms a connectivity matrix from `abs(L)>spin_system.tols.liouv_zero`, symmetrizes it, adds the identity to retain isolated states, and finds connected components with `scomponents`. All components are retained when `rho` is empty. With a nonempty `rho`, components are retained when their population exceeds `spin_system.tols.subs_drop`: `sphten-liouv` and `zeeman-liouv` use the 1-norm of the corresponding entries of the state vector; `zeeman-hilb` checks both corresponding rows and columns of the state matrix. An unexpected formalism raises an error.
+
+The function builds sparse projectors for retained components and reports their dimensions. Unless `merge` is in `spin_system.sys.disable`, it groups small subspaces using `binpack(subspace_dims,spin_system.tols.merge_dim)` and concatenates their projectors into working subspaces.
+
+## Further information
+
+- http://dx.doi.org/10.1063/1.3398146
+- http://dx.doi.org/10.1016/j.jmr.2011.03.010
+- https://spindynamics.org/wiki/index.php?title=path_trace.m

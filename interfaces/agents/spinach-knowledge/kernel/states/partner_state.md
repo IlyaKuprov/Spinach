@@ -4,15 +4,7 @@
 
 ## Purpose
 
-Partner state expansion; a given state of the specified spins is kroneckered with all combinations of the specified states of specfied partner spins. Syntax: [A,descr]=partner_state(spin_system,active_spin,partners)
-
-## Physical / mathematical content
-
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Expands specified states of set_spin by Kronecker products with all combinations of the specified partner states. Syntax: `[A,descr]=partner_state(spin_system,set_spin,partners)`
 
 ## Parameters / inputs
 
@@ -57,18 +49,3 @@ Partner state expansion; a given state of the specified spins is kroneckered wit
 - {'Lz','L+','E' ,'E' ,'E'},...
 - {'E' ,'L+','Lz','E' ,'E'},...
 - {'Lz','L+','Lz','E' ,'E'}};
-
-## Implementation structure
-
-- Partner state expansion; a given state of the specified spins
-- is kroneckered with all combinations of the specified states
-- of specfied partner spins. Syntax:
-- [A,descr]=partner_state(spin_system,active_spin,partners)
-- set_spin -a cell array of two-element cell arrays
-- with the first element giving the state
-- of the spin and the second element num-
-- ber on the isotope list, for example
-- {{'L+',3}}
-- These spins will have their states set
-- immutably as specified.
-- partners -a cell array of partner state specifica-

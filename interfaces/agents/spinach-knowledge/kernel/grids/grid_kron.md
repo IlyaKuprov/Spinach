@@ -4,42 +4,20 @@
 
 ## Purpose
 
-Spherical grid direct product. Tiles one grid using the rotations of the other. Grids should be supplied using Euler angles in three col- umns [alphas betas gammas] in radians. Syntax: [angles,weights]=grid_kron(angles1,weights1,angles2,weights2)
-
-## Physical / mathematical content
-
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Constructs the direct product of two spherical grids, tiling one grid using the rotations of the other. Euler angles use the active ZYZ convention and are given in radians as three columns: `[alpha beta gamma]`.
 
 ## Parameters / inputs
 
-- angles1 -Euler angles (ZYZ active) of the first grid,
-- as [alpha beta gamma], radians
-- weights1 -weights of the first grid
-- angles2 -Euler angles (ZYZ active) of the second grid,
-- as [alpha beta gamma], radians
-- weights1 -weights of the second grid
+- `angles1`, `angles2` — Euler-angle matrices for the first and second grids.
+- `weights1`, `weights2` — corresponding column vectors of grid weights.
 
 ## Outputs
 
-- angles -Euler angles (ZYZ active) of the product grid,
-- as [alpha beta gamma], rad
-- weights -weights of the product grid
+- `angles` — active ZYZ Euler angles of the product grid, in radians.
+- `weights` — product-grid weights.
 
-## Implementation structure
+## Implementation
 
-- Spherical grid direct product. Tiles one grid using the rotations of
-- the other. Grids should be supplied using Euler angles in three col-
-- umns [alphas betas gammas] in radians. Syntax:
-- [angles,weights]=grid_kron(angles1,weights1,angles2,weights2)
-- angles1 -Euler angles (ZYZ active) of the first grid,
-- as [alpha beta gamma], radians
-- weights1 -weights of the first grid
-- angles2 -Euler angles (ZYZ active) of the second grid,
-- weights1 -weights of the second grid
-- angles -Euler angles (ZYZ active) of the product grid,
-- as [alpha beta gamma], rad
-- weights -weights of the product grid
+The function converts both angle grids to quaternions, forms every pair of quaternions, multiplies each pair, and converts the results back to Euler angles. It forms the output weights with `kron(weights1,weights2)`. Input checks require real three-column angle matrices, finite real column-vector weights, and matching angle and weight row counts for each grid.
+
+Source reference: <https://spindynamics.org/wiki/index.php?title=grid_kron.m>

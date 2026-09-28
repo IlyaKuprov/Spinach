@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Longitudinal and transverse relaxation rates in a system with a significant antisymmetry in the hyperfine tensor. Calculation time: seconds
+Compares textbook longitudinal (`R1`), transverse (`R2`), and cross-relaxation (`Rx`) rates with rates extracted from Spinach’s Redfield relaxation superoperator for a two-spin system with a strongly antisymmetric hyperfine tensor.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+The system contains a proton and an electron at 0.33 T. Their hyperfine coupling is specified by a full, nonsymmetric 3 × 3 tensor; the example uses zero equilibrium, a 10 ps correlation time, and the lab-frame relaxation representation. The textbook rates come from `rlx_hfc`; corresponding Spinach rates are evaluated as negative expectation values of the relaxation superoperator for normalized longitudinal and transverse states. A longitudinal cross term tests the transfer rate between the two spins.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The script constructs the spin system and an `sphten-liouv` basis with no approximation, builds the Redfield relaxation superoperator, and compares each `rlx_hfc` result against the associated matrix element of that superoperator. It also prints the complete superoperator in the IST basis. The reported calculation time is seconds.
 
 ## Implementation structure
 
-- Longitudinal and transverse relaxation rates in a system
-- with a significant antisymmetry in the hyperfine tensor.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
-- Textbook rates
-- Textbook and Spinach R1 for first spin
-- Textbook and Spinach R1 for second spin
-- Textbook and Spinach R2 for first spin
+After setting the field, isotopes, and hyperfine matrix, the script selects Redfield relaxation with zero equilibrium and lab-frame retention, then constructs the basis and relaxation superoperator. It evaluates `R1` for both spins using `Lz` states, `R2` using `L+` states, and `Rx` using a pair of `Lz` states, normalizing each state before evaluating the matrix elements. Finally, it prints the full relaxation superoperator.

@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Relayed NOE from hyperpolarized water to ALA-GLY dipeptide, generating Figure S7 from Christopher Pötzl
+Relayed NOE from hyperpolarized water to an ALA–GLY dipeptide, generating Figure S7 from Christopher Pötzl: https://doi.org/10.1016/j.jmr.2024.107727.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+The 30-proton model contains ten molecular protons and 20 water protons. The water spins have no coordinates, preventing direct cross-relaxation in this model; intermolecular exchange connects them to the first four labile protons at 20 s⁻¹. Redfield relaxation with empirical water R1 and R2 rates of 0.1 Hz, an IK-1 basis retaining up to three-spin molecular orders, and the specified thermal-equilibrium state are used. The initial state is changed to 100% water polarisation.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The combined Hamiltonian, relaxation, and exchange-kinetics Liouvillian is propagated for 128 steps of 0.125 s. Detection tracks the Z magnetisation of the three aliphatic protons and the α proton, and plots their time courses.
 
 ## Implementation structure
 
-- Relayed NOE from hyperpolarized water to ALA-GLY dipeptide,
-- generating Figure S7 from
-- Christopher Pötzl
-- Simulation timing parameters
-- Magnet field
-- 30 protons in the system
-- Cartesian coordinates of pertinent protons
-- 20 water protons exist, but have no coordinates to
-- prevent direct cross-relaxation from happening
-- Chemical shifts, all water at 4.5 ppm
-- Relaxation theories
-- Empirical relaxation at 0.1 Hz for water
+- Sets B₀ = 16.4 T and 30 protons; water shifts are 4.5 ppm.
+- Uses exchange flux rate 20 between protons 1–4 and water spins 11–20.
+- Builds `L=H+1i*R+1i*K`, prepares full water polarisation, and calls `evolution` in multichannel mode.
+- Plots the CH₃ and Hα magnetisation in arbitrary units over 16 s.

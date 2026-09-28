@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Simulation of XiX DNP contact time dependence in the steady state with electron-proton distance and elec- tron Rabi frequency ensembles. Calculation time: hours.
+Calculates steady-state proton polarisation versus XiX contact time, averaging over both electron–proton distance and electron microwave-field ensembles.
 
-## Physical / mathematical content
+## Model and quadrature
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The system is a trityl electron and proton at 1.2142 T and 80 K. Three Gauss–Legendre distance nodes span 3.5–20 Å; five microwave-field nodes span 10–20 MHz. At each distance, the source sets the pair coordinates and updates the orientation-dependent proton T1 rate through `r1n_dnp`; T2 rates, diagonal relaxation retention and `dibari` equilibrium are specified. The full spherical-tensor Liouville basis is used without basis approximation.
 
-## Numerical / algorithmic content
+## XiX scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of XiX DNP contact time dependence in the
-- steady state with electron-proton distance and elec-
-- tron Rabi frequency ensembles.
-- Calculation time: hours.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance and B1 ensemble
+For each distance, field node and loop count (1–64), the calculation uses a 48 ns pulse, inverted second-pulse phase, an 800-point two-angle spherical powder grid, and `powder(...,@xixdnp_steady,...,'esr')`. Shot spacing is 153 μs minus the total pulse duration; the source sets a −13 MHz added shift and +61 MHz electron offset. The signal is weighted over microwave-field nodes and over distance nodes with the radial `r^2` Jacobian. The resulting real proton `Lz` expectation value is plotted against total contact time and saved as `xix_q_con_time_ensemble_b1_r.fig`.

@@ -6,19 +6,13 @@
 
 Tests remaining regularisation and inverse-problem utilities. Syntax: result=test_dynamic_remaining_regularisation_suite()
 
-## Physical / mathematical content
 
 ## Numerical / algorithmic content
 
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-
+- Uses a synthetic L-curve with a known corner, scalar analytic references for positivity-constrained Tikhonov inversion, and an identity sensing matrix to test L1 sparse support and finite output metrics.
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks L-curve corner detection, positivity-constrained
-- Tikhonov inversion, and L1 sparsity targeting on compact analytical
-- inverse problems.
-
+- `result` — regression test result with explanatory messages.
 ## Implementation structure
 
 - Tests remaining regularisation and inverse-problem utilities. Syntax:

@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Pulse-acquire NMR spectrum of a highly symmetric spin system provided by Andres Castillo. Uses the fully sym- metric irreducible representation of S3(x)S3(x)S3 per- mutation symmetry group.
+Pulse-acquire NMR spectrum of a highly symmetric spin system provided by Andres Castillo. Uses the fully symmetric irreducible representation of the S3(x)S3(x)S3 permutation symmetry group.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The source specifies 13 protons at 9.4 T and three S3 groups acting on spins 1–3, 4–6, and 7–9. The spherical-tensor Liouville basis uses the IK-2 approximation, scalar-coupling connectivity, proximity level 1, and projection +1.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+Simulates a liquid-state pulse-acquire FID with 2048 points, a 2000 Hz sweep and 800 Hz offset; applies exponential apodisation with parameter 6, zero-fills to 8196 points, and Fourier-transforms and plots the real spectrum in ppm.
 
 ## Implementation structure
 
-- Pulse-acquire NMR spectrum of a highly symmetric spin
-- system provided by Andres Castillo. Uses the fully sym-
-- metric irreducible representation of S3(x)S3(x)S3 per-
-- mutation symmetry group.
-- Spin system specification
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Builds the symmetric basis for the supplied spin system, configures 1H acquisition, runs the liquid simulation, and processes the resulting FID.

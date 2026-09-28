@@ -4,27 +4,14 @@
 
 ## Purpose
 
-A scan through the microwave frequency range in a steady state DNP experiment for a single 15N labelled urea mole- cule at a specific orientation and a specific distance from a single electron. Laboratory frame DNP simulation is carried out with state space restriction to four-spin orders and a Weizmann DNP relaxation superoperator accounting for T1 and T2 and di- polar relaxation processes. Single crystal calculatio
+Calculates a single-crystal, laboratory-frame DNP steady state for a 15N-labelled urea molecule at one specified orientation and distance from one electron, while scanning two microwave-frequency windows. The source describes the calculation as taking minutes.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The spin system contains one electron, two 15N nuclei, and four 1H nuclei. It uses a 3.4 T field and the `sphten-liouv` formalism with the `IK-0` approximation, four-spin-order inter-level restriction, and projection set [-2, -1, 0, +1, +2]. Relaxation is the secular Weizmann DNP model with zero equilibrium state, temperature 4.2, specified electron/nuclear longitudinal and transverse rates, and distance-dependent rates set to 10^-3 for both R1d and R2d matrices.
 
-## Numerical / algorithmic content
+The electron is driven with a 100 kHz microwave amplitude. The scan concatenates 100 points from 144.0–145.5 MHz and 100 points from 14.0–15.5 MHz. A single orientation [pi/4, pi/5, pi/6] is passed to `crystal`; the calculation calls `dnp_freq_scan` with the ESR context.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Outputs
 
-## Implementation structure
-
-- A scan through the microwave frequency range in a steady
-- state DNP experiment for a single 15N labelled urea mole-
-- cule at a specific orientation and a specific distance
-- from a single electron.
-- Laboratory frame DNP simulation is carried out with state
-- space restriction to four-spin orders and a Weizmann DNP
-- relaxation superoperator accounting for T1 and T2 and di-
-- polar relaxation processes. Single crystal calculation.
-- Calculation time: minutes
-- Magnetic field
-- Spin system
-- Basis set
+Four plots show the real longitudinal expectation values for 1H and 15N across each of the two frequency windows. The source forms the coil observables from the 1H and 15N longitudinal operators and uses the corresponding first and second result columns for those plots.

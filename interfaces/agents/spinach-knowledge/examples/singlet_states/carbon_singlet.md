@@ -4,29 +4,21 @@
 
 ## Purpose
 
-Singlet relaxation rate for the two triple bond carbons in cis-dimethylbut-2-ynedioate. Magnetic parameters com- puted with DFT. Calculation time: seconds
+Calculate the singlet relaxation rate for the two triple-bond carbons in cis-dimethylbut-2-ynedioate using magnetic parameters computed with DFT. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- The system contains two `13C` spins in a 14.1 T magnetic field, with specified Zeeman matrices and coordinates.
+- Relaxation uses the Redfield model with a 100 ps correlation time, zero equilibrium, and lab-frame terms retained.
+- The calculation evaluates relaxation-superoperator matrix elements for normalized longitudinal magnetization, `<Sz|R|Sz>`, and the normalized singlet state, `<singlet|R|singlet>`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The basis uses `sphten-liouv` formalism without approximation. Relaxation integration and zero tolerances are both `1e-5`.
+- After creating the spin system and basis, the script constructs the relaxation superoperator `R` and reports its matrix elements for the two states.
 
 ## Implementation structure
 
-- Singlet relaxation rate for the two triple bond carbons
-- in cis-dimethylbut-2-ynedioate. Magnetic parameters com-
-- puted with DFT.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Relaxation superoperator accuracy
-- Spinach housekeeping
-- Relaxation superoperator
-- Action on longitudinal magnetization
-- Action on a singlet state
+- Specify the magnetic field, isotopes, Zeeman matrices, and coordinates.
+- Set relaxation parameters, basis, and accuracy tolerances.
+- Create the spin system, construct `R`, and report its action on longitudinal magnetization and the singlet state.

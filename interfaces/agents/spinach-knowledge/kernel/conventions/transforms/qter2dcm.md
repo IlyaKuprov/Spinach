@@ -4,39 +4,30 @@
 
 ## Purpose
 
-Converts a unit quaternion into a direction cosine matrix in the active convention, matching the one used by euler2dcm.m function. Syntax: dcm=qter2dcm(q)
+Converts a quaternion to the 3x3 direction cosine matrix (DCM) used by `euler2dcm.m`.
 
 ## Physical / mathematical content
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+The function first normalizes the quaternion components `(u,i,j,k)`. It then returns `[1-2*(j^2+k^2), 2*(i*j-u*k), 2*(i*k+u*j); 2*(i*j+u*k), 1-2*(i^2+k^2), 2*(j*k-u*i); 2*(i*k-u*j), 2*(j*k+u*i), 1-2*(i^2+j^2)]`. This is the active convention used by `euler2dcm.m`; MATLAB Aerospace Toolbox `quat2dcm()` returns the transpose for the same quaternion.
 
 ## Numerical / algorithmic content
 
+The quaternion norm must be at least `sqrt(eps())`; smaller norms cause an error. The DCM acts on a column vector as `v=dcm*v` and transforms a 3x3 tensor as `A=dcm*A*dcm'`.
+
+## Syntax
+
+```matlab
+dcm=qter2dcm(q)
+```
+
 ## Parameters / inputs
 
-- q -structure with four scalar fields q.u, q.i, q.j,
-- q.k giving the four components of the quaternion
+- `q` — structure with real numeric scalar fields `u`, `i`, `j`, and `k`.
 
 ## Outputs
 
-- dcm -directional cosine matrix
-- Note: the resulting rotation matrix is to be used as follows:
-- v=R*v (for 3x1 vectors)
-- A=R*A*R' (for 3x3 interaction tensors)
-- Note: Matlab's Aerospace Toolbox quat2dcm() returns the
-- transpose of this matrix for the same quaternion.
+- `dcm` — 3x3 direction cosine matrix.
 
 ## Implementation structure
 
-- Converts a unit quaternion into a direction cosine matrix in
-- the active convention, matching the one used by euler2dcm.m
-- function. Syntax:
-- dcm=qter2dcm(q)
-- q -structure with four scalar fields q.u, q.i, q.j,
-- q.k giving the four components of the quaternion
-- dcm -directional cosine matrix
-- Note: the resulting rotation matrix is to be used as follows:
-- v=R*v (for 3x1 vectors)
-- A=R*A*R' (for 3x3 interaction tensors)
-- Note: Matlab's Aerospace Toolbox quat2dcm() returns the
-- transpose of this matrix for the same quaternion.
+The function checks the quaternion fields and their values, rejects a norm below `sqrt(eps())`, normalizes the quaternion, and constructs the DCM from its components.

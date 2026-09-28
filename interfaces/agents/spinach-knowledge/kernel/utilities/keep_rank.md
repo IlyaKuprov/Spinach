@@ -4,36 +4,25 @@
 
 ## Purpose
 
-Truncates the singular value decomposition at the specified rank and reassembles the matrix. Syntax: A=keep_rank(A,rank)
+Truncate a matrix to a requested singular-value rank and return the reconstructed matrix.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+This is a numerical low-rank approximation based on the singular value decomposition; it does not assume a particular physical model.
 
 ## Numerical / algorithmic content
 
+The input is converted to a full matrix and factorised with `svd`. The routine retains the first `nsvk` singular components and forms `U(:,1:nsvk)*S(1:nsvk,1:nsvk)*V(:,1:nsvk)'`.
+
 ## Parameters / inputs
 
-- A -real or complex matrix, will be
-- converted to full if a sparse
-- matrix is received
-- nsvk -number of singular values to keep
+- `A` - numeric matrix with more than one row and more than one column; sparse input is converted to full.
+- `nsvk` - positive real integer no greater than the smaller matrix dimension.
 
 ## Outputs
 
-- A -filtered matrix, returned as full
+- `A` - full matrix reconstructed from the retained singular components.
 
 ## Implementation structure
 
-- Truncates the singular value decomposition at the specified rank
-- and reassembles the matrix. Syntax:
-- A=keep_rank(A,rank)
-- A - real or complex matrix, will be
-- converted to full if a sparse
-- matrix is received
-- nsvk - number of singular values to keep
-- A - filtered matrix, returned as full
-- Check consistency
-- Run singular value decomposition
-- Truncate to the specified rank and rebuild
-- Consistency enforcement
+Consistency checks precede the full SVD. The requested leading singular-vector columns and matching diagonal block of `S` are multiplied to produce the truncated matrix.

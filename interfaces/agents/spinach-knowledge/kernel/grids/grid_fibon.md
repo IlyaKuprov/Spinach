@@ -4,48 +4,21 @@
 
 ## Purpose
 
-Fibonacci type spherical quadrature grids, as per Appendix A.5 of http://dx.doi.org/10.1016/j.jmr.2014.05.009 Syntax: [alps,bets,gams,whts,vorn]=grid_fibon(type,parm)
-
-## Physical / mathematical content
-
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Generate Fibonacci-type spherical quadrature grids, as described in Appendix A.5 of http://dx.doi.org/10.1016/j.jmr.2014.05.009.
 
 ## Parameters / inputs
 
-- type -'fibonacci', 'zcw', or 'zcwn'
-- parm -point count parameter, the resulting
-- grid will have 2*n+1 points ('fib'),
-- fibonacci(n+2) points ('zcw'), or n
-- points (zcwn).
+- `type`: `'fib'`, `'zcw'`, or `'zcwn'`.
+- `parm`: positive integer point-count parameter. The grids have `2*parm+1`, `fibonacci(parm+2)`, or `parm` points, respectively.
 
 ## Outputs
 
-- alps -alpha Euler angles of the grid (radians),
-- zeros because these are two-angle grids
-- bets -beta Euler angles of the grid (radians)
-- gams -gamma Euler angles of the grid (radians)
-- whts -Voronoi tessellation body angle weights
-- vorn -a cell array of matrices containing the
-- coordinates of the vertices of the Voro-
-- noi polyhedra
-- Note: if no outputs are requested, a schematic is drawn.
+- `alps`: alpha Euler angles (radians); zero for these two-angle grids.
+- `bets`: beta Euler angles (radians).
+- `gams`: gamma Euler angles (radians).
+- `whts`: Voronoi tessellation body-angle weights, normalized by `4*pi`.
+- `vorn`: cell array of matrices containing Voronoi-polyhedron vertex coordinates.
 
-## Implementation structure
+## Implementation
 
-- Fibonacci type spherical quadrature grids, as per Appendix
-- A.5 of http://dx.doi.org/10.1016/j.jmr.2014.05.009 Syntax:
-- [alps,bets,gams,whts,vorn]=grid_fibon(type,parm)
-- type -'fibonacci', 'zcw', or 'zcwn'
-- parm -point count parameter, the resulting
-- grid will have 2*n+1 points ('fib'),
-- fibonacci(n+2) points ('zcw'), or n
-- points (zcwn).
-- alps -alpha Euler angles of the grid (radians),
-- zeros because these are two-angle grids
-- bets -beta Euler angles of the grid (radians)
-- gams -gamma Euler angles of the grid (radians)
+The `'fib'` and `'zcwn'` grids use the golden ratio to place points; `'zcw'` uses Fibonacci numbers. Voronoi tessellation is computed when weights are requested or the function is called without outputs. With no outputs, the function plots a schematic of the grid.

@@ -4,64 +4,34 @@
 
 ## Purpose
 
-Builds auxiliary matrices for the calculation of the directional derivatives of the trapezium product quadrature propagator: expm(-1i*((HL+HR)/2+(1i*dt/12)*[HL,HR])*dt) with respect to control coefficients in the evolution generators HL and HR on the left and the right edge of the interval. The de- rivatives are calculated using Eq 16 of Goodwin and Kuprov:
+Build the left- and right-edge auxiliary matrices used to differentiate the trapezium-product quadrature propagator
 
-## Physical / mathematical content
+`expm(-1i*((HL+HR)/2+(1i*dt/12)*[HL,HR])*dt)`
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+with respect to control coefficients in the interval generators. The derivative formula follows Eq. 16 of Goodwin and Kuprov ([doi:10.1063/1.4928978](https://doi.org/10.1063/1.4928978)).
 
 ## Syntax
 
 ```matlab
 [auxm_l,auxm_r]=aux_mat(drifts,controls,cc_comm_idx,...
-cc_comm,dt,cL,cR,k,j)
+                       cc_comm,dt,cL,cR,k,j)
 ```
 
-## Parameters / inputs
+## Inputs
 
-- drifts -a cell array of two matrices containing drift
-- generators at the left (first element) and the
-- right (second element) edge of the interval
-- controls -a cell array of K control generators
-- cc_comm_idx -a KxK matrix of logicals indicating non-zero
-- commutation of controls
-- cc_comm -a KxK cell array control commutation relarions
-- dt -interval duration, seconds
-- cL -control generator coefficients at the left
-- edge of the interval
-- cR -control generator coefficients at the right
-- edge of the interval
-- k -the index of the generator inside controls
-- array that the differentiation refers to
-- j -(optional) the index of the 2nd generator
-- inside controls array that the differentiation
-- refers to. Required for 3x3 block auxiliary
-- matrices
+- `drifts` — two drift-generator matrices, ordered left then right.
+- `controls` — cell array of `K` control-generator matrices.
+- `cc_comm_idx` — `K`-by-`K` logical matrix indicating which control commutators are nonzero.
+- `cc_comm` — `K`-by-`K` cell array of control commutation relations.
+- `dt` — interval duration in seconds.
+- `cL`, `cR` — control coefficients at the left and right interval edges.
+- `k` — index of the control generator being differentiated.
+- `j` — optional index of a second control generator; supply it for the mixed-derivative 3-by-3 auxiliary matrices.
 
 ## Outputs
 
-- auxm_l -auxilary matrix for the derivative of the
-- interval propagator with respect to cL
-- auxm_r -auxilary matrix for the derivative of the
-- interval propagator with respect to cR
+- `auxm_l`, `auxm_r` — left- and right-edge auxiliary matrices for the requested propagator derivative.
 
-## Implementation structure
+## Construction
 
-- Builds auxiliary matrices for the calculation of the directional
-- derivatives of the trapezium product quadrature propagator:
-- expm(-1i*((HL+HR)/2+(1i*dt/12)*[HL,HR])*dt)
-- with respect to control coefficients in the evolution generators
-- HL and HR on the left and the right edge of the interval. The de-
-- rivatives are calculated using Eq 16 of Goodwin and Kuprov:
-- [auxm_l,auxm_r]=aux_mat(drifts,controls,cc_comm_idx,...
-- cc_comm,dt,cL,cR,k,j)
-- drifts -a cell array of two matrices containing drift
-- generators at the left (first element) and the
-- right (second element) edge of the interval
-- controls -a cell array of K control generators
+The routine forms the interval generator from the average of the two edge generators and their commutator term. With no second index `j`, it returns 2-by-2 block matrices; when `j` is supplied, it returns 3-by-3 block matrices for the mixed derivative. The left and right matrices use the corresponding edge-specific directional derivatives.

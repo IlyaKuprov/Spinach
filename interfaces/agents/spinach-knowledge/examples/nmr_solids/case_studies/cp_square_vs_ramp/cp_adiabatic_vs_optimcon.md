@@ -7,12 +7,9 @@
 1H-15N cross-polarisation experiment in the doubly rotating frame using (a) tangent-ramped adiabatic CP; (b) numerically optimised (GRAPE method) shortcut to adiabaticity. Calculation time: minutes
 
 ## Physical / mathematical content
-
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- Compares tangent-ramped adiabatic cross-polarisation with a GRAPE-optimised shortcut in a powder simulation, monitoring the ¹⁵N Lx signal.
+- GRAPE optimises the ¹H Ly and ¹⁵N Lx control waveforms from the tangent-ramp initial guess, using L-BFGS with an SNS penalty.
+- Simulates the optimised pulses at the original 500 × 2 µs timing and at half duration (500 × 1 µs).
 
 ## Numerical / algorithmic content
 

@@ -4,27 +4,8 @@
 
 ## Purpose
 
-Field profile of a BEAM DNP experiment. <I_z> after a fixed contact time is calculated as a function of electron pulse amplitude and offset. Further information in: Calculation time: minutes (a large powder grid is needed)
+Computes the proton `I_z` signal at the end of a fixed-duration BEAM DNP contact as a function of microwave resonance offset. The associated experiment is described in [Science Advances](https://doi.org/10.1126/sciadv.abq0536); the source notes that the large powder grid makes this a minutes-scale calculation.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Field profile of a BEAM DNP experiment. <I_z> after a fixed
-- contact time is calculated as a function of electron pulse
-- amplitude and offset. Further information in:
-- Calculation time: minutes (a large powder grid is needed)
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Hush the output
-- Basis set
-- Spinach housekeeping
+The X-band model (0.3483 T) contains an electron and two protons, with trityl g-tensor values, proton Zeeman estimates, Cartesian coordinates, and spin temperature 80 K. It uses a full Zeeman-Hilbert basis, proton `Lz` detection, and the BEAM pulse sequence (32 MHz electron nutation frequency, 20.0/28.7 ns pulses, 165 blocks). For each of 120 offsets spanning −60 to +60 MHz, the script adds a −3.3 MHz reference offset, runs the powder calculation on `rep_2ang_800pts_sph`, and records the last contact-curve point. The offset sweep is parallelised with `parfor`.

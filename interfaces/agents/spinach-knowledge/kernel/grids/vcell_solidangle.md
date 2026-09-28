@@ -4,42 +4,20 @@
 
 ## Purpose
 
-Solid angle of a spherical Voronoi cell. Syntax: s=vcell_solidangle(P,K,xyz)
+Returns the solid angle of each spherical Voronoi cell specified by `K`. The optional knot points `xyz` guide selection of the cell containing each node rather than its complement.
 
-## Physical / mathematical content
+## Inputs
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
+- `P`: 3 x m array of Voronoi-cell vertex coordinates; columns must be finite real unit vectors, within `1e-6` in squared norm.
+- `K`: cell array of nonempty lists of finite, positive integer indices into `P`.
+- `xyz` (optional): 3 x numel(K) array of knot points; columns must be finite real unit vectors, within `1e-6` in squared norm.
 
-## Numerical / algorithmic content
+## Output
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- `S`: solid angle for each cell in `K`.
 
-## Parameters / inputs
+## Implementation
 
-- P -(3 x m) array with coordinates of the
-- vertices of the Voronoi cell
-- K -(n x 1) cell, each K{j} contains the
-- indices of the Voronoi cell
-- xyz -optional (3 x n) knot points to guide
-- vcell_solidangle to compute the solid
-- angle of the "right" cell containing
-- the node (and not the complement cell)
+The function validates its inputs, then calls `one_vcell_solidangle` for each cell's vertices. When `xyz` is supplied, it passes the corresponding knot point to that call. The calculation performed by `one_vcell_solidangle` is not included in this source.
 
-## Outputs
-
-- S -the solid angle of the Voronoi cell
-
-## Implementation structure
-
-- Solid angle of a spherical Voronoi cell. Syntax:
-- s=vcell_solidangle(P,K,xyz)
-- P -(3 x m) array with coordinates of the
-- vertices of the Voronoi cell
-- K -(n x 1) cell, each K{j} contains the
-- indices of the Voronoi cell
-- xyz -optional (3 x n) knot points to guide
-- vcell_solidangle to compute the solid
-- angle of the "right" cell containing
-- the node (and not the complement cell)
-- S -the solid angle of the Voronoi cell
-- Check consistency
+Source link: https://spindynamics.org/wiki/index.php?title=vcell_solidangle.m

@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts anisotropy and asymmetry representation of a 3x3 interaction tensor (Haeberlen-Mehring convention) into the corresponding matrix. Euler angles should be specified in radians. Syntax: M=anas2mat(iso,an,as,alp,bet,gam)
+Converts the isotropic part, anisotropy, and asymmetry of a 3x3 interaction tensor into a matrix using Euler angles specified in radians.
 
 ## Physical / mathematical content
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+The function computes principal values `xx`, `yy`, and `zz` from `iso`, `an`, and `as`, then rotates the diagonal tensor into the specified orientation.
 
 ## Numerical / algorithmic content
+
+It sets `ra=2*an/3`, `zz=iso+ra`, `yy=iso-ra*(1-as)/2`, and `xx=iso-ra*(1+as)/2`. With `R=euler2dcm(alp,bet,gam)`, it returns `M=R*diag([xx yy zz])*R'`.
 
 ## Parameters / inputs
 
@@ -30,15 +32,4 @@ Converts anisotropy and asymmetry representation of a 3x3 interaction tensor (Ha
 
 ## Implementation structure
 
-- Converts anisotropy and asymmetry representation of a 3x3 interaction
-- tensor (Haeberlen-Mehring convention) into the corresponding matrix.
-- Euler angles should be specified in radians. Syntax:
-- M=anas2mat(iso,an,as,alp,bet,gam)
-- iso -isotropic part of the interaction, defined as
-- (xx+yy+zz)/3 in terms of eigenvaues
-- an -interaction anisotropy, defined as zz-(xx+yy)/2
-- in terms of eigenvalues
-- as -interaction asymmetry, defined as (yy-xx)/(zz-iso)
-- alp -alpha Euler angle in radians
-- bet -beta Euler angle in radians
-- gam -gamma Euler angle in radians
+The function checks that all six inputs are real numeric scalars, computes the principal values, and applies the Euler-angle rotation.

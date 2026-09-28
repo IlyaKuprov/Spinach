@@ -4,30 +4,16 @@
 
 ## Purpose
 
-Nakajima-Zwanzig relaxation theory against Redfield theory for a two-spin system with dipolar and CSA cross-correlations. The three superoperators compared are the off-shell NZ kernel (resolvent form), the on-shell NZ kernel (back-rotated form), and Redfield theory. The on-shell kernel at zero shift reproduces Redfield theory exactly; the off-shell kernel agrees with Redfield theory on the zero-frequency subspace of 
+Compares Redfield relaxation with on-shell and off-shell Nakajima–Zwanzig (NZ) kernels for a two-spin system with dipolar and CSA cross-correlations. It evaluates the on-shell/Redfield difference, the off-shell/Redfield difference on the zero-frequency subspace and across the full superoperator, the dependence on correlation time, and the effect of an NZ lifetime shift. The source estimates minutes of calculation time.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The system is 1H/13C at 14.1 T, with shielding principal values `[7 15 -22]` and `[11 18 -29]`, Euler angles as specified in the script, and a 1.02-coordinate-unit separation for the dipolar coupling. Common settings are zero equilibrium, lab-frame retention, and `rlx_dfs='keep'`; the complete `sphten-liouv` basis is used without approximation.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Redfield and NZ relaxation superoperators are converted to full matrices. At zero shift the script compares on-shell NZ with Redfield; for off-shell NZ it also compares their action on the nullspace of the lab-frame coherent Hamiltonian. It scans correlation times `[2.5, 5, 10, 20]` ps and lifetime shifts `[0, 1e9, 1e10, 1e11]` Hz, recording relative matrix-norm differences and the largest absolute diagonal relaxation rate. These computed trends are plotted; no numerical outcomes are hard-coded in the page.
 
 ## Implementation structure
 
-- Nakajima-Zwanzig relaxation theory against Redfield theory for a
-- two-spin system with dipolar and CSA cross-correlations. The three
-- superoperators compared are the off-shell NZ kernel (resolvent form),
-- the on-shell NZ kernel (back-rotated form), and Redfield theory. The
-- on-shell kernel at zero shift reproduces Redfield theory exactly; the
-- off-shell kernel agrees with Redfield theory on the zero-frequency
-- subspace of the coherent Liouvillian and differs in first order in
-- omega*tau_c on coherences; a lifetime shift suppresses all rates by
-- pushing the kernel off the real axis.
-- Calculation time: minutes
-- Magnet and isotopes
-- Chemical shielding tensors
+The code builds separate spin systems and relaxation matrices for Redfield, on-shell NZ (`nz_onshell=true`, `nz_shift=0`), and off-shell NZ. It computes the relative norm comparisons, scans the correlation-time and lifetime-shift grids, and plots the two trends in side-by-side panels.

@@ -4,23 +4,8 @@
 
 ## Purpose
 
-Test of the reverse decomposition of spin-1 Hamiltonians.
+Tests the reverse decomposition of a spin-1 Hamiltonian by reconstructing a random traceless Hermitian 3×3 Hamiltonian from the parameters returned by `ham2nqi`.
 
-## Physical / mathematical content
+## Method and check
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Test of the reverse decomposition of
-- spin-1 Hamiltonians.
-- Get random test Hamiltonian
-- Translate back
-- Set up Spinach
-- Re-build using Spinach functionality
-- Compare the matrices
+The test draws a complex random matrix, Hermitian-symmetrises it, removes its trace, and calls `ham2nqi` to obtain `omega` and `Q`. It then builds a 14N spin system with `Q/(2*pi)` as the coupling matrix, zero magnet field, and the `zeeman-hilb` formalism with no approximation. Spinach reconstructs the Hamiltonian from the quadrupolar term and the three `omega`-weighted `Lx`, `Ly`, and `Lz` operators. The test passes when the 2-norm residual is at most 10⁻⁶ times the 2-norm of the sum of the two Hamiltonians.

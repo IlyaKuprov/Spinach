@@ -4,44 +4,33 @@
 
 ## Purpose
 
-Converts Hilbert space operators into Liouville space super- operators or state vectors. Syntax: L=hilb2liouv(H,conv_type)
+Converts a Hilbert-space operator into a Liouville-space superoperator or, for `statevec`, a column-stacked state vector.
 
 ## Physical / mathematical content
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The conversion type selects left multiplication, right multiplication, a commutator, an anticommutator, or direct vectorization of `H`.
 
 ## Numerical / algorithmic content
 
+With `I=speye(size(H))`, the returned matrices are formed as follows:
+
+- `left`: `kron(I,H)`.
+- `right`: `kron(transpose(H),I)`.
+- `comm`: `kron(I,H)-kron(transpose(H),I)`.
+- `acomm`: `kron(I,H)+kron(transpose(H),I)`.
+- `statevec`: `H(:)`, using MATLAB column-major ordering.
+
 ## Parameters / inputs
 
-- H -a Hilbert space operator
-- conv_type -the type of Liouville space superoperator
-- to return:
-- 'left' -left side product
-- superoperator
-- 'right' -right side product
-- superoperator
-- 'comm' -commutation superoperator
-- 'acomm' -anticommutation
-- superoperator
-- 'statevec' -stretches the operator
-- into a state vector
+- H - numeric Hilbert-space operator.
+- conv_type - character string selecting the conversion: `'left'`, `'right'`, `'comm'`, `'acomm'`, or `'statevec'`.
 
 ## Outputs
 
-- L -the resulting superoperator or state vector
+- L - resulting Liouville-space superoperator or column-stacked state vector.
 
 ## Implementation structure
 
-- Converts Hilbert space operators into Liouville space super-
-- operators or state vectors. Syntax:
-- L=hilb2liouv(H,conv_type)
-- H -a Hilbert space operator
-- conv_type -the type of Liouville space superoperator
-- to return:
-- 'left' -left side product
-- superoperator
-- 'right' -right side product
-- 'comm' -commutation superoperator
-- 'acomm' -anticommutation
-- 'statevec' -stretches the operator
+1. Check that `H` is numeric and `conv_type` is a character string.
+2. Create the sparse identity with the dimensions of `H`.
+3. Apply the Kronecker-product formula for the selected conversion, or return `H(:)` for `statevec`. Unknown conversion strings raise an error.

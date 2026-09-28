@@ -7,10 +7,8 @@
 Powder magic angle spinning spectrum of a pair of dipole-coupled quadrupolar nuclei; this is apparently something that other simu- lation packages cannot do. Parameters from Jeongjae Lee. Calculation time: seconds
 
 ## Physical / mathematical content
-
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+- Simulates a powder magic-angle-spinning spectrum of dipole-coupled quadrupolar ²³Na and ¹⁷O nuclei at 9.4 T, using coordinates and electric-field-gradient-derived quadrupolar interactions.
+- Acquires the ¹⁷O signal at 100 kHz spinning over a 200-point spherical orientation grid; applies exponential apodisation and a zero-filled Fourier transform before plotting.
 
 ## Numerical / algorithmic content
 

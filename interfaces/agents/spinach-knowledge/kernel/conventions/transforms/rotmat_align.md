@@ -4,43 +4,22 @@
 
 ## Purpose
 
-Rotation matrix aligning one vector with another vector. Syntax: rot_mat=rotmat_align(v_from,v_to)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Return a 3x3 rotation matrix that aligns `v_from` with `v_to`.
 
 ## Parameters / inputs
 
-- v_from -three-element real vector to rotate
-- v_to -three-element real vector to align to
+- `v_from`: three-element real, finite vector to rotate.
+- `v_to`: three-element real, finite vector to align to.
+- Neither vector may have a 2-norm below `eps('double')`.
 
 ## Outputs
 
-- rot_mat -3x3 rotation matrix that satisfies
-- rot_mat*(v_from/norm(v_from,2))=v_to/norm(v_to,2)
-- Note: aligning one vector with another leaves one rotational degree of
-- freedom around the aligned direction. If the resulting matrix is
-- converted to ZYZ Euler angles, this freedom appears as a non-uni-
-- que third Euler angle (the twist around the aligned axis). This
-- implementation fixes that freedom by returning the minimum-
-- angle alignment without any additional twist around the aligned
-- direction. In the anti-parallel case the axis is non-unique, and
-- the first null-space basis vector orthogonal to v_from is used.
+- `rot_mat`: 3x3 rotation matrix satisfying `rot_mat*(v_from/norm(v_from,2))=v_to/norm(v_to,2)`.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Rotation matrix aligning one vector with another vector. Syntax:
-- rot_mat=rotmat_align(v_from,v_to)
-- v_from -three-element real vector to rotate
-- v_to -three-element real vector to align to
-- rot_mat -3x3 rotation matrix that satisfies
-- rot_mat*(v_from/norm(v_from,2))=v_to/norm(v_to,2)
-- Note: aligning one vector with another leaves one rotational degree of
-- freedom around the aligned direction. If the resulting matrix is
-- converted to ZYZ Euler angles, this freedom appears as a non-uni-
-- que third Euler angle (the twist around the aligned axis). This
-- implementation fixes that freedom by returning the minimum-
-- angle alignment without any additional twist around the aligned
+The function normalizes both inputs, then uses their cross product as the rotation axis and their dot product as the cosine of the alignment angle. For non-collinear vectors, it constructs the matrix with Rodrigues' rotation formula. When the axis norm is below `1e-12`, it returns the identity for parallel vectors; for anti-parallel vectors, it uses the first null-space basis vector orthogonal to `v_from` as the rotation axis.
+
+Aligning two vectors leaves a rotational degree of freedom around the aligned direction. The implementation uses the minimum-angle alignment without an additional twist; the anti-parallel rotation axis is non-unique.
+
+Source reference: <https://spindynamics.org/wiki/index.php?title=rotmat_align.m>

@@ -4,28 +4,17 @@
 
 ## Purpose
 
-Menthol NMR spectrum from Damien Jeannerat, including the effect of bad Z1 and Z2 magnet shims. Calculation time: minutes.
+Simulates the menthol NMR spectrum and the effects of poor Z1 and Z2 magnet shims, using spectrum information from Damien Jeannerat. The source estimates a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Represents the menthol proton spin system with scalar couplings and models the specified Z1/Z2 shim errors.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Builds a scalar-coupling Liouville-space model and simulates a liquid-state FID.
+- Applies Gaussian apodisation and the bad-shim effects, Fourier-transforms the signal, and plots the spectrum.
 
 ## Implementation structure
 
-- Menthol NMR spectrum from Damien Jeannerat, including the
-- effect of bad Z1 and Z2 magnet shims.
-- Calculation time: minutes.
-- System and interaction specification
-- Formalism and basis set
-- Algorithms
-- Spinach housekeeping
-- Sequence parameters -1H
-- Simulation
-- Gaussian apodisation and then bad shims
-- Fourier transform
-- Plotting
+- Sets up the menthol spin system, acquisition, and shim parameters; computes and processes the FID before plotting.

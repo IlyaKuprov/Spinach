@@ -4,27 +4,20 @@
 
 ## Purpose
 
-Simulation of XiX DNP field profile in the steady state with averaging over electron-proton distance and electron Rabi frequency ensemble. Calculation time: minutes.
+Simulate a steady-state XiX DNP field profile at Q band, averaging over electron–proton distance and electron Rabi frequency. The source estimates a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- Models an electron (`E`) and proton (`1H`) at a 1.2142 T magnetic field and 80 K, with a trityl electron g-tensor and an estimated proton chemical shift.
+- Places the proton at each sampled distance from the electron. Uses `t1_t2` relaxation with a distance- and orientation-dependent proton longitudinal relaxation rate supplied by `r1n_dnp`; the equilibrium model is `dibari`.
+- Detects proton `Lz` while sweeping microwave resonance offsets from −100 to 100 MHz.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Uses the `sphten-liouv` formalism without basis approximation and a spherical powder grid (`rep_2ang_800pts_sph`). At each distance and electron nutation frequency, `powder` runs `xixdnp_steady` with the `esr` setting.
+- Sets 48 ns pulses, 36 XiX DNP blocks, an inverted second-pulse phase (`pi`), a −13 MHz additional shift, and shot spacing calculated as `204e-6 - 2*nloops*pulse_dur` seconds.
+- Samples distances from 3.5 to 20 Å at three Gauss–Legendre points and electron Rabi frequencies from 10 to 20 MHz at five points. Averages the resulting profiles using the B1 quadrature weights, then the distance quadrature weights multiplied by the radial factor `r^2`.
 
-## Implementation structure
+## Output
 
-- Simulation of XiX DNP field profile in the steady state with
-- averaging over electron-proton distance and electron Rabi
-- frequency ensemble.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance and B1 ensemble, Gauss-Legendre points
+Plots the real proton `Lz` expectation value against microwave resonance offset in MHz and saves the figure as `xix_q_field_profile_ensemble_b1_r.fig`.

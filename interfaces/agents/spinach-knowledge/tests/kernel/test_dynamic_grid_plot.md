@@ -4,31 +4,23 @@
 
 ## Purpose
 
-Tests grid_plot() under offscreen graphics. Syntax: result=test_dynamic_grid_plot()
+Regression test for `grid_plot()` using invisible figures.
 
 ## Physical / mathematical content
 
+- Uses four points at the vertices of a regular tetrahedron, normalized onto the unit sphere, and their spherical Voronoi tessellation.
+
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- Computes the tessellation with `voronoisphere(xyz)`.
+- With supplied tessera, numeric colours `(1:4).'`, and `options.dots=false`, checks that `grid_plot()` creates one patch per Voronoi cell, passes the numeric colour data to the patches, and creates no centre-dot line object.
+- With tessera and options omitted, checks that `grid_plot()` generates the same number of patches, draws one line object for the default centre dots, and leaves the axes with `PlotBoxAspectRatioMode` set to `manual` for square plotting.
+- Sets the default figure visibility to `off` during the test, creates each figure with `Visible='off'`, closes the figures, and restores the previous default visibility through an `onCleanup` handler.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test draws a tetrahedral spherical Voronoi tessellation, checks the
-- patch count and numeric colour mapping, and verifies optional centre dots.
+- `result` — regression test result with explanatory messages.
 
-## Implementation structure
+## Attribution
 
-- Tests grid_plot() under offscreen graphics. Syntax:
-- result=test_dynamic_grid_plot()
-- result -regression test result with explanatory messages
-- The test draws a tetrahedral spherical Voronoi tessellation, checks the
-- patch count and numeric colour mapping, and verifies optional centre dots.
-- Announce the test target
-- State the grid_plot target of the test
-- Force invisible figures during the test
-- Build a regular tetrahedral grid on the unit sphere
-- Compute the spherical Voronoi tessellation once
-- Draw supplied tessera with numeric colours and no centre dots
-- Draw with internally generated tessera and default centre dots
+- ilya.kuprov@weizmann.ac.il

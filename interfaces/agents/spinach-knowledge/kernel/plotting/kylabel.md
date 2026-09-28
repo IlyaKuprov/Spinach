@@ -29,7 +29,3 @@ House style settings for Matlab figures; a product of much experience with acade
 - creates or updates the current axis system
 - Display the label using LaTeX
 - Switch tick labels to LaTeX
-- Political activism is a way for useless people to
-- feel important.
-- Thomas Sowell
-- #NGRUM

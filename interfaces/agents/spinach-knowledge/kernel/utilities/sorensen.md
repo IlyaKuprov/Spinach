@@ -4,37 +4,33 @@
 
 ## Purpose
 
-Sorensen bound for the maximum transfer efficiency between two states under arbitrary control operators. Equation 186 from https://doi.org/10.1016/0079-6565(89)80006-8. Syntax: b=sorensen(rho_init,rho_targ)
+Computes the Sorensen bound for the maximum transfer efficiency between two states under arbitrary control operators (Equation 186 of https://doi.org/10.1016/0079-6565(89)80006-8).
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function diagonalises the initial and target matrices, sorts their eigenvalues in the same order, and computes
 
-## Numerical / algorithmic content
+`b = (sigma_init' * sigma_targ) / trace(rho_targ^2)`.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+This is an exact unitary bound. The amount reachable with realistically available instrumental controls may be smaller; see https://doi.org/10.1080/00268979909483117.
 
 ## Parameters / inputs
 
-- rho_init -initia ldensity matrix, Hilbert space
-- rho_targ -target density matrix, Hilbert space
-- Output:
-- b -Sorensen bound
-- Note: this is an exact unitary bound; the amount reachable
-- with realistically available instrumental controls
-- may be smaller, see the detailed analysis here:
+- `rho_init` — initial density matrix, Hilbert space.
+- `rho_targ` — target density matrix, Hilbert space.
+
+## Output
+
+- `b` — Sorensen bound.
 
 ## Implementation structure
 
-- Sorensen bound for the maximum transfer efficiency between
-- two states under arbitrary control operators. Equation 186
+The inputs must be numeric Hermitian matrices of the same size. The function checks these conditions, diagonalises both matrices, sorts their eigenvalues, and evaluates the bound above.
+
+Sorensen bound for the maximum transfer efficiency between two states under arbitrary control operators. Equation 186 from https://doi.org/10.1016/0079-6565(89)80006-8. Syntax: b=sorensen(rho_init,rho_targ)
+
 - from https://doi.org/10.1016/0079-6565(89)80006-8. Syntax:
-- b=sorensen(rho_init,rho_targ)
-- rho_init -initia ldensity matrix, Hilbert space
-- rho_targ -target density matrix, Hilbert space
-- Output:
-- b -Sorensen bound
-- Note: this is an exact unitary bound; the amount reachable
-- with realistically available instrumental controls
-- may be smaller, see the detailed analysis here:
-- Check consistency
+
+ilya.kuprov@weizmann.ac.il
+
+<https://spindynamics.org/wiki/index.php?title=sorensen.m>

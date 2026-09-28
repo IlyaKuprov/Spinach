@@ -4,39 +4,19 @@
 
 ## Purpose
 
-Saves pulses in Bruker format. The result is a text file with a list of amplitudes and phases, usable in TopSpin. Syntax: bruker_write(X,Y,dt,file_name)
+Writes a shaped pulse as a Bruker JCAMP text file for use in TopSpin. The routine converts the Cartesian pulse components to amplitude and phase, wraps phase into one turn and expresses it in degrees, and scales the amplitudes to Bruker's 0–100 range when the maximum amplitude is positive.
 
-## Physical / mathematical content
+## Inputs
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+- `X` — real numeric column vector of pulse components in Hz.
+- `Y` — real numeric column vector of pulse components in Hz, with the same number of elements as `X`.
+- `dt` — positive real scalar duration of each time slice, in seconds.
+- `file_name` — output filename as a character vector.
 
-## Numerical / algorithmic content
+## Output and file contents
 
-## Parameters / inputs
+The function writes an ASCII Bruker shape file. Its header includes the pulse duration in microseconds, the number of points, amplitude and phase ranges, and the JCAMP shape metadata. The data section contains one amplitude/phase pair per pulse point, followed by `##END`.
 
-- X -in-phase channel pulse amplitudes, a
-- column vector in Hz
-- Y -in-phase channel pulse amplitudes, a
-- column vector in Hz
-- dt -time slice duration, seconds
-- file_name -name of output file with .txt exten-
-- sion, a character string
+## Reference
 
-## Outputs
-
-- the function writes an ASCII text file
-
-## Implementation structure
-
-- Saves pulses in Bruker format. The result is a text file with a
-- list of amplitudes and phases, usable in TopSpin. Syntax:
-- bruker_write(X,Y,dt,file_name)
-- X -in-phase channel pulse amplitudes, a
-- column vector in Hz
-- Y -in-phase channel pulse amplitudes, a
-- dt -time slice duration, seconds
-- file_name -name of output file with .txt exten-
-- sion, a character string
-- the function writes an ASCII text file
-- Check consistency
-- Get amplitudes and phases
+[Spin Dynamics Wiki: `bruker_write.m`](https://spindynamics.org/wiki/index.php?title=bruker_write.m)

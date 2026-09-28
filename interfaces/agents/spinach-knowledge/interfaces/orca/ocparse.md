@@ -4,40 +4,21 @@
 
 ## Purpose
 
-ORCA cube file parser. Extracts the normalised probability density and the associated metric information from ORCA spin density in "3D simple format" (see ORCA manual). Syntax: [density,ext,dx,dy,dz]=ocparse(filename,pad_factor)
+Parses an ORCA cube file containing spin density in “3D simple format” and returns the normalised probability density and associated grid metrics.
 
-## Physical / mathematical content
+## Inputs
 
-- ORCA interfaces. They recover quantum-chemistry tensors and metadata and convert them to Spinach conventions.
+- `filename`: path to an existing cube file.
+- `pad_factor`: nonnegative integer scalar controlling zero-padding on each side of the grid.
 
-## Numerical / algorithmic content
+## Processing and outputs
 
-## Parameters / inputs
+The parser takes the absolute density values, arranges the density as `[X Y Z]`, normalises it by numerical integration, and zero-pads the grid according to `pad_factor`. It returns:
 
-- filename -character string specifying the file to load
-- pad_factor -padding factor specifying how many multiples
-- the array dimension in zeros to add on each
-- side of the cube
+- `density`: padded, normalised density.
+- `ext`: updated extents `[xmin xmax ymin ymax zmin zmax]` in Angstrom.
+- `dx`, `dy`, `dz`: grid steps in Angstrom.
 
-## Outputs
+## Source
 
-- density -probability density cube with dimensions
-- ordered as [X Y Z]
-- ext -grid extents in Angstrom, ordered as
-- [xmin xmax ymin ymax zmin zmax]
-- dx,dy,dz -grid steps in the three directions, Angstrom
-
-## Implementation structure
-
-- ORCA cube file parser. Extracts the normalised probability density and
-- the associated metric information from ORCA spin density in "3D simple
-- format" (see ORCA manual). Syntax:
-- [density,ext,dx,dy,dz]=ocparse(filename,pad_factor)
-- filename -character string specifying the file to load
-- pad_factor -padding factor specifying how many multiples
-- the array dimension in zeros to add on each
-- side of the cube
-- density -probability density cube with dimensions
-- ordered as [X Y Z]
-- ext -grid extents in Angstrom, ordered as
-- [xmin xmax ymin ymax zmin zmax]
+Ilya Kuprov, Elizaveta Suturina, and Petra Pikulova. [ocparse.m on the Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ocparse.m)

@@ -4,47 +4,21 @@
 
 ## Purpose
 
-Wigner D matrices, defined as (Brink & Satchler, Eq 2.13): D=expm(-1i*Lz*alp)*expm(-1i*Ly*bet)*expm(-1i*Lz*gam); where Lx, Ly, Lz are Pauli matrices. Syntax: D=wigner(l,alp,bet,gam)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Computes a Wigner D matrix using ZYZ Euler angles (Brink and Satchler, Eq. 2.13; Figures 1 and 2). The matrix represents `expm(-1i*L.z*alp)*expm(-1i*L.y*bet)*expm(-1i*L.z*gam)`, where `L` is obtained from `pauli(2*l+1)`.
 
 ## Parameters / inputs
 
-- l -rank of the Wigner matrix, may be half-integer
-- alp -alp Euler angle, radians
-- bet -bet Euler angle, radians
-- gam -gam Euler angle, radians
-- ZYZ convention is used for Euler angles, see Brink and Satchler,
-- Figures 1 and 2.
+- `l`: non-negative integer or half-integer rank.
+- `alp`, `bet`, `gam`: real scalar Euler angles in radians.
 
-## Outputs
+## Output
 
-- D -Wigner D matrix with rows and columns sorted
-- by descending ranks, for example (l=2):
-- [D( 2,2) ... D( 2,-2)
-- ... ... ...
-- D(-2,2) ... D(-2,-2)]
-- The output is to be used as y=D*x, where x is a column vector of
-- irreducible spherical tensor coefficients, listed vertically in
-- the order: T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2).
+- `D`: Wigner D matrix with rows and columns ordered by descending magnetic quantum number, from `l` to `-l`. For `l=2`, the first row runs from `D(2,2)` to `D(2,-2)`, and the last from `D(-2,2)` to `D(-2,-2)`. Apply it as `y=D*x` to a column of irreducible spherical tensor coefficients ordered `T(2,2)`, `T(2,1)`, `T(2,0)`, `T(2,-1)`, `T(2,-2)`.
 
-## Implementation structure
+## Implementation
 
-- Wigner D matrices, defined as (Brink & Satchler, Eq 2.13):
-- D=expm(-1i*Lz*alp)*expm(-1i*Ly*bet)*expm(-1i*Lz*gam);
-- where Lx, Ly, Lz are Pauli matrices. Syntax:
-- D=wigner(l,alp,bet,gam)
-- l -rank of the Wigner matrix, may be half-integer
-- alp -alp Euler angle, radians
-- bet -bet Euler angle, radians
-- gam -gam Euler angle, radians
-- ZYZ convention is used for Euler angles, see Brink and Satchler,
-- Figures 1 and 2.
-- D -Wigner D matrix with rows and columns sorted
-- by descending ranks, for example (l=2):
+Inputs are checked for the stated types and ranges. Ranks `l=1` and `l=2` use hard-coded matrices for speed; other ranks use the product of three matrix exponentials above.
+
+Source: <https://spindynamics.org/wiki/index.php?title=wigner.m>
+
+Contact: ilya.kuprov@weizmann.ac.il

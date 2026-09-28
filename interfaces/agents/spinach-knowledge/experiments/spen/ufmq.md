@@ -4,16 +4,17 @@
 
 ## Purpose
 
-Ultrafast multiple-quantum NMR, a literal implementation of Figure 1A from (http://dx.doi.org/10.1002/cphc.201800667). Syntax: fid=ufmq_nmr(spin_system,parameters,H,R,K,G,F) This sequence must be called from the imaging() context, which would provide H, R, K, G, and F. Parameters: parameters.spins nuclei on which the sequence runs parameters.dims size of the sample, m parameters.npts number of grid points parameters.
+Simulates the ultrafast multiple-quantum NMR sequence as a literal implementation of Figure 1A in (http://dx.doi.org/10.1002/cphc.201800667), and returns the acquired free induction decay (FID).
 
 ## Physical / mathematical content
 
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
+- The pulse sequence follows Figure 1A in (http://dx.doi.org/10.1002/cphc.201800667). Forms `L=H+F+1i*R+1i*K` and prepares the state with the source-defined 90-degree, delay, and 180-degree pulse sequence. The final preparation pulse depends on whether the requested multiple-quantum order is even or odd.
+- Selects the requested coherence order, applies chirp pulses with opposite encoding-gradient polarities, then selects single-quantum coherence for acquisition.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Applies the shaped chirp pulses by piecewise-constant propagation and builds propagators for the alternating acquisition-gradient periods.
+- Stores each loop's initial state and records the coil-detected signal point by point. Loop bodies use `parfor`; GPU arrays are used when enabled.
 
 ## Outputs
 
@@ -21,15 +22,5 @@ Ultrafast multiple-quantum NMR, a literal implementation of Figure 1A from (http
 
 ## Implementation structure
 
-- Ultrafast multiple-quantum NMR, a literal implementation of Figure 1A
-- from (http://dx.doi.org/10.1002/cphc.201800667). Syntax:
-- fid=ufmq_nmr(spin_system,parameters,H,R,K,G,F)
-- This sequence must be called from the imaging() context, which
-- would provide H, R, K, G, and F. Parameters:
-- parameters.spins nuclei on which the sequence runs
-- parameters.dims size of the sample, m
-- parameters.npts number of grid points
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
+- Checks the formalism and required inputs, then constructs the Liouvillian and chirp waveforms.
+- Executes the pulse preparation and multiple-quantum coherence selection, applies the gradient-encoded chirps, and generates an FID array with `npoints` rows and `nloops` columns.

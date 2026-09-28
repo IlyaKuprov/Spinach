@@ -4,32 +4,16 @@
 
 ## Purpose
 
-NOESY/EXSY experiment on phenylaziridine, including scalar relaxation of the second kind induced by the 14N nucleus, in a situation where the chemical exchange is intermediate, lines are broadened and scalar relaxation of the first kind must be accounted for. Set to reproduce Figures 1a and 4a from All parameters, except for the isotropic chemical shifts, exchange ra- tes and correlation times come from a DFT calcula
+Simulates a NOESY/EXSY experiment on phenylaziridine in the intermediate-exchange regime, where lines broaden and first-kind scalar relaxation must be included. The script is set to reproduce Figures 1a and 4a of the cited paper. All parameters except isotropic chemical shifts, exchange rates, and correlation times are taken from a DFT calculation; the source lists a calculation time of hours, faster on a GPU.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The spin system includes `1H` and quadrupolar `14N` nuclei. The model combines chemical exchange with second-kind scalar relaxation induced by nitrogen and accounts for first-kind scalar relaxation in this regime.
 
-## Numerical / algorithmic content
+## Reference
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+[doi:10.1002/ange.201410271](https://doi.org/10.1002/ange.201410271)
 
 ## Implementation structure
 
-- NOESY/EXSY experiment on phenylaziridine, including scalar relaxation
-- of the second kind induced by the 14N nucleus, in a situation where
-- the chemical exchange is intermediate, lines are broadened and scalar
-- relaxation of the first kind must be accounted for. Set to reproduce
-- Figures 1a and 4a from
-- All parameters, except for the isotropic chemical shifts, exchange ra-
-- tes and correlation times come from a DFT calculation.
-- Calculation time: hours, faster on a GPU.
-- Magnet induction
-- Isotopes
-- Coordinates (Angstrom)
-- 14N quadrupolar coupling
+Defines the molecular coordinates, isotopes, magnetic field, and `14N` quadrupolar coupling; runs the NOESY experiment and processes the resulting signal for display.

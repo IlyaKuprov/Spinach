@@ -4,34 +4,20 @@
 
 ## Purpose
 
-Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite()
+Checks spherical-geometry, quadrature, and grid-generation helpers against exact geometric and low-order integration references.
 
 ## Physical / mathematical content
 
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The suite treats directions as points on the unit sphere and checks spherical distances, areas, and solid-angle weights.
 
 ## Numerical / algorithmic content
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Cases include Gauss-Legendre exactness on low-degree polynomials, polar and Fibonacci grids, Voronoi solid angles, grid products, SHREWD weights, and seeded repulsion-grid invariants. Assertions cover point counts, bounds, unit vectors, positive or normalised weights, and geometric nullspaces where applicable.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks spherical arc and area formulae, Gauss-Legendre exactness,
-- polar-grid structure, spherical quadrature weights, Voronoi solid angles,
-- grid products, SHREWD weights, and seeded repulsion-grid invariants.
+`result` is the regression-test result with explanatory messages. The tested helpers include spherical arc and area formulae, Gauss-Legendre exactness, polar-grid structure, spherical quadrature weights, Voronoi solid angles, grid products, SHREWD weights, and seeded repulsion-grid invariants.
 
 ## Implementation structure
 
-- Tests grid and spherical geometry helpers. Syntax:
-- result=test_grid_geometry_suite()
-- result -regression test result with explanatory messages
-- The test checks spherical arc and area formulae, Gauss-Legendre exactness,
-- polar-grid structure, spherical quadrature weights, Voronoi solid angles,
-- grid products, SHREWD weights, and seeded repulsion-grid invariants.
-- Announce the test target
-- State the grid target of the test
-- Define Cartesian basis vectors on the unit sphere
-- Check spherical arc lengths between orthogonal and opposite points
-- Check the area of the positive-octant spherical triangle
-- Check spherical midpoint subdivision
+The suite first checks analytic spherical arc, triangle-area, and midpoint-subdivision examples, then quadrature and grid constructions. Further cases check polar-grid structure and its Laplacian nullspace, Fibonacci-grid vectors and Voronoi weights, products, SHREWD invariants, and seeded repulsion-grid properties.

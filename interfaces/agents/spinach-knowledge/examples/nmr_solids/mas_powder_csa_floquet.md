@@ -4,29 +4,12 @@
 
 ## Purpose
 
-Powder magic angle spinning spectrum of a single anisotropically shielded proton spin using a Floquet theory based formalism. Calculation time: seconds
+The source describes a powder MAS spectrum of a single anisotropically shielded proton, using a Floquet-based formalism. It estimates seconds.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The implementation sets a 14.1 T field and declares two `1H` spins, with separate shielding eigenvalue sets `[-2 -2 4]-5` and `[-1 -3 4]+5` and zero Euler angles. Thus, the header's “single” proton description does not match the two-spin system declaration. The MAS rate is 500 Hz about `[1 1 1]`; the Floquet grid is `leb_2ang_rank_17`, with maximum rank 17.
 
-## Numerical / algorithmic content
+## Implementation
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a single anisotropically shielded
-- proton spin using a Floquet theory based formalism.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The function runs `floquet` with `@acquire`, applies exponential apodisation (6), zero-fills the 512-point FID to 4096 points, Fourier transforms, and plots the real spectrum. The sweep is 20 kHz, with zero offset and inverted ppm axis.

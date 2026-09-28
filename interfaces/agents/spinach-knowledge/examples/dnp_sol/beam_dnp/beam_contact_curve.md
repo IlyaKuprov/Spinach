@@ -4,27 +4,8 @@
 
 ## Purpose
 
-The transformation of -E_z into I_z during the contact time of the BEAM DNP experiment. Further information in: Calculation time: seconds
+Plots the proton `I_z` expectation during a BEAM DNP contact, showing the transformation of electron `-E_z` into nuclear `I_z`. The experiment is described in [the associated Science Advances paper](https://doi.org/10.1126/sciadv.abq0536); the source estimates seconds to run.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- The transformation of -E_z into I_z during the contact time of the
-- BEAM DNP experiment. Further information in:
-- Calculation time: seconds
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Basis set
-- Spinach housekeeping
-- Detection state
-- Experiment parameters
+At 0.3483 T (X-band), the model contains one electron and two protons, with a trityl g tensor, proton Zeeman estimates, coordinates, and spin temperature 80 K. It uses a full Zeeman-Hilbert basis and proton `Lz` detection. The powder-averaged BEAM sequence uses a `rep_2ang_800pts_sph` grid, 165 blocks, pulse durations 20.0 and 28.7 ns, 32 MHz electron nutation frequency, and the source's stated offsets and reference point. The plotted observable is the real proton-detection signal versus contact time.

@@ -4,57 +4,32 @@
 
 ## Purpose
 
-HCCH-COSY pulse sequence from Figure 7.26a of Protein NMR Spectroscopy (2nd edition) using the bidirectional propagation method described in The sequence is hard-wired to work on 1H,13C proteins and uses PDB la- bels to select spins that will be affected by otherwise ideal pulses. F1 is 1H, F2 is C, F3 is H. Syntax: fid=hcch_cosy(spin_system,parameters,H,R,K)
+HCCH-COSY pulse sequence from Figure 7.26a of the second edition of *Protein NMR Spectroscopy*. It uses the bidirectional propagation method described in [the cited paper](http://dx.doi.org/10.1016/j.jmr.2014.04.002), with ideal pulses selected using PDB atom labels. The sequence is hard-wired for 1H and 13C proteins; F1, F2, and F3 are 1H, 13C, and 1H, respectively.
 
 ## Physical / mathematical content
 
-- Protein triple-resonance sequence implementations. They orchestrate heteronuclear coherence transfers across biomolecular spin networks while preserving phase and acquisition conventions.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The sequence starts from 1H longitudinal magnetisation, forms positive and negative 1H coherence for F1, and propagates the two branches through the 1H-13C transfer periods. Detection is on 1H; the backward half uses an adjoint propagation and the requested F3 decoupling. The two halves are stitched for the 13C States quadrature and the three dimensions are returned in F3-F2-F1 order.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The code derives `tau_ch = 1/(4 J_ch)` and `tau_cc = 1/(8 J_cc)`, and sets `DELTA = tau_cc - delta`. Evolution uses `L = H + iR + iK`.
 
 ## Parameters / inputs
 
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
-- parameters.J_cc -13C-13C J-coupling to be used for mag-
-- netisation transfer, typically 35 Hz
-- parameters.J_ch -1H-13C J-coupling to be used for mag-
-- netisation transfer, typically 140 Hz
-- parameters.delta -evolution delay, see the pulse sequence
-- diagram, typically 1.1e-3 seconds.
-- parameters.decouple_f3 -list of spins to be decoupled during
-- the detection period, typically {'13C'}
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.npoints`: three positive integer point counts ordered as [t1 t2 t3].
+- `parameters.sweep`: three positive sweep widths in Hz ordered as [f1 f2 f3].
+- `parameters.spins`: must be `{'1H','13C','1H'}`.
+- `parameters.J_cc`: positive 13C-13C coupling in Hz; the source comment gives 35 Hz as typical.
+- `parameters.J_ch`: positive 1H-13C coupling in Hz; the source comment gives 140 Hz as typical.
+- `parameters.delta`: positive evolution delay in seconds, shorter than `1/(8 J_cc)`; the source comment gives 1.1 ms as typical.
+- `parameters.decouple_f3`: cell array of isotope strings to decouple during F3 acquisition; the source comment gives `{'13C'}` as typical.
+- `H`: Hamiltonian matrix; `R`: relaxation superoperator; `K`: kinetics superoperator, supplied by the context function with matching dimensions.
+- The spin-system labels must use PDB atom IDs such as CA, HA, and C for selective pulse operations.
 
 ## Outputs
 
-- fid -a structure with four fields: fid.pos_pos, fid.pos_neg,
-- fid.neg_pos, fid.neg_neg that are used in the subsequ-
-- ent States quadrature processing
-- Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
-- sys.labels for this sequence to work properly.
+Returns `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the four sign combinations used in subsequent States quadrature processing.
 
-## Implementation structure
+## References
 
-- HCCH-COSY pulse sequence from Figure 7.26a of Protein NMR Spectroscopy
-- (2nd edition) using the bidirectional propagation method described in
-- The sequence is hard-wired to work on 1H,13C proteins and uses PDB la-
-- bels to select spins that will be affected by otherwise ideal pulses.
-- F1 is 1H, F2 is C, F3 is H. Syntax:
-- fid=hcch_cosy(spin_system,parameters,H,R,K)
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
+- *Protein NMR Spectroscopy*, 2nd edition, Figure 7.26a.
+- [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002)
+- [Spin Dynamics Wiki: hcch_cosy.m](https://spindynamics.org/wiki/index.php?title=hcch_cosy.m)

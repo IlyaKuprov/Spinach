@@ -4,35 +4,20 @@
 
 ## Purpose
 
-Voronoi tessellation of a 2D COMSOL mesh. Syntax: mesh=mesh_vorn(mesh)
+Computes a Voronoi tessellation of a two-dimensional COMSOL mesh and stores cells for the active vertices.
 
-## Physical / mathematical content
+## Behavior
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
-
-## Numerical / algorithmic content
-
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The routine calls MATLAB `voronoin` on the mesh coordinates, retains cells indexed by `mesh.idx.active`, and stops with an error if any retained cell is unbounded. It computes each retained cell's polygon area and stores the areas as Voronoi weights, along with the tessellation vertices and cells, cell count, and maximum cell size.
 
 ## Parameters / inputs
 
-- mesh -Spinach mesh object
+- `mesh`: Spinach mesh object containing coordinates and an active-vertex index list.
 
-## Outputs
+## Output
 
-- mesh -updated mesh object
+- `mesh`: updated mesh object with Voronoi tessellation and area-weight data in `mesh.vor`.
 
-## Implementation structure
+## Source
 
-- Voronoi tessellation of a 2D COMSOL mesh. Syntax:
-- mesh=mesh_vorn(mesh)
-- mesh -Spinach mesh object
-- mesh -updated mesh object
-- Check consistency
-- Run Voronoi tessellation of the mesh
-- Keep only active cells
-- Refuse unbounded active cells
-- Voronoi cell area calculation
-- Add weights to mesh structure
-- Find the maximum number of vertices making up the cell
-- Consistency enforcement
+[Spinach Wiki: mesh_vorn.m](https://spindynamics.org/wiki/index.php?title=mesh_vorn.m)

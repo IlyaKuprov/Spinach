@@ -4,41 +4,18 @@
 
 ## Purpose
 
-Tests remaining dynamic optimal-control helper paths. Syntax: result=test_dynamic_optimcon_remaining()
+Regression-tests remaining dynamic optimal-control helpers using small deterministic fixtures. Returns a test result with explanatory messages.
 
-## Physical / mathematical content
+## Test coverage
 
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test covers the remaining optimcon helpers with small deterministic
-- fixtures: waveform distortions, FIR kernel estimation, quasi-Newton
-- updates, Hessian handling, waveform utilities, GRAPE wrappers, Liouville
-- GRAPE derivatives, TGRAPE duration gradients, fmaxnewton zero-iteration
-- handling, and diagnostic plotting smoke paths.
+- Checks two-channel waveform distortions: identity mapping, non-orthogonal channel mixing at 60 degrees, causal complex FIR filtering, single-pole and single-zero filtering, and phase-preserving tanh and root-sigmoid amplitude compression. Compares returned Jacobians with centred finite-difference directional derivatives.
+- Tests causal FIR kernel estimation using `backslash`, `pinv`, `svd`, and Tikhonov-regularised solver paths, plus `same` alignment.
+- Checks BFGS Hessian updates and bad-curvature safeguards, BFGS history reconstruction, LBFGS inverse-Hessian action, Hessian ordering, and regularisation of an indefinite Hessian to positive definiteness.
+- Tests frequency-amplitude-phase-time conversion on a supplied grid; instantaneous-frequency recovery for a quadratic-phase signal; and masking of finite-difference stencils containing weak or zero-magnitude samples.
+- Checks drift extraction from a two-member context ensemble and trapezium-product auxiliary matrices, including left and right directional-derivative blocks and mixed-derivative matrix sizes. Exercises Cartesian-control plotting offscreen and verifies plotted instantaneous frequency for a linear-phase signal.
+- Compares ensemble GRAPE fidelity and gradient with the Cartesian wrapper, checks identity curvilinear coordinates, and compares phase-control gradients with centred finite differences.
+- Checks that `fmaxnewton` with zero maximum iterations returns its initial point without iterations or derivative calls. Tests finite Liouville-space GRAPE fidelity, gradient, and Hessian values, gradient agreement with centred finite differences, and Hessian symmetry for a real fidelity. Checks TGRAPE duration gradients against centred finite differences and verifies finite cooperative-GRAPE outputs and gradient shape.
 
 ## Implementation structure
 
-- Tests remaining dynamic optimal-control helper paths. Syntax:
-- result=test_dynamic_optimcon_remaining()
-- result -regression test result with explanatory messages
-- The test covers the remaining optimcon helpers with small deterministic
-- fixtures: waveform distortions, FIR kernel estimation, quasi-Newton
-- updates, Hessian handling, waveform utilities, GRAPE wrappers, Liouville
-- GRAPE derivatives, TGRAPE duration gradients, fmaxnewton zero-iteration
-- handling, and diagnostic plotting smoke paths.
-- Announce the test target
-- State the dynamic optimal-control target of the test
-- Ensure that a parallel pool is available for the ensemble loop
-- Run independent groups of small checks
+The test ensures a parallel pool is available, then runs independent distortion, quasi-Newton, waveform-utility, and GRAPE-family check groups. Local helper functions construct reference waveforms, small control-system fixtures, and finite-difference comparisons.

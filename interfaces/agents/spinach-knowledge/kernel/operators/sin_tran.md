@@ -4,38 +4,33 @@
 
 ## Purpose
 
-Single transition operators, spanning the space of matri- ces of the specified dimension. The set is returned as a cell array of sparse matrices using serpentine indexing where the position in the cell array maps in the follow- ing way to the location of the single non-zero: (1) (3) (6) (10) (2) (5) (9) (13) (4) (8) (12) (15) (7) (11) (14) (16) and likewise for larger matrices. Syntax: A=sin_tran(dim)
+Returns single-transition operators spanning the space of matrices of dimension `dim`. Each operator is a sparse matrix with one nonzero entry; the cell array uses serpentine indexing.
 
 ## Physical / mathematical content
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+For a 4-by-4 matrix, cell-array positions map to matrix entries as follows:
+
+```text
+ 1   3   6  10
+ 2   5   9  13
+ 4   8  12  15
+ 7  11  14  16
+```
+
+The pattern continues for larger matrices.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The function allocates a `dim^2`-element cell array and constructs each operator as a sparse matrix with one unit entry. Operators are converted to complex type to avoid expensive reallocations later. Construction uses `parfor`.
 
 ## Parameters / inputs
 
-- dim -dimension of the matrices
+- `dim` — matrix dimension; must be a positive real integer.
 
 ## Outputs
 
-- A -a cell array of matrices, structured
-- as described above; matrices are re-
-- turned as complex to avoid expensive
-- reallocations later
+- `A` — cell array of `dim^2` complex sparse matrices, ordered as shown above.
 
-## Implementation structure
+## Reference
 
-- Single transition operators, spanning the space of matri-
-- ces of the specified dimension. The set is returned as a
-- cell array of sparse matrices using serpentine indexing
-- where the position in the cell array maps in the follow-
-- ing way to the location of the single non-zero:
-- (1) (3) (6) (10)
-- (2) (5) (9) (13)
-- (4) (8) (12) (15)
-- (7) (11) (14) (16)
-- and likewise for larger matrices. Syntax:
-- A=sin_tran(dim)
-- dim -dimension of the matrices
+<https://spindynamics.org/wiki/index.php?title=sin_tran.m>

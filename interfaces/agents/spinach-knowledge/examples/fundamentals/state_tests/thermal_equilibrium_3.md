@@ -8,23 +8,12 @@ Test of the thermal equilibrium functionality against the textbook expressions f
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+Uses an X-band field of 0.34 T and a trityl electron with two protons. The example specifies anisotropic Zeeman principal values and Euler orientations, Cartesian coordinates, and a spin temperature of 80 K.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+For each of `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`, it computes the equilibrium state and the three spins' `Lz` expectation values. These are checked against textbook values formed from `levelpop` Boltzmann populations; each relative difference must be at most `1e-3`.
 
 ## Implementation structure
 
-- Test of the thermal equilibrium functionality against the
-- textbook expressions for the Boltzmann populations.
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Formalisms to test
-- Loop over formalisms
-- Formalism and basis set
-- Spinach housekeeping
-- Isotropic thermal equilibrium
+The loop creates the basis and equilibrium state for each formalism, evaluates the three observables, and compares Spinach results with the population-based expressions.

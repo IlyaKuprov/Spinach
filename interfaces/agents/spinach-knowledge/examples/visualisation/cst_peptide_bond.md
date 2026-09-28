@@ -4,19 +4,8 @@
 
 ## Purpose
 
-Example of shielding tensor visualisation for a peptide bond. Gaussian log is parsed. Note: antisymmetric components of the shielding ten- sors are ignored.
+Read the alanine Gaussian log at `../standard_systems/amino_acids/ala.log` and visualise the carbon, proton, and nitrogen shielding tensors. The source notes that antisymmetric shielding-tensor components are ignored.
 
-## Physical / mathematical content
+## Implementation
 
-- Visualisation examples. These scripts expose tensor geometry: principal axes, shielding/hyperfine/EFG ellipsoids, molecular frames, and the relationship between tensor eigenstructure and observable anisotropy.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Example of shielding tensor visualisation for a peptide
-- bond. Gaussian log is parsed.
-- Note: antisymmetric components of the shielding ten-
-- sors are ignored.
-- Read the Gaussian log
-- Do the visualisation
+The script parses the log with `gparse`, then makes a three-panel figure using `cst_display` in harmonic style. It selects C, H, and N in turn, passing display parameters `0.01`, `0.05`, and `0.01`, respectively.

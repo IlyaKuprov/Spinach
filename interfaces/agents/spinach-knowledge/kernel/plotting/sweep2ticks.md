@@ -4,33 +4,31 @@
 
 ## Purpose
 
-Converts offset-sweep-npoints specification into axis ticks in Hz. The function returns the frequency axis of the spectrum, suitable for use in Matlab functions like plot(). Syntax: axis_hz=sweep2ticks(offs,sweep,npoints)
+Converts an offset, sweep width, and point count into a frequency axis in Hz, suitable for use with MATLAB plotting functions such as `plot()`.
 
 ## Physical / mathematical content
 
+The axis is centered on `offs` and runs from `offs+sweep/2` to `offs-sweep/2`, with `npoints` evenly spaced ticks.
+
 ## Numerical / algorithmic content
+
+The column vector is constructed as `axis_hz=-linspace(-sweep/2,sweep/2,npoints)'+offs`.
 
 ## Parameters / inputs
 
-- offs -offset from carrier frequency, Hz
-- sweep -sweep width, Hz
-- npoints -number of points in the spectrum
+- `offs` — offset from carrier frequency, Hz; must be a real numeric scalar.
+- `sweep` — sweep width, Hz; must be a real numeric scalar.
+- `npoints` — number of points in the spectrum; must be a real numeric scalar integer of at least 1.
 
 ## Outputs
 
-- axis_hz -a column vector of axis ticks, Hz
+- `axis_hz` — column vector of frequency-axis ticks, Hz.
 
 ## Implementation structure
 
-- Converts offset-sweep-npoints specification into axis ticks in Hz.
-- The function returns the frequency axis of the spectrum, suitable
-- for use in Matlab functions like plot(). Syntax:
-- axis_hz=sweep2ticks(offs,sweep,npoints)
-- offs -offset from carrier frequency, Hz
-- sweep -sweep width, Hz
-- npoints -number of points in the spectrum
-- axis_hz -a column vector of axis ticks, Hz
-- Check consistency
-- Build the axis
-- Consistency enforcement
-- Spinach code is clear, useful and elegant because the program is the
+- Calls `grumble(offs,sweep,npoints)` to check the inputs.
+- Builds the axis using `linspace`, transposes it into a column vector, reverses its direction, and adds the offset.
+
+## Reference
+
+- [Spinach documentation: sweep2ticks.m](https://spindynamics.org/wiki/index.php?title=sweep2ticks.m)

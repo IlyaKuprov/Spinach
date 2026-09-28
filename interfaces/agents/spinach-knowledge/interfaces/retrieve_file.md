@@ -4,33 +4,18 @@
 
 ## Purpose
 
-Retrieves a file from an HTTPS link and stores it in a user- specified directory. Syntax: file_path=retrieve_file(file_url,file_name,dest_dir)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
+Retrieves a file from an HTTPS URL and stores it in a specified directory.
 
 ## Parameters / inputs
 
-- file_url -HTTPS URL pointing to the file to retrieve
-- file_name -name of the file to be stored on disk
-- dest_dir -destination directory for the downloaded file
+- `file_url` — HTTPS URL pointing to the file to retrieve. Must be a character array or scalar string and begin with the literal scheme `https://`.
+- `file_name` — name to use for the stored file. Must be a non-empty character array or scalar string.
+- `dest_dir` — destination directory for the downloaded file. Must be a non-empty character array or scalar string.
 
 ## Outputs
 
-- file_path -full path of the downloaded file on disk
+- `file_path` — full path of the downloaded file on disk.
 
 ## Implementation structure
 
-- Retrieves a file from an HTTPS link and stores it in a user-
-- specified directory. Syntax:
-- file_path=retrieve_file(file_url,file_name,dest_dir)
-- file_url -HTTPS URL pointing to the file to retrieve
-- file_name -name of the file to be stored on disk
-- dest_dir -destination directory for the downloaded file
-- file_path -full path of the downloaded file on disk
-- Check consistency
-- Ensure destination directory exists
-- Create destination directory
-- Build destination path
-- Retrieve the file
+The function checks the inputs, creates `dest_dir` if it does not exist, builds `file_path` with `fullfile(dest_dir,file_name)`, and downloads the file using `websave(file_path,file_url)`.

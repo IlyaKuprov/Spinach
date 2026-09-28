@@ -12,45 +12,25 @@ Volume isosurface plotting utility with non-linear adaptive surface spacing. The
 
 ## Parameters / inputs
 
-- spectrum -a real cube containing the 3D NMR spectrum
-- parameters.sweep -three sweep widths, Hz
-- parameters.spins -cell array with three character
-- strings specifying the working
-- spins.
-- parameters.offset -three transmitter offsets, Hz
-- parameters.axis_units -axis units ('ppm','Hz','Gauss')
-- nsurf -the number of surfaces, a reasonable value is 20
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the surfaces above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive surfa-
-- ces and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the surface
-- spacing function: k=1 corresponds to linear spacing and
-- k>1 bends the spacing curve to increase the sampling den-
-- sity near the baseline. A reasonable value is 2.
-- signs -can be set to 'positive', 'negative' or 'both' -this
-- will cause the corresponding surfaces to be plotted.
+- `spectrum` — real cube containing the 3D NMR spectrum.
+- `parameters.sweep` — three sweep widths, Hz.
+- `parameters.spins` — cell array of three character strings specifying the working spins.
+- `parameters.offset` — three transmitter offsets, Hz.
+- `parameters.axis_units` — `ppm`, `Hz`, or `Gauss`.
+- `parameters.npoints` and `parameters.zerofill` — each a three-element vector of finite positive integers; spectrum dimensions must match `parameters.zerofill`.
+- `nsurf` — number of surfaces (20 is a reasonable value).
+- `delta` — minimum and maximum surface elevations as fractions of total intensity; the first pair applies to positive surfaces and the second to negative ones. A suggested starting value is `[0.02 0.2 0.02 0.2]`.
+- `k` — controls surface-spacing curvature: 1 is linear; values above 1 increase sampling near the baseline. A reasonable value is 2.
+- `signs` — `positive`, `negative`, or `both`, selecting which surfaces to plot.
 
 ## Outputs
 
-- this function creates a figure
-- Note: the following functions are used to compute surface levels:
-- cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-- cont_levs_neg=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
-- where smin and smax are computed from the spectrum cube.
+- Creates a figure showing the 3D isosurfaces and projections onto the coordinate planes.
 
 ## Implementation structure
 
-- Volume isosurface plotting utility with non-linear adaptive surface
-- spacing. The function plots the 3D volume and the three projections
-- onto the coordinate planes. Syntax:
-- plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)
-- spectrum -a real cube containing the 3D NMR spectrum
-- parameters.sweep - three sweep widths, Hz
-- parameters.spins - cell array with three character
-- strings specifying the working
-- spins.
-- parameters.offset - three transmitter offsets, Hz
-- parameters.axis_units - axis units ('ppm','Hz','Gauss')
-- nsurf -the number of surfaces, a reasonable value is 20
+- Validates the real spectrum cube and plotting parameters, then derives surface levels with `contspacing`.
+- Builds and converts frequency axes, draws the isosurfaces, and labels the 3D plot.
+- Produces F3–F2, F2–F1, and F3–F1 projections by summing the spectrum along dimensions 1, 3, and 2, respectively, and plots each projection with `plot_2d` using 20 contour levels, independently of `nsurf`.
+
+[Source reference](https://spindynamics.org/wiki/index.php?title=plot_3d.m)

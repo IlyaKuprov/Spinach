@@ -4,70 +4,23 @@
 
 ## Purpose
 
-Nutation frequency distribution from a nutation curve measured with the same coil used for excitation and detection. Syntax: [freq,distr]=nutation_dist(curve,dt,lambda)
+Estimate a nutation frequency distribution from a nutation curve measured with the same coil for excitation and detection. The result is a non-negative, unit-integral density obtained by fitting the curve rather than taking a raw finite-time transform.
 
-## Physical / mathematical content
+## Inputs
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- curve -nutation curve, a row or column vector; either
-- the complex X+iY output of a quadrature receiver,
-- or a real phase-corrected trace
-- dt -sampling interval in seconds
-- lambda -second-derivative Tikhonov regularisation para-
-- meter, a non-negative real scalar; the curve is
-- normalised to unit maximum modulus and the fit-
-- ting kernel is dimensionless, so lambda is a di-
-- mensionless number of the order of the ratio of
-- the squared Frobenius norms of the kernel and of
-- the second difference matrix; zero switches the
-- regularisation off
+- `curve` — nutation curve as a row or column vector: either the complex `X+iY` output of a quadrature receiver or a real phase-corrected trace. It must be numeric, finite, nonzero, and contain at least eight points.
+- `dt` — sampling interval in seconds; a positive real scalar.
+- `lambda` — second-derivative Tikhonov regularisation parameter; a non-negative real scalar. Zero disables regularisation. The curve is normalised to unit maximum modulus and the fitting kernel is dimensionless, so `lambda` is dimensionless and is of the order of the ratio of the squared Frobenius norms of the kernel and the second-difference matrix.
 
 ## Outputs
 
-- freq -nutation frequency grid in rad/s, a column vector
-- distr -non-negative nutation frequency density in inverse
-- rad/s, normalised to unit integral over freq
-- Notes: when one coil both excites and detects, the reciprocity
-- principle makes the detected amplitude of every isochromat
-- proportional to its own nutation frequency, and only the
-- sine component of the nutation is observable. The curve is
-- therefore modelled as an unknown complex receiver scale
-- times
-- s(t)=integral(distr(freq)*freq*sin(freq*(t+t0)),d freq)
-- and the reception weight is divided out, so that the
-- returned density is the true nutation frequency distribu-
-- tion. A real receiver scale is a valid special case, and
-- a phase-corrected real trace is therefore accepted. The
-- frequency support, receiver phase, and sub-sample time
-- shift are selected from the supplied trace; the returned
-- density is therefore a stable estimate rather than a raw
-- finite-time transform. The reconstruction runs on twice
-- the noise-limited support width, centred on the same band
-- and clipped to the Nyquist interval, so that the margins
-- of the distribution are visible rather than truncated.
+- `freq` — nutation frequency grid in rad/s, returned as a column vector.
+- `distr` — non-negative nutation frequency density in inverse rad/s, normalised to unit integral over `freq`.
 
-## Implementation structure
+## Model and method
 
-- Nutation frequency distribution from a nutation curve measured with
-- the same coil used for excitation and detection. Syntax:
-- [freq,distr]=nutation_dist(curve,dt,lambda)
-- curve -nutation curve, a row or column vector; either
-- the complex X+iY output of a quadrature receiver,
-- or a real phase-corrected trace
-- dt -sampling interval in seconds
-- lambda -second-derivative Tikhonov regularisation para-
-- meter, a non-negative real scalar; the curve is
-- normalised to unit maximum modulus and the fit-
-- ting kernel is dimensionless, so lambda is a di-
-- mensionless number of the order of the ratio of
+When one coil both excites and detects, reciprocity makes the detected amplitude of each isochromat proportional to its nutation frequency; only the sine component is observable. The measured curve is modelled as an unknown complex receiver scale times `s(t)=integral(distr(freq)*freq*sin(freq*(t+t0)),d freq)`. The fit divides out this reception weight to recover the nutation frequency distribution. A real receiver scale is a valid special case, allowing a phase-corrected real trace.
+
+The routine normalises the signal, estimates noise from its second difference, and uses a faded, zero-filled Fourier spectrum to identify noise-limited frequency support. It doubles that support width about the same centre, subject to the `0` to `pi/dt` Nyquist interval, so the distribution margins remain visible. A frequency grid of 160 to 400 points is then fitted with non-negative least squares and a second-difference Tikhonov penalty. The fit selects receiver phase and a sub-sample time-origin shift from the supplied trace before converting fitted weights to a unit-integral density. If the curve contains no resolvable frequency range, the routine reports an error.
+
+Source: <https://spindynamics.org/wiki/index.php?title=nutation_dist.m>

@@ -4,41 +4,21 @@
 
 ## Purpose
 
-Dot and bracket property specifications for the tensor train class.
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Syntax
-
-```matlab
-answer=subsref(ttrain,reference)
-```
+Handle dot-property access, matrix-element extraction, and nested indexing for the tensor-train class.
 
 ## Parameters / inputs
 
-- ttrain -tensor train object
-- reference -Matlab subscript reference structure
+- `ttrain` — tensor train object.
+- `reference` — MATLAB subscript-reference structure.
 
 ## Outputs
 
-- answer -requested tensor train property, scalar
-- matrix element, or nested subscript result
+- `answer` — the requested property, matrix element, or result of nested indexing.
 
-## Implementation structure
+## Implementation
 
-- Dot and bracket property specifications for the tensor train class.
-- answer=subsref(ttrain,reference)
-- ttrain -tensor train object
-- reference -Matlab subscript reference structure
-- answer -requested tensor train property, scalar
-- matrix element, or nested subscript result
-- Methods and properties
-- Return the output requested
-- Matrix element extraction
-- Start with zero
-- Convert indices
-- Multiply up the tensor train
+For dot references, the supported properties are `ncores`, `ntrains`, `sizes`, `ranks`, `coeff`, `cores`, and `tolerance`; other field names raise an error. Parenthesis references require exactly two scalar indices. Logical indices are converted to numeric values, then row and column indices are validated against the tensor dimensions and converted to core indices. For each train, the function contracts the selected entries through the cores, multiplies by that train's coefficient, and sums the contributions. Advanced indexing is not implemented. Additional reference levels are applied recursively to the result.
+
+## Source
+
+D. Savostyanov and I. Kuprov, [`ttclass/subsref.m`](https://spindynamics.org/wiki/index.php?title=ttclass/subsref.m).

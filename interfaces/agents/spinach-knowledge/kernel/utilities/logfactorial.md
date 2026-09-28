@@ -8,9 +8,11 @@ Logarithm of the factorial function. Avoids complications with factorials of lar
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Computes `log(n!)` for non-negative integers without constructing factorials that can overflow double precision.
 
 ## Numerical / algorithmic content
+
+- Evaluates MATLAB `gammaln(n+1)` element-wise.
 
 ## Parameters / inputs
 
@@ -25,15 +27,4 @@ Logarithm of the factorial function. Avoids complications with factorials of lar
 
 ## Implementation structure
 
-- Logarithm of the factorial function. Avoids complications with
-- factorials of large numbers overflowing 64-bit numbers. Syntax:
-- lf=logfactorial(n)
-- n -non-negative integer number
-- lf -logarithm of the factorial of n
-- Clebsch-Gordan coefficients and other objects that in-
-- volve factorials.
-- Check consistency
-- Use the built-in log(gamma(n)) function
-- Consistency enforcement
-- For ten years or so, my name was "that jerk". But
-- that was a promotion. Before, I was "Who's he?"
+- Validates that every element of `n` is a non-negative integer, then returns `gammaln(n+1)`.

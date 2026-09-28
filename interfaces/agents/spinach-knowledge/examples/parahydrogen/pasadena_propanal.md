@@ -4,28 +4,16 @@
 
 ## Purpose
 
-PASADENA experiment simulation for the parahydrogenation of acrolein into propanal. Calculation time: seconds
+Simulates a PASADENA spectrum for parahydrogenation of acrolein to propanal. The source gives a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Parahydrogen examples. The physical motif is highly non-Boltzmann singlet order imported from para-H2 and converted into observable nuclear magnetisation through hydrogenation, exchange, or catalytic transfer processes.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The six-spin system models the propanal product at 7.05 T using the specified proton chemical shifts and scalar couplings. It uses the spherical-tensor Liouville formalism with no basis approximation and the `S3` and `S2` symmetry groups on spins 1–3 and 4–5. The initial state is the `Lz` product on spins 1 and 4.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The proton liquid-state acquisition uses a `pi/4` pulse, 500 ppm offset, 1000 ppm sweep, 1024 points, and 8192-point zero filling. The FID is Gaussian-apodised with parameter 10, Fourier transformed, and plotted.
 
 ## Implementation structure
 
-- PASADENA experiment simulation for the parahydrogenation of acrolein
-- into propanal.
-- Calculation time: seconds
-- Spin system
-- Magnetic field
-- Chemical shifts
-- Scalar couplings
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+The script defines six proton isotopes, the field and scalar interaction data, creates the symmetry-adapted basis, and runs `liquid` with `hp_acquire` before signal processing.

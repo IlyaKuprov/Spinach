@@ -4,23 +4,12 @@
 
 ## Purpose
 
-Forces GPU arithmetic to be turned off even if the user had requested it in sys.enable setting; restore previous state using end_disallow_gpu command.
+Temporarily disable GPU use when it is enabled in `spin_system.sys.enable`, preserving the previous state for `end_disallow_gpu`.
 
-## Physical / mathematical content
+## Behaviour
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+The include records whether `'gpu'` is present in `spin_system.sys.enable` as `user_wanted_gpu` and always reports a programmer-requested GPU-disallow warning. If GPU use was enabled, it removes `'gpu'` from the enable list.
 
-## Numerical / algorithmic content
+## Source documentation
 
-## Implementation structure
-
-- Forces GPU arithmetic to be turned off even if the user had
-- requested it in sys.enable setting; restore previous state
-- using end_disallow_gpu command.
-- Check if GPU is currently enabled
-- Disable GPU if it had been enabled
-- Once at MIT, I saw a frat bro accidentally smear a line all over the
-- table. Somehow he still managed to snort the whole thing. He looked
-- me square in the eyes and said "same high bro, Stokes theorem".
-- Internet folklore
-- #NHEAD #NGRUM
+https://spindynamics.org/wiki/index.php?title=start_disallow_gpu.m

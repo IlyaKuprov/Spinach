@@ -4,65 +4,27 @@
 
 ## Purpose
 
-Solid effect DNP experiment, computed using the large-scale formalism described in (http://dx.doi.org/10.1039/C2CP23233B). The system is re- stricted to one electron and one nucleus type, but the number of nuc- lei may be very large. Syntax: answer=solid_effect(spin_system,parameters)
+Simulate solid-effect dynamic nuclear polarisation with the large-scale formalism described in the cited paper. The model requires exactly one electron and one nuclear spin type, but can include many nuclei.
 
-## Physical / mathematical content
+## Method
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The function constructs the `H+`, `H0`, and `H-` Hamiltonian components, includes the microwave terms, and combines them using either the exact electron rotating-frame Hamiltonian or the selected average-Hamiltonian theory. It starts from thermal equilibrium and computes the requested output: a time-dependent coil signal, a steady-state signal, or a trajectory. It builds its own Liouvillian and must be called directly, without a context wrapper.
 
 ## Parameters / inputs
 
-- parameters.mw_pwr -microwave power in rad/s
-- parameters.theory -level of theory. Set to 'exact' for
-- the electron rotating frame calcula-
-- tion or to any of the following six
-- options for the average Hamiltonian
-- theory calculation on top of the el-
-- ectron + nuclear rotating frame:
-- 'ah_first_order', 'ah_second_order',
-- 'ah_third_order', 'kb_first_order',
-- 'kb_second_order', 'kb_third_order'.
-- See average.m function for the mea-
-- ning of these options.
-- parameters.nuclear_frq -nuclear Zeeman frequency in rad/s
-- parameters.calc_type -set to 'time_dependence' to get the
-- time dependence of the longitudinal
-- magnetization and to 'steady_state'
-- to get the asymptotic longitudinal
-- magnetization.
-- parameters.time_step -if 'time_dependence' is set in the
-- calc_type parameter, sets the time
-- step, seconds.
-- parameters.n_steps -if 'time_dependence' is set in the
-- calc_type parameter, sets the num-
-- ber of time steps.
+- `parameters.mw_pwr` — microwave power, in rad/s.
+- `parameters.theory` — `exact`, `ah_first_order`, `ah_second_order`, `ah_third_order`, `kb_first_order`, `kb_second_order`, `kb_third_order`, or `matrix_log`. See `average.m` for the average-Hamiltonian options.
+- `parameters.nuclear_frq` — nuclear Zeeman frequency, in rad/s.
+- `parameters.calc_type` — `time_dependence`, `steady_state`, or `trajectory`.
+- `parameters.time_step` — time step in seconds; required for `time_dependence` and `trajectory`.
+- `parameters.n_steps` — number of steps; required for `time_dependence` and `trajectory`.
+- `parameters.coil` — optional detection state(s); when omitted, the function uses each spin's longitudinal `Lz` state.
 
-## Outputs
+## Output
 
-- answer -with the 'time_dependence' calculation type, the
-- function returns the observables detected using
-- the coil states specified at each point in time;
-- with the 'steady_state' option specified, the
-- function returns the steady state values detec-
-- ted using the coil states specified.
-- Note: this function generates its own Liouvillian and should be
-- called directly, without a context wrapper.
+- `answer` — for `time_dependence`, observables detected by the coil states at each time point; for `steady_state`, the asymptotic detected values; for `trajectory`, the evolved state trajectory.
 
-## Implementation structure
+## References
 
-- Solid effect DNP experiment, computed using the large-scale formalism
-- described in (http://dx.doi.org/10.1039/C2CP23233B). The system is re-
-- stricted to one electron and one nucleus type, but the number of nuc-
-- lei may be very large. Syntax:
-- answer=solid_effect(spin_system,parameters)
-- parameters.mw_pwr -microwave power in rad/s
-- parameters.theory -level of theory. Set to 'exact' for
-- the electron rotating frame calcula-
-- tion or to any of the following six
-- options for the average Hamiltonian
-- theory calculation on top of the el-
-- ectron + nuclear rotating frame:
+- Large-scale solid-effect formalism: https://doi.org/10.1039/C2CP23233B
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=solid_effect.m>

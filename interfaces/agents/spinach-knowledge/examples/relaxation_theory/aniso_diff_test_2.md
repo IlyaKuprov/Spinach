@@ -4,28 +4,15 @@
 
 ## Purpose
 
-Relaxation superoperator calculation for an anisotropically shielded two-spin system with an anisotropic rotational diffusion tensor. Calculation time: seconds
+Build and display the Redfield relaxation superoperator for an anisotropically shielded, dipole-coupled `1H`–`13C` pair undergoing anisotropic rotational diffusion. Calculation time: seconds.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- The field is set from `2*pi*950.33e6/spin('1H')`; the scalar coupling is `145.0 Hz`.
+- The two shielding-tensor principal-value rows are `[10 20 30] ppm` and `[40 50 60] ppm`. Both Euler-angle rows are `[0 pi/4 0]`.
+- Rotational-diffusion eigenvalues are `[2.16e8 2.35e8 7.45e8]`, with correlation-time parameter `1./(6*D)`.
+- Relaxation is Redfield, with zero equilibrium and `labframe` retention; the basis is `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+## Calculation
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Relaxation superoperator calculation for an anisotropically shielded
-- two-spin system with an anisotropic rotational diffusion tensor.
-- Calculation time: seconds
-- Magnet field (Tesla)
-- Isotopes
-- Chemical shift tensors (ppm)
-- Scalar couplings (Hz)
-- Difusion tensor eigenvalues
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
+The function creates and bases the Spinach system, evaluates `relaxation(spin_system)`, and prints the full matrix with `disp(full(R))`.

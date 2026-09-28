@@ -4,29 +4,17 @@
 
 ## Purpose
 
-Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluation, the asynchronous parallel path. This include is called from within the relaxation.m theory blocks and follows the notation used in IK's paper: with the difference that the numerical quadrature method proposed there has been superceded by the much faster auxiliary matrix me- thod described in: The calling theory block must set rlx_onshell (true selects
+This is the asynchronous parallel include for Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluation, called from the `relaxation.m` theory blocks. It follows the notation of [the cited paper](http://dx.doi.org/10.1016/j.jmr.2010.12.004); its numerical quadrature method is superseded here by the faster auxiliary-matrix method described in [the second cited paper](http://dx.doi.org/10.1063/1.4928978).
 
-## Physical / mathematical content
+## Theory parameters
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `rlx_onshell`: true selects the back-rotated kernel, which reduces to Redfield theory at zero shift; false selects the Nakajima-Zwanzig resolvent kernel.
+- `rlx_shift`: the Laplace evaluation point, in Hz. Redfield theory is the on-shell form at zero shift.
 
-## Numerical / algorithmic content
+## Algorithm
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The include queues asynchronous integral jobs for significant spherical-tensor and correlation-function terms, then gathers their sparse contributions into the relaxation superoperator. The worker evaluates each contribution with the auxiliary-matrix integral routine `expmint`.
 
-## Implementation structure
+## Source documentation
 
-- Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluation,
-- the asynchronous parallel path. This include is called from within
-- the relaxation.m theory blocks and follows the notation used in
-- IK's paper:
-- with the difference that the numerical quadrature method proposed
-- there has been superceded by the much faster auxiliary matrix me-
-- thod described in:
-- The calling theory block must set rlx_onshell (true selects the
-- back-rotated kernel that reduces to Redfield theory at zero shift,
-- false the resolvent kernel of Nakajima-Zwanzig theory) and
-- rlx_shift (the Laplace evaluation point, Hz); Redfield theory is
-- the on-shell form at zero shift.
+https://spindynamics.org/wiki/index.php?title=redfield_integral_async.m

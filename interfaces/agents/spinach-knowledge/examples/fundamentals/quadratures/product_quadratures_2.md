@@ -4,29 +4,18 @@
 
 ## Purpose
 
-A test of Lie-group product quadratures on a chirped frequency oscillator with radiation damping that has a state-dependent and time-dependent evolution generator.
+Compares Lie-group product quadratures and Runge–Kutta–Munthe-Kaas integrators for a chirped oscillator with radiation damping and a state- and time-dependent generator. The radiation-damping term follows Bloembergen and Pound: https://doi.org/10.1103/PhysRev.95.8.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- The chirp rate is `2*pi*400` rad/s², longitudinal and transverse relaxation rates are 10 Hz, and radiation damping is 40 Hz. The initial magnetisation is rotated by 178° about the specified Euler-frame axis.
+- The Bloch–Maxwell generator depends on both time and the evolving magnetisation, so the evolution is not a fixed-generator propagation problem.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- A reference trajectory uses RKMK-DP8 with 4096 points over 0.5 s. The benchmark compares piecewise-constant left-edge propagation, LG2, LG4, LG4A, RKMK4, RKMK-DP5, and RKMK-DP8 over ten grids spanning approximately 2^8 to 2^11 points.
+- Relative final-magnetisation errors are plotted against grid size; empirical convergence orders are fitted from the final third of the log-log data.
 
 ## Implementation structure
 
-- A test of Lie-group product quadratures on a chirped frequency
-- oscillator with radiation damping that has a state-dependent
-- and time-dependent evolution generator.
-- Set system parameters
-- Bootstrap the object
-- Make Bloch-Maxwell generator
-- Set initial magnetisation
-- Run reference RKMK-DP8 simulation and keep the trajectory
-- Benchmark arrays
-- Benchmarking loop
-- Half a second
-- Piecewise-constant, left edge
+- Defines the magnetisation-dependent generator, integrates and stores the reference trajectory, then runs each method on each benchmark grid. It plots the reference magnetisation components and the method error curves.

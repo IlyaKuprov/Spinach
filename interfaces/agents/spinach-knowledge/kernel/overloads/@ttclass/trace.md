@@ -4,33 +4,20 @@
 
 ## Purpose
 
-Computes the trace of a tensor train operator. Syntax: tttrace=trace(tt)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
+Compute the trace of a tensor-train operator by tracing each core's physical matrix dimensions and contracting the resulting train.
 
 ## Parameters / inputs
 
-- tt -tensor train operator
+- `tt` — tensor train operator.
 
 ## Outputs
 
-- tttrace -trace of the tensor train operator
+- `tttrace` — trace of the tensor-train operator.
 
-## Implementation structure
+## Implementation
 
-- Computes the trace of a tensor train operator. Syntax:
-- tttrace=trace(tt)
-- tt -tensor train operator
-- tttrace -trace of the tensor train operator
-- Read sizes and ranks
-- Make an auxiliary tensor train
-- Run through all tensor trains
-- Preallocate a core
-- Fill in the core
-- Reshape the core
-- Sum up the auxiliary tensor train
-- Pronouncement of experts to the effect that something
+The function reads the core sizes and ranks, then creates an auxiliary train with the same coefficients and zero tolerances. For every core and every pair of bond indices, it reshapes the physical dimensions to a matrix and stores that matrix's trace in a core with singleton physical dimensions. It converts the auxiliary train to its full value with `full` for the result.
+
+## Source
+
+D. Savostyanov and I. Kuprov, [`ttclass/trace.m`](https://spindynamics.org/wiki/index.php?title=ttclass/trace.m).

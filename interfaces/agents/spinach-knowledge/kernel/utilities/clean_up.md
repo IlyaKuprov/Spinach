@@ -4,34 +4,18 @@
 
 ## Purpose
 
-Array clean-up utility. Drops non-zero elements with magnitude below the user-specified tolerance and converts between sparse and full storage de- pending on the density of non-zeroes in the array. Syntax: A=clean_up(spin_system,A,nonzero_tol)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+Rounds numerical array entries to increments of a tolerance and selects sparse or full storage according to the array's dimensions and density.
 
 ## Numerical / algorithmic content
 
+The function returns `opium` objects unchanged and skips cleanup when `nonzero_tol` is zero or NaN. It recursively processes cells and the prefix and suffix elements of polyadic objects. For ordinary arrays, it rounds with `nonzero_tol*round(A/nonzero_tol)`; unless cleanup is disabled in `spin_system.sys.disable`, it then applies the configured `small_matrix` and `dense_matrix` thresholds to choose sparse or full storage.
+
 ## Parameters / inputs
 
-- A -a numerical array or a cell array thereof
-- nonzero_tol -nonzero tolerance
+- `spin_system` — spin system descriptor containing cleanup settings and storage thresholds
+- `A` — numeric array, cell array, or polyadic object; `opium` objects are returned unchanged
+- `nonzero_tol` — positive real rounding tolerance; zero or NaN disables cleanup
 
 ## Outputs
 
-- A -cleaned-up array
-
-## Implementation structure
-
-- Array clean-up utility. Drops non-zero elements with magnitude below the
-- user-specified tolerance and converts between sparse and full storage de-
-- pending on the density of non-zeroes in the array. Syntax:
-- A=clean_up(spin_system,A,nonzero_tol)
-- A -a numerical array or a cell array thereof
-- nonzero_tol -nonzero tolerance
-- A -cleaned-up array
-- Skip opium objects
-- Skip if disabled
-- Process cells recursively
-- Process polyadics recursively
-- Check consistency
+- `A` — cleaned-up array or object

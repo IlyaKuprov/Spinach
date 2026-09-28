@@ -1,32 +1,14 @@
 # examples/dnp_liq/odnp_liquid_3.m
 
 - Signature: `odnp_liquid_3()`
+- Calculation time: minutes
 
 ## Purpose
 
-Steady state nuclear magnetisation as a function of microwave frequency offset and the magnet field in a DNP experiment with an electron and a nucleus connected by a hyperfine coupling. A g-hyperfine cross-correla- tion effect is visible at high field. The steady state is computed by setting the time derivative to zero in the inhomogeneous master equation, and solving the resulting algebraic equation for the steady s
+Computes the steady-state proton longitudinal signal over microwave-frequency offset and magnetic field for a liquid-state electron–nucleus DNP model. The source describes the example as showing a high-field g–hyperfine cross-correlation effect.
 
-## Physical / mathematical content
+## Spin system and steady-state calculation
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The model contains one proton and one electron. It specifies anisotropic Zeeman tensors, a 20 MHz isotropic hyperfine coupling, and a 3 Å interspin separation for the rank-2 anisotropic dipolar interaction. The calculation uses a complete sphten-liouv basis, Redfield relaxation, zero equilibrium (as required by this steady-state setup), secular relaxation retention, 298 K, and a 10 ps correlation time. The source tightens the relaxation-integration tolerance to 1e-10.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Steady state nuclear magnetisation as a function of microwave frequency
-- offset and the magnet field in a DNP experiment with an electron and a
-- nucleus connected by a hyperfine coupling. A g-hyperfine cross-correla-
-- tion effect is visible at high field.
-- The steady state is computed by setting the time derivative to zero in
-- the inhomogeneous master equation, and solving the resulting algebraic
-- equation for the steady state density matrix.
-- Calculation time: minutes.
-- Spin system
-- Anisotropic Zeeman interactions
-- Isotropic hyperfine coupling
-- Coordinates for dipolar coupling
+The ESR-context `liquid` calculation calls `dnp_freq_scan` with method `lvn-backs` and 500 kHz microwave power. It scans 512 offsets from -15 to +15 MHz and 64 fields from 1 to 10 T; a `parfor` loop processes the field values. The output is a colour map of the real steady-state proton `Lz` signal versus field and microwave offset.

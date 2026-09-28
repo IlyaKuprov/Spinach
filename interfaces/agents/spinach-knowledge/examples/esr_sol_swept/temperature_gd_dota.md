@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Powder averaged W-band field-swept ESR spectrum of Gd(III) DOTA complex. Exact diagonalisation is used and a tempera- ture dependence plot is produced. Calculation time: seconds.
+Powder averaged W-band field-swept ESR spectrum of Gd(III) DOTA complex. Exact diagonalisation is used and a temperature dependence plot is produced. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Field-swept ESR examples. These files emphasise resonance-field finding, powder averaging, anisotropic g and hyperfine tensors, and intensity accumulation over orientation manifolds.
+- The model is Gd(III) with isotropic g = 1.9918 and a zero-field-splitting tensor; it computes powder-averaged W-band field-swept ESR spectra at four temperatures.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- For each temperature, the script rebuilds the spin system with exact diagonalisation in the Zeeman Hilbert-space formalism, then evaluates the field sweep on the same powder grid and plots the four spectra.
 
 ## Implementation structure
 

@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Blue -> White -> Red colour map with 255 points and white colour corresponding to zero. Syntax: cmap=bwr_cmap() The output is 255x3 RGB column that starts at blue, goes into white and then into red in with a quadra- tic bend.
-
-## Physical / mathematical content
+Builds a 255-by-3 RGB blue–white–red colour map, with white at the midpoint for zero-valued data.
 
 ## Numerical / algorithmic content
 
+The first 128 rows interpolate from blue to white; rows 128–255 interpolate from white to red. The component values are then squared (`cmap=cmap.^2`) to apply the quadratic contrast curve.
+
 ## Outputs
 
-- cmap -colour map in Matlab format
-
-## Implementation structure
-
-- Blue -> White -> Red colour map with 255 points and
-- white colour corresponding to zero. Syntax:
-- cmap=bwr_cmap()
-- The output is 255x3 RGB column that starts at blue,
-- goes into white and then into red in with a quadra-
-- tic bend.
-- cmap -colour map in Matlab format
-- Preallocate the map
-- Rise from blue to white
-- Rise from white to red
-- Improve contrast
-- The worst thing I can be is the same as everybody
+- `cmap` — 255-by-3 MATLAB RGB colour map.

@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts an RCV sparse matrix into a full matrix. Syntax: A=full(A)
+Converts an RCV sparse matrix to a full MATLAB matrix.
 
 ## Physical / mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+This changes the matrix storage representation, not its represented entries: the output is the dense matrix corresponding to the input's stored coordinates and values.
 
 ## Numerical / algorithmic content
+
+After checking that A is an RCV object, the implementation constructs a MATLAB sparse matrix and delegates conversion to MATLAB's `full` function.
 
 ## Parameters / inputs
 
@@ -22,13 +24,5 @@ Converts an RCV sparse matrix into a full matrix. Syntax: A=full(A)
 
 ## Implementation structure
 
-- Converts an RCV sparse matrix into a full matrix. Syntax:
-- A=full(A)
-- A -an RCV sparse matrix
-- A -a full Matlab matrix
-- Check consistency
-- Delegate to Matlab
-- Consistency enforcement
-- Whenever you find yourself on the side of the
-- majority, it is time to pause and reflect.
-- Mark Twain
+- Requires A to be an RCV object.
+- Converts A to MATLAB sparse storage, then calls full on that sparse matrix.

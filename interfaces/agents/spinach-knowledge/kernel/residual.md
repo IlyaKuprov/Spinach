@@ -4,44 +4,32 @@
 
 ## Purpose
 
-Sets up interaction tensors under partial ordering in a liquid crystal with the user-supplied order matrix. All adjustable pa- rameters are set during the call to create.m function. Syntax: spin_system=residual(spin_system)
+Replaces anisotropic Zeeman and spin-spin coupling tensors with their isotropic parts plus weak residual-order contributions, using the user-supplied order matrix for each chemical subsystem.
 
 ## Physical / mathematical content
 
+For a tensor `T`, the function separates its isotropic part `iso` and evaluates the residual contribution as `extra_zz=trace(order_matrix*(T-iso))`. It then forms `iso+diag([-extra_zz/3 -extra_zz/3 2*extra_zz/3])` for the updated tensor.
+
 ## Numerical / algorithmic content
+
+The function checks that `spin_system.inter.order_matrix` is present and nonempty, then processes Zeeman and coupling tensors within each chemical subsystem. A coupling tensor whose matrix 2-norm is below `2*pi*spin_system.tols.inter_cutoff` after replacement is removed.
 
 ## Parameters / inputs
 
-- spin_system -the output of create.m containing
-- spin system and interaction infor-
-- mation, which must include the or-
-- der matrix
+- `spin_system` - output of `create.m` containing the spin system and interaction data, including the order matrix.
 
 ## Outputs
 
-- spin_system -the same object with anisotropic
-- parts of all interaction tensors
-- replaced with their partial order
-- residuals.
-- Note: this function is only applicable to weak residual order
-- in high-field NMR spectroscopy.
-- Note: the function overwrites the interaction tensors supplied
-- by the user. Relaxation superoperator, if required, must
-- be computed before this function is called.
-- Note: this function is invoked automatically by liquid.m con-
-- text when when parameters.needs cell array contains 'rdc'.
+- `spin_system` - the input structure with its interaction tensors overwritten by their partial-order residual forms.
 
-## Implementation structure
+## Notes
 
-- Sets up interaction tensors under partial ordering in a liquid
-- crystal with the user-supplied order matrix. All adjustable pa-
-- rameters are set during the call to create.m function. Syntax:
-- spin_system=residual(spin_system)
-- spin_system - the output of create.m containing
-- spin system and interaction infor-
-- mation, which must include the or-
-- der matrix
-- spin_system - the same object with anisotropic
-- parts of all interaction tensors
-- replaced with their partial order
-- residuals.
+- Applicable to weak residual order in high-field NMR spectroscopy.
+- Any required relaxation superoperator must be computed before this function, because the interaction tensors are overwritten.
+- The `liquid.m` context invokes this function automatically when `parameters.needs` contains `'rdc'`.
+
+## Source
+
+- ledwards@cbs.mpg.de
+- ilya.kuprov@weizmann.ac.il
+- <https://spindynamics.org/wiki/index.php?title=residual.m>

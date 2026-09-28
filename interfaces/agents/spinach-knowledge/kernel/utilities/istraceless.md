@@ -4,34 +4,20 @@
 
 ## Purpose
 
-A floating-point precision consistent check for whether a particular matrix is traceless. Syntax: A=istraceless(M)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Tests whether a numeric matrix is traceless within a tolerance set by the floating-point precision of its class and the matrix norm.
 
 ## Parameters / inputs
 
-- M -a matrix of any dimension
+- `M` - numeric matrix of any dimension.
 
 ## Outputs
 
-- A -true if the matrix is traceless to ap-
-- propriate precision, false otherwise
+- `A` - true when the trace test passes; false otherwise.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- A floating-point precision consistent check for whether
-- a particular matrix is traceless. Syntax:
-- A=istraceless(M)
-- M -a matrix of any dimension
-- A -true if the matrix is traceless to ap-
-- propriate precision, false otherwise
-- Check consistency
-- Working precision
-- Cheapest norm of M
-- Decide if M is traceless
-- Consistency enforcement
-- The College asked me to chair the Size and Shape
+The function sets `precision=eps(class(M))`, computes `norm_m=cheap_norm(M)`, and returns whether `abs(trace(M)) <= precision*norm_m`. It rejects nonnumeric inputs.
+
+## Source
+
+[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=istraceless.m)

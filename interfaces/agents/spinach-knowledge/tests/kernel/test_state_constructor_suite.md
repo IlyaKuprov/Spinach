@@ -4,34 +4,25 @@
 
 ## Purpose
 
-Tests state-constructor helper functions. Syntax: result=test_state_constructor_suite()
+Tests state-constructor helper functions.
 
 ## Physical / mathematical content
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- For two spin-half nuclei, the singlet and three triplet density matrices are unit-trace projectors that sum to the identity; the singlet is idempotent and orthogonal to the zero-projection triplet.
+- For two deuterons, singlet, triplet, and quintet projectors resolve the nine-dimensional Hilbert-space identity, and each population state has unit trace.
+- The four-spin `S(x)S` state equals the direct product of two two-spin singlet projectors.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Checks one-spin unit states in Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville form. At finite temperature, a zero Hamiltonian gives the maximally mixed thermal state.
+- Checks that `partner_state` generates four combinations for two binary partner spins and that each descriptor reproduces its corresponding `state` result.
+- Checks that a zero-field triplet density matrix produced by `zftrip` has unit trace and is Hermitian.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks unit, thermal, singlet/triplet, partner, deuteron-pair,
-- four-spin, and zero-field triplet state constructors using projector and
-- normalisation identities.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests state-constructor helper functions. Syntax:
-- result=test_state_constructor_suite()
-- result -regression test result with explanatory messages
-- The test checks unit, thermal, singlet/triplet, partner, deuteron-pair,
-- four-spin, and zero-field triplet state constructors using projector and
-- normalisation identities.
-- Announce the test target
-- State the state-constructor target of the test
-- One-spin Hilbert and Liouville unit states have known forms
-- Two-spin singlet and triplet constructors must form four orthogonal projectors summing to identity
-- partner_state must enumerate all requested partner-state combinations
-- Four-spin singlet-singlet state must match the explicit product of two two-spin singlets
+- Announces the state-constructor test and creates a test result.
+- Constructs one-, two-, three-, and four-spin test systems, a deuteron pair, and an `E3` system; compares constructor outputs with explicit states, projectors, and normalisation identities.

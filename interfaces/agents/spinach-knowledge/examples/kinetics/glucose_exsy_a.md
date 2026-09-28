@@ -4,29 +4,19 @@
 
 ## Purpose
 
-2D EXSY of transmembrane exchange of 2,2,3,3-tetrafluoroglucose. See the fitting example set for the script that yielded the parameters used below. Calculation time: seconds
+2D EXSY of transmembrane exchange of 2,2,3,3-tetrafluoroglucose. See the fitting example set for the script that yielded the parameters used below. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Sixteen ¹⁹F spins represent the α and β forms on the inside and outside of the membrane (four four-spin subsystems). Their chemical shifts, couplings, and coordinates are specified separately. A four-state reaction-rate matrix describes translocation; the initial population vector passed to `equilibrate` has an α/β imbalance. Relaxation is Redfield with secular retention and separate correlation times for inside and outside states.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The script runs a 2D `noesy` EXSY simulation with a 0.5 s mixing time, then applies squared-cosine apodisation and States-style quadrature processing before the two Fourier transforms. It loads the experimental spectrum, ranks it, and plots the simulated and experimental spectra plus a pointwise-deviation histogram.
 
 ## Implementation structure
 
-- 2D EXSY of transmembrane exchange of 2,2,3,3-tetrafluoroglucose. See
-- the fitting example set for the script that yielded the parameters
-- used below.
-- Calculation time: seconds
-- Magnet field
-- Isotopes
-- Chemical shifts
-- J-couplings
-- Cartesian coordinates
-- Chemical subsystems
-- Reaction rate matrix
-- Equilibrate translocation with alpha-beta imbalance as the start
+- Uses B₀ = 9.4 T and ¹⁹F chemical shifts/J couplings for the four α/β, inside/outside subsystems.
+- Sets the kinetic starting vector to [3.2258, 0, 3.1902, 0] before equilibration.
+- Uses `parameters.sweep=[8000 8000]`, `npoints=[256 256]`, and `zerofill=[1024 512]` (ppm axes).
+- Loads `glucose_expt_a.mat` / `Expression1` for the experimental comparison.

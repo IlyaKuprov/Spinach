@@ -4,34 +4,22 @@
 
 ## Purpose
 
-SPINAL phase sequences as described in the paper by Fung, Khitrin and Ermolaev (https://doi.org/10.1006/jmre.1999.1896). Syntax: phi=spinal(n)
-
-## Physical / mathematical content
-
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+Returns the phase, in radians, of pulse `n` in the SPINAL sequence described by Fung, Khitrin, and Ermolaev.
 
 ## Numerical / algorithmic content
 
+The implementation stores a 64-entry phase sequence in degrees. It selects entry `mod(n-1,64)+1` and converts that phase to radians, so the pattern repeats every 64 pulses.
+
 ## Parameters / inputs
 
-- n -a positive integer number
+- `n` - positive integer scalar identifying the pulse in the sequence
 
 ## Outputs
 
-- phi -the phase of the n-th pulse in
-- SPINAL sequence, radians
+- `phi` - phase of the `n`th pulse in the SPINAL sequence, radians
 
-## Implementation structure
+## Reference
 
-- SPINAL phase sequences as described in the paper by Fung, Khitrin
-- and Ermolaev (https://doi.org/10.1006/jmre.1999.1896). Syntax:
-- phi=spinal(n)
-- n -a positive integer number
-- phi -the phase of the n-th pulse in
-- SPINAL sequence, radians
-- Check consistency
-- Spinal phase sequence
-- Loop correctly over
-- Consistency enforcement
-- The key to performance is elegance, not
-- battalions of special cases.
+Fung, Khitrin, and Ermolaev, https://doi.org/10.1006/jmre.1999.1896
+
+Source Wiki page: https://spindynamics.org/wiki/index.php?title=spinal.m

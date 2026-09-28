@@ -4,49 +4,24 @@
 
 ## Purpose
 
-Cross-polarisation experiment in the rotating frame. Applies an ideal pi/2 pulse using the specified operators, then evolves the system with the specified spin-lock terms added to the Liovilli- an. The contact curve is returned. Syntax: contact_curve=cp_contact_hard(spin_system,parameters,H,R,K)
+Computes a rotating-frame cross-polarisation contact curve using an ideal pi/2 excitation pulse and hard spin-lock terms.
 
-## Physical / mathematical content
+## Implementation
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine composes `L=H+1i*R+1i*K`, applies the specified excitation operator(s) to `parameters.rho0` with a pi/2 flip angle, and records the initial coil signal. At each entry of `parameters.time_steps`, it forms the spin-lock contribution from the channel operators and nutation frequencies, propagates the state for that interval, and records the coil-detected signal.
 
 ## Parameters / inputs
 
-- parameters.irr_powers -a matrix containing the values
-- of the spin-lock nutation fre-
-- quency on each channel (rows)
-- at each time slice (cols), Hz
-- parameters.irr_opers -a cell array of spin operators
-- corresponding to the spin-lock
-- on each channel
-- parameters.exc_opers -a cell array of spin operators
-- for the ideal pi/2 excitation
-- pulse (same flip angle on all
-- channels)
-- parameters.time_steps -a vector of time slice durati-
-- ons, seconds
-- parameters.rho0 -initial state vector
-- parameters.coil -detection state vector
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- Output:
-- contact_curve -contact curve detected on the coil
-- state specified in parameters.coil
+- `parameters.irr_powers`: matrix of spin-lock nutation frequencies, with channels in rows and time slices in columns, Hz.
+- `parameters.irr_opers`: cell array of the spin operators for the spin lock on each channel.
+- `parameters.exc_opers`: cell array of spin operators for the ideal pi/2 excitation pulse; the same flip angle is used on all channels.
+- `parameters.time_steps`: vector of time-slice durations, s.
+- `parameters.rho0`: initial state vector.
+- `parameters.coil`: detection state vector.
+- `H`: Hamiltonian matrix supplied by the context function.
+- `R`: relaxation superoperator supplied by the context function.
+- `K`: kinetics superoperator supplied by the context function.
 
-## Implementation structure
+## Output
 
-- Cross-polarisation experiment in the rotating frame. Applies an
-- ideal pi/2 pulse using the specified operators, then evolves the
-- system with the specified spin-lock terms added to the Liovilli-
-- an. The contact curve is returned. Syntax:
-- contact_curve=cp_contact_hard(spin_system,parameters,H,R,K)
-- parameters.irr_powers -a matrix containing the values
-- of the spin-lock nutation fre-
-- quency on each channel (rows)
-- at each time slice (cols), Hz
-- parameters.irr_opers -a cell array of spin operators
-- corresponding to the spin-lock
-- on each channel
+- `contact_curve`: coil-detected contact curve, including the initial signal and one sample after each time slice.

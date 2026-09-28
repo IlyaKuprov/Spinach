@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Demonstrate the use of the auxiliary matrix algorithm in generating a gradient sandwich multiple-quantum filter. For further details see: Calculation time: seconds
+Demonstrate the auxiliary-matrix algorithm for generating a gradient-sandwich multiple-quantum filter. Background: [10.1016/j.jmr.2014.01.011](http://dx.doi.org/10.1016/j.jmr.2014.01.011). The source labels the calculation time as seconds.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+A three-proton system is prepared with a pi/2 1H pulse. The initial state is weighted to select a coherence-order subspace, then evolved through a two-pulse gradient sandwich; the output trajectory is analysed by coherence order.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The source uses two rectangular gradients of 20 G/cm, a 2.5 cm sample, and two 1 ms durations. It samples 1000 points over the total 2 ms trajectory and evaluates them with parfor.
 
 ## Implementation structure
 
-- Demonstrate the use of the auxiliary matrix algorithm in generating a
-- gradient sandwich multiple-quantum filter. For further details see:
-- Calculation time: seconds
-- Magnet and isotopes
-- Random chemical shifts and couplings
-- Set the basis
-- Run Spinach housekeeping
-- Build the Hamiltonian
-- Propagator for a pi/2 pulse
-- Build initial state vector
-- Determine projection quantum numbers of the basis
-- Determine the coherence order of each state
+- Specify random scalar shifts and couplings, create the sphten-liouv basis, and build the Hamiltonian.
+- Construct a hard pi/2 pulse propagator and weight the initial state by coherence order.
+- Call grad_sandw across the time axis and display the coherence-order trajectory with trajan.

@@ -4,36 +4,24 @@
 
 ## Purpose
 
-This function runs contiouously on one of our servers, its purpose is to catch any unintended consequences before they propagate too far down the development chain. Syntax: patrol(test_subject)
+Runs a continuous patrol over Spinach example files to catch problems during development.
 
 ## Physical / mathematical content
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+This is a development and example-integrity utility; it does not define a physical model.
 
 ## Numerical / algorithmic content
 
+The function repeatedly selects an example at random, checks it with Matlab's `checkcode`, and runs it unless it is listed as an exception. It waits one second between iterations and continues until interrupted.
+
 ## Parameters / inputs
 
-- test_subject -a character string; if it occurs
-- anywhere within the example file
-- path, that file is included into
-- the patrol run
+- `test_subject` — a character string. When nonempty, only example files whose contents or path contain this string are included; an empty value selects all examples.
 
 ## Outputs
 
-- whatever the individual examples return
+The output is whatever the individual examples display or return while they run. The patrol reports the number of selected files.
 
 ## Implementation structure
 
-- This function runs contiouously on one of our servers, its
-- purpose is to catch any unintended consequences before they
-- propagate too far down the development chain. Syntax:
-- patrol(test_subject)
-- test_subject -a character string; if it occurs
-- anywhere within the example file
-- path, that file is included into
-- the patrol run
-- whatever the individual examples return
-- Set default and check consistency
-- List exceptions
-- Shuffle the RNG
+After filtering the example tree, the function errors if no files match. It shuffles the random-number generator, then loops over the selected files by choosing one at random, running the syntax check, changing to that file's directory, and evaluating the example.

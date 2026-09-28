@@ -4,34 +4,16 @@
 
 ## Purpose
 
-Conjugates all core elements and coefficients of a tensor train object. Syntax: tt=conj(tt)
+Complex-conjugates the tensor train by conjugating every core element and every coefficient.
 
-## Physical / mathematical content
+## Input
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `tt` — tensor train object.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `tt` — tensor train object with conjugated cores and coefficients.
 
-- tt -tensor train object
+## Algorithm
 
-## Outputs
-
-- tt -tensor train object with complex-conjugated cores
-- and coefficients
-
-## Implementation structure
-
-- Conjugates all core elements and coefficients of a tensor
-- train object. Syntax:
-- tt=conj(tt)
-- tt -tensor train object
-- tt -tensor train object with complex-conjugated cores
-- and coefficients
-- Read tensor train sizes and ranks
-- Conjugate the cores
-- Conjugate the coefficients
-- I asked God for a bike, but I know God
-- doesn't work that way. So I stole a bike
-- and asked for forgiveness.
+The function loops over all trains and cores, applies `conj` to each core, then applies `conj` to the coefficient array.

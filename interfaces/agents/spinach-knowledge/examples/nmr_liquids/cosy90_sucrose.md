@@ -8,24 +8,12 @@ COSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation ti
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+This is a homonuclear proton COSY simulation for sucrose. Its spin-system parameters are generated from the vacuum DFT log at `../standard_systems/sucrose.log` by `g2spinach`, with hydrogen nuclei mapped to `1H`; the example then models the liquid-state COSY response.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The DFT conversion uses `min_j=2.0` and `no_xyz=1`, with the conversion argument 31.8. The subsequent Spinach setup sets field value 5.9 and uses greedy mode, proximity cutoff 4.0, an IK-2 scalar-coupling Liouville basis at proximity level 1, and a 90-degree COSY angle. It uses offset 800, sweep 1700, 512 points and 2048 zero-fill points in both dimensions, followed by two-dimensional cosine apodisation and a shifted 2D FFT; the plotted data are the real spectrum.
 
 ## Implementation structure
 
-- COSY spectrum of sucrose (magnetic parameters computed with DFT).
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The code converts the DFT log into `sys` and `inter`, builds the basis, runs `liquid(...,@cosy,...,'nmr')`, then windows and Fourier-transforms the FID before plotting.

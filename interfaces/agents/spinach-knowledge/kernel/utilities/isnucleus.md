@@ -4,33 +4,20 @@
 
 ## Purpose
 
-Returns true if the specification is a nucleus. Syntax: verdict=isnucleus(spin_spec)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Classifies a valid Spinach particle specification as a nucleus or not. The function first requires a character string and validates the specification with `spin`.
 
 ## Parameters / inputs
 
-- spin_spec -a character string
+- `spin_spec` - character string containing a Spinach particle specification.
 
 ## Outputs
 
-- verdict -true for a nucleus, false otherwise
+- `verdict` - true when the specification passes the function's nucleus test; false otherwise.
 
-## Implementation structure
+## Numerical / algorithmic content
 
-- Returns true if the specification is a nucleus. Syntax:
-- verdict=isnucleus(spin_spec)
-- spin_spec -a character string
-- verdict -true for a nucleus, false otherwise
-- Check consistency
-- A simple name matching check
-- Consistency enforcement
-- Prostitution and soldiering are arguably the oldest professions.
-- While doubts about their legitimacy are understandable, both pro-
-- vide a service that society appears to need. Yet one is heroised,
-- the other vilified.
-- Barbara Einhorn
+The function returns false when the first character is one of `E`, `C`, `V`, or `T`, or when the complete specification is one of `G`, `E`, `N`, or `M`. It returns true otherwise.
+
+## Source
+
+[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=isnucleus.m)

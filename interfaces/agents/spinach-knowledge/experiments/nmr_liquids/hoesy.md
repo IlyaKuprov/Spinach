@@ -4,15 +4,13 @@
 
 ## Purpose
 
-Phase-sensitive heteronuclear NOESY pulse sequence from:
+Phase-sensitive heteronuclear NOESY with indirect evolution in F1, a mixing period, and direct acquisition in F2. The implementation follows the sequence described in [the original paper](https://doi.org/10.1021/ja00353a071) and [this later reference](https://doi.org/10.1039/C8CP00911B).
 
-## Physical / mathematical content
+## Sequence and signal
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+The function builds `L = H + 1i*R + 1i*K`, applies the first F1 pulse, and evolves the two indirect-time halves with the configured F1 decoupling and refocusing. Phase-cycled F1 pulses generate cosine and sine pathways; homospoil is applied before the mixing evolution, then an F2 pulse and direct acquisition produce the two States components. The mixing period propagates relaxation and kinetics (`1i*R + 1i*K`).
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+This is an ideal heteronuclear NOESY model: gradient and diffusion attenuation, finite-pulse losses, and experimental normalisation are not included.
 
 ## Syntax
 
@@ -22,41 +20,17 @@ fid=hoesy(spin_system,parameters,H,R,K)
 
 ## Parameters / inputs
 
-- parameters.sweep two sweep widths, Hz
-- parameters.npoints number of FID points for both
-- dimensions
-- parameters.spins nuclei on which the sequence runs,
-- e.g. {'15N','13C'}
-- parameters.decouple_f1 nuclei to decouple in F1, e.g.
-- {'1H','13C'}
-- parameters.tmix mixing time, seconds
-- parameters.rho0 initial state
-- parameters.needs should be set to {'rho_eq'}, this
-- sequence needs the thermal equili-
-- brium state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.sweep`: two sweep widths [F1 F2], Hz.
+- `parameters.npoints`: numbers of FID points [F1 F2].
+- `parameters.spins`: nuclei used on F1 and F2, e.g. `{'15N','13C'}`.
+- `parameters.decouple_f1`: nuclei to decouple in F1, e.g. `{'1H','13C'}`.
+- `parameters.tmix`: mixing time, seconds.
+- `parameters.rho0`: initial state.
+- `parameters.needs`: set to `{'rho_eq'}`; the sequence requires the thermal-equilibrium state.
+- `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function.
 
 ## Outputs
 
-- fid.cos,fid.sin -two components of the FID for F1 hyper-
-- complex processing
-- Note: this is an ideal heteronuclear NOESY model. Gradient and
-- diffusion attenuation, finite-pulse losses, and experimental
-- normalisation are outside this pulse sequence function.
+- `fid.cos`, `fid.sin`: cosine and sine components of the F1 hypercomplex FID for States processing.
 
-## Implementation structure
-
-- Phase-sensitive heteronuclear NOESY pulse sequence from:
-- fid=hoesy(spin_system,parameters,H,R,K)
-- parameters.sweep two sweep widths, Hz
-- parameters.npoints number of FID points for both
-- dimensions
-- parameters.spins nuclei on which the sequence runs,
-- e.g. {'15N','13C'}
-- parameters.decouple_f1 nuclei to decouple in F1, e.g.
-- {'1H','13C'}
-- parameters.tmix mixing time, seconds
-- parameters.rho0 initial state
-- parameters.needs should be set to {'rho_eq'}, this
+[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=hoesy.m).

@@ -4,33 +4,20 @@
 
 ## Purpose
 
-Applies a bit-revert permutation to a tensor train operator by reversing the core order and swapping bond indices. Syntax: tt=revert(tt)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
+Reverse the order of the tensor-train cores and reverse each core's bond-index direction by swapping its outer bond dimensions.
 
 ## Parameters / inputs
 
-- tt -tensor train operator
+- `tt` — tensor train operator.
 
 ## Outputs
 
-- tt -tensor train operator with reversed core order
+- `tt` — tensor train operator with reversed core order and bond direction.
 
-## Implementation structure
+## Implementation
 
-- Applies a bit-revert permutation to a tensor train operator by
-- reversing the core order and swapping bond indices. Syntax:
-- tt=revert(tt)
-- tt -tensor train operator
-- tt -tensor train operator with reversed core order
-- Read sizes and ranks
-- Swap bond indices
-- Revert the train direction
-- Asking for efficiency and adaptability in the same program is
-- like asking for a beautiful and modest wife... we'll probably
-- have to settle for one or the other.
-- Gerald M. Weinberg, "The psychology of computer programming"
+The function reads the number of cores and trains from `tt.cores`. For each train, it permutes every core with dimensions `[4,2,3,1]`, then reverses the core sequence. This performs the bit-revert permutation described by the source comments.
+
+## Source
+
+D. Savostyanov, [`ttclass/revert.m`](https://spindynamics.org/wiki/index.php?title=ttclass/revert.m).

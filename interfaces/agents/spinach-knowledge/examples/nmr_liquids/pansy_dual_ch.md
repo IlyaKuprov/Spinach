@@ -4,28 +4,17 @@
 
 ## Purpose
 
-PANSY-COSY spectra of camphor with natural content of 13C isotope. Coordinates, shieldings, and J-couplings computed with DFT. Calculation time: seconds
+Simulates PANSY-COSY spectra of camphor with natural ¹³C abundance. Coordinates, shieldings, and J-couplings are computed with DFT; the source estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Uses DFT-derived molecular coordinates and magnetic parameters, and generates isotopomers to represent the natural ¹³C content.
+- Simulates both PANSY-COSY signal channels.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Loops over the generated isotopomers in parallel, applies apodisation and two-dimensional Fourier transforms to both signal components, and plots both spectra.
 
 ## Implementation structure
 
-- PANSY-COSY spectra of camphor with natural content of 13C isotope.
-- Coordinates, shieldings, and J-couplings computed with DFT.
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Reads the DFT data, generates isotopomers, preallocates results, then builds and simulates each spin-system basis in a parallel loop.

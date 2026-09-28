@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Computes rotational correlation functions using a Monte-Carlo method and compares them to the analytical results returned by Spinach kernel for the following correlation function: G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'> The sigma parameters refer to the rates of rotation and the four indices to the Wigner functions being correlated. Axial rotational diffusion tes- ted here. Calculation time: minutes.
+Compares a Monte Carlo estimate with the analytical Spinach result for `G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>`. This example tests axial rotational diffusion; the sigma parameters specify the rates along the axial and equivalent directions, while the four indices select the Wigner-function elements.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+The parameters are `sigma_ax=0.1`, `sigma_eq=0.2`, rank `L=2`, and indices `k=-1, m=2, p=-1, q=2` (converted from `[-L,L]` indexing to MATLAB array indices). The analytical model uses Redfield relaxation with correlation times `1./(3*[sigma_ax sigma_eq].^2)`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The Monte Carlo trajectory contains `1e6` rotations and the estimate uses `nlags=300`. Gaussian increments are scaled separately for axial and equivalent rotations; direction-cosine matrices are converted to Wigner functions, whose selected elements are cross-correlated. The normalized estimate is compared to the exponential sum from Spinach's `corrfun` calculation.
 
 ## Implementation structure
 
-- Computes rotational correlation functions using a Monte-Carlo method and
-- compares them to the analytical results returned by Spinach kernel for
-- the following correlation function:
-- G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>
-- The sigma parameters refer to the rates of rotation and the four indices
-- to the Wigner functions being correlated. Axial rotational diffusion tes-
-- ted here.
-- Calculation time: minutes.
-- Set testing parameters
-- Convert indices from [-L,L] to [1,2*L+1]
-- % Numerical Monte-Carlo calculation
-- Number of points and lags
+The source stores the trajectory, evaluates Wigner matrices in a `parfor` loop, then computes both the Monte Carlo correlation and the analytical Spinach curve for plotting. It labels the source's estimated run time as minutes.

@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Powder averaged X-band field-swept ESR spectrum of photo- generated pentacene triplet state. Calculation time: seconds.
+Powder averaged X-band field-swept ESR spectrum of photo-generated pentacene triplet state. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Field-swept ESR examples. These files emphasise resonance-field finding, powder averaging, anisotropic g and hyperfine tensors, and intensity accumulation over orientation manifolds.
+- The model is an S=1 photoexcited pentacene triplet with isotropic g = 2.0 and zero-field splitting D = 1360.1 MHz, E = -47.2 MHz; the observable is its powder-averaged X-band field-swept ESR spectrum.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The script samples the spherical orientation grid, constructs an orientation-dependent triplet initial state from the ZFS Hamiltonian, and calls `fieldsweep` over the configured microwave-frequency and field window.
 
 ## Implementation structure
 

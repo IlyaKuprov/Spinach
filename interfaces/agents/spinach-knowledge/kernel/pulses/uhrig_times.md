@@ -4,37 +4,19 @@
 
 ## Purpose
 
-Uhrig's UDD decoupling sequence timings. Syntax: time_delays=uhrig_times(T,N)
-
-## Physical / mathematical content
-
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+Returns the delay intervals for an Uhrig dynamical decoupling (UDD) sequence of `N` ideal pulses over total duration `T`.
 
 ## Numerical / algorithmic content
 
+The interior pulse positions use the WSW 2009 JCP formula, `T*(sin(pi*(1:N)/(2*N+2)).^2-0.5)`. The function differences these positions to obtain the interior delays, then adds equal starting and trailing delays so the delay sum is `T`.
+
 ## Parameters / inputs
 
-- T -total duration of the sequence (sum of all delays)
-- N -number of pulses in the sequence
+- `T` - finite positive real scalar; total sequence duration
+- `N` - finite positive real integer; number of pulses
 
 ## Outputs
 
-- time_delays -list of delays between ideal pulses in
-- the UDD sequence; the first pulse goes
-- after the first delay, and there is a
-- delay after the last pulse
+- `time_delays` - delays between ideal pulses; the first pulse follows the first delay, and a delay follows the last pulse
 
-## Implementation structure
-
-- Uhrig's UDD decoupling sequence timings. Syntax:
-- time_delays=uhrig_times(T,N)
-- T -total duration of the sequence (sum of all delays)
-- N -number of pulses in the sequence
-- time_delays -list of delays between ideal pulses in
-- the UDD sequence; the first pulse goes
-- after the first delay, and there is a
-- delay after the last pulse
-- Check consistency
-- Use the formula from WSW's 2009 JCP paper
-- Convert positions to delays
-- Add the starting and the trailing delay
+Source Wiki page: https://spindynamics.org/wiki/index.php?title=uhrig_times.m

@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is Z-magneti- sation on 19F. There are six control channels and a distribution over control powers. A keyhole condition is specified: the system must be in a two-spin or- der at point 20 in the pulse time grid. LBFGS q
+Demonstrates a keyhole objective in optimal-control pulse design: selected two-spin-correlation terms are specified at an intermediate point in the pulse sequence, while the full pulse is optimised for the target state.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The spin system provides 1H, 13C, and 19F channels with x- and y-phase controls. The keyhole constrains two-spin correlations at interval 20 in a 50-interval pulse.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The objective is optimised with LBFGS-GRAPE over five RF-power levels. The numerical setup uses six controls (x and y for each of the three nuclei) and a 50-interval waveform.
 
 ## Implementation structure
 
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is Z-magneti-
-- sation on 19F. There are six control channels and a distribution over
-- control powers.
-- A keyhole condition is specified: the system must be in a two-spin or-
-- der at point 20 in the pulse time grid. LBFGS quasi-Newton optimiser is
-- used with a piecewise-linear control sequence.
-- Calculation time: minutes.
-- Magnetic field
-- Spin system
-- Chemical shifts, ppm
+The script builds and normalises the initial and target states, configures the keyhole correlation constraint and RF-power ensemble, optimises the waveform, and simulates the shaped pulse. It reports the target-state overlap after the final simulation.

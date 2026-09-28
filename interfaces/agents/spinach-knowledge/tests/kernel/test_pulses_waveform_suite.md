@@ -2,31 +2,10 @@
 
 - Signature: `result=test_pulses_waveform_suite()`
 
-## Purpose
+Regression-tests waveform utilities against analytic values. `result` contains test messages.
 
-Tests deterministic pulse waveform generators. Syntax: result=test_pulses_waveform_suite()
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-## Outputs
-
-- result -regression test result with explanatory messages
-- The test checks analytic waveform formulas, periodic phase tables,
-- JCAMP pulse-file reading, chirp construction, and sech pulse coordinates.
-
-## Implementation structure
-
-- Tests deterministic pulse waveform generators. Syntax:
-- result=test_pulses_waveform_suite()
-- result -regression test result with explanatory messages
-- The test checks analytic waveform formulas, periodic phase tables,
-- JCAMP pulse-file reading, chirp construction, and sech pulse coordinates.
-- Announce the test target
-- State the waveform target of the test
-- Check sawtooth and triangular wave formulae at simple fractions of the period
-- Check Uhrig delay formula for three pulses over a unit interval
-- Check periodic phase tables and wrap-around indexing
-- Check simple analytic pulse envelopes
-- Check reading of a distributed rectangular Bruker pulse file
+- For `amp=2`, `freq=1`, and `t=[0,.25,.5,.75,1]`, checks sawtooth `amp*(2*freq*mod(t,1/freq)-1)` and triangle-wave absolute value.
+- For `T=1`, `N=3`, checks Uhrig positions `pos=T*(sin(pi*(1:N)/(2*N+2)).^2-0.5)`, delays `diff(pos)`, and equal end chunks `(T-sum(delays))/2`.
+- Checks PMLG5/SPINAL first phases `339.22°`/`10°` and periods `20`/`64`.
+- Checks rectangular and sinc3 envelopes; `rectangular_1000.pk` amplitude, phase, Cartesian controls and scaling; and VG `E0A` inverse-duration scaling.
+- Checks WURST chirp (5 points, duration 1, bandwidth 4, exponent 2) and sech pulse (3, 2, 5, 2, 5): grids, amplitudes, phases and Cartesian controls.

@@ -4,33 +4,28 @@
 
 ## Purpose
 
-Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the formalism described in https://doi.org/10.1063/1.4928978 Syntax: Hr=rotframe(spin_system,H0,H,isotope,order)
+Transforms the laboratory-frame Hamiltonian `H=H0+H1` into a rotating frame referenced to spins of the selected isotope, to the requested perturbation order. The formalism is described in https://doi.org/10.1063/1.4928978.
 
 ## Physical / mathematical content
 
+The carrier Hamiltonian `H0` defines the frame. The rotation period depends on the selected isotope's gyromagnetic ratio and the magnetic field; the Hilbert-space period is twice the Liouville-space period.
+
 ## Numerical / algorithmic content
 
-Numerical frames reject all spins under `nmr` and `cavity`; electrons under `esr`, `deer`, `deer-zz`, and `spin-phonon`; and spin-half nuclei under `qnmr`. Nuclei under electron-only rotating sets and higher-spin nuclei under `qnmr` remain in the laboratory frame and may be transformed. `labframe` retains all spin carriers. Numerical frames are not implemented for `se_dnp_h+`, `se_dnp_h-`, or `se_dnp_h0`: `assume` omits all Zeeman interactions from these solid-effect components, so they do not supply the laboratory Hamiltonian H0+H1 required by this transformation. This refusal does not alter the component construction or the solid-effect experiment.
+The function checks its inputs and calls `intrep` with the period and perturbation order. Its auxiliary-matrix method is faster than the commutator-series and diagonalisation alternatives. Numerical frames are refused for all spins under `nmr` and `cavity`, electrons under `esr`, `deer`, `deer-zz`, and `spin-phonon`, and spin-half nuclei under `qnmr`. Nuclei under electron-only rotating sets and higher-spin nuclei under `qnmr` remain in the laboratory frame; `labframe` retains all spin carriers. The numerical transformation is not implemented for `se_dnp_h+`, `se_dnp_h-`, or `se_dnp_h0`, whose assumptions omit the Zeeman interactions needed to form the laboratory-frame `H0+H1`.
 
 ## Parameters / inputs
 
-- spin_system - spin system with assumptions set by `assume`; the selected isotope must still be in the laboratory frame.
-- H0 -carrier Hamiltonian with respect to which the
-- rotating frame transformation is to be done
-- H -laboratory frame Hamiltonian H0+H1 that is to
-- be transformed into the rotating frame
-- isotope -string, such as '1H', specifying the spins
-- with respect to which the transformation is
-- being computed
-- order -perturbation theory order in the rotating
-- frame transformation, this may be inf
+- `spin_system` — spin system with assumptions set by `assume`; the selected isotope must remain in the laboratory frame under those assumptions.
+- `H0` — carrier Hamiltonian defining the rotating frame.
+- `H` — laboratory-frame Hamiltonian `H0+H1` to transform.
+- `isotope` — character string, such as `'1H'`, identifying the spins used to compute the transformation.
+- `order` — perturbation-theory order; may be `inf`.
 
 ## Outputs
 
-- Hr -rotating frame Hamiltonian
-- Notes: the auxiliary matrix method is massively faster than
-- either commutator series or diagonalisation.
+- `Hr` — rotating-frame Hamiltonian.
 
 ## Header notes
 
-The auxiliary-matrix method used by `intrep` is faster than the commutator-series and diagonalisation alternatives described in the source. The rotation period follows the selected isotope's gyromagnetic ratio and field, with the Hilbert-space period twice the Liouville-space period. `H` and `H0` must be Hermitian; missing assumption metadata is refused before the numerical transformation.
+Both `H` and `H0` must be Hermitian, and assumption metadata must be present. The function refuses unsupported assumptions before performing the transformation.

@@ -4,30 +4,22 @@
 
 ## Purpose
 
-Saves the current parallel pool ValueStore into a Matlab file. The snapshot contains keys and values only; callback functions are session-local and are not stored. Syntax: save_vstore(file_name)
-
-## Physical / mathematical content
-
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-
-## Numerical / algorithmic content
+Saves the current parallel pool ValueStore to a MATLAB MAT file. The snapshot contains keys and values only; callback functions are session-local and are not stored.
 
 ## Parameters / inputs
 
-- file_name -a character string specifying the destination
-- MAT file
+- `file_name` — a non-empty character row vector specifying the destination MAT file.
 
-## Implementation structure
+## Output / file format
 
-- Saves the current parallel pool ValueStore into a Matlab file.
-- The snapshot contains keys and values only; callback functions
-- are session-local and are not stored. Syntax:
-- save_vstore(file_name)
-- file_name -a character string specifying the destination
-- MAT file
-- Check consistency
-- Get the current parallel pool
-- Get the current ValueStore
-- Get all keys and values
-- Save the snapshot
-- Consistency enforcement
+The function returns no output. It saves the variables `key_set` and `val_set` in MATLAB `-v7.3` format. If the ValueStore has no keys, `val_set` is an empty cell array matching the size of `key_set`.
+
+## Errors / caveats
+
+- Raises an error if `file_name` is not a non-empty character row vector.
+- Raises an error if no current parallel pool exists; it does not start one.
+
+## Contact / link
+
+- ilya.kuprov@weizmann.ac.il
+- https://spindynamics.org/wiki/index.php?title=save_vstore.m

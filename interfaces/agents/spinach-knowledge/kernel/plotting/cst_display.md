@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Draws shielding tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A unit sphere in a Cartesian space is scaled by abs(Axx) in the x direction, abs(Ayy) in the y direction and abs(Azz) in the z direction, where Axx, Ayy, Azz are the eigenvalues of the CST ten- sor in units of ppm. 2. A set of axes is drawn inside the sphere with a red axis for a positive eigenvalue,
-
-## Physical / mathematical content
+Plots chemical shielding tensors (CSTs) for selected atoms on the molecular geometry, using ellipsoids or spherical harmonics.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+The default `harmonics` style converts each tensor to irreducible spherical-tensor coefficients and evaluates the associated spherical-harmonic surface. The `ellipsoids` style diagonalizes a symmetric tensor, scales a sampled unit sphere by its eigenvalues, rotates it by the eigenvectors, and translates it to the atom. Positive and negative values are shown in red and blue, respectively. With `kill_iso=true`, the isotropic component, `trace(cst)/3`, is subtracted before plotting.
 
 ## Syntax
 
@@ -20,39 +18,15 @@ cst_display(props,atoms,scaling,conmatrix,options)
 
 ## Parameters / inputs
 
-- props -output of gparse function
-- atoms -a cell array of element symbols
-- or a vector of integers, indica-
-- ting the atoms for which shiel-
-- ding tensors should be visuali-
-- sed, e.g. {'C','H'} or [1 2 5]
-- scaling -a factor to scale the tensors
-- by for visualisation
-- conmatrix -binary connectivity matrix, 1
-- if a pair of atoms should be
-- connected by a bond. If an em-
-- pty vector is supplied, 1.6
-- Angstrom cutoff distance is used
-- options.style -'ellipsoids' or 'harmonics'
-- options.kill_iso -set to true() to eliminate the
-- isotropic parts of tensors be-
-- fore plotting
-- options.numbers -set to true() to display atom
-- numbers
-- options.symbols -set to false() to not display
-- atom symbols
+- `props` — molecular structure returned by `gparse`; must contain `std_geom`, `symbols`, and the per-atom CST data in `cst`.
+- `atoms` — cell array of element symbols or vector of atom indices to display (for example, `{'C','H'}` or `[1 2 5]`).
+- `scaling` — positive real factor applied to the tensor surfaces and axes.
+- `conmatrix` — binary connectivity matrix; an empty value uses the 1.6 Å bond-distance cutoff described by the source.
+- `options.style` — `'ellipsoids'` or `'harmonics'`; default is `'harmonics'`.
+- `options.kill_iso` — remove the isotropic tensor component before plotting; default is `false`.
+- `options.numbers` — show atom numbers; default is `false`.
+- `options.symbols` — show atom symbols; default is `true`.
 
-## Implementation structure
+## Outputs
 
-- Draws shielding tensors and their eigensystems. Two styles are
-- implemented:
-- A. Ellipsoids (symmetric tensors only):
-- 1. A unit sphere in a Cartesian space is scaled by
-- abs(Axx) in the x direction, abs(Ayy) in the y
-- direction and abs(Azz) in the z direction, where
-- Axx, Ayy, Azz are the eigenvalues of the CST ten-
-- sor in units of ppm.
-- 2. A set of axes is drawn inside the sphere with a
-- red axis for a positive eigenvalue, and a blue
-- axis for a negative one.
-- 3. The sphere is translated to the point of corres-
+Updates the current figure with the molecular geometry, selected shielding tensors, and the requested atom labels; no MATLAB output arguments are returned.

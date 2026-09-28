@@ -4,27 +4,18 @@
 
 ## Purpose
 
-Simulation of XiX DNP field profile in the steady state, a single spin system without ensemble averaging. Calculation time: seconds
+Simulate a steady-state XiX DNP field profile for a single electron–proton spin system without ensemble averaging. The source estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- The system contains an electron and a proton at 3.4 T and 80 K, with trityl electron g-tensor and estimated proton Zeeman parameters. Their Cartesian coordinates place them 3.5 units apart in the supplied coordinate system. The model uses `t1_t2` relaxation, including a distance- and orientation-dependent proton R1 rate calculated by `r1n_dnp`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The calculation uses an unrestricted `sphten-liouv` basis and diagonal relaxation. It detects proton `Lz` while sweeping 201 electron offsets from −300 to 300 MHz. The experiment specifies a spherical grid, ten XiX blocks, and an inverted second-pulse phase; `powder` runs `xixdnp_steady` with the `'esr'` option.
 
 ## Implementation structure
 
-- Simulation of XiX DNP field profile in the steady state,
-- a single spin system without ensemble averaging.
-- Calculation time: seconds
-- W-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Relaxation rates, distance and ori. dep. R1n
-- Basis set
-- Algorithmic options
+- Define the magnet, spins, Zeeman interactions, temperature, coordinates, relaxation, basis, and propagator tolerance.
+- Create the Spinach spin system and set the proton detection state and XiX experiment parameters.
+- Run the steady-state calculation, plot the real proton `Lz` expectation value against microwave resonance offset, and save `xix_w_field_profile_single.fig`.

@@ -4,28 +4,14 @@
 
 ## Purpose
 
-Fitting of 1H NMR spectrum of syn-3,5-difluoroheptane with respect to J-couplings. See our paper for further details: Methyl groups are ghosted out because they do not influence the signals in question. Calculation time: hours
+Fit the J-couplings of syn-3,5-difluoroheptane against three experimental spectra: a 19F spectrum (`syn_dfh_fluorine.mat`) and two distinct 1H datasets (`syn_dfh_proton_a.mat` and `syn_dfh_proton_b.mat`). The methyl groups are ghosted out because they do not influence the signals in question. See https://doi.org/doi/10.1021/acs.joc.4c00670 for further details.
 
-## Physical / mathematical content
+Calculation time: hours.
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Workflow
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Fitting of 1H NMR spectrum of syn-3,5-difluoroheptane with
-- respect to J-couplings. See our paper for further details:
-- Methyl groups are ghosted out because they do not influence
-- the signals in question.
-- Calculation time: hours
-- Load experimental data
-- Normalize the data
-- Set the guess
-- Set optimiser options
-- Get the figure going
-- Run the optimisation
-- Display the result
+- Load the ppm axes and spectra from all three files and normalize each experimental spectrum by its maximum.
+- Start a 15-parameter Nelder–Mead fit with `fminsearch` (`MaxIter=5000`, `MaxFunEvals=Inf`). Parameters 1–3 scale the simulated spectra; parameters 4–15 specify fitted J-couplings, with symmetry-related couplings sharing parameters. Couplings to the ghosted methyl groups are fixed at 7.45.
+- For each trial parameter set, build a Spinach spin system at `sys.magnet=11.7464` using the specified isotope, chemical-shift, and coupling assignments; use a Zeeman–Hilbert basis without approximation. Simulate three acquisitions: 19F; 1H A, observing spins 11 and 18; and 1H B, observing spins 8 and 9.
+- Apply Gaussian apodisation (15.0, 16.0, and 8.0 for 19F, 1H A, and 1H B, respectively), scale the signals, Fourier-transform and zero-fill them, then interpolate the simulated ppm spectra onto their respective experimental axes.
+- Plot experimental and simulated spectra for all three datasets during fitting. Minimize the sum of squared spectral residuals, weighting the 19F residual by 10 and each 1H residual by 1; display the fitted parameter vector.

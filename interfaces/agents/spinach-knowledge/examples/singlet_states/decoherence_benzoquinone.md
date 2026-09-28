@@ -8,27 +8,12 @@ Long-lived spin states in the para-benzoquinone molecule (4 protons, 256-dimensi
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The example examines long-lived spin states in para-benzoquinone’s four-proton system using a Redfield relaxation superoperator that includes every dipolar coupling and CSA tensor.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+It uses a 256-dimensional Liouville space, a 1.0 T field, a 100 ps correlation time, 1e-5 relaxation tolerances, and lists the 20 smallest-magnitude relaxation eigenvalues.
 
 ## Implementation structure
 
-- Long-lived spin states in the para-benzoquinone molecule
-- (4 protons, 256-dimensional Liouville space). The relaxation
-- superoperator accounts for every dipolar coupling and every
-- CSA tensor in the system.
-- Calculation time: seconds
-- Read the spin system (coordinates, chemical shifts,
-- J-couplings and CSAs) from a vacuum DFT calculation
-- Set magnet field to 1.0 Tesla
-- Tighten up the tolerances
-- Set relaxation theory parameters
-- Relaxation superoperator accuracy
-- Use complete basis set
+The function imports vacuum-DFT spin data, constructs a complete spherical-tensor Liouville basis, builds the relaxation superoperator, and extracts its eigenvalues.

@@ -4,28 +4,14 @@
 
 ## Purpose
 
-Recovery of an RF field distribution from a nutation curve measured with the same coil used for excitation and detection. A proton en- semble is driven on-resonance by a bimodal distribution of RF field amplitudes; following the reciprocity principle, the detected sig- nal of every ensemble member is weighted by its own RF field ampli- tude. The transverse magnetisation components are combined into a complex nutation
+Demonstrates recovery of an RF-field distribution from a nutation curve when the same coil excites and detects the ensemble. The detected signal is reciprocity-weighted by each member’s RF-field amplitude.
 
-## Physical / mathematical content
+## Simulated nutation curve
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The system is one on-resonance 1H spin at 14.1 T, in the sphten-liouv formalism with approximation none. The initial state is Lz and the detection components are Lx and Ly. The RF-frequency grid is 2*pi*linspace(25e3,65e3,201) rad/s. Its normalized bimodal Gaussian density has components with weights 0.8 and 0.2, centered at 2*pi*50e3 and 2*pi*38e3 rad/s, with standard deviations 2*pi*3.0e3 and 2*pi*2.5e3 rad/s.
 
-## Numerical / algorithmic content
+The simulation uses dt=2e-6 s and npts=256. Each ensemble member evolves under H+b1_freq(n)*Lx. Its complex transverse signal is weighted by both its probability mass and RF frequency before accumulation. The curve receives a 1.9-radian phase, is normalized to unit maximum magnitude, and is given reproducible complex Gaussian noise of scale 2e-3 using rng(1).
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+## Distribution recovery
 
-## Implementation structure
-
-- Recovery of an RF field distribution from a nutation curve measured
-- with the same coil used for excitation and detection. A proton en-
-- semble is driven on-resonance by a bimodal distribution of RF field
-- amplitudes; following the reciprocity principle, the detected sig-
-- nal of every ensemble member is weighted by its own RF field ampli-
-- tude. The transverse magnetisation components are combined into a
-- complex nutation curve, a receiver phase is applied, noise is add-
-- ed, and nutation_dist.m is called with a user-specified Tikhonov
-- regularisation parameter to recover the true nutation frequency
-- distribution with the reception weight divided out.
-- Calculation time: seconds
-- Isotopes
+The script calls nutation_dist(curve,dt,lambda) with lambda=3e2 for second-derivative Tikhonov regularisation, then plots the source and recovered probability densities against nutation frequency in kHz.

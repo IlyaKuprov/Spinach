@@ -4,25 +4,24 @@
 
 ## Purpose
 
-Rearms the sniffer database. The sniffer checks Spinach distribution .m files for any modifications that the user did since downloading Spinach. The function prints the list of files that have changed in any way since the in- ternal database has been rearmed. The purpose is to catch local modifications that the user may have made and forgotten about, that are causing some un- intended consequences elsewhere in Spinac
+Rebuilds the sniffer database from the current contents of Spinach's `.m` files. The `sniff` function uses this baseline to identify files changed since it was created.
 
 ## Physical / mathematical content
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+This is an integrity utility; it does not model a physical system.
 
 ## Numerical / algorithmic content
 
+For each included file, it hashes the filename together with a hash of the file contents. The resulting list is saved as `smells.mat`, replacing the previous database.
+
+## Parameters / inputs
+
+None.
+
+## Outputs
+
+No return value. The function overwrites `smells.mat` and displays `rearm: sniffer rearmed.`
+
 ## Implementation structure
 
-- Rearms the sniffer database. The sniffer checks Spinach
-- distribution .m files for any modifications that the user
-- did since downloading Spinach. The function prints the
-- list of files that have changed in any way since the in-
-- ternal database has been rearmed.
-- The purpose is to catch local modifications that the user
-- may have made and forgotten about, that are causing some un-
-- intended consequences elsewhere in Spinach.
-- List top level directories
-- List exceptions
-- Get the directory trees
-- Get the table going
+It scans `.m` files under `kernel`, `interfaces`, `experiments`, and `etc`, applies the exception list, collects the hashes, deletes the existing `smells.mat`, and saves the new `smells` variable.

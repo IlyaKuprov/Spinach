@@ -6,29 +6,8 @@
 
 Spinach implementation of the broadband refocusing example from GRAPE is used to design a 200 µs broadband x-phase π pulse: {Sx -> Sx, Sy -> -Sy, Sz -> -Sz} over an offset range of ±12.5 kHz.
 
-## Physical / mathematical content
+## Implementation
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Spinach implementation of the broadband refocusing example from
-- GRAPE is used to design a 200 µs broadband x-phase π pulse:
-- {Sx -> Sx, Sy -> -Sy, Sz -> -Sz}
-- over an offset range of ±12.5 kHz.
-- Magnetic field (Tesla)
-- Chemical shift (ppm)
-- Basis set
-- Spinach housekeeping
-- Normalised Cartesian basis states
-- RF controls and offset operator
-- Drift Hamiltonian
-- Control data structure
+- Implements the refocusing example from [Tosner et al., JMR (2009)](http://dx.doi.org/10.1016/j.jmr.2008.11.020). Builds a 14.1 T single-proton Liouville-space model and uses Lz as the offset operator on 101 design offsets from −12.5 to +12.5 kHz.
+- Optimizes Cartesian Lx/Ly controls for 600 time steps over 200 µs, with a 2π·30 kHz power level, L-BFGS, and at most 200 iterations. The objective implements the stated x-phase pi-refocusing map.
+- Tests the pulse at 201 offsets from −25 to +25 kHz with shaped_pulse_xy and plots the fidelity profile.

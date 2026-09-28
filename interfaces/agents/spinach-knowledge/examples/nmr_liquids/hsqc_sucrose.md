@@ -8,25 +8,12 @@ HSQC spectrum of sucrose with natural content of 13C isotope (magnetic parameter
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Magnetic parameters are generated from the sucrose vacuum-DFT output. Before simulation, the script replaces selected isotropic shielding values with experimental shifts; the HSQC is then accumulated over 13C isotopomers.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The IK-2 sphten-liouv basis uses scalar-coupling connectivity and proximity level 1. The sequence uses J=140 Hz, square apodisation, 128 points per dimension and 512-point zero filling; simulations are run in parallel and combined using the States signal before the 2D Fourier transform.
 
 ## Implementation structure
 
-- HSQC spectrum of sucrose with natural content of 13C isotope
-- (magnetic parameters computed with DFT).
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Set the isotropic parts of shielding tensors to experimental values
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
+The field is 5.9 T; sweeps are [3350 950] Hz and offsets [5000 1100] Hz. The script updates shielding entries for spin numbers [1:19 24:30] using the listed `new_shifts` array, dilutes for 13C, and plots the real spectrum with positive polarity.

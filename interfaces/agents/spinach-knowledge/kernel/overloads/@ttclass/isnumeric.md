@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Returns TRUE for non-empty tensor train objects. Syntax: answer=isnumeric(tt)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Reports whether the input is a non-empty tensor-train object according to the `ttclass` representation.
 
 ## Numerical / algorithmic content
+
+Returns true only when `tt` is a `ttclass` object and `tt.cores` is non-empty. Other inputs return false; this predicate checks the core container, not the numerical values or whether the represented tensor is nonzero.
 
 ## Parameters / inputs
 
@@ -22,11 +20,4 @@ Returns TRUE for non-empty tensor train objects. Syntax: answer=isnumeric(tt)
 
 ## Implementation structure
 
-- Returns TRUE for non-empty tensor train objects. Syntax:
-- answer=isnumeric(tt)
-- tt -tensor train object
-- answer -logical true for non-empty tensor train objects
-- Non-empty tensor trains should return true()
-- People who think honestly and deeply have a hostile
-- attitude towards the public.
-- Johann Wolfgang von Goethe
+The implementation combines `isa(tt,'ttclass')` with `~isempty(tt.cores)` and assigns the resulting logical flag.

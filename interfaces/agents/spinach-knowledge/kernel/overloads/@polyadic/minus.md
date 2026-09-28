@@ -4,24 +4,22 @@
 
 ## Purpose
 
-Polyadic subtraction operation. Does not perform the actual sub- traction, but instead stores the operands as a sum of unopened Kronecker products. Syntax: c=minus(a,b)
+Polyadic subtraction operation. Does not perform the subtraction immediately, but instead stores the operands as a sum of unopened Kronecker products. Syntax: c=minus(a,b)
 
 ## Physical / mathematical content
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Subtraction is represented by negating the second operand and adding it to the first; the polyadic representation avoids immediately expanding the Kronecker products.
 
 ## Numerical / algorithmic content
 
 ## Parameters / inputs
 
-- a,b -polyadic objects
+- `a`, `b`: polyadic objects
 
 ## Outputs
 
-- c -polyadic object
-- Note: use this operation sparingly -the subtractions are simply
-- buffered, and all subsequent operations will be slower.
+- `c`: polyadic object
+- Note: use this operation sparingly—the subtractions are buffered, and all subsequent operations will be slower.
 
 ## Implementation structure
 

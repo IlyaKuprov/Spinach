@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Kronecker product between two RCV sparse matrices. Syntax: C=kron(A,B)
+Forms the Kronecker product of two RCV sparse matrices.
 
-## Physical / mathematical content
+## Mathematical content
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+For each stored entry pair `A(i,j)` and `B(k,l)`, the result stores their product at row `(i-1)*B.numRows+k` and column `(j-1)*B.numCols+l`. Its dimensions are `A.numRows*B.numRows` by `A.numCols*B.numCols`.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The function checks that both inputs are RCV matrices. If either input is marked as GPU-resident, it converts both to GPU arrays. It forms all pairs of stored-entry indices with `ndgrid`, computes the corresponding output indices and value products, and constructs the result with `rcv`; the output GPU flag is the logical OR of the input flags.
 
 ## Parameters / inputs
 
@@ -25,15 +25,7 @@ Kronecker product between two RCV sparse matrices. Syntax: C=kron(A,B)
 
 ## Implementation structure
 
-- Kronecker product between two RCV sparse matrices. Syntax:
-- C=kron(A,B)
-- A -left RCV sparse matrix
-- B -right RCV sparse matrix
-- C -RCV sparse matrix
-- Check consistency
-- Compute the output dimensions
-- Align locations
-- Build the Cartesian product of indices and values
-- Assemble the output RCV object
-- Consistency enforcement
-- Along the Yangzi River, apes moan ceaselessly.
+- Check that both inputs are RCV matrices.
+- Compute the product dimensions and, when needed, move both inputs to GPU arrays.
+- Form all stored-entry pairs, map their indices into the Kronecker-product matrix, and multiply their values.
+- Assemble the output RCV matrix and set its GPU flag from the inputs.

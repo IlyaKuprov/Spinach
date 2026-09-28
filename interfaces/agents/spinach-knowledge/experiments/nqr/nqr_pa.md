@@ -4,52 +4,31 @@
 
 ## Purpose
 
-Nuclear quadrupole resonance soft pulse-acquire experiment. Idealised ac- quisition with infinite bandwidth is done. Syntax: spectrum=nqr_pa(spin_system,parameters,H,R,K)
-
-## Physical / mathematical content
-
-- NQR experiment implementations. These pulse sequences work in quadrupolar-dominated regimes with little or no Zeeman interaction and focus on nutation, free evolution, and transition detection in electric-field-gradient frames.
-
-## Numerical / algorithmic content
+Nuclear quadrupole resonance soft pulse-acquire experiment with idealised, infinite-bandwidth acquisition.
 
 ## Parameters / inputs
 
-- parameters.sweep vector with two elements giving
-- the spectrum window extents, Hz
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.Lx Lx and Ly operators that go into
-- parameters.Ly the RF Hamiltonian
-- parameters.rf_frq RF irradiation frequency, Hz
-- parameters.rf_pwr the multiplier (rad/s) in front
-- of [Lx*cos(ωt)+Ly*sin(ωt)] in the
-- RF Hamiltonian
-- parameters.rf_dur pulse duration, seconds
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `spin_system` — spin system supplied by the simulation context.
+- `parameters.sweep` — two-element vector specifying the spectrum window extents in Hz, in ascending order.
+- `parameters.npoints` — number of points in the spectrum; a positive integer.
+- `parameters.rho0` — initial state.
+- `parameters.coil` — detection state.
+- `parameters.Lx`, `parameters.Ly` — operators used in the RF Hamiltonian; numeric matrices of equal size.
+- `parameters.rf_frq` — RF irradiation frequency in Hz.
+- `parameters.rf_pwr` — multiplier in rad/s of `Lx*cos(ωt)+Ly*sin(ωt)` in the RF Hamiltonian.
+- `parameters.rf_dur` — pulse duration in seconds; non-negative.
+- `H` — Hamiltonian matrix received from the context function.
+- `R` — relaxation superoperator received from the context function.
+- `K` — kinetics superoperator received from the context function.
 
 ## Outputs
 
-- spectrum -the spectrum of the system with the specified
-- starting state detected on the specified coil
-- state within the frequency interval requested
-- Note: relaxation must be present in the system dynamics, or the
-- matrix inversion operation would fail to converge. The re-
-- laxation matrix R should *not* be thermalised.
+- `spectrum` — spectrum of the specified initial state detected on the specified coil state within the requested frequency interval.
 
-## Implementation structure
+Relaxation must be present in the system dynamics for the matrix inversion to converge. The relaxation matrix `R` should **not** be thermalised.
 
-- Nuclear quadrupole resonance soft pulse-acquire experiment. Idealised ac-
-- quisition with infinite bandwidth is done. Syntax:
-- spectrum=nqr_pa(spin_system,parameters,H,R,K)
-- parameters.sweep vector with two elements giving
-- the spectrum window extents, Hz
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.Lx Lx and Ly operators that go into
-- parameters.Ly the RF Hamiltonian
-- parameters.rf_frq RF irradiation frequency, Hz
-- parameters.rf_pwr the multiplier (rad/s) in front
+## Implementation
+
+The function converts the simulation to Liouville space, converts the RF operators to commutation superoperators when starting in `zeeman-hilb`, applies a soft off-resonance pulse with `shaped_pulse_af`, and performs frequency-domain acquisition with `slowpass`.
+
+Source: <https://spindynamics.org/wiki/index.php?title=nqr_pa.m>

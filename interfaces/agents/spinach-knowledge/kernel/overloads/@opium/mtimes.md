@@ -8,8 +8,6 @@ Matrix products involving an OPIUM object. Syntax: c=mtimes(a,b)
 
 ## Physical / mathematical content
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
 ## Numerical / algorithmic content
 
 ## Parameters / inputs
@@ -22,15 +20,7 @@ Matrix products involving an OPIUM object. Syntax: c=mtimes(a,b)
 
 ## Implementation structure
 
-- Matrix products involving an OPIUM object. Syntax:
-- c=mtimes(a,b)
-- a,b -opia or numerical arrays
-- c -multiplication result
-- When A is a scalar
-- Return opium multiplied by A
-- When A is not a scalar
-- Check dimension
-- Return A multiplied by opium
-- When B is a scalar
-- When B is not a scalar
-- When both are opia
+- Scale an OPIUM operand when multiplied by a scalar
+- Check dimensions and perform the matrix product when an OPIUM operand is multiplied by a numeric matrix
+- Apply the OPIUM object's coefficient and dimensions when both operands are OPIUM objects
+- Error when operands are neither numeric nor OPIUM objects

@@ -4,32 +4,23 @@
 
 ## Purpose
 
-Tests permutation group database metadata. Syntax: result=test_perm_group_suite()
+Tests permutation group database metadata.
 
 ## Physical / mathematical content
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- Tests real-valued-character Abelian permutation subgroups, including character orthogonality, closure, commutativity, and involution order.
 
 ## Numerical / algorithmic content
 
+- Compares the S6A and S8A element and character tables with explicit reference tables using tolerances of `1e-15`.
+- Checks S4A, S6A, and S8A metadata, singleton classes, one-dimensional irreducible representations, real sign-valued characters, valid permutation rows, and maximality via centraliser size.
+
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks the real-valued-character Abelian permutation subgroups
-- against explicit element tables, explicit character tables, character
-- orthogonality, closure, commutativity, and involution order.
+- `result` — regression test result with explanatory messages.
 
 ## Implementation structure
 
-- Tests permutation group database metadata. Syntax:
-- result=test_perm_group_suite()
-- result -regression test result with explanatory messages
-- The test checks the real-valued-character Abelian permutation subgroups
-- against explicit element tables, explicit character tables, character
-- orthogonality, closure, commutativity, and involution order.
-- Announce the test target
-- State the utility target of the test
-- Check the S6 Abelian subgroup table
-- Check the S8 Abelian subgroup table
-- Check structural consistency of all real-valued-character Abelian options
-- Get the group under test
+- Announces the test target and initialises the regression result.
+- Checks the S6A and S8A element and character tables.
+- Checks structural consistency of S4A, S6A, and S8A, including permutation products and centralisers.

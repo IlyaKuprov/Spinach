@@ -8,23 +8,15 @@ Field-swept powder EPR spectra of an NV centre in diamond at X and W bands. Calc
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+This example models the NV centre using the `14N` isotope and orientation `111`, and computes its electron-spin powder EPR response at X and W microwave frequencies.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The model uses the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`) and the spherical powder grid `rep_2ang_100pts_sph`. Each field sweep uses 512 points, RSPT order `Inf`, line width `0.001 T`, integration tolerance `0.0001`, and transition-moment tolerance `0.01`.
 
 ## Implementation structure
 
-- Field-swept powder EPR spectra of an NV centre
-- in diamond at X and W bands.
-- Calculation time: seconds.
-- Set NV centre parameters
-- Build the spin system
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- EPR sim parameters
-- Set X-band parameters
-- Run the X-band simulation
-- Plot the X-band spectrum
+- Set the NV orientation and nitrogen isotope, then construct the ground-state model with `diamond_nvm_gs`.
+- Set the magnet field to 1 T, build the Zeeman Hilbert basis, and run Spinach housekeeping.
+- Use `fieldsweep` at 9.5 GHz over 0.1–0.5 T (X band) and at 94 GHz over 3.2–3.5 T (W band).
+- Plot the two spectra against their returned magnetic-field axes.

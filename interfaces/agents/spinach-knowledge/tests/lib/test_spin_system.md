@@ -4,31 +4,18 @@
 
 ## Purpose
 
-Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Builds a Spinach spin system and basis with the quiet settings used by regression tests.
 
 ## Parameters / inputs
 
-- sys -Spinach system specification
-- inter -Spinach interaction specification
-- bas -Spinach basis specification
+- `sys` - Spinach system specification.
+- `inter` - Spinach interaction specification.
+- `bas` - Spinach basis specification.
 
 ## Outputs
 
-- spin_system -Spinach spin system object
+- `spin_system` - Spinach spin-system object with the requested basis.
 
 ## Implementation structure
 
-- Builds a small quiet Spinach spin system for tests. Syntax:
-- spin_system=test_spin_system(sys,inter,bas)
-- sys -Spinach system specification
-- inter -Spinach interaction specification
-- bas -Spinach basis specification
-- spin_system -Spinach spin system object
-- Apply quiet settings used by regression tests
-- Build the Spinach object and basis
+- Sets `sys.output='hush'`, adds `hygiene` to `sys.disable` without duplicates, sets `sys.parallel={'local',1}` and `sys.parprops={}`, then calls `create(sys,inter)` and `basis(spin_system,bas)`.

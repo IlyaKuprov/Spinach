@@ -4,34 +4,21 @@
 
 ## Purpose
 
-Normalized Gaussian function in magnetic resonance notation. Syntax: y=gaussfun(x,fwhm)
+Evaluates a Gaussian line shape centered at zero and normalized to unit area.
 
 ## Physical / mathematical content
 
-- Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
+The width is specified by the full width at half maximum, `fwhm`.
 
 ## Numerical / algorithmic content
 
+The routine converts `fwhm` to the Gaussian standard deviation and evaluates the normalized Gaussian elementwise at `x`.
+
 ## Parameters / inputs
 
-- x -argument values, a real array of any dimension
-- fwhm -full width at half-maximum
+- `x` - real numeric array of any dimension.
+- `fwhm` - positive real scalar full width at half maximum.
 
 ## Outputs
 
-- y -function values at the points specified in x
-
-## Implementation structure
-
-- Normalized Gaussian function in magnetic resonance
-- notation. Syntax:
-- y=gaussfun(x,fwhm)
-- x -argument values, a real array of any dimension
-- fwhm -full width at half-maximum
-- y -function values at the points specified in x
-- Check consistency
-- Compute standard deviation
-- Compute the Gaussian
-- Consistency enforcement
-- Fifty years ago the back streets of Leningrad
-- have taught me one lesson: when a fight is un-
+- `y` - Gaussian values at the points in `x`, with the same array dimensions.

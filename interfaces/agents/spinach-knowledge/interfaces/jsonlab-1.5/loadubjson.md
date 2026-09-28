@@ -4,7 +4,7 @@
 
 ## Purpose
 
-No descriptive header was found. The best immediate identifier is `data = loadubjson(fname,varargin)`, and the implementation details below should be used to infer its role.
+Parse UBJSON data supplied as a file or a string.
 
 ## Physical / mathematical content
 

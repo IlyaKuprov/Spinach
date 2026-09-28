@@ -4,37 +4,19 @@
 
 ## Purpose
 
-Returns the isotropic Zeeman offset of the specified spin from the pure magnetogyric ratio frequency in the current magnet. Syntax: offs=offsetof(spin_system,idx)
+Returns the isotropic Zeeman offset of the specified spin from the pure magnetogyric-ratio frequency in the current magnet.
 
-## Physical / mathematical content
+## Parameters
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- `spin_system` — spin system containing the Zeeman tensors and base frequencies.
+- `idx` — index of the spin in the isotope array. Use `idxof()` to find the index from a text label. Must be a positive integer no greater than the number of particles in `spin_system.comp.isotopes`.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `offs` — offset from the pure magnetogyric-ratio frequency at the current field, in Hz.
 
-- idx -index of the spin in sys.isotopes
-- array, use idxof() to find index
-- by the text label
+## Calculation
 
-## Outputs
+After checking `idx`, the function takes the spin’s Zeeman tensor from `spin_system.inter.zeeman.matrix{idx}`, subtracts `eye(3)*spin_system.inter.basefrqs(idx)`, and converts its isotropic part to Hz: `offs=-trace(offs)/(3*2*pi)`.
 
-- offs -offset from the pure magnetogyric
-- ratio frequency at the current fi-
-- eld, Hz
-
-## Implementation structure
-
-- Returns the isotropic Zeeman offset of the specified spin
-- from the pure magnetogyric ratio frequency in the current
-- magnet. Syntax:
-- offs=offsetof(spin_system,idx)
-- idx -index of the spin in sys.isotopes
-- array, use idxof() to find index
-- by the text label
-- offs -offset from the pure magnetogyric
-- ratio frequency at the current fi-
-- eld, Hz
-- Check consistency
-- Pull out the Zeeman tensor
+Source: <https://spindynamics.org/wiki/index.php?title=offsetof.m>

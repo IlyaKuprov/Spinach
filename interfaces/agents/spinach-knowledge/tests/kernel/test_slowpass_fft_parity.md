@@ -4,32 +4,24 @@
 
 ## Purpose
 
-Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity()
+Checks slowpass amplitude normalisation against a time-domain signal processed with MATLAB's unnormalised FFT.
 
 ## Physical / mathematical content
 
+For a damped one-spin signal, frequency-domain acquisition by `slowpass()` should match the unnormalised FFT amplitude at zero frequency.
+
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The test builds a damped one-proton Liouville-space system at `14.1 T`, acquires a `4096`-point FID with a `4096 Hz` sweep, and compares the zero-frequency bin (index `2049`) of `slowpass()` with `fftshift(fft(fid))`. The comparison uses absolute and relative tolerances of `1e-6` and `2e-3`. It also verifies that a one-point spectrum is rejected when the error message contains `integer greater than one`.
 
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test compares frequency-domain acquisition from slowpass() with the
-- same damped one-spin signal acquired in the time domain and processed by
-- Matlab's unnormalised FFT.
+`result` is the regression-test record with the comparison and rejection checks.
 
 ## Implementation structure
 
-- Tests slowpass amplitude normalisation against time-domain FFT. Syntax:
-- result=test_slowpass_fft_parity()
-- result -regression test result with explanatory messages
-- The test compares frequency-domain acquisition from slowpass() with the
-- same damped one-spin signal acquired in the time domain and processed by
-- Matlab's unnormalised FFT.
-- Announce the test target
-- State the slowpass normalisation target of the test
-- Build a damped one-spin Liouville-space system
-- Get production generators and states
-- Acquire the signal in the time domain
-- Use the exact FFT bins as the slowpass frequency grid
+Acquires the same damped signal in time and frequency domains, checks the zero-frequency amplitude, and tests the single-point error path.
+
+## Header notes
+
+The source header credits Ilya Kuprov (`ilya.kuprov@weizmann.ac.il`).

@@ -4,29 +4,8 @@
 
 ## Purpose
 
-Example of a 2D-INADEQUATE spectrum of a generic three-spin system. Calculation time: seconds. Theresa Hune Christian Griesinger
+Example of a 2D-INADEQUATE spectrum of a generic three-spin system. Calculation time: seconds. Contributors named in the source: Theresa Hune and Christian Griesinger.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Example of a 2D-INADEQUATE spectrum of a
-- generic three-spin system.
-- Calculation time: seconds.
-- Theresa Hune
-- Christian Griesinger
-- Magnetic field (700 MHz)
-- Generic three-spin system
-- Formalism and basis set
-- Spinach housekeeping
-- Generate isotopomers
-- Sequence parameters
-- Preallocate the answer
+The three 13C spins are simulated at 16.44 T (700 MHz) with J(1,2) = 20 Hz, J(1,3) = 60 Hz, and no coupling between spins 2 and 3. The code generates pair-labelled 13C isotopomers and simulates a two-dimensional INADEQUATE experiment. It apodises both quadrature components, forms the States signal, Fourier transforms both dimensions, and plots the resulting spectrum.

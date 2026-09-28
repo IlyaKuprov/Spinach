@@ -4,13 +4,11 @@
 
 ## Purpose
 
-Tensor train subtraction operation. Does not perform the actual subtraction but instead concatenates the operands until such time as recompression beco- mes absolutely necessary. Syntax: c=minus(a,b)
-
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Represents the difference of two tensor trains without immediately performing a recompression.
 
 ## Numerical / algorithmic content
+
+The inputs must be `ttclass` objects with matching core counts and mode sizes. The result is assembled by concatenating their train components and pairing the second operand's coefficients with negative signs. Zero-coefficient components are discarded; if none remain, the result is set to a zero tensor train.
 
 ## Parameters / inputs
 
@@ -19,19 +17,4 @@ Tensor train subtraction operation. Does not perform the actual subtraction but 
 
 ## Outputs
 
-- c -a tensor train object
-
-## Implementation structure
-
-- Tensor train subtraction operation. Does not perform the actual subtraction
-- but instead concatenates the operands until such time as recompression beco-
-- mes absolutely necessary. Syntax:
-- c=minus(a,b)
-- a -a tensor train object
-- b -a tensor train object
-- c -a tensor train object
-- Validate the input
-- Write the difference object
-- Filter out zero coeff
-- Meraki (Greek, n.) -the soul, creativity or love put into something;
-- the essence of yourself that is put into your work.
+- a -the tensor train representing the difference `a-b`

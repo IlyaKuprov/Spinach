@@ -4,34 +4,20 @@
 
 ## Purpose
 
-Converts a tensor train representation of a matrix into a matrix. Syntax: answer=full(ttrain)
+Converts a tensor-train representation of a matrix into a dense matrix.
 
-## Physical / mathematical content
+## Input
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+- `ttrain` — tensor train object.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `answer` — full matrix represented by `ttrain`.
 
-- ttrain -tensor train object
+## Note
 
-## Outputs
+The dense result can be very large; careless use may exhaust available memory.
 
-- answer -a full matrix
-- Note: the result can be huge, careless use would crash the system.
+## Algorithm
 
-## Implementation structure
-
-- Converts a tensor train representation of a matrix
-- into a matrix. Syntax:
-- answer=full(ttrain)
-- ttrain -tensor train object
-- answer -a full matrix
-- Note: the result can be huge, careless use would crash the system.
-- Preallocate the result
-- Get object dimensions
-- Get tensor ranks
-- Get mode sizes
-- Loop over the buffer
-- Multiply up the tensor train
+The function preallocates the result, obtains the train ranks and mode sizes, contracts the cores from the last core toward the first for each train, and adds each contracted matrix weighted by its coefficient.

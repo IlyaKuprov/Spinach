@@ -4,34 +4,19 @@
 
 ## Purpose
 
-Arc length between two points on the unit sphere specified by the unit vectors supplied. Syntax: sig=arclength(r1,r2)
+Returns the arc length between two points on the unit sphere represented by unit vectors.
 
 ## Physical / mathematical content
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
+- The function returns the angular distance in radians, computed as `atan2(norm(cross(r1,r2)),dot(r1,r2))`.
+- Inputs must be real numeric three-element vectors whose Euclidean norms differ from one by no more than `sqrt(eps)`; the vectors are then normalized before the angle is evaluated.
 
 ## Parameters / inputs
 
-- r1,r2 -three-element unit vectors with Cartesian
-- coordinates of the arc endpoints
+- `r1`, `r2` — three-element unit vectors giving the Cartesian coordinates of the arc endpoints.
 
 ## Outputs
 
-- sig -arc length
+- `sig` — arc length in radians.
 
-## Implementation structure
-
-- Arc length between two points on the unit sphere specified by
-- the unit vectors supplied. Syntax:
-- sig=arclength(r1,r2)
-- r1,r2 -three-element unit vectors with Cartesian
-- coordinates of the arc endpoints
-- sig -arc length
-- Check consistency
-- Normalise the vectors
-- Get the arc length
-- Consistency enforcement
-- Ah, there's nothing more exciting than science. You get all the
-- fun of sitting still, being quiet, writing down numbers, paying
+<https://spindynamics.org/wiki/index.php?title=arclength.m>

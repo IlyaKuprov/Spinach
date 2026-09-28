@@ -4,45 +4,37 @@
 
 ## Purpose
 
-Fast spin echo (FSE) pulse sequence. Syntax: mri=fse(spin_system,parameters,H,R,K,G,F) This sequence must be called from the imaging() context, which would provide H,R,K,G, and F.
+Fast spin echo (FSE) imaging sequence. Call it from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`.
 
 ## Physical / mathematical content
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The sequence forms the background operator `B=H+F+1i*R+1i*K` and constructs a pulse operator for the first spin named in `parameters.spins`. It applies an initial 90-degree pulse, moves to the left edge of k-space under the readout gradient, then repeats a 180-degree pulse, phase-encoding gradient, readout, and opposite phase-encoding gradient for each image row.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+- Phase-encoding amplitudes span `-parameters.pe_grad_amp` to `parameters.pe_grad_amp` across `parameters.image_size(1)` rows.
+- Each readout trajectory is generated with `krylov()` using a time step of `parameters.ro_grad_dur/(parameters.image_size(2)-1)`. Projection onto `parameters.coil` fills the corresponding k-space row.
+- The k-space data receive square-sinebell apodisation in both dimensions. The output is `-real(fftshift(fft2(ifftshift(fid)),2))`.
 
 ## Parameters / inputs
 
-- parameters.pe_grad_amp -phase encoding gradient amplitude, T/m
-- parameters.ro_grad_amp -readout gradient amplitude, T/m
-- parameters.pe_grad_dur -the duration of the phase encoding
-- gradient, seconds
-- parameters.ro_grad_dur -the duration of the readout gradient,
-- seconds
-- parameters.image_size -number of points in each dimension of
-- the resulting image
+- `spin_system`: must use the `sphten-liouv` or `zeeman-liouv` formalism.
+- `H`, `R`, `K`, `F`: numeric matrices of the same dimensions.
+- `G`: cell array containing at least two gradient operators; the sequence uses `G{1}` for phase encoding and `G{2}` for readout.
+- `parameters.spins`: nonempty cell array of character strings; its first entry selects the spin used for pulses.
+- `parameters.npts`: vector of positive integers used to construct the pulse operator.
+- `parameters.rho0`: numeric initial state.
+- `parameters.coil`: numeric detection operator.
+- `parameters.pe_grad_amp`: real scalar phase-encoding gradient amplitude, T/m.
+- `parameters.ro_grad_amp`: real scalar readout gradient amplitude, T/m.
+- `parameters.pe_grad_dur`: positive real scalar phase-encoding gradient duration, seconds.
+- `parameters.ro_grad_dur`: positive real scalar readout gradient duration, seconds.
+- `parameters.image_size`: two integers greater than one specifying the number of points in each image dimension.
 
 ## Outputs
 
-- mri -MRI image with square sinebell apodisation.
+- `mri`: MRI image reconstructed from k-space data with square-sinebell apodisation.
 
-## Implementation structure
+## Reference
 
-- Fast spin echo (FSE) pulse sequence. Syntax:
-- mri=fse(spin_system,parameters,H,R,K,G,F)
-- This sequence must be called from the imaging() context, which
-- would provide H,R,K,G, and F.
-- parameters.pe_grad_amp - phase encoding gradient amplitude, T/m
-- parameters.ro_grad_amp - readout gradient amplitude, T/m
-- parameters.pe_grad_dur - the duration of the phase encoding
-- gradient, seconds
-- parameters.ro_grad_dur - the duration of the readout gradient,
-- seconds
-- parameters.image_size - number of points in each dimension of
-- the resulting image
+- <https://spindynamics.org/wiki/index.php?title=fse.m>

@@ -4,29 +4,10 @@
 
 ## Purpose
 
-Water protons in the unit cell of monohydrocalcite, inc- luding slow isotropic rotational diffusion and MAS. Fur- ther details in: Calculation time: minutes, seconds with a GPU.
+Calculates proton NMR spectra for water protons in monohydrocalcite under MAS while varying slow isotropic rotational-diffusion correlation time. The source cites https://doi.org/10.1038/s41467-023-44381-x and reports minutes of runtime, or seconds with a GPU.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Water protons in the unit cell of monohydrocalcite, inc-
-- luding slow isotropic rotational diffusion and MAS. Fur-
-- ther details in:
-- Calculation time: minutes, seconds with a GPU.
-- 400 MHz NMR
-- Read CASTEP file
-- Drop C, O, and Ca atoms
-- Keep two protons
-- Convert shielding tensors into shift using the
-- parametrisation of Huang et al. ACIE 2021
-- Get coordinates
-- Basis set
+- Reads `mhc.magres`, removes C, O, and Ca, and retains the proton sites at positions 1 and 4. The CASTEP shielding tensors are converted to shifts using the Huang et al. ACIE 2021 parametrisation; the model uses their coordinates and a 9.4 T field (labelled 400 MHz NMR in the source), with an `sphten-liouv` basis with no approximation.
+- Uses `gridfree` acquisition with MAS rate 10,000 Hz, axis `[1 1 1]`, sweep 120,000 Hz, 1,024 points, 4,096-point zero filling, zero offset, and no decoupling.
+- Runs correlation times `1e-6*[0.10 1.00 10.0 100.0 1000.0]` s with corresponding Wigner ranks `[2 3 5 7 13]`. For each, it acquires the FID, applies exponential apodisation (6), Fourier transforms, and plots the real spectrum. GPU enablement is commented out in the source.

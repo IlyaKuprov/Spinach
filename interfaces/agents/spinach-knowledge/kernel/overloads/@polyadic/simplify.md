@@ -4,34 +4,24 @@
 
 ## Purpose
 
-Simplifies the structure of the polyadic object by reordering buffers, dropping inconsequential terms, and flattening nested polyadics where possible. Syntax: p=simplify(p)
+Recursively simplifies prefix and suffix buffers and core terms: it removes zero and identity factors, absorbs scalar or `opium` factors, flattens eligible single-core nested polyadics, and combines adjacent `opium` factors. A zero representation becomes a sparse zero matrix; a bare single-core representation is returned directly.
 
 ## Physical / mathematical content
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+Simplification preserves the matrix represented by the polyadic while reducing redundant or zero structure.
 
 ## Numerical / algorithmic content
 
 ## Parameters / inputs
 
-- p -a polyadic object
+- `p`: a polyadic object
 
 ## Outputs
 
-- p -a polyadic or a numeric object
+- `p`: a polyadic or numeric object
 
 ## Implementation structure
 
-- Simplifies the structure of the polyadic object by reordering buffers,
-- dropping inconsequential terms, and flattening nested polyadics where
-- possible. Syntax:
-- p=simplify(p)
-- p -a polyadic object
-- p -a polyadic or a numeric object
-- Check consistency
-- Get size information
-- Flush trivial polyadics into all-zero sparse matrices
-- Loop until static
-- Default disposition
-- Simplify prefixes
+- Validates the input and obtains its represented dimensions.
+- Repeats simplification until no changes remain, processing prefixes, suffixes, and core terms recursively.
+- Returns sparse zero output for an empty/zero representation, and unwraps a bare single-core polyadic.

@@ -4,17 +4,12 @@
 
 ## Purpose
 
-Karplus coefficients extraction from a DFT dihedral angle scan over one of the chi angles in leucine using Gaussian09.
+Fits Karplus coefficients to the DFT dihedral-angle scan for a leucine chi angle, using Gaussian09-derived data. The script calls `karplus_fit('leu_chi_data',{[31 29 23 24]})` and displays fitted `A`, `B`, and `C` coefficients with their standard deviations.
 
 ## Physical / mathematical content
 
-- Karplus-curve examples. These scripts connect molecular geometry to scalar coupling estimates through empirical torsion-angle relationships and are therefore centred on conformational analysis and parameter fitting.
-
-## Numerical / algorithmic content
+A Karplus fit relates torsion angle to scalar coupling; this example extracts the three coefficients and their uncertainties from the supplied scan data.
 
 ## Implementation structure
 
-- Karplus coefficients extraction from a DFT dihedral angle scan
-- over one of the chi angles in leucine using Gaussian09.
-- Run the Karplus fitter
-- Display the answer
+Calls `karplus_fit` for the `leu_chi_data` dataset and atom quartet `[31 29 23 24]`, then prints each coefficient and standard deviation.

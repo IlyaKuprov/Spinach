@@ -4,25 +4,12 @@
 
 ## Purpose
 
-This include is executed at the start of create.m, it over- rides all user input. A good use case is forcing polyadic or GPU arithmetic, or some other specific hardware or soft- ware configuration.
+This include runs at the start of `create.m`. It disables the GPU device deprecation warning and sets default figure position, window style, menu bar, and toolbar. It does not replace a user-specified `sys.parallel` value.
 
-## Physical / mathematical content
+## Behaviour
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+When `sys.parallel` is absent, GPU use is enabled, and the host is `ALAUNDO` or `TALOS`, the include sets process parallelism to 32 or 12, respectively. The scratch-folder assignment in the source is commented out and has no effect.
 
-## Numerical / algorithmic content
+## Source documentation
 
-## Implementation structure
-
-- This include is executed at the start of create.m, it over-
-- rides all user input. A good use case is forcing polyadic
-- or GPU arithmetic, or some other specific hardware or soft-
-- ware configuration.
-- Kill the pointless GPU deprecation warning
-- Kill stupid ass figure defaults in R2025a and later
-- Do not override user spec
-- IK group system settings
-- Be careful with GPUs
-- 4 workers per GPU are safe
-- Do nothing
-- This relocates the scratch folder
+https://spindynamics.org/wiki/index.php?title=autoexec.m

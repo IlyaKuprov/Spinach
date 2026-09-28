@@ -4,57 +4,32 @@
 
 ## Purpose
 
-Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-
-## Numerical / algorithmic content
-
-- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, or `zeeman-wavef`. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The same method restriction is enforced at direct `grape_liouv` entry regardless of the requested output count.
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Validates optimal-control options and updates the spin system object. This call freezes the optimisation problem for ensemble evaluation.
 
 ## Parameters / inputs
 
-- spin_system -primary Spinach data structure,
-- created by create.m and updated
-- by basis.m functions
-- control -control data structure described
-- in detail in the online manual
+- `spin_system` — primary Spinach data structure, created by `create.m` and updated by `basis.m` functions.
+- `control` — control data structure described in detail in the [online manual](https://spindynamics.org/wiki/index.php?title=optimcon.m). Required fields include `isotopes`, `channels`, `operators`, `rho_init`, `rho_targ`, `pwr_levels`, `pulse_dt`, and `drifts`.
 
 ## Outputs
 
-- spin_system -updated Spinach data structure
-- Note: this function freezes the optimisation problem. The ensemble
-- case catalog is built here, its cases are assigned to the
-- parallel pool workers in contiguous blocks recorded in
-- spin_system.control.worker_cases, and the frozen problem is
-- published to the workers exactly once: the common part as a
-- parallel.pool.Constant in spin_system.control.invariants, the
-- drift generators as a parallel.pool.Constant built from a per-
-- worker Composite in spin_system.control.drift_slices, so that
-- each worker receives the drifts of its own case block and no-
-- thing else; the pool must therefore have SpmdEnabled set to
-- true. Heavy invariants -the drift generators, the control
-- operators, the offset operators, the control commutators,
-- and the Bloch-Siegert response operators -are then removed
-- from the returned structure, and their names are recorded
-- in spin_system.control.frozen_fields. All other control
-- fields stay live: ensemble() re-sends them to the workers
-- at every evaluation, and they may be overwritten between
-- optimisations. Among them are the Bloch-Siegert channel
-- carrier frequencies, kept in spin_system.control.carrier_-
-- frq, from which bloch_siegert() rebuilds the response ope-
-- rators when a waveform is replayed on the client. Changes
-- to the ensemble composition, the operators, the generators,
-- the channel isotopes, or the carrier frequencies require a
-- fresh optimcon() call: the frozen response operators are
-- built from the carriers seen here, and editing them after-
-- wards would replay physics that the optimiser never saw.
+- `spin_system` — updated Spinach data structure.
+
+## Control configuration
+
+- Fidelity measures are `real` (default), `imag`, and `square`. Integrators are `rectangle` (default, piecewise-constant) and `trapezium` (piecewise-linear). Methods are `lbfgs` (default), `rbfgs`, `newton`, and `goodwin`; `newton` and `goodwin` cannot use the trapezium integrator.
+- `pulse_dt` specifies positive interval durations. Rectangle integration uses one control value per interval; trapezium integration uses one more value than the number of intervals. Each ensemble drift supplies either one generator or one generator per control value.
+- Optional settings include offsets and their operators, power and state ensembles, ensemble correlations and budget, phase cycles, waveform basis or freeze mask, penalties and bounds, distortion functions, Bloch-Siegert corrections, keyholes, trajectory penalties, fidelity timing, plotting, and checkpointing. Unrecognised or mismatched options cause an error.
+- `steady` requires `sphten-liouv`; in this mode the supplied `rho_init` is ignored. Hilbert-space and wavefunction controls and drifts must be Hermitian, as must generators used with `goodwin`.
+- For `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, nonempty keyhole schedules with `newton` or `goodwin` are not implemented. First-order `lbfgs` and `rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available. Supplying `control.keyholes` is not supported with trapezium integration; when the field is absent, an empty schedule is created.
+- Bloch-Siegert corrections require channel-isotope control operators that are unit quadratures of the canonical `Lx` and `Ly` operators; they are unavailable with `newton`, `goodwin`, or trapezium integration.
+
+## Frozen ensemble problem
+
+`optimcon` builds the ensemble case catalog and records contiguous worker case blocks in `spin_system.control.worker_cases`. With a parallel pool, `SpmdEnabled` must be true. The common frozen problem is published once through `parallel.pool.Constant` in `spin_system.control.invariants`; drift generators are published through `spin_system.control.drift_slices`, using a per-worker `Composite` so each worker receives only the drifts needed for its case block.
+
+Heavy invariants—drift generators, control and offset operators, control commutators, and Bloch-Siegert response operators when present—are removed from the returned control structure; their names are recorded in `spin_system.control.frozen_fields`. The source header documents that other control fields stay live and `ensemble()` re-sends them to workers at every evaluation. When Bloch-Siegert corrections are enabled, channel carrier frequencies are retained in `spin_system.control.carrier_frq`; the header says `bloch_siegert()` uses them for client-side waveform replay. Changes to ensemble composition, operators, generators, channel isotopes, or carrier frequencies require a fresh `optimcon()` call: changing carriers after freezing would make replay disagree with the response operators seen by the optimiser.
+
+## Reference
+
+- [optimcon.m online manual](https://spindynamics.org/wiki/index.php?title=optimcon.m)

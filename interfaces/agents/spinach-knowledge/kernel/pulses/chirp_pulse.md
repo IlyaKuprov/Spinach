@@ -1,66 +1,28 @@
 # kernel/pulses/chirp_pulse.m
 
-- Signature: `[Cx,Cy,durs,ints,amps,phis,frqs]=...`
+- Signature: `[Cx,Cy,durs,ints,amps,phis,frqs]=chirp_pulse(npts,dur,bwidth,smp,type)`
 
 ## Purpose
 
-Chirp pulse waveform with a sine bell power or a quarter-sine amplitude fade-in and fade-out. Generates unidirectional chir- ps or saltire chirps which are super-positions of two counter- sweeping chirps. Syntax: [Cx,Cy,durs,ints,amps,phis,frqs]=... chirp_pulse(npts,dur,bwidth,smp,type)
+Generates a frequency-swept chirp pulse with a WURST or smoothed amplitude envelope, or a saltire pulse formed from a smoothed chirp. The waveform is calibrated to produce an inversion pulse.
 
-## Physical / mathematical content
+## Inputs
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- npts -number of discretization points in
-- the waveform
-- duration -pulse duration, seconds
-- bwidth -chirp sweep bandwidth around
-- zero frequency, Hz
-- type -'wurst', 'smoothed', or 'saltire'; the
-- default is uniform time grid, to get
-- adaptive sampling, add '-adaptive'
-- smp -smoothing parameter; for 'wurst', this
-- is the power in
-- 1-|sin(x)^smp|
-- as x approaches pi/2 at either the edge
-- of the pulse. For 'smoothed' and 'salti-
-- re', this is the fraction of the pulse
-- duration (in percent) that is affected
-- by a sine bell fade-in and fade-out: 0
-- means square amplitude envelope and 50
-- means sine bell envelope.
+- `npts` — positive integer number of waveform points.
+- `dur` — finite positive pulse duration in seconds.
+- `bwidth` — finite positive sweep bandwidth around zero frequency, in Hz.
+- `type` — one of `wurst`, `smoothed`, or `saltire`; append `-adaptive` for adaptive sampling.
+- `smp` — envelope parameter. For WURST, it is the power in `1-abs(sin(pi*time_grid).^smp)` and must exceed 1. For smoothed and saltire pulses it sets the edge-fade duration as a percentage from 0 to 50; 0 gives a square envelope and 50 a sine-bell envelope.
 
 ## Outputs
 
-- Cx -real part of the waveform, calibrated to
-- produce an inversion pulse, rad/s
-- Cy -imag part of the waveform, calibrated to
-- produce an inversion pulse, rad/s
-- durs -slice durations for piecewise-constant
-- approximation, seconds
-- ints -interval durations for piecewise-linear
-- approximation, seconds
-- amps -waveform amplitudes, rad/s
-- phis -waveform phases, rad
-- frqs -waveform frequencies, Hz
-- intv_grid -normalised interval grid, npts-1 elements
-- Note: Cy is zero for the saltire pulse, this radically changes
-- its phase and amplitude profiles.
+- `Cx`, `Cy` — real and imaginary Cartesian waveform components in rad/s.
+- `durs` — time-slice durations for piecewise-constant propagation, in seconds.
+- `ints` — interval durations for piecewise-linear propagation, in seconds.
+- `amps`, `phis`, `frqs` — waveform amplitude (rad/s), phase (rad), and instantaneous frequency (Hz). The saltire branch sets `Cy` to zero and returns before assigning `frqs`; requesting more than six outputs for a saltire pulse is rejected.
 
-## Implementation structure
+The adaptive mode uses a nonuniform time grid; otherwise the time grid is uniform. The phase is quadratic in the normalized time coordinate and the instantaneous frequency sweeps linearly across the specified bandwidth. The amplitude envelope is scaled by `2*pi*sqrt(bwidth/dur)`.
 
-- Chirp pulse waveform with a sine bell power or a quarter-sine
-- amplitude fade-in and fade-out. Generates unidirectional chir-
-- ps or saltire chirps which are super-positions of two counter-
-- sweeping chirps. Syntax:
-- [Cx,Cy,durs,ints,amps,phis,frqs]=...
-- chirp_pulse(npts,dur,bwidth,smp,type)
-- npts -number of discretization points in
-- the waveform
-- duration -pulse duration, seconds
-- bwidth -chirp sweep bandwidth around
-- zero frequency, Hz
-- type -'wurst', 'smoothed', or 'saltire'; the
+## Reference
+
+[Spin Dynamics Wiki: `chirp_pulse.m`](https://spindynamics.org/wiki/index.php?title=chirp_pulse.m)

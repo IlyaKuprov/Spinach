@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Directional derivatives of the matrix exponential. Implements Equation 11 of Najfeld and Havel (https://doi.org/10.1006/aama.1995.1017) and Equati- on 16 of Goodwin and Kuprov (https://doi.org/10.1063/1.4928978). Syntax: D=dirdiff(spin_system,A,B,T,N)
+Directional derivatives of the matrix exponential. Implements Equation 11 of Najfeld and Havel (https://doi.org/10.1006/aama.1995.1017) and Equation 16 of Goodwin and Kuprov (https://doi.org/10.1063/1.4928978). Syntax: D=dirdiff(spin_system,A,B,T,N)
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- The block-matrix exponential encodes directional derivatives of the matrix exponential for the Hamiltonian `A` and direction matrix or matrices `B`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Constructs an upper-bidiagonal block matrix with `A` on the diagonal and `B` (or ordered directions `B{n}`) on the first superdiagonal, exponentiates `-1i*auxmat*T`, then extracts blocks from the first block row and scales block `n` by `(n-1)!`.
 
 ## Parameters / inputs
 

@@ -4,31 +4,20 @@
 
 ## Purpose
 
-Optimal control pulse optimisation for state-to-state transfer in a quadrupolar 14N spin at a fixed orientation and power level Two pulses are optimised cooperatively, so that the sum of the outcomes only contains the target state, and no impurities. Calculation time: minutes.
+Optimise two pulses cooperatively for state-to-state transfer in a quadrupolar 14N spin at a fixed orientation and power level, so that their combined outcomes contain the target state without impurities. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- The initial state is the normalised 14N `T1,0` state; the target is the normalised `T2,0` state.
+- The drift Hamiltonian is assembled at orientation `[1 2 3]` and transformed to a rotating frame. The control operators are `Lx` and `Ly`.
+- The optimisation uses the cooperative GRAPE objective `grape_coop` with the limited-memory quasi-Newton method `lbfgs`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The spin system has a 14.1 T field, a glycine 14N NQI coupling specified by `eeqq2nqi(1.18e6,0.53,1,[1.0 2.0 3.0])`, and a 14N chemical shift of 32.4. It uses the `sphten-liouv` formalism without basis approximation.
+- The controls use a power level of `2*pi*50e3`, 100 slices of duration `10e-8`, an initial amplitude profile of ones, a random `2`-by-`100` initial guess, and a limit of 100 optimisation iterations.
 
 ## Implementation structure
 
-- Optimal control pulse optimisation for state-to-state transfer
-- in a quadrupolar 14N spin at a fixed orientation and power level
-- Two pulses are optimised cooperatively, so that the sum of the
-- outcomes only contains the target state, and no impurities.
-- Calculation time: minutes.
-- Magnet field
-- Isotopes
-- Glycine NQI, random orientation
-- Glycine 14N chemical shift
-- Basis set
-- Run Spinach housekeeping
-- Set up and normalise the initial state
+- Create the spin system and basis, prepare and normalise the initial and target states, and construct the drift and control operators.
+- Configure the cooperative optimisation, run `fmaxnewton` with `@grape_coop`, then print both final outcomes, their average, and the target state.

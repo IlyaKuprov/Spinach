@@ -4,37 +4,23 @@
 
 ## Purpose
 
-Discrete cosine transform algorithm for Chebyshev expansion coefficients of the user-specified scalar function. Syntax: c=cheb_coeff(f,a,b,n)
+Computes the coefficients of a Chebyshev expansion of the user-specified scalar function over the interval `[a,b]` using a discrete cosine transform.
 
 ## Physical / mathematical content
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function samples `f` at Chebyshev query points mapped from `[-1,1]` to `[a,b]`, then returns the corresponding expansion coefficients.
 
 ## Numerical / algorithmic content
 
+After checking the inputs, it computes `dct(f(x))/sqrt(n)` and scales coefficients 2 through `n` by `sqrt(2)`.
+
 ## Parameters / inputs
 
-- f -function handle, must be vectorised
-- a -left edge of the expansion interval
-- b -right edge of the expansion interval
-- n -number of Chebyshev polynomials in
-- the expansion
+- `f` — vectorised function handle
+- `a` — left edge of the expansion interval
+- `b` — right edge of the expansion interval
+- `n` — number of Chebyshev polynomials in the expansion
 
 ## Outputs
 
-- c -a vector of expansion coefficients
-
-## Implementation structure
-
-- Discrete cosine transform algorithm for Chebyshev expansion
-- coefficients of the user-specified scalar function. Syntax:
-- c=cheb_coeff(f,a,b,n)
-- f -function handle, must be vectorised
-- a -left edge of the expansion interval
-- b -right edge of the expansion interval
-- n -number of Chebyshev polynomials in
-- the expansion
-- c -a vector of expansion coefficients
-- Check consistency
-- [-1,+1] query points
-- Scaled query points
+- `c` — vector of expansion coefficients

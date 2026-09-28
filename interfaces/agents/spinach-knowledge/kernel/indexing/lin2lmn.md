@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts linear indices of Wigner D functions into L,M,N indices. In the linear indexing convention, Wigner D functions are listed in the order of increasing L rank. Within each L, the functions are listed in the order of decreasing left index M, and, for each M, in the or- der of decreasing N index. One base counting is used: I=1 -> (L=0,M=0,N=0) I=2 -> (L=1,M=1,N=1) I=3 -> (L=1,M=1,N=0), et cetera...
+Converts one-based linear indices of Wigner D functions to rank `L` and indices `M,N`. Indices are ordered by increasing `L`; within each rank, `M` decreases from `L` to `-L`, and for each `M`, `N` decreases from `L` to `-L`. Thus `I=1` maps to (0,0,0), `I=2` to (1,1,1), and `I=3` to (1,1,0).
 
 ## Physical / mathematical content
 
-- Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
+A rank-`L` block contains `(2*L+1)^2` Wigner D indices. The first linear index in that block is `(4*L^3-L)/3+1`.
 
 ## Numerical / algorithmic content
+
+The implementation inverts the cumulative rank-block count to obtain `L`, computes the position within that block to obtain `M,N`, then checks the result by converting back with `lmn2lin`.
 
 ## Syntax
 
@@ -20,26 +22,10 @@ Converts linear indices of Wigner D functions into L,M,N indices. In the linear 
 
 ## Parameters / inputs
 
-- I -linear indices of Wigner D functions, with
-- I=1 corresponding to L=0, M=0, N=0.
+- `I` - array of positive real integers; `I=1` corresponds to `L=0, M=0, N=0`.
 
 ## Outputs
 
-- L -ranks of Wigner D functions
-- M -row indices of Wigner D functions
-- N -column indices of Wigner D functions
-
-## Implementation structure
-
-- Converts linear indices of Wigner D functions into L,M,N indices. In
-- the linear indexing convention, Wigner D functions are listed in the
-- order of increasing L rank. Within each L, the functions are listed
-- in the order of decreasing left index M, and, for each M, in the or-
-- der of decreasing N index. One base counting is used:
-- I=1 -> (L=0,M=0,N=0)
-- I=2 -> (L=1,M=1,N=1)
-- I=3 -> (L=1,M=1,N=0), et cetera...
-- [L,M,N]=lin2lmn(I)
-- I -linear indices of Wigner D functions, with
-- I=1 corresponding to L=0, M=0, N=0.
-- L -ranks of Wigner D functions
+- `L` - ranks of Wigner D functions.
+- `M` - row indices of Wigner D functions.
+- `N` - column indices of Wigner D functions.

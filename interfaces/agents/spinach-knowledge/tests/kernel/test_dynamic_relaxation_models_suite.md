@@ -12,25 +12,13 @@ Tests dynamic relaxation model helper paths. Syntax: result=test_dynamic_relaxat
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
+- Builds one-spin Liouville-space examples and checks anisotropic tensor and function-handle T1/T2 rates, damping and Lindblad rates, a zero-H0 scalar Redfield integral, rotational-diffusion correlation-function weights and rates, and the serial Redfield include.
 ## Outputs
 
-- result -regression test result with explanatory messages
-- The test checks anisotropic and functional T1/T2 rates, damping, Lindblad,
-- scalar Redfield, correlation functions, and the serial Redfield include.
-
+- `result` — regression test result with explanatory messages.
 ## Implementation structure
 
-- Tests dynamic relaxation model helper paths. Syntax:
-- result=test_dynamic_relaxation_models_suite()
-- result -regression test result with explanatory messages
-- The test checks anisotropic and functional T1/T2 rates, damping, Lindblad,
-- scalar Redfield, correlation functions, and the serial Redfield include.
-- Announce the test target
-- State the relaxation-model target of the test
-- Check anisotropic tensor rates in the extended T1/T2 model
-- Check function-handle rates in the extended T1/T2 model
-- Check non-selective damping in Liouville space
-- Check one-spin Lindblad relaxation rates
-- Check scalar Redfield integral against the closed zero-H0 reference
+- Check anisotropic-tensor and function-handle T1/T2 rates.
+- Check unit-state preservation and relaxation rates for damping and one-spin Lindblad models.
+- Compare the scalar Redfield integral with its zero-H0 reference; check isotropic, axial, and rhombic correlation-function weights and rates, including species state count.
+- Exercise the serial Redfield include and check that its matrix is nonzero and preserves the unit state.

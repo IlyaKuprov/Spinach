@@ -4,34 +4,21 @@
 
 ## Purpose
 
-Converts g-tensor units into electron Zeeman frequency units. Syntax: f=g2freq(g,B)
-
-## Physical / mathematical content
-
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-
-## Numerical / algorithmic content
+Converts electron `g`-values and magnetic field to electron Zeeman frequencies.
 
 ## Parameters / inputs
 
-- g -g-values, scalar or array
-- B -magnetic field in Tesla
+- `g`: finite real scalar or numeric array of g-values.
+- `B`: finite real scalar magnetic field in tesla.
 
-## Outputs
+## Output
 
-- f -frequency in Hz
+- `f`: frequency in Hz, with the same array shape as `g`.
 
-## Implementation structure
+## Conversion
 
-- Converts g-tensor units into electron Zeeman frequency
-- units. Syntax:
-- f=g2freq(g,B)
-- g - g-values, scalar or array
-- B - magnetic field in Tesla
-- f - frequency in Hz
-- Check consistency
-- Get the free electron carrier frequency
-- Scale the frequency
-- Consistency enforcement
-- "Authors are listed in order of degree of belief in
-- the central thesis."
+`f = g * B * spin('E') / (2*pi*2.0023193043622)`
+
+The denominator uses the free-electron g-factor `2.0023193043622` to scale the free-electron carrier frequency returned by `spin('E')`.
+
+Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=g2freq.m)

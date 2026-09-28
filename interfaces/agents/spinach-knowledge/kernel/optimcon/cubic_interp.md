@@ -4,41 +4,30 @@
 
 ## Purpose
 
-Finds the extremum of a cubic interpolant built from function values and directional derivatives at two points and returns the best point inside the interpolation interval. Syntax: [alpha,fx]=cubic_interp(end_A,end_B,alpha_A,alpha_B,... f_A,dir_deriv_A,f_B,dir_deriv_B)
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
+Finds the maximum of a cubic interpolant within the interval bounded by `end_a` and `end_b`. The interpolant is determined by function values and directional derivatives at `alpha_a` and `alpha_b`.
 
 ## Numerical / algorithmic content
 
+The function constructs the cubic in coordinates normalised relative to `alpha_a` and `alpha_b`. It finds the roots of the cubic's derivative, discards complex roots and roots outside the interpolation interval, and compares the cubic values at the remaining roots and both interval boundaries. It returns the candidate with the largest value, transformed back to alpha coordinates.
+
 ## Parameters / inputs
 
-- end_a -first interpolation boundary in alpha space
-- end_b -second interpolation boundary in alpha space
-- alpha_a -first interpolation anchor point
-- alpha_b -second interpolation anchor point
-- f_a -function value at alpha_a
-- dir_der_a -directional derivative at alpha_a
-- f_b -function value at alpha_b
-- dir_der_b -directional derivative at alpha_b
+- `end_a` — first interpolation boundary in alpha space.
+- `end_b` — second interpolation boundary in alpha space.
+- `alpha_a` — first interpolation anchor point.
+- `alpha_b` — second interpolation anchor point; must differ from `alpha_a`.
+- `f_a` — function value at `alpha_a`.
+- `dir_der_a` — directional derivative at `alpha_a`.
+- `f_b` — function value at `alpha_b`.
+- `dir_der_b` — directional derivative at `alpha_b`.
+
+Inputs must be finite real scalars.
 
 ## Outputs
 
-- alpha -selected maximiser of the cubic model
-- fx -cubic model value at alpha
+- `alpha` — selected maximiser of the cubic model within the interpolation interval.
+- `fx` — cubic model value at `alpha`.
 
-## Implementation structure
+## Source
 
-- Finds the extremum of a cubic interpolant built from function
-- values and directional derivatives at two points and returns
-- the best point inside the interpolation interval. Syntax:
-- [alpha,fx]=cubic_interp(end_A,end_B,alpha_A,alpha_B,...
-- f_A,dir_deriv_A,f_B,dir_deriv_B)
-- end_a -first interpolation boundary in alpha space
-- end_b -second interpolation boundary in alpha space
-- alpha_a -first interpolation anchor point
-- alpha_b -second interpolation anchor point
-- f_a -function value at alpha_a
-- dir_der_a -directional derivative at alpha_a
-- f_b -function value at alpha_b
+- [Spinach documentation for cubic_interp.m](https://spindynamics.org/wiki/index.php?title=cubic_interp.m)

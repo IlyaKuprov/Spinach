@@ -4,28 +4,14 @@
 
 ## Purpose
 
-2Q ultrafast MaxQ NMR spectrum for a coupled two-spin system in the presence of realistic diffusion. Calculation time: minutes on NVidia Tesla A100, much longer on CPU
+Simulates a 2Q ultrafast MaxQ NMR spectrum for two coupled spins with diffusion. The source estimates minutes on an NVIDIA Tesla A100 and much longer on CPU. Authors: Maria Grazia Concilio, Ilya Kuprov, and Jean-Nicolas Dumez.
 
-## Physical / mathematical content
+## Model and sequence
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The 14.1 T system comprises two 1H spins with shifts 0.50 and 0.15 and an 8.0 Hz scalar coupling. It selects coherence order +2 and uses an untruncated sphten-liouv basis. The one-dimensional sample length is 0.015 m with 500 points; flow is zero and diffusion is 18e-10 m^2/s. Initial and detection state phantoms are uniform, with Lz and L+ 1H states.
 
-## Numerical / algorithmic content
+The imaging call uses ufmq. Acquisition uses 120 points, 50 loops, 6e-6 s dwell time, zero offset, and a delay of 0.041 s; the acquisition gradient is calculated from the maximum k value. WURST encoding uses 500 pulse points, 40 WURST cycles, Te=0.015 s, BW=15000 Hz, Ge=0.023 T/m, and the wurst chirp type.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Processing
 
-## Implementation structure
-
-- 2Q ultrafast MaxQ NMR spectrum for a coupled two-spin
-- system in the presence of realistic diffusion.
-- Calculation time: minutes on NVidia Tesla A100,
-- much longer on CPU
-- Magnetic field
-- Chemical shifts
-- J-coupling
-- Coherence selection
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sample geometry
+The example plots the k-space echo data, Fourier transforms the conventional dimension, and plots the resulting spectrum in ppm.

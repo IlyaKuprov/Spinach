@@ -4,30 +4,10 @@
 
 ## Purpose
 
-Overtone detection 14N powder NMR spectrum of glycine, computed using Fokker-Planck formalism. Glycine quadrupolar tensor data comes from the paper by O'Dell and Ratcliffe: This simulation demonstrates that the spin state that gives rise to the overtone signal in a static sample is the T2,-2 coherence. Calculation time: seconds
+Simulates the 14N powder overtone NMR spectrum of glycine using Fokker–Planck formalism. The quadrupolar tensor data are attributed to [O'Dell and Ratcliffe](http://dx.doi.org/10.1016/j.cplett.2011.08.030). The source states that the T2,-2 coherence gives rise to the overtone signal in a static sample and estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Scientific and numerical content
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The model uses 14N at 14.1 T, quadrupolar parameters `eeqq2nqi(1.18e6,0.53,1,[0 0 0])`, scalar Zeeman value 32.4, an unapproximated `sphten-liouv` basis and diagonal damping rate 500 with zero equilibrium. Krylov and trajectory-level methods are disabled.
 
-## Numerical / algorithmic content
-
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- Overtone detection 14N powder NMR spectrum of glycine, computed using
-- Fokker-Planck formalism. Glycine quadrupolar tensor data comes from
-- the paper by O'Dell and Ratcliffe:
-- This simulation demonstrates that the spin state that gives rise to
-- the overtone signal in a static sample is the T2,-2 coherence.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
-- Magic angle
+The powder setup uses grid `rep_2ang_6400pts_sph`, sweep 0–15 kHz and 256 points with 256-point zero filling. The initial state is explicitly `T2,-2` for 14N; the coil is the magic-angle weighted Lz/Lx combination. It calls `powder` with `@overtone_a` and `qnmr`; unlike `powder_glycine_1`, it has no pulse parameters.

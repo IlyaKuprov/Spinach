@@ -4,26 +4,16 @@
 
 ## Purpose
 
-Two-spin asymmetric chemical exchange pattern. Calculation time: seconds.
+Simulates a two-site asymmetric chemical-exchange pattern for two `1H` spin environments at 14.1 T. Their scalar offsets are 0 and 3, and the exchange-rate matrix is `[-500 2000; 500 -2000]`; the specified concentration weights are `[2000 500]`. The source lists a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The two exchanging environments have unequal forward and reverse rates, so their state interconversion is asymmetric. The example generates a liquid-state NMR signal from this exchange system.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+Uses the sphten-liouv formalism with no basis approximation, acquires the signal, applies exponential apodisation with parameter 6, and Fourier-transforms the zero-filled FID.
 
 ## Implementation structure
 
-- Two-spin asymmetric chemical exchange pattern.
-- Calculation time: seconds.
-- System specification
-- Basis specification
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Specifies the two-spin exchange system, constructs the Spinach basis, sets the acquisition parameters, simulates the FID, and plots its Fourier-transformed spectrum.

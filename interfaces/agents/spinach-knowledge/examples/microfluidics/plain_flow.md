@@ -4,21 +4,20 @@
 
 ## Purpose
 
-Simple flow simulation with no dynamics in the spin subspace: longitudinal magnetisation is tracked as a function of time af- ter injection into the flow field imported from COMSOL with a diffusion term also present. The tail of the pipe has drainage terms set up using a kinetics superoperator phantom.
+Simple flow simulation with no dynamics in the spin subspace: longitudinal magnetisation is tracked as a function of time after injection into the flow field imported from COMSOL with a diffusion term also present. The tail of the pipe has drainage terms set up using a kinetics superoperator phantom.
 
 ## Physical / mathematical content
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
+- This example imports a COMSOL mesh and velocity field and transports longitudinal magnetisation as a concentration-like quantity. It has no spin-subspace dynamics or chemical reaction; diffusion and distal-pipe drainage are included alongside flow.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- `meshflow` evolves the Lz signal initialized in cells 140–160, using the imported mesh flow, diffusion coefficient 1e-7 m^2/s, and a distal drainage term; each trajectory frame is plotted on the mesh.
 
 ## Implementation structure
 
 - Simple flow simulation with no dynamics in the spin subspace:
-- longitudinal magnetisation is tracked as a function of time af-
-- ter injection into the flow field imported from COMSOL with a
+- longitudinal magnetisation is tracked as a function of time after injection into the flow field imported from COMSOL with a
 - diffusion term also present. The tail of the pipe has drainage
 - terms set up using a kinetics superoperator phantom.
 - Import hydrodynamics information

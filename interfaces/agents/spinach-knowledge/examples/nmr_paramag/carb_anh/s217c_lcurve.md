@@ -3,23 +3,20 @@
 - Signature: `s217c_lcurve()`
 
 ## Purpose
-
-L-curves for the S217C mutant dataset for human carbonic anhydrase II. The system and the method are described in: A step-by-step tutorial is available here:
-
+L-curves for the S217C mutant dataset for human carbonic anhydrase II. The system and method are described in the [cited article](http://dx.doi.org/10.1039/c6sc03736d). A step-by-step tutorial is [available here](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 ## Physical / mathematical content
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+
+- The S217C example analyzes regularisation in the PCS inverse problem using an L-curve.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+
+- Sweeps 30 logarithmically spaced regularisation parameters, evaluates the PCS inverse problem in a parallel loop with GPU execution enabled, and uses L-curve analysis to suggest the regularisation parameter.
 
 ## Implementation structure
 
-- L-curves for the S217C mutant dataset for human carbonic anhydrase
-- II. The system and the method are described in:
-- A step-by-step tutorial is available here:
+
 - Load experimental data
 - Load susceptibility tensor
 - Solver parameters

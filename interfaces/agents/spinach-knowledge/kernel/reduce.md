@@ -12,9 +12,9 @@ Permutation symmetry separates irreducible sectors; zero-track elimination remov
 
 ## Numerical / algorithmic content
 
-Horizontal stacks of wavefunctions or Liouville states retain their actual complex columns during symmetry screening. The matrix 1-norm of a projected stack is its largest column 1-norm, so occupancy is tested without averaging columns or discarding their phases. Liouville stacks continue through ZTE and path tracing without disabling useful reduction. ZTE streams columns independently and combines their row maxima, avoiding dense whole-stack screening storage and cross-column scaling.
+Horizontal stacks of wavefunctions or Liouville states retain their actual complex columns during symmetry screening. The matrix 1-norm of a projected stack is its largest column 1-norm, so occupancy is tested without averaging columns or discarding their phases. Liouville stacks continue through ZTE and path tracing without disabling useful reduction. ZTE propagates state columns in bounded multi-column batches, combining row-wise amplitude maxima; column-wise normalisation prevents weak states from disappearing under shared Taylor convergence.
 
-Hilbert-space cell arrays of density matrices retain their existing absolute-value representative for screening. Input validation precedes reduction.
+Hilbert-space density matrices in cell arrays are screened one by one in their original phase; any matrix that occupies an irrep keeps that sector, without averaging or magnitude proxies. Input validation precedes reduction.
 
 ## Syntax
 

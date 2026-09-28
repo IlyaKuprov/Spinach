@@ -56,14 +56,8 @@ switch spin_system.bas.formalism
     
     case 'zeeman-hilb'
         
-        % If a cell array is supplied, make a representative density matrix
-        if iscell(rho)
-            rho_rep=abs(rho{1});
-            for n=2:numel(rho)
-                rho_rep=rho_rep+abs(rho{n});
-            end
-            rho=rho_rep/numel(rho);
-        end
+        % Screen every supplied density matrix in its original phase
+        if ~iscell(rho), rho={rho}; end
         
         % Run symmetry factorization
         if ismember('symmetry',spin_system.sys.disable)
@@ -99,9 +93,16 @@ switch spin_system.bas.formalism
                     % Flag the irrep for dropping
                     irrep_keep_index(n)=0;
                     
-                elseif norm(spin_system.bas.irrep(n).projector'*rho*... %#NORMOK
-                            spin_system.bas.irrep(n).projector,1)<spin_system.tols.irrep_drop
-                    
+                else
+
+                    % Keep a sector if any actual state occupies it
+                    P=spin_system.bas.irrep(n).projector;
+                    irrep_weight=0;
+                    for k=1:numel(rho)
+                        irrep_weight=max(irrep_weight,norm(P'*rho{k}*P,1)); %#NORMOK
+                    end
+                    if irrep_weight<spin_system.tols.irrep_drop
+
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ' has less than '...
                                         num2str(spin_system.tols.irrep_drop) ...
@@ -117,6 +118,8 @@ switch spin_system.bas.formalism
                                         num2str(spin_system.bas.irrep(n).dimension) ...
                                         ' states - kept.']);
                     
+                    end
+
                 end
                 
             end

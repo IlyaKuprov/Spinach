@@ -63,6 +63,23 @@ for k=1:numel(forms)
                       [rho 1i*rho],1e-8,1e-8,'projection must preserve both true columns');
 end
 
+% In Hilbert space, screen each density matrix without an averaged proxy
+bas.formalism='zeeman-hilb';
+hilb_system=basis(create(sys,inter),bas);
+hilb_system=assume(hilb_system,'nmr');
+hilb_system.tols.irrep_drop=1e-3;
+hilb_irreps=hilb_system.bas.irrep;
+P_first=hilb_irreps(1).projector;
+P_second=hilb_irreps(2).projector;
+hilb_states=cell(1,8);
+hilb_states(:)={sparse(size(P_first,1),size(P_first,1))};
+hilb_states{1}=P_first*P_first';
+hilb_states{2}=2*hilb_system.tols.irrep_drop*(P_second*P_second');
+hilb_projs=reduce(hilb_system,hamiltonian(hilb_system),hilb_states);
+result=test_true(result,'Hilbert weak state survives stack dilution',...
+                 numel(hilb_projs)==2,...
+                 'each occupied symmetry sector must survive independently');
+
 % Build Liouville-space controls without permutation factorisation
 bas=struct('formalism','sphten-liouv','approximation','none');
 spin_system=basis(create(sys,inter),bas);

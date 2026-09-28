@@ -26,9 +26,8 @@
 %                            L_reduced=P'*L*P
 %                            rho_reduced=P'*rho;
 %
-% Note: stack columns are screened independently, using one column's
-%       propagation storage and scaling at a time. Each column stops
-%       when its populated-coordinate count stops growing.
+% Note: stack columns are propagated together and screened by the
+%       maximum absolute amplitude reached in each state coordinate.
 %
 % Note: default tolerance may be altered by setting sys.tols.zte_tol
 %       variable before calling create.m 
@@ -100,36 +99,36 @@ else
     report(spin_system,['a maximum of ' num2str(spin_system.tols.zte_nsteps) ...
                         ' steps shall be taken, ' num2str(timestep) ' seconds each.']);
     
-    % Stream actual columns into a single vector of row maxima
-    amplitudes=zeros(size(rho,1),1);
-    for k=1:size(rho,2)
+    % Initialise row maxima across the actual state columns
+    amplitudes=max(abs(rho),[],2);
+    report(spin_system,['evolution step 0, active space dimension ' ...
+                        num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
 
-        % Skip exactly zero columns without discarding weak initial states
-        column=rho(:,k);
-        if nnz(column)==0, continue; end
-        col_amplitudes=abs(column);
+    % Bound the dense workspace that step allocates for wide stacks
+    batch_width=max(1,floor(16*1024^2/(16*size(rho,1))));
 
-        % Sample each trajectory with independent propagation scaling
-        for n=2:spin_system.tols.zte_nsteps
+    % Propagate stacks of columns at each time point
+    for n=2:spin_system.tols.zte_nsteps
 
-            % Record the active dimension before propagation
-            prev_space_dim=nnz(col_amplitudes>spin_system.tols.zte_tol);
+        % Record the active dimension before propagation
+        prev_space_dim=nnz(amplitudes>spin_system.tols.zte_tol);
 
-            % Propagate only one column and accumulate its time maxima
-            column=step(spin_system,L,column,timestep);
-            col_amplitudes=max(col_amplitudes,abs(column));
-            curr_space_dim=nnz(col_amplitudes>spin_system.tols.zte_tol);
-
-            % Terminate when this column's active dimension stops growing
-            if curr_space_dim==prev_space_dim, break; end
-
+        % Give step entire column batches with independent input scales
+        for first=1:batch_width:size(rho,2)
+            columns=first:min(first+batch_width-1,size(rho,2));
+            block=rho(:,columns);
+            column_scales=max(abs(block),[],1);
+            column_scales(column_scales==0)=1;
+            block=step(spin_system,L,block./column_scales,timestep).*column_scales;
+            rho(:,columns)=block;
+            amplitudes=max(amplitudes,max(abs(block),[],2));
         end
+        curr_space_dim=nnz(amplitudes>spin_system.tols.zte_tol);
+        report(spin_system,['evolution step ' num2str(n-1) ...
+                            ', active space dimension ' num2str(curr_space_dim)]);
 
-        % Combine column maxima without mixing their phases or scales
-        amplitudes=max(amplitudes,col_amplitudes);
-        report(spin_system,['screened state column ' num2str(k) ...
-                            ' of ' num2str(size(rho,2)) ', active space dimension ' ...
-                            num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
+        % Terminate when the active dimension stops growing
+        if curr_space_dim==prev_space_dim, break; end
 
     end
 

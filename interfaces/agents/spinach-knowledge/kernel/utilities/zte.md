@@ -12,7 +12,7 @@ Screening follows the actual initial state under the supplied Liouvillian. For a
 
 ## Numerical / algorithmic content
 
-Each nonzero column is propagated independently with `step`, which scales that column before its reordered Taylor expansion. Only one column trajectory and its amplitude maxima are held at a time, alongside the aggregate row maxima; additional screening storage is O(N) for an N-by-M input, and a sparse stack is never passed wholesale to the dense propagation routine. Exactly zero columns contribute no support.
+State columns are propagated together in bounded batches, one `step` call per batch and time point. The batch width limits the complex-double dense input to approximately 16 MiB (except when a single column exceeds that bound). Each column is normalised before the shared Taylor propagation and restored afterward, so a weak column is not lost to the convergence tolerance set by a stronger one. Row-wise maxima of absolute amplitudes across the stack and sampled times determine the retained coordinates; exactly zero columns contribute no support.
 
 Sampling uses `1/cheap_norm(L)` (unit time for a zero generator), up to `zte_nsteps` samples including the initial state. Each column stops when the number of coordinates whose sampled maximum exceeds `zte_tol` stops growing. Without `nstates`, coordinates whose maxima are strictly below `zte_tol` are dropped. With `nstates`, the largest row maxima over columns and sampled times determine the retained coordinates.
 

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fits the 1H NMR spectrum of syn-2,4-difluoropentane with respect to J-couplings. The source also simulates and fits the corresponding 19F and two 1H data sets. See the paper: https://doi.org/doi/10.1021/acs.joc.4c00670. The source notes a calculation time of hours.
+Fits the 1H NMR spectrum of syn-2,4-difluoropentane with respect to J-couplings. The source also simulates and fits the corresponding 19F and two 1H data sets. See the paper: https://doi.org/10.1021/acs.joc.4c00670. The source notes a calculation time of hours.
 
 ## Physical and mathematical content
 

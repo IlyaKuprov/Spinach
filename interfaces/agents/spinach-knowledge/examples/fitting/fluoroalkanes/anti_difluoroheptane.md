@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fit the 1H NMR spectrum of anti-3,5-difluoroheptane with respect to J-couplings. The fit also includes a 19F spectrum. Methyl groups are ghosted out because they do not influence the signals in question. See our paper for further details: https://doi.org/doi/10.1021/acs.joc.4c00670. Calculation time: hours.
+Fit the 1H NMR spectrum of anti-3,5-difluoroheptane with respect to J-couplings. The fit also includes a 19F spectrum. Methyl groups are ghosted out because they do not influence the signals in question. See our paper for further details: https://doi.org/10.1021/acs.joc.4c00670. Calculation time: hours.
 
 ## Model and fitting workflow
 

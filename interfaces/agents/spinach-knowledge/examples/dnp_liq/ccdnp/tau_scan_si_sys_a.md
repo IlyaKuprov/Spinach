@@ -10,7 +10,7 @@ Computes and plots steady-state (^1mathrm{H}) DNP as a function of microwave-fre
 
 ## Physical model
 
-- The two electrons are exchange-coupled (scalar coupling set to (6.2	imes10^6)); the electron Zeeman tensors are anisotropic, and coordinates specify the electron–proton geometry used for the anisotropic hyperfine interactions.
+- The two electrons are exchange-coupled (scalar coupling set to (6.2 × 10^6)); the electron Zeeman tensors are anisotropic, and coordinates specify the electron–proton geometry used for the anisotropic hyperfine interactions.
 - Relaxation uses Redfield theory with secular retention, zero equilibrium polarization, and temperature 298 K. The relaxation integration tolerance is set to (10^{-10}).
 
 ## Calculation

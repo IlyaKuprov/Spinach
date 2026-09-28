@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fit the J-couplings of syn-3,5-difluoroheptane against three experimental spectra: a 19F spectrum (`syn_dfh_fluorine.mat`) and two distinct 1H datasets (`syn_dfh_proton_a.mat` and `syn_dfh_proton_b.mat`). The methyl groups are ghosted out because they do not influence the signals in question. See https://doi.org/doi/10.1021/acs.joc.4c00670 for further details.
+Fit the J-couplings of syn-3,5-difluoroheptane against three experimental spectra: a 19F spectrum (`syn_dfh_fluorine.mat`) and two distinct 1H datasets (`syn_dfh_proton_a.mat` and `syn_dfh_proton_b.mat`). The methyl groups are ghosted out because they do not influence the signals in question. See https://doi.org/10.1021/acs.joc.4c00670 for further details.
 
 Calculation time: hours.
 

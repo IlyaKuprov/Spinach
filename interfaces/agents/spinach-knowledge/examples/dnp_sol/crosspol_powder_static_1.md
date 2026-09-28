@@ -9,7 +9,7 @@ Simulates a static-powder (^{15}mathrm{N})–electron cross-polarization contact
 ## Physical / mathematical content
 
 - The system contains (^{15}mathrm{N}) and an electron at 9.394 T and 298 K. The listed Zeeman scalars are 0 and 2.0023193043622, and the coordinates place the spins 10.05 source-coordinate units apart along (z).
-- The simulation uses a 100-step contact sequence. Each step is (10,mumathrm{s}); the electron and nitrogen irradiation-power arrays are both set to (5	imes10^4) for all steps.
+- The simulation uses a 100-step contact sequence. Each step is (10,mumathrm{s}); the electron and nitrogen irradiation-power arrays are both set to (5 × 10^4) for all steps.
 - The detected operator is the nitrogen (S_x) state. The source requests an isotropic-equilibrium term and uses the `rep_2ang_6400pts_sph` powder grid.
 
 ## Numerical / algorithmic content

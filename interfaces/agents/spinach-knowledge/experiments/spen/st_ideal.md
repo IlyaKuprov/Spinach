@@ -15,6 +15,15 @@ Computes the signal for the ideal Stejskal-Tanner diffusion-encoding sequence in
 
 - Propagates the state through the pulse sequence, gradient intervals, and delays, then evaluates the detected signal. The function returns a scalar absolute signal rather than a sampled time-domain trace.
 
+## Required inputs
+
+Call from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`. The `parameters` structure must contain:
+
+- `rho0` and `coil`: initial and detection states; `spins`: the working spin.
+- `npts`: number of spatial grid points.
+- `g_amp`: diffusion-gradient amplitude in T/m.
+- `delta_sml` and `delta_big`: the small and big Stejskal–Tanner time intervals, respectively, in seconds.
+
 ## Outputs
 
 - inten -the absolute value of the first point in

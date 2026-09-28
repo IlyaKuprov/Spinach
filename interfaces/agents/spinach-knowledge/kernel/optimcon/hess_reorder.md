@@ -8,7 +8,7 @@ Reorders a Hessian whose variables are laid out control-channel first and time-p
 
 ## Parameters / inputs
 
-- `hess` — square `(K*N)	imes(K*N)` Hessian in control-channel-first ordering.
+- `hess` — square `(K*N) × (K*N)` Hessian in control-channel-first ordering.
 - `K` — positive integer number of control channels.
 - `N` — positive integer number of time points.
 

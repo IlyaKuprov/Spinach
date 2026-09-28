@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fit the 1H NMR spectrum of anti-2,3-difluorobutane with respect to J-couplings. See the paper for further details: https://doi.org/doi/10.1021/acs.joc.4c00670
+Fit the 1H NMR spectrum of anti-2,3-difluorobutane with respect to J-couplings. See the paper for further details: https://doi.org/10.1021/acs.joc.4c00670
 
 Calculation time: hours.
 

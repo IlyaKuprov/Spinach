@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Pulse-acquire a ¹H NMR spectrum of syn-3,5-difluoroheptane. The basis is manually specified by merging Lie algebras of user-selected structural fragments, followed by symmetry factorisation and conservation-law screening. Source paper: [https://doi.org/doi/10.1021/acs.joc.4c00670](https://doi.org/doi/10.1021/acs.joc.4c00670). The source comment estimates minutes of computation and notes it is faster with a GPU.
+Pulse-acquire a ¹H NMR spectrum of syn-3,5-difluoroheptane. The basis is manually specified by merging Lie algebras of user-selected structural fragments, followed by symmetry factorisation and conservation-law screening. Source paper: [https://doi.org/10.1021/acs.joc.4c00670](https://doi.org/10.1021/acs.joc.4c00670). The source comment estimates minutes of computation and notes it is faster with a GPU.
 
 ## Physical / mathematical content
 

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fit the 1H NMR spectrum of syn-2,3-difluorobutane by varying J-couplings, Gaussian linewidth, and spectral amplitude. For further details, see https://doi.org/doi/10.1021/acs.joc.4c00670. Calculation time: hours.
+Fit the 1H NMR spectrum of syn-2,3-difluorobutane by varying J-couplings, Gaussian linewidth, and spectral amplitude. For further details, see https://doi.org/10.1021/acs.joc.4c00670. Calculation time: hours.
 
 ## Workflow
 

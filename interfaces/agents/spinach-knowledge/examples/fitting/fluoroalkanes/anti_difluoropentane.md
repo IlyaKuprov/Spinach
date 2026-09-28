@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fit simulated ¹⁹F and two ¹H NMR spectral regions to experimental data by varying J-couplings and three spectral amplitudes. The source header describes this as fitting the ¹H spectrum of **syn**-2,4-difluoropentane, whereas the function and data files are named **anti**; the code does not establish which stereoisomer the data represent. See the paper: https://doi.org/doi/10.1021/acs.joc.4c00670
+Fit simulated ¹⁹F and two ¹H NMR spectral regions to experimental data by varying J-couplings and three spectral amplitudes. The source header describes this as fitting the ¹H spectrum of **syn**-2,4-difluoropentane, whereas the function and data files are named **anti**; the code does not establish which stereoisomer the data represent. See the paper: https://doi.org/10.1021/acs.joc.4c00670
 
 Calculation time: hours.
 

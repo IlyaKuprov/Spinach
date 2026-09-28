@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Fit experimental ^1H and ^19F NMR spectra by optimising J-couplings and separate spectral scale factors. The source comments describe this as fitting the ^1H NMR spectrum of **2-fluoropentane**, although the function and data files are named `fluorobutane`. See https://doi.org/doi/10.1021/acs.joc.4c00670 for further details. Calculation time: hours.
+Fit experimental ^1H and ^19F NMR spectra by optimising J-couplings and separate spectral scale factors. The source comments describe this as fitting the ^1H NMR spectrum of **2-fluoropentane**, although the function and data files are named `fluorobutane`. See https://doi.org/10.1021/acs.joc.4c00670 for further details. Calculation time: hours.
 
 ## Workflow
 

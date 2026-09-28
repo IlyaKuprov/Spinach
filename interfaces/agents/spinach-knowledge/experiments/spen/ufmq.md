@@ -16,6 +16,17 @@ Simulates the ultrafast multiple-quantum NMR sequence as a literal implementatio
 - Applies the shaped chirp pulses by piecewise-constant propagation and builds propagators for the alternating acquisition-gradient periods.
 - Stores each loop's initial state and records the coil-detected signal point by point. Loop bodies use `parfor`; GPU arrays are used when enabled.
 
+## Required inputs
+
+Call from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`; the spin system must use `sphten-liouv`. The `parameters` structure must contain:
+
+- `rho0` and `coil`: initial and detection states; `spins`: a one-element cell array naming the active nucleus.
+- `dims`: sample length in metres; `npts`: number of spatial grid points.
+- `npoints`: acquired points per gradient readout; `nloops`: readout loops, each with a positive and a negative readout.
+- `Ga` and `Ge`: acquisition and encoding gradient amplitudes in T/m; `deltat`: acquisition time step in seconds.
+- `pulsenpoints`: points in the chirp shape; `Te`: chirp duration in seconds; `BW`: chirp bandwidth in Hz; `nWURST`: smoothing parameter; `chirptype`: `wurst` or `smoothed`.
+- `delay`: interpulse delay in seconds; `mqorder`: selected multiple-quantum coherence order.
+
 ## Outputs
 
 - fid -free induction decay of the ultrafast NMR spectrum.

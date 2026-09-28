@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Pulse-acquire 1H NMR spectrum of anti-3,5-difluoroheptane. The example manually specifies a basis by merging Lie algebras for selected spin fragments, followed by symmetry factorisation and conservation-law screening. See [the cited paper](https://doi.org/doi/10.1021/acs.joc.4c00670) for further information. Calculation time: minutes, faster with a GPU.
+Pulse-acquire 1H NMR spectrum of anti-3,5-difluoroheptane. The example manually specifies a basis by merging Lie algebras for selected spin fragments, followed by symmetry factorisation and conservation-law screening. See [the cited paper](https://doi.org/10.1021/acs.joc.4c00670) for further information. Calculation time: minutes, faster with a GPU.
 
 ## Physical / mathematical content
 

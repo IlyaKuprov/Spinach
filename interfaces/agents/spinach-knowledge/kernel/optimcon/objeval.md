@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Adapts an objective-function call to the number of outputs requested by an optimization routine, and combines the objective's fidelity, gradient, and Hessian components. The source notes that this function will be eliminated in a future release.
+Adapts an objective-function call to the number of outputs requested by an optimisation routine, and combines the objective's fidelity, gradient, and Hessian components. The source notes that this function will be eliminated in a future release.
 
 ## Inputs and guards
 

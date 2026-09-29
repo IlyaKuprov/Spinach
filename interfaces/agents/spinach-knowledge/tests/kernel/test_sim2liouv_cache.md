@@ -6,7 +6,7 @@
 
 Regression test for the Hilbert-to-Liouville conversion function `sim2liouv`, focused on cache identity across representations. The test verifies that converted operators and Hamiltonians use the converted basis cache identity, that cache insertion order does not cause collisions, that cache metadata remains correct when caching is disabled, that objects which never requested a cache are preserved, and that cache use does not change acquired signals.
 
-## Behavior
+## Behaviour
 
 - Registers a test named `kernel/sim2liouv_cache` with the description "Converted basis cache identity".
 - Builds small single-spin systems (`sys.magnet=1`, `sys.isotopes={'1H'}` or `{'13C'}`, `sys.output='hush'`, `sys.disable={'hygiene'}`, `sys.parallel={'processes',1}`, `sys.parprops={}`) with `inter.zeeman.scalar={1}` and `bas.formalism='zeeman-hilb'`, `bas.approximation='none'`.

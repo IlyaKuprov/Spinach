@@ -18,7 +18,7 @@ Pass all three arguments; use an empty numeric array such as `[]` for an omitted
 
 ## Cartesian matrix construction
 
-The function initializes `M=zeros(3)` and adds each nonempty rank contribution. The following are the exact source coefficients and matrices:
+The function initialises `M=zeros(3)` and adds each nonempty rank contribution. The following are the exact source coefficients and matrices:
 
 ```matlab
 if ~isempty(rank0), M=M+rank0*eye(3); end

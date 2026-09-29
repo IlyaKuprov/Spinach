@@ -4,7 +4,7 @@
 
 Creates a regression test result structure for the Spinach test suite. Source: [GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/new_test_result.m).
 
-## Behavior
+## Behaviour
 
 - Syntax: `result=new_test_result(id,name,purpose)`.
 - Validates the three input arguments via an internal `grumble` helper before building the structure.
@@ -14,11 +14,11 @@ Creates a regression test result structure for the Spinach test suite. Source: [
   - `purpose` must be a character row vector (empty allowed), otherwise errors with `'purpose must be a character string.'`.
 - On success, returns a structure with fields:
   - `id`, `name`, `purpose` — copied from the inputs.
-  - `status` — initialized to `'RUNNING'`.
-  - `elapsed` — initialized to `0`.
-  - `messages` — initialized to `{}`; accumulates one line per check.
-  - `failures` — initialized to `{}`; accumulates details of checks that did not pass; an empty `failures` field means no failed check has been recorded.
-  - `error` — initialized to `''`.
+  - `status` — initialised to `'RUNNING'`.
+  - `elapsed` — initialised to `0`.
+  - `messages` — initialised to `{}`; accumulates one line per check.
+  - `failures` — initialised to `{}`; accumulates details of checks that did not pass; an empty `failures` field means no failed check has been recorded.
+  - `error` — initialised to `''`.
 
 ## Inputs and outputs
 

@@ -6,13 +6,13 @@
 
 ## Purpose and model
 
-This example optimizes a simulated 1H-to-19F longitudinal-magnetization transfer in a scalar-coupled 1H-13C-19F model at 9.4 T. Chemical shifts are zero; the 1H-13C and 13C-19F couplings are 140 Hz and -160 Hz. No measured or imported data are used.
+This example optimises a simulated 1H-to-19F longitudinal-magnetisation transfer in a scalar-coupled 1H-13C-19F model at 9.4 T. Chemical shifts are zero; the 1H-13C and 13C-19F couplings are 140 Hz and -160 Hz. No measured or imported data are used.
 
 ## Controls and frozen samples
 
-Six x/y controls address the three nuclei. The waveform has 100 intervals of 100 microseconds each (10 ms total). Optimization samples five 1H offsets from -1000 to +1000 Hz and three RF powers, `2*pi*[800 900 1000]` rad/s. Samples 30-40 and 70-80, inclusive, are marked frozen for every control. The initial guess is random except those entries are set to 0.1; the source comment annotates them as “Frozen at 100 Hz.”
+Six x/y controls address the three nuclei. The waveform has 100 intervals of 100 microseconds each (10 ms total). Optimisation samples five 1H offsets from -1000 to +1000 Hz and three RF powers, `2*pi*[800 900 1000]` rad/s. Samples 30-40 and 70-80, inclusive, are marked frozen for every control. The initial guess is random except those entries are set to 0.1; the source comment annotates them as “Frozen at 100 Hz.”
 
-The source configures the NS penalty (weight 0.01), `control.method='goodwin'`, and 100 iterations, then calls `fmaxnewton` with `@grape_xy` (described in the source comments as Newton-Raphson GRAPE). Correlation-order, per-spin, x/y-control, and spectrogram plots are enabled. The source comment reports a typical optimization fidelity of 0.999999.
+The source configures the NS penalty (weight 0.01), `control.method='goodwin'`, and 100 iterations, then calls `fmaxnewton` with `@grape_xy` (described in the source comments as Newton-Raphson GRAPE). Correlation-order, per-spin, x/y-control, and spectrogram plots are enabled. The source comment reports a typical optimisation fidelity of 0.999999.
 
 ## Output and limits
 

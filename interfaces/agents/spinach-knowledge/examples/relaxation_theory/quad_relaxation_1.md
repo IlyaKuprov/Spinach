@@ -8,6 +8,6 @@ This liquid-state glycine example evaluates longitudinal and transverse relaxati
 
 ## Calculation and output
 
-The relaxation model is Redfield with zero equilibrium and lab-frame retention. The basis uses `sphten-liouv` with no approximation. The script builds the relaxation superoperator, evaluates the textbook rates with `rlx_nqi` using the same spin, magnet, quadrupole-coupling, asymmetry, and correlation-time inputs, and forms normalized `Lz` and `L+` states using the 2-norm.
+The relaxation model is Redfield with zero equilibrium and lab-frame retention. The basis uses `sphten-liouv` with no approximation. The script builds the relaxation superoperator, evaluates the textbook rates with `rlx_nqi` using the same spin, magnet, quadrupole-coupling, asymmetry, and correlation-time inputs, and forms normalised `Lz` and `L+` states using the 2-norm.
 
 It prints four values: longitudinal and transverse rates from the Spinach superoperator, followed by the corresponding textbook rates. The code does not include numerical output values in the source, so none are asserted here. This is a calculated comparison against analytical equations, not comparison with a measured relaxation experiment; the script prints values and does not create a plot.

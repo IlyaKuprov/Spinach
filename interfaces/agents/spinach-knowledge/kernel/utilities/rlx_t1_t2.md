@@ -6,7 +6,7 @@
 
 Extended T1/T2 relaxation model that returns the relaxation superoperators separately for the longitudinal and the transverse states.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)`.
 - Calls `grumble` to enforce that `spin_system.bas.formalism` is `'sphten-liouv'`; otherwise it errors with `'this function is only available in sphten-liouv formalism.'`.

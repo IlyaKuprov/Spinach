@@ -4,7 +4,7 @@
 
 A basic hydrodynamics infrastructure provider that returns first derivative operators with respect to the three sample coordinates ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/hydrodynamics.m)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `[Fx,Fy,Fz]=hydrodynamics(spin_system,parameters)`.
 - Input consistency is enforced by an internal `grumble` subfunction, which validates `parameters.dims`, `parameters.npts`, and `parameters.deriv` and errors out with specific messages on invalid input.
@@ -16,7 +16,7 @@ A basic hydrodynamics infrastructure provider that returns first derivative oper
   - 1D: `Fx=-1i*polyadic({{Dx}})`.
   - 2D: `Fx=-1i*polyadic({{opium(parameters.npts(2),1),Dx}})` and `Fy=-1i*polyadic({{Dy,opium(parameters.npts(1),1)}})`.
   - 3D: `Fx=-1i*polyadic({{opium(parameters.npts(3),1),opium(parameters.npts(2),1),Dx}})`, `Fy=-1i*polyadic({{opium(parameters.npts(3),1),Dy,opium(parameters.npts(1),1)}})`, and `Fz=-1i*polyadic({{Dz,opium(parameters.npts(2),1),opium(parameters.npts(1),1)}})`.
-- The direct product order is Z(x)Y(x)X(x)Spin, corresponding to a column-wise vectorization of a 3D array with dimensions ordered as [X Y Z].
+- The direct product order is Z(x)Y(x)X(x)Spin, corresponding to a column-wise vectorisation of a 3D array with dimensions ordered as [X Y Z].
 - Polyadic objects are returned; unless `'polyadic'` is listed in `spin_system.sys.enable`, the outputs are passed through `inflate()` to yield the corresponding sparse matrices.
 
 ## Inputs and outputs

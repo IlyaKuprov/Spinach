@@ -4,11 +4,11 @@
 
 Computes the natural logarithm of the factorial of a non-negative integer, avoiding direct factorial overflow in 64-bit double precision. The source notes that double precision overflow is a persistent problem with Clebsch-Gordan coefficients and other objects involving factorials.
 
-## Behavior
+## Behaviour
 
 - Syntax: `lf=logfactorial(n)`.
 - The function validates its input via an internal consistency check (`grumble`) and errors with the message `elements of n must be non-negative integers.` if any element of `n` is non-numeric, non-real, negative, or non-integer.
-- The result is computed using MATLAB's built-in `gammaln` function as `lf=gammaln(n+1)`, exploiting the identity that the gamma function generalizes the factorial.
+- The result is computed using MATLAB's built-in `gammaln` function as `lf=gammaln(n+1)`, exploiting the identity that the gamma function generalises the factorial.
 
 ## Inputs and outputs
 

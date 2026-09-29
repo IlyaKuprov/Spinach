@@ -12,9 +12,9 @@ A synthetic forward-and-inverse demonstration of recovering an RF-field (nutatio
 
 The Spinach system contains one `1H` isotope, `sys.magnet = 14.1`, zero scalar Zeeman shift, the `sphten-liouv` formalism, and basis approximation `none`. It sets `Lz` as the initial state, `Lx` and `Ly` as detection channels, and `Lx` as the RF operator; the drift Hamiltonian comes from `hamiltonian(assume(spin_system,'nmr'))`.
 
-The source samples 201 RF angular frequencies from 25 to 65 kHz, represented in rad/s. The normalized bimodal density combines a 0.8-weight Gaussian centred at 50 kHz with 3.0 kHz width and a 0.2-weight Gaussian centred at 38 kHz with 2.5 kHz width. For each grid point, it propagates the spin system under the drift plus RF term, with `dt = 2e-6 s` and `npts = 256`, then accumulates the complex transverse response with probability-mass and RF-amplitude weighting.
+The source samples 201 RF angular frequencies from 25 to 65 kHz, represented in rad/s. The normalised bimodal density combines a 0.8-weight Gaussian centred at 50 kHz with 3.0 kHz width and a 0.2-weight Gaussian centred at 38 kHz with 2.5 kHz width. For each grid point, it propagates the spin system under the drift plus RF term, with `dt = 2e-6 s` and `npts = 256`, then accumulates the complex transverse response with probability-mass and RF-amplitude weighting.
 
-The resulting curve is phase-shifted by 1.9 radians and normalized by its maximum magnitude. The source then adds complex Gaussian noise with scale `2e-3` after `rng(1)`, making the noise sequence reproducible for the same MATLAB random-number implementation.
+The resulting curve is phase-shifted by 1.9 radians and normalised by its maximum magnitude. The source then adds complex Gaussian noise with scale `2e-3` after `rng(1)`, making the noise sequence reproducible for the same MATLAB random-number implementation.
 
 ## Distribution recovery and output
 

@@ -29,4 +29,4 @@ For each F1 state, the source separates the + and - pathways by selecting zero c
 
 - `fid.pos` and `fid.neg`: the two components of the States quadrature signal, with the F1 states followed by F2 observable evolution.
 
-This documents the parameterized pulse sequence; it does not report measured data or assert that a simulation was executed or validated.
+This documents the parameterised pulse sequence; it does not report measured data or assert that a simulation was executed or validated.

@@ -8,10 +8,10 @@ Regression test that verifies Hilbert-space propagation performed by `step()` ag
 
 `rho(t) = exp(-iHt) rho(0) exp(+iHt)`
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Hilbert propagation against expm\n')`.
-- Initializes a regression test result via `new_test_result('kernel/step_matches_expm', 'Hilbert propagation against expm', 'step() must reproduce unitary density-matrix propagation.')`.
+- Initialises a regression test result via `new_test_result('kernel/step_matches_expm', 'Hilbert propagation against expm', 'step() must reproduce unitary density-matrix propagation.')`.
 - Builds a one-proton Hilbert-space spin system with `sys.magnet=0`, `sys.isotopes={'1H'}`, `inter.zeeman.scalar={0}`, `bas.formalism='zeeman-hilb'`, and `bas.approximation='none'`, using `test_spin_system(sys,inter,bas)`.
 - Defines the Hamiltonian `H = 2*pi*123*S.z` and the initial density matrix `rho = S.x + 0.25*S.y` from Pauli matrices `S=pauli(2)`, with a time step `dt = 2.5e-3`.
 - Constructs the independent exact propagator `P = expm(-1i*H*dt)` and computes the reference evolved state `rho_ref = P*rho*P'`.

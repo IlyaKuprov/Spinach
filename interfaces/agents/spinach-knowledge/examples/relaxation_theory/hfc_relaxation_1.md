@@ -14,6 +14,6 @@ The spins are 1H and E at Cartesian coordinates [0, 0, 0] and [0, 0, 1.5], in a 
 
 ## Rates inspected
 
-After forming R=relaxation(spin_system), the script obtains textbook r1, r2, and cross-relaxation rx values from rlx_dip, using the field, isotopes, coordinate separation, and correlation time. It then normalizes longitudinal Lz states and compares their -rho' * R * rho values with the two spins' printed R1 rates; transverse L+ states are used similarly for R2. The cross term is evaluated between normalized longitudinal states as -rho_b' * R * rho_a. Printed rate labels are Hz. Finally, the complete R is displayed in the IST basis.
+After forming R=relaxation(spin_system), the script obtains textbook r1, r2, and cross-relaxation rx values from rlx_dip, using the field, isotopes, coordinate separation, and correlation time. It then normalises longitudinal Lz states and compares their -rho' * R * rho values with the two spins' printed R1 rates; transverse L+ states are used similarly for R2. The cross term is evaluated between normalised longitudinal states as -rho_b' * R * rho_a. Printed rate labels are Hz. Finally, the complete R is displayed in the IST basis.
 
 This is a model-level comparison between the Redfield matrix elements and the textbook calculation in the script. The source contains no recorded rate output or experimental measurement, so this description makes no numerical agreement or experimental-validation claim.

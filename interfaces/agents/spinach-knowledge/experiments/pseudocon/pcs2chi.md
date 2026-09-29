@@ -8,7 +8,7 @@ Fits the rank-2, traceless magnetic-susceptibility tensor to observed pseudocont
 
 ## Inputs and units
 
-- `hfcs`: cell array of real symmetric 3-by-3 hyperfine tensors in Gauss, one per observation. The source notes that Gauss units avoid dependence on the electron g-tensor and that tensors should be normalized per unpaired electron, in the S*A*I spin-Hamiltonian convention (as returned by `gparse`).
+- `hfcs`: cell array of real symmetric 3-by-3 hyperfine tensors in Gauss, one per observation. The source notes that Gauss units avoid dependence on the electron g-tensor and that tensors should be normalised per unpaired electron, in the S*A*I spin-Hamiltonian convention (as returned by `gparse`).
 - `shifts`: real numeric vector of pseudocontact shifts in ppm, excluding the diamagnetic contribution.
 - `isotopes`: cell array of character strings naming the isotope for each observation, for example {'1H','13C'}.
 
@@ -16,9 +16,9 @@ The three inputs must contain the same number of observations. `hfcs` entries mu
 
 ## Fit and output
 
-For each tensor candidate, `hfc2pcs(hfcs{n},chi,isotopes{n})` supplies the predicted shift. The objective is the sum over observations of (observed shift - predicted shift)^2. `fminunc` uses the quasi-Newton algorithm with BFGS Hessian updates, starts all five independent parameters at zero, allows at most 100 iterations and unlimited function evaluations, and displays iterations. No physical bounds or regularization are imposed.
+For each tensor candidate, `hfc2pcs(hfcs{n},chi,isotopes{n})` supplies the predicted shift. The objective is the sum over observations of (observed shift - predicted shift)^2. `fminunc` uses the quasi-Newton algorithm with BFGS Hessian updates, starts all five independent parameters at zero, allows at most 100 iterations and unlimited function evaluations, and displays iterations. No physical bounds or regularisation are imposed.
 
-The fitted `chi` is symmetric and traceless, parameterized as [x1 x2 x3; x2 x4 x5; x3 x5 -(x1+x4)]. Thus the routine returns only the anisotropic rank-2 part, in cubic Angstroms; the second output `err` is the least-squares sum of squares.
+The fitted `chi` is symmetric and traceless, parameterised as [x1 x2 x3; x2 x4 x5; x3 x5 -(x1+x4)]. Thus the routine returns only the anisotropic rank-2 part, in cubic Angstroms; the second output `err` is the least-squares sum of squares.
 
 ## Reference
 

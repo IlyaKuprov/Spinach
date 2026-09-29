@@ -11,7 +11,7 @@ The example illustrates the cross-resonance mechanism in two fixed-frequency tra
 
 The model contains two three-level Duffing transmons (`T3`, `T3`). Their input frequencies are 5.5 and 6.0 GHz, their anharmonicities are −240 and −200 MHz, and their exchange coupling is 25 MHz. These are supplied through Spinach’s mode-frequency and coupling fields in Hz, which `create` converts to angular-frequency units internally. The laboratory-frame drift contains both Duffing-mode energies (their transition frequencies and self-anharmonicities) and the static mode-exchange interaction; the two drive operators act separately on the transmons.
 
-The common local oscillator is `2π × 6.0002 GHz`, 200 kHz above the target’s declared bare frequency. The two channel amplitudes are 5.969026041820607×10^8 and 2.883982055995430×10^7 rad/s, with phases 0 and −0.39720756 rad. A flat-top Gaussian envelope has rise and fall centers at 30 and 120 ns and a 15 ns ramp. Thus the propagated drive interval is 150 ns. The source describes these calibrated drive settings as fixed reference values, not parameters derived or optimised in this script.
+The common local oscillator is `2π × 6.0002 GHz`, 200 kHz above the target’s declared bare frequency. The two channel amplitudes are 5.969026041820607×10^8 and 2.883982055995430×10^7 rad/s, with phases 0 and −0.39720756 rad. A flat-top Gaussian envelope has rise and fall centres at 30 and 120 ns and a 15 ns ramp. Thus the propagated drive interval is 150 ns. The source describes these calibrated drive settings as fixed reference values, not parameters derived or optimised in this script.
 
 ## Simulated sequence and observable
 

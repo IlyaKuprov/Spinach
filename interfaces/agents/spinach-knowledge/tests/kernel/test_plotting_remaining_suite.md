@@ -6,7 +6,7 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_plott
 
 Regression test for the remaining Spinach plotting helper functions that are not covered by other kernel plotting tests. It exercises deterministic axis generators, contour spacing, colour maps, 2D cropping, 3D zooming, molecular stick plotting, cylindrical grids, ultrafast 2D plotting, tensor ellipsoid displays, 2D integration, and guarded interactive plotting paths, all under invisible (offscreen) figures and without image comparison.
 
-## Behavior
+## Behaviour
 
 - Announces itself with `TESTING: Remaining offscreen plotting helpers` and registers a test named `kernel/plotting_remaining_suite` with the description "Remaining plotting helper gaps" and the requirement that the helpers must return deterministic arrays, graphics objects, or guarded validation errors.
 - Saves the root default figure visibility and the `MATLAB:griddedInterpolant:MeshgridEval2DWarnId` warning state, sets `defaultFigureVisible` to `'off'`, and installs an `onCleanup` handler that closes all figures, restores visibility, and restores the warning state.

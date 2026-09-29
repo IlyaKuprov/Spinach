@@ -12,7 +12,7 @@ Apply one dense BFGS update for maximisation. `H` approximates the negative obje
 
 ## Inputs
 
-- `H` — existing real square approximation, or `[]` for initialization.
+- `H` — existing real square approximation, or `[]` for initialisation.
 - `dx` — nonempty real numeric vector of argument increments.
 - `dg` — nonempty real numeric vector of gradient increments, with the same number of elements as `dx`.
 
@@ -22,6 +22,6 @@ The implementation accepts row or column vectors and reshapes both increments in
 
 - `H` — updated real symmetric approximation to the negative objective Hessian.
 
-A curvature pair is used only when the finite inner products are positive in norm and `dg' * dx < -0.01*norm(dg)*norm(dx)`. With an empty `H`, a rejected pair returns an identity matrix sized to `dx`; a usable pair initializes a scaled identity and is then applied in the same call. With an existing matrix, a rejected pair leaves its symmetrized value unchanged. The BFGS update also returns that symmetrized value without updating if its denominators are non-finite or no larger than machine `eps`.
+A curvature pair is used only when the finite inner products are positive in norm and `dg' * dx < -0.01*norm(dg)*norm(dx)`. With an empty `H`, a rejected pair returns an identity matrix sized to `dx`; a usable pair initialises a scaled identity and is then applied in the same call. With an existing matrix, a rejected pair leaves its symmetrised value unchanged. The BFGS update also returns that symmetrised value without updating if its denominators are non-finite or no larger than machine `eps`.
 
 The routine assigns no physical units; increments and gradients retain the caller's optimisation-coordinate and objective units.

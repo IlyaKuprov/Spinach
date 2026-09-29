@@ -8,7 +8,7 @@ This example configures a piecewise-linear optimal-control pulse for transfer fr
 
 ## Spin model and transfer
 
-The model contains `1H`, `13C` and `19F` at 9.4 T. All chemical shifts are 0.0 ppm; the H–C and C–F scalar couplings are 140 Hz and −160 Hz. The basis is `sphten-liouv` with approximation `none`. Normalized `Lz` states on spins 1 and 3 form the initial and target states.
+The model contains `1H`, `13C` and `19F` at 9.4 T. All chemical shifts are 0.0 ppm; the H–C and C–F scalar couplings are 140 Hz and −160 Hz. The basis is `sphten-liouv` with approximation `none`. Normalised `Lz` states on spins 1 and 3 form the initial and target states.
 
 ## Piecewise-linear control design
 

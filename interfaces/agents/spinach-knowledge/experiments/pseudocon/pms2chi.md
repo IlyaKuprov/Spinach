@@ -8,7 +8,7 @@ Fits the magnetic-susceptibility tensor to observed paramagnetic shifts containi
 
 ## Inputs and units
 
-- `hfcs`: cell array of real symmetric 3-by-3 hyperfine tensors in Gauss, one per observation. The source notes that Gauss avoids dependence on the electron g-tensor and requires normalization per unpaired electron in the S*A*I spin-Hamiltonian convention (as returned by `gparse`).
+- `hfcs`: cell array of real symmetric 3-by-3 hyperfine tensors in Gauss, one per observation. The source notes that Gauss avoids dependence on the electron g-tensor and requires normalisation per unpaired electron in the S*A*I spin-Hamiltonian convention (as returned by `gparse`).
 - `shifts`: real numeric vector of observed paramagnetic (contact plus pseudocontact) shifts in ppm.
 - `isotopes`: cell array of character strings, one isotope label per observation (for example, `'13C'`).
 
@@ -16,9 +16,9 @@ The three arrays must have matching element counts. Each hyperfine tensor must b
 
 ## Fit and output
 
-The objective is the sum of squared differences between each observed shift and `hfc2pms(hfcs{n},chi,isotopes{n})`. `fminunc` uses quasi-Newton/BFGS, starts six independent parameters at zero, allows at most 100 iterations and unlimited function evaluations, displays iterations, and enables parallel evaluation. The code imposes no physical bounds or regularization.
+The objective is the sum of squared differences between each observed shift and `hfc2pms(hfcs{n},chi,isotopes{n})`. `fminunc` uses quasi-Newton/BFGS, starts six independent parameters at zero, allows at most 100 iterations and unlimited function evaluations, displays iterations, and enables parallel evaluation. The code imposes no physical bounds or regularisation.
 
-The fitted `chi` is a general symmetric 3-by-3 tensor parameterized by six independent entries, so unlike `pcs2chi` it is not constrained to be traceless. It is returned in cubic Angstroms; `err` is the least-squares sum of squares.
+The fitted `chi` is a general symmetric 3-by-3 tensor parameterised by six independent entries, so unlike `pcs2chi` it is not constrained to be traceless. It is returned in cubic Angstroms; `err` is the least-squares sum of squares.
 
 ## Reference
 

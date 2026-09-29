@@ -6,7 +6,7 @@
 
 Computes eigenvalue corrections and the Van Vleck transformation generator using Van Vleck perturbation theory, following Shavitt and Redmon, but excluding the quasi-degenerate split.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[Ep,G]=vvpert(E0,H1,order)`.
 - Calls `grumble(E0,H1,order)` to enforce consistency of the inputs.

@@ -21,7 +21,7 @@ For N = spin_system.comp.nspins, the function replaces spin_system.inter.zeeman.
 - cavity: a common rotating frame with the RWA; spin Zeeman, giant-spin, and spin-spin selectors are secular. When modes are present, the source sets mode frequencies to offsets, anharmonicity and Kerr terms to full, exchange to rwa, dispersive terms to full, and longitudinal/modulation terms to ignore. It checks that the longitudinal and modulation input terms being dropped are absent.
 - spin-phonon: electrons use a rotating frame, while nuclei and bosonic modes remain in the laboratory frame. Electron Zeeman selectors are secular and nuclear Zeeman selectors full; electron-nucleus couplings use z* or *z. When modes are present, the source sets exchange to nonelec and Kerr, longitudinal, dispersive, coupling-modulation, and Zeeman-modulation selectors to full.
 
-The assumptions argument must be a character string, and the source accepts two or three inputs; an unrecognized assumption string errors; the optional retention string can be couplings (sets all Zeeman selectors to ignore) or zeeman (sets all giant-spin and pair-coupling selectors to ignore). The retention pass changes spin selectors only; the source documents these filters as undefined for systems containing bosonic modes.
+The assumptions argument must be a character string, and the source accepts two or three inputs; an unrecognised assumption string errors; the optional retention string can be couplings (sets all Zeeman selectors to ignore) or zeeman (sets all giant-spin and pair-coupling selectors to ignore). The retention pass changes spin selectors only; the source documents these filters as undefined for systems containing bosonic modes.
 
 ## Reference
 

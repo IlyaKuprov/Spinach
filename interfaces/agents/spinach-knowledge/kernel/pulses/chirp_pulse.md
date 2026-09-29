@@ -6,17 +6,17 @@
 
 ## Purpose
 
-Builds a frequency-swept RF waveform calibrated for an inversion pulse. The sweep is centered on zero and linear in time; its phase is quadratic in normalized time. The supported families are WURST, smoothed, and saltire chirps, with an optional `-adaptive` suffix for a nonlinear sample grid.
+Builds a frequency-swept RF waveform calibrated for an inversion pulse. The sweep is centred on zero and linear in time; its phase is quadratic in normalised time. The supported families are WURST, smoothed, and saltire chirps, with an optional `-adaptive` suffix for a nonlinear sample grid.
 
-## Inputs and discretization
+## Inputs and discretisation
 
 - `npts` — finite positive integer number of waveform points.
 - `dur` — finite positive pulse duration in seconds.
-- `bwidth` — finite positive sweep bandwidth in Hz, centered on zero.
-- `type` — `'wurst'`, `'smoothed'`, or `'saltire'`; append `'-adaptive'` to use the nonlinear normalized time grid instead of the uniform grid.
+- `bwidth` — finite positive sweep bandwidth in Hz, centred on zero.
+- `type` — `'wurst'`, `'smoothed'`, or `'saltire'`; append `'-adaptive'` to use the nonlinear normalised time grid instead of the uniform grid.
 - `smp` — WURST edge power for the WURST family (the source accepts values of at least 1); for smoothed and saltire it is the percentage of duration affected by the quarter-sine edge ramps, from 0 (square envelope) through 50 (sine-bell envelope).
 
-With a uniform grid the function returns N point samples, N piecewise-constant slice durations in `durs` summing to `dur`, and N−1 piecewise-linear interval durations in `ints`. The adaptive option uses a nonlinear normalized grid and returns the corresponding nonuniform durations. The phase is `pi*dur*bwidth*t.^2` and frequency is `bwidth*t` on normalized time `t`; the amplitude envelope is calibrated by `2*pi*sqrt(bwidth/dur)`.
+With a uniform grid the function returns N point samples, N piecewise-constant slice durations in `durs` summing to `dur`, and N−1 piecewise-linear interval durations in `ints`. The adaptive option uses a nonlinear normalised grid and returns the corresponding nonuniform durations. The phase is `pi*dur*bwidth*t.^2` and frequency is `bwidth*t` on normalised time `t`; the amplitude envelope is calibrated by `2*pi*sqrt(bwidth/dur)`.
 
 ## Outputs and checks
 

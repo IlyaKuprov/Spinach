@@ -11,7 +11,7 @@ Builds population and coherence state combinations for a pair of selected spin-1
 
 ## Basis and formalism
 
-The single-spin coordinate basis is ordered as alpha = [1;0;0], beta = [0;1;0], gamma = [0;0;1]. Every pair product is kron(first,second): spin_a is the first factor and spin_b the second. The helper uses the tensor products of irr_sph_ten(3) elements as its product basis and normalizes each product basis operator to Frobenius norm 1. Spinach state descriptors are formed as T followed by the L,M indices for each selected site.
+The single-spin coordinate basis is ordered as alpha = [1;0;0], beta = [0;1;0], gamma = [0;0;1]. Every pair product is kron(first,second): spin_a is the first factor and spin_b the second. The helper uses the tensor products of irr_sph_ten(3) elements as its product basis and normalises each product basis operator to Frobenius norm 1. Spinach state descriptors are formed as T followed by the L,M indices for each selected site.
 
 The source constructs these labelled population states:
 
@@ -19,7 +19,7 @@ The source constructs these labelled population states:
 - T order is [T+,T0,T-]: T+ = (alpha x beta - beta x alpha)/sqrt(2); T0 = (alpha x gamma - gamma x alpha)/sqrt(2); T- = (beta x gamma - gamma x beta)/sqrt(2).
 - Q order is [Q++,Q+,Q0,Q-,Q--]: Q++ = alpha x alpha; Q+ = (alpha x beta + beta x alpha)/sqrt(2); Q0 = (alpha x gamma + 2 beta x beta + gamma x alpha)/sqrt(6); Q- = (beta x gamma + gamma x beta)/sqrt(2); Q-- = gamma x gamma.
 
-For 'zeeman-hilb', each generated state rho is normalized by its Frobenius norm. For 'zeeman-liouv' and 'sphten-liouv', the full state is normalized by its 2-norm. Other formalisms raise an unsupported-formalism error. The source cautions that the labelled states are not irreducible spherical tensors.
+For 'zeeman-hilb', each generated state rho is normalised by its Frobenius norm. For 'zeeman-liouv' and 'sphten-liouv', the full state is normalised by its 2-norm. Other formalisms raise an unsupported-formalism error. The source cautions that the labelled states are not irreducible spherical tensors.
 
 ## Inputs
 

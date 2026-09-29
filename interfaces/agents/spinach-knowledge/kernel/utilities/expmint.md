@@ -10,7 +10,7 @@ using the auxiliary matrix method of Charles van Loan. The matrix `A` must be He
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/expmint.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `R=expmint(spin_system,A,B,C,T)`.
 - Consistency is enforced first: `A`, `B` and `C` must be numeric matrices of the same dimension, `A` must be Hermitian, and `T` must be a real scalar; violations raise errors.

@@ -6,7 +6,7 @@ Regression test for phase-independent tensor-train compression error budgets. It
 
 Source: [tests/kernel/test_tt_phase.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_tt_phase.m)
 
-## Behavior
+## Behaviour
 
 - Initialises a regression record via `new_test_result` with identifier `kernel/tt_phase`, name `Tensor-train coefficient phases`, and the description `Compression must honour absolute error budgets independently of coefficient phase.`
 - Saves and restores the MATLAB random number generator state using `onCleanup` for reproducibility; seeds `rng(240924)`.

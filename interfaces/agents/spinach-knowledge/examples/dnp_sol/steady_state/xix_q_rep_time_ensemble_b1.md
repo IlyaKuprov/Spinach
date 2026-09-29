@@ -5,7 +5,7 @@
 
 ## Purpose and protocol variant
 
-Scans XiX steady-state proton polarization against shot repetition time, averaging over a microwave B1 ensemble only. Electron–proton distance and microwave offset are fixed. The source estimates minutes.
+Scans XiX steady-state proton polarisation against shot repetition time, averaging over a microwave B1 ensemble only. Electron–proton distance and microwave offset are fixed. The source estimates minutes.
 
 ## Inputs and scan axes
 

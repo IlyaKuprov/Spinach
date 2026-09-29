@@ -18,4 +18,4 @@ The result remains a `ttclass` unless all resulting mode sizes are one, in which
 
 - `ttrain` — tensor-train representation of a matrix.
 - `dim` — optional dimension, 1 or 2.
-- `answer` — mean along the selected matrix dimension, as a tensor train or materialized scalar.
+- `answer` — mean along the selected matrix dimension, as a tensor train or materialised scalar.

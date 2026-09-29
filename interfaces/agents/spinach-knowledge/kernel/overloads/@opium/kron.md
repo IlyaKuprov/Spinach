@@ -2,7 +2,7 @@
 
 - Signature: `c=kron(a,b)`
 
-## Meaning and behavior
+## Meaning and behaviour
 
 An `opium` object represents `coeff*I_dim`. When both operands are `opium` objects, the overload returns `opium(a.dim*b.dim,a.coeff*b.coeff)`: it composes the identity factors in the compact representation and does not expand either object into a matrix. This branch performs no explicit dimension-compatibility check.
 

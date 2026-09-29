@@ -21,4 +21,4 @@ The input offset array is 71 points from -35e6 to +35e6 Hz. Each point is shifte
 
 ## Result and scope
 
-The function plots the stored final proton signal against the unshifted offset axis converted to MHz; the ordinate is labelled as the 1H I_z expectation value. It returns no MATLAB output argument: the result is the figure. This is a fixed three-spin, powder-averaged scan on the stated grid and offset range, rather than a parameterized driver for arbitrary systems or pulse settings. It depends on Spinach, its `noveldnp` sequence and powder machinery, and MATLAB support for `parfor`.
+The function plots the stored final proton signal against the unshifted offset axis converted to MHz; the ordinate is labelled as the 1H I_z expectation value. It returns no MATLAB output argument: the result is the figure. This is a fixed three-spin, powder-averaged scan on the stated grid and offset range, rather than a parameterised driver for arbitrary systems or pulse settings. It depends on Spinach, its `noveldnp` sequence and powder machinery, and MATLAB support for `parfor`.

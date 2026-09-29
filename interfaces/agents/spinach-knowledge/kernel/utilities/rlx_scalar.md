@@ -4,11 +4,11 @@
 
 Computes the scalar relaxation superoperator using Redfield theory, from a background Hamiltonian, a stochastically modulated interaction operator, and a multi-exponential correlation function specified as weights and correlation times. Source: [Spinach GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rlx_scalar.m).
 
-## Behavior
+## Behaviour
 
 - Syntax: `R=rlx_scalar(spin_system,H0,H1,tau_c_array)`.
 - Validates inputs via an internal consistency check (`grumble`): `H0` and `H1` must be Hermitian square matrices of the same dimension, and `tau_c_array` must be a cell array of real 2-element vectors with non-negative correlation times.
-- Initializes `R` as a sparse zero matrix and loops over the correlation function components.
+- Initialises `R` as a sparse zero matrix and loops over the correlation function components.
 - For each component, extracts `weight` and `tau_c`; components with zero weight or zero correlation time are skipped.
 - Sets the integration upper limit as `upper_limit=2*tau_c*log(1/spin_system.tols.rlx_integration)`, i.e. according to the accuracy goal in `spin_system.tols.rlx_integration`.
 - Removes inconsequential non-zeroes from a copy of `H0` using `clean_up(spin_system,H0,1e-2/upper_limit)`.

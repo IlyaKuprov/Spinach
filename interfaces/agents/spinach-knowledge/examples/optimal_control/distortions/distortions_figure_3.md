@@ -14,7 +14,7 @@ The spin system contains 100 noninteracting 13C spins at equally spaced offsets 
 
 The GRAPE control is piecewise constant over 45 slices of 1 microsecond each. Both quadratures share the 13C channel; ten power levels span `2*pi*linspace(50e3,70e3,10)` rad/s. The `fmaxnewton` call uses `@grape_xy`, `lbfgs`, up to 200 iterations, `NS` and `SNS` penalties with weights 0.01 and 10, and freezes slices 41-45. The initial guess is 0.25 in both channels on slices 1-40 and zero on the final five.
 
-For the RLC model, the code sets Q to 1000 and forms two single-pole coefficients as `exp(-abs(omega)*dt/(2*Q))`, where `omega=-sys.magnet*spin('13C')` and `dt` is one slice. Those two `spf` filters are included as distortion functions in a second GRAPE optimisation; the optimized profile is also filtered for the comparison spectrum. The acquisition calculations use a 13C FID, a 70000 Hz sweep, 2048 points, zero-filling to 16384 points, Gaussian apodisation with parameter 10, and a Fourier transform. The comparison hard pulse is specified at `2*pi*60e3` rad/s for 4.2 microseconds, with phase `pi/2` and offset frequency zero.
+For the RLC model, the code sets Q to 1000 and forms two single-pole coefficients as `exp(-abs(omega)*dt/(2*Q))`, where `omega=-sys.magnet*spin('13C')` and `dt` is one slice. Those two `spf` filters are included as distortion functions in a second GRAPE optimisation; the optimised profile is also filtered for the comparison spectrum. The acquisition calculations use a 13C FID, a 70000 Hz sweep, 2048 points, zero-filling to 16384 points, Gaussian apodisation with parameter 10, and a Fourier transform. The comparison hard pulse is specified at `2*pi*60e3` rad/s for 4.2 microseconds, with phase `pi/2` and offset frequency zero.
 
 ## Syntax
 

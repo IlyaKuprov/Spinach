@@ -13,7 +13,7 @@ In this `ttclass` storage, `tt.cores` is an `ncores`-by-`ntrains` cell array. Co
 
 `ttrain=ctranspose(ttrain)`
 
-## Behavior
+## Behaviour
 
 For every core, the function permutes dimensions with `[1 3 2 4]`, exchanging the row- and column-mode axes while preserving both bond-rank axes. It then calls `conj`, which conjugates every permuted core and all train coefficients. Thus an input matrix of mode-product dimensions `M-by-N` is represented as its Hermitian transpose, with dimensions `N-by-M`; ranks and core/train counts are unchanged.
 

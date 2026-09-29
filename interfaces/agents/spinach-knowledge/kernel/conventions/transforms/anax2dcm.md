@@ -6,7 +6,7 @@
 
 ## Contract
 
-This function converts an angle-axis rotation to the 3x3 direction-cosine matrix in Spinach's active convention, matching `euler2dcm`. The angle is in radians. The axis may be a row or column with three real components; the function normalizes it internally, and a zero axis is rejected.
+This function converts an angle-axis rotation to the 3x3 direction-cosine matrix in Spinach's active convention, matching `euler2dcm`. The angle is in radians. The axis may be a row or column with three real components; the function normalises it internally, and a zero axis is rejected.
 
 For unit axis `u` and angle `theta`, the source implements Rodrigues' rotation formula: `R = I + sin(theta)*[u]_x + (1-cos(theta))*(u*u' - I)`, where `[u]_x` is the cross-product matrix. Apply it to a column vector as `v = R*v`, or transform a 3x3 interaction tensor as `A = R*A*R'`. The matrix is orthogonal and represents an active coordinate rotation. MATLAB Aerospace Toolbox `quat2dcm` uses the transpose for the same rotation, as the source comment notes.
 

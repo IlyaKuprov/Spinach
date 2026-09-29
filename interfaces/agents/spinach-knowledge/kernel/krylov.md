@@ -8,7 +8,7 @@
 
 Propagates state vectors without constructing the full propagator; the source recommends it when the propagator does not fit in memory but `L` does, while warning that it may be slow. A propagation step applies the matrix-exponential action to the state (Spinach convention: `rho_next=exp(-1i*L*timestep)*rho`); this implementation advances states through calls to `step(spin_system,L,rho,timestep)` ([helper source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/step.m)). The source comment identifies the implemented approach as a reordered Taylor process rather than a Krylov-subspace/Arnoldi iteration. In `zeeman-wavef`, the source header identifies `L` as the Hamiltonian and `rho` as a wavefunction; `zeeman-hilb` is unsupported.
 
-The routine has no frequency-unit conversion. `timestep` must be consistent with the units/convention of `L`; the source does not declare a standalone Hz-versus-angular-frequency conversion or normalization of the input/output state.
+The routine has no frequency-unit conversion. `timestep` must be consistent with the units/convention of `L`; the source does not declare a standalone Hz-versus-angular-frequency conversion or normalisation of the input/output state.
 
 ## Inputs and guards
 

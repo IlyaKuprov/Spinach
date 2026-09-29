@@ -6,9 +6,9 @@
 
 `perm_group` is a permutation group database that returns complete data for a requested permutation group. The available group names are `S2`, `S3`, `S4`, `S4A`, `S5`, `S6`, `S6A`, and `S8A`. The options ending in `A` are the largest real-valued-character Abelian subgroups.
 
-## Behavior
+## Behaviour
 
-The function is called as `group=perm_group(group_name)`. It first validates the input through an internal consistency check (`grumble`), which errors with `'group_name must be a character string.'` if the argument is not a character string. A `switch` statement then selects the group data; an unrecognized name triggers the error `'permutation group ' group_name ' is not available.'`.
+The function is called as `group=perm_group(group_name)`. It first validates the input through an internal consistency check (`grumble`), which errors with `'group_name must be a character string.'` if the argument is not a character string. A `switch` statement then selects the group data; an unrecognised name triggers the error `'permutation group ' group_name ' is not available.'`.
 
 After the switch, the function assembles `group.elements` by vertically concatenating all class matrices (`vertcat(group.class{:})`), and expands the class-wise character table into an element-wise character matrix `group.characters`, where each column repeats the character value of the corresponding class for every element in that class.
 

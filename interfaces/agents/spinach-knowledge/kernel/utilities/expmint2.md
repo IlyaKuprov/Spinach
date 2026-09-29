@@ -8,7 +8,7 @@
 
 as documented in the function header. The result corresponds to the (1,3) block of the exponential of an auxiliary block matrix, following the method of Van Loan (http://dx.doi.org/10.1109/TAC.1978.1101743).
 
-## Behavior
+## Behaviour
 
 - Syntax: `I=expmint2(spin_system,A,B,C,D,E,T)`.
 - The function first runs an internal consistency check (`grumble`) on all arguments.

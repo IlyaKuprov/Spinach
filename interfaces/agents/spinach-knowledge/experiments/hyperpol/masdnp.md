@@ -6,19 +6,19 @@
 
 ## Purpose and physical scope
 
-This routine simulates magic-angle-spinning DNP and returns a powder-orientation-weighted enhancement ratio. For each orientation it constructs an ESR rotor stack, applies microwave excitation and relaxation through a rotor period, forms an effective period generator, evolves the thermal-equilibrium state for the specified microwave duration, then averages the detected magnetization over a rotor period and divides by the corresponding equilibrium `coil` signal. The spin-system model supplies the couplings; the routine does not construct hyperfine tensors or run ESEEM/ENDOR or image reconstruction.
+This routine simulates magic-angle-spinning DNP and returns a powder-orientation-weighted enhancement ratio. For each orientation it constructs an ESR rotor stack, applies microwave excitation and relaxation through a rotor period, forms an effective period generator, evolves the thermal-equilibrium state for the specified microwave duration, then averages the detected magnetisation over a rotor period and divides by the corresponding equilibrium `coil` signal. The spin-system model supplies the couplings; the routine does not construct hyperfine tensors or run ESEEM/ENDOR or image reconstruction.
 
 ## Inputs
 
 - `parameters.spins`: spin labels for microwave irradiation; the implementation uses the first label, `parameters.spins{1}`, for the microwave frequency and operator.
-- `parameters.rate`: MAS rate in Hz; `parameters.axis`: spinning-axis direction vector; `parameters.max_rank`: integer rotor-discretization rank.
+- `parameters.rate`: MAS rate in Hz; `parameters.axis`: spinning-axis direction vector; `parameters.max_rank`: integer rotor-discretisation rank.
 - `parameters.mw_pwr`: microwave power in radians per second; `parameters.mw_frq`: microwave frequency in Hz; `parameters.mw_time`: irradiation/equilibration duration in seconds.
 - `parameters.grid`: name of a spherical averaging grid available in the Spinach grids folder; `parameters.coil`: detection state; `parameters.verbose`: diagnostic-output flag (0 or 1).
 - `spin_system` must use `sphten-liouv` or `zeeman-liouv` formalism. Call `masdnp` directly, not through a context wrapper.
 
 ## Calculation and output
 
-The routine builds the microwave operator from the first selected spin's `L+` and `L-` operators, constructs relaxation and a lab-frame thermal-equilibrium state, and iterates over the weighted spherical grid. The rotor propagator is assembled from step propagators over one rotor period; its logarithm supplies an effective generator for `evolution` over `parameters.mw_time`. The function then averages the detection-state projection over one rotor period and accumulates the orientation-weighted ratio `Hz_dnp/Hz_eq`. The output dnp is a scalar enhancement ratio, not an absolute polarization or a time/frequency spectrum.
+The routine builds the microwave operator from the first selected spin's `L+` and `L-` operators, constructs relaxation and a lab-frame thermal-equilibrium state, and iterates over the weighted spherical grid. The rotor propagator is assembled from step propagators over one rotor period; its logarithm supplies an effective generator for `evolution` over `parameters.mw_time`. The function then averages the detection-state projection over one rotor period and accumulates the orientation-weighted ratio `Hz_dnp/Hz_eq`. The output dnp is a scalar enhancement ratio, not an absolute polarisation or a time/frequency spectrum.
 
 ## Model limits
 

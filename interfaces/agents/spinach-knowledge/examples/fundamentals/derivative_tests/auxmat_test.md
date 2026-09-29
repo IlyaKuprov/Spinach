@@ -12,9 +12,9 @@ Checks the auxiliary block-matrix identity for differentiating the matrix expone
 
 is compared with a finite-difference derivative of `expm(L)`. In the source, `f=@(A)expm(A)`; the test is about the exponential, not an arbitrary matrix function.
 
-## Test inputs and parameterization
+## Test inputs and parameterisation
 
-A random dimension `dim=randi(20)` is used. The complex random matrices `A`, `B`, and `C` are normalized in the spectral norm; as written, the normalization of `C` divides by `norm(B,2)`. The matrix family is
+A random dimension `dim=randi(20)` is used. The complex random matrices `A`, `B`, and `C` are normalised in the spectral norm; as written, the normalisation of `C` divides by `norm(B,2)`. The matrix family is
 
 `L(a,b,c)=a*A+c*cos(b)*B+(a*c^4)*C+a*b*c*B*C`.
 
@@ -22,7 +22,7 @@ The source uses the partial derivatives `dL/da=A+c^4*C+b*c*B*C`, `dL/db=-c*sin(b
 
 ## Comparison and acceptance criterion
 
-For each parameter, the auxiliary block `P` is obtained from the block matrix exponential using that parameter's derivative of `L`. The reference `Q` is a fourth-order centered finite difference of `expm(L)`:
+For each parameter, the auxiliary block `P` is obtained from the block matrix exponential using that parameter's derivative of `L`. The reference `Q` is a fourth-order centred finite difference of `expm(L)`:
 
 `Q = 2*(f(t+h)-f(t-h))/(3*h) - (f(t+2*h)-f(t-2*h))/(12*h)`,
 

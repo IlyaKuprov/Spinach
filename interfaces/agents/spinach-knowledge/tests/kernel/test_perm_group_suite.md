@@ -4,7 +4,7 @@
 
 Regression test for the permutation group metadata database. It verifies that the real-valued-character Abelian permutation subgroups returned by `perm_group` are exact and internally consistent.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf` and initialises the result via `new_test_result` under the suite name `kernel/perm_group_suite`, describing the requirement that real-valued-character Abelian permutation subgroup tables be exact and internally consistent.
 - Checks the `S6A` table against an explicit 8-element reference table (permutations of degree 6) and an explicit 8-by-8 reference character table, using `test_close` with absolute and relative tolerances of `1e-15`. The reference notes state that `S6A` is represented by the direct product of `S4A` and `S2`, and has the real character table of `C2 x C2 x C2`.

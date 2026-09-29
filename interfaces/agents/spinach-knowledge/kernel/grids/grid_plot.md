@@ -13,6 +13,6 @@ Plot spherical sample points and their Voronoi tessellation. The routine draws i
 - `c` selects face colour: omitted or empty means white; a character value is used as the face colour name; otherwise each face uses `c(k)`. Numeric colour data should therefore provide one value per face; the routine does not validate its length.
 - `options.dots` controls centre markers. If the options argument or this field is absent, dots default to true; setting it false suppresses them.
 
-## Rendering behavior
+## Rendering behaviour
 
 When enabled, the sample centres are black dots with marker size 3. Each tessera is drawn as a fully opaque patch. The plot limits are [-1.1,+1.1] on each Cartesian axis, the axes are square, the camera position is [0,0,10], and tick marks are hidden. The routine computes a tessellation only when `vorn` is omitted or empty; it does not calculate quadrature weights.

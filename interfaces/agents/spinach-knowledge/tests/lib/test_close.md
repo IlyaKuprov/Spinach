@@ -6,7 +6,7 @@
 
 `test_close` adds a numerical regression check with tolerances and an explanation to a test result structure. It compares a value produced by Spinach against a reference value supplied by the test, using an absolute and a relative tolerance, and records the outcome of the check in the result structure.
 
-## Behavior
+## Behaviour
 
 - Syntax: `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)`.
 - A consistency-enforcement subfunction (`grumble`) validates all inputs and calls `error` on invalid arguments: `result` must be a scalar structure with `messages` and `failures` fields; `label` and `why` must be non-empty character row strings; `observed` and `reference` must be logical or numeric; `abs_tol` and `rel_tol` must be non-negative real scalars.

@@ -6,7 +6,7 @@ Returns the g-tensor of a specified spin at the input orientation, as documented
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/gtensorof.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `g=gtensorof(spin_system,spin_number)`.
 - The function first calls an internal consistency-checking subfunction `grumble(spin_system,spin_number)`.

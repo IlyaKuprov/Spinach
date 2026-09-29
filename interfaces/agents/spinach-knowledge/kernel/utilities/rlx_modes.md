@@ -6,7 +6,7 @@
 
 Builds the bosonic mode dissipation superoperator: thermalised GKSL dissipators for amplitude damping and pure dephasing of the bosonic modes declared in `inter.modes`, using the amplitude damping rates and pure dephasing rates ingested by `create.m` and the Bose-Einstein thermal occupation numbers computed from the physical mode frequencies and the system temperature.
 
-## Behavior
+## Behaviour
 
 - Syntax: `R=rlx_modes(spin_system)`.
 - Runs a consistency check (`grumble`) that errors if `spin_system.inter.modes` is missing, if the basis formalism is not `zeeman-liouv` or `sphten-liouv` (bosonic mode dissipators are only available in Liouville space), or if `spin_system.rlx.temperature` is missing.

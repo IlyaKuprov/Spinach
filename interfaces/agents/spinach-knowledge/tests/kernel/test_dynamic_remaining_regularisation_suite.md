@@ -4,7 +4,7 @@
 
 Regression test for the remaining regularisation and inverse-problem utilities in Spinach. The suite checks L-curve corner detection, positivity-constrained Tikhonov inversion, and L1 sparsity targeting on compact analytical inverse problems.
 
-## Behavior
+## Behaviour
 
 The function announces the test target with `fprintf('TESTING: Remaining regularisation utilities\n')` and initialises a test result via `new_test_result` for `kernel/dynamic_remaining_regularisation_suite`, describing the target as "Remaining regularisation utilities" with the requirement that regularisation helpers must recover compact analytical inverse-problem references.
 

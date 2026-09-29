@@ -6,7 +6,7 @@
 
 Regression test for `kill_spin` particle removal. It verifies that removing spins or bosonic modes from a Spinach system preserves the Hamiltonians and relaxation superoperators of the retained particles, as checked against independently constructed reference systems.
 
-## Behavior
+## Behaviour
 
 - Creates a test result object via `new_test_result('kernel/mode_removal', ...)` describing retained mode reindexing.
 - Iterates over ten hit lists covering spectator, spin, mode, simultaneous, logical-index, and no-op removals: `2`, `3`, `1`, `[2 4]`, `[false true false false false]`, `5`, `[]`, `[1 5]`, `[2 3 4]`, `[1 2 3 4]`.

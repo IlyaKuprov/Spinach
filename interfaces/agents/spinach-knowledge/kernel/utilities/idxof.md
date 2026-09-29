@@ -6,7 +6,7 @@
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/idxof.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `idx=idxof(sys,label)`.
 - The function first runs a consistency check (`grumble`) on the inputs.

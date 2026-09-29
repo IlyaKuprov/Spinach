@@ -6,7 +6,7 @@
 
 Regression test that verifies the sine, cosine, and Legendre waveform bases returned by Spinach have orthonormal columns, as required by pulse optimisation.
 
-## Behavior
+## Behaviour
 
 - Announces the test target by printing `TESTING: Waveform basis orthonormality`.
 - Initialises a regression test result via `new_test_result` with test name `kernel/wave_basis_orthonormality`, description `Waveform basis orthonormality`, and the numerical target statement `pulse waveform basis columns must be orthonormal.`

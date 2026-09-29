@@ -10,9 +10,9 @@ Compares first and mixed second derivatives of a matrix propagator with finite d
 
 ## Matrix inputs and first derivative
 
-For each constructed test system, the script draws a random complex `5×5` matrix `H` and symmetrizes it as `(H+H')/2`. Two random complex direction matrices `A` and `B` are likewise symmetrized and scaled by `1/20`.
+For each constructed test system, the script draws a random complex `5×5` matrix `H` and symmetrises it as `(H+H')/2`. Two random complex direction matrices `A` and `B` are likewise symmetrised and scaled by `1/20`.
 
-With step `1e-3` and propagator argument `1`, the first numerical derivative is the centered difference
+With step `1e-3` and propagator argument `1`, the first numerical derivative is the centred difference
 
 `(propagator(spin_system,H+1e-3*A,1)-propagator(spin_system,H-1e-3*A,1))/(2e-3)`.
 
@@ -24,4 +24,4 @@ The numerical mixed derivative is the four-corner central difference of `propaga
 
 ## Scope
 
-The matrices are randomized inside each formalism iteration and no random seed is set. The test covers one first-direction and one mixed-direction comparison per constructed system; it does not compare derivatives for a specified Spinach physical Hamiltonian.
+The matrices are randomised inside each formalism iteration and no random seed is set. The test covers one first-direction and one mixed-direction comparison per constructed system; it does not compare derivatives for a specified Spinach physical Hamiltonian.

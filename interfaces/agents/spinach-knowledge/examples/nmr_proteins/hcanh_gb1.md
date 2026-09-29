@@ -4,7 +4,7 @@ Source: [examples/nmr_proteins/hcanh_gb1.m](https://github.com/IlyaKuprov/Spinac
 
 ## Purpose
 
-Simulates a three-dimensional H(CA)NH protein NMR spectrum for GB1, with the source comment's assumption that only the backbone is 13C,15N-labelled. It is a Spinach simulation, not processing of measured data. The sequence source identifies F1 as 1H, F2 as 15N, and F3 as 1H. No paramagnetic center or magnetic tensor is specified in these example or sequence sources; tensor units and experimental agreement therefore do not arise here.
+Simulates a three-dimensional H(CA)NH protein NMR spectrum for GB1, with the source comment's assumption that only the backbone is 13C,15N-labelled. It is a Spinach simulation, not processing of measured data. The sequence source identifies F1 as 1H, F2 as 15N, and F3 as 1H. No paramagnetic centre or magnetic tensor is specified in these example or sequence sources; tensor units and experimental agreement therefore do not arise here.
 
 ## Protein system and basis
 

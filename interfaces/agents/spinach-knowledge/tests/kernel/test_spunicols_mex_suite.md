@@ -6,10 +6,10 @@
 
 Regression test suite for the sparse unique-column MEX helper `spunicols`. The suite verifies that `spunicols` reproduces the behaviour of the Matlab expression `unique(A.','rows').'` on sparse real double matrices, covering empty, zero-column, duplicate-column, NaN, Inf, signed-value, and random cases.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Sparse unique-column MEX helper\n')`.
-- Initializes a test result object via `new_test_result('kernel/spunicols_mex_suite', 'Sparse unique-column MEX helper', 'spunicols must match Matlab unique(A.'',''rows'').'' for sparse real double matrices.')`.
+- Initialises a test result object via `new_test_result('kernel/spunicols_mex_suite', 'Sparse unique-column MEX helper', 'spunicols must match Matlab unique(A.'',''rows'').'' for sparse real double matrices.')`.
 - Empty matrices: `sparse(0,0)` and `sparse(0,5)` are compared against `unique(A.','rows').'` using `isequal`; the zero-row case expects all empty columns to collapse to one column.
 - Zero-column and all-zero matrices: `sparse(4,0)` should remain a zero-column matrix, and `sparse(4,3)` (all-zero columns) should collapse to one sparse column.
 - Duplicate columns and lexicographic signs: a 4-by-6 sparse matrix built from `[0 0 0 0 0 0;1 1 -1 0 -1 1;0 0 3 0 3 0;-2 -2 0 0 0 -2]` is checked with `isequal` against the Matlab reference.

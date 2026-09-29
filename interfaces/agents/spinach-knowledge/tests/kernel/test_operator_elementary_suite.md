@@ -6,9 +6,9 @@
 
 Regression test for the elementary operator generators in `kernel/operators`. The suite verifies analytic commutation relations, indexing conventions, and small explicit matrices for the low-level operator constructors.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Elementary operator generators\n')` and initializes a test result object via `new_test_result('kernel/operator_elementary_suite', ...)`, describing the requirement that low-level operator constructors satisfy their defining algebraic identities. Each subsequent check is performed with `test_close`, which compares a computed quantity against a reference within specified absolute and relative tolerances and appends explanatory messages to the result.
+The function announces the test target with `fprintf('TESTING: Elementary operator generators\n')` and initialises a test result object via `new_test_result('kernel/operator_elementary_suite', ...)`, describing the requirement that low-level operator constructors satisfy their defining algebraic identities. Each subsequent check is performed with `test_close`, which compares a computed quantity against a reference within specified absolute and relative tolerances and appends explanatory messages to the result.
 
 The checks performed are:
 

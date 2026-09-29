@@ -6,7 +6,7 @@ Signature: stim_echo=endor_mims_echo(spin_system,parameters,H,R,K)
 
 ## Purpose and physical sequence
 
-This routine computes a stimulated-echo diagnostic for the Mims ENDOR sequence with the nuclear RF pulse absent. It prepares electron Lz magnetization and detects with the electron L+ state. The ideal sequence applies an electron pi/2 (90°) rotation about x, evolves for tau, applies a second x-axis pi/2 rotation, inserts the delay corresponding to the missing nuclear pulse, and applies a negative pi/2 rotation about y. It then records the electron-coil signal over a detection period from 0 to 2*tau. This is a simulated reference echo, not a nuclear-frequency spectrum or measured data.
+This routine computes a stimulated-echo diagnostic for the Mims ENDOR sequence with the nuclear RF pulse absent. It prepares electron Lz magnetisation and detects with the electron L+ state. The ideal sequence applies an electron pi/2 (90°) rotation about x, evolves for tau, applies a second x-axis pi/2 rotation, inserts the delay corresponding to the missing nuclear pulse, and applies a negative pi/2 rotation about y. It then records the electron-coil signal over a detection period from 0 to 2*tau. This is a simulated reference echo, not a nuclear-frequency spectrum or measured data.
 
 ## Inputs and documented values
 
@@ -19,6 +19,6 @@ This routine computes a stimulated-echo diagnostic for the Mims ENDOR sequence w
 
 ## Output and limitation
 
-stim_echo is the time-sampled stimulated echo in the absence of nuclear RF. The sequence uses ideal rotations and provides a baseline diagnostic; it does not by itself calculate ENDOR modulation, DNP/hyperpolarization, a magnetic-field sweep, or spatial imaging.
+stim_echo is the time-sampled stimulated echo in the absence of nuclear RF. The sequence uses ideal rotations and provides a baseline diagnostic; it does not by itself calculate ENDOR modulation, DNP/hyperpolarisation, a magnetic-field sweep, or spatial imaging.
 
 Source: https://spindynamics.org/wiki/index.php?title=endor_mims_echo.m

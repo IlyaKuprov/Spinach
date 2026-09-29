@@ -17,7 +17,7 @@ Adds selected atoms' hyperfine-tensor visualisations to the current 3-D molecula
 
 - `options.kill_iso` defaults to false; when true, subtracts `trace(hfc)/3` from each diagonal entry before drawing.
 - `options.numbers` defaults to false; `options.symbols` defaults to true.
-- The function calls two `light` placements, `hold('on')` and `molplot`, then adds surfaces/text to the current axes. It finishes with square, tight, equal axis scaling; hides tick labels and tick marks; selects perspective projection and orbit camera controls; and turns the box and `kgrid` on. No colormap is selected: surface colors are supplied as RGB arrays or line colors.
+- The function calls two `light` placements, `hold('on')` and `molplot`, then adds surfaces/text to the current axes. It finishes with square, tight, equal axis scaling; hides tick labels and tick marks; selects perspective projection and orbit camera controls; and turns the box and `kgrid` on. No colormap is selected: surface colours are supplied as RGB arrays or line colours.
 
 ## Inputs and guards
 

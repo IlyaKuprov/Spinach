@@ -13,7 +13,7 @@ for integer or half-integer angular momentum arguments, using a direct summation
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/wigner_6j.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `w = wigner_6j(j1,j2,j3,j4,j5,j6)`.
 - The function first calls an internal consistency check (`grumble`) on all six arguments.

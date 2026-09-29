@@ -8,7 +8,7 @@ A one-dimensional diffusion-equation example without spin dynamics. It uses a gh
 
 ## Geometry and initial profile
 
-The sample length is `0.02 m`, represented by `100` points. The diffusion parameter is `5e-5` (the source does not state its unit; with position in metres and time in seconds, its dimensional unit is m^2/s). The dimensionless initial profile is `exp(-0.125*((1:100)-20).^2)`, a Gaussian-shaped concentration profile centered at grid index 20.
+The sample length is `0.02 m`, represented by `100` points. The diffusion parameter is `5e-5` (the source does not state its unit; with position in metres and time in seconds, its dimensional unit is m^2/s). The dimensionless initial profile is `exp(-0.125*((1:100)-20).^2)`, a Gaussian-shaped concentration profile centred at grid index 20.
 
 ## Propagation and observable
 

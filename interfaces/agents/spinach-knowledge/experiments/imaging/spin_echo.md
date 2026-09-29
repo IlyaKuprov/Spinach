@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`spin_echo` is an imaging-context spin-echo acquisition. It applies a hard 90° pulse, evolves under the supplied Liouvillian and the first spatial-gradient operator, applies a hard 180° pulse, then detects during a second gradient-evolution interval. This is a parameterized sequence, not a report of a measured experiment or a run-verified image.
+`spin_echo` is an imaging-context spin-echo acquisition. It applies a hard 90° pulse, evolves under the supplied Liouvillian and the first spatial-gradient operator, applies a hard 180° pulse, then detects during a second gradient-evolution interval. This is a parameterised sequence, not a report of a measured experiment or a run-verified image.
 
 ## Inputs and units
 

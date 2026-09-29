@@ -6,7 +6,7 @@
 
 Source: [kernel/utilities/acomm.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/acomm.m)
 
-## Behavior
+## Behaviour
 
 - The function enforces input consistency before computing the result:
   - `A` must be a numeric square matrix, otherwise it errors with `'A must be a numeric square matrix.'`.

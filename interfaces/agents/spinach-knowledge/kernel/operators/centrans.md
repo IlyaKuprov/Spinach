@@ -8,7 +8,7 @@ Direct source: [kernel/operators/centrans.m](https://github.com/IlyaKuprov/Spina
 
 Construct a sparse complex `mult-by-mult` matrix whose only populated entries are on the two central basis indices. The routine uses `r=mult/2` and `s=r+1` (MATLAB's 1-based indexing) and accepts even integer `mult>=2`. The accepted character values are `x`, `y`, `z`, `+`, and `-`.
 
-## Matrix entries and normalization
+## Matrix entries and normalisation
 
 The returned entries are exactly:
 

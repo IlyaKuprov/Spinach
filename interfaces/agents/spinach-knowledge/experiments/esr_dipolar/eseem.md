@@ -10,7 +10,7 @@ Source: https://spindynamics.org/wiki/index.php?title=eseem.m
 
 This routine simulates an ideal hard-pulse ESEEM echo and returns its time-domain signal. In the physical experiment, ESEEM modulation can report nuclear-frequency structure coupled to the electron through hyperfine interactions. ENDOR is a distinct pulse experiment and is not implemented by this function. The modulation in a calculation depends on the caller-supplied spin system and Hamiltonian; the routine does not prescribe a hyperfine coupling value.
 
-This is a single spin-dynamics sequence, not a field sweep, DNP or other hyperpolarization workflow, or spatial imaging routine. No measured signal is read or claimed.
+This is a single spin-dynamics sequence, not a field sweep, DNP or other hyperpolarisation workflow, or spatial imaging routine. No measured signal is read or claimed.
 
 ## Inputs
 

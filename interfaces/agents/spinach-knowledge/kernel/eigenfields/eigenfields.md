@@ -9,12 +9,12 @@
 
 ## Purpose
 
-For `Hc+B*Hz`, find fields `B` in the requested window where an energy-level gap matches the microwave angular frequency and the transition moment through `Hmw` is significant. The formalism selects either a Hilbert-space field sweep or a Liouville-space generalized eigenproblem.
+For `Hc+B*Hz`, find fields `B` in the requested window where an energy-level gap matches the microwave angular frequency and the transition moment through `Hmw` is significant. The formalism selects either a Hilbert-space field sweep or a Liouville-space generalised eigenproblem.
 
 ## Inputs
 
 - `spin_system`: Spinach spin-system structure; `spin_system.bas.formalism` selects the pathway.
-- `Hz`: numeric square Hermitian field-dependent Hamiltonian (Hilbert space) or commutation superoperator (Liouville space), normalized to one Tesla.
+- `Hz`: numeric square Hermitian field-dependent Hamiltonian (Hilbert space) or commutation superoperator (Liouville space), normalised to one Tesla.
 - `Hc`: numeric square Hermitian field-independent Hamiltonian or superoperator, the same size as `Hz`, containing couplings and offsets.
 - `Hmw`: observable operator (Hilbert space) or observable vector (Liouville space), without the amplitude prefactor.
 - `parameters.window`: two real magnetic-field endpoints in Tesla. The implementation uses their minimum and maximum; the input order does not affect the window.
@@ -35,7 +35,7 @@ All transition records are filtered and sorted by increasing field.
 - `tran.tm`: transition moments.
 - `tran.tw`: transition widths in Tesla; the implementation assigns the supplied `parameters.fwhm`.
 - `tran.pd`: energy-level population differences in the Hilbert pathway; the Liouville pathway currently assigns ones.
-- `tran.ti`: transition identities. Hilbert-space rows contain source level, destination level, and that pair's branch number; Liouville-space identities are generalized-eigenvector ordinals.
+- `tran.ti`: transition identities. Hilbert-space rows contain source level, destination level, and that pair's branch number; Liouville-space identities are generalised-eigenvector ordinals.
 - `tran.tj`: scaled field-sweep Jacobians, computed from the transition-frequency slope relative to the electron gyromagnetic factor.
 - `tran.xyz`: a three-element column of `NaN` placeholders.
 
@@ -45,6 +45,6 @@ For `zeeman-hilb`, the field window is initially sampled at its endpoints and it
 
 A level pair is considered active if its transition moment exceeds `tm_tol` at any knot. On each interval the code forms Hermite cubic energy curves and solves their gap-minus-`omega` polynomial with [`cubic_roots.m`](cubic_roots.md). It also tests stationary points of the gap polynomial for near-zero (tangent) crossings. Transition moments, populations, and the frequency slope are interpolated at candidate roots. If either tracked state's squared overlap across the interval is not greater than 0.5, the routine rediagonalises at that root and reassigns the eigenstates by overlap before evaluating those quantities. The scaled Jacobian is `abs(spin('E'))/abs(d(energy gap)/dB)`, with `Inf` for a zero slope. The Hilbert pathway records each pair's branch number and assigns the supplied FWHM.
 
-For `zeeman-liouv` and `sphten-liouv`, the code solves `(omega*I-Hc)*uv = B*Hz*uv`. It discards non-finite field solutions, sufficiently complex fields, generalized eigenvectors with norm below `sqrt(eps)`, solutions whose pencil residual exceeds the source's relative threshold `1e-8`, and fields outside the window. It normalizes retained eigenvectors, computes transition moments as `abs(Hmw'*uv).^2`, uses the expectation of `Hz` for the field-sweep slope, and sets population differences to one.
+For `zeeman-liouv` and `sphten-liouv`, the code solves `(omega*I-Hc)*uv = B*Hz*uv`. It discards non-finite field solutions, sufficiently complex fields, generalised eigenvectors with norm below `sqrt(eps)`, solutions whose pencil residual exceeds the source's relative threshold `1e-8`, and fields outside the window. It normalises retained eigenvectors, computes transition moments as `abs(Hmw'*uv).^2`, uses the expectation of `Hz` for the field-sweep slope, and sets population differences to one.
 
 In both pathways, transitions with moment below `parameters.tm_tol` are removed. The code's explicit consistency checks cover Hamiltonian/superoperator sizes and Hermiticity, required parameter fields, real scalar tolerances, positive FWHM, two real window values, and the Hilbert-space perturbation order. An unsupported formalism raises an error.

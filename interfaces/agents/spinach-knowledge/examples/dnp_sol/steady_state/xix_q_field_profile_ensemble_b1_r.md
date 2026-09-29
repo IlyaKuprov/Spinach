@@ -16,4 +16,4 @@ For each distance and each of five Gauss–Legendre B1 points spanning 10e6–20
 
 ## Dependencies and output
 
-Requires Spinach and `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`. First the B1 results are quadrature-weighted; the distance average then applies the radial `r^2` factor with its quadrature weights and normalization. It plots the real proton `Lz` signal against microwave offset in MHz and saves `xix_q_field_profile_ensemble_b1_r.fig` in the MATLAB current directory. No numerical profile is saved, and both ensembles use finite quadrature grids.
+Requires Spinach and `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`. First the B1 results are quadrature-weighted; the distance average then applies the radial `r^2` factor with its quadrature weights and normalisation. It plots the real proton `Lz` signal against microwave offset in MHz and saves `xix_q_field_profile_ensemble_b1_r.fig` in the MATLAB current directory. No numerical profile is saved, and both ensembles use finite quadrature grids.

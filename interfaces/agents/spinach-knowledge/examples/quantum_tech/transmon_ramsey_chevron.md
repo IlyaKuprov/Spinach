@@ -8,7 +8,7 @@ A closed, coherently controlled three-level transmon in the Duffing approximatio
 
 ## Hamiltonian and parameters
 
-The source sets the field to zero, uses a T3 mode with rotating-frame frequency 0 and anharmonicity -260e6 Hz, and selects the Zeeman-Hilbert formalism without basis approximation. The cavity/Duffing Hamiltonian supplies the anharmonic drift H0. For each detuning Δ in a 256-point grid from -20e6 to 20e6 Hz, the evolution Hamiltonian is H0 + 2*pi*Δ*N, symmetrized in the source; N is the transmon number operator. The 256 free-evolution times span 0 to 1.0e-6 s.
+The source sets the field to zero, uses a T3 mode with rotating-frame frequency 0 and anharmonicity -260e6 Hz, and selects the Zeeman-Hilbert formalism without basis approximation. The cavity/Duffing Hamiltonian supplies the anharmonic drift H0. For each detuning Δ in a 256-point grid from -20e6 to 20e6 Hz, the evolution Hamiltonian is H0 + 2*pi*Δ*N, symmetrised in the source; N is the transmon number operator. The 256 free-evolution times span 0 to 1.0e-6 s.
 
 ## Pulse sequence and detection
 

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This no-argument example models a static-powder, doubly rotating-frame electron–`15N` cross-polarization contact experiment. It computes and plots the nitrogen `S_x` expectation value over the contact pulse. The source estimates the calculation time as seconds.
+This no-argument example models a static-powder, doubly rotating-frame electron–`15N` cross-polarisation contact experiment. It computes and plots the nitrogen `S_x` expectation value over the contact pulse. The source estimates the calculation time as seconds.
 
 ## Model and sequence
 

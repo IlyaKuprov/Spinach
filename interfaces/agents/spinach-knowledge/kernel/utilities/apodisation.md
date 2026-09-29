@@ -6,7 +6,7 @@ Apodises free induction decay (FID) data by applying window functions along each
 
 Source: [apodisation.m on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/apodisation.m)
 
-## Behavior
+## Behaviour
 
 - Validates inputs via an internal `grumble` subroutine: `fid` must be numeric, `winfuns` must be a cell array with one element per non-singleton dimension of `fid`, each element must be a cell array, and the window type must be one of the supported strings. Parameterised windows (`exp`, `gauss`, `kaiser`, `bad-z1`, `bad-z2`) require a finite real scalar parameter; all others take no parameters.
 - If `fp_half` is not supplied, it defaults to `true`.

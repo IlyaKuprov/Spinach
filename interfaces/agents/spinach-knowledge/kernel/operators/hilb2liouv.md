@@ -20,4 +20,4 @@ For the four action choices and square `H`, `L` is `d^2`-by-`d^2`. The commutato
 
 ## Inputs and checks
 
-The source checks that `H` is numeric and `conv_type` is a character array; unrecognized conversion types raise an error. It does not explicitly check that `H` is square, although the matrix-action formulas above presume a square operator.
+The source checks that `H` is numeric and `conv_type` is a character array; unrecognised conversion types raise an error. It does not explicitly check that `H` is square, although the matrix-action formulas above presume a square operator.

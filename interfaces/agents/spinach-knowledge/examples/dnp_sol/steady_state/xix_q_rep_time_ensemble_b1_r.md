@@ -5,7 +5,7 @@
 
 ## Purpose and protocol variant
 
-Scans XiX steady-state proton polarization against shot repetition time while averaging over both electron–proton distance and microwave B1 quadratures. This is the combined-ensemble, repetition-time variant; the source estimates hours.
+Scans XiX steady-state proton polarisation against shot repetition time while averaging over both electron–proton distance and microwave B1 quadratures. This is the combined-ensemble, repetition-time variant; the source estimates hours.
 
 ## Inputs and scan axes
 

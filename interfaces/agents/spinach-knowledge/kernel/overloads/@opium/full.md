@@ -2,9 +2,9 @@
 
 - Signature: `M=full(M)`
 
-## Meaning and behavior
+## Meaning and behaviour
 
-An `opium` object represents the scaled unit matrix `coeff*I_dim`. This overload returns `M.coeff*eye(M.dim)`: a square numeric matrix, with the identity explicitly formed by `eye`. It therefore materializes the represented matrix rather than retaining the compact `opium` object. This source contains no explicit input validation.
+An `opium` object represents the scaled unit matrix `coeff*I_dim`. This overload returns `M.coeff*eye(M.dim)`: a square numeric matrix, with the identity explicitly formed by `eye`. It therefore materialises the represented matrix rather than retaining the compact `opium` object. This source contains no explicit input validation.
 
 ## Input and output
 

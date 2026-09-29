@@ -6,9 +6,9 @@ Computes directional derivatives of the matrix exponential, implementing Equatio
 
 Source: [kernel/utilities/dirdiff.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dirdiff.m)
 
-## Behavior
+## Behaviour
 
-The function builds an auxiliary block matrix of dimension `N` by `N` blocks, each block having the size of `A`. All diagonal blocks are set to `A`. The superdiagonal blocks are set to the differentiation direction or directions: if `B` is a cell array, block `{n,n+1}` receives `B{n}` for `n=1..N-1`; if `B` is a single matrix, every superdiagonal block receives `B`. All other blocks are initialized as sparse zero matrices of the same size as `A`.
+The function builds an auxiliary block matrix of dimension `N` by `N` blocks, each block having the size of `A`. All diagonal blocks are set to `A`. The superdiagonal blocks are set to the differentiation direction or directions: if `B` is a cell array, block `{n,n+1}` receives `B{n}` for `n=1..N-1`; if `B` is a single matrix, every superdiagonal block receives `B`. All other blocks are initialised as sparse zero matrices of the same size as `A`.
 
 Before exponentiation, the propagator tolerance is tightened by setting `spin_system.tols.prop_chop` to `1e-14`. The auxiliary matrix is converted with `cell2mat` and exponentiated over time `T` using the `propagator` function, yielding `exp(-1i*A*T)` in the top-left block together with the derivative blocks.
 

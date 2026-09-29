@@ -11,7 +11,7 @@ Returns the delay intervals for an Uhrig dynamical decoupling (UDD) sequence of 
 
 ## Timing construction
 
-The implementation computes the centered pulse positions as `T*(sin(pi*(1:N)/(2*N+2)).^2-0.5)`, differences successive positions to obtain the interior intervals, and appends equal starting and trailing delays. Thus it returns `N+1` delay values: the first is before the first ideal pulse, the interior values are between pulses, and the last follows the final pulse. Their sum is `T`. The source comment attributes the timing formula to WSW's 2009 JCP paper.
+The implementation computes the centred pulse positions as `T*(sin(pi*(1:N)/(2*N+2)).^2-0.5)`, differences successive positions to obtain the interior intervals, and appends equal starting and trailing delays. Thus it returns `N+1` delay values: the first is before the first ideal pulse, the interior values are between pulses, and the last follows the final pulse. Their sum is `T`. The source comment attributes the timing formula to WSW's 2009 JCP paper.
 
 ## Parameters / inputs
 

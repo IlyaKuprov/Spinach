@@ -12,7 +12,7 @@ For each sample the code sets `sys.magnet=3.5`, isotope `E8`, Zeeman scalar `2.0
 
 The soft pulse has rank 2, phase `-pi/2`, frequency `-0.5e9`, duration `50.0e-9` s (50 ns), power `2*pi*0.02e+9`, and method `expm`. Raw frequency and power units are not annotated. Initial state and receiver are `Lz` and `L+` on `E8`; no spins are listed for decoupling. Acquisition settings are offset 0, sweep `0.8e10`, 512 points, zero-fill 2048, `axis_units='GHz'`, grid `rep_2ang_400pts_sph`, derivative off, and axis inversion off.
 
-For each sample, `powder(spin_system,@sp_acquire,parameters,'labframe')` acquires an FID. The script applies exponential apodisation with parameter 10, computes a 2048-point shifted FFT, and adds `W(n)` times that transform to a complex spectrum accumulator. It plots `real(spectrum)` with `plot_1d` inside the sample loop, so the displayed sum is progressively accumulated. There is no explicit final normalization in this script.
+For each sample, `powder(spin_system,@sp_acquire,parameters,'labframe')` acquires an FID. The script applies exponential apodisation with parameter 10, computes a 2048-point shifted FFT, and adds `W(n)` times that transform to a complex spectrum accumulator. It plots `real(spectrum)` with `plot_1d` inside the sample loop, so the displayed sum is progressively accumulated. There is no explicit final normalisation in this script.
 
 ## Source
 

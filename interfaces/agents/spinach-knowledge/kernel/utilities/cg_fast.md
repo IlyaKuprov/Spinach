@@ -6,7 +6,7 @@
 
 Computes the Clebsch-Gordan coefficient `cg_fast(L,M,L1,M1,L2,M2)`, i.e. the coefficient in front of the `Y(L,M)` spherical harmonic in the expansion of the product of `Y(L1,M1)` and `Y(L2,M2)` spherical harmonics. In the more general sense, the coefficient is the expansion coefficient of the `|L,M>` angular momentum or spin state in the product basis of `|L1,M1>|L2,M2>` states.
 
-## Behavior
+## Behaviour
 
 - Syntax: `cg=cg_fast(L,M,L1,M1,L2,M2)`.
 - The notation is matched to Varshalovich, Section 8.2.1, and the coefficient is computed from Equation 8.2.1(5) using log-factorials.

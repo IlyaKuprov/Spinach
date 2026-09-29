@@ -8,7 +8,7 @@ Extended validation of user-declared permutation symmetry. Confirms that the Zee
 
 The declared symmetry is a permutation of spin labels, not a spatial rotation; interaction tensors related by a rotation rather than being identical are not accepted. When no symmetry is declared, the function returns without performing any checks.
 
-## Behavior
+## Behaviour
 
 - Syntax: `validate_sym(spin_system,bas)`.
 - Calls `grumble(spin_system,bas)` first to enforce consistency of the basis specification fields.

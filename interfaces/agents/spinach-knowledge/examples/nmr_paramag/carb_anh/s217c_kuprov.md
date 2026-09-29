@@ -10,7 +10,7 @@ Reconstructs a spatially distributed PCS source for the S217C tag site of human 
 
 ## Density fit and outputs
 
-The code loads a precomputed effective susceptibility tensor from `s217c_chi_eff.mat` and configures `ipcs` with the Kuprov equation. The reconstruction box is centered at [-21.8, -18.4, 20.2] Angstrom and has 25 Angstrom sides; the confinement radii are 3 and 12 Angstrom, sharpening weight is 1, and six margins are 50 Angstrom each. PCS, nuclear positions, all-atom coordinates, and the tensor are passed to the solver; `gpu=true()` enables its GPU option.
+The code loads a precomputed effective susceptibility tensor from `s217c_chi_eff.mat` and configures `ipcs` with the Kuprov equation. The reconstruction box is centred at [-21.8, -18.4, 20.2] Angstrom and has 25 Angstrom sides; the confinement radii are 3 and 12 Angstrom, sharpening weight is 1, and six margins are 50 Angstrom each. PCS, nuclear positions, all-atom coordinates, and the tensor are passed to the solver; `gpu=true()` enables its GPU option.
 
 It solves successively on 64^3, 128^3, and 256^3 grids with regularisation parameter 0.50, feeding each source cube into the next grid as the guess. It then recalculates an effective susceptibility tensor with `chi_eff(source_cube,ranges,xyz,expt_pcs)` and displays that tensor. The source does not report a density centroid, tensor values, or PCS fit statistics; those are data- and run-dependent.
 

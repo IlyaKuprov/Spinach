@@ -6,7 +6,7 @@
 
 `p=simplify(p)`
 
-## Behavior
+## Behaviour
 
 The input must be a polyadic object; otherwise the function raises `p must be polyadic.` It first records `[nrows,ncols]=size(p)`. An empty core list, a zero prefix or suffix factor, or removal of all zero terms returns `spalloc(nrows,ncols,0)`, preserving the original represented dimensions as a sparse zero matrix.
 

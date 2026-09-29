@@ -6,7 +6,7 @@ Source: [kernel/utilities/min_int_type.m](https://github.com/IlyaKuprov/Spinach/
 
 Returns the minimum MATLAB integer data type sufficient to store a specified maximum value. The header comment notes this is useful in many indexing operations in the Spinach kernel where double precision would be a massive overkill.
 
-## Behavior
+## Behaviour
 
 - Syntax: `type=min_int_type(max_val,issigned)`.
 - The function first runs a consistency check (`grumble`) on the inputs.

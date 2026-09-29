@@ -6,7 +6,7 @@
 
 ## Question and choice
 
-How does TOP DNP steady-state proton longitudinal polarization vary with repetition time after averaging over electron–proton distance at fixed microwave nutation frequency? This is distance-only: unlike the B1 ensemble pages, it fixes B1 at 18 MHz.
+How does TOP DNP steady-state proton longitudinal polarisation vary with repetition time after averaging over electron–proton distance at fixed microwave nutation frequency? This is distance-only: unlike the B1 ensemble pages, it fixes B1 at 18 MHz.
 
 ## Model and scan
 
@@ -16,4 +16,4 @@ TOP settings: E/1H; spherical grid `rep_2ang_800pts_sph`; 10 ns pulse; 14 ns del
 
 ## Relaxation, averaging, and output
 
-At each distance, uses `inter.relaxation={'t1_t2'}` and `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r(n),bet)`; rates `inter.r1_rates={1e3 r1n_rate}` and `inter.r2_rates={200e3 50e3}`; diagonal retention and `dibari` equilibrium. Rate units are not annotated. Proton detection is `state(spin_system,'Lz','1H')`; each point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`. Distance average uses weights and radial `r^2` Jacobian, normalized by `sum((r.^2).*wr)`. Plots real proton `I_z` expectation versus repetition time in ms and saves `top_q_rep_time_ensemble_r.fig` in the MATLAB current folder; no separate numerical data file. TOP steady-state dynamics are delegated to `topdnp_steady`.
+At each distance, uses `inter.relaxation={'t1_t2'}` and `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r(n),bet)`; rates `inter.r1_rates={1e3 r1n_rate}` and `inter.r2_rates={200e3 50e3}`; diagonal retention and `dibari` equilibrium. Rate units are not annotated. Proton detection is `state(spin_system,'Lz','1H')`; each point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`. Distance average uses weights and radial `r^2` Jacobian, normalised by `sum((r.^2).*wr)`. Plots real proton `I_z` expectation versus repetition time in ms and saves `top_q_rep_time_ensemble_r.fig` in the MATLAB current folder; no separate numerical data file. TOP steady-state dynamics are delegated to `topdnp_steady`.

@@ -6,7 +6,7 @@
 
 Computes the Clebsch-Gordan coefficient: the coefficient in front of the `Y(L,M)` spherical harmonic in the expansion of the product of `Y(L1,M1)` and `Y(L2,M2)` spherical harmonics. In the more general sense, the coefficient refers to the expansion coefficient of the `|L,M>` angular momentum or spin state in the product basis of `|L1,M1>|L2,M2>` states.
 
-## Behavior
+## Behaviour
 
 - Syntax: `cg=clebsch_gordan(L,M,L1,M1,L2,M2)`.
 - The notation is matched to Varshalovich, Section 8.2.1, with the mapping `c=L`, `gam=M`, `a=L1`, `alp=M1`, `b=L2`, `bet=M2`.

@@ -6,7 +6,7 @@
 
 Computes trajectory similarity scores. Returns one numeric similarity score per time column for two state-space trajectories.
 
-## Behavior
+## Behaviour
 
 - Syntax: `score=trajsimil(spin_system,trajectory_1,trajectory_2,scorefcn)`.
 - Consistency is enforced first: the function is only available for Liouville space formalisms (`sphten-liouv` or `zeeman-liouv`); `scorefcn` must be a character string; the two trajectory matrices must have matching dimensions; each trajectory's row count must equal the basis set dimension; both trajectories must be numeric arrays of doubles; and `scorefcn` must be one of `RSP`, `RDN`, `SG-RSP`, `SG-RDN`, `BSG-RSP`, `BSG-RDN`.

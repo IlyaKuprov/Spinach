@@ -4,10 +4,10 @@
 
 Regression test suite for the sparse sortrows MEX helper `spsortrows`, verifying that it returns the same row permutation as MATLAB's built-in `sortrows` on sparse real double matrices.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Sparse sortrows MEX helper\n')`.
-- Initializes a test result via `new_test_result('kernel/spsortrows_mex_suite', 'Sparse sortrows MEX helper', 'spsortrows must return the same row permutation as Matlab sortrows.')`.
+- Initialises a test result via `new_test_result('kernel/spsortrows_mex_suite', 'Sparse sortrows MEX helper', 'spsortrows must return the same row permutation as Matlab sortrows.')`.
 - Checks empty matrices: `sparse(0,0)` (empty square) and `sparse(0,5)` (empty tall, zero-row), comparing `spsortrows(A)` against the second output of `sortrows(A)`.
 - Checks zero-column matrices with `sparse(4,0)`.
 - Checks duplicate rows and lexicographic sign ordering using a 5-by-4 sparse matrix containing repeated rows, negative entries, and a zero row.

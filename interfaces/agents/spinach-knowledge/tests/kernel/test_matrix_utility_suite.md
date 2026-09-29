@@ -6,9 +6,9 @@
 
 Regression test suite for the small matrix utility functions that Spinach uses throughout the kernel for algebra, sparsity, block assembly, and indexing operations. The suite verifies that these low-level matrix helpers preserve their exact algebraic definitions.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Matrix utility functions\n')` and initializes a test result object via `new_test_result('kernel/matrix_utility_suite', 'Matrix utility functions', 'matrix helpers must preserve their exact algebraic definitions.')`. It then runs a sequence of checks:
+The function announces the test target with `fprintf('TESTING: Matrix utility functions\n')` and initialises a test result object via `new_test_result('kernel/matrix_utility_suite', 'Matrix utility functions', 'matrix helpers must preserve their exact algebraic definitions.')`. It then runs a sequence of checks:
 
 - **Anticommutator:** `acomm(A,B)` is compared against `A*B+B*A` for the test matrices `A=[1 2;3 4]` and `B=[0 1;-1 2]`.
 - **Cheap norm (CPU):** `cheap_norm(A)` is compared against `norm(A,1)` for a CPU matrix.

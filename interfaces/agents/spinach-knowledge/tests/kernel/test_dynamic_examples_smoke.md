@@ -6,9 +6,9 @@
 
 Regression test that exercises compact dynamic example-stage calculations with plotting. It runs short liquid-state NMR calculations adapted from plotting examples, processes the deterministic signals, and verifies the plotted graphics objects under invisible offscreen figures.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `TESTING: Dynamic plotting example smoke paths` and initializes a test result named `examples/dynamic_examples_smoke` with the description `Dynamic plotting example smoke paths` and the requirement that compact example-stage calculations must run, process, and plot deterministic spectra.
+- Announces the test target with `TESTING: Dynamic plotting example smoke paths` and initialises a test result named `examples/dynamic_examples_smoke` with the description `Dynamic plotting example smoke paths` and the requirement that compact example-stage calculations must run, process, and plot deterministic spectra.
 - Forces invisible figures by saving and overriding `groot`'s `defaultFigureVisible` to `'off'`; an `onCleanup` object restores the original visibility and closes all figures with `close all force` after the test, whether it succeeds or fails.
 - Runs two subtests:
   - **One-dimensional acquisition path** (`local_test_acquire_1d`):

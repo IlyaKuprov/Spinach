@@ -6,7 +6,7 @@ Source: [examples/nmr_proteins/hncaco_gb1.m](https://github.com/IlyaKuprov/Spina
 
 ## Task and imported data
 
-This example simulates a 3D HN(CA)CO backbone spectrum for GB1, with the source comment assuming that only the backbone is 13C,15N-labelled. It imports structure and chemical-shift inputs from `2N9K.pdb` and `2N9K.bmrb` through `protein`, selecting molecule 1, deleting spins without shifts, and using `backbone-minimal`. These are inputs to a Spinach simulation; the script does not load an experimental 3D spectrum or establish agreement with measured data. No paramagnetic center or paramagnetic interaction is specified.
+This example simulates a 3D HN(CA)CO backbone spectrum for GB1, with the source comment assuming that only the backbone is 13C,15N-labelled. It imports structure and chemical-shift inputs from `2N9K.pdb` and `2N9K.bmrb` through `protein`, selecting molecule 1, deleting spins without shifts, and using `backbone-minimal`. These are inputs to a Spinach simulation; the script does not load an experimental 3D spectrum or establish agreement with measured data. No paramagnetic centre or paramagnetic interaction is specified.
 
 The field parameter is 14.1 T. The interaction and proximity cutoffs are 2.0 and 4.0; the example does not state their units. The basis uses `sphten-liouv`, approximation `IK-1`, connectivity `scalar_couplings`, interaction level 4, and proximity level 1. It enables `greedy` and disables `krylov`; the commented GPU option is not enabled. The sequence is HN(CA)CO: F1 is 15N, F2 is the carbonyl 13C coherence, and F3 is 1H, with the default receiver state on NH protons. The four FID fields are phase/sign branches for States quadrature.
 

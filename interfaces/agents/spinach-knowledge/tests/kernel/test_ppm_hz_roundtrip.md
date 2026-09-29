@@ -4,7 +4,7 @@
 
 Regression test for the chemical-shift and frequency conversion functions `ppm2hz` and `hz2ppm`, verifying that they implement the Larmor-frequency definition of chemical shift.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Chemical-shift frequency conversion\n')`.
 - Creates a regression test result via `new_test_result` with target `kernel/ppm_hz_roundtrip`, description `Chemical-shift frequency conversion`, and the requirement that `ppm2hz` and `hz2ppm` implement the Larmor-frequency definition.

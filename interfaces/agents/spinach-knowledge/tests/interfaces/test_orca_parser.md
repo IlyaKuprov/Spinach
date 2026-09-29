@@ -6,7 +6,7 @@ Source: [tests/interfaces/test_orca_parser.m](https://github.com/IlyaKuprov/Spin
 
 Regression test for the ORCA log parser (`oparse`) that runs on the ORCA output files bundled with the Spinach examples. It verifies that magnetic parameters are read from ORCA logs and attached to the correct atoms.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `TESTING: ORCA log parser`.
 - Creates a test result object via `new_test_result` for `interfaces/orca_parser`.

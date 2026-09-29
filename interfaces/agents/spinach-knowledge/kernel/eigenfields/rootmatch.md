@@ -22,7 +22,7 @@ Match roots across three magnetic-field root lists while preserving their order.
 
 ## Algorithm and edge cases
 
-Each list is sorted by field. When all three lists have equal lengths, the routine pairs roots by sorted order and returns immediately. Otherwise, a three-dimensional dynamic programme considers skipping the next root from any one list or matching the next root from all three. It first maximizes the number of order-preserving triples, then minimizes total continuation cost among solutions with that match count. A triple `(f1,f2,f3)` contributes
+Each list is sorted by field. When all three lists have equal lengths, the routine pairs roots by sorted order and returns immediately. Otherwise, a three-dimensional dynamic programme considers skipping the next root from any one list or matching the next root from all three. It first maximises the number of order-preserving triples, then minimises total continuation cost among solutions with that match count. A triple `(f1,f2,f3)` contributes
 
 `((f1-f2)/edge12)^2 + ((f2-f3)/edge23)^2 + ((f3-f1)/edge31)^2`.
 

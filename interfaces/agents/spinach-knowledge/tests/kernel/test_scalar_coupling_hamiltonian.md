@@ -6,10 +6,10 @@ Source: [tests/kernel/test_scalar_coupling_hamiltonian.m](https://github.com/Ily
 
 Regression test for the two-spin scalar-coupling Hamiltonian. The test verifies that an isotropic scalar coupling J produces the textbook Hamiltonian 2*pi*J*(Ix*Sx+Iy*Sy+Iz*Sz).
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Scalar coupling Hamiltonian\n')`.
-- Initializes a regression test result via `new_test_result` for `kernel/scalar_coupling_hamiltonian`, describing the target as "an isotropic J coupling must produce 2*pi*J I dot S."
+- Initialises a regression test result via `new_test_result` for `kernel/scalar_coupling_hamiltonian`, describing the target as "an isotropic J coupling must produce 2*pi*J I dot S."
 - Builds a two-proton Hilbert-space spin system with a 10 Hz J coupling:
   - `sys.magnet=0`
   - `sys.isotopes={'1H','1H'}`

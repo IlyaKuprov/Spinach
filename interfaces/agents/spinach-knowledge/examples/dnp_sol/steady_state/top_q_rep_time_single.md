@@ -6,7 +6,7 @@
 
 ## Question and choice
 
-How does TOP DNP steady-state proton longitudinal polarization vary with repetition time for one electron–proton pair and one fixed microwave nutation frequency? This baseline uses 3.5 Å distance and 18 MHz B1, with no ensemble averaging.
+How does TOP DNP steady-state proton longitudinal polarisation vary with repetition time for one electron–proton pair and one fixed microwave nutation frequency? This baseline uses 3.5 Å distance and 18 MHz B1, with no ensemble averaging.
 
 ## Model and scan
 

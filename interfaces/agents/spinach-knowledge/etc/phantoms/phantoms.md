@@ -12,7 +12,7 @@ Loads one of the built-in MRI phantom data sets and returns voxelwise relaxation
 [R1Ph,R2Ph,PDPh,dims,npts]=phantoms(ph_name)
 ```
 
-`ph_name` must be a character array and must name one of the case-sensitive entries below. There is no default; an unrecognized name raises an error.
+`ph_name` must be a character array and must name one of the case-sensitive entries below. There is no default; an unrecognised name raises an error.
 
 | `ph_name` | Input and processing | Returned sampling / dimensions |
 |---|---|---|
@@ -40,7 +40,7 @@ The following source-assigned values are for the `boob` phantom; the source labe
 | +3.2 | Fatty, medium fat | 0.50 | 2.67 | 16.54 |
 | +3.3 | Fatty, high fat | 0.45 | 2.61 | 18.39 |
 
-`R1Ph`, `R2Ph`, and `PDPh` are returned as cubes in MATLAB array layout. For the brain data, the input MAT file's T1/T2 units are inherited by the reciprocals; the source does not specify a unit conversion. Infinite rates are zeroed, but the implementation does not otherwise sanitize the arrays.
+`R1Ph`, `R2Ph`, and `PDPh` are returned as cubes in MATLAB array layout. For the brain data, the input MAT file's T1/T2 units are inherited by the reciprocals; the source does not specify a unit conversion. Infinite rates are zeroed, but the implementation does not otherwise sanitise the arrays.
 
 ## Source link
 

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Builds 1D harmonic oscillator infrastructure: the oscillator Hamiltonian, the position operator, and the coordinate grid, given force constant, particle mass, gravitational acceleration, and discretization settings.
+Builds 1D harmonic oscillator infrastructure: the oscillator Hamiltonian, the position operator, and the coordinate grid, given force constant, particle mass, gravitational acceleration, and discretisation settings.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[H_oscl,X_oscl,xgrid]=oscillator(parameters)`.
 - Validates all inputs via an internal `grumble` function, which errors if any field is missing or invalid.
@@ -23,7 +23,7 @@ Inputs (fields of `parameters`):
 - `parameters.frc_cnst` — force constant, N/m; must be a positive real scalar.
 - `parameters.par_mass` — particle mass, kg; must be a positive real scalar.
 - `parameters.grv_cnst` — gravitational acceleration, m/s^2; must be a real scalar (may be negative or zero).
-- `parameters.n_points` — number of discretization points; must be a positive real integer.
+- `parameters.n_points` — number of discretisation points; must be a positive real integer.
 - `parameters.box_size` — oscillator box size, m; must be a positive real scalar.
 
 Outputs:

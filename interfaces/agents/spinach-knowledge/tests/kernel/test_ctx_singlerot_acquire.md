@@ -6,10 +6,10 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_ctx_s
 
 Regression test for the single-rotor context (`singlerot()`) when used with `acquire()`. It runs a tiny anisotropic one-spin MAS calculation and checks the returned time-domain trace for basic physical and dimensional invariants.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Single-rotor acquire path\n')`.
-- Initializes a regression test result via `new_test_result('kernel/ctx_singlerot_acquire', ...)`, stating that `singlerot()` must project states into rotor space and run `acquire()`.
+- Initialises a regression test result via `new_test_result('kernel/ctx_singlerot_acquire', ...)`, stating that `singlerot()` must project states into rotor space and run `acquire()`.
 - Builds a one-spin anisotropic Liouville-space system:
   - `sys.magnet=14.1`, `sys.isotopes={'1H'}`.
   - `inter.zeeman.eigs={[-2 -2 4]}`, `inter.zeeman.euler={[0 0 0]}`.

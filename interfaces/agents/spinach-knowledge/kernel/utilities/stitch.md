@@ -6,7 +6,7 @@
 
 Stitches forward- and backward-propagated trajectories to obtain a three-dimensional free induction decay (FID) for 3D NMR pulse sequences at the cost of two 2D simulations. The initial condition is propagated forward to a midpoint, the detection state is propagated backward to the same midpoint, and this function combines the two stacks.
 
-## Behavior
+## Behaviour
 
 - Syntax: `fid=stitch(spin_system,L,rho_stack,coil_stack,mec_oper,mec_time,t1,t2,t3,tdir)`.
 - Sets the default time direction `tdir` to `'+-'` when the argument is absent.

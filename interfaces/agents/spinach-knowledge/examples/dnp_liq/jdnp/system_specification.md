@@ -7,7 +7,7 @@
 
 ## Purpose and use
 
-Returns the shared three-spin model used by the adjacent JDNP examples: one proton and two electrons, their interactions and relaxation settings, a complete basis specification, and reference g-factors. The scalar-coupling container is initialized but left for the calling simulation to set. fig_5_spatial_distribution() requests all four outputs; fig_6_microwave_free() requests the first three and then sets its own scalar coupling and correlation time.
+Returns the shared three-spin model used by the adjacent JDNP examples: one proton and two electrons, their interactions and relaxation settings, a complete basis specification, and reference g-factors. The scalar-coupling container is initialised but left for the calling simulation to set. fig_5_spatial_distribution() requests all four outputs; fig_6_microwave_free() requests the first three and then sets its own scalar coupling and correlation time.
 
 ## Spin system and interactions
 

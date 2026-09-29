@@ -6,7 +6,7 @@
 
 ## What it computes
 
-This is the steady-state counterpart of the TPPM/XiX DNP protocol. For every microwave offset it builds the two-pulse contact block, repeats the block, appends the shot-spacing interval, finds the stroboscopic steady state, and returns the detection-state overlap. It is not a transient curve and does not take an initial density operator. As in the source comments, `R` must be thermalised to a finite temperature. Values are model outputs; this description asserts no measured polarization or unrun result.
+This is the steady-state counterpart of the TPPM/XiX DNP protocol. For every microwave offset it builds the two-pulse contact block, repeats the block, appends the shot-spacing interval, finds the stroboscopic steady state, and returns the detection-state overlap. It is not a transient curve and does not take an initial density operator. As in the source comments, `R` must be thermalised to a finite temperature. Values are model outputs; this description asserts no measured polarisation or unrun result.
 
 ## Pulse block and units
 

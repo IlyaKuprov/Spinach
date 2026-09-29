@@ -23,8 +23,8 @@ The accumulated rotation is updated on the right as `R(:,:,n)=R(:,:,n-1)*expm(si
 
 ## Correlation estimate and output
 
-The selected matrix-element traces are passed to `xcorr(...,nlags,'normalized')`. The returned correlation and lag arrays are each transformed with `ifftshift`; the plot uses entries `1:nlags` of those shifted arrays, plotting `real(cf_mc)` against lag in points. The computed correlation is multiplied by `1/3` before plotting. Thus the displayed result is the real part of this finite Monte Carlo estimate under the source's normalization and index selection.
+The selected matrix-element traces are passed to `xcorr(...,nlags,'normalized')`. The returned correlation and lag arrays are each transformed with `ifftshift`; the plot uses entries `1:nlags` of those shifted arrays, plotting `real(cf_mc)` against lag in points. The computed correlation is multiplied by `1/3` before plotting. Thus the displayed result is the real part of this finite Monte Carlo estimate under the source's normalisation and index selection.
 
 ## Scope
 
-The angle sequence is random and the script sets no seed. It supplies no uncertainty estimate or analytical comparison, and the plotted lag axis is in points rather than a physical time unit. The source does not further explain the normalization convention behind `xcorr(...,'normalized')` or the factor `1/3`.
+The angle sequence is random and the script sets no seed. It supplies no uncertainty estimate or analytical comparison, and the plotted lag axis is in points rather than a physical time unit. The source does not further explain the normalisation convention behind `xcorr(...,'normalized')` or the factor `1/3`.

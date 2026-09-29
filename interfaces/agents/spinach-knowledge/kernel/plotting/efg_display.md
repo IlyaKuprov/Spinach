@@ -17,7 +17,7 @@ The default style is `harmonics`; the alternative is `ellipsoids`. Defaults are 
 
 - With `kill_iso=true`, the isotropic part is removed as `efg - eye(3)*trace(efg)/3` before plotting.
 - In `ellipsoids` style, the tensor eigensystem scales a sampled unit sphere along its three eigenvectors, translates it to the selected atom position, and draws it as a half-transparent grey surface. Principal-axis lines extend through the nucleus: positive eigenvalues are red and negative eigenvalues blue. This style requires an orthogonal eigensystem; the code switches to an error if `norm(V'*V-eye(3),2) > 1e-3` and recommends `harmonics`.
-- In `harmonics` style, `mat2sphten` supplies ranks 0, 1, and 2, which are combined with spherical harmonics to give a real radial value `R` on the sampled sphere. Coordinates are `scaling*R*[X;Y;Z]`, translated to the atom. The signed radial value sets RGB surface colour directly: positive is half-intensity red, negative is half-intensity blue, and zero has zero RGB; the surface alpha is 0.25. No additional normalization of `R` is applied.
+- In `harmonics` style, `mat2sphten` supplies ranks 0, 1, and 2, which are combined with spherical harmonics to give a real radial value `R` on the sampled sphere. Coordinates are `scaling*R*[X;Y;Z]`, translated to the atom. The signed radial value sets RGB surface colour directly: positive is half-intensity red, negative is half-intensity blue, and zero has zero RGB; the surface alpha is 0.25. No additional normalisation of `R` is applied.
 
 The molecular framework is drawn before the tensor surfaces, and optional atom numbers and symbols are added at geometry positions. The helper also installs two lights for surface rendering. All graphical objects are added to the current figure.
 

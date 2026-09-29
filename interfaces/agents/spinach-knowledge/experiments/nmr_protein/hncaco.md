@@ -17,7 +17,7 @@ Protein-specific HN(CA)CO, Figure 7.41 of the second edition of *Protein NMR Spe
 
 ## Coherence selection and transfer
 
-The code initializes positive and negative 15N states to emulate the INEPT block, uses 15N coherence for F1, and applies CA- and CO-selective pulse/evolution blocks. Its reverse half uses proton detection; positive and negative coherence are selected on the carbonyl carbons labelled `C` for F2. Thus the encoded HN(CA)CO experiment reports the 15N/CO dimensions with 1H detection. The source specifies the pulse operations and site selections but does not annotate a separate coherence order for every internal transfer delay.
+The code initialises positive and negative 15N states to emulate the INEPT block, uses 15N coherence for F1, and applies CA- and CO-selective pulse/evolution blocks. Its reverse half uses proton detection; positive and negative coherence are selected on the carbonyl carbons labelled `C` for F2. Thus the encoded HN(CA)CO experiment reports the 15N/CO dimensions with 1H detection. The source specifies the pulse operations and site selections but does not annotate a separate coherence order for every internal transfer delay.
 
 ## Timing and output
 

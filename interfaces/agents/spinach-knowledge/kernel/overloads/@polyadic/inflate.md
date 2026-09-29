@@ -5,7 +5,7 @@ Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=polyadic/inflate.m>
 
 ## Meaning
 
-A polyadic value stores a sum of terms in `p.cores`: each `p.cores{n}` is one term, and its cells are the ordered matrix factors in that term's Kronecker product. The `prefix` and `suffix` cell arrays hold matrix factors acting on the left and right of the core sum. This routine converts that representation to an explicit matrix; it is the materialization counterpart to building or composing the factorized representation.
+A polyadic value stores a sum of terms in `p.cores`: each `p.cores{n}` is one term, and its cells are the ordered matrix factors in that term's Kronecker product. The `prefix` and `suffix` cell arrays hold matrix factors acting on the left and right of the core sum. This routine converts that representation to an explicit matrix; it is the materialisation counterpart to building or composing the factorised representation.
 
 ## Construction and dimensions
 

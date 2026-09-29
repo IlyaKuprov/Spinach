@@ -4,7 +4,7 @@
 
 Removes specified particles (spins or bosonic modes) from the `spin_system` structure and updates all dependent data. Source: [kernel/utilities/kill_spin.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kill_spin.m).
 
-## Behavior
+## Behaviour
 
 - Validates the input via an internal `grumble` consistency check: a logical mask must have exactly `spin_system.comp.nspins` elements; a numeric list must contain positive integers not exceeding `spin_system.comp.nspins`.
 - Converts a logical `hit_list` to indices with `find`.

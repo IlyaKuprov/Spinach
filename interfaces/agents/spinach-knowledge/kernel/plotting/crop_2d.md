@@ -19,7 +19,7 @@ Each Hz axis is built with `ft_axis(offset,sweep,size(spec,dimension))`, then co
 
 Bounds select grid indices by strict `>` comparisons, not by rounding to the nearest ppm value. On an ascending axis, the first index above the lower bound is the left index and the first index above the upper bound is the right index. On a descending axis, the corresponding last indices above the upper and lower bounds are used. The returned slice is inclusive from left through right. Exact-boundary samples are not treated as interpolated endpoints, so the retained grid points need not coincide exactly with the requested ppm bounds; the chosen crossing can extend the crop past an upper boundary by one sample.
 
-The cropped matrix is `spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`. The new `parameters.zerofill` is the retained point count on each axis. Digital resolution is the original sweep divided by the original matrix dimension; each new sweep is that resolution times its retained point count. Offsets are recentered from the first retained Hz point, with a parity correction for odd point counts, so the updated metadata reproduces the selected points on the `ft_axis` grid.
+The cropped matrix is `spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`. The new `parameters.zerofill` is the retained point count on each axis. Digital resolution is the original sweep divided by the original matrix dimension; each new sweep is that resolution times its retained point count. Offsets are recentred from the first retained Hz point, with a parity correction for odd point counts, so the updated metadata reproduces the selected points on the `ft_axis` grid.
 
 ## Outputs
 

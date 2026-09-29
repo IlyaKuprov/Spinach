@@ -6,9 +6,9 @@
 
 Regression test for dynamic shaped-pulse propagation paths in Spinach. It verifies that the shaped-pulse helpers `shaped_pulse_xy` and `shaped_pulse_af` reduce to exact constant-generator propagation when their amplitude and frequency controls are held constant.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf('TESTING: Dynamic shaped pulse propagation paths\n')` and initializes a regression test result via `new_test_result` for `kernel/dynamic_shaped_pulses_deep`.
+- Announces the test target with `fprintf('TESTING: Dynamic shaped pulse propagation paths\n')` and initialises a regression test result via `new_test_result` for `kernel/dynamic_shaped_pulses_deep`.
 - Builds a one-proton Liouville-space spin system using `local_liouv_system(0)`, with `bas.formalism='zeeman-liouv'`, `bas.approximation='none'`, isotope `1H`, and zero scalar Zeeman interaction.
 - Obtains Liouville-space controls `Lx`, `Ly`, `Lz` via `operator(spin_system,...,1)` and the initial state `rho=state(spin_system,'Lz',1)`.
 - Defines a constant Cartesian RF generator over two slices with durations `slice_durs=[8e-5 13e-5]`, amplitudes `amp_x=2*pi*430` and `amp_y=-2*pi*170`, and drift `2*pi*35*Lz`; the reference state and propagator are computed with `step` and `propagator` over `sum(slice_durs)`.

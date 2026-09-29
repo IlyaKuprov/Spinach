@@ -6,7 +6,7 @@
 
 ## Question and model
 
-How does the steady-state proton longitudinal polarization vary with TOP contact time for two irradiation conditions at one fixed electron–proton separation? This is the fixed-distance counterpart to the distance-ensemble contact-time scripts: the coordinates place the electron and proton 3.5 Å apart. The model uses a Q-band magnet setting of 1.2142, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
+How does the steady-state proton longitudinal polarisation vary with TOP contact time for two irradiation conditions at one fixed electron–proton separation? This is the fixed-distance counterpart to the distance-ensemble contact-time scripts: the coordinates place the electron and proton 3.5 Å apart. The model uses a Q-band magnet setting of 1.2142, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
 
 ## Scan and sequence settings
 

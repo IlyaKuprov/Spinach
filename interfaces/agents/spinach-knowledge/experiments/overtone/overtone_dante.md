@@ -4,7 +4,7 @@ Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/mai
 
 Signature: `spectrum=overtone_dante(spin_system,parameters,H,R,K)`.
 
-## Behavior
+## Behaviour
 
 The source implements an overtone DANTE pulse train followed by the frequency-domain acquisition helper `overtone_a`. It computes `ovt_frq=-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`, forms `L=H+1i*R+1i*K`, and extends `parameters.Lx` across `spc_dim`. The source labels `Lx` as the X Zeeman operator on the quadrupolar nucleus. It sets the rotor period to `abs(1/rate)`, divides that period by `pulse_num` to get the pulse-cycle length, builds a pulse propagator and an intervening evolution propagator, combines them as `PE*PP`, and applies the combined propagator `n_periods*pulse_num` times to `rho0`.
 

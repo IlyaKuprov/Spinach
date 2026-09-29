@@ -5,7 +5,7 @@
 
 ## Purpose and sequence
 
-This phase-sensitive double-quantum-filtered COSY implementation starts from `Lz` magnetisation on the selected isotope, applies an `Lx` 90-degree pulse, and records an indirect-dimension (F1) trajectory. Two second-pulse branches, `Lx` and `Ly`, form the States quadrature components. An exact analytical coherence-order projection retains orders +2 and -2 in each branch; the code does not implement this filter as a phase cycle or a gradient-selection block. A third `Lx` 90-degree pulse precedes direct-dimension (F2) evolution and detection with the selected isotope's `L+` coil state. This describes the parameterized sequence, not a measured spectrum or run-verified output.
+This phase-sensitive double-quantum-filtered COSY implementation starts from `Lz` magnetisation on the selected isotope, applies an `Lx` 90-degree pulse, and records an indirect-dimension (F1) trajectory. Two second-pulse branches, `Lx` and `Ly`, form the States quadrature components. An exact analytical coherence-order projection retains orders +2 and -2 in each branch; the code does not implement this filter as a phase cycle or a gradient-selection block. A third `Lx` 90-degree pulse precedes direct-dimension (F2) evolution and detection with the selected isotope's `L+` coil state. This describes the parameterised sequence, not a measured spectrum or run-verified output.
 
 The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters.sweep` seconds.
 

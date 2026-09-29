@@ -11,10 +11,10 @@ In Liouville formalisms (`sphten-liouv` and `zeeman-liouv`), it constructs a Fok
 ## Parameters and grids
 
 - `parameters.rate_outer` and `rate_inner`: rotor rates in Hz.
-- `parameters.axis_outer` and `axis_inner`: normalized three-component vectors for the rotor axes.
+- `parameters.axis_outer` and `axis_inner`: normalised three-component vectors for the rotor axes.
 - `parameters.rank_outer` and `rank_inner`: retained harmonic ranks; increasing them increases the corresponding phase-grid size and retained Fourier content.
 - `parameters.grid`: spherical orientation-averaging grid. This is distinct from the two rotor-phase grids. The returned `sph_grid` contains Euler angles and quadrature weights.
-- `parameters.rframes`, offsets, and sequence-specific fields may further configure the calculation. The initial condition and other sequence requirements are conveyed through the usual context parameters.
+- `parameters.rframes`, offsets, and sequence-specific fields may further configure the calculation. `parameters.needs` defaults to `{}` and may contain only `'iso_eq'`. Set `parameters.needs={'iso_eq'}` when the context must create isotropic thermal-equilibrium `rho0`; this overwrites a user-supplied `rho0`. Otherwise provide the initial condition required by the chosen pulse sequence.
 
 The powder weights combine orientation-level sequence outputs when `parameters.sum_up` is enabled; with it disabled, the orientation results are returned separately. Liouville calculations accept two-angle spherical grids. The Hilbert-space rotor-stack route requires a three-angle grid when more than one orientation is used. The source notes that its state-projector treatment assumes a powder and does not support single-crystal DOR.
 

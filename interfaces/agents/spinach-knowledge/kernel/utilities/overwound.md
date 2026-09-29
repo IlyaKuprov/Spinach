@@ -6,7 +6,7 @@
 
 Checks if a Fokker-Planck state vector has any spatial frequencies that its spatial grid is dangerously close to misrepresenting due to insufficient point count.
 
-## Behavior
+## Behaviour
 
 - Syntax: `overwound(rho,spc_dim,spn_dim)`.
 - Calls the internal consistency-checking subfunction `grumble(rho,spc_dim,spn_dim)` before proceeding.

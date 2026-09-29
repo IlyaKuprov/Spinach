@@ -4,7 +4,7 @@
 
 Replicates specified rows of a matrix or cell array a specified number of times, as documented in the file header.
 
-## Behavior
+## Behaviour
 
 The function first runs a consistency check (`grumble`) on the inputs. It then builds a replication map: a row vector of ones of length equal to the number of rows of `A`, in which the entries at positions given by `row_nums` are replaced by the corresponding values of `rep_counts`. A row index vector is generated with `repelem(1:n,rep_map)`, and the output is formed by indexing `A` with that vector across all columns (`B=A(row_idx,:)`).
 

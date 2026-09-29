@@ -16,4 +16,4 @@ The three residuals test `Lz*L+ - L+*Lz = L+`, `Lz*L- - L-*Lz = -L-`, and `Lx*Ly
 
 ## Source-stated check and limits
 
-The script prints `Cross-formalism commutation test PASSED.` only when `norm(answer,'fro') < 1e-6`; otherwise it raises an error reporting failure. This describes the source's conditional check, not an observed run: no MATLAB execution is claimed here. The test covers these three identities for this one-spin setup and these three formalisms; it does not test dynamics, other basis approximations, or broader operator behavior.
+The script prints `Cross-formalism commutation test PASSED.` only when `norm(answer,'fro') < 1e-6`; otherwise it raises an error reporting failure. This describes the source's conditional check, not an observed run: no MATLAB execution is claimed here. The test covers these three identities for this one-spin setup and these three formalisms; it does not test dynamics, other basis approximations, or broader operator behaviour.

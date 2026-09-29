@@ -6,7 +6,7 @@ Prints console banners for the Spinach kernel. This is an internal kernel functi
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/banner.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `banner(spin_system,identifier)`.
 - The function first validates `identifier` via the internal `grumble` helper, which errors with `'identifier must be a character string.'` if `identifier` is not a character array.

@@ -4,7 +4,7 @@
 
 Runs the Spinach regression test suite ([source](https://github.com/IlyaKuprov/Spinach/blob/main/tests/run_tests.m)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `results=run_tests(varargin)`.
 - Enforces that options are supplied as name-value pairs; option names must be non-empty character row strings, otherwise an error is raised.

@@ -12,7 +12,7 @@ Returns one copy of every distinct column of a sparse matrix. This is a column-s
 
 For an input `A` with `m` rows and `n` columns, regard each column `a_j` as an element of `R^m`. Define `a_i ~ a_j` exactly when `a_i=a_j`. The result `B` contains one column for each equivalence class, so its shape is `m × u`, where `u` is the number of distinct input columns. In code the mapping is `B = unique(A.','rows').'`.
 
-MATLAB's `unique(...,'rows')` uses its default sorted ordering; the output columns are therefore ordered by the corresponding sorted rows, not kept in first-occurrence order. The function has one output only: it does not return the source-column indices or an index map. It applies no tolerance, normalization, or physical-unit conversion.
+MATLAB's `unique(...,'rows')` uses its default sorted ordering; the output columns are therefore ordered by the corresponding sorted rows, not kept in first-occurrence order. The function has one output only: it does not return the source-column indices or an index map. It applies no tolerance, normalisation, or physical-unit conversion.
 
 ## Input and output
 

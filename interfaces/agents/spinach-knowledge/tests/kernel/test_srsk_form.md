@@ -6,9 +6,9 @@
 
 Regression test for the SRSK formalism restriction in Spinach. It verifies that SRSK (source relaxation) requires the spherical-tensor Liouville formalism, and that a Zeeman Liouville request with SRSK is refused explicitly rather than silently selecting a different high-spin relaxation model. The physical scenario is a rapidly relaxing 14N source broadening its scalar-coupled proton.
 
-## Behavior
+## Behaviour
 
-The test builds a two-spin system (`1H`, `14N`) at 1e-3 magnet field with a 100 Hz scalar coupling, Lindblad relaxation rates `lind_r1_rates=[1,1e5]` and `lind_r2_rates=[1,1e5]` (rapid nitrogen relaxation), zero equilibrium magnetization, 298 K temperature, lab-frame relaxation retention, and density-frequency preservation (`rlx_dfs='keep'`).
+The test builds a two-spin system (`1H`, `14N`) at 1e-3 magnet field with a 100 Hz scalar coupling, Lindblad relaxation rates `lind_r1_rates=[1,1e5]` and `lind_r2_rates=[1,1e5]` (rapid nitrogen relaxation), zero equilibrium magnetisation, 298 K temperature, lab-frame relaxation retention, and density-frequency preservation (`rlx_dfs='keep'`).
 
 Under `zeeman-liouv` formalism with `SRSK` in `inter.relaxation` and `inter.srsk_sources=2`, the test loops over all combinations of retention (`labframe`, `secular`, `diagonal`) and equilibrium (`zero`, `IME`, `dibari`) settings, requiring that `relaxation()` throws an error containing `SRSK`, `not implemented`, and `zeeman-liouv`.
 

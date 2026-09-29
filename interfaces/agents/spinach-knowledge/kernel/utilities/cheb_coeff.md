@@ -6,7 +6,7 @@ Computes the Chebyshev expansion coefficients of a user-specified scalar functio
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/cheb_coeff.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `c=cheb_coeff(f,a,b,n)`.
 - Validates inputs via an internal `grumble` subfunction, which errors if `f` is not a function handle, if `a` and `b` are not real scalars with `a < b`, or if `n` is not a positive real integer.

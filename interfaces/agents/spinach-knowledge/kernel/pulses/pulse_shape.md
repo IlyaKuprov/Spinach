@@ -24,4 +24,4 @@ waveform=pulse_shape(pulse_name,npoints)
 - sinc3: evaluate pi*sinc(t) at equally spaced samples from -3 to 3, inclusive.
 - rectangular: return ones(1,npoints).
 
-For the sinc cases, MATLAB's normalized sinc convention is used. The sampled coordinate is dimensionless in this function; no time vector or sampling interval is returned. The source formulas are used directly rather than rescaled to unit peak. The implementation's acceptance check is npoints>=1 with an integer requirement (although its error text says greater than 1).
+For the sinc cases, MATLAB's normalised sinc convention is used. The sampled coordinate is dimensionless in this function; no time vector or sampling interval is returned. The source formulas are used directly rather than rescaled to unit peak. The implementation's acceptance check is npoints>=1 with an integer requirement (although its error text says greater than 1).

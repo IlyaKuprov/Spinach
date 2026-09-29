@@ -6,9 +6,9 @@ Regression test suite for operator-basis construction and expansion helpers in S
 
 Source: [tests/kernel/test_operator_basis_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_operator_basis_suite.m)
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf('TESTING: Operator-basis construction functions\n')` and initializes a test result object via `new_test_result('kernel/operator_basis_suite', ...)`.
+- Announces the test target with `fprintf('TESTING: Operator-basis construction functions\n')` and initialises a test result object via `new_test_result('kernel/operator_basis_suite', ...)`.
 - **Irreducible spherical tensors**: for multiplicity 3, checks `[Lz, T(k,m)] = m*T(k,m)` for rank-2 tensors with projections `2:-1:-2` (tolerance `1e-13`), and that `irr_sph_ten(mult)` returns `mult^2` operators.
 - **Stevens operators**: verifies `stevens(3,1,0)` equals the angular momentum `Lz` operator (tolerance `1e-14`).
 - **Weyl boson operators**: for `weyl(4)`, checks `c*a = n`, `[n,c] = c`, and `[n,a] = -a` (tolerance `1e-14`).

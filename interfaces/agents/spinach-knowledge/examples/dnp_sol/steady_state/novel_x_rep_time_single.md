@@ -8,7 +8,7 @@ Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/example
 
 ## Spin model and configuration
 
-The system contains `E` and `1H`, with `sys.magnet=0.34` for the X-band setup. Trityl electron Zeeman values are `[2.00319 2.00319 2.00258]`; proton values are `[0 0 5]` (source description: ppm guess), with orientations `(pi/180)*{[0 10 0],[0 0 10]}`. The spin-temperature parameter is `80`; no unit is stated. The electron coordinate is the origin and the proton coordinate is `(0,0,3.500)`, with the source labeling the distance in Å.
+The system contains `E` and `1H`, with `sys.magnet=0.34` for the X-band setup. Trityl electron Zeeman values are `[2.00319 2.00319 2.00258]`; proton values are `[0 0 5]` (source description: ppm guess), with orientations `(pi/180)*{[0 10 0],[0 0 10]}`. The spin-temperature parameter is `80`; no unit is stated. The electron coordinate is the origin and the proton coordinate is `(0,0,3.500)`, with the source labelling the distance in Å.
 
 The calculation uses the `sphten-liouv` basis without approximation, `prop_chop=1e-12`, and disables hygiene. Relaxation is `t1_t2`, diagonal retention, and DiBari equilibrium; the nuclear R1 function is `r1n_dnp(...,2.00230,1e-3,26,r_en,bet)`. The remaining relaxation entries are `1e3` and `[200e3 50e3]`, with no units specified for those values in this file. See [r1n_dnp.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1n_dnp.m).
 
@@ -24,4 +24,4 @@ The source uses Spinach system construction and propagation functions `create`, 
 
 ## Output and scope
 
-The saved figure `novel_x_rep_time_single.fig` plots the real proton longitudinal expectation value for both flipback conditions. It is the selected 3.5 Å pair under this parameterization, not the distance-averaged result from companion ensemble examples. The source uses `parfor` over repetition times and does not configure a worker count.
+The saved figure `novel_x_rep_time_single.fig` plots the real proton longitudinal expectation value for both flipback conditions. It is the selected 3.5 Å pair under this parameterisation, not the distance-averaged result from companion ensemble examples. The source uses `parfor` over repetition times and does not configure a worker count.

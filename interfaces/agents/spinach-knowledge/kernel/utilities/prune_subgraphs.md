@@ -4,7 +4,7 @@
 
 Removes subgraphs that are contained entirely within other subgraphs, keeping only subgraphs that are not proper subsets of any other subgraph in the set.
 
-## Behavior
+## Behaviour
 
 - The function first validates its input through an internal consistency check (`grumble`), which errors with `'subgraphs must be a logical array.'` if the input is not logical.
 - Trivial cases are ignored and returned unchanged: when the input has fewer than 2 rows (`ngraphs < 2`) or fewer than 2 columns (`nspins < 2`), the function returns immediately.

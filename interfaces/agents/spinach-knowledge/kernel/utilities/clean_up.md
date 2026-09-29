@@ -6,7 +6,7 @@ Array clean-up utility. Drops non-zero elements with magnitude below the user-sp
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/clean_up.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `A=clean_up(spin_system,A,nonzero_tol)`.
 - Objects of class `opium` are returned unchanged.

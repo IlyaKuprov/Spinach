@@ -8,9 +8,9 @@ This is a four-pulse DEER/PELDOR diagnostic driver rather than a signal-returnin
 
 ## Interface and parameters
 
-`deer_4p_soft_diag(spin_system,parameters)` has no declared output. Its parameter structure supplies the four-pulse settings (`pulse_frq`, `pulse_pwr`, `pulse_dur`, `pulse_phi`, `pulse_rnk`), delays (`p1_p2_gap`, `p2_p4_gap`), insertion count (`p3_nsteps`), echo window (`echo_time`, `echo_npts`), initial state (`rho0`), detection state (`coil`), receiver offset (`offset`), time-domain sweep width (`sweep`), FID point count (`npoints`), zero-filled FFT length (`zerofill`), shaped-pulse `method` (`'expm'`, `'expv'`, or `'evolution'`), and Hamiltonian-generation `assumptions`. The source gives frequencies and offsets/sweep in Hz, pulse durations in seconds, phases in radians, and echo time in seconds. It documents `echo_npts` and `p3_nsteps` as at least two.
+`deer_4p_soft_diag(spin_system,parameters)` has no declared output. Its parameter structure supplies the four-pulse settings (`pulse_frq`, `pulse_pwr`, `pulse_dur`, `pulse_phi`, `pulse_rnk`), delays (`p1_p2_gap`, `p2_p4_gap`), insertion count (`p3_nsteps`), echo window (`echo_time`, `echo_npts`), initial state (`rho0`), detection state (`coil`), one irradiated-spin selector (`spins`, a one-element cell such as `{'E'}`), receiver offset (`offset`), time-domain sweep width (`sweep`), FID point count (`npoints`), zero-filled FFT length (`zerofill`), shaped-pulse `method` (`'expm'`, `'expv'`, or `'evolution'`), and Hamiltonian-generation `assumptions`. The source gives frequencies and offsets/sweep in Hz, pulse durations in seconds, phases in radians, and echo time in seconds. It documents `echo_npts` and `p3_nsteps` as at least two.
 
-The source header labels `pulse_pwr` in Hz, whereas the two callback routines it invokes document that field in rad/s. This unit discrepancy is not resolved in the implementation; callers should not assume the two labels are interchangeable. The allowed `assumptions` labels are `'deer'` (retain two-electron flip-flop terms) and `'deer-zz'` (drop them).
+Despite the wrapper header’s Hz label, `pulse_pwr` is consumed in rad/s: the driver passes it unchanged through both callbacks to `shaped_pulse_af`. The allowed `assumptions` labels are `'deer'` (retain two-electron flip-flop terms) and `'deer-zz'` (drop them).
 
 ## Diagnostic interpretation
 

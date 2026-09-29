@@ -6,7 +6,7 @@ Prints an ASCII diagram of a `polyadic` object to the console, showing its size,
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/polinfo.m>
 
-## Behavior
+## Behaviour
 
 - Signature: `polinfo(p,level,label)`, with `level` defaulting to `0` and `label` defaulting to `'polyadic'` when not supplied.
 - Validates inputs via the internal `grumble` function: `p` must be a `polyadic` object, `level` a non-negative real integer scalar, and `label` a character string; violations raise errors (`'p must be a polyadic object.'`, `'level must be a non-negative integer.'`, `'label must be a character string.'`).

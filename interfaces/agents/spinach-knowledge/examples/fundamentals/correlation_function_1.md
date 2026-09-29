@@ -10,7 +10,7 @@ This example compares a finite Monte Carlo trajectory with Spinach's analytical 
 
 ## Numerical construction
 
-The Monte Carlo trajectory has `1e6` steps and requests `nlags=300`. At each step, three independent standard-normal increments weight the three displayed skew-symmetric rotation generators equally by `sigma_iso`; their sum is exponentiated and right-multiplied into the direction-cosine matrix, starting from `eye(3)`. A `parfor` loop converts each saved matrix through `dcm2euler` and `wigner(L,...)`; the selected Wigner elements are passed to normalized `xcorr`. The code multiplies that result by `1/(2*L+1)`, applies `ifftshift` to the correlation and lag vector, and plots the first 300 entries (lag points 0 through 299).
+The Monte Carlo trajectory has `1e6` steps and requests `nlags=300`. At each step, three independent standard-normal increments weight the three displayed skew-symmetric rotation generators equally by `sigma_iso`; their sum is exponentiated and right-multiplied into the direction-cosine matrix, starting from `eye(3)`. A `parfor` loop converts each saved matrix through `dcm2euler` and `wigner(L,...)`; the selected Wigner elements are passed to normalised `xcorr`. The code multiplies that result by `1/(2*L+1)`, applies `ifftshift` to the correlation and lag vector, and plots the first 300 entries (lag points 0 through 299).
 
 ## Analytical construction and observable
 

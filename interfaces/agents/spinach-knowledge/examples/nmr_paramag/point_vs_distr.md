@@ -12,4 +12,4 @@ After padding the density with two original grid lengths on each side, `kpcs(...
 
 ## Scope and omissions
 
-This is randomized synthetic data, with no fixed seed, experimental spectrum, field, or temperature. It is not a carbonic-anhydrase case and has no named metal site or protein residue. The source reports outputs at run time rather than fixed fit values; its header estimates a runtime of minutes.
+This is randomised synthetic data, with no fixed seed, experimental spectrum, field, or temperature. It is not a carbonic-anhydrase case and has no named metal site or protein residue. The source reports outputs at run time rather than fixed fit values; its header estimates a runtime of minutes.

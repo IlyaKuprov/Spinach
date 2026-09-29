@@ -5,7 +5,7 @@
 
 ## Purpose and sequence
 
-Computes a steady-state detected observable over microwave resonance offsets for the pulsed solid-effect or NOVEL DNP sequence. The input relaxation superoperator `R` is documented as thermalised to finite temperature. The function forms `L=H+1i*R+1i*K`; for each offset it adds the electron (L_z) offset term, applies the selected irradiation/contact block, then the unirradiated shot-spacing block, and solves the repeated-cycle steady state with a Newton solver. The output is the coil-state overlap with that steady state, not a measured polarization.
+Computes a steady-state detected observable over microwave resonance offsets for the pulsed solid-effect or NOVEL DNP sequence. The input relaxation superoperator `R` is documented as thermalised to finite temperature. The function forms `L=H+1i*R+1i*K`; for each offset it adds the electron (L_z) offset term, applies the selected irradiation/contact block, then the unirradiated shot-spacing block, and solves the repeated-cycle steady state with a Newton solver. The output is the coil-state overlap with that steady state, not a measured polarisation.
 
 For `flippulse=1`, the source applies an electron (X)-axis 90-degree pulse followed by a (-Y) microwave contact period. When `flipback=1`, it then applies a (-X) microwave flipback pulse of duration `pulse_dur`. For `flippulse=0`, it uses the contact period without the preparation pulse. `irr_powers`, `el_offs`, and `addshift` enter the generator multiplied by `2*pi`; use Hz-valued frequencies consistent with the source's stated Hz convention for microwave amplitude. Durations are in seconds.
 

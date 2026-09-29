@@ -4,7 +4,7 @@
 
 Returns `true` if the code is currently executing inside a `parfor` or `spmd` block, i.e. on a MATLAB parallel worker process. The function is used in internal Spinach kernel decision making: certain algorithms are switched to their serial versions when the calculation is already running inside a parallel loop.
 
-## Behavior
+## Behaviour
 
 - The function takes no arguments and returns a single logical value.
 - It calls the undocumented MATLAB internal function `parallel.internal.pool.isPoolWorker()`, which reports whether the current process is a parallel pool worker.

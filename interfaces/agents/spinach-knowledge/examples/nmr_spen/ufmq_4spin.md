@@ -7,7 +7,7 @@
 
 ## Experiment and spin model
 
-This example simulates a 4Q ultrafast MaxQ NMR spectrum for four coupled protons with diffusion. At 14.1 T the 1H shifts are 0.50, 0.35, 0.15, and 0 ppm. The listed 3J couplings are 8.0 Hz for pairs (1,2), (2,3), and (3,4); the listed 4J couplings are 3.0 Hz for (1,3) and (2,4); and the 5J coupling for (1,4) is 2.0 Hz. Coherence order +4 is selected in the full sphten-liouv basis. No relaxation phantom or operator is supplied; flow is set to zero. The uniform initial phantom is longitudinal 1H magnetization and detection is transverse 1H coherence. The calculation uses simulated data, not imported measurements.
+This example simulates a 4Q ultrafast MaxQ NMR spectrum for four coupled protons with diffusion. At 14.1 T the 1H shifts are 0.50, 0.35, 0.15, and 0 ppm. The listed 3J couplings are 8.0 Hz for pairs (1,2), (2,3), and (3,4); the listed 4J couplings are 3.0 Hz for (1,3) and (2,4); and the 5J coupling for (1,4) is 2.0 Hz. Coherence order +4 is selected in the full sphten-liouv basis. No relaxation phantom or operator is supplied; flow is set to zero. The uniform initial phantom is longitudinal 1H magnetisation and detection is transverse 1H coherence. The calculation uses simulated data, not imported measurements.
 
 ## Spatial encoding and acquisition
 

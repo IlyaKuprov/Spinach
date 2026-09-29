@@ -2,7 +2,7 @@
 
 - Signature: `summary_rlx_lindblad(spin_system,header)`
 
-## Behavior
+## Behaviour
 
 Prints one Lindblad relaxation-rate row per spin, in `spin_system.comp.nspins` order. Each row contains its index, isotope, `spin_system.rlx.lind_r1_rates(n)`, `spin_system.rlx.lind_r2_rates(n)`, and spin label; scalar rates use signed scientific notation with five decimal places. No rate-unit conversion occurs in this routine.
 

@@ -6,7 +6,7 @@
 
 Constructs the three triplet projectors for two distinct spin-1/2 particles. The spin indices must be distinct positive integers within the spin system, and both selected spins must have multiplicity 2. Pair operators are built in the caller's `spin_a,spin_b` order.
 
-## Construction and normalization
+## Construction and normalisation
 
 The function obtains identity, single-spin z, and pairwise Cartesian operators from `state`, then forms
 

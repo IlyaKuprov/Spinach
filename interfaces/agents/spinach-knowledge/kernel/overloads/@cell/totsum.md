@@ -8,7 +8,7 @@
 
 If every member is sparse, the implementation gathers each member's nonzero row indices, column indices, and values, concatenates those triplets, and constructs a sparse result sized to `size(A{1})`. Repeated row/column positions are combined by MATLAB's sparse constructor. There is no orientation weighting or tensor contraction: this is a sum over cell entries, with their matrix coordinates identifying contributions. The constructed dimensions come from the first entry, so all contributed indices must fit those dimensions.
 
-If at least one member is not sparse, the code initializes `S` as zeros with the first member's size and class, then adds entries in sequence using MATLAB addition. Compatible array sizes are required by those additions, subject to MATLAB's elementwise expansion rules; the wrapper does not reconcile shapes. This branch does not use the sparse-triplet construction. It neither implements `opium`/`polyadic` methods nor defines their semantics.
+If at least one member is not sparse, the code initialises `S` as zeros with the first member's size and class, then adds entries in sequence using MATLAB addition. Compatible array sizes are required by those additions, subject to MATLAB's elementwise expansion rules; the wrapper does not reconcile shapes. This branch does not use the sparse-triplet construction. It neither implements `opium`/`polyadic` methods nor defines their semantics.
 
 ## Inputs and validation
 
@@ -16,7 +16,7 @@ The intended input is a nonempty cell array whose members all pass `isnumeric`. 
 
 ## Output
 
-A single matrix containing the sum over all entries. The all-sparse path constructs sparse storage; the other path uses a zeros accumulator initialized from the first entry and then follows MATLAB's addition behavior.
+A single matrix containing the sum over all entries. The all-sparse path constructs sparse storage; the other path uses a zeros accumulator initialised from the first entry and then follows MATLAB's addition behaviour.
 
 ## References
 

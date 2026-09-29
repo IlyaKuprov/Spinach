@@ -14,4 +14,4 @@ It draws two shift matrices with `randn(3,3)` and a coupling matrix with `100*ra
 
 For construction A, it forms the lab-frame Hamiltonian from these unrotated inputs and sets `H_A = H + orientation(Q,[1 2 3])`. For construction B, it sets `R=euler2dcm(1,2,3)`, replaces each interaction matrix `A` by `R*A*R'`, rotates each coordinate row `r` as `r*R'`, then forms the Hamiltonian with `orientation(Q,[0 0 0])`. The comparison is `norm(H_A-H_B,1)`; the code errors if the residual exceeds `1e-3` and otherwise reports the residual.
 
-The random matrices are not explicitly symmetrized in the source, so this is a convention-level comparison using generated matrices, not a validation of molecular interaction parameters. The source gives the numeric magnet-field setting but no unit annotation.
+The random matrices are not explicitly symmetrised in the source, so this is a convention-level comparison using generated matrices, not a validation of molecular interaction parameters. The source gives the numeric magnet-field setting but no unit annotation.

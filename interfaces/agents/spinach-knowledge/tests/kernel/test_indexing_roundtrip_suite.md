@@ -4,9 +4,9 @@
 
 Regression test for Spinach's angular-momentum and matrix indexing helper functions. It verifies that linear and structured index representations are mutually consistent for spherical tensors, Wigner functions, and matrix serpentine indexing.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Indexing conversion functions\n')` and initializes a test result object via `new_test_result` with the identifier `kernel/indexing_roundtrip_suite`, the description `Indexing conversion functions`, and the criterion `indexing helpers must be exact inverses on valid integer domains.`
+The function announces the test target with `fprintf('TESTING: Indexing conversion functions\n')` and initialises a test result object via `new_test_result` with the identifier `kernel/indexing_roundtrip_suite`, the description `Indexing conversion functions`, and the criterion `indexing helpers must be exact inverses on valid integer domains.`
 
 It then performs the following checks, each through `test_close` with zero tolerances (exact comparison):
 

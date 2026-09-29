@@ -4,7 +4,7 @@
 
 Regression test for the remaining parallel, stochastic, and diagnostic utilities in the kernel layer: distributed-array reconstruction, zero stochastic Redfield integration, and Fokker-Planck overwinding diagnostics.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `TESTING: Remaining parallel and stochastic utilities`.
 - Creates a regression test result via `new_test_result` for `kernel/dynamic_remaining_parallel_suite`, described as "Remaining parallel and stochastic utilities", with the requirement that parallel and stochastic helper utilities preserve compact reference cases.

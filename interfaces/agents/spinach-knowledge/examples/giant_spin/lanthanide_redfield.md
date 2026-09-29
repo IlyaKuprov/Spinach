@@ -13,6 +13,6 @@ The sweep contains ten linearly spaced `B20` values from 0.1 to 10 cm^-1. At eac
 
 ## Calculation and plotted output
 
-For each point, the example builds the spin system, evaluates `R=relaxation(spin_system)`, and obtains the `E8` longitudinal and raising states `Lz` and `Lp`. The relaxation times are the negative reciprocal of the corresponding normalized projections: `T1 = -1 / ((Lz' * R * Lz) / (Lz' * Lz))` and `T2 = -1 / ((Lp' * R * Lp) / (Lp' * Lp))`.
+For each point, the example builds the spin system, evaluates `R=relaxation(spin_system)`, and obtains the `E8` longitudinal and raising states `Lz` and `Lp`. The relaxation times are the negative reciprocal of the corresponding normalised projections: `T1 = -1 / ((Lz' * R * Lz) / (Lz' * Lz))` and `T2 = -1 / ((Lp' * R * Lp) / (Lp' * Lp))`.
 
 It plots both series against B20 with point markers and a logarithmic y-axis. The axes identify zero-field splitting in cm^-1 and relaxation time in seconds. The source estimates a calculation time of minutes; it supplies no tabulated numerical relaxation-time results.

@@ -6,9 +6,9 @@
 
 Regression test for the dynamic propagation front-end kernels of Spinach. The test exercises `propagator()`, `step()`, `evolution()`, `krylov()`, and `reduce()` against direct finite-dimensional propagation references on tiny spin systems.
 
-## Behavior
+## Behaviour
 
-The function announces the test target, initializes a regression test result via `new_test_result()` for the target `kernel/dynamic_propagation_frontends`, and then runs four sub-tests:
+The function announces the test target, initialises a regression test result via `new_test_result()` for the target `kernel/dynamic_propagation_frontends`, and then runs four sub-tests:
 
 1. **`local_test_propagator_step`** — builds a one-spin spherical-tensor Liouville-space system (`sys.magnet = 14.1`, isotope `1H`, zero scalar Zeeman interaction, formalism `sphten-liouv`, approximation `none`, `assume(...,'nmr')`), forces Taylor propagation by setting `spin_system.tols.small_matrix = 2`, and uses `L = operator(spin_system,'Lz','1H')` with `rho = state(spin_system,'Lx','1H') + 0.25*state(spin_system,'Ly','1H')` and `dt = 2.5e-4`. It checks:
    - `propagator()` against `expm(full(-1i*L*dt))` (tolerances `1e-10`).

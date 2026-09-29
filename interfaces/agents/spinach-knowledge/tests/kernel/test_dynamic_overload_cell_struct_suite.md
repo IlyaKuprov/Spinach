@@ -6,9 +6,9 @@ Regression test for dynamic dispatch of the cheap cell, struct, and double overl
 
 Source: [tests/kernel/test_dynamic_overload_cell_struct_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_overload_cell_struct_suite.m)
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf('TESTING: Cell and structure overload dispatch\n')` and initializes a test result via `new_test_result` for `kernel/dynamic_overload_cell_struct_suite`, describing the requirement that cell, struct, and double overloads match explicit dense references on small deterministic objects.
+- Announces the test target with `fprintf('TESTING: Cell and structure overload dispatch\n')` and initialises a test result via `new_test_result` for `kernel/dynamic_overload_cell_struct_suite`, describing the requirement that cell, struct, and double overloads match explicit dense references on small deterministic objects.
 - Builds deterministic 2x2 matrix operands `A=[1 2;3 4]`, `B=[0 5;-1 2]`, `C=[2 -3;4 1]`, `D=[-2 0;5 3]`, and cells `cell_a={A,B}`, `cell_b={C,D}`.
 - Cell plus and minus: `cell_a+cell_b` and `cell_a-cell_b` are checked element-wise against `A+C`, `B+D`, `A-C`, `B-D` with tolerances `1e-15`.
 - Numeric-cell dispatch: `10+cell_a`, `cell_a-3`, and `7-cell_a` are checked against `10+A`, `B-3`, and `7-A` respectively.

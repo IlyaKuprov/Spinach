@@ -4,7 +4,7 @@
 
 Truncates an SVD decomposition to a user-specified tolerance in the Frobenius norm by returning the number of singular values to keep.
 
-## Behavior
+## Behaviour
 
 - Syntax: `r=frob_chop(s,tol)`.
 - The function first validates its inputs via an internal consistency check (`grumble`).

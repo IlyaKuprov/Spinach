@@ -9,7 +9,7 @@ At entry, if `spin_system.control.freeze` is nonempty, the routine multiplies bo
 
 Each trial is selected by cubic interpolation within a contracted interval whose endpoints use `spin_system.control.ls_tau2` and `spin_system.control.ls_tau3`. Failed monotonicity or sufficient-increase checks move the upper bracket; a trial that passes them is accepted only when the curvature test passes. Numerically unresolved interpolation or bracket collapse returns the lower endpoint with `exitflag=-2`; a Wolfe-accepted step returns `exitflag=0`.
 
-The routine reads these line-search fields rather than assigning their defaults. The `optimcon` wrapper initializes `ls_tau2=0.1`, `ls_tau3=0.5`, `ls_c1=1e-2` and `ls_c2=0.9`. The acceptance tests are supplied by `alpha_conds`; `ls_tau1` is a bracketing expansion setting, not used in this sectioning routine.
+The routine reads these line-search fields rather than assigning their defaults. The `optimcon` wrapper initialises `ls_tau2=0.1`, `ls_tau3=0.5`, `ls_c1=1e-2` and `ls_c2=0.9`. The acceptance tests are supplied by `alpha_conds`; `ls_tau1` is a bracketing expansion setting, not used in this sectioning routine.
 
 [Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/sectioning.m)
 [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=sectioning.m)

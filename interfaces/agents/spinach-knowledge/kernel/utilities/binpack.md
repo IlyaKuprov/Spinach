@@ -4,7 +4,7 @@
 
 `binpack.m` implements a simple one-dimensional bin packing algorithm. It collects a supplied list of numbers into sublists whose sums are smaller than or equal to a specified bin size. The header comment states that the algorithm is not optimal, but that it does the job.
 
-## Behavior
+## Behaviour
 
 The function is called as `bins=binpack(box_sizes,bin_size)`.
 

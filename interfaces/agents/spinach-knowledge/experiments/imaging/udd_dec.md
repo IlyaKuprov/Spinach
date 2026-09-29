@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`udd_dec` applies an Uhrig dynamic-decoupling (UDD) pulse train to an imaging phantom, then projects a user-selected spin state to form a sample image. It is a parameterized pulse-sequence simulation, not a measured phantom result. The source uses `H`, `R`, `K`, and `F` from the `imaging()` context to form `B=H+F+1i*R+1i*K`.
+`udd_dec` applies an Uhrig dynamic-decoupling (UDD) pulse train to an imaging phantom, then projects a user-selected spin state to form a sample image. It is a parameterised pulse-sequence simulation, not a measured phantom result. The source uses `H`, `R`, `K`, and `F` from the `imaging()` context to form `B=H+F+1i*R+1i*K`.
 
 ## Inputs and units
 

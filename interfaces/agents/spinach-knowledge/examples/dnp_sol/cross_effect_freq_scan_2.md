@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A three-spin TOTAPOL cross-effect dynamic nuclear polarization (DNP) frequency scan, set up to reproduce Figure 2a of the [Journal of Magnetic Resonance paper](https://doi.org/10.1016/j.jmr.2011.09.047). The source describes electron rotating-frame dynamics with Nottingham DNP relaxation theory, citing [the relaxation-theory paper](https://doi.org/10.1007/s00723-012-0367-0). It explicitly warns that calculated intensities differ because its relaxation model differs from the paper's and because the stated geometry and interaction amplitudes have minor inconsistencies.
+A three-spin TOTAPOL cross-effect dynamic nuclear polarisation (DNP) frequency scan, set up to reproduce Figure 2a of the [Journal of Magnetic Resonance paper](https://doi.org/10.1016/j.jmr.2011.09.047). The source describes electron rotating-frame dynamics with Nottingham DNP relaxation theory, citing [the relaxation-theory paper](https://doi.org/10.1007/s00723-012-0367-0). It explicitly warns that calculated intensities differ because its relaxation model differs from the paper's and because the stated geometry and interaction amplitudes have minor inconsistencies.
 
 ## Model and setup
 

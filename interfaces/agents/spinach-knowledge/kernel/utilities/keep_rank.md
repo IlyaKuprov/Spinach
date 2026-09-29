@@ -4,7 +4,7 @@
 
 Truncates the singular value decomposition of a matrix at a specified rank and reassembles the matrix, returning a low-rank approximation ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/keep_rank.m)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `A=keep_rank(A,nsvk)`.
 - Runs a consistency check (`grumble`) on the inputs before processing.

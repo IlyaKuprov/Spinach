@@ -6,7 +6,7 @@
 
 `tikhoind` computes the analytical Tikhonov-regularised solution to `K*x=y` without any constraints, producing a sign-indefinite output. It minimises `norm(K*x-y,2)^2 + lambda*norm(D*x,2)^2`.
 
-## Behavior
+## Behaviour
 
 - Validates inputs via an internal `grumble` consistency check:
   - All inputs (`K`, `D`, `y`, `lam`) must be numeric.

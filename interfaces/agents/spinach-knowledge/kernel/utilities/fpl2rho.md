@@ -4,7 +4,7 @@
 
 Converts a Fokker–Planck state vector into a Liouville space state vector by averaging the spin state vector across the spatial dimensions of the sample.
 
-## Behavior
+## Behaviour
 
 - Syntax: `rho=fpl2rho(rho,dims)`.
 - A consistency check (`grumble`) is performed first:

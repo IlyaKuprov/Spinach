@@ -6,7 +6,7 @@
 
 Regression test for affixed polyadic tensor products and spin-space flow lifting. The test verifies that Kronecker products preserve all prefixes and suffixes, and that polyadic and sparse production generators agree.
 
-## Behavior
+## Behaviour
 
 - The function creates a test result via `new_test_result` with the identifier `kernel/polyadic_kron`, the description `Affixed polyadic tensor products`, and the message `Kronecker products must preserve all prefixes and suffixes.`
 - The caller's random number generator state is saved with `rng()` and restored on cleanup via `onCleanup`; the test seeds the generator with `rng(240924)`.

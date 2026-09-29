@@ -10,13 +10,13 @@ For a selected rank `k`, the function returns a `2*k+1`-element cell array of `m
 
 With one input, `irr_sph_ten(mult)` recursively gathers all ranks `k=0,...,mult-1`. The rank-`k` block occupies cell positions `k^2+1` through `(k+1)^2`, so the full result has `mult^2` cells, with ranks increasing and projections decreasing within each rank.
 
-## Construction and normalization
+## Construction and normalisation
 
-For rank zero the sole tensor is `speye(mult)`, with no division by `sqrt(mult)`. For positive rank, `L=pauli(mult)` supplies the raising and lowering matrices. The highest-projection tensor is initialized exactly as `T{1}=((-1)^k)*(2^(-k/2))*L.p^k`. Subsequent components are generated for `n=2,...,2*k+1` by setting `q=k-n+2` and applying
+For rank zero the sole tensor is `speye(mult)`, with no division by `sqrt(mult)`. For positive rank, `L=pauli(mult)` supplies the raising and lowering matrices. The highest-projection tensor is initialised exactly as `T{1}=((-1)^k)*(2^(-k/2))*L.p^k`. Subsequent components are generated for `n=2,...,2*k+1` by setting `q=k-n+2` and applying
 
 `T{n}=(L.m*T{n-1}-T{n-1}*L.m)/sqrt((k+q)*(k-q+1))`.
 
-Thus the phase and scale of the top component and each ladder normalization are explicit in the source; no further normalization is applied afterward. This routine constructs matrix operators; it does not exponentiate them into propagators.
+Thus the phase and scale of the top component and each ladder normalisation are explicit in the source; no further normalisation is applied afterward. This routine constructs matrix operators; it does not exponentiate them into propagators.
 
 ## Inputs
 

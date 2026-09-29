@@ -17,7 +17,7 @@ The available pulse names select columns of coefficient tables embedded in the M
 - `pulse_name` - character string selecting one of `E0A`, `E0B`, `E100A`, `E100B`, `E200A`, `E200D`, `E200F`, `E300C`, `E300F`, `E400B`, `E300A`, `E500A`, `E500B`, `E500C`, `E600A`, `E600C`, `E600F`, `E800A`, `E800B`, or `E1000B`
 - `npoints` - finite positive integer number of discrete pulse intervals
 - `duration` - finite positive real pulse duration, in seconds
-- `waveform` - amplitude at the sampled intervals, in radians per second; the source documentation describes it as having no phase modulation and being normalized to produce a 90-degree pulse
+- `waveform` - amplitude at the sampled intervals, in radians per second; the source documentation describes it as having no phase modulation and being normalised to produce a 90-degree pulse
 
 There is no filter or phase input: pulse identity, point count, and duration are the controls exposed by this function.
 

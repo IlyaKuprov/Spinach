@@ -18,7 +18,7 @@ This routine produces time-domain `coil`-projection trajectories under a fixed m
 
 ## Propagation and output axes
 
-The routine calls Liouville-space conversion, updates the Hamiltonian with the microwave and offset operators, and calls `evolution` in 'multichannel' mode. The returned matrix has detection channels as rows and trajectory samples as columns; time spacing is dt. Its values are projections of the evolving state onto the supplied `coil` states. The routine supports only `sphten-liouv` and `zeeman-liouv` formalisms. Unlike the two steady-state scan routines, its source requires a thermalized relaxation superoperator.
+The routine calls Liouville-space conversion, updates the Hamiltonian with the microwave and offset operators, and calls `evolution` in 'multichannel' mode. The returned matrix has detection channels as rows and trajectory samples as columns; time spacing is dt. Its values are projections of the evolving state onto the supplied `coil` states. The routine supports only `sphten-liouv` and `zeeman-liouv` formalisms. Unlike the two steady-state scan routines, its source requires a thermalised relaxation superoperator.
 
 ## Source-coded numerical example
 

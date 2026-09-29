@@ -6,7 +6,7 @@ Converts user-friendly descriptions of spin states and operators into the formal
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/human2opspec.m>
 
-## Behavior
+## Behaviour
 
 The function supports three calling conventions:
 

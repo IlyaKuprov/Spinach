@@ -16,7 +16,7 @@ The initial parameter vector is [60.0933, 13.7569, 1.6424, 4.0779, 4.5179, 1.588
 
 ## MAS calculation, comparison, and limits
 
-For each trial parameter vector the script simulates a single-rotation spectrum using singlerot and acquire, with the rep_2ang_200pts_oct powder grid, maximum rank 50, 79Br observation, and axis units set to Hz. It plots the normalized input trace as red points and the calculated real Fourier spectrum as a blue line. The least-squares objective is the squared 2-norm of their difference; fminsearch is configured for up to 5000 iterations.
+For each trial parameter vector the script simulates a single-rotation spectrum using singlerot and acquire, with the rep_2ang_200pts_oct powder grid, maximum rank 50, 79Br observation, and axis units set to Hz. It plots the normalised input trace as red points and the calculated real Fourier spectrum as a blue line. The least-squares objective is the squared 2-norm of their difference; fminsearch is configured for up to 5000 iterations.
 
 The code models a one-dimensional MAS spectrum; it does not define a CP, HMQC, or Hartmann–Hahn transfer block. The wrapper call supplies the acquisition callback and spectral settings, not an experimental pulse sequence beyond what is explicit in the source. The file contains no saved best-fit parameter set or measured output. The source file gives no DOI.
 

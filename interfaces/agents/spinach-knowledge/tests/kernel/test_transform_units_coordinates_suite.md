@@ -4,9 +4,9 @@
 
 Regression test suite for the unit and coordinate transform helpers in `kernel/transform_units_coordinates_suite`. It verifies scalar physical constants, inverse unit conversions, crystallographic coordinate conversion, and ISO spherical coordinates.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Unit and coordinate transforms\n')` and initializes a regression test result object via `new_test_result('kernel/transform_units_coordinates_suite', ...)`, stating that unit and coordinate transforms must implement their defining constants and inverse maps.
+The function announces the test target with `fprintf('TESTING: Unit and coordinate transforms\n')` and initialises a regression test result object via `new_test_result('kernel/transform_units_coordinates_suite', ...)`, stating that unit and coordinate transforms must implement their defining constants and inverse maps.
 
 It then runs a sequence of `test_close` checks:
 

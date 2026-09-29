@@ -2,7 +2,7 @@
 
 - Signature: `summary_rlx_nott(spin_system)`
 
-## Behavior
+## Behaviour
 
 Reports four stored Nottingham DNP relaxation rates: electron R1 and R2, then nuclear R1 and R2, from `spin_system.rlx.nott_r1e`, `nott_r2e`, `nott_r1n` and `nott_r2n`. The report labels each value in Hz; this routine prints the values directly without converting them.
 

@@ -17,4 +17,4 @@ The sequence callback is `pansy_cosy`; the wrapper sets sweeps [1800, 9000], off
 
 ## Output and limits
 
-The wrapper plots a homonuclear-side spectrum from the accumulated `aa` component and a heteronuclear-side spectrum from `ab`; it does not write spectra to files or report measured observables. It does not specify normalization of the accumulated isotopomer spectra.
+The wrapper plots a homonuclear-side spectrum from the accumulated `aa` component and a heteronuclear-side spectrum from `ab`; it does not write spectra to files or report measured observables. It does not specify normalisation of the accumulated isotopomer spectra.

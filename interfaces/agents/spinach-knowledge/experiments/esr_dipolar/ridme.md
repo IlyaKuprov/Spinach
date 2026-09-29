@@ -8,7 +8,7 @@ Source: https://spindynamics.org/wiki/index.php?title=ridme.m
 
 ## What it calculates
 
-RIDME is a relaxation-induced dipolar-modulation experiment. This routine implements an ideal hard-pulse, five-pulse phase-cycled sequence on the selected probe spin. Its source explicitly notes that relaxation must be present for the experiment to work. This is not an ENDOR or DNP/hyperpolarization workflow, a field sweep, or an imaging routine.
+RIDME is a relaxation-induced dipolar-modulation experiment. This routine implements an ideal hard-pulse, five-pulse phase-cycled sequence on the selected probe spin. Its source explicitly notes that relaxation must be present for the experiment to work. This is not an ENDOR or DNP/hyperpolarisation workflow, a field sweep, or an imaging routine.
 
 ## Inputs
 
@@ -26,4 +26,4 @@ The implementation constructs the probe-spin X/Y pulse operators and real/imagin
 
 ## Output and limitations
 
-The result has four phase-cycle channels: `answer.pxpxpx`, `answer.pypypx`, `answer.mxmxpx`, and `answer.mymypx`; each has `real` and `imag` quadrature components. The code projects and normalizes by the corresponding probe-spin coil-state norm. The source does not specify returned array dimensions or provide separate named delay-axis vectors, so use `nsteps` and `stepsize` as the sampling controls without assuming additional axis metadata. The source supplies pulse angles and parameter constraints, but no example numerical times, measured data, or DOI.
+The result has four phase-cycle channels: `answer.pxpxpx`, `answer.pypypx`, `answer.mxmxpx`, and `answer.mymypx`; each has `real` and `imag` quadrature components. The code projects and normalises by the corresponding probe-spin coil-state norm. The source does not specify returned array dimensions or provide separate named delay-axis vectors, so use `nsteps` and `stepsize` as the sampling controls without assuming additional axis metadata. The source supplies pulse angles and parameter constraints, but no example numerical times, measured data, or DOI.

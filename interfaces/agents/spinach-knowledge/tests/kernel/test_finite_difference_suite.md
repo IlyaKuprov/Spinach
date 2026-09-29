@@ -6,9 +6,9 @@
 
 Regression test suite for the finite-difference and spectral differentiation helpers in Spinach. The suite verifies finite-difference weights, finite-difference matrices, Fourier differentiation, Laplacians, FFT differentiation kernels, pseudomodulation, and matrix-exponential directional derivatives against exact simple cases.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a test result object via `new_test_result` under the identifier `kernel/finite_difference_suite`, and then runs a sequence of checks using `test_close` and `test_true`:
+The function announces the test target with `fprintf`, initialises a test result object via `new_test_result` under the identifier `kernel/finite_difference_suite`, and then runs a sequence of checks using `test_close` and `test_true`:
 
 - **`fdweights`**: three-point centred finite-difference weights at zero are checked for orders 0, 1 and 2. The zeroth-order weights must interpolate the centre point (`[0 1 0]`), the first derivative weights must be `[-1/2, 0, 1/2]`, and the second derivative weights must be `[1, -2, 1]`, all with tolerances `1e-14`.
 - **`fdmat` and `fdvec`**: a five-point wall finite-difference matrix built with `fdmat(7,5,1,'wall')` must differentiate `x.^2` exactly on a unit grid of seven points, giving `2*x` with tolerances `1e-12`. `fdvec(f,5,1)` must apply the same derivative to a vector.

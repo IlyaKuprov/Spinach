@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Summarize derivatives of spin-spin coupling tensors and effective local fields with respect to dimensionless bosonic-mode displacement coordinates.
+Summarise derivatives of spin-spin coupling tensors and effective local fields with respect to dimensionless bosonic-mode displacement coordinates.
 
 ## What is reported
 

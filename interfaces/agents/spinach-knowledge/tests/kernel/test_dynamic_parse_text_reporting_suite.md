@@ -4,9 +4,9 @@
 
 Regression test suite for deterministic parsing, text, and safe reporting utilities in Spinach, covering operator-specification parsing, isotope predicates, label lookup, silent reporting calls, and polyadic text diagnostics.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf` and initializes a regression result via `new_test_result` for `kernel/dynamic_parse_text_reporting_suite`.
+- Announces the test target with `fprintf` and initialises a regression result via `new_test_result` for `kernel/dynamic_parse_text_reporting_suite`.
 - Builds a small three-spin system descriptor (`local_parse_spin_system`) with `sys.output` set to `'hush'`, isotopes `{'1H','E','13C'}`, labels `{'proton','electron','carbon'}`, all spin types `'S'`, multiplicities `[2 2 2]`, and coordinates `{[0 0 0],[1 0 0],[0 1 0]}`.
 - Tests `human2opspec(spin_system,'Lz','nuclei')`: expects opspecs `{[2 0 0];[0 0 2]}` and coefficients `[1;1]`, verifying nuclei selection of non-electron spins and Lz mapping to IST index two.
 - Tests `human2opspec(spin_system,{'Lx','Lz'},{1,3})`: expects product opspecs `{[1 0 2];[3 0 2]}` and Lx coefficients `[-sqrt(2);sqrt(2)]/2` (tolerances `1e-15`), reflecting the spherical tensor convention `Lx=(L+ + L-)/2`.

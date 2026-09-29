@@ -16,9 +16,9 @@ Looks up the magnetogyric ratio and level multiplicity for a named isotope or su
 
 ## Lookup cases
 
-The input can be an isotope name such as '15N' or '195Pt'. The source also handles 'G' (ghost spin: gamma = 0, multiplicity = 1), 'N' (neutron), and 'M' (muon). Parameterized names are 'E#' for a high-spin electron, 'C#' for an electromagnetic cavity mode, 'V#' for a phonon mode, and 'T#' for a transmon; # supplies the multiplicity or level count. The electron case requires at least two levels. Cavity, phonon, and transmon cases require at least three levels and assign gamma = 0.
+The input can be an isotope name such as '15N' or '195Pt'. The source also handles 'G' (ghost spin: gamma = 0, multiplicity = 1), 'N' (neutron), and 'M' (muon). Parameterised names are 'E#' for a high-spin electron, 'C#' for an electromagnetic cavity mode, 'V#' for a phonon mode, and 'T#' for a transmon; # supplies the multiplicity or level count. The electron case requires at least two levels. Cavity, phonon, and transmon cases require at least three levels and assign gamma = 0.
 
-The isotope cases assign gamma and multiplicity from the table in the source. An unrecognized name raises an unknown-isotope error. The function returns these values; it does not print a summary.
+The isotope cases assign gamma and multiplicity from the table in the source. An unrecognised name raises an unknown-isotope error. The function returns these values; it does not print a summary.
 
 ## Notes
 

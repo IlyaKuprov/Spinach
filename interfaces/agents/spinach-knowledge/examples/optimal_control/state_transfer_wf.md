@@ -6,7 +6,7 @@ Source: [examples/optimal_control/state_transfer_wf.m](https://github.com/IlyaKu
 
 ## Design objective
 
-The example formulates population transfer from the lowest to the highest energy level of a four-spin system using GRAPE in wave-function space. Unlike the companion singlet-to-carbon example, the state vectors here are explicitly initialized as the last and first entries of a 16-element vector.
+The example formulates population transfer from the lowest to the highest energy level of a four-spin system using GRAPE in wave-function space. Unlike the companion singlet-to-carbon example, the state vectors here are explicitly initialised as the last and first entries of a 16-element vector.
 
 ## Spin model and states
 
@@ -18,4 +18,4 @@ The x/y controls act on proton and carbon channels; the drift is offset using tr
 
 ## Test calculation
 
-The script propagates the pulse with `shaped_pulse_xy` and computes `real(rho_targ'*rho)` for reporting. This source describes an example and a test path; it does not include a measured numeric fidelity or evidence that the optimization converged. The source estimates calculation time as minutes.
+The script propagates the pulse with `shaped_pulse_xy` and computes `real(rho_targ'*rho)` for reporting. This source describes an example and a test path; it does not include a measured numeric fidelity or evidence that the optimisation converged. The source estimates calculation time as minutes.

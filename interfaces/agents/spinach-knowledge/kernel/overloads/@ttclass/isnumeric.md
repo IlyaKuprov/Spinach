@@ -15,4 +15,4 @@ Returns logical true exactly when `tt` is a `ttclass` object and its `cores` fie
 - `tt` — tensor-train object.
 - `answer` — logical predicate result.
 
-This method does not change the train, its shape, ranks, or coefficient and does not materialize the represented tensor.
+This method does not change the train, its shape, ranks, or coefficient and does not materialise the represented tensor.

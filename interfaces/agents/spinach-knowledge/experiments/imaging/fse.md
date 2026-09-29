@@ -7,7 +7,7 @@
 
 Call from `imaging()`, which supplies `H`, `R`, `K`, `G`, and `F`. The background generator is `B=H+F+1i*R+1i*K`. The first spin named in `parameters.spins` defines the transverse pulse operator. The code applies a 90-degree pulse about `Ly`, moves to the left edge of readout k-space with `G{2}`, and for each phase-encode row applies a 180-degree pulse, encodes with `G{1}`, samples the readout trajectory under `G{2}` through the coil state, then rewinds the phase gradient. In this implementation there is one 180-degree refocusing pulse and one readout per phase-encode row; it reconstructs after acquiring the rows.
 
-The initial state `parameters.rho0` is caller-supplied. This is an MRI sequence, not a DNP preparation or polarization measurement; no measured signal magnitude is reported.
+The initial state `parameters.rho0` is caller-supplied. This is an MRI sequence, not a DNP preparation or polarisation measurement; no measured signal magnitude is reported.
 
 ## Parameters and units
 

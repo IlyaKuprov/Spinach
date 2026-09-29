@@ -6,14 +6,14 @@
 
 Regression test for the dynamic equilibrium front-end kernels: `thermalize()`, `steady()`, and `residual()`. The test exercises these functions on compact Liouville-space systems with explicit fixed-point references, verifying that thermalisation and steady-state helpers produce explicit fixed points.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `TESTING: Dynamic equilibrium front ends` and registers a test result under `kernel/dynamic_equilibrium_frontends` via `new_test_result()`.
 - Runs three local subtests:
   - `local_test_thermalize` — checks IME and DiBari thermalisation branches.
   - `local_test_steady` — checks Newton and repeated-squaring steady-state solvers.
   - `local_test_residual` — checks weak residual-order tensor reduction.
-- **Thermalize subtest:** builds a one-spin spherical-tensor Liouville-space system (`local_liouville_system`), forms a sparse relaxation superoperator `R = -diag([0; ones(dim-1,1)])` and an equilibrium state `rho_eq = unit + 0.1*state(spin_system,'Lz','1H')`.
+- **Thermalise subtest:** builds a one-spin spherical-tensor Liouville-space system (`local_liouville_system`), forms a sparse relaxation superoperator `R = -diag([0; ones(dim-1,1)])` and an equilibrium state `rho_eq = unit + 0.1*state(spin_system,'Lz','1H')`.
   - IME mode: `thermalize(spin_system,R,[],[],rho_eq,'IME')` must make the requested equilibrium state stationary, i.e. `R_ime*rho_eq` matches a zero vector to tolerances `1e-14` (absolute and relative).
   - DiBari mode: `thermalize(spin_system,R,H_left,temperature,[],'dibari')` with `H_left = operator(spin_system,'Lz','1H','left')` and `temperature = 300.0` must equal the reference product `R*propagator(spin_system,H_left,1i*beta)`, where `beta = spin_system.tols.hbar/(spin_system.tols.kbol*temperature)`, to tolerances `1e-14`.
 - **Steady subtest:** builds the same one-spin system and constructs a contractive affine propagator `P` with a known fixed point `rho_ss = [1.0; 0.20; -0.10; 0.05]` using `contract = diag([0.25 0.50 0.75])`:

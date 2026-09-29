@@ -6,7 +6,7 @@ Source: [kernel/derivatives/fdkup.m](https://github.com/IlyaKuprov/Spinach/blob/
 
 ## Purpose
 
-Builds a sparse finite-difference matrix for the Kuprov operator acting on the vectorization of a 3D array `rho`, with array axes ordered `[X Y Z]`. The source states its action as `K[rho] = -(1/3) * Trace(Hessian[rho] * chi)` and cites [the original paper](http://dx.doi.org/10.1039/C4CP03106G).
+Builds a sparse finite-difference matrix for the Kuprov operator acting on the vectorisation of a 3D array `rho`, with array axes ordered `[X Y Z]`. The source states its action as `K[rho] = -(1/3) * Trace(Hessian[rho] * chi)` and cites [the original paper](http://dx.doi.org/10.1039/C4CP03106G).
 
 ## Inputs and output
 
@@ -20,7 +20,7 @@ Builds a sparse finite-difference matrix for the Kuprov operator acting on the v
 
 The code builds second-derivative matrices with Kronecker products in the `[X Y Z]` array order. Diagonal derivatives use a second-derivative `fdmat` on one axis; mixed derivatives use first-derivative matrices on both axes, with identities on untouched axes. It aliases the reversed mixed-derivative matrices to the corresponding forward pair. Each derivative factor along axis `i` is scaled by `npoints(i)/extents(i)`; a diagonal derivative therefore receives the squared axis factor, while a mixed derivative receives the product of its two axis factors.
 
-The final matrix is the explicit component sum `-(1/3) * sum(chi(i,j) * D_ij)` over all nine ordered axis pairs, where `D_ij` is the corresponding discretized second derivative. Thus `chi` is consumed directly in the supplied Cartesian component order; this routine has no separate tensor-frame rotation or coordinate-conversion input. The source comment describes `npoints` as dimensions “in Angstroms,” while the implementation uses these values as integer grid counts and applies physical extents through `extents`.
+The final matrix is the explicit component sum `-(1/3) * sum(chi(i,j) * D_ij)` over all nine ordered axis pairs, where `D_ij` is the corresponding discretised second derivative. Thus `chi` is consumed directly in the supplied Cartesian component order; this routine has no separate tensor-frame rotation or coordinate-conversion input. The source comment describes `npoints` as dimensions “in Angstroms,” while the implementation uses these values as integer grid counts and applies physical extents through `extents`.
 
 ## Guards
 

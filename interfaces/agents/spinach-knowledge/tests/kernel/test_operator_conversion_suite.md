@@ -4,10 +4,10 @@
 
 Regression test for the Hilbert-to-Liouville operator conversion utilities in Spinach. It verifies direct vectorisation identities for left, right, commutation, and anticommutation superoperators, `unit_oper` dimensions in Zeeman Hilbert and Liouville formalisms, and `lindbladian` rate calibration.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Hilbert/Liouville conversion helpers\n')`.
-- Initializes a `new_test_result` named `kernel/operator_conversion_suite` with the description "Hilbert/Liouville conversion helpers" and the requirement "operator conversion functions must implement vectorised product identities.".
+- Initialises a `new_test_result` named `kernel/operator_conversion_suite` with the description "Hilbert/Liouville conversion helpers" and the requirement "operator conversion functions must implement vectorised product identities.".
 - Builds a non-trivial Hermitian operator `H = S.z + 0.2*S.x` from `pauli(2)`, with `unit = speye(2)`.
 - Checks `hilb2liouv` against direct Kronecker-product identities:
   - `'left'` against `kron(unit,H)`.

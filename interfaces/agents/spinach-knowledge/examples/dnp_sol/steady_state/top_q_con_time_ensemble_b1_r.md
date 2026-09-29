@@ -6,7 +6,7 @@
 
 ## Question and model
 
-How does the steady-state proton longitudinal polarization change with TOP contact time for two irradiation settings when electron–proton distance and electron nutation frequency are both distributed? This Q-band electron–proton model uses `sys.magnet=1.2142`, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
+How does the steady-state proton longitudinal polarisation change with TOP contact time for two irradiation settings when electron–proton distance and electron nutation frequency are both distributed? This Q-band electron–proton model uses `sys.magnet=1.2142`, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
 
 ## Scan and averaging
 

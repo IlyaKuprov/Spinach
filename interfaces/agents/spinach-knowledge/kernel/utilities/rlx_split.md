@@ -4,7 +4,7 @@
 
 Splits a relaxation superoperator into longitudinal (`R1`), transverse (`R2`) and mixed (`Rm`) components.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[R1,R2,Rm]=rlx_split(spin_system,R)`.
 - The function first runs a consistency check (`grumble`) that requires:

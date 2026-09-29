@@ -6,7 +6,7 @@
 
 Regression test for isotope-resolved hyperfine coupling imports from Gaussian and ORCA electronic structure logs. It verifies that hyperfine tensors follow the requested nuclear gyromagnetic ratio during `g2spinach` conversion, including anisotropic and off-diagonal components, and that source isotopes are taken from the shipped logs rather than assumed from natural abundance.
 
-## Behavior
+## Behaviour
 
 - Registers a test named `interfaces/hfc_isotopes` with description `EPR isotope conversion` and the physical statement `hyperfine tensors follow the requested nuclear gyromagnetic ratio`.
 - Parses the Gaussian log `examples/standard_systems/nitroxide.log` with `gparse` and locates the nitrogen atom by symbol.

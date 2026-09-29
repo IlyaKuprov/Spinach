@@ -6,10 +6,10 @@
 
 Regression test for RF Cartesian and polar waveform conversion. It verifies that RF amplitude/phase coordinates round-trip to X/Y controls and that gradients transform by the chain rule.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `TESTING: RF Cartesian/polar conversion`.
-- Initializes a regression test result via `new_test_result` for target `kernel/rf_cartesian_polar`, stating that Cartesian and polar RF controls must describe the same complex waveform.
+- Initialises a regression test result via `new_test_result` for target `kernel/rf_cartesian_polar`, stating that Cartesian and polar RF controls must describe the same complex waveform.
 - Defines a waveform away from the zero-amplitude singularity:
   - Amplitudes `r = [1.0 2.0 3.0]`.
   - Phases `p = [0.0 pi/3 -pi/2]`.

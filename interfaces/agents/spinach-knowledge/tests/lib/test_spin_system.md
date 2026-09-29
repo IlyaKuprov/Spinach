@@ -4,12 +4,12 @@
 
 Builds a small quiet Spinach spin system for tests.
 
-## Behavior
+## Behaviour
 
 The function applies quiet settings used by regression tests before constructing the spin system:
 
 - Sets `sys.output` to `'hush'`.
-- Appends `'hygiene'` to `sys.disable` if that field already exists (using `unique` on the concatenated cell array), otherwise initializes `sys.disable` to `{'hygiene'}`.
+- Appends `'hygiene'` to `sys.disable` if that field already exists (using `unique` on the concatenated cell array), otherwise initialises `sys.disable` to `{'hygiene'}`.
 - Sets `sys.parallel` to `{'local',1}`.
 - Sets `sys.parprops` to `{}`.
 

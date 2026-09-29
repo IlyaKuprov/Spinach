@@ -6,7 +6,7 @@
 
 ## What it computes
 
-This is the stroboscopic steady-state implementation of the time-optimised pulsed DNP experiment cited in the source. It scans the microwave resonance offsets in `parameters.el_offs`, builds one repeated TOP block and its post-contact shot-spacing delay, solves for the periodic fixed point, and reports its overlap with the electron detection state `parameters.coil`. It models the spin-system dynamics represented by `H`, relaxation `R`, and kinetics `K`; the source requires finite-temperature thermalisation of `R`. This is a computed observable, not a claim of measured polarization or a numerical result.
+This is the stroboscopic steady-state implementation of the time-optimised pulsed DNP experiment cited in the source. It scans the microwave resonance offsets in `parameters.el_offs`, builds one repeated TOP block and its post-contact shot-spacing delay, solves for the periodic fixed point, and reports its overlap with the electron detection state `parameters.coil`. It models the spin-system dynamics represented by `H`, relaxation `R`, and kinetics `K`; the source requires finite-temperature thermalisation of `R`. This is a computed observable, not a claim of measured polarisation or a numerical result.
 
 ## Sequence and units
 
@@ -16,7 +16,7 @@ The block propagator is `propagator(L_curr,delay_dur)*propagator(L1,pulse_dur)`:
 
 ## Inputs and output
 
-Required experiment fields are `irr_powers` (microwave nutation frequency, Hz), `coil` (detection state), `pulse_dur` and `delay_dur` (seconds), `nloops`, `shot_spacing` (seconds), `addshift` (Hz), and numeric offset vector `el_offs` (Hz). The matrices `H`, `R`, and `K` must be dimension-compatible context matrices. The solver initializes one complex output element per offset; `size(dnp)` follows `size(parameters.el_offs)`. Each element is `coil'*rho_ss` at that offset. GPU use is optional when enabled by the Spinach system settings.
+Required experiment fields are `irr_powers` (microwave nutation frequency, Hz), `coil` (detection state), `pulse_dur` and `delay_dur` (seconds), `nloops`, `shot_spacing` (seconds), `addshift` (Hz), and numeric offset vector `el_offs` (Hz). The matrices `H`, `R`, and `K` must be dimension-compatible context matrices. The solver initialises one complex output element per offset; `size(dnp)` follows `size(parameters.el_offs)`. Each element is `coil'*rho_ss` at that offset. GPU use is optional when enabled by the Spinach system settings.
 
 ## References
 

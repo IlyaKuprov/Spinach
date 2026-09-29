@@ -17,4 +17,4 @@ The basis uses `formalism='zeeman-hilb'` and `approximation='none'`, followed by
 
 ## Field scan
 
-The script calls `fieldscan_enlev` with `fields=[0 500]`, `npoints=1000`, `orientation=[0 0 0]`, and `nstates=16`. The source does not state units for the field endpoints or orientation. This is an energy-level scan: the function has no output arguments, and the call does not capture or plot a returned spectrum. The MOLCAS ligand-field arrays are passed through `icm2hz`; the source does not label their input units.
+The script calls `fieldscan_enlev` with `fields=[0 500]`, `npoints=1000`, `orientation=[0 0 0]`, and `nstates=16`. The called `fieldscan_enlev` function interprets the field endpoints in tesla and the orientation Euler angles in radians. This is an energy-level scan: the function has no output arguments, and the call does not capture or plot a returned spectrum. The MOLCAS ligand-field arrays are passed to `icm2hz` as inverse-centimetre values; that function converts them to Hz.

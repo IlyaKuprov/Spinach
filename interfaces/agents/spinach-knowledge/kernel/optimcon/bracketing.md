@@ -30,7 +30,7 @@ For an objective being maximised, evaluate a trial step and either accept it und
 - `next_act` — `'sectioning'` when a bracket is handed to sectioning, or `'none'` when the line-search step is accepted without that stage.
 - `data` — updated evaluator workspace.
 
-## Search behavior
+## Search behaviour
 
 The first trial point is `x_0+alpha*dir`. The routine evaluates its objective and gradient, then applies Armijo, monotonicity, curvature, and directional-derivative-sign tests through `alpha_conds`. A failed sufficient-increase or monotonicity test, or a change in directional-derivative sign, records bracket endpoints and returns `next_act='sectioning'`. If the curvature test passes, it returns the accepted point with `next_act='none'`. Otherwise it advances the trial using cubic interpolation over a window extended using `spin_system.control.ls_tau1`. Non-finite expansion bounds, objective values, or directional derivatives raise an error describing apparent unbounded increase.
 

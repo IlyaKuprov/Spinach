@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A relaxation-time trajectory illustrating the short-correlation-time nuclear Overhauser effect in a heteronuclear two-spin system. This is not a NOESY pulse-sequence simulation: the example prepares an inverted longitudinal state and follows both spins' longitudinal magnetization under Redfield relaxation. The source estimates a calculation time of seconds.
+A relaxation-time trajectory illustrating the short-correlation-time nuclear Overhauser effect in a heteronuclear two-spin system. This is not a NOESY pulse-sequence simulation: the example prepares an inverted longitudinal state and follows both spins' longitudinal magnetisation under Redfield relaxation. The source estimates a calculation time of seconds.
 
 ## Spin system and relaxation model
 

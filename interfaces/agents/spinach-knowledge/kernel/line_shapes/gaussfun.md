@@ -6,7 +6,7 @@
 
 ## Meaning and equation
 
-This evaluates a zero-centred Gaussian normalized to unit area. The source sets `sigma=fwhm/(2*sqrt(2*log(2)))` and evaluates `y=exp(-x^2/(2*sigma^2))/(sigma*sqrt(2*pi))` elementwise. Thus `fwhm` is the full width at half maximum, and the integral over the real line is one.
+This evaluates a zero-centred Gaussian normalised to unit area. The source sets `sigma=fwhm/(2*sqrt(2*log(2)))` and evaluates `y=exp(-x^2/(2*sigma^2))/(sigma*sqrt(2*pi))` elementwise. Thus `fwhm` is the full width at half maximum, and the integral over the real line is one.
 
 ## Inputs and units
 

@@ -18,7 +18,7 @@ The wrapper passes `{'13C','1H'}` as the F1/F2 spins: 13C is indirect and 1H is 
 
 ## Processing and scope
 
-Each isotopomer is simulated with `liquid(...,@hsqc,...,'nmr')`. The positive and negative States FIDs receive square-cosine apodization in both dimensions. The wrapper Fourier-transforms both dimensions, combines the States data as the source specifies, sums isotope contributions, then plots the real 2D spectrum with positive polarity. It sets no explicit relaxation parameters. The wrapper supplies acquisition settings and data processing; pulse-train details are implemented by `experiments/nmr_liquids/hsqc.m`, not here.
+Each isotopomer is simulated with `liquid(...,@hsqc,...,'nmr')`. The positive and negative States FIDs receive square-cosine apodisation in both dimensions. The wrapper Fourier-transforms both dimensions, combines the States data as the source specifies, sums isotope contributions, then plots the real 2D spectrum with positive polarity. It sets no explicit relaxation parameters. The wrapper supplies acquisition settings and data processing; pulse-train details are implemented by `experiments/nmr_liquids/hsqc.m`, not here.
 
 ## Sources
 

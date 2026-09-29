@@ -12,7 +12,7 @@ Calculates powder-averaged pulsed-field magnetisation for the Ho(pzdo)4 metal-or
 
 The Spinach system has one `E17` effective spin, g = 1.24, and crystal-field coefficients from `ho_pzdo4_params.m`, converted rank by rank from cm^-1 to Hz and then to spherical form; the crystal-field Euler angles are zero. The Zeeman-Hilbert-space formalism is used without approximation, at 2 K. The field sweep is linear from 0 to 10 T at 10 T/ms, represented as B(t) = 1e4 t with t in seconds. The simulation uses 100,000 steps of 10 ns, spanning 1 ms, and records 1,000 output intervals.
 
-Spin-phonon relaxation uses a generalized Lindblad dissipator in the form of Saito and Miyashita. The coupling matrix has unit elements between adjacent mJ states, with projections rounded to half-integers. The bath is super-Ohmic (alpha = 2), with lambda = 10 cm^-1 and I0 = 1e-14 ps/rad; the source converts the bath parameter to rad/s units for Spinach. The magnetisation observable is the moment -1.24 Jz, in Bohr magnetons.
+Spin-phonon relaxation uses a generalised Lindblad dissipator in the form of Saito and Miyashita. The coupling matrix has unit elements between adjacent mJ states, with projections rounded to half-integers. The bath is super-Ohmic (alpha = 2), with lambda = 10 cm^-1 and I0 = 1e-14 ps/rad; the source converts the bath parameter to rad/s units for Spinach. The magnetisation observable is the moment -1.24 Jz, in Bohr magnetons.
 
 ## Powder calculation and output
 

@@ -6,10 +6,10 @@
 
 Regression test for a one-slice Cartesian shaped pulse. It verifies that a rectangular Cartesian shaped pulse reproduces the hard-pulse limit: a rectangular X pulse slice with amplitude 1 rad/s and duration pi seconds has a net flip angle of pi, so `Lz` must invert.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Piecewise Cartesian pulse rotation\n')`.
-- Initializes a regression test result via `new_test_result` with suite name `'kernel/shaped_pulse_rotation'`, description `'Piecewise Cartesian pulse rotation'`, and the criterion that a rectangular Cartesian shaped pulse must reproduce the hard-pulse limit.
+- Initialises a regression test result via `new_test_result` with suite name `'kernel/shaped_pulse_rotation'`, description `'Piecewise Cartesian pulse rotation'`, and the criterion that a rectangular Cartesian shaped pulse must reproduce the hard-pulse limit.
 - Builds a one-proton Hilbert-space spin system using `test_spin_system` with:
   - `sys.magnet=0` and `sys.isotopes={'1H'}`
   - `inter.zeeman.scalar={0}`

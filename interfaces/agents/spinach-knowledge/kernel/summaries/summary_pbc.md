@@ -2,7 +2,7 @@
 
 - Signature: `summary_pbc(spin_system,header)`
 
-## Behavior
+## Behaviour
 
 Prints each periodic-boundary vector from `spin_system.inter.pbc` as X, Y and Z columns. Each component is signed and formatted to three decimal places; the source assigns no coordinate units. The supplied `header` precedes the table.
 

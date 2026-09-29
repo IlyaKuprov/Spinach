@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A relaxation-time trajectory for the nuclear Overhauser effect in a homonuclear two-spin system in the long-correlation-time case. One longitudinal spin component is inverted and both spins' longitudinal magnetizations are followed; this is not a NOESY acquisition. The source estimates a calculation time of seconds.
+A relaxation-time trajectory for the nuclear Overhauser effect in a homonuclear two-spin system in the long-correlation-time case. One longitudinal spin component is inverted and both spins' longitudinal magnetisations are followed; this is not a NOESY acquisition. The source estimates a calculation time of seconds.
 
 ## Spin system and relaxation model
 

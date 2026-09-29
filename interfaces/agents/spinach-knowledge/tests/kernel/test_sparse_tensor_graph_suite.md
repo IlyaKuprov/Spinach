@@ -6,9 +6,9 @@
 
 Regression test suite for the small sparse-format, tensor-product, graph, and combinatorial helper functions in the kernel module. The suite verifies deterministic reference behaviour of these helpers against explicit references.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a result object via `new_test_result` for the target `kernel/sparse_tensor_graph_suite`, and then runs a sequence of checks:
+The function announces the test target with `fprintf`, initialises a result object via `new_test_result` for the target `kernel/sparse_tensor_graph_suite`, and then runs a sequence of checks:
 
 - **`sparse2csr`** — converts a sparse logical 3-by-3 matrix to partial CSR indexing and checks that the row pointer equals `[1;2;4;4]` (one-based row starts plus a final sentinel) and the column index equals `[2;1;3]` (row-major non-zero listing), each with tolerances `1e-15`.
 - **`kronm` and `kronm_new`** — for the cell array `Q={[1 2;0 -1],[2 0;1 3],[0 1;4 -2]}` and the 8-by-2 matrix `X=reshape(1:16,8,2)`, both functions are checked against multiplication by the explicit triple Kronecker product `kron(kron(Q{1},Q{2}),Q{3})`, with tolerances `1e-14`.

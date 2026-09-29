@@ -6,7 +6,7 @@
 
 Regression test for the admission of acquisition-stage irradiation specified in Hilbert space into Liouville-space simulation. The test verifies that a complex-phase soft pulse with transverse acquisition irradiation produces the same FID after Hilbert admission as under native Liouville execution, and that zero-power, absent-irradiation, and no-op formalism cases are handled correctly. Optional operator caching is not enabled.
 
-## Behavior
+## Behaviour
 
 - Builds a coupled `1H`–`13C` spin system with unequal Zeeman offsets (`inter.zeeman.scalar={1 3}`) and scalar coupling (`inter.coupling.scalar={0 150;0 0}`), at 9.4 T, with `bas.approximation='none'`.
 - Loops over the formalisms `zeeman-hilb`, `zeeman-liouv`, `sphten-liouv`, and `zeeman-wavef`, building the Hamiltonian and setting `parameters.homodec_oper` to `cos(0.4)*Lx(1H) + sin(0.4)*Ly(1H)` with `parameters.homodec_pwr=100`.

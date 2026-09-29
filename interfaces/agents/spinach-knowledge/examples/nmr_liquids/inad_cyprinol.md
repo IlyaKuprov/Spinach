@@ -18,7 +18,7 @@ Only `13C` is active, with `1H` decoupling. The wrapper specifies a working `J=5
 
 ## Processing and scope
 
-Each accepted pair is simulated with `liquid(...,@inadequate,...,'nmr')`; the FID receives exponential apodization with the source value 6, is Fourier-transformed and added to the 1D spectrum. The real spectrum is plotted. No explicit relaxation parameters are set in the wrapper. It chooses the eligible isotope pairs, method/basis and acquisition/processing settings; pulse-train details are in `experiments/nmr_liquids/inadequate.m`.
+Each accepted pair is simulated with `liquid(...,@inadequate,...,'nmr')`; the FID receives exponential apodisation with the source value 6, is Fourier-transformed and added to the 1D spectrum. The real spectrum is plotted. No explicit relaxation parameters are set in the wrapper. It chooses the eligible isotope pairs, method/basis and acquisition/processing settings; pulse-train details are in `experiments/nmr_liquids/inadequate.m`.
 
 ## Sources
 

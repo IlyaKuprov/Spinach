@@ -6,10 +6,10 @@ Source: [tests/kernel/test_relaxation_t2_rate.m](https://github.com/IlyaKuprov/S
 
 Regression test for the phenomenological T2 relaxation rate. It verifies that the `t1_t2` relaxation model assigns transverse `L+` order the negative generator eigenvalue corresponding to the specified R2 rate.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Phenomenological T2 decay rate\n')`.
-- Initializes a regression test result via `new_test_result` under the identifier `kernel/relaxation_t2_rate`, with the description "Phenomenological T2 decay rate" and the specification "the t1_t2 model must assign transverse magnetisation the generator eigenvalue -R2.".
+- Initialises a regression test result via `new_test_result` under the identifier `kernel/relaxation_t2_rate`, with the description "Phenomenological T2 decay rate" and the specification "the t1_t2 model must assign transverse magnetisation the generator eigenvalue -R2.".
 - Builds a one-spin system:
   - `sys.magnet = 14.1`
   - `sys.isotopes = {'1H'}`

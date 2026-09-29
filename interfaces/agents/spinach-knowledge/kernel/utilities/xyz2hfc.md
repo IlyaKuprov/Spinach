@@ -4,7 +4,7 @@
 
 Converts point electron and nuclear coordinates into a hyperfine interaction tensor.
 
-## Behavior
+## Behaviour
 
 - Syntax: `A=xyz2hfc(exyz,nxyz,isotope)`.
 - The function first runs a consistency check (`grumble`) on the inputs.

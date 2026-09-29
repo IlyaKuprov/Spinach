@@ -4,7 +4,7 @@
 
 Determines which substance in a spin system hosts a specified list of spins, throwing an error if the spins span more than one substance or belong to none. Source: [Spinach GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/which_subst.m).
 
-## Behavior
+## Behaviour
 
 - Syntax: `subst=which_subst(spin_system,spins)`.
 - Validates the spin list via an internal `grumble` subfunction: spins must be a real numeric vector of positive integers, must not exceed `spin_system.comp.nspins`, and must contain no repeated entries.

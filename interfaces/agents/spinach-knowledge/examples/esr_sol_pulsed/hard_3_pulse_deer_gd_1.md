@@ -13,7 +13,7 @@ The model contains two `E8` (Gd(III), spin-7/2) electron spins at a field of `3.
 
 The shared [`deer_3p_hard_deer` helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_hard_deer.m) applies a hard `π/2` probe pulse, evolves for the configured interval, applies a hard `π` pump pulse, refocuses the trajectory, applies a hard `π` probe pulse, and records the final probe-detected evolution. It is called through `powder` in the `'deer-zz'` context, which switches off inter-electron dipolar flip-flop terms to represent slightly different pulse frequencies, as the source comments explain. Powder averaging uses `rep_2ang_1600pts_sph` with detailed output; finite pulse widths and separate offsets are not specified.
 
-The DEER time axis uses 80 intervals of `1e-7` s, i.e. 100 ns per step and 8 μs total (81 samples). For pulse-spectrum plots, the source sets a `1e10` Hz sweep and 1024 nominal spectrum points, then zero-fills the FFT to `4*1024` points. The hard-pulse, pump-pulse, and probe-pulse FIDs are each apodized with an exponential parameter of 6 before transformation.
+The DEER time axis uses 80 intervals of `1e-7` s, i.e. 100 ns per step and 8 μs total (81 samples). For pulse-spectrum plots, the source sets a `1e10` Hz sweep and 1024 nominal spectrum points, then zero-fills the FFT to `4*1024` points. The hard-pulse, pump-pulse, and probe-pulse FIDs are each apodised with an exponential parameter of 6 before transformation.
 
 ## Observable and plotted output
 

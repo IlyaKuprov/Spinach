@@ -4,9 +4,9 @@
 
 Regression test suite for Spinach kernel tensor, vector, distribution, and relaxation utilities. The suite verifies Hermite spline interpolation, the skew-normal density in its normal limit, Fokker-Planck vector reshaping helpers, rotational correlation-function coefficients, tensor isotope-shift helpers, and small spin-system tensor extractors against exact analytical cases.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a regression test result via `new_test_result` for `kernel/tensor_vector_suite`, and then runs a sequence of checks, each appending pass/fail information with explanatory messages:
+The function announces the test target with `fprintf`, initialises a regression test result via `new_test_result` for `kernel/tensor_vector_suite`, and then runs a sequence of checks, each appending pass/fail information with explanatory messages:
 
 - **`herm_spline` quadratic reproduction**: interpolates on `linspace(0,1,6)` with endpoint values `0` and `1` and derivatives `0` and `2`, comparing against `spline_grid.^2` with absolute and relative tolerances `1e-15`.
 - **`snormpdf` zero-skew normal limit**: evaluates on the grid `-2:2` with location `1`, scale `2`, and skewness `0`, comparing against the ordinary normal density `exp(-0.5*((pdf_grid-1)/2).^2)/(2*sqrt(2*pi))` with tolerances `1e-14`.

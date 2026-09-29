@@ -7,7 +7,7 @@
 
 Call from `imaging()`, which supplies `H`, `R`, `K`, `G`, and `F`. The background generator is `B=H+F+1i*R+1i*K`. The source applies a 90-degree pulse about `Ly` to `parameters.rho0`, evolves for `t_echo`, applies an ideal 180-degree pulse, then evolves for a second `t_echo`. If `diff_g_amp` is present, the same two-component gradient vector is applied during each echo interval; otherwise both intervals are free background evolution. Each phase-encode row is prepared with `G{1}`, pre-rolled under the reversed readout gradient `G{2}`, and sampled under the forward readout gradient with the coil state. Phase rows are independent and executed with `parfor`.
 
-The source uses the first named spin in `parameters.spins`. The caller provides the starting state; this function neither prepares nor measures DNP polarization.
+The source uses the first named spin in `parameters.spins`. The caller provides the starting state; this function neither prepares nor measures DNP polarisation.
 
 ## Parameters and units
 

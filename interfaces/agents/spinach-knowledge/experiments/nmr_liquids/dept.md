@@ -6,7 +6,7 @@
 
 ## Purpose
 
-DEPT (distortionless enhancement by polarization transfer) pulse sequence, citing [DOI 10.1016/0022-2364(82)90286-4](https://doi.org/10.1016/0022-2364(82)90286-4). It is a one-dimensional liquid-NMR experiment; the source documents multiplicity-dependent phase behavior, not measured output from a run.
+DEPT (distortionless enhancement by polarisation transfer) pulse sequence, citing [DOI 10.1016/0022-2364(82)90286-4](https://doi.org/10.1016/0022-2364(82)90286-4). It is a one-dimensional liquid-NMR experiment; the source documents multiplicity-dependent phase behaviour, not measured output from a run.
 
 ## Inputs
 

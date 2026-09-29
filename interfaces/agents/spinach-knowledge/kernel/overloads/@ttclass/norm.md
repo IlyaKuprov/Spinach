@@ -12,4 +12,4 @@ Packing may combine buffered terms into a single train; orthogonalisation is app
 
 ## Supported inputs
 
-The explicit cases for `1`, `inf`, and `2` each raise an error stating that norm is unavailable for `ttclass`. Any other value raises an unrecognized-norm-type error. There is no separate type or shape check in this method.
+The explicit cases for `1`, `inf`, and `2` each raise an error stating that norm is unavailable for `ttclass`. Any other value raises an unrecognised-norm-type error. There is no separate type or shape check in this method.

@@ -6,7 +6,7 @@ Converts a secular relaxation superoperator into the Redfield "kite" form by dro
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sec2kite.m>
 
-## Behavior
+## Behaviour
 
 - Calls `grumble(spin_system,R)` to enforce consistency before processing.
 - Records the nonzero count of the input superoperator (`nnz_before`).

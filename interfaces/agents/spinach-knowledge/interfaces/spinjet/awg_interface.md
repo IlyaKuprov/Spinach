@@ -4,7 +4,7 @@
 
 ## Interface and commands
 
-`data=awg_interface(spin_system,awg_cmd,cmd_input)` dispatches to Python scripts that use the Bruker Xepr API. `spin_system.sys.root_dir` must name an existing directory. `awg_cmd` is a character array and must be one of: `reset_pspel`, `compile_pspel_shp`, `compile_pspel_def`, `compile_pspel_exp`, `modify_pspel_defs`, or `acquire_data`. Omitted `cmd_input` defaults to `{}`; it must be a cell array. The wrapper initializes `data=[]` and only fills it for acquisition.
+`data=awg_interface(spin_system,awg_cmd,cmd_input)` dispatches to Python scripts that use the Bruker Xepr API. `spin_system.sys.root_dir` must name an existing directory. `awg_cmd` is a character array and must be one of: `reset_pspel`, `compile_pspel_shp`, `compile_pspel_def`, `compile_pspel_exp`, `modify_pspel_defs`, or `acquire_data`. Omitted `cmd_input` defaults to `{}`; it must be a cell array. The wrapper initialises `data=[]` and only fills it for acquisition.
 
 - `reset_pspel` runs `Xepr_resetexpt`, asks the operator to hide and then show the PulseSPEL window, and pauses for a keypress (Ctrl+C can end the simulation).
 - `compile_pspel_shp`, `compile_pspel_def`, and `compile_pspel_exp` pass `cmd_input` to `Xepr_plsspel_shpfile`, `Xepr_plsspel_deffile`, and `Xepr_plsspel_expfile`, respectively. Shape compilation requires exactly one input, the shape-file path, and rejects files at or above 262,144 bytes.

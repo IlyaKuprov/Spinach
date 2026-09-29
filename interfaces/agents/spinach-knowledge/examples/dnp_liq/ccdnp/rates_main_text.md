@@ -4,7 +4,7 @@
 
 ## What it computes
 
-Builds the Redfield relaxation superoperator for a liquid-state cross-correlated DNP model with one proton and two exchange-coupled electrons, then prints selected self- and cross-relaxation projections. Use it to inspect the listed operator-specific rates for this main-text parameter set; it is not a frequency-scan or polarization time-course calculation.
+Builds the Redfield relaxation superoperator for a liquid-state cross-correlated DNP model with one proton and two exchange-coupled electrons, then prints selected self- and cross-relaxation projections. Use it to inspect the listed operator-specific rates for this main-text parameter set; it is not a frequency-scan or polarisation time-course calculation.
 
 ## Running and inputs
 
@@ -19,7 +19,7 @@ Call the no-argument MATLAB function `rates_main_text()` with Spinach on the MAT
 
 ## Console output
 
-After computing `R=relaxation(spin_system)`, the script prints matrix-element projections for normalized longitudinal proton/electron operators (their self terms and electron-to-proton terms), four normalized electron transverse combinations of the form `E1p ± 2*E1pE2z` and `E2p ± 2*E1zE2p`, and proton-containing longitudinal cross terms (including the printed terms labelled for NzE1z, NzE2z, and NzE1zE2z to Nz). It also prints mixed transverse-coherence projections labelled E1p to NzE1p, E1p to NzE1pE2z, and E1pE2z to NzE1pE2z. The source-specific clarification is that these are selected contractions of the relaxation superoperator with constructed operator states—not a dump of the complete relaxation matrix or its eigenmodes. It writes no data file and creates no figure; the values appear only in MATLAB's command output.
+After computing `R=relaxation(spin_system)`, the script prints matrix-element projections for normalised longitudinal proton/electron operators (their self terms and electron-to-proton terms), four normalised electron transverse combinations of the form `E1p ± 2*E1pE2z` and `E2p ± 2*E1zE2p`, and proton-containing longitudinal cross terms (including the printed terms labelled for NzE1z, NzE2z, and NzE1zE2z to Nz). It also prints mixed transverse-coherence projections labelled E1p to NzE1p, E1p to NzE1pE2z, and E1pE2z to NzE1pE2z. The source-specific clarification is that these are selected contractions of the relaxation superoperator with constructed operator states—not a dump of the complete relaxation matrix or its eigenmodes. It writes no data file and creates no figure; the values appear only in MATLAB's command output.
 
 ## Reference and caveat
 

@@ -6,7 +6,7 @@ Splits a spin system into several independent subsystems, each containing only o
 
 Source: [kernel/utilities/dilute.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dilute.m)
 
-## Behavior
+## Behaviour
 
 - Syntax: `subsystems=dilute(spin_system,isotope,tuples)`.
 - If `tuples` is not supplied, it defaults to `1` (singles).

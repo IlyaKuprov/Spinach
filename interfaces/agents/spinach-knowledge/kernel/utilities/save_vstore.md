@@ -6,7 +6,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/save_v
 
 Saves the current parallel pool `ValueStore` into a MATLAB file. The snapshot contains keys and values only; callback functions are session-local and are not stored.
 
-## Behavior
+## Behaviour
 
 - Syntax: `save_vstore(file_name)`.
 - Validates `file_name` via an internal consistency check (`grumble`), which errors with `'file_name must be a non-empty character string.'` unless the argument is a non-empty character row vector.

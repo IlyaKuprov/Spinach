@@ -20,4 +20,4 @@ The proton detector is `state(spin_system,'Lz','1H')`. XiX settings are `paramet
 
 ## Calculation and output
 
-For each distance node, each contact-time point is evaluated by `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The code then performs a distance average with quadrature weights multiplied by the radial (r^2) Jacobian and normalizes by the weighted (r^2) sum. It plots the real proton (L_z) expectation value against total contact time in μs and saves `xix_q_con_time_ensemble_r.fig`; the function has no explicit MATLAB output. The source comment estimates calculation time as minutes, not a measured runtime here.
+For each distance node, each contact-time point is evaluated by `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The code then performs a distance average with quadrature weights multiplied by the radial (r^2) Jacobian and normalises by the weighted (r^2) sum. It plots the real proton (L_z) expectation value against total contact time in μs and saves `xix_q_con_time_ensemble_r.fig`; the function has no explicit MATLAB output. The source comment estimates calculation time as minutes, not a measured runtime here.

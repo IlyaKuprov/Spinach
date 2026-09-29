@@ -20,6 +20,6 @@ The script forms a phase-cycle trace by summing the real and imaginary component
 
 ## Scope
 
-This is a parameterized simulation example, not a reported experimental fit: the file gives no reference dataset, fitted distance distribution, or expected trace values. Its numerical powder calculation and its stated isotropic-g approximation for the analytical calculation should not be conflated.
+This is a parameterised simulation example, not a reported experimental fit: the file gives no reference dataset, fitted distance distribution, or expected trace values. Its numerical powder calculation and its stated isotropic-g approximation for the analytical calculation should not be conflated.
 
 Source code: [`examples/esr_sol_pulsed/ridme_cu_nitroxide.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/ridme_cu_nitroxide.m).

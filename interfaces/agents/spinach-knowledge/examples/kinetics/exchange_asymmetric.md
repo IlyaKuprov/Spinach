@@ -10,6 +10,6 @@ Two 1H spin environments are assigned scalar Zeeman values 0 and 3, with exchang
 
 ## Acquisition and observable
 
-The initial density operator is the chemical-state-aware 1H raising operator, and the coil operator is the ordinary 1H raising operator. With no decoupling, acquisition calls `liquid` using `@acquire` in NMR mode. The parameters are offset 900, sweep 5000, 512 acquired points and 1024 zero-filled points; the frequency axis is labeled ppm and inverted. The FID is exponentially apodised with parameter 6, Fourier-transformed, and the real part of the shifted spectrum is plotted with `plot_1d`. The source contains no numeric spectrum or measured peak positions, so none are asserted here.
+The initial density operator is the chemical-state-aware 1H raising operator, and the coil operator is the ordinary 1H raising operator. With no decoupling, acquisition calls `liquid` using `@acquire` in NMR mode. The parameters are offset 900, sweep 5000, 512 acquired points and 1024 zero-filled points; the frequency axis is labelled ppm and inverted. The FID is exponentially apodised with parameter 6, Fourier-transformed, and the real part of the shifted spectrum is plotted with `plot_1d`. The source contains no numeric spectrum or measured peak positions, so none are asserted here.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/exchange_asymmetric.m)

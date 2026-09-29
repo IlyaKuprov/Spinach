@@ -4,7 +4,7 @@
 
 ## Calculation
 
-This is a simulated 90° proton-pulse design in the regime where Bloch–Siegert (counter-rotating-field) effects matter. The one-spin model is on resonance at 1 MHz: `sys.magnet=2π×10⁶/spin('1H')` sets that Larmor frequency and the chemical shift is 0 ppm. Spinach builds the full single-spin `sphten-liouv` basis with no approximation. The normalized initial and target states are longitudinal magnetization (`Lz`) and transverse magnetization (`Lx`). The drift is set to zero; the two quadrature controls are `Lx` and `Ly` for 1H.
+This is a simulated 90° proton-pulse design in the regime where Bloch–Siegert (counter-rotating-field) effects matter. The one-spin model is on resonance at 1 MHz: `sys.magnet=2π×10⁶/spin('1H')` sets that Larmor frequency and the chemical shift is 0 ppm. Spinach builds the full single-spin `sphten-liouv` basis with no approximation. The normalised initial and target states are longitudinal magnetisation (`Lz`) and transverse magnetisation (`Lx`). The drift is set to zero; the two quadrature controls are `Lx` and `Ly` for 1H.
 
 The ensemble varies an offset through the transverse `Lx` operator, using the 11 values in `linspace(-1e5,1e5,11)`. The source does not attach units to these values, so they are reported as entered rather than relabelled as Hz. Its RF scale is 0.2 times the absolute proton base frequency, and it uses 50 equal slices with `pulse_dt=(8π/pwr_levels/50)`; using the source's 1 MHz base frequency gives a total duration of 20 μs. The deterministic initial waveform has 50 amplitude samples ramping from 0.1 to 0.5 and 50 second-quadrature samples at 0.05.
 

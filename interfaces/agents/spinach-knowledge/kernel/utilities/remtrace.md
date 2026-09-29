@@ -6,7 +6,7 @@
 
 Subtracts an appropriate multiple of the unit matrix from a square matrix to make it traceless.
 
-## Behavior
+## Behaviour
 
 - Syntax: `A=remtrace(A)`.
 - The function calls an internal consistency check (`grumble`) that errors with `'A must be a square matrix.'` if the input is not numeric or if it is not square (`size(A,1)~=size(A,2)`).

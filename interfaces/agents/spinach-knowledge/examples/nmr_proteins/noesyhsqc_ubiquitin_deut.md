@@ -12,4 +12,4 @@ The call uses liquid with noesyhsqc, spin order 1H, 15N, 1H, tmix=0.090 (90 ms i
 
 ## Simulation and output
 
-Four phase-cycle FIDs are squared-cosine apodised. The code combines conjugate components to form absorption parts through the F3 and F2 transforms, then Fourier-transforms F1 and plots the negative real 3D spectrum. The PDB/BMRB files initialize the simulated model; no experimental spectrum is input and no measured coherence data or DOI citation is reported. The example identifies the 1H-1H-15N sequence dimensions and spin-1 deuterons, but does not label explicit coherence orders.
+Four phase-cycle FIDs are squared-cosine apodised. The code combines conjugate components to form absorption parts through the F3 and F2 transforms, then Fourier-transforms F1 and plots the negative real 3D spectrum. The PDB/BMRB files initialise the simulated model; no experimental spectrum is input and no measured coherence data or DOI citation is reported. The example identifies the 1H-1H-15N sequence dimensions and spin-1 deuterons, but does not label explicit coherence orders.

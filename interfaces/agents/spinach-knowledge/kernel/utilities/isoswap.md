@@ -6,7 +6,7 @@ Makes isotope replacements in the input structures. All interactions are automat
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isoswap.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `[sys,inter]=isoswap(sys,inter,spins,new_iso)`.
 - Enforces input consistency via an internal `grumble` subfunction, which errors if isotope information is missing from `sys`, if `inter` is not a structure, if `spins` is not a real numeric vector of integer indices not exceeding the number of isotopes, or if `new_iso` is not a character string.

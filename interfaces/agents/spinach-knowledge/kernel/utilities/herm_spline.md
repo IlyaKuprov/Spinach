@@ -6,7 +6,7 @@ Evaluates a cubic Hermite spline on the [0,1] interval, defined by function valu
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/herm_spline.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `y=herm_spline(f0,df0,f1,df1,x)`.
 - The spline coefficients (ordered from x^3 down to x^0) are obtained as a fixed 4x4 matrix multiplying the vector `[df0; f0; df1; f1]`, with the matrix rows `[1 2 1 -2; -2 -3 -1 3; 1 0 0 0; 0 1 0 0]`.

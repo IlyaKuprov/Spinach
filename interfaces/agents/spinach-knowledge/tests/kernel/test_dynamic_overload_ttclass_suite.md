@@ -6,9 +6,9 @@
 
 Regression test for dynamic dispatch of `ttclass` operator and method overloads. The suite verifies that `ttclass` object operations match exact dense references on one-core and two-core tensor trains, covering constructors, arithmetic, indexing, linear algebra, compression, and solver entry points.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf('TESTING: Tensor-train overload dispatch\n')` and initializes a result object via `new_test_result('kernel/dynamic_overload_ttclass_suite', ...)`, describing the requirement that `ttclass` overloads match explicit dense references on small deterministic tensor trains.
+- Announces the test target with `fprintf('TESTING: Tensor-train overload dispatch\n')` and initialises a result object via `new_test_result('kernel/dynamic_overload_ttclass_suite', ...)`, describing the requirement that `ttclass` overloads match explicit dense references on small deterministic tensor trains.
 - Builds one-core tensor trains from `A=[1 2;3 4]` and `B=[0 5;6 1]` as `T=ttclass(2,{A},0)` and `U=ttclass(-3,{B},0)`, with dense references `t_ref=2*A` and `u_ref=-3*B`.
 - Checks constructor, `full`, `size`, `sizes`, `ranks`, `numel`, and `subsref` dispatch, including direct function calls `sizes(T)`, `ranks(T)`, and `subsref(T,idx)` with `idx=substruct('()',{2,1})`. Verifies `T.sizes` equals `[2 2]`, `T.ranks` equals `[1;1]`, and structural predicates `T.ncores==1`, `T.ntrains==1`, `ismatrix(T)`, `isnumeric(T)`, `isreal(T)`.
 - Checks addition, subtraction, scalar multiplication (left and right `mtimes`), scalar `rdivide`, scalar `mrdivide`, and direct `plus`, `minus`, `rdivide`, `mrdivide` calls against dense references.

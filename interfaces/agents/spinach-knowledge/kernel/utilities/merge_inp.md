@@ -6,7 +6,7 @@
 
 Merges multiple `sys` and `inter` structures into one. Useful for setting up chemical kinetics simulations where the molecules come from different DFT calculations.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[sys,inter]=merge_inp(sys_parts,inter_parts)`.
 - Consistency is enforced first: both inputs must be row cell arrays of structures, `sys_parts` and `inter_parts` must have the same number of elements, at least one subsystem must be supplied, and every `sys` structure must contain an `isotopes` subfield.

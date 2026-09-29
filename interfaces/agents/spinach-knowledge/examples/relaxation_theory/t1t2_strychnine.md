@@ -8,7 +8,7 @@ This example runs a relaxation analysis for the proton system of strychnine, usi
 
 ## Spin system and relaxation model
 
-The system is initialized by `strychnine({'1H'})`, then sets `sys.magnet=5.9`. The basis uses `sphten-liouv`, the `IK-2` approximation, connectivity from scalar couplings, and proximity level 3. Redfield relaxation is selected with zero equilibrium, `kite` relaxation retention, and `inter.tau_c={200e-12}`. A distance cutoff of 4.0 is applied.
+The system is initialised by `strychnine({'1H'})`, then sets `sys.magnet=5.9`. The basis uses `sphten-liouv`, the `IK-2` approximation, connectivity from scalar couplings, and proximity level 3. Redfield relaxation is selected with zero equilibrium, `kite` relaxation retention, and `inter.tau_c={200e-12}`. A distance cutoff of 4.0 is applied.
 
 ## Analysis
 

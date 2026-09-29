@@ -6,9 +6,9 @@ Source: [MATLAB on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/exper
 
 ## Purpose and inputs
 
-A parameterized 3D PRESS voxel-selection diagnostic, called from `imaging()` with `H`, `R`, `K`, `G`, and `F`. `parameters.ss_grad_amp` contains three slice-gradient amplitudes in T/m. `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank` are cell arrays with three entries, one per slice pulse: RF-frequency vectors in Hz, RF-amplitude vectors in rad/s, pulse-duration vectors in seconds, phases at time zero (units are not specified by the source), and maximum Fokker–Planck pulse-operator ranks (the source says 2 is usually enough). `parameters.spins{1}` identifies the selected spin, and `parameters.npts` defines the spatial grid.
+A parameterised 3D PRESS voxel-selection diagnostic, called from `imaging()` with `H`, `R`, `K`, `G`, and `F`. `parameters.ss_grad_amp` contains three slice-gradient amplitudes in T/m. `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank` are cell arrays with three entries, one per slice pulse: RF-frequency vectors in Hz, RF-amplitude vectors in rad/s, pulse-duration vectors in seconds, phases at time zero (units are not specified by the source), and maximum Fokker–Planck pulse-operator ranks (the source says 2 is usually enough). `parameters.spins{1}` identifies the selected spin, and `parameters.npts` defines the spatial grid.
 
-The source forms `L=H+F+1i*R+1i*K`, accepts `sphten-liouv` and `zeeman-liouv`, and initializes a uniform `Lz` state across `prod(parameters.npts)` points. This is a simulated profile construction, not a measured voxel profile. The source comment says to add `polyadic` to `sys.enable`.
+The source forms `L=H+F+1i*R+1i*K`, accepts `sphten-liouv` and `zeeman-liouv`, and initialises a uniform `Lz` state across `prod(parameters.npts)` points. This is a simulated profile construction, not a measured voxel profile. The source comment says to add `polyadic` to `sys.enable`.
 
 ## Sequence and returned data
 

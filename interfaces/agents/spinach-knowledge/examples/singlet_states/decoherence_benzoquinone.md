@@ -12,7 +12,7 @@ The source imports coordinates, chemical shifts, J couplings and chemical-shift-
 
 ## Observable and limits
 
-The script constructs `R` and evaluates `eigs(R-speye(size(R)), 20, 'SM')+1`, labeled in the source as the twenty smallest relaxation rates in Hz. It reports rates only; it does not select or identify a singlet eigenmode, prepare or store a singlet state, or compute a lifetime, image or gradient-encoded signal.
+The script constructs `R` and evaluates `eigs(R-speye(size(R)), 20, 'SM')+1`, labelled in the source as the twenty smallest relaxation rates in Hz. It reports rates only; it does not select or identify a singlet eigenmode, prepare or store a singlet state, or compute a lifetime, image or gradient-encoded signal.
 
 The source comment gives a calculation time of seconds.
 

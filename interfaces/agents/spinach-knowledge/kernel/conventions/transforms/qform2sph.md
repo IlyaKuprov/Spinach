@@ -4,9 +4,9 @@
 
 - Signature: `[r0,r1,r2]=qform2sph(A)`
 
-## Behavior
+## Behaviour
 
-For the normalized quadratic form `[x y z]*A*[x y z]'/norm([x y z],2)^2`, the returned coefficients satisfy `quadratic_form = sum(r_LM*Y_LM)`. The input is a real symmetric 3x3 matrix.
+For the normalised quadratic form `[x y z]*A*[x y z]'/norm([x y z],2)^2`, the returned coefficients satisfy `quadratic_form = sum(r_LM*Y_LM)`. The input is a real symmetric 3x3 matrix.
 
 - `r0 = (2/3)*sqrt(pi)*trace(A)`.
 - `r1 = [0 0 0]`.

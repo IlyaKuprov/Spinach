@@ -6,7 +6,7 @@
 
 Computes the Tikhonov-regularised solution to `K*x=y` with a positivity constraint on `x`, using a regularised Newton-Raphson method (implemented via constrained numerical optimisation). The solution minimises `norm(K*x-y,2)^2 + lambda*norm(D*x,2)^2` subject to `x >= 0`.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[x,err,reg]=tikhonov(K,D,KtK,DtD,H,y,lambda)`.
 - Input consistency is enforced by an internal `grumble` subfunction, which errors if any input is non-numeric, if the row dimensions of `K` and `y` disagree, if any supplied `KtK`, `DtD`, or `H` is non-square, or if `lambda` is not a non-negative real scalar.

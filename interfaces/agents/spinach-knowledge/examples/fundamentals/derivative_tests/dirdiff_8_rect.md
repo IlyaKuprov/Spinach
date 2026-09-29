@@ -6,7 +6,7 @@
 
 ## Question and callable context
 
-This no-argument example checks whether selected columns of the analytical phase Hessian returned by `grape_phase` agree with centered finite differences of its returned gradient for GRAPE with the rectangle integrator. Run `dirdiff_8_rect()` in a Spinach MATLAB environment with the mapped helper `dirdiff_test_system.m` available. The source contains error paths for failed comparisons; this page does not claim that the script was executed or that any comparison passed.
+This no-argument example checks whether selected columns of the analytical phase Hessian returned by `grape_phase` agree with centred finite differences of its returned gradient for GRAPE with the rectangle integrator. Run `dirdiff_8_rect()` in a Spinach MATLAB environment with the mapped helper `dirdiff_test_system.m` available. The source contains error paths for failed comparisons; this page does not claim that the script was executed or that any comparison passed.
 
 ## Model and control setup
 
@@ -16,6 +16,6 @@ The configured power levels are `2*pi*linspace(50e3,70e3,10)`. The source sets `
 
 ## Numerical comparison and scope
 
-For each formalism the source draws one unseeded `2`-by-`5` phase array as `randn(2,5)/3` and uses `h=1e-5`. It obtains the analytical Hessian, then perturbs linear waveform entries 1, `end`, and 5 in turn. For each entry it estimates the corresponding Hessian column from the centered gradient difference `hess_num=(grad_forw-grad_back)/(2*h)`. The source accepts a column only if `norm(hess_anl(:,i)-hess_num,1)<1e-5*norm(hess_num,1)`; otherwise it raises an error identifying the formalism and column. Its middle-column comment refers to the specific linear index 5.
+For each formalism the source draws one unseeded `2`-by-`5` phase array as `randn(2,5)/3` and uses `h=1e-5`. It obtains the analytical Hessian, then perturbs linear waveform entries 1, `end`, and 5 in turn. For each entry it estimates the corresponding Hessian column from the centred gradient difference `hess_num=(grad_forw-grad_back)/(2*h)`. The source accepts a column only if `norm(hess_anl(:,i)-hess_num,1)<1e-5*norm(hess_num,1)`; otherwise it raises an error identifying the formalism and column. Its middle-column comment refers to the specific linear index 5.
 
 This samples three of the ten waveform entries for one random starting array per formalism; it is not a full-Hessian comparison or a sweep over random seeds and model settings. No observed pass/fail output is recorded here. Source: [examples/fundamentals/derivative_tests/dirdiff_8_rect.m](../../../../../../examples/fundamentals/derivative_tests/dirdiff_8_rect.m).

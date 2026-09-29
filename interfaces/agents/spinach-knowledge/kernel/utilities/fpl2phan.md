@@ -6,7 +6,7 @@ Returns the image painted within the Fokker-Planck vector by a user-specified sp
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/fpl2phan.m>
 
-## Behavior
+## Behaviour
 
 - Calls the internal consistency checker `grumble(rho,coil,dims)` before any computation.
 - Reshapes `rho` into a matrix of size `[numel(coil) prod(dims)]`, exposing the spin dimension as the first axis.

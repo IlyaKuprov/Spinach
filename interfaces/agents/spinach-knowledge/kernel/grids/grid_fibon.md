@@ -10,7 +10,7 @@ Build a deterministic two-angle quadrature grid on the sphere. The cited constru
 
 - `type` must be a character array; `parm` must be a positive real integer.
 - For a selected grid with N points, `alps`, `bets`, and `gams` are N-by-1 Euler-angle columns in radians. `alps` is zero throughout because these grids use two angles.
-- `whts` contains one normalized spherical-area weight per point; `vorn` contains the corresponding Voronoi tessera vertex data.
+- `whts` contains one normalised spherical-area weight per point; `vorn` contains the corresponding Voronoi tessera vertex data.
 
 ## Grid rules
 
@@ -22,4 +22,4 @@ The header help text lists `'fibonacci'`, but the executable switch label is `'f
 
 ## Weights and plotting
 
-The tessellation is calculated only when more than three outputs are requested or when the function is called with no output. Point coordinates are formed on the unit sphere and passed to `voronoisphere`; its body-angle weights are divided by `4*pi`, so the returned weights are normalized to the full sphere. A call with no outputs also sends the points and tessera to `grid_plot`. Requesting only the three angle outputs avoids this tessellation work.
+The tessellation is calculated only when more than three outputs are requested or when the function is called with no output. Point coordinates are formed on the unit sphere and passed to `voronoisphere`; its body-angle weights are divided by `4*pi`, so the returned weights are normalised to the full sphere. A call with no outputs also sends the points and tessera to `grid_plot`. Requesting only the three angle outputs avoids this tessellation work.

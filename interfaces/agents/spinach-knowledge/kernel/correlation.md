@@ -25,7 +25,7 @@ For `sphten-liouv`, the routine counts nonzero entries in the basis columns belo
 
 For `zeeman-liouv` and `zeeman-hilb`, it builds sparse identity-component channels for the selected spins, samples the generating operation at roots of unity, and combines the samples with discrete Fourier weights for the requested orders from zero through the number of selected spins. In Hilbert formalism the density matrix is processed through the corresponding squared spin-space dimension; the code restores the original input shape. The header notes that correlation order is not diagonal in the Zeeman basis and describes the Hilbert-space density-matrix handling as a Liouville-space stretch/filter/fold operation; the executable path performs the reshape and projection directly.
 
-The routine accepts only `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms. It checks that `rho` is numeric, that orders are a numeric vector of non-negative integers, and that `spins` is either a numeric vector of valid integer indices or a character selector equal to `'all'` or an isotope label present in the system. After filtering it warns when `norm(rho,1)<1e-10`, reporting that all magnetization appears to have been destroyed.
+The routine accepts only `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms. It checks that `rho` is numeric, that orders are a numeric vector of non-negative integers, and that `spins` is either a numeric vector of valid integer indices or a character selector equal to `'all'` or an isotope label present in the system. After filtering it warns when `norm(rho,1)<1e-10`, reporting that all magnetisation appears to have been destroyed.
 
 ## Units and examples
 

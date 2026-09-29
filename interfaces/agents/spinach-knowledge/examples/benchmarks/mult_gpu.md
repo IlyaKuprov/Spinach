@@ -8,7 +8,7 @@ mult_gpu(precision) compares dense square matrix-multiplication throughput on th
 
 It benchmarks random square matrices with dimensions 1,024, 2,048, 4,096, and 8,192. CPU timings use timeit; if gpuDeviceCount is positive, the matrices are copied to GPU arrays and timed with gputimeit. For each size it converts elapsed time to TFLOPS using the operation count 2*N^3-N^2 divided by seconds and 1e12, then reports the maximum across sizes. The largest case uses two 8,192-by-8,192 matrices, so sufficient host and (for GPU timing) device memory is needed.
 
-With no detected GPU, it displays “no CUDA GPUs detected” and skips GPU timing; the GPU timing entries remain initialized to NaN. This is a benchmark, not a device-independent performance guarantee. The hardware figures below are the workstation results recorded in the source comments, not expected results for other machines.
+With no detected GPU, it displays “no CUDA GPUs detected” and skips GPU timing; the GPU timing entries remain initialised to NaN. This is a benchmark, not a device-independent performance guarantee. The hardware figures below are the workstation results recorded in the source comments, not expected results for other machines.
 
 ## Recorded workstation results
 

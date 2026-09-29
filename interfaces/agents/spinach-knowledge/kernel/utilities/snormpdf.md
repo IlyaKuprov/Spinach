@@ -4,7 +4,7 @@
 
 Evaluates the probability density of Azzalini's skew normal distribution, given a location, a scale, and a skew factor.
 
-## Behavior
+## Behaviour
 
 - Syntax: `p=snormpdf(x,mu,sigma,alpha)`.
 - The function first calls an internal consistency checker (`grumble`) on all four inputs.

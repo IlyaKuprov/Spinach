@@ -4,7 +4,7 @@
 
 - Signature: `hz=ppm2hz(ppm,B0,nucleus)`
 
-## Behavior
+## Behaviour
 
 The conversion is `hz = 1e-6 * ppm * (B0 * spin(nucleus) / (2*pi))`. The factor `1e-6` converts ppm to a dimensionless fraction; `spin(nucleus)` supplies the signed magnetogyric ratio in rad/(s*T), and division by `2*pi` converts angular frequency to cycles per second (Hz). The sign is preserved.
 

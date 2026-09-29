@@ -13,7 +13,7 @@ In this `ttclass` storage, `tt.cores` is an `ncores`-by-`ntrains` cell array. Co
 
 `tt=clearcoeff(tt)`
 
-## Behavior
+## Behaviour
 
 For each train `n`, the function computes `tt.coeff(1,n)^(1/ncores)`, multiplies every core in that train by this factor, then sets that coefficient to one. Applying the same factor to all `ncores` cores absorbs the train coefficient into the core chain; the represented value is unchanged. Core count, train count, mode sizes, ranks, and output shape are unchanged.
 

@@ -4,7 +4,7 @@
 
 `zte.m` performs zero track elimination: it inspects the first few steps of the system trajectory and drops states that did not get populated beyond a user-specified tolerance, returning a projector matrix into the reduced state space.
 
-## Behavior
+## Behaviour
 
 - Syntax: `projector=zte(spin_system,L,rho,nstates)`.
 - Input validation (`grumble`) requires the basis formalism to be `zeeman-liouv` or `sphten-liouv`, both `L` and `rho` to be numeric, `rho` to be a single vector (not a stack), `L` to be square, and `size(L,2)==size(rho,1)`.

@@ -13,7 +13,7 @@ Fits a magnetic-susceptibility tensor to measured pseudocontact shifts (PCS) for
 - `nxyz` is an N-by-3 real array of nuclear coordinates in Angstroms.
 - `expt_pcs` is an N-by-1 real column of measured PCS values in ppm; its row count must match `nxyz`.
 
-The code normalizes the density by multiplying its mean grid value by the product of the three range extents, then dividing `source_cube` by that quantity. It constructs a symmetric, traceless 3-by-3 tensor from five fitted parameters and minimizes the squared Frobenius norm of the difference between measured PCS and `kpcs(...,'fft')` predictions. The initial parameter vector is `[0.10 0.10 0.01 0.01 0.01]`; `fminunc` uses central finite differences and parallel execution settings. After fitting, the code retains the tensor's spherical-rank-2 component and evaluates the predicted PCS again.
+The code normalises the density by multiplying its mean grid value by the product of the three range extents, then dividing `source_cube` by that quantity. It constructs a symmetric, traceless 3-by-3 tensor from five fitted parameters and minimises the squared Frobenius norm of the difference between measured PCS and `kpcs(...,'fft')` predictions. The initial parameter vector is `[0.10 0.10 0.01 0.01 0.01]`; `fminunc` uses central finite differences and parallel execution settings. After fitting, the code retains the tensor's spherical-rank-2 component and evaluates the predicted PCS again.
 
 ## Outputs
 

@@ -6,7 +6,7 @@ Source: https://spindynamics.org/wiki/index.php?title=endor_mims_ideal.m
 
 Signature: endor_spec=endor_mims_ideal(spin_system,parameters,H,R,K).
 
-This is a simulated Mims ENDOR experiment for electron-nuclear hyperfine-coupled systems. Starting from electron longitudinal polarization Lz, the routine applies ideal electron x-axis pi/2 (90°) pulses, separated by the Mims delay tau. At each entry of parameters.n_frq, it applies a shaped nuclear RF pulse to the selected nuclei twice, with RF on and RF off, and subtracts the off response as background. It then applies an electron y-axis minus-pi/2 pulse, evolves for a second tau, and detects the electron coherence with L+. The propagated Liouvillian is assembled from the supplied Hamiltonian, relaxation, and kinetics matrices as H + 1i*R + 1i*K.
+This is a simulated Mims ENDOR experiment for electron-nuclear hyperfine-coupled systems. Starting from electron longitudinal polarisation Lz, the routine applies ideal electron x-axis pi/2 (90°) pulses, separated by the Mims delay tau. At each entry of parameters.n_frq, it applies a shaped nuclear RF pulse to the selected nuclei twice, with RF on and RF off, and subtracts the off response as background. It then applies an electron y-axis minus-pi/2 pulse, evolves for a second tau, and detects the electron coherence with L+. The propagated Liouvillian is assembled from the supplied Hamiltonian, relaxation, and kinetics matrices as H + 1i*R + 1i*K.
 
 Required inputs:
 

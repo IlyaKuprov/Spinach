@@ -6,7 +6,7 @@
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kronm.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `x=kronm(Q,x)`.
 - A consistency check (`grumble`) is run first: `Q` must be a cell array, every element of `Q` must be a matrix, and `x` must be numeric; otherwise errors are thrown (`'Q must be a cell array.'`, `'Q must be a cell array of matrices.'`, `'x must be numeric.'`).

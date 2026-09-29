@@ -13,11 +13,11 @@ In this `ttclass` storage, `tt.cores` is an `ncores`-by-`ntrains` cell array. Co
 
 `tt=diag(tt)`
 
-## Behavior and result dimensions
+## Behaviour and result dimensions
 
 The source obtains mode sizes with `sizes(tt)` and bond ranks with `ranks(tt)`. A vector is selected when all row-mode sizes are one or all column-mode sizes are one. For each train and core, it forms a square physical core by applying MATLAB `diag` to the reshaped physical slice for every left/right bond-index pair. The output represents a diagonal matrix whose side length is the product of the vector mode sizes.
 
-Otherwise, the source accepts a matrix only when every mode is square (`sz(:,1)==sz(:,2)`). It extracts each core's physical diagonal separately for every bond-index pair and stores a vector core with physical dimensions `d-by-1`. The output is a column vector with length equal to the product of the input mode sizes. Rank bonds and train count are retained in both branches. Any input that is neither a recognized vector nor modewise square raises `Input should be either a square matrix or a vector.`
+Otherwise, the source accepts a matrix only when every mode is square (`sz(:,1)==sz(:,2)`). It extracts each core's physical diagonal separately for every bond-index pair and stores a vector core with physical dimensions `d-by-1`. The output is a column vector with length equal to the product of the input mode sizes. Rank bonds and train count are retained in both branches. Any input that is neither a recognised vector nor modewise square raises `Input should be either a square matrix or a vector.`
 
 ## Checks and limits
 

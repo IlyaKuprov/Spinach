@@ -25,7 +25,7 @@ The routine forms the generator from H + `1i`*R + `1i`*K, adds the microwave and
 
 ## Model limits
 
-The source explicitly requires an unthermalized relaxation superoperator. It also assumes the equilibrium state and relaxation superoperator are the same at every field in the sweep, and warns against broad field sweeps. Use only where that fixed-reference assumption is suitable. Supported formalisms are `sphten-liouv` and `zeeman-liouv`.
+The source explicitly requires an unthermalised relaxation superoperator. It also assumes the equilibrium state and relaxation superoperator are the same at every field in the sweep, and warns against broad field sweeps. Use only where that fixed-reference assumption is suitable. Supported formalisms are `sphten-liouv` and `zeeman-liouv`.
 
 ## Source-coded numerical example
 

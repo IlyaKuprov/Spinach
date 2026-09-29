@@ -6,7 +6,7 @@ Source: [tests/kernel/test_dynamic_spin_edit_suite.m](https://github.com/IlyaKup
 
 Regression test suite for the deterministic spin-system editing support utilities in the Spinach kernel: `kill_spin`, `dilute`, `dictum`, and `merge_inp`. The suite verifies that local spin-system editing helpers update dependent metadata without touching external state.
 
-## Behavior
+## Behaviour
 
 The test announces its target with `TESTING: Spin-system editing utilities`, registers a result under the identifier `kernel/dynamic_spin_edit_suite`, and builds a three-spin fixture (`1H`, `13C`, `13C` with labels `h`, `c1`, `c2`) via `local_edit_spin_system`.
 

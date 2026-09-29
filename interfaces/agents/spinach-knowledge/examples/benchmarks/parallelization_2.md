@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [examples/benchmarks/parallelization_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/benchmarks/parallelization_2.m)
 
-parallelization_2() has no arguments. It constructs a three-spin pyrene-cation model from the vacuum-DFT log at the relative path ../standard_systems/pyrene_cation.log; gparse and g2spinach must be available, and that file must resolve from the run directory. The parser call requests two electron spins and one proton, with options.no_xyz=1.
+parallelisation_2() has no arguments. It constructs a three-spin pyrene-cation model from the vacuum-DFT log at the relative path ../standard_systems/pyrene_cation.log; gparse and g2spinach must be available, and that file must resolve from the run directory. The parser call requests two electron spins and one proton, with options.no_xyz=1.
 
 The benchmark sets the field to 50 µT, uses the Zeeman Hilbert-space formalism with no basis approximation, assumes the lab frame, and adds the Hamiltonian contribution returned by orientation(Q,[pi/3,pi/4,pi/5]). Its initial operator is Lz on the electron spins. It calls evolution(...,5e-9,200,'observable') to time a 200-step observable propagation. The source does not label the 5e-9 argument's unit.
 

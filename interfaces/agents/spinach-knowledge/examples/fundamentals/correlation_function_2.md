@@ -10,7 +10,7 @@ The example compares a Monte Carlo estimate with Spinach's analytical expansion 
 
 ## Numerical construction
 
-With `1e6` steps and `nlags=300`, three standard-normal increments drive the direction-cosine matrix from the identity. In the source's explicit generator sum, `sigma_ax` weights the first skew-symmetric matrix (rotation about the z direction), while `sigma_eq` weights each of the other two. Every increment is applied by exponentiating the combined matrix and right-multiplying the current direction-cosine matrix. A `parfor` loop converts the trajectory to Euler angles and then to rank-`L` Wigner matrices. Normalized `xcorr` of the selected elements is scaled by `1/(2*L+1)`; after `ifftshift`, the first 300 entries pair with lag points 0 through 299.
+With `1e6` steps and `nlags=300`, three standard-normal increments drive the direction-cosine matrix from the identity. In the source's explicit generator sum, `sigma_ax` weights the first skew-symmetric matrix (rotation about the z direction), while `sigma_eq` weights each of the other two. Every increment is applied by exponentiating the combined matrix and right-multiplying the current direction-cosine matrix. A `parfor` loop converts the trajectory to Euler angles and then to rank-`L` Wigner matrices. Normalised `xcorr` of the selected elements is scaled by `1/(2*L+1)`; after `ifftshift`, the first 300 entries pair with lag points 0 through 299.
 
 ## Analytical construction and observable
 

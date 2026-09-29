@@ -15,7 +15,7 @@ There is no spatial-motion axis in this context: `parameters.spc_dim=1`, and `pa
 - `parameters.rho0` may be a spin state or a function handle of the three Euler angles. The source also supports the `iso_eq` and `aniso_eq` equilibrium requests; they cannot be combined with each other or with a supplied `rho0`.
 - `parameters.needs` may request `iso_eq`, `aniso_eq`, or `zeeman_op`; the latter supplies the orientation-specific Hermitian Zeeman Hamiltonian as `localpar.hzeeman` to the sequence. The two equilibrium requests are mutually exclusive. Omitted `parameters.decouple` defaults to no decoupling.
 - `parameters.rframes` can request rotating-frame transformations, for example `{{'13C',2},{'14N',3}}` specifies second order for carbon-13 and third order for nitrogen-14; the source header requires the respective spins to use laboratory-frame assumptions.
-- The context evaluates orientations in parallel when available unless `parameters.serial` disables that parallelization.
+- The context evaluates orientations in parallel when available unless `parameters.serial` disables that parallelisation.
 
 ## Source-supported example
 

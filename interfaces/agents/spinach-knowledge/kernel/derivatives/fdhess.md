@@ -17,7 +17,7 @@ Computes the finite-difference Hessian of a numeric three-dimensional array `A`,
 
 `{d2A_dxdx  d2A_dxdy  d2A_dxdz; d2A_dydx  d2A_dydy  d2A_dydz; d2A_dzdx  d2A_dzdy  d2A_dzdz}`
 
-For each entry, the code applies second-derivative `fdmat` operators on a diagonal axis, or first-derivative operators on both axes for a mixed derivative; identity factors occupy untouched axes. Kronecker products act on `A(:)`, and each result is reshaped to `size(A)`. With MATLAB column-major vectorization, the first (X) dimension is the fastest-varying factor. The source computes all nine ordered entries and places them in the displayed cell-array order.
+For each entry, the code applies second-derivative `fdmat` operators on a diagonal axis, or first-derivative operators on both axes for a mixed derivative; identity factors occupy untouched axes. Kronecker products act on `A(:)`, and each result is reshaped to `size(A)`. With MATLAB column-major vectorisation, the first (X) dimension is the fastest-varying factor. The source computes all nine ordered entries and places them in the displayed cell-array order.
 
 ## Guards
 

@@ -12,7 +12,7 @@ The two `1H` spins are placed at coordinates `[0.0 0.0 0.0]` and `[0.5 0.6 0.7]`
 
 ## Calculation and observable
 
-The calculation uses the unapproximated `sphten-liouv` basis, constructs the relaxation superoperator `R`, normalizes the singlet state of spins 1 and 2, and displays `norm(R*S)`. This is a relaxation-action norm for that normalized state, not a simulated time trace or a measured singlet lifetime. The source gives no numeric output value.
+The calculation uses the unapproximated `sphten-liouv` basis, constructs the relaxation superoperator `R`, normalises the singlet state of spins 1 and 2, and displays `norm(R*S)`. This is a relaxation-action norm for that normalised state, not a simulated time trace or a measured singlet lifetime. The source gives no numeric output value.
 
 ## Source
 

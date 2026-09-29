@@ -6,7 +6,7 @@
 
 Removes from a Hermitian operator `A` the part that does not commute with a Hermitian operator `B`, returning the commuting part `C`. The operator `B` is supplied through its eigenvectors and eigenvalues rather than as a matrix.
 
-## Behavior
+## Behaviour
 
 - Syntax: `C=remncomm(A,EvecB,EvalB)`.
 - The function first validates its inputs via an internal consistency check (`grumble`).

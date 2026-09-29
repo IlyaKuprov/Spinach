@@ -9,7 +9,7 @@
 
 This is a simulated ultrafast diffusion-ordered NMR experiment for two coupled protons. It adds spatial flow and dipole-dipole (DD) and chemical-shift-anisotropy (CSA) relaxation to the diffusion encoding. The spin system is two 1H nuclei at 14.1 T, with chemical shifts 6.5 and 7.5 ppm and a 15 Hz scalar coupling. Each spin has a CSA tensor with eigenvalues [-10, -10, 20]; their listed Euler angles are [0, 0, 0] and [0, pi/2, 0]. The source lists spin coordinates [0, 0, 0] and [0, 0, 2.5] without stating coordinate units.
 
-The calculation uses the full sphten-liouv basis, the NMR assumption, Redfield relaxation with a 1.0e-9 s correlation time, secular retention, and zero equilibrium. The relaxation operator and initial/detection states are supplied as spatial phantoms: relaxation uses a uniform spatial profile, the initial state is longitudinal 1H magnetization, and detection is transverse 1H coherence. These are simulated states, not imported measurement data.
+The calculation uses the full sphten-liouv basis, the NMR assumption, Redfield relaxation with a 1.0e-9 s correlation time, secular retention, and zero equilibrium. The relaxation operator and initial/detection states are supplied as spatial phantoms: relaxation uses a uniform spatial profile, the initial state is longitudinal 1H magnetisation, and detection is transverse 1H coherence. These are simulated states, not imported measurement data.
 
 ## Spatial encoding and acquisition
 

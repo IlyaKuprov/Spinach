@@ -18,6 +18,6 @@ This is a Davies ENDOR simulation with explicit shaped electron and nuclear puls
 
 ## Output axis and numerical cautions
 
-answer has the same shape as parameters.n_frq; each entry is the coil signal with nuclear RF divided by the zero-power reference signal at that frequency. No example numeric RF frequency or pulse duration is given in the source, so none is invented here. Increase the electron and nuclear Fokker–Planck ranks and the spherical-grid size until the output converges, as the source notes. The function is an ENDOR spin-dynamics simulation; it does not calculate DNP/hyperpolarization, image encoding, or a field sweep.
+answer has the same shape as parameters.n_frq; each entry is the coil signal with nuclear RF divided by the zero-power reference signal at that frequency. No example numeric RF frequency or pulse duration is given in the source, so none is invented here. Increase the electron and nuclear Fokker–Planck ranks and the spherical-grid size until the output converges, as the source notes. The function is an ENDOR spin-dynamics simulation; it does not calculate DNP/hyperpolarisation, image encoding, or a field sweep.
 
 Source: https://spindynamics.org/wiki/index.php?title=endor_davies.m

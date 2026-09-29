@@ -6,7 +6,7 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_coop_
 
 Regression test for cooperative phase gradients and the initial gradient guard in Spinach's optimal control module. It verifies that the primary fidelity and the squared impurity penalty share one gradient, that the cooperative objective matches independent matrix propagation, and that the optimiser's assembled-initial-guess safeguards behave correctly.
 
-## Behavior
+## Behaviour
 
 - Creates a regression result via `new_test_result('kernel/coop_gradient','Cooperative phase gradients','The primary fidelity and squared impurity must share one gradient.')`.
 - Sets a small-system numerical environment: `spin_system.tols.liouv_zero=1e-14`, `spin_system.tols.small_matrix=64`, `spin_system.tols.dense_matrix=0.5`, `spin_system.tols.prop_chop=1e-14`, isotopes `{'1H'}`, and Pauli operators from `pauli(2)`.

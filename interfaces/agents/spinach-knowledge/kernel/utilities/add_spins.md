@@ -6,7 +6,7 @@ Reduces the direct product of two su(2) irreducible representations into a direc
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/add_spins.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `[mult,proj]=add_spins(spin_a,spin_b)`.
 - Validates both inputs through an internal consistency check (`grumble`): each must be numeric, real, scalar, at least `1/2`, and such that `2*spin+1` is an integer; otherwise an error is thrown (`'spin_a must be a positive integer or half-integer.'` / `'spin_b must be a positive integer or half-integer.'`).

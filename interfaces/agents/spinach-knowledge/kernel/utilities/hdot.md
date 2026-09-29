@@ -6,7 +6,7 @@
 
 `hdot.m` computes the Frobenius inner product of two matrices via a Hadamard (element-wise) route, serving as an efficient replacement for `trace(A'*B)`.
 
-## Behavior
+## Behaviour
 
 - The function evaluates `H = sum(conj(A).*B,'all')`, exploiting the identity `trace(A'*B) = sum(sum(conj(A).*B))`.
 - This approach requires only O(n^2) multiplications, compared to O(n^3) for the direct `trace(A'*B)` computation.

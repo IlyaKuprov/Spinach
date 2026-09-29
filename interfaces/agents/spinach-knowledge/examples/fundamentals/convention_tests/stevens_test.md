@@ -10,7 +10,7 @@ For spin quantum number 12 (multiplicity 25), the test compares Spinach's Steven
 
 ## Explicit-operator comparison
 
-The source obtains the Spinach matrices from `stevens(mult,k,q)` and builds the comparison matrices from `S=pauli(mult)` with `s=sqn*(sqn+1)`, using polynomials in `S.z`, powers of `S.p` and `S.m`, and symmetrized products through `acomm`. For example, at rank 2 it uses `O_2,0 = 3*S.z^2 - s*S.u` and `O_2,+2 = (S.p^2+S.m^2)/2`; the negative-q expression has the source's imaginary phase, `O_2,-2 = (S.p^2-S.m^2)/(2i)`. Thus the comparisons exercise both normalization and signed-component/phase conventions, rather than only the diagonal component.
+The source obtains the Spinach matrices from `stevens(mult,k,q)` and builds the comparison matrices from `S=pauli(mult)` with `s=sqn*(sqn+1)`, using polynomials in `S.z`, powers of `S.p` and `S.m`, and symmetrised products through `acomm`. For example, at rank 2 it uses `O_2,0 = 3*S.z^2 - s*S.u` and `O_2,+2 = (S.p^2+S.m^2)/2`; the negative-q expression has the source's imaginary phase, `O_2,-2 = (S.p^2-S.m^2)/(2i)`. Thus the comparisons exercise both normalisation and signed-component/phase conventions, rather than only the diagonal component.
 
 For each rank the code forms a vector of individual matrix 1-norm residuals, then applies MATLAB's default vector norm to that vector. The error thresholds are:
 

@@ -4,7 +4,7 @@
 
 Generates an exponential fall-off (drop) from a specified starting value to a specified ending value over a given duration, with a specified exponential rate and number of discretisation points.
 
-## Behavior
+## Behaviour
 
 - Syntax: `drop=expdrop(from,to,duration,npoints,drop_rate)`
 - The function first validates all inputs via an internal consistency-checking subfunction `grumble`, which errors out with descriptive messages if any argument fails its checks.

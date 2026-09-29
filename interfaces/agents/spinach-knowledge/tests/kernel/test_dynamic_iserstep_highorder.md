@@ -6,9 +6,9 @@
 
 Regression test for the nonlinear high-order `iserstep` branches. It checks zero-step handling, nonlinear generator execution, and agreement of the high-order Lie and RKMK branches against a refined Dormand–Prince 8th-order (DP8) reference on a compact Hilbert-space problem.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf` and initializes a regression test result via `new_test_result` for `kernel/dynamic_iserstep_highorder`, describing the requirement that high-order Lie and RKMK solvers execute nonlinear generators while preserving density-matrix invariants.
+- Announces the test target with `fprintf` and initialises a regression test result via `new_test_result` for `kernel/dynamic_iserstep_highorder`, describing the requirement that high-order Lie and RKMK solvers execute nonlinear generators while preserving density-matrix invariants.
 - Builds a one-proton Hilbert-space spin system using `local_hilb_system`, with Pauli operators `Sx`, `Sy`, `Sz` from `pauli(2)`.
 - Uses the Hermitian density matrix `rho = [0.7, 0.2+0.1i; 0.2-0.1i, 0.3]`, which has non-zero coherences.
 - Defines a mildly nonlinear, non-commuting Hamiltonian field:

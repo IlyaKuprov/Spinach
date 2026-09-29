@@ -6,14 +6,14 @@
 
 Returns a rotor stack of Liouvillians or Hamiltonians for the traditional style calculation of MAS (magic angle spinning) dynamics.
 
-## Behavior
+## Behaviour
 
 - Syntax: `L=rotor_stack(spin_system,parameters,assumptions)`.
 - Calls `grumble` to enforce consistency of the inputs, then applies the requested assumptions throughout the rotor and frame pipeline via `assume`.
 - Obtains the Hamiltonian (and its spherical-tensor interaction blocks `Q`) with `hamiltonian`, then applies transmitter offsets with `frqoffset`.
 - Derives the rotor axis orientation from `parameters.axis` via `cart2sph`, converting the polar angle with `rotor_theta=pi/2-rotor_theta`.
 - Computes rotor phases with `fourdif(2*parameters.max_rank+1,1)`, yielding `2*max_rank+1` rotor ticks.
-- For each rotor tick (parallelized with `parfor`), and for each spherical rank `r` in `Q`, builds Wigner rotations:
+- For each rotor tick (parallelised with `parfor`), and for each spherical rank `r` in `Q`, builds Wigner rotations:
   - `D_rot2lab=wigner(r,+rotor_phi,+rotor_theta,0)` and `D_lab2rot=wigner(r,0,-rotor_theta,-rotor_phi)` for the rotor axis tilt.
   - `D_initial=wigner(r,orientation(1),orientation(2),orientation(3))` for the initial crystallite orientation at rotor phase zero.
   - `D_rotor=wigner(r,0,0,rotor_phases(n))` for the rotor rotation.
@@ -41,7 +41,7 @@ Inputs:
 
 - `spin_system` — spin system object.
 - `parameters` — structure with subfields:
-  - `axis` — spinning axis, a normalized 3-element vector.
+  - `axis` — spinning axis, a normalised 3-element vector.
   - `offset` — cell array of transmitter offsets in Hz on each of the spins listed in `parameters.spins`.
   - `spins` — cell array of the spins the offsets refer to, e.g. `{'1H','13C'}`.
   - `max_rank` — maximum harmonic rank to retain in the solution (increase until convergence is achieved; approximately equal to the number of spinning sidebands in the spectrum).

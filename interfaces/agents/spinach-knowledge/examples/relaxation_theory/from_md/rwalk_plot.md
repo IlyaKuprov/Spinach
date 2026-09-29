@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Visualizes one sampled rotational random walk on the unit sphere. It is a trajectory illustration, not a relaxation-rate calculation or a statistical validation of the walk.
+Visualises one sampled rotational random walk on the unit sphere. It is a trajectory illustration, not a relaxation-rate calculation or a statistical validation of the walk.
 
 ## Sampling and plotting
 

@@ -4,9 +4,9 @@
 
 Regression test for the dynamic relaxation model helper functions in Spinach. The suite verifies that relaxation helpers assign mathematically expected rates on tiny spin systems, covering anisotropic and functional T1/T2 rates, damping, Lindblad relaxation, scalar Redfield, correlation functions, and the serial Redfield include.
 
-## Behavior
+## Behaviour
 
-The test announces its target with `TESTING: Dynamic relaxation model helpers` and initializes a regression test result via `new_test_result` under the name `kernel/dynamic_relaxation_models_suite`.
+The test announces its target with `TESTING: Dynamic relaxation model helpers` and initialises a regression test result via `new_test_result` under the name `kernel/dynamic_relaxation_models_suite`.
 
 It then performs the following checks, each appended to the result with explanatory messages:
 

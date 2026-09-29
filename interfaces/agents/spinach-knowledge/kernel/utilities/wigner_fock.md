@@ -12,7 +12,7 @@ W(alpha) = (2/pi) * trace(rho * D(alpha) * P * D(alpha)')
 
 where `D(alpha) = expm(alpha*a' - conj(alpha)*a)` is the displacement operator and `P = expm(1i*pi*a'*a)` is the photon number parity operator, both built from ladder operators truncated to the dimension of the density matrix.
 
-## Behavior
+## Behaviour
 
 - Syntax: `W = wigner_fock(rho, alpha)`.
 - The annihilation operator is constructed as `diag(sqrt(1:(nlevels-1)), 1)` and the parity operator as `diag((-1).^(0:(nlevels-1)))`, where `nlevels` is the dimension of `rho`.

@@ -10,6 +10,6 @@ Builds a balanced two-dimensional polar point set with a centre point and `ncirc
 
 ## Laplacian
 
-When the third output is requested, the points are converted to Cartesian coordinates and Delaunay-triangulated. Each triangulation edge receives weight `1/d^2`, where `d` is its endpoint distance. The symmetric graph Laplacian uses negative off-diagonal edge weights and positive diagonal row sums, then is divided by its matrix 2-norm and converted to sparse form. `L` is `N` by `N`, follows the point ordering above, and is dimensionless after this normalization.
+When the third output is requested, the points are converted to Cartesian coordinates and Delaunay-triangulated. Each triangulation edge receives weight `1/d^2`, where `d` is its endpoint distance. The symmetric graph Laplacian uses negative off-diagonal edge weights and positive diagonal row sums, then is divided by its matrix 2-norm and converted to sparse form. `L` is `N` by `N`, follows the point ordering above, and is dimensionless after this normalisation.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/grid_polar.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grid_polar.m)

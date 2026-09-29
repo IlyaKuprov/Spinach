@@ -5,9 +5,9 @@ Wiki: [Spinach documentation for cubic_interp.m](https://spindynamics.org/wiki/i
 
 ## Purpose
 
-Maximizes the cubic Hermite interpolant defined by two function values and their directional derivatives. The interpolation interval has boundaries <code>end_a</code> and <code>end_b</code>; the two anchor points are <code>alpha_a</code> and <code>alpha_b</code>, with values <code>f_a</code> and <code>f_b</code> and directional derivatives <code>dir_deriv_a</code> and <code>dir_deriv_b</code>.
+Maximises the cubic Hermite interpolant defined by two function values and their directional derivatives. The interpolation interval has boundaries <code>end_a</code> and <code>end_b</code>; the two anchor points are <code>alpha_a</code> and <code>alpha_b</code>, with values <code>f_a</code> and <code>f_b</code> and directional derivatives <code>dir_deriv_a</code> and <code>dir_deriv_b</code>.
 
-The routine normalizes the anchor coordinate using <code>s = (alpha-alpha_a)/(alpha_b-alpha_a)</code>, constructs the cubic from the two endpoint values and derivatives, and evaluates its real stationary points that lie within the normalized interval together with both interval boundaries. It returns the point with the largest interpolated value, transformed back to the <code>alpha</code> coordinate. The second output is the value of the cubic model at that point, not a new evaluation of the underlying objective. This helper returns no gradient or adjoint.
+The routine normalises the anchor coordinate using <code>s = (alpha-alpha_a)/(alpha_b-alpha_a)</code>, constructs the cubic from the two endpoint values and derivatives, and evaluates its real stationary points that lie within the normalised interval together with both interval boundaries. It returns the point with the largest interpolated value, transformed back to the <code>alpha</code> coordinate. The second output is the value of the cubic model at that point, not a new evaluation of the underlying objective. This helper returns no gradient or adjoint.
 
 ## Call and validated inputs
 

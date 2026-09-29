@@ -9,7 +9,7 @@ Construct the igloo spherical grid described in Appendix A.2 of [the cited paper
 ## Inputs and outputs
 
 - `n_long` must be a positive real integer. Despite the parameter name and help description, the implementation uses it as the number of beta rings, including both poles.
-- The outputs `alps`, `bets`, and `gams` are N-by-1 columns of Euler angles in radians; `alps` is zero. N is the total number of ring points. `whts` contains one normalized spherical-area weight per point, and `vorn` contains the Voronoi tessera vertex data.
+- The outputs `alps`, `bets`, and `gams` are N-by-1 columns of Euler angles in radians; `alps` is zero. N is the total number of ring points. `whts` contains one normalised spherical-area weight per point, and `vorn` contains the Voronoi tessera vertex data.
 
 ## Grid rule
 
@@ -17,4 +17,4 @@ The beta values are evenly spaced from 0 through pi: `beta_k=k*pi/(n_long-1)` fo
 
 ## Weights and plotting
 
-Voronoi weights are computed only when more than three outputs are requested or when there are no outputs. The Cartesian unit-sphere points are passed to `voronoisphere`, and its body-angle weights are divided by `4*pi` to normalize by the full sphere. A no-output call also plots the points and tessera using `grid_plot`.
+Voronoi weights are computed only when more than three outputs are requested or when there are no outputs. The Cartesian unit-sphere points are passed to `voronoisphere`, and its body-angle weights are divided by `4*pi` to normalise by the full sphere. A no-output call also plots the points and tessera using `grid_plot`.

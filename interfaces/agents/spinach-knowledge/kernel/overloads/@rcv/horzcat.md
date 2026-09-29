@@ -8,9 +8,9 @@
 
 Horizontally concatenates one or more RCV matrices as consecutive column blocks.
 
-## Storage and behavior
+## Storage and behaviour
 
-RCV stores row indices, column indices, and values in parallel arrays, with `numRows` and `numCols` recording the represented shape. The overload requires every argument to be an `rcv` object and all row counts to match; the implementation assumes at least one argument. If any operand has `isGPU=true`, it applies `gpuArray` to every operand, leaving already-GPU operands as they are. In the supplied left-to-right order, each operand's row indices and values are retained, while its column indices are increased by the cumulative widths of all preceding operands. The adjusted row, column, and value arrays are then eagerly concatenated, and `numCols` is set to the sum of the operand widths. The output is an RCV matrix with `numRows` rows and that total number of columns; its data remain in coordinate-array form rather than being materialized as a sparse or dense MATLAB matrix.
+RCV stores row indices, column indices, and values in parallel arrays, with `numRows` and `numCols` recording the represented shape. The overload requires every argument to be an `rcv` object and all row counts to match; the implementation assumes at least one argument. If any operand has `isGPU=true`, it applies `gpuArray` to every operand, leaving already-GPU operands as they are. In the supplied left-to-right order, each operand's row indices and values are retained, while its column indices are increased by the cumulative widths of all preceding operands. The adjusted row, column, and value arrays are then eagerly concatenated, and `numCols` is set to the sum of the operand widths. The output is an RCV matrix with `numRows` rows and that total number of columns; its data remain in coordinate-array form rather than being materialised as a sparse or dense MATLAB matrix.
 
 Values are concatenated unchanged: this overload does not conjugate them or provide scalar expansion/broadcasting. Non-RCV scalar operands fail the object-type check.
 

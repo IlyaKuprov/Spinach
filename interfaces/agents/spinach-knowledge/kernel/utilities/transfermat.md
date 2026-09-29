@@ -4,7 +4,7 @@
 
 Computes the transfer matrix of a linear filter from stacks of observed amplifier input and output vectors ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/transfermat.m)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `T=transfermat(amp_inps,amp_outs)`.
 - The function first runs a consistency check (`grumble`) on the two input stacks, then computes `T=amp_outs/amp_inps`, described in the header as the SVD pseudoinverse route.

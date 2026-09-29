@@ -24,7 +24,7 @@ The Liouville-space paths convert offsets using the reference g-factor and magne
 
 ## Model limits
 
-The source says R must not be thermalized for this calculation (`inter.equilibrium`='zero'). The supported formalisms are `sphten-liouv` and `zeeman-liouv`. The two solver choices in each method family are direct backslash and GMRES.
+The source says R must not be thermalised for this calculation (`inter.equilibrium`='zero'). The supported formalisms are `sphten-liouv` and `zeeman-liouv`. The two solver choices in each method family are direct backslash and GMRES.
 
 ## Source-coded numerical example
 

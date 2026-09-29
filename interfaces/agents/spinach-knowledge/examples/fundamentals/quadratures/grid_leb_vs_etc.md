@@ -15,7 +15,7 @@ Every profile is requested from `grid_test` for spherical-harmonic ranks `4:2:60
 - Stoll from `grid_trian('stoll',9)`, labelled 326 points.
 - ASG and SOPHE from `grid_trian` at level 9, each labelled 326 points.
 
-The non-Lebedev grid helpers provide angles and weights to the test; the source explicitly constructs and normalizes Voronoi weights for the repulsion case. The plot uses logarithmic integration-error axes, limits the displayed error range to `10^-16` through 1, and displays spherical rank from 0 to 64.
+The non-Lebedev grid helpers provide angles and weights to the test; the source explicitly constructs and normalises Voronoi weights for the repulsion case. The plot uses logarithmic integration-error axes, limits the displayed error range to `10^-16` through 1, and displays spherical rank from 0 to 64.
 
 ## Output and interpretation
 

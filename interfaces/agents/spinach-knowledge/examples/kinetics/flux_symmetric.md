@@ -6,7 +6,7 @@
 
 ## Purpose and model
 
-This is a two-site symmetric intermolecular magnetization-flux simulation for two `1H` environments. The source sets `sys.magnet=14.1`, scalar Zeeman values `{0.0,3.0}`, and equal directed `inter.chem.flux_rate` entries of 2000 from site 1 to site 2 and from site 2 to site 1, with `inter.chem.flux_type=intermolecular`. The initial state is the sum of site-1 and site-2 `L+` operators, each weighted by 1.0. Units for the field, scalar values, and flux-rate entries are not stated in this source and are not supplied here.
+This is a two-site symmetric intermolecular magnetisation-flux simulation for two `1H` environments. The source sets `sys.magnet=14.1`, scalar Zeeman values `{0.0,3.0}`, and equal directed `inter.chem.flux_rate` entries of 2000 from site 1 to site 2 and from site 2 to site 1, with `inter.chem.flux_type=intermolecular`. The initial state is the sum of site-1 and site-2 `L+` operators, each weighted by 1.0. Units for the field, scalar values, and flux-rate entries are not stated in this source and are not supplied here.
 
 ## Acquisition and observable
 

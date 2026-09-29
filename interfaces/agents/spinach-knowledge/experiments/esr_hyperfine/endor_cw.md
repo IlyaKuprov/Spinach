@@ -6,7 +6,7 @@ Signature: fid=endor_cw(spin_system,parameters,H,R,K)
 
 ## Purpose and physical meaning
 
-This routine is a fast approximate simulation of isotropic continuous-wave ENDOR. It models nuclear-spin response weighted by electron–nuclear hyperfine couplings; it returns a nuclear free-induction decay (FID), whose Fourier transform approximates a CW ENDOR spectrum. It is not a magnetic-field sweep: the supplied sweep is a nuclear-frequency sweep width. The routine does not model DNP, hyperpolarization, or spatial imaging.
+This routine is a fast approximate simulation of isotropic continuous-wave ENDOR. It models nuclear-spin response weighted by electron–nuclear hyperfine couplings; it returns a nuclear free-induction decay (FID), whose Fourier transform approximates a CW ENDOR spectrum. It is not a magnetic-field sweep: the supplied sweep is a nuclear-frequency sweep width. The routine does not model DNP, hyperpolarisation, or spatial imaging.
 
 ## Inputs and required settings
 
@@ -17,7 +17,7 @@ This routine is a fast approximate simulation of isotropic continuous-wave ENDOR
 
 ## State preparation, propagation, and signal
 
-The routine forms L = H + 1i*R + 1i*K. For each electron–nucleus pair it computes the isotropic coupling amplitude from one third of the traces of the two coupling-matrix blocks, sums nuclear Lz states weighted by the absolute amplitudes, and normalizes the resulting initial state. A nuclear Sy pulse of pi/2 radians excites the nuclei. Detection uses the nuclear L+ state. Propagation uses a dwell time of 1/sweep and npoints-1 further points; the routine returns the real part of the FID for frequency symmetrization.
+The routine forms L = H + 1i*R + 1i*K. For each electron–nucleus pair it computes the isotropic coupling amplitude from one third of the traces of the two coupling-matrix blocks, sums nuclear Lz states weighted by the absolute amplitudes, and normalises the resulting initial state. A nuclear Sy pulse of pi/2 radians excites the nuclei. Detection uses the nuclear L+ state. Propagation uses a dwell time of 1/sweep and npoints-1 further points; the routine returns the real part of the FID for frequency symmetrisation.
 
 The numerical constants in the implementation are the pi/2 nuclear rotation and the sampling relation dt=1/sweep; the source does not provide a worked numeric sweep-width example. The returned value is simulated, not measured.
 

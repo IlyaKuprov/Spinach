@@ -6,7 +6,7 @@
 
 Regression test suite covering "difficult" dynamic coverage for Spinach include scripts, integrity utilities, and the MEX compiler helper. It exercises host-specific parallelisation overrides in `autoexec.m`, GPU guard includes, parallel profiler includes, serial and asynchronous Redfield integral includes, the integrity utilities `existentials`, `exorcise`, `patrol`, `rearm`, `sniff`, and `smack`, and `compile_mex.m`. The suite is designed to avoid touching production tests, production code, shipped build outputs, and repository state: it uses direct include execution, read-only integrity probes, and temporary-directory fixtures for mutating integrity and MEX helpers.
 
-## Behavior
+## Behaviour
 
 The main function announces the test target, initialises a test result via `new_test_result` with the name `kernel/dynamic_integrity_includes_mex` and the description "Dynamic integrity, include, and MEX helper coverage", then locates the canonical subtrees `kernel/includes`, `kernel/integrity`, and `etc/mex` relative to the Spinach root (three `fileparts` levels above the test file).
 

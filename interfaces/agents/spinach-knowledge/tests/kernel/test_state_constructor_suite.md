@@ -6,7 +6,7 @@ Regression test suite for Spinach state-constructor helper functions. It verifie
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_state_constructor_suite.m
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: State-constructor functions\n')` and initialises a test result object via `new_test_result('kernel/state_constructor_suite', ...)`.
 - **One-spin unit and thermal states**: builds a single `1H` spin system with zero scalar Zeeman interaction and `inter.temperature=300`.

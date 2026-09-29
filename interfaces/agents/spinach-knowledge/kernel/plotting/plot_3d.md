@@ -22,7 +22,7 @@ The 3D panel uses `meshgrid(axis_f2,axis_f1,axis_f3)`, so its X, Y, and Z coordi
 
 The function uses a 2-by-2 subplot layout; the first panel is created with `'replace'`. It makes the 3D axes square, boxed, gridded, reverses X/Y/Z directions, sets a camera position from the axis extents, and labels the axes. The projection panels are square and gridded with reversed X/Y directions. Finally, it sets the current figure position to `[100 100 2*default_width 2*default_height]`. It returns no value.
 
-The local guards require a real numeric 3D cube; three-element offsets, sweeps, point counts, zero-fill sizes, and spin entries; finite positive integer point-count and zero-fill vectors; and a spectrum shape matching `parameters.zerofill`. Units must be a character string recognized as `'ppm'`, `'Hz'`, or `'Gauss'`; `nsurf` and `k` must be positive integers and `delta` must contain four real values from 0 to 1.
+The local guards require a real numeric 3D cube; three-element offsets, sweeps, point counts, zero-fill sizes, and spin entries; finite positive integer point-count and zero-fill vectors; and a spectrum shape matching `parameters.zerofill`. Units must be a character string recognised as `'ppm'`, `'Hz'`, or `'Gauss'`; `nsurf` and `k` must be positive integers and `delta` must contain four real values from 0 to 1.
 
 ## References
 

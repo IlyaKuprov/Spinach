@@ -4,7 +4,7 @@
 
 ## What it demonstrates
 
-A no-argument Hamiltonian illustration of how two electron-spin energy levels change from a Zeeman-dominated regime toward exchange-dominated mixing. The function deliberately exaggerates the g-factor difference to make the crossover visible; it is a spectrum/energy-diagram calculation, not a DNP polarization simulation.
+A no-argument Hamiltonian illustration of how two electron-spin energy levels change from a Zeeman-dominated regime toward exchange-dominated mixing. The function deliberately exaggerates the g-factor difference to make the crossover visible; it is a spectrum/energy-diagram calculation, not a DNP polarisation simulation.
 
 ## Setup and model
 
@@ -14,8 +14,8 @@ Spinach builds the system and basis, then constructs the lab-frame Hamiltonian `
 
 ## Sweep and output
 
-The source defines `omega_e=sys.magnet*spin('E')` and samples `omega_j` at 1000 evenly spaced points from `-3*omega_e` to `+3*omega_e`. At each point it diagonalizes `Hz-omega_j*Lj`, sorts the eigenvalues, and stores the sorted energies. The plot scales both axes by `omega_e`: horizontal `omega_j/omega_e`, vertical `omega/omega_e`. Only a figure is created; the energy matrix is not returned or written to disk.
+The source defines `omega_e=sys.magnet*spin('E')` and samples `omega_j` at 1000 evenly spaced points from `-3*omega_e` to `+3*omega_e`. At each point it diagonalises `Hz-omega_j*Lj`, sorts the eigenvalues, and stores the sorted energies. The plot scales both axes by `omega_e`: horizontal `omega_j/omega_e`, vertical `omega/omega_e`. Only a figure is created; the energy matrix is not returned or written to disk.
 
-**Source-specific clarification:** the sweep diagonalizes an exchange-perturbed Hamiltonian directly and sorts eigenvalues independently at each point; it does not track eigenvectors/state identity through crossings. This makes it suitable for viewing the spectrum envelope/crossing structure, not for assigning continuous state labels from line order.
+**Source-specific clarification:** the sweep diagonalises an exchange-perturbed Hamiltonian directly and sorts eigenvalues independently at each point; it does not track eigenvectors/state identity through crossings. This makes it suitable for viewing the spectrum envelope/crossing structure, not for assigning continuous state labels from line order.
 
 **Caveats:** no relaxation, microwave irradiation, or proton is included. The deliberately large g-factor contrast is pedagogical, not an experimental parameter set.

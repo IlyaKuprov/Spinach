@@ -4,7 +4,7 @@ Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/mai
 
 Signature: `spectrum=overtone_pa(spin_system,parameters,H,R,K)`.
 
-## Behavior
+## Behaviour
 
 This is an overtone soft-pulse/acquire wrapper. It obtains the source-defined reference frequency, lifts the supplied quadrupolar-channel `Lx` operator across `spc_dim`, applies one pulse to `rho0`, then calls `overtone_a` with the original `H`, `R`, and `K`. The pulse evolution combines the supplied Hamiltonian, relaxation, and kinetics as `H+1i*R+1i*K`.
 

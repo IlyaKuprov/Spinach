@@ -10,4 +10,4 @@
 
 After creating or updating the Z-axis label, it obtains the current axes with `gca` and sets `TickLabelInterpreter` to `latex` and `FontSize` to `12`. These are effects on the current axes, in addition to the Z-label update. It does not change axis limits, tick values, plotted data, or colormaps, and performs no plotting or physical calculation.
 
-This function defines no axis-unit formula, `nfft` or dwell-time behavior, data-array or coordinate shape, or default bounds. Errors and accepted label arguments are governed by MATLAB's `zlabel` and graphics property handling; this source adds no explicit validation guard.
+This function defines no axis-unit formula, `nfft` or dwell-time behaviour, data-array or coordinate shape, or default bounds. Errors and accepted label arguments are governed by MATLAB's `zlabel` and graphics property handling; this source adds no explicit validation guard.

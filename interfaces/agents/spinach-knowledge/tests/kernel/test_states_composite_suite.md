@@ -11,7 +11,7 @@ Regression test suite for the composite state generators in `kernel/states`. The
 - Four-spin product states.
 - Partner-state enumeration.
 
-## Behavior
+## Behaviour
 
 The function announces the test target with `fprintf('TESTING: Composite state generators\n')` and initialises a regression test result via `new_test_result('kernel/states_composite_suite', 'Composite state generators', 'state helper functions must produce the textbook density operators.')`.
 

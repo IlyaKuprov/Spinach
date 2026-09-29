@@ -6,13 +6,13 @@
 
 Liouvillian path tracing. Treats the user-supplied Liouvillian as the adjacency matrix of a graph, computes the weakly connected subgraphs of that graph and returns a cell array of projectors into independently evolving populated subspaces.
 
-## Behavior
+## Behaviour
 
 - Syntax: `projectors=path_trace(spin_system,L,rho)`.
 - Input consistency is enforced by an internal `grumble` subfunction: both `L` and `rho` must be numeric, `L` must be square, and if `rho` is non-empty its row count must match the column count of `L`.
 - If `'pt'` appears in `spin_system.sys.disable`, path tracing is disabled and a unit projector `{1}` is returned after a warning.
 - If `size(L,2)` is smaller than `spin_system.tols.merge_dim`, path tracing is skipped and a unit projector `{1}` is returned.
-- The connectivity matrix is built as `G=(abs(L)>spin_system.tols.liouv_zero)`, then symmetrized with its transpose and combined with the identity so isolated states are not lost: `G=or(G,transpose(G)); G=or(G,speye(size(G)))`.
+- The connectivity matrix is built as `G=(abs(L)>spin_system.tols.liouv_zero)`, then symmetrised with its transpose and combined with the identity so isolated states are not lost: `G=or(G,transpose(G)); G=or(G,speye(size(G)))`.
 - Weakly connected subgraphs are obtained with `scomponents(G)`; the number of subspaces is `max(member_states)`.
 - If `rho` is non-empty, subspace population screening runs in a `parfor` loop using `spin_system.tols.subs_drop`:
   - For the `'sphten-liouv'` and `'zeeman-liouv'` formalisms (Liouville space, state vectors), a subspace is important when `norm(rho.*(member_states==n),1)>tolerance`.

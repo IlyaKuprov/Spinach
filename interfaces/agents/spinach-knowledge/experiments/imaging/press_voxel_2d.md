@@ -6,9 +6,9 @@ Source: [MATLAB on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/exper
 
 ## Purpose and inputs
 
-A parameterized 2D PRESS voxel-selection diagnostic, called from `imaging()` with the spatially resolved `H`, `R`, `K`, `G`, and `F` inputs. `parameters.ss_grad_amp` supplies two slice-gradient amplitudes in T/m. `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank` are cell arrays with two entries, one per slice pulse: RF-frequency vectors in Hz, RF-amplitude vectors in rad/s, duration vectors in seconds, pulse phases at time zero (units are not specified by the source), and maximum Fokker–Planck pulse-operator ranks (2 is noted as usually sufficient), respectively. `parameters.spins{1}` identifies the selected spin; `parameters.npts` sets the spatial grid dimensions.
+A parameterised 2D PRESS voxel-selection diagnostic, called from `imaging()` with the spatially resolved `H`, `R`, `K`, `G`, and `F` inputs. `parameters.ss_grad_amp` supplies two slice-gradient amplitudes in T/m. `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank` are cell arrays with two entries, one per slice pulse: RF-frequency vectors in Hz, RF-amplitude vectors in rad/s, duration vectors in seconds, pulse phases at time zero (units are not specified by the source), and maximum Fokker–Planck pulse-operator ranks (2 is noted as usually sufficient), respectively. `parameters.spins{1}` identifies the selected spin; `parameters.npts` sets the spatial grid dimensions.
 
-The source forms `L=H+F+1i*R+1i*K` and accepts `sphten-liouv` or `zeeman-liouv` formalism. It initializes a uniform `Lz` state across `prod(parameters.npts)` spatial points. This is a simulated diagnostic setup, not a measured initial profile.
+The source forms `L=H+F+1i*R+1i*K` and accepts `sphten-liouv` or `zeeman-liouv` formalism. It initialises a uniform `Lz` state across `prod(parameters.npts)` spatial points. This is a simulated diagnostic setup, not a measured initial profile.
 
 ## Sequence and returned data
 

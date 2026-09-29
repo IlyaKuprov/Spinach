@@ -13,7 +13,7 @@ dx=fdvec(x,npoints,order) differentiates a numeric row or column vector with a f
 
 ## Stencils and coordinate units
 
-For each element near the left edge, fdweights supplies weights evaluated at that element's position among the first npoints samples. The opposite edge uses the reversed weights multiplied by (-1)^order. Between these edges, a centered stencil uses offsets from -(npoints-1)/2 through (npoints-1)/2.
+For each element near the left edge, fdweights supplies weights evaluated at that element's position among the first npoints samples. The opposite edge uses the reversed weights multiplied by (-1)^order. Between these edges, a centred stencil uses offsets from -(npoints-1)/2 through (npoints-1)/2.
 
 fdvec has no sample-spacing input: the positions passed to fdweights are integer sample indices, so the returned derivative is with respect to that unit-spaced index. It does not impose periodic boundary conditions; the end points are evaluated with sided stencils. For non-unit physical spacing, the caller must account for the corresponding coordinate scaling.
 

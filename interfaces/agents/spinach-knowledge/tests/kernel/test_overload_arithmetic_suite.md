@@ -6,9 +6,9 @@
 
 Regression test for the "cheap" overload arithmetic in Spinach covering cell arrays, structs, RCV sparse storage, and polyadic classes. The test verifies that these overloaded operations match explicit Matlab matrix arithmetic on small examples.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Cheap overload arithmetic\n')` and initializes a test result object via `new_test_result` with suite name `kernel/overload_arithmetic_suite`, description `Cheap overload arithmetic`, and the message `cell, struct, RCV, and polyadic overloads must match explicit Matlab arithmetic on small examples.`
+The function announces the test target with `fprintf('TESTING: Cheap overload arithmetic\n')` and initialises a test result object via `new_test_result` with suite name `kernel/overload_arithmetic_suite`, description `Cheap overload arithmetic`, and the message `cell, struct, RCV, and polyadic overloads must match explicit Matlab arithmetic on small examples.`
 
 Each check is performed with `test_close`, which appends pass/fail results and explanatory messages to the returned result object.
 

@@ -4,9 +4,9 @@
 
 Regression test suite for Spinach coordinate and tensor transformation functions. The suite verifies that transformation helpers preserve rotations, coordinates, and tensor decompositions, using exact geometrical identities, algebraic inverses, and known tensor decompositions.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, then initializes a regression test result object via `new_test_result` with the identifier `kernel/transform_roundtrip_suite`, the description "Coordinate and tensor transform functions", and the requirement that "transform helpers must preserve rotations, coordinates, and tensor decompositions". Each check is registered through `test_close`, which compares computed values against references at tight tolerances (mostly `1e-14`, spherical tensor round-trip at `1e-13`) and appends explanatory messages to the result.
+The function announces the test target with `fprintf`, then initialises a regression test result object via `new_test_result` with the identifier `kernel/transform_roundtrip_suite`, the description "Coordinate and tensor transform functions", and the requirement that "transform helpers must preserve rotations, coordinates, and tensor decompositions". Each check is registered through `test_close`, which compares computed values against references at tight tolerances (mostly `1e-14`, spherical tensor round-trip at `1e-13`) and appends explanatory messages to the result.
 
 Checks performed:
 

@@ -6,9 +6,9 @@
 
 Regression test for the compact `imaging()` and `meshflow()` context hand-off paths. It verifies that both contexts assemble finite, correctly sized generators and phantom-derived initial and detection states, and that spatial flow is conserved.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf` and initializes a test result via `new_test_result` under the identifier `kernel/dynamic_fp_contexts`, describing the requirement that `imaging()` and `meshflow()` assemble context generators and phantom states with conserved spatial flow.
+- Announces the test target with `fprintf` and initialises a test result via `new_test_result` under the identifier `kernel/dynamic_fp_contexts`, describing the requirement that `imaging()` and `meshflow()` assemble context generators and phantom states with conserved spatial flow.
 - Runs two subtests: `local_test_imaging` (Cartesian-grid imaging context) and `local_test_meshflow` (unstructured-mesh flow context).
 
 ### Imaging subtest

@@ -8,7 +8,7 @@
 
 Maps total-angular-momentum rank `L` and projection `M` to a zero-based linear index for spin-state labels. Indices are ordered by increasing rank, and within each rank by decreasing projection. Thus (0,0) maps to 0, (1,1) to 1, and (1,0) to 2.
 
-This is an indexing conversion only: it does not construct or change a spin state, operator, Hamiltonian, or interaction. Its scope is the (L,M) labeling convention; it does not impose a particular Hamiltonian formalism or physical units.
+This is an indexing conversion only: it does not construct or change a spin state, operator, Hamiltonian, or interaction. Its scope is the (L,M) labelling convention; it does not impose a particular Hamiltonian formalism or physical units.
 
 ## Mapping and guards
 

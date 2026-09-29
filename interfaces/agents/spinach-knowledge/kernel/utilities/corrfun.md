@@ -6,7 +6,7 @@ Computes the Wigner matrix element correlation function under isotropic, axial, 
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/corrfun.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `[weights,rates,states]=corrfun(spin_system,n,k,m,p,q)`.
 - The rotational diffusion model is selected per chemical species from the number of elements in `spin_system.rlx.tau_c{s}`:

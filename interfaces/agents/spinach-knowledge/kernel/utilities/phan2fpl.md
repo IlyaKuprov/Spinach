@@ -4,7 +4,7 @@
 
 Projects a spatial intensity distribution (a phantom) into Fokker–Planck space, using the phantom as the image painted by the supplied spin state. The function is documented as part of the Spinach library and referenced from the Spin Dynamics Wiki.
 
-## Behavior
+## Behaviour
 
 - The function first validates its inputs via an internal consistency check (`grumble`).
 - The phantom array is stretched into a column vector with `phan(:)` and combined with the spin state vector using the Kronecker product: `rho = kron(phan(:), rho)`.

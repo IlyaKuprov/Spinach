@@ -6,7 +6,7 @@
 
 Transforms a laboratory-frame Hamiltonian into the interaction representation with respect to a specified Hamiltonian, to a specified order in perturbation theory, following the auxiliary matrix method described in [https://doi.org/10.1063/1.4928978](https://doi.org/10.1063/1.4928978).
 
-## Behavior
+## Behaviour
 
 - Syntax: `Hr=intrep(spin_system,H0,H,T,order)`.
 - Validates consistency: `H` and `H0` must be Hermitian; `order` must be a non-negative integer or `Inf`.
@@ -17,7 +17,7 @@ Transforms a laboratory-frame Hamiltonian into the interaction representation wi
   - `order=0`: shortcut for high field, `Hr=H-H0`.
   - `order=Inf`: shortcut for infinite order, `Hr=(1i/T)*logm(expm(full(-1i*H*T)))`.
   - Otherwise: computes derivatives via `dirdiff(spin_system,H0,H-H0,T,order+1)`, forms the first term `Hr=(1i/T)*(D{1}'*D{2})`, and adds the remaining series terms `Hr=Hr+(1i/T)*nchoosek(n-1,k-1)*D{n-k+1}'*D{k+1}/factorial(n)` for `n=2:order`, `k=1:n`.
-- Symmetrizes and cleans the output: `Hr=clean_up(spin_system,(Hr+Hr')/2,spin_system.tols.liouv_zero)`.
+- Symmetrises and cleans the output: `Hr=clean_up(spin_system,(Hr+Hr')/2,spin_system.tols.liouv_zero)`.
 - Reports matrix density statistics: dimension, number of nonzeros (`nnz`), density percentage, and sparsity flag (`issparse`).
 - The source notes that the auxiliary matrix method is massively faster than either commutator series or diagonalisation.
 

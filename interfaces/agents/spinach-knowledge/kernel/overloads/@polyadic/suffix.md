@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Adds a right-boundary factor to a factorized polyadic representation. The operation edits its stored factors; it does not expand the represented matrix.
+Adds a right-boundary factor to a factorised polyadic representation. The operation edits its stored factors; it does not expand the represented matrix.
 
 ## Representation and operator order
 
@@ -22,6 +22,6 @@ For scalar `a`, no suffix cell is added: the scalar eagerly left-multiplies the 
 - `a` is classified by `isscalar(a)`. For a non-scalar, a row-dimension mismatch raises `matrix dimension mismatch.`; otherwise the factor is appended.
 - Returns the updated `p`. The method does not add a separate explicit check of `a`'s type.
 
-## Materialization
+## Materialisation
 
 Scalar absorption eagerly scales each term's final stored core matrix. A non-scalar factor is retained in the suffix chain, so this overload does not form a dense polyadic matrix.

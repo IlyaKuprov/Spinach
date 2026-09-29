@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Checks selected structural and dimension invariants of a factorized polyadic; it does not construct or materialize the represented matrix and has no output argument.
+Checks selected structural and dimension invariants of a factorised polyadic; it does not construct or materialise the represented matrix and has no output argument.
 
 ## Storage checks
 

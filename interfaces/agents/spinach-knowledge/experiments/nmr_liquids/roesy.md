@@ -6,7 +6,7 @@
 
 Phase-sensitive homonuclear ROESY under the source's ideal-spin-lock model. The routine forms `L = H + 1i*R + 1i*K`, applies a `pi/2` pulse about `Lx` on the working spin to `parameters.rho0`, and records its F1 trajectory. The analytical spin-lock operator generates separate cosine and sine branches. During `parameters.tmix`, each branch evolves under `1i*R + 1i*K` (not `H`); F2 acquisition then uses the full `L` and detects `L+` on the same spin. The code does not insert a coherence-order selection step. It returns `fid.cos` and `fid.sin` for hypercomplex processing, each with F1-by-F2 shape `npoints(1) × npoints(2)`.
 
-This idealized model does not represent finite RF amplitude, RF offset, Hartmann-Hahn matching errors, or explicit RF phase transients.
+This idealised model does not represent finite RF amplitude, RF offset, Hartmann-Hahn matching errors, or explicit RF phase transients.
 
 ## Inputs
 

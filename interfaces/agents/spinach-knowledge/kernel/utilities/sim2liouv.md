@@ -6,7 +6,7 @@
 
 Moves a zeeman-hilb simulation context into Liouville space. When the formalism specified in the spin system object is `zeeman-hilb`, this function projects the evolution generators into Liouville space, converts the standard state-like and operator-like fields of the parameters structure, rebuilds the basis index table, migrates the symmetry irrep projectors into the adjoint representation, and sets the formalism to `zeeman-liouv`. For all other formalisms, every argument is returned unchanged. This makes Liouville-space pulse sequences callable with zeeman-hilb inputs.
 
-## Behavior
+## Behaviour
 
 - Calls `grumble` to enforce consistency: the formalism in `spin_system.bas.formalism` must be one of `sphten-liouv`, `zeeman-liouv`, `zeeman-hilb`, or `zeeman-wavef`; `parameters` must be a structure; `H`, `R`, and `K` must be numeric arrays.
 - Only proceeds when the formalism is `zeeman-hilb`; otherwise all arguments are returned unchanged.

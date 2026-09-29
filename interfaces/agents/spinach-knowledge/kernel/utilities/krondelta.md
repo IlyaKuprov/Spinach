@@ -6,7 +6,7 @@
 
 Computes the Kronecker symbol (Kronecker delta) for two integers, returning a logical value indicating whether the two inputs are equal.
 
-## Behavior
+## Behaviour
 
 - Syntax: `d=krondelta(a,b)`.
 - The function first calls an internal consistency check (`grumble`) on both inputs.

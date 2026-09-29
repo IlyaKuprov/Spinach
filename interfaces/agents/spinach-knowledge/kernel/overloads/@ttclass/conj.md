@@ -13,7 +13,7 @@ In this `ttclass` storage, `tt.cores` is an `ncores`-by-`ntrains` cell array. Co
 
 `tt=conj(tt)`
 
-## Behavior
+## Behaviour
 
 The function loops over every train and core and applies complex conjugation elementwise to each core, then applies complex conjugation to the coefficient array. It changes no core ordering, bond ranks, physical mode sizes, train count, or matrix/vector dimensions; the output has the same tensor-train layout.
 

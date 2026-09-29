@@ -14,7 +14,7 @@ The imaging Liouvillian combines the Hamiltonian, flow, relaxation, and diffusio
 
 ## RF preparation and singlet conversion
 
-The excitation uses a Gaussian amplitude shape with 25 steps over 2 ms, a 2 kHz pulse frequency, and phase pi/2. Each step lasts 80 microseconds; the amplitude table is 2*pi*100 times the normalized Gaussian shape. shaped_pulse_af applies the pulse with the x-gradient term. The resulting transverse-magnetisation state is saved before conversion.
+The excitation uses a Gaussian amplitude shape with 25 steps over 2 ms, a 2 kHz pulse frequency, and phase pi/2. Each step lasts 80 microseconds; the amplitude table is 2*pi*100 times the normalised Gaussian shape. shaped_pulse_af applies the pulse with the x-gradient term. The resulting transverse-magnetisation state is saved before conversion.
 
 The M2S block uses J = 55 and delta-v = 6 to set its free-evolution interval and number of repeated blocks: m1 is floor(pi*J/(2*delta_v)), incremented by one if odd. Alternating free evolution under the Hamiltonian with x rotations produces the singlet-order state used for the second image. The source also propagates the saved transverse-magnetisation state as a comparison.
 

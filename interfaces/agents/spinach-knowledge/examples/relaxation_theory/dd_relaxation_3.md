@@ -16,7 +16,7 @@ Both systems are evaluated at `sys.magnet = 14.1`, with the spins at `[0 0 0]` a
 
 ## Calculation and interpretation
 
-For each isotope pair the function builds the system and basis, constructs `R=relaxation(spin_system)`, forms the normalized longitudinal state `rho=state(spin_system,{'Lz'},{1})`, and obtains the scalar `rho'*R*rho`. It prints the ratio `R1pp/R1pd` and the textbook comparison
+For each isotope pair the function builds the system and basis, constructs `R=relaxation(spin_system)`, forms the normalised longitudinal state `rho=state(spin_system,{'Lz'},{1})`, and obtains the scalar `rho'*R*rho`. It prints the ratio `R1pp/R1pd` and the textbook comparison
 
 `[((1/2)(1/2+1))/(1(1+1))] * [spin('1H')/spin('2H')]^2`.
 

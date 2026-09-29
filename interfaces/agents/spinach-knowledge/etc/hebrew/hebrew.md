@@ -12,9 +12,9 @@ The source documents `hebrew()`, `hebrew(mode)`, `ncards=hebrew(mode,max_cards)`
 
 Place the vocabulary workbooks beside `hebrew.m`. The source names these files: `nouns.xlsx`, `adjectives.xlsx`, `verbs.xlsx`, `adverbs.xlsx`, `directions.xlsx`, `greetings.xlsx`, `languages.xlsx`, `numbers.xlsx`, `particles.xlsx`, `phrases.xlsx`, `prepositions.xlsx`, `pronouns.xlsx`, `proper_nouns.xlsx`, `quantifiers.xlsx`, `sex_terms.xlsx`, `weekdays.xlsx`, and `question_words.xlsx`. Each workbook's first column is the English prompt. Noun-like workbooks use English, masculine singular, feminine singular, masculine plural, feminine plural, invariant, and notes columns; adjectives omit invariant; verbs use English, infinitive, masculine singular, feminine singular, masculine plural, feminine plural, and notes.
 
-The loader creates one card for each nonempty English/form pair only when that form contains at least one Hebrew Unicode character (U+0590–U+05FF). It records the source word class and grammatical-form name with each card. Empty input after filtering is an error. Thus preserve actual Hebrew Unicode in spreadsheet cells; this function does not translate, transliterate, or synthesize vocabulary. The MATLAB source itself contains no Hebrew vocabulary strings, so examples or translations cannot be recovered from it.
+The loader creates one card for each nonempty English/form pair only when that form contains at least one Hebrew Unicode character (U+0590–U+05FF). It records the source word class and grammatical-form name with each card. Empty input after filtering is an error. Thus preserve actual Hebrew Unicode in spreadsheet cells; this function does not translate, transliterate, or synthesise vocabulary. The MATLAB source itself contains no Hebrew vocabulary strings, so examples or translations cannot be recovered from it.
 
-## Quiz behavior and limits
+## Quiz behaviour and limits
 
 - `"forward"` shows English first and reveals Hebrew after Enter; `"backward"` shows Hebrew first and reveals English. The English side includes source class and form.
 - `"both"` chooses a direction randomly for each card. In console mode the cards are shuffled, then reshuffled after a full pass; an open-ended run ends with Ctrl+C. `max_cards` limits the console run.

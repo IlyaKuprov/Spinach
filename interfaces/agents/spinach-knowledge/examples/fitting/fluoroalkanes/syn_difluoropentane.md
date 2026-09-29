@@ -12,7 +12,7 @@ The entry point loads `syn_dfp_fluorine.mat`, `syn_dfp_proton_a.mat`, and `syn_d
 
 ## Spin system and simulation
 
-The model has ten `1H` and two `19F` spins at `sys.magnet=11.7464`, with a Zeeman–Hilbert basis, no approximation, and `S3` symmetry for proton indices 1–3 and 10–12. Three `liquid`/`acquire` simulations observe 19F, 1H A (spins 4 and 8), and 1H B (spins 6 and 7), with no decoupling. The source sets their offset/sweep/point-count/zero-fill tuples to (−81655, 300, 512, 2048), (2426, 128, 256, 1024), and (986, 350, 512, 2048), respectively; axes are labeled ppm. Fixed Gaussian apodisation arguments are 7, 7, and 6 for the channels, with fitted scale factors applied before Fourier transformation. The theoretical spectra are converted to ppm and interpolated to their experimental axes with `pchip`.
+The model has ten `1H` and two `19F` spins at `sys.magnet=11.7464`, with a Zeeman–Hilbert basis, no approximation, and `S3` symmetry for proton indices 1–3 and 10–12. Three `liquid`/`acquire` simulations observe 19F, 1H A (spins 4 and 8), and 1H B (spins 6 and 7), with no decoupling. The source sets their offset/sweep/point-count/zero-fill tuples to (−81655, 300, 512, 2048), (2426, 128, 256, 1024), and (986, 350, 512, 2048), respectively; axes are labelled ppm. Fixed Gaussian apodisation arguments are 7, 7, and 6 for the channels, with fitted scale factors applied before Fourier transformation. The theoretical spectra are converted to ppm and interpolated to their experimental axes with `pchip`.
 
 ## Entry point and output
 

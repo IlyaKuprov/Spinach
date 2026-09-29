@@ -6,10 +6,10 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_ctx_p
 
 Regression test that verifies the equivalence of the `powder()` and `crystal()` static simulation contexts at a single orientation. The test uses the `single_crystal` grid so that `powder()` and `crystal()` represent the same Euler orientation of the same anisotropic one-spin Hamiltonian.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Powder and crystal single orientation\n')`.
-- Initializes a regression test result via `new_test_result('kernel/ctx_powder_crystal', ...)`, stating that `powder()` with the `single_crystal` grid must match `crystal()`.
+- Initialises a regression test result via `new_test_result('kernel/ctx_powder_crystal', ...)`, stating that `powder()` with the `single_crystal` grid must match `crystal()`.
 - Builds a one-spin anisotropic Liouville-space spin system with `test_spin_system(sys,inter,bas)` using:
   - `sys.magnet=14.1`, `sys.isotopes={'1H'}`.
   - `inter.zeeman.eigs={[-2 -2 4]}`, `inter.zeeman.euler={[0 0 0]}`.

@@ -15,7 +15,7 @@ Sets up or removes Spinach directories on the active MATLAB path. The Spinach ro
 - `'add'`: preserve the existing MATLAB path, add those same Spinach trees at the beginning, then run `existentials` checks.
 - `'remove'`: remove those Spinach trees from the path and report the removal; it does not reset MATLAB's path or remove unrelated entries.
 
-An unrecognized style raises an error. Because the type check uses `ischar`, a MATLAB string scalar is not the documented character-array input.
+An unrecognised style raises an error. Because the type check uses `ischar`, a MATLAB string scalar is not the documented character-array input.
 
 ## Operational notes
 

@@ -2,7 +2,7 @@
 
 - Signature: `summary_rlx_t1_t2(spin_system,header)`
 
-## Behavior
+## Behaviour
 
 Prints one extended T1/T2 row per spin, listing index, isotope, stored `r1_rates{n}` and `r2_rates{n}`, and spin label. A scalar numeric rate appears in signed scientific notation with five decimal places; a nonscalar numeric rate appears as `anisotropic`; a nonnumeric rate appears as `orientation`. The routine performs no unit conversion.
 

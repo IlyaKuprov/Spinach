@@ -6,7 +6,7 @@
 
 Regression test for once-only thermalisation of additive SRSK (scalar-relaxation-of-the-second-kind) relaxation. The test verifies that SRSK adds zero-destination rates before final thermalisation, so that the total generator is thermalised exactly once.
 
-## Behavior
+## Behaviour
 
 The test builds a two-spin system (`1H`, `14N`) with a fast quadrupolar source (`r1`/`r2` rates of `1e5` rad/s) coupled to a proton via scalar coupling. The scalar coupling is swept over `100`, `-100`, and `0` Hz, covering positive, negative, and zero coupling. An oriented quadrupole interaction (Euler angles `[0.3 0.7 0.2]`) supplies a complex, noncommuting thermalisation Hamiltonian as a contrary control; the test asserts that this Hamiltonian has a non-negligible imaginary Frobenius norm and does not commute with the relaxation superoperator.
 

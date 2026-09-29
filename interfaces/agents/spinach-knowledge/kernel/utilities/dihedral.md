@@ -6,7 +6,7 @@ Computes the dihedral angle between vectors specified by four sets of atomic coo
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dihedral.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `phi=dihedral(A,B,C,D)`.
 - The function first validates its arguments via an internal consistency check (`grumble`), which errors with the message `'the arguments must be 3-element row vectors of real numbers.'` if any argument is non-numeric, non-real, does not contain exactly 3 elements, or is not a row vector.

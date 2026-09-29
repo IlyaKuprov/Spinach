@@ -4,10 +4,10 @@
 
 Regression test that verifies the powder averaging path in `powder()`: the default powder average must equal an explicit weighted summation of the individual orientation traces using the spherical grid weights.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Powder weighted sum path\n')`.
-- Initializes a regression test result via `new_test_result` with the identifier `kernel/ctx_powder_average`, the description `'Powder weighted sum path'`, and the specification `'powder() must sum orientation outputs with grid weights.'`.
+- Initialises a regression test result via `new_test_result` with the identifier `kernel/ctx_powder_average`, the description `'Powder weighted sum path'`, and the specification `'powder() must sum orientation outputs with grid weights.'`.
 - Builds a one-spin anisotropic Liouville-space spin system:
   - `sys.magnet = 14.1`
   - `sys.isotopes = {'1H'}`

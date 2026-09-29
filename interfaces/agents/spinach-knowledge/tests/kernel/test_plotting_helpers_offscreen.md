@@ -6,9 +6,9 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_plott
 
 Regression test for offscreen execution of Spinach plotting helpers. It exercises the plotting helpers under invisible figures and checks graphics object creation, axis sizes, returned data arrays, and figure helper side effects without relying on image comparison.
 
-## Behavior
+## Behaviour
 
-- Called as `result=test_plotting_helpers_offscreen()`; prints `TESTING: Offscreen plotting helpers` and initializes a test result named `kernel/plotting_helpers_offscreen` ("Offscreen plotting helpers") with the requirement that plotting helpers must create deterministic graphics objects under invisible offscreen figures.
+- Called as `result=test_plotting_helpers_offscreen()`; prints `TESTING: Offscreen plotting helpers` and initialises a test result named `kernel/plotting_helpers_offscreen` ("Offscreen plotting helpers") with the requirement that plotting helpers must create deterministic graphics objects under invisible offscreen figures.
 - Saves the root default figure visibility, sets `defaultFigureVisible` to `'off'`, and registers an `onCleanup` handler that closes all figures with force and restores the original visibility after success or failure.
 - Builds a minimal spin system via `local_plot_system` with isotopes `{'1H','13C','15N'}`, magnet field 14.1, empty `sys.disable`, and `sys.output` set to `'hush'`.
 - **House-style helpers** (`local_test_house_style`): creates a figure with `kfigure('Visible','off')` and checks the handle is valid and invisible; calls `scale_figure([1.25 0.75])` and verifies the figure width and height equal 1.25 and 0.75 times the root default figure position (tolerances 1e-12); plots a 3D line with `plot3`, then applies `kgrid`, `ktitle`, `kxlabel`, `kylabel`, `kzlabel`, and `klegend({'trace'})`; in a second subplot uses `imagesc(magic(3))` with `kcolourbar('intensity')` and `ksgtitle('helper grid')`; asserts at least two axes objects, a valid legend object, and exactly one colorbar object.

@@ -6,13 +6,13 @@
 
 ## Purpose
 
-This example checks selected phase-waveform derivatives from the phase-modulated GRAPE routine `grape_phase` against centered finite differences of its reported fidelity, using the rectangle integrator.
+This example checks selected phase-waveform derivatives from the phase-modulated GRAPE routine `grape_phase` against centred finite differences of its reported fidelity, using the rectangle integrator.
 
 ## Spin system and controls
 
 For each of `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, `dirdiff_test_system` supplies a test system and the operators `Sx`, `Sy`, `Sz`, `Lx`, `Ly`, and `H`. The control structure sets isotope `13C`, channel map `[1;1]`, drift `H`, controls `Lx` and `Ly`, initial states `{Sx Sy Sz}`, target states `{-Sz Sy Sx}`, and power levels `2*pi*linspace(50e3,70e3,10)`. It selects `method='lbfgs'`, `max_iter=1000`, empty plotting options, `integrator='rectangle'`, `pulse_dt=12.8e-6*ones(1,5)`, and fixed amplitudes `ones(1,5)`, then passes the system and controls through `optimcon`.
 
-The L-BFGS method and iteration limit are control settings here; the example does not run an optimization loop. It evaluates `grape_phase` directly on a random five-element phase waveform `randn(1,5)/3`. The analytical gradient is taken from the first fidelity component (`grad_anl(:,:,1)`).
+The L-BFGS method and iteration limit are control settings here; the example does not run an optimisation loop. It evaluates `grape_phase` directly on a random five-element phase waveform `randn(1,5)/3`. The analytical gradient is taken from the first fidelity component (`grad_anl(:,:,1)`).
 
 ## Finite-difference checks
 

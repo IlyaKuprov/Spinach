@@ -11,7 +11,7 @@ Calculates Wigner 3j-symbols of the form
 
 using the Spinach library's Clebsch-Gordan coefficient routine. Source: [kernel/utilities/wigner_3j.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/wigner_3j.m).
 
-## Behavior
+## Behaviour
 
 - Syntax: `w = wigner_3j(j1,m1,j2,m2,j3,m3)`.
 - The function first runs an internal consistency check (`grumble`) on all six arguments, then converts the requested 3j-symbol to a Clebsch-Gordan coefficient via

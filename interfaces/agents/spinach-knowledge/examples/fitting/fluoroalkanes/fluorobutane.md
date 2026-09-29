@@ -8,9 +8,9 @@
 
 Fit the source's proton and fluorine spectra by varying scalar couplings and one scale per nucleus. The source header calls the target “2-fluoropentane,” while the function and MAT-file names say “fluorobutane”; the code does not resolve that naming discrepancy. The paper DOI is [10.1021/acs.joc.4c00670](https://doi.org/10.1021/acs.joc.4c00670). The source estimates calculation time in hours.
 
-## Inputs and parameterization
+## Inputs and parameterisation
 
-The entry point loads `fluorobutane_fluorine.mat` (`spec_f`, `axis_f`) and `fluorobutane_proton.mat` (two proton spectra and axes, `spec_ch`/`axis_ch` and `spec_ch2`/`axis_ch2`). Each is normalized by its integral: the first proton segment to −1, the second to −2, and fluorine to −1; the proton segments are concatenated for fitting.
+The entry point loads `fluorobutane_fluorine.mat` (`spec_f`, `axis_f`) and `fluorobutane_proton.mat` (two proton spectra and axes, `spec_ch`/`axis_ch` and `spec_ch2`/`axis_ch2`). Each is normalised by its integral: the first proton segment to −1, the second to −2, and fluorine to −1; the proton segments are concatenated for fitting.
 
 `fminsearch` starts from `[23.9529 6.2219 7.4903 7.1692 4.9608 17.4939 26.2802 48.6869 -14.0924 1.8099 4.3571]`; parameters 1–9 set grouped H–H, H–F, and F–H scalar couplings, and parameters 10 and 11 scale the proton and fluorine simulations. It uses `MaxIter=5000` and unlimited function evaluations. The local objective is the sum of squared residual norms of the real proton and fluorine spectra.
 

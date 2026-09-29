@@ -13,8 +13,8 @@ Gradient intervals use `G{1}` and last `g_dur/2` each. The first pair uses the s
 
 - `rho0`: caller-prepared initial state; `coil`: detection state; `spins`: a one-element cell array naming the working spin.
 - `g_amp`: gradient amplitude, T/m; `g_dur`: gradient pulse width, s; `kappa`: dimensionless bipolar-gradient imbalance, with amplitude ratio `(1+kappa):(1-kappa)`.
-- `g_stab_del` and `del`: stabilization delay and diffusion interval, respectively, in seconds. The code rejects `del < 2*g_dur+4*g_stab_del`.
-- `dims`: sample size in m; `npts`: number of spatial discretization points. `diff` supplies spatially uniform diffusion coefficient/tensor data in m^2/s, or `dxx` supplies voxel-wise diffusion along the sample axis in m^2/s; provide exactly one of these alternatives.
+- `g_stab_del` and `del`: stabilisation delay and diffusion interval, respectively, in seconds. The code rejects `del < 2*g_dur+4*g_stab_del`.
+- `dims`: sample size in m; `npts`: number of spatial discretisation points. `diff` supplies spatially uniform diffusion coefficient/tensor data in m^2/s, or `dxx` supplies voxel-wise diffusion along the sample axis in m^2/s; provide exactly one of these alternatives.
 - `npoints`: number of acquired signal points; `sweep`: acquisition sweep width, Hz.
 - `H`, `R`, and `K`: Fokker–Planck Hamiltonian, relaxation, and kinetics superoperators; `G`: gradient superoperators; `F`: diffusion and flow superoperator. The function requires the `sphten-liouv` formalism.
 

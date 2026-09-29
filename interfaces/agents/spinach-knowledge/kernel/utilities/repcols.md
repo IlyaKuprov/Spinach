@@ -6,7 +6,7 @@ Replicates specified columns of a matrix or cell array a specified number of tim
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/repcols.m>
 
-## Behavior
+## Behaviour
 
 The function is called as `B=repcols(A,col_nums,rep_counts)`. It first runs a consistency check (`grumble`) on the inputs, then builds a replication map: a row vector of ones with one entry per column of `A`, where the entries at positions `col_nums` are set to the corresponding values of `rep_counts`. A column index vector is generated with `repelem(1:n,rep_map)`, where `n` is the number of columns of `A`, and the output is formed by indexing `A` with that column vector (`B=A(:,col_idx)`). Columns not listed in `col_nums` are kept exactly once; listed columns appear the number of times given by their replication count, in the order induced by the index vector.
 

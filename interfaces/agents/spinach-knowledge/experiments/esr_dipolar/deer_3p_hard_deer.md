@@ -16,7 +16,7 @@ Hard pulses are appropriate only for spin-1/2 systems in the source's stated con
 
 ## Output modes and detection
 
-Both modes return a structure containing `deer_trace`, the probe-coil-detected trace. The trace is normalized by the coil norm; the Hilbert-space branch evaluates a trace against `coil_prob`, while the other branch uses the coil projection directly.
+Both modes return a structure containing `deer_trace`, the probe-coil-detected trace. The trace is normalised by the coil norm; the Hilbert-space branch evaluates a trace against `coil_prob`, while the other branch uses the coil projection directly.
 
 For `output='detailed'`, also provide `ex_hard`, `spectrum_sweep` (EPR sweep width in Hz), `spectrum_nsteps` (FID sample count), and `coil_pump`. The structure then additionally contains `hard_pulse_fid`, `prob_pulse_fid`, and `pump_pulse_fid`, the FIDs after the corresponding nonselective, probe-selective, and pump-selective `pi/2` pulses. Their sampling interval is `1/spectrum_sweep`.
 

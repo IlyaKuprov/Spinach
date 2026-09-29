@@ -16,7 +16,7 @@ For each basis row `n`, the code identifies the host part from the spins active 
 
 ## Output and lifecycle
 
-`G` is a cell array with one matrix per listed reactant. Each member is an `nstates×nstates` complex sparse matrix, where `nstates=size(spin_system.bas.basis,1)`. The stored coefficients are dimensionless `-1/+1` generator entries; a reaction rate is not an input to this function and must be applied by the caller. There is no normalization step. The routine collects drain/fill indices in parallel, removes unused rows, and assembles each reactant's sparse matrix.
+`G` is a cell array with one matrix per listed reactant. Each member is an `nstates×nstates` complex sparse matrix, where `nstates=size(spin_system.bas.basis,1)`. The stored coefficients are dimensionless `-1/+1` generator entries; a reaction rate is not an input to this function and must be applied by the caller. There is no normalisation step. The routine collects drain/fill indices in parallel, removes unused rows, and assembles each reactant's sparse matrix.
 
 ## Source Wiki
 

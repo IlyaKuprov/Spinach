@@ -6,7 +6,7 @@
 
 ## Contract
 
-This function converts an angle-axis rotation into Spinach's quaternion component structure. The angle is in radians; the real, nonzero three-element axis may be a row or column and is normalized internally. The output is a structure with scalar component `q.u` and vector components `q.i`, `q.j`, and `q.k`:
+This function converts an angle-axis rotation into Spinach's quaternion component structure. The angle is in radians; the real, nonzero three-element axis may be a row or column and is normalised internally. The output is a structure with scalar component `q.u` and vector components `q.i`, `q.j`, and `q.k`:
 
 - `q.u = cos(rot_angle/2)`
 - `[q.i,q.j,q.k] = unit_axis*sin(rot_angle/2)`

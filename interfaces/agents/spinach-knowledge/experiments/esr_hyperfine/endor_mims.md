@@ -6,9 +6,9 @@ Signature: fid=endor_mims(spin_system,parameters,H,R,K)
 
 ## Purpose and physical sequence
 
-This routine simulates Mims ENDOR using ideal hard pulses. It prepares electron Lz magnetization, applies electron pi/2 – tau – pi/2 pulses, selects zero electron coherence, applies a nuclear pi/2 pulse, and selects nuclear coherence orders -1 and +1. It propagates the indirect nuclear-frequency dimension, applies the phase-difference nuclear-pulse operation, then applies an electron pi/2 refocusing pulse and detects the stimulated echo on the electron L+ state after tau. The returned FID Fourier-transforms to a Mims ENDOR signal.
+This routine simulates Mims ENDOR using ideal hard pulses. It prepares electron Lz magnetisation, applies electron pi/2 – tau – pi/2 pulses, selects zero electron coherence, applies a nuclear pi/2 pulse, and selects nuclear coherence orders -1 and +1. It propagates the indirect nuclear-frequency dimension, applies the phase-difference nuclear-pulse operation, then applies an electron pi/2 refocusing pulse and detects the stimulated echo on the electron L+ state after tau. The returned FID Fourier-transforms to a Mims ENDOR signal.
 
-This is a simulated hyperfine-sensitive electron–nuclear sequence, not a measured acquisition. Its sweep parameter is a nuclear-frequency sweep width; the function does not sweep the static magnetic field and does not implement DNP, hyperpolarization, or spatial imaging.
+This is a simulated hyperfine-sensitive electron–nuclear sequence, not a measured acquisition. Its sweep parameter is a nuclear-frequency sweep width; the function does not sweep the static magnetic field and does not implement DNP, hyperpolarisation, or spatial imaging.
 
 ## Inputs and numerical settings
 

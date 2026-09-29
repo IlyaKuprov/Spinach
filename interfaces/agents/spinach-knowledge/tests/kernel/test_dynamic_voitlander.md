@@ -6,12 +6,12 @@ Regression test for `voitlander()`, the adaptive Voitlander spherical-triangle o
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_voitlander.m
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `TESTING: Voitlander spherical-triangle integration`.
 - Builds an isotropic spin-half electron (`sys.magnet=1`, `sys.isotopes={'E'}`, Zeeman matrix `2.0023*eye(3)`, `bas.formalism='zeeman-hilb'`, `bas.approximation='none'`) via `test_spin_system`.
 - Sets field-swept EPR parameters: `mw_freq=9.5e9`, `fwhm=2e-3`, `window=[0.33 0.35]`, `npoints=9`, `tm_tol=0`, `rspt_order=Inf`, `int_tol=1e9`, `pp_tol=(window(2)-window(1))/(2*(npoints-1))`, `orientation=[0 0 0]`, `rho0=-state(spin_system,'Lz','E')`.
-- Obtains Zeeman, coupling, and microwave Hamiltonians with `hamiltonian(assume(...))`, symmetrizes `Ic` and `Iz`, and builds `Hmw=(L+ + L-)/2`.
+- Obtains Zeeman, coupling, and microwave Hamiltonians with `hamiltonian(assume(...))`, symmetrises `Ic` and `Iz`, and builds `Hmw=(L+ + L-)/2`.
 - Finds the isotropic transition with `eigenfields` at orientation `[0 0 0]` and checks:
   - `isscalar(tf)` — one allowed EPR transition in the window.
   - `tj` equals `spin_system.tols.freeg/2.0023` within `1e-10`/`1e-12` — the field-sweep Jacobian reduces to the free-g over effective-g ratio.

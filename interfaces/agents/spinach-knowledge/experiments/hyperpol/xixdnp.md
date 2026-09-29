@@ -6,7 +6,7 @@
 
 ## What it computes
 
-This routine follows the TPPM DNP family and its X-inverse-X (XiX) special case. Starting from `parameters.rho0`, it applies a repeated two-pulse electron-microwave contact block and records the detected overlap after the initial state and after every block. The spin dynamics include the supplied Hamiltonian, relaxation, and kinetics; the routine itself does not solve a steady state or return an image. It produces a simulated contact curve, not a measured polarization result.
+This routine follows the TPPM DNP family and its X-inverse-X (XiX) special case. Starting from `parameters.rho0`, it applies a repeated two-pulse electron-microwave contact block and records the detected overlap after the initial state and after every block. The spin dynamics include the supplied Hamiltonian, relaxation, and kinetics; the routine itself does not solve a steady state or return an image. It produces a simulated contact curve, not a measured polarisation result.
 
 ## Pulse block and units
 

@@ -6,7 +6,7 @@
 
 Regression test for the remaining deterministic utility helpers in the Spinach kernel. It verifies that small hand-written utility calls preserve documented algebraic and reporting semantics, covering block eliminations, text reporting, spin metadata, analytical line shapes, pumping terms, kite pruning, trajectory stitching, and small random-rotation diagnostics.
 
-## Behavior
+## Behaviour
 
 The function announces its target with `fprintf`, registers a test result under the name `kernel/dynamic_remaining_core_suite` via `new_test_result`, and then runs a sequence of checks:
 

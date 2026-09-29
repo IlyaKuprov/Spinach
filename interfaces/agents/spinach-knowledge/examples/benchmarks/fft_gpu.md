@@ -7,7 +7,7 @@
 
 ## Purpose and use
 
-This script benchmarks MATLAB's three-dimensional `fftn` on cubic double-precision random arrays, comparing a CPU array with a `gpuArray` on the default GPU device. Call `fft_gpu()`; it takes no configuration arguments. If `gpuDeviceCount` reports zero, it prints `no CUDA GPUs detected` and returns without benchmarking. Otherwise it initializes `gpuDevice` and uses that device. MATLAB GPU support and enough device memory for the chosen arrays are required.
+This script benchmarks MATLAB's three-dimensional `fftn` on cubic double-precision random arrays, comparing a CPU array with a `gpuArray` on the default GPU device. Call `fft_gpu()`; it takes no configuration arguments. If `gpuDeviceCount` reports zero, it prints `no CUDA GPUs detected` and returns without benchmarking. Otherwise it initialises `gpuDevice` and uses that device. MATLAB GPU support and enough device memory for the chosen arrays are required.
 
 ## Benchmark procedure
 

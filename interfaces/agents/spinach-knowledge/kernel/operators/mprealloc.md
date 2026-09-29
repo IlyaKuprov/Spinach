@@ -20,4 +20,4 @@ For the first case the dimension is the row count of the supplied basis matrix; 
 
 ## Allocation and input checks
 
-For the selected dimension `d`, the implementation calls `spalloc(d,d,nnzpc*d)`; the third argument is reserved sparse storage, not a count of nonzeros already present. The function checks that `spin_system.bas.formalism` exists and that `nnzpc` is numeric, real, scalar, and integer-valued before allocation. An unrecognized formalism raises an error. The documentation describes `nnzpc` as the expected nonzero count per column.
+For the selected dimension `d`, the implementation calls `spalloc(d,d,nnzpc*d)`; the third argument is reserved sparse storage, not a count of nonzeros already present. The function checks that `spin_system.bas.formalism` exists and that `nnzpc` is numeric, real, scalar, and integer-valued before allocation. An unrecognised formalism raises an error. The documentation describes `nnzpc` as the expected nonzero count per column.

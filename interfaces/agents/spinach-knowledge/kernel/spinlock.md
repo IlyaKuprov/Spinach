@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Applies the source-described analytical approximation to spin locking: it removes spin-spin correlations and magnetization components other than those along the selected X or Y direction. It returns the transformed state rho; it is not a time-dependent pulse simulation.
+Applies the source-described analytical approximation to spin locking: it removes spin-spin correlations and magnetisation components other than those along the selected X or Y direction. It returns the transformed state rho; it is not a time-dependent pulse simulation.
 
 ## Operation
 
@@ -15,7 +15,7 @@ For direction 'X', the source applies step with Ly at pi/2, homospoil with the '
 ## Parameters / inputs
 
 - spin_system — Spinach system description used by step and homospoil.
-- Lx, Ly — X- and Y-magnetization operators for the spins to be locked; they must be numeric matrices of equal dimensions.
+- Lx, Ly — X- and Y-magnetisation operators for the spins to be locked; they must be numeric matrices of equal dimensions.
 - rho — numeric state vector or bookshelf stack with the row dimension matching Lx and Ly.
 - direction — 'X' or 'Y'.
 

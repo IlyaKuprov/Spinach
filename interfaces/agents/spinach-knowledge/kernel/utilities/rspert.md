@@ -6,7 +6,7 @@
 
 `rspert.m` implements Rayleigh–Schrödinger perturbation theory to arbitrary order for a non-degenerate Hamiltonian `H0 + H1`, returning perturbative corrections to eigenvalues and eigenvectors. The implementation follows Eqs. 2.21–2.23 from Stefan Stoll's PhD thesis.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[Ep,Vp]=rspert(E0,H1,order)`.
 - A consistency-checking subfunction `grumble` validates the inputs (real column vector `E0`, Hermitian `H1`, consistent dimensions, positive integer `order`).

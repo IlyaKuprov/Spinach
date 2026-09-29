@@ -7,7 +7,7 @@ Wiki: [Spin Dynamics Wiki: zfs2mat.m](https://spindynamics.org/wiki/index.php?ti
 
 ## Purpose and tensor convention
 
-Converts the zero-field-splitting parameters `D` and `E` into the symmetric spin-interaction matrix used by Spinach. In the tensor eigenframe the source first forms the diagonal matrix with entries `-D/3+E`, `-D/3-E`, and `2*D/3`. It computes the direction-cosine matrix `R=euler2dcm(alp,bet,gam)` and rotates the tensor as `M=R*M*R'`. It then removes any residual trace and symmetrizes the result. The trace correction and symmetrization are explicit numerical clean-up steps; the function does not solve an eigenproblem or compute a numerical derivative.
+Converts the zero-field-splitting parameters `D` and `E` into the symmetric spin-interaction matrix used by Spinach. In the tensor eigenframe the source first forms the diagonal matrix with entries `-D/3+E`, `-D/3-E`, and `2*D/3`. It computes the direction-cosine matrix `R=euler2dcm(alp,bet,gam)` and rotates the tensor as `M=R*M*R'`. It then removes any residual trace and symmetrises the result. The trace correction and symmetrisation are explicit numerical clean-up steps; the function does not solve an eigenproblem or compute a numerical derivative.
 
 ## Inputs and output
 

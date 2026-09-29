@@ -6,7 +6,7 @@ Builds a sparse block diagonal matrix, either from a multidimensional stack of m
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sp_block_diag.m>
 
-## Behavior
+## Behaviour
 
 Two syntaxes are supported:
 

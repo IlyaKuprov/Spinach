@@ -6,9 +6,9 @@
 
 Regression test for the deterministic closed-form physical formula utility helpers in the Spinach kernel. The suite verifies that spin addition, point-dipole tensors, hyperfine tensors, exponential drops, skew-normal densities, oscillator grids, hydrodynamic derivative construction, and spherical-tensor projection metadata match their analytic definitions on small systems.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Physical formula utilities\n')` and initializes a test result object via `new_test_result` for the target `kernel/dynamic_physics_formulae_suite`, described as "Physical formula utilities" with the property that closed-form physical helper formulae must match their analytic definitions on small systems.
+The function announces the test target with `fprintf('TESTING: Physical formula utilities\n')` and initialises a test result object via `new_test_result` for the target `kernel/dynamic_physics_formulae_suite`, described as "Physical formula utilities" with the property that closed-form physical helper formulae must match their analytic definitions on small systems.
 
 The suite then performs the following checks:
 

@@ -5,7 +5,7 @@
 
 ## Purpose and protocol variant
 
-Scans XiX steady-state proton polarization against shot repetition time, averaging over electron–proton distance while keeping microwave nutation power fixed. The source estimates minutes.
+Scans XiX steady-state proton polarisation against shot repetition time, averaging over electron–proton distance while keeping microwave nutation power fixed. The source estimates minutes.
 
 ## Inputs and scan axes
 

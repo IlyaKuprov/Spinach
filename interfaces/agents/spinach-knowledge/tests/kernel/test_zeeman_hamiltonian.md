@@ -6,10 +6,10 @@
 
 Regression test for the one-spin Zeeman Hamiltonian. The test verifies Spinach's NMR convention for a positive chemical shift: the rotating-frame Hamiltonian contribution is `-2*pi*nu*Lz`, i.e. a positive ppm shift enters the NMR Hamiltonian with the Spinach sign convention and rad/s units.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Zeeman Hamiltonian sign and units\n')`.
-- Initializes a regression test result via `new_test_result('kernel/zeeman_hamiltonian', 'Zeeman Hamiltonian sign and units', 'a scalar chemical shift must enter the NMR Hamiltonian with Spinach sign and rad/s units.')`.
+- Initialises a regression test result via `new_test_result('kernel/zeeman_hamiltonian', 'Zeeman Hamiltonian sign and units', 'a scalar chemical shift must enter the NMR Hamiltonian with Spinach sign and rad/s units.')`.
 - Builds a one-proton Hilbert-space spin system with a 1 ppm scalar shift:
   - `sys.magnet = 14.1`
   - `sys.isotopes = {'1H'}`

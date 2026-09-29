@@ -4,7 +4,7 @@ Source: [examples/nmr_proteins/expt_data/hnco_ubiquitin_expt.m](https://github.c
 
 ## Purpose
 
-Processes and plots a three-dimensional experimental HNCO spectrum of human ubiquitin. This is processing of imported measured data, not a Spinach spin-dynamics simulation: the function loads `fid` from `hnco_ubiquitin_expt.mat`, does not call a simulator or pulse-sequence function, and uses its `spin_system` struct only for plotting metadata. The source does not specify paramagnetic centers or magnetic tensors; this is protein nuclear-spin NMR.
+Processes and plots a three-dimensional experimental HNCO spectrum of human ubiquitin. This is processing of imported measured data, not a Spinach spin-dynamics simulation: the function loads `fid` from `hnco_ubiquitin_expt.mat`, does not call a simulator or pulse-sequence function, and uses its `spin_system` struct only for plotting metadata. The source does not specify paramagnetic centres or magnetic tensors; this is protein nuclear-spin NMR.
 
 ## Data processing
 

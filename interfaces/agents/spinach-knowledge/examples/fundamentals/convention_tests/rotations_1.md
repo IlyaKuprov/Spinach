@@ -6,7 +6,7 @@
 
 ## Purpose
 
-A seven-check internal consistency suite for Spinach's rotation and Cartesian/spherical-tensor conversion routines. It distinguishes DCM/Euler/Wigner conventions from tensor round trips and quaternion/angle-axis conversions, which helps localize which representation boundary a mismatch involves.
+A seven-check internal consistency suite for Spinach's rotation and Cartesian/spherical-tensor conversion routines. It distinguishes DCM/Euler/Wigner conventions from tensor round trips and quaternion/angle-axis conversions, which helps localise which representation boundary a mismatch involves.
 
 ## Setup and checks
 
@@ -17,8 +17,8 @@ Run `rotations_1()`. One random symmetric traceless 3×3 matrix `A` and one Eule
 3. Compare `dcm2wigner(euler2dcm(eulers))` with `wigner(2,...)`; 2-norm residual below `1e-10`.
 4. Round-trip `A` through `mat2sphten` and `sphten2mat`; matrix residual below `1e-10` in the 2-norm.
 5. Convert the Euler DCM to a quaternion with `dcm2qter` and back with `qter2dcm`; DCM residual below `1e-10`.
-6. Normalize a random quaternion, convert it to angle-axis with `qter2anax` and back with `anax2qter`; the four quaternion-component residual has 2-norm below `1e-10`.
-7. For a normalized random quaternion, compare its direct `qter2dcm` DCM with the DCM made from its `qter2anax` angle-axis pair using `anax2dcm`; residual below `1e-10`.
+6. Normalise a random quaternion, convert it to angle-axis with `qter2anax` and back with `anax2qter`; the four quaternion-component residual has 2-norm below `1e-10`.
+7. For a normalised random quaternion, compare its direct `qter2dcm` DCM with the DCM made from its `qter2anax` angle-axis pair using `anax2dcm`; residual below `1e-10`.
 
 ## Observable result and scope
 

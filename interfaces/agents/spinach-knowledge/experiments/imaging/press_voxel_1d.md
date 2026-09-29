@@ -10,7 +10,7 @@ The function creates a uniform longitudinal initial state by repeating Lz for sp
 
 ## Parameters and units
 
-Required fields are spins (a nonempty cell array of spin labels), npts (positive integer scalar), ss_grad_amp (real scalar in T/m), rf_frq_list (Hz), rf_amp_list (rad/s), rf_dur_list (seconds), rf_phi (pulse phase), and positive-integer max_rank. The RF frequency, amplitude, and duration lists must have equal lengths. The function initializes its own uniform Lz state; it does not require the rho0 or coil fields used by the acquisition routine. max_rank controls the Fokker-Planck pulse operator; the source comment says 2 is usually enough.
+Required fields are spins (a nonempty cell array of spin labels), npts (positive integer scalar), ss_grad_amp (real scalar in T/m), rf_frq_list (Hz), rf_amp_list (rad/s), rf_dur_list (seconds), rf_phi (pulse phase), and positive-integer max_rank. The RF frequency, amplitude, and duration lists must have equal lengths. The function initialises its own uniform Lz state; it does not require the rho0 or coil fields used by the acquisition routine. max_rank controls the Fokker-Planck pulse operator; the source comment says 2 is usually enough.
 
 ## Source-backed configuration example
 

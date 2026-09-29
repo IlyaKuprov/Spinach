@@ -34,7 +34,7 @@ For `sphten-liouv`, the routine prepares `spin_system.bas.lpst` and `spin_system
 ## Parameters / output
 
 - `spin_system` - primary structure produced by [create.m](create.md), including component multiplicities, types, isotope identities, interactions, and chemical-substance mapping.
-- `bas` - basis specification; required fields depend on formalism and approximation as summarized above.
+- `bas` - basis specification; required fields depend on formalism and approximation as summarised above.
 - Output `spin_system` - updated with `bas`, the selected basis and related metadata, and symmetry treatment.
 
 ## Reference

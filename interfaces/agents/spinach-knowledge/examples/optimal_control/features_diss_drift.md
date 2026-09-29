@@ -4,7 +4,7 @@
 
 ## Spin model and objective
 
-The simulated system is a six-site protein-backbone segment, ordered 15N(Nn), 1H, 13C(CA), 13C(CB), 13C(CO), 15N(Nn+1), at 9.4 T. The source uses shifts [119.79, 8.03, 57.32, 27.71, 177.25, 115.55] ppm and scalar couplings J(1,3)=−11, J(2,3)=140, J(3,4)=35, J(3,5)=55, J(3,6)=7, and J(5,6)=−15 Hz; other entries are left uncoupled. The normalized input is 1H `Lz` (spin 2), and the target is 13C `Lz` on spin 5 (the carbonyl site). These are model parameters, not imported experimental traces.
+The simulated system is a six-site protein-backbone segment, ordered 15N(Nn), 1H, 13C(CA), 13C(CB), 13C(CO), 15N(Nn+1), at 9.4 T. The source uses shifts [119.79, 8.03, 57.32, 27.71, 177.25, 115.55] ppm and scalar couplings J(1,3)=−11, J(2,3)=140, J(3,4)=35, J(3,5)=55, J(3,6)=7, and J(5,6)=−15 Hz; other entries are left uncoupled. The normalised input is 1H `Lz` (spin 2), and the target is 13C `Lz` on spin 5 (the carbonyl site). These are model parameters, not imported experimental traces.
 
 Relaxation is included in the drift using the `t1_t2` model, zero equilibrium, and diagonal retention. The six R1 rate entries are 1.0; the R2 entries in site order are [50, 1, 1, 1, 100, 50]. The source does not annotate units for these rate arrays. A sphten-liouv `IK-0` basis with `inter_level=4` applies the source's four-spin-correlation truncation. The drift is `hamiltonian + 1i*relaxation`, after which transmitter offsets [3214, 10000, −4800] are applied for 1H, 13C, and 15N (the source gives no units for this three-value setting). Each isotope also has an offset ensemble at −100, 0, and +100 Hz.
 

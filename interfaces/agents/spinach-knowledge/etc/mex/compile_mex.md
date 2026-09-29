@@ -14,7 +14,7 @@ Run `compile_mex()` in MATLAB from the Spinach installation that contains this f
 | `kernel/indexing/spsortrows.cpp` | `kernel/indexing` | Sparse-double row sorting |
 | `kernel/indexing/spunicols.cpp` | `kernel/indexing` | Sparse-double unique columns |
 
-The build calls select the `-R2018a` MEX API, optimization (`-O`), and `-DNDEBUG`. The first three also pass the current `COMPFLAGS` and `LINKFLAGS` through to MATLAB's compiler invocation. The target list and output paths are fixed in the function; this is an in-place rebuild, not a configurable target selector or installer.
+The build calls select the `-R2018a` MEX API, optimisation (`-O`), and `-DNDEBUG`. The first three also pass the current `COMPFLAGS` and `LINKFLAGS` through to MATLAB's compiler invocation. The target list and output paths are fixed in the function; this is an in-place rebuild, not a configurable target selector or installer.
 
 A working MATLAB `mex` compiler configuration and the source tree are prerequisites. The function contains no separate post-build test or result report, so successful return alone is not evidence that these kernels pass runtime tests.
 

@@ -6,7 +6,7 @@
 
 L1-norm Tikhonov regularised solver for `A*x=y` where `A` is an ill-conditioned matrix. The error functional `norm(A*x-y,2)^2 + lambda*norm(x,1)` is minimised using the FISTA algorithm. The user specifies the desired number of non-zeroes; the lambda parameter is then found by bracketing and bisection on the soft-thresholding value.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[x,err,reg]=tikhol1n(A,y,nnzt)`.
 - Input consistency is enforced by an internal `grumble` function: `A` must be a numeric matrix, `y` a numeric column vector with as many elements as rows of `A`, and `nnzt` a positive integer scalar not exceeding the number of columns of `A`.

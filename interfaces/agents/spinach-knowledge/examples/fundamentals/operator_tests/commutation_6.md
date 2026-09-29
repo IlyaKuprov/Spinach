@@ -17,4 +17,4 @@ For `centrans(mult,...)` at multiplicities `4, 6, 8`, it checks `[CTx,CTy]=i CTz
 
 Call `commutation_6()` in MATLAB with the Spinach functions used by the source available. Each residual is a Frobenius norm; the operator identities and reconstructed IST expansions are compared with `tol`. The source prints `Pauli operator commutation test PASSED.`, `CT commutation test PASSED.`, and `CT IST expansion test PASSED.` after their respective loops if their checks remain within tolerance; violations raise the corresponding error. The function reports no residual values.
 
-Coverage is limited to the listed multiplicities, identities, and five CT types. It does not sweep arbitrary dimensions or establish behavior for other representations or tensor-conversion choices.
+Coverage is limited to the listed multiplicities, identities, and five CT types. It does not sweep arbitrary dimensions or establish behaviour for other representations or tensor-conversion choices.

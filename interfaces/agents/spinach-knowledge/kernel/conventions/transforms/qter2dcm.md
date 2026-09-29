@@ -4,9 +4,9 @@
 
 - Signature: `dcm=qter2dcm(q)`
 
-## Behavior
+## Behaviour
 
-The function normalizes quaternion components `(u,i,j,k)` and returns the active-convention direction cosine matrix used by `euler2dcm.m`:
+The function normalises quaternion components `(u,i,j,k)` and returns the active-convention direction cosine matrix used by `euler2dcm.m`:
 
 `[1-2*(j^2+k^2), 2*(i*j-u*k), 2*(i*k+u*j); 2*(i*j+u*k), 1-2*(i^2+k^2), 2*(j*k-u*i); 2*(i*k-u*j), 2*(j*k+u*i), 1-2*(i^2+j^2)]`
 
@@ -14,4 +14,4 @@ Use it on a column vector as `v=dcm*v`, and on a 3x3 interaction tensor as `A=dc
 
 ## Input and output
 
-The input structure must contain numeric, real scalar fields `u`, `i`, `j`, and `k`. A Euclidean quaternion norm below `sqrt(eps())` raises an error; otherwise the components are normalized before constructing the matrix. The output `dcm` is a 3x3 direction cosine matrix.
+The input structure must contain numeric, real scalar fields `u`, `i`, `j`, and `k`. A Euclidean quaternion norm below `sqrt(eps())` raises an error; otherwise the components are normalised before constructing the matrix. The output `dcm` is a 3x3 direction cosine matrix.

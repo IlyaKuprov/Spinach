@@ -4,9 +4,9 @@
 
 Regression test suite for cheap deterministic low-level utility functions in the Spinach kernel. It checks small numerical helpers, matrix filters, integer type selection, and analytic line-shape definitions against explicit answers.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Low-level utility functions\n')` and initializes a test result object via `new_test_result('kernel/lowlevel_utilities_suite', 'Low-level utility functions', 'cheap scalar and matrix helpers must preserve their documented algebraic definitions.')`.
+The function announces the test target with `fprintf('TESTING: Low-level utility functions\n')` and initialises a test result object via `new_test_result('kernel/lowlevel_utilities_suite', 'Low-level utility functions', 'cheap scalar and matrix helpers must preserve their documented algebraic definitions.')`.
 
 Using test matrices `A=[1 2;3 4]`, `B=[0 1;-1 2]`, `C=[2 1;0 4]`, `D=[1+1i 2-1i;3 4i]`, `E=[2 0;1i -3]`, and `M=reshape(1:16,4,4)`, the suite verifies, each with tolerances `1e-15` (or `1e-14` for `keep_rank`):
 

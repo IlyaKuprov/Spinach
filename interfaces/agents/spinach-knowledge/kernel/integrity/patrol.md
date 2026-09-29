@@ -16,7 +16,7 @@ It shuffles MATLAB's random-number generator, then repeatedly chooses a remainin
 
 ## Inputs, outputs, and units
 
-`test_subject` defaults to `''` when omitted and must be a character array; other supplied types fail in `grumble(test_subject)`. The function returns no value. Example execution may have its own effects and outputs, but `patrol` does not define a physical equation, normalization, matrix output shape, or Hz/angular-frequency convention.
+`test_subject` defaults to `''` when omitted and must be a character array; other supplied types fail in `grumble(test_subject)`. The function returns no value. Example execution may have its own effects and outputs, but `patrol` does not define a physical equation, normalisation, matrix output shape, or Hz/angular-frequency convention.
 
 ## Source guard
 

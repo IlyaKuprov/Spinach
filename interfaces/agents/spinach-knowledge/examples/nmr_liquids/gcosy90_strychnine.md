@@ -8,7 +8,7 @@ This wrapper simulates Horne-Morris gradient-selected COSY for strychnine using 
 
 ## Basis and acquisition
 
-The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and proximity level 1; greedy basis construction uses `prox_cutoff=4.0`. The second pulse angle is `pi/2` rad. Acquisition settings are offset 1200 (unit not specified), sweep 2200 Hz, `npoints=[512 512]`, and `zerofill=[2048 2048]`; displayed axes use ppm. The gradient settings are amplitude 3 Gauss/cm, duration `2e-3` s, stabilization delay `2e-4` s, and active sample length 1.5 cm. The source estimates calculation time as minutes. No relaxation theory or rates are configured by this example.
+The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and proximity level 1; greedy basis construction uses `prox_cutoff=4.0`. The second pulse angle is `pi/2` rad. Acquisition settings are offset 1200 (unit not specified), sweep 2200 Hz, `npoints=[512 512]`, and `zerofill=[2048 2048]`; displayed axes use ppm. The gradient settings are amplitude 3 Gauss/cm, duration `2e-3` s, stabilisation delay `2e-4` s, and active sample length 1.5 cm. The source estimates calculation time as minutes. No relaxation theory or rates are configured by this example.
 
 ## Processing and plot
 

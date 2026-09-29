@@ -4,7 +4,7 @@
 
 Bins a three-dimensional Cartesian point cloud into a user-specified regular grid and returns raw per-cell counts. The implementation does not divide by the number of points or cell volume. Source: [Spinach repository](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/xyz2pd.m).
 
-## Behavior
+## Behaviour
 
 - Syntax: `density=xyz2pd(coords,x_range,y_range,z_range,x_npts,y_npts,z_npts)`.
 - Grid cell edges are computed with `linspace` along each axis, producing `npts+1` edges per axis from the given range.

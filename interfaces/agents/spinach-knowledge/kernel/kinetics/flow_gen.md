@@ -30,7 +30,7 @@ The directed contributions are assembled into an `ncells×ncells` sparse matrix 
 
 `F = diag(1./weights) * (B - diag(sum(B,1))) * diag(weights)`.
 
-The returned `F` has one row and column per Voronoi cell. No normalization of the mesh weights or state vector is performed here; the displayed diagonal balance and left/right weight scaling are the generator's actual construction.
+The returned `F` has one row and column per Voronoi cell. No normalisation of the mesh weights or state vector is performed here; the displayed diagonal balance and left/right weight scaling are the generator's actual construction.
 
 ## Construction guards
 

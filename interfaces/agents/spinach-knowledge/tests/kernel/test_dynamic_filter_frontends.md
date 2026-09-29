@@ -6,7 +6,7 @@
 
 Regression test for the dynamic state-filter front-end kernels of Spinach: `coherence()`, `correlation()`, `decouple()`, `homospoil()`, and `spinlock()`. The test runs these functions on small spherical-tensor Liouville-space spin systems whose surviving state components are analytically known, and checks that each filter keeps exactly the intended basis components.
 
-## Behavior
+## Behaviour
 
 - Registers a test target named `kernel/dynamic_filter_frontends` ("Dynamic state-filter front ends") via `new_test_result()`, with the requirement that state-selection front ends keep exactly the intended basis components.
 - **Coherence and correlation:** builds a heteronuclear `1H`/`13C` spherical-tensor Liouville system (`sys.magnet=14.1`, Zeeman scalars `{1.0,2.0}`, scalar coupling `10.0` between spins 1 and 2, formalism `'sphten-liouv'`, approximation `'none'`) through `test_spin_system()`. It constructs single- and two-spin state components (`Lz` on each spin, `L+`/`L-` on the proton combined with `Lz` on carbon, and `Lz`-`Lz`), then:

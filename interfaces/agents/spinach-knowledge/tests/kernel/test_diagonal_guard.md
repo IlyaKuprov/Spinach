@@ -4,7 +4,7 @@
 
 Regression test for the diagonal relaxation retention formalism boundaries in Spinach. It verifies that unsupported Zeeman diagonal retention fails explicitly, while spherical-tensor diagonal retention and Zeeman full retention preserve trace and the specified relaxation rates. A shipped GISSMO XML fixture checks pure damping in both Liouville bases and the conversion from Lorentzian linewidth to transverse decay rate.
 
-## Behavior
+## Behaviour
 
 - Builds spin-half (`1H`) and spin-one (`14N`) systems with a Lindblad bath (`inter.relaxation={'lindblad'}`, `inter.lind_r1_rates=4`, `inter.lind_r2_rates=7`, `inter.equilibrium='zero'`, `inter.temperature=298`, `inter.rlx_keep='labframe'`, `inter.rlx_dfs='keep'`, `sys.magnet=14.1`, `bas.approximation='none'`).
 - For each isotope, in the `zeeman-liouv` formalism, builds the full Zeeman generator `R=relaxation(spin_system)` and checks:
@@ -33,7 +33,7 @@ Regression test for the diagonal relaxation retention formalism boundaries in Sp
 result = test_diagonal_guard()
 ```
 
-- **Output**: `result` — regression result structure with explanatory messages, initialized via `new_test_result('kernel/diagonal_guard', 'Diagonal relaxation retention guard', 'unsupported Zeeman diagonal retention must fail without changing supported generators.')` and accumulated through `test_close` and `test_true` assertions.
+- **Output**: `result` — regression result structure with explanatory messages, initialised via `new_test_result('kernel/diagonal_guard', 'Diagonal relaxation retention guard', 'unsupported Zeeman diagonal retention must fail without changing supported generators.')` and accumulated through `test_close` and `test_true` assertions.
 - No inputs.
 
 ## References

@@ -6,9 +6,9 @@
 
 Regression test that verifies the liquid context (`liquid()`) against the direct `acquire()` path. The test checks that `liquid()` passes the offset Liouvillian to `acquire()` correctly.
 
-## Behavior
+## Behaviour
 
-1. Announces the test target with `fprintf('TESTING: Liquid context acquire path\n')` and initializes a test result via `new_test_result` for `kernel/ctx_liquid_acquire`.
+1. Announces the test target with `fprintf('TESTING: Liquid context acquire path\n')` and initialises a test result via `new_test_result` for `kernel/ctx_liquid_acquire`.
 2. Builds a one-spin Liouville-space spin system:
    - `sys.magnet = 14.1` (field in Tesla)
    - `sys.isotopes = {'1H'}`

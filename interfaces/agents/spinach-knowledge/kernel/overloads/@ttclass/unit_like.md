@@ -6,7 +6,7 @@
 
 `A=unit_like(A)`
 
-## Purpose and behavior
+## Purpose and behaviour
 
 Returns an identity in the same representation family as a square matrix or square-operator tensor train.
 

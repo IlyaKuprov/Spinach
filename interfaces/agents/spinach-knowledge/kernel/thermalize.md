@@ -6,12 +6,12 @@
 
 Modifies a relaxation superoperator `R` to drive a chosen stationary state. The two accepted methods modify `R` differently:
 
-- `method='IME'`: requires a nonempty numeric column `rho_eq` and a Liouville-space formalism. In `sphten-liouv`, `U` selects the first basis coordinate; in `zeeman-liouv`, `U` is the vectorized identity. The update is `R=R-kron(U',R*rho_eq)`.
+- `method='IME'`: requires a nonempty numeric column `rho_eq` and a Liouville-space formalism. In `sphten-liouv`, `U` selects the first basis coordinate; in `zeeman-liouv`, `U` is the vectorised identity. The update is `R=R-kron(U',R*rho_eq)`.
 - `method='dibari'`: requires a nonempty square `HLSPS` and positive real scalar temperature `T`. With `beta=spin_system.tols.hbar/(spin_system.tols.kbol*T)`, the update is `R=R*propagator(spin_system,HLSPS,1i*beta)`. This branch uses the lab-frame Hamiltonian supplied by the caller.
 
 ## Input checks
 
-`R` must be numeric and square. Before either method, `norm(R*unit_state(spin_system),2)>1e-10` is rejected as already thermalized. For `dibari`, `norm(HLSPS*unit_state(spin_system),2)<1e-8` is rejected as apparently a commutation superoperator. The source checks these conditions and returns the modified operator; it does not calculate `rho_eq` in the IME branch.
+`R` must be numeric and square. Before either method, `norm(R*unit_state(spin_system),2)>1e-10` is rejected as already thermalised. For `dibari`, `norm(HLSPS*unit_state(spin_system),2)<1e-8` is rejected as apparently a commutation superoperator. The source checks these conditions and returns the modified operator; it does not calculate `rho_eq` in the IME branch.
 
 ## References
 

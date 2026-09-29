@@ -8,7 +8,7 @@
 
 ## Orientation, operators, and dimensions
 
-`parameters.orientation` is a real, finite three-element Euler-angle vector in radians, specifying the system orientation relative to its input orientation. The context evaluates the Hamiltonian as the isotropic part plus the rotated anisotropic part, `H=I+orientation(Q,parameters.orientation)`, and Hermitian-symmetrizes it. It builds relaxation at the same orientation and obtains kinetics from the spin system. The angular coordinates affect the anisotropic spin terms; the isotropic contribution is not rotated.
+`parameters.orientation` is a real, finite three-element Euler-angle vector in radians, specifying the system orientation relative to its input orientation. The context evaluates the Hamiltonian as the isotropic part plus the rotated anisotropic part, `H=I+orientation(Q,parameters.orientation)`, and Hermitian-symmetrises it. It builds relaxation at the same orientation and obtains kinetics from the spin system. The angular coordinates affect the anisotropic spin terms; the isotropic contribution is not rotated.
 
 The spatial subspace has dimension one: the sequence receives `parameters.spc_dim=1`. The context sets `parameters.spn_dim=size(H,1)`, the Hamiltonian matrix dimension. These are context metadata, not a promise about the sequence's return value: the function returns whatever `pulse_sequence` returns. Its inputs are `spin_system`, the updated `parameters`, `H`, `R`, and `K`; it owns the observable and result shape.
 

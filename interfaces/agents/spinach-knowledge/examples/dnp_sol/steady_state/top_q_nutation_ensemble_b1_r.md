@@ -6,7 +6,7 @@
 
 ## Question and model
 
-How does the steady-state TOP DNP proton-polarization field profile over microwave offset change across selected electron nutation frequencies, when distance and B1 are distributed? The outer script evaluates `nu= [6.8 9.6 13.5 17.5 25 36]` MHz. Each profile uses the Q-band magnet setting 1.2142, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
+How does the steady-state TOP DNP proton-polarisation field profile over microwave offset change across selected electron nutation frequencies, when distance and B1 are distributed? The outer script evaluates `nu= [6.8 9.6 13.5 17.5 25 36]` MHz. Each profile uses the Q-band magnet setting 1.2142, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
 
 ## Offset sweep and averaging
 

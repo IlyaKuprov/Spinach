@@ -6,9 +6,9 @@
 
 Regression test suite for Spinach angular-momentum coefficient and spherical-function helpers. The suite checks Clebsch-Gordan coefficients, Wigner symbols, Wigner D matrices, and spherical harmonics against elementary exact values, verifying that the angular-momentum helpers reproduce elementary exact quantum-mechanical coefficients.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Angular-momentum coefficient functions\n')` and initializes a test result object via `new_test_result` with suite name `'kernel/wigner_angular_suite'`, description `'Angular-momentum coefficient functions'`, and the specification that angular-momentum helpers must reproduce elementary exact quantum-mechanical coefficients. Each individual check is performed with `test_close`, which compares a computed value against a reference value with absolute and relative tolerances and appends an explanatory message to the result.
+The function announces the test target with `fprintf('TESTING: Angular-momentum coefficient functions\n')` and initialises a test result object via `new_test_result` with suite name `'kernel/wigner_angular_suite'`, description `'Angular-momentum coefficient functions'`, and the specification that angular-momentum helpers must reproduce elementary exact quantum-mechanical coefficients. Each individual check is performed with `test_close`, which compares a computed value against a reference value with absolute and relative tolerances and appends an explanatory message to the result.
 
 Clebsch-Gordan checks:
 

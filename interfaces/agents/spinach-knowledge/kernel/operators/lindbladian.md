@@ -22,8 +22,8 @@ Here MATLAB `'` is the conjugate transpose. The routine replaces `rho` by `rho/n
 
 `R = -rlx_rate*R0/(rho'*R0*rho)`
 
-using the normalized `rho`. Thus the implemented calibration sets `rho'*R*rho` to `-rlx_rate` for that normalized vector. `rlx_rate` must be a finite, non-negative real scalar. This scalar constraint and the state test are the checks made here; no further physical property of the returned matrix is established by this routine.
+using the normalised `rho`. Thus the implemented calibration sets `rho'*R*rho` to `-rlx_rate` for that normalised vector. `rlx_rate` must be a finite, non-negative real scalar. This scalar constraint and the state test are the checks made here; no further physical property of the returned matrix is established by this routine.
 
 ## Scope
 
-The function returns a generator matrix, not a propagator. Its source documents the inputs as product superoperators and the output as a Lindblad superoperator; no additional Hilbert-space action, vectorization convention, or propagator construction is performed in this function.
+The function returns a generator matrix, not a propagator. Its source documents the inputs as product superoperators and the output as a Lindblad superoperator; no additional Hilbert-space action, vectorisation convention, or propagator construction is performed in this function.

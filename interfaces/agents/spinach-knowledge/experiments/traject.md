@@ -11,4 +11,4 @@ The time spacing is `1/sweep` seconds. The source calls `evolution` in `trajecto
 
 If `decouple` is non-empty, the requested isotope labels must occur in the spin system, and analytical decoupling is restricted to the `sphten-liouv` formalism. The routine applies the decoupling transformation to both `L` and `rho0` before propagation. The source example is `{'15N','13C'}`; an empty decoupling list skips that transformation.
 
-This describes the source's propagation request and documented trajectory representation; no simulation was run to materialize a trajectory.
+This describes the source's propagation request and documented trajectory representation; no simulation was run to materialise a trajectory.

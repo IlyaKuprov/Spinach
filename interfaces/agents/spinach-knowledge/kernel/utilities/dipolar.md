@@ -6,7 +6,7 @@
 
 Computes dipolar couplings in the presence or absence of periodic boundary conditions. This is an auxiliary function of the Spinach kernel; direct calls are discouraged. The header directs users to `xyz2dd` and `xyz2hfc` to convert Cartesian coordinates into dipolar and hyperfine couplings, respectively.
 
-## Behavior
+## Behaviour
 
 - Calls `grumble(spin_system)` to verify that the fields `comp`, `inter`, `chem`, and `tols` are present, erroring with `'spin_system object is missing essential information.'` otherwise.
 - Reports the dipolar interaction distance threshold (`spin_system.tols.prox_cutoff`, in Angstrom) and that a dipolar interaction network analysis is running.
@@ -25,7 +25,7 @@ Computes dipolar couplings in the presence or absence of periodic boundary condi
   - Forms the 3-by-3 dipolar coupling matrix `D = A * (I - 3*ort*ort')` written elementwise in the source.
   - If `'sodd'` is listed in `spin_system.sys.enable`, applies an approximate spin-orbit correction by sandwiching `D` between `spin_system.inter.zeeman.ddscal{rows(n)}` and `spin_system.inter.zeeman.ddscal{cols(n)}`.
   - Removes the isotropic part via `D = D - eye(3)*trace(D)/3` to clean up numerical noise.
-  - Accumulates `D` into `spin_system.inter.coupling.matrix{rows(n), cols(n)}`, initializing the cell if empty and summing otherwise.
+  - Accumulates `D` into `spin_system.inter.coupling.matrix{rows(n), cols(n)}`, initialising the cell if empty and summing otherwise.
 
 ## Inputs and outputs
 

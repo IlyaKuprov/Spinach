@@ -4,7 +4,7 @@
 
 ## What it calculates
 
-This zero-argument example constructs a liquid-state JDNP time trace for six static-field settings, with four rotational correlation times at each field. The inter-electron scalar coupling is reset at each field to the sum of the isotropic electron Zeeman frequency and the proton Zeeman frequency; the resulting figure compares time-dependent proton polarization across fields and correlation times. The source points to [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
+This zero-argument example constructs a liquid-state JDNP time trace for six static-field settings, with four rotational correlation times at each field. The inter-electron scalar coupling is reset at each field to the sum of the isotropic electron Zeeman frequency and the proton Zeeman frequency; the resulting figure compares time-dependent proton polarisation across fields and correlation times. The source points to [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
 
 ## Running assumptions and settings
 

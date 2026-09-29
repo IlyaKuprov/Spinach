@@ -6,7 +6,7 @@
 
 ## Purpose and callable context
 
-This helper constructs the spin system, normalized states, control operators, and drift Hamiltonian used by the directional-derivative examples. Call it with one of the three accepted character-vector values `sphten-liouv`, `zeeman-liouv`, or `zeeman-hilb`; any other input fails the source's consistency check. `dirdiff_8_rect()` is one mapped caller.
+This helper constructs the spin system, normalised states, control operators, and drift Hamiltonian used by the directional-derivative examples. Call it with one of the three accepted character-vector values `sphten-liouv`, `zeeman-liouv`, or `zeeman-hilb`; any other input fails the source's consistency check. `dirdiff_8_rect()` is one mapped caller.
 
 ## System and basis
 

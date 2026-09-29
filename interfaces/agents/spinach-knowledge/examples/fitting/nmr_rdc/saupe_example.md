@@ -8,7 +8,7 @@
 
 This example fits a Saupe order matrix from residual dipolar coupling (RDC) measurements and compares the measured couplings with values back-calculated from that matrix. The source header describes the measurements as NH RDC data and credits Andras Boeszoermenyi, Thibault Viennet, and Hari Arthanari.
 
-## Inputs and fit parameterization
+## Inputs and fit parameterisation
 
 Run `saupe_example()` from a working directory containing `protein.pdb` and `rdc_data.mat`. The function has no input arguments or declared return values. It reads the structure with `read_pdb_pro('protein.pdb',1)`; from the MAT file it loads `aa_num`, `rdc_hz`, `isotope_a`, `isotope_b`, `atom_a`, and `atom_b`. For each measured coupling, it selects the two coordinates matching the residue number and atom labels, and passes the isotope pairs, coordinate pairs, and measured RDC vector to `rdc_fit(isotopes,xyz,rdc_hz)`. Thus the example's explicit fit inputs are the observed couplings and their isotope/geometry assignments; it does not specify fit initialisation, objective details, or restraints in this script.
 

@@ -7,7 +7,7 @@
 
 Divides an RCV sparse matrix by a numeric scalar.
 
-## Behavior
+## Behaviour
 
 The function checks that `A` is an RCV object and `k` is a numeric scalar, then replaces the stored values with `A.val/k`. The row and column coordinate arrays and the matrix dimensions are unchanged, so the result remains in RCV form. The source does not add real, finite, or nonzero restrictions on `k` beyond its numeric-scalar check.
 

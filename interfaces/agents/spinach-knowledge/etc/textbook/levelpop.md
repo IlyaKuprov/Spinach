@@ -22,10 +22,10 @@ All arguments are required; no defaults are defined.
 
 The function obtains the magnetogyric ratio and multiplicity from `spin(isotope)`, creates the spin matrices with `pauli(multiplicity)`, and forms the Zeeman Hamiltonian `H=-mg_ratio*field*S.z`. Energies are returned as `E=ħ diag(H)/(k_B temperature)`, i.e. fractions of `k_B T`. The source uses exact SI constants `ħ=6.62607015e-34/(2π) J·s` and `k_B=1.380649e-23 J/K`.
 
-To avoid overflow in the Boltzmann factors, it computes `exp(-E+min(E))` and normalizes the result to obtain `P`. It returns `dP=-diff(P)`; these are signed differences for adjacent entries in the returned vector order, not absolute differences.
+To avoid overflow in the Boltzmann factors, it computes `exp(-E+min(E))` and normalises the result to obtain `P`. It returns `dP=-diff(P)`; these are signed differences for adjacent entries in the returned vector order, not absolute differences.
 
 - `E` — vector of energy levels in units of `k_B T`.
-- `P` — normalized vector of level populations.
+- `P` — normalised vector of level populations.
 - `dP` — signed adjacent-level population differences.
 
 The sign of the magnetogyric ratio matters: the source notes it is negative for electrons and positive for protons. Field and temperature are checked as real scalars, with temperature additionally checked to be non-zero; the source does not check either for finiteness.

@@ -6,7 +6,7 @@
 
 Regression test for the remaining dynamic optimal-control helper functions in Spinach. It exercises waveform distortion models, FIR kernel estimation, quasi-Newton updates, Hessian handling, waveform utilities, GRAPE wrappers, Liouville-space GRAPE derivatives, TGRAPE duration gradients, `fmaxnewton` zero-iteration handling, and diagnostic plotting smoke paths, using small deterministic fixtures.
 
-## Behavior
+## Behaviour
 
 The test function takes no arguments and returns a regression test result object with explanatory messages. It announces the target with `fprintf('TESTING: Remaining optimal-control dynamic helpers\n')`, creates a result via `new_test_result('kernel/dynamic_optimcon_remaining', ...)`, ensures a parallel pool exists (starting a one-worker `parpool('Processes',1)` if none is open), and then runs four independent check groups:
 

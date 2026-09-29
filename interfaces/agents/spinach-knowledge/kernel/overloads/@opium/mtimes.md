@@ -2,7 +2,7 @@
 
 - Signature: `c=mtimes(a,b)`
 
-## Meaning and behavior
+## Meaning and behaviour
 
 An `opium` object represents the scaled unit matrix `coeff*I_dim`. The overload keeps that representation for scalar scaling and for products of two `opium` objects; it returns a numeric result for the nonscalar numeric branches.
 

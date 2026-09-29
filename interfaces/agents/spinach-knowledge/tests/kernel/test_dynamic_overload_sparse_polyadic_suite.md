@@ -6,9 +6,9 @@ Regression test for dynamic dispatch of sparse, polyadic, and OPIUM operator ove
 
 Source: [tests/kernel/test_dynamic_overload_sparse_polyadic_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_overload_sparse_polyadic_suite.m)
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a test result via `new_test_result` under the identifier `kernel/dynamic_overload_sparse_polyadic_suite`, and then runs assertion groups:
+The function announces the test target with `fprintf`, initialises a test result via `new_test_result` under the identifier `kernel/dynamic_overload_sparse_polyadic_suite`, and then runs assertion groups:
 
 - **RCV construction and conversion**: builds deterministic sparse matrices `A` and `B`, wraps them as `rcv` objects, and checks `sparse(ra)`, `full(ra)`, `size(ra)`, and `size(ra,1)` against the source matrices with tolerances `1e-15` (exact match, tolerance zero, for size checks).
 - **RCV arithmetic**: checks `ra+rb`, `ra+B`, `ra-rb`, `3.*ra`, `ra*2`, `2*ra`, and `ra./2` against dense references with tolerances `1e-15`.

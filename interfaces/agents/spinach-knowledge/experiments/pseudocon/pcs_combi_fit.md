@@ -16,7 +16,7 @@ The input is a `parameters` structure with these fields:
 - `d_shifts` and `p_shifts`: vectors of distinct diamagnetic and paramagnetic chemical shifts, respectively, in ppm.
 - `d_ambig` and `p_ambig`: cell arrays of integer index groups marking shift entries whose diamagnetic or paramagnetic assignment may be permuted. These indices rearrange the corresponding shift vectors.
 
-The source checks required fields and rejects an obsolete `nel` field because hyperfine tensors are normalized per unpaired electron. Expanded hyperfine tensors, isotope labels, and shift arrays are passed to `pcs2chi`, which checks their compatible lengths and tensor/isotope types.
+The source checks required fields and rejects an obsolete `nel` field because hyperfine tensors are normalised per unpaired electron. Expanded hyperfine tensors, isotope labels, and shift arrays are passed to `pcs2chi`, which checks their compatible lengths and tensor/isotope types.
 
 ## Assignment search and outputs
 

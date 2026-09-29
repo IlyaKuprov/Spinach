@@ -6,7 +6,7 @@
 
 Generates sets of vector-covector pairs for the parallel implementation of the time propagation algorithm described in [http://dx.doi.org/10.1063/1.3679656](http://dx.doi.org/10.1063/1.3679656) (Equation 9). The function decomposes a density matrix into a low-rank vector-covector representation by discarding singular values below a user-specified tolerance.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[vec,cov]=svd_shrink(spin_system,rho,tol)`.
 - The function first validates its inputs via an internal consistency check (`grumble`):

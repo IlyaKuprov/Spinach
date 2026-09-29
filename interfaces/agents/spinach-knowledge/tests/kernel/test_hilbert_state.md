@@ -6,10 +6,10 @@
 
 Regression test for Hilbert-space state generation. It verifies that `state()` maps observable labels to the expected density matrices for a one-spin system.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Hilbert-space state generation\n')`.
-- Initializes a test result via `new_test_result('kernel/hilbert_state', 'Hilbert-space state generation', 'state() must map observable labels to density matrices.')`.
+- Initialises a test result via `new_test_result('kernel/hilbert_state', 'Hilbert-space state generation', 'state() must map observable labels to density matrices.')`.
 - Builds a one-proton Hilbert-space spin system with:
   - `sys.magnet = 0`
   - `sys.isotopes = {'1H'}`

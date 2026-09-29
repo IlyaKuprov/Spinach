@@ -4,7 +4,7 @@
 
 ## What it calculates
 
-This zero-argument example is the “top row” control paired with fig_3_time_dep_bot_row.m. Its source describes the intended demonstration as removal of the second electron to show the JDNP contribution absent from the corresponding two-electron case. It plots proton polarization time traces at three fields and cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j). That stated purpose is not a numerical result reproduced here.
+This zero-argument example is the “top row” control paired with fig_3_time_dep_bot_row.m. Its source describes the intended demonstration as removal of the second electron to show the JDNP contribution absent from the corresponding two-electron case. It plots proton polarisation time traces at three fields and cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j). That stated purpose is not a numerical result reproduced here.
 
 ## Model edits and run setup
 
@@ -14,4 +14,4 @@ Run with MATLAB and Spinach, the JDNP helper, and Spinach plotting routines avai
 
 ## Output and limits
 
-It opens a 1-by-3 figure with time in seconds and one panel per field; the time grid runs from zero through t_step*nsteps (301 samples). It plots normalized real proton Lz expectation values and does not save/export data. The helper supplies the starting system and parameters; the source does not list all helper defaults. The file's intended “vanishing JDNP” comparison has not been independently validated here, and mw_pwr has no unit stated in the source.
+It opens a 1-by-3 figure with time in seconds and one panel per field; the time grid runs from zero through t_step*nsteps (301 samples). It plots normalised real proton Lz expectation values and does not save/export data. The helper supplies the starting system and parameters; the source does not list all helper defaults. The file's intended “vanishing JDNP” comparison has not been independently validated here, and mw_pwr has no unit stated in the source.

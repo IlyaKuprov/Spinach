@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Scans the microwave frequency in a powder-averaged, laboratory-frame steady-state DNP calculation for a single `15N-labelled` urea spin system coupled to one electron. The example compares two widely separated frequency windows and observes longitudinal polarization on both proton and nitrogen channels. The source estimates a calculation time of hours.
+Scans the microwave frequency in a powder-averaged, laboratory-frame steady-state DNP calculation for a single `15N-labelled` urea spin system coupled to one electron. The example compares two widely separated frequency windows and observes longitudinal polarisation on both proton and nitrogen channels. The source estimates a calculation time of hours.
 
 ## Spin system and model
 
@@ -19,4 +19,4 @@ The function builds the spin system and basis with `create` and `basis`, then ca
 
 ## Result and scope
 
-The returned array is plotted in four panels: 1H then 15N longitudinal expectation values over each of the two frequency windows, using the real parts of the corresponding result column and frequency block. The axes are labelled microwave frequency in MHz; no output array or figure is saved by the function. The source supplies no computed polarization values or performance result beyond its hours estimate.
+The returned array is plotted in four panels: 1H then 15N longitudinal expectation values over each of the two frequency windows, using the real parts of the corresponding result column and frequency block. The axes are labelled microwave frequency in MHz; no output array or figure is saved by the function. The source supplies no computed polarisation values or performance result beyond its hours estimate.

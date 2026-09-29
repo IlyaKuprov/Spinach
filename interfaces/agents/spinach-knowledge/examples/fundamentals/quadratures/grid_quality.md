@@ -2,7 +2,7 @@
 
 ## Purpose and question
 
-This example plots how the error profiles returned by `grid_test` vary with grid size and spherical rank for three shipped grid families. The first two panels assess two- and three-angle REPULSION grids; the third assesses two-angle Lebedev grids. It is an error-profile visualization, not a timing benchmark.
+This example plots how the error profiles returned by `grid_test` vary with grid size and spherical rank for three shipped grid families. The first two panels assess two- and three-angle REPULSION grids; the third assesses two-angle Lebedev grids. It is an error-profile visualisation, not a timing benchmark.
 
 ## Inputs and numerical method
 

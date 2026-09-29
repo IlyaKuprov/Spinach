@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Compares steady-state NOVEL proton polarization across a repetition-time scan, with and without a flipback pulse, while averaging over a five-node microwave B1 distribution. The source estimates hours of calculation time. This is a parameterized example script, not a function that accepts scan settings or returns the computed arrays.
+Compares steady-state NOVEL proton polarisation across a repetition-time scan, with and without a flipback pulse, while averaging over a five-node microwave B1 distribution. The source estimates hours of calculation time. This is a parameterised example script, not a function that accepts scan settings or returns the computed arrays.
 
 ## Spin system and relaxation
 
@@ -19,4 +19,4 @@ The B1 quadrature nodes and weights come from `gaussleg(14e6,16e6,5)`, with the 
 
 ## Result and limits
 
-The two result arrays are integrated over B1 using the quadrature weights normalized by their sum. The figure plots the real proton longitudinal expectation value against repetition time for the no-flipback and flipback cases, and is saved as `novel_x_rep_time_ensemble_b1.fig`. The source specifies the computation and plot but contains no numerical polarization results. The cited helper definitions are not present in this file; a repository-wide text search found no function definition for either helper name, so their provider remains to be established before running this example.
+The two result arrays are integrated over B1 using the quadrature weights normalised by their sum. The figure plots the real proton longitudinal expectation value against repetition time for the no-flipback and flipback cases, and is saved as `novel_x_rep_time_ensemble_b1.fig`. The source specifies the computation and plot but contains no numerical polarisation results.

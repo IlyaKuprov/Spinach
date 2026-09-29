@@ -21,4 +21,4 @@ The GPU conversion comparison is conditional on `gpuDeviceCount>0`; otherwise th
 
 ## Output and limits
 
-The function returns no output argument. It displays section messages when execution reaches them; a failed explicit assertion, validation, or comparison can stop execution with an error. Results depend on unseeded random draws. This compact unit test checks selected operations on small matrices; it does not benchmark performance or establish behavior for every input, and GPU behavior is only exercised when a device is available.
+The function returns no output argument. It displays section messages when execution reaches them; a failed explicit assertion, validation, or comparison can stop execution with an error. Results depend on unseeded random draws. This compact unit test checks selected operations on small matrices; it does not benchmark performance or establish behaviour for every input, and GPU behaviour is only exercised when a device is available.

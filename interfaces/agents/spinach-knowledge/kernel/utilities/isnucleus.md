@@ -6,7 +6,7 @@ Returns `true` if a given spin specification string is a nucleus, and `false` ot
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isnucleus.m>
 
-## Behavior
+## Behaviour
 
 1. The input is first passed to an internal consistency-checking subfunction `grumble`, which:
    - Errors with `'spin_spec must be a character string.'` if the input is not a character string (`~ischar(spin_spec)`).

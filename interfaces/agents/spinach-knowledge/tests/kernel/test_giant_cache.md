@@ -6,9 +6,9 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_giant
 
 Regression test that verifies the giant-spin Hamiltonian cache (`sys.enable={'ham_cache'}`) preserves giant coefficients and retention. The test checks that cached assembly returns results identical to uncached production assembly for both cache insertion orders, that changed giant coefficients are distinguished by the cache, and that the crystal decomposition receives distinct full and Zeeman Hamiltonians.
 
-## Behavior
+## Behaviour
 
-- Initializes a regression record via `new_test_result` with the identifier `'kernel/giant_cache'`, the name `'Giant-spin cache identity'`, and the description `'cached assembly must preserve giant coefficients and retention.'`.
+- Initialises a regression record via `new_test_result` with the identifier `'kernel/giant_cache'`, the name `'Giant-spin cache identity'`, and the description `'cached assembly must preserve giant coefficients and retention.'`.
 - Specifies physical Hermitian giant terms in rotated tensor frames: physical non-axial rank-two and rank-four terms have nonzero tensor and sample frames. Uncached production assembly supplies the references.
 - System settings include `sys.magnet=0.73`, `sys.output='hush'`, `sys.disable={'hygiene'}`, `sys.enable={'ham_cache'}`, `sys.parallel={'processes',1}`, and `sys.parprops={}`.
 - Giant interaction coefficients are `inter.giant.coeff={{[0 0 0],[2e5 3e5 7e5 -3e5 2e5],zeros(1,7),[4e4 0 2e4 0 8e4 0 2e4 0 4e4]}}` with Euler angles `inter.giant.euler={{[0 0 0],[0.31 0.53 0.17],[0 0 0],[0.19 0.41 0.37]}}`.

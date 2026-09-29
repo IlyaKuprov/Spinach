@@ -15,11 +15,11 @@ D=fdmat(dim,nstenc,order,boundary) returns a sparse dim-by-dim matrix that appli
 
 ## How the matrix is assembled
 
-The routine calls fdweights to obtain the coefficient row for the requested derivative, then inserts those coefficients into a sparse matrix preallocated for up to dim*nstenc entries. For interior points, the sample offsets are the centered integers from -(nstenc-1)/2 through (nstenc-1)/2, and the resulting row is placed at each interior grid point.
+The routine calls fdweights to obtain the coefficient row for the requested derivative, then inserts those coefficients into a sparse matrix preallocated for up to dim*nstenc entries. For interior points, the sample offsets are the centred integers from -(nstenc-1)/2 through (nstenc-1)/2, and the resulting row is placed at each interior grid point.
 
-With 'wall', the first (nstenc-1)/2 rows use one-sided stencils drawn from the first nstenc samples. The matching rows at the far edge use the reversed coefficient order and the factor (-1)^order. The remaining rows use centered coefficients.
+With 'wall', the first (nstenc-1)/2 rows use one-sided stencils drawn from the first nstenc samples. The matching rows at the far edge use the reversed coefficient order and the factor (-1)^order. The remaining rows use centred coefficients.
 
-With 'pbc', every row uses the centered coefficient row. The column indices are wrapped into 1:dim by modulo indexing, which implements periodic indexing.
+With 'pbc', every row uses the centred coefficient row. The column indices are wrapped into 1:dim by modulo indexing, which implements periodic indexing.
 
 No grid-spacing argument is applied: coefficients correspond to unit sample spacing. If the sample spacing represents a physical interval other than one, the derivative must be scaled for that coordinate convention by the caller.
 
@@ -27,7 +27,7 @@ No grid-spacing argument is applied: coefficients correspond to unit sample spac
 
     D=fdmat(5,3,1,'wall');
 
-This makes a 5-by-5 first-derivative matrix. The first row uses the three-point forward weights [-3/2, 2, -1/2], interior rows use the centered weights [-1/2, 0, 1/2], and the last row uses the corresponding backward weights. Multiplication by a sample vector returns one estimate at each of the five positions.
+This makes a 5-by-5 first-derivative matrix. The first row uses the three-point forward weights [-3/2, 2, -1/2], interior rows use the centred weights [-1/2, 0, 1/2], and the last row uses the corresponding backward weights. Multiplication by a sample vector returns one estimate at each of the five positions.
 
 ## Related routine
 

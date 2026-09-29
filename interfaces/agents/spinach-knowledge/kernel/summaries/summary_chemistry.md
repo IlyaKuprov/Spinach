@@ -11,7 +11,7 @@ When `spin_system.chem.parts` contains more than one subsystem, reports each sub
 ## Reported values and units
 
 - If `spin_system.chem.rates` exists, the function removes its diagonal before enumerating entries. It prints a table headed `N(from)`, `N(to)`, and `Rate(Hz)`; each value is formatted with a sign and three digits after the decimal in scientific notation (`%+0.3e`). The two indices are printed from the matrix column and row, respectively.
-- If `spin_system.chem.flux_rate` exists, its nonzero entries are enumerated with `find`. A point-to-point flux table is printed only when entries are present; its indices are printed from the matrix row and column, respectively. Values are likewise labeled Hz and formatted as signed scientific notation with three digits after the decimal.
+- If `spin_system.chem.flux_rate` exists, its nonzero entries are enumerated with `find`. A point-to-point flux table is printed only when entries are present; its indices are printed from the matrix row and column, respectively. Values are likewise labelled Hz and formatted as signed scientific notation with three digits after the decimal.
 
 Subsystem and spin indices are counts/indices, not physical units. No subsystem or rate table is produced when there is only one chemical part. Rate-table headings are emitted when the rates field exists, even if removing the diagonal leaves no entries.
 

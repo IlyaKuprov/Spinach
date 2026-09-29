@@ -4,7 +4,7 @@
 
 Computes the Sorensen bound for the maximum transfer efficiency between two states under arbitrary control operators, implementing Equation 186 of Sorensen's review ([DOI: 10.1016/0079-6565(89)80006-8](https://doi.org/10.1016/0079-6565(89)80006-8)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `b=sorensen(rho_init,rho_targ)`.
 - Validates the inputs through an internal `grumble` subfunction, which errors with `'the inputs must be Hermitian matrices of the same size.'` unless both arguments are numeric, Hermitian, and of equal element count.

@@ -6,9 +6,9 @@
 
 Regression test for the dynamic trajectory-analysis front-end kernels. It exercises the plotting branches of `trajan()` and the scoring branches of `trajsimil()` on a compact two-spin spherical-tensor trajectory, checking that both helpers expose deterministic branch outputs.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf` and initializes a regression test result via `new_test_result` under the identifier `kernel/dynamic_trajectory_frontends`, described as "Dynamic trajectory analysis front ends" with the requirement that "trajectory plotting and similarity helpers must expose deterministic branch outputs".
+- Announces the test target with `fprintf` and initialises a regression test result via `new_test_result` under the identifier `kernel/dynamic_trajectory_frontends`, described as "Dynamic trajectory analysis front ends" with the requirement that "trajectory plotting and similarity helpers must expose deterministic branch outputs".
 - Forces figures to be invisible during plotting checks by setting the groot default figure visibility to `'off'`, registering an `onCleanup` handler that restores the previous visibility and executes `close all force` afterwards.
 - Builds the test trajectory with `local_test_trajectory`, then runs `local_test_trajan` and `local_test_trajsimil` in sequence, accumulating results.
 

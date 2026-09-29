@@ -12,7 +12,7 @@ This is a basis expansion of a projector, not a propagator. The function does no
 
 ## Basis and outputs
 
-`states` contains the Spinach BM-basis indices returned by `oper2bm(P)`; use [lin2kq](../indexing/lin2kq.md) for the K,Q bosonic-monomial indexing. `coeffs` is returned directly from the same conversion call. `enlev2bm` adds no scale factor or other coefficient normalization of its own; the values are those calculated by `oper2bm` for this diagonal projector.
+`states` contains the Spinach BM-basis indices returned by `oper2bm(P)`; use [lin2kq](../indexing/lin2kq.md) for the K,Q bosonic-monomial indexing. `coeffs` is returned directly from the same conversion call. `enlev2bm` adds no scale factor or other coefficient normalisation of its own; the values are those calculated by `oper2bm` for this diagonal projector.
 
 ## Inputs and checks
 

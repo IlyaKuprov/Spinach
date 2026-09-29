@@ -6,7 +6,7 @@
 
 Runs a single Spinach regression test selected by an identifier substring, returning the result structure for that test.
 
-## Behavior
+## Behaviour
 
 - Validates `test_id` with an internal consistency check (`grumble`), which errors unless the argument is a non-empty character row vector.
 - Adds the test library directory (`lib` under the folder containing `run_test.m`) to the MATLAB path.

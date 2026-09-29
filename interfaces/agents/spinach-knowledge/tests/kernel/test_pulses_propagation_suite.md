@@ -4,9 +4,9 @@
 
 Regression test suite for pulse-coordinate and propagation helper functions in Spinach. It verifies RF coordinate Hessian round-trips, Iserles generators, Lie-step methods on a constant generator, and R-sequence phase/compiler invariants.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf` and initializes a regression test result object via `new_test_result` for `kernel/pulses_propagation_suite`.
+- Announces the test target with `fprintf` and initialises a regression test result object via `new_test_result` for `kernel/pulses_propagation_suite`.
 - **Polar-Cartesian round-trip**: Uses non-zero amplitudes `r=[1.2 2.3 3.4]` and phases `p=[0.2 -0.7 1.1]` (away from the polar singularity). Defines `f=sum(r.^2)=sum(x.^2+y.^2)` whose Cartesian Hessian is exactly `2I`, with gradient `Dr=2*r` and all other derivative blocks zero. Converts polar coordinates, gradients, and Hessians to Cartesian via `polar2cartesian` and back via `cartesian2polar`, then checks:
   - Amplitude and phase Hessian round-trips (tolerance `1e-12`).
   - Cartesian gradients `Dx=2*x`, `Dy=2*y` (tolerance `1e-12`).

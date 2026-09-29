@@ -4,7 +4,7 @@ Source: [kernel/plotting/kfigure.m](https://github.com/IlyaKuprov/Spinach/blob/m
 
 - Signature: `handle = kfigure(varargin)`
 
-## Behavior and figure defaults
+## Behaviour and figure defaults
 
 Before creating a figure, `kfigure` sets these four defaults on MATLAB's root object `groot`:
 

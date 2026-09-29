@@ -15,7 +15,7 @@ The kernel is a vector of spectral multipliers, not a matrix or a signal. Under 
 
 ## Frequency grid and units
 
-The source uses centered integer mode indices and then ifftshift to arrange them in the bin order expected by fft. For odd npoints, the centered indices run from (1-npoints)/2 through (npoints-1)/2. For even npoints, they run from -npoints/2 through (npoints-1)/2, including the negative Nyquist bin. Multiplication by 2*pi/(npoints*dx) sets the angular wave-number scale; raising the imaginary multiplier to order gives the requested derivative order. The units are signal units divided by dx^order.
+The source uses centred integer mode indices and then ifftshift to arrange them in the bin order expected by fft. For odd npoints, the centred indices run from (1-npoints)/2 through (npoints-1)/2. For even npoints, they run from -npoints/2 through (npoints-1)/2, including the negative Nyquist bin. Multiplication by 2*pi/(npoints*dx) sets the angular wave-number scale; raising the imaginary multiplier to order gives the requested derivative order. The units are signal units divided by dx^order.
 
 The method assumes periodic boundary conditions and uniform spacing dx. It is the Fourier/spectral alternative to the finite-stencil construction in [fdmat.m](fdmat.md).
 

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`spiral` simulates a two-dimensional MRI acquisition with spiral k-space sampling. In the imaging context it applies 90° excitation, evolves for `t_echo`, applies a 180° pulse, evolves for the second `t_echo`, and then traverses a parameterized spiral while recording the selected observable. It constructs an image computationally; the source does not report a measured scan.
+`spiral` simulates a two-dimensional MRI acquisition with spiral k-space sampling. In the imaging context it applies 90° excitation, evolves for `t_echo`, applies a 180° pulse, evolves for the second `t_echo`, and then traverses a parameterised spiral while recording the selected observable. It constructs an image computationally; the source does not report a measured scan.
 
 ## Inputs and units
 

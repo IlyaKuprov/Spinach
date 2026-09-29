@@ -6,7 +6,7 @@
 
 Regression test for the supported boundaries of keyhole optimal control in Spinach. It verifies that spin-state projectors acting between noncommuting spin-half pulse slices are handled correctly: density-vector and wavefunction bases must reject Newton/Goodwin keyhole methods at both setup and direct-engine entry while retaining first derivatives, and empty schedules and Hilbert-space keyhole Hessians must remain supported.
 
-## Behavior
+## Behaviour
 
 - Declares a regression named `kernel/keyhole_guard` ("State-vector keyhole Hessian guard") with the requirement that unsupported Hessians are refused without changing supported methods.
 - Builds a spin-half system with `spin_system.sys.output='hush'`, empty enable/disable lists, tolerances (`liouv_zero=1e-14`, `small_matrix=64`, `dense_matrix=0.5`, `prop_chop=1e-14`), and isotope `1H`.

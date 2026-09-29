@@ -8,11 +8,11 @@ Returns the central angular distance between two directions on the unit sphere. 
 
 ## Rule and units
 
-After normalizing each input, the routine evaluates `atan2(norm(cross(r1,r2)),dot(r1,r2))`. This gives the shorter central angle from zero to pi radians using the cross-product magnitude and dot product. The scalar result `sig` is in radians; the function does not calculate a weighted grid or a physical length for a sphere with a different radius.
+After normalising each input, the routine evaluates `atan2(norm(cross(r1,r2)),dot(r1,r2))`. This gives the shorter central angle from zero to pi radians using the cross-product magnitude and dot product. The scalar result `sig` is in radians; the function does not calculate a weighted grid or a physical length for a sphere with a different radius.
 
 ## Parameters / inputs
 
-- `r1`, `r2` — real numeric three-element vectors giving Cartesian endpoint directions. Each supplied vector must have a Euclidean norm within `sqrt(eps)` of one; after this check, the function normalizes the vectors and uses column form internally.
+- `r1`, `r2` — real numeric three-element vectors giving Cartesian endpoint directions. Each supplied vector must have a Euclidean norm within `sqrt(eps)` of one; after this check, the function normalises the vectors and uses column form internally.
 
 ## Output
 

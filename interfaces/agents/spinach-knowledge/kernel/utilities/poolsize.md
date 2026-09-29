@@ -4,7 +4,7 @@
 
 Returns the current parallel pool size in Spinach ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/poolsize.m)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `n=poolsize()`.
 - The function obtains the current parallel pool handle with `gcp('nocreate')`.

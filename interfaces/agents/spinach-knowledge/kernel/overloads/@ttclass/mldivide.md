@@ -2,7 +2,7 @@
 
 Direct mapped source: [kernel/overloads/@ttclass/mldivide.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/mldivide.m) · [existing Spinach Wiki entry](https://spindynamics.org/wiki/index.php?title=ttclass/mldivide.m)
 
-## Behavior
+## Behaviour
 
 This overload computes tensor-train solution `x` from matrix `A` and vector `y`; both inputs must be `ttclass` objects. The method shrinks `A` and `y`, forms and shrinks `A'*A` and `A'*y`, then calls `amensolve(AA,Ay,1e-6)`. This is the normal-equation system `A'*A*x=A'*y`, not a direct unsymmetrised solve. MATLAB's `'` is conjugate transpose, so the products conjugate complex entries of `A` as part of the adjoint.
 

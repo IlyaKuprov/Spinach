@@ -4,7 +4,7 @@
 
 Regression test for hard pi-pulse rotation in the Spinach kernel. It verifies that a pi rotation about the X axis inverts longitudinal magnetisation, i.e. `Lz -> -Lz`.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Hard pi pulse rotation\n')`.
 - Registers a new test result via `new_test_result('kernel/pi_pulse_rotation', 'Hard pi pulse rotation', 'a pi rotation around X must invert longitudinal magnetisation.')`.

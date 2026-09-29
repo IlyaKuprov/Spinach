@@ -6,7 +6,7 @@
 
 ## Meaning and equation
 
-This convolves a unit-area Gaussian with either a point offset or a normalized triangular distribution. The Gaussian kernel is `g(u)=exp(-u^2/(2*sigma^2))/(sigma*sqrt(2*pi))`, with `sigma=fwhm/(2*sqrt(2*log(2)))`.
+This convolves a unit-area Gaussian with either a point offset or a normalised triangular distribution. The Gaussian kernel is `g(u)=exp(-u^2/(2*sigma^2))/(sigma*sqrt(2*pi))`, with `sigma=fwhm/(2*sqrt(2*log(2)))`.
 
 - One offset `q`: `y(x)=ampl*g(x-q)`.
 - Three distinct sorted offsets `a<b<c`: use the triangular density `T(t)=2*(t-a)/((b-a)*(c-a))` for `a<=t<=b`, `T(t)=2*(c-t)/((c-b)*(c-a))` for `b<t<=c`, and zero elsewhere. Then `y(x)=ampl*integral(T(t)*g(x-t),t=a..c)`.

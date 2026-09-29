@@ -6,9 +6,9 @@
 
 Regression test for graph, geometry, lattice, and coordinate utilities in Spinach. It verifies small graph decompositions, lattice generation, dihedral angles, coordinate density binning, nearest-spin lookup, substance and label lookup helpers, and coordinate-derived dipolar tensor identities.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a test result via `new_test_result` with the identifier `kernel/graph_geometry_suite` and the description "Graph, geometry, and coordinate utilities", then runs a sequence of assertions:
+The function announces the test target with `fprintf`, initialises a test result via `new_test_result` with the identifier `kernel/graph_geometry_suite` and the description "Graph, geometry, and coordinate utilities", then runs a sequence of assertions:
 
 - **Cubic lattice:** calls `cubic_lattice('13C',1.5,2)` and checks that the isotope count is 8 (a two-period cubic lattice contains 2^3 isotope entries), that the sorted coordinates enumerate all corners of the requested cubic grid (compared against `1.5*[0 0 0;0 0 1;0 1 0;0 1 1;1 0 0;1 0 1;1 1 0;1 1 1]` with tolerances `1e-15`), and that the first periodic boundary vector equals `[3 0 0]` (spacing times number of periods along x).
 - **Dihedral angle:** computes `dihedral([1 0 0],[0 0 0],[0 1 0],[0 1 1])` and checks that the magnitude of the angle is 90 degrees (tolerance `1e-13`), since orthogonal adjacent planes give a ninety-degree dihedral magnitude.

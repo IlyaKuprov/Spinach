@@ -6,13 +6,13 @@
 
 ## Purpose
 
-This example checks selected analytical waveform derivatives from the Cartesian GRAPE routine `grape_xy` against centered finite differences of its reported fidelity, using the trapezium integrator.
+This example checks selected analytical waveform derivatives from the Cartesian GRAPE routine `grape_xy` against centred finite differences of its reported fidelity, using the trapezium integrator.
 
 ## Spin system and controls
 
 For each of `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, `dirdiff_test_system` supplies a test system and the operators `Sx`, `Sy`, `Sz`, `Lx`, `Ly`, and `H`. The control structure sets isotope `13C`, channel map `[1;1]`, drift `H`, controls `Lx` and `Ly`, initial states `{Sx Sy Sz}`, target states `{-Sz Sy Sx}`, and power levels `2*pi*linspace(50e3,70e3,10)`. It selects `method='lbfgs'`, `max_iter=1000`, empty plotting options, `integrator='trapezium'`, and `pulse_dt=12.8e-6*ones(1,5)`, then passes the system and controls through `optimcon`.
 
-The L-BFGS method and iteration limit are control settings here; the example does not run an optimization loop. It evaluates `grape_xy` directly on a random (2×5) waveform `randn(2,5)/3`. The analytical gradient is taken from the first fidelity component (`grad_anl(:,:,1)`).
+The L-BFGS method and iteration limit are control settings here; the example does not run an optimisation loop. It evaluates `grape_xy` directly on a random (2×5) waveform `randn(2,5)/3`. The analytical gradient is taken from the first fidelity component (`grad_anl(:,:,1)`).
 
 ## Finite-difference checks
 
@@ -22,4 +22,4 @@ The source calls these indices left edge, midpoint, and right edge. The control 
 
 ## Scope
 
-These are three sampled coordinate-derivative checks for each constructed formalism, not a comparison over all ten waveform coordinates or an optimization-convergence test. The relative-error expression has no small-denominator guard when the finite-difference estimate is zero or near zero.
+These are three sampled coordinate-derivative checks for each constructed formalism, not a comparison over all ten waveform coordinates or an optimisation-convergence test. The relative-error expression has no small-denominator guard when the finite-difference estimate is zero or near zero.

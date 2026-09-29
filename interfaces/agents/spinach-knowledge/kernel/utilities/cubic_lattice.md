@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Creates a periodic volume-centered cubic lattice with user-supplied parameters, returning Spinach input data structures suitable for periodic-boundary simulations.
+Creates a periodic volume-centred cubic lattice with user-supplied parameters, returning Spinach input data structures suitable for periodic-boundary simulations.
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/cubic_lattice.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `[sys,inter]=cubic_lattice(isotope,spacing,n_periods)`.
 - Calls the internal consistency-checking function `grumble` on the inputs before building the lattice.

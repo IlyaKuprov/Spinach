@@ -10,7 +10,7 @@ Calculates pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, 
 
 ## Physical model and setup
 
-The system uses one `E17` effective spin with g = 1.24 and the CASSCF crystal-field coefficients from `ho_pzdo4_params.m`, converted rank by rank from cm^-1 to Hz and then to spherical form. The single-crystal field frame is aligned with the laboratory frame (orientation [0 0 0]). The formalism is Zeeman-Hilbert space without approximation. Spin-phonon relaxation uses the generalized Lindblad dissipator of Saito and Miyashita with a super-Ohmic bath (alpha = 2, lambda = 10 cm^-1, I0 = 1e-14 ps/rad); the bath parameter is converted to rad/s units in the source. The coupling matrix has unit elements between adjacent mJ states. Magnetisation is plotted as the moment -1.24 Jz in Bohr magnetons.
+The system uses one `E17` effective spin with g = 1.24 and the CASSCF crystal-field coefficients from `ho_pzdo4_params.m`, converted rank by rank from cm^-1 to Hz and then to spherical form. The single-crystal field frame is aligned with the laboratory frame (orientation [0 0 0]). The formalism is Zeeman-Hilbert space without approximation. Spin-phonon relaxation uses the generalised Lindblad dissipator of Saito and Miyashita with a super-Ohmic bath (alpha = 2, lambda = 10 cm^-1, I0 = 1e-14 ps/rad); the bath parameter is converted to rad/s units in the source. The coupling matrix has unit elements between adjacent mJ states. Magnetisation is plotted as the moment -1.24 Jz in Bohr magnetons.
 
 ## Field profiles and propagation
 

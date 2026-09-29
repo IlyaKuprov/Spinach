@@ -6,7 +6,7 @@ Extracts the 3x3 coupling tensor between a pair of spins from the `spin_system` 
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/get_coupling.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `A=get_coupling(spin_system,n,k)`.
 - Runs a consistency check (`grumble`) that errors if `spin_system` lacks the `inter` or `inter.coupling` fields, or if `n` or `k` is not a positive real integer.

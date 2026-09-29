@@ -6,7 +6,7 @@
 
 Turns specified states of a spin system into sinkholes: any population reaching them is summed up and stored forever in a frozen state. This is useful for state space restriction diagnostics.
 
-## Behavior
+## Behaviour
 
 - Syntax: `L=sinkhole(spin_system,L,states)`.
 - The function first runs a consistency check (`grumble`) on the inputs.

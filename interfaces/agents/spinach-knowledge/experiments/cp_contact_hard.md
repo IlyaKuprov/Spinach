@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A general rotating-frame cross-polarisation contact calculation. It starts from `parameters.rho0`, applies an ideal 90-degree excitation assembled from user-supplied operators, then propagates under the context Liouvillian plus the channel-specific spin-lock fields. Unlike the soft-pulse contact routine, the excitation pulse is idealized rather than given a finite duration.
+A general rotating-frame cross-polarisation contact calculation. It starts from `parameters.rho0`, applies an ideal 90-degree excitation assembled from user-supplied operators, then propagates under the context Liouvillian plus the channel-specific spin-lock fields. Unlike the soft-pulse contact routine, the excitation pulse is idealised rather than given a finite duration.
 
 ## Inputs and timing
 

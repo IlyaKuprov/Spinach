@@ -2,7 +2,7 @@
 
 Direct mapped source: [kernel/overloads/@ttclass/minus.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/minus.m) · [existing Spinach Wiki entry](https://spindynamics.org/wiki/index.php?title=ttclass/minus.m)
 
-## Behavior
+## Behaviour
 
 For `a-b`, the method represents the difference as concatenated tensor-train components; it does not subtract corresponding cores or call `shrink`. Existing cores and ranks stay with their respective components, while the coefficients of `b`'s components are negated. The component list can therefore grow until a later compression.
 

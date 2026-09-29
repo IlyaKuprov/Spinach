@@ -6,9 +6,9 @@
 
 Regression test for dynamic pulse utility paths in Spinach. The test verifies that pulse utilities produce finite dynamic outputs and match direct small-matrix references, covering gradient-pulse dynamics, heterodyne filtering, RLC response transforms, Bruker pulse-file writing, finite-RF R-sequence compilation, waveform basis variants, and pulse-shape variants.
 
-## Behavior
+## Behaviour
 
-The test announces its target, initializes a regression result via `new_test_result` with the identifier `kernel/dynamic_pulse_utilities_deep`, and then runs the following checks:
+The test announces its target, initialises a regression result via `new_test_result` with the identifier `kernel/dynamic_pulse_utilities_deep`, and then runs the following checks:
 
 - **Gradient pulse**: builds a one-proton Liouville-space spin system with a carrier frequency (`local_liouv_system(1.0)`), zero `Lz` operator, and an `Lx` state. `grad_pulse` is compared against a direct small-matrix exponential reference (`grad_pulse_ref`) with tolerance `1e-10`, and a non-zero response check (`norm(rho_grad-rho,2)>1e-8`) confirms that a finite gradient changes transverse magnetisation in the one-spin carrier frame.
 - **Gradient sandwich**: `grad_sandw` is compared against `grad_sandw_ref` using a propagator built from a `2*pi*50` Ly operator with a `2.0e-4` duration, gradient amplitudes `[3.0 -2.0]`, slice length `0.10`, durations `[1.0e-4 1.4e-4]`, and factors `[0.7 0.9]`, with tolerance `1e-10` and a non-zero response check against the propagated state.

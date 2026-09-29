@@ -6,7 +6,7 @@ Generates a random walk on the SO(3) rotation group, simulating isotropic rotati
 
 Source: [kernel/utilities/rwalk.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rwalk.m)
 
-## Behavior
+## Behaviour
 
 1. Validates inputs via an internal `grumble` subroutine: `npts` must be a positive real integer, and `tau_c` and `dt` must be positive real scalars.
 2. Generates a random unit jump sequence: `randn(npts,3)/sqrt(3)`.

@@ -6,7 +6,7 @@
 
 For each core in the first train, the method records the second and third core dimensions. It returns an `ncores`-by-2 array whose row `k` is `[size(tt.cores{k,1},2), size(tt.cores{k,1},3)]`, i.e. that core's physical row and column dimensions. It does not return bond ranks or aggregate dimensions across cores.
 
-This is a metadata query: it leaves the TT cores and ranks unchanged and does not materialize the represented matrix. It applies no conjugation or transpose and adds no explicit input guard.
+This is a metadata query: it leaves the TT cores and ranks unchanged and does not materialise the represented matrix. It applies no conjugation or transpose and adds no explicit input guard.
 
 ## Input and output
 

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Checks the angle-order convention and singular-branch handling of `euler_sup` by comparing its output rotation with direct direction-cosine-matrix (DCM) composition. This is a randomized consistency test, not a fit or a demonstration of every possible Euler-angle input.
+Checks the angle-order convention and singular-branch handling of `euler_sup` by comparing its output rotation with direct direction-cosine-matrix (DCM) composition. This is a randomised consistency test, not a fit or a demonstration of every possible Euler-angle input.
 
 ## Setup and checks
 
@@ -16,4 +16,4 @@ Three further 500-pair loops exercise near-singular branches: both middle angles
 
 ## Observable result and scope
 
-If all checks pass, the function prints `Euler angle superposition test PASSED.`; failures raise an error at the first failed identity, random, or singular-branch comparison. It produces no plot and returns no fit or rotation result. The samples are drawn from MATLAB's current random stream; the source does not set a seed, so this is repeated randomized coverage rather than an exhaustive guarantee.
+If all checks pass, the function prints `Euler angle superposition test PASSED.`; failures raise an error at the first failed identity, random, or singular-branch comparison. It produces no plot and returns no fit or rotation result. The samples are drawn from MATLAB's current random stream; the source does not set a seed, so this is repeated randomised coverage rather than an exhaustive guarantee.

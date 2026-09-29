@@ -7,7 +7,7 @@
 
 Convert an offset, sweep width, and point count into a column vector of frequency ticks in Hz, for example as an axis supplied to a plotting function.
 
-## Inputs and discretization
+## Inputs and discretisation
 
 - `offs` is a real scalar offset from the carrier frequency in Hz.
 - `sweep` is a real scalar sweep width in Hz.

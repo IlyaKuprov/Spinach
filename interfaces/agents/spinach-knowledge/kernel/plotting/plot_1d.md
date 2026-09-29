@@ -5,7 +5,7 @@
 
 ## Purpose and inputs
 
-Plots the supplied spectrum samples against an axis returned by [`axis_1d`](axis_1d.md). The source documents `spectrum` as a column vector. `parameters.sweep` is either a sweep width in Hz or a two-element pair of frequency bounds in Hz; spin labels, offset, and axis units control labeling and unit conversion. Extra arguments are passed to MATLAB `plot`.
+Plots the supplied spectrum samples against an axis returned by [`axis_1d`](axis_1d.md). The source documents `spectrum` as a column vector. `parameters.sweep` is either a sweep width in Hz or a two-element pair of frequency bounds in Hz; spin labels, offset, and axis units control labelling and unit conversion. Extra arguments are passed to MATLAB `plot`.
 
 With a scalar sweep, `axis_1d` calls [`ft_axis`](ft_axis.md) with offset, sweep, and `parameters.zerofill`. That helper starts from `linspace(-sweep/2,sweep/2,npoints+1)`, drops one periodic endpoint, shifts the retained samples by half a step when the point count is odd, and adds the offset. A two-element sweep instead produces `linspace(low,high,zerofill)`. If `zerofill` is absent but `parameters.npoints` is present, `plot_1d` copies that value to `zerofill`; it neither uses `nfft` or `dwell` nor performs zero-filling or a Fourier transform itself.
 

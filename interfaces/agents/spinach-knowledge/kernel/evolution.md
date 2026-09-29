@@ -29,4 +29,4 @@ The routine returns states or observable values, not a separate time vector; the
 
 ## Parallel context
 
-The source reports Hilbert-space parallel tests through a 128-core configuration (16 nodes, 8 cores each) and notes trajectory parallelization did not appear beneficial because of inter-thread communication ([10.1063/1.3679656](https://doi.org/10.1063/1.3679656)).
+The source reports Hilbert-space parallel tests through a 128-core configuration (16 nodes, 8 cores each) and notes trajectory parallelisation did not appear beneficial because of inter-thread communication ([10.1063/1.3679656](https://doi.org/10.1063/1.3679656)).

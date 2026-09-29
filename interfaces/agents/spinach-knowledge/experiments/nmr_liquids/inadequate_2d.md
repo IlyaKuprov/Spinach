@@ -8,7 +8,7 @@ Two-dimensional INADEQUATE. The source describes the F1 axis as a double-quantum
 
 ## Sequence and signal
 
-The source initializes longitudinal magnetisation on the configured nucleus and uses two delays `tau=abs(1/(4*parameters.J))` around an inversion pulse. A final 90-degree pulse creates the double-quantum signal, which is filtered to coherence orders +2 and -2. The F1 evolution is sampled at dwell `1/parameters.sweep(1)`; a following 90-degree pulse converts the stored states for detection, and F2 is acquired at dwell `1/parameters.sweep(2)`. Sweep widths and J are in Hz, so `tau` is in seconds. The returned `fid.cos` and `fid.sin` are the two States quadrature components; each is a two-dimensional array with `npoints(2)` F2 acquisition samples in rows and `npoints(1)` F1 increments in columns; the source passes the F1 state stack directly to `evolution` without transposing the result.
+The source initialises longitudinal magnetisation on the configured nucleus and uses two delays `tau=abs(1/(4*parameters.J))` around an inversion pulse. A final 90-degree pulse creates the double-quantum signal, which is filtered to coherence orders +2 and -2. The F1 evolution is sampled at dwell `1/parameters.sweep(1)`; a following 90-degree pulse converts the stored states for detection, and F2 is acquired at dwell `1/parameters.sweep(2)`. Sweep widths and J are in Hz, so `tau` is in seconds. The returned `fid.cos` and `fid.sin` are the two States quadrature components; each is a two-dimensional array with `npoints(2)` F2 acquisition samples in rows and `npoints(1)` F1 increments in columns; the source passes the F1 state stack directly to `evolution` without transposing the result.
 
 ## Inputs
 

@@ -18,7 +18,7 @@ The F1/F2 spins are `{'13C','1H'}`, making 13C indirect and 1H directly detected
 
 ## Processing and scope
 
-Each isotopomer is simulated with `liquid(...,@hsqc,...,'nmr')`. The positive and negative States FIDs receive cosine apodization in both dimensions; the script Fourier-transforms both dimensions, combines the States channels as the source specifies, and sums contributions. It plots the real 2D spectrum with positive polarity. No explicit relaxation parameters are set in this wrapper. It selects the molecular parameters and acquisition/processing settings; pulse-train details are in `experiments/nmr_liquids/hsqc.m`. The source does not identify the DFT functional or basis set in this wrapper.
+Each isotopomer is simulated with `liquid(...,@hsqc,...,'nmr')`. The positive and negative States FIDs receive cosine apodisation in both dimensions; the script Fourier-transforms both dimensions, combines the States channels as the source specifies, and sums contributions. It plots the real 2D spectrum with positive polarity. No explicit relaxation parameters are set in this wrapper. It selects the molecular parameters and acquisition/processing settings; pulse-train details are in `experiments/nmr_liquids/hsqc.m`. The source does not identify the DFT functional or basis set in this wrapper.
 
 ## Sources
 

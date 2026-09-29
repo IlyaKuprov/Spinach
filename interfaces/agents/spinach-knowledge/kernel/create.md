@@ -20,7 +20,7 @@ The kernel entry point constructs the `spin_system` object used by the rest of S
 3. Optional bosonic-mode specifications populate per-mode frequency, carrier, anharmonicity, damping, thermal occupation, and dephasing data, then pair-coupling and modulation data. If modes are present without mode interaction data, the source reports that zero couplings are assumed.
 4. One-particle magnetic terms are assembled from susceptibility contributions and the supplied Zeeman eigenvalue/Euler-angle, matrix, or scalar forms; electron g-tensors and nuclear ppm shifts are converted using the base frequencies. Giant-spin coefficients are absorbed where present.
 5. Chemistry, concentrations, exchange/flux settings, and order matrices are absorbed, with defaults where the source specifies them.
-6. Coordinates and optional periodic-boundary vectors are absorbed and passed to `dipolar` for dipolar couplings. If coordinates are absent, the source assumes zero point-dipolar interactions and initializes an identity proximity matrix. User-specified pair couplings are then added.
+6. Coordinates and optional periodic-boundary vectors are absorbed and passed to `dipolar` for dipolar couplings. If coordinates are absent, the source assumes zero point-dipolar interactions and initialises an identity proximity matrix. User-specified pair couplings are then added.
 7. Relaxation and radical-pair recombination specifications are absorbed and reported.
 8. The final `inter.ignore` processing drops the listed coupling tensors, and leftover unparsed `sys` fields are reported as an error.
 

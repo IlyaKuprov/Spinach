@@ -6,7 +6,7 @@
 
 Calculates `(Q{1}(x)Q{2}(x)...(x)Q{n})*M` without opening Kronecker products. This function applies the product of multiple Kronecker factors to a vector or matrix `M` by contracting implicit dimensions individually, avoiding explicit construction of the full Kronecker product.
 
-## Behavior
+## Behaviour
 
 - Validates inputs via an internal consistency check (`grumble`):
   - `Q` must be a cell array, otherwise the error `Q must be a cell array.` is raised.

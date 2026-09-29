@@ -6,9 +6,9 @@
 
 ## Purpose and data
 
-This script scans a regularization parameter for reconstruction of unpaired-electron density from experimental pseudocontact shifts (PCS). The source credits the data to Gottfried Otting (Australian National University). It loads the processed 1IGV PDB, the PCS coordinates and values (`x`, `y`, `z`, `expt_pcs`) from `tm_1igv_pcs.mat`, and `chi` from `tm_1igv_chi_eff.mat`. PDB atom coordinates supply the structural geometry passed to the solver. The script does not specify nuclear isotopes or units for these data and tensor.
+This script scans a regularisation parameter for reconstruction of unpaired-electron density from experimental pseudocontact shifts (PCS). The source credits the data to Gottfried Otting (Australian National University). It loads the processed 1IGV PDB, the PCS coordinates and values (`x`, `y`, `z`, `expt_pcs`) from `tm_1igv_pcs.mat`, and `chi` from `tm_1igv_chi_eff.mat`. PDB atom coordinates supply the structural geometry passed to the solver. The script does not specify nuclear isotopes or units for these data and tensor.
 
-## Regularization scan
+## Regularisation scan
 
 The solver configuration uses equation `kuprov`, no `ipcs` plot selection, box centre `[3.5 17.0 16.1]`, box size `[7.0 7.0 7.0]`, all PDB atom coordinates as `xyz_all`, margins `50*ones(1,6)`, confinement `[1.0 3.0]`, sharpening `0.0`, and the measured PCS, positions, and loaded tensor. GPU execution is enabled.
 

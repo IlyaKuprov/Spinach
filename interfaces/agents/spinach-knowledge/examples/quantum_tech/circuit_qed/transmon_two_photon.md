@@ -15,9 +15,9 @@ The example constructs `H=hamiltonian(assume(spin_system,'cavity'))` using the `
 
 ## Control sequence and objective
 
-The source and target are the normalized `BL1` and `BL3` states (ground and second excited levels in the source comments). GRAPE uses the fixed drift `H` and the two quadrature controls `Cx`, `Cy`; `fmaxnewton` optimizes the pulse with `grape_xy` from a smooth 200-sample initial guess. The target is state transfer to the second excited level via the virtual intermediate state, not a resonant one-photon drive.
+The source and target are the normalised `BL1` and `BL3` states (ground and second excited levels in the source comments). GRAPE uses the fixed drift `H` and the two quadrature controls `Cx`, `Cy`; `fmaxnewton` optimises the pulse with `grape_xy` from a smooth 200-sample initial guess. The target is state transfer to the second excited level via the virtual intermediate state, not a resonant one-photon drive.
 
-The optimized pulse is then propagated slice by slice. The plotted observable is the population in each of the four levels versus accumulated pulse time, labelled in nanoseconds. It is the model's simulated trajectory; this script does not calculate a device readout signal or report experimental hyperpolarization/measurement data.
+The optimised pulse is then propagated slice by slice. The plotted observable is the population in each of the four levels versus accumulated pulse time, labelled in nanoseconds. It is the model's simulated trajectory; this script does not calculate a device readout signal or report experimental hyperpolarisation/measurement data.
 
 ## Provenance
 

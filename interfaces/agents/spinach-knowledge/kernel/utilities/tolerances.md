@@ -6,7 +6,7 @@ Source: [kernel/utilities/tolerances.m](https://github.com/IlyaKuprov/Spinach/bl
 
 Sets the accuracy cut-offs, constants and tolerances used by the Spinach kernel. The function parses the `sys.tols` substructure into `spin_system.tols`, applies safe defaults, paranoid or loose presets depending on the `sys.enable` switches, and writes fundamental physical constants into the system description object.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[spin_system,sys]=tolerances(spin_system,sys)`.
 - The function first calls its internal consistency checker `grumble(spin_system,sys)`, which validates every user-specified `sys.tols` field (numeric type, realness, scalar nature, sign, integrality or range as appropriate) and errors with a descriptive message on violation.

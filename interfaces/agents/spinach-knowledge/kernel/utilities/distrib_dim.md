@@ -4,7 +4,7 @@
 
 Distributes a numerical array along a user-specified dimension for parallel processing using `spmd`, returning a distributed array suitable for parallel computation in Spinach.
 
-## Behavior
+## Behaviour
 
 - The function first validates its inputs via an internal consistency check (`grumble`):
   - `A` must be numeric.

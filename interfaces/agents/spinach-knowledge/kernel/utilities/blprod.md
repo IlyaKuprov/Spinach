@@ -6,7 +6,7 @@
 
 Extends Blicharski's tensor invariants into scalar products of different spin interaction tensors using polarisation identities. The function computes first-rank and second-rank cross-correlation amplitudes between two real 3x3 interaction tensors.
 
-## Behavior
+## Behaviour
 
 - Validates both inputs through an internal consistency check (`grumble`), which errors with `'A must be a real 3x3 matrix.'` or `'B must be a real 3x3 matrix.'` if an input is not numeric, not real, not a matrix, or not of size 3x3.
 - Computes Blicharski invariants of the difference `A-B` and the sum `A+B` via `blinv`, returning `[LsqAmB,DsqAmB]` and `[LsqApB,DsqApB]` respectively.

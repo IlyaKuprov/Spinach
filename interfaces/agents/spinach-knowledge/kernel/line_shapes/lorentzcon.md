@@ -6,7 +6,7 @@
 
 ## Meaning and equation
 
-The routine returns a Lorentzian, or its convolution with a normalized boxcar or triangular distribution. Let `gamma=fwhm/2`; the unit-area kernel centred at zero is `L(u)=gamma/(pi*(u^2+gamma^2))`.
+The routine returns a Lorentzian, or its convolution with a normalised boxcar or triangular distribution. Let `gamma=fwhm/2`; the unit-area kernel centred at zero is `L(u)=gamma/(pi*(u^2+gamma^2))`.
 
 - One offset `q`: `y(x)=ampl*L(x-q)`.
 - Two sorted offsets `a<b`: they define a uniform density `B(t)=1/(b-a)` on `[a,b]`; `y(x)=ampl*integral(B(t)*L(x-t),t=a..b)`. This is the source's Lorentzian-boxcar convolution.

@@ -6,9 +6,9 @@
 
 Regression test for the giant spin Hamiltonian descriptor route. The test verifies that high-rank giant spin Hamiltonian terms assembled through the descriptor route match direct spherical-tensor assembly.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf('TESTING: Giant spin Hamiltonian descriptor\n')` and initializes a regression test result via `new_test_result` under the identifier `kernel/giant_ham_descr`, with the message that high-rank giant spin terms must match direct spherical-tensor assembly.
+- Announces the test target with `fprintf('TESTING: Giant spin Hamiltonian descriptor\n')` and initialises a regression test result via `new_test_result` under the identifier `kernel/giant_ham_descr`, with the message that high-rank giant spin terms must match direct spherical-tensor assembly.
 - Runs two cases through the local helper `local_case`:
   - `'labframe'` assumption with `'strong'` strength and Euler angles `[0.41 0.29 0.13]`.
   - `'deer-zz'` assumption with `'secular'` strength and Euler angles `[0.17 0.39 0.51]`.

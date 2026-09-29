@@ -4,7 +4,7 @@
 
 Estimates the nutation frequency distribution from a nutation curve acquired with the same radiofrequency coil used for both excitation and detection, as documented in the file header. The function returns a non-negative frequency density rather than a raw finite-time transform.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[freq,distr]=nutation_dist(curve,dt,lambda)`.
 - Input validation (`grumble`) requires `curve` to be a non-empty numeric vector with at least eight points, no `Inf` or `NaN` entries, and not identically zero; `dt` must be a positive real scalar; `lambda` must be a non-negative real scalar.

@@ -6,7 +6,7 @@
 
 Regression test for a one-spin liquid-state free induction decay (FID). The test verifies that, with no Hamiltonian and no relaxation, transverse magnetisation is constant in time — i.e. a zero-offset isolated spin has a constant FID.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Single-spin liquid-state FID\n')`.
 - Registers a new test result via `new_test_result` under the name `kernel/liquid_single_spin_fid`, described as "Single-spin liquid-state FID", with the property that "a zero-offset isolated spin has a constant free induction decay."
@@ -34,7 +34,7 @@ result=test_liquid_single_spin_fid()
 
 **Outputs:**
 
-- `result` — regression test result structure with explanatory messages, as produced by `new_test_result` and finalized by `test_close`.
+- `result` — regression test result structure with explanatory messages, as produced by `new_test_result` and finalised by `test_close`.
 
 **Inputs:**
 

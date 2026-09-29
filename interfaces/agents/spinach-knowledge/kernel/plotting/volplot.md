@@ -16,7 +16,7 @@ Render a real scalar field as a volumetric 3D plot: sign determines colour and m
 
 ## Scaling and rendering
 
-Positive and negative data are normalized independently: the positive maximum maps to `1`, and the magnitude of the negative minimum maps to `-1`. A clipping fraction below 1 caps that sign at the requested fraction and remaps the retained range to the full sign interval. The source permutes the cube for surface plotting, draws orthogonal stacks of `surf` planes, and uses absolute scaled values for opacity. Values with magnitude below `1/64` in a plotted plane are changed to `NaN` so that they are not rendered. The blue-white-red colour map represents sign; the colour scale is fixed at `[-1 1]`.
+Positive and negative data are normalised independently: the positive maximum maps to `1`, and the magnitude of the negative minimum maps to `-1`. A clipping fraction below 1 caps that sign at the requested fraction and remaps the retained range to the full sign interval. The source permutes the cube for surface plotting, draws orthogonal stacks of `surf` planes, and uses absolute scaled values for opacity. Values with magnitude below `1/64` in a plotted plane are changed to `NaN` so that they are not rendered. The blue-white-red colour map represents sign; the colour scale is fixed at `[-1 1]`.
 
 ## Figure effects
 

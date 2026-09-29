@@ -8,7 +8,7 @@ Direct source: [kernel/operators/boson_ortho.m](https://github.com/IlyaKuprov/Sp
 
 Return the `boson_mono(nlevels)` monomials after sequential Gram–Schmidt subtraction with respect to the Frobenius inner product implemented by `hdot`. The source processes cells in their inherited `boson_mono` order. For each current operator `B{n}` and each preceding `B{k}`, it subtracts `B{k}*hdot(B{k},B{n})/hdot(B{k},B{k})`. Here `hdot(X,Y)=sum(conj(X).*Y,'all')`.
 
-## Ordering, dimensions, and normalization
+## Ordering, dimensions, and normalisation
 
 The result retains the input cell ordering and shape: an `nlevels^2-by-1` cell array of `nlevels-by-nlevels` matrices. The subtractions make each operator orthogonal to the preceding processed operators under `hdot`. There is no unit-norm rescaling: the routine does not divide each resulting matrix by its own norm, and the first item is unchanged.
 

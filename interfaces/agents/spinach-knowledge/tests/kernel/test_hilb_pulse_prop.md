@@ -6,7 +6,7 @@
 
 Regression test for Hilbert-space shaped-pulse propagators and density-state reuse, exercising `shaped_pulse_xy` across all six method/quadrature choices (`expv-pwc`, `expv-pwl`, `expm-pwc`, `expm-pwl`, `evol-pwc`, `evol-pwl`). The regression target states that returned propagators must reproduce two-sided density evolution.
 
-## Behavior
+## Behaviour
 
 - Builds a quiet single-proton (`1H`) spin-half system with `test_spin_system` under the `zeeman-hilb` formalism, `zeeman-hilb` approximation `none`, zero Zeeman scalar coupling, and zero magnet.
 - Defines noncommuting Pauli control generators (`ops.x`, `ops.y`), a drift Hamiltonian `2*pi*(35*ops.z+17*eye(2))`, and two positive density matrices `rho` and `rho_other`.

@@ -8,7 +8,7 @@
 
 Combines the fields of two MATLAB struct inputs into one struct. Both inputs must satisfy `isstruct`; inputs with `length>1` are rejected, so struct arrays are not accepted. The implementation starts from `s1` and assigns every field from `s2` in turn: a same-named field in `s2` replaces the value in `s1`, and fields present only in `s2` are added. This is a shallow field-wise replacement, not a recursive merge; nested structs are copied as field values. Empty struct inputs pass the explicit array-length guard. No units or numerical transformations are applied.
 
-## Example behavior
+## Example behaviour
 
 For `s1 = struct('a',1,'b',2)` and `s2 = struct('b',3,'c',4)`, the returned struct has `a = 1`, `b = 3`, and `c = 4`. The implementation raises an error for non-struct inputs and for struct inputs whose length exceeds one.
 

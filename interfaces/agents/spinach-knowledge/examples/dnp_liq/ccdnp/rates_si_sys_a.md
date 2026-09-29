@@ -10,7 +10,7 @@ Constructs the Redfield relaxation superoperator for the system-A case of cross-
 
 Run the no-argument MATLAB function `rates_si_sys_a()` with Spinach on the MATLAB path. The script defines the spin system and all settings inline, creates its basis and relaxation superoperator, and needs no external data file or user argument. Its source comment estimates the calculation at seconds. It uses `sphten-liouv` with no basis approximation and Redfield relaxation.
 
-## System A parameterization
+## System A parameterisation
 
 - Isotopes: `{'1H','E','E'}`; magnet assignment `sys.magnet=14.1` (the source does not label its unit). Proton Zeeman values are `[0 10 20]` with Euler angles `[0 0 0]`.
 - Electron 1 values are `[1.977873 1.977798 1.977792]` with zero Euler angles; electron 2 values are `[1.977919 1.978000 1.978000]` and Euler triple `[-0.590 -0.100 0.490]`. The scalar exchange assignment is `6.2e6`.
@@ -19,7 +19,7 @@ Run the no-argument MATLAB function `rates_si_sys_a()` with Spinach on the MATLA
 
 ## What it prints
 
-The script computes `R=relaxation(spin_system)` and prints projections for normalized longitudinal proton/electron operators, the electron transverse combinations `E1p ± 2*E1pE2z` and `E2p ± 2*E1zE2p`, and proton/electron longitudinal cross terms, including the terms labelled for NzE1z, NzE2z, and NzE1zE2z to Nz. It also prints mixed transverse-coherence projections labelled E1p to NzE1p, E1p to NzE1pE2z, and E1pE2z to NzE1pE2z. A useful source-specific distinction is that the coordinate comment identifies these coordinates as inputs for anisotropic hyperfine interactions; they are not merely display geometry. The function emits text to the MATLAB command window and does not save rates or make plots.
+The script computes `R=relaxation(spin_system)` and prints projections for normalised longitudinal proton/electron operators, the electron transverse combinations `E1p ± 2*E1pE2z` and `E2p ± 2*E1zE2p`, and proton/electron longitudinal cross terms, including the terms labelled for NzE1z, NzE2z, and NzE1zE2z to Nz. It also prints mixed transverse-coherence projections labelled E1p to NzE1p, E1p to NzE1pE2z, and E1pE2z to NzE1pE2z. A useful source-specific distinction is that the coordinate comment identifies these coordinates as inputs for anisotropic hyperfine interactions; they are not merely display geometry. The function emits text to the MATLAB command window and does not save rates or make plots.
 
 ## Reference and caveat
 

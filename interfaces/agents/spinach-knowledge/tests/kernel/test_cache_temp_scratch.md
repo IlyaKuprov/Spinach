@@ -6,9 +6,9 @@
 
 Regression test for cache management in a temporary scratch directory. It checks `cacheman()` and `wipe_cache()` against a temporary scratch directory, loads shipped small cache tables, exercises the on-demand SLE operator cache, and smoke-tests the read-only `sniff()` integrity pass. The stated requirement is that `cacheman()` and `wipe_cache()` must only affect Spinach cache records in the configured scratch directory.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf('TESTING: Temporary scratch cache management\n')` and initializes a test result via `new_test_result('kernel/cache_temp_scratch', ...)`.
+- Announces the test target with `fprintf('TESTING: Temporary scratch cache management\n')` and initialises a test result via `new_test_result('kernel/cache_temp_scratch', ...)`.
 - Creates an isolated scratch directory with `tempname(tempdir)` and `mkdir`, registering `onCleanup(@()local_remove_dir(scratch))` for cleanup.
 - Builds a minimal spin system with `sys.output='hush'`, `sys.scratch=scratch`, empty `sys.enable` and `sys.disable` cell arrays, and `tols.cache_mem=365`.
 - Ensures `cacheman()` uses a small process pool instead of auto-starting a large one: if `gcp('nocreate')` returns empty, it calls `parpool('Processes',1)`.

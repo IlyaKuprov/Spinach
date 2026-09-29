@@ -28,4 +28,4 @@ An input array with `p=numel(x0)` coordinates produces an `n-by-p` Jacobian when
 
 ## Finite differences and error pairing
 
-The code perturbs one input coordinate at a time, evaluates both sides of each centered difference, and then processes each output component independently. `sort` returns indices that are also used to reorder the corresponding error estimates, preserving the derivative/error pairing after the extreme derivative values are discarded.
+The code perturbs one input coordinate at a time, evaluates both sides of each centred difference, and then processes each output component independently. `sort` returns indices that are also used to reorder the corresponding error estimates, preserving the derivative/error pairing after the extreme derivative values are discarded.

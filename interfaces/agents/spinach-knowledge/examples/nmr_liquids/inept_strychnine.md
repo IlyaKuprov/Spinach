@@ -5,7 +5,7 @@
 
 ## Purpose
 
-An INEPT experiment on strychnine, not an INADEQUATE or NOE experiment. It models polarization transfer between proton and carbon channels and plots the carbon response; the source estimates calculation time in minutes.
+An INEPT experiment on strychnine, not an INADEQUATE or NOE experiment. It models polarisation transfer between proton and carbon channels and plots the carbon response; the source estimates calculation time in minutes.
 
 ## Implementation
 

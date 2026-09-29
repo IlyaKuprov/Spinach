@@ -6,7 +6,7 @@
 
 Regression test suite for the tensor transform helpers in `kernel/transform_tensor_suite`. The suite verifies that tensor transforms preserve their algebraic definitions and round-trips, covering interaction tensor parametrisations, spherical tensor round-trips, quadrupolar conversions, axial symmetrisation, and simple Hamiltonian decomposition.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Tensor transform helpers\n')` and initialises a test result object via `new_test_result('kernel/transform_tensor_suite', ...)`, with the failure message `'tensor transforms must preserve their algebraic definitions and round-trips.'`.
 - **Haeberlen parametrisation (`anas2mat`):** with `iso=10`, `aniso=6`, `asym=0.25` and zero Euler angles, checks that the returned matrix equals `diag([iso-red_aniso*(1+asym)/2, iso-red_aniso*(1-asym)/2, iso+red_aniso])` where `red_aniso=2*aniso/3`, i.e. `diag([7, 9, 14])`, to tolerances `1e-15`.

@@ -6,7 +6,7 @@
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/adelim.m>
 
-## Behavior
+## Behaviour
 
 The function is called as `[L,R]=adelim(spin_system,L,fast_idx,slow_idx)`.
 

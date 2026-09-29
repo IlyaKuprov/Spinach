@@ -10,7 +10,7 @@ Compares point-centre and distributed-density PCS for the Eu(III) complex 1,4,7,
 ## Inputs and calculations
 
 - Loads electron probability density, grid extent, coordinates, and spacing from `tetra_py_probden.mat`; reads HFC and susceptibility data from `tetra_py_dft_run.log` with `gparse`. The source says HFCs are in Gauss.
-- Normalizes the probability density by its three-dimensional trapezoidal integral using `dx^3`.
+- Normalises the probability density by its three-dimensional trapezoidal integral using `dx^3`.
 - Converts `props.chi` to a rank-2 tensor representation, then obtains `chi` with `sphten2mat`.
 - Computes point-model PCS with `ppcs(xyz,[0 0 0],chi)`; the point-centre coordinate is explicitly `[0 0 0]`, but its coordinate unit is not stated.
 - Computes the distributed result with `kpcs(probden,chi,ext,xyz,'fft')`.

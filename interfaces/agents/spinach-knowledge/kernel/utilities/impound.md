@@ -4,7 +4,7 @@
 
 `impound.m` packages everything it receives into a cell array and returns it back. It is useful for pulling information back from various Spinach wrappers by calling it as a pulse sequence.
 
-## Behavior
+## Behaviour
 
 The function is defined as `answer=impound(varargin)`. It returns what was received by assigning `answer=varargin`, so all input arguments are collected into a single cell array. The function contains no other logic.
 

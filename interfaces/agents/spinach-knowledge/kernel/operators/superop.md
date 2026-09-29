@@ -18,7 +18,7 @@ The two commutator-specific branches discard local transitions when the sum of t
 
 ## Specification, coefficients, and output
 
-`opspec` is a row vector with one operator-state index per spin. For each active spin, the implementation selects the multiplicity-specific left-product table `spin_system.bas.lpst` or right-product table `spin_system.bas.rpst`; table row/column indices are converted from Spinach's zero-based operator-state indexing, and table values supply the local structure coefficients. For multiple active spins, the indices and coefficients are combined by Kronecker products, then matched against rows of `spin_system.bas.basis` to assemble the action in the selected basis. No extra normalization factor is applied in this assembly.
+`opspec` is a row vector with one operator-state index per spin. For each active spin, the implementation selects the multiplicity-specific left-product table `spin_system.bas.lpst` or right-product table `spin_system.bas.rpst`; table row/column indices are converted from Spinach's zero-based operator-state indexing, and table values supply the local structure coefficients. For multiple active spins, the indices and coefficients are combined by Kronecker products, then matched against rows of `spin_system.bas.basis` to assemble the action in the selected basis. No extra normalisation factor is applied in this assembly.
 
 - `opspec`: Spinach operator specification described in Sections 2.1 and 3.3 of [the cited paper](http://dx.doi.org/10.1016/j.jmr.2010.11.008). It must contain one integer for each spin, with operator-state indices permitted by the corresponding multiplicity.
 - `side`: `'left'`, `'right'`, `'comm'`, or `'acomm'`.

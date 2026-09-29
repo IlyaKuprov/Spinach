@@ -4,7 +4,7 @@ Source: [examples/nmr_proteins/expt_data/hsqc_ubiquitin_expt.m](https://github.c
 
 ## Purpose
 
-Processes and plots measured two-dimensional 15N-1H HSQC data for human ubiquitin. The function loads `fid` from `hsqc_ubiquitin_expt.mat`; it does not simulate a pulse sequence, and its `spin_system` struct is used only for plotting metadata. The source specifies no paramagnetic centers or magnetic tensors, so this is protein nuclear-spin NMR rather than a paramagnetic calculation.
+Processes and plots measured two-dimensional 15N-1H HSQC data for human ubiquitin. The function loads `fid` from `hsqc_ubiquitin_expt.mat`; it does not simulate a pulse sequence, and its `spin_system` struct is used only for plotting metadata. The source specifies no paramagnetic centres or magnetic tensors, so this is protein nuclear-spin NMR rather than a paramagnetic calculation.
 
 ## Data processing
 

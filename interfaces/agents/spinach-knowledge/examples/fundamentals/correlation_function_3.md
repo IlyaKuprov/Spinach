@@ -10,7 +10,7 @@ This example compares a finite-trajectory estimate with Spinach's analytical cor
 
 ## Numerical construction
 
-The trajectory contains `1e6` updates and the correlation uses `nlags=300`. Three standard-normal increments weight the three explicit skew-symmetric generators; the source orders those terms as `sigma_z` times the first matrix, `sigma_y` times the second, and `sigma_x` times the third. The combined increment is exponentiated and right-multiplied into a direction-cosine matrix initialized to the identity. A `parfor` loop converts each stored matrix by `dcm2euler` and `wigner(L,...)`; normalized `xcorr` of the selected Wigner elements is multiplied by `1/(2*L+1)`. `ifftshift` places zero lag first, and the plotted segment uses lag points 0 through 299.
+The trajectory contains `1e6` updates and the correlation uses `nlags=300`. Three standard-normal increments weight the three explicit skew-symmetric generators; the source orders those terms as `sigma_z` times the first matrix, `sigma_y` times the second, and `sigma_x` times the third. The combined increment is exponentiated and right-multiplied into a direction-cosine matrix initialised to the identity. A `parfor` loop converts each stored matrix by `dcm2euler` and `wigner(L,...)`; normalised `xcorr` of the selected Wigner elements is multiplied by `1/(2*L+1)`. `ifftshift` places zero lag first, and the plotted segment uses lag points 0 through 299.
 
 ## Analytical construction and observable
 

@@ -7,7 +7,7 @@
 
 ## Experiment and spin model
 
-This is a simulated 2Q ultrafast MaxQ NMR spectrum for two coupled protons with diffusion. At 14.1 T the 1H shifts are 0.50 and 0.15 ppm and the scalar coupling is 8.0 Hz. The source selects coherence order +2 and uses the full sphten-liouv basis. It specifies no relaxation phantom or relaxation operator, and its flow field is zero. The uniform initial phantom is longitudinal 1H magnetization; detection is transverse 1H coherence. No measured signal is imported.
+This is a simulated 2Q ultrafast MaxQ NMR spectrum for two coupled protons with diffusion. At 14.1 T the 1H shifts are 0.50 and 0.15 ppm and the scalar coupling is 8.0 Hz. The source selects coherence order +2 and uses the full sphten-liouv basis. It specifies no relaxation phantom or relaxation operator, and its flow field is zero. The uniform initial phantom is longitudinal 1H magnetisation; detection is transverse 1H coherence. No measured signal is imported.
 
 ## Spatial encoding and acquisition
 

@@ -8,7 +8,7 @@
 
 ## Behaviour
 
-For a `ttclass` input, the method first evaluates `all(isreal(tt.coeff))`. Only if that is true does it visit every stored core `tt.cores{k,n}` for `n=1:tt.ntrains` and `k=1:tt.ncores`; it returns early when a core is not real. Thus the predicate covers the stored coefficients and core entries, rather than forming or inspecting a materialized tensor. It applies no conjugation and changes no train data.
+For a `ttclass` input, the method first evaluates `all(isreal(tt.coeff))`. Only if that is true does it visit every stored core `tt.cores{k,n}` for `n=1:tt.ntrains` and `k=1:tt.ncores`; it returns early when a core is not real. Thus the predicate covers the stored coefficients and core entries, rather than forming or inspecting a materialised tensor. It applies no conjugation and changes no train data.
 
 A non-`ttclass` input raises the error `input is not a ttclass.`.
 

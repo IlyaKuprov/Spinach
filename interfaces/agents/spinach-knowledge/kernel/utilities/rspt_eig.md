@@ -6,7 +6,7 @@
 
 Computes the eigensystem of sparse Hamiltonians to a user-specified order in Rayleigh–Schrödinger perturbation theory (RSPT), with careful handling of diagonal dominance and an option to perform exact diagonalisation (expensive). The function also returns eigenvalue derivatives and transition moments between eigenvectors under a user-specified operator. The parametrisation matches use cases in field-swept EPR spectroscopy.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)`.
 - Input consistency is enforced by an internal `grumble` subfunction, which requires `parameters.rspt_order` to be present and to be a positive real scalar or `Inf`, requires `Hz`, `Hc`, and `Hmw` to be square numeric matrices, and requires `B` to be a real scalar.

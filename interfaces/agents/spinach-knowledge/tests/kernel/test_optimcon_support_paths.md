@@ -6,7 +6,7 @@
 
 Regression test for small optimal-control support paths in Spinach. It exercises penalty functions, trapezium-product derivatives, objective-function collection, and small line-search helper paths, reporting each check through the standard test-result mechanism.
 
-## Behavior
+## Behaviour
 
 - Announces the target with `TESTING: Optimal-control support helper paths` and initialises a result via `new_test_result('optimcon/support_paths', ...)`, describing coverage of `penalty()`, `trapdiff()`, `objeval()`, and line-search helpers.
 - Builds a minimal quiet spin system (`sys.output='hush'`, `bas.formalism='zeeman-hilb'`, `tols.small_matrix=64`, `tols.prop_chop=1e-14`) for low-level helper calls.

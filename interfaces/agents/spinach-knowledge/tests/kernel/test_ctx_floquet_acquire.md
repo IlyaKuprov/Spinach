@@ -6,10 +6,10 @@
 
 Regression test for the Floquet context when used with `acquire()`. The test verifies that `floquet()` correctly projects states into Floquet space and runs `acquire()` on a tiny anisotropic one-spin MAS (magic-angle spinning) calculation, checking the returned time-domain trace for basic physical and dimensional invariants.
 
-## Behavior
+## Behaviour
 
 1. Announces the test target with `fprintf('TESTING: Floquet acquire path\n')`.
-2. Initializes a regression test result via `new_test_result('kernel/ctx_floquet_acquire', 'Floquet acquire path', 'floquet() must project states into Floquet space and run acquire().')`.
+2. Initialises a regression test result via `new_test_result('kernel/ctx_floquet_acquire', 'Floquet acquire path', 'floquet() must project states into Floquet space and run acquire().')`.
 3. Builds a one-spin anisotropic Liouville-space spin system:
    - `sys.magnet = 14.1` (field strength in Tesla as given in the source).
    - `sys.isotopes = {'1H'}`.

@@ -6,7 +6,7 @@
 
 Regression test suite for the rotation transform helpers in the kernel module. The suite verifies that rotation transforms preserve active rotation, composition, and round-trip conventions, covering active ZYZ Euler rotations, Euler/DCM inversion, rotation composition, angle-axis normalisation, quaternion round-trips, Wigner identity rotation, and minimum-angle vector alignment.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Rotation transform helpers\n')` and initialises a test result object via `new_test_result` for `kernel/transform_rotation_suite`.
 - **euler2dcm:** checks the active ZYZ convention on a quarter turn, verifying that `euler2dcm(pi/2,0,0)` equals `[0 -1 0;1 0 0;0 0 1]` (a positive active Z rotation maps the x axis into y), and that the one-vector syntax `euler2dcm([pi/2 0 0])` matches the three-scalar syntax, both at tolerances `1e-15`.

@@ -12,7 +12,7 @@ D = expm(-1i*Lz*alp) * expm(-1i*Ly*bet) * expm(-1i*Lz*gam)
 
 where the generic branch takes the `(2*l+1)`-dimensional angular-momentum generators from `pauli(2*l+1)`. The ZYZ convention is used for the Euler angles (see Brink and Satchler, Figures 1 and 2).
 
-## Behavior
+## Behaviour
 
 - Syntax: `D = wigner(l, alp, bet, gam)`.
 - The rank `l` may be a non-negative integer or half-integer.

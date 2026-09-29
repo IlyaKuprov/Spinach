@@ -6,7 +6,7 @@
 
 ## Purpose
 
-This example compares the analytical left- and right-control derivatives returned by `trapdiff` for the second-order Magnus product quadrature with centered finite differences of the associated matrix exponential.
+This example compares the analytical left- and right-control derivatives returned by `trapdiff` for the second-order Magnus product quadrature with centred finite differences of the associated matrix exponential.
 
 ## Test construction
 
@@ -18,4 +18,4 @@ It uses a step of `sqrt(eps('double'))`, constructs left and right directions fo
 
 ## Scope
 
-This is a finite-difference consistency check for the stated matrix construction and the two derivative outputs. The formalism labels do not constitute three independent derivative calculations, and the random matrices do not by themselves establish behavior for every physical generator or for a composed simulation algorithm.
+This is a finite-difference consistency check for the stated matrix construction and the two derivative outputs. The formalism labels do not constitute three independent derivative calculations, and the random matrices do not by themselves establish behaviour for every physical generator or for a composed simulation algorithm.

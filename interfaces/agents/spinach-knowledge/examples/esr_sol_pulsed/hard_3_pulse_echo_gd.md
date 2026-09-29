@@ -12,7 +12,7 @@ The field is 3.5 T. Both spins are E8 (eight-level electron spins) with scalar g
 
 ## Pulse sequence and sampled signal
 
-The source embeds separate probe- and pump-pulse operators for the outermost and central E8 transitions, respectively. It prepares Lz magnetisation, detects with L+ on spin 1, and calls the hard-echo helper through powder averaging. The helper applies probe π/2, evolves for tb, pump π, evolves for ta−tb, probe π, and samples the centered echo window of width tc. The fixed delays are ta = 2 µs, tb = 1 µs, and tc = 50 ns, with 500 sampling steps; the spherical powder grid is rep_2ang_1600pts_sph.
+The source embeds separate probe- and pump-pulse operators for the outermost and central E8 transitions, respectively. It prepares Lz magnetisation, detects with L+ on spin 1, and calls the hard-echo helper through powder averaging. The helper applies probe π/2, evolves for tb, pump π, evolves for ta−tb, probe π, and samples the centred echo window of width tc. The fixed delays are ta = 2 µs, tb = 1 µs, and tc = 50 ns, with 500 sampling steps; the spherical powder grid is rep_2ang_1600pts_sph.
 
 The script plots the imaginary echo response against time in microseconds and creates no saved data file. It reports an estimated calculation time of seconds. Its stated sharp-echo and missing-ZFS-distribution caveat limits comparison with experimental lineshapes.
 

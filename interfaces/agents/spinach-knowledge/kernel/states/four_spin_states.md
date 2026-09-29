@@ -14,7 +14,7 @@ Constructs one of sixteen singlet/triplet product states for four selected spin-
 
 - `spin_system` — a Spinach system used by `state` and by the consistency checks on spin count and multiplicities.
 - `spins` — a 1-by-4 row vector of four distinct positive real integer spin indices. Every index must be at most `spin_system.comp.nspins`, and each indexed spin must have multiplicity 2 (spin-1/2). These are indices, not spin quantum numbers. Their supplied order defines the pairs: the first pair is `spins(1:2)`; the second is `spins(3:4)`.
-- `spin_state` — a MATLAB character value equal to one of the exact, case-sensitive selectors in the table. The source rejects non-character input and errors on an unrecognized selector.
+- `spin_state` — a MATLAB character value equal to one of the exact, case-sensitive selectors in the table. The source rejects non-character input and errors on an unrecognised selector.
 
 ## Supported pair-state selectors
 

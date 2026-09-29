@@ -6,7 +6,7 @@
 
 Regression test for the `remtrace` kernel function. It verifies that `remtrace` subtracts the isotropic component of a second-rank interaction tensor, leaving the anisotropic traceless part.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Traceless rank-two tensor construction\n')`.
 - Registers a new test result via `new_test_result` with suite name `kernel/remtrace_tensor`, description `'Traceless rank-two tensor construction'`, and the physical statement `'anisotropic interaction tensors are obtained by subtracting the isotropic trace.'`.

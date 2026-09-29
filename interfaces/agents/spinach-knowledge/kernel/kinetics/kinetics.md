@@ -6,13 +6,13 @@
 
 ## Purpose and output
 
-Builds the chemical-kinetics superoperator from `spin_system.chem`. `K` is initialized with `mprealloc(spin_system,0)` and has the system superoperator dimensions. In a manually assembled Liouvillian, the source header specifies `1i*K`, for example `L=H+1i*R+1i*K`; Spinach context functions include kinetics automatically.
+Builds the chemical-kinetics superoperator from `spin_system.chem`. `K` is initialised with `mprealloc(spin_system,0)` and has the system superoperator dimensions. In a manually assembled Liouvillian, the source header specifies `1i*K`, for example `L=H+1i*R+1i*K`; Spinach context functions include kinetics automatically.
 
 ## Chemical-reaction block mapping
 
 For each nonzero entry of `spin_system.chem.rates`, the source obtains source and destination parts from `spin_system.chem.parts`. It makes masks for basis rows involving those spins and requires the selected source and destination basis submatrices to be identical. With those row-index sets `S` and `D`, the exact insertion is `K[S,D] += rate * ones(|S|,|D|)`. Reaction rates are used directly; this function applies no unit conversion. They must use the inverse-time convention compatible with the propagator to which `K` is added.
 
-## Magnetization-flux mapping
+## Magnetisation-flux mapping
 
 Each nonzero `flux_rate` entry identifies source and destination spins. The routine is available for this contribution only in `sphten-liouv` formalism. It separates basis rows with one active spin from rows with more than one, removes rows active on both the source and destination (stationary states), and checks that the remaining subspaces match.
 
@@ -24,8 +24,8 @@ When `chem.rp_theory` is nonempty and not `off`, the source constructs singlet/t
 
 ## Input and integrity guards
 
-Chemical reaction and flux terms each explicitly require `sphten-liouv`. Reaction source/destination basis subspaces must match; flux subspaces must match after stationary rows are excluded. An unrecognized flux type errors. Radical-pair recombination has its separate formalism and model guards. The source uses configured rates as supplied and does not normalize them or convert between Hz and angular-frequency units; no such unit conversion is present in this routine.
+Chemical reaction and flux terms each explicitly require `sphten-liouv`. Reaction source/destination basis subspaces must match; flux subspaces must match after stationary rows are excluded. An unrecognised flux type errors. Radical-pair recombination has its separate formalism and model guards. The source uses configured rates as supplied and does not normalise them or convert between Hz and angular-frequency units; no such unit conversion is present in this routine.
 
 ## Implementation lifecycle
 
-The routine initializes `K`, adds reaction blocks, processes fluxes if present, then adds the configured radical-pair term if enabled. If the assembled matrix has no nonzero entries, it reports that no significant kinetics was specified.
+The routine initialises `K`, adds reaction blocks, processes fluxes if present, then adds the configured radical-pair term if enabled. If the assembled matrix has no nonzero entries, it reports that no significant kinetics was specified.

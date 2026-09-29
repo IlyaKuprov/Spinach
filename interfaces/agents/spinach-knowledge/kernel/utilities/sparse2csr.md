@@ -4,7 +4,7 @@
 
 Computes a partial compressed row storage (CSR) transformation for a given MATLAB sparse matrix, adapted from code written by David Gleich. Only the index arrays are returned; the values are ignored.
 
-## Behavior
+## Behaviour
 
 - Validates the input with a consistency check (`grumble`), which errors with `'A must be a sparse logical matrix.'` unless the input is simultaneously logical, a matrix, and sparse.
 - Sets the problem dimensions from `size(A,1)` and `nnz(A)`.

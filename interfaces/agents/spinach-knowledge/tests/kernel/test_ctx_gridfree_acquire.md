@@ -4,7 +4,7 @@
 
 Regression test for the grid-free Fokker-Planck context, verifying that `gridfree()` correctly projects spin system states into SLE (stochastic Liouville equation) space and runs `acquire()` on the resulting context.
 
-## Behavior
+## Behaviour
 
 The test announces its target with `fprintf('TESTING: Grid-free acquire path\n')` and registers a test result via `new_test_result()` with the identifier `kernel/ctx_gridfree_acquire`, description `'Grid-free acquire path'`, and the requirement that `gridfree()` must project states into SLE space and run `acquire()`.
 

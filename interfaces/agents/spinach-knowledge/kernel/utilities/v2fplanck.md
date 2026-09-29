@@ -4,7 +4,7 @@
 
 `v2fplanck.m` translates a stationary 3D velocity field and a diffusion tensor field into a Fokker-Planck evolution generator for use in Spinach spin dynamics simulations.
 
-## Behavior
+## Behaviour
 
 - The function is called as `F=v2fplanck(spin_system,parameters)`.
 - It first validates the input parameters via an internal consistency-checking routine (`grumble`), which enforces:
@@ -28,7 +28,7 @@
   - Voxel-wise tensor components add terms of the form `-1i*Fx*spdiags(dxy(:),...)*Fy` for all active pairs.
 - The generator is cleaned using `clean_up(spin_system,F,spin_system.tols.liouv_zero)`.
 - Finally, the spatial generator is Kronecker-multiplied with the spin identity operator: `F=kron(F,opium(spn_dim,1))`, where `spn_dim` is the size of the spin basis.
-- The direct product order is Z(x)Y(x)X(x)Spin, corresponding to column-wise vectorization of a 3D array with dimensions ordered as [X Y Z].
+- The direct product order is Z(x)Y(x)X(x)Spin, corresponding to column-wise vectorisation of a 3D array with dimensions ordered as [X Y Z].
 - Polyadic objects are returned; use `inflate()` to obtain the corresponding sparse matrix.
 
 ## Inputs and outputs

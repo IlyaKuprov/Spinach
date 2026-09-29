@@ -6,7 +6,7 @@
 
 Loads a previously saved parallel pool `ValueStore` snapshot from a Matlab MAT file into the current parallel pool's `ValueStore`. The current store is cleared before the saved keys and values are inserted. Callback functions are session-local and are not loaded.
 
-## Behavior
+## Behaviour
 
 - Syntax: `load_vstore(file_name)`.
 - Validates `file_name` via an internal consistency check (`grumble`): it must be a non-empty character row vector, and it must point to an existing file; otherwise the function errors.

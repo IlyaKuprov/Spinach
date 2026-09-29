@@ -6,7 +6,7 @@ Replaces the isotropic parts of interaction tensors with user-supplied values. T
 
 Source: [kernel/utilities/shift_iso.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/shift_iso.m)
 
-## Behavior
+## Behaviour
 
 - Syntax: `tensors=shift_iso(tensors,spin_numbers,new_iso)`.
 - The function first runs a consistency check (`grumble`) on all inputs.

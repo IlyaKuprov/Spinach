@@ -17,4 +17,4 @@ For each array dimension, the routine builds an inclusive coordinate vector with
 
 ## Output and constraints
 
-The routine applies MATLAB's linear `max` to `probden(:)` and returns the `x`, `y`, and `z` coordinates at that linear index. If several entries share the maximum, MATLAB's first-maximum behavior selects the first in linear array order. The validator checks that `ranges` is real numeric with six elements and strictly increasing bounds, and that `probden` is real numeric and three-dimensional; it does not check that values are nonnegative or normalized as a probability density.
+The routine applies MATLAB's linear `max` to `probden(:)` and returns the `x`, `y`, and `z` coordinates at that linear index. If several entries share the maximum, MATLAB's first-maximum behaviour selects the first in linear array order. The validator checks that `ranges` is real numeric with six elements and strictly increasing bounds, and that `probden` is real numeric and three-dimensional; it does not check that values are nonnegative or normalised as a probability density.

@@ -8,4 +8,4 @@
 
 The result is a structure array with one entry per child node, in child order; an empty child list is represented by `[]`. Each entry has four fields: `name`, `attributes`, `data`, and `children`. Element names come from `TagName`; text and comment nodes are named `#text` and `#comment`, and other nodes use their MATLAB DOM class name. Element-node `data` is empty; nodes with `TextContent` store it as a character array, and otherwise `data` is empty. `children` recursively has the same representation.
 
-`attributes` is `[]` when the node has none. Otherwise it is a structure array whose entries each have `name` and `value` character fields, copied from the DOM attributes. These are structural XML values: the parser defines no Spinach state/operator dimensions, unit conversion, or caching behavior.
+`attributes` is `[]` when the node has none. Otherwise it is a structure array whose entries each have `name` and `value` character fields, copied from the DOM attributes. These are structural XML values: the parser defines no Spinach state/operator dimensions, unit conversion, or caching behaviour.

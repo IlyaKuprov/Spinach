@@ -8,7 +8,7 @@
 
 Moves a GPU-resident RCV sparse matrix's stored arrays to CPU memory.
 
-## Storage and behavior
+## Storage and behaviour
 
 RCV stores row indices, column indices, and corresponding values in parallel arrays; `numRows` and `numCols` retain the matrix shape. The overload checks that `A` is an `rcv` object. If `A.isGPU` is true, it eagerly applies `gather` to `A.row`, `A.col`, and `A.val`, then sets `A.isGPU` to false. If the flag is already false, it leaves the object unchanged. The row and column counts are not reassigned, so the represented dimensions remain unchanged. This transfers the stored arrays; it does not build a MATLAB sparse or dense matrix.
 

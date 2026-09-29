@@ -4,7 +4,7 @@ Source: [kernel/plotting/kbox.m](https://github.com/IlyaKuprov/Spinach/blob/main
 
 - Signature: `kbox()`
 
-## Behavior and coordinates
+## Behaviour and coordinates
 
 `kbox` operates on `gca` and draws a tickless outline with a tagged line object in the axes' data coordinates. Its bounds are the current `XLim`, `YLim`, and (in 3-D) `ZLim`; it does not choose numeric axis limits. In the standard 2-D view, where `abs(View*[0;1]-90) <= sqrt(eps)` and no child has nonempty `ZData`, it connects the four corners in the `x-y` plane at `z=0`. Otherwise it connects the 12 edges of the current limit box. The coordinate data are row vectors; each edge is represented by its two endpoints followed by `NaN` to break the line between edges. The 2-D line has empty `ZData`.
 

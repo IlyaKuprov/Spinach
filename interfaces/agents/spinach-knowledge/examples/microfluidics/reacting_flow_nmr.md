@@ -8,7 +8,7 @@ The spin system uses `sys.magnet=14.1` (the file does not annotate a field unit)
 
 ## Observable
 
-Acquisitions begin at every 25th chemistry-grid index (21 sampled starts, from 0 through 10,000 seconds). Each FID is apodised, zero-filled to 16384 points, Fourier transformed, and displayed as a real-intensity waterfall against time (seconds) and chemical shift (ppm); intensity is labeled a.u. The source header estimates days and says GPU execution is much faster; this is not a benchmark. The script defaults to `sys.enable={'greedy'}`; GPU transfers are conditional on `gpu` being enabled.
+Acquisitions begin at every 25th chemistry-grid index (21 sampled starts, from 0 through 10,000 seconds). Each FID is apodised, zero-filled to 16384 points, Fourier transformed, and displayed as a real-intensity waterfall against time (seconds) and chemical shift (ppm); intensity is labelled a.u. The source header estimates days and says GPU execution is much faster; this is not a benchmark. The script defaults to `sys.enable={'greedy'}`; GPU transfers are conditional on `gpu` being enabled.
 
 ## Source
 

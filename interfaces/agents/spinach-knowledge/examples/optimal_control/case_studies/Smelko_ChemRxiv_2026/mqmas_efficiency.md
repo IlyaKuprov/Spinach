@@ -11,7 +11,7 @@ This script compares simulated sequence efficiency for hard-pulse and optimal-co
 
 The model is one 27Al nucleus with spin 5/2, quadrupolar coupling 3.2 MHz, asymmetry 0.16, and a second-order quadrupolar interaction in the rotating frame. It includes shielding tensor eigenvalues -5, -5, and 10 ppm. The magnet is 400 MHz and the sample spins at 12.5 kHz about the axis [sqrt(2/3), 0, sqrt(1/3)]. The calculation uses a lab-frame Zeeman-Hilbert-space model.
 
-The simulated order is selected as 3Q or 5Q. The sequence applies excitation, filters to the positive and negative selected multiple-quantum orders, applies conversion, filters to zero quantum order, applies a central-transition-selective pulse, and reads the central-transition single-quantum component. The initial state is normalized 27Al longitudinal magnetization. Rotor-resolved drift Hamiltonians are sampled at 0.5 microsecond ticks; the powder average uses 400 crystallite orientations and 32 initial rotor phases per orientation.
+The simulated order is selected as 3Q or 5Q. The sequence applies excitation, filters to the positive and negative selected multiple-quantum orders, applies conversion, filters to zero quantum order, applies a central-transition-selective pulse, and reads the central-transition single-quantum component. The initial state is normalised 27Al longitudinal magnetisation. Rotor-resolved drift Hamiltonians are sampled at 0.5 microsecond ticks; the powder average uses 400 crystallite orientations and 32 initial rotor phases per orientation.
 
 ## Pulse comparison and observable
 

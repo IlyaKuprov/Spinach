@@ -14,6 +14,6 @@ The system contains 14N at `sys.magnet=14.1`. Its quadrupolar interaction is set
 
 ## Powder acquisition and output
 
-The source sets the magic angle to `atan(sqrt(2))`, initializes `rho0` as the 14N `T2,-2` state, and uses a coil operator formed from `cos(theta)*Lz + sin(theta)*Lx`. The powder grid is `rep_2ang_6400pts_sph`; the sweep is `[0e3 15e3]`, with 256 points and 256-point zero filling. The selected spin is 14N and the plotted axis units are kHz. The spectrum call is `powder(spin_system,@overtone_a,parameters,'qnmr')`; the plot displays its real part through `plot_1d`.
+The source sets the magic angle to `atan(sqrt(2))`, initialises `rho0` as the 14N `T2,-2` state, and uses a coil operator formed from `cos(theta)*Lz + sin(theta)*Lx`. The powder grid is `rep_2ang_6400pts_sph`; the sweep is `[0e3 15e3]`, with 256 points and 256-point zero filling. The selected spin is 14N and the plotted axis units are kHz. The spectrum call is `powder(spin_system,@overtone_a,parameters,'qnmr')`; the plot displays its real part through `plot_1d`.
 
 The header describes a static-sample spectrum. This script specifies no MAS or DOR rotor rate, RF pulse sequence, or contact-time parameter. No experimental comparison or fitted spectrum is produced by this file.

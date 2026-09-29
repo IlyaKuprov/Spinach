@@ -4,7 +4,7 @@
 
 ## What it calculates
 
-This example follows selected operator-state amplitudes for the proton plus two-electron JDNP system, using the electron singlet/triplet combinations and the nuclear-spin-resolved components defined explicitly in the source. The stated purpose is to illustrate imbalance between singlet–nuclear-alpha and singlet–nuclear-beta subspaces and the associated transient nuclear polarization. It cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
+This example follows selected operator-state amplitudes for the proton plus two-electron JDNP system, using the electron singlet/triplet combinations and the nuclear-spin-resolved components defined explicitly in the source. The stated purpose is to illustrate imbalance between singlet–nuclear-alpha and singlet–nuclear-beta subspaces and the associated transient nuclear polarisation. It cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
 
 ## Running assumptions and settings
 

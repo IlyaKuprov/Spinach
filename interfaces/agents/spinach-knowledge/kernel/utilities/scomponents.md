@@ -4,7 +4,7 @@
 
 Computes the strongly connected components of a directed graph using David Gleich's implementation of Tarjan's algorithm.
 
-## Behavior
+## Behaviour
 
 - Validates the input via an internal consistency check (`grumble`), which errors with `'the input must be a square logical matrix.'` if the input is not logical, not a matrix, or not square.
 - Converts the adjacency matrix to compressed sparse row (CSR) form via `sparse2csr(sparse(A))`, returning row pointers `rp` and column indices `ci`.
@@ -12,7 +12,7 @@ Computes the strongly connected components of a directed graph using David Gleic
 - Maintains per-node arrays: `root` (current component root), `dt` (discovery times, incremented by a counter `t`), and `sci` (component labels, set to `-1` while a node is on the stack).
 - Uses a call stack `rs` of size `2*n` storing (node, row-index) pairs, and a component stack `cs` of size `n`.
 - When a node's root equals itself, all nodes on the component stack down to that node are popped and assigned the current component number `cn`, which is then incremented.
-- Component numbering starts at `1` and increases in the order components are finalized.
+- Component numbering starts at `1` and increases in the order components are finalised.
 
 ## Inputs and outputs
 

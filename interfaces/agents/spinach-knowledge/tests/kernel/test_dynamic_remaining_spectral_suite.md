@@ -6,7 +6,7 @@
 
 Regression test suite for the remaining spectral, symmetry, and Fokker-Planck utilities in the Spinach kernel. It verifies field-swept eigensystem helpers, rotor-stack assembly, permutation-symmetry projectors, and one-dimensional Fokker-Planck operators against compact analytical matrix references.
 
-## Behavior
+## Behaviour
 
 The suite runs the following checks:
 

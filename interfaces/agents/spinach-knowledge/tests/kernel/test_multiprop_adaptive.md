@@ -6,7 +6,7 @@ Regression test for adaptive repeated propagator application in `multiprop()`. T
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_multiprop_adaptive.m
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Adaptive repeated propagator application\n')` and registers a test result via `new_test_result('kernel/multiprop_adaptive', ...)`, stating that `multiprop()` must apply propagators repeatedly by binary adaptive squaring.
 - Builds a minimal spin system structure with `sys.enable={}`, `sys.disable={}`, `bas.formalism='zeeman-liouv'`, `tols.prop_chop=0`, `tols.dense_matrix=0.15`, and `tols.small_matrix=200`.

@@ -6,7 +6,7 @@
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rocomm.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `C=rocomm(A)`.
 - The function first validates the input via an internal consistency check (`grumble`), which errors with `'A must be a cell array of square matrices.'` if `A` is not a cell array, if any element is not numeric, or if any element is not square (row count differs from column count).

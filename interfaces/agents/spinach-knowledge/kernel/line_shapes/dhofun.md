@@ -6,7 +6,7 @@
 
 ## Meaning and equation
 
-This is the normalized damped-harmonic-oscillator response in magnetic-resonance notation. For `x>0`, put `r=x/nat_freq` and `d=fwhm/nat_freq`; the source evaluates `y=(2*d/(pi*nat_freq))*r^2/((r^2-1)^2+(d*r)^2)`. It sets `y=0` for non-positive `x`. The response integrates to one over positive arguments, peaks at `nat_freq`, and the source identifies `fwhm` as the full width at half maximum at any damping; in the weak-damping limit it tends to a Lorentzian of that width.
+This is the normalised damped-harmonic-oscillator response in magnetic-resonance notation. For `x>0`, put `r=x/nat_freq` and `d=fwhm/nat_freq`; the source evaluates `y=(2*d/(pi*nat_freq))*r^2/((r^2-1)^2+(d*r)^2)`. It sets `y=0` for non-positive `x`. The response integrates to one over positive arguments, peaks at `nat_freq`, and the source identifies `fwhm` as the full width at half maximum at any damping; in the weak-damping limit it tends to a Lorentzian of that width.
 
 ## Inputs and units
 
@@ -18,4 +18,4 @@ This is the normalized damped-harmonic-oscillator response in magnetic-resonance
 
 ## Output
 
-- `y` - same size and type as `x`, initialized with zeros like `x`; positive-argument entries are replaced by the response.
+- `y` - same size and type as `x`, initialised with zeros like `x`; positive-argument entries are replaced by the response.

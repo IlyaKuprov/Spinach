@@ -24,7 +24,7 @@ The required `parameters` fields are:
 
 The pulse operators are formed from the raising operator for `parameters.spins{1}`. The implementation combines `H`, `R`, and `K` into the propagator generator, adjusts the four pulse frequencies for the electron reference frequency and `offset`, then applies four shaped pulses with free evolution between them. It creates a set of states at the third-pulse positions, refocuses that set, applies the fourth pulse, and samples the echo through `coil`. The trace time is referenced to the third-pulse insertion point after the second pulse.
 
-The declared result is a matrix containing `p3_nsteps` echoes with `echo_npts` points per echo. The header does not state which matrix axis represents which count. The echo window is positioned relative to the expected second-echo location. The source cautions that simulated echoes can be sharp because the simulation does not include experimental distributions, and recommends Fourier-transforming the echo before integration.
+The declared result is a matrix containing `p3_nsteps+1` echoes with `echo_npts+1` points per echo, including the initial trajectory state and initial observation. The header does not state which matrix axis represents which count. The echo window is positioned relative to the expected second-echo location. The source cautions that simulated echoes can be sharp because the simulation does not include experimental distributions, and recommends Fourier-transforming the echo before integration.
 
 ## Scope not specified by the source
 

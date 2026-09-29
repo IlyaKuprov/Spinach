@@ -12,4 +12,4 @@ Returns the conjugate transpose of an RCV sparse matrix while keeping its coordi
 
 The implementation first checks that `A` is an `rcv` object. It then swaps `A.row` with `A.col`, swaps `A.numRows` with `A.numCols`, and replaces `A.val` with `conj(A.val)`. Thus each stored coordinate/value pair `(i,j,v)` becomes `(j,i,conj(v))`, and the output shape is `[numCols,numRows]` from the input shape.
 
-Conjugation is elementwise over the stored value array. The implementation does not materialize a full matrix and does not add explicit checks for coordinate/value-array consistency or scalar/broadcast behavior.
+Conjugation is elementwise over the stored value array. The implementation does not materialise a full matrix and does not add explicit checks for coordinate/value-array consistency or scalar/broadcast behaviour.

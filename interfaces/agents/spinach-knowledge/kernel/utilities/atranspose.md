@@ -4,7 +4,7 @@
 
 `atranspose.m` performs an anti-diagonal transpose of a numeric array, returning the array reflected across its anti-diagonal.
 
-## Behavior
+## Behaviour
 
 The function calls `grumble(M)` to enforce consistency: if `M` is not numeric, it errors with `'M must be a numeric array.'`. Otherwise, it computes the result as `transpose(rot90(M,2))` — rotating the array by 180 degrees and then applying the standard transpose — and returns the transformed array.
 

@@ -6,7 +6,7 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_rotor
 
 Regression test for explicit assumptions during rotor-stack construction. It verifies that explicit assumptions reach numerical rotating frames, that fresh, stale, and matching objects produce identical numerical-frame stacks, and that inconsistent numerical-frame requests are rejected.
 
-## Behavior
+## Behaviour
 
 - The test is registered via `new_test_result` as `kernel/rotor_assume` with the description `Rotor-stack assumptions` and the message `Explicit assumptions must reach numerical rotating frames.`
 - The first system is an anisotropic heteronuclear pair (`1H`, `13C`) at 9.4 T with noncommuting laboratory Hamiltonians: Zeeman eigenvalues `[-12 5 20]` and `[-30 10 45]`, Zeeman Euler angles `[0.2 0.5 0.7]` and `[0.6 0.4 0.3]`, and a scalar coupling of 150 between the two spins. The rotor axis is `[1 2 3]/sqrt(14)`, transmitter offsets are `[70 -35]`, `max_rank` is 1, and the orientation is `[0.3 0.7 0.2]`.

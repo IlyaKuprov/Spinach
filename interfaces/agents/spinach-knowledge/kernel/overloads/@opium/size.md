@@ -2,11 +2,11 @@
 
 - Signature: `varargout=size(op,dim)`
 
-## Meaning and behavior
+## Meaning and behaviour
 
 The represented matrix has shape `[op.dim op.dim]`. With no `dim` argument, one output is that two-element shape vector; with two outputs, each output is `op.dim`. With a requested dimension, the method returns `op.dim` for dimension 1 or 2. The implementation checks that a supplied `dim` is scalar and a member of `[1 2]`; other values raise the source's polyadic-dimension error. Other call/output forms reach `invalid call syntax.`.
 
-This query reports the represented square shape without constructing the matrix. The source supports only the stated two dimensions; it does not define higher-dimension, cell-array, or broadcasting behavior.
+This query reports the represented square shape without constructing the matrix. The source supports only the stated two dimensions; it does not define higher-dimension, cell-array, or broadcasting behaviour.
 
 ## Input and output
 

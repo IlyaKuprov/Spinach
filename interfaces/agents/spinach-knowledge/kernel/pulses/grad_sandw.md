@@ -19,7 +19,7 @@ Computes the sample-averaged effect of a two-gradient sandwich using Edwards' fo
 
 ## What the implementation does
 
-The effective gradient operators use `1e-4 * shape_factor * gradient_amplitude * sample_length * duration * (carrier / magnet)`; the source warns that shifts are ignored. Before propagating, it checks that `L*G_i - G_i*L` has `cheap_norm` no greater than `1e-6` for each effective gradient operator; otherwise it errors. The state is evolved under `L` for each gradient duration, while a block evolution combines the gradient operators with `P` and maps the result back to the state-vector space. The half-gradient evolution factors account for the normalized sample integral.
+The effective gradient operators use `1e-4 * shape_factor * gradient_amplitude * sample_length * duration * (carrier / magnet)`; the source warns that shifts are ignored. Before propagating, it checks that `L*G_i - G_i*L` has `cheap_norm` no greater than `1e-6` for each effective gradient operator; otherwise it errors. The state is evolved under `L` for each gradient duration, while a block evolution combines the gradient operators with `P` and maps the result back to the state-vector space. The half-gradient evolution factors account for the normalised sample integral.
 
 The routine calls `report` with a progress message. It contains no explicit plotting or file-writing operation.
 

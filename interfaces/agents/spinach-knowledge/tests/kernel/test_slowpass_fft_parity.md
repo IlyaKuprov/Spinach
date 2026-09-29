@@ -6,7 +6,7 @@ Source: [tests/kernel/test_slowpass_fft_parity.m](https://github.com/IlyaKuprov/
 
 Regression test that checks the amplitude normalisation of `slowpass()` frequency-domain acquisition against a time-domain acquisition processed with MATLAB's unnormalised `fft()`. The test target is `kernel/slowpass_fft_parity`, and the stated requirement is that `slowpass()` must match the unnormalised amplitude convention of `fft(acquire())`.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Slowpass FFT amplitude parity\n')` and initialises the result via `new_test_result(...)`.
 - Builds a damped one-spin Liouville-space system: `sys.magnet=14.1`, `sys.isotopes={'1H'}`, zero scalar Zeeman interaction, `'damp'` relaxation with `inter.damp_rate=8.0`, `'zero'` equilibrium, `'labframe'` relaxation frame, temperature 298 K, spherical-tensor Liouville formalism with no approximation.

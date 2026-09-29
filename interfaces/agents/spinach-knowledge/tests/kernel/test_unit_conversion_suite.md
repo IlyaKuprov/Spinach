@@ -12,9 +12,9 @@ Regression test for the scalar unit-conversion helper functions used across Spin
 - milliTesla to Hz conversion (`mt2hz`),
 - Lorentzian full width at half maximum to transverse relaxation rate (`fwhm2rlx`).
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Unit-conversion functions\n')` and initializes a regression test result object via `new_test_result` with the identifier `kernel/unit_conversion_suite`, the description `Unit-conversion functions`, and the requirement that `unit conversion helpers must implement their defining physical constants.`
+The function announces the test target with `fprintf('TESTING: Unit-conversion functions\n')` and initialises a regression test result object via `new_test_result` with the identifier `kernel/unit_conversion_suite`, the description `Unit-conversion functions`, and the requirement that `unit conversion helpers must implement their defining physical constants.`
 
 Each check is performed with `test_close`, which compares the function output against a reference computed from the defining physical constants, using element-wise relative and absolute tolerances:
 

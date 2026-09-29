@@ -6,9 +6,9 @@
 
 Regression test suite for the exponential, Chebyshev, and Krylov numerical utilities in Spinach. The suite verifies Arnoldi basis identities, Chebyshev coefficients, exponential drop boundary values, and Van Loan exponential-integral helpers against small closed-form references.
 
-## Behavior
+## Behaviour
 
-- Announces the test target with `fprintf` and initializes a regression test result via `new_test_result` under the identifier `kernel/exponential_krylov_suite`, describing the requirement that Krylov bases and exponential-integral helpers reproduce closed-form matrix identities.
+- Announces the test target with `fprintf` and initialises a regression test result via `new_test_result` under the identifier `kernel/exponential_krylov_suite`, describing the requirement that Krylov bases and exponential-integral helpers reproduce closed-form matrix identities.
 - **Arnoldi identities:** builds `krylov_mat=diag([1 2 4])` with the operator `@(x)krylov_mat*x` and calls `arnoldi(krylov_op,[1;2;3],2)`. Checks that `V'*V` equals the identity (tolerances `1e-13`) and that `krylov_mat*V(:,1:2)` equals `V*H` (tolerances `1e-13`), i.e. `A*V(:,1:n)` equals `V*H` for the extended Hessenberg matrix.
 - **Arnoldi exact breakdown:** uses `break_mat=[5 0;0 7]` with initial vector `[1;0]` and `4` requested steps. Checks that `size(V_break,2)==1` with `size(H_break)` equal to `[1 1]` (an invariant one-dimensional Krylov subspace returned without zero padding) and that `H_break` equals `5` (tolerances `1e-15`), the eigenvalue on the invariant subspace.
 - **Chebyshev coefficients:** defines `cheb_poly=@(x)2-3*x+4*(2*x.^2-1)` and calls `cheb_coeff(cheb_poly,-1,1,8)`. Checks the result against the reference `[2 -3 4 0 0 0 0 0]` (tolerances `1e-13`), since a degree-two Chebyshev polynomial has only its first three coefficients.

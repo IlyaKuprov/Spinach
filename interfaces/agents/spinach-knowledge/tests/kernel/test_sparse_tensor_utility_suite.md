@@ -6,9 +6,9 @@ Regression test suite for the sparse, tensor, and numerical utility helpers in S
 
 Source: [tests/kernel/test_sparse_tensor_utility_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_sparse_tensor_utility_suite.m)
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a test result object via `new_test_result` under the identifier `kernel/sparse_tensor_utility_suite`, and then runs a sequence of `test_close` comparisons:
+The function announces the test target with `fprintf`, initialises a test result object via `new_test_result` under the identifier `kernel/sparse_tensor_utility_suite`, and then runs a sequence of `test_close` comparisons:
 
 - **Kronecker-product application**: builds two sparse 2×2 matrices `Q{1}` and `Q{2}` and a 4-element vector `x=(1:4)'`, forms the explicit product `K=kron(Q{1},Q{2})`, and checks that `kronm(Q,x)` and `kronm_new(Q,x)` both match `K*x` to absolute and relative tolerances of `1e-14`.
 - **Blicharski invariants**: for `A=[1 2 3;4 5 6;7 8 9]`, checks that `blinv` returns the first-rank invariant `Lsq` equal to the sum of squared antisymmetric off-diagonal differences, and the second-rank invariant `Dsq` equal to the traceless symmetric tensor amplitude (diagonal combination plus `3/4` times the sum of squared symmetric off-diagonal sums). For a second matrix `B=[2 -1 0; 3 4 1; 5 6 -2]`, checks that `blprod(A,B)` returns first- and second-rank tensor products `X1` and `X2` matching the polarisation identities `(Lap-Lam)/4` and `(Dap-Dam)/4`, where `blinv` is evaluated at `A-B` and `A+B`. All comparisons use tolerances of `1e-14`.

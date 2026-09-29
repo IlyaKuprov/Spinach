@@ -10,7 +10,7 @@ This high-rank isotropic case compares a Monte Carlo estimate with Spinach's ana
 
 ## Numerical construction
 
-The source generates `1e6` direction-cosine-matrix updates from three independent standard-normal increments, with all three displayed skew-symmetric generators scaled by `sigma_iso`. It stores the trajectory, converts each matrix through `dcm2euler` to `wigner(L,...)` in a `parfor` loop, and computes normalized `xcorr` for the selected elements. The result is rescaled by `1/(2*L+1)` (here `1/9`) and shifted together with its lag vector by `ifftshift`. With `nlags=100`, the plotted portion corresponds to lag points 0 through 99.
+The source generates `1e6` direction-cosine-matrix updates from three independent standard-normal increments, with all three displayed skew-symmetric generators scaled by `sigma_iso`. It stores the trajectory, converts each matrix through `dcm2euler` to `wigner(L,...)` in a `parfor` loop, and computes normalised `xcorr` for the selected elements. The result is rescaled by `1/(2*L+1)` (here `1/9`) and shifted together with its lag vector by `ifftshift`. With `nlags=100`, the plotted portion corresponds to lag points 0 through 99.
 
 ## Analytical construction and observable
 

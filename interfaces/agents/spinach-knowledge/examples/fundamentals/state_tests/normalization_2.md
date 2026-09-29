@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This check compares state inner products across Spinach's Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville formalisms, including the normalization factor used by the source for the spherical-tensor representation. Unlike normalization_1, it tests squared norms rather than differences between Cartesian-component norms.
+This check compares state inner products across Spinach's Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville formalisms, including the normalisation factor used by the source for the spherical-tensor representation. Unlike normalisation_1, it tests squared norms rather than differences between Cartesian-component norms.
 
 ## System and method
 

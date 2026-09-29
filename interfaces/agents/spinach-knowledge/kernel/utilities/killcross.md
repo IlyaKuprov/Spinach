@@ -10,7 +10,7 @@ M=killcross(M,f1idx,f2idx)
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/killcross.m>
 
-## Behavior
+## Behaviour
 
 - The function calls the internal consistency checker `grumble(M,f1idx,f2idx)` before modifying the matrix.
 - It then wipes the specified indices: `M(f2idx,:)=0; M(:,f1idx)=0;`, i.e. all rows listed in `f2idx` and all columns listed in `f1idx` are set to zero.

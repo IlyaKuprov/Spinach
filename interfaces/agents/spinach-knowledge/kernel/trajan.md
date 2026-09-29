@@ -6,7 +6,7 @@
 
 Trajectory analysis function. Plots the time dependence of the density matrix norm, partitioned into user-specified property classes. The trajectory would usually come out of an `evolution.m` run from a given starting point under a given Liouvillian.
 
-## Behavior
+## Behaviour
 
 - Syntax: `trajan(spin_system,traj,property,time_axis)`.
 - Validates inputs via an internal `grumble` function: the spin system formalism must be `sphten-liouv`; the trajectory must be numeric with a number of rows matching the basis dimension; the property string must be one of the five supported options; if supplied, `time_axis` must be a real row vector with one element per trajectory column.
@@ -20,7 +20,7 @@ Trajectory analysis function. Plots the time dependence of the density matrix no
 - For `total_each_spin` and `local_each_spin`, legend entries use user-specified labels from `spin_system.comp.labels` when available, otherwise isotope names with spin numbers, e.g. `isotope (n)`.
 - For all properties except `level_populations`, each result row is the Euclidean norm over the subspace: `sqrt(sum(subspace_trajectory.*conj(subspace_trajectory),1))`.
 - Y-axis extents: for norm-based properties, `[-0.05*max_val 1.05*max_val]`; for `level_populations`, `[min_val-0.05*(max_val-min_val), max_val+0.05*(max_val-min_val)]`, with a flat trajectory padded by `max(0.05*abs(max_val),1e-6)` so the limits differ.
-- Plotting: if a non-empty `time_axis` is supplied, results are plotted against it; otherwise against trajectory point index with x-label `trajectory point`. Line colors are set deterministically as `hsv2rgb([n/numel(p) 0.75 0.75])`. A legend is drawn only if none exists on the current axes (to avoid expensive redraws), using `klegend` with `Location` `Best` and `AutoUpdate` `off`. Axis labels, limits (`xlim tight`), title and grid are applied via `kylabel`, `ylim`, `ktitle` and `kgrid`.
+- Plotting: if a non-empty `time_axis` is supplied, results are plotted against it; otherwise against trajectory point index with x-label `trajectory point`. Line colours are set deterministically as `hsv2rgb([n/numel(p) 0.75 0.75])`. A legend is drawn only if none exists on the current axes (to avoid expensive redraws), using `klegend` with `Location` `Best` and `AutoUpdate` `off`. Axis labels, limits (`xlim tight`), title and grid are applied via `kylabel`, `ylim`, `ktitle` and `kgrid`.
 - An unknown property string raises `unknown property.`; the validation helper raises specific errors for wrong formalism, non-numeric trajectory, dimension mismatch, unknown property, or invalid `time_axis`.
 - The function is only applicable to trajectories recorded in the sphten-liouv formalism.
 

@@ -6,7 +6,7 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_chemi
 
 Regression test that verifies population conservation in a symmetric two-site chemical exchange model. The test checks that the kinetics generator built by `kinetics()` conserves the total population over the two sites, i.e. that probability leaving each site enters the other site.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Chemical exchange conservation\n')`.
 - Registers a new test result via `new_test_result()` with the identifier `kernel/chemical_exchange_conservation`, the description `Chemical exchange conservation`, and the criterion string `closed two-site exchange must conserve total spin population.`.

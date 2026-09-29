@@ -18,7 +18,7 @@ The function checks that X and Y are numeric real column vectors of equal length
 
 ## File output
 
-The header identifies Bruker JCAMP-DX shape data and Spinach, records the current date and time, amplitude and phase extrema, pulse length, and point count, then declares `##XYPOINTS= (XY..XY..)`. Each following row contains one normalized amplitude and its phase in degrees, separated by a space; `##END` closes the file. The initial `writelines(lines,file_name)` writes the header to the destination (replacing an existing file under MATLAB's default write behavior); the numeric pairs and terminator are appended. This operation therefore has a file-system side effect and overwrites an existing destination rather than adding a new pulse to it.
+The header identifies Bruker JCAMP-DX shape data and Spinach, records the current date and time, amplitude and phase extrema, pulse length, and point count, then declares `##XYPOINTS= (XY..XY..)`. Each following row contains one normalised amplitude and its phase in degrees, separated by a space; `##END` closes the file. The initial `writelines(lines,file_name)` writes the header to the destination (replacing an existing file under MATLAB's default write behaviour); the numeric pairs and terminator are appended. This operation therefore has a file-system side effect and overwrites an existing destination rather than adding a new pulse to it.
 
 ## Reference
 

@@ -6,9 +6,9 @@ Regression test suite for Spinach linear-algebra, angular-momentum, and perturba
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_linear_perturbation_suite.m>
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf`, initializes a result object via `new_test_result` for the `kernel/linear_perturbation_suite` target, and then runs a sequence of `test_close` and `test_true` checks:
+The function announces the test target with `fprintf`, initialises a result object via `new_test_result` for the `kernel/linear_perturbation_suite` target, and then runs a sequence of `test_close` and `test_true` checks:
 
 - **Spin addition** — calls `add_spins(1/2,1/2)` and verifies that the returned multiplicities equal `[1 3]` (one singlet and one triplet irrep, tolerance `1e-14`), that the projector completeness relation `projectors{1}*projectors{1}'+projectors{2}*projectors{2}'` equals `eye(4)` (`1e-13`), and that each projector block satisfies `projectors{k}'*projectors{k} = eye(1)` / `eye(3)` orthonormality (`1e-13`).
 - **Rayleigh–Schrödinger perturbation theory** — for a two-level system with `base_energy=[0;10]` and an off-diagonal perturbation of strength `0.01`, calls `rspert(base_energy,pert_mat,2)` and checks the second-order energies against the reference `[-pert_strength^2/10; 10+pert_strength^2/10]` (`1e-13`) and that the returned eigenvectors are column-normalised (`1e-14`).

@@ -6,7 +6,7 @@
 
 L-curve analysis function that locates the optimal regularisation parameter at the point of maximum curvature of the L-curve, given a sweep of regularisation parameters with corresponding least squares errors and regularisation functional values.
 
-## Behavior
+## Behaviour
 
 - Syntax: `lam_opt=lcurve(lam,err,reg,mode)`.
 - Input consistency is enforced by an internal `grumble` subfunction: `lam`, `err` and `reg` must be row vectors of positive, real, finite numbers of equal length, with at least six elements; `lam` must be in ascending order; `mode` must be `'log'` or `'linear'`.

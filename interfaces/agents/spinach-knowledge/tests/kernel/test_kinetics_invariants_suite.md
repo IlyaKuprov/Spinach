@@ -4,9 +4,9 @@
 
 Regression test for deterministic chemical kinetics helpers in Spinach. The suite verifies closed-form steady states, independent reaction blocks, reaction-generator state routing, and conservation in a tiny exchange kinetics superoperator.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Chemical kinetics invariants\n')` and initializes a result object via `new_test_result('kernel/kinetics_invariants_suite', 'Chemical kinetics invariants', 'kinetic generators must conserve matter and route spin order between declared species.')`.
+The function announces the test target with `fprintf('TESTING: Chemical kinetics invariants\n')` and initialises a result object via `new_test_result('kernel/kinetics_invariants_suite', 'Chemical kinetics invariants', 'kinetic generators must conserve matter and route spin order between declared species.')`.
 
 It then performs the following checks, each through `test_close` with explanatory messages:
 

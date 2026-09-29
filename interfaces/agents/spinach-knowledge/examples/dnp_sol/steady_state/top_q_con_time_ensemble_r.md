@@ -6,7 +6,7 @@
 
 ## Question and model
 
-How does the steady-state proton longitudinal polarization vary with TOP contact time for two fixed irradiation conditions after averaging over electron–proton distance? Unlike the `ensemble_b1_r` variant, this script has no B1 ensemble. It uses a Q-band magnet setting of 1.2142, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
+How does the steady-state proton longitudinal polarisation vary with TOP contact time for two fixed irradiation conditions after averaging over electron–proton distance? Unlike the `ensemble_b1_r` variant, this script has no B1 ensemble. It uses a Q-band magnet setting of 1.2142, trityl electron g principal values `[2.00319 2.00319 2.00258]`, proton shift values `[0 0 5]`, Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, and spin temperature 80 K.
 
 ## Scan and averaging
 
@@ -16,4 +16,4 @@ The basis is `sphten-liouv` without approximation; propagator chopping tolerance
 
 ## Output and limits
 
-Each setting is averaged over distance using the quadrature weights and radial Jacobian `r^2`. The real proton `I_z` expectation is plotted against total contact time, with curves labeled TOP, 18 MHz and TOP, 33 MHz, and saved as `top_q_con_time_ensemble_r.fig`. The source estimates hours of calculation; only a figure is saved, not a numeric results table.
+Each setting is averaged over distance using the quadrature weights and radial Jacobian `r^2`. The real proton `I_z` expectation is plotted against total contact time, with curves labelled TOP, 18 MHz and TOP, 33 MHz, and saved as `top_q_con_time_ensemble_r.fig`. The source estimates hours of calculation; only a figure is saved, not a numeric results table.

@@ -4,7 +4,7 @@
 
 Returns `true` for unit (identity) matrices. The test is designed to be computationally affordable. Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iseye.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `verdict=iseye(M)`.
 - Consistency is enforced first: if `M` is not numeric, the function errors with `'M must be numeric.'`.

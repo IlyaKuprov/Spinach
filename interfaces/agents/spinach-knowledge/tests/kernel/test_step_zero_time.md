@@ -6,7 +6,7 @@
 
 Regression test for zero-duration propagation. The test verifies the identity limit of the propagator: a zero time step must leave the density matrix exactly unchanged.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Zero-duration propagation identity\n')`.
 - Registers a new test result via `new_test_result` with test name `'kernel/step_zero_time'`, description `'Zero-duration propagation identity'`, and the statement `'a propagator over zero time is the identity map.'`.

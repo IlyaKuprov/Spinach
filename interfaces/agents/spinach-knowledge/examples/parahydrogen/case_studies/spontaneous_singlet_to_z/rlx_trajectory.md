@@ -9,7 +9,7 @@ Calculates the relaxation-driven evolution of spin order for a two-proton parahy
 
 ## Spin model and mechanism
 
-The only explicit spins are two `1H` nuclei. The singlet initial state evolves under a Hamiltonian built from the supplied anisotropic Zeeman tensors and a secular Redfield relaxation model. In this setup, the non-identical Zeeman tensors remove the equivalence that protects the singlet from coupling to other pair-spin orders; the plotted channels show how transverse exchange order, longitudinal two-spin order, and total longitudinal order change during the modeled relaxation. Coordinates are supplied for the dipolar tensor. The source does not include explicit nickel spins, a hydrogenation reaction, or a chemical-exchange kinetic model: this is a spin-dynamics trajectory, not a measured hyperpolarization trace or a modeled ALTADENA transport / SABRE catalyst-exchange cycle.
+The only explicit spins are two `1H` nuclei. The singlet initial state evolves under a Hamiltonian built from the supplied anisotropic Zeeman tensors and a secular Redfield relaxation model. In this setup, the non-identical Zeeman tensors remove the equivalence that protects the singlet from coupling to other pair-spin orders; the plotted channels show how transverse exchange order, longitudinal two-spin order, and total longitudinal order change during the modeled relaxation. Coordinates are supplied for the dipolar tensor. The source does not include explicit nickel spins, a hydrogenation reaction, or a chemical-exchange kinetic model: this is a spin-dynamics trajectory, not a measured hyperpolarisation trace or a modeled ALTADENA transport / SABRE catalyst-exchange cycle.
 
 ## Coded parameters and observables
 
@@ -24,4 +24,4 @@ The initial density operator is the two-spin singlet. The source defines `A` as 
 
 ## Interpretation boundary
 
-The result is a calculation of model spin-order trajectories under the stated Hamiltonian and relaxation assumptions. It is not an experimental observation, a simulated chemical reaction, or evidence for a quantitative hyperpolarization yield. The source does not report convergence tests or a literature DOI.
+The result is a calculation of model spin-order trajectories under the stated Hamiltonian and relaxation assumptions. It is not an experimental observation, a simulated chemical reaction, or evidence for a quantitative hyperpolarisation yield. The source does not report convergence tests or a literature DOI.

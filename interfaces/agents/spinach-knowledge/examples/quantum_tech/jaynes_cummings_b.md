@@ -5,7 +5,7 @@
 
 ## Purpose
 
-A finite-dimensional time-domain Jaynes–Cummings model of one electron spin coupled to one cavity mode. The script initializes transverse spin coherence with the cavity in its vacuum state, propagates in Spinach's cavity device context, and plots spin coherence, a cavity-field quadrature, and selected cavity-level populations.
+A finite-dimensional time-domain Jaynes–Cummings model of one electron spin coupled to one cavity mode. The script initialises transverse spin coherence with the cavity in its vacuum state, propagates in Spinach's cavity device context, and plots spin coherence, a cavity-field quadrature, and selected cavity-level populations.
 
 ## Physical model and spin selection
 
@@ -15,6 +15,6 @@ The sequence selects `parameters.spins={'E'}`; its offset is `5e6` Hz, sweep is 
 
 ## Initial state and plotted observables
 
-The initial density operator combines the spin `Lx` component paired with cavity state `BL1` and a half-weight electron-spin `E` component paired with the same cavity state. In the source's cavity-level labeling, `BL1` is the empty mode. Detection projects onto the spin `Lx`, the cavity quadrature `(C-A)/2i`, and the populations of `BL1`, `BL2`, and `BL3`. The plotted time axis has `251` samples from 0 to 2.5 μs.
+The initial density operator combines the spin `Lx` component paired with cavity state `BL1` and a half-weight electron-spin `E` component paired with the same cavity state. In the source's cavity-level labelling, `BL1` is the empty mode. Detection projects onto the spin `Lx`, the cavity quadrature `(C-A)/2i`, and the populations of `BL1`, `BL2`, and `BL3`. The plotted time axis has `251` samples from 0 to 2.5 μs.
 
 The figures therefore represent simulated spin/cavity coherence and low-lying cavity-state populations for this specified model. The source sets no independent drive-amplitude parameter, cavity linewidth, or relaxation term; it supplies the cavity-device context through `device(...,'cavity')` and the listed sequence parameters. These traces should not be read as measured defect spectra, device-fidelity results, or evidence of a particular experimental Rabi frequency. The source comment's runtime estimate is not repeated as a verified runtime claim.

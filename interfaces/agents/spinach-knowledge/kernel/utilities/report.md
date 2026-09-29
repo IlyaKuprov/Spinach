@@ -4,7 +4,7 @@
 
 Writes a log message to the console or an ASCII file, prefixed with the call stack of the function that produced it. Source: [kernel/utilities/report.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/report.m).
 
-## Behavior
+## Behaviour
 
 - Syntax: `report(spin_system,report_string)`.
 - A single-argument call raises the error `console reporting function requires two arguments.`.

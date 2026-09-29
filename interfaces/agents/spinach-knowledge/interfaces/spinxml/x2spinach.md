@@ -16,7 +16,7 @@ Reads a SpinXML file and constructs Spinach spin-system and interaction input fi
 
 The first pass reads each spin element's ID and isotope, and its optional label and Cartesian coordinate attributes x, y, and z. Spins are sorted by ID; the IDs must then be exactly the sequence 1 through the number of spins. The coordinate values are copied into the output without a unit conversion in this function.
 
-A second pass reads interaction elements, including their kind, spin IDs, units, labels, references, tensor/scalar specification, and optional orientation. The value forms handled in the source are tensor, scalar, eigenvalues, aniso_asymm, axiality_rhombicity, and span_skew. Recognized interaction kinds are hfc, shielding, shift, dipolar, quadrupolar, jcoupling, gtensor, zfs, exchange, and spinrotation.
+A second pass reads interaction elements, including their kind, spin IDs, units, labels, references, tensor/scalar specification, and optional orientation. The value forms handled in the source are tensor, scalar, eigenvalues, aniso_asymm, axiality_rhombicity, and span_skew. Recognised interaction kinds are hfc, shielding, shift, dipolar, quadrupolar, jcoupling, gtensor, zfs, exchange, and spinrotation.
 
 For absolute shielding, the supplied isotope reference is used to form the chemical-shift tensor as reference * I - shielding; the interaction must be nuclear and the reference for that isotope must be supplied. Chemical shifts and shieldings require ppm; gtensor requires bohr. The frequency-valued hfc, dipolar, quadrupolar, jcoupling, zfs, exchange, and spinrotation branches accept Hz, kHz, MHz, or GHz; hfc also accepts gauss. The source rejects unsupported units and incompatible spin assignments.
 

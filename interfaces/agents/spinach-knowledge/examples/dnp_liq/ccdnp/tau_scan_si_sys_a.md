@@ -16,7 +16,7 @@ Run with MATLAB and Spinach on the MATLAB path, from an environment where the ex
 - Basis: `sphten-liouv`, approximation `none`. Relaxation is `redfield`, equilibrium setting `zero`, retained relaxation terms `secular`, and `inter.temperature=298` (the source gives no unit). The relaxation-integration tolerance is `1e-10`; the source comments that it needs to be this tight.
 - Sequence settings: electron channel `{'E'}`, `parameters.mw_pwr=2*pi*1e6`, method `lvn-backs`, needs `{'rho_eq'}`, and reference g value is the mean of electron 1's Zeeman eigenvalues. The source does not annotate a unit for `mw_pwr`.
 
-## Scan, normalization, and output
+## Scan, normalisation, and output
 
 The frequency-offset vector is `2*pi*linspace(-10,30,512)*1e6`; the figure expresses it in MHz. The correlation-time vector is `linspace(50e-12,500e-12,128)` seconds, plotted as 50–500 ps. For each time, the function builds the Spinach system and basis, detects proton `Lz`, defines electron `Lx/2` and `Lz` operators, calls `liquid(...,@dnp_freq_scan,...,'esr')`, then divides the response by the proton detection expectation in `equilibrium(spin_system)`. It stores the scan as a complex 512×128 `answer` array and plots `real(answer)` with `τ_c` (ps) horizontal and microwave offset relative to `g_iso^(1)` (MHz) vertical. The function creates a figure but does not save the numeric array or figure to a file. It disables the `hygiene` check and sets output to `hush`.
 

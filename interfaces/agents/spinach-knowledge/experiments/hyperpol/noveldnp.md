@@ -15,7 +15,7 @@ Both branches use a microwave spin-lock contact period along (-Y). With `paramet
 
 ## Output and scope
 
-`contact_curve` is the single-coil observable trace from the `evolution(...,'observable')` path: the initial value followed by the values at each of `nsteps` time steps. It is an observable curve, not a polarization measurement, FID, image, or k-space array. This function has no gradient or spatial-encoding input.
+`contact_curve` is the single-coil observable trace from the `evolution(...,'observable')` path: the initial value followed by the values at each of `nsteps` time steps. It is an observable curve, not a polarisation measurement, FID, image, or k-space array. This function has no gradient or spatial-encoding input.
 
 Source-defined numeric choices include the 0/1 pulse switch and the 90-degree preparation followed by a 270-degree ((-Y)) spin-lock axis. The source and baseline page do not give an example parameter set or a computed numeric result.
 

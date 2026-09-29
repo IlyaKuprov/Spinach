@@ -15,7 +15,7 @@ Approximates the effect of one linear gradient pulse on the sample-averaged dens
 - `g_amp` — gradient amplitude in Gauss/cm; `s_len` — sample length in cm.
 - `g_dur` — gradient duration in seconds; `s_fac` — non-negative gradient shape factor, with 1 for a square gradient.
 
-The implementation first propagates the state under `L` for `g_dur`. It forms a gradient operator proportional to `g_amp*s_len*g_dur*s_fac`, then integrates the spatial coordinate over the normalized sample interval using an auxiliary block-operator evolution. This is an analytic sample average in the Edwards approximation, not a discretized user-supplied gradient waveform. The source notes that chemical shifts are ignored in the gradient operator.
+The implementation first propagates the state under `L` for `g_dur`. It forms a gradient operator proportional to `g_amp*s_len*g_dur*s_fac`, then integrates the spatial coordinate over the normalised sample interval using an auxiliary block-operator evolution. This is an analytic sample average in the Edwards approximation, not a discretised user-supplied gradient waveform. The source notes that chemical shifts are ignored in the gradient operator.
 
 The function accepts numeric arguments apart from `spin_system`, requires a Liouville-space formalism, and checks the gradient amplitude is real scalar, sample length positive, and duration and shape factor non-negative scalars. It also requires the Liouvillian and gradient operator to commute within the source's `1e-6` norm threshold; otherwise it errors. Progress is reported through Spinach's `report` routine; no file is written.
 

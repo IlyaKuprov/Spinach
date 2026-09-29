@@ -4,7 +4,7 @@
 
 `spden` returns the value of the Lorentzian spectral density function for rotational diffusion at a user-specified frequency. It is used in relaxation-theory calculations involving rotational diffusion.
 
-## Behavior
+## Behaviour
 
 The function is called as `J=spden(L,D,omega)`. It first runs an internal consistency check (`grumble`) on the inputs, then computes the rotational correlation time
 

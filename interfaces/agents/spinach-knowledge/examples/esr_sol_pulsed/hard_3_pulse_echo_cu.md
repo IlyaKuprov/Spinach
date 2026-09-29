@@ -12,7 +12,7 @@ The model contains two electron spins at 0.33 T. Their principal g values are [2
 
 ## Pulse sequence and sampled signal
 
-The initial state is electron Lz; the coil detects L+ on spin 1. The probe and pump operators are transverse Lx-type operators localized on spins 1 and 2, respectively. The hard-echo helper, called under powder averaging, applies an ideal probe π/2, evolves for tb, applies a pump π, evolves for ta−tb, applies a probe π, then evolves to and samples a centered echo window of width tc. Here ta = 0.2 µs, tb = 0.1 µs, and tc = 25 ns; the sampled window uses 256 steps. The powder grid is rep_2ang_1600pts_sph.
+The initial state is electron Lz; the coil detects L+ on spin 1. The probe and pump operators are transverse Lx-type operators localised on spins 1 and 2, respectively. The hard-echo helper, called under powder averaging, applies an ideal probe π/2, evolves for tb, applies a pump π, evolves for ta−tb, applies a probe π, then evolves to and samples a centred echo window of width tc. Here ta = 0.2 µs, tb = 0.1 µs, and tc = 25 ns; the sampled window uses 256 steps. The powder grid is rep_2ang_1600pts_sph.
 
 The plotted observable is the imaginary echo response over −tc/2 to +tc/2, displayed in microseconds. The script creates a figure and does not specify a saved data file. Its comment estimates seconds for calculation time.
 

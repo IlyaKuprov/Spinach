@@ -8,7 +8,7 @@ Source: https://spindynamics.org/wiki/index.php?title=sifter.m
 
 ## What it calculates
 
-This function simulates a SIFTER pulse sequence and returns a two-dimensional free-induction decay (FID). It uses the supplied spin-system Hamiltonian and pulse operators; the source does not define a field sweep, DNP/hyperpolarization step, imaging dimension, or a measured acquisition. No acronym expansion or specific hyperfine coupling is given in the routine source.
+This function simulates a SIFTER pulse sequence and returns a two-dimensional free-induction decay (FID). It uses the supplied spin-system Hamiltonian and pulse operators; the source does not define a field sweep, DNP/hyperpolarisation step, imaging dimension, or a measured acquisition. No acronym expansion or specific hyperfine coupling is given in the routine source.
 
 ## Inputs
 

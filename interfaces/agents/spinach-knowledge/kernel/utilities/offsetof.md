@@ -4,7 +4,7 @@
 
 Returns the isotropic Zeeman offset of a specified spin from the pure magnetogyric ratio frequency in the current magnet.
 
-## Behavior
+## Behaviour
 
 - Syntax: `offs=offsetof(spin_system,idx)`.
 - Validates the spin index via an internal consistency check (`grumble`): the index must be a positive integer scalar (numeric, real, integral, at least 1), otherwise an error `'idx must be a positive integer.'` is raised.

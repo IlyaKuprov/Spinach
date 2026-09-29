@@ -4,9 +4,9 @@
 
 Regression test for exponential FID apodisation in Spinach. The test verifies that the explicit exponential window multiplies the FID by `exp(-k*x)` and that the NMR Fourier convention halves the first point of each active FID dimension.
 
-## Behavior
+## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Exponential FID apodisation\n')` and initializes a regression test result via `new_test_result` for the target `'kernel/apodisation_exp_window'`, described as `'Exponential FID apodisation'`, with the specification that exponential apodisation must multiply by `exp(-k*x)` and halve the first point.
+The function announces the test target with `fprintf('TESTING: Exponential FID apodisation\n')` and initialises a regression test result via `new_test_result` for the target `'kernel/apodisation_exp_window'`, described as `'Exponential FID apodisation'`, with the specification that exponential apodisation must multiply by `exp(-k*x)` and halve the first point.
 
 A minimal reporting object is built by setting `spin_system.sys.output='hush'`, and a constant FID of four ones (`fid=ones(4,1)`) is constructed. The exponential window is applied through `apodisation(spin_system,fid,{{'exp',1}})`, producing `fid_obs`.
 

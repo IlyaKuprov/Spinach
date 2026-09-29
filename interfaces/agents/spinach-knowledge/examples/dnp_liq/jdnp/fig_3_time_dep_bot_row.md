@@ -4,7 +4,7 @@
 
 ## What it calculates
 
-This is the two-electron (“bottom row”) JDNP time-trace example, intended to be read alongside fig_3_time_dep_top_row.m, which removes one electron as a control. It computes proton Lz polarization at three fields while setting the inter-electron scalar coupling to its field-dependent matching value. The source cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
+This is the two-electron (“bottom row”) JDNP time-trace example, intended to be read alongside fig_3_time_dep_top_row.m, which removes one electron as a control. It computes proton Lz polarisation at three fields while setting the inter-electron scalar coupling to its field-dependent matching value. The source cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
 
 ## Running assumptions and settings
 

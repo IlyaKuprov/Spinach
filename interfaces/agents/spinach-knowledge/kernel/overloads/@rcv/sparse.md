@@ -7,7 +7,7 @@
 
 Converts an RCV coordinate-storage object to an ordinary MATLAB sparse matrix with the same dimensions.
 
-## Behavior
+## Behaviour
 
 The function requires an RCV input. If there are no stored entries, it creates a sparse matrix with `numRows` rows and `numCols` columns. Otherwise it calls MATLAB's `sparse(row,col,val,numRows,numCols)` constructor. Consequently, repeated RCV coordinates contribute their values additively at that matrix position in the converted matrix.
 

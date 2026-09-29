@@ -6,11 +6,11 @@
 
 ## Purpose
 
-Fits PCS for the S217C tag site of human carbonic anhydrase II (hCA-II) with the multipolar distributed-paramagnet model. It is distinct from both a single point-electron fit and the voxelized density reconstruction used by `s217c_kuprov`. The cited study describes Tm3+-DOTA-M8-tagged mutants and 1H-15N HSQC PCS referenced against diamagnetic Lu3+-DOTA-M8 samples; it reports 364 unambiguous 1H and 15N assignments for S217C. The script loads `s217c_expt.mat` but does not identify which nuclei or assignments are included there.
+Fits PCS for the S217C tag site of human carbonic anhydrase II (hCA-II) with the multipolar distributed-paramagnet model. It is distinct from both a single point-electron fit and the voxelised density reconstruction used by `s217c_kuprov`. The cited study describes Tm3+-DOTA-M8-tagged mutants and 1H-15N HSQC PCS referenced against diamagnetic Lu3+-DOTA-M8 samples; it reports 364 unambiguous 1H and 15N assignments for S217C. The script loads `s217c_expt.mat` but does not identify which nuclei or assignments are included there.
 
 ## Fit and outputs
 
-The call `ilpcs(xyz,expt_pcs,[0 1 2],[-23 -16 20])` fits multipole ranks 0, 1, and 2 from measured PCS at nuclear coordinates; the solver documentation says rank 0 is fixed by normalization, rather than fitted. The initial paramagnetic-centre coordinate is [-23, -16, 20] Angstrom. The fitted output includes centre coordinate `mxyz`, susceptibility tensor `chi`, multipole coefficients (not retained by this script), and predicted PCS. Coordinates are in Angstrom, PCS in ppm, and the tensor in Angstrom^3. The script plots experimental against predicted PCS and displays the tensor and centre location.
+The call `ilpcs(xyz,expt_pcs,[0 1 2],[-23 -16 20])` fits multipole ranks 0, 1, and 2 from measured PCS at nuclear coordinates; the solver documentation says rank 0 is fixed by normalisation, rather than fitted. The initial paramagnetic-centre coordinate is [-23, -16, 20] Angstrom. The fitted output includes centre coordinate `mxyz`, susceptibility tensor `chi`, multipole coefficients (not retained by this script), and predicted PCS. Coordinates are in Angstrom, PCS in ppm, and the tensor in Angstrom^3. The script plots experimental against predicted PCS and displays the tensor and centre location.
 
 ## Scope and limits
 

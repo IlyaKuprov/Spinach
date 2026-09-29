@@ -6,9 +6,9 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynam
 
 Regression test for `rlx_split()`, the relaxation-superoperator component splitter. It verifies that the function partitions a relaxation superoperator into single-spin longitudinal, single-spin transverse, and multi-spin (mixed) relaxation blocks without overlap.
 
-## Behavior
+## Behaviour
 
-- Announces the target with `fprintf('TESTING: Relaxation component splitting\n')` and initializes a test result via `new_test_result()` under the identifier `kernel/dynamic_rlx_split_suite`.
+- Announces the target with `fprintf('TESTING: Relaxation component splitting\n')` and initialises a test result via `new_test_result()` under the identifier `kernel/dynamic_rlx_split_suite`.
 - Builds a two-spin `1H` spherical-tensor Liouville system (`bas.formalism='sphten-liouv'`, `bas.approximation='none'`, `inter.temperature=300`, zero scalar Zeeman couplings) using `test_spin_system()`.
 - Derives state-category masks from the basis with `lin2lm()`:
   - `sso_mask`: single-spin states (`sum(logical(basis),2)==1`).

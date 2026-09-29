@@ -6,20 +6,20 @@
 
 ## Purpose
 
-Return a `3x3` rotation matrix mapping the normalized `v_from` direction onto the normalized `v_to` direction. Inputs are directions; no angle or unit conversion is involved.
+Return a `3x3` rotation matrix mapping the normalised `v_from` direction onto the normalised `v_to` direction. Inputs are directions; no angle or unit conversion is involved.
 
 ## Inputs and checks
 
 - `v_from` and `v_to` must each be numeric, real, finite vectors with three elements. Row and column vectors are accepted.
-- A vector whose 2-norm is below `eps('double')` is rejected. Both vectors are normalized before the alignment is calculated.
+- A vector whose 2-norm is below `eps('double')` is rejected. Both vectors are normalised before the alignment is calculated.
 
 ## Rotation convention and algorithm
 
-The implementation forms `rot_axis=cross(v_from,v_to)`, `axis_norm=norm(rot_axis,2)`, and `cos_ang=dot(v_from,v_to)` from the normalized vectors. Its collinearity threshold is `1e-12`.
+The implementation forms `rot_axis=cross(v_from,v_to)`, `axis_norm=norm(rot_axis,2)`, and `cos_ang=dot(v_from,v_to)` from the normalised vectors. Its collinearity threshold is `1e-12`.
 
 - If `axis_norm<1e-12` and `cos_ang>0`, the result is `eye(3)`.
 - If `axis_norm<1e-12` and `cos_ang<=0`, it takes the first basis vector from `null(v_from')` as the anti-parallel rotation axis, with `sin_ang=0` and `cos_ang=-1`.
-- Otherwise, the normalized cross product is the axis, `sin_ang=axis_norm`, and `cos_ang` is the dot product.
+- Otherwise, the normalised cross product is the axis, `sin_ang=axis_norm`, and `cos_ang` is the dot product.
 
 For the selected unit axis `a=(a1,a2,a3)`, the source builds
 

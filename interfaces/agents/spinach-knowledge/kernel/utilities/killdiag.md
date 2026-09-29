@@ -4,7 +4,7 @@
 
 `killdiag.m` zeroes out a band along the diagonal of a 2D spectrum using a brush of a specified width. It is documented as part of the Spinach kernel utilities ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/killdiag.m)).
 
-## Behavior
+## Behaviour
 
 - Syntax: `spec=killdiag(spec,brush_dim)`.
 - For each column `n` of the spectrum, the row index on the diagonal is computed as `k=n*size(spec,1)/size(spec,2)`.

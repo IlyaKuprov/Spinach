@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Returns the ordinary, non-conjugating transpose of the matrix represented by a polyadic, transforming its stored factorization rather than materializing the full matrix.
+Returns the ordinary, non-conjugating transpose of the matrix represented by a polyadic, transforming its stored factorisation rather than materialising the full matrix.
 
 ## Factor and operator order
 
@@ -18,6 +18,6 @@ For every buffered term, the method applies MATLAB `transpose` to each stored co
 - This implementation has no explicit class or consistency check; it directly accesses `p.cores`, `p.suffix`, and `p.prefix`.
 - It uses ordinary transpose, not conjugate transpose, so complex entries are not conjugated.
 
-## Materialization
+## Materialisation
 
-Each stored core and boundary factor is transformed eagerly, but the factorized representation is retained; no full matrix is formed.
+Each stored core and boundary factor is transformed eagerly, but the factorised representation is retained; no full matrix is formed.

@@ -6,10 +6,10 @@
 
 Regression test for Hilbert-space operator generation. It verifies that `operator()` builds the correct one-spin Hilbert-space angular momentum matrices from human-readable labels.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Hilbert-space operator generation\n')`.
-- Initializes a test result via `new_test_result('kernel/hilbert_operator', 'Hilbert-space operator generation', 'operator() must map Lx, Ly, Lz, L+, and L- labels to spin matrices.')`.
+- Initialises a test result via `new_test_result('kernel/hilbert_operator', 'Hilbert-space operator generation', 'operator() must map Lx, Ly, Lz, L+, and L- labels to spin matrices.')`.
 - Builds a one-proton Hilbert-space spin system with:
   - `sys.magnet = 0`
   - `sys.isotopes = {'1H'}`

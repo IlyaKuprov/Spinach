@@ -6,7 +6,7 @@
 
 Computes spin-phonon relaxation in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), as used by Nakano and Miyashita (J. Phys. Soc. Jpn. 70, 2151 (2001)) for the magnetisation dynamics of molecular magnets. A phonon bath with spectral density `I(w)=I0*w^alpha*theta(w)` couples to the spin system through a Hermitian operator `X`.
 
-## Behavior
+## Behaviour
 
 - The dissipator is `d(rho)/dt = -pi*([X,R*rho]+[X,R*rho'])`, where the thermally dressed coupling operator `R` is built in the eigenbasis of the current Hamiltonian from the transition frequencies `w_kn=(E_k-E_n)`:
   `<k|R|n> = <k|X|n> * (I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)`.

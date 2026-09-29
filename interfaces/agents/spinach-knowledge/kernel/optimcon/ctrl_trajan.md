@@ -21,6 +21,6 @@ After those early returns, the routine requires <code>waveform</code> and <code>
 
 The time axis is either slice number or cumulative <code>pulse_dt</code> in seconds. Rectangle controls are drawn with stairs and the final waveform column is appended; trapezium controls are drawn with linear plots. Plotted amplitudes and bounds use <code>mean(spin_system.control.pwr_levels)</code> and are divided by <code>2*pi</code> for Hz labels.
 
-Spectrogram and instantaneous-frequency plots use only the initial run of exactly equal <code>pulse_dt</code> values, and require at least five such slices. The spectrogram is formed from the complex control <code>X-iY</code>; instantaneous frequency is evaluated from <code>X-iY</code> using the first slice duration. The fidelity-robustness display is a probability-density-normalized histogram.
+Spectrogram and instantaneous-frequency plots use only the initial run of exactly equal <code>pulse_dt</code> values, and require at least five such slices. The spectrogram is formed from the complex control <code>X-iY</code>; instantaneous frequency is evaluated from <code>X-iY</code> using the first slice duration. The fidelity-robustness display is a probability-density-normalised histogram.
 
-The plotting routine is diagnostic: its displayed amplitudes, bounds, trajectory summaries and fidelity histogram are not a complete specification of optimization constraints or the objective's gradient.
+The plotting routine is diagnostic: its displayed amplitudes, bounds, trajectory summaries and fidelity histogram are not a complete specification of optimisation constraints or the objective's gradient.

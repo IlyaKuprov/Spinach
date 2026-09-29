@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A simulated 1H-to-15N cross-polarisation (CP) contact curve for one 15N and one 1H, in the doubly rotating frame. This is the grid-free Fokker-Planck treatment of a spinning powder, initialized from thermal equilibrium. The source estimates minutes on a Tesla A100 GPU and much longer on a CPU.
+A simulated 1H-to-15N cross-polarisation (CP) contact curve for one 15N and one 1H, in the doubly rotating frame. This is the grid-free Fokker-Planck treatment of a spinning powder, initialised from thermal equilibrium. The source estimates minutes on a Tesla A100 GPU and much longer on a CPU.
 
 ## Spin model and experiment
 

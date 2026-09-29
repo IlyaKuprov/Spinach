@@ -4,7 +4,7 @@
 
 Regression test suite for the thermal equilibrium state constructors in Spinach. The suite verifies that `equilibrium()` produces normalised Boltzmann states in the supported formalisms, checking Hilbert-space, Zeeman-Liouville, and oriented-Hamiltonian construction paths against direct Boltzmann references.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Thermal equilibrium constructors\n')` and initialises a regression test result via `new_test_result()` for `kernel/dynamic_state_equilibrium_suite`, with the specification that `equilibrium()` must produce normalised Boltzmann states in supported formalisms.
 - Builds a one-spin Hilbert-space system using `test_spin_system()` with `sys.magnet=0`, `sys.isotopes={'1H'}`, `inter.zeeman.scalar={0}`, `inter.temperature=300`, `bas.formalism='zeeman-hilb'`, and `bas.approximation='none'`.

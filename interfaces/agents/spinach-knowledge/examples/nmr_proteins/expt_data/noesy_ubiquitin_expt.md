@@ -4,7 +4,7 @@ Source: [examples/nmr_proteins/expt_data/noesy_ubiquitin_expt.m](https://github.
 
 ## Purpose
 
-Displays a precomputed experimental proton NOESY spectrum for human ubiquitin. The function loads `spectrum` directly from `noesy_ubiquitin_expt.mat`; there is no FID processing, Fourier transform, or pulse-sequence simulation in this file; its `spin_system` struct carries plotting metadata only. The source specifies no paramagnetic centers or magnetic tensors; this is a protein nuclear-spin data display example.
+Displays a precomputed experimental proton NOESY spectrum for human ubiquitin. The function loads `spectrum` directly from `noesy_ubiquitin_expt.mat`; there is no FID processing, Fourier transform, or pulse-sequence simulation in this file; its `spin_system` struct carries plotting metadata only. The source specifies no paramagnetic centres or magnetic tensors; this is a protein nuclear-spin data display example.
 
 ## Axes and display
 

@@ -4,7 +4,7 @@
 
 ## Purpose and physical scope
 
-Simulates the BEAM dynamic nuclear polarization (DNP) pulse-block experiment described in Science Advances, DOI 10.1126/sciadv.abq0536. The reported curve is calculated from the supplied spin system and context matrices; it is not a measured contact curve. Electron-nuclear hyperfine coupling, relaxation, and exchange or other kinetics can contribute only when represented in the supplied H, R and K.
+Simulates the BEAM dynamic nuclear polarisation (DNP) pulse-block experiment described in Science Advances, DOI 10.1126/sciadv.abq0536. The reported curve is calculated from the supplied spin system and context matrices; it is not a measured contact curve. Electron-nuclear hyperfine coupling, relaxation, and exchange or other kinetics can contribute only when represented in the supplied H, R and K.
 
 ## Inputs and parameters
 
@@ -24,7 +24,7 @@ contact_curve is a vector of nloops+1 contact values: element 1 is the initial c
 
 ## Limits and interpretation
 
-This implements the fixed BEAM pulse sequence and blockwise detection; it is not a general DNP optimizer or a complete model of polarization transfer independent of the supplied spin Hamiltonian and relaxation/kinetics. The source specifies the DOI above but gives no numeric microwave frequency, pulse-duration pair, loop count, or validated experimental fit, so no such values are invented here.
+This implements the fixed BEAM pulse sequence and blockwise detection; it is not a general DNP optimizer or a complete model of polarisation transfer independent of the supplied spin Hamiltonian and relaxation/kinetics. The source specifies the DOI above but gives no numeric microwave frequency, pulse-duration pair, loop count, or validated experimental fit, so no such values are invented here.
 
 Paper: https://doi.org/10.1126/sciadv.abq0536
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/beamdnp.m

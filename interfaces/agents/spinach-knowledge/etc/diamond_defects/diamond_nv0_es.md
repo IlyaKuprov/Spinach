@@ -30,4 +30,4 @@ The selected plane normal is rotated to the laboratory field axis. The output sp
 - `sys` contains `'E4'` and the selected nitrogen isotope.
 - `inter` contains the Zeeman and zero-field-splitting electron terms and the nitrogen hyperfine tensor.
 
-This is specifically the NV`0` excited-state parameterization; it is not the NV`−` ground-state model and includes no NQI term.
+This is specifically the NV`0` excited-state parameterisation; it is not the NV`−` ground-state model and includes no NQI term.

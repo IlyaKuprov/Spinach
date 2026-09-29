@@ -11,7 +11,7 @@ With cutoff `max_rank`, the spatial Fourier dimension is `2*max_rank+1`, labelle
 ## Parameters and orientation grid
 
 - `parameters.rate`: spinning rate in Hz. The source convention is positive for JEOL and negative for Varian and Bruker, reflecting their rotation directions.
-- `parameters.axis`: normalized three-component rotor-axis vector.
+- `parameters.axis`: normalised three-component rotor-axis vector.
 - `parameters.max_rank`: required Fourier cutoff.
 - `parameters.grid`: spherical averaging grid from the kernel grids directory; its Euler angles and weights define the powder orientations, separately from the Floquet harmonic index.
 - `parameters.spins` and `parameters.offset`: spin labels and corresponding transmitter offsets in Hz.

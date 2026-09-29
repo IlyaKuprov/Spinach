@@ -4,11 +4,11 @@
 
 Evaluates spherical harmonics Y(l,m,theta,phi) at user-specified polar and azimuthal angles.
 
-## Behavior
+## Behaviour
 
 - Syntax: `Y=spher_harmon(l,m,theta,phi)`.
 - Input consistency is enforced by an internal `grumble` subfunction, which errors out when: `l` is not a non-negative real integer; `m` is not a real integer in the interval `[-l,l]`; `theta` or `phi` is not numeric and real.
-- Schmidt-normalized associated Legendre functions are obtained with MATLAB's `legendre(l,cos(theta),'sch')`, reshaped to `[l+1 numel(theta)]`, and the row `abs(m)+1` is extracted and reshaped back to the size of `theta`.
+- Schmidt-normalised associated Legendre functions are obtained with MATLAB's `legendre(l,cos(theta),'sch')`, reshaped to `[l+1 numel(theta)]`, and the row `abs(m)+1` is extracted and reshaped back to the size of `theta`.
 - The spherical harmonic is assembled as `sqrt((2*l+1)/(4*pi))*S.*exp(1i*m*phi)`; for nonzero `m` an additional division by `sqrt(2)` is applied.
 - If `m>0` and `m` is odd, the sign of `Y` is flipped.
 

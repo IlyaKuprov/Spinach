@@ -4,7 +4,7 @@
 
 Adds phenomenological pumping terms to the relaxation superoperator to enable approximate simulation of CIDNP, PHIP and DNP type effects.
 
-## Behavior
+## Behaviour
 
 The function adds pumping as a coupling to the unit state: the first column of the relaxation superoperator `R` is incremented by `rate*rho`. The call is
 

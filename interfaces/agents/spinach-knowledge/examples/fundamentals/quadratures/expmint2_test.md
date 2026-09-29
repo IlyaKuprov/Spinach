@@ -6,7 +6,7 @@ This test compares the `expmint2` double-exponential matrix integral routine wit
 
 ## Test problem
 
-The matrix dimension is `n = 10 + randi(5)`, hence 11 through 15, and the upper integration limit is `ul = randi(10) + rand()`, with `1 <= ul < 11`. Three independent random complex matrices are symmetrized to make A, C, and E Hermitian; B and D are general random complex matrices. The random stream is not seeded here, so different calls need not use the same case.
+The matrix dimension is `n = 10 + randi(5)`, hence 11 through 15, and the upper integration limit is `ul = randi(10) + rand()`, with `1 <= ul < 11`. Three independent random complex matrices are symmetrised to make A, C, and E Hermitian; B and D are general random complex matrices. The random stream is not seeded here, so different calls need not use the same case.
 
 The example bootstraps a Spinach system and evaluates `expmint2(spin_system,A,B,C,D,E,ul)`. No other system or basis parameters are set in this file.
 

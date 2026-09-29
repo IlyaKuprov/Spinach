@@ -12,7 +12,7 @@ The model has two electrons, two 14N nuclei, and one 1H nucleus, in that spin or
 
 The model uses the full zeeman-hilb basis (bas.approximation='none'). No molecular identity or explicit initial density operator is specified in this caller.
 
-## Powder calculation and visualization
+## Powder calculation and visualisation
 
 The field-sweep setup uses sys.magnet=1, with sequence values fields=50e-6 and rates=50e6, electron indices [1 2], and Lebedev grid leb_2ang_rank_35. The powder calculation calls @rydmr_exp in the lab frame with spins={'E'}, needs={'zeeman_op'}, and sum_up=0; exponential kinetics and the yield calculation are handled through that routine rather than a separately constructed state in this script.
 

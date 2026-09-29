@@ -12,6 +12,6 @@ The full Zeeman-Hilbert basis is built without approximation, then the cavity-co
 
 ## Observable and plot
 
-For each spin count, the script diagonalizes the projected Hamiltonian and takes the span between its lowest and highest eigenvalues as the bright-mode splitting. It compares that gap with `2*sqrt(n)*2*pi*coupling` and raises an error if the relative discrepancy exceeds `1e-10`. The plot places spin count on the horizontal axis and splitting in MHz on the vertical axis, overlaying numerical points and the square-root prediction. It depicts the ideal collective coupling model, not an experimental spectrum.
+For each spin count, the script diagonalises the projected Hamiltonian and takes the span between its lowest and highest eigenvalues as the bright-mode splitting. It compares that gap with `2*sqrt(n)*2*pi*coupling` and raises an error if the relative discrepancy exceeds `1e-10`. The plot places spin count on the horizontal axis and splitting in MHz on the vertical axis, overlaying numerical points and the square-root prediction. It depicts the ideal collective coupling model, not an experimental spectrum.
 
 The source cites Tavis and Cummings, *Physical Review* **170**, 379 (1968) ([DOI](https://doi.org/10.1103/PhysRev.170.379)).

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Convert quaternion components in the active convention to ZYZ active Euler angles, in the convention matched to `euler2dcm.m`. The source header describes a unit quaternion; the implementation normalizes each accepted quaternion before evaluating the angles.
+Convert quaternion components in the active convention to ZYZ active Euler angles, in the convention matched to `euler2dcm.m`. The source header describes a unit quaternion; the implementation normalises each accepted quaternion before evaluating the angles.
 
 ## Inputs and checks
 

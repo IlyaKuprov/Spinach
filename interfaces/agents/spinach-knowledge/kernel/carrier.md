@@ -7,7 +7,7 @@
 
 Builds the carrier part of the Zeeman Hamiltonian from the isotropic free-particle magnetogyric ratios and the user-specified Z-axis field, as represented in `spin_system.inter.basefrqs`. The source describes its use in rotating-frame transforms and average-Hamiltonian theory.
 
-For each selected spin with nonzero `basefrqs`, the function adds that value times the spin's `Lz` operator, requested through `operator(spin_system,{'Lz'},{spin_index},operator_type)`. It then symmetrizes the sum as `(H+H')/2` and passes it to `clean_up` with `spin_system.tols.liouv_zero`. The carrier source applies no unit conversion and does not state a unit for `basefrqs`; the coefficient is used as stored.
+For each selected spin with nonzero `basefrqs`, the function adds that value times the spin's `Lz` operator, requested through `operator(spin_system,{'Lz'},{spin_index},operator_type)`. It then symmetrises the sum as `(H+H')/2` and passes it to `clean_up` with `spin_system.tols.liouv_zero`. The carrier source applies no unit conversion and does not state a unit for `basefrqs`; the coefficient is used as stored.
 
 ## Inputs and options
 

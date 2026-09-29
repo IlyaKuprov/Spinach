@@ -6,9 +6,9 @@
 
 Regression test for the deterministic chemistry and geometry utility helpers in the Spinach kernel. It verifies that lattice construction, geometric measurements, coupling extraction, chemical shifts, nearest-neighbour lookup, and tensor helpers preserve exact coordinate, tensor, and metadata formulae.
 
-## Behavior
+## Behaviour
 
-The test announces its target with `fprintf('TESTING: Chemistry and geometry utilities\n')` and initializes a result object via `new_test_result` for `kernel/dynamic_chem_geometry_suite`, describing the target as small chemistry and geometry helpers that must preserve exact coordinate, tensor, and metadata formulae.
+The test announces its target with `fprintf('TESTING: Chemistry and geometry utilities\n')` and initialises a result object via `new_test_result` for `kernel/dynamic_chem_geometry_suite`, describing the target as small chemistry and geometry helpers that must preserve exact coordinate, tensor, and metadata formulae.
 
 A local three-spin fixture (`local_geometry_spin_system`) is built with `spin_system.sys.output='hush'` and an empty `spin_system.sys.disable` cell. It defines `nspins=3`, isotopes `{'1H','13C','15N'}`, labels `{'proton','carbon','nitrogen'}`, and `mults=[2 2 2]`. Coordinates are `{[0 0 0],[2 0 0],[0.5 0 0]}` and chemical parts are `{[1 2],3}`. The coupling matrix is a 3-by-3 cell array with `{1,2}=diag([1 2 3])` and `{2,1}=diag([4 5 6])`. Base frequencies are `2*pi*[100e6 25e6 10e6]` and offsets are `2*pi*[100 50 0]`; the Zeeman matrix cells are `basefrqs(k)*eye(3)+offsets(k)*eye(3)` for each spin. Magnetogyric ratios come from `spin('1H')`, `spin('13C')`, `spin('15N')`; `zeeman.ddscal` holds three identity tensors; `tols.hbar=1.054571628e-34` and `tols.muB=9.274009994e-24`.
 

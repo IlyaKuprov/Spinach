@@ -4,7 +4,7 @@
 
 Computes the molecular connectivity matrix for a set of particles given their Cartesian coordinates and a connection distance cutoff. The header comment states that the algorithm has N·log(N) asymptotic complexity scaling with respect to the number of atoms.
 
-## Behavior
+## Behaviour
 
 - Syntax: `conmatrix=conmat(xyz,r0)`.
 - Input consistency is enforced by a local `grumble` subfunction, which errors if `xyz` is not a real numeric matrix with three columns, or if `r0` is not a positive real number.

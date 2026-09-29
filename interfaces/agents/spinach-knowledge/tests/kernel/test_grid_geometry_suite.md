@@ -6,7 +6,7 @@
 
 Regression test suite for Spinach grid and spherical geometry helper functions. It verifies spherical arc and area formulae, Gauss-Legendre quadrature exactness, polar-grid structure, spherical quadrature weights, Voronoi solid angles, direct-product grid construction, SHREWD weights, and seeded repulsion-grid invariants.
 
-## Behavior
+## Behaviour
 
 The function announces the test target with `fprintf`, creates a test result object via `new_test_result` under the name `kernel/grid_geometry_suite`, and then runs a sequence of assertions using `test_close` and `test_true`. Each assertion records a descriptive message. The checks performed are:
 

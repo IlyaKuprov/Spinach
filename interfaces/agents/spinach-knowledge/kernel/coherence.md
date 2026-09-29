@@ -15,7 +15,7 @@ Coherence orders are obtained from the basis projections: `lin2lm` supplies proj
 
 `spec` is a cell array of nested pairs: a spin selector and a vector of real integer coherence orders. A selector can be an isotope string in the system, `'electrons'`, `'nuclei'`, `'all'`, or a vector of spin numbers. For example, `{{'13C',[1 -1]},{'1H',-1}}` keeps entries with order 1 or -1 on 13C and order -1 on 1H. The selected spin sets and order lists are evaluated independently for each pair, then ANDed by mask intersection.
 
-The state array must be numeric. The implementation warns through `report` if the filtered result has 1-norm below `1e-10`, with the message that all magnetization appears to have been destroyed.
+The state array must be numeric. The implementation warns through `report` if the filtered result has 1-norm below `1e-10`, with the message that all magnetisation appears to have been destroyed.
 
 ## Reference
 

@@ -6,7 +6,7 @@
 
 Regression test for the one-spin optimal-control setup and Hilbert-space GRAPE in Spinach. The test checks that `optimcon()` accepts a minimal one-spin Hilbert-space control problem, and that `grape_hilb()` fidelity and gradient agree with independent matrix exponentiation and finite differences.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf` and initialises a regression test result via `new_test_result('optimcon/grape_one_spin', ...)`.
 - Ensures a parallel pool exists for the ensemble loop: if `gcp('nocreate')` returns empty, it calls `parpool('Processes',1)`.

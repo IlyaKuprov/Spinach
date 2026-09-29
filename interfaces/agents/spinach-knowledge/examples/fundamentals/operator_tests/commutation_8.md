@@ -8,11 +8,11 @@ Checks Hilbert-to-Liouville operator-action identities and the mapping between f
 
 ## Mathematical content
 
-For a matrix `R`, left multiplication by `H`, right multiplication by `H`, their commutator action, and their anticommutator action have distinct Liouville-space representations. This function compares those representations with the corresponding explicit Hilbert-space products after MATLAB column-major vectorization. It separately checks the first-rank Stevens-to-Pauli correspondence at several multiplicities.
+For a matrix `R`, left multiplication by `H`, right multiplication by `H`, their commutator action, and their anticommutator action have distinct Liouville-space representations. This function compares those representations with the corresponding explicit Hilbert-space products after MATLAB column-major vectorisation. It separately checks the first-rank Stevens-to-Pauli correspondence at several multiplicities.
 
 ## Callable context and model
 
-Call the zero-input MATLAB function `commutation_8()` from a Spinach checkout with the project functions on the MATLAB path. It returns no values, prints a success message for each test group, and raises an error when a comparison exceeds the source threshold. The Hilbert-Liouville test uses independent unseeded complex random 6-by-6 matrices `H` and `R`; they are not explicitly symmetrized or constrained to represent Hermitian physical observables.
+Call the zero-input MATLAB function `commutation_8()` from a Spinach checkout with the project functions on the MATLAB path. It returns no values, prints a success message for each test group, and raises an error when a comparison exceeds the source threshold. The Hilbert-Liouville test uses independent unseeded complex random 6-by-6 matrices `H` and `R`; they are not explicitly symmetrised or constrained to represent Hermitian physical observables.
 
 ## Checks encoded in the source
 

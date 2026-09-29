@@ -10,7 +10,7 @@
 
 Let `D=size(H,1)` for the Hamiltonian assembled in the system's composite spin-boson basis. The context sets `parameters.spn_dim=D` and `parameters.spc_dim=1`; there is no spatial-orientation grid in this context. It calls the sequence with `spin_system`, `parameters`, `H`, `R`, and `K`, and returns whatever the sequence returns, so the final output shape is sequence-specific.
 
-The orientation is `parameters.orientation`, a real three-element vector of active ZYZ Euler angles in radians for the spin subsystem only. Its default is `[0 0 0]`. The context evaluates `H=I+orientation(Q,parameters.orientation)` and Hermitian-symmetrizes the result; it also constructs relaxation at that orientation and obtains kinetics for the complete system.
+The orientation is `parameters.orientation`, a real three-element vector of active ZYZ Euler angles in radians for the spin subsystem only. Its default is `[0 0 0]`. The context evaluates `H=I+orientation(Q,parameters.orientation)` and Hermitian-symmetrises the result; it also constructs relaxation at that orientation and obtains kinetics for the complete system.
 
 ## Modes, channels, and units
 

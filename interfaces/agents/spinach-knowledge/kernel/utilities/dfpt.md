@@ -6,11 +6,11 @@ Graph partitioning module. Analyzes the system connectivity graph and creates a 
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dfpt.m>
 
-## Behavior
+## Behaviour
 
 - Syntax: `subgraphs=dfpt(conmatrix,max_sg_size)`.
 - A consistency check (`grumble`) enforces that `conmatrix` is a logical square matrix and `max_sg_size` is a real positive integer scalar; violations raise errors.
-- The crawl starts at each spin: `subgraphs` is initialized as `uint32(1:nspins)'`, where `nspins=size(conmatrix,2)`.
+- The crawl starts at each spin: `subgraphs` is initialised as `uint32(1:nspins)'`, where `nspins=size(conmatrix,2)`.
 - For each subgraph size from 2 to `max_sg_size`, the function loops over the current subgraphs. For each subgraph, it finds spins reachable from it via `any(conmatrix(:,subgraph),2)`, excludes spins already in the subgraph, and grows the subgraph in every direction by appending each neighbour.
 - Isolated subgraphs (no reachable neighbours) get a dummy index: `[subgraph subgraph(end)]`.
 - Subgraphs with neighbours are grown as `[repmat(subgraph,[numel(neighbours) 1]) neighbours]`.

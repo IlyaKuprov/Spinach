@@ -10,7 +10,7 @@ Source: https://spindynamics.org/wiki/index.php?title=oopeseem.m
 
 This routine simulates an ideal-pulse OOP-ESEEM echo and returns a time-domain signal. ESEEM-family modulation can carry nuclear-frequency information arising from electron–nuclear hyperfine coupling. ENDOR is a different experiment and is not implemented here; the source does not expand the acronym OOP or assign a numerical hyperfine coupling.
 
-The code evaluates the supplied spin system and state. It does not implement field sweeping, DNP/hyperpolarization, imaging, or measurement acquisition.
+The code evaluates the supplied spin system and state. It does not implement field sweeping, DNP/hyperpolarisation, imaging, or measurement acquisition.
 
 ## Inputs
 

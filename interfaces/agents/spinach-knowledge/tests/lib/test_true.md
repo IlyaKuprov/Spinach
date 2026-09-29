@@ -6,7 +6,7 @@
 
 `test_true` adds a logical regression check with a clear message to a Spinach test suite. It evaluates a pass/fail condition, appends a human-readable PASS or FAIL message to the running test result structure, and returns a `passed` flag so the caller can guard subsequent statements.
 
-## Behavior
+## Behaviour
 
 - Syntax: `[result,passed]=test_true(result,label,condition,why)`.
 - Input consistency is enforced first by the local `grumble` function, which errors when:

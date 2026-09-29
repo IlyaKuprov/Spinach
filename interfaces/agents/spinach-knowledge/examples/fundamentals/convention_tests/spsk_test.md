@@ -16,4 +16,4 @@ It draws `xx=rand()`, `yy=rand()+3`, and `zz=rand()+6`, so the generated values 
 - `sp=zz-xx`;
 - `sk=3*(yy-iso)/sp`.
 
-The Spinach construction is `AS=spsk2mat(iso,sp,sk,alp,bet,gam)`. It tests whether `norm(AM-AS,1)<1e-6`; the source displays its success message only on that branch and otherwise raises an error. This checks the parameterization for generated diagonal eigenvalues and orientations, not every possible tensor input.
+The Spinach construction is `AS=spsk2mat(iso,sp,sk,alp,bet,gam)`. It tests whether `norm(AM-AS,1)<1e-6`; the source displays its success message only on that branch and otherwise raises an error. This checks the parameterisation for generated diagonal eigenvalues and orientations, not every possible tensor input.

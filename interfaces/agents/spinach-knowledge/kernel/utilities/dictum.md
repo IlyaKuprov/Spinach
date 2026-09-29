@@ -4,7 +4,7 @@
 
 Overrides default assumptions about which interaction terms survive rotating frame transformations, as originally set by `assume.m`. One spin selection modifies Zeeman interaction assumptions; a two-spin selection modifies coupling assumptions.
 
-## Behavior
+## Behaviour
 
 - Syntax: `spin_system=dictum(spin_system,spins,strength)`.
 - Calls the internal `grumble` function first to enforce consistency: `spin_system.inter.coupling.strength` and `spin_system.inter.zeeman.strength` fields must exist (i.e. `assume()` must have been run before calling this function), `strength` must be a character string, and `spins` must be either a vector of one or two positive integers not exceeding `spin_system.comp.nspins`, or a cell array of one or two character strings matching isotopes present in the system. Otherwise the function errors out.

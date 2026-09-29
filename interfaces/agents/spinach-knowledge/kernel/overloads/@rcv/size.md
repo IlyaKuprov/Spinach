@@ -7,7 +7,7 @@
 
 Returns the stored matrix dimensions of an RCV sparse-matrix object.
 
-## Behavior
+## Behaviour
 
 - With one output and no dimension index, returns `[A.numRows A.numCols]`.
 - With one output and `dim=1` or `dim=2`, returns the row or column count, respectively. Any other positive integer dimension returns `1`.

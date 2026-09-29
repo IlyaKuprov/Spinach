@@ -9,7 +9,7 @@
 
 ## Purpose
 
-Find the real roots of a polynomial of degree at most three in the unit interval. This helper is used by eigenfield calculations to solve cubic interpolants on a normalized field-interval coordinate.
+Find the real roots of a polynomial of degree at most three in the unit interval. This helper is used by eigenfield calculations to solve cubic interpolants on a normalised field-interval coordinate.
 
 ## Inputs
 

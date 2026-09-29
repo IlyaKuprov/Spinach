@@ -6,7 +6,7 @@
 
 Computes Blicharski's relaxation theory invariants for a real 3x3 interaction matrix, as given by Equations 20-21 in [http://doi.org/10.1515/zna-1972-1012](http://doi.org/10.1515/zna-1972-1012).
 
-## Behavior
+## Behaviour
 
 - Validates the input via an internal consistency check (`grumble`), which errors with `'A must be a real 3x3 matrix.'` if the argument is not numeric, not real, not a matrix, or not of size 3x3.
 - Computes the first rank invariant `Lsq` as the sum of squared antisymmetric parts:

@@ -15,7 +15,7 @@ These are indexing and basis-conversion operations; the function does not expone
 
 ## Basis, coefficients, and order
 
-`states` are the IST-basis indices supplied by `oper2ist(P)`; [lin2lm](../indexing/lin2lm.md) maps the linear indices to spherical-tensor L,M labels. `coeffs` contains the corresponding coefficients returned by `oper2ist`. This function applies no additional multiplier or normalization: the coefficients are exactly the output of that conversion for `P`.
+`states` are the IST-basis indices supplied by `oper2ist(P)`; [lin2lm](../indexing/lin2lm.md) maps the linear indices to spherical-tensor L,M labels. `coeffs` contains the corresponding coefficients returned by `oper2ist`. This function applies no additional multiplier or normalisation: the coefficients are exactly the output of that conversion for `P`.
 
 ## Inputs and checks
 

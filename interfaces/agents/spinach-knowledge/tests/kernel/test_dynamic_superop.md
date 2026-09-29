@@ -6,10 +6,10 @@
 
 Regression test for `superop()` covering sparse-XYZ spherical-tensor product superoperators. The test verifies that `superop()` produces sparse XYZ product superoperators consistent with angular-momentum algebra, checking the unit-operator shortcut, direct commutator and anticommutator identities, and Lz spherical-tensor projection eigenvalues.
 
-## Behavior
+## Behaviour
 
 - Announces the test target with `fprintf('TESTING: Spherical-tensor superoperator construction\n')`.
-- Initializes a test result via `new_test_result('kernel/dynamic_superop', ...)` describing the requirement that `superop()` must produce sparse XYZ product superoperators consistent with angular-momentum algebra.
+- Initialises a test result via `new_test_result('kernel/dynamic_superop', ...)` describing the requirement that `superop()` must produce sparse XYZ product superoperators consistent with angular-momentum algebra.
 - Builds a two-spin spherical-tensor Liouville-space system with `sys.magnet=0`, `sys.isotopes={'1H','13C'}`, `inter.zeeman.scalar={0,0}`, `bas.formalism='sphten-liouv'`, and `bas.approximation='none'`, using `test_spin_system(sys,inter,bas)`; the matrix dimension is taken as `size(spin_system.bas.basis,1)`.
 - Unit-operator shortcut: `superop(spin_system,[0 0],'left')` is converted to sparse form and compared against `speye(matrix_dim)` with tolerances `1e-15`, asserting that an all-zero opspec must map to the unit operator over the full basis.
 - For Lz on spin 1 (`[2 0]`), builds left, right, commutator (`'comm'`), and anticommutator (`'acomm'`) superoperator forms and checks:

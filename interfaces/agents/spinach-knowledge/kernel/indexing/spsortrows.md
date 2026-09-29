@@ -9,7 +9,7 @@ Returns the row permutation for sorting a sparse matrix by rows, matching the se
 
 ## Execution and guards
 
-This file is the MATLAB fallback for the compiled MEX function. It first requires `A` to be numeric, sparse, real, double precision, and two-dimensional (the source uses `ismatrix`). It then calls `[~,idx]=sortrows(A)`; sorting and tie behavior therefore follow MATLAB's `sortrows` implementation. No additional row-count, column-count, or application-specific guard is present in this fallback.
+This file is the MATLAB fallback for the compiled MEX function. It first requires `A` to be numeric, sparse, real, double precision, and two-dimensional (the source uses `ismatrix`). It then calls `[~,idx]=sortrows(A)`; sorting and tie behaviour therefore follow MATLAB's `sortrows` implementation. No additional row-count, column-count, or application-specific guard is present in this fallback.
 
 ## Syntax and arguments
 

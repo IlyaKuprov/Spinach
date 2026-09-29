@@ -2,7 +2,7 @@
 
 - Signature: `summary_zeeman(spin_system,header)`
 
-## Behavior
+## Behaviour
 
 For each spin with a nonempty `spin_system.inter.zeeman.matrix{n}`, prints its index, isotope, multiplicity, three matrix rows, isotropic value `trace(M)/3`, and spectral matrix norms of the rank-1 and rank-2 parts. The parts come from `mat2sphten(M)` and `sphten2mat`; each norm uses MATLAB `norm(...,2)`. Values are printed as stored, without a unit conversion in this routine.
 

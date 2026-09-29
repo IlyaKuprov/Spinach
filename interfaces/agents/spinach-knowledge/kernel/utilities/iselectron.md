@@ -4,7 +4,7 @@
 
 Returns `true` if the particle specified is an electron, and `false` otherwise.
 
-## Behavior
+## Behaviour
 
 - The function first validates the input via an internal consistency check (`grumble`):
   - Errors with `'spin_spec must be a character string.'` if the input is not a character string.

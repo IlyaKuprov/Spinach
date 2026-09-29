@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Construct a Redfield relaxation superoperator for the two triple-bond carbons in cis-dimethylbut-2-ynedioate, then report its matrix elements for normalized longitudinal magnetization and the two-spin singlet state. The source says the magnetic parameters were computed with DFT.
+Construct a Redfield relaxation superoperator for the two triple-bond carbons in cis-dimethylbut-2-ynedioate, then report its matrix elements for normalised longitudinal magnetisation and the two-spin singlet state. The source says the magnetic parameters were computed with DFT.
 
 ## Spin pair and relaxation model
 
@@ -12,7 +12,7 @@ The system is a pair of 13C spins at 14.1 T. The source supplies Zeeman matrices
 
 ## Observable and limits
 
-After constructing `R`, the example normalizes `Sz` and the singlet operator and reports `Sz'*R*Sz` and `S'*R*S`. These are the reported relaxation-superoperator matrix elements; the script does not evolve a prepared state or report numerical lifetimes. It contains no storage interval, imaging or gradient model.
+After constructing `R`, the example normalises `Sz` and the singlet operator and reports `Sz'*R*Sz` and `S'*R*S`. These are the reported relaxation-superoperator matrix elements; the script does not evolve a prepared state or report numerical lifetimes. It contains no storage interval, imaging or gradient model.
 
 The source comment gives a calculation time of seconds.
 

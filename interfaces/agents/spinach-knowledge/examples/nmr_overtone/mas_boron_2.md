@@ -8,4 +8,4 @@ The model uses isotope 10B, magnet setting 16.4, and the coupling input `eeqq2nq
 
 The MAS settings are rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and grid `rep_2ang_200pts_sph`. The spectrum uses sweep `[-141e3 -139e3]`, 256 points, 256-point zero-fill, and `axis_units='kHz'`. The initial state is 10B `Lz`. The source defines the receiver as `cos(theta)*Lz state + sin(theta)*Lx state`, and defines a corresponding Lx operator using the same weights, with `theta=atan(sqrt(2))`.
 
-Average treatment uses `rf_pwr=2*pi*50e3/sin(theta)`, `rf_dur=2e-3`, and `rf_frq=-140e3`. The code calls `singlerot` with `overtone_pa` and `qnmr`, multiplies the spectrum by `exp(1i*1.45)`, and plots its real part using `plot_1d`. The source values are recorded as written; only the spectral-axis setting is explicitly labeled kHz.
+Average treatment uses `rf_pwr=2*pi*50e3/sin(theta)`, `rf_dur=2e-3`, and `rf_frq=-140e3`. The code calls `singlerot` with `overtone_pa` and `qnmr`, multiplies the spectrum by `exp(1i*1.45)`, and plots its real part using `plot_1d`. The source values are recorded as written; only the spectral-axis setting is explicitly labelled kHz.

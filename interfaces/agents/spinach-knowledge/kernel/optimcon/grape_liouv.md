@@ -1,51 +1,32 @@
 # kernel/optimcon/grape_liouv.m
 
-- Signature: `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...`
+- Signature: `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)`
+- Source: [kernel/optimcon/grape_liouv.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/grape_liouv.m)
 
 ## Purpose
 
-Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user-supplied shaped pulse from a given initial state and projects the result onto the given final state. The fidelity is returned, along with its gradient and Hessian with respect to amplitudes of all control operators at every time step of the shaped pulse. Uses Liouville-space or wavefunction formalisms.
+Evaluates the GRAPE objective and its first derivatives for one shaped pulse, propagating an initial state and projecting onto a target state. This is a low-level contribution routine, not the optimizer; its source directs callers to wrappers such as `grape_xy.m` and `grape_phase.m`.
 
-## Numerical / algorithmic content
+## Inputs and array shapes
 
-- The fidelity and its derivatives are propagated through the pulse sequence; both rectangular (piecewise-constant) and trapezium (piecewise-linear) integrators are supported.
-- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, both in `optimcon` setup and direct `grape_liouv` calls. First-order `lbfgs`/`rbfgs` keyhole methods and empty schedules remain available; no algorithm is substituted. A four-output Hessian request with keyholes is refused.
-- Zero fidelities and gradients are valid, including for auxiliary costates used by `grape_coop`. Initial-guess checks belong in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions. Hessians are unavailable for piecewise-linear integration, stroboscopic steady states, nonempty keyhole schedules, or trajectory cost terms.
+- `spin_system` is the Spinach system set up for optimal control. This routine reads settings from `spin_system.control`; it does not establish their defaults.
+- `drifts` is a cell array of square drift generators. One matrix represents a time-independent drift; multiple matrices represent time-dependent drifts. `controls` is a cell array of control generators in the selected formalism.
+- `waveform` is a real numeric array with one row per control and `spin_system.control.pulse_ntpts` columns; entries are control amplitudes in rad/s. For the rectangle integrator, each column is a piecewise-constant interval. For the trapezium integrator, the columns are pulse nodes and `pulse_dt` has one fewer element than the waveform columns.
+- `rho_init` and `rho_targ` are numeric column vectors in the chosen state-vector formalism. The initial state is not used for stroboscopic steady-state optimisation.
+- `fidelity_type` selects the real part, imaginary part, or absolute square of the state overlap: `'real'`, `'imag'`, or `'square'`. The supported state-vector formalisms are `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`.
 
-## Parameters / inputs
+The control setting `fid_type` is separate: it must be `'terminal'` or `'average'`. Terminal mode uses the final pulse node; average mode averages the fidelity over nodes 1 through N. The source does not assign a default for either setting.
 
-- spin_system -Spinach data object that has been through
-- the optimcon.m problem setup function.
-- drifts -drift generators (Liouvillians or wavefunction Hamiltonians):
-- a cell array containing one matrix (for time-independent
-- drift) or multiple matrices (one per time
-- slice / point, for time-dependent drift).
-- controls -control generators in the selected formalism (cell array of matrices).
-- waveform -control coefficients for each control ope-
-- rator (in vertical dimension) at each time
-- slice / point (horizonal dimension), rad/s
-- rho_init -initial state as a Liouville-space vector or wavefunction,
-- ignored in stroboscopic
-- steady state optimisations
-- rho_targ -target state as a Liouville-space vector or wavefunction.
-- fidelity_type -'real' (real part of the overlap)
-- 'imag' (imaginary part of the overlap)
-- 'square' (absolute square of the overlap)
+## Derivatives, masks, and limits
 
-## Outputs
+The returned `grad` differentiates the fidelity with respect to the waveform amplitudes. If `spin_system.control.freeze` is empty, the routine substitutes an all-false mask the size of `waveform`; otherwise it indexes the supplied mask by control row and time column. Frozen entries receive zero gradient. When a Hessian is requested, frozen rows and columns are zeroed and their diagonal entries are set to one.
 
-- fidelity -fidelity of the control sequence
-- grad -gradient of the fidelity with respect to
-- the control sequence
-- hess -Hessian of the fidelity with respect to
-- the control sequence, not available for
-- piecewise-linear or stroboscopic steady-state optimisations,
-- or nonempty keyhole schedules
-- traj_data.forward -forward trajectory from the initial con-
-- dition or stroboscopic steady state (a
-- stack of state vectors)
-- Note: this is a low level function that is not designed to be called
-- directly. Use grape_xy.m, grape_phase.m, or other wrapper func-
-- tions instead.
-- TODO (Keitel): add logic to avoid computing backward trajectory
-- when the gradient is not requested
+The fourth output `hess` is not available with the piecewise-linear `'trapezium'` integrator, stroboscopic steady states, nonempty keyhole schedules, average-fidelity mode, or trajectory penalties. In the supported state-vector formalisms, keyholes are also rejected for `'newton'` and `'goodwin'` methods; first-order `'lbfgs'` and `'rbfgs'` methods and empty keyhole schedules remain available. These are source guards, not a list of all optimizer methods.
+
+## Additional control transformations
+
+A nonzero `dead_time` pulls the target backward through the last drift. A nonempty `prefix` transforms the initial state using the first drift, and a nonempty `suffix` transforms the target using the last drift. With the Bloch-Siegert option enabled, the per-control response operator contributes an amplitude-squared term to the slice generator, with its corresponding amplitude derivative.
+
+The routine sums the operators in `traj_pen`, averages their expectation values over the same nodes used by the average-fidelity calculation, and subtracts this cost and its gradient. Trajectory penalties are rejected for stroboscopic steady states and whenever `phase_cycle` is nonempty. This function contains no phase-cycle mask or wrapper transformation; those are outside this mapped source. The forward trajectory, when returned, is a stack of state vectors across the pulse nodes. Zero fidelities and derivatives are accepted for auxiliary costates; initial-guess checks belong to the assembled objective rather than this contribution.
+
+[Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=grape_liouv.m)

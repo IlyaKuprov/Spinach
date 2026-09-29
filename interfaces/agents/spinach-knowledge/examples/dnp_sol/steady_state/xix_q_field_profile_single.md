@@ -1,15 +1,17 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_single.m
 
-- Signature: `xix_q_field_profile_single()`
+[Source MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_field_profile_single.m) · Signature: `xix_q_field_profile_single()`.
 
-## Purpose
+## Use and distinctive protocol
 
-Calculates the steady-state proton signal across a microwave resonance-offset sweep for a single XiX DNP spin system (seconds, according to the source comment).
+This is the compact steady-state XiX DNP field-profile example for one electron–proton spin system and one fixed separation, without distance-ensemble averaging. The source estimates a run time of seconds. Although the distance is fixed, the calculation still calls `powder` with an orientation grid.
 
-## Physical and numerical setup
+## Setup and scan
 
-The system contains an electron and a proton at a fixed 3.5 Å separation, at 80 K and a Q-band field of 1.2142 T. The electron Zeeman tensor is set to the trityl values in the source; the proton shift is specified as 5 ppm. The electron nutation frequency is fixed at 18 MHz. Relaxation uses the distance- and orientation-dependent `r1n_dnp` rate function, with R1 rates `{1e3, r1n_rate}` and R2 rates `{200e3, 50e3}`.
+The model is `{'E','1H'}`, with `sys.magnet=1.2142` (source comment: Q-band) and `inter.temperature=80` (source comment: spin temperature). The electron Zeeman values are `[2.00319 2.00319 2.00258]`; proton values are `[0 0 5]` (the source calls these a ppm guess). Euler arrays `[0 10 0]` and `[0 0 10]` are multiplied by `pi/180`. The coordinates are `[0 0 0]` and `[0 0 3.500]`; the script derives `r_en` from the proton z coordinate and passes it to `r1n_dnp` together with orientation angle `bet` and the constants `2.00230`, `1e-3`, and `52`.
 
-## Calculation and output
+Relaxation uses `t1_t2`, R1 assignments `{1e3,r1n_rate}`, R2 assignments `{200e3,50e3}`, diagonal retention, and `dibari` equilibrium. The basis is `sphten-liouv` with approximation `none`; it disables `hygiene` and sets propagation chop tolerance `1e-12`. The XiX setup uses grid `rep_2ang_800pts_sph`, 201 offsets from `-100e6` to `100e6` Hz, `18e6` Hz electron nutation frequency, `48e-9` s pulses, 36 blocks, phase `pi`, and `addshift=-13e6`. Shot spacing is computed as `204e-6 - 2*nloops*pulse_dur`.
 
-The script uses the full spherical-tensor Liouville basis and the `rep_2ang_800pts_sph` powder grid. It runs `xixdnp_steady` through `powder(...,'esr')` for 36 XiX blocks, with a 48 ns pulse and 204 μs shot repetition time. The 201 microwave offsets span −100 to +100 MHz. It plots the real proton (I_z) expectation value against offset and saves `xix_q_field_profile_single.fig`.
+## Dependencies, output, and limits
+
+The example calls `r1n_dnp`, Spinach `create`, `basis`, `state`, and `powder`, and kernel `xixdnp_steady`. It plots the real proton (I_Z) expectation value against offset in MHz with padded vertical limits, then saves `xix_q_field_profile_single.fig`. The function declares no numeric output. This source explicitly labels offsets and electron nutation frequency in Hz and pulse duration in seconds; units for `sys.magnet`, `inter.temperature`, the coordinate 3.500, relaxation-rate values, and `addshift` are not stated.

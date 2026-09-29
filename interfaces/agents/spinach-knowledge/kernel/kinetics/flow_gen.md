@@ -1,28 +1,37 @@
 # kernel/kinetics/flow_gen.m
 
 - Signature: `F=flow_gen(spin_system,parameters)`
+- Direct MATLAB source: [`kernel/kinetics/flow_gen.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/kinetics/flow_gen.m)
+- Existing Wiki: [`flow_gen.m`](https://spindynamics.org/wiki/index.php?title=flow_gen.m)
 
 ## Purpose
 
-Builds a spatial motion generator for hydrodynamic flow and diffusion on the Voronoi mesh stored in `spin_system.mesh`.
+Builds a sparse spatial-motion generator on the Voronoi mesh in `spin_system.mesh`, combining mesh advection and optional diffusion.
 
-## Physical / mathematical content
+## Inputs and domain
 
-The generator represents transfers between adjacent Voronoi cells. For each shared cell boundary, the code estimates the advective contribution from the boundary length, the distance between cell centres, and the average velocity in the two cells. Diffusion contributes transfers proportional to `parameters.diff`; diagonal entries are set to balance the off-diagonal transfers, and Voronoi cell areas are applied to the generator.
+`spin_system.mesh` must contain `idx` and `vor`; the implementation also uses active-cell and triangle indices, Voronoi vertices/cells/weights, mesh coordinates `x,y`, and velocity components `u,v`. `parameters.diff` is a finite, non-negative, real scalar diffusion coefficient in m^2/s; it defaults to zero. The source's `grumble` guard checks the mesh/index/Voronoi fields and diffusion value.
 
-## Numerical / algorithmic content
+## Transfer calculation and units
 
-The routine identifies neighboring cells through mesh triangles and shared Voronoi vertices, assembles local transfer entries in a `parfor` loop, then constructs a sparse matrix. If `parameters.diff` is absent, it defaults to zero.
+For cell `k` and a neighbour `m` sharing exactly two Voronoi vertices, let `A_k=mesh.vor.weights(k)`, `b_km` be the shared-edge length, `r_km=(x_m-x_k,y_m-y_k)`, and `vbar_km=(v_k+v_m)/2`. The code computes the signed advection contribution
 
-## Parameters / inputs
+`q_km = -(b_km/(2 A_k ||r_km||)) * dot(vbar_km,r_km)`.
 
-- `spin_system` - Spinach system descriptor with mesh data, including Voronoi cells, active mesh vertices, coordinates, and velocity components; mesh subfields are produced by COMSOL import functions.
-- `parameters.diff` - diffusion coefficient in m^2/s (default: zero).
+If `q_km>0`, it adds `+q_km` at matrix entry (k,m); otherwise it adds `-q_km` at (m,k). Diffusion is added at entry (m,k) as
 
-## Outputs
+`d_km = (b_km/(A_k ||r_km||)) * parameters.diff`.
 
-- `F` - spatial motion generator matrix with dimension equal to the number of Voronoi cells.
+With lengths in metres, velocity in m/s, and diffusion in m^2/s, both contributions have units s^-1. This is a spatial generator, not a frequency-domain line shape; the routine does not convert Hz to angular frequency or vice versa.
 
-## Implementation structure
+## Assembly and output
 
-The routine validates the mesh and its indexing and Voronoi data, finds neighboring cells sharing a Voronoi edge, computes advection and diffusion transfers, and assembles and balances the sparse generator.
+The directed contributions are assembled into an `ncells×ncells` sparse matrix `B`. The code subtracts each column sum on the diagonal, then applies Voronoi-weight scaling:
+
+`F = diag(1./weights) * (B - diag(sum(B,1))) * diag(weights)`.
+
+The returned `F` has one row and column per Voronoi cell. No normalization of the mesh weights or state vector is performed here; the displayed diagonal balance and left/right weight scaling are the generator's actual construction.
+
+## Construction guards
+
+Only pairs sharing exactly two Voronoi vertices enter the local transfer calculation. Missing mesh, indexing, or Voronoi structures and an invalid diffusion value raise source-defined errors. Mesh geometry and field consistency beyond these explicit checks are not asserted here.

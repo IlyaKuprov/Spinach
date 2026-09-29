@@ -1,33 +1,47 @@
 # kernel/utilities/stitch.m
 
-- Signature: `fid=stitch(spin_system,L,rho_stack,coil_stack,...`
+**Source:** [kernel/utilities/stitch.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/stitch.m)
 
 ## Purpose
 
-Stitches forward-propagated state trajectories and backward-propagated detection trajectories at the midpoint of a 3D NMR pulse sequence. This obtains a three-dimensional free induction decay from two 2D simulations (http://dx.doi.org/10.1016/j.jmr.2014.04.002).
+Stitches forward- and backward-propagated trajectories to obtain a three-dimensional free induction decay (FID) for 3D NMR pulse sequences at the cost of two 2D simulations. The initial condition is propagated forward to a midpoint, the detection state is propagated backward to the same midpoint, and this function combines the two stacks.
 
-The complete call is `fid=stitch(spin_system,L,rho_stack,coil_stack,mec_oper,mec_time,t1,t2,t3,tdir)`. If omitted, `tdir` defaults to `'+-'`.
+## Behavior
 
-## Parameters / inputs
+- Syntax: `fid=stitch(spin_system,L,rho_stack,coil_stack,mec_oper,mec_time,t1,t2,t3,tdir)`.
+- Sets the default time direction `tdir` to `'+-'` when the argument is absent.
+- Runs a consistency check (`grumble`) on all inputs before computation.
+- Preallocates `fid` as a complex array of size `t3.nsteps x t2.nsteps x t1.nsteps`.
+- Computes a half-step propagator `P = propagator(spin_system,L,t2.timestep/2)` and its conjugate transpose `Pct = P'`.
+- Builds the midpoint event propagator `Pm` as the ordered product of propagators for each event in `mec_oper` with durations from `mec_time`, starting from a sparse identity of the size of `L`, then applies `clean_up` with `spin_system.tols.prop_chop`.
+- If `'gpu'` is listed in `spin_system.sys.enable`, uploads `P`, `Pm`, `Pct`, `rho_stack` and `coil_stack` to the GPU via `gpuArray` and reports that stitching will be done on GPU; otherwise reports CPU stitching.
+- For each of the `t2.nsteps` steps, reports progress, computes `fid(:,k,:) = gather(coil_stack'*(Pm*rho_stack))`, then advances both stacks according to `tdir`:
+  - `'++'`: forward evolution of both `rho_stack` and `coil_stack` using `P`.
+  - `'+-'`: forward evolution of `rho_stack` with `P`, backward evolution of `coil_stack` with `Pct`.
+  - `'-+''`: backward evolution of `rho_stack` with `Pct`, forward evolution of `coil_stack` with `P`.
+  - `'--'`: backward evolution of both stacks using `Pct`.
+  - Any other value raises the error `'invalid time direction specification in tdir'`.
 
-- `spin_system` — spin-system structure used to construct propagators, apply the propagator cleanup tolerance, select CPU or GPU execution, and report progress.
-- `L` — spin-system Liouvillian; a square numerical matrix.
-- `rho_stack` — state-vector stack from the forward part of the simulation, with `size(L,1)` rows and `t1.nsteps` columns.
-- `coil_stack` — coil-vector stack from the backward part of the simulation, with `size(L,1)` rows and `t3.nsteps` columns.
-- `mec_oper` — cell array of midpoint-event operators, each a matrix the same size as `L`; for example, `{Lx,L,Sy}`.
-- `mec_time` — cell array of positive real durations for the corresponding midpoint events. It must have the same number of elements as `mec_oper`.
-- `t1.nsteps` — positive integer number of time steps in `t1`.
-- `t2.nsteps` — positive integer number of time steps in `t2`.
-- `t2.timestep` — finite positive real duration of each time step in `t2`.
-- `t3.nsteps` — positive integer number of time steps in `t3`.
-- `tdir` — optional two-character time-direction specification for state and coil propagation, respectively: `'++'`, `'+-'`, `'-+'`, or `'--'`. The default is `'+-'`.
+## Inputs and outputs
 
-## Output
+Inputs:
 
-- `fid` — three-dimensional free induction decay, indexed as `fid(t3,t2,t1)` and sized `t3.nsteps` by `t2.nsteps` by `t1.nsteps`.
+- `spin_system` — Spinach spin system object.
+- `L` — spin system Liouvillian; must be a square matrix.
+- `rho_stack` — state vector stack from the forward part of the simulation; numerical array of dimensions `size(L,1) x t1.nsteps`.
+- `coil_stack` — coil vector stack from the backward part of the simulation; numerical array of dimensions `size(L,1) x t3.nsteps`.
+- `mec_oper` — cell array of operators in the midpoint event chain (e.g. `{Lx,L,Sy}`); each element must be a square matrix of the same dimensions as `L`.
+- `mec_time` — cell array of durations of each event at the midpoint of the t2 evolution period; each element must be a positive real scalar, and the count must match `mec_oper`.
+- `t1` — struct with field `nsteps`, a positive real integer giving the number of time steps in t1.
+- `t2` — struct with fields `nsteps` (positive real integer, number of time steps in t2) and `timestep` (finite positive real scalar, duration of each time step in t2).
+- `t3` — struct with field `nsteps`, a positive real integer giving the number of time steps in t3.
+- `tdir` — optional time direction for state and coil propagation; one of `'++'`, `'+-'`, `'-+'`, `'--'`, default `'+-'`.
 
-## Algorithm
+Output:
 
-The function constructs a half-step propagator from `L` using `t2.timestep/2` and builds the midpoint-event propagator by applying the operators in `mec_oper` in sequence for their corresponding durations. At each `t2` step, it contracts the coil and state stacks through the midpoint propagator: `fid(:,k,:) = coil_stack'*(Pm*rho_stack)`. It then advances each stack by a half-step in the directions specified by `tdir`, using the propagator for `'+'` and its conjugate transpose for `'-'`. Stitching runs on the GPU when `'gpu'` is enabled in `spin_system.sys.enable`; otherwise it runs on the CPU. Each computed slice is gathered into `fid`.
+- `fid` — three-dimensional free induction decay, size `t3.nsteps x t2.nsteps x t1.nsteps`.
 
-Source reference: <https://spindynamics.org/wiki/index.php?title=stitch.m>
+## References
+
+- Spinach Wiki page: [stitch.m](https://spindynamics.org/wiki/index.php?title=stitch.m)
+- Method reference: [http://dx.doi.org/10.1016/j.jmr.2014.04.002](http://dx.doi.org/10.1016/j.jmr.2014.04.002)

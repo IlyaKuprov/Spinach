@@ -1,34 +1,18 @@
 # examples/spin_chemistry/cidnp_pumping_1.m
 
 - Signature: `cidnp_pumping_1()`
+- Source: [examples/spin_chemistry/cidnp_pumping_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/spin_chemistry/cidnp_pumping_1.m)
 
 ## Purpose
 
-A simulation of the matrix in Equation 2 of IK's paper on chemically amplified NOEs (https://doi.org/10.1016/j.jmr.2004.01.011). Calculation time: seconds.
+Builds the relaxation-and-pumping matrix used for an active-space projection. The source header says it simulates Equation 2 of the author's paper on chemically amplified NOEs and points to [DOI 10.1016/j.jmr.2004.01.011](https://doi.org/10.1016/j.jmr.2004.01.011); this records the source's citation, not an independent verification of the paper's results. Despite its directory and filename, this function does not evolve a radical pair or calculate a recombination yield.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
+- The system contains one proton and one fluorine at `sys.magnet=14.1` T. Scalar shifts are zero; the source labels the fluorine chemical-shift-anisotropy input as DFT and sets its principal values to `[-47 -16 63]` with zero Euler angles. It labels the coordinates as DFT and the scalar coupling as experimental; the coupling is `50` Hz. No coordinate or anisotropy units are stated in the script comments.
+- Relaxation is Redfield with secular terms retained, `tau_c=110e-12` s, equilibrium setting `IME`, and temperature value `298` as passed to Spinach. The basis uses `sphten-liouv` with approximation `none`.
+- After constructing the relaxation matrix `R`, the function forms and normalises the unit, proton-Z, fluorine-Z and product-Z operators. It applies pumping terms with strengths `1.3` on proton-Z and `34.0` on fluorine-Z through `magpump`.
 
-## Physical / mathematical content
+## Matrix output
 
-- At 14.1 T, the model is a 1H-19F pair with zero isotropic shifts, 50 Hz scalar coupling, and a fluorine CSA tensor with principal values `[-47 -16 63]`. The spins are separated by `2.60` along y.
-- The Redfield relaxation model retains secular terms, uses `tau_c=110e-12`, and is configured for equilibrium magnetisation at `298 K`. The script adds pumping terms with strengths `1.3` for 1H and `34.0` for 19F.
-
-## Numerical / algorithmic content
-
-- It forms the active-state basis `[U Hz Fz -HzFz]`, projects the relaxation-plus-pumping matrix into that four-state space, and displays the resulting matrix from Equation 2.
-
-## Implementation structure
-
-- A simulation of the matrix in Equation 2 of IK's paper on chemically
-- amplified NOEs (https://doi.org/10.1016/j.jmr.2004.01.011).
-- Calculation time: seconds.
-- Magnet field
-- Isotopes
-- Chemical shifts
-- Chemical shift anisotropies (DFT)
-- Coordinates (DFT)
-- J-coupling (expt)
-- Relaxation theory
-- Formalism and basis
-- Spinach housekeeping
+The active-space columns are `[U Hz Fz -HzFz]`. The function prints `P'*R*P`, identified in the source as Kuprov's matrix in Equation 2. There is no initial density operator, field sweep, time evolution or recombination kinetics in this script; describing it as a radical-pair reaction model would go beyond the code.

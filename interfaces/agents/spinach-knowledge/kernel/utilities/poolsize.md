@@ -1,23 +1,28 @@
 # kernel/utilities/poolsize.m
 
-- Signature: `n=poolsize()`
-
 ## Purpose
 
-Returns the number of workers in the current parallel pool, or `0` when no pool exists.
+Returns the current parallel pool size in Spinach ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/poolsize.m)).
 
-## Parameters / inputs
+## Behavior
 
-None.
+- Syntax: `n=poolsize()`.
+- The function obtains the current parallel pool handle with `gcp('nocreate')`.
+- If no pool exists, `n` is set to `0`.
+- Otherwise, `n` is set to `p.NumWorkers`, the number of workers in the current parallel pool.
+- When invoked from inside `parfor`, `spmd`, or an asynchronous parallel job, the function returns zero.
 
-## Output
+## Inputs and outputs
+
+**Inputs**
+
+- None.
+
+**Outputs**
 
 - `n` — number of workers in the current parallel pool.
 
-## Implementation structure
+## References
 
-The function calls `gcp('nocreate')` to query an existing pool without creating one. If the result is empty it returns `0`; otherwise it returns the pool's `NumWorkers`. The source documents that calls from `parfor`, `spmd`, or an asynchronous parallel job return `0`.
-
-## Reference
-
-- <https://spindynamics.org/wiki/index.php?title=poolsize.m>
+- [Spinach Wiki: poolsize.m](https://spindynamics.org/wiki/index.php?title=poolsize.m)
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/poolsize.m)

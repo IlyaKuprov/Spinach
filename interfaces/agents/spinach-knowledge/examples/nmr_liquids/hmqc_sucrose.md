@@ -1,17 +1,17 @@
 # examples/nmr_liquids/hmqc_sucrose.m
 
+- MATLAB implementation: [examples/nmr_liquids/hmqc_sucrose.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/hmqc_sucrose.m)
+
 - Signature: `hmqc_sucrose()`
 
-## Purpose
+## Spin system and method
 
-Simulates a liquid-state HMQC spectrum of sucrose at natural 13C abundance using magnetic parameters from a vacuum DFT calculation. The source notes a calculation time of seconds.
+Builds the sucrose spin system from `../standard_systems/sucrose.log`, mapping H to `1H` and C to `13C` from vacuum-DFT parameters; the `g2spinach` call also receives `[31.8 182.1]`. The wrapper sets `min_j=3.0` and `no_xyz=1`, then replaces isotropic shielding entries at spin indices `[1:19 24:30]` with `[94.5 73.4 74.9 71.5 74.7 62.4 63.6 106.0 78.7 76.3 83.7 64.7 5.49 3.63 3.83 3.54 3.90 3.90 3.90 3.75 3.75 4.29 4.12 3.96 3.90 3.90]`. The source calls these experimental isotropic shielding values but supplies no units.
 
-## Model and parameters
+The example describes natural 13C content and generates 13C isotopomers with `dilute`. It sets `sys.magnet=5.9`, enables `greedy`, and uses `prox_cutoff=4.0`. The basis is `sphten-liouv` / `IK-2`, connected by scalar couplings with proximity level 1.
 
-- Reads `../standard_systems/sucrose.log` for 1H and 13C, with a 3.0 Hz minimum coupling threshold, then sets selected isotropic shielding shifts to experimental values.
-- Uses a 5.9 T magnetic field, a scalar-coupling-connected `sphten-liouv` basis with `IK-2` approximation, and a 4.0 proximity cutoff.
-- Sets `J=140`, sweep widths `[3350 1000]`, offsets `[5000 1200]`, and a `[256 256]` acquisition grid zero-filled to `[512 512]`; axes are in ppm.
+## Acquisition and processing
 
-## Calculation
+It passes `J=140`, `sweep=[10000 3000]`, `offset=[4000 1000]`, `npoints=[256 256]`, and `zerofill=[512 512]` to `liquid(...,@hmqc,...,'nmr')`. The dimension order is `{'13C','1H'}`, with `1H` decoupling in F1 and `13C` decoupling in F2; the direct/F2 channel is therefore `1H`. Axis units are explicitly ppm; the source does not annotate units for the other numerical parameters.
 
-Generates 13C isotopomers with `dilute`, simulates each with `liquid(...,@hmqc,...)` in a `parfor` loop, applies cosine apodisation in both dimensions, and sums the shifted 2D Fourier transforms. Plots the magnitude spectrum with `plot_2d`.
+Each isotopomer is simulated in a `parfor` loop, cosine-apodised in both dimensions, Fourier transformed with the specified zero filling, and accumulated. No explicit relaxation model or relaxation parameters appear in this wrapper. Pulse-program internals are delegated to `@hmqc`. It plots `abs(spectrum)` after `scale_figure([1.5 2.0])`, using `plot_2d` arguments `20,[0.05 0.5 0.05 0.5],2,256,6,'positive'`. The source comment estimates calculation time in seconds.

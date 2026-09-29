@@ -1,15 +1,15 @@
 # examples/quantum_tech/transmon_rabi_leakage.m
 
-- Signature: `transmon_rabi_leakage()`
+Source: [examples/quantum_tech/transmon_rabi_leakage.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_rabi_leakage.m)
 
-## Purpose
+## What it models
 
-Rabi dynamics of a driven four-level transmon in the Duffing approximation, including leakage into the second and third excited states. The resonant drive is part of the rotating-frame Hamiltonian, and all four level populations come from a single trajectory. Calculation time: seconds.
+A closed, coherently driven four-level transmon in the Duffing approximation. The four truncated ladder states are reported as BL1 through BL4, so the higher two populations show leakage beyond the computational pair in this model. This is a calculated trajectory, not experimental data; the source estimates calculation time in seconds.
 
-## Model and parameters
+## Hamiltonian and parameters
 
-The model is a T4 transmon at zero rotating-frame frequency with anharmonicity -250 MHz, in the Zeeman-Hilbert formalism without approximation. A resonant 25 MHz drive is included in the Hamiltonian, and the initial state is BL1.
+The source sets the field to zero and declares one T4 mode, zero rotating-frame frequency, and anharmonicity -250e6 Hz. It uses the Zeeman-Hilbert formalism with no basis approximation and builds the cavity/Duffing drift Hamiltonian. A resonant quadrature drive is added as 2*pi*25e6*(C+A)/2, where C and A are the transmon ladder operators; the 25 MHz source parameter is converted to angular frequency in the Hamiltonian.
 
-## Calculation
+## State, propagation, and plot
 
-The code propagates one trajectory with a 1 ns step for 400 ns, evaluates populations in BL1 through BL4 at every point, and plots all four traces. Population outside the lowest two levels displays leakage into the higher transmon states.
+The initial state is BL1. Spinach propagates a single trajectory with 1 ns steps for 400 ns. At each point the code evaluates the BL1, BL2, BL3, and BL4 populations using the corresponding state operators and plots all four against time in ns. The figure visualizes leakage during ideal coherent Rabi dynamics; the source includes no relaxation, decoherence, rotational diffusion, correlation spectrum, cross-correlations, or secular approximation, and reports no comparison with an experiment.

@@ -1,21 +1,17 @@
 # examples/dnp_sol/crosspol_powder_static_1.m
 
-- Signature: `crosspol_powder_static_1()`
+- MATLAB implementation: [examples/dnp_sol/crosspol_powder_static_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/crosspol_powder_static_1.m)
 
 ## Purpose
 
-Simulates a static-powder (^{15}mathrm{N})–electron cross-polarization contact experiment in the doubly rotating frame and plots the real (^{15}mathrm{N}) (S_x) signal against contact-pulse duration. The source estimates the calculation time as seconds.
+This no-argument example models a static-powder, doubly rotating-frame electron–`15N` cross-polarization contact experiment. It computes and plots the nitrogen `S_x` expectation value over the contact pulse. The source estimates the calculation time as seconds.
 
-## Physical / mathematical content
+## Model and sequence
 
-- The system contains (^{15}mathrm{N}) and an electron at 9.394 T and 298 K. The listed Zeeman scalars are 0 and 2.0023193043622, and the coordinates place the spins 10.05 source-coordinate units apart along (z).
-- The simulation uses a 100-step contact sequence. Each step is (10,mumathrm{s}); the electron and nitrogen irradiation-power arrays are both set to (5 × 10^4) for all steps.
-- The detected operator is the nitrogen (S_x) state. The source requests an isotropic-equilibrium term and uses the `rep_2ang_6400pts_sph` powder grid.
+The system contains `15N` and an electron (`sys.isotopes={'15N','E'}`), with `sys.magnet=9.394`, Zeeman scalars 0 and 2.0023193043622, coordinates `[0,0,0]` and `[0,0,10.05]`, and `temperature=298`. No coordinate units are given in the script. It uses the full `sphten-liouv` basis (`approximation='none'`) and does not assign a relaxation model in this example.
 
-## Numerical / algorithmic content
+The sequence has 100 intervals, each `1e-5` seconds, so the plotted time axis runs from zero to 1 ms with 101 samples. Both rows of `irr_powers` contain 100 values of `5e4`. The supplied irradiation operators are electron `Ly` and nitrogen `Lx`; the excitation operators are electron `Lx` and nitrogen `Ly`. The detection state is nitrogen `Lx`, `spins={'15N'}`, and the powder grid is `rep_2ang_6400pts_sph`. The script requests `needs={'iso_eq'}` and comments that this is “Good enough here”; that qualification belongs to this example's chosen equilibrium treatment.
 
-Creates the spin system with the full `sphten-liouv` basis (`approximation='none'`) and calls `powder` with the `cp_contact_hard` sequence and NMR mode. The time axis starts at zero and is formed from the cumulative step durations; the plotted signal is the real part of the FID.
+## Calculation and output
 
-## Implementation structure
-
-The function specifies the field, isotopes, Zeeman scalars, coordinates and temperature; constructs and bases the Spinach system; sets the electron and nitrogen irradiation and excitation operators, detected nitrogen state, powder grid and 100-step timing; runs the powder simulation; and plots the resulting nitrogen signal versus contact duration.
+Spinach's `powder` driver calls `@cp_contact_hard` in NMR mode: `powder(spin_system,@cp_contact_hard,parameters,'nmr')`. The returned local variable `fid` is plotted as `real(fid)` against cumulative contact time in seconds; the vertical axis is labelled as the nitrogen `S_x` expectation value. The function itself declares no output argument, so its result is the generated figure rather than a returned FID. Running the example requires Spinach and the `cp_contact_hard` callback.

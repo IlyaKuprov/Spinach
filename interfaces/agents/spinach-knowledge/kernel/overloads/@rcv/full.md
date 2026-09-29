@@ -1,28 +1,23 @@
 # kernel/overloads/@rcv/full.m
 
+[GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/full.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/full.m)
+
 - Signature: `A=full(A)`
 
 ## Purpose
 
-Converts an RCV sparse matrix to a full MATLAB matrix.
+Materializes the matrix encoded by an RCV sparse matrix as a dense MATLAB matrix at its recorded dimensions.
 
-## Physical / mathematical content
+## Storage and behavior
 
-This changes the matrix storage representation, not its represented entries: the output is the dense matrix corresponding to the input's stored coordinates and values.
+RCV stores row indices, column indices, and corresponding values in parallel arrays, with `numRows` and `numCols` retaining the matrix shape. This overload checks that the input is an `rcv` object, then evaluates `full(sparse(A))`: the RCV sparse conversion first constructs a MATLAB sparse matrix at the recorded dimensions, and MATLAB's `full` then eagerly creates the dense result. The output is a full MATLAB matrix of size `numRows`-by-`numCols`; this is materialization, not a lazy RCV result.
 
-## Numerical / algorithmic content
+The overload does not conjugate values or implement scalar expansion or broadcasting.
 
-After checking that A is an RCV object, the implementation constructs a MATLAB sparse matrix and delegates conversion to MATLAB's `full` function.
+## Input
 
-## Parameters / inputs
+- `A` - an RCV sparse matrix. The explicit check is object type only.
 
-- A -an RCV sparse matrix
+## Output
 
-## Outputs
-
-- A -a full Matlab matrix
-
-## Implementation structure
-
-- Requires A to be an RCV object.
-- Converts A to MATLAB sparse storage, then calls full on that sparse matrix.
+- `A` - the corresponding full MATLAB matrix.

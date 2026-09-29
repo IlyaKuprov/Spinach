@@ -4,16 +4,25 @@
 
 ## Purpose
 
-Tests Hilbert-to-Liouville operator actions and the first-rank Stevens-to-Pauli mapping.
+Checks Hilbert-to-Liouville operator-action identities and the mapping between first-rank Stevens operators and Pauli Cartesian operators.
 
-## Physical / mathematical content
+## Mathematical content
 
-For random complex 6-by-6 matrices `H` and `R`, the script checks that the left, right, commutator, and anticommutator Liouville operators generated from `H` act on the vectorized `R` as `H*R`, `R*H`, `H*R-R*H`, and `H*R+R*H`. It also compares first-rank Stevens operators with the Pauli Cartesian operators at multiplicities 2, 3, 5, and 8.
+For a matrix `R`, left multiplication by `H`, right multiplication by `H`, their commutator action, and their anticommutator action have distinct Liouville-space representations. This function compares those representations with the corresponding explicit Hilbert-space products after MATLAB column-major vectorization. It separately checks the first-rank Stevens-to-Pauli correspondence at several multiplicities.
 
-## Numerical / algorithmic content
+## Callable context and model
 
-All action and operator-mapping residuals use the fixed threshold `1e-10`. Liouville action residuals are measured with the vector 2-norm; Stevens/Pauli differences use the Frobenius norm. A residual above threshold raises an error.
+Call the zero-input MATLAB function `commutation_8()` from a Spinach checkout with the project functions on the MATLAB path. It returns no values, prints a success message for each test group, and raises an error when a comparison exceeds the source threshold. The Hilbert-Liouville test uses independent unseeded complex random 6-by-6 matrices `H` and `R`; they are not explicitly symmetrized or constrained to represent Hermitian physical observables.
 
-## Implementation structure
+## Checks encoded in the source
 
-The first test builds the four Liouville representations and compares their action on `hilb2liouv(R,'statevec')` with explicitly formed Hilbert-space products. The second loops over multiplicities, obtains the Pauli and rank-1 Stevens operators, and checks `O_10=L.z`, `O_11=L.x`, and `O_1m1=L.y` before reporting success.
+- Forms `L_left=hilb2liouv(H,'left')`, `L_right=hilb2liouv(H,'right')`, `L_comm=hilb2liouv(H,'comm')`, `L_acomm=hilb2liouv(H,'acomm')`, and `R_vec=hilb2liouv(R,'statevec')`. The actions are compared respectively with `H*R`, `R*H`, `H*R-R*H`, and `H*R+R*H`, represented as column vectors. Each residual is a 2-norm; the maximum must be at most `1e-10`.
+- For multiplicities `[2 3 5 8]`, compares `stevens(mult,1,0)`, `stevens(mult,1,1)`, and `stevens(mult,1,-1)` with `pauli(mult)`'s `z`, `x`, and `y` operators, respectively. The maximum of the three Frobenius-norm differences must be at most `1e-10`.
+
+## Assumptions and limits
+
+The Liouville identities are tested on one random matrix pair at dimension 6 per invocation, with no random seed set in the function. The rank-1 comparison covers only the four listed multiplicities and the stated component correspondence. The source specifies conditional success messages and tolerances but embeds no fixed numerical residuals; this entry does not assert that a run passed.
+
+## Source
+
+[`examples/fundamentals/operator_tests/commutation_8.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/operator_tests/commutation_8.m)

@@ -1,24 +1,21 @@
 # examples/imaging/echo_planar_3d.m
 
-- Signature: `echo_planar_3d()`
-
 ## Purpose
 
-Simulate 3D slice selection followed by a three-dimensional echo-planar imaging sequence using a brain phantom, then display a reconstructed 2D slice. The source notes a simulation time of hours, faster with a Tesla V100 GPU; GPU execution is not enabled in this file.
+Demonstrates 3D slice selection followed by echo-planar acquisition on the `brain-medres` phantom. Despite the 3D sequence and volumetric phantom, the example displays k-space for a slice and reconstructs a 2D image using a 2D FFT; it is not a full 3D image reconstruction.
 
-## Physical / mathematical content
+## Spin and image model
 
-- Models a single `1H` spin at 5.9 T with zero chemical shift and diagonal T1/T2 relaxation, using rates of 1 for both R1 and R2. The `brain-medres` phantom supplies spatial R1, R2, and proton-density maps.
-- Uses a 50-step Gaussian slice-selection pulse of duration `2.0e-4` s, with RF frequency `-5e3`, amplitude scale `2*pi*7500`, and phase `pi/2`. Slice-selection, readout, and phase-encoding gradient amplitudes are `32.0e-3`, `5.3e-3`, and `4.8e-3` T/m; gradient angles are `[pi/3 pi/4 pi/5]`.
-- Sets diffusion and flow to zero. The initial spin state is `Lz`, and detection uses `L+` with a uniform coil phantom.
+The model is one `1H` spin at 5.9 T with zero chemical shift, `t1_t2` relaxation, diagonal retention, zero equilibrium, and both rate settings equal to 1. The basis is `sphten-liouv` with no approximation. The phantom call supplies full 3D `R1`, `R2`, and proton-density maps, dimensions, and point counts. The proton-density phantom weights the initial `Lz` state; a uniform coil vector detects `L+`, and `rlx_t1_t2` supplies the relaxation operators. Flow fields and diffusion are set to zero. The `R1` volume is plotted before the sequence.
 
-## Numerical / algorithmic content
+## Slice-select RF and gradients
 
-- Creates a spin system in the `sphten-liouv` formalism with no basis approximation, then runs `imaging(spin_system,@epi_3d,parameters)` with image size `[201 201]`, 4 ms readout and phase-encoding gradient durations, a 20 ms echo time, and periodic third-order spatial derivatives.
-- Displays the 3D R1 map, plots the acquired slice's k-space data after a fourth-root display scaling, applies `sqsin` apodisation in both dimensions, and reconstructs the real-valued image with a shifted 2D FFT. The phase-encoding gradient amplitude is halved after simulation for the plotting field of view and k-space extent.
+The slice-select pulse is a 50-step Gaussian pulse with phase `pi/2`, frequency entries `-5e3`, amplitude scaled by `2*pi*7500`, and total duration parameter `2.0e-4` divided equally among the steps. These RF-table values and durations have no unit comments in the source. The image-size array is `[201 201]`. Slice-select, readout, and phase-encode gradient amplitudes are `32.0e-3`, `5.3e-3`, and `4.8e-3` T/m, as labelled in the source. Readout and phase-encode duration fields are both `4e-3`; the echo-time field is `20e-3`. The gradient-angle array is `[pi/3 pi/4 pi/5]` and has no separate unit annotation. Spatial differentiation uses `{'period',3}`. The source actively sets `sys.enable={'greedy'}`; the nearby `gpu` text is a comment, not an enabled GPU option.
 
-## Implementation structure
+## Output and caveats
 
-- Defines the spin system, relaxation model, basis, RF pulse, and sequence parameters.
-- Loads the `brain-medres` phantom and supplies relaxation, initial-state, and detection phantoms to `epi_3d` through `imaging`.
-- Plots the phantom and the simulated slice in k-space and real space.
+The sequence call is `imaging(...,@epi_3d,...)`. The code halves `pe_grad_amp` for the plotted FOV and k-space extent because `G{1}` is effectively halved. It displays `fid.^(1/4)` as the k-space view (the source says this improves fringe visibility), then applies square-sine apodisation in both dimensions and forms a real-space slice with `fft2`. The source estimates hours of runtime and says a Tesla V100 is faster; this file does not enable GPU execution.
+
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/echo_planar_3d.m)

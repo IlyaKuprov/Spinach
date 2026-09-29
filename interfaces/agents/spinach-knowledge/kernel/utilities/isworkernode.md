@@ -1,23 +1,25 @@
 # kernel/utilities/isworkernode.m
 
-- Signature: `answer=isworkernode()`
-
 ## Purpose
 
-Reports whether the current execution is on a parallel-pool worker. Spinach uses this query to select serial versions of algorithms when already running inside a parallel loop.
+Returns `true` if the code is currently executing inside a `parfor` or `spmd` block, i.e. on a MATLAB parallel worker process. The function is used in internal Spinach kernel decision making: certain algorithms are switched to their serial versions when the calculation is already running inside a parallel loop.
 
-## Parameters / inputs
+## Behavior
 
-None.
+- The function takes no arguments and returns a single logical value.
+- It calls the undocumented MATLAB internal function `parallel.internal.pool.isPoolWorker()`, which reports whether the current process is a parallel pool worker.
 
-## Outputs
+## Inputs and outputs
 
-- `answer` - true if running on a parallel worker process.
+**Inputs**
 
-## Implementation
+- None.
 
-The function returns the result of MATLAB's undocumented `parallel.internal.pool.isPoolWorker()` function.
+**Outputs**
 
-## Source
+- `answer` — `true` if running on a parallel worker process, `false` otherwise.
 
-[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=isworkernode.m)
+## References
+
+- Source: [kernel/utilities/isworkernode.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isworkernode.m)
+- Spinach Wiki: [isworkernode.m](https://spindynamics.org/wiki/index.php?title=isworkernode.m)

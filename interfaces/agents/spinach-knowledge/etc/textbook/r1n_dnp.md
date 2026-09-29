@@ -1,29 +1,37 @@
 # etc/textbook/r1n_dnp.m
 
-- Signature: `R1n=r1n_dnp(B0,T,g,T1e,T1n_bulk,r,bet)`
+- MATLAB implementation: [etc/textbook/r1n_dnp.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1n_dnp.m)
+
+- Signature: R1n = r1n_dnp(B0,T,g,T1e,T1n_bulk,r,bet)
 
 ## Purpose
 
-Estimates the nuclear longitudinal relaxation rate in a simple cryogenic DNP model that combines bulk nuclear relaxation with relaxation induced by an unpaired electron. The source does not provide a literature citation for the model.
-
-## Model
-
-The function adds the bulk contribution `1/T1n_bulk` to an electron-mediated term. That term uses the squared dipolar angular factor `(1-3 cos²(bet))²`, the inverse-sixth-power distance dependence, electron longitudinal relaxation time `T1e`, and the thermal factor `sech²(g μB B0/(2 kB T))`. The angle `bet` is in radians; `r` is converted from ångströms to metres in the calculation.
+Estimates nuclear longitudinal relaxation in the simple cryogenic-DNP model in the source: a bulk nuclear rate plus an electron-mediated contribution.
 
 ## Inputs
 
-- `B0` — non-zero real main-magnet field in tesla.
-- `T` — positive real absolute temperature in kelvin.
-- `g` — real electron g-factor (dimensionless).
-- `T1e` — positive real electron longitudinal relaxation time in seconds.
-- `T1n_bulk` — positive real bulk nuclear longitudinal relaxation time in seconds.
-- `r` — positive real electron–nuclear separation in ångströms.
-- `bet` — real angle between the field and electron–nuclear direction, in radians.
+All seven arguments are required; there are no defaults.
 
-## Output
+- B0 — finite, nonzero real numeric scalar main magnetic field, in tesla.
+- T — positive real numeric scalar absolute temperature, in kelvin.
+- g — real numeric scalar electron g-factor; the source documents it as being in Bohr-magneton units and multiplies it by the Bohr magneton constant.
+- T1e — positive real numeric scalar electron longitudinal relaxation time, in seconds.
+- T1n_bulk — positive real numeric scalar bulk nuclear longitudinal relaxation time (the source does not state a unit in its parameter comment).
+- r — positive real numeric scalar electron-nuclear distance, in angstroms.
+- bet — real numeric scalar angle between the magnetic field and electron-nuclear direction, in radians. The check does not restrict its range.
 
-- `R1n` — modelled nuclear longitudinal relaxation rate in Hz.
+## Model and output
 
-## Reference
+Using mu0 = 4*pi*1e-7, muB = 9.274010e-24, and kB = 1.380649e-23, the source defines
 
-See the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=r1n_dnp.m). The MATLAB source contains a placeholder rather than a literature reference.
+~~~matlab
+sech_sq = sech(g*muB*B0/(2*kB*T))^2;
+geom_dd = (1-3*cos(bet)^2)/(r/1e10)^3;
+R1n = (((mu0/(4*pi))*(g*muB/B0)*geom_dd)^2)*sech_sq/T1e + 1/T1n_bulk;
+~~~
+
+Here the distance is converted from angstroms to metres before the inverse-cube geometric factor is formed. R1n is documented as the nuclear relaxation rate in Hz. This is a direct evaluation of the stated simple model; the source gives no temperature range or literature citation, and its reference line is a placeholder.
+
+## Source
+
+[Spinach Wiki: r1n_dnp.m](https://spindynamics.org/wiki/index.php?title=r1n_dnp.m).

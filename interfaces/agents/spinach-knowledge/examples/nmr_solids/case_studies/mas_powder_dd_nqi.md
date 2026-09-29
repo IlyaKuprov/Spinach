@@ -1,30 +1,15 @@
 # examples/nmr_solids/case_studies/mas_powder_dd_nqi.m
 
-- Signature: `mas_powder_dd_nqi()`
+Source: [mas_powder_dd_nqi.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/mas_powder_dd_nqi.m)
 
-## Purpose
+## Spin system
 
-Powder magic angle spinning spectrum of a pair of dipole-coupled quadrupolar nuclei; this is apparently something that other simu- lation packages cannot do. Parameters from Jeongjae Lee. Calculation time: seconds
+The header describes a powder MAS spectrum of a dipole-coupled pair of quadrupolar nuclei and credits the parameters to Jeongjae Lee. The system contains ²³Na and ¹⁷O at a magnet setting of 9.4, with coordinates (2.602, 8.750, 3.651) and (4.401, 10.184, 4.371). It supplies separate CAStep-to-NQI tensors: for ²³Na, the matrix rows are (−0.0497, 0.0520, −0.0019), (0.0520, 0.0315, 0.0027), and (−0.0019, 0.0027, 0.0182), followed by +0.1040 and spin 3/2; for ¹⁷O, the rows are (0.1580, 0.0340, −0.5562), (0.0340, −0.6005, 0.0586), and (−0.5562, 0.0586, 0.4425), followed by −0.0258 and spin 5/2. The source does not state units for the magnet setting, coordinates, or tensor arguments.
 
-## Physical / mathematical content
-- Simulates a powder magic-angle-spinning spectrum of dipole-coupled quadrupolar ²³Na and ¹⁷O nuclei at 9.4 T, using coordinates and electric-field-gradient-derived quadrupolar interactions.
-- Acquires the ¹⁷O signal at 100 kHz spinning over a 200-point spherical orientation grid; applies exponential apodisation and a zero-filled Fourier transform before plotting.
+The basis is sphten-liouv with no approximation and projection +1. A possible GPU setting is present only as a commented-out line, so this script does not enable it.
 
-## Numerical / algorithmic content
+## MAS acquisition and spectrum
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The acquisition parameters include rate 100000, axis [√(2/3), 0, √(1/3)], maximum rank 30, a 200-point spherical grid, sweep 5 × 10⁶, 1,024 points, zero-fill to 4,096, and offset zero. The source does not state a unit for rate, sweep, or offset; it explicitly sets the plotted axis units to MHz. It selects the ¹⁷O L+ state for both initial state and receiver coil, with no decoupling list and no RF or CP pulse sequence specified.
 
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a pair of dipole-coupled
-- quadrupolar nuclei; this is apparently something that other simu-
-- lation packages cannot do. Parameters from Jeongjae Lee.
-- Calculation time: seconds
-- System specification
-- Interactions
-- Basis set
-- Enable GPU
-- sys.enable={'gpu'};
-- Spinach housekeeping
-- Experiment setup
-- Simulation
+Spinach performs single-rotor acquisition, applies exponential apodisation with parameter 6, Fourier transforms the signal, and plots the real spectrum. This is a simulation, not an experimental spectrum supplied by the source. The header calls the pair dipole-coupled; the code provides both coordinates and the two diagonal NQI assignments but no separate off-diagonal coupling-matrix assignment.

@@ -1,32 +1,19 @@
 # experiments/nmr_solids/mqmas.m
 
-- Signature: `fid=mqmas(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/mqmas.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=mqmas.m)
 
-## Purpose
+## Purpose and inputs
 
-Rotor-synchronous MQMAS pulse sequence for a 2D amplitude-mode free induction decay. Call it from the `singlerot.m` context, which supplies `H`, `R`, and `K`. See <https://spindynamics.org/wiki/index.php?title=mqmas.m>.
+A rotor-synchronous MQMAS pulse sequence returning a 2D amplitude-mode free-induction decay. Call it through the `singlerot.m` context, which supplies `H`, `R`, and `K`. Signature: `fid=mqmas(spin_system,parameters,H,R,K)`. The three superoperators must be square numeric matrices of equal size.
 
-## Parameters / inputs
+- `parameters.spins` is a one-element cell containing an isotope string present in the system; `spc_dim` is a positive integer spatial dimension.
+- `pulse_dur` is a two-element vector of non-negative durations in seconds. `pulse_amp` is a two-element real vector in rad/s; the code adds these values directly to the pulse generators.
+- `mq_order` is an integer coherence order. `rho0` and `coil` are required initial and detection states.
+- `npoints` is a two-element vector of positive integers. `rate` is a non-zero real MAS rate in Hz, and `sweep` must be positive and equal to `abs(rate)`. Both dimensions are sampled stroboscopically at `1/abs(rate)`.
+- `decouple` is a cell array of isotope strings, possibly empty; listed isotopes must occur in the spin system. Analytical decoupling is restricted to `sphten-liouv` when the list is non-empty.
 
-- `spin_system`: Spinach spin system.
-- `H`, `R`, `K`: Numeric square matrices of equal size, supplied by `singlerot.m`.
-- `parameters.spins`: Cell array containing one isotope string present in the spin system; selects the active spin.
-- `parameters.pulse_dur`: Durations of the two pulses, in seconds; a two-element vector of non-negative real numbers.
-- `parameters.pulse_amp`: Amplitudes of the two pulses, in rad/s; a two-element vector of real numbers.
-- `parameters.mq_order`: Integer MQMAS coherence order.
-- `parameters.rho0`: Initial condition, usually `Lz`.
-- `parameters.coil`: Detection state, usually `L+`.
-- `parameters.spc_dim`: Positive integer spatial problem dimension.
-- `parameters.npoints`: Two-element vector of positive integers specifying the point counts in the indirect and direct dimensions.
-- `parameters.rate`: Non-zero real MAS rate.
-- `parameters.sweep`: Positive real sweep width; must equal `abs(parameters.rate)`. Both dimensions are sampled stroboscopically at this sweep width, relative to the rotor period.
-- `parameters.decouple`: Cell array of isotope strings to decouple, or an empty cell array. Listed isotopes must be present in the system; analytical decoupling requires the `sphten-liouv` formalism.
-- Other parameters required by the `singlerot.m` context.
+## Sequence outline
 
-## Outputs
+The source forms `L=H+1i*R+1i*K` and applies the decoupling configuration. It constructs `Lx` from the active spin’s `L+` operator, applies pulse 1, and selects `mq_order` coherence. The indirect trajectory advances for `npoints(1)-1` rotor periods. Pulse 2 is followed by selection of +1 coherence; direct acquisition then uses `coil` for `npoints(2)-1` intervals. The returned `fid` contains the two sampled dimensions in amplitude mode.
 
-- `fid`: 2D amplitude-mode free induction decay.
-
-## Implementation summary
-
-The sequence forms `L=H+1i*R+1i*K`, applies decoupling, and runs the first pulse before selecting `parameters.mq_order` coherence. It evolves the indirect dimension at intervals of `1/abs(parameters.rate)`, runs the second pulse, selects `+1` coherence, and evolves the direct dimension while detecting with `parameters.coil`.
+This mapping is MQMAS; the source does not describe an overtone cross-polarisation transfer block.

@@ -1,21 +1,37 @@
 # tests/lib/new_test_result.m
 
-- Signature: `result=new_test_result(id,name,purpose)`
-
 ## Purpose
 
-Initialises a regression-test result structure for subsequent checks.
+Creates a regression test result structure for the Spinach test suite. Source: [GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/new_test_result.m).
 
-## Parameters / inputs
+## Behavior
 
-- `id` - non-empty character-row test identifier.
-- `name` - non-empty character-row test name.
-- `purpose` - character-row purpose text; it may be empty.
+- Syntax: `result=new_test_result(id,name,purpose)`.
+- Validates the three input arguments via an internal `grumble` helper before building the structure.
+- Validation rules:
+  - `id` must be a non-empty character row vector, otherwise errors with `'id must be a non-empty character string.'`.
+  - `name` must be a non-empty character row vector, otherwise errors with `'name must be a non-empty character string.'`.
+  - `purpose` must be a character row vector (empty allowed), otherwise errors with `'purpose must be a character string.'`.
+- On success, returns a structure with fields:
+  - `id`, `name`, `purpose` — copied from the inputs.
+  - `status` — initialized to `'RUNNING'`.
+  - `elapsed` — initialized to `0`.
+  - `messages` — initialized to `{}`; accumulates one line per check.
+  - `failures` — initialized to `{}`; accumulates details of checks that did not pass; an empty `failures` field means no failed check has been recorded.
+  - `error` — initialized to `''`.
 
-## Outputs
+## Inputs and outputs
 
-- `result` - structure containing the supplied `id`, `name`, and `purpose`; status `RUNNING`; elapsed time `0`; empty `messages` and `failures` cells; and an empty `error` string.
+Inputs:
 
-## Implementation structure
+- `id` — stable test identifier (non-empty character row vector).
+- `name` — short human-readable test name (non-empty character row vector).
+- `purpose` — one-sentence purpose statement (character row vector; may be empty).
 
-- Validates the three inputs, then initializes the result fields. Invalid `id` or `name` values, or a non-character or non-row `purpose`, raise an error.
+Output:
+
+- `result` — test result structure as described above.
+
+## References
+
+- Source file: [tests/lib/new_test_result.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/new_test_result.m)

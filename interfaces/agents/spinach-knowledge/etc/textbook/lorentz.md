@@ -1,27 +1,25 @@
 # etc/textbook/lorentz.m
 
+- MATLAB implementation: [etc/textbook/lorentz.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/lorentz.m)
+
 - Signature: `[J,K,Kil]=lorentz(L)`
 
 ## Purpose
 
-Constructs matrix generators for the direct-sum Lorentz-group representation `(L,0) ⊕ (0,L)`, with inversion, for positive integer or half-integer rank `L`.
+Constructs the direct-sum (L,0) plus (0,L) matrix representation of the Lorentz group with inversion. Use it when explicit rotation and boost generators are needed; request only two outputs if the Killing form is not needed.
 
-## Construction
+## Input
 
-Let `D=2L+1` and let `s` be the spin-`L` matrices returned by `pauli(D)`. The rotation generators are block diagonal with `s` in both blocks; the boost generators have `+i s` in the first block and `-i s` in the second. Each returned generator is a `2D × 2D` matrix.
+- L — required real numeric scalar representation rank; it must be an integer or half-integer with L >= 1/2. There are no defaults. The source sets D = 2L+1 and obtains the spin matrices from pauli(D).
 
-If the third output is requested, the function also computes the 6-by-6 Killing form. It forms the adjoint-representation matrices for the six generators and evaluates their pairwise trace products; this calculation is the expensive optional part.
+## Construction and outputs
 
-## Inputs
+For each spin matrix s.x, s.y, s.z, J has s in both diagonal blocks, while K has +i s in the first block and -i s in the second. Each component is returned as a full 2D-by-2D matrix.
 
-- `L` — positive integer or half-integer representation rank, supplied as a real numeric scalar.
+- J — structure with rotation generators J.x, J.y, J.z.
+- K — structure with boost generators K.x, K.y, K.z.
+- Kil — optional 6-by-6 Killing form. The code computes it only when a third output is requested (nargout > 2), by forming adjoint-representation matrices for the six generators and taking pairwise trace products. This is the expensive part; [J,K] avoids it.
 
-## Outputs
+## Source
 
-- `J` — structure containing rotation generators `J.x`, `J.y`, and `J.z`.
-- `K` — structure containing boost generators `K.x`, `K.y`, and `K.z`.
-- `Kil` — 6-by-6 Killing form; computed only when requested.
-
-## Reference
-
-See the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=lorentz.m).
+[Spinach Wiki: lorentz.m](https://spindynamics.org/wiki/index.php?title=lorentz.m).

@@ -1,19 +1,17 @@
 # examples/esr_liq_pulsed/endor_benzoquinone.m
 
-- Signature: `endor_benzoquinone()`
+- Call: `endor_benzoquinone()` (no arguments; settings are defined in the function).
+- Source: [`examples/esr_liq_pulsed/endor_benzoquinone.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/endor_benzoquinone.m)
+- Experimental reference: [Figure 2, DOI 10.1002/mrc.1260280313](https://doi.org/10.1002/mrc.1260280313)
 
-## Purpose
+## Spin system
 
-Simulates liquid-state continuous-wave ENDOR of the 2-methoxy-1,4-benzoquinone radical, reproducing Figure 2 of http://dx.doi.org/10.1002/mrc.1260280313. Calculation time: seconds.
+The liquid-state continuous-wave ENDOR example models the 2-methoxy-1,4-benzoquinone radical with one electron and six `1H` spins. It sets `sys.magnet=0.33` and an isotropic electron Zeeman scalar of 2.004577. The source does not annotate the field or the raw coupling arguments with units. Electron–proton scalar couplings are passed to `mt2hz` with values `[0.08, 0.08, 0.08, -0.059, -0.364, -0.204]`; the first three proton spins (indices 2–4) are grouped under `S3` symmetry. The basis uses `sphten-liouv`, `approximation='none'`.
 
-## Physical / mathematical content
+## Simulation and output
 
-The spin system contains one electron and six protons with scalar electron–proton hyperfine couplings. At 0.33 T the electron g value is 2.004577. The basis imposes `S3` symmetry on three equivalent protons with 0.08 mT couplings; the other three have couplings of −0.059, −0.364, and −0.204 mT. The detected ENDOR channel is proton-based.
+It calls `liquid(spin_system,@endor_cw,parameters,'esr')` with offset 0, sweep `50e6`, 1024 points, zero filling to 4096, proton channel `{'1H'}`, axis units MHz, and derivative 1. It mean-centres the FID, applies Kaiser apodisation with parameter 20, Fourier-transforms it, and opens a figure plotting the negative spectrum magnitude with `plot_1d`. No output file is written by the example; the FID and spectrum are transient variables. The source estimates a calculation time of seconds.
 
-## Numerical / algorithmic content
+## Scope and caveats
 
-The CW ENDOR calculation uses a 50 MHz sweep, 1024 acquired points, and zero filling to 4096. It subtracts the mean, applies a Kaiser apodisation (parameter 20), Fourier transforms, and plots the negative spectrum magnitude.
-
-## Implementation structure
-
-It creates a full sphten-liouv basis, calls `liquid` with `@endor_cw`, then performs the stated signal processing and plots the result using `plot_1d`.
+This is a CW ENDOR example, not the pulsed Mims sequence used by the neighboring methyl, nitroxide, and phenyl examples. The source supplies no explicit relaxation settings and does not save numerical data. Treat 0.33 and the coupling inputs as the code values shown: the source does not state their units in comments.

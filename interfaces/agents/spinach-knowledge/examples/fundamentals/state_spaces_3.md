@@ -1,13 +1,16 @@
 # examples/fundamentals/state_spaces_3.m
 
 - Signature: `state_spaces_3()`
+- Source: [`examples/fundamentals/state_spaces_3.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/state_spaces_3.m)
 
-## Purpose
+## Model and question
 
-Simulate transverse magnetisation in the fatty-acid system produced by `fatty_acid(15)` under scalar-coupling evolution and repeated 180° pulses, without relaxation, and inspect how the state spreads through correlation orders. The source estimates minutes of calculation time.
+This example follows transverse magnetisation in the fatty-acid system returned by `fatty_acid(15)`, under strong scalar coupling and repeated refocusing pulses. Its analysis asks how the trajectory occupies successive spin-correlation orders; it does not test angular or powder quadrature. The source states that relaxation is absent and estimates a runtime of minutes.
 
-## Method
+The field is 14.1 T. The basis uses `sphten-liouv`, `IK-2`, proximity level 1, and scalar-coupling connectivity; `greedy` and `prop_cache` are enabled. The initial state is proton `Lx`; the source also constructs a proton `L+` coil state, but does not pass that coil into the trajectory calculation. The Hamiltonian is built under the NMR assumption, without a relaxation term.
 
-The example uses the `sphten-liouv` formalism, `IK-2` basis approximation, proximal level 1, scalar-coupling connectivity, and a 14.1 T field. It starts from proton Lx magnetisation and observes with proton L+. After 50 trajectory points at `4e-5` s intervals, it applies eight pi-rotation pulses about Lx; each pulse is followed by 100 further points at the same interval. The combined trajectory is analysed with `trajan(...,'correlation_order')`.
+## Sequence and output
 
-The system enables `greedy` and `prop_cache`. No relaxation operator or relaxation evolution is included.
+Trajectory-mode `evolution` first propagates 50 points at 4e-5 s per point. Eight loop iterations then apply a `pi` rotation about proton `Lx`, each followed by 100 more trajectory points at the same time step. Thus the source specifies 850 sampled evolution points and nominally 0.034 s of free evolution, apart from the instantaneous pulse steps. `trajan(...,'correlation_order')` displays the resulting correlation-order trajectory.
+
+The source defines no numerical pass/fail threshold, convergence test, or reference trace; any visual axis scaling is not an acceptance criterion. The page therefore describes the sequence and diagnostic output without claiming that the trajectory was run or that a particular correlation order is sufficient.

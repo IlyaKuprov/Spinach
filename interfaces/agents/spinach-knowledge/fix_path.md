@@ -1,25 +1,27 @@
 # fix_path.m
 
 - Signature: `fix_path(config_style)`
+- Return value: none; the function changes MATLAB's search path and reports status to the command window.
 
 ## Purpose
 
-Configure MATLAB's search path for Spinach. With no argument, the function uses the `noob` configuration. It can also add Spinach to the current path, remove Spinach folders, or reset MATLAB's path before adding Spinach.
+Sets up or removes Spinach directories on the active MATLAB path. The Spinach root is located relative to `fix_path.m`; the four managed trees are `etc`, `experiments`, `interfaces`, and `kernel`, including their subdirectories.
 
-## Physical / mathematical content
+## Accepted input
 
-Not applicable: this utility changes the MATLAB search path and does not perform a physical or mathematical calculation.
+`config_style` must be a character array. If omitted, it defaults to `'noob'`. The accepted values and effects are:
 
-## Numerical / algorithmic content
+- `'noob'` and `'reset'`: call MATLAB's `restoredefaultpath`, add the four Spinach trees to the beginning of the path, then run `existentials` checks. This resets the MATLAB path before adding Spinach.
+- `'add'`: preserve the existing MATLAB path, add those same Spinach trees at the beginning, then run `existentials` checks.
+- `'remove'`: remove those Spinach trees from the path and report the removal; it does not reset MATLAB's path or remove unrelated entries.
 
-No numerical algorithm is used. The selected configuration determines which path operations are performed.
+An unrecognized style raises an error. Because the type check uses `ischar`, a MATLAB string scalar is not the documented character-array input.
 
-## Implementation structure
+## Operational notes
 
-- Default `config_style` to `noob` when the argument is omitted.
-- Check that `config_style` is a character string; reject other types.
-- Locate the Spinach root from this file's full path.
-- For `noob` or `reset`, restore MATLAB's default path, add the `etc`, `experiments`, `interfaces`, and `kernel` trees, then run `existentials`.
-- For `add`, add those four trees to the existing path and run `existentials`.
-- For `remove`, remove those four trees from the path.
-- Report the operation in the MATLAB console; reject any unrecognized configuration with an error.
+The path edits use `genpath` over each managed tree. The reset modes therefore replace the current path with MATLAB's default path before adding Spinach; use `'add'` when unrelated existing path entries should be retained. No value is returned.
+
+## Links
+
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/fix_path.m
+- [Spinach Wiki: fix_path.m](https://spindynamics.org/wiki/index.php?title=fix_path.m)

@@ -1,26 +1,24 @@
 # etc/textbook/r2csa2tauc.m
 
-- Signature: `tauc=r2csa2tauc(R2,del_sq,B0,isotope)`
+- MATLAB implementation: [etc/textbook/r2csa2tauc.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r2csa2tauc.m)
+
+**Signature:** `tauc=r2csa2tauc(R2,del_sq,B0,isotope)`
 
 ## Purpose
 
-Calculates rotational correlation-time solutions consistent with a transverse CSA relaxation rate under the model implemented by this function. The Zeeman angular frequency is obtained from `B0` and the isotope's magnetogyric ratio.
-
-## Method
-
-The transverse CSA relation is rearranged as a cubic in the correlation time, and the function evaluates its three closed-form roots. It returns the roots in the `tauc` vector; entries may be complex. If all three are non-real, the function reports that there are no real solutions under this model.
+Finds the three algebraic rotational-correlation-time solutions of the cubic relation implemented for a transverse CSA relaxation rate. The executable signature and parameter description use `R2`; the prototype in the source comment alone says `R1`.
 
 ## Inputs
 
-- `R2` — transverse relaxation rate in Hz; positive real scalar.
-- `del_sq` — positive real scalar, the second-rank CSA invariant (see `blinv`).
-- `B0` — real scalar magnetic field in tesla.
-- `isotope` — character array identifying the isotope (for example, `'1H'`).
+- `R2` — positive real numeric scalar; the source documents the transverse relaxation rate in Hz.
+- `del_sq` — positive real numeric scalar, documented as the second-rank CSA invariant (see `blinv.m`). The source does not specify its units.
+- `B0` — real numeric scalar magnetic field in tesla. The consistency check does not require it to be positive.
+- `isotope` — character array identifying the isotope, for example `'1H'`.
 
-## Output
+## Calculation and output
 
-- `tauc` — vector of three algebraic correlation-time solutions in seconds.
+The code obtains `omega=-B0*spin(isotope)` and evaluates three closed-form roots of the cubic (the source identifies the expressions as Mathematica-generated). The output `tauc` is a three-element vector of algebraic solutions in seconds; the function does not select a single positive/physical root. For the roots, it raises an error only when all three entries fail the real-valued check, with the message “no real solutions - physically impossible case.”
 
 ## Reference
 
-See the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=r2csa2tauc.m).
+[Spinach Wiki: r2csa2tauc.m](https://spindynamics.org/wiki/index.php?title=r2csa2tauc.m)

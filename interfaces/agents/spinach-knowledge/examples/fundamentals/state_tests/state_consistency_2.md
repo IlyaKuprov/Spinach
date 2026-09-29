@@ -1,11 +1,21 @@
 # examples/fundamentals/state_tests/state_consistency_2.m
 
-- Signature: `state_consistency_2()`
+Source: [examples/fundamentals/state_tests/state_consistency_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/state_tests/state_consistency_2.m)
 
-## Purpose
+Signature: `state_consistency_2()`
 
-Verify that a constructed two-spin state is represented consistently in Zeeman Hilbert space, Zeeman Liouville space, and spherical-tensor Liouville space after projection back to the Zeeman basis.
+## Tested question
 
-## Method
+Does one constructed two-spin operator give the same Hilbert-space matrix when built directly in Zeeman Hilbert space, built in Zeeman Liouville space, or built in spherical-tensor Liouville space and projected back to the Zeeman basis?
 
-The example uses non-interacting `14N` and `235U` spins at 14.1 T. In each formalism it builds the same operator state: Lz on spin 1 and Lx on spin 2, plus L+ on spin 1. The Zeeman Liouville representation is reshaped to a 24-by-24 matrix; the spherical-tensor representation is first transformed with `sphten2zeeman` and then reshaped. The three matrices must agree pairwise within an L1-norm tolerance of `1e-6`, or the test fails.
+## System and state
+
+The source sets `sys.magnet=14.1`, isotopes `14N` and `235U`, and both scalar Zeeman entries to zero. It declares no couplings. The basis approximation is `none`. The test state is `state(...,{'Lz','Lx'},{1,2}) + state(...,{'L+'},{1})`: the product component has `Lz` on spin 1 and `Lx` on spin 2, with an additional `L+` component on spin 1.
+
+## Representation comparison
+
+The source builds that state in `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`. The Zeeman-Liouville vector is reshaped to a 24-by-24 matrix. The spherical-tensor vector is first multiplied by `sphten2zeeman(spin_system)`, then reshaped to the same dimensions. The three Hilbert-space matrices are compared pairwise using the matrix 1-norm; any difference greater than `1e-6` triggers the failure branch.
+
+## Output and scope
+
+The function prints either `State consistency test PASSED.` or raises `State consistency test FAILED.`; it does not return the matrices or report their residuals. This is a fixed state-space representation check, not a quadrature test, and does not establish agreement for other systems, states, or approximations.

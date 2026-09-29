@@ -1,13 +1,21 @@
 # examples/nmr_overtone/mas_glycine_1.m
 
+- MATLAB implementation: [examples/nmr_overtone/mas_glycine_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/mas_glycine_1.m)
+
 - Signature: `mas_glycine_1()`
 
-## Purpose
+## What the example models
 
-Simulates the 14N overtone MAS spectrum of glycine with the Fokker–Planck formalism. The quadrupolar tensor data are attributed to [O'Dell and Ratcliffe](http://dx.doi.org/10.1016/j.cplett.2011.08.030); the simulation parameters reproduce Figure 3b of [the cited paper](http://dx.doi.org/10.1039/C4CP03994G). The source estimates a calculation time of minutes.
+This is a single-spin 14N overtone MAS calculation using the Fokker-Planck formalism and `singlerot(...,@overtone_pa,...,'qnmr')`. The source sets `sys.magnet=14.1`, `sys.isotopes={'14N'}`, and constructs the quadrupolar interaction with `eeqq2nqi(1.18e6,0.53,1,[0 0 0])`; it sets `inter.zeeman.scalar{1}=32.4`. These are the source's literal values and constructor arguments; the source does not attach additional units to the tensor or scalar values. The basis is the full `sphten-liouv` basis (`approximation='none'`). Relaxation is `{'damp'}`, with diagonal terms retained, zero equilibrium, and `damp_rate=300`.
 
-## Scientific and numerical content
+The source cites O'Dell and Ratcliffe for the glycine quadrupolar tensor data ([DOI 10.1016/j.cplett.2011.08.030](https://doi.org/10.1016/j.cplett.2011.08.030)). Separately, it says its simulation parameters are set to reproduce Figure 3b of the authors' paper ([DOI 10.1039/C4CP03994G](https://doi.org/10.1039/C4CP03994G)). That is a statement of the example's intended comparison, not evidence here of an experimental reproduction or an independently checked match.
 
-The model uses a single 14N spin at 14.1 T, with the quadrupolar interaction set by `eeqq2nqi(1.18e6,0.53,1,[0 0 0])` and scalar Zeeman value 32.4. The basis is `sphten-liouv` with no approximation; diagonal damping is specified at rate 300 with zero equilibrium. The script disables Krylov and trajectory-level methods.
+## Rotor, preparation and detection
 
-At the magic angle, it calls `singlerot` with `@overtone_pa` and the `qnmr` pathway. The setup uses rank 6, rotor rate -19840, the `rep_2ang_6400pts_sph` grid, a 44–52 kHz sweep and 256 points with 256-point zero filling. It prepares and detects using the angle-weighted Lz/Lx combinations, applies a 260 μs pulse (55 kHz power factor and 48 kHz offset), and phases the result by 1.35 rad before plotting its real part.
+The source defines the magic angle as `atan(sqrt(2))`. The single-rotor settings are rank 6, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate `-19840`, and grid `'rep_2ang_6400pts_sph'`. The sweep is `[44e3 52e3]`, with `axis_units='kHz'`, 256 points and 256-point zero filling; these are the script's assigned values, not converted values.
+
+Preparation starts from `state(...,'Lz','14N')`. Both the coil and the `Lx` operator are the same angle-weighted combination of the 14N `Lz` and `Lx` states/operators, with coefficients `cos(theta)` and `sin(theta)`. The pulse fields are `rf_pwr=2*pi*55e3/sin(theta)`, `rf_dur=260e-6`, and `rf_frq=48e3`; the method is `'average'`. No contact-time or fitting workflow is defined in this source.
+
+## Output and limits
+
+The script phases the returned spectrum by `exp(1i*1.35)` and plots `real(spectrum)` with `plot_1d`. The source labels the calculation time as minutes. It defines a plotted simulation, not a saved data product; it does not report a fit, validation, or the numerical spectrum values.

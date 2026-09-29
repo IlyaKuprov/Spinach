@@ -1,21 +1,21 @@
 # examples/optimal_control/bloch_siegert/coote_badcop.m
 
 - Signature: `coote_badcop()`
+- Source: [examples/optimal_control/bloch_siegert/coote_badcop.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/bloch_siegert/coote_badcop.m)
+- Publication cited in the source: [Coote et al. DOI 10.1038/s41467-018-05400-4](https://doi.org/10.1038/s41467-018-05400-4)
 
-## Purpose
+## Objective and source-linked parameter set
 
-Reproduces the BADCOP-style selective-decoupling designs from [Coote et al.](https://doi.org/10.1038/s41467-018-05400-4), with Bloch-Siegert corrections enabled during design and validation. BADCOP1, BADCOP2, and BADCOP3 are designed and evaluated. Calculation time: minutes.
+The source estimates calculation time in minutes. Estimated calculation time: minutes. The example formulates BADCOP-style selective carbon decoupling pulse design with Bloch-Siegert (BSS) corrections. Its code comments associate durations, RF ceilings, contraction factor, and inversion bands with Table 1 and the article text, and the carrier with Supplementary Figure 5 of the cited paper.
 
-## Physical / mathematical content
+The model is a single `13C` spin at 18.8 T (approximately 800 MHz for `1H`) with zero scalar offset at the reference carrier. The carrier is 53.2 ppm, the contraction factor `alpha_scale` is 0.91, and total pulse duration is 1 ms. The optimizer uses 200 equal slices (5 microseconds each), L-BFGS with at most 200 iterations, and a correlated ensemble objective. The three RF ceilings are 5.94 kHz (BADCOP1), 4.87 kHz (BADCOP2), and 7.22 kHz (BADCOP3); each is converted to an angular-frequency control level as `2*pi*rf_hz`.
 
-- The model is a single (^{13}mathrm{C}) spin at 18.8 T, with zero scalar offset and a 53.2 ppm carrier. It builds correlated state-to-state targets over C-alpha and CO offset grids, C-beta inversion bands, and, for BADCOP2/3 only, C-beta preservation points outside the inversion band. The stated duration, RF ceilings, contraction factor, inversion bands, and carrier are taken from Table 1, the paper text, and Supplementary Figure 5.
-- The paper parameters are `alpha_scale=0.91` and `pulse_dur=1e-3` s. The three designs use RF ceilings of 5.94, 4.87, and 7.22 kHz and C-beta inversion bands of 5–37, 28–35, and 10–45 ppm, respectively. The latter two also target preservation outside their inversion bands.
+## Offset targets and constraints
 
-## Numerical / algorithmic content
+The offset list combines 100 C-alpha points from 40 to 72 ppm, 30 C-prime points from 165 to 185 ppm, and 60 C-beta inversion points within each variant's band: 5-37 ppm for BADCOP1, 28-35 ppm for BADCOP2, and 10-45 ppm for BADCOP3. For C-alpha offsets, alternating `Ix` and `Iy` states target their free precession under the offset Hamiltonian for `alpha_scale * pulse_duration`. C-prime and C-beta inversion points map `Iz -> -Iz`.
 
-- The C-alpha grid is 40–72 ppm (100 points), the CO grid 165–185 ppm (30 points), each C-beta inversion grid has 60 points, and preservation points are selected from an 80-point 5–80 ppm grid. The 1 ms pulse has 200 slices. L-BFGS runs for at most 200 iterations with the `rho_ens` ensemble correlation and BSS enabled.
-- Adapted and unadapted pulses are separately optimized and then propagated with BSS physics on a 251-point 0–200 ppm validation grid; the plotted profiles compare final (M_Z), with the inversion-band boundaries marked.
+Only BADCOP2 and BADCOP3 add C-beta preservation targets. Their additional 80-point grid spans 5-80 ppm, excluding the corresponding inversion band; each such point maps `Iz -> Iz`. The optimizer uses the chemical-shift offsets with `Lz` as the offset operator and has BSS corrections enabled for the corrected design.
 
-## Implementation structure
+## Evaluation observable
 
-- Set the single-spin model and sphten-liouv basis; construct operators, normalized states, and drift Hamiltonian; define shared paper parameters and the three variants; assemble offset-correlated targets and optimize BSS-aware pulses; optimize comparison pulses without BSS correction; validate both on the dense offset grid and plot the magnetization profiles.
+The code also optimises a BSS-disabled waveform for each variant. It evaluates both waveforms with BSS physics present over 251 points from 0 to 200 ppm, propagates with `shaped_pulse_xy` and `expv-pwc`, and records final longitudinal magnetisation as `real(Iz' * rho)`. The plotted profiles mark the specified C-beta inversion-band edges.

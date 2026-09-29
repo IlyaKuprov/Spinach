@@ -1,21 +1,18 @@
 # kernel/plotting/kfigure.m
 
-- Signature: `handle=kfigure(varargin)`
+Source: [kernel/plotting/kfigure.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/kfigure.m) · Source-listed Wiki URL: [Wiki](https://spindynamics.org/wiki/index.php?title=pauli.m)
 
-## Purpose
+- Signature: `handle = kfigure(varargin)`
 
-Sets four MATLAB root figure defaults to pre-R2025a values, creates a figure with the supplied arguments, and returns its handle.
+## Behavior and figure defaults
 
-## Physical / mathematical content
+Before creating a figure, `kfigure` sets these four defaults on MATLAB's root object `groot`:
 
-## Numerical / algorithmic content
+- `DefaultFigurePosition`: `[680 458 560 420]`
+- `DefaultFigureWindowStyle`: `normal`
+- `DefaultFigureMenuBar`: `figure`
+- `DefaultFigureToolbar`: `figure`
 
-- Sets `DefaultFigurePosition` to `[680 458 560 420]`, `DefaultFigureWindowStyle` to `normal`, `DefaultFigureMenuBar` to `figure`, and `DefaultFigureToolbar` to `figure` on `groot` before calling `figure`.
+The position value is retained as supplied to the root default; the function does not set a figure coordinate unit. The source describes these as the pre-R2025a settings. It then calls `figure(varargin{:})` and returns that handle. The root defaults are global MATLAB figure defaults and remain changed after the call, affecting later figures unless reset elsewhere.
 
-## Parameters / inputs
-
-- `varargin` - arguments forwarded to MATLAB's `figure` function
-
-## Outputs
-
-- `handle` - handle returned by `figure(varargin{:})`
+All input arguments are forwarded to MATLAB's `figure`; this function performs no input validation. It creates a figure but does not calculate plot data, axes limits, or physical quantities.

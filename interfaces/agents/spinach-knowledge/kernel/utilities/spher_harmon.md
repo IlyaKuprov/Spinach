@@ -1,37 +1,31 @@
 # kernel/utilities/spher_harmon.m
 
-- Signature: `Y=spher_harmon(l,m,theta,phi)`
-
 ## Purpose
 
-Evaluate spherical harmonics at the specified angles.
+Evaluates spherical harmonics Y(l,m,theta,phi) at user-specified polar and azimuthal angles.
 
-## Physical / mathematical content
+## Behavior
 
-- Uses Schmidt-normalized associated Legendre functions and the azimuthal factor `exp(1i*m*phi)`.
+- Syntax: `Y=spher_harmon(l,m,theta,phi)`.
+- Input consistency is enforced by an internal `grumble` subfunction, which errors out when: `l` is not a non-negative real integer; `m` is not a real integer in the interval `[-l,l]`; `theta` or `phi` is not numeric and real.
+- Schmidt-normalized associated Legendre functions are obtained with MATLAB's `legendre(l,cos(theta),'sch')`, reshaped to `[l+1 numel(theta)]`, and the row `abs(m)+1` is extracted and reshaped back to the size of `theta`.
+- The spherical harmonic is assembled as `sqrt((2*l+1)/(4*pi))*S.*exp(1i*m*phi)`; for nonzero `m` an additional division by `sqrt(2)` is applied.
+- If `m>0` and `m` is odd, the sign of `Y` is flipped.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- Computes `S=legendre(l,cos(theta),'sch')` and selects the `abs(m)+1` component, reshaping it to the size of `theta`.
-- Forms `Y=sqrt((2*l+1)/(4*pi))*S.*exp(1i*m*phi)`, dividing by `sqrt(2)` when `m` is nonzero. Negates `Y` when `m` is positive and odd.
+Inputs:
 
-## Parameters / inputs
+- `l` — L quantum number; non-negative real integer.
+- `m` — M quantum number; real integer from `[-l,l]`.
+- `theta` — array of theta angles in radians; numeric and real.
+- `phi` — array of phi angles in radians; numeric and real.
 
-- `l` — L quantum number; a numeric, real, scalar, non-negative integer.
-- `m` — M quantum number; a numeric, real, scalar integer in `[-l,l]`.
-- `theta` — numeric, real array of theta angles in radians.
-- `phi` — numeric, real array of phi angles in radians.
-
-## Outputs
+Output:
 
 - `Y` — array of spherical harmonics evaluated at the specified angles.
 
-## Implementation structure
+## References
 
-- Checks input constraints with `grumble(l,m,theta,phi)`, computes the selected Schmidt-normalized Legendre component, then forms the spherical harmonics.
-
-Source: [spher_harmon.m](https://spindynamics.org/wiki/index.php?title=spher_harmon.m).
-
-ilya.kuprov@weizmann.ac.il
-
-<https://spindynamics.org/wiki/index.php?title=spher_harmon.m>
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/spher_harmon.m>
+- Spin Dynamics Wiki: <https://spindynamics.org/wiki/index.php?title=spher_harmon.m>

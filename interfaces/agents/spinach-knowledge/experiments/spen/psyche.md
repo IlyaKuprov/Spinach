@@ -1,49 +1,18 @@
 # experiments/spen/psyche.m
 
-- Signature: `fid=psyche(spin_system,parameters,H,R,K,G,F)`
+Canonical source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/spen/psyche.m
+Spinach Wiki: https://spindynamics.org/wiki/index.php?title=psyche.m
 
-## Purpose
+`fid=psyche(spin_system,parameters,H,R,K,G,F)` models the PSYCHE pure-shift NMR sequence and returns a two-dimensional FID. The imaging context supplies the Fokker–Planck operators; the source combines them as `L=H+F+1i*R+1i*K` and extends the spin pulse operators across the spatial grid.
 
-PSYCHE pure-shift NMR pulse sequence that returns a two-dimensional free induction decay.
+## Coherence pathway, chirps, and acquisition
 
-## Parameters / inputs
+From `rho0`, a hard 90-degree pulse about `Lx` precedes the first half of F1 evolution. The sequence selects `+1` coherence, evolves for `delta` under `L+g_amp*G{1}`, applies a hard 180-degree pulse about `Lx`, and repeats that gradient-containing interval before selecting `-1` coherence. The PSYCHE element is a pair of chirps under the same gradient-containing generator: the first uses quadratures `{Cx,+Cy}`; after selection of zero coherence, the second uses `{Cx,-Cy}`. The pathway is then selected at `+1` and the second half of F1 is propagated in refocusing mode.
 
-- `parameters.rho0`: initial state.
-- `parameters.coil`: detection state.
-- `parameters.spins`: nuclei on which the sequence runs; a one-element cell array.
-- `parameters.g_amp`: gradient amplitude (T/m).
-- `parameters.dims`: sample size (m).
-- `parameters.npts`: number of spatial grid discretisation points.
-- `parameters.npoints`: two-element point-count vector `[F1 F2]`.
-- `parameters.diff`: diffusion constant (m^2/s).
-- `parameters.delta`: gradient evolution delay on either side of the hard 180-degree pulse (s).
-- `parameters.timestep1`, `parameters.timestep2`: F1 and F2 evolution time steps (s).
-- `parameters.pulsenpoints`: number of chirp waveform discretisation points.
-- `parameters.duration`: duration of each PSYCHE chirp pulse (s).
-- `parameters.bandwidth`: chirp sweep bandwidth around zero frequency (Hz).
-- `parameters.smfactor`: chirp smoothing parameter; see `chirp_pulse.m`.
-- `parameters.chirptype`: chirp waveform type; see `chirp_pulse.m`.
-- `parameters.beta`: PSYCHE-element flip angle (degrees).
-- `H`, `R`, `K`: Fokker–Planck Hamiltonian, relaxation superoperator, and kinetics superoperator, respectively, from the imaging context.
-- `G`: three Fokker–Planck gradient superoperators from the imaging context.
-- `F`: Fokker–Planck diffusion and flow superoperator from the context.
+The waveform comes from `chirp_pulse(pulsenpoints,duration,bandwidth,smfactor,chirptype)`. The source normalizes both components by `max(Cx)` and scales them by `2*pi*rfbeta`. For `chirptype='saltire'`, `rfbeta=(beta/360)*sqrt(2*bandwidth/duration)`; for other supported chirp types it computes `q_beta=-(2*log(cosd(beta)/2+1/2))/pi` and `rfbeta=sqrt(duration*bandwidth*q_beta/(2*pi))/duration`. Each chirp lasts `duration`, divided equally across the waveform points.
 
-## Physical / numerical content
+F1 is represented by `npoints(1)` points: each half uses `timestep1/2` and `npoints(1)-1` propagation steps, first in trajectory mode and then in refocusing mode. F2 is observed with `coil` under `L`, using `timestep2` and `npoints(2)-1` steps. Thus `fid` carries the requested F1 and F2 axes with point counts `npoints(1)` and `npoints(2)`; it is a simulated FID, not a transformed spectrum or measured result.
 
-The sequence forms `L=H+F+1i*R+1i*K` and constructs spatially extended `Lx` and `Ly` pulse operators. It generates a chirp waveform with `chirp_pulse`, calculates its RF amplitude from `beta` using a separate formula for `chirptype='saltire'`, normalises the waveform, and scales both quadratures by `2*pi*rfbeta`.
+## Required inputs
 
-A hard 90-degree pulse precedes the first half of F1 evolution. The sequence selects `+1` coherence, evolves for `delta` under `L+g_amp*G{1}`, applies a hard 180-degree pulse, and repeats that gradient evolution. It then selects `-1` coherence, applies the first gradient-assisted chirp with quadratures `{Cx,+Cy}`, selects `0` coherence, applies the second chirp with `{Cx,-Cy}`, and selects `+1` coherence. Each chirp is propagated with `shaped_pulse_xy` using `expv-pwc`. Refocused second-half F1 evolution is followed by F2 observable evolution using `parameters.coil`.
-
-## Output
-
-- `fid`: PSYCHE free induction decay as a 2D array.
-
-## Consistency checks
-
-Requires `sphten-liouv` formalism; matching-dimension numeric matrices `H`, `R`, `K`, and `F`; and a three-element cell array of numeric gradient operators `G`. Initial and detection states must be numeric column vectors matching `H`. `npoints` contains two integers greater than one; `npts` and `pulsenpoints` are positive integers. `dims`, `duration`, `bandwidth`, `timestep1`, and `timestep2` are positive finite real scalars; `diff` and `delta` are non-negative finite real scalars; `g_amp`, `smfactor`, and `beta` are finite real scalars. Supported `chirptype` values are `wurst`, `wurst-adaptive`, `smoothed`, `smoothed-adaptive`, `saltire`, and `saltire-adaptive`.
-
-## Source attribution
-
-- mohammadali.foroozandeh@chem.ox.ac.uk
-- mariagrazia.concilio@sjtu.edu.cn
-- <https://spindynamics.org/wiki/index.php?title=psyche.m>
+The function requires `rho0`, `coil`, one-element `spins`, `g_amp` (T/m), `dims` (m), `npts`, `npoints` (two integer axis lengths, each greater than one), `diff` (m^2/s), `pulsenpoints`, `duration` (s), `bandwidth` (Hz), `smfactor`, `chirptype`, `beta` (degrees), `timestep1` and `timestep2` (s), and `delta` (s). The checks require positive `dims`, `npts`, `pulsenpoints`, `duration`, `bandwidth`, and time steps; non-negative `diff` and `delta`; and finite real scalar gradient amplitude, smoothing factor, and flip angle. Supported `chirptype` values are `wurst`, `wurst-adaptive`, `smoothed`, `smoothed-adaptive`, `saltire`, and `saltire-adaptive`. The source requires `sphten-liouv` formalism; matrix inputs `H`, `R`, `K`, and `F` must have matching dimensions, and `G` must be a three-element cell array of numeric gradient operators.

@@ -1,19 +1,19 @@
 # examples/nmr_liquids/ct_cosy_2spins.m
 
+- MATLAB implementation: [examples/nmr_liquids/ct_cosy_2spins.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/ct_cosy_2spins.m)
+
 - Signature: `ct_cosy_2spins()`
 
 ## Purpose
 
-CT COSY spectrum for 2 spins. Calculation time: minutes. Source assignment: [doi:10.1002/jhet.5570250160](http://dx.doi.org/10.1002/jhet.5570250160).
+A two-proton constant-time COSY calculation, using the chemical-shift and coupling assignment cited in [DOI 10.1002/jhet.5570250160](http://dx.doi.org/10.1002/jhet.5570250160). The source labels the run as taking minutes.
 
-## Physical / mathematical content
+## Spin system and sequence
 
-This is a constant-time COSY simulation of a two-proton spin system. The two sites have shifts 2.00 and 5.00, with a scalar coupling of 7.0; the spectrum is calculated by Spinach's liquid-state `ct_cosy` sequence.
+The model has two 1H sites at 2.00 and 5.00 ppm in a 5.9 T field, joined by a 7.0 Hz scalar coupling. The wrapper uses the complete spherical-tensor Liouville basis (`sphten-liouv`, no basis approximation) and calls the liquid-state `ct_cosy` sequence through `liquid(...,'nmr')`. It requests proton detection, sets offset to 500 and sweeps to [2000 2000], with 512 acquired points and 2048 zero-fill points per dimension; the displayed axes are requested in ppm.
 
-## Numerical / algorithmic content
+The wrapper contains no separate mixing-time, phase-cycle table, or receiver-phase setting: it supplies the spin system and acquisition parameters to `ct_cosy`. Treat sequence-internal timing and coherence/receiver handling as belonging to that sequence implementation, not as independently specified here.
 
-The source sets field value 5.9 and uses the full `sphten-liouv` basis (no approximation), offset 500, sweep [2000 2000], 512 points and 2048 zero-fill points on each axis. It applies a squared-cosine apodisation to both dimensions, computes a shifted 2D FFT, and plots the spectrum magnitude in positive mode.
+## Processing and output
 
-## Implementation structure
-
-The function defines the two proton sites and their interaction, builds the Spinach system and basis, then calls `liquid(...,@ct_cosy,...,'nmr')`. The FID is windowed and Fourier-transformed before plotting.
+Both dimensions receive squared-cosine apodisation. The resulting 2D FID is Fourier transformed with a shifted 2D FFT, and its magnitude is displayed with the positive plotting convention. This is a simulated spectrum from the two-site model; the example does not load experimental data or report an experimental comparison.

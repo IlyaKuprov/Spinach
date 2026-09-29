@@ -1,34 +1,21 @@
 # kernel/optimcon/alpha_conds.m
 
-- Signature: `test=alpha_conds(test_type,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/alpha_conds.m
+Wiki: https://spindynamics.org/wiki/index.php?title=alpha_conds.m
 
-## Purpose
+## Purpose and interface
 
-Applies a selected line-search acceptance test used by the bracketing and sectioning routines in constrained optimisation. Returns true when the selected condition is satisfied.
+`alpha_conds(test_type,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system)` evaluates one selected line-search acceptance condition and returns its logical result. It tests a candidate; it does not perform the search or propagate a state.
 
-## Numerical / algorithmic content
+## Conditions
 
-- `test_type=0`: monotonic increase, `fx_1 > fx_0`.
-- `test_type=1`: Armijo sufficient increase, `fx_1 >= fx_0 + spin_system.control.ls_c1*alpha*(gfx_0'*dir)`.
-- `test_type=2`: strong Wolfe curvature, `abs(gfx_1'*dir) <= spin_system.control.ls_c2*abs(gfx_0'*dir)`.
-- `test_type=3`: positive directional derivative at the trial point, `gfx_1'*dir > 0`.
+- `test_type=0`: strict monotonic increase, `fx_1>fx_0`.
+- `test_type=1`: Armijo sufficient increase, `fx_1>=fx_0+spin_system.control.ls_c1*alpha*(gfx_0'*dir)`.
+- `test_type=2`: strong Wolfe curvature, `abs(gfx_1'*dir)<=spin_system.control.ls_c2*abs(gfx_0'*dir)`.
+- `test_type=3`: positive trial directional derivative, `gfx_1'*dir>0`.
 
-## Parameters / inputs
+The comparisons and constants above are exactly those in the branch expressions. The routine reads `ls_c1` for type 1 and `ls_c2` for type 2; the gradient-direction products use MATLAB transpose, with the relevant vectors checked as real columns.
 
-- `test_type` — condition selector (`0`, `1`, `2`, or `3`).
-- `alpha` — trial step length; used by test 1.
-- `fx_0`, `fx_1` — objective values at the initial and trial points; used by tests 0 and 1.
-- `gfx_0` — gradient at the initial point; used by tests 1 and 2.
-- `gfx_1` — gradient at the trial point; used by tests 2 and 3.
-- `dir` — search direction vector; used by tests 1, 2, and 3.
-- `spin_system` — Spinach data structure containing the line-search settings in `control`.
+## Input checks
 
-## Outputs
-
-- `test` — logical true if the selected condition is satisfied.
-
-## Implementation structure
-
-The function checks that `test_type` is a real scalar in `0:3`. It validates the inputs used by each test: required objective values and `alpha` are real scalars; required gradients and `dir` are real column vectors with matching dimensions. It then evaluates the selected condition.
-
-[Source documentation](https://spindynamics.org/wiki/index.php?title=alpha_conds.m)
+`test_type` must be a real numeric scalar in `0:3`. Types 0 and 1 require real scalar `fx_0` and `fx_1`; type 1 additionally requires real scalar `alpha`, real column `gfx_0`, and real column `dir`. Type 2 requires real columns `gfx_0`, `gfx_1`, and `dir`; type 3 requires real columns `gfx_1` and `dir`. The source checks matching dimensions between the direction and the gradients used in each condition. `spin_system` supplies the control coefficient only for types 1 and 2.

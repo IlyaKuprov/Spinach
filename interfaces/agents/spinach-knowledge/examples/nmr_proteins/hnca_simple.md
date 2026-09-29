@@ -1,23 +1,17 @@
 # examples/nmr_proteins/hnca_simple.m
 
+Source: [examples/nmr_proteins/hnca_simple.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/hnca_simple.m)
+
 - Signature: `hnca_simple()`
 
-## Purpose
+## Task and model
 
-A minimal example of HNCA pulse sequence simulation. Calculation time: seconds.
+This is an in-silico 3D HNCA backbone experiment on a minimal four-nucleus model, not a simulation of a supplied protein or an imported measured spectrum. The model contains `15N` (N), `13C` (CA), `1H` (H), and a second `13C` (C). The field parameter is 14.1 T. Scalar shifts are [110, 60, 8, 180] ppm in that spin order; nonzero scalar couplings are N-H 92 Hz, N-CA 11 Hz, N-C 15 Hz, CA-C 55 Hz, CA-H 2 Hz, and H-C 4 Hz.
 
-## Physical / mathematical content
+The basis is `sphten-liouv` with approximation `none`. The sequence function `hnca` defines F1 as 15N, F2 as 13C (the CA coherence pathway in this sequence), and F3 as 1H; its default receiver state is the NH proton coherence. Its four returned fields are the phase/sign branches for States quadrature, not four different receiver nuclei. The example sets sweeps [2800, 5000, 3000] Hz, offsets [-7200, 8600, 5100] Hz, 64 points per dimension, and zero-fills each dimension to 256; axes are requested in ppm. The sequence implementation uses 92 Hz for J_NH and 11.5 Hz for J_NCA during transfer; the simple spin-system coupling entry for N-CA above is 11 Hz.
 
-- Simulates a four-spin system containing `15N`, `13C` (CA), `1H`, and `13C` (C) at a magnetic field of 14.1. Scalar Zeeman values are `[110 60 8 180]`; the specified scalar couplings are N–H 92, N–CA 11, N–C 15, CA–C 55, CA–H 2, and H–C 4.
-- Uses the `sphten-liouv` basis with no approximation.
+## Processing and output
 
-## Numerical / algorithmic content
+The script calls `liquid(spin_system,@hnca,parameters,'nmr')`, applies square-cosine apodisation in all three dimensions, then performs shifted FFTs in F3, F2, and F1. It combines the four phase/sign branches by conjugation and addition to form the absorptive components. The plotted output is `-real(spectrum)`, using `plot_3d` with contour threshold 10, bounds [0.2, 0.9, 0.2, 0.9], dimension 2, and positive contours. The source estimates seconds of calculation time; this was not benchmarked here.
 
-- Calls `liquid(spin_system,@hnca,parameters,'nmr')` with spins `{'15N','13C','1H'}`, sweep widths `[2800 5000 3000]`, offsets `[-7200 8600 5100]`, 64 points per dimension, 256-point zero filling per dimension, and `ppm` axis units.
-- Applies squared-cosine apodisation in all three dimensions to each of the four acquired components: `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg`.
-- Performs shifted, zero-filled FFTs along F3, F2, then F1. Conjugate combinations of the phase components form the absorption parts of the F3 and F2 signals before the final transform.
-
-## Implementation structure
-
-- Defines the field, spin system, interactions, basis, and sequence parameters; constructs the Spinach system with `create` and `basis`.
-- Simulates the HNCA sequence, processes the four signal components into a three-dimensional spectrum, and plots `-real(spectrum)` using `plot_3d` with positive display.
+The sequence source cites the bidirectional-propagation method at http://dx.doi.org/10.1016/j.jmr.2014.04.002.

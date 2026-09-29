@@ -1,51 +1,44 @@
 # interfaces/g2spinach.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/g2spinach.m) · [Spinach Wiki: g2spinach.m](https://spindynamics.org/wiki/index.php?title=g2spinach.m)
+
 - Signature: `[sys,inter]=g2spinach(props,particles,references,options)`
 
-## Purpose
+## Inputs and selection
 
-Converts parsed Gaussian or ORCA electronic-structure properties into Spinach isotope and interaction data. Including an electron in `particles` selects EPR import; otherwise the routine imports NMR parameters.
+`props` is the property structure from `gparse` or `oparse`. `particles` is a cell array of two-entry cells, each containing an element symbol and a Spinach isotope string, for example `{{'H','1H'},{'N','15N'}}`. The routine walks `props.symbols` in atom order and selects entries whose element symbol matches a requested element; it returns the corresponding requested isotope in `sys.isotopes`. Add `{'E','E'}` to select EPR import. In EPR mode the electron is appended as the final spin, not mapped to a geometry atom.
 
-## Import behavior
+Supply `references` as a numeric vector with one value per entry of `particles`; these are absolute shielding values in ppm chosen to put each reference substance at zero chemical shift. Use reference calculations with the same method as the molecule. Zero values correspond to bare-nucleus referencing. `options` is optional; supported fields are `no_xyz`, `min_j`, `min_hfc`, and `purge` (the latter is relevant to EPR). The implementation's input checks require `props` to be a structure, `particles` to be a cell array, and the numeric reference vector to have matching length.
 
-For NMR, nuclear chemical-shift tensors are formed from the negative shielding tensor plus the supplied reference value. Available quadrupolar tensors and spin-rotation tensors are imported. Isotope-independent `k_couplings` are converted to isotope-specific scalar couplings using the spins' gyromagnetic ratios; supplied `j_couplings` are used as isotope-specific values and trigger a warning.
+By default, selected standard-geometry rows are returned as per-spin coordinate cells in `inter.coordinates`; `options.no_xyz` suppresses them. The EPR electron coordinate is empty. This mapping assumes parser atom order and symbols are the desired atom identities; the routine does not use atom labels to disambiguate repeated elements.
 
-For EPR, the electron is appended to the isotope list, its g-tensor is imported, and the selected nuclei's hyperfine tensors are converted to Hz and scaled by the target/source nuclear gyromagnetic-ratio. This scaling is applied before thresholding or purging. Each selected nucleus with a nonempty source hyperfine tensor must have explicit source-isotope metadata in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); malformed or missing metadata and zero-gamma source isotopes are rejected. The EPR branch sets nuclear chemical shifts to zero and ignores the reference values and offset specification. Molecular coordinates come from `props.std_geom`; `options.no_xyz=1` suppresses them, and the electron has no molecular coordinate.
+## NMR import
 
-## Parameters / inputs
+When no electron is requested, an available shielding tensor `props.cst` becomes `inter.zeeman.matrix{n}=-props.cst{atom}+references(ref_index(n))I` in ppm, with the matching reference selected from the particle list. Available nuclear quadrupole tensors are placed on the diagonal of `inter.coupling.matrix`; for nuclei with spin `I>1/2`, the parser tensor is divided by `2I(2I-1)`. Available spin-rotation tensors are copied to `inter.spinrot.matrix`. These parser fields use Hz for quadrupolar and spin-rotation tensors.
 
-- `props`: parsed output from `gparse` or `oparse`, with properties needed for the selected mode. EPR import requires explicit source-isotope metadata for every selected nonempty hyperfine tensor.
-- `particles`: cell array of element/isotope pairs to import, for example `{{'H','1H'},{'N','15N'}}`. Including `{'E','E'}` selects EPR mode.
-- `references`: vector of absolute shielding values for the reference substances, one per particle, to place at zero ppm; calculate these with the same electronic-structure method. References are ignored in EPR mode.
+For scalar couplings, `k_couplings` takes precedence when present: the isotope-independent K values are converted to isotope-specific J values using both selected nuclei's gyromagnetic ratios and the source prefactor, and the code's factor of one-half. Otherwise `j_couplings` is selected directly with a factor of one-half; this branch prints a warning that those values are isotope-specific and are not rescaled. `options.min_j` retains only values whose absolute magnitude is strictly greater than the threshold. The returned scalar matrix is a cell array in Hz.
 
-  The source gives the following absolute isotropic shielding values for tetramethylsilane in vacuum:
+## EPR import
 
-  | Method | 13C | 1H |
-  |---|---:|---:|
-  | GIAO, B3LYP/6-31G* | 189.6621 | 32.1833 |
-  | GIAO, B3LYP/6-311+G(2d,p) | 182.4485 | 31.8201 |
-  | GIAO, HF/6-31G* | 199.9711 | 32.5957 |
-  | GIAO, HF/6-311+G(2d,p) | 192.5828 | 32.0710 |
-  | CSGT, B3LYP/6-31G* | 188.5603 | 29.1952 |
-  | CSGT, B3LYP/6-311+G(2d,p) | 182.1386 | 31.7788 |
-  | CSGT, HF/6-31G* | 196.8670 | 29.5517 |
-  | CSGT, HF/6-311+G(2d,p) | 192.5701 | 31.5989 |
+The electron's `props.g_tensor.matrix` is the only nonzero Zeeman tensor. Nuclear shifts and offsets are ignored. Each selected nucleus is coupled symmetrically to the electron using its full hyperfine tensor: the source Gauss tensor is converted to Hz with `gauss2mhz`, then scaled by target/source gyromagnetic ratio. Nonempty HFCs require an explicit source isotope in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); missing, invalid, or zero-gyromagnetic-ratio sources are rejected. The converter uses Spinach's `spin` and `gauss2mhz` routines for isotope and field-unit conversions.
 
-  This reference setting is ignored when electrons are present.
-- `options.min_j`: scalar-coupling threshold in Hz; NMR couplings with absolute value at or below this threshold are zeroed.
-- `options.min_hfc`: EPR hyperfine threshold in Hz; tensors whose Frobenius norm is below it are removed.
-- `options.purge`: when set to `'on'` in EPR mode, removes nuclear spins with no remaining hyperfine coupling after thresholding.
-- `options.no_xyz`: when set to 1, omits coordinate information while retaining interaction tensors.
+`options.min_hfc` clears each coupling whose scaled tensor's Frobenius norm is below the threshold. With `options.purge='on'`, nuclei with no remaining coupling to the electron are removed from the isotope, Zeeman, coupling, and coordinate data. Without purge, these entries remain in the returned system.
 
-## Outputs
+## Outputs and reference values
 
-- `sys.isotopes`: imported isotope labels.
-- `inter.coordinates`: imported molecular coordinates in Angstrom when enabled; the EPR electron has an empty coordinate entry.
-- `inter.zeeman.matrix`: one 3-by-3 matrix per spin, in ppm for nuclei and as the g-tensor for the electron.
-- `inter.coupling.matrix`: 3-by-3 coupling tensors in Hz, including imported hyperfine or quadrupolar interactions.
-- `inter.coupling.scalar`: scalar couplings in Hz when supplied.
-- `inter.spinrot.matrix`: imported spin-rotation tensors when present.
+`sys.isotopes` lists the selected isotope strings (and the appended electron in EPR mode). `inter` uses cells: `zeeman.matrix` holds one 3-by-3 tensor per spin; `coupling.matrix` is an N-by-N cell array of 3-by-3 tensors; `coupling.scalar` is an N-by-N cell array of scalar values; and coordinates and spin-rotation tensors are stored per spin. These fields are conditional on the applicable import path and available `props` fields. Scalar couplings and converted EPR hyperfine tensors are in Hz.
 
-## Source
+For reference, the source documents these vacuum TMS absolute shielding values (13C, 1H):
 
-[Spinach Wiki: g2spinach.m](https://spindynamics.org/wiki/index.php?title=g2spinach.m)
+| Method | 13C | 1H |
+|---|---:|---:|
+| GIAO, B3LYP/6-31G* | 189.6621 | 32.1833 |
+| GIAO, B3LYP/6-311+G(2d,p) | 182.4485 | 31.8201 |
+| GIAO, HF/6-31G* | 199.9711 | 32.5957 |
+| GIAO, HF/6-311+G(2d,p) | 192.5828 | 32.0710 |
+| CSGT, B3LYP/6-31G* | 188.5603 | 29.1952 |
+| CSGT, B3LYP/6-311+G(2d,p) | 182.1386 | 31.7788 |
+| CSGT, HF/6-31G* | 196.8670 | 29.5517 |
+| CSGT, HF/6-311+G(2d,p) | 192.5701 | 31.5989 |
+
+In EPR mode the reference values are ignored. The function returns `sys` and `inter`; it does not run an electronic-structure calculation. See the linked MATLAB source for the exact input guards and transformations.

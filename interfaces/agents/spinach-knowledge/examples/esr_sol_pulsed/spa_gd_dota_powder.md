@@ -1,25 +1,19 @@
 # examples/esr_sol_pulsed/spa_gd_dota_powder.m
 
-- Signature: `spa_gd_dota_powder()`
+- Function: `spa_gd_dota_powder()`.
 
-## Purpose
+## Model
 
-Simulates a soft-pulse spectrum of a gadolinium ion using the Fokker–Planck formalism, powder averaging, and a third-order numerical rotating-frame transformation. The zero-field-splitting (ZFS) distribution is sampled using statistical parameters reported in Figure 5 of Raitsimring et al., App. Mag. Res. 28, 281–295 (2005). Calculation time: hours.
+This example builds a powder-averaged soft-pulse EPR calculation for a gadolinium ion with sampled zero-field splitting (ZFS). Its source comment attributes the distribution's statistical parameters to Figure 5 of Raitsimring et al., *App. Mag. Res.* 28, 281-295 (2005), and describes a third-order numerical rotating-frame transformation. The source estimates hours. It calls `[D,E,W]=zfs_sampling(30,5,1e-4)` and loops over the returned samples and weights; the file does not state units for these sampling arguments.
 
-## Physical / mathematical content
+For each sample the code sets `sys.magnet=3.5`, isotope `E8`, Zeeman scalar `2.002319`, and self-coupling matrix `0.56e9*zfs2mat(D(n),E(n),0,0,0)`. The basis is `sphten-liouv` with no approximation and projections `-3:3`; trajectory-level SSR is disabled. The rotating-frame setting is `parameters.rframes={{'E8',3}}`. The source does not annotate units for its field or coupling values.
 
-- Models an `E8` electron spin with `sys.magnet=3.5`, scalar Zeeman parameter `2.002319`, and a ZFS tensor constructed from each sampled pair of `D` and `E` values.
-- Uses a spherical powder grid (`rep_2ang_400pts_sph`), an `Lz` initial state, and an `L+` detection state. The rotating-frame setting is `{{'E8',3}}`.
-- Applies a rank-2 soft pulse with phase `-pi/2`, frequency `-0.5e9`, duration `50 ns`, and power `2*pi*0.02e9`.
+## Pulse, acquisition, and plotted observable
 
-## Numerical / algorithmic content
+The soft pulse has rank 2, phase `-pi/2`, frequency `-0.5e9`, duration `50.0e-9` s (50 ns), power `2*pi*0.02e+9`, and method `expm`. Raw frequency and power units are not annotated. Initial state and receiver are `Lz` and `L+` on `E8`; no spins are listed for decoupling. Acquisition settings are offset 0, sweep `0.8e10`, 512 points, zero-fill 2048, `axis_units='GHz'`, grid `rep_2ang_400pts_sph`, derivative off, and axis inversion off.
 
-- Obtains ZFS samples and weights with `zfs_sampling(30,5,1e-4)` and runs `powder(spin_system,@sp_acquire,parameters,'labframe')` for each sample.
-- Applies exponential apodisation to each acquired FID, Fourier-transforms it with 2048-point zero filling, and adds the result to the spectrum weighted by its ZFS sampling weight.
-- Uses a sweep of `0.8e10`, 512 acquisition points, a GHz plot axis, and the `expm` propagation method.
+For each sample, `powder(spin_system,@sp_acquire,parameters,'labframe')` acquires an FID. The script applies exponential apodisation with parameter 10, computes a 2048-point shifted FFT, and adds `W(n)` times that transform to a complex spectrum accumulator. It plots `real(spectrum)` with `plot_1d` inside the sample loop, so the displayed sum is progressively accumulated. There is no explicit final normalization in this script.
 
-## Implementation structure
+## Source
 
-1. Preallocates a complex 2048-point spectrum, obtains the ZFS samples, and opens a figure.
-2. For each sample, builds a spherical-tensor Liouville-space spin system without basis approximation, sets the acquisition and soft-pulse parameters, and simulates powder-averaged acquisition.
-3. Apodises and Fourier-transforms the FID, accumulates the weighted spectrum, and plots its real part after each iteration.
+[examples/esr_sol_pulsed/spa_gd_dota_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/spa_gd_dota_powder.m)

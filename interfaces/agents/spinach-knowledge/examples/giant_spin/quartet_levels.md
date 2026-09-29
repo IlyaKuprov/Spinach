@@ -1,19 +1,16 @@
 # examples/giant_spin/quartet_levels.m
 
+- MATLAB implementation: [examples/giant_spin/quartet_levels.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/quartet_levels.m)
+
 - Signature: `quartet_levels()`
+- Source: `examples/giant_spin/quartet_levels.m`
 
-## Purpose
+## Model and parameters
 
-Calculate the four energy levels of a spin-3/2 particle with zero-field splitting as the magnetic field is scanned from 0 to 1 T. The calculation takes seconds.
+This field scan models a spin-3/2 particle (`E4`) with a zero-field splitting. The example sets the field to 1.0 T and uses the isotropic Zeeman matrix `diag([2 2 2])`. It defines `D=icm2hz(-0.5)` and `E=0.3*D`, then constructs the zero-field-splitting matrix with `zfs2mat(D,E,0,0,0)`. The source does not label the input unit of -0.5.
 
-## Physical / mathematical content
+The Hilbert-space basis uses `zeeman-hilb` with `approximation='none'`. The scan parameters are fields from 0 to 1, 100 points, orientation `[0 0 0]`, and four states.
 
-The particle is specified as `E4` with an isotropic Zeeman tensor, `diag([2 2 2])`. The zero-field-splitting parameters are `D=icm2hz(-0.5)` and `E=0.3*D`; `zfs2mat(D,E,0,0,0)` constructs the coupling matrix with all three orientation angles set to zero. `sys.magnet` is set to `1.0` T, as required by the example.
+## Calculation
 
-## Numerical / algorithmic content
-
-The calculation uses the `zeeman-hilb` formalism with `bas.approximation='none'`. `fieldscan_enlev` evaluates four energy levels at `parameters.npoints=100` points over `parameters.fields=[0 1]`, with `parameters.orientation=[0 0 0]`.
-
-## Implementation structure
-
-The function `quartet_levels()` defines the particle, Zeeman tensor and zero-field-splitting matrix; creates the Spinach spin system with `create(sys,inter)`; applies the basis with `basis(spin_system,bas)`; and calls `fieldscan_enlev(spin_system,parameters)`.
+The function creates and bases the Spinach system, then calls `fieldscan_enlev(spin_system,parameters)` for the energy-level field scan. The source estimates a calculation time of seconds; it does not assign the function result or specify a separate plot or fixed numerical output.

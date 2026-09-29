@@ -1,26 +1,11 @@
 # experiments/spen/spencosy.m
 
-- Signature: `fid=spencosy(spin_system,parameters,H,R,K,G,F)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/spen/spencosy.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=spencosy.m)
 
-## Purpose
+Ultrafast COSY with spatial encoding and gradient acquisition. The source forms the Fokker–Planck generator L = H + F + 1i*R + 1i*K and applies an initial pi/2 pulse to parameters.rho0. It then applies two shaped chirp pulses from chirp_pulse with opposite signs of the encoding gradient Ge*G{1}. A gradient interval Gp*G{1} for Tp brackets the next pi/2 pulse. The source does not insert explicit coherence-order projection calls in this COSY sequence.
 
-Ultrafast COSY pulse sequence with spatial encoding and gradient readout.
+The trace starts with parameters.npoints*parameters.deltat of negative acquisition-gradient prephasing. Each loop-start state is then advanced by one combined positive/negative Ga*G{1} loop propagator; the acquired trace samples coil'*rho while stepping under the positive acquisition gradient. fid has shape [parameters.npoints, parameters.nloops]: points along each readout, then loop index. The loop bodies run with parfor; when GPU execution is enabled, the source moves propagators, state, and coil to the GPU.
 
-## Parameters
+Required sequence settings checked by the source are parameters.rho0, parameters.coil, scalar parameters.dims (sample size in m), parameters.npts (spin-packet count), parameters.spins, parameters.deltat, parameters.npoints, parameters.nloops, parameters.Ga, parameters.pulsenpoints, parameters.nWURST, parameters.Te, parameters.BW, parameters.Ge, parameters.Gp, and parameters.Tp. The source header gives gradient amplitudes in T/m and identifies nWURST as a pulse-smoothing factor. The header also documents D in m^2/s, but the function body does not read parameters.D; diffusion/flow enters through F. H, R, K, and F must be equal-sized matrices, G must be a cell array, and the required formalism is sphten-liouv. H, R, K, G, and F are supplied by the imaging context.
 
-- `parameters.dims`: sample size in metres; `parameters.npts`: number of spin packets; `parameters.spins`: nuclei on which the sequence runs.
-- `parameters.rho0`: initial state; `parameters.coil`: detection state.
-- `parameters.deltat`: acquisition timestep; `parameters.npoints`: acquired points per gradient readout; `parameters.nloops`: loops, each comprising a positive and a negative readout.
-- `parameters.Ga`: acquisition gradient in T/m; `parameters.Ge`: encoding gradient in T/m.
-- `parameters.pulsenpoints`: pulse-shape points; `parameters.nWURST`: pulse smoothing factor; `parameters.Te`: pulse duration; `parameters.BW`: pulse bandwidth.
-- `parameters.Gp`: coherence-selection gradient in T/m; `parameters.Tp`: its duration.
-- `parameters.D`: diffusion constant in `m^2/s` (listed in the source header; not accessed directly in this function).
-- `H`, `R`, `K`, `G`, `F`: Fokker–Planck Hamiltonian, relaxation, kinetics, gradient, and diffusion/flow operators, respectively. These last five inputs are built automatically by the imaging context function.
-
-## Sequence and output
-
-The function forms `L=H+F+1i*R+1i*K` and applies an initial `pi/2` pulse. It then applies two WURST chirp pulses with opposite encoding gradients, followed by a second `pi/2` pulse bracketed by coherence-selection gradients. After prephasing, it propagates alternating-gradient readout loops and detects `coil'*rho` at each point. The output `fid` is the UFCOSY free induction decay, an array of size `parameters.npoints` by `parameters.nloops`. Loop bodies run in parallel; propagators and states move to a GPU when GPU execution is enabled.
-
-The function requires `sphten-liouv` formalism. It checks that `H`, `R`, `K`, and `F` are equal-sized matrices and that `G` is a cell array.
-
-Authors: jeannicolas.dumez@cnrs.fr; ilya.kuprov@weizmann.ac.il; ludmilla.guduff@cnrs.fr. [Spinach documentation](https://spindynamics.org/wiki/index.php?title=spencosy.m).
+Authors: jeannicolas.dumez@cnrs.fr, ilya.kuprov@weizmann.ac.il, ludmilla.guduff@cnrs.fr.

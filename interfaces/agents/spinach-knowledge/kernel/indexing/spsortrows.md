@@ -1,29 +1,19 @@
 # kernel/indexing/spsortrows.m
 
 - Signature: `idx=spsortrows(A)`
+- Direct MATLAB source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/indexing/spsortrows.m>
 
 ## Purpose
 
-Returns the row permutation that sorts a sparse matrix lexicographically by rows, matching the second output of MATLAB's `sortrows(A)`.
+Returns the row permutation for sorting a sparse matrix by rows, matching the second output of MATLAB's `sortrows(A)`. This is an indexing utility: it returns neither a sorted matrix nor a modified input, and has no physical interaction, state/operator effect, Hamiltonian, or unit convention.
 
-## Physical / mathematical content
+## Execution and guards
 
-This is a sparse-matrix ordering utility; it does not modify `A` or return the sorted matrix.
+This file is the MATLAB fallback for the compiled MEX function. It first requires `A` to be numeric, sparse, real, double precision, and two-dimensional (the source uses `ismatrix`). It then calls `[~,idx]=sortrows(A)`; sorting and tie behavior therefore follow MATLAB's `sortrows` implementation. No additional row-count, column-count, or application-specific guard is present in this fallback.
 
-## Numerical / algorithmic content
+## Syntax and arguments
 
-This MATLAB fallback validates that `A` is a sparse, real, double matrix, then returns the permutation from `[~,idx]=sortrows(A)`. Spinach also provides a compiled MEX implementation.
-
-## Syntax
-
-```matlab
-idx=spsortrows(A)
-```
-
-## Parameters / inputs
+`idx=spsortrows(A)`
 
 - `A` - sparse real double matrix.
-
-## Outputs
-
-- `idx` - row permutation index, matching the second output of MATLAB's `sortrows(A)`.
+- `idx` - row permutation index, corresponding to the second output of `sortrows(A)`.

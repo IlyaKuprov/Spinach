@@ -1,29 +1,31 @@
 # kernel/utilities/jacobianest.m
 
+- MATLAB implementation: [kernel/utilities/jacobianest.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/jacobianest.m)
+
 - Signature: `[jac,err] = jacobianest(fun,x0)`
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=jacobianest.m>
 
 ## Purpose
 
-Estimate the Jacobian of a vector-valued function at `x0`, together with an entry-wise error estimate.
+Estimate the Jacobian of a vector-valued function at a numeric vector or array `x0`, and return an entry-wise estimated error alongside each partial derivative. This is a general numerical-differentiation utility, not a spin-system model.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-A general numerical differentiation utility; it does not encode a spin-system model.
+- `fun` is a function handle that accepts `x0` and returns a vector-valued result. The implementation checks that it is a function handle.
+- `x0` is numeric and may be a vector or array. Its elements are treated as independent scalar coordinates, addressed by linear index; the function receives the original array shape.
+- `jac` has one row per element of `fun(x0)` and one column per element of `x0` (the function output is vectorised internally).
+- `err` has the same shape as `jac` and contains the estimated error associated with each selected derivative.
 
-## Numerical / algorithmic content
+## Numerical method
 
-For each element of `x0`, the routine evaluates centered finite differences over a geometrically decreasing sequence of 26 step sizes. Romberg extrapolation cancels the leading second- and fourth-order error terms; after trimming the three largest- and smallest-step estimates, the estimate with the smallest predicted error is selected.
+The function evaluates `fun(x0)` once to establish the number of output components. For each input coordinate it forms a geometrically spaced set of 26 perturbations. For a nonzero coordinate, the signed perturbations are `x0(i)*100*(2.0000001).^(0:-1:-25)`; for a zero coordinate, the same relative scale is used without multiplying by zero. Each perturbation gives a centred finite-difference derivative, `(f(x0+h)-f(x0-h))/(2*h)`.
 
-## Parameters / inputs
+For each output component, `rombextrap` combines successive finite-difference values using the error powers `[2 4]`, cancelling the leading second- and fourth-order error terms, extrapolates towards zero step, and estimates uncertainty from the residual of that extrapolation. The selection step is important: it sorts the *extrapolated derivative values* in ascending numerical order, removes the three smallest and three largest values, and keeps the uncertainty estimates associated with the remaining candidates. It then selects the retained derivative whose estimated error is smallest. It does **not** trim the endpoints of the step-size sequence: the trim acts only after extrapolated derivative candidates and their uncertainties have been formed.
 
-- `fun` - function handle accepting the vector or array `x0` and returning a vector-valued result.
-- `x0` - numeric vector or array; each of its `numel(x0)` elements is treated as an independent variable.
+## Shape and edge cases
 
-## Outputs
+An input array with `p=numel(x0)` coordinates produces an `n-by-p` Jacobian when `fun(x0)` contains `n` values. If the function result is empty, the routine returns empty `0-by-p` arrays for both outputs. The reported errors are estimates produced by the extrapolation procedure, not an assertion of a rigorous bound.
 
-- `jac` - Jacobian array with one row per element of `fun(x0)` after linearisation and one column per element of `x0`.
-- `err` - estimated error for each corresponding Jacobian entry; it has the same size as `jac`.
+## Finite differences and error pairing
 
-## Implementation structure
-
-The result at the centre point determines the output dimension. Each input coordinate is perturbed in both directions, the finite-difference estimates are extrapolated, and the selected derivative and error estimate are stored in the corresponding Jacobian column.
+The code perturbs one input coordinate at a time, evaluates both sides of each centered difference, and then processes each output component independently. `sort` returns indices that are also used to reorder the corresponding error estimates, preserving the derivative/error pairing after the extreme derivative values are discarded.

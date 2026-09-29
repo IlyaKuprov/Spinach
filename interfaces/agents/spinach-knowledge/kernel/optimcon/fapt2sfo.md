@@ -1,24 +1,19 @@
 # kernel/optimcon/fapt2sfo.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/fapt2sfo.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=fapt2sfo.m)
+
 - Signature: `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)`
 
-## Purpose
+## Purpose and units
 
-Converts frequency-amplitude-phase-time pulse events into a two-row X/Y waveform for GRAPE. Each event contributes between its start and end times, inclusive; overlapping events add.
+Converts frequency-amplitude-phase-time pulse events to a two-row single-frequency-origin waveform for GRAPE. Each `fapt` cell contains a real five-element vector `[frequency, amplitude, phase, start_time, end_time]`: Hz, rad/s, radians, seconds, seconds. Amplitude must be nonnegative and end time must be strictly greater than start time. Events are active at grid ticks satisfying `start_time <= t <= end_time`; overlapping events add.
 
-## Parameters / inputs
+For an event at frequency `f`, amplitude `a`, and phase `phi`, the X and Y rows accumulate `a*cos(2*pi*f*t+phi)` and `a*sin(2*pi*f*t+phi)` respectively. This is the documented anticlockwise rotation convention. With a drift offset `2*pi*f*Lz`, an event at `f` is on resonance; reversing the Y sign gives the opposite sense and an offset of `2*f` for nonzero `f`. At `f=0`, the sign change reflects the nutation axis to `-phi`.
 
-- `fapt` — cell array of real five-element vectors: [frequency (Hz), amplitude (rad/s), phase at t=0 (radians), start time (seconds), end time (seconds)]. Amplitudes must be nonnegative, and each end time must exceed its start time.
-- `time_grid` — optional real row vector of time ticks. If supplied, it is used as given and `dt=[]`.
+## Time grid and outputs
 
-## Outputs
+If `time_grid` is omitted, the function spans from 0 to the latest event end time. It chooses `dt_hN = 1/(4*max(abs(frequency)))`, sets `npts = ceil(end_time/dt_hN)+1`, and uses `linspace` to make the grid; the returned `dt` is the second grid tick. If every event frequency is zero, an explicit grid is required. If supplied, `time_grid` is checked to be a real numeric row vector and `dt` is empty.
 
-- `wave` — 2-by-N waveform; row 1 is X and row 2 is Y. For an event with amplitude A, frequency f and phase phi, its contribution is `X=A*cos(2*pi*f*t+phi)` and `Y=A*sin(2*pi*f*t+phi)` on the event's time interval.
-- `dt` — time step for an automatically generated grid; empty when `time_grid` is supplied.
-- `time_grid` — row vector of time ticks used to construct the waveform.
-
-## Sampling and rotation convention
-
-Without an explicit grid, the routine samples from zero to the latest event end time with spacing no greater than `1/(4*max(abs(frequency)))`; an all-zero frequency list therefore requires an explicit grid. The positive sign in the Y row gives anticlockwise rotation: in a drift offset by `2*pi*f*Lz`, an event at frequency f is on resonance. Reversing the Y sign gives the opposite rotation sense and is off resonance by 2*f for nonzero f; at f=0 it reflects the nutation axis to -phi.
-
-[Source documentation](https://spindynamics.org/wiki/index.php?title=fapt2sfo.m)
+- `wave`: `2 x numel(time_grid)` array, with X then Y components, in rad/s.
+- `dt`: generated-grid step in seconds, or empty when the grid was supplied.
+- `time_grid`: row vector of sample times in seconds.

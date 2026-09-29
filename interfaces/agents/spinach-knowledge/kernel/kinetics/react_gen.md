@@ -1,30 +1,23 @@
 # kernel/kinetics/react_gen.m
 
 - Signature: `G=react_gen(spin_system,reaction)`
+- Direct MATLAB source: [`kernel/kinetics/react_gen.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/kinetics/react_gen.m)
+- Existing Wiki: [`react_gen.m`](https://spindynamics.org/wiki/index.php?title=react_gen.m)
 
-## Purpose
+## Purpose and inputs
 
-Builds state-space generators for the specified chemical reaction, mapping reactant basis states to corresponding product states.
+Builds state-space reaction generators for the listed reactant and product parts of `spin_system.chem.parts`. `reaction.reactants` and `reaction.products` are integer part indices. Each row of the two-column `reaction.matching` pairs a reactant spin index (column 1) with its corresponding product spin index (column 2).
 
-## Physical / mathematical content
+The guard rejects overlapping reactant/product part lists, unequal total numbers of spins on the two sides, or a matching map whose left/right indices fail to cover the respective reactant/product spin lists. During construction, each populated basis state must resolve to exactly one host substance; a destination state is looked up in the existing basis.
 
-For each reactant, the generator removes the source state and adds the matched product state when that product state is present in the basis. The mapping is defined by `reaction.matching`.
+## State-index map
 
-## Numerical / algorithmic content
+For each basis row `n`, the code identifies the host part from the spins active in that state. If that part is a reactant, it records a drain `-1` at (n,n) in that reactant's generator. It forms the product state by copying entries of the source basis row from `reaction.matching(:,1)` to `reaction.matching(:,2)`, then searches for that complete row in `spin_system.bas.basis`. If found at index `d`, it records a fill `+1` at (d,n); if absent, no fill entry is added. Thus for a mapped state `n→d`, the column-indexed action is `G_j[:,n] = -e_n + e_d`; when the destination row is not present, it is `G_j[:,n] = -e_n`.
 
-The routine scans basis states, identifies their chemical part, and constructs sparse complex matrices. It checks that reactants and products are disjoint, have the same total number of spins, and agree with the matching map.
+## Output and lifecycle
 
-## Parameters / inputs
+`G` is a cell array with one matrix per listed reactant. Each member is an `nstates×nstates` complex sparse matrix, where `nstates=size(spin_system.bas.basis,1)`. The stored coefficients are dimensionless `-1/+1` generator entries; a reaction rate is not an input to this function and must be applied by the caller. There is no normalization step. The routine collects drain/fill indices in parallel, removes unused rows, and assembles each reactant's sparse matrix.
 
-- `spin_system` - Spinach system description, including the chemical parts and basis.
-- `reaction.reactants` - vector of indices for reactants among `spin_system.chem.parts`.
-- `reaction.products` - vector of indices for products among `spin_system.chem.parts`.
-- `reaction.matching` - two-column matrix mapping spin indices from the reactant side (left column) to the product side (right column).
+## Source Wiki
 
-## Outputs
-
-- `G` - cell array with one sparse generator matrix per reactant, representing source-state drainage and matching product-state filling in the basis.
-
-## Implementation structure
-
-The routine validates the reaction specification, scans the basis in parallel, records drainage for each reactant state and filling for an available matched product state, then assembles one sparse matrix per reactant.
+[Spinach Wiki: `react_gen.m`](https://spindynamics.org/wiki/index.php?title=react_gen.m)

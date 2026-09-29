@@ -1,16 +1,7 @@
 # examples/relaxation_theory/csa_antisymm_1.m
 
-- Signature: `csa_antisymm_1()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/csa_antisymm_1.m)
 
-## Purpose
+This example estimates longitudinal and transverse relaxation rates for one 13C nucleus from a Redfield relaxation matrix and compares those projections with the textbook CSA routine rlx_csa. It is a numerical model comparison, not an experimental benchmark. The field is 14.1 T; the chemical-shielding matrix (ppm) is [100 20 15; 20 0 30; 25 10 -30], which is nonsymmetric and therefore includes an antisymmetric component. The correlation time is 50 ps (50e-12 s).
 
-Calculate longitudinal and transverse relaxation rates for a single `13C` nucleus with a shielding tensor that has a significant antisymmetric component, then compare Spinach projections with textbook CSA rates. Calculation time: seconds.
-
-## Model and parameters
-
-- Field: `14.1 T`. The shielding matrix (ppm) is `[100 20 15; 20 0 30; 25 10 -30]`.
-- Redfield relaxation uses `tau_c={50e-12}`, zero equilibrium, and `labframe` retention; the basis is `sphten-liouv` with no approximation.
-
-## Calculation
-
-After computing `R=relaxation(spin_system)`, the example projects `R` onto `Lz` and `L+` to obtain `R1Sp` and `R2Sp`. It calls `rlx_csa` with the same field, isotope, shielding matrix, and correlation time for `R1Book` and `R2Book`, then prints both pairs of values.
+The source requests Redfield relaxation with zero equilibrium and lab-frame retention, using sphten-liouv without approximation. It computes R=relaxation(spin_system), forms longitudinal and transverse estimates by projecting R onto Lz and L+ respectively, and applies a minus sign to each normalized projection. The same field, isotope, shielding matrix and correlation time are passed to rlx_csa for the textbook comparison. It prints both sets of rates; the source does not supply a measured value or state a numerical agreement claim. No cross-correlation term is explicitly selected.

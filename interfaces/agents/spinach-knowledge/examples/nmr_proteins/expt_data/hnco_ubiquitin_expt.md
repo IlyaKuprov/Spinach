@@ -1,21 +1,15 @@
 # examples/nmr_proteins/expt_data/hnco_ubiquitin_expt.m
 
-- Signature: `hnco_ubiquitin_expt()`
+Source: [examples/nmr_proteins/expt_data/hnco_ubiquitin_expt.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/expt_data/hnco_ubiquitin_expt.m)
 
 ## Purpose
 
-Processes and plots an experimental HNCO spectrum of human ubiquitin.
+Processes and plots a three-dimensional experimental HNCO spectrum of human ubiquitin. This is processing of imported measured data, not a Spinach spin-dynamics simulation: the function loads `fid` from `hnco_ubiquitin_expt.mat`, does not call a simulator or pulse-sequence function, and uses its `spin_system` struct only for plotting metadata. The source does not specify paramagnetic centers or magnetic tensors; this is protein nuclear-spin NMR.
 
-## Physical / mathematical content
+## Data processing
 
-- Displays a three-dimensional 15N, 13C, and 1H spectrum.
+The code truncates the first FID dimension to 64 points and applies cosine apodisation in all three dimensions. It Fourier-transforms F3 to 256 points and applies a phase factor of `exp(-1i*0.75)`. For F2 it recombines alternating real components as `real(odd) + 1i*real(even)` before a 256-point transform; F1 uses `real(odd) - 1i*real(even)` before its 256-point transform. It permutes dimensions to `[3 2 1]`, shifts each dimension, subtracts `spectrum(end,end,end)` as a baseline, and zeros indices 1 through 40 in the third array dimension. The result is plotted as its real part; no output spectrum file is written.
 
-## Numerical / algorithmic content
+## Axes and display
 
-- Loads and truncates the FID, applies cosine apodisation, processes F3, F2, and F1 with Fourier transforms, shifts the spectrum, corrects its baseline, and zeros the first 40 points of the third dimension to eliminate the water signal.
-
-## Implementation structure
-
-- Donghan Lee (Max Planck Institute)
-- Ilya Kuprov (University of Southampton)
-- Loads `hnco_ubiquitin_expt.mat`, sets the magnetic field to 11.7395 T and the spectral axis parameters, then plots the real spectrum in ppm.
+The plotting metadata specifies spins `15N`, `13C`, `1H`, magnetic field `11.7395` T, offsets `[-5870 22164 3653]` Hz, sweeps `[2000 1500 3000]` Hz, 64 acquired points per dimension, and zero filling to `[256 256 256]`. The axis display is in ppm. The source does not encode the experimental pulse sequence or receiver-channel acquisition; it processes the already acquired FID.

@@ -1,19 +1,21 @@
 # examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m
 
-- Signature: `vfit_4sim_ik()`
+- Signature: vfit_4sim_ik()
 
-## Purpose
+## Purpose and data
 
-Simultaneous fitting of multiple 51V MAS NMR spectra with respect to the chemical shielding anisotropy and quadrupole coupling tensor parameters. Calculation time: hours, much faster with a GPU.
+The example jointly fits four ⁵¹V MAS NMR spectra to chemical-shielding and quadrupolar tensor parameters. It loads v12_29_dec15.spc, v12_31_dec15.spc, v12_33_dec15.spc, and v12_35_dec15.spc, applies a Savitzky–Golay filter of order 3 and window length 51, crops the signal columns to indices 6200–10000, and normalizes each retained segment to its own maximum before padding to 4096 points. The source describes calculation time as hours and says it is much faster with a GPU; however, the GPU-enable line in the fitting function is commented out. Neither a timing nor GPU execution was measured here.
 
-## Physical / mathematical content
+## Shared spin model and optimizer inputs
 
-The model is a single 51V spin with a chemical-shielding tensor and a quadrupolar coupling tensor. One common set of tensor parameters is used to fit four experimental spectra acquired at different MAS rates; the source lists the rates as 41, 38.5, 36, and 34 kHz.
+Each trial uses one ⁵¹V spin, a chemical-shielding tensor and a quadrupolar tensor. The code maps the fit vector to isotropic shift, anisotropy, asymmetry and Euler angles; it converts the three angles from degrees to radians, forms the shielding principal values, and adds 456.818 to those values. Quadrupolar coupling is passed through eeqq2nqi with spin 3.5. The code sets sys.magnet to 14.1 without an explicit unit comment and uses an sphten-liouv basis with no approximation and projection +1.
 
-## Numerical / algorithmic content
+The optimizer starts from [-669.0, 564.0, 0.255, 82.0, 180.0, 19.0, 3.72, 0.62]. These are initial code values, not fitted results. The first two are transformed by the script when constructing the shielding tensor; the seventh is multiplied by 1e6 for the quadrupolar-coupling input. The source does not annotate units for these fit-vector values.
 
-The script loads and Savitzky–Golay filters `v12_29_dec15.spc`, `v12_31_dec15.spc`, `v12_33_dec15.spc`, and `v12_35_dec15.spc`, extracts and normalises the selected spectral ranges, then minimises a summed squared residual with `fminsearch`. Each trial simulates the four spectra using the same 51V spin system, a rank-30 truncation, and `rep_2ang_200pts_oct`; each signal is Gaussian-apodised before Fourier transformation.
+## Four MAS calculations and observable
 
-## Implementation structure
+The same model is simulated at code-set rate values 41000 for the 35 spectrum, 38500 for 33, 36000 for 31, and 34000 for 29; the source does not annotate their units. All four use the rep_2ang_200pts_oct powder grid, maximum rank 30, 4096 points and zero-fill 4096, with the plotted chemical-shift axis in ppm. Each FID is Gaussian-apodized with the code value 13000.0, Fourier-transformed and normalized to its maximum absolute value. The source plots input and simulated real spectra in four panels and minimizes the sum of the four squared real-spectrum residual norms using fminsearch.
 
-Preprocesses four experimental spectra, maps the fitted parameters to the chemical-shift and quadrupolar tensors, performs four MAS simulations at their respective rates, and compares the resulting spectra with the measurements in a four-panel plot.
+This is a four-spectrum fitting wrapper around singlerot and acquire, not a CP or HMQC sequence; it specifies no RF/contact-transfer condition. It describes input spectra and a model objective, but contains no saved best-fit result. No DOI is given in the source.
+
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m

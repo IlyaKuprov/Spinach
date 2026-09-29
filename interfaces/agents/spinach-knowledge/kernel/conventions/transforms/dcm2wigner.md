@@ -1,31 +1,29 @@
 # kernel/conventions/transforms/dcm2wigner.m
 
-- Signature: `D=dcm2wigner(dcm)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/dcm2wigner.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=dcm2wigner.m)
 
-## Purpose
+## Conversion
 
-Converts a directional cosine matrix into second-rank Wigner function matrix. Syntax: D=dcm2wigner(dcm)
+For a real 3x3 directional cosine matrix dcm, the function constructs the rank-2 Wigner matrix D. Its rows and columns are ordered by magnetic index m = 2, 1, 0, -1, -2. The documented action is v_out = D*v_in, where v_in contains irreducible spherical tensor coefficients in the same order: T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2). The source assigns no physical units to D and does not specify whether dcm represents an active or passive rotation; no such convention is inferred here.
 
-## Physical / mathematical content
-The input is a 3×3 directional cosine matrix representing a rotation. The output is its rank-2 Wigner D matrix, with rows and columns ordered by magnetic index 2, 1, 0, −1, −2. It acts on a column vector of irreducible spherical tensor coefficients in that same order.
+The implementation defines complex scalars A and B from the matrix entries, then Z:
 
-## Numerical / algorithmic content
-The function derives two complex coefficients, A and B, from entries of the directional cosine matrix. It checks their amplitudes against dcm(3,3), then tests their phases against other matrix entries, negating A and retesting if necessary. It sets Z=|A|²−|B|² and constructs the 5×5 Wigner matrix from polynomial expressions in A, B, their complex conjugates, and Z. Failed amplitude or phase checks raise errors.
+~~~text
+A = sqrt(0.5*(dcm(1,1) + i*dcm(1,2) - i*dcm(2,1) + dcm(2,2)))
+B = sqrt(0.5*(-dcm(1,1) + i*dcm(1,2) + i*dcm(2,1) + dcm(2,2)))
+Z = A*conj(A) - B*conj(B)
+~~~
 
-## Parameters / inputs
+Here conj denotes scalar complex conjugation (MATLAB apostrophe in the source). With these coefficients, the returned matrix is:
 
-- dcm -directional cosine matrix
+~~~text
+D = [ A^4                    2*A^3*B                 sqrt(6)*A^2*B^2      2*A*B^3                    B^4
+     -2*A^3*conj(B)          A^2*(2*Z-1)             sqrt(6)*A*B*Z        B^2*(2*Z+1)                2*conj(A)*B^3
+      sqrt(6)*A^2*conj(B)^2 -sqrt(6)*A*conj(B)*Z    0.5*(3*Z^2-1)        sqrt(6)*conj(A)*B*Z       sqrt(6)*conj(A)^2*B^2
+     -2*A*conj(B)^3          conj(B)^2*(2*Z+1)      -sqrt(6)*conj(A)*conj(B)*Z  conj(A)^2*(2*Z-1)  2*conj(A)^3*B
+      conj(B)^4              -2*conj(A)*conj(B)^3  sqrt(6)*conj(A)^2*conj(B)^2 -2*conj(A)^3*conj(B)  conj(A)^4 ];
+~~~
 
-## Outputs
+## Input and checks
 
-- D -matrix of second rank Wigner D functions. Rows
-- and columns are sorted by descending ranks:
-- [D( 2,2) ... D( 2,-2)
-- ... ... ...
-- D(-2,2) ... D(-2,-2)]
-- Notes: the resulting Wigner matrix is to be used as v=W*v, where v is
-- a column vector of irreducible spherical tensor coefficients in
-- the following order: T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2).
-
-## Implementation structure
-The main function calls the local `grumble` function before computing the coefficients and assembling D. `grumble` requires a real numeric 3×3 input. It checks orthogonality and determinant against tolerances: deviations above 1e−6 produce warnings, while deviations above 1e−2 produce errors. The main function applies further amplitude and phase self-consistency checks before returning D.
+The input must be a real numeric 3x3 matrix. The validator warns if norm(dcm'*dcm-eye(3),1)>1e-6 or abs(det(dcm)-1)>1e-6; either quantity above 1e-2 raises an error. The conversion also checks amplitude and phase consistency at 1e-6; a phase mismatch first changes the sign of A, and a remaining mismatch raises an error. The source has no separate finite-value check.

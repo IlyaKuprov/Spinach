@@ -1,34 +1,19 @@
 # examples/spin_chemistry/cidnp_nz_1.m
 
 - Signature: `cidnp_nz_1()`
+- Source: [examples/spin_chemistry/cidnp_nz_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/spin_chemistry/cidnp_nz_1.m)
 
 ## Purpose
 
-Field dependence of geminate CIDNP from a radical pair in a viscous solvent, computed with Redfield theory and the lifetime-shifted Nakajima-Zwanzig kernel. At a rotational correlation time of 1 ns and a singlet recombination rate of `3e8 Hz`, anisotropic hyperfine relaxation proceeds at a fair fraction of the recombination rate, and the pair drains before the bath decorrelates. Lifetime broadening of the spectral densities changes the nuclear polarisation left in the diamagnetic product. The doubled-space setup follows `cidnp_geminate.m`; the low-field regime is motivated by the field-cycling CIDNP work of the Yurkovskaya and Ivanov school (https://doi.org/10.1039/c3cp44098k). Calculation time: minutes
+Compares the field dependence of geminate CIDNP from a singlet-born radical pair using Redfield relaxation and a lifetime-shifted Nakajima–Zwanzig kernel. The source comment points to field-cycling CIDNP work at [DOI 10.1039/C3CP44098K](https://doi.org/10.1039/C3CP44098K) as motivation; that pointer is not evidence that the simulated curve is an experimental measurement.
 
-## Physical / mathematical content
+## Model and calculation
 
+- The spin system is two electrons and one proton, `{'E','E','1H'}`. The initial reactant state is the electron singlet `singlet(spin_system,1,2)`; the proton is included in the coupled spin system.
+- The field grid is `[0.002 0.005 0.01 0.02 0.035 0.05 0.075]` T (2–75 mT). The source sets the singlet recombination rate to `3e8` Hz and the rotational correlation time to `1e-9` s (1 ns).
+- Electron Zeeman factors are `2.0023` and `2.0034`. The proton has an anisotropic hyperfine tensor entered through `mt2hz([0.6 0.6 3.6])`, with zero Euler angles. Recombination uses the Haberkorn radical-pair model, with the singlet channel rate `k_rec` and the second channel set to zero.
+- For each field, the source constructs the Hamiltonian, relaxation and kinetics superoperators, then compares `redfield` with `naka-zwan`. For the latter it sets `nz_shift='chem'` and `nz_onshell=false`. It propagates the singlet in a doubled reactant/product space for `200e-9` s; only the reactant block has Hamiltonian and relaxation dynamics, and the kinetics operator transfers population out of the reactants.
 
-## Physical / mathematical content
+## Observable and plot
 
-- The field grid is `[0.002 0.005 0.01 0.02 0.035 0.05 0.075] T`; the singlet recombination rate is `3e8 Hz`, and `tau_c=1e-9 s`. The model has two electrons and one proton, with electron g factors `2.0023` and `2.0034`, and an anisotropic proton hyperfine tensor from `mt2hz([0.6 0.6 3.6])`.
-- Both Redfield and Nakajima-Zwanzig calculations retain lab-frame relaxation terms and DFS terms. For the latter, chemical lifetime shifting is enabled off shell.
-
-## Numerical / algorithmic content
-
-- At each field, the script constructs a doubled reactant/product problem, starts from an electron singlet, and propagates the coupled Hamiltonian, relaxation, and reaction dynamics for `200 ns`. It records product-block proton `Lz` polarisation and plots both theory curves against field.
-
-## Implementation structure
-
-- Field dependence of geminate CIDNP from a radical pair in a viscous
-- solvent, computed with Redfield theory and with the lifetime-shifted
-- Nakajima-Zwanzig kernel. At a rotational correlation time of 1 ns and
-- a singlet recombination rate of 3e8 Hz, the anisotropic hyperfine
-- relaxation proceeds at a fair fraction of the recombination rate, and
-- the pair drains before the bath decorrelates: the spectral densities
-- seen by the surviving pair are lifetime-broadened, which changes the
-- nuclear polarisation left in the diamagnetic product. The doubled-space
-- bookkeeping follows the cidnp_geminate.m example; the low-field regime
-- is motivated by the field-cycling CIDNP work of the Yurkovskaya and
-- Ivanov school:
-- Calculation time: minutes
+The reported quantity is the proton `Lz` expectation in the product block, `real(Nz'*rho_prod)`, labelled product nuclear polarisation. The script prints both theory columns against field and plots them versus field in mT, with Redfield and Nakajima–Zwanzig legend entries. It reports calculation time as minutes. The source comment's interpretation that lifetime broadening changes the product polarisation is explanatory context, not a separately established measurement.

@@ -1,24 +1,36 @@
 # kernel/utilities/rspert.m
 
-- Signature: `[Ep,Vp]=rspert(E0,H1,order)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspert.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspert.m)
 
 ## Purpose
 
-Computes Rayleigh-Schrodinger perturbation theory to the specified order, following Eqs. 2.21–2.23 of Stefan Stoll’s PhD thesis, with the typo in the numerator of Eq. 2.21 corrected.
+`rspert.m` implements Rayleigh–Schrödinger perturbation theory to arbitrary order for a non-degenerate Hamiltonian `H0 + H1`, returning perturbative corrections to eigenvalues and eigenvectors. The implementation follows Eqs. 2.21–2.23 from Stefan Stoll's PhD thesis.
 
-## Parameters / inputs
+## Behavior
 
-- `E0` — Real column vector of eigenvalues of `H0`.
-- `H1` — Hermitian perturbation written in the eigenbasis of `H0`.
-- `order` — Positive integer specifying the perturbation order. Sixth order is the sensible maximum.
+- Syntax: `[Ep,Vp]=rspert(E0,H1,order)`.
+- A consistency-checking subfunction `grumble` validates the inputs (real column vector `E0`, Hermitian `H1`, consistent dimensions, positive integer `order`).
+- Reciprocal energy differences `Q = 1./(E0'-E0)` are computed, with the diagonal zeroed; if any element of `Q` is non-finite, the function errors with `H0 has degenerate energy levels.`
+- First order: `E{1}=diag(H1)` and `V{1}=Q.*H1`.
+- Higher orders (loop `k=2:order`): computes `R=H1*V{k-1}`, sets `E{k}=real(diag(R))`, and builds `V{k}` by subtracting lower-order products `V{k-m}.*E{m}'` for `m=1:(k-1)` before multiplying elementwise by `Q`.
+- Summation: `Ep` starts from `E0` and accumulates all `E{n}` for `n=1:order`; `Vp` starts from the identity and accumulates all `V{n}`.
+- Normalisation: `Vp` is column-normalised as `Vp./sqrt(sum(abs(Vp).^2,1))`.
+- Notes from the header: there must be no degeneracies in `H0`; `H1` must be Hermitian; the source header cautions that perturbation theory requires `norm(H1,2)` much smaller than the smallest energy gap in `H0`, that numerical artefacts can appear beyond sixth order, and that the stated complexity is linear in order and cubic in matrix dimension.
 
-## Outputs
+## Inputs and outputs
 
-- `Ep` — Real vector of eigenvalues of `H0+H1` to the specified order. Its entries are not necessarily sorted in the same way as the input.
-- `Vp` — Normalized eigenvectors of `H0+H1` to the specified order, returned as a square unitary matrix. Its columns correspond, in order, to the eigenvalues in `Ep`.
+**Inputs**
 
-## Notes
+- `E0` — eigenvalues of `H0`, a column vector of real numbers.
+- `H1` — perturbation, written in the basis that diagonalises `H0`.
+- `order` — order of perturbation theory to be used; 6 is the sensible maximum.
 
-`H0` must have no degenerate energy levels. The perturbation theory converges only when `norm(H1,2)` is much smaller than the smallest energy gap in `H0`. Numerical artifacts appear beyond sixth order. Computational complexity is linear in `order` and cubic in the matrix dimension.
+**Outputs**
 
-Source: [rspert.m](https://spindynamics.org/wiki/index.php?title=rspert.m). Contact: ilya.kuprov@weizmann.ac.il.
+- `Ep` — eigenvalues of `H0+H1` to the specified order, a vector of reals, not necessarily sorted in the same way as the input.
+- `Vp` — normalised eigenvectors of `H0+H1` to the specified order in perturbation theory, a square unitary matrix with eigenvectors in columns, in the same order as the eigenvalues in `Ep`.
+
+## References
+
+- Stefan Stoll's PhD thesis, Eqs. 2.21–2.23.
+- Spinach Wiki page: [rspert.m](https://spindynamics.org/wiki/index.php?title=rspert.m)

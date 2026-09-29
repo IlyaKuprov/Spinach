@@ -1,23 +1,24 @@
 # examples/fundamentals/tensor_structures/polyadic_test_2.m
 
 - Signature: `polyadic_test_2()`
+- Source: [`examples/fundamentals/tensor_structures/polyadic_test_2.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/tensor_structures/polyadic_test_2.m)
 
 ## Purpose
 
-Validates the `polyadic` matrix object's constructor, dense conversion, and overloaded operations against explicit Kronecker-product matrix references. The test covers composition, arithmetic, sparse and dense operands, empty matrices, nested simplification, and GPU conversion when a device is available.
+A MATLAB unit test for the `polyadic` matrix representation. It compares the represented operations with explicit dense Kronecker-product matrices; it is not a spin-dynamics simulation.
 
-## Physical / mathematical content
+## Model and representation
 
-- The main reference is the sum `kron(a,b)+kron(c,d)`, represented as a two-term polyadic object. Further references are formed by ordinary dense matrix operations on that sum.
-- This is a matrix-algebra test; it does not define a physical spin system or dynamics.
+The test draws complex random matrices `a` (2×2), `b` (3×3), `c` (2×2 sparse, with `sprandn` density argument 0.75 for each real and imaginary draw), and `d` (3×3). It builds `p=polyadic({{a,b},{c,d}})`, whose reference is `kron(a,b)+kron(c,d)`, a 6×6 matrix. A second object `q` represents `kron(d.',a.')`. No random seed is set.
 
-## Numerical / algorithmic content
+There is no spin-system specification, basis, Hamiltonian, or physical unit in this example: the factors are generic numerical matrices. The tested tensor construction is a sum of Kronecker products, not a physical-spin tensor basis.
 
-- Most dense-reference identities are checked at `1e-12`; the optional GPU round-trip uses `1e-10`. GPU coverage is skipped when `gpuDeviceCount` is zero.
-- Checks include constructor/`full`/`inflate` consistency, `validate`, prefix and suffix multiplication, size and emptiness, addition and subtraction, scalar and matrix multiplication, Kronecker products, transpose operations, finiteness, nonzero counts, and simplification of nested expressions.
+## Use and checks
 
-## Implementation structure
+Run `polyadic_test_2()` with Spinach on the MATLAB path. The no-argument function checks the constructor, `full`, `inflate`, and `validate`; prefix/suffix composition, size and emptiness; addition, subtraction, scalar scaling, and matrix products; Kronecker products; transpose and conjugate transpose; finiteness and nonzero counts; a zero-row matrix; and nested-object simplification. It includes products with dense and sparse operands. Most numerical comparisons use the one-norm error threshold `1e-12`; the GPU comparison uses `1e-10`.
 
-- Construct complex dense and sparse factors, form a two-term polyadic object, and compare it with the dense sum-of-Kronecker-products reference.
-- Apply each operation to both polyadic and dense forms, asserting their results agree.
-- Exercise the zero-dimension and nested-simplification cases, then test GPU upload only if hardware is available.
+The GPU conversion comparison is conditional on `gpuDeviceCount>0`; otherwise the source prints that this branch was skipped. The source's assertions and messages describe intended checks, not an observed run or pass result.
+
+## Output and limits
+
+The function returns no output argument. It displays section messages when execution reaches them; a failed explicit assertion, validation, or comparison can stop execution with an error. Results depend on unseeded random draws. This compact unit test checks selected operations on small matrices; it does not benchmark performance or establish behavior for every input, and GPU behavior is only exercised when a device is available.

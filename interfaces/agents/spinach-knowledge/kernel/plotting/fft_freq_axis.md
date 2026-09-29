@@ -2,28 +2,29 @@
 
 - Signature: `[f_shift,f,df]=fft_freq_axis(npts,dt,zf)`
 
-## Purpose
+Returns column-vector frequency axes for the unshifted and shifted ordering of an FFT, together with the bin spacing. No FFT is performed.
 
-Returns unshifted and FFT-shifted frequency axes and their frequency resolution for a time-domain acquisition with optional zero filling.
+## Inputs
 
-## Syntax
+- `npts`: acquired-point count, an integer greater than 1.
+- `dt`: positive real scalar time step.
+- `zf`: non-negative integer number of added zero-fill points; defaults to zero when omitted.
 
-```matlab
-[f_shift,f,df]=fft_freq_axis(npts,dt,zf)
-```
+## Construction
 
-## Parameters / inputs
+The transform length is `nfft=npts+zf`, the sampling frequency is `1/dt`, and `df=1/(dt*nfft). The unshifted axis is `f=(0:nfft-1)'*df`, with zero first. The shifted axis is `f_shift=(-floor(nfft/2):ceil(nfft/2)-1)'*df`, in the order corresponding to `fftshift(fft(...)). Both vectors have `nfft` rows; `nfft` is an internal length, not a returned output.
 
-- `npts` — number of acquired time-domain points; integer greater than 1.
-- `dt` — time step between points; positive real scalar.
-- `zf` — number of zero-fill points added to the acquired points; non-negative integer. Defaults to 0 when omitted.
+## Existing syntax
 
-## Numerical / algorithmic content
-
-The transform length is `nfft=npts+zf`, the sampling frequency is `1/dt`, and the frequency resolution is `df=1/(dt*nfft)`. The unshifted axis `f` contains bins from 0 to `(nfft-1)*df`. The shifted axis is `(-floor(nfft/2):ceil(nfft/2)-1)*df`, matching the ordering produced by `fftshift`. The function validates the point count, time step, and zero-fill length.
+`[f_shift,f,df]=fft_freq_axis(npts,dt,zf)`
 
 ## Outputs
 
-- `f_shift` — frequency axis for data after `fftshift(fft(...))`.
-- `f` — frequency axis for `fft(...)`.
-- `df` — frequency resolution.
+- `f_shift`: bins for data ordered as `fftshift(fft(...))`.
+- `f`: bins for data ordered as `fft(...)`.
+- `df`: frequency spacing.
+
+## References
+
+- [Source: `kernel/plotting/fft_freq_axis.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/fft_freq_axis.m)
+- [Spinach Wiki: `fft_freq_axis.m`](https://spindynamics.org/wiki/index.php?title=fft_freq_axis.m)

@@ -1,23 +1,20 @@
 # interfaces/gaussian/brokensymm.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/gaussian/brokensymm.m) · [Spinach Wiki: brokensymm.m](https://spindynamics.org/wiki/index.php?title=brokensymm.m)
+
 - Signature: `J=brokensymm(props_sing,props_trip)`
 
-## Purpose
+## Inputs and calculation
 
-Estimates the exchange coupling from singlet and triplet DFT results using the Yamaguchi equation. The Hamiltonian convention is `H=-2J*(Sa.Sb)`; the routine returns a rough order-of-magnitude estimate, not a high-precision coupling.
+Pass two Gaussian property structures, ordinarily the outputs of `gparse` for the singlet and triplet calculations of the same biradical. Each must contain `energy` (SCF energy in Hartree) and `s_sq` (the computed expectation value of total spin squared). The function checks for these four fields; it does not parse Gaussian log files itself.
 
-## Method
+It applies Eq. 6 of the Yamaguchi treatment cited below:
 
-Using the singlet and triplet energies and their squared-spin expectation values, the function evaluates `J=(E_trip-E_sing)/(S2_sing-S2_trip)`, then converts Hartree to Hz with the factor `6.57968974479e15`. This is Eq. 6 of the cited paper.
+`J=(props_trip.energy-props_sing.energy)/(props_sing.s_sq-props_trip.s_sq)`
 
-## Parameters / inputs
+The result is then multiplied by `6.57968974479e15` to convert Hartree to Hz. The output is a scalar estimate under the Hamiltonian convention `H=-2J*(Sa.Sb)`; sign interpretation depends on retaining that convention. The source describes the estimate as order-of-magnitude and really rough, so it should not be treated as a precision exchange coupling.
 
-- `props_sing`: `gparse` output for the singlet state of the biradical; must contain `energy` and `s_sq`.
-- `props_trip`: `gparse` output for the triplet state of the biradical; must contain `energy` and `s_sq`.
-
-## Output
-
-- `J`: rough estimate of the exchange coupling in Hz under the stated Hamiltonian convention.
+The implementation depends on the input structures' numeric fields and does not perform the Gaussian calculations or additional unit conversions beyond Hartree-to-Hz.
 
 ## References
 

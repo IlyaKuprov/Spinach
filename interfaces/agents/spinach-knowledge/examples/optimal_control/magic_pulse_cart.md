@@ -1,26 +1,19 @@
 # examples/optimal_control/magic_pulse_cart.m
 
-- Signature: `magic_pulse_cart()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/magic_pulse_cart.m)
 
 ## Purpose
 
-A template for optimising a broadband ¹³C 90-degree “magic pulse” that tolerates resonance offsets and RF power calibration errors. See [the cited magic-pulse paper](http://dx.doi.org/10.1016/j.jmr.2005.12.010).
+This Cartesian-control example frames a broadband 90° 13C excitation pulse as three simultaneous state transfers: Lz to Lx, Ly to Ly, and Lx to -Lz. Its model contains 100 non-interacting 13C spins distributed equally over chemical shifts from -100 to +100 ppm at 28.18 T. The accompanying reference is the magic-pulse paper at [doi:10.1016/j.jmr.2005.12.010](https://doi.org/10.1016/j.jmr.2005.12.010).
 
-At 28.18 T, the pulse is intended to excite approximately 200 ppm (60 kHz) uniformly. To make the worst-case ¹³C–¹H J-coupling (about 200 Hz) negligible, its duration is capped at `1/(100*J) = 50 µs`. The required transfers are `{Lz → Lx, Ly → Ly, Lx → −Lz}`; the anticipated nutation-frequency range across the RF coil is 50–70 kHz. Calculation time: minutes.
+## Design objective and constraints
 
-## Physical / mathematical content
+The example motivates broadband excitation that tolerates resonance offsets and RF power-calibration variation. The source gives a 50 microsecond duration ceiling from a worst-case 13C-1H coupling of about 200 Hz; the configured waveform has 40 one-microsecond intervals, or 40 microseconds total. It explores ten RF nutation levels between 50 and 70 kHz and optimises the Cartesian x/y controls with GRAPE, calling `fmaxnewton` with `@grape_xy` and `control.method='lbfgs'`. The initial control guess is constant in both quadratures. The configured iteration limit is 200; the source also names `NS` and `SNS` penalties with weights 0.01 and 10, respectively, without defining those labels in this example.
 
-The example models 100 non-interacting ¹³C spins at equally spaced chemical shifts from −100 to +100 ppm. It uses a spherical-tensor Liouville-space basis with `IK-2` approximation, proximity level 1, and scalar-coupling connectivity. The `Lx`, `Ly`, and `Lz` starting states are normalised before optimisation; their targets are `−Lz`, `Ly`, and `Lx`, respectively.
+The three initial and target operators are normalised before optimisation. The basis configuration is `sphten-liouv` with `IK-2` at proximity level 1; the source comment describes this as retaining complete single-spin bases while omitting multi-spin orders for this case.
 
-## Numerical / algorithmic content
+## Evaluation shown by the example
 
-- Cartesian RF controls use the `Lx` and `Ly` operators, mapped to the ¹³C channel. The pulse has 40 intervals of 1 µs each, with ten power levels spanning `2π × 50–70 kHz`.
-- GRAPE optimisation calls `fmaxnewton` with `@grape_xy` and the `lbfgs` method. The initial guess is a `2 × 40` array of `1/4`; penalties `NS` and `SNS` have weights `0.01` and `10.0`, and the iteration limit is 200. Requested plots are `xy_controls`, `robustness`, and `spectrogram`.
-- The optimised profile is scaled by the mean power level and simulated as an XY-shaped pulse using `expv-pwc`. A ¹³C free induction decay is acquired with a 70,000 Hz sweep, 2,048 points, and 16,384-point zero filling; Gaussian apodisation with parameter 10 precedes the Fourier transform. The real spectrum is plotted on an inverted ppm axis.
-- For comparison, the script simulates and plots a conventional hard pulse at zero offset, phase `π/2`, power `2π × 60 kHz`, duration `4.2 µs`, rank 3, and `expv` propagation, using the same acquisition and spectral processing.
+After optimisation, the waveform is simulated on an initial Lz state with the piecewise-constant exponential propagator. The resulting 13C signal is acquired with an L+ coil, a 70 kHz sweep, 2,048 points, and 16,384-point zero filling; a Gaussian apodisation parameter of 10 is applied before plotting the real spectrum on a ppm axis. A conventional hard-pulse spectrum is plotted for comparison; its configured power is `2*pi*60e3`, duration 4.2 microseconds, phase pi/2, and pulse rank 3.
 
-## Implementation structure
-
-The function sets up the spin system and basis, constructs states and control operators, configures the optimisation, extracts the Cartesian waveform, and compares simulated spectra from the optimised and conventional pulses.
-
-Source contacts: ilya.kuprov@weizmann.ac.il; david.goodwin@inano.au.dk.
+These are design and evaluation settings in the example source, not a reported optimisation outcome or a kernel-test result. The source comments estimate a calculation time of minutes. Source contacts: ilya.kuprov@weizmann.ac.il and david.goodwin@inano.au.dk.

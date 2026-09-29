@@ -1,36 +1,15 @@
 # etc/molecules/cyprinol.m
 
-- Signature: `[sys,inter,bas]=cyprinol()`
+- MATLAB implementation: [etc/molecules/cyprinol.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/molecules/cyprinol.m)
 
-## Purpose
+## Call and returned model
 
-Spin system of cyprinol. Isotropic chemical shifts and J-couplings are taken from http://dx.doi.org/10.1002/mrc.4782 and, when not gi- ven there, estimated by tossing a twenty-sided coin. Syntax: [sys,inter,bas]=cyprinol()
+`[sys,inter,bas] = cyprinol()` takes no inputs. It constructs a fixed 69-spin cyprinol model: 42 `1H` spins followed by 27 `13C` spins. It returns the isotope list and chemical shifts in `sys` and `inter`, a scalar-coupling array in `inter`, and methyl permutation-symmetry settings in `bas`. The source does not assign a coordinate array or proton–proton J-couplings (both are marked TODO).
 
-## Physical / mathematical content
+## Parameter provenance and model limits
 
-## Numerical / algorithmic content
+The source cites [10.1002/mrc.4782](https://doi.org/10.1002/mrc.4782) for isotropic chemical shifts and J couplings, then explicitly says values absent from that report were estimated by “tossing a twenty-sided coin.” Treat those missing-data values as placeholders, not validated physical estimates. The implementation uses repeated heuristic coupling constants (including 40, 3, and 0.3 in the C–C block and 150 and 2 in the C–H block); the source does not state their units or provide a calibration procedure. Numeric shifts are included in the source, but it does not explain how individual assignments map to the cited paper.
 
-## Outputs
+Three proton triplets are declared as `S3` symmetry sets in `bas.sym_spins`: `H21a/H21b/H21c`, `H18a/H18b/H18c`, and `H19a/H19b/H19c`. These are the model's explicit permutation-symmetry instructions; they are not a claim that all sites in the molecule are equivalent under every experimental condition. For a richer test spin system, the source recommends `strychnine.m`.
 
-- sys -Spinach spin system description structure
-- inter -Spinach interaction description structure
-- bas -Spinach basis set description structure
-- Note: if you are looking for a test spin system, strychnine.m is a
-- more complete alternative.
-- Bud MacAulay
-- Ilya Kuprov
-
-## Implementation structure
-
-- Spin system of cyprinol. Isotropic chemical shifts and J-couplings
-- are taken from http://dx.doi.org/10.1002/mrc.4782 and, when not gi-
-- ven there, estimated by tossing a twenty-sided coin. Syntax:
-- [sys,inter,bas]=cyprinol()
-- sys -Spinach spin system description structure
-- inter -Spinach interaction description structure
-- bas -Spinach basis set description structure
-- Note: if you are looking for a test spin system, strychnine.m is a
-- more complete alternative.
-- Bud MacAulay
-- Ilya Kuprov
-- Hydrogen atoms
+Source: [cyprinol.m in Spinach](https://spindynamics.org/wiki/index.php?title=cyprinol.m); cited paper DOI: [10.1002/mrc.4782](https://doi.org/10.1002/mrc.4782).

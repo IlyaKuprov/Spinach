@@ -1,37 +1,26 @@
 # kernel/contexts/floquet.m
 
-- Signature: `[answer,sph_grid]=floquet(spin_system,pulse_sequence,...`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/floquet.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=floquet.m)
 
-## Purpose
+## Contract
 
-Floquet magic-angle-spinning context. It builds a Liouvillian superoperator for a powder simulation and passes it to a pulse sequence supplied as a function handle. The full call is `[answer,sph_grid]=floquet(spin_system,pulse_sequence,parameters,assumptions)`. The `assumptions` character string is passed to `assume` when the Hamiltonian is built.
+`floquet(spin_system,pulse_sequence,parameters,assumptions)` is the magic-angle-spinning powder context. The pulse sequence must be a function handle; the assumptions string is passed to `assume` for Hamiltonian construction. The implementation is restricted to the `sphten-liouv` and `zeeman-liouv` formalisms, builds the Hamiltonian and its spherical interaction components in the selected spin basis, then forms a Fourier/Floquet Liouvillian for each powder orientation. Relaxation and kinetics operators are included in the spin-space part.
 
-## Physical / mathematical content
+With cutoff `max_rank`, the spatial Fourier dimension is `2*max_rank+1`, labelled by ranks from `-max_rank` through `max_rank`; `spn_dim=size(H,1)`. The combined Floquet problem dimension is `spc_dim*spn_dim`. The rotor-turning term is constructed as `2*pi*rate` times the harmonic index, with `rate` in Hz. The implementation detects non-empty spherical interaction ranks and warns if the cutoff is below one of them; the header recommends increasing the cutoff until the result converges, roughly in line with the number of spinning sidebands.
 
-The context represents rotor-periodic dynamics in Floquet space. For each orientation in a spherical averaging grid, it constructs Fourier terms from the Hamiltonian's non-empty spherical interaction ranks, adds the isotropic Hamiltonian and the rotor turning generator, and calls the pulse sequence with the resulting Floquet Liouvillian, relaxation operator, and kinetics operator.
+## Parameters and orientation grid
 
-The Floquet spatial dimension is `2*parameters.max_rank+1`; the spin dimension is the dimension of the isotropic Hamiltonian. The retained harmonic rank should be increased until the result converges. Slower spinning generally requires more ranks, and the required rank is approximately the number of spinning sidebands. The code warns if `max_rank` is below a non-empty interaction rank because those harmonics are truncated.
+- `parameters.rate`: spinning rate in Hz. The source convention is positive for JEOL and negative for Varian and Bruker, reflecting their rotation directions.
+- `parameters.axis`: normalized three-component rotor-axis vector.
+- `parameters.max_rank`: required Fourier cutoff.
+- `parameters.grid`: spherical averaging grid from the kernel grids directory; its Euler angles and weights define the powder orientations, separately from the Floquet harmonic index.
+- `parameters.spins` and `parameters.offset`: spin labels and corresponding transmitter offsets in Hz.
+- `parameters.sum_up`: return a weighted orientation average when enabled, or a cell array of per-orientation outputs when disabled. The context also adds `spc_dim` and `spn_dim` to the parameter structure passed to the sequence.
 
-## Parameters and constraints
+Numerical rotating-frame transformations through `parameters.rframes` are not supported by this Floquet implementation. Its supported `parameters.needs` request is `iso_eq`; the source rejects other needs.
 
-- `parameters.rate`: spinning rate in Hz. Positive values correspond to the JEOL spinning direction; negative values correspond to the Varian and Bruker direction. Its spinning sense matches `singlerot.m`: the same rate produces the same powder result in both contexts.
-- `parameters.axis`: spinning axis as a normalized three-element vector. The implementation requires a row vector of three real numbers.
-- `parameters.spins`: non-empty cell array of spin isotope names involved in the pulse sequence, such as `{'1H','13C'}`. Each isotope must occur in the spin system.
-- `parameters.offset`: transmitter offsets in Hz corresponding to `parameters.spins`. If omitted, zero offsets are used.
-- `parameters.max_rank`: maximum harmonic rank retained in the Floquet calculation; required to be a non-negative integer.
-- `parameters.grid`: filename of a spherical grid in `kernel/grids`. Single-crystal simulations are not supported; use `singlerot.m` instead.
-- `parameters.sum_up`: when `1` (default), returns the weighted powder average; when `0`, returns the pulse-sequence result for each orientation as a cell array.
-- Pulse sequences may require additional fields in `parameters`; consult the pulse sequence documentation. The context also supplies `parameters.spc_dim` and `parameters.spn_dim`, the spatial and spin dynamics subspace dimensions, to the pulse sequence.
+When supplied, `parameters.rho0` and `parameters.coil` are projected into the central Floquet harmonic by `kron(P,...)`. The `iso_eq` request replaces a supplied `rho0` with equilibrium from the isotropic lab-frame Hamiltonian; without it, the context does not invent an initial state. Omitted `parameters.decouple` defaults to no decoupling, and `parameters.serial=true` selects serial orientation evaluation.
 
-The context requires the `zeeman-liouv` or `sphten-liouv` Liouville-space formalism and does not support a numerical rotating-frame transformation through `parameters.rframes`. Perturbative corrections to the rotating-frame transformation are not supported; use `singlerot.m` instead.
+## Source-supported example
 
-## Numerical / algorithmic content
-
-The context loads grid angles and weights, evaluates each powder orientation, and forms a weighted sum unless `parameters.sum_up` is disabled. It supports parallel orientation evaluation through MATLAB's parallel computing facilities; `parameters.serial` can turn parallel execution off. The state projector assumes a powder, not a single crystal.
-
-## Outputs
-
-- `answer`: the weighted powder average of the pulse-sequence output, or a cell array of individual orientation outputs when `parameters.sum_up` is `0`.
-- `sph_grid`: the spherical grid used in the calculation, containing `alphas`, `betas`, `gammas`, and `weights`.
-
-<https://spindynamics.org/wiki/index.php?title=floquet.m>
+`examples/nmr_solids/mas_powder_gly_floquet.m` calculates a 13C MAS powder spectrum for glycine at 14.1 T. It uses a 2 kHz rate, `max_rank=23`, and the `leb_2ang_rank_23` grid, with 256 time points and a 50 kHz sweep. These are example settings, not universal convergence prescriptions.

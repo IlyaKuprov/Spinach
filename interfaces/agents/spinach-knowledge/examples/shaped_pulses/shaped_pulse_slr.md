@@ -4,21 +4,22 @@
 
 ## Purpose
 
-Shinnar-Le Roux band-selective 90-degree excitation pulse on a chain of 31 strongly coupled protons. Calculation time: seconds.
+Build and apply a Shinnar–Le Roux (SLR) 90-degree band-selective excitation pulse in a strongly coupled 31-proton chain, then inspect the simulated proton spectrum.
 
-## Physical / mathematical content
+## Physical and numerical model
 
-- The system contains 31 `1H` spins at a magnetic field of `14.1`, with scalar Zeeman values spanning `-4` to `4` and nearest-neighbor scalar couplings of `10`.
-- The initial state is proton `Lz` magnetization. The SLR pulse acts through the proton `Lx` and `Ly` control operators; the acquired signal uses a proton `L+` coil state.
+The spin system uses 31 proton spins (1H) at a 14.1 T field, scalar Zeeman values spaced from -4 to 4, and scalar couplings of 10 between adjacent spins. The basis is the `sphten-liouv` formalism with the `IK-2` approximation and scalar-coupling connectivity with proximity level 1. The initial density operator is proton longitudinal (Lz) magnetization.
 
-## Numerical / algorithmic content
+The waveform generator is called as `slr_pulse(256, 15e-3, 32, pi/2, 0.01, 0.01)`. It returns x- and y-channel controls `Cx` and `Cy`, with durations `durs`; the plotted control amplitudes are labeled in rad/s and cumulative time in seconds. The example applies both quadratures with `shaped_pulse_xy` and the `expv-pwc` method. The source identifies the pulse as a 90-degree excitation; its plotted frequency response is the simulated result, not an experimental validation.
 
-- Uses the `sphten-liouv` basis with `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
-- Generates a 90-degree excitation waveform with `slr_pulse(256,15e-3,32,pi/2,0.01,0.01)` and applies its `Cx` and `Cy` components using `shaped_pulse_xy` with the `expv-pwc` method.
-- Acquires 2048 points with a sweep of 5000 Hz and zero-fills to 16384 points. Applies exponential apodisation with parameter `6`, then computes `fftshift(fft(fid,parameters.zerofill))`.
+## Acquisition and observable
 
-## Implementation structure
+Liquid-state acquisition uses proton L+ as the coil operator, zero offset, a 5000 Hz sweep, 2048 acquired points and 16384 zero-fill points. The FID receives exponential apodization with parameter 6 before a zero-filled Fourier transform; the example plots the pulse waveform and the magnitude spectrum labeled as band-selective excitation.
 
-- Creates the spin system, basis, Hamiltonian, control operators, and initial state.
-- Generates and applies the excitation SLR pulse, then runs liquid-state NMR acquisition.
-- Plots the pulse components against cumulative duration and the magnitude spectrum as band-selective excitation.
+## Scope
+
+This example specifies an excitation waveform and a simulated spectrum. It does not specify a gradient, relaxation model, experimental comparison, or convergence study.
+
+The source comment gives a calculation time of seconds.
+
+Source: [examples/shaped_pulses/shaped_pulse_slr.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_slr.m)

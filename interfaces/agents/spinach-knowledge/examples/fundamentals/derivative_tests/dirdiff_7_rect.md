@@ -1,17 +1,28 @@
 # examples/fundamentals/derivative_tests/dirdiff_7_rect.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_7_rect.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_7_rect.m)
+
 - Signature: `dirdiff_7_rect()`
 
-## Purpose
+## Question tested
 
-Checks directional derivatives returned by phase-modulated GRAPE for a rectangular pulse and an ensemble of chained waveform distortions.
+For phase-modulated GRAPE with the rectangular integrator and configured waveform-distortion chains, does the analytical derivative of the first fidelity component agree with centred finite differences at selected phase samples?
 
 ## Setup
 
-The test runs with sphten-liouv, zeeman-liouv, and zeeman-hilb. For each formalism it builds the system with dirdiff_test_system and sets a 13C control channel, channel map [1;1], drift H, controls Lx and Ly, initial states Sx, Sy, Sz, and targets −Sz, Sy, Sx. The power levels are 2*pi*linspace(50e3,70e3,10); GRAPE uses lbfgs, up to 1000 iterations, and the rectangle integrator.
+The script repeats the test for `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, using the system returned by `dirdiff_test_system`. Its controls use isotope `13C`, channel map `[1;1]`, drift `H`, operators `Lx` and `Ly`, initial states {Sx,Sy,Sz}, targets {-Sz,Sy,Sx}, power levels `2*pi*linspace(50e3,70e3,10)`, method `lbfgs`, maximum iterations 1000, and an empty plotting list. The rectangular grid and amplitude vector each have five entries: `12.8e-6*ones(1,5)` and `ones(1,5)`. The random phase guess is `randn(1,5)/3`; the increment is `h=sqrt(eps('double'))`.
 
-There are five pulse intervals, each 12.8e-6 s, with unit amplitudes. Two distortion chains are applied: firf(w,[0.9 0.1i]) → spf(w,0.2) → szf(w,0.2) → amp_root(w,2*pi*20e3,4), and the reverse ordering szf(w,0.2) → spf(w,0.2) → amp_root(w,2*pi*20e3,4) → firf(w,[0.9 0.1i]).
+The source configures two rows of four distortion callbacks:
 
-## Derivative check
+1. `firf(w,[0.9 0.1i])`, `spf(w,0.2)`, `szf(w,0.2)`, then `amp_root(w,2*pi*20e3,4)`.
+2. `szf(w,0.2)`, `spf(w,0.2)`, `amp_root(w,2*pi*20e3,4)`, then `firf(w,[0.9 0.1i])`.
 
-For a random five-sample phase vector randn(1,5)/3, the code obtains the analytical gradient from grape_phase and estimates derivatives with centered finite differences using h=sqrt(eps('double')). It checks samples 1, 5, and 3 (left edge, right edge, and midpoint). Each must satisfy abs(grad_anl-grad_num)/abs(grad_num)<1e-6; a failed comparison raises an error identifying the formalism and sample position.
+These are the source-listed chains; no additional units are assigned here to their numerical arguments.
+
+## Comparison and observable
+
+The analytical phase gradient is returned by `grape_phase`. At phase entries 1, 3, and 5, the script evaluates the first fidelity entry for guesses perturbed by +h and -h, then forms `g_num=(fid_plus(1)-fid_minus(1))/(2*h)`. It compares this with the corresponding analytical-gradient entry using `abs(g_anl-g_num)/abs(g_num) < 1e-6`. Each result produces a formalism- and position-specific passed message or raises an error.
+
+## Scope
+
+The comparisons cover only the left edge, right edge, and middle entry of the five-element phase guess for each formalism. They do not establish agreement for all phase coordinates or report an outcome of a particular test run.

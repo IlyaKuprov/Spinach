@@ -1,19 +1,17 @@
 # examples/dnp_sol/steady_state/xix_q_con_time_single.m
 
-- Signature: `xix_q_con_time_single()`
+Signature: `xix_q_con_time_single()`
 
-## Purpose
+This is the single-geometry XiX DNP contact-time calculation at steady state. Unlike the three ensemble variants, it fixes the electron–proton separation at 3.5 Å and does not average over distance. The source estimates the calculation time as minutes.
 
-Simulate the steady-state XiX DNP proton signal as a function of total contact time at a Q-band magnetic field. The source estimates a calculation time of minutes.
+## Setup and scan
 
-## Physical / mathematical content
+The E–¹H model uses `sys.magnet=1.2142` (Q-band setting), spin temperature `80`, trityl g values `[2.00319 2.00319 2.00258]`, proton Zeeman entry `[0 0 5]` (source comment: ppm guess), and Euler-angle entries `[0 10 0]` and `[0 0 10]` degrees. The coordinates place the proton on the z axis at 3.500; that distance is passed to `r1n_dnp`, whose source documents its `r` argument in Angstrom. The source derives the scalar electron–nuclear separation from those coordinates and calls `r1n_dnp` for the orientation-dependent nuclear R1, using arguments `sys.magnet`, temperature, `2.00230`, `1e-3`, `52`, that separation, and `bet`. It sets `inter.r1_rates={1e3,r1n_rate}` and `inter.r2_rates={200e3,50e3}`, with `t1_t2` relaxation, diagonal retention, and Di Bari equilibrium.
 
-- Models one electron and one proton (`'E'`, `'1H'`) at `sys.magnet=1.2142` and `inter.temperature=80`. The electron has a trityl g-tensor; the proton has an illustrative Zeeman shift. Their coordinates place them 3.500 units apart along z.
-- Uses `t1_t2` relaxation, including a proton longitudinal rate supplied by `r1n_dnp` as a function of orientation angle `bet` and electron–nuclear distance. Equilibrium is set to `'dibari'`, and the detected observable is proton `Lz`.
-- Averages the steady-state XiX response over the specified orientation grid using `powder(spin_system,@xixdnp_steady,parameters,'esr')`.
+The full `sphten-liouv` basis has no approximation; propagator chopping tolerance is `1e-12`. The contact scan is XiX loop counts 1–64, with two 48 ns pulses per loop. The source uses `phase=pi` (inverted second pulse), `18e6` electron nutation frequency (Hz), grid `rep_2ang_800pts_sph`, `addshift=-13e6`, and `el_offs=61e6`; shot spacing is 153 μs minus the pulse-train duration. Contact time is twice pulse duration times loop count and is plotted in μs.
 
-## Numerical / algorithmic content
+## Run dependencies and output
 
-- Creates the Spinach system with `create` and `basis`, using an unrestricted `sphten-liouv` basis and propagator chopping tolerance `1e-12`.
-- Sweeps `parameters.nloops` from 1 to 64. Each loop contributes two 48 ns pulses, so total contact time is `2*pulse_dur*nloops`; shot spacing is updated to `153e-6` minus that pulse-train duration.
-- Sets electron irradiation to 18 MHz, second-pulse phase to `pi`, and additional shift and electron offset to −13 MHz and 61 MHz. Plots the real part of the calculated proton `Lz` signal against contact time in microseconds and saves `xix_q_con_time_single.fig`.
+Requires Spinach MATLAB functions including `powder` and system/basis/state and plotting routines, plus [`r1n_dnp`](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1n_dnp.m) and [`xixdnp_steady`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/xixdnp_steady.m). The mapped source is [`xix_q_con_time_single.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_con_time_single.m).
+
+The no-argument function returns no MATLAB output. It plots the real proton `Lz` expectation value against contact time and saves `xix_q_con_time_single.fig` in the current directory. This is one fixed-separation result, not a distance-distribution average; the source does not emit a table or array of values as a function output.

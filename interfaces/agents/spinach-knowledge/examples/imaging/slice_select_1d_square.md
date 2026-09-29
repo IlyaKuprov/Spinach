@@ -1,20 +1,29 @@
 # examples/imaging/slice_select_1d_square.m
 
 - Signature: `slice_select_1d_square()`
+- Source: [examples/imaging/slice_select_1d_square.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/slice_select_1d_square.m)
 
-## Purpose
+## Experiment
 
-Shows 1D slice selection with a rectangular RF pulse while diffusion and flow are present. The source estimates seconds of runtime.
+This driver runs one-dimensional slice selection with a rectangular RF pulse while the sample has both flow and diffusion. Its source comment estimates a runtime of seconds; that is a source estimate, not a measured timing here.
 
-## Model and sequence
+## Model and encoded parameters
 
-The model is one `1H` at 5.9 T with zero chemical shift, diagonal T1/T2 relaxation, zero equilibrium, and rates `r1 = 30`, `r2 = 70`. It uses the `sphten-liouv` formalism without a basis approximation. The 0.30 m sample has 100 points; slice-selection and readout gradient amplitudes are each `30 mT/m`.
+The spin system contains one 1H with magnetic-induction parameter 5.9 and zero chemical shift; the source does not label a unit for the field value. It uses the sphten-liouv formalism with no basis approximation. The T1/T2 relaxation model keeps diagonal terms, sets the equilibrium state to zero, and assigns R1=30 and R2=70; the source gives no units for these rate values.
 
-The 50-step RF pulse has total duration `0.5e-4 s`, frequency `+100 kHz`, phase `pi/2`, and a rectangular amplitude profile scaled by `2*pi*3000`. The source sets the flow field to `1e-2` and diffusion to `5e-6`.
+The sample geometry is entered as dims=0.30 with 100 points; the source does not annotate a unit for dims. The spatial derivative option is {'period',3}. Readout settings are sweep=500000, 128 points, axis_units='kHz', and invert_axis=1. Slice-selection and readout gradient amplitudes are each 30e-3, with no units stated in the driver. Diffusion is 5e-6 and the one-dimensional flow field is 1e-2 at each sample point; their units are likewise not stated.
 
-## Computation and output
+The rectangular RF pulse is represented by 50 segments over a total pulse_time of 0.5e-4. The source sets the pulse frequency to +100e3, pulse power to `2*pi*3000`, and RF phase to pi/2, without annotating units for frequency or power. It supplies segment-wise frequency, amplitude, and duration lists, and sets max_rank=3.
 
-The pulse sequence is evaluated with `imaging(spin_system,@slice_select_1d,parameters)`. The signal receives square-sine apodisation and a real, shifted Fourier transform before plotting as a 1D profile.
+The initial-state and coil phantoms are uniform, with Lz preparation and L+ detection operators. The relaxation phantom is zero and uses relaxation(spin_system) as its operator.
+
+## Computation and observable
+
+After creating the spin system and basis, the driver calls imaging(spin_system,@slice_select_1d,parameters). It applies square-sine apodisation, takes a shifted Fourier transform, keeps its real part, and plots the resulting one-dimensional profile. The source specifies the calculation but does not give numerical profile values or a saved result; no simulation was run for this page.
+
+## Scope
+
+This example demonstrates a one-dimensional pulse-and-gradient acquisition with flow and diffusion enabled. The source does not report an experimental comparison or quantify slice-profile performance.
 
 ## Attribution
 

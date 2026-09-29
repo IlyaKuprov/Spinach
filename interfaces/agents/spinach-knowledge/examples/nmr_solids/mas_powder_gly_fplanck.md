@@ -1,21 +1,19 @@
 # examples/nmr_solids/mas_powder_gly_fplanck.m
 
-- Signature: `mas_powder_gly_fplanck()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_gly_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_gly_fplanck.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_gly_fplanck.m)
 
-Calculates the glycine powder `13C` MAS spectrum. The source header describes Fokker–Planck MAS formalism, while the implementation calls `singlerot(...)`. The header assumes `1H` decoupling; the script does not set a `parameters.decouple` value. Calculation time: seconds.
+## Purpose and model
 
-## Physical / mathematical content
+This example constructs a computed 13C MAS spectrum for glycine powder. Its header describes Fokker–Planck MAS formalism and assumes 1H decoupling; the implementation actually calls `singlerot(spin_system,@acquire,parameters,'nmr')`. The script itself does not add a 1H isotope to the imported system or set a decoupling parameter, so the header's decoupling assumption is not an explicit decoupler setting here. The source comment estimates a seconds-scale calculation time; this is not a measured runtime.
 
-- The spin system is generated from the glycine PCM-DFT log with `g2spinach`; the field is 14.1 T and the observed spin is `13C`.
-- The basis uses no approximation, projection +1, and a longitudinal `15N` subspace. Interaction and proximity cutoffs are set to 5.0 and 4.0.
+`gparse` reads `../standard_systems/glycine.log`, and `g2spinach` imports `13C` and `15N` with reference arguments `[182.1 264.5]` in that isotope order. `g2spinach` documents `references` as absolute shielding values for zero-ppm reference substances; these are calibration inputs, not reported experimental peak positions. The model field is `14.1 T`. The basis uses `sphten-liouv`, no approximation, projection `+1`, and a longitudinal `15N` subspace; interaction and proximity cutoffs are set to `5.0` and `4.0` respectively.
 
-## Numerical / algorithmic content
+## MAS acquisition and spectrum
 
-- The script sets a 2000 Hz rotor rate, axis `[1 1 1]`, maximum rank 23, and grid `leb_2ang_rank_23`.
-- Acquisition uses 256 points over a `5e4` sweep, zero-filled to 1024 with offset 17000; exponential apodisation parameter 6 is applied before Fourier transformation.
+The source sets the rotor axis to `[1 1 1]`, MAS rate to `2000 Hz` (2 kHz), powder grid `leb_2ang_rank_23`, and `max_rank=23`. Acquisition uses a `5e4 Hz` sweep and 256 points, zero-fills to 1024, and sets `offset=17000`; the script does not assign `axis_units`. Both initial state and receiver are `L+` on `13C`, and the selected observed spin is `13C`.
 
-## Implementation structure
+The code calls `singlerot`, applies exponential apodisation with parameter `6`, computes `fftshift(fft(fid,parameters.zerofill))`, and plots `real(spectrum)` with `plot_1d`. The output is a simulation spectrum; this source does not supply experimentally measured output or report a numerical comparison.
 
-- Parse the glycine DFT log, create the Spinach system and basis, configure acquisition, call `singlerot(spin_system,@acquire,parameters,'nmr')`, apodise, Fourier transform, and plot.
+Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).

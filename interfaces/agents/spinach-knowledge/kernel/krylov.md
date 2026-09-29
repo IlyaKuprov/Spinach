@@ -1,33 +1,25 @@
 # kernel/krylov.m
 
 - Signature: `answer=krylov(spin_system,L,coil,rho,timestep,nsteps,output)`
+- Direct MATLAB source: [`kernel/krylov.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/krylov.m)
+- Existing Wiki: [`krylov.m`](https://spindynamics.org/wiki/index.php?title=krylov.m)
 
-## Purpose
+## Purpose and propagation
 
-Propagates one or more state vectors without forming the full propagator. The routine uses a reordered Taylor process rather than a Krylov-subspace/Arnoldi iteration.
+Propagates state vectors without constructing the full propagator; the source recommends it when the propagator does not fit in memory but `L` does, while warning that it may be slow. A propagation step applies the matrix-exponential action to the state (Spinach convention: `rho_next=exp(-1i*L*timestep)*rho`); this implementation advances states through calls to `step(spin_system,L,rho,timestep)` ([helper source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/step.m)). The source comment identifies the implemented approach as a reordered Taylor process rather than a Krylov-subspace/Arnoldi iteration. In `zeeman-wavef`, the source header identifies `L` as the Hamiltonian and `rho` as a wavefunction; `zeeman-hilb` is unsupported.
 
-## Physical / mathematical content
+The routine has no frequency-unit conversion. `timestep` must be consistent with the units/convention of `L`; the source does not declare a standalone Hz-versus-angular-frequency conversion or normalization of the input/output state.
 
-For `sphten-liouv` and other supported Liouville-space use, `L` is the evolution generator and `rho` contains the initial state vector or vectors. In `zeeman-wavef`, `L` is the Hamiltonian, `rho` contains wavefunctions, and observables are overlap trajectories. The `zeeman-hilb` formalism is not supported.
+## Inputs and guards
 
-## Numerical / algorithmic content
+The formalism guard accepts `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`. The source checks that `L`, `coil`, `timestep`, and `nsteps` are numeric, that `rho` is numeric or a cell array, and that `output` is a character value in a whitelist. These are type/formalism checks; this function does not add explicit dimensional, finiteness, sign, or integer checks in the visible guards. GPU-enabled systems move `L`, `rho`, and `coil` to the GPU; otherwise `rho` is made full on the CPU.
 
-Each time step is evaluated by the Taylor-based `step` routine; GPU arrays are used when GPU execution is enabled in `spin_system.sys.enable`. The method avoids storing a full matrix exponential and may be slow.
+## Output modes and shapes
 
-## Parameters / inputs
+- `final`: advances once by `timestep*nsteps`; returns the gathered final state, with the state dimensions of `rho`.
+- `trajectory`: returns state vectors at the initial point and after each step, allocated as `size(rho,1)×(nsteps+1)`.
+- `refocus`: sets the step count to `size(rho,2)`; successively advances columns 2:end, 3:end, and so on, then returns the resulting `rho` matrix. This schedules the initial vector at zero steps, the next at one step, etc., as used for the second indirect-dimension evolution after a refocusing pulse.
+- `observable`: records `coil'*rho` initially and after every step, returning `(nsteps+1)×size(rho,2)` for a single detection vector.
+- `multichannel`: records all coil overlaps, returning `size(coil,2)×(nsteps+1)×size(rho,2)`; the source header notes that destination-state screening can be less efficient with multiple destinations.
 
-- `spin_system` - Spinach system descriptor and execution settings.
-- `L` - Liouvillian or, in `zeeman-wavef`, Hamiltonian used for evolution.
-- `coil` - detection state for `observable`; for `multichannel`, columns are the individual observable vectors. In `zeeman-wavef`, it is a reference wavefunction.
-- `rho` - initial state vector or horizontal stack of initial states; in `zeeman-wavef`, wavefunction(s).
-- `timestep` - time step.
-- `nsteps` - number of time steps.
-- `output` - output mode: `final` returns the state after `nsteps`; `trajectory` returns the initial and subsequent states; `refocus` evolves successive input vectors for zero, one, two, and further steps; `observable` returns the coil signal versus time; `multichannel` returns signals for multiple coil vectors.
-
-## Outputs
-
-- `answer` - final state, state trajectory, or observable trajectory, with dimensions depending on `output` and whether `rho` or `coil` contains multiple columns. `multichannel` returns one channel per coil vector; destination-state screening can be less efficient with multiple destinations.
-
-## Implementation structure
-
-The routine validates its inputs, moves data to the GPU when enabled, dispatches on `output`, and advances the requested state or observable trajectories through repeated calls to `step`.
+The input whitelist also contains `total`, but the dispatch switch has no `total` case; any unmatched dispatch reaches the source's `unknown output option` error. This distinction is based on the source's guard and dispatch, not a runtime test.

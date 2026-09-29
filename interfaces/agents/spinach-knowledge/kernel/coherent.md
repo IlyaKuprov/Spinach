@@ -1,33 +1,23 @@
 # kernel/coherent.m
 
-- Signature: `rho=coherent(spin_system,mode,alpha)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/coherent.m) · [Spin Dynamics Wiki: coherent.m](https://spindynamics.org/wiki/index.php?title=coherent.m)
 
-## Purpose
+## Contract
 
-Builds the normalised, Fock-space-truncated coherent state with amplitude `alpha` on the specified bosonic mode, with unit operators on all other particles of the system.
+`rho=coherent(spin_system,mode,alpha)` prepares the density operator of a coherent state in one truncated bosonic mode. The amplitude `alpha` is a finite complex scalar; `mode` is the particle index in the system and must identify a bosonic particle of type `C`, `V`, or `T`.
 
-## Physical / mathematical content
+## State and dimensions
 
-- The Fock state amplitudes up to the truncation level are proportional to `alpha^n/sqrt(n!)`.
-- Fock space truncation removes the tail of the Poisson distribution. The lost weight is reported, and the truncated state is renormalised.
+Let `N=spin_system.comp.mults(mode)` be the mode's Fock truncation. Before normalization, the state-vector coefficients for occupation `n=0,...,N-1` are `alpha^n/sqrt(n!)`. The cutoff omits the upper Poisson tail with mean `abs(alpha)^2`; the function reports its lost probability weight, then normalizes the retained coefficients. Thus the constructed single-mode state has unit trace after truncation, not the untruncated infinite-dimensional coherent state.
 
-## Numerical / algorithmic content
+The function forms the mode projector `|alpha><alpha|` and Kronecker-products it with identity operators for every other particle, in the particle order of the spin system. If `D=prod(spin_system.comp.mults)`, the Hilbert-space density matrix is `D-by-D`; the selected mode contributes an `N-by-N` block. This is a state operator, not a state ket. For example, `alpha=0` gives the truncated vacuum in the selected mode and leaves all other particles as identities.
 
-- Constructs the mode density matrix from the normalised amplitudes and takes its Kronecker product with identity operators on the other particles.
-- Returns a full density matrix in `zeeman-hilb` formalism or its vectorisation in `zeeman-liouv` formalism.
+## Formalism and basis
 
-## Parameters / inputs
+In `zeeman-hilb`, the function returns the density matrix. In `zeeman-liouv`, it returns the column vectorization of that matrix, with `D^2` entries. Other formalisms are rejected. The construction uses the system's Zeeman product basis and its particle ordering; it does not rotate, average, or otherwise transform the state.
 
-- `mode` - index of a bosonic mode in `sys.isotopes`.
-- `alpha` - coherent state amplitude, a complex scalar.
+## Inputs
 
-## Outputs
-
-- `rho` - coherent state density matrix (`zeeman-hilb`) or its vectorisation (`zeeman-liouv`).
-
-## Implementation structure
-
-- Checks that basis information is present, `mode` indexes a bosonic particle, and `alpha` is a finite numeric scalar.
-- Computes and normalises the truncated amplitudes, reports the lost Poisson-distribution weight, builds the composite density matrix, and converts it to the current Zeeman formalism. Other formalisms produce an error.
-
-<https://spindynamics.org/wiki/index.php?title=coherent.m>
+- `mode`: particle index, checked against the system's particle count and bosonic type.
+- `alpha`: finite numeric scalar, with real or complex value; it is the dimensionless coherent-state amplitude.
+- The mode cutoff is read from `spin_system.comp.mults(mode)`; it is not an extra function argument.

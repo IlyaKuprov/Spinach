@@ -1,19 +1,33 @@
 # kernel/utilities/iselectron.m
 
-- Signature: `verdict=iselectron(spin_spec)`
-
 ## Purpose
 
-Tests whether a Spinach particle specification denotes an electron. The function checks that `spin_spec` is a character string and a valid Spinach particle specification, then returns true when its first character is `E` and false otherwise.
+Returns `true` if the particle specified is an electron, and `false` otherwise.
 
-## Parameters / inputs
+## Behavior
 
-- `spin_spec` - a character string containing a Spinach particle specification.
+- The function first validates the input via an internal consistency check (`grumble`):
+  - Errors with `'spin_spec must be a character string.'` if the input is not a character string.
+  - Calls `spin(spin_spec)` to verify that the specification is a valid Spinach particle specification.
+- After validation, the function performs a simple matching check: if the first element of `spin_spec` is `'E'`, the verdict is `true`; otherwise it is `false`.
 
-## Outputs
+## Inputs and outputs
 
-- `verdict` - true if the first character of `spin_spec` is `E`, false otherwise.
+**Syntax**
 
-## Source
+```matlab
+verdict = iselectron(spin_spec)
+```
 
-[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=iselectron.m)
+**Inputs**
+
+- `spin_spec` — a Spinach particle specification (character string).
+
+**Outputs**
+
+- `verdict` — `true` for an electron, `false` otherwise.
+
+## References
+
+- Source: [kernel/utilities/iselectron.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iselectron.m)
+- Wiki: <https://spindynamics.org/wiki/index.php?title=iselectron.m>

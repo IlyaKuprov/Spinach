@@ -1,24 +1,21 @@
 # examples/optimal_control/state_transfer_wf.m
 
+Source: [examples/optimal_control/state_transfer_wf.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/state_transfer_wf.m)
+
 - Signature: `state_transfer_wf()`
 
-## Purpose
+## Design objective
 
-Transfer population from the lowermost to the uppermost energy level of a four-spin system using wave-function-space GRAPE. Calculation time: minutes.
+The example formulates population transfer from the lowest to the highest energy level of a four-spin system using GRAPE in wave-function space. Unlike the companion singlet-to-carbon example, the state vectors here are explicitly initialized as the last and first entries of a 16-element vector.
 
-## Physical / mathematical content
+## Spin model and states
 
-- The system contains two `1H` and two `13C` spins at a magnetic field of 14.1, with scalar Zeeman values `[1.5, 2.0, 30.0, 40.0]` and specified pairwise scalar couplings.
-- The calculation uses the `zeeman-wavef` formalism without a basis approximation. The initial and target states are, respectively, the last and first entries of 16-element state vectors.
-- The drift Hamiltonian includes transmitter offsets of 1050 for `1H` and 5285 for `13C`; the four controls are the `Lx` and `Ly` operators for each isotope.
+The model has two `1H` and two `13C` spins with `sys.magnet=14.1`. Scalar Zeeman entries are `[1.5, 2.0, 30.0, 40.0]`; scalar couplings are 1–2: 7.0, 1–3: 150, 2–4: 150, and 3–4: 50. Units for these interaction entries are not annotated in this source. The basis uses `zeeman-wavef` with approximation `none`. The initial vector has its final component set to one, and the target has its first component set to one. The source calls these variables `rho_init` and `rho_targ`, but they are wave-function-space vectors in this setup.
 
-## Numerical / algorithmic content
+## GRAPE configuration
 
-- The controls use 100 slices of duration `1.5e-4`, with pulse-power levels `2*pi*[460 480 500 520 540]`. The `NS` and `SNS` penalties have weights `[0.1 10]`.
-- Starting from a random 4-by-100 waveform, `fmaxnewton` optimises `@grape_xy` with method `goodwin` and a maximum of 100 iterations. The resulting pulse is scaled by the mean power level.
-- A test simulation applies the pulse with `shaped_pulse_xy` using `expv-pwc` propagation and reports `real(rho_targ'*rho)`.
+The x/y controls act on proton and carbon channels; the drift is offset using transmitter settings `[1050, 5285]` (units not specified at that assignment). The configured power levels are `2*pi*[460, 480, 500, 520, 540]`, over 100 slices of 150 microseconds (15 ms). The `NS` and `SNS` penalties have weights 0.1 and 10, the optimizer method is `goodwin`, and the iteration cap is 100. A random 4-by-100 guess is passed to `fmaxnewton` with `@grape_xy`; the returned pulse is scaled by the mean power level.
 
-## Implementation structure
+## Test calculation
 
-- Create the spin system and basis, then construct the initial and target states, control operators, and offset-adjusted drift Hamiltonian.
-- Configure the controls and optimisation, optimise the waveform, scale the pulse, and run the test simulation.
+The script propagates the pulse with `shaped_pulse_xy` and computes `real(rho_targ'*rho)` for reporting. This source describes an example and a test path; it does not include a measured numeric fidelity or evidence that the optimization converged. The source estimates calculation time as minutes.

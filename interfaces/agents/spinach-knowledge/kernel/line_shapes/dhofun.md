@@ -1,25 +1,21 @@
 # kernel/line_shapes/dhofun.m
 
+- MATLAB source: [kernel/line_shapes/dhofun.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/line_shapes/dhofun.m)
+- Existing Wiki: [dhofun.m](https://spindynamics.org/wiki/index.php?title=dhofun.m)
 - Signature: `y=dhofun(x,nat_freq,fwhm)`
 
-## Purpose
+## Meaning and equation
 
-Evaluates the normalized damped-harmonic-oscillator response at positive frequencies. It peaks at the undamped natural frequency and goes to zero quadratically as frequency approaches zero.
+This is the normalized damped-harmonic-oscillator response in magnetic-resonance notation. For `x>0`, put `r=x/nat_freq` and `d=fwhm/nat_freq`; the source evaluates `y=(2*d/(pi*nat_freq))*r^2/((r^2-1)^2+(d*r)^2)`. It sets `y=0` for non-positive `x`. The response integrates to one over positive arguments, peaks at `nat_freq`, and the source identifies `fwhm` as the full width at half maximum at any damping; in the weak-damping limit it tends to a Lorentzian of that width.
 
-## Physical / mathematical content
+## Inputs and units
 
-The response models a damped oscillator band. In the weak-damping limit it approaches a Lorentzian; `fwhm` is the full width at half maximum for all damping values.
+- `x` - real numeric array of any dimension. The guard checks that it is numeric and real; it does not explicitly reject non-finite values.
+- `nat_freq` - finite positive real numeric scalar.
+- `fwhm` - finite positive real numeric scalar.
 
-## Numerical / algorithmic content
+`x`, `nat_freq`, and `fwhm` must use the same frequency coordinate. The function does not convert between Hz and angular frequency, so the caller's consistent convention determines which is used. The response has reciprocal-frequency units.
 
-Non-positive entries of `x` return zero. The formula is evaluated using frequencies scaled by `nat_freq` to avoid intermediate overflow in single precision.
+## Output
 
-## Parameters / inputs
-
-- `x` - real numeric array of any dimension, in frequency units.
-- `nat_freq` - finite positive real scalar, the natural frequency of the undamped oscillator, in the same units as `x`.
-- `fwhm` - finite positive real scalar, the oscillator damping rate and full width at half maximum, in the same units as `x`.
-
-## Outputs
-
-- `y` - response values with the same size and type as `x`, normalized to unit integral over positive frequencies.
+- `y` - same size and type as `x`, initialized with zeros like `x`; positive-argument entries are replaced by the response.

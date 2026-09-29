@@ -1,21 +1,21 @@
 # examples/nmr_paramag/dft_density.m
 
 - Signature: `dft_density()`
+- Source: [dft_density.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/dft_density.m)
 
-## Purpose
+## Purpose and model
 
-Simulation of the PCS field for the Eu(III) complex of 1,4,7,10-tetrakis(2-pyridylmethyl)-1,4,7,10-tetraazacyclododecane. The example imports the electron probability density and DFT hyperfine and susceptibility data, then compares the distributed-density solution with point-model and HFC-derived PCS. The distributed model is based on the [Kuprov-equation paper](http://dx.doi.org/10.1039/C4CP03106G). The source notes that one outlier arises from an isotropic hyperfine contact shift for a nucleus; the point model and Kuprov equation used here do not include contact shifts.
+Compares point-centre and distributed-density PCS for the Eu(III) complex 1,4,7,10-tetrakis(2-pyridylmethyl)-1,4,7,10-tetraazacyclododecane. This is a molecular-complex example, not a carbonic-anhydrase example. The source cites the [paper describing the delocalised-model equation](https://doi.org/10.1039/C4CP03106G).
 
-## Physical / mathematical content
+## Inputs and calculations
 
-The calculation normalizes the imported three-dimensional electron probability density, obtains the susceptibility tensor from the DFT data, and solves the PCS field with `kpcs`. It also computes point-model PCS with `ppcs` and HFC-derived PCS with `hfc2pcs` for comparison.
+- Loads electron probability density, grid extent, coordinates, and spacing from `tetra_py_probden.mat`; reads HFC and susceptibility data from `tetra_py_dft_run.log` with `gparse`. The source says HFCs are in Gauss.
+- Normalizes the probability density by its three-dimensional trapezoidal integral using `dx^3`.
+- Converts `props.chi` to a rank-2 tensor representation, then obtains `chi` with `sphten2mat`.
+- Computes point-model PCS with `ppcs(xyz,[0 0 0],chi)`; the point-centre coordinate is explicitly `[0 0 0]`, but its coordinate unit is not stated.
+- Computes the distributed result with `kpcs(probden,chi,ext,xyz,'fft')`.
+- For each DFT atom except the final atom, maps H, C, and N to `1H`, `13C`, and `14N`, then obtains HFC-derived PCS with `hfc2pcs`.
 
-## Numerical / algorithmic content
+## Outputs and limits
 
-The DFT-derived PCS values are generated for the parsed nuclei using the corresponding isotope labels (¹H, ¹³C, or ¹⁴N). The example plots HFC-derived and point-model PCS against the distributed solution and displays the distributed PCS field.
-
-## Implementation structure
-
-- Load and normalize the electron probability density and read the DFT data.
-- Derive the susceptibility tensor and compute point-model and distributed PCS.
-- Calculate PCS from DFT hyperfine tensors and compare all models; plot the distributed field.
+Plots DFT-HFC PCS against distributed PCS and point-model PCS against distributed PCS; those plot axes are labelled in ppm. It transforms the distributed 3-D PCS grid for display and plots it with the molecular coordinates. The source gives no magnetic-field or temperature value and no units for the coordinates or susceptibility tensor. It notes one outlier caused by a nonzero isotropic HFC contact shift; neither the point model nor the Kuprov-equation calculation includes contact shifts. No spectrum is simulated.

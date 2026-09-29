@@ -1,34 +1,28 @@
 # experiments/sat_rec.m
 
-- Signature: `fids=sat_rec(spin_system,parameters,H,R,K)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/sat_rec.m
+Spinach Wiki: https://spindynamics.org/wiki/index.php?title=sat_rec.m
 
-## Purpose
+## Purpose and initial condition
 
-Computes a saturation-recovery pulse sequence with analytical saturation, using the unit state as the initial condition.
+`sat_rec` computes a saturation-recovery sequence with analytical saturation: it sets the initial state to `unit_state(spin_system)` rather than applying an explicit saturation pulse. The source notes that the relaxation superoperator must be thermalised. It does not accept a user-supplied starting state.
 
-## Numerical / algorithmic content
+## Propagation and acquisition
 
-The routine composes `L=H+1i*R+1i*K`, starts from `unit_state(spin_system)`, and propagates a trajectory over `parameters.n_delays` equally spaced relaxation periods spanning `parameters.max_delay`. It applies a 90-degree pulse about the source-defined `Ly` operator to each trajectory state, then acquires an FID for each state using the detection state on `parameters.spins{1}`, dwell time `1/parameters.sweep`, and `parameters.npoints-1` intervals. The FIDs are returned as columns.
+The routine forms `L=H+1i*R+1i*K`. It generates a relaxation trajectory from the unit state using a step of `max_delay/n_delays` for `n_delays` trajectory steps. At every trajectory state it applies a `pi/2` pulse about the Y component of `L+` for the selected isotope, `parameters.spins{1}`. It then acquires using the corresponding `L+` detection state and the same propagation generator, with dwell `1/sweep` and `npoints-1` evolution steps.
 
-## Parameters / inputs
+The `sweep` parameter is documented in Hz, so the FID dwell is `1/sweep`. `max_delay` is documented as the longest relaxation delay; the source does not state a unit in its parameter description. The documented output has one FID per delay, starting from zero, with individual FIDs in columns. The local code does not explicitly reshape or separately annotate the resulting matrix dimensions.
 
-- `parameters.sweep` — spectrum sweep width, Hz
-- `parameters.npoints` — number of points in each FID
-- `parameters.spins` — nuclei on which the sequence runs, specified as {'1H'}, {'13C'}, etc.
-- `parameters.max_delay` — longest relaxation delay
-- `parameters.n_delays` — number of relaxation delays to run
-- `H` — Hamiltonian matrix, received from the context function
-- `R` — relaxation superoperator, received from the context function; it must be thermalised
-- `K` — kinetics superoperator, received from the context function
+## Required parameters and outputs
 
-## Outputs
+- `sweep`: positive real scalar, Hz; `npoints`: positive integer.
+- `spins`: one-element cell array containing an isotope present in the system, e.g. `{'1H'}` (or `{'13C'}`).
+- `max_delay`: positive real scalar, the longest recovery delay; `n_delays`: positive integer.
+- `H`, `R` and `K`: numeric matrices with matching dimensions. The source requires the relaxation superoperator to be thermalised and rejects a system whose `spin_system.rlx.equilibrium` is `'zero'`.
+- `fids`: matrix of FIDs, with a delay's trace in each column as documented.
 
-- `fids` — free induction decays for each delay starting from zero, with individual FIDs in columns
+This describes the implemented sequence, not simulated or measured recovery curves.
 
-## Credit
+## Source reference
 
-Zak El-Machachi
-
-## Reference
-
-- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=sat_rec.m)
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=sat_rec.m)

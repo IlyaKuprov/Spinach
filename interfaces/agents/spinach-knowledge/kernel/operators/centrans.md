@@ -1,33 +1,30 @@
 # kernel/operators/centrans.m
 
+Direct source: [kernel/operators/centrans.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/centrans.m)
+
 - Signature: `A=centrans(mult,type)`
 
 ## Purpose
 
-Construct a sparse central-transition spin operator of dimension `mult` and return it as a complex matrix.
+Construct a sparse complex `mult-by-mult` matrix whose only populated entries are on the two central basis indices. The routine uses `r=mult/2` and `s=r+1` (MATLAB's 1-based indexing) and accepts even integer `mult>=2`. The accepted character values are `x`, `y`, `z`, `+`, and `-`.
 
-## Physical / mathematical content
+## Matrix entries and normalization
 
-The operator has nonzero entries only between the two central spin levels, at 1-based indices `mult/2` and `mult/2+1`. The `type` selects the central-transition component: `x`, `y`, `z`, `+` (raising), or `-` (lowering).
+The returned entries are exactly:
 
-For `x`, the two off-diagonal entries are `0.5`; for `y`, the upper and lower entries are `-0.5i` and `+0.5i`; for `z`, the two diagonal entries are `+0.5` and `-0.5`. Type `+` has a single upper off-diagonal entry `1`, and type `-` a single lower off-diagonal entry `1`. All unspecified entries are zero.
+| `type` | Nonzero matrix entries |
+| --- | --- |
+| `x` | `A(r,s)=A(s,r)=0.5` |
+| `y` | `A(r,s)=-0.5i` and `A(s,r)=+0.5i` |
+| `z` | `A(r,r)=+0.5` and `A(s,s)=-0.5` |
+| `+` | `A(r,s)=1` |
+| `-` | `A(s,r)=1` |
 
-## Numerical / algorithmic content
+No additional scale factor is applied; the matrix is converted to complex form before return. The source describes these as central-transition operators for half-integer spins in the Pauli basis.
 
-The routine initializes a sparse `mult`-by-`mult` matrix, fills the entries selected by `type`, and converts the result to complex.
+## Operator action
 
-## Parameters / inputs
-
-- `mult` - even integer spin multiplicity, at least 2; it sets the matrix dimension. The source checks that it is numeric, real, scalar, at least 2, and even.
-- `type` - character operator selector: `x`, `y`, `z`, `+` (raising), or `-` (lowering).
-
-## Outputs
-
-- `A` - sparse complex central-transition operator matrix of size `mult`-by-`mult`.
-
-## Implementation structure
-
-The function validates the even multiplicity and the character selector, writes the central-transition matrix entries at the two central indices, and returns the sparse matrix as complex.
+The function returns an operator matrix only. It does not construct left or right multiplication, a superoperator, or a propagator; any action is determined by how a caller uses the matrix.
 
 ## Reference
 

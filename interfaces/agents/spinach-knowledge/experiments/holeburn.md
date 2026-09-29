@@ -1,40 +1,30 @@
 # experiments/holeburn.m
 
-- Signature: `fid=holeburn(spin_system,parameters,H,R,K)`
+- Signature: fid=holeburn(spin_system,parameters,H,R,K)
 
-## Purpose
+## Purpose and physical scope
 
-Simulates a hole-burning experiment: a soft pulse modeled using the Fokker–Planck formalism, followed by a hard π/2 observation pulse and acquisition of a free induction decay (FID).
+Models a spectral hole-burning sequence: a frequency-selective soft pulse acts on the supplied initial state, followed by a hard pi/2 observation pulse and free-induction-decay acquisition. The soft pulse is propagated in a rank-truncated Fokker–Planck representation. Hyperfine interactions can influence the result through the supplied Spinach Hamiltonian, but this function itself is not an ESEEM or ENDOR sequence and does not create a hyperfine model.
 
-## Parameters / inputs
+## Inputs and parameters
 
-- `parameters.pulse_frq` — soft-pulse frequency, Hz.
-- `parameters.pulse_phi` — soft-pulse phase, rad.
-- `parameters.pulse_pwr` — soft-pulse power, rad/s.
-- `parameters.pulse_dur` — soft-pulse duration, s.
-- `parameters.pulse_rnk` — Fokker–Planck cut-off rank.
-- `parameters.offset` — receiver offset for time-domain detection, Hz.
-- `parameters.sweep` — sweep width for time-domain detection, Hz.
-- `parameters.npoints` — number of points in the FID.
-- `parameters.rho0` — initial state.
-- `parameters.coil` — detection state.
-- `parameters.method` — soft-pulse propagation method: `'expv'` for Krylov propagation, `'expm'` for exponential propagation, or `'evolution'` for the Spinach evolution function.
-- `parameters.spins` — irradiated spins, specified as a one-element cell array containing a character string.
-- `parameters.spc_dim` — spatial dimension used when extending the pulse operator.
-- `H` — Hamiltonian matrix received from the context function.
-- `R` — relaxation superoperator received from the context function.
-- `K` — kinetics superoperator received from the context function.
+H, R and K are the Hamiltonian, relaxation and kinetics matrices supplied by the experiment context. The code converts the context to Liouville space and requires a Liouville formalism supported by the source, namely sphten-liouv or zeeman-liouv. Its combined generator is H+1i*R+1i*K.
 
-## Output
+- parameters.spins: the function uses the first spin label to build the pulse operator; the source code uses this field even though its header does not document it.
+- parameters.pulse_frq: soft-pulse frequency in Hz.
+- parameters.offset: receiver offset in Hz; the code subtracts it from pulse_frq before soft-pulse propagation.
+- parameters.pulse_phi: soft-pulse phase in radians.
+- parameters.pulse_pwr: soft-pulse amplitude in radians per second.
+- parameters.pulse_dur: soft-pulse duration in seconds.
+- parameters.pulse_rnk: Fokker–Planck cutoff rank. The source advises increasing the rank until the output converges.
+- parameters.method: soft-pulse propagation choice: expv, expm, or evolution.
+- parameters.rho0 and parameters.coil: initial state and detection state.
+- parameters.sweep: acquisition sweep width in Hz; parameters.npoints is the number of FID points.
 
-- `fid` — free induction decay detected by `parameters.coil` after the hole-burning soft pulse and a hard π/2 pulse.
+## Sequence and output
 
-Increase `parameters.pulse_rnk` until the output converges.
+The routine forms the selected-spin raising operator, projects it into the enlarged space, and derives the x and y pulse operators. It applies shaped_pulse_af with the offset-corrected frequency, power, duration, phase, rank, and selected propagation method. It then applies a hard pi/2 step about the y operator and calls acquire with the resulting state. The only returned quantity is fid: the FID sampled at the requested point count and sweep width. No time-axis output is returned separately; the acquisition dwell is set by the sweep width.
 
-## Implementation
+The source provides pi/2 as the observation-pulse angle and recommends rank convergence, but gives no numeric pulse-frequency, power, duration, rank, or acquisition example. Those settings should be selected for the spin system and experiment rather than inferred here.
 
-The function moves the inputs into the adjoint representation if needed and checks their consistency. It forms `L=H+1i*R+1i*K`, constructs pulse operators for `parameters.spins{1}`, and extends them across the spatial dimension. After subtracting `parameters.offset` from `parameters.pulse_frq`, it applies the soft pulse with `shaped_pulse_af` using the specified propagation method. It then applies a hard π/2 pulse about the y-axis and calls `acquire` to obtain the FID.
-
-Source: <https://spindynamics.org/wiki/index.php?title=holeburn.m>
-
-Contact: ilya.kuprov@weizmann.ac.il
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/holeburn.m

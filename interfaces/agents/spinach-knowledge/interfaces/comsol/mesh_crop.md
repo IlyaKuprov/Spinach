@@ -1,24 +1,17 @@
 # interfaces/comsol/mesh_crop.m
 
-- Signature: `mesh=mesh_crop(mesh,ranges)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/mesh_crop.m) · [Spinach Wiki: mesh_crop.m](https://spindynamics.org/wiki/index.php?title=mesh_crop.m)
 
-## Purpose
+## Purpose and call
 
-Crops a 2D mesh to the rectangular coordinate window `[xmin,xmax] × [ymin,ymax]`. Vertices on the bounds are retained.
+`mesh = mesh_crop(mesh,ranges)` crops a two-dimensional mesh to a rectangular window in its x-y coordinates and returns the updated mesh structure. Coordinate values and any retained per-vertex data remain in their input units; no unit conversion is applied.
 
-## Behavior
+## Accepted data and transformation
 
-The routine removes cached Voronoi and plotting data when present, selects vertices within both coordinate ranges, keeps edges, triangles, and rectangles whose vertices all survive, and reindexes those elements. It crops coordinates and any present velocity or concentration arrays (`u`, `v`, and `c`). The active-vertex list is replaced by the vertices appearing in the retained triangles; an existing list triggers a warning.
+`ranges` must be a two-element cell array, `{[xmin xmax],[ymin ymax]}`. Each bound pair must be numeric, real, contain two elements, and have its first value strictly less than its second. Vertices on either bound are retained. The routine keeps an edge, triangle, or rectangle only when all its vertex indices refer to retained vertices, then remaps those indices to the cropped coordinate arrays.
 
-## Parameters / inputs
+The routine crops `mesh.x` and `mesh.y`, and also crops `mesh.u`, `mesh.v`, and `mesh.c` along their vertex dimension when those fields exist. It removes cached `mesh.vor` and `mesh.plot` fields when present because they refer to the previous mesh. If `mesh.idx.active` already exists, it warns that the list is being overwritten; the new list is the unique vertex indices appearing in the retained triangles.
 
-- `mesh`: Spinach mesh object with vertex-index data.
-- `ranges`: two-element cell array `{[xmin xmax],[ymin ymax]}`; each pair must contain two real, increasing bounds.
+## Output and guardrails
 
-## Output
-
-- `mesh`: cropped and reindexed mesh object.
-
-## Source
-
-[Spinach Wiki: mesh_crop.m](https://spindynamics.org/wiki/index.php?title=mesh_crop.m)
+The returned `mesh` contains the cropped coordinates and reindexed connectivity. The routine explicitly checks for `mesh.idx` and checks the range container, bound types, sizes, and ordering. It does not explicitly require finite bounds; the coordinates and connectivity arrays used by the crop are otherwise assumed to be present and compatible.

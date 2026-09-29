@@ -1,34 +1,19 @@
 # examples/singlet_states/warren_singlet.m
 
-- Signature: `warren_singlet()`
+Source: [examples/singlet_states/warren_singlet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/warren_singlet.m)
 
 ## Purpose
 
-Demonstrates that long-lived states can be immune not only to dipolar and CSA relaxation, but also to quadrupolar relaxation in certain circumstances. Computes and diagonalizes the full liquid-state Redfield superoperator for dipolar and quadrupolar relaxation. Calculation time: seconds
+Construct and diagonalise a full liquid-state Redfield relaxation superoperator for a two-spin 14N system. The example is intended to examine the source comment's case of long-lived states under dipolar and quadrupolar relaxation; it reports the sorted relaxation-superoperator eigenvalues rather than a propagated trajectory or an experimentally measured lifetime.
 
-## Physical / mathematical content
+## Spin system and interactions
 
-- The model contains two 14N spins at 14.1 T, with coordinates `[0.0 0.0 0.0]` and `[0.6 0.8 1.0]`. Each spin is assigned an EFG quadrupolar coupling via `eeqq2nqi(1.25e6,0.25,1,[0 0 0])`.
-- Relaxation is configured as Redfield with zero equilibrium, lab-frame terms retained, and correlation time `5e-9`; both relaxation tolerances are `1e-5`.
-- The basis uses the sphten-liouv formalism with no approximation.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- The code computes and sorts the eigenvalues of the full relaxation superoperator for inspection.
+The field is 14.1 T. The two 14N coordinates are entered as [0.0, 0.0, 0.0] and [0.6, 0.8, 1.0]. For each nucleus, a quadrupolar coupling matrix is constructed with eeqq2nqi(1.25e6, 0.25, 1, [0, 0, 0]). The example uses Redfield relaxation, zero equilibrium, lab-frame retention, and a 5 ns correlation time. Relaxation integration and zero-value tolerances are both 1e-5.
 
-## Numerical / algorithmic content
+## Calculation and output
 
-- The script constructs the Redfield relaxation superoperator, computes its full eigenvalue spectrum, and sorts the eigenvalues for inspection.
+The complete sphten-liouv basis is selected with no approximation. The script builds the spin system, obtains the relaxation matrix with relaxation(spin_system), and evaluates sort(eig(full(R))). Thus the explicit numerical output requested by the script is the ordered spectrum of the full relaxation matrix. The source comments describe the motivation as testing circumstances in which long-lived states can resist dipolar, CSA, and quadrupolar relaxation; no CSA interaction is separately specified in this script, and the source-only analysis does not establish a lifetime or numerical result.
 
-## Implementation structure
+## Citation
 
-- A demonstration that long-lived states exist that are immune
-- not only to dipolar and CSA, but also to quadrupolar relaxati-
-- on in certain circumstances. Full Redfield superoperator for
-- dipolar and quadrupolar relaxation in liquid state is compu-
-- ted and diagonalized.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Relaxation superoperator accuracy
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
+The source file names Warren and Kuprov in its comments but supplies no DOI or publication citation.

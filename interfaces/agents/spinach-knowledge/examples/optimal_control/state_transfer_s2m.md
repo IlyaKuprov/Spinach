@@ -1,24 +1,21 @@
 # examples/optimal_control/state_transfer_s2m.m
 
+Source: [examples/optimal_control/state_transfer_s2m.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/state_transfer_s2m.m)
+
 - Signature: `state_transfer_s2m()`
 
-## Purpose
+## Design objective
 
-Transfer coherence from a two-proton singlet state to a nearby carbon in a setting typical of parahydrogenation experiments. The example uses LBFGS-GRAPE as described at http://dx.doi.org/10.1016/j.jmr.2011.07.023. The source reports a terminal fidelity of 50% and a calculation time of minutes.
+This example designs a pulse to transfer coherence from a two-proton singlet to a nearby carbon, in a setting described as typical of parahydrogenation. Its source identifies LBFGS-GRAPE and cites [DOI 10.1016/j.jmr.2011.07.023](https://doi.org/10.1016/j.jmr.2011.07.023).
 
-## Physical / mathematical content
+## Spin model and transfer states
 
-- The system contains two `1H` and two `13C` spins at a magnetic field of 14.1, with scalar Zeeman values `{1.5, 2.0, 30.0, 40.0}` and specified scalar couplings of 7.0, 150, 150, and 50.
-- The initial state is a singlet on spins 1 and 2; the target is `Lz` on spin 4. Each is normalised by its vector 2-norm.
-- Proton and carbon `Lx` and `Ly` operators provide four controls. The drift Hamiltonian uses the `nmr` assumption and transmitter offsets of 1050 and 5285 for `1H` and `13C`, respectively.
+The four-spin system contains two `1H` and two `13C` spins, with `sys.magnet=14.1`. The scalar Zeeman entries are `[1.5, 2.0, 30.0, 40.0]`; the source does not label their units. Nonzero scalar couplings are 1–2: 7.0, 1–3: 150, 2–4: 150, and 3–4: 50 (the source gives no unit annotation beside these entries). The basis is `sphten-liouv` with approximation `none`. The normalized starting state is the singlet on spins 1 and 2; the normalized target is `Lz` on spin 4.
 
-## Numerical / algorithmic content
+## Pulse and ensemble settings
 
-- The calculation uses the `sphten-liouv` formalism with no basis approximation. Its controls comprise 100 slices of duration `1.5e-4`, pulse-power levels `2*pi*[460 480 500 520 540]`, and `NS` and `SNS` penalties weighted 0.1 and 10.
-- The control method is `lbfgs`, with a maximum of 100 iterations. Optimisation starts from a random `4`-by-`100` guess and calls `fmaxnewton` with `@grape_xy`.
-- The resulting pulse is scaled by the mean power level. A test simulation applies it with `shaped_pulse_xy` using `expv-pwc` propagation and reports `real(rho_targ'*rho)`.
+The controls are x/y operators on the proton and carbon channels. The drift Hamiltonian is shifted with transmitter settings `[1050, 5285]` (units are not annotated at that assignment). Five power levels are specified as `2*pi*[460, 480, 500, 520, 540]`; the waveform has 100 slices of 150 microseconds each, a 15 ms design duration. LBFGS is configured for at most 100 iterations, with `NS` and `SNS` penalties weighted 0.1 and 10. A random 4-by-100 guess is used, then `fmaxnewton` optimizes with `@grape_xy`; the pulse is scaled by the mean configured power before propagation.
 
-## Implementation structure
+## Reported quantity and evidence boundary
 
-- Create the spin system and basis, construct and normalise the initial and target states, then assemble the control operators and offset-adjusted drift Hamiltonian.
-- Configure the controls and optimisation plots, run `optimcon` and pulse optimisation, then scale the pulse and test it by simulation.
+The test simulation computes `real(rho_targ'*rho)` and sends the value to Spinach's report function. The source preamble reports a 50% terminal fidelity as a benchmark; the file embeds no numerical output from its test propagation. The source estimates minutes for calculation time.

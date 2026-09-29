@@ -1,23 +1,23 @@
 # examples/imaging/fast_echo_2d.m
 
-- Signature: `fast_echo_2d()`
-
 ## Purpose
 
-Fast (in the experiment duration sense) spin echo 2D brain imaging example. Simulation time: hours, faster with a Tesla V100 GPU.
+Runs the 2D fast spin-echo brain-imaging example using a single slice of the `brain-medres` phantom. “Fast” describes the experiment-duration intent in the source comment; the same header estimates simulation time in hours.
 
-## Physical / mathematical content
+## Spin and image model
 
-- Simulates a `1H` spin system at a magnetic induction of 5.9 with zero chemical shift. The `t1_t2` relaxation model uses diagonal relaxation, zero equilibrium, and R1 and R2 rates of 1.
-- Uses slice 50 of the `brain-medres` R1, R2, and proton-density phantoms. The R1 and R2 slices supply spatial relaxation maps; the proton-density slice supplies the initial-state map.
+The model is one `1H` spin at 5.9 T with zero chemical shift. It uses `t1_t2` relaxation, diagonal retention, zero equilibrium, and rate settings of 1 for both `R1` and `R2`; the basis is `sphten-liouv` with no approximation. The code selects slice 50 from the `R1`, `R2`, and proton-density maps, uses the first two geometry and point-count entries, and sets image size to `[101 105]`.
 
-## Numerical / algorithmic content
+The proton-density map weights the initial `Lz` state, and a uniform receive-coil phantom detects `L+`. The relaxation maps are paired with the `rlx_t1_t2` operators. The source does not configure flow or diffusion parameters in this example.
 
-- Builds a `sphten-liouv` basis with no approximation and disables path tracing. GPU enablement is suggested in a comment but is not active in the source.
-- Runs `imaging(spin_system,@fse,parameters)` for a `101 × 105` image, with a 5.3e-3 T/m readout gradient lasting 2e-3 s and a 4.8e-3 T/m phase-encoding gradient lasting 1e-3 s. The sequence parameters specify `1H`, no decoupling, and zero offset.
-- Uses the phantom's first two dimensions and point counts for the 2D sample geometry, with periodic third-order differentiation (`{'period',3}`). The initial spin state is `Lz`; the detection state is `L+` with a uniform coil map.
+## Gradient and acquisition settings
 
-## Implementation structure
+Readout and phase-encode amplitudes are `5.3e-3` and `4.8e-3` T/m, explicitly labelled in the source. Their duration fields are `2e-3` and `1e-3`, respectively; the source does not annotate duration units. The offset is zero, decoupling is empty, and spatial differentiation uses `{'period',3}`.
 
-- Creates the spin system and basis, obtains R1 and R2 relaxation superoperators, and loads the brain phantom maps.
-- Simulates the `fse` sequence and plots the recorded image alongside the R1 and R2 phantom slices.
+## Output and caveats
+
+The example calls `imaging` with `fse`, then plots the recorded image beside the selected `R1` and `R2` phantom maps. The source estimates hours of runtime and says a Tesla V100 is faster; its GPU-enable line is commented out, so this file does not enable GPU execution. The timing is an estimate in the source, not a benchmark.
+
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/fast_echo_2d.m)

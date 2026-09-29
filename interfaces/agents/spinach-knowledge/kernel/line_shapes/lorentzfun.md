@@ -2,35 +2,20 @@
 
 - Signature: `[real_part,imag_part]=lorentzfun(offs,ampl,fwhm,x,phi)`
 
-## Purpose
+## Meaning
 
-Compute a Lorentzian line shape in magnetic-resonance notation with phase distortion. The absorption mode integrates to `ampl/2` under the one-sided FID Fourier-transform convention; the source notes that `lorentzcon()` integrates to `ampl`.
+Returns the absorption and dispersion components of a Lorentzian line with a phase rotation. Let `gamma=fwhm/2` and `u=(x-offs)/gamma`. The unrotated Lorentzian is `L=ampl/(2*pi*gamma)/(1+u^2)`; the returned arrays are `real_part=L*cos(phi)-u*L*sin(phi)` and `imag_part=L*sin(phi)+u*L*cos(phi)`. At zero phase the absorption component integrates to `ampl/2`, as stated in the source's one-sided FID Fourier-transform convention; the source contrasts this with `lorentzcon()`, whose integral is `ampl`.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-Set `gam=fwhm/2`, `u=(x-offs)/gam`, and `L=ampl/(2*pi*gam)/(1+u^2)`. The outputs are `real_part=L*cos(phi)-u*L*sin(phi)` and `imag_part=L*sin(phi)+u*L*cos(phi)`. At `phi=0`, the real component is the absorptive Lorentzian and the imaginary component is the dispersive component. The width parameter `fwhm` is the full width at half-maximum.
+- `offs`: real numeric scalar peak offset; `ampl`: real numeric scalar amplitude multiplier.
+- `fwhm`: positive real numeric scalar full width at half maximum.
+- `x`: real numeric array of any dimension. Both outputs have the same size as `x`.
+- `phi`: real numeric scalar phase in radians.
 
-## Numerical / algorithmic content
+The formula performs no conversion between Hz and angular frequency. Use the same coordinate units for `offs`, `fwhm`, and `x`; the source does not specify which frequency convention is intended. The checks enforce the real/numeric/scalar or array conditions above and positive width.
 
-The function validates the inputs, sets `gam=fwhm/2`, and evaluates the phase-mixed components elementwise over `x`. Both returned arrays have the same size as `x`.
+## References
 
-## Parameters / inputs
-
-- `offs` - real scalar peak offset from zero
-- `ampl` - real scalar amplitude multiplier
-- `fwhm` - positive real scalar full width at half-maximum
-- `x` - numeric real array of any dimension
-- `phi` - real scalar phase distortion in radians
-
-## Outputs
-
-- `real_part` - real component of the phase-distorted line shape, same size as `x`
-- `imag_part` - imaginary component of the phase-distorted line shape, same size as `x`
-
-## Implementation structure
-
-A private consistency check rejects nonnumeric or nonreal `x`, a nonpositive or nonscalar `fwhm`, and nonscalar or nonnumeric/nonreal `offs`, `ampl`, or `phi`. The calculation then uses `gam=fwhm/2` in the Lorentzian denominator and applies the phase rotation to the two components.
-
-## Reference
-
-- [Spin Dynamics documentation for `lorentzfun.m`](https://spindynamics.org/wiki/index.php?title=lorentzfun.m)
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/line_shapes/lorentzfun.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=lorentzfun.m)

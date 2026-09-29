@@ -1,23 +1,22 @@
 # kernel/pulses/sawtooth.m
 
+- MATLAB source: [kernel/pulses/sawtooth.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/sawtooth.m)
+- Spinach wiki: [sawtooth.m](https://spindynamics.org/wiki/index.php?title=sawtooth.m)
 - Signature: `waveform=sawtooth(amplitude,frequency,time_grid)`
 
 ## Purpose
 
-Returns a sawtooth waveform evaluated at the supplied time points.
+Evaluates a sawtooth waveform directly at the supplied time points.
 
-## Algorithm
+## Waveform
 
-For each time `t`, the function evaluates `amplitude*(2*frequency*mod(t,1/frequency)-1)`. The waveform rises linearly from `-amplitude` to just below `amplitude` during each period `1/frequency`, then resets; the result has the same shape as `time_grid`.
+For each time value, the source computes `amplitude*(2*frequency*mod(time_grid,1/frequency)-1)`. The period is `1/frequency`. For positive amplitude the waveform ramps from `-amplitude` to values just below `amplitude`, then resets to `-amplitude` at each period boundary; the output has the same shape as `time_grid`.
 
-## Parameters / inputs
+## Inputs and output
 
-- `amplitude` — finite real scalar setting the magnitude at the tooth top.
-- `frequency` — positive finite real frequency, in teeth per second.
-- `time_grid` — finite real array of time points, in seconds.
+- `amplitude` — finite real numeric scalar; the source does not require it to be positive.
+- `frequency` — positive finite real numeric scalar, in teeth per second.
+- `time_grid` — finite real numeric array of time points, in seconds. Values are evaluated elementwise; a sorted or uniformly spaced grid is not required by the implementation.
+- `waveform` — real-valued samples with the same shape as `time_grid`.
 
-## Output
-
-- `waveform` — sawtooth values with the same shape as `time_grid`.
-
-[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=sawtooth.m)
+The function evaluates the stated formula without an additional window or filtering step.

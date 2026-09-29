@@ -1,32 +1,28 @@
 # kernel/plotting/contspacing.m
 
-- Signature: `[all_conts,pos_conts,neg_conts]=...`
+- Source: [kernel/plotting/contspacing.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/contspacing.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=contspacing.m)
+- Signature: `[all_conts,pos_conts,neg_conts]=contspacing(smax,smin,delta,k,signs,ncont)`
 
 ## Purpose
 
-Computes adaptive positive and/or negative contour levels for spectra, allowing small cross-peaks to be contoured alongside large diagonal peaks.
+Builds nonlinear positive and/or negative contour levels so weak cross-peaks can be contoured alongside strong peaks. It returns levels only; it does not plot a spectrum.
 
-## Syntax
+## Inputs
 
-```matlab
-[all_conts,pos_conts,neg_conts]=contspacing(smax,smin,delta,k,signs,ncont)
-```
-
-## Parameters / inputs
-
-- `smax` — global maximum spectrum intensity.
-- `smin` — global minimum spectrum intensity.
-- `delta` — four contour fractions: `[positive_min positive_max negative_min negative_max]`; each lies in [0,1], with each minimum no greater than its maximum. A suggested value is `[0.02 0.2 0.02 0.2]`.
-- `k` — positive integer curvature exponent; `k=1` gives linear spacing, while `k>1` increases sampling density near the baseline. A suggested value is 2.
+- `smax`, `smin` — global maximum and minimum spectrum intensities.
+- `delta` — four finite fractions in [0,1], ordered as [positive minimum, positive maximum, negative minimum, negative maximum]. Each pair must be ascending. The documented starting value is `[0.02 0.2 0.02 0.2]`.
+- `k` — positive integer curvature exponent. `k=1` gives linear spacing; `k>1` makes the power curve nonlinear.
 - `signs` — `'positive'`, `'negative'`, or `'both'`.
-- `ncont` — positive integer number of levels per requested sign; a suggested value is 20.
+- `ncont` — positive integer number of levels on each requested side; 20 is a documented reasonable value.
 
-## Numerical / algorithmic content
+## Level construction and ordering
 
-For `t=linspace(0,1,ncont)`, positive levels are `smax*(delta(1)+(delta(2)-delta(1))*t.^k)`, and negative levels are `smin*(delta(3)+(delta(4)-delta(3))*t.^k)`. A sign-specific output is empty if that sign is not requested or its corresponding extremum does not have that sign. `all_conts` concatenates the negative levels in reverse order with the positive levels. Inputs are checked for finite real scalar extrema, valid fractions, a positive integer `k` and `ncont`, and one of the three supported `signs` values.
+For `u=linspace(0,1,ncont)`, positive levels run from `smax*delta(1)` to `smax*delta(2)` using `u.^k`. Negative levels run from `smin*delta(3)` to `smin*delta(4)`; because `smin` is negative, that second endpoint is more negative. With `k>1`, levels cluster toward the start of each progression (the less intense edge of that side). Positive levels are produced only when `smax>0`; negative levels only when `smin<0`; an absent or unrequested side is empty.
+
+The returned arrays are row vectors. `pos_conts` is ascending from lower to higher positive intensity; `neg_conts` is reversed before concatenation, so `all_conts` places the most negative levels first, then the less negative levels, then the positive levels. Empty sides contribute no entries.
 
 ## Outputs
 
-- `all_conts` — requested contour levels, negative levels first in ascending order, followed by positive levels.
-- `pos_conts` — positive contour levels, or empty.
-- `neg_conts` — negative contour levels, or empty.
+- `all_conts` — combined requested levels, ordered from negative to positive.
+- `pos_conts` — positive levels, or an empty array.
+- `neg_conts` — negative levels, or an empty array.

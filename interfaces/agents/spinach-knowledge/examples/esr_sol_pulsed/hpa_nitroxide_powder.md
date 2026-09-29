@@ -1,15 +1,19 @@
 # examples/esr_sol_pulsed/hpa_nitroxide_powder.m
 
+- MATLAB implementation: [examples/esr_sol_pulsed/hpa_nitroxide_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/hpa_nitroxide_powder.m)
+
+[MATLAB example](../../../../../examples/esr_sol_pulsed/hpa_nitroxide_powder.m) · [acquire sequence helper](../../../../../experiments/acquire.m)
+
 - Signature: `hpa_nitroxide_powder()`
 
-## Purpose
+## Aim and spin system
 
-Simulates the powder-averaged pulse-acquire W-band ESR spectrum of an electron–¹⁴N nitroxide radical at 3.5 T. The script models acquisition and Fourier processing; it does not define an excitation pulse sequence. Calculation time: seconds.
+The source describes a powder-averaged pulse-acquire W-band Fourier ESR spectrum for a nitroxide radical and assumes an ideal pulse. The model has an electron (`E`) and `14N` at 3.5 T. The electron g tensor is `diag(2.01045, 2.00641, 2.00211)`; the electron–nitrogen coupling tensor is supplied as `1e7 * [1.2356 0 0.6322; 0 1.1266 0; 0.6322 0 8.2230]` (the source does not annotate the matrix unit). The source also specifies damping relaxation (`inter.relaxation={'damp'}`), retains diagonal relaxation terms, sets equilibrium to zero, and sets `damp_rate=5e7` (the source does not annotate this field's unit). It uses an exact spherical-tensor Liouville basis and disables trajectory-level SSR algorithms.
 
-## Physical model
+## Acquisition protocol
 
-The two-spin system contains an electron (E) and ¹⁴N. The electron g tensor and electron–nitrogen hyperfine tensor are anisotropic and include off-diagonal components. The spin system uses a secular diagonal relaxation model with a 5×10⁷ s⁻¹ damping rate and zero equilibrium state.
+Both the initial state and coil operator are `L+` on the electron. The code passes these to `acquire`, so the ideal pulse is represented by the chosen transverse initial coherence; no explicit pulse waveform, duration, or pulse-power scan is simulated. No spins are decoupled. Fixed acquisition settings are offset `-2e8`, sweep width `1e9` Hz, 128 points, zero-fill to 512, and the `rep_2ang_6400pts_sph` powder grid. The derivative is disabled, the axis is inverted, and the display is labelled `GHz-labframe`. The `acquire` helper documents sweep width in Hz.
 
-## Simulation and processing
+## Observable and output
 
-The calculation uses the full-sphten Liouville-space basis without a basis approximation and disables trajectory-level SSR. The initial state and detection coil are both the electron `L+` operator. The acquisition uses a 1 GHz sweep, 128 points, an offset of −2×10⁸ (in the script's frequency units), and the `rep_2ang_6400pts_sph` powder grid; the spectrum axis is labelled in GHz in the lab frame and inverted. After powder averaging, the FID is apodised with `crisp`, zero-filled to 512 points, Fourier transformed, and the real spectrum is plotted.
+The powder-averaged FID is apodised with the `crisp` window, Fourier transformed, and the real spectrum is plotted. The example does not save a data or figure file and estimates a run time of seconds. This is a simulated ideal-pulse acquisition with the specified damping model, not a measured spectrum.

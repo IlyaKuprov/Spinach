@@ -1,21 +1,24 @@
 # kernel/pulses/bruker_write.m
 
+[Source: `kernel/pulses/bruker_write.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/bruker_write.m)
+
 - Signature: `bruker_write(X,Y,dt,file_name)`
 
 ## Purpose
 
-Writes a shaped pulse as a Bruker JCAMP text file for use in TopSpin. The routine converts the Cartesian pulse components to amplitude and phase, wraps phase into one turn and expresses it in degrees, and scales the amplitudes to Bruker's 0–100 range when the maximum amplitude is positive.
+Exports Cartesian RF samples as a Bruker JCAMP shape file for TopSpin. For each paired X/Y Cartesian sample, `cartesian2polar` gives amplitude and phase; phase is wrapped to one turn and written in degrees. If the maximum amplitude is positive, amplitudes are scaled so that maximum is 100. This is a relative shape scale, not an exported Hz amplitude. All-zero input stays zero.
 
-## Inputs
+## Inputs and sampling
 
-- `X` — real numeric column vector of pulse components in Hz.
-- `Y` — real numeric column vector of pulse components in Hz, with the same number of elements as `X`.
-- `dt` — positive real scalar duration of each time slice, in seconds.
-- `file_name` — output filename as a character vector.
+- `X`, `Y` — equal-length real numeric column vectors of Cartesian RF components, in Hz.
+- `dt` — positive real slice duration in seconds. With `N = numel(X)`, the header pulse length is `N*dt`, converted to microseconds; there is one amplitude/phase pair for each of the N samples.
+- `file_name` — character vector naming the output text file; the documented convention is a `.txt` extension (the implementation checks character type, not the extension).
 
-## Output and file contents
+The function checks that X and Y are numeric real column vectors of equal length, dt is a positive real scalar, and the filename is a character vector. It does not emit a MATLAB output value.
 
-The function writes an ASCII Bruker shape file. Its header includes the pulse duration in microseconds, the number of points, amplitude and phase ranges, and the JCAMP shape metadata. The data section contains one amplitude/phase pair per pulse point, followed by `##END`.
+## File output
+
+The header identifies Bruker JCAMP-DX shape data and Spinach, records the current date and time, amplitude and phase extrema, pulse length, and point count, then declares `##XYPOINTS= (XY..XY..)`. Each following row contains one normalized amplitude and its phase in degrees, separated by a space; `##END` closes the file. The initial `writelines(lines,file_name)` writes the header to the destination (replacing an existing file under MATLAB's default write behavior); the numeric pairs and terminator are appended. This operation therefore has a file-system side effect and overwrites an existing destination rather than adding a new pulse to it.
 
 ## Reference
 

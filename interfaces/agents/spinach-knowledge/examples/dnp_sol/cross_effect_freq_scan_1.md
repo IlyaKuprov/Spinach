@@ -1,24 +1,23 @@
 # examples/dnp_sol/cross_effect_freq_scan_1.m
 
-- Signature: `cross_effect_freq_scan_1()`
+- MATLAB implementation: [examples/dnp_sol/cross_effect_freq_scan_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/cross_effect_freq_scan_1.m)
 
-## Purpose
+- **Call:** `cross_effect_freq_scan_1()` (zero input arguments; the function plots the result and returns no explicit value).
 
-Simulates a TOTAPOL-based cross-effect dynamic nuclear polarization (DNP) system and plots the proton (S_z) expectation value as a function of microwave-frequency offset. The example is intended to reproduce Figure 2c of [the cited Journal of Magnetic Resonance paper](http://dx.doi.org/10.1016/j.jmr.2011.09.047). The source notes that differences in intensity arise from its relaxation model and from minor inconsistencies between the geometry stated in the paper and the interaction amplitudes used there.
+## Purpose and source context
 
-The calculation uses electron rotating-frame dynamics with Nottingham DNP relaxation theory, as described in [the cited Applied Magnetic Resonance paper](http://dx.doi.org/10.1007/s00723-012-0367-0). The source estimates the calculation time as seconds.
+This TOTAPOL-based cross-effect DNP example calculates the proton response during electron rotating-frame irradiation using Nottingham DNP relaxation theory. It is configured to reproduce Fig. 2c of [the cited *Journal of Magnetic Resonance* paper](https://doi.org/10.1016/j.jmr.2011.09.047). The source cautions that intensity differences arise from a different relaxation model and minor inconsistencies between the stated geometry and interaction amplitudes in the original paper. The relaxation theory reference is [the Nottingham DNP paper](https://doi.org/10.1007/s00723-012-0367-0). The source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Model and relaxation
 
-- The spin system contains two electrons and one proton in a 3.4 T field. The electron Zeeman scalars are 2.0023193 and 2.0021091; the proton scalar is 0.
-- The specified coordinates (in the source's coordinate units) are ([0,0,0]), ([12.80,0,0]), and ([-3.12,0,3.12]) for the two electrons and proton, respectively.
-- Relaxation is `nottingham`, with secular terms retained, zero equilibrium, temperature 10, and the source's listed electron and nuclear (T_1/T_2) parameters.
-- The output is the proton (S_z) expectation value across 50,000 microwave offsets from -350 to 350 MHz, for a 100 kHz microwave power parameter and the specified static orientation.
+The assigned system field is `sys.magnet=3.4` (the source does not state its unit). The isotopes are `{'E','E','1H'}`; scalar Zeeman entries are `{2.0023193,2.0021091,0.0000000}`. Cartesian coordinates are `[0,0,0]`, `[12.80,0,0]` and `[-3.12,0,3.12]`; the source does not specify their unit. The full `sphten-liouv` basis uses no approximation.
 
-## Numerical / algorithmic content
+Relaxation is `nottingham` with `rlx_keep='secular'` and `equilibrium='zero'`. Source-set values are `nott_r1e=1e2`, `nott_r2e=1e5`, `nott_r1n=0.1`, `nott_r2n=1e3`, and `temperature=10`; units are not stated in the script.
 
-Builds the Spinach system and a full `sphten-liouv` basis with `approximation='none'`, then calls `crystal` with the `dnp_freq_scan` callback and ESR mode. It plots the real part of the returned frequency-scan signal.
+## Frequency scan and output
 
-## Implementation structure
+The irradiation spin is `'E'`, with `mw_pwr=2*pi*100e3` and `mw_frq=2*pi*linspace(-350,350,5e4)*1e6`. The scan therefore has 50,000 values over the plotted range `-350` to `+350 MHz`; the source's frequency assignment includes the `2*pi` factor. Detection is `state(spin_system,'Lz','1H')`; the microwave and electron-Zeeman operators are `operator(spin_system,'Lx','E')` and `operator(spin_system,'Lz','E')`. The fixed orientation is `[0 0 0]`; method is `lvn-backs`, `g_ref` is the first electron Zeeman scalar, and `needs={'aniso_eq'}`. The function calls `crystal(spin_system,@dnp_freq_scan,parameters,'esr')` and plots `real(answer)` against frequency offset.
 
-The function sets the field, isotopes, Zeeman scalars, coordinates, basis, and Nottingham relaxation parameters; creates and bases the Spinach system; configures the electron microwave operators, proton detection state, frequency offsets, and orientation; evaluates the scan; and labels the plotted proton signal.
+**Observable-label note:** as in the source, the receiver is set to `Lz` on `1H`, whereas the plotted axis is labelled as an $S_z$ expectation on $^1$H; these are retained as distinct source details, not reconciled here.
+
+**Dependencies:** Spinach system/basis/relaxation/state/operator and crystal routines; the `dnp_freq_scan` sequence and plotting helpers `kfigure`, `kgrid`, `kxlabel`, and `kylabel`.

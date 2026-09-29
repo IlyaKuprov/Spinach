@@ -1,53 +1,13 @@
 # experiments/esr_dipolar/deer_3p_soft_hole.m
 
-- Signature: `fids=deer_3p_soft_hole(spin_system,parameters,H,R,K)`
+This is a pulse diagnostic for the three-pulse DEER/PELDOR experiment, not the DEER echo-stack calculation. The source describes a hypothetical test in which a selected soft pulse is followed by an ideal hard `pi/2` pulse and time-domain acquisition.
 
-## Purpose
+## Preparation and acquisition
 
-Computes pulse diagnostics for the three-pulse DEER/PELDOR sequence. It evaluates each specified soft pulse from `parameters.rho0`, applies a common ideal `pi/2` hard pulse about `Ey` to the reference and three responses, then acquires the four FIDs.
+Each of the three shaped pulses is applied independently to `parameters.rho0`; the three pulse responses are not composed sequentially. The unpulsed state is retained as a reference. The code assembles these four states, applies a hard `pi/2` rotation about the constructed `Ey` operator, and calls `acquire`. That operator is built for the first entry of `parameters.spins`; the header describes the hard pulse as acting on all spins. The acquisition uses the receiver offset, sweep, and point count supplied in `parameters`.
 
-## Physical / mathematical content
+Required fields are `parameters.pulse_frq`, `parameters.pulse_pwr`, `parameters.pulse_dur`, `parameters.pulse_phi`, and `parameters.pulse_rnk` (three pulse values each), plus `parameters.offset`, `parameters.sweep`, `parameters.npoints`, `parameters.spins`, `parameters.rho0`, `parameters.coil`, and `parameters.method`. Pulse frequencies are Hz, powers rad/s, durations seconds, phases radians, and ranks integer Fokker-Planck ranks. Offset and sweep are Hz. The method is `expm`, `expv`, or `evolution`; context matrices `H`, `R`, and `K` must be same-sized. The spin list normally identifies electron spins.
 
-The function converts to Liouville representation as needed and forms `L = H + 1i*R + 1i*K`. Each response is generated with `shaped_pulse_af` using its pulse frequency, power, duration, phase, Fokker–Planck rank, and selected method, followed by time-domain acquisition with `acquire`.
+The function returns `fids` from `acquire`. Its implementation passes four prepared states (reference plus three pulse-specific states), and the diagnostic wrapper consumes four FID columns. The header output note instead says three FIDs. The source does not specify the returned array orientation or numeric units. It describes the acquisition as infinite-bandwidth while also requiring a sweep value; the implementation passes that value to `acquire`, so the source does not resolve the wording further.
 
-## Numerical / algorithmic content
-
-The returned FIDs are intended for pulse diagnostics; the source recommends apodising and Fourier transforming them. This routine does not calculate the DEER echo stack.
-
-## Parameters / inputs
-
-- parameters.pulse_frq -frequencies for the three
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the three
-- pulses, rad/s
-- parameters.pulse_dur -durations for the three
-- pulses, seconds
-- parameters.pulse_phi -initial phases for the three
-- pulses, radians
-- parameters.pulse_rnk -Fokker-Planck ranks for the
-- three pulses
-- parameters.offset -receiver offset for the time
-- domain detection, Hz
-- parameters.sweep -sweep width for time domain
-- detection, Hz
-- parameters.npoints -number of points in the free
-- induction decay
-- parameters.spins -irradiated spins, normally {'E'}
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.method -soft puse propagation method,
-- 'expv' for Krylov propagation,
-- 'expm' for exponential propa-
-- gation, 'evolution' for Spin-
-- ach evolution function
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fids -three free induction decays that should be apo-
-- dised and Fourier transformed
-- Note: for the method, start with 'expm', change to 'expv' if the
-- calculation runs out of memory, and use 'evolution' as the
-- last resort.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_soft_hole.m

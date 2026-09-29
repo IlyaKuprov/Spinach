@@ -1,15 +1,12 @@
 # examples/nmr_solids/static_powder_suc.m
 
 - Signature: `static_powder_suc()`
+- Source: [examples/nmr_solids/static_powder_suc.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/static_powder_suc.m)
 
-## Purpose
+## Purpose and model
 
-Simulates the 13C NMR spectrum of static sucrose powder, assuming proton decoupling. The source estimates a calculation time of hours.
+Calculates a static powder 13C NMR spectrum of sucrose; the source assumes proton decoupling and estimates hours of runtime. The spin system and interactions are generated from `../standard_systems/sucrose.log` with `gparse` and `g2spinach` (the source labels the input as PCM DFT data), selecting C/13C, at field parameter 14.1. The basis is `sphten-liouv` with IK-0 approximation, projection +1, and inter-level 3. The source sets interaction and proximity cutoffs to 5.0 and 4.0 and disables trajectory-level algorithms.
 
-## Model and basis
+## Powder acquisition and processing
 
-The spin system and interactions are read from `../standard_systems/sucrose.log` with `gparse` and `g2spinach` (PCM DFT data), at 14.1 T. The calculation uses the `sphten-liouv` formalism, IK-0 approximation, +1 projection, and inter-level 3. It disables trajectory-level algorithms and sets the interaction and proximity cutoffs to 5.0 and 4.0, respectively.
-
-## Simulation and processing
-
-The static 13C powder acquisition uses the `rep_2ang_800pts_sph` grid, 50 kHz sweep, 128 points, 512-point zero-fill, and 15000 offset; the axis is in ppm and inverted. The 13C `L+` state is used for both initial state and detection. The FID is apodised exponentially with parameter 6, Fourier transformed, and plotted.
+`powder` uses the `rep_2ang_800pts_sph` orientation grid. Acquisition parameters are sweep 5e4, 128 points, 512-point zero-fill, and offset 15000; the frequency axis is labelled ppm and inverted. Both initial and detection states are 13C `L+`. Although the source describes a proton-decoupled spectrum, its `decouple` setting is empty and it specifies no explicit pulse sequence, rotor, or gradient. The FID is exponentially apodised with parameter 6, Fourier transformed, and its real spectrum is plotted.

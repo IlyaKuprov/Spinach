@@ -1,30 +1,9 @@
 # kernel/overloads/@ttclass/rand.m
 
-- Signature: `tt=rand(tt,ttrank)`
+Signature: `tt=rand(tt,ttrank)`
 
-## Purpose
+Source: [kernel/overloads/@ttclass/rand.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/rand.m) · Wiki: [ttclass/rand.m](https://spindynamics.org/wiki/index.php?title=ttclass/rand.m)
 
-Generates a tensor train with random cores, retaining the supplied train's physical dimensions and using the requested bond rank for internal bonds (except that a one-core train has boundary ranks 1).
+The input must be a `ttclass` object; `ttrank` must be a numeric, real, scalar positive integer. The method takes the two physical dimensions of each mode from `sizes(tt)`, replaces the core buffer with one train, and fills its cores immediately with MATLAB `rand` values.
 
-## Physical / mathematical content
-
-The generated cores have the same physical index dimensions as the input. The result has coefficient 1 and tolerance 0.
-
-## Numerical / algorithmic content
-
-Each core is filled with MATLAB `rand`. For multiple cores, the first and last ranks are 1 and each internal bond has rank `ttrank`.
-
-## Parameters / inputs
-
-- tt - a tensor train object
-- ttrank - bond rank, a positive real integer
-
-## Outputs
-
-- tt - a tensor train object
-
-## Implementation structure
-
-- Validate the object and rank input.
-- Read the physical sizes, allocate the cores, and fill them with random values.
-- Set the coefficient to 1 and tolerance to 0.
+For more than one core, core `k` has shape `[r_left, size_k(1), size_k(2), r_right]`: the first left and last right ranks are 1, and every internal bond rank is `ttrank`. A one-core train has shape `[1, size_1(1), size_1(2), 1]`, so `ttrank` does not change its rank. The result has coefficient 1 and tolerance 0. The method generates stored core values, not a lazy random expression; it applies no conjugation.

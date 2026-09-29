@@ -1,35 +1,24 @@
 # kernel/derivatives/fftdiff.m
 
-- Signature: `kern=fftdiff(order,npoints,dx)`
+Direct source: [kernel/derivatives/fftdiff.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fftdiff.m)
+Spin Dynamics Wiki: [fftdiff.m](https://spindynamics.org/wiki/index.php?title=fftdiff.m)
 
-## Purpose
+## Purpose and interface
 
-Construct a Fourier-domain kernel for differentiating a periodic real signal sampled on a uniform grid. Apply it as:
+kern=fftdiff(order,npoints,dx) returns a length-npoints Fourier-domain multiplier for differentiating a uniformly sampled periodic real signal. Apply it to a signal with npoints entries in the Fourier-bin layout of fft:
 
-```matlab
-derivative=real(ifft(fft(signal).*kern));
-```
+    signal=[0 1 0 -1 0 1 0 -1];
+    kern=fftdiff(1,8,0.25);
+    derivative=real(ifft(fft(signal).*kern));
 
-The signal must have `npoints` samples with grid spacing `dx`. Periodic boundary conditions are assumed.
+The kernel is a vector of spectral multipliers, not a matrix or a signal. Under the discrete Fourier representation, periodic Fourier modes are eigenvectors of differentiation; the corresponding multiplier for a mode with wave number k is (2*pi*1i*k/(npoints*dx))^order. The result is mapped back to sample space by the inverse FFT, and real keeps the real-valued result for real input signals.
 
-## Parameters / inputs
+## Frequency grid and units
 
-- `order` — positive integer derivative order.
-- `npoints` — positive integer number of grid points.
-- `dx` — positive real grid step length.
+The source uses centered integer mode indices and then ifftshift to arrange them in the bin order expected by fft. For odd npoints, the centered indices run from (1-npoints)/2 through (npoints-1)/2. For even npoints, they run from -npoints/2 through (npoints-1)/2, including the negative Nyquist bin. Multiplication by 2*pi/(npoints*dx) sets the angular wave-number scale; raising the imaginary multiplier to order gives the requested derivative order. The units are signal units divided by dx^order.
 
-## Output
+The method assumes periodic boundary conditions and uniform spacing dx. It is the Fourier/spectral alternative to the finite-stencil construction in [fdmat.m](fdmat.md).
 
-- `kern` — vector of Fourier-domain differentiation multipliers.
+## Input guards
 
-## Numerical / algorithmic content
-
-Each kernel entry is the corresponding angular-frequency factor `(2i*pi*k/(npoints*dx))^order`. For odd `npoints`, the integer frequency indices run from `(1-npoints)/2` through `(npoints-1)/2`. For even `npoints`, they run from `-npoints/2` through `npoints/2-1`, including the negative Nyquist index. `ifftshift` places these multipliers in the ordering used by `fft`. The result is a spectral derivative of the periodic sampled signal, not a finite-difference approximation.
-
-## Validation
-
-The function rejects `order` or `npoints` unless each is a real numeric scalar integer of at least 1. It rejects `dx` unless it is a real numeric scalar greater than zero. The validation error messages describe `order` and `npoints` as “non-negative,” but the implemented checks require them to be positive.
-
-## Reference
-
-- [fftdiff.m](https://spindynamics.org/wiki/index.php?title=fftdiff.m)
+The source requires order and npoints to be real numeric scalars, positive integers. It requires dx to be a real numeric scalar greater than zero. The error strings describe order and npoints as “non-negative,” but the actual predicates reject values below 1, so zero is not accepted.

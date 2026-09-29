@@ -4,23 +4,16 @@
 
 ## Purpose
 
-Optimise a pulse for state-to-state transfer across two scalar couplings in a three-spin hydrofluorocarbon fragment, from Lz on 1H to Lz on 19F. The six-channel pulse is designed to be robust to proton transmitter offset and reduced pulse nutation frequency. It uses Newton-Raphson GRAPE as described in [Goodwin and Kuprov (2016)](http://dx.doi.org/10.1063/1.4949534), with point-by-point waveform variation and a penalty when the waveform exceeds a user-specified power threshold. The initial guess is random. Calculation time: minutes.
+This example configures Newton-Raphson GRAPE pulse design for transfer from proton `Lz` to fluorine `Lz` across a three-spin H–C–F model. The stated design aim is robustness to proton transmitter offset and reduced pulse nutation frequency. The source cites Goodwin and Kuprov (2016), [doi:10.1063/1.4949534](https://doi.org/10.1063/1.4949534), for the method.
 
-## Physical / mathematical content
+## Spin model and transfer
 
-- The spin system contains 1H, 13C and 19F at a magnetic field of 9.4 T. All chemical shifts are 0 ppm; the 1H–13C and 13C–19F scalar couplings are 140 Hz and −160 Hz, respectively.
-- The initial and target states are normalised Lz states on 1H and 19F. The six control operators are Lx and Ly for each isotope; the proton Lz operator defines the offset variation.
-- The optimisation samples five proton offsets from −1 to +1 kHz and three pulse-power levels, 2π × [0.8, 0.9, 1.0] × 10³ rad/s, to account for nutation-frequency variation.
+The model uses `1H`, `13C` and `19F` at 9.4 T, with all three chemical shifts set to 0.0 ppm. Its nonzero scalar couplings are 140 Hz for H–C and −160 Hz for C–F; the basis is `sphten-liouv` with approximation `none`. The normalized initial and target states are `Lz` on spin 1 (¹H) and spin 3 (¹⁹F), respectively.
 
-## Numerical / algorithmic content
+## Configured pulse design
 
-- Uses the `sphten-liouv` formalism with no basis approximation. The drift Hamiltonian is constructed under the `nmr` assumption.
-- Configures `control.method='newton'`, the `NS` penalty with weight 0.01, and a maximum of 50 iterations. The waveform has 100 slices of 10⁻⁴ s each; its initial guess is `randn(6,100)/10`.
-- Calls `fmaxnewton(spin_system,@grape_xy,guess)`, scales the resulting pulse by the mean power level, and tests it with `shaped_pulse_xy` using `expv-pwc` propagation. The reported fidelity is `real(rho_targ'*rho)`.
+Six transverse controls (`Lx` and `Ly` for each isotope) share the corresponding three channels. The proton `Lz` operator defines five offset samples from −1000 to +1000 Hz. The configured pulse-power levels are `2*pi*[0.8 0.9 1.0]*1e3` rad/s. The waveform has 100 pointwise samples with 0.1 ms per slice (10 ms total); an `NS` penalty is assigned weight 0.01. The source describes a penalty when the waveform exceeds a user-specified power threshold, but does not give a separate numeric threshold.
 
-## Implementation structure
+The script sets `method='newton'` and `max_iter=50`, starts from a random `6 x 100` guess, and calls `fmaxnewton(...,@grape_xy,guess)`. These are design settings, not evidence that optimization converged. Afterward it runs one shaped-pulse simulation under the configured drift and reports the real target overlap; the source contains no resulting fidelity value and does not show separate post-optimization simulations over the offset/power ensemble.
 
-1. Define the field, isotopes, chemical shifts, scalar couplings and basis; create the Spinach spin system.
-2. Construct and normalise the initial and target states, then assemble the six control operators, proton offset operator and drift Hamiltonian.
-3. Configure the control channels, robustness samples, slice durations, penalty, Newton optimisation and diagnostic plots; initialise the optimisation context with `optimcon`.
-4. Generate a random initial waveform, optimise it, and simulate the resulting pulse to report the final target-state fidelity.
+Source: [examples/optimal_control/features_newton.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_newton.m).

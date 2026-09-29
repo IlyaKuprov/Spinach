@@ -1,37 +1,28 @@
 # experiments/nmr_liquids/crazed.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/crazed.m) · [Spinach Wiki: crazed.m](https://spindynamics.org/wiki/index.php?title=crazed.m)
+
 - Signature: `fid=crazed(spin_system,parameters,H,R,K)`
 
 ## Purpose
 
-CRAZED pulse sequence, implemented as an ideal analytical coherence-pathway version of the sequence described in [the cited paper](https://doi.org/10.1126/science.8266096). The gradient selection is represented by explicit coherence projections.
+CRAZED pulse sequence, implemented as an ideal analytical coherence-pathway version of the sequence described in [DOI 10.1126/science.8266096](https://doi.org/10.1126/science.8266096). The source represents gradient selection by explicit coherence projections; it does not model a spatial gradient waveform.
 
-## Physical / mathematical content
+## Inputs
 
-- Starting from `parameters.rho0`, the sequence applies a 90-degree y pulse to `parameters.spins{1}`, evolves through the F1 trajectory, and selects coherence order +2 (the double-quantum branch).
-- It applies the second y pulse with angle `parameters.angle`, selects coherence order +1 (the observable single-quantum branch), then evolves and detects on the same spin.
+- `parameters.sweep`: positive scalar sweep width in Hz.
+- `parameters.npoints`: two positive integers, giving the F1 and F2 point counts.
+- `parameters.spins`: a one-element cell array naming the isotope used by the sequence, for example `{'1H'}` or `{'13C'}`.
+- `parameters.angle`: finite real second-pulse angle in radians.
+- `parameters.rho0`: numeric initial state with a row dimension matching the Liouville-space dimension.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices supplied by the context function; the source combines them as `H + 1i*R + 1i*K`. The implementation requires the `sphten-liouv` formalism.
 
-## Numerical / algorithmic content
+## Sequence and coherence selection
 
-- The scalar time step is `1/parameters.sweep`. The F1 trajectory contains `parameters.npoints(1)` points and the F2 acquisition contains `parameters.npoints(2)` points. The source forms `L = H + 1i*R + 1i*K` and requires the `sphten-liouv` formalism.
+The source applies a 90-degree y pulse to the selected spin, evolves the F1 trajectory with timestep `1/parameters.sweep`, projects onto the +2 double-quantum coherence branch, applies the second y pulse with angle `parameters.angle`, then projects onto the +1 single-quantum branch. Detection uses the `L+` state of the same spin during F2 evolution, with the same timestep and the F2 point count. These projections are the source's analytical representation of gradient selection.
 
-## Syntax
+## Output and scope
 
-```matlab
-fid=crazed(spin_system,parameters,H,R,K)
-```
+- `fid`: two-dimensional free induction decay with F1 and F2 evolution as above.
 
-## Parameters / inputs
-
-- `parameters.sweep`: sweep width in Hz.
-- `parameters.npoints`: point counts for both dimensions.
-- `parameters.spins`: spin label used by the sequence, e.g. `'1H'` or `'13C'`.
-- `parameters.angle`: second pulse angle.
-- `parameters.rho0`: initial condition.
-- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices received from the context function.
-
-## Outputs
-
-- `fid`: two-dimensional free induction decay. The source models gradient selection with explicit projection onto the +2 double-quantum branch followed by the +1 observable single-quantum branch.
-
-[Spinach Wiki: crazed.m](https://spindynamics.org/wiki/index.php?title=crazed.m)
+This is a description of the parameterized sequence implementation, not a measured spectrum or a claim that a simulation was run and validated.

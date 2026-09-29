@@ -1,27 +1,25 @@
 # kernel/integrity/existentials.m
 
+Source: [MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/existentials.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=existentials.m).
+
 - Signature: `existentials()`
 
 ## Purpose
 
-Checks the Matlab environment and Spinach path during startup. It returns immediately on parallel workers. On the client, it checks the Matlab release and required toolboxes, then detects function-name collisions and Spinach files that are not visible on the Matlab path.
+A startup integrity check for the MATLAB installation and Spinach path. It returns without checking when called on a parallel worker; on the client it reports that startup checks are running, then verifies environment prerequisites and the visibility of Spinach files.
 
-## Physical / mathematical content
+## Integrity lifecycle
 
-This is an environment-integrity check; it does not model a physical system.
+The client-side checks proceed in source order: MATLAB must be R2026a or newer; the MATLAB installation must contain Parallel Computing, Deep Learning, Reinforcement Learning, Optimization, Statistics and Machine Learning, and Mapping toolboxes; then the routine recursively enumerates Spinach `.m` files under `kernel`, `interfaces`, `experiments`, and `etc`.
 
-## Numerical / algorithmic content
+For each enumerated file it constructs the expected Spinach pathname and asks MATLAB `which` for the resolved file. A different resolved pathname is reported as a same-name collision, except for overloads; an empty result is reported as a Spinach file missing from the MATLAB path. Those path failures print diagnostic paths and stop with `startup checks not passed`. On Windows, for a drive-letter path, a non-NTFS filesystem produces a warning about reliable file locking and performance.
 
-No numerical calculation is performed. The routine compares each discovered Spinach file with the location returned by Matlab's `which`.
+## Inputs, outputs, and units
 
-## Parameters / inputs
+There are no function arguments or returned values. This is an environment/path check, not a numerical or physical calculation; equations, normalization, matrix shape, and Hz-versus-angular-frequency units do not apply.
 
-None.
+## Source guards
 
-## Outputs
+The worker early return is `if isworkernode, return; end`. The routine is not parameterized by a user-supplied input domain. Missing release/toolbox prerequisites fail immediately with explicit errors before the recursive path audit.
 
-No return value. It displays startup-check progress and raises an error if a prerequisite, path entry, or collision check fails.
-
-## Implementation structure
-
-The routine requires Matlab R2026a or later and the Parallel Computing, Deep Learning, Reinforcement Learning, Optimisation, Statistics and Machine Learning, and Mapping toolboxes. It scans `.m` files under `kernel`, `interfaces`, `experiments`, and `etc`. A same-named file outside Spinach is reported as a collision, except for overloads; a Spinach file that `which` cannot find is reported as a path setup problem.
+Related source-backed checks: [`exorcise.m`](./exorcise.md) audits source conventions; [`patrol.m`](./patrol.md) selects and runs examples.

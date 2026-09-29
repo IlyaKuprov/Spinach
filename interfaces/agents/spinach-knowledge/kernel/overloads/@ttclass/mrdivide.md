@@ -1,20 +1,11 @@
 # kernel/overloads/@ttclass/mrdivide.m
 
-- Signature: `a=mrdivide(a,b)`
+Direct mapped source: [kernel/overloads/@ttclass/mrdivide.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/mrdivide.m) · [existing Spinach Wiki entry](https://spindynamics.org/wiki/index.php?title=ttclass/mrdivide.m)
 
-## Purpose
+## Behavior
 
-Divides a tensor-train object by a scalar.
+For `a/b`, the guard requires `a` to be `ttclass` and `b` to satisfy `isscalar`; it does not additionally constrain `b` to `double`. The operation divides every train coefficient by `b` and every stored tolerance by `abs(b)`. It leaves cores, mode sizes, and ranks unchanged, and neither compresses nor materializes a dense result.
 
-## Numerical / algorithmic content
+The scalar is not conjugated; `abs(b)` is used only in the tolerance update. There is no explicit zero-divisor guard, so zero follows MATLAB's division behavior. Other operand combinations raise the method's error.
 
-For a `ttclass` first argument and scalar second argument, the function divides the stored coefficients by the scalar and divides the tolerances by its absolute value. The core arrays are unchanged. Other input combinations raise an error.
-
-## Parameters / inputs
-
-- a -tensor train object
-- b -a scalar
-
-## Outputs
-
-- a -the tensor train object after division
+No numeric example or DOI is present in the source or either existing page.

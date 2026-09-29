@@ -4,21 +4,23 @@
 
 ## Purpose
 
-Computes Gauss-Legendre points and weights on the interval `[a,b]`. The requested accuracy order `n` produces `n+1` points.
+Constructs a Gauss-Legendre quadrature rule on the finite interval `[a,b]`.
+
+## Rule, dimensions, and reproducibility
+
+The requested positive integer `n` gives `n+1` nodes: the routine refines the Legendre-polynomial roots on `[-1,1]`, computes their Gauss-Legendre weights, maps both to `[a,b]`, then sorts the nodes in ascending order with their corresponding weights. Thus `x` and `w` are matching `(n+1)`-element column vectors. As a Gauss-Legendre rule with `n+1` nodes, it integrates polynomials through degree `2*n+1` exactly in exact arithmetic.
+
+Node starts are computed from a fixed formula and refined by Newton iteration; no random sampling is used. Iteration stops when the largest node update is no greater than machine epsilon. The implementation rejects `n>40` and advises subdividing the interval instead.
 
 ## Parameters / inputs
 
-- `a` — finite real scalar left endpoint, with `a < b`.
-- `b` — finite real scalar right endpoint.
-- `n` — positive real integer accuracy order; values above 40 are rejected.
+- `a`, `b` — finite real scalar endpoints with `a < b`.
+- `n` — finite positive real integer no greater than 40.
 
 ## Outputs
 
-- `x` — Gauss-Legendre points on `[a,b]`, sorted in ascending order.
-- `w` — corresponding Gauss-Legendre weights, reordered with `x`.
+- `x` — ascending Gauss-Legendre nodes on `[a,b]`.
+- `w` — corresponding integration weights for `[a,b]`.
 
-## Method
-
-The routine initializes nodes in `[-1,1]`, refines them by Newton-Raphson iteration, computes the weights, maps the nodes to `[a,b]`, and sorts the points and their weights together.
-
-Source reference: <https://spindynamics.org/wiki/index.php?title=gaussleg.m>
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/gaussleg.m)
+<https://spindynamics.org/wiki/index.php?title=gaussleg.m>

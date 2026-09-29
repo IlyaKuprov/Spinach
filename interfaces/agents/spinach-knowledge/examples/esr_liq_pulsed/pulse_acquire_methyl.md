@@ -1,28 +1,21 @@
 # examples/esr_liq_pulsed/pulse_acquire_methyl.m
 
-- Signature: `pulse_acquire_methyl()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/pulse_acquire_methyl.m) · [Figure 4 reference](https://doi.org/10.1051/0004-6361:20020268)
 
-## Purpose
+## Call and result
 
-X-band pulse-acquire FFT ESR spectrum of methyl radical. A common line width is used as a relaxation model. The example is set to reproduce Figure 4 from the paper by Zhitnikov and Dmitriev: http://dx.doi.org/10.1051/0004-6361:20020268. Calculation time: seconds.
+Call **pulse_acquire_methyl()** with no arguments. It has no output arguments: it creates local FID and spectrum variables, then displays the real spectrum with **kfigure** and **plot_1d**; it does not write a data file. The source describes calculation time as seconds and identifies Figure 4 by Zhitnikov and Dmitriev as the target.
 
-## Physical / mathematical content
+## Spin system and relaxation
 
-- Reads a methyl radical spin system from a vacuum DFT calculation, using supplied hyperfine couplings rather than coordinate information.
-- Sets the magnet induction to 0.33 and models relaxation with diagonal damping at a rate of `2.5e7`.
-- Simulates an electron-spin pulse-acquire ESR signal with `liquid(spin_system,@acquire,parameters,'esr')`.
+The source describes an X-band pulse-acquire FFT ESR spectrum of methyl radical. It reads **../standard_systems/methyl.log** using **gparse** and **g2spinach**, maps **E** to **E** and **H** to **1H**, and passes **[0 0]**. With **options.no_xyz=1**, coordinate information is ignored; the source comment says hyperfine couplings are provided. It sets **sys.magnet=0.33**.
 
-## Numerical / algorithmic content
+The simple common-linewidth model uses relaxation **'damp'**, diagonal retention, zero equilibrium, and **inter.damp_rate=2.5e7**. The **sphten-liouv** basis has no approximation, projection **+1**, and longitudinal **1H**; no symmetry group is specified.
 
-- Uses the `sphten-liouv` basis with no approximation, projection `+1`, and longitudinal `1H` states.
-- Sets a sweep of `5e8`, acquires 256 points, and specifies 1024 points for the Fourier transform. The axis units are `GHz-labframe`; the derivative and axis-inversion flags are enabled.
-- Applies no apodisation, computes `fftshift(fft(fid,parameters.zerofill))`, and plots the real part of the spectrum.
+## ESR acquisition
 
-## Implementation structure
+Detected spin is **E**; initial state and receiver are both **state(spin_system,'L+','E')**, with an empty decoupling list. Offset is **0**, sweep **5e8**, point count 256, zero-fill 1024, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies **'none'** apodisation, Fourier-transforms using the zero-fill length, and plots the real spectrum.
 
-- Ignore coordinate information (HFCs provided).
-- Read the spin system (vacuum DFT calculation).
-- Set magnet induction, basis, and relaxation parameters.
-- Create the Spinach spin system and basis.
-- Set the sequence parameters and run the simulation.
-- Apply apodisation, perform the Fourier transform, and plot the spectrum.
+## Dependencies and limits
+
+Requires the relative **standard_systems/methyl.log** input, Spinach **gparse**/**g2spinach** import helpers, and system/basis/state, liquid ESR/acquire, apodisation, FFT, and plotting routines. The DOI cited by the source is linked above. The source values for field, damping, offset, and sweep have no units annotated in the file; the axis-unit field is explicitly **'GHz-labframe'**. No pulse shape or duration is specified: pulse-acquire is implemented through **@acquire**, not a pulse-program block in this function.

@@ -1,31 +1,35 @@
 # etc/diamond_defects/diamond_p1_13c.m
 
-- Signature: [sys,inter]=diamond_p1_13c(parameters)
+- MATLAB implementation: [etc/diamond_defects/diamond_p1_13c.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_p1_13c.m)
 
-## Purpose
+**Call:** `[sys,inter] = diamond_p1_13c(parameters)`
 
-Builds a P1-centre spin system with one nitrogen nucleus and eighteen 13C neighbours. The electron and nitrogen parameters match diamond_p1.m. Carbon hyperfine tensors and site assignments are based on R. C. Barklie and J. Guven, *J. Phys. C: Solid State Phys.* **14**, 3621–3631 (1981), doi:10.1088/0022-3719/14/25/009; A. Cox, M. E. Newton, and J. M. Baker, *J. Phys.: Condens. Matter* **6**, 551–563 (1994), doi:10.1088/0953-8984/6/2/012; and C. V. Peaker et al., *Diamond Relat. Mater.* **70**, 118–123 (2016), doi:10.1016/j.diamond.2016.10.013.
+Builds a P1-centre spin model containing one electron, one nitrogen nucleus and eighteen `13C` neighbours.
 
-Five sites have literature-based labels and assignments: G1_C1, G2_C3, G4_C5, G8_C2, and G14_C4. G1_C1 and G2_C3 use the Cox et al. Table 2 assignments; the sign for G2_C3 and the assignments of G4_C5, G8_C2, and G14_C4 follow Peaker et al. The remaining thirteen sites carry _calc labels and use Peaker et al.'s Table 4 values.
+## Inputs
 
-## Physical / mathematical content
+- `parameters.orientation`: `'111'`, `'110'` or `'100'`; the selected crystal direction is aligned with the magnetic field.
+- `parameters.nitrogen`: `'14N'` or `'15N'`.
 
-Each 13C nucleus is coupled to the electron by its own anisotropic hyperfine tensor. For 14N, the nitrogen hyperfine tensor and quadrupole interaction match diamond_p1.m; for 15N, the opposite-sign hyperfine tensor is used and no quadrupole term is added. The electron coordinate is deliberately left unspecified so that point-dipolar electron–nuclear couplings are not added on top of the measured or calculated hyperfine tensors.
+Both fields are required; the source checks these character values exactly. The electron/nitrogen parameter convention is documented as following `diamond_p1.m`.
 
-## Numerical / algorithmic content
+## Model details
 
-The source reconstructs representative carbon coordinates from ideal diamond-lattice directions and Peaker et al.'s tabulated distances from the midpoint of the broken N–C bond, expressed in units of a0. Relaxed Cartesian coordinates are not reported in that paper. The code sets a0 = 3.567 Å, places nitrogen at the origin, and leaves the electron coordinate empty. It constructs each carbon tensor from its principal values and polar/azimuthal axes, symmetrises it, and rotates it consistently with the requested orientation. These coordinates are representative reconstructions, not reported relaxed positions.
+The carbon sites are labelled `G1_C1` through `G18`; the source identifies five measured/assigned sites (G1_C1, G2_C3, G4_C5, G8_C2 and G14_C4), while the other thirteen carry `_calc` labels and use Peaker et al.'s calculated Table 4 values. For example, G1_C1 has principal hyperfine values 139.531, 139.531 and 338.171 MHz in the source table; the code scales the table by `1e6` when constructing the tensor.
 
-## Parameters / inputs
+The tensors and site assignments draw on Barklie & Guven (1981), Cox et al. (1994), and Peaker et al. (2016). The coordinate model is deliberately representative, not a set of relaxed Cartesian coordinates: it uses ideal diamond-lattice directions, Peaker's tabulated distances `d/a0`, and `a0 = 3.567` Å. Nitrogen is at the origin. The electron coordinate is left empty so Spinach does not add point-dipolar electron–nuclear couplings on top of the explicit measured/calculated hyperfine tensors. Each carbon tensor's principal axes are rotated into the chosen field orientation before insertion into `inter.coupling.matrix`.
 
-- parameters.orientation: '111', '110', or '100'; the corresponding crystal-plane normal is aligned with the magnetic field.
-- parameters.nitrogen: '14N' or '15N'. Both fields are required.
+## Outputs and scope
 
-## Outputs
+- `sys`: isotope and label arrays for the electron, selected nitrogen isotope and 18 carbons, with the reconstructed nuclear coordinates.
+- `inter`: Zeeman and coupling data, including the carbon hyperfine tensors.
 
-- sys: Spinach system specification structure, with the electron, nitrogen, and eighteen 13C nuclei and their labels.
-- inter: Spinach interaction specification structure, including coordinates for nitrogen and carbon; the electron coordinate is empty.
+The carbon count and site parameters are fixed by the routine; it does not expose a subset-size parameter. Use the returned tensors as the source model provides them rather than interpreting the representative coordinates as relaxed structure.
 
-## Implementation structure
+## References
 
-The routine validates its two required fields, constructs the orientation rotation and site list, sets isotope and label arrays, builds the nitrogen interactions, reconstructs nuclear coordinates, and adds the eighteen rotated carbon hyperfine tensors to Spinach's coupling matrix.
+- R. C. Barklie and J. Guven, *J. Phys. C: Solid State Phys.* **14**, 3621–3631 (1981), [doi:10.1088/0022-3719/14/25/009](https://doi.org/10.1088/0022-3719/14/25/009).
+- A. Cox, M. E. Newton and J. M. Baker, *J. Phys.: Condens. Matter* **6**, 551–563 (1994), [doi:10.1088/0953-8984/6/2/012](https://doi.org/10.1088/0953-8984/6/2/012).
+- C. V. Peaker et al., *Diamond and Related Materials* **70**, 118–123 (2016), [doi:10.1016/j.diamond.2016.10.013](https://doi.org/10.1016/j.diamond.2016.10.013).
+
+[Spin Dynamics Wiki source page](https://spindynamics.org/wiki/index.php?title=diamond_p1_13c.m).

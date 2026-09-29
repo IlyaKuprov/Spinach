@@ -1,20 +1,20 @@
 # experiments/pseudocon/probmax.m
 
+- Source: [experiments/pseudocon/probmax.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/probmax.m)
+- Wiki: [probmax.m](https://spindynamics.org/wiki/index.php?title=probmax.m)
 - Signature: `[x,y,z]=probmax(probden,ranges)`
 
 ## Purpose
 
-Returns the coordinates of the maximum value in a three-dimensional probability-density array, using the coordinate bounds in `ranges`.
+Returns the coordinate of the largest value in a three-dimensional sampled probability-density array. It locates a sampled maximum; it does not fit or interpolate a continuous maximum.
 
-## Numerical / algorithmic content
+## Inputs and coordinate mapping
 
-The routine builds one coordinate grid per dimension with `linspace` and `ndgrid`, matching each grid length to the corresponding dimension of `probden`. It locates the maximum array value and returns the coordinates at its linear index.
+- `probden` is a real numeric 3-D array with dimensions ordered `[X Y Z]`.
+- `ranges` is a real six-element vector `[xmin xmax ymin ymax zmin zmax]`. Each lower bound must be strictly less than its matching upper bound.
 
-## Parameters / inputs
+For each array dimension, the routine builds an inclusive coordinate vector with `linspace` from the corresponding lower and upper bounds, using that dimension's array length. `ndgrid` combines these vectors into coordinate arrays aligned with `probden`.
 
-- `probden` — real three-dimensional probability-density array, with dimensions ordered `[X Y Z]`.
-- `ranges` — six-element vector `[xmin xmax ymin ymax zmin zmax]` defining the coordinate bounds.
+## Output and constraints
 
-## Outputs
-
-- `x`, `y`, `z` — coordinates of the maximum point.
+The routine applies MATLAB's linear `max` to `probden(:)` and returns the `x`, `y`, and `z` coordinates at that linear index. If several entries share the maximum, MATLAB's first-maximum behavior selects the first in linear array order. The validator checks that `ranges` is real numeric with six elements and strictly increasing bounds, and that `probden` is real numeric and three-dimensional; it does not check that values are nonnegative or normalized as a probability density.

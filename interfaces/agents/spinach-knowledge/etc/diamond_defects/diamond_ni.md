@@ -1,33 +1,48 @@
 # etc/diamond_defects/diamond_ni.m
 
-- Signature: [sys,inter]=diamond_ni(parameters)
+- MATLAB implementation: [etc/diamond_defects/diamond_ni.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_ni.m)
+
+- Signature: `[sys,inter]=diamond_ni(parameters)`
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=diamond_ni.m)
+- W8 magnetic parameters: Isoya, Kanda, Norris, Tang, and Bowman, *Phys. Rev. B* **41**, 3905 (1990), https://doi.org/10.1103/PhysRevB.41.3905.
+- Other nickel-centre table values: Nadolinny et al., *Crystals* **7**, 237 (2017), https://doi.org/10.3390/cryst7080237.
 
 ## Purpose
 
-Constructs a spin system for the listed nickel-related diamond centres. The W8 magnetic parameters are from Isoya, Kanda, Norris, Tang, and Bowman, *Phys. Rev. B* **41**, 3905 (1990), https://doi.org/10.1103/PhysRevB.41.3905. Parameters for the other nickel centres are from Nadolinny et al., *Crystals* **7**, 237 (2017), https://doi.org/10.3390/cryst7080237.
+Constructs Spinach system and interaction specifications for the listed nickel-related diamond centres. This function selects a reported centre model and orientation; it does not run a spectrum or spin-dynamics simulation.
 
-The W8 quartet entry uses zero zero-field splitting because the cited parameter set reports none; off-central transitions are treated as unresolved, not explicitly modelled. In the Nadolinny review, the Table 2 zero-field-splitting column is in tesla, as its heading states. The source also records reported values of D = -171 GHz for NOL1/NIRIM5 and D = 31.72 GHz for AB5; both exceed the 9.5 GHz X-band quantum, while the AB5 splitting is below the 94 GHz W-band quantum used in the shipped example.
+## Call and inputs
 
-## Physical / mathematical content
+Call `[sys,inter]=diamond_ni(parameters)` with exactly one structure argument. Required fields are `parameters.centre` and `parameters.orientation`. Centre strings are case-insensitive and accepted values are `'w8'`, `'ne1'`–`'ne5'`, `'ne8'`, `'ab1'`–`'ab5'`, `'nol1'`, and `'nirim5'`. Orientation must be exactly `'111'`, `'110'`, or `'100'`; its crystal-plane normal is aligned with the applied field (`z`).
 
-Depending on the selected centre, the system contains an electron (or an effective E3/E4 spin), optional nickel and carbon nuclei, and the tabulated nitrogen hyperfine tensors. The routine includes the centre's electron g tensor and, where specified, its zero-field-splitting tensor. For W8, the nickel isotope can be omitted with 'none'; 61Ni is assigned its tabulated hyperfine coupling.
+For W8, also supply `parameters.nickel` (a character isotope label or `'none'`) and `parameters.n_13c` (integer scalar 0–4). `'61Ni'` adds a `61Ni` nucleus with isotropic A = 0.65 mT; `'none'` adds no Ni nucleus. Another isotope string is placed in `sys.isotopes` without a hyperfine tensor; the function does not validate that label, so it must be a valid Spinach isotope name. For non-W8 centres, `n_13c` may be omitted or set to zero; a nonzero value is rejected.
 
-## Numerical / algorithmic content
+Example: `[sys,inter]=diamond_ni(struct('centre','w8','orientation','111','nickel','none','n_13c',1));`
 
-Tabulated principal values are converted to frequency units where necessary and transformed from the centre frame to the selected crystal orientation. For W8, up to four nearest-neighbour 13C nuclei can be included. They are placed in source order on [111], [1-1-1], [-11-1], and [-1-11] bonds. Selecting fewer than four therefore selects a particular isotopomer, not an average: at orientation '111', the [111] carbon splits by 1.339 mT and each other listed carbon by 0.451 mT. To represent a mixture, include all four and select or weight isotopomers in the calling script.
+## Centre models
 
-## Parameters / inputs
+The code uses the following principal values. Hyperfine values listed in mT are converted to Hz internally using `abs(spin('E'))/(2*pi)*1e-3`. The g tensors are dimensionless.
 
-- parameters.centre: 'w8', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5', 'ne8', 'ab1', 'ab2', 'ab3', 'ab4', 'ab5', 'nol1', or 'nirim5'.
-- parameters.orientation: '111', '110', or '100'; the corresponding crystal-plane normal is aligned with the magnetic field.
-- parameters.nickel: required for W8; '61Ni', 'none', or another isotope string. It is ignored for other centres.
-- parameters.n_13c: required for W8; integer from 0 to 4. It is only supported for W8 and must be zero otherwise.
+| Centre | Electron / g principal values | Nuclear content |
+|---|---|---|
+| W8 | E4; isotropic g = 2.032; zero ZFS in the model | Optional 0–4 nearest-neighbour `13C`, A = [0.340, 0.340, 1.339] mT each; selected `61Ni` has A = 0.65 mT |
+| NE1 | E; g = [2.1282, 2.0070, 2.0908] | two `14N` tensors, each [2.09, 1.43, 1.45] mT |
+| NE2 | E; g = [2.1301, 2.0100, 2.0931] | three `14N` tensors: [2.10, 1.42, 1.41], [1.87, 1.18, 1.25], [0.18, 0.35, 0.25] mT |
+| NE3 | E; g = [2.0729, 2.0100, 2.0476] | three `14N` tensors: [1.60, 1.24, 1.15], [0.66, 0.50, 0.50] twice, mT |
+| NE4 | E; g = [2.0988, 2.0988, 2.0227] | no nuclear tensors are added by this case |
+| NE5 | E; g = [2.0329, 2.0898, 2.0476] | two `14N` tensors, each [1.22, 0.98, 0.89] mT |
+| NE8 | E; g = [2.0439, 2.1722, 2.0476] | four `14N` tensors, each [1.14, 0.78, 0.75] mT |
+| AB1 | E; g = [2.0920, 2.0920, 2.0024] | no nuclear tensors are added by this case |
+| AB2 | E; g = [2.0672, 2.0672, 2.0072] | no nuclear tensors are added by this case |
+| AB3 | E; g = [2.1105, 2.0663, 2.0181] | no nuclear tensors are added by this case |
+| AB4 | E; g = [2.0220, 2.0094, 2.0084] | no nuclear tensors are added by this case |
+| AB5 | E3; g = [2.022, 2.022, 2.037]; axial ZFS parameter 1.132 T | no nuclear tensors are added by this case |
+| NOL1 / NIRIM5 | E3; g = [2.002, 2.002, 2.0235]; axial ZFS parameter −6.10 T | no nuclear tensors are added by this case |
 
-## Outputs
+For the NE1/2/3/5/8 tensors, the principal-axis frame uses `alpha=14°` for NE1/2/3 and `27.5°` for NE5/8; AB3/AB4 use axes constructed from `[100]`, `[011]`, and `[0 −1 1]`; AB1/AB2, AB5, and NOL1/NIRIM5 use the source `frame_111`, while the NE centres use their alpha-defined frame. The review’s Table 2 labels its zero-field-splitting column in tesla, as the source comment notes. The NOL1/NIRIM5 and AB5 code multiplies the stated field-equivalent ZFS parameters by `abs(spin('E'))/(2*pi)` before constructing the tensor. Source comments connect these models to `D = −171 GHz` for NOL1/NIRIM5 (Nadolinny et al., *Diam. Relat. Mater.* **11**, 627 (2002)) and `D = 31.72 GHz` for AB5 (Landolt–Börnstein III/41A2a). The same comments note these splittings greatly exceed the 9.5 GHz X-band quantum; the AB5 splitting is below the 94 GHz W-band quantum of the shipped example.
 
-- sys: Spinach system specification structure.
-- inter: Spinach interaction specification structure.
+## W8 carbon ordering and limits
 
-## Implementation structure
+The W8 carbons are placed, in order, on the `[111]`, `[1-1-1]`, `[-11-1]`, and `[-1-11]` nearest-neighbour bonds. Thus `n_13c` below four selects a particular isotopomer, not an average: at orientation `'111'`, the `[111]` carbon splits by 1.339 mT and each other listed carbon by 0.451 mT. To represent an isotopomer mixture, request all four and select or weight them in the calling script.
 
-After validating the input, the function selects centre-specific tensors and nuclei, constructs the orientation rotation, then fills the Zeeman and coupling matrices. The W8 path optionally appends the requested nearest-neighbour 13C nuclei; the NOL1/NIRIM5 and AB5 paths include their zero-field-splitting tensors.
+W8 is represented as a quartet with zero ZFS: the cited data in the source did not report W8 ZFS, and off-central transitions are treated as unresolved rather than explicitly modelled. The routine returns only its selected g, ZFS (where coded), and coupling matrices; it does not provide relaxation, line broadening, or mixture averaging.

@@ -1,24 +1,20 @@
 # examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m
 
 - Signature: `yusuke_optimal_vs_cw_demo()`
-- Status: historical documentation. The corresponding `.m` file is absent from the current checkout; this description is based on `b4f03f29^:examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m` and does not establish current behavior.
+- Historical status: the example source is absent from the current checkout. This page documents the historical implementation at the stable path `examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m`; it is not a current runnable-example guarantee.
 
-## Purpose
+## Aim and model boundary
 
-The historical example optimises a Bloch–Siegert-aware, phase-modulated low-power waveform against a constant-phase X-pulse baseline. It is a reduced single-spin identity-cycle surrogate intended to preserve magnetisation over offset and RF-amplitude (B1) variation. The header describes it as a control-side companion to `yusuke_14n_broadening_demo.m`; it is explicitly not a full QJF/MAS quadrupolar simulation.
+The script optimises a phase-modulated, low-power identity cycle and compares it with a constant-phase X-pulse having the same RF amplitude and total duration. The intended reduced-model question is whether the cycle preserves three Cartesian magnetisation states across offset and B1 variation. The source calls this a control-side companion to `yusuke_14n_broadening_demo.m`, but explicitly frames it as a surrogate—not a full quadrupolar-(^{14}mathrm N), QJF, or MAS simulation. Its header gives 70 kHz MAS, approximately 10 μs pulse elements, and a 15–23 kHz (^{14}mathrm N) frequency range as motivation only.
 
-## Historical setup and numerics
+## Historical setup
 
-- Random seed: `rng(1)`.
-- Field: `sys.magnet=18.8` T, corresponding to 800 MHz for (^1)H.
-- Model: one (^ {13})C spin, zero isotropic Zeeman coupling, and the full spherical-tensor Liouville basis (`formalism='sphten-liouv'`, `approximation='none'`). The identity-cycle states are normalised (S_x), (S_y), and (S_z).
-- Header context: 70 kHz MAS, (t_psim10) μs, and (
-u_{14N}) in the 15–23 kHz range. These are motivating 14N-decoupling conditions, not a simulated quadrupolar 14N system.
-- RF and pulse: nominal RF 20 kHz; 10 equal elements of 10 μs each (100 μs total). The constant-phase reference is a 4π X pulse. The phase-only optimiser uses L-BFGS, up to 40 iterations, with Bloch–Siegert corrections enabled (`control.bsiegert=true()`); amplitudes are held fixed.
-- Optimisation training grid: seven offsets from −12 to +12 kHz and B1 scales [0.95, 1.00, 1.05]. Evaluation grid: 61 offsets from −20 to +20 kHz and nine B1 scales from 0.90 to 1.10.
+The script fixes `rng(1)`, sets `sys.magnet=18.8` T (800 MHz for (^{1}mathrm H)), and creates a one-spin (^{13}mathrm C) model with zero isotropic Zeeman coupling. It uses `formalism='sphten-liouv'` and `approximation='none'`. Normalised (S_x,S_y,S_z) states serve as the three initial and target operators; (L_x,L_y) are the two RF controls and (L_z) the offset operator.
 
-The objective evaluates preservation of the three Cartesian basis states; the code also evaluates offset and B1 profiles for the optimised and constant-phase waveforms and plots phase/profile comparisons. The source contains no prose conclusion or fixed numerical result; this page therefore makes no claim that either waveform wins over the evaluation grid.
+The pulse has 10 equal 10 μs elements (100 μs total) at nominal 20 kHz RF. Amplitudes remain fixed while element phases are varied. The constant-phase baseline uses zero phase for every element; the header characterises it as a 4π X pulse. The optimiser is configured for L-BFGS with at most 40 iterations, uses Bloch–Siegert corrections, and starts from a random phase vector. The training set comprises seven offsets from −12 to +12 kHz and B1 scales ([0.95,1.00,1.05]).
 
-## Source and citation status
+## Evaluation and interpretation
 
-The historical header says the numerical regime is inspired by “the 14N decoupling papers” but gives no bibliographic citation. No paper citation or DOI is supplied by the source. The file's author line is `aditya.dev@weizmann.ac.il`.
+Both waveforms are evaluated over 61 offsets from −20 to +20 kHz and nine B1 scaling factors from 0.90 to 1.10. The script produces fidelity maps and offset/B1 profiles, including mean profiles, for visual comparison. These grids describe the script's evaluation procedure; they are not reported experimental results. The source contains no prose conclusion or fixed numerical result, so it does not establish that either waveform outperforms the other across the evaluation range.
+
+The historical header mentions “the 14N decoupling papers” but names no paper or DOI. No bibliographic citation should be inferred from the filename or motivation.

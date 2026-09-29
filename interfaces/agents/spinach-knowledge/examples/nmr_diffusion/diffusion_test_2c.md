@@ -1,27 +1,9 @@
 # examples/nmr_diffusion/diffusion_test_2c.m
 
-- Signature: `diffusion_test_2c()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_diffusion/diffusion_test_2c.m)
 
-## Purpose
+This example propagates a loaded 2D phantom through a diffusion-and-flow transport generator without spin interactions. It loads `R1` from `phantom_a.mat` as the initial state and sets the velocity fields `u` and `v` to zero. The source comment labels the case anisotropic diffusion with periodic boundary conditions; the configured tensor components are all equal. The source header estimates calculation time as minutes.
 
-Evolve a phantom under a two-dimensional diffusion and flow generator with no spin interactions. The sample geometry uses periodic derivatives. The source comments estimate a calculation time of minutes.
+The grid has dimensions `[0.02 0.02]` and `[108 90]` points. The derivative setting is `{'period',7}`. Each diffusion-tensor component, `dxx`, `dxy`, `dyx`, and `dyy`, is set uniformly to `5e-5`; the source gives no units for these values or the grid dimensions. With a ghost spin and empty Zeeman and coupling matrices, the example constructs the system and basis, then builds the generator using `v2fplanck(spin_system,parameters)` and `inflate`.
 
-## Physical / mathematical content
-
-- Loads `R1` from `phantom_a.mat` as the initial state.
-- Configures a ghost spin (`'G'`) with zero magnetization and no Zeeman or coupling interactions.
-- Uses a 108-by-90 grid over dimensions `[0.02 0.02]`, with `parameters.deriv={'period',7}`.
-- Sets both flow fields, `u` and `v`, to zero. Sets each diffusion tensor field, `dxx`, `dxy`, `dyx`, and `dyy`, to a constant `5e-5` across the grid.
-
-## Numerical / algorithmic content
-
-- Creates the spin system with the `sphten-liouv` formalism and `none` basis approximation.
-- Constructs the diffusion and flow generator with `v2fplanck(spin_system,parameters)` and applies `inflate` to it.
-- Calls `evolution` in `'trajectory'` mode with initial state `R1(:)`, time step `5e-4`, and 200 steps.
-
-## Implementation structure
-
-- Loads the phantom and configures a ghost spin without spin interactions.
-- Creates the spin system and basis, then specifies the sample geometry, zero flow fields, and diffusion tensor fields.
-- Builds the diffusion and flow generator and computes the trajectory.
-- Plots each of the 200 trajectory columns as a 108-by-90 image, calling `drawnow` and pausing for `0.025` seconds between frames.
+It requests 200 trajectory steps at `timestep=5e-4` with `evolution(spin_system,F,[],R1(:),timestep,nsteps,'trajectory')`. Each column is reshaped to `108-by-90` and displayed with `imagesc`; the loop calls `drawnow` and pauses `0.025` seconds per frame.

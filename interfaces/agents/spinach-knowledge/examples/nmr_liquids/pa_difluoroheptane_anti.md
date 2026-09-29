@@ -4,18 +4,20 @@
 
 ## Purpose
 
-Pulse-acquire 1H NMR spectrum of anti-3,5-difluoroheptane. The example manually specifies a basis by merging Lie algebras for selected spin fragments, followed by symmetry factorisation and conservation-law screening. See [the cited paper](https://doi.org/10.1021/acs.joc.4c00670) for further information. Calculation time: minutes, faster with a GPU.
+Simulates a one-dimensional pulse-acquire 1H NMR spectrum for anti-3,5-difluoroheptane. The manually specified 23-spin isotope list contains seven 12C, fourteen 1H, and two 19F spins. The source cites [DOI 10.1021/acs.joc.4c00670](https://doi.org/10.1021/acs.joc.4c00670) for the manual basis construction; its header estimates minutes for calculation time and says it is faster with a GPU.
 
-## Physical / mathematical content
+## Spin model and acquisition
 
-- The manually specified 23-spin model contains carbon-12, proton and fluorine-19 spins, with chemical shifts and scalar couplings assigned explicitly. The basis partitions the spins into three fragments and applies S3 symmetry to the two proton triplets; the longitudinal projection is specified for fluorine-19.
+The field setting is `11.7464`. The source assigns proton chemical-shift values `1.0092` and `4.6834`. It sets the two 19F shift entries to `0.0000` and comments that the actual value is `-184.1865`, but is zeroed because that value does not matter here and the calculation is faster. Scalar couplings are entered explicitly in the example; their units are not labelled.
 
-## Numerical / algorithmic content
+The basis is `sphten-liouv` with `IK-0` and `inter_level=1`. Three manual fragment memberships are specified, with `S3` symmetry for spin groups `[14 15 16]` and `[21 22 23]`; the basis also sets `longitudinal={{'19F'}}` and `projections={1}`. The code disables ZTE. A GPU enable statement is present only as a comment and is not active. No relaxation model is configured in this example.
 
-- The basis uses spherical-tensor Liouville formalism, IK-0 approximation and interaction level 1. Manual fragment membership, symmetry factorisation and projection selection define the reduced basis.
-- GPU acceleration is noted as useful but remains commented out in the source; ZTE is explicitly disabled. Acquisition uses 4096 points, zero-filling to 16536, a 2500 Hz sweep and 1400 Hz offset, followed by 5 Hz exponential apodisation.
+The acquisition selects `{'1H'}`, sets both initial state and receiver coil to `state(spin_system,'L+','1H')`, and leaves the decoupling list empty. Offset is `1400`, sweep `2500`, acquired points `4096`, zero fill `16536`, and the axis is in ppm with `invert_axis=1`. The code does not label units for the field, offset, or sweep literals.
 
-## Implementation structure
+## Propagation and processing
 
-- Define the field (11.7464 T), 23 isotopes, chemical shifts and scalar couplings, then construct the manually partitioned, symmetry-factorised basis.
-- Set proton pulse-acquire initial state and coil, simulate, apodise, Fourier transform and plot the real spectrum with the frequency axis inverted.
+The pulse-acquire sequence is propagated with `liquid(...,@acquire,...,'nmr')`. The FID is apodised with `exp` and parameter `5`, Fourier-transformed, and plotted as the real spectrum with the frequency axis inverted. The source supplies no numerical peak positions or intensities.
+
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pa_difluoroheptane_anti.m)

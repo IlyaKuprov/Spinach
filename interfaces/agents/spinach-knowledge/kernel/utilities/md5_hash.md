@@ -1,27 +1,19 @@
 # kernel/utilities/md5_hash.m
 
-- Signature: `hashstr=md5_hash(A)`
-
 ## Purpose
 
-MD5 hash of any Matlab object as a hex string. Identical sparse and full matrices return different hashes. Syntax: hashstr=md5_hash(A)
+Returns an MD5 hash of any MATLAB object as a hexadecimal string, per the header comment of [`kernel/utilities/md5_hash.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/md5_hash.m). The header notes that identical sparse and full matrices return different hashes.
 
-## Physical / mathematical content
+## Behavior
 
-- Produces a hexadecimal MD5 digest of serialized MATLAB object bytes. Objects with different serializations, including sparse and full matrices, can have different hashes.
+The function serializes the input object into a bytestream with `serializeToBytes`, computes the MD5 digest with `digestMD5`, and formats the digest bytes as a lowercase hexadecimal string via `sprintf('%.2x',...)`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- Computes MD5 over the byte stream returned by `serializeToBytes` and renders each digest byte as two hexadecimal digits.
+- `A` — MATLAB object of any type.
+- `hashstr` — hexadecimal character string.
 
-## Parameters / inputs
+## References
 
-- A -Matlab object of any type
-
-## Outputs
-
-- hashstr -hexadecimal character string
-
-## Implementation structure
-
-- Serializes `A`, computes its MD5 digest, and converts the digest bytes to a hexadecimal character string.
+- [Spinach Wiki: md5_hash.m](https://spindynamics.org/wiki/index.php?title=md5_hash.m)
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/md5_hash.m)

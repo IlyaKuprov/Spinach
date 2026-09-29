@@ -4,22 +4,19 @@
 
 ## Purpose
 
-Adapts an objective-function call to the number of outputs requested by the optimisation routine. It reshapes the parameter vector using `data.x_shape`, calls the objective with `spin_system`, and combines fidelity, gradient, and Hessian contributions into the total objective and its derivatives.
+Adapts an objective-function call to the number of outputs requested by an optimization routine, and combines the objective's fidelity, gradient, and Hessian components. The source notes that this function will be eliminated in a future release.
 
-## Parameters / inputs
+## Inputs and guards
 
-- `x` — non-empty real numeric parameter vector.
-- `objfun_handle` — objective function handle; it must provide at least two outputs.
-- `data` — optimisation state, including `x_shape` and counters; objective diagnostics and trajectory data are stored here.
-- `spin_system` — passed to the objective function.
+All four arguments are required; the source assigns no defaults. It checks that `objfun_handle` is a function handle and that `x` is non-empty, numeric, and real. The guard does not explicitly test `isvector(x)`, despite the error text describing a vector. The routine also expects `data.x_shape` and the counter fields it updates; it does not validate `data` or `spin_system` here.
 
-## Outputs
+## Wrapper transformations
 
-- `data` — updated state containing the separate fidelity contributions, trajectory data, and evaluation counters.
-- `fx` — total objective, computed as the first fidelity contribution minus the sum of the remaining contributions.
-- `grad` — combined gradient, returned when three or more outputs are requested.
-- `hess` — combined Hessian, returned when four outputs are requested.
+The wrapper reshapes `x` to `data.x_shape` and calls the objective handle with that shaped control and `spin_system`. With two outputs requested from `objeval`, it asks the objective for `[traj_data,fidelity]`; with three, it also requests a gradient; with four, it requests a Hessian as well. Other output counts raise an error.
 
-The function supports requests for two, three, or four outputs; other output counts raise an error. The source marks the function for elimination in a future release.
+In all supported cases, the combined objective is `fidelity(1)-sum(fidelity(2:end))`: the first fidelity component is added and the remaining components are subtracted. For gradient calls, the same first-component-minus-rest combination is applied along the third dimension, then the result is flattened to a column with `grad(:)`. For Hessian calls the component combination is applied along the third dimension and the resulting matrix is returned without flattening. The routine stores the uncombined values in `data.fx_sep_pen` and the trajectory data in `data.traj_data`.
 
+Each supported call increments `data.count.fx`; gradient requests also increment `data.count.gfx`, and Hessian requests increment `data.count.hfx`. This wrapper does not select line-search or Hessian-update options and does not apply freeze or phase-cycle masks.
+
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/objeval.m)
 [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=objeval.m)

@@ -1,26 +1,27 @@
 # kernel/line_shapes/gausscon.m
 
+- MATLAB source: [kernel/line_shapes/gausscon.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/line_shapes/gausscon.m)
+- Existing Wiki: [gausscon.m](https://spindynamics.org/wiki/index.php?title=gausscon.m)
 - Signature: `y=gausscon(offs,ampl,fwhm,x)`
 
-## Purpose
+## Meaning and equation
 
-Evaluates a Gaussian line shape or its convolution with a triangular distribution.
+This convolves a unit-area Gaussian with either a point offset or a normalized triangular distribution. The Gaussian kernel is `g(u)=exp(-u^2/(2*sigma^2))/(sigma*sqrt(2*pi))`, with `sigma=fwhm/(2*sqrt(2*log(2)))`.
 
-## Physical / mathematical content
+- One offset `q`: `y(x)=ampl*g(x-q)`.
+- Three distinct sorted offsets `a<b<c`: use the triangular density `T(t)=2*(t-a)/((b-a)*(c-a))` for `a<=t<=b`, `T(t)=2*(c-t)/((c-b)*(c-a))` for `b<t<=c`, and zero elsewhere. Then `y(x)=ampl*integral(T(t)*g(x-t),t=a..c)`.
 
-A scalar `offs` gives a Gaussian centered at that offset. Three offsets specify the vertices of a triangular distribution whose convolution with the Gaussian is evaluated. `ampl` scales the resulting values.
+The source sorts the three offsets. Repeated or numerically coalescent vertices are handled as the corresponding limiting shape: all coalescent gives the Gaussian at their mean; a repeated lower pair or upper pair gives a right-angle triangle convolved with the Gaussian. The comparison uses a tolerance proportional to machine precision and the offset norm. The Gaussian and triangular kernels each have unit area, so the output area is `ampl` (including its sign).
 
-## Numerical / algorithmic content
+## Inputs and units
 
-The Gaussian standard deviation is obtained from `fwhm`. For three offsets, the routine sorts them and evaluates the convolution using Gaussian values and error-function integrals; repeated vertices are handled as limiting cases.
+- `offs` - one or three finite real numeric values; a three-value input specifies triangle vertices.
+- `ampl` - finite real numeric scalar multiplier.
+- `fwhm` - finite positive real numeric scalar Gaussian full width at half maximum.
+- `x` - finite real numeric array of any dimension.
 
-## Parameters / inputs
+All offsets, `x`, and `fwhm` use the same coordinate units. There is no Hz-to-angular-frequency conversion; keep the caller's frequency convention consistent. For dimensionless `ampl`, `y` has reciprocal-coordinate units.
 
-- `offs` - finite real scalar or three-element vector of offsets.
-- `ampl` - finite real scalar amplitude multiplier.
-- `fwhm` - finite positive real full width at half maximum.
-- `x` - array of finite real argument values.
+## Output
 
-## Outputs
-
-- `y` - array of values with the same size as `x`.
+- `y` - line-shape values with the same size as `x`.

@@ -1,20 +1,20 @@
 # examples/giant_spin/nuclear_relaxation_1.m
 
+- MATLAB implementation: [examples/giant_spin/nuclear_relaxation_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/nuclear_relaxation_1.m)
+
 - Signature: `nuclear_relaxation_1()`
+- Source: `examples/giant_spin/nuclear_relaxation_1.m`
 
-## Purpose
+## Model and tensors
 
-Calculate proton relaxation rates and a frequency shift for a rapidly relaxing Dy(III) ion using adiabatic elimination. The example uses a specified ligand field; the source comments give a calculation time of minutes.
+The model couples a Dy(III) `E16` giant spin to a proton (`1H`) at the source-specified field value `14.1`; the source does not state a unit for this value. The electron Zeeman tensor is assembled from principal values `[1.325781, 1.322640, 1.317917]` and the supplied direction-cosine matrix `V`. The proton shift tensor is the zero matrix. `sys.enable={'sodd'}` enables the source-described spin-orbit corrections to dipolar couplings.
 
-## Physical model
+The source supplies Cartesian coordinates `[0.00 0.00 0.00]` and `[0.00 5.00 7.00]` for the two spins; it does not state coordinate units. MOLCAS ligand-field coefficients are supplied at ranks 2, 4, and 6. The code converts each set with `icm2hz` and `stev2sph`, then applies Wigner rotations from the supplied ligand-frame and molecular-frame direction-cosine matrices before assigning the resulting spherical tensors to `inter.giant.coeff`. The input-coefficient units are not stated in the source.
 
-- The spin system contains an `E16` Dy(III) electron and a `1H` nucleus at a magnetic field of `14.1`. Their Cartesian coordinates are `[0.00 0.00 0.00]` and `[0.00 5.00 7.00]`, respectively.
-- The electron g-tensor is constructed as `V'*diag(D)*V`, with principal values `D=[1.325781 1.322640 1.317917]`; the nuclear shift tensor is zero. Spin–orbit corrections to dipolar couplings are enabled with `sys.enable={'sodd'}`.
-- MOLCAS ligand-field coefficients of ranks 2, 4, and 6 are converted with `icm2hz` and `stev2sph`, then rotated with two sets of Euler angles obtained from the supplied direction-cosine matrices. The resulting spherical tensors are assigned to `inter.giant.coeff`.
-- Separate electron relaxation times are set to `T1e = T2e = 50 fs`; the corresponding proton rates are zero. Relaxation is kept in the laboratory frame with zero equilibrium.
+Separate electron relaxation times are set to T1e = T2e = 50 fs (rates `1/50e-15`); the proton relaxation rates are zero. Relaxation is kept in the lab frame with zero equilibrium. The basis uses `sphten-liouv` and `approximation='none'`.
 
-## Calculation
+## Orientation average and reported quantities
 
-The calculation uses the `sphten-liouv` formalism without basis approximation. It partitions the 1024 Liouville-space states into four pure-nuclear slow states (`1:4`) and electron-involving fast states (`5:1024`). For each orientation in the loaded `leb_2ang_rank_11.mat` grid, it combines the Hamiltonian with non-interacting relaxation, applies `adelim` to eliminate the fast subspace, and adds the weighted result to a `4×4` nuclear relaxation matrix. The orientation loop uses MATLAB `parfor`.
+The 1024 Liouville-space states are partitioned into four pure-nuclear slow states (indices 1:4) and electron-involving fast states (5:1024). For each weighted orientation in `leb_2ang_rank_11.mat`, the example forms `L = I + orientation(Q,angles) + 1i*R_ni`, where `R_ni` is the non-interacting relaxation superoperator, and uses `adelim(spin_system,L,fast_idx,slow_idx)` to obtain the effective slow-subspace relaxation matrix. MATLAB `parfor` performs the orientation loop and the weighted matrices are accumulated.
 
-Normalized proton `Lz` and `L+` states in the slow subspace are used to report `1H R1` and `1H R2` from the real parts of their matrix projections, and `1H DFS` from the imaginary part of the `L+` projection. All three displayed values are labelled `Hz`.
+Normalized proton `Lz` and `L+` states restricted to the slow subspace give the displayed `1H R1` and `1H R2` from the real parts of the negative matrix projections, and `1H DFS` from the imaginary part of the negative `L+` projection. All three printed values are labelled Hz. The source estimates a calculation time of minutes; it contains no fixed numerical output values or plot.

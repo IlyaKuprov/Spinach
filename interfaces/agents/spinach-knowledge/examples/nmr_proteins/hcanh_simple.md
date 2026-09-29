@@ -1,25 +1,22 @@
 # examples/nmr_proteins/hcanh_simple.m
 
 - Signature: `hcanh_simple()`
+- Source: [examples/nmr_proteins/hcanh_simple.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/hcanh_simple.m)
 
-## Purpose
+## Task
 
-A minimal example of H(CA)NH pulse sequence simulation. Calculation time: seconds.
+A self-contained forward simulation of a three-dimensional H(CA)NH protein-NMR-style sequence on a five-spin toy system. This source does not import a protein structure, measured spectrum, or paramagnetic centre; it constructs a nuclear spin model directly.
 
-## Physical / mathematical content
+## Spin model and basis
 
-The example defines a five-spin liquid-state NMR system at a magnetic field of 14.1, with isotopes `{'15N','13C','1H','13C','1H'}` labelled `{'N','CA','H','C','HA'}`. Scalar Zeeman values are `{110 60 8 180 4}`. The specified scalar couplings, indexed by spin number, are (1,3) = 92, (1,2) = 11, (1,4) = 15, (1,5) = 1, (2,4) = 55, (2,3) = 2, (2,5) = 140, (3,4) = 4, (3,5) = 8, and (4,5) = 4.
+The field is set to `sys.magnet=14.1` (the source gives no unit). The spins, in order, are `15N, 13C, 1H, 13C, 1H`, labelled `N, CA, H, C, HA`. The scalar Zeeman values are `{110 60 8 180 4}`. Scalar coupling entries by one-based spin pair are `(1,3)=92`, `(1,2)=11`, `(1,4)=15`, `(1,5)=1`, `(2,4)=55`, `(2,3)=2`, `(2,5)=140`, `(3,4)=4`, `(3,5)=8`, and `(4,5)=4`. The basis uses `sphten-liouv` with `approximation='none'`. Units for the field, Zeeman values, and couplings are not stated in this file.
 
-The calculation uses the `sphten-liouv` basis formalism with `approximation='none'`. It simulates the `@hcanh` sequence through `liquid(...,'nmr')` with dimensions `{'1H','15N','1H'}`, sweep widths `[5000 3000 5000]`, offsets `[3600 -6600 3600]`, `npoints=[64 64 64]`, `zerofill=[256 256 256]`, and axis units `ppm`.
+## Sequence, acquisition, and processing
 
-## Numerical / algorithmic content
+The sequence is `@hcanh` with dimension spins `{'1H','15N','1H'}`. The source sets sweeps to `[5000 3000 5000]`, offsets to `[3600 -6600 3600]`, acquisition points to `[64 64 64]`, and zero-fill sizes to `[256 256 256]`; it labels the axes `ppm`. Units for the sweep and offset literals are not specified in the source.
 
-The four returned coherence components (`pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg`) each receive squared-cosine (`sqcos`) apodisation in all three dimensions. Shifted, zero-filled FFTs are applied along F3, then F2, then F1. The F3 components are combined as `f3_pos=f3_pos_pos+conj(f3_neg_neg)` and `f3_neg=f3_neg_pos+conj(f3_pos_neg)`; after the F2 transforms, `f3f2=f3f2_pos+conj(f3f2_neg)`. The final F1 transform produces `spectrum`.
+The call `liquid(spin_system,@hcanh,parameters,'nmr')` generates simulated FIDs. Each of `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg` is apodised with `sqcos` in all three dimensions. The code zero-fills and Fourier-transforms along F3, forms `f3_pos=f3_pos_pos+conj(f3_neg_neg)` and `f3_neg=f3_neg_pos+conj(f3_pos_neg)`, transforms along F2 and combines `f3f2_pos+conj(f3f2_neg)`, then transforms along F1.
 
-## Implementation structure
+## Output and scope
 
-1. Define the magnetic field, spin isotopes and labels, Zeeman values, and scalar couplings.
-2. Create the spin system and construct its basis with `create` and `basis`.
-3. Set the three-dimensional sequence and acquisition parameters, then run `liquid(spin_system,@hcanh,parameters,'nmr')`.
-4. Apodise the four FID components; perform the F3, F2, and F1 FFTs and combine the specified components for absorption-mode processing.
-5. Create a figure and plot `real(spectrum)` using `plot_3d(spin_system,real(spectrum),parameters,10,[0.05 0.5 0.05 0.5],2,'positive')`.
+The script displays `real(spectrum)` with `plot_3d`, threshold `10`, bounds `[0.05 0.5 0.05 0.5]`, dimension `2`, and selection `'positive'`; it contains no spectrum-file export. The source describes calculation time as seconds. No measured-data agreement is claimed.

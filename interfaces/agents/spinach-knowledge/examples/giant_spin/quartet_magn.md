@@ -1,19 +1,12 @@
 # examples/giant_spin/quartet_magn.m
 
+- MATLAB implementation: [examples/giant_spin/quartet_magn.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/quartet_magn.m)
+
 - Signature: `quartet_magn()`
+- Source: `examples/giant_spin/quartet_magn.m`
 
-## Purpose
+## Model and parameters
 
-Calculate and plot the sample magnetisation during a finite-speed magnetic-field sweep for a spin-3/2 particle with zero-field splitting. The source estimates a calculation time of seconds.
+This example calculates sample magnetisation during a finite-speed field sweep for a spin-3/2 particle (`E4`) with zero-field splitting. It sets `sys.magnet=1.0` T and uses the isotropic Zeeman matrix `diag([2 2 2])`. The splitting parameters are `D=icm2hz(-0.5)` and `E=0.3*D`; `zfs2mat(D,E,0,0,0)` constructs the coupling matrix. The input unit of -0.5 is not stated in the source. Temperature is set to `1.0`; no temperature unit is stated. The basis is `zeeman-hilb` with `approximation='none'`.
 
-## Physical model
-
-- The particle is specified as `sys.isotopes={'E4'}`, with an isotropic Zeeman tensor `diag([2 2 2])`.
-- The zero-field-splitting parameters are `D=icm2hz(-0.5)` and `E=0.3*D`. The coupling matrix is `zfs2mat(D,E,0,0,0)`.
-- The temperature is `inter.temperature=1.0`.
-
-## Calculation and output
-
-- Set `sys.magnet=1.0` Tesla, as required by the source. Create the spin system with `create(sys,inter)` and set the basis using `bas.approximation='none'` and `bas.formalism='zeeman-hilb'`.
-- Scan `parameters.fields=[0 1]` with `parameters.npoints=1000` over `parameters.sweep_time=1e-9` seconds. Set `parameters.orientation=[0 0 0]` and `parameters.nstates=4`.
-- Call `[fields,z_magn]=fieldscan_magn(spin_system,parameters)` and plot `z_magn` against `fields`, labelling the axes “Magnetic field, Tesla” and “Sample magnetisation”.
+The scan covers fields from 0 to 1 with 1000 points over `sweep_time=1e-9` seconds, at orientation `[0 0 0]`, with four states. The function calls `[fields,z_magn]=fieldscan_magn(spin_system,parameters)` and plots `z_magn` against `fields`. The axes label field in Tesla and sample magnetisation. The source estimates a calculation time of seconds; it gives no fixed numerical trace.

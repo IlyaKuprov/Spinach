@@ -1,22 +1,30 @@
 # kernel/utilities/which_subst.m
 
-- Signature: `subst=which_subst(spin_system,spins)`
-
 ## Purpose
 
-Returns the number of the substance containing all specified spins. Raises an error if the spins cross chemical boundaries or do not belong to any substance.
-
-## Parameters
-
-- `spin_system`: spin system whose `chem.parts` lists the spins in each substance and whose `comp.nspins` gives the total spin count.
-- `spins`: a list of distinct positive integer spin numbers, each no greater than the total spin count.
-
-## Output
-
-- `subst`: a positive integer identifying the substance.
+Determines which substance in a spin system hosts a specified list of spins, throwing an error if the spins span more than one substance or belong to none. Source: [Spinach GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/which_subst.m).
 
 ## Behavior
 
-The function validates `spins`, finds the substance containing them, and checks that every specified spin belongs to that substance. It raises an error for invalid, repeated, or out-of-range spin numbers; spins absent from all substances; or spins crossing chemical boundaries.
+- Syntax: `subst=which_subst(spin_system,spins)`.
+- Validates the spin list via an internal `grumble` subfunction: spins must be a real numeric vector of positive integers, must not exceed `spin_system.comp.nspins`, and must contain no repeated entries.
+- Builds a logical mask over `spin_system.chem.parts`, marking substances whose spin list contains any of the specified spins.
+- Errors with `'spin list crosses chemical boundaries.'` if more than one substance matches, or `'spins do not belong to any substance.'` if none matches.
+- Returns the index of the single matching substance via `find` on the mask.
+- Performs a final check that all specified spins are members of `spin_system.chem.parts{subst}`; otherwise errors again with `'spin list crosses chemical boundaries.'`.
 
-Source: <https://spindynamics.org/wiki/index.php?title=which_subst.m>
+## Inputs and outputs
+
+**Inputs**
+
+- `spin_system` — spin system structure containing `chem.parts` (cell array of per-substance spin lists) and `comp.nspins` (total spin count).
+- `spins` — a list of positive integers identifying spins.
+
+**Outputs**
+
+- `subst` — a positive integer giving the substance number hosting all specified spins.
+
+## References
+
+- [which_subst.m — Spinach Wiki](https://spindynamics.org/wiki/index.php?title=which_subst.m)
+- [which_subst.m — GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/which_subst.m)

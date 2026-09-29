@@ -1,23 +1,34 @@
 # tests/kernel/test_hilbert_state.m
 
-- Signature: `result=test_hilbert_state()`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_hilbert_state.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_hilbert_state.m)
 
 ## Purpose
 
-Tests that `state()` returns the expected Hilbert-space density matrices for a one-spin system.
+Regression test for Hilbert-space state generation. It verifies that `state()` maps observable labels to the expected density matrices for a one-spin system.
 
-## Test setup
+## Behavior
 
-Creates a one-proton (`1H`) spin system with zero magnetic field (`sys.magnet=0`), zero scalar Zeeman interaction, `zeeman-hilb` formalism, and no basis approximation. Reference spin-half matrices are obtained from `S=pauli(2)`.
+- Announces the test target with `fprintf('TESTING: Hilbert-space state generation\n')`.
+- Initializes a test result via `new_test_result('kernel/hilbert_state', 'Hilbert-space state generation', 'state() must map observable labels to density matrices.')`.
+- Builds a one-proton Hilbert-space spin system with:
+  - `sys.magnet = 0`
+  - `sys.isotopes = {'1H'}`
+  - `inter.zeeman.scalar = {0}`
+  - `bas.formalism = 'zeeman-hilb'`
+  - `bas.approximation = 'none'`
+  - the system is produced by `test_spin_system(sys, inter, bas)`.
+- Obtains textbook spin-half reference matrices from `pauli(2)`.
+- Runs three closeness checks with `test_close`, each using absolute and relative tolerances of `1e-15`:
+  - `'Lz state'`: `state(spin_system,'Lz',1)` against `S.z`, described as the longitudinal magnetisation density matrix.
+  - `'Lx state'`: `state(spin_system,'Lx',1)` against `S.x`, described as the transverse in-phase density matrix.
+  - `'identity state'`: `state(spin_system,'E',1)` against `S.u`, described as the unit density matrix.
 
-## Assertions
+## Inputs and outputs
 
-Each comparison uses `test_close` with absolute and relative tolerances of `1e-15`:
+- **Outputs:**
+  - `result` — regression test result with explanatory messages.
+- **Inputs:** none; the function is called as `result = test_hilbert_state()`.
 
-- `state(spin_system,'Lz',1)` equals `S.z` (longitudinal magnetisation).
-- `state(spin_system,'Lx',1)` equals `S.x` (transverse in-phase density matrix).
-- `state(spin_system,'E',1)` equals `S.u` (unit density matrix).
+## References
 
-## Output
-
-`result` is a regression test result with explanatory messages, created for `kernel/hilbert_state` and updated by the three comparisons.
+- Source file header documents the syntax `result=test_hilbert_state()` and the output description.

@@ -1,20 +1,21 @@
 # examples/fitting/fluoroalkanes/syn_difluorobutane.m
 
+- MATLAB implementation: [examples/fitting/fluoroalkanes/syn_difluorobutane.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fitting/fluoroalkanes/syn_difluorobutane.m)
+
 - Signature: `syn_difluorobutane()`
 
-## Purpose
+## Purpose and data convention
 
-Fit the 1H NMR spectrum of syn-2,3-difluorobutane by varying J-couplings, Gaussian linewidth, and spectral amplitude. For further details, see https://doi.org/10.1021/acs.joc.4c00670. Calculation time: hours.
+Fit the 1H spectrum of syn-2,3-difluorobutane across two proton intervals (CH and methyl, abbreviated ME in the input variable names). The model contains two 19F spins, but this example loads and fits proton data only. See [10.1021/acs.joc.4c00670](https://doi.org/10.1021/acs.joc.4c00670); the source estimates calculation time in hours.
 
-## Workflow
+The entry point loads `syn_dfb_proton.mat` with `ch_axis_hz`, `ch_expt_data`, `me_axis_hz`, and `me_expt_data`. It normalizes their integrals to −2 and −6, then concatenates both spectra and frequency axes. The source labels those axes Hz.
 
-- Load the CH and ME experimental frequency axes and spectra from `syn_dfb_proton.mat`. Normalize the two spectra by their respective integrals to −2 and −6, then concatenate the intervals for fitting.
-- Start from the parameter vector `[23.95 6.47 0.90 4.36 18.15 47.88 -11.61 13.63 1.7]`, ordered as near F–CH3, CH3–H, far F–CH3, three-bond H–H, three-bond F–H, two-bond F–H, three-bond F–F couplings, Gaussian linewidth, and amplitude.
-- Use `fminsearch` to minimize the squared norm of the difference between the real experimental and simulated spectra. Optimization uses central finite differences, `DiffMinChange=1e-3`, `MaxIter=5000`, and `MaxFunEvals=Inf`; the fitted parameters are displayed.
+## Model and fit
 
-## Spectrum simulation and comparison
+`fminsearch` minimizes the squared norm of the real-spectrum residual over a 9-element vector: parameters 1–7 are grouped scalar couplings (H–F, H–H, and F–F), parameter 8 is the Gaussian apodisation argument, and parameter 9 scales the simulated spectrum. The initial guess is `[23.95 6.47 0.90 4.36 18.15 47.88 -11.61 13.63 1.7]`; optimiser settings include `MaxIter=5000`, unlimited function evaluations, a `DiffMinChange` of `1e-3`, and central finite differences.
 
-- Construct an eight-1H/two-19F spin system at 11.7464 T. Assign chemical shifts of 1.34375 to the six methyl protons, 4.57625 to the two methine protons, and 0.00 to both fluorines. The seven coupling parameters specify the symmetry-related scalar couplings between methyl protons, methine protons, and fluorines.
-- Use an untruncated Zeeman–Hilbert basis with separate S3 symmetry groups for the two methyl groups. Acquire a 1H spectrum with `L+` initial and detection states, no decoupling, an offset of 1500 Hz, an 1800 Hz sweep, and 4096 points.
-- Apply Gaussian apodisation using the fitted linewidth, Fourier-transform with zero filling to 32768 points, scale by the fitted amplitude, reverse the spectrum, and interpolate it onto the concatenated experimental frequency axes using `pchip`.
-- Plot experimental and simulated real spectra in the 2230–2350 Hz and 645–700 Hz windows during optimization.
+The Spinach model uses eight `1H` and two `19F` spins at `sys.magnet=11.7464`, a Zeeman–Hilbert basis without approximation, and `S3` groups on proton indices 1–3 and 4–6. A single 1H liquid-state acquisition uses `offset=1500`, `sweep=1800`, 4096 points, 32768-point zero filling, and Hz axes. After apodisation and scaling, the simulated spectrum is reversed and interpolated onto the concatenated experimental axis with `pchip`.
+
+## Entry point and visible result
+
+Run `syn_difluorobutane()` with the MAT file available. The function has no declared return value; it displays the optimiser vector and plots experimental points against the simulated line, including a full-spectrum panel and a 645–700 Hz zoom. Source comments estimate hours of calculation. No fit outcome, parameter uncertainty, or acceptance threshold is stated in the source.

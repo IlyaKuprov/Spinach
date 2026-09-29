@@ -1,31 +1,19 @@
 # examples/optimal_control/magic_pulse_phase.m
 
-- Signature: `magic_pulse_phase()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/magic_pulse_phase.m)
 
 ## Purpose
 
-A template for optimising a broadband ¹³C 90-degree excitation pulse that tolerates resonance offsets and RF power calibration errors. The example targets a 28.18 T magnet, approximately 200 ppm (60 kHz) of excitation bandwidth, and negligible effects from a worst-case ¹³C–¹H J-coupling of about 200 Hz. The source comment states a duration limit of 1/(100J) = 50 µs, whereas the implemented pulse has 60 intervals of 1 µs each (60 µs total); the code and comment therefore do not agree. The desired transfers are {Lz → Lx, Ly → Ly, Lx → −Lz}, with RF nutation frequencies from 50 to 70 kHz across the coil. Estimated calculation time: minutes.
+This phase-control example sets up a broadband 90° 13C excitation pulse for the simultaneous transfers Lz to Lx, Ly to Ly, and Lx to -Lz. The model contains 100 non-interacting 13C spins equally distributed from -100 to +100 ppm at 28.18 T. The source cites the magic-pulse paper at [doi:10.1016/j.jmr.2005.12.010](https://doi.org/10.1016/j.jmr.2005.12.010) and motivates tolerance to resonance offsets and RF power-calibration variation.
 
-- Reference: http://dx.doi.org/10.1016/j.jmr.2005.12.010
-- Source contacts: ilya.kuprov@weizmann.ac.il; david.goodwin@inano.au.dk
+## Design objective and constraints
 
-## Physical / mathematical content
+The source describes a 50 microsecond duration ceiling based on a worst-case 13C-1H coupling of about 200 Hz, but configures 60 one-microsecond phase intervals (60 microseconds total). Those are distinct source statements; the example does not explain how the configured grid relates to the stated ceiling. It samples ten RF nutation levels from 50 to 70 kHz while holding the amplitude profile fixed, and uses GRAPE phase control through `fmaxnewton` with `@grape_phase` and `control.method='lbfgs'`. The initial phase profile is random, scaled by pi/5. The configured iteration limit is 200.
 
-- The ensemble comprises 100 non-interacting ¹³C spins at equally spaced chemical shifts from −100 to +100 ppm. The `sphten-liouv` formalism with `IK-2`, proximity level 1, and `scalar_couplings` connectivity retains complete single-spin bases while ignoring multi-spin orders in this case.
-- Normalised `Lx`, `Ly`, and `Lz` states define three simultaneous transfers: `Lx → −Lz`, `Ly → Ly`, and `Lz → Lx`. The control operators are `Lx` and `Ly`; the drift Hamiltonian is obtained under the `nmr` assumption.
-- Phase samples are optimised by `fmaxnewton(spin_system,@grape_phase,guess)` with `control.method='lbfgs'` and a 200-iteration limit. The amplitude profile remains fixed at ones; robustness is sampled at ten RF power levels from 50 to 70 kHz, expressed as angular frequencies by multiplication by `2*pi`.
+The normalised Lx, Ly, and Lz states define the three transfer targets. As in the Cartesian counterpart, the basis is `sphten-liouv` with `IK-2` at proximity level 1; the source comment says that this retains complete single-spin bases and omits multi-spin orders in this case.
 
-## Numerical / algorithmic content
+## Evaluation shown by the example
 
-- Both control operators map to the ¹³C channel through `control.channels=[1; 1]`. The pulse grid is `1e-6*ones(1,60)`, and the initial phase guess is `(pi/5)*randn(1,60)`. Plotting options are `phi_controls`, `xy_controls`, `robustness`, and `spectrogram`.
-- After optimisation, `polar2cartesian` converts the phase profile and an amplitude profile of `mean(control.pwr_levels)*control.amplitudes` into Cartesian controls. `shaped_pulse_xy` simulates their action on an initial `Lz` state using `expv-pwc`.
-- The resulting state is acquired on ¹³C with an `L+` detection state, no decoupling, zero offset, a 70,000 Hz sweep, 2,048 points, 16,384-point zero filling, a ppm axis, and axis inversion. The FID receives Gaussian apodisation with parameter 10 before its shifted Fourier transform.
-- For comparison, a conventional hard pulse is simulated from `Lz` using zero pulse frequency, phase `pi/2`, power `2*pi*60e3`, duration `4.2e-6`, rank 3, and the `expv` method. Its FID receives the same apodisation and Fourier transform. The real spectra are plotted in separate subplots.
+The optimised phase and fixed amplitude are converted to Cartesian x/y controls and applied to an initial Lz state using the piecewise-constant exponential propagator. The resulting 13C signal is acquired with an L+ coil, a 70 kHz sweep, 2,048 points, 16,384-point zero filling, and a ppm axis; Gaussian apodisation with parameter 10 precedes the shifted Fourier transform. The script plots the real spectrum and compares it with a conventional hard-pulse spectrum configured with `2*pi*60e3` power, 4.2 microsecond duration, phase pi/2, and rank 3.
 
-## Implementation structure
-
-1. Set the magnetic field and construct the 100-spin chemical-shift ensemble; create the Spinach system and basis.
-2. Prepare and normalise the three spin states, then obtain control operators and the drift Hamiltonian.
-3. Configure fixed-amplitude, phase-only control and run LBFGS GRAPE optimisation through `fmaxnewton` and `grape_phase`.
-4. Convert the optimised pulse to Cartesian controls, simulate it, acquire and process its spectrum, and plot the result.
-5. Acquire and process a conventional hard-pulse spectrum for comparison.
+The source defines the design and plotting, but does not supply an observed waveform or convergence result. Its calculation-time comment says minutes. Source contacts: ilya.kuprov@weizmann.ac.il and david.goodwin@inano.au.dk.

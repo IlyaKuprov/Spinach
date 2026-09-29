@@ -2,19 +2,13 @@
 
 - Signature: `summary_zeeman(spin_system,header)`
 
-## Purpose
-
-Prints a summary of the Zeeman interaction matrices stored in a Spinach system.
-
-## Parameters / inputs
-
-- `spin_system` - Spinach spin system structure.
-- `header` - character string printed before the table.
-
-## Output
-
-No MATLAB output argument; writes through `report`.
-
 ## Behavior
 
-The function checks the inputs, then processes each nonempty Zeeman matrix. For each, it reports the spin index, isotope, multiplicity (2S+1), matrix, isotropic part (trace/3), and the matrix 2-norms of the rank-1 and rank-2 components. It obtains those components with `mat2sphten` and `sphten2mat`, and prints the third row of the original matrix as well.
+For each spin with a nonempty `spin_system.inter.zeeman.matrix{n}`, prints its index, isotope, multiplicity, three matrix rows, isotropic value `trace(M)/3`, and spectral matrix norms of the rank-1 and rank-2 parts. The parts come from `mat2sphten(M)` and `sphten2mat`; each norm uses MATLAB `norm(...,2)`. Values are printed as stored, without a unit conversion in this routine.
+
+The supplied `header` precedes the report. There is no return value; output goes through `report`. The local guard requires a structure `spin_system` and character-array `header`.
+
+## References
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_zeeman.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_zeeman.m)

@@ -1,15 +1,13 @@
 # examples/nmr_solids/mas_powder_csa_fplanck.m
 
-- Signature: `mas_powder_csa_fplanck()`
+Source: [examples/nmr_solids/mas_powder_csa_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_csa_fplanck.m)
 
-## Purpose
+## Model
 
-Calculates the powder MAS spectrum of a pair of anisotropically shielded protons using a Fokker–Planck-based formalism. The source estimates seconds.
+The header describes a powder MAS spectrum of two anisotropically shielded protons using a Fokker-Planck formalism. The active code declares two `1H` spins at 14.1 T with Zeeman eigenvalue triplets `[-2 -2 4]-5` and `[-1 -3 4]+5`; both Euler-angle triples are `[0 0 0]`. No dipolar coupling, quadrupolar interaction, or RF pulse sequence is specified.
 
-## Physical and numerical content
+## Calculation and display
 
-The system has two `1H` spins at 14.1 T, with shielding eigenvalue sets `[-2 -2 4]-5` and `[-1 -3 4]+5` and zero Euler angles. The MAS rate is 500 Hz about `[1 1 1]`, with maximum rank 17 and grid `leb_2ang_rank_17`. Acquisition is for `1H`.
+The basis is `sphten-liouv` with no approximation and the `+1` projection. The rotor axis is `[1 1 1]` at 500 Hz. Maximum rank is 17 and the orientation grid is `leb_2ang_rank_17`. Importantly, the function call in this file is `singlerot(spin_system,@acquire,parameters,'nmr')`, not a call named `fplanck` or `gridfree`; the header's formalism label and the active entry point are distinct source facts.
 
-## Implementation
-
-The function calls `singlerot` with `@acquire`, applies exponential apodisation (6), zero-fills the 512-point FID to 4096 points, Fourier transforms, and plots the real spectrum. The sweep is 20 kHz and the axis units are ppm.
+The signal is acquired on `1H` from and to `L+` states. The sweep is 20 kHz, with 512 points and zero-fill to 4096. The source applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots the real spectrum. It does not set offset, axis units, or axis inversion in this file. The settings define a simulation and processing pipeline, not an experimentally measured spectrum.

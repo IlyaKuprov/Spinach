@@ -1,31 +1,29 @@
 # kernel/contexts/device.m
 
-- Signature: `answer=device(spin_system,pulse_sequence,parameters,assumptions)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/device.m) · [Spin Dynamics Wiki: device.m](https://spindynamics.org/wiki/index.php?title=device.m)
 
-## Purpose
+## Contract
 
-Builds the evolution generators for a spin-boson device at a fixed orientation of the spin subsystem, then passes them to the supplied pulse-sequence function handle.
+`answer=device(spin_system,pulse_sequence,parameters,assumptions)` constructs the Hamiltonian, relaxation operator, and kinetic operator for a spin-boson device, then passes them to the supplied pulse-sequence function handle. The system must contain at least one bosonic mode; the spin subsystem is evaluated at one fixed orientation, while bosonic terms are not rotated.
 
-## Parameters / inputs
+## Degrees of freedom and dimensions
 
-- `pulse_sequence` — function handle for a pulse sequence in the experiments directory.
-- `parameters.spins` — cell array of spin species used as channels, in channel order (for example, `{'E'}`). It may be omitted when no spin channels are needed.
-- `parameters.offset` — transmitter offsets in Hz, one per listed spin species.
-- `parameters.mode_offset` — detuning offsets in Hz, one per bosonic mode in declaration order. The transmitter sign convention applies: each offset contributes minus the offset times that mode's number operator, so a positive offset lowers the mode frequency.
-- `parameters.decouple` — cell array of spin species to remove from the evolution generators and initial state (for example, `{'1H'}`); defaults to an empty cell array.
-- `parameters.orientation` — Euler angles in radians using the active ZYZ convention, specifying the spin-subsystem orientation. Bosonic terms are unaffected; the default is `[0 0 0]`.
-- `parameters.rframes` — numerical rotating-frame specification for spin species, for example `{{'E',2}}`; see the header of `rotframe.m`.
-- `parameters.needs` — cell array of additional sequence requirements. `'rho_eq'` requests thermal equilibrium at the system temperature, including Bose-Einstein populations of the bosonic modes, placed in `parameters.rho0`.
-- Other `parameters` subfields may be required by the pulse sequence; consult its documentation.
-- `assumptions` — one of `'labframe'`, `'cavity'`, or `'spin-phonon'`; see the header of `assume.m`.
+Let `D=size(H,1)` for the Hamiltonian assembled in the system's composite spin-boson basis. The context sets `parameters.spn_dim=D` and `parameters.spc_dim=1`; there is no spatial-orientation grid in this context. It calls the sequence with `spin_system`, `parameters`, `H`, `R`, and `K`, and returns whatever the sequence returns, so the final output shape is sequence-specific.
 
-The wrapper sets `parameters.spc_dim` to 1 and `parameters.spn_dim` to the spin-dynamics matrix dimension before calling the sequence.
+The orientation is `parameters.orientation`, a real three-element vector of active ZYZ Euler angles in radians for the spin subsystem only. Its default is `[0 0 0]`. The context evaluates `H=I+orientation(Q,parameters.orientation)` and Hermitian-symmetrizes the result; it also constructs relaxation at that orientation and obtains kinetics for the complete system.
 
-## Output
+## Modes, channels, and units
 
-Returns whatever the pulse sequence returns.
+The system includes spin and bosonic particles. The context accepts spin-channel species only for spin particles; the source example is `parameters.spins={'E'}`, and this field may be omitted when no spin channels are needed. Spin transmitter offsets in `parameters.offset` are in Hz and follow the transmitter sign convention.
 
-## Notes
+`parameters.mode_offset` supplies one detuning in Hz per bosonic mode, in declaration order. For mode `n`, the context subtracts `2*pi*mode_offset(n)*N_n` from `H`, where `N_n` is that mode's number operator; a positive detuning therefore lowers the mode frequency. The default mode offsets are zero. The context's orientation and offsets have these explicit units; other Hamiltonian terms retain the units and operator basis supplied by Spinach's system and Hamiltonian construction.
 
-- The spin system must contain at least one bosonic mode. Pure-spin systems should use `liquid.m`, `crystal.m`, or `powder.m`.
-- Dissipative bosonic modes require a Liouville-space formalism; coherent simulations may also use `zeeman-hilb`.
+`assumptions` must select one of `'labframe'`, `'cavity'`, or `'spin-phonon'`; the context applies it through `assume.m` before constructing operators. `parameters.rframes` requests rotating frames for spin species (the source example is `{{'E',2}}`); it does not rotate bosonic terms. `parameters.decouple` selects spin decoupling and defaults to empty.
+
+## Optional equilibrium state and formalism
+
+Put `'rho_eq'` in `parameters.needs` to calculate the thermal equilibrium state at the system temperature, including Bose-Einstein populations of the bosonic modes; it is passed as `parameters.rho0`. Dissipative bosonic modes require a Liouville-space formalism. Coherent simulations may also use `zeeman-hilb`, as stated in the source header.
+
+## Source-supported example
+
+A spin-channel list may be `{'E'}`. For a system with multiple modes, provide one `mode_offset` value for each mode in its declaration order; use zero values for no mode detuning. These examples specify parameter structure, not a calculated device response.

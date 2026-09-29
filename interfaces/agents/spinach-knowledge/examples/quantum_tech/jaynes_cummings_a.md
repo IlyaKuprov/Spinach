@@ -1,22 +1,15 @@
 # examples/quantum_tech/jaynes_cummings_a.m
 
+[Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/jaynes_cummings_a.m)
+
 - Signature: `jaynes_cummings_a()`
 
-## Purpose
+## Model and basis
 
-Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with five population numbers included. The avoided crossing in the one-photon energy level splitting of the mode is plotted with respect to the detuning. Calculation time: seconds
+This is a closed, coherent Jaynes–Cummings cavity-QED eigenvalue model: one electron spin-1/2 couples to a quantized cavity mode. The cavity is represented by the `C5` truncation (five population levels, as stated in the example header); no Tavis–Cummings ensemble is present. The script sets the magnetic field to 0.33 T, sets the cavity frequency from the electron Zeeman frequency so the two are resonant at zero detuning, and places the spin and cavity coupling in `inter.modes.exchange{1,2}=2.828e6` in Spinach's angular-frequency Hamiltonian convention. It switches to the cavity rotating frame with `assume(spin_system,'cavity')`.
 
-## Physical / mathematical content
+The Hilbert-space basis is `zeeman-hilb` with no approximation. The electron detuning term is formed with its `Lz` operator. The calculation then projects onto the two one-excitation states: the excited-spin/empty-cavity state and the ground-spin/one-photon state. It diagonalises this two-state Hamiltonian at each detuning. There is no time-dependent drive or dissipative term in this source.
 
-An electron spin is coupled to a five-population cavity mode, with the cavity set resonant to the electron at a 0.33 T magnet field. In the cavity rotating frame, the Jaynes–Cummings Hamiltonian is evaluated as the electron detuning is swept, showing the avoided crossing between the two one-excitation states.
+## Avoided crossing
 
-## Numerical / algorithmic content
-
-The calculation constructs the rotating-frame Hamiltonian under the cavity assumption, projects it onto the one-excitation manifold, and diagonalises the resulting two-state matrix for 100 detunings from −15 to +15 MHz. The two eigenvalues are plotted against detuning.
-
-## Implementation structure
-
-- Define an electron spin and a `C5` cavity mode, with exchange coupling `2.828e6` and the cavity frequency resonant with the electron.
-- Build the unapproximated Zeeman Hilbert-space basis, assume the cavity frame, and form the Jaynes–Cummings Hamiltonian and electron `Lz` detuning operator.
-- Select the electron-excitation and cavity-excitation states to form the one-photon subspace; sweep detuning and diagonalise the projected Hamiltonian at each point.
-- Plot the two energy branches in MHz against detuning in MHz.
+The detuning sweep covers −15 to +15 MHz in 100 points (the source uses angular frequency internally and divides by `2*pi` for the plotted axis). The observable is the pair of one-excitation energy eigenvalues, plotted in MHz against detuning in MHz. Their avoided crossing is the model's vacuum-Rabi splitting from coherent spin-cavity coupling; it is a Hamiltonian spectrum, not a measured cavity trace or a device-fidelity result.

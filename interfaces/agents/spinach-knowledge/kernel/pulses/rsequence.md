@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Generates pulse phases, RF amplitude, and pulse durations for an R-sequence. The source cites Malcolm Levitt's review and uses the notation `RN_{n}^{nu}`.
+Generates the pulse phases, RF nutation frequency, and segment duration(s) for an R-sequence, using the `RN_n^nu` notation cited in Malcolm Levitt's review.
 
-## Algorithm
+## Element construction
 
-The rotor period is `1/mas_rate`; one R element lasts `n_rotor_periods/(mas_rate*n_blocks_per_period)`. For `'180_pulse'`, the function sets `pulse_amp=pi/r_element_dur`, uses that full duration, and alternates phases according to `(-1)^q*pi*phase_factor/n_blocks_per_period`. For `'90270_pulse'`, it sets `pulse_amp=2*pi/r_element_dur`, splits the element into durations `r_element_dur/4` and `3*r_element_dur/4`, and gives the second pulse in each pair a phase offset of `pi`. It then applies the requested supercycle and repeats the resulting phase sequence `n_cycle_repeats` times.
+The rotor period is `1/mas_rate` seconds, with `mas_rate` in Hz. One R element lasts `r_element_dur=n_rotor_periods/(mas_rate*n_blocks_per_period)` seconds. For `180_pulse`, the amplitude is `pi/r_element_dur`, the duration is the full element duration, and the phase for block index `q` is `(-1)^q*pi*phase_factor/n_blocks_per_period` radians. This is the phase increment written in the cited notation as `180*nu/N = 180*phase_factor/n_blocks_per_period` degrees.
 
-## Parameters / inputs
+For `90270_pulse`, the amplitude is `2*pi/r_element_dur`; the two durations are `r_element_dur/4` and `3*r_element_dur/4`. Each block contributes a phase and a second phase offset by `pi`, with the first phase following the same alternating formula. The generated phase list is then transformed by the selected supercycle and the resulting list is repeated `n_cycle_repeats` times.
 
-- `n_rotor_periods` — “small n” symmetry number: rotor periods required in the R symmetry; positive integer.
-- `n_blocks_per_period` — “capital N” symmetry number: R elements in the R symmetry; positive integer.
-- `phase_factor` — “nu” phase factor; the alternating phase increment is `pi*phase_factor/n_blocks_per_period` radians (equivalently `180*phase_factor/n_blocks_per_period` degrees).
-- `n_cycle_repeats` — positive integer number of times to apply the full sequence.
-- `mas_rate` — rotor spinning rate, in Hz.
-- `element_type` — `'180_pulse'` (simple inversion) or `'90270_pulse'` (composite inversion).
-- `supercycle_type` — `'hetero_single_quantum'`, `'homo_double_quantum_nucycle'`, or `'homo_double_quantum_nupicycle'`. Their phase patterns are respectively `[phase]_0:[-phase]_0:[phase]_120:[-phase]_120:[phase]_240:[-phase]_240`, `[phase]_0:[-phase]_0`, and `[phase]_0:[-phase]_0:[-phase]_180:[phase]_180`.
+## Supercycle phase patterns
 
-## Outputs
+- `hetero_single_quantum` concatenates the phases and their negatives, then the corresponding copies shifted by `2*pi/3` and `4*pi/3`; its notation is `[phase]_0:[-phase]_0:[phase]_120:[-phase]_120:[phase]_240:[-phase]_240`.
+- `homo_double_quantum_nucycle` concatenates `[phase]_0:[-phase]_0`.
+- `homo_double_quantum_nupicycle` concatenates `[phase]_0:[-phase]_0:[-phase]_180:[phase]_180`, equivalently `[phase, -phase, -phase+pi, phase+pi]`.
 
-- `phases` — pulse phase sequence, in radians.
-- `pulse_amp` — scalar RF nutation frequency, in radians per second.
-- `pulse_dur` — pulse duration(s) for the sequence element, in seconds; a scalar for `'180_pulse'`, two durations for `'90270_pulse'`.
+These are the implemented phase concatenations; this description does not assert their performance outside the source's stated purpose.
 
-For background, see [Malcolm Levitt's review](https://doi.org/10.1002/9780470034590.emrstm0551) and the [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=rsequence.m).
+## Outputs and reference
+
+- `phases` — sequence phases in radians.
+- `pulse_amp` — scalar RF nutation frequency in rad/s.
+- `pulse_dur` — pulse duration(s) in seconds: one value for `180_pulse`, two for `90270_pulse`.
+
+For background, see [Malcolm Levitt's review](https://doi.org/10.1002/9780470034590.emrstm0551), and the [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/rsequence.m) and [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=rsequence.m).

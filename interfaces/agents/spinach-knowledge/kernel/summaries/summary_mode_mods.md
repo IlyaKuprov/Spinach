@@ -1,28 +1,15 @@
 # kernel/summaries/summary_mode_mods.m
 
-- Signature: `summary_mode_mods(spin_system,header)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_mode_mods.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_mode_mods.m)
 
 ## Purpose
 
-Summarizes how dimensionless bosonic mode displacement coordinates modulate spin-spin coupling tensors and effective local fields in the spin Hamiltonian.
+Summarize derivatives of spin-spin coupling tensors and effective local fields with respect to dimensionless bosonic-mode displacement coordinates.
 
-## Physical / mathematical content
+## What is reported
 
-For each reported modulation, the table identifies the mode pair and derivative order, names the affected coupling tensor or local field, and gives the derivative norm in Hz.
+Each nonempty derivative entry is listed with its two mode indices, derivative order, target, and norm. Coupling-tensor targets are identified by the affected spin pair; their derivative matrices are measured with the Frobenius norm. Effective-field targets identify the affected spin and use the matrix 2-norm of the derivative vector. Both displayed norms are divided by `2*pi` and reported in Hz. The derivative order is the position `m` in the stored derivative-order list.
 
-## Numerical / algorithmic content
+## Output and inputs
 
-The function traverses nonempty entries in `spin_system.inter.modes.coupling_mod` and `zeeman_mod`. Coupling-tensor derivatives use the Frobenius norm; effective-field derivatives use the 2-norm. Both are divided by `2*pi` for reporting. Input checks require a structure and a character-string header.
-
-## Parameters / inputs
-
-- spin_system - Spinach spin system description object
-- header - a string of text to precede the summary
-
-## Outputs
-
-- Prints the modulation summary through `report.m` to the console or user-specified output.
-
-## Implementation structure
-
-After validation and table headings, the function reports nonempty coupling-tensor derivatives and effective-field derivatives, with their mode indices, order, target, and norm.
+The routine has no returned output. It sends the supplied header, headings, rows, and final separator through `report` to the console or configured report destination. It checks that `spin_system` is a structure and `header` is a character array; the routine does not assign fields of the input structure.

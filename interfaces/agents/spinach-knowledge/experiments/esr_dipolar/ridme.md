@@ -1,44 +1,29 @@
 # experiments/esr_dipolar/ridme.m
 
-- Signature: `answer=ridme(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_dipolar/ridme.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/ridme.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=ridme.m
 
-RIDME pulse sequence using idealized hard pulses that affect only the user-specified electron. `H` is the Hamiltonian commutation superoperator, `R` is the relaxation superoperator, and `K` is the chemical kinetics superoperator.
+`answer=ridme(spin_system,parameters,H,R,K)`
 
-## Physical / mathematical content
+## What it calculates
 
-The sequence applies five pulses to the probe spin, with evolution during `tau 1`, `tau 2`, and the mixing time. Phase cycling at the third and fourth pulses produces four signal components. Relaxation must be present for this experiment to work.
+RIDME is a relaxation-induced dipolar-modulation experiment. This routine implements an ideal hard-pulse, five-pulse phase-cycled sequence on the selected probe spin. Its source explicitly notes that relaxation must be present for the experiment to work. This is not an ENDOR or DNP/hyperpolarization workflow, a field sweep, or an imaging routine.
 
-## Numerical / algorithmic content
+## Inputs
 
-The Liouvillian is `L=H+1i*R+1i*K`. Evolution uses the specified step size and step counts to generate a trajectory and refocus the four phase-cycle branches. The real and imaginary signal components are projections onto the corresponding probe-spin coil states, normalized by their norms.
+- `spin_system` — Spinach spin system.
+- `parameters.rho0` — initial state.
+- `parameters.probe_spin` — positive integer spin index for the observed spin.
+- `parameters.stepsize` — positive time increment in seconds.
+- `parameters.nsteps` — row vector of two positive integers; entries count steps for the two delay dimensions, `tau1` and `tau2`.
+- `parameters.tmix` — positive mixing time in seconds.
+- `H`, `R`, `K` — dimension-matched numeric generator matrices for the Hamiltonian, relaxation, and chemical kinetics contributions; the routine forms `L=H+1i*R+1i*K`. Relaxation is part of the required physical model, not an optional post-processing correction.
 
-## Parameters / inputs
+## Sequence and propagation
 
-- `H`: Hamiltonian, received from the context function.
-- `R`: relaxation superoperator, received from the context function.
-- `K`: kinetics superoperator, received from the context function.
-- `parameters.rho0`: initial state.
-- `parameters.probe_spin`: number of the spin on which the sequence operates; a positive real integer.
-- `parameters.stepsize`: step size for the increment of the relaxation period, seconds; a positive real scalar.
-- `parameters.nsteps(1)`: number of steps for `tau 1`.
-- `parameters.nsteps(2)`: number of steps for `tau 2`. `parameters.nsteps` must be a row vector of two positive integers.
-- `parameters.tmix`: mixing time, seconds; a positive real scalar.
+The implementation constructs the probe-spin X/Y pulse operators and real/imaginary detection quadratures. It applies a `pi/2` X pulse, evolves for `stepsize*nsteps(1)`, applies a `pi` X pulse, and samples the two-delay trajectory using `stepsize` and `nsteps(1)+nsteps(2)`. Four third-pulse branches use `+X`, `+Y`, `-X`, and `-Y` rotations of `pi/2`; each evolves for `tmix` and receives its corresponding fourth pulse. The stored evolution is reversed for refocusing, followed by a `pi` X pulse and final evolution over `stepsize*nsteps(2)`. These pulse rotations are in radians.
 
-`H`, `R`, and `K` must be numeric matrices of the same dimensions.
+## Output and limitations
 
-## Outputs
-
-Each of the following has `.real` and `.imag` quadrature components of the signal, corresponding to phase-cycle instances on the third, fourth, and fifth pulses in the RIDME sequence:
-
-- `answer.pxpxpx`
-- `answer.pypypx`
-- `answer.mxmxpx`
-- `answer.mymypx`
-
-## Implementation structure
-
-A `+pi/2` pulse about `Sx` is followed by evolution for `tau 1`, a `+pi` pulse about `Sx`, and trajectory evolution over `parameters.nsteps(1)+parameters.nsteps(2)` steps. The third pulse creates `+Sx`, `+Sy`, `-Sx`, and `-Sy` phase-cycle branches, each of which evolves for `parameters.tmix`. The fourth pulse applies the corresponding `+Sx`, `+Sy`, `-Sx`, or `-Sy` rotation. After refocusing evolution, the fifth pulse applies `+pi` about `Sx` to every branch, followed by evolution for `tau 2` and observation.
-
-<https://spindynamics.org/wiki/index.php?title=ridme.m>
+The result has four phase-cycle channels: `answer.pxpxpx`, `answer.pypypx`, `answer.mxmxpx`, and `answer.mymypx`; each has `real` and `imag` quadrature components. The code projects and normalizes by the corresponding probe-spin coil-state norm. The source does not specify returned array dimensions or provide separate named delay-axis vectors, so use `nsteps` and `stepsize` as the sampling controls without assuming additional axis metadata. The source supplies pulse angles and parameter constraints, but no example numerical times, measured data, or DOI.

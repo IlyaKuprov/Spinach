@@ -1,21 +1,13 @@
 # examples/nmr_solids/mas_powder_gly_floquet.m
 
-- Signature: `mas_powder_gly_floquet()`
+Source: [examples/nmr_solids/mas_powder_gly_floquet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_gly_floquet.m)
 
-## Purpose
+## Model
 
-Calculates a glycine powder `13C` MAS spectrum using Floquet MAS formalism. The source header says to assume `1H` decoupling; however, the script sets `parameters.decouple={}`. Calculation time: seconds.
+This is a simulated 13C MAS powder example for glycine. It reads `../standard_systems/glycine.log` with `gparse` and passes the parsed data to `g2spinach`, selecting 13C and 15N spins with reference values [182.1, 264.5]. The code labels the input as PCM DFT-derived spin-system properties and sets the field to 14.1 T. The source does not state units for the two reference values or for the interaction and proximity cutoffs (5.0 and 4.0). These are model-building inputs, not measured spectrum values.
 
-## Physical / mathematical content
+The basis is spherical-tensor Liouville space with no approximation, projection +1, and a longitudinal 15N specification. The experiment settings are a [1, 1, 1] rotor axis, rate 2000 Hz, maximum rank 23, and grid `leb_2ang_rank_23`. The header says the spectrum assumes proton decoupling, but the selected spin list is 13C and 15N and `parameters.decouple` is empty; the source does not configure an explicit proton spin or RF decoupling field. The simulation call is `floquet(spin_system,@acquire,parameters,'nmr')`.
 
-- The spin system is generated from the glycine PCM-DFT log with `g2spinach`; the script sets the field to 14.1 T and observes `13C`.
-- The basis uses no approximation, projection +1, and a longitudinal `15N` subspace. Interaction and proximity cutoffs are set to 5.0 and 4.0.
+## Signal and display
 
-## Numerical / algorithmic content
-
-- Floquet acquisition uses a 2000 Hz rotor rate, axis `[1 1 1]`, maximum rank 23, and grid `leb_2ang_rank_23`.
-- The FID has 256 points over a `5e4` sweep, zero-filled to 1024 with offset 17000; exponential apodisation parameter 6 is applied before Fourier transformation.
-
-## Implementation structure
-
-- Parse the glycine DFT log and generate the spin system, set field and basis options, configure the experiment, call `floquet(...)`, apodise, Fourier transform, and plot.
+Both the initial state and receiver coil are the 13C `L+` state. The code requests 256 points, a sweep setting of 5e4, zero filling to 1024, offset 17000, and a ppm axis with inversion enabled. It applies exponential apodisation parameter 6 to the FID, Fourier transforms with `fftshift`, then plots the real spectrum using `plot_1d`. The result is a computed spectrum from the imported model and acquisition settings, not an experimentally measured spectrum.

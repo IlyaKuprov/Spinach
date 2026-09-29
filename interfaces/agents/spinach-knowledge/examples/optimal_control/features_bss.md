@@ -1,19 +1,13 @@
 # examples/optimal_control/features_bss.m
 
-- Signature: `features_bss()`
+[Stable source link](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_bss.m) · [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=features_bss.m)
 
-## Purpose
+## Calculation
 
-Optimises a 90-degree pulse for a single proton with a 1 MHz Larmor frequency when Bloch–Siegert corrections are included. The control is a significant fraction of the Larmor frequency, so the counter-rotating field shifts the resonance. The example compares pulses optimised with the correction enabled and disabled, evaluating both in the corrected model. Its offset ensemble is deliberately applied through transverse Lx rather than the usual Lz operator.
+This is a simulated 90° proton-pulse design in the regime where Bloch–Siegert (counter-rotating-field) effects matter. The one-spin model is on resonance at 1 MHz: `sys.magnet=2π×10⁶/spin('1H')` sets that Larmor frequency and the chemical shift is 0 ppm. Spinach builds the full single-spin `sphten-liouv` basis with no approximation. The normalized initial and target states are longitudinal magnetization (`Lz`) and transverse magnetization (`Lx`). The drift is set to zero; the two quadrature controls are `Lx` and `Ly` for 1H.
 
-## Physical / mathematical content
+The ensemble varies an offset through the transverse `Lx` operator, using the 11 values in `linspace(-1e5,1e5,11)`. The source does not attach units to these values, so they are reported as entered rather than relabelled as Hz. Its RF scale is 0.2 times the absolute proton base frequency, and it uses 50 equal slices with `pulse_dt=(8π/pwr_levels/50)`; using the source's 1 MHz base frequency gives a total duration of 20 μs. The deterministic initial waveform has 50 amplitude samples ramping from 0.1 to 0.5 and 50 second-quadrature samples at 0.05.
 
-The single-spin pulse-design problem includes Bloch–Siegert shift corrections and an offset ensemble represented by a transverse Lx term. The target is a 90-degree rotation.
+## Optimisation and reported observable
 
-## Numerical / algorithmic content
-
-The pulse is optimised with LBFGS-GRAPE, once with Bloch–Siegert corrections enabled and once without them. Both resulting pulses are evaluated using the corrected model, and their fidelities are reported.
-
-## Implementation structure
-
-The script creates the one-proton spin system, sets Lx and Ly as RF controls, defines the transverse offset ensemble, runs the two optimisation cases, and reports corrected-model fidelities. The stated Larmor frequency is 1 MHz.
+`optimcon` prepares the control problem for LBFGS GRAPE (`fmaxnewton` with `@grape_xy`), real-valued fidelity and a 100-iteration limit. The script optimises once with `control.bsiegert=true` and again with it false, then evaluates each resulting pulse using `ensemble` in the corrected model. It reports two corrected-model ensemble fidelities without hard-coded values. The source header describes the corrected-versus-uncorrected gap as about six times the Lz-offset ensemble gap; the script does not compute that separate offset comparison. The calculation is a Spinach simulation, not a hardware measurement.

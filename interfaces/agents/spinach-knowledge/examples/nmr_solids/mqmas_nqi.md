@@ -1,23 +1,17 @@
 # examples/nmr_solids/mqmas_nqi.m
 
+- MATLAB implementation: [examples/nmr_solids/mqmas_nqi.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mqmas_nqi.m)
+
+Source: [examples/nmr_solids/mqmas_nqi.m](../../../../../examples/nmr_solids/mqmas_nqi.m)
+
 - Signature: `mqmas_nqi()`
 
-## Purpose
+## Model
 
-Rotor-synchronous MQMAS spectrum of a 87Rb compound, transmitter set to the isotropic chemical shift. Calculation time: minutes
+The spin system contains `87Rb` at 9.4 T, with the source specifying just a nuclear quadrupole interaction. It constructs the NQI with `eeqq2nqi(5e6,0.50,3/2,[0 0 0])`: a 5 MHz coupling input, asymmetry parameter 0.50, spin 3/2, and zero Euler-angle values. These are settings for the simulated example, not a reported measurement of a particular compound.
 
-## Physical / mathematical content
+## Rotor-synchronous MQMAS sequence
 
-- Models the quadrupolar nucleus `87Rb` using an NQI interaction built by `eeqq2nqi(5e6,0.50,3/2,[0 0 0])`.
-- Simulates a rotor-synchronous multiple-quantum MAS experiment with MQ order 3 and the transmitter offset at zero, as stated in the example description.
+The script sets a 62.5 kHz rotor rate about axis vector `[1 1 1]`, rank 7, and powder grid `rep_2ang_1600pts_sph`. It uses MQ order 3, zero offset from the transmitter position described as the isotropic chemical shift, and puts `87Rb` in rotor frame 2. Two RF amplitudes are specified as `2*pi*250e3` rad/s each (250 kHz in cycles per second), with pulse durations 2 microseconds and 1 microsecond. The initial state is `Lz` and the receiver is `L+`.
 
-## Numerical / algorithmic content
-
-- Uses `singlerot` to simulate the two-dimensional lab-frame pulse sequence, then applies squared-cosine apodisation along both dimensions and a two-dimensional Fourier transform with zero filling to `[256 256]`.
-- The experiment uses a 62.5 kHz rotor rate, rank-7 orientation grid `rep_2ang_1600pts_sph`, two 128-point dimensions, pulse amplitudes `2π × [250e3 250e3]`, and durations of 2 μs and 1 μs. The plotting call passes `20` as an argument.
-
-## Implementation structure
-
-- Creates a 9.4 T `87Rb` spin system in the `sphten-liouv` basis without approximation and disables trajectory-level output.
-- Uses `Lz` as the initial state and `L+` as the receiver; runs `mqmas` through `singlerot` in the lab frame with the specified rotor and pulse parameters.
-- Applies the two-dimensional apodisation and Fourier transform, then plots the magnitude spectrum.
+The experiment is run with `singlerot` and `mqmas` in the lab frame. The two acquisition dimensions use 128 points each and are zero-filled to 256 each. Both dimensions receive squared-cosine apodisation before a two-dimensional Fourier transform; the magnitude spectrum is plotted. These settings define a calculation, not an experimentally measured spectrum.

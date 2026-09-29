@@ -1,33 +1,16 @@
 # kernel/optimcon/cubic_interp.m
 
-- Signature: `[alpha,fx]=cubic_interp(end_a,end_b,alpha_a,alpha_b,...`
+Source: [kernel/optimcon/cubic_interp.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/cubic_interp.m)
+Wiki: [Spinach documentation for cubic_interp.m](https://spindynamics.org/wiki/index.php?title=cubic_interp.m)
 
 ## Purpose
 
-Finds the maximum of a cubic interpolant within the interval bounded by `end_a` and `end_b`. The interpolant is determined by function values and directional derivatives at `alpha_a` and `alpha_b`.
+Maximizes the cubic Hermite interpolant defined by two function values and their directional derivatives. The interpolation interval has boundaries <code>end_a</code> and <code>end_b</code>; the two anchor points are <code>alpha_a</code> and <code>alpha_b</code>, with values <code>f_a</code> and <code>f_b</code> and directional derivatives <code>dir_deriv_a</code> and <code>dir_deriv_b</code>.
 
-## Numerical / algorithmic content
+The routine normalizes the anchor coordinate using <code>s = (alpha-alpha_a)/(alpha_b-alpha_a)</code>, constructs the cubic from the two endpoint values and derivatives, and evaluates its real stationary points that lie within the normalized interval together with both interval boundaries. It returns the point with the largest interpolated value, transformed back to the <code>alpha</code> coordinate. The second output is the value of the cubic model at that point, not a new evaluation of the underlying objective. This helper returns no gradient or adjoint.
 
-The function constructs the cubic in coordinates normalised relative to `alpha_a` and `alpha_b`. It finds the roots of the cubic's derivative, discards complex roots and roots outside the interpolation interval, and compares the cubic values at the remaining roots and both interval boundaries. It returns the candidate with the largest value, transformed back to alpha coordinates.
+## Call and validated inputs
 
-## Parameters / inputs
+<code>[alpha,fx] = cubic_interp(end_a,end_b,alpha_a,alpha_b,f_a,dir_deriv_a,f_b,dir_deriv_b)</code>
 
-- `end_a` — first interpolation boundary in alpha space.
-- `end_b` — second interpolation boundary in alpha space.
-- `alpha_a` — first interpolation anchor point.
-- `alpha_b` — second interpolation anchor point; must differ from `alpha_a`.
-- `f_a` — function value at `alpha_a`.
-- `dir_der_a` — directional derivative at `alpha_a`.
-- `f_b` — function value at `alpha_b`.
-- `dir_der_b` — directional derivative at `alpha_b`.
-
-Inputs must be finite real scalars.
-
-## Outputs
-
-- `alpha` — selected maximiser of the cubic model within the interpolation interval.
-- `fx` — cubic model value at `alpha`.
-
-## Source
-
-- [Spinach documentation for cubic_interp.m](https://spindynamics.org/wiki/index.php?title=cubic_interp.m)
+All eight inputs must be finite, real, numeric scalars, and <code>alpha_a</code> must differ from <code>alpha_b</code>. The code does not require <code>end_a</code> and <code>end_b</code> to differ, nor does it require the anchor points to lie inside the interpolation interval. There are no default input values.

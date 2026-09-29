@@ -1,19 +1,14 @@
 # examples/optimal_control/bloch_siegert/bloch_siegert_a.m
 
 - Signature: `bloch_siegert_a()`
+- Source: [examples/optimal_control/bloch_siegert/bloch_siegert_a.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/bloch_siegert/bloch_siegert_a.m)
 
-## Purpose
+## Objective and spin model
 
-Bloch-Siegert shift compensation demo. It optimises a 90-degree pulse taking (L_z) to (L_x) for a single on-resonance (^{1}mathrm{H}) spin, then compares performance with and without Bloch-Siegert (BSS) correction as control power varies. Calculation time: minutes.
+Estimated calculation time: minutes. The example optimises a 90-degree state transfer, `Lz -> Lx`, for a single on-resonance `1H` spin at `sys.magnet=14.1`. The scalar Zeeman interaction is set to zero, and the calculation uses the exact `sphten-liouv` basis. The initial and target states are constructed and normalised separately. The drift is the NMR-assumption Hamiltonian; the two control operators are `Lx` and `Ly` on the proton channel.
 
-## Physical / mathematical content
+## Waveform parameterisation and comparison
 
-- The source sets `sys.magnet=14.1`, one `1H` isotope, and zero scalar coupling. It builds normalized (L_z) initial and (L_x) target states. The example illustrates how an unaccounted Bloch-Siegert shift can reduce pulse fidelity at higher control power.
+For each of 20 control levels, the example scales the absolute proton Larmor angular frequency by evenly spaced relative powers from 0.001 to 1.0. Power levels are in rad/s. Each pulse has 50 equal-duration slices, with slice duration `(pi/100)/pwr_level`; the common initial guess is a 2-by-50 Gaussian array scaled by 1/10. The optimizer is L-BFGS through `fmaxnewton`, with at most 500 iterations and `tol_x=1e-4`.
 
-## Numerical / algorithmic content
-
-- The optimizer uses L-BFGS (`max_iter=500`, `tol_x=1e-4`) and a 50-slice GRAPE-XY pulse; each slice duration is set to `(pi/100)/control.pwr_levels`. It sweeps 20 powers from (10^{-3}) to 1 times the proton Zeeman frequency, using the same random initial guess for each comparison. At each power, one pulse is designed with BSS disabled and one with BSS enabled; both are evaluated using the BSS-enabled setting, and terminal infidelity is plotted against relative control power.
-
-## Implementation structure
-
-- Create the one-spin system and sphten-liouv basis; build and normalize the initial and target states; obtain the (L_x)/(L_y) control operators and drift Hamiltonian; configure the optimizer; sweep power, optimize both BSS settings, evaluate both pulses under BSS, and plot the two infidelity curves.
+At each power it constructs settings with Bloch-Siegert (BSS) correction disabled and enabled, then optimises one `grape_xy` waveform for each setting. Both waveforms are evaluated with the BSS-enabled settings via `ensemble`. The plotted quantity is terminal infidelity, `1-fidelity`, against relative control power, with a logarithmic vertical axis. Both designs are therefore evaluated in the presence of BSS physics.

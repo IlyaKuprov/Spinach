@@ -1,21 +1,15 @@
 # examples/nmr_solids/cp_matching_4.m
 
-- Signature: `cp_matching_4()`
+Signature: cp_matching_4()
 
-## Purpose
+## What the example models
 
-Tests the ¹H–¹⁵N Hartmann–Hahn power match in a model with conformational exchange between two geometries whose N–H vectors differ by 90°. The source estimates a calculation time of seconds.
+The source describes CP between ¹H and ¹⁵N with conformational exchange between two geometries whose N–H vectors differ by 90°. The code represents four spins as two separate ¹H–¹⁵N pairs, with the N positions at [0,0,2] and [0,2,0]; the two exchange groups are [1 2] and [3 4]. It sets sys.magnet=9.394 and four zero scalar Zeeman entries, uses exchange-rate matrix [−5000, +5000; +5000, −5000] and concentrations [1,1]. No units for these exchange-rate values are stated. The basis is sphten-liouv with approximation none.
 
-## Physical / mathematical content
+## MAS and CP scan
 
-The model contains two ¹H–¹⁵N pairs, one for each geometry, with the two spin pairs grouped into exchanging chemical states. The exchange-rate matrix has off-diagonal rates of 5,000 s⁻¹ and equal state concentrations. Under a 10 kHz MAS rate, the experiment starts from ¹H transverse magnetisation and observes the ¹⁵N signal.
+The example passes rate 10000, axis [sqrt(2/3), 0, sqrt(1/3)], max_rank 3, and powder grid rep_2ang_200pts_oct. It uses a ¹H Lx initial state, ¹⁵N Lx detection coil, zero excitation operators, and ten time-step entries of 4e-5. The time-step and rate units are not stated in the source.
 
-## Numerical / algorithmic content
+A parfor loop scans 60 ¹H irradiation settings from 20e3 to 80e3 while holding the ¹⁵N irradiation setting at 50e3. The plotted scan values are divided by 1e3 and the axis is labelled ¹H spin-lock RF power in kHz, giving a displayed range of 20–80 kHz. At each point, singlerot is called with cp_contact_hard; real(fid(end)) is plotted as ¹⁵N signal in a.u. The plotted quantity is a computed final FID sample, not a measured spectrum or a validation result. Contact duration and pulse/sequence details are delegated to the named call and are not specified here. The source header estimates calculation time as seconds, not a measured timing result.
 
-The source uses the full `sphten-liouv` basis and `singlerot` with `@cp_contact_hard`. At MAS axis `[sqrt(2/3) 0 sqrt(1/3)]`, it scans 60 proton spin-lock powers from 20 to 80 kHz with the ¹⁵N power fixed at 50 kHz, using the `rep_2ang_200pts_oct` grid, `max_rank=3`, and ten 40 μs steps. Each scan point runs in a `parfor` loop; the real final FID point is plotted against ¹H power.
-
-## Implementation structure
-
-- Defines the two orientations as separate ¹H–¹⁵N pairs and specifies the chemical-exchange groups, rates, and concentrations.
-- Builds the basis and transverse operators, then configures MAS, initial state, detection coil, and time grid.
-- Performs the parallel RF-power sweep and plots the final ¹⁵N signal.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_4.m

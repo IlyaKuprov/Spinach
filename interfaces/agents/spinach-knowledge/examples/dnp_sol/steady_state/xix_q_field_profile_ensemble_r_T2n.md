@@ -1,19 +1,19 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_r_T2n.m
 
-- Signature: `xix_q_field_profile_ensemble_r_T2n()`
+[Source MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_r_T2n.m) · Signature: `xix_q_field_profile_ensemble_r_T2n()`.
 
-## Purpose
+## Use and distinctive variant
 
-Simulates how the nuclear transverse relaxation time T2n affects steady-state XiX DNP field profiles for an electron–proton distance ensemble. The source estimates a calculation time of minutes.
+This steady-state XiX DNP example varies the proton transverse relaxation time (T_{2n}), averaging each field profile over the electron–proton distance quadrature. The source estimates a run time of minutes.
 
-## Physical / mathematical content
+## Setup and scan
 
-- Models an electron and a proton at a Q-band magnetic field of 1.2142 T and a spin temperature of 80 K. The electron Zeeman tensor uses trityl g-values; the proton Zeeman tensor uses a ppm estimate.
-- Sweeps T2n over 2000, 200, 20, 2, and 0.2 μs. For each value, the proton transverse relaxation rate is `1/T2n`; the proton longitudinal relaxation rate is calculated by `r1n_dnp` and depends on distance and orientation.
-- Samples electron–proton separations from 3.5 to 20 using three Gauss–Legendre points. The resulting profiles are averaged with quadrature weights and an `r^2` Jacobian.
+The two-spin model uses `{'E','1H'}`, `sys.magnet=1.2142` (commented as Q-band), and `inter.temperature=80` (commented as spin temperature). Electron Zeeman values are `[2.00319 2.00319 2.00258]`; the proton values are `[0 0 5]` (source: ppm guess). Euler arrays `[0 10 0]` and `[0 0 10]` are scaled by `pi/180`. The basis is `sphten-liouv` with approximation `none`; propagation chop tolerance is `1e-12`, and `hygiene` is disabled.
 
-## Numerical / algorithmic content
+The three-point distance quadrature is `gaussleg(3.5,20,3)`; for each point the electron is at the origin and the proton coordinate is `[0 0 r]` and radial averaging weighted by quadrature weight times (r^2). The scanned proton (T_{2n}) values are `[2e-3,200e-6,20e-6,2e-6,0.2e-6]` seconds. It uses `t1_t2` relaxation, diagonal relaxation terms, `dibari` equilibrium, R1 assignments `{1e3,r1n_rate}`, and R2 assignments `{200e3,1/T2n}` (electron/proton order). The proton R1 function is `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r,bet)`.
 
-- For each T2n and sampled distance, creates an electron–proton spin system in the unrestricted spherical-tensor Liouville-space basis, with `t1_t2` relaxation and a proton `Lz` detection state.
-- Calculates steady-state XiX DNP with `powder(spin_system,@xixdnp_steady,parameters,'esr')` on the `rep_2ang_800pts_sph` grid. The microwave resonance offsets span −100 to 100 MHz in 201 points; the experiment uses an 18 MHz electron nutation frequency, 48 ns pulses, 36 XiX blocks, an inverted second-pulse phase, and a −13 MHz additional shift.
-- Plots the real, distance-averaged proton steady-state signal against microwave resonance offset for each T2n, adds a legend, and saves `xix_q_field_profile_ensemble_r_T2n.fig`.
+The steady-state XiX calculation uses 201 offsets from `-100e6` to `100e6` Hz, grid `rep_2ang_800pts_sph`, `18e6` Hz electron nutation frequency, `48e-9` s pulses, 36 blocks, phase `pi`, and `addshift=-13e6`. Shot spacing is set by `204e-6 - 2*nloops*pulse_dur`.
+
+## Dependencies, output, and limits
+
+The example depends on `xix_field_profile_ensemble_r`, `r1n_dnp`, `gaussleg`, Spinach `create`, `basis`, `state`, and `powder`, and kernel `xixdnp_steady`. It plots the real proton (I_Z) response versus offset in MHz with vertical limits ([-3×10^{-3},3×10^{-3}]), and saves `xix_q_field_profile_ensemble_r_T2n.fig`. No numerical result is declared as a function output. Units for the magnet value, spin-temperature value, quadrature coordinates, relaxation-rate values, and `addshift` are not specified in this source.

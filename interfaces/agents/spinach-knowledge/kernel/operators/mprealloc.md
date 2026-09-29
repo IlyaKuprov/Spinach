@@ -1,30 +1,23 @@
 # kernel/operators/mprealloc.m
 
 - Signature: `A=mprealloc(spin_system,nnzpc)`
+- Direct source: [kernel/operators/mprealloc.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/mprealloc.m)
+- Wiki: [mprealloc.m](https://spindynamics.org/wiki/index.php?title=mprealloc.m)
 
 ## Purpose
 
-Preallocates an all-zero sparse operator of the dimension required by the current Spinach formalism, with storage estimated from the expected number of nonzeros per column.
+Allocates an all-zero sparse square matrix sized for the active Spinach formalism, reserving an estimated number of nonzeros per column. This routine allocates storage only: it does not construct matrix elements, define an operator's action, or propagate a state.
 
-## Physical / mathematical content
+## Dimension and formalism
 
-The matrix dimension is taken from the current basis for `sphten-liouv`, from the product of spin multiplicities for `zeeman-wavef` and `zeeman-hilb`, and from the product of squared multiplicities for `zeeman-liouv`.
+The function reads `spin_system.bas.formalism` and chooses the square dimension as follows:
 
-## Numerical / algorithmic content
+- `sphten-liouv`: `size(spin_system.bas.basis,1)`.
+- `zeeman-wavef` and `zeeman-hilb`: `prod(spin_system.comp.mults)`.
+- `zeeman-liouv`: `prod(spin_system.comp.mults.^2)`.
 
-The routine calls `spalloc(problem_dim,problem_dim,nnzpc*problem_dim)` to create the sparse matrix. It uses `spin_system.bas.basis` to obtain the `sphten-liouv` dimension and `spin_system.comp.mults` for the Zeeman formalisms. Other formalism values raise an error.
+For the first case the dimension is the row count of the supplied basis matrix; in the other cases it is calculated from the spin multiplicities. The routine does not create or reorder any basis, so the basis ordering is whatever the selected formalism already uses.
 
-## Parameters / inputs
+## Allocation and input checks
 
-- spin_system - Spinach system structure containing the current formalism; it must include `bas.formalism`, and the selected case also uses the basis or multiplicities described above.
-- nnzpc - expected number of nonzeros per column; the interface describes this as a positive real integer.
-
-## Outputs
-
-- A - all-zero sparse matrix sized for the current formalism and preallocated for `nnzpc*problem_dim` nonzero entries.
-
-## Implementation structure
-
-1. Check the formalism field and the numeric, real, scalar, integer form of `nnzpc`.
-2. Select the matrix dimension for `sphten-liouv`, `zeeman-wavef`, `zeeman-hilb`, or `zeeman-liouv`.
-3. Allocate the square sparse matrix with `spalloc`; unsupported formalism values raise an error.
+For the selected dimension `d`, the implementation calls `spalloc(d,d,nnzpc*d)`; the third argument is reserved sparse storage, not a count of nonzeros already present. The function checks that `spin_system.bas.formalism` exists and that `nnzpc` is numeric, real, scalar, and integer-valued before allocation. An unrecognized formalism raises an error. The documentation describes `nnzpc` as the expected nonzero count per column.

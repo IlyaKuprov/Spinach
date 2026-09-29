@@ -1,23 +1,26 @@
 # kernel/pulses/wave_basis.m
 
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/wave_basis.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=wave_basis.m
 - Signature: `basis_waves=wave_basis(basis_type,n_func,n_points)`
 
 ## Purpose
 
-Returns sampled sine, cosine, or Legendre basis functions for pulse-waveform expansion as columns of a matrix.
+Returns sampled basis functions for pulse-waveform expansion. It constructs the requested functions as rows and returns their orthogonalized sampled vectors as columns of `basis_waves`.
 
-## Numerical / algorithmic content
+## Basis definitions and discretization
 
-The sine and cosine functions are sampled over `[-pi,pi]`; Legendre polynomials are sampled over `[-1,1]`. Rows are generated for the requested functions, then `orth(basis_waves')` orthogonalizes the sampled vectors and returns them as columns. Discretization means the raw functions may not be precisely orthogonal under the standard scalar product; orthogonalization can flip the sign of some functions. If the sampled basis is rank-deficient, the function errors and asks to reduce `n_func`.
+- `sine_waves`: rows `sin(n*x)` for `n=1:n_func`, with `x` sampled by `linspace(-pi,pi,n_points)`.
+- `cosine_waves`: rows `cos((n-1)*x)` on that same interval, so the first row is the constant (zero-frequency) function and subsequent rows begin at frequency 1.
+- `legendre`: Legendre polynomials of orders `0:n_func-1` sampled on `linspace(-1,1,n_points)`; each sampled row is first normalized by its 2-norm.
 
-## Parameters / inputs
+After construction the source applies MATLAB's `orth` to the transpose, making the sampled functions orthogonal as vectors under the discrete representation. The source notes that discretization means the functions are not precisely orthogonal under the continuous standard scalar product, and that orthogonalization can flip some functions upside-down. If the requested sampled rows are linearly dependent, the returned column count is smaller than `n_func` and the function errors, directing the caller to reduce `n_func`.
 
-- `basis_type` - character string: `'sine_waves'`, `'cosine_waves'`, or `'legendre'`
-- `n_func` - positive integer number of functions; sine frequencies start at 1, cosine frequencies at 0, and Legendre polynomial ranks at 0
+## Inputs and output
+
+- `basis_type` - character string: `sine_waves`, `cosine_waves`, or `legendre`
+- `n_func` - positive integer number of requested functions
 - `n_points` - positive integer number of discretization points
+- `basis_waves` - matrix with the orthogonalized sampled basis functions in columns
 
-## Outputs
-
-- `basis_waves` - matrix with the orthogonalized basis functions in columns
-
-Source Wiki page: https://spindynamics.org/wiki/index.php?title=wave_basis.m
+These are dimensionless sampled basis functions, not a pulse-file reader or a pulse amplitude/phase generator. The function exposes no filter parameter.

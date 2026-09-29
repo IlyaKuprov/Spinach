@@ -1,19 +1,18 @@
 # examples/relaxation_theory/trosy_selenium.m
 
+- Source: [examples/relaxation_theory/trosy_selenium.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_selenium.m)
 - Signature: `trosy_selenium()`
 
 ## Purpose
 
-Calculate transverse relaxation matrix elements for `77Se` and its directly bonded `13C` in ethylselenol as a function of applied magnetic field. Calculation time: minutes.
+Calculate transverse relaxation matrix elements versus field for selenium and its directly bonded carbon in ethylselenol. The source estimates a runtime of minutes.
 
-## Physical / mathematical content
+## Model and relaxation pathway
 
-- The two-spin model uses coordinates and Zeeman shielding tensors extracted from `../standard_systems/ethylselenol.out`.
-- Relaxation uses the `redfield` model with `rlx_keep='labframe'`, `equilibrium='zero'`, and correlation time `tau_c=25e-9` s.
-- For each field, the code evaluates `-v'*R*v` for normalized single-spin `L+` states and for normalized combinations `Se+ ± 2 Se+ Cz` and `C+ ± 2 C+ Sez`, where `R` is the relaxation superoperator.
+The two spins are `77Se` and `13C`. The code reads `../standard_systems/ethylselenol.out`, converts its carbon and selenium data with `g2spinach`, and takes Zeeman matrices and coordinates from converted-data entries 3 (selenium) and 2 (carbon). The source gives conversion parameters [186.38, 0.0] but does not state units for those parameters, tensor values, or coordinates. Both selected nuclei are spin-half isotopes, and this model contains no quadrupolar nucleus or quadrupolar interaction.
 
-## Numerical / algorithmic content
+Relaxation is explicitly Redfield, with lab-frame relaxation, zero equilibrium, and a 25 ns correlation time; the basis uses `sphten-liouv` with no approximation. The coordinates and shielding tensors feed the dipolar and anisotropic-shielding relaxation terms. The script evaluates normalized selenium and carbon transverse coherences plus opposite-sign two-spin operator combinations (selenium raising coherence paired with selenium-plus-carbon-longitudinal coherence, and the analogous carbon pair). These branches give the TROSY-style relaxation-interference comparison. The source does not separately output a CSA–dipolar cross-correlation term and does not call a stochastic-Liouville solver.
 
-- The basis uses `sphten-liouv` formalism with `approximation='none'`; startup hygiene checks are disabled.
-- A grid of 20 proton Larmor frequencies from 200 to 800 MHz is converted to magnetic fields using `B0=2*pi*lin_freq*1e6/spin('1H')`. At each field, the spin system and basis are created, `R` is calculated, and six relaxation matrix elements are evaluated.
-- Separate plots show the three selenium and three carbon matrix elements against proton Larmor frequency in MHz; the vertical axis is relaxation matrix element in Hz.
+## Calculation and output
+
+Twenty proton Larmor frequencies from 200 to 800 MHz are converted to fields with `2*pi*lin_freq*1e6/spin('1H')`. At every field the spin system, basis, and Redfield relaxation superoperator are rebuilt, and six operator matrix elements are evaluated. Separate plots show selenium and carbon matrix-element branches against proton Larmor frequency in MHz; the vertical axis is relaxation matrix element in Hz. This is a model calculation, not a pulse sequence or measured spectrum.

@@ -1,22 +1,24 @@
 # kernel/derivatives/fdhess.m
 
+Source: [kernel/derivatives/fdhess.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fdhess.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=fdhess.m)
+
 - Signature: `H=fdhess(A,nstenc)`
 
-## Purpose
+## Purpose and inputs
 
-Computes the finite-difference Hessian of a numeric 3D array on a unit-spaced grid, with dimensions ordered `[X Y Z]`.
+Computes the finite-difference Hessian of a numeric three-dimensional array `A`, with dimensions ordered `[X Y Z]`. The source specifies unit grid spacing, so the derivatives are per unit grid coordinate; this routine has no physical extents or unit-conversion input. The stencil uses periodic boundary conditions.
 
-## Parameters / inputs
+- `A`: numeric 3D array.
+- `nstenc`: odd integer stencil-point count, at least 3. Each dimension of `A` must be at least this large.
 
-- `A`: numeric 3D array; each dimension must contain at least `nstenc` elements.
-- `nstenc`: odd integer number of stencil points, at least 3. Periodic boundary conditions are used.
+## Output and assembly
 
-## Output
+`H` is a 3-by-3 cell array; every cell contains a 3D array with the same shape as `A`. Its rows and columns are the derivative axes `[X Y Z]`, in this order:
 
-`H` is a 3×3 cell array of 3D derivative arrays, ordered as
+`{d2A_dxdx  d2A_dxdy  d2A_dxdz; d2A_dydx  d2A_dydy  d2A_dydz; d2A_dzdx  d2A_dzdy  d2A_dzdz}`
 
-`{d2A_dxdx d2A_dxdy d2A_dxdz; d2A_dydx d2A_dydy d2A_dydz; d2A_dzdx d2A_dzdy d2A_dzdz}`
+For each entry, the code applies second-derivative `fdmat` operators on a diagonal axis, or first-derivative operators on both axes for a mixed derivative; identity factors occupy untouched axes. Kronecker products act on `A(:)`, and each result is reshaped to `size(A)`. With MATLAB column-major vectorization, the first (X) dimension is the fastest-varying factor. The source computes all nine ordered entries and places them in the displayed cell-array order.
 
-## Implementation
+## Guards
 
-Diagonal entries use second-derivative `fdmat` operators. Mixed entries apply first-derivative `fdmat` operators along both corresponding dimensions and are assembled with Kronecker products.
+The source requires `A` to be numeric and three-dimensional, every dimension to meet the stencil size, and `nstenc` to be an odd integer of at least 3. The guard accepts 3 as the minimum stencil count. See related operators [fdkup.m](fdkup.md) and [fdlap.m](fdlap.md).

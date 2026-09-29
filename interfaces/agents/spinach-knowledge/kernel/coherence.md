@@ -1,30 +1,22 @@
 # kernel/coherence.m
 
-- Signature: `rho=coherence(spin_system,rho,spec)`
+- Signature: `rho = coherence(spin_system,rho,spec)`
+- Implementation: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/coherence.m>
 
-## Purpose
+## Contract and supported bases
 
-Keeps only the specified coherence orders in a state vector or density matrix. This is useful as an analytical replacement for complicated phase cycles.
+Keeps only the specified coherence orders in a state vector, a horizontal stack of state vectors, or (for `zeeman-hilb`) a density matrix or horizontal stack of density matrices. Supported formalisms are `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`; the source also notes support for Fokker-Planck direct products in the Liouville-space formalisms.
 
-## Physical / mathematical content
+Let `N = size(spin_system.bas.basis,1)`. The implementation folds the input into a two-dimensional working array with `N` rows in the Liouville formalisms and `N^2` rows in `zeeman-hilb`; the remaining dimension is `numel(rho)` divided by that row count. It applies a row mask to all columns, then reshapes the result back to the input's original dimensions. For `zeeman-hilb`, the row count `N^2` represents the stretched density-matrix elements.
 
-- Coherence orders are determined from projection quantum numbers of the basis states. For each entry in `spec`, the function retains states whose summed coherence order on the selected spins matches one of the specified orders. All entries in `spec` must be satisfied.
+Coherence orders are obtained from the basis projections: `lin2lm` supplies projection orders for `sphten-liouv`; the Zeeman-Liouville case forms ket and bra projections from the basis and spin multiplicities and subtracts the bra from the ket; the Hilbert case forms all ket-minus-bra projection differences. For each specification, the function sums those orders over the selected spins and retains rows whose sum belongs to the supplied order vector. Masks from separate specifications are intersected, so every specification must match.
 
-## Numerical / algorithmic content
+## Specification
 
-- The function builds a mask for each coherence specification, intersects the masks, zeros the excluded states, and restores the original shape of `rho`.
+`spec` is a cell array of nested pairs: a spin selector and a vector of real integer coherence orders. A selector can be an isotope string in the system, `'electrons'`, `'nuclei'`, `'all'`, or a vector of spin numbers. For example, `{{'13C',[1 -1]},{'1H',-1}}` keeps entries with order 1 or -1 on 13C and order -1 on 1H. The selected spin sets and order lists are evaluated independently for each pair, then ANDed by mask intersection.
 
-## Parameters / inputs
+The state array must be numeric. The implementation warns through `report` if the filtered result has 1-norm below `1e-10`, with the message that all magnetization appears to have been destroyed.
 
-- `spin_system` — spin system specifying the basis, formalism, and spins.
-- `rho` — a state vector or a horizontal stack thereof; in `zeeman-hilb`, a density matrix or a horizontal stack thereof.
-- `spec` — a cell array specifying which coherence orders to keep on which spins. For example, `{{'13C',[1 -1]},{'1H',-1}}` keeps states with coherence order `((1 OR -1 on 13C) AND (-1 on 1H))`. Spins may be specified by isotope, spin number, `'electrons'`, `'nuclei'`, or `'all'`.
+## Reference
 
-## Outputs
-
-- `rho` — the state vector or density matrix with undesired coherence orders zeroed out.
-- Note: this function requires `sphten-liouv`, `zeeman-liouv`, or `zeeman-hilb` formalism; Fokker-Planck direct products are supported in the Liouville space formalisms. In `zeeman-hilb`, density matrices are stretched into Liouville space, filtered there, and folded back.
-
-## Implementation structure
-
-- Checks the inputs and formalism, computes coherence orders for the basis, applies the intersected mask, and reshapes the result to the original dimensions. Reports a warning if the resulting magnetization is nearly zero.
+- [Spinach Wiki: `coherence.m`](https://spindynamics.org/wiki/index.php?title=coherence.m)

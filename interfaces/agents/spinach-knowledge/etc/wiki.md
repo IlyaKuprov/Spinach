@@ -1,15 +1,11 @@
 # etc/wiki.m
 
-## Signature
+## Use
 
-`wiki()`
+Call wiki() in MATLAB to ask MATLAB's web function to open the Spinach Wiki main page in the default browser. The routine takes no arguments, returns no values, and performs no simulation or search within MATLAB.
 
-## Purpose
+The destination is the [Spinach Wiki main page](https://spindynamics.org/wiki/index.php?title=Main_Page). Viewing it requires the browser and network to be available.
 
-Opens the Spinach documentation home page in the system's default web browser.
+## Source
 
-## Behavior
-
-Calls MATLAB's `web` function with the Wiki main-page URL and the `-browser` option. The routine takes no inputs and returns no outputs.
-
-[Spinach Wiki](https://spindynamics.org/wiki/index.php?title=Main_Page)
+[etc/wiki.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/wiki.m)

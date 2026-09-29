@@ -1,32 +1,14 @@
 # kernel/operators/weyl.m
 
-- Signature: `A=weyl(nlevels)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/weyl.m
+Wiki: https://spindynamics.org/wiki/index.php?title=weyl.m
 
-## Purpose
+## Purpose and basis
 
-Construct sparse Weyl boson operators for a bosonic mode truncated to a specified number of population levels.
+`weyl(nlevels)` returns sparse, complex matrices for one truncated bosonic mode. `nlevels` must be a positive real integer. Each output is `nlevels`-by-`nlevels`; the number operator has diagonal entries `0,1,...,nlevels-1`, so matrix position `j` corresponds to population `j-1` in MATLAB one-based indexing.
 
-## Physical / mathematical content
+## Operators and normalization
 
-The operators obey `A.c*A.a=A.n`, `[A.n,A.c]=A.c`, `[A.n,A.a]=-A.a`, and `[A.a,A.c]=A.u`, except at the truncation edge state, where the `[A.a,A.c]` element is `1-nlevels`. This exception is unavoidable for finite truncation.
+The returned fields are `A.u` (identity), `A.c` (creation), `A.a` (annihilation), and `A.n` (number). The source constructs `A.c` from `sqrt(1:nlevels)` on diagonal offset `-1`, `A.a` from `sqrt(0:(nlevels-1))` on offset `+1`, and `A.n` from `0:(nlevels-1)` on the main diagonal; `A.u` is `speye(nlevels)`. This records the literal vectors and offsets supplied to `spdiags`.
 
-## Numerical / algorithmic content
-
-The operators are constructed as sparse `nlevels`-by-`nlevels` matrices and declared complex at build time to avoid expensive reallocations later.
-
-## Parameters / inputs
-
-- `nlevels` — a positive integer specifying the number of population levels.
-
-## Outputs
-
-- `A.u` — unit operator.
-- `A.c` — creation operator.
-- `A.a` — annihilation operator.
-- `A.n` — population number operator.
-
-## Implementation structure
-
-The function validates `nlevels`, then constructs the creation operator on the lower diagonal, the population number operator on the main diagonal, the annihilation operator on the upper diagonal, and the unit operator as a sparse identity matrix.
-
-<https://spindynamics.org/wiki/index.php?title=weyl.m>
+The source documents the normalization relations `A.c*A.a=A.n`, `[A.n,A.c]=A.c`, `[A.n,A.a]=-A.a`, and `[A.a,A.c]=A.u`, with the stated finite-cutoff exception: at the edge state, the `[A.a,A.c]` element is `1-nlevels`. The truncation therefore modifies that commutator at the highest retained population. These finite matrices are not a propagator or evolution generator.

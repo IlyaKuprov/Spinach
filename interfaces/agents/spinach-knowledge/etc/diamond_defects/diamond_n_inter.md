@@ -1,30 +1,39 @@
 # etc/diamond_defects/diamond_n_inter.m
 
-- Signature: [sys,inter]=diamond_n_inter(parameters)
+- MATLAB implementation: [etc/diamond_defects/diamond_n_inter.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_n_inter.m)
+
+- Signature: `[sys,inter]=diamond_n_inter(parameters)`
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=diamond_n_inter.m)
+- Magnetic parameters: Felton et al., *J. Phys.: Condens. Matter* **21**, 364212 (2009), https://doi.org/10.1088/0953-8984/21/36/364212.
 
 ## Purpose
 
-Builds the electron–nitrogen spin system for a nitrogen interstitial in diamond, using the War9 or War10 centre parameters reported by Felton et al., *J. Phys.: Condens. Matter* **21**, 364212 (2009), https://doi.org/10.1088/0953-8984/21/36/364212.
+Builds the electron–nitrogen spin-system specifications for the War9 or War10 nitrogen-interstitial centre in diamond. It returns `sys` and `inter`; it does not perform a spin-dynamics calculation.
 
-## Physical / mathematical content
+## Call and inputs
 
-The electron g tensor and nitrogen hyperfine tensor are assembled in the crystal principal-axis frame and rotated so the requested crystal direction is aligned with the magnetic field. War9 uses the reported electron and nitrogen tensors. War10 uses the reported electron tensor and the nitrogen tensor defined in the source; the 14N coupling is obtained by scaling the 15N tensor by the nuclear gyromagnetic-ratio ratio. No zero-field splitting or nuclear quadrupole tensor is added.
+Call `[sys,inter]=diamond_n_inter(parameters)` with exactly one structure argument. Required fields:
 
-## Numerical / algorithmic content
+- `parameters.centre`: character string `'war9'` or `'war10'` (case-insensitive; the function lowercases this field).
+- `parameters.orientation`: exactly `'111'`, `'110'`, or `'100'`, specifying the crystal-plane normal aligned with the applied field (`z`).
+- `parameters.nitrogen`: exactly `'14N'` or `'15N'`.
 
-The routine constructs an orthonormal crystal frame, selects the War9 or War10 parameter set, builds the requested crystal-to-field rotation, and returns Zeeman and electron–nuclear coupling matrices in Spinach format. Unsupported centre, isotope, or orientation values raise an error.
+Example: `[sys,inter]=diamond_n_inter(struct('centre','war9','orientation','111','nitrogen','14N'));`
 
-## Parameters / inputs
+## Centre tensors and isotope treatment
 
-- parameters.centre: 'war9' or 'war10'.
-- parameters.orientation: '111', '110', or '100'; the corresponding crystal-plane normal is aligned with the magnetic field.
-- parameters.nitrogen: '14N' or '15N'.
+The tabulated g and hyperfine tensors are expressed in centre frames and rotated into the requested field orientation. Principal values encoded by the source are:
 
-## Outputs
+| Centre | g principal values | Nitrogen A principal values |
+|---|---|---|
+| War9 | `[2.00343, 2.00272, 2.00268]` | `[8.30, 7.85, 8.17] MHz` |
+| War10 | `[2.00344, 2.00272, 2.00269]` | `[1.00, −1.01, 0.00] MHz` |
 
-- sys: Spinach system specification structure.
-- inter: Spinach interaction specification structure.
+For `15N` these A values are used directly. For `14N` the hyperfine tensor is multiplied by `spin('14N')/spin('15N')`. War9 uses a shared g/hyperfine frame built from directions `(θ,φ)=(90°,45°),(180°,45°),(90°,315°)`. For War10 the g tensor stays in that frame, while the hyperfine frame uses `(44.8°,45.0°)`, `(134.8°,45.0°)`, and `(90°,315°)`. Although `14N` is quadrupolar, this routine does not add a nuclear quadrupole interaction: its returned coupling matrix contains only the electron–nitrogen hyperfine tensor.
 
-## Implementation structure
+## Outputs and scope
 
-The function validates the single input structure, selects the centre-specific tensors, applies the isotope scaling when requested, rotates the tensors for the selected orientation, and populates the Zeeman and coupling matrices.
+- `sys.isotopes` identifies the electron (`'E'`) and selected nitrogen isotope.
+- `inter.zeeman.matrix{1}` holds the rotated electron g tensor; `inter.coupling.matrix{1,2}` holds the rotated A tensor.
+
+The War10 tensor is anisotropic and has a negative second principal value; it should not be read as an isotropic positive coupling. The code creates no additional nuclei or NQI terms.

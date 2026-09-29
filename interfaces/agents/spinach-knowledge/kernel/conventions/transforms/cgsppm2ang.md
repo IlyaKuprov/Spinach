@@ -4,22 +4,22 @@
 
 ## Purpose
 
-Converts magnetic susceptibility from the cgs-ppm (aka cm^3/mol) units quoted by quantum chemistry packages into Angstrom^3 units required by Spinach pseudocontact shift functionality. Syntax: ang=cgsppm2ang(cgsppm)
+Converts magnetic susceptibility values in cgs-ppm (described in the source as cm³/mol) to cubic angstroms for Spinach pseudocontact-shift calculations.
 
-## Physical / mathematical content
-Converts susceptibility values from cgs-ppm (described in the source as cm^3/mol) to cubic angstroms using `ang = (4*pi*1e18/6.02214129e23)*cgsppm`. The scalar factor is applied elementwise, preserving the input array's size.
+## Conversion
 
-## Numerical / algorithmic content
+The implementation applies the scalar factor `4*pi*1e18/6.02214129e23`:
 
-## Parameters / inputs
+`ang = 4*pi*1e18*cgsppm/6.02214129e23`.
 
-- cgsppm -any numerical array of susceptibility
-- values in cgs-ppm
+The documented output has the same array size as the input and contains susceptibility values in cubic angstroms. The conversion uses the source's numerical Avogadro constant, `6.02214129e23`.
 
-## Outputs
+## Inputs and outputs
 
-- ang -array of the same size with suscepti-
-- bility values in cubic Angstrom
+- `cgsppm`: numeric array of susceptibility values in cgs-ppm (cm³/mol as described in the source). The validator checks numeric type only; it does not impose a real-valued or finite-value condition or a particular shape.
+- `ang`: converted susceptibility array, documented as the same size as `cgsppm`, in cubic angstroms.
 
-## Implementation structure
-The function calls the local `grumble` helper, which raises `input must be numeric.` if `cgsppm` is not numeric. It then computes `ang=4*pi*1e18*cgsppm/6.02214129e23;`. No other input checks or transformations are performed.
+## References
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/cgsppm2ang.m)
+- [Spinach Wiki: cgsppm2ang.m](https://spindynamics.org/wiki/index.php?title=cgsppm2ang.m)

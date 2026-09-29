@@ -1,27 +1,23 @@
 # kernel/indexing/spunicols.m
 
+Source: [MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/indexing/spunicols.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=spunicols.m).
+
 - Signature: `A=spunicols(A)`
 
 ## Purpose
 
-Returns a sparse matrix containing one copy of each distinct column of the input matrix.
+Returns one copy of every distinct column of a sparse matrix. This is a column-set operation, not a physical model and not a line-shape or chemical-flow calculation.
 
-## Physical / mathematical content
+## Mathematical mapping
 
-This utility operates on matrix columns; it does not model a physical system.
+For an input `A` with `m` rows and `n` columns, regard each column `a_j` as an element of `R^m`. Define `a_i ~ a_j` exactly when `a_i=a_j`. The result `B` contains one column for each equivalence class, so its shape is `m × u`, where `u` is the number of distinct input columns. In code the mapping is `B = unique(A.','rows').'`.
 
-## Numerical / algorithmic content
+MATLAB's `unique(...,'rows')` uses its default sorted ordering; the output columns are therefore ordered by the corresponding sorted rows, not kept in first-occurrence order. The function has one output only: it does not return the source-column indices or an index map. It applies no tolerance, normalization, or physical-unit conversion.
 
-The function transposes `A`, applies Matlab's `unique(...,'rows')` to the rows, then transposes the result back. Duplicate columns are therefore retained only once.
+## Input and output
 
-## Parameters / inputs
+The source contract is a sparse, real, double, two-dimensional matrix. The MATLAB fallback returns a sparse real double matrix made from the unique columns. The entries' interpretation and units are inherited unchanged from the caller; the operation itself is unit-agnostic.
 
-- `A` — a sparse, real, double matrix.
+## Source guard
 
-## Outputs
-
-- `A` — a sparse real double matrix containing the unique columns of the input.
-
-## Implementation structure
-
-The input is checked for consistency, then the Matlab fallback computes `unique(A.','rows').'`. The file serves as the reference implementation for the compiled MEX function.
+The local `grumble` check rejects inputs that are not numeric, sparse, real, class `double`, and a matrix, with the error “A must be a sparse real double matrix.” The source is documented as the MATLAB fallback for the compiled MEX implementation.

@@ -1,30 +1,21 @@
 # kernel/utilities/logfactorial.m
 
-- Signature: `lf=logfactorial(n)`
-
 ## Purpose
 
-Logarithm of the factorial function. Avoids complications with factorials of large numbers overflowing 64-bit numbers. Syntax: lf=logfactorial(n)
+Computes the natural logarithm of the factorial of a non-negative integer, avoiding direct factorial overflow in 64-bit double precision. The source notes that double precision overflow is a persistent problem with Clebsch-Gordan coefficients and other objects involving factorials.
 
-## Physical / mathematical content
+## Behavior
 
-- Computes `log(n!)` for non-negative integers without constructing factorials that can overflow double precision.
+- Syntax: `lf=logfactorial(n)`.
+- The function validates its input via an internal consistency check (`grumble`) and errors with the message `elements of n must be non-negative integers.` if any element of `n` is non-numeric, non-real, negative, or non-integer.
+- The result is computed using MATLAB's built-in `gammaln` function as `lf=gammaln(n+1)`, exploiting the identity that the gamma function generalizes the factorial.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- Evaluates MATLAB `gammaln(n+1)` element-wise.
+- `n` — non-negative integer number (must be numeric, real, and have all elements non-negative integers).
+- `lf` — logarithm of the factorial of `n`.
 
-## Parameters / inputs
+## References
 
-- n -non-negative integer number
-
-## Outputs
-
-- lf -logarithm of the factorial of n
-- Notes: double precision overflow is a persistent problem with
-- Clebsch-Gordan coefficients and other objects that in-
-- volve factorials.
-
-## Implementation structure
-
-- Validates that every element of `n` is a non-negative integer, then returns `gammaln(n+1)`.
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/logfactorial.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=logfactorial.m>

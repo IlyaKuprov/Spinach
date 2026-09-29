@@ -1,33 +1,33 @@
 # experiments/nmr_protein/hcanh.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_protein/hcanh.m)
+
 - Signature: `fid=hcanh(spin_system,parameters,H,R,K)`
 
 ## Purpose
 
-Protein-specific H(CA)NH experiment, Figure 7.37 in the second edition of *Protein NMR Spectroscopy*. It uses preset J-couplings for magnetisation transfer and the bidirectional propagation method described in [the cited paper](http://dx.doi.org/10.1016/j.jmr.2014.04.002). The sequence is hard-wired for 1H, 13C, and 15N proteins; F1, F2, and F3 are 1H, 15N, and 1H, respectively.
+Protein-specific H(CA)NH, Figure 7.37 of the second edition of *Protein NMR Spectroscopy*. The implementation uses the bidirectional-propagation method described in [the cited paper](http://dx.doi.org/10.1016/j.jmr.2014.04.002). It is hard-wired for 1H, 13C, and 15N; F1, F2, and F3 are 1H, 15N, and 1H.
 
-## Physical / mathematical content
+## Inputs and spin labels
 
-The forward half starts from CA-proton magnetisation, selects positive and negative 1H coherence for F1 States quadrature, and carries out the transfer and refocusing steps. The backward half propagates the 1H detection state under the adjoint Liouvillian; stitching the two halves produces the four sign combinations. The pulse sequence uses ideal broadband pulses selected by PDB atom labels and decouples 13CO during the indicated transfer periods.
+- `spin_system` must use the `sphten-liouv` formalism. Set protein atom labels to PDB atom IDs such as `CA`, `HA`, and `H` so the sequence can select its pulse and state sites.
+- `parameters.npoints` is a three-integer vector `[n1 n2 n3]` for `[t1 t2 t3]`; `parameters.sweep` is a three-positive-real vector `[f1 f2 f3]`.
+- `parameters.spins` is fixed by the source to `{'1H','15N','1H'}`; it is not a free choice of detected isotopes.
+- `H`, `R`, and `K` are same-size matrices supplied by the context function (Hamiltonian, relaxation, and kinetics matrices).
+- `parameters.rho0` and `parameters.coil` may be supplied. If absent, the code builds `rho0` from longitudinal magnetisation on labels `HA`, `HA1`, `HA2`, or `HA3`, and builds the proton detection state from label `H`.
 
-The source hard-codes J_CH = 140 Hz and J_NH = 92 Hz, with delays derived from those couplings and additional fixed delays of 12.5 ms and 23.0 ms. Evolution uses `L = H + iR + iK`.
+## Coherence selection and transfer
 
-## Parameters / inputs
+The source starts from the labelled H-alpha sites, applies a proton pulse, and retains positive and negative 1H coherence for the first States dimension. Its CA/H/N pulse and evolution blocks implement the H(CA)NH transfer; positive and negative 15N coherence are selected for F2, and 1H single-quantum coherence is used for proton detection in F3. This is the source-supported pathway summary; individual transfer/refocusing operations are encoded in the pulse blocks rather than exposed as a user-selectable pathway.
 
-- `parameters.npoints`: three positive integer point counts ordered as [t1 t2 t3].
-- `parameters.sweep`: three positive sweep widths in Hz ordered as [f1 f2 f3].
-- `parameters.spins`: required to be `{'1H','15N','1H'}`.
-- `parameters.rho0`: optional initial state; if omitted, the source constructs it from protons with labels HA, HA1, HA2, or HA3.
-- `parameters.coil`: optional detection state; if omitted, the source constructs it from protons labelled H.
-- `H`: Hamiltonian matrix; `R`: relaxation superoperator; `K`: kinetics superoperator, supplied by the context function with matching dimensions.
-- The spin-system labels must use PDB atom IDs such as CA, HA, and H for the sequence's selective operations.
+## Timing and output
 
-## Outputs
+The J values are hard-coded: `J_ch = 140 Hz` and `J_nh = 92 Hz`. The corresponding `tau1` and `delta1` are `1/(4 J_ch)` (about 1.79 ms); `tau2` and `delta3` are `1/(4 J_nh)` (about 2.72 ms). The other fixed delays are `delta2 = 12.5 ms` and `delta4 = 23.0 ms`. These delays are in seconds in the implementation; the J values are in Hz.
 
-Returns a structure with `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the four sign combinations used in subsequent States quadrature processing.
+The returned structure has four FIDs: `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the two sign choices in each of the first two States dimensions. Each array is permuted to `[n3 n2 n1]`, corresponding to `[t3 t2 t1]` after acquisition/detection and stitching.
 
 ## References
 
 - *Protein NMR Spectroscopy*, 2nd edition, Figure 7.37.
-- [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002)
-- [Spin Dynamics Wiki: hcanh.m](https://spindynamics.org/wiki/index.php?title=hcanh.m)
+- [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002).
+- [Spin Dynamics Wiki: hcanh.m](https://spindynamics.org/wiki/index.php?title=hcanh.m).

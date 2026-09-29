@@ -1,29 +1,27 @@
 # kernel/pulses/grad_sandw.m
 
-- Signature: `rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/grad_sandw.m) · [Spin Dynamics Wiki: grad_sandw.m](https://spindynamics.org/wiki/index.php?title=grad_sandw.m)
 
-## Purpose
+Signature: `rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)`
 
-Approximates the effect of two linear gradient pulses with intervening evolution on the sample-averaged state, using Edwards' formalism. It assumes negligible diffusion and gradients antisymmetric about the sample midpoint. The routine integrates over the spatial coordinate and returns a spatially averaged state, so this result cannot be followed by another gradient pulse to refocus the dephasing.
+## Purpose and assumptions
 
-## Inputs
+Computes the sample-averaged effect of a two-gradient sandwich using Edwards' formalism. It assumes negligible diffusion, linear gradients, and gradients antisymmetric about the sample midpoint. Because the spatial coordinate is integrated out, the returned state is not a spatially resolved state for a later gradient to refocus; this routine is for standalone gradient pairs. Use the imaging context for more sophisticated gradient evolution.
 
-- `spin_system` — Spinach system in Liouville space (`sphten-liouv` or `zeeman-liouv`).
-- `L` — numeric system Liouvillian.
-- `rho` — numeric state vector or matrix of states.
-- `P` — numeric total propagator for events between the two gradients.
-- `g_amps` — two real gradient amplitudes in Gauss/cm.
-- `s_len` — positive real sample length in cm.
-- `g_durs` — two real, non-negative gradient durations in seconds.
-- `s_facs` — two real, non-negative gradient shape factors; use `[1 1]` for square pulses.
+## Inputs and units
 
-The effective gradient operators are built from the carrier frequencies, sample length, pulse amplitudes, durations, and shape factors; frequency shifts are ignored. The Liouvillian must commute with each effective gradient operator to within the source's `1e-6` norm check, or the function errors.
+- `spin_system`, `L`, and `rho`: a Liouville-space spin system, its Liouvillian, and the state vector. The source accepts the `sphten-liouv` and `zeeman-liouv` formalisms.
+- `P`: the source describes this as the total propagator for all events between the two gradients.
+- `g_amps`: two real gradient amplitudes in gauss/cm; the source header calls these a row vector, while validation checks for two elements.
+- `s_len`: positive sample length in cm.
+- `g_durs`: two real, non-negative gradient durations in seconds.
+- `s_facs`: two real, non-negative shape factors. Keep the documented `[1 1]` for square gradient pulses.
 
-## Output
+## What the implementation does
 
-- `rho` — state vector or state matrix integrated over the sample coordinate after the gradient sandwich.
+The effective gradient operators use `1e-4 * shape_factor * gradient_amplitude * sample_length * duration * (carrier / magnet)`; the source warns that shifts are ignored. Before propagating, it checks that `L*G_i - G_i*L` has `cheap_norm` no greater than `1e-6` for each effective gradient operator; otherwise it errors. The state is evolved under `L` for each gradient duration, while a block evolution combines the gradient operators with `P` and maps the result back to the state-vector space. The half-gradient evolution factors account for the normalized sample integral.
 
-This function is intended for standalone gradient pairs. Use the imaging context for more sophisticated gradient evolution.
+The routine calls `report` with a progress message. It contains no explicit plotting or file-writing operation.
 
 ## References
 

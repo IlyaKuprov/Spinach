@@ -1,24 +1,21 @@
 # examples/esr_liq_pulsed/pulse_acquire_benzoquinone.m
 
-- Signature: `pulse_acquire_benzoquinone()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/pulse_acquire_benzoquinone.m) · [Figure 1 reference](https://doi.org/10.1002/mrc.1260280313)
 
-## Purpose
+## Call and result
 
-Simulate pulse-acquire FFT ESR of the 2-methoxy-1,4-benzoquinone radical in the liquid state, set to reproduce Figure 1 in http://dx.doi.org/10.1002/mrc.1260280313. A common linewidth is represented by a damping relaxation model. Calculation time: seconds.
+Call **pulse_acquire_benzoquinone()** with no arguments. It has no output arguments: the function builds local FID and spectrum variables, then opens a figure with **kfigure** and **plot_1d**. It does not save a data file. The source describes the calculation as taking seconds.
 
-## Physical / mathematical content
+## Spin system and relaxation
 
-- The spin system contains one electron and six protons at a magnet induction of 0.33 T. The electron's scalar Zeeman value is 2.004577; its six proton couplings are specified in mT and converted to Hz with `mt2hz`.
-- Relaxation uses diagonal damping at a rate of 1e6, with zero equilibrium. The first three protons form an `S3` symmetry group in the basis specification.
+The system is specified inline: one electron (**E**) and six protons (**1H**), with magnetic-induction setting **sys.magnet=0.33** and electron scalar Zeeman value **2.004577**. The six electron–proton scalar-coupling entries are **mt2hz(0.08)** three times, then **mt2hz(-0.059)**, **mt2hz(-0.364)**, and **mt2hz(-0.204)**. This represents the source-described 2-methoxy-1,4-benzoquinone radical in liquid state.
 
-## Numerical / algorithmic content
+The common-linewidth relaxation model uses **'damp'**, diagonal retention, zero equilibrium, and **inter.damp_rate=1e6**. The basis is **sphten-liouv** with no approximation, longitudinal **1H**, projection **+1**, and **S3** symmetry over spins **[2 3 4]**.
 
-- The simulation uses `liquid` with the `acquire` sequence in ESR mode. The initial state and detection operator are both the electron `L+` state.
-- Acquisition specifies a −1e7 Hz offset, a 3e7 Hz sweep, and 1024 points. No apodisation is applied; the FID is Fourier transformed with 4096-point zero filling and `fftshift`.
-- The real part of the spectrum is plotted with a GHz lab-frame axis; the parameters request a derivative spectrum and inverted axis.
+## ESR acquisition
 
-## Implementation structure
+The initial state and receiver are both **state(spin_system,'L+','E')**; the detected spin is **E** and the decoupling list is empty. Offset is **-1e7**, sweep **3e7**, point count 1024, and zero-fill 4096. The axis label is **'GHz-labframe'**, and derivative and axis inversion are both 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies **'none'** apodisation, computes **fftshift(fft(fid,parameters.zerofill))**, and plots the real spectrum.
 
-- Define the magnet induction, isotope list, scalar Zeeman value, and electron–proton couplings.
-- Configure damping relaxation and a `sphten-liouv` basis without approximation, then create the Spinach spin system and basis.
-- Set acquisition and plotting parameters, simulate the FID, apply no apodisation, Fourier transform it, and plot the real spectrum.
+## Dependencies and limits
+
+Requires Spinach system/basis/state construction, **mt2hz**, liquid ESR/acquire, apodisation, FFT, and plotting routines. Unlike the log-import examples, all spin-system parameters are supplied in this function; it reads no external spin-system file. It defines no explicit pulse shape, duration, or amplitude—the pulse-acquire calculation is represented by the **@acquire** liquid-ESR call. The field, damping, offset, sweep, and coupling values above are reproduced as coded; the source does not annotate their units. The axis-unit setting is explicit.

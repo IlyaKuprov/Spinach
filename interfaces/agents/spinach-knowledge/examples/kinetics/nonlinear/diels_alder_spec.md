@@ -1,22 +1,17 @@
 # examples/kinetics/nonlinear/diels_alder_spec.m
 
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/nonlinear/diels_alder_spec.m
+
 - Signature: `diels_alder_spec()`
 
-## Purpose
+## Model and scope
 
-Repeated pulse-acquire experiment during the Diels–Alder cycloaddition of acetylene to butadiene, demonstrating the nonlinear kinetics module. Calculation time: hours; GPU use is hard-coded.
+This script couples a second-order Diels-Alder model, `acetylene (A) + butadiene (B) -> cyclohexadiene (C)`, to proton spin dynamics. It imports A, B, and C from `acetylene.out`, `butadiene.out`, and `cyclohexadiene.out`; each `g2spinach` call passes 31.8 as its third argument (the script does not state its unit), with a minimum imported J coupling of 2.0 Hz. Ethanol (D) is a six-proton solvent subsystem; the script does not assign it coordinates. The source assigns three 7.0 Hz couplings from ethanol protons 1-3 to protons 4-5. The groups occupy spins 1-2, 3-8, 9-16, and 17-22, respectively.
 
-## Physical / mathematical content
+The concentration model starts at `[0.01, 0.02, 0, 17.1] mol/L` for `[A, B, C, D]`. Its reaction generator uses `rrc=25.0`; the source comment labels this value `mol/(L*s)`. D remains a spectator. Concentrations are advanced over 0-10 s in 100 LG4 steps and plotted for A, B, and C only. For the spin model, the field is 14.1 T; Redfield and T1/T2 relaxation are configured with secular retention and zero equilibrium. Correlation times are 1e-12, 20e-12, 50e-12, and 5e-12 s for A-D; solvent R1 and R2 entries are set to 0.5.
 
-DFT output supplies the spin systems for acetylene (A), butadiene (B), and cyclohexadiene (C); natural-abundance ethanol (D) is added as solvent. The second-order reaction A + B → C is coupled to the spin evolution, while ethanol is not a reactant. The rate constant is 25 mol/(L·s), and concentration-weighted product/reactant spin systems are evolved with the time-dependent reaction generators. Redfield/T1-T2 relaxation is configured, with nonzero rates assigned to the solvent spins.
+## Acquisition and output
 
-## Numerical / algorithmic content
+The concentration-weighted spin trajectory uses the A+B -> C reaction generators and a two-point Lie step. Nine 1H pulse-acquire simulations start at integer times 0-8 s; each applies a pi/2 Ly pulse and evolves 4096 points at 4000 Hz with offset 2370 Hz. The script places the evolution arrays on the GPU, applies exponential apodisation with parameter 6, zero-fills to 16384 points, and plots a waterfall of real spectral intensity versus chemical shift (ppm) and start time (s).
 
-Concentrations are integrated for 10 s in 100 steps using the LG4 stepper, then interpolated to supply the reaction-dependent generators. The spin trajectory uses a two-point Lie quadrature. Nine pulse-acquire experiments (at integer-second time points 0–8 s) run in a `parfor` loop; each uses a GPU-resident evolution and 4096 acquired points at 4000 Hz. The collected FIDs are apodised and Fourier transformed with 16384-point zero filling for a ppm waterfall plot.
-
-## Implementation structure
-
-- Imports the three molecular spin systems from `acetylene.out`, `butadiene.out`, and `cyclohexadiene.out`; adds six-spin ethanol.
-- Sets B₀ = 14.1 T, greedy parallelisation, and reaction rate constant 25 mol/(L·s).
-- Starts at [0.01, 0.02, 0, 17.1] mol/L for A, B, C, and D; ethanol is excluded from the concentration-kinetics plot and reaction.
-- Sets acquisition offset 2370 Hz, sweep 4000 Hz, 4096 points, and 16384-point zero filling.
+This describes the configured example, not an independently established reaction yield or experimental spectrum. The source header estimates hours of calculation and notes hard-coded GPU use.

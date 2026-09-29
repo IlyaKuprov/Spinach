@@ -1,31 +1,42 @@
 # kernel/utilities/path_trace.m
 
-- Signature: `projectors=path_trace(spin_system,L,rho)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/path_trace.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/path_trace.m)
 
 ## Purpose
 
-`path_trace` treats the supplied Liouvillian as a graph adjacency matrix, finds its weakly connected subgraphs, and returns projectors into independently evolving populated subspaces.
+Liouvillian path tracing. Treats the user-supplied Liouvillian as the adjacency matrix of a graph, computes the weakly connected subgraphs of that graph and returns a cell array of projectors into independently evolving populated subspaces.
 
-## Parameters
+## Behavior
 
-- `spin_system` — supplies run settings, tolerances, and basis formalism.
-- `L` — Hamiltonian or Liouvillian matrix.
-- `rho` — initial state for source-state screening or detection state for destination-state screening. Pass `[]` to disable population screening.
+- Syntax: `projectors=path_trace(spin_system,L,rho)`.
+- Input consistency is enforced by an internal `grumble` subfunction: both `L` and `rho` must be numeric, `L` must be square, and if `rho` is non-empty its row count must match the column count of `L`.
+- If `'pt'` appears in `spin_system.sys.disable`, path tracing is disabled and a unit projector `{1}` is returned after a warning.
+- If `size(L,2)` is smaller than `spin_system.tols.merge_dim`, path tracing is skipped and a unit projector `{1}` is returned.
+- The connectivity matrix is built as `G=(abs(L)>spin_system.tols.liouv_zero)`, then symmetrized with its transpose and combined with the identity so isolated states are not lost: `G=or(G,transpose(G)); G=or(G,speye(size(G)))`.
+- Weakly connected subgraphs are obtained with `scomponents(G)`; the number of subspaces is `max(member_states)`.
+- If `rho` is non-empty, subspace population screening runs in a `parfor` loop using `spin_system.tols.subs_drop`:
+  - For the `'sphten-liouv'` and `'zeeman-liouv'` formalisms (Liouville space, state vectors), a subspace is important when `norm(rho.*(member_states==n),1)>tolerance`.
+  - For the `'zeeman-hilb'` formalism (Hilbert space, state matrices), a subspace is important when either `norm(rho(member_states==n,:),1)>tolerance` or `norm(rho(:,member_states==n),1)>tolerance`.
+  - Any other formalism specification raises the error `'unexpected formalism specification.'`.
+- Projectors into significant subspaces are built as sparse matrices of size `size(L,1)` by the subspace dimension, with columns selecting the member state indices.
+- Dimension statistics are reported per unique subspace dimension, followed by the total number of kept subspaces and their total dimension.
+- Unless `'merge'` is in `spin_system.sys.disable`, small subspaces are merged into batches using `binpack(subspace_dims,spin_system.tols.merge_dim)`; the projectors in each bin are horizontally concatenated into a single projector, and the resulting working subspace dimensions are reported. If merging is disabled, a warning is printed and the unmerged projectors are kept.
+- The returned projectors are intended to be used as `L_reduced=P'*L*P` for matrices and `rho_reduced=P'*rho` for state vectors.
 
-## Outputs
+## Inputs and outputs
 
-`projectors` is a cell array of projectors. For a projector `P`, use `L_reduced=P'*L*P` for matrices and `rho_reduced=P'*rho` for state vectors.
+Inputs:
 
-## Algorithm and run conditions
+- `spin_system` — spin system object supplying `spin_system.sys.disable`, `spin_system.bas.formalism`, and the tolerances `spin_system.tols.liouv_zero`, `spin_system.tols.subs_drop`, and `spin_system.tols.merge_dim`.
+- `L` — Hamiltonian or Liouvillian matrix; must be numeric and square.
+- `rho` — the initial state (source state screening) or the detection state (destination state screening); pass `[]` to disable screening. If non-empty, must be numeric with row count consistent with `L`.
 
-The function requires numeric `L` and `rho`, a square `L`, and, when `rho` is nonempty, matching dimensions between the columns of `L` and the rows of `rho`. If `pt` is in `spin_system.sys.disable`, or if `size(L,2)<spin_system.tols.merge_dim`, it skips path tracing and returns the unit projector `{1}`.
+Outputs:
 
-Otherwise, it forms a connectivity matrix from `abs(L)>spin_system.tols.liouv_zero`, symmetrizes it, adds the identity to retain isolated states, and finds connected components with `scomponents`. All components are retained when `rho` is empty. With a nonempty `rho`, components are retained when their population exceeds `spin_system.tols.subs_drop`: `sphten-liouv` and `zeeman-liouv` use the 1-norm of the corresponding entries of the state vector; `zeeman-hilb` checks both corresponding rows and columns of the state matrix. An unexpected formalism raises an error.
+- `projectors` — a cell array of projectors into independently evolving populated subspaces, to be used as `L_reduced=P'*L*P` (matrices) and `rho_reduced=P'*rho` (state vectors).
 
-The function builds sparse projectors for retained components and reports their dimensions. Unless `merge` is in `spin_system.sys.disable`, it groups small subspaces using `binpack(subspace_dims,spin_system.tols.merge_dim)` and concatenates their projectors into working subspaces.
+## References
 
-## Further information
-
-- http://dx.doi.org/10.1063/1.3398146
-- http://dx.doi.org/10.1016/j.jmr.2011.03.010
-- https://spindynamics.org/wiki/index.php?title=path_trace.m
+- [http://dx.doi.org/10.1063/1.3398146](http://dx.doi.org/10.1063/1.3398146)
+- [http://dx.doi.org/10.1016/j.jmr.2011.03.010](http://dx.doi.org/10.1016/j.jmr.2011.03.010)
+- Spin Dynamics Wiki: [https://spindynamics.org/wiki/index.php?title=path_trace.m](https://spindynamics.org/wiki/index.php?title=path_trace.m)

@@ -1,30 +1,19 @@
 # interfaces/comsol/comsol_velo.m
 
-- Signature: `mesh=comsol_velo(mesh,file_name)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/comsol_velo.m) · [Spinach Wiki: comsol_velo.m](https://spindynamics.org/wiki/index.php?title=comsol_velo.m)
 
-## Purpose
+## Purpose and call
 
-Imports ASCII 2D flow velocity files produced by COMSOL. Syntax: mesh=comsol_velo(mesh,file_name)
+`mesh = comsol_velo(mesh,file_name)` reads vertex velocities from a COMSOL ASCII flow-velocity export and adds them to an existing mesh structure, normally one returned by `comsol_mesh`.
 
-## Physical / mathematical content
+## Accepted input and transformation
 
-The imported `mesh.u` and `mesh.v` values are velocity components at mesh vertices. The velocity-file vertex coordinates must match `mesh.x` and `mesh.y`.
+`file_name` must satisfy `ischar`. The file must contain a `% Nodes:` readout-count line followed by that many numeric rows with five columns. For each row, columns 1 and 2 are read as x and y coordinates, columns 4 and 5 as the two velocity components; column 3 is ignored. The routine compares the file's coordinate vectors with `mesh.x` and `mesh.y` in their existing order. It raises an error if either vector's 1-norm difference exceeds `1e-6`; it does not reorder or interpolate the readouts.
 
-## Numerical / algorithmic content
+## Output and units
 
-Requires `file_name` to be a character string. Reads the velocity-readout count from the `% Nodes:` line, then parses each five-column row as vertex coordinates and velocity components. Rejects coordinates that differ from `mesh.x` or `mesh.y` by more than `1e-6` in 1-norm; otherwise stores the velocities in `mesh.u` and `mesh.v`.
+The returned mesh is the input structure with `mesh.u` and `mesh.v` added as column vectors at the vertices. Coordinate and velocity numbers are copied without unit conversion, so their units are those of the COMSOL export. The function returns the updated structure and no separate status value.
 
-## Parameters / inputs
+## Guardrails
 
-- mesh -mesh object produced by comsol_mesh()
-- file_name -a character string
-
-## Outputs
-
-- the following fields are added to the mesh object
-- mesh.u, mesh.v -column vectors with velocities
-- at each vertex of the mesh
-
-## Implementation structure
-
-Validates `file_name`, opens the file, finds `% Nodes:` to determine the readout count, parses coordinates and velocity components, and closes the file. It checks the coordinates against the mesh before assigning `mesh.u` and `mesh.v`.
+The explicit file-name check is `ischar(file_name)`; coordinate consistency is checked by the stated aggregate tolerance. The input mesh is otherwise assumed to provide compatible coordinate vectors.

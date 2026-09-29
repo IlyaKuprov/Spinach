@@ -1,22 +1,17 @@
 # examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_r.m
 
-- Signature: `xix_w_field_profile_ensemble_r()`
+- MATLAB implementation: [examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_r.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_r.m)
 
 ## Purpose
 
-Simulation of a steady-state XiX DNP field profile at a 3.4 T W-band magnet field, averaged over an electron–proton distance ensemble. Calculation time: minutes.
+Run the no-argument MATLAB function `xix_w_field_profile_ensemble_r()` with Spinach and its example helpers available; it calculates a steady-state XiX DNP microwave field profile averaged over an electron–proton distance distribution. The source labels the magnet W-band and sets `sys.magnet=3.4`; its calculation-time estimate is minutes.
 
-## Physical / mathematical content
+## Model and scan
 
-- The model contains an electron and a proton with a trityl electron g-tensor, a proton Zeeman shift, and a temperature of 80 K. At each electron–proton distance, it uses `t1_t2` relaxation with an orientation- and distance-dependent proton longitudinal relaxation rate, and detects the proton `Lz` expectation value. The distance average includes an `r^2` Jacobian.
+The model contains E and 1H with a trityl g-tensor [2.00319 2.00319 2.00258], proton shift [0 0 5] (the source labels the proton value a ppm guess), Euler angles [0 10 0] and [0 0 10] degrees, and spin-temperature value 80. A three-point Gauss–Legendre distance quadrature uses bounds 3.5 and 20; unlike the companion B1-and-distance source, this file does not annotate the distance unit. At each distance the coordinates are updated and `r1n_dnp` provides orientation- and distance-dependent proton longitudinal relaxation using additional parameters `2.00230`, `1e-3`, and `52`; the source sets `r1_rates={1e3 r1n_rate}`, `r2_rates={200e3 50e3}`, `t1_t2`, `rlx_keep='diagonal'`, and `equilibrium='dibari'`. The basis is `sphten-liouv` without approximation, with propagator chop tolerance `1e-12`.
 
-## Numerical / algorithmic content
+The electron nutation frequency is fixed at 20e6 Hz; this variant averages distance only, not a B1 ensemble. At every distance it evaluates a 201-point offset scan from −300e6 to 300e6 Hz using `powder(spin_system,@xixdnp_steady,parameters,'esr')`. The XiX train uses 18 ns pulses, 10 blocks, an inverted second-pulse phase ( `pi` ), shot spacing 167e−6, additional shift −33e6, and powder grid `rep_2ang_800pts_sph`. The distance profiles are combined with Gauss–Legendre weights multiplied by `r^2`, the radial Jacobian, then normalized by the weighted sum.
 
-- Three Gauss–Legendre points span electron–proton distances from 3.5 to 20. For each distance, the code constructs a spin system in an unrestricted `sphten-liouv` basis and calls `powder` with `@xixdnp_steady` over 201 microwave resonance offsets from −300 to 300 MHz. It combines the resulting profiles using the quadrature weights and `r^2` weighting.
+## Output and dependencies
 
-## Implementation structure
-
-- Set the magnet field, electron and proton isotopes, Zeeman interactions, temperature, basis, and propagator tolerance.
-- Generate the distance quadrature and microwave-offset grid.
-- For each distance, set Cartesian coordinates and relaxation, construct the spin system, and configure proton detection and XiX experiment parameters, including the microwave power, spherical grid, pulse duration, ten blocks, phase, shot spacing, and additional shift.
-- Run the steady-state powder simulation, average over distance, plot the real proton expectation value against microwave offset, and save `xix_w_field_profile_ensemble_r.fig`.
+The real part of the distance-averaged DNP value is plotted as the proton `Lz` expectation value against microwave offset in MHz and saved to `xix_w_field_profile_ensemble_r.fig`. The driver uses Spinach's system, basis, detection, and powder functions and calls `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. It saves the plot as a MATLAB figure, not a separate numeric result file.

@@ -1,20 +1,20 @@
 # examples/giant_spin/dy_lft_single_2.m
 
-- Signature: `dy_lft_single_2()`
+- MATLAB implementation: [examples/giant_spin/dy_lft_single_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/dy_lft_single_2.m)
+
+- Source: [examples/giant_spin/dy_lft_single_2.m](../../../../../examples/giant_spin/dy_lft_single_2.m)
+- Signature: `dy_lft_single_2()` (no input or output arguments)
 
 ## Purpose
 
-A demonstration that most lanthanide complexes are in the ZFS limit for the purposes of relaxation theory. One of the figures from our forthcoming papers on the subject. Calculation time: hours.
+Demonstrates the zero-field-splitting (ZFS) limit for relaxation theory in a single-lanthanide model; the source describes it as a figure from forthcoming papers. The source estimates calculation time in hours; it was not timed here.
 
-## Physical / mathematical content
+## Spin model and construction
 
-- The source models a single `E16` Dy ion with a real g-tensor, a 1.0 T magnet setting, and MOLCAS ligand-field parameters at ranks 2, 4, and 6. It rotates those tensors into the molecular frame and uses zero Euler angles for the resulting Spinach giant-spin tensors.
+The system is one `E16` Dy ion with `sys.magnet=1.0`. A real anisotropic g tensor is built from `D=[1.322766699, 1.324261429, 1.328750739]` and the source rotation matrix `V`. The MOLCAS ligand-field arrays at ranks 2, 4, and 6 are converted with `icm2hz` and `stev2sph`, rotated using the Euler angles derived from `R`, and supplied through `inter.giant.coeff`; the associated giant-spin Euler angles are zero.
 
-## Numerical / algorithmic content
+The basis uses `formalism='zeeman-hilb'` and `approximation='none'`, followed by `create` and `basis`.
 
-- The Stevens coefficients are converted with `icm2hz` and `stev2sph`, then rotated with the Wigner matrix for each rank before being supplied to Spinach. The spin system uses the `zeeman-hilb` formalism with no basis approximation.
-- The source calls `fieldscan_enlev` with `parameters.fields=[0 500]`, `parameters.npoints=1000`, `parameters.orientation=[0 0 0]`, and `parameters.nstates=16`.
+## Field scan
 
-## Implementation structure
-
-- Defines the Dy g-tensor and rotated rank-2, rank-4, and rank-6 MOLCAS ligand-field tensors, builds the Spinach system, and performs the specified energy-level field scan.
+The script calls `fieldscan_enlev` with `fields=[0 500]`, `npoints=1000`, `orientation=[0 0 0]`, and `nstates=16`. The source does not state units for the field endpoints or orientation. This is an energy-level scan: the function has no output arguments, and the call does not capture or plot a returned spectrum. The MOLCAS ligand-field arrays are passed through `icm2hz`; the source does not label their input units.

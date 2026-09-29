@@ -1,18 +1,13 @@
 # experiments/esr_dipolar/deer_3p_hard_echo.m
 
-- Signature: `echo=deer_3p_hard_echo(spin_system,parameters,H,R,K)`
+This is an echo-window sampler for the three-pulse DEER experiment, not a routine that constructs a complete DEER trace. The source describes its diagnostic use: locating an echo that may be narrow in simulation and, for high-spin electrons, displaced from its expected position. It uses the supplied hard-pulse operators as-is; their spin or transition selectivity is determined by the caller.
 
-## Purpose and sequence
+## Sequence and detection
 
-Sample a three-pulse hard-pulse echo window. Starting from `parameters.rho0`, apply the probe `pi/2` pulse and evolve for `parameters.tb`; apply the pump `pi` pulse and evolve for `parameters.ta-parameters.tb`; apply the probe `pi` pulse, evolve for `parameters.ta-parameters.tc/2`, then detect with `parameters.coil` over the window `parameters.tc` using `parameters.nsteps` samples. `H`, `R` and `K` define the supplied evolution; this routine does not construct a dipolar interaction.
+Starting from `parameters.rho0`, the function applies `parameters.ex_prob` at `pi/2`, evolves for `parameters.tb`, applies `parameters.ex_pump` at `pi`, evolves for `parameters.ta-parameters.tb`, then applies `parameters.ex_prob` at `pi`. After that pulse it evolves for `parameters.ta-parameters.tc/2` and records the observable with `parameters.coil` across an interval of `parameters.tc` using `parameters.nsteps` samples. Thus the third pulse is at time `parameters.ta`, and the sampled window is centered at `2*parameters.ta` relative to the sequence start. Here `parameters.ta` is the first-to-third-pulse time, `parameters.tb` the first-to-second-pulse time, and `parameters.tc` the acquisition-window width; all are in seconds.
 
-## Parameters and output
+The required fields are `parameters.ex_prob` (probe operator), `parameters.ex_pump` (pump operator), `parameters.rho0` (initial state), `parameters.coil` (detection state), `parameters.ta`, `parameters.tb`, `parameters.tc`, and `parameters.nsteps` (positive integer sample count). The context supplies `H`, `R`, and `K` as same-sized matrices; they form `L=H+1i*R+1i*K`. The source checks the timing constraints `parameters.tb<=parameters.ta` and `parameters.tc/2<=parameters.ta`.
 
-- `parameters.ex_prob` and `parameters.ex_pump`: probe and pump pulse operators.
-- `parameters.ta`, `parameters.tb` and `parameters.tc`: sequence timing values in seconds.
-- `parameters.rho0`: initial state; `parameters.nsteps`: number of points across the detection window; `parameters.coil`: detection operator.
-- Returns `echo`, the sampled observable across the echo window.
+The return value `echo` is the sampled signal with the requested number of points. The source does not state its array orientation, numeric units, or whether a caller should interpret the signal as real or complex. It specifies this three-pulse sequence only; it does not define a CPMG/CP, Bruker, or four-pulse timing scheme.
 
-## Input requirements
-
-`H`, `R` and `K` must be same-sized matrices. `parameters.ta`, `parameters.tb` and `parameters.tc` must be positive, `parameters.tb <= parameters.ta`, `parameters.tc/2 <= parameters.ta`, and `parameters.nsteps` must be a positive integer.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_hard_echo.m

@@ -1,21 +1,25 @@
 # examples/dnp_sol/steady_state/xix_w_field_profile_single.m
 
-- Signature: `xix_w_field_profile_single()`
+- MATLAB implementation: [examples/dnp_sol/steady_state/xix_w_field_profile_single.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_w_field_profile_single.m)
 
 ## Purpose
 
-Simulate a steady-state XiX DNP field profile for a single electron–proton spin system without ensemble averaging. The source estimates a calculation time of seconds.
+The source header estimates the calculation time as seconds.
 
-## Physical / mathematical content
+`xix_w_field_profile_single()` calculates the steady-state XiX DNP proton response versus microwave resonance offset for one electron–proton spin system. It has no distance or microwave-field ensemble. The run still calls `powder` on `rep_2ang_800pts_sph`, so orientations are sampled with that configured grid.
 
-- The system contains an electron and a proton at 3.4 T and 80 K, with trityl electron g-tensor and estimated proton Zeeman parameters. Their Cartesian coordinates place them 3.5 units apart in the supplied coordinate system. The model uses `t1_t2` relaxation, including a distance- and orientation-dependent proton R1 rate calculated by `r1n_dnp`.
+## Model and sequence
 
-## Numerical / algorithmic content
+The system is an electron (`E`) and `1H` at a W-band magnet setting of `3.4`. The electron Zeeman principal values are `[2.00319 2.00319 2.00258]`; the proton shift is the stated `[0 0 5]` ppm guess. The Euler angles are `[0 10 0]` and `[0 0 10]` degrees, converted to radians in the script. Spin temperature is `80`; the coordinates place the electron at the origin and proton at `[0 0 3.5]` (the coordinate unit is not stated).
 
-- The calculation uses an unrestricted `sphten-liouv` basis and diagonal relaxation. It detects proton `Lz` while sweeping 201 electron offsets from −300 to 300 MHz. The experiment specifies a spherical grid, ten XiX blocks, and an inverted second-pulse phase; `powder` runs `xixdnp_steady` with the `'esr'` option.
+The relaxation setup uses `t1_t2`, `r1n_dnp` for the distance/orientation-dependent electron–nuclear contribution, `r1_rates={1e3 r1n_rate}`, `r2_rates={200e3,50e3}`, diagonal relaxation retention, and the Di Bari equilibrium. The function selects the full `sphten-liouv` basis with no approximation, disables hygiene, and sets `prop_chop=1e-12`.
 
-## Implementation structure
+## Run parameters and output
 
-- Define the magnet, spins, Zeeman interactions, temperature, coordinates, relaxation, basis, and propagator tolerance.
-- Create the Spinach spin system and set the proton detection state and XiX experiment parameters.
-- Run the steady-state calculation, plot the real proton `Lz` expectation value against microwave resonance offset, and save `xix_w_field_profile_single.fig`.
+The detected operator is proton `Lz`. The XiX parameters are electron nutation frequency `20e6 Hz`, pulse duration `18e-9 s`, `10` XiX DNP blocks, second-pulse phase `pi` (commented as inverted), shot spacing `167e-6`, and additive shift `-33e6`. The offset scan has 201 points from `-300e6` to `300e6` in the source; the plot expresses the horizontal axis in MHz.
+
+`powder(spin_system,@xixdnp_steady,parameters,'esr')` supplies the steady-state calculation. The script plots the real proton `I_z` expectation against resonance offset and saves `xix_w_field_profile_single.fig`.
+
+## Dependencies and scope
+
+The entry point depends on Spinach system construction, basis, state, powder, and plotting helpers, plus `r1n_dnp` and the XiX sequence function `xixdnp_steady`. The file defines a single parameter set and offset profile; it does not compute distance- or B1-ensemble averages.

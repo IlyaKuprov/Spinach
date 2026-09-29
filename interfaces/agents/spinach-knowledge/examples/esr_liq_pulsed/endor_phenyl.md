@@ -1,23 +1,17 @@
 # examples/esr_liq_pulsed/endor_phenyl.m
 
-- Signature: `endor_phenyl()`
+- Call: `endor_phenyl()` (no arguments; settings are defined in the function).
+- Source: [`examples/esr_liq_pulsed/endor_phenyl.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/endor_phenyl.m)
+- Experimental reference: Kasai, Hedaya & Whipple, “Electron spin resonance study of phenyl radicals isolated in an argon matrix at 4°K,” *J. Am. Chem. Soc.* **91** (1969), 4364–4368, [DOI 10.1021/ja01044a008](https://doi.org/10.1021/ja01044a008).
 
-## Purpose
+## Spin system
 
-Simulate liquid-state Mims ENDOR of the phenyl radical. The isotropic g-factor (2.0024) and proton hyperfine couplings—ortho 17.4 G, meta 5.9 G, and para 1.9 G—are taken from Kasai, Hedaya, and Whipple (J. Am. Chem. Soc. 1969, 91, 4364). The two ortho protons and the two meta protons form equivalent pairs treated with S2 x S2 symmetry.
+The source specifies one electron and five ring protons (two ortho, two meta, one para), with isotropic electron g-factor 2.0024 and experimental proton couplings: ortho 17.4 G, meta 5.9 G, para 1.9 G. In code these are converted to mT arguments for `mt2hz` (1.74, 0.59, and 0.19, respectively), using the phenyl g-factor. The ortho and meta pairs are equivalent and use direct-product `S2 x S2` symmetry; the para proton is not included in a symmetry pair. The source sets `sys.magnet=0.33` without annotating that field value's unit. It uses `sphten-liouv` and `approximation='none'`.
 
-## Physical / mathematical content
+## Simulation and output
 
-- The spin system contains one electron and five ring protons: two ortho, two meta, and one para.
-- The magnetic field is 0.33 T. Isotropic electron–proton hyperfine couplings are converted from 1.74, 0.59, and 0.19 mT to Hz using `mt2hz` and the phenyl-radical g-factor.
+The liquid-state Mims ENDOR call is `liquid(spin_system,@endor_mims,parameters,'esr')`. Parameters set offset 0, 512 points, sweep `3e8`, `tau=100e-9` (100 ns), zero filling to 4096, spin channel `{'E'}`, and axis units MHz. The source mean-centres the FID, applies Kaiser apodisation with parameter 6, Fourier-transforms, then plots the spectrum magnitude and labels the axis “Nuclear frequency, MHz”. It opens a figure but does not save the FID or spectrum to a file. The source estimates a calculation time of seconds.
 
-## Numerical / algorithmic content
+## Scope and caveats
 
-- The basis uses `sphten-liouv` formalism with `approximation='none'`; `bas.sym_group` and `bas.sym_spins` specify the two equivalent proton pairs.
-- Mims ENDOR is simulated with `liquid(spin_system,@endor_mims,parameters,'esr')`. Parameters specify zero offset, 512 points, a 300 MHz sweep, `tau=100 ns`, 4096-point zero filling, electron detection, and MHz axis units.
-- The mean is subtracted from the simulated FID, which is then apodised with a Kaiser window of parameter 6. The code applies `fft`, centers the result with `fftshift`, and plots the spectrum magnitude against nuclear frequency in MHz.
-
-## Implementation structure
-
-- Define the field, isotopes, isotropic g-factor, and hyperfine couplings; configure the basis and symmetry; create the spin system; run the ENDOR simulation; process and plot the spectrum.
-- The source comments give a calculation time of seconds.
+The experimentally reported G values and their mT conversions are both retained above; do not read the code's converted inputs as if they were reported directly in G. The source does not specify units for `sys.magnet` or `parameters.sweep`, and it provides no explicit relaxation model.

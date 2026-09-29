@@ -1,29 +1,31 @@
 # kernel/utilities/min_int_type.m
 
-- Signature: `type=min_int_type(max_val,issigned)`
+Source: [kernel/utilities/min_int_type.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/min_int_type.m)
 
 ## Purpose
 
-Minimum integer data type sufficient to store the specified value. Useful in many indexing operations in the Spinach kernel where double precision would be a massive overkill. Syntax: type=min_int_type(max_val,issigned)
+Returns the minimum MATLAB integer data type sufficient to store a specified maximum value. The header comment notes this is useful in many indexing operations in the Spinach kernel where double precision would be a massive overkill.
 
-## Physical / mathematical content
+## Behavior
 
-- Selects the smallest built-in MATLAB signed or unsigned integer class whose positive range covers `max_val`.
+- Syntax: `type=min_int_type(max_val,issigned)`.
+- The function first runs a consistency check (`grumble`) on the inputs.
+- For `'signed'`, it compares `max_val` against `intmax` of `int8`, `int16`, `int32`, and `int64` in ascending order, returning the first type whose maximum covers `max_val`; if `max_val` exceeds `intmax('int64')`, it errors with `Matlab's signed integer types cannot go that far.`
+- For `'unsigned'`, it compares `max_val` against `intmax` of `uint8`, `uint16`, `uint32`, and `uint64` in ascending order, returning the first type whose maximum covers `max_val`; if `max_val` exceeds `intmax('uint64')`, it errors with `Matlab's unsigned integer types cannot go that far.`
+- Any other `issigned` value triggers the error `unrecognised sign handling type.`
+- The consistency check requires `max_val` to be numeric, scalar, real, an integer (`mod(max_val,1)~=0` fails), and at least 1; otherwise it errors with `max_val must be a positive real integer.` It also requires `issigned` to be a character array equal to `'signed'` or `'unsigned'`; otherwise it errors with `valid valued for issigned are 'signed' and 'unsigned'.`
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- Compares `max_val` with `intmax` for the signed or unsigned 8-, 16-, 32-, and 64-bit classes, returning the first fit or raising an error if none fits.
+Inputs:
 
-## Parameters / inputs
+- `max_val` — maximum value that the integer type must cover; must be a positive real integer scalar.
+- `issigned` — whether the integer needs to cover negative values; `'signed'` or `'unsigned'`.
 
-- max_val -maximum value that the integer
-- must cover
-- issigned -whether the integer needs to
-- cover the negative values:
-- 'signed' or 'unsigned'
-- Output:
-- type -Matlab data type to use
+Output:
 
-## Implementation structure
+- `type` — MATLAB data type to use (`'int8'`, `'int16'`, `'int32'`, `'int64'`, `'uint8'`, `'uint16'`, `'uint32'`, or `'uint64'`).
 
-- Requires a positive real integer `max_val` and `issigned` equal to `signed` or `unsigned`, then checks the corresponding integer classes in increasing width.
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=min_int_type.m>

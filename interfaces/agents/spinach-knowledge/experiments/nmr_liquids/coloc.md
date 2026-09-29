@@ -1,34 +1,28 @@
 # experiments/nmr_liquids/coloc.m
 
-- Signature: `fid=coloc(spin_system,parameters,H,R,K)`
+- MATLAB source: [experiments/nmr_liquids/coloc.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/coloc.m)
+- Spinach Wiki: [coloc.m](https://spindynamics.org/wiki/index.php?title=coloc.m)
+- Sequence reference: [DOI 10.1016/0022-2364(84)90136-7](https://doi.org/10.1016/0022-2364(84)90136-7)
 
 ## Purpose
 
-COLOC NMR pulse sequence implementing Fig. 1b of [the cited paper](https://doi.org/10.1016/0022-2364(84)90136-7), with the dashed pulses during the delta(2) period omitted. The delay delta(1) defaults to half of the maximum F1 evolution time implied by the sweep width; delta(2) is specified by the caller and is typically `40e-3` seconds.
+COLOC as shown in Fig. 1b of the cited paper, with the dashed pulses during the delta2 interval omitted. The code prepares an embedded echo in the F1 evolution period, selects proton coherence, transfers it during delta2, then detects on the second spin. The output is an FID intended for magnitude-mode processing; this description is of the implemented sequence, not a measured outcome. All sequence delays and readout evolve under `L=H+1i*R+1i*K`.
 
-## Physical / mathematical content
+## Inputs and parameters
 
-- The initial state is longitudinal magnetisation on `parameters.spins{1}`; the sequence applies a 90-degree x pulse, then samples an embedded echo over the F1 grid. At each point it evolves for half the current t1, applies pi pulses about x to spins 1 and 2, then evolves for `delta1 - t1/2`.
-- The resulting stack is selected for coherence order -1 on spin 1, rotated by 90 degrees about x on spin 1 and about y on spin 2, evolved for delta(2), and selected for coherence order +1 on spin 2. Spin 1 is decoupled and the signal is detected on spin 2.
-- The effective Liouvillian is `L = H + 1i*R + 1i*K`, matching the function's Hamiltonian, relaxation, and kinetics inputs.
+Signature: fid=coloc(spin_system,parameters,H,R,K)
 
-## Numerical / algorithmic content
+- parameters.sweep: positive [F1 F2] sweep widths in Hz.
+- parameters.npoints: positive integer point counts [F1 F2].
+- parameters.spins: two isotope labels {F1 F2}; the source gives {'13C','1H'} as an example. The sequence starts on spin 1 and detects on spin 2.
+- parameters.delta2: required COLOC delay in seconds; the source gives 40e-3 seconds as a typical value.
+- parameters.delta1: optional echo delay in seconds. If omitted, the code sets it to (npoints(1)-1)/(2*sweep(1)), half the maximum F1 evolution time. A supplied value must be at least that large.
+- H, R, and K: same-size Hamiltonian, relaxation, and kinetics matrices from the context function; the routine requires sphten-liouv formalism.
 
-- The indirect evolution times are `t1 = (0:npoints(1)-1)/sweep(1)`; the echo is split around the pi-pulse pair as described above. Direct-dimension acquisition uses the reciprocal second sweep width and `npoints(2)` points.
-- The implementation requires the `sphten-liouv` formalism. `H`, `R`, and `K` must be numeric matrices of the same dimensions.
+## Sequence and readout
 
-## Parameters / inputs
+The initial state is Lz on the first (F1) spin; the coil state is L+ on the second (F2) spin. After a 90-degree x pulse on F1, each F1 increment is embedded in an echo: evolution for half the increment, simultaneous 180-degree x pulses on both spins, and the remaining part of delta1. The source labels its selection block “Proton coherence selection”; the actual projection requests coherence order -1 on `parameters.spins{1}` (the first configured spin). A 90-degree F1 x pulse and F2 y pulse precede delta2; the code then selects order +1 on F2, decouples F1, and records the F2 observable evolution at 1/sweep(2) spacing for npoints(2) points.
 
-- `parameters.sweep`: two positive sweep widths `[F1 F2]`, in Hz.
-- `parameters.npoints`: two point counts `[F1 F2]`.
-- `parameters.spins`: two spin labels `{F1 F2}` (for example, `'13C'` and `'1H'`).
-- `parameters.delta2`: COLOC delta(2) delay, typically `40e-3` seconds.
-- `parameters.delta1`: optional COLOC delta(1) delay in seconds; when supplied it must be at least half the maximum t1. If omitted, the implementation sets it to `(npoints(1)-1)/(2*sweep(1))`.
-- `H`, `R`, and `K`: same-sized Hamiltonian, relaxation, and kinetics matrices, respectively, supplied by the context function.
+For natural-abundance simulations, the source recommends isotope dilution via dilute.m.
 
-## Outputs
-
-- `fid`: free induction decay for magnitude-mode processing.
-- Natural-abundance simulations should use isotope dilution; see `dilute.m`.
-
-[Spinach Wiki: coloc.m](https://spindynamics.org/wiki/index.php?title=coloc.m)
+No MATLAB execution or experimental signal is claimed here.

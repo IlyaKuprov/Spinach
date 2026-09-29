@@ -1,30 +1,24 @@
 # kernel/overloads/@polyadic/polyadic.m
 
-- Signature: `p=polyadic(cores)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/polyadic.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=polyadic.m)
 
-## Purpose
+## Signature
 
-Constructs a matrix as a sum of Kronecker-product terms whose factors remain unopened. For example, `cores={{A,B,C},{D,E}}` represents `kron(A,kron(B,C)) + kron(D,E)`. Multiplicative actions can be computed without explicitly expanding those products; the source comment notes that this can save orders of magnitude in CPU time.
+`p=polyadic(cores)`
 
-## Physical / mathematical content
+## Representation
 
-The `cores` property stores sums of Kronecker-product terms; `prefix` and `suffix` properties hold matrices applied from the left and right.
+`cores` is a cell array of cell arrays. Each outer cell holds one summand; its inner cell holds the factors of that summand’s Kronecker product. Thus `cores={{A,B,C},{D,E}}` represents `kron(A,kron(B,C)) + kron(D,E)`. Matrix factors may themselves be polyadic objects. The class also initializes empty `prefix` and `suffix` cell arrays for later matrix-composition factors.
 
-## Numerical / algorithmic content
+The Kronecker products are stored unopened: the source states that multiplicative actions can be performed without opening them, potentially saving orders of magnitude in CPU time. This is a factorized representation, not an eagerly expanded sum.
 
-- The constructor checks core consistency, stores `cores`, and validates the resulting object.
+## Inputs and checks
 
-## Parameters / inputs
+- `cores`: must be a cell array, and each outer element must also be a cell array; otherwise the constructor raises the corresponding `cores must be a cell array.` or `elements of cores must also be cell arrays.` error.
+- After assigning `cores`, the constructor calls `validate(p)` to validate the constructed object. The constructor itself does not state additional dimension rules.
 
-- `cores`: a cell array of cell arrays containing matrix factors whose Kronecker products form the terms of the represented matrix.
+## Output
 
-## Outputs
+- `p`: the polyadic object containing the supplied factorization.
 
-- `p`: a polyadic representation of the matrix.
-- Note: nested polyadics are permitted -the input matrices may be
-- polyadics themselves.
-
-## Implementation structure
-
-- Checks that `cores` is consistent.
-- Stores the cell array in `p.cores` and validates the constructed object.
+No complex conjugation, scalar broadcasting, or Kronecker-product expansion is performed by this constructor. Related overloads: [prefix](./prefix.md), [simplify](./simplify.md), and [size](./size.md).

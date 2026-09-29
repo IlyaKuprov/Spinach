@@ -1,33 +1,25 @@
 # kernel/optimcon/ensemble.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/ensemble.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ensemble.m)
+
 - Signature: `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)`
 
-## Purpose
+## Purpose and objective
 
-A parallel wrapper around GRAPE for ensemble optimal control optimisation. It handles multiple control power levels, resonance offsets, multistate transfers, and ensembles of drift Liouvillians.
+Evaluates the GRAPE figure of merit for every selected case in the ensemble catalog, distributes cases across the workers, and reduces their outputs on the client. Each case is passed the configured `control.fidelity` method. The returned fidelity is the arithmetic mean of the per-case fidelities; requested gradients and Hessians are summed across cases and divided by the case count. The gradient has the waveform shape and the Hessian is a square matrix with one row and column per waveform sample.
 
-## Physical / mathematical content
+The cases are defined by the catalog built in `optimcon.m`: state-target pairs, drift generators, power levels, resonance-offset combinations, phase-cycle rows and distortion functions. Per-case transformations and the chain rule for distortions are handled by `ens_block.m`.
 
-GRAPE propagates fidelity derivatives through a piecewise-constant pulse sequence for gradient-based optimisation of waveform samples.
+## Inputs and constraints
 
-## Numerical / algorithmic content
+- `waveform`: real numeric control coefficients in rad/s, with `ncontrols` rows. It has `pulse_nsteps` columns for the rectangle integrator and `pulse_nsteps + 1` for the trapezium integrator. The wrapper checks type and shape but does not explicitly test sample finiteness.
+- `spin_system`: spin system whose ensemble problem has been prepared by `optimcon.m`. If `control.return_traj` is absent, the wrapper sets it to `false`.
 
-Parallel execution distributes ensemble cases across workers. The per-case propagation and derivative calculations run in `ens_block.m`; each worker sums its gradients, Hessians, and trajectories before the results are collected. This matters for large Spinach operators arising from basis expansion or powder or spatial lifting.
-
-## Parameters / inputs
-
-- `waveform` — control coefficients for each control operator, in rad/s.
-- `spin_system` — spin system containing the ensemble control problem prepared by `optimcon.m`.
+Call from the client on the same parallel pool that was open when `optimcon.m` ran. The function rejects calls from a worker or a changed pool, modified frozen generators/operators, or a changed ensemble composition. A Hessian request requires the rectangle integrator and no waveform distortions.
 
 ## Outputs
 
-- `traj_data` — trajectory data for diagnostic plotting. Trajectories are returned in catalog order, or as an ensemble average when the `average` trajectory option is selected.
-- `fidelity` — ensemble-averaged figure of merit for overlap between the current and desired state(s). With penalty methods, an array separates penalties from simulation fidelity.
-- `gradient` — ensemble-averaged fidelity gradient with respect to the control sequence. With penalty methods, an array separates penalty gradients from the fidelity gradient.
-- `hessian` — ensemble-averaged fidelity Hessian with respect to the control sequence. With penalty methods, an array separates penalty Hessians from the fidelity Hessian.
-
-## Ensemble worker data flow
-
-Cases in `spin_system.control.catalog` are assigned contiguous per-worker blocks by `optimcon.m` in `spin_system.control.worker_cases`. Each worker holds the common frozen problem and its block's drift generators as pool constants. At each objective evaluation, only the waveform and live control fields travel to the workers; per-case physics runs in `ens_block.m`. Call `ensemble` from the client using the same pool that was open when `optimcon.m` ran, because each worker holds only its own block.
-
-[Source documentation](https://spindynamics.org/wiki/index.php?title=ensemble.m)
+- `traj_data`: an `n_cases x 1` cell array of per-case trajectory structures in catalog order. If `'average'` is in `control.traj_opts`, returns a one-element cell containing a structure whose `forward` member is the ensemble-mean forward trajectory.
+- `fidelity`: scalar mean figure of merit over catalog cases.
+- `gradient`: mean fidelity derivative with respect to waveform samples, with the same dimensions as `waveform`, returned when requested.
+- `hessian`: mean fidelity Hessian with dimensions `numel(waveform) x numel(waveform)`, returned when requested and supported.

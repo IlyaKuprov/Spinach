@@ -1,19 +1,9 @@
 # examples/singlet_states/decoherence_diacetylene.m
 
-- Signature: `decoherence_diacetylene()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/decoherence_diacetylene.m)
 
-## Purpose
+This calculation models diacetylene with two protons and four carbons (4,096-dimensional Liouville space). The spin data are imported from vacuum-DFT coordinates, shifts, couplings and CSAs; the source selects 1H and 13C and passes `[31.8 182.4]` to `g2spinach` as conversion arguments, without assigning units to those values. All dipolar couplings and CSA tensors enter the Redfield relaxation superoperator.
 
-Long-lived spin states in the diacetylene molecule (2 protons, 4 carbons, 4096-dimensional Liouville space). The relaxation superoperator accounts for every dipolar coupling and every CSA tensor in the system. Calculation time: seconds
+The executable field assignment is 14.1 T, although its immediately preceding comment says 1.0 Tesla; this description follows the assignment. The model sets zero equilibrium, keeps relaxation in the lab frame, uses a 100 ps correlation time and sets both relaxation tolerances to 1e-5. It uses the complete, unapproximated `sphten-liouv` basis.
 
-## Physical / mathematical content
-
-For diacetylene with 2 protons and 4 carbons, the Redfield relaxation superoperator includes every dipolar coupling and CSA tensor, and the calculation examines the singlet between the two central carbons.
-
-## Numerical / algorithmic content
-
-In 4,096-dimensional Liouville space, the code lists 20 smallest-magnitude relaxation eigenvalues, evaluates the normalized singlet self-relaxation rate, and analyzes two slowly relaxing eigenvectors.
-
-## Implementation structure
-
-The code imports vacuum-DFT spin data, sets the field to 14.1 T, uses Redfield relaxation with zero equilibrium, lab-frame retention and tau_c=100e-12, sets the relaxation integration and zero tolerances to 1e-5, and builds an untruncated sphten-liouv basis.
+The function displays 20 small-magnitude relaxation eigenvalues, then constructs the normalized singlet operator for the two centre carbons (spin indices 1 and 2) and evaluates `S'*R*S` as its self-relaxation rate. It also finds two low-magnitude eigenvectors and prints their spherical-tensor composition with `stateinfo`. These are model diagnostics; the source contains no reported numerical result, preparation pulse, gradient, storage-time trace or image reconstruction.

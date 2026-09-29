@@ -1,32 +1,23 @@
 # kernel/operators/irr_sph_ten.m
 
-- Signature: `T=irr_sph_ten(mult,k)`
+- Signature: `T=irr_sph_ten(mult)` or `T=irr_sph_ten(mult,k)`
+- DIRECT source: [kernel/operators/irr_sph_ten.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/irr_sph_ten.m)
+- Wiki: [irr_sph_ten.m](https://spindynamics.org/wiki/index.php?title=irr_sph_ten.m)
 
-## Purpose
+## Definition and basis ordering
 
-Constructs single-spin irreducible spherical tensor operators `T(k,m)`.
+For a selected rank `k`, the function returns a `2*k+1`-element cell array of `mult`-by-`mult` spin operators, ordered by decreasing projection: `m=k,k-1,...,-k`. The source documents the component relation `Lz*T(k,m)-T(k,m)*Lz = m*T(k,m)`.
 
-## Physical / mathematical content
+With one input, `irr_sph_ten(mult)` recursively gathers all ranks `k=0,...,mult-1`. The rank-`k` block occupies cell positions `k^2+1` through `(k+1)^2`, so the full result has `mult^2` cells, with ranks increasing and projections decreasing within each rank.
 
-The operators obey the commutation relation `[Lz,T(k,m)]=m*T(k,m)`. For a specified rank `k`, there are `2*k+1` components, returned in decreasing order of projection `m`. With only `mult`, the routine returns every rank from zero through `mult-1`, with decreasing projection within each rank.
+## Construction and normalization
 
-The source notes that operator normalisation is not appropriate for its spin-dynamics convention: use identical commutation relations, rather than equal matrix norms, to make the formalism independent of the spin quantum number.
+For rank zero the sole tensor is `speye(mult)`, with no division by `sqrt(mult)`. For positive rank, `L=pauli(mult)` supplies the raising and lowering matrices. The highest-projection tensor is initialized exactly as `T{1}=((-1)^k)*(2^(-k/2))*L.p^k`. Subsequent components are generated for `n=2,...,2*k+1` by setting `q=k-n+2` and applying
 
-## Numerical / algorithmic content
+`T{n}=(L.m*T{n-1}-T{n-1}*L.m)/sqrt((k+q)*(k-q+1))`.
 
-For rank zero, the component is the identity matrix. For higher ranks, the highest-projection component is formed from the raising operator as `(-1)^k * 2^(-k/2) * L.p^k`; the remaining components are generated sequentially by the lowering-operator commutator using Racah's rule. The one-argument form concatenates these rank-specific cell arrays in increasing rank order.
+Thus the phase and scale of the top component and each ladder normalization are explicit in the source; no further normalization is applied afterward. This routine constructs matrix operators; it does not exponentiate them into propagators.
 
-## Parameters / inputs
+## Inputs
 
-- mult - spin multiplicity; a positive integer.
-- k - irreducible spherical tensor rank (optional); an integer from zero to `mult-1`.
-
-## Outputs
-
-- T - with `mult` and `k`, a cell array of rank-`k` tensors in decreasing projection order; with `mult` alone, a cell array containing all ranks in increasing rank order and decreasing projection within each rank.
-
-## Implementation structure
-
-1. Validate `mult` and, when supplied, `k`.
-2. For a one-argument call, recursively collect the tensors for all ranks from zero to `mult-1`.
-3. For a two-argument call, return the identity for rank zero or generate the rank-`k` components from the highest projection by sequential lowering.
+`mult` must be a finite positive integer. In the two-input form, `k` must be a finite integer satisfying `0<=k<mult`. Calls with any number of inputs other than one or two raise an error. The single-input form returns all of the stated rank blocks.

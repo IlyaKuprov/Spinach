@@ -1,23 +1,12 @@
 # examples/nmr_paramag/carb_anh/s220c_point.m
 
 - Signature: `s220c_point()`
+- Source: [s220c_point.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s220c_point.m)
 
-## Purpose
+## S220C point-centre fit
 
-Fits a point paramagnetic centre to experimental pseudocontact shifts (PCS) for the S220C mutant of human carbonic anhydrase II. The example cites the [study](https://doi.org/10.1039/c6sc03736d) and links to a [step-by-step tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
+This human carbonic anhydrase II example fits the S220C PCS data with a point paramagnetic-centre model. Its source cites the [study](https://doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
-## Physical / mathematical content
+The script loads experimental PCS values and coordinates from `s220c_expt.mat`, then calls `ippcs` with the coordinate data and the supplied vector `[-14 -26 4]`. The fit returns the point location `mxyz`, susceptibility tensor `chi`, and predicted PCS values. It plots predicted against experimental PCS in ppm with a diagonal reference and displays `chi` and `mxyz`; it does not save those results.
 
-- Paramagnetic NMR pseudocontact-shift fitting, with a point-electron location and magnetic-susceptibility tensor as the fitted parameters.
-
-## Numerical / algorithmic content
-
-- Calls `ippcs(xyz,[-14 -26 4],expt_pcs)` using the experimental PCS and coordinate data loaded by the script.
-- Plots experimental against predicted PCS, with a diagonal reference line, and prints the fitted susceptibility tensor and point-electron location.
-
-## Implementation structure
-
-- Load `expt_pcs` and `xyz` from `s220c_expt.mat`.
-- Call `ippcs` with the coordinate data, the vector `[-14 -26 4]`, and experimental PCS.
-- Plot experimental versus predicted PCS and the diagonal reference line.
-- Display the returned susceptibility tensor and point-electron location.
+The source does not identify the observed nucleus, give field or temperature values, or state units for the coordinate vector, fitted centre, or susceptibility tensor. It describes a PCS fit, not a spectral simulation; those unspecified quantities should not be inferred from this script.

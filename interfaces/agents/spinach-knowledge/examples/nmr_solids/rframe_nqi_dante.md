@@ -1,33 +1,16 @@
 # examples/nmr_solids/rframe_nqi_dante.m
 
 - Signature: `rframe_nqi_dante()`
+- Source: [examples/nmr_solids/rframe_nqi_dante.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/rframe_nqi_dante.m)
 
 ## Purpose
 
-DANTE MAS spectrum of a single quadrupolar 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The calculation accounts for the second-order quadrupolar shift and lineshape. Set to reproduce Figure 3d from Calculation time: minutes
+Simulates a DANTE MAS spectrum of one quadrupolar 14N nucleus using a one-dimensional Fokker–Planck equation and a spherical grid. The source says it is set to reproduce Figure 3d of [the cited paper](https://doi.org/10.1016/j.jmr.2012.05.024), and estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Spin system and rotor sampling
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The field parameter is 18.8 and the quadrupolar interaction is constructed as `eeqq2nqi(1.18e6, 0.50, 1, [0 0 0])`; the source does not state units for these interaction arguments. The simulation uses the full spherical-tensor Liouville basis, `singlerot` with the DANTE callback in the lab frame, rate 62.5e3, rotor axis `[1,1,1]`, maximum rank 35, and grid `rep_2ang_200pts_sph`. The selected rotating-frame order is 2. No gradient is configured.
 
-## Numerical / algorithmic content
+## DANTE acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- DANTE MAS spectrum of a single quadrupolar 14N nucleus using 1D
-- Fokker-Planck equation and a spherical grid. The calculation
-- accounts for the second-order quadrupolar shift and lineshape.
-- Set to reproduce Figure 3d from
-- Calculation time: minutes
-- System specification
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
+The initial state is the 14N `Lz` state and the receiver is `L+`. The sequence parameters are pulse duration 1.2e-6, pulse amplitude 88e3, two pulses, and two periods. Acquisition uses sweep 2000000, 1024 points, zero-fill to 4096, and offset 2200; the frequency-axis units are explicitly set to Hz. The FID receives exponential apodisation with parameter 6, is Fourier transformed, and the plotted spectrum is its magnitude.

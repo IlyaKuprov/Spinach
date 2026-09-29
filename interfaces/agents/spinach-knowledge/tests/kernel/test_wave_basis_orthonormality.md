@@ -1,23 +1,27 @@
 # tests/kernel/test_wave_basis_orthonormality.m
 
-- Signature: `result=test_wave_basis_orthonormality()`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_wave_basis_orthonormality.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_wave_basis_orthonormality.m)
 
 ## Purpose
 
-Tests that the sine, cosine, and Legendre waveform bases returned by Spinach have orthonormal columns, as required by pulse optimisation.
+Regression test that verifies the sine, cosine, and Legendre waveform bases returned by Spinach have orthonormal columns, as required by pulse optimisation.
 
-## Physical / mathematical content
+## Behavior
 
-Orthonormal basis columns give independent waveform coefficients.
+- Announces the test target by printing `TESTING: Waveform basis orthonormality`.
+- Initialises a regression test result via `new_test_result` with test name `kernel/wave_basis_orthonormality`, description `Waveform basis orthonormality`, and the numerical target statement `pulse waveform basis columns must be orthonormal.`
+- Iterates over the basis families `sine_waves`, `cosine_waves`, and `legendre`.
+- For each family, builds a waveform basis with `wave_basis(basis_type,5,32)`.
+- Checks orthonormality by comparing the Gram matrix `B'*B` against `eye(5)` using `test_close` with absolute and relative tolerances of `1e-12` each, logging the check under a label of the form `<basis_type> Gram matrix` with the message `orthonormal columns give independent waveform coefficients`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-For each basis, the test constructs `B=wave_basis(basis_type,5,32)` and checks that its Gram matrix `B'*B` equals `eye(5)` within absolute and relative tolerances of `1e-12`.
+- **Outputs:**
+  - `result` — regression test result with explanatory messages.
+- **Inputs:** none (the function takes no arguments).
 
-## Outputs
+## References
 
-- `result` — regression test result with explanatory messages.
-
-## Implementation structure
-
-The test announces its target, creates a regression test result, then checks the `sine_waves`, `cosine_waves`, and `legendre` bases in a loop.
+- `wave_basis` — constructs the waveform bases under test.
+- `new_test_result` — initialises the regression test result object.
+- `test_close` — performs the numerical closeness comparison against the identity Gram matrix.

@@ -1,19 +1,18 @@
 # examples/nmr_paramag/carb_anh/s220c_lcurve.m
 
-- Signature: `s220c_lcurve()`
+- Function: `s220c_lcurve()`
+- Source: [`examples/nmr_paramag/carb_anh/s220c_lcurve.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s220c_lcurve.m)
 
 ## Purpose
 
-Computes an L-curve for the S220C carbonic anhydrase II PCS reconstruction. The source cites the [method paper](http://dx.doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
+Selects a smoothing parameter for the distributed PCS-density reconstruction of the S220C mutant of human carbonic anhydrase II. The source cites method paper DOI [10.1039/c6sc03736d](https://doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
-## Physical / mathematical content
+## Inputs and scan
 
-Examines the trade-off between PCS fit error and density regularisation in the distributed inverse problem.
+Loads `expt_pcs`, `xyz`, and `xyz_all` from `s220c_expt.mat`, plus `chi` from `s220c_chi_eff.mat`. It sets the `ipcs` equation to `kuprov`, enables GPU execution, and configures box centre [-16.0, -25.5, 6.0], box size [50.0, 50.0, 50.0], margins 50 in six directions, confinement [2.0, 12.0], and sharpening 0.0.
 
-## Numerical / algorithmic content
+The scan contains 30 logarithmically spaced values from 0.01 to 100 in `lam`. A parallel loop calls `ipcs(parameters,64,lam(n))` for each value and records the returned error and regularisation terms; the regularisation term is divided by `lam(n)` before analysis. `lcurve(lam,err,reg,'log')` plots the L-curve and returns the suggested smoothing parameter, which is displayed.
 
-Sets `parameters.gpu=true()` and evaluates 30 logarithmically spaced values `10.^linspace(-2,2,30)` in a `parfor` loop. Each call uses `ipcs(parameters,64,lam(n))`; the routine collects error and regularisation values, divides the latter by `lam(n)`, and calls `lcurve(lam,err,reg,'log')`.
+## Scope and limitations
 
-## Implementation structure
-
-Loads experimental PCS and coordinates from `s220c_expt.mat` plus `chi` from `s220c_chi_eff.mat`. The solver uses equation `kuprov`, box centre `[-16.0 -25.5 6.0]`, box size `[50.0 50.0 50.0]`, confinement `[2.0 12.0]`, and sharpening `0.0`; it displays the suggested smoothing parameter.
+This example scans the regularisation parameter for one fixed grid size, 64; it does not perform the three-grid refinement used by `s220c_kuprov`. The source specifies no measured nuclei, field, temperature, coordinate units, or tensor units. The listed geometry values do not carry units in the source, and no fitted parameter value is reported as a fixed result.

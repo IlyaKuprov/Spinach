@@ -1,26 +1,23 @@
 # experiments/nmr_liquids/noesyhsqc.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/noesyhsqc.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=noesyhsqc.m)
+
 - Signature: `fid=noesyhsqc(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and sequence
 
-Phase-sensitive NOESY-HSQC. The sequence is hard-wired to {F1,F2,F3} = {1H,15N,1H}, with carbon decoupled throughout. The source cites [10.1021/bi00441a004](https://doi.org/10.1021/bi00441a004), [10.1016/0022-2364(90)90227-Z](https://doi.org/10.1016/0022-2364(90)90227-Z), [10.1002/9780470034590.emrstm0563](https://doi.org/10.1002/9780470034590.emrstm0563), and [10.1016/j.jmr.2014.04.002](https://doi.org/10.1016/j.jmr.2014.04.002). The first citation is the NOESY-HMQC precursor noted by the source.
+A phase-sensitive NOESY-HSQC sequence hard-wired to `{F1,F2,F3}={1H,15N,1H}`, with carbon decoupled throughout when `13C` is present. The source cites [the NOESY-HSQC reference](https://doi.org/10.1021/bi00441a004), [the earlier precursor](https://doi.org/10.1016/0022-2364(90)90227-Z), [the handbook chapter](https://doi.org/10.1002/9780470034590.emrstm0563), and [the later article](https://doi.org/10.1016/j.jmr.2014.04.002). It initializes proton longitudinal magnetisation internally and uses proton L+ detection; the header notes that the relaxation destination is the zero state, not a thermalised state.
 
-## Sequence and output
-
-The routine starts from proton longitudinal magnetization (`Lz`) and assumes an unthermalised relaxation superoperator whose destination is the zero state. It decouples carbon when present, discretizes three evolution dimensions, and uses a J-transfer interval `delta = abs(1/(4*parameters.J))`. The NOESY stage separates the two proton coherence pathways, applies homospoil and mixing under relaxation and kinetics, then performs HSQC transfer. Forward density trajectories and backward detection trajectories are joined with `stitch`; the resulting dimensions are permuted to [F3 F2 F1].
-
-- Output: `fid`, with fields `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg` for subsequent States quadrature processing.
-- The implementation requires `sphten-liouv` formalism and both 1H and 15N isotopes in the spin system.
+The code evolves the NOESY t1 period with nitrogen decoupled, explicitly branches the proton coherence into +1 and −1 components, applies 90° x pulses, homospoils, and evolves the NOESY mixing time under decoupled relaxation and kinetics. It then performs the HSQC transfer with two periods of `delta=1/(4*abs(J))`, combined proton/nitrogen 180° pulses, and the listed y/x pulses, before applying the final nitrogen 90° pulse. In the backward detection trajectory it selects zero proton coherence and splits nitrogen coherence into +1 and −1. Four forward/backward combinations are stitched into the States-processing fields; this description follows the explicit coherence projections and operations in the source rather than assigning additional pathways.
 
 ## Inputs
 
 - `parameters.npoints`: three positive integer point counts ordered [t1 t2 t3].
-- `parameters.sweep`: three positive sweep widths ordered [f1 f2 f3], in Hz.
-- `parameters.J`: non-zero real HSQC-stage J-coupling in Hz.
-- `parameters.tmix`: non-negative NOESY mixing time in seconds.
-- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices supplied by the context function; they must have matching dimensions.
+- `parameters.sweep`: three positive sweep widths in Hz ordered [f1 f2 f3].
+- `parameters.J`: HSQC-stage J coupling in Hz; the transfer delay is `abs(1/(4*J))` seconds.
+- `parameters.tmix`: NOESY mixing time in seconds.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices from the context function. The required isotope set is `1H` and `15N`; `13C` is decoupled if present.
 
-## Reference link
+## Output
 
-[Spinach Wiki: noesyhsqc.m](https://spindynamics.org/wiki/index.php?title=noesyhsqc.m)
+The four fields `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg` are used for subsequent States quadrature processing. Each sampled three-dimensional FID is permuted by the source to [t3 t2 t1], i.e. array dimensions `[npoints(3), npoints(2), npoints(1)]`.

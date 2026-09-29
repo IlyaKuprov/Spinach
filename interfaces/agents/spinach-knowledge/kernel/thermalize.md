@@ -2,25 +2,18 @@
 
 - Signature: `R=thermalize(spin_system,R,HLSPS,T,rho_eq,method)`
 
-## Purpose
+## Purpose and methods
 
-Modifies the relaxation superoperator to drive the system to the user-specified target state using the inhomogeneous master equation (IME) formalism, or to the equilibrium state of the lab-frame Hamiltonian at the specified temperature using the DiBari-Levitt formalism.
+Modifies a relaxation superoperator `R` to drive a chosen stationary state. The two accepted methods modify `R` differently:
 
-## Parameters / inputs
+- `method='IME'`: requires a nonempty numeric column `rho_eq` and a Liouville-space formalism. In `sphten-liouv`, `U` selects the first basis coordinate; in `zeeman-liouv`, `U` is the vectorized identity. The update is `R=R-kron(U',R*rho_eq)`.
+- `method='dibari'`: requires a nonempty square `HLSPS` and positive real scalar temperature `T`. With `beta=spin_system.tols.hbar/(spin_system.tols.kbol*T)`, the update is `R=R*propagator(spin_system,HLSPS,1i*beta)`. This branch uses the lab-frame Hamiltonian supplied by the caller.
 
-- `spin_system` - Spinach spin system structure.
-- `R` - symmetric negative-definite relaxation superoperator that drives the system toward the zero state vector; it may be obtained from `relaxation.m` when `inter.equilibrium` is `'zero'`.
-- `HLSPS` - lab-frame Hamiltonian left-side product superoperator, available from `hamiltonian.m` (and `orientation.m` if needed); pass an empty array for IME.
-- `T` - absolute temperature; pass an empty array for IME.
-- `rho_eq` - thermal equilibrium state; pass an empty array for DiBari-Levitt.
-- `method` - `'IME'` for the inhomogeneous master equation or `'dibari'` for DiBari-Levitt thermalisation.
+## Input checks
 
-## Output
+`R` must be numeric and square. Before either method, `norm(R*unit_state(spin_system),2)>1e-10` is rejected as already thermalized. For `dibari`, `norm(HLSPS*unit_state(spin_system),2)<1e-8` is rejected as apparently a commutation superoperator. The source checks these conditions and returns the modified operator; it does not calculate `rho_eq` in the IME branch.
 
-- `R` - thermalized relaxation superoperator.
+## References
 
-## Behavior
-
-The function validates the inputs and rejects an `R` that already acts on the unit state within its tolerance. For IME, it constructs the unit state according to the Liouville-space formalism and applies the correction `R = R - kron(U', R*rho_eq)`. For DiBari-Levitt, it computes `beta = hbar/(kbol*T)` and applies `R = R*propagator(spin_system,HLSPS,1i*beta)`.
-
-IME requires the population of the unit state in the state vector to be exactly 1; the function cannot check or enforce this. The DiBari-Levitt method is computationally expensive, but tends to work better than IME, particularly in exotic regimes.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/thermalize.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=thermalize.m)

@@ -1,30 +1,23 @@
 # kernel/plotting/volplot.m
 
-- Signature: `volplot(data_cube,axis_ranges,clip_ranges)`
+- Source: [kernel/plotting/volplot.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/volplot.m)
+- Wiki: [volplot.m](https://spindynamics.org/wiki/index.php?title=volplot.m)
+- Paper cited in the source: [DOI 10.1039/C4CP03106G](http://dx.doi.org/10.1039/C4CP03106G)
 
 ## Purpose
 
-Volumetric 3D plot of a scalar field. Sign is mapped to colour and amplitude to opacity, with separate scaling for positive and negative values. Displaying the colour bar is recommended.
+Render a real scalar field as a volumetric 3D plot: sign determines colour and magnitude determines opacity. The source recommends displaying a colour bar, but the function does not add one.
 
-## Parameters / inputs
+## Inputs
 
-- `data_cube` — real 3D numeric array ordered as `[X Y Z]`, with at least two points along each dimension.
-- `axis_ranges` — real six-element vector `[xmin xmax ymin ymax zmin zmax]`; each minimum must be less than its maximum. Defaults to `[-1 1 -1 1 -1 1]` if omitted.
-- `clip_ranges` — optional real two-element vector of positive and negative clipping fractions, respectively. Each element must be in `(0,1]`; the default is `[1 1]`. Clipping can be useful for steep functions.
+- `data_cube` is a real numeric 3D array ordered as `[X Y Z]`, with at least two samples along each dimension.
+- `axis_ranges` is `[xmin xmax ymin ymax zmin zmax]`; each lower bound must be less than its upper bound. It defaults to `[-1 1 -1 1 -1 1]`.
+- `clip_ranges` gives the positive and negative clipping fractions, respectively. It defaults to `[1 1]`; both values must lie in `(0,1]`.
 
-## Outputs
+## Scaling and rendering
 
-The function produces a figure; it has no return value.
+Positive and negative data are normalized independently: the positive maximum maps to `1`, and the magnitude of the negative minimum maps to `-1`. A clipping fraction below 1 caps that sign at the requested fraction and remaps the retained range to the full sign interval. The source permutes the cube for surface plotting, draws orthogonal stacks of `surf` planes, and uses absolute scaled values for opacity. Values with magnitude below `1/64` in a plotted plane are changed to `NaN` so that they are not rendered. The blue-white-red colour map represents sign; the colour scale is fixed at `[-1 1]`.
 
-## Numerical / algorithmic content
+## Figure effects
 
-Positive values are divided by their positive maximum and mapped into `[0,1]`; negative values are scaled by the magnitude of their negative minimum and mapped into `[-1,0]`. If a corresponding clipping fraction is less than one, values beyond that fraction are clipped and the remaining values remapped to the same interval. The function reports these scaling and clipping operations in the command window.
-
-The array is permuted to match the `surf`/`meshgrid` convention. The figure is drawn from surfaces parallel to the XY, XZ, and YZ planes. Values with magnitude below `1/64` are omitted from each plane. Surface colour represents the signed value, while alpha data uses its absolute value.
-
-The plot uses a blue–white–red colormap and fixes colour limits at `[-1 1]`. Its default alpha map is interpolated, divided by five, and set to zero where the resulting opacity is below `0.01`. Axis extents come from `axis_ranges`, independently of the plotted geometry; the plot uses equal data aspect ratios, perspective projection, a grid, and X, Y, and Z labels.
-
-## Links
-
-- [volplot.m documentation](https://spindynamics.org/wiki/index.php?title=volplot.m)
-- [Pseudocontact-shift paper linked in the source](http://dx.doi.org/10.1039/C4CP03106G)
+The function clears the current figure with `clf`, draws into its axes, and changes the figure colour map and alpha map. It sets the requested axis extents independently of plotted geometry, equal data aspect, perspective projection, grid, and X/Y/Z labels, then turns hold off. It returns no value and writes no file; it does not create the recommended colour bar.

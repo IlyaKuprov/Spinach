@@ -1,24 +1,15 @@
 # examples/esr_sol_swept/fieldsweep_nitroxide.m
 
-- Signature: `fieldsweep_nitroxide()`
+[Source code](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_swept/fieldsweep_nitroxide.m) · Function: `fieldsweep_nitroxide()`
 
-## Purpose
+This example computes a field-swept EPR spectrum of a nitroxide by finding resonance fields and transition moments; the source estimates seconds for the calculation. The model contains an electron (`E`) and one `14N` nucleus. The electron Zeeman tensor is diagonal with entries `[2.01045, 2.00641, 2.00211]`. The electron–nitrogen coupling matrix is `[1.2356 0 0.6322; 0 1.1266 0; 0.6322 0 8.2230]*1e7`; the source gives no unit annotation for these entries.
 
-Compute a field-swept nitroxide EPR spectrum from resonance fields and transition moments. The source notes a calculation time of seconds.
+## Calculation and scan
 
-## Physical / mathematical content
+The example uses the `zeeman-hilb` formalism with `bas.approximation='none'`, samples orientations on `rep_2ang_100pts_sph`, and calls `fieldsweep`. It is a field-swept spectrum calculation rather than a pulse sequence. The initial state `-state(spin_system,'Lz','E')` is described in the source as the high-temperature approximation.
 
-- The spin system contains an electron (`E`) and a nitrogen-14 nucleus (`14N`).
-- The electron has an anisotropic Zeeman tensor with diagonal elements 2.01045, 2.00641, and 2.00211. The electron–nitrogen coupling tensor, scaled by `1e7`, has diagonal elements 1.2356, 1.1266, and 8.2230 and symmetric x–z elements of 0.6322.
-- The calculation uses the `zeeman-hilb` formalism without a basis approximation and starts from `-state(spin_system,'Lz','E')` for the high-temperature approximation.
+The supplied scan values are `mw_freq=9e9` (unit not annotated in this file), field window `[0.316 0.326]`, and `npoints=1024`. The plotted field axis is labelled tesla, so the window is a magnetic-field interval in the plotted axis. Other inputs are `fwhm=1e-5` (unit not stated), `int_tol=10.0`, `tm_tol=0.1`, and `rspt_order=Inf`. The source comments that `sys.magnet=1` is required.
 
-## Numerical / algorithmic content
+## Output and scope
 
-- `fieldsweep` evaluates the spectrum using the `rep_2ang_100pts_sph` orientation grid, a 9 GHz microwave frequency, and `rspt_order=Inf`.
-- The magnetic-field window is 0.316–0.326 T with 1024 points. The specified linewidth and tolerances are `fwhm=1e-5`, `int_tol=10.0`, and `tm_tol=0.1`.
-
-## Implementation structure
-
-- Set the isotopes and `sys.magnet=1`, then populate the Zeeman and coupling tensors.
-- Create the spin system with `create`, apply the basis with `basis`, set the experiment parameters and initial state, and call `[spec,parameters]=fieldsweep(spin_system,parameters)`.
-- Plot `spec` against `parameters.b_axis`, labeling magnetic field in tesla and intensity in arbitrary units.
+`fieldsweep` returns the spectrum `spec` and scan parameters; the example plots intensity in arbitrary units against `parameters.b_axis` in tesla. This is the two-spin model encoded in the example, not a general nitroxide conformational or solvent model. To represent a different nitroxide, update its interaction tensors and scan inputs rather than interpreting the plotted line shape as universal.

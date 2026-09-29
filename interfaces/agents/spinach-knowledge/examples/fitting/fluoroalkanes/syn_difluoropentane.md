@@ -1,19 +1,19 @@
 # examples/fitting/fluoroalkanes/syn_difluoropentane.m
 
+- MATLAB implementation: [examples/fitting/fluoroalkanes/syn_difluoropentane.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fitting/fluoroalkanes/syn_difluoropentane.m)
+
 - Signature: `syn_difluoropentane()`
 
-## Purpose
+## Purpose and experimental convention
 
-Fits the 1H NMR spectrum of syn-2,4-difluoropentane with respect to J-couplings. The source also simulates and fits the corresponding 19F and two 1H data sets. See the paper: https://doi.org/10.1021/acs.joc.4c00670. The source notes a calculation time of hours.
+Fit the three source-provided spectra for syn-2,4-difluoropentane: a 19F trace and two 1H traces. The source scales the experimental traces before fitting: fluorine to peak height 7, proton A to peak height 4 followed by a −0.1 offset, and proton B to peak height 10. See [10.1021/acs.joc.4c00670](https://doi.org/10.1021/acs.joc.4c00670); the source estimates hours of calculation.
 
-## Physical and mathematical content
+The entry point loads `syn_dfp_fluorine.mat`, `syn_dfp_proton_a.mat`, and `syn_dfp_proton_b.mat`, each with `axis_ppm` and `spec`. The source initial guess is `[6.2780 23.5067 5.1361 7.0537 24.9899 16.9264 48.0475 1.6017 -14.5413 0.7437 0.8771 0.6311]`; `fminsearch` uses `MaxIter=5000` and unlimited function evaluations. The first nine parameters populate grouped scalar couplings; the final three scale the 19F, 1H A, and 1H B simulations.
 
-The model contains ten 1H and two 19F spins, with chemical shifts and scalar couplings parameterised for the fit. The two equivalent three-proton groups are represented with S3 symmetry. Experimental spectra are loaded, scaled/shifted, and compared with Spinach simulations; the fitted vector controls couplings and signal scaling.
+## Spin system and simulation
 
-## Numerical and algorithmic content
+The model has ten `1H` and two `19F` spins at `sys.magnet=11.7464`, with a Zeeman–Hilbert basis, no approximation, and `S3` symmetry for proton indices 1–3 and 10–12. Three `liquid`/`acquire` simulations observe 19F, 1H A (spins 4 and 8), and 1H B (spins 6 and 7), with no decoupling. The source sets their offset/sweep/point-count/zero-fill tuples to (−81655, 300, 512, 2048), (2426, 128, 256, 1024), and (986, 350, 512, 2048), respectively; axes are labeled ppm. Fixed Gaussian apodisation arguments are 7, 7, and 6 for the channels, with fitted scale factors applied before Fourier transformation. The theoretical spectra are converted to ppm and interpolated to their experimental axes with `pchip`.
 
-The objective is the sum of squared spectral residual norms for the 19F spectrum and both 1H spectra. The script searches the supplied initial parameter vector with `fminsearch`. Simulated FIDs are apodised, Fourier transformed, converted to frequency axes, interpolated onto the experimental axes, and plotted against the data.
+## Entry point and output
 
-## Implementation structure
-
-The function loads the three experimental data files, prepares the initial guess and optimiser options, then calls the local error function. That function builds the spin system and symmetry-adapted basis, configures separate 19F and 1H acquisitions, simulates the three spectra, processes them, and returns the combined least-squares error.
+Run `syn_difluoropentane()` with all three MAT files available. The objective is the unweighted sum of squared residual norms over the three spectra. The function returns no declared output; it displays the parameter vector and produces three reversed-ppm panels comparing experiment and simulation. No fitted numerical outcome, uncertainty estimate, or success criterion is given in the source. The source does not attach units to its Gaussian apodisation arguments.

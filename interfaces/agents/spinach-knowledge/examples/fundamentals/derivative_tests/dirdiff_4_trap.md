@@ -1,22 +1,21 @@
 # examples/fundamentals/derivative_tests/dirdiff_4_trap.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_4_trap.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_4_trap.m)
+
 - Signature: `dirdiff_4_trap()`
 
-## Purpose
+## Question tested
 
-Check directional derivatives of the phase-modulated GRAPE module with the trapezium integrator.
+For phase-modulated GRAPE with the trapezium integrator, does the analytical derivative of the first fidelity component with respect to selected phase samples agree with a centred finite difference?
 
-## Physical / mathematical content
+## Setup
 
-The test checks how the GRAPE fidelity changes with selected phase-waveform samples. Spin systems are constructed in the `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms.
+The script repeats the comparison for `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, using the system returned by `dirdiff_test_system`. The control configuration uses isotope `13C`, channel map `[1;1]`, drift `H`, controls `Lx` and `Ly`, initial states {Sx,Sy,Sz}, and target states {-Sz,Sy,Sx}. It sets power levels to `2*pi*linspace(50e3,70e3,10)`, method `lbfgs`, maximum iterations 1000, and an empty plotting list. The trapezium grid has four entries, `12.8e-6*ones(1,4)`, while the amplitude vector and random phase guess each have five entries; the guess is `randn(1,5)/3`. The finite-difference increment is `h=sqrt(eps('double'))`.
 
-## Numerical / algorithmic content
+## Comparison and observable
 
-For the left edge, midpoint, and right edge of a random five-sample phase waveform, the analytical gradient from `grape_phase` is compared with a centered finite difference using `sqrt(eps('double'))`. Each relative discrepancy must be below `1e-6`.
+For phase entries 1, 3, and 5, the script forms `g_num=(fid_plus(1)-fid_minus(1))/(2*h)`, where `fid_plus` and `fid_minus` are the first fidelity entries returned by `grape_phase` at guesses differing by +h and -h in that entry. It compares this with the corresponding analytical-gradient entry from `grape_phase`. Each comparison uses the strict condition `abs(g_anl-g_num)/abs(g_num) < 1e-6`; the script prints a formalism-specific passed message or raises an error for that sample.
 
-## Implementation structure
+## Scope
 
-- Configure phase-modulated controls with the trapezium integrator, L-BFGS method, unit amplitudes, and `12.8e-6` s pulse intervals.
-- Obtain the analytical gradient for a random five-element phase waveform.
-- Perturb waveform entries 1, 3, and 5 in both directions and compare the finite-difference gradients with the corresponding analytical entries.
-- Raise an error for any failed edge or midpoint check.
+Only the left edge, right edge, and middle sample of the five-element phase vector are checked in each formalism. This is not a check of every gradient coordinate or a reported result for a test run.

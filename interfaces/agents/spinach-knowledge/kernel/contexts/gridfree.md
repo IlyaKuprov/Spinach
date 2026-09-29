@@ -1,45 +1,25 @@
 # kernel/contexts/gridfree.m
 
 - Signature: `answer=gridfree(spin_system,pulse_sequence,parameters,assumptions)`
+- Source: [kernel/contexts/gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/gridfree.m)
+- Wiki: [gridfree.m](https://spindynamics.org/wiki/index.php?title=gridfree.m)
 
-## Purpose
+## Contract
 
-Fokker-Planck magic angle spinning and SLE context. Generates a Liouvillian superoperator and passes it to the pulse sequence function, which should be supplied as a handle.
+`gridfree` builds a Fokker–Planck Liouvillian for magic-angle spinning and stochastic Liouville equation (SLE) simulations, then calls the pulse-sequence handle with `(spin_system,parameters,H,R,K)`. The sequence's return value is the context output; the context itself does not prescribe its shape.
 
-## Physical / mathematical content
+The spin subspace has dimension `spn_dim=size(H,1)`. The SLE orientation subspace has dimension `spc_dim`, obtained from the spatial operators, and the combined Fokker–Planck dimension is `spn_dim*spc_dim`. The spatial basis is the Wigner-D-function basis used by the SLE operators, not a sampled spherical `parameters.grid` (that field is rejected here). The context reports the powder average of the pulse-sequence result. It is restricted to the Liouville formalisms `zeeman-liouv` and `sphten-liouv`.
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- The context calls `relaxation(spin_system)` and `kinetics(spin_system)` and includes their operators in the enlarged state space. Rotational correlation times for SLE are specified by `parameters.tau_c`; `inter.tau_c` is used by the Redfield theory module.
+## Spin and orientation inputs
 
-## Numerical / algorithmic content
+`assumptions` is applied before constructing the Hamiltonian. `parameters.spins` lists channel spins in channel order; the documented example is `{'1H','13C'}`. `parameters.offset` supplies the matching transmitter offsets in Hz and defaults to zero offsets when omitted. `parameters.add_terms`, when present, is a cell array of {c,A} pairs; each `c*A` is added to the isotropic spin Hamiltonian after frequency offsets.
 
-- The context obtains spatial operators from `sle_operators`, combines isotropic and anisotropic spin terms with spatial operators, and adds rotation and rotational diffusion operators when their parameters are specified.
+For spinning, `parameters.rate` is in Hz: positive values denote JEOL rotation and negative values Varian/Bruker rotation. `parameters.axis` is a normalized three-component axis; the implementation normalizes it before forming the rotation term, which is `2*pi*rate` times the axis-weighted SLE angular-momentum operators. `parameters.max_rank` truncates the Wigner-D ranks. Increase it until convergence; the source notes that slower spinning requires higher ranks and gives the number of spinning sidebands as an approximate starting scale.
 
-## Parameters / inputs
+For rotational diffusion, `parameters.tau_c` is in seconds. A scalar specifies isotropic diffusion; a symmetric positive-definite 3-by-3 correlation-time tensor specifies anisotropic diffusion, with rotational diffusion tensor `inv(6*tau_c)`. For this SLE context the correlation times belong in `parameters.tau_c`, not `inter.tau_c` (the latter is for Redfield theory).
 
-- `pulse_sequence` — a function handle to a pulse sequence in the experiments directory.
-- `assumptions` — a string passed to `assume.m` when the Hamiltonian is built.
-- `parameters` — a structure with the following subfields:
-  - `.rate` — spinning rate in Hz: positive for JEOL, negative for Varian and Bruker, due to different rotation directions.
-  - `.axis` — spinning axis, given as a normalized 3-element vector.
-  - `.spins` — a cell array of spins involved in the pulse sequence, e.g. `{'1H','13C'}`.
-  - `.offset` — a cell array of transmitter offsets in Hz for the spins listed in `parameters.spins`.
-  - `.max_rank` — maximum D-function rank retained in the solution. Increase until convergence is achieved; it is approximately equal to the number of spinning sidebands in the spectrum.
-  - `.tau_c` — rotational diffusion correlation times in seconds: a single number for isotropic diffusion or a symmetric positive-definite 3x3 correlation-time tensor for anisotropic diffusion. The rotational diffusion tensor is `inv(6*tau_c)`.
-  - `.add_terms` — optional cell array of two-element cell arrays `{c,A}`; each term `c*A` is added to the isotropic spin Hamiltonian after frequency offsets have been applied.
-  - `.*` — additional subfields may be required by the pulse sequence; check its documentation.
-- The parameters structure is passed to the pulse sequence with `parameters.spc_dim` (matrix dimension of the spatial dynamics subspace) and `parameters.spn_dim` (matrix dimension of the spin dynamics subspace) set.
+If the sequence requests `iso_eq`, the context constructs thermal equilibrium from the isotropic Hamiltonian and replaces any supplied `parameters.rho0`. Initial and detection states are placed in the `D[0,0,0]` component before the sequence call. The context also sets `parameters.spc_dim` and `parameters.spn_dim` for the sequence.
 
-## Outputs
+## Example from the source documentation
 
-- Returns the powder average of whatever the pulse sequence returns.
-- The Wigner D-function rank truncation level depends on the spinning rate: slower spinning requires greater ranks.
-- Rotational correlation times for SLE go in `parameters.tau_c`, not `inter.tau_c` (the latter is used by the Redfield theory module).
-- The state projector assumes a powder; single-crystal MAS is not currently supported.
-- Perturbative corrections to the rotating-frame transformation are not supported; use `singlerot.m` if needed.
-
-## Implementation structure
-
-The context builds the Liouvillian, projects the initial and detection states into `D[0,0,0]`, and calls `pulse_sequence(spin_system,parameters,H,R,K)`.
-
-<https://spindynamics.org/wiki/index.php?title=gridfree.m>
+`parameters.spins={'1H','13C'}` shows the channel-list form. The source specifies rate, axis, offsets, rank truncation, and correlation times by the fields above; it does not provide a complete runnable parameter set.

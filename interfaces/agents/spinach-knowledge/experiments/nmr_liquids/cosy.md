@@ -1,36 +1,25 @@
 # experiments/nmr_liquids/cosy.m
 
-- Signature: `fid=cosy(spin_system,parameters,H,R,K)`
+- MATLAB source: [experiments/nmr_liquids/cosy.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/cosy.m)
+- Spinach Wiki: [cosy.m](https://spindynamics.org/wiki/index.php?title=cosy.m)
+- Sequence references: [DOI 10.1063/1.432450](https://doi.org/10.1063/1.432450); [DOI 10.1016/0022-2364(82)90279-7](https://doi.org/10.1016/0022-2364(82)90279-7)
 
 ## Purpose
 
-Phase-sensitive COSY sequence; the source cites [DOI 10.1063/1.432450](https://doi.org/10.1063/1.432450) and [DOI 10.1016/0022-2364(82)90279-7](https://doi.org/10.1016/0022-2364(82)90279-7).
+Phase-sensitive COSY with one analytically retained F1 coherence pathway. The implementation returns a two-dimensional free-induction decay. It describes a parameterised sequence, not an experimental or run-verified result. The sequence propagates states under `L=H+1i*R+1i*K`.
 
-## Physical / mathematical content
+## Inputs and parameters
 
-- The sequence prepares longitudinal magnetisation on `parameters.spins{1}`, applies a 90-degree x pulse, evolves along F1, and selects the +1 coherence pathway. It then applies the second x pulse with angle `parameters.angle` and acquires F2 with the same spin as the detected observable.
+Signature: fid=cosy(spin_system,parameters,H,R,K)
 
-## Numerical / algorithmic content
+- parameters.sweep: one positive sweep width in Hz, used for both dimensions; the sampling interval is 1/sweep seconds.
+- parameters.npoints: two positive integer point counts [F1 F2].
+- parameters.spins: one nucleus label in a cell array, e.g. {'1H'} or {'13C'}.
+- parameters.angle: finite second-pulse angle in radians; pi/2 gives the usual 90-degree pulse, and the source also cites COSY45 and COSY60.
+- H, R, and K: same-size Hamiltonian, relaxation, and kinetics matrices from the context function; the routine requires sphten-liouv formalism.
 
-- Both dimensions use the reciprocal of the scalar sweep width. The F1 trajectory has `parameters.npoints(1)` points; F2 acquisition has `parameters.npoints(2)` points. The source combines the inputs as `L = H + 1i*R + 1i*K` and requires the `sphten-liouv` formalism.
+## Evolution, coherence selection, and detection
 
-## Syntax
+The routine starts from Lz magnetisation and an L+ detection state on the selected spin. It applies a 90-degree x pulse, records the F1 trajectory at 1/sweep spacing, and explicitly selects F1 coherence order +1. The second x pulse uses parameters.angle; direct F2 evolution is then detected with the L+ observable at the same reciprocal-sweep spacing. Thus the code retains a single phase-sensitive pathway rather than summing all F1 coherence orders.
 
-```matlab
-fid=cosy(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- `parameters.sweep`: scalar sweep width in Hz.
-- `parameters.npoints`: point counts for F1 and F2.
-- `parameters.spins`: spin label used by the sequence, e.g. `'1H'` or `'13C'`.
-- `parameters.angle`: second-pulse angle in radians; the source notes COSY45 and COSY60 variants as examples.
-- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices received from the context function.
-
-## Outputs
-
-- `fid`: two-dimensional free induction decay.
-- The implementation analytically retains the +1 t1 coherence order, corresponding to one phase-sensitive pathway. If the second pulse is not 90 degrees, magnitude-mode plotting is advised.
-
-[Spinach Wiki: cosy.m](https://spindynamics.org/wiki/index.php?title=cosy.m)
+The source advises magnitude-mode plotting when the second pulse differs from 90 degrees. No MATLAB execution or experimental signal is claimed here.

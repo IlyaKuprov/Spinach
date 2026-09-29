@@ -1,25 +1,22 @@
 # kernel/optimcon/distortions/amp_tanh.m
 
-- Signature: `[w,J]=amp_tanh(w,sat_lvls)`
+- Signature: [w,J]=amp_tanh(w,sat_lvls)
+- MATLAB source: [amp_tanh.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/amp_tanh.m)
 
 ## Purpose
 
-Models amplifier compression by applying a saturating hyperbolic tangent to the radial amplitude of each XY waveform pair. The radial output amplitude is `a*tanh(r/a)`, where `r=sqrt(X^2+Y^2)` and `a` is that pair's saturation level; the X and Y components retain their direction.
+Models radial amplifier compression independently for each in-phase/quadrature (XY) channel pair and time slice. For a pair with components X and Y, let r=sqrt(X^2+Y^2) and let a be its saturation level. The output has radial amplitude a*tanh(r/a) and retains the input direction; at r=0 the pair is unchanged.
 
-## Parameters / inputs
+## Inputs and units
 
-- `w`: Real waveform in rad/s nutation frequency units. Each column is one time slice; rows are arranged `XYXY...`, with in-phase (X) and quadrature (Y) components for each control channel. The number of rows must be even.
-- `sat_lvls`: Finite, positive real saturation levels, one per XY pair. Each level gives the limiting output amplitude `sqrt(X^2+Y^2)`.
+- w is a real numeric waveform in rad/s nutation-frequency units. Columns are time slices; rows are ordered XYXY..., one X/Y pair per control channel. The number of rows must be even.
+- sat_lvls is a numeric, real array with one finite, strictly positive value per XY pair. Each value is the limiting radial output amplitude, in the same amplitude units as w.
 
-## Outputs
+## Outputs and derivative
 
-- `w`: Distorted waveform with the same units and layout as the input.
-- `J`: Optional sparse Jacobian of the distorted waveform with respect to the vectorisation of the input waveform.
+- w is the distorted waveform, with the input shape and units.
+- J is optional. When requested, it is a sparse Jacobian of the vectorised output with respect to the vectorised input. For r>0, set s=a*tanh(r/a)/r and c=(1/cosh(r/a)^2-s)/r^2; the local XY block is J_pair=[s+c*X^2,c*X*Y;c*X*Y,s+c*Y^2]. At r=0 the implementation uses s=1 and c=0, giving the identity block. There are no cross-time or cross-channel terms. GPU-computed block values are gathered to host memory before sparse assembly.
 
-## Numerical / algorithmic content
+## References
 
-For each XY pair and time slice, the function computes `r=sqrt(X^2+Y^2)` and multiplies both components by `a*tanh(r/a)/r`. At zero amplitude it uses a scale of `1`. When requested, it assembles a sparse Jacobian from a 2-by-2 Cartesian block for each XY pair and time slice. Jacobian values computed on a GPU are gathered to host memory before sparse assembly.
-
-## Reference
-
-- [Spinach documentation: amp_tanh.m](https://spindynamics.org/wiki/index.php?title=amp_tanh.m)
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=amp_tanh.m

@@ -1,35 +1,30 @@
 # experiments/sp_acquire.m
 
+- MATLAB source: [experiments/sp_acquire.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/sp_acquire.m)
 - Signature: `fid=sp_acquire(spin_system,parameters,H,R,K)`
 
-## Purpose
+## What the routine does
 
-Applies a soft pulse and then acquires the free induction decay. The soft pulse is simulated using the Fokker–Planck formalism.
+This routine applies one Fokker–Planck-simulated soft pulse and then delegates time-domain signal acquisition to `acquire`. It forms `L=H+1i*R+1i*K` after conversion to the adjoint representation when needed. Pulse X and Y operators are built from `parameters.spins{1}`, extended over the Fokker–Planck spatial basis, and passed with the caller's `parameters.rho0` to `shaped_pulse_af`.
 
-## Numerical / algorithmic content
+Before that call, the code replaces `parameters.pulse_frq` with `parameters.pulse_frq-parameters.offset`. The routine passes the pulse frequency, power, duration, phase, Fokker–Planck cut-off rank, and selected propagation method to `shaped_pulse_af`; it does not define an additional chirp law or a gradient-encoding sequence here.
 
-The routine moves the system into the adjoint representation if needed, forms `L=H+1i*R+1i*K`, and constructs the X and Y pulse operators for `parameters.spins{1}`. It subtracts `parameters.offset` from `parameters.pulse_frq`, passes the adjusted frequency and pulse settings to `shaped_pulse_af`, then calls `acquire` to produce the FID.
+## Required parameters and units
 
-## Parameters / inputs
+- `pulse_frq`: soft-pulse frequency relative to the current rotating frame, Hz.
+- `pulse_phi`: pulse phase, rad; `pulse_pwr`: pulse power, rad/s; `pulse_dur`: pulse duration, s.
+- `pulse_rnk`: Fokker–Planck cut-off rank; the source suggests starting at 2 and increasing until the answer stops changing.
+- `offset`: transmitter/receiver offset relative to the current rotating frame, Hz.
+- `sweep`: acquisition sweep width, Hz; `npoints`: positive integer number of FID samples.
+- `rho0`: initial state; `coil`: detection state; `spins`: a one-element cell array of spin-label strings, whose first member defines the pulse operators.
+- `method`: one of `expv`, `expm`, or `evolution` for soft-pulse propagation.
+- `H`, `R`, and `K`: matching-size numeric Liouville-space matrices supplied by the context function. The source accepts the `sphten-liouv` and `zeeman-liouv` formalisms.
 
-- `parameters.pulse_frq` — soft-pulse frequency relative to the current rotating frame, Hz
-- `parameters.pulse_phi` — soft-pulse phase, rad
-- `parameters.pulse_pwr` — soft-pulse power, rad/s
-- `parameters.pulse_dur` — soft-pulse duration, s
-- `parameters.pulse_rnk` — Fokker–Planck cut-off rank; start with 2 and increase until the answer stops changing
-- `parameters.offset` — transmitter/receiver offset
-- `parameters.sweep` — sweep width for time-domain detection, Hz
-- `parameters.npoints` — number of points in the FID
-- `parameters.rho0` — initial state
-- `parameters.coil` — detection state
-- `parameters.method` — soft-pulse propagation method: `expv`, `expm`, or `evolution`
-- `parameters.spins` — working spins; the pulse operators use the first specified spin
-- `H`, `R`, `K` — Hamiltonian, relaxation, and kinetics matrices, respectively, received from the context function
+## Output axis
 
-## Outputs
+`fid` is the time-domain signal returned by `acquire`. That routine uses a dwell interval of `1/sweep` seconds and `npoints-1` evolution steps, yielding `npoints` observable samples for one initial state. The function returns the signal vector, not a separately constructed time vector.
 
-- `fid` — dynamics of the coil state as a function of time
+## References
 
-## Reference
-
-- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=sp_acquire.m)
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/sp_acquire.m)
+- [Spinach Wiki: sp_acquire.m](https://spindynamics.org/wiki/index.php?title=sp_acquire.m)

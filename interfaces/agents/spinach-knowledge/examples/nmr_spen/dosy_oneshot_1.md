@@ -1,15 +1,19 @@
 # examples/nmr_spen/dosy_oneshot_1.m
 
-- Signature: `dosy_oneshot_1()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_spen/dosy_oneshot_1.m)
+
+- Signature: dosy_oneshot_1()
 
 ## Purpose
 
-Runs a one-shot DOSY imaging sequence for three coupled 1H spins with different longitudinal and transverse relaxation rates. The source estimates minutes on an NVIDIA Tesla A100 and longer on CPU.
+Simulates a one-shot DOSY imaging sequence for three coupled 1H spins with different longitudinal and transverse relaxation rates. The source estimates minutes on an NVIDIA Tesla A100 and substantially longer on CPU.
 
-## Spin system and relaxation
+## Spin system, relaxation, and acquisition
 
-At 11.7428 T, the shifts are 4.70, 3.50, and 1.50 ppm; couplings are 15 Hz (1–2), 15 Hz (2–3), and 10 Hz (1–3). The T1 values are [0.1952, 0.2100, 0.2500] s and T2 values [0.1602, 0.1802, 0.1902] s. Relaxation uses the diagonal-preserving T1/T2 model with zero equilibrium. The basis is full `sphten-liouv`; perturbation theory is disabled and greedy computation enabled.
+At a field parameter of 11.7428 T, the three shift values are 4.70, 3.50, and 1.50. The scalar-coupling network has pair values 15 for spins 1–2, 15 for 2–3, and 10 for 1–3. The t1_t2 relaxation model keeps diagonal relaxation terms and uses zero equilibrium; the reciprocal-rate inputs are formed from T1 values [0.1952, 0.2100, 0.2500] and T2 values [0.1602, 0.1802, 0.1902].
 
-## Spatial acquisition
+The acquisition sweep is 5000 Hz with 1024 points, zero-filled to 32768; the axis is ppm and the offset is 2497.78 Hz. The 0.015 m sample is represented by 5000 spatial points with a 7-point periodic derivative stencil. Uniform spatial phantoms set the initial Lz state and L- detection state.
 
-The 15 mm sample is represented by 5000 points with a 7-point periodic derivative stencil. A uniform spatial phantom supplies the relaxation, initial 1H `Lz` state, and receive profile. Acquisition uses 1H, 5 kHz sweep, 1024 points, 32768-point zero-fill, and a 2497.78 Hz offset. The imaging call runs `dosy_oneshot` with gradient amplitude 0.255 T/m, `kappa` 0.2, 1 ms gradient duration, 50 ms diffusion delay, and 0.5 ms gradient-stabilisation delay; the FID is exponentially apodised with parameter 5 before Fourier transformation.
+## Diffusion encoding and observable
+
+The reference diffusion coefficient is 18.55 × 10⁻¹⁰ m²/s. The dosy_oneshot imaging sequence uses gradient amplitude 0.255 T/m, kappa 0.2, gradient duration 0.001 seconds, diffusion delay 0.05 seconds, and gradient-stabilisation delay 0.0005 seconds. The resulting FID is exponentially apodised with parameter 5, Fourier transformed with the specified zero filling, and plotted as the negative real spectrum.

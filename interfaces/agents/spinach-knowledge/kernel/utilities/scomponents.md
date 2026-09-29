@@ -1,29 +1,31 @@
 # kernel/utilities/scomponents.m
 
-- Signature: `sci=scomponents(A)`
-
 ## Purpose
 
-Finds the strongly connected components of a graph using David Gleich's implementation of Tarjan's algorithm. Reference: http://dx.doi.org/10.1137/0201010
+Computes the strongly connected components of a directed graph using David Gleich's implementation of Tarjan's algorithm.
 
-## Syntax
+## Behavior
 
-```matlab
-sci=scomponents(A)
-```
+- Validates the input via an internal consistency check (`grumble`), which errors with `'the input must be a square logical matrix.'` if the input is not logical, not a matrix, or not square.
+- Converts the adjacency matrix to compressed sparse row (CSR) form via `sparse2csr(sparse(A))`, returning row pointers `rp` and column indices `ci`.
+- Runs an iterative (explicit-stack) form of Tarjan's algorithm over all nodes `sv = 1:n`, skipping nodes already assigned to a root (`root(v) > 0`).
+- Maintains per-node arrays: `root` (current component root), `dt` (discovery times, incremented by a counter `t`), and `sci` (component labels, set to `-1` while a node is on the stack).
+- Uses a call stack `rs` of size `2*n` storing (node, row-index) pairs, and a component stack `cs` of size `n`.
+- When a node's root equals itself, all nodes on the component stack down to that node are popped and assigned the current component number `cn`, which is then incremented.
+- Component numbering starts at `1` and increases in the order components are finalized.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- `A` — a square logical matrix with 1 for connected nodes in the graph. The function rejects inputs that are not square logical matrices.
+**Input:**
 
-## Outputs
+- `A` — a logical square matrix with `1` (true) marking connected nodes in the graph.
 
-- `sci` — a column vector of integers specifying the strongly connected component to which each graph node belongs.
+**Output:**
 
-## Implementation structure
+- `sci` — a column vector of integers specifying the strongly connected component each graph node belongs to.
 
-The function checks the input with `grumble(A)`, obtains CSR indices with `[rp,ci]=sparse2csr(sparse(A))`, and runs Tarjan's algorithm. Component numbers start at 1 and are assigned as components are found.
+## References
 
-Contacts: dgleich@purdue.edu; ilya.kuprov@weizmann.ac.il
-
-<https://spindynamics.org/wiki/index.php?title=scomponents.m>
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/scomponents.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=scomponents.m>
+- R. E. Tarjan, algorithm reference cited in the source: <http://dx.doi.org/10.1137/0201010>

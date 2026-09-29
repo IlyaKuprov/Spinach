@@ -1,30 +1,31 @@
 # kernel/derivatives/fdvec.m
 
-- Signature: `dx=fdvec(x,npoints,order)`
+Direct source: [kernel/derivatives/fdvec.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fdvec.m)
+Spin Dynamics Wiki: [fdvec.m](https://spindynamics.org/wiki/index.php?title=fdvec.m)
 
-## Purpose
+## Purpose and interface
 
-Computes the specified derivative of a row or column vector using finite differences. Interior elements use a centered stencil; elements near either end use sided stencils with the same number of points.
+dx=fdvec(x,npoints,order) differentiates a numeric row or column vector with a finite-difference stencil and returns derivative estimates in the same shape as x. The function first sizes dx from the input shape, then reshapes a working copy of x to a column for the calculation; this is why row input still produces row output.
 
-## Parameters / inputs
+- x must be a numeric vector with at least three elements.
+- npoints is the positive odd stencil size.
+- order is a positive integer smaller than npoints.
 
-- `x` — numeric row or column vector to differentiate.
-- `npoints` — number of points in each finite-difference stencil; must be a positive odd integer.
-- `order` — derivative order; must be a positive integer smaller than `npoints`.
+## Stencils and coordinate units
 
-## Outputs
+For each element near the left edge, fdweights supplies weights evaluated at that element's position among the first npoints samples. The opposite edge uses the reversed weights multiplied by (-1)^order. Between these edges, a centered stencil uses offsets from -(npoints-1)/2 through (npoints-1)/2.
 
-- `dx` — derivative values in a vector with the same shape as `x`.
+fdvec has no sample-spacing input: the positions passed to fdweights are integer sample indices, so the returned derivative is with respect to that unit-spaced index. It does not impose periodic boundary conditions; the end points are evaluated with sided stencils. For non-unit physical spacing, the caller must account for the corresponding coordinate scaling.
 
-## Numerical / algorithmic content
+## Input guards and example
 
-- Coefficients are computed by `fdweights` for unit-spaced sample positions. No spacing parameter is supplied, so the result is a derivative with respect to the sample index.
-- The first `(npoints-1)/2` elements use weights evaluated at their positions within the first `npoints` samples. The corresponding elements at the right end use reversed weights with a factor of `(-1)^order`.
-- Interior elements use a centered, symmetric `npoints`-point stencil.
+The source checks that x is numeric and a vector, that its element count is at least three, that npoints is a positive odd integer, and that order is positive and below npoints. The error text for the length check says “more than three elements,” while the actual predicate rejects only lengths below three; a three-element vector passes that guard. The implementation does not separately check that npoints is no greater than numel(x).
 
-## Validation
+    x=[0 1 4 9 16];
+    dx=fdvec(x,3,1);
 
-- `x` must be a numeric vector. The implementation also checks that it has at least three elements, although its error message says “more than three elements.”
-- `npoints` and `order` must satisfy the integer, positivity, odd-stencil and derivative-order constraints above. The implementation does not separately check that `npoints` is no larger than the length of `x`.
+The call requests a first derivative from five samples using three points per stencil; the output has the same row shape as x.
 
-Source reference: <https://spindynamics.org/wiki/index.php?title=fdvec.m>
+## Related routine
+
+- [fdweights.m](fdweights.md) computes the coefficients for each stencil.

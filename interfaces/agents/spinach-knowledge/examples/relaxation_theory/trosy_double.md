@@ -4,21 +4,12 @@
 
 ## Purpose
 
-Hari Arthanari's Double TROSY effect. Calculation time: seconds.
+A 13C-detected simulation of the source's Double TROSY example. The source estimates a calculation time of seconds. The four-spin fragment contains two `1H`, one `19F`, and one `13C`; its tensors, coordinates, and scalar-coupling submatrix are selected from a parsed DFT output. The DFT entries selected are `[10 20 19 8]` in that spin order. The source labels the input a 3-fluorotyrosine calculation, while the input filename is `4_fluoro_phe.out`; the structure's naming is therefore left as the source presents it rather than reconciled here.
 
-## Physical / mathematical content
+## Relaxation and acquisition
 
-- Uses a four-spin system comprising two `1H`, one `19F`, and one `13C` spin, selected from a parsed DFT calculation with their coordinates, chemical-shift tensors, and scalar J-couplings.
-- Uses Redfield relaxation with the secular terms retained, zero equilibrium, and a correlation time of `20e-9` s. The magnetic field is `14.1` T.
-- Compares the calculated `13C` spectra before and after clearing the coordinates of both protons for a run labeled in the source as having no proton DD.
+The model uses secular Redfield relaxation, zero equilibrium, and `tau_c = 20e-9`. The field parameter is set to `14.1`; the source does not annotate its unit. The basis is the full `sphten-liouv` basis without approximation. The initial density operator and receiver are both the `13C` `L+` state, with no decoupled spins. The source sets offset `26800`, sweep `500`, 2048 points, zero filling to 16384 points, and a ppm axis with the displayed axis inverted.
 
-## Numerical / algorithmic content
+The source acquires a liquid-state NMR signal, applies Gaussian apodisation with parameter `6`, Fourier transforms it, and plots the real spectrum. It then rebuilds the system after clearing both proton coordinates and repeats the acquisition; the source describes this comparison as removing proton dipolar relaxation. These are simulated spectra, not measurements.
 
-- Uses the `sphten-liouv` basis formalism with no basis approximation.
-- Initializes and detects `13C` `L+` coherence, with no decoupling. Acquisition uses an offset of `26800`, a sweep of `500`, and `2048` points; the chemical-shift axis is in ppm and inverted.
-- Applies Gaussian apodisation with parameter `6`, then computes `fftshift(fft(fid,16384))`. Plots the real spectra in two panels.
-
-## Implementation structure
-
-- Parses `../standard_systems/4_fluoro_phe.out` using `gparse` and `g2spinach`, then selects DFT spin indices `[10 20 19 8]`.
-- Creates the spin system and basis, runs `liquid` acquisition, and plots the full spectrum. It then clears the two proton coordinates, rebuilds the spin system, repeats acquisition and processing, and plots the comparison spectrum.
+Source: [examples/relaxation_theory/trosy_double.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_double.m).

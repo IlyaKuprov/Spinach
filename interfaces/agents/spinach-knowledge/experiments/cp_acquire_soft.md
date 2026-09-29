@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Simulates rotating-frame cross-polarisation followed by time-domain FID acquisition. The source describes wiping the low-gamma spin state before the CP stage and decoupling the high-gamma spins during acquisition.
+A rotating-frame cross-polarisation transfer followed by time-domain FID acquisition. The source describes the first spin as high-gamma and the second as low-gamma (for example, proton then carbon): it wipes the low-gamma component of the starting state, excites the high-gamma channel, applies a two-channel CP contact, then wipes the high-gamma state and acquires while decoupling that channel.
 
-## Implementation
+## Inputs
 
-The routine composes `L=H+1i*R+1i*K`, wipes the low-gamma part of `parameters.rho0`, applies the high-gamma excitation pulse, and evolves during the CP contact. It then acquires the FID on `parameters.coil` with the specified sweep width and point count.
+- `parameters.spins`: two isotope names, high-gamma first and low-gamma second (for example, `{'1H','13C'}`).
+- `parameters.rho0`: initial state; the low-gamma spin state is wiped before the transfer.
+- `parameters.hi_pwr`: high-gamma excitation nutation frequency in Hz. The routine applies a +X 90-degree excitation of duration `1/(4*hi_pwr)` seconds.
+- `parameters.cp_pwr`: two nutation frequencies in Hz, ordered by `parameters.spins`, for the CP contact. During contact, the high-gamma channel is irradiated along -Y and the low-gamma channel along +X.
+- `parameters.cp_dur`: contact duration in seconds.
+- `parameters.coil`: detection state; `parameters.sweep` is FID sweep width in Hz and `parameters.npoints` is its positive integer point count.
+- `H`, `R`, and `K`: same-sized Hamiltonian, relaxation, and kinetics matrices supplied by the context function; the routine combines them as `H+1i*R+1i*K`.
 
-## Parameters / inputs
-
-- `parameters.spins`: working spins in a cell array, high-gamma first and low-gamma last (for example, {'1H','13C'}).
-- `parameters.hi_pwr`: high-gamma excitation-pulse nutation frequency, Hz.
-- `parameters.cp_pwr`: two-channel nutation frequencies during CP contact, Hz.
-- `parameters.cp_dur`: CP contact duration, s.
-- `parameters.rho0`: initial state; the low-gamma spin state is wiped before the sequence.
-- `parameters.coil`: detection state.
-- `parameters.sweep`: FID sweep width, Hz.
-- `parameters.npoints`: number of FID points.
-- `H`: Hamiltonian matrix supplied by the context function.
-- `R`: relaxation superoperator supplied by the context function.
-- `K`: kinetics superoperator supplied by the context function.
+The implementation also reads `parameters.spc_dim` to embed the channel operators in the full space. This field is not listed in the function's parameter header, which does not define its meaning or units.
 
 ## Output
 
-- `fid`: signal detected on the coil state during the sequence.
+Returns `fid`, the observable-mode FID from evolution with the high-gamma channel decoupled after CP. The call uses the reciprocal sweep width as the sampling interval and `npoints-1` evolution steps; the source does not prescribe a reshaping or row/column convention for the returned array.
+
+## Source limits
+
+The function fixes the two irradiation axes and uses nutation frequencies as RF amplitudes in its rotating-frame generator; it does not define instrument-specific RF calibration or a CP matching-condition search.
+
+Source implementation: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/cp_acquire_soft.m

@@ -1,27 +1,30 @@
 # kernel/pulses/chirp_pulse.m
 
+[Source: `kernel/pulses/chirp_pulse.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/chirp_pulse.m)
+
 - Signature: `[Cx,Cy,durs,ints,amps,phis,frqs]=chirp_pulse(npts,dur,bwidth,smp,type)`
 
 ## Purpose
 
-Generates a frequency-swept chirp pulse with a WURST or smoothed amplitude envelope, or a saltire pulse formed from a smoothed chirp. The waveform is calibrated to produce an inversion pulse.
+Builds a frequency-swept RF waveform calibrated for an inversion pulse. The sweep is centered on zero and linear in time; its phase is quadratic in normalized time. The supported families are WURST, smoothed, and saltire chirps, with an optional `-adaptive` suffix for a nonlinear sample grid.
 
-## Inputs
+## Inputs and discretization
 
-- `npts` — positive integer number of waveform points.
+- `npts` — finite positive integer number of waveform points.
 - `dur` — finite positive pulse duration in seconds.
-- `bwidth` — finite positive sweep bandwidth around zero frequency, in Hz.
-- `type` — one of `wurst`, `smoothed`, or `saltire`; append `-adaptive` for adaptive sampling.
-- `smp` — envelope parameter. For WURST, it is the power in `1-abs(sin(pi*time_grid).^smp)` and must exceed 1. For smoothed and saltire pulses it sets the edge-fade duration as a percentage from 0 to 50; 0 gives a square envelope and 50 a sine-bell envelope.
+- `bwidth` — finite positive sweep bandwidth in Hz, centered on zero.
+- `type` — `'wurst'`, `'smoothed'`, or `'saltire'`; append `'-adaptive'` to use the nonlinear normalized time grid instead of the uniform grid.
+- `smp` — WURST edge power for the WURST family (the source accepts values of at least 1); for smoothed and saltire it is the percentage of duration affected by the quarter-sine edge ramps, from 0 (square envelope) through 50 (sine-bell envelope).
 
-## Outputs
+With a uniform grid the function returns N point samples, N piecewise-constant slice durations in `durs` summing to `dur`, and N−1 piecewise-linear interval durations in `ints`. The adaptive option uses a nonlinear normalized grid and returns the corresponding nonuniform durations. The phase is `pi*dur*bwidth*t.^2` and frequency is `bwidth*t` on normalized time `t`; the amplitude envelope is calibrated by `2*pi*sqrt(bwidth/dur)`.
 
-- `Cx`, `Cy` — real and imaginary Cartesian waveform components in rad/s.
-- `durs` — time-slice durations for piecewise-constant propagation, in seconds.
-- `ints` — interval durations for piecewise-linear propagation, in seconds.
-- `amps`, `phis`, `frqs` — waveform amplitude (rad/s), phase (rad), and instantaneous frequency (Hz). The saltire branch sets `Cy` to zero and returns before assigning `frqs`; requesting more than six outputs for a saltire pulse is rejected.
+## Outputs and checks
 
-The adaptive mode uses a nonuniform time grid; otherwise the time grid is uniform. The phase is quadratic in the normalized time coordinate and the instantaneous frequency sweeps linearly across the specified bandwidth. The amplitude envelope is scaled by `2*pi*sqrt(bwidth/dur)`.
+- `Cx`, `Cy` — real and imaginary RF components in rad/s. For saltire, `Cy` is identically zero; the real waveform's sign is represented by phases of 0 or pi.
+- `durs`, `ints` — piecewise-constant slice durations and piecewise-linear interval durations, respectively, in seconds.
+- `amps`, `phis`, `frqs` — waveform amplitude in rad/s, phase in radians, and instantaneous frequency in Hz.
+
+The routine checks the scalar/range constraints on its parameters and rejects inadequate phase sampling when a sample-to-sample phase jump exceeds pi and fewer than seven outputs are requested. Requesting the seventh output, `frqs`, bypasses that particular error check. The function returns waveforms and grids only; it does not write files or configure hardware.
 
 ## Reference
 

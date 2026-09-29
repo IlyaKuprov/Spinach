@@ -4,19 +4,18 @@
 
 ## Purpose
 
-NOESY spectrum of sucrose (magnetic parameters computed with DFT). Calculation time: minutes.
+Simulates a two-dimensional proton NOESY spectrum of sucrose. The proton spin model is parsed from the vacuum-DFT sucrose log; `options.min_j=1.0` is passed to the parser as the minimum retained coupling threshold. The example does not specify units for that threshold. Its header estimates minutes for calculation time.
 
-## Physical / mathematical content
+## Spin model and sequence
 
-- Sucrose magnetic parameters are read from a vacuum-DFT log with a minimum retained J-coupling of 1.0 Hz. The proton spin system is simulated at 5.9 T.
-- Redfield relaxation uses the IME equilibrium option, 298 K, a 200 ps correlation time, and kite retention; the NOESY mixing time is 0.5 s.
+The field setting is `5.9`. The basis uses the `sphten-liouv` formalism, `IK-2` approximation, scalar-coupling connectivity, and proximity level `3`. Redfield relaxation uses IME equilibrium, temperature `298`, `rlx_keep='kite'`, and `tau_c={200e-12}`. The script enables the greedy algorithm, disables Krylov, and sets the proximity cutoff to `4.0`.
 
-## Numerical / algorithmic content
+The NOESY mixing time is `0.5`; offset is `800`; sweep is `[1700 1700]`; acquired points are `[512 512]`; and zero-fill sizes are `[2048 2048]`. The selected spins are `{'1H'}`, axes are in ppm, and the simulation requests equilibrium density with `needs={'rho_eq'}`. The example leaves units unstated for mixing time, offset, sweep, and minimum-coupling threshold.
 
-- The spherical-tensor Liouville basis uses IK-2 with scalar-coupling connectivity and proximity level 3. Greedy handling is enabled, Krylov propagation is disabled, and the proximity cutoff is 4.0.
-- The 1H acquisition uses an 800 Hz offset, 1700 Hz sweep in both dimensions, 512 acquired points and 2048-point zero filling per dimension. Square-cosine apodisation and States processing precede the two Fourier transforms.
+## Propagation and processing
 
-## Implementation structure
+The script calls `liquid(...,@noesy,...,'nmr')`. It applies `sqcos` apodisation to the cosine and sine FIDs in both dimensions, combines them as the States signal, Fourier-transforms F2 and F1 with the configured zero-fill lengths, and plots the negative real spectrum. The source supplies no numerical peak intensities or cross-relaxation rates.
 
-- Parse the sucrose DFT log, build the proton basis and configure the NOESY sequence.
-- Simulate, apodise cosine and sine FIDs, combine the States signal, Fourier transform F2 and F1, then plot the negative real spectrum.
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noesy_sucrose.m)

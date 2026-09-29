@@ -1,15 +1,17 @@
 # examples/optimal_control/steady_orbit/solid_effect_chirp.m
 
-- Signature: `solid_effect_chirp()`
+Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/steady_orbit/solid_effect_chirp.m) · Function: `solid_effect_chirp()`
 
-## Purpose
+The example defines a phase-controlled, stroboscopic steady-state DNP design for an electron–proton pair. It builds the spin system, declares the proton longitudinal-magnetisation state as the destination, configures powder-dependent ESR drift and control constraints, and calls the GRAPE phase objective through `fmaxnewton`. This describes the optimisation setup, not a reported optimised pulse or measured enhancement.
 
-Optimises the phase of a stroboscopic steady-state DNP pulse, using timing and power settings matching the XiX experiment. The source notes that the calculation can take days on a large parallel cluster.
+The model uses `E` and `1H` at 3.35316 T and 80 K. The trityl electron Zeeman principal values are [2.00319, 2.00319, 2.00258], with Euler angles [0, 10, 0] degrees; the proton shift is [0, 0, 5] ppm, with Euler angles [0, 0, 10] degrees. Their coordinates are [0, 0, 0] and [0, 0, 3.500]; the script does not label the coordinate unit. The T1/T2 relaxation configuration uses a distance- and orientation-dependent proton R1 callback from `r1n_dnp`, R1 entries {1e3, callback}, R2 entries {200e3, 50e3}, diagonal relaxation retention, and `dibari` equilibrium. The basis is `sphten-liouv` with no approximation.
 
-## Model and optimisation
+The target is proton `Lz`, normalised by its overlap with the equilibrium state. The code also constructs an equilibrium initial state, while its comment says the steady-state module ignores that initial state. Powder drifts use spins {`E`, `1H`}, grid `rep_2ang_800pts_sph`, and an ESR transmitter reference at 94.0 GHz. The controls are electron `Lx/Ly`, with `Lz` as the offset operator. The listed microwave control levels span 2π·5×10⁶ to 2π·25×10⁶ rad/s (20 levels), and the five offsets are −2, −1, 0, +1, and +2 MHz.
 
-- Models an electron and a proton at 3.35316 T and 80 K, separated by 3.500 Å. It uses the specified Zeeman tensors, distance- and orientation-dependent proton longitudinal relaxation, and a full spherical-tensor Liouville-space basis.
-- Uses a powder grid (`rep_2ang_800pts_sph`) and a 94.0 GHz transmitter. The objective is proton longitudinal magnetisation relative to thermal equilibrium, evaluated in steady state.
-- Optimises electron-control phase across 720 pulse samples of 0.5 ns each. The following 20 samples form a frozen 0.5 ns-per-sample ringdown, followed by a frozen 167 µs delay. Microwave power levels are `2*pi*linspace(5,25,20)*1e6` rad/s, with offsets of −2, −1, 0, +1, and +2 MHz.
-- Uses `rbfgs` with up to 10,000 iterations, a budget of 500, and 240 processes. A 16-tap filter loaded from `hiper_kernel_trans.mat` is normalised to unit absolute DC gain and applied as control distortion.
-- Starts from a smoothed 50 MHz chirp over 360 ns, with its phase negated and shifted by 140 MHz. It calls `fmaxnewton` with `grape_phase` and requests robustness and spectrogram plots.
+The control vector has 720 pulse samples of 0.5 ns each (360 ns), 20 frozen 0.5 ns ringdown samples, then a frozen 167 μs sequence delay. Amplitude is one during the pulse and zero in the ringdown and delay. The configured method is `rbfgs`, with maximum 10,000 iterations, `steady=true`, and budget 500; robustness and spectrogram plots are requested. A 16-coefficient prefix of `hiper_kernel_trans.mat` is normalised to unit absolute DC gain and passed through `firf` for optimisation distortion and plotting. The system requests 240 processes and sets propagation chop tolerance 1e-14 and steady-state tolerance 1e-10; the source comments that the calculation may take days on a large parallel cluster, which is not a run result.
+
+The source does not specify the scalar fidelity/loss formula, a converged waveform, numerical robustness or spectrogram values, or a measured DNP enhancement. The requested robustness/spectrogram displays are outputs to inspect, not results reported here; this is an example setup, not a kernel test.
+
+Its starting phase is built from a smoothed 50 MHz chirp over 720 points and 360 ns, negated and shifted by a 140 MHz phase ramp before wrapping to 2π. Twenty ringdown zeros and one sequence-delay zero are appended. This is the chirped starting guess only; it is not evidence that the optimiser converged to a chirp or any other waveform.
+
+The source comments identify Guinevere Mathies, Shebha-Anandhi Jegadeesan, and Ilya Kuprov as contacts: guinevere.mathies@uni-konstanz.de, shebha-anandhi.jegadeesan@uni-konstanz.de, and ilya.kuprov@weizmann.ac.il.

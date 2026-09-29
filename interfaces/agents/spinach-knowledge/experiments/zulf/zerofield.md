@@ -4,30 +4,28 @@
 
 ## Purpose
 
-Simulates a Budker-group-style gamma-weighted pulse-acquire sequence in zero field. The initial state, pulse operator, and detection state are weighted by each spin's magnetogyric ratio relative to 1H, as in preparation with a high-field pre-polarisation magnet.
+Simulates a gamma-weighted pulse-and-acquire experiment in zero field. The initial state, pulse operator, and detection state use each nucleus's magnetogyric ratio relative to proton, matching the source's stated high-field pre-polarisation model.
 
-## Physical / mathematical content
+## Inputs and units
 
-The supplied matrices form the Liouvillian `L = H + 1i*R + 1i*K`. The initial state is the weighted sum of single-spin `Lz` states, while the coil state is the weighted sum of `L+` states. A weighted `Ly` pulse operator acts on the initial state with the requested flip angle. Detection is performed against the weighted coil state.
+- `spin_system` is the Spinach system structure, including spin magnetogyric ratios and spin count.
+- `parameters.sweep` is the acquisition spectral-window width in hertz; its reciprocal sets the evolution timestep.
+- `parameters.npoints` is a positive integer acquisition point count.
+- `parameters.detection` must be `'uniaxial'` or `'quadrature'`.
+- `parameters.flip_angle` is a real numeric scalar in radians, specified for protons. The weighted pulse operator scales the response for other nuclei by their gamma ratio relative to proton.
+- `H`, `R`, and `K` are numeric matrices of equal dimensions: the Hamiltonian, relaxation superoperator, and kinetics superoperator supplied by the context function.
 
-## Numerical / algorithmic content
+## Pulse and acquisition
 
-The acquisition time step is `1/parameters.sweep`; the evolution call uses `parameters.npoints-1` propagation steps and observable mode. The routine requires positive scalar sweep width, a positive integer point count, a real scalar flip angle, and a detection mode of `'uniaxial'` or `'quadrature'`. The supplied `H`, `R`, and `K` must be numeric matrices of equal size. In quadrature mode the complex signal is retained; uniaxial detection takes its real part.
+The Liouvillian is assembled as `H + 1i*R + 1i*K`. With `weights = spin_system.inter.gammas/spin('1H')`, the routine forms the initial density operator as the weighted sum of per-spin `Lz` states, the detection coil as the weighted sum of per-spin `L+` states, and the pulse operator as the weighted sum of per-spin `Ly` operators. It applies the pulse with `step(spin_system,Sy,rho,parameters.flip_angle)`, then calls `evolution` with timestep `1/parameters.sweep`, interval count `parameters.npoints-1`, and mode `'observable'`.
 
-## Parameters / inputs
+For `'quadrature'`, the returned complex FID is left unchanged. For `'uniaxial'`, the routine takes its real part, removing imaginary-channel information used for frequency-sign discrimination.
 
-- `parameters.sweep` - the width of the spectral window (Hz)
-- `parameters.npoints` - number time steps in the simulation
-- `parameters.detection` - 'uniaxial' to emulate common ZULF hardware, 'quadrature' for proper frequency sign discrimination
-- `parameters.flip_angle` - pulse flip angle in radians for protons; for other nuclei, this will be scaled by the gamma ratio
-- `H` - Hamiltonian matrix, received from context function
-- `R` - relaxation superoperator, received from context function
-- `K` - kinetics superoperator, received from context function
+## Guardrails
 
-## Outputs
+The routine checks that `H`, `R`, and `K` are numeric matrices with matching dimensions; sweep is a positive real scalar; point count is a positive integer; detection mode is one of the two listed strings; and flip angle is a real numeric scalar. These checks do not validate physical consistency of the supplied Spinach system or superoperators, and the real-scalar comparisons do not explicitly reject non-finite values.
 
-- `fid` - free induction decay
+## Links
 
-## Implementation structure
-
-After consistency checks, the routine composes the Liouvillian, constructs the gamma-weighted initial state and detection coil, builds the weighted `Ly` pulse operator, applies the pulse, and calls `evolution` for acquisition. The detection-mode switch leaves quadrature data unchanged and removes the imaginary part for uniaxial detection.
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/zulf/zerofield.m
+- [Spinach Wiki: zerofield.m](https://spindynamics.org/wiki/index.php?title=zerofield.m)

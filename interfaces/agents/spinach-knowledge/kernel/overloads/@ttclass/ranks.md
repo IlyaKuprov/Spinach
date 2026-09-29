@@ -1,29 +1,9 @@
 # kernel/overloads/@ttclass/ranks.m
 
-- Signature: `ttranks=ranks(ttrain)`
+Signature: `ttranks=ranks(ttrain)`
 
-## Purpose
+Source: [kernel/overloads/@ttclass/ranks.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/ranks.m) · Wiki: [ttclass/ranks.m](https://spindynamics.org/wiki/index.php?title=ttclass/ranks.m)
 
-Returns the bond dimensions of the tensor trains stored in the input buffer.
+For each buffered train, the method returns an `(ncores+1)-by-ntrains` rank array. Column `n` lists the first core's left bond dimension through the last core's left bond dimension, followed by the last core's fourth dimension (the right boundary rank). Thus the first and final entries are the boundary ranks, expected to be 1 for a valid train; this method reads them and does not validate that condition.
 
-## Physical / mathematical content
-
-For each buffered train, the function reads each core's first dimension as the corresponding left rank and the final core's fourth dimension as the right boundary rank.
-
-## Numerical / algorithmic content
-
-The output is an `(ncores+1)-by-ntrains` array; the first and last entries for each train are 1 for valid tensor trains.
-
-## Parameters / inputs
-
-- ttrain - a tensor train object
-
-## Outputs
-
-- ttranks - `(ncores+1)` by `ntrains` array; the first and last elements for each train are 1
-
-## Implementation structure
-
-- Read the number of cores and buffered trains.
-- Allocate the output array.
-- For each train, extract left ranks from the cores and the final right rank from the last core.
+It reads core-array dimensions only: it neither evaluates nor materialises tensor entries and leaves the train unchanged. There is no explicit type or shape guard in this method; it directly accesses `ttrain.cores`. The method performs no scalar operation or conjugation.

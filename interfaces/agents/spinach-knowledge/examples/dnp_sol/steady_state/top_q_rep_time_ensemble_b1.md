@@ -1,13 +1,23 @@
 # examples/dnp_sol/steady_state/top_q_rep_time_ensemble_b1.m
 
-- Signature: `top_q_rep_time_ensemble_b1()`
+- MATLAB implementation: [examples/dnp_sol/steady_state/top_q_rep_time_ensemble_b1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/top_q_rep_time_ensemble_b1.m)
 
-## Purpose
+- Signature: `top_q_rep_time_ensemble_b1()`; source runtime estimate: minutes.
 
-Calculates steady-state proton longitudinal expectation versus repetition time, averaging over a microwave B1 distribution. The source comments estimate the calculation takes minutes.
+## Question and choice
 
-## Physical / mathematical content
+How does TOP DNP steady-state proton longitudinal polarization vary with repetition time when microwave B1 is distributed but electron–proton distance is fixed? This variant uses a 3.5 Å separation and no distance ensemble.
 
-The model is an electron-proton pair at 3.5 Å in a Q-band field (1.2142 T), with spin temperature 80 K, trityl electron g principal values [2.00319, 2.00319, 2.00258], and proton shift [0, 0, 5] ppm. It uses the full sphten-liouv basis, distance- and orientation-dependent proton relaxation via `r1n_dnp`, diagonal relaxation, dibari equilibrium, and the `rep_2ang_800pts_sph` powder grid.
+## Model and scan
 
-The script samples five B1 values by Gauss-Legendre quadrature over 10–20 MHz and evaluates 30 logarithmically spaced repetition times from 10 μs to 1 ms. Each calculation uses 300 TOP DNP blocks, 10 ns pulses, 14 ns delays, a −13 MHz added shift, and 95 MHz electron offset; shot spacing is repetition time minus the pulse-train duration. It calls `powder` with `@topdnp_steady` in `esr` mode and averages over B1 weights. The output plots proton Iz expectation versus repetition time and is saved as `top_q_rep_time_ensemble_b1.fig`.
+No arguments. Source settings: `sys.magnet=1.2142` (labelled Q-band), isotopes E/1H, trityl electron g values `[2.00319 2.00319 2.00258]`, proton Zeeman values `[0 0 5]` (source comment: ppm guess), Euler angles `(pi/180)*{[0 10 0],[0 0 10]}`, spin temperature 80, and coordinates (0,0,0)/(0,0,3.5) (distance in Å). Basis is full `sphten-liouv` with no approximation; propagator chopping tolerance `1e-12`; hygiene disabled.
+
+B1 nodes/weights are `[b1,wb1]=gaussleg(10e6,20e6,5)` (Hz per source comment); distance is fixed. The 30-point repetition-time scan is `logspace(-5,-3,30)` seconds (10 μs–1 ms). It sets electron nutation frequency to `b1(k)` at each B1 node. TOP settings: spins E/1H; spherical grid `rep_2ang_800pts_sph`; 10 ns pulse; 14 ns delay; 300 blocks; `addshift=-13e6`; `el_offs=95e6`. Shot spacing subtracts 300 pulse-plus-delay periods (7.2 μs) from each repetition time.
+
+## Relaxation and calculation
+
+The source sets `inter.relaxation={'t1_t2'}`, callback `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`, `inter.r1_rates={1e3 r1n_rate}`, `inter.r2_rates={200e3 50e3}`, diagonal retention, and `dibari` equilibrium. Rate units are not annotated. Proton detection is `state(spin_system,'Lz','1H')`. Each point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`; B1 results are averaged with normalized `wb1` weights.
+
+## Output and limits
+
+Plots the real part of proton `I_z` expectation against repetition time in ms and saves `top_q_rep_time_ensemble_b1.fig` in the MATLAB current folder; no separate numerical data file is saved. TOP steady-state dynamics are delegated to `topdnp_steady`.

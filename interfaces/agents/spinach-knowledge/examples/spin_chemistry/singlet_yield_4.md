@@ -1,25 +1,17 @@
 # examples/spin_chemistry/singlet_yield_4.m
 
-- Signature: `singlet_yield_4()`
-
 ## Purpose
 
-Reproduce Figure 3 from the paper by Till, Timmel, Brocklehurst and Hore: http://dx.doi.org/10.1016/S0009-2614(98)01158-0. The source notes that the original paper uses only electron Zeeman operators for the field sweep, missing effects associated with the increasing nuclear Zeeman interaction on the high-field side of the plot. Calculation time: seconds.
+The source comment associates this calculation with Figure 3 by Till, Timmel, Brocklehurst and Hore and cites [10.1016/S0009-2614(98)01158-0](https://doi.org/10.1016/S0009-2614(98)01158-0). The comment says the paper's field sweep uses only electron Zeeman operators and therefore omits the rising nuclear-Zeeman contribution on the high-field side. This is a report of what the source comment says, not an independent check of the cited paper. The source estimates calculation time as seconds; this is not a measured benchmark.
 
-## Physical / mathematical content
+## Spin model and observable
 
-- The spin system contains two electrons (`E`) and two protons (`1H`). Electron scalar Zeeman values are `2.0023` and `2.0044`; both proton scalar Zeeman entries are zero.
-- Scalar couplings between electron 1 and protons 3 and 4 are `gauss2mhz(35)*1e6` and `gauss2mhz(30)*1e6`, respectively. The `{4,4}` scalar coupling entry is set to zero.
-- The calculation plots singlet recombination yield against `log(magnetic induction / mT)`.
+The isotope list is two electrons and two protons (`{'E','E','1H','1H'}`). Their Zeeman scalar values are 2.0023, 2.0044, 0, and 0. The listed scalar hyperfine couplings connect electron 1 to the two protons at 35 G and 30 G, respectively. The source selects electron spins for the field-sweep Zeeman operator (`parameters.spins={'E'}` and `parameters.needs={'zeeman_op'}`), so the plotted sweep does not add nuclear Zeeman operators. The unapproximated basis is `zeeman-hilb`.
 
-## Numerical / algorithmic content
+The shared `rydmr_exp` callback starts from the electron singlet selected by `[1 2]` and computes singlet recombination yield with exponential recombination kinetics. This script supplies no separate relaxation-rate parameter.
 
-- Set `sys.magnet=1` for the field sweep. Use the `zeeman-hilb` formalism with approximation `none`.
-- Sweep `parameters.fields=1e-3*10.^linspace(-5,3,2000)` with rates `[0.1 1.0 10.0 100.0 1000.0]*1e6`. Set `parameters.electrons=[1 2]`, `parameters.spins={'E'}`, and `parameters.needs={'zeeman_op'}`.
-- Create the spin system, apply the basis, and run `liquid(spin_system,@rydmr_exp,parameters,'labframe')`.
+## Sweep and plot
 
-## Implementation structure
+The field array is `1e-3*10.^linspace(-5,3,2000)` T, spanning 10^-5 to 10^3 mT logarithmically. Five recombination rates are `[0.1 1.0 10.0 100.0 1000.0]*1e6` Hz. The plot uses `linspace(-5,3,2000)` as the log10 magnetic-induction axis in mT, and labels the vertical axis as singlet recombination yield.
 
-- Define the unit magnet, spin system, basis, couplings, and sequence parameters.
-- Initialise the Spinach spin system with `create` and `basis`.
-- Simulate with `liquid`, then plot the result against `linspace(-5,3,2000)` with grid and axis labels.
+Source: [examples/spin_chemistry/singlet_yield_4.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/spin_chemistry/singlet_yield_4.m).

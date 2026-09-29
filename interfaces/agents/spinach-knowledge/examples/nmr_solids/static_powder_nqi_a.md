@@ -1,15 +1,14 @@
 # examples/nmr_solids/static_powder_nqi_a.m
 
 - Signature: `static_powder_nqi_a()`
+- Source: [examples/nmr_solids/static_powder_nqi_a.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/static_powder_nqi_a.m)
 
-## Purpose
+## Purpose and model
 
-Simulates the static 14N powder pattern of L-valyl-L-alanine, using the large orientation grid specified in the example to reproduce Figure 5 of O'Dell and Ratcliffe. The source estimates a calculation time of minutes. Reference: [O'Dell and Ratcliffe](https://doi.org/10.1016/j.cplett.2011.08.030).
+Calculates the static powder 14N NMR pattern of L-valyl-L-alanine. The source says the large orientation grid is intended to reproduce Figure 5 of O'Dell and Ratcliffe ([DOI](https://doi.org/10.1016/j.cplett.2011.08.030)); its runtime estimate is minutes.
 
-## Spin system and interactions
+Two 14N spins are assigned separate quadrupolar interactions with `eeqq2nqi`: values 1.24e6 and 3.06e6, asymmetries 0.22 and 0.40, respectively. The field parameter is 21.1. A full Zeeman Hilbert-space basis is used with no approximation. `powder` performs the static orientation average on `icos_2ang_163842pts`; no rotor or gradient parameters are set.
 
-The model contains two 14N spins at 21.1 T. Their quadrupolar interaction matrices are generated with `eeqq2nqi`, using coupling magnitudes 1.24 and 3.06 MHz and asymmetries 0.22 and 0.40, respectively. The basis is the full Zeeman Hilbert-space basis (`zeeman-hilb`, no approximation).
+## Acquisition and processing
 
-## Simulation and processing
-
-The acquisition uses 14N, a 6 MHz sweep, 512 points, a 2048-point zero-fill, and the `icos_2ang_163842pts` powder grid. The frequency axis is in MHz and inverted. Initial and detection states are both the 14N `L+` state. The powder FID is apodised with an exponential parameter of 6, Fourier transformed, and plotted.
+The NMR acquisition selects 14N with offset 0, sweep 6e6, 512 acquired points, and 2048-point zero-fill. The frequency-axis setting is MHz and the axis is inverted. The initial and detection states are both 14N `L+`. The powder FID is exponentially apodised with parameter 6, Fourier transformed, and plotted using its real part.

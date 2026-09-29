@@ -1,21 +1,17 @@
 # examples/nmr_solids/mas_powder_nqi_fplanck.m
 
-- Signature: `mas_powder_nqi_fplanck()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_nqi_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_nqi_fplanck.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_nqi_fplanck.m)
 
-Simulates the powder MAS spectrum of a single quadrupolar deuterium nucleus. The source header identifies Fokker–Planck theory and states that perturbative corrections to the rotating-frame transformation are not applied; the simulation call is `singlerot(...)`. Calculation time: seconds.
+## Purpose and spin system
 
-## Physical / mathematical content
+This example computes a powder MAS spectrum for one quadrupolar `2H` nucleus. The source sets `9.4 T`, quadrupolar tensor eigenvalues `[-1e3 -2e3 3e3] Hz`, and Euler angles `[0 0 0]`. These are model inputs rather than experimental measurements; the tensor eigenvalues sum to zero. Spinach documents quadrupolar interaction tensors in Hz in its [g2spinach knowledge page](../../interfaces/g2spinach.md).
 
-- The source specifies one `2H` nucleus at 9.4 T, with quadrupolar coupling eigenvalues `[-1e3 -2e3 3e3]` and Euler angles `[0 0 0]`.
-- The rotor axis is `[1 1 1]` at 1000 Hz, with `2H` as the initial state and detected operator.
+## Fokker–Planck label, actual call, and acquisition
 
-## Numerical / algorithmic content
+The source header identifies Fokker–Planck theory and says perturbative corrections to the rotating-frame transformation are not applied. The code's actual simulation call is `singlerot(spin_system,@acquire,parameters,'nmr')`, not `floquet` or `gridfree`; the page therefore distinguishes the stated formalism from the invoked routine. The source estimates seconds for calculation time, not a measured runtime.
 
-- Uses the spherical-tensor Liouville-space basis with no approximation and projection +1. The source sets maximum rank 17 and grid `leb_2ang_rank_17`.
-- Acquires 512 points over a `2e4` sweep, zero-fills to 4096, applies exponential apodisation parameter 6, then Fourier transforms and plots the real spectrum.
+The rotor axis is `[1 1 1]` and rate `1000 Hz`; powder settings are `leb_2ang_rank_17` and `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, offset 0, and ppm axis units; it selects `2H`, leaves `decouple={}`, and sets `invert_axis=1`. Both initial state and receiver are `L+` on `2H`.
 
-## Implementation structure
-
-- Define the quadrupolar spin system and basis, configure the experiment, call `singlerot(spin_system,@acquire,parameters,'nmr')`, apodise, Fourier transform, and plot.
+The returned FID is exponentially apodised with parameter `6`, Fourier transformed with `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted using `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.

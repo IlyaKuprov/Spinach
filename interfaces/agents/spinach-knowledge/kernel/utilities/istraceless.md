@@ -1,23 +1,23 @@
 # kernel/utilities/istraceless.m
 
-- Signature: `A=istraceless(M)`
-
 ## Purpose
 
-Tests whether a numeric matrix is traceless within a tolerance set by the floating-point precision of its class and the matrix norm.
+Checks whether a matrix is traceless within floating-point precision, returning a logical true or false. Source: [kernel/utilities/istraceless.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/istraceless.m).
 
-## Parameters / inputs
+## Behavior
 
-- `M` - numeric matrix of any dimension.
+The function calls `grumble(M)` to enforce that the input is numeric, raising the error `'M must be numeric.'` if `~isnumeric(M)` is true. It then computes the working precision as `eps(class(M))`, obtains the cheapest norm of `M` via `cheap_norm(M)`, and returns `A=(abs(trace(M))<=precision*norm_m)`. Thus `A` is true when the absolute value of the trace does not exceed the precision-scaled norm of the matrix.
 
-## Outputs
+## Inputs and outputs
 
-- `A` - true when the trace test passes; false otherwise.
+**Inputs:**
 
-## Numerical / algorithmic content
+- `M` — a matrix of any dimension.
 
-The function sets `precision=eps(class(M))`, computes `norm_m=cheap_norm(M)`, and returns whether `abs(trace(M)) <= precision*norm_m`. It rejects nonnumeric inputs.
+**Outputs:**
 
-## Source
+- `A` — true if the matrix is traceless to appropriate precision, false otherwise.
 
-[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=istraceless.m)
+## References
+
+- Spinach Dynamics Wiki: [istraceless.m](https://spindynamics.org/wiki/index.php?title=istraceless.m)

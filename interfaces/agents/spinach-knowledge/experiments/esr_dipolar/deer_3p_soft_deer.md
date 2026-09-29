@@ -1,25 +1,13 @@
 # experiments/esr_dipolar/deer_3p_soft_deer.m
 
-- Signature: `echo_stack=deer_3p_soft_deer(spin_system,parameters,H,R,K)`
+This function simulates a three-pulse DEER/PELDOR echo stack with soft pulses propagated by the Fokker-Planck formalism. It accepts context-supplied Hamiltonian, relaxation, and kinetics matrices, converts to Liouville representation when needed, and forms `L=H+1i*R+1i*K`. The source admits the `sphten-liouv` and `zeeman-liouv` formalisms.
 
-## Purpose and sequence
+## Timing and detection
 
-Simulate a three-pulse DEER/PELDOR sequence with soft pulses using the Fokker-Planck formalism. The function propagates the initial state through the first pulse, samples the second-pulse position across the first-to-third-pulse gap, applies the third pulse, and records an echo window for each sampled position.
+After the first shaped pulse, the routine propagates a trajectory across `parameters.p1_p3_gap` at `parameters.p2_nsteps` insertion positions, applies the second shaped pulse at those positions, refocuses the trajectory, and applies the third shaped pulse. It then propagates to the echo-window start and samples `parameters.coil` over `parameters.echo_time` with `parameters.echo_npts` points. The time coordinate denotes the second-pulse insertion point after the first pulse ends. This source defines three-pulse DEER, not four-pulse DEER or CPMG/CP.
 
-## Parameters and output
+Required fields are `parameters.pulse_frq`, `parameters.pulse_pwr`, `parameters.pulse_dur`, `parameters.pulse_phi`, and `parameters.pulse_rnk` (three values each), plus `parameters.p1_p3_gap`, `parameters.p2_nsteps`, `parameters.echo_time`, `parameters.echo_npts`, `parameters.rho0`, `parameters.coil`, `parameters.spins`, `parameters.offset`, and `parameters.method`. The context arguments `H`, `R`, and `K` must be same-sized matrices. Units are Hz for pulse frequencies and receiver offset, rad/s for pulse power, seconds for durations and the gap/window, and radians for phases; ranks are integer Fokker-Planck ranks. The spin cell normally contains E; the pulse operators are built for its first entry. Methods are `expm`, `expv`, or `evolution`.
 
-- `parameters.pulse_frq`, `parameters.pulse_pwr`, `parameters.pulse_dur`, `parameters.pulse_phi` and `parameters.pulse_rnk` give the three pulses' frequencies, powers, durations, phases and Fokker-Planck ranks. Each is a three-element vector; powers and durations must be positive.
-- `parameters.p1_p3_gap` sets the first-to-third-pulse gap; `parameters.p2_nsteps` sets the number of sampled second-pulse positions.
-- `parameters.echo_time` and `parameters.echo_npts` specify the echo sampling window and its number of points.
-- `parameters.rho0` and `parameters.coil` are the initial and detection states; `parameters.spins` selects the irradiated spin, `parameters.offset` gives the receiver offset, and `parameters.method` selects the propagation method (`expv`, `expm` or `evolution`).
-- Returns `echo_stack`, with one `parameters.echo_npts`-sample trace for each of the `parameters.p2_nsteps` positions.
+`echo_stack` contains `parameters.p2_nsteps` echoes with `parameters.echo_npts` samples per echo. The source suggests `expm`, then `expv` if memory is exhausted, then `evolution`; this is source guidance, not a performance guarantee. It also notes that simulated echoes may be narrow without experimental-parameter distributions and recommends Fourier-transforming the echo before integration.
 
-## Requirements
-
-The function is available only in Liouville space. `H`, `R` and `K` must be same-sized matrices. `parameters.spins` is a one-element cell array containing a character string; `parameters.p1_p3_gap` must be positive and `parameters.p2_nsteps` and `parameters.echo_npts` positive integers.
-
-## Notes
-
-- The DEER-trace time refers to the second-pulse insertion point, after the first pulse ends.
-- Simulated echoes can be sharp because the simulation lacks the experimental parameter distributions; Fourier-transform the echo before integration.
-- For propagation, start with `expm`, switch to `expv` if memory runs out, and use `evolution` only as a last resort.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_soft_deer.m

@@ -2,18 +2,11 @@
 
 - Signature: `answer=ismatrix(tt)`
 
-## Purpose
+## Purpose and behavior
 
-Tests whether the input is a non-empty tensor-train object.
+Returns logical true exactly when `tt` is a `ttclass` object and its `cores` property is non-empty; otherwise it returns logical false. The predicate checks the stored TT core-cell container only; it is not a test or description of a polyadic-object representation. It does not inspect core contents, validate TT ranks, or determine whether a general MATLAB array has exactly two dimensions, so read the result as this overload's storage predicate rather than a general shape validation.
 
-## Input
+## Sources
 
-- `tt` — object to test.
-
-## Output
-
-- `answer` — logical true when `tt` is a `ttclass` object with non-empty cores; logical false otherwise.
-
-## Behavior
-
-The function checks the object's class and whether its `cores` property is non-empty.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/ismatrix.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/ismatrix.m)

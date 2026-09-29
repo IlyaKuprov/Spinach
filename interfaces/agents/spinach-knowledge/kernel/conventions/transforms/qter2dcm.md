@@ -1,33 +1,17 @@
 # kernel/conventions/transforms/qter2dcm.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/qter2dcm.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=qter2dcm.m)
+
 - Signature: `dcm=qter2dcm(q)`
 
-## Purpose
+## Behavior
 
-Converts a quaternion to the 3x3 direction cosine matrix (DCM) used by `euler2dcm.m`.
+The function normalizes quaternion components `(u,i,j,k)` and returns the active-convention direction cosine matrix used by `euler2dcm.m`:
 
-## Physical / mathematical content
+`[1-2*(j^2+k^2), 2*(i*j-u*k), 2*(i*k+u*j); 2*(i*j+u*k), 1-2*(i^2+k^2), 2*(j*k-u*i); 2*(i*k-u*j), 2*(j*k+u*i), 1-2*(i^2+j^2)]`
 
-The function first normalizes the quaternion components `(u,i,j,k)`. It then returns `[1-2*(j^2+k^2), 2*(i*j-u*k), 2*(i*k+u*j); 2*(i*j+u*k), 1-2*(i^2+k^2), 2*(j*k-u*i); 2*(i*k-u*j), 2*(j*k+u*i), 1-2*(i^2+j^2)]`. This is the active convention used by `euler2dcm.m`; MATLAB Aerospace Toolbox `quat2dcm()` returns the transpose for the same quaternion.
+Use it on a column vector as `v=dcm*v`, and on a 3x3 interaction tensor as `A=dcm*A*dcm'`. For the same quaternion, MATLAB Aerospace Toolbox `quat2dcm()` returns the transpose of this matrix.
 
-## Numerical / algorithmic content
+## Input and output
 
-The quaternion norm must be at least `sqrt(eps())`; smaller norms cause an error. The DCM acts on a column vector as `v=dcm*v` and transforms a 3x3 tensor as `A=dcm*A*dcm'`.
-
-## Syntax
-
-```matlab
-dcm=qter2dcm(q)
-```
-
-## Parameters / inputs
-
-- `q` — structure with real numeric scalar fields `u`, `i`, `j`, and `k`.
-
-## Outputs
-
-- `dcm` — 3x3 direction cosine matrix.
-
-## Implementation structure
-
-The function checks the quaternion fields and their values, rejects a norm below `sqrt(eps())`, normalizes the quaternion, and constructs the DCM from its components.
+The input structure must contain numeric, real scalar fields `u`, `i`, `j`, and `k`. A Euclidean quaternion norm below `sqrt(eps())` raises an error; otherwise the components are normalized before constructing the matrix. The output `dcm` is a 3x3 direction cosine matrix.

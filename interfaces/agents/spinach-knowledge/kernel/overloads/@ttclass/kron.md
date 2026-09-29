@@ -1,23 +1,20 @@
 # kernel/overloads/@ttclass/kron.m
 
-- Signature: `c=kron(a,b)`
+[Mapped MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/kron.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/kron.m)
 
-## Purpose
+## Signature
 
-Constructs the Kronecker product of two tensor-train matrix representations, core by core.
+`c=kron(a,b)`
 
-## Numerical / algorithmic content
+## Core and coefficient action
 
-Both operands are shrunk before their sizes and ranks are read. The operation requires the same number of cores, forms each output core from the Kronecker product of reshaped operand cores, multiplies the coefficients, and sets the output tolerance from the operand coefficients and tolerances.
+The method shrinks both operands first. If shrinking does not leave a `ttclass` object, it converts that operand with `truncate(ttort(pack(x),+1))`, retaining scalar-topology trains as a single normalized train. It then requires equal core counts; a mismatch raises `tensor train structures must be consistent.`.
 
-## Parameters / inputs
+For each core index `k`, it reshapes each operand core using that train's ranks and two mode sizes, takes `kron(core_of_b,core_of_a)`, permutes the resulting axes, and reshapes to one output core. Its shape is `[a_ranks(k,1)*b_ranks(k,1), b_sizes(k,1)*a_sizes(k,1), b_sizes(k,2)*a_sizes(k,2), a_ranks(k+1,1)*b_ranks(k+1,1)]`. Thus each of the two mode sizes and each boundary rank is the product of the corresponding operand values; the rank ordering is the product of the two operands' ranks.
 
-- a,b -tensor train objects
+The output coefficient is `b.coeff*a.coeff`. If either coefficient is zero, output tolerance is set to zero; otherwise it is `abs(a.coeff)*b.tolerance+abs(b.coeff)*a.tolerance`. The method does not conjugate either operand. It returns a `ttclass` with constructed cores, not a full materialized matrix. Its element ordering differs from the flat matrix Kronecker product by row and column permutations, and is consistent with [`ttclass/vec`](https://spindynamics.org/wiki/index.php?title=ttclass/vec.m).
 
-## Outputs
+## Inputs and output
 
-- c -a tensor train object
-
-## Ordering caveat
-
-The result is not ordered like the flat matrix Kronecker product: it differs by a row and column permutation. Its element order is consistent with the output of `ttclass/vec`.
+- `a`, `b` — tensor-train objects with equal numbers of cores.
+- `c` — tensor-train Kronecker result.

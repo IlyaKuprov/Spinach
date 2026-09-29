@@ -1,11 +1,12 @@
 # examples/visualisation/efg_silicate.m
 
 - Signature: `efg_silicate()`
+- Source: [examples/visualisation/efg_silicate.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/visualisation/efg_silicate.m)
 
-## Purpose
+## Purpose and input
 
-Convert the CASTEP-derived `alsilicate.magres` data with `c2spinach`, then visualise the electric-field-gradient tensor for aluminium in an aluminosilicate solid.
+This example imports CASTEP MAGRES data from `alsilicate.magres` using `c2spinach`, then displays the aluminium electric-field-gradient (EFG) tensor for the aluminosilicate example.
 
-## Implementation
+## Rendering
 
-The script creates two views with `efg_display`: ellipsoids and spherical harmonics. Each call selects `Al` and uses the source parameter `100`.
+A two-panel figure compares ellipsoid and spherical-harmonic styles. Both calls select Al, pass the parameter 100 to `efg_display`, and set camera position [40 40 40]. The figure uses `scale_figure([1.875 1.125])`. The source does not state units or a physical interpretation for the display parameter 100; it is recorded only as the value supplied to the renderer.

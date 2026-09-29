@@ -1,21 +1,15 @@
 # examples/nmr_proteins/expt_data/hsqc_ubiquitin_expt.m
 
-- Signature: `hsqc_ubiquitin_expt()`
+Source: [examples/nmr_proteins/expt_data/hsqc_ubiquitin_expt.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/expt_data/hsqc_ubiquitin_expt.m)
 
 ## Purpose
 
-Processes and plots an experimental HSQC spectrum of human ubiquitin.
+Processes and plots measured two-dimensional 15N-1H HSQC data for human ubiquitin. The function loads `fid` from `hsqc_ubiquitin_expt.mat`; it does not simulate a pulse sequence, and its `spin_system` struct is used only for plotting metadata. The source specifies no paramagnetic centers or magnetic tensors, so this is protein nuclear-spin NMR rather than a paramagnetic calculation.
 
-## Physical / mathematical content
+## Data processing
 
-- Displays a two-dimensional 15N and 1H spectrum.
+The loaded FID has positive and negative components. Each component is cosine-apodised in both dimensions and multiplied by the F1 phase factor `exp(-1i*0.7)`. The code Fourier-transforms each component along dimension 1 with zero filling to 1024 points, combines them as `f1_pos + conj(f1_neg)` to form a States signal, then Fourier-transforms dimension 2 to 1024 points. It flips both dimensions and plots `-imag(spectrum)`; it does not write a processed spectrum file.
 
-## Numerical / algorithmic content
+## Axes and display
 
-- Applies a phase factor and cosine apodisation to positive and negative FIDs, Fourier-transforms and combines them into a States signal, then Fourier-transforms, flips, and plots the spectrum.
-
-## Implementation structure
-
-- Donghan Lee (Max Planck Institute)
-- Ilya Kuprov (University of Southampton)
-- Loads `hsqc_ubiquitin_expt.mat`, sets the magnetic field to 11.7395 T, zero filling to [1024 1024], sweeps to [2000 4000] Hz, and offsets to [-5870 3753] Hz; plots in ppm.
+Plotting metadata specifies spins `15N`, `1H`, field `11.7395` T, offsets `[-5870 3753]` Hz, sweeps `[2000 4000]` Hz, and zero filling `[1024 1024]`; axes are displayed in ppm. The source processes imported experimental data and does not specify the pulse sequence or its receiver acquisition.

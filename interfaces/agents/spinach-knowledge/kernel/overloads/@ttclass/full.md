@@ -4,20 +4,15 @@
 
 ## Purpose
 
-Converts a tensor-train representation of a matrix into a dense matrix.
+Materializes a tensor-train matrix as a dense numeric matrix. A TT stores each sum term as a column of core cells, with a coefficient for that term; each core carries left/right bond ranks and one row-mode and one column-mode dimension. This is a tensor-train representation, not a polyadic-object storage interface.
 
-## Input
+## Contraction and result shape
 
-- `ttrain` — tensor train object.
+The result is initialized with `zeros(size(ttrain))`, so its matrix shape is the product of the row-mode sizes by the product of the column-mode sizes. For each train term, the function starts from the last core, contracts toward the first using the adjacent bond ranks, and reshapes/permutes the accumulated row and column mode axes into matrix order. It multiplies that dense term by its stored coefficient and adds it to the result.
 
-## Output
+The allocation is dense and can be very large. The function contains no explicit class, rank-consistency, or mode-size validation; it relies on the object's core, rank, size, and `size` methods to describe a valid TT.
 
-- `answer` — full matrix represented by `ttrain`.
+## Sources
 
-## Note
-
-The dense result can be very large; careless use may exhaust available memory.
-
-## Algorithm
-
-The function preallocates the result, obtains the train ranks and mode sizes, contracts the cores from the last core toward the first for each train, and adds each contracted matrix weighted by its coefficient.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/full.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/full.m)

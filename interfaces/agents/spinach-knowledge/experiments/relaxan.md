@@ -1,25 +1,25 @@
 # experiments/relaxan.m
 
-- Signature: `[r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/relaxan.m
+Spinach Wiki: https://spindynamics.org/wiki/index.php?title=relaxan.m
 
 ## Purpose
 
-Analyses the spin system relaxation model, reports longitudinal and transverse relaxation rates and times for every spin, and returns the relaxation superoperator.
+`relaxan` evaluates the configured relaxation model for each spin. It returns longitudinal and transverse rates and times, and the complete relaxation superoperator. This is model analysis, not an experimental measurement.
 
-## Numerical / algorithmic content
+## Calculation
 
-The routine builds `R` with `relaxation`, optionally at the supplied orientation. For each spin it evaluates the decay rate of its `Lz` state and `L+` state from the corresponding normalized quadratic form with `R`; it returns the rates in Hz and their reciprocals as relaxation times in seconds. Dynamic frequency shifts are dropped.
+The routine converts the supplied system to the adjoint representation with `sim2liouv` and calls `relaxation`, with the optional orientation argument when supplied. For each spin it constructs `Lz` and `L+` state vectors, then computes the respective rate as `-real((S'*R*S)/(S'*S))`; each reported time is the reciprocal of its rate. The printed rate columns are labelled Hz and the time columns seconds. Dynamic frequency shifts are dropped.
 
-## Parameters / inputs
+`euler_angles` is optional and is documented for orientation-dependent relaxation. The source checks for a real three-element value when it is supplied.
 
-- `euler_angles` — optional real three-element Euler-angle vector for orientation-dependent relaxation properties.
+## Inputs and outputs
 
-## Outputs
+- Call: `[r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)`; omit the second argument when no orientation is requested.
+- `r1` and `r2` are `nspins`-by-1 vectors of longitudinal and transverse rates; `t1` and `t2` are matching time vectors.
+- `R` is the complete relaxation superoperator.
+- The routine reports each spin number and the system's isotope label alongside the calculated values.
 
-- `r1` — vector of longitudinal relaxation rates, in Hz, one per spin.
-- `r2` — vector of transverse relaxation rates, in Hz, one per spin.
-- `t1` — vector of longitudinal relaxation times, in seconds, one per spin.
-- `t2` — vector of transverse relaxation times, in seconds, one per spin.
-- `R` — complete relaxation superoperator.
+## Source reference
 
-The function requires Liouville-space formalism.
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=relaxan.m)

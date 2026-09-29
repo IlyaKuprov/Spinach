@@ -1,30 +1,28 @@
 # etc/diamond_defects/diamond_p.m
 
-- Signature: [sys,inter]=diamond_p(parameters)
+- MATLAB implementation: [etc/diamond_defects/diamond_p.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_p.m)
 
-## Purpose
+## Purpose and call
 
-Builds spin systems for the phosphorus-related diamond centres MA1, NP1–NP6, NP8, and NP9. The tabulated magnetic parameters are from Nadolinny et al., *Crystals* **7**, 237 (2017), https://doi.org/10.3390/cryst7080237.
+`[sys,inter]=diamond_p(parameters)` constructs Spinach spin-system and interaction specifications for the phosphorus-related diamond centres described by Nadolinny et al., *Crystals* **7**, 237 (2017), <https://doi.org/10.3390/cryst7080237>.
 
-## Physical / mathematical content
+## Inputs and constraints
 
-The selected centre determines the electron g tensor and the set of nuclear hyperfine tensors. The model includes 31P nuclei and, for NP1–NP3, the specified 14N nuclei. MA1 may additionally include the reported 13C hyperfine coupling. The routine does not add zero-field splitting or nuclear quadrupole interactions.
+`parameters` must be one structure with these fields:
 
-## Numerical / algorithmic content
+- `centre`: character string naming `'ma1'`, `'np1'`, `'np2'`, `'np3'`, `'np4'`, `'np5'`, `'np6'`, `'np8'`, or `'np9'`; matching is case-insensitive.
+- `orientation`: character string `'111'`, `'110'`, or `'100'`, specifying the crystal-plane normal aligned with the magnetic field.
+- `include_13c`: scalar logical controlling the reported MA1 13C hyperfine coupling. It defaults to `false` if absent; `true` is accepted only for MA1.
 
-The tabulated principal values are converted from mT to frequency units and transformed from their principal-axis frame to the requested crystal orientation. MA1's 13C coupling is optional and disabled by default.
+## Model and units
 
-## Parameters / inputs
+The centre selects an electron g tensor and nuclear hyperfine tensors. Each centre includes 31P; NP1–NP3 also include 14N; NP8 includes two 31P nuclei; MA1 can include 13C when requested. Tabulated hyperfine principal values are converted from mT to frequency units using `abs(spin('E'))/(2*pi)*1e-3`. Tensors are placed in the frames specified for each centre and rotated to align the selected crystal-plane normal with the field. The routine populates the electron Zeeman matrix and electron–nuclear coupling matrices.
 
-- parameters.centre: 'ma1', 'np1', 'np2', 'np3', 'np4', 'np5', 'np6', 'np8', or 'np9'.
-- parameters.orientation: '111', '110', or '100'; the corresponding crystal-plane normal is aligned with the magnetic field.
-- parameters.include_13c: scalar logical; include the reported 13C hyperfine coupling for MA1. Defaults to false; true is supported only for MA1.
+## Outputs and limitations
 
-## Outputs
+- `sys`: Spinach system specification structure containing the electron and selected nuclear isotopes.
+- `inter`: Spinach interaction specification structure containing the electron Zeeman tensor and electron–nuclear hyperfine couplings.
 
-- sys: Spinach system specification structure.
-- inter: Spinach interaction specification structure.
+No zero-field-splitting or nuclear quadrupole interaction is assigned. The function returns specifications, not a simulated spectrum. Source documentation: <https://spindynamics.org/wiki/index.php?title=diamond_p.m>.
 
-## Implementation structure
-
-The function selects the table entry, builds its nuclei and tensors, rotates them for the selected orientation, and returns the Zeeman and electron–nuclear coupling matrices.
+**Frame clarification:** NP6 uses the trigonal frame for its g tensor but the identity frame for its 31P hyperfine tensor; do not assume all tensors for one centre share a frame.

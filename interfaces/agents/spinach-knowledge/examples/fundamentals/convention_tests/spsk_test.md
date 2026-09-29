@@ -1,11 +1,19 @@
 # examples/fundamentals/convention_tests/spsk_test.m
 
+- MATLAB implementation: [examples/fundamentals/convention_tests/spsk_test.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/convention_tests/spsk_test.m)
+
 - Signature: `spsk_test()`
 
-## Purpose
+## Question tested
 
-Checks the span-skew interaction convention implemented by `spsk2mat` against direct rotation of a diagonal tensor.
+The test checks the span–skew convention used by `spsk2mat`: do the isotropic value, span, skew, and Euler angles reconstruct the same rotated tensor as direct rotation of its principal-value diagonal matrix?
 
-## Method and check
+## Construction and criterion
 
-The test draws three separated eigenvalues (`xx=rand()`, `yy=rand()+3`, and `zz=rand()+6`) and random Euler angles. It constructs `AM=R*diag([xx yy zz])*R'` directly, then computes the isotropic value, span, and skew parameters used by `spsk2mat` to form `AS`. The 1-norm of `AM-AS` must be below 10⁻⁶.
+It draws `xx=rand()`, `yy=rand()+3`, and `zz=rand()+6`, so the generated values are ordered and distinct, then draws Euler angles `alp` and `gam` from `[0,2π)` and `bet` from `[0,π)`. With `R=euler2dcm(alp,bet,gam)`, the direct matrix is `AM=R*diag([xx yy zz])*R'`. The convention parameters in the source are
+
+- `iso=(xx+yy+zz)/3`;
+- `sp=zz-xx`;
+- `sk=3*(yy-iso)/sp`.
+
+The Spinach construction is `AS=spsk2mat(iso,sp,sk,alp,bet,gam)`. It tests whether `norm(AM-AS,1)<1e-6`; the source displays its success message only on that branch and otherwise raises an error. This checks the parameterization for generated diagonal eigenvalues and orientations, not every possible tensor input.

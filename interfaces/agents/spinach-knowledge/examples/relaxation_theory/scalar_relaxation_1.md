@@ -1,15 +1,11 @@
 # examples/relaxation_theory/scalar_relaxation_1.m
 
-- Signature: `scalar_relaxation_1()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/scalar_relaxation_1.m) · Signature: `scalar_relaxation_1()`
 
-## Purpose
+## Purpose and physical setting
 
-Constructs and displays a Redfield superoperator for scalar relaxation of the first kind in a two-proton system with a fluctuating J-coupling. The example is described as modelling the effect of slow nitrogen inversion in aziridines, which modulates scalar couplings on a millisecond timescale; see the cited [article](http://dx.doi.org/10.1002/ange.201410271). Calculation time: seconds.
+Builds a relaxation superoperator for scalar relaxation of the first kind in a two-proton model with a noisy J-coupling. The source relates the example to aziridines, where slow nitrogen inversion jitters scalar couplings on a millisecond time scale, and cites [the described effect](https://doi.org/10.1002/ange.201410271). The model itself contains the two listed proton spins; it is not a simulated nitrogen-inversion trajectory.
 
-## Physical / mathematical content
+## Model and output
 
-The two `1H` spins are specified at `11.75 T`, with Zeeman scalars `0.0` and `2.0`. The Redfield setup selects `SRFK` relaxation, keeps the `kite` terms, uses zero equilibrium, sets correlation times to `1.0` and `1e-3`, and sets the sole off-diagonal SRFK modulation depth to `15.0`.
-
-## Numerical / algorithmic content
-
-The model uses the complete `sphten-liouv` basis with no approximation. It creates the spin system and basis, obtains the relaxation superoperator, and displays the nonzero pattern with `spy`.
+The source sets `sys.magnet=11.75` and `inter.zeeman.scalar={0.0 2.0}`; units for these scalar values are not identified. It uses the complete `sphten-liouv` basis without approximation and configures `inter.relaxation={'SRFK'}`, `inter.rlx_keep='kite'`, and zero equilibrium. The SRFK correlation-time input is `[1.0 1e-3]`, with off-diagonal modulation-depth entry `15.0`; the source does not label units for these values. After system and basis construction, it evaluates `relaxation(spin_system)` and displays the superoperator's nonzero pattern with `spy`. It does not set up an acquisition, pulse sequence, or spectrum calculation.

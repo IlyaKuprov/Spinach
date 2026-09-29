@@ -1,28 +1,29 @@
 # kernel/derivatives/fourdif.m
 
-- Signature: `[x,DM]=fourdif(N,m)`
+[Direct MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fourdif.m) · [Spinach Wiki documentation](https://spindynamics.org/wiki/index.php?title=fourdif.m)
 
-## Purpose
+## Purpose and signature
 
-Computes the m-th derivative Fourier spectral differentiation matrix on the equispaced grid `x_j = 2*pi*j/N`, for `j=0,...,N-1`, in `[0,2*pi)`.
+`[x,DM] = fourdif(N,m)` returns Fourier spectral differentiation data on the canonical periodic grid with `N` equally spaced points in `[0,2*pi)`.
 
-## Inputs
+## Inputs and outputs
 
-- `N` - positive real integer grid dimension.
-- `m` - positive real integer derivative order.
+- `N`: positive real integer scalar, the number of grid points.
+- `m`: positive real integer scalar, the derivative order.
+- `x`: `N`-by-1 column of points `x_j = 2*pi*j/N`, for `j=0,...,N-1`.
+- `DM`: `N`-by-`N` differentiation matrix, formed only when the caller requests a second output.
 
-## Outputs
+For example, `[x,DM]=fourdif(8,1)` requests eight grid points and an 8-by-8 first-derivative matrix. The coordinate spans one period; the matrix is defined with respect to this canonical coordinate, not automatically rescaled to a different interval.
 
-- `x` - the grid points.
-- `DM` - the m-th order differentiation matrix, constructed when two outputs are requested.
+## Construction
 
-## Algorithm
+For first and second derivatives, the source uses explicit first-column formulae, with the parity-dependent cotangent/cosecant forms for the first derivative and the flipping trick cited below for improved accuracy. For orders above two, it uses the discrete-Fourier construction. It obtains the first row and column and assembles the matrix with `toeplitz`.
 
-For `m=1` and `m=2`, explicit formulae compute the first column; the implementation uses the flipping trick to improve accuracy. For `m>2`, it uses a discrete Fourier approach. The first row and column are assembled into `DM` with `toeplitz()`.
+The source also contains a zeroth-order identity branch, while its input guard accepts only positive `m`; the documented accepted call therefore has `m >= 1`.
 
-The code contains an `m=0` identity-matrix branch, but the input check requires `m` to be a positive integer, so validated calls cannot reach it.
+## Validation and reference
 
-## References
+The guard requires `N` and `m` each to be numeric, real, scalar, and a positive integer. The grid spacing used in the construction is `2*pi/N`.
 
 - S.C. Reddy and J.A.C. Weideman, [doi:10.1137/0916073](http://dx.doi.org/10.1137/0916073).
 - [Spinach Wiki documentation](https://spindynamics.org/wiki/index.php?title=fourdif.m)

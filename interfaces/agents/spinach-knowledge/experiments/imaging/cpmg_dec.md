@@ -1,26 +1,21 @@
 # experiments/imaging/cpmg_dec.m
 
 - Signature: `mri=cpmg_dec(spin_system,parameters,H,R,K,G,F)`
+- Canonical MATLAB source: [`experiments/imaging/cpmg_dec.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/cpmg_dec.m)
 
-## Purpose
+## Contract
 
-Runs a Carr–Purcell–Meiboom–Gill (CPMG) sequence on an MRI phantom from the `imaging()` context and returns an image of the specified spin state.
+Call from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`. The function returns an MRI phantom/image on the spatial grid described by `parameters.npts`; it does not return an acquired FID. The source describes the output as the detection-state amplitude at each sample point.
 
-## Physical / mathematical content
+Required controls are `parameters.dec_time` (positive total free-evolution duration, seconds), `parameters.npulses` (positive integer number of refocusing pi pulses, excluding the initial pi/2), and `parameters.spins` (nonempty cell array of spin labels; only its first entry defines the pulse operator). The input state and grid are supplied through the imaging parameters. The detected state is `parameters.coil_st{1}`; the coil phantom itself is ignored. The source restricts use to the `sphten-liouv` and `zeeman-liouv` formalisms.
 
-The sequence applies an initial `pi/2` rotation about `Ly`, followed by `parameters.npulses` `pi` rotations about `Lx`. Evolution under `B=H+F+1i*R+1i*K` spans `parameters.dec_time`, with half-delays before the first and after the last `pi` pulse.
+## Sequence and propagation
 
-## Numerical / algorithmic content
+The background generator is `B=H+F+1i*R+1i*K`. Spatially expanded `Lx` and `Ly` pulse operators are formed with the identity across the grid. The sequence applies an ideal pi/2 rotation about `Ly`, then free evolution under `B` for half an interval. With `tau=dec_time/npulses`, it applies `npulses-1` cycles of a pi rotation about `Lx` and a full `tau` evolution, followed by one last pi rotation and a final half-interval. Thus free evolution totals `dec_time`; the documented pulse count excludes the initial pi/2.
 
-The code constructs spatially replicated `Lx` and `Ly` operators and propagates `parameters.rho0` through the pulses and delays using `step()`. Each pulse-to-pulse delay is `parameters.dec_time/parameters.npulses`.
+The final state is projected with `fpl2phan(rho,parameters.coil_st{1},parameters.npts)`. The returned image follows that spatial grid; no simulated or measured voxel values are asserted here. `G` is checked as a cell array with at least one gradient operator, but is not otherwise used by this function's sequence.
 
-## Outputs
+## References
 
-- mri -amplitude of the detection state at each point of the
-- sample
-- Note: the spin state to be observed should be specified in
-- parameters.coil_st, the coil phantom is ignored.
-
-## Implementation structure
-
-After `grumble()` validates the inputs, the function assembles `B`, constructs pulse operators, runs the CPMG echo train, and converts the final state to an image with `fpl2phan(rho,parameters.coil_st{1},parameters.npts)`. `G` is validated but is not otherwise used.
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=cpmg_dec.m>
+- Source: [`experiments/imaging/cpmg_dec.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/cpmg_dec.m)

@@ -1,14 +1,23 @@
 # examples/dnp_liq/jdnp/fig_6_microwave_free.m
 
-- Signature: `fig_6_microwave_free()`
-- Calculation time: minutes
+- MATLAB implementation: [examples/dnp_liq/jdnp/fig_6_microwave_free.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/jdnp/fig_6_microwave_free.m)
 
-## Purpose
+- Signature: fig_6_microwave_free()
+- The source comment gives a calculation time of minutes.
+- The shared model is described in system_specification.m, which cites [Concilio et al., *Physical Chemistry Chemical Physics* (2022)](https://doi.org/10.1039/d1cp04186j).
 
-Simulates the microwave-free JDNP field-ramp example. The initial equilibrium state is propagated while the magnetic field is changed from 14.09 T to 9.39 T, and the script plots the singlet and triplet populations resolved by nuclear-spin projection alongside the nuclear magnetisation.
+## Purpose and run context
 
-## Model and ramp
+Demonstrates a microwave-free JDNP field-ramp trajectory. Call fig_6_microwave_free(); it obtains the spin system, interactions, and basis from system_specification(), modifies the electron-pair scalar interaction and correlation-time setting, and propagates the initial thermal-equilibrium state through the ramp.
 
-The spin system, interactions, and basis come from `system_specification()`. The electron-proton scalar coupling is set using the 11.74 T midpoint field, and the correlation time is set to 2.2 ns. The script builds the initial Spinach system at 14.09 T in the lab frame and computes its thermal-equilibrium state. It then samples a 211-point linear field grid ending at 9.39 T, with a 0.1 ms propagation step at each grid point.
+## Field ramp and propagation
 
-At each field value, the Hamiltonian and relaxation superoperator are rebuilt and the state is advanced with `evolution`; no microwave drive is added. The trajectory is projected onto explicitly constructed singlet, triplet, electron, and nuclear-spin operators. Three panels show the alpha/beta triplet populations, the alpha/beta singlet populations, and the nuclear `N_z` signal versus the ramp time.
+The start, match, and final field values are 14.09, 11.74, and 9.39. The scalar interaction between electron spins 2 and 3 is set to match_field*(spin('E')+spin('1H'))/(2*pi); the correlation-time entry is set to 2.2e-9. The system is constructed at the start field, its basis is built, and the lab-frame Hamiltonian is used to obtain the initial equilibrium state.
+
+The field sequence is linspace(start_field,final_field,211), with dt=1e-4. The initial state plus 211 propagated states form the trajectory. At each field value the code updates sys.magnet, recreates the system and basis, constructs the lab-frame Hamiltonian and relaxation superoperator, then calls evolution for one step using H+1i*R. No microwave drive is added. The plotted time axis is labelled in seconds and spans 0 to 0.0211.
+
+## Observables and limitation
+
+The code constructs product-state operators for the alpha- and beta-manifold singlet/triplet components, additional nuclear-N_z-resolved singlet/triplet components, and the longitudinal operators of both electrons and the nucleus. It computes their real projections onto the trajectory. Three panels display the alpha/beta triplet populations, the alpha/beta singlet populations, and nuclear N_z, respectively.
+
+The source header states that the field ramp and unequal singlet-alpha/singlet-beta relaxation rates produce enhancement beyond the Boltzmann level at both fields. The plotted nuclear panel is the N_z trajectory; the script does not plot an explicit Boltzmann reference curve.

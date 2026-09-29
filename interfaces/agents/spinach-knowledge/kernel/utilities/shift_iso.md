@@ -1,25 +1,40 @@
 # kernel/utilities/shift_iso.m
 
-- Signature: `tensors=shift_iso(tensors,spin_numbers,new_iso)`
-
 ## Purpose
 
-Replaces the isotropic parts of selected interaction tensors with user-supplied values while retaining their anisotropic parts. This is useful for correcting DFT calculations when the anisotropy of the spin interactions is satisfactory but the isotropic part is not.
+Replaces the isotropic parts of interaction tensors with user-supplied values. This is useful for correcting DFT calculations, where the anisotropy of the various spin interactions is usually satisfactory, but the isotropic part is not.
 
-## Parameters / inputs
+Source: [kernel/utilities/shift_iso.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/shift_iso.m)
 
-- `tensors` — cell array of interaction tensors as real 3×3 matrices.
-- `spin_numbers` — indices of the tensors whose isotropic parts should be replaced; each index must be a positive integer within the cell array.
-- `new_iso` — real replacement isotropic values, in the same order as `spin_numbers`. The two inputs must have the same number of elements.
+## Behavior
 
-## Outputs
+- Syntax: `tensors=shift_iso(tensors,spin_numbers,new_iso)`.
+- The function first runs a consistency check (`grumble`) on all inputs.
+- For each spin number in `spin_numbers`, the corresponding tensor is decomposed into spherical tensor components using `mat2sphten`, which returns the isotropic part (`rank0`, discarded), the rank-1 component, and the rank-2 component.
+- The tensor is then rebuilt with `sphten2mat([],rank1,rank2)`, keeping only the anisotropic parts, and the new isotropic contribution is added as `new_iso(n)*eye(3)`.
+- Only the tensors listed in `spin_numbers` are modified; all other tensors in the cell array are returned unchanged.
 
-- `tensors` — cell array of interaction tensors as 3×3 matrices, with the selected isotropic parts replaced.
+## Inputs and outputs
 
-## Implementation
+**Inputs**
 
-For each index in `spin_numbers`, the function uses `mat2sphten` to separate the selected tensor into isotropic, rank-1, and rank-2 parts. It discards the original isotropic part and rebuilds the tensor as `sphten2mat([],rank1,rank2)+new_iso(n)*eye(3)`. Tensors not selected by `spin_numbers` are left unchanged. Inputs are checked for the stated types, dimensions, index bounds, and matching numbers of indices and replacement values.
+- `tensors` — a cell array of interaction tensors as 3x3 matrices.
+- `spin_numbers` — a vector containing the numbers of spins in the `tensors` array that should have the isotropic parts replaced. Must be a vector of positive integers, each no greater than the number of tensors supplied.
+- `new_iso` — a vector containing the new isotropic parts in the same order as the spin numbers listed in `spin_numbers`. Must be a vector of real numbers with the same number of elements as `spin_numbers`.
 
-[Source page](https://spindynamics.org/wiki/index.php?title=shift_iso.m)
+**Outputs**
 
-Contacts: ledwards@cbs.mpg.de; ilya.kuprov@weizmann.ac.il.
+- `tensors` — a cell array of interaction tensors as 3x3 matrices, with the isotropic parts of the selected tensors replaced.
+
+**Validation errors**
+
+- `tensors` must be a cell array of real 3x3 matrices (empty elements are permitted).
+- `spin_numbers` must be a vector of positive integers.
+- No index in `spin_numbers` may exceed the number of tensors supplied.
+- `new_iso` must be a vector of real numbers.
+- `spin_numbers` and `new_iso` must have the same number of elements.
+
+## References
+
+- Spinach documentation: [shift_iso.m](https://spindynamics.org/wiki/index.php?title=shift_iso.m)
+- Source code: [kernel/utilities/shift_iso.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/shift_iso.m)

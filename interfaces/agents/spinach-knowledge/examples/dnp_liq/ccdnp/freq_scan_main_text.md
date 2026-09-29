@@ -1,30 +1,11 @@
 # examples/dnp_liq/ccdnp/freq_scan_main_text.m
 
-- Signature: `freq_scan_main_text()`
+- MATLAB implementation: [examples/dnp_liq/ccdnp/freq_scan_main_text.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/ccdnp/freq_scan_main_text.m)
 
-## Purpose
+freq_scan_main_text() computes a steady-state proton DNP response over microwave-frequency offset and magnetic field for a liquid three-spin system (1H, E, E). The source describes two exchange-coupled electrons, each dipolar-coupled to the nucleus, and cites [J. Magn. Reson. 2021, 106940](https://doi.org/10.1016/j.jmr.2021.106940). It requires Spinach, MATLAB, the dnp_freq_scan callback on the path, and Parallel Computing Toolbox for its parfor; there are no external data files.
 
-Steady-state nuclear magnetisation as a function of microwave-frequency offset and magnetic field in a DNP experiment with two exchange-coupled electrons, both coupled to a nucleus by dipolar interactions. Further particulars: https://doi.org/10.1016/j.jmr.2021.106940. Calculation time: seconds.
+The model uses proton Zeeman eigenvalues [0 10 20], electron g-tensor eigenvalues [2.0034 2.0038 2.0038] and [2.0057 2.0030 2.0030] with the source's stated Euler triples [-0.872 -0.013 0.868] and [-1.145 0.061 1.143]. Scalar electron exchange is set to 3e6; the three coordinate rows are [0 0 0], [5.090 0.010 0.958], and [-5.090 0.061 1.032]. These numerical interaction and coordinate values are given without units in the source. The basis is sphten-liouv with no approximation. Relaxation is Redfield with zero equilibrium, secular retention, temperature 298, correlation time 100e-12, and integration tolerance 1e-10 (the source comments that this tolerance needs to be this tight).
 
-## Physical / mathematical content
+Sequence settings are electron irradiation, mw_pwr=2*pi*1e6, method lvn-backs, and needs={'rho_eq'}; g_ref is the mean of the first electron's g eigenvalues. The frequency-offset grid is 2*pi*linspace(-5,10,512)*1e6; the field grid is linspace(1,20,128) Tesla. A parfor loop builds the system and steady state at each field, calls liquid(...,@dnp_freq_scan,...,'esr'), then divides each frequency trace by the equilibrium coil projection coil'*rho_eq.
 
-- Three-spin model comprising one proton and two electrons. The electron pair has 3 MHz exchange coupling; coordinates define the electron–nuclear dipolar couplings. Relaxation uses Redfield theory with a 100 ps correlation time at 298 K.
-
-## Numerical / algorithmic content
-
-- Computes a steady-state map over 512 microwave-frequency offsets from −5 to 10 MHz and 128 magnetic fields from 1 to 20 T. A parfor loop distributes field points, and the proton signal is normalized to the thermal-equilibrium reference.
-
-## Implementation structure
-
-- Steady state nuclear magnetisation as a function of microwave frequency
-- offset and the magnet field in a DNP experiment with two electrons con-
-- nected by exchange coupling, both coupled to a nucleus by dipolar coup-
-- lings. Further particulars in:
-- Calculation time: seconds
-- Spin system
-- Zeeman interactions
-- Exchange coupling
-- Coordinates
-- Basis set
-- Relaxation theory
-- Sequence parameters
+The output is a figure of real(answer) against field and frequency offset, with a colorbar labelled steady-state 1H DNP; the plotted offset is converted to MHz relative to the isotropic g reference. No result array is saved. The source comments “Calculation time: seconds”; this is not a reproduced runtime or a performance guarantee.

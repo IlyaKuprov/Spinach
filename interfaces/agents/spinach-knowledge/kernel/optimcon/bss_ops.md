@@ -1,31 +1,22 @@
 # kernel/optimcon/bss_ops.m
 
-- Signature: `resp_ops=bss_ops(spin_system,channels,carrier_frq)`
+Source: [kernel/optimcon/bss_ops.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/bss_ops.m)
 
 ## Purpose
 
-Builds one Bloch–Siegert response operator for each optimal-control channel. Its coefficient in each GRAPE time slice is the square of that channel's physical control amplitude. For spin `n) and channel `c`, the second-order frequency-shift coefficient is
+Builds one Bloch–Siegert response operator for each control channel. In GRAPE, the coefficient multiplying a channel's response operator in a time slice is the square of that channel's physical control amplitude. The routine constructs the operators; it does not itself calculate an objective or an objective gradient.
 
-```
-(gamma_n/gamma_c)^2 * [1/(2*(omega_n+omega_c)) + 1/(2*(omega_n-omega_c))]
-```
+For spin n and channel c, define the signed laboratory frequency <code>omega_n = spin_system.inter.basefrqs(n)</code> and signed carrier <code>omega_c = carrier_frq(c)</code>. The coefficient multiplying that spin's longitudinal operator is <code>(gamma_n/gamma_c)^2/[2*(omega_n+omega_c)]</code> for every spin, plus <code>(gamma_n/gamma_c)^2/[2*(omega_n-omega_c)]</code> for foreign-isotope spins. The on-channel resonant term is omitted because it is the control operator that GRAPE propagates exactly. Only spin-type particles marked <code>S</code> are included.
 
-The second term is included only for spins whose isotope differs from the channel isotope. Thus an on-channel spin receives only the never-resonant term; a foreign-isotope spin receives both terms. The coefficient multiplies that spin's longitudinal operator. The signed frequencies `omega_n` and `omega_c` are the spin's laboratory-frame Zeeman frequency and the channel carrier frequency, respectively.
+## Call and data
 
-## Syntax
+<code>resp_ops = bss_ops(spin_system,channels,carrier_frq)</code>
 
-```matlab
-resp_ops=bss_ops(spin_system,channels,carrier_frq)
-```
+- <code>spin_system</code> supplies the spin-system formalism, composition, isotope data and signed base frequencies.
+- <code>channels</code> is a cell array of character vectors naming the control-channel isotopes. There is one output operator per channel; for an X/Y pair, for example, the channel list may be <code>{'1H','1H'}</code>.
+- <code>carrier_frq</code> supplies one signed carrier frequency per channel, in rad/s. The documentation specifies a row vector; validation checks the number of elements, not row orientation.
+- <code>resp_ops</code> is a cell array of the response operators in the supplied spin-system formalism.
 
-## Inputs
+There are no default input values. The routine requires <code>spin_system.comp</code>; it checks that <code>channels</code> is a cell array of character vectors naming isotopes in <code>spin_system.comp.isotopes</code>. Carrier frequencies must be numeric, real, finite, nonzero, and one per channel. It rejects a spin when <code>abs(omega_n+omega_c) &lt; 1e-6*abs(omega_c)</code>; for foreign isotopes it also rejects <code>abs(omega_n-omega_c) &lt; 1e-6*abs(omega_c)</code>.
 
-- `spin_system` — Spinach spin-system structure.
-- `channels` — cell array of isotope strings, one per control channel (for example, `{'1H','1H'}` for an X/Y pair).
-- `carrier_frq` — row vector of signed carrier frequencies in rad/s, one per channel. For an on-resonance transmitter, use the corresponding `spin_system.inter.basefrqs` value.
-
-## Output
-
-- `resp_ops` — cell array of Bloch–Siegert response operators, one per channel, in the spin-system formalism.
-
-The routine requires each channel isotope to be present in the spin system and rejects zero carriers and degenerate frequency denominators.
+The formulas use angular-frequency values in rad/s. No gradient or adjoint is returned.

@@ -1,17 +1,19 @@
 # examples/nmr_solids/wise_mas_gly.m
 
-- Signature: `wise_mas_gly()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/wise_mas_gly.m)
+
+- Signature: wise_mas_gly()
 
 ## Purpose
 
-Simulates a two-dimensional WISE (wide-line separation) spectrum of alpha-glycine powder under magic-angle spinning. The source notes an hours-long runtime, substantially shorter on a GPU.
+Simulates a two-dimensional WISE spectrum of alpha-glycine powder under magic-angle spinning (MAS). The source estimates a runtime of hours and notes faster execution on a GPU.
 
-## Spin system and experiment
+## Spin system and rotor sampling
 
-The PCM-DFT spin system is loaded from `../../examples/standard_systems/glycine.log`; the field is 9.4 T, corresponding to a 400 MHz proton-frequency spectrometer; interactions below 200 Hz are discarded (`sys.tols.inter_cutoff=200`). Isotropic shifts are set to 176.4 and 43.6 ppm for CO and Cα, 2.6 and 3.8 ppm for the two Hα sites, and 8.0 ppm for each of the three HN sites. The calculation uses the `sphten-liouv` basis with IK-0 approximation and inter-level 3. MAS rate is 5 kHz, the axis is [1 1 1], maximum rank is 9, and the powder grid is `rep_2ang_200pts_sph`.
+The seven-spin system is generated from the PCM-DFT glycine structure: two 13C and five 1H sites. The file labels the setting as a 400 MHz spectrometer and sets sys.magnet to 9.4. Isotropic shifts are set to 176.4 and 43.6 for the carbonyl and Cα carbons, 2.6 and 3.8 for the two Hα sites, and 8.0 for each of three HN sites. It uses an sphten-liouv basis with IK-0 approximation and inter-level 3, discarding interactions below 200 Hz. The rotor-axis vector is [1, 1, 1], the rate parameter is 5000, and the orientation grid is rep_2ang_200pts_sph; maximum rank is 9.
 
-The WISE/CP settings are offsets [2000, 10000] Hz, high-power irradiation 83 kHz, CP powers [60, 50] kHz, and CP duration 100 μs. The two dimensions use sweeps [1/(6 μs), 1/(33 μs)] Hz, [128, 512] acquired points, and [512, 2048] zero-filled points; the listed spin channels are 1H and 13C.
+## WISE acquisition and processing
 
-## Processing
+The wise sequence uses 1H and 13C channels, offsets [2000, 10000] Hz, high-power irradiation of 83000 Hz, cross-polarisation powers [60000, 50000] Hz, and a 0.0001-second contact duration. The two sweeps are [1/(6e-6), 1/(33e-6)] Hz, with [128, 512] acquired points and [512, 2048] zero-filled points. Detection is on the 13C L+ state.
 
-The sequence is simulated by `singlerot` with the WISE sequence function. Cosine and sine components are Fourier transformed along the first dimension and combined as `real(F1_cos) + i real(F1_sin)`; a second Fourier transform produces the plotted 2D spectrum.
+singlerot returns cosine and sine FIDs. Each is apodised with a squared-cosine window; the first-dimension transforms are combined as real cosine plus i times real sine, then Fourier transformed in the second dimension. The plotted observable is the real part of the resulting two-dimensional spectrum.

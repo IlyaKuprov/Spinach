@@ -2,19 +2,13 @@
 
 - Signature: `summary_symmetry(spin_system,header)`
 
-## Purpose
-
-Prints the permutation-symmetry groups and their associated spins from a Spinach system.
-
-## Parameters / inputs
-
-- `spin_system` - Spinach spin system structure.
-- `header` - character string printed before the table.
-
-## Output
-
-No MATLAB output argument; writes the header and table through `report`.
-
 ## Behavior
 
-The function checks that `spin_system` is a structure and `header` is a character string. It iterates over `spin_system.comp.sym_spins` and prints each corresponding entry from `spin_system.comp.sym_group` alongside its spin list.
+Reports a two-column table headed Group and Spins. Row `n` prints `spin_system.comp.sym_group{n}` and its associated spin-index list `spin_system.comp.sym_spins{n}`; it does not calculate the symmetry groups. The supplied `header` precedes the table.
+
+The function returns nothing and sends its lines through `report`. The local guard requires a structure `spin_system` and character-array `header`.
+
+## References
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_symmetry.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_symmetry.m)

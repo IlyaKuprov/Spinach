@@ -1,25 +1,26 @@
 # examples/dnp_liq/ccdnp/rates_main_text.m
 
-- Signature: `rates_main_text()`
+- MATLAB implementation: [examples/dnp_liq/ccdnp/rates_main_text.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/ccdnp/rates_main_text.m)
 
-## Purpose
+## What it computes
 
-Self-and cross-relaxation rates in cross-correlated DNP, considering a system with two electrons connected by exchange coupling, both coupled to a nucleus by dipolar couplings. Further particulars in: https://doi.org/10.1016/j.jmr.2021.106940
+Builds the Redfield relaxation superoperator for a liquid-state cross-correlated DNP model with one proton and two exchange-coupled electrons, then prints selected self- and cross-relaxation projections. Use it to inspect the listed operator-specific rates for this main-text parameter set; it is not a frequency-scan or polarization time-course calculation.
 
-Calculation time: seconds
+## Running and inputs
 
-## Physical / mathematical content
+Call the no-argument MATLAB function `rates_main_text()` with Spinach on the MATLAB path. It constructs the spin system, basis and relaxation superoperator internally; it accepts no parameters and reads no external input files. The source comment estimates a calculation time of seconds. It uses a full `sphten-liouv` basis (`bas.approximation='none'`) and Redfield relaxation.
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, electron-electron scalar exchange, electron-nuclear dipolar couplings, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+## Model settings
 
-## Numerical / algorithmic content
+- Isotopes: `{'1H','E','E'}`. The file sets `sys.magnet=14.1`; it does not state a unit for that literal. Proton Zeeman values are `[0 10 20]` with Euler triple `[0 0 0]`.
+- Electron Zeeman principal values are `[2.003400 2.003800 2.003800]` and `[2.005700 2.003000 2.003000]`, with Euler triples `[-0.872 -0.013 0.868]` and `[-1.145 0.061 1.143]`. Scalar electron-electron coupling is assigned `3e6`.
+- Coordinates are `[0 0 0]`, `[5.090 0.010 0.958]`, and `[-5.090 0.061 1.032]`. The source does not label units for the Zeeman/coupling/coordinate literals.
+- Relaxation settings: `inter.relaxation={'redfield'}`, `inter.equilibrium='zero'`, `inter.rlx_keep='labframe'`, `inter.temperature=298`, `inter.tau_c={100e-12}`, and `sys.tols.rlx_integration=1e-10`. The file does not explicitly state units for these values.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then calculate the relaxation superoperator and print selected rate matrix elements.
+## Console output
 
-## Implementation structure
+After computing `R=relaxation(spin_system)`, the script prints matrix-element projections for normalized longitudinal proton/electron operators (their self terms and electron-to-proton terms), four normalized electron transverse combinations of the form `E1p ± 2*E1pE2z` and `E2p ± 2*E1zE2p`, and proton-containing longitudinal cross terms (including the printed terms labelled for NzE1z, NzE2z, and NzE1zE2z to Nz). It also prints mixed transverse-coherence projections labelled E1p to NzE1p, E1p to NzE1pE2z, and E1pE2z to NzE1pE2z. The source-specific clarification is that these are selected contractions of the relaxation superoperator with constructed operator states—not a dump of the complete relaxation matrix or its eigenmodes. It writes no data file and creates no figure; the values appear only in MATLAB's command output.
 
-- Set up the spin system and basis with Zeeman interactions, electron-electron scalar exchange, and coordinate-derived electron-nuclear dipolar couplings.
-- Compute the relaxation superoperator.
-- Print selected self- and cross-relaxation rates from its matrix elements.
+## Reference and caveat
+
+The source cites https://doi.org/10.1016/j.jmr.2021.106940. numerical output depends on running the MATLAB/Spinach calculation.

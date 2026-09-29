@@ -1,19 +1,19 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_2.m
 
-- Signature: `thermal_equilibrium_2()`
+Source: [examples/fundamentals/state_tests/thermal_equilibrium_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/state_tests/thermal_equilibrium_2.m)
 
-## Purpose
+Signature: `thermal_equilibrium_2()`
 
-Thermal equilibrium states, using all the different formalisms supported by Spinach kernel.
+## Tested question
 
-## Physical / mathematical content
+Does the finite-temperature equilibrium state for one four-spin system represent the same Hilbert-space matrix when calculated in Zeeman Hilbert, Zeeman Liouville, and spherical-tensor Liouville formalisms?
 
-Computes finite-temperature equilibrium for an E8, 1H, 14N, 15N spin system at 14.1 T and 4.2 K. The source includes several very large scalar couplings, annotated 'Remove these couplings to get machine precision.'
+## System and method
 
-## Numerical / algorithmic content
+The source sets a 14.1 T field, 4.2 K temperature, isotopes `E8`, `1H`, `14N`, and `15N`, and scalar Zeeman entries `{2.002319, 1.0, 2.0, 3.0}`. Scalar couplings are 1–2 = `1e6`, 2–3 = `1e6`, 1–3 = `1e3`, 3–4 = `1e3`, and 1–4 = `1e2`. The source comments that removing these couplings gives machine-precision agreement; no numerical residuals are printed.
 
-The equilibrium density operator is calculated with `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv` (no basis approximation). Liouville representations are converted to the Zeeman-Hilbert matrix form, with the spherical-tensor result also transformed and scaled by the product of spin multiplicities. The test compares the resulting matrices and fails if either 2-norm difference exceeds `1e-8`.
+With approximation `none`, it calculates `equilibrium(spin_system)` in each formalism. The Zeeman-Liouville state is reshaped to 96-by-96. The spherical-tensor state is transformed by `sphten2zeeman(spin_system)`, reshaped to 96-by-96, and divided by the product of the spin multiplicities. The direct Zeeman-Hilbert matrix is the reference representation.
 
-## Implementation structure
+## Check, output, and limits
 
-Builds the same spin system and equilibrium state in each formalism, performs the representation conversions, then checks cross-formalism agreement.
+The source evaluates the matrix 2-norms of the Hilbert-vs-Zeeman-Liouville and Zeeman-Liouville-vs-projected-spherical-tensor differences. Either norm above `1e-8` raises `Cross-formalism thermal equilibrium test FAILED.`; otherwise the function prints the corresponding PASSED message. This is one finite-temperature state-space comparison, not a quadrature test, and it does not provide independent level-population values or establish agreement beyond this specified system and the source's stated coupling caveat.

@@ -1,15 +1,19 @@
 # examples/nmr_spen/idosyzs_test_1.m
 
-- Signature: `idosyzs_test_1()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_spen/idosyzs_test_1.m)
+
+- Signature: idosyzs_test_1()
 
 ## Purpose
 
-Models diffusion attenuation during soft pulses in a simplified Zangger–Sterk pure-shift iDOSY sequence. It simulates signal over a gradient-amplitude series and fits a modified Stejskal–Tanner form, including a fitted gradient shift. The method is described in [the cited JMR paper](https://doi.org/10.1016/j.jmr.2019.02.010). The source estimates seconds on an NVIDIA Tesla A100 and longer on CPU.
+Models diffusion attenuation during soft pulses in a simplified Zangger–Sterk pure-shift iDOSY sequence. The sequence and modified Stejskal–Tanner fit are described in [the cited Journal of Magnetic Resonance paper](https://doi.org/10.1016/j.jmr.2019.02.010). The source estimates seconds on an NVIDIA Tesla A100 and substantially longer on CPU.
 
-## Model and sequence
+## Spin system and spatial selection
 
-The model is one 1H spin at 11.7426 T with a 4.6 ppm shift, sample length 15 mm, 4000 spatial points, and a 7-point periodic derivative stencil. The reference diffusion coefficient is 18×10⁻¹⁰ m²/s. The soft pulse shape is `gaussian_1000.pk`, sampled at 100 points, with duration 45 ms and phase π; transmitter offset is 2500 Hz. The gradient duration is 2 ms, diffusion delay 100 ms, and Zangger–Sterk gradient amplitude 0.0053 T/m.
+The model is one 1H at field parameter 11.7426, with shift value 4.6 and a reference diffusion coefficient of 18 × 10⁻¹⁰ m²/s. The sample length is 0.015 m, represented by 4000 points with a 7-point periodic derivative stencil. Relaxation phantoms and operators are empty. The initial Lz state occupies the central 2000 spatial points with 1000-point zero margins on both sides; detection uses a uniform L+ phantom.
 
-## Simulation and fit
+## Sequence, encoding, and fit
 
-Twenty imaging simulations use gradient amplitudes from 0.01 to 0.40 T/m. The normalised intensities are fitted to `A exp[-D·C·(g-g₀)²]`, where the code's Stejskal–Tanner factor C uses the spin, gradient duration, and diffusion delay. The report gives fitted D (scaled by 10⁻¹⁰) and fitted gradient shift g₀. The simulation supplies no relaxation phantom or relaxation operator, and the initial 1H `Lz` state has white spatial margins.
+The soft-pulse shape is gaussian_1000.pk, sampled at 100 points with duration parameter 0.045; the inversion-pulse phase is pi. The sequence sets transmitter offset 2500, small-gradient-duration parameter 0.002, diffusion-delay parameter 0.1, and Zangger–Sterk selection-gradient amplitude 0.0053. It runs idosyzs for 20 diffusion-gradient amplitudes spanning 0.01–0.40 T/m.
+
+The simulated intensities are normalised to the first point and fitted to an exponential attenuation with an amplitude, diffusion coefficient, and fitted gradient shift. The fit factor uses the spin, gradient duration, and delay corrected by one third of the gradient duration, with the source’s 10⁻¹⁰ scaling; the reported diffusion coefficient is the fitted coefficient multiplied by 10⁻¹⁰. The page plots simulated points and the fitted curve and reports the fitted diffusion coefficient and gradient shift.

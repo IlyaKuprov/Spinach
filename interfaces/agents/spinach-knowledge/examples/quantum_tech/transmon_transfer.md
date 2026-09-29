@@ -1,15 +1,17 @@
 # examples/quantum_tech/transmon_transfer.m
 
-- Signature: `transmon_transfer()`
+Source: [examples/quantum_tech/transmon_transfer.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_transfer.m)
 
-## Purpose
+## What it models
 
-Coherence transfer from transmon 1 to transmon 2 in a coupled two-transmon Duffing model. GRAPE optimization accounts for distributions of control powers and transmon offsets and penalizes excess power. Calculation time: minutes.
+GRAPE optimization of coherence transfer from transmon 1 to transmon 2 in a coupled pair of Duffing modes. This is a simulated control problem with power and frequency-offset ensembles, not an experimental transfer result; the source estimates calculation time in minutes.
 
-## Model and parameters
+## Drift model and states
 
-The T3 and T5 modes have rotating-frame frequencies 100 MHz and -200 MHz, anharmonicities -10 MHz and -20 MHz, and a 50 MHz flip-flop exchange coupling. The initial coherence is on transmon 1 and the target coherence is on transmon 2.
+The source sets the field to zero and declares T3 and T5 modes with rotating-frame frequencies 100e6 and -200e6 Hz, anharmonicities -10e6 and -20e6 Hz, and an inter-mode exchange parameter of 50e6 Hz. The Zeeman-Hilbert basis is unapproximated. The cavity drift includes the two Duffing ladders and their flip-flop exchange coupling.
 
-## Optimization
+The initial state is the sum of C and A coherence operators on transmon 1 with transmon 2 in BL1; the target places the same C/A coherence on transmon 2 while transmon 1 is in BL1. Both are Frobenius-normalized, symmetrized, and the target is rescaled by the Sorensen bound, as specified by the source comment. C and A denote the raising and lowering operators used to form the coherence components.
 
-The two control channels use five offset samples each, spanning -10 to 10 MHz per transmon. The pulse-power levels are `2*pi*[40,45,50,55,60] MHz*5`; the 200 slices are 0.25 ns each. GRAPE uses the SNSA penalty (weight 1.0), rbfgs method, and a 200-iteration limit, starting from a random two-channel pulse. The target is normalized using the Sørensen bound.
+## Control ensemble and optimization
+
+Two quadrature controls address the respective transmons. Each has five offset samples spanning -10e6 to 10e6 Hz, and the source sets the power ensemble to 2*pi*[40,45,50,55,60]*1e6*5 rad/s. The 200 pulse slices are 0.25 ns each. The random two-channel initial pulse is optimized with GRAPE using the SNSA penalty (weight 1.0), rbfgs method, and 200-iteration limit; control, spectrogram, and robustness plots are enabled. The source contains no relaxation model, rotational diffusion, correlation spectrum, cross-correlations, secular approximation, or reported final fidelity. It therefore supports no relaxation-rate benchmark or experimental-agreement claim.

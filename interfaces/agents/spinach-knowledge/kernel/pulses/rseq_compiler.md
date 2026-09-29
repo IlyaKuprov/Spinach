@@ -4,25 +4,17 @@
 
 ## Purpose
 
-Compiles the distinct pulse propagators needed by an R-sequence, reusing a propagator wherever the phase (and, for composite pulses, the phase-duration pair) repeats.
+Precomputes the distinct propagators needed for an R-sequence, so repeated pulse settings share entries rather than requiring the same propagator to be constructed repeatedly.
 
-## Algorithm
+## Implementation
 
-For `'180_pulse'`, the function finds the unique values in `pulse_phi` and builds one propagator for each phase from `L+pulse_amp*(Sx*cos(phi)+Sy*sin(phi))`, using the single pulse duration. For `'90270_pulse'`, it pairs the alternating durations with the phases, finds unique phase-duration rows, and builds one propagator for each row.
+For `180_pulse`, the function groups the values in `pulse_phi` by unique phase and constructs one propagator per phase using the Liouvillian `L+pulse_amp*(Sx*cos(phi)+Sy*sin(phi))` and the single pulse duration. For `90270_pulse`, it alternates the two supplied segment durations across the phase list, groups unique phase-duration pairs, and constructs one propagator for each pair using the same phase-modulated Liouvillian and that pair's duration. The two supported element types are simple and composite inversion pulses, respectively.
 
-## Parameters / inputs
-
-- `spin_system` — Spinach system description used by `propagator`.
-- `L` — background Liouvillian.
-- `Sx`, `Sy` — Cartesian spin operators for the spins affected by the pulses; the source requires Hermitian matrices.
-- `pulse_phi` — phase sequence, in radians.
-- `pulse_amp` — scalar RF nutation frequency, in radians per second.
-- `pulse_dur` — pulse duration in seconds; scalar for `'180_pulse'`, or two durations for `'90270_pulse'`.
-- `element_type` — `'180_pulse'` for simple inversion pulses or `'90270_pulse'` for composite inversion pulses.
+The inputs use radians for `pulse_phi`, rad/s for scalar `pulse_amp`, and seconds for `pulse_dur`. The source checks that `L`, `Sx`, and `Sy` are numeric and that the spin operators are Hermitian; `180_pulse` requires one duration, while `90270_pulse` requires two durations and an even number of phases.
 
 ## Outputs
 
-- `P` — cell array of unique propagator matrices.
-- `T` — index array with the same dimensions as `pulse_phi`, indicating which entry of `P` to use at each phase-sequence slice.
+- `P` — cell array of propagator matrices, one for each distinct setting required by the selected element type.
+- `T` — index array shaped like `pulse_phi`; each entry selects the corresponding propagator in `P`.
 
-[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=rseq_compiler.m)
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/rseq_compiler.m) · [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=rseq_compiler.m)

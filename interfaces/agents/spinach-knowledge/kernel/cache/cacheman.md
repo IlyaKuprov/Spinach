@@ -1,30 +1,9 @@
 # kernel/cache/cacheman.m
 
-- Signature: `cacheman(spin_system) %#NHEAD`
+`cacheman(spin_system)` is an internal scratch-cache cleanup helper and should not be called directly. It uses `spin_system.sys.scratch` as the directory and `spin_system.tols.cache_mem` as the age threshold, which must be a finite, non-negative real scalar. The documented default threshold is 365 days. Because the cutoff is computed as `now - cache_mem`, the tolerance is measured in MATLAB serial-date days.
 
-## Purpose
+A write probe creates, saves, and removes a temporary MAT-file in the scratch directory. The function errors if it cannot write there or if the scratch directory is missing. It examines direct entries matching `spinach_*` and treats entries with a modification date earlier than the cutoff as stale. Stale files are deleted; stale directories are removed recursively. Individual deletion failures are caught quietly, and successful file and directory removals are reported.
 
-Cache management heuristics. Looks after the scratch folder and prevents it from filling up the disk. Do not call directly. The function inspects the scratch folder and deletes any files that are older than the threshold (default is 365 days) speci- fied in spin_system.tols.cache_mem field.
+If a parallel pool already exists, the helper obtains its `Cluster.JobStorageLocation` without starting a pool. It will not recursively remove an expired directory whose full path exactly matches that pool directory.
 
-## Physical / mathematical content
-
-- Cache-management utilities. These files maintain Spinach temporary or persistent cache state used to avoid repeated expensive construction of large operators or metadata.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Cache management heuristics. Looks after the scratch folder and
-- prevents it from filling up the disk. Do not call directly.
-- The function inspects the scratch folder and deletes any files
-- that are older than the threshold (default is 365 days) speci-
-- fied in spin_system.tols.cache_mem field.
-- Check consistency
-- Get parallel pool directory
-- Calculate the time horizon
-- Look into the scratch directory
-- Delete anything that is out of date
-- Report to the user
-- Consistency enforcement
+[MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cache/cacheman.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=cacheman.m)

@@ -1,28 +1,15 @@
 # kernel/summaries/summary_mode_coup.m
 
-- Signature: `summary_mode_coup(spin_system,header)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_mode_coup.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_mode_coup.m)
 
 ## Purpose
 
-Prints the bosonic-mode coupling terms stored in a Spinach spin system.
+Print a table of bosonic-mode couplings stored in a Spinach system.
 
-## Physical / mathematical content
+## What is reported
 
-The table distinguishes mode-mode exchange, cross-Kerr, longitudinal, and dispersive couplings. Longitudinal entries involving only component types C, V, and T are labelled radiation-pressure couplings; other longitudinal entries retain the longitudinal label. Spin-mode exchange is included in the documented scope, but this routine reports entries from the mode-coupling matrices shown below.
+For each nonempty coupling entry, the table gives the component indices, a coupling-type label, and the stored amplitude divided by `2*pi` and formatted in Hz. The reported categories are exchange, cross-Kerr, longitudinal, radiation pressure, and dispersive. Longitudinal entries are labelled radiation pressure when both endpoint component types belong to C, V, or T; otherwise they retain the longitudinal label. Every nonempty entry in the exchange array is printed as `exchange`; the routine does not give spin-mode exchange a separate label. The source description includes spin-mode exchange among the couplings covered by this summary.
 
-## Numerical / algorithmic content
+## Output and inputs
 
-The function scans the exchange, Kerr, longitudinal, and dispersive coupling arrays for nonempty entries. Each amplitude is divided by `2*pi` and displayed in Hz. It checks that `spin_system` is a structure and `header` is a character string.
-
-## Parameters / inputs
-
-- spin_system - Spinach spin system description object
-- header - a string of text to precede the summary
-
-## Outputs
-
-- Prints a coupling table through `report.m` to the console or user-specified output.
-
-## Implementation structure
-
-After input validation and table headings, the routine loops over nonempty entries in each coupling array and prints the component indices, coupling type, and amplitude in Hz.
+The routine has no returned output. It sends the supplied header, table headings, rows, and separators through `report` to the console or configured report destination. The input checks require `spin_system` to be a structure and `header` to be a character array; no input-structure fields are assigned by the routine.

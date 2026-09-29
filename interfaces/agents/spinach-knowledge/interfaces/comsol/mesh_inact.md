@@ -1,24 +1,15 @@
 # interfaces/comsol/mesh_inact.m
 
-- Signature: `mesh=mesh_inact(mesh,vertex_list)`
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/mesh_inact.m) · [Spinach Wiki: mesh_inact.m](https://spindynamics.org/wiki/index.php?title=mesh_inact.m)
 
-## Purpose
+## Purpose and return value
 
-Marks selected vertices of a 2D microfluidic mesh as inactive for hydrodynamic and diffusive transport.
+`mesh=mesh_inact(mesh,vertex_list)` removes the selected mesh vertices from the active set and returns the updated mesh structure. This is an in-memory mesh operation; it does not call COMSOL.
 
-## Behavior
+## Accepted data
 
-The listed vertices are removed from `mesh.idx.active`. The routine then sets the velocity components `u` and `v`, and concentration data `c`, to zero at every inactive vertex when those fields are present. It checks that the mesh has indexing data and that the indices are positive integers within the vertex count.
+`mesh` must carry vertex coordinates in `mesh.x`, indexing data in `mesh.idx.active`, and, when present, vertex fields `mesh.u`, `mesh.v`, and `mesh.c`. `vertex_list` is a real numeric row vector of positive integers no greater than `numel(mesh.x)`. The implementation checks that `mesh.idx` exists, but assumes its `active` member and the coordinates exist.
 
-## Parameters / inputs
+## Transformation and guardrails
 
-- `mesh`: Spinach mesh object with an active-vertex list.
-- `vertex_list`: row vector of vertex indices to inactivate.
-
-## Output
-
-- `mesh`: updated mesh object.
-
-## Source
-
-[Spinach Wiki: mesh_inact.m](https://spindynamics.org/wiki/index.php?title=mesh_inact.m)
+The function removes the listed indices from `mesh.idx.active` using MATLAB `setdiff`. It then identifies every vertex not in the resulting active list and sets the corresponding entries of `u` and `v` to zero, if those fields exist; rows of `c` are likewise zeroed when present. The coordinate and velocity units are not changed. The function does not return a separate status value; success is represented by the returned, modified `mesh`. Invalid list type, shape, sign, integrality, or bounds cause an error.

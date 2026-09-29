@@ -4,12 +4,22 @@
 
 ## Purpose
 
-Simulates RIDME for a Cu(II)–nitroxide two-electron system at 1.249 T (Q-band). The main calculation uses brute-force time propagation with Liouville-space powder averaging, retaining g-tensor orientation effects on the dipolar coupling. The example includes extended T1/T2 relaxation; its analytical treatment uses only the isotropic parts of the electron g factors. Calculation time: seconds.
+Illustrates RIDME on a Cu(II)–nitroxide two-electron model at `sys.magnet=1.249` (the source describes this as Q-band). The numerical path uses brute-force time propagation and Liouville-space powder averaging, including g-factor orientation effects on the dipolar coupling; extended T1/T2 relaxation is included. The source notes that its analytical calculation uses only isotropic parts of the electron g factors. The source comments give a calculation time of seconds.
 
 ## Spin system and relaxation
 
-The copper and nitroxide g-tensor principal values are [2.056, 2.056, 2.205] and [2.009, 2.006, 2.003], respectively, with zero Euler angles. The spins are separated by 43 Å. T1 values are 35 μs (Cu) and 2 ms (nitroxide); T2 values are 1.5 μs and 1.3 μs. Relaxation is retained in the lab frame with zero equilibrium state.
+The two electron spins are ordered Cu first and nitroxide second. Their Zeeman principal values are `[2.056, 2.056, 2.205]` and `[2.009, 2.006, 2.003]`, respectively; both Euler-angle triples are zero. The coordinates are `[43, 0, 0]` and `[0, 0, 0]` Å. Both spins use the `t1_t2` relaxation model: the two R1 entries are `1/(35e-6)` and `1/(2e-3)` Hz, and the R2 entries are `1/(1.5e-6)` and `1/(1.3e-6)` Hz. The model keeps relaxation in the lab frame and sets equilibrium to zero.
 
-## Simulation and processing
+The calculation uses the `sphten-liouv` formalism with no basis approximation and disables trajectory-level SSR algorithms. These are choices of this example, not claims about the only valid RIDME setup.
 
-The code uses the full sphten Liouville-space basis without approximation and disables trajectory-level SSR. It starts from the electron `Lz` state and probes spin 2. RIDME evolution uses a 16 ns timestep, 25 and 188 steps in the two evolution dimensions, a 35 μs mixing time, and the `rep_2ang_800pts_sph` grid. The reported trace sums the real and imaginary components of the PxPxPx, PyPyPx, MxMxPx, and MyMyPx phase-cycle pathways. The script plots the real and imaginary trace components against time in microseconds.
+## Sequence, calculation, and output
+
+The initial state is electron `Lz`; spin 2 is the probe. The RIDME timing uses a 16 ns step, 25 and 188 steps in the two evolution dimensions, and a 35 μs mixing time. Powder averaging uses `rep_2ang_800pts_sph`; the ESR calculation is dispatched as `powder(spin_system,@ridme,parameters,'esr')`.
+
+The script forms a phase-cycle trace by summing the real and imaginary components from the PxPxPx, PyPyPx, MxMxPx, and MyMyPx pathways. It then plots the real and imaginary pathway traces together with the corresponding summed RIDME trace against time in μs. The plotted interval is constructed from the two evolution-step counts, so it is not a separately supplied experimental time axis.
+
+## Scope
+
+This is a parameterized simulation example, not a reported experimental fit: the file gives no reference dataset, fitted distance distribution, or expected trace values. Its numerical powder calculation and its stated isotropic-g approximation for the analytical calculation should not be conflated.
+
+Source code: [`examples/esr_sol_pulsed/ridme_cu_nitroxide.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/ridme_cu_nitroxide.m).

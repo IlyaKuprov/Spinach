@@ -1,21 +1,19 @@
 # examples/nmr_solids/mas_powder_gly_gridfree.m
 
-- Signature: `mas_powder_gly_gridfree()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_gly_gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_gly_gridfree.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_gly_gridfree.m)
 
-Calculates the glycine powder `13C` MAS spectrum using grid-free Fokker–Planck formalism. The spin-system parameters are generated from the glycine PCM-DFT log; the script explicitly sets the field to 14.1 T. Calculation time: minutes.
+## Purpose and model
 
-## Physical / mathematical content
+This example constructs a computed 13C MAS spectrum for glycine powder with the grid-free Fokker–Planck route: the source calls `gridfree(spin_system,@acquire,parameters,'nmr')`. Its header says the magnetic parameters are estimated from a DFT calculation and estimates minutes for calculation time; that duration is a source estimate, not a measured runtime.
 
-- `g2spinach` reads the glycine log for `13C` and `15N`; the simulation observes `13C` and uses a longitudinal `15N` subspace.
-- The basis uses no approximation and projection +1. Interaction and proximity cutoffs are 5.0 and 4.0; the header assumes `1H` decoupling and the script sets `parameters.decouple={}`.
+`gparse` reads `../standard_systems/glycine.log`; `g2spinach` imports `13C` and `15N` with reference arguments `[182.1 264.5]` in isotope order. The `g2spinach` argument `references` denotes absolute shielding values for zero-ppm reference substances, not measured spectrum peaks. The source sets field `14.1 T`. The basis is `sphten-liouv`, approximation `none`, longitudinal `15N`, and projection `+1`; interaction and proximity cutoffs are `5.0` and `4.0`.
 
-## Numerical / algorithmic content
+## MAS acquisition and spectrum
 
-- Grid-free acquisition uses a 2000 Hz rotor rate, axis `[1 1 1]`, and maximum rank 23.
-- The FID has 256 points over a `5e4` sweep, zero-filled to 1024 with offset 17000; exponential apodisation parameter 6 is applied before Fourier transformation.
+The MAS rotor axis is `[1 1 1]` and rate is `2000 Hz` (2 kHz); powder settings are `leb_2ang_rank_23` and `max_rank=23`. The acquisition sweep is `5e4 Hz` with 256 points, zero-fill 1024, and `offset=17000`. It selects `13C`, assigns `axis_units='ppm'`, sets `invert_axis=1`, and explicitly leaves `decouple={}`. Both initial state and receiver are `L+` on `13C`.
 
-## Implementation structure
+After `gridfree` returns the FID, the script applies exponential apodisation parameter `6`, Fourier transforms with `fftshift(fft(fid,parameters.zerofill))`, and plots the real spectrum via `plot_1d`. These are model and processing settings for a computed spectrum; this file does not provide experimental measured output or a numerical comparison.
 
-- Parse the glycine DFT log, set the field and basis options, configure the experiment, call `gridfree(spin_system,@acquire,parameters,'nmr')`, apodise, Fourier transform, and plot.
+Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).

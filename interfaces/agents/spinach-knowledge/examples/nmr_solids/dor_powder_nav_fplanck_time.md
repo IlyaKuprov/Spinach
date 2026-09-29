@@ -1,19 +1,19 @@
 # examples/nmr_solids/dor_powder_nav_fplanck_time.m
 
-- Signature: `dor_powder_nav_fplanck_time()`
+- Signature: dor_powder_nav_fplanck_time()
 
 ## Purpose
 
-Double angle spinning spectrum of N-acetylvaline 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The calculation includes the second-order quadrupolar shift and the third-order lineshape. Time-domain detection. Note: slower spinning rates and larger NQIs require larger ranks and spherical grids. At the moment the spinning frequencies are set artificially too high to reduce the simulation time in this example. Calculation time: seconds
+The example models a one-dimensional double-angle-spinning (DOR) powder spectrum for the ¹⁴N nucleus of N-acetylvaline. Its source describes time-domain detection, second-order quadrupolar shifts, and third-order lineshape contributions. The source comment estimates seconds of calculation and explicitly says its rotor rates are set artificially high to shorten this example; it warns that slower spinning or larger NQIs need larger ranks and spherical grids. These are source comments, not timing or convergence results from a run in this task.
 
-## Physical / mathematical content
+## Spin model and rotor treatment
 
-This 14N double-angle-spinning example models the quadrupolar interaction with `eeqq2nqi(3.21e6,0.27,1,[0 0 0])` at 14.1 T. The source describes the target as the 14N nucleus of N-acetylvaline and notes second-order quadrupolar shift and third-order lineshape contributions.
+The system contains only ¹⁴N and one quadrupolar coupling tensor, supplied through eeqq2nqi(3.21e6, 0.27, 1, [0 0 0]). The source does not annotate the unit of 3.21e6. It sets sys.magnet to 14.1 without a unit comment. The basis is sphten-liouv with no approximation. Damping relaxation is selected with a code value of 2e3, diagonal relaxation retention, and zero equilibrium state.
 
-## Numerical / algorithmic content
+The DOR propagation uses the one-dimensional Fokker–Planck method on the rep_2ang_100pts_oct spherical grid. Code-set outer and inner rotor-rate values are 1e6 and 5e6; the source does not state their units. The corresponding ranks are 7 and 4. The axis vectors are explicitly commented as 54.74° (outer) and 30.56° (inner). This is a single-spin powder calculation, not a CP or HMQC sequence.
 
-The source calls `doublerot` with `acquire` in the lab frame, using the 1D Fokker–Planck treatment, outer/inner rates of 1 and 5 MHz and ranks 7 and 4. It uses the `rep_2ang_100pts_oct` grid and disables `trajlevel`; diagonal damping is 2 kHz. The time-domain signal has 256 points over a 100 kHz sweep and is zero-filled to 1024 before Fourier transformation.
+## Acquisition and reported observable
 
-## Implementation structure
+The script sets a sweep of 1e5, 256 acquired points, and zero-fills to 1024; the displayed axis unit is kHz. Both initial state and receiver coil are ¹⁴N L+, and the rotating-frame entry is ¹⁴N, frame 3. It passes these settings and the acquire callback to doublerot in the lab frame, Fourier-transforms the resulting FID, and plots the real spectrum. The script defines that calculated observable. The wrapper call does not add an RF pulse, Hartmann–Hahn condition, or additional experimental internals.
 
-Builds the single-spin quadrupolar system and basis, sets DOR and acquisition parameters, acquires the time-domain signal, Fourier transforms it, and plots the real spectrum.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/dor_powder_nav_fplanck_time.m

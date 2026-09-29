@@ -1,31 +1,34 @@
 # kernel/derivatives/fdmat.m
 
-- Signature: `D=fdmat(dim,nstenc,order,boundary)`
+Direct source: [kernel/derivatives/fdmat.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fdmat.m)
+Spin Dynamics Wiki: [fdmat.m](https://spindynamics.org/wiki/index.php?title=fdmat.m)
 
-## Purpose
+## Purpose and interface
 
-Returns a sparse, arbitrary-order finite-difference differentiation matrix for unit grid point spacing.
+D=fdmat(dim,nstenc,order,boundary) returns a sparse dim-by-dim matrix that applies a finite-difference derivative to a vector of dim samples. The stencil is built on unit-spaced integer sample positions. The optional boundary argument defaults to 'pbc'; the other supported value is 'wall'.
 
-## Parameters / inputs
+- dim is a positive integer of at least 3.
+- nstenc is a positive odd integer, the number of grid points in the stencil.
+- order is a positive integer smaller than nstenc.
+- boundary must be a character string equal to 'pbc' or 'wall'; any other value errors. The source does not separately check that nstenc is no greater than dim.
+- D is sparse and square. Applying D*x maps the sampled vector to derivative estimates at the same grid positions.
 
-- `dim` — dimension of the column vector to be differentiated; must be an integer of at least 3.
-- `nstenc` — number of points in the finite-difference stencil; must be a positive odd integer.
-- `order` — derivative order; must be a positive integer smaller than `nstenc`.
-- `boundary` — `'wall'` uses sided finite-difference schemes at the edges; `'pbc'` assumes periodic boundaries. Defaults to `'pbc'` and must be a character string.
+## How the matrix is assembled
 
-## Outputs
+The routine calls fdweights to obtain the coefficient row for the requested derivative, then inserts those coefficients into a sparse matrix preallocated for up to dim*nstenc entries. For interior points, the sample offsets are the centered integers from -(nstenc-1)/2 through (nstenc-1)/2, and the resulting row is placed at each interior grid point.
 
-- `D` — sparse finite-difference differentiation matrix of size `dim` by `dim`.
+With 'wall', the first (nstenc-1)/2 rows use one-sided stencils drawn from the first nstenc samples. The matching rows at the far edge use the reversed coefficient order and the factor (-1)^order. The remaining rows use centered coefficients.
 
-## Numerical / algorithmic content
+With 'pbc', every row uses the centered coefficient row. The column indices are wrapped into 1:dim by modulo indexing, which implements periodic indexing.
 
-The matrix is preallocated with space for `dim*nstenc` entries. Finite-difference coefficients are obtained from `fdweights`.
+No grid-spacing argument is applied: coefficients correspond to unit sample spacing. If the sample spacing represents a physical interval other than one, the derivative must be scaled for that coordinate convention by the caller.
 
-- For `'wall'`, the first `(nstenc-1)/2` rows use sided stencils spanning the first `nstenc` grid points. The corresponding rows at the opposite edge use the reversed coefficients, multiplied by `(-1)^order`. Interior rows use a centered stencil.
-- For `'pbc'`, every row uses the same centered-stencil coefficients. Column indices wrap around the matrix using modulo indexing.
+## Example
 
-An unrecognized boundary type raises an error.
+    D=fdmat(5,3,1,'wall');
 
-## Link
+This makes a 5-by-5 first-derivative matrix. The first row uses the three-point forward weights [-3/2, 2, -1/2], interior rows use the centered weights [-1/2, 0, 1/2], and the last row uses the corresponding backward weights. Multiplication by a sample vector returns one estimate at each of the five positions.
 
-- <https://spindynamics.org/wiki/index.php?title=fdmat.m>
+## Related routine
+
+- [fdweights.m](fdweights.md) generates the coefficient rows used here.

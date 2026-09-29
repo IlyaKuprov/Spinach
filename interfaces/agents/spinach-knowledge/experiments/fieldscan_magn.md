@@ -1,45 +1,23 @@
 # experiments/fieldscan_magn.m
 
-- Signature: `[fields,z_magn]=fieldscan_magn(spin_system,parameters)`
+- MATLAB implementation: [experiments/fieldscan_magn.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/fieldscan_magn.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=fieldscan_magn.m
 
-Z magnetization of the sample as a function of magnetic field in a finite-speed magnetic field sweep experiment. Syntax: [fields,z_magn]=fieldscan_magn(spin_system,parameters)
+Signature: [fields,z_magn]=fieldscan_magn(spin_system,parameters).
 
-## Physical / mathematical content
+This simulates the sample's z magnetization during a finite-speed magnetic-field sweep. For the fixed requested orientation, it constructs lab-frame Zeeman and coupling Hamiltonians and a z magnetic-moment observable from the rotated g tensors and spin operators. The initial density operator is thermal equilibrium at the starting field, normalized to unit trace. If parameters.nstates is supplied, the calculation is projected into the corresponding low-energy subspace.
 
+The field grid is linear between the requested endpoints. With npoints samples and total sweep_time, the time increment is dt=sweep_time/(npoints-1). At each sample the code records real(hdot(rho,mz)) and propagates the state with the propagator for the instantaneous field-dependent Hamiltonian. The source does not provide a physical unit for the returned magnetization values, so retain them as the routine's simulated signal rather than assigning a unit.
 
-- At the specified orientation, constructs the z magnetic-moment operator from the rotated g tensors and spin operators.
-- Initializes the density operator at the first field and evaluates magnetization with `hdot(rho,mz)`.
+Required inputs:
 
-## Numerical / algorithmic content
+- parameters.fields: two ascending endpoints in tesla.
+- parameters.npoints: number of field samples; at least two are needed for the source's npoints-1 time-step denominator.
+- parameters.orientation: three Euler angles [alp bet gam] in radians.
+- parameters.sweep_time: total sweep duration in seconds; the source requires it to be positive.
+- spin_system: must use zeeman-hilb formalism. The optional parameters.nstates is a positive integer specifying the low-energy active-space size.
 
+Return values: fields is the sampled magnetic-field axis in tesla and z_magn is the corresponding simulated magnetization signal. This is not, by itself, a DNP/hyperpolarization protocol or an imaging acquisition: the source contains no RF irradiation, polarization-transfer step, spatial encoding, or explicit relaxation/kinetics input during the sweep.
 
-- Creates a linearly spaced magnetic-field grid and adjusts the Zeeman Hamiltonian across the sweep.
-- If `parameters.nstates` is supplied, the requested eigenstates are used to form an active-space projection; the magnetization observable is the real part of `hdot(rho,mz)`.
-
-## Parameters / inputs
-
-- parameters.fields -two-element vector in Tesla,
-- ordered as [from to]
-- parameters.npoints -number of points in the scan
-- parameters.orientation -system orientation, three-
-- element vector containing
-- Euler angles in radians,
-- ordered as [alp bet gam]
-- parameters.sweep_time -sweep time, seconds
-- parameters.nstates -(optional) number of lowest energy
-- states to use for the effective
-- Hamiltonian in the time domain
-
-## Outputs
-
-- fields -magnetic fields in Tesla at each point in time
-- z_magn -total sample magnetisation at each point in time
-- Note: this function requires Hilbert space formalism.
-
-## Implementation structure
-
-
-- Validates the `zeeman-hilb` setup and sweep inputs, then constructs the field grid and orientation-dependent magnetic-moment operator.
-- Initializes the density operator, optionally forms an active-space projection, and evaluates the magnetization observable in the acquisition loop.
+Limit: the model is the finite-rate coherent field sweep from a thermal starting state at one fixed orientation, with optional low-energy projection. It is not a claim about measured magnetization or experimental enhancement.

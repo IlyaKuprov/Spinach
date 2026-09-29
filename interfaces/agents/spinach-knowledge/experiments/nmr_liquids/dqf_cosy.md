@@ -1,32 +1,24 @@
 # experiments/nmr_liquids/dqf_cosy.m
 
 - Signature: `fid=dqf_cosy(spin_system,parameters,H,R,K)`
+- Source: [`experiments/nmr_liquids/dqf_cosy.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/dqf_cosy.m)
 
-## Purpose
+## Purpose and sequence
 
-Phase-sensitive double-quantum filtered COSY pulse sequence.
+This phase-sensitive double-quantum-filtered COSY implementation starts from `Lz` magnetisation on the selected isotope, applies an `Lx` 90-degree pulse, and records an indirect-dimension (F1) trajectory. Two second-pulse branches, `Lx` and `Ly`, form the States quadrature components. An exact analytical coherence-order projection retains orders +2 and -2 in each branch; the code does not implement this filter as a phase cycle or a gradient-selection block. A third `Lx` 90-degree pulse precedes direct-dimension (F2) evolution and detection with the selected isotope's `L+` coil state. This describes the parameterized sequence, not a measured spectrum or run-verified output.
 
-## Implementation
+The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters.sweep` seconds.
 
-The sequence starts from `Lz` magnetisation on `parameters.spins{1}`, applies an `Lx` 90-degree pulse, and records the F1 trajectory. Separate `Lx` and `Ly` second-pulse branches form the States quadrature components. Each branch is filtered to coherence orders `+2` and `-2` by an exact analytical coherence-order projection, then receives a third `Lx` 90-degree pulse before F2 detection. The two observable evolutions are returned as `fid.cos` and `fid.sin`; the filter is not an explicit phase cycle or finite-gradient selection block. Evolution uses `L=H+1i*R+1i*K` and timestep `1/parameters.sweep`.
+## Parameters and inputs
 
-## Parameters / inputs
+- `parameters.sweep`: positive real scalar sweep width in Hz, applied to both dimensions.
+- `parameters.npoints`: two positive integer point counts, ordered F1 then F2.
+- `parameters.spins`: one-element cell array naming an isotope present in the system (for example, `{'1H'}` or `{'13C'}`); the selected isotope must have at least two spins.
+- `H`, `R`, and `K`: same-sized numeric Hamiltonian, relaxation, and kinetics matrices supplied by the context function. The function requires the `sphten-liouv` formalism.
 
-- `parameters.sweep` — sweep width in Hz.
-- `parameters.npoints` — number of points for both dimensions.
-- `parameters.spins` — nuclei on which the sequence runs, specified as `{'1H'}`, `{'13C'}`, etc.; the selected isotope must have at least two spins.
-- `H` — Hamiltonian matrix, received from context function.
-- `R` — relaxation superoperator, received from context function.
-- `K` — kinetics superoperator, received from context function.
+## Outputs and references
 
-The implementation requires `sphten-liouv` formalism, same-sized matrix inputs `H`, `R`, and `K`, a positive scalar sweep width, and two positive integer point counts.
-
-## Outputs
-
-- `fid.cos`, `fid.sin` — components of the free induction decay for hypercomplex processing.
-
-## References
-
-- [Double-quantum-filtered COSY reference](https://doi.org/10.1016/0006-291X(83)91225-1)
-- [COSY reference](https://doi.org/10.1021/ja00388a062)
-- [Spin Dynamics Wiki: `dqf_cosy.m`](https://spindynamics.org/wiki/index.php?title=dqf_cosy.m)
+- `fid.cos` and `fid.sin`: the two FID components for hypercomplex processing.
+- [Double-quantum-filtered COSY reference, DOI 10.1016/0006-291X(83)91225-1](https://doi.org/10.1016/0006-291X(83)91225-1)
+- [COSY reference, DOI 10.1021/ja00388a062](https://doi.org/10.1021/ja00388a062)
+- [Spinach Wiki: `dqf_cosy.m`](https://spindynamics.org/wiki/index.php?title=dqf_cosy.m)

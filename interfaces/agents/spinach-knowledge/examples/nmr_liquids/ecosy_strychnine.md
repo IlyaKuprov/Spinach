@@ -1,21 +1,15 @@
 # examples/nmr_liquids/ecosy_strychnine.m
 
-- Signature: `ecosy_strychnine()`
+- MATLAB implementation: [examples/nmr_liquids/ecosy_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/ecosy_strychnine.m)
 
-## Purpose
+## Model and sequence
 
-E.COSY spectrum of strychnine. Calculation time: minutes
+This example simulates phase-sensitive E.COSY for strychnine on the 22-spin, proton-only network from `strychnine({'1H'})`; no carbon or nitrogen spins are selected. The wrapper sets `sys.magnet=5.9` (field value; no unit is stated here) and delegates the sequence to `liquid(...,@ecosy,parameters,'nmr')`. The sequence implementation is in `experiments/nmr_liquids/ecosy.m`, not in this wrapper; it cites https://doi.org/10.1021/ja00308a042, https://doi.org/10.1063/1.451421, and https://doi.org/10.1016/0022-2364(87)90102-8. Acquisition and detection use the `1H` channel.
 
-## Physical / mathematical content
+## Basis and acquisition
 
-- Two-dimensional 1H E.COSY simulation of strychnine, using scalar-coupling evolution to produce correlated cross peaks.
-- The cosine and sine FIDs are squared-cosine apodised. After the F2 transforms, the States-like signal is assembled as `real(f1_cos)+1i*imag(f1_sin)` and Fourier transformed along F1.
+The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and proximity level 1; greedy basis construction uses `prox_cutoff=4.0`. Settings are offset 1200 (unit not specified), sweep 2200 Hz, `npoints=[512 512]`, and `zerofill=[2048 2048]`; displayed axes use ppm. No relaxation theory or rates are configured by this example. The source estimates calculation time as minutes.
 
-## Numerical / algorithmic content
+## Processing and plot
 
-- Uses the sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1, and greedy settings with `prox_cutoff=4.0`. The field is 5.9 T; 1H acquisition settings are offset `1200`, sweep `2200`, `npoints=[512 512]`, and `zerofill=[2048 2048]`. The implementation simulates the full spin system directly, without an isotopomer loop.
-
-## Implementation structure
-
-- Create the 1H strychnine spin system at 5.9 T and construct the selected basis.
-- Simulate E.COSY with the stated acquisition settings, apply squared-cosine windows, form the signal from the real cosine and imaginary sine components after F2 transformation, Fourier transform F1, and plot the real spectrum.
+The wrapper applies squared-cosine apodisation to the cosine and sine FID components in both dimensions. It Fourier-transforms F2, combines the components as `real(f1_cos)+1i*imag(f1_sin)`, then Fourier-transforms F1. It plots `real(spectrum)` with both signs displayed.

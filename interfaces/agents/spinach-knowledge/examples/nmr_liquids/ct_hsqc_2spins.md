@@ -1,19 +1,19 @@
 # examples/nmr_liquids/ct_hsqc_2spins.m
 
+- MATLAB implementation: [examples/nmr_liquids/ct_hsqc_2spins.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/ct_hsqc_2spins.m)
+
 - Signature: `ct_hsqc_2spins()`
 
 ## Purpose
 
-CT HSQC spectrum of 2 spin system. Calculation time: seconds
+A two-spin heteronuclear constant-time HSQC simulation. One 13C site and one 1H site are coupled directly, providing a small model for following heteronuclear transfer and quadrature-sensitive processing. The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin system and sequence
 
-This is a two-spin heteronuclear constant-time HSQC example with one `13C` and one `1H` site, coupled by 140.0. It uses Spinach's liquid-state `ct_hsqc` simulation and combines the positive- and negative-frequency signals using States-style quadrature reconstruction.
+The system is at 5.9 T, with source chemical shifts of 50.00 ppm for 13C and 3.00 ppm for 1H and a 140.0 Hz scalar coupling. The sequence parameter `J` is also set to 140. The wrapper calls `liquid(...,@ct_hsqc,...,'nmr')`, requests spins [13C,1H], and sets `decouple_f2={'13C'}`. Its acquisition parameters are sweep [2500 950], offset [3000 600], 128 points and 512 zero-fill points per dimension, with ppm display axes.
 
-## Numerical / algorithmic content
+The example calls `dilute(spin_system,'13C')` and processes the resulting subsystem list in a parallel loop. Both `fid.pos` and `fid.neg` are squared-cosine apodised. Their separately transformed signals are combined as `f1_pos + conj(f1_neg)` (the source's States reconstruction), then transformed along the other dimension. Thus the quadrature combination is explicit; this wrapper does not specify a separate phase-cycle table or mixing-time parameter.
 
-The source sets field value 5.9, chemical shifts 50.00 and 3.00, and `parameters.J=140`. It uses sweeps [2500 950], offsets [3000 600], 128 points and 512 zero-fill points, with `13C` decoupling in F2. It dilutes the system into carbon isotopomers, simulates each, applies squared-cosine apodisation separately to positive and negative FIDs, Fourier-transforms in F2, combines them as `f1_pos+conj(f1_neg)`, accumulates the F1 transforms, and plots the real spectrum in negative display mode.
+## Processing and output
 
-## Implementation structure
-
-The function constructs the heteronuclear system, creates the carbon-diluted subsystem list and preallocates the zero-filled complex spectrum. A parallel loop builds each subsystem basis, runs `ct_hsqc`, processes both signal components and adds their F1 transforms to the accumulated spectrum.
+The accumulated spectrum is plotted using its real part and the negative plotting convention. The axes are requested in ppm. This is a calculated spectrum for the specified two-site Hamiltonian and processing choices; the script does not load or compare an experimental HSQC data set.

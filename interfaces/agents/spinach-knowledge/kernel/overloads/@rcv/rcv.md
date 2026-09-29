@@ -1,35 +1,28 @@
 # kernel/overloads/@rcv/rcv.m
 
-- Signature: `obj=rcv(varargin)`
+- Signature: `obj=rcv(M)`, `obj=rcv(dim1,dim2)`, or `obj=rcv(R,C,V,dim1,dim2)`
+- Source: [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/rcv.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=rcv/rcv.m)
 
 ## Purpose
 
-Constructs an RCV sparse-matrix object from a matrix, dimensions, or explicit row, column, and value arrays.
+Constructs an RCV (row-column-value) sparse-matrix object. RCV names the coordinate storage format.
 
-## Mathematical content
+## Representation and dimensions
 
-The object stores matrix entries as parallel row-index, column-index, and value arrays, together with the matrix dimensions. For a matrix input, the constructor obtains these arrays from its nonzero entries.
+An RCV object stores parallel column vectors `row`, `col`, and `val`, plus `numRows`, `numCols`, and an `isGPU` flag. The constructor stores row and column indices as `int64`, values as `double`, and dimensions as `int64`.
 
-## Numerical / algorithmic content
+- `rcv(M)` accepts an existing RCV object unchanged or a numeric matrix. For a matrix it retains both dimensions and obtains the stored entries from `find(M)`.
+- `rcv(dim1,dim2)` creates an empty matrix with those dimensions.
+- `rcv(R,C,V,dim1,dim2)` stores the supplied coordinate/value entries after columnizing the arrays. The three arrays must have equal element counts; `R` and `C` must be finite real integer coordinates inside the matrix dimensions. Dimensions must be finite, real, non-negative integer scalars. `V` must be numeric; the constructor does not impose a real-valued or finite-value check on it.
 
-The one-input form returns an existing RCV object unchanged or converts a matrix by extracting its nonzeros. The two-dimension form creates an empty CPU-resident object. The five-input form casts indices and dimensions to `int64`, values to `double`, and marks the object GPU-resident if any entry-array input is a `gpuArray`; in that case the stored arrays are uploaded to the GPU. It validates argument count, dimensions, array lengths, and index bounds.
+The explicit-coordinate form retains repeated coordinates as supplied; this constructor neither sorts nor coalesces them. Converting with MATLAB's `sparse` constructor sums contributions at repeated coordinates; see [`sparse`](sparse.md). Coordinates are 1-based matrix row and column indices, not linear indices. The RCV class has no `subsref` element-indexing overload; convert to a MATLAB sparse matrix for ordinary matrix-element indexing.
 
-## Parameters / inputs
+For products, [`mtimes`](mtimes.md) handles scalar scaling (which retains RCV form) and compatible RCV/MATLAB-sparse matrix products (which return MATLAB sparse form).
 
-- M -a Matlab matrix
-- dim1 -number of rows
-- dim2 -number of columns
-- R -row indices of non-zero entries
-- C -column indices of non-zero entries
-- V -values corresponding to entries in R and C
+## GPU behavior
 
-## Outputs
+A matrix input preserves its CPU/GPU location. In the explicit-coordinate form, if any of `R`, `C`, or `V` is GPU-resident, all three stored entry arrays are placed on the GPU and `isGPU` is true. The dimension-only empty form is CPU-resident.
 
-- obj -an RCV sparse matrix object
+## Class predicates
 
-## Implementation structure
-
-- Validate inputs for the selected one-, two-, or five-argument form.
-- For a matrix input, preserve its GPU location, record its dimensions, extract nonzero entries, and store row and column indices as `int64` and values as `double`.
-- For explicit arrays, store the supplied entries and dimensions using those types; upload the entry arrays when any of them is GPU-resident.
-- The class also reports `true` for `isnumeric`, `ismatrix`, and `isfloat`.
+The class reports `true` for `isnumeric`, `ismatrix`, and `isfloat`.

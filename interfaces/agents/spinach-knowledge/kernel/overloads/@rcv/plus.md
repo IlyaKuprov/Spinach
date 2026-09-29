@@ -2,29 +2,22 @@
 
 - Signature: `C=plus(A,B)`
 
-## Purpose
+## Operation and storage
 
-Adds two same-size RCV matrices, or an RCV matrix and a same-size MATLAB sparse matrix. Scalar addition is rejected.
+An RCV object stores column-vector coordinates `row` and `col` as `int64`, values in `val` as `double`, dimensions `numRows` and `numCols` as `int64`, and an `isGPU` flag. For two RCV matrices of equal size, the method implements `A+B` by concatenating their `row`, `col`, and `val` vectors; it does not merge equal coordinates in this method. If either operand is marked GPU-resident, both operands are converted to GPU arrays before concatenation. The output remains RCV and has the common input dimensions. This is an eager construction of the coordinate/value arrays, not a lazy sum operator.
 
-## Mathematical content
+An RCV matrix may also be added to a MATLAB sparse matrix of the same dimensions. The overload checks the sizes, converts the sparse operand to RCV, and recursively uses the RCV-plus-RCV branch. Numeric scalar addition is explicitly rejected: a scalar would make the represented matrix non-sparse. No scalar broadcasting is provided. The implementation adds values directly and does not conjugate them.
 
-For two RCV inputs, the function represents their sum by concatenating their stored row indices, column indices, and values. A MATLAB sparse operand is converted to RCV form before the same addition path is used.
+## Input checks
 
-## Numerical / algorithmic content
+At least one operand must be RCV. The other operand must be RCV, MATLAB sparse, or a numeric scalar; the scalar cases then raise the explicit scalar-addition error. Two RCV operands and mixed RCV/sparse operands must have matching row and column dimensions. Other combinations fail the consistency check.
 
-The operands must have matching dimensions. If either RCV input is marked as GPU-resident, both are converted to GPU arrays before their stored entries are concatenated. A numeric scalar paired with an RCV matrix is explicitly rejected because adding it would make the matrix non-sparse.
+## Inputs and output
 
-## Parameters / inputs
+- `A`, `B`: equal-sized RCV matrices, or an RCV and a same-sized MATLAB sparse matrix.
+- `C`: RCV sum with the common input dimensions.
 
-- A -left operand
-- B -right operand
+## Source and Wiki
 
-## Outputs
-
-- C -sum A+B, RCV sparse matrix
-
-## Implementation structure
-
-- Check operand types; reject scalar-plus-RCV and unsupported combinations.
-- For two RCV inputs, check equal dimensions, align GPU residency if needed, then concatenate their stored entries into the result.
-- For a MATLAB sparse operand, check dimensions, convert it to RCV, and recurse through the RCV addition path.
+- [Source: kernel/overloads/@rcv/plus.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/plus.m)
+- [Spinach Wiki: rcv/plus.m](https://spindynamics.org/wiki/index.php?title=rcv/plus.m)

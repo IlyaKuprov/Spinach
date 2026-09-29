@@ -1,28 +1,30 @@
 # kernel/utilities/keep_rank.m
 
-- Signature: `A=keep_rank(A,nsvk)`
-
 ## Purpose
 
-Truncate a matrix to a requested singular-value rank and return the reconstructed matrix.
+Truncates the singular value decomposition of a matrix at a specified rank and reassembles the matrix, returning a low-rank approximation ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/keep_rank.m)).
 
-## Physical / mathematical content
+## Behavior
 
-This is a numerical low-rank approximation based on the singular value decomposition; it does not assume a particular physical model.
+- Syntax: `A=keep_rank(A,nsvk)`.
+- Runs a consistency check (`grumble`) on the inputs before processing.
+- Converts the input to full storage with `full(A)` and computes the singular value decomposition `[U,S,V]=svd(full(A))`.
+- Truncates the decomposition to the specified rank and rebuilds the matrix as `A=U(:,1:nsvk)*S(1:nsvk,1:nsvk)*V(:,1:nsvk)'`.
+- The consistency check errors with `'A must be a matrix.'` if `A` is not numeric or if either dimension has size less than or equal to 1.
+- The consistency check errors with `'nsvk must be a positive integer smaller than dim(A)'` if `nsvk` is not numeric, not real, not scalar, less than 1, non-integer (`mod(nsvk,1)~=0`), or greater than any dimension of `A` (`any(nsvk>size(A))`).
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-The input is converted to a full matrix and factorised with `svd`. The routine retains the first `nsvk` singular components and forms `U(:,1:nsvk)*S(1:nsvk,1:nsvk)*V(:,1:nsvk)'`.
+**Inputs**
 
-## Parameters / inputs
+- `A` — real or complex matrix; sparse inputs are converted to full.
+- `nsvk` — number of singular values to keep.
 
-- `A` - numeric matrix with more than one row and more than one column; sparse input is converted to full.
-- `nsvk` - positive real integer no greater than the smaller matrix dimension.
+**Outputs**
 
-## Outputs
+- `A` — filtered matrix, returned as full.
 
-- `A` - full matrix reconstructed from the retained singular components.
+## References
 
-## Implementation structure
-
-Consistency checks precede the full SVD. The requested leading singular-vector columns and matching diagonal block of `S` are multiplied to produce the truncated matrix.
+- Source code: [kernel/utilities/keep_rank.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/keep_rank.m)
+- Spinach Wiki: [keep_rank.m](https://spindynamics.org/wiki/index.php?title=keep_rank.m)

@@ -1,22 +1,17 @@
 # examples/nmr_liquids/ct_hsqc_sucrose.m
 
-- Signature: `ct_hsqc_sucrose()`
+- MATLAB implementation: [examples/nmr_liquids/ct_hsqc_sucrose.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/ct_hsqc_sucrose.m)
 
-## Purpose
+This example computes a natural-abundance 13C/1H constant-time HSQC for sucrose, using a DFT-derived spin system with selected isotropic shifts replaced by fixed values. It is a model spectrum rather than an experimental dataset.
 
-CT HSQC spectrum of sucrose with natural content of 13C isotope (magnetic parameters computed with DFT). Calculation time: seconds
+## Spin system and transfer
 
-## Physical / mathematical content
+The starting parameters are parsed from the vacuum DFT log for sucrose and passed to g2spinach for 1H and 13C; the reference inputs are [31.8, 182.1], in that particle order. Import uses a 3.0 Hz scalar-coupling threshold and disables coordinate import. The example then replaces isotropic shift values for spins 1-19 and 24-30, in order, with 94.5, 73.4, 74.9, 71.5, 74.7, 62.4, 63.6, 106.0, 78.7, 76.3, 83.7, 64.7, 5.49, 3.63, 3.83, 3.54, 3.90, 3.90, 3.90, 3.75, 3.75, 4.29, 4.12, 3.96, 3.90, and 3.90 ppm, respectively. These overrides retain the calculated anisotropic shielding components while setting the isotropic shifts to the values identified as experimental in the source.
 
-- Two-dimensional constant-time HSQC of sucrose using 13C and 1H spins. Magnetic parameters are initialized from a vacuum DFT log, then selected isotropic shifts are replaced with experimental values.
-- The simulation treats 13C isotopomers separately, applies squared-cosine apodisation to the positive and negative FIDs, forms a States signal, and Fourier transforms both dimensions.
+At 5.9 T, the liquid-state simulation enumerates 13C isotopomers and uses a sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1; greedy selection uses a 4.0 proximity cutoff. Isotopomers are simulated in parallel with the phase-sensitive constant-time HSQC sequence and a 140 Hz working J coupling. The sequence reference links are CT-HSQC, 1992 <https://doi.org/10.1016/0022-2364(92)90144-V> and the second source cited by the sequence <https://doi.org/10.1007/BF00227470>.
 
-## Numerical / algorithmic content
+## Acquisition and display
 
-- Spin-system generation uses `g2spinach` with `min_j=3.0` and `no_xyz=1`; the code then sets the isotropic shifts for listed spins. The basis is sphten-liouv / IK-2 with scalar-coupling connectivity and proximity level 1; greedy settings use `prox_cutoff=4.0`.
-- Sequence settings are `J=140`, sweep `[3350 950]`, offset `[5000 1100]`, `npoints=[128 128]`, and `zerofill=[512 512]`; F2 13C is decoupled. Isotopomer calculations use `parfor` (no GPU path is present).
+F1/F2 sweep widths are 3350/950 Hz, transmitter offsets 5000/1100 Hz, and the acquired matrix is 128 x 128 points; zero filling gives 512 points in each dimension. The 13C channel is configured for decoupling during F2 acquisition. The positive and negative FIDs each receive squared-cosine apodisation; their transformed components are combined as a States signal before the second Fourier transform. The plotted output is the real two-dimensional spectrum in ppm, using the negative-contour plotting option.
 
-## Implementation structure
-
-- Build the sucrose spin system from the vacuum DFT log and replace the listed isotropic shifts with experimental values; set the field to 5.9 T and define the selected basis and CT-HSQC parameters.
-- Generate 13C isotopomers, simulate each in parallel, then apodise the FIDs, form the States signal, Fourier transform both dimensions, and plot the real spectrum.
+The source comments estimate seconds for the calculation. The example reports no peak assignments or experimental comparison; the hard-coded shift substitutions are spin-system inputs, not measurements from this example.

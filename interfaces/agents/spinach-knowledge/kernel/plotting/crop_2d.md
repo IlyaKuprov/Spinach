@@ -1,25 +1,27 @@
 # kernel/plotting/crop_2d.m
 
+- Source: [kernel/plotting/crop_2d.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/crop_2d.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=crop_2d.m)
 - Signature: `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)`
 
 ## Purpose
 
-Crops a two-dimensional spectrum to user-specified frequency-axis ranges in ppm while preserving the digital resolution and updating the axis parameters for the retained points.
+Crops a two-dimensional spectrum to two ppm ranges while retaining whole sampled points and updating the frequency-axis metadata. No interpolation is performed.
 
-## Parameters / inputs
+## Inputs and axes
 
-- `spin_system` — Spinach spin-system structure, used to convert frequency axes to ppm.
-- `spec` — two-dimensional matrix containing the spectrum.
-- `parameters.sweep` — one or two sweep widths in Hz.
-- `parameters.spins` — cell array containing one or two working-spin isotope names; a single spin is used for both dimensions.
-- `parameters.offset` — one or two transmitter offsets in Hz.
-- `crop_ranges` — two-element cell array, `{[f1_min f1_max],[f2_min f2_max]}`; each pair gives ascending ppm bounds within its spectrum axis.
+- `spec` — numeric 2-D spectrum; dimension 1 is the F1 row axis and dimension 2 is the F2 column axis.
+- `parameters.sweep`, `parameters.offset`, and `parameters.spins` — one value per axis or a scalar duplicated for both axes. Sweep and offset are in Hz; spins identify the nuclei for ppm conversion.
+- `crop_ranges` — two-cell array, `{[f1_min f1_max],[f2_min f2_max]}`; each pair must be finite, real, two-element, ascending and inside its corresponding ppm axis.
 
-## Numerical / algorithmic content
+Each Hz axis is built with `ft_axis(offset,sweep,size(spec,dimension))`, then converted to ppm using that axis's nuclear spin and the spin-system magnetic field. Thus ppm axes may ascend or descend, including for negative-gyromagnetic-ratio nuclei.
 
-The routine constructs each axis with `ft_axis`, converts it to ppm using the isotope gyromagnetic ratio and the spin-system magnetic field, and selects the array indices bracketing the requested ranges. Bounds outside the available axes are rejected. The returned `parameters.zerofill`, `parameters.sweep`, and `parameters.offset` are recalculated from the retained points and their original digital resolution.
+## Sample selection and updated parameters
+
+Bounds select grid indices by strict `>` comparisons, not by rounding to the nearest ppm value. On an ascending axis, the first index above the lower bound is the left index and the first index above the upper bound is the right index. On a descending axis, the corresponding last indices above the upper and lower bounds are used. The returned slice is inclusive from left through right. Exact-boundary samples are not treated as interpolated endpoints, so the retained grid points need not coincide exactly with the requested ppm bounds; the chosen crossing can extend the crop past an upper boundary by one sample.
+
+The cropped matrix is `spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`. The new `parameters.zerofill` is the retained point count on each axis. Digital resolution is the original sweep divided by the original matrix dimension; each new sweep is that resolution times its retained point count. Offsets are recentered from the first retained Hz point, with a parity correction for odd point counts, so the updated metadata reproduces the selected points on the `ft_axis` grid.
 
 ## Outputs
 
-- `spec` — cropped two-dimensional spectrum.
-- `parameters` — updated parameters; the new offset, sweep, and zerofill reproduce the retained axis points on the `ft_axis` grid.
+- `spec` — cropped 2-D matrix, with retained F1 rows and F2 columns.
+- `parameters` — updated `zerofill`, `sweep`, and `offset`; other fields are carried through.

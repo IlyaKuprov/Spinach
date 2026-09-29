@@ -1,21 +1,23 @@
 # kernel/conventions/transforms/tsm2param.m
 
-- Signature: `[ax,rh,angles]=tsm2param(M)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/tsm2param.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=tsm2param.m)
 
-## Purpose
+## Purpose and limitation
 
-Converts a traceless symmetric 3x3 interaction matrix to axiality, rhombicity, and Euler angles. The source warns that this conversion is unstable and recommends publishing the 3x3 matrix instead, citing IUPAC.
+Converts a traceless symmetric interaction matrix to axiality, rhombicity, and Euler angles in Mehring eigenvalue order. The source warns that the parameterisation is unstable and recommends publishing the 3x3 matrix instead, consistent with IUPAC guidance.
 
-## Parameters / inputs
+## Input and reconstruction
 
-- `M` — a 3x3 matrix or five independent elements ordered `[Mxx, Mxy, Mxz, Myy, Myz]`. For five elements, the matrix is assembled symmetrically with `Mzz = -Mxx - Myy`.
+`M` is real numeric input with either nine matrix elements or five independent elements ordered `[Mxx, Mxy, Mxz, Myy, Myz]`. For five elements the function constructs:
 
-## Outputs
+`[Mxx Mxy Mxz; Mxy Myy Myz; Mxz Myz -Mxx-Myy]`
 
-- `ax` — axiality: `2*DZ - (DX + DY)`.
-- `rh` — rhombicity: `DY - DX`.
-- `angles` — Euler angles in radians, one of eight equivalent sets.
+For nine elements, the source checks `issymmetric(M)` and `abs(trace(M))<=10*eps`; it has no explicit `size(M)==[3 3]` or finite-value check. Inputs passing those checks are passed to `eig`, which requires a square matrix. The five-element input is indexed linearly in the stated order.
 
-Eigenvalues use Mehring ordering: `DZ` is the largest and `DX` the smallest, including signs; `DY` is the remaining eigenvalue. The eigenvectors are ordered X, Y, Z, adjusted to have positive determinant, and passed to `dcm2euler`. The source defines a consistency-checking helper, but the call to it is commented out.
+## Conversion and outputs
 
-[Source](https://spindynamics.org/wiki/index.php?title=tsm2param.m)
+Let `lambdaX` be the smallest eigenvalue, `lambdaZ` the largest, and `lambdaY` the remaining eigenvalue. The returned scalar invariants are `ax=2*lambdaZ-(lambdaX+lambdaY)` and `rh=lambdaY-lambdaX`. They retain the input matrix's units; no unit conversion is applied.
+
+The eigenvector columns are reordered as X, Y, Z and multiplied by `det(V)` so the resulting orientation matrix has determinant +1. The function passes that matrix to [`dcm2euler.m`](dcm2euler.md); `angles` is its 1-by-3 ZYZ active Euler-angle row in radians. The eigensystem does not define a unique orientation when eigenvalues are degenerate, consistent with the source's warning about instability.
+
+The implementation calls its validation helper before diagonalisation. It requires real numeric input with five or nine elements; on the nine-element path it additionally checks symmetry and the absolute trace tolerance above.

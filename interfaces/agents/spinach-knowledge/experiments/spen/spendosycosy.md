@@ -1,56 +1,11 @@
 # experiments/spen/spendosycosy.m
 
-- Signature: `fid=spendosycosy(spin_system,parameters,H,R,K,G,F)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/spen/spendosycosy.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=spendosycosy.m)
 
-## Purpose
+Ultrafast 3D DOSY-COSY combines the DOSY preparation and diffusion delay with a COSY evolution dimension. The source forms L = H + F + 1i*R + 1i*K, excites rho0 with pi/2, and steps through the coherence orders +1 → -1 → 0 during the first chirp/encoding interval and diffusion preparation. After the delay td-Tau-Te, a further pi/2 pulse takes the state through -1; a second chirp and positive Ge*G{1} interval return it to +1. The chirp parameters are pulsenpoints, Te, BW, smfactor, and chirptype ('wurst' or 'smoothed').
 
-Simulates the ultrafast 3D DOSY-COSY pulse sequence and returns the free induction decay over both acquisition dimensions and the loop index.
+The COSY axis is generated as a trajectory under L with timestep 1/sweep and npoints2-1 intervals, then a pi/2 pulse and +1 selection are applied to that stack. The acquisition trace uses negative-gradient prephasing for half of npoints1*deltat, followed by npoints1 detections of coil'*rho under the positive acquisition gradient. The returned fid is [npoints1, npoints2, nloops]: acquisition points, COSY evolution points, and loop index. npoints2 is the trajectory length, including its initial state. The header also mentions singular `npoints`, but the body reads and validates `npoints1` and `npoints2` instead. Loop bodies run with parfor; the source transfers the COSY stack, propagators, and coil to the GPU when GPU execution is enabled.
 
-## Physical / mathematical content
+The function checks rho0, coil, scalar dims (m), scalar npts, spins, npoints1, npoints2, sweep, deltat, nloops, Ga, pulsenpoints, smfactor, Te, Tau, td, BW, Ge, and chirptype in parameters. Gradient amplitudes are in T/m, and td must be at least Tau+Te. Although the source header lists Gp and Tp as coherence-selection gradient settings, the function body does not access those fields. The required formalism is sphten-liouv; H, R, K, and F must be equal-sized matrices, G must be a cell array, and these context inputs are supplied by imaging.
 
-- Combines diffusion encoding with COSY coherence transfer. The source applies chirp pulses and gradient intervals, selects the specified coherence orders, and includes the intervening diffusion evolution.
-- Uses the Hamiltonian, relaxation, kinetics, gradient, and diffusion/flow superoperators supplied by the imaging context; the measured signal is formed with the supplied detection state.
-
-## Numerical / algorithmic content
-
-- Applies shaped chirp pulses by piecewise-constant propagation and builds propagators for the acquisition periods.
-- Stores loop starting states, propagates and detects the signal over both acquired point dimensions, and uses parallel loop execution; GPU arrays are used when enabled.
-
-## Parameters / inputs
-
-- parameters.dims size of the sample in m
-- parameters.npts number of spin packets
-- parameters.spins nuclei on which the sequence runs
-- parameters.deltat timestep for acquisition
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
-- parameters.Ga acquisition gradient in T/m
-- parameters.pulsenpoints number of points in the pulse shape
-- parameters.smfactor smoothing factor for the pulse
-- parameters.Te duration of the pulse
-- parameters.Tau duration extra dephasing gradient
-- parameters.td diffusion delay, at least
-- parameters.Tau+parameters.Te
-- parameters.BW bandwidth of the pulse
-- parameters.Ge encoding gradient in T/m
-- parameters.Gp coherence selection gradient in T/m
-- parameters.Tp duration of the coherence selection gradient
-- parameters.chirptype can be 'wurst' or 'smoothed'
-- H Fokker-Planck Hamiltonian
-- R Fokker-Planck relaxation superoperator
-- K Fokker-Planck kinetics superoperator
-- G Fokker-Planck gradient superoperators
-- F Fokker-Planck diffusion and flow superoperator
-
-## Outputs
-
-- fid -SPENDOSYCOSY free induction decay as a 3D array
-- Note: the last five parameters are built automatically by the imaging
-- context function.
-
-## Implementation structure
-
-- Forms the Liouvillian and pulse operators, then executes the source-defined diffusion-encoding and COSY preparation with coherence-order selection.
-- Builds the acquisition propagators and loop states, and returns an FID array indexed by `npoints1`, `npoints2`, and `nloops`.
+Authors: jeannicolas.dumez@cnrs.fr, ilya.kuprov@weizmann.ac.il, ludmilla.guduff@cnrs.fr.

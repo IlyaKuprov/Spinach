@@ -1,24 +1,21 @@
 # examples/optimal_control/static_powder_control.m
 
+Source: [examples/optimal_control/static_powder_control.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/static_powder_control.m)
+
 - Signature: `static_powder_control()`
 
-## Purpose
+## Design objective and spin model
 
-Optimise a pulse that prepares deuterium magnetisation in alanine's -CD3 group for rephasing 100 microseconds after the pulse. The optimisation covers a 100-orientation powder, RF power levels from 46 to 54 kHz, and transmitter offsets from -1 to 1 kHz. It uses Goodwin's GRAPE Hessian algorithm because the propagator dimensions are small, yielding a spin echo.
+Design a deuterium pulse that prepares magnetisation in alanine's `-CD3` group for rephasing 100 microseconds after the pulse. The source describes a 600 MHz magnet, a single `2H` spin, and an alanine deuterium quadrupole-interaction tensor passed as `anas2mat(0,40e3,0,0,0,0)`. It uses the `sphten-liouv` basis without approximation. The normalized initial and target operators are deuterium `Lz` and `Lx`.
 
-## Physical / mathematical content
+## Powder and robustness ensemble
 
-- A 600 MHz magnet and an alanine -CD3 deuterium nuclear quadrupole interaction define the spin system.
-- The initial deuterium `Lz` state and target `Lx` state are normalised. Deuterium `Lx` and `Ly` operators control the pulse; `Lz` supplies the offset operator.
-- The optimisation includes powder orientations, five RF power levels, and five transmitter offsets.
+The drift Liouvillians are built in the lab frame for the 100-orientation powder grid `rep_2ang_100pts_sph`. The settings specify no decoupled spins, zero central offset, and rotating frames `{{'2H',2}}`. RF power levels are `2*pi*[46,48,50,52,54]*1e3` rad/s (46–54 kHz when expressed as cycles per second), while five offset samples span −1 to +1 kHz. This tests the requested B1 and transmitter-offset spread across powder orientations.
 
-## Numerical / algorithmic content
+## Pulse design
 
-- The pulse has 100 slices of 2 microseconds each. `fmaxnewton` optimises a random two-channel waveform guess using `grape_xy`, the `goodwin` method, a 100-iteration limit, a 100-microsecond dead time, and `NS` and `SNS` penalties.
-- A parallel loop tests the optimised pulse across the powder drifts and compares its echo with an ideal free induction decay. The signals are exponentially apodised and Fourier transformed for comparison.
+Goodwin's GRAPE Hessian method is selected, with 100 iterations, a 100 microsecond dead time, and `NS`/`SNS` penalties weighted 0.1 and 10. The pulse has 100 slices of 2 microseconds (200 microseconds total). A random 2-by-100 guess is optimized by `fmaxnewton` with `@grape_xy`; x/y components are then scaled by the mean power level.
 
-## Implementation structure
+## Observable and comparison
 
-- Create the deuterium spin system and powder drift Liouvillians, then configure and run the pulse optimisation.
-- Apply the resulting pulse in a test calculation, plot the time-domain echo, and compare the Fourier transforms of the optimised half-echo and ideal free induction decay.
-- Calculation time: minutes.
+For every ensemble drift, the script applies the optimized pulse and then computes the target-observable evolution with 0.5 microsecond sampling and 499 intervals. It also computes an ideal free-induction reference initialized from the target state. The source plots the time-domain echo and compares Fourier transforms of the optimized half-echo (samples 201 onward) and the ideal FID (first 300 samples), with both spectra normalized by their own maxima. The header describes the design goal; no run output is included here to establish that rephasing was achieved. The source estimates minutes for calculation time.

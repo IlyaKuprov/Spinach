@@ -1,25 +1,18 @@
 # experiments/pseudocon/geffect.m
 
-- Signature: `g=geffect(spin_system,states)`
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/geffect.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=geffect.m) · [Reference DOI 10.1063/1.4793736](https://doi.org/10.1063/1.4793736)
 
 ## Purpose
 
-Computes the effective g-tensor for a user-selected Kramers doublet, following [Equations 61 and 62](https://doi.org/10.1063/1.4793736).
+Computes an effective g tensor for a user-selected Kramers doublet, as described by Equations 61 and 62 of [the cited paper](https://doi.org/10.1063/1.4793736). It is a Hilbert-space eigenstate calculation, not a pulse-transfer, DANTE, REDOR, or overtone cross-polarization simulation.
 
-## Parameters / inputs
+## Inputs and requirements
 
-- `spin_system` — Spinach spin system.
-- `states` — indices of the selected states, numbered in ascending energy order from the lowest-energy state.
+- `spin_system` must use the `zeeman-hilb` formalism.
+- `states` contains two distinct positive integer state indices. They refer to eigenstates numbered from lowest to highest energy; both indices must be within the number of basis states.
 
-## Outputs
+For every spin, the routine gets its g tensor with `gtensorof`, builds the `L+`, `L-` and `Lz` operators, and combines them into the three magnetic-moment operators. It obtains the lab-frame Hamiltonian, adds the `[0 0 0]` orientation contribution, symmetrizes it, diagonalizes and sorts its eigenstates, and projects the magnetic-moment operators into the selected two-state subspace. The 3-by-3 matrix `G` is assembled using Equation 61; the returned tensor is `real(sqrtm(G))`.
 
-- `g` — 3-by-3 g-tensor matrix in Bohr magneton units.
+## Output
 
-## Method
-
-The routine obtains each spin's g-tensor and constructs its spin operators and the total magnetic-moment components. It builds and symmetrises the lab-frame Hamiltonian at orientation `[0 0 0]`, diagonalises it, sorts the eigenstates by ascending energy, and selects `states`. The magnetic-moment operators are projected into that selected subspace; the matrix `G` is assembled using Equation 61, and the returned tensor is `real(sqrtm(G))).
-
-## References
-
-- [10.1063/1.4793736](https://doi.org/10.1063/1.4793736)
-- [Spin Dynamics Wiki: geffect.m](https://spindynamics.org/wiki/index.php?title=geffect.m)
+- `g` is a 3-by-3 effective g-tensor matrix, in the Bohr magneton units stated by the source header.

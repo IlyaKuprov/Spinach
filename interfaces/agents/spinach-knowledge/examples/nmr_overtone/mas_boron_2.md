@@ -1,13 +1,11 @@
 # examples/nmr_overtone/mas_boron_2.m
 
-- Signature: `mas_boron_2()`
+- MATLAB implementation: [examples/nmr_overtone/mas_boron_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/mas_boron_2.m)
 
-## Purpose
+This example simulates a 10B MAS overtone spectrum with the sample spinning in the JEOL direction. The source credits the parameters to Nghia Duong and Yusuke Nishiyama and describes the RF power and pulse width as realistic; it estimates hours of calculation. The file supplies no DOI or measured comparison, so those comments are not evidence of experimental agreement.
 
-Simulates an overtone `10B` MAS NMR spectrum with the sample spinning in the JEOL direction. The source credits parameters to Nghia Duong and Yusuke Nishiyama and specifies realistic RF power and pulse width; it estimates hours of calculation time.
+The model uses isotope 10B, magnet setting 16.4, and the coupling input `eeqq2nqi(0.7e6,0.0,3,[0 0 0])`. Units are not annotated for the magnet setting or coupling arguments. Relaxation is `damp` with diagonal retention, zero equilibrium, and `damp_rate=100`; the basis is `sphten-liouv` with approximation `none`.
 
-## Model and calculation
+The MAS settings are rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and grid `rep_2ang_200pts_sph`. The spectrum uses sweep `[-141e3 -139e3]`, 256 points, 256-point zero-fill, and `axis_units='kHz'`. The initial state is 10B `Lz`. The source defines the receiver as `cos(theta)*Lz state + sin(theta)*Lx state`, and defines a corresponding Lx operator using the same weights, with `theta=atan(sqrt(2))`.
 
-The `10B` system is at 16.4 T, with quadrupole parameters 0.7 MHz, asymmetry 0, and spin 3. Diagonal damping relaxation is used at rate 100, and trajectory-level options are disabled.
-
-At the magic angle, the sequence uses rank 12, a 70 kHz spinning rate, grid `rep_2ang_200pts_sph`, a −141 to −139 kHz sweep, and 256 points with 256-point zero-fill. The average-treatment RF settings are 2π × 50 kHz divided by sin of the magic angle, 2 ms duration, and −140 kHz frequency. The code runs `singlerot` with `overtone_pa` and applies phase factor `exp(1i*1.45)`.
+Average treatment uses `rf_pwr=2*pi*50e3/sin(theta)`, `rf_dur=2e-3`, and `rf_frq=-140e3`. The code calls `singlerot` with `overtone_pa` and `qnmr`, multiplies the spectrum by `exp(1i*1.45)`, and plots its real part using `plot_1d`. The source values are recorded as written; only the spectral-axis setting is explicitly labeled kHz.

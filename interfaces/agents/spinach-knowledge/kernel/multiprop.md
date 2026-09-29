@@ -2,31 +2,20 @@
 
 - Signature: `rho=multiprop(spin_system,P,rho,N)`
 
-## Purpose
+## Meaning
 
-Apply the propagator `P` `N` times to `rho` using binary exponentiation, without explicitly constructing `P^N`. The operation depends on `spin_system.bas.formalism`.
+Applies a square propagator `P` exactly `N` times by processing the binary digits of `N`. It multiplies the state by the current power only for set bits, shifts to the next bit, and squares `P` only when more bits remain. It therefore does not form `P^N` as a separate matrix. After each required square, the code calls `clean_up(...,spin_system.tols.prop_chop)`. A validated `N=0` returns the original `rho` unchanged.
 
-## Physical / mathematical content
+For `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, each active power acts as `rho=P*rho`. In `zeeman-hilb`, `rho=P*rho*P'`, where MATLAB `P'` is the conjugate transpose. The output retains `rho`'s dimensions.
 
-For `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, each active binary power updates the state as `rho=P*rho`. In `zeeman-hilb`, it updates the density matrix as `rho=P*rho*P'`. Thus `N=0` leaves `rho` unchanged, after input validation.
+## Inputs and guards
 
-## Numerical / algorithmic content
+- `spin_system.bas.formalism` must be one of the four formalisms above, and `spin_system.tols.prop_chop` must be a non-negative real scalar.
+- `P` must be a finite numeric square matrix; `rho` a finite numeric matrix.
+- `N` must be a real numeric scalar representing a non-negative integer. Non-integer MATLAB numeric classes are also checked for finiteness and an upper bound of `flintmax`; integer classes are checked for non-negativity. The routine converts accepted values to `uint64` for bit processing.
+- Dimensions must agree. For the Hilbert-space density-matrix formalism, `rho` must be square; in the other formalisms its row count must match `P`.
 
-The routine processes the binary representation of `N`, applying the current propagator power only for set bits and squaring `P` between powers. It cleans the squared propagator using `spin_system.tols.prop_chop` only when higher powers remain to be processed.
+## References
 
-Inputs are checked before the zero-step return. The formalism must be one of `zeeman-hilb`, `zeeman-liouv`, `sphten-liouv`, or `zeeman-wavef`; `prop_chop` must be a non-negative real numeric scalar; `P` must be a finite numeric square matrix; and `rho` must be a finite numeric matrix with a row count matching `P`. For `zeeman-hilb`, `rho` must also be square. `N` must be a non-negative real numeric integer scalar; values not represented as integer classes must be finite and no greater than `flintmax`.
-
-## Parameters / inputs
-
-- `spin_system` - Spinach spin-system structure containing `bas.formalism` and `tols.prop_chop`.
-- `P` - finite numeric square propagator matrix.
-- `rho` - finite numeric state matrix; use state vectors/stacks for the Liouville and wavefunction formalisms, or a density matrix for Hilbert space. Its row count must match `P`; it must be square for `zeeman-hilb`.
-- `N` - non-negative integer number of propagator applications, supplied as a real numeric scalar and subject to the source integer-range check.
-
-## Outputs
-
-- `rho` - propagated state; for `N=0`, the validated input is returned unchanged.
-
-## Implementation structure
-
-The implementation validates the formalism, tolerance, matrices, dimensions, and exponent, then performs binary exponentiation. Liouville and wavefunction states are left-multiplied by the active power; Hilbert-space density matrices are transformed on both sides. Propagator powers are cleaned after squaring only when later binary powers are still required.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/multiprop.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=multiprop.m)

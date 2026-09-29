@@ -1,23 +1,19 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_b1_r.m
 
-- Signature: `xix_q_field_profile_ensemble_b1_r()`
+- Signature: `xix_q_field_profile_ensemble_b1_r()` (no arguments)
+- Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_b1_r.m)
+- Method: [steady-state XiX implementation](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/xixdnp_steady.m), which cites [10.1021/jacs.1c09900](https://doi.org/10.1021/jacs.1c09900).
 
-## Purpose
+## Purpose and protocol
 
-Simulate a steady-state XiX DNP field profile at Q band, averaging over electron–proton distance and electron Rabi frequency. The source estimates a calculation time of minutes.
+Calculates a steady-state XiX DNP microwave-offset profile with two explicit ensemble integrations: electron–proton distance and electron nutation frequency (B1). It is the distance-plus-B1 variant of the fixed-distance B1 example. The source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Setup and scan
 
-- Models an electron (`E`) and proton (`1H`) at a 1.2142 T magnetic field and 80 K, with a trityl electron g-tensor and an estimated proton chemical shift.
-- Places the proton at each sampled distance from the electron. Uses `t1_t2` relaxation with a distance- and orientation-dependent proton longitudinal relaxation rate supplied by `r1n_dnp`; the equilibrium model is `dibari`.
-- Detects proton `Lz` while sweeping microwave resonance offsets from −100 to 100 MHz.
+The script uses an `E`/`1H` pair, `sys.magnet=1.2142`, spin temperature `80`, trityl electron Zeeman principal values `[2.00319 2.00319 2.00258]`, proton shift guess `[0 0 5]` ppm, and Euler inputs `(pi/180)*{[0 10 0],[0 0 10]}`. At each sampled distance, the proton coordinate is set to z=`r(n)`; here `gaussleg(3.5,20,3)` is explicitly annotated as Å. The proton `r1` handle calls `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r(n),bet)`; electron `r1=1e3`, `r2_rates={200e3 50e3}`, relaxation retention is diagonal, and equilibrium is `dibari`. Magnet, temperature and rates are not assigned units in this source.
 
-## Numerical / algorithmic content
+For each distance and each of five Gauss–Legendre B1 points spanning 10e6–20e6 Hz, it evaluates 201 microwave offsets from −100e6 to 100e6 Hz on `rep_2ang_800pts_sph`, using the unapproximated `sphten-liouv` basis, proton `Lz` detection, and `powder(...,@xixdnp_steady,...,'esr')`. The XiX protocol uses 48e-9 s pulses, 36 blocks, second-pulse phase `pi`, additional shift −13e6 (unit not annotated), and shot spacing `204e-6 - 2*nloops*pulse_dur`.
 
-- Uses the `sphten-liouv` formalism without basis approximation and a spherical powder grid (`rep_2ang_800pts_sph`). At each distance and electron nutation frequency, `powder` runs `xixdnp_steady` with the `esr` setting.
-- Sets 48 ns pulses, 36 XiX DNP blocks, an inverted second-pulse phase (`pi`), a −13 MHz additional shift, and shot spacing calculated as `204e-6 - 2*nloops*pulse_dur` seconds.
-- Samples distances from 3.5 to 20 Å at three Gauss–Legendre points and electron Rabi frequencies from 10 to 20 MHz at five points. Averages the resulting profiles using the B1 quadrature weights, then the distance quadrature weights multiplied by the radial factor `r^2`.
+## Dependencies and output
 
-## Output
-
-Plots the real proton `Lz` expectation value against microwave resonance offset in MHz and saves the figure as `xix_q_field_profile_ensemble_b1_r.fig`.
+Requires Spinach and `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`. First the B1 results are quadrature-weighted; the distance average then applies the radial `r^2` factor with its quadrature weights and normalization. It plots the real proton `Lz` signal against microwave offset in MHz and saves `xix_q_field_profile_ensemble_b1_r.fig` in the MATLAB current directory. No numerical profile is saved, and both ensembles use finite quadrature grids.

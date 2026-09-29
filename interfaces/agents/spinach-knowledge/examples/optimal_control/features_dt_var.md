@@ -1,19 +1,16 @@
 # examples/optimal_control/features_dt_var.m
 
 - Signature: `features_dt_var()`
+- Source: [examples/optimal_control/features_dt_var.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_dt_var.m)
 
-## Purpose
+## Purpose and model
 
-Demonstrates optimal-control pulse design with nonuniform time slices and RF-power robustness. It optimises a shaped pulse for the stated state-transfer task and checks the result by propagating the pulse.
+This simulated optimal-control example transfers normalized longitudinal magnetization from 1H to 19F through the scalar-coupled 1H-13C-19F model. It sets a 9.4 T field, zero chemical shifts, and couplings of 140 Hz (1H-13C) and -160 Hz (13C-19F). The model is defined in the script; it does not import measured data.
 
-## Physical / mathematical content
+## Controls and optimization
 
-The spin system contains 1H, 13C, and 19F channels, with x- and y-phase controls on each nucleus. The objective includes a state-norm (SNS) penalty and is evaluated over five RF-power levels.
+The six controls are x and y RF components on each nucleus. The pulse has 50 nonuniform intervals, with durations defined by `3e-4*(0.25+0.75*cos(linspace(-pi/2,pi/2,50)))` seconds (about 75 to 300 microseconds). Optimization uses five RF-power levels from `2*pi*800` to `2*pi*1200` rad/s, the SNS penalty with weight 100, the `lbfgs` method, and a 100-iteration limit. A random 6-by-50 initial waveform is passed to `fmaxnewton` with `@grape_xy`; correlation-order, per-spin, and x/y-control plots are enabled.
 
-## Numerical / algorithmic content
+## Output and limits
 
-The 50 pulse slices have nonuniform durations. The source uses the lbfgs method with grape_xy gradients through fmaxnewton, and then validates the optimised waveform with shaped_pulse_xy.
-
-## Implementation structure
-
-The code constructs and normalises the initial and target states, generates an initial control guess, and optimises six x/y controls over the five-point RF-power ensemble with an SNS penalty. It then rescales and propagates the waveform using shaped_pulse_xy and reports the fidelity. The pulse has 50 nonuniform time slices.
+The optimized waveform is scaled by the mean power level and propagated once with `shaped_pulse_xy` using `expv-pwc`. The reported quantity is the real overlap `Re[rho_targ'*rho(T)]`. This final check uses a single drift Hamiltonian and the mean-power-scaled pulse; it is not a reported sweep over all five powers. The example is a model simulation, not a hardware or experimental validation.

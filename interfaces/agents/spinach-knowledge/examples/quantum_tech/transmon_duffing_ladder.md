@@ -1,15 +1,13 @@
 # examples/quantum_tech/transmon_duffing_ladder.m
 
+Source: [examples/quantum_tech/transmon_duffing_ladder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_duffing_ladder.m)
+
 - Signature: `transmon_duffing_ladder()`
 
-## Purpose
+## Model and calculation
 
-Duffing-model energy ladder of a weakly anharmonic transmon, showing how the transition frequencies separate as anharmonicity increases. Inspired by the transmon model of Koch et al., Phys. Rev. A 76, 042319 (2007). Calculation time: seconds.
+The isotope label `T5` represents a single five-level transmon-mode truncation; it is not an electron spin, defect isotope, or EPR system. The mode frequency is `5.0e9` (5 GHz). In the lab-frame Hamiltonian the code adds a Duffing term, using the `CCAA` operator, and sweeps the anharmonicity over 80 values from −400 to −50 MHz (the code stores this range as angular-frequency values, `2*pi*linspace(-400e6,-50e6,80)`). No time-dependent drive or dissipative interaction is configured: each point is a static Hamiltonian calculation.
 
-## Model and parameters
+For each value, the five eigenenergies are sorted and adjacent differences give the 0–1, 1–2, 2–3, and 3–4 transition frequencies. The plot shows those four transitions in GHz against the positive quantity −α/(2π) in MHz, so increasing horizontal coordinate means increasing magnitude of the negative anharmonicity. It is an energy-ladder comparison across the specified parameter sweep, not a measured spectrum or device-performance result.
 
-A single T5 mode has frequency 5.0 GHz. The code forms its harmonic Hamiltonian in the lab-frame context, then adds the Duffing term using the CCAA operator. Anharmonicity is swept across 80 values from -400 to -50 MHz.
-
-## Calculation
-
-For each anharmonicity, the Hamiltonian eigenvalues are sorted and the four adjacent transition frequencies are computed. The plot shows those transitions against `-alpha/2pi` in MHz, with frequencies in GHz. The cited transmon model is Koch et al., Phys. Rev. A 76, 042319 (2007).
+The source cites Koch et al., *Physical Review A* **76**, 042319 (2007) ([DOI](https://doi.org/10.1103/PhysRevA.76.042319)).

@@ -4,27 +4,22 @@
 
 ## Purpose
 
-Finds a steady state under repeated application of the same dissipative evolution propagator. Syntax: `rho=steady(spin_system,P,rho,method)`.
+Finds a state fixed by repeated application of the same propagator: the returned column state satisfies the solver's fixed-point problem for `P`. The propagator must include a thermalised relaxation superoperator. For the meaning and construction of a propagator, see [`propagator.m`](propagator.md).
 
-## Physical / mathematical content
+## Supported representations and normalisation
 
-The returned state is fixed by the propagator `P` (that is, repeated application leaves the steady state unchanged). `P` must include a thermalised relaxation superoperator; it may be a single propagator or a product representing a repeating pulse block or sequence.
+Only `sphten-liouv` and `zeeman-liouv` are accepted. `P` must be numeric and square, and `rho` a numeric column vector. If `rho` is omitted or empty, the default is a vector with first entry 1 in `sphten-liouv`, or the vectorised identity divided by the Hilbert-space dimension in `zeeman-liouv`.
 
-## Numerical / algorithmic content
+For a supplied initial state, `sphten-liouv` requires `rho(1)==1`; `zeeman-liouv` requires unit trace within `1e-10`. The solver also checks the formalism-specific trace-conservation and thermalisation conditions on `P`.
 
-The default `newton` method solves the fixed-point equations with a Newton-Raphson iteration and normalization pinning. The alternative `squaring` method repeatedly squares the propagator until convergence; it is more expensive but unconditionally numerically stable.
+## Methods
 
-## Parameters / inputs
+- `newton` is the default. It solves using the Jacobian `P-I`, pinning the first coordinate in `sphten-liouv` or using a trace-pinned bordered system in `zeeman-liouv`. Iteration stops when the update norm is no greater than `spin_system.tols.stst_tol`; failure to converge within the source's iteration limit raises an error.
+- `squaring` repeatedly squares the propagator, preserving the trace row for `zeeman-liouv`, until successive propagators differ by no more than `spin_system.tols.stst_tol`; it then applies the resulting propagator once to `rho`. The source also has a bounded iteration guard that errors on stagnation.
 
-- `P` - propagator, an exponential of the Liouvillian that contains a thermalised relaxation superoperator (`inter.equilibrium='IME'` or `'dibari'`) or a product thereof (for example, from a repeating block of a pulse or a pulse sequence).
-- `rho` - optional initial guess for the steady state; a good one can significantly accelerate this function (leave empty otherwise). It must have unit trace, which in `sphten-liouv` means a first element equal to 1.
-- `method` - `'newton'` (default) for the Newton-Raphson steady-state solver, or `'squaring'` for propagator squaring (much more expensive, but unconditionally numerically stable).
+The returned `rho` is a column vector in the selected Liouville representation. This function contains no progress-print or summary-output call; it returns the state or raises an error.
 
-## Outputs
+## Links
 
-- `rho` - steady state under repeated application of the propagator `P`.
-- Available for `sphten-liouv` and `zeeman-liouv` formalisms; the Newton-Raphson solver pins the first state-vector element in `sphten-liouv` and the density-matrix trace in `zeeman-liouv`.
-
-## Implementation structure
-
-- Uses a Newton iteration with the first basis element fixed in `sphten-liouv` or a trace-pinned bordered system in `zeeman-liouv`; `squaring` iterates the propagator instead. The solver checks its input formalism, normalization, and propagator constraints.
+- Source: [`kernel/steady.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/steady.m).
+- Wiki: [`steady.m`](https://spindynamics.org/wiki/index.php?title=steady.m).

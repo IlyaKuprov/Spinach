@@ -1,25 +1,35 @@
 # kernel/utilities/polinfo.m
 
-- Signature: `polinfo(p,level,label)`
-
 ## Purpose
 
-Prints an ASCII description of a polyadic object to the console.
+Prints an ASCII diagram of a `polyadic` object to the console, showing its size, prefix, Kronecker-core terms, and suffix, including nested polyadic elements.
 
-## Parameters / inputs
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/polinfo.m>
 
-- `p` — polyadic object to describe.
-- `level` — optional non-negative integer scalar indentation level; defaults to `0`.
-- `label` — optional character-string label; defaults to `'polyadic'`.
+## Behavior
 
-## Output
+- Signature: `polinfo(p,level,label)`, with `level` defaulting to `0` and `label` defaulting to `'polyadic'` when not supplied.
+- Validates inputs via the internal `grumble` function: `p` must be a `polyadic` object, `level` a non-negative real integer scalar, and `label` a character string; violations raise errors (`'p must be a polyadic object.'`, `'level must be a non-negative integer.'`, `'label must be a character string.'`).
+- Indentation is `4*level` spaces, so nested calls print deeper levels.
+- Prints the label and the object's dimensions as `label [nrowsxncols]`.
+- For `polyadic` inputs, prints a `prefix:` header when `p.prefix` is non-empty, then lists each prefix element: nested `polyadic` elements recurse via `polinfo(p.prefix{n},level+2,sprintf('polyad %d',n))`; `opium` objects print as `opium  n [nrowsxncols]`; anything else prints as `matrix  n [nrowsxncols]`.
+- Iterates `p.cores`, printing `kron n` for each core cell and then each factor within it, with the same polyadic/opium/matrix classification and recursion at `level+2`.
+- For `polyadic` inputs, prints a `suffix:` header when `p.suffix` is non-empty, then lists suffix elements with the same classification and recursion.
+- The header comment notes that polyadic objects can be huge and that the code avoids making memory copies.
 
-There is no return value; the function prints the description. It indents by four spaces per level and shows the label and object dimensions.
+## Inputs and outputs
 
-## Implementation structure
+Inputs:
 
-The description traverses the object's prefix, Kronecker terms and core entries, then its suffix. Nested polyadic entries are described recursively at `level+2`; other entries are identified by type and dimensions. The implementation avoids copying polyadic objects, which can be very large.
+- `p` — polyadic object to diagram.
+- `level` — optional non-negative integer indentation level (default `0`).
+- `label` — optional character string label for the printed header (default `'polyadic'`).
 
-## Reference
+Outputs:
 
-- <https://spindynamics.org/wiki/index.php?title=polyadic/polinfo.m>
+- An ASCII diagram printed to the console; no return values.
+
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=polyadic/polinfo.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/polinfo.m>

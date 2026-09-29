@@ -1,30 +1,27 @@
 # kernel/contexts/crystal.m
 
-- Signature: `answer=crystal(spin_system,pulse_sequence,parameters,assumptions)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/crystal.m) · [Spin Dynamics Wiki: crystal.m](https://spindynamics.org/wiki/index.php?title=crystal.m)
 
-## Purpose
+## Contract
 
-Builds the Hamiltonian and relaxation/kinetics inputs for a single-crystal orientation, then calls the supplied pulse-sequence function handle. The orientation is specified by three Euler angles.
+`answer=crystal(spin_system,pulse_sequence,parameters,assumptions)` assembles the Hamiltonian, relaxation operator, and kinetic operator for one single-crystal orientation, then calls the supplied pulse-sequence function handle. It does not sweep an orientation grid or perform powder averaging.
 
-## Parameters / inputs
+## Orientation, operators, and dimensions
 
-- `pulse_sequence` — function handle for a pulse sequence in the experiments directory.
-- `assumptions` — string passed to `assume.m` when the Hamiltonian is built.
-- `parameters.spins` — cell array of spin species used by the pulse sequence, for example `{'1H','13C'}`.
-- `parameters.offset` — transmitter offsets in Hz, one per spin in `parameters.spins`.
-- `parameters.orientation` — row vector of three Euler angles in radians, specifying the system orientation relative to the input orientation.
-- `parameters.rframes` — rotating-frame specification. The source gives `{{'13C',2},{'14N,3}}` as an example of second-order carbon-13 and third-order nitrogen-14 transformations. When used, the assumptions for those spins should be in the laboratory frame.
-- `parameters.needs` — cell array of additional sequence requirements:
-  - `'zeeman_op'` requests the laboratory-frame Zeeman Hamiltonian in `parameters.hzeeman`.
-  - `'aniso_eq'` requests thermal equilibrium recomputed from the full anisotropic Hamiltonian at the current orientation and supplied as `parameters.rho0`.
-- Other `parameters` subfields may be required by the pulse sequence; consult its documentation.
+`parameters.orientation` is a real, finite three-element Euler-angle vector in radians, specifying the system orientation relative to its input orientation. The context evaluates the Hamiltonian as the isotropic part plus the rotated anisotropic part, `H=I+orientation(Q,parameters.orientation)`, and Hermitian-symmetrizes it. It builds relaxation at the same orientation and obtains kinetics from the spin system. The angular coordinates affect the anisotropic spin terms; the isotropic contribution is not rotated.
 
-The wrapper also sets `parameters.spc_dim` to 1 and `parameters.spn_dim` to the spin-dynamics matrix dimension before calling the sequence.
+The spatial subspace has dimension one: the sequence receives `parameters.spc_dim=1`. The context sets `parameters.spn_dim=size(H,1)`, the Hamiltonian matrix dimension. These are context metadata, not a promise about the sequence's return value: the function returns whatever `pulse_sequence` returns. Its inputs are `spin_system`, the updated `parameters`, `H`, `R`, and `K`; it owns the observable and result shape.
 
-## Output
+## Inputs and conventions
 
-Returns whatever the pulse sequence returns.
+- `pulse_sequence` must be a function handle. `assumptions` is a character string passed to `assume.m` before the Hamiltonian is built, so the operator basis/frame is the one requested by that assumption.
+- `parameters.spins` lists channel species, for example `{'1H','13C'}`; `parameters.offset` gives the corresponding transmitter offsets in Hz. Missing offsets default to zero.
+- `parameters.rframes` selects rotating-frame transformations by species and order. The source example uses second order for carbon-13 and third order for nitrogen-14; when using these transformations, the assumptions for those spins should be laboratory frame. Arbitrary order, including infinite order, is supported by the called rotating-frame routine.
+- Put `'zeeman_op'` in `parameters.needs` to receive the laboratory-frame Zeeman Hamiltonian in `parameters.hzeeman`. Put `'aniso_eq'` there to recompute thermal equilibrium with the full anisotropic Hamiltonian at this orientation and receive it as `parameters.rho0`.
+- Missing `decouple` and `rframes` fields default to empty; missing channel offsets default to zero. Other sequence-specific parameter fields pass through.
 
-## Note
+The source states the angle and offset units explicitly: radians for orientation, hertz for transmitter offsets. The Hamiltonian is assembled by Spinach's `hamiltonian` and `orientation` routines in the formalism selected through the spin-system assumptions; this context adds no separate unit conversion for the spin-system Hamiltonian.
 
-Arbitrary-order rotating-frame transformations, including infinite order, are supported. See the header of `rotframe.m` for details.
+## Source-supported examples
+
+Use a single orientation such as `[0 0 0]` for the input orientation. The header's channel example is `{'1H','13C'}`; its rotating-frame example specifies order 2 for carbon-13 and order 3 for nitrogen-14. Those examples describe channel/frame choices, not simulated outputs.

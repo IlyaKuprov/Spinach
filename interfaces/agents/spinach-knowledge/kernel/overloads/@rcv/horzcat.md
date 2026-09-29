@@ -1,31 +1,23 @@
 # kernel/overloads/@rcv/horzcat.m
 
-- Signature: `A=horzcat(A,B)`
+[GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/horzcat.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/horzcat.m)
+
+- Signature: `A=horzcat(varargin)` (the arguments are used in their supplied order)
 
 ## Purpose
 
-Horizontally concatenates RCV sparse matrices in the order supplied, producing a matrix with the common row count and the sum of their column counts.
+Horizontally concatenates one or more RCV matrices as consecutive column blocks.
 
-## Physical / mathematical content
+## Storage and behavior
 
-The output places each input matrix in a consecutive column block; row indices are preserved and column indices are offset by the widths of preceding blocks.
+RCV stores row indices, column indices, and values in parallel arrays, with `numRows` and `numCols` recording the represented shape. The overload requires every argument to be an `rcv` object and all row counts to match; the implementation assumes at least one argument. If any operand has `isGPU=true`, it applies `gpuArray` to every operand, leaving already-GPU operands as they are. In the supplied left-to-right order, each operand's row indices and values are retained, while its column indices are increased by the cumulative widths of all preceding operands. The adjusted row, column, and value arrays are then eagerly concatenated, and `numCols` is set to the sum of the operand widths. The output is an RCV matrix with `numRows` rows and that total number of columns; its data remain in coordinate-array form rather than being materialized as a sparse or dense MATLAB matrix.
 
-## Numerical / algorithmic content
+Values are concatenated unchanged: this overload does not conjugate them or provide scalar expansion/broadcasting. Non-RCV scalar operands fail the object-type check.
 
-The variadic implementation accepts the input sequence as varargin. If any input is GPU-resident, all inputs are moved to GPU before their coordinate and value arrays are concatenated.
+## Input
 
-## Parameters / inputs
+- One or more RCV sparse matrices, in the order to appear from left to right. Every input must have the same row count.
 
-- A -left RCV sparse matrix
-- B -right RCV sparse matrix
+## Output
 
-## Outputs
-
-- A -RCV sparse matrix
-
-## Implementation structure
-
-- Requires every input to be an RCV object and all row counts to match.
-- Moves all operands to GPU if at least one input is GPU-resident.
-- Offsets each input's column indices by the cumulative column count.
-- Concatenates the row, adjusted column, and value arrays; sets numCols to the sum of input column counts.
+- `A` - the RCV matrix formed by the consecutive horizontal blocks.

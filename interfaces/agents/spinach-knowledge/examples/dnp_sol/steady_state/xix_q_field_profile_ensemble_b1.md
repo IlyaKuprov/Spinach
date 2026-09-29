@@ -1,19 +1,19 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_b1.m
 
-- Signature: `xix_q_field_profile_ensemble_b1()`
+- Signature: `xix_q_field_profile_ensemble_b1()` (no arguments)
+- Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_b1.m)
+- Method: [steady-state XiX implementation](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/xixdnp_steady.m), which cites [10.1021/jacs.1c09900](https://doi.org/10.1021/jacs.1c09900).
 
-## Purpose
+## Purpose and protocol
 
-Simulates a steady-state XiX DNP field profile at Q band, averaged over an ensemble of electron Rabi frequencies. The source estimates a calculation time of minutes.
+Builds a steady-state XiX DNP microwave-offset profile and averages it over electron nutation-frequency (B1) quadrature points. This is the fixed-distance, B1-ensemble variant; the sibling files add distance averaging or vary the electron relaxation time. The example source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Setup and scan
 
-The system contains an electron and a proton at a 3.5 Å separation in a 1.2142 T magnetic field, with a trityl electron g-tensor, an estimated proton chemical shift, and a temperature of 80 K. It uses `t1_t2` relaxation, including a proton longitudinal relaxation rate supplied by `r1n_dnp` that depends on orientation through `bet`. The detected observable is proton `Lz`.
+The script creates an `E`/`1H` pair, with `sys.magnet=1.2142`, spin temperature `80`, trityl electron Zeeman principal values `[2.00319 2.00319 2.00258]`, and the proton shift guess `[0 0 5]` ppm. Euler-angle inputs are `(pi/180)*{[0 10 0],[0 0 10]}`; the two coordinate rows place the proton at z=3.5 relative to the electron (no coordinate unit is stated in this source). Relaxation is `t1_t2`, with electron `r1=1e3`, proton `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`, `r2_rates={200e3 50e3}`, diagonal relaxation retention, and `dibari` equilibrium. The source does not annotate units for the magnet, temperature, or rate values.
 
-## Numerical / algorithmic content
+It uses an unapproximated `sphten-liouv` basis, proton `Lz` detection, propagator chop tolerance `1e-12`, and powder grid `rep_2ang_800pts_sph`. The 201 microwave offsets span −100e6 to 100e6 Hz. Five Gauss–Legendre points sample B1 from 10e6 to 20e6 Hz; each point runs `powder(spin_system,@xixdnp_steady,parameters,'esr')`. XiX settings are 48e-9 s pulses, 36 blocks, second-pulse phase `pi`, additional shift −13e6 (the source does not annotate its unit), and shot spacing `204e-6 - 2*nloops*pulse_dur`.
 
-The script creates the spin system in an unrestricted `sphten-liouv` basis. It evaluates `xixdnp_steady` through `powder` on the `rep_2ang_800pts_sph` grid for 201 electron microwave offsets from −100 to 100 MHz. Each calculation uses 36 XiX blocks, 48 ns pulses, an inverted second-pulse phase, and the specified shot spacing. Five Gauss–Legendre points span electron nutation frequencies of 10–20 MHz; their weighted results are combined into an ensemble-averaged profile.
+## Dependencies and output
 
-## Implementation structure
-
-After configuring the spin system, relaxation, and experiment parameters, the function loops over the B1 quadrature points and runs the steady-state powder simulation at each point. It plots the real part of the averaged proton `Lz` expectation value against microwave resonance offset and saves `xix_q_field_profile_ensemble_b1.fig`.
+Requires Spinach setup/functions plus `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`. B1 profiles are combined with the quadrature weights; the script plots `real(dnp)` (the real proton signal) against offset in MHz and saves `xix_q_field_profile_ensemble_b1.fig` in the MATLAB current directory. It saves no tabulated profile; the scan is a finite quadrature on the stated grid and offsets.

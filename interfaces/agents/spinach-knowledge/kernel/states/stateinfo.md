@@ -4,24 +4,26 @@
 
 ## Purpose
 
-Prints the state-vector 2-norm and the basis states associated with the `npops` largest-magnitude coefficients in `rho`, in descending order. Syntax: `stateinfo(spin_system,rho,npops)`
+Prints a summary of a state vector's norm and its largest-magnitude basis coefficients. It accepts only the `sphten-liouv` formalism, where `spin_system.bas.basis` supplies the spherical-tensor basis labels.
 
-## Physical / mathematical content
+## Inputs
 
-- Requires a spherical-tensor basis; each reported label identifies a direct-product spherical-tensor component.
+- `rho` is a numeric column vector.
+- `npops` is a positive real integer no greater than the vector length.
 
-## Parameters / inputs
+## Printed values
 
-- rho -state vector
-- npops -number of largest-magnitude coefficients to print
+The function uses `report` to print:
 
-## Outputs
+1. The vector's 2-norm, computed as `norm(rho,2)`.
+2. The `npops` entries with the largest `abs(rho)`, sorted in descending order of magnitude. Each row contains one `(L,M)` label per spin, the corresponding coefficient, and its one-based position in the basis vector. A spin with `L=0` is printed as `....`.
 
-- This function prints a summary of the state composition to the con-
-- sole in the following format:
-- (L1,M1) (L2,M2) ... (Ln,Mn) coefficient number
-- This corresponds to the direct product of single-spin irreducible
-- spherical tensors with the specified indices, its coefficient in
-- the linear combination, and the number of the corresponding state
-- in the basis set.
-- Note: this function requires a spherical tensor basis set.
+The coefficient is the vector entry itself, not its squared magnitude; it is formatted with `%+5.3e`. The function reports no physical unit; values retain the numerical scale and any units of the supplied vector. The labels follow the spin columns of the configured basis, and the final number is the basis-vector index, not a population.
+
+## Side effects and return
+
+This function reports to the console through `report` and has no return value. It does not alter `rho` or the basis.
+
+- Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/stateinfo.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=stateinfo.m
+- Related: [basis](../basis.md)

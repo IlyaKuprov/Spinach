@@ -1,22 +1,18 @@
 # examples/kinetics/relayed_hyperpol.m
 
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/relayed_hyperpol.m
+
 - Signature: `relayed_hyperpol()`
+- Source citation: Christopher Pötzl, Figure S7, https://doi.org/10.1016/j.jmr.2024.107727
 
-## Purpose
+## Model and exchange
 
-Relayed NOE from hyperpolarized water to an ALA–GLY dipeptide, generating Figure S7 from Christopher Pötzl: https://doi.org/10.1016/j.jmr.2024.107727.
+This model follows relayed NOE from hyperpolarised water to an ALA-GLY dipeptide. It contains 30 1H spins: ten peptide protons with coordinates (four marked labile and six aliphatic) and 20 water protons with empty coordinates. The missing water coordinates intentionally remove direct intermolecular cross-relaxation in this model. The ten peptide shifts are [8.45, 8.45, 8.45, 8.11, 3.73, 0.99, 0.99, 0.99, 3.99, 3.32] ppm; water shifts are 4.5 ppm. The four labile peptide spins (1-4) and the water spins (11-20) are linked by symmetric intermolecular flux-rate blocks set to `20`; the source does not annotate units for this value.
 
-## Physical / mathematical content
+At 16.4 T and 298 K, the source selects Redfield T1/T2 relaxation, Dibari equilibrium, secular retention, and a correlation time of 1.2e-10 s. Peptide R1/R2 entries are zero and water entries are 0.1 Hz. The basis uses sphten-liouv, IK-1, full-tensor connectivity, proximity level 3, and interaction level 1. Hamiltonian, relaxation, and kinetics terms are assembled as `L=H+1i*R+1i*K`.
 
-The 30-proton model contains ten molecular protons and 20 water protons. The water spins have no coordinates, preventing direct cross-relaxation in this model; intermolecular exchange connects them to the first four labile protons at 20 s⁻¹. Redfield relaxation with empirical water R1 and R2 rates of 0.1 Hz, an IK-1 basis retaining up to three-spin molecular orders, and the specified thermal-equilibrium state are used. The initial state is changed to 100% water polarisation.
+## Preparation, evolution, and output
 
-## Numerical / algorithmic content
+Starting from the configured isotropic equilibrium, the script replaces the water-spin Lz component with a fully polarised water state. It detects the aliphatic methyl protons 6-8 and H-alpha proton 5, then calls multichannel `evolution` with dt=0.125 s and 128 steps (16 s total). The plot shows the real CH3 and H-alpha magnetisation traces in arbitrary units.
 
-The combined Hamiltonian, relaxation, and exchange-kinetics Liouvillian is propagated for 128 steps of 0.125 s. Detection tracks the Z magnetisation of the three aliphatic protons and the α proton, and plots their time courses.
-
-## Implementation structure
-
-- Sets B₀ = 16.4 T and 30 protons; water shifts are 4.5 ppm.
-- Uses exchange flux rate 20 between protons 1–4 and water spins 11–20.
-- Builds `L=H+1i*R+1i*K`, prepares full water polarisation, and calls `evolution` in multichannel mode.
-- Plots the CH₃ and Hα magnetisation in arbitrary units over 16 s.
+The modeled relay is constrained by the coordinate-free water pool and specified exchange matrix; this page does not infer an experimental outcome beyond the source's stated Figure S7 context.

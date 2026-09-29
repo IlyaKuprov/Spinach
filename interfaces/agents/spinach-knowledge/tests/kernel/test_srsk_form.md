@@ -1,31 +1,37 @@
 # tests/kernel/test_srsk_form.m
 
-- Signature: `result=test_srsk_form()`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_srsk_form.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_srsk_form.m)
 
 ## Purpose
 
-Tests SRSK formalism restrictions and supported source relaxation.
+Regression test for the SRSK formalism restriction in Spinach. It verifies that SRSK (source relaxation) requires the spherical-tensor Liouville formalism, and that a Zeeman Liouville request with SRSK is refused explicitly rather than silently selecting a different high-spin relaxation model. The physical scenario is a rapidly relaxing 14N source broadening its scalar-coupled proton.
 
-## Physical / mathematical content
+## Behavior
 
-A rapidly relaxing 14N source broadens its scalar-coupled proton in spherical-tensor Liouville space. The test checks the Abragam longitudinal and transverse rates of the additive SRSK contribution.
+The test builds a two-spin system (`1H`, `14N`) at 1e-3 magnet field with a 100 Hz scalar coupling, Lindblad relaxation rates `lind_r1_rates=[1,1e5]` and `lind_r2_rates=[1,1e5]` (rapid nitrogen relaxation), zero equilibrium magnetization, 298 K temperature, lab-frame relaxation retention, and density-frequency preservation (`rlx_dfs='keep'`).
 
-## Numerical / algorithmic content
+Under `zeeman-liouv` formalism with `SRSK` in `inter.relaxation` and `inter.srsk_sources=2`, the test loops over all combinations of retention (`labframe`, `secular`, `diagonal`) and equilibrium (`zero`, `IME`, `dibari`) settings, requiring that `relaxation()` throws an error containing `SRSK`, `not implemented`, and `zeeman-liouv`.
 
-Checks that Zeeman Liouville SRSK is explicitly refused across lab-frame, secular, and diagonal retention and zero, IME, and dibari equilibrium choices, including when extended T1/T2 is requested. Separately checks a Zeeman Lindblad control without SRSK and the supported spherical-tensor Liouville SRSK contribution on longitudinal and complex transverse proton states.
+It further checks that the refusal remains specific when extended T1/T2 is requested alongside SRSK (`theories={'t1_t2','SRSK'}`), confirming the public SRSK guard precedes the recursive model restriction.
 
-## Syntax
+Removing SRSK (`theories={'lindblad'}`) must preserve the specified proton transverse relaxation rate: `R*rho` must equal `-rho` for the `1H` `L+` state within 1e-10 tolerance.
 
-`result=test_srsk_form()`
+In the supported `sphten-liouv` formalism, the additive SRSK contribution (total relaxation superoperator minus the Lindblad-only superoperator) is checked against Abragam scalar-relaxation rates:
 
-## Parameters / inputs
+- Longitudinal: `r1_add = (4/3)*coupling^2*(1e-5/(1+freq_diff^2*1e-10))` with `coupling = 2*pi*100`, applied to the `1H` `Lz` state.
+- Transverse: `r2_add = (2/3)*coupling^2*(1e-5 + 1e-5/(1+freq_diff^2*1e-10))`, applied to the complex non-Hermitian state `(1+2i)*L+`.
 
-None. The test constructs its own spin-system fixtures.
+Both checks use 1e-10 absolute and relative tolerances.
 
-## Outputs
+## Inputs and outputs
 
-`result` is a regression test result with explanatory messages.
+```matlab
+result = test_srsk_form()
+```
 
-## Header notes
+- **Output** `result` — regression test result structure with explanatory messages, created via `new_test_result('kernel/srsk_form', ...)` and accumulated through `test_true` and `test_close` assertions.
+- **Input** — none.
 
-Contact: talos@spindynamics.org.
+## References
+
+- Spinach source: [tests/kernel/test_srsk_form.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_srsk_form.m)

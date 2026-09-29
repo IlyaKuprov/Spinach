@@ -1,24 +1,18 @@
 # kernel/overloads/@ttclass/sum.m
 
-- Signature: `answer=sum(ttrain,dim)`
+## Signature
 
-## Purpose
+`answer=sum(ttrain,dim)`
 
-Sum the elements of a tensor-train matrix along its row or column dimension.
+## Behaviour
 
-## Parameters / inputs
+The method sums a tensor-train matrix over one matrix dimension: `dim=1` sums rows and `dim=2` sums columns, as specified by the function interface. If `dim` is omitted, it follows MATLAB's first-nonsingleton-dimension convention for the two matrix dimensions: dimension 1 when the row size is nonsingleton, otherwise dimension 2. An input whose matrix dimensions are both singleton is materialized immediately as a scalar.
 
-- `ttrain` — tensor train representing a matrix.
-- `dim` — summation dimension, 1 or 2; when omitted, the first non-singleton dimension is selected, matching MATLAB's matrix behavior.
+For each core of each train, the selected physical mode is summed locally, then reshaped back into a core with that physical dimension set to one: `[left-rank,1,column-mode,right-rank]` for `dim=1`, or `[left-rank,row-mode,1,right-rank]` for `dim=2`. Core order, bond ranks, train coefficients, and the unsummed physical modes are retained. The output is the corresponding row- or column-shaped tensor-train matrix; if all its physical modes are singleton, it is materialized as a scalar instead.
 
-## Outputs
+No rank reduction, truncation, or rounding is performed. The output tolerance field is explicitly reset to zero for every train, rather than propagated from the input; this routine uses no tolerance-based approximation. The supported summation dimensions are 1 and 2.
 
-- `answer` — tensor train representing the summation result, or its full scalar value when all resulting modes are singleton.
+## References
 
-## Implementation
-
-If all physical dimensions are singleton, the function immediately returns `full(ttrain)`. Otherwise, it creates an auxiliary train with the same coefficients and zero tolerances, sums each core over the selected physical dimension, and reshapes that mode to size one while retaining the other physical dimension and the TT ranks. If the resulting train has only singleton modes, it is converted to a scalar with `full`.
-
-## Source
-
-D. Savostyanov and I. Kuprov, [`ttclass/sum.m`](https://spindynamics.org/wiki/index.php?title=ttclass/sum.m).
+- [Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/sum.m)
+- [Spin Dynamics Wiki: `ttclass/sum.m`](https://spindynamics.org/wiki/index.php?title=ttclass/sum.m)

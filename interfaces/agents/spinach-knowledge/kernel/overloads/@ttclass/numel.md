@@ -1,29 +1,13 @@
 # kernel/overloads/@ttclass/numel.m
 
 - Signature: `n=numel(tt)`
+- Source: [`kernel/overloads/@ttclass/numel.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/numel.m)
+- Wiki: [`ttclass/numel.m`](https://spindynamics.org/wiki/index.php?title=ttclass/numel.m)
 
-## Purpose
+## Shape action
 
-Returns the number of elements in the matrix represented by a tensor train. The count may exceed the range that a MATLAB double can represent exactly for large spin systems.
+Checks that `tt` is a `ttclass`, obtains `sizes(tt)`, converts its dimensions to `int64`, and multiplies all entries of that size array using native integer arithmetic. This counts logical matrix elements represented by the tensor train, not the number of stored core entries; it does not inspect or expand the cores and is independent of coefficient values and ranks.
 
-## Physical / mathematical content
+## Result and guards
 
-The implementation first checks that the input is a `ttclass` object, then multiplies the dimensions returned by `sizes(tt)` using native `int64` arithmetic. It raises an error if the result exceeds `flintmax`, otherwise returns the count as a double.
-
-## Numerical / algorithmic content
-
-The representability check uses MATLAB's `flintmax`; the dimension product is formed with `prod(...,'native')` on `int64` values.
-
-## Parameters / inputs
-
-- tt - tensor train object
-
-## Outputs
-
-- n - an integer-valued double; an error is raised if the count exceeds MATLAB's `flintmax`
-
-## Implementation structure
-
-- Validate that `tt` is a `ttclass` object.
-- Compute the product of its sizes in `int64` arithmetic.
-- Check against `flintmax` and convert the result to double.
+If the computed count exceeds MATLAB's `flintmax`, the method errors because that count cannot be represented exactly as a double. Otherwise it converts the integer count to a double scalar. Non-`ttclass` inputs raise an error. No conjugation or core transformation is involved.

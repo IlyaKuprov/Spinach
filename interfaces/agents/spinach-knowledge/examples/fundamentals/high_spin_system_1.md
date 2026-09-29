@@ -1,17 +1,15 @@
 # examples/fundamentals/high_spin_system_1.m
 
+- MATLAB implementation: [examples/fundamentals/high_spin_system_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/high_spin_system_1.m)
+
 - Signature: `high_spin_system_1()`
 
-## Purpose
+## Physical question and spin model
 
-Simulates a pulse-acquire NMR spectrum for a hypothetical scalar coupling to 235U, illustrating the splitting of proton spectral lines.
+This pulse-acquire NMR example illustrates the expected splitting of proton lines from a hypothetical scalar coupling to 235U. It builds a four-spin system at `14.1` T with isotopes `1H`, `235U`, `1H`, `1H`; the source assigns scalar shifts `-0.5`, `0.0`, `2.5`, and `1.3` ppm, respectively. The basis is `sphten-liouv` with approximation `none`. The specified scalar couplings are `J12=100` Hz and `J34=50` Hz, with `J44=0` also assigned.
 
-## Spin system and acquisition
+## Acquisition and processing
 
-The system is at 14.1 T and contains 1H, 235U, 1H, and 1H spins. Their scalar shifts are −0.5, 0.0, 2.5, and 1.3 ppm; the specified scalar couplings are J12=100 Hz, J34=50 Hz, and J44=0. The basis is sphten-liouv with approximation none.
+The acquisition observes `1H`, starts from the `L+` state for `1H`, and uses the corresponding `L+` state as the coil. Decoupling is empty and the offset is 0. The sweep width is `3500` Hz, with `1024` acquired points and zero filling to `4096`; the displayed axis is in ppm and inverted. The code simulates an NMR FID with `liquid(spin_system,@acquire,parameters,'nmr')`, applies exponential apodization with parameter 6, computes `fftshift(fft(fid,4096))`, and plots the real spectrum using `plot_1d`.
 
-Acquisition observes 1H only, starting from L+ and detecting with an L+ coil; no decoupling is applied. The offset is 0, sweep width 3500 Hz, and the FID has 1024 points, zero-filled to 4096. The axis is in ppm and inverted.
-
-## Processing
-
-The script calls liquid with acquire and NMR mode, applies exponential apodisation with parameter 6, and computes fftshift(fft(fid,4096)). It plots the real spectrum with plot_1d.
+The source comment states the expected qualitative outcome, namely splitting from the hypothetical uranium coupling; the script does not encode a numeric peak-position check or report a measured spectrum. Exact plotted output depends on the simulation and processing settings above. Source: [examples/fundamentals/high_spin_system_1.m](../../../../../examples/fundamentals/high_spin_system_1.m).

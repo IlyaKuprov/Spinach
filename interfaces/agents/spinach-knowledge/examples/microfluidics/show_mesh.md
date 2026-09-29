@@ -1,21 +1,17 @@
 # examples/microfluidics/show_mesh.m
 
-- Signature: `show_mesh()`
+Source: [examples/microfluidics/show_mesh.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/microfluidics/show_mesh.m)
 
 ## Purpose
 
-Import and plot a COMSOL hydrodynamic mesh and velocity field, including its tessellation.
+Imports and visualizes a COMSOL microfluidic mesh with its velocity field; this example does not construct a spin-dynamics or transport calculation.
 
-## Physical / mathematical content
+## Input and mesh selection
 
-- This script visualizes imported microfluidic hydrodynamics; it does not simulate spin dynamics.
+- Reads `chip_mesh.txt` and `chip_velo.txt` through `comsol_import`.
+- The import crop is x = `[286.8 287.5]` and y = `[576.0 579.0]`; the source supplies no coordinate units.
+- Excludes the listed mesh elements: `[9 10 19 30 20 25 14 13 3372 3373 3380 3381 3382 3386 3169 3185 3201 3054 3077 3055 3053 3078 3186 3168 875 899 897 877 876 860 858 885 859 883]`.
 
-## Numerical / algorithmic content
+## Visualization
 
-- Imports `chip_mesh.txt` and `chip_velo.txt` with `comsol_import`, using a crop of `[286.8 287.5]` by `[576.0 579.0]` and a specified list of inactive mesh elements.
-- Plots the mesh with `mesh_plot(spin_system,2,0)`, then limits the displayed region to `x = [286.88 287.42]` and `y = [578.07 578.50]`.
-
-## Implementation structure
-
-- Imports the hydrodynamic data and attaches the mesh to a bootstrapped system without defining a spin system.
-- Opens a figure and plots triangles, rectangles, tessellation, and velocities, with a legend.
+The imported mesh is attached to a bootstrapped Spinach structure (the source comments that there is no spin system). `mesh_plot(spin_system,2,0)` draws triangles, rectangles, tessellation, and velocities. The displayed window is x = `[286.88 287.42]`, y = `[578.07 578.50]`, with a legend for those four layers.

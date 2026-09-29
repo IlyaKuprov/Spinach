@@ -1,21 +1,15 @@
 # examples/nmr_paramag/point_vs_distr.m
 
 - Signature: `point_vs_distr()`
+- Source: [examples/nmr_paramag/point_vs_distr.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/point_vs_distr.m)
+- Model reference cited by the source: [DOI 10.1039/c6cp05437d](https://doi.org/10.1039/c6cp05437d)
 
-## Purpose
+## Synthetic density and PCS data
 
-Comparison of point and multipole PCS fits when the electron probability density is spatially distributed: the synthetic density is a mixture of four randomly positioned Gaussians. The example samples nuclei in a spherical shell around the origin and fits the same PCS data with a point model and a multipole model through rank 2. The source cites the [model paper](http://dx.doi.org/10.1039/c6cp05437d). Calculation time: minutes.
+The example constructs four equal-weight Gaussian components with randomly selected centroids inside a 3-Angstrom cube and `sigma=0.5 Angstrom`. It places 100 nuclei randomly in a spherical layer with inner radius 5 Angstrom and thickness 10 Angstrom; the grid has 64 points per axis over the corresponding -15 to 15 Angstrom extent. The susceptibility tensor is rotated by Euler angles (pi/3, pi/4, pi/5) from the diagonal values formed with `ax=-0.45` and `rh=-0.05`; the source labels these tensor values in cubic Angstroms.
 
-## Physical / mathematical content
+After padding the density with two original grid lengths on each side, `kpcs(...,'fft')` generates the PCS values at those nuclei. `ippcs` fits the point model about the origin; `ilpcs` fits multipole ranks 0, 1, and 2 about the same origin. The source prints the true tensor, fitted parameters and their reported standard deviations, plots residuals against distance, and compares true and fitted multipole moments.
 
-The four Gaussian centers are randomized within a 3 Å cube, with `sigma=0.5` Å. The simulated PCS data are evaluated by `kpcs` using the FFT method; inverse fits use `ippcs` for the point model and `ilpcs` for ranks `[0 1 2]`.
+## Scope and omissions
 
-## Numerical / algorithmic content
-
-The example uses a 64-point grid in each dimension and places 100 nuclei at random radii from 5 to 15 Å. It zero-pads the density by two volumes on each side before the FFT-based calculation, then reports fitted parameters, residuals, and multipole moments.
-
-## Implementation structure
-
-- Generate a four-Gaussian electron density and a random set of nuclear coordinates.
-- Compute distributed PCS with the FFT solution and fit point and rank-2 multipole models.
-- Compare fit residuals and recovered moments with the known input values.
+This is randomized synthetic data, with no fixed seed, experimental spectrum, field, or temperature. It is not a carbonic-anhydrase case and has no named metal site or protein residue. The source reports outputs at run time rather than fixed fit values; its header estimates a runtime of minutes.

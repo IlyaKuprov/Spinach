@@ -1,24 +1,38 @@
 # kernel/utilities/xyz2dd.m
 
-- Signature: `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,isotope2)`
+## Purpose
 
-Converts two spin coordinates and their isotope specifications into a dipolar coupling constant, three Euler angles, and, if requested, a dipolar interaction tensor.
+Converts a coordinate specification of the dipolar interaction into the dipolar interaction constant, three Euler angles, and the dipolar interaction matrix.
 
-## Inputs
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/xyz2dd.m>
 
-- `r1`, `r2`: Three-element real coordinate vectors of the same dimensions, in ångströms. The coordinates must differ.
-- `isotope1`, `isotope2`: Isotope specification character strings, such as `'13C'`.
+## Behavior
 
-## Outputs
+- Syntax: `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,isotope2)`.
+- Validates inputs via an internal consistency check (`grumble`): each coordinate vector must be numeric, real, and contain exactly three elements; `r1` and `r2` must have the same size; the two positions must differ (nonzero Euclidean distance); both isotope specifications must be character strings.
+- Uses fundamental constants `hbar=1.054571628e-34` and `mu0=4*pi*1e-7`.
+- Computes the inter-spin distance as the 2-norm of `r2-r1` and the unit vector `ort=(r2-r1)/distance`.
+- Computes the dipolar interaction constant as `spin(isotope1)*spin(isotope2)*hbar*mu0/(4*pi*(distance*1e-10)^3)`, i.e. the distance in Angstroms is converted to meters via the `1e-10` factor.
+- Derives Euler angles from the unit vector using `cart2sph`, with `bet=pi/2-bet` and `gam=0`.
+- If more than four output arguments are requested, builds the 3x3 dipolar coupling matrix `M=d*[1-3*ort_i*ort_j ...]`, then symmetrizes it (`M=(M+M')/2`) and removes its trace (`M=M-eye(3)*trace(M)/3`) to clean up rounding errors.
+- Notes from the header: Euler angles are not uniquely defined for the orientation of axial interactions (the gamma angle can be anything); free-particle magnetogyric ratios are used, and `xyz2hfc.m` should be used instead if the system contains electrons.
 
-- `d`: Dipolar coupling constant, in rad/s.
-- `alp`, `bet`, `gam`: Euler angles, in radians. For this axial interaction, the angles are not unique; the function sets `gam=0`.
-- `M`: Dipolar interaction tensor, in rad/s, computed when requested as a fifth output.
+## Inputs and outputs
 
-## Calculation
+Inputs:
 
-The function uses the separation `distance=norm(r2-r1,2)` and unit direction `ort=(r2-r1)/distance`. It computes `d` from the product of the isotope magnetogyric ratios returned by `spin`, `hbar`, `mu0`, and the inverse cube of the separation converted from ångströms to metres. The direction determines `alp` and `bet`; `gam` is set to zero. When requested, the tensor is `M=d*(eye(3)-3*ort(:)*ort(:)')`, then symmetrized and made traceless to remove rounding errors.
+- `r1`, `r2` — 3-element vectors of spin coordinates in Angstroms.
+- `isotope1`, `isotope2` — isotope specification strings, e.g. `'13C'`.
 
-Free-particle magnetogyric ratios are used. For systems containing electrons, use `xyz2hfc.m` instead.
+Outputs:
 
-[Source page](https://spindynamics.org/wiki/index.php?title=xyz2dd.m)
+- `d` — dipolar coupling constant, rad/s.
+- `alp` — alpha Euler angle, radians.
+- `bet` — beta Euler angle, radians.
+- `gam` — gamma Euler angle, radians.
+- `M` — dipolar interaction tensor, rad/s (computed only when requested).
+
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=xyz2dd.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/xyz2dd.m>

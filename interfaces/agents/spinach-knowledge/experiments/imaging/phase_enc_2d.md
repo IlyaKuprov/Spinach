@@ -1,38 +1,28 @@
 # experiments/imaging/phase_enc_2d.m
 
-- Signature: `mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)`
+- Signature: `mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)`.
+- Canonical implementation: `experiments/imaging/phase_enc_2d.m` — https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/phase_enc_2d.m.
 
-## Purpose
+## Contract and physical sequence
 
-2D phase-encoding imaging pulse sequence with optional diffusion weighting during the echo time. Call it from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`.
+Call from `imaging()`, which supplies `H`, `R`, `K`, `G`, and `F`. The background generator is `B=H+F+1i*R+1i*K`. The source applies a 90-degree pulse about `Ly` to `parameters.rho0`, evolves for `t_echo`, applies an ideal 180-degree pulse, then evolves for a second `t_echo`. If `diff_g_amp` is present, the same two-component gradient vector is applied during each echo interval; otherwise both intervals are free background evolution. Each phase-encode row is prepared with `G{1}`, pre-rolled under the reversed readout gradient `G{2}`, and sampled under the forward readout gradient with the coil state. Phase rows are independent and executed with `parfor`.
 
-## Sequence and reconstruction
+The source uses the first named spin in `parameters.spins`. The caller provides the starting state; this function neither prepares nor measures DNP polarization.
 
-The sequence forms the background operator `B=H+F+1i*R+1i*K` and applies an ideal 90-degree pulse about `Ly` to `parameters.spins{1}`. It evolves for `parameters.t_echo`, applies a 180-degree pulse about the same axis, and evolves for another `parameters.t_echo`. When `parameters.diff_g_amp` is present, both echo-time evolutions include `parameters.diff_g_amp(1)*G{1}+parameters.diff_g_amp(2)*G{2}`.
+## Parameters and units
 
-For each of `parameters.image_size(1)` phase-encoding steps, a gradient amplitude spanning `-parameters.pe_grad_amp` to `+parameters.pe_grad_amp` is applied with `G{1}` for `parameters.pe_grad_dur`. A pre-roll under `-parameters.ro_grad_amp*G{2}` precedes detection with `parameters.coil` under `+parameters.ro_grad_amp*G{2}`. The phase-encoding steps run in a `parfor` loop. The acquired data receive square-sinebell apodisation in both dimensions; the output is the real part of the shifted 2D Fourier transform.
+- `parameters.rho0`: state vector matching `H`; `parameters.coil`: detection state vector matching `H`.
+- `parameters.spins`: nonempty cell array of character strings; `parameters.npts`: vector of positive integer voxel counts.
+- `parameters.image_size`: two integer counts greater than one, ordered as phase rows and readout points.
+- `parameters.t_echo`: positive echo interval in seconds. Optional `parameters.diff_g_amp` has two real gradient amplitudes in T/m along `G{1}` and `G{2}`.
+- `parameters.pe_grad_amp`, `parameters.ro_grad_amp`: real scalar gradient amplitudes in T/m; `parameters.pe_grad_dur`, `parameters.ro_grad_dur`: corresponding durations in seconds.
+- `G` must contain at least two operators. `H`, `R`, `K`, and `F` must be same-size matrices. The formalism must be `sphten-liouv` or `zeeman-liouv`.
 
-## Parameters / inputs
+## Returned image and source-derived numerical facts
 
-- `spin_system`: spin system; its formalism must be `sphten-liouv` or `zeeman-liouv`.
-- `H`, `R`, `K`, `F`: numeric matrices of the same dimensions, supplied by `imaging()`.
-- `G`: cell array containing at least two gradient operators, supplied by `imaging()`.
-- `parameters.npts`: vector of positive integers specifying spatial-grid point counts.
-- `parameters.spins`: nonempty cell array of character strings; the first entry selects the spin for the pulse operator.
-- `parameters.rho0`: numeric initial state.
-- `parameters.coil`: numeric detection operator.
-- `parameters.t_echo`: positive echo time in seconds, used on each side of the 180-degree pulse.
-- `parameters.diff_g_amp`: optional two-element real vector of X- and Y-gradient amplitudes in T/m, active during the echo-time evolutions.
-- `parameters.pe_grad_amp`: real phase-encoding gradient amplitude in T/m.
-- `parameters.ro_grad_amp`: real readout gradient amplitude in T/m.
-- `parameters.pe_grad_dur`: positive phase-encoding gradient duration in seconds.
-- `parameters.ro_grad_dur`: positive readout gradient duration in seconds.
-- `parameters.image_size`: two integers greater than one specifying the number of points in each image dimension.
+The pre-reconstruction k-space array and returned image have dimensions `image_size(1)-by-image_size(2)`. The source spaces phase amplitudes with `linspace(-pe_grad_amp,+pe_grad_amp,image_size(1))` and samples readout at intervals of `ro_grad_dur/(image_size(2)-1)` seconds. It applies square-sinebell apodisation in both dimensions and returns the real 2D Fourier transform. For example, the minimum accepted `image_size` of `2-by-2` gives a 2-by-2 k-space array and output matrix; this is a dimension example only, not an image result. The source-defined phase spacing and readout timing are given above.
 
-## Output
+## References
 
-- `mri`: real MRI image reconstructed with square-sinebell apodisation.
-
-## Reference
-
-- [Spinach documentation: phase_enc_2d.m](https://spindynamics.org/wiki/index.php?title=phase_enc_2d.m)
+- [Spinach documentation: `phase_enc_2d.m`](https://spindynamics.org/wiki/index.php?title=phase_enc_2d.m).
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/phase_enc_2d.m).

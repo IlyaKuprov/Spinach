@@ -1,31 +1,22 @@
 # kernel/optimcon/distortions/spf.m
 
-- Signature: `[w,J]=spf(w,p)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/spf.m)
 
-## Purpose
+## Purpose and syntax
 
-Applies a discrete single-pole filter to a Spinach optimal-control waveform. Odd rows contain in-phase (real) components; even rows contain quadrature (imaginary) components.
+`[w,J]=spf(w,p)` applies a discrete single-pole filter to an optimal-control waveform. The waveform has one time slice per column; each adjacent odd/even row pair stores the real and imaginary components of one complex control signal.
 
-## Physical / mathematical content
+For each channel, the first sample is unchanged and subsequent samples follow `Y(n)=(1-p)*X(n)+p*Y(n-1)`. The source gives `p=exp(-r*dt+1i*(omega-omega_rf)*dt)`, where `r` is the damping rate, `omega` the pole frequency, `omega_rf` the rotating-frame frequency, and `dt` the time discretisation step. The source does not prescribe a numeric unit convention for these quantities.
 
-For each XY control pair, the filter coefficient is `p=exp(-r*dt+1i*(omega-omega_rf)*dt)`, where `r` is the damping rate, `omega` is the pole frequency, `omega_rf` is the rotating-frame frequency, and `dt` is the time-discretisation step.
+## Inputs and output
 
-## Numerical / algorithmic content
+- `w`: Real numeric waveform with an even number of rows. It is returned with the same dimensions; columns represent time slices.
+- `p`: Numeric vector with exactly one finite coefficient per X,Y pair, satisfying `abs(p(k))<1`. Complex coefficients are accepted. There is no broadcast default: a scalar is valid only when there is one pair.
 
-The filter follows `Y(n)=(1-p)*X(n)+p*Y(n-1)`. The implementation leaves the first time slice unchanged and filters subsequent slices.
+The user is responsible for leaving sufficient ring-down margin.
 
-## Parameters / inputs
+## Jacobian
 
-- `w` — real waveform array with one time slice per column and rows ordered XYXY... for the in-phase and quadrature components of each control channel. The number of rows must be even.
-- `p` — one finite coefficient per XY control pair, with `|p(k)|<1` for causal stability.
-
-## Outputs
-
-- `w` — distorted waveform with the same dimensions as the input. Allowing sufficient ring-down margin is the user's responsibility.
-- `J` — Jacobian with respect to vectorisations of the output and input arrays, returned when requested.
-
-## Implementation structure
-
-The function forms a complex signal from each XY row pair, applies the filter, and writes its real and imaginary parts back to the corresponding rows. The Jacobian is computed using automatic differentiation when requested.
+When requested, `J` is the Jacobian of the vectorised output with respect to the vectorised input. The implementation obtains it by automatic differentiation and returns the extracted real Jacobian.
 
 <https://spindynamics.org/wiki/index.php?title=spf.m>

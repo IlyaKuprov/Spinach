@@ -1,27 +1,25 @@
 # kernel/integrity/patrol.m
 
+Source: [MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/patrol.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=patrol.m).
+
 - Signature: `patrol(test_subject)`
 
 ## Purpose
 
-Runs a continuous patrol over Spinach example files to catch problems during development.
+Checks MATLAB syntax and runs selected example files. The source comment describes its use as a continuous server-side safeguard, but one call to `patrol` performs a finite pass through the selected examples; the function itself does not contain a perpetual service loop.
 
-## Physical / mathematical content
+## Selection and execution
 
-This is a development and example-integrity utility; it does not define a physical model.
+The routine recursively lists `.m` files under `examples`. With the default empty subject it selects all listed files. A nonempty character-string subject selects a file when the text occurs either in the file's pathname or in one of its lines. The exception list is empty in the source.
 
-## Numerical / algorithmic content
+It shuffles MATLAB's random-number generator, then repeatedly chooses a remaining selected file at random. For each file it checks `checkcode`; any diagnostic opens that file in the editor and raises an error. Otherwise it changes to the file's directory and evaluates the example, then flushes the display and pauses for one second before proceeding. The example's return value is not captured by `patrol`. The routine does not restore the prior working directory or random-number-generator state in this code.
 
-The function repeatedly selects an example at random, checks it with Matlab's `checkcode`, and runs it unless it is listed as an exception. It waits one second between iterations and continues until interrupted.
+## Inputs, outputs, and units
 
-## Parameters / inputs
+`test_subject` defaults to `''` when omitted and must be a character array; other supplied types fail in `grumble(test_subject)`. The function returns no value. Example execution may have its own effects and outputs, but `patrol` does not define a physical equation, normalization, matrix output shape, or Hz/angular-frequency convention.
 
-- `test_subject` — a character string. When nonempty, only example files whose contents or path contain this string are included; an empty value selects all examples.
+## Source guard
 
-## Outputs
+The selection is driven by literal `contains` checks against both file contents and the full pathname. Syntax diagnostics are fail-fast: the editor is opened for the affected file and the call stops with an error.
 
-The output is whatever the individual examples display or return while they run. The patrol reports the number of selected files.
-
-## Implementation structure
-
-After filtering the example tree, the function errors if no files match. It shuffles the random-number generator, then loops over the selected files by choosing one at random, running the syntax check, changing to that file's directory, and evaluating the example.
+Related checks: [`existentials.m`](./existentials.md) checks startup prerequisites and path visibility; [`exorcise.m`](./exorcise.md) checks source conventions.

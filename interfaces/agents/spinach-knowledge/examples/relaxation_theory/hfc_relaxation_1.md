@@ -1,19 +1,19 @@
 # examples/relaxation_theory/hfc_relaxation_1.m
 
-- Signature: `hfc_relaxation_1()`
+- MATLAB implementation: [examples/relaxation_theory/hfc_relaxation_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/hfc_relaxation_1.m)
+
+Source: [examples/relaxation_theory/hfc_relaxation_1.m](https://github.com/IlyaKuprov/Spinach/blob/master/examples/relaxation_theory/hfc_relaxation_1.m)
 
 ## Purpose
 
-Builds the Redfield relaxation superoperator for a liquid-state proton–electron pair whose anisotropic hyperfine coupling is obtained from the point-dipole approximation, then compares its rate matrix elements with textbook rates.
+Constructs the full Redfield relaxation superoperator for a liquid-state proton–electron pair with a point-dipole anisotropic hyperfine interaction. It compares selected entries of that superoperator with textbook dipolar-rate expressions and prints the complete matrix; the source gives an expected run time of seconds.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-The two spins are placed at `[0 0 0]` and `[0 0 1.5]`, with a 14.1 T field. Redfield relaxation uses zero equilibrium, lab-frame retention, and a 10 ps correlation time. The script obtains longitudinal, transverse, and cross-relaxation rates from `rlx_dip`, using the inter-spin distance computed from the coordinates.
+The spins are 1H and E at Cartesian coordinates [0, 0, 0] and [0, 0, 1.5], in a 14.1 T field. The source describes the hyperfine coupling as derived from those coordinates using the point-dipole approximation; it does not state a coordinate unit. The liquid-motion model is Redfield relaxation with a single tau_c of 10e-12 s (10 ps), zero equilibrium, and labframe retention. The basis is the complete sphten-liouv basis (approximation none).
 
-## Numerical / algorithmic content
+## Rates inspected
 
-Spinach constructs an `sphten-liouv` basis without approximation and assembles the relaxation superoperator. Normalized `Lz` states provide the `R1` matrix elements, normalized `L+` states provide `R2`, and a pair of `Lz` states gives the cross-relaxation element. Each is displayed alongside the corresponding `rlx_dip` result in Hz; the full relaxation superoperator is then printed in the IST basis. The calculation time is seconds.
+After forming R=relaxation(spin_system), the script obtains textbook r1, r2, and cross-relaxation rx values from rlx_dip, using the field, isotopes, coordinate separation, and correlation time. It then normalizes longitudinal Lz states and compares their -rho' * R * rho values with the two spins' printed R1 rates; transverse L+ states are used similarly for R2. The cross term is evaluated between normalized longitudinal states as -rho_b' * R * rho_a. Printed rate labels are Hz. Finally, the complete R is displayed in the IST basis.
 
-## Implementation structure
-
-The script specifies field, isotopes, and Cartesian coordinates; configures the Redfield model; creates the spin system and basis; and calls `relaxation`. It computes textbook rates with `rlx_dip` and the coordinate separation, evaluates the matching Spinach rates for both spins, compares the longitudinal cross term, and prints `full(R)`.
+This is a model-level comparison between the Redfield matrix elements and the textbook calculation in the script. The source contains no recorded rate output or experimental measurement, so this description makes no numerical agreement or experimental-validation claim.

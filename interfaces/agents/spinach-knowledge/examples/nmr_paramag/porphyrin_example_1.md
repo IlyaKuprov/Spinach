@@ -1,21 +1,15 @@
 # examples/nmr_paramag/porphyrin_example_1.m
 
 - Signature: `porphyrin_example_1()`
+- Source: [examples/nmr_paramag/porphyrin_example_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/porphyrin_example_1.m)
+- Manual cited by the source: [Pseudocontact shift analysis](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis)
 
-## Purpose
+## Point-model calculation
 
-Computes point-model PCS for porphyrin-ring protons in basic Cu(II) and Co(II) complexes, with the metal at the origin. The source links to the [pseudocontact-shift analysis getting-started manual](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
+The source defines 12 porphyrin-ring proton coordinates and places the metal at `mxyz=[0 0 0]`. It supplies diagonal g-tensors `diag([3.0 3.0 2.0])` for Co(II) and `diag([2.0 2.0 2.2])` for Cu(II), then calls `g2chi(g,298,1/2)` to form each Curie susceptibility tensor. The source does not annotate the unit of the `298` argument or the units of the coordinate values.
 
-## Physical / mathematical content
+`ppcs(nxyz,mxyz,chi)` computes point-model PCS for each ion. The example displays the two result columns in Co, Cu order and labels the PCS output in ppm.
 
-The calculation derives Curie susceptibility tensors from the Cu(II) and Co(II) g-tensors, then evaluates the point-model pseudocontact shifts at the listed proton coordinates.
+## Scope and omissions
 
-## Numerical / algorithmic content
-
-The two tensors are calculated at 298 K for spin 1/2: `g_co=diag([3.0 3.0 2.0])` and `g_cu=diag([2.0 2.0 2.2])`. The metal coordinate is `[0 0 0]`; `ppcs` returns separate PCS values for Co and Cu.
-
-## Implementation structure
-
-- Define the porphyrin proton coordinates and the two metal-ion g-tensors.
-- Convert the g-tensors to Curie susceptibility tensors at 298 K for spin 1/2.
-- Calculate and display the Co(II) and Cu(II) point-model PCS values.
+This is a basic Cu(II)/Co(II) porphyrin comparison, not a carbonic-anhydrase calculation: there is no protein, residue, or distinct metal site. It does not use a distributed-density model, fit parameters, experimental spectra, a specified magnetic field, or a field/temperature sweep. The only temperature-like input is the unlabelled value 298 passed to `g2chi`.

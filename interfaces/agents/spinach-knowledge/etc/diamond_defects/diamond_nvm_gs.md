@@ -1,29 +1,27 @@
 # etc/diamond_defects/diamond_nvm_gs.m
 
-- Signature: [sys,inter]=diamond_nvm_gs(parameters)
+- MATLAB implementation: [etc/diamond_defects/diamond_nvm_gs.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_nvm_gs.m)
 
-## Purpose
+## Purpose and signature
 
-Constructs the NV centre ground-state spin system in diamond using the magnetic parameters of Felton et al., *Phys. Rev. B* **79**, 075203 (2009), https://doi.org/10.1103/PhysRevB.79.075203.
+Constructs a diamond NV-centre ground-state spin system using magnetic parameters from S. Felton et al., *Phys. Rev. B* **79**, 075203 (2009), <https://doi.org/10.1103/PhysRevB.79.075203>.
 
-## Physical / mathematical content
+`[sys,inter]=diamond_nvm_gs(parameters)`
 
-The electron is represented as E3. Its principal g values are 2.0031, 2.0031, and 2.0029, with axial zero-field splitting D = 2872 MHz. For 14N, the electron–nuclear hyperfine principal values are -2.70, -2.70, and -2.14 MHz, and the nitrogen quadrupole interaction has D = -5.01 MHz. For 15N, the routine uses hyperfine values 3.65, 3.65, and 3.03 MHz and adds no quadrupole interaction.
+## Parameters and constraints
 
-## Numerical / algorithmic content
+`parameters` must be a structure; both fields are optional:
 
-The tensors are defined in the trigonal principal-axis frame and rotated to align the selected crystal direction with the field. If omitted, orientation and nitrogen isotope default to '111' and '14N', respectively.
+- `parameters.orientation`: `'111'`, `'110'`, or `'100'`, specifying the crystal-plane normal aligned with the magnetic field. Defaults to `'111'`. If supplied, it must be a character string; an unsupported value errors.
+- `parameters.nitrogen`: `'14N'` or `'15N'`; defaults to `'14N'`. Unsupported values error; the source does not separately check this field's type.
 
-## Parameters / inputs
+## Physical and numerical model
 
-- parameters.orientation: '111', '110', or '100'; default '111'.
-- parameters.nitrogen: '14N' or '15N'; default '14N'.
+The isotope list is `{'E3',parameters.nitrogen}`. Tensors are defined in a trigonal principal-axis frame and rotated so the selected crystal direction aligns with the field. The electron g-tensor principal values are 2.0031, 2.0031, and 2.0029; the electron zero-field-splitting tensor is `zfs2mat(2872e6,0,0,0,0)` (D = 2872 MHz). For `'14N'`, the hyperfine principal values are −2.70, −2.70, and −2.14 MHz, with a quadrupolar tensor `zfs2mat(-5.01e6,0,0,0,0)` (D = −5.01 MHz). For `'15N'`, the hyperfine values are 3.65, 3.65, and 3.03 MHz; no nitrogen quadrupolar tensor is assigned.
 
-## Outputs
+## Outputs and scope
 
-- sys: Spinach system specification structure.
-- inter: Spinach interaction specification structure.
+- `sys`: Spinach system specification structure containing the isotope list.
+- `inter`: Spinach interaction specification structure containing the electron Zeeman tensor and the zero-field-splitting and isotope-dependent coupling tensors.
 
-## Implementation structure
-
-The routine fills the isotope list and Zeeman/coupling matrices, including the electron zero-field splitting and the isotope-dependent nitrogen interactions. The consistency check validates the structure and, when supplied, the orientation's character-string type; the orientation switch rejects unsupported values.
+The function builds specifications; it does not calculate a spectrum or set a magnetic-field magnitude. Only the listed orientations and isotopes have implemented branches. Source documentation: <https://spindynamics.org/wiki/index.php?title=diamond_nvm_gs.m>.

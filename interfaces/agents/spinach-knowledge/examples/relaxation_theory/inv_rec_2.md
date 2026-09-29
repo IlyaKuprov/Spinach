@@ -1,19 +1,17 @@
 # examples/relaxation_theory/inv_rec_2.m
 
-- Signature: `inv_rec_2()`
+- MATLAB implementation: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/inv_rec_2.m)
 
-## Purpose
+Source: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/master/examples/relaxation_theory/inv_rec_2.m)
 
-Simulates inversion-recovery proton spectra for the strychnine spin system at six recovery delays. The source estimates the calculation time in minutes.
+## Purpose and molecular model
 
-## Physical / mathematical content
+Simulates proton inversion-recovery spectra for the strychnine spin system at six recovery delays; the source estimates calculation time in minutes. It obtains the proton system from strychnine({'1H'}) and sets the field to 14.1 T. It is a simulation workflow, not an experimental result or a claimed fit.
 
-The spin system is loaded with `strychnine({'1H'})` and set to 14.1 T. Redfield relaxation uses `dibari` equilibrium, kite retention, temperature 298, and a 200 ps correlation time. The script sets a proximity cutoff of 4.0. The basis uses `sphten-liouv`, IK-2 approximation, scalar-coupling connectivity, and proximity level 3; Krylov propagation is disabled.
+## Relaxation and basis
 
-## Numerical / algorithmic content
+The relaxation mechanism is Redfield with tau_c={200e-12} s (200 ps), dibari equilibrium, kite retention (rlx_keep='kite'), and temperature value 298 (the source does not state a temperature unit). The basis uses sphten-liouv, IK-2, scalar-coupling connectivity, and proximity level 3. The script sets the proximity cutoff to 4.0 without stating its unit and disables Krylov propagation.
 
-For each delay in `[0.01, 0.1, 0.5, 1, 5, 10]` seconds, the equilibrium state is inverted with a 180-degree `Ly` pulse, allowed to recover under the rotating-frame NMR Hamiltonian plus `1i*relaxation`, and tipped by a 90-degree `Ly` pulse. The script acquires a proton FID with sweep width 6500, 8192 points, offset 2800 Hz, and zero-fills to 65536 points. It applies exponential apodisation with parameter 5, Fourier transforms the signal, and plots the real spectrum.
+## Pulse sequence and acquisition
 
-## Implementation structure
-
-The code builds the strychnine spin system and selected basis, sets acquisition parameters, computes `rho_eq` and an `L+` proton detection coil, then forms the rotating-frame Liouvillian. A six-iteration loop applies the inversion, recovery evolution, read pulse, and acquisition; each result is apodised, transformed, and drawn in one panel of a 2-by-3 figure labelled by recovery delay.
+The recovery delays are 0.01, 0.1, 0.5, 1, 5, and 10 s. For each delay, the script starts from isotropic thermal equilibrium, applies a pi rotation about Ly, evolves under the rotating-frame Hamiltonian plus Redfield relaxation for that delay, then applies a pi/2 Ly read pulse. It acquires the proton signal with an L+ detection state. Acquisition settings are sweep 6500, 8192 points, zero-fill to 65536, proton channel, ppm axis, and an explicitly labelled offset of 2800 Hz. Each FID receives exponential apodisation with parameter 5, is Fourier transformed, and is plotted in its own panel of a 2-by-3 figure labelled by recovery delay. The plot therefore compares six simulated spectra across the specified delays; the source does not report a measured spectrum or rate benchmark.

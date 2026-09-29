@@ -1,19 +1,16 @@
 # examples/parahydrogen/pasadena_propanal.m
 
 - Signature: `pasadena_propanal()`
+- Source: [examples/parahydrogen/pasadena_propanal.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/parahydrogen/pasadena_propanal.m)
 
-## Purpose
+## Purpose and PASADENA context
 
-Simulates a PASADENA spectrum for parahydrogenation of acrolein to propanal. The source gives a calculation time of seconds.
+The source describes a PASADENA simulation of parahydrogenation of acrolein into propanal; it gives a calculation time of seconds and credits Ronghui Zhou and Ilya Kuprov. Unlike the ethylbenzene source, this file gives no DOI. In the physical experiment, parahydrogen's proton singlet order becomes observable after chemical addition makes the product proton environments inequivalent. This script does not simulate that reaction or the singlet-to-product transfer: its initial state is directly set to longitudinal two-spin order on product spins 1 and 4. It is not an ALTADENA low-field-to-high-field transfer or SABRE catalyst-exchange simulation.
 
-## Physical / mathematical content
+## Product spin system
 
-The six-spin system models the propanal product at 7.05 T using the specified proton chemical shifts and scalar couplings. It uses the spherical-tensor Liouville formalism with no basis approximation and the `S3` and `S2` symmetry groups on spins 1–3 and 4–5. The initial state is the `Lz` product on spins 1 and 4.
+The six-spin model contains only `1H` nuclei at `7.05` T. Under Spinach's nuclear Zeeman and scalar-coupling unit conventions, the shifts in index order are `{1.11, 1.11, 1.11, 2.46, 2.46, 9.79}` ppm. The assigned scalar couplings are `J(1-4)=J(2-4)=J(3-4)=J(1-5)=J(2-5)=J(3-5)=7.3` Hz and `J(4-6)=J(5-6)=1.4` Hz; other matrix entries are not explicitly assigned. The basis is spherical-tensor Liouville space with no basis approximation and symmetry groups `S3` on spins 1–3 and `S2` on spins 4–5. The initial state is `state(spin_system,{'Lz','Lz'},{1,4})`.
 
-## Numerical / algorithmic content
+## Acquisition and observable
 
-The proton liquid-state acquisition uses a `pi/4` pulse, 500 ppm offset, 1000 ppm sweep, 1024 points, and 8192-point zero filling. The FID is Gaussian-apodised with parameter 10, Fourier transformed, and plotted.
-
-## Implementation structure
-
-The script defines six proton isotopes, the field and scalar interaction data, creates the symmetry-adapted basis, and runs `liquid` with `hp_acquire` before signal processing.
+The proton acquisition uses a `pi/4` y pulse, 500 Hz transmitter offset, 1000 Hz sweep, and 1024 points. The FID is zero-filled to 8192 points, Gaussian-apodised with parameter 10, Fourier transformed, and plotted as a real spectrum with the ppm axis inverted. No catalyst, chemical-exchange kinetics, explicit parahydrogen singlet, or relaxation superoperator appears in the script. This is a calculated product spectrum, not a measured trace or a prediction of conversion or polarization yield.

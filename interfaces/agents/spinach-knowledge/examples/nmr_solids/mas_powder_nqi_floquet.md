@@ -1,21 +1,15 @@
 # examples/nmr_solids/mas_powder_nqi_floquet.m
 
-- Signature: `mas_powder_nqi_floquet()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_nqi_floquet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_nqi_floquet.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_nqi_floquet.m)
 
-Simulates the powder MAS spectrum of a single quadrupolar deuterium nucleus using Floquet theory. Perturbative corrections to the rotating-frame transformation are not applied. Calculation time: seconds.
+## Purpose and spin system
 
-## Physical / mathematical content
+This example computes a powder MAS spectrum for one quadrupolar `2H` nucleus. It sets the field to `9.4 T`, the quadrupolar tensor eigenvalues to `[-1e3 -2e3 3e3] Hz`, and its Euler angles to `[0 0 0]`. The values are model inputs, not experimental measurements; the tensor eigenvalues sum to zero. Spinach documents quadrupolar interaction tensors in Hz in its [g2spinach knowledge page](../../interfaces/g2spinach.md).
 
-- The source specifies one `2H` nucleus at 9.4 T, with quadrupolar coupling eigenvalues `[-1e3 -2e3 3e3]` and Euler angles `[0 0 0]`.
-- The rotor axis is `[1 1 1]` at 1000 Hz; both the initial state and detected operator are `L+` on `2H`.
+## MAS algorithm and acquisition
 
-## Numerical / algorithmic content
+The source uses the Floquet route directly: `floquet(spin_system,@acquire,parameters,'nmr')`. Its header says perturbative corrections to the rotating-frame transformation are not applied and estimates a seconds-scale calculation time; the timing is not a measured runtime. The rotor axis is `[1 1 1]` and rate `1000 Hz`; the powder grid is `leb_2ang_rank_17` with `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, and offset 0. It selects `2H`, leaves `decouple={}`, sets ppm axis units, and inverts the axis. Both initial state and receiver are `L+` on `2H`.
 
-- Uses the spherical-tensor Liouville-space basis with no approximation and projection +1. Floquet acquisition uses maximum rank 17 and grid `leb_2ang_rank_17`.
-- Acquires 512 points over a `2e4` sweep, zero-fills to 4096, applies exponential apodisation parameter 6, then Fourier transforms and plots the real spectrum.
-
-## Implementation structure
-
-- Define the quadrupolar spin system and basis, configure the experiment, run the Floquet acquisition, apodise, Fourier transform, and plot.
+The returned FID is exponentially apodised with parameter `6`, Fourier transformed using `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted with `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.

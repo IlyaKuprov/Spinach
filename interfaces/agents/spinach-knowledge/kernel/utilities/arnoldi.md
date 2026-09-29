@@ -1,22 +1,34 @@
 # kernel/utilities/arnoldi.m
 
-- Signature: `[V,H]=arnoldi(Op,v0,niter)`
+Source: [kernel/utilities/arnoldi.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/arnoldi.m)
 
 ## Purpose
 
-Construct an orthonormal Krylov basis by repeatedly applying an operator to a starting vector. The source cautions that this Arnoldi implementation is numerically unstable and should be used with care.
+Generates an orthonormal Krylov basis from repeated action of an operator on a starting vector, using the Arnoldi procedure. The header comment notes that the procedure is numerically unstable and must be used with caution.
 
-## Numerical content
+## Behavior
 
-Starting with the normalized `v0`, each iteration applies `Op` to the latest basis vector, orthogonalizes the result against all previously computed basis vectors with Gram-Schmidt, and records the coefficients in an extended Hessenberg matrix. If the residual norm is exactly zero, the function returns the completed invariant subspace with `V` and `H` truncated.
+- Syntax: `[V,H]=arnoldi(Op,v0,niter)`.
+- The first basis vector is `v0` normalized by its 2-norm.
+- Each iteration applies `Op` to the latest basis vector and orthogonalizes the result against all previous basis vectors via a classical Gram–Schmidt loop, storing the projections in `H`.
+- The subdiagonal entry `H(n+1,n)` is the 2-norm of the orthogonalized vector, which is then normalized to become the next basis vector.
+- If an exact Krylov breakdown occurs (`H(n+1,n)==0`), `V` and `H` are truncated to the completed invariant subspace (`V=V(:,1:n)`, `H=H(1:n,1:n)`) and the function returns.
+- `V` and `H` are preallocated as complex (`'like',1i`) with sizes `numel(v0)`-by-`niter+1` and `niter+1`-by-`niter` respectively.
+- Input validation is performed by the internal `grumble` function, which errors when: `Op` is not a function handle; `v0` is not a numeric column vector; or `niter` is not a non-negative real integer scalar.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- `Op` - function handle that accepts a column vector and returns a column vector.
-- `v0` - numeric column vector that starts the Arnoldi process.
-- `niter` - non-negative integer number of iterations. Without exact breakdown, the Krylov basis has `niter+1` columns.
+Inputs:
 
-## Outputs
+- `Op` — function handle taking a column vector and returning another column vector.
+- `v0` — starting vector of the Arnoldi process.
+- `niter` — number of iterations to take; the Krylov subspace will be `niter+1` dimensional.
 
-- `V` - matrix whose columns are the computed orthonormal Krylov basis vectors.
-- `H` - extended Hessenberg matrix of Arnoldi coefficients.
+Outputs:
+
+- `V` — matrix containing the orthonormal basis vectors of the Krylov subspace in columns.
+- `H` — extended Hessenberg matrix.
+
+## References
+
+- Spinach Wiki: [arnoldi.m](https://spindynamics.org/wiki/index.php?title=arnoldi.m)

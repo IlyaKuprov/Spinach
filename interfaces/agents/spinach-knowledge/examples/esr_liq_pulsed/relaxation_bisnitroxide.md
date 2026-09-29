@@ -1,23 +1,19 @@
 # examples/esr_liq_pulsed/relaxation_bisnitroxide.m
 
-- Signature: `relaxation_bisnitroxide()`
+## Purpose and interface
 
-## Purpose
+An X-band pulse-acquire FFT ESR example for a bisnitroxide, using explicit time-domain simulation with a Redfield relaxation superoperator. Call `relaxation_bisnitroxide()` with no arguments. It declares no return values and plots the real spectrum; it does not save the signal or spectrum.
 
-X-band pulse-acquire FFT ESR spectrum of a bisnitroxide radical, using explicit time-domain simulation with a Redfield relaxation superoperator. Parameters from https://doi.org/10.1039/C8CP06819D. Calculation time: seconds.
+## Spin system and model
 
-## Physical / mathematical content
+The spins are two electrons and two `14N` nuclei (`{'E','E','14N','14N'}`). Both electron principal g values are `[2.00925 2.00605 2.00205]`; the first orientation is `[0 0 0]` and the second is `[123.1 129.8 -46.6]*pi/180`. The nitrogen Zeeman tensors are set to zero. Coupling eigenvalues are encoded as electron-electron `[17.5 17.5 -35]*1e6` and electron-nitrogen `[18 17 103]*1e6` (for pairs 1–2 and 1–3 / 2–4 respectively); the source does not state their units. The 1–2 tensor Euler angles are `[-174 74 0]*pi/180`, the 1–3 angles are zero, and the 2–4 angles copy electron 2's Zeeman orientation. The scalar 1–2 coupling is assigned `-2*16e6`, also without a source unit label.
 
-- The spin system contains two electrons and two `14N` nuclei, with Zeeman interactions, electron–electron and electron–nitrogen couplings, and a magnetic field of 0.35 T.
-- Relaxation uses the `redfield` model with a correlation time of `4e-10` s, zero equilibrium, and lab-frame relaxation terms.
+The source sets `sys.magnet=0.35` and comments this value as Tesla. It uses the full `sphten-liouv` basis and Redfield relaxation with zero equilibrium, lab-frame terms retained, and `inter.tau_c={4e-10}` (no unit is attached to this value in the source).
 
-## Numerical / algorithmic content
+## Pulse-acquire and processing
 
-- The simulation uses the `sphten-liouv` formalism without basis approximation. It acquires 512 points over a `5e8` Hz sweep with zero offset.
-- The acquired signal receives no apodisation and is Fourier transformed with zero filling to 1024 points. The real spectrum is plotted using a `GHz-labframe` axis.
+Initial density and receiver are both electron `L+`; decoupling is empty and offset is `0e8`. Acquisition uses sweep `5e8`, 512 points, 1024-point zero filling, GHz-labframe axis units, first-derivative display, and inverted axis. The `liquid(...,@acquire,...,'esr')` signal is not apodised, then Fourier transformed and plotted. Sweep/offset and coupling values are left in their source-coded form because no units are given for them.
 
-## Implementation structure
+Requires Spinach `create`, `basis`, `state`, `liquid`, `acquire`, `apodisation`, `kfigure`, and `plot_1d`. The parameter source cited by the example is [DOI: 10.1039/C8CP06819D](https://doi.org/10.1039/C8CP06819D).
 
-- Define the spin system, Zeeman interactions, couplings, magnetic field, basis, and relaxation settings.
-- Create the Spinach spin system and set the pulse-acquire sequence parameters.
-- Run `liquid(spin_system,@acquire,parameters,'esr')`, apply no apodisation, Fourier transform the signal, and plot the real spectrum.
+[Source: `relaxation_bisnitroxide.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/relaxation_bisnitroxide.m).

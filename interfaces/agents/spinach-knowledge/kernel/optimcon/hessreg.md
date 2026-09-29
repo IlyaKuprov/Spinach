@@ -1,25 +1,21 @@
 # kernel/optimcon/hessreg.m
 
 - Signature: `[H,data]=hessreg(spin_system,H,g,data)`
+- Source: [kernel/optimcon/hessreg.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/hessreg.m)
 
 ## Purpose
 
-Regularises a real symmetric Newton-Raphson Hessian using rational function optimisation (RFO), shifting its spectrum as needed to obtain a better-conditioned Hessian.
+Applies rational-function-optimisation (RFO) regularisation to a Newton-Raphson Hessian and gradient pair. It returns a regularised Hessian and the updated diagnostic counter; it does not return or modify the gradient. This helper does not perform a line search.
 
-## Parameters / inputs
+## Inputs and settings
 
-- `spin_system` — Spinach system object; regularisation settings are read from `spin_system.control`.
-- `H` — real symmetric Hessian matrix.
-- `g` — real column gradient with the same number of elements as the dimension of `H`.
-- `data` — diagnostic structure whose `data.count.rfo` field is incremented for each RFO iteration.
+- `H` must be a real, square, symmetric numeric matrix. `g` must be a real column vector with one element per Hessian dimension.
+- The four RFO settings are read from `spin_system.control.reg_alpha`, `reg_phi`, `reg_max_iter`, and `reg_max_cond`. This function does not assign their defaults. The diagnostic structure must already provide `data.count.rfo`.
 
-## Outputs
+## Regularisation
 
-- `H` — regularised Hessian. If it is already positive definite and below the configured condition-number limit, the input Hessian is returned unchanged.
-- `data` — diagnostic structure with the RFO iteration count updated.
+If `H` is positive definite and its 2-norm condition number is already below `reg_max_cond`, the function returns it unchanged and takes no RFO iterations. Otherwise, for up to `reg_max_iter` iterations it forms the augmented matrix with blocks `alpha^2*H`, `alpha*g`, `alpha*g'`, and zero. It computes the smallest eigenvalue shift needed to make the augmented matrix nonnegative, subtracts that shift times the identity, removes the final row and column, and divides the remaining Hessian by `alpha^2`. It then multiplies `alpha` by `reg_phi`, increments `data.count.rfo`, and stops early if the condition number is below the target.
 
-## Implementation
-
-The routine uses `reg_alpha`, `reg_phi`, `reg_max_iter`, and `reg_max_cond` from `spin_system.control`. Each iteration forms the augmented RFO Hessian, shifts by its lowest eigenvalue when needed, and checks the resulting Hessian's condition number. It symmetrises the final result and warns if the target condition number was not reached.
+Finally, the result is replaced by its real symmetric part. If its condition number still meets or exceeds `reg_max_cond`, the routine emits a warning that the target was not reached. The source validates `H` and `g`, but does not validate or initialise the settings or counter structure.
 
 [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=hessreg.m)

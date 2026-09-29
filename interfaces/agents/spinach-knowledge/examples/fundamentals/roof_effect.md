@@ -1,20 +1,19 @@
 # examples/fundamentals/roof_effect.m
 
-- Signature: `roof_effect()`
+- MATLAB implementation: [examples/fundamentals/roof_effect.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/roof_effect.m)
 
 ## Purpose
 
-Illustrates the roof effect in the NMR spectrum of a strongly J-coupled two-spin system as the two resonance offsets approach one another.
+Illustrate the roof effect in the spectrum of a strongly J-coupled two-proton system while bringing the two resonance offsets closer together.
 
-## Physical / mathematical content
+## System and acquisition
 
-- The model has two `1H` spins at 5.9 T, chemical shifts 0.95 and 1.45, and a 7.0 Hz scalar coupling. It uses the `sphten-liouv` basis without approximation.
+The source configures two `1H` spins at 5.9 T, scalar Zeeman values 0.95 and 1.45, and a 7.0 Hz scalar coupling. It uses the `sphten-liouv` basis without approximation. For each plotted case, the source replaces the two Zeeman matrices with values corresponding to offsets around 1.2 ppm: `1.2 + ppm` and `1.2 - ppm`, where `ppm` takes 0.2, 0.05, 0.0125, and 0.00625. Thus the sweep parameter controls the symmetric separation; the initially configured scalar shifts are not used unchanged in those four simulations.
 
-## Numerical / algorithmic content
+The acquisition uses proton `L+` for both the initial state and receiver, runs `liquid` with the NMR assumption, and sets offset and sweep to 300 Hz with 1,024 points. The FID is exponentially apodised with parameter 10, zero-filled to 4,096 points, Fourier transformed, and shifted for plotting. The plotted ordinate is the real spectrum and the axis is in Hz with inversion enabled.
 
-- For each separation parameter 0.2, 0.05, 0.0125, and 0.00625, the code updates the two Zeeman frequencies symmetrically about 1.2 ppm, simulates liquid-state acquisition, applies exponential apodisation (10), and Fourier-transforms the FID.
-- Acquisition uses 300 Hz offset and sweep, 1024 points, zero filling to 4096, Hz axis units, and an inverted axis.
+## Output and limitations
 
-## Implementation structure
+The output is a four-panel set of spectra for the four offset settings. The source specifies no numerical roof-effect metric, acceptance threshold, or automated assertion; the page therefore does not claim that a particular spectral shape or intensity ratio was measured. The source contains no cited external reference for this example.
 
-- Sets `L+` as both the initial state and receiver, runs `liquid` with the NMR assumption, applies apodisation and an FFT, and plots the real spectrum for each separation.
+[Source example](../../../../../examples/fundamentals/roof_effect.m).

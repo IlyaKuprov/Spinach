@@ -1,31 +1,18 @@
 # examples/nmr_zerofield/zero_field_pyridine.m
 
 - Signature: `zero_field_pyridine()`
+- Source: [`examples/nmr_zerofield/zero_field_pyridine.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_zerofield/zero_field_pyridine.m)
 
 ## Purpose
 
-Zero-field NMR spectroscopy -15N pyridine. Set to reproduce Figure 3 from http://dx.doi.org/10.1021/ja2112405 Calculation time: seconds
+This simulated zero-field NMR example treats 15N pyridine and is set up to reproduce Figure 3 of [Journal of the American Chemical Society, DOI 10.1021/ja2112405](https://doi.org/10.1021/ja2112405). That is the source's stated target, not a report of a run or an independent reproduction check.
 
-## Physical / mathematical content
+## Spin and coupling model
 
-- Zero- and ultralow-field NMR examples. The main physics is the crossover from Zeeman-dominated spectra to J-dominated spectra, with coherent evolution in near-zero field and detection of low-frequency transitions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin list is five 1H nuclei followed by one 15N nucleus, with the magnetic field set to zero. The source assigns these scalar couplings (spin indices are their positions in that list; values are in Hz): 1–2 and 4–5, 4.88; 1–4 and 2–5, 0.97; 1–3 and 3–5, 1.83; 1–5, −0.12; 2–3 and 3–4, 7.62; 2–4, 1.38; 1–6 and 5–6, −10.93; 2–6 and 4–6, −1.47; 3–6, 0.27; and 6–6, 0.00. The Hilbert-space basis is `zeeman-hilb` with no approximation. The example does not specify spatial coordinates, gradients, chirps, or a field-drop schedule.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The FID is calculated by `liquid(...,@zerofield,...,'labframe')`. The settings give a 60 Hz sweep, 512 acquired points, 1024-point zero filling, zero offset, 1H excitation, a π/2 flip angle, uniaxial detection, and an axis in Hz. The code subtracts the FID mean, applies exponential apodisation with parameter 12, Fourier transforms and shifts the signal, then plots the real spectrum. The source comment estimates calculation time as seconds; that is a source note, not a runtime measured here.
 
-## Implementation structure
-
-- Zero-field NMR spectroscopy -15N pyridine. Set to reproduce
-- Figure 3 from http://dx.doi.org/10.1021/ja2112405
-- Calculation time: seconds
-- Magnetic field
-- Spin system
-- Interactions
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- Fourier transform
+This is a zero-field NMR simulation, not SPEN, ultrafast DOSY, or a multiple-quantum experiment: the source has no spatial encoding or gradient schedule and no explicit multiple-quantum selection. It imports no experimental data.

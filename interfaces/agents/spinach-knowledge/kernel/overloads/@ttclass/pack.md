@@ -1,29 +1,15 @@
 # kernel/overloads/@ttclass/pack.m
 
 - Signature: `ttout=pack(tt)`
+- Source: [`kernel/overloads/@ttclass/pack.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/pack.m)
+- Wiki: [`ttclass/pack.m`](https://spindynamics.org/wiki/index.php?title=ttclass/pack.m)
 
-## Purpose
+## Core action
 
-Packs the trains in the addition buffer into one tensor train without recompressing it. The source advises using `ttclass/shrink.m` rather than calling this function directly in normal use.
+For `N==1` buffered train, returns the input unchanged. Otherwise, it allocates new zero-filled cores with physical dimensions from `tt.sizes` and internal bond dimensions equal to the sums of corresponding ranks across buffered trains; the two boundary ranks are fixed to one. For trains with more than one site, it places the coefficient-scaled first core for each summand in its own first-bond block, places intermediate cores on rank-diagonal blocks, and places each last core in its own final-bond block. This block/direct-sum construction represents the sum without expanding it to a dense matrix. For the one-site case, it instead adds each coefficient-scaled core into the sole output core.
 
-## Physical / mathematical content
+The packed train is materialized in its core arrays and is not recompressed: the summed internal ranks remain, even if a smaller representation could exist. Coefficients are multiplied into the first core (or the one-site core) without conjugation.
 
-The output combines the buffered summands into a single train whose bond dimensions are the sums of the corresponding ranks. The coefficients are incorporated into the first core; no recompression is performed.
+## Output and guards
 
-## Numerical / algorithmic content
-
-If there is only one buffered train, the function returns the input unchanged. Otherwise it allocates cores for the summed ranks and copies the buffered cores into the corresponding rank blocks.
-
-## Parameters / inputs
-
-- tt - tensor train object with unprocessed additions
-
-## Outputs
-
-- ttout - tensor train with the additions buffer absorbed into its cores, but not recompressed
-
-## Implementation structure
-
-- Read the train sizes and ranks; return immediately when there is one train.
-- Sum the ranks across buffered trains and allocate the combined cores.
-- Collect the buffered trains into the single output train.
+For multiple buffered trains, the output has `coeff=1`, the combined cores, and `tolerance=abs(sum(tt.tolerance))`; the logical site sizes are unchanged. A single buffered train is returned as-is, including its existing coefficient and tolerance. The implementation has no explicit type, shape, or rank validation. The source recommends using `ttclass/shrink.m` rather than calling `pack` directly in normal use.

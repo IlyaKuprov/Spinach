@@ -1,15 +1,17 @@
 # examples/quantum_tech/transmon_ramsey_chevron.m
 
-- Signature: `transmon_ramsey_chevron()`
+Source: [examples/quantum_tech/transmon_ramsey_chevron.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_ramsey_chevron.m)
 
-## Purpose
+## What it models
 
-Ramsey chevron of a three-level transmon in the Duffing approximation. A nominal pi/2 pulse prepares a coherence, and detuning during free evolution produces Ramsey fringes. Calculation time: seconds.
+A closed, coherently controlled three-level transmon in the Duffing approximation. The plotted chevron is a simulated Ramsey sequence over detuning and free-evolution time, not an experimental measurement; the source estimates calculation time in seconds.
 
-## Model and parameters
+## Hamiltonian and parameters
 
-The T3 transmon is in the rotating frame with anharmonicity -260 MHz and uses the Zeeman-Hilbert formalism without approximation. The detuning grid contains 256 points from -20 to 20 MHz; free-evolution times contain 256 points from 0 to 1 microsecond.
+The source sets the field to zero, uses a T3 mode with rotating-frame frequency 0 and anharmonicity -260e6 Hz, and selects the Zeeman-Hilbert formalism without basis approximation. The cavity/Duffing Hamiltonian supplies the anharmonic drift H0. For each detuning Δ in a 256-point grid from -20e6 to 20e6 Hz, the evolution Hamiltonian is H0 + 2*pi*Δ*N, symmetrized in the source; N is the transmon number operator. The 256 free-evolution times span 0 to 1.0e-6 s.
 
-## Calculation
+## Pulse sequence and detection
 
-A nominal pi/2 propagator prepares the initial BL1 state. For each detuning and time, the code propagates under the anharmonic Hamiltonian plus the number-operator offset, applies the same final pi/2 pulse, and detects BL2 population. The result is plotted as a detuning-versus-time Ramsey chevron.
+The initial BL1 state is acted on by a nominal pi/2 propagator made from the transmon quadrature (C+A)/2. At every detuning and time sample, the code propagates under the detuned drift, applies the same pi/2 propagator again, and detects BL2 population. The image uses time in seconds on the horizontal axis and detuning in Hz on the vertical axis, with colour encoding the calculated population.
+
+No dissipative relaxation or dephasing term, rotational diffusion, correlation spectrum, cross-correlation, or secular approximation is specified. The sequence therefore illustrates ideal coherent Ramsey fringes; it does not establish experimental agreement or a coherence-time benchmark.

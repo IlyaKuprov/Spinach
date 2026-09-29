@@ -1,32 +1,22 @@
 # kernel/operators/enlev2ist.m
 
 - Signature: `[states,coeffs]=enlev2ist(mult,lvl_num,particle)`
+- DIRECT source: [kernel/operators/enlev2ist.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/enlev2ist.m)
+- Wiki: [enlev2ist.m](https://spindynamics.org/wiki/index.php?title=enlev2ist.m)
 
-## Purpose
+## Definition
 
-Expands the projector onto a specified Zeeman energy level as a linear combination of irreducible spherical tensors.
+This function expands the projector onto one selected level of a spin or boson in Spinach's irreducible spherical-tensor (IST) basis. It first forms a `mult`-by-`mult` diagonal matrix `P` with one unit diagonal entry, then returns the results of [oper2ist](oper2ist.md). The meaning of `lvl_num` depends on `particle`:
 
-## Physical / mathematical content
+- For `particle='S'`, spin levels are numbered from the bottom up, and the matrix index set to one is `mult-lvl_num+1`. Thus the level numbering is reversed relative to the diagonal index.
+- For `particle='B'`, bosonic levels are numbered from the top down, and the set diagonal index is `lvl_num`.
 
-The energy-level numbering depends on the particle type: spin levels are counted from the bottom up, while bosonic levels are counted from the top down. The resulting projector is represented in the irreducible spherical tensor basis.
+These are indexing and basis-conversion operations; the function does not exponentiate the projector or produce a propagator.
 
-## Numerical / algorithmic content
+## Basis, coefficients, and order
 
-The routine builds a diagonal projector of size mult by mult. For a spin it sets element (mult-lvl_num+1,mult-lvl_num+1) to one; for a boson it sets (lvl_num,lvl_num) to one. It then calls oper2ist to obtain the tensor-basis states and coefficients.
+`states` are the IST-basis indices supplied by `oper2ist(P)`; [lin2lm](../indexing/lin2lm.md) maps the linear indices to spherical-tensor L,M labels. `coeffs` contains the corresponding coefficients returned by `oper2ist`. This function applies no additional multiplier or normalization: the coefficients are exactly the output of that conversion for `P`.
 
-## Parameters / inputs
+## Inputs and checks
 
-- mult - multiplicity of the spin or dimension of the bosonic level space; a positive integer.
-- lvl_num - energy-level number, counted from the bottom for spins and from the top for bosons, within the range 1 to mult.
-- particle - particle type: 'S' for a spin or 'B' for a boson.
-
-## Outputs
-
-- states - indices in the Spinach IST basis that contribute to the operator; use lin2lm to convert them to L,M spherical-tensor indices.
-- coeffs - coefficients of the irreducible spherical tensors in the linear combination.
-
-## Implementation structure
-
-1. Check the multiplicity and level-number inputs.
-2. Place a unit entry on the appropriate diagonal position for the selected particle type; other particle values produce an error.
-3. Expand the projector with oper2ist and return its states and coefficients.
+`mult` is intended to be a positive integer and `lvl_num` a level in the range 1 through `mult`. The source checks each for numeric, scalar, real values and checks the stated range for `lvl_num`, but does not explicitly test integrality or finiteness. `particle` must be the character value `'S'` or `'B'`; other values raise an error.

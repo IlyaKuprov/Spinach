@@ -1,30 +1,32 @@
 # kernel/utilities/rwalk.m
 
-- Signature: `eulers=rwalk(npts,tau_c,dt)`
-
 ## Purpose
 
-Generate a random walk on SO(3) for isotropic rotational diffusion.
+Generates a random walk on the SO(3) rotation group, simulating isotropic rotational diffusion. The function returns a trajectory of Euler angles describing the orientation of a diffusing object over time.
 
-## Parameters / inputs
+Source: [kernel/utilities/rwalk.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rwalk.m)
 
-- `npts` — number of trajectory points; a positive integer.
-- `tau_c` — isotropic rotational correlation time, in seconds; a positive real number.
-- `dt` — spacing between trajectory points, in seconds; a positive real number.
+## Behavior
 
-## Outputs
+1. Validates inputs via an internal `grumble` subroutine: `npts` must be a positive real integer, and `tau_c` and `dt` must be positive real scalars.
+2. Generates a random unit jump sequence: `randn(npts,3)/sqrt(3)`.
+3. Scales the jumps by `sqrt(dt/tau_c)`, setting the effective diffusion coefficient.
+4. Enforces small-angle validity: if the mean absolute jump angle exceeds `pi/32`, the function errors with `'jump angles must be small, reduce your dt.'`.
+5. Builds the direction cosine matrix (DCM) trajectory: starting from the identity, each step applies `expm(R)` where `R` is the skew-symmetric generator assembled from the three jump angle components, and multiplies onto the previous DCM.
+6. Converts each DCM to Euler angles using `dcm2euler` in a `parfor` loop, returning an `npts x 3` array.
 
-- `eulers` — an `npts` × 3 array of Euler angles, in radians, one row per trajectory point. The angles describe orientations relative to the starting point, **not** increments relative to the preceding point.
+Note (from source): the returned angles are **not** increments relative to the previous point; they are angles relative to the starting point of the trajectory.
 
-## Algorithm
+## Inputs and outputs
 
-1. Check that the inputs have the required scalar, real, positive values and that `npts` is an integer.
-2. Draw Gaussian jump-angle triples using `randn(npts,3)/sqrt(3)`, then scale them by `sqrt(dt/tau_c)`.
-3. Reject the trajectory if `mean(abs(jump_angles))` exceeds `pi/32`; reduce `dt` to obtain smaller jumps.
-4. Initialize the direction-cosine matrix (DCM) trajectory at the identity. For each subsequent point, form a skew-symmetric matrix from its three jump angles and left-multiply the preceding DCM by its matrix exponential.
-5. Convert each DCM to Euler angles with `dcm2euler`.
+| Name | Type | Description |
+|---|---|---|
+| `npts` | positive integer scalar | Number of points in the trajectory |
+| `tau_c` | positive real scalar | Isotropic rotational correlation time, seconds |
+| `dt` | positive real scalar | Inter-point spacing, seconds |
+| `eulers` | `npts x 3` real array | Euler angles (radians) for each trajectory point |
 
-## Source
+## References
 
-- [rwalk.m documentation](https://spindynamics.org/wiki/index.php?title=rwalk.m)
-- Contact: ilya.kuprov@weizmann.ac.il
+- Spin Dynamics Wiki: [rwalk.m](https://spindynamics.org/wiki/index.php?title=rwalk.m)
+- Source file: [kernel/utilities/rwalk.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rwalk.m)

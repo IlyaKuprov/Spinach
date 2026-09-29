@@ -1,34 +1,18 @@
 # kernel/conventions/transforms/stev2sph.m
 
-- Signature: `Bkq=stev2sph(k,Bkq)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/stev2sph.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=stev2sph.m)
 
-## Purpose
+## Purpose and convention
 
-Converts coefficients of Stevens operators produced by `stevens.m` into coefficients of irreducible spherical tensor operators produced by `irr_sph_ten.m`. Supports spherical ranks 1 through 12. Source for ranks up to 6: http://dx.doi.org/10.1088/0022-3719/18/7/009
+Converts coefficients of Stevens operators into coefficients of irreducible spherical tensor operators. For each rank `k`, the input has `2*k+1` real coefficients ordered by projections `-k:k` (increasing); the output has `2*k+1` complex coefficients ordered `k:-1:-k` (decreasing). The scaling factors are dimensionless: this conversion does not change the coefficients’ physical units.
 
-## Syntax
+## Conversion
 
-```matlab
-Bkq=stev2sph(k,Bkq)
-```
+For ranks `k=1,...,12`, the implementation builds a diagonal-plus-antidiagonal matrix `A=diag(u)+fliplr(diag(v))` and returns `transpose(B_in'*A)`, where `B_in` is the input column. Its diagonal and antidiagonal entries are:
 
-## Parameters / inputs
+- `u=[-1i*(-1).^(k:-1:1)'; 1; ones(k,1)].*a{k}`
+- `v=[1i*ones(k,1); 0; (-1).^(1:k)'].*a{k}`
 
-- `k`: spherical rank; a real integer from 1 to 12.
-- `Bkq`: a finite, real column vector of `2*k+1` coefficients in front of Stevens operators, in increasing order of projections.
+The rank-specific scale vector `a{k}` is defined in the source. Its squared entry for projection magnitude `q>0` is `2^(k-2)*P(k,q)/C(k,q)^2`; for `q=0` it is `2^k*P(k,0)/C(k,0)^2`. Here `P(k,q)=product((k+p)*(k-p+1), p=q+1,...,k)`, and `C(k,q)` is the corresponding Stevens coefficient from [`stevens.m`](../../operators/stevens.md), doubled when `k` is even and `q` is odd. The source's explicit rank tables implement these factors through rank 12. The formula reproduces the published ranks 1–6; the cited published source is [J. Phys. C: Solid State Phys. 18, 1429 (1985)](https://doi.org/10.1088/0022-3719/18/7/009). The rank-7–12 rational factors are based on the integer coefficient table of Ryabov, *J. Magn. Reson.* 140, 141 (1999); the source notes large-prime denominators at rank 9, projections 1 and 2.
 
-## Output
-
-- `Bkq`: a column vector of `2*k+1` complex coefficients in front of irreducible spherical tensor operators, in decreasing order of projections.
-
-## Numerical / algorithmic content
-
-The implementation selects a rank-specific vector of scaling factors, constructs a transformation matrix with diagonal and antidiagonal terms, and applies it to the input coefficients as `transpose(Bkq'*A)`. It checks that `k` is a real integer from 1 to 12 and that the input is a finite, real column vector of length `2*k+1`.
-
-For ranks 7–12, the squared scaling factors are exact rationals computed from the integer coefficient table of `stevens.m` (Ryabov, J. Magn. Reson. 140, 141 (1999)) and the normalization of `irr_sph_ten.m`: `2^(k-2)*P(k,q)/C(k,q)^2` for `q>0`, and `2^k*P(k,0)/C(k,0)^2` for `q=0`. Here `P(k,q)` is the product of `(k+p)(k-p+1)` for `p` from `q+1` to `k`, and `C(k,q)` is the `stevens.m` coefficient, doubled for even `k` and odd `q`. The same expression reproduces the published ranks 1–6. The Ryabov table has a cluster of large primes at rank 9 projections 1 and 2, hence the denominators there.
-
-## Source
-
-- <https://spindynamics.org/wiki/index.php?title=stev2sph.m>
-- e.suturina@bath.ac.uk
-- ilya.kuprov@weizmann.ac.il
+The input rank must be a finite, real numeric scalar integer from 1 through 12. `B_in` must be a finite, real numeric column with exactly `2*k+1` elements. The result is a complex column vector of the same length, suitable as coefficients for [`irr_sph_ten.m`](../../operators/irr_sph_ten.md).

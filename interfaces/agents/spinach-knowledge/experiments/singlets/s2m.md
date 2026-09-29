@@ -1,28 +1,32 @@
 # experiments/singlets/s2m.m
 
+- MATLAB source: [experiments/singlets/s2m.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/singlets/s2m.m)
 - Signature: `rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v)`
 
-## Purpose
+## What the routine does
 
-Implements the S2M sequence of Pileio and Levitt.
+The source identifies this as the S2M sequence of Pileio and Levitt. It accepts the caller's initial state `rho`; it does not construct a magnetisation preparation or apply an explicit coherence-order filter. The pulse and free-evolution steps are the sequence implementation, not a measurement of transfer efficiency or a promise of a particular final singlet population.
 
-## Numerical / algorithmic content
+## Sequence and timing
 
-The routine sets `t=1/(4*sqrt(J^2+delta_v^2))` and rounds `floor(pi*abs(J)/(2*abs(delta_v)))` up to an even repetition count `m1`. It first runs `m1/2` blocks of evolution under `L` for `t`, a `pi` pulse about `Hx`, and another `L` evolution for `t`. It then evolves under `L` for `t`, applies a `sign(J)*pi/2` pulse about `Hx`, runs `m1` such evolution/pulse/evolution blocks, and finishes with a `pi/2` pulse about `Hy`.
+The routine sets `t=1/(4*sqrt(J^2+delta_v^2))`. Because `J` and `delta_v` are in Hz, `t` is in seconds. It sets `m1=floor(pi*abs(J)/(2*abs(delta_v)))` and increments `m1` by one when it is odd, giving an even pulse-repeat count.
 
-## Parameters / inputs
+In order, it performs:
 
-- `L` — background Liouvillian
-- `Hx` — X spin operator
-- `Hy` — Y spin operator
-- `rho` — initial state vector
-- `J` — J-coupling (Hz); the phase of the 90-degree pulse next to the lone tau delay follows its sign
-- `delta_v` — Zeeman frequency difference (Hz)
+1. `m1/2` repetitions of free evolution under `L` for `t`, an `Hx` rotation by `pi`, and another `L` evolution for `t`.
+2. One `L` evolution for `t`, followed by an `Hx` rotation by `sign(J)*pi/2`.
+3. `m1` repetitions of `L` for `t`, an `Hx` rotation by `pi`, and `L` for `t`.
+4. A final `Hy` rotation by `pi/2`.
 
-## Outputs
+The source uses `J` and `delta_v` (both in Hz) to set the delay and repetition count; their sign/magnitude are not inserted as additional Hamiltonian terms by this function. The sign of `J` selects the sign of the middle 90-degree X rotation. `L` is the supplied background Liouvillian; `Hx` and `Hy` are supplied spin-operator matrices.
 
-- `rho` — final state vector
+## Inputs and output
 
-## Reference
+- `L`, `Hx`, and `Hy` must be numeric matrices of matching dimensions; the row dimension of `rho` must match the column dimension of `L`.
+- `J` and `delta_v` must each be finite, real, nonzero numeric scalars.
+- Output `rho` is the final propagated state, with the state-space dimension of the input.
 
-- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=s2m.m)
+## References
+
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/singlets/s2m.m)
+- [Spinach Wiki: s2m.m](https://spindynamics.org/wiki/index.php?title=s2m.m)

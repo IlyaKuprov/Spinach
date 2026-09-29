@@ -1,19 +1,15 @@
 # examples/nmr_solids/cp_respiration.m
 
-- Signature: `cp_respiration()`
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_respiration.m
 
 ## Purpose
 
-1H-13C RESPIRATION-CP experiment in the doubly rotating frame. Magic angle spinning simulation using Fokker-Planck formalism. Calculation time: seconds
+A 1H–13C RESPIRATION-CP example in the doubly rotating frame using magic-angle spinning and the Fokker–Planck formalism. The source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Spin model and sequence inputs
 
-The model is a two-spin 1H/13C system with a 2.00 Å internuclear separation at 11.7 T. It implements RESPIRATION cross-polarisation under magic-angle spinning, with 1H excitation and 13C detection.
+The source sets sys.magnet to 11.7 and places 1H and 13C at [0, 0, 0] and [0, 0, 2.00]; these coordinates provide the pair geometry for the dipolar interaction. No additional interaction tensor is assigned in the wrapper. It uses the full sphten-liouv basis. The wrapper sets rate=20000 (no unit is stated), the axis [sqrt(2/3), 0, sqrt(1/3)], max_rank=8, and the rep_2ang_100pts_sph grid. It initializes 1H transverse magnetisation (Lx) and detects 13C L+; nloops is 16 and theta is pi/20. These are parameters passed to the external respiration sequence helper: this file does not define its internal RF waveform or give an RF-amplitude or CP-contact-time schedule.
 
-## Numerical / algorithmic content
+## Acquired and plotted spectrum
 
-The code calls `singlerot` with the `respiration` pulse sequence, a 20 kHz spinning rate, maximum rank 8, and the `rep_2ang_100pts_sph` grid. The pulse train has 16 loops and θ=π/20; acquisition uses 512 points over a 40 kHz sweep. The FID is exponentially apodised (parameter 5), zero-filled to 16384 points, Fourier transformed, and plotted in kHz.
-
-## Implementation structure
-
-Creates the spin system and full sphten-liouv basis, sets the Fokker–Planck and acquisition parameters, simulates the signal, then applies exponential apodisation and an FFT before plotting the real spectrum.
+The wrapper requests 512 points, zerofill to 16384, sweep=40000, and axis_units=kHz. It applies exponential apodisation with parameter 5, Fourier-transforms the FID, and plots the real spectrum. The code specifies the plotted frequency axis as kHz but does not annotate units for rate, sweep, or the apodisation parameter. This is a simulated output path, not a claim about a measured spectrum or a validation run.

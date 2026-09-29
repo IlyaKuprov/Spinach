@@ -1,28 +1,13 @@
 # kernel/overloads/@ttclass/nnz.m
 
 - Signature: `answer=nnz(ttrain)`
+- Source: [`kernel/overloads/@ttclass/nnz.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/nnz.m)
+- Wiki: [`ttclass/nnz.m`](https://spindynamics.org/wiki/index.php?title=ttclass/nnz.m)
 
-## Purpose
+## Core action
 
-Counts nonzero entries across the cores of a tensor train.
+Applies MATLAB `nnz` to each entry of `ttrain.cores` and sums those counts. The scalar therefore counts stored nonzero core entries across the train buffer; it is not the number of nonzero entries in the represented matrix or tensor. It does not expand the train and does not use `ttrain.coeff`.
 
-## Physical / mathematical content
+## Result and guards
 
-For each core, MATLAB `nnz` counts its nonzero entries; the function sums those counts over all cores. It does not expand the represented tensor.
-
-## Numerical / algorithmic content
-
-The implementation applies `nnz` to each cell in `ttrain.cores`, then sums the resulting counts.
-
-## Parameters / inputs
-
-- ttrain - tensor train object
-
-## Outputs
-
-- answer - number of nonzero elements across all tensor train cores
-
-## Implementation structure
-
-- Apply `nnz` to every core with `cellfun`.
-- Sum the per-core counts.
+Returns the summed count as a scalar. The method has no explicit type, shape, or rank guard, and performs no core or rank transformation. Its count follows the stored core shapes, not the logical dimensions represented by them.

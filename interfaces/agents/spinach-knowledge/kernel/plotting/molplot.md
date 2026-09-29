@@ -1,28 +1,16 @@
 # kernel/plotting/molplot.m
 
 - Signature: `molplot(xyz,conmatrix)`
+- MATLAB source: [`kernel/plotting/molplot.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/molplot.m)
 
-## Purpose
+## Purpose and inputs
 
-Plots a stick representation of a molecule from Cartesian coordinates supplied. Syntax: molplot(xyz,conmatrix)
+Draws molecular sticks from Cartesian coordinates; it is a geometry renderer, not a molecular simulation. `xyz` is an N-by-3 numeric real matrix in Angstroms. `conmatrix` identifies atom pairs to draw; when it is empty, the function calls `conmat(xyz,1.6)`, using the 1.6 Angstrom cutoff documented by the source.
 
-## Physical / mathematical content
+## Rendering and side effects
 
-## Numerical / algorithmic content
+For every nonzero element returned by `find(conmatrix)`, the function appends the two endpoint coordinates and a NaN separator to three row vectors. Each vector therefore has length `3*nnz(conmatrix)`. One `plot3` call draws these segments in grey, RGB `[0.5 0.5 0.5]`, with line width 1.5. A symmetric connectivity matrix enumerates both ordered entries, so the same geometric segment is represented twice.
 
-## Parameters / inputs
+The function has no output arguments. It checks that `xyz` is numeric, real, and has three columns; a nonempty connectivity matrix must be square and match the number of coordinate rows. It does not explicitly set axis labels, limits, aspect ratio, view, or colormap.
 
-- `xyz` — Cartesian coordinates as an N-by-3 matrix, in Angstroms.
-- `conmatrix` — N-by-N connectivity matrix indicating bonds to draw as sticks. If empty, connectivity is computed with `conmat(xyz,1.6)`, using a 1.6 Angstrom cutoff.
-
-## Outputs
-
-- this function creates a figure
-
-## Implementation structure
-
-- Validates that `xyz` is an N-by-3 coordinate array and that `conmatrix`, when supplied, is a logical square matrix with one row per atom.
-- If `conmatrix` is empty, obtains it from `conmat(xyz,1.6)`.
-- Builds NaN-separated coordinate arrays for each connected atom pair and draws the sticks with `plot3` in grey.
-
-[Source reference](https://spindynamics.org/wiki/index.php?title=molplot.m)
+[Wiki reference](https://spindynamics.org/wiki/index.php?title=molplot.m)

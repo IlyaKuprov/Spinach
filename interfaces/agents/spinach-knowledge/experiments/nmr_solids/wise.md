@@ -1,32 +1,19 @@
 # experiments/nmr_solids/wise.m
 
-- Signature: `fid=wise(spin_system,parameters,H,R,K)`
+MATLAB source: [experiments/nmr_solids/wise.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/wise.m)
 
-## Purpose
+WISE (WIdeline SEparation) is described in the source as a powder-MAS heteronuclear correlation experiment. For the common `1H`-`13C` case, it links proton line shapes in one dimension with carbon chemical shifts in the other. Reference: [10.1021/ma00038a037](https://doi.org/10.1021/ma00038a037).
 
-WISE (WIdeline SEparation) is a powder MAS heteronuclear correlation experiment. In the common 1H–13C implementation, molecular dynamics information is contained in 1H line shapes separated in the second dimension by 13C chemical shifts. See https://doi.org/10.1021/ma00038a037.
+## Inputs and source-defined sequence
 
-## Parameters / inputs
+`fid=wise(spin_system,parameters,H,R,K)` expects the working spins in order: high-gamma channel first and low-gamma channel second (the source example is `{'1H','13C'}`). It receives `H`, `R`, and `K`, combines them as `L=H+1i*R+1i*K`, and uses `spc_dim` from the context to extend the spin-control operators. The source's preparation step analytically decouples the second spin from `rho0` before building the pulse sequence.
 
-- `spin_system` — spin system; this implementation requires the `sphten-liouv` formalism.
-- `parameters.spins` — two working spin isotopes, e.g. `{'1H','13C'}`.
-- `parameters.hi_pwr` — amplitude of high-power pulses on the high-gamma channel, Hz; a positive real scalar.
-- `parameters.cp_pwr` — RF amplitudes on the two channels during CP contact, Hz; a two-element row vector of positive values.
-- `parameters.cp_dur` — CP contact time duration, s; a positive real scalar.
-- `parameters.rho0` — initial state.
-- `parameters.coil` — detection state.
-- `parameters.sweep` — sweep widths for F1 and F2, Hz; a two-element row vector of positive values.
-- `parameters.npoints` — numbers of points in F1 and F2; a two-element row vector of positive integers.
-- `H` — Hamiltonian matrix, received from the context function.
-- `R` — relaxation superoperator, received from the context function.
-- `K` — kinetics superoperator, received from the context function. `H`, `R`, and `K` must have the same dimensions.
+Required fields are `spins`, `hi_pwr`, `cp_pwr`, `cp_dur`, `rho0`, `coil`, `sweep`, `npoints`, and `spc_dim`. `hi_pwr` is the high-gamma-channel RF amplitude in Hz. `cp_pwr` supplies two positive amplitudes in Hz, one per channel; `cp_dur` is the contact time in seconds. `sweep` and `npoints` each have two entries for F1 and F2; sweep widths are positive and in Hz, with dwell times `1./sweep`.
 
-## Outputs
+The source applies high-power 90-degree pulses along X and Y on the first channel, using `1/(4*hi_pwr)` seconds. It evolves both quadratures for `npoints(1)-1` F1 steps. The contact generator adds `-2*pi*cp_pwr(1)*Hy` on channel 1 and `+2*pi*cp_pwr(2)*Cx` on channel 2; contact evolution is for `cp_dur`. It then analytically decouples the first channel during acquisition and detects the F2 evolution on `coil` for `npoints(2)-1` steps.
 
-- `fid.sin`, `fid.cos` — sine and cosine components of the States quadrature.
+## Output and limits
 
-## Implementation summary
+The return value is a structure with `fid.cos` and `fid.sin`, the cosine and sine States-quadrature components. Each contains F2 observable samples for the F1 trajectory states: `npoints(2)` by `npoints(1)`, including the initial sample on each dimension. The source does not construct a MAS rotor or powder-orientation sweep; those dynamics are represented by the context-supplied matrices and spatial dimension. The implementation describes the transfer/control sequence, not a processed spectrum.
 
-The sequence pre-saturates the second spin channel, applies separate high-power 90-degree pulses to the first channel for the cosine and sine pathways, and evolves both pathways during F1. Cross-polarization follows, with RF terms on both channels for `parameters.cp_dur`. The first channel is then wiped and decoupled before F2 acquisition through `parameters.coil`.
-
-Source reference: <https://spindynamics.org/wiki/index.php?title=wise.m>
+https://spindynamics.org/wiki/index.php?title=wise.m

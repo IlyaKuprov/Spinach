@@ -1,36 +1,17 @@
 # kernel/conventions/transforms/axrh2mat.m
 
-- Signature: `M=axrh2mat(iso,ax,rh,alp,bet,gam)`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/axrh2mat.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=axrh2mat.m)
 
-## Purpose
+## Contract
 
-Converts axiality and rhombicity representation of a 3x3 interaction tensor into the corresponding matrix. Syntax: M=axrh2mat(iso,ax,rh,alp,bet,gam)
+axrh2mat constructs a real symmetric 3-by-3 interaction matrix from isotropic value, axiality, rhombicity, and three Euler angles. The interaction's unit is inherited from iso, ax, and rh; the source does not name a particular unit. The angles alp, bet, and gam are in radians and are passed to euler2dcm.
 
-## Physical / mathematical content
+## Principal values and frame
 
-The principal values are `xx=iso-(ax+3*rh)/6`, `yy=iso-(ax-3*rh)/6`, and `zz=iso+ax/3`. The Euler-angle rotation maps the diagonal tensor into the requested coordinate frame.
-## Numerical / algorithmic content
+Using Mehring ordering xx<=yy<=zz, the source defines iso=(xx+yy+zz)/3, ax=2*zz-(xx+yy), and rh=yy-xx. It reconstructs the principal values as xx=iso-(ax+3*rh)/6, yy=iso-(ax-3*rh)/6, and zz=iso+ax/3. It then forms R*diag([xx yy zz])*R' with R=euler2dcm(alp,bet,gam) and symmetrizes the result as (M+M')/2.
 
-The function computes the three principal values, obtains a rotation matrix with `euler2dcm(alp,bet,gam)`, and forms `M=R*diag([xx yy zz])*R'`. It then replaces `M` with `(M+M')/2` to enforce symmetry.
-## Parameters / inputs
+Inputs are real numeric scalars; the source requires rh>=0 and ax>=rh. There are no spin-system fields, grid axes, or spatial dimensions in this transform. The source notes that the inverse transformation is ill-defined.
 
-- iso -isotropic part of the interaction, defined as
-- (xx+yy+zz)/3 in terms of eigenvaues
-- ax -interaction axiality, defined as 2*zz-(xx+yy)
-- in terms of eigenvalues (Mehring order, that
-- is xx<=yy<=zz)
-- rh -interaction rhombicity, defined as (yy-xx) in
-- terms of eigenvalues (Mehring order, that is
-- xx<=yy<=zz)
-- alp -alpha Euler angle in radians
-- bet -beta Euler angle in radians
-- gam -gamma Euler angle in radians
+## Source-supported use
 
-## Outputs
-
-- M -3x3 matrix
-- Note: the inverse transformation is ill-defined.
-
-## Implementation structure
-
-A local `grumble` function checks that all inputs are real numeric scalars, that `rh` is nonnegative, and that `ax` is at least `rh`. The main function then computes the principal values, rotates the diagonal matrix, and symmetrizes the result.
+The documented call is M=axrh2mat(iso,ax,rh,alp,bet,gam).

@@ -1,5 +1,28 @@
 # tests/kernel/test_dynamic_parse_text_reporting_suite.m
 
-- Signature: `result=test_dynamic_parse_text_reporting_suite()`
+## Purpose
 
-Regression checks for operator-specification parsing, isotope predicates, label lookup, and text reporting. The suite exercises `human2opspec` selection and product-operator coefficients, `idxof` label lookup, and electron/nucleus classification. It checks that `report`, `banner`, and `summary_coordinates` are silent in hush mode, and that `polinfo` reports the shape of a polyadic product and its matrix-core sizes. These are described as test checks, not as verified passing results.
+Regression test suite for deterministic parsing, text, and safe reporting utilities in Spinach, covering operator-specification parsing, isotope predicates, label lookup, silent reporting calls, and polyadic text diagnostics.
+
+## Behavior
+
+- Announces the test target with `fprintf` and initializes a regression result via `new_test_result` for `kernel/dynamic_parse_text_reporting_suite`.
+- Builds a small three-spin system descriptor (`local_parse_spin_system`) with `sys.output` set to `'hush'`, isotopes `{'1H','E','13C'}`, labels `{'proton','electron','carbon'}`, all spin types `'S'`, multiplicities `[2 2 2]`, and coordinates `{[0 0 0],[1 0 0],[0 1 0]}`.
+- Tests `human2opspec(spin_system,'Lz','nuclei')`: expects opspecs `{[2 0 0];[0 0 2]}` and coefficients `[1;1]`, verifying nuclei selection of non-electron spins and Lz mapping to IST index two.
+- Tests `human2opspec(spin_system,{'Lx','Lz'},{1,3})`: expects product opspecs `{[1 0 2];[3 0 2]}` and Lx coefficients `[-sqrt(2);sqrt(2)]/2` (tolerances `1e-15`), reflecting the spherical tensor convention `Lx=(L+ + L-)/2`.
+- Tests `idxof(sys,'carbon')` label lookup, expecting the one-based spin index `3`.
+- Tests isotope predicates: `isnucleus('1H')` is true, `iselectron('E')` is true, and `isnucleus('E')` is false.
+- Tests hush-mode reporting side-effect freedom using `evalc`: `report(spin_system,'hidden message')`, `banner(spin_system,'basis_banner')`, and `summary_coordinates(spin_system,'coordinate summary')` must all produce empty console text.
+- Tests `polinfo(polyadic({{speye(2),sparse(1)}}))`: the captured text must contain `'polyadic [2x2]'`, `'matrix 1 [2x2]'`, and `'matrix 2 [1x1]'`, describing the unopened polyadic size and its matrix cores.
+
+## Inputs and outputs
+
+```matlab
+result = test_dynamic_parse_text_reporting_suite()
+```
+
+- `result` — regression test result object with explanatory messages accumulated through `test_true` and `test_close` assertions.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_parse_text_reporting_suite.m)

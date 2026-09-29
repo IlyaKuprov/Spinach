@@ -1,33 +1,18 @@
 # kernel/operators/unit_oper.m
 
-- Signature: `A=unit_oper(spin_system)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/unit_oper.m
+Wiki: https://spindynamics.org/wiki/index.php?title=unit_oper.m
 
-## Purpose
+## Purpose and output
 
-Returns a sparse identity operator with dimensions appropriate to the current formalism and basis.
+`unit_oper(spin_system)` returns a sparse identity matrix for the selected formalism. It is diagonal in, and preserves, the current basis ordering; it does not construct a generator or time propagator.
 
-## Physical / mathematical content
+## Dimensions
 
-- In `sphten-liouv`, the dimension is the number of rows in `spin_system.bas.basis`.
-- In `zeeman-hilb` and `zeeman-wavef`, the dimension is the product of the spin multiplicities.
-- In `zeeman-liouv`, the dimension is the square of that product.
+Let `d=prod(spin_system.comp.mults)`. The function uses these dimensions:
 
-## Numerical / algorithmic content
+- `sphten-liouv`: `size(spin_system.bas.basis,1)`.
+- `zeeman-hilb` and `zeeman-wavef`: `d`.
+- `zeeman-liouv`: `prod(spin_system.comp.mults.^2)`, equal to `d^2`.
 
-- Constructs the sparse identity matrix with `speye`.
-
-## Parameters / inputs
-
-- `spin_system` — Spinach data object containing basis information; call `basis.m` first.
-
-## Outputs
-
-- `A` — Sparse identity matrix of the appropriate dimension.
-
-## Implementation structure
-
-- Checks that `spin_system.bas.formalism` is present, then selects the dimension by formalism. An unknown formalism raises an error.
-
-## Reference
-
-- https://spindynamics.org/wiki/index.php?title=unit_oper.m
+For each supported formalism the returned matrix is `speye` of the specified dimension, so it acts as the identity in that representation. Any other `spin_system.bas.formalism` raises an error.

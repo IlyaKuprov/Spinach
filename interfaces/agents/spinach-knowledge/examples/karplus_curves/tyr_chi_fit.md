@@ -1,15 +1,11 @@
 # examples/karplus_curves/tyr_chi_fit.m
 
-- Signature: `tyr_chi_fit()`
+## Purpose and callable context
 
-## Purpose
+The no-argument MATLAB entry point `tyr_chi_fit()` fits Karplus coefficients for a DFT dihedral-angle scan over one tyrosine chi angle. The source comments identify Gaussian09 as the calculation package used for the scan. It calls `karplus_fit('.\tyr_chi_data',{[15 14 11 12]})`: the relative data directory is `tyr_chi_data` and the four atom indices define the fitted torsion. Running the wrapper therefore depends on the `karplus_fit` helper and that dataset being available in the execution context.
 
-Fits Karplus coefficients to the DFT dihedral-angle scan for a tyrosine chi angle, using Gaussian09-derived data. The script calls `karplus_fit('.\tyr_chi_data',{[15 14 11 12]})` and displays fitted `A`, `B`, and `C` coefficients with their standard deviations.
+## Method and output
 
-## Physical / mathematical content
+The helper returns `A`, `B`, `C` and their reported standard deviations `sA`, `sB`, `sC`; the wrapper prints those six values. The source does not state the fit equation or the units, and contains no fitted numerical results. It makes no plot.
 
-A Karplus fit relates torsion angle to scalar coupling; this example extracts the three coefficients and their uncertainties from the supplied scan data.
-
-## Implementation structure
-
-Calls `karplus_fit` for the `tyr_chi_data` dataset and atom quartet `[15 14 11 12]`, then prints each coefficient and standard deviation.
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/karplus_curves/tyr_chi_fit.m)

@@ -1,22 +1,17 @@
 # examples/quantum_tech/diamond_defects/diamond_ninter_epr_xw.m
 
-- Signature: `diamond_ninter_epr_xw()`
+[Source MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/diamond_defects/diamond_ninter_epr_xw.m)
 
-## Purpose
+## Physical model
 
-Field-swept powder EPR spectra of a nitrogen interstitial defect in diamond at X and W bands. Calculation time: seconds.
+This is a conventional spin-Hamiltonian powder EPR simulation of the WAR9 nitrogen-interstitial centre in diamond. The example selects 15N, orientation 111, and the builder specifies one electron doublet (electron label `E`, S = 1/2) hyperfine-coupled to that nitrogen nucleus (I = 1/2). The WAR9 15N hyperfine principal values in `diamond_n_inter` are 8.30, 7.85, and 8.17 MHz, and its electron g tensor is anisotropic. The requested transition family is electron-spin EPR (`parameters.spins={'E'}`); the nuclear coupling contributes hyperfine structure.
 
-## Physical / mathematical content
+This source has no cavity mode or Jaynes–Cummings/Tavis–Cummings or vacuum-Rabi term, cavity coupling, detuning, drive-amplitude dynamics, or dissipation. Its microwave frequency specifies the EPR resonance condition in a field sweep, not a coherent cavity drive. It therefore does not simulate a cavity device or establish measured spectra or device fidelity.
 
-The model is the WAR9 nitrogen-interstitial centre in diamond, with `15N` and orientation `111`. The example calculates electron-spin powder EPR field sweeps at X and W bands.
+## Calculation and plotted quantity
 
-## Numerical / algorithmic content
+The calculation uses the full Zeeman Hilbert basis (`zeeman-hilb`, `approximation='none'`) and spherical grid `rep_2ang_100pts_sph`. The source sets `sys.magnet` to 1 T and calls `fieldsweep` at 9.755 GHz over 0.347–0.349 T and at 94 GHz over 3.351–3.355 T. Both sweeps use 1e-5 T FWHM, integration tolerance 0.1, transition-moment tolerance 0.1, RSPT order `Inf`, and 1024 field points. The plotted observable is the simulated EPR intensity (arbitrary units) versus each returned field axis, not a measured trace or a time-domain response. No explicit observable matrix is constructed in this example; the plotted arrays come from `fieldsweep`.
 
-The spin system is evaluated in the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`). Powder averaging uses `rep_2ang_100pts_sph`; each spectrum has 1024 field points and RSPT order `Inf`. The line width is `1e-5 T`, with integration and transition-moment tolerances both `0.1`.
+## Parameter provenance
 
-## Implementation structure
-
-- Set the WAR9 centre, `15N`, and orientation `111`; build the model using `diamond_n_inter`.
-- Set the magnet field to 1 T, form the Zeeman Hilbert basis, and run Spinach housekeeping.
-- Run X-band `fieldsweep` at 9.755 GHz over 0.347–0.349 T and W-band `fieldsweep` at 94 GHz over 3.351–3.355 T.
-- Plot both spectra against their returned field axes.
+The WAR9 magnetic parameters are attributed by `diamond_n_inter` to Felton et al., *J. Phys.: Condens. Matter* 21, 364212 (2009), [doi:10.1088/0953-8984/21/36/364212](https://doi.org/10.1088/0953-8984/21/36/364212).

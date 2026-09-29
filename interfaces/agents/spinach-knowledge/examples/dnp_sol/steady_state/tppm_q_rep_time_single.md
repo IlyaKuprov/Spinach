@@ -1,15 +1,17 @@
 # examples/dnp_sol/steady_state/tppm_q_rep_time_single.m
 
-- Signature: `tppm_q_rep_time_single()`
+- MATLAB implementation: [examples/dnp_sol/steady_state/tppm_q_rep_time_single.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/tppm_q_rep_time_single.m)
 
-## Purpose
+`tppm_q_rep_time_single()` takes no inputs. It asks how the steady-state proton longitudinal-polarisation expectation changes with TPPM DNP repetition time for one fixed electron–proton separation and one fixed microwave nutation frequency. This is the single-condition baseline among the four variants: it performs no distance or B1 ensemble averaging. The source header estimates seconds of calculation time.
 
-Calculates the steady-state proton polarisation produced by a two-spin trityl–proton model under TPPM microwave irradiation, scanning the pulse repetition interval and plotting the detected proton `Lz` expectation value.
+## Model and sequence
 
-## Physical and numerical model
+The source labels the model Q-band TPPM DNP. It sets `sys.magnet=1.2142` and spin temperature 80; no units are attached to those values in the source. The spins are `{'E','1H'}`; trityl g principal values are `[2.00319 2.00319 2.00258]`, and the proton Zeeman entry `[0 0 5]` is described as a ppm guess. Euler angles `[0 10 0]` and `[0 0 10]` are converted from degrees to radians. Coordinates fix the electron–proton separation at 3.5 Å along z. The basis is `sphten-liouv` with `approximation='none'`; propagator chopping is `1e-12`.
 
-The model uses an electron and a proton at a 1.2142 T Q-band field, with trityl principal g values [2.00319, 2.00319, 2.00258], an 80 K spin temperature, and a 3.5 Å electron–nuclear separation. The relaxation model uses T1/T2 rates, including a distance- and orientation-dependent proton rate from `r1n_dnp`; the equilibrium is set to `dibari`, and only diagonal relaxation terms are retained. The spin system is represented in the full spherical-tensor Liouville formalism (`sphten-liouv`, no basis approximation).
+Relaxation is set to `t1_t2`, with the nuclear R1 function handle calling `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`. The source also sets `inter.r1_rates={1e3 r1n_rate}`, `inter.r2_rates={200e3 50e3}`, diagonal relaxation retention, and `dibari` equilibrium; rate units are not specified in the file.
 
-## Experiment and output
+The sequence parameters are spins `{'E','1H'}`, orientation grid `rep_2ang_800pts_sph`, fixed electron nutation frequency 33 MHz, 16 ns pulse duration, 300 loops, second-pulse phase 120°, added shift −13 MHz, and electron offset +2 MHz. The 30-point repetition-time axis is logarithmic from `10^-5` to `10^-2.7` s; each shot spacing is `rep_time - 2*nloops*pulse_dur`.
 
-The experiment detects proton `Lz`, uses an 800-point two-angle powder grid, and evaluates 30 logarithmically spaced repetition times from 10 μs to about 2 ms. Each point is computed by `powder(...,@xixdnp_steady,...,'esr')` with the source's TPPM pulse settings (including 120° second-pulse phase, −13 MHz added shift, and +2 MHz electron offset). The plotted real proton expectation value is saved as `tppm_q_rep_time_single.fig`.
+## Calculation and output
+
+The proton detection operator is `state(spin_system,'Lz','1H')`. Each repetition-time point is evaluated with `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The script plots the real proton `Lz` expectation value against repetition time in ms and saves `tppm_q_rep_time_single.fig` in the current working directory. The function declares no output argument.

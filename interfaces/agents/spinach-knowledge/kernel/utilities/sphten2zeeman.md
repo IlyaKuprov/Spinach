@@ -1,31 +1,32 @@
 # kernel/utilities/sphten2zeeman.m
 
-- Signature: `P=sphten2zeeman(spin_system)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sphten2zeeman.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sphten2zeeman.m)
 
 ## Purpose
 
-Constructs a projector that converts state vectors from Spinach’s spherical-tensor basis to the Zeeman basis in Liouville space. For a state vector `rho_sphten`, the corresponding vector is `rho_zeeman = P * rho_sphten`.
+Returns a projector matrix `P` that converts state vectors written in the spherical tensor basis set used by Spinach into state vectors written in the Zeeman basis set in Liouville space, via `rho_zeeman = P * rho_sphten`.
 
-## Mathematical content
+## Behavior
 
-- For each source basis row, the function forms the Kronecker product of the corresponding per-spin irreducible spherical-tensor matrices, divides the resulting vectorized matrix by its 2-norm, and scales it by `sqrt(prod(spin_system.comp.mults))`. These factors account for the source and destination basis normalizations.
-- `P` is sparse, with `prod(spin_system.comp.mults.^2)` rows and one column per row of `spin_system.bas.basis`. It need not be square.
-- The input must use the `sphten-liouv` formalism.
+- The function first calls an internal consistency check (`grumble`) that errors with `'this function is only available for sphten-liouv formalism.'` unless `spin_system.bas.formalism` is `'sphten-liouv'`.
+- The projector is preallocated as a sparse matrix with `prod(spin_system.comp.mults.^2)` rows and `size(spin_system.bas.basis,1)` columns, initially with zero nonzeros, using `spalloc`.
+- The destination (Zeeman) basis is not normalized; a destination normalization factor `destin_norm = sqrt(prod(spin_system.comp.mults))` is computed once.
+- A `parfor` loop runs over the rows of `spin_system.bas.basis` (the source basis set). For each basis element:
+  - The state `rho` is built as a Kronecker product over all spins `k`, using the irreducible spherical tensors `irr_sph_ten(spin_system.comp.mults(k))` selected by the basis-set index `spin_system.bas.basis(n,k)+1`.
+  - The source basis is not normalized; a per-column source normalization `source_norm = norm(rho(:),2)` is computed.
+  - The column of the projector is written as `P(:,n) = destin_norm * rho(:) / source_norm`.
+- The projector need not be square and may be huge.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- `spin_system` — Spinach data structure using the `sphten-liouv` formalism and containing basis-set information.
+**Inputs**
 
-## Outputs
+- `spin_system` — main Spinach data structure using the `sphten-liouv` formalism and including basis set information.
 
-- `P` — projector matrix mapping spherical-tensor-basis state vectors to Zeeman-basis state vectors: `rho_zeeman = P * rho_sphten`. It may be large and need not be square.
+**Outputs**
 
-## Implementation structure
-
-- Preallocates a sparse projector with one column for each basis-set row.
-- Builds each column from the tensor product of per-spin spherical-tensor matrices, applies the normalization factors, and fills the columns in a `parfor` loop.
-- Rejects spin systems whose formalism is not `sphten-liouv`.
+- `P` — projector matrix used as `rho_zeeman = P * rho_sphten`.
 
 ## References
 
-- [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=sphten2zeeman.m)
+- Spinach Wiki: [sphten2zeeman.m](https://spindynamics.org/wiki/index.php?title=sphten2zeeman.m)

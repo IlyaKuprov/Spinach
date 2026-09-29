@@ -1,19 +1,19 @@
 # examples/giant_spin/triple_tb_eqmag_field.m
 
-- Signature: `triple_tb_eqmag_field()`
+- MATLAB implementation: [examples/giant_spin/triple_tb_eqmag_field.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/triple_tb_eqmag_field.m)
 
 ## Purpose
 
-Simulates the magnetic-field dependence of the equilibrium magnetisation of a triangular triple-Tb complex, corresponding to Figures S27 and S28 in the cited paper’s Supplementary Information (https://doi.org/10.1002/chem.201703842). Ligand-field parameters and the g-tensor for the J=6 ground term were computed with SINGLE_ANISO in MOLCAS. Calculation time: hours.
+The function `triple_tb_eqmag_field()` calculates the field dependence of the equilibrium magnetisation of a triangular three-terbium complex. The source associates the calculation with Figures S27 and S28 in the Supplementary Information of [the cited paper](https://doi.org/10.1002/chem.201703842). It says the J=6 ground-term ligand-field parameters and g-tensor were computed with SINGLE_ANISO in MOLCAS; estimated calculation time is hours.
 
-## Physical / mathematical content
+## Physical model and parameters
 
-The model contains three J=6 terbium centres with site-specific g-tensors and rank-2, -4 and -6 Stevens ligand-field coefficients. It includes spin–orbit corrections to dipolar couplings and equal pairwise exchange couplings of 0.003 cm⁻¹, converted to Hz using the Spinach NMR convention. The calculation evaluates equilibrium magnetisation at 2.0 K.
+The three giant-spin sites are entered as `E13` isotopes, each representing a J=6 Tb centre. Site g tensors are assembled as `g=U*diag(g_values)*U'`. The three eigenvalue triplets in the source are `[1.497075749,1.495252923,1.481370349]`, `[1.496540374,1.494559188,1.482686210]`, and `[1.497265940,1.494866241,1.481858735]`; the corresponding orientation matrices and coordinates are defined in the source. The source does not assign units to those tensor or coordinate entries.
 
-## Numerical / algorithmic content
+Equal pairwise scalar exchange couplings are set with `J=icm2hz(0.003)`; the stated conversion uses the Spinach NMR convention. `sys.enable={'sodd'}` enables the source-commented spin-orbit corrections to dipolar couplings. Site-specific Stevens coefficients of ranks 2, 4 and 6 are converted with `icm2hz`, converted to irreducible spherical tensors with `stev2sph`, and rotated with Wigner matrices before assignment to `inter.giant.coeff`. The source also defines site Euler data in `inter.giant.euler`.
 
-Each site’s Stevens coefficients are converted from cm⁻¹ to Hz, transformed into irreducible spherical tensors and rotated into the molecular frame. Using an unrestricted Zeeman–Hilbert basis and the `leb_2ang_rank_11` spherical powder grid, the script calls `eqmag` at fields of 0.01, 0.1–1.5 in 0.1 steps, and 2, 3, 4, 5 and 6 T. It records the Z component and plots it alongside experimental data.
+## Calculation and output
 
-## Implementation structure
+The basis is `zeeman-hilb` with `bas.approximation='none'`. At fixed `inter.temperature=2.0` K, the script evaluates `eqmag` over the field array `[0.01,0.1,0.2,...,1.5,2,3,4,5,6]`; the plot labels field in Tesla. For each field it creates the spin system and basis, takes `mag(3)` as the Z component, and plots magnetisation labelled in Bohr magnetons. The powder grid is `leb_2ang_rank_11`. The theory curve is overlaid with points loaded from `triple_tb_eqmag.mat` (`field` and `magn`).
 
-The function `triple_tb_eqmag_field()` defines three `E13` centres, their g-tensor eigenvalues and orientations, Tb coordinates, exchange couplings, and site-specific ligand-field coefficients. It supplies the transformed coefficients through `inter.giant.coeff`, creates a spin system at each field, computes `eqmag`, and loads `field` and `magn` from `triple_tb_eqmag.mat` for comparison.
+This is a script-defined calculation and plotting workflow, not a reported numerical result. The comparison requires the external MAT file; the source does not save a result file.

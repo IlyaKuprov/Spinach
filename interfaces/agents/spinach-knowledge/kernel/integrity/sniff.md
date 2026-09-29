@@ -1,27 +1,13 @@
 # kernel/integrity/sniff.m
 
-- Signature: `sniff(action)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/sniff.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=sniff.m)
 
-## Purpose
+`sniff(action)` compares current Spinach .m files with the fingerprint list made by [`rearm`](rearm.md). It is an integrity check, not a model of a physical system.
 
-Compares Spinach `.m` files with the integrity baseline recorded in `smells.mat` by `rearm`. It reports files whose names or contents no longer match that baseline.
+The scan covers .m files recursively below `kernel`, `interfaces`, `experiments`, and `etc`, using the same basename-plus-content fingerprint as `rearm`. A fingerprint absent from `smells` is printed as `smells fishy: <path>`; with action `'open'`, the file is also opened in the editor. If all scanned fingerprints are found, `sniff` prints comment-line and code-line counts and an all-clear message. Blank lines are excluded from those counts, and only lines whose first character is `%` are counted as comment lines. These counting filters are applied after fingerprinting, so comments and blank lines still affect the fingerprint.
 
-## Physical / mathematical content
+The saved values are tested by membership, not matched to paths. A changed file can be flagged, but an identical basename and content at another location can match; deleted files are not detected by scanning. `sniff` loads `smells.mat` by that bare filename and does not itself rebuild the baseline; call [`rearm`](rearm.md) to establish a new one.
 
-This is a source-integrity utility; it does not model a physical system.
+## Inputs and outputs
 
-## Numerical / algorithmic content
-
-For each included file, the routine hashes its filename and contents, then checks whether the resulting value is present in the saved `smells` list.
-
-## Parameters / inputs
-
-- `action` — `'none'` prints the names of flagged files; `'open'` opens them in the editor. The default is `'none'`.
-
-## Outputs
-
-No return value. Flagged files are reported as `smells fishy`; if all checks pass, the function prints the comment and code line counts and an all-clear message.
-
-## Implementation structure
-
-The function loads `smells.mat` and scans `.m` files under `kernel`, `interfaces`, `experiments`, and `etc`, applying the exception list. It ignores blank and comment lines when counting code and comment lines.
+`action` is an optional character input: omitted means `'none'`; the only accepted values are `'none'` and `'open'`. Other values raise an error. The function has no return value. Failure to load `smells.mat` is not caught by a source-level recovery guard.

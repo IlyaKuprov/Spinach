@@ -1,22 +1,23 @@
 # kernel/pulses/isergen.m
 
-- Signature: `H=isergen(HL,HM,HR,dt)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/isergen.m) · [Spin Dynamics Wiki: isergen.m](https://spindynamics.org/wiki/index.php?title=isergen.m)
 
-## Purpose
+Signature: `H=isergen(HL,HM,HR,dt)`
 
-Second- and fourth-order Iserles product quadrature generators for one time propagation step for a state-independent Hamiltonian.
+## Purpose and interval data
 
-## Numerical / algorithmic content
+Builds the effective generator for one time-propagation interval with a state-independent Hamiltonian. `HL` and `HR` are the Hamiltonians at the left and right edges; `HM` is optional and, when nonempty, is the midpoint Hamiltonian. `dt` is the interval duration in seconds. The output is used in `exp(-1i*H*dt)`.
 
-- If `HM` is empty, second-order product quadrature is used; otherwise, fourth-order product quadrature is used.
+## Quadrature choice and ordering
 
-## Parameters / inputs
+An empty `HM` selects the second-order product quadrature:
 
-- `HL` — Hamiltonian at the left edge of the interval.
-- `HM` — optional Hamiltonian at the interval midpoint; if empty, second-order quadrature is used.
-- `HR` — Hamiltonian at the right edge of the interval.
-- `dt` — interval duration, in seconds.
+`H=(HL+HR)/2 + (1i*dt/6)*(HL*HR-HR*HL)`
 
-## Outputs
+A supplied `HM` selects the fourth-order product quadrature:
 
-- `H` — effective evolution generator, to be used as `exp(-1i*H*dt)`.
+`H=(HL+4*HM+HR)/6 + (1i*dt/12)*(HL*HR-HR*HL)`
+
+The commutator correction is ordered as `HL*HR-HR*HL`; reversing its factors changes the expression. These are endpoint samples, plus a midpoint sample for the fourth-order option—not a waveform file or a sequence of pulse-amplitude samples. Any pulse amplitude or phase is represented through the supplied Hamiltonians; there are no separate pulse-control arguments. Plotting and file output are not handled here.
+
+The source checks that each supplied Hamiltonian is square and that `dt` is a real numeric scalar. It does not explicitly check that the Hamiltonian dimensions match one another.

@@ -1,22 +1,25 @@
 # kernel/conventions/transforms/euler_equiv.m
 
-- Signature: `answer=euler_equiv(eulers_a,eulers_b,tol)`
+**MATLAB source:** [kernel/conventions/transforms/euler_equiv.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/euler_equiv.m)
+**Spinach Wiki:** [euler_equiv.m](https://spindynamics.org/wiki/index.php?title=euler_equiv.m)
 
-## Purpose
+## Purpose and convention
 
-Tests whether two ZYZ active Euler-angle sets represent the same rotation to within an angular tolerance. Euler angles are not unique, so the function compares their rotations, not the angle triples themselves.
+Tests whether two ZYZ active Euler-angle triples represent rotations whose relative geodesic angle is no greater than a tolerance. Euler triples are not compared component-by-component because they are not unique; the matrices produced by [euler2dcm.m](euler2dcm.md) are compared instead. All angles and the tolerance are in radians.
 
-## Parameters / inputs
+## Inputs
 
-- `eulers_a`, `eulers_b`: real, finite three-element Euler-angle vectors `[alpha beta gamma]` in radians, using the ZYZ active convention.
-- `tol`: finite, non-negative scalar tolerance in radians.
+Signature: `answer=euler_equiv(eulers_a,eulers_b,tol)`
 
-## Output
+- `eulers_a` and `eulers_b`: numeric, real, finite three-element vectors `[alpha beta gamma]` in the ZYZ active convention. Row and column vectors are accepted; each is reshaped to a row internally.
+- `tol`: numeric, real, finite scalar with `tol >= 0`.
 
-- `answer`: true if the relative rotation angle is less than or equal to `tol`.
+## Comparison
 
-## Method
+Let `D_a=euler2dcm(eulers_a)` and `D_b=euler2dcm(eulers_b)`. The implementation forms `D_rel = D_b * D_a^T` and calculates:
 
-The function obtains direction-cosine matrices with `euler2dcm`, forms the relative rotation `dcm_b*dcm_a'`, and compares its geodesic angle on SO(3) to `tol`.
+- `s = norm([D_rel(3,2)-D_rel(2,3); D_rel(1,3)-D_rel(3,1); D_rel(2,1)-D_rel(1,2)], 2) / 2`
+- `c = (trace(D_rel)-1) / 2`, then clamps `c` to `[-1,1]`.
+- `theta = atan2(s,c)`.
 
-Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=euler_equiv.m)
+The scalar logical output is `answer = (theta <= tol)`. Thus equality at the requested tolerance returns true.

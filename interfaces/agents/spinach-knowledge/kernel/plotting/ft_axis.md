@@ -4,23 +4,21 @@
 
 ## Purpose
 
-Generates a row vector of frequency-axis ticks centred on `offset` over the range `sweep`, with spacing `sweep/npoints`.
+Returns a row vector of Fourier-frequency coordinates with spacing `sweep/npoints`. It is an axis-construction helper, not a Fourier transform.
 
-## Physical / mathematical content
+## Axis construction
 
-- The ticks span a frequency interval of width `sweep` around `offset`. For odd `npoints`, the first endpoint is dropped and the remaining ticks are shifted by half a spacing; for even `npoints`, the last endpoint is dropped.
+The code first forms `linspace(-sweep/2,sweep/2,npoints+1)`. For odd `npoints` it drops the first value, shifts the remaining values left by half a bin, and adds `offset`; for even `npoints` it drops the last value and adds `offset`. Thus odd point counts give bins symmetric about the offset; even counts include the lower edge `offset-sweep/2` and stop one bin below the upper periodic edge `offset+sweep/2`. The coordinate units are those supplied for `offset` and `sweep`.
 
-## Numerical / algorithmic content
+## Inputs and guards
 
-- The function starts with `npoints+1` equally spaced values over `[-sweep/2,sweep/2]`, applies the parity-dependent endpoint adjustment, then adds `offset`.
-- `offset` must be a real numeric scalar, `sweep` a positive real numeric scalar, and `npoints` a real numeric integer greater than 2.
+- `offset` - real numeric scalar centre frequency.
+- `sweep` - positive real numeric scalar frequency span.
+- `npoints` - real numeric integer greater than 2.
 
-## Parameters / inputs
+Invalid inputs raise an error. The output `ax` is a 1-by-`npoints` row vector.
 
-- offset -centre frequency
-- sweep -frequency range
-- npoints -number of points
+## Links
 
-## Outputs
-
-- ax -row vector of axis ticks
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/ft_axis.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ft_axis.m)

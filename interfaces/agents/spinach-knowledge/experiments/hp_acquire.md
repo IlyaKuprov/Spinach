@@ -1,47 +1,31 @@
 # experiments/hp_acquire.m
 
-- Signature: `fid=hp_acquire(spin_system,parameters,H,R,K)`
+- Signature: fid=hp_acquire(spin_system,parameters,H,R,K)
 
-## Purpose
+## Purpose and physical scope
 
-Standard pulse-acquire sequence with a hard pulse. The user supplies the pulse operator, pulse angle and initial condition. Echo detection is optional.
+Runs a user-specified hard-pulse/acquisition sequence. The source describes a standard pulse-acquire experiment; the function name does not establish that the initial state was produced by DNP or is hyperpolarized. Hyperfine couplings and relaxation affect the calculated signal only through the supplied system and context matrices. This is not an ESEEM or ENDOR experiment by itself.
 
-## Physical / mathematical content
+## Inputs and parameters
 
-The Liouvillian is assembled as `L=H+1i*R+1i*K`. The hard pulse acts on the initial state; when echo detection is requested, the sequence is `echo_time - pulse - echo_time - fid`.
+H, R and K are context-supplied Hamiltonian, relaxation and kinetics matrices with matching dimensions. The routine combines them as H+1i*R+1i*K.
 
-## Numerical / algorithmic content
+- parameters.sweep: acquisition sweep width in Hz.
+- parameters.npoints: positive integer number of FID samples.
+- parameters.rho0: initial state.
+- parameters.coil: detection state.
+- parameters.pulse_op: user-supplied pulse operator.
+- parameters.pulse_angle: hard-pulse rotation angle in radians.
+- parameters.decouple: required cell array of spin labels to decouple, or an empty cell array. The source example is {'15N','13C'}; decoupling is documented for sphten-liouv formalism.
+- parameters.echo_time: optional evolution interval for echo detection. The source comment does not state its unit.
+- parameters.echo_oper and parameters.echo_angle: echo pulse operator and angle, used when echo_time is supplied; angle is in radians.
 
-The function checks input consistency, projects the pulse operator using `kron(speye(parameters.spc_dim),parameters.pulse_op)`, and applies the pulse with `step`. If `parameters.echo_time` is supplied, it evolves for the echo time, projects and applies the echo pulse, then evolves for the echo time again. It then applies decoupling and records the coil observable using `evolution` with a sampling interval of `1/parameters.sweep` and `parameters.npoints-1` evolution steps.
+## Sequence and output
 
-## Parameters / inputs
+The function applies pulse_op to rho0 with step and pulse_angle. If echo_time is present, it evolves for that interval, applies echo_oper through a second step, and evolves for the same interval again. It then applies the requested decoupling and calls evolution in observable mode with parameters.coil. The acquisition interval is 1/sweep, with npoints-1 evolution intervals, so fid contains the acquired observable samples; only fid is returned, not a separate time axis.
 
-- `parameters.sweep` — sweep width, Hz; a positive real scalar.
-- `parameters.npoints` — number of points in the FID; a positive integer.
-- `parameters.rho0` — initial state.
-- `parameters.coil` — detection state.
-- `parameters.pulse_op` — pulse operator.
-- `parameters.pulse_angle` — pulse angle in radians; a real scalar.
-- `parameters.decouple` — spins to decouple, e.g. `{'15N','13C'}`; a cell array of isotope strings, or an empty cell array. Nonempty analytical decoupling is available only in the `sphten-liouv` formalism.
-- `parameters.echo_time` — optional positive real echo time for echo detection (`echo_time - pulse - echo_time - fid`).
-- `parameters.echo_oper` — optional pulse operator for echo detection; required when `parameters.echo_time` is supplied.
-- `parameters.echo_angle` — optional real pulse angle for echo detection; required when `parameters.echo_time` is supplied.
-- `H` — Hamiltonian matrix received from the context function.
-- `R` — relaxation superoperator received from the context function.
-- `K` — kinetics superoperator received from the context function.
+## Limits and interpretation
 
-`H`, `R` and `K` must be numeric matrices of the same size. If either echo pulse parameter is supplied, `parameters.echo_time` must also be supplied.
+This routine provides pulse, optional echo, decoupling, and FID propagation under the supplied H, R and K. It does not create a polarization mechanism, define a measured polarization level, or report a separate echo amplitude. The source gives no numerical pulse angle, sweep width, or echo-time example; the isotope labels above are the source's actual decoupling example.
 
-## Outputs
-
-- `fid` — free induction decay observed through the detection state specified in `parameters.coil`.
-
-## Implementation structure
-
-Input validation precedes Liouvillian construction, pulse application, optional echo evolution, decoupling and observable acquisition.
-
-## Authors and link
-
-- ilya.kuprov@weizmann.ac.il
-- ledwards@cbs.mpg.de
-- <https://spindynamics.org/wiki/index.php?title=hp_acquire.m>
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hp_acquire.m

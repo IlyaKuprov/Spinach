@@ -1,23 +1,16 @@
 # examples/optimal_control/state_transfer_coop.m
 
 - Signature: `state_transfer_coop()`
+- Source: [`examples/optimal_control/state_transfer_coop.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/state_transfer_coop.m)
 
 ## Purpose
 
-Optimise two pulses cooperatively for state-to-state transfer in a quadrupolar 14N spin at a fixed orientation and power level, so that their combined outcomes contain the target state without impurities. Calculation time: minutes.
+An optimal-control design for two pulses optimised cooperatively in a quadrupolar `14N` spin at a fixed orientation and power level. The stated design aim is for the combined outcomes to contain the target state without impurities; the source describes the calculation time as minutes. This is an objective, not a reported convergence result.
 
-## Physical / mathematical content
+## Spin model and state transfer
 
-- The initial state is the normalised 14N `T1,0` state; the target is the normalised `T2,0` state.
-- The drift Hamiltonian is assembled at orientation `[1 2 3]` and transformed to a rotating frame. The control operators are `Lx` and `Ly`.
-- The optimisation uses the cooperative GRAPE objective `grape_coop` with the limited-memory quasi-Newton method `lbfgs`.
+The example uses a glycine nitrogen quadrupole interaction constructed with `eeqq2nqi(1.18e6,0.53,1,[1 2 3])`, a `14N` Zeeman scalar of 32.4, and `sys.magnet=14.1`. It uses the full spherical-tensor Liouville-space basis with no approximation. The initial and target states are the individually normalised `T1,0` and `T2,0` states of `14N`. The drift is formed from the isotropic and orientation-dependent quadrupolar Hamiltonian contributions, then transformed to the nitrogen carrier frame.
 
-## Numerical / algorithmic content
+## Cooperative optimisation and diagnostics
 
-- The spin system has a 14.1 T field, a glycine 14N NQI coupling specified by `eeqq2nqi(1.18e6,0.53,1,[1.0 2.0 3.0])`, and a 14N chemical shift of 32.4. It uses the `sphten-liouv` formalism without basis approximation.
-- The controls use a power level of `2*pi*50e3`, 100 slices of duration `10e-8`, an initial amplitude profile of ones, a random `2`-by-`100` initial guess, and a limit of 100 optimisation iterations.
-
-## Implementation structure
-
-- Create the spin system and basis, prepare and normalise the initial and target states, and construct the drift and control operators.
-- Configure the cooperative optimisation, run `fmaxnewton` with `@grape_coop`, then print both final outcomes, their average, and the target state.
+The controls are `Lx` and `Ly`; the configured pulse has 100 slices of 10⁻⁷ s each (10 μs total), constant amplitude, and power level `2*pi*50e3`. The source supplies a random 2-by-100 initial guess, selects L-BFGS with a 100-iteration termination limit, and calls `fmaxnewton(spin_system,@grape_coop,guess)`. It requests coherence-order and phase-control plots. Finally, it prints the two final trajectory states, their average, and the target for comparison. The source contains no recorded numerical fidelity.

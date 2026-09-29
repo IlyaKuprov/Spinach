@@ -1,24 +1,18 @@
 # kernel/overloads/@ttclass/subsref.m
 
-- Signature: `answer=subsref(ttrain,reference)`
+## Signature
 
-## Purpose
+`answer=subsref(ttrain,reference)`
 
-Handle dot-property access, matrix-element extraction, and nested indexing for the tensor-train class.
+## Behaviour
 
-## Parameters / inputs
+A dot reference returns one of the stored properties `ncores`, `ntrains`, `sizes`, `ranks`, `coeff`, `cores`, or `tolerance`; an unlisted property or reference type errors. Parentheses indexing accepts exactly two subscripts, for the represented matrix's row and column. Each must be a scalar index; logical scalars are converted to numeric values. Indices must be real positive integers, no greater than `flintmax` or the corresponding matrix dimension. Vector, range, and other advanced indexing are not implemented.
 
-- `ttrain` — tensor train object.
-- `reference` — MATLAB subscript-reference structure.
+The row and column linear indices are separately expanded into per-core physical coordinates from the last mode back to the first, using the mode sizes. For each tensor-train component, the selected core slices are contracted along their bond indices from the last core towards the first; that scalar contraction is multiplied by the component's coefficient, and the component contributions are added. Thus a parenthesized matrix-element request returns a scalar, not a tensor-train object. A dot request returns the selected property, and any remaining reference levels are applied recursively to that result.
 
-## Outputs
+This accessor does not alter ranks, coefficients, or tolerance. It does not round or truncate the representation; it evaluates a single requested element. The method's row/column interpretation follows the tensor train's stored core order and its per-core row and column mode sizes.
 
-- `answer` — the requested property, matrix element, or result of nested indexing.
+## References
 
-## Implementation
-
-For dot references, the supported properties are `ncores`, `ntrains`, `sizes`, `ranks`, `coeff`, `cores`, and `tolerance`; other field names raise an error. Parenthesis references require exactly two scalar indices. Logical indices are converted to numeric values, then row and column indices are validated against the tensor dimensions and converted to core indices. For each train, the function contracts the selected entries through the cores, multiplies by that train's coefficient, and sums the contributions. Advanced indexing is not implemented. Additional reference levels are applied recursively to the result.
-
-## Source
-
-D. Savostyanov and I. Kuprov, [`ttclass/subsref.m`](https://spindynamics.org/wiki/index.php?title=ttclass/subsref.m).
+- [Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/subsref.m)
+- [Spin Dynamics Wiki: `ttclass/subsref.m`](https://spindynamics.org/wiki/index.php?title=ttclass/subsref.m)

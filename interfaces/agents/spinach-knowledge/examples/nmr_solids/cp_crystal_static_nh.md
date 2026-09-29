@@ -1,22 +1,24 @@
 # examples/nmr_solids/cp_crystal_static_nh.m
 
-- Signature: `cp_crystal_static_nh()`
+- Signature: cp_crystal_static_nh()
 
 ## Purpose
 
-Simulates a static, single-crystal ¹H–¹⁵N cross-polarisation experiment in the doubly rotating frame. The source estimates a calculation time of seconds.
+A simulated static single-crystal 1H-15N cross-polarisation (CP) contact curve in the doubly rotating frame. The source estimates a calculation time of seconds. This is a single specified crystal orientation, not a powder average.
 
-## Physical / mathematical content
+## Spin model and experiment
 
-The model is a two-spin ¹⁵N–¹H pair with zero isotropic shifts, a 1.05 Å internuclear separation, and temperature 298 K. One specified crystal orientation, `[pi/3 pi/4 pi/5]`, is used; this is not a powder average. The simulated observable is the ¹⁵N transverse signal during CP.
+The model contains one 15N and one 1H, with zero isotropic Zeeman shifts, coordinates [0, 0, 0] and [0, 0, 1.05] (the existing page identifies their separation as 1.05 angstrom), and temperature set to 298. The basis is sphten-liouv with no approximation. The example lists shifts and coordinates rather than explicit coupling tensors.
 
-## Numerical / algorithmic content
+There is no rotor or powder grid. The selected crystal orientation is [pi/3, pi/4, pi/5]. The example requests aniso_eq for 15N, detects the 15N Lx state, and applies 5e4 Hz (50 kHz) spin-lock nutation frequency on each channel. It propagates 100 steps of 1e-5 seconds each. The specified excitation operators are Hx on 1H and Ly on 15N; the spin-lock operators are Hy on 1H and Lx on 15N.
 
-The source uses the full `sphten-liouv` basis without approximation and calls `crystal` with `@cp_contact_hard`. It requests `aniso_eq` for the ¹⁵N spin, applies 50 kHz spin-lock fields on both spins, and propagates 100 time steps of 10 μs.
+The simulation calls crystal with the generic cp_contact_hard experiment function. That function uses the supplied ideal pi/2 excitation, spin-lock operators and powers, and time steps to compute the contact curve; it does not define the spin model or orientation. This example is CP, not HMQC, and has no DOR rotor scheme.
 
-## Implementation structure
+## Output and interpretation
 
-- Defines the two isotopes, isotropic shifts, coordinates, and temperature.
-- Builds the full basis and spin system.
-- Sets the two-channel RF operators, ¹⁵N coil state, initial equilibrium requirement, time steps, and crystal orientation.
-- Runs the single-crystal CP simulation and plots the real ¹⁵N signal versus time.
+The returned simulated signal is plotted as its real part against cumulative time in seconds, with the axis labelled as the 15N SX expectation value. It is not a measured spectrum or a validation result.
+
+## Source
+
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_crystal_static_nh.m
+https://github.com/IlyaKuprov/Spinach/blob/main/experiments/cp_contact_hard.m

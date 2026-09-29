@@ -1,15 +1,11 @@
 # examples/nmr_solids/mas_powder_csa_floquet.m
 
-- Signature: `mas_powder_csa_floquet()`
+Source: [examples/nmr_solids/mas_powder_csa_floquet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_csa_floquet.m)
 
-## Purpose
+## Model
 
-The source describes a powder MAS spectrum of a single anisotropically shielded proton, using a Floquet-based formalism. It estimates seconds.
+The header calls this a powder MAS spectrum of a single anisotropically shielded proton. The active system declaration instead contains two `1H` spins and two Zeeman eigenvalue triplets, `[-2 -2 4]-5` and `[-1 -3 4]+5`, with both Euler-angle triples set to `[0 0 0]`. The model field is 14.1 T. The script specifies these shielding tensors but no dipolar coupling, quadrupolar interaction, or RF pulse sequence; it also sets an empty decoupling list.
 
-## Physical and numerical content
+## Calculation and display
 
-The implementation sets a 14.1 T field and declares two `1H` spins, with separate shielding eigenvalue sets `[-2 -2 4]-5` and `[-1 -3 4]+5` and zero Euler angles. Thus, the header's “single” proton description does not match the two-spin system declaration. The MAS rate is 500 Hz about `[1 1 1]`; the Floquet grid is `leb_2ang_rank_17`, with maximum rank 17.
-
-## Implementation
-
-The function runs `floquet` with `@acquire`, applies exponential apodisation (6), zero-fills the 512-point FID to 4096 points, Fourier transforms, and plots the real spectrum. The sweep is 20 kHz, with zero offset and inverted ppm axis.
+The basis is `sphten-liouv` with no approximation and the `+1` projection. The MAS axis is `[1 1 1]` and the rotor rate is 500 Hz. The source selects the `leb_2ang_rank_17` grid and maximum rank 17, then calls `floquet(spin_system,@acquire,parameters,'nmr')`. Acquisition is on `1H` from an `L+` initial state with an `L+` receiver. The sweep is 20 kHz, with 512 acquired points, zero-filled to 4096, zero offset, ppm axis units, and inverted axis. Exponential apodisation uses parameter 6 before Fourier transformation; the plotted trace is the real spectrum. These are simulation and display settings, not an experimentally measured spectrum.

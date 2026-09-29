@@ -1,21 +1,25 @@
 # examples/fundamentals/quadratures/product_quadratures_1.m
 
-- Signature: `product_quadratures_1()`
+- MATLAB implementation: [examples/fundamentals/quadratures/product_quadratures_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/quadratures/product_quadratures_1.m)
 
 ## Purpose
 
-Tests the accuracy of Lie-group product quadratures as the time-grid spacing changes during an E1000B Veshtort–Griffin pulse.
+Compare product-quadrature propagation schemes as the time grid is refined for an E1000B Veshtort-Griffin pulse. The source calls this an accuracy test but defines no pass/fail threshold.
 
-## Physical / mathematical content
+## System and numerical question
 
-- The model contains 31 `1H` spins at 14.1 T, with Zeeman shifts linearly spaced from -4 to 4 and 10 Hz scalar couplings between adjacent spins. The basis is `sphten-liouv` with the IK-2 approximation, scalar-coupling connectivity, and proximity level 1.
-- The pulse lasts 10 ms. The initial density operator is `Lz` on `1H`, and the control operator is `Lx` on `1H`.
+The model contains 31 `1H` spins at 14.1 T. Their scalar Zeeman values are linearly spaced from -4 to 4; adjacent spins are coupled by 10 Hz. The basis uses `sphten-liouv`, the IK-2 approximation, scalar-coupling connectivity, and proximity level 1, followed by the NMR assumption. The initial state is proton `Lz`, and the control operator is proton `Lx`. The pulse duration is 0.01 s.
 
-## Numerical / algorithmic content
+The comparison asks how final-state error varies with grid density for left-point and midpoint propagation, a two-point product quadrature, and a three-point product quadrature.
 
-- A 2000-point, three-Hamiltonian-step calculation supplies the reference. The benchmark compares left-point, midpoint, two-point Lie-group, and three-point Lie-group propagation (LP, MP, LG-2, LG-4) at 100, 200, ..., 1000 grid points, recording relative state errors.
+## Method and checks
 
-## Implementation structure
+The reference pulse has 2,000 nominal grid points; the source generates 3,999 amplitude samples and applies them in three-sample `step` calls at stride two. The benchmark grid sizes are 100, 200, ..., 1,000 points. Left-point and midpoint methods use one amplitude sample per step; the midpoint uses the average of the adjacent endpoint amplitudes. The two-point and three-point methods pass two or three adjacent Hamiltonians to `step`, respectively.
 
-- Generates the E1000B pulse with `vg_pulse`, forms the reference, and runs the benchmark cases in a `parfor` loop. The figure shows pulse amplitude and relative error versus time-grid size on log-log axes.
-- The source estimates a runtime of seconds.
+For each method the plotted error is `norm(rho_ref - rho_method) / norm(rho_ref)`. The output figure shows the pulse amplitude and error versus grid-point count; error is plotted on a logarithmic scale. No numerical tolerance or pass/fail decision is implemented.
+
+## Output and limitations
+
+The source provides a comparative error plot, not a tabulated result or assertion that a particular method meets a tolerance. The reference is a finer calculation using the three-point propagation family, not an analytic solution. The source header estimates runtime as seconds; no runtime was measured for this note.
+
+[Source example](../../../../../../examples/fundamentals/quadratures/product_quadratures_1.m).

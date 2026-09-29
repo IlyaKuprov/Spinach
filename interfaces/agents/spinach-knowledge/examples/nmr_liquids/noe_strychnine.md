@@ -4,19 +4,18 @@
 
 ## Purpose
 
-Inversion-recovery NOE effect spectrum on strychnine, with the rightmost proton signal inverted and a pulse-acquire experiment performed after a 500 ms mixing time. Calculation time: minutes.
+An inversion-recovery NOE-effect spectrum calculation for the strychnine proton system. Spin 9 is inverted, allowed to relax for 500 ms, and the resulting difference from equilibrium is measured with pulse-acquire. The source estimates a calculation time of minutes.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-- The strychnine proton spin system is treated with scalar-coupling connectivity and Redfield relaxation. The relaxation parameters are the Di Bari equilibrium convention, 298 K, and a 200 ps correlation time.
-- The initial state is formed by inverting spin 9 relative to thermal equilibrium. After 500 ms of relaxation evolution, the unperturbed equilibrium state is subtracted before acquisition, isolating the NOE difference signal.
+The example obtains the system from `strychnine({'1H'})`, sets `sys.magnet=14.1`, and disables Krylov propagation. It uses the spherical-tensor Liouville formalism, the IK-2 approximation, scalar-coupling connectivity, proximity level 3, and a proximity cut-off of 4.0. Relaxation is Redfield; the equilibrium convention is `dibari`, retained terms are `kite`, temperature is set to 298, and `tau_c={200e-12}`.
 
-## Numerical / algorithmic content
+## Preparation, acquisition, and processing
 
-- Spinach uses the spherical-tensor Liouville basis with the IK-2 approximation, scalar-coupling connectivity, proximity level 3, and a 4.0 proximity cutoff; Krylov propagation is disabled.
-- A pulse-acquire calculation uses 8192 points, zero-filled to 65536, with a 6500 Hz sweep and 2800 Hz offset. The FID receives 6 Hz exponential apodisation before the Fourier transform.
+The code constructs the Redfield relaxation superoperator and thermal equilibrium state. It forms the inverted state as `rho_eq-2*Lz9*(Lz9'*rho_eq)/norm(Lz9)^2`, propagates it under `1i*R` for 0.5, then subtracts equilibrium to leave the perturbation.
 
-## Implementation structure
+Pulse-acquire observes `1H`: the initial state is the difference operator, the coil is `L+`, and a `Ly` pulse of angle `pi/2` is applied. Decoupling is empty. The source sets offset 2800, sweep 6500, 8192 points, zero-filling to 65536, ppm axis units, and an inverted axis. It runs `liquid(...,@hp_acquire,...,'nmr')`, applies exponential apodisation with parameter 6, Fourier-transforms and shifts the result, then plots the real spectrum.
 
-- Build the strychnine spin system and Redfield relaxation superoperator, calculate equilibrium, and construct the spin-9-inverted state.
-- Evolve for 0.5 s, subtract equilibrium, then run pulse-acquire with a proton coil and 90-degree `Ly` pulse. Invert the plotted frequency axis and display the real spectrum.
+## Source
+
+[examples/nmr_liquids/noe_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_strychnine.m)

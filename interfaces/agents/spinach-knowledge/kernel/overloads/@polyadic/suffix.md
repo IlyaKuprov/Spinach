@@ -1,31 +1,27 @@
 # kernel/overloads/@polyadic/suffix.m
 
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/suffix.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=polyadic/suffix.m)
+
 - Signature: `p=suffix(p,a)`
 
 ## Purpose
 
-Associates a suffix factor with a polyadic object. A scalar is multiplied into the final core of each term; a matrix factor is appended to the suffix chain after its dimensions are checked.
+Adds a right-boundary factor to a factorized polyadic representation. The operation edits its stored factors; it does not expand the represented matrix.
 
-## Physical / mathematical content
+## Representation and operator order
 
-A polyadic represents a sum of products of core matrices, with optional prefix and suffix factors. The suffix chain records right-side factors of that represented product; it may itself contain a polyadic.
+The polyadic stores buffered terms in the outer cell array `p.cores`; each term is a cell sequence of core matrices. Boundary factors are stored in ordered cell sequences `p.prefix` and `p.suffix`. The source documentation notes that a suffix may itself be a polyadic.
 
-## Numerical / algorithmic content
+For non-scalar `a`, the method appends `a` to `p.suffix`, so it remains a separate factor rather than being multiplied into the cores. A suffix acts on an argument before the polyadic does; appending a factor extends the right-boundary product chain. The compatibility check is `size(p,2) == size(a,1)`.
 
-Scalar factors are absorbed into every term's last core. A non-scalar factor is stored without expanding the polyadic, subject to the inner-dimension check.
+For scalar `a`, no suffix cell is added: the scalar eagerly left-multiplies the last core matrix in every buffered term, using `a * p.cores{n}{end}`. This branch has no separate dimension check.
 
-## Parameters / inputs
+## Inputs and output
 
-- p -polyadic object
-- a -suffix matrix
+- `p` must be a `polyadic` object; the method checks this before doing either branch.
+- `a` is classified by `isscalar(a)`. For a non-scalar, a row-dimension mismatch raises `matrix dimension mismatch.`; otherwise the factor is appended.
+- Returns the updated `p`. The method does not add a separate explicit check of `a`'s type.
 
-## Outputs
+## Materialization
 
-- p -polyadic object with the factor incorporated as a core scaling or suffix factor
-- Note: a suffix can be a polyadic itself.
-
-## Implementation structure
-
-- Checks that p is a polyadic.
-- For scalar a, left-multiplies the last core of each term by a.
-- Otherwise checks size(p,2) against size(a,1), then appends a to p.suffix.
+Scalar absorption eagerly scales each term's final stored core matrix. A non-scalar factor is retained in the suffix chain, so this overload does not form a dense polyadic matrix.

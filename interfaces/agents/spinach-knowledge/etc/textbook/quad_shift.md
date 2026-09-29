@@ -1,34 +1,34 @@
 # etc/textbook/quad_shift.m
 
-- Signature: `delta=quad_shift(Cq,eta,v0,S,m)`
+- MATLAB implementation: [etc/textbook/quad_shift.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/quad_shift.m)
+
+- Signature: delta = quad_shift(Cq,eta,v0,S,m)
 
 ## Purpose
 
-Evaluates the second-order quadrupolar shift of the powder-pattern centre of gravity for the `|S,m⟩ → |S,m−1⟩` NMR transition of a quadrupolar nucleus.
-
-## Expression
-
-The implementation uses Samoson's expression (Equation 3 in the cited paper):
-
-```matlab
-delta = -1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3) ...
-        *(S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2);
-```
-
-The result is in ppm. The source notes that this expression was checked against numerical calculations.
+Calculates the second-order quadrupolar shift of the powder-pattern centre of gravity for the NMR transition |S,m> to |S,m-1>.
 
 ## Inputs
 
-- `Cq` — quadrupolar coupling constant in Hz; real scalar.
-- `eta` — quadrupolar asymmetry parameter; real scalar.
-- `v0` — nuclear Larmor frequency in Hz; real scalar.
-- `S` — nuclear spin; integer or half-integer greater than 1/2.
-- `m` — magnetic quantum number for an existing `|S,m⟩ → |S,m−1⟩` transition.
+All five arguments are required; there are no defaults.
 
-## Output
+- Cq — real numeric scalar quadrupolar constant, in Hz.
+- eta — real numeric scalar quadrupolar asymmetry parameter. The code does not enforce a range.
+- v0 — real numeric scalar Larmor frequency, in Hz. The expression divides by v0, so use a nonzero frequency; the input check itself does not reject zero.
+- S — real numeric scalar integer or half-integer spin, strictly greater than 1/2.
+- m — real numeric scalar, integer or half-integer, satisfying 1-S <= m <= S. Although the error text describes an existing transition, the check does not require m to have the same integer/half-integer parity as S; ensure it is an actual spin-S projection for the intended physical transition.
 
-- `delta` — second-order quadrupolar shift in ppm.
+## Expression and output
 
-## Reference
+The implementation uses Samoson's Equation 3:
 
-Samoson, Equation 3: [original article](https://doi.org/10.1016/0009-2614(85)85414-2). See also the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=quad_shift.m).
+~~~matlab
+delta = -1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3) ...
+        *(S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2);
+~~~
+
+delta is the second-order shift in ppm. The source comment says this expression was checked against pure numerics; it does not specify the test setup.
+
+## Source
+
+Samoson, Equation 3, [Chemical Physics Letters (1985), DOI: 10.1016/0009-2614(85)85414-2](https://doi.org/10.1016/0009-2614(85)85414-2). [Spinach Wiki: quad_shift.m](https://spindynamics.org/wiki/index.php?title=quad_shift.m).

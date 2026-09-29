@@ -1,36 +1,23 @@
 # kernel/operators/hilb2liouv.m
 
 - Signature: `L=hilb2liouv(H,conv_type)`
+- DIRECT source: [kernel/operators/hilb2liouv.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/hilb2liouv.m)
+- Wiki: [hilb2liouv.m](https://spindynamics.org/wiki/index.php?title=hilb2liouv.m)
 
-## Purpose
+## Definition and ordering
 
-Converts a Hilbert-space operator into a Liouville-space superoperator or, for `statevec`, a column-stacked state vector.
+For a square `d`-by-`d` matrix `H`, the function builds a Liouville-space matrix from Kronecker products with the sparse identity `I=speye(size(H))`. Matrix operators are represented as column-stacked vectors, consistent with MATLAB `H(:)` ordering. In this convention `kron(I,H)` acts by left multiplication, `X -> H*X`, while `kron(transpose(H),I)` acts by right multiplication, `X -> X*H`. The source uses the non-conjugating `transpose(H)`.
 
-## Physical / mathematical content
+## Conversion choices
 
-The conversion type selects left multiplication, right multiplication, a commutator, an anticommutator, or direct vectorization of `H`.
+- `'left'` returns `kron(I,H)`: left action, `X -> H*X`.
+- `'right'` returns `kron(transpose(H),I)`: right action, `X -> X*H`.
+- `'comm'` returns `kron(I,H)-kron(transpose(H),I)`: `X -> H*X-X*H`.
+- `'acomm'` returns `kron(I,H)+kron(transpose(H),I)`: `X -> H*X+X*H`.
+- `'statevec'` returns `H(:)`, the column-stacked vector itself, rather than a `d^2`-by-`d^2` superoperator.
 
-## Numerical / algorithmic content
+For the four action choices and square `H`, `L` is `d^2`-by-`d^2`. The commutator and anticommutator branches contain only the stated difference or sum: there is no extra scalar such as `1i` or `hbar`, and no matrix exponential. They are direct superoperators, not time propagators.
 
-With `I=speye(size(H))`, the returned matrices are formed as follows:
+## Inputs and checks
 
-- `left`: `kron(I,H)`.
-- `right`: `kron(transpose(H),I)`.
-- `comm`: `kron(I,H)-kron(transpose(H),I)`.
-- `acomm`: `kron(I,H)+kron(transpose(H),I)`.
-- `statevec`: `H(:)`, using MATLAB column-major ordering.
-
-## Parameters / inputs
-
-- H - numeric Hilbert-space operator.
-- conv_type - character string selecting the conversion: `'left'`, `'right'`, `'comm'`, `'acomm'`, or `'statevec'`.
-
-## Outputs
-
-- L - resulting Liouville-space superoperator or column-stacked state vector.
-
-## Implementation structure
-
-1. Check that `H` is numeric and `conv_type` is a character string.
-2. Create the sparse identity with the dimensions of `H`.
-3. Apply the Kronecker-product formula for the selected conversion, or return `H(:)` for `statevec`. Unknown conversion strings raise an error.
+The source checks that `H` is numeric and `conv_type` is a character array; unrecognized conversion types raise an error. It does not explicitly check that `H` is square, although the matrix-action formulas above presume a square operator.

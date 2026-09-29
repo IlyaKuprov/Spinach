@@ -1,31 +1,34 @@
 # experiments/esr_dipolar/oopeseem.m
 
-- Signature: `fid=oopeseem(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_dipolar/oopeseem.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/oopeseem.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=oopeseem.m
 
-Out-of-phase ESEEM pulse sequence with the first pulse set to `pi/4` to probe two-electron correlations in the initial condition. The source comment gives the syntax as `fid=eseem(spin_system,parameters,H,R,K)`; the function declaration is `fid=oopeseem(spin_system,parameters,H,R,K)`.
+`fid=oopeseem(spin_system,parameters,H,R,K)`
 
-## Parameters / inputs
+## What it calculates
 
-- `parameters.npoints` — number of time points to be computed.
-- `parameters.timestep` — simulation time step, seconds.
+This routine simulates an ideal-pulse OOP-ESEEM echo and returns a time-domain signal. ESEEM-family modulation can carry nuclear-frequency information arising from electron–nuclear hyperfine coupling. ENDOR is a different experiment and is not implemented here; the source does not expand the acronym OOP or assign a numerical hyperfine coupling.
+
+The code evaluates the supplied spin system and state. It does not implement field sweeping, DNP/hyperpolarization, imaging, or measurement acquisition.
+
+## Inputs
+
+- `spin_system` — Spinach spin system; only `sphten-liouv` and `zeeman-liouv` formalisms are accepted.
+- `parameters.npoints` — number of computed points; the source checks for one element.
+- `parameters.timestep` — simulation time step in seconds; the source checks for one element.
 - `parameters.rho0` — initial state.
 - `parameters.coil` — detection state.
-- `parameters.screen` — optional screen state; must be the Hermitian conjugate of the detection state. Defaults to `[]` if absent.
-- `parameters.pulse_op` — pulse operator `A`; the pulse propagators are `exp(-i*A*pi)` and `exp(-i*A*pi/4)`.
-- `H` — Hamiltonian matrix, received from the context function.
-- `R` — relaxation superoperator, received from the context function.
-- `K` — kinetics superoperator, received from the context function.
+- `parameters.screen` — optional screen state, documented as the Hermitian conjugate of the detection state; defaults to `[]`.
+- `parameters.pulse_op` — caller-supplied pulse operator, dimension-matched to `H`.
+- `H`, `R`, `K` — dimension-matched numeric Hamiltonian, relaxation, and kinetics matrices. The function calls `sim2liouv` as needed, then forms `L=H+1i*R+1i*K`.
 
-## Outputs
+## Sequence and propagation
 
-- `fid` — OOP-ESEEM time trace.
+The supplied pulse operator is applied to `rho0` with a `pi/4` rotation. The state evolves with `timestep/2` for `npoints-1` steps in trajectory mode with `screen`; a `pi` rotation follows, then a second `timestep/2` evolution for `npoints-1` steps in refocus mode with `coil` as observable. Detection returns the transposed full projection `coil'*rho_stack` as `fid`. The source header describes the ideal pulse propagators as `exp(-i*A*pi/4)` and `exp(-i*A*pi)`.
 
-## Implementation structure
+## Output and scope
 
-The function calls `sim2liouv()`, checks input consistency, and forms `L=H+1i*R+1i*K`. It applies a `pi/4` pulse to `parameters.rho0`, evolves the state for a spin echo, applies a `pi` pulse, and evolves it again with refocusing. Detection uses `parameters.coil` to produce `fid`.
+`fid` is the time-domain OOP-ESEEM trace; the source does not return a separate time vector or name array axes. Its source-backed pulse-angle values are `pi/4` and `pi` radians; it supplies no concrete experimental parameter values or DOI.
 
-The sequence uses ideal pulses; the source comment says to replace them with `shaped_pulse_af()` to have soft pulses instead.
-
-[Source documentation](https://spindynamics.org/wiki/index.php?title=oopeseem.m)
+The source header shows `fid=eseem(...)` as its syntax example, whereas the declared function is `fid=oopeseem(...)`.

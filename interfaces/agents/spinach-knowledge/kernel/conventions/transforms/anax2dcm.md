@@ -1,35 +1,21 @@
 # kernel/conventions/transforms/anax2dcm.m
 
-- Signature: `dcm=anax2dcm(rot_axis,rot_angle)`
+- Signature: `dcm = anax2dcm(rot_axis,rot_angle)`
+- Source: [`kernel/conventions/transforms/anax2dcm.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/anax2dcm.m)
+- Existing Wiki page: [`anax2dcm.m`](https://spindynamics.org/wiki/index.php?title=anax2dcm.m)
 
-## Purpose
+## Contract
 
-Converts an angle and axis to a direction cosine matrix in the active convention used by `euler2dcm.m`. The angle is in radians, and the function normalizes the axis.
+This function converts an angle-axis rotation to the 3x3 direction-cosine matrix in Spinach's active convention, matching `euler2dcm`. The angle is in radians. The axis may be a row or column with three real components; the function normalizes it internally, and a zero axis is rejected.
 
-## Physical / mathematical content
+For unit axis `u` and angle `theta`, the source implements Rodrigues' rotation formula: `R = I + sin(theta)*[u]_x + (1-cos(theta))*(u*u' - I)`, where `[u]_x` is the cross-product matrix. Apply it to a column vector as `v = R*v`, or transform a 3x3 interaction tensor as `A = R*A*R'`. The matrix is orthogonal and represents an active coordinate rotation. MATLAB Aerospace Toolbox `quat2dcm` uses the transpose for the same rotation, as the source comment notes.
 
-The matrix applies an active rotation: `v=R*v` for a 3×1 vector and `A=R*A*R'` for a 3×3 interaction tensor. MATLAB Aerospace Toolbox's `quat2dcm()` returns the transpose of this matrix for the same rotation.
+## Inputs and output
 
-## Numerical / algorithmic content
+- `rot_axis`: real numeric three-element direction, row or column; it must be nonzero.
+- `rot_angle`: real numeric scalar in radians.
+- `dcm`: 3x3 direction-cosine matrix.
 
-The function normalizes the axis, then constructs the matrix as `eye(3) + sin(rot_angle)*K + (1-cos(rot_angle))*(rot_axis*rot_axis'-eye(3))`, where `K` is the skew-symmetric matrix formed from the axis components.
+## Source-supported examples
 
-## Parameters / inputs
-
-- rot_axis -cartesian direction vector given as
-- a row or column with three real ele-
-- ments
-- rot_angle -rotation angle in radians
-
-## Outputs
-
-- dcm -directional cosine matrix
-- Note: the resulting rotation matrix is to be used as follows:
-- v=R*v (for 3x1 vectors)
-- A=R*A*R' (for 3x3 interaction tensors)
-- Note: Matlab's Aerospace Toolbox quat2dcm() returns the
-- transpose of this matrix for the same rotation.
-
-## Implementation structure
-
-The function checks that both inputs are real and numeric, that `rot_axis` has three elements and is nonzero, and that `rot_angle` is scalar. It then normalizes the axis and computes the direction cosine matrix.
+A zero angle gives the identity matrix for any allowed nonzero axis. With `rot_axis = [0 0 1]` and `rot_angle = pi/2`, the active matrix maps the column vector `[1;0;0]` to `[0;1;0]`.

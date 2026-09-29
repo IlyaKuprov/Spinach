@@ -1,15 +1,15 @@
 # examples/optimal_control/bloch_siegert/yusuke_1h_14n_optimal_vs_cw_demo.m
 
-- Signature: `yusuke_1h_14n_optimal_vs_cw_demo()`
+> **Historical example — no longer shipped in current Spinach.** This page describes a deleted example only; do not try to run it or assume its source path exists in the current package.
 
-## Status
+- Historical function signature: yusuke_1h_14n_optimal_vs_cw_demo()
 
-Historical example: the MATLAB source was removed in commit `b4f03f29`. This note describes the source at its parent revision; the example is not available at the current source path and should not be treated as a runnable current demo.
+## Historical model and setup
 
-## Purpose and model
+The script set up a reduced two-spin model: one observed 1H and one controlled 14N. Its header describes the field as corresponding to 800 MHz 1H; the code sets sys.magnet=18.8 and a scalar-coupling entry of 1500. It treats the coupling as an effective reduced-model surrogate, not a literal solid-state Hamiltonian. Controls act on 14N, while the target is preservation of the 1H transverse operators.
 
-The deleted script is a reduced heteronuclear control demonstration inspired by the low-power, offset-tolerant (^{14}mathrm N)-decoupling work of Nehra, Agarwal, and Nishiyama. It represents one observed (^{1}mathrm H) spin coupled to one controlled (^{14}mathrm N) spin, with an effective scalar coupling of 1500 and an 18.8 T field (approximately 800 MHz (^{1}mathrm H)). The model uses an effective interaction rather than a full quadrupolar/MAS Hamiltonian; its source describes the quadrupolar/MAS response as compressed into an effective nitrogen-offset ensemble.
+The script seeded its random-number generator with 1. The phase-only control used a nominal 14N RF value of 20 kHz and 120 pulse elements of 10 μs each (1.2 ms total from those settings). Optimization used a square-fidelity objective and L-BFGS, with a maximum of 40 iterations and Bloch–Siegert correction enabled on the driven 14N channel. The training ensemble used seven offsets from −12 to +12 kHz and B1 scales 0.95, 1.00, and 1.05. The script initialized the phase sequence with a repeating four-phase pattern before calling its GRAPE phase optimizer.
 
-Only the (^{14}mathrm N) channel is controlled, while normalized transverse (^{1}mathrm H) states are the preservation targets. A phase-only waveform is optimized with GRAPE/`fmaxnewton` from an XY-type phase seed, with Bloch–Siegert correction enabled on the driven nitrogen channel. The 120 elements are 10 μs each (1.2 ms total), at a nominal 20 kHz RF field. The comparison is a constant-phase CW-like waveform with the same duration and power—not a separate optimized control. Training uses seven offsets from −12 to +12 kHz and three (B_1) scales (0.95, 1.00, 1.05); evaluation uses 61 offsets from −20 to +20 kHz and nine scales from 0.90 to 1.10.
+It compared the optimized phase waveform with a zero-phase, constant-amplitude CW-like baseline of the same duration and nominal RF value. Evaluation sampled 61 14N offsets from −20 to +20 kHz and nine B1 scales from 0.90 to 1.10, then formed offset/B1 profiles and training-ensemble scores. The script is written to plot these evaluations and print mean and minimum training fidelities for each waveform; no numerical scores or successful-run claim are asserted here.
 
-The source plots the phase cycle, offset- and (B_1)-averaged proton-preservation fidelities, and offset/(B_1) maps; it also prints training-ensemble mean and worst-case fidelities for the two waveforms. Those are outputs the script is designed to calculate, not results asserted by this note. The source names Nehra, Agarwal, and Nishiyama but gives no complete bibliographic reference; no missing citation details are invented.
+The source describes the example as inspired by offset-tolerant 14N decoupling work by Nehra, Agarwal, and Nishiyama, but gives no complete bibliographic reference or DOI; none is inferred here.

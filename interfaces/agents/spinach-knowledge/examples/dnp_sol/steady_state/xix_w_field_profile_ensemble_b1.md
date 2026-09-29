@@ -1,25 +1,17 @@
 # examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_b1.m
 
-- Signature: `xix_w_field_profile_ensemble_b1()`
+- MATLAB implementation: [examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_b1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_b1.m)
 
 ## Purpose
 
-Simulation of XiX DNP field profile in the steady state with electron Rabi frequency ensemble averaging. Calculation time: minutes.
+Run the no-argument MATLAB function `xix_w_field_profile_ensemble_b1()` with Spinach and its example helpers available; it computes a steady-state XiX DNP field profile averaged over an electron nutation-frequency (B1) ensemble. The source labels the magnet setting W-band and assigns `sys.magnet=3.4`; its stated calculation-time estimate is minutes.
 
-## Physical / mathematical content
+## Model and scan
 
-- Models an electron–proton pair at a 3.4 T W-band field and 80 K. The electron has a trityl g-tensor, the proton a specified chemical shift, and their Cartesian coordinates place them 3.5 distance units apart. Relaxation includes a distance- and orientation-dependent proton longitudinal rate supplied by `r1n_dnp`.
-- Calculates the steady-state proton `Lz` expectation value across microwave offsets from −300 to 300 MHz for a ten-block XiX sequence with an inverted-phase second pulse.
+The two-spin model uses isotopes E and 1H, the trityl g-tensor [2.00319 2.00319 2.00258], proton shift [0 0 5] (the source labels the proton value a ppm guess), Euler angles [0 10 0] and [0 0 10] degrees, and spin-temperature value 80. Coordinates place the electron and proton at z = 0 and 3.500; this source does not state a unit for that coordinate separation. Orientation- and distance-dependent proton longitudinal relaxation uses `r1n_dnp` with additional parameters `2.00230`, `1e-3`, and `52`; rates are set as `r1_rates={1e3 r1n_rate}` and `r2_rates={200e3 50e3}` within the `t1_t2` relaxation model; the basis uses `sphten-liouv` without approximation and a `1e-12` propagator chop tolerance.
 
-## Numerical / algorithmic content
+A five-point Gauss–Legendre quadrature uses the B1 interval 10e6–20e6 Hz. At each point, the driver sets the electron nutation frequency and calls `powder(spin_system,@xixdnp_steady,parameters,'esr')` on 201 equally spaced microwave offsets from −300e6 to 300e6 Hz. The pulse train has 18 ns pulses, 10 XiX blocks, an inverted second-pulse phase ( `pi` ), shot spacing 167e−6, and additional shift −33e6; the orientation grid is `rep_2ang_800pts_sph`. The five offset profiles are combined using the Gauss–Legendre weights `wb1` and normalized by their sum. This is a B1 average only, not a distance ensemble.
 
-- Uses a full spherical-tensor Liouville-space basis, a spherical powder grid, and `xixdnp_steady` for the steady-state calculation. Five Gauss–Legendre points span electron nutation frequencies of 10–20 MHz; the resulting powder profiles are averaged with their quadrature weights.
-- Plots the real, ensemble-averaged proton signal against microwave resonance offset and saves the figure as `xix_w_field_profile_ensemble_b1.fig`.
+## Output and dependencies
 
-## Implementation structure
-
-- Set the W-band magnet field and electron–proton isotopes.
-- Specify Zeeman interactions, temperature, Cartesian coordinates, and electron–nuclear distance.
-- Configure relaxation rates, equilibrium, the basis set, and propagator tolerance; create the Spinach spin system.
-- Define proton detection, the B1 quadrature points, and XiX experiment parameters.
-- Run the steady-state powder calculation for each B1 value, average the profiles, plot the result, and save the figure.
+The real part of the averaged DNP values is plotted as the proton `Lz` expectation value against microwave offset in MHz and saved to `xix_w_field_profile_ensemble_b1.fig`. In addition to Spinach's system, basis, detection, and powder routines, the driver calls `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. Its output is a figure; the source does not save a separate numeric result file.

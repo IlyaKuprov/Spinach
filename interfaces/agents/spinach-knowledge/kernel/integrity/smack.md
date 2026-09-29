@@ -1,27 +1,11 @@
 # kernel/integrity/smack.m
 
-- Signature: `smack()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/smack.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=smack.m)
 
-## Purpose
+`smack()` is a MATLAB environment-recovery utility for problems involving MATLAB Distributed Computing Server (MDCS), not a spin-dynamics calculation. Its source comment says to use it from the command line; the function does not enforce that restriction.
 
-Resets Matlab state after problems with MDCS (Matlab Distributed Computing Server). This function is intended for use from the command line only.
+The function deletes the current parallel pool, deletes jobs belonging to the `Processes` cluster, closes all open MATLAB file handles, clears the workspace, and resets each device counted by `gpuDeviceCount`. These are broad session side effects, not a selective cleanup of a particular job or GPU.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-This is a Matlab environment-recovery utility; it does not perform a physical calculation.
-
-## Numerical / algorithmic content
-
-No numerical calculation is performed. The function deletes the current parallel pool and jobs on the `Processes` cluster, closes open file handles, clears the workspace, and resets available GPUs.
-
-## Parameters / inputs
-
-None.
-
-## Outputs
-
-No return value. Matlab state is cleared and any available GPU devices are reset.
-
-## Implementation structure
-
-The function deletes `gcp('nocreate')`, deletes jobs from `parcluster('Processes')`, calls `fclose('all')` and `clear('all')`, then resets each device returned by `gpuDeviceCount`.
+No inputs or return value. There is no source-level validation or recovery guard around the cleanup operations. Use only when those whole-session effects are intended.

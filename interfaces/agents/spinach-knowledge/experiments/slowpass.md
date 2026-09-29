@@ -1,29 +1,26 @@
 # experiments/slowpass.m
 
+- MATLAB source: [experiments/slowpass.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/slowpass.m)
 - Signature: `spectrum=slowpass(spin_system,parameters,H,R,K)`
 
-## Purpose
+## What the routine computes
 
-Calculates spectrum values at the frequency positions specified by `parameters.sweep`, without first calculating the complete free induction decay.
+`slowpass` evaluates the response at specified frequency points directly from the Liouvillian resolvent; it does not first calculate a complete FID and Fourier-transform it. The caller supplies the starting state in `parameters.rho0`, the detection state in `parameters.coil`, and the dynamics through `H`, `R`, and `K`.
 
-## Numerical / algorithmic content
+The routine moves the inputs to the adjoint representation when needed, forms `L=H+1i*R+1i*K`, and obtains subspaces selected for the coil. In each subspace it projects the initial state, coil, and Liouvillian, then evaluates and sums the coil response at each frequency `omega` by solving the shifted Liouvillian system with right-hand side `rho0_subs` and pairing the result with `coil_subs`.
 
-The routine constructs a frequency grid, projects the initial state, detection state, and Liouvillian into each selected subspace, and solves a linear system at each frequency. Depending on the configured execution path it uses backslash or preconditioned GMRES; a GPU backslash path is also provided. The accumulated spectrum is scaled by the sampling rate implied by the frequency grid to match the unnormalised FFT amplitude convention. The relaxation matrix `R` must not be thermalised.
+## Frequency and output axes
 
-## Parameters / inputs
+- `parameters.sweep` is a two-element frequency interval in Hz.
+- `parameters.npoints` sets the number of points. The code forms `2*pi*linspace(sweep(1),sweep(2),npoints)'`, so the interval is converted to angular frequency for the resolvent.
+- The returned `spectrum` is a complex column vector with `npoints` entries, one per equally spaced requested frequency. No time axis or FID is returned.
 
-- `parameters.sweep` — two-element vector giving the spectrum frequency extents, Hz
-- `parameters.npoints` — number of points in the spectrum
-- `parameters.rho0` — initial state
-- `parameters.coil` — detection state
-- `H` — Hamiltonian matrix, received from the context function
-- `R` — relaxation superoperator, received from the context function; it must not be thermalised
-- `K` — kinetics superoperator, received from the context function
+## Inputs and relaxation condition
 
-## Outputs
+- Required state inputs are `parameters.rho0` and `parameters.coil`; `H`, `R`, and `K` are matrices supplied by the context function.
+- Relaxation must be present in the dynamics for the source's linear-system calculation, and `R` must not be thermalised. This is a stated input condition, not a report of a run or a measured convergence result.
 
-- `spectrum` — spectrum of the system for the specified starting state and detection state over the requested frequency interval
+## References
 
-## Reference
-
-- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=slowpass.m)
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/slowpass.m)
+- [Spinach Wiki: slowpass.m](https://spindynamics.org/wiki/index.php?title=slowpass.m)

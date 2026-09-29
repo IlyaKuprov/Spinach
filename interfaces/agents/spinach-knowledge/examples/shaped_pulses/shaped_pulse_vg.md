@@ -4,20 +4,22 @@
 
 ## Purpose
 
-Apply a Veshtort-Griffin E1000B 90-degree selective pulse to a system of 31 proton spins with nearest-neighbor J couplings and linear coupling topology. Calculation time: seconds.
+Apply a Veshtort–Griffin E1000B 90-degree selective pulse to a 31-proton chain with nearest-neighbor couplings, and inspect the simulated spectrum under an explicit frequency offset.
 
-## Physical / mathematical content
+## Physical and numerical model
 
-- The magnetic field is 14.1; the 31 `1H` spins have scalar Zeeman shifts linearly spaced from -4 to 4, with nearest-neighbor scalar couplings of 10.
-- The pulse is applied with a 480 Hz frequency offset through `H+2*pi*480*Lz`, starting from an `Lz` state.
+The model has 31 proton spins (1H) at a 14.1 T field, scalar Zeeman values linearly spaced from -4 to 4, and scalar couplings of 10 between adjacent spins. It uses the `sphten-liouv` formalism, `IK-2` approximation, scalar-coupling connectivity and proximity level 1. The initial state is proton longitudinal (Lz) magnetization.
 
-## Numerical / algorithmic content
+The pulse duration is 10 ms, divided into 500 equal time intervals. The source obtains a 500-sample amplitude waveform from `vg_pulse('E1000B', 500, duration)`. It applies that waveform on the x control channel with a 480 Hz offset represented by adding `2*pi*480*Lz` to the Hamiltonian; propagation is requested with `expv-pwc`. The source describes this as a 90-degree selective pulse, but does not report a measured or independently validated excitation profile.
 
-- The basis uses `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level 1.
-- `vg_pulse('E1000B',500,duration)` generates amplitudes for a 0.01 s pulse on a 500-step time grid; `shaped_pulse_xy` propagates the state using `expv-pwc`.
-- Acquisition uses a 5000 Hz sweep and 2048 points. The FID receives exponential apodisation with parameter 6, followed by an FFT with 16384-point zero filling and `fftshift`.
+## Acquisition and observable
 
-## Implementation structure
+Liquid-state proton acquisition uses L+ as the coil operator, zero acquisition offset, a 5000 Hz sweep, 2048 points and 16384 zero-fill points. The FID is exponentially apodized with parameter 6 and Fourier transformed; the plotted observable is the imaginary part of the spectrum.
 
-- Create the spin system and basis, apply the `nmr` assumptions, and construct the Hamiltonian and `1H` control and offset operators.
-- Execute the shaped pulse, acquire the FID with `liquid` and `@acquire`, then plot the imaginary part of the spectrum in Hz.
+## Scope
+
+The frequency offset is part of the pulse Hamiltonian, not a gradient. The example does not specify a relaxation superoperator, gradient encoding, or experimental validation.
+
+The source comment gives a calculation time of seconds.
+
+Source: [examples/shaped_pulses/shaped_pulse_vg.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_vg.m)

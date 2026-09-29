@@ -1,21 +1,24 @@
 # examples/fundamentals/quadratures/grid_diagrams.m
 
-- Signature: `grid_diagrams()`
-
 ## Purpose
 
-Create six spherical-grid diagrams for a book, with each panel labelled by grid type and point count.
+This is a plotting example for a six-panel visual comparison of spherical-grid point patterns. It illustrates grid constructions and their displayed point counts; it does not measure integration accuracy.
 
-## Physical / mathematical content
+## Grid inputs and construction
 
-The function visualizes nodes on the unit sphere; it does not perform a quadrature-accuracy comparison. Cartesian plotting coordinates are formed from the spherical angles betas and gammas.
+The function creates a compact 2-by-3 tiled figure. Its panels use these source-defined inputs and labels:
 
-## Numerical / algorithmic content
+- Fibonacci sequence grid: `grid_fibon('fib',321)`, labelled 643 points.
+- Icosahedral subdivision: angles loaded from `icos_2ang_642pts.mat`, labelled 642 points.
+- Octahedral subdivision: `grid_trian('stoll',13)`, labelled 678 points.
+- Repulsion grid: `repulsion(620,3,200)`, labelled 620 points.
+- Igloo grid: `grid_igloo(23)`, labelled 616 points.
+- Lebedev grid: angles loaded from `leb_2ang_rank_41.mat`, labelled 590 points.
 
-The six displayed sets are a Fibonacci sequence grid (643 points), an icosahedral grid (642), an octahedral Stoll grid (678), a repulsion grid (620), an Igloo grid (616), and the rank-41 Lebedev grid (590).
+For the loaded icosahedral and Lebedev angles, the displayed unit-sphere coordinates are formed from beta and gamma as `(sin(beta)*cos(gamma), sin(beta)*sin(gamma), cos(beta))`. The helper routines and plotting functions generate or display the other point sets.
 
-## Implementation structure
+## Output and limitations
 
-- Create a compact 2-by-3 tiled figure.
-- Generate or load each named grid, map angular coordinates to Cartesian sphere coordinates where needed, and plot the points with grid_plot.
-- Add the grid labels and point counts shown in the panels.
+The output is a MATLAB figure with panels marked SEQ, ICO, OCT, OPT, NAT, and LEB and with the point-count text shown above. Those counts are labels supplied by this example; it does not independently verify them, load quadrature weights, or test a spherical integral. The MAT-file paths are relative to the example's expected working directory. The source gives no numerical quality result or citation.
+
+Source: [grid_diagrams.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/quadratures/grid_diagrams.m).

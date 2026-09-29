@@ -1,27 +1,23 @@
 # kernel/overloads/@polyadic/validate.m
 
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/validate.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=polyadic/validate.m)
+
 - Signature: `validate(p)`
 
 ## Purpose
 
-Checks the structure and factor dimensions of a polyadic object, raising an error when a representation invariant is not met.
+Checks selected structural and dimension invariants of a factorized polyadic; it does not construct or materialize the represented matrix and has no output argument.
 
-## Physical / mathematical content
+## Storage checks
 
-This is a representation validator, not a matrix operation: it checks that core terms, prefix factors, and suffix factors can form compatible matrix products.
+The outer `p.cores` array, `p.prefix`, and `p.suffix` must be cell arrays. Each buffered core term must itself be a cell array, and its entries must pass the numeric check. Prefix and suffix entries are also checked as numeric. For entries that pass those checks and are identified as `polyadic` objects, the implementation calls `validate` recursively.
 
-## Numerical / algorithmic content
+## Dimension checks
 
-Dimension totals for each core term are obtained by multiplying the row and column sizes of its stored core matrices. The routine also reports a warning when the number of core terms or boundary factors exceeds 100.
+For each core term, the validator multiplies the row counts of its core matrices and separately multiplies their column counts. Every buffered term must have the same resulting row and column totals. If present, the last prefix factor's number of columns must equal the core row total; the first suffix factor's number of rows must equal the core column total. Consecutive factors within each prefix or suffix chain must also have matching inner dimensions. A failed type, cell-structure, or dimension check raises an error.
 
-## Parameters / inputs
+This verifies factor-chain compatibility without multiplying the factors. It does not return the inferred matrix dimensions.
 
-- p -a polyadic object
+## Warnings
 
-## Implementation structure
-
-- Requires p to be a polyadic and its top-level cores, prefix, and suffix fields to be cell arrays.
-- Checks that each core term is a cell array and that its entries and boundary factors are numeric; the implementation also calls validate recursively for entries identified as polyadic.
-- Checks that all buffered core terms have the same total row and column dimensions.
-- Checks that prefix-to-core, core-to-suffix, and successive prefix/suffix dimensions match.
-- Warns if the number of core terms, prefix factors, or suffix factors is greater than 100.
+The function prints a warning message if there are more than 100 buffered core terms, more than 100 prefix factors, or more than 100 suffix factors; these thresholds do not raise errors.

@@ -1,19 +1,13 @@
 # examples/imaging/gradient_echo_1d.m
 
-- Signature: `gradient_echo_1d()`
+A one-dimensional gradient-echo simulation with diffusion and flow; the source labels its calculation time as seconds and credits Ahmed Allami and Ilya Kuprov. [Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/gradient_echo_1d.m)
 
-## Purpose
+## Model and sequence
 
-Simulates a one-dimensional gradient echo in the presence of diffusion and flow. Calculation time: seconds. Ahmed Allami and Ilya Kuprov.
+The system contains one `1H` spin, `sys.magnet=5.9` and scalar chemical shift `1.0`. The source does not annotate units for those two values. It uses the `sphten-liouv` formalism with no basis approximation. The sequence calls `imaging(spin_system,@grad_echo,parameters)`: offset `0.0`, gradient amplitude `5e-6`, step duration `2e-4`, and 200 steps. No unit is attached to those gradient parameters in this example.
 
-## Physical / mathematical content
+The one-dimensional geometry is `dims=0.30` with 100 points and `{'period',3}` differentiation. The relaxation phantom and operator are empty. Initial and coil spatial phantoms are uniform ones, with `Lz` for the initial state and `L+` for detection. Flow is set to `u=ones(100,1)` and diffusion to `1e-6`; the source does not state units for the geometry, flow, or diffusion values.
 
-The example uses a single `1H` spin at a magnetic induction of 5.9 with a chemical shift of 1.0. It sets `parameters.dims=0.30`, `parameters.npts=100`, and `parameters.deriv={'period',3}`. Diffusion is set to `1e-6`, and the flow profile is one at every spatial point. The initial-state and detection phantoms are uniform across the sample, with `Lz` used for the initial spin state and `L+` for detection. The relaxation phantoms are empty.
+## Output and interpretation
 
-## Numerical / algorithmic content
-
-The spin system uses the `sphten-liouv` formalism with no basis approximation. The `grad_echo` sequence is run through `imaging` with a zero offset, gradient amplitude of `5e-6`, step duration of `2e-4`, and 200 gradient steps. The real part of the resulting echo is plotted against time in seconds, from minus to plus the gradient duration.
-
-## Implementation structure
-
-`gradient_echo_1d` creates the spin system and basis, sets the sequence and sample parameters, calls `imaging(spin_system,@grad_echo,parameters)`, and plots the echo intensity.
+The returned echo is plotted as its real part against a 401-point axis from `-0.04` to `+0.04` seconds (the range is calculated from the configured step duration and step count). The plot labels signal intensity in arbitrary units. The example does not define an RF-pulse amplitude or duration separately; avoid attributing either to this sequence from this file alone.

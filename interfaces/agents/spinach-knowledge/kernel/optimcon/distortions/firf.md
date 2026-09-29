@@ -1,25 +1,23 @@
 # kernel/optimcon/distortions/firf.m
 
-- Signature: `[w,J]=firf(w,ker)`
+- Signature: [w,J]=firf(w,ker)
+- MATLAB source: [firf.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/firf.m)
 
 ## Purpose
 
-Applies an FIR convolution filter to a Spinach optimal-control waveform. Each pair of rows represents the in-phase and quadrature components of one complex control channel. The distal end of the convolution is truncated to retain the input number of time samples.
+Applies a finite-impulse-response convolution filter to each complex control channel in a Spinach optimal-control waveform. The output keeps the input sample count by truncating the distal end of the convolution; leaving sufficient ring-down margin is the user's responsibility.
 
-## Parameters / inputs
+## Inputs and units
 
-- `w`: Real numeric waveform with one time slice per column and rows arranged `XYXY...` across control channels. The number of rows must be even.
-- `ker`: Nonempty numeric vector of FIR filter coefficients. Coefficients may be complex.
+- w is a real numeric waveform. Columns are time samples; rows are arranged XYXY..., pairing each channel's in-phase X and quadrature Y components. The number of rows must be even.
+- ker is a nonempty numeric vector of FIR coefficients. The implementation accepts complex coefficients as well as real ones. Coefficients multiply waveform samples; no separate coefficient units are specified by the function.
 
-## Outputs
+## Output and derivative
 
-- `w`: Filtered waveform with the same dimensions as the input. Leaving sufficient ring-down margin is the user's responsibility.
-- `J`: When requested, the sparse Jacobian with respect to vectorisations of the output and input arrays.
+For each channel the paired rows are combined as z=X+iY, filtered by a Toeplitz convolution matrix, then split back into real and imaginary rows. The matrix is lower-triangular in its causal sample ordering. If ker has fewer entries than the waveform has time samples, it is zero-padded to that length; if it has more, only the first number-of-samples entries are used. The returned w has the same dimensions as the input.
 
-## Numerical / algorithmic content
+The optional J is a sparse Jacobian of the vectorised output with respect to the vectorised input. It represents the real-coordinate derivative of the complex linear filter, including the X/Y cross terms when the filter coefficients are complex. No adjoint is returned.
 
-The function constructs a sparse Toeplitz convolution matrix, using the available coefficients up to the waveform length. For each channel, it combines the paired rows into a complex signal, applies the filter, and writes the real and imaginary parts back to the corresponding rows. When requested, it assembles the Jacobian from the real and imaginary parts of the convolution matrix.
+## References
 
-## Reference
-
-- <https://spindynamics.org/wiki/index.php?title=firf.m>
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=firf.m

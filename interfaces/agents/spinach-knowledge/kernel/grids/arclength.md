@@ -4,19 +4,19 @@
 
 ## Purpose
 
-Returns the arc length between two points on the unit sphere represented by unit vectors.
+Returns the central angular distance between two directions on the unit sphere. For a unit sphere, this angle is also the great-circle arc length in sphere-radius units.
 
-## Physical / mathematical content
+## Rule and units
 
-- The function returns the angular distance in radians, computed as `atan2(norm(cross(r1,r2)),dot(r1,r2))`.
-- Inputs must be real numeric three-element vectors whose Euclidean norms differ from one by no more than `sqrt(eps)`; the vectors are then normalized before the angle is evaluated.
+After normalizing each input, the routine evaluates `atan2(norm(cross(r1,r2)),dot(r1,r2))`. This gives the shorter central angle from zero to pi radians using the cross-product magnitude and dot product. The scalar result `sig` is in radians; the function does not calculate a weighted grid or a physical length for a sphere with a different radius.
 
 ## Parameters / inputs
 
-- `r1`, `r2` — three-element unit vectors giving the Cartesian coordinates of the arc endpoints.
+- `r1`, `r2` — real numeric three-element vectors giving Cartesian endpoint directions. Each supplied vector must have a Euclidean norm within `sqrt(eps)` of one; after this check, the function normalizes the vectors and uses column form internally.
 
-## Outputs
+## Output
 
-- `sig` — arc length in radians.
+- `sig` — scalar angular distance in radians.
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/arclength.m)
 <https://spindynamics.org/wiki/index.php?title=arclength.m>

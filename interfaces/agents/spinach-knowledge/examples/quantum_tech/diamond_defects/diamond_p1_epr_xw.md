@@ -1,22 +1,17 @@
 # examples/quantum_tech/diamond_defects/diamond_p1_epr_xw.m
 
+[Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/diamond_defects/diamond_p1_epr_xw.m) · [P1 spin-system builder](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_p1.m)
+
 - Signature: `diamond_p1_epr_xw()`
 
-## Purpose
+## Model
 
-Field-swept powder EPR spectra of a P1 centre in diamond at X and W bands. Calculation time: seconds.
+This example calculates field-swept powder EPR spectra for the diamond P1 centre, a substitutional nitrogen electron-spin defect. It calls `diamond_p1` with `nitrogen='14N'` and the [111] orientation. The model contains an electron spin S = 1/2 and the selected ¹⁴N nucleus (I = 1); the builder supplies the anisotropic electron g tensor, electron-nuclear hyperfine tensor and the ¹⁴N quadrupolar interaction. For this isotope, the helper gives principal g values 2.00220, 2.00220 and 2.00218, hyperfine components 81.3, 81.3 and 114.0 MHz, and a quadrupolar parameter of −3.97 MHz. The spin-system parameters cite Nir-Arad et al., *Phys. Chem. Chem. Phys.* 26, 27633 (2024), [doi:10.1039/d4cp03055a](https://doi.org/10.1039/d4cp03055a), and Smith et al., *Phys. Rev.* 115, 1546 (1959), [doi:10.1103/PhysRev.115.1546](https://doi.org/10.1103/PhysRev.115.1546).
 
-## Physical / mathematical content
+The example uses the exact Zeeman-Hilbert-space basis (`zeeman-hilb`, no approximation) and asks the EPR field-sweep routine for electron transitions with `parameters.spins={'E'}`. That selects the electron-spin transitions; the nitrogen coupling shapes their hyperfine structure rather than being selected as an independent EPR-active spin.
 
-The example builds the P1 centre with orientation `111` and `14N`, then calculates electron-spin powder EPR spectra at X and W bands.
+## Field-swept spectra
 
-## Numerical / algorithmic content
+The powder average uses `rep_2ang_100pts_sph`. The X-band calculation uses 9.5 GHz microwave frequency and scans 0.330–0.350 T with 1,024 field points. The W-band calculation uses 94 GHz and scans 3.348–3.360 T, reusing the same point count. The two plotted traces are simulated intensity in arbitrary units versus magnetic field in tesla. They are model spectra, not measured defect data.
 
-Spinach uses the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`) with powder averaging on `rep_2ang_100pts_sph`. The field sweeps have 1024 points and RSPT order `Inf`; the line width is `1e-4 T`, integration tolerance is `1.0`, and transition-moment tolerance is `0.1`.
-
-## Implementation structure
-
-- Set the P1 orientation and nitrogen isotope, then build the model with `diamond_p1`.
-- Set the magnet field to 1 T, construct the Zeeman Hilbert basis, and run Spinach housekeeping.
-- Run X-band `fieldsweep` at 9.5 GHz over 0.33–0.35 T and W-band `fieldsweep` at 94 GHz over 3.348–3.36 T.
-- Plot both spectra against their returned magnetic-field axes.
+The example sets `fwhm=1e-4`, but does not annotate that input's unit; it is therefore not converted here. No measured spectrum, runtime benchmark, or convergence study is reported.

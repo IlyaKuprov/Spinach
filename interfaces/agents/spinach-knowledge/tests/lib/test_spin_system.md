@@ -1,21 +1,38 @@
 # tests/lib/test_spin_system.m
 
-- Signature: `spin_system=test_spin_system(sys,inter,bas)`
-
 ## Purpose
 
-Builds a Spinach spin system and basis with the quiet settings used by regression tests.
+Builds a small quiet Spinach spin system for tests.
 
-## Parameters / inputs
+## Behavior
 
-- `sys` - Spinach system specification.
-- `inter` - Spinach interaction specification.
-- `bas` - Spinach basis specification.
+The function applies quiet settings used by regression tests before constructing the spin system:
 
-## Outputs
+- Sets `sys.output` to `'hush'`.
+- Appends `'hygiene'` to `sys.disable` if that field already exists (using `unique` on the concatenated cell array), otherwise initializes `sys.disable` to `{'hygiene'}`.
+- Sets `sys.parallel` to `{'local',1}`.
+- Sets `sys.parprops` to `{}`.
 
-- `spin_system` - Spinach spin-system object with the requested basis.
+It then builds the Spinach object with `create(sys,inter)` and the basis with `basis(spin_system,bas)`, returning the resulting spin system object.
 
-## Implementation structure
+## Inputs and outputs
 
-- Sets `sys.output='hush'`, adds `hygiene` to `sys.disable` without duplicates, sets `sys.parallel={'local',1}` and `sys.parprops={}`, then calls `create(sys,inter)` and `basis(spin_system,bas)`.
+Syntax:
+
+```
+spin_system=test_spin_system(sys,inter,bas)
+```
+
+Inputs:
+
+- `sys` — Spinach system specification.
+- `inter` — Spinach interaction specification.
+- `bas` — Spinach basis specification.
+
+Output:
+
+- `spin_system` — Spinach spin system object.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_spin_system.m)

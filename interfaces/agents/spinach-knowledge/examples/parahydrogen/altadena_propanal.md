@@ -1,24 +1,16 @@
 # examples/parahydrogen/altadena_propanal.m
 
-- Signature: `altadena_propanal()`
+- Signature: altadena_propanal()
+- Source: [examples/parahydrogen/altadena_propanal.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/parahydrogen/altadena_propanal.m)
 
-## Purpose
+## Model and assumptions
 
-Simulates the ALTADENA experiment for the parahydrogenation of acrolein into propanal. The simple ALTADENA model assumes perfectly adiabatic transfer and ignores isotropic mixing at low field. Note the small flip angle. Calculation time: seconds.
+This is a Spinach simulation of ALTADENA polarization following parahydrogenation of acrolein to propanal. Para-hydrogen carries correlated proton-pair spin order into the product; under the idealized ALTADENA picture, adiabatic transport from the low-field reaction region to the high-field detection region converts that order into observable product polarization. The script represents the product spin system and its chosen initial density operator; it does not simulate the chemical addition, a field ramp, or a measured enhancement. Its header explicitly assumes perfectly adiabatic transfer and omits isotropic mixing at low field, so the plotted signal is conditional on those simplifications.
 
-## Physical / mathematical content
+The model has six spin-1/2 protons at 7.05 T and uses the `sphten-liouv` formalism without basis approximation.  The three equivalent sites assigned 1.11 ppm and the two sites at 2.46 ppm are grouped with S3 and S2 symmetry, respectively; the remaining site is assigned 9.79 ppm. Scalar couplings are 7.3 Hz from each of the first three spins to each of spins 4 and 5, and 1.4 Hz from spins 4 and 5 to spin 6. The source expresses the chemical shifts as values in `inter.zeeman.scalar`; the acquisition axis is configured in ppm.
 
-- The six-spin `1H` system uses a magnetic field of 7.05, chemical shifts of 1.11, 1.11, 1.11, 2.46, 2.46, and 9.79, and scalar couplings of 7.3 between each of spins 1–3 and spins 4–5, and 1.4 between spin 6 and each of spins 4–5.
-- The initial state is `1.0*state(spin_system,{'Lz','Lz'},{1,4}) - 0.5*state(spin_system,{'Lz'},{1}) + 0.5*state(spin_system,{'Lz'},{4})`. Detection uses `state(spin_system,'L+','1H')`; the pulse operator is `operator(spin_system,'Ly','1H')` with a small flip angle of `pi/100`.
+## Initial order and computed signal
 
-## Numerical / algorithmic content
+The initial operator weights the two-spin longitudinal term for spins 1 and 4 by 1.0, the spin-1 longitudinal term by −0.5, and the spin-4 term by +0.5. A small 1H pulse of `pi/100` (1.8 degrees) converts part of the resulting order into a detectable transverse signal. `liquid` with `hp_acquire` computes the simulated free-induction signal; exponential apodisation (parameter 6), Fourier transformation, zero filling to 8192 points, and plotting produce the spectrum. Acquisition is set to a 500 Hz offset, 1000 Hz sweep, and 1024 acquired points, with the display axis in ppm and reversed orientation. The source comments estimate seconds of calculation time; this is a code comment, not a benchmark performed here.
 
-- Uses the `sphten-liouv` formalism with no basis approximation and symmetry groups `S3` on spins `[1 2 3]` and `S2` on spins `[4 5]`.
-- Acquires the signal with `liquid(spin_system,@hp_acquire,parameters,'nmr')`, applies exponential apodisation with parameter 6, and computes `fftshift(fft(fid,parameters.zerofill))`.
-- Acquisition and plotting parameters are `decouple={}`, `offset=500`, `sweep=1000`, `npoints=1024`, `zerofill=8192`, `axis_units='ppm'`, and `invert_axis=1`. The real spectrum is plotted with `plot_1d`.
-
-## Implementation structure
-
-- Defines the spin system, magnetic field, chemical shifts, scalar couplings, and basis; creates and configures the Spinach spin system; sets the sequence parameters; then acquires, apodises, Fourier-transforms, and plots the signal.
-
-Source authors: Ronghui Zhou (hui@ufl.edu) and Ilya Kuprov (ilya.kuprov@weizmann.ac.il).
+Source authors in the existing entry are Ronghui Zhou (hui@ufl.edu) and Ilya Kuprov (ilya.kuprov@weizmann.ac.il). No DOI or published hyperpolarization measurement is given in this example. The result should therefore be read as an idealized simulated ALTADENA spectrum, not experimental evidence for a measured polarization level.

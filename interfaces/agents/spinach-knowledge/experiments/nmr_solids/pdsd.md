@@ -1,27 +1,18 @@
 # experiments/nmr_solids/pdsd.m
 
-- Signature: `fid=pdsd(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/pdsd.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=pdsd.m)
 
-## Purpose
+## Purpose and inputs
 
-A simplified 2D PDSD experiment with NOESY-type quadrature detection and a four-step phase cycle, called from the `singlerot` context.
+A simplified model of the PDSD experiment with NOESY-type quadrature detection and a four-step phase cycle, called from the `singlerot` context. Signature: `fid=pdsd(spin_system,parameters,H,R,K)`. `H`, `R`, and `K` are square numeric matrices of equal size.
 
-## Parameters / inputs
+- `parameters.sweep` is a positive real sweep width in Hz; the indirect and direct dwell is `1/sweep`.
+- `parameters.npoints` is a two-element vector of positive integers for indirect and direct samples.
+- `parameters.tmix` is a non-negative mixing duration in seconds.
+- `parameters.rate` is a real scalar in Hz, used as the amplitude of the proton irradiation term during mixing; `spc_dim` is a positive integer MAS spatial dimension.
 
-- `spin_system` — Spinach spin system object.
-- `parameters.sweep` — Sweep width in Hz; sets the evolution timestep to `1/parameters.sweep`.
-- `parameters.npoints` — Two-element vector giving the number of complex points in the indirect and direct dimensions.
-- `parameters.tmix` — Mixing time in seconds.
-- `parameters.rate` — MAS rate in Hz, used to set proton irradiation power during mixing.
-- `parameters.spc_dim` — Spatial dimension of the MAS problem, received from the context function.
-- `H`, `R`, `K` — Hamiltonian, relaxation, and kinetics superoperators received from the context function.
+## Sequence outline
 
-## Outputs
+The operators and states are hard-coded for `13C` and `1H`: the initial state is a spatially averaged `13C` `Ly` state, detection uses spatially averaged `13C` `L+`, and proton decoupling is requested for the indirect and direct evolution. For each of four phase-cycle pathways, the code evolves the indirect trajectory under the decoupled generator, applies one of the listed transverse `13C` rotations, evolves for `tmix` under `L+2*pi*rate*Hx` (`Hx` is the `1H` `Lx` control), then applies the pathway’s third rotation. It decouples `1H` again for detection evolution and subtracts paired pathway signals.
 
-- `fid.cos`, `fid.sin` — Quadrature components of the 2D PDSD spectrum.
-
-## Implementation summary
-
-The sequence starts from a `13C` `Ly` state, omitting cross-polarisation. It evolves the indirect dimension under proton decoupling, applies the phase-cycled second pulse, evolves for `parameters.tmix` with proton irradiation, and applies a third pulse. After the proton subspace is removed, direct-dimension evolution and `13C` detection occur under proton decoupling. Differences between paired phase-cycle signals form `fid.cos` and `fid.sin` to eliminate axial peaks.
-
-Source reference: <https://spindynamics.org/wiki/index.php?title=pdsd.m>
+The outputs `fid.cos=fids{1}-fids{3}` and `fid.sin=fids{2}-fids{4}` are 2D quadrature components, sampled with `npoints(1)` indirect and `npoints(2)` direct points. This source initializes directly on `13C`; it contains no CP-transfer block. It is a simplified sequence model, not a runtime or experimental-validation claim.

@@ -2,31 +2,30 @@
 
 - Signature: `efg_display(props,atoms,scaling,conmatrix,options)`
 
-## Purpose
+Plots selected nuclear EFG or NQI tensors on the molecular geometry in the current figure. It returns no MATLAB output arguments.
 
-Plots electric-field-gradient (EFG) or nuclear-quadrupole-interaction (NQI) tensors for selected atoms on the molecular geometry, using ellipsoids or spherical harmonics.
+## Inputs and selection
 
-## Numerical / algorithmic content
+- `props.std_geom` and `props.symbols` are required. The geometry rows identify the atoms used by the plot; `molplot` draws the molecular framework using `conmatrix`.
+- `atoms` may be a numeric array of positive integer atom indices (flattened by `atoms(:)`) or a cell array of element-symbol strings. For example, `{'N','O'}` selects atoms with those symbols and `[1 2 5]` selects those indices. A symbol selection includes every matching atom.
+- For each selected atom, a nonempty `props.nqi{n}` tensor takes precedence; otherwise the routine uses nonempty `props.efg{n}`. It errors if neither is available.
+- `scaling` is a positive real number. A nonempty `conmatrix` must be square with one row and column per atom.
 
-For each selected nucleus, the routine uses its NQI tensor when present, otherwise its EFG tensor, and errors if neither is available. The default `harmonics` style converts the tensor to irreducible spherical-tensor coefficients and evaluates the spherical-harmonic surface. The `ellipsoids` style diagonalizes a symmetric tensor, scales a sampled unit sphere by its eigenvalues, rotates it by the eigenvectors, and translates it to the atom. Surface sign is coloured red for positive and blue for negative values. With `kill_iso=true`, the isotropic component, `trace(efg)/3`, is subtracted before plotting.
+## Styles and options
 
-## Syntax
+The default style is `harmonics`; the alternative is `ellipsoids`. Defaults are `options.kill_iso=false`, `options.numbers=false`, and `options.symbols=true`.
 
-```matlab
-efg_display(props,atoms,scaling,conmatrix,options)
-```
+- With `kill_iso=true`, the isotropic part is removed as `efg - eye(3)*trace(efg)/3` before plotting.
+- In `ellipsoids` style, the tensor eigensystem scales a sampled unit sphere along its three eigenvectors, translates it to the selected atom position, and draws it as a half-transparent grey surface. Principal-axis lines extend through the nucleus: positive eigenvalues are red and negative eigenvalues blue. This style requires an orthogonal eigensystem; the code switches to an error if `norm(V'*V-eye(3),2) > 1e-3` and recommends `harmonics`.
+- In `harmonics` style, `mat2sphten` supplies ranks 0, 1, and 2, which are combined with spherical harmonics to give a real radial value `R` on the sampled sphere. Coordinates are `scaling*R*[X;Y;Z]`, translated to the atom. The signed radial value sets RGB surface colour directly: positive is half-intensity red, negative is half-intensity blue, and zero has zero RGB; the surface alpha is 0.25. No additional normalization of `R` is applied.
 
-## Parameters / inputs
+The molecular framework is drawn before the tensor surfaces, and optional atom numbers and symbols are added at geometry positions. The helper also installs two lights for surface rendering. All graphical objects are added to the current figure.
 
-- `props` — structure from `c2spinach` or `gparse`, with molecular geometry and symbols and per-atom `nqi` or `efg` data.
-- `atoms` — cell array of element symbols or vector of atom indices to display (for example, `{'N','O'}` or `[1 2 5]`).
-- `scaling` — positive real factor applied to the tensor surfaces and axes.
-- `conmatrix` — binary connectivity matrix; an empty value uses the 1.6 Å bond-distance cutoff described by the source.
-- `options.style` — `'ellipsoids'` or `'harmonics'`; default is `'harmonics'`.
-- `options.kill_iso` — remove the isotropic tensor component before plotting; default is `false`.
-- `options.numbers` — show atom numbers; default is `false`.
-- `options.symbols` — show atom symbols; default is `true`.
+## Existing syntax
 
-## Outputs
+`efg_display(props,atoms,scaling,conmatrix,options)`
 
-Updates the current figure with the molecular geometry, selected tensors, and requested atom labels; no MATLAB output arguments are returned.
+## References
+
+- [Source: `kernel/plotting/efg_display.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/efg_display.m)
+- [Spinach Wiki: `efg_display.m`](https://spindynamics.org/wiki/index.php?title=efg_display.m)

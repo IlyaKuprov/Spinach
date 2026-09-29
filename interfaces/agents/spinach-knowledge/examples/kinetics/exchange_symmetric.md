@@ -1,19 +1,17 @@
 # examples/kinetics/exchange_symmetric.m
 
-- Signature: `exchange_symmetric()`
+- MATLAB implementation: [examples/kinetics/exchange_symmetric.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/exchange_symmetric.m)
 
-## Purpose
+- Callable as the no-argument MATLAB function `exchange_symmetric()`; it creates the Spinach system and basis before running the acquisition.
 
-Simulates a two-site symmetric chemical-exchange pattern for two `1H` spin environments at 14.1 T. Their scalar offsets are 0 and 3, both exchange directions have rate 2000, and the concentration weights are `[1 1]`. The source lists a calculation time of seconds.
+## Purpose and model
 
-## Physical / mathematical content
+This example simulates a two-site symmetric chemical-exchange NMR pattern for two `1H` environments. The source sets `sys.magnet=14.1`, scalar Zeeman values `{0.0, 3.0}`, exchange sites `{1,2}`, and `inter.chem.rates=[-2e3 2e3; 2e3 -2e3]`, with `inter.chem.concs=[1.0 1.0]`. The field, scalar-value, and rate units are not annotated in this source; the page therefore preserves the configured values without assigning units.
 
-The two environments interconvert at equal rates and have equal specified concentration weights. The example generates a liquid-state NMR signal from this exchange system.
+## Acquisition and observable
 
-## Numerical / algorithmic content
+The full `sphten-liouv` basis is used (`bas.approximation=none`). The initial state is the `1H` chemical-state `L+` operator and the coil is `1H` `L+`. `liquid(spin_system,@acquire,parameters,'nmr')` generates the FID with an empty decoupling list, `offset=900`, `sweep=5000`, 512 points, and zero filling to 1024. The plotted frequency-axis unit is explicitly set to ppm and the axis is inverted. The FID receives exponential apodisation with parameter 6; a shifted FFT is applied and `plot_1d` displays its real part.
 
-Uses the sphten-liouv formalism with no basis approximation, acquires the signal, applies exponential apodisation with parameter 6, and Fourier-transforms the zero-filled FID.
+## Scope
 
-## Implementation structure
-
-Specifies the two-spin exchange system, constructs the Spinach basis, sets the acquisition parameters, simulates the FID, and plots its Fourier-transformed spectrum.
+The source header estimates a calculation time of seconds; this is not a measured runtime. The source defines a simulation and plotting procedure but supplies no numerical spectrum or fitted exchange result, so no line positions, intensities, or fit outcomes are asserted.

@@ -1,26 +1,16 @@
 # examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m
 
-- Signature: `bubble_pulse_acquire()`
+- Signature: bubble_pulse_acquire()
+- Source: [examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m)
 
-## Purpose
+## Model and assumptions
 
-Simulates a PNL (partially negative line) spectrum of ortho-deuterium in the presence of a parahydrogenation catalyst. Bubbling is followed by a 45-degree pulse. The source notes that a paper link will follow in due course.
+The script predicts a partially negative-line (PNL) deuterium spectrum for ortho-D2 in a parahydrogenation catalyst model. Its four spin-1 deuterons are arranged as two exchanging pairs: spins 1–2 have the D2-like shifts 4.55 and 4.55, while spins 3–4 have shifts −13.5 and −16.5. The scalar couplings are 12.0 Hz within the first pair and 0.24 Hz within the second. The field is set to 7.05 T. These are model inputs. The four-spin system contains only deuterons: no para-H2 protons or explicit SABRE transfer step is represented. The plotted spectrum is simulated, not a report of a measured PNL signal or measured hyperpolarization.
 
-## Physical / mathematical content
+The two chemical compartments are defined by atom groups [1 2] and [3 4], with concentrations [1 0] and a two-state rate matrix whose off-diagonal entries are 1 and 5000. The source does not label the rate units or state a direction in prose; it supplies the matrix directly. The catalyst-associated deuterons also have DFT-derived, rotated nuclear-quadrupole-interaction tensors. In the source's stated 10^3 multiplier convention, the tensors are [[106.7, −6.2, 31.9], [−6.2, −55.5, 3.3], [31.9, 3.3, −51.2]] and [[−53.7, 11.8, −19.7], [11.8, −5.3, −73.8], [−19.7, −73.8, 59.0]]. Their units are not written beside these matrices. DFT coordinates for spins 3 and 4 are [−1.962, 0.573, −0.576] and [−0.175, 1.399, −1.630]; coordinates for the D2 pair are absent.
 
-- The spin system contains four `2H` nuclei. Experimental chemical shifts are `[4.55, 4.55, -13.5, -16.5]`; J-couplings are 12.0 between spins 1 and 2 and 0.24 between spins 3 and 4.
-- NQI tensors for spins 3 and 4 come from a DFT calculation and are rotated from the Gaussian `abc` principal-axis frame into the standard-orientation frame used for the coordinates. The coordinates for spins 1 and 2 are unspecified (D2); those for spins 3 and 4 are `[-1.962, 0.573, -0.576]` and `[-0.175, 1.399, -1.630]`.
-- Chemical kinetics use parts `{[1 2], [3 4]}`, rates `[-1 5000; 1 -5000]`, and initial concentrations `[1 0]`. The magnetic field is 7.05.
-- Relaxation combines `redfield` and `t1_t2`, with zero equilibrium, secular terms retained, correlation times `{1e-12, 400e-12}`, R1 rates `{0.04 0.04 0 0}`, and R2 rates `{8.00 8.00 0 0}`.
+## Relaxation, bubbling, and readout
 
-## Numerical / algorithmic content
+The `sphten-liouv` model uses no basis approximation and combines the spin Hamiltonian, secular Redfield relaxation, chemical exchange, and a magnetic-pumping term. Relaxation is configured with correlation times 1 ps and 400 ps, R1 values [0.04, 0.04, 0, 0], and R2 values [8, 8, 0, 0]; the equilibrium state is zero and the retained relaxation is secular. The initial state is the unit state. The pumping target is the singlet plus five quintet components, with the identity component removed; the `magpump` rate is 0.1. The source explicitly calls the bubbling-rate guess in need of a proper rate, so this term is a provisional model choice rather than a fitted experimental parameter. The acquisition example evolves this model for 7 seconds before applying a 45-degree deuterium pulse.
 
-- The simulation uses the `sphten-liouv` formalism without approximation. It constructs the Hamiltonian, relaxation superoperator, and free-kinetics generator, then adds a bubbling pump based on the deuterium-pair states `S` and `Q{1}` through `Q{5}`. The pump rate `1e-1` is marked in the source as a guess requiring a proper rate.
-- Starting from `unit_state`, the system evolves under the Hamiltonian, relaxation, and pumped kinetics for 7 seconds. A pulse-acquire calculation then applies a `pi/4` pulse about `Ly` and detects `L+` on spins 1 and 2.
-- Acquisition uses offset `209.6554`, sweep `60`, `256` points, `1024`-point zero filling, ppm axis units, and an inverted axis. The FID receives exponential apodisation with parameter `6`; its FFT is shifted and normalised by the maximum absolute spectral amplitude.
-
-## Implementation structure
-
-- Creates the spin system and basis, runs relaxation analysis, and obtains the deuterium-pair spin states.
-- Builds free and bubbling kinetics, evolves the initial state, and passes the resulting state to `liquid` with `hp_acquire`.
-- Plots the real spectrum with the y-axis label `NMR intensity, a.u.` and x-axis limits `[4.40 4.70]`.
+The simulated `hp_acquire` acquisition uses a deuterium coil, offset 209.6554 Hz, sweep 60 Hz, 256 points, and 1024-point zero filling. The ppm-axis spectrum is exponentially apodised (parameter 6), Fourier transformed, and normalised to unit maximum magnitude; the displayed region is 4.40–4.70 ppm and intensity is labelled in arbitrary units. The source says a paper link will follow; it supplies no DOI or experimental spectrum.

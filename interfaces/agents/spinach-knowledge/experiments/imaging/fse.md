@@ -1,40 +1,28 @@
 # experiments/imaging/fse.m
 
-- Signature: `mri=fse(spin_system,parameters,H,R,K,G,F)`
+- Signature: `mri=fse(spin_system,parameters,H,R,K,G,F)`.
+- Canonical implementation: `experiments/imaging/fse.m` — https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/fse.m.
 
-## Purpose
+## Contract and sequence
 
-Fast spin echo (FSE) imaging sequence. Call it from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`.
+Call from `imaging()`, which supplies `H`, `R`, `K`, `G`, and `F`. The background generator is `B=H+F+1i*R+1i*K`. The first spin named in `parameters.spins` defines the transverse pulse operator. The code applies a 90-degree pulse about `Ly`, moves to the left edge of readout k-space with `G{2}`, and for each phase-encode row applies a 180-degree pulse, encodes with `G{1}`, samples the readout trajectory under `G{2}` through the coil state, then rewinds the phase gradient. In this implementation there is one 180-degree refocusing pulse and one readout per phase-encode row; it reconstructs after acquiring the rows.
 
-## Physical / mathematical content
+The initial state `parameters.rho0` is caller-supplied. This is an MRI sequence, not a DNP preparation or polarization measurement; no measured signal magnitude is reported.
 
-The sequence forms the background operator `B=H+F+1i*R+1i*K` and constructs a pulse operator for the first spin named in `parameters.spins`. It applies an initial 90-degree pulse, moves to the left edge of k-space under the readout gradient, then repeats a 180-degree pulse, phase-encoding gradient, readout, and opposite phase-encoding gradient for each image row.
+## Parameters and units
 
-## Numerical / algorithmic content
+- `parameters.rho0`: input state vector; `parameters.coil`: detection state vector. Both must match the dimension of `H`.
+- `parameters.spins`: nonempty cell array of character strings; the first entry selects the observed spin.
+- `parameters.npts`: vector of positive integer spatial sample counts; `parameters.image_size`: two integer counts greater than one, [phase rows, readout points].
+- `parameters.pe_grad_amp`, `parameters.ro_grad_amp`: real scalar phase/readout gradient amplitudes in T/m along `G{1}` and `G{2}`.
+- `parameters.pe_grad_dur`, `parameters.ro_grad_dur`: corresponding gradient durations in seconds.
+- `G` must contain at least two operators. `H`, `R`, `K`, and `F` are same-size matrices. The source accepts `sphten-liouv` and `zeeman-liouv` formalisms.
 
-- Phase-encoding amplitudes span `-parameters.pe_grad_amp` to `parameters.pe_grad_amp` across `parameters.image_size(1)` rows.
-- Each readout trajectory is generated with `krylov()` using a time step of `parameters.ro_grad_dur/(parameters.image_size(2)-1)`. Projection onto `parameters.coil` fills the corresponding k-space row.
-- The k-space data receive square-sinebell apodisation in both dimensions. The output is `-real(fftshift(fft2(ifftshift(fid)),2))`.
+## Returned image and source-derived numerical facts
 
-## Parameters / inputs
+The sampled complex array has dimensions `image_size(1)-by-image_size(2)`, with phase rows first and readout samples second. The source spaces phase amplitudes with `linspace(-pe_grad_amp,+pe_grad_amp,image_size(1))`; readout spacing is `ro_grad_dur/(image_size(2)-1)` seconds. It applies square-sinebell apodisation in both dimensions and returns a real matrix via `-real(fftshift(fft2(ifftshift(fid)),2))`. For example, the minimum accepted `image_size` of `2-by-2` produces a 2-by-2 sampled array and reconstructed matrix; this illustrates dimensions only, not an image result. The gradient spacing above is the source-defined timing formula.
 
-- `spin_system`: must use the `sphten-liouv` or `zeeman-liouv` formalism.
-- `H`, `R`, `K`, `F`: numeric matrices of the same dimensions.
-- `G`: cell array containing at least two gradient operators; the sequence uses `G{1}` for phase encoding and `G{2}` for readout.
-- `parameters.spins`: nonempty cell array of character strings; its first entry selects the spin used for pulses.
-- `parameters.npts`: vector of positive integers used to construct the pulse operator.
-- `parameters.rho0`: numeric initial state.
-- `parameters.coil`: numeric detection operator.
-- `parameters.pe_grad_amp`: real scalar phase-encoding gradient amplitude, T/m.
-- `parameters.ro_grad_amp`: real scalar readout gradient amplitude, T/m.
-- `parameters.pe_grad_dur`: positive real scalar phase-encoding gradient duration, seconds.
-- `parameters.ro_grad_dur`: positive real scalar readout gradient duration, seconds.
-- `parameters.image_size`: two integers greater than one specifying the number of points in each image dimension.
+## References
 
-## Outputs
-
-- `mri`: MRI image reconstructed from k-space data with square-sinebell apodisation.
-
-## Reference
-
-- <https://spindynamics.org/wiki/index.php?title=fse.m>
+- [Spinach documentation: `fse.m`](https://spindynamics.org/wiki/index.php?title=fse.m).
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/fse.m).

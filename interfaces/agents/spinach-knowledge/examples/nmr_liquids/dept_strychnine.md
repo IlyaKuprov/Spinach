@@ -1,22 +1,15 @@
 # examples/nmr_liquids/dept_strychnine.m
 
-- Signature: `dept_strychnine()`
+- MATLAB implementation: [examples/nmr_liquids/dept_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/dept_strychnine.m)
 
-## Purpose
+This example calculates a natural-abundance 13C DEPT135 spectrum for strychnine from a liquid-state spin model. It illustrates DEPT editing through proton-carbon scalar-coupling transfer; it does not load or fit an experimental spectrum.
 
-DEPT135 experiment on strychnine. Calculation time: minutes
+## Spin system and editing
 
-## Physical / mathematical content
+The built-in strychnine system contains 1H and 13C spins and is evaluated at 5.9 T and 298 K. The calculation uses a sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1, dilutes over 13C isotopomers, then simulates each in parallel with the DEPT sequence. Its working J coupling is 150 Hz and the selection-pulse angle is 3*pi/4 radians (135 degrees). The sequence evolves for J-dependent delays, applies proton/carbon pulses and decouples the proton spins for carbon detection. The receiver state is the 13C L+ operator. At this DEPT135 angle, the sequence documentation states that CH and CH3 signals are opposite in phase to CH2 signals; quaternary carbons are not present in DEPT. The pulse-sequence reference is [DEPT](https://doi.org/10.1016/0022-2364(82)90286-4).
 
-- Simulates a one-dimensional DEPT135 experiment on the 1H/13C strychnine spin system. The signal is generated with Spinach’s liquid-state DEPT sequence, including scalar-coupling-mediated transfer.
-- Natural-abundance 13C isotopomers are simulated separately; the free-induction decay is exponentially apodised and Fourier transformed to give the plotted carbon spectrum.
+## Acquisition and display
 
-## Numerical / algorithmic content
+The 13C sweep width is 10000 Hz with 2048 acquired points and zero filling to 8196 points. The configured offsets are [5000, 0] Hz; the plot uses the 13C offset and displays the real spectrum in ppm. Each isotopomer's FID is exponentially apodised with the source setting `{'exp',6}` before Fourier transformation and summation.
 
-- Uses a sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1; temperature is 298 K and the field is 5.9 T. Sequence parameters are sweep `10000`, offset `[5000 0]`, `npoints=2048`, `zerofill=8196`, `J=150`, and `beta=3*pi/4`.
-- Iteration over 13C isotopomers is parallelised with `parfor`; no GPU execution is present.
-
-## Implementation structure
-
-- Create the 1H/13C strychnine spin system; set the 5.9 T field and 298 K temperature, then configure the scalar-coupling basis and DEPT135 parameters.
-- Generate 13C isotopomers and simulate each in parallel. Exponentially apodise (`exp`, 6), Fourier transform, and plot the real 13C spectrum.
+The source labels the expected calculation time as minutes. The plotted model can illustrate the DEPT135 phase edit, but the example does not supply carbon assignments, a measured spectrum, or a claimed experimental agreement.

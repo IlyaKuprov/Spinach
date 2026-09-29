@@ -1,17 +1,17 @@
 # examples/dnp_liq/jdnp/fig_4_state_amplitudes.m
 
-- Signature: `fig_4_state_amplitudes()`
-- Reference: [Concilio et al., *Phys. Chem. Chem. Phys.* (2022)](https://doi.org/10.1039/d1cp04186j)
-- Calculation time: seconds
+- MATLAB implementation: [examples/dnp_liq/jdnp/fig_4_state_amplitudes.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/jdnp/fig_4_state_amplitudes.m)
 
-## Purpose
+## What it calculates
 
-Propagates a liquid-state radical-pair model under microwave irradiation and plots the populations of the electron-pair singlet and triplet states resolved by nuclear-spin projection. The example illustrates how the singlet-alpha and singlet-beta populations evolve differently, alongside the triplet populations and nuclear magnetisation.
+This example follows selected operator-state amplitudes for the proton plus two-electron JDNP system, using the electron singlet/triplet combinations and the nuclear-spin-resolved components defined explicitly in the source. The stated purpose is to illustrate imbalance between singlet–nuclear-alpha and singlet–nuclear-beta subspaces and the associated transient nuclear polarization. It cites [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
 
-## Model and setup
+## Running assumptions and settings
 
-The script loads the system from `system_specification()`, sets a 14.08 T field, and drives the electron spins with a 250 kHz microwave field. The microwave offset is set from the trityl and free-electron resonance frequencies. It changes the electron-proton scalar coupling using the electron and proton Zeeman frequencies, then constructs the spin system in the supplied basis.
+The zero-argument function reads sys, inter, bas, and parameters from system_specification() and assumes proton at site 1 and electrons at sites 2 and 3. Run with MATLAB, Spinach, that JDNP helper, and Spinach plotting routines available on the path. It sets the field to 14.08 T, parameters.mw_pwr=2*pi*250e3, t_step=1e-3, and nsteps=700; the microwave offset is calculated from g_ref and g_trityl. As in the field-sweep example, the scalar coupling {2,3} is set to the sum of the isotropic electron and proton Zeeman terms. Propagation uses the ESR Hamiltonian plus relaxation and requests the multichannel evolution mode.
 
-## Propagation and output
+The 15 detection channels are ordered as [Tpa,Tpb,Tma,Tmb,T0a,T0b,Sa,Sb,SNz,TpNz,T0Nz,TmNz,E1z,E2z,Nz]. Here the first six are the electron triplet components resolved by nuclear alpha/beta, channels 7–8 are the alpha/beta singlets, 9–12 are nuclear-z-weighted singlet/triplet components, and 13–15 are electron 1, electron 2, and nuclear Lz components, respectively.
 
-The Hamiltonian is built for ESR conditions, combined with the relaxation superoperator and microwave terms, and propagated from the isotropic thermal-equilibrium state. The `evolution` call requests 700 steps at 1 ms spacing in multichannel mode for the state operators assembled in the script. The resulting figure has three panels: triplet populations for alpha and beta nuclear projections, the two singlet populations, and the nuclear Lz signal. Curves are plotted as real parts against time.
+## Output and limits
+
+The function creates a three-panel figure: panel 1 plots triplet channels 1, 3, 5 (alpha) and 2, 4, 6 (beta); panel 2 plots singlet channels 7–8; panel 3 plots channel 15 (Nz). Each trace uses the real part of the corresponding returned channel. All panels plot t_axis(2:end) against answer(:,2:end), so the initial time sample is deliberately not displayed. The time grid spans zero through t_step*nsteps (701 samples), with axes labelled in seconds. No output file is written.

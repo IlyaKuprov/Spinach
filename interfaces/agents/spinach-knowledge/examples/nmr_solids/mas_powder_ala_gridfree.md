@@ -1,15 +1,13 @@
 # examples/nmr_solids/mas_powder_ala_gridfree.m
 
-- Signature: `mas_powder_ala_gridfree()`
+Source: [examples/nmr_solids/mas_powder_ala_gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_ala_gridfree.m)
 
-## Purpose
+## Model
 
-Calculates the `13C` MAS spectrum of alanine powder, assuming `1H` decoupling, with a grid-free Fokker–Planck MAS formalism. The source states that magnetic parameters come from a DFT calculation and estimates seconds on a Tesla V100 GPU, much longer on CPU.
+This example builds an alanine powder spin system from the PCM-DFT output in `../standard_systems/alanine.log`. The `g2spinach` call maps carbon to `13C` and nitrogen to `15N` and supplies reference shieldings `[182.1 264.5]` for zero-ppm chemical-shift references. The code sets a 14.1 T field. The individual interaction tensors are supplied by the parsed calculation output rather than listed as numbers in this script.
 
-## Physical and numerical content
+The source describes the target as a `13C` MAS spectrum assuming `1H` decoupling. Its experiment settings specify a rotor axis of `[1 1 1]` and a rate of 2000 Hz, and acquire on `13C` with `L+` initial and receiver operators. The script sets `parameters.decouple={}` and defines no RF pulse sequence, so the decoupling assumption in the header is not implemented as an explicit decoupling waveform here.
 
-The spin system is constructed from the PCM-DFT alanine data in `../standard_systems/alanine.log` at 14.1 T. The basis selects the `15N` longitudinal subspace with projection +1. The calculation sets the trajectory-level option disabled and uses a 2 kHz MAS rate about `[1 1 1]`, maximum rank 17, and a 50 kHz sweep. Acquisition is for `13C` with an empty decoupling list.
+## Calculation and display
 
-## Implementation
-
-The function calls `gridfree` with `@acquire`, applies exponential apodisation (6), zero-fills the 256-point FID to 1024 points, Fourier transforms, and plots the real spectrum. Offset is 15 kHz. A GPU-enabling line is present but commented out; the source does not enable it in the active configuration.
+The basis uses `sphten-liouv` with no approximation, a `15N` longitudinal subspace, and the `+1` projection. The source sets interaction and proximity cutoffs to 5.0 and 4.0, disables trajectory-level storage, and uses maximum rank 17. It calls `gridfree(spin_system,@acquire,parameters,'nmr')`, then applies exponential apodisation with parameter 6, Fourier transforms the FID after zero-filling 256 points to 1024, and plots the real spectrum. The sweep is 50 kHz, the offset is 15 kHz, and the ppm axis is inverted. These are simulation and display settings; the file does not present an experimentally measured spectrum.

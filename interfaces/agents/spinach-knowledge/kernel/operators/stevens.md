@@ -1,34 +1,22 @@
 # kernel/operators/stevens.m
 
+- Source: [kernel/operators/stevens.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/stevens.m)
+- Wiki: [stevens.m on the Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=stevens.m)
 - Signature: `S=stevens(mult,k,q)`
 
 ## Purpose
 
-Construct an extended Stevens operator matrix for a spin multiplicity, rank, and projection.
+Constructs the extended Stevens operator matrix for a finite spin of multiplicity `mult`, rank `k`, and projection `q`. It uses the spin matrices returned by `pauli(mult)`; it is not a bosonic operator constructor.
 
-## Physical / mathematical content
+## Operator construction
 
-- Starts from the spin raising operator raised to rank `k`, then commutes with the lowering operator to obtain the requested projection.
-- Uses the Hermitian sum for `q >= 0` and the Hermitian difference divided by `2i` for `q < 0`.
+Set `L=pauli(mult)` and start with `S=L.p^k`. The code applies the lowering commutator `S=L.m*S-S*L.m` once for each integer from `abs(q)` through `k-1`, giving `k-abs(q)` such steps. It then symmetrizes the result according to the sign of `q`:
 
-## Numerical / algorithmic content
+- For `q>=0`, the result is `coeff*(S+S')/2`.
+- For `q<0`, the result is `coeff*(S-S')/(2i)`.
 
-- Normalization uses explicitly stockpiled integer coefficients. The historical definition is irregular; only ranks up to 12 are available.
+Here `S'` is MATLAB's conjugate transpose. The input checks require a positive integer multiplicity (ultimately enforced by `pauli`), integer rank `0<=k<=12`, and integer projection `-k<=q<=k`.
 
-## Parameters / inputs
+## Coefficient and normalization
 
-- `mult` — multiplicity of the spin in question.
-- `k` — Stevens operator rank, an integer from 0 to 12.
-- `q` — Stevens operator projection, an integer from `-k` to `k`.
-
-## Outputs
-
-- `S` — Stevens operator matrix.
-
-## Implementation structure
-
-- Validates the inputs, obtains spin matrices with `pauli(mult)`, constructs and commutes the operator, applies its normalization coefficient, and forms the result according to the sign of `q`.
-
-## Reference
-
-- <https://spindynamics.org/wiki/index.php?title=stevens.m>
+The source stores coefficient vectors explicitly in `C` for ranks 0 through 12 rather than generating them from a formula. The scalar starts as `(-1)^(k-q)/C{k+1}(abs(q)+1)`; when `k` is even and `q` is odd, the code divides that scalar by an additional 2. This scalar is then used in the sign-dependent symmetrization above. These are the implementation's normalization conventions; no additional physical interpretation is implied here.

@@ -4,36 +4,32 @@
 
 ## Purpose
 
-Simulates zero-field magnetometry by propagating the equilibrium initial condition through an exponential drop of the external magnetic field, then acquiring a free induction decay at zero field.
+Models zero-field magnetometry by starting from isotropic thermal equilibrium, propagating through an exponential external-field drop, and acquiring an FID at zero field. The field-drop function is `expdrop`; the subsequent acquisition is simulated with the coupling Hamiltonian and supplied relaxation and kinetics terms.
 
-## Physical / mathematical content
+## Inputs and units
 
-The function constructs its own Zeeman and coupling Hamiltonians in the lab frame. It normalises the Zeeman Hamiltonian to 1 T, then propagates the equilibrium state through the field-drop profile using `drop(n)*H_z + H_c + 1i*R + 1i*K`. At zero field, acquisition uses `H_c + 1i*R + 1i*K`. The pulse and detection states are weighted by the spin magnetogyric ratios relative to 1H.
+- `spin_system` supplies the spin system, initial magnet field (`spin_system.inter.magnet`), and magnetogyric ratios.
+- `parameters.drop_field` is the target field in tesla, non-negative.
+- `parameters.drop_time` is the drop duration in seconds and must be positive.
+- `parameters.drop_npoints` is a positive integer number of drop discretisation points.
+- `parameters.drop_rate` is a positive real scalar in hertz, passed to `expdrop`.
+- `parameters.sweep` is the positive acquisition spectral width in hertz; acquisition uses timestep `1/parameters.sweep`.
+- `parameters.npoints` is a positive integer acquisition point count.
+- `parameters.detection` must be `'uniaxial'` or `'quadrature'`.
+- `parameters.flip_angle` is a real numeric scalar in radians, specified for protons; gamma weighting scales the pulse for other nuclei.
+- `H`, `R`, and `K` must be numeric matrices of equal dimensions. `R` and `K` enter both field-drop propagation and acquisition. Although accepted and shape-checked, `H` is not used to construct the propagated Hamiltonian: the routine constructs its own field and coupling Hamiltonians from `spin_system`.
 
-## Numerical / algorithmic content
+## Propagation and readout
 
-The exponential field-drop profile is generated from the system magnet field, `parameters.drop_field`, `parameters.drop_time`, `parameters.drop_npoints`, and `parameters.drop_rate`; each profile value is propagated for `drop_time/drop_npoints`. The weighted transverse pulse is applied after the drop. Acquisition uses a time step of `1/parameters.sweep` and `parameters.npoints-1` observable-mode propagation steps. The detection mode is either `'quadrature'`, which retains the complex signal, or `'uniaxial'`, which returns its real part. Consistency checks require positive sweep width, acquisition point count, drop time, drop rate, and drop-step count; `drop_field` must be non-negative and flip angle a real scalar.
+The Zeeman and coupling Hamiltonians are generated under the lab-frame `zeeman` and `couplings` assumptions. The Zeeman term is divided by the initial magnet field to normalise it to one tesla. `expdrop` receives the initial field, target field, drop time, drop point count, and drop rate; the propagation timestep is `drop_time/drop_npoints`. Starting from `equilibrium(spin_system)`, each generated field value multiplies the normalised Zeeman term, while the coupling Hamiltonian and `1i*R + 1i*K` are also included in that step.
 
-## Parameters / inputs
+At the end of the drop, the routine builds gamma-weighted `L+` detection and `Ly` pulse operators using `spin_system.inter.gammas/spin('1H')`, applies the pulse, and acquires using `H_c + 1i*R + 1i*K` with timestep `1/parameters.sweep` and interval count `parameters.npoints-1`. The requested detection mode leaves quadrature data unchanged or returns only the real part for uniaxial detection. The result is the FID on the internally generated gamma-weighted detection state.
 
-- `.drop_field` - the magnetic field that the sample should be dropped to, starting from the field specified in sys.magnet, Tesla
-- `.drop_time` - drop time, seconds
-- `.drop_npoints` - number of discretisation points in the drop
-- `.drop_rate` - field drop rate, Hz
-- `.sweep` - sweep width during acquisition
-- `.npoints` - number of points during acquisition
-- `.detection` - 'uniaxial' to emulate common ZULF hardware, 'quadrature' for proper frequency sign discrimination
-- `.flip_angle` - pulse flip angle in radians for protons; for other nuclei, this will be scaled by the gamma ratio
-- `H` - checked as a matrix argument but not used to construct the Hamiltonian; this function makes its own Hamiltonian
-- `R` - relaxation superoperator, used during field drop and acquisition
-- `K` - kinetics superoperator, used during field drop and acquisition
+## Guardrails and scope
 
-## Outputs
+The source checks that `H`, `R`, and `K` are numeric matrices with matching dimensions; sweep and drop rate are positive real scalars; `npoints` and `drop_npoints` are positive integers; target field is a non-negative real scalar; drop time is positive; detection mode is one of the two listed strings; and flip angle is a real numeric scalar. Its header explicitly notes that the supplied offset/Hamiltonian argument is ignored in favor of its internally generated Hamiltonian. Its real-scalar comparisons do not explicitly reject non-finite values.
 
-- `fid` - the free induction decay detected on the internally generated gamma-weighted state
+## Links
 
-Note: this function ignores the offset parameter and makes its own Hamiltonian.
-
-## Implementation structure
-
-After validation, the routine builds the internal Zeeman and coupling Hamiltonians, propagates the equilibrium state through the exponential field drop, constructs the gamma-weighted detection coil and pulse operator, applies the pulse, and evolves the signal at zero field. The final detection-mode switch either leaves the quadrature signal unchanged or takes its real part for uniaxial detection.
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/zulf/zulf_abrupt.m
+- [Spinach Wiki: zulf_abrupt.m](https://spindynamics.org/wiki/index.php?title=zulf_abrupt.m)

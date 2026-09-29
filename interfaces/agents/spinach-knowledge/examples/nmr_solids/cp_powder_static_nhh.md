@@ -1,19 +1,15 @@
 # examples/nmr_solids/cp_powder_static_nhh.m
 
-- Signature: `cp_powder_static_nhh()`
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_powder_static_nhh.m
 
 ## Purpose
 
-Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15 in a bath of 8 protons scattered on a 2 Angstrom radius sphere around it. Static powder simulation in a reduced (up to, and including four-spin correlations) Liouville space. Calculation time: minutes on a Tesla A100, much longer on CPU.
+Static-powder 1H–15N cross-polarisation in the doubly rotating frame for one 15N surrounded by eight protons. The source describes the proton bath as scattered on a 2 Å-radius sphere around the nitrogen and gives an estimated runtime of minutes on a Tesla A100, much longer on CPU; these are source notes, not a recorded benchmark from this task.
 
-## Physical / mathematical content
+## Spin model and reduced basis
 
-This static 15N–1H cross-polarisation model has eight protons positioned around one 15N; the source describes the proton bath as scattered on a 2 Å-radius sphere. The simulation starts from the anisotropic equilibrium requested by `parameters.needs={'aniso_eq'}` at 298 K and observes the 15N response while both nuclei are irradiated in the doubly rotating frame.
+The code sets the field parameter to 9.394, gives coordinates for all nine spins, and assigns scalar Zeeman values individually. The coordinate geometry defines the proton–nitrogen dipolar network. It requests anisotropic equilibrium at 298 K. The sphten-liouv basis uses IK-0 with inter_level 4; the source describes the retained space as including correlations through four spins. The source comment says a GPU is needed and the code enables greedy mode.
 
-## Numerical / algorithmic content
+## Cross-polarisation observable
 
-The calculation uses the sphten-liouv formalism with the IK-0 reduced basis, `inter_level=4`, and `sys.enable={'greedy'}` (the source comments that this example needs a GPU). The hard-contact pulse simulation is powder averaged on `rep_2ang_100pts_sph`; it uses 100 intervals of 10 μs and 50 kHz irradiation on both channels.
-
-## Implementation structure
-
-Builds the nine-spin system and fourth-level interaction-space basis, defines the two-channel RF and 15N detection operators, then calls `powder` with `cp_contact_hard` and plots the real 15N response versus cumulative contact time.
+Both irradiation-power rows contain 5e4 over 100 points; the source gives no unit for this value. The RF operators are Ly on 1H and Lx on 15N, with excitation operators Lx on 1H and Ly on 15N. Detection is the 15N Lx state. The powder grid is rep_2ang_100pts_sph, and 100 steps of 1e-5 seconds span 1 ms. The wrapper calls cp_contact_hard and plots the real 15N response versus cumulative time. It does not specify a Hartmann–Hahn matching condition or expose the helper's internal contact dynamics. No measured spectrum is reported.

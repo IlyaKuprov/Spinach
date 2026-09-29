@@ -1,19 +1,23 @@
 # examples/nmr_liquids/hoesy_ftyr_b.m
 
+- MATLAB implementation: [examples/nmr_liquids/hoesy_ftyr_b.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/hoesy_ftyr_b.m)
+
 - Signature: `hoesy_ftyr_b()`
 
 ## Purpose
 
-(19F) -> (1H) HOESY spectrum of fluorotyrosine. This is not the right way to run this sequence in proteins because aromatic 19F T2 is short, but 19F is being phase-encoded. Calculation time: minutes
+Simulates the reverse-direction `19F -> 1H` HOESY experiment for 3-fluorotyrosine. The source cautions that this is not the preferred direction for proteins because aromatic fluorine has short `19F T2`, while noting that fluorine is phase-encoded in this experiment.
 
-## Physical / mathematical content
+## Spin system and model
 
-This is the reverse 19F-to-1H fluorotyrosine HOESY variant. The source loads the 3-fluorotyrosine DFT spin system and uses Redfield relaxation with a 10e-9 s correlation time and temperature 298 K, with the code comment identifying the correlation time as appropriate to a large protein.
+The source reads `../standard_systems/3_fluoro_tyr.log` through `gparse` and `g2spinach`, requesting only `1H` and `19F` spins and passing `[31.82 192.97]` as the shift-range argument. The explicit spin network is therefore proton plus fluorine-19, with no carbon, nitrogen, or oxygen spins requested. The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-2`, scalar-coupling connectivity, and proximity level 3. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `10e-9` s (commented as a large protein) and temperature `298` K. Algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-The IK-2 sphten-liouv basis uses scalar-coupling connectivity and proximity level 3. A 0.5 s mixing time is simulated with 128 points per dimension, zero-filled to 512, then square-cosine apodisation and 2D Fourier transforms are applied.
+The mixing time is `0.5` s (commented as quite long). Dimensions are ordered `{'19F','1H'}`, with `decouple_f1={'1H'}`; proton is the detected nucleus in this transfer direction. Sweeps are `[2500 4000]` Hz, offsets `[-70000 3000]` Hz, and each dimension has 128 acquired points and 512-point zero filling. Axes are labelled in ppm.
 
-## Implementation structure
+The wrapper calls `liquid(spin_system,@hoesy,parameters,'nmr')`, applies `sqcos` apodisation to cosine and sine FIDs in both dimensions, zero-fills and Fourier-transforms F2, forms `f1_cos-1i*f1_sin`, and Fourier-transforms F1. The real spectrum is plotted with negative display polarity using `plot_2d`.
 
-The script sets a 14.1 T field, sweeps [2500 4000] Hz and offsets [-70000 3000] Hz. It observes spins `{'19F','1H'}`, decouples 1H in F1, and plots the real spectrum with negative display polarity.
+## Sequence boundary
+
+This file supplies the spin-system, acquisition and processing settings to the shared `liquid` driver and passes `@hoesy` as the sequence. The HOESY pulse-program internals are not implemented in this wrapper, so no pulse timings or internal transfer steps are specified here.

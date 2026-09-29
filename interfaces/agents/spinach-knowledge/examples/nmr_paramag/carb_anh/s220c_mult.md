@@ -1,19 +1,16 @@
 # examples/nmr_paramag/carb_anh/s220c_mult.m
 
-- Signature: `s220c_mult()`
+- Function: `s220c_mult()`
+- Source: [`examples/nmr_paramag/carb_anh/s220c_mult.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s220c_mult.m)
 
 ## Purpose
 
-Multipolar PCS fit for the S220C mutant of human carbonic anhydrase II. The source cites the [method paper](http://dx.doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
+Fits a multipolar model to PCS measurements for the S220C mutant of human carbonic anhydrase II. The source cites method paper DOI [10.1039/c6sc03736d](https://doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
-## Physical / mathematical content
+## Inputs and model
 
-Fits the measured PCS data using multipole orders `[0 1 2]` and reports the susceptibility tensor and magnetic multipole-centre position.
+Loads `expt_pcs` and `xyz` from `s220c_expt.mat`. It calls `ilpcs(xyz,expt_pcs,[0 1 2],[-14 -26 4])`; the selected multipole orders are 0, 1, and 2, with the final three-number argument serving as the initial centre supplied to the fitting routine. The returned values include the fitted susceptibility tensor, multipole centre, and predicted PCS values.
 
-## Numerical / algorithmic content
+## Output and scope
 
-Calls `ilpcs` with experimental PCS data, orders `[0 1 2]`, and initial position `[-14 -26 4]`.
-
-## Implementation structure
-
-Loads `expt_pcs` and `xyz` from `s220c_expt.mat`, plots predicted against experimental PCS with a diagonal reference line, and displays `chi` and `mxyz`.
+It plots predicted versus experimental PCS in ppm with a diagonal reference, then displays the tensor and magnetic multipole centre. The source does not specify the measured nuclei, field, temperature, coordinate units, or tensor units, and does not save fitted results in the function.

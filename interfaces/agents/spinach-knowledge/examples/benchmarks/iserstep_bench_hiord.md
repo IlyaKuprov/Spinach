@@ -1,17 +1,16 @@
 # examples/benchmarks/iserstep_bench_hiord.m
 
-## Status
+- Signature: `iserstep_bench_hiord()`
+- Historical status: the example was removed from the current source tree; its stable historical source path is `examples/benchmarks/iserstep_bench_hiord.m`. This page records the comparison implemented there, not a current benchmark or an available entry point.
 
-This page documents a historical Spinach example, not a current runnable example. The source file `examples/benchmarks/iserstep_bench_hiord.m` was deleted in commit `c70f9b30` (“Deleting a duplicate example file”) and is absent from the current checkout. The historical function signature was `iserstep_bench_hiord()`; it is not an available entry point in the current source tree.
+## Problem and reference
 
-## Historical purpose and physics
+The example compares higher-order propagators on a chirped Bloch–Maxwell oscillator with both time-dependent and state-dependent evolution. Its radiation-damping term follows Bloembergen and Pound ([Phys. Rev. 95, 8 (1954)](https://doi.org/10.1103/PhysRev.95.8)). The source sets chirp rate (2pi×400), longitudinal and transverse relaxation rates (r_1=r_2=10), and radiation-damping rate (r_{rd}=40). The generator combines the chirped transverse precession/relaxation matrix with a magnetisation-dependent radiation-damping matrix, including the source's (-i) Liouvillian factors. The initial magnetisation is a 178° rotation of the positive z direction.
 
-The example compared higher-order `iserstep` methods for a chirped-frequency oscillator with radiation damping and a generator depending on both time and magnetisation. The comments cite Bloembergen and Pound for radiation damping: [Phys. Rev. 95, 8 (1954)](https://doi.org/10.1103/PhysRev.95.8).
+A 4096-point RKMK-DP8 propagation over 0.5 s supplies a reference trajectory and terminal state. For each tested grid size, the script reports terminal-state relative error, (|mu-mu_{ref}|/|mu_{ref}|), against that reference. The reference is a high-resolution numerical comparison, not an analytic exact solution.
 
-In the historical source, the chirp rate was `2*pi*400`, the longitudinal and transverse relaxation rates were both `10`, and the radiation-damping rate was `40`. Its Bloch–Maxwell generator combined a chirped transverse precession/relaxation matrix with a magnetisation-dependent radiation-damping matrix, with the `-1i` Liouvillian factors included. The initial magnetisation was rotated from the positive z direction by 178 degrees. These values and the setup describe the old example only; they are not a current benchmark configuration.
+## Methods and diagnostics
 
-## Historical method and outputs
+Ten grid sizes are generated as `ceil(2.^linspace(8,10.5,10))`; the step is (0.5/(n_p-1)). The script compares PWCL, LG2, LG4 and LG4A through `iserstep`, and RKMK4, RKMK-DP5 and RKMK-DP8 through `step`. It plots the reference magnetisation trajectory and relative error against grid size. For each method it fits (log(error)) against (log(n_p)) over the last third of the grid sizes and prints the negative fitted slope as an empirical convergence order.
 
-A 4096-point RKMK-DP8 propagation over 0.5 seconds supplied the reference final magnetisation. The source then compared terminal-state relative errors on ten grids from `ceil(2.^linspace(8,10.5,10))`: PWCL, LG2, LG4, and LG4A through `iserstep`, and RKMK4, RKMK-DP5, and RKMK-DP8 through `step`. It plotted the reference magnetisation trajectory and relative error versus grid size, and printed empirical convergence orders by fitting log(error) against log(grid size) over the last third of the grids.
-
-Those are outputs and comparisons described by the historical source, not instructions or confirmation that the deleted example can be run in the current checkout. The historical source is available in repository history as `c70f9b30^:examples/benchmarks/iserstep_bench_hiord.m`.
+The source describes the setup, comparison, plots, and printed orders; it does not provide fixed results in the source comments. Do not treat the page as a performance ranking or claim that a particular method wins without running the historical code under a specified environment. The source was removed as a duplicate example and is not runnable from the current checkout as-is.

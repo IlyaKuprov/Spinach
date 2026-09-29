@@ -1,34 +1,17 @@
 # experiments/nqr/nqr_pa.m
 
-- Signature: `spectrum=nqr_pa(spin_system,parameters,H,R,K)`
+MATLAB source: [experiments/nqr/nqr_pa.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nqr/nqr_pa.m)
 
-## Purpose
+This is a nuclear-quadrupole-resonance soft-pulse/acquire sequence. Acquisition is described as idealised with infinite bandwidth; the pulse is a shaped, off-resonance pulse, not a DANTE train.
 
-Nuclear quadrupole resonance soft pulse-acquire experiment with idealised, infinite-bandwidth acquisition.
+## Inputs and source-defined sequence
 
-## Parameters / inputs
+`spectrum=nqr_pa(spin_system,parameters,H,R,K)` requires `sweep` (two frequency-window limits in Hz, in ascending order), scalar positive-integer `npoints`, `rho0`, `coil`, RF operators `Lx` and `Ly`, `rf_frq` (Hz), `rf_pwr` (the multiplier in rad/s for the RF Hamiltonian), `rf_dur` (seconds), and `spc_dim`. `H`, `R`, and `K` are context-supplied matrices of matching dimensions. For a `zeeman-hilb` input, the function converts the system to Liouville space and converts `Lx` and `Ly` to commutation superoperators; it then extends them using `spc_dim`.
 
-- `spin_system` — spin system supplied by the simulation context.
-- `parameters.sweep` — two-element vector specifying the spectrum window extents in Hz, in ascending order.
-- `parameters.npoints` — number of points in the spectrum; a positive integer.
-- `parameters.rho0` — initial state.
-- `parameters.coil` — detection state.
-- `parameters.Lx`, `parameters.Ly` — operators used in the RF Hamiltonian; numeric matrices of equal size.
-- `parameters.rf_frq` — RF irradiation frequency in Hz.
-- `parameters.rf_pwr` — multiplier in rad/s of `Lx*cos(ωt)+Ly*sin(ωt)` in the RF Hamiltonian.
-- `parameters.rf_dur` — pulse duration in seconds; non-negative.
-- `H` — Hamiltonian matrix received from the context function.
-- `R` — relaxation superoperator received from the context function.
-- `K` — kinetics superoperator received from the context function.
+The pulse call uses `H+1i*R+1i*K`, both RF operators, `rho0`, and the specified frequency, amplitude, and duration. It passes the resulting state to `slowpass` for the requested frequency-domain acquisition. The output is a spectrum with `npoints` samples in the supplied window; the function does not itself construct a field-orientation or MAS sweep.
 
-## Outputs
+## Relaxation requirement
 
-- `spectrum` — spectrum of the specified initial state detected on the specified coil state within the requested frequency interval.
+The source warns that relaxation must be present in the dynamics for the matrix inversion in acquisition to converge, and that `R` should not be thermalised. These are source-level input requirements, not a statement that a particular model or result has been validated.
 
-Relaxation must be present in the system dynamics for the matrix inversion to converge. The relaxation matrix `R` should **not** be thermalised.
-
-## Implementation
-
-The function converts the simulation to Liouville space, converts the RF operators to commutation superoperators when starting in `zeeman-hilb`, applies a soft off-resonance pulse with `shaped_pulse_af`, and performs frequency-domain acquisition with `slowpass`.
-
-Source: <https://spindynamics.org/wiki/index.php?title=nqr_pa.m>
+https://spindynamics.org/wiki/index.php?title=nqr_pa.m

@@ -1,21 +1,13 @@
 # examples/imaging/gradient_image_1d.m
 
-- Signature: `gradient_image_1d()`
+A one-dimensional hard-pulse imaging example with diffusion and flow; its header gives a seconds-scale calculation time and credits Ahmed Allami and Ilya Kuprov. [Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/gradient_image_1d.m)
 
-## Purpose
+## Model and sequence
 
-Simulate a 1D imaging experiment with a hard pulse in the presence of diffusion and flow. Calculation time: seconds. Ahmed Allami and Ilya Kuprov.
+The model is one `1H` spin with `sys.magnet=5.9` and scalar chemical shift `1.0`; the example does not annotate units for these values. Relaxation is `t1_t2` with diagonal terms retained, zero equilibrium, `R1=0.5` and `R2=2.0`. It uses `sphten-liouv` without basis approximation. The sequence call is `imaging(spin_system,@basic_1d_hard,parameters)`, with no decoupled spins, offset `0`, sweep value `500000`, 128 acquired points and 128-point zero-fill; the displayed axis is configured in kHz and inverted. A readout-gradient amplitude of `30e-3` is supplied without a unit comment.
 
-## Physical / mathematical content
+The sample uses `dims=0.30`, 100 points and `{'period',3}` differentiation. The relaxation phantom is all zeros, with the relaxation operator from `relaxation(spin_system)`. Initial and coil spatial phantoms are uniform ones; their states are `Lz` and `L+`, respectively. Flow is `u=1e-2` at every point and diffusion is `5e-6`; the example does not annotate units for these values or the sample length.
 
-- The spin system contains one `1H` spin at 5.9 T with a scalar chemical shift of 1.0. It uses `t1_t2` relaxation with diagonal terms retained, zero equilibrium, and R1 and R2 rates of 0.5 and 2.0.
-- The 0.30-long spatial domain has 100 points and a third-order periodic derivative. Uniform initial `Lz` and detection `L+` phantoms are specified, along with a zero relaxation phantom. Flow is `1e-2` at every spatial point, and diffusion is `5e-6`.
+## Output and interpretation
 
-## Numerical / algorithmic content
-
-- The simulation uses the `sphten-liouv` formalism without basis approximation and runs the `basic_1d_hard` sequence through `imaging` with a readout gradient amplitude of `30e-3`.
-- Acquisition settings specify a sweep of 500000, 128 points, zero filling to 128 points, a zero offset, a `kHz` axis, and axis inversion. The FID receives `sqsin` apodisation; the plotted image is the real part of its shifted Fourier transform.
-
-## Implementation structure
-
-- Create the spin system and basis, define sequence and spatial parameters, run `imaging(spin_system,@basic_1d_hard,parameters)`, apodise the FID, Fourier-transform it, and display the result with `plot_1d`.
+The imaging result is square-sine apodised, then transformed with a centered 1D FFT; the real spectrum is passed to `plot_1d`. The source gives the display axis unit (`kHz`), but does not label the gradient amplitude, flow, diffusion, or geometry units. It specifies the hard-pulse sequence helper but no independent RF amplitude or duration.

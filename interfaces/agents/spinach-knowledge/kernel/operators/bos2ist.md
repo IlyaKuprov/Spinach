@@ -2,28 +2,19 @@
 
 - Signature: `[states,coeffs]=bos2ist(prod_spec,nlevels)`
 
-## Purpose
+## Meaning
 
-Convert a bosonic operator product specification into its contributing irreducible spherical-tensor (IST) states and coefficients.
+Expands an ordered product of truncated-mode bosonic operators into Spinach irreducible spherical-tensor (IST) basis states and their coefficients. The accepted symbols in `prod_spec` are `C` (creation), `A` (annihilation), and `N` (number operator); `CCAA` is the source's example. Starting with the sparse identity, the routine scans the string from left to right and right-multiplies by the corresponding `weyl(nlevels)` matrix at each character. An empty character string leaves the identity matrix to be expanded.
 
-## Physical / mathematical content
+## Index mapping and output
 
-`prod_spec` specifies an ordered product of operators for a truncated bosonic mode: `C` is creation, `A` is annihilation, and `N` is the number operator. The allowed symbols are `C`, `A`, and `N`; an empty specification represents the identity operator.
+The routine passes the completed matrix to `oper2ist`. Its `states` are Spinach IST linear basis indices, not oscillator population labels; `lin2lm` converts an index to spherical-tensor `L,M` labels. The parallel `coeffs` values give the expansion coefficients for those states. In the called `oper2ist` implementation, linear labels start at zero and terms with coefficient magnitude no greater than `10*eps('double')` are omitted.
 
-## Numerical / algorithmic content
+## Inputs and guards
 
-The function starts with an `nlevels`-by-`nlevels` sparse identity matrix, obtains the Weyl operators from `weyl(nlevels)`, and multiplies in the operators named by `prod_spec` in order. It converts the resulting matrix with `oper2ist`, which supplies `states` and `coeffs`.
+`prod_spec` must be a character value whose characters are all in `C`, `A`, or `N`. The local check requires `nlevels` to be numeric, real, scalar, and at least one; the subsequent `weyl` call additionally enforces a positive integer. The truncation sets the matrix size used for the Weyl operators and IST expansion.
 
-## Parameters / inputs
+## References
 
-- `prod_spec` - character specification of the ordered product, using `C` (creation), `A` (annihilation), and `N` (number); the empty character vector yields the identity.
-- `nlevels` - number of energy levels in the truncated bosonic mode. The explicit check requires a numeric, real scalar at least 1; it does not test integrality, although the error message describes a positive real integer.
-
-## Outputs
-
-- `states` - contributing states in Spinach IST basis indexing; use `lin2lm` to convert to spherical-tensor `L,M` indices.
-- `coeffs` - coefficients of the corresponding ISTs in the linear combination.
-
-## Implementation structure
-
-The routine checks that `prod_spec` is a character value and that each character is one of `C`, `A`, or `N`. It initializes the sparse identity, applies the selected Weyl operators sequentially, then calls `oper2ist` to produce the output state indices and coefficients.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/bos2ist.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=bos2ist.m)

@@ -1,11 +1,11 @@
 # interfaces/hiper/spinach2hiper.m
 
-- Signature: `spinach2hiper(file_name,amp,phi,off,dt)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/hiper/spinach2hiper.m) · [Wiki page](https://spindynamics.org/wiki/index.php?title=spinach2hiper.m)
 
-Exports phase-modulated optimal-control waveforms for Graham Smith's HiPER instrument to `file_name.csv`.
+**Call:** `spinach2hiper(file_name,amp,phi,off,dt)`. The function writes `[file_name '.csv']` and has no return value.
 
-`file_name` is a character string without the extension. `amp` and `phi` are equal-length finite real vectors (amplitudes and phases in radians); `off` is a finite real transmitter offset in Hz; and `dt` is a positive finite real slice duration in seconds.
+`file_name` is required to be a character string; the documented convention is a basename without an extension, and the implementation always appends `.csv`. `amp` and `phi` must be equal-length, finite, real numeric vectors. Amplitudes are written unchanged; phases are input in radians, converted to degrees, and wrapped to [0, 360]. `off` is a finite real numeric scalar in Hz and is repeated for each slice after conversion to MHz by multiplying by `1e-6`. `dt` is a positive finite real numeric scalar in seconds, converted to nanoseconds by multiplying by `1e9`.
 
-The CSV columns are `time_ns` (slice start times from zero, spaced by `dt*10^9` ns), `freq_MHz` (`off*10^-6`), `phase_deg` (phase converted to degrees and wrapped to [0,360]), and `amplitude`.
+The CSV table columns are `time_ns`, `freq_MHz`, `phase_deg`, and `amplitude`. Slice start times are `cumsum(dt_ns)-dt_ns`, so the first row starts at zero and subsequent starts are separated by one slice duration. The input vectors are columnized for the table. The source cautions that instrument phase direction may differ; test positive and negative phases as appropriate for the instrument.
 
-[Spinach documentation](https://spindynamics.org/wiki/index.php?title=spinach2hiper.m)
+The exporter calls `wrapTo360`, `table`, and `writetable`; it performs no amplitude scaling or hardware calibration.

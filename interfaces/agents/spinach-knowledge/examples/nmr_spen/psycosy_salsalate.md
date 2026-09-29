@@ -1,20 +1,12 @@
 # examples/nmr_spen/psycosy_salsalate.m
 
-- Signature: `psycosy_salsalate()`
+- Function: `psycosy_salsalate()`
+- Source: [examples/nmr_spen/psycosy_salsalate.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_spen/psycosy_salsalate.m)
 
-## Purpose
+This is a simulated PSYCOSY experiment for a five-proton model of one salsalate ring. The source supplies a 14.1 T magnet, five 1H shifts (8.14, 7.44, 7.71, 7.28, and 7.60 ppm), and scalar couplings of 7.9, 7.5, 8.1, 1.6, and 1.2 Hz; it also assigns zero couplings for the listed (5,2) and (5,5) entries. These are simulation inputs, not imported experimental measurements.
 
-PSYCOSY of one salsalate ring. Calculation time: minutes on NVidia Tesla A100, much longer on CPU
+The spatial sample is 15 mm long and represented by 100 points, with the period-3 spatial derivative setting. Flow is zero and the diffusion coefficient is zero, so this calculation does not model diffusion attenuation. The initial and receive phantoms are uniform; the spin states are 1H longitudinal magnetisation and 1H transverse detection. Relaxation is represented by the relaxation operator with a zero spatial relaxation phantom.
 
-## Physical / mathematical content
+The script calls Spinach imaging with the PSYCOSY sequence. It sets a 1H, 720 Hz sweep, offset 4620, and a 512 by 512 acquisition, zero-filled to 1024 by 1024. The sequence inputs include 110 ms mixing and a 0.01 T/m gradient. Its saltire-chirp inputs are 20 degrees, 15 ms pulse duration, 50 ms gradient duration, 10 kHz sweep, 250 points, and smoothing factor 20. The source passes these parameters to the sequence; it does not spell out the internal pulse/gradient waveform or a detailed pathway derivation, so none is inferred here.
 
-- The source defines one salsalate-ring spin system with five 1H shifts (8.14, 7.44, 7.71, 7.28, and 7.60 ppm) at 14.1 T, and scalar couplings including 7.9, 7.5, 8.1, 1.6, and 1.2 Hz. The spatial model is 15 mm long with 100 points.
-- It simulates `@psycosy` with Spinach's imaging function. The 2D acquisition uses 512 points per dimension, zero-filled to 1024, with 720 Hz sweep and 4620 Hz offset; sequence settings include a 110 ms mixing time, 0.01 T/m gradient, and a 20° saltire chirp (15 ms pulse, 10 kHz sweep, 50 ms gradient duration).
-
-## Numerical / algorithmic content
-
-- The resulting two-dimensional FID is square-sine apodised in each dimension and transformed with a 2D FFT. The script plots the magnitude spectrum.
-
-## Implementation structure
-
-- Sets up the spin system, basis, and sequence parameters; runs imaging and performs the stated apodisation, Fourier transform, and plot.
+Each FID dimension receives square-sine apodisation; a two-dimensional FFT is shifted and plotted as a positive magnitude spectrum. The model is configured with the sphten-liouv formalism, IK-2 approximation, proximity level 1, scalar-coupling connectivity, greedy algorithm, proximity cutoff 4.0, and merge dimension 500. These settings describe this example only; the file contains no comparison with measured data or stated accuracy bound. The source comment's machine-time estimate is not repeated as a validated runtime.

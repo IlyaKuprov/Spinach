@@ -1,28 +1,15 @@
 # kernel/summaries/summary_modes.m
 
-- Signature: `summary_modes(spin_system,header)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_modes.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_modes.m)
 
 ## Purpose
 
-Prints a parameter summary for bosonic modes represented in a Spinach spin system.
+Print the stored parameters of bosonic components in a Spinach system.
 
-## Physical / mathematical content
+## What is reported
 
-The table includes modes whose component type is C, V, or T, labelled as cavity, phonon, or transmon, respectively. It reports each mode's isotope, multiplicity, frequency, anharmonicity, damping, and dephasing values.
+The table includes only components whose type code is C, V, or T, labelled cavity, phonon, or transmon respectively. For each included component it prints the component index, the isotope string from `spin_system.comp.isotopes`, the type label, `spin_system.comp.mults`, and the stored frequency, anharmonicity, damping, and dephasing values. The four parameter values are divided by `2*pi` and printed in Hz. The isotope string is displayed as component metadata; this routine does not calculate a nuclear spin quantum number or isotope-dependent gyromagnetic ratio.
 
-## Numerical / algorithmic content
+## Output and inputs
 
-The listed frequency, anharmonicity, damping, and dephasing fields are divided by `2*pi` and printed in Hz. The function checks that `spin_system` is a structure and `header` is a character string.
-
-## Parameters / inputs
-
-- spin_system - Spinach spin system description object
-- header - a string of text to precede the summary
-
-## Outputs
-
-- Prints the mode table through `report.m` to the console or user-specified output.
-
-## Implementation structure
-
-After validation and table headings, the function iterates over the spin-system components, selects types C, V, and T, maps those type codes to labels, and prints the stored mode parameters.
+The routine has no returned output. It sends the supplied header, headings, rows, and separators through `report` to the console or configured report destination. Its input checks require `spin_system` to be a structure and `header` to be a character array; the routine does not assign fields of the input structure.

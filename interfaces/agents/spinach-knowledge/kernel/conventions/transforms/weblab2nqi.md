@@ -1,27 +1,22 @@
 # kernel/conventions/transforms/weblab2nqi.m
 
-- Signature: `varargout=weblab2nqi(C_q,eta_q,I,alpha,theta,phi)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/weblab2nqi.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=weblab2nqi.m)
 
-Converts Weblab one-cone model parameters (see `weblab_cone.png`) into NQI quadrupolar coupling tensors used by Spinach. See the [function reference](https://spindynamics.org/wiki/index.php?title=weblab2nqi.m).
+## Purpose and inputs
 
-## Inputs
+Converts the Weblab one-cone model parameters ([diagram](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/weblab_cone.png)) into quadrupolar coupling tensors for multiple sites. `C_q` is `e^2*q*Q/h` in Hz; `eta_q` is the dimensionless quadrupolar asymmetry; `I` is the spin quantum number; and `alpha`, `theta`, and, where accepted, `phi` are model angles in radians. The generated site tensors are 3x3 matrices in Hz.
 
-- `C_q`: quadrupolar coupling constant `e^2*q*Q/h`, in Hz.
-- `eta_q`: quadrupolar tensor asymmetry parameter.
-- `I`: spin quantum number; an integer or half-integer at least 1.
-- `alpha`, `theta`, `phi`: Weblab cone-model angles in radians. `phi` is required for two- and three-output calls and must be omitted for four- and six-output calls.
+The inputs must be numeric, real scalars. `I` must also satisfy `I>=1` and `2*I+1` integer (integer or half-integer spins starting at 1). The code does not impose finite-value checks or an interval on `eta_q` or the angles.
 
-## Output modes
+## Output modes and azimuths
 
-Each output `Q1`, `Q2`, … is a 3×3 quadrupolar coupling tensor in Hz. The function calls `eeqq2nqi(C_q,eta_q,I,[azimuth theta alpha])` for each site:
+The number and arrangement of outputs determines the accepted input form:
 
-| Outputs | Call arguments | Azimuths, in output order |
-| --- | --- | --- |
-| `Q1,Q2` | `C_q,eta_q,I,alpha,theta,phi` | `-phi/2`, `+phi/2` |
-| `Q1,Q2,Q3` | `C_q,eta_q,I,alpha,theta,phi` | `-phi`, `0`, `+phi` |
-| `Q1`–`Q4` | `C_q,eta_q,I,alpha,theta` | `0`, `pi/2`, `pi`, `3*pi/2` |
-| `Q1`–`Q6` | `C_q,eta_q,I,alpha,theta` | `0`, `pi/3`, `2*pi/3`, `pi`, `4*pi/3`, `5*pi/3` |
+- Two outputs require six inputs including `phi`; the site azimuths are `-phi/2` and `+phi/2`.
+- Three outputs require six inputs; the azimuths are `-phi`, `0`, and `+phi`.
+- Four outputs require five inputs, with `phi` omitted; the fixed azimuths are `0`, `pi/2`, `pi`, and `3*pi/2`.
+- Six outputs require five inputs, with `phi` omitted; the fixed azimuths are `0`, `pi/3`, `2*pi/3`, `pi`, `4*pi/3`, and `5*pi/3`.
 
-## Validation
+For every site, the wrapper calls `eeqq2nqi(C_q,eta_q,I,[azimuth theta alpha])`. That routine uses the ZYZ active Euler convention in radians. Its principal values are `XX=-C_q*(1-eta_q)/(4*I*(2*I-1))`, `YY=-C_q*(1+eta_q)/(4*I*(2*I-1))`, and `ZZ=C_q/(2*I*(2*I-1))`; it rotates `diag([XX YY ZZ])` by `R=euler2dcm([azimuth theta alpha])` as `Q=R*diag([XX YY ZZ])*R'`, then removes the trace-rounding component and symmetrises the matrix. Each output `Qn` is one such 3x3 Hz tensor.
 
-Only 2, 3, 4, or 6 outputs are supported. All supplied inputs must be numeric, real scalars; `I` must also satisfy the spin constraint above. The function rejects a missing `phi` in two- or three-output mode and a supplied `phi` in four- or six-output mode.
+Only 2, 3, 4, or 6 outputs are supported. Two- and three-output calls require exactly six inputs; four- and six-output calls require exactly five and reject a supplied `phi`. `phi` must be scalar in the six-input modes. The five-input modes set it internally to an empty array.

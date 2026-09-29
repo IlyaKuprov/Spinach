@@ -1,19 +1,19 @@
 # examples/fundamentals/operator_tests/commutation_2.m
 
+- MATLAB implementation: [examples/fundamentals/operator_tests/commutation_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/operator_tests/commutation_2.m)
+
 - Signature: `commutation_2()`
 
 ## Purpose
 
-Checks angular-momentum commutation relations in three Spinach representations.
+Checks the angular-momentum operator commutation identities for a `235U` spin in three Spinach representations. It is an algebra and representation-convention check, not a magnetic-resonance propagation or experimental model.
 
-## Physical / mathematical content
+## System and operators
 
-The test builds a single 235U spin at zero field with zero scalar Zeeman interaction. For each of `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`, it constructs the Cartesian and ladder operators and evaluates the three relations `[Lz,L+]=L+`, `[Lz,L-]=-L-`, and `[Lx,Ly]=iLz`.
+The source creates one `235U` isotope with `sys.magnet = 0` and zero scalar Zeeman interaction. For each formalism `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`, it uses basis approximation `none` and obtains `L+`, `L-`, `Lx`, `Ly`, and `Lz` with `operator`.
 
-## Numerical / algorithmic content
+The three residuals test `Lz*L+ - L+*Lz = L+`, `Lz*L- - L-*Lz = -L-`, and `Lx*Ly - Ly*Lx = 1i*Lz`. Their Frobenius norms fill a complex 3-by-3 answer array, with one column for each formalism.
 
-Each commutator residual is measured with the Frobenius norm. The three formalisms pass together only when the Frobenius norm of the 3-by-3 residual array is below `1e-6`; otherwise the example raises an error.
+## Source-stated check and limits
 
-## Implementation structure
-
-The script recreates the spin system and basis for each formalism, fills one residual column with the three operator identities, then reports a single cross-formalism pass or failure.
+The script prints `Cross-formalism commutation test PASSED.` only when `norm(answer,'fro') < 1e-6`; otherwise it raises an error reporting failure. This is the source's conditional pass/fail rule, not an observed run: no MATLAB execution is claimed here. The scope is limited to these identities, this one-isotope system, and these three formalisms; no dynamics or broader operator validation is reported.

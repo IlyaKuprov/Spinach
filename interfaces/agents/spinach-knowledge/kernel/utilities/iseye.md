@@ -1,23 +1,28 @@
 # kernel/utilities/iseye.m
 
-- Signature: `verdict=iseye(M)`
-
 ## Purpose
 
-Performs the function's computationally affordable test for whether a numeric matrix is the identity matrix.
+Returns `true` for unit (identity) matrices. The test is designed to be computationally affordable. Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iseye.m>
 
-## Parameters / inputs
+## Behavior
 
-- `M` - numeric matrix.
+- Syntax: `verdict=iseye(M)`.
+- Consistency is enforced first: if `M` is not numeric, the function errors with `'M must be numeric.'`.
+- If `M` is not square, `verdict` is `false`.
+- Otherwise, if `M` is not diagonal (`~isdiag(M)`), `verdict` is `false`.
+- Otherwise, a random test vector `a=randn(size(M,2),1)` is generated, and `M*a` is compared with `a` via `nnz(M*a-a)`. If `nnz(M*a-a)~=0`, `verdict` is `false`; otherwise `verdict` is `true`.
 
-## Outputs
+## Inputs and outputs
 
-- `verdict` - true or false.
+**Inputs**
 
-## Numerical / algorithmic content
+- `M` — a matrix (must be numeric).
 
-A nonsquare matrix returns false. For a square matrix, the function first returns false if `M` is not diagonal. Otherwise it draws one random column vector `a` of matching length and returns true exactly when `nnz(M*a-a)` is zero; a failed comparison returns false. The source validates that `M` is numeric.
+**Outputs**
 
-## Source
+- `verdict` — `true` or `false`.
 
-[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=iseye.m)
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=iseye.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iseye.m>

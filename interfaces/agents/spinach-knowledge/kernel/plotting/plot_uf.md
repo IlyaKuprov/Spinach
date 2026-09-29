@@ -4,33 +4,21 @@
 
 ## Purpose
 
-Plot an ultrafast constant-time 2D NMR spectrum with axes for the UF and conventional dimensions.
+Plot an ultrafast constant-time 2D spectrum with a UF axis and a conventional axis. The routine constructs plotting coordinates and draws contours; it does not calculate the spectrum.
 
-## Physical / mathematical content
+## Axis construction
 
-The conventional-dimension sweep width is `1/(2*Ta)`, where `Ta=parameters.deltat*parameters.npoints`. The UF axis uses the magnetogyric ratio of the first working spin, `k_max=gamma*parameters.Ga*Ta/(2*pi)`, and `constant_c=(-2*(2*parameters.Te))/parameters.dims`. Its resolution is `abs(1/(constant_c*parameters.dims))` and its sweep width is `abs(k_max/constant_c)`.
+Let `Ta=parameters.deltat*parameters.npoints` seconds. The conventional sweep is `sweep_conv=1/(2*Ta)` Hz, and the conventional axis is `sweep_conv*(-floor(nloops/2):(ceil(nloops/2)-1))/nloops+offset(2)` Hz. The first entry in `parameters.spins` supplies `gamma=spin(spins{1})` in rad/s/T; the code sets `k_max=gamma*Ga*Ta/(2*pi)` in m⁻¹, `t_max=2*Te`, and `constant_c=(-2*t_max)/dims`. It then uses `res_uf=abs(1/(constant_c*dims))` Hz and `sweep_uf=abs(k_max/constant_c)` Hz. The UF-axis sample count is `round(dims*k_max)`, which must equal `size(spectrum_uf,1)`; its values are `-sweep_uf/2+res_uf*(0:(uf_dim_size-1))+offset(1)`.
 
-The source cites *Progress in Nuclear Magnetic Resonance Spectroscopy* **57** (2010), 241 for the constant. See also the [plot_uf.m documentation](https://spindynamics.org/wiki/index.php?title=plot_uf.m).
+For `axis_units='ppm'`, the two axes are converted with `1e6*(2*pi*frequency)/(spin(spins{i})*spin_system.inter.magnet)`; for `'Hz'`, the frequency values are unchanged. The code then adds `offset_uf_cov` to the UF/F1 axis in the selected units. Offsets `offset(1)` and `offset(2)` are in Hz before conversion; `offset_uf_cov` is documented in the selected axis units. The constant-time-axis construction cites *Progress in Nuclear Magnetic Resonance Spectroscopy* **57** (2010), 241; no DOI is given in the source.
 
-## Numerical / algorithmic content
+## Rendering and checks
 
-The function constructs the conventional and UF frequency axes from the acquisition settings and transmitter offsets. For `ppm` axes, it converts both axes using the respective working spins and `spin_system.inter.magnet`; for `Hz` axes, it retains the frequency values. It then adds `parameters.offset_uf_cov` to the UF axis, plots `flipud(spectrum_uf)` as contours, and reverses both axis directions. The UF dimension of `spectrum_uf` must equal `round(parameters.dims*k_max)`.
+The contour call uses `axis_f2` for X, `axis_f1` for Y, and `flipud(spectrum_uf)` for the matrix. It boxes and grids the current axes, labels X as `1Q / ppm` and Y as `MQ / ppm`, and reverses both axis directions. Those labels are literal source strings; the code does not compose them from `axis_units`. No explicit axis limits or colormap are set here, and the function returns no value.
 
-## Parameters / inputs
+The input must be a real numeric matrix. The parameter structure must supply spins, two offsets, `offset_uf_cov`, sample dimension, acquisition time step and point count, loop count, gradient amplitude, echo time, and axis units; the source checks these scalar values for the required finite/positive forms and accepts only `'ppm'` or `'Hz'`. A single spin entry is duplicated for both dimensions. The UF row count is checked against the rounded `dims*k_max` value.
 
-- `spin_system`: supplies `spin_system.inter.magnet` for ppm conversion.
-- `spectrum_uf`: real matrix containing the 2D UF NMR spectrum.
-- `parameters.spins`: cell array of one or two character strings specifying the working spins; a single spin is used for both dimensions.
-- `parameters.dims`: sample dimension, m.
-- `parameters.deltat`: acquisition-gradient time step, s.
-- `parameters.npoints`: number of points in the acquisition gradient.
-- `parameters.nloops`: number of acquisition loops; sets the conventional-axis point count.
-- `parameters.Te`: echo time, used to set `t_max=2*parameters.Te`.
-- `parameters.Ga`: acquisition-gradient amplitude, T/m.
-- `parameters.offset`: two transmitter offsets for the UF and conventional dimensions, Hz.
-- `parameters.axis_units`: `'ppm'` or `'Hz'`.
-- `parameters.offset_uf_cov`: offset between chemical shifts of a multiple-quantum signal along the F1 dimension of conventional and UF spectra, in the selected axis units.
+## References
 
-## Output
-
-A contour figure with axes for the UF and conventional dimensions.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/plot_uf.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=plot_uf.m)

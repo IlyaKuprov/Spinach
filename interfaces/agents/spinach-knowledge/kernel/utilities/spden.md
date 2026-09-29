@@ -1,36 +1,40 @@
 # kernel/utilities/spden.m
 
-- Signature: `J=spden(L,D,omega)`
-
 ## Purpose
 
-Computes the Lorentzian spectral density for rotational diffusion at the specified frequency.
+`spden` returns the value of the Lorentzian spectral density function for rotational diffusion at a user-specified frequency. It is used in relaxation-theory calculations involving rotational diffusion.
 
-## Physical / mathematical content
+## Behavior
 
-The correlation time and spectral density are
+The function is called as `J=spden(L,D,omega)`. It first runs an internal consistency check (`grumble`) on the inputs, then computes the rotational correlation time
 
-- `tau_c=1/(L*(L+1)*D)`
-- `J=(tau_c/(2*L+1))/(1+(tau_c*omega)^2)`
+`tau_c = 1/(L*(L+1)*D)`
 
-## Numerical / algorithmic content
+and evaluates the spectral density as
 
-The function checks the inputs, calculates `tau_c`, then calculates `J`.
+`J = (tau_c/(2*L+1))/(1+(tau_c*omega)^2)`.
 
-## Parameters / inputs
+Input validation enforces:
 
-- `L` — spherical rank; a positive real integer. Use 2 for common NMR mechanisms such as dipolar relaxation.
-- `D` — rotational diffusion coefficient in s⁻¹; a positive real scalar.
-- `omega` — frequency in rad/s; a real scalar.
+- `L` must be a positive real integer (numeric, scalar, real, `L >= 1`, integer-valued); otherwise the error `L must be a positive real integer.` is raised.
+- `D` must be a positive real scalar; otherwise the error `D must be a positive real scalar.` is raised.
+- `omega` must be a real scalar; otherwise the error `omega must be a real scalar.` is raised.
 
-## Outputs
+The header comment notes that `L = 2` should be used for common NMR mechanisms such as dipolar relaxation.
+
+## Inputs and outputs
+
+Inputs:
+
+- `L` — spherical rank; use 2 for common NMR mechanisms such as dipolar relaxation.
+- `D` — rotational diffusion coefficient, s^-1.
+- `omega` — frequency, rad/s.
+
+Output:
 
 - `J` — spectral density function value.
 
-## Implementation structure
+## References
 
-Input consistency is enforced by the local `grumble` function.
-
-Source: <https://spindynamics.org/wiki/index.php?title=spden.m>
-
-ilya.kuprov@weizmann.ac.il
+- Source: [Spinach repository — kernel/utilities/spden.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/spden.m)
+- Spinach Wiki: [spden.m](https://spindynamics.org/wiki/index.php?title=spden.m)

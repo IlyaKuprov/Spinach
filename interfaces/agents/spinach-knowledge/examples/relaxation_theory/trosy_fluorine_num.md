@@ -4,23 +4,12 @@
 
 ## Purpose
 
-Calculate transverse relaxation rates as a function of applied magnetic field for the fluorine atom and its directly bonded carbon in a 3-fluorotyrosine-labelled protein. Calculation time: minutes.
+Calculates field-dependent transverse relaxation matrix elements for the `19F` and directly bonded `13C` in the source's 3-fluorotyrosine model. Although the source describes a labelled protein, the constructed spin system contains only this two-spin fragment; it is not a whole-protein simulation.
 
-## Physical / mathematical content
+## Model and quantities
 
-- The two-spin system contains `19F` and `13C`. Their coordinates and Zeeman shielding matrices are extracted from a 3-fluorotyrosine DFT calculation.
-- Relaxation uses the `redfield` model with `labframe` terms, `zero` equilibrium, and a correlation time of `25e-9` s.
-- At each field, rates are evaluated as `-v'*R*v` for normalized single-spin transverse states and for the corresponding states combined with longitudinal order on the other spin.
+The two spins' coordinates and chemical-shift tensors are selected from `3_fluoro_tyr.log`, using DFT indices 8 for `19F` and 7 for `13C`. The full `sphten-liouv` basis is used without approximation; relaxation is lab-frame Redfield with zero equilibrium and `tau_c = 25e-9` (no unit is annotated for this parameter). The source estimates a calculation time of minutes. At each of 20 fields corresponding to proton Larmor frequencies from 200 to 800 MHz, it obtains the relaxation superoperator and evaluates matrix elements for the single-spin `L+` operators and paired coherence operators. For each nucleus the paired states combine that nucleus's `L+` with plus or minus twice the partner's `Lz` term; the resulting rates represent the broad/narrow TROSY components alongside the single-spin transverse rate.
 
-## Numerical / algorithmic content
+Two plots show the `19F` and `13C` results. Their horizontal axis is proton Larmor frequency in MHz and their vertical axis is a relaxation matrix element in Hz. This script evaluates relaxation rates directly; it does not simulate or compare an experimental spectrum.
 
-- Read `../standard_systems/3_fluoro_tyr.log` using `gparse` and `g2spinach`, with isotope substitutions `C` to `13C` and `F` to `19F` and reference values `[186.38 192.97]`.
-- Use the `sphten-liouv` formalism with `none` basis approximation; disable `hygiene` startup checks.
-- Sweep 20 proton Larmor frequencies from 200 to 800 MHz, converting each frequency to a magnetic field with `B0=2*pi*lin_freq*1e6/spin('1H')`. Create the spin system and basis and calculate the relaxation superoperator at each field.
-
-## Implementation structure
-
-- Extract the fluorine and carbon shielding matrices and coordinates from DFT entries 8 and 7, respectively.
-- Construct and normalize the `L+` state for each spin and the combinations `F+ - 2 F+ Cz`, `F+ + 2 F+ Cz`, `C+ - 2 C+ Fz`, and `C+ + 2 C+ Fz`.
-- Calculate six relaxation matrix elements at each field: three for fluorine states and three for carbon states.
-- Produce separate fluorine and carbon plots against proton Larmor frequency (MHz), with relaxation matrix elements in Hz.
+Source: [examples/relaxation_theory/trosy_fluorine_num.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_fluorine_num.m).

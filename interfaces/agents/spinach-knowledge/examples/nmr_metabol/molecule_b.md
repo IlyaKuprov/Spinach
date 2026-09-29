@@ -1,19 +1,21 @@
 # examples/nmr_metabol/molecule_b.m
 
 - Signature: `molecule_b()`
+- Source: [examples/nmr_metabol/molecule_b.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_metabol/molecule_b.m)
 
-## Purpose
+## What it models and loads
 
-Simulate a 1H NMR spectrum of a molecule from the GISSMO database. Calculation time: seconds.
+This example simulates a one-dimensional liquid-state `1H` NMR spectrum for a molecule identified in the source as a GISSMO-database entry. The source comment estimates calculation time as seconds; that is not a timing measurement from this review. The wrapper imports `molecule_b.xml` with `gissmo2spinach('molecule_b.xml',1)` to obtain `sys` and `inter`. That XML is an input to the spin-system simulation, not an acquired FID or spectrum loaded for plotting. This wrapper does not say whether the XML parameters were experimentally measured, calculated, or curated.
 
-## Implementation
+## Spin system and acquisition setup
 
-- Import the GISSMO dataset with `gissmo2spinach('molecule_b.xml',1)`.
-- Build the Spinach basis using `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level 1.
-- Create the spin system and basis with `create` and `basis`.
-- Set both the initial state and detection coil to `state(spin_system,'L+','1H')`; use no decoupling.
-- Set offset to 3500, sweep to 5000, acquisition points to 4096, zero filling to 16536, axis units to `ppm`, and axis inversion to 1.
-- Acquire the liquid-state NMR FID with `liquid(spin_system,@acquire,parameters,'nmr')`, apply Gaussian apodisation with parameter 10, and compute `fftshift(fft(fid,parameters.zerofill))`.
-- Plot the real spectrum with `plot_1d`.
+- The basis uses `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
+- The observed spins are `{'1H'}`; both the initial state and detection coil are set to `state(spin_system,'L+','1H')`. `parameters.decouple={}` specifies no decoupling entries.
+- The source sets offset `3500`, sweep `5000`, `4096` acquisition points, and `16536` zero-filled points. It labels the plotted axis `ppm` and sets `invert_axis=1`. The wrapper does not state units for offset, sweep, or the Gaussian parameter below; these numbers are the literal settings in the code, not inferred Hz or ppm values.
+- No relaxation parameters are assigned in this wrapper.
 
-Source attribution: ilya.kuprov@weizmann.ac.il
+Acquisition is delegated through `liquid(spin_system,@acquire,parameters,'nmr')`. The wrapper does not show the helper's internal pulse, phase, gradient, or receiver program, so those details are not asserted here.
+
+## Processing and output
+
+The returned FID is apodised with `{'gauss',10}`, Fourier-transformed as `fftshift(fft(fid,parameters.zerofill))`, and displayed as `real(spectrum)` with `plot_1d`. The zero-argument function does not declare a returned value or write an output spectrum file in this source. No experimental spectrum is loaded or compared in the wrapper.

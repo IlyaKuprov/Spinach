@@ -1,21 +1,23 @@
 # examples/fundamentals/pfg_test_1.m
 
 - Signature: `pfg_test_1()`
+- Source: [examples/fundamentals/pfg_test_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/pfg_test_1.m)
+- Background reference: [Journal of Magnetic Resonance, DOI 10.1016/j.jmr.2014.01.011](https://doi.org/10.1016/j.jmr.2014.01.011)
 
 ## Purpose
 
-Exercise the explicit gradient-pulse function grad_pulse, which uses the auxiliary-matrix formalism to compute a sample-volume integral. Background: [10.1016/j.jmr.2014.01.011](http://dx.doi.org/10.1016/j.jmr.2014.01.011).
+Demonstrate an explicit gradient pulse calculation using the auxiliary-matrix formalism to obtain the sample-volume-integrated state trajectory. The observable displayed is how coherence-order content evolves during a homospoil gradient; the source does not reduce it to a reported scalar filter efficiency.
 
-## Physical / mathematical content
+## Spin system and initial state
 
-The example evolves a three-proton system under a rectangular homospoil gradient pulse and examines the trajectory by coherence order. Chemical shifts and scalar couplings are randomized for the run.
+The no-argument example creates three `1H` spins at a 5.9 T magnet, with independently randomized scalar shifts (`10*rand(1)` per spin) and scalar pair couplings (`20*rand(1)` for each pair). It uses the `sphten-liouv` basis with `approximation='none'` and applies the NMR assumption. A normalized random state vector is used as the initial state, with its first element set to 1 before normalization. Basis projection quantum numbers from `lin2lm` are summed to assign each basis state a coherence order. The state is normalized separately within each represented coherence-order subspace and those subspaces are weighted linearly from 0.1 to 0.9.
 
-## Numerical / algorithmic content
+## Pulse calculation and output
 
-It evaluates 100 pulse durations at steps of 2e-7 s, with gradient strength 20 G/cm, sample length 1.5 cm, and rectangular shape factor 1. The trajectory loop uses parfor.
+The script calls `grad_pulse(spin_system,L,rho,gradient_strength,sample_length,duration,gradient_shape_factor)` for 100 durations from zero to 19.8 microseconds in increments of 0.2 microseconds. It sets the gradient to 20 G/cm, the sample length to 1.5 cm, and the shape factor to 1 (rectangular). The calls are parallelized with `parfor`. `trajan(...,'coherence_order')` displays the resulting trajectory with a linear vertical axis.
 
-## Implementation structure
+These are source inputs and plotted output, not a reported numerical validation result: the function has no assertion, tolerance, or scalar result. Because shifts and couplings are randomized without setting the RNG state, a run need not reproduce a particular trajectory.
 
-- Set a 5.9 T, three-1H system with random scalar shifts and couplings, then construct the sphten-liouv basis and Hamiltonian.
-- Build and weight the initial state by coherence-order subspaces, then call grad_pulse for each duration.
-- Plot the resulting state trajectory with trajan(...,'coherence_order').
+## Callable context
+
+Run `pfg_test_1()` with the Spinach system, basis, Hamiltonian, gradient-pulse, coherence-analysis, and plotting functions used in the source; it accepts no arguments and produces a figure. No external experimental data are read.

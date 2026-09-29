@@ -1,63 +1,13 @@
 # experiments/esr_dipolar/deer_3p_soft_diag.m
 
-- Signature: `deer_3p_soft_diag(spin_system,parameters)`
+This function orchestrates pulse and echo-stack diagnostics for three-pulse DEER. It runs the soft-hole worker through `powder`, apodises the four FIDs with the `crisp` window, zero-fills and Fourier-transforms them, then runs the soft-DEER worker through `powder`. It displays four figures: pulse spectra, the unphased echo stack, the first three SVD echo components, and the first three SVD DEER-trace components. The signature has no numerical return value.
 
-## Purpose
+## Inputs and interpretation
 
-Runs the three-pulse diagnostic sequence and an echo-stack calculation. It calls `deer_3p_soft_hole` through `powder`, apodises and zero-fills/FFT-transforms its four FIDs for pulse diagnostic plots, then calls `deer_3p_soft_deer` through `powder`. It plots the unphased echo stack and SVD-derived echo and DEER components against their respective axes.
+The function takes `spin_system` and `parameters`. It requires the three-element pulse arrays `parameters.pulse_frq`, `parameters.pulse_pwr`, `parameters.pulse_dur`, `parameters.pulse_phi`, and `parameters.pulse_rnk`; FID/spectrum fields `parameters.offset`, `parameters.sweep`, `parameters.npoints`, and `parameters.zerofill`; initial and detection states `parameters.rho0` and `parameters.coil`; DEER timing fields `parameters.p1_p3_gap`, `parameters.p2_nsteps`, `parameters.echo_time`, and `parameters.echo_npts`; and `parameters.method` and `parameters.assumptions`. The delegated soft-hole worker additionally requires `parameters.spins` to identify irradiated spins.
 
-## Parameters / inputs
+Pulse frequencies are Hz, durations seconds, phases radians, and ranks integer Fokker-Planck ranks. The wrapper header labels `parameters.pulse_pwr` in Hz, whereas the delegated soft-pulse worker documents it in rad/s. The wrapper passes the field through unchanged, so the source does not resolve which unit the caller should supply. `parameters.offset` and `parameters.sweep` are the time-domain receiver offset and sweep in Hz; `parameters.npoints` is the FID point count and `parameters.zerofill` the FFT length. `parameters.p1_p3_gap` is the first-to-third-pulse interval in seconds, `parameters.p2_nsteps` the number of second-pulse insertion positions, `parameters.echo_time` the echo sampling interval, and `parameters.echo_npts` its number of points.
 
-- parameters.pulse_frq -frequencies for the three
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the three
-- pulses, Hz
-- parameters.pulse_dur -durations for the three
-- pulses, seconds
-- parameters.pulse_phi -initial phases for the three
-- pulses, radians
-- parameters.pulse_rnk -Fokker-Planck ranks for the
-- three pulses
-- parameters.offset -receiver offset for the time
-- domain detection, Hz
-- parameters.sweep -sweep width for time domain
-- detection, Hz
-- parameters.npoints -number of points in the free
-- induction decay
-- parameters.zerofill -length of the zero-filled FFT
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.p1_p3_gap -time between the first and the
-- third pulses, seconds
-- parameters.p2_nsteps -number of second pulse posi-
-- tions in the interval between
-- the first and the third pulse
-- parameters.echo_time -time to sample around the ex-
-- pected echo position
-- parameters.echo_npts -number of points in the echo
-- discretization
-- parameters.method -soft puse propagation method,
-- 'expv' for Krylov propagation,
-- 'expm' for exponential propa-
-- gation, 'evolution' for Spin-
-- ach evolution function
-- parameters.assumptions -Hamiltonian generation assump-
-- tions, use 'deer' to keep two-
-- electron flip-flop terms and
-- 'deer-zz' to drop them
+`parameters.method` selects `expm`, `expv`, or `evolution` soft-pulse propagation. `parameters.assumptions` is passed to `powder` as the Hamiltonian-generation assumption: the source header describes `deer` as retaining two-electron flip-flop terms and `deer-zz` as dropping them. The source defines this three-pulse DEER workflow only; it does not define Bruker/CPMG/CP or four-pulse timing, nor does it state plot export or persistence behavior.
 
-## Outputs
-
-- Figure 1: pulse diagnostics
-- Figure 2: DEER echo stack
-- Figure 3: principal components of the stack, echo
-- Figure 4: principal components of the stack, DEER
-- Note: for the method, start with 'expm', change to 'expv' if the
-- calculation runs out of memory, and use 'evolution' as the
-- last resort.
-- Note: simulated echoes tend to be sharp and hard to catch becau-
-- se simulation does not have distributions in experimental
-- parameters. Fourier transforming the echo prior to integ-
-- ration is recommended.
-- Note: the time in the DEER trace refers to the second pulse inser-
-- tion point, after end of first pulse.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_soft_diag.m

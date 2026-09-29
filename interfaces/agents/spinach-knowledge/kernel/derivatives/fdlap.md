@@ -1,27 +1,23 @@
 # kernel/derivatives/fdlap.m
 
+Source: [kernel/derivatives/fdlap.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fdlap.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=fdlap.m)
+
 - Signature: `L=fdlap(dims,extents,nstenc)`
 
-## Purpose
+## Purpose and inputs
 
-Constructs a sparse finite-difference Laplacian for a vectorized 1D, 2D, or 3D array whose dimensions are ordered as `[X Y Z]`. The finite-difference approximation uses periodic boundary conditions.
+Constructs a sparse finite-difference Laplacian for a vectorized one-, two-, or three-dimensional array with axes ordered `[X Y Z]` (using only the leading axes for lower-dimensional inputs). Boundary conditions are periodic.
 
-## Parameters / inputs
+- `dims`: vector of one, two, or three positive integer grid counts.
+- `extents`: corresponding vector of positive real axis extents.
+- `nstenc`: odd integer stencil-point count of at least 3; every grid dimension must be at least this large.
 
-- `dims`: One-, two-, or three-element vector of positive integers giving the number of discretization points along each dimension, ordered as `[X Y Z]`.
-- `extents`: Corresponding one-, two-, or three-element vector of positive real sizes, ordered as `[X Y Z]`.
-- `nstenc`: Number of finite-difference stencil points; it must be an odd integer of at least 3, and every value in `dims` must be at least `nstenc`.
+## Output and assembly
 
-## Output
+`L` is a sparse square matrix with one row and column per grid point, acting on the column-major vectorization of the array. The source obtains a second-derivative `fdmat` matrix for each axis and scales the axis-`i` term by `(dims(i)/extents(i))^2`. In two dimensions it adds the Y and X terms as Kronecker products; in three dimensions it adds Z, Y, and X terms with identity factors on the other axes. This ordering makes X (the first array dimension) the fastest-varying factor. For a one-dimensional input, the result is just the scaled X derivative matrix.
 
-- `L`: Sparse Laplacian matrix acting on the vectorization of the array.
+## Guards and naming clarification
 
-## Construction
+The implementation accepts one, two, or three dimensions and rejects other dimension counts. It checks positive real integer grid counts, positive real extents, sufficient points for the stencil, and an odd integer stencil size of at least 3. The source comment's syntax line names the first argument `npoints`, while the MATLAB function signature and implementation call it `dims`.
 
-For each dimension, `fdlap` obtains a second-derivative matrix using `fdmat(dims(i),nstenc,2)` and scales it by `(dims(i)/extents(i))^2`. In 1D, `L` is the scaled matrix `Dxx`. In 2D and 3D, `L` is the sum of the scaled second-derivative matrices expanded along the other dimensions with Kronecker products and sparse identity matrices (`speye`). The X dimension is the innermost factor, followed by Y and then Z.
-
-The function checks that `dims` contains positive integers, `extents` contains positive real values, and the stencil satisfies the size and parity requirements. It rejects numbers of spatial dimensions other than one, two, or three.
-
-## Reference
-
-- [Spinach `fdlap.m` documentation](https://spindynamics.org/wiki/index.php?title=fdlap.m).
+For the related 3D Hessian and tensor-weighted derivative constructors, see [fdhess.m](fdhess.md) and [fdkup.m](fdkup.md).

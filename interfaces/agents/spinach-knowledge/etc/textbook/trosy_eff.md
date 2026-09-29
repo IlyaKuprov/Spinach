@@ -1,24 +1,22 @@
 # etc/textbook/trosy_eff.m
 
-## Signature
+## Use
 
-`eff=trosy_eff(B0,isotopes,xyz,csa)`
-
-## Purpose
-
-Estimates how much of the CSA contribution to transverse linewidth is cancelled by dipole–dipole/CSA (DD–CSA) cross-correlation for two spin-1/2 nuclei. The result is the magnitude of the cross-correlation invariant divided by the second-rank CSA invariant; the function describes `eff=1` as the limit in which the linewidth is purely dipolar.
-
-## Model and calculation
-
-The routine constructs the dipolar coupling tensor from the two coordinates and isotope labels. It removes the isotropic part of the first spin's chemical-shift tensor, scales its anisotropic part by the magnetic field and the spin gyromagnetic ratio, and evaluates the CSA invariant and its cross-invariant with the dipolar tensor.
+eff=trosy_eff(B0,isotopes,xyz,csa) estimates how much of the first spin's chemical-shift-anisotropy (CSA) contribution to transverse linewidth is cancelled by dipole–dipole/CSA (DD–CSA) cross-correlation in a two-spin system.
 
 ## Inputs
 
-- `B0`: magnetic field in tesla.
-- `isotopes`: cell array of two spin-1/2 isotope labels, for example `{'19F','13C'}`.
-- `xyz`: cell array containing the two three-element Cartesian nuclear coordinates in angstroms.
-- `csa`: real 3-by-3 chemical-shift or shielding tensor for the first spin, in ppm. Its isotropic part is removed.
+- B0: finite, non-zero real magnetic field in tesla; the check does not require it to be positive.
+- isotopes: cell array of two character isotope labels, both resolving to spin-1/2 isotopes (e.g. {'19F','13C'}).
+- xyz: cell array of two real numeric three-element coordinate vectors with matching shape, giving the nuclei positions in Å.
+- csa: real numeric 3-by-3 shielding or chemical-shift tensor for the first spin, in ppm. Its isotropic part is removed.
 
-## Output
+The nuclei must be at least 0.25 Å apart; closer coordinates are rejected. A non-zero second-rank anisotropic component of csa is required.
 
-- `eff`: dimensionless magnitude ratio describing the CSA linewidth cancellation by DD–CSA cross-correlation.
+## Calculation and output
+
+The routine obtains the dipolar tensor from xyz2dd, forms the field-scaled anisotropic Zeeman tensor from the traceless part of csa, and evaluates abs(X_DD_Z/DsqZ) using blprod and blinv. eff is a non-negative relative measure: the source describes eff = 1 as the case where the linewidth is purely dipolar. The implementation returns the absolute ratio directly and does not clamp it to an interval.
+
+## Scope and source
+
+Only two spin-1/2 isotopes are supported, and csa belongs to the first spin. Source: [implementation](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/trosy_eff.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=trosy_eff.m).

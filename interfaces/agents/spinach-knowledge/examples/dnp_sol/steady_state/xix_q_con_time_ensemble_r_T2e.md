@@ -1,13 +1,19 @@
 # examples/dnp_sol/steady_state/xix_q_con_time_ensemble_r_T2e.m
 
-- Signature: `xix_q_con_time_ensemble_r_T2e()`
+Signature: `xix_q_con_time_ensemble_r_T2e()`
 
-## Purpose
+This is the distance-ensemble XiX steady-state DNP contact-time example that scans electron T2 while keeping nuclear relaxation inputs fixed. The source estimates the calculation time as hours.
 
-Compares steady-state XiX proton-polarisation contact-time curves across five electron T2 values, averaging over electron–proton distance for each curve.
+## Setup and scan
 
-## Model and scan
+The E–¹H pair uses `sys.magnet=1.2142` (Q-band setting), spin temperature `80`, trityl g values `[2.00319 2.00319 2.00258]`, and proton Zeeman entry `[0 0 5]` (source comment: ppm guess). Euler-angle entries are `[0 10 0]` and `[0 0 10]` degrees. It uses the full `sphten-liouv` basis without approximation, `prop_chop=1e-12`, `sys.disable={'hygiene'}`, diagonal relaxation retention, and Di Bari equilibrium.
 
-The source varies electron T2 across 50, 15, 5, 1.5 and 0.5 μs. Each run models a trityl–proton pair at 1.2142 T and 80 K, using three Gauss–Legendre distance nodes from 3.5 to 20 Å. The orientation-dependent proton T1 rate is evaluated with `r1n_dnp`; electron T1 is fixed at 1 ms, diagonal relaxation terms are retained, and the equilibrium is `dibari`. The full spherical-tensor Liouville basis is used without basis approximation; distance averaging includes the radial `r^2` Jacobian.
+The scan is electron T2 `[50e-6 15e-6 5e-6 1.5e-6 0.5e-6]` seconds. At each of three Gauss–Legendre distances from 3.5–20 Å (`gaussleg(3.5,20,3)`), the z-axis geometry is evaluated with orientation-dependent nuclear R1 from `r1n_dnp`, called with the source arguments `sys.magnet`, temperature, `2.00230`, `1e-3`, `52`, the current radius, and `bet`. Relaxation entries are `inter.r1_rates={1e3,r1n_rate}` and `inter.r2_rates={1/T2e,50e3}`; the distance values are combined with quadrature weights and the radial `r^2` Jacobian.
 
-Each curve scans 1–64 XiX loops using 48 ns pulses, inverted second-pulse phase, 18 MHz electron nutation frequency and an 800-point two-angle spherical powder grid. The source sets −13 MHz added shift, +61 MHz electron offset, and 153 μs shot spacing minus total pulse duration; steady states are evaluated with `powder(...,@xixdnp_steady,...,'esr')`. Distance-averaged real proton `Lz` expectation-value curves are overlaid, labelled by T2e, and saved as `xix_q_con_time_ensemble_r_T2e.fig`.
+Each curve scans XiX loop counts 1–64. Pulses are 48 ns, with `phase=pi` for the inverted second pulse; contact time is twice pulse duration times loop count and is plotted in μs. The source updates shot spacing as 153 μs minus the two-pulse train duration. Other fixed settings: electron nutation frequency `18e6` Hz, grid `rep_2ang_800pts_sph`, `addshift=-13e6`, and `el_offs=61e6` (the latter two are the source's numeric settings, without a unit annotation there).
+
+## Run dependencies and output
+
+Requires Spinach MATLAB functions including `gaussleg`, `powder`, and system/basis/state and plotting routines; also requires [`r1n_dnp`](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1n_dnp.m) and the steady-state sequence [`xixdnp_steady`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/xixdnp_steady.m). The mapped source is [`xix_q_con_time_ensemble_r_T2e.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_con_time_ensemble_r_T2e.m).
+
+The no-argument function returns no MATLAB output. It plots the real proton `Lz` expectation value after distance averaging and saves `xix_q_con_time_ensemble_r_T2e.fig` in the current directory. Only electron T2 varies among the five plotted curves; the distance quadrature, nuclear R1 model, nuclear R2 entry, and pulse protocol are shared.

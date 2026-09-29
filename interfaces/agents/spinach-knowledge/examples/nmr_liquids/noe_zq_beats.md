@@ -4,19 +4,16 @@
 
 ## Purpose
 
-Zero-quantum beats in the Overhauser effect in a strongly coupled two-spin system. Calculation time: seconds.
+A relaxation-time simulation of zero-quantum beats in the Overhauser effect for a strongly coupled homonuclear two-spin system. It follows longitudinal signals after one spin is inverted; it does not run a NOESY pulse sequence. The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin system and Liouvillian
 
-- The system is two protons with a 0.01 ppm difference in isotropic shift, a 3.0 Hz scalar coupling, and a 2.00 Å separation. Redfield relaxation is specified with a 1 ns correlation time, 298 K, the Di Bari equilibrium convention, and secular retention.
-- Starting from thermal equilibrium with spin 1 inverted, the calculation follows both longitudinal magnetizations; the strong coupling allows the zero-quantum-beat behaviour associated with the NOE to appear.
+The two spins are `1H`. Their isotropic Zeeman scalars are 0.0 and 0.01 ppm; the scalar-coupling matrix contains 3.0 Hz for the pair. Coordinates are `[0 0 0]` and `[0 0 2]` Angstrom. The field is set by `sys.magnet=14.1`. The basis is spherical-tensor Liouville with no approximation. Redfield relaxation uses the `dibari` equilibrium convention, `secular` retention, temperature 298, and `tau_c={1e-9}`; the proximity cut-off is 4.0. The propagated Liouvillian is the assumed NMR Hamiltonian plus `1i*relaxation(spin_system)`.
 
-## Numerical / algorithmic content
+## Preparation and observables
 
-- The Liouvillian is the NMR-frame Hamiltonian plus the relaxation contribution. It is propagated in the full spherical-tensor Liouville basis, with a 4.0 proximity cutoff.
-- The two longitudinal detection channels are sampled every 0.01 s over 1000 intervals (0–10 s).
+Thermal equilibrium is calculated using the lab-frame Hamiltonian. The initial state inverts spin 1's `Lz` component relative to equilibrium. Multichannel propagation detects both spins' `Lz` operators, with step parameter `1e-2`, 1000 steps, and `multichannel` mode. The code plots the real part of the answer against `linspace(0,10,1001)`, with time labelled in seconds.
 
-## Implementation structure
+## Source
 
-- Build the two-proton system at 14.1 T, construct the Redfield superoperator, and add it to the assumed NMR Hamiltonian.
-- Invert spin 1 relative to equilibrium, run multichannel evolution with both `Lz` operators, and plot the real longitudinal signals for Proton A and Proton B.
+[examples/nmr_liquids/noe_zq_beats.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_zq_beats.m)

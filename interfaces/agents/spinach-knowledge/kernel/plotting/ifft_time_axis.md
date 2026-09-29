@@ -4,24 +4,25 @@
 
 ## Purpose
 
-Constructs time axes for an inverse Fourier transform, accounting for optional zero padding on each side of the frequency domain. Syntax: `[t_shift,t,dt]=ifft_time_axis(npts,df,zf)`; the function returns three outputs (not `nifft`).
+Builds unshifted and shifted time coordinates for an inverse FFT, with optional zero-fill points on both sides of the frequency-domain data. The function returns three outputs; `nifft` is an internal length, not a fourth output.
 
-## Physical / mathematical content
+## Axis construction and units
 
-- The time-step interval is `dt=1/(df*nifft)`, where `nifft=npts+2*zf`.
+The effective transform length is `nifft=npts+2*zf`, and `dt=1/(df*nifft)`. For `df` in Hz, `dt` and both time axes are in seconds.
 
-## Numerical / algorithmic content
+- `t` is a column vector `(0:nifft-1)'*dt`, matching the unshifted `ifft` order.
+- `t_shift` is the column vector `(-floor(nifft/2):ceil(nifft/2)-1)'*dt`, matching `fftshift(ifft(...))` order for either parity of `nifft`.
+- Both axes have `nifft` samples; `dt` is a scalar.
 
-- `t` is the column vector `(0:nifft-1).' * dt`; `t_shift` is `(-floor(nifft/2):ceil(nifft/2)-1).' * dt`. The function constructs these axes only; it does not modify data or perform an inverse Fourier transform.
+## Inputs and guards
 
-## Parameters / inputs
+- `npts` - real numeric integer greater than 1.
+- `df` - positive real numeric scalar frequency interval in Hz.
+- `zf` - optional nonnegative real numeric integer; defaults to 0 and is added on each side, so the total length grows by `2*zf`.
 
-- `npts` - number of frequency-domain points; real integer greater than 1
-- `df` - frequency interval between points, in Hz; positive real scalar
-- `zf` - zero-fill length on each side of the frequency domain; optional, defaults to 0, and must be a nonnegative real integer
+Invalid inputs raise an error. There is no plotting or axes side effect; the routine only constructs coordinates.
 
-## Outputs
+## Links
 
-- t_shift -time axis for fftshift(ifft(...))
-- t -time axis for ifft(...)
-- dt -time step between points
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/ifft_time_axis.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ifft_time_axis.m)

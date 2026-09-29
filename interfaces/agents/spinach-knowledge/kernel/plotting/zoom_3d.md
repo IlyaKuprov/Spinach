@@ -1,26 +1,15 @@
 # kernel/plotting/zoom_3d.m
 
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/zoom_3d.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=zoom_3d.m)
+
 - Signature: `[density,ext]=zoom_3d(density,ext,zoom_ranges)`
 
-## Purpose
+## Inputs
 
-Zooms a 3D probability density cube to user-specified fractional limits along each axis.
+- `density`: numeric real 3-D cube, with dimensions ordered `[X Y Z]`.
+- `ext`: six real grid extents in Angstrom, ordered `[xmin xmax ymin ymax zmin zmax]`; each minimum must be below its maximum.
+- `zoom_ranges`: six real fractions ordered `[xmin xmax ymin ymax zmin zmax]`; each value is between 0 and 1 and each lower fraction is below its upper fraction. The source example is `[0.3 0.6 0.1 0.2 0.5 0.8]`.
 
-## Parameters / inputs
+## Cropping behaviour
 
-- `density`: Real, three-dimensional probability density cube, with dimensions ordered `[X Y Z]`.
-- `ext`: Real, six-element vector of grid extents in Angstrom, ordered `[xmin xmax ymin ymax zmin zmax]`. Each minimum must be less than its corresponding maximum.
-- `zoom_ranges`: Real, six-element vector of fractional zoom limits, ordered `[xmin xmax ymin ymax zmin zmax]`; for example, `[0.3 0.6 0.1 0.2 0.5 0.8]`. Values must lie between `0` and `1`, and each minimum must be less than its corresponding maximum.
-
-## Outputs
-
-- `density`: Extracted probability density subcube, with dimensions ordered `[X Y Z]`.
-- `ext`: Updated grid extents in Angstrom, ordered `[xmin xmax ymin ymax zmin zmax]`.
-
-## Numerical / algorithmic content
-
-The function checks the inputs, then constructs axis coordinates using `linspace` between each pair of supplied extents, with one coordinate per density element along that axis. It converts fractional lower limits to indices using `floor` and fractional upper limits using `ceil`, clamping the resulting indices to the corresponding array bounds. It extracts the indexed subcube and sets `ext` to the original axis coordinates at the selected boundary indices.
-
-## Reference
-
-- [Spinach `zoom_3d.m` page](https://spindynamics.org/wiki/index.php?title=zoom_3d.m)
+For each axis, the source builds coordinates with `linspace(ext_min,ext_max,n)`. It selects from `max(1,floor(n*lower_fraction))` through `min(n,ceil(n*upper_fraction))`, using MATLAB's one-based array indices, then returns that subcube. The returned `ext` is replaced by the coordinates at the selected endpoints. This is index cropping: the routine does not interpolate or resample the density cube, draw a plot, or write a file.

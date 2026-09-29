@@ -1,20 +1,17 @@
 # examples/fundamentals/quadratures/grid_quality.m
 
-- Signature: `grid_quality()`
+## Purpose and question
 
-## Purpose
+This example plots how the error profiles returned by `grid_test` vary with grid size and spherical rank for three shipped grid families. The first two panels assess two- and three-angle REPULSION grids; the third assesses two-angle Lebedev grids. It is an error-profile visualization, not a timing benchmark.
 
-Compares integration-error profiles for the spherical and SO(3) grids shipped with Spinach; it is an accuracy check, not a timing benchmark.
+## Inputs and numerical method
 
-## Physical / mathematical content
+Each grid is loaded from its kernel MAT-file with Euler-angle arrays and weights. Grid sizes for both REPULSION families are 100, 200, 400, 800, 1600, 3200, 6400, and 12800 points. The two-angle grids are passed to `grid_test` for ranks 0 through 80 with `Y_lm`. The three-angle grids use ranks 0 through 30 with `D_lmn`. Their error profiles are plotted on logarithmic y axes.
 
-- Spherical-harmonic and Wigner-D-function quadrature tests expose how grid choice and size affect angular integration accuracy.
+The Lebedev panel loads two-angle grids at ranks 5, 17, 29, 41, and 53 and evaluates `Y_lm` at the even ranks 2 through 100. It explicitly plots the even-rank coordinates alongside the corresponding profile values. The REPULSION panels plot `grid_profile(2:end)` against MATLAB's default sample index; the source labels the horizontal axis spherical rank but does not pass explicit rank coordinates to those plot calls.
 
-## Numerical / algorithmic content
+## Output and limitations
 
-- `grid_test` evaluates two-angle REPULSION grids for `Y_lm` ranks 0:80, three-angle REPULSION grids for `D_lmn` ranks 0:30, and two-angle Lebedev grids for even `Y_lm` ranks 2:100.
-- REPULSION point counts are 100, 200, 400, 800, 1600, 3200, 6400, and 12800; Lebedev ranks are 5, 17, 29, 41, and 53. The plotted profiles use a logarithmic error axis.
+The function creates three figures with integration error on the y axis and adds a legend entry per grid size or Lebedev rank. No threshold, pass/fail test, or numerical results are encoded in the example; actual accuracy values must come from running it with the shipped grid data and helper routines. In particular, the REPULSION-panel horizontal positions should not be read as an explicit mapping to requested ranks without checking `grid_test`'s output convention. The source reports no citation.
 
-## Implementation structure
-
-- Loads each grid's angles and weights from the corresponding `kernel/grids` MAT-file, calls `grid_test`, and plots the resulting profiles. Separate figures are made for the two-angle REPULSION, three-angle REPULSION, and two-angle Lebedev families.
+Source: [grid_quality.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/quadratures/grid_quality.m).

@@ -1,22 +1,32 @@
 # kernel/conventions/transforms/gauss2mhz.m
 
-- Signature: `hfc_mhz=gauss2mhz(hfc_gauss,g)`
-
 ## Purpose
 
-Converts hyperfine couplings from gauss to MHz (linear frequency). Here, a gauss value can be specified as the magnetic field at which the electron frequency equals the frequency provided.
+Converts hyperfine coupling values in gauss to linear frequency values in MHz. The source describes the Gauss specification as the magnetic field at which the electron frequency equals the supplied frequency.
 
-## Parameters / inputs
+## Signature
 
-- `hfc_gauss`: real numeric array of hyperfine couplings in gauss; arrays of any dimensions are supported.
-- `g`: optional real scalar electron g-factor. If omitted, the free-electron value `2.0023193043622` is used.
-
-## Output
-
-- `hfc_mhz`: array of values in MHz, with the same shape as `hfc_gauss`.
+`hfc_mhz=gauss2mhz(hfc_gauss,g)`
 
 ## Conversion
 
-The conversion uses `hfc_mhz = 1e-10 * g * muB * hfc_gauss / (hbar * 2*pi)`, with the Bohr magneton and reduced Planck constant in SI units.
+The source sets `muB = 9.274009994e-24`, `hbar = 1.054571628e-34`, and computes:
 
-Source: [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=gauss2mhz.m)
+`C = 1e-10 * g * muB / (hbar * 2*pi)`
+
+`hfc_mhz = C * hfc_gauss`
+
+If `g` is omitted, it uses `g = 2.0023193043622` (free-electron g-factor) and displays a message.
+
+## Inputs and output
+
+- `hfc_gauss`: real numeric array in gauss; arrays of any dimensions are supported.
+- `g`: optional real numeric scalar. The implementation requires one element but does not explicitly require it to be finite or positive.
+- `hfc_mhz`: array in MHz, with the same dimensions as `hfc_gauss`.
+
+The conversion applies a scalar factor; there is no orientation or rotation input.
+
+## References
+
+- MATLAB source: [kernel/conventions/transforms/gauss2mhz.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/gauss2mhz.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=gauss2mhz.m)

@@ -1,31 +1,21 @@
 # examples/spin_chemistry/cidnp_geminate.m
 
-- Signature: `cidnp_geminate()`
+Source: [examples/spin_chemistry/cidnp_geminate.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/spin_chemistry/cidnp_geminate.m)
 
 ## Purpose
 
-A basic example of the geminate CIDNP effect simulation. Calculation time: seconds
+A minimal geminate CIDNP calculation that starts from an electron-pair singlet, evolves a radical-pair reaction model, and reports proton longitudinal magnetisation separately in reactants and products.
 
-## Physical / mathematical content
+## Spin system and reaction model
 
-- At 14.1 T the system contains two electron spins and one 1H spin, with g factors `2.0023`, `2.0024`, and `1.0`. The electron pair has a singlet initial state and couples to the proton with `J=1e7`; recombination uses Haberkorn theory with rates `[1e7 0]`.
-- The model duplicates the state space into reactant and product sectors; the reaction superoperator removes population from reactants and transfers it to products, where no further dynamics are assumed.
+The system is specified at 14.1 T with isotopes E, E, and 1H. The Zeeman scalar entries are 2.0023, 2.0024, and 1.0. The only explicit scalar coupling is between the second electron and the proton, with value 1e7. Haberkorn radical-pair kinetics use electron indices [1, 2] and rate entries [1e7, 0]. The source does not annotate units for these rate and coupling entries.
 
-## Numerical / algorithmic content
+The Hamiltonian is built under the ESR assumption, and the initial state is the singlet of spins 1 and 2. The script doubles the state space into reactant and product sectors, sets the product-sector Hamiltonian to zero (no product-subspace dynamics), and builds the kinetic blocks so that loss from reactants is balanced by gain in products. No relaxation superoperator is configured; the evolved Liouvillian is H + iK.
 
-- It evolves the assembled Liouvillian for `1e-6 s` and reports the proton `Lz` magnetisation in the reactant and product sectors separately.
+## Evolution and observable
 
-## Implementation structure
+The doubled state is evolved for one final step of 1 microsecond. The proton Lz state is then projected onto the reactant and product portions of the state vector, and the script prints the real-valued longitudinal magnetisation for each sector. These are model outputs requested by the code; this source-only description does not assert their numerical values or interpret them as measurements.
 
-- A basic example of the geminate CIDNP effect simulation.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Get the Hamiltonian
-- Get the kinetics superoperator
-- Get the initial state
-- Double up the problem (no dynamics assumed in the product subspace)
-- Set up a reaction ("whatever is leaving reactants must appear in products")
-- Assemble the Liouvillian
-- Evolve for a microsecond
+## Citation
+
+The source file supplies author comments but no DOI or publication citation.

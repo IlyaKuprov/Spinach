@@ -1,22 +1,21 @@
 # etc/data_processing/autophase.m
 
-- Signature: `[spec,cheb_coeffs]=autophase(spec,guess)`
-- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=autophase.m)
+- MATLAB implementation: [etc/data_processing/autophase.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/data_processing/autophase.m)
 
-## Purpose
+## Purpose and call
 
-Correct the phase of a one-dimensional complex NMR spectrum by fitting a smooth phase profile represented by Chebyshev polynomials.
+Correct the phase of a one-dimensional complex NMR spectrum by fitting a phase profile across the spectral window with low-order Chebyshev polynomials.
 
-## Method
+`[spec,cheb_coeffs]=autophase(spec,guess)`
 
-The spectral window is mapped to `[-1,1]`. `autophase` optimises the Chebyshev coefficients with `fminunc`, choosing phases that move the spectrum’s fourth-norm signal from the imaginary component toward the real component. The fitted phase multipliers are applied to the spectrum; the initial standard-deviation scaling is then undone.
+`spec` must be a finite numeric vector with non-zero standard deviation. The initial `guess` must be a finite real row vector of at least two coefficients, in radians; `[phi 0 0]` is the suggested starting form, with `phi` the zero-order phase guess.
 
-## Inputs
+## Numerical mechanism
 
-- `spec` — finite, non-constant numeric vector containing the complex spectrum.
-- `guess` — finite real row vector of at least two initial Chebyshev coefficients, in radians. `[phi 0 0]` is a suggested initial value, where `phi` is the zero-order phase guess.
+The routine divides the spectrum by `std(spec)` before optimization, then uses `fminunc` with central finite differences, no iteration/evaluation cap, and function/optimality/step tolerances of `1e-12`. For sample positions mapped linearly across `[-1,1]`, it builds Chebyshev polynomials by recurrence and applies the pointwise phase multiplier `exp(1i*phis*cheb)`. The objective minimized is `norm(imag(spec),4)-norm(real(spec),4)`, moving fourth-norm signal from the imaginary to the real component. It applies the fitted correction, restores the original standard-deviation scale, and returns the coefficients.
 
-## Outputs
+## Outputs and limitation
 
-- `spec` — phase-corrected spectrum, returned as a column vector.
-- `cheb_coeffs` — fitted Chebyshev coefficients describing the phase profile across the spectral window.
+`spec` is returned as the phased spectrum in a column vector; `cheb_coeffs` are the fitted phase-profile coefficients for the window mapped to `[-1,1]`. The fit is an unconstrained `fminunc` optimization initialized by `guess`, so the starting coefficients matter; the function does not impose phase bounds.
+
+Source and credit: [Spinach Wiki: autophase.m](https://spindynamics.org/wiki/index.php?title=autophase.m). Ilya Kuprov (contact detail is in the source file).

@@ -1,21 +1,19 @@
 # examples/nmr_solids/cp_matching_1.m
 
-- Signature: `cp_matching_1()`
+Signature: cp_matching_1()
 
-## Purpose
+## What the example models
 
-Sweeps the proton spin-lock power to examine the Hartmann–Hahn matching condition for ¹H–¹⁵N cross-polarisation under MAS. The source estimates a calculation time of seconds.
+The file describes a Hartmann–Hahn cross-polarisation (CP) matching test between ¹H and ¹⁵N under MAS. Its explicit system has two spins, ¹H and ¹⁵N, sys.magnet=9.394, scalar Zeeman entries 0.1495 and 0, and coordinates [−1.11551509, 1.65289357, −1.19927242] and [−2.67552180, 0.95825426, 0]. The basis is sphten-liouv with approximation none. Coordinates and Zeeman values are code settings; the file does not spell out additional interaction terms or their units.
 
-## Physical / mathematical content
+## MAS and CP scan
 
-The model contains one ¹H and one ¹⁵N with the specified isotropic shifts and coordinates. At a 10 kHz rotor rate, the simulation starts from ¹H transverse magnetisation, applies a fixed 50 kHz ¹⁵N spin-lock field, and records the final ¹⁵N signal while the ¹H power varies from 20 to 80 kHz.
+The example passes rate 10000, rotor-axis vector [sqrt(2/3), 0, sqrt(1/3)], max_rank 3, and powder grid rep_2ang_200pts_oct to the experiment call. It starts from the ¹H Lx state, detects with the ¹⁵N Lx coil, sets zero excitation operators, and uses ten time steps each set to 4e-5. The source gives no units for rate, time-step values, or the second irradiation setting.
 
-## Numerical / algorithmic content
+It samples 120 ¹H irradiation settings from 20e3 to 80e3, holding the ¹⁵N irradiation setting at 50e3. The scan runs in a parfor loop. The plot converts the scanned values by 1e3 and labels the horizontal axis as ¹H spin-lock RF power in kHz, so the displayed range is 20–80 kHz. At each setting the code calls singlerot with cp_contact_hard, stores real(fid(end)), and plots that terminal ¹⁵N signal in a.u. against the scanned ¹H power.
 
-The full `sphten-liouv` basis is used. With MAS axis `[sqrt(2/3) 0 sqrt(1/3)]`, each of 120 power values is simulated in a `parfor` loop with `singlerot` and `@cp_contact_hard`, using the `rep_2ang_200pts_oct` grid, `max_rank=3`, and ten 40 μs time steps. The plotted quantity is the real part of the final FID point.
+## Scope of the result
 
-## Implementation structure
+This is a computed end-of-FID signal-versus-power curve, not an experimental spectrum or a validation result. The file delegates contact dynamics to cp_contact_hard and the experiment call; it does not specify contact duration, pulse shape, or further sequence internals, so none are inferred here. The source header estimates calculation time as seconds; that is a source comment, not a timed run in this note.
 
-- Defines the two-spin system and builds its basis and transverse operators.
-- Constructs the MAS and CP parameters, initial ¹H state, ¹⁵N coil, time grid, and powder grid.
-- Runs the parallel single-power sweep and plots ¹⁵N signal against ¹H spin-lock power.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_1.m

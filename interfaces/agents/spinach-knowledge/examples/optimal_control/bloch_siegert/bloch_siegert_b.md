@@ -1,19 +1,16 @@
 # examples/optimal_control/bloch_siegert/bloch_siegert_b.m
 
 - Signature: `bloch_siegert_b()`
+- Source: [examples/optimal_control/bloch_siegert/bloch_siegert_b.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/bloch_siegert/bloch_siegert_b.m)
 
-## Purpose
+## Objective and spin model
 
-Bloch-Siegert shift compensation demo for a universal rotation pulse over a range of resonance offsets. It compares optimization with and without BSS correction as control power varies. Calculation time: minutes.
+Estimated calculation time: minutes. This example designs a universal rotation pulse over an ensemble of 100 non-interacting `13C` spins whose scalar chemical shifts are equally spaced from -100 to +100 ppm at `sys.magnet=28.18`. The selected basis is `sphten-liouv` with `IK-2`, proximity level 1, and scalar-coupling connectivity; the source comment says this retains each spin's complete basis while omitting multi-spin orders.
 
-## Physical / mathematical content
+The target action is defined on three normalised states: `Sx -> -Sz`, `Sy -> Sy`, and `Sz -> Sx`. The control operators are `Lx` and `Ly` on `13C`, with the NMR-assumption Hamiltonian as drift. The three initial and target states are passed together to the ensemble optimizer.
 
-- The model uses 100 non-interacting (^{13}mathrm{C}) spins with equally spaced offsets from -100 to +100 ppm at `sys.magnet=28.18`. The `IK-2` basis retains the complete basis on each spin while neglecting multi-spin orders. The desired rotation maps (S_x,S_y,S_z) to (-S_z,S_y,S_x). The comparison illustrates BSS-related fidelity loss when the shift is not included in pulse design.
+## Waveform parameterisation and comparison
 
-## Numerical / algorithmic content
+The 20 power levels span 0.001 to 1.0 times the absolute `13C` Larmor angular frequency and are specified in rad/s. Each waveform has 50 equal-duration slices, with `pulse_dt=(pi/100)/pwr_level`. A shared 2-by-50 Gaussian initial guess is scaled by 1/10. L-BFGS via `fmaxnewton` is limited to 500 iterations with `tol_x=1e-4`.
 
-- L-BFGS uses 500 iterations maximum and `tol_x=1e-4`; GRAPE-XY pulses have 50 slices. Twenty control powers span (10^{-3}) to 1 times the carbon Zeeman frequency. At each power, pulses are optimized with BSS off and on from a shared random guess, then both are evaluated with BSS enabled. The plotted quantity is terminal infidelity versus relative control power.
-
-## Implementation structure
-
-- Set the field, 100 isotope and offset entries, and the `IK-2` basis with `prox_level=1` and `scalar_couplings` connectivity; construct the system and basis; build normalized spin states, control operators, and drift Hamiltonian; configure the ensemble-independent optimizer; sweep powers, design and evaluate both pulses, and plot the infidelity curves.
+For every power, the code constructs optimizer settings with BSS off and on and optimises a `grape_xy` waveform under each. Both are then evaluated with the BSS-enabled settings using `ensemble`. The figure plots `1-fidelity` against relative power on a logarithmic scale.

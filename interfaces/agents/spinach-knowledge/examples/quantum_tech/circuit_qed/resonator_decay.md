@@ -1,30 +1,22 @@
 # examples/quantum_tech/circuit_qed/resonator_decay.m
 
 - Signature: `resonator_decay()`
+- Source: [resonator_decay.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/circuit_qed/resonator_decay.m)
 
-## Purpose
+## Purpose and open-system model
 
-Open-system dynamics of a leaky microwave resonator at finite temperature. A Fock state decays as a downward cascade through the level ladder, and a coherent state decays with its Poisson population structure largely preserved; both settle into the thermal state of the mode. The mean photon number follows the analytical amplitude damping solution in both cases, up to the distortion of the weak thermal channel by the 
+This example propagates a thermally damped microwave resonator and compares photon-number decay from a Fock state and a coherent state. In the finite-temperature bosonic relaxation model, emission and thermal absorption drive the mode toward its Bose–Einstein occupation. The finite Hilbert-space cutoff can distort that weak thermal channel, as the source comments explicitly caution.
 
-## Physical / mathematical content
+The mode is truncated to five Fock levels (`C5`), with frequency 6.02 GHz, energy-relaxation lifetime 10 ns, and bath temperature 0.050 K. The code computes the thermal occupation as `n_eq = 1 / (exp(h f / (k_B T)) - 1)`, using the SI values of Planck’s and Boltzmann’s constants. It specifies a 5 μs pure-dephasing time and derives the total coherence time including thermal damping. The frequency/lifetime inputs and temperature are interpreted by the Spinach mode model; frequency-like inputs are supplied in Hz, lifetimes and times in seconds, and temperature in kelvin.
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+## Initial states, propagation, and observables
 
-## Numerical / algorithmic content
+The initial conditions are the highest retained Fock level (`BL5`, four photons in this five-level basis) and a coherent state with amplitude 1.5. The harmonic-mode Hamiltonian is combined with Spinach’s finite-temperature bosonic relaxation superoperator; the Liouville-space generator is `G = -iH + R`. The script propagates both density operators on a 1 ns grid for 100 steps (0–100 ns). It records the populations of all five levels and obtains mean photon number by weighting those populations with 0 through 4.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+For energy-damping rate `κ = 1/T1`, the comparison curve is `n(t) = (n(0) - n_eq) exp(-κ t) + n_eq`. The source checks both mean-photon trajectories against this curve to 5×10^-3, checks that the transient population maxima descend in Fock-level order, and requires the final Fock-run ground-state population to be within 2×10^-3 of `1/(1+n_eq)`. These are in-code numerical checks, not independently rerun results. The plotted population traces are simulated trajectories, not measured resonator data.
 
-## Implementation structure
+The source header attributes its model and parameters to the matching example in the paraqeet package.
 
-- Open-system dynamics of a leaky microwave resonator at finite
-- temperature. A Fock state decays as a downward cascade through
-- the level ladder, and a coherent state decays with its Poisson
-- population structure largely preserved; both settle into the
-- thermal state of the mode. The mean photon number follows the
-- analytical amplitude damping solution in both cases, up to the
-- distortion of the weak thermal channel by the Fock space trun-
-- cation. Model and parameters from the resonator decay example
-- of the paraqeet package.
-- Calculation time: seconds
-- Magnet field
-- Microwave resonator with five Fock levels
+## Scope
+
+This is a five-level thermal open-system model. Its late-time state and accuracy are subject to that truncation; the script does not establish performance for an untruncated resonator or report an experimental decay measurement.

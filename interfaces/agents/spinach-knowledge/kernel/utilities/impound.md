@@ -1,23 +1,24 @@
 # kernel/utilities/impound.m
 
-- Signature: `answer=impound(varargin)`
-
 ## Purpose
 
-Returns all arguments received by the function, collected in a cell array. This is useful for passing information back from Spinach wrappers when `impound` is used as a pulse sequence.
+`impound.m` packages everything it receives into a cell array and returns it back. It is useful for pulling information back from various Spinach wrappers by calling it as a pulse sequence.
 
-## Parameters / inputs
+## Behavior
 
-- `varargin` - any number of input parameters of any type.
+The function is defined as `answer=impound(varargin)`. It returns what was received by assigning `answer=varargin`, so all input arguments are collected into a single cell array. The function contains no other logic.
 
-## Outputs
+## Inputs and outputs
 
-- `answer` - a cell array containing the input parameters, in their original order.
+Inputs:
 
-## Implementation
+- `varargin` — any number of parameters of any type.
 
-The function assigns `varargin` directly to `answer`; it does not transform or interpret the inputs.
+Outputs:
 
-## Source
+- `answer` — all input parameters as a cell array.
 
-[Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=impound.m)
+## References
+
+- Source: [kernel/utilities/impound.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/impound.m)
+- Spinach Wiki: [impound.m](https://spindynamics.org/wiki/index.php?title=impound.m)

@@ -1,27 +1,21 @@
 # kernel/summaries/summary_basis.m
 
+Source: [kernel/summaries/summary_basis.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_basis.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_basis.m)
+
 - Signature: `summary_basis(spin_system)`
 
 ## Purpose
 
-Prints a summary of the basis set for a Spinach system. Syntax: `summary_basis(spin_system)`.
+Reports the final basis-set summary for a Spinach system. For each listed basis state, each spin's stored basis entry is converted by `lin2lm` to its irreducible spherical-tensor quantum-number pair `(L,M)`; the table columns are the spin indices.
 
-## Physical / mathematical content
+## Numerical content
 
-For each reported basis state, lists the irreducible spherical-tensor quantum-number pairs `(L,M)` for each spin.
-
-## Numerical / algorithmic content
-
-Reports the basis dimension and its percentage of the full state space. If the number of basis states exceeds `spin_system.tols.basis_hush`, detailed state labels are suppressed.
+The reported dimension is the number of rows in `spin_system.bas.basis`. The final percentage is `100 * nstates / (prod(spin_system.comp.mults)^2)`, printed as a percentage of the full state space. If `nstates` is greater than `spin_system.tols.basis_hush`, the detailed state table is suppressed; the final dimension and percentage are still reported. The labels and counts have no physical units.
 
 ## Parameters / inputs
 
-- `spin_system` - Spinach spin system description object.
+- `spin_system` - Spinach spin system structure.
 
-## Outputs
+## Output and side effects
 
-- Prints through `report.m` to the console or the user-specified output.
-
-## Implementation structure
-
-- Checks that the input is a structure, gets the basis dimension, conditionally reports each basis state's `(L,M)` labels, then reports the dimension and percentage of the full state space.
+Writes the heading, optional per-state `(L,M)` table, and final dimension/percentage through `report.m`, which routes the text to the console or the configured output. The function checks that `spin_system` is a structure and otherwise does not modify it.

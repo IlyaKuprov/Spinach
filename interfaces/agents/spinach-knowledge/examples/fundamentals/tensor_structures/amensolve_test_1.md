@@ -1,26 +1,32 @@
 # examples/fundamentals/tensor_structures/amensolve_test_1.m
 
+- MATLAB implementation: [examples/fundamentals/tensor_structures/amensolve_test_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/tensor_structures/amensolve_test_1.m)
+
 - Signature: `amensolve_test_1()`
+- Source: [`examples/fundamentals/tensor_structures/amensolve_test_1.m`](../../../../../../examples/fundamentals/tensor_structures/amensolve_test_1.m)
 
 ## Purpose
 
-Tests `ttclass/amensolve` against dense references. The main cases construct positive-definite tensor-train systems from `B'*B` plus a diagonal shift, form the right-hand side from a known tensor-train solution, and compare AMEn's answer with the exact dense solution and dense residual. The suite also checks repeatability, a zero-enrichment regression, and finite output for a nonsymmetric smoke case.
+Exercises `ttclass/amensolve` on buffered tensor-train linear systems, comparing the approximate solve with a constructed exact solution and dense references. It covers three Hermitian positive-definite cases, a repeatability check, a zero-enrichment finite-output regression, and a nonsymmetric smoke case.
 
-## Physical / mathematical content
+## Tensor construction and mathematical scope
 
-- This is a numerical tensor-train linear-solver test, not a spin-dynamics example.
-- The positive-definite cases use a known solution `x_exact`, with `A=B'*B+diag_shift*I` and `y=A*x_exact`; the dense solution and residual provide independent checks of the computed result.
-- The nonsymmetric case is only a finite-output smoke test; the source does not impose the positive-definite accuracy contract on it.
+This is an algebraic tensor-train test, not a specified magnetic-resonance model: it defines no spins, Hamiltonian, or physical basis. For each positive-definite case, random rectangular core factors form buffered `B` and random vector factors form a known buffered tensor-train solution `x_exact`. The operator is constructed as `shrink(B' * B + diag_shift * unit_like(B' * B))`; the right-hand side is `shrink(A * x_exact)`. Dense `A`, `x_exact`, and `y` are materialised for references.
 
-## Numerical / algorithmic content
+## Cases and solver settings
 
-- Cases span small and medium systems and a dense-reference system of dimension 2000. Relative solution error and relative residual are checked against case-dependent tolerances derived from each case's `tol`.
-- A medium case is run twice with the random-number generator reset to test reproducibility. The zero-enrichment case checks that output and dense-reference error/residual remain finite; it does not apply the enriched-run accuracy threshold.
-- The test also verifies that the result is one tensor train, preserves the expected mode sizes, and contains only finite values.
+The script seeds the random generator with `rng(1)`. Mode sizes are algebraic dimensions, not physical units:
 
-## Implementation structure
+| Case | Mode sizes | Dense vector dimension | Operator terms | RHS terms | Diagonal shift | Solver tolerance |
+|---|---:|---:|---:|---:|---:|---:|
+| `small_exact` | [5 4 3 2] | 120 | 3 | 2 | 5e-2 | 1e-10 |
+| `medium_balanced` | [10 10 10] | 1000 | 3 | 2 | 8e-2 | 1e-8 |
+| `large_2000` | [20 10 10] | 2000 | 2 | 2 | 1e-1 | 2e-8 |
 
-- Build test-case specifications with dimensions, term counts, diagonal shifts, tolerances, and AMEn options.
-- Construct tensor-train operators and right-hand sides, then materialise dense references for comparison.
-- Run `amensolve`, check dense solution error, residual, output structure, dimensions, and finiteness, and report each case.
-- Run the reproducibility, zero-enrichment, and nonsymmetric smoke checks, then print the final success message.
+The per-case AMEn options set sweep limits (80, 120, or 140), initial guess ranks (2), enrichment ranks (4 or 6), rank caps (24 or 32), dense-local size limits (450–600), local iteration limits (150–260), and verbosity 0. The source also applies case-specific solution-error and residual limits derived from the requested tolerance; these are test acceptance criteria, not observed results.
+
+## Use and checks
+
+Run `amensolve_test_1` in the Spinach MATLAB environment. The test calls `amensolve(A_tt,y_tt,tol,opts)`, converts the returned train with `full`, and checks relative solution error and relative residual against dense references. It also asserts a single-train output, preserved mode sizes, finite values, and repeatability. The zero-enrichment regression requires finite error and residual values; the nonsymmetric smoke uses mode sizes [6 6 5], four operator and four RHS terms, seed 123, and tolerance 1e-8, and checks finite output and residual.
+
+No physical units are assigned to dimensions, shift, or tolerance. Source assertions describe intended checks only; they do not establish that this test was run or passed.

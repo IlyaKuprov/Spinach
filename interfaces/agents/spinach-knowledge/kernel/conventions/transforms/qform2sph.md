@@ -1,29 +1,24 @@
 # kernel/conventions/transforms/qform2sph.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/qform2sph.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=qform2sph.m)
+
 - Signature: `[r0,r1,r2]=qform2sph(A)`
 
-## Purpose
+## Behavior
 
-Expands the normalized quadratic form `[x y z]*A*[x y z]'/ (x^2+y^2+z^2)` in spherical harmonics, returning coefficients for ranks 0, 1, and 2.
+For the normalized quadratic form `[x y z]*A*[x y z]'/norm([x y z],2)^2`, the returned coefficients satisfy `quadratic_form = sum(r_LM*Y_LM)`. The input is a real symmetric 3x3 matrix.
 
-## Physical / mathematical content
+- `r0 = (2/3)*sqrt(pi)*trace(A)`.
+- `r1 = [0 0 0]`.
+- `r2` has five entries ordered by decreasing m: m=2, 1, 0, -1, -2. With `c=sqrt(2*pi/15)`, they are:
+  - `r2(1)=c*(A(1,1)-A(2,2)-1i*(A(1,2)+A(2,1)))`
+  - `r2(2)=-c*(A(1,3)+A(3,1)-1i*(A(2,3)+A(3,2)))`
+  - `r2(3)=-(2/3)*sqrt(pi/5)*(-2*A(3,3)+A(2,2)+A(1,1))`
+  - `r2(4)=c*(A(1,3)+A(3,1)+1i*(A(2,3)+A(3,2)))`
+  - `r2(5)=c*(A(1,1)-A(2,2)+1i*(A(1,2)+A(2,1)))`
 
-The rank-0 coefficient is `r0=(2/3)*sqrt(pi)*trace(A)`. Rank-1 coefficients are zero. The five rank-2 coefficients are ordered by m=2,1,0,-1,-2; the source evaluates them from the symmetric matrix elements.
+No unit conversion is applied; the coefficient scale follows the units of `A`.
 
-## Numerical / algorithmic content
+## Input and outputs
 
-The function requires a real numeric symmetric 3x3 matrix. It returns a scalar rank-0 coefficient, three zero rank-1 coefficients, and five rank-2 coefficients. For the rank-2 terms, let `c=sqrt(2*pi/15)`; their values in order are `c*(A11-A22-2i*A12)`, `-2*c*(A13-i*A23)`, `(2/3)*sqrt(pi/5)*(2*A33-A11-A22)`, `2*c*(A13+i*A23)`, and `c*(A11-A22+2i*A12)`.
-
-## Parameters / inputs
-
-- `A` — real numeric symmetric 3x3 matrix.
-
-## Outputs
-
-- `r0` — rank-0 coefficient.
-- `r1` — three zero rank-1 coefficients.
-- `r2` — five rank-2 coefficients, ordered by m=2,1,0,-1,-2.
-
-## Implementation structure
-
-The function checks that A is real, numeric, symmetric, and 3x3, then evaluates the rank-0 and rank-2 expressions; rank 1 is set to zero.
+The explicit input check requires `A` to be numeric, real, symmetric, and exactly 3x3. Outputs are scalar `r0`, a 1x3 zero row vector `r1`, and a 1x5 row vector `r2`.

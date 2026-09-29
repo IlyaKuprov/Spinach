@@ -1,19 +1,23 @@
 # examples/giant_spin/triple_dy_magn.m
 
+- MATLAB implementation: [examples/giant_spin/triple_dy_magn.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/triple_dy_magn.m)
+
 - Signature: `triple_dy_magn()`
 
 ## Purpose
 
-Simulates a finite-speed magnetic-field sweep of a single crystal of a triangular triple-Dy complex in a micro-SQUID, corresponding to Figure S24 in the Supplementary Information of the cited study (doi:10.1002/chem.201703842; https://doi.org/10.1002/chem.201703842). The ligand-field parameters and ground-term g-tensor were computed with SINGLE_ANISO in MOLCAS. The stated calculation time is hours.
+Simulates a finite-speed magnetic-field sweep for a single crystal of a triangular triple-Dy complex in a micro-SQUID. The example is associated with Figure S24 in the Supplementary Information of https://doi.org/10.1002/chem.201703842. The source says the ligand-field parameters and g-tensor for the J=15/2 ground term were computed with SINGLE_ANISO in MOLCAS and notes a calculation time of hours.
 
-## Physical / mathematical content
+## Model and parameters
 
-Models three J=15/2 dysprosium centres in a triangular arrangement. Rotated g-tensors, molecular coordinates, exchange coupling of 0.0063 cm⁻¹ (converted to Hz using the NMR convention), and spin–orbit corrections to dipole–dipole couplings define the interactions. Rank-2, -4, and -6 Stevens ligand-field coefficients are converted to spherical tensors, rotated into the molecular frame, and assigned to all three centres with their respective triangular orientations.
+The three centres are specified as `E16` and described in the source as J=15/2 dysprosium atoms. The principal g-tensor values are `[1.325781502 1.322640525 1.317917615]`; the site tensors are constructed from a common eigenvector matrix and rotated around the triangle. The source enables `sodd` for spin-orbit corrections to dipole-dipole couplings and sets equal pairwise scalar exchange couplings via `J=icm2hz(0.0063)` using its stated NMR convention.
 
-## Numerical / algorithmic content
+The giant-ion coefficients use ranks 2, 4, and 6. The script applies `icm2hz`, `stev2sph`, and Wigner rotations before supplying these coefficients and site Euler rotations. Units for the stored coefficient arrays and g-tensor values are not stated. The basis is `zeeman-hilb` with approximation `none`; the temperature is `0.03` K and `sys.magnet=1.0` T.
 
-Uses an unrestricted Zeeman Hilbert-space basis at 0.03 K. `fieldscan_magn` calculates the z-magnetisation over 5,000 points from 0 to 1 T for a 10⁻⁵ s sweep, orientation [0, π/2, 0], and 64 states. The system magnet setting is 1 T.
+## Calculation and output
 
-## Implementation structure
+The sweep parameters are `fields=[0 1]` T, `npoints=5000`, `sweep_time=1e-5` seconds, orientation `[0 pi/2 0]`, and `nstates=64`. The script calls `fieldscan_magn(spin_system,parameters)` and receives `fields` and `z_magn`; it plots magnetisation against field. Unlike the equilibrium comparison scripts, this source does not load experimental data.
 
-The `triple_dy_magn()` function builds the tensors and interactions, creates the Spinach spin system and basis, runs `fieldscan_magn`, and plots magnetisation against magnetic field.
+## Scope
+
+The stated calculation is a single-crystal finite-speed sweep for the listed field interval, sweep time, orientation, and 64 states. The source text does not report numerical magnetisation values.

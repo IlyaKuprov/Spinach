@@ -1,19 +1,23 @@
 # examples/nmr_overtone/cpmas_glycine_simple.m
 
+- MATLAB implementation: [examples/nmr_overtone/cpmas_glycine_simple.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/cpmas_glycine_simple.m)
+
 - Signature: `cpmas_glycine_simple()`
 
-## Purpose
+## What it models
 
-Simulates a 14N-overtone/proton cross-polarisation spectrum for glycine under MAS. The source estimates a calculation time of hours and credits Ilya Kuprov, M. Carravetta, and M. Concistre.
+This is a single-condition Spinach calculation of proton-to-`14N` overtone cross-polarisation in glycine under MAS, according to the source header. It constructs a spin system from parameters in the script and calls `singlerot(spin_system,@overtone_cp,parameters,'qnmr')`; it does not load or fit a measured spectrum. The sequence implementation is delegated to `@overtone_cp`, which is not defined in this wrapper, so pulse shapes, phase cycling, and other sequence internals are not specified here. No gradient list or laboratory pulse-acquire schedule is defined in this wrapper.
 
-## Physical / mathematical content
+The header says the glycine quadrupolar tensor data come from O'Dell and Ratcliffe, [DOI 10.1016/j.cplett.2011.08.030](https://doi.org/10.1016/j.cplett.2011.08.030). The input is `C_q=1.18e6` Hz (1.18 MHz), `eta_q=0.53`, and `I=1`, converted with `eeqq2nqi`. This paper is the named source for a model tensor; the example contains no experimental data file.
 
-The source attributes the glycine quadrupolar tensor data to O'Dell and Ratcliffe ([DOI](http://dx.doi.org/10.1016/j.cplett.2011.08.030)). It specifies 14N and 1H at 14.1 T, 14N quadrupolar parameters of 1.18 MHz and η=0.53, and a 1H shift of 32.4. Damping relaxation is used with diagonal retention, zero equilibrium, and rate 300. The basis is sphten-liouv without approximation.
+## Spin system and relaxation
 
-## Numerical / algorithmic content
+The isotopes are `14N` and `1H`; the field input is `sys.magnet=14.1`. The wrapper sets `inter.zeeman.scalar={32.4,0}`, places the nuclei at `[0,0,0]` and `[0,0,1.00]`, and leaves the homonuclear `inter.coupling.matrix{2,2}` empty. It does not provide a separate explicit N-H coupling value; the presence of coordinates alone is not enough to infer an additional coupling model from this wrapper. Relaxation uses the damping option, diagonal retained terms, zero equilibrium, and `damp_rate=300` (no unit is given inline).
 
-The source disables Krylov and trajectory-level options and uses the 6400-point spherical powder grid `rep_2ang_6400pts_sph`, rank 7, and a MAS rate of −19.840 kHz. The spectrum spans [44, 52] kHz with 256 acquired and zero-filled points; the RF powers are 55.0 and 35.1 kHz, the RF frequency is 48 kHz, and the RF duration is 100 μs. The spectrum is computed with `singlerot` and `@overtone_cp`.
+The basis is spherical-tensor Liouville space with no approximation. The wrapper disables `krylov` and `trajlevel`, sets `max_rank=7`, and uses the rough powder grid `rep_2ang_6400pts_sph`. Its rotor-rate input is `-19840`; the wrapper does not attach a unit to that literal.
 
-## Implementation structure
+## Fixed RF condition and simulated spectrum
 
-The function builds the system and basis, sets the MAS and cross-polarisation operators, runs the single spectrum simulation, and plots its real part.
+The spectral sweep is 44-52 kHz with 256 points and 256-point zero filling. The axis is identified as kHz. The initial state is an oriented `1H` state, while the receiver and overtone channel operators are built for `14N`. The RF frequency input is `48e3` (48 kHz); the contact-duration input is `1e-4` s. The two-channel RF power input is `2*pi*[55.0e3,35.1e3]/sin(theta)`, where `theta=atan(sqrt(2))` is the magic angle.
+
+The program runs one `singlerot` calculation, plots the real part of the simulated spectrum, and does not report any measured signal or fitted parameter. “Hours” in the source header is a runtime estimate only.

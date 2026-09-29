@@ -1,27 +1,27 @@
 # kernel/optimcon/bfgs_upd.m
 
-- Signature: `H=bfgs_upd(H,dx,dg)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/bfgs_upd.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=bfgs_upd.m)
 
 ## Purpose
 
-Performs one dense BFGS update for maximisation. `H` approximates the negative Hessian of the objective, and `dg` is the gradient increment between steps.
-
-## Algorithm
-
-The update uses the sign-adjusted gradient increment `-dg`. A curvature safeguard rejects pairs that are non-finite or do not satisfy the required negative-curvature test on `dg' * dx`. If `H` is empty and the pair is rejected, the routine returns an identity matrix; if a supplied `H` is paired with a rejected step, it is symmetrised and returned unchanged. For an empty `H` with an accepted pair, a scaled identity initializes the approximation before the BFGS update.
+Apply one dense BFGS update for maximisation. `H` approximates the negative objective Hessian; `dx` and `dg` are argument and gradient increments. The update uses the sign-adjusted gradient increment `y=-dg`. It updates curvature information only; it does not evaluate the objective or impose constraints.
 
 ## Syntax
 
-```matlab
-H=bfgs_upd(H,dx,dg)
-```
+`H=bfgs_upd(H,dx,dg)`
 
 ## Inputs
 
-- `H` — current approximation to the negative Hessian, or `[]` on the first call.
-- `dx` — argument increment between the current and previous steps.
-- `dg` — gradient increment between the current and previous steps.
+- `H` — existing real square approximation, or `[]` for initialization.
+- `dx` — nonempty real numeric vector of argument increments.
+- `dg` — nonempty real numeric vector of gradient increments, with the same number of elements as `dx`.
 
-## Output
+The implementation accepts row or column vectors and reshapes both increments into columns. It checks that a supplied `H` is real, square, and dimensionally compatible. It does not require the increments or `H` to be finite at input validation; non-finite increment curvature fails the pair test.
 
-- `H` — updated BFGS approximation to the negative Hessian.
+## Update and output
+
+- `H` — updated real symmetric approximation to the negative objective Hessian.
+
+A curvature pair is used only when the finite inner products are positive in norm and `dg' * dx < -0.01*norm(dg)*norm(dx)`. With an empty `H`, a rejected pair returns an identity matrix sized to `dx`; a usable pair initializes a scaled identity and is then applied in the same call. With an existing matrix, a rejected pair leaves its symmetrized value unchanged. The BFGS update also returns that symmetrized value without updating if its denominators are non-finite or no larger than machine `eps`.
+
+The routine assigns no physical units; increments and gradients retain the caller's optimisation-coordinate and objective units.

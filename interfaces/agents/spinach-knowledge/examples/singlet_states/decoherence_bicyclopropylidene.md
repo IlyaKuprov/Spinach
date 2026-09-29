@@ -1,19 +1,9 @@
 # examples/singlet_states/decoherence_bicyclopropylidene.m
 
-- Signature: `decoherence_bicyclopropylidene()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/decoherence_bicyclopropylidene.m)
 
-## Purpose
+This example constructs an eight-proton bicyclopropylidene spin system from vacuum-DFT coordinates, chemical shifts, couplings and chemical-shift-anisotropy tensors. The source describes a 65,536-dimensional Liouville space and includes every dipolar coupling and CSA tensor in the relaxation superoperator. Its `focus` is the spectrum of relaxation modes, rather than a simulated singlet-preparation or storage sequence.
 
-Long-lived spin states in the bicyclopropylidene molecule (8 protons, 65536-dimensional Liouville space). The relaxation superoperator accounts for every dipolar coupling and every CSA tensor in the system. Calculation time: hours
+The model selects 1H spins from `../standard_systems/bicyclopropylidene.log` (the conversion call also passes the numeric argument `31.8`, without a unit stated in the source), sets the field to 1.0 T, and uses Redfield relaxation, zero equilibrium, lab-frame retention and a 100 ps correlation time. The complete `sphten-liouv` basis is used without approximation; the relaxation-integration and zero tolerances are both 1e-5.
 
-## Physical / mathematical content
-
-The eight-proton bicyclopropylidene model includes every dipolar coupling and CSA tensor in its relaxation superoperator.
-
-## Numerical / algorithmic content
-
-Redfield relaxation with a 100 ps correlation time is evaluated in a complete 65,536-dimensional Liouville space, and the twenty smallest-magnitude eigenvalues are listed as relaxation rates in Hz.
-
-## Implementation structure
-
-The function imports vacuum-DFT coordinates, shifts, J-couplings and CSAs, sets a 1.0 T field, zero equilibrium and lab-frame relaxation, and uses 1e-5 integration and zero tolerances before building the relaxation superoperator.
+After constructing the relaxation superoperator, the function displays its 20 smallest-magnitude relaxation eigenvalues, labelled in Hz. It does not report an evaluated lifetime or a time-domain decay trace. The function contains no RF preparation pulse, gradient, storage interval or imaging reconstruction.

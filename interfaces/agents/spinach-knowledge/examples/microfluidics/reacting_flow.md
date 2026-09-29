@@ -1,31 +1,13 @@
 # examples/microfluidics/reacting_flow.m
 
-- Signature: `reacting_flow()`
+## Model and transport
 
-## Purpose
+This example evolves concentrations on a cropped, inactivated COMSOL mesh with imported velocity data; it has no spin dynamics. Two competing second-order reaction channels are coupled to the shared flow-diffusion generator, with a fifth inert solvent component. The source sets `k1=2.0` toward exo and `k2=1.0` toward endo (rate units commented as `mol/(L*s)`) and diffusion to `1e-7` (no unit is stated for that value). The mesh crop is x=`[286.8, 287.5]` and y=`[576.0, 579.0]`; the code also inactivates listed mesh indices. It seeds component 1 at cell 1240 with 0.50 and component 2 at cell 1246 with 0.25; these initial values have no unit specified, and the plotted fields are labeled a.u.
 
-Flow in the absence of spin dynamics, but presence of two unidirectional second-order chemical reactions. Simulation time: seconds.
+## Time stepping and observable
 
-## Physical / mathematical content
+The script takes 280 steps of 20 seconds. At each step it evaluates the concentration-dependent reaction matrix in every cell, combines those matrices with the flow-diffusion generator, and advances the flattened state with `step`. Four mesh concentration fields are animated in a 2-by-2 plot: cyclopentadiene, acrylonitrile, exo-NBCN, and endo-NBCN. The source header describes runtime as seconds; this is not a measured runtime. No separate boundary-condition rule is stated beyond using the imported, cropped and inactivated mesh.
 
-- This example has no spin dynamics: it combines flow and strong diffusion on an imported COMSOL mesh with two competing second-order cycloaddition reactions. The local chemistry is evaluated from reactant concentrations in each mesh cell.
+## Source
 
-## Numerical / algorithmic content
-
-- At each time step, the code builds a cell-specific chemical generator, combines it with the mesh flow/diffusion generator, and advances the flattened concentration trajectory with `step`.
-- A `parfor` loop evaluates the local reaction generator independently for each mesh cell; the four plotted fields are the two reactants and two products.
-
-## Implementation structure
-
-- Flow in the absence of spin dynamics, but presence of two
-- unidirectional second-order chemical reactions.
-- Simulation time: seconds.
-- Import hydrodynamics information
-- No spin system here
-- Rate constants, mol/(L*s)
-- Cycloaddition reaction generator, including solvent
-- Strong diffusion
-- Timing parameters
-- Get diffusion and flow generator
-- Trajectory preallocation and the initial state
-- Time evolution loop
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/microfluidics/reacting_flow.m

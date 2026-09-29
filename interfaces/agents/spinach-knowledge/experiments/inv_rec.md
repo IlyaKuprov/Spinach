@@ -1,47 +1,23 @@
 # experiments/inv_rec.m
 
-- Signature: `fids=inv_rec(spin_system,parameters,H,R,K)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/inv_rec.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=inv_rec.m)
 
 ## Purpose
 
-Inversion-recovery pulse sequence. Syntax: fids=inv_rec(spin_system,parameters,H,R,K)
+`inv_rec` is a liquid-NMR inversion-recovery sequence that generates a family of free-induction decays over a relaxation-delay trajectory. It starts from isotropic thermal equilibrium, applies a 180° inversion pulse, evolves the state under relaxation (and kinetics), applies a 90° pulse at each trajectory point, and detects an FID. The relaxation superoperator must be thermalised. This is a sequence implementation, not a measured relaxation result.
 
-## Physical / mathematical content
+## Inputs and units
 
-## Numerical / algorithmic content
+The signature takes `H`, `R`, and `K` and constructs `L=H+1i*R+1i*K`; unlike the imaging routines, it does not take `F` or gradient operators.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- `parameters.sweep`: spectral sweep width in Hz; acquisition step is `1/sweep` seconds.
+- `parameters.npoints`: number of acquired FID points.
+- `parameters.spins`: cell array of spin-name strings that selects the pulse and detection nucleus; source examples include `{'1H'}` and `{'13C'}`.
+- `parameters.max_delay`: maximum relaxation-evolution duration, in seconds.
+- `parameters.n_delays`: positive integer number of relaxation-evolution steps spanning `max_delay` (step interval `max_delay/n_delays`).
 
-## Parameters / inputs
+The pulse/detection states are formed from `L+` of the selected first spin: `Ly` generates the 180° and 90° rotations, while `state(...,'L+',...)` provides the detection observable. There is no explicit coherence-order filter.
 
-- parameters.sweep spectrum sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.max_delay longest relaxation delay
-- parameters.n_delays number of relaxation delays to run
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+## Detection and return
 
-## Outputs
-
-- fids -free induction decays for each delay starting from zero,
-- a matrix with individual FIDs in columns
-- Note: the relaxation superoperator must be thermalised.
-- Zak El-Machachi
-
-## Implementation structure
-
-- Inversion-recovery pulse sequence. Syntax:
-- fids=inv_rec(spin_system,parameters,H,R,K)
-- parameters.sweep spectrum sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.max_delay longest relaxation delay
-- parameters.n_delays number of relaxation delays to run
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fids -free induction decays for each delay starting from zero,
+`fids` contains the acquired FIDs as columns, with one column per relaxation-trajectory state; the row dimension is the FID time-point dimension (`npoints`). The trajectory starts at zero delay, and each propagation interval is `max_delay/n_delays`. The function returns the matrix only, not explicit time or delay-axis vectors. No DOI or numerical experimental data are supplied in the source page.

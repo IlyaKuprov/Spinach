@@ -4,38 +4,25 @@
 
 ## Purpose
 
-Sensitivity-improved, echo/antiecho gradient-selected HSQC based on the Bruker `hsqcetgpsi` pulse program and standard HSQC. Gradient selection is represented by coherence-order selection statements. The routine returns the two acquisition pathways as `fid.pos` and `fid.neg`.
+A sensitivity-improved, echo/antiecho gradient-selected HSQC sequence based on the Bruker `hsqcetgpsi` program. It transfers heteronuclear coherence through the specified scalar coupling, samples indirect evolution, and returns separate echo and antiecho FIDs. The source implements gradient selection analytically by selecting F1 coherence orders; it does not simulate physical gradient waveforms.
 
-## Implementation
+The source cites the standard HSQC and pulse-program background: [DOI 10.1016/0009-2614(80)80041-8](https://doi.org/10.1016/0009-2614(80)80041-8), [DOI 10.1002/cmr.a.10095](https://doi.org/10.1002/cmr.a.10095), [DOI 10.1016/0022-2364(91)90036-S](https://doi.org/10.1016/0022-2364(91)90036-S), [DOI 10.1021/ja00052a088](https://doi.org/10.1021/ja00052a088), and [DOI 10.1007/BF00175254](https://doi.org/10.1007/BF00175254).
 
-The routine builds `L=H+1i*R+1i*K`, sets the evolution delay from the working scalar coupling `parameters.J`, and prepares the proton-detected HSQC pathways using the specified F1 and F2 spins. It selects the pathway coherences analytically and acquires the echo and antiecho signals. For natural-abundance simulations, the source recommends isotope-dilution functionality (see `dilute.m`).
+## Inputs
 
-## Parameters / inputs
+- `spin_system` must use the sphten-liouv formalism. `H`, `R`, and `K` are same-sized Hamiltonian, relaxation, and kinetics matrices supplied by the context function; the routine combines them as `H+1i*R+1i*K`.
+- `parameters.spins` is a two-element cell array naming the active indirect (F1) and detected direct (F2) isotopes, in that order. The source example is `{'13C','1H'}`.
+- `parameters.sweep` and `parameters.npoints` are two-element F1/F2 vectors: sweep widths in Hz and point counts (positive integers), respectively. The time increments are their reciprocals.
+- `parameters.J` is the working scalar coupling in Hz; the sequence sets its coupling-evolution interval from `abs(1/(2*J))`.
+- `parameters.decouple_f1` lists nuclei receiving midpoint 180-degree refocusing pulses during F1 evolution; it must not include the active F1 isotope. `parameters.decouple_f2` lists nuclei decoupled during F2 acquisition. Both isotope lists must refer to spins in the system. The source header gives `decouple_f2={'15N','13C'}` as an example.
+- `parameters.trim_angle` is the proton trim-pulse angle in radians. `parameters.si_time` is the sensitivity-improvement delay in seconds.
 
-- `parameters.sweep`: [F1 F2] sweep widths, Hz.
-- `parameters.npoints`: [F1 F2] numbers of points.
-- `parameters.spins`: {F1 F2} nuclei, e.g. {'13C','1H'}.
-- `parameters.decouple_f2`: nuclei to decouple in F2, e.g. {'15N','13C'}.
-- `parameters.decouple_f1`: nuclei receiving midpoint 180-degree refocusing pulses in F1, e.g. {'1H','15N'}; must not include the F1 active isotope.
-- `parameters.J`: working scalar coupling, Hz.
-- `parameters.trim_angle`: proton trim-pulse angle, rad.
-- `parameters.si_time`: sensitivity-improvement delay, s.
-- `H`: Hamiltonian matrix supplied by the context function.
-- `R`: relaxation superoperator supplied by the context function.
-- `K`: kinetics superoperator supplied by the context function.
+## Sequence and output
 
-## Output
+The initial operator is longitudinal magnetization on F2 and the receive state is its raising operator. After the transfer and trim rotations, the routine evolves an F1 trajectory, applies the requested midpoint refocusing pulses, and selects the +1 and -1 F1 coherence pathways into separate states. Subsequent refocusing and sensitivity-improvement delays lead to direct-dimension acquisition with F2 decoupling. The result is a structure with `fid.pos` and `fid.neg`, the echo and antiecho signals from observable-mode evolution. The source recommends using Spinach isotope-dilution functionality for natural-abundance simulations (see `dilute.m`). It defines the two dimensions and point counts but leaves the returned arrays' orientation to the evolution routine.
 
-- `fid.pos`, `fid.neg`: detected echo and antiecho signal components.
+## Source limits
 
-## References
+No gradient amplitudes, durations, or hardware waveform are specified: pathway selection is by coherence filtering. The source supplies no receiver phase-cycle table or calibration procedure beyond the listed parameters.
 
-The source cites these standard-HSQC references:
-
-- [10.1016/0009-2614(80)80041-8](https://doi.org/10.1016/0009-2614(80)80041-8)
-- [10.1002/cmr.a.10095](https://doi.org/10.1002/cmr.a.10095)
-- [10.1016/0022-2364(91)90036-S](https://doi.org/10.1016/0022-2364(91)90036-S)
-- [10.1021/ja00052a088](https://doi.org/10.1021/ja00052a088)
-- [10.1007/BF00175254](https://doi.org/10.1007/BF00175254)
-
-[Source page](https://spindynamics.org/wiki/index.php?title=hsqcetgpsi.m)
+Source implementation: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/bruker/hsqcetgpsi.m

@@ -4,19 +4,16 @@
 
 ## Purpose
 
-Nuclear Overhauser effect in a heteronuclear two-spin system in the short correlation time case. Calculation time: seconds.
+A relaxation-time trajectory illustrating the short-correlation-time nuclear Overhauser effect in a heteronuclear two-spin system. This is not a NOESY pulse-sequence simulation: the example prepares an inverted longitudinal state and follows both spins' longitudinal magnetization under Redfield relaxation. The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-- The model contains one proton and one carbon-13 spin, separated by 1.03 Å, with zero isotropic Zeeman offsets. Redfield relaxation uses a 100 ps correlation time, 298 K, and the Di Bari equilibrium convention.
-- The initial density operator is thermal equilibrium with the proton spin inverted. The calculation tracks the longitudinal magnetization of both spins, showing their NOE relaxation response.
+The isotopes are `1H` and `13C`; both isotropic Zeeman scalars are set to zero. Their coordinates are `[0 0 0]` and `[0 0 1.03]`; the source gives no coordinate unit. The field is set by `sys.magnet=14.1`. The basis uses spherical-tensor Liouville formalism with no approximation. Redfield relaxation uses the `dibari` equilibrium convention, `kite` retention, temperature 298, and `tau_c={100e-12}`.
 
-## Numerical / algorithmic content
+## Preparation and observable channels
 
-- The calculation uses the full spherical-tensor Liouville basis (no basis approximation) and retains the Redfield relaxation terms with the kite selection.
-- The relaxation-only evolution is sampled every 0.01 s for 400 intervals, covering 0–4 s.
+After constructing the relaxation superoperator and thermal equilibrium state, the code inverts spin 1's `Lz` component relative to equilibrium. Multichannel evolution uses the `Lz` operators for spins 1 and 2 as separate observation channels. The call uses `1i*R`, step parameter `1e-2`, 400 steps, and `multichannel` mode; the plotted time coordinate is `linspace(0,4,401)` and is labelled in seconds. The plot labels the traces Proton and Carbon.
 
-## Implementation structure
+## Source
 
-- Create the H-1/C-13 system at 14.1 T, construct the basis and Redfield superoperator, and calculate thermal equilibrium.
-- Invert the proton's `Lz` component, then call multichannel evolution with both spins' `Lz` operators as detection channels; plot and label the proton and carbon longitudinal signals.
+[examples/nmr_liquids/noe_two_spin_het.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_two_spin_het.m)

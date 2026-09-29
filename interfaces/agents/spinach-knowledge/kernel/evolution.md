@@ -1,93 +1,32 @@
 # kernel/evolution.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/evolution.m) | [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=evolution.m)
+
 - Signature: `answer=evolution(spin_system,L,coil,rho,timestep,nsteps,output,destination)`
 
-## Purpose
+## Purpose and inputs
 
-Time evolution function. Performs all types of time propagation with automatic trajectory level state space restriction. Syntax: answer=evolution(spin_system,L,coil,rho,timestep,... nsteps,output,destination)
+`evolution` propagates a supplied initial state under the supplied Hamiltonian or Liouvillian. It supports Hilbert-space density matrices and wavefunctions, and Liouville-space state vectors; the active formalism in `spin_system.bas.formalism` selects the implementation. In Liouville calculations, `rho` may be one state vector or a horizontal stack of initial state vectors. In Hilbert-space calculations it is the initial density matrix or wavefunction. `coil` is used for observable detection; for `multichannel`, its columns are the separate observable vectors. The optional `destination` is used for destination-state screening.
 
-## Physical / mathematical content
+The source defines `timestep` as the duration of one step in seconds and `nsteps` as the number of steps. The requested total duration is therefore `timestep*nsteps`. This function has no frequency-offset or field-grid input and does not convert an offset axis to Hz: any offsets or frequencies must already be represented in `L` according to the caller's Hamiltonian/Liouvillian convention. For a manually assembled Liouville generator, the source documents `L=H+1i*R+1i*K`, where `H`, `R`, and `K` are the Hamiltonian-commutation, relaxation, and kinetics superoperators. For Hilbert-space propagation, `L` is the Hamiltonian matrix.
 
-- Supports Hilbert-space density-matrix, Liouville-space state-vector, and wavefunction propagation, with trajectory-level state-space restriction.
+## Propagation direction and rule
 
-## Numerical / algorithmic content
+Propagation proceeds forward from `rho`. In the ordinary matrix path, the code obtains a one-step propagator using `propagator(spin_system,L,timestep)` and repeatedly left-applies it to the current state, `rho_loc=P*rho_loc`, for the requested steps. Polyadic generators are forwarded to `krylov` with the same time-step and output arguments. The source delegates construction of the propagator to those helpers; it does not define a separate frequency grid or reverse-time propagation here. For Liouville calculations, automatic trajectory-level restriction and subspace splitting can reduce the working space; these are controlled by the Spinach system settings. In a non-Krylov Liouville path the code may choose an internal optimal substep count and set its step to `(timestep*nsteps)/nsteps_opt`; this preserves the requested total duration but does not preserve the caller's individual step spacing. The Krylov path receives the supplied `timestep` and `nsteps` directly.
 
-- Polyadic generators are forwarded to `krylov()`. In the Liouville-space `final` path, smaller subspaces use an exponential propagator and large subspaces use Krylov propagation; the `krylov` enable/disable settings can affect this choice.
-- Hilbert-space final-state and observable calculations support parallel execution; the source reports tests through 128 cores and says parallel trajectory calculation did not appear beneficial because of inter-thread communication.
+## Output forms and dimensions
 
-## Parameters / inputs
+The accepted `output` strings are `final`, `trajectory`, `total`, `refocus`, `observable`, and `multichannel`.
 
-- For Liouville space calculations:
-- L -the Liouvillian to be used during evolution. If L
-- is assembled manually from Hamiltonian commutation
-- superoperator H, relaxation superoperator R, and
-- kinetics superoperator K, use L=H+1i*R+1i*K.
-- rho -the initial state vector or a horizontal stack thereof
-- output -a string giving the type of evolution that is required
-- 'final' -returns the final state vector or a horizontal
-- stack thereof.
-- 'trajectory' -returns the stack of state vectors giving
-- the trajectory of the system starting from
-- rho with the user-specified number of steps
-- and step length.
-- 'total' -returns the integral of the observable trace
-- from the simulation start to infinity. This
-- option requires the presence of relaxation.
-- 'refocus' -evolves the first vector for zero steps,
-- second vector for one step, third vector for
-- two steps, etc., consistent with the second
-- stage of evolution in the indirect dimension
-- after a refocusing pulse.
-- 'observable' -returns the time dynamics of an observable
-- as a vector (if starting from a single ini-
-- tial state) or a matrix (if starting from a
-- stack of initial states).
-- 'multichannel' -returns the time dynamics of several
-- observables as rows of a matrix (if
-- starting from a single initial state)
-- or as a channels-by-time-by-states
-- array (if starting from a stack of
-- initial states). Note that destination
-- state screening may be less efficient
-- when there are multiple destinations
-- to screen against.
-- coil -the detection state, used when 'observable' is specified as
-- the output option. If 'multichannel' is selected, the coil
-- should contain multiple columns corresponding to individual
-- observable vectors.
-- destination -(optional) the state to be used for destination state
-- screening.
-- For Hilbert space calculations:
-- L -Hamiltonian matrix
-- coil -observable operator (if any)
-- rho -initial density matrix
-- timestep -duration of a single time step (seconds)
-- nsteps -number of steps to take
-- output -a string giving the type of evolution that is required
-- 'final' -returns the final density matrix.
-- 'trajectory' -returns a cell array of density matrices
-- giving the trajectory of the system star-
-- ting from rho with the user-specified num-
-- ber of steps and step length.
-- 'refocus' -evolves the first matrix for zero steps,
-- second matrix for one step, third matrix for
-- two steps, etc., consistent with the second
-- stage of evolution in the indirect dimension
-- after a refocusing pulse.
-- 'observable' -returns the time dynamics of an observable
-- as a vector.
-- destination -this argument is ignored.
-- For wavefunction calculations the Liouville space call signature
-- applies with L the Hamiltonian matrix, rho a wavefunction or a
-- horizontal stack thereof, and coil a reference wavefunction: the
-- 'observable' and 'multichannel' outputs return overlap trajectories
-- of the coil with the evolving wavefunction; expectation values of
-- operators require a density matrix formalism. Stacks are supported
-- by 'final', 'refocus', 'observable', and 'multichannel'; the
-- 'trajectory' output takes a single column, and 'total' is not
-- defined for unitary wavefunction evolution.
+- `final` returns the final state, or a horizontal stack of final state vectors.
+- `trajectory` returns the state trajectory. The source rejects this option for a stack of Liouville state vectors; representation depends on the active formalism.
+- `observable` returns an observable time trace as a vector for one initial state or a matrix for a stack of initial states.
+- `multichannel` returns several observable traces. With a stack of initial states, the documented shape is channels-by-time-by-states; with one initial state it is a channel-by-time matrix.
+- `total` integrates the observable trace from the start of the simulation to infinity and requires relaxation. The source rejects it for unitary wavefunction evolution and for polyadic generators.
+- `refocus` propagates successive input vectors for zero, one, two, and subsequent steps, matching the described indirect-dimension refocusing use.
 
-## Outputs
+The routine returns states or observable values, not a separate time vector; the caller's `timestep` supplies the spacing. The input contract checks that `L`, `coil`, `timestep`, and `nsteps` are numeric, that `rho` is numeric or a cell array, and that `output` is one of the listed strings.
 
-- `answer` is a vector, matrix, channels-by-time-by-states array, or cell array of matrices, depending on the selected output and formalism.
-- The source reports Hilbert-space parallel tests through 128 cores and notes trajectory parallelization did not appear beneficial because of inter-thread communication ([10.1063/1.3679656](https://doi.org/10.1063/1.3679656)).
+## Parallel context
+
+The source reports Hilbert-space parallel tests through a 128-core configuration (16 nodes, 8 cores each) and notes trajectory parallelization did not appear beneficial because of inter-thread communication ([10.1063/1.3679656](https://doi.org/10.1063/1.3679656)).

@@ -1,30 +1,22 @@
 # kernel/operators/boson_mono.m
 
+Direct source: [kernel/operators/boson_mono.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/boson_mono.m)
+
 - Signature: `B=boson_mono(nlevels)`
 
 ## Purpose
 
-Construct a cell array of monomials in the creation and annihilation operators for a truncated bosonic mode.
+Construct the ordered monomials of the truncated bosonic creation and annihilation matrices returned by `weyl(nlevels)`. For each `k,q=0,...,nlevels-1`, the cell contains `A.c^k*A.a^q`, with creation powers on the left and annihilation powers on the right. This function adds no further scalar prefactor; the ladder-matrix convention comes from `weyl`. Its documented number-operator relation is `[N,B(k,q)]=(k-q)*B(k,q)`.
 
-## Physical / mathematical content
+## Ordering and dimensions
 
-The returned operators are `B(k,q)=(Cr^k)*(An^q)` for `k,q=0,...,nlevels-1`, where `Cr` and `An` are the creation and annihilation generators from `weyl(nlevels)`. They satisfy `[N,B(k,q)]=(k-q)*B(k,q)`.
+The returned `B` is an `nlevels^2-by-1` cell array. Each `B{j}` is an `nlevels-by-nlevels` matrix. The cells are ordered by increasing `k+q` and, within each equal-sum group, decreasing `k`. For `nlevels=3` the 1-based cell-number map is: `1:(0,0), 2:(1,0), 3:(0,1), 4:(2,0), 5:(1,1), 6:(0,2), 7:(2,1), 8:(1,2), 9:(2,2)`.
 
-## Numerical / algorithmic content
+The function accepts a positive integer `nlevels`. The finite truncation and matrix conventions are those of [`weyl.m`](weyl.md).
 
-The function generates all `nlevels^2` pairs and orders them by increasing `k+q`; within each equal-sum group, `k` decreases. For `nlevels=3`, the pair order is `(0,0),(1,0),(0,1),(2,0),(1,1),(0,2),(2,1),(1,2),(2,2)`.
+## Operator action
 
-## Parameters / inputs
-
-- `nlevels` - positive integer number of bosonic ladder population levels; the indices `k` and `q` run from 0 to `nlevels-1`. The source checks that `nlevels` is numeric, real, scalar, at least 1, and integer-valued.
-
-## Outputs
-
-- `B` - cell array containing the `nlevels^2` bosonic monomial matrices in the ordering described above.
-
-## Implementation structure
-
-The routine obtains the truncated creation and annihilation operators from `weyl(nlevels)`, forms every ordered product `(A.c^k)*(A.a^q)`, then reorders the cells by increasing index sum and decreasing `k` within each sum.
+The output consists of Hilbert-space operator matrices formed by ordinary matrix products. The routine does not construct left-multiplication, right-multiplication, a commutator superoperator, or a propagator.
 
 ## Reference
 

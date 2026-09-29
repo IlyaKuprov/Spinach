@@ -1,13 +1,11 @@
 # examples/nmr_overtone/mas_boron_1.m
 
-- Signature: `mas_boron_1()`
+- MATLAB implementation: [examples/nmr_overtone/mas_boron_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/mas_boron_1.m)
 
-## Purpose
+This example simulates a 10B magic-angle-spinning (MAS) overtone spectrum in Z-detection. The source comments say the sample spins in the JEOL direction, credit parameters to Nghia Duong and Yusuke Nishiyama, and identify the target as the most intense of five overtone spinning sidebands. The comment estimates hours of calculation. These comments do not assert an experimental fit or reproduction.
 
-Simulates an overtone Z-detection `10B` MAS NMR spectrum, with the sample spinning in the JEOL direction. The source credits parameters to Nghia Duong and Yusuke Nishiyama and focuses on the most intense of the five overtone spinning sidebands. It estimates hours of calculation time.
+The system has isotope 10B and magnet setting 16.4. Its only listed coupling is `eeqq2nqi(0.7e6,0.0,3,[0 0 0])`; the source does not state units for the magnet or coupling arguments. The relaxation settings are `damp`, diagonal retention, zero equilibrium, and `damp_rate=50`. The basis is `sphten-liouv` with approximation `none`.
 
-## Model and calculation
+The sequence uses rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and grid `rep_2ang_800pts_sph`. It sets sweep `[-141e3 -139e3]`, 256 points, 256-point zero-fill, and `axis_units='kHz'`. Both initial state and receiver are 10B `Lz`, matching the source's Z-detection description. The source does not set explicit RF power, duration, frequency, or an average-treatment field in this file.
 
-The `10B` system is at 16.4 T, with quadrupole parameters 0.7 MHz, asymmetry 0, and spin 3. Diagonal damping relaxation is used at rate 50, and the code disables trajectory-level options.
-
-The sequence setup uses rank 12, a 70 kHz spinning rate, grid `rep_2ang_800pts_sph`, and a −141 to −139 kHz sweep with 256 points and 256-point zero-fill. The initial state and receiver are both `10B` `Lz`; the simulation uses `singlerot` with `overtone_a`.
+The simulation call is `singlerot` with `overtone_a` and `qnmr`. The script plots `real(spectrum)` through `plot_1d`; it does not apply a separate phase factor. Its narrow sweep and spherical 800-point grid distinguish this sideband-focused setup from the two panoramic 10B examples in this group.

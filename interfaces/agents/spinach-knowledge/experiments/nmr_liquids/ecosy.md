@@ -1,33 +1,25 @@
 # experiments/nmr_liquids/ecosy.m
 
 - Signature: `fid=ecosy(spin_system,parameters,H,R,K)`
+- Source: [`experiments/nmr_liquids/ecosy.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/ecosy.m)
 
-## Purpose
+## Purpose and sequence
 
-Phase-sensitive E.COSY pulse sequence. The implementation includes coherence orders through six-quantum order.
+This phase-sensitive E.COSY implementation begins with an `Lx` initial (post-pulse) state on the selected isotope and records its indirect-dimension (F1) trajectory. The second pulse is represented by States quadrature branches using `Lx` and `Ly`. Each branch is projected onto coherence orders +/-2 through +/-6; the code weights these orders 1, 2, 4, 6, and 9, respectively. A third `Lx` pulse is applied to the cosine branch and `Ly` to the sine branch, followed by direct-dimension (F2) propagation and observation using the selected isotope's `L+` coil state. These are code-defined sequence operations, not a measured spectrum or a run-verified result.
 
-## Implementation
+The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters.sweep` seconds.
 
-The kernel forms the initial `Lx` state and detection state, then propagates the F1 trajectory. It creates separate States-quadrature branches with `Lx` and `Ly` second pulses. The multiple-quantum filter combines coherence-order projections at orders `+/-2` through `+/-6`, with respective weights `1`, `2`, `4`, `6`, and `9`. A third pulse is applied to each branch and F2 detection returns real and imaginary components in `fid.cos` and `fid.sin`. The Liouvillian is `H+1i*R+1i*K` and the dwell time is `1/parameters.sweep`.
+## Parameters and inputs
 
-## Parameters / inputs
+- `parameters.sweep`: positive real scalar sweep width in Hz, for both dimensions.
+- `parameters.npoints`: two positive integer point counts, ordered F1 then F2.
+- `parameters.spins`: one-element cell array naming an isotope present in the system (for example, `{'1H'}` or `{'13C'}`).
+- `H`, `R`, and `K`: same-sized numeric Hamiltonian, relaxation, and kinetics matrices supplied by the context function. The function requires the `sphten-liouv` formalism.
 
-- `parameters.sweep` — sweep width in Hz.
-- `parameters.npoints` — number of points for both dimensions.
-- `parameters.spins` — nuclei on which the sequence runs, specified as `{'1H'}`, `{'13C'}`, etc.
-- `H` — Hamiltonian matrix, received from context function.
-- `R` — relaxation superoperator, received from context function.
-- `K` — kinetics superoperator, received from context function.
+## Outputs and references
 
-The implementation requires `sphten-liouv` formalism, same-sized matrix inputs `H`, `R`, and `K`, a positive scalar sweep width, two positive integer point counts, and one isotope present in the system.
-
-## Outputs
-
-- `fid.cos`, `fid.sin` — real and imaginary components of the States quadrature signal.
-
-## References
-
-- [E.COSY reference](https://doi.org/10.1021/ja00308a042)
-- [E.COSY reference](https://doi.org/10.1063/1.451421)
-- [E.COSY reference](https://doi.org/10.1016/0022-2364(87)90102-8)
-- [Spin Dynamics Wiki: `ecosy.m`](https://spindynamics.org/wiki/index.php?title=ecosy.m)
+- `fid.cos` and `fid.sin`: real and imaginary States-quadrature FID components, as identified by the source header.
+- [E.COSY reference, DOI 10.1021/ja00308a042](https://doi.org/10.1021/ja00308a042)
+- [E.COSY reference, DOI 10.1063/1.451421](https://doi.org/10.1063/1.451421)
+- [E.COSY reference, DOI 10.1016/0022-2364(87)90102-8](https://doi.org/10.1016/0022-2364(87)90102-8)
+- [Spinach Wiki: `ecosy.m`](https://spindynamics.org/wiki/index.php?title=ecosy.m)

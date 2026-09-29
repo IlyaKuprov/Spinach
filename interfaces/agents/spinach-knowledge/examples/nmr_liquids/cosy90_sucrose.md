@@ -1,19 +1,21 @@
 # examples/nmr_liquids/cosy90_sucrose.m
 
+- MATLAB implementation: [examples/nmr_liquids/cosy90_sucrose.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/cosy90_sucrose.m)
+
 - Signature: `cosy90_sucrose()`
 
 ## Purpose
 
-COSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation time: minutes
+A liquid-state proton COSY-90 simulation for sucrose using magnetic parameters imported from a vacuum DFT calculation. The source estimates a calculation time of minutes.
 
-## Physical / mathematical content
+## Spin system and basis
 
-This is a homonuclear proton COSY simulation for sucrose. Its spin-system parameters are generated from the vacuum DFT log at `../standard_systems/sucrose.log` by `g2spinach`, with hydrogen nuclei mapped to `1H`; the example then models the liquid-state COSY response.
+The example parses the sucrose DFT log at ../standard_systems/sucrose.log and calls `g2spinach` to import hydrogen nuclei as `1H`. It passes `options.min_j=2.0` (the helper defines this as a scalar-coupling threshold in Hz) and `options.no_xyz=1`; it supplies 31.8 ppm as the reference-shielding argument to `g2spinach`. The imported system is then assigned a field of 5.9 T. The Liouville-space basis uses IK-2, scalar-coupling connectivity, proximity level 1, and the greedy system-building option; the source also sets a proximity cutoff of 4.0.
 
-## Numerical / algorithmic content
+## COSY acquisition and processing
 
-The DFT conversion uses `min_j=2.0` and `no_xyz=1`, with the conversion argument 31.8. The subsequent Spinach setup sets field value 5.9 and uses greedy mode, proximity cutoff 4.0, an IK-2 scalar-coupling Liouville basis at proximity level 1, and a 90-degree COSY angle. It uses offset 800, sweep 1700, 512 points and 2048 zero-fill points in both dimensions, followed by two-dimensional cosine apodisation and a shifted 2D FFT; the plotted data are the real spectrum.
+The pulse angle is pi/2, the offset is 800 Hz, and the sweep width is 1700 Hz. The FID has 512 by 512 sampled points and is zero-filled to 2048 by 2048 before the 2D FFT. Both axes are in ppm. Cosine apodisation is applied on both time dimensions, and the plotted array is the real part of the shifted spectrum.
 
-## Implementation structure
+## Interpretation and scope
 
-The code converts the DFT log into `sys` and `inter`, builds the basis, runs `liquid(...,@cosy,...,'nmr')`, then windows and Fourier-transforms the FID before plotting.
+The plotted spectrum is generated from the magnetic parameters imported from the DFT log, rather than from shifts and couplings tabulated directly in this function. The source does not state the DFT method in the function body or present an experimental comparison, so the calculation should be read as a simulation using that supplied log and reference-shielding input, not as a measured sucrose spectrum.

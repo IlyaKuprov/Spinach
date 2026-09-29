@@ -4,21 +4,16 @@
 
 ## Purpose
 
-90-degree Q5 pulse on a chain of 31 strongly coupled protons. Calculation time: seconds.
+This example applies the sampled Q5 pulse labelled as a 90-degree pulse to the Lz state of a 31-proton chain, then simulates liquid-state acquisition and plots the imaginary part of the processed spectrum. The spectrum is a model output; the source does not establish an experimental result or convergence.
 
-## Physical / mathematical content
+## Spin system and waveform
 
-- At a magnetic field of 14.1, the system contains 31 `1H` spins with scalar Zeeman values spanning -4 to 4 and nearest-neighbor scalar couplings of 10.
-- The pulse acts on an initial `Lz` state using `Lx` and `Ly` controls, with a 480 Hz frequency offset applied through `H+2*pi*480*Lz`.
+The model is at 14.1 T, with scalar Zeeman shifts from −4 to +4 ppm and 10 Hz scalar couplings between adjacent protons. The basis is IK-2 with scalar-coupling connectivity and proximity level 1, under the NMR assumption.
 
-## Numerical / algorithmic content
+The waveform is read from q5_1000.pk as amplitude and phase samples. It uses 200 points over 0.012 s, giving uniform 60 μs intervals. The source scales the amplitudes by 8 × (π/2) × 200 divided by (sum of amplitudes × 0.012 s), converts amplitude/phase to Cartesian Cx/Cy, and propagates with shaped_pulse_xy using expv-pwc. A 480 Hz offset enters through H + 2π × 480 × Lz. These are the script's calibration and offset settings; no independent flip-angle or convergence test is reported.
 
-- The `sphten-liouv` basis uses the `IK-2` approximation, `scalar_couplings` connectivity, and proximity level 1.
-- A 200-point waveform is read from `q5_1000.pk` for a 0.012-second pulse. Its amplitude is calibrated using `8*(pi/2)*npoints/(sum(A)*duration)`, converted from amplitude and phase to Cartesian controls, and propagated with `shaped_pulse_xy` using `expv-pwc`.
-- Acquisition uses a 5000 Hz sweep, 2048 points, and zero filling to 16384 points. The FID receives exponential apodisation with parameter 6; the imaginary part of its shifted Fourier spectrum is plotted.
+## Acquisition and observable
 
-## Implementation structure
+The initial state is 1H Lz; the RF controls are Lx/Ly. Liquid-state acquisition uses a 5000 Hz sweep, 2048 points, zero filling to 16384 points, and a Hz axis. The FID is exponentially apodised with parameter 6 and Fourier transformed; the imaginary spectrum is plotted. No explicit spatial-gradient or homospoil stage or relaxation-superoperator construction appears in this script.
 
-- Create the spin system, construct its basis, apply the `nmr` assumptions, and obtain the Hamiltonian and `Lx`, `Ly`, and `Lz` operators.
-- Prepare the `Lz` state, execute the calibrated Q5 pulse, then acquire with an `L+` coil, no decoupling, and zero acquisition offset.
-- Apodise and Fourier-transform the FID, then plot the resulting spectrum on a Hz axis.
+The shaped_pulse_xy implementation cites DOI [10.1016/j.jmr.2004.08.017](https://doi.org/10.1016/j.jmr.2004.08.017). See [shaped_pulse_q5.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_q5.m) and [shaped_pulse_xy.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_xy.m).

@@ -1,14 +1,15 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m
 
-- Signature: `mq_conversion()`
+## Objective and context
+Design the multiple-quantum conversion step for the z-filtered 27Al MQMAS experiment: convert a 3Q or 5Q coherence into the population difference across the central transition. The function defaults to 5Q and accepts mq_order = 3 or 5. Related ChemRxiv record: [DOI 10.26434/chemrxiv.15008427](https://doi.org/10.26434/chemrxiv.15008427).
 
-## Purpose
+## Spin model and rotor ensemble
+The model is one spin-5/2 27Al nucleus with quadrupolar coupling CQ = 3.0 MHz, asymmetry eta = 1.0, and 10 ppm axial shielding anisotropy, represented by principal values [-5, -5, 10] ppm. It uses a 400 MHz proton-frequency reference, 12.5 kHz magic-angle spinning, and a second-order quadrupolar interaction in the rotating frame. Rotor-phase-resolved drifts span 200 crystallite orientations and 80 initial rotor phases, with 160 rotor ticks.
 
-Optimal control design of the multiple-quantum conversion pulse of the z-filtered 27Al MQMAS experiment. Reproduces, using Spinach, the conversion pulse optimisation from https://doi.org/10.26434/chemrxiv.15008427 A single 27Al nucleus with the quadrupolar coupling and the shielding anisotropy assumed in the paper (CQ=3.0 MHz, eta=1.0, 10 ppm axial shielding anisotropy) is spun at 12.5 kHz in a 400 MHz magnet. The quadrupolar interaction is taken to second order in the rotating frame, and the powder average runs over 200 crystallite orientations at 80 initial rotor phases each. The pulse is three rotor periods (240 us) long in 0.5 us slices, the controls are Cartesian, and the 100 kHz amplitude ceiling is enforced by a spillout penalty followed by clipping. The initial state is the Hermitian combination of the +MQ and -MQ coherences between the m=+3/2 and m=-3/2 levels (3Q) or between the m=+5/2 and m=-5/2 levels (5Q), and the target is the population difference across the central transition, as in the paper. The resulting waveform is saved for the MQMAS efficiency calculation; the waveforms supplied in this folder reached fidelities of 0.91 (3Q) and 0.86 (5Q) after 500 iterations.
+## Coherence conversion and pulse design
+The normalized initial state is the Hermitian combination of the +MQ and -MQ coherences between m = +mq_order/2 and m = -mq_order/2: the m = +/-3/2 pair for 3Q or the m = +/-5/2 pair for 5Q. The target is the normalized population difference across the central transition. The GRAPE objective is transfer fidelity to this target across the powder and rotor-phase drift ensemble. Cartesian Lx and Ly controls are optimized in 480 slices of 0.5 us (240 us total, three rotor periods), with a 100 kHz amplitude ceiling. An SNSA amplitude-spillout penalty of weight 100 constrains an L-BFGS GRAPE search for up to 500 iterations. The initial guess has random amplitudes up to 10% of the ceiling with one slice at the ceiling; the optimized amplitudes are clipped and fidelity is reevaluated.
 
-## Implementation
+Reference-waveform fidelities after 500 iterations: 0.91 (3Q) and 0.86 (5Q). The saved waveform is in rad/s with slice durations, in mq_conv_<order>q.mat.
 
-- Uses the 27Al MAS drift model on a 200-orientation powder grid, with 80 initial rotor phases and 160 rotor ticks.
-- The initial state is the Hermitian combination of the +MQ and −MQ coherences for the selected 3Q or 5Q order; the target is the central-transition population difference. The script sets mq_order=5 by default.
-- Optimizes 480 Cartesian slices of 0.5 µs (240 µs total) with a 100 kHz ceiling, SNSA spillout penalty, L-BFGS, and up to 500 iterations; it clips the amplitude and reevaluates fidelity.
-- Saves the waveform and slice durations as mq_conv_<order>q.mat (the filename embeds the selected MQ order).
+## Source
+[mq_conversion.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m)

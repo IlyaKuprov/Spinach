@@ -1,15 +1,25 @@
 # examples/fundamentals/convention_tests/rotations_1.m
 
+- MATLAB implementation: [examples/fundamentals/convention_tests/rotations_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/convention_tests/rotations_1.m)
+
 - Signature: `rotations_1()`
 
 ## Purpose
 
-Checks consistency among Spinach's DCM, Euler-angle, Wigner-matrix, and Cartesian-to-spherical-tensor rotation routines.
+A seven-check internal consistency suite for Spinach's rotation and Cartesian/spherical-tensor conversion routines. It distinguishes DCM/Euler/Wigner conventions from tensor round trips and quaternion/angle-axis conversions, which helps localize which representation boundary a mismatch involves.
 
-## Checks
+## Setup and checks
 
-A random symmetric traceless 3×3 matrix and random Euler angles are used for three comparisons:
+Run `rotations_1()`. One random symmetric traceless 3×3 matrix `A` and one Euler triple (drawn componentwise as `rand(1,3).*[2*pi pi 2*pi]`) are reused across the checks:
 
-1. Rotating the matrix by its DCM and then converting it with `mat2sphten` is compared with converting first and applying `wigner(2,...)`; the rank-2 coefficient residual must be below 10⁻¹⁰ in the 2-norm.
-2. Converting the Euler angles to a DCM and back with `dcm2euler` must reproduce the angles within a 2-norm tolerance of 10⁻³.
-3. `dcm2wigner(euler2dcm(...))` is compared with the direct `wigner(2,...)` result, with a 2-norm tolerance of 10⁻¹⁰.
+1. Convert `euler2dcm(eulers)*A*euler2dcm(eulers)'` to rank-2 spherical components and compare with rank-2 components of `A` rotated by `wigner(2,...)`; the 2-norm residual must be below `1e-10`.
+2. Convert Euler angles to a DCM and back with `dcm2euler`; the direct angle-vector difference must have 2-norm below `1e-3`.
+3. Compare `dcm2wigner(euler2dcm(eulers))` with `wigner(2,...)`; 2-norm residual below `1e-10`.
+4. Round-trip `A` through `mat2sphten` and `sphten2mat`; matrix residual below `1e-10` in the 2-norm.
+5. Convert the Euler DCM to a quaternion with `dcm2qter` and back with `qter2dcm`; DCM residual below `1e-10`.
+6. Normalize a random quaternion, convert it to angle-axis with `qter2anax` and back with `anax2qter`; the four quaternion-component residual has 2-norm below `1e-10`.
+7. For a normalized random quaternion, compare its direct `qter2dcm` DCM with the DCM made from its `qter2anax` angle-axis pair using `anax2dcm`; residual below `1e-10`.
+
+## Observable result and scope
+
+Each successful check prints `Test 1 passed.` through `Test 7 passed.`; the first failed check raises its numbered inconsistency error. The function produces no plot and returns no declared result. It draws a new matrix, Euler triple, and quaternions per run without setting a seed; the result is sampled internal-consistency coverage, not exhaustive validation of every rotation or singular convention.

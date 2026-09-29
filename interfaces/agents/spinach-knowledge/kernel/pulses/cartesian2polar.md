@@ -1,28 +1,23 @@
 # kernel/pulses/cartesian2polar.m
 
+[Source: `kernel/pulses/cartesian2polar.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/cartesian2polar.m)
+
 - Signature: `[r,p,Dr,Dp,Drr,Drp,Dpr,Dpp]=cartesian2polar(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy)`
 
 ## Purpose
 
-Converts Cartesian pulse components `x` and `y` to polar amplitude and phase, and optionally transforms the gradient and Hessian of a scalar function from Cartesian to polar coordinates.
+Converts paired Cartesian components into polar waveform coordinates, and optionally transforms first and second derivatives of a scalar objective with respect to those components. It is an algebraic coordinate conversion: it does not create a time grid, resample the waveform, or change units supplied by the caller.
 
-## Coordinate transform
+## Inputs and outputs
 
-The amplitude is `r=sqrt(x.^2+y.^2)`; the phase is `p=atan2(y,x)`. With first derivatives supplied, the function returns the derivatives with respect to amplitude and phase. With second derivatives supplied, it also returns the four Hessian blocks: amplitude–amplitude (`Drr`), amplitude–phase (`Drp`), phase–amplitude (`Dpr`), and phase–phase (`Dpp`).
+- `x`, `y` — real numeric vectors of equal size, the X and Y components.
+- With four inputs, `Dx` and `Dy` are the matching first derivatives. When requested as outputs, `Dr` and `Dp` are the derivatives in amplitude and phase coordinates.
+- With eight inputs, `Dxx`, `Dxy`, `Dyx`, and `Dyy` supply the second-derivative matrices; the corresponding outputs are `Drr`, `Drp`, `Dpr`, and `Dpp`.
+- `r = sqrt(x.^2 + y.^2)` is the non-negative radius in the same numerical scale as x and y; `p = atan2(y,x)` is in radians.
 
-## Inputs
+The supported input forms are two, four, or eight arguments. Inputs must be real numeric arrays of compatible dimensions; the second-derivative form requires row-vector inputs and same-sized square derivative matrices. Supplying derivative inputs does not require returning their transformed outputs, but those outputs are calculated only when requested. No unit conversion or file/system-state side effect occurs.
 
-- `x`, `y` — same-sized real numeric Cartesian waveform components.
-- `Dx`, `Dy` — optional same-sized real numeric vectors giving the scalar-function derivatives with respect to `x` and `y`.
-- `Dxx`, `Dxy`, `Dyx`, `Dyy` — optional real numeric square matrices of matching size, giving the Cartesian second-derivative blocks. The eight-input form requires `x`, `y`, `Dx`, and `Dy` to be row vectors when more than four outputs are requested.
-
-Use either the two-input form, the four-input gradient form, or the eight-input Hessian form; other input counts are rejected. The derivative inputs must have mutually consistent dimensions.
-
-## Outputs
-
-- `r`, `p` — waveform amplitudes and phases.
-- `Dr`, `Dp` — scalar-function gradient with respect to amplitude and phase.
-- `Drr`, `Drp`, `Dpr`, `Dpp` — scalar-function Hessian blocks in the corresponding polar coordinates.
+This conversion is also used by `bruker_write.m`, which subsequently wraps phase and converts it to degrees for Bruker export.
 
 ## Reference
 

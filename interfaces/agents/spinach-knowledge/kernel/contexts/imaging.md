@@ -1,43 +1,25 @@
 # kernel/contexts/imaging.m
 
 - Signature: `answer=imaging(spin_system,pulse_sequence,parameters)`
+- Source: [kernel/contexts/imaging.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/imaging.m)
+- Wiki: [Imaging.m](https://spindynamics.org/wiki/index.php?title=Imaging.m)
 
-## Purpose
+## Contract
 
-Fokker-Planck imaging simulation context. Builds the Hamiltonian, relaxation and kinetics superoperators, spatial dynamics generator (including diffusion and flow), and gradient operators, then passes them to a pulse sequence supplied as a function handle.
+`imaging` builds spin Hamiltonian and kinetic operators, voxel-dependent relaxation, spatial gradient operators, and the spatial diffusion/flow generator. It passes `H`, `R`, `K`, `G`, and `F` to `pulse_sequence(spin_system,parameters,H,R,K,G,F)`; the context output is whatever that sequence returns. The context applies the `nmr` assumption and channel-frequency offsets.
 
-## Physical / mathematical content
+The spin-space dimension is `spn_dim=size(H,1)`; the spatial dimension is `spc_dim=prod(parameters.npts)`; the combined state-space dimension is their product. Spatial arrays are ordered as [X Y Z], while the direct-product factor order is Z, then Y, then X, then Spin. The corresponding vector is the column-wise vectorization of a 3D [X Y Z] array with a spin-state component at each voxel. `parameters.spc_dim` and `parameters.spn_dim` are passed to the sequence.
 
-The context combines spin dynamics with a voxelized spatial state space. It applies the same Hamiltonian and kinetics superoperator in every voxel, while relaxation superoperators are weighted by voxel phantoms. The gradient and diffusion/flow generators are constructed by `g2fplanck` and `v2fplanck`, respectively. The direct-product order is `Z(x)Y(x)X(x)Spin`, corresponding to column-wise vectorization of a 3D array with dimensions `[X Y Z]`.
+## Grid, transport, and units
 
-## Numerical / algorithmic content
+`parameters.dims` gives box lengths in metres and `parameters.npts` gives point counts along the axes. The flow fields `u`, `v`, and `w` are X-, Y-, and Z-velocity components at each sample point, in m/s. For spatially uniform diffusion, `parameters.diff` is a diffusion coefficient or 3-by-3 tensor in m^2/s. For voxel-dependent diffusion, the source documents Cartesian tensor-component fields from `dxx` through `dzz`, specified at each voxel.
 
-The function checks parameter consistency, applies NMR assumptions, builds the Hamiltonian and processes channel offsets, then constructs the kinetics, relaxation, gradient, and spatial-dynamics operators. It builds initial and detection states from phantoms when explicit states are not supplied. Operators are represented as polyadic objects and inflated if `polyadic` is not enabled. Finally, it calls `pulse_sequence(spin_system,parameters,H,R,K,G,F)`.
+The documented derivative choices are `parameters.deriv={'fourier'}` for Fourier differentiation, or `parameters.deriv={'period',n}` for n-point central finite differences with periodic boundary conditions.
 
-## Parameters / inputs
+## Spin operators and phantoms
 
-- `pulse_sequence`: pulse-sequence function handle; see the Spinach `experiments` directory for supplied sequences.
-- `parameters.u`, `parameters.v`, `parameters.w`: X, Y, and Z components of the velocity vectors at each sample point, in m/s.
-- `parameters.diff`: diffusion coefficient or 3×3 tensor, in m²/s, when the diffusion parameter is the same in every voxel.
-- `parameters.dxx`, `parameters.dxy`, …, `parameters.dzz`: Cartesian components of the diffusion tensor for each voxel.
-- `parameters.dims`: dimensions of the 3D box, in meters.
-- `parameters.npts`: number of points in each dimension of the 3D box.
-- `parameters.deriv`: `{'fourier'}` selects Fourier differentiation matrices; `{'period',n}` selects n-point central finite-difference matrices with periodic boundary conditions.
-- `parameters.rlx_ph={Ph1,Ph2,...,PhN}` and `parameters.rlx_op={R1,R2,...,RN}`: **required** relaxation phantom coefficients and corresponding relaxation superoperators. Both must be cell arrays with the same number of elements; each phantom must match the voxel grid specified by `parameters.npts`.
-- `parameters.rho0_ph={Ph1,Ph2,...,PhN}` and `parameters.rho0_st={rho1,rho2,...,rhoN}`: initial-condition phantoms and corresponding spin states from `state()`. These are required **only when `parameters.rho0` is absent**; otherwise the supplied initial state is used.
-- `parameters.coil_ph={Ph1,Ph2,...,PhN}` and `parameters.coil_st={rho1,rho2,...,rhoN}`: detection-state phantoms and corresponding spin states from `state()`, allowing voxel-dependent detection angles and sensitivities. These are required **only when `parameters.coil` is absent**; otherwise the supplied coil state is used.
+The Hamiltonian and kinetics are shared across voxels. Relaxation is assembled from paired cell arrays `rlx_ph` and `rlx_op`: each `rlx_ph` entry is a spatial phantom with the same dimensions as the voxel grid, and the matching `rlx_op` entry is a spin relaxation superoperator. Initial states are assembled from `rho0_ph` and `rho0_st`; receiver/detection states are assembled from `coil_ph` and `coil_st`. Each phantom has the grid dimensions, and each paired state/operator is a spin-space object. The source requires the phantom and paired-state/operator lists to have matching lengths. A user-supplied `rho0` or `coil` can be used instead of building that object from phantoms.
 
-Each initial-condition or detection phantom used must match `parameters.npts` and the relaxation phantoms in size. The corresponding phantom and state lists must be cell arrays of equal length.
+## Example from the source documentation
 
-## Outputs
-
-Returns whatever the pulse sequence returns.
-
-## Reference
-
-- <https://spindynamics.org/wiki/index.php?title=Imaging.m>
-
-## Authors
-
-- a.j.allami@soton.ac.uk
-- ilya.kuprov@weizmann.ac.il
+For example, choose `parameters.deriv={'fourier'}` or `parameters.deriv={'period',n}` according to the requested spatial derivative scheme; the source gives these selector forms but no complete numerical imaging setup.

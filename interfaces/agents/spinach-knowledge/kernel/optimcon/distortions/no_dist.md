@@ -1,24 +1,21 @@
 # kernel/optimcon/distortions/no_dist.m
 
-- Signature: `[w,J]=no_dist(w)`
+- Signature: [w,J]=no_dist(w)
+- MATLAB source: [no_dist.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/no_dist.m)
 
 ## Purpose
 
-Returns the waveform unchanged. If a second output is requested, it returns the unit Jacobian for the vectorised waveform.
+Selects the identity transformation for an optimal-control distortion stage: it returns the input waveform unchanged.
 
-## Parameters / inputs
+## Input and output
 
-- `w` — a numerical waveform array. The function requires its elements to be real.
+- w must be a real numeric array. The function imposes no vector or matrix shape restriction and does not explicitly require finite values.
+- The returned w is the same array, unchanged; its units and dimensions are therefore unchanged.
 
-## Outputs
+## Derivative
 
-- `w` — the input waveform, unchanged.
-- `J` — if requested, a sparse identity matrix of size `numel(w)` by `numel(w)`.
-
-## Implementation
-
-The function checks that `w` is numeric and real, raising an error otherwise. It constructs `J` with `speye(numel(w))` only when a second output is requested.
+The optional J is sparse identity matrix speye(numel(w)), the Jacobian of the unchanged waveform with respect to its MATLAB vectorisation. No adjoint is returned.
 
 ## Reference
 
-- [Spinach documentation for `no_dist.m`](https://spindynamics.org/wiki/index.php?title=no_dist.m)
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=no_dist.m

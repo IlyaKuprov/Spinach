@@ -1,13 +1,19 @@
 # examples/nmr_overtone/dante_glycine.m
 
-- Signature: `dante_glycine()`
+- MATLAB implementation: [examples/nmr_overtone/dante_glycine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/dante_glycine.m)
 
-## Purpose
+## Purpose and literature provenance
 
-Calculates a `14N` overtone DANTE spectrum of glycine with the Fokker–Planck formalism. The glycine quadrupolar tensor is attributed to O'Dell and Ratcliffe, [Chemical Physics Letters (2011)](https://doi.org/10.1016/j.cplett.2011.08.030); the source estimates minutes of calculation time.
+This example calculates a 14N overtone DANTE spectrum of glycine with the Fokker-Planck formalism. The source attributes the glycine quadrupolar tensor data to O'Dell and Ratcliffe, https://doi.org/10.1016/j.cplett.2011.08.030, and estimates minutes of calculation time. The paper is cited as provenance for the tensor input; the spectrum and its phase adjustment below are simulation output, not a claim of reproducing a measured spectrum.
 
-## Model and calculation
+## Spin model and MAS
 
-The single-`14N` system is at 14.1 T, with quadrupole parameters 1.18 MHz and asymmetry 0.53 (spin 1), and a scalar Zeeman entry of 32.4. The model uses diagonal damping relaxation at rate 300, the `sphten-liouv` basis without approximation, and disables Krylov and trajectory-level options.
+The source defines a single 14N spin with sys.magnet=14.1. Its coupling input is eeqq2nqi(1.18e6,0.53,1,[0 0 0]), and its scalar Zeeman input is 32.4. These are transcribed without assigning units beyond those stated by the source. Relaxation is damp, retaining diagonal terms with zero equilibrium and damp_rate=300. The basis is sphten-liouv with no approximation; krylov and trajlevel are disabled.
 
-At the magic angle, the spectrum setup uses rank 7, rate −19.840 kHz, grid `rep_2ang_1600pts_sph`, a −60 to 80 kHz sweep, and 2048 points with 2048-point zero-fill. The initial state is `14N` `Lz`; the receiver is magic-angle weighted. The average-treatment DANTE sequence has pulse amplitude 2π × 55 kHz divided by sin of the magic angle, 10 μs pulse duration, 48 kHz RF frequency, four periods, and two pulses. The code runs `singlerot` with `overtone_dante` and applies a phase factor `exp(-1i*2.12)`.
+The magic-angle parameter is atan(sqrt(2)); the spectrum axis input is [sqrt(2/3) 0 sqrt(1/3)]. The simulation sets max_rank=7, rotor-rate input -19840, and grid rep_2ang_1600pts_sph. The sweep is [-60e3 80e3] with 2048 points and 2048-point zero-fill, and axis_units=kHz. The initial state is the 14N Lz state; receiver and RF operator use magic-angle-weighted Lz and Lx terms.
+
+## DANTE settings and output
+
+The sequence uses average treatment, four periods, and two pulses. The source sets pulse amplitude to 2*pi*55e3/sin(theta), pulse duration to 10e-6, and RF-frequency input to 48e3; it selects 14N as the irradiated spin. The simulated spectrum is calculated with singlerot and overtone_dante, then multiplied by exp(-1i*2.12) before its real part is plotted with plot_1d.
+
+This is a single-spin nitrogen overtone DANTE calculation, not a proton-to-nitrogen cross-polarisation scan. The phase multiplication is part of the source's plotting workflow; it is not evidence of a fitted experimental phase.

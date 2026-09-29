@@ -1,19 +1,15 @@
 # examples/imaging/diffusion_weighted_2d.m
 
-- Signature: `diffusion_weighted_2d()`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/diffusion_weighted_2d.m
 
-## Purpose
+## Experiment
 
-Simulates a 2D diffusion-weighted image using an arbitrary geometric pattern as the diffusion-coefficient distribution. Runtime is minutes; a Tesla V100 GPU can make it faster.
+Constructs a 2D phase-encoded diffusion-weighted image using a spatially varying geometric pattern as the diffusion-coefficient field. The source estimates minutes of runtime and notes a Tesla V100 may shorten it; GPU enablement is commented out, so this function does not request a GPU.
 
-## Physical / mathematical content
+## Spin and image model
 
-Models a single 1H spin at 5.9 T with a 0.0 chemical shift on a 0.30 × 0.25 spatial domain. The diffusion tensor has dxx = dyy = 1e-3*pattern and dxy = dyx = 0; flow velocities u and v are zero. The initial state is Lz, and detection uses L+.
+The model is a single 1H spin with `sys.magnet=5.9` and zero scalar Zeeman shift. The domain is configured as [0.30 0.25] with a [90 108] grid and third-order periodic derivatives; requested image size is [101 105]. The example loads pattern from ../../etc/phantoms/`pattern.mat`, sets `dxx=dyy=1e-3*pattern`, and sets the off-diagonal tensor components and both in-plane flow fields to zero. Initial magnetisation is `Lz`, detection is `L+`, and both spatial profiles are uniform. No relaxation phantom is provided.
 
-## Numerical / algorithmic content
+## Encoding and output
 
-Uses a 90 × 108 spatial grid with third-order periodic derivatives and requests a 101 × 105 image. The phase-encoded 2D sequence uses diffusion gradients [1e-3 1e-3] T/m, a readout gradient of 4.3e-3 T/m for 2e-3 s, a phase-encoding gradient of 3.8e-3 T/m for 1e-3 s, and an echo time of 1e-2 s. The spin offset is 0.0, with no decoupling or relaxation operators.
-
-## Implementation structure
-
-The function diffusion_weighted_2d() creates the Spinach spin system in the sphten-liouv formalism with no basis approximation. It loads pattern from ../../etc/phantoms/pattern.mat, assigns uniform initial-state and coil phantoms, and runs imaging(spin_system,@phase_enc_2d,parameters). It plots the diffusion-weighted image beside the diffusion-coefficient phantom. GPU enablement is present as a commented-out setting.
+The phase-encoded sequence is `phase_enc_2d`. Diffusion-gradient amplitudes are [1e-3 1e-3] T/m; readout and phase-encoding amplitudes are 4.3e-3 and 3.8e-3 T/m. The source sets their durations to 2e-3 and 1e-3, and the echo-time parameter to 1e-2; units for these durations are not annotated in this example. The resulting image is shown next to the loaded coefficient phantom. These are configured simulation parameters, not reported measured image values.

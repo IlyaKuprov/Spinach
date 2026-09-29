@@ -1,19 +1,26 @@
 # examples/nmr_liquids/inad_cyprinol.m
 
+- MATLAB implementation: [examples/nmr_liquids/inad_cyprinol.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/inad_cyprinol.m)
+
 - Signature: `inad_cyprinol()`
 
 ## Purpose
 
-INADEQUATE spectrum of cyprinol. The sequence selects double- quantum coherence from coupled 13C pairs and converts it back for detection. A parallel sum over isotopomers that have adjacent 13C spins is used. Calculation time: minutes
+Build a 1D INADEQUATE spectrum from naturally abundant 13C pairs in cyprinol. The source comment estimates minutes for the calculation.
 
-## Physical / mathematical content
+## Spin system and method
 
-The script simulates a 1D INADEQUATE spectrum of cyprinol. It generates isotopomers containing two 13C nuclei, checks the coupling between those nuclei, and only simulates pairs passing the source's `abs(J)>2*pi*1.0` threshold. The sequence selects double-quantum coherence and converts it for detection, as described in the source comment.
+`cyprinol()` supplies 42 `1H` and 27 `13C` sites with scalar-coupling and isotropic-shift data; its source says unreported values are estimated. The script forms two-13C isotopomers using `dilute(spin_system,'13C',2)`, computes the pair coupling as `trace(get_coupling(...))/3`, and simulates only pairs satisfying `abs(J)>2*pi*1.0` (the source comment describes this as stronger than 1 Hz). It uses a sparse Liouville-space basis (`sphten-liouv`, IK-1), scalar-coupling connectivity, proximity level 1 and interaction level 4. Greedy setup uses proximity cutoff 4.0; the field is 11.7 T.
 
-## Numerical / algorithmic content
+## INADEQUATE acquisition
 
-The IK-1 sphten-liouv basis uses scalar-coupling connectivity, proximity level 1 and interaction level 4. The 13C acquisition uses J=50, decouples 1H, has a 10,000 Hz sweep, 5,000 Hz offset, 4,096 points and 8,192-point zero filling; an exponential apodisation parameter of 6 precedes the Fourier transform.
+Only `13C` is active, with `1H` decoupling. The wrapper specifies a working `J=50 Hz`, sweep 10000 Hz, offset 5000 (the sources do not state its unit), 4096 points and 8192 zero-fill points; the axis is in ppm and inverted. Its source comment describes selection of double-quantum coherence from coupled 13C pairs and conversion back for detection.
 
-## Implementation structure
+## Processing and scope
 
-The field is 11.7 T. Isotopomer simulations are accumulated in a `parfor` loop; only pairs that pass the coupling threshold are built in the specified basis and passed to `liquid` with the INADEQUATE sequence. The 1D real spectrum is plotted with the configured inverted axis.
+Each accepted pair is simulated with `liquid(...,@inadequate,...,'nmr')`; the FID receives exponential apodization with the source value 6, is Fourier-transformed and added to the 1D spectrum. The real spectrum is plotted. No explicit relaxation parameters are set in the wrapper. It chooses the eligible isotope pairs, method/basis and acquisition/processing settings; pulse-train details are in `experiments/nmr_liquids/inadequate.m`.
+
+## Sources
+
+Cyprinol shift/coupling source: http://dx.doi.org/10.1002/mrc.4782
+INADEQUATE sequence source: https://doi.org/10.1021/ja00534a056

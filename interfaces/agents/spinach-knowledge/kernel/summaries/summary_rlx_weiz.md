@@ -2,18 +2,13 @@
 
 - Signature: `summary_rlx_weiz(spin_system)`
 
-## Purpose
-
-Prints the Weizmann DNP relaxation-rate fields already stored in a Spinach system; it does not calculate the rates.
-
-## Parameters / inputs
-
-- `spin_system` - Spinach spin system structure containing the Weizmann relaxation fields.
-
-## Output
-
-No MATLAB output argument; writes through `report`. The report gives electron and nuclear R1 and R2 rates in Hz, followed by each nonzero inter-nuclear dipolar R1 and R2 entry with its row and column indices, also in Hz.
-
 ## Behavior
 
-The function checks that `spin_system` is a structure, prints a Weizmann DNP heading, reads the rates from `spin_system.rlx.weiz_r1e`, `weiz_r2e`, `weiz_r1n`, `weiz_r2n`, `weiz_r1d`, and `weiz_r2d`, then prints a closing separator.
+Prints the stored Weizmann DNP relaxation rates `weiz_r1e`, `weiz_r2e`, `weiz_r1n` and `weiz_r2n` with electron/nuclear R1/R2 labels, plus each nonzero entry of the inter-nuclear dipolar rate matrices `weiz_r1d` and `weiz_r2d` with its row and column indices. The report labels the rates in Hz and performs no conversion.
+
+There is no return value: output goes through `report(spin_system,...)`. The local guard requires `spin_system` to be a structure.
+
+## References
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_rlx_weiz.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_rlx_weiz.m)

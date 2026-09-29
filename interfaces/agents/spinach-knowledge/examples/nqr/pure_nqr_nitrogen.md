@@ -1,20 +1,16 @@
 # examples/nqr/pure_nqr_nitrogen.m
 
 - Signature: `pure_nqr_nitrogen()`
+- Source: [examples/nqr/pure_nqr_nitrogen.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nqr/pure_nqr_nitrogen.m)
 
-## Purpose
+## Objective and model
 
-Powder NQR spectrum of a system with a single (^{14}mathrm{N}) nucleus at zero magnetic field. Calculation time: seconds.
+This example specifies a zero-field powder NQR calculation for one spin-1 `14N` nucleus. It sets `sys.magnet=0` and builds the quadrupolar interaction with `eeqq2nqi(1.18e6,0.53,1,[0 0 0])`: the helper defines the first argument as `e^2 q Q / h` in Hz, the second as the dimensionless asymmetry, the third as the nuclear spin, and the last as Euler angles in radians. Thus the input is 1.18 MHz, asymmetry 0.53, spin 1, and zero orientation angles. The helper's convention is documented in [kernel/conventions/transforms/eeqq2nqi.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/eeqq2nqi.m).
 
-## Physical / mathematical content
+The calculation uses the exact `sphten-liouv` basis with `bas.approximation='none'`. Relaxation is configured with `inter.relaxation={'damp'}`, `inter.damp_rate=1e5`, lab-frame retention, zero equilibrium, and temperature 298 K.
 
-- The model contains one (^{14}mathrm{N}) spin and a quadrupolar interaction specified by `eeqq2nqi(1.18e6,0.53,1,[0 0 0])`. With `sys.magnet=0`, the spectrum is generated without a Zeeman field; the transition frequencies are governed by the quadrupolar interaction and its asymmetry parameter.
+## Acquisition and processing
 
-## Numerical / algorithmic content
+The acquisition requests anisotropic equilibrium, uses a 5e6 Hz sweep, 512 points, and the `rep_2ang_200pts_sph` powder grid. The receiver operator is the `14N` `L+` state; the pulse is an `Lx` operator with flip angle `pi/2`. Spinach's `powder` acquisition calls `hp_acquire` in the lab frame. The returned FID is exponentially apodised with parameter 6, then transformed as `imag(fftshift(fft(fid)))`; plotting uses MHz axis units.
 
-- A powder calculation uses `rep_2ang_200pts_sph` and `hp_acquire` with a 5 MHz sweep and 512 points. The acquisition uses (L_+) detection and an (L_x) pulse operator with a (pi/2) pulse angle.
-- The code applies laboratory-frame damping at (10^5), sets zero equilibrium and temperature 298, applies exponential apodisation with parameter 6, then plots the imaginary part of the shifted Fourier transform. The frequency axis is labelled in MHz.
-
-## Implementation structure
-
-- Set zero field, isotope, and quadrupolar coupling; select the sphten-liouv basis with no approximation; configure damping and zero equilibrium; construct the Spinach system and basis; set powder acquisition parameters; calculate the powder FID, apodise, Fourier transform, and plot.
+Estimated calculation time: seconds.

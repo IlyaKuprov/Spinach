@@ -1,31 +1,19 @@
 # kernel/operators/enlev2bm.m
 
 - Signature: `[states,coeffs]=enlev2bm(nlevels,lvl_num)`
+- DIRECT source: [kernel/operators/enlev2bm.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/enlev2bm.m)
+- Wiki: [enlev2bm.m](https://spindynamics.org/wiki/index.php?title=enlev2bm.m)
 
-## Purpose
+## Definition
 
-Expands the projector onto one energy level of a truncated bosonic mode as a linear combination of bosonic monomials.
+The function represents one energy-level projector of a truncated bosonic mode in Spinach's bosonic-monomial basis. It creates an `nlevels`-by-`nlevels` diagonal matrix `P`, sets only `P(lvl_num,lvl_num)=1`, and passes `P` to [oper2bm](oper2bm.md). The level number is one-based: level 1 is the empty-mode state, and increasing indices count upward from it.
 
-## Physical / mathematical content
+This is a basis expansion of a projector, not a propagator. The function does not exponentiate an operator or apply time evolution.
 
-The selected level is numbered upward from the empty-mode state. The routine constructs the diagonal projector with its only nonzero element at (lvl_num,lvl_num), then expands that operator in the bosonic-monomial basis.
+## Basis and outputs
 
-## Numerical / algorithmic content
+`states` contains the Spinach BM-basis indices returned by `oper2bm(P)`; use [lin2kq](../indexing/lin2kq.md) for the K,Q bosonic-monomial indexing. `coeffs` is returned directly from the same conversion call. `enlev2bm` adds no scale factor or other coefficient normalization of its own; the values are those calculated by `oper2bm` for this diagonal projector.
 
-A zero matrix of size nlevels by nlevels is created, the selected diagonal element is set to one, and oper2bm converts the projector to bosonic-monomial states and coefficients. Use lin2kq to convert the returned basis indices to K,Q indices when needed.
+## Inputs and checks
 
-## Parameters / inputs
-
-- nlevels - number of energy levels in the mode; a positive integer.
-- lvl_num - energy-level index, counting upward from the empty-mode state and bounded by nlevels.
-
-## Outputs
-
-- states - bosonic-monomial basis indices contributing to the operator; use lin2kq to convert them to K,Q indices.
-- coeffs - coefficients of those bosonic monomials in the linear combination.
-
-## Implementation structure
-
-1. Check that nlevels and lvl_num are numeric, scalar, real values and that the level is within the specified range.
-2. Build the diagonal level projector.
-3. Expand it with oper2bm and return the resulting states and coefficients.
+`nlevels` is the mode's number of levels, intended as a positive integer. The source checks that it is numeric, scalar, real, and at least 1; it does not explicitly test integrality or finiteness. `lvl_num` must be numeric, scalar, real, and between 1 and `nlevels`; the source uses it directly as a MATLAB matrix index, so it must also be a valid integer index.

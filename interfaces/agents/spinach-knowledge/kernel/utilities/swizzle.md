@@ -1,23 +1,29 @@
 # kernel/utilities/swizzle.m
 
-- Signature: `tuples=swizzle(index_arrays)`
-
 ## Purpose
 
-Flattens nested index lists into a matrix of tuples in random order, useful for distributing nested-loop iterations across parallel workers.
+Flattens nested index lists into an array of tuples in random order, which is useful for flattening nested loops for parallel processing.
 
-## Parameters / inputs
+## Behavior
 
-- `index_arrays` — a cell array of row vectors containing positive integers.
+- Syntax: `tuples=swizzle(index_arrays)`.
+- The function first validates its input via an internal consistency check (`grumble`):
+  - Errors with `index_arrays must be a cell array of row vectors.` if the input is not a cell array.
+  - Errors with `elements of index_arrays must be row vectors of positive integers.` if any element is not real, not a row vector, contains non-integer values, or contains values less than 1.
+- The tuples are built by Kronecker-style expansion: the first index vector initializes the column, and each subsequent vector appends a new column formed by `kron` of ones and the vector against the accumulated tuples.
+- After construction, the rows of the tuple matrix are randomly permuted with `randperm`, so the tuples are returned in random order with tuples listed as rows.
 
-## Outputs
+## Inputs and outputs
 
-- `tuples` — a matrix with one tuple per row, in random order. Each column corresponds to an input index array.
+**Inputs**
 
-## Algorithm
+- `index_arrays` — a cell array of row vectors (each element must be a row vector of positive integers).
 
-The function validates `index_arrays`, constructs all combinations of its entries using Kronecker products, then randomly permutes the resulting rows.
+**Outputs**
 
-## Source
+- `tuples` — a matrix of tuples in random order, with tuples listed as rows.
 
-<https://spindynamics.org/wiki/index.php?title=swizzle.m>
+## References
+
+- Source: [kernel/utilities/swizzle.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/swizzle.m)
+- Wiki: <https://spindynamics.org/wiki/index.php?title=swizzle.m>

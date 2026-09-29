@@ -1,13 +1,21 @@
 # examples/nmr_overtone/mas_valine_2.m
 
+- MATLAB implementation: [examples/nmr_overtone/mas_valine_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/mas_valine_2.m)
+
 - Signature: `mas_valine_2()`
 
-## Purpose
+## What the example models
 
-Simulates 14N Z-detected overtone MAS NMR of N-acetylvaline in the Fokker–Planck formalism. The quadrupolar tensor data are attributed to [the cited paper](http://dx.doi.org/10.1039/c4cp03994g). The source estimates a calculation time of hours.
+This is the Z-detected 14N overtone MAS example for N-acetylvaline, evaluated with the Fokker-Planck formalism and `singlerot(...,@overtone_a,...,'qnmr')`. Its spin and interaction model matches the values explicitly assigned in `mas_valine_1.m`: `sys.magnet=14.102`, `sys.isotopes={'14N'}`, quadrupolar input `eeqq2nqi(3.21e6,0.27,1,[0 0 0])`, Zeeman eigenvalues `[57.5 81.0 227.0]`, and Euler expression `[-90 -90 -17]*(pi/180)`. The source does not state tensor units next to these values. The full `sphten-liouv` basis has no approximation; relaxation is diagonal damping with zero equilibrium and `damp_rate=2000`.
 
-## Scientific and numerical content
+The source attributes the valine quadrupolar tensor data to the authors' paper ([DOI 10.1039/C4CP03994G](https://doi.org/10.1039/C4CP03994G)) and estimates calculation time as hours. These comments do not report a fit, experimental reconstruction, or numerical validation.
 
-The spin and interactions match the companion valine example: 14N at 14.102 T, quadrupolar parameters `eeqq2nqi(3.21e6,0.27,1,[0 0 0])`, and Zeeman eigenvalues [57.5, 81.0, 227.0] with Euler angles [-90, -90, -17] degrees. It uses an unapproximated `sphten-liouv` basis, diagonal damping rate 2000, zero equilibrium, and disables Krylov and trajectory-level methods.
+## MAS and Z-detection
 
-The rank-8 setup uses rotor rate -19840, grid `rep_2ang_6400pts_sph`, sweep 75–100 kHz, and 256 points with 256-point zero filling. The initial state is 14N Lz and the coil detects the same Lz operator. The script calls `singlerot` with `@overtone_a` and `qnmr`; it does not set the pulse and phase parameters used by `mas_valine_1`.
+The source assigns `max_rank=8`, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rotor-rate parameter `-19840`, and grid `'rep_2ang_6400pts_sph'`. The sweep is `[75e3 100e3]`, with 256 points, 256-point zero filling, and `axis_units='kHz'`.
+
+Both the initial state and the coil are the 14N `Lz` state. The source sets `spins={'14N'}` and does not assign RF-pulse fields, an angle-weighted `Lx` detector, or a phase factor. It invokes `singlerot` with `@overtone_a` and `'qnmr'`; the method is therefore distinct from the explicitly pulse-driven `mas_valine_1.m` path. No contact-time or fitting procedure is specified.
+
+## Output and limits
+
+The script plots `real(spectrum)` with `plot_1d`; it does not save a spectrum file or state its numerical values. The absence of pulse and phase assignments here is a source-level distinction, not a claim about how a measured experiment was acquired.

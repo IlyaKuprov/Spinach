@@ -1,28 +1,23 @@
 # kernel/pulses/grad_pulse.m
 
+[Source: `kernel/pulses/grad_pulse.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/grad_pulse.m)
+
 - Signature: `rho=grad_pulse(spin_system,L,rho,g_amp,s_len,g_dur,s_fac)`
 
 ## Purpose
 
-Approximates the effect of a single linear gradient pulse on the sample-averaged density matrix using Edwards' formalism. It assumes negligible diffusion and a gradient antisymmetric about the sample midpoint. The function integrates over the sample coordinate, so a later gradient pulse cannot refocus the spatial dephasing produced here.
+Approximates the effect of one linear gradient pulse on the sample-averaged density matrix using Edwards' formalism. It assumes negligible diffusion and a gradient antisymmetric about the sample midpoint. Because the returned state has already been averaged over sample position, it cannot retain spatial information needed to model subsequent gradient refocusing; use `grad_sandw.m` or the imaging context for that work.
 
-## Inputs
+## Inputs and timing
 
-- `spin_system` — Spinach system structure in Liouville space (`sphten-liouv` or `zeeman-liouv`).
-- `L` — numeric system Liouvillian.
-- `rho` — numeric state vector or matrix of states.
-- `g_amp` — real scalar gradient amplitude in Gauss/cm.
-- `s_len` — positive real sample length in cm.
-- `g_dur` — non-negative real gradient duration in seconds.
-- `s_fac` — non-negative real shape factor; use 1 for a square gradient pulse.
+- `spin_system` — Spinach system structure in Liouville space.
+- `L` — system Liouvillian; `rho` — state vector.
+- `g_amp` — gradient amplitude in Gauss/cm; `s_len` — sample length in cm.
+- `g_dur` — gradient duration in seconds; `s_fac` — non-negative gradient shape factor, with 1 for a square gradient.
 
-The calculation constructs an effective gradient operator from the carrier frequencies, sample length, amplitude, duration, and shape factor; frequency shifts are ignored. It requires `L` to commute with that operator to within the source's `1e-6` norm check, and errors otherwise.
+The implementation first propagates the state under `L` for `g_dur`. It forms a gradient operator proportional to `g_amp*s_len*g_dur*s_fac`, then integrates the spatial coordinate over the normalized sample interval using an auxiliary block-operator evolution. This is an analytic sample average in the Edwards approximation, not a discretized user-supplied gradient waveform. The source notes that chemical shifts are ignored in the gradient operator.
 
-## Output
-
-- `rho` — state vector or state matrix integrated over the spatial coordinate after the gradient pulse.
-
-For a gradient sandwich or more sophisticated gradient evolution, use `grad_sandw.m` or the imaging context rather than chaining calls to this spatially averaged result.
+The function accepts numeric arguments apart from `spin_system`, requires a Liouville-space formalism, and checks the gradient amplitude is real scalar, sample length positive, and duration and shape factor non-negative scalars. It also requires the Liouvillian and gradient operator to commute within the source's `1e-6` norm threshold; otherwise it errors. Progress is reported through Spinach's `report` routine; no file is written.
 
 ## References
 

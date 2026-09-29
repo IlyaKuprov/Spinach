@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Non-refocused INEPT. This variant returns the directly acquired coupled antiphase spectrum; it is not the refocused, broadband-decoupled INEPT variant. The source cites [this paper](https://doi.org/10.1021/ja00497a058).
+This is the non-refocused INEPT variant: the source says it returns the directly acquired coupled antiphase spectrum, rather than a refocused, broadband-decoupled variant. It cites [this paper](https://doi.org/10.1021/ja00497a058).
 
 ## Sequence and signal
 
-The sequence starts from isotropic thermal equilibrium, applies pulses to the two working spin channels with J-coupling evolution intervals of `abs(1/(4*parameters.J))`, and uses phase-cycled pulses on the second configured spin channel before direct acquisition. The detected result is the coupled antiphase FID, rather than a refocused broadband-decoupled spectrum.
+The source starts from isotropic thermal equilibrium and detects the first configured nucleus. It applies a 90-degree x pulse to the second nucleus, evolves for `tau=abs(1/(4*parameters.J))`, applies simultaneous 180-degree y pulses to both configured nuclei, evolves for a second `tau`, then applies a 90-degree x pulse to the first nucleus. Opposite 90-degree y phases on the second nucleus are combined by a difference phase cycle before direct acquisition. The code does not specify an explicit coherence-order filter, so no narrower pathway selection is asserted here. With `J` in Hz, `tau` is in seconds; dwell time is `1/parameters.sweep` for a sweep width in Hz. The output `fid` is a one-dimensional FID with `parameters.npoints` samples. The source notes that `dilute.m` can generate carbon isotopomers.
 
-## Syntax
+## Inputs
 
-```matlab
-fid=inept(spin_system,parameters,H,R,K)
-```
+- `parameters.sweep`: one positive sweep width in Hz.
+- `parameters.npoints`: positive integer number of FID points.
+- `parameters.spins`: two different working isotope names in a cell array, ordered `{F1 F2}`; source example: `{'15N','1H'}`.
+- `parameters.J`: working scalar coupling in Hz.
+- `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function. The source requires the `sphten-liouv` formalism and same-sized matrices.
 
-## Parameters / inputs
-
-- `parameters.sweep`: F1 sweep width, Hz.
-- `parameters.npoints`: number of points.
-- `parameters.spins`: {F1 F2} working nuclei, e.g. `{'15N','1H'}`.
-- `parameters.J`: working scalar coupling, Hz.
-- `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function.
-
-## Output
-
-- `fid`: directly acquired free induction decay.
-
-[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inept.m).
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/inept.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inept.m).

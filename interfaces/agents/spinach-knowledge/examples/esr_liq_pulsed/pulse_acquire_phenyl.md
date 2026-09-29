@@ -1,26 +1,22 @@
 # examples/esr_liq_pulsed/pulse_acquire_phenyl.m
 
-- Signature: `pulse_acquire_phenyl()`
-
 ## Purpose
 
-W-band pulse-acquire FFT ESR spectrum of phenyl radical. Simple fixed line width is used as a relaxation model. Calculation time: seconds
+A W-band pulse-acquire FFT ESR example for the phenyl radical. It takes the phenyl spin-system data from a vacuum-DFT log and uses simple fixed-linewidth diagonal damping for relaxation.
 
-## Physical / mathematical content
+## Interface and input
 
-- Reads phenyl spin-system properties from a vacuum DFT calculation in `../standard_systems/phenyl.log`; coordinate information is ignored because hyperfine couplings are provided.
-- Sets the magnet induction to 3.5 and uses diagonal damping relaxation with a rate of `1e7` and zero equilibrium.
-- Acquires an electron-spin signal with `L+` as both the initial state and detection state.
+- Call from MATLAB with no arguments: `pulse_acquire_phenyl()`. The function declares no return values; it displays a figure rather than saving or returning the FID or spectrum.
+- The input path is `../standard_systems/phenyl.log`, parsed by `gparse` and converted by `g2spinach` with electron and proton isotope mappings. `options.no_xyz=1` tells the importer to ignore coordinates because the hyperfine couplings are supplied in the input.
 
-## Numerical / algorithmic content
+## Spin system and experiment
 
-- Uses the `sphten-liouv` formalism without basis approximation, with `1H` longitudinal states and projection `+1`.
-- Runs `liquid(spin_system,@acquire,parameters,'esr')` with a sweep of `2e8`, 512 points, and no decoupling.
-- Applies no apodisation, then computes `fftshift(fft(fid,1024))` and plots the real spectrum. The plot parameters request `GHz-labframe` axis units, a derivative, and an inverted axis.
+The source sets `sys.magnet=3.5` and uses the full `sphten-liouv` basis (`approximation='none'`), with the longitudinal `1H` component and projection `+1`. Relaxation is `damp`, retaining diagonal terms, with zero equilibrium and `inter.damp_rate=1e7` (no rate unit is written in the source).
 
-## Implementation structure
+The ESR acquisition uses `liquid(spin_system,@acquire,parameters,'esr')`: the initial state and receiver are both the electron `L+` operator, with no decoupling and zero offset. It sets sweep `2e8`, 512 acquired points, 1024-point zero filling, GHz-labframe axis units, derivative display, and inverted axis. No apodisation is applied; the FID is Fourier transformed and the real spectrum is plotted.
 
-- Set `options.no_xyz=1` and read the spin system with `gparse` and `g2spinach`.
-- Configure the magnet, basis, relaxation, and spin system.
-- Set acquisition parameters and simulate the ESR free-induction decay.
-- Apply no apodisation, Fourier-transform the result, and plot the real spectrum.
+## Dependencies and caveats
+
+Requires Spinach import, system/basis, ESR acquisition, apodisation, and plotting functions (`gparse`, `g2spinach`, `create`, `basis`, `state`, `liquid`, `acquire`, `apodisation`, `kfigure`, `plot_1d`). Run where the relative phenyl-log path resolves. The source supplies no numeric hyperfine table; those couplings come from the log. The magnetic-field value is assigned as 3.5 without an inline unit annotation.
+
+[Source: `pulse_acquire_phenyl.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/pulse_acquire_phenyl.m).

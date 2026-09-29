@@ -1,27 +1,35 @@
 # etc/textbook/levelpop.m
 
-- Signature: `[E,P,dP]=levelpop(isotope,field,temperature)`
+- MATLAB implementation: [etc/textbook/levelpop.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/levelpop.m)
 
 ## Purpose
 
-Calculates Zeeman-level energies and their thermal populations for the spin specified by `isotope`, in a static magnetic field and at a specified temperature. The spin multiplicity and magnetogyric ratio are obtained from `spin`.
+Computes the energy levels and equilibrium populations for one isotope in a static field at a specified spin temperature. This is a single-spin Zeeman calculation; it does not assemble couplings or a multi-spin Hamiltonian.
 
-## Method
+## Use
 
-The function builds the Zeeman Hamiltonian `H=-mg_ratio*field*S.z`. It returns its energy levels in units of `k_B T`, then evaluates and normalizes the Boltzmann factors `exp(-E)`. The population calculation is shifted by the minimum energy before exponentiation for numerical stability. `dP` contains the signed differences `P(j)-P(j+1)` for adjacent entries in the returned population vector. Because the Zeeman Hamiltonian includes the signed magnetogyric ratio, the level ordering and population differences depend on its sign.
+```matlab
+[E,P,dP]=levelpop(isotope,field,temperature)
+```
 
-## Inputs
+All arguments are required; no defaults are defined.
 
-- `isotope` — character array identifying the spin (for example, `'1H'`, `'13C'`, or `'E'`).
-- `field` — real scalar magnetic field in tesla.
-- `temperature` — non-zero real scalar spin temperature in kelvin.
+- `isotope` — character array naming a Spinach isotope; source examples include `'1H'`, `'13C'`, and `'E'`.
+- `field` — real numeric scalar for the primary magnetic field, in tesla.
+- `temperature` — non-zero real numeric scalar spin temperature, in kelvin. The input check does not require positivity.
 
-## Outputs
+## Calculation and outputs
 
-- `E` — vector of Zeeman energies divided by `k_B T`.
+The function obtains the magnetogyric ratio and multiplicity from `spin(isotope)`, creates the spin matrices with `pauli(multiplicity)`, and forms the Zeeman Hamiltonian `H=-mg_ratio*field*S.z`. Energies are returned as `E=ħ diag(H)/(k_B temperature)`, i.e. fractions of `k_B T`. The source uses exact SI constants `ħ=6.62607015e-34/(2π) J·s` and `k_B=1.380649e-23 J/K`.
+
+To avoid overflow in the Boltzmann factors, it computes `exp(-E+min(E))` and normalizes the result to obtain `P`. It returns `dP=-diff(P)`; these are signed differences for adjacent entries in the returned vector order, not absolute differences.
+
+- `E` — vector of energy levels in units of `k_B T`.
 - `P` — normalized vector of level populations.
-- `dP` — signed population differences for adjacent vector entries.
+- `dP` — signed adjacent-level population differences.
 
-## Reference
+The sign of the magnetogyric ratio matters: the source notes it is negative for electrons and positive for protons. Field and temperature are checked as real scalars, with temperature additionally checked to be non-zero; the source does not check either for finiteness.
 
-See the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=levelpop.m).
+## Source link
+
+[Spinach Wiki: levelpop.m](https://spindynamics.org/wiki/index.php?title=levelpop.m)

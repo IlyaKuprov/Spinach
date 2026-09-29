@@ -1,21 +1,15 @@
 # examples/nmr_solids/cp_matching_3.m
 
-- Signature: `cp_matching_3()`
+Signature: cp_matching_3()
 
-## Purpose
+## What the example computes
 
-Maps the ¹H–¹⁵N Hartmann–Hahn response by scanning both spin-lock powers under MAS. The source estimates a calculation time of hours.
+This example makes a two-parameter CP matching map for a ¹H–¹⁵N pair under MAS; it is a grid of RF settings, not a two-dimensional acquired NMR spectrum. The source sets sys.magnet=9.394, isotopes ¹H and ¹⁵N, Zeeman scalar entries 0.1495 and 0, and coordinates [−1.11551509, 1.65289357, −1.19927242] and [−2.67552180, 0.95825426, 0]. It uses the sphten-liouv basis with approximation none. No further interaction terms or units for these values are stated in this file.
 
-## Physical / mathematical content
+## Rotor, powder and RF settings
 
-The model is a single ¹H–¹⁵N pair with specified shifts and coordinates. At a fixed 10 kHz rotor rate, the example scans each channel from 0 to 50 kHz, starts from ¹H transverse magnetisation, and records the final ¹⁵N signal for every power pair.
+The passed experiment parameters include rate 10000, axis [sqrt(2/3), 0, sqrt(1/3)], max_rank 3, powder grid rep_2ang_200pts_oct, ¹H Lx initial state, ¹⁵N Lx detection coil, zero excitation operators, and ten time-step entries of 4e-5. Rate and time-step units are not stated. Each RF axis uses 50 values from 0e3 to 50e3: the first row of irr_powers varies ¹H and the second varies ¹⁵N. Both plot labels use Hz, so each code range is 0–50,000 Hz.
 
-## Numerical / algorithmic content
+For each ¹H value, a parallel inner sweep evaluates all ¹⁵N values through singlerot with cp_contact_hard. The matrix stores real(fid(end)) as cp(n,k), where n is the first (¹H) setting and k the second (¹⁵N) setting. The image is rendered with imagesc and the source labels its horizontal axis ¹H spin-lock RF power, Hz, and vertical axis ¹⁵N spin-lock RF power, Hz. This note preserves both the matrix indexing and labels as written; it does not infer an axis correction or claim a validated interpretation. The output is a simulated terminal-FID signal map, not a measured spectrum. Contact details are delegated to the named call. The source header estimates calculation time as hours; this is not a timing measurement made here.
 
-The full `sphten-liouv` basis is used with interaction/proximity cutoffs of 5.0/4.0 and `trajlevel` disabled. A 50×50 grid of power pairs is simulated with `singlerot` and `@cp_contact_hard` at MAS axis `[sqrt(2/3) 0 sqrt(1/3)]`, using `parfor` over the inner scan, `max_rank=3`, the `rep_2ang_200pts_oct` grid, and ten 40 μs steps per run. The signal matrix is displayed as an image and updated after each outer-loop row.
-
-## Implementation structure
-
-- Defines the two-spin system, basis, and transverse operators.
-- Configures MAS, the initial ¹H state, ¹⁵N coil, time steps, and powder grid.
-- Evaluates all 2,500 power pairs and plots the ¹⁵N signal as a two-dimensional image.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_3.m

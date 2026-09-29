@@ -1,32 +1,17 @@
 # kernel/overloads/@rcv/size.m
 
-- Signature: `[s,ncols]=size(A,dim)`
+- Signature: `s=size(A,dim)` or `[s,ncols]=size(A)`
+- Source: [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/size.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=rcv/size.m)
 
 ## Purpose
 
-Returns the dimensions of an RCV sparse matrix in MATLAB-style one-output, dimension-query, or two-output form.
+Returns the stored matrix dimensions of an RCV sparse-matrix object.
 
-## Mathematical content
+## Behavior
 
-With one output and no dimension index, `size` returns `[numRows numCols]`. With a dimension index, it returns the corresponding row or column count for dimensions 1 and 2, and `1` for any other positive integer dimension. With two outputs and no dimension index, it returns the row and column counts separately.
+- With one output and no dimension index, returns `[A.numRows A.numCols]`.
+- With one output and `dim=1` or `dim=2`, returns the row or column count, respectively. Any other positive integer dimension returns `1`.
+- With two outputs and no dimension index, returns the row count in `s` and the column count in `ncols`.
+- A dimension index must be a finite, real, positive integer scalar. Requesting two outputs together with a dimension index raises an error.
 
-## Numerical / algorithmic content
-
-The function requires an RCV input and, when supplied, a positive integer scalar dimension index. The two-output form cannot be combined with a dimension query.
-
-## Parameters / inputs
-
-- A -RCV sparse matrix
-- dim -optional dimension index
-
-## Outputs
-
-- s -size vector, dimension length, or number
-- of rows in the two-output form
-- ncols -number of columns in the two-output form
-
-## Implementation structure
-
-- Validate the RCV input and optional dimension index.
-- Reject a dimension query when two outputs are requested.
-- Return `[numRows numCols]`, the selected dimension length (or `1` beyond dimension 2), or the separate row and column counts according to the requested form.
+Dimensions are carried in the RCV object as `int64` values. The returned dimension answers depend on `numRows` and `numCols`, not the number of stored coordinate entries.

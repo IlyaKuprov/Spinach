@@ -1,28 +1,30 @@
 # kernel/utilities/killdiag.m
 
-- Signature: `spec=killdiag(spec,brush_dim)`
-
 ## Purpose
 
-Zero a brush-width band around the diagonal of a two-dimensional spectrum.
+`killdiag.m` zeroes out a band along the diagonal of a 2D spectrum using a brush of a specified width. It is documented as part of the Spinach kernel utilities ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/killdiag.m)).
 
-## Physical / mathematical content
+## Behavior
 
-This utility masks matrix values; it does not interpret them beyond their placement in a 2D spectrum.
+- Syntax: `spec=killdiag(spec,brush_dim)`.
+- For each column `n` of the spectrum, the row index on the diagonal is computed as `k=n*size(spec,1)/size(spec,2)`.
+- The brush extends from `round(k-(brush_dim-1)/2)` to `round(k+(brush_dim-1)/2)`, giving a band of `brush_dim` points centred on the diagonal.
+- Row indices outside the array boundaries (`k<1` or `k>size(spec,1)`) are discarded before zeroing.
+- The selected elements `spec(k,n)` are set to zero; the function returns the modified matrix.
+- Input consistency is enforced by the internal `grumble` function, which errors when: `spec` is not a numeric matrix; `brush_dim` is not a positive real integer scalar; or the brush is wider than the spectrum (`any(size(spec)<brush_dim)`).
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-For each column, the diagonal row is mapped proportionally from the column index to the row dimension. The rows within the requested brush width are set to zero, with the interval clipped at the matrix boundaries. This mapping also handles rectangular matrices.
+**Inputs**
 
-## Parameters / inputs
+- `spec` — 2D matrix representing a spectrum.
+- `brush_dim` — the width of the band to zero out around the diagonal, in points.
 
-- `spec` - numeric matrix representing a 2D spectrum.
-- `brush_dim` - positive real integer no larger than either matrix dimension; specifies the number of rows in the band to mask at each column.
+**Outputs**
 
-## Outputs
+- `spec` — 2D matrix representing the spectrum with the diagonal band zeroed.
 
-- `spec` - the input matrix with the diagonal band zeroed.
+## References
 
-## Implementation structure
-
-After validation, the routine visits each column, calculates the corresponding diagonal row and brush interval, clips the interval to valid row indices, and assigns zero to those entries.
+- Spin Dynamics Wiki page for `killdiag.m`: <https://spindynamics.org/wiki/index.php?title=killdiag.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/killdiag.m>

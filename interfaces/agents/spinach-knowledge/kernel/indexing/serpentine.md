@@ -1,10 +1,18 @@
 # kernel/indexing/serpentine.m
 
 - Signature: `S=serpentine(nlevels,idx_base)`
+- Direct MATLAB source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/indexing/serpentine.m>
+- Spin Dynamics Wiki: <https://spindynamics.org/wiki/index.php?title=serpentine.m>
 
 ## Purpose
 
-Builds the square serpentine index matrix used to number matrix elements with a single index. Entries increase by diagonals of constant row-plus-column, with ties ordered from the larger row index to the smaller one. For `nlevels=4`, the base-1 matrix is:
+Builds the square index matrix used by Spinach to number matrix elements with a single index. Values are assigned in increasing order along diagonals of constant row-plus-column; ties are ordered from larger row number to smaller row number. This is a data-layout helper, not a physical interaction or dynamics operation: it does not change matrix values, states, operators, or Hamiltonians.
+
+## Exact construction
+
+The code creates 1-based row and column coordinate grids with `ndgrid(1:nlevels)`, sorts the coordinate pairs by `[row+column, -row]`, and assigns consecutive values `1:nlevels^2` to the sorted positions. When `idx_base=0`, it subtracts one from every completed entry; for `idx_base=1`, the assigned values are retained.
+
+For `nlevels=4`, the base-1 matrix is:
 
 ```text
 1  3  6 10
@@ -13,21 +21,19 @@ Builds the square serpentine index matrix used to number matrix elements with a 
 7 11 14 16
 ```
 
-The base-0 matrix has 1 subtracted from every entry.
+The corresponding base-0 matrix is:
 
-## Physical / mathematical content
+```text
+0  2  5  9
+1  4  8 12
+3  7 11 14
+6 10 13 15
+```
 
-This matrix is an indexing map, not a physical matrix operation.
+## Syntax and guards
 
-## Numerical / algorithmic content
+`S=serpentine(nlevels,idx_base)`
 
-The implementation creates all row and column coordinates, sorts them by increasing `row+column` and then decreasing row, and assigns the sequence `1:nlevels^2` in that order. For base 0 it subtracts 1 from the completed matrix.
-
-## Parameters / inputs
-
-- `nlevels` - positive real integer dimension of the square matrix.
-- `idx_base` - indexing base, either 0 or 1.
-
-## Outputs
-
-- `S` - `nlevels`-by-`nlevels` serpentine index matrix, expressed in the selected base.
+- `nlevels` - positive real numeric integer scalar; determines the number of rows and columns.
+- `idx_base` - real numeric scalar equal to 0 or 1.
+- `S` - `nlevels`-by-`nlevels` index matrix in the requested base.

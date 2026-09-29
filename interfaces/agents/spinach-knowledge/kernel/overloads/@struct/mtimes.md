@@ -1,20 +1,18 @@
 # kernel/overloads/@struct/mtimes.m
 
+Direct source: [kernel/overloads/@struct/mtimes.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@struct/mtimes.m)
+Wiki: [struct/mtimes.m](https://spindynamics.org/wiki/index.php?title=struct/mtimes.m)
+
 - Signature: `str_out=mtimes(M,str_in)`
 
 ## Purpose
 
-Multiply every numeric leaf field of a structure by `M`, recursively processing nested structures.
+Apply left matrix multiplication by `M` to every field of a structure; nested structures are handled recursively through MATLAB's overloaded `mtimes` dispatch.
 
-## Parameters / inputs
+## Inputs and output
 
-- `M` - numeric multiplier.
-- `str_in` - structure whose fields are numeric values or nested structures of such values.
+- `M` is numeric. The implementation checks `isnumeric(M)`, not a particular shape.
+- `str_in` must be a structure. Its fields are operated on one at a time.
+- `str_out` has the corresponding field names, with each field replaced by `M*str_in.field`.
 
-## Outputs
-
-- `str_out` - structure with the same field layout and each numeric leaf replaced by `M*value`.
-
-## Implementation structure
-
-The function checks that `M` is numeric and `str_in` is a structure, then visits each field and applies `M*field`. MATLAB's matrix multiplication rules apply to each leaf.
+For numeric leaves, ordinary MATLAB matrix-multiplication rules apply: inner dimensions must agree, and the result shape follows those operands. The implementation checks neither each leaf's type nor its dimensions in advance; incompatible fields fail when their `*` operation is evaluated. A nested structure invokes this overload again.

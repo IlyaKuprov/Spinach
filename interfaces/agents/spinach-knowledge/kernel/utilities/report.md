@@ -1,32 +1,37 @@
 # kernel/utilities/report.m
 
-- Signature: `report(spin_system,report_string)`
-
 ## Purpose
 
-Prints a character message with a prefix derived from the call stack. A one-argument call errors; an empty `spin_system` selects standard output. Setting `spin_system.sys.output='hush'` suppresses the call, and otherwise the message is written with a trailing newline to the configured output destination.
+Writes a log message to the console or an ASCII file, prefixed with the call stack of the function that produced it. Source: [kernel/utilities/report.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/report.m).
 
-## Physical / mathematical content
+## Behavior
 
-This is an output utility; it does not perform spin dynamics or numerical calculations.
+- Syntax: `report(spin_system,report_string)`.
+- A single-argument call raises the error `console reporting function requires two arguments.`.
+- If `spin_system` is empty, `spin_system.sys.output` is set to `1` (console) before proceeding.
+- If `spin_system.sys.output` is `'hush'`, the call is ignored and nothing is printed.
+- Otherwise the input is validated by the internal `grumble` function, which errors when:
+  - `spin_system.sys` or `spin_system.sys.output` does not exist: `spin_system.sys.output field must exist.`;
+  - `spin_system.sys.output` is neither `double` nor `char`, or is `char` but not exactly `'hush'`: `spin_system.sys.output must be either 'hush' or a file ID.`;
+  - `report_string` is not a character array: `report_string must be a string.`.
+- The call stack is obtained with `dbstack`. Entries listed as uninformative (`hamiltonian/parfor_progr`, `@(~)parfor_progr`, `iDispatchDataReceived`, `@(src,event)iDispatchDataReceived(func,src,event)`, `DataQueue.dispatchContinuation`, `DataQueue.maybeDrainAndDispatchAllDataOnQueue`, `AbstractDataQueue.notifyQueue`, `ParforEngine.getCompleteIntervals`, `parallel_function`, `powder/parfor_progr`, `make_general_channel/channel_general`, `ThreadsParforEngine.getCompleteIntervals`) are deleted; `distributed_execution` is replaced with `parfor/spmd > `; every other entry is suffixed with ` > `.
+- The stack names are concatenated in reverse order (from caller down to `report`), the trailing `.m`-style extension is trimmed by dropping the last three characters, and an empty prefix is replaced by a single space.
+- The prefix is rolled to a fixed width: if shorter than 50 characters it is padded to 50; otherwise it is truncated to `'...'` plus the last 47 characters.
+- The final line is `'[' prefix ' ]  ' report_string`, written with `fprintf(spin_system.sys.output,'%s\n',...)` inside a `try`/`end` block that ignores impossible writes; a trailing newline is appended automatically, so the input string need not end with one.
+- All output can be silenced by setting `sys.output='hush'` in the Spinach input stream or by setting `spin_system.sys.output='hush'` at any point during the calculation.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-The function removes known uninformative stack entries, labels parallel-worker stack entries as `parfor/spmd`, reverses and joins the remaining caller names, removes the final three-character suffix, and pads the prefix to 50 characters. Longer prefixes are shortened to 50 characters with a leading ellipsis. It then prepends the prefix and writes the result with `fprintf`; impossible write errors are suppressed.
+**Inputs**
 
-## Parameters / inputs
+- `spin_system` — Spinach system object; its `sys.output` field must be `'hush'` or a file ID (`double` or `char`). An empty `spin_system` is tolerated and treated as console output.
+- `report_string` — character string with the message to log.
 
-- `spin_system` - system structure with `sys.output` set to `'hush'` or a file identifier; an empty value defaults to output identifier 1.
-- `report_string` - character array to report; non-character input errors.
+**Outputs**
 
-## Outputs
+- None returned; the function prints the message to the console or to the destination specified in `spin_system.sys.output`.
 
-No value is returned. The message is printed to the configured destination, unless output is hushed.
+## References
 
-## Implementation structure
-
-Validation requires `spin_system.sys.output` and a character `report_string`. With output enabled, the function builds the call-stack prefix and writes `[prefix ]  report_string` followed by a newline. Errors from the final `fprintf` are caught and ignored.
-
-## Reference
-
-[Spin Dynamics Wiki: report.m](https://spindynamics.org/wiki/index.php?title=report.m)
+1. Spinach Wiki: [report.m](https://spindynamics.org/wiki/index.php?title=report.m)
+2. Source file: [kernel/utilities/report.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/report.m)

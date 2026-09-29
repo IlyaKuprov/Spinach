@@ -1,29 +1,18 @@
 # kernel/overloads/@rcv/rdivide.m
 
 - Signature: `A=rdivide(A,k)`
+- Source: [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/rdivide.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=rcv/rdivide.m)
 
 ## Purpose
 
 Divides an RCV sparse matrix by a numeric scalar.
 
-## Mathematical content
+## Behavior
 
-The operation divides each stored value of `A` by `k`, leaving the sparse structure and dimensions unchanged.
+The function checks that `A` is an RCV object and `k` is a numeric scalar, then replaces the stored values with `A.val/k`. The row and column coordinate arrays and the matrix dimensions are unchanged, so the result remains in RCV form. The source does not add real, finite, or nonzero restrictions on `k` beyond its numeric-scalar check.
 
-## Numerical / algorithmic content
+## Inputs and output
 
-The function requires `A` to be an RCV object and `k` to be a numeric scalar, then replaces `A.val` with `A.val/k`.
-
-## Parameters / inputs
-
-- A -RCV sparse matrix
-- k -numeric scalar
-
-## Outputs
-
-- A -RCV sparse matrix
-
-## Implementation structure
-
-- Check that the first argument is RCV and the divisor is a numeric scalar.
-- Divide the stored value array by the scalar and return the modified RCV object.
+- `A` — RCV sparse matrix.
+- `k` — numeric scalar.
+- Output `A` — the RCV matrix with each stored value divided by `k`.

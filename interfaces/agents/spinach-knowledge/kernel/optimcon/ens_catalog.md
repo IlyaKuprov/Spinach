@@ -1,24 +1,21 @@
 # kernel/optimcon/ens_catalog.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/ens_catalog.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ens_catalog.m)
+
 - Signature: `[catalog,ens_sizes]=ens_catalog(control)`
 
-## Purpose
+## Purpose and layout
 
-Builds an ensemble case catalog for optimal control. Enumerates the Cartesian product of state-target pairs, drift generators, control power levels, resonance-offset combinations, phase-cycle lines, and distortion functions, then applies ensemble correlation filters and the ensemble budget. Each catalog row identifies one case to simulate when evaluating control-sequence fidelity.
+Builds the case list used by ensemble optimal control. The Cartesian grid spans state-target pairs, drift generators, power levels, combinations of resonance offsets, phase-cycle rows, and distortion rows. `catalog` is an `n_cases x 6` numeric array; its columns index those six dimensions in that order. `ens_sizes` is a `1 x 6` vector of their sizes in the same order. The offset-combination count is the product of the number of values in each offset channel, or 1 when there are no offset channels.
 
-## Parameters / inputs
+`control` must be the optimal-control structure produced by `optimcon.m`. The function checks for the catalog inputs expected there, including `rho_init`, `rho_targ`, `ndrifts`, `pwr_levels`, `offsets`, `phase_cycle`, `distortion`, `ens_corrs`, and `budget`.
 
-- `control` — control data structure produced by `optimcon.m`.
+## Correlations and budget
 
-## Outputs
+The source applies these named correlation filters when present in `control.ens_corrs`:
 
-- `catalog` — `[n_cases x 6]` array of ensemble indices. Its columns index the state-target pair, drift generator, power level, offset combination, phase-cycle line, and distortion function, in that order.
-- `ens_sizes` — `[1 x 6]` array of ensemble dimension sizes in the same column order, before correlation filters and budgeting.
+- `rho_ens` removes the original state-target-pair column, deduplicates the remaining tuples, then rebuilds that column with a distinct sequential index.
+- `rho_drift` retains rows whose state-target-pair and drift indices match.
+- `power_drift` retains rows whose power-level and drift indices match.
 
-## Numerical / algorithmic content
-
-- The number of offset combinations is the product of the numbers of values in `control.offsets`, or 1 when `control.offsets` is empty.
-- Correlation options in `control.ens_corrs` restrict cases: `rho_ens` assigns one state-target pair per remaining ensemble combination; `rho_drift` retains cases whose state-target and drift indices match; `power_drift` retains cases whose power and drift indices match.
-- If `control.budget` is finite and at most 1, it is converted to a sample count by rounding that fraction of the filtered case count, with a minimum of 1. A budget smaller than the filtered case count selects a random subset using a fixed seed; the prior RNG state is restored afterward.
-
-<https://spindynamics.org/wiki/index.php?title=ens_catalog.m>
+Budgeting is applied after filtering. A finite budget at most 1 is treated as a fraction of the filtered case count, rounded to a sample count and clamped to at least 1. Otherwise the budget is used as a case count. If the resulting budget is smaller than the catalog, a subset is selected with a fixed Twister seed; the caller's prior MATLAB RNG state is restored afterward.

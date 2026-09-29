@@ -1,22 +1,21 @@
 # examples/fundamentals/derivative_tests/dirdiff_2.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_2.m)
+
 - Signature: `dirdiff_2()`
 
 ## Purpose
 
-Check the analytical left- and right-control derivatives returned by `trapdiff` against central finite differences for the second-order Magnus product quadrature.
+This example compares the analytical left- and right-control derivatives returned by `trapdiff` for the second-order Magnus product quadrature with centered finite differences of the associated matrix exponential.
 
-## Physical / mathematical content
+## Test construction
 
-The test uses a general coherent and non-symmetric dissipative case, represented by separate left and right drift generators and a control operator. The three formalism labels are used to construct Spinach test systems; the derivative check then operates on random matrices.
+For each of `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, the script constructs a test spin system; the derivative comparison itself uses independent random complex 50-by-50 drift matrices and a 50-by-50 control matrix, not a physical spin Hamiltonian. It scales the time step with the reciprocal drift-matrix norms and tests the coherent plus non-symmetric dissipative case.
 
-## Numerical / algorithmic content
+## Derivatives and comparison
 
-The time step is estimated as the mean of the inverse 2-norms of the two drift matrices. The finite-difference increment is `sqrt(eps('double'))`. Analytical directional derivatives are compared with centered differences of matrix exponentials; each difference must be below `10*sqrt(eps('double'))` in 2-norm.
+It uses a step of `sqrt(eps('double'))`, constructs left and right directions for the second-order Magnus trapezoid, and estimates each matrix-exponential derivative by central differences in that direction. It compares both estimates with `trapdiff` using spectral 2-norm residuals; each must be strictly below `10*sqrt(eps('double'))`. Otherwise the script raises an error; a successful comparison prints `trapezium quadrature derivative test passed`.
 
-## Implementation structure
+## Scope
 
-- Construct test systems for `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`.
-- Generate two random complex `50×50` drift matrices and one random complex control matrix.
-- Build the left and right control directions and evaluate both derivatives with `trapdiff`.
-- Compare each result with its finite-difference estimate and fail if either check is outside tolerance.
+This is a finite-difference consistency check for the stated matrix construction and the two derivative outputs. The formalism labels do not constitute three independent derivative calculations, and the random matrices do not by themselves establish behavior for every physical generator or for a composed simulation algorithm.

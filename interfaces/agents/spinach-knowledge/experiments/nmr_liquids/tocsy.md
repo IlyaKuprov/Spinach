@@ -2,31 +2,23 @@
 
 - Signature: `fid=tocsy(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and sequence
 
-Amplitude-mode homonuclear TOCSY experiment using continuous spin-lock mixing. The homonuclear spin species is selected with `parameters.spins`, for example `{'1H'}` or `{'13C'}`. The sequence is described in the cited TOCSY papers; it is not an explicit MLEV, DIPSI, WALTZ, or clean-TOCSY composite pulse-train simulation.
+Amplitude-mode homonuclear TOCSY with the source's continuous-spin-lock model. Starting from `parameters.rho0`, the routine applies a `pi/2` pulse about `Lx` on the working spin, then records F1 evolution under `L = H + 1i*R + 1i*K`. During the mixing interval, it propagates two branches with `L + 2*pi*lamp*Lx` and `L + 2*pi*lamp*Ly`; these include the full Liouvillian as well as the spin-lock term. It detects with `L+` on the same spin during F2 and returns `fid.cos` and `fid.sin`, the States-quadrature components, each with shape `npoints(1) × npoints(2)`.
 
-## Physical / mathematical content
+This is not an explicit MLEV, DIPSI, WALTZ, or clean-TOCSY pulse-train simulation.
 
-The sequence starts from `parameters.rho0`, applies a 90-degree x pulse, and evolves the two-dimensional indirect and detection periods under the full Liouvillian `L = H + iR + iK`. During the mixing time it propagates under x- and y-oriented spin-lock terms, `L + 2 pi lamp Lx` and `L + 2 pi lamp Ly`, producing cosine and sine components for States quadrature processing. Here `lamp` is the spin-lock power in Hz. Relaxation and kinetics therefore act during the spin lock as well as during the other evolution periods.
+## Inputs
 
-## Parameters / inputs
-
-- `parameters.sweep`: two positive sweep widths in Hz, for F1 and F2.
-- `parameters.npoints`: two positive integer point counts, for F1 and F2.
-- `parameters.spins`: a one-element cell array naming the working isotope, e.g. `{'1H'}`.
-- `parameters.tmix`: non-negative mixing time in seconds.
-- `parameters.lamp`: positive spin-lock power in Hz.
-- `parameters.rho0`: initial state.
-- `H`: Hamiltonian matrix; `R`: relaxation superoperator; `K`: kinetics superoperator, all supplied by the context function and required to have matching dimensions.
-
-## Outputs
-
-Returns `fid.cos` and `fid.sin`, the cosine and sine signal components used for States quadrature processing.
+- `parameters.spins`: one homonuclear species in a cell array; source examples include `{'1H'}` and `{'13C'}`.
+- `parameters.sweep`: two positive sweep widths in Hz; `parameters.npoints`: two positive integer point counts, in F1/F2 order.
+- `parameters.tmix`: non-negative scalar mixing time in seconds; `parameters.lamp`: spin-lock power in Hz, used in the source as `2*pi*lamp` angular frequency; `parameters.rho0`: numeric initial state with a Liouville-space dimension matching `H`.
+- `H`, `R`, and `K`: numeric, same-sized matrices from the context function. Supported formalisms are `sphten-liouv` and `zeeman-liouv`.
 
 ## References
 
 - [TOCSY paper](https://doi.org/10.1016/0022-2364(83)90226-3)
 - [TOCSY paper](https://doi.org/10.1021/ja00295a052)
 - [TOCSY paper](https://doi.org/10.1016/0022-2364(85)90018-6)
-- [Spin Dynamics Wiki: tocsy.m](https://spindynamics.org/wiki/index.php?title=tocsy.m)
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/tocsy.m)
+- [Spinach Wiki: tocsy.m](https://spindynamics.org/wiki/index.php?title=tocsy.m)

@@ -1,48 +1,34 @@
 # experiments/bruker/hsqcedetgp.m
 
-- Signature: `fid=hsqcedetgp(spin_system,parameters,H,R,K)`
+## Purpose and sequence
 
-## Purpose
+This routine implements Bruker's echo/antiecho, gradient-selected multiplicity-edited HSQC sequence. Gradient selection is represented analytically by coherence-order filters, not explicit gradient pulses. The function begins with F2 longitudinal magnetisation and applies a proton 90-degree pulse. The initial INEPT transfer uses two evolution periods of `delta/2`, where `delta = abs(1/(2*J))`, separated by simultaneous F1/F2 180-degree refocusing. A proton trim pulse and transfer pulses then prepare the F1 coherence.
 
-Simulate the echo/antiecho, gradient-selected multiplicity-edited HSQC sequence. Gradient selection is represented analytically by coherence-order selection rather than explicit gradient pulses. The implementation is based on the Bruker `hsqcedetgp` pulse program and standard HSQC sequence.
+F1 is sampled through half-step evolution blocks with requested midpoint refocusing pulses. The resulting +1 and -1 F1 coherence branches represent the echo and antiecho pathways. Each branch then undergoes two multiplicity-editing delays of `edit_time`, separated by a simultaneous F1/F2 180-degree pulse. Back-transfer uses two more `delta/2` periods with a simultaneous 180-degree pulse between them. A final coherence filter retains zero F1 order and +1 F2 order; the code decouples the selected F2 nuclei and detects the two branches separately. The source labels the paired `edit_time` intervals as the multiplicity-editing period; it does not give a recommended delay or map output signs to specific multiplicity classes.
 
-## Physical / mathematical content
+## Call contract
 
-The sequence starts from longitudinal magnetisation on the F2 spin and uses two INEPT periods of `abs(1/(2*J))/2`, separated by simultaneous F1/F2 refocusing pulses. After the proton trim and transfer pulses, it evolves F1 in two halves with configured refocusing pulses and selects opposite F1 coherence orders for the echo and antiecho pathways. Each pathway then undergoes two multiplicity-editing intervals of `edit_time`, separated by another simultaneous refocusing pulse, followed by back-transfer, F2 coherence selection, optional F2 decoupling, and detection.
+`fid=hsqcedetgp(spin_system,parameters,H,R,K)`
 
-## Numerical / algorithmic content
+- `spin_system` must use the `sphten-liouv` formalism.
+- `parameters.sweep` is a two-element vector of positive real F1/F2 sweep widths in Hz; the sample time increments are their reciprocals.
+- `parameters.npoints` is a two-element vector of positive integer F1/F2 point counts.
+- `parameters.spins` is a two-element cell array naming the active F1 and F2 nuclei (typically a heteronucleus and 1H in the source examples).
+- `parameters.decouple_f1` is the cell list of nuclei given midpoint 180-degree refocusing pulses in F1. The source documentation says this list must not contain the active F1 isotope.
+- `parameters.decouple_f2` is the cell list of nuclei to decouple during F2 acquisition (examples in the source are 15N and 13C).
+- `parameters.J` is the working scalar coupling in Hz; validation requires a nonzero real scalar. The INEPT interval is computed as `abs(1/(2*J))` seconds and split into two equal halves.
+- `parameters.trim_angle` is the proton trim-pulse angle in radians; validation requires one finite real scalar, without specifying a narrower allowed range.
+- `parameters.edit_time` is the multiplicity-editing interval in seconds; validation requires one positive real scalar. The sequence uses it twice, with the refocusing pulse between the intervals.
+- `H`, `R`, and `K` are numeric matrices supplied by the context function. The source requires matching dimensions and combines them as `H + 1i*R + 1i*K`.
 
-The code forms `L = H + 1i*R + 1i*K`, uses dwell times `1/sweep(1)` and `1/sweep(2)`, and delegates propagation, pulses, and coherence selection to Spinach's `evolution`, `step`, and `coherence` routines. The function requires the `sphten-liouv` formalism.
+The output is a structure containing `fid.pos` and `fid.neg`, documented as echo and antiecho signal components. They are the F2 observable-evolution outputs for the two F1 coherence branches. The routine requests `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 acquisition steps; the source does not declare the arrays' storage orientation or numeric class, nor does it prescribe the multiplicity-to-sign assignment.
 
-## Syntax
+Natural-abundance simulations should use Spinach isotope-dilution functionality, as noted in the source.
 
-```matlab
-fid=hsqcedetgp(spin_system,parameters,H,R,K)
-```
+## References and source
 
-## Parameters / inputs
-
-- `parameters.sweep`: two positive real sweep widths, `[F1 F2]`, Hz.
-- `parameters.npoints`: two positive integer point counts, `[F1 F2]`.
-- `parameters.spins`: two different isotope strings, `{F1 F2}`, present in the spin system (e.g. `{'13C','1H'}`).
-- `parameters.decouple_f2`: cell array of isotopes to decouple in F2 (e.g. `{'15N','13C'}`).
-- `parameters.decouple_f1`: cell array of isotopes receiving midpoint 180-degree refocusing pulses in F1 (e.g. `{'1H','15N'}`); it must not include the active F1 isotope.
-- `parameters.J`: non-zero real scalar working scalar coupling, Hz.
-- `parameters.trim_angle`: finite real proton trim-pulse angle, radians.
-- `parameters.edit_time`: positive real multiplicity-editing delay, seconds; applied in two intervals.
-- `H`: Hamiltonian matrix.
-- `R`: relaxation superoperator.
-- `K`: kinetics superoperator. These matrices must have matching dimensions.
-
-## Outputs
-
-- `fid.pos` and `fid.neg`: echo and antiecho signal components.
-
-For natural-abundance simulations, the source recommends isotope dilution; see [`dilute.m`](https://spindynamics.org/wiki/index.php?title=dilute.m).
-
-## References and links
-
-- [HSQC sequence reference](https://doi.org/10.1016/0009-2614(80)80041-8)
-- [HSQC reference](https://doi.org/10.1002/cmr.a.10095)
-- [Multiplicity-edited HSQC reference](https://doi.org/10.1002/mrc.1260310315)
-- [Spinach documentation for `hsqcedetgp.m`](https://spindynamics.org/wiki/index.php?title=hsqcedetgp.m)
+- Original HSQC sequence: https://doi.org/10.1016/0009-2614(80)80041-8
+- HSQC reference: https://doi.org/10.1002/cmr.a.10095
+- Multiplicity-editing reference: https://doi.org/10.1002/mrc.1260310315
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=hsqcedetgp.m
+- Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/bruker/hsqcedetgp.m

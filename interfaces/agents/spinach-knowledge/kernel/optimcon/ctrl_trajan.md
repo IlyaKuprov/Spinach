@@ -1,26 +1,26 @@
 # kernel/optimcon/ctrl_trajan.m
 
-- Signature: `ctrl_trajan(spin_system,waveform,traj_data,fidelities)`
+Source: [kernel/optimcon/ctrl_trajan.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/ctrl_trajan.m)
+Wiki: [Spinach documentation: ctrl_trajan.m](https://spindynamics.org/wiki/index.php?title=ctrl_trajan.m)
 
 ## Purpose
 
-Internal diagnostic plotting function for the optimal control module. It plots selected control-pulse and trajectory analyses. Specify plotting settings when setting up the optimal control problem in `optimcon.m`; do not call this function directly.
+An internal diagnostic plotting routine for optimal-control runs. Plot selection is supplied through <code>spin_system.control.plotting</code>, typically via <code>optimcon.m</code>; this function produces plots and does not return an objective, constraint value, gradient, or adjoint. It accepts trajectory structures from GRAPE, one per ensemble member, and can display waveform diagnostics, trajectory analyses, and fidelity robustness information.
 
-## Parameters / inputs
+If the plotting selection is empty, the function returns before validating the other inputs. It also removes <code>trajectory</code> from the requested plot list and returns if no plots remain.
 
-- `spin_system`: supplies plotting settings, pulse timing, integrator and control parameters, and the basis used for trajectory analysis.
-- `waveform`: waveform supplied to a user-end function such as `grape_xy.m`; must be a real numeric array.
-- `traj_data`: cell array of trajectory data structures returned by GRAPE, one per ensemble member.
-- `fidelities`: fidelity array returned by a user-end function such as `grape_xy`; must be a real numeric array.
+## Call and data
 
-## Plotting and analysis
+<code>ctrl_trajan(spin_system,waveform,traj_data,fidelities)</code>
 
-- Plot selections handled here include `spectrogram`, `xy_controls`, `phi_controls`, `amp_controls`, `frq_controls`, `correlation_order`, `coherence_order`, `local_each_spin`, `total_each_spin`, `level_populations`, and `robustness`. `time_by_slice` selects waveform slice number rather than elapsed seconds for the time axis. The `trajectory` key triggers a trajectory return; it does not produce a plot here.
-- Cartesian control, phase, and amplitude plots use linear plots for the `trapezium` integrator and stairs plots for the `rectangle` integrator. Cartesian controls and paired-channel amplitudes are displayed in Hz; phases are displayed in radians. The Cartesian control plot shows lower and upper control bounds and reports the maximum nutation angle. The amplitude plot shows an amplitude bound.
-- Spectrogram and instantaneous-frequency plots use paired control channels and require at least five initial slices of equal duration. Both use only that initial uniform-duration portion when later slice durations differ; the spectrogram labels its time axis as truncated in that case. Spectrogram, instantaneous-frequency, phase, and amplitude plots require an even number of control channels.
-- Trajectory analyses process each ensemble member's forward trajectory with `trajan`, after tracing over spatial degrees of freedom. These analyses reject the `zeeman-hilb`, `zeeman-liouv`, and `zeeman-wavef` formalisms and request `sphten-liouv` instead.
-- `robustness` plots a histogram of fidelities and displays their mean and standard deviation.
+- <code>waveform</code> is arranged in successive X/Y row pairs, with columns representing time slices. Phase, amplitude, spectrogram, and instantaneous-frequency plots require an even number of rows.
+- <code>traj_data</code> is a cell array of trajectory data; trajectory diagnostics trace over spatial degrees of freedom and are not available for every Zeeman formalism.
+- <code>fidelities</code> supplies the fidelity data used by the robustness histogram.
 
-## Reference
+After those early returns, the routine requires <code>waveform</code> and <code>fidelities</code> to be real numeric arrays and <code>traj_data</code> to be a cell array. It does not locally validate finiteness or cross-check waveform columns against slice durations. There are no default input values.
 
-- [Spinach documentation: ctrl_trajan.m](https://spindynamics.org/wiki/index.php?title=ctrl_trajan.m)
+The time axis is either slice number or cumulative <code>pulse_dt</code> in seconds. Rectangle controls are drawn with stairs and the final waveform column is appended; trapezium controls are drawn with linear plots. Plotted amplitudes and bounds use <code>mean(spin_system.control.pwr_levels)</code> and are divided by <code>2*pi</code> for Hz labels.
+
+Spectrogram and instantaneous-frequency plots use only the initial run of exactly equal <code>pulse_dt</code> values, and require at least five such slices. The spectrogram is formed from the complex control <code>X-iY</code>; instantaneous frequency is evaluated from <code>X-iY</code> using the first slice duration. The fidelity-robustness display is a probability-density-normalized histogram.
+
+The plotting routine is diagnostic: its displayed amplitudes, bounds, trajectory summaries and fidelity histogram are not a complete specification of optimization constraints or the objective's gradient.

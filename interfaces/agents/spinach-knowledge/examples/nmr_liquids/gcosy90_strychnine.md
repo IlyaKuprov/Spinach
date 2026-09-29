@@ -1,21 +1,15 @@
 # examples/nmr_liquids/gcosy90_strychnine.m
 
-- Signature: `gcosy90_strychnine()`
+- MATLAB implementation: [examples/nmr_liquids/gcosy90_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/gcosy90_strychnine.m)
 
-## Purpose
+## Model and sequence
 
-Gradient-selected COSY spectrum of strychnine. Calculation time: minutes
+This wrapper simulates Horne-Morris gradient-selected COSY for strychnine using the 22-spin, proton-only network from `strychnine({'1H'})`; no carbon or nitrogen spins are selected. It sets `sys.magnet=5.9` (field value; no unit is stated here) and calls `liquid(...,@gcosy,parameters,'nmr')`; the gradient-selection pulse program is in `experiments/nmr_liquids/gcosy.m`, not encoded by the wrapper. The selected pathway is `P+N`, which the sequence source describes as the P- and N-type components for echo/anti-echo recombination. The observed channel is `1H`.
 
-## Physical / mathematical content
+## Basis and acquisition
 
-- Two-dimensional gradient-selected COSY simulation of strychnine using 1H spins and a 90-degree pulse. Scalar-coupling evolution generates the COSY correlations; gradient selection uses the `P+N` pathway.
-- The positive and negative echo FIDs are squared-cosine apodised, Fourier transformed along F2, combined as an echo/anti-echo signal, and transformed along F1.
+The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and proximity level 1; greedy basis construction uses `prox_cutoff=4.0`. The second pulse angle is `pi/2` rad. Acquisition settings are offset 1200 (unit not specified), sweep 2200 Hz, `npoints=[512 512]`, and `zerofill=[2048 2048]`; displayed axes use ppm. The gradient settings are amplitude 3 Gauss/cm, duration `2e-3` s, stabilization delay `2e-4` s, and active sample length 1.5 cm. The source estimates calculation time as minutes. No relaxation theory or rates are configured by this example.
 
-## Numerical / algorithmic content
+## Processing and plot
 
-- Uses the sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1, and greedy settings with `prox_cutoff=4.0`; the field is 5.9 T. Sequence settings are angle `pi/2`, offset `1200`, sweep `2200`, `npoints=[512 512]`, `zerofill=[2048 2048]`, gradient amplitude `3`, duration `2e-3`, stabilization delay `2e-4`, and `s_len=1.5`. The single simulation has no isotopomer-parallel or GPU loop.
-
-## Implementation structure
-
-- Create the 1H strychnine spin system at 5.9 T and construct the selected basis.
-- Run gradient-selected COSY with the listed pulse, gradient, and acquisition settings; apply squared-cosine apodisation, form the echo/anti-echo signal, Fourier transform both dimensions, and plot the real spectrum.
+The wrapper applies squared-cosine apodisation to the positive and negative pathway FIDs, Fourier-transforms F2, combines them as `f1_pos+conj(f1_neg)`, then Fourier-transforms F1. It plots `abs(spectrum)` with positive contours.

@@ -1,24 +1,23 @@
 # examples/imaging/dpfgse_signal_suppress.m
 
-- Signature: `dpfgse_signal_suppress()`
-
 ## Purpose
 
-Simulates DPFGSE water suppression for a solution of GABA in water, with gradients and soft pulses implemented explicitly. The source estimates a simulation time of minutes, faster with a Tesla V100 GPU.
+Models DPFGSE water suppression for a seven-proton GABA-in-water solution. The example explicitly supplies gradient and shaped-RF settings, runs the spectroscopy imaging sequence, and plots the processed spectrum.
 
-## Physical / mathematical content
+## Spin model
 
-- The seven-spin `1H` system has a 5.9 T magnet, chemical shifts of 3.00, 1.88, 2.28, and 4.80 ppm, and scalar couplings of 7.36 and 7.58 Hz.
-- The sequence uses two gradient amplitudes, 1e-3 and 1.5e-3, with a duration of 1e-3 s. A ten-step Gaussian-shaped 180-degree pulse is specified for water.
-- The sample uses a 0.30 spatial dimension with 100 grid points and a periodic third-derivative setting. Diffusion and flow are set to zero; no relaxation phantoms or operators are supplied.
+The source sets a 5.9 T magnet, shifts of 3.00, 3.00, 1.88, 1.88, 2.28, 2.28, and 4.80 ppm, and the listed scalar couplings at 7.36 and 7.58 Hz. It uses the `sphten-liouv` formalism with `IK-2`, proximity level 1, and scalar-coupling connectivity. Path tracing and Krylov propagation are disabled.
 
-## Numerical / algorithmic content
+## Spatial and sequence settings
 
-- The basis uses `sphten-liouv` formalism with `IK-2` approximation, proximity level 1, and scalar-coupling connectivity. Path tracing and Krylov acceleration are disabled.
-- Acquisition uses a 800 Hz offset, 1200 Hz sweep, and 512 points. The FID is exponentially apodised with parameter 6, Fourier-transformed with 2048-point zero filling, shifted with `fftshift`, and plotted as the real spectrum in Hz with an inverted axis.
+The spatial sample is configured with `dims=0.30`, `npts=100`, and derivative rule `{'period',3}`. The initial-state phantom is constant, the initial spin state is `Lz`, the receive-coil phantom is uniform, and detection uses `L+`; diffusion is set to zero.
 
-## Implementation structure
+The configured spectrum has offset 800, sweep 1200, 512 acquired points, zero-fill to 2048, and an axis labelled in Hz. The source sets `g_amp=[1e-3 1.5e-3]` and `g_dur=1e-3`, without an inline unit comment for those gradient values. Its water-selective 180-degree pulse uses ten Gaussian-shaped steps, zero phase, frequency entries of 1220, amplitudes scaled by `2*pi*1700`, and equal step durations summing to `2e-3`; the maximum rank is 2. The source does not annotate units for these RF table values or durations, so the literals are retained without assigning units.
 
-- Creates the spin system and basis, then sets initial `Lz` and detection `L+` states with uniform spatial phantoms.
-- Specifies a ten-step pulse with frequency entries of 1220, Gaussian amplitude scaled by `2*pi*1700`, a total duration of 2e-3 s, zero phase, and maximum rank 2.
-- Calls `imaging(spin_system,@dpfgse_suppress,parameters)`, processes the resulting FID, and plots the spectrum. GPU enablement appears only as a commented-out setting.
+## Output and caveats
+
+`imaging` calls `dpfgse_suppress`; the returned FID is exponentially apodised with parameter 6, Fourier transformed with zero-fill 2048, and the real spectrum is plotted. The source estimates minutes of runtime and says a Tesla V100 is faster; its GPU-enable line is commented out, so this file does not itself enable GPU execution. The timing is a source estimate, not a measurement.
+
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/dpfgse_signal_suppress.m)

@@ -1,15 +1,10 @@
 # examples/relaxation_theory/dd_csa_xcorr_2.m
 
 - Signature: `dd_csa_xcorr_2()`
+- Source: [examples/relaxation_theory/dd_csa_xcorr_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/dd_csa_xcorr_2.m)
 
-## Purpose
+This example is labelled in its source as a reproduction of Fig. 5a from Grace and Kumar ([doi:10.1006/jmra.1995.1151](https://doi.org/10.1006/jmra.1995.1151)). It models DD–CSA cross-correlation in a high-field `1H`/`19F` liquid-state NMR system and plots simulated fluorine spectra over a set of mixing times. The reference identifies the reproduction target; the script alone does not establish quantitative agreement with experimental data.
 
-DD–CSA cross-correlation example reproducing Fig. 5a from Grace and Kumar ([http://dx.doi.org/10.1006/jmra.1995.1151](http://dx.doi.org/10.1006/jmra.1995.1151)). Calculation time: seconds.
+The system's geometry and interaction parameters are imported from `../standard_systems/fdnb.log` using `gparse` and `g2spinach`, with atom mappings H to `1H` and F to `19F`, and conversion arguments `[32.0 270.0]`. The field is `9.4 T`. The source first assigns a proximity cutoff of `5 Å`, then overwrites it with `4.0 Å`; the latter is the effective value. Redfield relaxation uses `rlx_keep='secular'`, `equilibrium='dibari'`, temperature `298 K`, and a single correlation time `tau_c=9.6e-12 s`. The basis is `sphten-liouv` with no approximation. That single time sets the rotational-correlation timescale; for isotropic rank-2 tumbling the BRW spectral density is Lorentzian in frequency, proportional to `tau_c/[1 + (omega*tau_c)^2]`.
 
-## Imported system and relaxation model
-
-The source reads the vacuum-DFT spin system from `../standard_systems/fdnb.log` using `gparse` and `g2spinach` with the H/`1H` and F/`19F` mappings and arguments `[32.0 270.0]`. It sets the field to 9.4 T, Redfield relaxation with secular retention, Di Bari equilibrium at 298 K, and `tau_c={9.6e-12}`. The proximity cutoff is first assigned 5 Å and then overwritten with 4.0 Å before system creation. The basis is `sphten-liouv` without approximation.
-
-## Simulation and spectra
-
-The acquisition uses `19F`, offset −521, sweep 50, 128 points, and zero-fill 512. The code assumes NMR conditions, forms the Hamiltonian plus `1i*relaxation(spin_system)`, and applies the frequency offset. For each mixing time `[0.1 1.4 1.6 1.8 2.0 2.2 2.4 10]` s, it starts from thermal equilibrium, applies a pi pulse, evolves through mixing, applies a pi/2 pulse, and acquires the detection period. The FID is exponentially apodised with 6 before Fourier transformation; the real spectra are plotted against 19F linear frequency in Hz.
+The simulation uses the `19F` spin channel, offset `-521 Hz`, sweep `50 Hz`, `128` points, and zero-fill to `512`. It adds the Redfield relaxation superoperator to the Hamiltonian, applies the NMR high-field assumption and frequency offset, and detects with `L+`. The initial state is thermal equilibrium from the lab-frame Hamiltonian. For each mixing time `[0.1, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 10] s`, the script applies an `Lx` pi pulse, evolves during mixing, applies an `Ly` pi/2 pulse, and acquires the FID. Exponential apodisation with coefficient `6` precedes the Fourier transform. The plotted quantity is the real spectrum versus `19F` linear frequency in Hz, with the frequency axis reversed.

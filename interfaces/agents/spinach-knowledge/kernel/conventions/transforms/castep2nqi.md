@@ -4,24 +4,24 @@
 
 ## Purpose
 
-Converts CASTEP EFG tensor (it is printed in atomic units) to NQI 3x3 tensor in Hz that is required by Spinach. Syntax: nqi=castep2nqi(V,Q,I)
+Converts a CASTEP electric-field-gradient tensor into the nuclear quadrupole interaction tensor used by Spinach.
 
-## Physical / mathematical content
-The conversion multiplies the CASTEP EFG tensor V by a scalar factor to obtain a 3×3 nuclear quadrupole interaction tensor in Hz. The factor converts EFG atomic units and Q in barns to SI units, then applies the nuclear charge and divides by Planck's constant and 2I(2I−1). No coordinate rotation or tensor reparameterisation is performed.
+## Conversion
 
-## Numerical / algorithmic content
-The calculation is `nqi=V*9.717362e21*(Q*1e-28)*1.60217657e-19/(6.62606957e-34*2*I*(2*I-1))`. The result retains V's 3×3 shape. Before calculation, the function requires real numeric inputs, a 3×3 V, a scalar Q, and a scalar integer or half-integer I of at least 1.
+For a real 3-by-3 EFG tensor `V` in atomic units, nuclear quadrupole moment `Q` in barns, and spin quantum number `I`, the implemented conversion is
 
-## Parameters / inputs
+`nqi = V * 9.717362e21 * (Q * 1e-28) * 1.60217657e-19 / (6.62606957e-34 * 2 * I * (2 * I - 1))`.
 
-- V -EFG tensor from CASTEP output, a.u.
-- Q -nuclear quadrupole moment, barn
-- I -nuclear spin quantum number
+The scalar factor combines the source's EFG atomic-unit constant, barn-to-square-metre factor, elementary charge, Planck constant, and spin denominator. It scales `V` without a coordinate rotation or tensor reparameterisation, so the output is a 3-by-3 tensor in Hz, ready for `create.m`.
 
-## Outputs
+## Inputs and outputs
 
-- nqi -3x3 matrix in Hz, ready for input
-- into create.m function
+- `V`: real numeric 3-by-3 CASTEP EFG tensor in atomic units.
+- `Q`: real numeric scalar nuclear quadrupole moment in barns.
+- `I`: real numeric scalar integer or half-integer, at least 1.
+- `nqi`: 3-by-3 nuclear quadrupole interaction tensor in Hz.
 
-## Implementation structure
-The main function calls the local `grumble(V,Q,I)` validator, defines the EFG atomic-unit conversion factor, elementary charge, and Planck constant, then computes `nqi` by scalar multiplication of V. `grumble` raises errors for nonnumeric or nonreal inputs, an incorrectly sized V, a nonscalar Q, or an I that is not a scalar integer or half-integer of at least 1.
+## References
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/castep2nqi.m)
+- [Spinach Wiki: castep2nqi.m](https://spindynamics.org/wiki/index.php?title=castep2nqi.m)

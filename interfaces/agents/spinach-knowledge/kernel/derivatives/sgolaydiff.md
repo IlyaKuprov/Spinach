@@ -1,37 +1,27 @@
 # kernel/derivatives/sgolaydiff.m
 
-- Signature: `dy=sgolaydiff(y,der_order,npoints,poly_order)`
+[Direct MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/sgolaydiff.m) · [Spinach Wiki documentation](https://spindynamics.org/wiki/index.php?title=sgolaydiff.m)
 
-## Purpose
+## Purpose and signature
 
-Savitzky-Golay differentiation of noisy sampled signals by local least-squares polynomial fitting.
+`dy=sgolaydiff(y,der_order,npoints,poly_order)` smooths or differentiates sampled signals by local polynomial least-squares fits.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Fits a local polynomial around each sample and evaluates the requested derivative at that sample. Derivative order 0 returns the smoothed signal.
-- Derivatives are reported for a uniform grid with unit sample spacing.
+- `y`: finite, non-empty, dense floating-point `N`-by-`M` matrix. Rows are samples and columns are independent signals.
+- `der_order`: non-negative integer derivative order, no greater than `poly_order`; order zero returns the fitted smoothed values.
+- `npoints`: odd integer window width, at least 3 and no greater than `N`.
+- `poly_order`: non-negative integer strictly less than `npoints`.
+- `dy`: `N`-by-`M` output, with one requested derivative value per input sample and signal.
 
-## Numerical / algorithmic content
+There is no abscissa or sample-spacing argument: derivatives are with respect to a uniform unit-step sample coordinate. To express derivatives against an axis with spacing `h`, scale the returned order-`der_order` derivative by `h^(-der_order)`.
 
-- Uses an odd-length window, with sided windows near the signal boundaries and centred windows elsewhere.
-- Centres and scales the sample offsets, constructs a local Vandermonde matrix, and fits the polynomial by least squares using MATLAB's backslash operator.
-- Multiplies the fitted coefficient by the derivative-order factorial and divides by the offset scale raised to that order.
+## Local fits and boundaries
 
-## Parameters / inputs
+At each row, the routine selects a window of `npoints` samples. Interior windows are centred on the current sample; near either edge the window is shifted to remain inside the data, producing one-sided fits at the boundaries. It centres the integer sample offsets at the current row and scales them by their largest absolute offset, builds a Vandermonde matrix through degree `poly_order`, and solves `V\y(window,:)` by MATLAB least squares. The requested coefficient is multiplied by `factorial(der_order)` and divided by the offset scale to the same derivative order.
 
-- `y` — N-by-M signal matrix; rows are samples and columns are independent signals. It must be a non-empty, dense floating-point matrix with finite values and at least three rows.
-- `der_order` — non-negative integer derivative order; must not exceed `poly_order`. Order 0 returns the smoothed signal.
-- `npoints` — odd number of points in the local least-squares window; at least 3 and no greater than the number of sample rows.
-- `poly_order` — non-negative integer order of the local polynomial; must be smaller than `npoints`.
+The guard also requires finite input data, at least three input rows, a valid odd window, and the stated order/window relationships.
 
-## Outputs
+## Existing usage note
 
-- `dy` — N-by-M derivative matrix on a unit-step uniform grid.
-
-## Note
-
-- `sgolaydiff(s,1,7,3)` is recommended for differentiating EPR spectra; use a tight integration tolerance and increase the number of field/frequency axis points.
-
-## Reference
-
-- https://spindynamics.org/wiki/index.php?title=sgolaydiff.m
+`sgolaydiff(s,1,7,3)` is recommended for differentiating EPR spectra; use a tight integration tolerance and increase the number of field/frequency axis points.

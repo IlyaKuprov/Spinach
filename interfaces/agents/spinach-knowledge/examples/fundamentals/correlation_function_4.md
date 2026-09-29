@@ -1,19 +1,17 @@
 # examples/fundamentals/correlation_function_4.m
 
+- MATLAB implementation: [examples/fundamentals/correlation_function_4.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/correlation_function_4.m)
+
 - Signature: `correlation_function_4()`
 
-## Purpose
+## What is compared
 
-Compares a Monte Carlo estimate with the analytical Spinach result for `G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>`, using isotropic rotational diffusion at higher tensor rank. The sigma parameter sets the rotational-rate scale; the four indices select the Wigner-function elements being correlated.
+This high-rank isotropic case compares a Monte Carlo estimate with Spinach's analytical expansion for `G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>`. It sets `sigma_iso=0.2`, `L=4`, and `k=-1, m=2, p=-1, q=2`; each Wigner index is shifted by `L+1` for MATLAB indexing.
 
-## Physical / mathematical content
+## Numerical construction
 
-The test sets `sigma_iso=0.2`, rank `L=4`, and indices `k=-1, m=2, p=-1, q=2` (converted from `[-L,L]` indexing to MATLAB array indices). The analytical model uses Redfield relaxation and correlation time `1/(3*sigma_iso^2)`.
+The source generates `1e6` direction-cosine-matrix updates from three independent standard-normal increments, with all three displayed skew-symmetric generators scaled by `sigma_iso`. It stores the trajectory, converts each matrix through `dcm2euler` to `wigner(L,...)` in a `parfor` loop, and computes normalized `xcorr` for the selected elements. The result is rescaled by `1/(2*L+1)` (here `1/9`) and shifted together with its lag vector by `ifftshift`. With `nlags=100`, the plotted portion corresponds to lag points 0 through 99.
 
-## Numerical / algorithmic content
+## Analytical construction and observable
 
-It generates `1e6` rotations and estimates the correlation over `nlags=100`. Direction-cosine matrices are converted to Wigner functions, and normalized cross-correlation of the selected elements is compared with the exponential sum from Spinach's `corrfun` calculation.
-
-## Implementation structure
-
-The Monte Carlo calculation stores the rotation trajectory and evaluates Wigner matrices in a `parfor` loop. A one-spin dummy system supplies the analytical curve; the example plots both results. The source estimates a run time of minutes.
+A one-spin dummy system (zero magnet, isotope `G`) is configured with Redfield relaxation, lab-frame retention, zero equilibrium, spherical-tensor Liouville formalism, and no basis approximation. It uses `tau_c={1/(3*sigma_iso^2)}`. The output of `corrfun(spin_system,L,k,m,p,q)` is summed as `sum_j weights{1}(j)*exp(rates{1}(j)*(0:(nlags-1)))`. The function plots real Monte Carlo points against the analytical curve; it does not set a tolerance or assert pass/fail. The source estimates minutes of calculation time.

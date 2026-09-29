@@ -2,30 +2,22 @@
 
 - Signature: `C=mtimes(A,B)`
 
-## Purpose
+## Operation and result form
 
-Implements scalar scaling and matrix multiplication when at least one operand is an RCV sparse matrix.
+An RCV object stores column-vector coordinates `row` and `col` as `int64`, values in `val` as `double`, dimensions `numRows` and `numCols` as `int64`, and an `isGPU` flag. With an RCV operand and a numeric scalar, the overload scales the RCV `val` vector by that scalar and returns the scaled operand in RCV form. The scalar may be on either side; this is scalar scaling, not array broadcasting. The scalar path does not conjugate values.
 
-## Mathematical content
+For matrix multiplication, the accepted combinations are RCV-by-RCV, RCV-by-MATLAB-sparse, and MATLAB-sparse-by-RCV. Each branch checks the inner dimensions, then converts RCV operand(s) with `sparse` and performs ordinary MATLAB matrix multiplication. The result is a MATLAB sparse matrix with size `size(A,1)-by-size(B,2)`; this path eagerly materializes that sparse product rather than returning a lazy operator. Multiplication uses `*`, not a conjugate-transpose operation.
 
-A numeric scalar scales the stored values of an RCV operand. For matrix operands, the function computes the usual product `A*B` after requiring the inner dimensions to agree.
+## Input checks
 
-## Numerical / algorithmic content
+At least one operand must be RCV. When paired with RCV, the other operand must be RCV, MATLAB sparse, or a numeric scalar; dense nonscalar numeric matrices are not accepted. Scalars are recognized with `isnumeric` and `isscalar`. Matrix cases error when the inner dimensions do not agree. No general implicit expansion or broadcasting is implemented.
 
-RCV-by-RCV and mixed RCV/MATLAB-sparse matrix products are converted to MATLAB sparse matrices for multiplication and return a MATLAB sparse result. Scalar scaling returns an RCV object. The input check accepts an RCV operand paired with another RCV matrix, a MATLAB sparse matrix, or a numeric scalar.
+## Inputs and outputs
 
-## Parameters / inputs
+- `A`, `B`: operands in the combinations described above.
+- `C`: RCV for scalar scaling; MATLAB sparse for matrix multiplication.
 
-- A -left operand
-- B -right operand
+## Source and Wiki
 
-## Outputs
-
-- C -product A*B as a Matlab sparse matrix if
-- both operands are RCV or Matlab matrices
-
-## Implementation structure
-
-- Check that at least one operand is RCV and that the other operand is an RCV matrix, MATLAB sparse matrix, or numeric scalar.
-- For RCV-by-scalar or scalar-by-RCV, scale the RCV `val` array and return the RCV operand.
-- For RCV-by-RCV, RCV-by-MATLAB-sparse, or MATLAB-sparse-by-RCV, check inner dimensions, convert the RCV operand(s) to MATLAB sparse form, and multiply.
+- [Source: kernel/overloads/@rcv/mtimes.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/mtimes.m)
+- [Spinach Wiki: rcv/mtimes.m](https://spindynamics.org/wiki/index.php?title=rcv/mtimes.m)

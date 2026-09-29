@@ -1,24 +1,22 @@
 # examples/fundamentals/symmetry_4.m
 
+- MATLAB implementation: [examples/fundamentals/symmetry_4.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/symmetry_4.m)
+
 - Signature: `symmetry_4()`
+- Source: [examples/fundamentals/symmetry_4.m](../../../../../examples/fundamentals/symmetry_4.m)
 
 ## Purpose
 
-Builds the Hamiltonian for a radical pair with four equivalent proton nuclei, imposes S4 permutation symmetry on those nuclei, and visualises the Hamiltonian sparsity before and after symmetry factorisation.
+Shows how S4 symmetry factorisation changes the sparsity pattern of the Hamiltonian for a zero-field radical pair with four equivalent protons.
 
-## Physical / mathematical content
+## Spin model and basis
 
-- The spin system contains two electrons and four protons; the four proton spins are grouped under the S4 symmetry group.
-- The code sets zero magnetic field, equal electron Zeeman scalars of 2.002, and electron-proton scalar coupling entries of 0.295 (converted with `mt2hz`).
-- It forms the Hamiltonian and concatenates the irreducible-representation projectors returned by the symmetry-adapted basis. The transformed matrix `S'*H*S` is compared with `H`.
+The source sets `sys.magnet=0` for two electrons and four protons, groups protons 3–6 under S4, and uses the Zeeman-Hilbert formalism (`zeeman-hilb`) with approximation `none`. The electron Zeeman scalars are both 2.002 and the proton entries are zero. In the scalar-coupling matrix, electron 1 couples to each proton with input value 0.295 passed through `mt2hz`; the other listed entries are zero.
 
-## Numerical / algorithmic content
+## Construction and display
 
-- `bas.sym_spins={[3 4 5 6]}` and `bas.sym_group={'S4'}` request the permutation-symmetry basis for the four equivalent nuclei.
-- The final two-panel plot shows entries for which `abs(H)>1e3` and `abs(S'*H*S)>1e3`; guide lines are drawn at indices 20 and 28.
+The system and basis are built, the `labframe` assumption is applied, and the source calls `hamiltonian(spin_system)` and concatenates the irrep projectors into `S`. The source labels this section “Hamiltonian superoperator”, while the selected basis formalism is `zeeman-hilb`; this page reports both source details without resolving that terminology. The plotted masks use `abs(H)>1e3` and `abs(S'*H*S)>1e3`, with guide lines at indices 20 and 28.
 
-## Implementation structure
+## Scope
 
-- Define the spin system, Zeeman and scalar-coupling interactions, and S4 basis.
-- Create the Spinach system, build the basis under the lab-frame assumption, and construct the Hamiltonian.
-- Concatenate the irrep projectors and plot the original and transformed Hamiltonian sparsity patterns.
+This is a matrix-sparsity visualisation, not a time-domain simulation. The source specifies plot thresholds and guide lines but does not report a numerical comparison or observed run result.

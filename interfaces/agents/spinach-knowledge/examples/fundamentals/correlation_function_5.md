@@ -1,19 +1,30 @@
 # examples/fundamentals/correlation_function_5.m
 
+- MATLAB implementation: [examples/fundamentals/correlation_function_5.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/correlation_function_5.m)
+
 - Signature: `correlation_function_5()`
 
 ## Purpose
 
-Uses Monte Carlo rotational diffusion to estimate `G(k,m,p,q)=<R(k,m)*R(p,q)>`, where `R` is a three-dimensional Cartesian rotation matrix. Unlike the preceding Wigner-function examples, this script plots only the Monte Carlo estimate.
+Estimates the rotational correlation `G(k,m,p,q)=<R(k,m)*R(p,q)>` by Monte Carlo sampling, with `R` the accumulated 3D Cartesian rotation matrix. The source describes a run time of minutes. This example plots the sampled estimate; it does not compare it with a separate analytical curve.
 
-## Physical / mathematical content
+## Sampling and convention
 
-The isotropic rate parameter is `sigma_iso=0.2`; the selected matrix elements are `k=2, m=3, p=2, q=3`. The correlation is scaled by `1/3`, as implemented in the source.
+The script sets `sigma_iso=0.2`, selects `(k,m,p,q)=(2,3,2,3)`, and uses `npoints=1e6` with `nlags=300`. It draws a `3×npoints` array of standard-normal angle components and starts with `R(:,:,1)=eye(3)`. For `n=2,...,npoints`, it forms a skew-symmetric generator from the three source matrices
 
-## Numerical / algorithmic content
+```matlab
+J1 = [ 0  1  0; -1  0  0;  0  0  0];
+J2 = [ 0  0  1;  0  0  0; -1  0  0];
+J3 = [ 0  0  0;  0  0  1;  0 -1  0];
+R_gen = angles(1,n)*J1 + angles(2,n)*J2 + angles(3,n)*J3;
+```
 
-The script propagates `1e6` rotations from Gaussian angular increments and computes a normalized cross-correlation with `nlags=300`. It plots the real Monte Carlo correlation against lag; the source estimates a run time of minutes.
+The accumulated rotation is updated on the right as `R(:,:,n)=R(:,:,n-1)*expm(sigma_iso*R_gen)`. Thus the first angle column is generated but not used in an update.
 
-## Implementation structure
+## Correlation estimate and output
 
-Starting from the identity matrix, each step right-multiplies the accumulated rotation by the matrix exponential of the increment generator scaled by `sigma_iso`. The chosen Cartesian matrix elements are passed to `xcorr`; the shifted result is scaled by `1/3` before plotting.
+The selected matrix-element traces are passed to `xcorr(...,nlags,'normalized')`. The returned correlation and lag arrays are each transformed with `ifftshift`; the plot uses entries `1:nlags` of those shifted arrays, plotting `real(cf_mc)` against lag in points. The computed correlation is multiplied by `1/3` before plotting. Thus the displayed result is the real part of this finite Monte Carlo estimate under the source's normalization and index selection.
+
+## Scope
+
+The angle sequence is random and the script sets no seed. It supplies no uncertainty estimate or analytical comparison, and the plotted lag axis is in points rather than a physical time unit. The source does not further explain the normalization convention behind `xcorr(...,'normalized')` or the factor `1/3`.

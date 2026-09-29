@@ -1,34 +1,23 @@
 # kernel/contexts/doublerot.m
 
-- Signature: `[answer,sph_grid]=doublerot(spin_system,pulse_sequence,...`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/doublerot.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=doublerot.m)
 
-## Purpose
+## Contract
 
-Implements the double-angle-spinning context. In Liouville space it builds the Fokker–Planck evolution generator; in Hilbert space it builds a stack of spin Hamiltonians, one for each pair of rotor phases on the two-rotor phase grid. It passes the generator or Hamiltonian stack to the supplied pulse-sequence function handle.
+`doublerot(spin_system,pulse_sequence,parameters,assumptions)` is the double-angle-spinning context. The sequence is a function handle, and `assumptions` is passed to `assume` while constructing the Hamiltonian. The context obtains the spin Hamiltonian and its spherical interaction components from the selected Spinach basis and system; it also builds relaxation and kinetics operators and evaluates the sequence over a powder grid.
 
-## Parameters / inputs
+In Liouville formalisms (`sphten-liouv` and `zeeman-liouv`), it constructs a Fokker–Planck generator for the two independent rotor phases. In Hilbert formalisms (`zeeman-hilb` and `zeeman-wavef`), it instead supplies a stack of spin Hamiltonians indexed by pairs of rotor phases; that route has no rotor-derivative operator. The two rotor phase axes have `2*rank_outer+1` and `2*rank_inner+1` points, so the spatial dimension is their product. The spin dimension is `size(H,1)`; the context passes these dimensions as `parameters.spc_dim` and `parameters.spn_dim`. In the Liouville route the combined generator dimension is their product, and the rotor derivative term uses `2*pi*rate` with rates in hertz.
 
-- `pulse_sequence` — function handle for a pulse sequence in the experiments directory.
-- `assumptions` — string passed to `assume.m` when the Hamiltonian is built.
-- `parameters.rate_outer`, `parameters.rate_inner` — outer and inner rotor spinning rates in Hz.
-- `parameters.axis_outer`, `parameters.axis_inner` — normalized three-element vectors specifying the outer and inner rotor axes.
-- `parameters.rank_outer`, `parameters.rank_inner` — maximum harmonic ranks retained for the outer and inner rotors. Increase them until convergence; the source notes that the rank is approximately the number of spinning sidebands in the spectrum.
-- `parameters.rframes` — rotating-frame specification; see the header of `rotframe.m`. When used, the assumptions for the affected spins should be in the laboratory frame.
-- `parameters.grid` — spherical-grid file name from the kernel `grids` directory. Use a two-angle grid in Liouville space and a three-angle grid in Hilbert space.
-- `parameters.needs` — cell array of sequence requirements. `'iso_eq'` requests the thermal-equilibrium state of the isotropic Hamiltonian in `parameters.rho0`.
-- `parameters.serial` — when true, disables automatic parallelisation.
-- `parameters.sum_up` — defaults to 1 and returns the powder average; set to 0 to return each orientation's result in a cell array.
-- Other `parameters` subfields may be required by the pulse sequence; consult its documentation.
+## Parameters and grids
 
-The wrapper sets `parameters.spc_dim` to the rotor-trajectory space dimension and `parameters.spn_dim` to the spin-dynamics matrix dimension before calling the sequence.
+- `parameters.rate_outer` and `rate_inner`: rotor rates in Hz.
+- `parameters.axis_outer` and `axis_inner`: normalized three-component vectors for the rotor axes.
+- `parameters.rank_outer` and `rank_inner`: retained harmonic ranks; increasing them increases the corresponding phase-grid size and retained Fourier content.
+- `parameters.grid`: spherical orientation-averaging grid. This is distinct from the two rotor-phase grids. The returned `sph_grid` contains Euler angles and quadrature weights.
+- `parameters.rframes`, offsets, and sequence-specific fields may further configure the calculation. The initial condition and other sequence requirements are conveyed through the usual context parameters.
 
-## Outputs
+The powder weights combine orientation-level sequence outputs when `parameters.sum_up` is enabled; with it disabled, the orientation results are returned separately. Liouville calculations accept two-angle spherical grids. The Hilbert-space rotor-stack route requires a three-angle grid when more than one orientation is used. The source notes that its state-projector treatment assumes a powder and does not support single-crystal DOR.
 
-- `answer` — the weighted powder average, or, when `parameters.sum_up` is 0, the pulse-sequence outputs for individual orientations.
-- `sph_grid` — the spherical grid used in the calculation.
+## Source-supported example
 
-## Notes
-
-- Arbitrary-order rotating-frame transformations, including infinite order, are supported; see the header of `rotframe.m`.
-- The state projector assumes a powder; single-crystal DOR is not currently supported.
-- Parallel processing through MATLAB's Distributed Computing Toolbox is supported, with system orientations evaluated in parallel.
+`examples/nmr_solids/dor_powder_nav_fplanck_time.m` uses the Liouville route for 14N, with outer/inner rates of 1 MHz and 5 MHz, ranks 7 and 4, and the `rep_2ang_100pts_oct` orientation grid. Its header explicitly says those spinning frequencies are intentionally high to shorten this example, not representative experimental settings. The related frequency-domain example is `examples/nmr_solids/dor_powder_nav_fplanck_freq.m`.

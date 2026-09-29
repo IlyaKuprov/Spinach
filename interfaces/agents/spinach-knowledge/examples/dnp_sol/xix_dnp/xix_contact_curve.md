@@ -1,19 +1,25 @@
 # examples/dnp_sol/xix_dnp/xix_contact_curve.m
 
-- Signature: `xix_contact_curve()`
+- MATLAB implementation: [examples/dnp_sol/xix_dnp/xix_contact_curve.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/xix_dnp/xix_contact_curve.m)
+
+**Entry point:** xix_contact_curve() (no input arguments).
 
 ## Purpose
 
-Tracks transfer from electron polarization (-E_z) to proton polarization (I_z) during an X-inverse-X (XiX) DNP contact. Further information: https://doi.org/10.1021/jacs.1c09900. Calculation time: seconds.
+Calculates and plots the proton I_z expectation during an X-inverse-X (XiX) DNP contact, following transfer from electron −E_z to proton I_z. The source lists a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin system and sequence
 
-The model contains a trityl electron and two protons, with anisotropic Zeeman terms, specified coordinates, and a spin temperature of 80 K. XiX irradiation drives the electron–nuclear dynamics; the detected signal is the real expectation value of proton (L_z).
+The Q-band model contains one electron and two protons, with **sys.magnet=1.2142**, electron Zeeman principal values [2.00319, 2.00319, 2.00258], proton Zeeman values [0, 0, 5] and [0, 5, 0] (identified as ppm guesses in the source), and Cartesian coordinates [0,0,0], [0,3.5,0], and [2.475,2.475,0]. The spin temperature is set to 80, with a full **zeeman-hilb** basis and no approximation.
 
-## Numerical / algorithmic content
+The experiment uses **spins={'E','1H'}**, electron nutation frequency 17.8 MHz (**irr_powers=17.8e6** Hz), 48 ns pulses, 80 XiX blocks, an inverted second-pulse phase of π, and the 1600-point **rep_2ang_1600pts_sph** powder grid. Its offset argument is [46.5e6,0] Hz: the source forms this from the −13 MHz reference point and a 59.5 MHz offset. The script sets **parameters.needs={'aniso_eq'}**.
 
-The script evaluates a contact curve with the ESR powder simulation on the `rep_2ang_1600pts_sph` grid. It uses 80 XiX blocks, each pulse lasting 48 ns, and plots 81 samples over the corresponding total contact time.
+## Calculation and output
 
-## Implementation structure
+The script constructs the spin system and basis, detects proton **Lz**, then calls **powder(spin_system,@xixdnp,parameters,'esr')**. It plots the real part of the returned contact curve against a time vector from zero to **2*pulse_dur*nloops** seconds (7.68 μs, with **nloops+1** points) and labels the ordinate as proton I_z expectation.
 
-It constructs a full Zeeman–Hilbert basis, detects proton (L_z), and calls `powder` with `@xixdnp`. The irradiation uses the electron and one proton, a 17.8 MHz electron nutation frequency, and the specified offset; the plotted curve is the real-valued result.
+Dependencies are Spinach system, basis, and state construction; **powder** and the **xixdnp** sequence; and the **kfigure**, **kxlabel**, and **kylabel** plotting helpers.
+
+## Reference
+
+[XiX DNP paper, DOI: 10.1021/jacs.1c09900](https://doi.org/10.1021/jacs.1c09900).

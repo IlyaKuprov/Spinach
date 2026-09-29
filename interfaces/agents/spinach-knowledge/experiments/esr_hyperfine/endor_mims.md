@@ -1,39 +1,22 @@
 # experiments/esr_hyperfine/endor_mims.m
 
-- Signature: `fid=endor_mims(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_hyperfine/endor_mims.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_hyperfine/endor_mims.m)
 
-## Purpose
+Signature: fid=endor_mims(spin_system,parameters,H,R,K)
 
-Mims ENDOR pulse sequence with ideal hard pulses. Syntax: fid=endor_mims(spin_system,parameters,H,R,K)
+## Purpose and physical sequence
 
-## Physical / mathematical content
+This routine simulates Mims ENDOR using ideal hard pulses. It prepares electron Lz magnetization, applies electron pi/2 – tau – pi/2 pulses, selects zero electron coherence, applies a nuclear pi/2 pulse, and selects nuclear coherence orders -1 and +1. It propagates the indirect nuclear-frequency dimension, applies the phase-difference nuclear-pulse operation, then applies an electron pi/2 refocusing pulse and detects the stimulated echo on the electron L+ state after tau. The returned FID Fourier-transforms to a Mims ENDOR signal.
 
+This is a simulated hyperfine-sensitive electron–nuclear sequence, not a measured acquisition. Its sweep parameter is a nuclear-frequency sweep width; the function does not sweep the static magnetic field and does not implement DNP, hyperpolarization, or spatial imaging.
 
-- The Mims ENDOR sequence selects electron zero-order coherence, applies a nuclear pulse, and detects the resulting electron coherence; nuclear coherence orders are selected during the pulse pathway.
-- The evolution generator combines the Hamiltonian, relaxation, and kinetics terms as `L = H + iR + iK`.
+## Inputs and numerical settings
 
-## Numerical / algorithmic content
+- spin_system; H, R, and K are the spin system and context-provided Hamiltonian, relaxation, and kinetics matrices. The matrices must have identical dimensions. Supported formalisms are sphten-liouv and zeeman-liouv; conversion to the adjoint representation is performed if needed.
+- parameters.sweep: nuclear frequency sweep width, in Hz. It sets the indirect-dimension time step to 1/sweep seconds.
+- parameters.npoints: number of FID points.
+- parameters.tau: stimulated-echo time, in seconds.
 
+The implementation uses pi/2 rotations and propagates npoints-1 further indirect-dimension points. The source gives no worked numeric sweep-width or tau example. Relaxation and kinetics enter through L = H + 1i*R + 1i*K; the output is the electron-coil-detected FID, not a spectrum already Fourier transformed.
 
-- The indirect time-domain trajectory is sampled at spacing `1/parameters.sweep`; `parameters.npoints` controls the number of points.
-- The routine propagates with `step()` and `evolution()` and returns the resulting time-domain ENDOR signal; FFT processing is downstream, not performed here.
-
-## Parameters / inputs
-
-- parameters.sweep nuclear frequency sweep width, Hz
-- parameters.npoints number of fid points to be computed
-- parameters.tau stimulated echo time, seconds
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid -free induction decay whose Fourier transform is the
-- Mims ENDOR signal
-
-## Implementation structure
-
-
-- Converts the system to the adjoint representation when required, validates the Liouville-space inputs, and constructs electron and nuclear pulse operators.
-- Applies the Mims pulse and coherence-selection sequence, evolves the indirect dimension, and returns the sampled trajectory.
+Source: https://spindynamics.org/wiki/index.php?title=endor_mims.m

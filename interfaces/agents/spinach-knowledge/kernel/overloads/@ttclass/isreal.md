@@ -1,23 +1,18 @@
 # kernel/overloads/@ttclass/isreal.m
 
-- Signature: `answer=isreal(tt)`
+[Mapped MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/isreal.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/isreal.m)
 
-## Purpose
+## Signature
 
-Tests whether a tensor-train object's stored coefficients and core arrays are real-valued.
+`answer=isreal(tt)`
 
-## Numerical / algorithmic content
+## Behaviour
 
-The function first checks all entries of `tt.coeff`. If they are real, it checks the core array for every train and returns early when a non-real core is found. A non-`ttclass` input raises an error.
+For a `ttclass` input, the method first evaluates `all(isreal(tt.coeff))`. Only if that is true does it visit every stored core `tt.cores{k,n}` for `n=1:tt.ntrains` and `k=1:tt.ncores`; it returns early when a core is not real. Thus the predicate covers the stored coefficients and core entries, rather than forming or inspecting a materialized tensor. It applies no conjugation and changes no train data.
 
-## Parameters / inputs
+A non-`ttclass` input raises the error `input is not a ttclass.`.
 
-- tt -tensor train object
+## Input and output
 
-## Outputs
-
-- answer -logical true when all coefficients and core elements of the tensor train are real
-
-## Implementation structure
-
-The coefficient check uses `all(isreal(tt.coeff))`; core checks use `isreal` on each stored core. Core traversal is skipped if a coefficient is non-real.
+- `tt` — tensor-train object.
+- `answer` — logical result of the coefficient and core checks.

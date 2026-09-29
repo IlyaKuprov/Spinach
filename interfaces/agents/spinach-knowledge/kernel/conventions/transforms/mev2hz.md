@@ -1,18 +1,11 @@
 # kernel/conventions/transforms/mev2hz.m
 
-- Signature: `hz=mev2hz(mev)`
+Source implementation: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/mev2hz.m
+Spinach Wiki: [mev2hz.m](https://spindynamics.org/wiki/index.php?title=mev2hz.m)
 
 ## Purpose
 
-Converts energy values from millielectronvolts (meV) to frequency in hertz (Hz).
-
-## Physical / mathematical content
-
-Using `E=h*nu` and the exact electronvolt-to-joule conversion, `hz=(1e-3*1.602176634e-19/6.62607015e-34)*mev`.
-
-## Numerical / algorithmic content
-
-The conversion is a constant elementwise scaling; there are no optional arguments or defaults.
+Converts energy values in milli-electronvolts (meV), as used in solid-state physics and phonon spectroscopy, to frequency in hertz (Hz), used in magnetic resonance. It applies E = h times nu using the exact electronvolt-to-joule factor in the implementation.
 
 ## Syntax
 
@@ -20,14 +13,16 @@ The conversion is a constant elementwise scaling; there are no optional argument
 hz=mev2hz(mev)
 ```
 
-## Parameters / inputs
+## Input
 
-- `mev` — a real numeric array of any dimensions, containing energies in meV.
+- `mev` is a numeric array of real values in meV. Arrays of any dimensions are accepted; no separate shape restriction is imposed.
 
-## Outputs
+## Output and conversion
 
-- `hz` — an array of frequencies in Hz with the same dimensions as `mev`.
+- `hz` is an array of values in Hz with the same dimensions as `mev`.
 
-## Implementation structure
+The function applies the elementwise scaling
 
-The function checks that the input is numeric and real, then applies the conversion factor.
+`hz = (1e-3 * 1.602176634e-19 / 6.62607015e-34) * mev`.
+
+The factors are the meV-to-eV multiplier, the exact electronvolt value in joules, and the exact Planck constant in joule-seconds, respectively. The function has no optional arguments or defaults.

@@ -1,36 +1,33 @@
 # kernel/utilities/dihedral.m
 
-- Signature: `phi=dihedral(A,B,C,D)`
-
 ## Purpose
 
-Computes the dihedral angle for four atoms assumed to be bonded in the order A-B-C-D.
+Computes the dihedral angle between vectors specified by four sets of atomic coordinates, for atoms assumed to be bonded as A-B-C-D.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dihedral.m>
 
-The result is a dihedral angle in degrees.
+## Behavior
 
-## Numerical / algorithmic content
+- Syntax: `phi=dihedral(A,B,C,D)`.
+- The function first validates its arguments via an internal consistency check (`grumble`), which errors with the message `'the arguments must be 3-element row vectors of real numbers.'` if any argument is non-numeric, non-real, does not contain exactly 3 elements, or is not a row vector.
+- Unit direction vectors are formed along the three bonds: `b1=(B-A)/norm(B-A,2)`, `b2=(C-B)/norm(C-B,2)`, `b3=(D-C)/norm(D-C,2)`.
+- The dihedral angle is computed as `phi=180*atan2(dot(norm(b2,2)*b1,cross(b2,b3)),dot(cross(b1,b2),cross(b2,b3)))/pi`, i.e. via a two-argument arctangent of a dot product against a cross product, converted from radians to degrees by the factor `180/pi`.
 
-The function normalizes the three successive bond vectors `B-A`, `C-B`, and `D-C`, then uses their dot and cross products in `atan2` to calculate the angle. It converts the result from radians to degrees.
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
 
-- A -row vector of cartesian coordinates
-- for atom A
-- B -row vector of cartesian coordinates
-- for atom B
-- C -row vector of cartesian coordinates
-- for atom C
-- D -row vector of cartesian coordinates
-- for atom D
+- `A` — row vector of Cartesian coordinates for atom A.
+- `B` — row vector of Cartesian coordinates for atom B.
+- `C` — row vector of Cartesian coordinates for atom C.
+- `D` — row vector of Cartesian coordinates for atom D.
 
-## Outputs
+Each must be a 3-element row vector of real numbers.
 
-- phi -dihedral angle, degrees
+Output:
 
-## Implementation structure
+- `phi` — dihedral angle, in degrees.
 
-The function first checks that each argument is a real, numeric, three-element row vector, then computes the dihedral angle.
+## References
 
-Source reference: <https://spindynamics.org/wiki/index.php?title=dihedral.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=dihedral.m>

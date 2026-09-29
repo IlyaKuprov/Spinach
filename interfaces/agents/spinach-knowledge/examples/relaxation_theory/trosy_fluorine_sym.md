@@ -4,21 +4,12 @@
 
 ## Purpose
 
-Calculate transverse relaxation and broad and narrow TROSY line rates as functions of magnetic field for `19F` and its directly bonded `13C` in a 3-fluorotyrosine-labelled protein. The calculation also separates the `13C` TROSY rate into dipole–dipole (DD), chemical-shift anisotropy (CSA), and DD–CSA cross-correlation contributions. The source describes the analytical calculation time as seconds.
+An analytical dipole-dipole/chemical-shift-anisotropy calculation of field-dependent TROSY relaxation rates for the `19F` and bonded `13C` in the source's 3-fluorotyrosine model. Coordinates and shift tensors are taken from `3_fluoro_tyr.log`; the source passes them to `rlx_dd_csa` with correlation-time parameter `25e-9` (no unit is annotated for this parameter). The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Rates and plotted mechanisms
 
-- The calculation uses the fluorine and carbon shielding tensors and atomic coordinates extracted from a 3-fluorotyrosine DFT calculation.
-- `rlx_dd_csa` returns total `R2` rates and broad and narrow TROSY rates for both nuclei, plus the DD, CSA, and cross-correlation contributions used for the `13C` mechanism plot.
+The calculation samples 20 fields corresponding to proton Larmor frequencies from 200 to 800 MHz. It plots broad and narrow TROSY line rates together with the total transverse rate for fluorine and carbon; the axes are labelled proton Larmor frequency in MHz and relaxation matrix element in Hz. A third plot decomposes the carbon TROSY rate into dipole-dipole, CSA, and DD-CSA cross-correlation contributions. The source plots the cross term as `-abs(c_tro_xc)`, making the interference contribution visible alongside the two positive mechanism terms.
 
-## Numerical / algorithmic content
+These are calculated relaxation rates and mechanism contributions from the analytical function, not measured line widths or an experimental spectrum. This example calls `rlx_dd_csa`; it does not set up a Bloch-Redfield or stochastic-Liouville spin-system calculation in this file.
 
-- Read `../standard_systems/3_fluoro_tyr.log` with `gparse` and `g2spinach`, mapping carbon to `13C` and fluorine to `19F` with the supplied values `[186.38 192.97]`.
-- Extract shielding tensors and coordinates from entries 8 (`19F`) and 7 (`13C`) of the resulting interaction data.
-- Evaluate 20 proton Larmor frequencies from 200 to 800 MHz and convert them to magnetic fields using `spin('1H')`.
-- At each field, call `rlx_dd_csa` with a `25e-9` s timescale, the nuclei `{'19F','13C'}`, their shielding tensors, and their coordinates.
-
-## Implementation structure
-
-- Plot broad TROSY, total `R2`, and narrow TROSY rates against proton Larmor frequency separately for `19F` and `13C`.
-- Plot the `13C` TROSY DD and CSA contributions alongside `-abs` of the DD–CSA cross-correlation contribution in a stacked bar chart. Plot rates are labelled in Hz.
+Source: [examples/relaxation_theory/trosy_fluorine_sym.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_fluorine_sym.m).

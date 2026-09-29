@@ -1,36 +1,25 @@
 # experiments/imaging/epi_2d.m
 
 - Signature: `mri=epi_2d(spin_system,parameters,H,R,K,G,F)`
+- Canonical MATLAB source: [`experiments/imaging/epi_2d.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/epi_2d.m)
 
-## Purpose
+## Contract and sequence
 
-Diffusion-weighted echo-planar 2D imaging pulse sequence with variable diffusion-encoding direction. Call this function from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`.
+This is a diffusion-weighted, two-dimensional echo-planar MRI simulation with variable diffusion-encoding direction. Call it from the `imaging()` context, which supplies `H`, `R`, `K`, `G`, and `F`. It forms `B=H+F+1i*R+1i*K`, uses `G{1}` along X for phase encoding and `G{2}` along Y for readout, and expands the requested `parameters.spins{1}` `Lx` and `Ly` pulse operators over the spatial grid.
 
-## Parameters
+The sequence starts with a hard pi/2 about `Ly`, optionally applies a diffusion gradient with X/Y amplitudes from `diff_g_amp`, applies a hard pi about `Lx`, and, when enabled, repeats that diffusion-gradient evolution. The prephasers bring the phase-encoding and readout gradients together for the shorter duration, with any remaining half-duration evolved separately. The readout propagators use opposite signs of the Y gradient. Successive phase-encoding rows alternate readout polarity; the negative-polarity row is stored in reverse readout order. After each row, the phase-encoding propagator advances the state.
 
-- `parameters.pe_grad_dur`: phase-encoding gradient duration (X), in seconds; a positive real scalar.
-- `parameters.ro_grad_dur`: readout gradient duration (Y), in seconds; a positive real scalar.
-- `parameters.pe_grad_amp`, `parameters.ro_grad_amp`: phase-encoding and readout gradient amplitudes, each a real scalar.
-- `parameters.image_size`: two integers greater than one, giving the number of points in each image dimension.
-- `parameters.diff_g_amp` (optional): two real diffusion-gradient amplitudes in X and Y, in T/m. If specified, `parameters.diff_g_dur` is required.
-- `parameters.diff_g_dur` (optional): diffusion-gradient duration in seconds; if present, a positive real scalar.
-- `parameters.npts`: vector of positive integers used to construct the spatial pulse operators.
-- `parameters.spins`: nonempty cell array of character strings; the first entry selects the spin for the pulse operators.
-- `parameters.rho0`: numeric initial state.
-- `parameters.coil`: numeric detection operator.
+The acquisition matrix `fid` has `parameters.image_size` shape. Each readout/phase increment is propagated for `ro_grad_dur/(image_size(2)-1)` or `pe_grad_dur/(image_size(1)-1)` seconds. The matrix is square-sinebell apodised in both dimensions and transformed as `real(fftshift(fft2(ifftshift(fid))))`; the returned `mri` therefore has the same two-dimensional grid size. These are simulated sampled data and a computed image, not a measured scan. The source does not specify a calibrated field of view or physical k-space units.
 
-The function supports the `sphten-liouv` and `zeeman-liouv` formalisms. `H`, `R`, `K`, and `F` must be numeric matrices of the same size; `G` must be a cell array containing at least two gradient operators.
+## Parameters, units, and constraints
 
-## Sequence and reconstruction
+- `parameters.pe_grad_dur` (phase encode, X) and `parameters.ro_grad_dur` (readout, Y): positive scalar durations in seconds.
+- `parameters.image_size`: two integers, each at least 2; these set the phase and readout sample counts.
+- `parameters.diff_g_amp`: optional two-element real X/Y vector in T/m; when present it requires `parameters.diff_g_dur`, a positive scalar in seconds.
+- `parameters.pe_grad_amp` and `parameters.ro_grad_amp` are also used to scale `G{1}` and `G{2}` in the code. The source help text does not state their units, so use the gradient/operator convention of the calling imaging setup rather than assuming a calibration here.
+- The function also requires numeric `parameters.rho0` and `parameters.coil`, a positive-integer `parameters.npts` vector, and nonempty `parameters.spins` cell array. `H`, `R`, `K`, and `F` must be same-size matrices, while `G` must contain at least two gradient operators.
 
-The background operator is `B=H+F+1i*R+1i*K`. The sequence applies an ideal 90-degree `Ly` pulse. If `diff_g_amp` is supplied, the X and Y diffusion gradients are applied for `diff_g_dur` before an ideal 180-degree `Lx` pulse and again after it.
+## References
 
-Phase-encoding and readout gradients are prephased together for half the shorter gradient duration; any remaining half-duration of the longer prephaser is applied separately. The phase-encoding loop alternates the readout-gradient sign between lines, records the coil signal into k-space, and advances under the phase-encoding gradient. The k-space data receive square-sinebell apodisation in both dimensions.
-
-## Output
-
-- `mri`: MRI image computed as `real(fftshift(fft2(ifftshift(fid))))` from the apodised k-space data.
-
-## Reference
-
-<https://spindynamics.org/wiki/index.php?title=epi_2d.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=epi_2d.m>
+- Source: [`experiments/imaging/epi_2d.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/epi_2d.m)

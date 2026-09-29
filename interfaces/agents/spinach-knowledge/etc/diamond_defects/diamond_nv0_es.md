@@ -1,29 +1,33 @@
 # etc/diamond_defects/diamond_nv0_es.m
 
-- Signature: [sys,inter]=diamond_nv0_es(parameters)
+- MATLAB implementation: [etc/diamond_defects/diamond_nv0_es.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_nv0_es.m)
+
+- Signature: `[sys,inter]=diamond_nv0_es(parameters)`
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=diamond_nv0_es.m)
+- Magnetic parameters: Felton et al., *Phys. Rev. B* **77**, 081201 (2008), https://doi.org/10.1103/PhysRevB.77.081201.
 
 ## Purpose
 
-Returns the NV0 excited-state electron–nitrogen spin system for diamond. Magnetic parameters are from Felton et al., *Phys. Rev. B* **77**, 081201 (2008), https://doi.org/10.1103/PhysRevB.77.081201.
+Builds the NV`0` excited-state electron–nitrogen spin-system specifications. The effective electron is a quartet (`E4`, spin 3/2), coupled to one nitrogen. The function returns model matrices; it does not propagate dynamics or simulate an experiment.
 
-## Physical / mathematical content
+## Call and inputs
 
-The effective electron has spin 3/2 (E4), with principal g values 2.0035, 2.0035, and 2.0029 and axial zero-field splitting D = 1685 MHz. The nitrogen hyperfine principal values for 15N are -23.8, -23.8, and -35.7 MHz. For 14N they are scaled by the ratio of nuclear gyromagnetic ratios. No nitrogen quadrupole interaction is included because none is reported for this state.
+Call `[sys,inter]=diamond_nv0_es(parameters)` with exactly one structure argument. Required fields:
 
-## Numerical / algorithmic content
+- `parameters.orientation`: exactly `'111'`, `'110'`, or `'100'`; the corresponding crystal-plane normal is aligned with the applied field (`z`).
+- `parameters.nitrogen`: exactly `'14N'` or `'15N'`.
 
-The routine constructs the trigonal principal-axis frame, rotates the electron Zeeman, zero-field-splitting, and hyperfine tensors for the requested crystal orientation, and stores them in Spinach's interaction matrices.
+Example: `[sys,inter]=diamond_nv0_es(struct('orientation','111','nitrogen','14N'));`
 
-## Parameters / inputs
+## Magnetic model
 
-- parameters.orientation: '111', '110', or '100'; the corresponding crystal-plane normal is aligned with the magnetic field.
-- parameters.nitrogen: '14N' or '15N'.
+In the principal frame the electron g values are `[2.0035, 2.0035, 2.0029]`, axial zero-field splitting is `D=1685 MHz`, and the `15N` hyperfine values are `[−23.8, −23.8, −35.7] MHz`. The `14N` hyperfine tensor is obtained by multiplying those values by `spin('14N')/spin('15N')`. No `14N` nuclear quadrupole interaction is added because the source says none is reported for this state.
 
-## Outputs
+The selected plane normal is rotated to the laboratory field axis. The output specifies electron and nitrogen isotope labels, the rotated electron Zeeman tensor, electron zero-field splitting converted to Spinach's interaction representation, and electron–nitrogen hyperfine coupling.
 
-- sys: Spinach system specification structure.
-- inter: Spinach interaction specification structure.
+## Outputs and scope
 
-## Implementation structure
+- `sys` contains `'E4'` and the selected nitrogen isotope.
+- `inter` contains the Zeeman and zero-field-splitting electron terms and the nitrogen hyperfine tensor.
 
-The function validates both input fields, selects the isotope-specific hyperfine tensor, applies the orientation rotation, and returns the E4–nitrogen system with its Zeeman, zero-field-splitting, and hyperfine interactions.
+This is specifically the NV`0` excited-state parameterization; it is not the NV`−` ground-state model and includes no NQI term.

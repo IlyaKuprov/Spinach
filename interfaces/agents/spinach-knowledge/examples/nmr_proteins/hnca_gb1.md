@@ -1,23 +1,22 @@
 # examples/nmr_proteins/hnca_gb1.m
 
 - Signature: `hnca_gb1()`
+- Source: [examples/nmr_proteins/hnca_gb1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/hnca_gb1.m)
 
-## Purpose
+## Task and input
 
-Simulates an HNCA spectrum of GB1 protein, assuming that only the backbone is 13C,15N-labelled. The source notes a calculation time of minutes, faster with a Tesla A100 GPU.
+A forward simulation of a three-dimensional HNCA spectrum for GB1. The source assumes only the backbone is `13C,15N`-labelled. It calls `protein('2N9K.pdb','2N9K.bmrb',options)` with `pdb_mol=1`, `noshift='delete'`, and `select='backbone-minimal'`. These inputs construct the protein spin system; the script does not load a measured spectrum or compare the simulated result with experimental data. No paramagnetic centre or electron-spin interaction is specified.
 
-## Physical / mathematical content
+## Spin model and basis
 
-The example imports GB1 protein data from `2N9K.pdb` and `2N9K.bmrb`, selecting the minimal backbone with `options.select='backbone-minimal'` and deleting spins without shifts. It sets the magnetic field to 14.1 and simulates the `hnca` liquid-state NMR sequence for `15N`, `13C`, and `1H`.
+The field literal is `14.1` (unit not stated). The interaction and proximity cutoffs are `2.0` and `4.0`. The basis uses `sphten-liouv`, approximation `IK-1`, connectivity `scalar_couplings`, interaction level `4`, and proximity level `1`. The active algorithmic options enable `greedy` and disable `krylov`; the source's `% 'gpu'` text is a comment, not an enabled option.
 
-## Numerical / algorithmic content
+## Sequence, acquisition, and processing
 
-The simulation uses the `sphten-liouv` formalism with the `IK-1` approximation and scalar-coupling connectivity. It enables the `greedy` option and explicitly disables `krylov`; the commented `'gpu'` option is not enabled. The four acquired components receive squared-cosine apodisation in all three dimensions. FFTs with zero filling and `fftshift` are applied along F3, F2, and F1; conjugate combinations form the absorption components before the final spectrum is plotted.
+The `@hnca` sequence dimensions are `{'15N','13C','1H'}`. The source sets sweep `[2800 5000 3000]`, offset `[-7200 8600 5100]`, acquisition points `[128 128 128]`, zero-fill sizes `[256 256 256]`, and `axis_units='ppm'`. The source does not state units for the sweep or offset literals.
 
-## Implementation structure
+The `liquid(spin_system,@hnca,parameters,'nmr')` call generates simulated FIDs. Each of `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg` is apodised with `sqcos` in all dimensions. The zero-filled, shifted F3 transforms are combined as `f3_pos=f3_pos_pos+conj(f3_neg_neg)` and `f3_neg=f3_neg_pos+conj(f3_pos_neg)`; after the F2 transforms the source combines `f3f2_pos+conj(f3f2_neg)`, then transforms along F1.
 
-1. Import the protein data with `protein('2N9K.pdb','2N9K.bmrb',options)`; set `sys.magnet=14.1`, `sys.tols.inter_cutoff=2.0`, and `sys.tols.prox_cutoff=4.0`.
-2. Configure the basis with `bas.inter_level=4` and `bas.prox_level=1`, then build the spin system using `create` and `basis`.
-3. Set spin order to `{'15N','13C','1H'}`, sweep widths to `[2800 5000 3000]`, offsets to `[-7200 8600 5100]`, acquisition points to `[128 128 128]`, zero-fill sizes to `[256 256 256]`, and axis units to `ppm`.
-4. Run `fid=liquid(spin_system,@hnca,parameters,'nmr')`, apodise `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg`, and assemble the three-dimensional Fourier-domain spectrum.
-5. Plot `-real(spectrum)` with `plot_3d`.
+## Output and scope
+
+The plot is `-real(spectrum)`, using threshold `10`, bounds `[0.1 0.5 0.1 0.5]`, dimension `2`, and selection `'positive'`. The source says calculation takes minutes and is faster with a Tesla A100 GPU; it does not activate the commented `gpu` option. No spectrum-file export is coded.

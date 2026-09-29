@@ -1,26 +1,23 @@
 # examples/optimal_control/state_transfer_pro.m
 
+Source: [examples/optimal_control/state_transfer_pro.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/state_transfer_pro.m)
+
 - Signature: `state_transfer_pro()`
 
-## Purpose
+## Design objective
 
-Optimise a pulse for magnetisation transfer from H(N) to C(O) in a typical protein backbone spin system, using literature shifts and couplings. The optimisation spans pulse powers to emulate B1 inhomogeneity and offsets to account for imperfect transmitter placement. It uses LBFGS-GRAPE with point-by-point waveform variation and a pulse-amplitude penalty.
+Design a shaped pulse that transfers magnetisation from the amide `1H` (spin 2) to the carbonyl `13C` (spin 5) in a six-spin protein-backbone model. The source describes a robustness ensemble for transmitter placement and RF-amplitude variation, optimized with point-by-point LBFGS-GRAPE and an amplitude penalty.
 
-## Physical / mathematical content
+## Spin model and states
 
-- The spin system contains six nuclei at a 9.4 T magnetic field, with specified chemical shifts and scalar couplings.
-- The initial and target states are normalised `Lz` states on H and C, respectively. Control operators act on the `1H`, `13C`, and `15N` channels.
-- The optimisation uses three offsets from −100 to 100 Hz on each channel and five pulse-power levels from 0.9 to 1.1 kHz, converted to rad/s.
+The model uses isotopes `15N, 1H, 13C, 13C, 13C, 15N`, a field setting of `sys.magnet=9.4`, and the source's textbook shift values `[119.79, 8.03, 57.32, 27.71, 177.25, 115.55]` ppm. Its nonzero scalar couplings are 1–3: −11 Hz, 2–3: 140 Hz, 3–4: 35 Hz, 3–5: 55 Hz, 3–6: 7 Hz, and 5–6: −15 Hz. The basis is spherical-tensor Liouville space (`sphten-liouv`) with `IK-0` approximation. The normalized initial and target operators are `Lz` on spins 2 and 5, respectively.
 
-## Numerical / algorithmic content
+## Robust pulse design
 
-- The basis uses the `sphten-liouv` formalism and `IK-0` approximation. The pulse has 500 slices of 40 µs each.
-- `fmaxnewton` optimises the waveform with `grape_xy` using the `lbfgs` method, an `NS` penalty of weight 0.01, and a maximum of 500 iterations.
-- A test simulation applies the optimised pulse with `shaped_pulse_xy` and reports the real overlap with the target state.
+Three channels control `1H`, `13C`, and `15N`, with x/y controls for each. The ensemble contains three offsets per channel on the grid −100, 0, and 100 Hz. The drift Hamiltonian is shifted using source settings `[3214, 10000, -4800]` for the three transmitters; the source does not annotate units on this separate transmitter-placement vector. Five RF power levels span `2*pi*0.9e3` to `2*pi*1.1e3 rad/s`. The waveform has 500 slices of 40 microseconds each (20 ms total), uses the `NS` penalty with weight 0.01, and allows up to 500 LBFGS iterations.
 
-## Implementation structure
+The random 6-by-500 initial guess is seeded with a short y-control segment on the proton channel and a terminal y-control segment on the carbon channel; these are starting-guess features, not a claim about the optimized waveform. `fmaxnewton` is called with `@grape_xy`; the resulting pulse is scaled by the mean power level and propagated with `shaped_pulse_xy`.
 
-- Define the magnetic field, spin system, chemical shifts, scalar couplings, and basis; then create the Spinach spin system.
-- Construct the initial and target states, control and offset operators, drift Hamiltonian, and transmitter offsets.
-- Configure the control ensemble and initialise a waveform guess that starts with a `1H` pulse and ends with a `13C` pulse. Optimise, scale the result by the mean power level, and run the test simulation.
-- Estimated calculation time: hours. Reference: http://dx.doi.org/10.1016/j.jmr.2011.07.023
+## What the example reports
+
+The script computes and reports `real(rho_targ'*rho)` after the test propagation. The source gives no numerical value for the computed overlap or optimization fidelity. The source estimates calculation time as hours. It cites [DOI 10.1016/j.jmr.2011.07.023](https://doi.org/10.1016/j.jmr.2011.07.023).

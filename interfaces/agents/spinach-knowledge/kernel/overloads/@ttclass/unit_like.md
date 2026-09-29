@@ -1,29 +1,20 @@
 # kernel/overloads/@ttclass/unit_like.m
 
-- Signature: `A=unit_like(A)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/unit_like.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/unit_like.m)
 
-## Purpose
+## Signature
 
-Returns a unit object of the same type as whatever is supplied.
+`A=unit_like(A)`
 
-## Physical / mathematical content
+## Purpose and behavior
 
-Returns an identity matrix or tensor-train representation for a square matrix.
+Returns an identity in the same representation family as a square matrix or square-operator tensor train.
 
-## Numerical / algorithmic content
+For a `ttclass` input, the function checks that every core has equal row and column mode sizes. It then creates one local `eye(mode_size)` matrix per core and calls `ttclass(1,core,0)`. The result is a single rank-one tensor train with the same local mode dimensions, coefficient 1, and tolerance 0; input coefficients, buffered columns, and bond ranks are not copied.
 
-For a tensor-train input, the function checks that each core has matching row and column mode sizes, creates an identity matrix for each core, and constructs `ttclass(1,core,0)`. For a sparse square matrix it returns `speye(size(A))`; for a dense square matrix it returns `eye(size(A))`. Other inputs, including tensor trains that do not represent square matrices, raise an error.
+For a square sparse matrix it returns `speye(size(A))`; for a square full matrix it returns `eye(size(A))`. A nonsquare matrix or a tensor train with any unequal local row and column mode size raises an error.
 
-## Syntax
+## Input and output
 
-```matlab
-A=unit_like(A)
-```
-
-## Parameters / inputs
-
-- `A` — a full or sparse square matrix, or a tensor-train representation of a square matrix.
-
-## Outputs
-
-- `A` — a unit matrix in the same format.
+- `A` — a full or sparse square matrix, or a `ttclass` representation whose local row and column mode sizes match.
+- `A` — an identity matrix or tensor-train identity in the corresponding representation family.

@@ -1,19 +1,17 @@
 # examples/fundamentals/correlation_function_1.m
 
+- MATLAB implementation: [examples/fundamentals/correlation_function_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/correlation_function_1.m)
+
 - Signature: `correlation_function_1()`
 
-## Purpose
+## What is compared
 
-Compares a Monte Carlo estimate with the analytical Spinach result for the rotational correlation function `G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>`. The example tests isotropic rotational diffusion; `sigma_iso` sets the rotational-rate scale, and the indices select the correlated Wigner-function elements.
+This example compares a finite Monte Carlo trajectory with Spinach's analytical correlation-function expansion for `G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>`. The source uses the prime on the second Wigner element and selects `k=-1, m=2, p=-1, q=2`; it converts each index from `[-L,L]` to MATLAB indexing by adding `L+1`. The case is isotropic rotational diffusion, with `sigma_iso=0.1` and rank `L=2`.
 
-## Physical / mathematical content
+## Numerical construction
 
-The test uses `sigma_iso=0.1`, rank `L=2`, and indices `k=-1, m=2, p=-1, q=2` (converted from `[-L,L]` indexing to MATLAB array indices). The analytical model is represented with Redfield relaxation and correlation time `1/(3*sigma_iso^2)`.
+The Monte Carlo trajectory has `1e6` steps and requests `nlags=300`. At each step, three independent standard-normal increments weight the three displayed skew-symmetric rotation generators equally by `sigma_iso`; their sum is exponentiated and right-multiplied into the direction-cosine matrix, starting from `eye(3)`. A `parfor` loop converts each saved matrix through `dcm2euler` and `wigner(L,...)`; the selected Wigner elements are passed to normalized `xcorr`. The code multiplies that result by `1/(2*L+1)`, applies `ifftshift` to the correlation and lag vector, and plots the first 300 entries (lag points 0 through 299).
 
-## Numerical / algorithmic content
+## Analytical construction and observable
 
-A Monte Carlo trajectory of `1e6` rotations is generated from Gaussian increments, with `nlags=300`. Each direction-cosine matrix is converted to Euler angles and then to Wigner functions; normalized cross-correlation is compared with the exponential sum returned by Spinach's `corrfun` calculation.
-
-## Implementation structure
-
-The script constructs and stores the rotation-matrix trajectory, computes the selected Wigner-element cross-correlation, builds a one-spin dummy system for the analytical calculation, and plots Monte Carlo points against the Spinach curve. The source estimates a run time of minutes.
+A one-spin dummy system (zero magnet, isotope `G`) is configured with Redfield relaxation, lab-frame retention, zero equilibrium, spherical-tensor Liouville formalism, and no basis approximation. Its correlation time is `1/(3*sigma_iso^2)`. After `create` and `basis`, `corrfun(spin_system,L,k,m,p,q)` supplies weights and rates; the curve is assembled as `sum_j weights{1}(j)*exp(rates{1}(j)*(0:(nlags-1)))`. The function displays real Monte Carlo points against this curve. It has no numerical tolerance or pass/fail assertion; the plotted comparison, not an automated verdict, is the observable. The source estimates minutes of calculation time.

@@ -1,30 +1,31 @@
 # kernel/optimcon/distortions/kernelest.m
 
-- Signature: `h=kernelest(x,y,ker_len,method,align,lambda)`
+- Signature: h=kernelest(x,y,ker_len,method,align,lambda)
+- MATLAB source: [kernelest.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/kernelest.m)
 
 ## Purpose
 
-Estimate an FIR convolution kernel from input and output signal samples on the same uniform grid.
+Estimates an FIR convolution kernel from input samples x and output samples y on the same uniform grid. It builds a Toeplitz convolution matrix from x and solves the selected linear system; it does not return a gradient or adjoint.
 
-## Parameters / inputs
+## Inputs and defaults
 
-- `x` — numeric vector of input samples.
-- `y` — numeric vector of output samples, with the same length as `x`.
-- `ker_len` — positive integer kernel length, in taps.
-- `method` — solution method: `'backslash'` (default), `'pinv'`, `'svd'`, or `'tikh'`.
-- `align` — output alignment: `'causal'` (default) or `'same'`.
-- `lambda` — positive real scalar Tikhonov parameter for `'tikh'`; defaults to `1e-6`.
+- x and y are numeric vectors with equal numbers of samples. The function reshapes each to a column; the header describes samples on a uniform grid. No time step or physical units are supplied by this interface.
+- ker_len is a positive integer tap count.
+- method may be 'backslash' (default), 'pinv', 'svd', or 'tikh'. The choice is lowercased before dispatch, so letter case does not change a recognised choice.
+- align may be 'causal' (default) or 'same', also dispatched case-insensitively.
+- lambda defaults to 1e-6 and must be a positive real scalar. The value is used by 'tikh'; the source validates it for every method.
 
-## Output
+The method and alignment inputs must be character vectors or strings. The source does not explicitly require x or y to be real or finite. Unrecognised method or alignment values raise an error during dispatch.
 
-- `h` — estimated convolution kernel.
+## Matrix construction and methods
 
-## Numerical method
+The convolution matrix has ker_len columns and is built from the samples of x, followed by zeros. For 'causal' alignment, the first numel(x) rows are selected. For 'same', a central block of numel(x) rows begins at floor(ker_len/2)+1.
 
-The function builds a Toeplitz convolution matrix from `x`, then selects either its first `numel(x)` rows for `'causal'` alignment or a central block starting at `floor(ker_len/2)+1` for `'same'` alignment. It solves the resulting system with MATLAB backslash, a pseudoinverse, a truncated-SVD pseudoinverse, or Tikhonov regularisation, according to `method`. The truncated-SVD method discards singular values at or below `max(size(sys_mat))*eps(max(s_vals))`; the Tikhonov method solves `(sys_mat'*sys_mat+lambda*eye(ker_len))*h=sys_mat'*y`.
-
-The function checks input types, sample counts, kernel length, and `lambda`, and rejects unknown methods or alignment choices.
+- 'backslash' uses MATLAB's backslash solve (labelled least-squares in the source).
+- 'pinv' applies the pseudoinverse, giving a minimum-norm least-squares estimate.
+- 'svd' forms an economy SVD and uses the truncated pseudoinverse: singular values are retained only when they exceed max(size(sys_mat))*eps(max(s_vals)).
+- 'tikh' solves (sys_mat'*sys_mat+lambda*eye(ker_len))*h=sys_mat'*y, equivalent to a Tikhonov-regularised least-squares fit with squared residual plus lambda times squared kernel norm.
 
 ## Reference
 
-- [Spinach documentation for `kernelest.m`](https://spindynamics.org/wiki/index.php?title=kernelest.m)
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=kernelest.m

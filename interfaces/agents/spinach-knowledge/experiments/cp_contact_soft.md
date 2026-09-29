@@ -4,27 +4,25 @@
 
 ## Purpose
 
-Simulates a rotating-frame cross-polarisation contact curve with a soft `pi/2` high-gamma excitation pulse, followed by spin-lock evolution.
+A two-channel rotating-frame CP contact with a finite-duration high-gamma excitation pulse and observable detection through the contact. The routine wipes the low-gamma component of `parameters.rho0`, excites the high-gamma spin along +X, and applies high-gamma -Y and low-gamma +X irradiation during the contact.
 
-## Implementation
+## Inputs and timing
 
-The routine composes `L=H+1i*R+1i*K`, wipes the low-gamma spin state from `parameters.rho0`, applies the high-gamma excitation pulse, and evolves during the CP contact while detecting on `parameters.coil`. The requested contact evolution is set by the time step and number of steps.
+- `parameters.spins`: two isotope names, high-gamma first and low-gamma second (for example, `{'1H','13C'}`).
+- `parameters.rho0`: initial state; the low-gamma spin state is wiped before the pulse.
+- `parameters.hi_pwr`: high-gamma excitation nutation frequency in Hz; the +X 90-degree pulse duration is `1/(4*hi_pwr)` seconds.
+- `parameters.cp_pwr`: two CP-channel nutation frequencies in Hz, ordered by `parameters.spins`.
+- `parameters.timestep`: CP integration step in seconds; `parameters.nsteps`: number of steps, so the specified contact integration spans `timestep*nsteps` seconds.
+- `parameters.coil`: detection state. `H`, `R`, and `K` are same-sized Hamiltonian, relaxation, and kinetics matrices supplied by the context function; the routine forms `H+1i*R+1i*K`.
 
-## Parameters / inputs
-
-- `parameters.spins`: working spins in a cell array, high-gamma first and low-gamma last (for example, {'1H','13C'}).
-- `parameters.hi_pwr`: high-gamma excitation-pulse nutation frequency, Hz.
-- `parameters.cp_pwr`: two-channel nutation frequencies during CP contact, Hz.
-- `parameters.timestep`: CP contact time step, s.
-- `parameters.nsteps`: number of CP contact time steps.
-- `parameters.rho0`: initial state; the low-gamma spin state is wiped before the sequence.
-- `parameters.coil`: detection state vector.
-- `H`: Hamiltonian matrix supplied by the context function.
-- `R`: relaxation superoperator supplied by the context function.
-- `K`: kinetics superoperator supplied by the context function.
+The implementation also reads `parameters.spc_dim` when embedding control operators. The parameter header does not document this field's meaning or units.
 
 ## Output
 
-- `contact_curve`: signal detected on the coil state during the CP contact.
+Returns `contact_curve`, the observable-mode result from evolution under the contact generator, detected on `parameters.coil` at the requested step interval. The header names the result as a contact curve but does not specify its array orientation or dimension convention; those are inherited from the evolution routine.
 
-[Source page](https://spindynamics.org/wiki/index.php?title=cp_contact_soft.m)
+## Source limits
+
+This routine computes only the CP contact and its detection. It does not append an FID acquisition or specify instrument-specific RF calibration or a matching-condition search.
+
+Source implementation: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/cp_contact_soft.m

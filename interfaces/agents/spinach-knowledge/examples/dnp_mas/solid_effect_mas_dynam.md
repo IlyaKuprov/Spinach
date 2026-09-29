@@ -1,15 +1,21 @@
 # examples/dnp_mas/solid_effect_mas_dynam.m
 
-- Signature: `solid_effect_mas_dynam()`
+- MATLAB implementation: [examples/dnp_mas/solid_effect_mas_dynam.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_mas/solid_effect_mas_dynam.m)
+
+- Function: `solid_effect_mas_dynam()`
 
 ## Purpose
 
-Tracks the level populations during one rotor period for a single-crystal solid-effect DNP model. The example follows Fred Mentink-Vigier et al.; Spinach uses different rotation conventions ([paper](https://doi.org/10.1016/j.jmr.2015.07.001)). The source estimates seconds to run.
+Tracks spin-level populations during the first rotor period for a single-crystal solid-effect MAS DNP model. The example follows [Mentink-Vigier et al.](https://doi.org/10.1016/j.jmr.2015.07.001); its source notes that Spinach rotation conventions differ from the paper and estimates seconds of calculation time.
 
-## Model
+## Spin system and relaxation
 
-The model is an electron–`^1H` pair at 9.403 T. It sets the electron g-tensor principal values to [2.00614, 2.00194, 2.00988] with Euler angles `pi*[253.6 105.1 123.8]/180`, and places the spins 3.00 Å apart on z. Weizmann relaxation parameters are used at 100 K with DiBari equilibrium and secular relaxation retention.
+The spins are `{'E','1H'}`, with `sys.magnet=9.403`. The electron Zeeman principal values are `[2.00614 2.00194 2.00988]`, with Euler angles `pi*[253.6 105.1 123.8]/180`; the proton Zeeman values are zero. The relative coordinates are `[0 0 0]` and `[0 0 3.00]`.
 
-## Calculation
+Weizmann relaxation uses `weiz_r1e=1/0.3e-3`, `weiz_r1n=1/4.0`, `weiz_r2e=1/1.0e-6`, and `weiz_r2n=1/0.2e-3`; both `weiz_r1d` and `weiz_r2d` are zero 2-by-2 arrays. Temperature is `100`, equilibrium is `'dibari'`, and retained relaxation terms are `'secular'`. The complete spherical-tensor Liouville basis is used (`formalism='sphten-liouv'`, `approximation='none'`).
 
-The script builds a full sphten-Liouville basis and an ESR rotor stack about `[sqrt(2/3) 0 sqrt(1/3)]`, with 12.5 kHz MAS and rank limit 3000. It constructs electron `Lx` microwave and `Lz` offset operators, then steps the equilibrium state through the rotor stack with 0.85 MHz microwave power and −400 MHz offset. Finally, `trajan(...,'level_populations')` analyses the resulting one-period trajectory. This is a single-crystal trajectory calculation, not a powder average.
+## Rotor-period trajectory
+
+The ESR rotor stack uses axis `[sqrt(2/3) 0 sqrt(1/3)]`, orientation `[0 0 0]`, selected spins `{'E','1H'}`, magnetic MAS frame, empty rotor frames, zero offsets, and `max_rank=3000`; the rate setting is `12.5e3`. Electron `Lx` and `Lz` operators provide the microwave and offset terms, with `mw_pwr=0.85e6` and `mw_off=-400e6`; the relaxation superoperator is included during propagation.
+
+The code forms `rho_eq` from the thermal equilibrium of the left lab-frame Hamiltonian and assigns it as the initial state `rho(:,1)`. The code steps it through the rotor stack with step duration `1/(nsteps*parameters.rate)`, where `nsteps=numel(H)`, then uses `trajan(spin_system,rho,'level_populations')` to analyse the trajectory. This example covers one initial-state rotor period; it does not solve for a periodic steady state or report a DNP enhancement, and it is not a powder average.

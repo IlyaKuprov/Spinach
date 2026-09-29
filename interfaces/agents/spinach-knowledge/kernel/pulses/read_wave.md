@@ -4,24 +4,19 @@
 
 ## Purpose
 
-Reads a JCAMP-DX pulse waveform file from `kernel/pulses/pk_files` and returns its amplitude and phase samples, with optional Cartesian components and the file's scaling factor.
+Reads a JCAMP-DX pulse file from `kernel/pulses/pk_files`. The numeric columns are the waveform amplitude in percent and phase in degrees; the required `##$SHAPE_INTEGFAC` header supplies a separate scaling-factor output.
 
-## Algorithm
+## Implementation
 
-The two numeric columns are read as amplitude (percent) and phase (degrees). The function scales amplitude by 1/100, converts phase to radians and unwraps it, then resamples both on a normalized sample grid to `npoints` using PCHIP interpolation. It reads the `##$SHAPE_INTEGFAC` header value and errors if that value is absent or NaN. Cartesian components are computed when at least four outputs are requested.
+The file's amplitude column is divided by 100, and its phase is converted to radians and unwrapped. Both arrays are interpolated with shape-preserving piecewise cubic interpolation (`pchip`) from a normalized grid spanning 0 to 1 onto `npoints`; this supports either upsampling or downsampling. If four or more outputs are requested, the function also converts amplitude and phase to Cartesian X and Y components. The scaling factor is returned from the header, not applied by these steps.
 
-## Parameters / inputs
-
-- `filename` — character-string name of the waveform file in `kernel/pulses/pk_files`.
-- `npoints` — positive integer number of points for the upsampled or downsampled waveform.
+`filename` must be a character string and `npoints` a positive real integer. The file is sought in the bundled `kernel/pulses/pk_files` directory; the source invites users to submit custom pulse files to the project.
 
 ## Outputs
 
-- `A` — polar amplitude at each slice.
-- `phi` — unwrapped polar phase at each slice, in radians.
-- `Cx`, `Cy` — Cartesian X and Y amplitudes at each slice.
-- `scaling_factor` — value read from the waveform's `##$SHAPE_INTEGFAC` header.
+- `A` — polar amplitude samples, scaled from percent to a fraction.
+- `phi` — unwrapped phase samples in radians.
+- `Cx`, `Cy` — optional Cartesian components in X and Y.
+- `scaling_factor` — value of `##$SHAPE_INTEGFAC` in the file header.
 
-Place custom pulse files in `kernel/pulses/pk_files`; the source also asks users to consider sending them to the project.
-
-[Spinach wiki page](https://spindynamics.org/wiki/index.php?title=read_wave.m)
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/read_wave.m) · [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=read_wave.m)

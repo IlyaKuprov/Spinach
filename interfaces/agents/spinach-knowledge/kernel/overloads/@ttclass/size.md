@@ -2,29 +2,21 @@
 
 - Signature: `varargout=size(tt,dim)`
 
-## Purpose
+## Action
 
-Return the row and column dimensions of the matrix represented by a tensor train, following the supported forms of MATLAB's `size` function.
+The method multiplies each core's second dimension across the core sequence to obtain the represented row count `m`, and each third dimension to obtain the column count `n`; it uses the first train's products. Supported forms are `sz=size(tt)` (returns `[m n]`), `[m,n]=size(tt)`, and `d=size(tt,dim)` for `dim=1` or `dim=2`. A supplied dimension other than 1 or 2, or an unsupported input/output form, reaches the `incorrect call syntax.` error. If either returned dimension exceeds MATLAB's `intmax`, it raises the tensor-train-dimensions error.
 
-## Syntax
+This is a metadata query: it does not change cores or ranks and does not materialize the represented matrix. It applies no conjugation or transpose.
 
-- `sz=size(tt)` returns `[m n]`.
-- `[m,n]=size(tt)` returns the row and column dimensions separately.
-- `d=size(tt,dim)` returns the row dimension for `dim=1` or the column dimension for `dim=2`.
-
-## Parameters / inputs
+## Input and output
 
 - `tt` — tensor-train representation of a matrix.
-- `dim` — optional dimension selector, 1 or 2.
-
-## Outputs
-
-- `m,n` — integer dimensions of the represented matrix.
-
-## Implementation
-
-The function multiplies the second and third physical dimensions, respectively, across all cores. It errors for unsupported call syntax and if either resulting dimension exceeds MATLAB's `intmax`.
+- `dim` — optional selector: 1 for rows or 2 for columns.
+- Output — row and column dimensions, separately or as a two-element row vector.
 
 ## Source
 
-D. Savostyanov and I. Kuprov, [`ttclass/size.m`](https://spindynamics.org/wiki/index.php?title=ttclass/size.m).
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/size.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/size.m)
+
+D. Savostyanov and I. Kuprov.

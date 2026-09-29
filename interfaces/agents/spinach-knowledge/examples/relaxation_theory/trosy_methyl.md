@@ -2,25 +2,14 @@
 
 - Signature: `trosy_methyl()`
 
-## Purpose
+## Purpose and model
 
-Simulates methyl TROSY in a rapidly rotating `13CH3` group of a slowly tumbling protein using the Fokker-Planck formalism. The source notes a calculation time of minutes.
+Simulates methyl TROSY for a rapidly rotating `13CH3` group in a slowly tumbling protein using the source's Fokker-Planck formalism. The source estimates a calculation time of minutes and sets the field parameter to `14.1`; no unit is annotated. It represents the three methyl orientations as three four-spin rotamers, for a 12-spin system containing one carbon and three protons in each rotamer. The proton positions are cyclically permuted between rotamers, their populations are equal, and the source supplies a three-state jump-rate matrix. It sets `tau_m = 1e-11` and `k_jump = 1/(2*tau_m)`; no unit is annotated for these values.
 
-## Physical / mathematical content
+The shielding tensors are source-provided DFT values converted to chemical-shift tensors. The three methyl-proton shifts are described in the source as guesses and adjusted by `0.8`, `1.0`, and `1.2`. Intramethyl scalar-coupling entries are set to `125` for each carbon-proton pair and `-12` for each proton-proton pair; the source does not annotate units for these entries. The system uses the full `sphten-liouv` basis, disables `zte`, and sets `tau_c = 50e-9` (no unit is annotated for this parameter) with maximum rank 3.
 
-- The model contains three equally populated methyl rotamers, each with one `13C` and three `1H` spins. Their coordinates and shielding-derived chemical shift tensors are assigned with cyclic permutations of the proton positions.
-- Absolute shielding tensors are converted to traceless chemical shift tensors using `-remtrace(shielding{n})`. The proton tensors receive guessed isotropic offsets of `0.8`, `1.0`, and `1.2`.
-- Scalar couplings within each rotamer are `125` for each carbon–proton pair and `-12` for each proton–proton pair.
-- Methyl turning is represented by a three-state exchange-rate matrix with diagonal entries `-2*k_jump` and off-diagonal entries `k_jump`, where `tau_m=1e-11` and `k_jump=1/(2*tau_m)`.
+## Simulated spectra
 
-## Numerical / algorithmic content
+Frequency-domain `gridfree` detection with `slowpass` produces separate carbon and proton spectra. Each channel uses its own `L+` initial state and matching receiver, with no decoupling. The carbon spectrum uses a sweep from -300 to 300 Hz and 1024 points; the proton spectrum uses 200 to 1000 Hz and 2048 points. The plotted outputs are the real parts of the calculated spectra, not measured spectra.
 
-- The magnetic field is `14.1`. The calculation uses `sphten-liouv` formalism with no basis approximation and disables `zte` for high accuracy.
-- Both frequency-domain calculations use `gridfree(spin_system,@slowpass,parameters,'nmr')`, `tau_c=50e-9`, `max_rank=3`, no decoupling, and matching `L+` initial and detection states for the observed isotope.
-- The `13C` spectrum uses a sweep of `[-300 300]` Hz and `1024` points; the `1H` spectrum uses `[200 1000]` Hz and `2048` points. The real spectra are plotted side by side.
-
-## Implementation structure
-
-- Defines Cartesian coordinates and DFT absolute shielding tensors for one carbon and three protons, then constructs the corresponding chemical shift tensors and scalar-coupling matrix.
-- Builds a 12-spin system partitioned into three four-spin rotamers, assigns their coordinates, shift tensors, and intrarotamer couplings, and sets equal populations and exchange rates.
-- Creates the spin system, selects its basis, calculates the `13C` and `1H` spectra, and plots them with `plot_1d`.
+Source: [examples/relaxation_theory/trosy_methyl.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_methyl.m).

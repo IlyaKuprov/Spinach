@@ -1,15 +1,23 @@
 # examples/relaxation_theory/sle_esr_nitroxide_2.m
 
-- Signature: `sle_esr_nitroxide_2()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/sle_esr_nitroxide_2.m)
 
 ## Purpose
 
-Simulates the slow-motion ESR spectrum of a nitroxide radical, as a reproduction of Figure 2 in Concilio et al. ([arXiv:1511.01667](http://arxiv.org/abs/1511.01667)). Calculation time: seconds.
+This example calculates a slow-motion ESR spectrum for a nitroxide radical. The source describes the calculation as a reproduction of Figure 2 in Concilio et al. ([arXiv:1511.01667](https://arxiv.org/abs/1511.01667)); the plotted trace is a simulation, not an experimental spectrum supplied by the example. The source lists a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin model and motion
 
-The system contains `14N` and an electron at `0.3343 T`. The hyperfine matrix is `1e6*gauss2mhz([10.00 3.544 11.70; 3.544 18.00 5.072; 11.70 5.072 30.00])`; the electron Zeeman matrix is `[2.0065794 -0.0007548 -0.0032848; -0.0007548 2.0056940 -0.0006008; -0.0032848 -0.0006008 2.0048920]`.
+The spin system is one 14N nucleus and one electron; the source sets `sys.magnet=0.3343`. Its 14N-electron hyperfine input is the matrix
 
-## Numerical / algorithmic content
+```
+[10.00  3.544 11.70; 3.544 18.00 5.072; 11.70 5.072 30.00]
+```
 
-The complete `sphten-liouv` basis is used without approximation. The SLE parameters are maximum rank `7` and correlation time `17e-9 s`. Electron `L+` is used for both initial and detection states. The simulation uses sweep `[-2.2e8,2e8]`, `1650` points and zero-fill points, `GHz-labframe` axis units, inverted axis, and first derivative; `gridfree` with `slowpass` generates the spectrum, which is plotted.
+passed through `gauss2mhz`. The source does not state a separate unit for the tensor entries. The electron Zeeman tensor is set to `[2.0065794 -0.0007548 -0.0032848; -0.0007548 2.0056940 -0.0006008; -0.0032848 -0.0006008 2.0048920]`; no unit is specified for this matrix in the file. The basis is `sphten-liouv` with no basis approximation.
+
+The Stochastic Liouville Equation (SLE) calculation uses maximum rank 7 and `parameters.tau_c=17e-9`. Both the initial state and detection coil are the electron raising state, `L+`; the selected spin is `E`, and the decoupling list is empty. The spectrum is generated with `gridfree` and `slowpass` in ESR mode; this script does not set a separate Bloch-Redfield relaxation model.
+
+## Spectrum and plot
+
+The sweep is `[-2.2e8, 2e8]` on the `GHz-labframe` axis, with 1650 points and 1650 zero-fill points. The axis is inverted and the first derivative is requested. The script plots the real part of the calculated signal with `plot_1d`; the example specifies no measured line positions or intensities.

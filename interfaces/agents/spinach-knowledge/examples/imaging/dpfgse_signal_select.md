@@ -1,25 +1,17 @@
 # examples/imaging/dpfgse_signal_select.m
 
-- Signature: `dpfgse_signal_select()`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/dpfgse_signal_select.m
 
-## Purpose
+## Experiment and spin model
 
-Simulate DPFGSE signal selection for a solution of GABA in water, with gradients and soft pulses represented explicitly. The source estimates a runtime of minutes, faster with a Tesla V100 GPU.
+Demonstrates DPFGSE signal selection for a solution of GABA in water, with gradients and soft pulses modelled explicitly. The seven-spin system consists of seven 1H isotopes at `sys.magnet=5.9` Tesla. Chemical shifts are [3.00 3.00 1.88 1.88 2.28 2.28 4.80] ppm; scalar couplings are 7.36 Hz for spin pairs (1,3), (1,4), (2,3), and (2,4), and 7.58 Hz for (3,5), (3,6), (4,5), and (4,6). The basis uses `sphten-liouv`, `IK-2`, proximity level 1, and scalar-coupling connectivity. Path tracing and Krylov acceleration are disabled. The source estimates minutes of runtime and notes a Tesla V100 may speed it up, but GPU enablement is commented out.
 
-## Physical / mathematical content
+## Selection and acquisition
 
-- The seven-spin `1H` system uses a 5.9 T magnet, chemical shifts of 3.00, 3.00, 1.88, 1.88, 2.28, 2.28, and 4.80 ppm, and scalar couplings of 7.36 and 7.58 Hz between the specified spin pairs.
-- The simulation uses a 0.30-unit spatial domain with 100 points and `parameters.deriv={'period',3}`. Flow and diffusion are set to zero; the relaxation phantom and operator arrays (`parameters.rlx_ph` and `parameters.rlx_op`) are empty.
-- Uniform initial-state and coil phantoms use `Lz` and `L+` proton states, respectively.
+The 1D domain is configured as 0.30 with 100 points and third-order periodic derivatives. Initial magnetisation and detection use `Lz` and `L+`, with uniform profiles; relaxation phantoms/operators are empty, and flow and diffusion are explicitly zero. Gradient amplitudes are [1e-3 1.5e-3], with `g_dur=1e-3`; the source does not annotate their units. Signal selection uses a ten-step Gaussian RF table with frequency 750, amplitude scale 2*pi*340, total configured duration 10e-3, and zero RF phase; RF units are not specified in the source. Maximum rank is 2.
 
-## Numerical / algorithmic content
+Acquisition parameters are offset 800, sweep 1200, 512 points, and zero-fill to 2048; the plotted axis is configured in Hz and inverted. The source does not attach units directly to the offset/sweep values.
 
-- The basis uses `sphten-liouv` formalism, `IK-2` approximation, proximity level 1, and scalar-coupling connectivity. Path tracing and Krylov acceleration are disabled.
-- Signal selection uses gradient amplitudes of 1e-3 and 1.5e-3 with a duration of 1e-3, and a ten-step Gaussian RF pulse with frequency 750, amplitude scale `2*pi*340`, and total duration 10e-3. The maximum rank is 2 and the RF phase is zero.
-- Acquisition specifies a proton offset of 800, sweep of 1200, and 512 points. The resulting FID is exponentially apodised with parameter 6, Fourier-transformed with zero filling to 2048 points, shifted with `fftshift`, and plotted as a real spectrum on an inverted Hz axis.
+## Output
 
-## Implementation structure
-
-- Construct the spin system and basis, then pass the sequence, spatial-grid, and state parameters to `imaging(spin_system,@dpfgse_select,parameters)`.
-- Process the returned FID with `apodisation` and `fftshift(fft(...))`, then plot it with `plot_1d`.
-- GPU enabling appears only as a commented-out setting; the function does not enable it.
+imaging runs `dpfgse_select`; the returned FID is exponentially apodised with parameter 6, Fourier-transformed after zero-filling and shifted, then plotted as the real spectrum. These are processing settings, not a reported experimental spectrum or measured signal.

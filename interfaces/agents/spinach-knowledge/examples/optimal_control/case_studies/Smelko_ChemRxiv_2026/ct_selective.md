@@ -1,14 +1,15 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m
 
-- Signature: `ct_selective()`
+## Objective and context
+Design a central-transition-selective pulse for the z-filtered 27Al MQMAS experiment. Related ChemRxiv record: [DOI 10.26434/chemrxiv.15008427](https://doi.org/10.26434/chemrxiv.15008427).
 
-## Purpose
+## Spin model and rotor ensemble
+The model is one spin-5/2 27Al nucleus with quadrupolar coupling CQ = 3.0 MHz, asymmetry eta = 1.0, and 10 ppm axial shielding anisotropy, represented by principal values [-5, -5, 10] ppm. It uses a 400 MHz proton-frequency reference, 12.5 kHz magic-angle spinning, and a second-order quadrupolar interaction in the rotating frame. Rotor-phase-resolved drifts span 200 crystallite orientations and 80 initial rotor phases, with 160 rotor ticks.
 
-Optimal control design of the central transition selective pulse of the z-filtered 27Al MQMAS experiment. Reproduces, using Spinach, the soft pulse optimisation from https://doi.org/10.26434/chemrxiv.15008427 A single 27Al nucleus with the quadrupolar coupling and the shielding anisotropy assumed in the paper (CQ=3.0 MHz, eta=1.0, 10 ppm axial shielding anisotropy) is spun at 12.5 kHz in a 400 MHz magnet. The quadrupolar interaction is taken to second order in the rotating frame, and the powder average runs over 200 crystallite orientations at 80 initial rotor phases each. The pulse is 50 us long in 0.5 us slices, the controls are Cartesian, and the 10 kHz amplitude ceiling is enforced by a spillout penalty followed by clipping. The initial state is the population difference across the central transition, and the target is the single-quantum coherence of the central transition, as in the paper. The resulting waveform is saved for the MQMAS efficiency calculation; the waveform supplied in this folder reached a fidelity of 0.69 after 500 iterations, against the maximum of 1/sqrt(2) for this initial and target state pair.
+## State transfer and pulse design
+The normalized initial operator is the population difference across the central transition. The target is a single-quantum coherence between the central-transition levels; the GRAPE objective is transfer fidelity to this target across the powder and rotor-phase drift ensemble. The pulse uses Cartesian Lx and Ly controls in 100 slices of 0.5 us (50 us total), with a 10 kHz amplitude ceiling. An SNSA amplitude-spillout penalty of weight 100 constrains an L-BFGS GRAPE search for up to 500 iterations. The initial guess has random amplitudes up to 10% of the ceiling with one slice at the ceiling. After optimization, amplitudes are clipped to the ceiling and fidelity is reevaluated.
 
-## Implementation
+Reference-waveform fidelity after 500 iterations: 0.69; the maximum for this normalized initial/target state pair is 1/sqrt(2). The waveform is stored in rad/s with its slice durations in ct_pulse.mat.
 
-- Builds the 27Al Zeeman-Hilbert spin system and obtains MAS drift Hamiltonians over the 200-orientation two-angle grid and 80 initial rotor phases (160 rotor ticks).
-- The normalized initial state is the central-transition population difference; the target is central-transition single-quantum coherence.
-- Optimizes Cartesian controls in 100 slices of 0.5 µs (50 µs total), with a 10 kHz amplitude ceiling, SNSA spillout penalty, L-BFGS, and a 500-iteration limit. The amplitude is clipped and the fidelity recomputed afterward.
-- Saves the waveform in rad/s and slice durations to ct_pulse.mat.
+## Source
+[ct_selective.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m)

@@ -1,42 +1,17 @@
 # experiments/overtone/overtone_cp.m
 
-- Signature: `spectrum=overtone_cp(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/overtone/overtone_cp.m) · [Spinach wiki](https://spindynamics.org/wiki/index.php?title=overtone_cp.m)
 
-## Purpose
+Signature: `spectrum=overtone_cp(spin_system,parameters,H,R,K)`.
 
-Cross-polarization overtone experiment. Syntax: spectrum=overtone_cp(spin_system,parameters,H,R,K)
+## Behavior
 
-## Physical / mathematical content
+This wrapper calculates the overtone reference frequency as `-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`, lifts `parameters.Nx` and `parameters.Hx` over the requested Fokker–Planck spatial dimension using an identity Kronecker factor, applies one spin-lock pulse step, then calls `overtone_a` for acquisition. The source labels `Nx` as the X Zeeman operator of the quadrupolar nucleus and `Hx` as the X Zeeman operator of a spin-1/2 nucleus. It weights those channels with the first and second entries of `rf_pwr`, respectively; it does not specify a source-to-destination magnetization direction or a protein-specific transfer pathway. The existing background statement that quadrupolar nuclei have spin greater than 1/2 is general context; this wrapper only labels the channel as quadrupolar and does not validate spin or construct an electric-field-gradient tensor.
 
-The function calculates the overtone reference frequency as `-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`. It projects the supplied `parameters.Nx` and `parameters.Hx` operators over the requested Fokker–Planck spatial dimension.
-## Numerical / algorithmic content
+With `method='average'`, the code forms an average pulse operator using `omega=2*pi*(ovt_frq-rf_frq)` and applies its propagator to `rho0` for `rf_dur`. With `method='fplanck'`, it instead calls `shaped_pulse_af` using `H+rf_pwr(2)*Hx`, `Nx`, the initial state, the offset in Hz, the quadrupolar-channel power, and the pulse duration. These are distinct source branches; the wrapper exposes no separate MAS-rate or sample-orientation field. `spc_dim` is documented as a Fokker–Planck spatial dimension, not an angle.
 
-The `average` method forms an average pulse Hamiltonian and applies its propagator to `parameters.rho0`; the `fplanck` method applies `shaped_pulse_af` to the initial state. Both methods then delegate frequency-domain acquisition to `overtone_a`.
-## Parameters / inputs
+## Inputs and limits
 
-- parameters.spins overtone-active nucleus, specified as a single-element cell array
-- parameters.spc_dim Fokker-Planck spatial dimension
-- parameters.method pulse simulation method, either 'average' or 'fplanck'
-- parameters.sweep vector with two elements giving the spectrum frequency extents in Hz around the overtone frequency
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.Nx X Zeeman operator on the quadrupolar nucleus
-- parameters.Hx X Zeeman operator on the spin-1/2 nucleus
-- parameters.rf_frq spin-lock frequency offset from the overtone frequency on the quadrupolar nucleus, Hz
-- parameters.rf_pwr a vector of spin-lock powers on the quadrupolar nucleus (first element) and the spin-1/2 nucleus (second element), rad/s
-- parameters.rf_dur spin-lock pulse duration, seconds
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+Required fields are `spins` (one-element cell array), `spc_dim` (positive integer), `method` (`'average'` or `'fplanck'`), `sweep` (two-element real frequency extent in Hz around the overtone frequency), `npoints` (positive integer), `rho0` (initial state), `coil` (detection state), `Nx`, `Hx`, `rf_frq` (spin-lock offset in Hz), `rf_pwr` (two powers in rad/s, quadrupolar then spin-1/2), and `rf_dur` (positive scalar in seconds). The consistency check requires `H`, `R`, and `K` to be numeric matrices; the source does not impose an equal-size check here.
 
-## Outputs
-
-- spectrum -the resulting spectrum
-- Notes: relaxation must be present in the system dynamics, or the
-- matrix inversion in overtone_a function call would fail to
-- converge. The relaxation matrix must *not* be thermalised.
-
-## Implementation structure
-
-Validates the inputs, projects the pulse operators, applies the selected spin-lock pulse method, and calls `overtone_a` to acquire the spectrum.
+The source comment warns that relaxation must be present for the matrix inversion in `overtone_a` to converge and that `R` must not be thermalised. This documents an input requirement, not a runtime result. The return value is the result from `overtone_a`; this wrapper does not reshape it. `sweep` and `npoints` specify the requested frequency interval and sampling, while the precise MATLAB output shape is defined by the acquisition helper.

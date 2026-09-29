@@ -1,23 +1,19 @@
 # examples/nmr_paramag/carb_anh/s50c_point.m
 
 - Signature: `s50c_point()`
+- Source: [s50c_point.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s50c_point.m)
 
 ## Purpose
 
-Fits a point paramagnetic centre to experimental pseudocontact shifts (PCS) for the S50C mutant of human carbonic anhydrase II. The example cites the [study](https://doi.org/10.1039/c6sc03736d) and links to a [step-by-step tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
+Fit a point paramagnetic centre to experimental pseudocontact shifts (PCS) for the S50C mutant dataset of human carbonic anhydrase II. The source cites the [study](https://doi.org/10.1039/c6sc03736d) and a [PCS tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
-## Physical / mathematical content
+## Model and inputs
 
-- Paramagnetic NMR pseudocontact-shift fitting, with a point-electron location and magnetic-susceptibility tensor as the fitted parameters.
+- This is a point-centre inverse PCS fit, not a distributed electron-density calculation.
+- Loads `expt_pcs` and nuclear coordinates `xyz` from `s50c_expt.mat`; the source does not state coordinate units or enumerate the nuclei/isotopes in this MAT-file.
+- Calls `ippcs(xyz,[-27.0 13.0 18.0],expt_pcs)`. This vector is passed as the second argument; the example does not label its physical meaning or units.
+- The example gives no magnetic-field or temperature value.
 
-## Numerical / algorithmic content
+## Outputs and limits
 
-- Calls `ippcs(xyz,[-27.0  13.0  18.0],expt_pcs)` using the experimental PCS and coordinate data loaded by the script.
-- Plots experimental against predicted PCS, with a diagonal reference line, and prints the fitted susceptibility tensor and point-electron location.
-
-## Implementation structure
-
-- Load `expt_pcs` and `xyz` from `s50c_expt.mat`.
-- Call `ippcs` with the coordinate data, the vector `[-27.0  13.0  18.0]`, and experimental PCS.
-- Plot experimental versus predicted PCS and the diagonal reference line.
-- Display the returned susceptibility tensor and point-electron location.
+The call returns `mxyz`, `chi`, and `pred_pcs`: the fitted point-electron location, susceptibility tensor, and predicted PCS, respectively. It plots experimental against predicted PCS with axes labelled in ppm and displays `chi` and `mxyz`. The source provides no numerical fit result in advance and does not state units for the tensor or returned coordinates. It does not simulate a spectrum.

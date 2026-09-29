@@ -1,22 +1,22 @@
 # examples/esr_sol_pulsed/eseem_nitroxide_powder.m
 
-- Signature: `eseem_nitroxide_powder()`
+## Experiment and spin system
 
-## Purpose
+This example computes a powder-averaged two-pulse ESEEM signal for a `14N` nitroxide radical at 0.3249 T. The spin order is nitrogen then electron. The nitrogen self-coupling eigenvalues are `[-0.4, -1.6, +2.0] × 10^5 Hz`, with Euler angles `[0,0,0]`; the electron–nitrogen coupling is isotropic, `[2.0,2.0,2.0] × 10^6 Hz`, also with Euler angles `[0,0,0]`. The script does not explicitly assign an electron Zeeman tensor. The source comment names Figure 4a of [doi:10.1063/1.453532](https://doi.org/10.1063/1.453532) as the comparison target. Ideal hard pulses are assumed.
 
-Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulation in Liouville space with powder averaging over a finite grid. Set to reproduce Figure 4a in http://dx.doi.org/10.1063/1.453532; ideal pulses are assumed. Calculation time: seconds.
+## Sequence and powder sampling
 
-## Physical / mathematical content
+The calculation uses the `sphten-liouv` basis without approximation and disables trajectory-level SSR. `powder` calls the shared `eseem` sequence in the `esr` context using the finite `rep_2ang_400pts_sph` orientation grid. The initial state, receiver, screen, and pulse operator are electron `Lz`, `L+`, `L-`, and `Ly`, respectively; the pulse sequence is an ideal π/2 pulse, free evolution, ideal π pulse, and refocused evolution followed by receiver projection.
 
-- The system contains 14N and an electron at 0.3249 T. Nitrogen self-coupling eigenvalues are [-0.4, -1.6, 2.0]×10^5 and electron–nitrogen coupling eigenvalues are [2, 2, 2]×10^6; both interactions have zero Euler angles.
-- Powder averaging uses `rep_2ang_400pts_sph`.
+The sequence uses zero offset, 512 points, `timestep = 2e-7` s, and `zerofill = 2048`. Each of the two evolution intervals advances by `timestep/2`, hence the interpulse-delay increment is `1e-7` s and the full echo-time increment is `2e-7` s. These are fixed field, offset, and grid settings; the angular average is over the configured finite grid.
 
-## Numerical / algorithmic content
+## Signal and displayed spectrum
 
-- The sequence uses 512 points at a 200 ns timestep and 2048-point zero filling. The signal is mean-subtracted and exponentially apodised with parameter 5 before Fourier transformation and `fftshift`.
-- The frequency axis uses an interpulse-delay increment of half the timestep.
+Before the FFT, the script passes `mean(fid)-fid` to exponential apodisation with parameter 5. It zero-fills, Fourier-transforms, and applies `fftshift` to the result, then plots the real apodised time signal and the real spectrum. The spectral frequency axis uses `fft_freq_axis(npoints,timestep/2,zerofill-npoints)*1e-6` and is labelled in MHz. The script displays the figure; it contains no explicit data-file or figure-export call.
 
-## Implementation structure
+## Source links
 
-- Create the spin system in the `sphten-liouv` basis without approximation, with trajectory-level SSR disabled; call `powder` with `@eseem` in the `esr` context.
-- Plot the real apodised time-domain signal and real spectrum.
+- [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/eseem_nitroxide_powder.m)
+- [ESEEM sequence helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
+- [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)
+- [Cited DOI](https://doi.org/10.1063/1.453532)

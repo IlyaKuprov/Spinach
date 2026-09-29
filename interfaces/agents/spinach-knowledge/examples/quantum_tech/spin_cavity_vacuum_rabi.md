@@ -1,19 +1,18 @@
 # examples/quantum_tech/spin_cavity_vacuum_rabi.m
 
 - Signature: `spin_cavity_vacuum_rabi()`
+- Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/spin_cavity_vacuum_rabi.m)
 
-## Purpose
+## Model
 
-Vacuum Rabi oscillation between an electron spin and a microwave cavity mode in the Jaynes–Cummings approximation. This is the one-spin limit of the spin-ensemble cavity experiments of Schuster et al. and Kubo et al., Phys. Rev. Lett. 105, 140501 and 140502 (2010). Calculation time: seconds.
+This is a one-electron, one-cavity-mode Jaynes–Cummings calculation of vacuum-Rabi exchange, described in the source as the one-spin limit of the spin-ensemble cavity experiments of Schuster et al. and Kubo et al., *Physical Review Letters* **105**, 140501 and 140502 (2010). It is a schematic coherent exchange model, not a device-fidelity calculation or a measured defect spectrum.
 
-## Physical / mathematical content
+The particle list `{'E','C3'}` means a multiplicity-2 electron (spin one-half) and a cavity mode truncated to three levels; `C3` is a mode specification, not a carbon isotope. The source sets `sys.magnet=0`, places the cavity at zero rotating-frame frequency, and sets its exchange coefficient to `8e6` (8 MHz in the frequency convention used by the source). The exchange-only model has no explicit drive, relaxation, or dissipation term. It is not a material-specific defect Hamiltonian: no nuclear defect isotope, defect zero-field splitting, or EPR field/frequency selection is specified.
 
-- A resonant cavity exchanges a single excitation with an electron spin. The example tracks spin and cavity excitation populations and checks both visible transfer and conservation of population in the active doublet.
+## Initial state and plotted observable
 
-## Numerical / algorithmic content
+In the `zeeman-hilb` formalism with no basis approximation, the initial state `{'ZL2','BL1'}` places one excitation on the electron and the cavity in its vacuum state. Spin and cavity excitation populations are projected from each trajectory point using `{'ZL2','E'}` and `{'ZL1','BL2'}`. The `cavity` device trajectory has 501 points and the figure plots the real populations over 0–500 ns. The source checks that transfer is visible and that the two populations sum to one in the active doublet; this is an internal numerical check, not experimental validation.
 
-- Spinach builds a `zeeman-hilb` model with no basis approximation and propagates the initial spin excitation through the cavity device context. The sequence uses 501 points, corresponding to the plotted 0–500 ns interval.
+## Interpretation
 
-## Implementation structure
-
-- The source uses isotopes `{'E','C3'}`, a resonant cavity mode at zero rotating-frame frequency, and exchange coupling `8e6`. The initial state is `{'ZL2','BL1'}` on the spin and cavity. Projectors `{'ZL2','E'}` and `{'ZL1','BL2'}` measure the spin and cavity populations, respectively.
+The figure shows the ideal time-domain exchange of a single excitation between the two modeled subsystems. It does not show a driven EPR spectrum, an isotope-resolved defect transition, or loss-limited cavity dynamics. The source labels the calculation time as seconds, but that comment is not a measured runtime or a convergence claim.

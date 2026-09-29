@@ -1,68 +1,23 @@
 # experiments/esr_dipolar/deer_4p_soft_diag.m
 
-- Signature: `deer_4p_soft_diag(spin_system,parameters)`
+- MATLAB implementation: [experiments/esr_dipolar/deer_4p_soft_diag.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_4p_soft_diag.m)
 
 ## Purpose
 
-Runs four-pulse DEER diagnostics. It calls `deer_4p_soft_hole` through `powder`, apodises and zero-fills/FFT-transforms its four FIDs for pulse-diagnostic plots, then calls `deer_4p_soft_deer` through `powder` to obtain the echo stack. The wrapper plots the real, unphased stack and uses its SVD to plot echo and DEER components.
+This is a four-pulse DEER/PELDOR diagnostic driver rather than a signal-returning sequence function. It first examines the frequency-selective effects of the four soft pulses, then calculates and plots a powder-averaged echo stack and its principal components.
 
-## Parameters / inputs
+## Interface and parameters
 
-- parameters.pulse_frq -frequencies for the four
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the four
-- pulses, Hz
-- parameters.pulse_dur -durations for the four
-- pulses, seconds
-- parameters.pulse_phi -initial phases for the four
-- pulses, radians
-- parameters.pulse_rnk -Fokker-Planck ranks for the
-- four pulses
-- parameters.p1_p2_gap -time between the end of the
-- first and the start of the
-- second pulse, seconds
-- parameters.p2_p4_gap -time between the end of the
-- second the start of the third
-- pulse, seconds
-- parameters.p3_nsteps -number of third pulse posi-
-- tions in the interval between
-- the first echo and the fourth
-- pulse
-- parameters.echo_time -time to sample around the ex-
-- pected second echo position
-- parameters.echo_npts -number of points in the second
-- echo discretization
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.offset -receiver offset for the time
-- domain detection, Hz
-- parameters.sweep -sweep width for time domain
-- detection, Hz
-- parameters.npoints -number of points in the free
-- induction decay
-- parameters.zerofill -length of the zero-filled FFT
-- parameters.method -soft puse propagation method,
-- 'expv' for Krylov propagation,
-- 'expm' for exponential propa-
-- gation, 'evolution' for Spin-
-- ach evolution function
-- parameters.assumptions -Hamiltonian generation assump-
-- tions, use 'deer' to keep two-
-- electron flip-flop terms and
-- 'deer-zz' to drop them
+`deer_4p_soft_diag(spin_system,parameters)` has no declared output. Its parameter structure supplies the four-pulse settings (`pulse_frq`, `pulse_pwr`, `pulse_dur`, `pulse_phi`, `pulse_rnk`), delays (`p1_p2_gap`, `p2_p4_gap`), insertion count (`p3_nsteps`), echo window (`echo_time`, `echo_npts`), initial state (`rho0`), detection state (`coil`), receiver offset (`offset`), time-domain sweep width (`sweep`), FID point count (`npoints`), zero-filled FFT length (`zerofill`), shaped-pulse `method` (`'expm'`, `'expv'`, or `'evolution'`), and Hamiltonian-generation `assumptions`. The source gives frequencies and offsets/sweep in Hz, pulse durations in seconds, phases in radians, and echo time in seconds. It documents `echo_npts` and `p3_nsteps` as at least two.
 
-## Outputs
+The source header labels `pulse_pwr` in Hz, whereas the two callback routines it invokes document that field in rad/s. This unit discrepancy is not resolved in the implementation; callers should not assume the two labels are interchangeable. The allowed `assumptions` labels are `'deer'` (retain two-electron flip-flop terms) and `'deer-zz'` (drop them).
 
-- Figure 1: pulse diagnostics
-- Figure 2: DEER echo stack
-- Figure 3: principal components of the stack, echo
-- Figure 4: principal components of the stack, DEER
-- Note: for the method, start with 'expm', change to 'expv' if the
-- calculation runs out of memory, and use 'evolution' as the
-- last resort.
-- Note: simulated echoes tend to be sharp and hard to catch becau-
-- se simulation does not have distributions in experimental
-- parameters. Fourier transforming the echo prior to integ-
-- ration is recommended.
-- Note: the time in the DEER trace refers to the second pulse inser-
-- tion point, after end of first pulse.
+## Diagnostic interpretation
+
+The first calculation uses `deer_4p_soft_hole` under `powder`, apodises the four resulting FIDs with the `crisp` window, and Fourier-transforms them to compare the four pulse responses. The second uses `deer_4p_soft_deer` under `powder` to obtain the echo stack. The driver plots the unphased stack and uses singular-value decomposition to form its echo- and DEER-domain principal-component plots. Its documented outputs are four figures: pulse diagnostics, echo stack, echo principal components, and DEER principal components.
+
+## Scope not specified by the source
+
+This function does not return the FIDs, echo stack, or principal-component arrays to its caller; its declared interface is plotting-only. The source supplies no default parameter values, sample data, or numeric results, and does not define the matrix orientation of the internal stack in the diagnostic text.
+
+Source: https://spindynamics.org/wiki/index.php?title=deer_4p_soft_diag.m

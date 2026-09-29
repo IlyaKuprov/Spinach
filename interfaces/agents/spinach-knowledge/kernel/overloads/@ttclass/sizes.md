@@ -2,22 +2,20 @@
 
 - Signature: `modesizes=sizes(tt)`
 
-## Purpose
+## Action
 
-Return the physical row and column dimensions for each core of a tensor train.
+For each core in the first train, the method records the second and third core dimensions. It returns an `ncores`-by-2 array whose row `k` is `[size(tt.cores{k,1},2), size(tt.cores{k,1},3)]`, i.e. that core's physical row and column dimensions. It does not return bond ranks or aggregate dimensions across cores.
 
-## Parameters / inputs
+This is a metadata query: it leaves the TT cores and ranks unchanged and does not materialize the represented matrix. It applies no conjugation or transpose and adds no explicit input guard.
 
-- `tt` — tensor train object.
+## Input and output
 
-## Outputs
-
-- `modesizes` — an `ncores`-by-2 array; each row contains the second and third dimensions of the corresponding core in the first train.
-
-## Implementation
-
-The function obtains the number of cores from `tt.cores`, allocates the output array, and fills each row from `size(tt.cores{k,1},2)` and `size(tt.cores{k,1},3)`.
+- `tt` — tensor-train object.
+- `modesizes` — `ncores`-by-2 array of per-core physical row and column dimensions for the first train.
 
 ## Source
 
-D. Savostyanov and I. Kuprov, [`ttclass/sizes.m`](https://spindynamics.org/wiki/index.php?title=ttclass/sizes.m).
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/sizes.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/sizes.m)
+
+D. Savostyanov and I. Kuprov.

@@ -1,28 +1,15 @@
 # kernel/summaries/summary_couplings.m
 
-- Signature: `summary_couplings(spin_system,header)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_couplings.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_couplings.m)
 
 ## Purpose
 
-Prints a summary of significant spin-spin coupling tensors in a Spinach spin system.
+Print a table of selected spin-spin coupling tensors from a Spinach system.
 
-## Physical / mathematical content
+## What is reported
 
-For each reported pair, the table shows the coupling matrix components and its isotropic contribution, calculated as the matrix trace divided by three. It also reports the norms of the rank-1 and rank-2 parts obtained from the spherical-tensor decomposition.
+A pair is included when the matrix spectral norm satisfies `norm(J,2) > 2*pi*spin_system.tols.inter_cutoff`. The table identifies the two spin indices and prints all three matrix rows, the isotropic value `trace(J)/3`, and the rank-1 and rank-2 component norms. The tensor decomposition uses `mat2sphten` and `sphten2mat`; each displayed matrix row, isotropic value, and rank norm is divided by `2*pi`, so the displayed coupling values are in Hz. The rank norms use the matrix 2-norm.
 
-## Numerical / algorithmic content
+## Output and inputs
 
-The routine selects entries whose matrix 2-norm exceeds `2*pi*spin_system.tols.inter_cutoff`. Matrix components, the isotropic contribution, and rank norms are reported after division by `2*pi`; the rank norms use the Frobenius norm. Input checks require a structure and a character-string header.
-
-## Parameters / inputs
-
-- spin_system - Spinach spin system description object
-- header - a string of text to precede the summary
-
-## Outputs
-
-- Prints the summary through `report.m` to the console or user-specified output.
-
-## Implementation structure
-
-After printing column headings, the function traverses the selected matrix entries and reports the spin indices, matrix elements, isotropic value, and rank-1 and rank-2 norms. It ends the table with a separator.
+The routine has no returned output. It sends the supplied header, table headings, rows, and separators to `report`, which routes text to the console or the configured report destination. Its input checks require `spin_system` to be a structure and `header` to be a character array; the routine does not update fields of the input structure.

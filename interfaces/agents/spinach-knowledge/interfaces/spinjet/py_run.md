@@ -1,25 +1,11 @@
 # interfaces/spinjet/py_run.m
 
-- Signature: `arg_out=py_run(spin_system,pyscript,arg_in)`
+[MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/spinjet/py_run.m) · [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=py_run.m)
 
-## Purpose
+## Interface
 
-Runs a Python script from the `interfaces/spinjet/Xepr_python/` folder of a Bruker Xepr installation, passing inputs to the script and returning its printed output.
+`arg_out=py_run(spin_system,pyscript,arg_in)` runs `<spin_system.sys.root_dir>/interfaces/spinjet/Xepr_python/<pyscript>.py` using the `python` command and MATLAB `system`. `spin_system.sys.root_dir` must be present as a character array, and `pyscript` must be a non-empty character array; the named script file must exist. The `.py` suffix is added by the wrapper. If `arg_in` is omitted it defaults to `{}`; supplied inputs must be a cell array.
 
-## Physical / mathematical content
+Each cell input is converted with `num2str` unless it is already a character array. The wrapper strips one pair of surrounding double quotes when present, escapes backslashes, dollar signs, backticks, and double quotes, and appends each value as a double-quoted command-line argument. It does not marshal MATLAB arrays as Python objects: the script receives textual command-line arguments.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- `spin_system` - spin system created by Spinach, with `spin_system.sys.root_dir` defined as a character string.
-- `pyscript` - name of the Python script as a character string, without the `.py` extension.
-- `arg_in` - cell array containing inputs to the script. If omitted, it defaults to an empty cell array. Non-character entries are converted with `num2str`.
-
-## Outputs
-
-- `arg_out` - cell array of tokens from the script's standard output, split on whitespace. It is empty if the command succeeds without producing output. If the command returns a nonzero status, the function raises an error containing the status code and returned output rather than returning `arg_out`.
-
-## Implementation structure
-
-The function checks the spin system, script name, script file, and input cell array before running the script. It builds a `python` command using `spin_system.sys.root_dir` and the script name. Each supplied input is passed as a double-quoted command-line argument; existing surrounding double quotes are removed, and backslashes, dollar signs, backticks, and double quotes are escaped. It then runs the command with `system` and splits nonempty output after trimming it.
+A nonzero `system` status raises an error containing the status and Python output. On success, the wrapper trims the captured stdout and splits it into whitespace-delimited text tokens, returning those tokens as a cell array (transposed from `strsplit`'s row result). It does not parse the tokens into numeric or structured MATLAB values. No cache or physical-unit semantics are defined in this helper.

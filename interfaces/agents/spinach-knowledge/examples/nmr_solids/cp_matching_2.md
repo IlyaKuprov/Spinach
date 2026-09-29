@@ -1,21 +1,19 @@
 # examples/nmr_solids/cp_matching_2.m
 
-- Signature: `cp_matching_2()`
+Signature: cp_matching_2()
 
-## Purpose
+## What the example models
 
-Sweeps proton spin-lock power to test the Hartmann–Hahn matching condition for ¹H–¹⁵N cross-polarisation with a low-power ¹⁵N spin lock. The source describes matching-condition reflections with opposite phase and estimates a calculation time of seconds.
+This is a Hartmann–Hahn ¹H–¹⁵N cross-polarisation matching test without exchange, described by the source as running with low power on ¹⁵N and showing matching-condition reflections with opposite phase. The code sets a two-spin system at sys.magnet=9.394, Zeeman scalar entries 0.1495 and 0, and coordinates [−1.11551509, 1.65289357, −1.19927242] and [−2.67552180, 0.95825426, 0]. It uses the sphten-liouv basis with approximation none. The source supplies coordinates but does not define additional interaction terms or state their units.
 
-## Physical / mathematical content
+## MAS and power sweep
 
-The two-spin model uses the specified isotropic shifts and coordinates under a 10 kHz MAS rate. The simulation starts from ¹H transverse magnetisation, scans ¹H power from 0 to 30 kHz while holding ¹⁵N power at 1 kHz, and records the final ¹⁵N signal.
+The model passes rate 10000, axis [sqrt(2/3), 0, sqrt(1/3)], max_rank 3, and grid rep_2ang_200pts_oct. The initial state is ¹H Lx, the detection coil is ¹⁵N Lx, excitation operators are zero, and the time grid contains ten entries of 4e-5. The file does not state units for rate, time-step values, or the fixed ¹⁵N irradiation value.
 
-## Numerical / algorithmic content
+A parfor loop scans fifty ¹H irradiation settings from 0e3 to 30e3; ¹⁵N is held at 1e3. The plotted x-axis divides the scanned values by 1e3 and is labelled ¹H spin-lock RF power in kHz, giving a displayed range of 0–30 kHz. For each setting, singlerot is called with cp_contact_hard; the stored observable is real(fid(end)), plotted as ¹⁵N signal in a.u. The opposite-phase reflection description is the source comment about the intended/illustrated pattern, not an independently measured or validated spectrum.
 
-The full `sphten-liouv` basis is used. With MAS axis `[sqrt(2/3) 0 sqrt(1/3)]`, fifty power points are evaluated in a `parfor` loop with `singlerot` and `@cp_contact_hard`; each run uses `max_rank=3`, the `rep_2ang_200pts_oct` grid, and ten 40 μs steps. The plotted signal is the real part of the final FID point.
+## Scope and call boundary
 
-## Implementation structure
+The file does not expose contact duration, pulse shape, or the internals of cp_contact_hard / singlerot. It therefore documents a simulated terminal-FID power sweep, not a full experimental sequence or a 2D acquired spectrum. The source header estimates calculation time as seconds; no timing measurement is reported here.
 
-- Defines the two-spin model and constructs the basis and transverse operators.
-- Sets MAS and CP parameters, the ¹H initial state, ¹⁵N coil, time grid, and powder grid.
-- Performs the parallel proton-power sweep with the ¹⁵N power fixed at 1 kHz, then plots the ¹⁵N signal.
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_2.m

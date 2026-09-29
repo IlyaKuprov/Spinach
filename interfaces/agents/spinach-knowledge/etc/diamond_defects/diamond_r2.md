@@ -1,16 +1,29 @@
 # etc/diamond_defects/diamond_r2.m
 
-`[sys,inter]=diamond_r2(parameters)`
+- MATLAB implementation: [etc/diamond_defects/diamond_r2.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_r2.m)
 
-Builds a single-electron Spinach model for the R2 self-interstitial defect. The magnetic parameters are attributed to Hunt et al., *Physical Review B* **61**, 3863 (2000) ([doi:10.1103/PhysRevB.61.3863](https://doi.org/10.1103/PhysRevB.61.3863)).
+**Call:** `[sys,inter] = diamond_r2(parameters)`
 
-## Parameters
+Builds the R2 self-interstitial model as one E3 electronic-spin site in Spinach.
 
-- `parameters.d_sign`: real scalar multiplying the axial zero-field-splitting parameter, whose magnitude is 4173 MHz.
-- `parameters.orientation`: crystal plane normal, specified as `'111'`, `'110'`, or `'100'`; the chosen normal is aligned with the magnetic-field (laboratory z) axis.
+## Inputs
 
-The electron g principal values are 2.0019, 2.0019, and 2.0021. The routine rotates the g and zero-field-splitting tensors into the selected field orientation, then returns them in Spinach's system and interaction structures. The electron isotope label is `E3`.
+- `parameters.orientation`: `'111'`, `'110'` or `'100'`; the selected crystal direction is aligned with the magnetic field.
+- `parameters.d_sign`: real numeric scalar multiplying the axial zero-field-splitting parameter. The source validates scalar reality, but does not restrict this multiplier to exactly `+1` or `-1`.
 
-The input must be a structure with both fields present; the orientation must be one of the three listed character values, and `d_sign` must be a real numeric scalar.
+Both fields are required. Orientation values are matched exactly.
 
-[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=diamond_r2.m).
+## Model and outputs
+
+The source assigns the electron isotope label `E3`, constructs principal g values `[2.0019, 2.0019, 2.0021]`, and forms an axial zero-field-splitting tensor with `zfs2mat(parameters.d_sign * 4173e6, 0, 0, 0, 0)`. The numeric `4173e6` argument is passed directly to `zfs2mat`; the routine's comments do not independently state its unit. A rotation maps the chosen crystal direction onto the field axis, then rotates both electron tensors into that frame.
+
+- `sys`: the single-site electronic-spin specification (`E3`).
+- `inter`: electron Zeeman tensor and the axial ZFS interaction, with ZFS converted through `mat2ias` for Spinach's interaction structure.
+
+This helper does not add nuclei or expose a magnitude range for `d_sign`; callers can choose any real scalar accepted by the input check.
+
+## Reference
+
+Magnetic parameters are attributed in the source to Hunt et al., *Physical Review B* **61**, 3863 (2000), [doi:10.1103/PhysRevB.61.3863](https://doi.org/10.1103/PhysRevB.61.3863).
+
+[Spin Dynamics Wiki source page](https://spindynamics.org/wiki/index.php?title=diamond_r2.m).

@@ -1,19 +1,18 @@
 # examples/relaxation_theory/hfc_antisymm_1.m
 
+- MATLAB implementation: [examples/relaxation_theory/hfc_antisymm_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/hfc_antisymm_1.m)
+
 - Signature: `hfc_antisymm_1()`
+- Source: [examples/relaxation_theory/hfc_antisymm_1.m](https://github.com/IlyaKuprov/Spinach/blob/master/examples/relaxation_theory/hfc_antisymm_1.m)
 
-## Purpose
+## Purpose and model
 
-Compares textbook longitudinal (`R1`), transverse (`R2`), and cross-relaxation (`Rx`) rates with rates extracted from Spinach’s Redfield relaxation superoperator for a two-spin system with a strongly antisymmetric hyperfine tensor.
+This example compares textbook and Redfield-superoperator longitudinal, transverse, and cross-relaxation rates for a proton-electron pair whose hyperfine tensor has a substantial antisymmetric component. The tensor is `1e6` times `[[10, 1, 1.5], [2, 0, 3], [2.5, 1, -3]]`; the script multiplies it by `2*pi` when passing it to `rlx_hfc`. The tensor's unit is not stated on that assignment. The script passes a single 10 ps correlation time to `rlx_hfc`, but does not itself state a spectral-density function. The displayed rates are in Hz.
 
-## Physical / mathematical content
+## System and relaxation settings
 
-The system contains a proton and an electron at 0.33 T. Their hyperfine coupling is specified by a full, nonsymmetric 3 × 3 tensor; the example uses zero equilibrium, a 10 ps correlation time, and the lab-frame relaxation representation. The textbook rates come from `rlx_hfc`; corresponding Spinach rates are evaluated as negative expectation values of the relaxation superoperator for normalized longitudinal and transverse states. A longitudinal cross term tests the transfer rate between the two spins.
+The spins are `1H` and `E` at `sys.magnet=0.33`, with one correlation time of 10 ps. The source selects Redfield relaxation, zero equilibrium, lab-frame retention, and the full `sphten-liouv` basis (`approximation='none'`). It does not set an explicit secular restriction or select particular cross-correlations, so the page does not attribute either choice to the example.
 
-## Numerical / algorithmic content
+## Rates and operators
 
-The script constructs the spin system and an `sphten-liouv` basis with no approximation, builds the Redfield relaxation superoperator, and compares each `rlx_hfc` result against the associated matrix element of that superoperator. It also prints the complete superoperator in the IST basis. The reported calculation time is seconds.
-
-## Implementation structure
-
-After setting the field, isotopes, and hyperfine matrix, the script selects Redfield relaxation with zero equilibrium and lab-frame retention, then constructs the basis and relaxation superoperator. It evaluates `R1` for both spins using `Lz` states, `R2` using `L+` states, and `Rx` using a pair of `Lz` states, normalizing each state before evaluating the matrix elements. Finally, it prints the full relaxation superoperator.
+After forming `R=relaxation(spin_system)`, the script calls `rlx_hfc` for textbook rates. It evaluates normalized `Lz` state matrix elements for `R1` on each spin, normalized `L+` state matrix elements for `R2` on each spin, and a normalized pair of `Lz` states for the transfer rate `Rx`; the Redfield values are formed as `-rho'*R*rho` or `-rho_b'*R*rho_a`. It prints these rate comparisons and the complete relaxation superoperator in the IST basis. These operator matrix elements are a superoperator diagnostic, not a simulated or observed experimental signal.

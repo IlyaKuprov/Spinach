@@ -1,29 +1,22 @@
 # kernel/conventions/transforms/zfs2mat.m
 
+Source: [kernel/conventions/transforms/zfs2mat.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/zfs2mat.m)
+Wiki: [Spin Dynamics Wiki: zfs2mat.m](https://spindynamics.org/wiki/index.php?title=zfs2mat.m)
+
 - Signature: `M=zfs2mat(D,E,alp,bet,gam)`
 
-## Purpose
+## Purpose and tensor convention
 
-Converts the zero-field splitting parameters `D` and `E` into a spin interaction matrix, following the convention described in the abstract of [doi:10.1063/1.1682294](http://dx.doi.org/10.1063/1.1682294).
+Converts the zero-field-splitting parameters `D` and `E` into the symmetric spin-interaction matrix used by Spinach. In the tensor eigenframe the source first forms the diagonal matrix with entries `-D/3+E`, `-D/3-E`, and `2*D/3`. It computes the direction-cosine matrix `R=euler2dcm(alp,bet,gam)` and rotates the tensor as `M=R*M*R'`. It then removes any residual trace and symmetrizes the result. The trace correction and symmetrization are explicit numerical clean-up steps; the function does not solve an eigenproblem or compute a numerical derivative.
 
-## Physical / mathematical content
+## Inputs and output
 
-The function constructs the zero-field splitting tensor in its eigenframe as a diagonal matrix with entries `-D/3+E`, `-D/3-E`, and `2*D/3`. It then rotates the tensor using the direction-cosine matrix returned by `euler2dcm(alp,bet,gam)`. The output is made symmetric and traceless to remove floating-point residuals.
+- `D`, `E` — real numeric scalar zero-field-splitting parameters in Hz.
+- `alp`, `bet`, `gam` — real numeric scalar Euler angles in radians.
+- `M` — symmetric `3x3` interaction matrix in Hz.
 
-## Numerical / algorithmic content
+The implementation's `grumble` guard rejects any input that is not a real numeric scalar, with the message “all inputs must be real scalars.” There are no other input-dependent branches in this routine.
 
-The implementation checks that all five inputs are real numeric scalars, builds the diagonal tensor, applies `M=R*M*R'` with `R=euler2dcm(alp,bet,gam)`, and symmetrizes and removes the trace from the result. Angles are passed to `euler2dcm` in radians.
+## Reference
 
-## Parameters / inputs
-
-- `D`, `E` — real scalar zero-field splitting parameters, in Hz.
-- `alp`, `bet`, `gam` — alpha, beta, and gamma Euler angles, in radians.
-
-## Outputs
-
-- `M` — symmetric 3×3 spin interaction matrix, in Hz.
-
-## References
-
-- [Zero-field splitting convention](http://dx.doi.org/10.1063/1.1682294).
-- [Spin Dynamics Wiki: zfs2mat.m](https://spindynamics.org/wiki/index.php?title=zfs2mat.m)
+The source cites the zero-field-splitting convention in the abstract of [doi:10.1063/1.1682294](http://dx.doi.org/10.1063/1.1682294). The source and Wiki describe the operation but provide no worked numerical example; none is added here.

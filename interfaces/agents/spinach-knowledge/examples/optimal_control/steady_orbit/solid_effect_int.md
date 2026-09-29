@@ -1,22 +1,17 @@
 # examples/optimal_control/steady_orbit/solid_effect_int.m
 
-- Signature: `solid_effect_int()`
+Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/steady_orbit/solid_effect_int.m) · Function: `solid_effect_int()`
 
-## Purpose
+The example defines a phase-controlled, stroboscopic steady-state DNP design for an electron–proton pair. It builds the spin system, declares the proton longitudinal-magnetisation state as the destination, configures powder-dependent ESR drift and control constraints, and calls the GRAPE phase objective through `fmaxnewton`. This describes the optimisation setup, not a reported optimised pulse or measured enhancement.
 
-Panoramic optimisation for stroboscopic steady-state DNP, using timing and power settings matching the XiX experiment while allowing the phase to vary freely.
+The model uses `E` and `1H` at 3.35316 T and 80 K. The trityl electron Zeeman principal values are [2.00319, 2.00319, 2.00258], with Euler angles [0, 10, 0] degrees; the proton shift is [0, 0, 5] ppm, with Euler angles [0, 0, 10] degrees. Their coordinates are [0, 0, 0] and [0, 0, 3.500]; the script does not label the coordinate unit. The T1/T2 relaxation configuration uses a distance- and orientation-dependent proton R1 callback from `r1n_dnp`, R1 entries {1e3, callback}, R2 entries {200e3, 50e3}, diagonal relaxation retention, and `dibari` equilibrium. The basis is `sphten-liouv` with no approximation.
 
-## Model and numerical setup
+The target is proton `Lz`, normalised by its overlap with the equilibrium state. The code also constructs an equilibrium initial state, while its comment says the steady-state module ignores that initial state. Powder drifts use spins {`E`, `1H`}, grid `rep_2ang_800pts_sph`, and an ESR transmitter reference at 94.0 GHz. The controls are electron `Lx/Ly`, with `Lz` as the offset operator. The listed microwave control levels span 2π·5×10⁶ to 2π·25×10⁶ rad/s (20 levels), and the five offsets are −2, −1, 0, +1, and +2 MHz.
 
-- An electron (`E`) and proton (`1H`) at a 3.35316 T W-band field (HIPER at St Andrews), separated by 3.500 Å, with a spin temperature of 80 K.
-- Zeeman principal values are `[2.00319 2.00319 2.00258]` for the trityl electron and `[0 0 5]` ppm for the proton; Euler angles are `[0 10 0]` and `[0 0 10]` degrees.
-- `t1_t2` relaxation uses electron R1 = `1e3`, R2 = `200e3`, proton R2 = `50e3`, and an orientation-dependent proton R1 from `r1n_dnp` using `2.00230`, `1.0e-3`, `52.0`, the electron–proton distance, and `bet`. Relaxation is diagonal and equilibrium is `dibari`.
-- The calculation uses an unrestricted `sphten-liouv` basis, 240 processes, propagation chopping tolerance `1e-14`, and steady-state tolerance `1e-10`. Calculation time is days on a large parallel cluster.
+The control vector has 720 pulse samples of 0.5 ns each (360 ns), 20 frozen 0.5 ns ringdown samples, then a frozen 167 μs sequence delay. Amplitude is one during the pulse and zero in the ringdown and delay. The configured method is `rbfgs`, with maximum 10,000 iterations, `steady=true`, and budget 500; robustness and spectrogram plots are requested. A 16-coefficient prefix of `hiper_kernel_trans.mat` is normalised to unit absolute DC gain and passed through `firf` for optimisation distortion and plotting. The system requests 240 processes and sets propagation chop tolerance 1e-14 and steady-state tolerance 1e-10; the source comments that the calculation may take days on a large parallel cluster, which is not a run result.
 
-## Optimisation
+The source does not specify the scalar fidelity/loss formula, a converged waveform, numerical robustness or spectrogram values, or a measured DNP enhancement. The requested robustness/spectrogram displays are outputs to inspect, not results reported here; this is an example setup, not a kernel test.
 
-- Powder averaging uses `rep_2ang_800pts_sph`; the transmitter is set to precisely 94.0 GHz. The target is proton `Lz` magnetisation normalised to its thermal-equilibrium value.
-- Electron `Lx` and `Ly` are phase controls, with `Lz` as the offset operator. Microwave power levels are `2*pi*linspace(5,25,20)*1e6` rad/s, and tested offsets are `[-2 -1 0 +1 +2]` MHz.
-- The sequence comprises 720 adjustable 0.5 ns pulse samples, 20 frozen 0.5 ns ringdown samples, and a frozen 167 µs delay. Amplitude is one during the pulse and zero thereafter.
-- The HiPER filter is loaded from `hiper_kernel_trans.mat`; its first 16 coefficients are normalised to unit absolute DC gain and applied through `firf` in optimisation and plotting.
-- A sinusoidal phase chirp initialises `fmaxnewton` with `grape_phase`. Optimisation uses `rbfgs`, up to 10,000 iterations, `steady=true`, and a budget of 500; robustness and spectrogram plots are requested.
+This variant supplies a sinusoidal phase starting guess: the 720-point phase array is `wrapTo2Pi(4π sin(−4·linspace(−π, π, 720)))`, followed by 20 ringdown zeros and one sequence-delay zero. That is an initialisation choice; it does not assert that the final optimised phase remains sinusoidal.
+
+The source comments identify Guinevere Mathies, Shebha-Anandhi Jegadeesan, and Ilya Kuprov as contacts: guinevere.mathies@uni-konstanz.de, shebha-anandhi.jegadeesan@uni-konstanz.de, and ilya.kuprov@weizmann.ac.il.

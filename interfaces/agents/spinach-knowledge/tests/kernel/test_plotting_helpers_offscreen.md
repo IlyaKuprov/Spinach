@@ -1,27 +1,30 @@
 # tests/kernel/test_plotting_helpers_offscreen.m
 
-- Signature: `result=test_plotting_helpers_offscreen()`
+Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_plotting_helpers_offscreen.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_plotting_helpers_offscreen.m)
 
 ## Purpose
 
-Tests offscreen execution of Spinach plotting helpers under invisible figures, without relying on image comparison.
+Regression test for offscreen execution of Spinach plotting helpers. It exercises the plotting helpers under invisible figures and checks graphics object creation, axis sizes, returned data arrays, and figure helper side effects without relying on image comparison.
 
-## Physical / mathematical content
+## Behavior
 
-The test uses deterministic one-, two-, and three-dimensional spectra, MRI image data, a signed volume, and a compact mesh with heterogeneous Voronoi cells.
+- Called as `result=test_plotting_helpers_offscreen()`; prints `TESTING: Offscreen plotting helpers` and initializes a test result named `kernel/plotting_helpers_offscreen` ("Offscreen plotting helpers") with the requirement that plotting helpers must create deterministic graphics objects under invisible offscreen figures.
+- Saves the root default figure visibility, sets `defaultFigureVisible` to `'off'`, and registers an `onCleanup` handler that closes all figures with force and restores the original visibility after success or failure.
+- Builds a minimal spin system via `local_plot_system` with isotopes `{'1H','13C','15N'}`, magnet field 14.1, empty `sys.disable`, and `sys.output` set to `'hush'`.
+- **House-style helpers** (`local_test_house_style`): creates a figure with `kfigure('Visible','off')` and checks the handle is valid and invisible; calls `scale_figure([1.25 0.75])` and verifies the figure width and height equal 1.25 and 0.75 times the root default figure position (tolerances 1e-12); plots a 3D line with `plot3`, then applies `kgrid`, `ktitle`, `kxlabel`, `kylabel`, `kzlabel`, and `klegend({'trace'})`; in a second subplot uses `imagesc(magic(3))` with `kcolourbar('intensity')` and `ksgtitle('helper grid')`; asserts at least two axes objects, a valid legend object, and exactly one colorbar object.
+- **1D plotting** (`local_test_plot_1d`): defines a Gaussian spectrum on `linspace(-2,2,32)` with `parameters.spins={'1H'}`, offset 0, sweep 1000, zerofill 32, `axis_units='Hz'`, `invert_axis=0`; plots with `plot_1d` and checks exactly one line object whose `YData` matches the input spectrum (1e-12) and that the axes `XDir` is `'normal'`; then plots the complex spectrum `spectrum+1i*(2*spectrum)` and checks two line objects (real and imaginary) and one legend object.
+- **2D plotting** (`local_test_plot_2d`): uses `parameters.spins={'1H','13C'}`, offsets `[0 0]`, sweep `[1000 800]`, zerofill `[12 16]`, `axis_units='Hz'`, and a deterministic two-peak spectrum from `local_spectrum_2d` (positive peak `exp(-8*((row-0.30).^2+(col+0.20).^2))` minus `0.75*exp(-10*((row+0.25).^2+(col-0.35).^2))` on `linspace(-1,1)` grids); calls `plot_2d(spin_system,spectrum,parameters,4,[0.10 0.80 0.10 0.80],1,32,2,'both')` and checks the returned spectrum equals `transpose(spectrum)`, the returned frequency axes have lengths matching `size(spectrum,2)` and `size(spectrum,1)`, exactly one contour object, exactly one colorbar, and both axes directions reversed (NMR-style); then stack-plots a 12-by-12 spectrum with `stack_2d(spin_system,stack_spectrum,stack_params,1,@(slice)norm(slice,2))` and checks the patch count equals the number of columns and each patch `XData` length equals the number of rows plus one (trailing NaN point).
+- **3D plotting** (`local_test_plot_3d`): builds a 5-by-5-by-5 Gaussian spectrum over `linspace(-1,1,5)` grids, mean-subtracted, with `parameters.spins={'1H','13C','15N'}`, offsets `[0 0 0]`, sweep `[900 700 500]`, `npoints=[5 5 5]`, `zerofill=[5 5 5]`, `axis_units='Hz'`; calls `plot_3d(spin_system,spectrum,parameters,2,[0.20 0.80 0.20 0.80],1,'both')` and checks at least 2 patch objects (isosurfaces and projection contours) and at least 4 axes objects (volume view plus three projections).
+- **MRI and volume plots** (`local_test_misc_plots`): sets MRI parameters (`pe_grad_amp=0.01`, `pe_grad_dur=1e-3`, `ro_grad_amp=0.02`, `ro_grad_dur=1e-3`, `dims=[0.02 0.03]`, `spins={'1H'}`) and plots `reshape(1:16,[4 4])` through the `'image'`, `'phantom'`, and `'k-space'` branches of `mri_2d_plot`, checking exactly 3 image objects; when the count guard holds, verifies the first image `CData` equals the real part of the complex k-space data (1e-12); then calls `volplot` on a 4-by-4-by-4 cube with a value 1 at `(2,2,2)` and -0.5 at `(3,3,3)`, limits `[-1 1 -1 1 -1 1]` and levels `[1 1]`, checking at least one surface object.
+- **COMSOL mesh and concentration plots** (`local_test_comsol_plots`): constructs a 10-vertex mesh with heterogeneous Voronoi cells `{[1 2 3],[4 5 6 7],[8 9 10]}`, edge indices `[1 2]`, triangle `[1 2 3]`, rectangle `[1 2 4 3]`, and `max_cell_size=4`; runs `mesh_preplot` and checks the precomputed Voronoi arrays `mesh.plot.vor_a`/`vor_b` against explicit expected x/y vectors with NaN separators, and that an empty tessellation yields 0-by-0 arrays; attaches the mesh to the spin system with `zext=[-1 1]` and concentrations `[1;-0.5;0]`, then calls `conc_plot` and verifies: one side patch (14 vertices) and two cap patches (7 vertices each); top cap vertices `[vertices(cells{1},:) ones(3,1); vertices(cells{2},:) -0.5*ones(4,1)]` with faces `[1 2 3 1 NaN;4 5 6 7 4]`; bottom cap vertices reusing the active cell geometry at zero height; cap `FaceVertexCData` of `0.5*ones(2,3)` (neutral colours); side vertices pairing top and bottom cell boundaries; side faces `[1 2 5 4 1;2 3 6 5 2;3 1 4 6 3;7 8 12 11 7;8 9 13 12 8;9 10 14 13 9;10 7 11 14 10]` with `FaceVertexCData` `0.5*ones(7,3)`; projected cap areas equal to the `polyarea` of each active Voronoi cell; and total side-wall area equal to the sum over the two active cells of `abs(concentration)` times the cell perimeter (computed via edge lengths and cross-product norms), all at 1e-12 tolerance.
+- Uses the shared test utilities `new_test_result`, `test_true`, and `test_close` (the latter returning a count flag used to guard the k-space `CData` check).
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-Checks plotted data and frequency-axis sizes, graphics object counts and properties, figure dimensions, Voronoi plotting arrays, concentration-plot connectivity, and cap and side-wall areas.
+- **Inputs**: none. The function takes no arguments.
+- **Outputs**: `result` — regression test result structure with explanatory messages, accumulated by the `test_true` and `test_close` assertions across all subtests.
 
-## Outputs
+## References
 
-- `result` — regression test result with explanatory messages.
-
-## Implementation structure
-
-- Announce the test target and initialize the regression result.
-- Force invisible figures during the test, restoring figure visibility during cleanup.
-- Build a minimal spin-system structure used by the plotting routines.
-- Exercise house-style figure helpers and one-, two-, and three-dimensional spectral plotting.
-- Exercise MRI, volume, COMSOL mesh, and concentration plotting utilities.
+- Source file: [tests/kernel/test_plotting_helpers_offscreen.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_plotting_helpers_offscreen.m) in the Spinach repository.
+- Tested helpers: `kfigure`, `scale_figure`, `kgrid`, `ktitle`, `kxlabel`, `kylabel`, `kzlabel`, `klegend`, `kcolourbar`, `ksgtitle`, `plot_1d`, `plot_2d`, `stack_2d`, `plot_3d`, `mri_2d_plot`, `volplot`, `mesh_preplot`, `conc_plot`.

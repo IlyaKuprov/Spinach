@@ -1,15 +1,17 @@
 # examples/quantum_tech/transmon_cavity_swap.m
 
+Source: [examples/quantum_tech/transmon_cavity_swap.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_cavity_swap.m)
+
 - Signature: `transmon_cavity_swap()`
 
-## Purpose
+## Model
 
-Vacuum Rabi swap between a transmon and a microwave cavity mode, both represented by truncated bosonic Weyl algebras. This is the circuit-QED Jaynes-Cummings limit of Blais et al., Rev. Mod. Phys. 93, 025005 (2021). Calculation time: seconds.
+This is a coherent Jaynes–Cummings-limit vacuum-Rabi exchange between a truncated transmon oscillator and a truncated cavity mode, not an electron-spin or defect calculation. The isotope labels `T3` and `C3` give three-level representations for the transmon and cavity. At zero magnetic field both rotating-frame mode frequencies are set to zero, so the modes are resonant; the transmon anharmonicity is `-250e6` (−250 MHz) and the exchange coupling is `20e6` (20 MHz). The source configures no external drive or dissipative terms.
 
-## Model and parameters
+The Zeeman-Hilbert basis is used without approximation. The initial state is transmon `BL2` with cavity `BL1`, i.e. one transmon excitation and the cavity in its lowest state. A cavity-context device trajectory evolves this initial condition. The trajectory settings include `sweep=2e9` and `npoints=301`; the plotted time coordinates are explicitly 0–150 ns at 301 points.
 
-At zero magnet field, the rotating-frame transmon (T3) and cavity (C3) frequencies are both zero; the transmon anharmonicity is -250 MHz and their exchange coupling is 20 MHz. The calculation uses the Zeeman-Hilbert formalism with no approximation and starts with the transmon in BL2 and the cavity in BL1.
+## Observable and plot
 
-## Calculation
+The code evaluates transmon and cavity excitation populations from separate coil operators and plots both against time. It also checks that cavity population reaches at least 0.95, transmon population falls to at most 0.05, and the two populations sum to one within `1e-6`. The curves represent ideal coherent excitation exchange in this finite model; these source-level checks do not establish measured device performance or fidelity.
 
-The cavity-context device trajectory uses `sweep=2e9` and `npoints=301`. The code projects transmon and cavity excitation populations, checks that exchange is visible (cavity population reaches at least 0.95 and transmon population falls to at most 0.05), and verifies active-doublet population conservation to 1e-6. It plots the populations over 0–150 ns. The model is cited to Blais et al., Rev. Mod. Phys. 93, 025005 (2021).
+The source relates the example to the circuit-QED Jaynes–Cummings model and cites Blais et al., *Reviews of Modern Physics* **93**, 025005 (2021) ([DOI](https://doi.org/10.1103/RevModPhys.93.025005)).

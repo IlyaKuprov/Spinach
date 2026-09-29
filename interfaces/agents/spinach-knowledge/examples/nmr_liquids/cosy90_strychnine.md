@@ -1,19 +1,21 @@
 # examples/nmr_liquids/cosy90_strychnine.m
 
+- MATLAB implementation: [examples/nmr_liquids/cosy90_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/cosy90_strychnine.m)
+
 - Signature: `cosy90_strychnine()`
 
 ## Purpose
 
-COSY spectrum of strychnine. Calculation time: minutes
+A liquid-state homonuclear proton COSY-90 calculation for strychnine. The source estimates a calculation time of minutes.
 
-## Physical / mathematical content
+## Spin system and basis
 
-This example obtains a proton spin system from Spinach's `strychnine({'1H'})` helper and simulates its homonuclear liquid-state COSY spectrum. The sequence is run with a 90-degree angle and detects a two-dimensional signal.
+Rather than listing shifts and couplings locally, the function imports the proton model with `strychnine({'1H'})`; that helper supplies `sys` and `inter`. The field is set to 5.9 T. The basis is Liouville-space IK-2 with scalar-coupling connectivity and proximity level 1. The greedy option is enabled, with a proximity cutoff of 4.0 (the example does not specify a unit for this cutoff).
 
-## Numerical / algorithmic content
+## COSY acquisition and processing
 
-The model sets field value 5.9 and uses the greedy option and proximity cutoff 4.0, with the `sphten-liouv` formalism, IK-2 approximation, scalar-coupling connectivity and proximity level 1. The sequence uses offset 1200, sweep 2200, 512 points and 2048 zero-fill points on each axis. A cosine window is applied on both dimensions before the shifted 2D FFT; the plot uses the real spectrum.
+The pulse angle is pi/2, the offset is 1200 Hz, and the sweep width is 2200 Hz. The simulation samples 512 by 512 points, then zero-fills to 2048 by 2048 for the 2D FFT; the axes are labelled in ppm. A cosine window is applied in both dimensions. The plotted signal is the real part of the shifted spectrum, displayed with two-dimensional contours.
 
-## Implementation structure
+## Interpretation and scope
 
-The function loads the strychnine proton parameters, sets the field and basis, and passes the resulting system to `liquid(...,@cosy,...,'nmr')`. It then applies the two-dimensional cosine apodisation, performs the zero-filled 2D Fourier transform and plots the spectrum.
+The function calls the liquid-state COSY sequence and displays its simulated spectrum for the imported strychnine parameter set. The source does not reproduce the helper's shift or coupling table in this file and does not report an experimental comparison or a numerical peak assignment. The displayed spectrum therefore describes this configured simulation, not an independent measurement.

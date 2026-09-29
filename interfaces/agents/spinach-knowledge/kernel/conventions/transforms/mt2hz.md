@@ -1,18 +1,11 @@
 # kernel/conventions/transforms/mt2hz.m
 
-- Signature: `hfc_hz=mt2hz(hfc_mt,g)`
+Source implementation: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/mt2hz.m
+Spinach Wiki: [mt2hz.m](https://spindynamics.org/wiki/index.php?title=mt2hz.m)
 
 ## Purpose
 
-Converts hyperfine couplings from milliTesla (mT) to linear frequency in hertz (Hz).
-
-## Physical / mathematical content
-
-With `muB=9.274009994e-24` and `hbar=1.054571628e-34`, the conversion is `hfc_hz=hfc_mt*(1e-3*g*muB/(hbar*2*pi))`.
-
-## Numerical / algorithmic content
-
-If omitted, `g` defaults to 2.0023193043622. The conversion scales each input value by the same factor.
+Converts hyperfine couplings from milliTesla (mT) to hertz (Hz, linear frequency). The field specification is described as the magnetic field at which the electron frequency equals the supplied frequency.
 
 ## Syntax
 
@@ -20,15 +13,17 @@ If omitted, `g` defaults to 2.0023193043622. The conversion scales each input va
 hfc_hz=mt2hz(hfc_mt,g)
 ```
 
-## Parameters / inputs
+The second argument may be omitted; in that case the function displays a message and uses the free-electron g-factor `2.0023193043622`.
 
-- `hfc_mt` — real numeric array of hyperfine couplings in mT.
-- `g` — optional real numeric scalar electron g-factor; defaults to 2.0023193043622.
+## Inputs
 
-## Outputs
+- `hfc_mt` is a numeric array of real values in mT; arrays of any dimensions are accepted.
+- `g` is a real numeric scalar. If provided for an isotope-specific calculation, use the desired g-factor explicitly; only the omitted-argument case receives the free-electron default.
 
-- `hfc_hz` — converted hyperfine couplings in Hz.
+## Output and conversion
 
-## Implementation structure
+- `hfc_hz` is an array of values in Hz with the same dimensions as `hfc_mt`.
 
-The function applies the default g-factor when it is omitted, validates the inputs, then multiplies by the conversion factor.
+The implementation defines `muB=9.274009994*10^-24`, `hbar=1.054571628*10^-34`, and `C=1e-3*g*muB/(hbar*2*pi)`, then returns `hfc_hz=C*hfc_mt`. These source constants and the mT factor `1e-3` are retained as implemented.
+
+Validation checks that `hfc_mt` is numeric and real, and that `g` is numeric, real, and scalar. The implementation does not impose an additional positivity or finiteness check on `g`.

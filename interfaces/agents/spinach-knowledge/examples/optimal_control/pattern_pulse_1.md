@@ -1,26 +1,15 @@
 # examples/optimal_control/pattern_pulse_1.m
 
-- Signature: `pattern_pulse_1()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/pattern_pulse_1.m)
 
 ## Purpose
 
-Design a phase-modulated pulse for nutation-frequency-selective excitation, as described in the Glaser group paper (https://doi.org/10.1016/j.jmr.2004.12.005). The pulse drives magnetisation into specified target states over specified nutation-frequency intervals. Calculation time: minutes.
+This example designs a phase-modulated, nutation-frequency-selective excitation pulse. For an on-resonance 13C spin at 28.18 T with no basis approximation, it asks for an initial Sz state to reach Sz in three selected nutation-frequency bands and Sx at the other sampled frequencies. The source cites the Glaser-group paper at [doi:10.1016/j.jmr.2004.12.005](https://doi.org/10.1016/j.jmr.2004.12.005).
 
-## Physical / mathematical content
+## Target pattern and pulse design
 
-- A single on-resonance `13C` spin is simulated at a magnetic field of 28.18 T, with no basis approximations. The drift Hamiltonian is zero.
-- The initial state is normalised `Sz`. Across 128 nutation frequencies from 6 to 14 kHz, the target is normalised `Sz` in the first 20, middle 20 (indices 54–73), and last 20 frequency samples, and normalised `Sx` elsewhere.
-- The optimised control is the phase of a pulse with a fixed amplitude profile. Its Cartesian components act through `Lx` and `Ly`.
+The drift Hamiltonian is zero for this single on-resonance spin. The target pattern is defined over 128 nutation frequencies from 6 to 14 kHz: Sz is targeted at indices 1-20, 54-73, and 109-128; Sx is targeted at the remaining samples. The source plots this requested pattern before optimisation. It keeps the amplitude profile fixed and optimises phase with GRAPE via `fmaxnewton` and `@grape_phase`, using the `lbfgs` method. The initial phase is constant at pi/4, the configured iteration limit is 200, and the pulse grid has 250 intervals of 20 microseconds (5 milliseconds total). The B1 levels are set from the 6-14 kHz range and represented in the controls as angular frequencies in rad/s.
 
-## Numerical / algorithmic content
+## Evaluation shown by the example
 
-- The script runs GRAPE phase optimisation with the L-BFGS method (`control.method='lbfgs'`, `@grape_phase`), starting from a constant `pi/4` phase profile and allowing up to 200 iterations.
-- The pulse has 250 intervals of 20 µs each. The ensemble uses B1 power levels of `2*pi*nutf_range` rad/s and a separate initial–target state pair for each level.
-- After optimisation, a `parfor` loop simulates the shaped pulse at each power level using `shaped_pulse_xy` with the `expv-pwc` propagator. The resulting states are projected onto `Sx` and `Sz` and plotted against the target pattern.
-
-## Implementation structure
-
-- Initialise the spin system and obtain the normalised `Sx` and `Sz` states, `Lx` and `Ly` control operators, and drift Hamiltonian.
-- Construct and plot the frequency-dependent `Sx` and `Sz` target pattern.
-- Set the control ensemble, pulse grid, plotting options, and initial phase guess; configure optimisation with `optimcon` and run `fmaxnewton` using `@grape_phase`.
-- Simulate the optimised pulse across the nutation-frequency range in parallel and plot its `Sx` and `Sz` projections alongside the targets.
+For each nutation-frequency sample, the script simulates the shaped pulse and projects the final state onto Sx and Sz, then plots those projections against the target pattern. This defines how the example evaluates the design; the source contains no measured or reported post-optimisation values. Its calculation-time comment says minutes. Source contact: ilya.kuprov@weizmann.ac.il.

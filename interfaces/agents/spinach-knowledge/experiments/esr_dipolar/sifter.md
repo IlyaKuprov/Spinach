@@ -1,42 +1,29 @@
 # experiments/esr_dipolar/sifter.m
 
-- Signature: `fid=sifter(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_dipolar/sifter.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/sifter.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=sifter.m
 
-SIFTER pulse sequence. `H` is the Hamiltonian matrix, `R` is the relaxation matrix, and `K` is the chemical kinetics matrix.
+`fid=sifter(spin_system,parameters,H,R,K)`
 
-## Physical / mathematical content
+## What it calculates
 
-The sequence applies a 90-degree X pulse, evolves through the first part of `t1`, applies a 180-degree +X pulse, and evolves through the second part of `t1`. It then applies a 90-degree +Y pulse, evolves through the first part of `t2`, applies a 180-degree +X pulse, and detects during the second part of `t2`.
+This function simulates a SIFTER pulse sequence and returns a two-dimensional free-induction decay (FID). It uses the supplied spin-system Hamiltonian and pulse operators; the source does not define a field sweep, DNP/hyperpolarization step, imaging dimension, or a measured acquisition. No acronym expansion or specific hyperfine coupling is given in the routine source.
 
-## Numerical / algorithmic content
+## Inputs
 
-- The Liouvillian is assembled as `L=H+1i*R+1i*K`.
-- Evolution uses `parameters.timestep` and `parameters.npoints/2-1` steps for each period. The first part of `t1` uses `trajectory` mode; the second part of `t1` and first part of `t2` use `refocus` mode. The state-stack columns are reversed before the first part of `t2`.
-- The second part of `t2` uses `observable` mode with `parameters.coil` for 2D detection.
-
-## Parameters / inputs
-
-- `spin_system` — passed to the pulse and evolution operations.
-- `H` — Hamiltonian matrix.
-- `R` — relaxation matrix.
-- `K` — chemical kinetics matrix.
-- `parameters.npoints` — number of points in time evolution; must be a finite even real integer greater than or equal to 2.
-- `parameters.timestep` — simulation time step, seconds; must be a positive real scalar.
+- `spin_system` — Spinach spin system.
+- `parameters.npoints` — number of points; it must be a finite even real integer of at least 2.
+- `parameters.timestep` — positive real time step in seconds.
 - `parameters.rho0` — initial state.
 - `parameters.coil` — detection state.
-- `parameters.pulse_opx` — pulse operator in X phase.
-- `parameters.pulse_opy` — pulse operator in Y phase.
+- `parameters.pulse_opx` and `parameters.pulse_opy` — caller-supplied X- and Y-phase pulse operators, dimension-matched to `H`.
+- `H`, `R`, `K` — dimension-matched numeric matrices for the Hamiltonian, relaxation, and chemical kinetics contributions. The generator is `L=H+1i*R+1i*K`.
 
-`H`, `R`, and `K` must be numeric matrices of the same dimensions. All listed `parameters` fields are required.
+## Sequence and propagation
 
-## Outputs
+The routine applies a `pi/2` X pulse, evolves a first interval with `npoints/2-1` steps at `timestep` in trajectory mode, and applies a `pi` X pulse. It then refocus-evolves the stored stack for the first part of the echo, applies a `pi/2` Y pulse, reverses the stored order, and refocus-evolves the second delay period. A final `pi` X pulse precedes observable-mode evolution with `coil` over `npoints/2-1` steps. Pulse angles are in radians; the user supplies the X and Y pulse operators.
 
-- `fid` — a 2D free induction decay.
+## Output and scope
 
-## Implementation structure
-
-The function checks input consistency, composes the Liouvillian, then applies the pulses and evolution periods in sequence. The final evolution call returns `fid`.
-
-Source: <https://spindynamics.org/wiki/index.php?title=sifter.m>
+`fid` is the source-documented 2D FID. Its two sampling dimensions arise from the two evolution periods, but the function does not return separate named axis vectors; `timestep` and the even `npoints` control sampling. The numeric examples specified by the routine are the pulse angles `pi/2` and `pi`, and `npoints` must be at least 2 and even. No DOI or concrete physical parameter set is supplied.

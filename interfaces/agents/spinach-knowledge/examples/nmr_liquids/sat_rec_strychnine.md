@@ -1,27 +1,11 @@
 # examples/nmr_liquids/sat_rec_strychnine.m
 
-- Signature: `sat_rec_strychnine()`
+[Spinach source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/sat_rec_strychnine.m)
 
-## Purpose
+This wrapper simulates a proton saturation-recovery experiment for strychnine. The source comment describes the example as being at 250 MHz; the implementation obtains a proton spin system from `strychnine({'1H'})` and sets `sys.magnet=5.9` (5.9 T by Spinach convention). It does not read a measured spectrum or an experimental acquisition file. Its comment estimates minutes of calculation time; this was not timed here.
 
-Simulate a 1H saturation-recovery experiment on strychnine at 250 MHz. Calculation time: minutes.
+The relaxation setup is Redfield with `inter.equilibrium='dibari'`, `inter.rlx_keep='kite'`, `tau_c={200e-12}` s (200 ps), and `temperature=298` (the wrapper gives no unit annotation). The basis is `sphten-liouv` / `IK-2`, with scalar-coupling connectivity and proximity level 1; the proximity cutoff is 5.0 and `greedy` parallelisation is enabled.
 
-## Physical / mathematical content
+The single-channel acquisition uses `1H`, offset 1250, sweep 2500, and 4096 points, with ppm axis labels and an inverted axis. The wrapper sets a maximum delay of 0.5 and requests 10 delays; it does not state the delay list or explicitly label the units of these parameter literals. The call `liquid(spin_system,@sat_rec,parameters,'nmr')` delegates the saturation-recovery pulse sequence to `@sat_rec`. The wrapper does not specify pulse timings/phases, gradient use, or receiver settings, so none are inferred.
 
-- Loads the strychnine 1H spin system with `strychnine({'1H'})` and sets the magnetic induction to `5.9`.
-- Uses Redfield relaxation with `inter.equilibrium='dibari'`, `inter.rlx_keep='kite'`, correlation time `200e-12`, and temperature `298`.
-- Uses the `sphten-liouv` formalism with `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
-
-## Numerical / algorithmic content
-
-- Sets the proximity cutoff to `5.0` and enables `greedy` parallelisation.
-- Configures the 1H sequence with offset `1250`, sweep `2500`, `4096` points, maximum delay `0.5`, and `10` delays. The axis is in `ppm` and is inverted.
-- Runs `liquid(spin_system,@sat_rec,parameters,'nmr')`, applies exponential apodisation with parameter `6`, then Fourier-transforms and centers the result with `fftshift(fft(fids,[],1))`.
-- Plots the real part of the spectra with `plot_1d`.
-
-## Implementation structure
-
-1. Read strychnine spin-system properties and set the magnet, proximity cutoff, and parallelisation option.
-2. Set relaxation parameters and the basis; construct the spin system with `create` and `basis`.
-3. Set sequence parameters and run the saturation-recovery simulation.
-4. Apodise the FIDs, Fourier-transform them, and plot the real spectra.
+The returned FIDs are apodised exponentially with parameter 6, Fourier-transformed along dimension 1, shifted with `fftshift`, and plotted as their real part with `plot_1d`. This source produces a plotted simulated delay-series spectrum; it does not report fitted recovery constants or measured data.

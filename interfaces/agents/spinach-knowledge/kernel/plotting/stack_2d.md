@@ -1,30 +1,23 @@
 # kernel/plotting/stack_2d.m
 
-- Signature: `stack_2d(spin_system,spectrum,parameters,stack_dim,alpha_fun)`
+- Source: [kernel/plotting/stack_2d.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/stack_2d.m)
+- Wiki: [stack_2d.m](https://spindynamics.org/wiki/index.php?title=stack_2d.m)
 
 ## Purpose
 
-Plot a 2D NMR spectrum as a stack of lines in the current figure.
+Draw a 2D NMR spectrum as stacked line traces in the current axes. Spectrum values are used as trace heights; the function builds frequency or point-index coordinates and does not rescale the spectrum amplitudes.
 
-## Parameters / inputs
+## Inputs
 
-- `spin_system` — spin-system data used for axis conversion and reporting.
-- `spectrum` — numeric 2D spectrum. If it has a nonzero imaginary component, the real and imaginary components are plotted separately.
-- `parameters.sweep` — one or two sweep widths in Hz.
-- `parameters.spins` — cell array of one or two character strings specifying the working spins.
-- `parameters.offset` — one or two transmitter offsets in Hz; defaults to zero offsets if omitted.
-- `parameters.axis_units` — `ppm`, `Gauss`, `Hz`, `kHz`, `MHz`, or `points`; defaults to `ppm` if omitted.
-- `stack_dim` — stacking dimension, `1` or `2`.
-- `alpha_fun` — optional function handle applied to each spectral slice to determine stack-line opacity. Defaults to `@(x)sqrt(norm(x,2))`.
+- `spin_system` supplies the spin and field information used for axis conversion and reporting.
+- `spectrum` is a numeric 2D array. Its columns provide the F1 samples and its rows the F2 samples; F2 is horizontal and F1 vertical in the plot.
+- `parameters.sweep` contains one or two sweep widths in Hz. A single width is duplicated for both dimensions.
+- `parameters.offset` contains one or two transmitter offsets in Hz and defaults to zero when omitted.
+- `parameters.spins` is a cell array of one or two spin labels. `parameters.axis_units` defaults to `ppm`; supported values are `ppm`, `Gauss`, `Hz`, `kHz`, `MHz`, and `points`.
+- `stack_dim` selects 1 or 2. With 1, each trace runs along F1 and traces are taken at successive F2 positions; with 2, each trace runs along F2 and traces are taken at successive F1 positions.
+- `alpha_fun` optionally maps each slice to its line opacity. The default is `@(x)sqrt(norm(x,2))`.
 
-## Outputs
+## Plot construction and effects
 
-The function updates the current figure; it does not return an output argument.
-
-## Numerical / algorithmic content
-
-The function constructs F1 and F2 axes from the offsets, sweep widths, and spectrum dimensions, then converts and labels them in the requested units. A single spin, offset, or sweep value is duplicated for both dimensions. For `stack_dim=1` or `stack_dim=2`, it draws lines from slices in the corresponding direction. Slice opacity values are divided by their maximum and values below `0.01` are set to `0.01`. The plot uses a perspective projection, reverses both horizontal axes, and labels F1 and F2.
-
-## Reference
-
-- [Spinach `stack_2d.m` documentation](https://spindynamics.org/wiki/index.php?title=stack_2d.m)
+Frequency coordinates are made with `ft_axis` using offsets, sweep widths, and the matching spectrum dimension. `ppm` and `Gauss` axes use the spin and field data; `Hz`, `kHz`, and `MHz` rescale the frequency axis, while `points` uses sample indices. If any imaginary data are nonzero, the function recursively plots the real part and then the imaginary part on the same axes.
+Each slice opacity is evaluated by `alpha_fun`, normalized by the largest opacity, and floored at `0.01`. The function draws patch-line traces, tightens the horizontal limits, enables the grid and perspective projection, orbits the camera, reverses both horizontal axis directions, and labels F1/F2. It updates the current figure and returns no data or file.

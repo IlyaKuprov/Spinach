@@ -1,29 +1,15 @@
 # examples/microfluidics/plain_reaction.m
 
-- Signature: `plain_reaction()`
+## Model
 
-## Purpose
+A homogeneous cycloaddition concentration model with two reactants, two competing product channels, and an inert fifth solvent component; there is no spin dynamics, flow, or diffusion. The source comments assign `k1=0.5` to the exo channel and `k2=0.1` to the endo channel, with rate-constant units stated as `mol/(L*s)`. For concentrations A and B, the implemented rates are `dA/dt=dB/dt=-(k1+k2)*A*B`, `dP3/dt=k1*A*B`, `dP4/dt=k2*A*B`, and `dS/dt=0`. Initial concentrations are `[0.6; 0.5; 0; 0; 18.1] mol/L`.
 
-Non-linear reaction kinetics in a situation when there is no hydrodynamics, diffusion, or spin dynamics. This is intended as a stepping stone to the more complicated cases in the same directory of the Spinach example set. Calculation time: seconds.
+## Integration and output
 
-## Physical / mathematical content
+The concentration trajectory is advanced for 20 seconds in 200 steps with `step` and the `LG4` integrator. A concentration-versus-time plot shows components 1–4 in mol/L and omits solvent. The file header describes runtime as seconds; that is a source estimate, not a timing measurement here.
 
-- This standalone concentration model contains two competing second-order cycloaddition channels from cyclopentadiene and acrylonitrile to the exo and endo products. It has no spin system, hydrodynamics, or diffusion; solvent is included as an inert fifth component.
+The labels need care: this file's plot legend calls components 3 and 4 endo and exo, respectively, while the `k1`/`k2` comments associate those channels with exo and endo in the opposite order. The paired flow example titles components 3 and 4 exo and endo.
 
-## Numerical / algorithmic content
+## Source
 
-- The nonlinear concentration-dependent reaction generator is stepped on a 20-second grid with 200 time steps using Spinach `step` and the `LG4` integrator; the plotted traces omit the solvent.
-
-## Implementation structure
-
-- Non-linear reaction kinetics in a situation when there is
-- no hydrodynamics, diffusion, or spin dynamics. This is intended as a stepping stone to the more complicated cases
-- in the same directory of the Spinach example set.
-- Calculation time: seconds.
-- No spin system here
-- Rate constants, mol/(L*s)
-- Cycloaddition reaction generator, including solvent
-- Kinetic time grid, 20 seconds
-- Preallocate concentration trajectory
-- Initial concentrations, mol/L
-- Concentration dynamics
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/microfluidics/plain_reaction.m

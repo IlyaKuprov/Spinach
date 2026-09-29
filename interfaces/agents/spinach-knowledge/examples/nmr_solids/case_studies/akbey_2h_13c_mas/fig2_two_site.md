@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_two_site.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_two_site.m)
 
-Source: https://github.com/IlyaKuprov/Spinach/blob/master/examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_two_site.m
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_two_site.m
 
 This example simulates two-site position exchange of a deuterium nucleus. The comments say the sites differ in chemical shift and quadrupolar-tensor orientation, and identify Figure 2 of the cited paper as the reproduction target. The model contains two ²H chemical sites with equal concentrations and an exchange-rate matrix given as 1e4 times [-1, 1; 1, -1]. It constructs one quadrupolar tensor per site using weblab2nqi(0.16e6, 0, 1, 0, acos(1/3), 2*pi/3). The source does not annotate units for the helper inputs. The magnetic-field parameter is set to 9.4. The source does not state units for that value, the helper inputs, the exchange rates, or the rotor-rate input.
 

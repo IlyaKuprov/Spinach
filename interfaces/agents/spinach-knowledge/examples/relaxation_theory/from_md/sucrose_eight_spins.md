@@ -3,7 +3,7 @@
 - MATLAB implementation: [examples/relaxation_theory/from_md/sucrose_eight_spins.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/from_md/sucrose_eight_spins.m)
 
 - Signature: `sucrose_eight_spins()`
-- Source: [examples/relaxation_theory/from_md/sucrose_eight_spins.m](https://github.com/IlyaKuprov/Spinach/blob/master/examples/relaxation_theory/from_md/sucrose_eight_spins.m)
+- Source: [examples/relaxation_theory/from_md/sucrose_eight_spins.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/from_md/sucrose_eight_spins.m)
 - Paper cited by the source comments: [10.1016/j.jmr.2020.106891](https://doi.org/10.1016/j.jmr.2020.106891)
 
 ## Purpose and model

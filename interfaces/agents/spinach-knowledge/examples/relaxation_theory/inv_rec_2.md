@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/inv_rec_2.m)
 
-Source: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/master/examples/relaxation_theory/inv_rec_2.m)
+Source: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/inv_rec_2.m)
 
 ## Purpose and molecular model
 

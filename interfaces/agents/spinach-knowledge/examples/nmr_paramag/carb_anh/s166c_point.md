@@ -18,7 +18,7 @@ The MATLAB source specifies no magnetic field or acquisition temperature. The pa
 
 ## Sources
 
-- [MATLAB example source](https://github.com/IlyaKuprov/Spinach/blob/master/examples/nmr_paramag/carb_anh/s166c_point.m)
-- [Point PCS fitter and units](https://github.com/IlyaKuprov/Spinach/blob/master/experiments/pseudocon/ippcs.m)
+- [MATLAB example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s166c_point.m)
+- [Point PCS fitter and units](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/ippcs.m)
 - [Suturina et al., Chemical Science 8, 2751-2757 (2017), DOI: 10.1039/c6sc03736d](https://doi.org/10.1039/c6sc03736d)
 - [PCS analysis tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis)

@@ -20,6 +20,6 @@ Unlike the 1D and 2D examples, this file calls imaging with press_voxel_3d only.
 
 ## Source
 
-[Example source](https://github.com/IlyaKuprov/Spinach/blob/master/examples/imaging/press_3d_example.m) · [Voxel diagnostic](https://github.com/IlyaKuprov/Spinach/blob/master/experiments/imaging/press_voxel_3d.m)
+[Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/press_3d_example.m) · [Voxel diagnostic](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_voxel_3d.m)
 
 The source credits Ahmed Allami and Ilya Kuprov.

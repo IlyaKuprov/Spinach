@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m)
 
-Source: https://github.com/IlyaKuprov/Spinach/blob/master/examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m
 
 This driver simulates a three-dimensional ¹H–¹H–¹⁵N NOESY-HSQC spectrum for ¹⁵N-labelled ubiquitin, assuming the protein is not ¹³C-labelled. Its comments specify a 900 MHz instrument and a 65 ms mixing time, and identify 1D3Z PDB and BMRB files as the molecular and shift inputs. Those files are simulation inputs, not an experimental spectrum supplied for comparison. The driver says the calculation takes hours.
 

@@ -20,8 +20,8 @@ The `ipcs` interface documents nuclear and atom coordinates, box coordinates, an
 
 ## Sources
 
-- [MATLAB example source](https://github.com/IlyaKuprov/Spinach/blob/master/examples/nmr_paramag/carb_anh/s217c_kuprov.m)
-- [Distributed PCS solver and units](https://github.com/IlyaKuprov/Spinach/blob/master/experiments/pseudocon/ipcs.m)
-- [Effective susceptibility fitter](https://github.com/IlyaKuprov/Spinach/blob/master/experiments/pseudocon/chi_eff.m)
+- [MATLAB example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s217c_kuprov.m)
+- [Distributed PCS solver and units](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/ipcs.m)
+- [Effective susceptibility fitter](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/chi_eff.m)
 - [Suturina et al., Chemical Science 8, 2751-2757 (2017), DOI: 10.1039/c6sc03736d](https://doi.org/10.1039/c6sc03736d)
 - [PCS analysis tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis)

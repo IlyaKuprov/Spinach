@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_adiabatic_vs_optimcon.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_adiabatic_vs_optimcon.m)
 
-Source: https://github.com/IlyaKuprov/Spinach/blob/master/examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_adiabatic_vs_optimcon.m
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_adiabatic_vs_optimcon.m
 
 This example compares simulated ¹H–¹⁵N cross-polarisation in the doubly rotating frame using a tangent-ramped contact and GRAPE-optimised controls. The spin pair is ¹⁵N and ¹H; the source sets the field parameter to 9.394 and temperature to 298, without annotating units for those values. The coordinates are [0 0 0] and [0 0 1.05], and both scalar Zeeman inputs are zero; coordinate units are not stated. No experimental dataset is loaded: the powder-averaged trajectories and waveforms are simulation products.
 

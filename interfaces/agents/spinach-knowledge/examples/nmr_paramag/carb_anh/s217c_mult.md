@@ -18,7 +18,7 @@ No multipole coefficients, actual fitted values, or residual statistics are save
 
 ## Sources
 
-- [MATLAB example source](https://github.com/IlyaKuprov/Spinach/blob/master/examples/nmr_paramag/carb_anh/s217c_mult.m)
-- [Multipolar PCS fitter and units](https://github.com/IlyaKuprov/Spinach/blob/master/experiments/pseudocon/ilpcs.m)
+- [MATLAB example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s217c_mult.m)
+- [Multipolar PCS fitter and units](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/ilpcs.m)
 - [Suturina et al., Chemical Science 8, 2751-2757 (2017), DOI: 10.1039/c6sc03736d](https://doi.org/10.1039/c6sc03736d)
 - [PCS analysis tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis)

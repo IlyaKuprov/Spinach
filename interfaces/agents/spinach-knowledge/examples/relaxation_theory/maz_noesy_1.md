@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [examples/relaxation_theory/maz_noesy_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/maz_noesy_1.m)
 
-Source: [examples/relaxation_theory/maz_noesy_1.m](https://github.com/IlyaKuprov/Spinach/blob/master/examples/relaxation_theory/maz_noesy_1.m)
+Source: [examples/relaxation_theory/maz_noesy_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/maz_noesy_1.m)
 
 ## Purpose and spin system
 

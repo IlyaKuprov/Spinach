@@ -9,7 +9,7 @@
 %
 % Calculation time: minutes
 %
-% ilya.kuprov@weizmann.ac.il
+% talos@spindynamics.org
 
 function mas_fplanck_slices()
 

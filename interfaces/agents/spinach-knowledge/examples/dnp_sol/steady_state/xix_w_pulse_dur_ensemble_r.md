@@ -16,7 +16,7 @@ The sequence uses phase `pi` for the second pulse, additive shift `-33e6`, and s
 
 ## Distance quadrature and output
 
-The three-node distance quadrature is specified as `[r,w]=gaussleg(3.5,20,3)` (the source does not annotate the coordinate unit). For each node, the script resets the proton coordinate, constructs the distance-dependent relaxation rate, creates the Spinach system, and runs the pulse-duration sweep with `parfor`. Each point calls `powder(...,@xixdnp_steady,...,'esr')` with `irr_powers=20e6` and orientation grid `rep_2ang_800pts_sph`.
+The four-node distance quadrature is specified as `[r,w]=gaussleg(3.5,20,3)` (the source does not annotate the coordinate unit). For each node, the script resets the proton coordinate, constructs the distance-dependent relaxation rate, creates the Spinach system, and runs the pulse-duration sweep with `parfor`. Each point calls `powder(...,@xixdnp_steady,...,'esr')` with `irr_powers=20e6` and orientation grid `rep_2ang_800pts_sph`.
 
 The final map is averaged over distance using the quadrature weights multiplied by `r.^2`, the Jacobian identified in the source. It plots the real proton `I_z` expectation against offset and pulse duration and saves `xix_w_pulse_dur_ensemble_r.fig`.
 

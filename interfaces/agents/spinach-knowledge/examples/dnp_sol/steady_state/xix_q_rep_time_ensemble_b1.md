@@ -9,7 +9,7 @@ Scans XiX steady-state proton polarisation against shot repetition time, averagi
 
 ## Inputs and scan axes
 
-- Five Gauss–Legendre B1 nodes spanning `10e6`–`20e6` Hz.
+- Six Gauss–Legendre B1 nodes spanning `10e6`–`20e6` Hz.
 - Thirty logarithmically spaced repetition times, `logspace(-5,-3,30)`. They are used in the shot-spacing subtraction with the source's 48 ns pulse duration, i.e. on the same time scale (seconds). For every point, `shot_spacing=rep_time-2*nloops*pulse_dur`.
 - Fixed Cartesian coordinate values at z = 0 and z = 3.500 (no unit is annotated beside these coordinates in this source); fixed `parameters.el_offs=-39e6` and `parameters.addshift=-13e6`.
 

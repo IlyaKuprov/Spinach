@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Compares steady-state NOVEL proton polarisation across a repetition-time scan, with and without a flipback pulse, while averaging over a five-node microwave B1 distribution. The source estimates hours of calculation time. This is a parameterised example script, not a function that accepts scan settings or returns the computed arrays.
+Compares steady-state NOVEL proton polarisation across a repetition-time scan, with and without a flipback pulse, while averaging over a six-node microwave B1 distribution. The source estimates hours of calculation time. This is a parameterised example script, not a function that accepts scan settings or returns the computed arrays.
 
 ## Spin system and relaxation
 

@@ -2,7 +2,7 @@
 
 - Signature: `[traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)`
 
-Evaluates phase-only GRAPE derivatives with amplitudes fixed by `spin_system.control.amplitudes`. Each phase row pairs with one amplitude row; polar samples are converted to Cartesian x/y controls before calling `grape_xy`. The freeze mask is expanded to both Cartesian channels for each phase coordinate. This is a coordinate wrapper, not an optimizer or line-search selector.
+Evaluates phase-only GRAPE derivatives with amplitudes fixed by `spin_system.control.amplitudes`. Each phase row pairs with one amplitude row; polar samples are converted to Cartesian x/y controls before calling `grape_xy`. The freeze mask is expanded to both Cartesian channels for each phase coordinate. This is a coordinate wrapper, not an optimiser or line-search selector.
 
 The amplitude and phase arrays must be real numeric arrays with equal element counts and `ncontrols/2` rows; amplitudes must be nonnegative. Under the `rectangle` integrator, each has `pulse_nsteps` columns; under `trapezium`, each has `pulse_nsteps+1`. The control amplitude profile must exist, and `ncontrols` must be even.
 

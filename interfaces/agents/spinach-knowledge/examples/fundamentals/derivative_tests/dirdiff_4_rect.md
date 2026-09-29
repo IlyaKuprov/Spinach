@@ -20,4 +20,4 @@ The five-element phase vector is perturbed with `h=sqrt(eps('double'))`. At indi
 
 ## Scope
 
-The example checks three coordinates for each constructed formalism; it does not test every phase coordinate or demonstrate optimizer convergence. The source does not declare an explicit unit or phase convention for the waveform values. Its relative-error expression also has no small-denominator guard when a finite-difference estimate is zero or near zero.
+The example checks three coordinates for each constructed formalism; it does not test every phase coordinate or demonstrate optimiser convergence. The source does not declare an explicit unit or phase convention for the waveform values. Its relative-error expression also has no small-denominator guard when a finite-difference estimate is zero or near zero.

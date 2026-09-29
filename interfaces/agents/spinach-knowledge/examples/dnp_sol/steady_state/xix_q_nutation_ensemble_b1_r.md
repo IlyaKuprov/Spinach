@@ -10,7 +10,7 @@ Builds six steady-state XiX DNP field profiles against microwave offset, one for
 ## Inputs and scan axes
 
 - Nutation frequencies `nu=1e6*[6.8 9.6 13.5 17.5 25 36]` Hz, paired in order with `srt=1e-3*[0.051 0.051 0.102 0.153 0.153 0.306]` s.
-- Three Gauss–Legendre distance nodes on 3.5–20 Å; five B1 nodes from `0.2*nu` to `1.2*nu` Hz for each frequency. The distance average includes the radial `r^2` Jacobian.
+- Four Gauss–Legendre distance nodes on 3.5–20 Å; six B1 nodes from `0.2*nu` to `1.2*nu` Hz for each frequency. The distance average includes the radial `r^2` Jacobian.
 - Thirteen microwave resonance offsets from `linspace(-64e6,-52e6,13)` Hz. The script sets `parameters.addshift=-13e6` and derives shot spacing as `srt-2*nloops*pulse_dur`.
 
 ## Shared spin-system setup
@@ -29,4 +29,4 @@ The local function `xix_field_profile_b1_r(nu,srt)` constructs the distance-spec
 
 ## Clarification
 
-Despite “ensemble” in the name, the six nutation frequencies are a discrete outer profile scan, each paired with a different `srt`; the B1 quadrature is five nodes scaled separately by each `nu`, not a single fixed B1 interval.
+Despite “ensemble” in the name, the six nutation frequencies are a discrete outer profile scan, each paired with a different `srt`; the B1 quadrature is six nodes scaled separately by each `nu`, not a single fixed B1 interval.

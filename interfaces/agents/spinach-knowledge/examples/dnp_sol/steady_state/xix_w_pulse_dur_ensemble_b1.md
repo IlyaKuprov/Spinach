@@ -16,7 +16,7 @@ The sequence sets the second pulse phase to `pi`, the additive shift to `-33e6`,
 
 ## Numerical scan and output
 
-The pulse-duration vector contains 200 values from `2e-9` to `21e-9 s`. The offset vector contains 101 values from `-230e6` to `205e6 Hz` (the figure axis is MHz). The five-node B1 quadrature is defined by `[b1,wb1]=gaussleg(10e6,20e6,5)`; its inputs are labelled Hz in the source. For each B1 node, the script sets `irr_powers=b1(k)` and uses `parfor` over durations to call `powder(...,@xixdnp_steady,...,'esr')` on `rep_2ang_800pts_sph`. It then combines the B1-node results using `wb1` and plots the real proton expectation as an offset-by-duration map, with offset in MHz and duration in ns. The figure is saved as `xix_w_pulse_dur_ensemble_b1.fig`.
+The pulse-duration vector contains 200 values from `2e-9` to `21e-9 s`. The offset vector contains 101 values from `-230e6` to `205e6 Hz` (the figure axis is MHz). The six-node B1 quadrature is defined by `[b1,wb1]=gaussleg(10e6,20e6,5)`; its inputs are labelled Hz in the source. For each B1 node, the script sets `irr_powers=b1(k)` and uses `parfor` over durations to call `powder(...,@xixdnp_steady,...,'esr')` on `rep_2ang_800pts_sph`. It then combines the B1-node results using `wb1` and plots the real proton expectation as an offset-by-duration map, with offset in MHz and duration in ns. The figure is saved as `xix_w_pulse_dur_ensemble_b1.fig`.
 
 ## Dependencies and scope
 

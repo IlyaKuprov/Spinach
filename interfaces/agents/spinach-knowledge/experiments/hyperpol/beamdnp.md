@@ -24,7 +24,7 @@ contact_curve is a vector of nloops+1 contact values: element 1 is the initial c
 
 ## Limits and interpretation
 
-This implements the fixed BEAM pulse sequence and blockwise detection; it is not a general DNP optimizer or a complete model of polarisation transfer independent of the supplied spin Hamiltonian and relaxation/kinetics. The source specifies the DOI above but gives no numeric microwave frequency, pulse-duration pair, loop count, or validated experimental fit, so no such values are invented here.
+This implements the fixed BEAM pulse sequence and blockwise detection; it is not a general DNP optimiser or a complete model of polarisation transfer independent of the supplied spin Hamiltonian and relaxation/kinetics. The source specifies the DOI above but gives no numeric microwave frequency, pulse-duration pair, loop count, or validated experimental fit, so no such values are invented here.
 
 Paper: https://doi.org/10.1126/sciadv.abq0536
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/beamdnp.m

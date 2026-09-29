@@ -10,7 +10,7 @@ Fits a point-electron PCS model to measured pseudocontact shifts, estimating the
 
 Call as `[mxyz,chi,pred_pcs,s_mxyz,s_chi] = ippcs(nxyz,mguess,expt_pcs)`. `nxyz` contains nuclear coordinates in Å as a real N-by-3 array (the implementation also accepts a cell array of such coordinate arrays). `mguess` is a real 1-by-3 initial estimate of the paramagnetic-centre coordinates in Å. `expt_pcs` is a real column of measured PCS values in ppm, one per nucleus.
 
-The optimizer has eight free parameters: three centre coordinates and five independent susceptibility components in Å³. Those five values are assembled into a symmetric traceless tensor: the first row is `[p4 p5 p6]`, the second `[p5 p7 p8]`, and the third `[p6 p8 -p4-p7]`. The initial values for the five tensor parameters are each `0.1`. No parameter bounds or additional physical constraints are imposed by this fit.
+The optimiser has eight free parameters: three centre coordinates and five independent susceptibility components in Å³. Those five values are assembled into a symmetric traceless tensor: the first row is `[p4 p5 p6]`, the second `[p5 p7 p8]`, and the third `[p6 p8 -p4-p7]`. The initial values for the five tensor parameters are each `0.1`. No parameter bounds or additional physical constraints are imposed by this fit.
 
 ## Fit and uncertainty estimates
 

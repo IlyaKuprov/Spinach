@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Evaluates the GRAPE objective and its first derivatives for one shaped pulse, propagating an initial state and projecting onto a target state. This is a low-level contribution routine, not the optimizer; its source directs callers to wrappers such as `grape_xy.m` and `grape_phase.m`.
+Evaluates the GRAPE objective and its first derivatives for one shaped pulse, propagating an initial state and projecting onto a target state. This is a low-level contribution routine, not the optimiser; its source directs callers to wrappers such as `grape_xy.m` and `grape_phase.m`.
 
 ## Inputs and array shapes
 
@@ -21,7 +21,7 @@ The control setting `fid_type` is separate: it must be `'terminal'` or `'average
 
 The returned `grad` differentiates the fidelity with respect to the waveform amplitudes. If `spin_system.control.freeze` is empty, the routine substitutes an all-false mask the size of `waveform`; otherwise it indexes the supplied mask by control row and time column. Frozen entries receive zero gradient. When a Hessian is requested, frozen rows and columns are zeroed and their diagonal entries are set to one.
 
-The fourth output `hess` is not available with the piecewise-linear `'trapezium'` integrator, stroboscopic steady states, nonempty keyhole schedules, average-fidelity mode, or trajectory penalties. In the supported state-vector formalisms, keyholes are also rejected for `'newton'` and `'goodwin'` methods; first-order `'lbfgs'` and `'rbfgs'` methods and empty keyhole schedules remain available. These are source guards, not a list of all optimizer methods.
+The fourth output `hess` is not available with the piecewise-linear `'trapezium'` integrator, stroboscopic steady states, nonempty keyhole schedules, average-fidelity mode, or trajectory penalties. In the supported state-vector formalisms, keyholes are also rejected for `'newton'` and `'goodwin'` methods; first-order `'lbfgs'` and `'rbfgs'` methods and empty keyhole schedules remain available. These are source guards, not a list of all optimiser methods.
 
 ## Additional control transformations
 

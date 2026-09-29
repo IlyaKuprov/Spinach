@@ -14,7 +14,7 @@ All five arguments are required; the source assigns no defaults. `signal` must b
 
 The signal is columnised, its phase is formed with `unwrap(angle(signal))`, and `sgolaydiff(phase,1,npoints,poly_order)` is divided by `2*pi*dt`. At each sample, the routine positions a full `npoints`-sample stencil within the signal bounds, including at the edges. It sets the frequency to NaN if any sample in that stencil has magnitude less than or equal to `amp_tol*max(abs(signal))`. Thus `amp_tol=0` still masks stencils containing exact zero-magnitude samples. The output is reshaped to the input signal's row or column shape.
 
-This routine has no optimizer, line search, freeze mask, or phase-cycle mask; its mask is solely the weak-amplitude stencil test above.
+This routine has no optimiser, line search, freeze mask, or phase-cycle mask; its mask is solely the weak-amplitude stencil test above.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/inst_freq.m)
 [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=inst_freq.m)

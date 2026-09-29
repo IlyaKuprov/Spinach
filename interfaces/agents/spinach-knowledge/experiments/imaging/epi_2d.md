@@ -14,7 +14,7 @@ The acquisition matrix `fid` has `parameters.image_size` shape. Each readout/pha
 ## Parameters, units, and constraints
 
 - `parameters.pe_grad_dur` (phase encode, X) and `parameters.ro_grad_dur` (readout, Y): positive scalar durations in seconds.
-- `parameters.image_size`: two integers, each at least 2; these set the phase and readout sample counts.
+- `parameters.image_size`: two odd integers, each at least 3; these set the phase and readout sample counts. The `imaging()` context rejects even sizes before EPI runs.
 - `parameters.diff_g_amp`: optional two-element real X/Y vector in T/m; when present it requires `parameters.diff_g_dur`, a positive scalar in seconds.
 - `parameters.pe_grad_amp` and `parameters.ro_grad_amp` are also used to scale `G{1}` and `G{2}` in the code. The source help text does not state their units, so use the gradient/operator convention of the calling imaging setup rather than assuming a calibration here.
 - The function also requires numeric `parameters.rho0` and `parameters.coil`, a positive-integer `parameters.npts` vector, and nonempty `parameters.spins` cell array. `H`, `R`, `K`, and `F` must be same-size matrices, while `G` must contain at least two gradient operators.

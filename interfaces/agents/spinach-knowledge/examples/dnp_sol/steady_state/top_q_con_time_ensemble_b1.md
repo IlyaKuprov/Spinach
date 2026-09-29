@@ -24,4 +24,4 @@ The source uses Spinach system construction and propagation functions `create`, 
 
 ## Output and scope
 
-The saved figure `top_q_con_time_ensemble_b1.fig` plots the real proton longitudinal expectation value against total contact time for the two B1 ensembles. It represents the specified pair, TOP helper, relaxation model, and five-node quadratures; the source provides no numerical result array as a function return.
+The saved figure `top_q_con_time_ensemble_b1.fig` plots the real proton longitudinal expectation value against total contact time for the two B1 ensembles. It represents the specified pair, TOP helper, relaxation model, and six-node quadratures; the source provides no numerical result array as a function return.

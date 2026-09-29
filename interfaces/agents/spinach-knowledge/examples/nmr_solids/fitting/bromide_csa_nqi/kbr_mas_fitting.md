@@ -12,7 +12,7 @@ The input file is KBr_400MHz_2kHz.txt; column 2 is flipped and divided by 100 to
 
 The model contains three ⁷⁹Br spins with a shared isotropic chemical shift and three diagonal quadrupolar tensors. For each tensor the third diagonal element is minus the sum of the first two, and the initial guess supplies the XX and YY values in kHz before the code multiplies them by 1e3. The basis is sphten-liouv with IK-0 approximation, inter-level 1 and projection +1. One fitted relaxation-rate value is assigned to both T1 and T2 for all three spins; the model uses zero equilibrium and diagonal relaxation retention. The starting density operator is a weighted sum of the three L+ states, with the three component weights among the fit parameters.
 
-The initial parameter vector is [60.0933, 13.7569, 1.6424, 4.0779, 4.5179, 1.5885, 0.9449, 263.9835, 40, 32, 28]: the source labels the first value as chemical shift in ppm, six tensor eigenvalue inputs in kHz, the relaxation rate in Hz, and the last three as weights. They are optimizer starting values, not reported fitted values.
+The initial parameter vector is [60.0933, 13.7569, 1.6424, 4.0779, 4.5179, 1.5885, 0.9449, 263.9835, 40, 32, 28]: the source labels the first value as chemical shift in ppm, six tensor eigenvalue inputs in kHz, the relaxation rate in Hz, and the last three as weights. They are optimiser starting values, not reported fitted values.
 
 ## MAS calculation, comparison, and limits
 

@@ -14,7 +14,7 @@ The model has two `1H` and two `13C` spins with `sys.magnet=14.1`. Scalar Zeeman
 
 ## GRAPE configuration
 
-The x/y controls act on proton and carbon channels; the drift is offset using transmitter settings `[1050, 5285]` (units not specified at that assignment). The configured power levels are `2*pi*[460, 480, 500, 520, 540]`, over 100 slices of 150 microseconds (15 ms). The `NS` and `SNS` penalties have weights 0.1 and 10, the optimizer method is `goodwin`, and the iteration cap is 100. A random 4-by-100 guess is passed to `fmaxnewton` with `@grape_xy`; the returned pulse is scaled by the mean power level.
+The x/y controls act on proton and carbon channels; the drift is offset using transmitter settings `[1050, 5285]` (units not specified at that assignment). The configured power levels are `2*pi*[460, 480, 500, 520, 540]`, over 100 slices of 150 microseconds (15 ms). The `NS` and `SNS` penalties have weights 0.1 and 10, the optimiser method is `goodwin`, and the iteration cap is 100. A random 4-by-100 guess is passed to `fmaxnewton` with `@grape_xy`; the returned pulse is scaled by the mean power level.
 
 ## Test calculation
 

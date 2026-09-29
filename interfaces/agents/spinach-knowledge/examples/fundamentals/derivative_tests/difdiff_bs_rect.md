@@ -22,4 +22,4 @@ At each entry the relative error is `abs(grad_anl-grad_num)/max(abs(grad_num),ep
 
 ## Scope
 
-The waveform is randomised without a source-level seed, and only three of its 400 entries are checked in a run. These checks do not establish the accuracy of every gradient component or report an optimizer outcome. No units are added to the source's magnetic-field, offset, power, or pulse-interval values.
+The waveform is randomised without a source-level seed, and only three of its 400 entries are checked in a run. These checks do not establish the accuracy of every gradient component or report an optimiser outcome. No units are added to the source's magnetic-field, offset, power, or pulse-interval values.

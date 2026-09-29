@@ -16,7 +16,7 @@ The pulse sequence uses second-pulse phase `pi`, additive shift `-33e6`, and sho
 
 ## Quadratures and output
 
-Distance nodes and weights come from `[r,w]=gaussleg(3.5,20,3)`; the source labels this a distance ensemble but does not state the coordinate unit. At each node the script updates the proton coordinate and evaluates the distance-dependent relaxation rate. The five-node B1 quadrature is `[b1,wb1]=gaussleg(10e6,20e6,5)`, labelled Hz. It loops over distance and B1 nodes, parallelises the duration sweep with `parfor`, and calls `powder(...,@xixdnp_steady,...,'esr')` using `rep_2ang_800pts_sph`.
+Distance nodes and weights come from `[r,w]=gaussleg(3.5,20,3)`; the source labels this a distance ensemble but does not state the coordinate unit. At each node the script updates the proton coordinate and evaluates the distance-dependent relaxation rate. The six-node B1 quadrature is `[b1,wb1]=gaussleg(10e6,20e6,5)`, labelled Hz. It loops over distance and B1 nodes, parallelises the duration sweep with `parfor`, and calls `powder(...,@xixdnp_steady,...,'esr')` using `rep_2ang_800pts_sph`.
 
 The accumulated map is averaged over B1 with `wb1`, then over distance with weights `r.^2 .* w`; the `r.^2` factor is the Jacobian noted in the source. The real proton `I_z` expectation is plotted against offset and pulse duration and saved as `xix_w_pulse_dur_ensemble_b1_r.fig`.
 

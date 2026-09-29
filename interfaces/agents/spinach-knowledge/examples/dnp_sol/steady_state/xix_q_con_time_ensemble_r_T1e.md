@@ -10,7 +10,7 @@ Compares steady-state XiX proton contact-time curves for five electron longitudi
 
 ## Model and sweep
 
-The outer function evaluates `T1e=[10e-3,3.0e-3,1.0e-3,0.3e-3,0.1e-3]` s, i.e. 10, 3.0, 1.0, 0.3, and 0.1 ms. For each value it calls the local helper `xix_contact_curve_ensemble_r(T1e)`. The helper builds the same Q-band electron–`1H` pair at `sys.magnet=1.2142` (1.2142 T), with electron Zeeman principal values `[2.00319 2.00319 2.00258]`, proton shift `[0 0 5]` (source: ppm guess), Euler-angle triplets `[0 10 0]` degrees converted to radians, and spin temperature 80 K. The three-node distance quadrature is `gaussleg(3.5,20,3)` Å, and coordinates are set to `[0 0 0]` and `[0 0 r]` at each node.
+The outer function evaluates `T1e=[10e-3,3.0e-3,1.0e-3,0.3e-3,0.1e-3]` s, i.e. 10, 3.0, 1.0, 0.3, and 0.1 ms. For each value it calls the local helper `xix_contact_curve_ensemble_r(T1e)`. The helper builds the same Q-band electron–`1H` pair at `sys.magnet=1.2142` (1.2142 T), with electron Zeeman principal values `[2.00319 2.00319 2.00258]`, proton shift `[0 0 5]` (source: ppm guess), Euler-angle triplets `[0 10 0]` degrees converted to radians, and spin temperature 80 K. The four-node distance quadrature is `gaussleg(3.5,20,3)` Å, and coordinates are set to `[0 0 0]` and `[0 0 r]` at each node.
 
 The basis is `sphten-liouv` with no approximation, propagator chop tolerance `1e-12`, and hygiene disabled. Relaxation uses `t1_t2`, diagonal terms, and `dibari` equilibrium. The electron R1 rate is `1/T1e`; electron R2 and proton R2 are 200000 and 50000. Proton R1 is supplied by `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r(n),bet)`, a distance- and orientation-dependent function handle. Rate units are not annotated in the source.
 

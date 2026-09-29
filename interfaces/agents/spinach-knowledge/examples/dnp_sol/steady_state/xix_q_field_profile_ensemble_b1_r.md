@@ -12,7 +12,7 @@ Calculates a steady-state XiX DNP microwave-offset profile with two explicit ens
 
 The script uses an `E`/`1H` pair, `sys.magnet=1.2142`, spin temperature `80`, trityl electron Zeeman principal values `[2.00319 2.00319 2.00258]`, proton shift guess `[0 0 5]` ppm, and Euler inputs `(pi/180)*{[0 10 0],[0 0 10]}`. At each sampled distance, the proton coordinate is set to z=`r(n)`; here `gaussleg(3.5,20,3)` is explicitly annotated as Å. The proton `r1` handle calls `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r(n),bet)`; electron `r1=1e3`, `r2_rates={200e3 50e3}`, relaxation retention is diagonal, and equilibrium is `dibari`. Magnet, temperature and rates are not assigned units in this source.
 
-For each distance and each of five Gauss–Legendre B1 points spanning 10e6–20e6 Hz, it evaluates 201 microwave offsets from −100e6 to 100e6 Hz on `rep_2ang_800pts_sph`, using the unapproximated `sphten-liouv` basis, proton `Lz` detection, and `powder(...,@xixdnp_steady,...,'esr')`. The XiX protocol uses 48e-9 s pulses, 36 blocks, second-pulse phase `pi`, additional shift −13e6 (unit not annotated), and shot spacing `204e-6 - 2*nloops*pulse_dur`.
+For each distance and each of six Gauss–Legendre B1 points spanning 10e6–20e6 Hz, it evaluates 201 microwave offsets from −100e6 to 100e6 Hz on `rep_2ang_800pts_sph`, using the unapproximated `sphten-liouv` basis, proton `Lz` detection, and `powder(...,@xixdnp_steady,...,'esr')`. The XiX protocol uses 48e-9 s pulses, 36 blocks, second-pulse phase `pi`, additional shift −13e6 (unit not annotated), and shot spacing `204e-6 - 2*nloops*pulse_dur`.
 
 ## Dependencies and output
 

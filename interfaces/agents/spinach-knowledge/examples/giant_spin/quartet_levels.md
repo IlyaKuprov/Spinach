@@ -7,7 +7,7 @@
 
 ## Model and parameters
 
-This field scan models a spin-3/2 particle (`E4`) with a zero-field splitting. The example sets the field to 1.0 T and uses the isotropic Zeeman matrix `diag([2 2 2])`. It defines `D=icm2hz(-0.5)` and `E=0.3*D`, then constructs the zero-field-splitting matrix with `zfs2mat(D,E,0,0,0)`. The source does not label the input unit of -0.5.
+This field scan models a spin-3/2 particle (`E4`) with a zero-field splitting. The example sets the field to 1.0 T and uses the isotropic Zeeman matrix `diag([2 2 2])`. It defines `D=icm2hz(-0.5)` and `E=0.3*D`, then constructs the zero-field-splitting matrix with `zfs2mat(D,E,0,0,0)`. The `icm2hz` API takes `-0.5` in inverse centimetres (cm⁻¹) and converts the splitting to Hz.
 
 The Hilbert-space basis uses `zeeman-hilb` with `approximation='none'`. The scan parameters are fields from 0 to 1, 100 points, orientation `[0 0 0]`, and four states.
 

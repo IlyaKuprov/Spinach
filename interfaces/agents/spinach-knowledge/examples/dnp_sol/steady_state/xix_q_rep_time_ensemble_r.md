@@ -9,7 +9,7 @@ Scans XiX steady-state proton polarisation against shot repetition time, averagi
 
 ## Inputs and scan axes
 
-- Three Gauss–Legendre distance nodes over 3.5–20 Å; the distance average includes the radial `r^2` Jacobian.
+- Four Gauss–Legendre distance nodes over 3.5–20 Å; the distance average includes the radial `r^2` Jacobian.
 - Thirty logarithmically spaced repetition times, `logspace(-5,-3,30)`; each shot spacing subtracts the two-pulse-per-block XiX train duration from the repetition time. Pulse duration is 48 ns.
 - Fixed electron nutation frequency `parameters.irr_powers=18e6` Hz, fixed `parameters.el_offs=-39e6`, and `parameters.addshift=-13e6`.
 

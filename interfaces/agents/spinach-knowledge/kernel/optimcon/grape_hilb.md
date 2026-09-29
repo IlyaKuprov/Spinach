@@ -4,7 +4,7 @@
 
 ## Purpose and interface
 
-`[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` evaluates a Hilbert-space density-matrix GRAPE objective and requested derivatives. It is a low-level evaluator, not the optimizer; the source directs users to [`grape_xy.m`](wrappers/grape_xy.md) or [`grape_phase.m`](wrappers/grape_phase.md) for the higher-level optimisation interface.
+`[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` evaluates a Hilbert-space density-matrix GRAPE objective and requested derivatives. It is a low-level evaluator, not the optimiser; the source directs users to [`grape_xy.m`](wrappers/grape_xy.md) or [`grape_phase.m`](wrappers/grape_phase.md) for the higher-level optimisation interface.
 
 `spin_system` carries settings prepared by `optimcon.m`. `drifts` supplies drift Hamiltonians, cycled across pulse intervals; `controls` is a cell array of Hilbert-space control operators. The real numeric `waveform` has one row per control and `pulse_ntpts` columns, with amplitudes in rad/s. `rho_init` and `rho_targ` are density matrices. The final argument selects `'real'`, `'imag'`, or `'square'` fidelity.
 

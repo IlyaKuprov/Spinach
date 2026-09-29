@@ -5,7 +5,7 @@
 
 ## Purpose and model
 
-Implements the large-scale solid-effect DNP model cited below. The source documents a system with one electron and one nuclear spin type, potentially with many nuclei, and accepts the `sphten-liouv` or `zeeman-liouv` formalism. It constructs the `H+`, `H0`, and `H-` Hamiltonian sectors, adds the electron microwave terms and the electron/nuclear Zeeman terms, then selects an exact or average-Hamiltonian treatment. These are spin-dynamics observables; this function does not acquire an MRI image or FID.
+Implements the large-scale solid-effect DNP model cited below. The source documents a system with one electron and one nuclear spin type, potentially with many nuclei, and accepts the `sphten-liouv` or `zeeman-liouv` formalism. It constructs the `H+`, `H0`, and `H-` Hamiltonian sectors, adds the electron microwave terms and the electron/nuclear Zeeman terms, then selects an exact or average-Hamiltonian treatment. These are spin-dynamics observables; this function does not acquire an MRI image or FID. Call `solid_effect(spin_system,parameters)` directly: it constructs its own Liouvillian and is not a callback for `liquid`, `powder`, or another context wrapper.
 
 ## Inputs and numerical choices
 

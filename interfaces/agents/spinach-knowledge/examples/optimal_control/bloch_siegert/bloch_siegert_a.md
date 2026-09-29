@@ -9,6 +9,6 @@ Estimated calculation time: minutes. The example optimises a 90-degree state tra
 
 ## Waveform parameterisation and comparison
 
-For each of 20 control levels, the example scales the absolute proton Larmor angular frequency by evenly spaced relative powers from 0.001 to 1.0. Power levels are in rad/s. Each pulse has 50 equal-duration slices, with slice duration `(pi/100)/pwr_level`; the common initial guess is a 2-by-50 Gaussian array scaled by 1/10. The optimizer is L-BFGS through `fmaxnewton`, with at most 500 iterations and `tol_x=1e-4`.
+For each of 20 control levels, the example scales the absolute proton Larmor angular frequency by evenly spaced relative powers from 0.001 to 1.0. Power levels are in rad/s. Each pulse has 50 equal-duration slices, with slice duration `(pi/100)/pwr_level`; the common initial guess is a 2-by-50 Gaussian array scaled by 1/10. The optimiser is L-BFGS through `fmaxnewton`, with at most 500 iterations and `tol_x=1e-4`.
 
 At each power it constructs settings with Bloch-Siegert (BSS) correction disabled and enabled, then optimises one `grape_xy` waveform for each setting. Both waveforms are evaluated with the BSS-enabled settings via `ensemble`. The plotted quantity is terminal infidelity, `1-fidelity`, against relative control power, with a logarithmic vertical axis. Both designs are therefore evaluated in the presence of BSS physics.

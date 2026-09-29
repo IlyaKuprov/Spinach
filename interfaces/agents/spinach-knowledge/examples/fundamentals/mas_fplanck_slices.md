@@ -9,9 +9,9 @@ Tests agreement between explicitly midpoint-sliced MAS propagation (`rotor_stack
 
 ## Cases and method
 
-The `13C` case has anisotropic shielding and a continuous transverse RF field, so the instantaneous drift and control do not generally commute. The `27Al` case uses the 3.2 MHz, asymmetry-0.16 quadrupolar tensor and shielding of the Šmelko example, with the central-transition coherence selectively prepared and the rotating-frame transformation taken through third order. Its third-order term is checked against the second-order generator to ensure it is nonzero.
+The `13C` case uses an L+ to Lz transfer under anisotropic shielding and continuous transverse RF; this phase-sensitive observable distinguishes opposite rotor traversal directions. The `27Al` case uses the 3.2 MHz, asymmetry-0.16 quadrupolar tensor and shielding of the Šmelko example, with the central-transition coherence selectively prepared and the rotating-frame transformation taken through third order. Its third-order term is checked against the second-order generator to ensure it is nonzero.
 
-A single normalised complex signal is evaluated after one rotor period. The FP computation applies a phase-point delta and sums the detection operator over rotor phases. The sliced computation samples the Hamiltonian at each slice midpoint; each route includes the same carrier transformation. It reports rank/slice signals, last refinement increments, and their difference, and throws if either refinement or the cross-route difference exceeds its normalised-signal target (0.001 for CSA, 0.0001 for the quadrupolar central transition).
+A single normalised complex signal is evaluated after one rotor period. The FP computation applies a phase-point delta and sums the detection operator over rotor phases. For a positive rotor rate, the FP phase delta travels toward decreasing phase. The sliced computation therefore starts at the negative half-step and visits rotor-stack phases in reverse order; each route includes the same carrier transformation. It reports rank/slice signals, last refinement increments, and their difference, and throws if either refinement or the cross-route difference exceeds its normalised-signal target (0.001 for CSA, 0.0001 for the quadrupolar central transition).
 
 ## Output and limits
 

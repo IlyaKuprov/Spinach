@@ -13,7 +13,7 @@
 
 function mas_fplanck_slices()
 
-% Set a single-spin CSA with a non-commuting transverse RF field
+% Set a single-spin CSA with RF and a phase-sensitive L+ to Lz transfer
 sys.magnet=9.4;
 sys.isotopes={'13C'};
 sys.parallel={'processes',1};
@@ -31,7 +31,8 @@ parameters.spins={'13C'};
 parameters.offset=0;
 parameters.rframes={{'13C',1}};
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=parameters.rho0;
+parameters.coil=state(spin_system,'Lz','13C');
+parameters.ref_norm=norm(parameters.rho0)*norm(parameters.coil);
 parameters.rf_op=operator(spin_system,'Lx','13C');
 parameters.rf_amp=2*pi*3500;
 parameters.duration=1/parameters.rate;
@@ -61,6 +62,7 @@ parameters.rframes={{'27Al',3}};
 rho_ct=sparse(3,4,1,6,6);
 parameters.rho0=rho_ct(:);
 parameters.coil=parameters.rho0;
+parameters.ref_norm=norm(parameters.rho0)*norm(parameters.coil);
 parameters.rf_op=operator(spin_system,'Lx','27Al');
 parameters.rf_amp=0;
 
@@ -97,21 +99,21 @@ for n=1:numel(ranks)
             real(fp_sig(n)),imag(fp_sig(n)));
 end
 
-% Propagate equal-duration Hamiltonian slices at their phase midpoints
+% Traverse midpoint slices toward decreasing phase as in the FP generator
 sl_sig=zeros(size(counts));
 for n=1:numel(counts)
     count=counts(n);
     parameters.max_rank=(count-1)/2;
-    parameters.orientation=[0 0 pi/count];
+    parameters.orientation=[0 0 -pi/count];
     parameters.masframe='rotor';
     L=rotor_stack(spin_system,parameters,'labframe');
     rho=parameters.rho0;
     for k=1:count
-        rho=expm(-1i*full(L{k}+parameters.rf_amp*parameters.rf_op)*...
+        idx=mod(1-k,count)+1;
+        rho=expm(-1i*full(L{idx}+parameters.rf_amp*parameters.rf_op)*...
                  (parameters.duration/count))*rho;
     end
-    sl_sig(n)=(parameters.coil'*rho)/...
-              (parameters.coil'*parameters.rho0);
+    sl_sig(n)=(parameters.coil'*rho)/parameters.ref_norm;
     fprintf('Slices %d: %.9g%+.9gi\n',count,...
             real(sl_sig(n)),imag(sl_sig(n)));
 end
@@ -124,7 +126,7 @@ function signal=fp_signal(~,parameters,G,~,~)
 % Integrate over one rotor period and contract with the physical coil
 G=G+parameters.rf_amp*kron(speye(parameters.spc_dim),parameters.rf_op);
 rho=expm(-1i*full(G)*parameters.duration)*parameters.rho0;
-signal=(parameters.coil'*rho)/(parameters.coil'*parameters.rho0);
+signal=(parameters.coil'*rho)/parameters.ref_norm;
 
 end
 

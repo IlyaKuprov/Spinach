@@ -159,10 +159,12 @@ For a direct single-crystal MAS route check, run
 `examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced
 `rotor_stack` evolution against `singlerot` in Fokker–Planck Liouville
 space while independently refining slice count and rotor rank. The cases
-are `13C` CSA under transverse RF and the central transition of strongly
-quadrupolar `27Al` with third-order rotating-frame correction. It asserts
-agreement of normalised complex signals and checks that the third-order
-term is nonzero. This is not a test of powder averaging, the complete
+are phase-sensitive `13C` L+ to Lz transfer under RF and the central
+transition of strongly quadrupolar `27Al` with third-order rotating-frame
+correction. For a positive rotor rate the FP phase delta moves toward
+decreasing phase; start sliced sampling at the negative half-step and
+visit rotor-stack phases in reverse order. The test asserts agreement of
+normalised complex signals and checks that the third-order term is nonzero. This is not a test of powder averaging, the complete
 satellite manifold, or optimal-control gradients.
 
 ## Quadrupolar nuclei and NQR

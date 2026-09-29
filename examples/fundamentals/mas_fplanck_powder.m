@@ -35,6 +35,7 @@ parameters.coil=parameters.rho0;
 parameters.ref_norm=parameters.coil'*parameters.rho0;
 parameters.rf_op=operator(spin_system,'Lx','13C');
 parameters.rf_amp=2*pi*3500;
+
 % The complete rotor stack spans exactly one rotor period
 parameters.duration=1/parameters.rate;
 parameters.serial=true;

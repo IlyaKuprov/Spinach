@@ -1,6 +1,6 @@
-# examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m
+# kernel/optimcon/mas_drifts.m
 
-- Signature: `drifts=mqmas_drifts(spin_system,parameters)`
+- Signature: `drifts=mas_drifts(spin_system,parameters)`
 
 ## Purpose and returned ensemble
 
@@ -25,6 +25,7 @@ After consistency checks, the routine obtains the laboratory-frame Hamiltonian a
 
 The grid's two angles do not mean the implementation discards a third Euler angle: the source notes that it uses all three Euler angles supplied by the grid, including the azimuth held in the third angle for two-angle grids.
 
-## Scope and citation
+## Source and references
 
-These are implementation facts from the historical MATLAB source, not a validation of its scientific use or a claim about present-day behaviour. The source itself does not provide an article title, DOI, or other citation for this case study.
+- MATLAB source: [kernel/optimcon/mas_drifts.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/mas_drifts.m)
+- Spin Dynamics Wiki: <https://spindynamics.org/wiki/index.php?title=mas_drifts.m>

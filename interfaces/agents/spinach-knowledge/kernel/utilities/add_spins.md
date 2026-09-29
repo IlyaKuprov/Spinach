@@ -6,21 +6,11 @@ Reduces the direct product of two su(2) irreducible representations into a direc
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/add_spins.m>
 
-## Behaviour
+## How to use it
 
-- Syntax: `[mult,proj]=add_spins(spin_a,spin_b)`.
-- Validates both inputs through an internal consistency check (`grumble`): each must be numeric, real, scalar, at least `1/2`, and such that `2*spin+1` is an integer; otherwise an error is thrown (`'spin_a must be a positive integer or half-integer.'` / `'spin_b must be a positive integer or half-integer.'`).
-- Builds the individual spin irreps via `pauli(2*spin+1)` for each input.
-- Constructs the direct-product representation generators:
-  - `Sx=kron(spin_a.u,spin_b.x)+kron(spin_a.x,spin_b.u)`
-  - `Sy=kron(spin_a.u,spin_b.y)+kron(spin_a.y,spin_b.u)`
-  - `Sz=kron(spin_a.u,spin_b.z)+kron(spin_a.z,spin_b.u)`
-- Diagonalises the Casimir operator `Sx^2+Sy^2+Sz^2` and indexes its eigenvalues with `unique(uint32(D))` to identify the distinct total-spin sectors.
-- Forms one projector per distinct eigenvalue from the eigenvector blocks of the Casimir diagonalisation.
-- Canonicalises each projector block:
-  - Records the multiplicity `mult(n)` as the number of columns of the projector.
-  - Diagonalises the projected `Sz` block, sorts eigenvalues in descending order, and rotates the projector so that `Sz` is diagonal; fails with `'irrep canonicalisation failed.'` if the projected `Sz` does not match the canonical `pauli` `z` matrix within `sqrt(eps)` in the 1-norm.
-  - Applies column sign flips until the projected `Sx` block has real positive entries (within `sqrt(eps)`); fails with the same error if the projected `Sx` or `Sy` blocks do not match the canonical `pauli` `x`/`y` matrices within `sqrt(eps)` in the 1-norm.
+`[mult,proj]=add_spins(spin_a,spin_b)` reduces the tensor product of two spins into total-spin sectors. Each input must be a real scalar integer or half-integer quantum number of at least 1/2; invalid inputs raise an error. The sectors are ordered by increasing total-spin Casimir eigenvalue. `mult` records the dimension of each sector, and `proj{n}` gives its basis vectors as columns in the original direct-product space.
+
+The projected spin generators are canonicalised to the standard spin matrices: within each sector, columns follow descending `Sz` eigenvalue and phase conventions chosen to match `Sx` and `Sy`. The function errors if that canonicalisation fails, rather than returning an inconsistent projector. For spin quantum numbers a and b, the expected sectors have total spin from |a−b| to a+b in integer steps.
 
 ## Inputs and outputs
 
@@ -31,7 +21,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/add_sp
 
 **Outputs**
 
-- `mult` — multiplicities corresponding to the values of the total spin that are present.
+- `mult` — one value per total-spin sector; the implementation records the dimension of each projected block.
 - `proj` — projectors that reduce the direct product representation; a cell array of matrices.
 
 ## References

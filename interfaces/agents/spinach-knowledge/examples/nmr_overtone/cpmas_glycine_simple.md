@@ -12,7 +12,7 @@ The header says the glycine quadrupolar tensor data come from O'Dell and Ratclif
 
 ## Spin system and relaxation
 
-The isotopes are `14N` and `1H`; the field input is `sys.magnet=14.1`. The wrapper sets `inter.zeeman.scalar={32.4,0}`, places the nuclei at `[0,0,0]` and `[0,0,1.00]`, and leaves the homonuclear `inter.coupling.matrix{2,2}` empty. It does not provide a separate explicit N-H coupling value; the presence of coordinates alone is not enough to infer an additional coupling model from this wrapper. Relaxation uses the damping option, diagonal retained terms, zero equilibrium, and `damp_rate=300` (no unit is given inline).
+The isotopes are `14N` and `1H`; the field input is `sys.magnet=14.1`. The wrapper sets `inter.zeeman.scalar={32.4,0}`, places the nuclei at `[0,0,0]` and `[0,0,1.00]`, and leaves the homonuclear `inter.coupling.matrix{2,2}` empty. No additional N–H tensor is assigned by hand: `create` uses these 1 Å coordinates to generate the point-dipolar N–H coupling automatically. Adding a second dipolar tensor would double-count it. Relaxation uses the damping option, diagonal retained terms, zero equilibrium, and `damp_rate=300` (no unit is given inline).
 
 The basis is spherical-tensor Liouville space with no approximation. The wrapper disables `krylov` and `trajlevel`, sets `max_rank=7`, and uses the rough powder grid `rep_2ang_6400pts_sph`. Its rotor-rate input is `-19840`; the wrapper does not attach a unit to that literal.
 

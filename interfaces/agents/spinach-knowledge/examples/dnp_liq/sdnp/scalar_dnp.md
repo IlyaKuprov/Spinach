@@ -14,7 +14,7 @@ Calculates the field dependence of the Overhauser coupling factor for the `13C` 
 
 ## Spin system and relaxation settings
 
-The spins are `E` and `13C`, with dipolar coordinates (0, 0, 0) and (0, 0, 3.1) Angstrom. Their Zeeman tensors are electron [2.0029, 2.0065, 2.0098] in Bohr-magneton units and nuclear [100, 120, 120] ppm; both Euler-angle triples are zero radians. The static isotropic hyperfine coupling is 2e6 Hz. The basis is `sphten-liouv` with no approximation.
+The spins are `E` and `13C`, with dipolar coordinates (0, 0, 0) and (0, 0, 3.1) Angstrom. Their Zeeman tensors are electron [2.0029, 2.0065, 2.0098] as a dimensionless g tensor (the Bohr magneton enters separately in the spin Hamiltonian) and nuclear [100, 120, 120] ppm; both Euler-angle triples are zero radians. The static isotropic hyperfine coupling is 2e6 Hz. The basis is `sphten-liouv` with no approximation.
 
 Three relaxation contributions are enabled: `SRFK`, `redfield`, and `t1_t2`. The empirical electron rates are R1=2e6 Hz (T1=500 ns) and R2=5e6 Hz (T2=200 ns); the nuclear rates are R1=0.25 Hz (T1=4 s) and R2=3.00 Hz (T2=1/3 s). Rotational Redfield relaxation uses a 30 ps correlation time. Scalar collisional Redfield uses weighted correlation-time components (0.62, 30 ps) and (0.38, 0.80 ps), with scalar modulation depth 3.6e6 Hz for the pair. Temperature is 298 and equilibrium is Di Bari; relaxation retention is secular.
 

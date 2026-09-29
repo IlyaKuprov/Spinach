@@ -12,7 +12,7 @@ The source attributes the glycine quadrupolar tensor to O'Dell and Ratcliffe, [D
 
 ## Spin system and model settings
 
-The isotopes are `14N` and `1H`, with `sys.magnet=14.10220742`. The wrapper also specifies `inter.zeeman.scalar={32.4,0.0}` and coordinates `[0,0,0]` and `[0,0,1.00]`; it does not label units for those literals. It does not assign a distinct N-H coupling value in the visible wrapper, so no particular scalar or dipolar coupling should be inferred from this file alone. The source delegates pulse/sequence execution to `@overtone_cp` and does not expose that function's internal pulse details. No gradient list or laboratory pulse-acquire schedule is defined in this wrapper.
+The isotopes are `14N` and `1H`, with `sys.magnet=14.10220742`. The wrapper also specifies `inter.zeeman.scalar={32.4,0.0}` and coordinates `[0,0,0]` and `[0,0,1.00]`; it does not label units for those literals. No distinct N–H tensor is assigned by hand: `create` generates the point-dipolar coupling from the 1 Å coordinates. A second dipolar tensor would double-count it. The source delegates pulse/sequence execution to `@overtone_cp` and does not expose that function's internal pulse details. No gradient list or laboratory pulse-acquire schedule is defined in this wrapper.
 
 Relaxation is configured as damping with diagonal relaxation terms retained, zero equilibrium, and `damp_rate=1000` (unit not stated in this wrapper). The basis is spherical-tensor Liouville space without approximation; `max_rank=5`. The rotor rate is set per point, using negative values corresponding to the 20-90 kHz sweep. The rotor grid is `rep_2ang_200pts_oct`.
 

@@ -12,7 +12,7 @@ The source comment attributes the glycine quadrupolar tensor to O'Dell and Ratcl
 
 ## Spin system and approximations
 
-The isotope labels are `14N` and `1H`; the field input is `sys.magnet=14.10220742`. The source also sets `inter.zeeman.scalar={32.4,0.0}` and coordinates `[0,0,0]` and `[0,0,1.00]`; it does not annotate units for these literals in this wrapper. No separate N-H coupling value is assigned here, so the wrapper alone does not establish a particular scalar or dipolar coupling model. The RF/sequence calculation is delegated to `@overtone_cp`; its internal pulse program is not present in this file. No gradient list or laboratory pulse-acquire schedule is defined in this wrapper.
+The isotope labels are `14N` and `1H`; the field input is `sys.magnet=14.10220742`. The source also sets `inter.zeeman.scalar={32.4,0.0}` and coordinates `[0,0,0]` and `[0,0,1.00]`; it does not annotate units for these literals in this wrapper. No separate N–H tensor is assigned by hand: `create` generates the point-dipolar coupling from the 1 Å coordinates. A second dipolar tensor would double-count it. The RF/sequence calculation is delegated to `@overtone_cp`; its internal pulse program is not present in this file. No gradient list or laboratory pulse-acquire schedule is defined in this wrapper.
 
 Relaxation is configured as `{'damp'}`, with `rlx_keep='diagonal'`, zero equilibrium, and `damp_rate=300` (the wrapper does not state a unit for that rate). The basis is spherical-tensor Liouville space with no approximation, and the spectrum calculation uses `max_rank=7`. The rotor-axis vector is `[sqrt(2/3),0,sqrt(1/3)]`; the RF/operator-state mixing angle is set to `atan(sqrt(2))`, the magic angle.
 

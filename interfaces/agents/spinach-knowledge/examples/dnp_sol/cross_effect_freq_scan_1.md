@@ -10,9 +10,9 @@ This TOTAPOL-based cross-effect DNP example calculates the proton response durin
 
 ## Model and relaxation
 
-The assigned system field is `sys.magnet=3.4` (the source does not state its unit). The isotopes are `{'E','E','1H'}`; scalar Zeeman entries are `{2.0023193,2.0021091,0.0000000}`. Cartesian coordinates are `[0,0,0]`, `[12.80,0,0]` and `[-3.12,0,3.12]`; the source does not specify their unit. The full `sphten-liouv` basis uses no approximation.
+The assigned system field is `sys.magnet=3.4` T. The isotopes are `{'E','E','1H'}`; scalar Zeeman entries are `{2.0023193,2.0021091,0.0000000}` (dimensionless electron g factors and a proton shift in ppm). Cartesian coordinates are `[0,0,0]`, `[12.80,0,0]` and `[-3.12,0,3.12]` in ångström. The full `sphten-liouv` basis uses no approximation.
 
-Relaxation is `nottingham` with `rlx_keep='secular'` and `equilibrium='zero'`. Source-set values are `nott_r1e=1e2`, `nott_r2e=1e5`, `nott_r1n=0.1`, `nott_r2n=1e3`, and `temperature=10`; units are not stated in the script.
+Relaxation is `nottingham` with `rlx_keep='secular'` and `equilibrium='zero'`. The Nottingham rates `nott_r1e=1e2`, `nott_r2e=1e5`, `nott_r1n=0.1`, and `nott_r2n=1e3` are in hertz; `temperature=10` is in kelvin.
 
 ## Frequency scan and output
 

@@ -29,12 +29,10 @@ The function announces its target with `fprintf`, registers a test result under 
 - **Trajectory stitching** (`stitch`): with zero Liouvillian, `rho_stack=[1 2;3 4]`, identity `coil_stack`, and step structures `t1.nsteps=2`, `t2.nsteps=3`, `t2.timestep=0.1`, `t3.nsteps=2`, every `t2` slice of the FID must equal `coil_stack'*rho_stack`.
 - **Random rotations** (`rwalk`): with `rng(1,'twister')` and a one-worker process pool ensured by `local_ensure_pool`, `rwalk(5,1,1e-6)` must return a `5x3` array of finite Euler angles; when the shape guard holds, the first orientation must reconstruct the identity via `euler2dcm` (compared to `eye(3)` at `1e-14`).
 
-Local helper functions construct the test fixtures: `local_liouvillian_system(dim)` builds a quiet spherical-tensor Liouville descriptor (`bas.formalism='sphten-liouv'`, `sys.output='hush'`, with `liouv_zero`, `prop_chop`, `dense_matrix=0.5`, and `small_matrix=10` tolerances); `local_dipolar_system()` builds the two-spin dipolar fixture; `local_isoswap_inputs()` builds the isotope-swap interaction structures; and `local_ensure_pool()` starts a one-worker `parpool('Processes',1)` if none exists.
-
 ## Inputs and outputs
 
 ```matlab
-result = test_dynamic_remaining_core_suite()
+result=test_dynamic_remaining_core_suite()
 ```
 
 **Inputs:** none.

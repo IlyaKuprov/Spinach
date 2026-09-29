@@ -19,13 +19,7 @@ The test announces its target, initialises a regression result via `new_test_res
 - **Waveform basis variants**: for `{'sine_waves','cosine_waves','legendre'}`, builds `wave_basis(type,3,17)` and checks that the Gram matrix equals `eye(3)` (tolerance `1e-12`) and that the size is `[17 3]`.
 - **Pulse-shape variants**: checks `pulse_shape('rectangular',5)` equals `ones(1,5)`; `pulse_shape('sinc3',5)` equals `pi*sinc(linspace(-3,3,5))`; `pulse_shape('sinc5',5)` equals `pi*sinc(linspace(-5,5,5))`; and `pulse_shape('gaussian',5)` equals `exp(-(time_grid.^2)/2)/(sqrt(2*pi)*sqrt(2))` over `linspace(-2,2,5)`, all with tolerance `1e-15`.
 
-Local helper functions:
-
-- `local_liouv_system(magnet)` — builds a quiet one-spin Liouville-space test system (`zeeman-liouv` formalism, no approximation) with the given magnet field.
-- `local_hilb_system()` — builds a quiet one-spin Hilbert-space test system (`zeeman-hilb` formalism, no approximation) with zero magnet field.
-- `grad_pulse_ref(spin_system,L,rho,g_amp,s_len,g_dur,s_fac)` — direct small-matrix reference for a single gradient pulse using an auxiliary-matrix exponential.
-- `grad_sandw_ref(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)` — direct small-matrix reference for a gradient sandwich using a block auxiliary exponential.
-- `local_delete(file_name)` — best-effort deletion of a temporary file if it exists.
+Independent small-matrix auxiliary-exponential references provide the expected single-gradient and gradient-sandwich propagations in both Hilbert and Liouville formalisms.
 
 ## Inputs and outputs
 

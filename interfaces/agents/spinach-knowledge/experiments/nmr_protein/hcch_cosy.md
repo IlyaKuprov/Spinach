@@ -11,6 +11,7 @@ HCCH-COSY, Figure 7.26a of the second edition of *Protein NMR Spectroscopy*. The
 ## Inputs and spin labels
 
 - `spin_system` must use the `sphten-liouv` formalism. PDB atom labels such as `CA`, `HA`, and `C` identify pulse sites, including the carbonyl-carbon site labelled `C`.
+- `parameters.spins={'1H','13C','1H'}` is mandatory; the grumbler rejects a missing or different channel selector.
 - `parameters.npoints` is a three-integer vector `[n1 n2 n3]` for `[t1 t2 t3]`; `parameters.sweep` is a three-positive-real vector `[f1 f2 f3]`.
 - `parameters.J_cc` and `parameters.J_ch` are the 13C-13C and 1H-13C couplings in Hz. Header examples are 35 Hz and 140 Hz, respectively.
 - `parameters.delta` is the pulse-sequence evolution delay in seconds (header example `1.1e-3`).
@@ -23,7 +24,7 @@ The source begins with 1H longitudinal magnetisation, creates positive and negat
 
 ## Timing and output
 
-The source sets `tau_ch = abs(1/(4 J_ch))`, `tau_cc = abs(1/(8 J_cc))`, and `DELTA = tau_cc - delta`. With the header's typical values, these are about 1.79 ms, 3.57 ms, and 2.47 ms, respectively. Couplings are in Hz and delays in seconds. `delta` is passed into the sequence's stitched pulse block and its adjoint reverse evolution.
+The source sets `tau_ch=abs(1/(4*parameters.J_ch))`, `tau_cc=abs(1/(8*parameters.J_cc))`, and `DELTA=tau_cc-parameters.delta`. With the header's typical values, these are about 1.79 ms, 3.57 ms, and 2.47 ms, respectively. Couplings are in Hz and delays in seconds. `delta` is passed into the sequence's stitched pulse block and its adjoint reverse evolution.
 
 The returned structure has `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`. Each FID is permuted to `[n3 n2 n1]`, or `[t3 t2 t1]` in acquisition order.
 

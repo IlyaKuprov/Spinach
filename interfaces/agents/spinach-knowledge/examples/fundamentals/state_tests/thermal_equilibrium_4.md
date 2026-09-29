@@ -11,7 +11,7 @@ Checks whether a computed thermal-equilibrium state is stationary under two ther
 
 The model has four `19F` spins, a magnet-field parameter of `9.4`, and scalar Zeeman parameters `-120.5380`, `-133.9429`, `-129.3169`, and `-129.5320`. Its six scalar-coupling entries are: pairs 1–2 and 3–4, `271.2924` each; 1–3, `0.5401`; 1–4, `-25.9884`; 2–3, `9.9625`; and 2–4, `-40.7675`. The source does not state units for these parameters.
 
-Relaxation is configured as `damp`, with temperature parameter `40`, damping rate `5.0`, and `rlx_keep='labframe'`; the equilibrium setting starts at `zero` before the explicit thermalisation calls. The basis uses `approximation='none'` for both `sphten-liouv` and `zeeman-liouv`.
+Relaxation is configured as `damp`, with temperature parameter `40`, damping rate `5.0`, and `rlx_keep='labframe'`; the equilibrium setting starts at `zero` before the explicit thermalisation calls. The basis uses `approximation='none'` for both `sphten-liouv` and `zeeman-liouv`. Full lab-frame retention is required for the `zeeman-liouv` branch: `relaxation` explicitly rejects `rlx_keep='diagonal'` in that formalism.
 
 ## Procedure and check
 

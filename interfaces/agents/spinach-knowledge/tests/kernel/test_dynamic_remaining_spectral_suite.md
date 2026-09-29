@@ -18,13 +18,6 @@ The suite runs the following checks:
 6. **`rotor_stack` rank-zero assembly** — on a 14.1 T one-proton system with `max_rank = 0`, `offset = 0`, `rframes = {}`, and `masframe = 'rotor'`, checks that the returned Hamiltonian equals the direct NMR Hamiltonian (with frequency offset applied) and that the rotor phase grid is a single zero phase.
 7. **`symmetry` S2 fully symmetric projector** — on a four-state two-proton product basis with `sym_group = {'S2'}`, `sym_spins = {[1 2]}`, and `sym_a1g_only = true`, checks projector orthonormality (`projector'*projector = eye(3)`), that the mixed S2 orbit symmetrises the two exchanged basis states to `[0;1;1;0]/sqrt(2)`, and that the A1g irrep dimension is 3.
 
-Local helper functions:
-
-- `local_created_system(formalism, magnet)` — builds a quiet one-proton Spinach object in the requested formalism.
-- `local_minimal_system(formalism, dim)` — creates a quiet minimal descriptor for matrix-only helper calls.
-- `local_tiny_rank_one(dim)` — creates a rank-one rotational-basis cell evaluating to a tiny zero surrogate (`realmin`).
-- `local_ensure_pool()` — starts a one-worker process pool for compact `parfor` utilities.
-
 ## Inputs and outputs
 
 **Syntax:**

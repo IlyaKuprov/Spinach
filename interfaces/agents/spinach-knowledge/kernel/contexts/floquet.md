@@ -13,7 +13,7 @@ With cutoff `max_rank`, the spatial Fourier dimension is `2*max_rank+1`, labelle
 - `parameters.rate`: spinning rate in Hz. The source convention is positive for JEOL and negative for Varian and Bruker, reflecting their rotation directions.
 - `parameters.axis`: normalised three-component rotor-axis vector.
 - `parameters.max_rank`: required Fourier cutoff.
-- `parameters.grid`: spherical averaging grid from the kernel grids directory; its Euler angles and weights define the powder orientations, separately from the Floquet harmonic index.
+- `parameters.grid`: spherical averaging grid from the kernel grids directory; its Euler angles and weights define the powder orientations, separately from the Floquet harmonic index. The `single_crystal` grid is explicitly rejected by `floquet()`; use `singlerot()` for a single-crystal simulation.
 - `parameters.spins` and `parameters.offset`: spin labels and corresponding transmitter offsets in Hz.
 - `parameters.sum_up`: return a weighted orientation average when enabled, or a cell array of per-orientation outputs when disabled. The context also adds `spc_dim` and `spn_dim` to the parameter structure passed to the sequence.
 

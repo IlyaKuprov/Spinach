@@ -296,6 +296,12 @@ if ismember('E',[nuclei{:}])
         if ~ismember(props.symbols{n},elements)||isempty(props.hfc.full.matrix{n})
             continue
         end
+        if isfield(props,'isotopes')&&...
+           (numel(props.isotopes)~=numel(props.symbols))
+            error(['EPR import requires an explicit HFC source isotope '...
+                   'for each atom: props.isotopes and props.symbols must '...
+                   'have the same length; subset both with the same indices.']);
+        end
         source_iso='';
         if isfield(props,'isotopes')&&(numel(props.isotopes)>=n)
             if isnumeric(props.isotopes)
@@ -312,7 +318,19 @@ if ismember('E',[nuclei{:}])
            isempty(regexp(source_iso,['^[1-9][0-9]*' props.symbols{n} '$'],'once'))
             error('EPR import without an explicit HFC source isotope is not implemented.');
         end
-        source_gammas(n)=spin(source_iso);
+        try
+            source_gammas(n)=spin(source_iso);
+        catch exception
+            if strcmp(exception.message,[source_iso ' - unknown isotope.'])
+                error(['invalid HFC source isotope ' source_iso ' at atom '...
+                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
+            elseif strcmp(exception.message,...
+                          [source_iso ' - no data available in the current NMR literature.'])
+                error(['no spin data for HFC source isotope ' source_iso ' at atom '...
+                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
+            end
+            rethrow(exception)
+        end
         if source_gammas(n)==0
             error('EPR import with a zero-gamma HFC source isotope is not implemented.');
         end
@@ -329,4 +347,5 @@ end
 %
 % A sign, first reported in 1955
 % at an IBM computing facility
+
 

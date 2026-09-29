@@ -126,11 +126,67 @@ unknown=rmfield(props,'isotopes'); unknown.hfc.full.matrix{atom}=[];
 result=test_true(result,'empty tensor without provenance',...
                  isempty(empty_hfc.coupling.matrix{1,2}),...
                  'an unprinted selected tensor remains empty without an isotope field');
+unknown.isotopes=props.isotopes(1);
+[~,empty_hfc]=g2spinach(unknown,{{'E','E'},{'N','15N'}},[0 0],options);
+result=test_true(result,'empty tensor with partial isotope metadata',...
+                 isempty(empty_hfc.coupling.matrix{1,2}),...
+                 'no isotope alignment is required without a selected HFC');
+other=props; other.isotopes=props.isotopes(1);
+[electron,~]=g2spinach(other,{{'E','E'},{'F','19F'}},[0 0],options);
+result=test_true(result,'unselected isotope metadata',...
+                 isequal(electron.isotopes,{'E'}),...
+                 'irrelevant nuclear tensors do not require isotope alignment');
+
+% Diagnose atom selection that did not also subset the isotope metadata
+selected=props;
+selected.symbols=props.symbols(atom);
+selected.hfc.full.matrix=props.hfc.full.matrix(atom);
+caught=false;
+try
+    g2spinach(selected,{{'E','E'},{'N','14N'}},[0 0],options);
+catch exception
+    caught=contains(exception.message,'props.isotopes')&&...
+           contains(exception.message,'same indices');
+end
+result=test_true(result,'misaligned isotope metadata',caught,...
+                 'an unsliced isotope array gives an actionable alignment error');
+selected.isotopes=props.isotopes(atom);
+[~,aligned]=g2spinach(selected,{{'E','E'},{'N','14N'}},[0 0],options);
+result=test_close(result,'aligned isotope metadata',aligned.coupling.matrix{1,2},...
+                  inter14.coupling.matrix{1,2},0,0,...
+                  'the same atom selection applied to isotopes restores the original HFC');
+
+% Diagnose unsupported source isotopes without exposing a bare spin() error
+invalid=props; invalid.isotopes(atom)=99;
+caught=false;
+try
+    g2spinach(invalid,{{'E','E'},{'N','14N'}},[0 0],options);
+catch exception
+    caught=contains(exception.message,'invalid HFC source isotope 99N')&&...
+           contains(exception.message,'props.isotopes');
+end
+result=test_true(result,'invalid source isotope context',caught,...
+                 'an unsupported source mass identifies the offending metadata');
+no_data=props; no_data.symbols{atom}='At'; no_data.isotopes(atom)=210;
+caught=false;
+try
+    g2spinach(no_data,{{'E','E'},{'At','210At'}},[0 0],options);
+catch exception
+    caught=contains(exception.message,'no spin data for HFC source isotope 210At')&&...
+           contains(exception.message,'props.isotopes');
+end
+result=test_true(result,'no-data source isotope context',caught,...
+                 'a known isotope without spin data identifies its atom and metadata');
 
 % No nuclear hyperfine provenance is needed for an electron-only import
 [electron,~]=g2spinach(unknown,{{'E','E'}},0,options);
 result=test_true(result,'electron only',isequal(electron.isotopes,{'E'}),...
                  'the provenance requirement applies only to imported nuclear tensors');
+electron_only=props; electron_only.isotopes=props.isotopes(1);
+[electron,~]=g2spinach(electron_only,{{'E','E'}},0,options);
+result=test_true(result,'electron only with stale isotope metadata',...
+                 isequal(electron.isotopes,{'E'}),...
+                 'unused isotope metadata does not block an electron-only import');
 
 % Read ORCA isotope strings and compare every proton tensor component
 props=oparse(fullfile(root_dir,'examples','esr_liq_pulsed',...
@@ -210,4 +266,5 @@ result=test_close(result,'nonsymmetric isotope scaling',inter.coupling.matrix{1,
                   'a declared antisymmetric HFC part is scaled without symmetrisation');
 
 end
+
 

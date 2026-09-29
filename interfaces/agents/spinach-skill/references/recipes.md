@@ -167,6 +167,15 @@ visit rotor-stack phases in reverse order. The test asserts agreement of
 normalised complex signals and checks that the third-order term is nonzero. This is not a test of powder averaging, the complete
 satellite manifold, or optimal-control gradients.
 
+For a powder-average route check, run
+`examples/fundamentals/mas_fplanck_powder.m`. It uses the same weighted
+Lebedev crystallite grid for both routes, averaging rotor start phase
+explicitly in the sliced route and through the uniform FP phase state in
+`singlerot`. Evolve exactly one full period when visiting an entire
+rotor stack; refine FP rank, midpoint slices, and rotor-phase quadrature
+separately. The finite-grid CSA test does not cover quadrupolar powder
+satellites or optimal-control gradients.
+
 ## Quadrupolar nuclei and NQR
 
 Quadrupolar coupling is a self-coupling on the diagonal of the coupling cell

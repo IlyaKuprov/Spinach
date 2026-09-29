@@ -307,8 +307,10 @@ hertz, not rad/s, however large the numbers look.
   `props.hfc.full.matrix`, and `props.isotopes` when selecting nuclei from a
   parsed log. For a selected nonempty HFC, an isotope-array length mismatch
   now gives an alignment diagnostic; an unsupported source isotope identifies
-  the atom and asks you to check isotope/symbol order. Empty or unselected
-  tensors and electron-only or NMR imports need no source-isotope alignment.
+  the atom and asks you to check isotope/symbol order. A known isotope
+  without tabulated spin data gets a distinct atom-specific diagnostic. Empty
+  or unselected tensors and electron-only or NMR imports need no source-isotope
+  alignment.
 
 - `particles` — cell array of element/isotope pairs, e.g.
   `{{'C','13C'},{'N','15N'}}`. Including an electron, as in

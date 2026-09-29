@@ -167,6 +167,16 @@ catch exception
 end
 result=test_true(result,'invalid source isotope context',caught,...
                  'an unsupported source mass identifies the offending metadata');
+no_data=props; no_data.symbols{atom}='At'; no_data.isotopes(atom)=210;
+caught=false;
+try
+    g2spinach(no_data,{{'E','E'},{'At','210At'}},[0 0],options);
+catch exception
+    caught=contains(exception.message,'no spin data for HFC source isotope 210At')&&...
+           contains(exception.message,'props.isotopes');
+end
+result=test_true(result,'no-data source isotope context',caught,...
+                 'a known isotope without spin data identifies its atom and metadata');
 
 % No nuclear hyperfine provenance is needed for an electron-only import
 [electron,~]=g2spinach(unknown,{{'E','E'}},0,options);

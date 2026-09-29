@@ -324,6 +324,10 @@ if ismember('E',[nuclei{:}])
             if strcmp(exception.message,[source_iso ' - unknown isotope.'])
                 error(['invalid HFC source isotope ' source_iso ' at atom '...
                        num2str(n) '; check props.isotopes and props.symbols atom order.']);
+            elseif strcmp(exception.message,...
+                          [source_iso ' - no data available in the current NMR literature.'])
+                error(['no spin data for HFC source isotope ' source_iso ' at atom '...
+                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
             end
             rethrow(exception)
         end

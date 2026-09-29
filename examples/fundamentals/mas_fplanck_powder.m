@@ -1,10 +1,10 @@
-% Compares powder-averaged sliced MAS with Fokker-Planck MAS dynamics.
-% Syntax:
+% Comparison of powder-averaged sliced and Fokker-Planck MAS
+% evolution for a 13C spin with CSA and transverse RF. Both routes
+% use the same weighted Lebedev crystallite powder_grid.
 %
-%                        mas_fplanck_powder()
+% Syntax: mas_fplanck_powder()
 %
-% No inputs. Checks rotor rank, slices, phase, and powder grid convergence.
-% The same weighted Lebedev crystallite grid is used by both routes.
+% Checks rotor rank, slice slice_count, rotor phase, and powder powder_grid.
 %
 % Calculation time: minutes
 %
@@ -12,18 +12,24 @@
 
 function mas_fplanck_powder()
 
-% Set a spin with anisotropic shielding and continuous transverse RF
+% System specification
 sys.magnet=9.4;
 sys.isotopes={'13C'};
 sys.parallel={'processes',1};
 sys.parprops={};
 inter.zeeman.eigs={[-120 -25 145]};
 inter.zeeman.euler={[0.4 0.7 0.2]};
+
+% Basis set
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
+
+% Spin system
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 spin_system.sys.output='hush';
+
+% MAS and RF parameters
 parameters.rate=10000;
 parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.grid='leb_2ang_rank_5';
@@ -35,43 +41,44 @@ parameters.coil=parameters.rho0;
 parameters.ref_norm=parameters.coil'*parameters.rho0;
 parameters.rf_op=operator(spin_system,'Lx','13C');
 parameters.rf_amp=2*pi*3500;
-
-% The complete rotor stack spans exactly one rotor period
 parameters.duration=1/parameters.rate;
 parameters.serial=true;
 parameters.verbose=0;
 
-% Refine the Fokker-Planck rotor rank on the fixed powder grid
-ranks=[6 8];
-fp_sig=zeros(size(ranks));
-for n=1:numel(ranks)
-    parameters.max_rank=ranks(n);
-    fp_sig(n)=singlerot(spin_system,@fp_powder_signal,...
-                       parameters,'labframe');
-    fprintf('Powder FP rank %d: %.9g%+.9gi\n',ranks(n),...
-            real(fp_sig(n)),imag(fp_sig(n)));
+% Fokker-Planck rotor-rank convergence
+rotor_ranks=[6 8];
+fp_sig=zeros(size(rotor_ranks));
+for rank_idx=1:numel(rotor_ranks)
+    parameters.max_rank=rotor_ranks(rank_idx);
+    fp_sig(rank_idx)=singlerot(spin_system,@fp_powder_signal,...
+                               parameters,'labframe');
+    fprintf('Powder FP rank %d: %.9g%+.9gi\n',rotor_ranks(rank_idx),...
+            real(fp_sig(rank_idx)),imag(fp_sig(rank_idx)));
 end
 
-% Refine phase quadrature and midpoint slices independently
-counts=[33 65]; phase_counts=[7 13];
-sl_sig=zeros(numel(counts),numel(phase_counts));
-for n=1:numel(counts)
-    for k=1:numel(phase_counts)
-        sl_sig(n,k)=sliced_powder_signal(spin_system,parameters,...
-                                        counts(n),phase_counts(k));
+% Sliced propagation and rotor-phase convergence
+slice_counts=[33 65];
+phase_counts=[7 13];
+sl_sig=zeros(numel(slice_counts),numel(phase_counts));
+for slice_idx=1:numel(slice_counts)
+    for phase_idx=1:numel(phase_counts)
+        sl_sig(slice_idx,phase_idx)=sliced_powder_signal(...
+            spin_system,parameters,slice_counts(slice_idx),...
+            phase_counts(phase_idx));
         fprintf('Powder slices %d phases %d: %.9g%+.9gi\n',...
-                counts(n),phase_counts(k),...
-                real(sl_sig(n,k)),imag(sl_sig(n,k)));
+                slice_counts(slice_idx),phase_counts(phase_idx),...
+                real(sl_sig(slice_idx,phase_idx)),...
+                imag(sl_sig(slice_idx,phase_idx)));
     end
 end
 
-% Check the powder quadrature against a finer Lebedev grid
+% Powder quadrature convergence
 parameters.grid='leb_2ang_rank_11';
 fp_fine=singlerot(spin_system,@fp_powder_signal,...
                   parameters,'labframe');
 grid_step=abs(fp_fine-fp_sig(end));
 
-% Compare normalised signals and each independent refinement
+% Comparison of the two simulation routes
 fp_step=abs(fp_sig(end)-fp_sig(end-1));
 sl_step=abs(sl_sig(end,end)-sl_sig(end-1,end));
 phase_step=abs(sl_sig(end,end)-sl_sig(end,end-1));
@@ -79,42 +86,46 @@ route_gap=abs(fp_sig(end)-sl_sig(end,end));
 fprintf('Powder CSA: FP step %.6g, slice step %.6g, ',fp_step,sl_step);
 fprintf('phase step %.6g, grid step %.6g, gap %.6g\n',...
         phase_step,grid_step,route_gap);
-target=0.002;
+tolerance=0.002;
 assert(all(isfinite([fp_step sl_step phase_step grid_step ...
                      route_gap]))&&...
-       fp_step<target/2&&sl_step<target/2&&...
-       phase_step<target/2&&grid_step<target&&route_gap<target,...
+       fp_step<tolerance/2&&sl_step<tolerance/2&&...
+       phase_step<tolerance/2&&grid_step<tolerance&&route_gap<tolerance,...
        'Powder-averaged MAS routes did not converge.');
 fprintf('MAS_FPLANCK_POWDER_SUCCESS\n');
 
 end
 
 % Build the sliced propagator for each crystallite and rotor start phase
-function signal=sliced_powder_signal(spin_system,parameters,count,nphases)
+function signal=sliced_powder_signal(spin_system,parameters,...
+                                     slice_count,phase_count)
 
-grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',...
+powder_grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',...
                    parameters.grid),'alphas','betas','gammas','weights');
 parameters.grid='single_crystal';
 parameters.masframe='rotor';
-parameters.max_rank=(count-1)/2;
+parameters.max_rank=(slice_count-1)/2;
 signal=0;
-for q=1:numel(grid.weights)
-    orient_sig=0;
-    for phase=1:nphases
-        rotor_phase=2*pi*(phase-1)/nphases;
-        parameters.orientation=[grid.alphas(q)+rotor_phase-pi/count ...
-                                grid.betas(q) grid.gammas(q)];
+for crystal_idx=1:numel(powder_grid.weights)
+    crystal_signal=0;
+    for phase_idx=1:phase_count
+        rotor_phase=2*pi*(phase_idx-1)/phase_count;
+        parameters.orientation=[powder_grid.alphas(crystal_idx)+...
+                                rotor_phase-pi/slice_count ...
+                                powder_grid.betas(crystal_idx) ...
+                                powder_grid.gammas(crystal_idx)];
         L=rotor_stack(spin_system,parameters,'labframe');
         rho=parameters.rho0;
-        for n=1:count
-            idx=mod(1-n,count)+1;
-            rho=expm(-1i*full(L{idx}+parameters.rf_amp*...
+        for slice_idx=1:slice_count
+            rotor_idx=mod(1-slice_idx,slice_count)+1;
+            rho=expm(-1i*full(L{rotor_idx}+parameters.rf_amp*...
                                 parameters.rf_op)*...
-                     (parameters.duration/count))*rho;
+                     (parameters.duration/slice_count))*rho;
         end
-        orient_sig=orient_sig+parameters.coil'*rho/nphases;
+        crystal_signal=crystal_signal+parameters.coil'*rho/phase_count;
     end
-    signal=signal+grid.weights(q)*orient_sig/parameters.ref_norm;
+    signal=signal+powder_grid.weights(crystal_idx)*...
+                  crystal_signal/parameters.ref_norm;
 end
 
 end

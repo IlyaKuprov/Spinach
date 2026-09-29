@@ -1,11 +1,11 @@
-% Compares explicitly sliced MAS evolution with Fokker-Planck Liouville MAS.
-% Syntax:
+% Comparison of explicitly sliced and Fokker-Planck MAS evolution
+% for single-crystal 13C CSA and 27Al quadrupolar systems. The 13C
+% calculation includes RF; the 27Al central transition includes the
+% third-order rotating-frame correction.
 %
-%                     mas_fplanck_slices()
+% Syntax: mas_fplanck_slices()
 %
-% No inputs. Prints convergence metrics; throws on a failed equivalence test.
-% The cases are 13C CSA under finite RF and the central transition of a
-% strongly quadrupolar 27Al spin with third-order rotating-frame terms.
+% Prints convergence metrics and fails if the two routes disagree.
 %
 % Calculation time: minutes
 %
@@ -13,17 +13,23 @@
 
 function mas_fplanck_slices()
 
-% Set a single-spin CSA with RF and a phase-sensitive L+ to Lz transfer
+% 13C system specification
 sys.magnet=9.4;
 sys.isotopes={'13C'};
 sys.parallel={'processes',1};
 sys.parprops={};
 inter.zeeman.eigs={[-120 -25 145]};
 inter.zeeman.euler={[0.4 0.7 0.2]};
+
+% Basis set
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
+
+% Spin system
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
+
+% MAS and RF parameters
 parameters.rate=10000;
 parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.grid='single_crystal';
@@ -39,12 +45,12 @@ parameters.duration=1/parameters.rate;
 parameters.serial=true;
 parameters.verbose=0;
 
-% Refine the rotor rank and the midpoint slice count independently
+% Compare independent rotor-rank and slice-slice_count refinements
 [fp_csa,sl_csa]=compare_routes(spin_system,parameters,...
                                [4 6 8 10],[33 65 129]);
 check_limit('13C CSA with RF',fp_csa,sl_csa,1e-3);
 
-% Use the Smelko 27Al quadrupolar parameters with a selective central coherence
+% 27Al quadrupolar system specification
 clear sys inter bas
 sys.magnet=2*pi*400e6/spin('1H');
 sys.isotopes={'27Al'};
@@ -53,10 +59,16 @@ sys.parprops={};
 inter.coupling.matrix{1,1}=eeqq2nqi(3.2e6,0.16,5/2,[0 0 0]);
 inter.zeeman.eigs={[-5 -5 10]};
 inter.zeeman.euler={[0 0 0]};
+
+% Basis set
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
+
+% Spin system
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
+
+% MAS parameters and central-transition observable
 parameters.spins={'27Al'};
 parameters.rframes={{'27Al',3}};
 rho_ct=sparse(3,4,1,6,6);
@@ -71,7 +83,7 @@ parameters.rf_amp=0;
                                [3 5 7 9],[17 33 65 129]);
 check_limit('27Al Q3 central transition',fp_nqi,sl_nqi,1e-4);
 
-% Check that third-order correction is exercised, not merely requested
+% Confirm that the third-order correction contributes
 parameters.max_rank=1;
 parameters.masframe='rotor';
 parameters.orientation=[0 0 0];
@@ -88,34 +100,34 @@ end
 
 % Compare phase-space propagation with a midpoint rotor stack
 function [fp_sig,sl_sig]=compare_routes(spin_system,parameters,...
-                                         ranks,counts)
+                                         rotor_ranks,slice_counts)
 
 % Propagate a single-crystal phase delta with the FP rotor generator
-fp_sig=zeros(size(ranks));
-for n=1:numel(ranks)
-    parameters.max_rank=ranks(n);
-    fp_sig(n)=singlerot(spin_system,@fp_signal,parameters,'labframe');
-    fprintf('FP rank %d: %.9g%+.9gi\n',ranks(n),...
-            real(fp_sig(n)),imag(fp_sig(n)));
+fp_sig=zeros(size(rotor_ranks));
+for rank_idx=1:numel(rotor_ranks)
+    parameters.max_rank=rotor_ranks(rank_idx);
+    fp_sig(rank_idx)=singlerot(spin_system,@fp_signal,parameters,'labframe');
+    fprintf('FP rank %d: %.9g%+.9gi\n',rotor_ranks(rank_idx),...
+            real(fp_sig(rank_idx)),imag(fp_sig(rank_idx)));
 end
 
 % Traverse midpoint slices toward decreasing phase as in the FP generator
-sl_sig=zeros(size(counts));
-for n=1:numel(counts)
-    count=counts(n);
-    parameters.max_rank=(count-1)/2;
-    parameters.orientation=[0 0 -pi/count];
+sl_sig=zeros(size(slice_counts));
+for slice_idx=1:numel(slice_counts)
+    slice_count=slice_counts(slice_idx);
+    parameters.max_rank=(slice_count-1)/2;
+    parameters.orientation=[0 0 -pi/slice_count];
     parameters.masframe='rotor';
     L=rotor_stack(spin_system,parameters,'labframe');
     rho=parameters.rho0;
-    for k=1:count
-        idx=mod(1-k,count)+1;
-        rho=expm(-1i*full(L{idx}+parameters.rf_amp*parameters.rf_op)*...
-                 (parameters.duration/count))*rho;
+    for step_idx=1:slice_count
+        rotor_idx=mod(1-step_idx,slice_count)+1;
+        rho=expm(-1i*full(L{rotor_idx}+parameters.rf_amp*parameters.rf_op)*...
+                 (parameters.duration/slice_count))*rho;
     end
-    sl_sig(n)=(parameters.coil'*rho)/parameters.ref_norm;
-    fprintf('Slices %d: %.9g%+.9gi\n',count,...
-            real(sl_sig(n)),imag(sl_sig(n)));
+    sl_sig(slice_idx)=(parameters.coil'*rho)/parameters.ref_norm;
+    fprintf('Slices %d: %.9g%+.9gi\n',slice_count,...
+            real(sl_sig(slice_idx)),imag(sl_sig(slice_idx)));
 end
 
 end
@@ -130,8 +142,8 @@ signal=(parameters.coil'*rho)/parameters.ref_norm;
 
 end
 
-% Require both independent refinements to meet a normalised-signal target
-function check_limit(label,fp_sig,sl_sig,target)
+% Require both independent refinements to meet a normalised-signal tolerance
+function check_limit(label,fp_sig,sl_sig,tolerance)
 
 % Test the last refinement and the cross-route complex-signal difference
 fp_step=abs(fp_sig(end)-fp_sig(end-1));
@@ -140,7 +152,7 @@ route_gap=abs(fp_sig(end)-sl_sig(end));
 fprintf('%s: FP step %.6g, slice step %.6g, gap %.6g\n',...
         label,fp_step,sl_step,route_gap);
 assert(all(isfinite([fp_step sl_step route_gap]))&&...
-       fp_step<target/2&&sl_step<target/2&&route_gap<target,...
+       fp_step<tolerance/2&&sl_step<tolerance/2&&route_gap<tolerance,...
        '%s MAS routes have not converged to the same signal.',label);
 
 end

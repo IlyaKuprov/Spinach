@@ -20,7 +20,7 @@ F1 is sampled through half-step evolution blocks with requested midpoint refocus
 - `parameters.trim_angle` is the proton trim-pulse angle in radians; validation requires one finite real scalar, without specifying a narrower allowed range.
 - `H`, `R`, and `K` are numeric matrices supplied by the context function. The source requires matching dimensions and combines them as `H + 1i*R + 1i*K`.
 
-The function returns a structure with `fid.pos` and `fid.neg`, documented as echo and antiecho signal components. Each is the F2 observable-evolution output for its selected F1 branch. The routine requests `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 acquisition steps; the source does not declare array orientation or numeric class.
+The function returns a structure with `fid.pos` and `fid.neg`, documented as echo and antiecho signal components. Each is the F2 observable-evolution output for its selected F1 branch. The routine requests `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 acquisition steps; both arrays have `npoints(2)` F2-time rows and `npoints(1)` F1-stack columns; the source does not prescribe a numeric class.
 
 Natural-abundance simulations should use Spinach isotope-dilution functionality, as noted in the source.
 

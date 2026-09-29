@@ -11,16 +11,16 @@ Computes the transfer matrix of a linear filter from stacks of observed amplifie
 - The returned matrix satisfies `amp_outs=T*amp_inps` in the least squares sense.
 - The header notes that the number of input-output vector pairs should be bigger than the number of elements in those vectors.
 - Consistency enforcement (`grumble`) errors when:
-  - `amp_inps` is not numeric, or is not wider than it is tall (`size(amp_inps,2)<size(amp_inps,1)`), with message `amp_inps must be a stack of column vectors wider than it is tall.`;
-  - `amp_outs` is not numeric, or is not wider than it is tall, with message `amp_outs must be a stack of column vectors wider than it is tall.`;
+  - `amp_inps` is not numeric, or has fewer columns than rows (`size(amp_inps,2)<size(amp_inps,1)`), with message `amp_inps must be a stack of column vectors wider than it is tall.`;
+  - `amp_outs` is not numeric, or has fewer columns than rows, with message `amp_outs must be a stack of column vectors wider than it is tall.`;
   - the two stacks have different numbers of vectors (`size(amp_inps,2)~=size(amp_outs,2)`), with message `the number of vectors in amp_inps and amp_outs stacks must be the same.`.
 
 ## Inputs and outputs
 
 Inputs:
 
-- `amp_inps` — numeric matrix with amplifier input vectors as columns; must have more columns than rows.
-- `amp_outs` — numeric matrix with amplifier output vectors as columns; must have more columns than rows and the same number of columns as `amp_inps`.
+- `amp_inps` — numeric matrix with amplifier input vectors as columns; must have at least as many columns as rows.
+- `amp_outs` — numeric matrix with amplifier output vectors as columns; must have at least as many columns as rows and the same number of columns as `amp_inps`.
 
 Outputs:
 

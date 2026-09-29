@@ -21,7 +21,7 @@ F1 is sampled through half-step evolution blocks with requested midpoint refocus
 - `parameters.edit_time` is the multiplicity-editing interval in seconds; validation requires one positive real scalar. The sequence uses it twice, with the refocusing pulse between the intervals.
 - `H`, `R`, and `K` are numeric matrices supplied by the context function. The source requires matching dimensions and combines them as `H + 1i*R + 1i*K`.
 
-The output is a structure containing `fid.pos` and `fid.neg`, documented as echo and antiecho signal components. They are the F2 observable-evolution outputs for the two F1 coherence branches. The routine requests `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 acquisition steps; the source does not declare the arrays' storage orientation or numeric class, nor does it prescribe the multiplicity-to-sign assignment.
+The output is a structure containing `fid.pos` and `fid.neg`, documented as echo and antiecho signal components. They are the F2 observable-evolution outputs for the two F1 coherence branches. The routine requests `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 acquisition steps; both arrays have `npoints(2)` F2-time rows and `npoints(1)` F1-stack columns; the source does not prescribe a numeric class or the multiplicity-to-sign assignment.
 
 Natural-abundance simulations should use Spinach isotope-dilution functionality, as noted in the source.
 

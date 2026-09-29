@@ -4,28 +4,15 @@
 
 ## Purpose
 
-Scales the current figure from the default size by the factors provided by the user. Syntax: scale_figure(by)
+Resize the current MATLAB figure relative to the root object's default figure dimensions while keeping its present centre fixed. This changes figure geometry, not plotted data or axes.
 
-## Physical / mathematical content
+## Parameters and effect
 
-## Numerical / algorithmic content
+`by` is a two-element positive real row vector in `[width height]` order. The function reads the current figure's `Position` and calculates its centre from the position and size. It reads the root `defaultfigureposition` for the default width and height, multiplies those dimensions elementwise by `by`, then sets the current figure position to the scaled size around the unchanged centre. No axes limits, labels, or colormaps are changed, and there is no return value.
 
-## Parameters / inputs
+The guard rejects nonnumeric, nonreal, non-row, non-two-element, or nonpositive `by` values.
 
-- by -two-element row vector of scaling factors,
-- format: [width height]
+## References
 
-## Implementation structure
-
-- Scales the current figure from the default size by the factors
-- provided by the user. Syntax:
-- scale_figure(by)
-- by - two-element row vector of scaling factors,
-- format: [width height]
-- Check consistency
-- Get figure location
-- Get figure centroid
-- Get default figure size
-- Scale the figure
-- Update figure parameters
-- Consistency enforcement
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/scale_figure.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=scale_figure.m)

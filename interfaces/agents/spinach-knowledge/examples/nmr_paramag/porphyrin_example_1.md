@@ -1,25 +1,15 @@
 # examples/nmr_paramag/porphyrin_example_1.m
 
 - Signature: `porphyrin_example_1()`
+- Source: [examples/nmr_paramag/porphyrin_example_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/porphyrin_example_1.m)
+- Manual cited by the source: [Pseudocontact shift analysis](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis)
 
-## Purpose
+## Point-model calculation
 
-Computing PCS using different models in basic Cu(II) and Co(II) porphyrin complexes. The metal is at the origin. See the "getting started" manual at
+The source defines 12 porphyrin-ring proton coordinates and places the metal at `mxyz=[0 0 0]`. It supplies diagonal g-tensors `diag([3.0 3.0 2.0])` for Co(II) and `diag([2.0 2.0 2.2])` for Cu(II), then calls `g2chi(g,298,1/2)` to form each Curie susceptibility tensor. The source does not annotate the unit of the `298` argument or the units of the coordinate values.
 
-## Physical / mathematical content
+`ppcs(nxyz,mxyz,chi)` computes point-model PCS for each ion. The example displays the two result columns in Co, Cu order and labels the PCS output in ppm.
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+## Scope and omissions
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Computing PCS using different models in basic Cu(II) and Co(II) porphyrin
-- complexes. The metal is at the origin. See the "getting started" manual at
-- Porphyrin ring proton coordinates
-- Co(II) g-tensor
-- Cu(II) g-tensor
-- Curie susceptibility tensors
-- Metal position
-- PCS calculation
-- Output
+This is a basic Cu(II)/Co(II) porphyrin comparison, not a carbonic-anhydrase calculation: there is no protein, residue, or distinct metal site. It does not use a distributed-density model, fit parameters, experimental spectra, a specified magnetic field, or a field/temperature sweep. The only temperature-like input is the unlabelled value 298 passed to `g2chi`.

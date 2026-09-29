@@ -1,51 +1,32 @@
 # experiments/esr_dipolar/eseem.m
 
-- Signature: `fid=eseem(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_dipolar/eseem.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=eseem.m
 
-ESEEM pulse sequence with ideal hard pulses. Syntax: fid=eseem(spin_system,parameters,H,R,K)
+`fid=eseem(spin_system,parameters,H,R,K)`
 
-## Physical / mathematical content
+## What it calculates
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+This routine simulates an ideal hard-pulse ESEEM echo and returns its time-domain signal. In the physical experiment, ESEEM modulation can report nuclear-frequency structure coupled to the electron through hyperfine interactions. ENDOR is a distinct pulse experiment and is not implemented by this function. The modulation in a calculation depends on the caller-supplied spin system and Hamiltonian; the routine does not prescribe a hyperfine coupling value.
 
-## Numerical / algorithmic content
+This is a single spin-dynamics sequence, not a field sweep, DNP or other hyperpolarisation workflow, or spatial imaging routine. No measured signal is read or claimed.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Inputs
 
-## Parameters / inputs
+- `spin_system` — Spinach spin system. The routine accepts `sphten-liouv` and `zeeman-liouv` formalisms.
+- `parameters.npoints` — number of sampled points; the source checks that it has one element.
+- `parameters.timestep` — sampling time step in seconds; the source checks that it has one element.
+- `parameters.rho0` — initial state.
+- `parameters.coil` — detection state.
+- `parameters.screen` — optional screen state, documented as the Hermitian conjugate of the detection state; omitted values default to `[]`.
+- `parameters.pulse_op` — caller-supplied pulse operator, dimension-matched to `H`. Its flip-angle arguments below are in radians.
+- `H`, `R`, `K` — dimension-matched numeric matrices supplied by the context: Hamiltonian, relaxation, and kinetics contributions. After `sim2liouv` conversion as needed, the routine forms `L=H+1i*R+1i*K`.
 
-- parameters.npoints number of points to be computed
-- parameters.timestep simulation time step, seconds
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.screen optional screen state (must be
-- the Hermitian conjugate of the
-- detection state)
-- parameters.pulse_op pulse operator
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+## Sequence and propagation
 
-## Outputs
+The supplied pulse operator acts on `rho0` with a `pi/2` rotation. The first evolution uses `timestep/2`, `npoints-1` steps, trajectory mode, and `screen`; a `pi` pulse is then applied, followed by a second `timestep/2` evolution over `npoints-1` steps in refocus mode with `coil` as observable. The code detects `full(coil'*rho_stack)` and transposes the result to form `fid`. The pulse operator is provided by the caller rather than constructed in this routine.
 
-- fid -time domaing signal whose Fourier transform is the
-- ESEEM spectrum
+## Output and scope
 
-## Implementation structure
-
-- ESEEM pulse sequence with ideal hard pulses. Syntax:
-- fid=eseem(spin_system,parameters,H,R,K)
-- parameters.npoints number of points to be computed
-- parameters.timestep simulation time step, seconds
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.screen optional screen state (must be
-- the Hermitian conjugate of the
-- detection state)
-- parameters.pulse_op pulse operator
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
+`fid` is the time-domain echo signal, not a spectrum. The source does not return a separate time vector or name its array axes; `timestep` supplies the sampling interval. The source-backed numerical pulse examples are `pi/2` and `pi` radians, with two half-step evolution periods. It gives no concrete experimental parameter set, hyperfine value, or DOI.

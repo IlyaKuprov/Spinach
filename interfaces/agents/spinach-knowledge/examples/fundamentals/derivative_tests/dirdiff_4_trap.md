@@ -1,31 +1,21 @@
 # examples/fundamentals/derivative_tests/dirdiff_4_trap.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_4_trap.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_4_trap.m)
+
 - Signature: `dirdiff_4_trap()`
 
-## Purpose
+## Question tested
 
-Directional derivative test for the phase-modulated GRAPE module, trapezium integrator.
+For phase-modulated GRAPE with the trapezium integrator, does the analytical derivative of the first fidelity component with respect to selected phase samples agree with a centred finite difference?
 
-## Physical / mathematical content
+## Setup
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The script repeats the comparison for `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, using the system returned by `dirdiff_test_system`. The control configuration uses isotope `13C`, channel map `[1;1]`, drift `H`, controls `Lx` and `Ly`, initial states {Sx,Sy,Sz}, and target states {-Sz,Sy,Sx}. It sets power levels to `2*pi*linspace(50e3,70e3,10)`, method `lbfgs`, maximum iterations 1000, and an empty plotting list. The trapezium grid has four entries, `12.8e-6*ones(1,4)`, while the amplitude vector and random phase guess each have five entries; the guess is `randn(1,5)/3`. The finite-difference increment is `h=sqrt(eps('double'))`.
 
-## Numerical / algorithmic content
+## Comparison and observable
 
-## Implementation structure
+For phase entries 1, 3, and 5, the script forms `g_num=(fid_plus(1)-fid_minus(1))/(2*h)`, where `fid_plus` and `fid_minus` are the first fidelity entries returned by `grape_phase` at guesses differing by +h and -h in that entry. It compares this with the corresponding analytical-gradient entry from `grape_phase`. Each comparison uses the strict condition `abs(g_anl-g_num)/abs(g_num) < 1e-6`; the script prints a formalism-specific passed message or raises an error for that sample.
 
-- Directional derivative test for the phase-modulated GRAPE
-- module, trapezium integrator.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Set the interval grid
-- Spinach housekeeping
-- Random phases and finite diff increment
-- Call GRAPE and request analytical gradient
-- Left waveform edge
-- Right waveform edge
+## Scope
+
+Only the left edge, right edge, and middle sample of the five-element phase vector are checked in each formalism. This is not a check of every gradient coordinate or a reported result for a test run.

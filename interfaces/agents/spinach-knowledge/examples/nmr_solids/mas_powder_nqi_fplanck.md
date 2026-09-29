@@ -1,33 +1,17 @@
 # examples/nmr_solids/mas_powder_nqi_fplanck.m
 
-- Signature: `mas_powder_nqi_fplanck()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_nqi_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_nqi_fplanck.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_nqi_fplanck.m)
 
-Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus using Fokker-Planck theory. Perturbative cor- rections to the rotationg frame transformation are not applied. Calculation time: seconds
+## Purpose and spin system
 
-## Physical / mathematical content
+This example computes a powder MAS spectrum for one quadrupolar `2H` nucleus. The source sets `9.4 T`, quadrupolar tensor eigenvalues `[-1e3 -2e3 3e3] Hz`, and Euler angles `[0 0 0]`. These are model inputs rather than experimental measurements; the tensor eigenvalues sum to zero. Spinach documents quadrupolar interaction tensors in Hz in its [g2spinach knowledge page](../../interfaces/g2spinach.md).
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## Fokker–Planck label, actual call, and acquisition
 
-## Numerical / algorithmic content
+The source header identifies Fokker–Planck theory and says perturbative corrections to the rotating-frame transformation are not applied. The code's actual simulation call is `singlerot(spin_system,@acquire,parameters,'nmr')`, not `floquet` or `gridfree`; the page therefore distinguishes the stated formalism from the invoked routine. The source estimates seconds for calculation time, not a measured runtime.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The rotor axis is `[1 1 1]` and rate `1000 Hz`; powder settings are `leb_2ang_rank_17` and `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, offset 0, and ppm axis units; it selects `2H`, leaves `decouple={}`, and sets `invert_axis=1`. Both initial state and receiver are `L+` on `2H`.
 
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a single quadrupolar
-- deuterium nucleus using Fokker-Planck theory. Perturbative cor-
-- rections to the rotationg frame transformation are not applied.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The returned FID is exponentially apodised with parameter `6`, Fourier transformed with `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted using `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.

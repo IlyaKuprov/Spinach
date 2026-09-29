@@ -1,32 +1,23 @@
 # examples/relaxation_theory/from_md/sucrose_three_spins.m
 
+- MATLAB implementation: [examples/relaxation_theory/from_md/sucrose_three_spins.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/from_md/sucrose_three_spins.m)
+
 - Signature: `sucrose_three_spins()`
+- Source: [examples/relaxation_theory/from_md/sucrose_three_spins.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/from_md/sucrose_three_spins.m)
+- Paper cited by the source comments: [10.1016/j.jmr.2020.106891](https://doi.org/10.1016/j.jmr.2020.106891)
 
-## Purpose
+## Purpose and model
 
-One of the calculations reported in the JMR paper with Jim Prestegard: a three-spin subsystem from the glucose ring of sucrose -an illustra- tion of incorrect viscosity of TIP3P water. The experimental value of tau_c for sucrose is around 90 ps (and this is correctly reproduced by OPC and TIP5P water), but TIP3P only agrees with Redfield theory when tau_c is set to 37 ps in the latter. Here, numerical relaxation supe
+This is the three-proton glucose-ring sucrose counterpart to the eight-spin trajectory example. It compares diagonal relaxation-rate components from a trajectory-based `ngce` calculation with an analytical Redfield calculation using an isotropic rotational-diffusion approximation. The source comments attribute the calculation to the JMR paper with Jim Prestegard and provide the DOI above.
 
-## Physical / mathematical content
+The source frames the example as an illustration of TIP3P water's incorrect viscosity. The comments also report a sucrose correlation time around 90 ps, say OPC and TIP5P water reproduce it, and say TIP3P agrees with Redfield theory only at 37 ps. Those are the source's literature-context claims; this script does not itself measure that correlation time or compare its output with experimental data. Its observable is a computed rate-matrix comparison, not an experimental relaxation trace.
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+## System and relaxation settings
 
-## Numerical / algorithmic content
+The model is three protons at 14.1 T. Analytical Redfield settings are `inter.tau_c={37e-12}` (37 ps), temperature 298 K, zero equilibrium, and lab-frame retention. The script assumes the lab frame and uses the complete `sphten-liouv` basis (`approximation='none'`). It specifies no particular cross-correlation selection and no explicit secular restriction.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Trajectory calculation and plotted observable
 
-## Implementation structure
+The source loads `suc_three_spin_traj.mat`, with `traj` arranged as XYZ, spins, and time plus a frame interval `dt`; it retains the first 50,000 frames and chooses frame 1 as the reference geometry. It updates the three coordinates and dipolar couplings for each frame, extracts the anisotropic Hamiltonian component, and passes the resulting frame Hamiltonians to `ngce` with the coherent Hamiltonian, `dt`, and the 37 ps correlation-time argument. At the reference geometry it calculates `R_red` using `relaxation`.
 
-- One of the calculations reported in the JMR paper with Jim Prestegard:
-- a three-spin subsystem from the glucose ring of sucrose -an illustra-
-- tion of incorrect viscosity of TIP3P water.
-- The experimental value of tau_c for sucrose is around 90 ps (and this
-- is correctly reproduced by OPC and TIP5P water), but TIP3P only agrees
-- with Redfield theory when tau_c is set to 37 ps in the latter.
-- Here, numerical relaxation superoperator computed from a long MD tra-
-- jectory is compared with the analytical one computed using the isotro-
-- pic rotational diffusion approximation.
-- Calculation time: minutes, with most of the time spent
-- computing MD frame Hamiltonians
-- Three-spin system
+The plot places `diag(R_gce)` (molecular dynamics) against `diag(R_red)` (rotational diffusion), adds the equality line, and shows horizontal uncertainty bars equal to twice `diag(dR_gce)`; the source calls these 95% confidence intervals. It compares computed relaxation-rate components and does not define an initial state or detection operator for a time-domain experiment.

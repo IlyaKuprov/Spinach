@@ -1,36 +1,9 @@
 # kernel/overloads/@polyadic/full.m
 
-- Signature: `answer=full(p)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/full.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=polyadic/full.m)
 
-## Purpose
+`full(p)` materialises the represented matrix. It first recursively converts nested polyadics in cores, prefixes, and suffixes. For each outer core term it starts with the full first factor, appends later factors with `kron` in their stored order, and adds that Kronecker-product term to the accumulated matrix. The row and column counts are products of the factor dimensions in the first term; the source does not check that later terms have matching dimensions.
 
-Converts a polyadic representation of a matrix into a full mat- rix. Syntax: answer=full(p) The function opens up all the Kronecker products and uses full arithmetic throughout even if some cores are sparse.
+After summing terms, it multiplies by prefixes in stored product order and then suffixes in stored product order. The accumulator is created with `zeros`, the first factor and final result are explicitly made full, and the source documentation states that full arithmetic is used even when cores are sparse. This is materialisation, not a contraction-only operation; it returns an ordinary full matrix rather than a polyadic. The overload contains no broadcasting or dimension-validation step beyond the matrix and `kron` operations it invokes.
 
-## Physical / mathematical content
-
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- p -a polyadic object
-
-## Outputs
-
-- answer -a full matrix
-
-## Implementation structure
-
-- Converts a polyadic representation of a matrix into a full mat-
-- rix. Syntax:
-- answer=full(p)
-- The function opens up all the Kronecker products and uses full
-- arithmetic throughout even if some cores are sparse.
-- p -a polyadic object
-- answer -a full matrix
-- Process nested polyadics
-- Find the core dimensions
-- Preallocate the answer
-- Loop over the sum
-- Compute the polyadic
+Source comment: [DOI 10.1016/j.evolhumbehav.2017.04.001](http://dx.doi.org/10.1016/j.evolhumbehav.2017.04.001).

@@ -1,36 +1,31 @@
 # kernel/utilities/hdot.m
 
-- Signature: `H=hdot(A,B)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/hdot.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/hdot.m)
 
 ## Purpose
 
-Hadamard route to Frobenius matrix product. Useful as a replacement for trace(A'*B) because trace(A'*B)=hadm(conj(A),B) and the latter only needs O(n^2) multiplications as com- pared to O(n^3) for trace(A'*B). Syntax: H=hdot(A,B)
+`hdot.m` computes the Frobenius inner product of two matrices via a Hadamard (element-wise) route, serving as an efficient replacement for `trace(A'*B)`.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- The function evaluates `H = sum(conj(A).*B,'all')`, exploiting the identity `trace(A'*B) = sum(sum(conj(A).*B))`.
+- This approach requires only O(n^2) multiplications, compared to O(n^3) for the direct `trace(A'*B)` computation.
+- Before computing, a consistency check (`grumble`) enforces that both inputs are numeric and have identical dimensions, raising errors otherwise:
+  - `'both inputs must be numeric.'` if either input is non-numeric.
+  - `'the two inputs must have identical dimensions.'` if the sizes differ.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs:**
 
-- A,B -square matrices of the same size
+- `A`, `B` — square matrices of the same size; both must be numeric.
 
-## Outputs
+**Outputs:**
 
-- H -Frobenius inner product of A and B
+- `H` — the Frobenius inner product of `A` and `B`.
 
-## Implementation structure
+**Syntax:** `H=hdot(A,B)`
 
-- Hadamard route to Frobenius matrix product. Useful as a
-- replacement for trace(A'*B) because
-- trace(A'*B)=hadm(conj(A),B)
-- and the latter only needs O(n^2) multiplications as com-
-- pared to O(n^3) for trace(A'*B). Syntax:
-- H=hdot(A,B)
-- A,B -square matrices of the same size
-- H -Frobenius inner product of A and B
-- Check consistency
-- Do the calculation
-- Consistency enforcement
-- An infinite number of mathematicians walk into a bar. The first one
+## References
+
+- Spinach Wiki: [hdot.m](https://spindynamics.org/wiki/index.php?title=hdot.m)

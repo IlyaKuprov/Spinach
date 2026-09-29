@@ -1,31 +1,20 @@
 # examples/nmr_liquids/pa_naphtopyranone.m
 
 - Signature: `pa_naphtopyranone()`
+- Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pa_naphtopyranone.m)
 
 ## Purpose
 
-NMR spectrum of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one, magnetic parameters from: Calculation time: seconds
+Simulates a liquid-state pulse-acquire 1H NMR spectrum for 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one. It is a proton acquisition through `liquid(...,@acquire,...,'nmr')`, not an INADEQUATE, inversion-recovery, NOE, or NOESY sequence.
 
-## Physical / mathematical content
+## System and interactions
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The source specifies twelve 1H spins at `sys.magnet=14.095` T, their scalar shifts, and pairwise scalar couplings. The coded shift list is `[8.345, 7.741, 8.097, 8.354, 7.784, 8.330, 7.059, 7.941, 7.466, 7.326, 7.466, 7.941]`; the displayed chemical-shift axis is ppm. Representative coded couplings are `J(1,2)=7.8`, `J(1,3)=0.9`, and `J(4,5)=8.4`. It uses a scalar-coupling-connected `sphten-liouv` basis with `IK-2` approximation and proximal level 1.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The source uses 1H `L+` for both initial state and receiver, with no decoupling. It sets `offset=4600`, `sweep=1200`, `npoints=4096`, and `zerofill=32768`, with ppm units and inverted axis. The source does not label offset or sweep units. After liquid-state acquisition it applies exponential apodisation parameter 10, computes the shifted zero-filled Fourier transform, and plots the real spectrum.
 
-## Implementation structure
+## Source limits
 
-- NMR spectrum of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one,
-- magnetic parameters from:
-- Calculation time: seconds
-- Magnetic induction
-- Spin system
-- Chemical shifts
-- Scalar couplings
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+Magnetic parameters are cited to [the original report](https://doi.org/10.1016/j.saa.2010.11.015); the example comments estimate seconds of computation. No relaxation model or measured/computed peak values are supplied by this source file.

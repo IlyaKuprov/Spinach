@@ -1,42 +1,9 @@
 # interfaces/pdb_bmrb/read_bmrb.m
 
-- Signature: `[aa_num,aa_typ,pdb_id,chemsh]=read_bmrb(bmrb_file_name)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/pdb_bmrb/read_bmrb.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=Read_bmrb.m)
 
-## Purpose
+`[aa_num,aa_typ,pdb_id,chemsh]=read_bmrb(bmrb_file_name)` reads the Spinach-supported BMRB assignment text format and returns one entry per accepted record. The filename must be a MATLAB character array; there are no optional arguments. The parser replaces tabs with spaces, scans each line using eight space-delimited fields, and accepts a line only when all eight fields parse as nonempty. This is a specific field layout, not a general-purpose reader for arbitrary BMRB formats.
 
-Reads BMRB file, extracts amino acid numbers, amino acid types, PDB atom identifiers and chemical shifts. Syntax: [aa_num,aa_typ,pdb_id,chemsh]=read_bmrb(bmrb_file_name)
+For N accepted assignments, aa_num is an N×1 numeric vector, aa_typ and pdb_id are N×1 cell arrays of strings, and chemsh is an N×1 numeric vector of chemical shifts in ppm. Residue types are converted to uppercase. Values are taken from fields 2, 3, 4 and 6; fields 1, 5, 7 and 8 must nevertheless be present for the record to be retained. An empty or wholly unparseable assignment file raises an error stating that the data format is not canonical.
 
-## Physical / mathematical content
-
-- PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- bmrb_file_name -a character string with the file name
-
-## Outputs
-
-- aa_num -amino acid numbers, vector
-- aa_typ -amino acid types, cell array of strings
-- pdb_id -atom identifiers using PDB nomenclature,
-- cell array of strings
-- chems -chemical shifts in ppm
-- Note: direct calls are discouraged, see the protein HOWTO docu-
-- ment for instructions on importing protein data.
-
-## Implementation structure
-
-- Reads BMRB file, extracts amino acid numbers, amino acid types,
-- PDB atom identifiers and chemical shifts. Syntax:
-- [aa_num,aa_typ,pdb_id,chemsh]=read_bmrb(bmrb_file_name)
-- bmrb_file_name -a character string with the file name
-- aa_num -amino acid numbers, vector
-- aa_typ -amino acid types, cell array of strings
-- pdb_id -atom identifiers using PDB nomenclature,
-- cell array of strings
-- chems -chemical shifts in ppm
-- Note: direct calls are discouraged, see the protein HOWTO docu-
-- ment for instructions on importing protein data.
-- Check consistency
+The source header's output list calls the shift vector chems, but the function signature and implementation use chemsh. Direct calls are discouraged in favor of the protein import workflow described in the protein HOWTO.

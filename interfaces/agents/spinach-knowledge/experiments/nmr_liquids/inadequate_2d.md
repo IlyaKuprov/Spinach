@@ -4,54 +4,19 @@
 
 ## Purpose
 
-2D INADEQUATE pulse sequence from:
+Two-dimensional INADEQUATE. The source describes the F1 axis as a double-quantum frequency coordinate and cites [the first paper](https://doi.org/10.1021/ja00398a044) and [the second paper](https://doi.org/10.1016/0022-2364(81)90060-3). It recommends `dilute.m` for generating carbon-pair isotopomers.
 
-## Physical / mathematical content
+## Sequence and signal
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The source initialises longitudinal magnetisation on the configured nucleus and uses two delays `tau=abs(1/(4*parameters.J))` around an inversion pulse. A final 90-degree pulse creates the double-quantum signal, which is filtered to coherence orders +2 and -2. The F1 evolution is sampled at dwell `1/parameters.sweep(1)`; a following 90-degree pulse converts the stored states for detection, and F2 is acquired at dwell `1/parameters.sweep(2)`. Sweep widths and J are in Hz, so `tau` is in seconds. The returned `fid.cos` and `fid.sin` are the two States quadrature components; each is a two-dimensional array with `npoints(2)` F2 acquisition samples in rows and `npoints(1)` F1 increments in columns; the source passes the F1 state stack directly to `evolution` without transposing the result.
 
-## Numerical / algorithmic content
+## Inputs
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- `parameters.sweep`: two positive sweep widths, `[F1 F2]`, in Hz.
+- `parameters.npoints`: two positive integer point counts, `[F1 F2]`.
+- `parameters.spins`: active nucleus in a cell array; source example: `{'13C'}`.
+- `parameters.decouple`: optional cell array of nuclei to decouple; source example: `{'1H'}`. If absent, the function sets it to an empty cell array.
+- `parameters.J`: working scalar coupling in Hz.
+- `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function. The source requires the `sphten-liouv` formalism and same-sized matrices.
 
-## Syntax
-
-```matlab
-fid=inadequate_2d(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- parameters.sweep [F1 F2] sweep widths, Hz
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins active nucleus, e.g. {'13C'}
-- parameters.decouple optional nuclei to decouple, e.g. {'1H'}
-- parameters.J working scalar coupling, Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.cos,fid.sin -two components of the States signal
-- Notes: use dilute.m to generate carbon pair isotopomers. The F1
-- axis is a double-quantum frequency coordinate.
-- Theresa Hune
-- Christian Griesinger
-
-## Implementation structure
-
-- 2D INADEQUATE pulse sequence from:
-- fid=inadequate_2d(spin_system,parameters,H,R,K)
-- parameters.sweep [F1 F2] sweep widths, Hz
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins active nucleus, e.g. {'13C'}
-- parameters.decouple optional nuclei to decouple, e.g. {'1H'}
-- parameters.J working scalar coupling, Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid.cos,fid.sin - two components of the States signal
-- axis is a double-quantum frequency coordinate.
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/inadequate_2d.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inadequate_2d.m).

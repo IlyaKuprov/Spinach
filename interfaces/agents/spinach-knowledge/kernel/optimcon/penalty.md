@@ -1,76 +1,19 @@
 # kernel/optimcon/penalty.m
 
-- Signature: `[pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)`
+Signature: `[pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)`
 
-## Purpose
 
-Penalty terms for the Optimal Control module. Returns the penalty function and its gradient for the waveform, which should be sup- plied as row vector or a horizontal stack thereof. Syntax: [pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)
+For a real numeric waveform `wf`, rows are controls and columns are time samples. The scalar `pen_term` and requested derivative outputs are initialised to zero: `pen_grad` has the shape of `wf`, while `pen_hess` is a `numel(wf)`-by-`numel(wf)` matrix in MATLAB column-major waveform order. It calculates only outputs requested by `nargout`. There is no default penalty type.
 
-## Physical / mathematical content
+Let `N=size(wf,2)`. The implemented choices are:
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
+- `none`: leaves the penalty, gradient and Hessian at zero.
+- `NS`: sum of squared waveform entries divided by `N`; gradient is `2*wf/N` and Hessian is `2*I/N`.
+- `DNS`: forms `D=fdmat(N,5,2,'wall')` and penalises the squared entries of `wf*D'`, divided by `N`. Its gradient is `2*(wf*D')*D/N` and its Hessian is `2*kron(D'*D,speye(size(wf,1)))/N`.
+- `SNS`: penalises squared deviations only where entries are strictly above `cb` or strictly below `fb`, divided by `N`. The gradient is twice the active deviation divided by `N`; the Hessian is diagonal with `2/N` for active entries and zero elsewhere. Entries exactly on either bound are inactive.
+- `SNSA`: interprets rows in interleaved Cartesian pairs `[Xa Ya Xb Yb ...]`, computes each pair amplitude, and penalises only amplitude strictly above scalar `cb`, divided by `N`. It maps the amplitude gradient back to Cartesian waveform coordinates and assembles the Hessian in paired-coordinate blocks. Inactive amplitudes are set to 1 for the polar-to-Cartesian derivative calculation to avoid the polar singularity. `fb` is checked but does not enter this case's penalty.
 
-## Numerical / algorithmic content
+Both bounds must be real numeric scalars or arrays the same size as `wf`; all entries must satisfy `cb>=fb`. For `SNSA`, both bounds must instead be scalars and `wf` must have an even number of rows. The DNS case requires at least five time samples. `type` must be a character string; an unrecognised value raises an error.
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-
-## Parameters / inputs
-
-- wf -control sequence waveform
-- type='none' -no waveform penalty.
-- type='NS' -norm square, designed to favour
-- low-power waveforms over high-
-- power ones.
-- type='DNS' -derivative norm square, desig-
-- ned to favour smooth waveforms
-- over jagged ones.
-- type='SNS' -spillout norm square, NS appli-
-- ed to the part of the waveform
-- with values outside the floor
-- and ceiling bounds.
-- type='SNSA' -SNS applied after a transform to
-- amplitude-phase representation
-- Penalises amplitude values outs-
-- ide the ceiling bound. Requires
-- even number of control channels
-- with waveform rows ordered as:
-- [Xa Ya Xb Yb ... Xn Yn]
-- fb -floor bound, a scalar or an array
-- with the same dimensions as the
-- waveform used in the SNS penalty
-- function.
-- cb -ceiling bound, a scalar or an ar-
-- ray with the same dimensions as
-- the waveform used in the SNS pen-
-- alty function, scalar only for
-- the SNSA penalty function.
-
-## Outputs
-
-- pen_term -value of the penalty term
-- pen_grad -gradient of the penalty term with
-- respect to the waveform vector
-- pen_hess -Hessian of the penalty term with
-- respect to the waveform vector
-- The waveforms on different channels are assumed to be stored in the
-- rows of the input array. The Hessian elements correspond to the ele-
-- ments of the waveform array ordered as:
-- [X1 Y1 Z1 X2 Y2 Z2 ... Xn Yn Zn]
-- where X,Y,Z are different control channels and the index enumerates
-- the time discretization points. Gradient dimensions and element or-
-- der are the same as the input waveform dimensions and element order.
-
-## Implementation structure
-
-- Penalty terms for the Optimal Control module. Returns the penalty
-- function and its gradient for the waveform, which should be sup-
-- plied as row vector or a horizontal stack thereof. Syntax:
-- [pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)
-- wf - control sequence waveform
-- type='none' - no waveform penalty.
-- type='NS' - norm square, designed to favour
-- low-power waveforms over high-
-- power ones.
-- type='DNS' - derivative norm square, desig-
-- ned to favour smooth waveforms
-- over jagged ones.
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/penalty.m)
+[Spinach Wiki](https://spindynamics.org/wiki/index.php?title=penalty.m)

@@ -1,36 +1,39 @@
 # kernel/utilities/krondelta.m
 
-- Signature: `d=krondelta(a,b)`
+**Source:** [kernel/utilities/krondelta.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/krondelta.m)
 
 ## Purpose
 
-Kronecker symbol. Syntax: d=krondelta(a,b)
+Computes the Kronecker symbol (Kronecker delta) for two integers, returning a logical value indicating whether the two inputs are equal.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `d=krondelta(a,b)`.
+- The function first calls an internal consistency check (`grumble`) on both inputs.
+- If the inputs pass validation, the function returns `true` when `a==b` and `false` otherwise.
+- The output is created via `true()` or `false()`, so `d` is a logical scalar.
 
-## Numerical / algorithmic content
+### Input validation
 
-## Parameters / inputs
+The internal `grumble` subroutine enforces all of the following conditions on both `a` and `b`, and throws an error with the message `'a and b must be real integer scalars.'` if any check fails:
 
-- a -an integer number
-- b -an integer number
+- `isnumeric` must be true.
+- `isscalar` must be true.
+- `isreal` must be true.
+- `mod(a,1)==0` and `mod(b,1)==0` (i.e., the values must be integers).
 
-## Outputs
+## Inputs and outputs
 
-- d -a logical number
+**Inputs**
 
-## Implementation structure
+- `a` — an integer number.
+- `b` — an integer number.
 
-- Kronecker symbol. Syntax:
-- d=krondelta(a,b)
-- a -an integer number
-- b -an integer number
-- d -a logical number
-- Check consistency
-- Compute the answer
-- Consistency enforcement
-- Die ganzen Zahlen hat der liebe Gott gemacht,
-- alles andere ist Menschenwerk.
-- Leopold Kronecker
+**Outputs**
+
+- `d` — a logical number (`true` if `a` equals `b`, `false` otherwise).
+
+## References
+
+- Spin Dynamics Wiki page for this function: [krondelta.m](https://spindynamics.org/wiki/index.php?title=krondelta.m)
+- The source file closes with the quotation attributed to Leopold Kronecker: "Die ganzen Zahlen hat der liebe Gott gemacht, alles andere ist Menschenwerk."

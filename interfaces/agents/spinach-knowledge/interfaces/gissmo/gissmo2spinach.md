@@ -1,34 +1,11 @@
 # interfaces/gissmo/gissmo2spinach.m
 
-- Signature: `[sys,inter]=gissmo2spinach(filename,subsystem)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/gissmo/gissmo2spinach.m) · [Wiki page](https://spindynamics.org/wiki/index.php?title=gissmo2spinach.m)
 
-## Purpose
+**Call:** `[sys,inter]=gissmo2spinach(filename,subsystem)`.
 
-Reads a GISSMO XML file and forms the Spinach system and interaction structures for the selected coupling matrix.
+`filename` must be a non-empty character string naming an existing GISSMO XML file. `subsystem` selects a coupling matrix by its one-based order among the XML `coupling_matrix` elements; the importer does not separately validate that selector. It parses the XML with `parsexml`, reads the top-level `field_strength`, and processes the selected matrix's `lw`, `spin_names`, `chemical_shifts_ppm`, and `couplings_hz` elements.
 
-## Physical / mathematical content
+For the field, it evaluates `sys.magnet = 2*pi*1e6*field_strength/spin('1H')`, treating the XML numeric field-strength value as MHz before conversion. The spin list supplies each XML index and name; labels are stored as `sys.labels{index}='Atom name'`. Chemical-shift entries provide an index and a ppm value, copied to `inter.zeeman.scalar{index}`. Coupling entries provide `from_index`, `to_index`, and `value`; the numeric coupling value is copied into `inter.coupling.scalar{from_index,to_index}` in the XML's Hz convention. Imported isotopes are all set to `'1H'`.
 
-GISSMO provides proton chemical shifts in ppm, scalar J-couplings in hertz, the proton spectrometer frequency, and a non-selective linewidth. The frequency determines the magnetic induction. The linewidth is treated as Lorentzian FWHM in hertz and converted by `fwhm2rlx` to the damping rate `pi*FWHM` in inverse seconds.
-
-Pure non-selective damping uses zero equilibrium and full (`labframe`) retention. In either Liouville formalism its generator is `-rate*(I-u*u')`, where `u` is the normalised unit state: every traceless state decays, while trace and the identity are preserved. Damping is added after retention, so this setting preserves the previous spherical-tensor result without requesting unsupported Zeeman diagonal retention; it does not require a laboratory-frame Hamiltonian for pure damping.
-
-## Numerical / algorithmic content
-
-The XML coupling matrices are selected by one-based order. Spin labels, shifts, and couplings use their XML indices; the imported spins are protons. Essential magnetic-field, linewidth, shift, and coupling data must be present. The file must exist and its filename must be a non-empty character string.
-
-## Syntax
-
-`[sys,inter]=gissmo2spinach(filename,subsystem)`
-
-## Parameters / inputs
-
-- `filename`: character string containing the GISSMO XML filename.
-- `subsystem`: one-based index of the coupling matrix to import.
-
-## Outputs
-
-- `sys,inter`: Spinach data structures ready for `create`.
-
-## Header notes
-
-GISSMO supplies only chemical shifts, J-couplings, the non-selective linewidth, and the magnet field. Add further parameters by editing `sys` and `inter` as needed. As documented by `fwhm2rlx`, a linewidth-based relaxation rate is an approximation and should be treated as an upper bound when other broadening is present.
+The selected matrix's linewidth text is passed to `fwhm2rlx`; that helper converts an FWHM value in Hz to `pi*FWHM` (its approximate R2-rate value). The importer sets `inter.relaxation={'damp'}`, `inter.rlx_keep='labframe'`, and `inter.equilibrium='zero'`. At least one field, linewidth, chemical-shift list, and coupling list must be encountered or the call errors. It returns the assembled `sys` and `inter` structures for `create`; additional parameters may need to be supplied by the caller. Dependencies called here are `parsexml`, `spin('1H')`, and `fwhm2rlx`.

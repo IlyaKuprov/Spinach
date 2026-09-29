@@ -1,38 +1,32 @@
 # kernel/utilities/binpack.m
 
-- Signature: `bins=binpack(box_sizes,bin_size)`
-
 ## Purpose
 
-A simple 1D bin packing algorithm. Collects the list of numbers supplied into sublists that sum to the number that is smaller or equal to the number specified. The algorithm is not optimal, but it does the job. Syntax: bins=binpack(box_sizes,bin_size)
+`binpack.m` implements a simple one-dimensional bin packing algorithm. It collects a supplied list of numbers into sublists whose sums are smaller than or equal to a specified bin size. The header comment states that the algorithm is not optimal, but that it does the job.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function is called as `bins=binpack(box_sizes,bin_size)`.
 
-## Numerical / algorithmic content
+1. Input consistency is enforced by an internal `grumble` subfunction, which errors if `box_sizes` is not a numeric, real, finite row vector of positive integers, or if `bin_size` is not a single positive real integer.
+2. Boxes are numbered by their indices, `box_index=(1:numel(box_sizes))'`.
+3. Boxes larger than `bin_size` (`box_sizes>bin_size`) are each placed into their own bin as singleton index vectors and removed from the packing list.
+4. Remaining boxes are packed iteratively: in each pass, `cumsum(box_sizes)<=bin_size` selects the leading run of boxes whose cumulative sum fits within the bin; those indices are appended as a new bin, and the packed boxes are removed from the lists. The loop repeats until no boxes remain.
 
-## Parameters / inputs
+Because the packing loop consumes boxes in list order via a cumulative-sum cutoff, each bin contains a contiguous prefix of the remaining box list; the header notes the result is not an optimal packing.
 
-- box_sizes -a row vector of box sizes
-- bin_size -an integer specifying the bin size
+## Inputs and outputs
 
-## Outputs
+Inputs:
 
-- bins -a cell array of index vectors specifying
-- boxes allocated into each bin
+- `box_sizes` — a row vector of box sizes; must be a numeric, real, finite row vector of positive integers.
+- `bin_size` — an integer specifying the bin size; must be a single positive real integer.
 
-## Implementation structure
+Output:
 
-- A simple 1D bin packing algorithm. Collects the list of numbers
-- supplied into sublists that sum to the number that is smaller or
-- equal to the number specified. The algorithm is not optimal, but
-- it does the job. Syntax:
-- bins=binpack(box_sizes,bin_size)
-- box_sizes -a row vector of box sizes
-- bin_size -an integer specifying the bin size
-- bins -a cell array of index vectors specifying
-- boxes allocated into each bin
-- Check consistency
-- Number the boxes
-- Find boxes that are bigger than bins
+- `bins` — a cell array of index vectors specifying the boxes allocated into each bin. Oversized boxes each occupy their own single-element bin.
+
+## References
+
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/binpack.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=binpack.m>

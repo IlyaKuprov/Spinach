@@ -1,46 +1,39 @@
 # kernel/utilities/xyz2pd.m
 
-- Signature: `density=xyz2pd(coords,x_range,y_range,z_range,...`
-
 ## Purpose
 
-Probability density estimation for a three-dimensional Cartesian point cloud on a user-specified regular grid. Syntax: density=xyz2pd(coords,x_range,y_range,z_range,... x_npts, y_npts, z_npts)
+Bins a three-dimensional Cartesian point cloud into a user-specified regular grid and returns raw per-cell counts. The implementation does not divide by the number of points or cell volume. Source: [Spinach repository](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/xyz2pd.m).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `density=xyz2pd(coords,x_range,y_range,z_range,x_npts,y_npts,z_npts)`.
+- Grid cell edges are computed with `linspace` along each axis, producing `npts+1` edges per axis from the given range.
+- Each coordinate column is binned with `discretize` to obtain per-axis cell indices.
+- Points with any `NaN` bin index (i.e., outside the grid) are discarded via a validity mask.
+- Linear cell indices are formed with `sub2ind` over the grid dimensions `[x_npts y_npts z_npts]`.
+- Per-cell counts are accumulated with `accumarray` and reshaped into a three-dimensional array of size `x_npts`-by-`y_npts`-by-`z_npts`.
+- Input validation (internal `grumble` function) errors out when:
+  - `coords` is not a real finite numeric matrix with exactly three columns, or is empty;
+  - any range is not a two-element real finite vector with strictly increasing entries;
+  - any point count is not a real integer scalar greater than 1.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
 
-- coords -an N-by-3 array of Cartesian coordinates
-- x_range -a two-element vector [xmin xmax] specifying the
-- Cartesian grid extent along the x axis
-- y_range -a two-element vector [ymin ymax] specifying the
-- Cartesian grid extent along the y axis
-- z_range -a two-element vector [zmin zmax] specifying the
-- Cartesian grid extent along the z axis
-- x_npts -the number of grid points along the x axis
-- y_npts -the number of grid points along the y axis
-- z_npts -the number of grid points along the z axis
+- `coords` — N-by-3 array of Cartesian coordinates.
+- `x_range` — two-element vector `[xmin xmax]` giving the grid extent along x.
+- `y_range` — two-element vector `[ymin ymax]` giving the grid extent along y.
+- `z_range` — two-element vector `[zmin zmax]` giving the grid extent along z.
+- `x_npts` — number of grid points along x.
+- `y_npts` — number of grid points along y.
+- `z_npts` — number of grid points along z.
 
-## Outputs
+Output:
 
-- density -a three-dimensional array containing the num-
-- ber of points falling into each grid cell
+- `density` — three-dimensional array containing the number of points falling into each grid cell.
 
-## Implementation structure
+## References
 
-- Probability density estimation for a three-dimensional Cartesian
-- point cloud on a user-specified regular grid. Syntax:
-- density=xyz2pd(coords,x_range,y_range,z_range,...
-- x_npts, y_npts, z_npts)
-- coords -an N-by-3 array of Cartesian coordinates
-- x_range -a two-element vector [xmin xmax] specifying the
-- Cartesian grid extent along the x axis
-- y_range -a two-element vector [ymin ymax] specifying the
-- Cartesian grid extent along the y axis
-- z_range -a two-element vector [zmin zmax] specifying the
-- Cartesian grid extent along the z axis
-- x_npts -the number of grid points along the x axis
+- Spinach wiki page: <https://spindynamics.org/wiki/index.php?title=xyz2pd.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/xyz2pd.m>

@@ -1,62 +1,29 @@
 # kernel/pulses/polar2cartesian.m
 
-- Signature: `[x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/polar2cartesian.m
+Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=polar2cartesian.m
 
 ## Purpose
 
-Converts [RF_amplitude, RF_phase] representation of a pulse waveform and the derivatives of any function with respect to those amplitudes and pha- ses into the [RF_x, RF_y] representation and the derivatives of the func- tion with respect to those X and Y RF values. Syntax: [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
+Convert pulse amplitudes and phases from polar coordinates to Cartesian RF components, and transform first- or second-derivative data for a scalar objective into the corresponding X/Y coordinates.
 
-## Physical / mathematical content
+## Syntax
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+~~~matlab
+[x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
+~~~
 
-## Numerical / algorithmic content
+The source accepts 2, 4, or 8 inputs. Supply r and p for the waveform conversion; append Dr,Dp for first derivatives, and append Drr,Drp,Dpr,Dpp for second derivatives.
 
-## Parameters / inputs
+## Inputs and coordinate conventions
 
-- r -vector of waveform amplitudes
-- p -vector of waveform phases
-- Dr -optional vector of derivatives of some scalar function
-- with respect to the waveform amplitudes.
-- Dp -optional vector of derivatives of some scalar function
-- with respect to the waveform phases.
-- Drr -matrix of second derivatives of the function with respect
-- to the waveform amplitudes.
-- Drp -matrix of second derivatives of the function with respect
-- to the waveform amplitudes and phases.
-- Dpr -matrix of second derivatives of the function with respect
-- to the waveform phases and amplitudes.
-- Dpp -matrix of second derivatives of the function with respect
-- to the waveform phases.
+- r: real numeric vector of RF amplitudes; the output components retain this amplitude scale.
+- p: matching real numeric phase vector, interpreted in radians by the trigonometric formulas.
+- Dr,Dp: matching vectors of first derivatives of a scalar function with respect to amplitude and phase.
+- Drr,Drp,Dpr,Dpp: matching square second-derivative matrices in the listed derivative order.
 
-## Outputs
+The Cartesian components are x=r.*cos(p) and y=r.*sin(p); the quadrature order is cosine/X first and sine/Y second. First derivatives transform as Dx=Dr.*cos(p)-Dp.*sin(p)./r and Dy=Dr.*sin(p)+Dp.*cos(p)./r. The second-derivative outputs are ordered Dxx,Dxy,Dyx,Dyy, for X/X, X/Y, Y/X, and Y/Y respectively.
 
-- x -vector of waveform amplitudes along X
-- y -vector of waveform amplitudes along Y
-- Dx -vector of derivatives of the function with respect to
-- the waveform amplitudes along X
-- Dy -vector of derivatives of the function with respect to
-- the waveform amplitudes along Y
-- Dxx -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along X
-- Dxy -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along X and Y
-- Dyx -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along Y and X
-- Dyy -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along Y
+## Validation and scope
 
-## Implementation structure
-
-- Converts [RF_amplitude, RF_phase] representation of a pulse waveform and
-- the derivatives of any function with respect to those amplitudes and pha-
-- ses into the [RF_x, RF_y] representation and the derivatives of the func-
-- tion with respect to those X and Y RF values. Syntax:
-- [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
-- r -vector of waveform amplitudes
-- p -vector of waveform phases
-- Dr -optional vector of derivatives of some scalar function
-- with respect to the waveform amplitudes.
-- Dp -optional vector of derivatives of some scalar function
-- with respect to the waveform phases.
-- Drr -matrix of second derivatives of the function with respect
+The implementation checks input types and compatible vector or matrix dimensions. The derivative formulas contain divisions by r and r.^2; the source does not add a zero-amplitude special case. The function has no time-grid, timing, phase-cycle, plotting, or file-export argument: it is a coordinate/derivative conversion utility.

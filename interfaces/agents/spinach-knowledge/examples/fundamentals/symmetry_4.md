@@ -1,29 +1,22 @@
 # examples/fundamentals/symmetry_4.m
 
+- MATLAB implementation: [examples/fundamentals/symmetry_4.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/symmetry_4.m)
+
 - Signature: `symmetry_4()`
+- Source: [examples/fundamentals/symmetry_4.m](../../../../../examples/fundamentals/symmetry_4.m)
 
 ## Purpose
 
-Hamiltonian symmetrization for a radical pair with four equivalent nuclei under the S4 permutation group.
+Shows how S4 symmetry factorisation changes the sparsity pattern of the Hamiltonian for a zero-field radical pair with four equivalent protons.
 
-## Physical / mathematical content
+## Spin model and basis
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The source sets `sys.magnet=0` for two electrons and four protons, groups protons 3–6 under S4, and uses the Zeeman-Hilbert formalism (`zeeman-hilb`) with approximation `none`. The electron Zeeman scalars are both 2.002 and the proton entries are zero. In the scalar-coupling matrix, electron 1 couples to each proton with input value 0.295 passed through `mt2hz`; the other listed entries are zero.
 
-## Numerical / algorithmic content
+## Construction and display
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The system and basis are built, the `labframe` assumption is applied, and the source calls `hamiltonian(spin_system)` and concatenates the irrep projectors into `S`. The source labels this section “Hamiltonian superoperator”, while the selected basis formalism is `zeeman-hilb`; this page reports both source details without resolving that terminology. The plotted masks use `abs(H)>1e3` and `abs(S'*H*S)>1e3`, with guide lines at indices 20 and 28.
 
-## Implementation structure
+## Scope
 
-- Hamiltonian symmetrization for a radical pair with four
-- equivalent nuclei under the S4 permutation group.
-- Magnetic field
-- Spin system
-- Basis set
-- Interactions
-- Spinach housekeeping
-- Assumptions
-- Hamiltonian superoperator
-- Symmetry factorization
-- Plotting
+This is a matrix-sparsity visualisation, not a time-domain simulation. The source specifies plot thresholds and guide lines but does not report a numerical comparison or observed run result.

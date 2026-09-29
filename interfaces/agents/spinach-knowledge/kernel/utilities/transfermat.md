@@ -1,40 +1,32 @@
 # kernel/utilities/transfermat.m
 
-- Signature: `T=transfermat(amp_inps,amp_outs)`
-
 ## Purpose
 
-Transfer matrix calculation for linear filters. Syntax: T=transfermat(amp_inps,amp_outs)
+Computes the transfer matrix of a linear filter from stacks of observed amplifier input and output vectors ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/transfermat.m)).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `T=transfermat(amp_inps,amp_outs)`.
+- The function first runs a consistency check (`grumble`) on the two input stacks, then computes `T=amp_outs/amp_inps`, described in the header as the SVD pseudoinverse route.
+- The returned matrix satisfies `amp_outs=T*amp_inps` in the least squares sense.
+- The header notes that the number of input-output vector pairs should be bigger than the number of elements in those vectors.
+- Consistency enforcement (`grumble`) errors when:
+  - `amp_inps` is not numeric, or has fewer columns than rows (`size(amp_inps,2)<size(amp_inps,1)`), with message `amp_inps must be a stack of column vectors wider than it is tall.`;
+  - `amp_outs` is not numeric, or has fewer columns than rows, with message `amp_outs must be a stack of column vectors wider than it is tall.`;
+  - the two stacks have different numbers of vectors (`size(amp_inps,2)~=size(amp_outs,2)`), with message `the number of vectors in amp_inps and amp_outs stacks must be the same.`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
 
-- amp_inps -a matrix with amplifier input vectors as columns
-- amp_outs -a matrix with amplifier output vectors as columns
+- `amp_inps` — numeric matrix with amplifier input vectors as columns; must have at least as many columns as rows.
+- `amp_outs` — numeric matrix with amplifier output vectors as columns; must have at least as many columns as rows and the same number of columns as `amp_inps`.
 
-## Outputs
+Outputs:
 
-- T -the transfer matrix, such that amp_outs=T*amp_inps
-- in the least squares sense
-- Note: the number of input-output vector pairs should be bigger than
-- the number of elements in those vectors.
+- `T` — the transfer matrix, such that `amp_outs=T*amp_inps` in the least squares sense.
 
-## Implementation structure
+## References
 
-- Transfer matrix calculation for linear filters. Syntax:
-- T=transfermat(amp_inps,amp_outs)
-- amp_inps -a matrix with amplifier input vectors as columns
-- amp_outs -a matrix with amplifier output vectors as columns
-- T -the transfer matrix, such that amp_outs=T*amp_inps
-- in the least squares sense
-- Note: the number of input-output vector pairs should be bigger than
-- the number of elements in those vectors.
-- Check consistency
-- Run the SVD pseudoinverse
-- Consistency enforcement
-- A good friend will always stab you in the front.
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/transfermat.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=transfermat.m>

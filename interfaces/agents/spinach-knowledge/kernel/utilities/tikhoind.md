@@ -1,47 +1,41 @@
 # kernel/utilities/tikhoind.m
 
-- Signature: `[x,err,reg]=tikhoind(K,D,y,lam)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/tikhoind.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/tikhoind.m)
 
 ## Purpose
 
-Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-indefinite output). Syntax: [x,err,reg]=tikhoind(K,D,y,lam)
+`tikhoind` computes the analytical Tikhonov-regularised solution to `K*x=y` without any constraints, producing a sign-indefinite output. It minimises `norm(K*x-y,2)^2 + lambda*norm(D*x,2)^2`.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Validates inputs via an internal `grumble` consistency check:
+  - All inputs (`K`, `D`, `y`, `lam`) must be numeric.
+  - The number of rows of `K` must match the number of rows of `y`.
+  - `lam` must be a positive real scalar (the check rejects non-real, non-scalar, or negative values).
+- Computes the analytical solution as `x = ((K'*K) + lam*(D'*D)) \ (K'*y)`.
+- If more than one output is requested, computes `err = norm(K*x-y,2)^2`.
+- If more than two outputs are requested, computes `reg = norm(D*x,2)^2`.
+- The kernel matrix `K` may be complex and non-square; `y` may be complex.
+- For best numerical performance, the source recommends scaling `K` to have approximately unit 2-norm and `y` to have approximately unit 1-norm.
+- The source notes that `tikhonov.m` provides the positive-constrained solver.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+**Syntax:** `[x,err,reg]=tikhoind(K,D,y,lam)`
 
-## Parameters / inputs
+**Inputs:**
 
-- K -kernel matrix, may be complex, may be non-square
-- D -regularisation matrix
-- y -a column vector, may be complex
-- lam -Tikhonov regularisation parameter
+- `K` — kernel matrix, may be complex, may be non-square.
+- `D` — regularisation matrix.
+- `y` — column vector, may be complex.
+- `lam` — Tikhonov regularisation parameter; must be a positive real scalar.
 
-## Outputs
+**Outputs:**
 
-- x -a real vector, a minimum of
-- norm(K*x-y,2)^2+lambda*norm(D*x,2)^2
-- err -error signal norm(K*x-y,2)^2
-- reg -regularisation signal norm(D*x,2)^2
-- Note: for best numerical performance, scale K to have approxima-
-- tely unit 2-norm, and y to have approximately unit 1-norm.
-- Note: see tikhonov.m for the positive-constraned solver.
+- `x` — a real vector, a minimum of `norm(K*x-y,2)^2 + lambda*norm(D*x,2)^2`.
+- `err` — error signal, `norm(K*x-y,2)^2`.
+- `reg` — regularisation signal, `norm(D*x,2)^2`.
 
-## Implementation structure
+## References
 
-- Analytical Tikhonov regularised solution to K*x=y without any
-- constraints (sign-indefinite output). Syntax:
-- [x,err,reg]=tikhoind(K,D,y,lam)
-- K -kernel matrix, may be complex, may be non-square
-- D -regularisation matrix
-- y -a column vector, may be complex
-- lam -Tikhonov regularisation parameter
-- x -a real vector, a minimum of
-- norm(K*x-y,2)^2+lambda*norm(D*x,2)^2
-- err -error signal norm(K*x-y,2)^2
-- reg -regularisation signal norm(D*x,2)^2
-- Note: for best numerical performance, scale K to have approxima-
+- Spinach Wiki: [tikhoind.m](https://spindynamics.org/wiki/index.php?title=tikhoind.m)

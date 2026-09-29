@@ -4,30 +4,16 @@
 
 ## Purpose
 
-A demonstration that the two-spin singet state is immune to dipolar relaxation. Full Redfield superoperator for dipolar relaxation in liquid state is computed and the norm of its action on a singlet state is printed to the console. Calculation time: seconds
+Tests the action of a liquid-state dipolar Redfield relaxation superoperator on a two-proton singlet. The source describes the singlet as immune to dipolar relaxation, but the program itself prints a norm rather than asserting a tolerance or reporting a measured lifetime.
 
-## Physical / mathematical content
+## Physical model
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The two `1H` spins are placed at coordinates `[0.0 0.0 0.0]` and `[0.5 0.6 0.7]` in a `14.1 T` field. The source does not label coordinate units. It requests Redfield relaxation with zero equilibrium, lab-frame relaxation terms, and a correlation time of `5e-9 s`. Integration and zero tolerances are each `1e-5`; the proximity cutoff is `4.0` (no unit is specified).
 
-## Numerical / algorithmic content
+## Calculation and observable
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The calculation uses the unapproximated `sphten-liouv` basis, constructs the relaxation superoperator `R`, normalises the singlet state of spins 1 and 2, and displays `norm(R*S)`. This is a relaxation-action norm for that normalised state, not a simulated time trace or a measured singlet lifetime. The source gives no numeric output value.
 
-## Implementation structure
+## Source
 
-- A demonstration that the two-spin singet state is immune
-- to dipolar relaxation. Full Redfield superoperator for
-- dipolar relaxation in liquid state is computed and the
-- norm of its action on a singlet state is printed to the
-- console.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Relaxation superoperator accuracy
-- Proximity cut-off
-- Basis set
-- Spinach housekeeping
+[examples/singlet_states/dipolar_singlet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/dipolar_singlet.m)

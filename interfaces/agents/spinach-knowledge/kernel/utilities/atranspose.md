@@ -1,36 +1,21 @@
 # kernel/utilities/atranspose.m
 
-- Signature: `M=atranspose(M)`
-
 ## Purpose
 
-Anti-diagonal array transpose. Syntax: M=atranspose(M)
+`atranspose.m` performs an anti-diagonal transpose of a numeric array, returning the array reflected across its anti-diagonal.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function calls `grumble(M)` to enforce consistency: if `M` is not numeric, it errors with `'M must be a numeric array.'`. Otherwise, it computes the result as `transpose(rot90(M,2))` — rotating the array by 180 degrees and then applying the standard transpose — and returns the transformed array.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Syntax:** `M=atranspose(M)`
 
-- M -a transposable array
+- **Input:** `M` — a transposable (numeric) array.
+- **Output:** `M` — the anti-diagonal transposed array.
 
-## Outputs
+## References
 
-- M -a transposable array
-
-## Implementation structure
-
-- Anti-diagonal array transpose. Syntax:
-- M=atranspose(M)
-- M -a transposable array
-- Check consistency
-- Rotate and transpose
-- Consistency enforcement
-- Overheard at the reception following David Deutch's lecture on
-- Constructor Theory at the Oxford Physics Department in 2012:
-- A -"It is not very often that you see so clearly
-- what is wrong with modern physics."
-- B -"And what would that be?"
-- A -"The existence of this man. The possibility
+- Source: [kernel/utilities/atranspose.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/atranspose.m)
+- Wiki: [atranspose.m — Spinach](https://spindynamics.org/wiki/index.php?title=atranspose.m)

@@ -1,32 +1,25 @@
 # examples/esr_sol_pulsed/holeburn_gd_dota_powder.m
 
+- MATLAB implementation: [examples/esr_sol_pulsed/holeburn_gd_dota_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/holeburn_gd_dota_powder.m)
+
+[MATLAB example](../../../../../examples/esr_sol_pulsed/holeburn_gd_dota_powder.m) · [holeburn sequence helper](../../../../../experiments/holeburn.m)
+
 - Signature: `holeburn_gd_dota_powder()`
 
-## Purpose
+## Aim and model
 
-A hole burning simulation for a gadolinium ion. The soft pulse is simulated using Fokker-Planck formalism. Zero-field splitting dis- ribution is sampled using the statistical parameters reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005). A numerical powder grid and numerical second-order rotating frame transformation are used. Note: non-central transition Gd(III) holes are very shallow. Calc
+This example models soft-pulse spectral hole burning for a powder of Gd(III) centres. It samples a zero-field-splitting (ZFS) distribution using `zfs_sampling(30,5,1e-2)`; the source says its statistical parameters come from Figure 5 of Raitsimring et al. The run samples each returned `D,E` pair with weight `W`, and applies a numerical powder grid and a numerical second-order rotating-frame transformation.
 
-## Physical / mathematical content
+For each ZFS sample, the system is `E8` (the electron-spin label used for Gd(III)) at 3.5 T, with isotropic Zeeman scalar 2.002319 and a ZFS matrix formed as `0.56e9*zfs2mat(D(n),E(n),0,0,0)`. The basis is spherical-tensor Liouville space, exact (`approximation='none'`), with projections `-3:3`; trajectory-level SSR algorithms are disabled. The factor and arguments are recorded as coded; the source does not state separate units for the ZFS sampler outputs.
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Pulse and acquisition protocol
 
-## Numerical / algorithmic content
+The sequence helper `holeburn` applies the shaped soft pulse using the Fokker–Planck formalism, then an ideal hard `pi/2` observation pulse and signal acquisition. The soft-pulse rank is 2, phase `-pi/2` rad, carrier `-0.5e9` Hz, duration `50e-9` s, and propagator method `expm`. Two otherwise matched simulations are compared: A sets the soft-pulse power to zero; B sets it to `2*pi*1e7` rad/s. Both use the same pulse frequency, phase and duration.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The initial state is `Lz` on `E8`, the detection operator is `L+`, and no spins are decoupled. Acquisition uses zero offset (the helper does not annotate offset units), sweep width `0.8e10` Hz, 512 points, a 2048-point zero-fill, the `rep_2ang_400pts_sph` orientation grid, second-order rotating frames for `E8`, no derivative, and a non-inverted axis. The axis display unit is GHz. Sweep width is in Hz as defined by the `acquire` helper; pulse parameter units follow `holeburn`'s parameter documentation.
 
-## Implementation structure
+## Observable and output
 
-- A hole burning simulation for a gadolinium ion. The soft pulse is
-- simulated using Fokker-Planck formalism. Zero-field splitting dis-
-- ribution is sampled using the statistical parameters reported in
-- Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005).
-- A numerical powder grid and numerical second-order rotating frame
-- transformation are used.
-- Note: non-central transition Gd(III) holes are very shallow.
-- Calculation time: minutes
-- Initialize the spectra
-- Get the sampling
-- Get the figure going
-- Loop over ZFS distribution
+For each ZFS sample, the two FIDs receive exponential apodisation with parameter 10, are Fourier transformed, and are accumulated with that sample's weight. The real accumulated spectrum for A is plotted in red and B in blue, with the plot refreshed during the weighted ZFS loop. The example plots the spectra and does not write a data or figure file.
+
+The source notes that non-central Gd(III) transition holes are very shallow and estimates a calculation time of minutes. The cited distribution source is Raitsimring et al., *Applied Magnetic Resonance* 28, 281–295 (2005), Figure 5 ([DOI](https://doi.org/10.1007/BF03166762)).

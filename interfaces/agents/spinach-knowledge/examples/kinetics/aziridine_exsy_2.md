@@ -1,35 +1,21 @@
 # examples/kinetics/aziridine_exsy_2.m
 
-- Signature: `aziridine_exsy_2()`
+## Purpose and callable context
 
-## Purpose
+The no-argument MATLAB example simulates a two-dimensional NOESY/EXSY experiment on phenylaziridine in the intermediate-exchange regime. The source states that lines broaden, SRSK is induced by 14N, and first-kind scalar relaxation (SRFK) must also be included. It is set to reproduce Figures 1a and 4a of the cited paper; the source estimates hours of calculation time, faster on a GPU. Those comments describe the intended example, not a validation of the simulation output.
 
-NOESY/EXSY experiment on phenylaziridine, including scalar relaxation of the second kind induced by the 14N nucleus, in a situation where the chemical exchange is intermediate, lines are broadened and scalar relaxation of the first kind must be accounted for. Set to reproduce Figures 1a and 4a from All parameters, except for the isotropic chemical shifts, exchange ra- tes and correlation times come from a DFT calcula
+## Spin and exchange model
 
-## Physical / mathematical content
+The 20-spin model consists of two 10-spin conformational blocks with 14N at spin positions 4 and 14 and 1H at the other positions. Coordinates are labelled Angstrom, and Zeeman and coupling tensors (including the 14N quadrupolar tensors) are provided as matrices. As the source notes, all parameters except isotropic shifts, exchange rates and correlation times come from a DFT calculation. Shifts are supplied as two ten-spin lists; `inter.chem.parts` couples the two blocks.
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+Both kinetic rates are `1.2e3`; the source uses `[-kplus kminus; kplus -kminus]` and concentration weights `[kminus kplus]`. No units are attached to these rate values in the source. Relaxation is configured as Redfield, SRFK and SRSK; SRSK sources are spins 4 and 14, `tau_c={50e-12 50e-12}`, and SRFK uses `srfk_tau_c={[1.0 1/kplus]}` with selected `srfk_mdepth` entries. The basis is `sphten-liouv` / `IK-1`, scalar-coupling connectivity, inter-level 4 and proximity level 3; Krylov is disabled, greedy is enabled, and the proximity cutoff is 10.0.
 
-## Numerical / algorithmic content
+## Sequence, observable, and limits
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+A concentration-aware 1H longitudinal-magnetisation state is propagated by `liquid` with `@noesy` in NMR mode. The mixing-time parameter is 0.800; acquisition uses 128 points and 512 zero-filled points per dimension, with axes requested in ppm. Offset and sweep are 2000 and `[4000 4000]`; the source does not state their units. The cosine and sine channels receive squared-cosine apodisation, are combined as a States signal, and are Fourier-transformed in both dimensions. The negative real spectrum is plotted by `plot_2d`. The page does not report numerical peak positions/intensities or claim that the target paper figures were independently reproduced.
 
-## Implementation structure
+## Reference
 
-- NOESY/EXSY experiment on phenylaziridine, including scalar relaxation
-- of the second kind induced by the 14N nucleus, in a situation where
-- the chemical exchange is intermediate, lines are broadened and scalar
-- relaxation of the first kind must be accounted for. Set to reproduce
-- Figures 1a and 4a from
-- All parameters, except for the isotropic chemical shifts, exchange ra-
-- tes and correlation times come from a DFT calculation.
-- Calculation time: hours, faster on a GPU.
-- Magnet induction
-- Isotopes
-- Coordinates (Angstrom)
-- 14N quadrupolar coupling
+[Article DOI](https://doi.org/10.1002/ange.201410271)
+
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/aziridine_exsy_2.m)

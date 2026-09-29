@@ -2,59 +2,21 @@
 
 - Signature: `fid=pansy_triple(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and pathway
 
-Triple-channel PANSY pulse sequence from:
+Triple-channel PANSY, in magnitude-mode analytical-pathway form. The source starts from `Lz` on working spin 1, forms `L = H + 1i*R + 1i*K`, and creates first-pulse branches with `+pi/2` and `-pi/2` rotations about spin 1's `Lx`. It selects `+1` coherence on spin 1 and evolves both branches during F1. The second `pi/2` pulse uses the sum of the `Ly` operators for all three spins; branch subtraction is the stated axial-peak elimination. The source does not apply a later coherence-order filter. It notes that the working nuclei cannot be decoupled; gradient echo/anti-echo variants are separate sequences.
 
-## Physical / mathematical content
+## Inputs and acquisition
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+- `parameters.spins`: three working nuclei in a cell array; source example: `{'1H','13C','15N'}`.
+- `parameters.sweep`: three positive sweep widths in Hz; `parameters.npoints`: three positive integer point counts, ordered F1 then detection channels.
+- `H`, `R`, and `K`: numeric, same-sized matrices supplied by the context function. The source requires the `sphten-liouv` formalism.
 
-## Numerical / algorithmic content
+Each FID field is a two-dimensional array with `npoints(1)` F1-state columns: `fid.aa` detects `L+` on spin 1 with `npoints(1)` samples (F1/F1); `fid.ab` detects on spin 2 with `npoints(2)` samples (F1/F2); and `fid.ac` detects on spin 3 with `npoints(3)` samples (F1/F3). Their shapes are respectively `npoints(1) × npoints(1)`, `npoints(2) × npoints(1)`, and `npoints(3) × npoints(1)` (direct-dimension samples in rows).
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## References
 
-## Syntax
-
-```matlab
-fid=pansy_triple(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- parameters.spins -three nuclei on which the sequence
-- runs, e.g. {'1H','13C','15N'}
-- parameters.sweep -a vector with three sweep widths
-- in Hz
-- parameters.npoints -a vector of three integers specify-
-- ing point count in each dimension
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.aa -COSY FID on F1 nuclei
-- fid.ab -COSY FID on F1,F2 nuclei
-- fid.ac -COSY FID on F1,F3 nuclei
-- Note: decoupling with respect to any of the working nuclei is
-- impossible in this pulse sequence.
-- Note: this is the magnitude-mode analytical-pathway version.
-- Gradient echo/anti-echo PANSY variants should be implemented
-- as separate pulse sequence functions.
-- Andrew Porter
-
-## Implementation structure
-
-- Triple-channel PANSY pulse sequence from:
-- fid=pansy_triple(spin_system,parameters,H,R,K)
-- parameters.spins -three nuclei on which the sequence
-- runs, e.g. {'1H','13C','15N'}
-- parameters.sweep -a vector with three sweep widths
-- in Hz
-- parameters.npoints -a vector of three integers specify-
-- ing point count in each dimension
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid.aa -COSY FID on F1 nuclei
+- [PANSY paper](https://doi.org/10.1021/ja0634876)
+- [PANSY chapter](https://doi.org/10.1007/128_2011_226)
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/pansy_triple.m)
+- [Spinach Wiki: pansy_triple.m](https://spindynamics.org/wiki/index.php?title=pansy_triple.m)

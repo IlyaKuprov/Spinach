@@ -1,44 +1,30 @@
 # kernel/conventions/transforms/ias2mat.m
 
-- Signature: `C=ias2mat(a,d,A)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/ias2mat.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ias2mat.m)
 
-## Purpose
+## Signature
 
-Reconstruction of a 3x3 real interaction matrix C between real vectors u and v from its isotropic-antisymmetric-symmetric de- composition: a*(u'*v) + d'*cross(u,v) + u'*A*v = u'*C*v
+`C = ias2mat(a, d, A)`
 
-## Physical / mathematical content
+## Purpose and decomposition
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Reconstructs a real 3-by-3 interaction matrix from isotropic, antisymmetric, and symmetric components. The source defines its convention for real vectors `u` and `v` by:
 
-## Numerical / algorithmic content
+`a*(u'*v) + d'*cross(u,v) + u'*A*v = u'*C*v`
 
-## Syntax
+The constructed matrix is exactly:
 
-```matlab
-C=ias2mat(a,d,A)
-```
+`C = a*eye(3,3) + [0 d(3) -d(2); -d(3) 0 d(1); d(2) -d(1) 0] + A`
 
-## Parameters / inputs
+This fixes the antisymmetric-component sign/orientation; it is the matrix written in the implementation, not an inferred inverse transform.
 
-- a -scalar component
-- d -antisymmetric coupling vector
-- A -symmetric coupling matrix
+## Inputs and output
 
-## Outputs
+- `a`: real numeric scalar.
+- `d`: real numeric 3-by-1 column vector.
+- `A`: real numeric 3-by-3 matrix. The source rejects it when `norm(A-A',2)/norm(A,2) > 1e-6`.
+- `C`: reconstructed real 3-by-3 matrix.
 
-- C -real 3x3 matrix
+## Reference
 
-## Implementation structure
-
-- Reconstruction of a 3x3 real interaction matrix C between real
-- vectors u and v from its isotropic-antisymmetric-symmetric de-
-- composition:
-- a*(u'*v) + d'*cross(u,v) + u'*A*v = u'*C*v
-- C=ias2mat(a,d,A)
-- a -scalar component
-- d -antisymmetric coupling vector
-- A -symmetric coupling matrix
-- C -real 3x3 matrix
-- Check consistency
-- Reconstruct the matrix
-- Consistency enforcement
+- [Spinach Wiki: ias2mat.m](https://spindynamics.org/wiki/index.php?title=ias2mat.m)

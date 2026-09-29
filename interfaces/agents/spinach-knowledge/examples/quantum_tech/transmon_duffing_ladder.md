@@ -1,31 +1,13 @@
 # examples/quantum_tech/transmon_duffing_ladder.m
 
+Source: [examples/quantum_tech/transmon_duffing_ladder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_duffing_ladder.m)
+
 - Signature: `transmon_duffing_ladder()`
 
-## Purpose
+## Model and calculation
 
-Duffing-model energy ladder of a weakly anharmonic transmon, showing how the transition frequencies separate as anharmo- nicity increases. Inspired by the transmon model of Koch et al., Phys. Rev. A 76, 042319 (2007). Calculation time: seconds
+The isotope label `T5` represents a single five-level transmon-mode truncation; it is not an electron spin, defect isotope, or EPR system. The mode frequency is `5.0e9` (5 GHz). In the lab-frame Hamiltonian the code adds a Duffing term, using the `CCAA` operator, and sweeps the anharmonicity over 80 values from −400 to −50 MHz (the code stores this range as angular-frequency values, `2*pi*linspace(-400e6,-50e6,80)`). No time-dependent drive or dissipative interaction is configured: each point is a static Hamiltonian calculation.
 
-## Physical / mathematical content
+For each value, the five eigenenergies are sorted and adjacent differences give the 0–1, 1–2, 2–3, and 3–4 transition frequencies. The plot shows those four transitions in GHz against the positive quantity −α/(2π) in MHz, so increasing horizontal coordinate means increasing magnitude of the negative anharmonicity. It is an energy-ladder comparison across the specified parameter sweep, not a measured spectrum or device-performance result.
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-
-## Implementation structure
-
-- Duffing-model energy ladder of a weakly anharmonic transmon,
-- showing how the transition frequencies separate as anharmo-
-- nicity increases. Inspired by the transmon model of Koch et
-- al., Phys. Rev. A 76, 042319 (2007).
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Transmon mode frequency
-- Formalism and basis
-- Spinach housekeeping
-- Harmonic part from the declared frequency
-- Anharmonicity operator
+The source cites Koch et al., *Physical Review A* **76**, 042319 (2007) ([DOI](https://doi.org/10.1103/PhysRevA.76.042319)).

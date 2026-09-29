@@ -1,51 +1,27 @@
 # experiments/pseudocon/ippcs.m
 
-- Signature: `[mxyz,chi,pred_pcs,s_mxyz,s_chi]=ippcs(nxyz,mguess,expt_pcs)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/ippcs.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ippcs.m)
 
 ## Purpose
 
-Fits the point electron model PCS to the experimental pseudocon- tact shift coordinates and values. Syntax: [exyz,chi,pred_pcs]=ippcs(nxyz,mguess,expt_pcs)
+Fits a point-electron PCS model to measured pseudocontact shifts, estimating the paramagnetic-centre position and magnetic-susceptibility tensor. It is a nonlinear parameter-fitting utility, not a pulse-sequence simulator.
 
-## Physical / mathematical content
+## Inputs and parameterisation
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
+Call as `[mxyz,chi,pred_pcs,s_mxyz,s_chi] = ippcs(nxyz,mguess,expt_pcs)`. `nxyz` contains nuclear coordinates in Å as a real N-by-3 array (the implementation also accepts a cell array of such coordinate arrays). `mguess` is a real 1-by-3 initial estimate of the paramagnetic-centre coordinates in Å. `expt_pcs` is a real column of measured PCS values in ppm, one per nucleus.
 
-## Numerical / algorithmic content
+The optimiser has eight free parameters: three centre coordinates and five independent susceptibility components in Å³. Those five values are assembled into a symmetric traceless tensor: the first row is `[p4 p5 p6]`, the second `[p5 p7 p8]`, and the third `[p6 p8 -p4-p7]`. The initial values for the five tensor parameters are each `0.1`. No parameter bounds or additional physical constraints are imposed by this fit.
 
-## Parameters / inputs
+## Fit and uncertainty estimates
 
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is measured, in Angstroms.
-- mguess -initial guess for the unpaired electron coordina-
-- tes as [x y z], in Angstroms.
-- expt_pcs -pseudocontact shift in ppm at each nucleus.
+The routine minimises the sum of squared residuals `expt_pcs - ppcs(nxyz,mxyz,chi)` using `fminunc`, central finite differences, and parallel function evaluations. The fitted PCS values are returned in `pred_pcs`. A good centre-position initial guess is important because the objective is nonlinear.
+
+`jacobianest` estimates the residual Jacobian at the solution. The reported parameter standard deviations use the local least-squares covariance estimate `sdr^2 * inv(J'*J)`, where `sdr = sqrt(RSS/(N-8))`; the centre entries give `s_mxyz`. `s_chi` maps the five component estimates back onto a 3-by-3 layout, with the final diagonal estimate set to `sqrt(sp(4)^2+sp(7)^2)`. These are local linearised estimates from the fit, not independently validated confidence intervals.
 
 ## Outputs
 
-- mxyz -optimized paramagnetic centre coordinates as [x y z],
-- in Angstroms.
-- chi -optimized magnetic susceptibility tensor in cubic
-- Angstroms.
-- pred_pcs -predicted pseudocontact shift at each nucleus with
-- the optimized mxyz and chi, ppm.
-- s_mxyz -standard deviations of paramagnetic centre
-- coordinates as [x y z], in Angstroms.
-- s_chi -standard deviations of magnetic susceptibility
-- tensor elements in cubic Angstroms.
-- Note: a good initial guess for the paramagnetic centre location is
-- essential for a successful fit.
+`mxyz` is the fitted 1-by-3 centre coordinate, `chi` the fitted symmetric traceless susceptibility tensor in Å³, and `pred_pcs` the predicted ppm values at the input nuclei. `s_mxyz` and `s_chi` contain the corresponding coordinate and tensor-element standard-deviation estimates.
 
-## Implementation structure
+## References
 
-- Fits the point electron model PCS to the experimental pseudocon-
-- tact shift coordinates and values. Syntax:
-- [exyz,chi,pred_pcs]=ippcs(nxyz,mguess,expt_pcs)
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is measured, in Angstroms.
-- mguess -initial guess for the unpaired electron coordina-
-- tes as [x y z], in Angstroms.
-- expt_pcs -pseudocontact shift in ppm at each nucleus.
-- mxyz -optimized paramagnetic centre coordinates as [x y z],
-- in Angstroms.
-- chi -optimized magnetic susceptibility tensor in cubic
-- Angstroms.
+- [Spin Dynamics Wiki: ippcs.m](https://spindynamics.org/wiki/index.php?title=ippcs.m)

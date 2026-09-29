@@ -1,34 +1,11 @@
 # examples/nmr_liquids/roesy_sucrose.m
 
-- Signature: `roesy_sucrose()`
+[Spinach source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/roesy_sucrose.m)
 
-## Purpose
+This wrapper simulates a proton ROESY spectrum for sucrose using molecular magnetic parameters read from a vacuum-DFT log, not an experimental spectrum. It parses `../standard_systems/sucrose.log` with `gparse` and `g2spinach`, selecting `1H` and setting `options.min_j=1.0`. The source header says the magnetic parameters were computed with DFT; the source comment estimates minutes of calculation time, but no calculation or runtime measurement was performed for this draft.
 
-ROESY spectrum of sucrose (magnetic parameters computed with DFT). Calculation time: minutes
+At `sys.magnet=5.9` (5.9 T by Spinach convention), the spin system uses a `sphten-liouv` basis, `IK-2` approximation, scalar-coupling connectivity, and proximity level 3. The wrapper specifies Redfield relaxation, zero equilibrium, secular relaxation terms, and correlation time `200e-12` s (200 ps). It enables `greedy`, disables `krylov`, and sets a proximity cutoff of 4.0. The initial density operator is `Lz` for `1H`. These settings describe the model; this script does not compare its output against measurement.
 
-## Physical / mathematical content
+The wrapper sets `tmix=0.5`, offset 800, sweep `[1700 1700]`, `[512 512]` points, and `[2048 2048]` zero-fill sizes, and labels the plotted axes in ppm. It does not annotate units for the time, offset, or sweep literals, so those values are stated without assigning additional units.
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- ROESY spectrum of sucrose (magnetic parameters computed with DFT).
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
+The `liquid(spin_system,@roesy,parameters,'nmr')` call delegates the sequence to `@roesy` and supplies cosine and sine signal components. Each is apodised with a squared-cosine window in both dimensions; dimension-1 Fourier transforms are combined as `f1_cos-1i*f1_sin` and Fourier-transformed along dimension 2. The real spectrum is plotted with `plot_2d`. No pulse timings/phases, gradients, or receiver settings are exposed in this wrapper, so the sequence internals are not described.

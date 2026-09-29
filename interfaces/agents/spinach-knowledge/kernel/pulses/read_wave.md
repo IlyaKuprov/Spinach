@@ -4,41 +4,19 @@
 
 ## Purpose
 
-Reads JCAMP-DX pulse waveform files (a few examples are distri- buted with Spinach, see /kernel/pulses/pk_files). Syntax: [A,phi,Cx,Cy,scaling_factor]=read_wave(filename,npoints)
+Reads a JCAMP-DX pulse file from `kernel/pulses/pk_files`. The numeric columns are the waveform amplitude in percent and phase in degrees; the required `##$SHAPE_INTEGFAC` header supplies a separate scaling-factor output.
 
-## Physical / mathematical content
+## Implementation
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+The file's amplitude column is divided by 100, and its phase is converted to radians and unwrapped. Both arrays are interpolated with shape-preserving piecewise cubic interpolation (`pchip`) from a normalised grid spanning 0 to 1 onto `npoints`; this supports either upsampling or downsampling. If four or more outputs are requested, the function also converts amplitude and phase to Cartesian X and Y components. The scaling factor is returned from the header, not applied by these steps.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- filename -a string containing the name of the file
-- npoints -waveform upsampling or downsampling is
-- performed to this number of points
+`filename` must be a character string and `npoints` a positive real integer. The file is sought in the bundled `kernel/pulses/pk_files` directory; the source invites users to submit custom pulse files to the project.
 
 ## Outputs
 
-- A -polar amplitude at each slice
-- phi -polar phase at each slice, radians
-- Cx -Cartesian amplitude in X at each slice
-- Cy -Cartesian amplitude in Y at each slice
-- scaling factor -scaling factor for a given pulse shape
-- Note: put your own pulses into /kernel/pulses/pk_files; please
-- also consider sending them to us.
+- `A` — polar amplitude samples, scaled from percent to a fraction.
+- `phi` — unwrapped phase samples in radians.
+- `Cx`, `Cy` — optional Cartesian components in X and Y.
+- `scaling_factor` — value of `##$SHAPE_INTEGFAC` in the file header.
 
-## Implementation structure
-
-- Reads JCAMP-DX pulse waveform files (a few examples are distri-
-- buted with Spinach, see /kernel/pulses/pk_files). Syntax:
-- [A,phi,Cx,Cy,scaling_factor]=read_wave(filename,npoints)
-- filename - a string containing the name of the file
-- npoints - waveform upsampling or downsampling is
-- performed to this number of points
-- A - polar amplitude at each slice
-- phi - polar phase at each slice, radians
-- Cx - Cartesian amplitude in X at each slice
-- Cy - Cartesian amplitude in Y at each slice
-- scaling factor - scaling factor for a given pulse shape
-- Note: put your own pulses into /kernel/pulses/pk_files; please
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/read_wave.m) · [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=read_wave.m)

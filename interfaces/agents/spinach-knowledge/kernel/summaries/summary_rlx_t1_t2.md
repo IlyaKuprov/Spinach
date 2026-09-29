@@ -2,35 +2,13 @@
 
 - Signature: `summary_rlx_t1_t2(spin_system,header)`
 
-## Purpose
+## Behaviour
 
-Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax: summary_rlx_t1_t2(spin_system,header)
+Prints one extended T1/T2 row per spin, listing index, isotope, stored `r1_rates{n}` and `r2_rates{n}`, and spin label. A scalar numeric rate appears in signed scientific notation with five decimal places; a nonscalar numeric rate appears as `anisotropic`; a nonnumeric rate appears as `orientation`. The routine performs no unit conversion.
 
-## Physical / mathematical content
+The supplied header precedes the table. Output is routed through `report` rather than returned. The local guard requires a structure `spin_system` and character-array `header`.
 
-## Numerical / algorithmic content
+## References
 
-## Parameters / inputs
-
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-
-## Outputs
-
-- this function prints to the console or to the user-specified
-- output via report.m function
-
-## Implementation structure
-
-- Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax:
-- summary_rlx_t1_t2(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the relaxation-rate table
-- Consistency enforcement
-- Whether you are more afraid of the forces of
-- order or the forces of chaos is generally a
-- matter of disposition.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_rlx_t1_t2.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_rlx_t1_t2.m)

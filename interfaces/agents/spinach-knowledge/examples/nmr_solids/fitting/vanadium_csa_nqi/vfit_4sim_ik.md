@@ -1,32 +1,21 @@
 # examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m
 
-- Signature: `vfit_4sim_ik()`
+- Signature: vfit_4sim_ik()
 
-## Purpose
+## Purpose and data
 
-Simultaneous fitting of multiple 51V MAS NMR spectra with respect to the chemical shielding anisotropy and quadrupole coupling tensor parameters. Calculation time: hours, much faster with a GPU.
+The example jointly fits four ⁵¹V MAS NMR spectra to chemical-shielding and quadrupolar tensor parameters. It loads v12_29_dec15.spc, v12_31_dec15.spc, v12_33_dec15.spc, and v12_35_dec15.spc, applies a Savitzky–Golay filter of order 3 and window length 51, crops the signal columns to indices 6200–10000, and normalises each retained segment to its own maximum before padding to 4096 points. The source describes calculation time as hours and says it is much faster with a GPU; however, the GPU-enable line in the fitting function is commented out. Neither a timing nor GPU execution was measured here.
 
-## Physical / mathematical content
+## Shared spin model and optimiser inputs
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+Each trial uses one ⁵¹V spin, a chemical-shielding tensor and a quadrupolar tensor. The code maps the fit vector to isotropic shift, anisotropy, asymmetry and Euler angles; it converts the three angles from degrees to radians, forms the shielding principal values, and adds 456.818 to those values. Quadrupolar coupling is passed through eeqq2nqi with spin 3.5. The code sets sys.magnet to 14.1 without an explicit unit comment and uses an sphten-liouv basis with no approximation and projection +1.
 
-## Numerical / algorithmic content
+The optimiser starts from [-669.0, 564.0, 0.255, 82.0, 180.0, 19.0, 3.72, 0.62]. These are initial code values, not fitted results. The first two are transformed by the script when constructing the shielding tensor; the seventh is multiplied by 1e6 for the quadrupolar-coupling input. The source does not annotate units for these fit-vector values.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Four MAS calculations and observable
 
-## Implementation structure
+The same model is simulated at code-set rate values 41000 for the 35 spectrum, 38500 for 33, 36000 for 31, and 34000 for 29; the source does not annotate their units. All four use the rep_2ang_200pts_oct powder grid, maximum rank 30, 4096 points and zero-fill 4096, with the plotted chemical-shift axis in ppm. Each FID is Gaussian-apodised with the code value 13000.0, Fourier-transformed and normalised to its maximum absolute value. The source plots input and simulated real spectra in four panels and minimises the sum of the four squared real-spectrum residual norms using fminsearch.
 
-- Simultaneous fitting of multiple 51V MAS NMR spectra with
-- respect to the chemical shielding anisotropy and quadrupole
-- coupling tensor parameters.
-- Calculation time: hours, much faster with a GPU.
-- Load and filter the data
-- Set spectral ranges
-- Preprocess the spectra
-- Set the initial guess
-- Set optimiser options
-- Get a figure going
-- Run the optimisation
-- Least squares error function
+This is a four-spectrum fitting wrapper around singlerot and acquire, not a CP or HMQC sequence; it specifies no RF/contact-transfer condition. It describes input spectra and a model objective, but contains no saved best-fit result. No DOI is given in the source.
+
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m

@@ -1,39 +1,28 @@
 # interfaces/castep/c2spinach.m
 
 - Signature: `props=c2spinach(file_name)`
+- Source: [interfaces/castep/c2spinach.m](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/castep/c2spinach.m)
+- Wiki: [c2spinach.m](https://spindynamics.org/wiki/index.php?title=c2spinach.m)
 
-## Purpose
+## Purpose and input
 
-Parser for .magres files written by CASTEP and other codes in the CCP-NC magres v1.0 format. Reads the [atoms] and [magres] blocks and returns the geometry and the magnetic resonance tensors, keyed to the atoms in the order in which the atom records appear in the file. Syntax: props=c2spinach(file_name)
+Parses a CCP-NC magres v1.0 text file (the source documents CASTEP and other codes) into a MATLAB structure keyed to the atom order in the file. `file_name` must be a character array. The parser removes trailing `#` comments, trims lines, and requires exactly one balanced `[atoms]` block and one `[magres]` block; angle-bracket block tags are also recognised. Other blocks, such as `[magres_old]`, are not used.
 
-## Physical / mathematical content
+Atom rows contain the species, a label, a numeric index, and three coordinates. Atom label/index pairs must be unique. The parser accepts the standard units `Angstrom` for `atom`, `ppm` for `ms`, `au` for `efg`, and `10^19.T^2.J^-1` for `isc` when corresponding units records occur; a different declared unit for these record types is rejected. The code does not perform a coordinate-unit conversion.
 
-- CASTEP interface. Recovers the periodic DFT (GIPAW) shielding, electric field gradient, and reduced spin-spin coupling tensors and converts them to the conventions used by `gparse` and `oparse`, so that `g2spinach` consumes the output the same way.
-- Shielding tensors are returned in the printed component order (xx xy xz yx yy yz zx zy zz as the rows of the 3x3 matrix), which is the orientation in which Spinach contracts a Zeeman tensor with the spin operator on the left and the field on the right; the antisymmetric part of the shielding therefore enters with the sign the magres standard defines.
-- Reduced couplings K (magres units 10^19 T^2 J^-1) are multiplied by mu_N^2/h, which is the unit `gparse` reports Gaussian K-couplings in; `g2spinach` then converts them into J-couplings for the isotopes it is given.
+## Returned structure
 
-## Numerical / algorithmic content
+- `props.filename`: the input filename.
+- `props.symbols`: a 1-by-`natoms` cell array of atomic symbols in atom-row order.
+- `props.std_geom`: an `natoms`-by-3 coordinate matrix in Angstrom; `props.natoms` is the atom count.
+- `props.cst`: when at least one `ms` record is present, a 1-by-`natoms` cell array of chemical-shielding tensors in ppm, relative to the bare nucleus. Each tensor is assembled as a 3-by-3 matrix in the printed component order: rows `xx xy xz`, `yx yy yz`, `zx zy zz`.
+- `props.efg`: when at least one `efg` record is present, a 1-by-`natoms` cell array of 3-by-3 EFG tensors in atomic units, with the same printed-component ordering.
+- `props.k_couplings`: when one or more `isc` records are present, an `natoms`-by-`natoms` symmetric matrix of isotropic reduced couplings in Hz, using the `gparse` convention (magres K multiplied by `mu_N^2/h`).
 
-- Every record is matched with a regular expression that spells out the field count and the number syntax; a record with the right tag and the wrong shape is an error rather than a silently shifted tensor.
-- Block tags (`[atoms]`, `[magres]`, also the angle-bracket form) are located first; nested, unbalanced, missing, or repeated [atoms] and [magres] blocks are errors. Everything outside those two blocks, including the `[magres_old]` block CASTEP appends, is ignored.
-- Units records for atom, ms, efg, and isc are checked against the standard units and anything else is an error; an absent units record means the standard unit, as the specification prescribes.
-- The file contains an explicit `grumble(...)` validator for the input argument and a local key resolver shared by the ms, efg, and isc records.
+A missing site tensor is represented by an empty cell; if no record of a tensor type occurs anywhere, its field is omitted. For each `isc` record the code averages the three diagonal tensor components, multiplies by `1e19*(5.0507837461e-27)^2/6.62607015e-34`, and stores that value in both atom-pair directions. Self-couplings are skipped (leaving a zero diagonal); repeated or reversed pair records are averaged. CASTEP's glued label/index form, such as `O100`, is resolved as well as a label and index in separate tokens in magnetic-resonance records; unresolved or ambiguous atom matches are errors.
 
-## Parameters / inputs
+## Parsing guardrails and consumers
 
-- file_name - the name of the *.magres file, a character string
+Malformed atom, tensor, or coupling rows; duplicate atom keys; repeated `ms` or `efg` records for one atom; invalid block structure; unrecognised atom matches; and unsupported declared units for these record types raise errors. The argument validator checks the character-array type, while file opening and parsing are performed directly by the routine.
 
-## Outputs
-
-- props.filename - log file name
-- props.symbols - atomic symbols, 1 x natoms cell
-- props.std_geom - atomic coordinates, natoms x 3, Angstrom
-- props.natoms - number of atoms
-- props.cst - chemical shielding tensors relative to the bare nucleus in vacuum, ppm, 1 x natoms cell, printed component order
-- props.efg - EFG tensors, a.u., 1 x natoms cell
-- props.k_couplings - isotropic reduced spin-spin couplings, natoms x natoms, in the units used by gparse.m (magres K times mu_N^2/h, Hz)
-- Only the tensors that the file contains are returned; test for their presence with isfield. An atom without a tensor gets an empty cell.
-
-## Internal Spinach / MATLAB structure cues
-
-- Consumers in the repository: `examples/nmr_solids/case_studies/mathies_14n_13c/*`, `examples/nmr_solids/case_studies/mathies_carbonate/*`, `examples/visualisation/efg_silicate.m` (through `efg_display`), `g2spinach` for `cst` and `k_couplings`, and `tests/interfaces/test_c2spinach.m`.
+The source documents the reduced-coupling output as input to `g2spinach`, which converts it to isotope-specific J couplings. Existing repository notes also identify `gparse`/`oparse` conventions and consumers in `examples/nmr_solids/case_studies/mathies_14n_13c/*`, `examples/nmr_solids/case_studies/mathies_carbonate/*`, `examples/visualisation/efg_silicate.m` (through `efg_display`), `g2spinach`, and `tests/interfaces/test_c2spinach.m`; those paths are retained as navigation cues, not claims that the examples were run for this note.

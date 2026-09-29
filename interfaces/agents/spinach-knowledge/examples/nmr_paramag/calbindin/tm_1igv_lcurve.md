@@ -1,30 +1,19 @@
 # examples/nmr_paramag/calbindin/tm_1igv_lcurve.m
 
+- MATLAB implementation: [examples/nmr_paramag/calbindin/tm_1igv_lcurve.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/calbindin/tm_1igv_lcurve.m)
+
 - Signature: `tm_1igv_lcurve()`
 
-## Purpose
+## Purpose and data
 
-Inverse problem for the unpaired electron density distribution. Experimental data from Gottfried Ott- ing (Australian National University).
+This script scans a regularisation parameter for reconstruction of unpaired-electron density from experimental pseudocontact shifts (PCS). The source credits the data to Gottfried Otting (Australian National University). It loads the processed 1IGV PDB, the PCS coordinates and values (`x`, `y`, `z`, `expt_pcs`) from `tm_1igv_pcs.mat`, and `chi` from `tm_1igv_chi_eff.mat`. PDB atom coordinates supply the structural geometry passed to the solver. The script does not specify nuclear isotopes or units for these data and tensor.
 
-## Physical / mathematical content
+## Regularisation scan
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+The solver configuration uses equation `kuprov`, no `ipcs` plot selection, box centre `[3.5 17.0 16.1]`, box size `[7.0 7.0 7.0]`, all PDB atom coordinates as `xyz_all`, margins `50*ones(1,6)`, confinement `[1.0 3.0]`, sharpening `0.0`, and the measured PCS, positions, and loaded tensor. GPU execution is enabled.
 
-## Numerical / algorithmic content
+Fifteen smoothing values are defined by `10.^linspace(-1.5,1.0,15)`. In a `parfor` loop, the script calls `ipcs(parameters,128,lam(n))` at grid size 128, records the returned error and regularizer, and divides the regularizer by that scan's `lam(n)`. It then passes `lam`, error, and rescaled regularizer to `lcurve(lam,err,reg,'log')`, calls `drawnow`, and displays the suggested smoothing parameter returned by `lcurve`.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+## Scope
 
-## Implementation structure
-
-- Inverse problem for the unpaired electron density
-- distribution. Experimental data from Gottfried Ott-
-- ing (Australian National University).
-- Load the pdb file
-- Load experimental data
-- Load susceptibility tensor
-- Inverse solver parameters
-- Regularisation parameter array
-- Result arrays
-- Run a parallel loop
-- L-curve analysis
+This is a parameter-selection workflow, not a reported numerical conclusion: the source contains no selected value or claim of fit agreement. It does not update the saved susceptibility tensor. The script gives no units or sign convention for the PCS, coordinates, or `chi`, so none are inferred here.

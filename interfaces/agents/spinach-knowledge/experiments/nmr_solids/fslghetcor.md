@@ -1,67 +1,20 @@
 # experiments/nmr_solids/fslghetcor.m
 
-- Signature: `fid=fslghetcor(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/fslghetcor.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=fslghetcor.m)
 
-## Purpose
+Heteronuclear-correlation MAS NMR with frequency-switched Lee–Goldburg (FSLG) homonuclear decoupling and a cross-polarisation (CP) contact. The source cites [10.1103/PhysRev.140.A1261](https://doi.org/10.1103/PhysRev.140.A1261), [10.1016/0009-2614(89)87166-0](https://doi.org/10.1016/0009-2614(89)87166-0), and [10.1006/jmre.1996.1089](https://doi.org/10.1006/jmre.1996.1089) (Figure 1).
 
-Heteronuclear correlation MAS NMR experiment with frequency-switched Lee-Goldburg homonuclear decoupling. Further details in:
+## Inputs
 
-## Physical / mathematical content
+Signature: `fid=fslghetcor(spin_system,parameters,H,R,K)`. It requires the `sphten-liouv` formalism; `H`, `R`, and `K` must be same-sized numeric matrices.
 
-- Solid-state pulse sequence implementations. The core ingredients are anisotropic Hamiltonians, rotor synchronisation, cross-polarisation, recoupling/decoupling, and powder or rotor-stack propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `parameters.spins` has exactly two isotope strings present in the spin system. The source example is the common `1H`/`13C` pair; the first entry supplies the FSLG controls and the second the second-channel control operator.
+- `hi_pwr` is a positive scalar high-power-channel amplitude in Hz; `cp_pwr` is a two-element vector of positive CP-channel amplitudes in Hz; `cp_dur` is a positive contact duration in seconds.
+- `offset` is a two-element real vector in Hz. `nblocks` and `spc_dim` are positive integers. `rho0` and `coil` are required initial and detection states.
+- `sweep` is a two-element real vector in Hz; its F1 element may be NaN because F1 timing comes from the FSLG blocks. `npoints` is a two-element vector of positive integers for F1 and F2.
 
-## Numerical / algorithmic content
+## Sequence outline
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The code extends the `Lx`, `Ly`, and `Lz` controls over the Fokker–Planck dimension, and forms `L=H+1i*R+1i*K`. It starts cosine and sine trajectories with the high-power pulse for `1/(4*hi_pwr)` plus the magic-angle duration `acos(1/sqrt(3))/(2*pi*hi_pwr)`. Alternating FSLG generators use the first offset and `hi_pwr/sqrt(2)`; each block applies paired evolutions of `sqrt(2/3)/hi_pwr`. The implementation optionally moves those generators to a GPU when GPU support is enabled.
 
-## Syntax
-
-```matlab
-fid=fslghetcor(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- parameters.spins -working spins, e.g. {'1H',13C'}
-- parameters.hi_pwr -amplitude of high power pulses
-- on the high-gamma channel, Hz
-- parameters.cp_pwr -amplitude of CP pulse on each
-- channel during the CP contact
-- time, Hz
-- parameters.cp_dur -CP contact time duration, s
-- parameters.offset -transmitter offsets on the
-- two channels, Hz
-- parameters.nblocks -number of FSLG blocks per
-- indirect-dimension point
-- parameters.spc_dim -Fokker-Planck spatial dimension
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.sweep -sweep width, Hz for F1, F2
-- parameters.npoints -number of points in F1, F2
-- H -Hamiltonian superoperator, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.sin, fid.cos -sine and cosine components
-- of the States quadrature
-
-## Implementation structure
-
-- Heteronuclear correlation MAS NMR experiment with frequency-switched
-- Lee-Goldburg homonuclear decoupling. Further details in:
-- fid=fslghetcor(spin_system,parameters,H,R,K)
-- parameters.spins -working spins, e.g. {'1H',13C'}
-- parameters.hi_pwr -amplitude of high power pulses
-- on the high-gamma channel, Hz
-- parameters.cp_pwr -amplitude of CP pulse on each
-- channel during the CP contact
-- time, Hz
-- parameters.cp_dur -CP contact time duration, s
-- parameters.offset -transmitter offsets on the
-- two channels, Hz
+It then applies the paired CP generator `L-2*pi*cp_pwr(1)*Hy+2*pi*cp_pwr(2)*Cx` for `cp_dur`, decouples the first listed spin, and acquires F2 with `coil` at dwell `1/sweep(2)`. Output fields `fid.cos` and `fid.sin` are the two States-quadrature components; each axis uses its corresponding `npoints` count. The source does not define additional protein-specific transfer or REDOR steps.

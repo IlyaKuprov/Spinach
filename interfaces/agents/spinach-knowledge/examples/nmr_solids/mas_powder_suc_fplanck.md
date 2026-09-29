@@ -1,32 +1,17 @@
 # examples/nmr_solids/mas_powder_suc_fplanck.m
 
-- Signature: `mas_powder_suc_fplanck()`
+Source: [examples/nmr_solids/mas_powder_suc_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_suc_fplanck.m)
 
 ## Purpose
 
-13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Chemical shiel- ding tensors, J-couplings and coordinates are estimated with DFT. Calculation time: days
+The source header describes a 13C sucrose-powder MAS spectrum using the Fokker-Planck MAS formalism. It estimates “days” of calculation time; this is a source comment, not a measured timing. The filename and header identify the intended formalism, while the executable simulation call in this file is `singlerot`.
 
-## Physical / mathematical content
+## Model and acquisition
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model is imported from `../standard_systems/sucrose.log` through `gparse` and `g2spinach`, selecting `13C` and using `182.1` as the absolute shielding reference (ppm; `g2spinach` defines the reference as placed at zero ppm). The source describes the chemical-shielding tensors, J-couplings, and coordinates as DFT-derived. The field is `14.1` T. The basis uses `sphten-liouv`, `IK-0`, projection `+1`, and inter-level 3; interaction and proximity cutoffs are 5.0 and 4.0.
 
-## Numerical / algorithmic content
+The rotor-axis vector is `1 1 1`, MAS rate is `6000` Hz, maximum rank is 23, sweep is `50000` Hz, and offset is `15000` Hz. The acquisition has 256 points and zero-fills to 1024. It selects `13C`; `g2spinach` imports only carbon atoms, so proton spins and carbon–proton couplings are absent. This implements the header’s ideal `1H`-decoupling assumption without an RF channel; the script does not assign a `decouple` field. It assigns no dipolar tensor value directly; the parsed model also carries molecular coordinates. This source does not set `axis_units` or `invert_axis` explicitly.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Calculation and display
 
-## Implementation structure
-
-- 13C MAS spectrum of sucrose powder (assuming decoupling of 1H),
-- computed using the Fokker-Planck MAS formalism. Chemical shiel-
-- ding tensors, J-couplings and coordinates are estimated with DFT.
-- Calculation time: days
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- % Simulation
-- Apodisation
+Despite the filename and Fokker-Planck description, the code calls `singlerot(spin_system,@acquire,parameters,'nmr')`, with `parameters.grid='leb_2ang_rank_23'`; it does not call a function named `fplanck`. The initial state and receiver are both `L+` on `13C`. It exponentially apodises the calculated FID with parameter 6, Fourier transforms to 1024 points, and plots the real spectrum with `plot_1d`. The settings and resulting spectrum are a simulation, not an experimental measurement.

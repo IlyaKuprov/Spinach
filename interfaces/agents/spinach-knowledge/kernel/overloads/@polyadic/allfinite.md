@@ -1,37 +1,7 @@
 # kernel/overloads/@polyadic/allfinite.m
 
-- Signature: `answ=allfinite(p)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/allfinite.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=polyadic/allfinite.m)
 
-## Purpose
+`allfinite(p)` visits every inner core cell in every polyadic term, then every prefix and suffix cell. It passes each stored component to `allfinite`; the first false result returns false immediately, and true is returned only after all component checks succeed. Recursive dispatch covers components that are themselves polyadic.
 
-Returns true if none of the elements of the polyadic are Inf or NaN. Syntax: answ=allfinite(p)
-
-## Physical / mathematical content
-
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- p -a polyadic object
-
-## Outputs
-
-- answ -logical true if all numeric data
-- in the polyadic object is finite
-
-## Implementation structure
-
-- Returns true if none of the elements of the polyadic are Inf
-- or NaN. Syntax:
-- answ=allfinite(p)
-- p -a polyadic object
-- answ -logical true if all numeric data
-- in the polyadic object is finite
-- Check the core array
-- Check prefix and suffix arrays
-- All finite
-- Beauty is the first test: there is no permanent
-- place in the world for ugly mathematics.
-- G.H. Hardy
+This is a finiteness test on the stored representation, including the factors and the left and right operators. It does not construct the Kronecker products or materialise the represented matrix. No dimension validation, matrix action, or broadcasting is performed by this method; component handling is delegated to the applicable `allfinite` overloads.

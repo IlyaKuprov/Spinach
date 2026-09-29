@@ -1,34 +1,16 @@
 # kernel/overloads/@struct/plus.m
 
+Direct source: [kernel/overloads/@struct/plus.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@struct/plus.m)
+Wiki: [struct/plus.m](https://spindynamics.org/wiki/index.php?title=struct/plus.m)
+
 - Signature: `str3=plus(str1,str2)`
 
 ## Purpose
 
-Adds corresponding fields of two structures. Nested structu- res are processed recursively. Syntax: str3=plus(str1,str2)
+Add corresponding fields of two structures, recursively applying `+` to nested structures and dispatching non-structure field values to their own overloaded `plus` methods.
 
-## Physical / mathematical content
+## Inputs and output
 
-## Numerical / algorithmic content
+Both top-level operands must be structures. At each recursive structure level, the implementation checks that both operands have the same number of field names and the same set of names; field ordering need not match. It then evaluates `str1.field + str2.field` for each name. A mismatch, or a non-structure operand at a recursive call, raises `structure topology mismatch.`
 
-## Parameters / inputs
-
-- str1, str2 -input structures, must have the same topology
-
-## Outputs
-
-- str3 -output structure
-
-## Implementation structure
-
-- Adds corresponding fields of two structures. Nested structu-
-- res are processed recursively. Syntax:
-- str3=plus(str1,str2)
-- str1, str2 -input structures, must have the same topology
-- str3 -output structure
-- Decide how to proceed
-- Get the field names
-- Check topology
-- Loop over field names
-- Recursive call for each field name
-- Complain and bomb out
-- He was the sort of person who stood on mountaintops during
+`str3` contains the corresponding field results. There is no separate pre-check for leaf dimensions or types: those are governed by the `+` operation selected for each pair of field values.

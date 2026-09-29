@@ -1,51 +1,17 @@
 # experiments/imaging/press_voxel_2d.m
 
+Source: [MATLAB on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_voxel_2d.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=press_voxel_2d.m)
+
 - Signature: `phan=press_voxel_2d(spin_system,parameters,H,R,K,G,F)`
 
-## Purpose
+## Purpose and inputs
 
-Voxel selection diagnostics function for 2D PRESS sequences. Re- turns the sample excitation profile. Syntax: phan=press_voxel_2d(spin_system,parameters,H,R,K,G,F) This sequence must be called from the imaging() context, which would provide H, R, K, G, and F.
+A parameterised 2D PRESS voxel-selection diagnostic, called from `imaging()` with the spatially resolved `H`, `R`, `K`, `G`, and `F` inputs. `parameters.ss_grad_amp` supplies two slice-gradient amplitudes in T/m. `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank` are cell arrays with two entries, one per slice pulse: RF-frequency vectors in Hz, RF-amplitude vectors in rad/s, duration vectors in seconds, pulse phases at time zero (units are not specified by the source), and maximum Fokker–Planck pulse-operator ranks (2 is noted as usually sufficient), respectively. `parameters.spins{1}` identifies the selected spin; `parameters.npts` sets the spatial grid dimensions.
 
-## Physical / mathematical content
+The source forms `L=H+F+1i*R+1i*K` and accepts `sphten-liouv` or `zeeman-liouv` formalism. It initialises a uniform `Lz` state across `prod(parameters.npts)` spatial points. This is a simulated diagnostic setup, not a measured initial profile.
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+## Sequence and returned data
 
-## Numerical / algorithmic content
+The first shaped AFP pulse selects the X slice with `L+parameters.ss_grad_amp(1)*G{1}` and is rephased with the corresponding minus-gradient Liouvillian for half the sum of that pulse train's durations. The code then selects single-quantum coherence for `parameters.spins{1}`. The second shaped AFP pulse selects the Y slice at half the supplied second-pulse durations (the source labels this scaling as a 90-degree pulse); its rephasing evolution lasts one quarter of the second-pulse duration sum. The code selects zero-quantum coherence and calls `fpl2phan` with `Lz` as detection operator, returning `phan=real(...)` on the `parameters.npts` spatial grid. This function returns the 2D phantom array, not separate coordinate vectors.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Parameters / inputs
-
-- parameters.ss_grad_amp -the two amplitudes of slice selection
-- gradient, T/m
-- parameters.rf_frq_list -cell array of two vectors of RF frequ-
-- encies at each pulse slice, Hz
-- parameters.rf_amp_list -cell array of two vectors of RF
-- amplitudes at each pulse slice, rad/s
-- parameters.rf_dur_list -cell array of two vectors of pulse
-- slice durations, in seconds
-- parameters.rf_phi -cell array of two pulse phases at
-- time zero
-- parameters.max_rank -cell array of two maximum rank in the
-- Fokker-Planck pulse operator (2 is
-- usually enough)
-
-## Outputs
-
-- phan -the excitation profile imprinted into a 2D phantom.
-
-## Implementation structure
-
-- Voxel selection diagnostics function for 2D PRESS sequences. Re-
-- turns the sample excitation profile. Syntax:
-- phan=press_voxel_2d(spin_system,parameters,H,R,K,G,F)
-- This sequence must be called from the imaging() context, which
-- would provide H, R, K, G, and F.
-- parameters.ss_grad_amp -the two amplitudes of slice selection
-- gradient, T/m
-- parameters.rf_frq_list -cell array of two vectors of RF frequ-
-- encies at each pulse slice, Hz
-- parameters.rf_amp_list -cell array of two vectors of RF
-- amplitudes at each pulse slice, rad/s
-- parameters.rf_dur_list -cell array of two vectors of pulse
+This describes the implementation, not a run-verified or experimentally measured profile. No numerical phantom example or DOI is recorded in the source or existing page; the source's rank-2 note is retained above.

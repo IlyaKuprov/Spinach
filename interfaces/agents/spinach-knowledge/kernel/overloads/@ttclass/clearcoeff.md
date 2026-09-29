@@ -1,37 +1,22 @@
 # kernel/overloads/@ttclass/clearcoeff.m
 
-- Signature: `tt=clearcoeff(tt)`
+## Links
 
-## Purpose
+- [Direct MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/clearcoeff.m)
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=ttclass/clearcoeff.m)
 
-Absorbs physical coefficients into tensor train cores without changing the value represented by the tensor train. Syntax: tt=clearcoeff(tt)
+## Storage and scope
 
-## Physical / mathematical content
+In this `ttclass` storage, `tt.cores` is an `ncores`-by-`ntrains` cell array. Core `tt.cores{k,n}` has left/right bond-rank axes 1 and 4 and physical row/column axes 2 and 3. Adjacent cores contract by summing over their matching right/left bond index; each train has boundary ranks one. The row coefficient `tt.coeff(1,n)` weights train `n`, and the columns store separate coefficient-weighted TT chains. This is a tensor-train, not a `polyadic`, representation.
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+## Signature
 
-## Numerical / algorithmic content
+`tt=clearcoeff(tt)`
 
-## Parameters / inputs
+## Behaviour
 
-- tt -tensor train object
+For each train `n`, the function computes `tt.coeff(1,n)^(1/ncores)`, multiplies every core in that train by this factor, then sets that coefficient to one. Applying the same factor to all `ncores` cores absorbs the train coefficient into the core chain; the represented value is unchanged. Core count, train count, mode sizes, ranks, and output shape are unchanged.
 
-## Outputs
+## Checks
 
-- tt -tensor train object with each coefficient distributed
-- into its cores and the coefficient array set to one
-
-## Implementation structure
-
-- Absorbs physical coefficients into tensor train cores without
-- changing the value represented by the tensor train. Syntax:
-- tt=clearcoeff(tt)
-- tt -tensor train object
-- tt -tensor train object with each coefficient distributed
-- into its cores and the coefficient array set to one
-- Get the number of cores and trains
-- Loop over the trains in the buffer
-- Scale the coefficient
-- Apply it to cores
-- Erase the coefficient
-- "Moral outrage is a middle-class luxury."
+The overload contains no input, shape, rank, or coefficient validation and no error branch; it assumes a valid `ttclass` object with consistent core and coefficient storage.

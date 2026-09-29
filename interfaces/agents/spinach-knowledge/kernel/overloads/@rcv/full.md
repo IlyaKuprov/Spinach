@@ -1,34 +1,23 @@
 # kernel/overloads/@rcv/full.m
 
+[GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/full.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/full.m)
+
 - Signature: `A=full(A)`
 
 ## Purpose
 
-Converts an RCV sparse matrix into a full matrix. Syntax: A=full(A)
+Materialises the matrix encoded by an RCV sparse matrix as a dense MATLAB matrix at its recorded dimensions.
 
-## Physical / mathematical content
+## Storage and behaviour
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+RCV stores row indices, column indices, and corresponding values in parallel arrays, with `numRows` and `numCols` retaining the matrix shape. This overload checks that the input is an `rcv` object, then evaluates `full(sparse(A))`: the RCV sparse conversion first constructs a MATLAB sparse matrix at the recorded dimensions, and MATLAB's `full` then eagerly creates the dense result. The output is a full MATLAB matrix of size `numRows`-by-`numCols`; this is materialisation, not a lazy RCV result.
 
-## Numerical / algorithmic content
+The overload does not conjugate values or implement scalar expansion or broadcasting.
 
-## Parameters / inputs
+## Input
 
-- A -an RCV sparse matrix
+- `A` - an RCV sparse matrix. The explicit check is object type only.
 
-## Outputs
+## Output
 
-- A -a full Matlab matrix
-
-## Implementation structure
-
-- Converts an RCV sparse matrix into a full matrix. Syntax:
-- A=full(A)
-- A -an RCV sparse matrix
-- A -a full Matlab matrix
-- Check consistency
-- Delegate to Matlab
-- Consistency enforcement
-- Whenever you find yourself on the side of the
-- majority, it is time to pause and reflect.
-- Mark Twain
+- `A` - the corresponding full MATLAB matrix.

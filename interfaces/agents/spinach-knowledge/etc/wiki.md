@@ -1,23 +1,11 @@
 # etc/wiki.m
 
-- Signature: `wiki()`
+## Use
 
-## Purpose
+Call wiki() in MATLAB to ask MATLAB's web function to open the Spinach Wiki main page in the default browser. The routine takes no arguments, returns no values, and performs no simulation or search within MATLAB.
 
-Opens Spinach documentation Wiki page.
+The destination is the [Spinach Wiki main page](https://spindynamics.org/wiki/index.php?title=Main_Page). Viewing it requires the browser and network to be available.
 
-## Physical / mathematical content
+## Source
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Opens Spinach documentation Wiki page.
-- Call the default browser
-- It is possible that a bust of Helen might one day be dug
-- from the soil of Troy and authenticated as the true like-
-- ness, even though you and I are struck by the ugliness of
-- the woman depicted and appalled to think of a war being
-- fought for so charmless a cause.
-- Taki Theodoracopoulos
-- #NHEAD #NGRUM #NWIKI
+[etc/wiki.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/wiki.m)

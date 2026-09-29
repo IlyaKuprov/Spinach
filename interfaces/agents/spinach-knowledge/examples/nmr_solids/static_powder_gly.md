@@ -1,31 +1,16 @@
 # examples/nmr_solids/static_powder_gly.m
 
 - Signature: `static_powder_gly()`
+- Source: [examples/nmr_solids/static_powder_gly.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/static_powder_gly.m)
 
 ## Purpose
 
-13C NMR spectrum of glycine powder. Magnetic parameters loaded from a DFT simulation. Protons assumed to be decoupled. Calculation time: seconds
+A static-powder 13C NMR calculation for glycine using magnetic parameters read from a DFT log. The source assumes proton decoupling and records a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin model and powder average
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The parsed glycine model includes 13C and 15N spins; protons are not included, so their decoupling is an assumption rather than an explicitly simulated channel. The field parameter is 14.1 (no unit is stated in the source). The basis retains 15N longitudinal terms with projection +1, and the source sets interaction and proximity cutoffs to 5.0 and 4.0. `powder` performs the static orientation average on `rep_2ang_6400pts_sph`; no rotor or gradient sequence is specified.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 13C NMR spectrum of glycine powder. Magnetic parameters loaded
-- from a DFT simulation. Protons assumed to be decoupled.
-- Calculation time: seconds
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
+The selected 13C channel starts from and detects `L+`; no spins are listed for decoupling. Acquisition uses sweep 5e4, offset 18000, 128 points, and zero filling to 512. The displayed axis is configured in ppm; units for sweep and offset are not stated. The FID receives exponential apodisation with parameter 6, then a zero-filled Fourier transform; the real spectrum is plotted.

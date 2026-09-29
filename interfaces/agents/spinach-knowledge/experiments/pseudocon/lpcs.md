@@ -1,56 +1,24 @@
 # experiments/pseudocon/lpcs.m
 
-- Signature: `theo_pcs=lpcs(nxyz,mxyz,ranks,Ilm,chi)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/lpcs.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=lpcs.m)
 
 ## Purpose
 
-Computes PCS from the multipole moments of the paramagnetic centre probability density as described in Equation 33 is used under the assumption that all nuclei are outside the bounding sphere shown in Figure 1 of the paper.
+Computes theoretical pseudocontact shifts from multipole moments of the paramagnetic-centre probability density. It applies the paper’s Equation 33 under the stated far-field assumption that every nucleus lies outside the density’s bounding sphere; it is not a general near-field density solver.
 
-## Physical / mathematical content
+## Inputs and moment convention
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
+Call as `theo_pcs = lpcs(nxyz,mxyz,ranks,Ilm,chi)`. `nxyz` is a finite real N-by-3 array of nuclear coordinates in Å; `mxyz` is a finite real 1-by-3 paramagnetic-centre coordinate in Å. `ranks` is a vector of finite non-negative integer multipole ranks. `Ilm` is a cell array with one finite real vector of length `2*L+1` for each rank `L`.
 
-## Numerical / algorithmic content
+For rank `L`, the supplied coefficients are spherical-harmonic moments: integrate the probability density times `Y_Lm` and `r^L` over volume. The source’s component ordering includes `Ilm = N/(2*sqrt(pi))` at rank zero; rank one is `[imag(I11), I10, real(I11)]`; rank two is `[imag(I22), imag(I21), I20, real(I21), real(I22)]`. Higher-rank vectors follow the corresponding real/imaginary component ordering.
 
-## Syntax
+`chi` may be a real 3-by-3 susceptibility tensor or its five independent elements, in Å³. The five-element form is expanded as a symmetric traceless tensor with the third diagonal equal to minus the sum of the first two. Coordinates are shifted by `mxyz` before conversion to spherical coordinates.
 
-```matlab
-theo_pcs=lpcs(nxyz,mxyz,ranks,Ilm,chi)
-```
+## Calculation and output
 
-## Parameters / inputs
+The routine combines each supplied multipole rank with the rank-2 anisotropic susceptibility components and spherical harmonics. A rank-`L` term has radial dependence `r^(-L-3)` and harmonic degree `L+2`; the summed real value is scaled by `1e6` to return `theo_pcs` in ppm at each nuclear coordinate.
 
-- nxyz -nuclear coordinates as [x y z] with multiple
-- rows, at which PCS is to be evaluated, in
-- Angstroms.
-- mxyz -paramagnetic centre coordinates as [x y z],
-- in Angstroms.
-- ranks -array of multipole ranks supplied in Ilm
-- Ilm -{[],[]} array of numbers corresponding to
-- the integrals
-- Int[rho(r,theta,phi)*Y_lm(theta,phi)*r^l*d^3r]
-- for L=0 Ilm=N/2/sqrt(pi)
-- for L=1 Ilm=[imag(I11) I10 real(I11)]
-- for L=2 Ilm=[imag(I22) imag(I21) I20 ...
-- real(I21) real(I22)]
-- et cetera.
-- chi -the 3x3 matrix or the five independent elements
-- of the susceptibility tensor in cubic Angstroms
-- Output:
-- theo_pcs -predicted pseudocontact shift (in ppm) at
-- each of the nuclei.
+## References
 
-## Implementation structure
-
-- Computes PCS from the multipole moments of the paramagnetic
-- centre probability density as described in
-- Equation 33 is used under the assumption that all nuclei are
-- outside the bounding sphere shown in Figure 1 of the paper.
-- theo_pcs=lpcs(nxyz,mxyz,ranks,Ilm,chi)
-- nxyz -nuclear coordinates as [x y z] with multiple
-- rows, at which PCS is to be evaluated, in
-- Angstroms.
-- mxyz -paramagnetic centre coordinates as [x y z],
-- in Angstroms.
-- ranks -array of multipole ranks supplied in Ilm
-- Ilm -{[],[]} array of numbers corresponding to
+- [10.1039/C6CP05437D](https://doi.org/10.1039/C6CP05437D)
+- [Spin Dynamics Wiki: lpcs.m](https://spindynamics.org/wiki/index.php?title=lpcs.m)

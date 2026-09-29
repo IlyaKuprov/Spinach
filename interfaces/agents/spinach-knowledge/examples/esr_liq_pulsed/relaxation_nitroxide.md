@@ -1,32 +1,21 @@
 # examples/esr_liq_pulsed/relaxation_nitroxide.m
 
-- Signature: `relaxation_nitroxide()`
+**Call:** <code>relaxation_nitroxide()</code> — no input arguments and no returned outputs.
 
-## Purpose
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/relaxation_nitroxide.m) · [DFT input](https://github.com/IlyaKuprov/Spinach/blob/main/examples/standard_systems/nitroxide.log)
 
-W-band pulse-acquire FFT ESR spectrum of a nitroxide radical, using explicit time domain simulation with Redfield relaxati- on supeoperator. Calculation time: seconds
+## What it models
 
-## Physical / mathematical content
+A W-band nitroxide pulse-acquire ESR spectrum. The source imports a DFT-derived system from <code>../standard_systems/nitroxide.log</code> with <code>gparse</code> and <code>g2spinach</code>, maps an electron (<code>E</code>) and <code>14N</code>, and sets <code>options.no_xyz=1</code> because hyperfine couplings are provided. It sets <code>sys.magnet=3.5</code>; the example labels this magnet induction but does not state its unit.
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The basis is <code>sphten-liouv</code> with <code>approximation='none'</code>. Relaxation is <code>redfield</code>, with <code>equilibrium='zero'</code>, <code>rlx_keep='secular'</code>, and <code>tau_c={5e-11}</code>. These are the model choices encoded by the example, not a claim of validation against measurement.
 
-## Numerical / algorithmic content
+## Acquisition and plotted result
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The electron channel is observed: <code>spins={'E'}</code>, with <code>rho0</code> and <code>coil</code> both <code>state(...,'L+','E')</code> and no decoupled spins. Acquisition parameters are <code>offset=-2e8</code>, <code>sweep=2e8</code>, <code>npoints=512</code>, and <code>zerofill=1024</code>; the source sets <code>axis_units='GHz-labframe'</code>, <code>derivative=1</code>, and <code>invert_axis=1</code>. The numeric offset, sweep, and magnet values have no unit annotation in this file.
 
-## Implementation structure
+The function calls <code>liquid(spin_system,@acquire,parameters,'esr')</code>, applies <code>{{'none'}}</code> apodisation, computes <code>fftshift(fft(fid,parameters.zerofill))</code>, and plots the real spectrum. It opens a figure; the FID and spectrum are local variables, not returned or saved by this function. The source comments estimate seconds of calculation time.
 
-- W-band pulse-acquire FFT ESR spectrum of a nitroxide radical,
-- using explicit time domain simulation with Redfield relaxati-
-- on supeoperator.
-- Calculation time: seconds
-- Ignore coordinate information (HFCs provided)
-- Spin system properties (imported from a DFT calculation)
-- Magnet induction
-- Basis set
-- RElaxation theory
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+## Requirements and scope
+
+Run with Spinach and the example's relative input layout available (the relative <code>../standard_systems/nitroxide.log</code> path must resolve). The source uses <code>gparse</code>, <code>g2spinach</code>, <code>create</code>, <code>basis</code>, <code>state</code>, <code>liquid</code>, <code>acquire</code>, <code>apodisation</code>, <code>kfigure</code>, and <code>plot_1d</code>, plus MATLAB FFT routines. The .m file supplies no DOI or bibliography entry; the stable source and input links above are the cited records.

@@ -2,34 +2,16 @@
 
 - Signature: `M=full(M)`
 
-## Purpose
+## Meaning and behaviour
 
-Converts an OPIUM object into the full scaled unit matrix that it represents. Syntax: M=full(M)
+An `opium` object represents the scaled unit matrix `coeff*I_dim`. This overload returns `M.coeff*eye(M.dim)`: a square numeric matrix, with the identity explicitly formed by `eye`. It therefore materialises the represented matrix rather than retaining the compact `opium` object. This source contains no explicit input validation.
 
-## Physical / mathematical content
+## Input and output
 
-## Numerical / algorithmic content
+- Input: `M`, an `opium` object with the `coeff` and `dim` fields used by the implementation.
+- Output: the full scaled unit matrix of order `M.dim`.
 
-## Parameters / inputs
+## Source links
 
-- M -an OPIUM object
-
-## Outputs
-
-- M -a full scaled unit matrix
-- of appropriate dimension
-
-## Implementation structure
-
-- Converts an OPIUM object into the full scaled
-- unit matrix that it represents. Syntax:
-- M=full(M)
-- M -an OPIUM object
-- M -a full scaled unit matrix
-- of appropriate dimension
-- Make a scaled unit matrix
-- Katherine had been apolitical. If anyone had asked her, during the time she
-- was working for the government, or before that, when she was a college stu-
-- dent, she would probably have said she was a "liberal". But she was liberal
-- only in the mindless, automatic way that most people are. Without really
-- thinking about it or trying to analyze it, she superficially accepted the
+- MATLAB source: [kernel/overloads/@opium/full.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@opium/full.m)
+- Existing Wiki page: [opium/full.m](https://spindynamics.org/wiki/index.php?title=opium/full.m)

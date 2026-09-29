@@ -1,60 +1,26 @@
 # kernel/states/equilibrium.m
 
-- Signature: `rho=equilibrium(spin_system,I,Q,euler_angles)`
+- MATLAB implementation: [kernel/states/equilibrium.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/equilibrium.m)
 
 ## Purpose
 
-Returns the thermal equilibrium state at the current temperature. If the anisotropic part and the orientation parameters are not given, uses the isotropic Hamiltonian, otherwise uses the full Hamiltonian at the speci- fied orientation. Syntax: rho=equilibrium(spin_system,I,Q,euler_angles)
+Return the Boltzmann thermal-equilibrium density matrix (Hilbert space) or state vector (Liouville space) for the configured spin-system temperature. The full interface is `rho=equilibrium(spin_system,I,Q,euler_angles)`, but the accepted call forms are one, two, or four arguments:
 
-## Physical / mathematical content
+- `rho=equilibrium(spin_system)` builds the Hamiltonian internally under the `'labframe'` assumption and uses its isotropic part.
+- `rho=equilibrium(spin_system,I)` uses the supplied isotropic Hamiltonian only.
+- `rho=equilibrium(spin_system,I,Q,euler_angles)` adds the anisotropic contribution at the requested orientation.
 
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
+A three-argument call is not implemented.
 
-## Numerical / algorithmic content
+## Inputs and constraints
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- `spin_system` must have a temperature in `spin_system.rlx.temperature` (configured through `inter.temperature`); an empty or exactly zero temperature is rejected. The routine uses `hbar/(kbol*T)` from the configured physical constants.
+- `I` is numeric: the isotropic Hamiltonian in Hilbert space, or its **left-side product superoperator** in Liouville space. In Liouville calculations, neither `I` nor anisotropic terms may be supplied as commutation superoperators.
+- For the four-argument form, `Q` is a cell array of anisotropic Hamiltonian terms and `euler_angles` is a real three-element vector in radians, giving the system orientation relative to the input orientation. The orientation-dependent term is added to `I`.
+- Hamiltonians `I` and `Q` generated with `hamiltonian.m` must use the `'labframe'` assumption.
 
-## Parameters / inputs
+## Numerical mechanism and limitations
 
-- I -isotropic part of the Hamiltonian left side pro-
-- duct superoperator (in Liouville space) or Hamil-
-- tonian (in Hilbert space). If this argument is
-- omitted, the Hamiltonian is built here and used
-- to compute the thermal equilibrium state.
-- Q -irreducible components of the anisotropic part
-- of the Hamiltonian left side product superopera-
-- tor (in Liouville space) or Hamiltonian (in Hil-
-- bert space), as returned by hamiltonian.m; this
-- is needed when the thermal equilibrium state de-
-- pends on the system orientation.
-- euler_angles -a row vector of Euler angles (in radians) speci-
-- fying the system orientation relative to the in-
-- put orientation. If the angles are not supplied,
-- only isotropic part of the Hamiltonian is used.
+The calculation forms the imaginary-time thermal state with `beta=hbar/(kbol*T)`. Liouville formalisms propagate the thermodynamic unit state with `step` at `-1i*beta` and normalise by its overlap with that unit state. Zeeman Hilbert formalism obtains an imaginary-time propagator, normalises by the trace, and uses scaling-and-squaring with intermediate normalisation/cleanup for numerical stability. In Liouville space, a NaN result is reported as a too-low-temperature accuracy failure, for which the source error message directs the caller to switch to Hilbert space. Ground-state degeneracy is common, so absolute-zero equilibrium is unsupported.
 
-## Outputs
-
-- rho -thermal equilibrium density matrix (Hilbert spa-
-- ce) or state vector (Liouville space).
-- WARNING: Liouville space calculations must supply left side product su-
-- peroperators, not commutation superoperators.
-- WARNING: assumptions supplied to the hamiltonian.m call that generates
-- I and Q must be 'labframe'.
-- WARNING: spin system ground states are commonly degenerate; absolute
-- zero temperatures are not supported.
-
-## Implementation structure
-
-- Returns the thermal equilibrium state at the current temperature. If the
-- anisotropic part and the orientation parameters are not given, uses the
-- isotropic Hamiltonian, otherwise uses the full Hamiltonian at the speci-
-- fied orientation. Syntax:
-- rho=equilibrium(spin_system,I,Q,euler_angles)
-- I -isotropic part of the Hamiltonian left side pro-
-- duct superoperator (in Liouville space) or Hamil-
-- tonian (in Hilbert space). If this argument is
-- omitted, the Hamiltonian is built here and used
-- to compute the thermal equilibrium state.
-- Q -irreducible components of the anisotropic part
-- of the Hamiltonian left side product superopera-
+Source and credits: [Spinach Wiki: equilibrium.m](https://spindynamics.org/wiki/index.php?title=equilibrium.m). Luke Edwards and Ilya Kuprov (contact details are in the source file).

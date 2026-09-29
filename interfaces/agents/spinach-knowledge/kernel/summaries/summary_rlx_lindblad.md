@@ -2,35 +2,13 @@
 
 - Signature: `summary_rlx_lindblad(spin_system,header)`
 
-## Purpose
+## Behaviour
 
-Prints Lindblad relaxation-rate summary for a Spinach system. Syntax: summary_rlx_lindblad(spin_system,header)
+Prints one Lindblad relaxation-rate row per spin, in `spin_system.comp.nspins` order. Each row contains its index, isotope, `spin_system.rlx.lind_r1_rates(n)`, `spin_system.rlx.lind_r2_rates(n)`, and spin label; scalar rates use signed scientific notation with five decimal places. No rate-unit conversion occurs in this routine.
 
-## Physical / mathematical content
+The supplied header precedes the table and all output is sent through `report`; there is no return value. The local guard requires a structure `spin_system` and character-array `header`.
 
-## Numerical / algorithmic content
+## References
 
-## Parameters / inputs
-
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-
-## Outputs
-
-- this function prints to the console or to the user-specified
-- output via report.m function
-
-## Implementation structure
-
-- Prints Lindblad relaxation-rate summary for a Spinach system. Syntax:
-- summary_rlx_lindblad(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the relaxation-rate table
-- Consistency enforcement
-- Tay's Law: the tendency for artificial intelligence
-- systems to become racist, sexist, anti-semitic, ho-
-- mophobic, and transphobic when given unrestricted
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_rlx_lindblad.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_rlx_lindblad.m)

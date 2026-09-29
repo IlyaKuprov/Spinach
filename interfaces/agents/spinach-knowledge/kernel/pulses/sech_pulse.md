@@ -1,52 +1,33 @@
 # kernel/pulses/sech_pulse.m
 
-- Signature: `[Cx,Cy,time_grid,amps,phis]=...`
+- MATLAB source: [kernel/pulses/sech_pulse.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/sech_pulse.m)
+- Spinach wiki: [sech_pulse.m](https://spindynamics.org/wiki/index.php?title=sech_pulse.m)
+- Signature: `[Cx,Cy,time_grid,amps,phis]=sech_pulse(peak_amp,freq_mod,phase_mod,dur,npts)`
 
 ## Purpose
 
-Hyperbolic secant pulse in Cartesian and amplitude-phase representation. Syntax: [Cx,Cy,time_grid,amps,phis]=... sech_pulse(peak_ampl,freq_mod,phase_mod,dur,npts)
+Constructs a sampled hyperbolic-secant RF pulse and returns Cartesian and amplitude-phase representations.
 
-## Physical / mathematical content
+## Waveform
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+The source builds `time_grid=linspace(-dur/2,dur/2,npts)`, including the two duration endpoints when there is more than one point. At each point it computes `amps=peak_amp*sech(freq_mod*time_grid)` and `phis=phase_mod*log(cosh(freq_mod*time_grid))`, then calls `polar2cartesian(amps,phis)` to obtain `Cx` and `Cy`. The phase is zero at the pulse centre, `t=0`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+- `peak_amp` — real scalar peak amplitude, in radians per second.
+- `freq_mod` — real scalar frequency-modulation parameter, in radians per second.
+- `phase_mod` — real, dimensionless phase-modulation parameter.
+- `dur` — positive real scalar duration, in seconds.
+- `npts` — positive integer number of digitisation points.
+- `Cx`, `Cy` — Cartesian RF coefficients, in radians per second.
+- `time_grid` — sample times, in seconds; `amps` — sampled amplitudes, in radians per second; `phis` — sampled phases, in radians.
 
-- peak_amp -peak amplitude, rad/s
-- freq_mod -frequency modulation parameter, rad/s
-- phase_mod -phase modulation parameter, dimless
-- dur -pulse duration, seconds
-- npts -number of digitisation points
+The source constructs these samples directly; it has no separate post-generation filter parameter.
 
-## Outputs
+## Example
 
-- Cx -a vector of coefficients in front of Sx
-- spin operator at each time slice, rad/s
-- Cy -a vector of coefficients in front of Sy
-- spin operator at each time slice, rad/s
-- time_grid -a vector of time grid points, seconds
-- amps -a vector of pulse amplitudes at each ti-
-- me slice, rad/s
-- phis -a vector of pulse phases at each time
-- slice (phi=0 at t=0 in the centre), rad
-- Example:
-- [Cx,Cy,time_grid]=sech_pulse(1,672,5,10.24e-3,1000);
-- plot(time_grid,[Cx; Cy]); kgrid; xlim tight;
-- kxlabel('time, seconds'); kylabel('amplitude, rad/s');
-
-## Implementation structure
-
-- Hyperbolic secant pulse in Cartesian and amplitude-phase
-- representation. Syntax:
-- [Cx,Cy,time_grid,amps,phis]=...
-- sech_pulse(peak_ampl,freq_mod,phase_mod,dur,npts)
-- peak_amp -peak amplitude, rad/s
-- freq_mod -frequency modulation parameter, rad/s
-- phase_mod -phase modulation parameter, dimless
-- dur -pulse duration, seconds
-- npts -number of digitisation points
-- Cx -a vector of coefficients in front of Sx
-- spin operator at each time slice, rad/s
-- Cy -a vector of coefficients in front of Sy
+```matlab
+[Cx,Cy,time_grid]=sech_pulse(1,672,5,10.24e-3,1000);
+plot(time_grid,[Cx; Cy]); kgrid; xlim tight;
+kxlabel('time, seconds'); kylabel('amplitude, rad/s');
+```

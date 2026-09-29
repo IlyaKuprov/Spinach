@@ -1,31 +1,18 @@
 # examples/nmr_zerofield/zero_field_methanol.m
 
 - Signature: `zero_field_methanol()`
+- Source: [`examples/nmr_zerofield/zero_field_methanol.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_zerofield/zero_field_methanol.m)
 
 ## Purpose
 
-Zero-field NMR spectroscopy -13C methanol. Set to reproduce Figure 1 from http://dx.doi.org/10.1016/j.cplett.2013.06.042 Calculation time: seconds
+This is a simulated zero-field NMR example for 13C-labelled methanol, set up to reproduce Figure 1 of [Chemical Physics Letters, DOI 10.1016/j.cplett.2013.06.042](https://doi.org/10.1016/j.cplett.2013.06.042). The reference is the example's stated target, not a claim that this copy has been run or independently matched to the figure.
 
-## Physical / mathematical content
+## Spin and field model
 
-- Zero- and ultralow-field NMR examples. The main physics is the crossover from Zeeman-dominated spectra to J-dominated spectra, with coherent evolution in near-zero field and detection of low-frequency transitions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The four-spin system contains three 1H spins and one 13C spin. The field is set to zero, and the scalar 1H–13C couplings from each proton to carbon are each 141.0 Hz. The source selects the spherical-tensor Liouville formalism with no approximation and uses S3 permutation symmetry for the three proton spins. No spatial coordinates, gradient, chirp, field-drop schedule, or external measured trace is specified.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The zero-field signal is calculated with `liquid(...,@zerofield,...,'labframe')`. The acquisition settings specify a 700 Hz sweep, 4096 points, 16384-point zero filling, a 1H channel, a π/2 flip angle, uniaxial detection, and a zero offset; the plotted axis is in Hz. The code subtracts the FID mean, applies exponential apodisation with parameter 6, Fourier transforms and shifts the result, then plots its real part. The source comment estimates calculation time as seconds; that is a source note, not a runtime measured here.
 
-## Implementation structure
-
-- Zero-field NMR spectroscopy -13C methanol. Set to reproduce
-- Figure 1 from http://dx.doi.org/10.1016/j.cplett.2013.06.042
-- Calculation time: seconds
-- Spin system
-- Interactions
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+This is a zero-field NMR simulation, not an SPEN or ultrafast-DOSY experiment: there is no encoded spatial dimension or gradient schedule, and the source does not define a multiple-quantum selection step. It imports no experimental data.

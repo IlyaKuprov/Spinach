@@ -1,34 +1,18 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m
 
 - Signature: `bb_inversion_pulse()`
+- Source: [examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m)
 
 ## Purpose
 
-Broadband inversion pulse design for liquid-state NMR. Reprodu- ces, using Spinach, the second example from: A single proton is considered in the rotating frame with multiple transmitter offsets (or chemical shifts). The goal is to design a 600 µs broadband inversion pulse (1 µs slices) that performs: I_z → -I_z uniformly over a frequency offset range of ±50 kHz; controls are Cartesian (Lx, Ly) operators in the rotat
+This liquid-state NMR example formulates robust broadband inversion of a single proton over transmitter offsets. Its target operation is longitudinal magnetisation inversion, +Iz to -Iz. The source describes it as a Spinach reproduction of the second example associated with the Journal of Magnetic Resonance DOI [10.1016/j.jmr.2008.11.020](https://doi.org/10.1016/j.jmr.2008.11.020).
 
-## Physical / mathematical content
+## Model and optimisation
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The model is one 1H spin at 14.1 T, with zero scalar chemical shift, in the NMR rotating frame. The initial and target states are normalised +Sz and -Sz. The pulse uses Cartesian Lx and Ly controls and an Lz offset operator, with 101 equally spaced offsets from -50 to +50 kHz in the design ensemble.
 
-## Numerical / algorithmic content
+The design has 600 time slices of 1 microsecond each, for a total duration of 600 microseconds. The control power level is 2*pi*10 kHz in angular-frequency units. Starting from a random 2-by-600 guess scaled by 1/10, the example configures the L-BFGS method, the NS and SNSA penalties with weights 0.01 and 10, respectively, and a maximum of 200 iterations. It calls fmaxnewton with the GRAPE XY objective.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Verification observable
 
-## Implementation structure
-
-- Broadband inversion pulse design for liquid-state NMR. Reprodu-
-- ces, using Spinach, the second example from:
-- A single proton is considered in the rotating frame with multiple
-- transmitter offsets (or chemical shifts). The goal is to design a
-- 600 µs broadband inversion pulse (1 µs slices) that performs:
-- I_z → -I_z
-- uniformly over a frequency offset range of ±50 kHz; controls are
-- Cartesian (Lx, Ly) operators in the rotating frame.
-- Magnetic field (Tesla)
-- Chemical shift (ppm)
-- Basis set
-- Spinach housekeeping
+After optimisation, the script rescales the two waveform channels to physical angular-frequency controls and simulates the pulse at 201 offsets from -100 to +100 kHz. At each offset it evaluates -real(Sz' * rho_f), the inversion transfer relative to the normalised initial state, and plots that profile. The wider verification grid is distinct from the +/-50 kHz optimisation ensemble. The source defines this evaluation but supplies no numerical profile values in the page; no performance result or experimental validation is asserted here.

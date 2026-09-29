@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Singlet relaxation rate for the two triple bond carbons in cis-dimethylbut-2-ynedioate. Magnetic parameters com- puted with DFT. Calculation time: seconds
+Construct a Redfield relaxation superoperator for the two triple-bond carbons in cis-dimethylbut-2-ynedioate, then report its matrix elements for normalised longitudinal magnetisation and the two-spin singlet state. The source says the magnetic parameters were computed with DFT.
 
-## Physical / mathematical content
+## Spin pair and relaxation model
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The system is a pair of 13C spins at 14.1 T. The source supplies Zeeman matrices `[[29.13, 0, 0], [0, 253.00, -5.64], [0, -35.61, 38.78]]` and `[[29.13, 0, 0], [0, 253.00, 5.64], [0, 35.61, 38.78]]`, with coordinates (0, 0.609, 0.298) and (0, -0.609, 0.298). It selects Redfield relaxation, zero equilibrium, lab-frame retention, and a 100 ps correlation time. The basis is the full `sphten-liouv` basis (`approximation='none'`); the relaxation integration and zero tolerances are both `1e-5`.
 
-## Numerical / algorithmic content
+## Observable and limits
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+After constructing `R`, the example normalises `Sz` and the singlet operator and reports `Sz'*R*Sz` and `S'*R*S`. These are the reported relaxation-superoperator matrix elements; the script does not evolve a prepared state or report numerical lifetimes. It contains no storage interval, imaging or gradient model.
 
-## Implementation structure
+The source comment gives a calculation time of seconds.
 
-- Singlet relaxation rate for the two triple bond carbons
-- in cis-dimethylbut-2-ynedioate. Magnetic parameters com-
-- puted with DFT.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Relaxation superoperator accuracy
-- Spinach housekeeping
-- Relaxation superoperator
-- Action on longitudinal magnetization
-- Action on a singlet state
+Source: [examples/singlet_states/carbon_singlet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/carbon_singlet.m)

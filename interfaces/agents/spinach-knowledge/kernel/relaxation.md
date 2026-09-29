@@ -4,51 +4,31 @@
 
 ## Purpose
 
-Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
+Builds a relaxation superoperator by accumulating the terms selected in `spin_system.rlx.theories`. It can also add dissipative bosonic-mode terms from `spin_system.inter.modes` in Liouville-space formalisms.
 
 ## Physical / mathematical content
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-
-Diagonal relaxation retention is not implemented in `zeeman-liouv` and is
-rejected explicitly: deleting population-transfer terms is not a
-basis-independent self-relaxation approximation. Spherical-tensor diagonal
-retention and Zeeman full (`labframe`) retention remain available.
-- SRSK contributes zero-destination relaxation rates to the accumulated generator; IME or DiBari-Levitt thermalisation is applied once to the accumulated spin relaxation, not separately to the recursive SRSK contribution. Bosonic mode dissipation is excluded from that recursive contribution and appended once after outer spin thermalisation, with the original mode parameters and temperature.
+- The source dispatches among several named models, including extended `t1_t2`, Redfield and Nakajima–Zwanzig rotational-diffusion treatments, a user-rate Lindblad model, and other named relaxation models. A returned `R` is a dissipative superoperator; when assembling a Liouvillian manually, retain the documented convention `L=H+1i*R+1i*K`, not `H+R+K`.
+- `euler_angles` specifies orientation in the active ZYZ convention, in radians, relative to the input orientation. It affects theories that use relaxation-rate anisotropy; the header explicitly notes that Redfield is orientation-independent here. Mode dissipators are independent of these spin Euler angles.
+- The Redfield and Nakajima–Zwanzig choices are alternative evaluations of the same kernel and are rejected when selected together. The source also enforces model/formalism combinations: for example, extended `t1_t2` is restricted to `sphten-liouv`, while diagonal retention is rejected for `zeeman-liouv`.
+- For SRSK, the source recursively builds an extended `t1_t2` contribution with the local equilibrium set to `'zero'`; it leaves thermalisation and mode dissipation to the outer call. The outer call applies the selected thermalisation to the accumulated spin relaxation and appends bosonic-mode terms once. The source's SRSK rate-report text labels the displayed `R1` and `R2` increments in Hz.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-SRSK is supported in spherical-tensor Liouville space only. Requests with
-`zeeman-liouv` are rejected upfront as not implemented rather than passed
-to the recursive extended T1/T2 builder; no substitute relaxation model is used.
+The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no spin theory is selected and no dissipative mode term is present, the result is set to zero.
 
 ## Parameters / inputs
 
-- euler_angles -three Euler angles (ZYZ active convention
-- in radians) specifying system orientation
-- relative to the input orientation; requi-
-- by those theories that support relaxation
-- rate anisotropy. It has no effect on tho-
-- se theories (e.g. Redfield) that do not.
+- `spin_system` — Spinach system containing the selected relaxation theories and their parameters.
+- `euler_angles` — optional orientation specification for theories that support anisotropic rates; active ZYZ angles in radians.
+
+The function header does not state units for the relaxation-rate or correlation-time fields, so this entry does not assign them. Its explicit unit note is that the Euler angles are in radians.
 
 ## Outputs
 
-- R -relaxation superoperator. If a Liouvillian is
-- assembled manually, this dissipative superoperator
-- must enter as 1i*R, for example
-- L=H+1i*R+1i*K; do not use H+R+K.
-- Note: a variety of relaxation theories are supported, see the relax-
-- ation theory parameters section of the online manual.
-- Note: Spinach context functions include relaxation and kinetics
-- superoperators into the total Liovillian automatically.
-- Note: dissipative bosonic modes declared in inter.modes receive
-- thermalised GKSL dissipators from rlx_modes.m in Liouville
-- space formalisms; the euler_angles parameter refers to the
-- spin subsystem only and has no effect on the mode terms.
+- `R` — relaxation superoperator. Spinach contexts include relaxation and kinetics superoperators in the total Liouvillian automatically; use the `1i*R` convention when assembling one manually.
 
-## Header notes
+## Source
 
-Euler angles use the active ZYZ convention in radians and affect theories with anisotropic rates, not Redfield rotational averaging. In a manually assembled generator use L=H+1i*R+1i*K, not H+R+K.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/relaxation.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=relaxation.m)

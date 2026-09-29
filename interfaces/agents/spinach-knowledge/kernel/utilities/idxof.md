@@ -1,39 +1,32 @@
 # kernel/utilities/idxof.m
 
-- Signature: `idx=idxof(sys,label)`
-
 ## Purpose
 
-Allows interaction specification by spin label rather than number. Syntax: idx=idxof(sys,label)
+`idxof.m` returns the index of a spin in the Spinach input structure given its label, allowing interactions to be specified by spin label rather than by number.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/idxof.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `idx=idxof(sys,label)`.
+- The function first runs a consistency check (`grumble`) on the inputs.
+- It locates the label by scanning `sys.labels` with `strcmp` via `cellfun` and `find`.
+- If no match is found, it errors with `'label not found.'`.
+- If more than one match is found, it errors with `'labels are not unique'`.
+- The consistency check errors when: `label` is not a character array (`'label must be a character string.'`), `sys.labels` is missing (`'sys.labels is missing.'`), or the number of elements in `sys.labels` does not match the number of elements in `sys.isotopes` (`'number of elements in sys.label must match the number of spins.'`).
 
-## Parameters / inputs
+## Inputs and outputs
 
-- sys -Spinach input structure that
-- includes a sys.labels field
-- with unique labels
-- label -label whose index is to be returned
+Inputs:
 
-## Outputs
+- `sys` — Spinach input structure that includes a `sys.labels` field with unique labels.
+- `label` — label whose index is to be returned; must be a character string.
 
-- idx -the index of the spin, an integer
+Outputs:
 
-## Implementation structure
+- `idx` — the index of the spin, an integer.
 
-- Allows interaction specification by spin label
-- rather than number. Syntax:
-- idx=idxof(sys,label)
-- sys -Spinach input structure that
-- includes a sys.labels field
-- with unique labels
-- label -label whose index is to be returned
-- idx -the index of the spin, an integer
-- Check consistency
-- Locate the label
-- Check the output
-- Consistency enforcement
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=idxof.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/idxof.m>

@@ -1,29 +1,17 @@
 # examples/kinetics/flux_symmetric.m
 
-- Signature: `flux_symmetric()`
+- MATLAB implementation: [examples/kinetics/flux_symmetric.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/flux_symmetric.m)
 
-## Purpose
+- Callable as the no-argument MATLAB function `flux_symmetric()`; it constructs the Spinach system and basis before acquisition.
 
-Two-spin symmetric magnetization flux problem. Calculation time: seconds.
+## Purpose and model
 
-## Physical / mathematical content
+This is a two-site symmetric intermolecular magnetisation-flux simulation for two `1H` environments. The source sets `sys.magnet=14.1`, scalar Zeeman values `{0.0,3.0}`, and equal directed `inter.chem.flux_rate` entries of 2000 from site 1 to site 2 and from site 2 to site 1, with `inter.chem.flux_type=intermolecular`. The initial state is the sum of site-1 and site-2 `L+` operators, each weighted by 1.0. Units for the field, scalar values, and flux-rate entries are not stated in this source and are not supplied here.
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Acquisition and observable
 
-## Numerical / algorithmic content
+The full `sphten-liouv` basis is used (`bas.approximation=none`). The function passes the system, `@acquire` callback, and NMR parameters to `liquid`, with the `1H` `L+` coil and no decoupled spins. Acquisition uses `offset=900`, `sweep=5000`, 512 points, and zero filling to 1024; its plotted axis is labelled in ppm and inverted. The FID is exponentially apodised with parameter 6, transformed with a shifted FFT, and its real spectrum is plotted with `plot_1d`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Scope
 
-## Implementation structure
-
-- Two-spin symmetric magnetization flux problem.
-- Calculation time: seconds.
-- System specification
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The source header estimates a calculation time of seconds; this is not a measured runtime. The file specifies a symmetric flux setup rather than a fitted exchange result, and it contains no numerical spectrum from which to report peak positions or intensities.

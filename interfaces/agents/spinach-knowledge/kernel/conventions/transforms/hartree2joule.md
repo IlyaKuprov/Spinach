@@ -1,38 +1,26 @@
 # kernel/conventions/transforms/hartree2joule.m
 
-- Signature: `energy=hartree2joule(energy)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/hartree2joule.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=hartree2joule.m)
 
-## Purpose
+## Signature
 
-Converts Hartree energy units into J/mol. A Hartree is twice the ground state ionisation energy of the hydrogen atom. Syntax: energy=hartree2joule(energy)
+`energy=hartree2joule(energy)`
 
-## Physical / mathematical content
+## Purpose and conversion
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Multiplies an energy value expressed in Hartree by the source's fixed conversion factor:
 
-## Numerical / algorithmic content
+`energy_out=2625499.62*energy_in`
 
-## Parameters / inputs
+The source describes a Hartree as twice the ground-state ionisation energy of hydrogen. The factor maps one Hartree to `2625499.62` J/mol. Although the output-parameter comment says Joules, the implemented conversion is molar energy, not joules per particle.
 
-- energy -a numerical array of energies in
-- Hartree units
+## Inputs and output
 
-## Outputs
+- `energy`: real numeric array; input unit is Hartree.
+- Output `energy`: converted numeric array in J/mol, with the same array layout for supported inputs.
 
-- energy -a numerical array of energies in
-- Joules
+The implementation rejects nonnumeric or nonreal input. It imposes no explicit size or dimensionality check.
 
-## Implementation structure
+## Reference
 
-- Converts Hartree energy units into J/mol. A Hartree is twice the
-- ground state ionisation energy of the hydrogen atom. Syntax:
-- energy=hartree2joule(energy)
-- energy -a numerical array of energies in
-- Hartree units
-- Joules
-- Check consistency
-- Perform the conversion
-- Consistency enforcement
-- "We only need to be lucky once. You need to be
-- lucky every time."
-- The IRA to Margaret Thatcher, after
+- [Spinach Wiki: hartree2joule.m](https://spindynamics.org/wiki/index.php?title=hartree2joule.m)

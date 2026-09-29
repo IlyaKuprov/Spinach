@@ -1,40 +1,19 @@
 # kernel/conventions/transforms/euler2dcm.m
 
-- Signature: `R=euler2dcm(arg1,arg2,arg3)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/euler2dcm.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=euler2dcm.m)
 
-## Purpose
+## Conversion and convention
 
-Converts Euler angles (ZYZ active convention) into a direction cosine matrix. Syntax: R=euler2dcm(alpha,beta,gamma) OR R=euler2dcm([alpha beta gamma])
+The function converts Euler angles in radians to a 3x3 direction cosine matrix using the active ZYZ convention of Brink & Satchler, Fig. 1a. Each factor is a counterclockwise rotation about its indicated axis:
 
-## Physical / mathematical content
+~~~text
+Rz(theta) = [cos(theta)  -sin(theta)  0;  sin(theta)  cos(theta)  0;  0  0  1]
+Ry(theta) = [cos(theta)  0  sin(theta);  0  1  0;  -sin(theta)  0  cos(theta)]
+R = Rz(alpha)*Ry(beta)*Rz(gamma)
+~~~
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+The documented applications are v_out = R*v_in for a 3x1 vector and A_out = R*A_in*R' for a 3x3 interaction tensor.
 
-## Numerical / algorithmic content
+## Inputs and constraints
 
-## Parameters / inputs
-
-- alpha,beta,gamma -Euler angles in radians (ZYZ
-- active convention)
-
-## Outputs
-
-- R -direction cosine matrix
-- Note: the resulting rotation matrix is to be used as follows:
-- v=R*v (for 3x1 vectors)
-- A=R*A*R' (for 3x3 interaction tensors)
-
-## Implementation structure
-
-- Converts Euler angles (ZYZ active convention) into a direction
-- cosine matrix. Syntax:
-- R=euler2dcm(alpha,beta,gamma)
-- R=euler2dcm([alpha beta gamma])
-- alpha,beta,gamma - Euler angles in radians (ZYZ
-- active convention)
-- R - direction cosine matrix
-- Note: the resulting rotation matrix is to be used as follows:
-- v=R*v (for 3x1 vectors)
-- A=R*A*R' (for 3x3 interaction tensors)
-- Adapt to the input style
-- Assume that a single input is a 3-vector
+Call either R=euler2dcm([alpha beta gamma]) or R=euler2dcm(alpha,beta,gamma). In the one-input form the code takes the first three elements by linear indexing; it does not check that the input is a three-element vector, so later elements are unused and fewer than three elements fail during indexing. In the three-input form each angle must be a numeric real scalar. The source checks no angle range or finiteness. The output is a 3x3 direction cosine matrix.

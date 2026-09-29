@@ -1,38 +1,23 @@
 # kernel/overloads/@rcv/gpuArray.m
 
+[GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/gpuArray.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/gpuArray.m)
+
 - Signature: `obj=gpuArray(obj)`
 
 ## Purpose
 
-Transfers an RCV sparse matrix to the GPU. Syntax: obj=gpuArray(obj)
+Moves a CPU-resident RCV sparse matrix's stored arrays to GPU memory.
 
-## Physical / mathematical content
+## Storage and behaviour
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+RCV stores row indices, column indices, and corresponding values in parallel arrays; `numRows` and `numCols` retain the matrix shape. The overload checks that `obj` is an `rcv` object. If `obj.isGPU` is false, it eagerly applies `gpuArray` to `obj.row`, `obj.col`, and `obj.val`, then sets `obj.isGPU` to true. If the flag is already true, it leaves the object unchanged. The row and column counts are not reassigned, so the represented dimensions remain unchanged. This transfers the stored arrays; it does not build a MATLAB sparse or dense matrix.
 
-## Numerical / algorithmic content
+The values are transferred without conjugation or scalar expansion/broadcasting.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Input
 
-## Parameters / inputs
+- `obj` - an RCV sparse matrix. The explicit check is object type only.
 
-- obj -an RCV sparse matrix
+## Output
 
-## Outputs
-
-- obj -the same matrix with data stored on GPU
-
-## Implementation structure
-
-- Transfers an RCV sparse matrix to the GPU. Syntax:
-- obj=gpuArray(obj)
-- obj -an RCV sparse matrix
-- obj -the same matrix with data stored on GPU
-- Check consistency
-- Upload to GPU
-- Consistency enforcement
-- Then it got worse. The book is very, very good. If
-- someone's going to beat you to the punch with a great
-- book idea, the least they can do is write something
-- crap. Not Andrew. Which shouldn't really come as a
-- surprise, since the little bastard is prodigiously
+- `obj` - the same RCV matrix with its stored arrays on the GPU when it was CPU-resident.

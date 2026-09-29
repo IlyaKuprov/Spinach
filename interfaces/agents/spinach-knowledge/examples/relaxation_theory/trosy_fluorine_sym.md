@@ -4,26 +4,12 @@
 
 ## Purpose
 
-Transverse relaxation rate as a function of the applied magnetic field in a 3-fluorotyrosine labelled protein. The fluorine atom and its directly bonded carbon are included. Analytical calcula- tions broken down by mechanism. Calculation time: seconds.
+An analytical dipole-dipole/chemical-shift-anisotropy calculation of field-dependent TROSY relaxation rates for the `19F` and bonded `13C` in the source's 3-fluorotyrosine model. Coordinates and shift tensors are taken from `3_fluoro_tyr.log`; the source passes them to `rlx_dd_csa` with correlation-time parameter `25e-9` (no unit is annotated for this parameter). The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Rates and plotted mechanisms
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The calculation samples 20 fields corresponding to proton Larmor frequencies from 200 to 800 MHz. It plots broad and narrow TROSY line rates together with the total transverse rate for fluorine and carbon; the axes are labelled proton Larmor frequency in MHz and relaxation matrix element in Hz. A third plot decomposes the carbon TROSY rate into dipole-dipole, CSA, and DD-CSA cross-correlation contributions. The source plots the cross term as `-abs(c_tro_xc)`, making the interference contribution visible alongside the two positive mechanism terms.
 
-## Numerical / algorithmic content
+These are calculated relaxation rates and mechanism contributions from the analytical function, not measured line widths or an experimental spectrum. This example calls `rlx_dd_csa`; it does not set up a Bloch-Redfield or stochastic-Liouville spin-system calculation in this file.
 
-## Implementation structure
-
-- Transverse relaxation rate as a function of the applied magnetic
-- field in a 3-fluorotyrosine labelled protein. The fluorine atom
-- and its directly bonded carbon are included. Analytical calcula-
-- tions broken down by mechanism.
-- Calculation time: seconds.
-- Read 3-fluorotyrosine DFT calculation
-- Extract coordinates and CSAs
-- Magnetic field grid
-- Loop over magnetic fields
-- Call the analytical function
-- Relaxation rates
-- Mechanisms for 13C
+Source: [examples/relaxation_theory/trosy_fluorine_sym.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_fluorine_sym.m).

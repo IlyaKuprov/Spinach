@@ -1,63 +1,26 @@
 # kernel/conventions/transforms/cart2mode.m
 
-- Signature: `mode_derivs=cart2mode(cart_derivs,eigvecs,masses,frqs)`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/cart2mode.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=cart2mode.m)
 
-## Purpose
+## Contract
 
-Converts Cartesian derivatives of spin Hamiltonian parameters, as produced by electronic structure theory packages, into the derivatives with respect to dimensionless mode coordinates that the bosonic mode specification interface of create.m expects in inter.modes.coupling_mod and inter.modes.zeeman_mod fields. The dimensionless coordinate of each mode is (a+a')/sqrt(2), and the Cartesian displacement that it produce
+cart2mode projects Cartesian first- or second-derivative data for an interaction parameter onto one or two mass-weighted normal modes, including the mode's zero-point displacement scale. It produces derivatives with respect to the dimensionless coordinate (a+a')/sqrt(2) used by the bosonic mode interface in create.m. It is a derivative-coordinate transform, not an orientation-grid or spatial-coordinate transform.
 
-## Physical / mathematical content
+## Inputs and dimensions
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Let N be the number of atoms. Cartesian degrees of freedom are ordered [x1 y1 z1 x2 y2 z2 ...].
 
-## Numerical / algorithmic content
+- cart_derivs: first derivatives in Hz per Angstrom, shape [d1 d2 3N]; or second derivatives in Hz per Angstrom squared, shape [d1 d2 3N 3N].
+- eigvecs: documented as orthonormal mass-weighted normal-mode eigenvectors. The first-order case uses one [3N 1] vector; the second-order case uses two columns [3N 2].
+- masses: positive atomic masses in unified atomic mass units, as an [N 1] column.
+- frqs: positive mode frequency in Hz, a scalar for first order or a [1 2] vector for second order.
 
-## Parameters / inputs
+Each mode's Cartesian displacement scale is based on the zero-point amplitude sqrt(hbar/(m*omega)), with omega=2*pi*frqs; the implementation converts this displacement to Angstrom and converts masses from unified atomic mass units to kg. It contracts each first derivative once with its mode scale, or each second derivative with both scales.
 
-- cart_derivs -first derivatives of an interaction with
-- respect to Cartesian displacements, in Hz
-- per Angstrom, an array of dimension
-- [d1 d2 3N] where N is the number of atoms
-- and the Cartesian degrees of freedom are
-- ordered [x1 y1 z1 x2 y2 z2 ...]; or second
-- derivatives in Hz per Angstrom squared, an
-- array of dimension [d1 d2 3N 3N]
-- eigvecs -orthonormal mass-weighted normal mode
-- eigenvector, a [3N 1] column vector for
-- the first order case; two such vectors
-- as a [3N 2] array for the second order
-- case
-- masses -atomic masses in unified atomic mass
-- units, an [N 1] column vector
-- frqs -mode frequency in Hz, a positive scalar
-- for the first order case; a [1 2] vector
-- for the second order case
+## Output and use
 
-## Outputs
+mode_derivs is a [d1 d2] array in Hz. It is intended for the corresponding inter.modes.coupling_mod cell (d1=3, d2=3) or inter.modes.zeeman_mod cell (d1=1, d2=3). These dimensions describe the interaction parameter data, not atoms or modes. The routine returns raw Taylor derivatives; Spinach applies the Taylor-series one-half factor internally for second-order terms. Derivative data in wavenumbers or meV must first be converted to Hz with icm2hz.m or mev2hz.m. Zero and negative frequencies are rejected because the zero-point scaling is undefined.
 
-- mode_derivs -derivatives with respect to dimensionless
-- mode coordinates, in Hz, a [d1 d2] array
-- to be placed into the corresponding cell
-- of inter.modes.coupling_mod (d1=3, d2=3)
-- or inter.modes.zeeman_mod (d1=1, d2=3)
-- Note: raw Taylor derivatives are returned; the 1/2 factors of
-- the Taylor expansion are applied by Spinach internally.
-- Derivative data in wavenumbers or meV should be conver-
-- ted into Hz with icm2hz.m or mev2hz.m beforehand. Zero
-- and negative frequency modes are rejected because their
-- zero-point scaling is undefined.
+## Source-supported use
 
-## Implementation structure
-
-- Converts Cartesian derivatives of spin Hamiltonian parameters,
-- as produced by electronic structure theory packages, into the
-- derivatives with respect to dimensionless mode coordinates that
-- the bosonic mode specification interface of create.m expects in
-- inter.modes.coupling_mod and inter.modes.zeeman_mod fields. The
-- dimensionless coordinate of each mode is (a+a')/sqrt(2), and the
-- Cartesian displacement that it produces on a degree of freedom
-- with mass m is scaled by sqrt(hbar/(m*omega)), where omega is
-- the angular frequency of the mode. Syntax:
-- mode_derivs=cart2mode(cart_derivs,eigvecs,masses,frqs)
-- cart_derivs -first derivatives of an interaction with
-- respect to Cartesian displacements, in Hz
+The documented call is mode_derivs=cart2mode(cart_derivs,eigvecs,masses,frqs). The input descriptions above are the examples of supported first- and second-order array layouts given by the source; no concrete numerical dataset is supplied.

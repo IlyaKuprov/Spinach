@@ -4,30 +4,18 @@
 
 ## Purpose
 
-NOESY spectrum of 13C methanol. J-couplings from Pecul and Helgaker, CSA tensors from DFT. Note the presence of cross-peaks between 13C doublet components. Calculation time: seconds
+Simulates a two-dimensional proton NOESY spectrum for the methanol spin system built from the vacuum-DFT log. The isotope map retains 13C and 1H, then the script removes the terminal OH proton, leaving the three methyl protons and 13C. The source identifies the J-couplings as values from Pecul and Helgaker and the CSA tensors as DFT-derived; it specifically notes cross-peaks between the two 13C-coupled doublet components. The field setting is `14.1`. The example header estimates seconds for calculation time.
 
-## Physical / mathematical content
+## Spin model and sequence
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+All four chemical shifts are placed on resonance. The script assigns scalar-coupling values of `141` between 13C and each of the three protons, and `-11` between each proton pair; the example does not label units for these assignments. Redfield relaxation is used with IME equilibrium, temperature `298`, `rlx_keep='kite'`, and `tau_c={50e-12}`. The basis is the full `sphten-liouv` formalism with `approximation='none'`. The NOESY simulation requests equilibrium density through `needs={'rho_eq'}` and uses `parameters.spins={'1H'}`.
 
-## Numerical / algorithmic content
+The sequence settings are mixing time `0.5`, offset `0`, sweep `[300 300]`, `[256 256]` acquired points, and `[1024 1024]` zero-fill sizes. The axis units are ppm. These values are reproduced as source literals; the example does not attach units to the mixing-time, offset, or sweep assignments.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Propagation and processing
 
-## Implementation structure
+`liquid(...,@noesy,...,'nmr')` propagates the NOESY sequence. The cosine and sine FIDs are each apodised with `sqcos` in both dimensions. The script forms the States signal as cosine minus `i` times sine, Fourier-transforms the indirect dimension and then the direct dimension using the specified zero-fill lengths, and plots the negative real part. The source specifically mentions cross-peaks between the 13C-coupled doublet components but supplies no numerical cross-peak intensities or cross-relaxation rates.
 
-- NOESY spectrum of 13C methanol. J-couplings from Pecul and Helgaker,
-- CSA tensors from DFT. Note the presence of cross-peaks between 13C
-- doublet components.
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Remove the OH proton
-- Put all chemical shifts on resonance
-- Magnet field
-- Assign J-couplings
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noesy_methanol.m)

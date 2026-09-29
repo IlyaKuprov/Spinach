@@ -4,28 +4,20 @@
 
 ## Purpose
 
-Pulse-acquire 1H NMR spectrum of anti-3,5-difluoroheptane with a manual basis set specification as a merger of Lie algebras of the user-specified structral fragments followed by symmetry fac- torisation and conservation law screening. See our paper: for further information. Calculation time: minutes, faster with a GPU.
+Simulates a one-dimensional pulse-acquire 1H NMR spectrum for anti-3,5-difluoroheptane. The manually specified 23-spin isotope list contains seven 12C, fourteen 1H, and two 19F spins. The source cites [DOI 10.1021/acs.joc.4c00670](https://doi.org/10.1021/acs.joc.4c00670) for the manual basis construction; its header estimates minutes for calculation time and says it is faster with a GPU.
 
-## Physical / mathematical content
+## Spin model and acquisition
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The field setting is `11.7464`. The source assigns proton chemical-shift values `1.0092` and `4.6834`. It sets the two 19F shift entries to `0.0000` and comments that the actual value is `-184.1865`, but is zeroed because that value does not matter here and the calculation is faster. Scalar couplings are entered explicitly in the example; their units are not labelled.
 
-## Numerical / algorithmic content
+The basis is `sphten-liouv` with `IK-0` and `inter_level=1`. Three manual fragment memberships are specified, with `S3` symmetry for spin groups `[14 15 16]` and `[21 22 23]`; the basis also sets `longitudinal={{'19F'}}` and `projections={1}`. The code disables ZTE. A GPU enable statement is present only as a comment and is not active. No relaxation model is configured in this example.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The acquisition selects `{'1H'}`, sets both initial state and receiver coil to `state(spin_system,'L+','1H')`, and leaves the decoupling list empty. Offset is `1400`, sweep `2500`, acquired points `4096`, zero fill `16536`, and the axis is in ppm with `invert_axis=1`. The code does not label units for the field, offset, or sweep literals.
 
-## Implementation structure
+## Propagation and processing
 
-- Pulse-acquire 1H NMR spectrum of anti-3,5-difluoroheptane with
-- a manual basis set specification as a merger of Lie algebras of
-- the user-specified structral fragments followed by symmetry fac-
-- torisation and conservation law screening. See our paper:
-- for further information.
-- Calculation time: minutes, faster with a GPU.
-- Magnet induction
-- Isotopes
-- Chemical shifts
-- J-couplings
-- Basis set
-- GPU is useful here
+The pulse-acquire sequence is propagated with `liquid(...,@acquire,...,'nmr')`. The FID is apodised with `exp` and parameter `5`, Fourier-transformed, and plotted as the real spectrum with the frequency axis inverted. The source supplies no numerical peak positions or intensities.
+
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pa_difluoroheptane_anti.m)

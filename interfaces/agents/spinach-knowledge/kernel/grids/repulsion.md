@@ -1,49 +1,17 @@
 # kernel/grids/repulsion.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/repulsion.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=repulsion.m) · [Bak–Nielsen reference](http://dx.doi.org/10.1006/jmre.1996.1087)
+
 - Signature: `[alphas,betas,gammas,weights]=repulsion(npoints,ndims,niter)`
+- Inputs: positive integer `npoints` and `niter`; `ndims` must be `2`, `3`, or `4`.
+- Outputs: four `npoints x 1` columns. Angles are in radians; each `weights` entry is `1/npoints`, so the weights sum to one. They are uniform, not SHREWD-optimised.
 
-## Purpose
+The function starts with `rand(ndims,npoints)-0.5`, then repeats exactly `niter` updates. For each point pair it forms a normalised difference vector, sets non-finite entries from self-interactions to zero, and multiplies by the corresponding entries of `R'*R`; summing over partners gives `F`. It updates `R_new=R-ndims*F/npoints` and normalises every column to unit length. The initial random coordinates are not projected before the first update. The source prints the maximum displacement each iteration and does not stop on convergence.
 
-Generates repulsion grids on a unit hypersphere. See the paper by Bak and Nielsen (http://dx.doi.org/10.1006/jmre.1996.1087) to get further information on the algorithm involved. Syntax: [alphas,betas,gammas,weights]=repulsion(npoints,ndims,niter)
+Angle mapping depends on `ndims`:
 
-## Physical / mathematical content
+- `2`: `betas=atan2(R(2,:),R(1,:))'`; `alphas` and `gammas` are zero columns. This is a one-angle circle grid.
+- `3`: from `cart2sph`, `betas=theta+pi/2`, `gammas=phi`, and `alphas` is zero. With no output arguments, this branch also plots the grid.
+- `4`: rows of `R` become the `u,i,j,k` components of quaternion records, which `qter2euler` converts to Euler angles.
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- npoints -number of points in the resulting spherical grid
-- ndims -hypersphere dimension: 2 returns a single-angle
-- (beta) grid, 3 returns a two-angle grid (alpha,
-- beta), 4 returns a three-angle (alpha,beta,gam-
-- ma) spherical grid
-- niter -number of repulsion interations (simple clipped
-- gradient descent at the moment)
-
-## Outputs
-
-- alphas -alpha Euler angles of the grid, in radians,
-- zeros for two-angle grids
-- betas -beta Euler angles of the grid, in radians
-- gammas -gamma Euler angles of the grid, in radians,
-- zeros for single-angle grids
-- weights -point weights of the grid
-- Note: uniform weights are assigned at the moment, use the supp-
-- lied SHREWD function to generate optimal weights.
-
-## Implementation structure
-
-- Generates repulsion grids on a unit hypersphere. See the paper by
-- Bak and Nielsen (http://dx.doi.org/10.1006/jmre.1996.1087) to get
-- further information on the algorithm involved. Syntax:
-- [alphas,betas,gammas,weights]=repulsion(npoints,ndims,niter)
-- npoints -number of points in the resulting spherical grid
-- ndims -hypersphere dimension: 2 returns a single-angle
-- (beta) grid, 3 returns a two-angle grid (alpha,
-- beta), 4 returns a three-angle (alpha,beta,gam-
-- ma) spherical grid
-- niter -number of repulsion interations (simple clipped
-- gradient descent at the moment)
-- alphas -alpha Euler angles of the grid, in radians,
+The initial points depend on MATLAB's random-number state; the function does not seed the generator, so a fixed seed is needed for repeatable starts. It validates the stated scalar ranges but does not impose a convergence test or optimise the returned uniform weights. This function generates orientation grids; it does not calculate eigenfields, time evolution, or frequency offsets.

@@ -1,32 +1,14 @@
 # examples/nmr_solids/static_powder_nqi_a.m
 
 - Signature: `static_powder_nqi_a()`
+- Source: [examples/nmr_solids/static_powder_nqi_a.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/static_powder_nqi_a.m)
 
-## Purpose
+## Purpose and model
 
-Static quadrupolar 14N powder pattern of L-valyl-L-alanine using very large numerical orientation grid, set to reproduce Figure 5 from the paper by O'Dell and Ratcliffe: Calculation time: minutes
+Calculates the static powder 14N NMR pattern of L-valyl-L-alanine. The source says the large orientation grid is intended to reproduce Figure 5 of O'Dell and Ratcliffe ([DOI](https://doi.org/10.1016/j.cplett.2011.08.030)); its runtime estimate is minutes.
 
-## Physical / mathematical content
+Two 14N spins are assigned separate quadrupolar interactions with `eeqq2nqi`: values 1.24e6 and 3.06e6, asymmetries 0.22 and 0.40, respectively. The field parameter is 21.1. A full Zeeman Hilbert-space basis is used with no approximation. `powder` performs the static orientation average on `icos_2ang_163842pts`; no rotor or gradient parameters are set.
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## Acquisition and processing
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Static quadrupolar 14N powder pattern of L-valyl-L-alanine using
-- very large numerical orientation grid, set to reproduce Figure 5
-- from the paper by O'Dell and Ratcliffe:
-- Calculation time: minutes
-- System specification
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The NMR acquisition selects 14N with offset 0, sweep 6e6, 512 acquired points, and 2048-point zero-fill. The frequency-axis setting is MHz and the axis is inverted. The initial and detection states are both 14N `L+`. The powder FID is exponentially apodised with parameter 6, Fourier transformed, and plotted using its real part.

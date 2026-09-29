@@ -1,43 +1,33 @@
 # kernel/utilities/dihedral.m
 
-- Signature: `phi=dihedral(A,B,C,D)`
-
 ## Purpose
 
-Computes the dihedral angle between vectors specified by the four sets of atomic coordinates. The atoms are assu- med to be bonded as A-B-C-D. Syntax: phi=dihedral(A,B,C,D)
+Computes the dihedral angle between vectors specified by four sets of atomic coordinates, for atoms assumed to be bonded as A-B-C-D.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dihedral.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `phi=dihedral(A,B,C,D)`.
+- The function first validates its arguments via an internal consistency check (`grumble`), which errors with the message `'the arguments must be 3-element row vectors of real numbers.'` if any argument is non-numeric, non-real, does not contain exactly 3 elements, or is not a row vector.
+- Unit direction vectors are formed along the three bonds: `b1=(B-A)/norm(B-A,2)`, `b2=(C-B)/norm(C-B,2)`, `b3=(D-C)/norm(D-C,2)`.
+- The dihedral angle is computed as `phi=180*atan2(dot(norm(b2,2)*b1,cross(b2,b3)),dot(cross(b1,b2),cross(b2,b3)))/pi`, i.e. via a two-argument arctangent of a dot product against a cross product, converted from radians to degrees by the factor `180/pi`.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- A -row vector of cartesian coordinates
-- for atom A
-- B -row vector of cartesian coordinates
-- for atom B
-- C -row vector of cartesian coordinates
-- for atom C
-- D -row vector of cartesian coordinates
-- for atom D
+Inputs:
 
-## Outputs
+- `A` — row vector of Cartesian coordinates for atom A.
+- `B` — row vector of Cartesian coordinates for atom B.
+- `C` — row vector of Cartesian coordinates for atom C.
+- `D` — row vector of Cartesian coordinates for atom D.
 
-- phi -dihedral angle, degrees
+Each must be a 3-element row vector of real numbers.
 
-## Implementation structure
+Output:
 
-- Computes the dihedral angle between vectors specified by
-- the four sets of atomic coordinates. The atoms are assu-
-- med to be bonded as A-B-C-D. Syntax:
-- phi=dihedral(A,B,C,D)
-- A - row vector of cartesian coordinates
-- for atom A
-- B - row vector of cartesian coordinates
-- for atom B
-- C - row vector of cartesian coordinates
-- for atom C
-- D - row vector of cartesian coordinates
-- for atom D
+- `phi` — dihedral angle, in degrees.
+
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=dihedral.m>

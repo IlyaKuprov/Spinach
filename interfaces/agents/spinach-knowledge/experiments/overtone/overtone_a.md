@@ -1,51 +1,17 @@
 # experiments/overtone/overtone_a.m
 
-- Signature: `spectrum=overtone_a(spin_system,parameters,H,R,K)`
+MATLAB source: [experiments/overtone/overtone_a.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/overtone/overtone_a.m)
 
-## Purpose
+This function acquires an overtone signal in the frequency domain. Its input `spins` is a single-element cell array naming the overtone-active nucleus. The function does not implement overtone cross-polarisation or a pseudocontact-tensor calculation; it prepares an overtone frequency and delegates acquisition to `slowpass`.
 
-Overtone signal acquisition experiment in the frequency domain. Syntax: spectrum=overtone_a(spin_system,parameters,H,R,K)
+## Inputs and frequency mapping
 
-## Physical / mathematical content
+`spectrum=overtone_a(spin_system,parameters,H,R,K)` requires `spins`, `sweep`, `npoints`, `rho0`, and `coil`, together with the context-supplied matrices `H`, `R`, and `K`. `sweep` is a two-element frequency interval in Hz around the overtone frequency, and `npoints` is the requested positive integer sample count.
 
-- Overtone experiment implementations. These routines excite or detect high-order quadrupolar transitions and therefore combine non-secular quadrupolar terms, MAS or field effects, and specialised detection pathways.
+The source computes `ovt_frq=-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`, replaces the sweep with `ovt_frq-parameters.sweep`, then calls `slowpass`. Thus the frequency remapping is explicit in the code; the mapped endpoints are passed to the acquisition routine without additional pulse or tensor construction in this function.
 
-## Numerical / algorithmic content
+## Output and limits
 
-## Parameters / inputs
+`spectrum` is the frequency-domain signal for the supplied starting state and detection coil, with `npoints` samples. The source notes that relaxation must be present for the `slowpass` matrix inversion and that `R` should not be thermalised. It does not specify a field-orientation or MAS sweep here.
 
-- parameters.spins overtone-active nucleus, specified as a
-- single-element cell array
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz around the overtone frequency
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- spectrum -the spectrum of the system with the specified
-- starting state detected on the specified coil
-- state within the frequency interval requested
-- Note: relaxation must be present in the system dynamics, or the matrix
-- inversion operation in the slowpass call would fail. The relaxa-
-- tion superoperator R must *not* be thermalised.
-
-## Implementation structure
-
-- Overtone signal acquisition experiment in the frequency domain. Syntax:
-- spectrum=overtone_a(spin_system,parameters,H,R,K)
-- parameters.spins overtone-active nucleus, specified as a
-- single-element cell array
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz around the overtone frequency
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
+https://spindynamics.org/wiki/index.php?title=overtone_a.m

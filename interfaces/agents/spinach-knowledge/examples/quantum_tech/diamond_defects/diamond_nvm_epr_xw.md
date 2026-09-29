@@ -1,30 +1,17 @@
 # examples/quantum_tech/diamond_defects/diamond_nvm_epr_xw.m
 
-- Signature: `diamond_nvm_epr_xw()`
+[Source MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/diamond_defects/diamond_nvm_epr_xw.m)
 
-## Purpose
+## Physical model
 
-Field-swept powder EPR spectra of an NV centre in diamond at X and W bands. Calculation time: seconds.
+This is a conventional powder EPR field sweep for the negatively charged nitrogen-vacancy centre in diamond, using its ground-state model. The example chooses 14N and orientation 111. The model builder defines an electron spin triplet (Spinach electron label `E3`, S = 1) coupled to a 14N nucleus (I = 1); its spin Hamiltonian contains electron zero-field splitting, nitrogen hyperfine coupling, and nitrogen quadrupolar coupling. `parameters.spins={'E3'}` selects the electron-spin EPR transitions, with nuclear-spin structure affecting their positions and intensities.
 
-## Physical / mathematical content
+No cavity mode, Jaynes–Cummings/Tavis–Cummings interaction, vacuum-Rabi coupling, detuning, driven cavity dynamics, or dissipation appears in this example. The microwave frequency is used for the resonance condition in a magnetic-field sweep; the script specifies no drive amplitude or time-dependent observable. This is not a cavity-device simulation and does not imply measured performance or device fidelity.
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+## Calculation and plotted quantity
 
-## Numerical / algorithmic content
+The full Zeeman Hilbert basis is used (`zeeman-hilb`, `approximation='none'`), with spherical grid `rep_2ang_100pts_sph`. The source sets `sys.magnet` to 1 T, and `fieldsweep` runs at 9.5 GHz over 0.1–0.5 T and at 94 GHz over 3.2–3.5 T. Both sweeps use 0.001 T FWHM, integration tolerance 1e-4, transition-moment tolerance 0.01, RSPT order `Inf`, and 512 field points. The plotted arrays are simulated EPR intensity in arbitrary units against returned magnetic-field axes, not experimental spectra or time traces. This example plots the `fieldsweep` output rather than declaring a separate observable operator.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Parameter provenance
 
-## Implementation structure
-
-- Field-swept powder EPR spectra of an NV centre
-- in diamond at X and W bands.
-- Calculation time: seconds.
-- Set NV centre parameters
-- Build the spin system
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- EPR sim parameters
-- Set X-band parameters
-- Run the X-band simulation
-- Plot the X-band spectrum
+The ground-state NV magnetic parameters are attributed by `diamond_nvm_gs` to Felton et al., *Physical Review B* 79, 075203 (2009), [doi:10.1103/PhysRevB.79.075203](https://doi.org/10.1103/PhysRevB.79.075203).

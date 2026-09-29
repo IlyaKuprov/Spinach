@@ -1,31 +1,25 @@
 # examples/imaging/slice_select_1d_shaped.m
 
-- Signature: `slice_select_1d_shaped()`
+- MATLAB implementation: [examples/imaging/slice_select_1d_shaped.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/slice_select_1d_shaped.m)
 
 ## Purpose
 
-Slice selection example using a one-dimensional sample and a shaped slice selection pulse in the presence of diffusion and flow. Calculation time: seconds. Ahmed Allami Ilya Kuprov
+This zero-argument example models one-dimensional slice selection with a Gaussian-shaped RF pulse while diffusion and flow are included in the imaging parameters. The source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Spin, relaxation, and spatial model
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system is one 1H at 5.9 T with zero chemical shift. It uses diagonal T1/T2 relaxation, zero equilibrium, and rate values r1=30 and r2=70; the example does not attach units to these rates. The basis uses sphten-liouv without an approximation.
 
-## Numerical / algorithmic content
+The sample extent is 0.30 on a 500-point grid, and the signal uses 128 points. The example sets both slice-selection and readout gradient amplitudes to 30e-3; the sequence callback documentation specifies T/m for the slice-selection gradient. The source does not label the sample-extent unit. The initial-state and receive-coil spatial profiles are uniform, with Lz initial state and L+ detection for 1H.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Shaped pulse, transport, and readout
 
-## Implementation structure
+The RF pulse is represented by 50 steps over a total duration of 0.5e-4 s. Its frequency is +100e3 Hz, phase is pi/2, and per-step amplitudes are 2*pi*20000 multiplied by the Gaussian profile returned by pulse_shape. The sequence callback documentation specifies RF amplitude in rad/s and pulse duration in seconds; each step receives duration 0.5e-4/50 s. Maximum rank is 3. The flow-field vector is set to 1e-2 at every point and the diffusion parameter is 5e-6; the example does not state units for either value.
 
-- Slice selection example using a one-dimensional sample and
-- a shaped slice selection pulse in the presence of diffusion
-- and flow.
-- Calculation time: seconds.
-- Ahmed Allami
-- Ilya Kuprov
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Relaxation model
-- Basis set
-- Spinach housekeeping
+The example calls imaging with slice_select_1d in the imaging context, applies square-sine apodisation, computes a real shifted Fourier transform, and plots the resulting one-dimensional profile. It supplies transport parameters but does not state a numerical simulation outcome.
+
+## Source
+
+[Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/slice_select_1d_shaped.m) · [Imaging callback](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/slice_select_1d.m)
+
+The source credits Ahmed Allami and Ilya Kuprov.

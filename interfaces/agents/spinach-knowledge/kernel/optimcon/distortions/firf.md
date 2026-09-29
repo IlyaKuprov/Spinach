@@ -1,47 +1,23 @@
 # kernel/optimcon/distortions/firf.m
 
-- Signature: `[w,J]=firf(w,ker)`
+- Signature: [w,J]=firf(w,ker)
+- MATLAB source: [firf.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/firf.m)
 
 ## Purpose
 
-Applies an FIR convolution filter to a Spinach optimal control module waveform. Treats odd rows of multi-row waveform arrays as real, and even rows as imaginary, components of a complex signal. The distal end of the convolution is truncated so the output has the same number of samples as the input. Syntax: [w,J]=firf(w,ker)
+Applies a finite-impulse-response convolution filter to each complex control channel in a Spinach optimal-control waveform. The output keeps the input sample count by truncating the distal end of the convolution; leaving sufficient ring-down margin is the user's responsibility.
 
-## Physical / mathematical content
+## Inputs and units
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- w is a real numeric waveform. Columns are time samples; rows are arranged XYXY..., pairing each channel's in-phase X and quadrature Y components. The number of rows must be even.
+- ker is a nonempty numeric vector of FIR coefficients. The implementation accepts complex coefficients as well as real ones. Coefficients multiply waveform samples; no separate coefficient units are specified by the function.
 
-## Numerical / algorithmic content
+## Output and derivative
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+For each channel the paired rows are combined as z=X+iY, filtered by a Toeplitz convolution matrix, then split back into real and imaginary rows. The matrix is lower-triangular in its causal sample ordering. If ker has fewer entries than the waveform has time samples, it is zero-padded to that length; if it has more, only the first number-of-samples entries are used. The returned w has the same dimensions as the input.
 
-## Parameters / inputs
+The optional J is a sparse Jacobian of the vectorised output with respect to the vectorised input. It represents the real-coordinate derivative of the complex linear filter, including the X/Y cross terms when the filter coefficients are complex. No adjoint is returned.
 
-- w -waveform, one time slice per column, and
-- rows arranged as XYXY... with respect to
-- in-phase and quadrature parts on each
-- control channel
-- ker -a vector of FIR filter coefficients
+## References
 
-## Outputs
-
-- w -distorted waveform, same dimension as the
-- input waveform; leaving sufficient ring-
-- down margin is the user's responsibility
-- J -Jacobian matrix with respect to vectorisa-
-- tions of the output and the input arrays
-
-## Implementation structure
-
-- Applies an FIR convolution filter to a Spinach optimal control
-- module waveform. Treats odd rows of multi-row waveform arrays
-- as real, and even rows as imaginary, components of a complex
-- signal. The distal end of the convolution is truncated so the
-- output has the same number of samples as the input. Syntax:
-- [w,J]=firf(w,ker)
-- w -waveform, one time slice per column, and
-- rows arranged as XYXY... with respect to
-- in-phase and quadrature parts on each
-- control channel
-- ker -a vector of FIR filter coefficients
-- w -distorted waveform, same dimension as the
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=firf.m

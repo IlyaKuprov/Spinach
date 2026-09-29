@@ -1,54 +1,27 @@
 # experiments/nmr_liquids/clip_hsqc.m
 
-- Signature: `fid=clip_hsqc(spin_system,parameters,H,R,K)`
+- MATLAB source: [experiments/nmr_liquids/clip_hsqc.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/clip_hsqc.m)
+- Spinach Wiki: [clip_hsqc.m](https://spindynamics.org/wiki/index.php?title=clip_hsqc.m)
+- Sequence reference: [DOI 10.1016/j.jmr.2008.03.009](https://doi.org/10.1016/j.jmr.2008.03.009)
 
 ## Purpose
 
-CLIP-HSQC pulse sequence from:
+This is a liquid-state CLIP-HSQC sequence implementation. It builds a two-dimensional, States-quadrature free-induction signal using forward density-state evolution and backward coil-state evolution. Evolution uses the composed Liouvillian `L=H+1i*R+1i*K`; the receiver branch is propagated with `L'` and negative time increments. This is the code's parameterised sequence design; it does not by itself establish an experimental or run-verified result.
 
-## Physical / mathematical content
+## Inputs and parameters
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+Signature: fid=clip_hsqc(spin_system,parameters,H,R,K)
 
-## Numerical / algorithmic content
+- parameters.sweep: two positive sweep widths [F1 F2] in Hz; the time increments are their reciprocals, in seconds.
+- parameters.npoints: two positive integer point counts [F1 F2].
+- parameters.spins: two isotope labels {F1 F2}, e.g. {'13C','1H'}; the code uses element 1 for F1 and element 2 for F2.
+- parameters.J: one active scalar coupling in Hz. The code derives delta=abs(1/(2*J)), a time in seconds.
+- H, R, and K: same-size Hamiltonian, relaxation, and kinetics matrices supplied by the context function. The implementation requires the sphten-liouv formalism.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Coherence transfer and detection
 
-## Syntax
+The initial state is longitudinal magnetisation on spin F2 and the receiver is its L+ state. The sequence starts with a 90-degree F2 x pulse, evolves for delta/2, applies a simultaneous 180-degree x pulse on F1 and F2, and evolves for another delta/2. Subsequent F2 y and signed F1 x pulses create the two F1 branches. During indirect evolution, the code uses 1/sweep(1) spacing and refocuses with F2 pulses.
 
-```matlab
-fid=clip_hsqc(spin_system,parameters,H,R,K)
-```
+The forward states are coherence-selected for F2 order 0 together with F1 order +1 or -1. The backward-evolved coil branches are selected for F1 order 0 and F2 order +1. Inner products combine the paired branches into fid.pos and fid.neg, the two States-quadrature components over the F1 and F2 sampling dimensions.
 
-## Parameters / inputs
-
-- parameters.sweep [F1 F2] sweep widths, Hz
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins {F1 F2} nuclei (e.g. {'13C','1H'})
-- parameters.J active scalar coupling, Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid -free induction decay. States quadrature detection is
-- used; the two components of the States signal are re-
-- turned in fid.pos and fid.neg
-
-## Implementation structure
-
-- CLIP-HSQC pulse sequence from:
-- fid=clip_hsqc(spin_system,parameters,H,R,K)
-- parameters.sweep [F1 F2] sweep widths, Hz
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins {F1 F2} nuclei (e.g. {'13C','1H'})
-- parameters.J active scalar coupling, Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid -free induction decay. States quadrature detection is
-- used; the two components of the States signal are re-
-- turned in fid.pos and fid.neg
+No MATLAB execution or experimental signal is claimed here.

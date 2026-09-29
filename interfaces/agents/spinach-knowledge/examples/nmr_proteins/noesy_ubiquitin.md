@@ -1,32 +1,15 @@
 # examples/nmr_proteins/noesy_ubiquitin.m
 
-- Signature: `noesy_ubiquitin()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/noesy_ubiquitin.m)
 
-## Purpose
+This example simulates a 1H-1H NOESY spectrum of ubiquitin with a 65 ms mixing time. The source assumes the protein is neither 13C- nor 15N-labelled and estimates hours of calculation time.
 
-1H-1H NOESY spectrum of ubiquitin with 65 ms mixing time. It is assumed that the protein is not 13C-or 15N-labelled. Calculation time: hours.
+## Protein model and sequence settings
 
-## Physical / mathematical content
+The example imports all atoms from 1D3Z.pdb / 1D3Z.bmrb, then removes 13C and 15N spins. It sets sys.magnet=21.1356 (unit not annotated in this source), interaction/proximity cutoffs of 2.0/4.0, and Redfield relaxation with rlx_keep='kite', zero equilibrium, and tau_c=5e-9 (unit not specified). The basis is IK-1 sphten-liouv with scalar-coupling connectivity and inter/proximity levels 4/3.
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The sequence uses liquid with noesy; the source sets tmix=0.065, matching its stated 65 ms mixing time. It also sets offset 4250, sweep settings [11750 11750], 512 points per dimension, and zero-fill sizes [2048 2048]. Those numeric settings are not assigned units in the file; the plotted axes are in ppm. RF pulse widths or phases, contact time, and rotor parameters are not specified.
 
-## Numerical / algorithmic content
+## Simulation and output
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H-1H NOESY spectrum of ubiquitin with 65 ms mixing time. It is
-- assumed that the protein is not 13C-or 15N-labelled.
-- Calculation time: hours.
-- Protein data import
-- Magnet field
-- Tolerances
-- Relaxation theory
-- Basis set
-- Algorithmic options
-- Create the spin system structure
-- Kill carbons and nitrogens (protein assumed unlabelled)
-- Build the basis
+The simulated cosine and sine FIDs are squared-cosine apodised and Fourier-transformed in F2. The States signal is formed as f1_cos-1i*f1_sin before the F1 transform, and the plot shows the negative real part of the 2D spectrum. The PDB/BMRB inputs define the simulated protein model; the example does not read an experimental spectrum or report measured coherence data. No DOI citation appears in the source.

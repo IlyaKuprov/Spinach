@@ -1,31 +1,22 @@
 # examples/fundamentals/perturb_theory.m
 
 - Signature: `perturb_theory()`
+- Source: [examples/fundamentals/perturb_theory.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/perturb_theory.m)
 
 ## Purpose
 
-Rayleigh-Schrodinger and Van Vleck perturbation theory modules test. Eigenvector representations differ in the two theories, but the energies are the same.
+Compare Rayleigh-Schrodinger perturbation theory (RSPT) and Van Vleck perturbation theory (VVPT) for the energies and eigenvectors of the same finite Hermitian perturbation problem. The source describes the eigenvector representations as different while the energies agree; the example compares both perturbative results with direct diagonalisation.
 
-## Physical / mathematical content
+## Model and assumptions
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The no-argument script uses a 512-dimensional `pauli(512)` operator, with `H0=full(sigma.z)` as the source's Zeeman term. It generates a dense random complex matrix `X` and forms the Hermitian perturbation `H1=(1/25)*(X+X')/2`; there is no fixed random seed in the function. It is a numerical comparison on this constructed matrix, not a spin-system simulation or a statistical study.
 
-## Numerical / algorithmic content
+## Checks and output
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+For each order 1 through 10, `rspert(diag(H0),H1,n)` and `vvpert(diag(H0),H1,n)` provide energies, which are sorted in descending order. The exact comparator is the sorted real spectrum of `H0+H1`. The plotted energy residual is the relative 2-norm of the difference between the exact energy vector and the zero-order or nth-order perturbative vector, divided by the exact energy-vector norm. A second plot compares eigenvector overlaps with the exact eigenvectors (sorted by their eigenvalues); RSPT supplies eigenvectors directly, whereas the VVPT output is a generator that the script exponentiates with `expm` before comparison. The overlap residual uses `norm(abs(V'*V_inf)-eye(size(V)),2)`, making it insensitive to eigenvector phase.
 
-## Implementation structure
+The script plots both residual sequences against orders 0 through 10 on logarithmic vertical axes. It does not specify a pass/fail tolerance, print a numerical table, or assert that either method meets a threshold; curve values depend on the random draw.
 
-- Rayleigh-Schrodinger and Van Vleck perturbation theory
-- modules test. Eigenvector representations differ in the
-- two theories, but the energies are the same.
-- Settings
-- H0 -Zeeman interaction
-- H1 -random matrix
-- Energies -perturbation theories
-- Energies -diagonalisation
-- Comparison with diagonalisation
-- Eigensystems, PTs
-- RSPT gets the eigensystem directly
-- VVPT returns a generator that needs exponentiation
+## Callable context
+
+Run `perturb_theory()` with Spinach functions `pauli`, `rspert`, and `vvpert`, plus MATLAB linear algebra and plotting. The function takes no arguments and produces figures rather than returned values.

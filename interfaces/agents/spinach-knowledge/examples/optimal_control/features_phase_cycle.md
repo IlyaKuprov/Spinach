@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is quadrature transverse magnetisation on 19F. A phase cycle is specified: a flip in the phase of the fluorine channel must produce the corresponding flip in the phase of the resulting magne- tisation on 19F. Calculati
+This example configures a state-transfer pulse from proton `Lz` to transverse fluorine magnetisation and a two-row phase cycle. Its stated design check is that changing the phase of the fluorine channel should produce the corresponding phase change in the final ¹⁹F magnetisation. This describes the intended test; source reading does not establish its outcome.
 
-## Physical / mathematical content
+## Spin model and transfer
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The three-spin model contains `1H`, `13C` and `19F` at 9.4 T; each chemical shift is 0.0 ppm. The H–C and C–F scalar couplings are 140 Hz and −160 Hz. The basis is `sphten-liouv` with no approximation. The normalised initial state is `Lz` on proton spin 1; the target is the normalised sum of `L+` and `L-` on fluorine spin 3.
 
-## Numerical / algorithmic content
+## Pulse design and phase-cycle test
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The control set is `Lx/Ly` on all three isotopes, with channel map `[1;1;2;2;3;3]`. The five configured power levels span 0.8–1.2 × 10³ × 2π rad/s. Fifty slices of 0.2 ms give a 10 ms pulse. The script uses the `SNS` penalty with weight 100, `lbfgs`, and a maximum of 100 iterations; the initial guess is a random `6 x 50` array. The phase-cycle matrix has two rows: all-zero phases, then `[0 0 0 pi pi]`. The test code reads column 4 and rotates the fluorine control rows 5:6 by that phase before each simulation.
 
-## Implementation structure
+After optimising, the script simulates each phase-cycle row and calls `stateinfo` on the resulting state. It does not print a scalar fidelity or include observed output, so the intended phase response and convergence are not reported here.
 
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is quadrature
-- transverse magnetisation on 19F.
-- A phase cycle is specified: a flip in the phase of the fluorine channel
-- must produce the corresponding flip in the phase of the resulting magne-
-- tisation on 19F.
-- Calculation time: minutes.
-- Magnetic field
-- Spin system
-- Chemical shifts, ppm
-- Scalar couplings, Hz (literature values)
+Source: [examples/optimal_control/features_phase_cycle.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_phase_cycle.m).

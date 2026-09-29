@@ -1,59 +1,28 @@
 # kernel/plotting/contspacing.m
 
-- Signature: `[all_conts,pos_conts,neg_conts]=...`
+- Source: [kernel/plotting/contspacing.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/contspacing.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=contspacing.m)
+- Signature: `[all_conts,pos_conts,neg_conts]=contspacing(smax,smin,delta,k,signs,ncont)`
 
 ## Purpose
 
-Non-linear adaptive contour spacing. Useful for NMR data where small cross-peaks must be adequately contoured next to large diagonal peaks.
+Builds nonlinear positive and/or negative contour levels so weak cross-peaks can be contoured alongside strong peaks. It returns levels only; it does not plot a spectrum.
 
-## Physical / mathematical content
+## Inputs
 
-## Numerical / algorithmic content
+- `smax`, `smin` — global maximum and minimum spectrum intensities.
+- `delta` — four finite fractions in [0,1], ordered as [positive minimum, positive maximum, negative minimum, negative maximum]. Each pair must be ascending. The documented starting value is `[0.02 0.2 0.02 0.2]`.
+- `k` — positive integer curvature exponent. `k=1` gives linear spacing; `k>1` makes the power curve nonlinear.
+- `signs` — `'positive'`, `'negative'`, or `'both'`.
+- `ncont` — positive integer number of levels on each requested side; 20 is a documented reasonable value.
 
-## Syntax
+## Level construction and ordering
 
-```matlab
-[all_conts,pos_conts,neg_conts]=...
-contspacing(smax,smin,delta,k,signs,ncont)
-```
+For `u=linspace(0,1,ncont)`, positive levels run from `smax*delta(1)` to `smax*delta(2)` using `u.^k`. Negative levels run from `smin*delta(3)` to `smin*delta(4)`; because `smin` is negative, that second endpoint is more negative. With `k>1`, levels cluster toward the start of each progression (the less intense edge of that side). Positive levels are produced only when `smax>0`; negative levels only when `smin<0`; an absent or unrequested side is empty.
 
-## Parameters / inputs
-
-- smax -global maximum intensity in the spectrum
-- smin -global minimum intensity in the spectrum
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the contours above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive conto-
-- urs and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the contour
-- spacing function: k=1 corresponds to linear spacing and
-- k>1 bends the spacing curve to increase the sampling den-
-- sity near the baseline. A reasonable value is 2.
-- signs -can be set to 'positive', 'negative' or 'both' -this
-- will cause the corresponding contours to be returned.
-- ncont -the number of contours, a reasonable value is 20
+The returned arrays are row vectors. `pos_conts` is ascending from lower to higher positive intensity; `neg_conts` is reversed before concatenation, so `all_conts` places the most negative levels first, then the less negative levels, then the positive levels. Empty sides contribute no entries.
 
 ## Outputs
 
-- all_conts -all contour levels, a row vector
-- pos_conts -positive contour levels, a row vector
-- neg_conts -negative contour levels, a row vector
-- Note: the following functions are used to get contour levels
-- pos_conts=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-- neg_conts=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
-
-## Implementation structure
-
-- Non-linear adaptive contour spacing. Useful for NMR data where small
-- cross-peaks must be adequately contoured next to large diagonal peaks.
-- [all_conts,pos_conts,neg_conts]=...
-- contspacing(smax,smin,delta,k,signs,ncont)
-- smax -global maximum intensity in the spectrum
-- smin -global minimum intensity in the spectrum
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the contours above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive conto-
-- urs and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the contour
+- `all_conts` — combined requested levels, ordered from negative to positive.
+- `pos_conts` — positive levels, or an empty array.
+- `neg_conts` — negative levels, or an empty array.

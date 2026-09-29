@@ -1,28 +1,16 @@
 # kernel/includes/end_disallow_gpu.m
 
-- Signature: `(script file)`
+- Signature: script include; reads variables in the shared script workspace
 
-## Purpose
+## Purpose and behaviour
 
-Reinstates GPU arithmetic setting to the previous state after the start_disallow_gpu command had been issued.
+This is the closing include for the GPU-disallow sequence. It requires the variable `user_wanted_gpu`; if that variable does not exist, it errors with a message requiring a preceding `start_disallow_gpu` command. When `user_wanted_gpu` is true, it appends `'gpu'` to `spin_system.sys.enable`. When false, it makes no change. The source does not otherwise restore or validate the enable list, nor does it check for an existing duplicate before appending.
 
-## Physical / mathematical content
+## Source comment attribution
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+The source quotes Юлий Ким, “Истерическая перестроечная” (1988).
 
-## Numerical / algorithmic content
+## Source links
 
-## Implementation structure
-
-- Reinstates GPU arithmetic setting to the previous state after
-- the start_disallow_gpu command had been issued.
-- Check that a disallow command had been called
-- Return GPU policy to its previous state
-- Юлий Ким, "Истерическая
-- перестроечная", 1988
-- Ну ребята, всё ребята,
-- Нету хода нам назад,
-- Оборвалися канаты,
-- Тормоза не тормозят.
-- Вышла фига из кармана,
-- Тут же рухнули мосты,
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/includes/end_disallow_gpu.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=end_disallow_gpu.m)

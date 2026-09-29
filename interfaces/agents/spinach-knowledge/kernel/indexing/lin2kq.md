@@ -4,13 +4,15 @@
 
 ## Purpose
 
-Converts linear serpentine indexing of matrices into their k,q indexing. In base-1 indexing convention: (1,1)(1,2)(1,3) (1)(3)(6) (2,1)(2,2)(2,3) <=> (2)(5)(8) (3,1)(3,2)(3,3) (4)(7)(9) and in base 0 indexing convention: (0,0)(0,1)(0,2) (0)(2)(5) (1,0)(1,1)(1,2) <=> (1)(4)(7) (2,0)(2,1)(2,2) (3)(6)(8)
+Converts each linear serpentine matrix index back into its row and column coordinates. For an N-by-N matrix, the serpentine ordering runs over increasing row-plus-column diagonals, with row decreasing within each diagonal. The original 3-by-3 index maps are `[1 3 6; 2 5 8; 4 7 9]` in base 1 and `[0 2 5; 1 4 7; 3 6 8]` in base 0. For example, base 1 index 5 maps to (2,2); base 0 index 4 maps to (1,1).
 
 ## Physical / mathematical content
 
-- Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
+This is an indexing conversion only. It does not change matrix values, represent an interaction, or act on a physical state or operator. The inputs and outputs are dimensionless indices, so no sign or unit convention applies.
 
 ## Numerical / algorithmic content
+
+The function builds `S=serpentine(N,idx_base)`. For every element of `I`, it finds the row and column of the matching entry in `S`. With base 0, it subtracts one from the row and column returned by MATLAB's one-based array lookup. Both outputs preserve the size of `I`.
 
 ## Syntax
 
@@ -20,29 +22,16 @@ Converts linear serpentine indexing of matrices into their k,q indexing. In base
 
 ## Parameters / inputs
 
-- N -matrix dimension
-- I -linear serpentine indices, an
-- array of integers
-- idx_base -indexing base, 0 or 1
+- `N` - positive integer matrix dimension, supplied as a scalar.
+- `I` - numeric real integer array of linear indices. The inclusive range is `idx_base:N^2-1+idx_base`.
+- `idx_base` - scalar numeric real indexing base, either 0 or 1.
 
 ## Outputs
 
-- K -row indices, an array of the
-- same size as I
-- Q -col indices, an array of the
-- same size as I
+- `K` - row indices, with the same size as `I`.
+- `Q` - column indices, with the same size as `I`.
 
-## Implementation structure
+## Sources
 
-- Converts linear serpentine indexing of matrices into their
-- k,q indexing. In base-1 indexing convention:
-- (1,1)(1,2)(1,3) (1)(3)(6)
-- (2,1)(2,2)(2,3) <=> (2)(5)(8)
-- (3,1)(3,2)(3,3) (4)(7)(9)
-- and in base 0 indexing convention:
-- (0,0)(0,1)(0,2) (0)(2)(5)
-- (1,0)(1,1)(1,2) <=> (1)(4)(7)
-- (2,0)(2,1)(2,2) (3)(6)(8)
-- [K,Q]=lin2kq(N,I,idx_base)
-- N -matrix dimension
-- I -linear serpentine indices, an
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/indexing/lin2kq.m) (local path: `kernel/indexing/lin2kq.m`).
+- [Existing Wiki page](https://spindynamics.org/wiki/index.php?title=lin2kq.m).

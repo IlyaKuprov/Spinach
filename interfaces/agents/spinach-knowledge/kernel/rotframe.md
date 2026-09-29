@@ -4,33 +4,31 @@
 
 ## Purpose
 
-Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the formalism described in https://doi.org/10.1063/1.4928978 Syntax: Hr=rotframe(spin_system,H0,H,isotope,order)
+Transforms the laboratory-frame Hamiltonian `H=H0+H1` into a rotating frame referenced to the selected isotope, to the requested perturbation order. The source cites the formalism in [doi:10.1063/1.4928978](https://doi.org/10.1063/1.4928978).
 
 ## Physical / mathematical content
 
+`H0` is the carrier Hamiltonian defining the frame; `H` is the laboratory-frame Hamiltonian `H0+H1`. The selected isotope is a character string such as `'1H'`, and `order` is the perturbation-theory order, which may be `inf`. The source computes the period from the isotope gyromagnetic ratio and field: `T=-2*pi/(spin(isotope)*spin_system.inter.magnet)` for Liouville-space formalisms and `T=-4*pi/(spin(isotope)*spin_system.inter.magnet)` for Hilbert-space formalisms.
+
 ## Numerical / algorithmic content
 
-Numerical frames reject all spins under `nmr` and `cavity`; electrons under `esr`, `deer`, `deer-zz`, and `spin-phonon`; and spin-half nuclei under `qnmr`. Nuclei under electron-only rotating sets and higher-spin nuclei under `qnmr` remain in the laboratory frame and may be transformed. `labframe` retains all spin carriers. Numerical frames are not implemented for `se_dnp_h+`, `se_dnp_h-`, or `se_dnp_h0`: `assume` omits all Zeeman interactions from these solid-effect components, so they do not supply the laboratory Hamiltonian H0+H1 required by this transformation. This refusal does not alter the component construction or the solid-effect experiment.
+After validating the inputs, the wrapper passes `H0`, `H`, the selected period, and `order` to `intrep`. Both Hamiltonians must be Hermitian, assumption metadata must be present, and the selected isotope must still be in the laboratory frame under those assumptions.
+
+Numerical frames are refused for all spins under `nmr` and `cavity`, electrons under `esr`, `deer`, `deer-zz`, and `spin-phonon`, and spin-1/2 nuclei under `qnmr`. Nuclei under electron-only rotating sets and higher-spin nuclei under `qnmr` remain in the laboratory frame. Carrier-free solid-effect components `se_dnp_h+`, `se_dnp_h-`, and `se_dnp_h0` are not supported as numerical frames because the source identifies them as not being laboratory Hamiltonians of the form `H0+H1`.
 
 ## Parameters / inputs
 
-- spin_system - spin system with assumptions set by `assume`; the selected isotope must still be in the laboratory frame.
-- H0 -carrier Hamiltonian with respect to which the
-- rotating frame transformation is to be done
-- H -laboratory frame Hamiltonian H0+H1 that is to
-- be transformed into the rotating frame
-- isotope -string, such as '1H', specifying the spins
-- with respect to which the transformation is
-- being computed
-- order -perturbation theory order in the rotating
-- frame transformation, this may be inf
+- `spin_system` — spin system with assumptions set by `assume()`.
+- `H0` — carrier Hamiltonian defining the rotating frame.
+- `H` — laboratory-frame Hamiltonian to transform.
+- `isotope` — character string identifying spins used to compute the transformation, for example `'1H'`.
+- `order` — perturbation-theory order; may be `inf`.
 
 ## Outputs
 
-- Hr -rotating frame Hamiltonian
-- Notes: the auxiliary matrix method is massively faster than
-- either commutator series or diagonalisation.
+- `Hr` — rotating-frame Hamiltonian.
 
-## Header notes
+## Source
 
-The auxiliary-matrix method used by `intrep` is faster than the commutator-series and diagonalisation alternatives described in the source. The rotation period follows the selected isotope's gyromagnetic ratio and field, with the Hilbert-space period twice the Liouville-space period. `H` and `H0` must be Hermitian; missing assumption metadata is refused before the numerical transformation.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/rotframe.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rotframe.m)

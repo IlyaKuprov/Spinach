@@ -1,99 +1,22 @@
 # kernel/contexts/powder.m
 
-- Signature: `[answer,sph_grid]=powder(spin_system,pulse_sequence,...`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/powder.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=powder.m)
 
-## Purpose
+## Contract
 
-Static powder interface to pulse sequences. Generates a Liouvillian superoperator, the initial state, the coil state, then passes them on to the pulse sequence function. Syntax: [answer,sph_grid]=powder(spin_system,pulse_sequence,... parameters,assumptions)
+`powder(spin_system,pulse_sequence,parameters,assumptions)` is the static-powder interface; the source directs MAS calculations to `singlerot`. The pulse sequence must be a function handle, and the assumptions string is passed to `assume`. The context constructs the spin Hamiltonian in the chosen basis, the relaxation and kinetics operators, and any requested initial/detection information, then runs the sequence independently at each orientation.
 
-## Physical / mathematical content
+There is no spatial-motion axis in this context: `parameters.spc_dim=1`, and `parameters.spn_dim=size(I,1)` for the Hamiltonian object `I` constructed in the selected spin basis. An orientation grid loaded from `parameters.grid` supplies `alphas`, `betas`, `gammas`, and `weights`. The three Euler angles rotate anisotropic spin-system contributions for each powder point; a function-handle initial state receives the angles in the ZYZ active convention. When `parameters.sum_up` is true, the outputs are summed with the grid weights; otherwise `answer` is a cell array with one pulse-sequence result per orientation. `sph_grid` returns the grid angles and weights.
 
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
+## Parameters and assumptions
 
-## Numerical / algorithmic content
+- `parameters.grid` is required and names a spherical grid file in `kernel/grids`.
+- `parameters.spins` lists spin channels, for example `{'1H','13C'}`; matching `parameters.offset` entries are transmitter offsets in Hz. If offsets are omitted, they default to zero.
+- `parameters.rho0` may be a spin state or a function handle of the three Euler angles. The source also supports the `iso_eq` and `aniso_eq` equilibrium requests; they cannot be combined with each other or with a supplied `rho0`.
+- `parameters.needs` may request `iso_eq`, `aniso_eq`, or `zeeman_op`; the latter supplies the orientation-specific Hermitian Zeeman Hamiltonian as `localpar.hzeeman` to the sequence. The two equilibrium requests are mutually exclusive. Omitted `parameters.decouple` defaults to no decoupling.
+- `parameters.rframes` can request rotating-frame transformations, for example `{{'13C',2},{'14N',3}}` specifies second order for carbon-13 and third order for nitrogen-14; the source header requires the respective spins to use laboratory-frame assumptions.
+- The context evaluates orientations in parallel when available unless `parameters.serial` disables that parallelisation.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Source-supported example
 
-## Parameters / inputs
-
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- parameters.spins -a cell array giving the spins that the
-- pulse sequence works on, in the order
-- of channels, e.g. {'1H','13C'}
-- parameters.offset -a cell array giving transmitter offsets
-- in Hz on each of the spins listed in
-- parameters.spins
-- parameters.grid -name of the spherical averaging grid
-- file (see the grids directory in the
-- kernel).
-- parameters.rframes -rotating frame specification, e.g.
-- {{'13C',2},{'14N,3}} requests second
-- order rotating frame transformation
-- with respect to carbon-13 and third
-- order rotating frame transformation
-- with respect to nitrogen-14. When
-- this option is used, the assumptions
-- on the respective spins should be
-- laboratory frame.
-- parameters.needs -a cell array of strings specifying ad-
-- ditional information required by the
-- sequence:
-- 'zeeman_op' -Zeeman part of the Hami-
-- ltonian in the laboratory frame, to be
-- placed into parameters.hzeeman and sent
-- to the pulse sequence
-- 'iso_eq' -thermal equilibrium is com-
-- computed using the isotropic part of
-- the Hamiltonian, and sent to the pulse
-- sequence via parameters.rho0
-- 'aniso_eq' -thermal equilibrium is re-
-- computed using the full anisotropic Ha-
-- miltonian at each orientation, and sent
-- to pulse sequence via parameters.rho0
-- parameters.rho0 -initial state; may be a function handle
-- that depends on the three Euler angles
-- in ZYZ active convention
-- parameters.serial -if set to true, disables automatic pa-
-- rallelisation
-- parameters.sum_up -if set to false, causes the pulse sequ-
-- ence output at each orientation to be
-- returned instead of the powder average
-- parameters.* -additional subfields may be required by
-- the pulse sequence -check its documen-
-- tation page
-- assumptions -context-specific assumptions ('nmr', 'epr',
-- 'labframe', etc.) -see the pulse sequence
-- header for information on this setting.
-
-## Outputs
-
-- answer -powder average of whatever it is that the pulse
-- sequence returns; if parameters.sum_up is set to
-- false, a cell array of outputs at each orienta-
-- tion is returned
-- sph_grid -powder averaging grid data structure with three
-- Euler angles and weights for each point
-- Note: THIS IS FOR STATIC POWDERS -use singlerot for MAS simulations.
-- Note: arbitrary order rotating frame transformation is supported, inc-
-- luding infinite order. See the header of rotframe.m for further
-- information.
-- Note: the function supports parallel processing via Matlab's Distri-
-- buted Computing Toolbox -different system orientations are eva-
-- luated on different labs.
-
-## Implementation structure
-
-- Static powder interface to pulse sequences. Generates a Liouvillian
-- superoperator, the initial state, the coil state, then passes them
-- on to the pulse sequence function. Syntax:
-- [answer,sph_grid]=powder(spin_system,pulse_sequence,...
-- parameters,assumptions)
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- parameters.spins -a cell array giving the spins that the
-- pulse sequence works on, in the order
-- of channels, e.g. {'1H','13C'}
-- parameters.offset -a cell array giving transmitter offsets
+`examples/nqr/pure_nqr_iodine.m` runs a static powder NQR calculation for one 127I nucleus (spin 5/2), using a 560 MHz quadrupole interaction, asymmetry 0.01, the `rep_2ang_200pts_sph` grid, and 512 points. It requests orientation-dependent equilibrium with `parameters.needs={'aniso_eq'}`.

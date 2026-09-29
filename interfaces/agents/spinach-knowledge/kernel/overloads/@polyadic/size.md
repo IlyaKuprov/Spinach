@@ -1,37 +1,13 @@
 # kernel/overloads/@polyadic/size.m
 
-- Signature: `varargout=size(p,dim)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/size.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=polyadic/size.m)
 
-## Purpose
+## Signatures and results
 
-Returns the size of the matrix represented by the polyadic. Syntax: answer=size(p,dim)
+- `size(p)` with zero or one requested output returns the two-element row vector `[nrows ncols]`.
+- `[nrows,ncols]=size(p)` returns the row and column dimensions separately.
+- `size(p,dim)` returns the requested dimension for `dim` equal to `1` (rows) or `2` (columns).
 
-## Physical / mathematical content
+For rows, the method uses the row count of `p.prefix{1}` when a prefix exists; otherwise it multiplies the row dimensions of the factors in the first core term. For columns, it uses the column count of the last suffix factor when a suffix exists; otherwise it multiplies the column dimensions of the factors in the first core term. Thus the factorised dimensions are computed from stored factors without opening the Kronecker products. The method obtains dimensions from the first core term.
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- p -a polyadic object
-- dim -dimension whose size is required
-
-## Outputs
-
-- answer -a vector with one or two elements
-
-## Implementation structure
-
-- Returns the size of the matrix represented by the polyadic. Syntax:
-- answer=size(p,dim)
-- p -a polyadic object
-- dim -dimension whose size is required
-- answer -a vector with one or two elements
-- Check consistency
-- Get row dimension
-- The leftmost matrix in the prefix
-- The cores of the polyadic
-- Get column dimension
-- The rightmost matrix in the suffix
-- Compose the answer
+When `dim` is supplied it must be a scalar equal to `1` or `2`; otherwise the method raises `for a polyadic object, dim must be 1 or 2`. Call/output combinations that reach the function’s explicit fallback branch raise `invalid call syntax.` The source has no separate two-result branch when `dim` is supplied. This overload only inspects factor sizes; it does not multiply, conjugate, or broadcast factors. Related pages: [polyadic representation](./polyadic.md), [prefix](./prefix.md), and [simplify](./simplify.md).

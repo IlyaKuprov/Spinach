@@ -1,32 +1,23 @@
 # kernel/conventions/transforms/kelvin2hz.m
 
-- Signature: `hz=kelvin2hz(kelvin)`
+MATLAB source: [kernel/conventions/transforms/kelvin2hz.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/kelvin2hz.m)
+Spinach Wiki: [kelvin2hz.m](https://spindynamics.org/wiki/index.php?title=kelvin2hz.m)
 
 ## Purpose
 
-Converts Kelvin energy units used for Debye temperatures and thermal energy scales in solid state physics into Hz units preferred in magnetic resonance. Syntax: hz=kelvin2hz(kelvin) Arrays of any dimensions are supported. Parameters: kelvin -an array of values in Kelvin
+Converts temperature-valued energy scales, including Debye temperatures and thermal-energy scales in solid-state physics, to frequency values in hertz used in magnetic resonance.
 
-## Physical / mathematical content
+## Usage
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+`hz = kelvin2hz(kelvin)`
 
-## Numerical / algorithmic content
+## Input and output
 
-## Outputs
+- `kelvin`: a real numeric array of values in kelvin. Arrays of any dimensions are supported.
+- `hz`: the corresponding frequency array in hertz, with the input array's shape.
 
-- hz -an array of values in Hz
+The implementation checks that the input is numeric and real; it does not impose a particular array dimension.
 
-## Implementation structure
+## Conversion
 
-- Converts Kelvin energy units used for Debye temperatures and
-- thermal energy scales in solid state physics into Hz units
-- preferred in magnetic resonance. Syntax:
-- hz=kelvin2hz(kelvin)
-- Arrays of any dimensions are supported. Parameters:
-- kelvin -an array of values in Kelvin
-- hz -an array of values in Hz
-- Check consistency
-- Run the conversion
-- Consistency enforcement
-- When you can measure what you are speaking about, and
-- express it in numbers, you know something about it; but
+The function applies `hz = 1.380649e-23 * kelvin / 6.62607015e-34`, i.e. `hz = (k_B / h) * kelvin`, using the exact SI values for the Boltzmann and Planck constants as written in the source. The conversion factor is approximately 20836619123.3 Hz/K. It returns ordinary frequency in hertz, not angular frequency.

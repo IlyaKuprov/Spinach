@@ -1,29 +1,15 @@
 # examples/kinetics/exchange_asymmetric.m
 
-- Signature: `exchange_asymmetric()`
+## Purpose and callable context
 
-## Purpose
+The no-argument MATLAB function is a compact two-spin asymmetric chemical-exchange example. The source describes a calculation time of seconds. Its numeric settings are given below as written; the source does not annotate units for the magnet field, scalar offsets, kinetic rates, acquisition offset/sweep, or exponential apodisation parameter.
 
-Two-spin asymmetric chemical exchange pattern. Calculation time: seconds.
+## Physical model and parameters
 
-## Physical / mathematical content
+Two 1H spin environments are assigned scalar Zeeman values 0 and 3, with exchange parts `{1,2}`. The rate matrix is `[-500 2000; 500 -2000]`, and the specified concentration weights are `[2000 500]`; the unequal off-diagonal rates make the exchange asymmetric. The source sets `sys.magnet=14.1`. It constructs the `sphten-liouv` basis with approximation `none`.
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Acquisition and observable
 
-## Numerical / algorithmic content
+The initial density operator is the chemical-state-aware 1H raising operator, and the coil operator is the ordinary 1H raising operator. With no decoupling, acquisition calls `liquid` using `@acquire` in NMR mode. The parameters are offset 900, sweep 5000, 512 acquired points and 1024 zero-filled points; the frequency axis is labelled ppm and inverted. The FID is exponentially apodised with parameter 6, Fourier-transformed, and the real part of the shifted spectrum is plotted with `plot_1d`. The source contains no numeric spectrum or measured peak positions, so none are asserted here.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Two-spin asymmetric chemical exchange pattern.
-- Calculation time: seconds.
-- System specification
-- Basis specification
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/exchange_asymmetric.m)

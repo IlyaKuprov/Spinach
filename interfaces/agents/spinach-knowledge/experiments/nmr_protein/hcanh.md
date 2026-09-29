@@ -1,55 +1,33 @@
 # experiments/nmr_protein/hcanh.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_protein/hcanh.m)
+
 - Signature: `fid=hcanh(spin_system,parameters,H,R,K)`
 
 ## Purpose
 
-Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR Spectroscopy", 2nd edition) using pre-set values of J-couplings used in the magnetisation transfer stages. The simulation uses the bidirectional propagation method described in The sequence is hard-wired to work on 1H,13C,15N proteins and uses PDB labels to select spins that will be affected by otherwise ideal pulses. F1 is 1H, F2 is 15N, F3 is 1H. Synt
+Protein-specific H(CA)NH, Figure 7.37 of the second edition of *Protein NMR Spectroscopy*. The implementation uses the bidirectional-propagation method described in [the cited paper](http://dx.doi.org/10.1016/j.jmr.2014.04.002). It is hard-wired for 1H, 13C, and 15N; F1, F2, and F3 are 1H, 15N, and 1H.
 
-## Physical / mathematical content
+## Inputs and spin labels
 
-- Protein triple-resonance sequence implementations. They orchestrate heteronuclear coherence transfers across biomolecular spin networks while preserving phase and acquisition conventions.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `spin_system` must use the `sphten-liouv` formalism. Set protein atom labels to PDB atom IDs such as `CA`, `HA`, and `H` so the sequence can select its pulse and state sites.
+- `parameters.npoints` is a three-integer vector `[n1 n2 n3]` for `[t1 t2 t3]`; `parameters.sweep` is a three-positive-real vector `[f1 f2 f3]`.
+- `parameters.spins` is fixed by the source to `{'1H','15N','1H'}`; it is not a free choice of detected isotopes.
+- `H`, `R`, and `K` are same-size matrices supplied by the context function (Hamiltonian, relaxation, and kinetics matrices).
+- `parameters.rho0` and `parameters.coil` may be supplied. If absent, the code builds `rho0` from longitudinal magnetisation on labels `HA`, `HA1`, `HA2`, or `HA3`, and builds the proton detection state from label `H`.
 
-## Numerical / algorithmic content
+## Coherence selection and transfer
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The source starts from the labelled H-alpha sites, applies a proton pulse, and retains positive and negative 1H coherence for the first States dimension. Its CA/H/N pulse and evolution blocks implement the H(CA)NH transfer; positive and negative 15N coherence are selected for F2, and 1H single-quantum coherence is used for proton detection in F3. This is the source-supported pathway summary; individual transfer/refocusing operations are encoded in the pulse blocks rather than exposed as a user-selectable pathway.
 
-## Parameters / inputs
+## Timing and output
 
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
-- parameters.spins -isotopes affected by ideal broadband
-- pulses, specified as a cell array of
-- strings, e.g. {'1H','15N','1H'}.
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+The J values are hard-coded: `J_ch=140` and `J_nh=92` (Hz). The corresponding `tau1=abs(1/(4*J_ch))` and `delta1=abs(1/(4*J_ch))` (about 1.79 ms); `tau2=abs(1/(4*J_nh))` and `delta3=abs(1/(4*J_nh))` (about 2.72 ms). The other fixed delays are `delta2 = 12.5 ms` and `delta4 = 23.0 ms`. These delays are in seconds in the implementation; the J values are in Hz.
 
-## Outputs
+The returned structure has four FIDs: `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the two sign choices in each of the first two States dimensions. Each array is permuted to `[n3 n2 n1]`, corresponding to `[t3 t2 t1]` after acquisition/detection and stitching.
 
-- fid -a structure with four fields: fid.pos_pos, fid.pos_neg,
-- fid.neg_pos, fid.neg_neg that are used in the subsequ-
-- ent States quadrature processing
-- Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
-- sys.labels for this sequence to work properly.
+## References
 
-## Implementation structure
-
-- Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR
-- Spectroscopy", 2nd edition) using pre-set values of J-couplings
-- used in the magnetisation transfer stages. The simulation uses
-- the bidirectional propagation method described in
-- The sequence is hard-wired to work on 1H,13C,15N proteins and uses
-- PDB labels to select spins that will be affected by otherwise ideal
-- pulses. F1 is 1H, F2 is 15N, F3 is 1H. Syntax:
-- fid=hcanh(spin_system,parameters,H,R,K)
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
+- *Protein NMR Spectroscopy*, 2nd edition, Figure 7.37.
+- [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002).
+- [Spin Dynamics Wiki: hcanh.m](https://spindynamics.org/wiki/index.php?title=hcanh.m).

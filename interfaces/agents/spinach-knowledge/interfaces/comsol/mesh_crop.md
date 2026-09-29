@@ -1,37 +1,17 @@
 # interfaces/comsol/mesh_crop.m
 
-- Signature: `mesh=mesh_crop(mesh,ranges)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/mesh_crop.m) · [Spinach Wiki: mesh_crop.m](https://spindynamics.org/wiki/index.php?title=mesh_crop.m)
 
-## Purpose
+## Purpose and call
 
-2D microfluidic mesh cropping. Updates the mesh object to remove anything outside the user-specified vertex coordi- nate ranges. Syntax: mesh=mesh_crop(mesh,ranges)
+`mesh = mesh_crop(mesh,ranges)` crops a two-dimensional mesh to a rectangular window in its x-y coordinates and returns the updated mesh structure. Coordinate values and any retained per-vertex data remain in their input units; no unit conversion is applied.
 
-## Physical / mathematical content
+## Accepted data and transformation
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+`ranges` must be a two-element cell array, `{[xmin xmax],[ymin ymax]}`. Each bound pair must be numeric, real, contain two elements, and have its first value strictly less than its second. Vertices on either bound are retained. The routine keeps an edge, triangle, or rectangle only when all its vertex indices refer to retained vertices, then remaps those indices to the cropped coordinate arrays.
 
-## Numerical / algorithmic content
+The routine crops `mesh.x` and `mesh.y`, and also crops `mesh.u`, `mesh.v`, and `mesh.c` along their vertex dimension when those fields exist. It removes cached `mesh.vor` and `mesh.plot` fields when present because they refer to the previous mesh. If `mesh.idx.active` already exists, it warns that the list is being overwritten; the new list is the unique vertex indices appearing in the retained triangles.
 
-## Parameters / inputs
+## Output and guardrails
 
-- mesh -Spinach mesh object
-- ranges -{[xmin xmax],[ymin ymax]}
-
-## Outputs
-
-- mesh -updated mesh object
-
-## Implementation structure
-
-- 2D microfluidic mesh cropping. Updates the mesh object to
-- remove anything outside the user-specified vertex coordi-
-- nate ranges. Syntax:
-- mesh=mesh_crop(mesh,ranges)
-- mesh -Spinach mesh object
-- ranges -{[xmin xmax],[ymin ymax]}
-- mesh -updated mesh object
-- Check consistency
-- Remove tessellation and preplot
-- Find vertices in the user-specified range
-- Find edges in the user-specified range
-- Re-index edges with updated vertices
+The returned `mesh` contains the cropped coordinates and reindexed connectivity. The routine explicitly checks for `mesh.idx` and checks the range container, bound types, sizes, and ordering. It does not explicitly require finite bounds; the coordinates and connectivity arrays used by the crop are otherwise assumed to be present and compatible.

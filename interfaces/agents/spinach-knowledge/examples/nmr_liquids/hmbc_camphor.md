@@ -1,31 +1,15 @@
 # examples/nmr_liquids/hmbc_camphor.m
 
+- MATLAB implementation: [examples/nmr_liquids/hmbc_camphor.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/hmbc_camphor.m)
+
 - Signature: `hmbc_camphor()`
 
-## Purpose
+## Purpose and spin system
 
-HMBC spectrum of camphor with natural content of 13C isotope. Coordinates, shielding anisotropies and J-couplings computed witt DFT. Calculation time: seconds
+Liquid-state HMBC for camphor at natural 13C abundance; the source comment estimates seconds of calculation time. The wrapper parses `../standard_systems/camphor.log` and maps H/C to `1H`/`13C` through `g2spinach`; its comment identifies the coordinates, shielding anisotropies, and J-couplings as vacuum-DFT-derived. It sets `options.min_j=3.0` and `options.no_xyz=0`, and passes the source range expression `[31.8-0.35 182.1+7.14]` to the importer.
 
-## Physical / mathematical content
+## Acquisition and simulation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The wrapper sets `sys.magnet=14.1`, enables `greedy` with proximity cutoff 4.0, and uses `sphten-liouv` / `IK-2`, scalar-coupling connectivity, and proximity level 1. It sets `J=140` Hz, `delta_b=60e-3` s, sweeps `[40000 1500]` Hz, offsets `[18000 900]` (units not stated here), `[128 128]` points, and `[512 512]` zero-fill points. `spins={'13C','1H'}` assigns carbon to F1 and proton to F2; the example uses Hz axes. `dilute(...,'13C')` supplies natural-abundance carbon isotopomers.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HMBC spectrum of camphor with natural content of 13C isotope.
-- Coordinates, shielding anisotropies and J-couplings computed
-- witt DFT.
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
+The wrapper calls `liquid(...,@hmbc,parameters,'nmr')`; the separate `experiments/nmr_liquids/hmbc.m` pulse program uses proton excitation and detection, carbon pulses, a J-set delay and `delta_b`, and indirect carbon evolution with proton decoupling. The wrapper supplies settings, not the internal pulse operations. Hamiltonian, relaxation, and kinetics superoperators are passed from the `liquid` context; this wrapper specifies no relaxation rates or model. Each isotopomer is simulated in `parfor`, cosine-apodised in both dimensions, Fourier-transformed and summed; the absolute spectrum is plotted in positive mode. The pulse-program references are https://doi.org/10.1021/ja00268a061 and https://doi.org/10.1016/0022-2364(88)90172-2.

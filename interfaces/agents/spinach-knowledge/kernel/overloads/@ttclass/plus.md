@@ -1,37 +1,9 @@
 # kernel/overloads/@ttclass/plus.m
 
-- Signature: `a=plus(a,b)`
+Signature: `a=plus(a,b)`
 
-## Purpose
+Source: [kernel/overloads/@ttclass/plus.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/plus.m) · Wiki: [ttclass/plus.m](https://spindynamics.org/wiki/index.php?title=ttclass/plus.m)
 
-Tensor train addition operation. Does not perform the actual addition, but instead concatenates the operands until such time as recompression becomes absolutely necessary. Syntax: c=plus(a,b)
+Both inputs must be `ttclass` objects. The method requires equal core counts and equal physical-size arrays; it does not accept a scalar operand. It concatenates the operands' coefficient vectors, core-buffer columns, and tolerance vectors in order. It then removes entries with zero coefficients, applying the same selection to cores and tolerances.
 
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- a -a tensor train object
-- b -a tensor train object
-
-## Outputs
-
-- c -a tensor train object
-
-## Implementation structure
-
-- Tensor train addition operation. Does not perform the actual addition,
-- but instead concatenates the operands until such time as recompression
-- becomes absolutely necessary. Syntax:
-- c=plus(a,b)
-- a -a tensor train object
-- b -a tensor train object
-- c -a tensor train object
-- Validate the input
-- Write the sum object
-- Filter out zero coeff
-- Twinkle, twinkle, little star.
-- I don't wonder what you are.
+This is a buffered, lazy sum: it retains each nonzero component's existing cores and bond ranks rather than adding core entries or forming/recompressing the represented tensor. If every coefficient is zero, the method replaces the result with `0*unit_like(a)`. No conjugation is performed.

@@ -4,31 +4,18 @@
 
 ## Purpose
 
-NOESY spectrum of strychnine. Calculation time: minutes
+Simulates a two-dimensional proton NOESY spectrum of strychnine. The system is supplied by `strychnine({'1H'})`, so this example selects the 1H channel. Its header estimates minutes for calculation time.
 
-## Physical / mathematical content
+## Spin model and sequence
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The field setting is `5.9`. The basis uses the `sphten-liouv` formalism, `IK-2` approximation, scalar-coupling connectivity, and proximity level `3`. Redfield relaxation uses IME equilibrium, temperature `298`, `rlx_keep='kite'`, and `tau_c={200e-12}`. The script enables the greedy algorithm, disables Krylov, and sets the proximity cutoff to `4.0`.
 
-## Numerical / algorithmic content
+The NOESY mixing time is `0.5`; offset is `1200`; sweep is `[2500 2500]`; acquired points are `[512 512]`; and zero-fill sizes are `[2048 2048]`. The selected spins are `{'1H'}`, axes are in ppm, and the simulation requests the equilibrium density with `needs={'rho_eq'}`. The code does not label units for the mixing-time, offset, or sweep values.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Propagation and processing
 
-## Implementation structure
+The script calls `liquid(...,@noesy,...,'nmr')`. It applies `sqcos` apodisation to the cosine and sine FIDs in both dimensions, combines them as the States signal, Fourier-transforms F2 and F1 with the configured zero-fill lengths, and plots the negative real spectrum. The source configures a simulated spectrum but supplies no numerical peak intensities, cross-relaxation rates, or peak-sign assignments.
 
-- NOESY spectrum of strychnine.
-- Calculation time: minutes
-- Spin system properties
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noesy_strychnine.m)

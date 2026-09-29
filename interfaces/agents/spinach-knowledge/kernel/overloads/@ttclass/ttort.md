@@ -1,46 +1,26 @@
 # kernel/overloads/@ttclass/ttort.m
 
-- Signature: `[tt,lognrm]=ttort(tt,direct)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/ttort.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/ttort.m)
 
-## Purpose
+## Signature
 
-Performs TT-orthogonalisation for a tensor train (or for each tensor train in a buffered sum). Syntax: [tt,lognrm]=ttort(tt,direct)
+`[tt,lognrm]=ttort(tt,direct)`
 
-## Physical / mathematical content
+## Purpose and core ordering
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Orthogonalises each buffered train in `tt` independently. Core row `k` of column `n` is the `k`th core of train `n`, with mode sizes `sz(k,1)` and `sz(k,2)` and bond ranks `r(k)` and `r(k+1)`. The direction is selected by `direct`: `+1` sweeps from core 1 to core `d`; `-1` sweeps from core `d` back to core 1. Other values raise an error.
 
-## Numerical / algorithmic content
+## QR sweeps
 
-## Parameters / inputs
+For `direct=+1`, each core `k=1:d-1` is reshaped to `[r(k)*sz(k,1)*sz(k,2),r(k+1)]` and thin-QR factorised. The `Q` factor is reshaped back into core `k`, and `R` is multiplied into the next core, which is reshaped as `[r(k+1),sz(k+1,1)*sz(k+1,2)*r(k+2)]`. The next bond rank becomes the number of columns of `Q`.
 
-- direct=+1 -gives left-to-right orthogonality,
-- direct=-1 -gives right-to-left orthogonality
-- tt -tensor train object, possibly with buffered sums
+For `direct=-1`, core `k=d:-1:2` is reshaped to `[r(k),sz(k,1)*sz(k,2)*r(k+1)]`; the preceding core is reshaped as `[r(k-1)*sz(k-1,1)*sz(k-1,2),r(k)]`. Thin QR is applied to the non-conjugate transpose of core `k`; the transposed `Q` becomes core `k`, and `R.'` is absorbed into core `k-1`. The rank at bond `k` is updated to the number of columns of `Q`.
 
-## Outputs
+At each step the code measures `norm(R,2)` and, when nonzero, normalises `R` by that value before passing it to the adjacent core. It also normalises the final boundary core for each train. With one output, each removed norm factor is multiplied into that train's coefficient. With two outputs, `tt.coeff` is set to ones, `lognrm` is initialised from `log(tt.coeff)` before that reset, and each `log(norm(R,2))` and final-core log norm is accumulated into the corresponding entry. The log-output form is intended for tensor norms that may exceed the preserved numeric example `realmax()=1.7977e+308`.
 
-- tt -tensor train object with all terms in the buffe-
-- red sum has all of them orthogonalised in the
-- direction requested
-- lognrm -if this output is present, all buffered trains
-- are also normalized, and natural logs of their
-- norms returned in the vector lognrm. Use this
-- option if the tensor norm is likely to exceed
-- realmax()=1.7977e+308.
-- Note: normally you should not call this subroutine directly.
+## Inputs and outputs
 
-## Implementation structure
-
-- Performs TT-orthogonalisation for a tensor train (or for each tensor
-- train in a buffered sum). Syntax:
-- [tt,lognrm]=ttort(tt,direct)
-- direct=+1 -gives left-to-right orthogonality,
-- direct=-1 -gives right-to-left orthogonality
-- tt -tensor train object, possibly with buffered sums
-- tt -tensor train object with all terms in the buffe-
-- red sum has all of them orthogonalised in the
-- direction requested
-- lognrm -if this output is present, all buffered trains
-- are also normalized, and natural logs of their
-- norms returned in the vector lognrm. Use this
+- `tt` — a tensor-train object, possibly with multiple buffered trains.
+- `direct` — `+1` for left-to-right or `-1` for right-to-left orthogonalisation.
+- `tt` — the orthogonalised tensor-train object, with core and rank arrays updated in the selected direction.
+- `lognrm` — when requested, one accumulated log value per buffered train.

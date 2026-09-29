@@ -2,35 +2,20 @@
 
 - Signature: `cylgrid(zmin,zmax,rmax)`
 
-## Purpose
+Draws a labelled cylindrical reference grid in the current axes. It returns no output arguments.
 
-Draws a cylindrical grid with 10% spacing added around the indicated data extent values. Syntax: cylgrid(zmin,zmax,rmax)
+## Inputs
 
-## Physical / mathematical content
+- `zmin`, `zmax`: finite real scalars with `zmin < zmax`.
+- `rmax`: positive finite real scalar, the unpadded data radius.
 
-## Numerical / algorithmic content
+## Geometry and appearance
 
-## Parameters / inputs
+The radial margin is `rgap = 0.1*rmax`; the axial margin is `zgap = 0.1*(zmax-zmin)`. At each of the padded end planes `zmin-zgap` and `zmax+zgap`, the routine draws seven circular rings, with radii evenly spaced from zero through `rmax+rgap`. Twelve light-grey spokes at 30-degree intervals run from the axis to that outer radius on both planes; matching vertical generators join their endpoints. The lower ring plane carries angle labels `0, 30, ..., 330` degrees.
 
-- zmin -lower bound on the Z axis
-- zmax -upper bound on the Z axis
-- rmax -upper bound on the radius
+Seven evenly spaced z values from `zmin-zgap` to `zmax+zgap` are marked and labelled along the positive radial edge. The view limits extend to two gap widths beyond the padded radius and z ends. The current axes use perspective projection, with box, ticks, and axes visibility disabled; the current figure background is set to white. These are plotting side effects, not returned data.
 
-## Outputs
+## References
 
-- this function updates the current figure
-
-## Implementation structure
-
-- Draws a cylindrical grid with 10% spacing added around
-- the indicated data extent values. Syntax:
-- cylgrid(zmin,zmax,rmax)
-- zmin -lower bound on the Z axis
-- zmax -upper bound on the Z axis
-- rmax -upper bound on the radius
-- this function updates the current figure
-- Check consistency
-- Get the extent gaps
-- Draw the spokes
-- Draw the circles
-- Set axis extents
+- [Source: `kernel/plotting/cylgrid.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/cylgrid.m)
+- [Spinach Wiki: `cylgrid.m`](https://spindynamics.org/wiki/index.php?title=cylgrid.m)

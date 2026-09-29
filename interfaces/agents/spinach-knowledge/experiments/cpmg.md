@@ -1,41 +1,19 @@
 # experiments/cpmg.m
 
+- MATLAB implementation: [experiments/cpmg.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/cpmg.m)
+
 - Signature: `fid=cpmg(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and signal
 
-CPMG echo train with detection. Syntax: fid=cpmg(spin_system,parameters,H,R,K)
+This routine generates a CPMG echo train from a caller-supplied initial state and records its projection onto a supplied detection state. It applies a nominal `pi/2` excitation, samples the first half-echo, then repeats the refocusing `pi` pulse and full-echo acquisition for `parameters.nloops` loops. The implementation does not describe a vendor-specific Bruker acquisition, receiver dead time, or phase cycle; those are not part of this function's contract.
 
-## Physical / mathematical content
+## Inputs and pulse preparation
 
-## Numerical / algorithmic content
+`H`, `R`, and `K` are numeric matrices of equal size and are combined as `H + 1i*R + 1i*K`. The parameter structure supplies `rho0` (initial state), `coil` (detection state), `pulse_op` (pulse operator), `nloops` (positive integer loop count), `timestep` (positive scalar propagation step), and `npoints` (number of steps in a half-echo). The routine lifts `pulse_op` with `kron(speye(parameters.spc_dim),parameters.pulse_op)`; `parameters.spc_dim` must therefore be present and consistent with the operator/state representation. The source does not assign a unit to `timestep`.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Output
 
-## Parameters / inputs
+`fid` is a row vector of coil-detected samples: the initial half-echo followed by the sampled echoes. The detection is the conjugate-transpose projection `parameters.coil' * trajectory`, so complex signal values are retained. `npoints` sets the initial half-echo sampling; each repeated echo is propagated over `2*parameters.npoints-1` steps.
 
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.pulse_op -pulse operator
-- parameters.nloops -number of CPMG loops
-- parameters.timestep -time step
-- parameters.npoints -number of steps per half-echo
-
-## Outputs
-
-- fid -free induction decay throughout the sequence
-
-## Implementation structure
-
-- CPMG echo train with detection. Syntax:
-- fid=cpmg(spin_system,parameters,H,R,K)
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.pulse_op -pulse operator
-- parameters.nloops -number of CPMG loops
-- parameters.timestep -time step
-- parameters.npoints -number of steps per half-echo
-- fid -free induction decay throughout the sequence
-- Check consistency
-- Project the operator
-- Compose Liouvillian
+[Source page](https://spindynamics.org/wiki/index.php?title=cpmg.m)

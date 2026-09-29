@@ -1,34 +1,16 @@
 # examples/optimal_control/features_multitarget.m
 
 - Signature: `features_multitarget()`
+- Source: [examples/optimal_control/features_multitarget.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_multitarget.m)
 
-## Purpose
+## Purpose and spin model
 
-An example of multi-target optimal control pulse design in the context of singlet state NMR spectroscopy. A pulse is designed that moves TT (carbon-triplet, proton-triplet) into SS (carbon-singlet, proton-singlet) and TS (carbon-triplet, proton-singlet) into ST (carbon-singlet, proton- triplet) simultaneously. The system is assumed to have a distribution in one of the J-couplings. Calculation time: hours.
+This singlet-state NMR simulation optimises one pulse for two transfers: carbon-triplet/proton-triplet to carbon-singlet/proton-singlet (TT to SS), and carbon-triplet/proton-singlet to carbon-singlet/proton-triplet (TS to ST). The four sites are 1H, 13C, 13C, and 1H at 14.1 T, with zero chemical shifts. The fixed couplings are 15 Hz for pairs 1-2 and 3-4, 3 Hz for 1-3 and 2-4, 150 Hz for 2-3, and 8 Hz for 1-4. The pulse is designed in a model built by the script; no imported measurements are used.
 
-## Physical / mathematical content
+## Robust control calculation
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The TT/TS source and SS/ST target operators are built from singlet/triplet terms on the proton pair (sites 1 and 4) and carbon pair (sites 2 and 3). The 1H-13C coupling for sites 1-2 is varied over 11 values from 13 to 16 Hz, producing an ensemble of drift Hamiltonians. Four x/y controls address the proton and carbon channels. The pulse has 275 intervals of 500 microseconds (137.5 ms) and uses a single power of `2*pi*500` rad/s, the SNS penalty (weight 100), `lbfgs`, and a 150-iteration limit. A random 4-by-275 guess is optimised through `fmaxnewton` with `@grape_xy`; robustness and spectrogram plots are among the enabled diagnostics. The source comments estimate hours of calculation time; this is an estimate, not a measured runtime here.
 
-## Numerical / algorithmic content
+## Output and limits
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- An example of multi-target optimal control pulse design in the context
-- of singlet state NMR spectroscopy. A pulse is designed that moves TT
-- (carbon-triplet, proton-triplet) into SS (carbon-singlet, proton-singlet)
-- and TS (carbon-triplet, proton-singlet) into ST (carbon-singlet, proton-
-- triplet) simultaneously. The system is assumed to have a distribution in
-- one of the J-couplings.
-- Calculation time: hours.
-- Magnetic field
-- Isotopes
-- Interactions
-- Basis set
-- Run Spinach housekeeping
+The optimisation is configured with all 11 drift Hamiltonians, but the final `shaped_pulse_xy` check propagates only with the sixth drift, corresponding to a 1-2 coupling of 14.5 Hz. It reports two real final overlaps, one for each target. Those two values are single-ensemble-member simulation outputs, not an aggregate robustness score. No hardware validation is performed.

@@ -1,31 +1,25 @@
 # examples/fundamentals/derivative_tests/dirdiff_3_trap.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_3_trap.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_3_trap.m)
+
 - Signature: `dirdiff_3_trap()`
 
 ## Purpose
 
-Directional derivative test for the Cartesian GRAPE module, trapezium integrator.
+This example checks selected analytical waveform derivatives from the Cartesian GRAPE routine `grape_xy` against centred finite differences of its reported fidelity, using the trapezium integrator.
 
-## Physical / mathematical content
+## Spin system and controls
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+For each of `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, `dirdiff_test_system` supplies a test system and the operators `Sx`, `Sy`, `Sz`, `Lx`, `Ly`, and `H`. The control structure sets isotope `13C`, channel map `[1;1]`, drift `H`, controls `Lx` and `Ly`, initial states `{Sx Sy Sz}`, target states `{-Sz Sy Sx}`, and power levels `2*pi*linspace(50e3,70e3,10)`. It selects `method='lbfgs'`, `max_iter=1000`, empty plotting options, `integrator='trapezium'`, and `pulse_dt=12.8e-6*ones(1,5)`, then passes the system and controls through `optimcon`.
 
-## Numerical / algorithmic content
+The L-BFGS method and iteration limit are control settings here; the example does not run an optimisation loop. It evaluates `grape_xy` directly on a random (2×5) waveform `randn(2,5)/3`. The analytical gradient is taken from the first fidelity component (`grad_anl(:,:,1)`).
 
-## Implementation structure
+## Finite-difference checks
 
-- Directional derivative test for the Cartesian GRAPE
-- module, trapezium integrator.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Set the interval grid
-- Spinach housekeeping
-- Random guess and finite diff increment
-- Call GRAPE and request analytical gradient
-- Left waveform edge
-- Right waveform edge
+With `h=sqrt(eps('double'))`, the script central-differences the first fidelity component at linear control indices 1, 3, and 10. For each index `k`, it compares the analytic gradient with `(f_1(x+h*e_k)-f_1(x-h*e_k))/(2*h)`; the relative discrepancy must be below `1e-6` or it raises an error.
+
+The source calls these indices left edge, midpoint, and right edge. The control array is 2-by-5, so MATLAB linear index 3 is `guess(1,2)`, not the central time column; index 10 is `guess(2,5)`.
+
+## Scope
+
+These are three sampled coordinate-derivative checks for each constructed formalism, not a comparison over all ten waveform coordinates or an optimisation-convergence test. The relative-error expression has no small-denominator guard when the finite-difference estimate is zero or near zero.

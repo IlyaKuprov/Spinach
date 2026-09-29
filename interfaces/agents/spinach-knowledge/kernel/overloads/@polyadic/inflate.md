@@ -1,37 +1,20 @@
 # kernel/overloads/@polyadic/inflate.m
 
-- Signature: `answer=inflate(p)`
+MATLAB source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/inflate.m>
+Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=polyadic/inflate.m>
 
-## Purpose
+## Meaning
 
-Converts a polyadic representation of a matrix into a sparse mat- rix. Syntax: answer=inflate(p) The function opens up all the Kronecker products while preserving the sparse type if some cores are sparse.
+A polyadic value stores a sum of terms in `p.cores`: each `p.cores{n}` is one term, and its cells are the ordered matrix factors in that term's Kronecker product. The `prefix` and `suffix` cell arrays hold matrix factors acting on the left and right of the core sum. This routine converts that representation to an explicit matrix; it is the materialisation counterpart to building or composing the factorised representation.
 
-## Physical / mathematical content
+## Construction and dimensions
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
+Nested polyadics in core factors, prefixes, and suffixes are first recursively passed to `inflate`. The output row and column counts for the core sum are products of the row and column sizes of the factors in the first term, respectively. For each term, the function forms a left-to-right Kronecker product of its factors, extracts its nonzero row indices, column indices, and values with `find`, combines those triplets across terms, and constructs a sparse matrix of the computed dimensions. If there are no triplets, it constructs an empty sparse matrix with those dimensions.
 
-## Numerical / algorithmic content
+The dimensions are taken from `p.cores{1}`; this file does not add an explicit consistency check for the dimensions of later terms. The source does not implement broadcasting or dimension repair: products and affix actions use MATLAB's matrix operations and therefore require compatible dimensions.
 
-## Parameters / inputs
+## Operator composition and storage
 
-- p -a polyadic object
+After assembling the core sum, prefixes are left-multiplied in reverse cell order, so the resulting product is `prefix{1} * prefix{2} * core_sum` when there are two prefixes. Suffixes are right-multiplied in forward cell order, giving `core_sum * suffix{1} * suffix{2}`. The core accumulator is explicitly made sparse from triplets. The source header notes that full prefix or suffix factors may produce a full result; the function does not convert the final product back to sparse storage.
 
-## Outputs
-
-- answer -a sparse matrix, except if prefixes or suffixes
-- are full (in that case, a full matrix)
-
-## Implementation structure
-
-- Converts a polyadic representation of a matrix into a sparse mat-
-- rix. Syntax:
-- answer=inflate(p)
-- The function opens up all the Kronecker products while preserving
-- the sparse type if some cores are sparse.
-- p -a polyadic object
-- answer -a sparse matrix, except if prefixes or suffixes
-- are full (in that case, a full matrix)
-- Process nested polyadics
-- Find the core dimensions
-- Get index arrays going
-- Loop over the sum
+No orientation variable or orientation-specific action is present in this function: it composes the matrix factors stored in the polyadic value.

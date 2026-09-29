@@ -1,52 +1,13 @@
 # experiments/esr_dipolar/deer_3p_hard_echo.m
 
-- Signature: `echo=deer_3p_hard_echo(spin_system,parameters,H,R,K)`
+This is an echo-window sampler for the three-pulse DEER experiment, not a routine that constructs a complete DEER trace. The source describes its diagnostic use: locating an echo that may be narrow in simulation and, for high-spin electrons, displaced from its expected position. It uses the supplied hard-pulse operators as-is; their spin or transition selectivity is determined by the caller.
 
-## Purpose
+## Sequence and detection
 
-Samples the spin echo in the three-pulse DEER experiment to determine its precise location -in simulations, DEER spin echoes can be narrow and easy to miss. For high-spin electrons the echo may not be in the expected place. Ideal hard pulses are used, each pulse only hits its specific electron or transition, depending on the pulse operator supp- lied. Syntax: echo=deer_3p_hard_echo(spin_system,parameters,H,R,K)
+Starting from `parameters.rho0`, the function applies `parameters.ex_prob` at `pi/2`, evolves for `parameters.tb`, applies `parameters.ex_pump` at `pi`, evolves for `parameters.ta-parameters.tb`, then applies `parameters.ex_prob` at `pi`. After that pulse it evolves for `parameters.ta-parameters.tc/2` and records the observable with `parameters.coil` across an interval of `parameters.tc` using `parameters.nsteps+1` samples including the initial observation, spaced by `parameters.tc/parameters.nsteps`. Thus the third pulse is at time `parameters.ta`, and the sampled window is centred at `2*parameters.ta` relative to the sequence start. Here `parameters.ta` is the first-to-third-pulse time, `parameters.tb` the first-to-second-pulse time, and `parameters.tc` the acquisition-window width; all are in seconds.
 
-## Physical / mathematical content
+The required fields are `parameters.ex_prob` (probe operator), `parameters.ex_pump` (pump operator), `parameters.rho0` (initial state), `parameters.coil` (detection state), `parameters.ta`, `parameters.tb`, `parameters.tc`, and `parameters.nsteps` (positive integer propagation-step count, yielding `nsteps+1` echo samples). The context supplies `H`, `R`, and `K` as same-sized matrices; they form `L=H+1i*R+1i*K`. The source checks the timing constraints `parameters.tb<=parameters.ta` and `parameters.tc/2<=parameters.ta`.
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The return value `echo` is the sampled signal with the requested number of points. The source does not state its array orientation, numeric units, or whether a caller should interpret the signal as real or complex. It specifies this three-pulse sequence only; it does not define a CPMG/CP, Bruker, or four-pulse timing scheme.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Parameters / inputs
-
-- parameters.ex_prob -probe pulse operator
-- parameters.ex_pump -pump pulse operator
-- parameters.ta -time between first and third pulse, s
-- parameters.tb -time between first and second pulse, s
-- parameters.tc -time interval to sample around the
-- echo, s
-- parameters.rho0 -initial condition
-- parameters.nsteps -number of sampling steps in the tc
-- interval
-- parameters.coil -detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- echo -the signal detected during the parameters.tc interval
-- with parameters.nsteps points in it
-
-## Implementation structure
-
-- Samples the spin echo in the three-pulse DEER experiment to determine
-- its precise location -in simulations, DEER spin echoes can be narrow
-- and easy to miss. For high-spin electrons the echo may not be in the
-- expected place. Ideal hard pulses are used, each pulse only hits its
-- specific electron or transition, depending on the pulse operator supp-
-- lied. Syntax:
-- echo=deer_3p_hard_echo(spin_system,parameters,H,R,K)
-- parameters.ex_prob -probe pulse operator
-- parameters.ex_pump -pump pulse operator
-- parameters.ta -time between first and third pulse, s
-- parameters.tb -time between first and second pulse, s
-- parameters.tc -time interval to sample around the
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_hard_echo.m

@@ -1,52 +1,36 @@
 # kernel/utilities/rspert.m
 
-- Signature: `[Ep,Vp]=rspert(E0,H1,order)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspert.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspert.m)
 
 ## Purpose
 
-Rayleigh-Schrodinger perturbation theory to arbitrary order, Eqs 2.21-2.23 from Stefan Stoll's PhD thesis, with the typo fixed in the numerator of Eq 2.21. Syntax: [Ep,Vp]=rspert(E0,H1,order)
+`rspert.m` implements Rayleigh–Schrödinger perturbation theory to arbitrary order for a non-degenerate Hamiltonian `H0 + H1`, returning perturbative corrections to eigenvalues and eigenvectors. The implementation follows Eqs. 2.21–2.23 from Stefan Stoll's PhD thesis.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `[Ep,Vp]=rspert(E0,H1,order)`.
+- A consistency-checking subfunction `grumble` validates the inputs (real column vector `E0`, Hermitian `H1`, consistent dimensions, positive integer `order`).
+- Reciprocal energy differences `Q = 1./(E0'-E0)` are computed, with the diagonal zeroed; if any element of `Q` is non-finite, the function errors with `H0 has degenerate energy levels.`
+- First order: `E{1}=diag(H1)` and `V{1}=Q.*H1`.
+- Higher orders (loop `k=2:order`): computes `R=H1*V{k-1}`, sets `E{k}=real(diag(R))`, and builds `V{k}` by subtracting lower-order products `V{k-m}.*E{m}'` for `m=1:(k-1)` before multiplying elementwise by `Q`.
+- Summation: `Ep` starts from `E0` and accumulates all `E{n}` for `n=1:order`; `Vp` starts from the identity and accumulates all `V{n}`.
+- Normalisation: `Vp` is column-normalised as `Vp./sqrt(sum(abs(Vp).^2,1))`.
+- Notes from the header: there must be no degeneracies in `H0`; `H1` must be Hermitian; the source header cautions that perturbation theory requires `norm(H1,2)` much smaller than the smallest energy gap in `H0`, that numerical artefacts can appear beyond sixth order, and that the stated complexity is linear in order and cubic in matrix dimension.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- E0 -eigenvalues of H0, a column vector of real
-- numbers
-- H1 -perturbation, written in the basis that di-
-- agonalises H0
-- order -order of perturbation theory to be used, 6
-- is the sensible maximum
+- `E0` — eigenvalues of `H0`, a column vector of real numbers.
+- `H1` — perturbation, written in the basis that diagonalises `H0`.
+- `order` — order of perturbation theory to be used; 6 is the sensible maximum.
 
-## Outputs
+**Outputs**
 
-- Ep -eigenvalues of H0+H1 to the specified order,
-- a vector of reals, not necessarily sorted in
-- the same way as the input
-- Vp -normalised eigenvectors of H0+H1 to the spe-
-- cified order in perturbation theory, a squa-
-- re unitary matrix with eigenvectors in cols
-- in the same order as the eigenvalues in Ep
-- Notes: there must be no degeneracies in H0; H1 must be Hermitian,
-- the theory only converges when norm(H1,2) is much smaller
-- than the smallest energy gap in H0; numerical artefacts
-- appear beyond sixth order; complexity is linear in the or-
-- der and cubic in the matrix dimension.
+- `Ep` — eigenvalues of `H0+H1` to the specified order, a vector of reals, not necessarily sorted in the same way as the input.
+- `Vp` — normalised eigenvectors of `H0+H1` to the specified order in perturbation theory, a square unitary matrix with eigenvectors in columns, in the same order as the eigenvalues in `Ep`.
 
-## Implementation structure
+## References
 
-- Rayleigh-Schrodinger perturbation theory to arbitrary order, Eqs
-- 2.21-2.23 from Stefan Stoll's PhD thesis, with the typo fixed in
-- the numerator of Eq 2.21. Syntax:
-- [Ep,Vp]=rspert(E0,H1,order)
-- E0 -eigenvalues of H0, a column vector of real
-- numbers
-- H1 -perturbation, written in the basis that di-
-- agonalises H0
-- order -order of perturbation theory to be used, 6
-- is the sensible maximum
-- Ep -eigenvalues of H0+H1 to the specified order,
-- a vector of reals, not necessarily sorted in
+- Stefan Stoll's PhD thesis, Eqs. 2.21–2.23.
+- Spinach Wiki page: [rspert.m](https://spindynamics.org/wiki/index.php?title=rspert.m)

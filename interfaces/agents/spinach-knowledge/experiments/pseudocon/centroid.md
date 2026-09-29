@@ -1,39 +1,17 @@
 # experiments/pseudocon/centroid.m
 
-- Signature: `[x,y,z]=centroid(probden,ranges)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/centroid.m) · [Spinach wiki](https://spindynamics.org/wiki/index.php?title=centroid.m)
 
-## Purpose
+Signature: `[x,y,z]=centroid(probden,ranges)`.
 
-Finds the centre of mass point of a 3D probability density in a cube. Syntax: [x,y,z]=centroid(probden,ranges)
+## Behaviour
 
-## Physical / mathematical content
+This helper finds the coordinate centroid of a three-dimensional real numeric array. It creates coordinate grids with `ndgrid` from three inclusive `linspace` axes spanning `[xmin,xmax]`, `[ymin,ymax]`, and `[zmin,zmax]`, with each axis length taken from the corresponding dimension of `probden`. It then returns three ratios of nested trapezoidal integrals: each coordinate multiplied by `probden`, divided by the nested trapezoidal integral of `probden`. The resulting scalar coordinates use the units of the supplied ranges; the source specifies no physical coordinate unit.
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
+Despite its pseudocontext folder, this function does not calculate a pseudocontact shift or tensor. It accepts no susceptibility tensor, magnetic-field orientation, nucleus, or spin-system argument; it returns only the centroid of the input array.
 
-## Numerical / algorithmic content
+## Inputs, outputs, and limits
 
-## Parameters / inputs
+`probden` is described as a probability-density cube ordered `[X Y Z]`. The code checks that it is a numeric, real, three-dimensional array; it does not check non-negativity or unit normalisation. `ranges` must be a real numeric six-element vector ordered `[xmin xmax ymin ymax zmin zmax]`, with each lower bound strictly less than its upper bound. Outputs `x`, `y`, and `z` are scalar coordinates.
 
-- probden -probability density cube with dimensions
-- ordered as [X Y Z]
-- ranges -six-element vector giving axis extents
-- as [xmin xmax ymin ymax zmin zmax]
-
-## Outputs
-
-- [x,y,z] -centre of mass coordinates
-
-## Implementation structure
-
-- Finds the centre of mass point of a 3D probability density
-- in a cube. Syntax:
-- [x,y,z]=centroid(probden,ranges)
-- probden -probability density cube with dimensions
-- ordered as [X Y Z]
-- ranges -six-element vector giving axis extents
-- as [xmin xmax ymin ymax zmin zmax]
-- [x,y,z] -centre of mass coordinates
-- Check consistency
-- Get coordinate arrays
-- Get the normalization
-- Get centroid coordinates
+The integrals use nested default `trapz` calls without explicit spacing arguments. The source has no special handling for a zero normalisation, so a nonzero integrated density is required for finite centroid coordinates. No runtime result or accuracy assessment is implied.

@@ -1,35 +1,38 @@
 # kernel/utilities/acomm.m
 
-- Signature: `C=acomm(A,B)`
-
 ## Purpose
 
-A simple shorthand for the anticommutator of two matrices. Syntax: C=acomm(A,B)
+`acomm.m` computes the anticommutator of two square matrices, returning `C = A*B + B*A`. It is a simple shorthand provided by the Spinach kernel utilities.
 
-## Physical / mathematical content
+Source: [kernel/utilities/acomm.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/acomm.m)
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- The function enforces input consistency before computing the result:
+  - `A` must be a numeric square matrix, otherwise it errors with `'A must be a numeric square matrix.'`.
+  - `B` must be a numeric square matrix, otherwise it errors with `'B must be a numeric square matrix.'`.
+  - `A` and `B` must have identical dimensions, otherwise it errors with `'A and B must have the same dimensions.'`.
+- Checks use `isnumeric`, `ismatrix`, and comparison of `size(A,1)` with `size(A,2)` (and likewise for `B`), plus `isequal(size(A),size(B))`.
+- After validation, the function returns `C = A*B + B*A`.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- A,B -square matrices
+**Syntax**
 
-## Outputs
+```matlab
+C = acomm(A,B)
+```
 
-- C -a square matrix
+**Inputs**
 
-## Implementation structure
+- `A` — a numeric square matrix.
+- `B` — a numeric square matrix of the same dimensions as `A`.
 
-- A simple shorthand for the anticommutator of two
-- matrices. Syntax:
-- C=acomm(A,B)
-- A,B -square matrices
-- C -a square matrix
-- Check consistency
-- Do the deed
-- Consistency enforcement
-- Enough of all this academic chatter, back
-- again to devilry!
-- Mephisto
+**Outputs**
+
+- `C` — a square matrix, the anticommutator `A*B + B*A`.
+
+## References
+
+- Spin Dynamics Wiki page for this function: <https://spindynamics.org/wiki/index.php?title=acomm.m>
+- Source file: [kernel/utilities/acomm.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/acomm.m)

@@ -4,36 +4,24 @@
 
 ## Purpose
 
-Converts CASTEP EFG tensor (it is printed in atomic units) to NQI 3x3 tensor in Hz that is required by Spinach. Syntax: nqi=castep2nqi(V,Q,I)
+Converts a CASTEP electric-field-gradient tensor into the nuclear quadrupole interaction tensor used by Spinach.
 
-## Physical / mathematical content
+## Conversion
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+For a real 3-by-3 EFG tensor `V` in atomic units, nuclear quadrupole moment `Q` in barns, and spin quantum number `I`, the implemented conversion is
 
-## Numerical / algorithmic content
+`nqi = V * 9.717362e21 * (Q * 1e-28) * 1.60217657e-19 / (6.62606957e-34 * 2 * I * (2 * I - 1))`.
 
-## Parameters / inputs
+The scalar factor combines the source's EFG atomic-unit constant, barn-to-square-metre factor, elementary charge, Planck constant, and spin denominator. It scales `V` without a coordinate rotation or tensor reparameterisation, so the output is a 3-by-3 tensor in Hz, ready for `create.m`.
 
-- V -EFG tensor from CASTEP output, a.u.
-- Q -nuclear quadrupole moment, barn
-- I -nuclear spin quantum number
+## Inputs and outputs
 
-## Outputs
+- `V`: real numeric 3-by-3 CASTEP EFG tensor in atomic units.
+- `Q`: real numeric scalar nuclear quadrupole moment in barns.
+- `I`: real numeric scalar integer or half-integer, at least 1.
+- `nqi`: 3-by-3 nuclear quadrupole interaction tensor in Hz.
 
-- nqi -3x3 matrix in Hz, ready for input
-- into create.m function
+## References
 
-## Implementation structure
-
-- Converts CASTEP EFG tensor (it is printed in atomic units) to NQI
-- 3x3 tensor in Hz that is required by Spinach. Syntax:
-- nqi=castep2nqi(V,Q,I)
-- V -EFG tensor from CASTEP output, a.u.
-- Q -nuclear quadrupole moment, barn
-- I -nuclear spin quantum number
-- nqi -3x3 matrix in Hz, ready for input
-- into create.m function
-- Check consistency
-- Fundamental constants
-- Calculation
-- Consistency enforcement
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/castep2nqi.m)
+- [Spinach Wiki: castep2nqi.m](https://spindynamics.org/wiki/index.php?title=castep2nqi.m)

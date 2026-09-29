@@ -1,31 +1,21 @@
 # examples/esr_liq_pulsed/pulse_acquire_chrysene.m
 
-- Signature: `pulse_acquire_chrysene()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/pulse_acquire_chrysene.m)
 
-## Purpose
+## Call and result
 
-W-band pulse-acquire FFT ESR spectrum of a chrysene cation radical in a non-viscous liquid. Simple common line width is used as a relaxation model. Symmetry treatment is performed using the full S2xS2xS2xS2xS2xS2 group direct product. Calculation time: seconds
+Call **pulse_acquire_chrysene()** with no arguments. It returns no variables: the function builds local FID and spectrum variables and opens a figure using **kfigure** and **plot_1d**; no data file is written. The source labels calculation time as seconds.
 
-## Physical / mathematical content
+## Spin system, symmetry, and relaxation
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example is described as W-band pulse-acquire FFT ESR of a chrysene cation radical in a non-viscous liquid. It imports **../standard_systems/chrysene_cation.log** with **gparse** and **g2spinach**, using label mapping **{{'E','E'},{'H','1H'}}** and passing **[0 0]**. **options.no_xyz=1** ignores coordinate information; the source comment says hyperfine couplings are provided. The magnetic-induction parameter is **3.5**.
 
-## Numerical / algorithmic content
+Common-linewidth damping uses **'damp'**, diagonal retention, zero equilibrium, and damping value **1e6**. The **sphten-liouv** basis has no approximation, longitudinal **1H**, projection **+1**, and six **S2** symmetry pairs: **[1 7]**, **[2 8]**, **[3 9]**, **[4 10]**, **[5 11]**, and **[6 12]**.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## ESR acquisition
 
-## Implementation structure
+The initial state and receiver are **state(spin_system,'L+','E')**; **E** is detected and decoupling is empty. Offset is **-2e7**, sweep **1e8**, point count 1024, zero-fill 4096, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The FID comes from **liquid(spin_system,@acquire,parameters,'esr')**; it receives **'none'** apodisation, is Fourier-transformed using the zero-fill length, and its real part is plotted.
 
-- W-band pulse-acquire FFT ESR spectrum of a chrysene cation radical in
-- a non-viscous liquid. Simple common line width is used as a relaxation
-- model. Symmetry treatment is performed using the full S2xS2xS2xS2xS2xS2
-- group direct product.
-- Calculation time: seconds
-- Ignore coordinate information (HFCs provided)
-- Read the spin system (vacuum DFT calculation)
-- Magnet induction
-- Relaxation theory
-- Basis set
-- Symmetry
-- Spinach housekeeping
+## Dependencies and limits
+
+Requires the relative standard-system log, Spinach **gparse**/**g2spinach** import helpers, and system/basis/state, liquid ESR/acquire, apodisation, FFT, and plotting routines. The source cites no paper DOI. It specifies no pulse shape or duration, so do not infer timing or RF details from the pulse-acquire label; the implemented acquisition is the **@acquire** call. The source values for field, damping, offset, and sweep carry no inline units; the axis-unit setting is explicit.

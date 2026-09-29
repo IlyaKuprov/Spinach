@@ -1,37 +1,22 @@
 # experiments/imaging/udd_dec.m
 
-- Signature: `mri=udd_dec(spin_system,parameters,H,R,K,G,F)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/udd_dec.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=udd_dec.m)
 
 ## Purpose
 
-The effect of Uhrid Dynamic Decoupling (UDD) pulse sequence on the MRI phantom. The function runs the UDD and then pro- jects out the user-specified spin state, returning the cor- responding image. Syntax: mri=udd_dec(spin_system,parameters,H,R,K,G,F) This sequence must be called from the imaging() context, which would provide H,R,K,G, and F. Parameters: parameters.dec_time -total duration of the sequence parameters.
+`udd_dec` applies an Uhrig dynamic-decoupling (UDD) pulse train to an imaging phantom, then projects a user-selected spin state to form a sample image. It is a parameterised pulse-sequence simulation, not a measured phantom result. The source uses `H`, `R`, `K`, and `F` from the `imaging()` context to form `B=H+F+1i*R+1i*K`.
 
-## Physical / mathematical content
+## Inputs and units
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
+- `parameters.dec_time`: total sequence duration, in the simulation time unit (seconds in the Spinach imaging convention).
+- `parameters.npulses`: number of UDD refocusing pulses, excluding the initial 90° pulse.
+- `parameters.spins`: cell array of spin-name strings; the first entry selects the pulse operators (the source example is `{'1H'}`).
+- `parameters.rho0`: initial state, supplied by the imaging setup.
+- `parameters.npts`: imaging sample-grid dimensions.
+- `parameters.coil_st`: cell array whose first entry is the user-specified detection state.
 
-## Numerical / algorithmic content
+The sequence starts with a 90° y pulse, obtains intervals from `uhrig_times(dec_time,npulses)`, alternates each delay with a 180° x pulse, and applies the final delay. The pulse operators are built from `L+` for the selected first spin. The observed state is explicitly chosen through `coil_st{1}`; this function ignores the coil phantom rather than detecting through the imaging coil. It does not apply an explicit coherence-order filter.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Detection and return
 
-## Outputs
-
-- mri -amplitude of the detection state at each point of the
-- sample
-- Note: the spin state to be observed should be specified in
-- parameters.coil_st, the coil phantom is ignored.
-
-## Implementation structure
-
-- The effect of Uhrid Dynamic Decoupling (UDD) pulse sequence
-- on the MRI phantom. The function runs the UDD and then pro-
-- jects out the user-specified spin state, returning the cor-
-- responding image. Syntax:
-- mri=udd_dec(spin_system,parameters,H,R,K,G,F)
-- This sequence must be called from the imaging() context, which
-- would provide H,R,K,G, and F. Parameters:
-- parameters.dec_time -total duration of the sequence
-- parameters.npulses -number of pulses in the sequence,
-- excluding the first pi/2 pulse
-- parameters.spins -nuclei on which the sequence
-- is to act, e.g. {'1H'}
+`mri` is the projected amplitude of the selected state at the sample points, produced by `fpl2phan(rho,parameters.coil_st{1},parameters.npts)`. Its spatial axes/grid are those encoded by `npts`; the function returns the phantom array without a separate coordinate vector. The timing and pulse count define a simulated design; no run-verified image or experimental measurement is claimed.

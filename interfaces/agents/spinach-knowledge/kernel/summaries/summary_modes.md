@@ -1,37 +1,15 @@
 # kernel/summaries/summary_modes.m
 
-- Signature: `summary_modes(spin_system,header)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_modes.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_modes.m)
 
 ## Purpose
 
-Prints bosonic mode parameter summary for a Spinach system. Syntax: summary_modes(spin_system,header)
+Print the stored parameters of bosonic components in a Spinach system.
 
-## Physical / mathematical content
+## What is reported
 
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The table includes only components whose type code is C, V, or T, labelled cavity, phonon, or transmon respectively. For each included component it prints the component index, the isotope string from `spin_system.comp.isotopes`, the type label, `spin_system.comp.mults`, and the stored frequency, anharmonicity, damping, and dephasing values. The four parameter values are divided by `2*pi` and printed in Hz. The isotope string is displayed as component metadata; this routine does not calculate a nuclear spin quantum number or isotope-dependent gyromagnetic ratio.
 
-## Numerical / algorithmic content
+## Output and inputs
 
-## Parameters / inputs
-
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-
-## Outputs
-
-- this function prints to the console or to the user-specified
-- output via report.m function
-
-## Implementation structure
-
-- Prints bosonic mode parameter summary for a Spinach system. Syntax:
-- summary_modes(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the summary table
-- Translate the type letter into a word
-- Do the printing in Hz
-- Consistency enforcement
+The routine has no returned output. It sends the supplied header, headings, rows, and separators through `report` to the console or configured report destination. Its input checks require `spin_system` to be a structure and `header` to be a character array; the routine does not assign fields of the input structure.

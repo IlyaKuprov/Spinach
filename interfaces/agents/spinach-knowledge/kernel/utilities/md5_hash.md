@@ -1,36 +1,19 @@
 # kernel/utilities/md5_hash.m
 
-- Signature: `hashstr=md5_hash(A)`
-
 ## Purpose
 
-MD5 hash of any Matlab object as a hex string. Identical sparse and full matrices return different hashes. Syntax: hashstr=md5_hash(A)
+Returns an MD5 hash of any MATLAB object as a hexadecimal string, per the header comment of [`kernel/utilities/md5_hash.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/md5_hash.m). The header notes that identical sparse and full matrices return different hashes.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function serialises the input object into a bytestream with `serializeToBytes`, computes the MD5 digest with `digestMD5`, and formats the digest bytes as a lowercase hexadecimal string via `sprintf('%.2x',...)`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+- `A` — MATLAB object of any type.
+- `hashstr` — hexadecimal character string.
 
-- A -Matlab object of any type
+## References
 
-## Outputs
-
-- hashstr -hexadecimal character string
-
-## Implementation structure
-
-- MD5 hash of any Matlab object as a hex string. Identical sparse
-- and full matrices return different hashes. Syntax:
-- hashstr=md5_hash(A)
-- A -Matlab object of any type
-- hashstr -hexadecimal character string
-- Make a bytestream
-- Compute MD5 hash
-- Convert into a hex string
-- The basic principle of the new education is to be that dunces and
-- idlers must not be made to feel inferior to intelligent and indus-
-- trious pupils. That would be "undemocratic". These differences be-
-- tween pupils -for there are obviously and nakedly individual dif-
+- [Spinach Wiki: md5_hash.m](https://spindynamics.org/wiki/index.php?title=md5_hash.m)
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/md5_hash.m)

@@ -1,32 +1,11 @@
 # examples/nmr_solids/mas_powder_csa_floquet.m
 
-- Signature: `mas_powder_csa_floquet()`
+Source: [examples/nmr_solids/mas_powder_csa_floquet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_csa_floquet.m)
 
-## Purpose
+## Model
 
-Powder magic angle spinning spectrum of a single anisotropically shielded proton spin using a Floquet theory based formalism. Calculation time: seconds
+The header calls this a powder MAS spectrum of a single anisotropically shielded proton. The active system declaration instead contains two `1H` spins and two Zeeman eigenvalue triplets, `[-2 -2 4]-5` and `[-1 -3 4]+5`, with both Euler-angle triples set to `[0 0 0]`. The model field is 14.1 T. The script specifies these shielding tensors but no dipolar coupling, quadrupolar interaction, or RF pulse sequence; it also sets an empty decoupling list.
 
-## Physical / mathematical content
+## Calculation and display
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a single anisotropically shielded
-- proton spin using a Floquet theory based formalism.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The basis is `sphten-liouv` with no approximation and the `+1` projection. The MAS axis is `[1 1 1]` and the rotor rate is 500 Hz. The source selects the `leb_2ang_rank_17` grid and maximum rank 17, then calls `floquet(spin_system,@acquire,parameters,'nmr')`. Acquisition is on `1H` from an `L+` initial state with an `L+` receiver. The sweep is 20 kHz, with 512 acquired points, zero-filled to 4096, zero offset, ppm axis units, and inverted axis. Exponential apodisation uses parameter 6 before Fourier transformation; the plotted trace is the real spectrum. These are simulation and display settings, not an experimentally measured spectrum.

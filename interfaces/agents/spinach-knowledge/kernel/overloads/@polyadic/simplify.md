@@ -1,37 +1,19 @@
 # kernel/overloads/@polyadic/simplify.m
 
-- Signature: `p=simplify(p)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/simplify.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=polyadic/simplify.m)
 
-## Purpose
+## Signature
 
-Simplifies the structure of the polyadic object by reordering buffers, dropping inconsequential terms, and flattening nested polyadics where possible. Syntax: p=simplify(p)
+`p=simplify(p)`
 
-## Physical / mathematical content
+## Behaviour
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The input must be a polyadic object; otherwise the function raises `p must be polyadic.` It first records `[nrows,ncols]=size(p)`. An empty core list, a zero prefix or suffix factor, or removal of all zero terms returns `spalloc(nrows,ncols,0)`, preserving the original represented dimensions as a sparse zero matrix.
 
-## Numerical / algorithmic content
+Otherwise it repeatedly simplifies until a pass makes no changes. In `prefix` and `suffix`, nested polyadics are simplified recursively; zero factors collapse the result to the dimension-preserving sparse zero, identity factors are removed, and `opium` factors or numeric scalar factors are removed and their `coeff`/scalar is applied as `coeff*p` before returning.
 
-## Parameters / inputs
+Within each core term, nested polyadics are simplified recursively. A nested polyadic with no prefix or suffix and exactly one term is flattened by splicing its factor list into the parent term. A zero factor removes that whole summand. An identity factor that is not `opium` is replaced by `opium(size(factor,1),1)`. Empty terms are discarded; if none remain, the result is again the sparse zero of the saved dimensions. Adjacent `opium` factors are combined by an explicit `kron` call, and the process repeats.
 
-- p -a polyadic object
+Finally, if the result is still polyadic but has no prefix or suffix and contains exactly one term with exactly one factor, that factor is returned directly. These are local representation rewrites; the function does not expand the entire sum of Kronecker products. It does explicitly combine adjacent `opium` factors with `kron` and can return the sole factor instead of a polyadic wrapper.
 
-## Outputs
-
-- p -a polyadic or a numeric object
-
-## Implementation structure
-
-- Simplifies the structure of the polyadic object by reordering buffers,
-- dropping inconsequential terms, and flattening nested polyadics where
-- possible. Syntax:
-- p=simplify(p)
-- p -a polyadic object
-- p -a polyadic or a numeric object
-- Check consistency
-- Get size information
-- Flush trivial polyadics into all-zero sparse matrices
-- Loop until static
-- Default disposition
-- Simplify prefixes
+No complex conjugation or broadcasting rule is implemented in this function. Related pages: [polyadic representation](./polyadic.md), [prefix](./prefix.md), and [size](./size.md).

@@ -1,34 +1,18 @@
 # examples/optimal_control/features_keyhole.m
 
 - Signature: `features_keyhole()`
+- Source: [examples/optimal_control/features_keyhole.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_keyhole.m)
 
-## Purpose
+## Purpose and model
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is Z-magneti- sation on 19F. There are six control channels and a distribution over control powers. A keyhole condition is specified: the system must be in a two-spin or- der at point 20 in the pulse time grid. LBFGS q
+The script designs a simulated transfer from 1H longitudinal magnetisation to 19F in a 9.4 T 1H-13C-19F model. Chemical shifts are zero and the scalar couplings are 140 Hz (1H-13C) and -160 Hz (13C-19F). The model is specified in code; no experimental data are imported.
 
-## Physical / mathematical content
+## Keyhole and controls
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+Six x/y controls address the three nuclei. The 50 intervals are each 200 microseconds (10 ms total), and five RF-power levels span `2*pi*800` to `2*pi*1200` rad/s. At sample 20, the keyhole callback evaluates `correlation(spin_system,rho,2,'all')`, imposing an intermediate all-spin second-order-correlation condition while the final target remains the 19F longitudinal state. The source comment describes the control sequence as piecewise-linear; the code supplies 50 interval samples and does not specify a separate interpolation object.
 
-## Numerical / algorithmic content
+The optimisation uses the SNS penalty (weight 100), `lbfgs`, and a 200-iteration limit, with `fmaxnewton` and `@grape_xy`. It starts from a random 6-by-50 waveform and enables correlation-order, per-spin, x/y-control, and spectrogram plots.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Output and limits
 
-## Implementation structure
-
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is Z-magneti-
-- sation on 19F. There are six control channels and a distribution over
-- control powers.
-- A keyhole condition is specified: the system must be in a two-spin or-
-- der at point 20 in the pulse time grid. LBFGS quasi-Newton optimiser is
-- used with a piecewise-linear control sequence.
-- Calculation time: minutes.
-- Magnetic field
-- Spin system
-- Chemical shifts, ppm
+The optimised waveform is scaled by the mean power, propagated with `shaped_pulse_xy` using `expv-pwc`, and assessed by the real final target-state overlap. This check is one propagation, not a reported power-ensemble table. The result is a numerical model simulation; the example does not establish experimental or hardware performance.

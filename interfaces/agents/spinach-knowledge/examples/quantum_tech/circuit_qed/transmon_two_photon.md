@@ -1,35 +1,24 @@
 # examples/quantum_tech/circuit_qed/transmon_two_photon.m
 
+- Source: [transmon_two_photon.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/circuit_qed/transmon_two_photon.m)
 - Signature: `transmon_two_photon()`
 
 ## Purpose
 
-Two-photon transition in a four-level Duffing transmon. The drive carrier is placed halfway between the 0-1 and 1-2 tran- sition frequencies, where neither single-photon transition is resonant, and GRAPE finds a pulse that moves the population from the ground state into the second excited state through a virtual intermediate state. Model and parameters from Example 2 of the GRAPE_SCQ package. Calculation time: minute
+Find a shaped pulse that drives a four-level Duffing transmon from its ground state to its second excited state by a two-photon transition, while the carrier is off resonance from both adjacent one-photon transitions. This is a simulated control trajectory, not a measured device transfer.
 
-## Physical / mathematical content
+## Hamiltonian and rotating frame
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The system declares the four-state transmon mode as `T4`, with detuning `inter.modes.frqs={100e6}` and anharmonicity `inter.modes.anharms={-200e6}` (frequency settings in Hz: 100 MHz and −200 MHz). In the Duffing/Fock description, the mode drift has the form `H ∝ Δ a†a + (α/2) a†a†aa`, truncated to four levels; here Δ=100 MHz and α=−200 MHz. Its 0↔1 and 1↔2 transition offsets are therefore +100 MHz and −100 MHz, so the carrier sits halfway between them. There is no separately parameterised resonator mode or transmon–resonator coupling in this script.
 
-## Numerical / algorithmic content
+The example constructs `H=hamiltonian(assume(spin_system,'cavity'))` using the `zeeman-hilb` basis and no basis approximation. In this Spinach cavity-QED frame, mode energies are carrier detunings and the rotating-wave approximation is used; the example's Duffing anharmonicity is retained. The oscillator quadratures are built from the transmon ladder operators as `Cx=(C+A)/2` and `Cy=i(C−A)/2`.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Control sequence and objective
 
-## Implementation structure
+The source and target are the normalised `BL1` and `BL3` states (ground and second excited levels in the source comments). GRAPE uses the fixed drift `H` and the two quadrature controls `Cx`, `Cy`; `fmaxnewton` optimises the pulse with `grape_xy` from a smooth 200-sample initial guess. The target is state transfer to the second excited level via the virtual intermediate state, not a resonant one-photon drive.
 
-- Two-photon transition in a four-level Duffing transmon. The
-- drive carrier is placed halfway between the 0-1 and 1-2 tran-
-- sition frequencies, where neither single-photon transition is
-- resonant, and GRAPE finds a pulse that moves the population
-- from the ground state into the second excited state through a
-- virtual intermediate state. Model and parameters from Example
-- 2 of the GRAPE_SCQ package.
-- Calculation time: minutes
-- Magnet field
-- Particle specification
-- Transmon detuning from the carrier and anharmonicity
-- Formalism and basis
+The optimised pulse is then propagated slice by slice. The plotted observable is the population in each of the four levels versus accumulated pulse time, labelled in nanoseconds. It is the model's simulated trajectory; this script does not calculate a device readout signal or report experimental hyperpolarisation/measurement data.
+
+## Provenance
+
+The source comments identify the model and parameters as Example 2 of the GRAPE_SCQ package and estimate minutes of calculation time. That is source-provided context, not a runtime measured for this note.

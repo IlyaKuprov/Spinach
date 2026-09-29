@@ -1,30 +1,20 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_3.m
 
 - Signature: `thermal_equilibrium_3()`
+- Source: [`examples/fundamentals/state_tests/thermal_equilibrium_3.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/state_tests/thermal_equilibrium_3.m)
 
 ## Purpose
 
-Test of the thermal equilibrium functionality against the textbook expressions for the Boltzmann populations.
+Checks Spinach's isotropic thermal-equilibrium state against textbook Boltzmann-population expressions for the three spins, across three basis formalisms.
 
-## Physical / mathematical content
+## Model and setup
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The example uses a three-spin trityl/proton system: one electron and two `1H` spins. It sets `sys.magnet=0.34` (described in the source as an X-band magnet), anisotropic Zeeman principal values `[2.00319 2.00319 2.00258]` for the electron and proton shift guesses `[0 0 5]` and `[0 5 0]`. The Euler-angle vectors are `[0 10 0]`, `[0 0 10]`, and `[100 0 0]` degrees (the source scales them by `pi/180`); the three Cartesian coordinate vectors are `[0 0 0]`, `[0 3.5 0]`, and `[2.475 2.475 0]`. The source sets the spin-temperature parameter to `80` without spelling out its unit.
 
-## Numerical / algorithmic content
+## Use and comparison
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The basis uses `approximation='none'` and successively tests `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`. For each, it forms `equilibrium(spin_system)`, evaluates each spin's longitudinal expectation value (`Lz`),, and compares those values with expressions built from `levelpop` for `E` and `1H`. The stated relative-error limit is `1e-3`; a larger discrepancy triggers an error.
 
-## Implementation structure
+## Output and limits
 
-- Test of the thermal equilibrium functionality against the
-- textbook expressions for the Boltzmann populations.
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Formalisms to test
-- Loop over formalisms
-- Formalism and basis set
-- Spinach housekeeping
-- Isotropic thermal equilibrium
+This is an assertion-style test, not a spectrum simulation. The source contains a success message, but that message is not evidence that the test was run here. The field, temperature, and coordinate values above are reported as source inputs; the file does not declare units for the temperature or coordinates.

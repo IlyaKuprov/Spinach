@@ -1,30 +1,26 @@
 # examples/fundamentals/quadratures/grid_leb_vs_etc.m
 
-- Signature: `grid_leb_vs_etc()`
+## Purpose and question
 
-## Purpose
+This example compares spherical-harmonic integration-error profiles for a Lebedev grid and six other grid constructions. The source comment calls it a heuristic-versus-Lebedev bake-off, but a source comment is not evidence that one family wins; the plotted data must be produced to assess that question.
 
-Heuristic vs Lebedev spherical quadrature bake-off, illus- trating the fact that, well... heuristic grids suck.
+## Benchmark configuration
 
-## Physical / mathematical content
+Every profile is requested from `grid_test` for spherical-harmonic ranks `4:2:60` using `Y_lm`. The compared configurations are:
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- Lebedev rank 29, loaded with its angles and weights; the legend labels it 302 points.
+- Repulsion with the same number of points as that Lebedev grid, generated with parameter 3 and 10000 iterations. Voronoi weights are computed from the unit-sphere coordinates derived from beta and gamma, then divided by `4*pi`. Its legend also says 302 points.
+- ZCWn from `grid_fibon('zcwn',302)`, labelled 302 points.
+- Igloo from `grid_igloo(17)`, labelled 328 points.
+- Stoll from `grid_trian('stoll',9)`, labelled 326 points.
+- ASG and SOPHE from `grid_trian` at level 9, each labelled 326 points.
 
-## Numerical / algorithmic content
+The non-Lebedev grid helpers provide angles and weights to the test; the source explicitly constructs and normalises Voronoi weights for the repulsion case. The plot uses logarithmic integration-error axes, limits the displayed error range to `10^-16` through 1, and displays spherical rank from 0 to 64.
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Output and interpretation
 
-## Implementation structure
+The function draws seven error profiles against spherical-harmonic rank. It contains no pass/fail threshold and does not print tabulated error values, so the source alone does not establish a performance ranking or quantitative error bound.
 
-- Heuristic vs Lebedev spherical quadrature bake-off, illus-
-- trating the fact that, well... heuristic grids suck.
-- Evaluate Lebedev grid
-- Evaluate Repulsion grid with Voronoi weights
-- Evaluate ZCWn grid with Voronoi weights
-- Evaluate Igloo grid with Voronoi weights
-- Evaluate Stoll grid with Voronoi weights
-- Evaluate ASG grid with Voronoi weights
-- Evaluate SOPHE grid with Voronoi weights
-- Plot the profiles
-- Residual cosmetics
+There is a label-to-construction clarification: the second plotted series is computed from the Stoll grid call, but its legend text is `EasySpin, 326 pts`. The source does not show an EasySpin call for that series. The source also does not include citations or a saved benchmark result. The plotted profiles depend on the local grid files, helper implementations, and a MATLAB run.
+
+Source: [grid_leb_vs_etc.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/quadratures/grid_leb_vs_etc.m).

@@ -1,92 +1,36 @@
 # interfaces/b2spinach.m
 
 - Signature: `bdata=b2spinach(inpath)`
+- Return value: a structure containing the complex FID matrix, parsed acquisition metadata, and available auxiliary lists.
 
-## Purpose
+## Purpose and accepted input
 
-Imports time-domain NMR data recorded by Bruker instruments: reads the binary fid or ser file together with the acquisiti- on and processing parameter files from the numbered experi- ment directory. Syntax: bdata=b2spinach(inpath)
+Imports time-domain NMR data from a numbered Bruker experiment directory. `inpath` must be a character array naming an existing folder with an `acqus` file. A one-dimensional acquisition is read from `fid`; two or more dimensions use `ser`, with dimensionality inferred from the highest present `acqu2s`, `acqu3s`, or `acqu4s` status file. An `acqu5s` file causes an explicit error: more than four dimensions are unsupported.
 
-## Physical / mathematical content
+## Returned structure
 
-## Numerical / algorithmic content
+- `bdata.fid` is a complex matrix with one FID per column, in binary-file order. Each column contains `bdata.npoints` complex points. The source documents the indirect-dimension loop order for three-or-more-dimensional data as determined by `AQSEQ` in `acqus`; the returned data remain a column matrix.
+- `bdata.acqus` contains parameters parsed from `acqus`; `bdata.acqu2s`, `acqu3s`, and `acqu4s` are included for the dimensions present. Numeric parameters are stored as scalars or column vectors; string values are character arrays or cells of character arrays.
+- `bdata.procs` contains parameters from `pdata/1/procs` when that file exists.
+- `bdata.dirname` is the input directory string; `ndims_data` is the detected dimensionality; `arraydim` is the number of FIDs declared by the indirect-dimension status files; and `fids_in_file` is the number of FID slots actually decoded from the binary file. The binary-file count can exceed the declared count when storage was preallocated or an acquisition was interrupted, and can fall short for non-uniformly sampled data.
+- Acquisition metadata includes `npoints = acqus.TD/2`, pulse-program name `pulprog`, observe-nucleus label `nucleus` (for example, `'1H'`), `gamma = spin(nucleus)` in radians per second per tesla, `sfrq = acqus.SFO1` in MHz, `sw_ppm = acqus.SW` in ppm, and acquisition time `at = npoints/(sw_ppm*sfrq)` in seconds. `spec_start` is `procs.OFFSET-sw_ppm` when processing parameters are present; otherwise it is `1e6*(SFO1/BF1-1)-0.5*sw_ppm*SFO1/BF1` from the acquisition parameters.
+- `digshift` records the digital-filter group delay in complex points. The importer reports this value but does not shift or trim the FIDs to apply a correction. `grad_amps` is included when `difflist` or `difflist.txt` exists and is multiplied by `0.01` to report tesla per metre. Optional `vd_list`, `vc_list`, and `nus_list` fields are read from their same-named files; the NUS schedule is documented as one row per sampled FID and one column per indirect dimension.
 
-## Parameters / inputs
+## Import transformations
 
-- inpath -character string with the path to the numbered
-- Bruker experiment directory containing the ac-
-- qus file and the fid or ser file
+Acquisition parameters are decoded by a local JCAMP reader. It considers private `##$` entries, removes inline `$$` comments, joins multi-line arrays marked with a `(start..end)` range, stores angle-bracket strings as character data or cell arrays, and converts fully numeric values to numeric arrays; other scalar values remain text. It reads `acqus` and the dimension-specific `acquNs` files, plus only the first processed data directory's `procs` file when present.
 
-## Outputs
+Binary byte order follows `BYTORDA` (`0` little-endian, `1` big-endian). `DTYPA` selects signed 32-bit integer, 32-bit float, or 64-bit float storage (`0`, `1`, or `2`, respectively). The code accounts for Bruker 1024-byte block padding, while also accepting unpadded FID strides when the file length matches. It reshapes the interleaved real values by FID, drops block padding, forms each complex point as real minus `1i` times imaginary, and applies the binary scale factor `2^NC`.
 
-- bdata.fid -matrix of complex free induction de-
-- cays, one per column, in the order
-- they are stored in the file; for data
-- sets with three and more dimensions
-- the loop order over the indirect di-
-- mensions is determined by the AQSEQ
-- parameter of the acqus structure
-- bdata.acqus -structure with every parameter found
-- in the acqus file: numeric parameters
-- as scalars or column vectors, string
-- parameters as character strings or
-- cell arrays thereof
-- bdata.acqu2s -same for the acqu2s file of data sets
-- with two or more dimensions
-- bdata.acqu3s -same for the acqu3s file of data sets
-- with three or more dimensions
-- bdata.acqu4s -same for the acqu4s file of four-di-
-- mensional data sets
-- bdata.procs -same for the procs file of the first
-- processed data directory when present
-- bdata.dirname -experiment directory name
-- bdata.ndims_data -number of dimensions in the data set
-- bdata.arraydim -number of fids the status parameter
-- files declare as acquired
-- bdata.fids_in_file -number of fid slots held by the bina-
-- ry file, and the column count of the
-- fid matrix; exceeds arraydim when the
-- acquisition was preallocated or inter-
-- rupted, and falls short of it for non-
-- uniformly sampled data sets, where the
-- fids follow the acquisition order of
-- the sampling schedule in nus_list
-- bdata.npoints -complex points per fid
-- bdata.pulprog -pulse programme name
-- bdata.nucleus -observe nucleus, e.g. '1H'
-- bdata.gamma -magnetogyric ratio of the observe
-- nucleus, rad/(s*T)
-- bdata.sfrq -spectrometer frequency, MHz
-- bdata.at -acquisition time, seconds
-- bdata.sw_ppm -spectral width, ppm
-- bdata.spec_start -lower edge of the spectrum, ppm
-- bdata.digshift -group delay of the digital filter in
-- complex points; the first round(dig-
-- shift) points of each fid precede the
-- start of the true signal
-- bdata.grad_amps -gradient amplitudes, T/m, present
-- when the difflist file exists
-- bdata.vd_list -variable delay list, seconds, present
-- when the vdlist file exists
-- bdata.vc_list -variable counter list, present when
-- the vclist file exists
-- bdata.nus_list -non-uniform sampling schedule, pre-
-- sent when the nuslist file exists
-- Adapted from the brukerimport() function of the GNAT package by:
-- Dr. Mathias Nilsson
-- School of Chemistry, University of Manchester,
-- Oxford Road, Manchester M13 9PL, UK
+Digital-filter delay handling sets `digshift` to zero for analogue mode (`DIGMOD == 0`) and uses a reported `GRPDLY` when it is present and not `-1`. Otherwise, for non-unit `DECIM`, it uses the built-in decimation table for `DSPFVS` 10–12 or the source's closed-form expression for `DSPFVS == 13`. Missing or unsupported firmware/decimation combinations raise errors; data without digital filtering receive zero delay.
 
-## Implementation structure
+The list reader requires non-empty, whitespace-separated rows with a consistent number of entries. A single terminal `n`, `u`, `m`, or `s` is interpreted as a multiplier of `1e-9`, `1e-6`, `1e-3`, or `1`, respectively. Invalid numeric entries raise an error. The gradient list then receives the additional `0.01` scaling described above.
 
-- Imports time-domain NMR data recorded by Bruker instruments:
-- reads the binary fid or ser file together with the acquisiti-
-- on and processing parameter files from the numbered experi-
-- ment directory. Syntax:
-- bdata=b2spinach(inpath)
-- inpath - character string with the path to the numbered
-- Bruker experiment directory containing the ac-
-- qus file and the fid or ser file
-- bdata.fid -matrix of complex free induction de-
-- cays, one per column, in the order
-- they are stored in the file; for data
-- sets with three and more dimensions
+## Guardrails and dependencies
+
+The importer errors for a missing directory or `acqus`, a missing `fid`/`ser`, unsupported dimensions, unsupported byte-order or data-type codes, malformed list data, or binary lengths inconsistent with the acquisition point count and block stride. It also errors if the binary file contains fewer FIDs than `arraydim`, except when a `nuslist` file is present; that exception does not itself validate schedule-to-column agreement. It relies on Spinach's `spin` function to obtain `gamma` from the observe nucleus.
+
+## Links
+
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/b2spinach.m
+- [Spinach Wiki: b2spinach.m](https://spindynamics.org/wiki/index.php?title=b2spinach.m)

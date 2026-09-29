@@ -1,33 +1,21 @@
 # examples/nmr_solids/mas_powder_trp_fplanck.m
 
+- MATLAB implementation: [examples/nmr_solids/mas_powder_trp_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_trp_fplanck.m)
+
+Source: [examples/nmr_solids/mas_powder_trp_fplanck.m](../../../../../examples/nmr_solids/mas_powder_trp_fplanck.m)
+
 - Signature: `mas_powder_trp_fplanck()`
 
-## Purpose
+## Model and data
 
-13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Isotropic chemical shifts come from the experimental data. Coordinates are from X-ray data and CSAs are estimated with DFT. Calculation time: days, hours with a Tesla A100 GPU.
+This example calculates the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling, using the Fokker-Planck MAS formalism. It imports tryptophan data from `trp_xray.out`, maps C and N to `13C` and `15N`, and sets 9.4 T. The source identifies X-ray coordinates and DFT-estimated chemical-shift anisotropies; its indexed isotropic shifts are described as experimental inputs, not simulated output.
 
-## Physical / mathematical content
+For the two unit-cell molecules, the first eight indexed shift values are 124.2, 110.1, 114.7, 118.0, 119.3, 107.5, 134.9, and 125.0 ppm. The first molecule uses 26.8, 54.6, and 174.4 ppm for the final three; the second uses 28.0, 52.1, and 173.3 ppm. These are Zeeman-tensor inputs, not reported spectrum positions.
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+## Fokker-Planck calculation and acquisition
 
-## Numerical / algorithmic content
+The basis is `sphten-liouv` with `IK-0`, longitudinal `15N`, projection +1, and interaction level 3. The rotor rate is 14 kHz about axis vector `[1 1 1]`; the calculation uses rank 11 and the named `leb_2ang_rank_11` grid. Each system is propagated by `singlerot` with `acquire` in NMR mode, and the two FIDs are added. Acquisition uses a 100 kHz sweep, 2048 points, 8192-point zero filling, and `13C` `L+` initial and receiver states. The source enables the GPU for the second molecule; the GPU-enable line for the first is commented out.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Spectrum processing
 
-## Implementation structure
-
-- 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H),
-- computed using the Fokker-Planck MAS formalism. Isotropic chemical
-- shifts come from the experimental data. Coordinates are from X-ray
-- data and CSAs are estimated with DFT.
-- Calculation time: days, hours with a Tesla A100 GPU.
-- % First molecule in the unit cell
-- Spin system properties (DFT calculation)
-- Magnet field
-- Experimental chemical shifts, first conformation
-- Basis set
-- Algorithmic options
-- sys.enable={'gpu'};
+The summed FID is exponentially apodised with parameter 6, Fourier transformed, and plotted as its real spectrum. The simulation settings are not measured spectral output.

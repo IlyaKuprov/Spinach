@@ -1,31 +1,20 @@
 # examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck_exchange.m
 
 - Signature: `mas_powder_mhc_fplanck_exchange()`
+- Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck_exchange.m
 
 ## Purpose
 
-Water protons in the unit cell of monohydrocalcite, inc- luding position exchange and MAS. Further details in: Calculation time: seconds.
+Simulates the MAS 1H NMR spectrum of water protons in monohydrocalcite with position exchange between two reaction endpoints. The source cites https://doi.org/10.1038/s41467-023-44381-x, attributes its parametrisation to Huang et al. (ACIE, 2021), and reports seconds of calculation time.
 
-## Physical / mathematical content
+## Spin and exchange model
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The code reads the CASTEP-derived `mhc.magres` file and removes C, O, and Ca. It builds two two-proton endpoints from proton sites at positions 1 and 4, with the site order reversed in the second endpoint; all four spins are 1H. Their shielding tensors are `29.25*eye(3)-cst` using the corresponding source tensors, and the coordinates are selected from those two positions. The kinetic parts are `[1 2]` and `[3 4]`, with initial concentrations `[1 1]` in arbitrary units. The exchange-rate matrix is `2,000*[-1 1; 1 -1]` Hz. The field setting is `sys.magnet=9.4`, labelled 400 MHz NMR in the source; the basis is `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+## MAS and pulse-acquire settings
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The source sets the MAS rate parameter to 10,000 (no unit is written beside this assignment) about axis `[1 1 1]`, with powder grid `rep_2ang_100pts_sph` and maximum rank 13. The sweep is set as `1/(5e-6)`; the source does not annotate a unit on this assignment. It uses 512 points and 1,024-point zero filling. The initial state and detection operator are both `state(spin_system,'L+','1H')`, and the sequence callback is `@acquire` inside `singlerot`. No RF pulse duration or power is specified in this source.
 
-## Implementation structure
+## Inputs and outputs
 
-- Water protons in the unit cell of monohydrocalcite, inc-
-- luding position exchange and MAS. Further details in:
-- Calculation time: seconds.
-- 400 MHz NMR
-- Read CASTEP file
-- Drop C, O, and Ca atoms
-- Two reaction endpoints with two protons
-- each, swapped by the reaction
-- Convert shielding tensors into shift using the
-- parametrisation of Huang et al. ACIE 2021
-- Get coordinates
-- Chemical kinetics endpoints
+The simulation applies exponential apodisation with parameter 6 to the computed FID, Fourier transforms it, and plots the real spectrum with `plot_1d`. Its input is the CASTEP-derived structural/shielding data in `mhc.magres`; it does not load an experimental FID or measured spectrum. The output is a simulated MAS spectrum.

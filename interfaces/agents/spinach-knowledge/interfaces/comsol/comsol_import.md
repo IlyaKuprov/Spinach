@@ -1,58 +1,33 @@
 # interfaces/comsol/comsol_import.m
 
 - Signature: `mesh=comsol_import(comsol)`
+- Source: [interfaces/comsol/comsol_import.m](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/comsol_import.m)
+- Wiki: [comsol_import.m](https://spindynamics.org/wiki/index.php?title=comsol_import.m)
 
-## Purpose
+## Purpose and input structure
 
-COMSOL 2D mesh data import, cropping and preprocessing for Spinach. Syntax: mesh=comsol_import(comsol)
+Imports and preprocesses a 2D COMSOL mesh and vertex-centred flow velocities. The required `comsol` structure contains:
 
-## Physical / mathematical content
+- `mesh_file`: character-array path to a COMSOL ASCII file with vertex coordinates and edge indices.
+- `velo_file`: character-array path to a COMSOL ASCII file with vertex-centred flow velocities.
+- `crop`: a two-element cell array `{[xmin xmax],[ymin ymax]}`; each interval must be numeric, real, have two elements, and have its first limit below its second.
+- `inactivate`: a numeric row vector of positive integer mesh-vertex indices to deactivate.
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+The validator requires a struct, both character-array paths, and all four fields. It does not check the deactivation indices against the imported mesh size in this wrapper.
 
-## Numerical / algorithmic content
+## Processing and return value
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Returns a mesh structure, not a modified `comsol` input. The wrapper calls these Spinach routines in order:
 
-## Parameters / inputs
+1. `comsol_mesh(comsol.mesh_file)` imports geometry and edge indices.
+2. `comsol_velo(mesh,comsol.velo_file)` adds the vertex-centred velocity data.
+3. `mesh_crop(mesh,comsol.crop)` retains the requested rectangular region.
+4. `mesh_inact(mesh,comsol.inactivate)` deactivates the selected vertices.
+5. `mesh_vorn(mesh)` computes the Voronoi tessellation.
+6. `mesh_preplot(mesh)` prepares plotting auxiliaries.
 
-- comsol.mesh_file -name of an ASCII file with
-- vertex coordinates and edge
-- index produced by COMSOL
-- comsol.velo_file -name of an ASCII file with
-- vertex-centred flow veloci-
-- ties produced by COMSOL
-- comsol.crop -{[xmin xmax],[ymin ymax]}
-- region of the mesh to retain
-- comsol.inactivate -a row vector with mesh vertex
-- indices to deactivate
+The documented result contains geometry fields `.x`, `.y`, and `.idx`; velocity fields `.u` and `.v`; Voronoi data `.vor`; and fast-plot data `.plot`. This wrapper delegates file interpretation and mesh operations to the listed functions; it adds no separate unit conversion.
 
-## Outputs
+## Dependencies and guardrails
 
-- mesh – Spinach mesh object with
-- ▸ geometry (.x, .y, .idx)
-- ▸ flow velocities (.u, .v)
-- ▸ Voronoi tessellation (.vor)
-- ▸ fast-plot auxiliaries (.plot)
-- Notes: internally this routine is just a convenience wrapper
-- that calls the following functions
-- ▸ comsol_mesh() – mesh import
-- ▸ comsol_velo() – velocity import
-- ▸ mesh_crop() – region trimming
-- ▸ mesh_vorn() – Voronoi tessellation
-- ▸ mesh_preplot() – plotting accelerators
-
-## Implementation structure
-
-- COMSOL 2D mesh data import, cropping and preprocessing for
-- Spinach. Syntax:
-- mesh=comsol_import(comsol)
-- comsol.mesh_file -name of an ASCII file with
-- vertex coordinates and edge
-- index produced by COMSOL
-- comsol.velo_file -name of an ASCII file with
-- vertex-centred flow veloci-
-- ties produced by COMSOL
-- comsol.crop -{[xmin xmax],[ymin ymax]}
-- region of the mesh to retain
-- comsol.inactivate -a row vector with mesh vertex
+The six routines above are required dependencies. Character-array rather than string-scalar path inputs are required by the local `ischar` checks. Crop bounds must be ordered as specified, and inactivation entries must be positive integers in a row vector; index-range validation is not performed here.

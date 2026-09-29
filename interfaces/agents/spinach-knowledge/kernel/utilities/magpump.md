@@ -1,49 +1,43 @@
 # kernel/utilities/magpump.m
 
-- Signature: `R=magpump(spin_system,R,rho,rate)`
-
 ## Purpose
 
 Adds phenomenological pumping terms to the relaxation superoperator to enable approximate simulation of CIDNP, PHIP and DNP type effects.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function adds pumping as a coupling to the unit state: the first column of the relaxation superoperator `R` is incremented by `rate*rho`. The call is
 
-## Numerical / algorithmic content
-
-## Syntax
-
-```matlab
+```
 R=magpump(spin_system,R,rho,rate)
 ```
 
-## Parameters / inputs
+For the pumping to work correctly, the unit state population (first element) in the state vector that `R` will be acting on must be set to 1.
 
-- R -relaxation superoperator, from relaxation()
-- rho -the state to be pumped, from state()
-- rate -pumping rate, Hz
+The function is only available in the `sphten-liouv` formalism, and may be called repeatedly if multiple states are pumped.
 
-## Outputs
+Consistency checks are enforced by an internal `grumble` function:
 
-- R -modified relaxation superoperator
-- Note: for the pumping to work correctly, the unit state population
-- (first element) in the state vector that R will be acting on
-- must be set to 1.
-- Note: this function is only available in sphten-liouv formalism, and
-- may be called repeatedly if multiple states are pumped.
+- `R` must be a numeric matrix.
+- `rho` must be a numeric column vector.
+- `rate` must be a finite real scalar.
+- `spin_system.bas.formalism` must be `sphten-liouv`.
+- `rho(1)` must be zero; otherwise an error is raised stating that the unit state cannot be pumped.
 
-## Implementation structure
+## Inputs and outputs
 
-- Adds phenomenological pumping terms to the relaxation superoperator
-- to enable approximate simulation of CIDNP, PHIP and DNP type effects.
-- R=magpump(spin_system,R,rho,rate)
-- R -relaxation superoperator, from relaxation()
-- rho -the state to be pumped, from state()
-- rate -pumping rate, Hz
-- R -modified relaxation superoperator
-- Note: for the pumping to work correctly, the unit state population
-- (first element) in the state vector that R will be acting on
-- must be set to 1.
-- Note: this function is only available in sphten-liouv formalism, and
-- may be called repeatedly if multiple states are pumped.
+**Inputs**
+
+- `spin_system` — spin system object.
+- `R` — relaxation superoperator, from `relaxation()`.
+- `rho` — the state to be pumped, from `state()`.
+- `rate` — pumping rate, Hz.
+
+**Outputs**
+
+- `R` — modified relaxation superoperator.
+
+## References
+
+- Source: [magpump.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/magpump.m)
+- Wiki: [magpump.m](https://spindynamics.org/wiki/index.php?title=magpump.m)

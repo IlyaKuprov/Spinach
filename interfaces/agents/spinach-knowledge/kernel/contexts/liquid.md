@@ -1,74 +1,25 @@
 # kernel/contexts/liquid.m
 
 - Signature: `answer=liquid(spin_system,pulse_sequence,parameters,assumptions)`
+- Source: [kernel/contexts/liquid.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/liquid.m)
+- Wiki: [liquid.m](https://spindynamics.org/wiki/index.php?title=liquid.m)
 
-## Purpose
+## Contract
 
-Liquid-phase interface to pulse sequences. Generates a Liouvillian superoperator and passes it on to the pulse sequence function, which should be supplied as a handle. This interface handles RDC mode --if the 'rdc' need is specified, it would use the order matrix supplied by the user to compute the residual anisotropies of all interactions. Syntax: answer=liquid(spin_system,pulse_sequence,parameters,assumptions)
+`liquid` constructs the liquid-phase spin Liouvillian components and calls `pulse_sequence(spin_system,parameters,H,R,K)`. The context returns whatever the pulse sequence returns. It applies the supplied `assumptions` before constructing the operators; the source documentation lists context-specific choices such as `nmr`, `epr`, and `labframe`, with the pulse-sequence documentation determining which are appropriate.
 
-## Physical / mathematical content
+This context has no orientation or spatial grid: `parameters.spc_dim=1` and `parameters.spn_dim=size(H,1)`. The spin-space operator dimension follows the spin system's active basis and assumptions. The context does not define the shape of the pulse sequence's returned value.
 
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
+## Channel and sequence inputs
 
-## Numerical / algorithmic content
+`parameters.spins` is a nonempty cell array of isotope labels in channel order; the documented example is `{'1H','13C'}`. `parameters.offset` gives one transmitter offset per listed spin, in Hz, and defaults to zero offsets when omitted. `parameters.needs` requests optional sequence inputs:
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- `zeeman_op` builds the laboratory-frame Zeeman operator and places it in `parameters.hzeeman`.
+- `rho_eq` builds the thermal-equilibrium state with respect to the isotropic Hamiltonian and places it in `parameters.rho0`.
+- `rdc` selects residual-dipolar-coupling handling. The context uses the order matrix through `residual(spin_system)`, then forms the coherent Hamiltonian from the isotropic part and the rank components at zero orientation. Relaxation and kinetics are also built for this mode.
 
-## Parameters / inputs
+The `parameters.rframes` cell array specifies rotating frames as {isotope, order} pairs. For example, `{{'13C',2},{'14N',3}}` requests a second-order transformation for the carbon-13 carrier and a third-order transformation for nitrogen-14; the source states that arbitrary orders, including infinite order, are supported. If omitted, no extra rotating-frame transformations are applied.
 
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- parameters.spins -a cell array giving the
-- spins that the pulse sequence works on, in
-- the order of channels, e.g. {'1H','13C'}
-- parameters.offset -a cell array giving
-- transmitter offsets on each of the spins
-- listed in parameters.spins array.
-- parameters.needs -a cell array of strings specifying additional
-- information required by the sequence:
-- 'zeeman_op' -Zeeman part of the Hamiltonian
-- in the laboratory frame, to be placed into
-- parameters.hzeeman and sent to pulse sequence
-- 'rdc' -triggers the processing of residual
-- anisotropic couplings due to partial order
-- 'rho_eq' -thermal equilibrium state at the
-- specified temperature with respect to the
-- isotropic part of the Hamiltonian; this is
-- placed into parameters.rho0
-- parameters.rframes -rotating frame specification, e.g.
-- {{'13C',2},{'14N,3}} requests second
-- order rotating frame transformation
-- with respect to carbon-13 and third
-- order rotating frame transformation
-- with respect to nitrogen-14. When
-- this option is used, the assumptions
-- on the respective spins should be
-- laboratory frame.
-- parameters.* -additional subfields may be required by
-- the pulse sequence -check its docs
-- assumptions -context-specific assumptions ('nmr', 'epr',
-- 'labframe', etc.) -see the pulse sequence
-- header for information on this setting.
+## Example from the source documentation
 
-## Outputs
-
-- answer -whatever it is that the pulse sequence returns.
-- Note: arbitrary order rotating frame transformation is supported, inc-
-- luding infinite order. See the header of rotframe.m for further
-- information.
-
-## Implementation structure
-
-- Liquid-phase interface to pulse sequences. Generates a Liouvillian
-- superoperator and passes it on to the pulse sequence function, which
-- should be supplied as a handle.
-- This interface handles RDC mode --if the 'rdc' need is specified,
-- it would use the order matrix supplied by the user to compute the
-- residual anisotropies of all interactions. Syntax:
-- answer=liquid(spin_system,pulse_sequence,parameters,assumptions)
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- parameters.spins -a cell array giving the
-- spins that the pulse sequence works on, in
+This context function assembles sequence inputs; it does not itself specify a complete pulse sequence.

@@ -1,32 +1,32 @@
 # kernel/conventions/transforms/gauss2mhz.m
 
-- Signature: `hfc_mhz=gauss2mhz(hfc_gauss,g)`
-
 ## Purpose
 
-Converts hyperfine couplings from Gauss to MHz (linear frequency). The Gauss specification may be defined as "the magnetic field at which the electron frequency is equal to the frequency provided". Syntax: hfc_mhz=gauss2mhz(hfc_gauss,g) Arrays of any dimensions are supported. Parameters: hfc_gauss -an array of values in Gauss g -electron g-factor; if this parameter is skipped, free electron g-factor is used for conve
+Converts hyperfine coupling values in gauss to linear frequency values in MHz. The source describes the Gauss specification as the magnetic field at which the electron frequency equals the supplied frequency.
 
-## Physical / mathematical content
+## Signature
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+`hfc_mhz=gauss2mhz(hfc_gauss,g)`
 
-## Numerical / algorithmic content
+## Conversion
 
-## Outputs
+The source sets `muB = 9.274009994e-24`, `hbar = 1.054571628e-34`, and computes:
 
-- hfc_mhz -an array of values in MHz
+`C = 1e-10 * g * muB / (hbar * 2*pi)`
 
-## Implementation structure
+`hfc_mhz = C * hfc_gauss`
 
-- Converts hyperfine couplings from Gauss to MHz (linear
-- frequency). The Gauss specification may be defined as
-- "the magnetic field at which the electron frequency is
-- equal to the frequency provided". Syntax:
-- hfc_mhz=gauss2mhz(hfc_gauss,g)
-- Arrays of any dimensions are supported. Parameters:
-- hfc_gauss -an array of values in Gauss
-- g -electron g-factor; if this parameter
-- is skipped, free electron g-factor is
-- used for conversion
-- hfc_mhz -an array of values in MHz
-- Set the defaults
+If `g` is omitted, it uses `g = 2.0023193043622` (free-electron g-factor) and displays a message.
+
+## Inputs and output
+
+- `hfc_gauss`: real numeric array in gauss; arrays of any dimensions are supported.
+- `g`: optional real numeric scalar. The implementation requires one element but does not explicitly require it to be finite or positive.
+- `hfc_mhz`: array in MHz, with the same dimensions as `hfc_gauss`.
+
+The conversion applies a scalar factor; there is no orientation or rotation input.
+
+## References
+
+- MATLAB source: [kernel/conventions/transforms/gauss2mhz.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/gauss2mhz.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=gauss2mhz.m)

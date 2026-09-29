@@ -1,39 +1,9 @@
 # kernel/overloads/@ttclass/ranks.m
 
-- Signature: `ttranks=ranks(ttrain)`
+Signature: `ttranks=ranks(ttrain)`
 
-## Purpose
+Source: [kernel/overloads/@ttclass/ranks.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/ranks.m) · Wiki: [ttclass/ranks.m](https://spindynamics.org/wiki/index.php?title=ttclass/ranks.m)
 
-Returns the bond dimensions of a tensor train. Syntax: ttranks=ranks(ttrain)
+For each buffered train, the method returns an `(ncores+1)-by-ntrains` rank array. Column `n` lists the first core's left bond dimension through the last core's left bond dimension, followed by the last core's fourth dimension (the right boundary rank). Thus the first and final entries are the boundary ranks, expected to be 1 for a valid train; this method reads them and does not validate that condition.
 
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- ttrain -a tensor train object
-
-## Outputs
-
-- ttranks -(ncores+1) by (ntrains) array; the
-- first and the last elements for each
-- train are 1
-
-## Implementation structure
-
-- Returns the bond dimensions of a tensor train. Syntax:
-- ttranks=ranks(ttrain)
-- ttrain -a tensor train object
-- ttranks -(ncores+1) by (ntrains) array; the
-- first and the last elements for each
-- train are 1
-- Get core array dimensions
-- Preallocate the answer
-- Loop over the buffer
-- Extract the ranks
-- I refrain from publishing for fear that disputes and controversies
-- may be raised against me by ignoramuses.
+It reads core-array dimensions only: it neither evaluates nor materialises tensor entries and leaves the train unchanged. There is no explicit type or shape guard in this method; it directly accesses `ttrain.cores`. The method performs no scalar operation or conjugation.

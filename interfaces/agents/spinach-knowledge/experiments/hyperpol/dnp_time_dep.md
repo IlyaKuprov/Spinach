@@ -1,53 +1,31 @@
 # experiments/hyperpol/dnp_time_dep.m
 
+- MATLAB implementation: [experiments/hyperpol/dnp_time_dep.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/dnp_time_dep.m)
+
 - Signature: `answer=dnp_time_dep(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and physical scope
 
-Time-domain spin dynamics under microwave irradiation. Syntax: answer=dnp_time_dep(spin_system,parameters,H,R,K)
+This routine produces time-domain `coil`-projection trajectories under a fixed microwave drive and offset. It converts the supplied generator and parameters to Liouville space, adds the microwave and electron-offset terms to the Hamiltonian, and propagates the initial state under the Hamiltonian, relaxation and kinetics. Electron-nuclear hyperfine effects are represented only when included in the supplied spin-system model. This routine returns signal trajectories; it does not reconstruct an image or execute an ESEEM/ENDOR sequence.
 
-## Physical / mathematical content
+## Inputs
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
+- `parameters.mw_pwr`: microwave power in radians per second; `parameters.mw_off`: microwave-frequency offset from the free-electron frequency in radians per second.
+- `parameters.rho0`: initial state; `parameters.coil`: detection-state vector or horizontal stack.
+- `parameters.mw_oper`: microwave irradiation operator; `parameters.ez_oper`: electron `Lz` operator.
+- `parameters.dt`: time step in seconds; `parameters.nsteps`: number of `evolution` steps.
+- H, R and K: Hamiltonian, relaxation and kinetics matrices supplied by the context function.
 
-## Numerical / algorithmic content
+## Propagation and output axes
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine calls Liouville-space conversion, updates the Hamiltonian with the microwave and offset operators, and calls `evolution` in 'multichannel' mode. The returned matrix has detection channels as rows and trajectory samples as columns; time spacing is dt. Its values are projections of the evolving state onto the supplied `coil` states. After `sim2liouv` conversion, the propagator supports `sphten-liouv` and `zeeman-liouv`. A `zeeman-hilb` density-matrix input is also accepted: `sim2liouv` first converts its generators, states and operators to `zeeman-liouv` before the formalism guard. Unlike the two steady-state scan routines, its source requires a thermalised relaxation superoperator.
 
-## Parameters / inputs
+## Source-coded numerical example
 
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.mw_off -microwave frequency offset
-- from free electron,rad/s
-- parameters.rho0 -thermal equilibrium state
-- parameters.coil -coil state vector or a hori-
-- zontal stack thereof
-- parameters.mw_oper -microwave irradiation operator
-- parameters.ez_oper -Lz operator on the electrons
-- parameters.dt -time step, seconds
-- parameters.nsteps -number of time steps
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+`examples/dnp_liq/odnp_liquid_2.m` models liquid-phase Overhauser DNP after a perfect electron ESR inversion pulse. It sets `parameters.mw_pwr`=0, `parameters.mw_off`=0, `parameters.dt`=1e-6 seconds and `parameters.nsteps`=1e3. Its plot uses a 0-to-1000-microsecond axis with 1001 samples; the pulse prepares the input state before this propagator call. This is a simulation setup, not experimental data.
 
-## Outputs
+## Source and attribution
 
-- answer -a matrix of projections of the trajectory on
-- each of the coils provided at each time step
-- Note: the relaxation superoperator must be thermalised for this
-- type of calculation.
-
-## Implementation structure
-
-- Time-domain spin dynamics under microwave irradiation. Syntax:
-- answer=dnp_time_dep(spin_system,parameters,H,R,K)
-- parameters.mw_pwr - microwave power, rad/s
-- parameters.mw_off - microwave frequency offset
-- from free electron,rad/s
-- parameters.rho0 - thermal equilibrium state
-- parameters.coil - coil state vector or a hori-
-- zontal stack thereof
-- parameters.mw_oper - microwave irradiation operator
-- parameters.ez_oper - Lz operator on the electrons
-- parameters.dt - time step, seconds
-- parameters.nsteps - number of time steps
+- Source: `experiments/hyperpol/dnp_time_dep.m`
+- <https://spindynamics.org/wiki/index.php?title=dnp_time_dep.m>
+- Source attribution: ilya.kuprov@weizmann.ac.il

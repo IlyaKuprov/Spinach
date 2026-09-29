@@ -1,38 +1,36 @@
 # kernel/utilities/sinkhole.m
 
-- Signature: `L=sinkhole(spin_system,L,states)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sinkhole.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sinkhole.m)
 
 ## Purpose
 
-Turns the specified states into sinkholes --any population reaching them will be summed up and stored forever in a frozen state. This is useful for state space restriction diagnostics. Syntax: L=sinkhole(spin_system,L,states)
+Turns specified states of a spin system into sinkholes: any population reaching them is summed up and stored forever in a frozen state. This is useful for state space restriction diagnostics.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `L=sinkhole(spin_system,L,states)`.
+- The function first runs a consistency check (`grumble`) on the inputs.
+- The columns of the Liouvillian corresponding to the sinkhole states are zeroed: `L(:,states)=0`.
+- This functionality is only available in the `sphten-liouv` formalism; an error is raised otherwise.
+- Consistency enforcement errors if:
+  - `spin_system.bas.formalism` is not `'sphten-liouv'`.
+  - `L` is not numeric or not a square matrix.
+  - The dimension of `L` does not match the dimension of the basis set (`spin_system.bas.basis`).
+  - `states` is not a numeric, real vector of positive integers.
+  - Any element of `states` exceeds the state space dimension.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- L -Liovillian matrix
-- states -a vector of integers specifying the
-- numbers of the states to be set up
-- as sinkholes
-- Output:
-- L -updated Liouvillian matrix
-- Note: this functionality is only available in sphten-liouv formalism.
+- `spin_system` — spin system object.
+- `L` — Liouvillian matrix.
+- `states` — vector of positive integers specifying the numbers of the states to be set up as sinkholes.
 
-## Implementation structure
+**Outputs**
 
-- Turns the specified states into sinkholes --any population reaching
-- them will be summed up and stored forever in a frozen state. This is
-- useful for state space restriction diagnostics. Syntax:
-- L=sinkhole(spin_system,L,states)
-- L -Liovillian matrix
-- states -a vector of integers specifying the
-- numbers of the states to be set up
-- as sinkholes
-- Output:
-- L -updated Liouvillian matrix
-- Note: this functionality is only available in sphten-liouv formalism.
-- Check consistency
+- `L` — updated Liouvillian matrix with the specified columns zeroed.
+
+## References
+
+- Spinach Wiki: [sinkhole.m](https://spindynamics.org/wiki/index.php?title=sinkhole.m)

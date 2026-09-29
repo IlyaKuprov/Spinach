@@ -1,44 +1,24 @@
 # kernel/carrier.m
 
-- Signature: `H=carrier(spin_system,spins,operator_type)`
+- Signature: `H = carrier(spin_system,spins,operator_type)`
+- Implementation: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/carrier.m>
 
-## Purpose
+## Contract
 
-Returns the "carrier" Hamiltonian -the part of the Zeeman interaction Hamiltonian that corresponds to all particles having the Zeeman frequ- ency prescribed by their isotropic free-particle magnetogyric ratio and Z axis magnet field specified by the user. This Hamiltonian is used in rotating frame transforms and average Hamiltonian theories. Syntax: H=carrier(spin_system,spins,operator_type)
+Builds the carrier part of the Zeeman Hamiltonian from the isotropic free-particle magnetogyric ratios and the user-specified Z-axis field, as represented in `spin_system.inter.basefrqs`. The source describes its use in rotating-frame transforms and average-Hamiltonian theory.
 
-## Physical / mathematical content
+For each selected spin with nonzero `basefrqs`, the function adds that value times the spin's `Lz` operator, requested through `operator(spin_system,{'Lz'},{spin_index},operator_type)`. It then symmetrises the sum as `(H+H')/2` and passes it to `clean_up` with `spin_system.tols.liouv_zero`. The carrier source applies no unit conversion and does not state a unit for `basefrqs`; the coefficient is used as stored.
 
-## Numerical / algorithmic content
+## Inputs and options
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- `spin_system` — Spinach system object.
+- `spins` — character array naming an isotope present in `spin_system.comp.isotopes` (for example, `'1H'`), or `'all'`. An isotope name selects all matching entries; `'all'` selects every spin.
+- `operator_type` — optional character array. It defaults to `'comm'` and must be one of `'left'`, `'right'`, `'comm'`, or `'acomm'`. In Liouville space these request the left-product, right-product, commutation, and anticommutation superoperators, respectively.
 
-## Parameters / inputs
+## Output dimensions
 
-- spins -a string specifying the isotope, e.g. '1H';
-- to select all spins, use 'all'.
-- in Liouville space, operator_type can be set to
-- 'left' -produces left side product superoperator
-- 'right' -produces right side product superoperator
-- 'comm' -produces commutation superoperator (default)
-- 'acomm' -produces anticommutation superoperator
-- in Hilbert space this parameter is ignored.
+`H` is the Hamiltonian matrix in Hilbert space or the corresponding superoperator in Liouville space. Its square dimensions follow the operator space and basis configured for `spin_system` (the Hilbert basis dimension in Hilbert space, or the Liouville basis dimension for the superoperator).
 
-## Outputs
+## Reference
 
-- H -a Hamiltonian (Hilbert space) or its superoperator
-- of the specified type (Liouville space).
-
-## Implementation structure
-
-- Returns the "carrier" Hamiltonian -the part of the Zeeman interaction
-- Hamiltonian that corresponds to all particles having the Zeeman frequ-
-- ency prescribed by their isotropic free-particle magnetogyric ratio and
-- Z axis magnet field specified by the user. This Hamiltonian is used in
-- rotating frame transforms and average Hamiltonian theories. Syntax:
-- H=carrier(spin_system,spins,operator_type)
-- spins -a string specifying the isotope, e.g. '1H';
-- to select all spins, use 'all'.
-- in Liouville space, operator_type can be set to
-- 'left' -produces left side product superoperator
-- 'right' -produces right side product superoperator
-- 'comm' -produces commutation superoperator (default)
+- [Spinach Wiki: `carrier.m`](https://spindynamics.org/wiki/index.php?title=carrier.m)

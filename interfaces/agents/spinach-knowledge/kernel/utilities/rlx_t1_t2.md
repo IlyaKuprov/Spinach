@@ -1,49 +1,43 @@
 # kernel/utilities/rlx_t1_t2.m
 
-- Signature: `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rlx_t1_t2.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rlx_t1_t2.m)
 
 ## Purpose
 
-Extended T1/T2 relaxation model returning the relaxation super- operators separately for the longitudinal and the transverse states. Syntax: [R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)
+Extended T1/T2 relaxation model that returns the relaxation superoperators separately for the longitudinal and the transverse states.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)`.
+- Calls `grumble` to enforce that `spin_system.bas.formalism` is `'sphten-liouv'`; otherwise it errors with `'this function is only available in sphten-liouv formalism.'`.
+- Computes spherical tensor ranks (`L`) and projections (`M`) via `lin2lm(spin_system.bas.basis)`.
+- Preallocates per-isotope `r1_rates` and `r2_rates` vectors sized to `spin_system.comp.isotopes`.
+- For each isotope, the R1 and R2 rate specifications are read from the cell arrays `spin_system.rlx.r1_rates{n}` and `spin_system.rlx.r2_rates{n}`. Each entry may be:
+  - A numeric scalar: the rate is assigned directly.
+  - A numeric 3x3 tensor: Euler angles must be supplied, otherwise the function errors with `'Euler angles must be specified with anisotropic T1/T2 relaxation theory.'`. The orientation vector is computed as `ort=[0 0 1]*euler2dcm(euler_angles(1),euler_angles(2),euler_angles(3))` (noted in the source as matching `alphas=0` of two-angle grids), and the rate is `ort*current_r*_rate*ort'`.
+  - A function handle: Euler angles must be supplied (same error otherwise); the rate is obtained by calling the handle as `current_r*_rate(euler_angles(1),euler_angles(2),euler_angles(3))`.
+  - Any other specification triggers an error (`'unknown R1 rate specification.'`).
+- Euler angles use the ZYZ active convention in radians and specify the system orientation relative to the input orientation; they have no effect when R1 and R2 rates are scalars.
+- After filling the rates, the function verifies that all R1 and R2 rates are real, erroring with `'all R1 and R2 relaxation rates must be real numbers.'` if not.
+- Builds diagonal superoperators over the Liouville space of dimension `size(spin_system.bas.basis,1)` using a `parfor` loop over all states:
+  - Spins in the unit state (`L(n,:)==0`) do not contribute.
+  - Spins in longitudinal states (`M(n,:)==0` among contributing spins) contribute their R1 rate.
+  - Spins in transverse states (`M(n,:)~=0` among contributing spins) contribute their R2 rate.
+  - Each state's total R1 and R2 rates are the sums of the contributing single-spin rates; multi-spin orders relax at the sum of the rates of their constituent single-spin orders.
+- Returns `R1Op=-spdiags(r1_diagonal,0,matrix_dim,matrix_dim)` and `R2Op=-spdiags(r2_diagonal,0,matrix_dim,matrix_dim)` as sparse diagonal superoperators with negated (dissipative) diagonals.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+**Inputs**
 
-## Parameters / inputs
+- `spin_system` — Spinach spin system object; must use the `sphten-liouv` formalism, with relaxation specifications in `spin_system.rlx.r1_rates` and `spin_system.rlx.r2_rates`.
+- `euler_angles` — Three Euler angles (ZYZ active convention, radians) specifying system orientation relative to the input orientation; required when R1 and/or R2 rates are given as 3x3 tensors or function handles, and ignored for scalar rates.
 
-- euler_angles -three Euler angles (ZYZ active convention
-- in radians) specifying system orientation
-- relative to the input orientation; requi-
-- red when R1 and/or R2 rates had been spe-
-- cified as 3x3 tensor or a function handle,
-- this argument has no effect for R1 and R2
-- rates specified as scalars.
+**Outputs**
 
-## Outputs
+- `R1Op` — Relaxation superoperator containing all longitudinal relaxation terms.
+- `R2Op` — Relaxation superoperator containing all transverse relaxation terms.
 
-- R1Op -relaxation superoperator containing
-- all longitudinal relaxation terms
-- R2Op -relaxation superoperator containing
-- all transverse relaxation terms
-- Note: multi-spin orders relax at the sum of the rates of
-- their constituent single-spin orders.
+## References
 
-## Implementation structure
-
-- Extended T1/T2 relaxation model returning the relaxation super-
-- operators separately for the longitudinal and the transverse
-- states. Syntax:
-- [R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)
-- euler_angles -three Euler angles (ZYZ active convention
-- in radians) specifying system orientation
-- relative to the input orientation; requi-
-- red when R1 and/or R2 rates had been spe-
-- cified as 3x3 tensor or a function handle,
-- this argument has no effect for R1 and R2
-- rates specified as scalars.
-- R1Op -relaxation superoperator containing
+- Spinach Wiki: [rlx_t1_t2.m](https://spindynamics.org/wiki/index.php?title=rlx_t1_t2.m)

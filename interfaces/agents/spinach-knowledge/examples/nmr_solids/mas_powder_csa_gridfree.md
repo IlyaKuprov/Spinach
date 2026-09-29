@@ -1,33 +1,13 @@
 # examples/nmr_solids/mas_powder_csa_gridfree.m
 
-- Signature: `mas_powder_csa_gridfree()`
+Source: [examples/nmr_solids/mas_powder_csa_gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_csa_gridfree.m)
 
-## Purpose
+## Model
 
-Powder magic angle spinning spectrum of a pair of anisotropically shielded proton spins using grid- free Fokker-Planck equation formalism. Calculation time: minutes
+This source models two `1H` spins at 14.1 T with Zeeman eigenvalue triplets `[-2 -2 4]-5` and `[-1 -3 4]+5`, each with Euler angles `[0 0 0]`. It specifies anisotropic shielding tensors, but no dipolar coupling, quadrupolar interaction, or RF pulse sequence. The header describes a powder MAS spectrum using a grid-free Fokker-Planck formalism.
 
-## Physical / mathematical content
+## Calculation and display
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The basis is `sphten-liouv` with no approximation and the `+1` projection. The rotor axis is `[1 1 1]` at 500 Hz. The experiment settings acquire on `1H` from and to `L+` states, with an empty decoupling list, a 20 kHz sweep, 512 points, and zero-fill to 4096. No explicit orientation grid is set. The active call is `gridfree(spin_system,@acquire,parameters,'nmr')`.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a pair of
-- anisotropically shielded proton spins using grid-
-- free Fokker-Planck equation formalism.
-- Calculation time: minutes
-- System specification
-- Basis set
-- Spinach housekeeping
-- Parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+After exponential apodisation with parameter 6, the code Fourier transforms the FID and plots the real spectrum. The axis units are ppm and the axis is inverted. These are simulation and display settings, not an experimentally measured spectrum.

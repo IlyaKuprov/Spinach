@@ -1,57 +1,15 @@
 # kernel/optimcon/trapdiff.m
 
-- Signature: `[DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)`
+Signature: `[DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)`
 
-## Purpose
 
-Directional derivatives for the trapezium product quadrature publi- shed by Iserles and Norsett (see Corollary 3.3) in The derivatives are of the following propagator: expm(-i*((HL+HR)/2+i*dt*(sqrt(3)/12)*[HL,HR])*dt) with respect to the coefficients cL,cR in the evolution generators HL and HR on the left and the right side of the interval respecti- vely. Evolution generators HL and HR are split into the drift part H
+This routine returns directional derivatives of the trapezium-product interval propagator `expm(-i*((HL+HR)/2 + i*dt*(sqrt(3)/12)*[HL,HR])*dt)` with respect to the left and right endpoint coefficients. Here `HL=Hd{1}+cL*Hc` and `HR=Hd{2}+cR*Hc`; `[HL,HR]` denotes the commutator. The `sqrt(3)/12` coefficient and propagator form are retained from the source documentation.
 
-## Physical / mathematical content
+`Hd` is a two-element cell array of same-size square drift matrices, ordered left edge then right edge; `Hc` is a matching-size square control operator or superoperator. `dt` must be a positive real scalar; `cL` and `cR` must be real numeric scalars. The guards do not impose finiteness on these scalar inputs. `DL` and `DR` are matrix derivatives, each the same size as the propagator, with respect to `cL` and `cR` respectively.
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The routine builds endpoint-specific directions: `H_dir_L=Hc/2+1i*dt*sqrt(3)/12*(Hc*Hd{2}-Hd{2}*Hc)` and `H_dir_R=Hc/2+1i*dt*sqrt(3)/12*(Hd{1}*Hc-Hc*Hd{1})`. It passes each direction to `dirdiff` and selects the second returned derivative entry. It has no waveform, freeze or phase-cycle mask.
 
-## Numerical / algorithmic content
+The trapezium-product quadrature is attributed to Iserles and Nørsett, Corollary 3.3, [doi:10.1098/rsta.1999.0362](https://doi.org/10.1098/rsta.1999.0362). The derivative method cites Goodwin and Kuprov, Eq. 16, [doi:10.1063/1.4928978](https://doi.org/10.1063/1.4928978).
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Syntax
-
-```matlab
-[DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)
-```
-
-## Parameters / inputs
-
-- Hd -a cell array of two matrices containing drift
-- generators at the left (first element) and the
-- right (second element) edge of the interval
-- Hc -control operator or superoperator
-- dt -interval duration, seconds
-- cL -control operator coefficient at the
-- left edge of the interval
-- cR -control operator coefficient at the
-- right edge of the interval
-
-## Outputs
-
-- DL -derivative of the interval propagator
-- with respect to cL
-- DR -derivative of the interval propagator
-- with respect to cR
-
-## Implementation structure
-
-- Directional derivatives for the trapezium product quadrature publi-
-- shed by Iserles and Norsett (see Corollary 3.3) in
-- The derivatives are of the following propagator:
-- expm(-i*((HL+HR)/2+i*dt*(sqrt(3)/12)*[HL,HR])*dt)
-- with respect to the coefficients cL,cR in the evolution generators
-- HL and HR on the left and the right side of the interval respecti-
-- vely. Evolution generators HL and HR are split into the drift part
-- Ho and the control part Hc, such that HL=Ho+cL*Hc and HR=Ho+cR*Hc
-- on the left and the right edge of the interval.
-- The derivatives are calculated using Eq 16 of Goodwin and Kuprov
-- [DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)
-- Hd -a cell array of two matrices containing drift
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/trapdiff.m)
+[Spinach Wiki](https://spindynamics.org/wiki/index.php?title=trapdiff.m)

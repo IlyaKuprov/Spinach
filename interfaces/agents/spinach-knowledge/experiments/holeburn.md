@@ -1,65 +1,30 @@
 # experiments/holeburn.m
 
-- Signature: `fid=holeburn(spin_system,parameters,H,R,K)`
+- Signature: fid=holeburn(spin_system,parameters,H,R,K)
 
-## Purpose
+## Purpose and physical scope
 
-Hole burning experiment -a soft pulse follwed by a hard pi/2 observation pulse. The soft pulse is simulated using Fokker- Planck formalism. Syntax: fid=holeburn(spin_system,parameters,H,R,K)
+Models a spectral hole-burning sequence: a frequency-selective soft pulse acts on the supplied initial state, followed by a hard pi/2 observation pulse and free-induction-decay acquisition. The soft pulse is propagated in a rank-truncated Fokker–Planck representation. Hyperfine interactions can influence the result through the supplied Spinach Hamiltonian, but this function itself is not an ESEEM or ENDOR sequence and does not create a hyperfine model.
 
-## Physical / mathematical content
+## Inputs and parameters
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+H, R and K are the Hamiltonian, relaxation and kinetics matrices supplied by the experiment context. The Liouville core accepts `sphten-liouv` and `zeeman-liouv` directly. A `zeeman-hilb` density-matrix context is also supported: `sim2liouv` converts the generators, basis and state-like `rho0`/`coil` fields to `zeeman-liouv` before the grumbler runs. Its combined generator is H+1i*R+1i*K.
 
-## Numerical / algorithmic content
+- parameters.spins: the function uses the first spin label to build the pulse operator; the source code uses this field even though its header does not document it.
+- parameters.pulse_frq: soft-pulse frequency in Hz.
+- parameters.offset: receiver offset in Hz; the code subtracts it from pulse_frq before soft-pulse propagation.
+- parameters.pulse_phi: soft-pulse phase in radians.
+- parameters.pulse_pwr: soft-pulse amplitude in radians per second.
+- parameters.pulse_dur: soft-pulse duration in seconds.
+- parameters.pulse_rnk: Fokker–Planck cutoff rank. The source advises increasing the rank until the output converges.
+- parameters.method: soft-pulse propagation choice: expv, expm, or evolution.
+- parameters.rho0 and parameters.coil: initial state and detection state.
+- parameters.sweep: acquisition sweep width in Hz; parameters.npoints is the number of FID points.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Sequence and output
 
-## Parameters / inputs
+The routine forms the selected-spin raising operator, projects it into the enlarged space, and derives the x and y pulse operators. It applies shaped_pulse_af with the offset-corrected frequency, power, duration, phase, rank, and selected propagation method. It then applies a hard pi/2 step about the y operator and calls acquire with the resulting state. The only returned quantity is fid: the FID sampled at the requested point count and sweep width. No time-axis output is returned separately; the acquisition dwell is set by the sweep width.
 
-- parameters.pulse_frq -frequency of the soft pulse, Hz
-- parameters.pulse_phi -phase of the soft pulse, rad
-- parameters.pulse_pwr -power of the soft pulse, rad/s
-- parameters.pulse_dur -duration of the sof pulse, s
-- parameters.pulse_rnk -Fokker-Planck cut-off rank
-- parameters.offset -receiver offset for the time
-- domain detection, Hz
-- parameters.sweep -sweep width for time domain
-- detection, Hz
-- parameters.npoints -number of points in the free
-- induction decay
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.method -soft puse propagation method,
-- 'expv' for Krylov propagation,
-- 'expm' for exponential propa-
-- gation, 'evolution' for Spin-
-- ach evolution function
-- H -Hamiltonian matrix, received from context
-- function
-- R -relaxation superoperator, received from
-- context function
-- K -kinetics superoperator, received from
-- context function
-- Output:
-- fid -free induction decay seen by the state speci-
-- fied in parameters coil after the hole burning
-- pulse followed by a hard pi/2 pulse.
-- Note: the rank parameter should be increased until conver-
-- gence is achieved in the output.
+The source provides pi/2 as the observation-pulse angle and recommends rank convergence, but gives no numeric pulse-frequency, power, duration, rank, or acquisition example. Those settings should be selected for the spin system and experiment rather than inferred here.
 
-## Implementation structure
-
-- Hole burning experiment -a soft pulse follwed by a hard pi/2
-- observation pulse. The soft pulse is simulated using Fokker-
-- Planck formalism. Syntax:
-- fid=holeburn(spin_system,parameters,H,R,K)
-- parameters.pulse_frq -frequency of the soft pulse, Hz
-- parameters.pulse_phi -phase of the soft pulse, rad
-- parameters.pulse_pwr -power of the soft pulse, rad/s
-- parameters.pulse_dur -duration of the sof pulse, s
-- parameters.pulse_rnk -Fokker-Planck cut-off rank
-- parameters.offset -receiver offset for the time
-- domain detection, Hz
-- parameters.sweep -sweep width for time domain
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/holeburn.m

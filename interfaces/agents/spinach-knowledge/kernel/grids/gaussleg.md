@@ -4,38 +4,23 @@
 
 ## Purpose
 
-Computes Gauss-Legendre points and weights in [a,b] interval with accuracy order n. Syntax: [x,w]=gaussleg(a,b,n)
+Constructs a Gauss-Legendre quadrature rule on the finite interval `[a,b]`.
 
-## Physical / mathematical content
+## Rule, dimensions, and reproducibility
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+The requested positive integer `n` gives `n+1` nodes: the routine refines the Legendre-polynomial roots on `[-1,1]`, computes their Gauss-Legendre weights, maps both to `[a,b]`, then sorts the nodes in ascending order with their corresponding weights. Thus `x` and `w` are matching `(n+1)`-element column vectors. As a Gauss-Legendre rule with `n+1` nodes, it integrates polynomials through degree `2*n+1` exactly in exact arithmetic.
 
-## Numerical / algorithmic content
+Node starts are computed from a fixed formula and refined by Newton iteration; no random sampling is used. Iteration stops when the largest node update is no greater than machine epsilon. The implementation rejects `n>40` and advises subdividing the interval instead.
 
 ## Parameters / inputs
 
-- a -left edge of the interval
-- b -right edge of the interval
-- n -accuracy order, the number of points in the
-- resulting grid will be n+1.
+- `a`, `b` — finite real scalar endpoints with `a < b`.
+- `n` — finite positive real integer no greater than 40.
 
 ## Outputs
 
-- x -Gauss-Legendre points
-- w -Gauss-Legendre weights
+- `x` — ascending Gauss-Legendre nodes on `[a,b]`.
+- `w` — corresponding integration weights for `[a,b]`.
 
-## Implementation structure
-
-- Computes Gauss-Legendre points and weights in [a,b] interval
-- with accuracy order n. Syntax:
-- [x,w]=gaussleg(a,b,n)
-- a -left edge of the interval
-- b -right edge of the interval
-- n -accuracy order, the number of points in the
-- resulting grid will be n+1.
-- x -Gauss-Legendre points
-- w -Gauss-Legendre weights
-- Check consistency
-- Initial guess for the nodes in [-1 1]
-- Newton-Raphson refinement
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/gaussleg.m)
+<https://spindynamics.org/wiki/index.php?title=gaussleg.m>

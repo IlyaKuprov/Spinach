@@ -1,30 +1,20 @@
 # examples/benchmarks/comm_gpu.m
 
-- Signature: `comm_gpu(n)`
+- MATLAB implementation: [examples/benchmarks/comm_gpu.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/benchmarks/comm_gpu.m)
 
-## Purpose
+- Signature: `comm_gpu(n)`; with no argument, runs once for each GPU reported by `gpuDeviceCount('available')`.
+- Returns: no MATLAB output arguments. Prints peak bandwidths and opens a two-panel figure.
 
-GPU communications benchmark. Adapted from example code in Matlab documentation. Data for IK's favourite NVIDIA cards on Dell Power Edge T630 workstation: Tesla K40 (2013): send 9.7, gather 2.6, bw GPU 190, bw CPU 64 Titan V (2017, TCC mode): send 10.3, gather 2.6, bw GPU 568, bw CPU 64 Tesla A100 (2021, PCI-E): send 10.4, gather 2.6, bw GPU 1291, bw CPU 64
+## Purpose and use
 
-## Physical / mathematical content
+This standalone MATLAB GPU benchmark separates host-to-device transfer, device-to-host transfer, and simple read/write throughput on the GPU and CPU. Run `comm_gpu()` to use every available device in turn, or `comm_gpu(n)` to select device index `n` through `gpuDevice(n)`. It requires MATLAB GPU support and an available CUDA GPU; it is not a Spinach simulation.
 
-- Benchmark examples. These files stress-test Spinach performance, scaling, and numerical throughput on representative spin-dynamics workloads, so runtime, memory pressure, and solver/pathway choices are part of the intended content.
+## What it measures
 
-## Numerical / algorithmic content
+The test sizes are `2.^(14:28)` bytes. Each size is divided by eight to allocate a column of double-precision values, generated as random integers from 0 to 9 on the host and on the GPU. For each size it times (1) `gpuArray(host_data)` with `gputimeit`, (2) `gather(gpu_data)` with `gputimeit`, (3) `gpu_data+1.0` with `gputimeit`, and (4) `host_data+1.0` with `timeit`. Transfer bandwidth is size/time; the read/write estimates count two passes (2×size/time). The script converts these values to decimal GB/s and reports the maximum in each series. Its transfer plot distinguishes send from gather, using a logarithmic size axis and the default linear bandwidth axis. The read/write plot compares GPU and host arithmetic on logarithmic size and bandwidth axes.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The header records reference figures for an NVIDIA Tesla K40 (2013), Titan V (2017, TCC mode), and Tesla A100 (2021, PCIe) in a Dell PowerEdge T630: respectively send/gather/bw-GPU/bw-CPU values of 9.7/2.6/190/64, 10.3/2.6/568/64, and 10.4/2.6/1291/64. These are historical workstation notes, not guaranteed results; the comment does not give units for those four-tuples (the script's current console output labels its calculated bandwidths GB/s).
 
-## Implementation structure
+## Limits
 
-- GPU communications benchmark. Adapted from example code in Matlab
-- documentation. Data for IK's favourite NVIDIA cards on Dell Power
-- Edge T630 workstation:
-- Tesla K40 (2013): send 9.7, gather 2.6, bw GPU 190, bw CPU 64
-- Titan V (2017, TCC mode): send 10.3, gather 2.6, bw GPU 568, bw CPU 64
-- Tesla A100 (2021, PCI-E): send 10.4, gather 2.6, bw GPU 1291, bw CPU 64
-- All GPUs by default
-- Pick the GPU
-- 8 bytes per double
-- Array sizes to test
-- Preallocate answer arrays
-- Measure performance
+Results depend on device, MATLAB/toolbox version, and host/device configuration. The function does not return the per-size timing or bandwidth arrays, and the source provides no device selection by name or input size override. Plotting uses Spinach helpers such as `kgrid`, `klegend`, `kfigure`, and `scale_figure`.

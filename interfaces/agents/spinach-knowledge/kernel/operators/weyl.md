@@ -1,48 +1,14 @@
 # kernel/operators/weyl.m
 
-- Signature: `A=weyl(nlevels)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/weyl.m
+Wiki: https://spindynamics.org/wiki/index.php?title=weyl.m
 
-## Purpose
+## Purpose and basis
 
-Weyl boson operators (sparse, see below for normalisa- tion convention) for a bosonic mode with a user-speci- fied population number truncation. Syntax: A=weyl(nlevels)
+`weyl(nlevels)` returns sparse, complex matrices for one truncated bosonic mode. `nlevels` must be a positive real integer. Each output is `nlevels`-by-`nlevels`; the number operator has diagonal entries `0,1,...,nlevels-1`, so matrix position `j` corresponds to population `j-1` in MATLAB one-based indexing.
 
-## Physical / mathematical content
+## Operators and normalisation
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The returned fields are `A.u` (identity), `A.c` (creation), `A.a` (annihilation), and `A.n` (number). The source constructs `A.c` from `sqrt(1:nlevels)` on diagonal offset `-1`, `A.a` from `sqrt(0:(nlevels-1))` on offset `+1`, and `A.n` from `0:(nlevels-1)` on the main diagonal; `A.u` is `speye(nlevels)`. This records the literal vectors and offsets supplied to `spdiags`.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- nlevels -an integer specifying the
-- number of population levels
-
-## Outputs
-
-- A.u -unit operator
-- A.c -creation operator
-- A.a -annihilation operator
-- A.n -population number operator
-- Note: the matrices are normalised to obey the following
-- relations for all energy level counts
-- A.c*A.a=A.n, [A.n,A.c]=A.c
-- [A.n,A.a]=-A.a, [A.a,A.c]=A.u
-- except for the edge state at which [A.a,A.c] ele-
-- ment is (1-nlevels), this is unavoidable.
-- Note: arrays are declared complex at build time to avoid
-- expensive reallocation operations later on.
-
-## Implementation structure
-
-- Weyl boson operators (sparse, see below for normalisa-
-- tion convention) for a bosonic mode with a user-speci-
-- fied population number truncation. Syntax:
-- A=weyl(nlevels)
-- nlevels -an integer specifying the
-- number of population levels
-- A.u -unit operator
-- A.c -creation operator
-- A.a -annihilation operator
-- A.n -population number operator
-- Note: the matrices are normalised to obey the following
-- relations for all energy level counts
+The source documents the normalisation relations `A.c*A.a=A.n`, `[A.n,A.c]=A.c`, `[A.n,A.a]=-A.a`, and `[A.a,A.c]=A.u`, with the stated finite-cutoff exception: at the edge state, the `[A.a,A.c]` element is `1-nlevels`. The truncation therefore modifies that commutator at the highest retained population. These finite matrices are not a propagator or evolution generator.

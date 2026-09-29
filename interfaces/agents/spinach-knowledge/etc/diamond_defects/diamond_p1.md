@@ -1,41 +1,29 @@
 # etc/diamond_defects/diamond_p1.m
 
-- Signature: `[sys,inter]=diamond_p1(parameters)`
+- MATLAB implementation: [etc/diamond_defects/diamond_p1.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_p1.m)
 
-## Purpose
+## Purpose and call
 
-P1 centre spin system for diamond. Syntax: [sys,inter]=diamond_p1(parameters) Magnetic parameters from: Nir-Arad et al. Phys. Chem. Chem. Phys. 26, 27633 (2024), <https://doi.org/10.1039/d4cp03055a>, and Smith et al. Phys. Rev. 115, 1546 (1959),
+Constructs a P1-centre spin system for diamond:
 
-## Physical / mathematical content
+`[sys,inter]=diamond_p1(parameters)`
 
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+`parameters` must be a structure. Its supported fields are:
 
-## Numerical / algorithmic content
+- `orientation`: `'111'`, `'110'`, or `'100'`; the specified crystal-plane normal is aligned with the magnetic field. Defaults to `'111'`.
+- `nitrogen`: `'14N'` or `'15N'`. Defaults to `'14N'`.
 
-## Parameters / inputs
+## Physical and numerical model
 
-- a structure (parameters.*) with the following fields:
-- .orientation -'111', '110', or '100' crystal
-- plane normal aligned with the
-- magnetic field, def. is '111'
-- .nitrogen -'14N' or '15N', default is '14N'
+The system contains an electron (`'E'`) and the selected nitrogen isotope. The electron g-tensor principal values in the trigonal frame are 2.00220, 2.00220, and 2.00218. For `'14N'`, the electron–nitrogen hyperfine values are 81.3, 81.3, and 114.0 MHz, and a nitrogen quadrupolar tensor is assigned as `zfs2mat(-3.97e6,0,0,0,0)`. For `'15N'`, the hyperfine values are −114.0, −114.0, and −159.9 MHz; no nitrogen quadrupolar tensor is assigned. Tensors are transformed from the trigonal principal-axis frame with a rotation aligning the selected crystal direction with `[0 0 1]`.
 
-## Outputs
+Magnetic parameters: Nir-Arad et al., *Phys. Chem. Chem. Phys.* **26**, 27633 (2024), <https://doi.org/10.1039/d4cp03055a>; Smith et al., *Phys. Rev.* **115**, 1546 (1959), <https://doi.org/10.1103/PhysRev.115.1546>.
 
-- sys -Spinach system specification structure
-- inter -Spinach interaction specification structure
+## Outputs and limitations
 
-## Implementation structure
+- `sys`: Spinach system specification structure.
+- `inter`: Spinach interaction specification structure containing the electron Zeeman tensor and isotope-dependent coupling tensors.
 
-- P1 centre spin system for diamond. Syntax:
-- [sys,inter]=diamond_p1(parameters)
-- Magnetic parameters from: Nir-Arad et al. Phys. Chem. Chem. Phys. 26,
-- 27633 (2024), <https://doi.org/10.1039/d4cp03055a>, and
-- Smith et al. Phys. Rev. 115, 1546 (1959),
-- a structure (parameters.*) with the following fields:
-- .orientation -'111', '110', or '100' crystal
-- plane normal aligned with the
-- magnetic field, def. is '111'
-- .nitrogen -'14N' or '15N', default is '14N'
-- sys -Spinach system specification structure
-- inter -Spinach interaction specification structure
+The function builds specifications, not a simulation, and does not set a magnetic-field strength. Although both fields default when omitted from the structure, the `parameters` structure argument itself is still required. Supplied `orientation` must be a character array; supplied `nitrogen` is not separately type-checked. Unsupported orientation and isotope values error. Source documentation: <https://spindynamics.org/wiki/index.php?title=diamond_p1.m>.
+
+**Orientation clarification:** `'111'`, `'110'`, and `'100'` identify the crystal-plane normal aligned with the field; they are not field-strength settings.

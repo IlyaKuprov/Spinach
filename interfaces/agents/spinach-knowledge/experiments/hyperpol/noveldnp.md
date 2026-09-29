@@ -1,47 +1,25 @@
 # experiments/hyperpol/noveldnp.m
 
 - Signature: `contact_curve=noveldnp(spin_system,parameters,H,R,K)`
+- Canonical MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/noveldnp.m
 
-## Purpose
+## Purpose and sequence
 
-Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed solid effect (SE). For futher information see: Syntax (call from powder context): contact_curve=noveldnp(spin_system,parameters,H,R,K)
+Computes a DNP contact-time observable for the pulsed solid effect or NOVEL. The supplied context matrices are combined as `L=H+1i*R+1i*K`; `K` is the kinetics superoperator, so it is not an MRI readout or a substitute for the spin Hamiltonian. The source builds electron-spin operators from the electron raising operator.
 
-## Physical / mathematical content
+Both branches use a microwave spin-lock contact period along (-Y). With `parameters.flippulse=0`, propagation starts directly from `parameters.rho0` (the no-prepulse solid-effect branch). With `parameters.flippulse=1`, an electron (X)-axis 90-degree pulse is first applied for `parameters.pulse_dur`, then the (-Y) contact period is sampled (NOVEL). The microwave amplitude is given in Hz and multiplied by `2*pi` in the generator.
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
+## Inputs and units
 
-## Numerical / algorithmic content
+`H`, `R`, and `K` are context-supplied matrices. Required fields are `parameters.irr_powers` (non-negative microwave amplitude, Hz), `rho0` (initial state), `coil` (detection state), `timestep` (positive seconds), `nsteps` (positive integer), and `flippulse` (0 or 1). When `flippulse=1`, `pulse_dur` is also required and is a positive duration in seconds.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Output and scope
 
-## Parameters / inputs
+`contact_curve` is the single-coil observable trace from the `evolution(...,'observable')` path: the initial value followed by the values at each of `nsteps` time steps. It is an observable curve, not a polarisation measurement, FID, image, or k-space array. This function has no gradient or spatial-encoding input.
 
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.timestep -time step of the contact curve, s
-- parameters.nsteps -number of time steps in the con-
-- tact curve
-- parameters.flippulse -0: Solid Effect (no flip pulse)
-- 1: NOVEL (90-degree flip pulse)
-- Output:
-- contact_curve -time dependence of the coil state
+Source-defined numeric choices include the 0/1 pulse switch and the 90-degree preparation followed by a 270-degree ((-Y)) spin-lock axis. The source and baseline page do not give an example parameter set or a computed numeric result.
 
-## Implementation structure
+## References
 
-- Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed
-- solid effect (SE). For futher information see:
-- Syntax (call from powder context):
-- contact_curve=noveldnp(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.timestep -time step of the contact curve, s
+- NOVEL/solid-effect references retained from the source: https://doi.org/10.1016/0022-2364(88)90190-4 and https://doi.org/10.1063/1.5000528
+- Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=noveldnp.m

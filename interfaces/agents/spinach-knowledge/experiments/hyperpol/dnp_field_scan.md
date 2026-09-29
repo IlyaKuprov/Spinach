@@ -1,62 +1,38 @@
 # experiments/hyperpol/dnp_field_scan.m
 
+- MATLAB implementation: [experiments/hyperpol/dnp_field_scan.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/dnp_field_scan.m)
+
 - Signature: `dnp=dnp_field_scan(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and physical scope
 
-Magnetic field scan steady-state DNP experiment. Returns the steady-state population of the user-specified state as a fun- ction of magnetic field. Syntax: dnp=dnp_field_scan(spin_system,parameters,H,R,K)
+This routine solves a steady-state DNP problem at each supplied magnetic-field offset. It is a steady-state linear-system calculation, not time propagation or a pulse-sequence controller. Microwave driving and the electron Zeeman offset act on the spin model supplied by the caller; the caller supplies the Hamiltonian, relaxation and kinetics superoperators. Electron-nuclear hyperfine interactions contribute only if they are present in that model. This is not an ESEEM/ENDOR sequence or an image-reconstruction routine.
 
-## Physical / mathematical content
+## Inputs
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- `parameters.mw_pwr`: microwave power in Hz; the implementation converts it to angular units in the Liouvillian.
+- `parameters.mw_frq`: microwave-frequency offset in Hz from the free-electron frequency at the reference B0.
+- `parameters.fields`: real vector of magnetic-field offsets from reference B0, in tesla.
+- `parameters.rho0`: equilibrium state at reference B0.
+- `parameters.coil`: one detection-state vector or a horizontal stack of detection states.
+- `parameters.mw_oper`: microwave irradiation operator; `parameters.ez_oper`: electron `Lz` operator.
+- `parameters.method`: `'backslash'` or `'gmres'`.
+- H, R and K: Hamiltonian, relaxation and kinetics matrices supplied by the context function.
 
-## Numerical / algorithmic content
+## Calculation and output axes
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The routine forms the generator from H + `1i`*R + `1i`*K, adds the microwave and reference-frequency terms, and forms the source b = R*`rho0`. For each field it adds the electron Zeeman offset, solves the steady-state linear system, and projects the solution onto each detection state. The returned dnp has shape [numel(`parameters.fields`), size(`parameters.coil`,2)]: rows follow the supplied field vector and columns follow the `coil`-state stack. Values are expectation values and may be complex; the example plots their real part.
 
-## Parameters / inputs
+## Model limits
 
-- parameters.mw_pwr -microwave power, Hz
-- parameters.mw_frq -microwave frequency offset from
-- the free electron frequency at
-- the reference B0 field, Hz
-- parameters.fields -a vector of magnetic field off-
-- sets from the reference B0 field,
-- Tesla
-- parameters.rho0 -equilibrium state at the reference
-- B0 field
-- parameters.coil -coil state vector or a horizon-
-- tal stack thereof
-- parameters.mw_oper -microwave irradiation operator
-- parameters.ez_oper -Lz operator on the electrons
-- parameters.method -'backslash' to use Matlab's
-- linear equation solver, 'gmres'
-- to use ILU preconditioned GMRES
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- Output:
-- dnp -an array of steady state expectation values for
-- the states specified in parameters.coil at each
-- of the fields supplied
-- Note: the relaxation superoperator should NOT be thermalized
-- for this type of calculation.
-- Note: thermal equilibrium state and relaxation superoperator are
-- assumed to be the same at all fields in the sweep -DO NOT
-- USE with broad magnetic field sweep experiments.
+The source explicitly requires an unthermalised relaxation superoperator. It also assumes the equilibrium state and relaxation superoperator are the same at every field in the sweep, and warns against broad field sweeps. Use only where that fixed-reference assumption is suitable. Supported formalisms are `sphten-liouv` and `zeeman-liouv`.
 
-## Implementation structure
+## Source-coded numerical example
 
-- Magnetic field scan steady-state DNP experiment. Returns the
-- steady-state population of the user-specified state as a fun-
-- ction of magnetic field. Syntax:
-- dnp=dnp_field_scan(spin_system,parameters,H,R,K)
-- parameters.mw_pwr - microwave power, Hz
-- parameters.mw_frq - microwave frequency offset from
-- the free electron frequency at
-- the reference B0 field, Hz
-- parameters.fields - a vector of magnetic field off-
-- sets from the reference B0 field,
-- Tesla
-- parameters.rho0 - equilibrium state at the reference
+`examples/dnp_sol/solid_effect_field_scan_1.m` sets `parameters.mw_pwr`=1e5 Hz, `parameters.mw_frq`=-14e8 Hz, and `parameters.fields`=linspace(-0.08,+0.08,512) tesla. It detects the 15N `Lz` state in a gadolinium-containing solid-effect DNP example. These are simulation inputs, not measured values or a reported calculation result.
+
+## Source and attribution
+
+- Source: `experiments/hyperpol/dnp_field_scan.m`
+- <https://spindynamics.org/wiki/index.php?title=dnp_field_scan.m>
+- Source attribution: ilya.kuprov@weizmann.ac.il

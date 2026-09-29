@@ -4,61 +4,19 @@
 
 ## Purpose
 
-RLC circuit response calculation -converts a waveform from the ideal shape emitted by the instrument into the shape that comes out of the RLC circuit of the probe. Syntax: [X,Y,dt]=restrans(X_user,Y_user,dt_user,... omega,Q,model,up_factor)
+Applies the source's second-order RLC probe-response model to rotating-frame in-phase and out-of-phase waveform components and returns the filtered components on a coarser time grid.
 
-## Physical / mathematical content
+## Time grid and signal processing
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+For `pwc`, each input pair is interpreted at a slice midpoint: the duration is `numel(X_user)*dt_user`, and the finer circuit grid is populated by nearest-neighbour interpolation with extrapolation. For `pwl` and `pwl_tsc`, the paired samples are interpreted at slice edges: the duration is `(numel(X_user)-1)*dt_user`, and linear interpolation fills the finer grid. The fine time step is `pi/(16*omega)` (the source labels this 16-fold Nyquist oversampling).
 
-## Numerical / algorithmic content
+On that grid, the code forms the input carrier from amplitude `sqrt(X0.^2+Y0.^2)` and phase `atan2(Y0,X0)`, simulates the transfer function with numerator `1/Q` and denominator coefficients `[1/omega^2,1/(omega*Q),1]`, then heterodynes the response back into X and Y. Each component is demodulated with a `lowpass` call using an IIR impulse response, cutoff argument 1, sample-rate argument 64, and steepness 0.95. The samples are then downsampled using the integer stride obtained from `floor(numel(X)/(up_factor*numel(X_user)))`; `dt` is multiplied by that stride. For `pwl_tsc`, the internal time grid used by the diagnostic plot is shifted by `-2*Q/omega`; the function does not return a time grid.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- X_user -in-phase part of the rotating frame
-- pulse waveform, a column vector of
-- real numbers
-- Y_user -out-of-phase part of the rotating
-- frame pulse waveform, a column vec-
-- tor of real numbers
-- dt_user -time slice duration, seconds
-- omega -RLC circuit resonance frequency in
-- radians per second, a real number
-- Q -RLC circuit quality factor, a real
-- positive number
-- model -input signal model, use 'pwc' for
-- piecewise-constant, and 'pwl' for
-- piecewise-linear input; time shift
-- compensation for piecewise-linear
-- is requested by 'pwl_tsc'
-- up_factor -the output waveform will have more
-- discretisation points than the in-
-- put waveform by this factor, about
-- 100 is a safe guess
+`X_user` and `Y_user` must be real column vectors with equal lengths; `dt_user`, `omega`, and `Q` must be finite positive scalars. The model is one of `pwc`, `pwl`, or `pwl_tsc`, and `up_factor` is a finite positive integer. The code rejects `dt_user < pi/omega` as breaking its rotating-frame approximation. The source describes about 100 as a safe guess for `up_factor`; this is guidance in the source, not a general accuracy guarantee.
 
-## Outputs
+- `X`, `Y` — output rotating-frame components after the modeled response.
+- `dt` — output slice duration in seconds.
 
-- X -in-phase part of the rotating frame
-- pulse waveform distorted by the RLC
-- response, a column vector of real
-- numbers
-- Y -out-of-phase part of the rotating
-- frame pulse waveform distorted by
-- the RLC response, a column vector
-- of real numbers
-- dt -slice duration in the distorted wave-
-- form, seconds
-
-## Implementation structure
-
-- RLC circuit response calculation -converts a waveform from the
-- ideal shape emitted by the instrument into the shape that comes
-- out of the RLC circuit of the probe. Syntax:
-- [X,Y,dt]=restrans(X_user,Y_user,dt_user,...
-- omega,Q,model,up_factor)
-- X_user -in-phase part of the rotating frame
-- pulse waveform, a column vector of
-- real numbers
-- Y_user -out-of-phase part of the rotating
-- frame pulse waveform, a column vec-
-- tor of real numbers
-- dt_user -time slice duration, seconds
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/restrans.m) · [Spinach wiki page](https://spindynamics.org/wiki/index.php?title=restrans.m)

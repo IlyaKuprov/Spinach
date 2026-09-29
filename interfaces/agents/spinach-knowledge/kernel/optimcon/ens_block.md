@@ -1,41 +1,24 @@
 # kernel/optimcon/ens_block.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/ens_block.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ens_block.m)
+
 - Signature: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
 
-## Purpose
+## Role and case mapping
 
-Fidelity, gradient, and Hessian contributions of one block of ensemble cases, evaluated on the parallel pool worker that holds the drift generators of that block. This function is called by ensemble.m inside its spmd block; the per-case physics (phase cycle, offsets, power level, waveform distortions, GRAPE) is applied here. Syntax: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`.
+This is the worker-side evaluator called by `ensemble.m`. For each case assigned to `block`, catalog columns select the state-target pair, drift generator, power level, offset combination, phase-cycle row, and distortion row. The selected initial and target states, drift and waveform are passed to the GRAPE engine chosen for the spin-system formalism.
 
-## Physical / mathematical content
+Offsets are supplied in Hz and enter the drift as angular-frequency terms `2*pi*offset*off_op`. A phase-cycle row phases the initial and target states and rotates the control channels. The selected power level scales the rotated waveform; the case's distortion functions are then applied in column order. When derivatives are requested, their Jacobians are composed and used to pull the GRAPE gradient back to the input waveform. Frozen waveform samples have zero gradient entries.
 
-Each ensemble member has its own initial/target state pair, drift generator, power level, resonance offsets, phase-cycle step, and distortion model. Offsets specified in Hz contribute angular frequencies through the factor `2*pi`. Phase cycles rotate paired control channels and phase the states; power scaling and distortions determine the actual field experienced by the spins. The chosen GRAPE engine evaluates that member in the configured Hilbert or Liouville representation.
+## Outputs and limits
 
-## Numerical / algorithmic content
+- `traj`: a cell array of trajectory structures, one per case in block order (empty for an empty block). With `'average'` in `control.traj_opts`, a nonempty block is collapsed to one structure whose `forward` member is the sum of that block's forward trajectories; `ensemble.m` forms the catalog-wide mean.
+- `fid`: one fidelity per case, `1 x n_block`.
+- `grad`: block-summed case gradients, a `(ncontrols*nsteps) x 1` column when requested.
+- `hess`: block-summed case Hessians, flattened as a `((ncontrols*nsteps)^2) x 1` column when requested.
 
-For a Cartesian input waveform, the gradient is the pullback of the physical-field derivative through the distortion Jacobian, phase rotation, and power scaling. Only then are frozen Cartesian input entries zeroed. The Liouville engine separately skips physical derivatives only where the composed distortion-and-phase Jacobian has no dependence on any unfrozen input, up to the floating-point summation bound; a frozen long steady-orbit delay may therefore be skipped without suppressing live pullback contributions. Supported Hessians undergo the corresponding two-sided phase/power transformation and have frozen rows and columns zeroed; distortion Hessians remain unavailable. An outer coordinate wrapper must defer its own mask: `grape_curv` passes an empty Cartesian mask and freezes only after its curvilinear pullback. Direct GRAPE engine calls retain their separate existing behaviour.
+The waveform is real numeric, in rad/s, with `ncontrols` rows and `pulse_nsteps` columns for the rectangle integrator or one extra column for the trapezium integrator. The implementation checks type and shape but does not explicitly test sample finiteness. Hessians are supported only with the rectangle integrator and no waveform distortions. The Hessian pullback accounts for phase cycling and power scaling; frozen input coordinates have zero rows and columns.
 
-Worker-local drift storage avoids duplicating the complete drift ensemble on every worker. Fidelities remain per-case, while gradients and Hessians are block sums for reduction and ensemble averaging by `ensemble`. With `traj_opts` containing `average`, one summed forward trajectory is returned per non-empty block; otherwise trajectories retain block order. These sums also support Hilbert-space cell trajectories. An empty block contributes no trajectories.
+## Inputs
 
-## Syntax
-
-`[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
-
-## Parameters / inputs
-
-- `spin_system`: frozen problem published by `optimcon`, with the drift generators removed.
-- `drifts`: cell array of drift generators populated at the indices used by this block's cases.
-- `control`: live client-side control structure.
-- `block`: index into `spin_system.control.worker_cases`.
-- `waveform`: coefficients for the control operators, with controls in rows and time samples in columns; power scaling converts them to the fields used by the engines.
-- `n_outputs`: requested output count: two for fidelity, three for the gradient, and four for the Hessian.
-
-## Outputs
-
-- `traj`: trajectories in block order, or one forward-trajectory sum when `traj_opts` contains `average`; an empty block returns an empty cell.
-- `fid`: a `1 x n_block` array of per-case fidelities.
-- `grad`: summed case gradients as a `ncontrols*nsteps x 1` column, empty unless `n_outputs>2`.
-- `hess`: summed case Hessians as a `(ncontrols*nsteps)^2 x 1` column, empty unless `n_outputs>3`.
-
-## Header notes
-
-The worker receives the frozen spin-system description and its local drift generators together with live control data, the block identifier, waveform, and requested output count.
+`spin_system` and `drifts` are worker-resident frozen problem data published by `optimcon.m`; `control` is the live control structure supplied by `ensemble.m`; `block` is a valid positive integer worker-block index. `n_outputs` requests fidelity only, gradient, or Hessian through `ensemble.m` (2, 3, or 4 outputs respectively).

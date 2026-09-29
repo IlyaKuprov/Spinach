@@ -1,32 +1,20 @@
 # examples/nmr_liquids/pa_sucrose.m
 
 - Signature: `pa_sucrose()`
+- Source: [examples/nmr_liquids/pa_sucrose.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pa_sucrose.m)
 
-## Purpose
+## What it models and loads
 
-1H NMR spectrum of sucrose (magnetic parameters read in from a DFT calculation), including Redfield relaxation superoperator. Calculation time: seconds
+A simulated liquid-state 1H pulse-acquire spectrum of sucrose. The wrapper parses `../standard_systems/sucrose.log`, described in its source comment as a vacuum DFT calculation, and passes the parsed data to `g2spinach` for 1H spin-system properties. This is a computational-chemistry input, not an experimental spectrum. The source comment estimates a run time of seconds; that estimate was not measured here.
 
-## Physical / mathematical content
+## Spin system and relaxation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The wrapper sets `options.min_j=1.0`, passes 31.8 as an additional `g2spinach` argument (its meaning and units are not named in this wrapper), and sets the magnetic field to 14.1 (unit not stated). The basis is spherical-tensor Liouville space, IK-2 approximation, scalar-coupling connectivity and proximity level 2. Redfield relaxation is enabled, equilibrium is zero, retained terms are `secular`, and the correlation time is 1e-9 s (1 ns). The proximity cutoff is 4.0; its unit is not stated.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The initial density operator and receiver are the 1H raising state, with no decoupling. The wrapper calls `liquid(...,@acquire,...,'nmr')`; acquisition uses offset 1800, sweep 5000 and 8,192 points, with zero filling to 65,536. Offset and sweep are not unit-labelled in the wrapper. The displayed axis is ppm and inverted. It applies exponential apodisation with parameter 6, Fourier transforms the FID and plots the real spectrum.
 
-## Implementation structure
+## Output and limits
 
-- 1H NMR spectrum of sucrose (magnetic parameters read in from a DFT
-- calculation), including Redfield relaxation superoperator.
-- Calculation time: seconds
-- Read the spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Proximity cut-off
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+The source produces a plotted simulation, not a measured spectrum or saved data file. It does not report numerical peaks or relaxation rates. The positional `g2spinach` argument 31.8 is recorded without assigning it a meaning the wrapper does not specify; details of the parser and acquisition callback are likewise outside this file.

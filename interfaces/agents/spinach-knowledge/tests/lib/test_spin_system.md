@@ -1,34 +1,38 @@
 # tests/lib/test_spin_system.m
 
-- Signature: `spin_system=test_spin_system(sys,inter,bas)`
-
 ## Purpose
 
-Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas)
+Builds a small quiet Spinach spin system for tests.
 
-## Physical / mathematical content
+## Behaviour
 
-## Numerical / algorithmic content
+The function applies quiet settings used by regression tests before constructing the spin system:
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Sets `sys.output` to `'hush'`.
+- Appends `'hygiene'` to `sys.disable` if that field already exists (using `unique` on the concatenated cell array), otherwise initialises `sys.disable` to `{'hygiene'}`.
+- Sets `sys.parallel` to `{'local',1}`.
+- Sets `sys.parprops` to `{}`.
 
-## Parameters / inputs
+It then builds the Spinach object with `create(sys,inter)` and the basis with `basis(spin_system,bas)`, returning the resulting spin system object.
 
-- sys -Spinach system specification
-- inter -Spinach interaction specification
-- bas -Spinach basis specification
+## Inputs and outputs
 
-## Outputs
+Syntax:
 
-- spin_system -Spinach spin system object
+```
+spin_system=test_spin_system(sys,inter,bas)
+```
 
-## Implementation structure
+Inputs:
 
-- Builds a small quiet Spinach spin system for tests. Syntax:
-- spin_system=test_spin_system(sys,inter,bas)
-- sys -Spinach system specification
-- inter -Spinach interaction specification
-- bas -Spinach basis specification
-- spin_system -Spinach spin system object
-- Apply quiet settings used by regression tests
-- Build the Spinach object and basis
+- `sys` — Spinach system specification.
+- `inter` — Spinach interaction specification.
+- `bas` — Spinach basis specification.
+
+Output:
+
+- `spin_system` — Spinach spin system object.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_spin_system.m)

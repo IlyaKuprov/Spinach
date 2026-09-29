@@ -1,49 +1,23 @@
 # experiments/fieldscan_magn.m
 
-- Signature: `[fields,z_magn]=fieldscan_magn(spin_system,parameters)`
+- MATLAB implementation: [experiments/fieldscan_magn.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/fieldscan_magn.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=fieldscan_magn.m
 
-Z magnetization of the sample as a function of magnetic field in a finite-speed magnetic field sweep experiment. Syntax: [fields,z_magn]=fieldscan_magn(spin_system,parameters)
+Signature: [fields,z_magn]=fieldscan_magn(spin_system,parameters).
 
-## Physical / mathematical content
+This simulates the sample's z magnetisation during a finite-speed magnetic-field sweep. For the fixed requested orientation, it constructs lab-frame Zeeman and coupling Hamiltonians and a z magnetic-moment observable from the rotated g tensors and spin operators. The initial density operator is thermal equilibrium at the starting field, normalised to unit trace. If parameters.nstates is supplied, the calculation is projected into the corresponding low-energy subspace.
 
-## Numerical / algorithmic content
+The field grid is linear between the requested endpoints. With npoints samples and total sweep_time, the time increment is dt=sweep_time/(npoints-1). At each sample the code records real(hdot(rho,mz)) and propagates the state with the propagator for the instantaneous field-dependent Hamiltonian. The source does not provide a physical unit for the returned magnetisation values, so retain them as the routine's simulated signal rather than assigning a unit.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Required inputs:
 
-## Parameters / inputs
+- parameters.fields: two ascending endpoints in tesla.
+- parameters.npoints: number of field samples; at least two are needed for the source's npoints-1 time-step denominator.
+- parameters.orientation: three Euler angles [alp bet gam] in radians.
+- parameters.sweep_time: total sweep duration in seconds; the source requires it to be positive.
+- spin_system: must use zeeman-hilb formalism. The optional parameters.nstates is a positive integer specifying the low-energy active-space size.
 
-- parameters.fields -two-element vector in Tesla,
-- ordered as [from to]
-- parameters.npoints -number of points in the scan
-- parameters.orientation -system orientation, three-
-- element vector containing
-- Euler angles in radians,
-- ordered as [alp bet gam]
-- parameters.sweep_time -sweep time, seconds
-- parameters.nstates -(optional) number of lowest energy
-- states to use for the effective
-- Hamiltonian in the time domain
+Return values: fields is the sampled magnetic-field axis in tesla and z_magn is the corresponding simulated magnetisation signal. This is not, by itself, a DNP/hyperpolarisation protocol or an imaging acquisition: the source contains no RF irradiation, polarisation-transfer step, spatial encoding, or explicit relaxation/kinetics input during the sweep.
 
-## Outputs
-
-- fields -magnetic fields in Tesla at each point in time
-- z_magn -total sample magnetisation at each point in time
-- Note: this function requires Hilbert space formalism.
-
-## Implementation structure
-
-- Z magnetization of the sample as a function of magnetic field in a
-- finite-speed magnetic field sweep experiment. Syntax:
-- [fields,z_magn]=fieldscan_magn(spin_system,parameters)
-- parameters.fields -two-element vector in Tesla,
-- ordered as [from to]
-- parameters.npoints -number of points in the scan
-- parameters.orientation -system orientation, three-
-- element vector containing
-- Euler angles in radians,
-- ordered as [alp bet gam]
-- parameters.sweep_time -sweep time, seconds
-- parameters.nstates -(optional) number of lowest energy
+Limit: the model is the finite-rate coherent field sweep from a thermal starting state at one fixed orientation, with optional low-energy projection. It is not a claim about measured magnetisation or experimental enhancement.

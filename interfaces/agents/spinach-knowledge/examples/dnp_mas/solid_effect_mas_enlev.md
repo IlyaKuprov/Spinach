@@ -1,31 +1,17 @@
 # examples/dnp_mas/solid_effect_mas_enlev.m
 
-- Signature: `solid_effect_mas_enlev()`
+- MATLAB implementation: [examples/dnp_mas/solid_effect_mas_enlev.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_mas/solid_effect_mas_enlev.m)
 
 ## Purpose
 
-A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spinach rotation conventions are different): Energy level diagram as a function of the rotor phase. Calculation time: milliseconds
+This no-argument example, run as `solid_effect_mas_enlev()`, builds an ESR rotor stack for an electron–`^1H` pair and plots the energy levels as the rotor phase changes. It follows Fred Mentink-Vigier's MAS DNP treatment, with the source noting that Spinach's rotation conventions differ ([paper](https://doi.org/10.1016/j.jmr.2015.07.001)). The source header estimates milliseconds.
 
-## Physical / mathematical content
+## Model and stack
 
-- MAS DNP examples. These files model microwave-driven electron-nuclear polarisation transfer under magic-angle spinning, combining rotor-synchronised anisotropic interactions, relaxation, microwave irradiation, and powder/rotor averaging.
+The field is assigned `9.403`. The electron g-tensor eigenvalues are `[2.00614 2.00194 2.00988]` with Euler angles `pi*[253.6 105.1 123.8]/180`; the proton Zeeman eigenvalues and Euler angles are both zero. Coordinates are `[0 0 0]` and `[0 0 3.00]`. The basis is full Zeeman-Hilbert (`formalism='zeeman-hilb'`, `approximation='none'`).
 
-## Numerical / algorithmic content
+The rotor-stack axis is `[sqrt(2/3) 0 sqrt(1/3)]`, with empty rotor frames, orientation `[0 0 0]`, spins `{'E','1H'}`, magnet MAS frame, zero offsets, and `max_rank=200`. The code calls `rotor_stack(spin_system,parameters,'esr')`.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Output and scope
 
-## Implementation structure
-
-- A MAS DNP simulation performed as described in Fred Mentink-
-- Vigier's paper (Spinach rotation conventions are different):
-- Energy level diagram as a function of the rotor phase.
-- Calculation time: milliseconds
-- Magnet field
-- Spin specification
-- Interactions
-- Basis set
-- Spinach housekeeping
-- Stack generation parameters
-- Stack generation
-- Stack diagonalization
+For each stack Hamiltonian, the example sorts the real eigenvalues of `eig(H{n})`, then plots them against rotor phase over `[0,2*pi)`. The axes are rotor phase in radians and level energy in rad/s. This is a single-orientation energy-level plot; the code does not perform powder averaging or propagate a microwave-driven, relaxing state.

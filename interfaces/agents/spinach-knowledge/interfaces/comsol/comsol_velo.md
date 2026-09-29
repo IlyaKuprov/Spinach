@@ -1,39 +1,19 @@
 # interfaces/comsol/comsol_velo.m
 
-- Signature: `mesh=comsol_velo(mesh,file_name)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/comsol_velo.m) · [Spinach Wiki: comsol_velo.m](https://spindynamics.org/wiki/index.php?title=comsol_velo.m)
 
-## Purpose
+## Purpose and call
 
-Imports ASCII 2D flow velocity files produced by COMSOL. Syntax: mesh=comsol_velo(mesh,file_name)
+`mesh = comsol_velo(mesh,file_name)` reads vertex velocities from a COMSOL ASCII flow-velocity export and adds them to an existing mesh structure, normally one returned by `comsol_mesh`.
 
-## Physical / mathematical content
+## Accepted input and transformation
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+`file_name` must satisfy `ischar`. The file must contain a `% Nodes:` readout-count line followed by that many numeric rows with five columns. For each row, columns 1 and 2 are read as x and y coordinates, columns 4 and 5 as the two velocity components; column 3 is ignored. The routine compares the file's coordinate vectors with `mesh.x` and `mesh.y` in their existing order. It raises an error if either vector's 1-norm difference exceeds `1e-6`; it does not reorder or interpolate the readouts.
 
-## Numerical / algorithmic content
+## Output and units
 
-## Parameters / inputs
+The returned mesh is the input structure with `mesh.u` and `mesh.v` added as column vectors at the vertices. Coordinate and velocity numbers are copied without unit conversion, so their units are those of the COMSOL export. The function returns the updated structure and no separate status value.
 
-- mesh -mesh object produced by comsol_mesh()
-- file_name -a character string
+## Guardrails
 
-## Outputs
-
-- the following fields are added to the mesh object
-- mesh.u, mesh.v -column vectors with velocities
-- at each vertex of the mesh
-
-## Implementation structure
-
-- Imports ASCII 2D flow velocity files produced by COMSOL. Syntax:
-- mesh=comsol_velo(mesh,file_name)
-- mesh -mesh object produced by comsol_mesh()
-- file_name -a character string
-- the following fields are added to the mesh object
-- mesh.u, mesh.v -column vectors with velocities
-- at each vertex of the mesh
-- Check consistency
-- Open the file
-- Velocity readout count
-- Parse velocity readouts
-- Close the file
+The explicit file-name check is `ischar(file_name)`; coordinate consistency is checked by the stated aggregate tolerance. The input mesh is otherwise assumed to provide compatible coordinate vectors.

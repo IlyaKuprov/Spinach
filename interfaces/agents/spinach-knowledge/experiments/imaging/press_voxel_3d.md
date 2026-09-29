@@ -1,52 +1,15 @@
 # experiments/imaging/press_voxel_3d.m
 
+Source: [MATLAB on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_voxel_3d.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=press_voxel_3d.m)
+
 - Signature: `phan=press_voxel_3d(spin_system,parameters,H,R,K,G,F)`
 
-## Purpose
+## Purpose and inputs
 
-Voxel selection diagnostics function for 3D PRESS sequences. Returns the sample excitation profile. Syntax: phan=press_voxel_3d(spin_system,parameters,H,R,K,G,F) This sequence must be called from the imaging() context, which would provide H, R, K, G, and F.
+A parameterised 3D PRESS voxel-selection diagnostic, called from `imaging()` with `H`, `R`, `K`, `G`, and `F`. `parameters.ss_grad_amp` contains three slice-gradient amplitudes in T/m. `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank` are cell arrays with three entries, one per slice pulse: RF-frequency vectors in Hz, RF-amplitude vectors in rad/s, pulse-duration vectors in seconds, phases at time zero (units are not specified by the source), and maximum Fokker–Planck pulse-operator ranks (the source says 2 is usually enough). `parameters.spins{1}` identifies the selected spin, and `parameters.npts` defines the spatial grid.
 
-## Physical / mathematical content
+The source forms `L=H+F+1i*R+1i*K`, accepts `sphten-liouv` and `zeeman-liouv`, and initialises a uniform `Lz` state across `prod(parameters.npts)` points. This is a simulated profile construction, not a measured voxel profile. The source comment says to add `polyadic` to `sys.enable`.
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+## Sequence and returned data
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Parameters / inputs
-
-- parameters.ss_grad_amp -the three amplitudes of slice selection
-- gradient, T/m
-- parameters.rf_frq_list -cell array of three vectors of RF frequ-
-- encies at each pulse slice, Hz
-- parameters.rf_amp_list -cell array of three vectors of RF
-- amplitudes at each pulse slice, rad/s
-- parameters.rf_dur_list -cell array of three vectors of pulse
-- slice durations, in seconds
-- parameters.rf_phi -cell array of three pulse phases at
-- time zero
-- parameters.max_rank -cell array of three maximum rank in the
-- Fokker-Planck pulse operator (2 is
-- usually enough)
-
-## Outputs
-
-- phan -the excitation profile imprinted into a 3D phantom.
-- Notes: add 'polyadic' to sys.enable, or this will crash your computer.
-
-## Implementation structure
-
-- Voxel selection diagnostics function for 3D PRESS sequences. Returns
-- the sample excitation profile. Syntax:
-- phan=press_voxel_3d(spin_system,parameters,H,R,K,G,F)
-- This sequence must be called from the imaging() context, which
-- would provide H, R, K, G, and F.
-- parameters.ss_grad_amp -the three amplitudes of slice selection
-- gradient, T/m
-- parameters.rf_frq_list -cell array of three vectors of RF frequ-
-- encies at each pulse slice, Hz
-- parameters.rf_amp_list -cell array of three vectors of RF
-- amplitudes at each pulse slice, rad/s
-- parameters.rf_dur_list -cell array of three vectors of pulse
+The X shaped AFP pulse uses the full first pulse train and is rephased for half its summed duration; the source then selects single-quantum coherence. The Y pulse uses half the second pulse durations (annotated as scaled to 90 degrees), is rephased for one quarter of their sum, and is followed by zero-quantum selection. The Z pulse likewise uses half the third pulse durations, is rephased for one quarter of their sum, and is followed by single-quantum selection. `fpl2phan` uses the `L+` state as detection operator; the returned `phan=abs(...)` is a 3D phantom array on `parameters.npts`, with no separate coordinate-vector outputs.

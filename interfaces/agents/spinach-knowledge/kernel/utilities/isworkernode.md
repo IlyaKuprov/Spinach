@@ -1,38 +1,25 @@
 # kernel/utilities/isworkernode.m
 
-- Signature: `answer=isworkernode()`
-
 ## Purpose
 
-Returns true if executed inside a parfor or spmd block. This function is used in the internal decision making of Spinach kernel: certain algorithms are switched to their serial ver- sions if the calculation is already running inside some par- allel loop. Syntax: answer=isworkernode()
+Returns `true` if the code is currently executing inside a `parfor` or `spmd` block, i.e. on a MATLAB parallel worker process. The function is used in internal Spinach kernel decision making: certain algorithms are switched to their serial versions when the calculation is already running inside a parallel loop.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- The function takes no arguments and returns a single logical value.
+- It calls the undocumented MATLAB internal function `parallel.internal.pool.isPoolWorker()`, which reports whether the current process is a parallel pool worker.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+**Inputs**
 
-## Parameters / inputs
+- None.
 
-- none
+**Outputs**
 
-## Outputs
+- `answer` — `true` if running on a parallel worker process, `false` otherwise.
 
-- answer -true if running on a parallel worker process
+## References
 
-## Implementation structure
-
-- Returns true if executed inside a parfor or spmd block. This
-- function is used in the internal decision making of Spinach
-- kernel: certain algorithms are switched to their serial ver-
-- sions if the calculation is already running inside some par-
-- allel loop. Syntax:
-- answer=isworkernode()
-- none
-- answer -true if running on a parallel worker process
-- Undocumented function, c'est la vie
-- In the beginning the Universe was created. This has
-- made a lot of people very angry and been widely re-
-- garded as a bad move.
+- Source: [kernel/utilities/isworkernode.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isworkernode.m)
+- Spinach Wiki: [isworkernode.m](https://spindynamics.org/wiki/index.php?title=isworkernode.m)

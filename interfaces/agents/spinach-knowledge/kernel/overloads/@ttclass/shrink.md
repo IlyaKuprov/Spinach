@@ -2,36 +2,20 @@
 
 - Signature: `ttrain=shrink(ttrain)`
 
-## Purpose
+## Action
 
-Approximates a given tensor train with lower TT-ranks. Syntax: ttrain=shrink(ttrain)
+`shrink` first calls `pack` to absorb the buffered sum of trains into one TT, then calls `ttort(ttrain,+1)` for left-to-right orthogonalisation. It forms `nrm=ttrain.coeff*norm(ttrain.cores{d,1}(:),2)`; if this value is exactly zero, it returns `0*unit_like(ttrain)` without truncating. Otherwise it calls `truncate` to reduce TT ranks according to the train's truncation settings. The core count and physical mode dimensions are retained; ranks may be reduced. When more than one train is packed, `pack` incorporates each train's coefficient into its first core and sets the packed coefficient to one; its single-train fast path leaves the input coefficient as-is. Subsequent coefficient handling is delegated to orthogonalisation and truncation.
 
-## Physical / mathematical content
+The result remains a TT, rather than a materialised matrix, except when every core has singleton physical dimensions in both axes (core dimensions 2 and 3); in that case the method calls `full` and returns the scalar value. This test concerns physical dimensions, not bond dimensions. The method has no explicit conjugation or transpose action.
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+## Input and output
 
-## Numerical / algorithmic content
+- `ttrain` — tensor-train object.
+- `ttrain` — packed, left-to-right orthogonalised, truncated train, or the scalar result in the singleton-physical-mode case.
 
-## Parameters / inputs
+## Source
 
-- ttrain -a tensor train object
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/shrink.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/shrink.m)
 
-## Outputs
-
-- ttrain -compressed tensor train object with
-- right-to-left orthogonalisation
-
-## Implementation structure
-
-- Approximates a given tensor train with lower TT-ranks. Syntax:
-- ttrain=shrink(ttrain)
-- ttrain -a tensor train object
-- ttrain -compressed tensor train object with
-- right-to-left orthogonalisation
-- Read train sizes
-- Summation
-- Left-to-right orthogonalisation
-- Check the norm and escape if the object is zero
-- Truncation
-- Convert to a scalar if appropriate
-- It's a tough life, being small and delicious.
+D. Savostyanov and I. Kuprov.

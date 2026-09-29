@@ -1,39 +1,30 @@
 # kernel/utilities/keep_rank.m
 
-- Signature: `A=keep_rank(A,nsvk)`
-
 ## Purpose
 
-Truncates the singular value decomposition at the specified rank and reassembles the matrix. Syntax: A=keep_rank(A,rank)
+Truncates the singular value decomposition of a matrix at a specified rank and reassembles the matrix, returning a low-rank approximation ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/keep_rank.m)).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `A=keep_rank(A,nsvk)`.
+- Runs a consistency check (`grumble`) on the inputs before processing.
+- Converts the input to full storage with `full(A)` and computes the singular value decomposition `[U,S,V]=svd(full(A))`.
+- Truncates the decomposition to the specified rank and rebuilds the matrix as `A=U(:,1:nsvk)*S(1:nsvk,1:nsvk)*V(:,1:nsvk)'`.
+- The consistency check errors with `'A must be a matrix.'` if `A` is not numeric or if either dimension has size less than or equal to 1.
+- The consistency check errors with `'nsvk must be a positive integer smaller than dim(A)'` if `nsvk` is not numeric, not real, not scalar, less than 1, non-integer (`mod(nsvk,1)~=0`), or greater than any dimension of `A` (`any(nsvk>size(A))`).
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- A -real or complex matrix, will be
-- converted to full if a sparse
-- matrix is received
-- nsvk -number of singular values to keep
+- `A` — real or complex matrix; sparse inputs are converted to full.
+- `nsvk` — number of singular values to keep.
 
-## Outputs
+**Outputs**
 
-- A -filtered matrix, returned as full
+- `A` — filtered matrix, returned as full.
 
-## Implementation structure
+## References
 
-- Truncates the singular value decomposition at the specified rank
-- and reassembles the matrix. Syntax:
-- A=keep_rank(A,rank)
-- A - real or complex matrix, will be
-- converted to full if a sparse
-- matrix is received
-- nsvk - number of singular values to keep
-- A - filtered matrix, returned as full
-- Check consistency
-- Run singular value decomposition
-- Truncate to the specified rank and rebuild
-- Consistency enforcement
+- Source code: [kernel/utilities/keep_rank.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/keep_rank.m)
+- Spinach Wiki: [keep_rank.m](https://spindynamics.org/wiki/index.php?title=keep_rank.m)

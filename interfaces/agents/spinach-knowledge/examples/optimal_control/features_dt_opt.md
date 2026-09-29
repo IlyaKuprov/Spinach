@@ -1,34 +1,13 @@
 # examples/optimal_control/features_dt_opt.m
 
-- Signature: `features_dt_opt()`
+[Stable source link](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_dt_opt.m) · [Pulse-sequence reference](https://doi.org/10.1016/0022-2364(83)90133-6)
 
-## Purpose
+## Calculation
 
-Optimisation of slice durations in a composite inversion pulse with specified amplitudes, phases, and a constrain- ed overall duration. The initial guess is 270(-x)360(x)90(y)270(-y)360(y)90(x) [Fig. 3] from https://doi.org/10.1016/0022-2364(83)90133-6 --the optimisation demonstrates that a slightly better pulse of the same power and duration exists. Calculation time: minutes.
+This example changes only the six slice durations of a composite 13C inversion pulse: the Cartesian control amplitudes and phases remain fixed. The starting sequence, also given in Fig. 3 of the cited paper, is `270(-x)360(x)90(y)270(-y)360(y)90(x)`. The simulated ensemble contains 100 non-interacting 13C spins with chemical shifts evenly spanning −166 to +166 ppm at 14.1 T (about ±25 kHz as described in the source). The `sphten-liouv` `IK-2` basis uses proximity level 1 and scalar-coupling connectivity; there are no couplings between these spins. The normalised initial state is 13C `Lz` and is also supplied as the target; the source comments identify minimising the objective as inversion.
 
-## Physical / mathematical content
+The six-slice Cartesian waveform is `2π×25 kHz` times x-coefficients [−1, 1, 0, 0, 0, 1] and y-coefficients [0, 0, 1, −1, 1, 0]. Initial durations are [30, 40, 10, 30, 40, 10] μs, totaling 160 μs. The `tgrape` objective supplies the gradient to MATLAB `fmincon`; an L-BFGS Hessian approximation is requested, all durations have lower bound zero, and an equality constraint fixes their sum at 160 μs. Thus the optimiser redistributes time among the six slices without changing the waveform amplitude or overall duration.
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+## Simulated observables
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Optimisation of slice durations in a composite inversion
-- pulse with specified amplitudes, phases, and a constrain-
-- ed overall duration. The initial guess is
-- 270(-x)360(x)90(y)270(-y)360(y)90(x) [Fig. 3]
-- from https://doi.org/10.1016/0022-2364(83)90133-6 --the
-- optimisation demonstrates that a slightly better pulse of
-- the same power and duration exists.
-- Calculation time: minutes.
-- Set the magnetic field
-- Put 100 non-interacting spins at equal intervals over the area
-- that needs to be affected by the pulse (25 kHz either side)
-- Select a basis set -IK-2 keeps complete basis on each
+The source propagates both the initial and optimised durations with `step`. For each, it applies a 90° `Ly` readout rotation, simulates 13C acquisition with `liquid`/`acquire`, applies Gaussian apodisation (parameter 10), zero-fills to 16384 points, and forms the shifted FFT on an inverted Hz axis. The script plots initial and optimised spectra side by side and prints the duration vectors in microseconds. The DOI and the source comment's “slightly better” design motivation are retained, but the file contains no numerical improvement or experimental validation; none is asserted here.

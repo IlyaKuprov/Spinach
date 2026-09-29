@@ -1,53 +1,23 @@
 # experiments/nmr_solids/dante.m
 
-- Signature: `fid=dante(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/dante.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=dante.m)
 
 ## Purpose
 
-DANTE pulse sequence. Syntax: fid=dante(spin_system,parameters,H,R,K) This function should normally be called using singlerot.m context that would provide H, R, and K.
+A rotor-synchronous DANTE pulse train, normally called from the `singlerot.m` context that supplies the Hamiltonian, relaxation, and kinetics superoperators. This source describes DANTE; it should not be conflated with a REDOR sequence.
 
-## Physical / mathematical content
+## Inputs
 
-- Solid-state pulse sequence implementations. The core ingredients are anisotropic Hamiltonians, rotor synchronisation, cross-polarisation, recoupling/decoupling, and powder or rotor-stack propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+Signature: `fid=dante(spin_system,parameters,H,R,K)`.
 
-## Numerical / algorithmic content
+- `H`, `R`, and `K` must be numeric matrices of equal size.
+- `parameters.spins` is a one-element cell array naming an isotope present in the spin system. `parameters.decouple` is a cell array of isotope strings to decouple; it may be empty, and listed isotopes must be present.
+- `parameters.pulse_dur` is a positive pulse duration in seconds; `pulse_amp` is a real RF amplitude in Hz; `pulse_num` and `n_periods` are positive integers.
+- `parameters.rate` is a non-zero real rotor rate in Hz. `parameters.sweep` is a positive real acquisition sweep width in Hz, and `npoints` is a positive integer.
+- `parameters.spc_dim` is a positive integer Fokker–Planck spatial dimension; `rho0` and `coil` are required initial and detection states.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Propagation and output
 
-## Parameters / inputs
+The implementation forms `L=H+1i*R+1i*K`, builds `Lx` from the `L+` operator of `parameters.spins{1}`, and applies the requested decoupling. Each rotor period has duration `abs(1/rate)` and is divided into `pulse_num` slots. In every slot, the working spin evolves for `pulse_dur` under `L+2*pi*pulse_amp*Lx`, then freely under `L` for the rest of that slot. The pulse must fit its slot. After `n_periods`, the function acquires `fid` using `coil`, dwell `1/sweep`, and `npoints-1` propagation steps.
 
-- parameters.pulse_dur -duration of each pulse, seconds
-- parameters.pulse_amp -amplitude of each pulse, Hz
-- parameters.pulse_num -number of pulses within rotor period
-- parameters.n_periods -number of rotor periods that the
-- sequence is active for
-- parameters.spins -working spin, specified as a
-- single-element cell array
-- parameters.decouple -isotopes to decouple, specified
-- as a cell array
-- parameters.rate -rotor frequency in Hz
-- parameters.sweep -acquisition sweep width in Hz
-- parameters.npoints -number of acquisition points
-- parameters.spc_dim -Fokker-Planck spatial dimension
-- parameters.rho0 -initial condition, usually Lz
-- parameters.coil -detection state, usually L+
-
-## Outputs
-
-- fid -free induction decay
-
-## Implementation structure
-
-- DANTE pulse sequence. Syntax:
-- fid=dante(spin_system,parameters,H,R,K)
-- This function should normally be called using singlerot.m context
-- that would provide H, R, and K.
-- parameters.pulse_dur -duration of each pulse, seconds
-- parameters.pulse_amp -amplitude of each pulse, Hz
-- parameters.pulse_num -number of pulses within rotor period
-- parameters.n_periods -number of rotor periods that the
-- sequence is active for
-- parameters.spins -working spin, specified as a
-- single-element cell array
-- parameters.decouple -isotopes to decouple, specified
+The output is the free-induction decay `fid`. This source provides no REDOR-specific echo/recoupling step or protein-specific transfer block.

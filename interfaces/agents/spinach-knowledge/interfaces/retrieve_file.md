@@ -1,36 +1,9 @@
 # interfaces/retrieve_file.m
 
-- Signature: `file_path=retrieve_file(file_url,file_name,dest_dir)`
+[MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/retrieve_file.m) · [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=retrieve_file.m)
 
-## Purpose
+## Interface
 
-Retrieves a file from an HTTPS link and stores it in a user- specified directory. Syntax: file_path=retrieve_file(file_url,file_name,dest_dir)
+`file_path=retrieve_file(file_url,file_name,dest_dir)` downloads the URL to `fullfile(dest_dir,file_name)` and returns that destination path. Each input may be a character array or scalar string; after conversion, the URL must begin literally with `https://`, and `file_name` and `dest_dir` must be non-empty. No other filename or URL-content rule is imposed here.
 
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- file_url -HTTPS URL pointing to the file to retrieve
-- file_name -name of the file to be stored on disk
-- dest_dir -destination directory for the downloaded file
-
-## Outputs
-
-- file_path -full path of the downloaded file on disk
-
-## Implementation structure
-
-- Retrieves a file from an HTTPS link and stores it in a user-
-- specified directory. Syntax:
-- file_path=retrieve_file(file_url,file_name,dest_dir)
-- file_url -HTTPS URL pointing to the file to retrieve
-- file_name -name of the file to be stored on disk
-- dest_dir -destination directory for the downloaded file
-- file_path -full path of the downloaded file on disk
-- Check consistency
-- Ensure destination directory exists
-- Create destination directory
-- Build destination path
-- Retrieve the file
+If `dest_dir` is absent, the function calls `mkdir` before forming the path. The transfer is performed by MATLAB `websave(file_path,file_url)`; download errors are not caught by this wrapper. It returns the full destination path and does not define a separate cache, retry, or unit convention.

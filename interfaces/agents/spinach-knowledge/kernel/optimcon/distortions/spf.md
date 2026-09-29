@@ -1,53 +1,22 @@
 # kernel/optimcon/distortions/spf.m
 
-- Signature: `[w,J]=spf(w,p)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/spf.m)
 
-## Purpose
+## Purpose and syntax
 
-Applies a discrete single-pole filter: Y(n)=(1-p)*X(n)+p*Y(n-1) to a Spinach optimal control module waveform. Treats odd rows of multi-row waveform arrays as real, and even rows as imaginary, components of a complex signal. Syntax: [w,J]=spf(w,p)
+`[w,J]=spf(w,p)` applies a discrete single-pole filter to an optimal-control waveform. The waveform has one time slice per column; each adjacent odd/even row pair stores the real and imaginary components of one complex control signal.
 
-## Physical / mathematical content
+For each channel, the first sample is unchanged and subsequent samples follow `Y(n)=(1-p)*X(n)+p*Y(n-1)`. The source gives `p=exp(-r*dt+1i*(omega-omega_rf)*dt)`, where `r` is the damping rate, `omega` the pole frequency, `omega_rf` the rotating-frame frequency, and `dt` the time discretisation step. The source does not prescribe a numeric unit convention for these quantities.
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+## Inputs and output
 
-## Numerical / algorithmic content
+- `w`: Real numeric waveform with an even number of rows. It is returned with the same dimensions; columns represent time slices.
+- `p`: Numeric vector with exactly one finite coefficient per X,Y pair, satisfying `abs(p(k))<1`. Complex coefficients are accepted. There is no broadcast default: a scalar is valid only when there is one pair.
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The user is responsible for leaving sufficient ring-down margin.
 
-## Parameters / inputs
+## Jacobian
 
-- w -waveform, one time slice per column, and
-- rows arranged as XYXY... with respect to
-- in-phase and quadrature parts on each
-- control channel
-- p -a vector (one element per XY control pair)
-- containing the filter coefficient:
-- p=exp(-r*dt+1i*(omega-omega_rf)*dt)
-- where r is th damping rate, omega is the
-- pole frequency, omega_rf is the rotating
-- frame frequency, and dt is the time dis-
-- cretisation step.
+When requested, `J` is the Jacobian of the vectorised output with respect to the vectorised input. The implementation obtains it by automatic differentiation and returns the extracted real Jacobian.
 
-## Outputs
-
-- w -distorted waveform, same dimension as the
-- input waveform; leaving sufficient ring-
-- down margin is the user's responsibility
-- J -Jacobian matrix with respect to vectorisa-
-- tions of the output and the input arrays
-
-## Implementation structure
-
-- Applies a discrete single-pole filter:
-- Y(n)=(1-p)*X(n)+p*Y(n-1)
-- to a Spinach optimal control module waveform. Treats odd
-- rows of multi-row waveform arrays as real, and even rows
-- as imaginary, components of a complex signal. Syntax:
-- [w,J]=spf(w,p)
-- w -waveform, one time slice per column, and
-- rows arranged as XYXY... with respect to
-- in-phase and quadrature parts on each
-- control channel
-- p -a vector (one element per XY control pair)
-- containing the filter coefficient:
+<https://spindynamics.org/wiki/index.php?title=spf.m>

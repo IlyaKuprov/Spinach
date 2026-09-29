@@ -1,31 +1,16 @@
 # examples/nmr_solids/static_powder_csa.m
 
 - Signature: `static_powder_csa()`
+- Source: [examples/nmr_solids/static_powder_csa.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/static_powder_csa.m)
 
 ## Purpose
 
-Two-spin static CSA powder pattern. Calculation time: seconds
+A two-spin static CSA powder pattern; the source records a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin model and powder average
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The system contains two 1H spins with distinct anisotropic Zeeman eigenvalue inputs, `[-2 -2 4]-5` and `[-1 -3 4]+5`; both Euler-angle triples are `[0 0 0]`. The source supplies no units for these entries. The field parameter is 14.1, also without an explicit unit. The static powder calculation uses `rep_2ang_6400pts_sph`; no rotor or gradient sequence is configured.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Two-spin static CSA powder pattern.
-- Calculation time: seconds
-- System specification
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The 1H channel starts from and detects `L+`, with no decoupling. Acquisition uses offset 0, sweep 15000, 256 points, and zero filling to 512. The display axis is configured in ppm; units for offset and sweep are not stated. The FID is exponentially apodised with parameter 6, Fourier transformed with the specified zero fill, and plotted as its real part.

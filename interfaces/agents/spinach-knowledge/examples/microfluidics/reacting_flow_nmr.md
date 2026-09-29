@@ -1,35 +1,15 @@
 # examples/microfluidics/reacting_flow_nmr.m
 
-- Signature: `reacting_flow_nmr()`
+## Coupled model
 
-## Purpose
+A spatial Diels–Alder reaction model on imported COMSOL mesh and velocity data couples advection-diffusion-reaction transport to proton NMR detection. The mesh crop is x=`[286.8, 287.5]` and y=`[576.0, 579.0]`, with listed mesh indices inactivated. The source sets exo/endo channel rates to `k1=2.0` and `k2=1.0` (the source comment gives `mol/(L*s)`; the implemented bimolecular terms require `L/(mol*s)` for concentrations in mol/L) and diffusion to `1e-7` without stating its unit. The initial field places 0.50 and 0.25 in reactant components at cells 1240 and 1246; their units are not given. Chemistry uses 501 steps of 20 seconds, while cellwise concentrations are interpolated with `makima` for spin evolution.
 
-Complete microfluidic simulation: diffusion, flow, two second- order chemical reactions, and NMR detection in a narrow strip of the chip where the coil is assumed to be located. Calculation time: days, much faster on GPU.
+The spin system uses `sys.magnet=14.1` (the file does not annotate a field unit) and a rectangular coil-selection mask defined by `287.0<x<287.3` and `577.0<y<577.5`. Proton acquisition parameters are offset 2328, sweep 3500, and 1024 steps; the file does not state units for offset or sweep, and sets the sampling interval to `1/sweep`. It applies a `pi/2` excitation and advances the transport-, relaxation-, and concentration-dependent spin evolution with `step` using left/right interval generators.
 
-## Physical / mathematical content
+## Observable
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+Acquisitions begin at every 25th chemistry-grid index (21 sampled starts, from 0 through 10,000 seconds). Each FID is apodised, zero-filled to 16384 points, Fourier transformed, and displayed as a real-intensity waterfall against time (seconds) and chemical shift (ppm); intensity is labelled a.u. The source header estimates days and says GPU execution is much faster; this is not a benchmark. The script defaults to `sys.enable={'greedy'}`; GPU transfers are conditional on `gpu` being enabled.
 
-## Numerical / algorithmic content
+## Source
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Implementation structure
-
-- Complete microfluidic simulation: diffusion, flow, two second-
-- order chemical reactions, and NMR detection in a narrow strip
-- of the chip where the coil is assumed to be located.
-- Calculation time: days, much faster on GPU.
-- Import Diels-Alder cycloaddition
-- Import hydrodynamics information
-- Magnet field
-- This needs a GPU
-- Spinach housekeeping
-- % Concentration dynamics stage
-- Rate constants, mol/(L*s)
-- Cycloaddition reaction generator, including solvent
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/microfluidics/reacting_flow_nmr.m

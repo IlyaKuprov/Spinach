@@ -1,42 +1,29 @@
 # kernel/utilities/dipolar.m
 
-- Signature: `spin_system=dipolar(spin_system)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dipolar.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dipolar.m)
 
 ## Purpose
 
-Computes dipolar couplings in the presence or absence of periodic boundary conditions. This is an auxiliary function of Spinach ker- nel, direct calls are discouraged. Use xyz2dd and xyz2hfc to con- vert Cartesian coordinates into dipolar and hyperfine couplings respectively. Syntax: spin_system=dipolar(spin_system)
+Computes dipolar couplings in the presence or absence of periodic boundary conditions. This is an auxiliary function of the Spinach kernel; direct calls are discouraged. The header directs users to `xyz2dd` and `xyz2hfc` to convert Cartesian coordinates into dipolar and hyperfine couplings, respectively.
 
-## Physical / mathematical content
+## Physical construction
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+For coordinate-bearing spin pairs within each chemical species, an isolated system contributes one separation vector. With periodic boundary conditions, integer-translated images contribute along one, two or three lattice vectors, from `-dd_ncells` to `+dd_ncells` in each periodic direction. Only separations shorter than `spin_system.tols.prox_cutoff` (ångström) enter the proximity network; a separation below `0.5` Å is treated as an atomic collision.
 
-## Numerical / algorithmic content
+Each retained image contributes a dipolar tensor proportional to `gamma_n*gamma_k/r^3` and to the traceless axial form given by the identity matrix minus three times the outer product of the unit separation vector with itself; `r` is converted from ångström to metres. The prefactor contains `0.5` to compensate for counting ordered spin pairs twice. When the `sodd` spin-orbit option is enabled, Zeeman anisotropy scaling acts on the tensor; its numerical isotropic trace is then removed. Contributions from accepted images sum into the pair’s dipolar coupling matrix.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- spin_system -Spinach data object containing infor-
-- mation about chemical subsystems, ato-
-- mic coordinates, and periodic bounda-
-- ry conditions
+**Syntax:** `spin_system = dipolar(spin_system)`
 
-## Outputs
+**Input:**
 
-- spin_system -Spinach data object with the interac-
-- tion arrays updated with dipolar and
-- hyperfine coupling information
+- `spin_system` — Spinach data object containing information about chemical subsystems, atomic coordinates, and periodic boundary conditions.
 
-## Implementation structure
+**Output:**
 
-- Computes dipolar couplings in the presence or absence of periodic
-- boundary conditions. This is an auxiliary function of Spinach ker-
-- nel, direct calls are discouraged. Use xyz2dd and xyz2hfc to con-
-- vert Cartesian coordinates into dipolar and hyperfine couplings
-- respectively. Syntax:
-- spin_system=dipolar(spin_system)
-- spin_system -Spinach data object containing infor-
-- mation about chemical subsystems, ato-
-- mic coordinates, and periodic bounda-
-- ry conditions
-- spin_system -Spinach data object with the interac-
-- tion arrays updated with dipolar and
+- `spin_system` — Spinach data object with the interaction arrays updated with dipolar and hyperfine coupling information.
+
+## References
+
+- Spinach Wiki page for `dipolar.m`: [https://spindynamics.org/wiki/index.php?title=dipolar.m](https://spindynamics.org/wiki/index.php?title=dipolar.m)

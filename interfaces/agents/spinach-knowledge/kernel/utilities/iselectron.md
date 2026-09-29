@@ -1,33 +1,33 @@
 # kernel/utilities/iselectron.m
 
-- Signature: `verdict=iselectron(spin_spec)`
-
 ## Purpose
 
-Returns true if the particle is an electron. Syntax: verdict=iselectron(spin_spec)
+Returns `true` if the particle specified is an electron, and `false` otherwise.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- The function first validates the input via an internal consistency check (`grumble`):
+  - Errors with `'spin_spec must be a character string.'` if the input is not a character string.
+  - Calls `spin(spin_spec)` to verify that the specification is a valid Spinach particle specification.
+- After validation, the function performs a simple matching check: if the first element of `spin_spec` is `'E'`, the verdict is `true`; otherwise it is `false`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Syntax**
 
-- spin_spec -a Spinach particle specification
+```matlab
+verdict = iselectron(spin_spec)
+```
 
-## Outputs
+**Inputs**
 
-- verdict -true for an electron, false otherwise
+- `spin_spec` — a Spinach particle specification (character string).
 
-## Implementation structure
+**Outputs**
 
-- Returns true if the particle is an electron. Syntax:
-- verdict=iselectron(spin_spec)
-- spin_spec -a Spinach particle specification
-- verdict -true for an electron, false otherwise
-- Check consistency
-- A simple matching check
-- Consistency enforcement
-- Лучше умереть героем чем жить пидорасом.
-- Евгений Пригожин
+- `verdict` — `true` for an electron, `false` otherwise.
+
+## References
+
+- Source: [kernel/utilities/iselectron.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iselectron.m)
+- Wiki: <https://spindynamics.org/wiki/index.php?title=iselectron.m>

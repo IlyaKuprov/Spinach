@@ -1,40 +1,40 @@
 # kernel/utilities/spden.m
 
-- Signature: `J=spden(L,D,omega)`
-
 ## Purpose
 
-Lorentzian spectral density function for rotational diffusion at the user-specified frequency. Syntax: J=spden(L,D,omega)
+`spden` returns the value of the Lorentzian spectral density function for rotational diffusion at a user-specified frequency. It is used in relaxation-theory calculations involving rotational diffusion.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The function is called as `J=spden(L,D,omega)`. It first runs an internal consistency check (`grumble`) on the inputs, then computes the rotational correlation time
 
-## Numerical / algorithmic content
+`tau_c = 1/(L*(L+1)*D)`
 
-## Parameters / inputs
+and evaluates the spectral density as
 
-- L -spherical rank, use 2 for common NMR
-- mechanisms such as dipolar relaxation
-- D -rotational diffusion coefficient, s^{-1}
-- omega -frequency, rad/s
+`J = (tau_c/(2*L+1))/(1+(tau_c*omega)^2)`.
 
-## Outputs
+Input validation enforces:
 
-- J -spectral density function value
+- `L` must be a positive real integer (numeric, scalar, real, `L >= 1`, integer-valued); otherwise the error `L must be a positive real integer.` is raised.
+- `D` must be a positive real scalar; otherwise the error `D must be a positive real scalar.` is raised.
+- `omega` must be a real scalar; otherwise the error `omega must be a real scalar.` is raised.
 
-## Implementation structure
+The header comment notes that `L = 2` should be used for common NMR mechanisms such as dipolar relaxation.
 
-- Lorentzian spectral density function for rotational
-- diffusion at the user-specified frequency. Syntax:
-- J=spden(L,D,omega)
-- L -spherical rank, use 2 for common NMR
-- mechanisms such as dipolar relaxation
-- D -rotational diffusion coefficient, s^{-1}
-- omega -frequency, rad/s
-- J -spectral density function value
-- Check consistency
-- Get the correlation time
-- Get the spectral density
-- Consistency enforcement
+## Inputs and outputs
+
+Inputs:
+
+- `L` — spherical rank; use 2 for common NMR mechanisms such as dipolar relaxation.
+- `D` — rotational diffusion coefficient, s^-1.
+- `omega` — frequency, rad/s.
+
+Output:
+
+- `J` — spectral density function value.
+
+## References
+
+- Source: [Spinach repository — kernel/utilities/spden.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/spden.m)
+- Spinach Wiki: [spden.m](https://spindynamics.org/wiki/index.php?title=spden.m)

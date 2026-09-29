@@ -1,31 +1,20 @@
 # examples/benchmarks/fft_gpu.m
 
-- Signature: `fft_gpu()`
+- MATLAB implementation: [examples/benchmarks/fft_gpu.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/benchmarks/fft_gpu.m)
 
-## Purpose
+- Signature: `fft_gpu()`.
+- Returns: no MATLAB output arguments. Prints per-run CPU/GPU timings and opens a comparison plot.
 
-GPU arithmetic benchmark -3D Fourier transforms.
+## Purpose and use
 
-## Physical / mathematical content
+This script benchmarks MATLAB's three-dimensional `fftn` on cubic double-precision random arrays, comparing a CPU array with a `gpuArray` on the default GPU device. Call `fft_gpu()`; it takes no configuration arguments. If `gpuDeviceCount` reports zero, it prints `no CUDA GPUs detected` and returns without benchmarking. Otherwise it initialises `gpuDevice` and uses that device. MATLAB GPU support and enough device memory for the chosen arrays are required.
 
-- Benchmark examples. These files stress-test Spinach performance, scaling, and numerical throughput on representative spin-dynamics workloads, so runtime, memory pressure, and solver/pathway choices are part of the intended content.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Benchmark procedure
 
-## Numerical / algorithmic content
+The cube side lengths are 128, 192, 256, 384, and 512 points. For each size, ten CPU and ten GPU runs are timed with `tic`/`toc`; each iteration creates a new `randn(...,'double')` CPU array and a `randn(...,'gpuArray')` GPU array before timing its `fftn`. `wait(dev)` brackets the GPU transform so asynchronous device work is complete at both timing boundaries. The script prints every individual timing in seconds.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The plot uses the mean of repetitions 2–10 (the first repetition is excluded) for each implementation. It plots CPU and GPU means against the cube side length—not total voxel count—with logarithmic axes, labels the ordinate as calculation time in seconds, and restricts the displayed x range to 100–600. The first sample is discarded from the displayed mean, but the source does not explain why.
 
-## Implementation structure
+## Limits
 
-- GPU arithmetic benchmark -3D Fourier transforms.
-- Look for GPUs
-- Initialise GPU device
-- FFT dimensions (reduce if card runs out of memory)
-- Timing array
-- FFT size loop
-- Statistics loop
-- CPU benchmark
-- GPU benchmark
-- Analysis
-- Plotting
+This measures FFT throughput, not a Spinach spin-dynamics workload or an end-to-end scientific calculation. The largest cubes can exhaust GPU memory; the source comment recommends reducing `sizes` if the card runs out. Timings and the speed comparison are hardware- and MATLAB-dependent, and the script does not return the timing array or save the figure automatically.

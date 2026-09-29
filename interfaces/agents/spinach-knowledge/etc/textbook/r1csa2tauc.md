@@ -1,40 +1,28 @@
 # etc/textbook/r1csa2tauc.m
 
+- MATLAB implementation: [etc/textbook/r1csa2tauc.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1csa2tauc.m)
+
 - Signature: `tauc=r1csa2tauc(R1,del_sq,B0,isotope)`
 
 ## Purpose
 
-Estimates the rotational correlation time from the longitudinal CSA relaxation rate. Syntax: tauc=r1csa2tauc(R1,del_sq,B0,isotope)
+Returns the two rotational correlation-time candidates compatible with a longitudinal CSA relaxation rate under the quadratic relation implemented here.
 
-## Physical / mathematical content
+## Inputs
 
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+All four arguments are required; there are no defaults.
 
-## Numerical / algorithmic content
+- R1 — positive real numeric scalar longitudinal relaxation rate, documented in Hz.
+- del_sq — positive real numeric scalar second-rank invariant of the CSA. It is the dimensionless squared invariant of fractional shielding: pass the second output of [blinv.m](https://spindynamics.org/wiki/index.php?title=blinv.m) applied to `1e-6*Z_ppm`, not to the unconverted ppm tensor.
+- B0 — real numeric scalar magnetic field, in tesla. The input check does not require it to be positive or nonzero, but the calculation requires a nonzero Zeeman frequency.
+- isotope — character array naming the isotope, for example '1H'.
 
-## Parameters / inputs
+## Calculation and output
 
-- R1 -longitudinal relaxation rate, Hz
-- del_sq -second rank invariant of the CSA,
-- see blinv.m function
-- B0 -magnetic field, Tesla
-- isotope -isotope specification string, e.g. '1H'
+The code sets omega = -B0*spin(isotope), evaluates the plus-square-root quadratic candidate first in tauc(2) to reduce cancellation, then sets tauc(1) = 1/(omega^2*tauc(2)). The returned two-element row vector is therefore [tauc(1), tauc(2)]: the reciprocal-derived candidate is component 1 and the plus-branch candidate is component 2. This corrects the prior page's claim that the returned vector is ordered with the larger candidate first; the source computes the plus branch first but stores it at index 2. The source documents tauc in seconds.
 
-## Outputs
+The discriminant is del_sq^2*omega^4 - 225*omega^2*R1^2. The source raises its “no real solutions” error only when both computed components are non-real; it does not require both candidates individually to be real before returning.
 
-- tauc -rotational correlation time, seconds
+## Source
 
-## Implementation structure
-
-- Estimates the rotational correlation time from the
-- longitudinal CSA relaxation rate. Syntax:
-- tauc=r1csa2tauc(R1,del_sq,B0,isotope)
-- R1 -longitudinal relaxation rate, Hz
-- del_sq -second rank invariant of the CSA,
-- see blinv.m function
-- B0 -magnetic field, Tesla
-- isotope -isotope specification string, e.g. '1H'
-- tauc -rotational correlation time, seconds
-- Check consistency
-- Get the Zeeman frequency
-- Solve the quadratic equation, larger root first to avoid cancellation
+[Spinach Wiki: r1csa2tauc.m](https://spindynamics.org/wiki/index.php?title=r1csa2tauc.m).

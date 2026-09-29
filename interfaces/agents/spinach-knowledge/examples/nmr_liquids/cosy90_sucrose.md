@@ -1,31 +1,21 @@
 # examples/nmr_liquids/cosy90_sucrose.m
 
+- MATLAB implementation: [examples/nmr_liquids/cosy90_sucrose.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/cosy90_sucrose.m)
+
 - Signature: `cosy90_sucrose()`
 
 ## Purpose
 
-COSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation time: minutes
+A liquid-state proton COSY-90 simulation for sucrose using magnetic parameters imported from a vacuum DFT calculation. The source estimates a calculation time of minutes.
 
-## Physical / mathematical content
+## Spin system and basis
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example parses the sucrose DFT log at ../standard_systems/sucrose.log and calls `g2spinach` to import hydrogen nuclei as `1H`. It passes `options.min_j=2.0` (the helper defines this as a scalar-coupling threshold in Hz) and `options.no_xyz=1`; it supplies 31.8 ppm as the reference-shielding argument to `g2spinach`. The imported system is then assigned a field of 5.9 T. The Liouville-space basis uses IK-2, scalar-coupling connectivity, proximity level 1, and the greedy system-building option; the source also sets a proximity cutoff of 4.0.
 
-## Numerical / algorithmic content
+## COSY acquisition and processing
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The pulse angle is pi/2, the offset is 800 Hz, and the sweep width is 1700 Hz. The FID has 512 by 512 sampled points and is zero-filled to 2048 by 2048 before the 2D FFT. Both axes are in ppm. Cosine apodisation is applied on both time dimensions, and the plotted array is the real part of the shifted spectrum.
 
-## Implementation structure
+## Interpretation and scope
 
-- COSY spectrum of sucrose (magnetic parameters computed with DFT).
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The plotted spectrum is generated from the magnetic parameters imported from the DFT log, rather than from shifts and couplings tabulated directly in this function. The source does not state the DFT method in the function body or present an experimental comparison, so the calculation should be read as a simulation using that supplied log and reference-shielding input, not as a measured sucrose spectrum.

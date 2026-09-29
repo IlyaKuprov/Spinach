@@ -1,40 +1,23 @@
 # kernel/pulses/uhrig_times.m
 
+MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/uhrig_times.m
+Source Wiki page: https://spindynamics.org/wiki/index.php?title=uhrig_times.m
+
 - Signature: `time_delays=uhrig_times(T,N)`
 
 ## Purpose
 
-Uhrig's UDD decoupling sequence timings. Syntax: time_delays=uhrig_times(T,N)
+Returns the delay intervals for an Uhrig dynamical decoupling (UDD) sequence of `N` ideal pulses over total duration `T`.
 
-## Physical / mathematical content
+## Timing construction
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+The implementation computes the centred pulse positions as `T*(sin(pi*(1:N)/(2*N+2)).^2-0.5)`, differences successive positions to obtain the interior intervals, and appends equal starting and trailing delays. Thus it returns `N+1` delay values: the first is before the first ideal pulse, the interior values are between pulses, and the last follows the final pulse. Their sum is `T`. The source comment attributes the timing formula to WSW's 2009 JCP paper.
 
 ## Parameters / inputs
 
-- T -total duration of the sequence (sum of all delays)
-- N -number of pulses in the sequence
+- `T` - finite positive real scalar; total sequence duration, in seconds
+- `N` - finite positive real integer scalar; number of pulses
 
-## Outputs
+## Output
 
-- time_delays -list of delays between ideal pulses in
-- the UDD sequence; the first pulse goes
-- after the first delay, and there is a
-- delay after the last pulse
-
-## Implementation structure
-
-- Uhrig's UDD decoupling sequence timings. Syntax:
-- time_delays=uhrig_times(T,N)
-- T -total duration of the sequence (sum of all delays)
-- N -number of pulses in the sequence
-- time_delays -list of delays between ideal pulses in
-- the UDD sequence; the first pulse goes
-- after the first delay, and there is a
-- delay after the last pulse
-- Check consistency
-- Use the formula from WSW's 2009 JCP paper
-- Convert positions to delays
-- Add the starting and the trailing delay
+- `time_delays` - `N+1` delays, in seconds

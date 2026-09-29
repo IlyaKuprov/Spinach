@@ -1,39 +1,17 @@
 # etc/molecules/methyl_group.m
 
-- Signature: `xyz=methyl_group(c_xyz,cc_th,cc_ph,phase)`
+- MATLAB implementation: [etc/molecules/methyl_group.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/molecules/methyl_group.m)
 
-## Purpose
+**Call:** `xyz = methyl_group(c_xyz, cc_th, cc_ph, phase)` (for example, `xyz=methyl_group([0 0 0],pi/2,0,0)` with Spinach's `euler2dcm` available).
 
-Coordinates for the four atoms of a methyl group. Syntax: xyz=methyl_group(c_xyz,cc_th,cc_ph,phase)
+**Inputs:** `c_xyz` is a real numeric three-element row vector in Angstrom. `cc_th` and `cc_ph` are real numeric scalar polar and azimuthal angles for the C–C bond, in radians; `phase` is a real numeric scalar phase in radians for methyl rotation around that bond. The checks enforce real numeric scalar angles and the stated row-vector shape; the source does not impose angle ranges or an explicit finiteness test.
 
-## Physical / mathematical content
+## Geometry construction
 
-## Numerical / algorithmic content
+The carbon is placed at the supplied `c_xyz`. Three C–H vectors of length 1.050 Angstrom are generated with the tetrahedral polar angle `acos(1/3)` and azimuths `phase`, `2*pi/3 + phase`, and `4*pi/3 + phase`. The routine first rotates this canonical four-atom geometry to orient the C–C bond using `euler2dcm(0,-cc_th,-cc_ph)`, then translates every coordinate by `c_xyz`.
 
-## Parameters / inputs
+## Output
 
-- c_xyz -coordinates of C, row vector, Angstrom
-- cc_th -polar theta angle of the C-C bond, radians
-- cc_ph -polar phi angle of the C-C bond, radians
-- phase -phase of the methyl group with respect to
-- its rotation around the C-C bond, radians
+`xyz` is a 4-by-1 cell array of Cartesian 1-by-3 coordinate row vectors in Angstrom: carbon first, followed by the three hydrogens. This function returns coordinates only; it does not create a Spinach spin-system structure.
 
-## Outputs
-
-- xyz -a column cell array of Cartesian XYZ row
-- vectors; carbon is the first atom
-
-## Implementation structure
-
-- Coordinates for the four atoms of a methyl group. Syntax:
-- xyz=methyl_group(c_xyz,cc_th,cc_ph,phase)
-- c_xyz -coordinates of C, row vector, Angstrom
-- cc_th -polar theta angle of the C-C bond, radians
-- cc_ph -polar phi angle of the C-C bond, radians
-- phase -phase of the methyl group with respect to
-- its rotation around the C-C bond, radians
-- xyz -a column cell array of Cartesian XYZ row
-- vectors; carbon is the first atom
-- Check consistency
-- Generate a canonical methyl group
-- Rotate the CC bond
+**Source reference:** [Spinach Wiki: methyl_group.m](https://spindynamics.org/wiki/index.php?title=methyl_group.m).

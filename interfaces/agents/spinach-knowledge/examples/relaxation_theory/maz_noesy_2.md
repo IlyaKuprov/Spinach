@@ -1,35 +1,15 @@
 # examples/relaxation_theory/maz_noesy_2.m
 
-- Signature: `maz_noesy_2()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/maz_noesy_2.m) · Signature: `maz_noesy_2()`
 
-## Purpose
+## Purpose and physical model
 
-Methylaziridine NOESY, including the effects of the scalar relaxation of the first kind (caused by the modulation of J-coupling by the nit- rogen centre inversion process) and second kind (caused by the rapid quadrupolar relaxation of the 14N nucleus). The calculation illustra- tes the effect described in: Calculation time: minutes.
+This example calculates a two-dimensional methylaziridine NOESY spectrum with two scalar-relaxation contributions: first-kind relaxation from nitrogen-centre inversion modulating scalar couplings, and second-kind relaxation associated with rapid quadrupolar relaxation of the `14N` nucleus. The source cites [the study describing the effect](https://doi.org/10.1002/ange.201410271) and gives an estimated calculation time of minutes.
 
-## Physical / mathematical content
+The spin system is seven `1H` nuclei and one `14N` nucleus, with magnet setting 11.75. The source specifies vacuum-DFT shielding tensors, a vacuum-DFT quadrupole tensor for nitrogen, scalar couplings, and molecular coordinates; the coordinate comment explicitly gives Angstrom. The nitrogen quadrupole matrix is the source matrix [-1.2932, 0.6251, 1.8700; 0.6251, 1.7170, -2.3127; 1.8700, -2.3127, -0.4238] multiplied by 1e6, with no unit stated for its entries. Nitrogen-to-proton scalar-coupling entries include 4.4, 5.2, and 44.8, also without units stated. It assigns isotropic shifts from experiment using the values 1.3, 1.7, 1.9, 0.0, 0.1, 1.2, 1.2, and 1.2. This experimental assignment is an input to the calculation, not a measured spectrum or measured intensity supplied to the plotting step.
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## Relaxation and sequence
 
-## Numerical / algorithmic content
+The basis is `sphten-liouv` with IK-2 approximation, scalar-coupling connectivity, and proximity level 4. The source sets inter-spin and proximity cutoffs to 2.0 and 4.0 and disables Krylov propagation. It requests Redfield, SRFK, and SRSK relaxation, uses zero equilibrium, sets `srsk_sources` to 4, and keeps the relaxation terms in the kite. The Redfield correlation-time input is 25e-12; the SRFK inputs are `srfk_tau_c={[1.0 1e-3]}` and modulation depth 15.0 for entries (1,5), (2,5), and (3,5). The source does not label units for these relaxation parameters, so their supplied numeric values are retained without converting them to named units.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- Methylaziridine NOESY, including the effects of the scalar relaxation
-- of the first kind (caused by the modulation of J-coupling by the nit-
-- rogen centre inversion process) and second kind (caused by the rapid
-- quadrupolar relaxation of the 14N nucleus). The calculation illustra-
-- tes the effect described in:
-- Calculation time: minutes.
-- Magnet induction
-- Isotopes
-- Absolute shielding tensors (vacuum DFT)
-- Assign isotropic components from the experiment
-- Quadrupole couplings (vacuum DFT)
-- Scalar couplings (vacuum DFT)
+The source runs `liquid(spin_system,@noesy,parameters,'nmr')`. The `@noesy` sequence observes protons, starts from proton `Lz`, and uses a 2.0 s mixing time, 500 Hz offset, sweeps of 1400 in both dimensions, 256 points per dimension, and zero-filling to 1024 in each dimension. The cosine and sine acquisition components are cosine-apodised in both dimensions, Fourier transformed along F2, combined into a states signal, then Fourier transformed along F1. The plot is the negative real part of the calculated spectrum, shown with `plot_2d`. These lines and intensities are simulation output; the example does not load or plot a measured NOESY spectrum.

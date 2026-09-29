@@ -1,49 +1,27 @@
 # kernel/derivatives/pseudomodulation.m
 
-- Signature: `output=pseudomodulation(field,spectrum,mod_amp,mod_order)`
+[Direct MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/pseudomodulation.m) · [Spinach Wiki documentation](https://spindynamics.org/wiki/index.php?title=pseudomodulation.m)
 
-## Purpose
+## Purpose and signature
 
-Pseudomodulation of uniformly sampled spectra using the Hyde et al. Fourier-domain algorithm. Syntax: output=pseudomodulation(field,spectrum,mod_amp,mod_order)
+`output=pseudomodulation(field,spectrum,mod_amp,mod_order)` applies the requested Fourier-domain pseudomodulation harmonic to one or more uniformly sampled spectra.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `field`: dense floating-point, finite, real `N`-by-1 column with at least three points, uniform spacing, and non-zero sweep width. Either sweep direction is handled.
+- `spectrum`: non-empty dense floating-point `N`-by-`M` matrix with finite entries. Rows correspond to field points; each column is an independent spectrum.
+- `mod_amp`: finite, non-negative real scalar in the same field units as `field`.
+- `mod_order`: scalar harmonic order 0, 1, or 2.
+- `output`: same row and column dimensions as `spectrum`; real input spectra are returned real, while complex input may produce a complex result.
 
-## Numerical / algorithmic content
+The Fourier-domain treatment follows Hyde et al., *Journal of Magnetic Resonance* **96**, 1–13 (1992), Eqs. 5–7, as cited in the MATLAB source.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Fourier-domain construction
 
-## Parameters / inputs
+The routine obtains the field step, builds an angular-frequency vector in MATLAB FFT ordering (including the sign of the field step), and forms the dimensionless Bessel argument `mod_amp*ang_freq/2`. It transforms along the row/field dimension, multiplies by the Bessel factor for the selected order, then inverse-transforms along that same dimension:
 
-- field -N-by-1 real, ordered, uniformly spaced field
-- axis
-- spectrum -N-by-M spectrum matrix; rows are field samples,
-- and columns are independent spectra
-- mod_amp -non-negative modulation amplitude in field units
-- mod_order -modulation harmonic order: 0, 1, or 2
+- Order 0: `ifft(spec_ft.*besselj(0,bessel_arg),npts,1)`.
+- Order 1: `2i*ifft(spec_ft.*besselj(1,bessel_arg),npts,1)`.
+- Order 2: `2*ifft(spec_ft.*besselj(2,bessel_arg),npts,1)`.
 
-## Outputs
-
-- output -N-by-M pseudomodulated spectrum matrix
-- The implementation follows Eqs. 5-7 of Hyde et al., J. Magn.
-- Reson. 96, 1-13 (1992). After phase-sensitive detection, the
-- time-dependent prefactors are set to unity, leaving amplitude
-- factors 2i for the first harmonic, and 2 for the second harmonic.
-
-## Implementation structure
-
-- Pseudomodulation of uniformly sampled spectra using the Hyde
-- et al. Fourier-domain algorithm. Syntax:
-- output=pseudomodulation(field,spectrum,mod_amp,mod_order)
-- field -N-by-1 real, ordered, uniformly spaced field
-- axis
-- spectrum -N-by-M spectrum matrix; rows are field samples,
-- and columns are independent spectra
-- mod_amp -non-negative modulation amplitude in field units
-- mod_order -modulation harmonic order: 0, 1, or 2
-- output -N-by-M pseudomodulated spectrum matrix
-- The implementation follows Eqs. 5-7 of Hyde et al., J. Magn.
-- Reson. 96, 1-13 (1992). After phase-sensitive detection, the
+The field spacing supplies the reciprocal-field scale of the frequency axis; the amplitude and field must use matching units so the Bessel argument is dimensionless. The source uses the finite, uniformly spaced axis guard rather than padding or correcting irregular samples.

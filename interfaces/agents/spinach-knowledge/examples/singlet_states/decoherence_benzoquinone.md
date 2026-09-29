@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Long-lived spin states in the para-benzoquinone molecule (4 protons, 256-dimensional Liouville space). The relaxation superoperator accounts for every dipolar coupling and every CSA tensor in the system. Calculation time: seconds
+Build a Redfield relaxation superoperator for the four-proton para-benzoquinone spin system (256-dimensional Liouville space) from vacuum-DFT spin data, then request its 20 smallest-magnitude relaxation eigenvalues.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The source imports coordinates, chemical shifts, J couplings and chemical-shift-anisotropy (CSA) tensors from `../standard_systems/benzoquinone.log` using `gparse` and `g2spinach` with mapping `{{'H','1H'}}`, argument `31.8` and final argument `[]` (the source does not describe these argument roles); the source comment states that the relaxation model accounts for every dipolar coupling and every CSA tensor. The magnetic field is set to 1.0 T. Redfield relaxation uses zero equilibrium, lab-frame retention and a 100 ps correlation time. The full `sphten-liouv` basis is used, with relaxation-integration and relaxation-zero tolerances of `1e-5`.
 
-## Numerical / algorithmic content
+## Observable and limits
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+The script constructs `R` and evaluates `eigs(R-speye(size(R)), 20, 'SM')+1`, labelled in the source as the twenty smallest relaxation rates in Hz. It reports rates only; it does not select or identify a singlet eigenmode, prepare or store a singlet state, or compute a lifetime, image or gradient-encoded signal.
 
-## Implementation structure
+The source comment gives a calculation time of seconds.
 
-- Long-lived spin states in the para-benzoquinone molecule
-- (4 protons, 256-dimensional Liouville space). The relaxation
-- superoperator accounts for every dipolar coupling and every
-- CSA tensor in the system.
-- Calculation time: seconds
-- Read the spin system (coordinates, chemical shifts,
-- J-couplings and CSAs) from a vacuum DFT calculation
-- Set magnet field to 1.0 Tesla
-- Tighten up the tolerances
-- Set relaxation theory parameters
-- Relaxation superoperator accuracy
-- Use complete basis set
+Source: [examples/singlet_states/decoherence_benzoquinone.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/decoherence_benzoquinone.m)

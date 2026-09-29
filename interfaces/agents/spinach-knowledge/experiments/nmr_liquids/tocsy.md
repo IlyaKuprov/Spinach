@@ -2,59 +2,23 @@
 
 - Signature: `fid=tocsy(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and sequence
 
-Amplitude-mode homonuclear TOCSY pulse sequence from:
+Amplitude-mode homonuclear TOCSY with the source's continuous-spin-lock model. Starting from `parameters.rho0`, the routine applies a `pi/2` pulse about `Lx` on the working spin, then records F1 evolution under `L = H + 1i*R + 1i*K`. During the mixing interval, it propagates two branches with `L + 2*pi*lamp*Lx` and `L + 2*pi*lamp*Ly`; these include the full Liouvillian as well as the spin-lock term. It detects with `L+` on the same spin during F2 and returns `fid.cos` and `fid.sin`, the States-quadrature components, each with shape `npoints(2) × npoints(1)` (F2 direct-time samples in rows, F1 state-stack samples in columns).
 
-## Physical / mathematical content
+This is not an explicit MLEV, DIPSI, WALTZ, or clean-TOCSY pulse-train simulation.
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+## Inputs
 
-## Numerical / algorithmic content
+- `parameters.spins`: one homonuclear species in a cell array; source examples include `{'1H'}` and `{'13C'}`.
+- `parameters.sweep`: two positive sweep widths in Hz; `parameters.npoints`: two positive integer point counts, in F1/F2 order.
+- `parameters.tmix`: non-negative scalar mixing time in seconds; `parameters.lamp`: spin-lock power in Hz, used in the source as `2*pi*lamp` angular frequency; `parameters.rho0`: numeric initial state with a Liouville-space dimension matching `H`.
+- `H`, `R`, and `K`: numeric, same-sized matrices from the context function. Supported formalisms are `sphten-liouv` and `zeeman-liouv`.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## References
 
-## Syntax
-
-```matlab
-fid=tocsy(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- parameters.sweep -sweep widths, Hz
-- parameters.npoints -number of points for both
-- dimensions
-- parameters.spins -nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.tmix -mixing time, seconds
-- parameters.lamp -spin-lock power, Hz
-- parameters.rho0 -initial state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.cos, fid.sin -sine and cosine components
-- of the States quadrature
-- Note: this is an ideal continuous-spin-lock TOCSY, not an
-- explicit MLEV, DIPSI, WALTZ, or clean-TOCSY composite
-- pulse-train simulation.
-
-## Implementation structure
-
-- Amplitude-mode homonuclear TOCSY pulse sequence from:
-- fid=tocsy(spin_system,parameters,H,R,K)
-- parameters.sweep - sweep widths, Hz
-- parameters.npoints - number of points for both
-- dimensions
-- parameters.spins - nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.tmix - mixing time, seconds
-- parameters.lamp - spin-lock power, Hz
-- parameters.rho0 - initial state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
+- [TOCSY paper](https://doi.org/10.1016/0022-2364(83)90226-3)
+- [TOCSY paper](https://doi.org/10.1021/ja00295a052)
+- [TOCSY paper](https://doi.org/10.1016/0022-2364(85)90018-6)
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/tocsy.m)
+- [Spinach Wiki: tocsy.m](https://spindynamics.org/wiki/index.php?title=tocsy.m)

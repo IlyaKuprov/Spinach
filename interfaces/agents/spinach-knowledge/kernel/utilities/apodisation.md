@@ -1,81 +1,50 @@
 # kernel/utilities/apodisation.m
 
-- Signature: `fid=apodisation(spin_system,fid,winfuns,fp_half)`
-
 ## Purpose
 
-Performs free induction decay apodisation. Supports free induction decays of any dimension. To satisfy Fourier transform symmetry requirements, the first elements of the FID in each dimension are divided by 2, except for singleton dimensions and those the user designates inactive. Syntax: fid=apodisation(spin_system,fid,winfuns)
+Apodises free induction decay (FID) data by applying window functions along each dimension, with optional halving of first points to satisfy Fourier transform symmetry requirements. Supports FIDs of any dimensionality.
 
-## Physical / mathematical content
+Source: [apodisation.m on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/apodisation.m)
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+## Behaviour
 
-## Numerical / algorithmic content
+- Validates inputs via an internal `grumble` subroutine: `fid` must be numeric, `winfuns` must be a cell array with one element per non-singleton dimension of `fid`, each element must be a cell array, and the window type must be one of the supported strings. Parameterised windows (`exp`, `gauss`, `kaiser`, `bad-z1`, `bad-z2`) require a finite real scalar parameter; all others take no parameters.
+- If `fp_half` is not supplied, it defaults to `true`.
+- Non-singleton dimensions are identified with `find(size(fid)>1)`; dimensions whose `winfuns` entry is empty are excluded as inactive.
+- When `fp_half` is true, the first points along each active dimension are divided by 2 (indexing the hyperplane where that dimension equals 1), and a report is printed per dimension.
+- For each active dimension, a window function vector of length `npts = size(fid,dim)` is built and applied by elementwise multiplication after reshaping to match the array dimensions.
+- Supported window types:
+  - `none`: all-ones window (no apodisation, but first-point halving still applies when enabled).
+  - `crisp`: `cos(x).^8` half-bell with `x` from 0 to `pi/2`.
+  - `exp`: `exp(-k*x)` with `x` from 0 to 1.
+  - `gauss`: `exp(-k*(x.^2))` with `x` from 0 to 1.
+  - `cos`: `cos(x)` half-bell with `x` from 0 to `pi/2`.
+  - `sin`: `sin(x)` full bell with `x` from 0 to `pi`.
+  - `sqcos`: `cos(x).^2` half-bell with `x` from 0 to `pi/2`.
+  - `sqsin`: `sin(x).^2` full bell with `x` from 0 to `pi`.
+  - `kaiser`: MATLAB `kaiser(npts,k)` window; the peak is in the middle of the FID.
+  - `bad-z1`: `sinc(x*k)` over `x` from 0 to 1 (excluding the first point, which is set to 1 to avoid the singularity); emulates a misset Z1 shim.
+  - `bad-z2`: `(fresnelc(x)+1i*fresnels(x))/x` with `x = sqrt(t*k)` for `t` from 0 to 1 (first point set to 1); computed in a `parfor` loop; emulates a misset Z2 shim.
+  - The source header gives illustrative dimensionless `k` values for 1H NMR at 600 MHz: `bad-z1` uses 10 and `bad-z2` uses 40; these are not defaults enforced by the function.
+- An unsupported window type raises an error.
+- After each window is applied, a report line is printed naming the dimension and window type.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs and outputs
 
-## Parameters / inputs
+**Syntax:** `fid = apodisation(spin_system, fid, winfuns, fp_half)`
 
-- fid -the free induction decay. The function expects a column
-- vector in the case of 1D FID, a 2D matrix with the time
-- origin located at the (1,1) corner point in the case of
-- a 2D FID, a 3D matrix with the time origin located at
-- the (1,1,1) corner point in the case of a 3D FID, etc.
-- winfuns -a cell array of window function specifications for each
-- dimension of the FID in the format {{spec},{spec},...},
-- omitting singleton dimensions. The following specifica-
-- tions are supported:
-- {} -do nothing in this dimension
-- {'none'} -no window function, but divide the first
-- point by 2 to satisfy the Fourier trans-
-- form symmetry requirement
-- {'crisp'} -multiplied by cos(x)^8 half-bell. First
-- point has x=0, last point has x=pi/2.
-- {'exp',k} -multiplied by exp(-k*x). First point has
-- x=0, last point has x=1.
-- {'gauss',k} -multiplied by exp(-k*(x.^2)). First point
-- has x=0, last point has x=1.
-- {'cos'} -multiplied by cos(x) half-bell. First po-
-- int has x=0, last point has x=pi/2.
-- {'sin'} -multiplied by sin(x) full bell. First po-
-- int has x=0, last point has x=pi.
-- {'sqcos'} -multiplied by cos(x).^2 half-bell. First
-- point has x=0, last point has x=pi/2.
-- {'sqsin'} -multiplied by sin(x).^2 full bell. First
-- point has x=0, last point has x=pi.
-- {'kaiser',k} -multiplied by a Kaiser function with the
-- side lobe attenuation factor k. The peak
-- of the Kaiser function is in the middle
-- of the FID.
-- {'bad-z1',k} -emulation of a misset Z1 shim, k is a di-
-- mensionless constant proportional to the
-- shim current, a good guess for 1H NMR at
-- 600 MHz is 10.
-- {'bad-z2',k} -emulation of a misset Z2 shim, k is a di-
-- mensionless constant proportional to the
-- shim current, a good guess for 1H NMR at
-- 600 MHz is 40.
-- fp_half -set to false() to disable dividing of the first points
-- by 2, this is needed when multiple window functions are
-- applied to the same dimension one after another
+**Inputs:**
 
-## Outputs
+- `spin_system` — spin system object, used for reporting.
+- `fid` — the FID. A column vector for 1D data; for higher dimensions, a matrix (2D, 3D, etc.) with the time origin at the `(1,1)`, `(1,1,1)`, ... corner.
+- `winfuns` — cell array of window function specifications, one per non-singleton dimension, in the format `{{spec},{spec},...}`. Each specification is one of the window types listed above; an empty element marks the dimension as inactive.
+- `fp_half` — optional logical; set to `false` to disable first-point halving, needed when multiple window functions are applied to the same dimension sequentially.
 
-- fid -apodised free induction decay
+**Outputs:**
 
-## Implementation structure
+- `fid` — the apodised free induction decay.
 
-- Performs free induction decay apodisation. Supports free induction decays
-- of any dimension. To satisfy Fourier transform symmetry requirements, the
-- first elements of the FID in each dimension are divided by 2, except for
-- singleton dimensions and those the user designates inactive. Syntax:
-- fid=apodisation(spin_system,fid,winfuns)
-- fid -the free induction decay. The function expects a column
-- vector in the case of 1D FID, a 2D matrix with the time
-- origin located at the (1,1) corner point in the case of
-- a 2D FID, a 3D matrix with the time origin located at
-- the (1,1,1) corner point in the case of a 3D FID, etc.
-- winfuns -a cell array of window function specifications for each
-- dimension of the FID in the format {{spec},{spec},...},
+## References
+
+- [apodisation.m — Spinach Wiki](https://spindynamics.org/wiki/index.php?title=apodisation.m)
+- [apodisation.m source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/apodisation.m)

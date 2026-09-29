@@ -4,27 +4,16 @@
 
 ## Purpose
 
-An example of the S2M sequence for a two-spin system. Calculation time: seconds
+Demonstrates singlet-to-magnetisation (S2M) conversion for a coupled pair of `13C` spins: the initial singlet is converted by the S2M sequence and the final longitudinal-state overlap is displayed.
 
-## Physical / mathematical content
+## Spin system and pulse operators
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The model has two `13C` spins at `9.4 T`, scalar Zeeman values `0.03` and `-0.03`, and scalar coupling `55`. The source does not label units for those scalar values. It uses an unapproximated `sphten-liouv` basis, an NMR Hamiltonian, and carbon `Lx` and `Ly` operators as the sequence's pulse operators.
 
-## Numerical / algorithmic content
+## Preparation and observable
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The input is the singlet on spins 1 and 2; the detector is `state(spin_system,'Lz','all')`. The code calls `s2m` with arguments `55` and `6.0`, then displays the detector overlap with the returned state as longitudinal magnetisation. These are sequence arguments as supplied by the example; this file does not define a pulse waveform, phase/amplitude/time discretisation, gradient, relaxation, or storage model. The source labels the calculation time as seconds but does not report a numerical overlap.
 
-## Implementation structure
+## Source
 
-- An example of the S2M sequence for a two-spin system.
-- Calculation time: seconds
-- Spin system and interactions
-- Basis set
-- Spinach housekeeping
-- Hamiltonian
-- Pulse operators
-- Start with singlet state
-- Detect longitudinal magnetisation
-- Call the S2M sequence
-- Display the longitudinal magnetisation
+[examples/singlet_states/s2m_example.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/s2m_example.m)

@@ -2,34 +2,9 @@
 
 - Signature: `A=complex(A)`
 
-## Purpose
+For each linear cell index, the overload replaces the content with the result of `complex(A{n})`. The cell array's indexing and shape are retained; conversion behaviour for each value is delegated to MATLAB's `complex` dispatch. The documented use is a cell array of numeric objects. This wrapper has no explicit cell-type or element-type validation and adds no broadcasting or two-argument real/imaginary construction.
 
-A shorthand for making all elements of a cell array complex.
+## References
 
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-## Syntax
-
-```matlab
-A=complex(A)
-```
-
-## Parameters / inputs
-
-- A -a cell array of numeric objects
-
-## Outputs
-
-- A -a cell array of numeric objects
-
-## Implementation structure
-
-- A shorthand for making all elements of a cell array complex.
-- A=complex(A)
-- A - a cell array of numeric objects
-- Inflate element by element
-- It is not your paintings I like, it
-- is your painting.
-- Albert Camus
+- MATLAB source: [`kernel/overloads/@cell/complex.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@cell/complex.m)
+- Spinach Wiki: [`cell/complex.m`](https://spindynamics.org/wiki/index.php?title=cell/complex.m)

@@ -1,44 +1,29 @@
 # experiments/esr_dipolar/sifter.m
 
-- Signature: `fid=sifter(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_dipolar/sifter.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/sifter.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=sifter.m
 
-SIFTER pulse sequence. Syntax: fid=sifter(spin_system,parameters,H,R,K) where H is the Hamiltonian matrix, R is the relaxation matrix and K is the chemical kinetics matrix.
+`fid=sifter(spin_system,parameters,H,R,K)`
 
-## Physical / mathematical content
+## What it calculates
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+This function simulates a SIFTER pulse sequence and returns a two-dimensional free-induction decay (FID). It uses the supplied spin-system Hamiltonian and pulse operators; the source does not define a field sweep, DNP/hyperpolarisation step, imaging dimension, or a measured acquisition. No acronym expansion or specific hyperfine coupling is given in the routine source.
 
-## Numerical / algorithmic content
+## Inputs
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- `spin_system` — Spinach spin system.
+- `parameters.npoints` — number of points; it must be a finite even real integer of at least 2.
+- `parameters.timestep` — positive real time step in seconds.
+- `parameters.rho0` — initial state.
+- `parameters.coil` — detection state.
+- `parameters.pulse_opx` and `parameters.pulse_opy` — caller-supplied X- and Y-phase pulse operators, dimension-matched to `H`.
+- `H`, `R`, `K` — dimension-matched numeric matrices for the Hamiltonian, relaxation, and chemical kinetics contributions. The generator is `L=H+1i*R+1i*K`.
 
-## Parameters / inputs
+## Sequence and propagation
 
-- parameters.npoints -number of points in time evolution
-- parameters.timestep -simulation time step, seconds
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.pulse_opx -pulse operator in X phase
-- parameters.pulse_opy -pulse operator in Y phase
+The routine applies a `pi/2` X pulse, evolves a first interval with `npoints/2-1` steps at `timestep` in trajectory mode, and applies a `pi` X pulse. It then refocus-evolves the stored stack for the first part of the echo, applies a `pi/2` Y pulse, reverses the stored order, and refocus-evolves the second delay period. A final `pi` X pulse precedes observable-mode evolution with `coil` over `npoints/2-1` steps. Pulse angles are in radians; the user supplies the X and Y pulse operators.
 
-## Outputs
+## Output and scope
 
-- fid -a 2D free induction decay
-
-## Implementation structure
-
-- SIFTER pulse sequence. Syntax:
-- fid=sifter(spin_system,parameters,H,R,K)
-- where H is the Hamiltonian matrix, R is the relaxation matrix
-- and K is the chemical kinetics matrix.
-- parameters.npoints -number of points in time evolution
-- parameters.timestep -simulation time step, seconds
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.pulse_opx -pulse operator in X phase
-- parameters.pulse_opy -pulse operator in Y phase
-- fid -a 2D free induction decay
-- Check consistency
+`fid` is the source-documented 2D FID. Its two sampling dimensions arise from the two evolution periods, but the function does not return separate named axis vectors; `timestep` and the even `npoints` control sampling. The numeric examples specified by the routine are the pulse angles `pi/2` and `pi`, and `npoints` must be at least 2 and even. No DOI or concrete physical parameter set is supplied.

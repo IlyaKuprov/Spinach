@@ -1,35 +1,13 @@
 # kernel/plotting/klegend.m
 
-- Signature: `leg_obj=klegend(varargin)`
+- MATLAB implementation: [kernel/plotting/klegend.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/klegend.m)
 
-## Purpose
+## Purpose and use
 
-House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_obj=klegend(varargin)
+leg_obj=klegend(varargin) is a styled wrapper around MATLAB legend. Pass the normal legend arguments as varargin; the wrapper forwards them to legend and returns the resulting legend object as leg_obj. Input conventions and units are those of MATLAB's legend function.
 
-## Physical / mathematical content
+## Styling applied by the wrapper
 
-## Numerical / algorithmic content
+The call appends the Interpreter='latex' and IconColumnWidth=10 settings to the forwarded arguments. It then sets the legend box face to ColorType='truecoloralpha' with ColorData=uint8([200 200 200 64]'), giving the box a translucent grey fill. The function does not otherwise define legend contents or labels; supply those through the standard legend arguments.
 
-## Parameters / inputs
-
-- varargin -same arguments as those accepted by
-- Matlab's legend function
-
-## Outputs
-
-- leg_obj -Matlab figure legend object
-
-## Implementation structure
-
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- leg_obj=klegend(varargin)
-- varargin -same arguments as those accepted by
-- Matlab's legend function
-- leg_obj -Matlab figure legend object
-- Display the legend using LaTeX
-- Make legend box translucent
-- It was awesome -my first tabloid story. If you're going to
-- have a tabloid story written about you, it might as well be
-- with Johnny Depp.
-- Christina Ricci, about newspapers
+Source documentation: [klegend.m](https://spindynamics.org/wiki/index.php?title=klegend.m).

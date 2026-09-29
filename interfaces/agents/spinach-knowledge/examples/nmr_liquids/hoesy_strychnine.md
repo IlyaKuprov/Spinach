@@ -1,33 +1,23 @@
 # examples/nmr_liquids/hoesy_strychnine.m
 
+- MATLAB implementation: [examples/nmr_liquids/hoesy_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/hoesy_strychnine.m)
+
 - Signature: `hoesy_strychnine()`
 
 ## Purpose
 
-13C{1H} HOESY spectrum of strychnine with natural content of 13C isotope. Calculation time: minutes
+Simulates the `13C{1H}` HOESY spectrum of strychnine at natural `13C` content. The source estimates calculation time as minutes; this is source documentation, not a timing measured here.
 
-## Physical / mathematical content
+## Spin system and model
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example obtains a strychnine spin system from `strychnine({'1H','13C'})`, so the explicit spin labels are proton and carbon-13. `dilute(spin_system,'13C')` generates carbon-13 isotopomer subsystems; the script simulates each and accumulates their spectra. The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-1`, scalar-coupling connectivity, proximity level 3 and interaction level 4. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `50e-12` s and temperature `298` K. Algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Mixing time is `0.5` s. The source orders dimensions as `{'1H','13C'}`, with `decouple_f1={'13C'}`; carbon-13 is the detected nucleus in the source's `13C{1H}` description. Sweeps are `[6000 18000]` Hz, offsets `[3000 12000]` Hz, and each dimension has 128 acquired points and 512-point zero filling. Axes are labelled in ppm.
 
-## Implementation structure
+Each carbon-13 isotopomer is sent to `liquid(subsystem,@hoesy,parameters,'nmr')`. The wrapper applies `sqcos` apodisation to cosine and sine FIDs in both dimensions, zero-fills and Fourier-transforms F2, forms the States signal `f1_cos-1i*f1_sin`, then Fourier-transforms F1 and adds the result to the accumulated spectrum. The real spectrum is plotted with positive display polarity using `plot_2d`.
 
-- 13C{1H} HOESY spectrum of strychnine with natural content
-- of 13C isotope.
-- Calculation time: minutes
-- Strychnine spin system
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Generate isotopomers
-- Preallocate the answer
+## Sequence boundary
+
+This wrapper builds the strychnine spin systems, configures acquisition and processing, and calls the shared `liquid` driver with `@hoesy`. It does not define the HOESY pulse-program internals; pulse timing and internal coherence-transfer steps belong to the sequence function.

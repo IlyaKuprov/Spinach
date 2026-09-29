@@ -13,11 +13,12 @@ Regression test for zero-duration propagation. The test verifies the identity li
 - Builds a one-proton Hilbert-space spin system with `sys.magnet=0`, `sys.isotopes={'1H'}`, `inter.zeeman.scalar={0}`, `bas.formalism='zeeman-hilb'`, and `bas.approximation='none'`, using `test_spin_system(sys,inter,bas)`.
 - Constructs an arbitrary Hermitian density matrix `rho=S.x+2*S.z` and a Hamiltonian `H=3*S.x+5*S.z` from `pauli(2)`.
 - Propagates the density matrix for zero time with `step(spin_system,H,rho,0)`.
-- Checks the identity limit with `test_close(result,'rho(t=0)=rho(0)',rho_obs,rho,1e-15,1e-15,'zero-duration evolution cannot change the state')`, using absolute and relative tolerances of `1e-15`.\n
+- Checks the identity limit with `test_close(result,'rho(t=0)=rho(0)',rho_obs,rho,1e-15,1e-15,'zero-duration evolution cannot change the state')`, using absolute and relative tolerances of `1e-15`.
+
 ## Inputs and outputs
 
 ```matlab
-result = test_step_zero_time()
+result=test_step_zero_time()
 ```
 
 - **Output:** `result` — regression test result with explanatory messages.

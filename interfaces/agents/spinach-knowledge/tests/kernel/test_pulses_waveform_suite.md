@@ -17,13 +17,14 @@ The function announces the test target with `fprintf('TESTING: Pulse waveform ge
 - **JCAMP pulse-file reading**: `read_wave('rectangular_1000.pk',4)` returns amplitude, phase, Cartesian controls, and a scaling factor; amplitude is compared against `ones(1,4)` (100 percent amplitude at every point), phase against `zeros(1,4)`, `Cx` against `ones(1,4)` (zero-phase polar coordinates convert into unit X control), `Cy` against `zeros(1,4)`, and the scaling factor against `1` (unit integral scaling). Tolerances are `1e-15`.
 - **Veshtort-Griffin scaling**: `vg_pulse('E0A',7,2)` is compared against `vg_pulse('E0A',7,1)/2`, reflecting normalisation of VG pulse amplitudes as `2*pi*shape/duration`. Tolerances are `1e-14`.
 - **WURST chirp**: `chirp_pulse(5,1,4,2,'wurst')` is evaluated on `time_grid=linspace(-0.5,0.5,5)`. References: amplitudes `2*pi*sqrt(4)*(1-abs(sin(pi*time_grid).^2))` (calibrated as `sqrt(bandwidth/duration)*(1-|sin(pi t)^p|)`), phases `pi*4*(time_grid.^2)` (linear chirp phase `pi*duration*bandwidth*t^2` on the normalised grid), frequencies `4*time_grid` (bandwidth times normalised time), durations `ones(1,5)/5` (uniform piecewise-constant slices), intervals `diff(time_grid)`, and Cartesian controls from `polar2cartesian(amps_ref,phis_ref)` (X is amplitude times cosine phase, Y is amplitude times sine phase). Amplitude, phase, frequency, and control comparisons use tolerances `1e-12`; duration and interval comparisons use `1e-15`.
-- **Hyperbolic secant pulse**: `sech_pulse(3,2,5,2,5)` (peak amplitude 3, frequency modulation 2, phase modulation 5, duration 2, 5 points) is compared against a time grid `linspace(-dur/2,dur/2,npts)` centred at zero, amplitudes `peak_amp*sech(freq_mod*time_ref)`, phases `phase_mod*log(cosh(freq_mod*time_ref))`, and Cartesian controls from `polar2cartesian(amps_ref,phis_ref)`. Tolerances are `1e-15`.\n
+- **Hyperbolic secant pulse**: `sech_pulse(3,2,5,2,5)` (peak amplitude 3, frequency modulation 2, phase modulation 5, duration 2, 5 points) is compared against a time grid `linspace(-dur/2,dur/2,npts)` centred at zero, amplitudes `peak_amp*sech(freq_mod*time_ref)`, phases `phase_mod*log(cosh(freq_mod*time_ref))`, and Cartesian controls from `polar2cartesian(amps_ref,phis_ref)`. Tolerances are `1e-15`.
+
 ## Inputs and outputs
 
 ### Syntax
 
 ```matlab
-result = test_pulses_waveform_suite()
+result=test_pulses_waveform_suite()
 ```
 
 ### Inputs

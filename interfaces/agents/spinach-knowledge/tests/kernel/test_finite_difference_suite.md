@@ -18,11 +18,12 @@ The function announces the test target with `fprintf`, initialises a test result
 - **`fourdif` and `fourlap`**: for `N=16`, the first and second Fourier differentiation matrices must exactly differentiate `sin(grid)` to `cos(grid)` and `-sin(grid)` respectively (tolerances `1e-12`). The Fourier Laplacian `fourlap(N,2*pi)` must satisfy `Lf*s = -s`, since `sin(x)` is a Laplacian eigenfunction with eigenvalue `-1` on a `2*pi` periodic interval.
 - **`fftdiff`**: the FFT differentiation kernel `fftdiff(1,N,2*pi/N)` must reproduce the same spectral derivative, verified by comparing `real(ifft(fft(s).*kern))` with `cos(grid)` (tolerances `1e-12`).
 - **`pseudomodulation`**: the zeroth harmonic with zero amplitude must return the input spectrum unchanged (tolerances `1e-14`). With a small amplitude `pm_amp = 1e-4`, the first harmonic must match the Hyde derivative limit `pm_amp*cos(2*pm_field)` (tolerances `1e-9`/`1e-12`), and the second harmonic must match `(pm_amp^2/4)*sin(2*pm_field)` (tolerances `1e-13`/`1e-14`). The function must reject spectra oriented across columns (error message containing `same number of rows`) and row-vector field axes (error message containing `column vector`); both rejections are verified with `try/catch` blocks.
-- **`dirdiff`**: for a spin system with `output='hush'`, empty enable/disable lists, `small_matrix=10` and `prop_chop=1e-14`, and for commuting diagonal matrices `A=diag([1 2])`, `B=diag([3 4])` with `Tstep=0.125`, the zeroth directional derivative must equal the unperturbed propagator `expm(-1i*A*Tstep)` and the first derivative must equal `(-1i*Tstep)*B*P`, both with tolerances `1e-14`.\n
+- **`dirdiff`**: for a spin system with `output='hush'`, empty enable/disable lists, `small_matrix=10` and `prop_chop=1e-14`, and for commuting diagonal matrices `A=diag([1 2])`, `B=diag([3 4])` with `Tstep=0.125`, the zeroth directional derivative must equal the unperturbed propagator `expm(-1i*A*Tstep)` and the first derivative must equal `(-1i*Tstep)*B*P`, both with tolerances `1e-14`.
+
 ## Inputs and outputs
 
 ```matlab
-result = test_finite_difference_suite()
+result=test_finite_difference_suite()
 ```
 
 **Outputs**

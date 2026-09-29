@@ -24,11 +24,12 @@ The function announces the test target with `fprintf`, creates a test result obj
 - **SHREWD weights** — `shrewd(zeros(4,1),theta,phi,1,1e-8)` on the tetrahedral grid must return all-positive weights summing to 1 at tolerance `1e-12`.
 - **Grid test** — `grid_test(0,0,0,1,0,'D_lmn')` must return a rank-zero residual of 0 at tolerance `1e-15` (a single unit-weight point integrates the constant Wigner function exactly).
 - **Spatial grid point estimate** — `ngridpts(amps,durs,'1H',coh_order,sample_size)` with `amps=[0.01 -0.02]`, `durs=[1e-3 2e-3]`, `coh_order=2`, and `sample_size=0.01` must equal the reference value `ceil(abs(coh_order*spin('1H')*sum(abs(amps.*durs)))*sample_size/pi)` exactly (tolerance 0). The source comment states this is a change detector mirroring the implemented worst-case spiral formula, not an independent derivation.
-- **Repulsion grid** — the global RNG state is saved with `rng`, reseeded with `rng(1,'twister')`, `repulsion(5,3,1)` is called, and the original RNG state is restored. The returned weights must equal `ones(5,1)/5` at tolerance `1e-15` (uniform weights), and the angles must describe unit vectors at tolerance `1e-14`.\n
+- **Repulsion grid** — the global RNG state is saved with `rng`, reseeded with `rng(1,'twister')`, `repulsion(5,3,1)` is called, and the original RNG state is restored. The returned weights must equal `ones(5,1)/5` at tolerance `1e-15` (uniform weights), and the angles must describe unit vectors at tolerance `1e-14`.
+
 ## Inputs and outputs
 
 ```matlab
-result = test_grid_geometry_suite()
+result=test_grid_geometry_suite()
 ```
 
 - **Outputs**

@@ -23,8 +23,8 @@ All five arguments are required; there are no defaults.
 The implementation uses Samoson's Equation 3:
 
 ~~~matlab
-delta = -1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3) ...
-        *(S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2);
+delta=-1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3)*...
+           (S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2);
 ~~~
 
 delta is the second-order shift in ppm. The source comment says this expression was checked against pure numerics; it does not specify the test setup.

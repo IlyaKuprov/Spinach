@@ -1,0 +1,18 @@
+# examples/fundamentals/mas_fplanck_slices.m
+
+- Signature: `mas_fplanck_slices()`
+- Source: [`examples/fundamentals/mas_fplanck_slices.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/mas_fplanck_slices.m)
+
+## Purpose
+
+Tests agreement between explicitly midpoint-sliced MAS propagation (`rotor_stack`) and the Liouville-space Fokker–Planck rotor generator (`singlerot`). Both routes start from the same single crystal at phase zero, use the same magic-angle rotor and spin Hamiltonian, and independently refine their discretizations.
+
+## Cases and method
+
+The `13C` case has anisotropic shielding and a continuous transverse RF field, so the instantaneous drift and control do not generally commute. The `27Al` case uses the 3.2 MHz, asymmetry-0.16 quadrupolar tensor and shielding of the Šmelko example, with the central-transition coherence selectively prepared and the rotating-frame transformation taken through third order. Its third-order term is checked against the second-order generator to ensure it is nonzero.
+
+A single normalized complex signal is evaluated after one rotor period. The FP computation applies a phase-point delta and sums the detection operator over rotor phases. The sliced computation samples the Hamiltonian at each slice midpoint; each route includes the same carrier transformation. It reports rank/slice signals, last refinement increments, and their difference, and throws if either refinement or the cross-route difference exceeds its normalized-signal target (0.001 for CSA, 0.0001 for the quadrupolar central transition).
+
+## Output and limits
+
+The script prints `MAS_FPLANCK_SLICES_SUCCESS` only after both assertions and the third-order-term check pass; it produces no figure. These tests establish equivalence for the specified single-crystal observables and settings, not for a powder average, the entire strongly quadrupolar satellite manifold, or a complete optimal-control gradient.

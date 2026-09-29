@@ -1,6 +1,10 @@
-% Spinach implementation of the broadband refocusing example from
+% Spinach variant of the broadband refocusing example from
 %
 %          http://dx.doi.org/10.1016/j.jmr.2008.11.020
+%
+% Unlike the paper, this script uses a 30 kHz nominal RF scale
+% with a soft Cartesian penalty, and scores three state transfers
+% rather than the published target propagator.
 %
 % GRAPE is used to design a 200 µs broadband x-phase π pulse:
 %
@@ -49,8 +53,8 @@ control.off_ops={Lz};                           % Offset operator
 control.offsets={linspace(-12.5e3,12.5e3,101)}; % As per the paper, Hz
 control.rho_init={Sx, Sy, Sz};                  % Initial states
 control.rho_targ={Sx,-Sy,-Sz};                  % Target states
-control.pulse_dt=(200e-6/600)*ones(1,600);      % As per the paper
-control.pwr_levels=2*pi*30e3;                   % As per the paper
+control.pulse_dt=(200e-6/600)*ones(1,600);      % 200 us, 600 Spinach slices
+control.pwr_levels=2*pi*30e3;                   % Spinach scale; paper says 15 kHz
 control.penalties={'NS','SNS'};                 % Penalties
 control.p_weights=[0.01 100];                   % Penalty weights
 control.method='lbfgs';                         % Optimiser

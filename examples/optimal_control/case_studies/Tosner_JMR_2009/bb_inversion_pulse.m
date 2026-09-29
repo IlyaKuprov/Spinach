@@ -1,7 +1,9 @@
-% Broadband inversion pulse design for liquid-state NMR. Reprodu-
-% ces, using Spinach, the second example from:
+% Spinach variant of the broadband inversion example from:
 %
 %             http://dx.doi.org/10.1016/j.jmr.2008.11.020
+%
+% SNSA penalises amplitudes above 10 kHz rather than imposing the
+% hard RF cap used in the article; this is not its published pulse.
 %
 % A single proton is considered in the rotating frame with multiple
 % transmitter offsets (or chemical shifts). The goal is to design a
@@ -53,7 +55,7 @@ control.offsets={linspace(-50e3,50e3,101)};      % As per the paper
 control.rho_init={+Sz};                          % Initial state
 control.rho_targ={-Sz};                          % Target state
 control.pulse_dt=1e-6*ones(1,600);               % As per the paper
-control.pwr_levels=2*pi*10e3;                    % As per the paper
+control.pwr_levels=2*pi*10e3;                    % RF scale, not a hard cap
 control.penalties={'NS','SNSA'};                 % Penalties
 control.p_weights=[0.01 10];                     % Penalty weights
 control.method='lbfgs';                          % Optimiser

@@ -1,0 +1,85 @@
+% Designs a toroid excitation pulse under Skinner et al. geometry
+% Syntax:
+%
+%    [result,fig]=toroid_oc_optim()
+%
+% Parameters:
+%
+%    No input parameters; the RF and offset ensemble is set below
+%
+% Outputs:
+%
+%    result - optimised RF waveform and physical response maps
+%
+%    fig    - radius-offset response and hard-pulse comparison
+%
+% Source: Skinner et al., J. Magn. Reson. 209, 282-290 (2011).
+% DOI: 10.1016/j.jmr.2011.01.026, Eqs. (1),(3),(4).
+% This is a new Spinach optimisation under the published probe
+% geometry, not the article's original optimised waveform.
+%
+function [result,fig]=toroid_oc_optim()
+
+% Construct the 200 MHz proton model and on-resonance state target
+sys.magnet=4.7;
+sys.isotopes={'1H'};
+inter.zeeman.scalar={0};
+bas.formalism='sphten-liouv';
+bas.approximation='none';
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+Sz=state(spin_system,'Lz',1);
+Sz=Sz/norm(full(Sz),2);
+Sx=state(spin_system,'Lx',1);
+Sx=Sx/norm(full(Sx),2);
+Lx=operator(spin_system,'Lx',1);
+Ly=operator(spin_system,'Ly',1);
+Lz=operator(spin_system,'Lz',1);
+H=hamiltonian(assume(spin_system,'nmr'));
+
+% Sample physical radius uniformly, not the induced RF frequency
+radii_m=linspace(1e-3,6e-3,11);
+control.isotopes={'1H'};
+control.channels=[1;1];
+control.drifts={{H}};
+control.operators={Lx,Ly};
+control.off_ops={Lz};
+control.offsets={linspace(-1.5e3,1.5e3,9)};
+control.pwr_levels=2*pi*25e3*6e-3./radii_m;
+control.rho_init={Sz};
+control.rho_targ={Sx};
+control.pulse_dt=0.5e-6*ones(1,44);
+control.penalties={'SNSA'};
+control.p_weights=100;
+control.method='lbfgs';
+control.max_iter=160;
+control.plotting={};
+
+% Reproducibly optimize the shaped pulse under the 25 kHz outer-wall cap
+rng(1);
+guess=randn(2,numel(control.pulse_dt))/10;
+spin_system=optimcon(spin_system,control);
+xy_profile=fmaxnewton(spin_system,@grape_xy,guess);
+peak_ratio=max(hypot(xy_profile(1,:),xy_profile(2,:)));
+rf_hz=25e3*xy_profile/max(1,peak_ratio);
+
+% Verify the final waveform on a denser physical radius-offset grid
+[result.response,fig]=toroid_response_map(rf_hz,control.pulse_dt);
+[result.baseline,baseline_fig]=toroid_response_map();
+close(baseline_fig);
+result.rf_hz=rf_hz;
+result.pulse_dt=control.pulse_dt;
+result.radius_m=radii_m;
+result.offset_hz=control.offsets{1};
+result.peak_hz=max(hypot(rf_hz(1,:),rf_hz(2,:)));
+
+% Compare the new Spinach design with the paper's hard-pulse benchmark
+figure(fig);
+nexttile(2); hold on;
+plot(result.baseline.offset_hz/1e3,result.baseline.detected,'--');
+legend({'Spinach OC','hard benchmark'},'Location','southwest');
+ylim([0 1]);
+
+end
+
+

@@ -14,7 +14,7 @@ Both evolution calls pass `0.5/sweep` seconds as the evolution step and request 
 
 Use one of the supported formalisms `sphten-liouv` or `zeeman-liouv`. `H`, `R`, `K`, and `F` must be same-size matrices; `G` must be a cell array with at least one gradient operator; and `parameters.rho0` must be numeric. `parameters.spins` is a nonempty cell array of character strings, with the first entry used for the pulse. The routine checks positive-integer `npts` (the spatial lifting count) and `npoints`, as well as positive real `sweep` and real scalar `ro_grad_amp`.
 
-The source header lists `parameters.offset` in Hz, but the function body neither accesses nor validates that field. It uses the supplied `F` as part of `L`; because the function does not access `parameters.offset`, whether the configured offset is encoded in `F` must be established by the calling context, not inferred from this routine. The return value is the FID produced by `acquire` for the requested `npoints`; this function does not Fourier transform it or return an image tensor.
+The source header lists `parameters.offset` in Hz. The `imaging()` context applies `frqoffset(spin_system,H,parameters)` before passing `H` to this sequence, so the offset is already in the Hamiltonian. The sequence does not read the offset directly; `F` is the separate diffusion/flow generator from `v2fplanck`, combined with `H` in `L`. The return value is the FID produced by `acquire` for the requested `npoints`; this function does not Fourier transform it or return an image tensor.
 
 ## References
 

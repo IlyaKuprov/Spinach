@@ -12,7 +12,7 @@ The code forms L = H + F + iR + iK and builds transverse RF controls Lx and Ly f
 
 The sequence requires spins (a nonempty cell array of spin labels), scalar positive-integer npts, numeric rho0, scalar ss_grad_amp, rf_frq_list, rf_amp_list, rf_dur_list, rf_phi, and positive-integer max_rank. The three RF lists must have the same number of entries. The source documents RF frequency in Hz, RF amplitude in rad/s, and pulse duration in seconds; ss_grad_amp is in T/m. max_rank controls the Fokker-Planck pulse operator; the source comment says 2 is usually enough. The downstream acquire call also needs sweep, npoints, coil, and decouple in the imaging parameter context. sweep is in Hz and acquire samples at 1/sweep-second spacing.
 
-The returned fid is the one-dimensional complex FID from acquire, with npoints samples (a row vector in the acquisition convention), not a spatial image. The source does not report measured data.
+The returned fid is the one-dimensional complex FID from acquire, with `parameters.npoints` samples (a `parameters.npoints×1` column vector), not a spatial image. The source does not report measured data.
 
 ## Source-backed configuration example
 

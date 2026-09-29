@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This example sets up a powder magic-angle-spinning (MAS) trajectory calculation for isotopically labelled glycine, initially with proton L+ magnetisation and detected on 13C. It is useful for seeing how a full spherical-tensor Liouville-space basis, a finite orientation grid, rotor-phase averaging, and correlation-order analysis are combined in one simulation. The source describes the calculation as taking hours and notes that a GPU can make it faster.
+This example sets up a powder magic-angle-spinning (MAS) trajectory calculation for isotopically labelled glycine, initially with proton L+ magnetisation and proton L+ detection; `parameters.spins={'13C'}` separately selects the rotor context’s working channel. It is useful for seeing how a full spherical-tensor Liouville-space basis, a finite orientation grid, rotor-phase averaging, and correlation-order analysis are combined in one simulation. The source describes the calculation as taking hours and notes that a GPU can make it faster.
 
 ## System and state-space setup
 

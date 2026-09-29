@@ -5,11 +5,11 @@
 %
 % Parameters:
 %
-%    offset_hz - resonance offsets in Hz; default is 200 points
-%                across the paper's 20 kHz total bandwidth
+%    offset_hz - resonance offsets in Hz; 200 points across
+%                20 kHz reproduce the paper's grid
 %
-%    rf_scales - relative RF amplitudes; default is five evenly
-%                spaced values from 0.8 to 1.2
+%    rf_scales - relative RF amplitudes; five evenly spaced
+%                values from 0.8 to 1.2 reproduce the source grid
 %
 % Outputs:
 %
@@ -25,10 +25,6 @@
 % durations in seconds; pulse675 and pulse615 are selected.
 %
 function [profiles,fig]=bebop_bibop_profiles(offset_hz,rf_scales)
-
-% Use the article's optimisation ensemble unless specified otherwise
-if nargin<1, offset_hz=linspace(-10e3,10e3,200); end
-if nargin<2, rf_scales=linspace(0.8,1.2,5); end
 
 % Build one spin in the rotating frame
 sys.magnet=14.1;

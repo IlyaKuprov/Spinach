@@ -7,37 +7,28 @@
 % Parameters:
 %
 %    rf_hz      - two-row Cartesian waveform in Hz at the outer
-%                 radius; default is a 25 kHz y-phase hard pulse
+%                 radius; [0;25e3] gives the Fig. 8A hard pulse
 %
-%    pulse_dt   - slice durations in seconds; default is 3.74 us
+%    pulse_dt   - slice durations in seconds; 3.74e-6 for Fig. 8A
 %
-%    offset_hz  - resonance offsets in Hz; default is +/-1.5 kHz
+%    offset_hz  - resonance offsets in Hz; Fig. 8A uses +/-1.5 kHz
 %
-%    radii_m    - sample radii in metres; default is 1-6 mm
+%    radii_m    - sample radii in metres spanning 1-6 mm
 %
 % Outputs:
 %
-%    response   - x magnetization and radial average vs offset
+%    response   - x magnetisation by radius and offset, plus
+%                 the radial integral at each offset
 %
 %    fig        - offset-radius response and detected profile
 %
 % Source: Skinner et al., J. Magn. Reson. 209, 282-290 (2011).
 % DOI: 10.1016/j.jmr.2011.01.026, Eqs. (1),(3), Fig. 8A.
-% This default is the paper's optimised rectangular benchmark,
-% not its numerically optimised shaped pulse in Fig. 8B.
+% With [0;25e3] and 3.74e-6, this simulates the rectangular
+% Fig. 8A benchmark, not the shaped pulse in Fig. 8B.
 %
 function [response,fig]=toroid_response_map(rf_hz,pulse_dt,...
                                                offset_hz,radii_m)
-
-% Use the paper's probe dimensions and hard-pulse benchmark
-if nargin<1
-    rf_hz=[0;25e3]; pulse_label='hard-pulse';
-else
-    pulse_label='shaped-pulse';
-end
-if nargin<2, pulse_dt=3.74e-6; end
-if nargin<3, offset_hz=linspace(-1.5e3,1.5e3,51); end
-if nargin<4, radii_m=linspace(1e-3,6e-3,51); end
 
 % Build the rotating-frame single-spin model
 sys.magnet=14.1;
@@ -84,12 +75,12 @@ tiledlayout(1,2);
 nexttile;
 surf(offset_hz/1e3,rf_scale,mag_x,'EdgeColor','none');
 xlabel('offset (kHz)'); ylabel('relative B_1');
-zlabel('M_x'); title([pulse_label ' toroid response']); colorbar;
+zlabel('M_x'); title('toroid radial response'); colorbar;
 view(35,25);
 nexttile;
 plot(offset_hz/1e3,response.detected,'LineWidth',1.5);
 xlabel('offset (kHz)'); ylabel('detected M_x');
-title([pulse_label ' detected signal']); ylim([-1 1]); grid on;
+title('radius-weighted signal'); ylim([-1 1]); grid on;
 
 end
 

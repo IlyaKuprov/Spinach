@@ -51,7 +51,7 @@ calculation, never from plausibility.
 
 ## Optimal-control case studies
 
-For deposited BEBOP/BIBOP and universal-rotation waveforms with offset–RF maps, use `examples/optimal_control/case_studies/Kobzar_JMR_2004/bebop_bibop_profiles.m` and `examples/optimal_control/case_studies/Kobzar_JMR_2012/ur180_profiles.m`. For a physical inverse-radius RF distribution, use `examples/optimal_control/case_studies/Skinner_JMR_2011/toroid_oc_optim.m` with its analytical benchmark in the same folder. The retained `Tosner_JMR_2009` scripts are illustrative variants, not numerical reproductions.
+For deposited BEBOP/BIBOP and universal-rotation waveforms with offset–RF maps, use `examples/optimal_control/case_studies/Kobzar_JMR_2004/bebop_bibop_profiles.m` and `examples/optimal_control/case_studies/Kobzar_JMR_2012/ur180_profiles.m`. For a physical inverse-radius RF distribution, use `examples/optimal_control/case_studies/Skinner_JMR_2011/toroid_oc_optim.m` with its numerically simulated rectangular-pulse benchmark in the same folder. The retained `Tosner_JMR_2009` scripts are illustrative variants, not numerical reproductions.
 
 ## Liquid-state NMR, one dimension
 

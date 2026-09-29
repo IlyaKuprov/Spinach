@@ -5,11 +5,11 @@
 %
 % Parameters:
 %
-%    offset_hz - resonance offsets in Hz; default is 100 points
-%                over a total 20 kHz span
+%    offset_hz - resonance offsets in Hz; 100 points over
+%                20 kHz reproduce the source grid
 %
-%    rf_scales - relative RF amplitudes; default is five evenly
-%                spaced values from 0.6 to 1.4
+%    rf_scales - relative RF amplitudes; five evenly spaced
+%                values from 0.6 to 1.4 reproduce the source grid
 %
 % Outputs:
 %
@@ -25,10 +25,6 @@
 % 20 kHz bandwidth, five B1 scales, and 10 kHz maximum RF.
 %
 function [profiles,fig]=ur180_profiles(offset_hz,rf_scales)
-
-% Use the source waveform's optimised ensemble by default
-if nargin<1, offset_hz=linspace(-10e3,10e3,100); end
-if nargin<2, rf_scales=linspace(0.6,1.4,5); end
 
 % Build the one-spin rotating-frame Spinach representation
 sys.magnet=14.1;

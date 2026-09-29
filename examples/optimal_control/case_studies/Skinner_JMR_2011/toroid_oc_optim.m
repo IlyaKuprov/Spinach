@@ -63,9 +63,13 @@ xy_profile=fmaxnewton(spin_system,@grape_xy,guess);
 peak_ratio=max(hypot(xy_profile(1,:),xy_profile(2,:)));
 rf_hz=25e3*xy_profile/max(1,peak_ratio);
 
-% Verify the final waveform on a denser physical radius-offset grid
-[result.response,fig]=toroid_response_map(rf_hz,control.pulse_dt);
-[result.baseline,baseline_fig]=toroid_response_map();
+% Verify the shaped pulse and hard benchmark on the same dense grid
+check_offsets=linspace(-1.5e3,1.5e3,51);
+check_radii=linspace(1e-3,6e-3,51);
+[result.response,fig]=toroid_response_map(rf_hz,control.pulse_dt,...
+                                          check_offsets,check_radii);
+[result.baseline,baseline_fig]=toroid_response_map([0;25e3],3.74e-6,...
+                                                    check_offsets,check_radii);
 close(baseline_fig);
 result.rf_hz=rf_hz;
 result.pulse_dt=control.pulse_dt;

@@ -19,7 +19,7 @@ After the first selection, the code applies the documented sensitivity-improveme
 - `parameters.J` is the working scalar coupling in Hz; validation requires a nonzero real scalar. The sequence interval is computed as `abs(1/(2*J))` seconds.
 - `H`, `R`, and `K` are numeric matrices supplied by the context function; the source requires matching dimensions and combines them as `H + 1i*R + 1i*K`.
 
-The function returns a structure with `fid.pos` and `fid.neg`, the source-described echo and antiecho signal components. Each field is the output of the F2 observable evolution for its selected F1 branch. The implementation uses `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 observable-evolution steps; the source does not specify a memory orientation, output class, or additional wrapper shape beyond these fields.
+The function returns a structure with `fid.pos` and `fid.neg`, the source-described echo and antiecho signal components. Each field is the output of the F2 observable evolution for its selected F1 branch. The implementation uses `npoints(1)-1` F1 trajectory steps and `npoints(2)-1` F2 observable-evolution steps. Both `fid.pos` and `fid.neg` have `npoints(2) × npoints(1)` shape: F2 time samples are rows and the F1 state stack forms columns.
 
 Natural-abundance simulations should use Spinach isotope-dilution functionality, as noted in the source.
 

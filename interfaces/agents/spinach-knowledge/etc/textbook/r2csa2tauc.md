@@ -11,7 +11,7 @@ Finds the three algebraic rotational-correlation-time solutions of the cubic rel
 ## Inputs
 
 - `R2` — positive real numeric scalar; the source documents the transverse relaxation rate in Hz.
-- `del_sq` — positive real numeric scalar, documented as the second-rank CSA invariant (see `blinv.m`). The source does not specify its units.
+- `del_sq` — positive real numeric scalar, documented as the second-rank CSA invariant (see `blinv.m`). It is dimensionless squared fractional shielding: `rlx_csa` obtains it as the second output of `blinv(1e-6*Z_ppm)`, not from the raw ppm tensor.
 - `B0` — real numeric scalar magnetic field in tesla. The consistency check does not require it to be positive.
 - `isotope` — character array identifying the isotope, for example `'1H'`.
 

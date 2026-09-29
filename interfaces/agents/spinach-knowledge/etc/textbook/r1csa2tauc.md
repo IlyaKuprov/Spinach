@@ -2,7 +2,7 @@
 
 - MATLAB implementation: [etc/textbook/r1csa2tauc.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1csa2tauc.m)
 
-- Signature: tauc = r1csa2tauc(R1,del_sq,B0,isotope)
+- Signature: `tauc=r1csa2tauc(R1,del_sq,B0,isotope)`
 
 ## Purpose
 
@@ -13,7 +13,7 @@ Returns the two rotational correlation-time candidates compatible with a longitu
 All four arguments are required; there are no defaults.
 
 - R1 — positive real numeric scalar longitudinal relaxation rate, documented in Hz.
-- del_sq — positive real numeric scalar second-rank invariant of the CSA. The source refers to [blinv.m](https://spindynamics.org/wiki/index.php?title=blinv.m) for the invariant; this function's comments do not specify its units.
+- del_sq — positive real numeric scalar second-rank invariant of the CSA. It is the dimensionless squared invariant of fractional shielding: pass the second output of [blinv.m](https://spindynamics.org/wiki/index.php?title=blinv.m) applied to `1e-6*Z_ppm`, not to the unconverted ppm tensor.
 - B0 — real numeric scalar magnetic field, in tesla. The input check does not require it to be positive or nonzero, but the calculation requires a nonzero Zeeman frequency.
 - isotope — character array naming the isotope, for example '1H'.
 

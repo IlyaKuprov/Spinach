@@ -1,6 +1,6 @@
 # experiments/esr_dipolar/deer_3p_soft_diag.m
 
-This function orchestrates pulse and echo-stack diagnostics for three-pulse DEER. It runs the soft-hole worker through `powder`, apodises the four FIDs with the `crisp` window, zero-fills and Fourier-transforms them, then runs the soft-DEER worker through `powder`. It displays four figures: pulse spectra, the unphased echo stack, the first three SVD echo components, and the first three SVD DEER-trace components. The signature has no numerical return value.
+This function orchestrates pulse and echo-stack diagnostics for three-pulse DEER. It runs the soft-hole worker through `powder`, apodises the four FIDs with the `crisp` window, zero-fills and Fourier-transforms them, then runs the soft-DEER worker through `powder`. It displays four figures: pulse spectra, the unphased echo stack, the first three SVD echo components, and the first three SVD DEER-trace components. The signature has no numerical return value. The source warns that simulated echoes can be very sharp because experimental parameter distributions are absent; it recommends Fourier-transforming the echo before integration rather than directly integrating an under-resolved time-domain echo.
 
 ## Inputs and interpretation
 

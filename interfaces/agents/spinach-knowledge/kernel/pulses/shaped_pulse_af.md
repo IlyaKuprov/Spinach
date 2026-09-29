@@ -13,7 +13,7 @@ Propagates a shaped RF pulse in amplitude-frequency coordinates using the Fokker
 
 The source sets the phase-coordinate dimension to `2*max_rank+1`, obtains phase coordinates and a derivative operator with `fourdif`, and adds `rf_phi` to the phase coordinates. It builds the background term from `L0`, the phase-dependent RF term from `cos(phases)*Lx + sin(phases)*Ly`, and the phase-turning generator from the derivative operator. For slice `n`, the generator passed to the propagator is `F0 + rf_amp_list(n)*F1 + 2i*pi*rf_frq_list(n)*M`, applied for `rf_dur_list(n)`.
 
-The frequency, amplitude, and duration lists describe successive piecewise-constant slices and must have equal lengths. This implementation does not apply a separate temporal window or filter. Its supported formalisms are state-vector based: `sphten-liouv`, `zeeman-liouv`, or `zeeman-wavef`.
+The frequency, amplitude, and duration lists describe successive piecewise-constant slices and must have equal lengths. Their time discretisation must also be sufficiently fine to reproduce the intended waveform; check convergence as the slices are refined, independently of `max_rank` convergence. This implementation does not apply a separate temporal window or filter. Its supported formalisms are state-vector based: `sphten-liouv`, `zeeman-liouv`, or `zeeman-wavef`.
 
 ## Inputs and outputs
 

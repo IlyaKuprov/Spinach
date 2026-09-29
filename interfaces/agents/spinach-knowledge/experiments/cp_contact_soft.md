@@ -19,7 +19,7 @@ The implementation also reads `parameters.spc_dim` when embedding control operat
 
 ## Output
 
-Returns `contact_curve`, the observable-mode result from evolution under the contact generator, detected on `parameters.coil` at the requested step interval. The header names the result as a contact curve but does not specify its array orientation or dimension convention; those are inherited from the evolution routine.
+Returns `contact_curve`, the observable-mode result detected on `parameters.coil`: `nsteps+1` time rows, beginning with the post-excitation state before contact and continuing with one row after each contact step. The step spacing is `parameters.timestep`; multiple detection states, if supplied, occupy separate columns.
 
 ## Source limits
 

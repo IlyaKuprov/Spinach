@@ -18,7 +18,7 @@ Before that call, the code replaces `parameters.pulse_frq` with `parameters.puls
 - `sweep`: acquisition sweep width, Hz; `npoints`: positive integer number of FID samples.
 - `rho0`: initial state; `coil`: detection state; `spins`: a one-element cell array of spin-label strings, whose first member defines the pulse operators.
 - `method`: one of `expv`, `expm`, or `evolution` for soft-pulse propagation.
-- `H`, `R`, and `K`: matching-size numeric Liouville-space matrices supplied by the context function. The source accepts the `sphten-liouv` and `zeeman-liouv` formalisms.
+- `H`, `R`, and `K`: generators supplied by the context. Direct `sphten-liouv` and `zeeman-liouv` inputs are supported; a `zeeman-hilb` density-matrix context is also accepted because `sim2liouv` converts its generators, `rho0`, and `coil` to `zeeman-liouv` before the formalism guard.
 
 ## Output axis
 

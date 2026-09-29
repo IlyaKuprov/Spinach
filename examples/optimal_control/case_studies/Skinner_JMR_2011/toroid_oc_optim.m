@@ -55,7 +55,7 @@ control.method='lbfgs';
 control.max_iter=160;
 control.plotting={};
 
-% Reproducibly optimize the shaped pulse under the 25 kHz outer-wall cap
+% Reproducibly optimise the shaped pulse under the 25 kHz outer-wall cap
 rng(1);
 guess=randn(2,numel(control.pulse_dt))/10;
 spin_system=optimcon(spin_system,control);

@@ -6,7 +6,7 @@
 % Parameters:
 %
 %    offset_hz - resonance offsets in Hz; 200 points across
-%                20 kHz reproduce the paper's grid
+%                20 kHz form the verification grid
 %
 %    rf_scales - relative RF amplitudes; five evenly spaced
 %                values from 0.8 to 1.2 reproduce the source grid

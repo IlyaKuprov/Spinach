@@ -1,6 +1,6 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m
 
-> This historical Spinach variant optimizes a ten-level RF-power ensemble and uses L-BFGS; the paper’s first example is a single-system two-channel design. Its on-resonance 1H–13C state transfer and 1/J duration remain useful, but it does not reproduce the paper’s pulse.
+> This historical Spinach variant optimises a ten-level RF-power ensemble and uses L-BFGS; the paper’s first example is a single-system two-channel design. Its on-resonance 1H–13C state transfer and 1/J duration remain useful, but it does not reproduce the paper’s pulse.
 
 - Signature: `coherence_transfer()`
 

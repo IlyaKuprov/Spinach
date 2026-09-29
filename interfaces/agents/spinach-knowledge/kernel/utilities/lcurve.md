@@ -11,7 +11,7 @@ L-curve analysis function that locates the optimal regularisation parameter at t
 - Syntax: `lam_opt=lcurve(lam,err,reg,mode)`.
 - Input consistency is enforced by an internal `grumble` subfunction: `lam`, `err` and `reg` must be row vectors of positive, real, finite numbers of equal length, with at least six elements; `lam` must be in ascending order; `mode` must be `'log'` or `'linear'`.
 - If `err` does not increase or `reg` does not decrease with `lam`, a warning is issued ("err should increase and reg should decrease with lam, inspect the sweep.") but execution continues.
-- All three vectors are converted to base-10 logarithms and resampled onto 1000 points over the sampled interval using quintic splines (`spapi` with `optknt(...,5)` knots), then converted back to linear coordinates.
+- All three vectors are converted to base-10 logarithms and resampled onto 1000 points over the sampled interval using quartic (order-five) splines (`spapi` with `optknt(...,5)` knots), then converted back to linear coordinates.
 - A two-panel figure is produced: the L-curve (`err` versus `reg`) on the left and the curvature versus `lam` on the right, both with log-scaled axes; the located optimum is marked with a red circle on both panels.
 - Derivatives are computed with `fdvec` using 5-point stencils, either in logarithmic coordinates (`'log'` mode) or linear coordinates (`'linear'` mode); any other mode string raises an error.
 - The signed curvature is computed as `kappa=(xp.*ypp-yp.*xpp)./((xp.^2+yp.^2).^(3/2))`.

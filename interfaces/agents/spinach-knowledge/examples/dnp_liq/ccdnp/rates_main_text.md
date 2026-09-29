@@ -12,10 +12,10 @@ Call the no-argument MATLAB function `rates_main_text()` with Spinach on the MAT
 
 ## Model settings
 
-- Isotopes: `{'1H','E','E'}`. The file sets `sys.magnet=14.1`; it does not state a unit for that literal. Proton Zeeman values are `[0 10 20]` with Euler triple `[0 0 0]`.
-- Electron Zeeman principal values are `[2.003400 2.003800 2.003800]` and `[2.005700 2.003000 2.003000]`, with Euler triples `[-0.872 -0.013 0.868]` and `[-1.145 0.061 1.143]`. Scalar electron-electron coupling is assigned `3e6`.
-- Coordinates are `[0 0 0]`, `[5.090 0.010 0.958]`, and `[-5.090 0.061 1.032]`. The source does not label units for the Zeeman/coupling/coordinate literals.
-- Relaxation settings: `inter.relaxation={'redfield'}`, `inter.equilibrium='zero'`, `inter.rlx_keep='labframe'`, `inter.temperature=298`, `inter.tau_c={100e-12}`, and `sys.tols.rlx_integration=1e-10`. The file does not explicitly state units for these values.
+- Isotopes: `{'1H','E','E'}`. The file sets `sys.magnet=14.1` T. Proton Zeeman chemical shifts are `[0 10 20]` ppm with Euler triple `[0 0 0]`.
+- Electron Zeeman principal values are `[2.003400 2.003800 2.003800]` and `[2.005700 2.003000 2.003000]`, with Euler triples `[-0.872 -0.013 0.868]` and `[-1.145 0.061 1.143]`. Scalar electron–electron coupling is `3e6` Hz.
+- Coordinates are `[0 0 0]`, `[5.090 0.010 0.958]`, and `[-5.090 0.061 1.032]`. Coordinates are in ångström (Å).
+- Relaxation settings: `inter.relaxation={'redfield'}`, `inter.equilibrium='zero'`, `inter.rlx_keep='labframe'`, `inter.temperature=298`, `inter.tau_c={100e-12}`, and `sys.tols.rlx_integration=1e-10`. Temperature is in kelvin and `tau_c` in seconds; `rlx_integration` is a numerical tolerance.
 
 ## Console output
 

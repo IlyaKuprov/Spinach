@@ -23,7 +23,7 @@ For `Hc+B*Hz`, find fields `B` in the requested window where an energy-level gap
 - `parameters.tm_tol`: relative transition-moment threshold.
 - `parameters.pp_tol`: peak-position tolerance in Tesla, intended to be much smaller than a typical line width.
 - `parameters.fwhm`: positive transition full width at half maximum in Tesla.
-- `parameters.rspt_order`: for `zeeman-hilb`, a non-negative integer perturbation order or `Inf` for exact diagonalisation; it controls treatment of the off-diagonal Hamiltonian part.
+- `parameters.rspt_order`: for `zeeman-hilb`, perturbation order `1`, `2`, `3`, or `4`, or `Inf` for exact diagonalisation; zero and other finite orders are rejected by `rspt_eig`. The selected order controls treatment of the off-diagonal Hamiltonian part.
 
 The source checks that `Hc` and `Hz` are same-sized square Hermitian numeric matrices. It requires the microwave frequency, window, transition-moment tolerance, and FWHM fields; these parameter values are checked for the types and scalar/size constraints implemented in the source. It also checks peak-position tolerance as a real scalar and validates `rspt_order` for the Hilbert-space pathway. It does not impose a window endpoint ordering.
 

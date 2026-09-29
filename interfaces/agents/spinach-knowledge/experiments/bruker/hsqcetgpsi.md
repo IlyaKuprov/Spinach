@@ -19,7 +19,7 @@ The source cites the standard HSQC and pulse-program background: [DOI 10.1016/00
 
 ## Sequence and output
 
-The initial operator is longitudinal magnetisation on F2 and the receive state is its raising operator. After the transfer and trim rotations, the routine evolves an F1 trajectory, applies the requested midpoint refocusing pulses, and selects the +1 and -1 F1 coherence pathways into separate states. Subsequent refocusing and sensitivity-improvement delays lead to direct-dimension acquisition with F2 decoupling. The result is a structure with `fid.pos` and `fid.neg`, the echo and antiecho signals from observable-mode evolution. The source recommends using Spinach isotope-dilution functionality for natural-abundance simulations (see `dilute.m`). It defines the two dimensions and point counts but leaves the returned arrays' orientation to the evolution routine.
+The initial operator is longitudinal magnetisation on F2 and the receive state is its raising operator. After the transfer and trim rotations, the routine evolves an F1 trajectory, applies the requested midpoint refocusing pulses, and selects the +1 and -1 F1 coherence pathways into separate states. Subsequent refocusing and sensitivity-improvement delays lead to direct-dimension acquisition with F2 decoupling. The result is a structure with `fid.pos` and `fid.neg`, the echo and antiecho signals from observable-mode evolution. The source recommends using Spinach isotope-dilution functionality for natural-abundance simulations (see `dilute.m`). Both returned arrays have `npoints(2) × npoints(1)` shape: F2 direct-time samples are rows and the F1 trajectory-state stack forms columns.
 
 ## Source limits
 

@@ -8,7 +8,7 @@ Source: [kernel/utilities/nearest_spin.m](https://github.com/IlyaKuprov/Spinach/
 
 ## Behaviour
 
-- Syntax: `k=nearest_spin(spin_system,n)`.
+- Syntax: `[k,d]=nearest_spin(spin_system,n)`.
 - The function first validates its inputs through an internal consistency check (`grumble`):
   - `n` must be a positive real integer scalar; otherwise it errors with `'n must be a positive real integer'`.
   - `n` must not exceed the number of isotopes in `spin_system.comp.isotopes`; otherwise it errors with `'the specified spin does not exist'`.

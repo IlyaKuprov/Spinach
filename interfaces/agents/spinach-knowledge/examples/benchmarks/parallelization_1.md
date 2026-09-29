@@ -2,7 +2,7 @@
 
 ## Use
 
-parallelisation_1() takes no arguments and returns no values. It is a timing example for evaluating observables during Hilbert-space time propagation on different local parallel-pool sizes. It requires the Spinach setup used by the example and MATLAB parallel-pool support for the requested sizes.
+`parallelization_1()` takes no arguments and returns no values. It is a timing example for evaluating observables during Hilbert-space time propagation on different local parallel-pool sizes. It requires the Spinach setup used by the example and MATLAB parallel-pool support for the requested sizes.
 
 ## Spin system and propagation
 

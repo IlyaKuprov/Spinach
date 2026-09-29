@@ -8,7 +8,7 @@ Returns a rotor stack of Liouvillians or Hamiltonians for the traditional style 
 
 ## Behaviour
 
-- Syntax: `L=rotor_stack(spin_system,parameters,assumptions)`.
+- Syntax: `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)`.
 - Calls `grumble` to enforce consistency of the inputs, then applies the requested assumptions throughout the rotor and frame pipeline via `assume`.
 - Obtains the Hamiltonian (and its spherical-tensor interaction blocks `Q`) with `hamiltonian`, then applies transmitter offsets with `frqoffset`.
 - Derives the rotor axis orientation from `parameters.axis` via `cart2sph`, converting the polar angle with `rotor_theta=pi/2-rotor_theta`.

@@ -239,6 +239,15 @@ beyond the time step, a coarser one loses phase resolution; at slower rates
 consecutive steps reuse a stack element); the carrier step must be finer than
 the narrowest line (0.5 MHz for the 2 MHz wide central line).
 
+For Liouville MAS EPR, use `echo_sweep` with `singlerot` in `sphten-liouv`
+or `zeeman-liouv`. The context supplies the rotor-augmented generator and
+relaxation operators; pulses and the interpulse delay propagate directly,
+without a Hamiltonian rotor stack or `nphases`. `timestep` samples only the
+finite echo detection window. Retain `max_rank` for Fokker-Planck rotor
+resolution. With `state()` inputs, spin-tensor amplitudes have their own
+normalisation: compare spectral shapes or use `zeeman-liouv` for amplitudes
+matched to `zeeman-hilb`.
+
 ## DEER
 
 `esr_sol_pulsed/hard_3_pulse_deer_no.m` is the minimal two-label calculation.

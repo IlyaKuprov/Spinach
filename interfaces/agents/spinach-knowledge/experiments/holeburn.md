@@ -8,7 +8,7 @@ Models a spectral hole-burning sequence: a frequency-selective soft pulse acts o
 
 ## Inputs and parameters
 
-H, R and K are the Hamiltonian, relaxation and kinetics matrices supplied by the experiment context. The code converts the context to Liouville space and requires a Liouville formalism supported by the source, namely sphten-liouv or zeeman-liouv. Its combined generator is H+1i*R+1i*K.
+H, R and K are the Hamiltonian, relaxation and kinetics matrices supplied by the experiment context. The Liouville core accepts `sphten-liouv` and `zeeman-liouv` directly. A `zeeman-hilb` density-matrix context is also supported: `sim2liouv` converts the generators, basis and state-like `rho0`/`coil` fields to `zeeman-liouv` before the grumbler runs. Its combined generator is H+1i*R+1i*K.
 
 - parameters.spins: the function uses the first spin label to build the pulse operator; the source code uses this field even though its header does not document it.
 - parameters.pulse_frq: soft-pulse frequency in Hz.

@@ -14,7 +14,9 @@ Regression test suite for the `orientation()` and `average()` helper functions, 
 - Contracts the zero-orientation Hamiltonian as `H = orientation(Q,[0 0 0])` and compares it to the reference sum `H_ref = Q{1}{1,1} + Q{1}{2,2} + Q{1}{3,3}` using `test_close` with tolerances `1e-14` (absolute and relative), under the name `zero Euler orientation`. The rationale recorded is that `wigner(r,0,0,0)` is the identity, so only diagonal rotational components remain.
 - Builds a quiet spin system for `average()` diagnostics: `sys.magnet = 0`, `sys.isotopes = {'1H'}`, `inter.zeeman.scalar = {0}`, `bas.formalism = 'sphten-liouv'`, `bas.approximation = 'none'`, passed through `test_spin_system`.
 - Defines an unmodulated Hamiltonian decomposition with `Hp` and `Hm` as zero 2-by-2 sparse matrices, `H0 = [0 1; -1 0]` sparse, and modulation frequency `omega = 2*pi*1000`.
-- Runs `H_avg = average(spin_system,Hp,H0,Hm,omega,'ah_first_order')` and compares it to `H0` using `test_close` with tolerances `1e-14` (absolute and relative), under the name `unmodulated average`. The rationale recorded is that with zero positive and negative Fourier components, first-order averaging returns `H0`.\n## Inputs and outputs
+- Runs `H_avg = average(spin_system,Hp,H0,Hm,omega,'ah_first_order')` and compares it to `H0` using `test_close` with tolerances `1e-14` (absolute and relative), under the name `unmodulated average`. The rationale recorded is that with zero positive and negative Fourier components, first-order averaging returns `H0`.
+
+## Inputs and outputs
 
 Syntax:
 

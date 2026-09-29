@@ -6,7 +6,7 @@ A basic hydrodynamics infrastructure provider that returns first derivative oper
 
 ## Behavior
 
-- Syntax: `[Fx,Fy,Fz]=hydrodynamics(parameters)`.
+- Syntax: `[Fx,Fy,Fz]=hydrodynamics(spin_system,parameters)`.
 - Input consistency is enforced by an internal `grumble` subfunction, which validates `parameters.dims`, `parameters.npts`, and `parameters.deriv` and errors out with specific messages on invalid input.
 - Derivative operators are built according to `parameters.deriv{1}`:
   - `'period'`: n-point central finite-difference matrices with periodic boundary conditions, obtained from `fdmat(...)` and divided by the grid spacing `parameters.dims(k)/parameters.npts(k)` for each dimension.

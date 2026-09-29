@@ -1,5 +1,7 @@
 # examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_levels.m
 
+- MATLAB implementation: [examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_levels.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_levels.m)
+
 Signature: `mn3_trimer_levels()`
 
 This example plots the Zeeman levels of the (CH6N3)2MnCl4 molecular crystal, modelled as three E6 manganese ions with S=5/2. The 216-state model has isotropic exchange between neighbours, axial and rhombic zero-field splitting on each ion, and g=2 on all three spins. It is the calculation behind Fig. 5 of https://arxiv.org/abs/2609.16352.

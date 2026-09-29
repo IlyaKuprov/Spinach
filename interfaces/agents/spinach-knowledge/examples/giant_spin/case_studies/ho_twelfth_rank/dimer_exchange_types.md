@@ -1,5 +1,7 @@
 # examples/giant_spin/case_studies/ho_twelfth_rank/dimer_exchange_types.m
 
+- MATLAB implementation: [examples/giant_spin/case_studies/ho_twelfth_rank/dimer_exchange_types.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/case_studies/ho_twelfth_rank/dimer_exchange_types.m)
+
 - Signature: `dimer_exchange_types()`
 - Source: `examples/giant_spin/case_studies/ho_twelfth_rank/dimer_exchange_types.m`
 

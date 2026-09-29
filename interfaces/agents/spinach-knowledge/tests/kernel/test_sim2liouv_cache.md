@@ -1,6 +1,6 @@
 # tests/kernel/test_sim2liouv_cache.m
 
-**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_sim2liouv_cache.m](https://github.com/IlyaKuplov/Spinach/blob/main/tests/kernel/test_sim2liouv_cache.m)
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_sim2liouv_cache.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_sim2liouv_cache.m)
 
 ## Purpose
 
@@ -29,5 +29,5 @@ result = test_sim2liouv_cache()
 
 ## References
 
-- [sim2liouv](https://github.com/IlyaKuprov/Spinach/blob/master/sim2liouv.m) — Hilbert-to-Liouville conversion under test.
+- [sim2liouv](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sim2liouv.m) — Hilbert-to-Liouville conversion under test.
 - [Spinach GitHub repository](https://github.com/IlyaKuprov/Spinach)

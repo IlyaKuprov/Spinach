@@ -1,5 +1,7 @@
 # examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_basis.m
 
+- MATLAB implementation: [examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_basis.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_basis.m)
+
 Signature: `[P,msz]=mn3_trimer_basis(spin_system,nstates)`
 
 This helper constructs the reduced spaces used for the (CH6N3)2MnCl4 trimer study. The model has three E6 manganese centres (S=5/2), so the full Zeeman-Hilbert space has 216 states. The returned spaces are built from the isotropic nearest-neighbour exchange Hamiltonian and total S_z, rather than from the full exchange-plus-zero-field-splitting Hamiltonian.

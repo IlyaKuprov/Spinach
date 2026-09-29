@@ -1,5 +1,7 @@
 # examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_magn.m
 
+- MATLAB implementation: [examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_magn.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/case_studies/ho_twelfth_rank/mn3_trimer_magn.m)
+
 Signature: `mn3_trimer_magn()`
 
 This example calculates pulsed-field magnetisation for the (CH6N3)2MnCl4 linear trimer: three S=5/2 E6 spins, g=2, nearest-neighbour isotropic exchange J=-2.42 cm^-1 in the paper's H=-2*J*S1.S2 convention, and axial/rhombic zero-field splitting D=0.167 cm^-1 and E=0.040 cm^-1 on every ion. The calculation uses the same tensor orientation and effective bases as the companion level diagram and targets the Fig. 6 comparison in https://arxiv.org/abs/2609.16352.

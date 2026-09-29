@@ -1,5 +1,7 @@
 # examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m
 
+- MATLAB implementation: [examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m)
+
 - Signature: `powder_gly_14n()`
 
 ## Purpose

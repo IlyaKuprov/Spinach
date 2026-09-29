@@ -23,4 +23,4 @@ Regression test for the admission of acquisition-stage irradiation specified in 
 
 ## References
 
-- [Source file on GitHub](https://github.com/IlyaKuplov/Spinach/blob/main/tests/kernel/test_homodec_adapt.m)
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_homodec_adapt.m)

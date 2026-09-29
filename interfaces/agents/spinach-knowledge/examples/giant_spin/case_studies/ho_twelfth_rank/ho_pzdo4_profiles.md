@@ -1,5 +1,7 @@
 # examples/giant_spin/case_studies/ho_twelfth_rank/ho_pzdo4_profiles.m
 
+- MATLAB implementation: [examples/giant_spin/case_studies/ho_twelfth_rank/ho_pzdo4_profiles.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/giant_spin/case_studies/ho_twelfth_rank/ho_pzdo4_profiles.m)
+
 - Signature: `ho_pzdo4_profiles()`
 
 ## Purpose

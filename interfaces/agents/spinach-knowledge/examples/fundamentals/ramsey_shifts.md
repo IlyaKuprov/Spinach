@@ -1,5 +1,7 @@
 # examples/fundamentals/ramsey_shifts.m
 
+- MATLAB implementation: [examples/fundamentals/ramsey_shifts.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/ramsey_shifts.m)
+
 - Signature: `ramsey_shifts()`
 - Source: `examples/fundamentals/ramsey_shifts.m`
 

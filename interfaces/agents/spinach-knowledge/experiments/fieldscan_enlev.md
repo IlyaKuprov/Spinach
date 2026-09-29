@@ -14,7 +14,7 @@ Required inputs:
 - parameters.npoints: number of field-grid points (positive integer).
 - parameters.orientation: fixed orientation as three Euler angles [alp bet gam] in radians.
 - parameters.nstates: number of lowest energy levels to calculate (positive integer).
-- spin_system: must use zeeman-hilb formalism.
+- spin_system: must use zeeman-hilb formalism and be built with `sys.magnet=1` T; the grumbler rejects any other stored reference field before the scan.
 
 Output: a figure with magnetic field in tesla on the horizontal axis and energy in cm^-1 on the vertical axis. There is no returned signal vector. The source gives no fixed numerical field range, point count, orientation, or state-count example; those are user-selected inputs.
 

@@ -13,6 +13,6 @@ At 16.4 T and 298 K, the source selects Redfield T1/T2 relaxation, Dibari equili
 
 ## Preparation, evolution, and output
 
-Starting from the configured isotropic equilibrium, the script replaces the water-spin Lz component with a fully polarised water state. It detects the aliphatic methyl protons 6-8 and H-alpha proton 5, then calls multichannel `evolution` with dt=0.125 s and 128 steps (16 s total). The plot shows the real CH3 and H-alpha magnetisation traces in arbitrary units.
+Starting from isotropic equilibrium, the script replaces the `Lz` component only for the ten exchange-coupled water protons (spins 11–20) with a fully polarised `Wz` component. The other ten water protons (21–30) retain equilibrium populations and have no exchange-flux entries. It detects the aliphatic methyl protons 6-8 and H-alpha proton 5, then calls multichannel `evolution` with dt=0.125 s and 128 steps (16 s total). The plot shows the real CH3 and H-alpha magnetisation traces in arbitrary units.
 
 The modeled relay is constrained by the coordinate-free water pool and specified exchange matrix; this page does not infer an experimental outcome beyond the source's stated Figure S7 context.

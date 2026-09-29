@@ -16,7 +16,7 @@ The basis is `sphten-liouv` with `approximation='none'`; the propagator chop tol
 
 ## Experiment and scan
 
-`gaussleg(10e6,20e6,5)` supplies five quadrature nodes and weights for the B1 ensemble (the source labels the range in Hz). The electron nutation frequency is set to each node. For every field node, the function scans `nloops=1:64`; each loop contributes two 48 ns pulses, giving contact times `2*nloops*48e-9` s (96 ns to 6.144 μs). The second pulse phase is π. The powder grid is `rep_2ang_800pts_sph`; the source also sets `addshift=-13e6`, `el_offs=61e6`, and shot spacing to 153 μs minus the total pulse duration.
+`gaussleg(10e6,20e6,5)` supplies six quadrature nodes and weights for the B1 ensemble (the source labels the range in Hz). The electron nutation frequency is set to each node. For every field node, the function scans `nloops=1:64`; each loop contributes two 48 ns pulses, giving contact times `2*nloops*48e-9` s (96 ns to 6.144 μs). The second pulse phase is π. The powder grid is `rep_2ang_800pts_sph`; the source also sets `addshift=-13e6`, `el_offs=61e6`, and shot spacing to 153 μs minus the total pulse duration.
 
 ## Calculation and output
 

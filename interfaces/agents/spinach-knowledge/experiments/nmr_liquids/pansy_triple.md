@@ -12,7 +12,7 @@ Triple-channel PANSY, in magnitude-mode analytical-pathway form. The source star
 - `parameters.sweep`: three positive sweep widths in Hz; `parameters.npoints`: three positive integer point counts, ordered F1 then detection channels.
 - `H`, `R`, and `K`: numeric, same-sized matrices supplied by the context function. The source requires the `sphten-liouv` formalism.
 
-Each FID field is a two-dimensional array with an F1 axis of `npoints(1)`: `fid.aa` detects `L+` on spin 1 with `npoints(1)` samples (F1/F1); `fid.ab` detects on spin 2 with `npoints(2)` samples (F1/F2); and `fid.ac` detects on spin 3 with `npoints(3)` samples (F1/F3). Their shapes are respectively `npoints(1) × npoints(1)`, `npoints(1) × npoints(2)`, and `npoints(1) × npoints(3)`.
+Each FID field is a two-dimensional array with `npoints(1)` F1-state columns: `fid.aa` detects `L+` on spin 1 with `npoints(1)` samples (F1/F1); `fid.ab` detects on spin 2 with `npoints(2)` samples (F1/F2); and `fid.ac` detects on spin 3 with `npoints(3)` samples (F1/F3). Their shapes are respectively `npoints(1) × npoints(1)`, `npoints(2) × npoints(1)`, and `npoints(3) × npoints(1)` (direct-dimension samples in rows).
 
 ## References
 

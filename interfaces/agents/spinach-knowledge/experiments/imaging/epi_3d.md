@@ -14,7 +14,7 @@ The source projects the post-echo state into a voxel-resolved `1H` signal for di
 - `parameters.rho0`: column state vector with the same dimension as `H`.
 - `parameters.coil`: detection state vector with the same dimension as `H`.
 - `parameters.npts`: three positive integer voxel counts; `parameters.dims`: three finite positive spatial extents used for voxel display. This function does not state their unit.
-- `parameters.image_size`: two finite integer counts, each at least 2, ordered as phase-encode rows and readout samples.
+- `parameters.image_size`: two odd finite integer counts, each at least 3, ordered as phase-encode rows and readout samples. The required `imaging()` context rejects even sizes before EPI runs.
 - `parameters.ss_grad_amp`, `parameters.pe_grad_amp`, `parameters.ro_grad_amp`: real scalar gradient amplitudes in T/m for `G{1}`, `G{2}`, and `G{3}`, respectively.
 - `parameters.pe_grad_dur`, `parameters.ro_grad_dur`: gradient durations in seconds; `parameters.t_echo`: positive finite echo interval in seconds.
 - Optional `parameters.diff_g_amp`: three finite real amplitudes in T/m, applied along `G{1}`, `G{2}`, and `G{3}` during the echo interval.
@@ -23,7 +23,7 @@ The source projects the post-echo state into a voxel-resolved `1H` signal for di
 
 ## Returned data and source-derived numerical facts
 
-`fid` is complex with dimensions `image_size(1)-by-image_size(2)`. The source samples readout with increments of `ro_grad_dur/(image_size(2)-1)` seconds and advances phase encoding with increments of `pe_grad_dur/(image_size(1)-1)` seconds. For example, the smallest accepted `image_size` is `2-by-2`, which allocates four k-space samples and uses one interval in each encoded direction; this is a shape example, not a simulated or measured result. The general increments above remain the source-defined timing formulas. The state is optionally moved to GPU when enabled and gathered before return.
+`fid` is complex with dimensions `image_size(1)-by-image_size(2)`. The source samples readout with increments of `ro_grad_dur/(image_size(2)-1)` seconds and advances phase encoding with increments of `pe_grad_dur/(image_size(1)-1)` seconds. For example, the smallest accepted `image_size` is `3-by-3`, which allocates nine k-space samples and uses two intervals in each encoded direction; this is a shape example, not a simulated or measured result. The general increments above remain the source-defined timing formulas. The state is optionally moved to GPU when enabled and gathered before return.
 
 ## References
 

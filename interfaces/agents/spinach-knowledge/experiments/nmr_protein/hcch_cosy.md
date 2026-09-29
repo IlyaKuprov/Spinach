@@ -14,7 +14,7 @@ HCCH-COSY, Figure 7.26a of the second edition of *Protein NMR Spectroscopy*. The
 - `parameters.spins={'1H','13C','1H'}` is mandatory; the grumbler rejects a missing or different channel selector.
 - `parameters.npoints` is a three-integer vector `[n1 n2 n3]` for `[t1 t2 t3]`; `parameters.sweep` is a three-positive-real vector `[f1 f2 f3]`.
 - `parameters.J_cc` and `parameters.J_ch` are the 13C-13C and 1H-13C couplings in Hz. Header examples are 35 Hz and 140 Hz, respectively.
-- `parameters.delta` is the pulse-sequence evolution delay in seconds (header example `1.1e-3`).
+- `parameters.delta` is a positive pulse-sequence evolution delay in seconds (header example `1.1e-3`). It must be strictly less than `1/(8*parameters.J_cc)`; equality or a longer delay is rejected before `DELTA=tau_cc-parameters.delta` can become non-positive.
 - `parameters.decouple_f3` lists nuclei to decouple during detection; the header example is `{'13C'}`.
 - `H`, `R`, and `K` are same-size matrices supplied by the context function (Hamiltonian, relaxation, and kinetics matrices).
 

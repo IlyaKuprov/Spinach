@@ -12,7 +12,7 @@ Magnitude-mode PANSY-COSY. The source begins with `Lz` magnetisation on the firs
 - `parameters.sweep`: two positive sweep widths in Hz; `parameters.npoints`: two positive integer point counts, ordered F1 then the two detected dimensions.
 - `H`, `R`, and `K`: numeric, same-sized matrices supplied by the context function. The source requires the `sphten-liouv` formalism.
 
-The F1 trajectory contains `npoints(1)` states. The output fields are two-dimensional FIDs: `fid.aa` detects with `L+` on spin 1 and has shape `npoints(1) × npoints(1)`; `fid.ab` detects with `L+` on spin 2 and has shape `npoints(1) × npoints(2)`. These are the source's F1/F1 and F1/F2 magnitude-mode COSY channels.
+The F1 trajectory contains `npoints(1)` states. The output fields are two-dimensional FIDs: `fid.aa` detects with `L+` on spin 1 and has shape `npoints(1) × npoints(1)`; `fid.ab` detects with `L+` on spin 2 and has shape `npoints(2) × npoints(1)` (direct F2 samples in rows, F1 states in columns). These are the source's F1/F1 and F1/F2 magnitude-mode COSY channels.
 
 ## References
 

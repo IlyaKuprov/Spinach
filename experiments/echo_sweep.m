@@ -124,7 +124,14 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
         rho=step(spin_system,Lp,parameters.rho0,parameters.pulse_dur);
         rho=coherence(spin_system,rho,{{parameters.spins{1},-1}});
         if parameters.tau>0
-            nsteps=max(1,ceil(norm(L0,1)*parameters.tau/2e4));
+
+            % Match the CPU or GPU norm used by step for long delays
+            if ismember('gpu',spin_system.sys.enable)
+                generator_norm=norm(L0,inf);
+            else
+                generator_norm=norm(L0,1);
+            end
+            nsteps=max(1,ceil(generator_norm*parameters.tau/2e4));
             for n=1:nsteps
                 rho=step(spin_system,L0,rho,parameters.tau/nsteps);
             end

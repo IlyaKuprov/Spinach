@@ -12,10 +12,10 @@ Run the no-argument MATLAB function `rates_si_sys_a()` with Spinach on the MATLA
 
 ## System A parameterisation
 
-- Isotopes: `{'1H','E','E'}`; magnet assignment `sys.magnet=14.1` (the source does not label its unit). Proton Zeeman values are `[0 10 20]` with Euler angles `[0 0 0]`.
-- Electron 1 values are `[1.977873 1.977798 1.977792]` with zero Euler angles; electron 2 values are `[1.977919 1.978000 1.978000]` and Euler triple `[-0.590 -0.100 0.490]`. The scalar exchange assignment is `6.2e6`.
-- The file explicitly labels its coordinate set “Coordinates for anisotropic HF”: proton `[0 0 0]`, electron 1 `[7.0300 0.0187 0.9820]`, electron 2 `[-7.0300 0.2051 -1.0001]`. No coordinate units are given in the source.
-- The relaxation configuration is Redfield with equilibrium mode `zero` and `rlx_keep='labframe'`. It sets temperature `298`, correlation-time literal `100e-12`, and integration tolerance `1e-10`; the file does not explicitly supply units for these values.
+- Isotopes: `{'1H','E','E'}`; magnet assignment `sys.magnet=14.1` T. Proton Zeeman shifts `[0 10 20]` are in ppm, with Euler angles `[0 0 0]` in radians.
+- The dimensionless electron g-tensor values are `[1.977873 1.977798 1.977792]` with zero Euler angles for electron 1, and `[1.977919 1.978000 1.978000]` with Euler triple `[-0.590 -0.100 0.490]` radians for electron 2. The scalar exchange assignment is `6.2e6` Hz.
+- The file explicitly labels its coordinate set “Coordinates for anisotropic HF”: proton `[0 0 0]`, electron 1 `[7.0300 0.0187 0.9820]`, electron 2 `[-7.0300 0.2051 -1.0001]`. Spinach interprets these coordinates in ångström.
+- The relaxation configuration is Redfield with equilibrium mode `zero` and `rlx_keep='labframe'`. It sets temperature `298` K, correlation time `100e-12` s, and dimensionless integration tolerance `1e-10`.
 
 ## What it prints
 
@@ -23,4 +23,4 @@ The script computes `R=relaxation(spin_system)` and prints projections for norma
 
 ## Reference and caveat
 
-The source cites https://doi.org/10.1016/j.jmr.2021.106940. Magnet, Zeeman, coupling, coordinate, temperature, correlation-time, and tolerance units are not explicitly annotated in this file; the literals above are transcribed without assigning inferred units.
+The source cites https://doi.org/10.1016/j.jmr.2021.106940. The physical units above follow the Spinach parameter contracts, including where this driver omits explicit unit annotations.

@@ -11,7 +11,7 @@ Extends the solid-effect DNP time-evolution example to a larger, tilted electron
 
 The field setting is `sys.magnet=3.4` (the source labels it a magnetic field without stating a unit). The electron is at the origin; all six proton coordinates are [0,0,4+n^2] multiplied by `euler2dcm(pi/6,pi/7,pi/8)` for `n=2:7`. Relaxation uses the Weizmann model, secular retention, IME equilibrium, and temperature 4.2. The source assigns `weiz_r1e=1e2`, `weiz_r1n=0.1`, `weiz_r2e=1e5`, and `weiz_r2n=1e3`; symmetric entries for adjacent nuclei in the 7-by-7 R1/R2 dipolar arrays (pairs 2–3 through 6–7) are set to 0.1. The rate and temperature units are not specified.
 
-The basis uses `sphten-liouv`, no approximation, level 5, and projections [+2, +1, 0, -1, -2]. The experiment parameters are `mw_pwr=2*pi*250e3`, `nuclear_frq=2*pi*144.76e6`, theory `kb_second_order`, 0.01 s time step, and 1000 steps. The code explicitly sets `sys.disable={'krylov'}`; the line enabling the GPU is commented out. Thus the header's A100 timing note is not, by itself, evidence that this invocation enables GPU execution.
+The basis uses `sphten-liouv` with `IK-0` approximation, interaction level 5, and projections [+2, +1, 0, -1, -2]. The experiment parameters are `mw_pwr=2*pi*250e3`, `nuclear_frq=2*pi*144.76e6`, theory `kb_second_order`, 0.01 s time step, and 1000 steps. The code explicitly sets `sys.disable={'krylov'}`; the line enabling the GPU is commented out. Thus the header's A100 timing note is not, by itself, evidence that this invocation enables GPU execution.
 
 ## Computation and output
 

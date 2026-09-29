@@ -1,10 +1,10 @@
 % Comparison of powder-averaged sliced and Fokker-Planck MAS
 % evolution for a 13C spin with CSA and transverse RF. Both routes
-% use the same weighted Lebedev crystallite powder_grid.
+% use the same weighted Lebedev crystallite grid.
 %
 % Syntax: mas_fplanck_powder()
 %
-% Checks rotor rank, slice slice_count, rotor phase, and powder powder_grid.
+% Checks rotor rank, slice count, rotor phase, and powder grid.
 %
 % Calculation time: minutes
 %
@@ -100,21 +100,28 @@ end
 function signal=sliced_powder_signal(spin_system,parameters,...
                                      slice_count,phase_count)
 
+% Load the common powder grid and configure single-crystal rotor stacks
 powder_grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',...
                    parameters.grid),'alphas','betas','gammas','weights');
 parameters.grid='single_crystal';
 parameters.masframe='rotor';
 parameters.max_rank=(slice_count-1)/2;
+
+% Average rotor start phases for each weighted crystallite
 signal=0;
 for crystal_idx=1:numel(powder_grid.weights)
     crystal_signal=0;
     for phase_idx=1:phase_count
         rotor_phase=2*pi*(phase_idx-1)/phase_count;
+
+        % Build the phase-shifted midpoint rotor stack
         parameters.orientation=[powder_grid.alphas(crystal_idx)+...
                                 rotor_phase-pi/slice_count ...
                                 powder_grid.betas(crystal_idx) ...
                                 powder_grid.gammas(crystal_idx)];
         L=rotor_stack(spin_system,parameters,'labframe');
+
+        % Propagate towards decreasing rotor phase
         rho=parameters.rho0;
         for slice_idx=1:slice_count
             rotor_idx=mod(1-slice_idx,slice_count)+1;
@@ -122,8 +129,12 @@ for crystal_idx=1:numel(powder_grid.weights)
                                 parameters.rf_op)*...
                      (parameters.duration/slice_count))*rho;
         end
+
+        % Accumulate the rotor-phase signal
         crystal_signal=crystal_signal+parameters.coil'*rho/phase_count;
     end
+
+    % Apply the crystallite weight
     signal=signal+powder_grid.weights(crystal_idx)*...
                   crystal_signal/parameters.ref_norm;
 end
@@ -133,9 +144,14 @@ end
 % Add a constant RF generator across FP rotor phase collocation points
 function signal=fp_powder_signal(~,parameters,G,~,~)
 
+% Add the RF operator at every rotor collocation point
 G=G+parameters.rf_amp*kron(speye(parameters.spc_dim),...
                            parameters.rf_op);
+
+% Propagate the uniform rotor-phase state for one period
 rho=expm(-1i*full(G)*parameters.duration)*parameters.rho0;
+
+% Detect and normalise the signal
 signal=(parameters.coil'*rho)/parameters.ref_norm;
 
 end

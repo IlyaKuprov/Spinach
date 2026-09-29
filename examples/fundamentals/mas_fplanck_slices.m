@@ -45,7 +45,7 @@ parameters.duration=1/parameters.rate;
 parameters.serial=true;
 parameters.verbose=0;
 
-% Compare independent rotor-rank and slice-slice_count refinements
+% Compare independent rotor-rank and slice-count refinements
 [fp_csa,sl_csa]=compare_routes(spin_system,parameters,...
                                [4 6 8 10],[33 65 129]);
 check_limit('13C CSA with RF',fp_csa,sl_csa,1e-3);
@@ -135,9 +135,13 @@ end
 % Add the same transverse RF operator at every FP rotor collocation point
 function signal=fp_signal(~,parameters,G,~,~)
 
-% Integrate over one rotor period and contract with the physical coil
+% Add the RF operator at every rotor collocation point
 G=G+parameters.rf_amp*kron(speye(parameters.spc_dim),parameters.rf_op);
+
+% Propagate the single-crystal phase state for one period
 rho=expm(-1i*full(G)*parameters.duration)*parameters.rho0;
+
+% Detect and normalise the signal
 signal=(parameters.coil'*rho)/parameters.ref_norm;
 
 end

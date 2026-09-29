@@ -11,7 +11,7 @@ Implements the time-optimised pulsed DNP loop described in the cited paper. The 
 
 `H`, `R`, and `K` are context-supplied matrices. Required fields are `irr_powers` (non-negative microwave amplitude in Hz), `rho0` (initial state), `coil` (detection state), `pulse_dur` and `delay_dur` (seconds), and `nloops` (positive integer). The `2*pi` factor converts the Hz amplitude in the driven generator to angular frequency; pulse and delay lengths are in seconds.
 
-`contact_curve` is explicitly allocated as a `1 x (nloops+1)) row: the initial `coil)-state observable followed by one value after each pulse-delay cycle. It is not an FID, MRI image, or k-space trajectory. The source has no gradient or spatial-encoding input.
+`contact_curve` is a `1 x (nloops+1)` row: the initial `coil`–state overlap, followed by one detected value after each pulse–delay cycle. It is not an FID, MRI image, or k-space trajectory. The source has no gradient or spatial-encoding input.
 
 The numeric examples directly encoded by the source are the x-axis microwave term and the initial-plus-one-sample-per-loop convention; neither the source nor baseline page supplies a numerical parameter set or calculated experiment result.
 

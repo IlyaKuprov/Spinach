@@ -119,13 +119,13 @@ for crystal_idx=1:numel(powder_grid.weights)
                                 rotor_phase-pi/slice_count ...
                                 powder_grid.betas(crystal_idx) ...
                                 powder_grid.gammas(crystal_idx)];
-        L=rotor_stack(spin_system,parameters,'labframe');
+        liouv_stack=rotor_stack(spin_system,parameters,'labframe');
 
         % Propagate towards decreasing rotor phase
         rho=parameters.rho0;
         for slice_idx=1:slice_count
             rotor_idx=mod(1-slice_idx,slice_count)+1;
-            rho=expm(-1i*full(L{rotor_idx}+parameters.rf_amp*...
+            rho=expm(-1i*full(liouv_stack{rotor_idx}+parameters.rf_amp*...
                                 parameters.rf_op)*...
                      (parameters.duration/slice_count))*rho;
         end
@@ -142,14 +142,14 @@ end
 end
 
 % Add a constant RF generator across FP rotor phase collocation points
-function signal=fp_powder_signal(~,parameters,G,~,~)
+function signal=fp_powder_signal(~,parameters,generator,~,~)
 
 % Add the RF operator at every rotor collocation point
-G=G+parameters.rf_amp*kron(speye(parameters.spc_dim),...
+generator=generator+parameters.rf_amp*kron(speye(parameters.spc_dim),...
                            parameters.rf_op);
 
 % Propagate the uniform rotor-phase state for one period
-rho=expm(-1i*full(G)*parameters.duration)*parameters.rho0;
+rho=expm(-1i*full(generator)*parameters.duration)*parameters.rho0;
 
 % Detect and normalise the signal
 signal=(parameters.coil'*rho)/parameters.ref_norm;

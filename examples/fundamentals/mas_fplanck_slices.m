@@ -87,11 +87,11 @@ check_limit('27Al Q3 central transition',fp_nqi,sl_nqi,1e-4);
 parameters.max_rank=1;
 parameters.masframe='rotor';
 parameters.orientation=[0 0 0];
-L3=rotor_stack(spin_system,parameters,'labframe');
+third_gen=rotor_stack(spin_system,parameters,'labframe');
 parameters.rframes={{'27Al',2}};
-L2=rotor_stack(spin_system,parameters,'labframe');
-q3_norm=norm(L3{1}-L2{1},'fro');
-assert(q3_norm>100*eps(norm(L3{1},'fro')),...
+second_gen=rotor_stack(spin_system,parameters,'labframe');
+q3_norm=norm(third_gen{1}-second_gen{1},'fro');
+assert(q3_norm>100*eps(norm(third_gen{1},'fro')),...
        'The third-order quadrupolar correction was not resolved.');
 fprintf('Third-order correction norm: %.9g rad/s\n',q3_norm);
 fprintf('MAS_FPLANCK_SLICES_SUCCESS\n');
@@ -118,11 +118,12 @@ for slice_idx=1:numel(slice_counts)
     parameters.max_rank=(slice_count-1)/2;
     parameters.orientation=[0 0 -pi/slice_count];
     parameters.masframe='rotor';
-    L=rotor_stack(spin_system,parameters,'labframe');
+    liouv_stack=rotor_stack(spin_system,parameters,'labframe');
     rho=parameters.rho0;
     for step_idx=1:slice_count
         rotor_idx=mod(1-step_idx,slice_count)+1;
-        rho=expm(-1i*full(L{rotor_idx}+parameters.rf_amp*parameters.rf_op)*...
+        rho=expm(-1i*full(liouv_stack{rotor_idx}+...
+                          parameters.rf_amp*parameters.rf_op)*...
                  (parameters.duration/slice_count))*rho;
     end
     sl_sig(slice_idx)=(parameters.coil'*rho)/parameters.ref_norm;
@@ -133,13 +134,14 @@ end
 end
 
 % Add the same transverse RF operator at every FP rotor collocation point
-function signal=fp_signal(~,parameters,G,~,~)
+function signal=fp_signal(~,parameters,generator,~,~)
 
 % Add the RF operator at every rotor collocation point
-G=G+parameters.rf_amp*kron(speye(parameters.spc_dim),parameters.rf_op);
+generator=generator+parameters.rf_amp*...
+          kron(speye(parameters.spc_dim),parameters.rf_op);
 
 % Propagate the single-crystal phase state for one period
-rho=expm(-1i*full(G)*parameters.duration)*parameters.rho0;
+rho=expm(-1i*full(generator)*parameters.duration)*parameters.rho0;
 
 % Detect and normalise the signal
 signal=(parameters.coil'*rho)/parameters.ref_norm;

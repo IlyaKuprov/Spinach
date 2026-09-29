@@ -143,6 +143,8 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
 
     % Echo integral has units of signal times seconds
     echo=echo*parameters.timestep;
+
+    % Return the completed spectrum to CPU memory for powder averaging
     if isa(echo,'gpuArray')
         echo=gather(echo);
     end
@@ -266,9 +268,9 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
         error('Liouvillian dimension must be divisible by parameters.spc_dim.');
     end
     for name={'rho0','coil'}
-        v=parameters.(name{1});
-        if (~isnumeric(v))||(~iscolumn(v))||...
-           (numel(v)~=size(H,1))||(~all(isfinite(nonzeros(v))))
+        state_vec=parameters.(name{1});
+        if (~isnumeric(state_vec))||(~iscolumn(state_vec))||...
+           (numel(state_vec)~=size(H,1))||(~all(isfinite(nonzeros(state_vec))))
             error('parameters.%s must be a finite rotor-augmented state.',name{1});
         end
     end

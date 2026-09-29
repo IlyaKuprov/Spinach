@@ -128,7 +128,7 @@ signal=(parameters.coil'*rho)/(parameters.coil'*parameters.rho0);
 
 end
 
-% Require both independent refinements to meet a normalized-signal target
+% Require both independent refinements to meet a normalised-signal target
 function check_limit(label,fp_sig,sl_sig,target)
 
 % Test the last refinement and the cross-route complex-signal difference

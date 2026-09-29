@@ -155,6 +155,16 @@ Cross polarisation is `cp_powder_static_nh.m` and
 `cp_contact_mas_nh_fplanck.m`; recoupling is `redor_curve.m` and
 `pdsd_simple.m`.
 
+For a direct single-crystal MAS route check, run
+`examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced
+`rotor_stack` evolution against `singlerot` in Fokker–Planck Liouville
+space while independently refining slice count and rotor rank. The cases
+are `13C` CSA under transverse RF and the central transition of strongly
+quadrupolar `27Al` with third-order rotating-frame correction. It asserts
+agreement of normalised complex signals and checks that the third-order
+term is nonzero. This is not a test of powder averaging, the complete
+satellite manifold, or optimal-control gradients.
+
 ## Quadrupolar nuclei and NQR
 
 Quadrupolar coupling is a self-coupling on the diagonal of the coupling cell

@@ -29,7 +29,7 @@ Inputs:
 
 Outputs:
 
-- `g` — a 3x3 matrix in Bohr magneton units, per the file header.
+- `g` — a dimensionless 3×3 g tensor; the implementation divides the magnetic-moment coupling by the Bohr magneton, which enters separately in `mu = -mu_B*g*S/hbar`.
 
 ## References
 

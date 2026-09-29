@@ -12,7 +12,7 @@ Maps the steady-state proton longitudinal signal against microwave-frequency off
 
 ## Spin system and relaxation model
 
-The spins are one proton and one electron. The proton Zeeman eigenvalues are [15, 5, −20] ppm; the electron values are [2.00210, 2.00250, 2.00290] in Bohr-magneton units. Their Euler angles are [0, 0, 0] and [pi/3, pi/4, pi/5], respectively. The isotropic hyperfine coupling is 20e6 Hz. The coordinates are (0, 0, 0) and (0, 0, 3.0) Angstrom for the proton and electron.
+The spins are one proton and one electron. The proton Zeeman eigenvalues are [15, 5, −20] ppm; the electron values are [2.00210, 2.00250, 2.00290] as dimensionless g factors. Their Euler angles are [0, 0, 0] and [pi/3, pi/4, pi/5], respectively. The isotropic hyperfine coupling is 20e6 Hz. The coordinates are (0, 0, 0) and (0, 0, 3.0) Angstrom for the proton and electron.
 
 The basis is `sphten-liouv` with no approximation. Redfield relaxation uses zero equilibrium (required by this steady-state calculation), secular retention, temperature 298, and a 10 ps correlation time (identified in the source as TEMPOL in water). The relaxation-integration tolerance is set to `1e-10`, which the source marks as necessary for this calculation.
 

@@ -14,7 +14,7 @@ All seven arguments are required; there are no defaults.
 
 - B0 — finite, nonzero real numeric scalar main magnetic field, in tesla.
 - T — positive real numeric scalar absolute temperature, in kelvin.
-- g — real numeric scalar electron g-factor; the source documents it as being in Bohr-magneton units and multiplies it by the Bohr magneton constant.
+- g — real numeric scalar electron g-factor; a dimensionless input, multiplied by the Bohr magneton constant in the calculation.
 - T1e — positive real numeric scalar electron longitudinal relaxation time, in seconds.
 - T1n_bulk — positive real numeric scalar bulk nuclear longitudinal relaxation time in seconds; `1/T1n_bulk` contributes to the relaxation rate in Hz.
 - r — positive real numeric scalar electron-nuclear distance, in angstroms.

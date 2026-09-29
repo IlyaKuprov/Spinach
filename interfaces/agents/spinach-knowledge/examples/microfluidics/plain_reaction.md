@@ -2,7 +2,7 @@
 
 ## Model
 
-A homogeneous cycloaddition concentration model with two reactants, two competing product channels, and an inert fifth solvent component; there is no spin dynamics, flow, or diffusion. The source comments assign `k1=0.5` to the exo channel and `k2=0.1` to the endo channel, with rate-constant units stated as `mol/(L*s)`. For concentrations A and B, the implemented rates are `dA/dt=dB/dt=-(k1+k2)*A*B`, `dP3/dt=k1*A*B`, `dP4/dt=k2*A*B`, and `dS/dt=0`. Initial concentrations are `[0.6; 0.5; 0; 0; 18.1] mol/L`.
+A homogeneous cycloaddition concentration model with two reactants, two competing product channels, and an inert fifth solvent component; there is no spin dynamics, flow, or diffusion. The source comments assign `k1=0.5` to the exo channel and `k2=0.1` to the endo channel. The source comment labels the constants `mol/(L*s)`, but with concentrations in mol/L the bilinear terms `k*A*B` require `L/(mol*s)` for both constants. For concentrations A and B, the implemented rates are `dA/dt=dB/dt=-(k1+k2)*A*B`, `dP3/dt=k1*A*B`, `dP4/dt=k2*A*B`, and `dS/dt=0`. Initial concentrations are `[0.6; 0.5; 0; 0; 18.1] mol/L`.
 
 ## Integration and output
 

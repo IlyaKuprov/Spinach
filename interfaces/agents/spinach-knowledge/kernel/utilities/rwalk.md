@@ -6,16 +6,11 @@ Generates a random walk on the SO(3) rotation group, simulating isotropic rotati
 
 Source: [kernel/utilities/rwalk.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rwalk.m)
 
-## Behaviour
+## Model and constraints
 
-1. Validates inputs via an internal `grumble` subroutine: `npts` must be a positive real integer, and `tau_c` and `dt` must be positive real scalars.
-2. Generates a random unit jump sequence: `randn(npts,3)/sqrt(3)`.
-3. Scales the jumps by `sqrt(dt/tau_c)`, setting the effective diffusion coefficient.
-4. Enforces small-angle validity: if the mean absolute jump angle exceeds `pi/32`, the function errors with `'jump angles must be small, reduce your dt.'`.
-5. Builds the direction cosine matrix (DCM) trajectory: starting from the identity, each step applies `expm(R)` where `R` is the skew-symmetric generator assembled from the three jump angle components, and multiplies onto the previous DCM.
-6. Converts each DCM to Euler angles using `dcm2euler` in a `parfor` loop, returning an `npts x 3` array.
+`rwalk(npts,tau_c,dt)` models isotropic rotational diffusion with Gaussian three-component angular increments `randn(npts,3)/sqrt(3)`, scaled by `sqrt(dt/tau_c)`. Their lengths fluctuate: only the expected squared norm of each unscaled vector is one. The function rejects invalid point counts or non-positive correlation time and spacing, and applies a small-jump guard comparing `mean(abs(jump_angles))` with `pi/32`; reducing `dt` may be necessary if this guard fires.
 
-Note (from source): the returned angles are **not** increments relative to the previous point; they are angles relative to the starting point of the trajectory.
+It composes the corresponding rotation matrices into a trajectory and returns one Euler-angle triple per point. These angles describe orientations relative to the starting frame, not successive frame-to-frame increments.
 
 ## Inputs and outputs
 

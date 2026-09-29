@@ -1,49 +1,20 @@
 # kernel/optimcon/distortions/non_orth.m
 
-- Signature: `[w,J]=non_orth(w,xy_ang)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/non_orth.m)
 
-## Purpose
+## Purpose and syntax
 
-Non-orthogonal channel distortion model. Treats odd rows of multi-row waveform arrays as in-phase channels, and even rows as out-of-phase channels. The in-phase channel is kept fixed; the out-of-phase channel is tilted so that its true angle to the in-phase channel is user-specified. Syntax: [w,J]=non_orth(w,xy_ang)
+`[w,J]=non_orth(w,xy_ang)` models non-orthogonal X,Y control-channel outputs. Rows are paired as X,Y, with one time slice per column. The X component is retained with an admixture of Y; the Y component is scaled to set the angle between the output directions.
 
-## Physical / mathematical content
+## Inputs
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `w`: Real numeric waveform array with an even number of rows. Each adjacent odd/even row pair is one control channel; columns are time slices.
+- `xy_ang`: Angle in degrees for each X,Y pair. A scalar is expanded to all pairs, or provide one value per pair. Values must be real, finite, and strictly between 0 and 180 degrees. At 90 degrees there is no distortion. There is no default angle.
 
-## Numerical / algorithmic content
+For each pair and time slice, the transformation is `X_out = X_in + cosd(xy_ang)*Y_in` and `Y_out = sind(xy_ang)*Y_in`. The output waveform has the same dimensions as `w`.
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Jacobian
 
-## Parameters / inputs
+When requested, `J` is the sparse Jacobian of the vectorised output with respect to the vectorised input. Each pair contributes the block `[1, cosd(xy_ang); 0, sind(xy_ang)]`; the same channel mixing is applied independently at every time slice.
 
-- w -waveform, one time slice per column, and
-- rows arranged as XYXY... with respect to
-- in-phase and quadrature parts on each
-- control channel
-- xy_ang -true angle, in degrees, between the instru-
-- ment output directions of each X,Y control
-- pair; may be a scalar or one value per pair,
-- with 90 degrees corresponding to no distortion
-
-## Outputs
-
-- w -distorted waveform, same dimension as the
-- input waveform
-- J -Jacobian matrix with respect to vectorisa-
-- tions of the output and the input arrays
-
-## Implementation structure
-
-- Non-orthogonal channel distortion model. Treats odd rows of
-- multi-row waveform arrays as in-phase channels, and even rows
-- as out-of-phase channels. The in-phase channel is kept fixed;
-- the out-of-phase channel is tilted so that its true angle to
-- the in-phase channel is user-specified. Syntax:
-- [w,J]=non_orth(w,xy_ang)
-- w -waveform, one time slice per column, and
-- rows arranged as XYXY... with respect to
-- in-phase and quadrature parts on each
-- control channel
-- xy_ang -true angle, in degrees, between the instru-
-- ment output directions of each X,Y control
+<https://spindynamics.org/wiki/index.php?title=non_orth.m>

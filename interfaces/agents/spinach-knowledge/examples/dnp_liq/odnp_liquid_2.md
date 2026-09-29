@@ -1,32 +1,23 @@
 # examples/dnp_liq/odnp_liquid_2.m
 
+- MATLAB implementation: [examples/dnp_liq/odnp_liquid_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/odnp_liquid_2.m)
+
 - Signature: `odnp_liquid_2()`
+- Calculation time: seconds
+- [MATLAB source](../../../../../examples/dnp_liq/odnp_liquid_2.m)
 
 ## Purpose
 
-Overhauser type DNP in liquid phase at room temperature, after a perfect inversion pulse on the electron ESR signal. The simulation uses Redfield theory to account for the dipolar cross-relaxation. Calculation time: seconds
+Models liquid-phase Overhauser DNP at room temperature after a perfect inversion of the electron ESR signal. Redfield relaxation represents dipolar electron–nuclear cross-relaxation. The simulation follows longitudinal signals after the inversion rather than applying a continuous microwave drive.
 
-## Physical / mathematical content
+## Spin system and relaxation
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The three spins are `1H`, `1H`, and `E`, with `sys.magnet=3.4`. The Zeeman matrices are isotropic for both protons (diagonal entries 5) and specify electron entries 2.0023, 2.0025, and 2.0027. Coordinates, in the source's stated Angstrom units, are (0, 0, 0), (0, 2, 0), and (0, 0, 1.5), respectively. The basis is `sphten-liouv` with no approximation. Relaxation uses `redfield`, Di Bari equilibrium, secular retention, temperature 298, and a 10 ps correlation time.
 
-## Numerical / algorithmic content
+## Preparation and time evolution
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The script creates the spin system and basis, obtains `rho_eq=equilibrium(spin_system)`, then applies `step(spin_system,Lx,rho_eq,pi)` using the electron `Lx` operator. This prepares `rho0` by a pi-radian inversion. The ESR-context call is `liquid(spin_system,@dnp_time_dep,parameters,'esr')`; the parameter structure selects the electron, supplies `rho0`, and defines proton 1, proton 2, and electron `Lz` states as the three coil channels. Microwave power and offset are both zero. The time step is `1e-6` and the number of steps is `1e3`.
 
-## Implementation structure
+## Output and scope
 
-- Overhauser type DNP in liquid phase at room temperature, after a perfect
-- inversion pulse on the electron ESR signal. The simulation uses Redfield
-- theory to account for the dipolar cross-relaxation.
-- Calculation time: seconds
-- Spin system
-- Zeeman interactions
-- Coordinates (Angstrom)
-- Basis set
-- Relaxation theory
-- Spinach housekeeping
-- Isotropic thermal equilibrium
-- Electron control operator
+The first plot is the real electron longitudinal signal (the third coil channel); the second plots the two proton longitudinal signals. The plotted abscissa is `linspace(0,1000,1001)`, labelled in microseconds, and the ordinates are longitudinal `Lz` signals. This is a fixed three-spin geometry with one correlation time and no microwave drive; it is not a field or frequency sweep.

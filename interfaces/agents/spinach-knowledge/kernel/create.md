@@ -1,61 +1,41 @@
 # kernel/create.m
 
+Source: [kernel/create.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/create.m)
+Wiki: [Spin Dynamics Wiki: create.m](https://spindynamics.org/wiki/index.php?title=create.m)
+
 - Signature: `spin_system=create(sys,inter)`
 
-## Purpose
+## Purpose and inputs
 
-The entry function of the Spinach kernel that creates the spin system object that the rest of the library requires to run. It checks and absorbs interaction specifications, and writes some useful diagnostics to the console. Syntax: spin_system=create(sys,inter)
+The kernel entry point constructs the `spin_system` object used by the rest of Spinach. It validates and absorbs system and interaction specifications, then reports diagnostics.
 
-## Physical / mathematical content
+- `sys` — spin-system and instrument specification structure. The source requires isotope labels and a scalar magnet field; consult the Spin System Specification section of the manual for the complete input specification.
+- `inter` — interaction specification structure. It may be omitted; the executable code then sets it to `[]` before validation.
+- `spin_system` — assembled system object, including system, component, interaction, chemistry, and relaxation data. For `N=numel(sys.isotopes)`, particle metadata is held per particle and pairwise couplings in `N-by-N` cells, with populated spin-coupling entries represented by `3x3` tensors.
 
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+## Assembly in execution order
 
-## Numerical / algorithmic content
+1. Startup checks and configuration establish output and scratch destinations, run the available validation hooks, configure tolerances and enabled features, and prepare parallel/cache/GPU-related settings when requested.
+2. Particle metadata is absorbed: isotope labels and particle count, spin versus bosonic-mode classification, multiplicities, gyromagnetic ratios, magnet field, and base frequencies `-gamma*magnet`.
+3. Optional bosonic-mode specifications populate per-mode frequency, carrier, anharmonicity, damping, thermal occupation, and dephasing data, then pair-coupling and modulation data. If modes are present without mode interaction data, the source reports that zero couplings are assumed.
+4. One-particle magnetic terms are assembled from susceptibility contributions and the supplied Zeeman eigenvalue/Euler-angle, matrix, or scalar forms; electron g-tensors and nuclear ppm shifts are converted using the base frequencies. Giant-spin coefficients are absorbed where present.
+5. Chemistry, concentrations, exchange/flux settings, and order matrices are absorbed, with defaults where the source specifies them.
+6. Coordinates and optional periodic-boundary vectors are absorbed and passed to `dipolar` for dipolar couplings. If coordinates are absent, the source assumes zero point-dipolar interactions and initialises an identity proximity matrix. User-specified pair couplings are then added.
+7. Relaxation and radical-pair recombination specifications are absorbed and reported.
+8. The final `inter.ignore` processing drops the listed coupling tensors, and leftover unparsed `sys` fields are reported as an error.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Couplings, decoupling, and guards
 
-## Parameters / inputs
+`inter.ignore` is specifically a coupling drop list: for each listed pair the source clears both `{i,j}` and `{j,i}` entries after assembly. It does not remove spins or other interaction families. Pair couplings below the configured cutoff are cleared; couplings involving multiplicity-one ghost spins are also cleared. A populated coupling between different chemical subsystems is rejected.
 
-- sys -spin system and instrument specification
-- structure, see the spin system specifica-
-- tion section of the online manual
-- inter -interaction specification structure, see
-- see the spin system specification section
-- of the online manual
+Field validation is delegated substantially to `grumble` and the helper routines. The source checks the required isotope/magnet inputs and applies field-specific checks for modes, tensors, coordinates and periodic boundaries, chemistry, relaxation, recombination, and ignore-pair indices. In particular, damped bosonic modes require an explicit `inter.temperature`; bosonic particle combinations are restricted for mode couplings and modulation; and an unconsumed system option is an error. This function assembles the model specification; it does not solve an eigenfield problem or compute numerical derivatives.
 
-## Outputs
+## Units and conventions
 
-- spin_system -the primary object used by Spinach
-- to store simulation information
-- Note: inter.modes.carriers declares, for each bosonic mode, the labo-
-- ratory frequency of the rotating frame in which inter.modes.frqs
-- is specified; declared frequencies are then detunings and may be
-- negative, and thermal occupations are computed from the physical
-- frequency, meaning the sum of the carrier and the detuning.
-- Note: inter.modes.t2_times is interpreted at the declared temperature:
-- the pure dephasing rate is extracted as 1/T2-kappa*(1+2*nbar)/2,
-- where kappa is the amplitude damping rate and nbar the thermal
-- occupation at the physical mode frequency.
-- Note: quadrature operators of bosonic modes follow the (a+a')/sqrt(2)
-- normalisation everywhere, in inter.modes.longitudinal as well as
-- in the modulation channels.
+The magnet field is in tesla; coordinates and periodic translations are in ångströms; temperatures are in kelvin; mode lifetimes, mode `T2` values, and correlation times are in seconds. Frequency-specified mode frequencies, carriers, anharmonicities, mode couplings and modulation terms, giant-spin coefficients, and user spin couplings are multiplied by `2*pi` on absorption. The coupling cutoff is applied to input coupling magnitudes in Hz. Mode lifetime damping is `1/lifetime`, linewidth damping is `2*pi*linewidth`, and Q-factor damping uses physical angular frequency divided by Q. Nuclear shifts are specified in ppm; electron Zeeman tensors use g-tensor units; absorbed Zeeman matrices are in angular-frequency units. The source reports relaxation and recombination rates in Hz. Consult the source-specific field validation for each interaction family's allowed forms.
 
-## Implementation structure
+For bosonic modes, `inter.modes.carriers` declares the laboratory rotating-frame frequency used by `inter.modes.frqs`; those declared frequencies are detunings and may be negative. Thermal occupation uses the physical frequency: carrier plus detuning when a positive carrier is specified, otherwise the absolute declared frequency. The mode pure-dephasing rate is `1/T2-kappa*(1+2*nbar)/2`, with amplitude-damping rate `kappa` and thermal occupation `nbar`; the source checks that the resulting pure-dephasing contribution is physically non-negative. Bosonic-mode quadratures use `(a+a')/sqrt(2)` in both `inter.modes.longitudinal` and the modulation channels.
 
-- The entry function of the Spinach kernel that creates the spin
-- system object that the rest of the library requires to run. It
-- checks and absorbs interaction specifications, and writes some
-- useful diagnostics to the console. Syntax:
-- spin_system=create(sys,inter)
-- sys -spin system and instrument specification
-- structure, see the spin system specifica-
-- tion section of the online manual
-- inter -interaction specification structure, see
-- see the spin system specification section
-- of the online manual
-- spin_system -the primary object used by Spinach
+## Call syntax
+
+The source gives the call syntax `spin_system=create(sys,inter)`; when there are no interaction specifications, `create(sys)` is also accepted by the executable code.

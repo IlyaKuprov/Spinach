@@ -1,40 +1,16 @@
 # kernel/conventions/transforms/qter2anax.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/qter2anax.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=qter2anax.m)
+
 - Signature: `[rot_axis,rot_angle]=qter2anax(q)`
 
-## Purpose
+## Behaviour
 
-Converts a quaternion representation of a rotation into angle-axis rotation parameters. Syntax: [rot_axis,rot_angle]=qter2anax(q)
+The function normalises `[q.u q.i q.j q.k]` by its Euclidean norm. Let `v=[q.i q.j q.k]` after normalisation and `n=norm(v,2)`. If `n==0`, it returns `rot_angle=0` and `rot_axis=[0 0 1]`. Otherwise it returns `rot_angle=2*atan2(n,q.u)` in radians and `rot_axis=v/n`.
 
-## Physical / mathematical content
+## Input and outputs
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+The required structure fields are `u`, `i`, `j`, and `k`. The explicit checks reject missing fields and non-real concatenated components; this function does not explicitly check that the components are numeric scalars or that the quaternion norm is nonzero before normalisation.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- q -quaternion, a structure with four fields
-- q.u, q.i, q.j, q.k giving the four compo-
-- nents of the quaternion
-
-## Outputs
-
-- rot_axis -cartesian direction vector as a row
-- with three real elements
-- rot_angle -rotation angle in radians
-
-## Implementation structure
-
-- Converts a quaternion representation of a rotation into angle-axis
-- rotation parameters. Syntax:
-- [rot_axis,rot_angle]=qter2anax(q)
-- q - quaternion, a structure with four fields
-- q.u, q.i, q.j, q.k giving the four compo-
-- nents of the quaternion
-- rot_axis -cartesian direction vector as a row
-- with three real elements
-- rot_angle -rotation angle in radians
-- Check consistency
-- Normalize the quaternion
-- Compute the vector part norm
+- `rot_axis` — 1x3 row vector.
+- `rot_angle` — scalar angle in radians.

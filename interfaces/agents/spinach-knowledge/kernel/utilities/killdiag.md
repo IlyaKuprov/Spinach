@@ -1,38 +1,30 @@
 # kernel/utilities/killdiag.m
 
-- Signature: `spec=killdiag(spec,brush_dim)`
-
 ## Purpose
 
-Zeroes out the diagonal of a 2D spectrum using the brush with the specified dimensions. Syntax: spec=killdiag(spec,brush_dim)
+`killdiag.m` zeroes out a band along the diagonal of a 2D spectrum using a brush of a specified width. It is documented as part of the Spinach kernel utilities ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/killdiag.m)).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `spec=killdiag(spec,brush_dim)`.
+- For each column `n` of the spectrum, the row index on the diagonal is computed as `k=n*size(spec,1)/size(spec,2)`.
+- The brush extends from `round(k-(brush_dim-1)/2)` to `round(k+(brush_dim-1)/2)`, giving a band of `brush_dim` points centred on the diagonal.
+- Row indices outside the array boundaries (`k<1` or `k>size(spec,1)`) are discarded before zeroing.
+- The selected elements `spec(k,n)` are set to zero; the function returns the modified matrix.
+- Input consistency is enforced by the internal `grumble` function, which errors when: `spec` is not a numeric matrix; `brush_dim` is not a positive real integer scalar; or the brush is wider than the spectrum (`any(size(spec)<brush_dim)`).
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- spec -2D matrix representing a spectrum
-- brush_dim -the width of the band to zero out
-- around the diagonal, points
+- `spec` — 2D matrix representing a spectrum.
+- `brush_dim` — the width of the band to zero out around the diagonal, in points.
 
-## Outputs
+**Outputs**
 
-- spec -2D matrix representing a spectrum
+- `spec` — 2D matrix representing the spectrum with the diagonal band zeroed.
 
-## Implementation structure
+## References
 
-- Zeroes out the diagonal of a 2D spectrum using the brush
-- with the specified dimensions. Syntax:
-- spec=killdiag(spec,brush_dim)
-- spec -2D matrix representing a spectrum
-- brush_dim -the width of the band to zero out
-- around the diagonal, points
-- Check consistency
-- Loop over the column index
-- Find the row index
-- Find the row index extents
-- Avoid array boundaries
-- Zero the elements
+- Spin Dynamics Wiki page for `killdiag.m`: <https://spindynamics.org/wiki/index.php?title=killdiag.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/killdiag.m>

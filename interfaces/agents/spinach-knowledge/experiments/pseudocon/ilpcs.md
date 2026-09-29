@@ -1,69 +1,35 @@
 # experiments/pseudocon/ilpcs.m
 
 - Signature: `[mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=ilpcs(nxyz,expt_pcs,ranks,mguess)`
+- MATLAB source: [`experiments/pseudocon/ilpcs.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/ilpcs.m)
 
 ## Purpose
 
-Fits experimental PCS data using the distributed paramagnetc centre model described in
+Fits measured PCS values to a distributed paramagnetic-centre multipole model. The model is the one described in [10.1039/C6CP05437D](https://doi.org/10.1039/C6CP05437D). This is a numerical parameter fit, not a pulse-sequence routine.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
+- `nxyz` — N-by-3 array of nuclear coordinates, in ångströms (Å), at the PCS observation sites.
+- `expt_pcs` — real N-by-1 column of experimental PCS values, in ppm; N must match the number of rows of `nxyz`.
+- `ranks` — row vector of unique non-negative integer multipole ranks, beginning with 0.
+- `mguess` — 1-by-3 initial paramagnetic-centre coordinate in Å. The source notes that a good initial centre guess is essential for a successful fit.
+- `mxyz` — fitted paramagnetic-centre coordinate, in Å.
+- `chi` — fitted magnetic-susceptibility tensor, in cubic ångströms (Å³).
+- `Ilm` — cell-array representation of the fitted multipole moments, in the ordering defined by the cited model.
+- `pred_pcs` — PCS values predicted at the input coordinates, in ppm.
+- `s_mxyz`, `s_chi`, and `s_Ilm` — estimated standard deviations for the fitted centre, susceptibility parameters, and multipole moments. These are calculated only when more than four outputs are requested.
 
-## Numerical / algorithmic content
+The coordinates are used as Cartesian components in the same frame throughout the fit; this routine does not rotate or reorient them.
 
-## Syntax
+## Fit parameterisation and assumptions
 
-```matlab
-[mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=...
-ilpcs(nxyz,expt_pcs,ranks,mguess)
-```
+The objective is the unweighted sum of squared differences between `expt_pcs` and values from `lpcs`. The minimiser is MATLAB `fminunc`, with central finite differences and parallel evaluation enabled. It starts from `mguess`, five susceptibility parameters initialised to 0.1, and zero initial values for the adjustable multipoles. The rank-0 moment is fixed at `0.5/sqrt(pi)`; the remaining requested multipole components are fitted.
 
-## Parameters / inputs
+The susceptibility tensor is parameterised by five values as a symmetric traceless matrix: its third diagonal element is set to minus the sum of the first two. There are no explicit bounds in the `fminunc` call. The source estimates parameter standard deviations from a numerically estimated residual Jacobian and a residual-variance factor with `N - n_mvars - 8` degrees of freedom, where `n_mvars` counts adjustable multipole components. The initial centre estimate and this model parameterisation therefore matter to interpreting the fit.
 
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is to be evaluated, in Angstroms.
-- expt_pcs -a column vector of experimental pseudocontact shifts
-- in ppm
-- ranks -row of multipole expansion ranks to be used in the
-- fitting procedure
-- mguess -guess value for the paramagnetic centre position,
-- a three-element vector in Angstrom
-- Output:
-- mxyz -optimized paramagnetic centre coordinates as [x y z],
-- in Angstroms.
-- chi -optimized magnetic susceptibility tensor in cubic
-- Angstroms.
-- Ilm -{[],[]} cell array of numbers corresponding to the
-- multipole moments defined in the paper cited above:
-- for L=0, Ilm=N/2/sqrt(pi)
-- for L=1, Ilm=[real(I11) I10 imag(I11)]
-- for L=2, Ilm=[real(I22) real(I21) I20 imag(I21) imag(I22)]
-- et cetera.
-- pred_pcs -predicted pseudocontact shift (in ppm) at each of
-- the nuclei.
-- chi -optimized magnetic susceptibility tensor in cubic
-- Angstroms.
-- s_mxyz -standard deviations of paramagnetic centre
-- coordinates as [x y z], in Angstroms.
-- s_chi -standard deviations of magnetic susceptibility
-- tensor elements in cubic Angstroms.
-- s_Ilm -standard deviations of the multipole moments, arranged
-- in the same order as the moments themselves.
-- Note: a good initial guess for the paramagnetic centre location is
-- essential for a successful fit.
+Input checks enforce the coordinate, PCS, initial-guess, and rank shapes/types described above. The function itself does not report an experimental fit quality beyond its fitted and predicted values and the optional parameter standard deviations.
 
-## Implementation structure
+## References
 
-- Fits experimental PCS data using the distributed paramagnetc centre
-- model described in
-- [mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=...
-- ilpcs(nxyz,expt_pcs,ranks,mguess)
-- nxyz -nuclear coordinates as [x y z] with multiple rows,
-- at which PCS is to be evaluated, in Angstroms.
-- expt_pcs -a column vector of experimental pseudocontact shifts
-- in ppm
-- ranks -row of multipole expansion ranks to be used in the
-- fitting procedure
-- mguess -guess value for the paramagnetic centre position,
-- a three-element vector in Angstrom
+- [10.1039/C6CP05437D](https://doi.org/10.1039/C6CP05437D)
+- [Spin Dynamics Wiki: ilpcs.m](https://spindynamics.org/wiki/index.php?title=ilpcs.m)

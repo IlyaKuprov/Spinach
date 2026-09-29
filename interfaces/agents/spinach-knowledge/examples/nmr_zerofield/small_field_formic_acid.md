@@ -1,31 +1,15 @@
 # examples/nmr_zerofield/small_field_formic_acid.m
 
-- Signature: `small_field_formic_acid()`
+## Experiment represented and source-label discrepancy
 
-## Purpose
+The filename and function name identify this as the small-field formic-acid example, while its header comment instead says “15N pyridine” and says it is set to reproduce Figure 2 of [the cited Physical Review Letters paper](https://doi.org/10.1103/PhysRevLett.107.107601). The executable spin model is unambiguous about its channels: it contains one 1H and one 13C, not 15N. The script computes a simulated signal; it does not import measured data.
 
-Zero-field NMR spectroscopy -15N pyridine. Set to reproduce Fig 2 from http://dx.doi.org/10.1103/PhysRevLett.107.107601 Calculation time: seconds
+## Spin model and acquisition
 
-## Physical / mathematical content
+The code sets sys.magnet to 1.76e-7 T and defines one 1H–13C scalar coupling of 221 Hz. It does not set a temperature. The basis is zeeman-hilb with approximation none. Acquisition uses a 600 Hz sweep, 8196 points, and 16384 zero-fill points; offset is zero, the selected detection channel is 1H, the axis is in Hz without inversion, and the nominal flip angle is π/2 with uniaxial detection. No gradient or chirp schedule is specified.
 
-- Zero- and ultralow-field NMR examples. The main physics is the crossover from Zeeman-dominated spectra to J-dominated spectra, with coherent evolution in near-zero field and detection of low-frequency transitions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Spinach builds the spin system and basis, then liquid propagates it with zerofield in the lab frame. The FID is mean-subtracted and exponentially apodised with parameter 12, followed by a shifted FFT using the zero-fill length and a plot of the real spectrum. The source header estimates a calculation time of seconds.
 
-## Numerical / algorithmic content
+## Source
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Zero-field NMR spectroscopy -15N pyridine. Set to reproduce
-- Fig 2 from http://dx.doi.org/10.1103/PhysRevLett.107.107601
-- Calculation time: seconds
-- Magnetic field
-- Spin system
-- Interactions
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- Fourier transform
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_zerofield/small_field_formic_acid.m)

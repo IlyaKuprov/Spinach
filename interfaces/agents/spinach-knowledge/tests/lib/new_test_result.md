@@ -1,31 +1,37 @@
 # tests/lib/new_test_result.m
 
-- Signature: `result=new_test_result(id,name,purpose)`
-
 ## Purpose
 
-Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose)
+Creates a regression test result structure for the Spinach test suite. Source: [GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/new_test_result.m).
 
-## Physical / mathematical content
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `result=new_test_result(id,name,purpose)`.
+- Validates the three input arguments via an internal `grumble` helper before building the structure.
+- Validation rules:
+  - `id` must be a non-empty character row vector, otherwise errors with `'id must be a non-empty character string.'`.
+  - `name` must be a non-empty character row vector, otherwise errors with `'name must be a non-empty character string.'`.
+  - `purpose` must be a character row vector (empty allowed), otherwise errors with `'purpose must be a character string.'`.
+- On success, returns a structure with fields:
+  - `id`, `name`, `purpose` — copied from the inputs.
+  - `status` — initialised to `'RUNNING'`.
+  - `elapsed` — initialised to `0`.
+  - `messages` — initialised to `{}`; accumulates one line per check.
+  - `failures` — initialised to `{}`; accumulates details of checks that did not pass; an empty `failures` field means no failed check has been recorded.
+  - `error` — initialised to `''`.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- id -stable test identifier
-- name -short human-readable test name
-- purpose -one-sentence purpose statement
+Inputs:
 
-## Outputs
+- `id` — stable test identifier (non-empty character row vector).
+- `name` — short human-readable test name (non-empty character row vector).
+- `purpose` — one-sentence purpose statement (character row vector; may be empty).
 
-- result -test result structure
+Output:
 
-## Implementation structure
+- `result` — test result structure as described above.
 
-- Creates a regression test result structure. Syntax:
-- result=new_test_result(id,name,purpose)
-- id -stable test identifier
-- name -short human-readable test name
-- purpose -one-sentence purpose statement
-- result -test result structure
-- Build the result structure
+## References
+
+- Source file: [tests/lib/new_test_result.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/new_test_result.m)

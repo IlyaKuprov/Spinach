@@ -1,41 +1,28 @@
 # kernel/utilities/poolsize.m
 
-- Signature: `n=poolsize()`
-
 ## Purpose
 
-Returns the current parallel pool size. Syntax: n=poolsize()
+Returns the current parallel pool size in Spinach ([source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/poolsize.m)).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `n=poolsize()`.
+- The function obtains the current parallel pool handle with `gcp('nocreate')`.
+- If no pool exists, `n` is set to `0`.
+- Otherwise, `n` is set to `p.NumWorkers`, the number of workers in the current parallel pool.
+- When invoked from inside `parfor`, `spmd`, or an asynchronous parallel job, the function returns zero.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+**Inputs**
 
-## Parameters / inputs
+- None.
 
-- none
+**Outputs**
 
-## Outputs
+- `n` — number of workers in the current parallel pool.
 
-- n -number of workers in the current
-- parallel pool
-- Note: when this function is invoked from inside parfor, spmd,
-- or asynchronous parallel job, it returns zero.
+## References
 
-## Implementation structure
-
-- Returns the current parallel pool size. Syntax:
-- n=poolsize()
-- none
-- n - number of workers in the current
-- parallel pool
-- Note: when this function is invoked from inside parfor, spmd,
-- or asynchronous parallel job, it returns zero.
-- Get the pool handle
-- Query the pool
-- Run a man through a line of fire, and he turns into a seasoned
-- wolf; the weak, and in really tough cases unnecessary, intellect
-- is replaced by the wise animal instinct.
+- [Spinach Wiki: poolsize.m](https://spindynamics.org/wiki/index.php?title=poolsize.m)
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/poolsize.m)

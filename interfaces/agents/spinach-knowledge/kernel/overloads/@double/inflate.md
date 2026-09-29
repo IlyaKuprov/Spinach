@@ -1,23 +1,18 @@
 # kernel/overloads/@double/inflate.m
 
-- Signature: `A=inflate(A)`
+- MATLAB implementation: [kernel/overloads/@double/inflate.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@double/inflate.m)
 
-## Purpose
+## Purpose and use
 
-A dummy function that mirrors the inflate() command for polyadics, but is not supposed to do anything to proper numerical arrays. Syntax: A=inflate(A)
+B=inflate(A) is the @double overload of Spinach's inflate interface. It deliberately does not inflate, reshape, or otherwise transform an ordinary double array: the output B is the input A unchanged. This dummy overload lets code using the polyadic inflate command also call it for proper numerical arrays without changing them.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-## Numerical / algorithmic content
+- A: the double-array argument supplied to this overload; no units or shape restrictions are imposed in this file.
+- B: the same value returned unchanged.
 
-## Implementation structure
+## Limitation
 
-- A dummy function that mirrors the inflate() command for
-- polyadics, but is not supposed to do anything to proper
-- numerical arrays. Syntax:
-- A=inflate(A)
-- No effect on doubles
-- If men define situations as real, they are real
-- in their consequences.
-- Thomas Theorem
-- #NHEAD #NGRUM
+This implementation is intentionally a no-op; do not expect it to add dimensions or convert an array into a polyadic representation.
+
+Source documentation: [double/inflate.m](https://spindynamics.org/wiki/index.php?title=double/inflate.m).

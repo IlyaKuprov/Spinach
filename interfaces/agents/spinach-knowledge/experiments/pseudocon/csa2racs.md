@@ -1,44 +1,20 @@
 # experiments/pseudocon/csa2racs.m
 
-- Signature: `racs=csa2racs(csa,chi,B,T)`
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/csa2racs.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=csa2racs.m)
 
 ## Purpose
 
-Calculates a high-termperature estimate of the residual aniso- tropic chemcial shift from user-supplied CSA tensor and magne- tic susceptibility tensor. Syntax: racs=csa2racs(csa,chi,B,T)
+Computes a high-temperature estimate of the residual anisotropic chemical shift from supplied chemical-shift-anisotropy and magnetic-susceptibility tensors. The source identifies the expression with Equation (2) of [Otting et al.](https://doi.org/10.1021/ja0564259). This is a tensor calculation, not a pulse-transfer or MAS simulation.
 
-## Physical / mathematical content
+## Inputs
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- `csa` is a real numeric 3-by-3 chemical-shift tensor in ppm.
+- `chi` is a real numeric 3-by-3 magnetic-susceptibility tensor in cubic Angstroms.
+- `B` is a real scalar magnetic induction in Tesla.
+- `T` is a positive real scalar absolute temperature in Kelvin.
 
-## Numerical / algorithmic content
+The routine keeps the spherical-rank-2 component of each tensor, contracts them by a trace, and applies the field- and temperature-dependent factor. In the source this is `1e-30*(B^2/(15*mu_0*k_b*T))*trace(csa*chi)`, with `mu_0=4*pi*1e-7` and `k_b=1.38064852e-23`. The scalar field enters as `B^2`; no field-orientation or pulse-delay input appears in this signature.
 
-## Parameters / inputs
+## Output
 
-- csa -3x3 chemical shift tensor in ppm
-- chi -3x3 magnetic susceptibility tensor
-- in cubic Angstroms
-- T -absolute temperature in Kelvin
-- B -magnetic induction in Tesla
-
-## Outputs
-
-- racs -residual anisotropic chemical
-- shift in ppm
-- The function implements Equation (2) from the paper by Otting
-- and company: http://dx.doi.org/10.1021/ja0564259
-
-## Implementation structure
-
-- Calculates a high-termperature estimate of the residual aniso-
-- tropic chemcial shift from user-supplied CSA tensor and magne-
-- tic susceptibility tensor. Syntax:
-- racs=csa2racs(csa,chi,B,T)
-- csa -3x3 chemical shift tensor in ppm
-- chi -3x3 magnetic susceptibility tensor
-- in cubic Angstroms
-- T -absolute temperature in Kelvin
-- B -magnetic induction in Tesla
-- racs -residual anisotropic chemical
-- shift in ppm
-- The function implements Equation (2) from the paper by Otting
+- `racs` is the residual anisotropic chemical shift in ppm.

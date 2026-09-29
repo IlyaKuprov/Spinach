@@ -2,70 +2,26 @@
 
 - Signature: `A=operator(spin_system,operators,spins,operator_type,format)`
 
-## Purpose
+## Meaning
 
-Generates Hilbert space operators or Liouville space superoperators from their human-readable descriptions. Syntax: A=operator(spin_system,operators,spins,operator_type,format)
+Builds the requested spin operator or Liouville-space superoperator in the basis selected by `spin_system.bas.formalism`. The accepted specification forms are paired character strings (operator labels plus isotope/type), a character label plus a numeric row of spin indices, or paired cell arrays of labels and numeric spin indices. The first two forms sum the corresponding single-spin operators; paired cells specify a product. Source examples are `operators='Lz'; spins='13C'`, `operators='Lz'; spins=[1 2 4]`, and `operators={'Lz','L+'}; spins={1,2}`.
 
-## Physical / mathematical content
+Documented operator labels include `E`, `Lz`, `Lx`, `Ly`, `L+`, `L-`, `Tl,m`, and Zeeman-basis central-transition labels `CTx`, `CTy`, `CTz`, `CT+`, `CT-`. String spin selectors may be isotope names or `electrons`, `nuclei`, or `all`.
 
-## Numerical / algorithmic content
+## Basis and index construction
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The routine passes the request to `human2opspec`, then assembles each returned specification. In Zeeman formalisms it maps each per-spin linear specification through `lin2lm` to `L,M`, selects `irr_sph_ten(mults(k),L){L-M+1}` for that spin, and Kronecker-products the local matrices in specification order. In `zeeman-liouv` the resulting Hilbert operator is converted by `hilb2liouv`. In `sphten-liouv` it calls `superop` for each specification. The code uses a sum of the resulting terms with their returned coefficients.
 
-## Parameters / inputs
+For Liouville calculations the documented `operator_type` values are `left`, `right`, `comm` (default), and `acomm`. Hilbert formalisms ignore this option. A Liouville product request represents the superoperator of the full product operator, not a product of separately generated single-spin superoperators.
 
-- 1. If operators is a string and spins is a string
-- operators='Lz'; spins='13C';
-- the function returns the sum of the corresponding single-spin operators
-- (Hilbert space) or superoperators (Liouville space) on all spins of that
-- type. Valid labels for states in this type of call are 'E' (identity),
-- 'Lz', 'Lx', 'Ly', 'L+', 'L-', 'Tl,m' (irreducible spherical tensor, l
-- and m are integers), 'CTx', 'CTy', 'CTz', 'CT+', 'CT-' (central transi-
-- tion operators in the Zeeman basis). Valid labels for spins are standard
-- isotope names, as well as 'electrons', 'nuclei', and 'all'.
-- 2. If operators is a string and spins is a vector
-- operators='Lz'; spins=[1 2 4];
-- the function returns the sum of all single-spin operators (Hilbert space)
-- or superoperators (Liouville space) for all spins with the specified num-
-- bers. Valid labels for operators are the same as in Item 1 above.
-- 3. If operators is a cell array of strings and spins is a cell array of
-- numbers
-- operators={'Lz','L+'}; spins={1,2};
-- then a product operator (Hilbert space) or its superoperator (Liouville
-- space) is produced. In the case above, Spinach will generate LzS+ in Hil-
-- bert space or its specified superoperator in Liouville space. Valid la-
-- bels for operators are the same as in Item 1 above.
-- In Liouville space calculations, operator_type can be set to:
-- 'left' -produces left side product superoperator
-- 'right' -produces right side product superoperator
-- 'comm' -produces commutation superoperator (default)
-- 'acomm' -produces anticommutation superoperator
-- In Hilbert space calculations operator_type parameter is ignored, and the
-- operator itself is always returned.
-- The format parameter refers to the format of the output: 'csc' returns a
-- Matlab sparse matrix, 'xyz' returns a [rows, cols, vals] array.
+## Output and guards
 
-## Outputs
+- `format='csc'` (default) returns a sparse square matrix. Its dimension is the Spinach basis dimension in `sphten-liouv`, the product of spin multiplicities in Hilbert and wavefunction formalisms, or that Hilbert dimension squared in `zeeman-liouv`.
+- `format='xyz'` returns the nonzero entries as `[row,column,value]` triplets, with row and column indices from MATLAB `find`.
+- It requires basis information, nonempty spin selections, and unique positive integer spin indices; paired cell arrays must have matching lengths and character operator labels. The format must be `csc` or `xyz`. The local guard requires `operator_type` to be a character string; the downstream superoperator/conversion routines handle its meaning.
+- Caching is optional: `op_cache` in `spin_system.sys.enable` enables the cache path when its ValueStore is available.
 
-- A -a CSC sparse (default) or a [rows, cols, vals] repre-
-- sentation of a spin operator or superoperator.
-- Notes: WARNING -a product of two commutation superoperators is NOT a com-
-- mutation superoperator of a product. In Liouville space, you cannot
-- generate single-spin superoperators and multiply them up.
-- Note: operator caching is supported, add 'op_cache' to sys.enable array
-- to enable; make sure your scratch storage is fast.
+## References
 
-## Implementation structure
-
-- Generates Hilbert space operators or Liouville space superoperators from
-- their human-readable descriptions. Syntax:
-- A=operator(spin_system,operators,spins,operator_type,format)
-- 1. If operators is a string and spins is a string
-- operators='Lz'; spins='13C';
-- the function returns the sum of the corresponding single-spin operators
-- (Hilbert space) or superoperators (Liouville space) on all spins of that
-- type. Valid labels for states in this type of call are 'E' (identity),
-- 'Lz', 'Lx', 'Ly', 'L+', 'L-', 'Tl,m' (irreducible spherical tensor, l
-- and m are integers), 'CTx', 'CTy', 'CTz', 'CT+', 'CT-' (central transi-
-- tion operators in the Zeeman basis). Valid labels for spins are standard
-- isotope names, as well as 'electrons', 'nuclei', and 'all'.
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operator.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=operator.m)

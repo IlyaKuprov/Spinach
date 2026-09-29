@@ -1,32 +1,11 @@
 # examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m
 
-- Signature: `noesyhsqc_ubiquitin_prot()`
+- MATLAB implementation: [examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m)
 
-## Purpose
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m
 
-1H-1H-15N NOESY-HSQC spectrum of 15N-labelled ubiquitin at 900 MHz with 65 ms mixing time. It is assumed that the protein is not 13C-labelled. Calculation time: hours.
+This driver simulates a three-dimensional ¹H–¹H–¹⁵N NOESY-HSQC spectrum for ¹⁵N-labelled ubiquitin, assuming the protein is not ¹³C-labelled. Its comments specify a 900 MHz instrument and a 65 ms mixing time, and identify 1D3Z PDB and BMRB files as the molecular and shift inputs. Those files are simulation inputs, not an experimental spectrum supplied for comparison. The driver says the calculation takes hours.
 
-## Physical / mathematical content
+The protein import keeps all selected atoms and deletes unavailable shifts. The model uses Redfield relaxation, a 5e-9 correlation-time input, and a 90.0 coupling input. The magnetic-field parameter is 21.1356; the source does not state its unit. It also sets interaction and proximity cutoffs to 2.0 and 4.0. The 5e-9 correlation-time and 90.0 coupling inputs have no units stated in this driver. It removes ¹³C spins before building the basis. The sequence inputs include a 0.065 mixing-time value and a 90.0 J value, dimensions with 128, 64, and 128 acquired points and zero-fill to 512, 256, and 512 points, offsets [4250 -10600 4250], and sweeps [10750 3000 10750]. The axes are labelled in ppm; the source gives no separate units for the J, offset, or sweep values. The code does not specify the sequence's RF pulse shapes or durations in this driver: it delegates the experiment to the NOESY-HSQC sequence routine.
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H-1H-15N NOESY-HSQC spectrum of 15N-labelled ubiquitin at 900
-- MHz with 65 ms mixing time. It is assumed that the protein is
-- not 13C-labelled.
-- Calculation time: hours.
-- Protein data import
-- Magnet field
-- Tolerances
-- Relaxation theory
-- Basis set
-- Algorithmic options
-- Create the spin system structure
-- Kill carbons
+The simulation returns four sign-labelled signal components. The driver applies squared-cosine apodisation, Fourier transforms each component along the indirect ¹H dimension, combines them into absorption-mode signals, then transforms along the second ¹H and ¹⁵N dimensions. The plotted result is the negative real part of the resulting spectrum, rendered as positive contours by the 3D plotting call. The source labels the components by signs but does not name their coherence orders; no more specific coherence assignment is made here.

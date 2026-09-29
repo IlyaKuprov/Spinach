@@ -1,37 +1,30 @@
 # kernel/conventions/transforms/g2freq.m
 
-- Signature: `f=g2freq(g,B)`
-
 ## Purpose
 
-Converts g-tensor units into electron Zeeman frequency units. Syntax: f=g2freq(g,B)
+Converts g-values and a scalar magnetic field to electron Zeeman frequency values.
 
-## Physical / mathematical content
+## Signature
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+`f=g2freq(g,B)`
 
-## Numerical / algorithmic content
+## Conversion
 
-## Parameters / inputs
+The source first evaluates `omega = B*spin('E')/(2*pi)`, then `f = g .* omega / 2.0023193043622`. Equivalently:
 
-- g -g-values, scalar or array
-- B -magnetic field in Tesla
+`f = g .* (B*spin('E')/(2*pi)) / 2.0023193043622`
 
-## Outputs
+The source documents `B` in tesla and `f` in Hz. The denominator is the source's free-electron g-factor constant, `2.0023193043622`.
 
-- f -frequency in Hz
+## Inputs and output
 
-## Implementation structure
+- `g`: finite, real numeric array; no positivity or orientation constraint is applied.
+- `B`: finite real numeric scalar in tesla.
+- `f`: frequency array in Hz, with the same dimensions as `g`.
 
-- Converts g-tensor units into electron Zeeman frequency
-- units. Syntax:
-- f=g2freq(g,B)
-- g - g-values, scalar or array
-- B - magnetic field in Tesla
-- f - frequency in Hz
-- Check consistency
-- Get the free electron carrier frequency
-- Scale the frequency
-- Consistency enforcement
-- "Authors are listed in order of degree of belief in
-- the central thesis."
+Only a scalar field is accepted; the function does not take an orientation or apply a tensor rotation. The frequency scale uses `spin('E')` as shown in the source.
+
+## References
+
+- MATLAB source: [kernel/conventions/transforms/g2freq.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/g2freq.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=g2freq.m)

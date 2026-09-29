@@ -1,32 +1,26 @@
 # kernel/conventions/transforms/hz2icm.m
 
-- Signature: `icm=hz2icm(hz)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/hz2icm.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=hz2icm.m)
 
-## Purpose
+## Signature
 
-Converts Hz units used in magnetic resonance into cm^-1 units used in spectroscopy. Syntax: icm=hz2icm(hz) Arrays of any dimensions are supported. Parameters: hz -an array of values in Hz
+`icm = hz2icm(hz)`
 
-## Physical / mathematical content
+## Purpose and conversion
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Converts frequency values used in magnetic resonance to spectroscopic wavenumbers using the implemented equation:
 
-## Numerical / algorithmic content
+`icm = hz / (100 * 299792458)`
 
-## Outputs
+Input `hz` is in Hz; output `icm` is in inverse centimetres (cm^-1). The denominator uses 100 centimetres per metre and the speed-of-light value 299792458 used in the source. Division by this positive constant preserves the sign of the input.
 
-- icm -an array of values in inverse centimetres
+## Inputs and output
 
-## Implementation structure
+- `hz`: real numeric array; arrays of any dimensionality are documented as supported.
+- `icm`: converted array in cm^-1, retaining the input array dimensions.
 
-- Converts Hz units used in magnetic resonance into cm^-1 units
-- used in spectroscopy. Syntax:
-- icm=hz2icm(hz)
-- Arrays of any dimensions are supported. Parameters:
-- hz -an array of values in Hz
-- icm -an array of values in inverse centimetres
-- Check consistency
-- Run the conversion
-- Consistency enforcement
-- "Damn, would I have to be nice to everyone for two years?!"
-- IK, upon being informed that he was to
-- organise the 48th ESR Group Conference
+The implementation rejects nonnumeric or nonreal input and imposes no explicit size check.
+
+## Reference
+
+- [Spinach Wiki: hz2icm.m](https://spindynamics.org/wiki/index.php?title=hz2icm.m)

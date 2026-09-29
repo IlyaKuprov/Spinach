@@ -1,65 +1,35 @@
 # kernel/trajan.m
 
-- Signature: `trajan(spin_system,traj,property,time_axis)`
+**Source:** <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/trajan.m>
 
 ## Purpose
 
-Trajectory analysis function. Plots the time dependence of the densi- ty matrix norm, partitioned into user-specified property classes. See for further information. Syntax: trajan(spin_system,traj,property,time_axis)
+Trajectory analysis function. Plots the time dependence of the density matrix norm, partitioned into user-specified property classes. The trajectory would usually come out of an `evolution.m` run from a given starting point under a given Liouvillian.
 
-## Physical / mathematical content
+## Interpretation of plotted trajectories
 
-## Numerical / algorithmic content
+For `sphten-liouv` state-vector columns, the unit-state component is removed before analysing correlation or coherence content; `level_populations` is the exception. The non-population plots show norms of selected coefficient subspaces, not a time-resolved probability distribution.
 
-## Parameters / inputs
+- `correlation_order` groups basis states by the number of spins carrying a nontrivial factor; `coherence_order` groups them by the sum of spherical-tensor projection quantum numbers. Each trace is the norm of the corresponding coefficient subspace.
+- `total_each_spin` includes every state involving that spin, including correlations with other spins. `local_each_spin` retains only states local to that spin. Because total-spin groups can overlap, their plotted norms should not be summed as disjoint populations.
+- `level_populations` transforms to the Zeeman representation, divides by the product of spin multiplicities and plots the real diagonal of each density matrix; the unit-state contribution is retained.
 
-- traj -a stack of state vectors of any length. The
-- number of rows in the trajectory array must
-- match the number of states in the basis.
-- property -if set to 'correlation_order', returns the
-- time dependence of the total populations of
-- one-spin, two-spin, three-spin, etc. corre-
-- lations in the system.
-- if set to 'coherence_order', returns the ti-
-- me dependence of different orders of coheren-
-- ce in the system, where a coherence order is
-- defined as the sum of projection quantum num-
-- bers in the spherical tensor representation
-- of each state.
-- if set to 'total_each_spin', returns the ti-
-- me dependence of total state space populati-
-- on that involves each individual spin in the
-- system in any way (all local populations and
-- coherences of the spin as well as all of its
-- correlations to all third party spins).
-- if set to 'local_each_spin', returns the ti-
-- me dependence of the population of the sub-
-- space of states that are local to each indi-
-- vidual spin and do not involve any correla-
-- tions to other spins in the system.
-- if set to 'level_populations', returns the
-- populations of the Zeeman energy levels.
-- time_axis -(optional) user specified time axis, a row
-- vector of time positions of each state vec-
-- tor inthe trajectory array.
-- The trajectory would usually come out of the evolution.m run from a
-- given starting point under a given Liouvillian.
-- Output:
-- this function writes into the current figure
-- Note: this function is only applicable to the trajectories recorded
-- in sphten-liouv formalism.
-- Note: unit state population is ignored.
+The optional `time_axis` locates the trajectory columns on the plot. The function writes to the current figure and returns no numerical array.
 
-## Implementation structure
+## Inputs and outputs
 
-- Trajectory analysis function. Plots the time dependence of the densi-
-- ty matrix norm, partitioned into user-specified property classes. See
-- for further information. Syntax:
-- trajan(spin_system,traj,property,time_axis)
-- traj -a stack of state vectors of any length. The
-- number of rows in the trajectory array must
-- match the number of states in the basis.
-- property -if set to 'correlation_order', returns the
-- time dependence of the total populations of
-- one-spin, two-spin, three-spin, etc. corre-
-- lations in the system.
-- if set to 'coherence_order', returns the ti-
+**Inputs**
+
+- `spin_system` — spin system object; its basis must be in `sphten-liouv` formalism.
+- `traj` — a stack of state vectors of any length; the number of rows must match the number of states in the basis.
+- `property` — one of `correlation_order`, `coherence_order`, `total_each_spin`, `local_each_spin`, `level_populations`.
+- `time_axis` — optional user-specified time axis; a row vector of time positions of each state vector in the trajectory array.
+
+**Outputs**
+
+- This function writes into the current figure; no variables are returned.
+
+## References
+
+- Article behind the method: <http://dx.doi.org/10.1016/j.jmr.2013.02.012>
+- Spinach Wiki page: <https://spindynamics.org/wiki/index.php?title=trajan.m>

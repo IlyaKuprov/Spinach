@@ -1,30 +1,15 @@
 # examples/nmr_diffusion/diffusion_test_2a.m
 
-- Signature: `diffusion_test_2a()`
+Source: [examples/nmr_diffusion/diffusion_test_2a.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_diffusion/diffusion_test_2a.m)
 
-## Purpose
+## Model
 
-A standard diffusion equation solver with no spin dynamics present. Isotropic diffusion. Calculation time: minutes.
+A two-dimensional diffusion-equation example without spin dynamics. It loads `R1` from `phantom_a.mat`, then uses `R1(:)` as the initial field. The source does not define the physical meaning or units of that loaded array. The spin setup uses ghost isotope `G`, zero magnet field, empty Zeeman and coupling matrices, and the `sphten-liouv` basis with no approximation. Both flow components are zero; the derivative setting is `{'period',7}`.
 
-## Physical / mathematical content
+## Geometry and transport
 
-- Diffusion examples. The dominant mathematics is diffusion or advection-diffusion PDE propagation, sometimes with additional spin phase accumulation under gradients.
+The rectangular sample is `[0.02 0.02] m` on a `[108 90]` grid. The diffusion tensor is spatially uniform and isotropic: `dxx = dyy = 5e-5`, with `dxy = dyx = 0`. The source does not state the diffusion-coefficient unit; metre coordinates and second-based propagation imply m^2/s.
 
-## Numerical / algorithmic content
+## Propagation and observable
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- A standard diffusion equation solver with no spin
-- dynamics present. Isotropic diffusion.
-- Calculation time: minutes.
-- Load the phantom
-- Ghost spin
-- No spin interactions
-- Basis set
-- Spinach housekeeping
-- Sample geometry
-- 2D flow parameters
-- 2D diffusion tensor field
-- Diffusion and flow generator
+The generator is built with `v2fplanck(spin_system,parameters)` and `inflate`. `evolution` records `200` steps of `5e-4 s` from `R1(:)` (a total modeled interval of `0.1 s`). Each trajectory column is reshaped to `108 x 90` and displayed with `imagesc`. The source labels the calculation time as minutes.

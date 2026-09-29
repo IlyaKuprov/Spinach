@@ -1,39 +1,36 @@
 # kernel/utilities/phan2fpl.m
 
-- Signature: `rho=phan2fpl(phan,rho)`
-
 ## Purpose
 
-Projects a spatial intensity distribution into the Fokker-Planck space, using it as the image painted by the the spin state supp- lied. Syntax: rho=phan2fpl(phan,rho)
+Projects a spatial intensity distribution (a phantom) into Fokker–Planck space, using the phantom as the image painted by the supplied spin state. The function is documented as part of the Spinach library and referenced from the Spin Dynamics Wiki.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- The function first validates its inputs via an internal consistency check (`grumble`).
+- The phantom array is stretched into a column vector with `phan(:)` and combined with the spin state vector using the Kronecker product: `rho = kron(phan(:), rho)`.
+- The result is a Fokker–Planck space state vector in which each spatial voxel of the phantom is paired with the corresponding spin state.
+- Validation rules enforced by `grumble`:
+  - `rho` must be numeric and a column vector (`size(rho,2) == 1`), otherwise an error is raised.
+  - `phan` must be numeric, real, and 1D, 2D, or 3D (`ndims` in `[1 2 3]`), otherwise an error is raised.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Syntax:
 
-- phan -phantom (the spatial distribution of the
-- amplitude of the specified spin state)
-- rho -Liouville space state vector
+```matlab
+rho = phan2fpl(phan, rho)
+```
 
-## Outputs
+Inputs:
 
-- rho -Fokker-Planck state vector
+- `phan` — phantom; the spatial distribution of the amplitude of the specified spin state. Must be a real numeric 1D, 2D, or 3D array.
+- `rho` — Liouville space state vector. Must be a numeric column vector.
 
-## Implementation structure
+Outputs:
 
-- Projects a spatial intensity distribution into the Fokker-Planck
-- space, using it as the image painted by the the spin state supp-
-- lied. Syntax:
-- rho=phan2fpl(phan,rho)
-- phan -phantom (the spatial distribution of the
-- amplitude of the specified spin state)
-- rho -Liouville space state vector
-- rho -Fokker-Planck state vector
-- Check consistency
-- Stretch the phantom and kron it with the spin state
-- Consistency enforcement
-- Q: "How many members of a certain demographic group does
+- `rho` — Fokker–Planck state vector.
+
+## References
+
+- Spin Dynamics Wiki page for `phan2fpl.m`: <https://spindynamics.org/wiki/index.php?title=phan2fpl.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/phan2fpl.m>

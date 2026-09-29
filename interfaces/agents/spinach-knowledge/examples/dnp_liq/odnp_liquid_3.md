@@ -1,32 +1,25 @@
 # examples/dnp_liq/odnp_liquid_3.m
 
+- MATLAB implementation: [examples/dnp_liq/odnp_liquid_3.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/odnp_liquid_3.m)
+
 - Signature: `odnp_liquid_3()`
+- Calculation time: minutes
+- [MATLAB source](../../../../../examples/dnp_liq/odnp_liquid_3.m)
 
 ## Purpose
 
-Steady state nuclear magnetisation as a function of microwave frequency offset and the magnet field in a DNP experiment with an electron and a nucleus connected by a hyperfine coupling. A g-hyperfine cross-correla- tion effect is visible at high field. The steady state is computed by setting the time derivative to zero in the inhomogeneous master equation, and solving the resulting algebraic equation for the steady s
+Maps the steady-state proton longitudinal signal against microwave-frequency offset and magnetic field for a liquid-phase electron–nucleus DNP model. The example is constructed to show a high-field g–hyperfine cross-correlation effect. Rather than propagating a transient, it sets the time derivative of the inhomogeneous master equation to zero and solves for the steady-state density matrix.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The spins are one proton and one electron. The proton Zeeman eigenvalues are [15, 5, −20] ppm; the electron values are [2.00210, 2.00250, 2.00290] as dimensionless g factors. Their Euler angles are [0, 0, 0] and [pi/3, pi/4, pi/5], respectively. The isotropic hyperfine coupling is 20e6 Hz. The coordinates are (0, 0, 0) and (0, 0, 3.0) Angstrom for the proton and electron.
 
-## Numerical / algorithmic content
+The basis is `sphten-liouv` with no approximation. Redfield relaxation uses zero equilibrium (required by this steady-state calculation), secular retention, temperature 298, and a 10 ps correlation time (identified in the source as TEMPOL in water). The relaxation-integration tolerance is set to `1e-10`, which the source marks as necessary for this calculation.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Field and microwave scan
 
-## Implementation structure
+The field grid is `linspace(1,10,64)` Tesla. At each field, a `parfor` iteration sets the local system magnet, creates the spin system and basis, and constructs the proton `Lz` coil and electron `Lx` microwave and `Lz` offset operators. The ESR-context calculation is `liquid(spin_system,@dnp_freq_scan,locpar,'esr')`. Its parameters use the electron spin, `method='lvn-backs'`, `needs={'rho_eq'}`, and `g_ref=mean(inter.zeeman.eigs{2})`; microwave power is `2*pi*500e3`. The offset vector is `2*pi*linspace(-15,15,512)*1e6`, spanning −15 to +15 MHz in the plot's frequency-offset units.
 
-- Steady state nuclear magnetisation as a function of microwave frequency
-- offset and the magnet field in a DNP experiment with an electron and a
-- nucleus connected by a hyperfine coupling. A g-hyperfine cross-correla-
-- tion effect is visible at high field.
-- The steady state is computed by setting the time derivative to zero in
-- the inhomogeneous master equation, and solving the resulting algebraic
-- equation for the steady state density matrix.
-- Calculation time: minutes.
-- Spin system
-- Anisotropic Zeeman interactions
-- Isotropic hyperfine coupling
-- Coordinates for dipolar coupling
+## Output and scope
+
+The result is a 512-by-64 array. The image plot displays its real part versus field and microwave-frequency offset; the colour bar is the steady-state proton longitudinal signal, labelled as `<H_Z>`. This is a steady-state scan over the specified single-spin-pair model and field/frequency grids; the source does not present a time-domain trajectory.

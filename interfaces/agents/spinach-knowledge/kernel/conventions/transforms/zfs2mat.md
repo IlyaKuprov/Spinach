@@ -1,39 +1,22 @@
 # kernel/conventions/transforms/zfs2mat.m
 
+Source: [kernel/conventions/transforms/zfs2mat.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/zfs2mat.m)
+Wiki: [Spin Dynamics Wiki: zfs2mat.m](https://spindynamics.org/wiki/index.php?title=zfs2mat.m)
+
 - Signature: `M=zfs2mat(D,E,alp,bet,gam)`
 
-## Purpose
+## Purpose and tensor convention
 
-Converts D and E zero-field splitting parameters described in the abstract of (http://dx.doi.org/10.1063/1.1682294) into a spin interaction matrix. Syntax: M=zfs2mat(D,E,alp,bet,gam)
+Converts the zero-field-splitting parameters `D` and `E` into the symmetric spin-interaction matrix used by Spinach. In the tensor eigenframe the source first forms the diagonal matrix with entries `-D/3+E`, `-D/3-E`, and `2*D/3`. It computes the direction-cosine matrix `R=euler2dcm(alp,bet,gam)` and rotates the tensor as `M=R*M*R'`. It then removes any residual trace and symmetrises the result. The trace correction and symmetrisation are explicit numerical clean-up steps; the function does not solve an eigenproblem or compute a numerical derivative.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+- `D`, `E` — real numeric scalar zero-field-splitting parameters in Hz.
+- `alp`, `bet`, `gam` — real numeric scalar Euler angles in radians.
+- `M` — symmetric `3x3` interaction matrix in Hz.
 
-## Numerical / algorithmic content
+The implementation's `grumble` guard rejects any input that is not a real numeric scalar, with the message “all inputs must be real scalars.” There are no other input-dependent branches in this routine.
 
-## Parameters / inputs
+## Reference
 
-- D,E -real scalar parameters, Hz
-- alp -alpha Euler angle in radians
-- bet -beta Euler angle in radians
-- gam -gamma Euler angle in radians
-
-## Outputs
-
-- M -symmetric 3x3 matrix, Hz
-
-## Implementation structure
-
-- Converts D and E zero-field splitting parameters described in
-- the abstract of (http://dx.doi.org/10.1063/1.1682294) into a
-- spin interaction matrix. Syntax:
-- M=zfs2mat(D,E,alp,bet,gam)
-- D,E -real scalar parameters, Hz
-- alp -alpha Euler angle in radians
-- bet -beta Euler angle in radians
-- gam -gamma Euler angle in radians
-- M -symmetric 3x3 matrix, Hz
-- Check consistency
-- Compute the matrix in the eigenframe
-- Rotate the molecule
+The source cites the zero-field-splitting convention in the abstract of [doi:10.1063/1.1682294](http://dx.doi.org/10.1063/1.1682294). The source and Wiki describe the operation but provide no worked numerical example; none is added here.

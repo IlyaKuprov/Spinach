@@ -1,32 +1,13 @@
 # examples/relaxation_theory/quad_relaxation_1.m
 
-- Signature: `quad_relaxation_1()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/quad_relaxation_1.m) · Signature: `quad_relaxation_1()`
 
-## Purpose
+## Purpose and physical model
 
-14N quadrupolar relaxation in glycine in liquid state. The numerical output of Spinach is compared to the analytical equation from the textbook. Calculation time: seconds
+This liquid-state glycine example evaluates longitudinal and transverse relaxation rates for `14N` under quadrupolar relaxation, then compares Spinach's numerical rates with textbook analytical expressions. The source specifies a single `14N` spin and sets the magnet to 14.1. It obtains the spin quantum number from the isotope, forms the quadrupolar-interaction tensor with `eeqq2nqi` using coupling input 1.18e6 and asymmetry 0.53, and uses a correlation-time input of 1e-9. The source does not state units alongside those three parameter values.
 
-## Physical / mathematical content
+## Calculation and output
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The relaxation model is Redfield with zero equilibrium and lab-frame retention. The basis uses `sphten-liouv` with no approximation. The script builds the relaxation superoperator, evaluates the textbook rates with `rlx_nqi` using the same spin, magnet, quadrupole-coupling, asymmetry, and correlation-time inputs, and forms normalised `Lz` and `L+` states using the 2-norm.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- 14N quadrupolar relaxation in glycine in liquid state. The
-- numerical output of Spinach is compared to the analytical
-- equation from the textbook.
-- Calculation time: seconds
-- System specification
-- Spin quantum number and quadrupolar tensor
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
-- Textbook relaxation rate expressions
-- States of interest
+It prints four values: longitudinal and transverse rates from the Spinach superoperator, followed by the corresponding textbook rates. The code does not include numerical output values in the source, so none are asserted here. This is a calculated comparison against analytical equations, not comparison with a measured relaxation experiment; the script prints values and does not create a plot.

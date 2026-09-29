@@ -1,39 +1,27 @@
 # tests/kernel/test_dynamic_propagation_frontends.m
 
-- Signature: `result=test_dynamic_propagation_frontends()`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_propagation_frontends.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_propagation_frontends.m)
 
 ## Purpose
 
-Tests dynamic propagation front-end kernels on tiny systems. Syntax: result=test_dynamic_propagation_frontends()
+Regression test for the dynamic propagation front-end kernels of Spinach. The test exercises `propagator()`, `step()`, `evolution()`, `krylov()`, and `reduce()` against direct finite-dimensional propagation references on tiny spin systems.
 
-## Physical / mathematical content
+## What the suite checks
 
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `propagator` and `step` must agree with direct small-matrix propagation, including the Taylor, numeric Liouville, time-independent and function-handle routes. A zero-duration step preserves the state; the Hilbert density-matrix route matches its commutator reference.
+- `evolution` and `krylov` must match explicitly propagated references across their final-state, full-trajectory, single- and multichannel observable, refocusing and total-output modes. These checks guard output meaning and shape as well as numerical agreement on the test systems.
+- `reduce` must return orthonormal projectors whose retained subspaces reconstruct the input state; with trajectory-level reduction disabled it returns the identity projector. The suite compares against direct finite-dimensional references, not a full-scale performance run.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+```matlab
+result = test_dynamic_propagation_frontends()
+```
 
-## Outputs
+- **Output:** `result` — regression test result structure with explanatory messages for each checked branch.
+- **Input:** none.
 
-- result -regression test result with explanatory messages
-- The test exercises propagator(), step(), evolution(), krylov(), and
-- reduce() against direct finite-dimensional propagation references.
+## References
 
-## Implementation structure
-
-- Tests dynamic propagation front-end kernels on tiny systems. Syntax:
-- result=test_dynamic_propagation_frontends()
-- result -regression test result with explanatory messages
-- The test exercises propagator(), step(), evolution(), krylov(), and
-- reduce() against direct finite-dimensional propagation references.
-- Announce the test target
-- State the dynamic propagation target of the test
-- Check scaled Taylor propagator and step() branches
-- Check evolution() output modes against explicit propagator products
-- Check direct krylov() output modes against step() references
-- Check reduce() projector invariants and blanket-disable branch
-- Build a one-spin Liouville-space system and force Taylor propagation
+- Spinach dynamic propagation kernels: `propagator()`, `step()`, `evolution()`, `krylov()`, `reduce()`.
+- [Spinach GitHub repository](https://github.com/IlyaKuprov/Spinach)

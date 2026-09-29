@@ -2,31 +2,11 @@
 
 - Signature: `answer=ismatrix(tt)`
 
-## Purpose
+## Purpose and behaviour
 
-Returns TRUE for non-empty tensor train objects. Syntax: answer=ismatrix(tt)
+Returns logical true exactly when `tt` is a `ttclass` object and its `cores` property is non-empty; otherwise it returns logical false. The predicate checks the stored TT core-cell container only; it is not a test or description of a polyadic-object representation. It does not inspect core contents, validate TT ranks, or determine whether a general MATLAB array has exactly two dimensions, so read the result as this overload's storage predicate rather than a general shape validation.
 
-## Physical / mathematical content
+## Sources
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- tt -tensor train object
-
-## Outputs
-
-- answer -logical true for non-empty tensor train objects
-
-## Implementation structure
-
-- Returns TRUE for non-empty tensor train objects. Syntax:
-- answer=ismatrix(tt)
-- tt -tensor train object
-- answer -logical true for non-empty tensor train objects
-- Non-empty tensor trains should return true()
-- The stronger the house, the greater the immigration.
-- The Law of Three Little Pigs
-- #NGRUM
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/ismatrix.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/ismatrix.m)

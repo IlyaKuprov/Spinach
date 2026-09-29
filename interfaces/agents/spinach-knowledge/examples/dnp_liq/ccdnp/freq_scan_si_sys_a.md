@@ -1,32 +1,11 @@
 # examples/dnp_liq/ccdnp/freq_scan_si_sys_a.m
 
-- Signature: `freq_scan_si_sys_a()`
+- MATLAB implementation: [examples/dnp_liq/ccdnp/freq_scan_si_sys_a.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/ccdnp/freq_scan_si_sys_a.m)
 
-## Purpose
+freq_scan_si_sys_a() computes the same type of steady-state proton DNP frequency-versus-field map as the main-text example, using the SI system-A parameter set. The source describes two exchange-coupled electrons dipolar-coupled to a nucleus and cites [J. Magn. Reson. 2021, 106940](https://doi.org/10.1016/j.jmr.2021.106940). It requires MATLAB, Spinach, the dnp_freq_scan callback on the path, and Parallel Computing Toolbox for the field-grid parfor; no external data file is read.
 
-Steady state nuclear magnetisation as a function of microwave frequency offset and the magnet field in a DNP experiment with two electrons con- nected by exchange coupling, both coupled to a nucleus by dipolar coup- lings. Further particulars in: Calculation time: seconds
+The three spins are 1H, E, E. Proton Zeeman eigenvalues are [0 10 20]; the electron g eigenvalues are [1.977873 1.977798 1.977792] and [1.977919 1.978000 1.978000], with Euler triples [0 0 0] and [-0.59 -0.10 0.49]. Scalar electron exchange is 6.2e6. The coordinates are [0 0 0], [7.03 0.0187 0.9820], and [-7.03 0.2051 -1.0001], supplied for anisotropic hyperfine interactions. The source gives no units for these values, so none are assigned here.
 
-## Physical / mathematical content
+The model uses sphten-liouv with no approximation and Redfield relaxation with zero equilibrium, secular retention, temperature 298, correlation time 100e-12 (commented as TEMPOL in water), and relaxation-integration tolerance 1e-10. Electron irradiation uses mw_pwr=2*pi*1e6, method lvn-backs, and needs={'rho_eq'}; the reference g value is the mean of electron 1's g eigenvalues. The offset grid is 2*pi*linspace(-10,30,512)*1e6, wider than the main-text example's range; the field grid is linspace(1,20,128) Tesla. Each field's frequency trace is computed via liquid(...,@dnp_freq_scan,...,'esr') and normalised by coil'*rho_eq.
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Steady state nuclear magnetisation as a function of microwave frequency
-- offset and the magnet field in a DNP experiment with two electrons con-
-- nected by exchange coupling, both coupled to a nucleus by dipolar coup-
-- lings. Further particulars in:
-- Calculation time: seconds
-- Spin system
-- Zeeman interactions
-- Exchange coupling
-- Coordinates for anisotropic HF
-- Basis set
-- Disable start-up checks
-- Relaxation theory
+The figure plots the real normalised response against field and microwave-frequency offset, converted to MHz relative to the isotropic electron-1 g reference. No data array is written. Unlike the main-text parameterisation, this SI file sets the electron g tensors near 1.978, exchange to 6.2e6, and scans offsets from -10 to 30 MHz; use this file when the system-A parameter set, rather than the main-text set, is intended. The source's “Calculation time: seconds” is an estimate, not a reproduced runtime.

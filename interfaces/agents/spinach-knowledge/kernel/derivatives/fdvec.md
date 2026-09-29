@@ -1,41 +1,31 @@
 # kernel/derivatives/fdvec.m
 
-- Signature: `dx=fdvec(x,npoints,order)`
+Direct source: [kernel/derivatives/fdvec.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fdvec.m)
+Spin Dynamics Wiki: [fdvec.m](https://spindynamics.org/wiki/index.php?title=fdvec.m)
 
-## Purpose
+## Purpose and interface
 
-Performs arbitrary-order finite-difference differentiation of a user-supplied row or column vector. Uses central finite-differe- nce stencils in the middle and sided stencils of the same order of accuracy on the sides. Syntax: dx=fdvec(x,npoints,order)
+dx=fdvec(x,npoints,order) differentiates a numeric row or column vector with a finite-difference stencil and returns derivative estimates in the same shape as x. The function first sizes dx from the input shape, then reshapes a working copy of x to a column for the calculation; this is why row input still produces row output.
 
-## Physical / mathematical content
+- x must be a numeric vector with at least three elements.
+- npoints is the positive odd stencil size.
+- order is a positive integer smaller than npoints.
 
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
+## Stencils and coordinate units
 
-## Numerical / algorithmic content
+For each element near the left edge, fdweights supplies weights evaluated at that element's position among the first npoints samples. The opposite edge uses the reversed weights multiplied by (-1)^order. Between these edges, a centred stencil uses offsets from -(npoints-1)/2 through (npoints-1)/2.
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+fdvec has no sample-spacing input: the positions passed to fdweights are integer sample indices, so the returned derivative is with respect to that unit-spaced index. It does not impose periodic boundary conditions; the end points are evaluated with sided stencils. For non-unit physical spacing, the caller must account for the corresponding coordinate scaling.
 
-## Parameters / inputs
+## Input guards and example
 
-- x -column or row vector to be differentiated
-- npoints -number of points in the finite difference
-- stencil
-- order -order of the derivative required
+The source checks that x is numeric and a vector, that its element count is at least three, that npoints is a positive odd integer, and that order is positive and below npoints. The error text for the length check says “more than three elements,” while the actual predicate rejects only lengths below three; a three-element vector passes that guard. The implementation does not separately check that npoints is no greater than numel(x).
 
-## Outputs
+    x=[0 1 4 9 16];
+    dx=fdvec(x,3,1);
 
-- dx -column or row vector with the derivative
+The call requests a first derivative from five samples using three points per stencil; the output has the same row shape as x.
 
-## Implementation structure
+## Related routine
 
-- Performs arbitrary-order finite-difference differentiation of a
-- user-supplied row or column vector. Uses central finite-differe-
-- nce stencils in the middle and sided stencils of the same order
-- of accuracy on the sides. Syntax:
-- dx=fdvec(x,npoints,order)
-- x -column or row vector to be differentiated
-- npoints -number of points in the finite difference
-- stencil
-- order -order of the derivative required
-- dx -column or row vector with the derivative
-- Check consistency
-- Preallocate the answer
+- [fdweights.m](fdweights.md) computes the coefficients for each stencil.

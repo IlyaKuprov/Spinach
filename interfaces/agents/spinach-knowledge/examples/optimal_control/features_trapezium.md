@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is Z-magneti- sation on 19F. There are six control channels. The waveform is treated as piecewise-linear using derivatives of a Lie group product quadrature, as described in: Calculation time: minutes.
+This example configures a piecewise-linear optimal-control pulse for transfer from proton `Lz` to fluorine `Lz` in a three-spin H–C–F system. The source describes the waveform treatment as derivatives of a Lie-group product quadrature and cites [doi:10.1016/j.jmr.2023.107478](https://doi.org/10.1016/j.jmr.2023.107478).
 
-## Physical / mathematical content
+## Spin model and transfer
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The model contains `1H`, `13C` and `19F` at 9.4 T. All chemical shifts are 0.0 ppm; the H–C and C–F scalar couplings are 140 Hz and −160 Hz. The basis is `sphten-liouv` with approximation `none`. Normalised `Lz` states on spins 1 and 3 form the initial and target states.
 
-## Numerical / algorithmic content
+## Piecewise-linear control design
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The six controls are `Lx` and `Ly` on each isotope, with channel map `[1;1;2;2;3;3]`. Five configured power levels run from 0.8 × 10³ × 2π to 1.2 × 10³ × 2π rad/s. The time grid has 50 slices of 0.2 ms (10 ms total), represented by 51 control values at slice endpoints. The code sets `integrator='trapezium'`, `method='lbfgs'`, `max_iter=100`, and an `SNS` penalty of weight 100. It passes a random `6 x 51` guess to `fmaxnewton(spin_system,@grape_xy,guess)` and rescales the returned waveform by the mean configured power level.
 
-## Implementation structure
+For the follow-up simulation, each slice uses generators formed from the left, midpoint and right endpoint controls, then advances the state with `step`. The script computes and reports the real initial-to-target overlap. The iteration limit and requested report do not establish convergence or provide a measured fidelity in this source.
 
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is Z-magneti-
-- sation on 19F. There are six control channels.
-- The waveform is treated as piecewise-linear using derivatives of a Lie
-- group product quadrature, as described in:
-- Calculation time: minutes.
-- Magnetic field
-- Spin system
-- Chemical shifts, ppm
-- Scalar couplings, Hz (literature values)
-- Basis set
+Source: [examples/optimal_control/features_trapezium.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_trapezium.m).

@@ -1,43 +1,29 @@
 # kernel/conventions/transforms/euler2qter.m
 
-- Signature: `q=euler2qter(arg1,arg2,arg3)`
+**MATLAB source:** [kernel/conventions/transforms/euler2qter.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/euler2qter.m)
+**Spinach Wiki:** [euler2qter.m](https://spindynamics.org/wiki/index.php?title=euler2qter.m)
 
-## Purpose
+## Purpose and convention
 
-Converts Euler angles (ZYZ active convention) into a unit quaternion in the active convention, matching euler2dcm.m function. Syntax: q=euler2qter(alpha,beta,gamma) OR q=euler2qter([alpha beta gamma])
+Converts ZYZ active Euler angles, in radians, to the unit quaternion representing the same active rotation as [euler2dcm.m](euler2dcm.md). The quaternion can be converted to that direction-cosine matrix with [qter2dcm.m](qter2dcm.md).
 
-## Physical / mathematical content
+## Inputs
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Signature: `q=euler2qter(arg1,arg2,arg3)`
 
-## Numerical / algorithmic content
+The function accepts either one argument, interpreted by indexing its first three elements as `[alpha beta gamma]`, or three separate arguments `alpha`, `beta`, and `gamma`. In the three-argument form each value must be numeric, real, and a column (a scalar is also accepted); the three inputs must have equal element counts. The one-argument branch does not validate vector shape or length before indexing: fewer than three elements fail during indexing, and elements after the first three are unused. No finite-value check is applied to the angles.
 
-## Parameters / inputs
+Angles are in radians and use the ZYZ active convention.
 
-- alpha,beta,gamma -Euler angles in radians (ZYZ active
-- convention), scalars or column vec-
-- tors of equal length
+## Output and conversion
 
-## Outputs
+Returns a structure with fields `q.u`, `q.i`, `q.j`, and `q.k`. For vector-valued three-argument inputs, each field is a column vector; scalar inputs produce scalar fields.
 
-- q -structure with four fields q.u, q.i, q.j, q.k giving
-- the four components of the quaternion; for column
-- vector inputs each field is a column vector
-- Note: the quaternion returned represents the same rotation
-- as euler2dcm(alpha,beta,gamma); it is converted into
-- that matrix by qter2dcm.m function.
+The source computes:
 
-## Implementation structure
+- `q.u = cos(beta/2) * cos((alpha+gamma)/2)`
+- `q.i = sin(beta/2) * sin((gamma-alpha)/2)`
+- `q.j = sin(beta/2) * cos((gamma-alpha)/2)`
+- `q.k = cos(beta/2) * sin((alpha+gamma)/2)`
 
-- Converts Euler angles (ZYZ active convention) into a unit
-- quaternion in the active convention, matching euler2dcm.m
-- function. Syntax:
-- q=euler2qter(alpha,beta,gamma)
-- q=euler2qter([alpha beta gamma])
-- alpha,beta,gamma -Euler angles in radians (ZYZ active
-- convention), scalars or column vec-
-- tors of equal length
-- q -structure with four fields q.u, q.i, q.j, q.k giving
-- the four components of the quaternion; for column
-- vector inputs each field is a column vector
-- Note: the quaternion returned represents the same rotation
+The returned quaternion is in the active convention and corresponds to the rotation represented by `euler2dcm(alpha,beta,gamma)`.

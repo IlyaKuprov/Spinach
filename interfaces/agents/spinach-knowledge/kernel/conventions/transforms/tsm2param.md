@@ -1,44 +1,23 @@
 # kernel/conventions/transforms/tsm2param.m
 
-- Signature: `[ax,rh,angles]=tsm2param(M)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/tsm2param.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=tsm2param.m)
 
-## Purpose
+## Purpose and limitation
 
-Attempts to convert a traceless symmetric 3x3 interaction matrix into axiality, rhombicity and three Euler angles. The transformation is un- stable and should be avoided if at all possible: it is always best to just publish the 3x3 matrix as recommended by IUPAC. Syntax: [ax,rh,angles]=tsm2param(M)
+Converts a traceless symmetric interaction matrix to axiality, rhombicity, and Euler angles in Mehring eigenvalue order. The source warns that the parameterisation is unstable and recommends publishing the 3x3 matrix instead, consistent with IUPAC guidance.
 
-## Physical / mathematical content
+## Input and reconstruction
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+`M` is real numeric input with either nine matrix elements or five independent elements ordered `[Mxx, Mxy, Mxz, Myy, Myz]`. For five elements the function constructs:
 
-## Numerical / algorithmic content
+`[Mxx Mxy Mxz; Mxy Myy Myz; Mxz Myz -Mxx-Myy]`
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+For nine elements, the source checks `issymmetric(M)` and `abs(trace(M))<=10*eps`; it has no explicit `size(M)==[3 3]` or finite-value check. Inputs passing those checks are passed to `eig`, which requires a square matrix. The five-element input is indexed linearly in the stated order.
 
-## Parameters / inputs
+## Conversion and outputs
 
-- M -3x3 matrix or its five independent elements in the
-- order of [Mxx, Mxy, Mxz, Myy, Myz]
+Let `lambdaX` be the smallest eigenvalue, `lambdaZ` the largest, and `lambdaY` the remaining eigenvalue. The returned scalar invariants are `ax=2*lambdaZ-(lambdaX+lambdaY)` and `rh=lambdaY-lambdaX`. They retain the input matrix's units; no unit conversion is applied.
 
-## Outputs
+The eigenvector columns are reordered as X, Y, Z and multiplied by `det(V)` so the resulting orientation matrix has determinant +1. The function passes that matrix to [`dcm2euler.m`](dcm2euler.md); `angles` is its 1-by-3 ZYZ active Euler-angle row in radians. The eigensystem does not define a unique orientation when eigenvalues are degenerate, consistent with the source's warning about instability.
 
-- ax -axiality, Mehring order of eigenvalues
-- rh -rhombicity, Mehring order of eigenvalues
-- angles -Euler angles (one of the eight equivalent
-- sets), radians
-- Note: Mehring convention has Z as the largest eigenvalue, and X as
-- the smallest eigenvalue, this includes signs.
-
-## Implementation structure
-
-- Attempts to convert a traceless symmetric 3x3 interaction matrix into
-- axiality, rhombicity and three Euler angles. The transformation is un-
-- stable and should be avoided if at all possible: it is always best to
-- just publish the 3x3 matrix as recommended by IUPAC. Syntax:
-- [ax,rh,angles]=tsm2param(M)
-- M - 3x3 matrix or its five independent elements in the
-- order of [Mxx, Mxy, Mxz, Myy, Myz]
-- ax - axiality, Mehring order of eigenvalues
-- rh - rhombicity, Mehring order of eigenvalues
-- angles - Euler angles (one of the eight equivalent
-- sets), radians
-- Note: Mehring convention has Z as the largest eigenvalue, and X as
+The implementation calls its validation helper before diagonalisation. It requires real numeric input with five or nine elements; on the nine-element path it additionally checks symmetry and the absolute trace tolerance above.

@@ -1,33 +1,25 @@
 # examples/nmr_liquids/hoesy_camphor.m
 
+- MATLAB implementation: [examples/nmr_liquids/hoesy_camphor.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/hoesy_camphor.m)
+
 - Signature: `hoesy_camphor()`
 
 ## Purpose
 
-13C{1H} HOESY spectrum of camphor with natural content of 13C isotope. Coordinates, shielding anisotropies and J-couplings computed with DFT. Calculation time: minutes
+Simulates the `13C{1H}` HOESY spectrum of camphor at natural `13C` content. The source header says the coordinates, shielding anisotropies and J couplings come from vacuum DFT and estimates calculation time as minutes; that is source documentation, not a timing measured here.
 
-## Physical / mathematical content
+## Spin system and model
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example reads `../standard_systems/camphor.log` with `gparse` and `g2spinach`, requesting `1H` and `13C` spins with the source arguments `[31.5 189.2]`; `options.min_j=3.0` and `options.no_xyz=0`. The spin model therefore tracks the specified proton and carbon-13 network, not the other molecular nuclei. `dilute(spin_system,'13C')` generates the carbon-13 isotopomer subsystems; the script simulates each and accumulates their spectra.
 
-## Numerical / algorithmic content
+The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-2`, scalar-coupling connectivity, and proximity level 3. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `50e-12` s and temperature `298` K. The algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Acquisition and processing
 
-## Implementation structure
+Mixing time is `0.5` s. The source orders the dimensions as `{'1H','13C'}`, with `decouple_f1={'13C'}`; the detected signal is carbon-13, as stated by the source's `13C{1H}` description. Sweeps are `[1800 9000]` Hz, offsets `[900 4500]` Hz, and both dimensions have 128 acquired points and 512-point zero filling. The plotted axes use ppm.
 
-- 13C{1H} HOESY spectrum of camphor with natural content of 13C isotope.
-- Coordinates, shielding anisotropies and J-couplings computed with DFT.
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Generate isotopomers
-- Preallocate the answer
+For each isotopomer, `liquid(subsystem,@hoesy,parameters,'nmr')` returns cosine and sine FIDs. Both are apodised with `sqcos` in both dimensions; the script zero-fills and Fourier-transforms F2, forms the States signal `f1_cos-1i*f1_sin`, then Fourier-transforms F1. The accumulated real spectrum is plotted with positive display polarity using `plot_2d`.
+
+## Sequence boundary
+
+This wrapper configures the spin system and parameters, calls the shared `liquid` driver with `@hoesy`, and processes the returned FIDs. It does not contain the HOESY pulse-program implementation; pulse timing and internal coherence-transfer steps are delegated to that sequence function.

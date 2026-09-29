@@ -1,32 +1,24 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m
 
 - Signature: `mqmas_efficiency()`
+- Source: [examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m)
 
 ## Purpose
 
-Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard pulses and with the optimal control pulses produced by the other examples in this folder. Reproduces, using Spinach, the sequence efficiency calculation from https://doi.org/10.26434/chemrxiv.15008427 The nucleus has the quadrupolar coupling of aluminium acetylacetonate (CQ=3.2 MHz, eta=0.16) and is spun at 12.5 kHz in a 400 MHz magnet; the quadrupolar interaction is taken to second order in the rotating frame. The sequence is: excitation pulse, +MQ/-MQ coherence filter, conversion pulse, population filter, central transition selective pulse, and detection of the central transition single-quantum coherence. The efficiency is the modulus of the detected element of the density matrix, normalised to the initial state as in the paper. The powder average runs over 400 crystallite orientations at 32 initial rotor phases each. Hard pulses have the durations optimised in the paper. Optimal control waveforms are read from the files written by mq_excitation.m, mq_conversion.m, and ct_selective.m examples for both coherence orders; the files supplied in this folder were produced by those examples on 128 cores and only need rerunning if the optimisations are changed. With these waveforms, the 3QMAS efficiency is 0.071 with hard pulses and 0.419 with optimal control pulses, and the 5QMAS efficiency is 0.0109 and 0.258, respectively: signal enhancement factors of 5.9 and 23.8, against 5.7 and 25 simulated in the paper.
+This script compares simulated sequence efficiency for hard-pulse and optimal-control implementations of a z-filtered 27Al multiple-quantum magic-angle-spinning (MQMAS) experiment. It evaluates pulse waveforms made by the sibling excitation, conversion, and central-transition-selective optimisation examples; it does not perform those waveform optimisations itself. The source identifies the comparison with the ChemRxiv DOI [10.26434/chemrxiv.15008427](https://doi.org/10.26434/chemrxiv.15008427).
 
-## Physical / mathematical content
+## Spin system and sequence
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The model is one 27Al nucleus with spin 5/2, quadrupolar coupling 3.2 MHz, asymmetry 0.16, and a second-order quadrupolar interaction in the rotating frame. It includes shielding tensor eigenvalues -5, -5, and 10 ppm. The magnet is 400 MHz and the sample spins at 12.5 kHz about the axis [sqrt(2/3), 0, sqrt(1/3)]. The calculation uses a lab-frame Zeeman-Hilbert-space model.
 
-## Numerical / algorithmic content
+The simulated order is selected as 3Q or 5Q. The sequence applies excitation, filters to the positive and negative selected multiple-quantum orders, applies conversion, filters to zero quantum order, applies a central-transition-selective pulse, and reads the central-transition single-quantum component. The initial state is normalised 27Al longitudinal magnetisation. Rotor-resolved drift Hamiltonians are sampled at 0.5 microsecond ticks; the powder average uses 400 crystallite orientations and 32 initial rotor phases per orientation.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Pulse comparison and observable
 
-## Implementation structure
+The hard-pulse durations for excitation, conversion, and central-transition selection are [4.2, 1.4, 9] microseconds for 3Q and [4.4, 2.4, 9] microseconds for 5Q. Their angular-frequency amplitudes are 2*pi*[100, 100, 9.3] kHz. For the optimal-control comparison, the script loads the matching order-specific excitation and conversion waveforms and the central-transition waveform from the MAT files written by the sibling examples.
 
-- Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard
-- pulses and with the optimal control pulses produced by the other
-- examples in this folder. Reproduces, using Spinach, the sequence
-- efficiency calculation from
-- The nucleus has the quadrupolar coupling of aluminium acetylace-
-- tonate (CQ=3.2 MHz, eta=0.16) and is spun at 12.5 kHz in a 400
-- MHz magnet; the quadrupolar interaction is taken to second order
-- in the rotating frame. The sequence is: excitation pulse, +MQ/-MQ
-- coherence filter, conversion pulse, population filter, central
-- transition selective pulse, and detection of the central transi-
-- tion single-quantum coherence. The efficiency is the modulus of
-- the detected element of the density matrix, normalised to the
+For each powder/rotor instance, the script propagates the density matrix through the three pulses and intervening coherence filters. It records matrix element (3,4), the central-transition single-quantum component, then defines efficiency as the modulus of the mean complex signal over the ensemble. Thus the reported quantity is not the mean of individual signal magnitudes.
+
+## Source-stated comparison values
+
+The source comments report 3Q efficiencies of 0.071 for hard pulses and 0.419 for optimal-control pulses, an enhancement factor of 5.9, compared with 5.7 simulated in the cited paper. For 5Q, the corresponding efficiencies are 0.0109 and 0.258, an enhancement factor of 23.8, compared with 25 simulated in the paper. The source comments estimate minutes of calculation time on 128 cores.

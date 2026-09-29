@@ -1,29 +1,15 @@
 # kernel/plotting/kletter.m
 
+Source: [kernel/plotting/kletter.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/kletter.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=kletter.m)
+
 - Signature: `kletter(letter_label)`
 
-## Purpose
+## Position and units
 
-Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the plot box, with its left edge and its cap line 10 points away from the left and the top edge of the box, whatever the proportions of the figure or of the axes.
+The function labels the current axes returned by `gca`. It temporarily changes the axes `Units` to `points`, obtains `tightPosition(ax_obj)`, and restores the previous units. For the measured plot-box width and height, `w` and `h`, in points, it computes the normalised text position as `x = 10/w` and `y = 1 - 10/h`. Thus the left edge and the text cap line are offset 10 points from the plot box's left and top edges. The position passed to `text` uses normalised units.
 
-## Physical / mathematical content
+The created text is left-aligned, bold, 16-point, and tagged `kletter`; vertical alignment is `cap`. Its position is calculated when called, not maintained by a resize listener. The source notes that `fig2tiles.m` reapplies the tagged label when retiled axes are made for a merged figure; the knowledge page is [fig2tiles.md](fig2tiles.md).
 
-- None: `kletter` is a figure annotation utility; it draws a panel letter and carries no physical or mathematical content.
+## Input and output
 
-## Numerical / algorithmic content
-
-- The offsets are absolute (10 points) inside the rendered plot box when the function is called, so the figure should already have its final size, and a tiled layout all of its tiles, at that point; the position is then stored as a fraction of the plot box (normalised text units), so the label follows the axes if they are resized later; the text object carries the tag `kletter`, and `fig2tiles` deletes and re-applies tagged labels on the retiled axes of a merged figure so their offsets are exact there.
-- The label is a `text` object that belongs to the current axes, so it is carried along when the axes are copied into a tiled figure by `fig2tiles`.
-
-## Implementation structure
-
-- Check consistency
-- Offset from the box edges, points
-- Rendered plot box of the current axes in points
-- Label position as a fraction of the plot box
-- Place the tagged label with its cap line at the top offset
-- Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- The grumbler requires `letter_label` to be a one-element character string.
+`letter_label` must be a one-element character array; other inputs raise an error. The function creates a text object in the current axes and returns no output. It has no plot-data or physical-coordinate calculation, and no explicit guard for the measured plot-box dimensions.

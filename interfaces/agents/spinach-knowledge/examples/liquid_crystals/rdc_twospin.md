@@ -1,31 +1,21 @@
 # examples/liquid_crystals/rdc_twospin.m
 
-- Signature: `rdc_twospin()`
+Source: [examples/liquid_crystals/rdc_twospin.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/liquid_crystals/rdc_twospin.m)
 
-## Purpose
+## System and phenomenon
 
-CLIP-HSQC spectrum of a C-H system in a liquid crystal with a user-specified order matrix. Calculation time: seconds.
+A two-spin 1H–13C C–H system is used to simulate a CLIP-HSQC spectrum in a liquid crystal. The code supplies a user-defined order matrix and requests residual-dipolar-coupling support (`parameters.needs={'rdc'}`).
 
-## Physical / mathematical content
+## Model and parameters
 
-- Liquid-crystal examples. These scripts exploit partial ordering and Saupe-tensor physics, so anisotropic couplings survive orientational averaging and generate residual dipolar couplings or anisotropic transfer behaviour.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system is set at `sys.magnet=5.9`, with chemical shifts `5.0` and `65.0`, a scalar coupling of `140`, and the order matrix `diag([1e-3 2e-3 -3e-3])`. The source does not annotate units for the field or coupling values. It uses the `sphten-liouv` formalism with no basis approximation.
 
-## Numerical / algorithmic content
+The CLIP-HSQC call uses `parameters.J=140`, sweeps `[3000 1000]`, offsets `[4250 1200]`, `128` points per dimension and zero-fills to `[512 512]`; the displayed axis units are ppm. The selected spin order is `13C`, then `1H`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Calculation and observable
 
-## Implementation structure
+`liquid(spin_system,@clip_hsqc,parameters,'nmr')` produces positive and negative phase-cycle FIDs. Each is apodised with squared-cosine windows, Fourier transformed along F2, combined as `f1_pos+conj(f1_neg)` for States processing, then Fourier transformed along F1. The plotted observable is the real part of the resulting 2D spectrum.
 
-- CLIP-HSQC spectrum of a C-H system in a liquid crystal
-- with a user-specified order matrix.
-- Calculation time: seconds.
-- Spin system parameters
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
-- Form States signal
+## Scope
+
+The calculation uses one fixed order matrix and one scalar coupling for this two-spin system.

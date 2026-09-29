@@ -1,30 +1,29 @@
 # tests/list_tests.m
 
-- Signature: `manifest=list_tests(varargin)`
-
 ## Purpose
 
-Lists Spinach regression tests. Syntax: manifest=list_tests(varargin)
+Lists the Spinach regression tests available in the `tests` directory ([source](https://github.com/IlyaKuprov/Spinach/blob/main/tests/list_tests.m)).
 
-## Physical / mathematical content
+## Behaviour
 
-## Numerical / algorithmic content
+The function adds the test library (`lib` subdirectory of the folder containing `list_tests.m`) to the MATLAB path, parses the supplied options, and obtains the test manifest from `test_manifest()`. If a non-empty `pattern` option is given, the manifest is filtered to the entries whose `id` or `name` contains the pattern as a substring (case-sensitive `contains` check). The remaining entries are printed to the command window, one per line, as identifier, a tab, and the test name.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- varargin -optional name-value pair 'pattern', string
+**Syntax**
 
-## Outputs
+```matlab
+manifest = list_tests(varargin)
+```
 
-- manifest -structure array with test identifiers and names
+**Inputs**
 
-## Implementation structure
+- `varargin` — optional name-value pair `'pattern'`, a string used as a substring filter on test identifiers and names; parsed by `test_options`.
 
-- Lists Spinach regression tests. Syntax:
-- manifest=list_tests(varargin)
-- varargin -optional name-value pair 'pattern', string
-- manifest -structure array with test identifiers and names
-- Add the test library to the path
-- Parse options
-- Apply substring filter
-- Print the list
+**Outputs**
+
+- `manifest` — structure array with test identifiers (`id`) and names (`name`), as returned by `test_manifest()` and optionally filtered by the pattern.
+
+## References
+
+- [Spinach regression test lister — source file](https://github.com/IlyaKuprov/Spinach/blob/main/tests/list_tests.m)

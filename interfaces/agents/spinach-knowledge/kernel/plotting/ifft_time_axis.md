@@ -4,38 +4,25 @@
 
 ## Purpose
 
-Time axis for IFFT with optional zero-filling. Syntax: [t_shift,t,dt,nifft]=ifft_time_axis(npts,df,zf)
+Builds unshifted and shifted time coordinates for an inverse FFT, with optional zero-fill points on both sides of the frequency-domain data. The function returns three outputs; `nifft` is an internal length, not a fourth output.
 
-## Physical / mathematical content
+## Axis construction and units
 
-## Numerical / algorithmic content
+The effective transform length is `nifft=npts+2*zf`, and `dt=1/(df*nifft)`. For `df` in Hz, `dt` and both time axes are in seconds.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- `t` is a column vector `(0:nifft-1)'*dt`, matching the unshifted `ifft` order.
+- `t_shift` is the column vector `(-floor(nifft/2):ceil(nifft/2)-1)'*dt`, matching `fftshift(ifft(...))` order for either parity of `nifft`.
+- Both axes have `nifft` samples; `dt` is a scalar.
 
-## Parameters / inputs
+## Inputs and guards
 
-- npts -number of frequency-domain points
-- df -frequency interval between points, Hz
-- zf -zero-fill length added to either
-- side of the frequency domain
+- `npts` - real numeric integer greater than 1.
+- `df` - positive real numeric scalar frequency interval in Hz.
+- `zf` - optional nonnegative real numeric integer; defaults to 0 and is added on each side, so the total length grows by `2*zf`.
 
-## Outputs
+Invalid inputs raise an error. There is no plotting or axes side effect; the routine only constructs coordinates.
 
-- t_shift -time axis for fftshift(ifft(...))
-- t -time axis for ifft(...)
-- dt -time step between points
+## Links
 
-## Implementation structure
-
-- Time axis for IFFT with optional zero-filling. Syntax:
-- [t_shift,t,dt,nifft]=ifft_time_axis(npts,df,zf)
-- npts -number of frequency-domain points
-- df -frequency interval between points, Hz
-- zf -zero-fill length added to either
-- side of the frequency domain
-- t_shift -time axis for fftshift(ifft(...))
-- t -time axis for ifft(...)
-- dt -time step between points
-- Set default zero-fill
-- Check consistency
-- IFFT length
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/ifft_time_axis.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ifft_time_axis.m)

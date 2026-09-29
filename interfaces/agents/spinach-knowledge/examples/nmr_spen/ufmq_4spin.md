@@ -1,31 +1,20 @@
 # examples/nmr_spen/ufmq_4spin.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_spen/ufmq_4spin.m)
+
 - Signature: `ufmq_4spin()`
+- Credits: Maria Grazia Concilio, Ilya Kuprov, and Jean-Nicolas Dumez.
 
-## Purpose
+## Experiment and spin model
 
-4Q ultrafast MaxQ NMR spectrum for a coupled four-spin system in the presence of realistic diffusion. Calculation time: hours, much faster on GPU
+This example simulates a 4Q ultrafast MaxQ NMR spectrum for four coupled protons with diffusion. At 14.1 T the 1H shifts are 0.50, 0.35, 0.15, and 0 ppm. The listed 3J couplings are 8.0 Hz for pairs (1,2), (2,3), and (3,4); the listed 4J couplings are 3.0 Hz for (1,3) and (2,4); and the 5J coupling for (1,4) is 2.0 Hz. Coherence order +4 is selected in the full sphten-liouv basis. No relaxation phantom or operator is supplied; flow is set to zero. The uniform initial phantom is longitudinal 1H magnetisation and detection is transverse 1H coherence. The calculation uses simulated data, not imported measurements.
 
-## Physical / mathematical content
+## Spatial encoding and acquisition
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The sample is 0.015 m long and represented by 500 spatial points, with derivative setting `parameters.deriv={'period',7}`. The diffusion coefficient is 18e-10 m^2/s. Acquisition uses the 1H channel, zero offset, 6.0e-6 s dwell, 120 points, and 50 loops. As in the two-spin example, the source computes maximum k from points divided by sample length, derives acquisition-gradient duration from dwell times points, and calculates the acquisition gradient from those values and the 1H spin factor.
 
-## Numerical / algorithmic content
+Encoding uses 500 pulse points and 40 WURST cycles, with Te=0.015 s, bandwidth 15000 Hz, gradient Ge=0.023 T/m, and a WURST chirp. A 0.041 s delay is set. The simulation is produced by `imaging` with `@ufmq`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Signal display and limits
 
-## Implementation structure
-
-- 4Q ultrafast MaxQ NMR spectrum for a coupled four-spin
-- system in the presence of realistic diffusion.
-- Calculation time: hours, much faster on GPU
-- Magnetic field
-- Chemical shifts
-- 3J couplings
-- 4J couplings
-- 5J couplings
-- Coherence selection
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
+The imaginary part of the simulated k-space echo array is plotted against t2-point and k-space-point indices. The conventional dimension is Fourier transformed with a shift along dimension 2, and the magnitude is plotted in ppm for the two 1H channels specified for display. The source describes the calculation as hours, much faster on GPU; it gives no numeric runtime or measured signal. No DOI, imported measurement, or experimental validation is specified in this example.

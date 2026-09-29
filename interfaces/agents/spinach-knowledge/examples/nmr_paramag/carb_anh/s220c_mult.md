@@ -1,23 +1,16 @@
 # examples/nmr_paramag/carb_anh/s220c_mult.m
 
-- Signature: `s220c_mult()`
+- Function: `s220c_mult()`
+- Source: [`examples/nmr_paramag/carb_anh/s220c_mult.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s220c_mult.m)
 
 ## Purpose
 
-Multipolar fit for the S220C mutant dataset for human carbonic anhydrase II. The system and the method are described in: A step-by-step tutorial is available here:
+Fits a multipolar model to PCS measurements for the S220C mutant of human carbonic anhydrase II. The source cites method paper DOI [10.1039/c6sc03736d](https://doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
-## Physical / mathematical content
+## Inputs and model
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+Loads `expt_pcs` and `xyz` from `s220c_expt.mat`. It calls `ilpcs(xyz,expt_pcs,[0 1 2],[-14 -26 4])`; the selected multipole orders are 0, 1, and 2, with the final three-number argument serving as the initial centre supplied to the fitting routine. The returned values include the fitted susceptibility tensor, multipole centre, and predicted PCS values.
 
-## Numerical / algorithmic content
+## Output and scope
 
-## Implementation structure
-
-- Multipolar fit for the S220C mutant dataset for human carbonic anhydrase
-- II. The system and the method are described in:
-- A step-by-step tutorial is available here:
-- Load experimental data
-- Solve the inverse problem
-- Plot experimental vs predicted PCS
-- Report and save the parameters
+It plots predicted versus experimental PCS in ppm with a diagonal reference, then displays the tensor and magnetic multipole centre. The source does not specify the measured nuclei, field, temperature, coordinate units, or tensor units, and does not save fitted results in the function.

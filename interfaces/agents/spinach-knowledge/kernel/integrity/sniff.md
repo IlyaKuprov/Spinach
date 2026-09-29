@@ -1,33 +1,13 @@
 # kernel/integrity/sniff.m
 
-- Signature: `sniff(action)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/sniff.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=sniff.m)
 
-## Purpose
+`sniff(action)` compares current Spinach .m files with the fingerprint list made by [`rearm`](rearm.md). It is an integrity check, not a model of a physical system.
 
-Kernel integrity control. Checks Spinach distribution .m files for any modifications that the user did since downloading Spi- nach. The function prints the list of files that have changed in any way since the internal database has been rearmed. The purpose is to catch local modifications that the user may have made and forgotten about, that are causing some unintend- ed consequences elsewhere in Spinach. Syntax: snif
+The scan covers .m files recursively below `kernel`, `interfaces`, `experiments`, and `etc`, using the same basename-plus-content fingerprint as `rearm`. A fingerprint absent from `smells` is printed as `smells fishy: <path>`; with action `'open'`, the file is also opened in the editor. If all scanned fingerprints are found, `sniff` prints comment-line and code-line counts and an all-clear message. Blank lines are excluded from those counts, and only lines whose first character is `%` are counted as comment lines. These counting filters are applied after fingerprinting, so comments and blank lines still affect the fingerprint.
 
-## Physical / mathematical content
+The saved values are tested by membership, not matched to paths. A changed file can be flagged, but an identical basename and content at another location can match; deleted files are not detected by scanning. `sniff` loads `smells.mat` by that bare filename and does not itself rebuild the baseline; call [`rearm`](rearm.md) to establish a new one.
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+## Inputs and outputs
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- action -'none' prints the names of fishy files to
-- the console, 'open' opens them
-
-## Implementation structure
-
-- Kernel integrity control. Checks Spinach distribution .m files
-- for any modifications that the user did since downloading Spi-
-- nach. The function prints the list of files that have changed
-- in any way since the internal database has been rearmed.
-- The purpose is to catch local modifications that the user may
-- have made and forgotten about, that are causing some unintend-
-- ed consequences elsewhere in Spinach. Syntax:
-- sniff(action)
-- action -'none' prints the names of fishy files to
-- the console, 'open' opens them
-- Default is to take no action
-- Check consistency
+`action` is an optional character input: omitted means `'none'`; the only accepted values are `'none'` and `'open'`. Other values raise an error. The function has no return value. Failure to load `smells.mat` is not caught by a source-level recovery guard.

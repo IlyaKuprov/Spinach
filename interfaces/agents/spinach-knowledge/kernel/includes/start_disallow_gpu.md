@@ -1,26 +1,16 @@
 # kernel/includes/start_disallow_gpu.m
 
-- Signature: `(script file)`
+- Signature: script include; no function output.
 
-## Purpose
+## Purpose and state effect
 
-Forces GPU arithmetic to be turned off even if the user had requested it in sys.enable setting; restore previous state using end_disallow_gpu command.
+Temporarily remove GPU arithmetic from the enabled Spinach features when a calling routine requires it to be disabled. This changes the configuration field `spin_system.sys.enable`; it does not directly switch hardware or alter an operator or state.
 
-## Physical / mathematical content
+## Execution and guard
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+The include records `user_wanted_gpu=ismember('gpu',spin_system.sys.enable)`, then always reports `WARNING: GPU disallowed by programmer request.` If that saved flag is true, it removes the literal `'gpu'` entry using `setdiff`. If GPU was not enabled, it leaves the list unchanged apart from the warning. The saved flag is intended for the paired `end_disallow_gpu` include to restore the earlier setting; restoration does not occur in this file.
 
-## Numerical / algorithmic content
+## References
 
-## Implementation structure
-
-- Forces GPU arithmetic to be turned off even if the user had
-- requested it in sys.enable setting; restore previous state
-- using end_disallow_gpu command.
-- Check if GPU is currently enabled
-- Disable GPU if it had been enabled
-- Once at MIT, I saw a frat bro accidentally smear a line all over the
-- table. Somehow he still managed to snort the whole thing. He looked
-- me square in the eyes and said "same high bro, Stokes theorem".
-- Internet folklore
-- #NHEAD #NGRUM
+- MATLAB source: [`kernel/includes/start_disallow_gpu.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/includes/start_disallow_gpu.m)
+- Existing Wiki page: https://spindynamics.org/wiki/index.php?title=start_disallow_gpu.m

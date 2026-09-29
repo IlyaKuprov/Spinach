@@ -1,34 +1,16 @@
 # examples/optimal_control/features_dt_var.m
 
 - Signature: `features_dt_var()`
+- Source: [examples/optimal_control/features_dt_var.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_dt_var.m)
 
-## Purpose
+## Purpose and model
 
-Optimal control pulse optimisation for state-to-state transfer across a scalar coupling in a hydrofluorocarbon fragment spin system. The start- ing state is Z-magnetisation on 1H, the destination state is Z-magneti- sation on 19F. There are six control channels, the time slice duration is not uniform, and there is a distribution over control powers. Calculation time: minutes.
+This simulated optimal-control example transfers normalised longitudinal magnetisation from 1H to 19F through the scalar-coupled 1H-13C-19F model. It sets a 9.4 T field, zero chemical shifts, and couplings of 140 Hz (1H-13C) and -160 Hz (13C-19F). The model is defined in the script; it does not import measured data.
 
-## Physical / mathematical content
+## Controls and optimisation
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The six controls are x and y RF components on each nucleus. The pulse has 50 nonuniform intervals, with durations defined by `3e-4*(0.25+0.75*cos(linspace(-pi/2,pi/2,50)))` seconds (about 75 to 300 microseconds). Optimisation uses five RF-power levels from `2*pi*800` to `2*pi*1200` rad/s, the SNS penalty with weight 100, the `lbfgs` method, and a 100-iteration limit. A random 6-by-50 initial waveform is passed to `fmaxnewton` with `@grape_xy`; correlation-order, per-spin, and x/y-control plots are enabled.
 
-## Numerical / algorithmic content
+## Output and limits
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Optimal control pulse optimisation for state-to-state transfer across a
-- scalar coupling in a hydrofluorocarbon fragment spin system. The start-
-- ing state is Z-magnetisation on 1H, the destination state is Z-magneti-
-- sation on 19F. There are six control channels, the time slice duration
-- is not uniform, and there is a distribution over control powers.
-- Calculation time: minutes.
-- Magnetic field
-- Spin system
-- Chemical shifts, ppm
-- Scalar couplings, Hz (literature values)
-- Basis set
-- Spinach housekeeping
+The optimised waveform is scaled by the mean power level and propagated once with `shaped_pulse_xy` using `expv-pwc`. The reported quantity is the real overlap `Re[rho_targ'*rho(T)]`. This final check uses a single drift Hamiltonian and the mean-power-scaled pulse; it is not a reported sweep over all five powers. The example is a model simulation, not a hardware or experimental validation.

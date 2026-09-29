@@ -1,86 +1,25 @@
 # interfaces/gaussian/gparse.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/gaussian/gparse.m) · [Spinach Wiki: gparse.m](https://spindynamics.org/wiki/index.php?title=gparse.m)
+
 - Signature: `props=gparse(filename,options)`
 
-## Purpose
+## Input and options
 
-A parser for Gaussian (03, 09, 16) calculation logs. Ex- tracts all potentially useful information. Syntax: props=gparse(filename,options)
+`filename` must be a nonempty character vector naming an existing Gaussian 03, 09, or 16 output log. The optional `options` argument is a cell array of character vectors; valid entries are `'g_nosymm'`, `'cst_nosymm'`, and `'hfc_nosymm'`. By default, parsed g, chemical-shielding, and hyperfine tensors are symmetrised; each corresponding option disables that symmetrisation. Other entries and non-cell/non-character options are rejected.
 
-## Physical / mathematical content
+The parser reads the existing text log using MATLAB file and text-processing functions; it does not launch Gaussian. The source recommends a route section containing `#p nmr=(giao,spinspin,susceptibility) output=pickett pop=minimal IOp(6/82=1)` to produce a useful property log. This is guidance, not an argument checked by the parser.
 
-- Gaussian interfaces. These parse quantum-chemistry output into spin Hamiltonian ingredients such as hyperfine, shielding, or exchange parameters.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## Returned property structure
 
-## Numerical / algorithmic content
+The single output is a structure, not a Spinach system. Parsed fields include input and standard geometries in Å, atom count, method, SCF energy in Hartree, atomic numbers and symbols, charge, multiplicity, spin components and `s_sq`, and isotope mass numbers, atomic masses, nuclear spins, quadrupole moments, and magnetic moments when present. Special geometry symbols include `Bq` for ghost atoms, `X` for dummy atoms, and `TV` for translation vectors. If no standard orientation is printed but an input geometry exists, `std_geom` is set to that input geometry.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+Magnetic-property fields are conditional on the printed sections: `hfc.iso` and `hfc.full.matrix` are hyperfine values/tensors in Gauss; `g_tensor.matrix` and its eigenvalues/eigenvectors describe the dimensionless g tensor; `cst` contains absolute shielding tensors; `k_couplings` and `j_couplings` are isotropic couplings in Hz; `srt` contains spin-rotation tensors in Hz; and `nqi` contains nuclear quadrupolar tensors in Hz. Other parsed values include susceptibility, Gibbs free energy in Hartree, and electric dipole moment in Debye. `filename`, `error`, and `complete` identify the source log and termination state.
 
-## Parameters / inputs
+## Transformations and checks
 
-- file_name -a character strong with a file name
-- options -symmetrisation of the interaction
-- tensors. By default all tensors are
-- symmetrised. The symmetrisation may
-- be turned off by adding the following
-- strings to the options cell array:
-- 'g_nosymm', 'cst_nosymm',
-- 'hfc_nosymm'
+For Link1/multi-job logs, the parser processes the occurrences in the text and retains the latest occurrence of each parsed property rather than returning one structure per job. It reads geometries and the Gaussian isotope table, and constructs atomic symbols from the atomic numbers. The anisotropic spin-dipole part of the HFC is normalised by `multiplicity-1` before it is combined with the isotropic Fermi-contact term; closed-shell HFC sections are ignored. If an anisotropic HFC section appears without multiplicity, parsing stops with an error.
 
-## Outputs
+The parser checks the HFC unit columns using the factor `2.802495`, checks g-tensor eigenvalues against printed g shifts referenced to `g_e=2.0023193043`, and checks shielding trace/3 against the printed isotropic value (tolerance `1e-3`). Disagreements raise errors rather than silently returning the inconsistent tensor. Gaussian error-termination markers set `props.error`; normal termination sets `props.complete`. An incomplete log without a detected error produces a warning, so inspect these fields before downstream use.
 
-- props.inp_geom -input geometry (Angstrom)
-- props.std_geom -standard geometry (Angstrom)
-- props.natoms -number of atoms
-- props.method -energy method
-- props.energy -SCF energy (Hartree)
-- props.hfc.iso -isotropic hyperfines (Gauss)
-- props.hfc.full.eigvals -HFC eigenvalues (Gauss)
-- props.hfc.full.eigvecs -HFC eigenvectors
-- props.hfc.full.matrix -HFC tensors (Gauss)
-- props.g_tensor.eigvecs -g-tensor eigenvectors
-- props.g_tensor.eigvals -g-tensor eigenvalues
-- props.g_tensor.matrix -g-tensor
-- props.cst -absolute shielding tensors
-- props.k_couplings -isotropic K-couplings (Hz)
-- props.j_couplings -isotropic J-couplings (Hz)
-- props.srt -spin-rotation tensor
-- props.nqi -nuclear quadrupolar tensors
-- props.chi -susceptibility tensor
-- props.gibbs -Gibbs free energy (Hartree)
-- props.symbols -atomic symbols
-- props.isotopes -nuclear isotopes used by Gaussian
-- props.atomic_numbers -atomic numbers
-- props.charge -overall charge
-- props.el_dip_std -electric dipole moment, Debye
-- props.multiplicity -overall multiplicity
-- props.filename -log file name
-- props.error -true if the calculation
-- contains an error of any type
-- Notes: the following keywords must be added to the route
-- section of the Gaussian input file to produce a
-- useful log:
-- #p nmr=(giao,spinspin,susceptibility)
-- output=pickett pop=minimal IOp(6/82=1)
-- Gaussian divides its isotropic Fermi contact couplings
-- by 2S=multiplicity-1, but prints the anisotropic spin
-- dipole couplings without that normalisation; the two
-- blocks therefore disagree by 2S for anything above a
-- doublet. This is corrected here, and the hyperfine
-- tensors returned are the ones that enter the spin
-- Hamiltonian as S*A*I, in agreement with oparse.m
-
-## Implementation structure
-
-- A parser for Gaussian (03, 09, 16) calculation logs. Ex-
-- tracts all potentially useful information. Syntax:
-- props=gparse(filename,options)
-- file_name -a character strong with a file name
-- options -symmetrisation of the interaction
-- tensors. By default all tensors are
-- symmetrised. The symmetrisation may
-- be turned off by adding the following
-- strings to the options cell array:
-- 'g_nosymm', 'cst_nosymm',
-- 'hfc_nosymm'
-- props.inp_geom -input geometry (Angstrom)
+[Spinach Wiki: gparse.m](https://spindynamics.org/wiki/index.php?title=gparse.m)

@@ -1,41 +1,30 @@
 # kernel/operators/sin_tran.m
 
+- Source: [kernel/operators/sin_tran.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/sin_tran.m)
+- Wiki: [sin_tran.m on the Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=sin_tran.m)
 - Signature: `A=sin_tran(dim)`
 
 ## Purpose
 
-Single transition operators, spanning the space of matri- ces of the specified dimension. The set is returned as a cell array of sparse matrices using serpentine indexing where the position in the cell array maps in the follow- ing way to the location of the single non-zero: (1) (3) (6) (10) (2) (5) (9) (13) (4) (8) (12) (15) (7) (11) (14) (16) and likewise for larger matrices. Syntax: A=sin_tran(dim)
+Returns the single-transition matrix units spanning the full space of `dim`-by-`dim` matrices. This is an operator basis, not a generator or a propagator, and the implementation does not assign it a spin or boson model.
 
-## Physical / mathematical content
+## Ordering and construction
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The output is a `dim^2`-by-1 cell array. Each entry is a `dim`-by-`dim` sparse complex matrix with exactly one nonzero value, equal to 1, at its assigned row and column. Cell indices enumerate matrix entries along successive anti-diagonals: start at the first column and move upward along each anti-diagonal, then continue to the next one. For dimension 4, the cell index at each matrix location is:
 
-## Numerical / algorithmic content
+```text
+ 1   3   6  10
+ 2   5   9  13
+ 4   8  12  15
+ 7  11  14  16
+```
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Thus each cell contains a matrix unit, and the `dim^2` cells cover all row/column positions exactly once. The implementation computes each position with `lin2kq(dim,n,1)` and constructs the corresponding sparse unit-entry matrix; it declares the result complex and uses `parfor` over the cell indices.
 
-## Parameters / inputs
+## Input
 
-- dim -dimension of the matrices
+- `dim`: positive real integer giving the row and column dimension.
 
-## Outputs
+## Output
 
-- A -a cell array of matrices, structured
-- as described above; matrices are re-
-- turned as complex to avoid expensive
-- reallocations later
-
-## Implementation structure
-
-- Single transition operators, spanning the space of matri-
-- ces of the specified dimension. The set is returned as a
-- cell array of sparse matrices using serpentine indexing
-- where the position in the cell array maps in the follow-
-- ing way to the location of the single non-zero:
-- (1) (3) (6) (10)
-- (2) (5) (9) (13)
-- (4) (8) (12) (15)
-- (7) (11) (14) (16)
-- and likewise for larger matrices. Syntax:
-- A=sin_tran(dim)
-- dim -dimension of the matrices
+- `A`: a column cell array of `dim^2` sparse complex matrix units in the ordering above.

@@ -2,49 +2,10 @@
 
 - Signature: `[traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)`
 
-## Purpose
+Evaluates phase-only GRAPE derivatives with amplitudes fixed by `spin_system.control.amplitudes`. Each phase row pairs with one amplitude row; polar samples are converted to Cartesian x/y controls before calling `grape_xy`. The freeze mask is expanded to both Cartesian channels for each phase coordinate. This is a coordinate wrapper, not an optimiser or line-search selector.
 
-Cost function for optimal control using the GRAPE algorithm. Returns fidelity, gradient and Hessian for a given waveform, specified in po- lar coordinates. Only the phase channel gradient is returned, the am- plitude profile is taken as a given. Syntax: [traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)
+The amplitude and phase arrays must be real numeric arrays with equal element counts and `ncontrols/2` rows; amplitudes must be nonnegative. Under the `rectangle` integrator, each has `pulse_nsteps` columns; under `trapezium`, each has `pulse_nsteps+1`. The control amplitude profile must exist, and `ncontrols` must be even.
 
-## Physical / mathematical content
+Two outputs request trajectory and fidelity only; three also returns the phase gradient; four request gradient and Hessian. The gradient is converted from Cartesian derivatives with `cartesian2polar` and has one third-dimension slice for the objective and each penalty. The Hessian has shape `numel(phi_profile)` by `numel(phi_profile)` by (number of penalties+1): Cartesian channel blocks are reordered, contracted into phase-pair blocks, and the same-track diagonal includes the second-derivative correction from the polar map. Final ordering follows MATLAB vectorisation. The source rejects unsupported output counts and unknown time-propagation algorithms.
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- phi_profile -set of control pulse phases from an amplitude-phase
-- description.
-
-## Outputs
-
-- fidelity -figure of merit for the overlap of the current state
-- of the system and the desired state(s). When penalty
-- methods are specified, fidelity is returned as an ar-
-- ray separating the penalties from the simulation
-- fidelity.
-- gradient -gradient of the fidelity with respect to the control
-- sequence. When penalty methods are specified, gradi-
-- ent is returned as an array separating penalty gra-
-- dients from the fidelity gradient.
-- hessian -Hessian of the fidelity with respect to the control
-- sequence. When penalty methods are specified, gradi-
-- ent is returned as an array separating penalty Hes-
-- sians from the fidelity Hessian.
-
-## Implementation structure
-
-- Cost function for optimal control using the GRAPE algorithm. Returns
-- fidelity, gradient and Hessian for a given waveform, specified in po-
-- lar coordinates. Only the phase channel gradient is returned, the am-
-- plitude profile is taken as a given. Syntax:
-- [traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)
-- phi_profile -set of control pulse phases from an amplitude-phase
-- description.
-- fidelity -figure of merit for the overlap of the current state
-- of the system and the desired state(s). When penalty
-- methods are specified, fidelity is returned as an ar-
-- ray separating the penalties from the simulation
-- fidelity.
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/wrappers/grape_phase.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grape_phase.m)

@@ -1,39 +1,21 @@
 # kernel/overloads/@ttclass/mean.m
 
-- Signature: `answer=mean(ttrain,dim)`
+[Mapped MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/mean.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/mean.m)
 
-## Purpose
+## Signature
 
-Mean of elements of a tensor train representation of a matrix. Syntax: answer=mean(ttrain,dim)
+`answer=mean(ttrain,dim)`
 
-## Physical / mathematical content
+## Core and coefficient action
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+If every mode size is one, the method immediately returns `full(ttrain)` as a scalar, before choosing or validating `dim`. Otherwise, when `dim` is omitted it selects the first non-singleton dimension in matrix order (dimension 1 before dimension 2). Only dimensions 1 and 2 are handled; another value raises `incorrect dimension specificaton.`.
 
-## Numerical / algorithmic content
+For every train and core, it sums the selected physical core dimension (array dimension `dim+1`), reshapes that dimension to one, and divides by that core's original size along the selected mode. For `dim=1`, each output core has shape `[rank(k,n),1,size2(k),rank(k+1,n)]`; for `dim=2`, it has shape `[rank(k,n),size1(k),1,rank(k+1,n)]`. Ranks and the other mode sizes are retained. The auxiliary train keeps `ttrain.coeff`; its tolerance is reset to `zeros(1,ntrains)`. There is no conjugation.
 
-## Parameters / inputs
+The result remains a `ttclass` unless all resulting mode sizes are one, in which case the method returns `full(answer)`. No full matrix is formed for a non-scalar result.
 
-- ttrain -a tensor train representation of a matrix
-- dim -dimension to operate on (dim=1 or dim=2)
+## Inputs and output
 
-## Outputs
-
-- answer -the mean value computed along the speci-
-- fied dimension
-
-## Implementation structure
-
-- Mean of elements of a tensor train representation of a
-- matrix. Syntax:
-- answer=mean(ttrain,dim)
-- ttrain -a tensor train representation of a matrix
-- dim -dimension to operate on (dim=1 or dim=2)
-- answer -the mean value computed along the speci-
-- fied dimension
-- Get sizes and ranks
-- If all dimensions are singleton, return a scalar immediately
-- In dim is omitted, choose first non-singleton dimension
-- (this mimics the Matlab behaviour for matices)
-- Make an auxiliary tensor train
+- `ttrain` — tensor-train representation of a matrix.
+- `dim` — optional dimension, 1 or 2.
+- `answer` — mean along the selected matrix dimension, as a tensor train or materialised scalar.

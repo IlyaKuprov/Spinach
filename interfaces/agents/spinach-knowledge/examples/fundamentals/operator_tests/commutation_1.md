@@ -1,25 +1,19 @@
 # examples/fundamentals/operator_tests/commutation_1.m
 
+- MATLAB implementation: [examples/fundamentals/operator_tests/commutation_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/operator_tests/commutation_1.m)
+
 - Signature: `commutation_1()`
 
 ## Purpose
 
-Commutators of simple operators and superoperators. The test calculation is performed three times in the three formalisms supported by Spinach.
+Checks the angular-momentum operator commutation identities in three Spinach representations. This is an algebra and representation-convention check, not a magnetic-resonance propagation or experimental model.
 
-## Physical / mathematical content
+## System and operators
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The source creates one `1H` spin with `sys.magnet = 0` and zero scalar Zeeman interaction. For each formalism `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`, it uses basis approximation `none` and obtains `Lx`, `Ly`, `Lz`, `L+`, and `L-` with `operator`.
 
-## Numerical / algorithmic content
+The three residuals test `Lz*L+ - L+*Lz = L+`, `Lz*L- - L-*Lz = -L-`, and `Lx*Ly - Ly*Lx = 1i*Lz`. For each formalism, their Frobenius norms fill a column of a complex 3-by-3 answer array.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Source-stated check and limits
 
-## Implementation structure
-
-- Commutators of simple operators and superoperators. The test
-- calculation is performed three times in the three formalisms
-- supported by Spinach.
-- Simple 1-spin system
-- Preallocate the answer
-- Run the tests
-- Report the outcome
+The script prints `Cross-formalism commutation test PASSED.` only when `norm(answer,'fro') < 1e-6`; otherwise it raises an error reporting failure. This describes the source's conditional check, not an observed run: no MATLAB execution is claimed here. The test covers these three identities for this one-spin setup and these three formalisms; it does not test dynamics, other basis approximations, or broader operator behaviour.

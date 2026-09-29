@@ -1,44 +1,24 @@
 # kernel/overloads/@polyadic/polyadic.m
 
-- Signature: `p=polyadic(cores)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/polyadic.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=polyadic.m)
 
-## Purpose
+## Signature
 
-Creates an object of a polyadic class. Syntax: p=polyadic(cores) A polyadic is a matrix formed by a Kronecker product, with those products stored unopened. For example, cores={{A,B,C},{D,E}} corresponds to A(x)B(x)C + D(x)E matrix. Any multiplicative acti- on by this matrix may be computed without opening the Kronecker products. This can save orders of magnitude in CPU time.
+`p=polyadic(cores)`
 
-## Physical / mathematical content
+## Representation
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
+`cores` is a cell array of cell arrays. Each outer cell holds one summand; its inner cell holds the factors of that summand’s Kronecker product. Thus `cores={{A,B,C},{D,E}}` represents `kron(A,kron(B,C)) + kron(D,E)`. Matrix factors may themselves be polyadic objects. The class also initialises empty `prefix` and `suffix` cell arrays for later matrix-composition factors.
 
-## Numerical / algorithmic content
+The Kronecker products are stored unopened: the source states that multiplicative actions can be performed without opening them, potentially saving orders of magnitude in CPU time. This is a factorised representation, not an eagerly expanded sum.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs and checks
 
-## Parameters / inputs
+- `cores`: must be a cell array, and each outer element must also be a cell array; otherwise the constructor raises the corresponding `cores must be a cell array.` or `elements of cores must also be cell arrays.` error.
+- After assigning `cores`, the constructor calls `validate(p)` to validate the constructed object. The constructor itself does not state additional dimension rules.
 
-- cores -a cell array of cell arrays of matrices
-- whose Konecker products make up the mat-
-- rix of interest.
+## Output
 
-## Outputs
+- `p`: the polyadic object containing the supplied factorisation.
 
-- p -a polyadic representation of a matrix
-- that behaves in many respects like the
-- matrix it represents.
-- Note: nested polyadics are permitted -the input matrices may be
-- polyadics themselves.
-
-## Implementation structure
-
-- Creates an object of a polyadic class. Syntax:
-- p=polyadic(cores)
-- A polyadic is a matrix formed by a Kronecker product, with those
-- products stored unopened. For example,
-- cores={{A,B,C},{D,E}}
-- corresponds to A(x)B(x)C + D(x)E matrix. Any multiplicative acti-
-- on by this matrix may be computed without opening the Kronecker
-- products. This can save orders of magnitude in CPU time.
-- cores - a cell array of cell arrays of matrices
-- whose Konecker products make up the mat-
-- rix of interest.
-- p - a polyadic representation of a matrix
+No complex conjugation, scalar broadcasting, or Kronecker-product expansion is performed by this constructor. Related overloads: [prefix](./prefix.md), [simplify](./simplify.md), and [size](./size.md).

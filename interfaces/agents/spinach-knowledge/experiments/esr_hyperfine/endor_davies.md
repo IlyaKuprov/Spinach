@@ -1,72 +1,23 @@
 # experiments/esr_hyperfine/endor_davies.m
 
-- Signature: `answer=endor_davies(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_hyperfine/endor_davies.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_hyperfine/endor_davies.m)
 
-## Purpose
+Signature: answer=endor_davies(spin_system,parameters,H,R,K)
 
-Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effects, such as orientation selection. Soft pulses are simula- ted using the Fokker-Planck formalism. Syntax: answer=endor_davies(spin_system,parameters,H,R,K)
+## Purpose and physical sequence
 
-## Physical / mathematical content
+This is a Davies ENDOR simulation with explicit shaped electron and nuclear pulses. The soft-pulse treatment uses the Fokker–Planck formalism and can represent orientation selection. The code first applies an electron pi pulse. For each nuclear RF frequency it compares an RF-on nuclear pulse with a same-duration zero-power reference, applies an electron pi/2 pulse to each branch, and returns the ratio of the two coil-detected signals. If parameters.tau is supplied and nonzero, both branches also pass through a spin-echo stage: free evolution for tau, an electron pi pulse, and a second tau period. Thus the output is a simulated ENDOR response over the entries of n_frq, not a magnetic-field axis or measured spectrum.
 
-- Hyperfine ESR experiment implementations. These sequences probe coupled electron-nuclear dynamics through ENDOR or HYSCORE-type manipulations of coherence pathways.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+## Inputs and required settings
 
-## Numerical / algorithmic content
+- spin_system; H, R, and K are the spin system and context-provided Hamiltonian, relaxation, and kinetics matrices. The matrices must have matching dimensions; the routine moves to the adjoint representation if needed.
+- Electron pulse: parameters.e_frq in Hz, e_phi in radians, e_pwr in rad/s, e_dur in seconds, and positive-integer Fokker–Planck cutoff e_rnk. The source specifies e_dur as the electron pi-pulse duration and obtains the pi/2 pulse by using half that duration.
+- Nuclear pulse: parameters.n_frq is a vector of RF frequencies in Hz; n_phi is in radians, n_pwr in rad/s, n_dur in seconds, and n_rnk is the positive-integer Fokker–Planck cutoff.
+- parameters.method selects the method passed to shaped_pulse_af. parameters.spins lists the irradiated spins with electron first and nucleus second. parameters.offset supplies electron and nuclear transmitter offsets in Hz.
+- parameters.rho0 is the initial state and parameters.coil is the detection state. Optional parameters.tau is a non-negative spin-echo delay in seconds; omitting it skips the echo stage.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Output axis and numerical cautions
 
-## Parameters / inputs
+answer has the same shape as parameters.n_frq; each entry is the coil signal with nuclear RF divided by the zero-power reference signal at that frequency. No example numeric RF frequency or pulse duration is given in the source, so none is invented here. Increase the electron and nuclear Fokker–Planck ranks and the spherical-grid size until the output converges, as the source notes. The function is an ENDOR spin-dynamics simulation; it does not calculate DNP/hyperpolarisation, image encoding, or a field sweep.
 
-- The following parameters refer to the electron pi pulse. The duration
-- of the electron pi/2 pulse is obtained by halving parameters.e_dur:
-- parameters.e_frq -frequency of the electron pulse, Hz
-- parameters.e_phi -phase of the electron pulse, rad
-- parameters.e_pwr -power of the electron pulse, rad/s
-- parameters.e_dur -duration of the electron pulse, s
-- parameters.e_rnk -Fokker-Planck cut-off rank for
-- the electron pulse
-- The following parameters refer to the nuclei pulse:
-- parameters.n_frq -vector of frequencies for the nuclei
-- pulse, in Hz. The answer is returned
-- as a vector of the same dimension.
-- parameters.n_phi -phase of the nuclei pulse, rad
-- parameters.n_pwr -power of the nuclei pulse, rad/s
-- parameters.n_dur -duration of the nuclei pulse, s
-- parameters.n_rnk -Fokker-Planck cut-off rank for
-- the nuclei pulse
-- parameters.method -method to use during the call
-- to shaped_pulse_af()
-- parameters.spins -irradiated spins, electron first,
-- nucleus second
-- parameters.offset -transmitter offsets for the electron
-- and the nucleus pulses, Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.tau -optional spin echo delay, seconds
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- answer -amplitude detected on the coil state for each
-- frequency of the nuclear pulse
-- Note: Fokker-Planck ranks should be increased until convergence is
-- achieved in the output. The same applies to the size of the
-- spherical grid.
-
-## Implementation structure
-
-- Davies ENDOR sequence with explicit soft pulses and all of the atten-
-- dant effects, such as orientation selection. Soft pulses are simula-
-- ted using the Fokker-Planck formalism. Syntax:
-- answer=endor_davies(spin_system,parameters,H,R,K)
-- The following parameters refer to the electron pi pulse. The duration
-- of the electron pi/2 pulse is obtained by halving parameters.e_dur:
-- parameters.e_frq -frequency of the electron pulse, Hz
-- parameters.e_phi -phase of the electron pulse, rad
-- parameters.e_pwr -power of the electron pulse, rad/s
-- parameters.e_dur -duration of the electron pulse, s
-- parameters.e_rnk -Fokker-Planck cut-off rank for
-- the electron pulse
+Source: https://spindynamics.org/wiki/index.php?title=endor_davies.m

@@ -1,35 +1,36 @@
 # kernel/utilities/kronm.m
 
-- Signature: `x=kronm(Q,x)`
-
 ## Purpose
 
-Calculates (Q{1}(x)Q{2}(x)...(x)Q{n})*x without opening Kronecker products. Syntax: x=kronm(Q,x)
+`kronm.m` calculates `(Q{1}(x)Q{2}(x)...(x)Q{n})*x` — the action of a Kronecker product of matrices on a vector or matrix — without explicitly opening (forming) the Kronecker products.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kronm.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `x=kronm(Q,x)`.
+- A consistency check (`grumble`) is run first: `Q` must be a cell array, every element of `Q` must be a matrix, and `x` must be numeric; otherwise errors are thrown (`'Q must be a cell array.'`, `'Q must be a cell array of matrices.'`, `'x must be numeric.'`).
+- The number of matrices in `Q` is `nmats=numel(Q)`; the number of columns of `x` is `ncols=size(x,2)`.
+- Row and column counts of each factor are collected in reverse order: for `n=1:nmats`, `[row_dims(n),col_dims(n)]=size(Q{nmats-n+1})`.
+- A dimension map for `x` is built as `x_dims=[col_dims,ncols]`, and `x` is reshaped (after `full`) into that map.
+- The products run over `n=1:nmats`:
+  - Shortcut for `opium` objects: if `isa(Q{nmats-n+1},'opium')` and its `coeff` is not equal to 1, the step is `x=Q{nmats-n+1}.coeff*x` and the loop continues.
+  - For `n==1` (the leading dimension), no permutation is needed: `x` is reshaped to `[x_dims(1) prod(x_dims)/x_dims(1)]`, multiplied as `x=Q{nmats}*x`, the dimension map is updated with `x_dims(1)=row_dims(1)`, and `x` is reshaped back with `full`.
+  - Otherwise, `permute` is used: the `n`-th dimension is brought forward via `dims=[n,setdiff(1:numel(x_dims),n)]`, `x` is reshaped to `[col_dims(n),numel(x)/col_dims(n)]`, multiplied as `x=Q{nmats-n+1}*x`, the dimension map is updated with `x_dims(n)=row_dims(n)`, `x` is reshaped to `[row_dims(n),x_dims(dims(2:end))]`, and `ipermute` restores the dimension order.
+- Finally, `x` is reshaped to `[prod(row_dims),ncols]` for output.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- Q -cell array of Kronecker terms
-- x -a vector or a matrix of appropriate dimension
-- Output:
-- x -a vector or a matrix of appropriate dimension
+**Inputs**
 
-## Implementation structure
+- `Q` — cell array of Kronecker terms (each element a matrix; `opium` objects are handled via the coefficient shortcut).
+- `x` — a vector or a matrix of appropriate dimension; must be numeric.
 
-- Calculates (Q{1}(x)Q{2}(x)...(x)Q{n})*x without opening
-- Kronecker products. Syntax:
-- x=kronm(Q,x)
-- Q - cell array of Kronecker terms
-- x - a vector or a matrix of appropriate dimension
-- Output:
-- Check consistency
-- Number of matrices in Q
-- Number of columns in x
-- Row and column counts in Q
-- Dimension map for x
-- Reshape into the map
+**Output**
+
+- `x` — a vector or a matrix of appropriate dimension, the result of the Kronecker-product action.
+
+## References
+
+- Spinach Wiki page for `kronm.m`: <https://spindynamics.org/wiki/index.php?title=kronm.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kronm.m>

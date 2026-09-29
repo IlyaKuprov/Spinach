@@ -4,29 +4,16 @@
 
 ## Purpose
 
-An off-resonance rectangular soft pulse simulated using the Fokker-Planck formalism. Note that the pulse frequency off- set accumulates as additional phase during the pulse in the same way as it would during a chirp. Calculation time: seconds
+This example uses the Fokker–Planck shaped-pulse propagator to simulate an off-resonance rectangular soft pulse. Its source comment notes that the frequency offset accumulates phase during the pulse, as it does during a chirp. The subsequent spectrum is a simulated acquisition result, not an experimental measurement.
 
-## Physical / mathematical content
+## Spin system and pulse
 
-- Shaped-pulse examples. These scripts demonstrate amplitude, phase, frequency, and gradient waveform design, including adiabatic sweeps, excitation profiles, and hardware-response considerations.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model is a 31-proton chain at 14.1 T, with scalar Zeeman shifts from −4 to +4 ppm and 10 Hz scalar couplings between adjacent spins. It uses the IK-2 basis with scalar-coupling connectivity and proximity level 1. The initial state is 1H Lz; the controls are Lx and Ly, and the background Hamiltonian is constructed under the NMR assumption.
 
-## Numerical / algorithmic content
+The call `shaped_pulse_af(spin_system,H,Lx,Ly,rho,1922.4,50.0,5e-3,-pi/2,2)` supplies a 1922.4 Hz RF frequency offset, 50.0 rad/s RF amplitude, a 5 ms pulse duration, an initial RF phase of −π/2 rad, and maximum Fokker–Planck rank 2. These scalar pulse parameters describe a single constant-amplitude, constant-frequency slice; this is not a sampled amplitude/phase waveform. The helper documentation identifies the Fokker–Planck construction with Eq. 33 of the paper at DOI [10.1016/j.jmr.2016.07.005](https://doi.org/10.1016/j.jmr.2016.07.005).
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Acquisition and observable
 
-## Implementation structure
+The pulse-prepared state is passed to liquid-state NMR acquisition with a 7000 Hz sweep, 2048 acquired points, zero filling to 8192 points, and a Hz axis. The FID is phase-corrected by exp(−i × 0.67), exponentially apodised with parameter 6, Fourier transformed, and plotted as a real spectrum. The script does not explicitly construct a relaxation superoperator or apply a gradient or homospoil step before this acquisition.
 
-- An off-resonance rectangular soft pulse simulated using the
-- Fokker-Planck formalism. Note that the pulse frequency off-
-- set accumulates as additional phase during the pulse in the
-- same way as it would during a chirp.
-- Calculation time: seconds
-- Magnetic field
-- Isotopes
-- Zeeman interactions
-- Couplings
-- Basis set
-- Spinach housekeeping
-- Background Hamiltonian
+Sources: [shaped_pulse_fp.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_fp.m) and [shaped_pulse_af.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_af.m).

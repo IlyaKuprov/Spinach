@@ -1,85 +1,29 @@
 # kernel/pulses/shaped_pulse_af.m
 
-- Signature: `[rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,...`
+- MATLAB source: [kernel/pulses/shaped_pulse_af.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_af.m)
+- Spinach wiki: [shaped_pulse_af.m](https://spindynamics.org/wiki/index.php?title=shaped_pulse_af.m)
+- Signature: `[rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,rf_amp_list,rf_dur_list,rf_phi,max_rank,method)`
+- Reference: [Eq. 33](http://dx.doi.org/10.1016/j.jmr.2016.07.005)
 
 ## Purpose
 
-Shaped pulse in amplitude-frequency coordinates using Fokker-Planck formalism (Eqn. 33 in http://dx.doi.org/10.1016/j.jmr.2016.07.005).
+Propagates a shaped RF pulse in amplitude-frequency coordinates using the Fokker–Planck formalism in Eq. 33 of the cited paper.
 
-## Physical / mathematical content
+## Construction and propagation
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The source sets the phase-coordinate dimension to `2*max_rank+1`, obtains phase coordinates and a derivative operator with `fourdif`, and adds `rf_phi` to the phase coordinates. It builds the background term from `L0`, the phase-dependent RF term from `cos(phases)*Lx + sin(phases)*Ly`, and the phase-turning generator from the derivative operator. For slice `n`, the generator passed to the propagator is `F0 + rf_amp_list(n)*F1 + 2i*pi*rf_frq_list(n)*M`, applied for `rf_dur_list(n)`.
 
-## Numerical / algorithmic content
+The frequency, amplitude, and duration lists describe successive piecewise-constant slices and must have equal lengths. Their time discretisation must also be sufficiently fine to reproduce the intended waveform; check convergence as the slices are refined, independently of `max_rank` convergence. This implementation does not apply a separate temporal window or filter. Its supported formalisms are state-vector based: `sphten-liouv`, `zeeman-liouv`, or `zeeman-wavef`.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Inputs and outputs
 
-## Syntax
+- `L0` — background drift Liouvillian; `Lx` and `Ly` — X and Y projections of the RF operator.
+- `rho` — initial state vector or horizontal stack of state vectors.
+- `rf_frq_list` — RF frequencies in Hz, relative to the offsets and/or rotating frames used to construct `L0`.
+- `rf_amp_list` — RF amplitudes in radians per second; `rf_dur_list` — slice durations in seconds.
+- `rf_phi` — phase of the first pulse slice, added to the phase coordinates.
+- `max_rank` — finite positive integer truncation rank. Increase it until the result stops changing; the source describes 2 as a starting point, not a guaranteed converged setting.
+- `method` — `'expv'` (Krylov propagation), `'expm'` (explicit exponential propagation), or `'evolution'` (Spinach evolution function).
+- `rho` — propagated state; optional `traj` — a `1 x (nsteps+1)` cell array including the initial state; optional `P` — effective pulse propagator, available with `method='expm'` and described by the source as expensive.
 
-```matlab
-[rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,...
-rf_amp_list,rf_dur_list,rf_phi,...
-max_rank,method)
-```
-
-## Parameters / inputs
-
-- L0 -drift Liouvillian that continues
-- running in the background
-- Lx -X projection of the RF operator
-- Ly -Y projection of the RF operator
-- rho -initial state vector or a horizontal
-- stack thereof
-- rf_frq_list -a vector of RF frequencies at each
-- time slice (relative to the offsets
-- and/or rotating frames that were
-- used to make the background L0 that
-- you have supplied, Hz
-- rf_amp_list -a vector of RF amplitudes at each
-- time slice, rad/s
-- rf_dur_list -a vector of time slice durations,
-- in seconds
-- rf_phi -RF phase of the first pulse slice
-- max_rank -maximum rank of the Fokker-Planck
-- theory, increase until the answer
-- stops changing, 2 is a good start
-- method -propagation method, 'expv' for Krylov
-- propagation, 'expm' for exponential
-- propagation, 'evolution' for Spinach
-- evolution function
-
-## Outputs
-
-- rho -final state vector or a stack thereof
-- traj -system trajectory as a [1 x (nsteps+1)]
-- cell array, the first point is the ini-
-- tial condition
-- P -effective pulse propagator (expensive),
-- only available for the 'expm' method
-- Note: the pulse is assumed to be piecewise-constant and should be
-- supplied with sufficiently fine time discretisation to pro-
-- perly reproduce the waveform.
-- Note: make it dead certain that your freqiency has the correct
-- sign; wrong sign means that the pulse hits very far away
-- from your intended location. This is the principal source
-- of bugs when using this function.
-
-## Implementation structure
-
-- Shaped pulse in amplitude-frequency coordinates using Fokker-Planck
-- formalism (Eqn. 33 in http://dx.doi.org/10.1016/j.jmr.2016.07.005).
-- [rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,...
-- rf_amp_list,rf_dur_list,rf_phi,...
-- max_rank,method)
-- L0 -drift Liouvillian that continues
-- running in the background
-- Lx -X projection of the RF operator
-- Ly -Y projection of the RF operator
-- rho -initial state vector or a horizontal
-- stack thereof
-- rf_frq_list -a vector of RF frequencies at each
+The source warns that the sign convention for `rf_frq_list` must agree with the offsets and rotating frames in `L0`; it notes that the wrong sign can place the pulse far from the intended location.

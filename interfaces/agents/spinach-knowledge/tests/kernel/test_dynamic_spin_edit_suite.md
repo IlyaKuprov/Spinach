@@ -1,34 +1,28 @@
 # tests/kernel/test_dynamic_spin_edit_suite.m
 
-- Signature: `result=test_dynamic_spin_edit_suite()`
+Source: [tests/kernel/test_dynamic_spin_edit_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_spin_edit_suite.m)
 
 ## Purpose
 
-Tests deterministic spin-system editing support utilities. Syntax: result=test_dynamic_spin_edit_suite()
+Regression test suite for the deterministic spin-system editing support utilities in the Spinach kernel: `kill_spin`, `dilute`, `dictum`, and `merge_inp`. The suite verifies that local spin-system editing helpers update dependent metadata without touching external state.
 
-## Physical / mathematical content
+## What the suite checks
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- **Removing a spin:** `kill_spin` preserves consistent isotope/label identity, coordinate and chemical-partition dimensions, and renumbers spin-dependent indices such as SRSK sources. Obsolete basis and interaction metadata cannot survive a changed spin list. A numeric spin index and the equivalent logical deletion mask must yield the same reduced system.
+- **Isotopic dilution and assumptions:** `dilute` constructs separate subsystems with a single selected low-abundance `13C` at each labelled site. `dictum` changes the intended Zeeman or coupling strength through numeric spin/pair selectors or an isotope selector without changing unrelated assignments.
+- **Merging input structures:** `merge_inp` concatenates extensive spin fields, block-merges pair matrices, offsets spin and chemical-subsystem indices, and retains common settings such as the shared temperature. It must reject conflicting common values, partially specified nested groups, unknown fields and missing isotope lists rather than silently producing inconsistent combined inputs.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Outputs
+```matlab
+result=test_dynamic_spin_edit_suite()
+```
 
-- result -regression test result with explanatory messages
-- The test checks spin removal, dilute-isotope subsystem generation,
-- assumption overrides, and merging of Spinach input structures.
+- **Output**: `result` — regression result reporting which spin-editing invariants pass and any failed assertions.
+- The function takes no inputs.
 
-## Implementation structure
+## References
 
-- Tests deterministic spin-system editing support utilities. Syntax:
-- result=test_dynamic_spin_edit_suite()
-- result -regression test result with explanatory messages
-- The test checks spin removal, dilute-isotope subsystem generation,
-- assumption overrides, and merging of Spinach input structures.
-- Announce the test target
-- State the spin editing target of the test
-- Build a small but structurally complete spin-system descriptor
-- Check numeric spin removal updates identities, labels, coordinates, and parts
-- Check chemical part renumbering across multiple subsystems
-- Check destruction of stale basis, connectivity, symmetry, and assumption data
-- Check logical spin removal follows the same path
+- Tested functions: `kill_spin`, `dilute`, `dictum`, `merge_inp`.
+- Test infrastructure: `new_test_result`, `test_true`.
+- Support utilities referenced by the fixture: `spin`, `md5_hash`.

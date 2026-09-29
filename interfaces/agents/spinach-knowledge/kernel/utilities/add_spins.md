@@ -1,46 +1,30 @@
 # kernel/utilities/add_spins.m
 
-- Signature: `[mult,proj]=add_spins(spin_a,spin_b)`
-
 ## Purpose
 
-Reduction of direct products of two su(2) irreps. Syntax: [mult,proj]=add_spins(spin_a,spin_b)
+Reduces the direct product of two su(2) irreducible representations into a direct sum of irreducible representations, returning the multiplicities of the total spin values that occur and the corresponding projection operators.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/add_spins.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## How to use it
 
-## Numerical / algorithmic content
+`[mult,proj]=add_spins(spin_a,spin_b)` reduces the tensor product of two spins into total-spin sectors. Each input must be a real scalar integer or half-integer quantum number of at least 1/2; invalid inputs raise an error. The sectors are ordered by increasing total-spin Casimir eigenvalue. `mult` records the dimension of each sector, and `proj{n}` gives its basis vectors as columns in the original direct-product space.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+The projected spin generators are canonicalised to the standard spin matrices: within each sector, columns follow descending `Sz` eigenvalue and phase conventions chosen to match `Sx` and `Sy`. The function errors if that canonicalisation fails, rather than returning an inconsistent projector. For spin quantum numbers a and b, the expected sectors have total spin from |a−b| to a+b in integer steps.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- spin_a -quantum number of the first spin,
-- an integer or a half-integer
-- spin_b -quantum number of the second spin,
-- an integer or a half-integer
+**Inputs**
 
-## Outputs
+- `spin_a` — quantum number of the first spin; an integer or a half-integer.
+- `spin_b` — quantum number of the second spin; an integer or a half-integer.
 
-- mult -multiplicities corresponding to
-- the values of the total spin that
-- are present
-- proj -projectors that reduce the direct
-- product representation, a cell ar-
-- ray of matrices
+**Outputs**
 
-## Implementation structure
+- `mult` — one value per total-spin sector; the implementation records the dimension of each projected block.
+- `proj` — projectors that reduce the direct product representation; a cell array of matrices.
 
-- Reduction of direct products of two su(2) irreps. Syntax:
-- [mult,proj]=add_spins(spin_a,spin_b)
-- spin_a -quantum number of the first spin,
-- an integer or a half-integer
-- spin_b -quantum number of the second spin,
-- mult -multiplicities corresponding to
-- the values of the total spin that
-- are present
-- proj -projectors that reduce the direct
-- product representation, a cell ar-
-- ray of matrices
-- Check consistency
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=add_spins.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/add_spins.m>

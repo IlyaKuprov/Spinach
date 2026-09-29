@@ -1,59 +1,25 @@
 # experiments/hyperpol/topdnp_steady.m
 
 - Signature: `dnp=topdnp_steady(spin_system,parameters,H,R,K)`
+- Context: call from a powder context; `H`, `R`, and `K` are supplied by that context.
+- Canonical implementation: [`experiments/hyperpol/topdnp_steady.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/topdnp_steady.m)
 
-## Purpose
+## What it computes
 
-Time-optimised pulsed DNP experiment from: (a steady state version). Syntax (call from powder context): dnp=topdnp_steady(spin_system,parameters,H,R,K)
+This is the stroboscopic steady-state implementation of the time-optimised pulsed DNP experiment cited in the source. It scans the microwave resonance offsets in `parameters.el_offs`, builds one repeated TOP block and its post-contact shot-spacing delay, solves for the periodic fixed point, and reports its overlap with the electron detection state `parameters.coil`. It models the spin-system dynamics represented by `H`, relaxation `R`, and kinetics `K`; the source requires finite-temperature thermalisation of `R`. This is a computed observable, not a claim of measured polarisation or a numerical result.
 
-## Physical / mathematical content
+## Sequence and units
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+The source forms `L=H+1i*R+1i*K`. For each offset it adds `2*pi*(el_offs+addshift)*Ez` and electron microwave drive `2*pi*irr_powers*Ex`; the offset, centre shift, and microwave amplitude are specified in Hz and converted by `2*pi` to angular-frequency terms. The electron operators are `Ez` and `Ex`.
 
-## Numerical / algorithmic content
+The block propagator is `propagator(L_curr,delay_dur)*propagator(L1,pulse_dur)`: with Spinach's left-acting propagators this applies the +X microwave pulse first, then the free/contact delay. That block is repeated `nloops` times, followed by evolution under `L_curr` for `shot_spacing`. The code finds the resulting stroboscopic steady state with `steady(...,'newton')`. `pulse_dur`, `delay_dur`, and `shot_spacing` are seconds; `nloops` is a positive integer.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs and output
 
-## Parameters / inputs
+Required experiment fields are `irr_powers` (microwave nutation frequency, Hz), `coil` (detection state), `pulse_dur` and `delay_dur` (seconds), `nloops`, `shot_spacing` (seconds), `addshift` (Hz), and numeric offset vector `el_offs` (Hz). The matrices `H`, `R`, and `K` must be dimension-compatible context matrices. The solver initialises one complex output element per offset; `size(dnp)` follows `size(parameters.el_offs)`. Each element is `coil'*rho_ss` at that offset. GPU use is optional when enabled by the Spinach system settings.
 
-- H -Hamiltonian matrix, received from
-- context function
-- R -relaxation superoperator, received
-- from context function, must be ther-
-- malised to some finite temperature
-- K -kinetics superoperator, received
-- from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.coil -detection state vector
-- parameters.pulse_dur -pulse duration, seconds
-- parameters.delay_dur -delay duration, seconds
-- parameters.nloops -number of XiX/TPPM DNP blocks,
-- must be an integer power of 2
-- parameters.shot_spacing -delay between microwave irradiation
-- periods, seconds
-- parameters.addshift -shift of the centre of the field
-- profile, Hz
-- parameters.el_offs -microwave resonance offsets, a vector
-- of frequencies in Hz
-- Output:
-- dnp -steady state observable on the de-
-- tection state vector as a function
-- of microwave resonance offset
+## References
 
-## Implementation structure
-
-- Time-optimised pulsed DNP experiment from:
-- (a steady state version). Syntax (call from powder context):
-- dnp=topdnp_steady(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from
-- context function
-- R -relaxation superoperator, received
-- from context function, must be ther-
-- malised to some finite temperature
-- K -kinetics superoperator, received
-- from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
+- Source paper: [DOI 10.1126/sciadv.aav6909](https://doi.org/10.1126/sciadv.aav6909).
+- Spin Dynamics Wiki: [`topdnp_steady.m`](https://spindynamics.org/wiki/index.php?title=topdnp_steady.m).
+- MATLAB implementation: [`experiments/hyperpol/topdnp_steady.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/topdnp_steady.m).

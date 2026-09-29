@@ -1,22 +1,18 @@
 # kernel/plotting/kfigure.m
 
-- Signature: `handle=kfigure(varargin)`
+Source: [kernel/plotting/kfigure.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/kfigure.m) · Source-listed Wiki URL: [Wiki](https://spindynamics.org/wiki/index.php?title=pauli.m)
 
-## Purpose
+- Signature: `handle = kfigure(varargin)`
 
-Resets the stupid ass figure defaults in R2025a and later back to sensible values.
+## Behaviour and figure defaults
 
-## Physical / mathematical content
+Before creating a figure, `kfigure` sets these four defaults on MATLAB's root object `groot`:
 
-## Numerical / algorithmic content
+- `DefaultFigurePosition`: `[680 458 560 420]`
+- `DefaultFigureWindowStyle`: `normal`
+- `DefaultFigureMenuBar`: `figure`
+- `DefaultFigureToolbar`: `figure`
 
-## Implementation structure
+The position value is retained as supplied to the root default; the function does not set a figure coordinate unit. The source describes these as the pre-R2025a settings. It then calls `figure(varargin{:})` and returns that handle. The root defaults are global MATLAB figure defaults and remain changed after the call, affecting later figures unless reset elsewhere.
 
-- Resets the stupid ass figure defaults in R2025a
-- and later back to sensible values.
-- Reset to pre-R2025a settings
-- Create and return a handle
-- #NGRUM #NHEAD
-- The most common error of a smart engineer is to
-- optimize a thing that should not exist.
-- Elon Musk
+All input arguments are forwarded to MATLAB's `figure`; this function performs no input validation. It creates a figure but does not calculate plot data, axes limits, or physical quantities.

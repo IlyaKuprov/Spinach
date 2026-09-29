@@ -1,43 +1,26 @@
 # kernel/pulses/vg_pulse.m
 
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/vg_pulse.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=vg_pulse.m
 - Signature: `waveform=vg_pulse(pulse_name,npoints,duration)`
 
 ## Purpose
 
-Veshtort-Griffin shaped pulses, generated from tables given in There are good reasons to believe (see Section 2.2 of the paper) that these are the best possible pulses within their design specifications and basis sets. Syntax: waveform=vg_pulse(pulse_name,npoints,duration)
+Generates the tabulated Veshtort–Griffin shaped pulses associated with the cited paper. The source repeats the paper's statement that there are good reasons to believe these are the best possible pulses within their design specifications and basis sets (Section 2.2); that is the paper's claim, not a general guarantee for other designs.
 
-## Physical / mathematical content
+## Coefficients and sampling
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+The available pulse names select columns of coefficient tables embedded in the MATLAB source; the function does not take a waveform-file path or read an external pulse file. For the selected name, it sums cosine harmonics `k=0:20` and sine harmonics `k=1:20` on a `npoints`-element grid from `0` through `2*pi`, then applies the factor `2*pi/duration`. The output is sampled amplitude, not a phase-modulated waveform.
 
-## Numerical / algorithmic content
+## Inputs and output
 
-## Parameters / inputs
+- `pulse_name` - character string selecting one of `E0A`, `E0B`, `E100A`, `E100B`, `E200A`, `E200D`, `E200F`, `E300C`, `E300F`, `E400B`, `E300A`, `E500A`, `E500B`, `E500C`, `E600A`, `E600C`, `E600F`, `E800A`, `E800B`, or `E1000B`
+- `npoints` - finite positive integer number of discrete pulse intervals
+- `duration` - finite positive real pulse duration, in seconds
+- `waveform` - amplitude at the sampled intervals, in radians per second; the source documentation describes it as having no phase modulation and being normalised to produce a 90-degree pulse
 
-- pulse_name -a character string, one of the following: E0A,
-- E0B, E100A, E100B, E200A, E200D, E200F, E300C,
-- E300F, E400B, E300A, E500A, E500B, E500C, E600A,
-- E600C, E600F, E800A, E800B, E1000B
-- npoints -number of discrete time intervals in the pulse
-- duration -duration of the pulse, seconds
+There is no filter or phase input: pulse identity, point count, and duration are the controls exposed by this function.
 
-## Outputs
+## Reference
 
-- waveform -amplitude of the pulse at each interval (there
-- is no phase modulation), normalised to produce
-- a 90-degree pulse, rad/s
-
-## Implementation structure
-
-- Veshtort-Griffin shaped pulses, generated from tables given in
-- There are good reasons to believe (see Section 2.2 of the paper) that
-- these are the best possible pulses within their design specifications
-- and basis sets. Syntax:
-- waveform=vg_pulse(pulse_name,npoints,duration)
-- pulse_name -a character string, one of the following: E0A,
-- E0B, E100A, E100B, E200A, E200D, E200F, E300C,
-- E300F, E400B, E300A, E500A, E500B, E500C, E600A,
-- E600C, E600F, E800A, E800B, E1000B
-- npoints -number of discrete time intervals in the pulse
-- duration -duration of the pulse, seconds
-- waveform -amplitude of the pulse at each interval (there
+- Veshtort–Griffin pulse design paper: https://doi.org/10.1002/cphc.200400018

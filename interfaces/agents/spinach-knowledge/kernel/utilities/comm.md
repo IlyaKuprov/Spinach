@@ -1,36 +1,22 @@
 # kernel/utilities/comm.m
 
-- Signature: `C=comm(A,B)`
-
 ## Purpose
 
-A simple shorthand for the commutator of two matrices. Syntax: C=comm(A,B)
+`comm.m` computes the commutator of two square matrices, providing a simple shorthand for the expression `A*B-B*A`. Source: [kernel/utilities/comm.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/comm.m).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function is called as `C=comm(A,B)`. It first runs an internal consistency check (`grumble`) on the inputs and then returns `C=A*B-B*A`. The consistency check raises an error with the message `both inputs must be numeric.` if either input is not numeric, and an error with the message `both inputs must be square matrices.` if either input is not square (i.e., its number of rows differs from its number of columns).
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
+- `A`, `B` — square matrices; both must be numeric.
 
-- A,B -square matrices
+Outputs:
+- `C` — a square matrix, the commutator `A*B-B*A`.
 
-## Outputs
+## References
 
-- C -a square matrix
-
-## Implementation structure
-
-- A simple shorthand for the commutator of two
-- matrices. Syntax:
-- C=comm(A,B)
-- A,B -square matrices
-- C -a square matrix
-- Check consistency
-- Do the deed
-- Consistency enforcement
-- Люцифер, принц изгнанников!
-- Да вернётся имя Твоё,
-- да осветит царствие Твоё,
-- и да утешит братиев Твоих
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=comm.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/comm.m>

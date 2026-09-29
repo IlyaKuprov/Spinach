@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Nuclear overhauser effect in a homonuclear two-spin system in the long correlation time case. Calculation time: seconds
+A relaxation-time trajectory for the nuclear Overhauser effect in a homonuclear two-spin system in the long-correlation-time case. One longitudinal spin component is inverted and both spins' longitudinal magnetisations are followed; this is not a NOESY acquisition. The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+Both isotopes are `1H`, both isotropic Zeeman scalars are zero, and the source assigns coordinates `[0 0 0]` and `[0 0 2.00]` without giving a coordinate unit. It sets `sys.magnet=14.1`. The basis uses spherical-tensor Liouville formalism with no approximation. Redfield relaxation uses the `dibari` equilibrium convention, `kite` retention, temperature 298, and `tau_c={1e-9}`.
 
-## Numerical / algorithmic content
+## Preparation and observable channels
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The code constructs the relaxation superoperator and thermal equilibrium state, then inverts spin 1's `Lz` component relative to equilibrium. Multichannel evolution under `1i*R` detects the two spins separately with their respective `Lz` operators, using step parameter `1e-2` and 1000 steps. The trajectory is plotted against `linspace(0,10,1001)`, labelled in seconds, with the traces identified as Proton A and Proton B.
 
-## Implementation structure
+## Source
 
-- Nuclear overhauser effect in a homonuclear two-spin system in
-- the long correlation time case.
-- Calculation time: seconds
-- Set the spin system
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Spinach housekeeping
-- Build the relaxation superoperator
-- Get thermal equilibrium state
-- Start in a state with one spin inverted
-- Compute the evolution trajectory
+[examples/nmr_liquids/noe_two_spin_hom.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_two_spin_hom.m)

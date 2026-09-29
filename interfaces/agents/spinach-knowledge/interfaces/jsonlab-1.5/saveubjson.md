@@ -1,29 +1,13 @@
 # interfaces/jsonlab-1.5/saveubjson.m
 
-- Signature: `json=saveubjson(rootname,obj,varargin)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/saveubjson.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
-## Purpose
+**Call:** `json=saveubjson(rootname,obj,varargin)`. The implementation also accepts `saveubjson(obj)`; the one-input form derives a root name from the input variable, or uses `root` when that value is unnamed. With a root name, use `saveubjson(rootname,obj,filename)`, an options structure, or name/value pairs. A sole character optional argument is interpreted as a filename; `FileName` is the corresponding option.
 
-No descriptive header was found. The best immediate identifier is `json=saveubjson(rootname,obj,varargin)`, and the implementation details below should be used to infer its role.
+The accepted MATLAB data families are numeric/logical arrays, character data, cells, structs/struct arrays, and class instances; class instances are serialised from their visible properties. An empty root name omits the root wrapper unless `ForceRootName` is enabled. The returned `json` is a character vector containing UBJSON bytes; `FileName` writes it in binary mode. Numeric arrays above two dimensions, sparse arrays, complex arrays, and arrays selected by `ArrayToStruct` use JData metadata; higher-dimensional cells and struct arrays are reshaped to two dimensions. The serializer does not assign or convert physical units.
 
-## Physical / mathematical content
+Options read by this implementation include `FileName`, `ArrayToStruct` (default 0), `SingletArray` (default 0), `SingletCell` (default 1), `ForceRootName` (default 0), `JSONP`, `Inf`, `NaN`, and `UnpackHex` (default 1). `ArrayToStruct` stores array type and size with data; sparse arrays use index/value triplets and complex arrays carry real/imaginary components and a complex marker. `JSONP`, when nonempty, wraps the serialised result in the named call form. The source code does not consult several options mentioned in copied header text, including `FloatFormat`, `ArrayIndent`, and `ParseLogical`; they are not described here as supported controls.
 
-- JSONLab vendored utilities. The main content is data serialisation, structure walking, option parsing, and text/binary JSON handling rather than spin physics.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The source example builds a mesh struct with coordinate/connectivity arrays and `SpecialData=[NaN,Inf,-Inf]`, then calls `saveubjson('jsonmesh',jsonmesh)` or writes `meshdata.ubj`. The example is source documentation, not a run result. Non-finite-value encodings and downstream interpretation should be checked against the consumer's UBJSON implementation.
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- json=saveubjson(rootname,obj,filename)
-- json=saveubjson(rootname,obj,opt)
-- json=saveubjson(rootname,obj,'param1',value1,'param2',value2,...)
-- convert a MATLAB object (cell, struct or array) into a Universal
-- Binary JSON (UBJSON) binary string
-- author: Qianqian Fang (q.fang <at> neu.edu)
-- created on 2013/08/17
-- $Id$
-- input:
-- rootname: the name of the root-object, when set to '', the root name
-- is ignored, however, when opt.ForceRootName is set to 1 (see below),
-- the MATLAB variable name will be used as the root name.
+The vendored source identifies Qianqian Fang as author and gives a BSD license (see `LICENSE_BSD.txt`).

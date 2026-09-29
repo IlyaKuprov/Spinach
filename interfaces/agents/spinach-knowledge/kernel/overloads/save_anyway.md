@@ -1,34 +1,20 @@
 # kernel/overloads/save_anyway.m
 
+Source: [kernel/overloads/save_anyway.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/save_anyway.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=save_anyway.m)
+
 - Signature: `save_anyway(file_name,variable)`
 
 ## Purpose
 
-A wrapper intended to trick SPMD blocks into saving data. Can only save one variable at a time, its name in the mat file is "variable". Syntax: save_anyway(file_name,variable)
+A wrapper intended to let SPMD blocks save a value using a fixed variable name in a MAT-file.
 
-## Physical / mathematical content
+## Behaviour
 
-## Numerical / algorithmic content
+The function checks only that `file_name` is a character array, then calls `save(file_name,'variable','-v7.3')`. Consequently, the saved MAT-file variable is named `variable`, regardless of the caller's name for the second argument. It saves one variable per call in MATLAB v7.3 format and then calls `drawnow`. There is no returned output; save errors are not caught by this wrapper.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs
 
-## Parameters / inputs
+- `file_name`: character array naming the MAT-file.
+- `variable`: value to save.
 
-- file_name -a character string specifying the
-- file name
-- variable -the variable to be saved
-
-## Implementation structure
-
-- A wrapper intended to trick SPMD blocks into saving data. Can
-- only save one variable at a time, its name in the mat file is
-- "variable". Syntax:
-- save_anyway(file_name,variable)
-- file_name -a character string specifying the
-- file name
-- variable -the variable to be saved
-- Check consistency
-- Just call save
-- Consistncy enforcement
-- Life struggles to survive here, and while some clings
-- to a tenacious existence, it is anemic and sickly.
+The source does not add validation for the value being saved.

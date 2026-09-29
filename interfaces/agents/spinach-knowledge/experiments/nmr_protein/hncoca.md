@@ -1,56 +1,28 @@
 # experiments/nmr_protein/hncoca.m
 
-- Signature: `fid=hncoca(spin_system,parameters,H,R,K)`
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_protein/hncoca.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=hncoca.m)
 
-## Purpose
+## What the sequence represents
 
-Phase-sensitive HN(CO)CA pulse sequence from using the bidirectional propagation method described in The sequence is hard-wired to work on 1H,13C,15N proteins and uses PDB labels to select spins that will be affected by otherwise ideal pulses. F1 is N, F2 is CA, F3 is H. Syntax: fid=hncoca(spin_system,parameters,H,R,K)
+This is a phase-sensitive three-dimensional HN(CO)CA sequence for 1H, 13C, and 15N-labelled proteins. The documented frequency dimensions are F1 = N, F2 = CA, and F3 = H. The source cites the reported experiment ([DOI: 10.1007/BF01874573](https://doi.org/10.1007/BF01874573)) and the bidirectional-propagation method ([DOI: 10.1016/j.jmr.2014.04.002](https://doi.org/10.1016/j.jmr.2014.04.002)).
 
-## Physical / mathematical content
+This is the HN-to-N-to-carbonyl-to-CA correlation pathway, with the final proton channel detected. In the implementation, PDB atom labels select `H`, `N`, `C` (carbonyl), and `CA`; the source comment asks that labels such as `CA` and `HA` be provided through `sys.labels`. The code uses `spin_system.comp.labels` for the atom selections, and obtains isotope-wide proton and nitrogen pulse operators with `operator(...,'L+','1H')` and `operator(...,'L+','15N')`. Carbonyl and alpha-carbon operators are selected from the `C` and `CA` label masks. These are ideal Cartesian pulses applied with `step`.
 
-- Protein triple-resonance sequence implementations. They orchestrate heteronuclear coherence transfers across biomolecular spin networks while preserving phase and acquisition conventions.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The routine creates an NH `Lz` initial state and NH `L+` detection state when `parameters.rho0` or `parameters.coil` is not supplied. It selects positive and negative 15N coherence in F1, then constructs the four sign combinations by stitching forward state trajectories with backward-propagated detection trajectories. This is why the return value contains four States-quadrature components rather than one ordinary spectrum.
 
-## Numerical / algorithmic content
+## Inputs and timing
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Call signature: `fid=hncoca(spin_system,parameters,H,R,K)`.
 
-## Parameters / inputs
+- `parameters.npoints`: three integers ordered `[t1 t2 t3]`.
+- `parameters.sweep`: three sweep widths in Hz, ordered `[f1 f2 f3]`.
+- `parameters.tau`: four delays in seconds. The source gives `[2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3]` as reasonable values.
+- `parameters.rho0`: optional initial state; defaults to NH-proton `Lz` state.
+- `parameters.coil`: optional detection state; defaults to NH-proton `L+` state.
+- `H`, `R`, `K`: Hamiltonian, relaxation, and kinetics matrices supplied by the context function.
 
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
-- parameters.tau -the four delays required for the ope-
-- ration of the sequence (see the paper)
-- in seconds. Reasonable values are
-- [2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3]
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+The routine requires the `sphten-liouv` formalism and matching matrix dimensions for `H`, `R`, and `K`. It checks for three entries in `npoints` and `sweep`, four in `tau`, and positive real delay values. It is hard-wired to the stated protein nuclei and atom-label conventions.
 
-## Outputs
+## Output
 
-- fid -a structure with four fields: fid.pos_pos, fid.pos_neg,
-- fid.neg_pos, fid.neg_neg that are used in the subsequ-
-- ent States quadrature processing
-- Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
-- sys.labels for this sequence to work properly.
-
-## Implementation structure
-
-- Phase-sensitive HN(CO)CA pulse sequence from
-- using the bidirectional propagation method described in
-- The sequence is hard-wired to work on 1H,13C,15N proteins and uses
-- PDB labels to select spins that will be affected by otherwise ideal
-- pulses. F1 is N, F2 is CA, F3 is H. Syntax:
-- fid=hncoca(spin_system,parameters,H,R,K)
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
+`fid` contains `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg` for States quadrature. The four 3D arrays are permuted with `[3 2 1]`, giving dimension order `[t3,t2,t1]` and nominal extents `[npoints(3),npoints(2),npoints(1)]`; these correspond to H, CA, and N, respectively.

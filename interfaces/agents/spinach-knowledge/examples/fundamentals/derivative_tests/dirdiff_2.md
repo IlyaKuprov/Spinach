@@ -1,32 +1,21 @@
 # examples/fundamentals/derivative_tests/dirdiff_2.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_2.m)
+
 - Signature: `dirdiff_2()`
 
 ## Purpose
 
-Test of matrix exponential differentiation of second order Magnus product quadrature (trapdiff.m) with the result com- pared to the central finite difference derivative. General coherent + non-symmetric dissipative case is tested.
+This example compares the analytical left- and right-control derivatives returned by `trapdiff` for the second-order Magnus product quadrature with centred finite differences of the associated matrix exponential.
 
-## Physical / mathematical content
+## Test construction
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+For each of `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, the script constructs a test spin system; the derivative comparison itself uses independent random complex 50-by-50 drift matrices and a 50-by-50 control matrix, not a physical spin Hamiltonian. It scales the time step with the reciprocal drift-matrix norms and tests the coherent plus non-symmetric dissipative case.
 
-## Numerical / algorithmic content
+## Derivatives and comparison
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+It uses a step of `sqrt(eps('double'))`, constructs left and right directions for the second-order Magnus trapezoid, and estimates each matrix-exponential derivative by central differences in that direction. It compares both estimates with `trapdiff` using spectral 2-norm residuals; each must be strictly below `10*sqrt(eps('double'))`. Otherwise the script raises an error; a successful comparison prints `trapezium quadrature derivative test passed`.
 
-## Implementation structure
+## Scope
 
-- Test of matrix exponential differentiation of second order
-- Magnus product quadrature (trapdiff.m) with the result com-
-- pared to the central finite difference derivative. General
-- coherent + non-symmetric dissipative case is tested.
-- Formalisms to test
-- Loop over formalisms
-- Get the Spinach object
-- Left and right drift generators, dissipative
-- Control operator
-- A reasonable time step estimate
-- Reasonable controls
-- Get analytical derivatives
+This is a finite-difference consistency check for the stated matrix construction and the two derivative outputs. The formalism labels do not constitute three independent derivative calculations, and the random matrices do not by themselves establish behaviour for every physical generator or for a composed simulation algorithm.

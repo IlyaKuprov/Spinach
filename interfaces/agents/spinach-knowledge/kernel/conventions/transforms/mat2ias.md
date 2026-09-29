@@ -1,44 +1,23 @@
 # kernel/conventions/transforms/mat2ias.m
 
-- Signature: `[a,d,A]=mat2ias(C)`
+MATLAB source: [kernel/conventions/transforms/mat2ias.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/mat2ias.m)
+Spinach Wiki: [mat2ias.m](https://spindynamics.org/wiki/index.php?title=mat2ias.m)
 
-## Purpose
+## Purpose and usage
 
-Isotropic-antisymmetric-symmetric decomposition of a 3x3 real interaction matrix between real vectors u and v: u'*C*v = a*(u'*v) + d'*cross(u,v) + u'*A*v
+Decomposes a real 3-by-3 interaction matrix `C` into isotropic, antisymmetric, and traceless symmetric parts:
 
-## Physical / mathematical content
+`[a, d, A] = mat2ias(C)`
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+For real vectors `u` and `v`, the decomposition obeys
 
-## Numerical / algorithmic content
+`u' * C * v = a * (u' * v) + d' * cross(u, v) + u' * A * v`.
 
-## Syntax
+## Input and outputs
 
-```matlab
-[a,d,A]=mat2ias(C)
-```
+- `C`: any real numeric 3-by-3 matrix; symmetry is not required.
+- `a`: scalar isotropic component, `trace(C)/3`.
+- `d`: 3-by-1 antisymmetric coupling vector, `[(C(2,3)-C(3,2)); (C(3,1)-C(1,3)); (C(1,2)-C(2,1))]/2`.
+- `A`: 3-by-3 symmetric traceless matrix, `(C + C')/2 - a*eye(3,3)`.
 
-## Parameters / inputs
-
-- C -real 3x3 matrix
-
-## Outputs
-
-- a -scalar component
-- d -antisymmetric coupling vector
-- A -symmetric coupling matrix
-
-## Implementation structure
-
-- Isotropic-antisymmetric-symmetric decomposition of a 3x3
-- real interaction matrix between real vectors u and v:
-- u'*C*v = a*(u'*v) + d'*cross(u,v) + u'*A*v
-- [a,d,A]=mat2ias(C)
-- C -real 3x3 matrix
-- a -scalar component
-- d -antisymmetric coupling vector
-- A -symmetric coupling matrix
-- Check consistency
-- Isotropic part
-- Antisymmetric part
-- Traceless symmetric part
+The implementation checks that `C` is numeric, real, and exactly 3-by-3. It does not require `C` to be symmetric.

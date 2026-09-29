@@ -1,48 +1,18 @@
 # kernel/grids/grid_plot.m
 
-- Signature: `grid_plot(x,y,z,vorn,c,options)`
+[Direct MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/grid_plot.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=grid_plot.m)
 
 ## Purpose
 
-Spherical quadrature grid plotter. Takes a cloud of points on a sphere and plots its Voronoi tessellation. Syntax: grid_plot(x,y,z,vorn,c,options)
+Plot spherical sample points and their Voronoi tessellation. The routine draws into the current graphics axes and returns no value.
 
-## Physical / mathematical content
+## Inputs
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `x`, `y`, and `z` are equal-length N-by-1 column vectors of finite real numeric Cartesian coordinates. They represent points on a sphere; the function does not rescale them or check that each point has unit norm, and the coordinates have no physical units assigned by this routine.
+- `vorn` is a cell array of tessera vertex data. If omitted or empty, the tessellation is obtained from `voronoisphere([x';y';z'])`. The source checks that `vorn` is a cell array, but does not check that its cell count matches N.
+- `c` selects face colour: omitted or empty means white; a character value is used as the face colour name; otherwise each face uses `c(k)`. Numeric colour data should therefore provide one value per face; the routine does not validate its length.
+- `options.dots` controls centre markers. If the options argument or this field is absent, dots default to true; setting it false suppresses them.
 
-## Numerical / algorithmic content
+## Rendering behaviour
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- x,y,z -column vectors containing Cartesian
-- coordinates of grid points
-- c -values to be mapped into the colour
-- of each tessellation face, white if
-- this input is left empty
-- vorn -Voronoi tessellation; if this is not
-- provided, it will be computed
-- options.dots -the default (true) puts black
-- dots at centres of tessellati-
-- on faces
-
-## Outputs
-
-- this function plots a figure
-
-## Implementation structure
-
-- Spherical quadrature grid plotter. Takes a cloud of points
-- on a sphere and plots its Voronoi tessellation. Syntax:
-- grid_plot(x,y,z,vorn,c,options)
-- x,y,z -column vectors containing Cartesian
-- coordinates of grid points
-- c -values to be mapped into the colour
-- of each tessellation face, white if
-- this input is left empty
-- vorn -Voronoi tessellation; if this is not
-- provided, it will be computed
-- options.dots -the default (true) puts black
-- dots at centres of tessellati-
+When enabled, the sample centres are black dots with marker size 3. Each tessera is drawn as a fully opaque patch. The plot limits are [-1.1,+1.1] on each Cartesian axis, the axes are square, the camera position is [0,0,10], and tick marks are hidden. The routine computes a tessellation only when `vorn` is omitted or empty; it does not calculate quadrature weights.

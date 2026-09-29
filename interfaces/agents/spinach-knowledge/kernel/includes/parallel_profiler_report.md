@@ -1,30 +1,20 @@
 # kernel/includes/parallel_profiler_report.m
 
-- Signature: `(script file)`
+- Signature: script include; intended immediately after a profiled `parfor` or `spmd` stage started with `parallel_profiler_start`
 
-## Purpose
+## Summary report and worker-data mapping
 
-An include that writes the report of the profiling infrastructure around parallel stages. Should be invoked just after a parfor or an spmd for which parallel_profiler_start was previously called.
+The summary runs only when `~isworkernode`. It calls `tocBytes(gcp)`, averages the returned rows over workers with `mean(...,1)`, divides both columns by `2^20`, and reports the first value as the average MB received by a worker and the second as the average MB sent back. It also calls `toc()` and reports the elapsed stage time in seconds. The MB labels and direction are the source's own interpretation of those two columns.
 
-## Physical / mathematical content
+## Detailed profiler file
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+A second guard requires both `~isworkernode` and `'dafuq'` in `spin_system.sys.enable`. Under that guard the include drains `parProfiler.drainLog()` into `parpool_history`, takes the caller name from `dbstack` entry `a(end-1).name`, and builds `filename=[spin_system.sys.scratch filesep datestr(clock,30) '_' a(end-1).name '.mat']`. It saves `parpool_history` to that MAT file. It then calls `drawnow` and reports the saved filename. When either guard is false, this detailed drain-and-save branch does not run.
 
-## Numerical / algorithmic content
+## Source comment attribution
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The source includes a poem attributed to Philip Larkin.
 
-## Implementation structure
+## Source links
 
-- An include that writes the report of the profiling infrastructure
-- around parallel stages. Should be invoked just after a parfor or
-- an spmd for which parallel_profiler_start was previously called.
-- Brief parallel profiler report
-- Detailed parallel profiler report
-- They fuck you up, your mum and dad.
-- They may not mean to, but they do.
-- They fill you with the faults they had
-- And add some extra, just for you.
-- But they were fucked up in their turn
-- By fools in old-style hats and coats,
-- Who half the time were soppy-stern
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/includes/parallel_profiler_report.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=parallel_profiler_report.m)

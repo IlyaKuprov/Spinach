@@ -1,32 +1,15 @@
 # examples/nmr_solids/cp_respiration.m
 
-- Signature: `cp_respiration()`
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_respiration.m
 
 ## Purpose
 
-1H-13C RESPIRATION-CP experiment in the doubly rotating frame. Magic angle spinning simulation using Fokker-Planck formalism. Calculation time: seconds
+A 1H–13C RESPIRATION-CP example in the doubly rotating frame using magic-angle spinning and the Fokker–Planck formalism. The source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Spin model and sequence inputs
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The source sets sys.magnet to 11.7 and places 1H and 13C at [0, 0, 0] and [0, 0, 2.00]; these coordinates provide the pair geometry for the dipolar interaction. No additional interaction tensor is assigned in the wrapper. It uses the full sphten-liouv basis. The wrapper sets rate=20000 (no unit is stated), the axis [sqrt(2/3), 0, sqrt(1/3)], max_rank=8, and the rep_2ang_100pts_sph grid. It initialises 1H transverse magnetisation (Lx) and detects 13C L+; nloops is 16 and theta is pi/20. These are parameters passed to the external respiration sequence helper: this file does not define its internal RF waveform or give an RF-amplitude or CP-contact-time schedule.
 
-## Numerical / algorithmic content
+## Acquired and plotted spectrum
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H-13C RESPIRATION-CP experiment in the doubly rotating frame.
-- Magic angle spinning simulation using Fokker-Planck formalism.
-- Calculation time: seconds
-- Magnet field
-- System specification
-- Formalism and basis
-- Spinach housekeeping
-- Experiment parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The wrapper requests 512 points, zerofill to 16384, sweep=40000, and axis_units=kHz. It applies exponential apodisation with parameter 5, Fourier-transforms the FID, and plots the real spectrum. The code specifies the plotted frequency axis as kHz but does not annotate units for rate, sweep, or the apodisation parameter. This is a simulated output path, not a claim about a measured spectrum or a validation run.

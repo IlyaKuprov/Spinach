@@ -1,29 +1,13 @@
 # examples/nmr_paramag/carb_anh/s166c_lcurve.m
 
+- MATLAB implementation: [examples/nmr_paramag/carb_anh/s166c_lcurve.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s166c_lcurve.m)
+
 - Signature: `s166c_lcurve()`
 
-## Purpose
+This script examines regularisation for the S166C mutant dataset of human carbonic anhydrase II. The source cites https://doi.org/10.1039/c6sc03736d for the system and method and http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis for a tutorial. The article gives the literature context; this script implements a regularisation diagnostic.
 
-L-curves for the S166C mutant dataset for human carbonic anhydrase II. The system and the method are described in: A step-by-step tutorial is available here:
+It loads `expt_pcs`, `xyz`, and `xyz_all` from `s166c_expt.mat`, together with `chi` from `s166c_chi_eff.mat`. The solver parameters select equation `kuprov`, an empty plot request, box centre [-14.0, -3.6, -11.0], box size [50.0, 50.0, 50.0], margins 50 on six faces, confinement [2.0, 12.0], sharpening 0.0, and the loaded data and tensor; `gpu=true()` is set. Units and nuclear-isotope assignments are not stated in this script.
 
-## Physical / mathematical content
+The regularisation values are 30 log-spaced points from 10^-2 through 10^2. A `parfor` loop calls `ipcs(parameters,64,lam(n))`, stores its error and regularisation outputs, and divides each returned regularisation value by its corresponding `lam(n)`. The script then calls `lcurve(lam,err,reg,'log')`, draws the figure, and prints the returned suggested smoothing parameter. Thus the plotted L-curve uses the normalised `reg/lam` values; the suggested smoothing parameter is returned by `lcurve`.
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-
-## Implementation structure
-
-- L-curves for the S166C mutant dataset for human carbonic anhydrase
-- II. The system and the method are described in:
-- A step-by-step tutorial is available here:
-- Load experimental data
-- Load susceptibility tensor
-- Solver parameters
-- Regularisation parameter array
-- Result arrays
-- Run a parallel loop
-- L-curve analysis
+This file is a parameter-sensitivity diagnostic, distinct from the 64-to-256 grid refinement in `s166c_kuprov.m`.

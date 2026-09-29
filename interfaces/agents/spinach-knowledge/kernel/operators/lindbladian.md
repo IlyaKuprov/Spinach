@@ -1,45 +1,29 @@
 # kernel/operators/lindbladian.m
 
 - Signature: `R=lindbladian(A_left,A_right,rho,rlx_rate)`
+- Direct source: [kernel/operators/lindbladian.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/lindbladian.m)
+- Wiki: [lindbladian.m](https://spindynamics.org/wiki/index.php?title=lindbladian.m)
 
 ## Purpose
 
-Generates a Lindblad superoperator from user-specified left-side and right-side product superoperators and calibrates it using the experi- mental relaxation rate of a user-specified state. Syntax: R=lindbladian(A_left,A_right,rho,rlx_rate)
+Constructs and rate-calibrates a matrix relaxation generator from left- and right-side product superoperators and a state vector whose rate is specified. It returns the generator matrix; this routine does not exponentiate it or construct a time-step propagator.
 
-## Physical / mathematical content
+## Inputs and operator action
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+`A_left` and `A_right` are the left-side and right-side product superoperators for the interaction, respectively. They must have compatible matrix dimensions for the products in the implementation. `rho` is the state vector supplied for rate calibration and must have dimensions compatible with the matrix products. The function forms a matrix `R`; its action on a state vector is ordinary matrix multiplication `R*rho`. It does not construct the left/right product superoperators or convert between state-vector conventions.
 
-## Numerical / algorithmic content
+## Construction and rate calibration
 
-## Parameters / inputs
+The unscaled matrix is formed in this order:
 
-- A_left -left side product superoperator of the
-- interaction that is causing relaxation
-- (see operator.m and hamiltonian.m)
-- A_right -right side product superoperator of the
-- same interaction
-- rho -the state vector whose relaxation rate
-- is known from the experiment
-- rlx_rate -experimental relaxation rate of rho
+`R0 = A_left*A_right' - (A_left'*A_left + A_right*A_right')/2`
 
-## Outputs
+Here MATLAB `'` is the conjugate transpose. The routine replaces `rho` by `rho/norm(rho,2)`, rejects a zero input state, and checks whether `abs(rho'*R0*rho) <= 1e-10*norm(R0*rho,2)`; if so it errors because the supplied operator does not appear to relax that state. Otherwise the returned matrix is
 
-- R -Lindblad relaxation superoperator indu-
-- ced by the interaction A, such that
-- <rho|R|rho>/norm(rho,2)^2 = -rlx_rate
+`R = -rlx_rate*R0/(rho'*R0*rho)`
 
-## Implementation structure
+using the normalised `rho`. Thus the implemented calibration sets `rho'*R*rho` to `-rlx_rate` for that normalised vector. `rlx_rate` must be a finite, non-negative real scalar. This scalar constraint and the state test are the checks made here; no further physical property of the returned matrix is established by this routine.
 
-- Generates a Lindblad superoperator from user-specified left-side and
-- right-side product superoperators and calibrates it using the experi-
-- mental relaxation rate of a user-specified state. Syntax:
-- R=lindbladian(A_left,A_right,rho,rlx_rate)
-- A_left -left side product superoperator of the
-- interaction that is causing relaxation
-- (see operator.m and hamiltonian.m)
-- A_right -right side product superoperator of the
-- same interaction
-- rho -the state vector whose relaxation rate
-- is known from the experiment
-- rlx_rate -experimental relaxation rate of rho
+## Scope
+
+The function returns a generator matrix, not a propagator. Its source documents the inputs as product superoperators and the output as a Lindblad superoperator; no additional Hilbert-space action, vectorisation convention, or propagator construction is performed in this function.

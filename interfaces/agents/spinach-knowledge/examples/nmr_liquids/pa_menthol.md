@@ -1,31 +1,20 @@
 # examples/nmr_liquids/pa_menthol.m
 
 - Signature: `pa_menthol()`
+- Source: [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pa_menthol.m)
 
 ## Purpose
 
-Menthol NMR spectrum from Damien Jeannerat, including the effect of bad Z1 and Z2 magnet shims. Calculation time: minutes.
+Simulates a liquid-state menthol 1H NMR FID and illustrates effects labelled as bad Z1 and Z2 magnet shims. It is a pulse-acquire calculation using `liquid(...,@acquire,...,'nmr')`, not an INADEQUATE, inversion-recovery, NOE, or NOESY sequence.
 
-## Physical / mathematical content
+## System and basis
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example loads `sys` and `inter` from `menthol.mat`; their numerical shifts, couplings, isotope inventory, and field are not stated in this MATLAB file. It builds a scalar-coupling-connected `sphten-liouv` basis with `IK-2` approximation, proximal level 1, projection +1, and three S3 symmetry groups. The source enables the greedy algorithm.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The detected spin is 1H; both the initial state and receiver are `L+` on 1H, and `decouple` is empty. Source settings are `offset=1000`, `sweep=2000`, `npoints=8192`, and `zerofill=65536`; the axis is ppm and inverted. Offset and sweep units are not given in this source. The FID is processed first with Gaussian apodisation parameter 5, then with the source's `bad-z1` parameter 10 and `bad-z2` parameter 40 operations (each call passes final argument 0). The shifted Fourier transform is plotted using its real part.
 
-## Implementation structure
+## Source limits
 
-- Menthol NMR spectrum from Damien Jeannerat, including the
-- effect of bad Z1 and Z2 magnet shims.
-- Calculation time: minutes.
-- System and interaction specification
-- Formalism and basis set
-- Algorithms
-- Spinach housekeeping
-- Sequence parameters -1H
-- Simulation
-- Gaussian apodisation and then bad shims
-- Fourier transform
-- Plotting
+The source attributes the example to Damien Jeannerat and estimates minutes of calculation, but provides no DOI, explicit shim units, numerical spectrum, measured shim values, or relaxation model in this MATLAB file. The loaded MAT file supplies the spin-system numbers.

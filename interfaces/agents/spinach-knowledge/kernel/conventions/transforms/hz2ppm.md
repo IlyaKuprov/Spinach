@@ -1,39 +1,28 @@
 # kernel/conventions/transforms/hz2ppm.m
 
-- Signature: `ppm=hz2ppm(hz,B0,nucleus)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/hz2ppm.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=hz2ppm.m)
 
-## Purpose
+## Signature
 
-Converts resonance offsets into chemical shifts. Syntax: ppm=hz2ppm(hz,B0,nucleus)
+`ppm = hz2ppm(hz, B0, nucleus)`
 
-## Physical / mathematical content
+## Purpose and conversion
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Converts a resonance offset to a chemical-shift value with the implemented expression:
 
-## Numerical / algorithmic content
+`ppm = 1e6 * (2*pi*hz) / (B0*spin(nucleus))`
 
-## Parameters / inputs
+Here `hz` is the resonance offset in Hz, `B0` is magnetic induction in tesla, and `nucleus` names the isotope (for example, `'1H'`). The source notes that signs of the magnetogyric ratios are preserved. The expression uses `spin(nucleus)` as returned, with no absolute-value operation.
 
-- hz -resonance offset in Hz
-- B0 -magnet induction, Tesla
-- nucleus -a string specifying the isotope, e.g. '1H'
+## Inputs and output
 
-## Outputs
+- `hz`: real numeric array; no explicit dimensionality or size restriction is checked.
+- `B0`: real numeric scalar.
+- `nucleus`: character array naming the isotope; the implementation rejects non-character input.
+- `ppm`: chemical shift in ppm, returned from the displayed expression.
 
-- ppm -chemical shift in ppm
-- Note: signs of the magnetogyric ratios are preserved.
+The source checks that `hz` is numeric and real, that `B0` is numeric, real, and scalar, and that `nucleus` is a character array. It does not explicitly test the sign or nonzero value of `B0`; no explicit size or dimensionality check is applied to `hz`.
 
-## Implementation structure
+## Reference
 
-- Converts resonance offsets into chemical shifts. Syntax:
-- ppm=hz2ppm(hz,B0,nucleus)
-- hz -resonance offset in Hz
-- B0 -magnet induction, Tesla
-- nucleus -a string specifying the isotope, e.g. '1H'
-- ppm -chemical shift in ppm
-- Note: signs of the magnetogyric ratios are preserved.
-- Check consistency
-- Calculate chemical shift in Hz
-- Consistency enforcement
-- Somebody Else's Wife: oh, I am so tired of being boringly taken
-- for granted, he never really acknowledges
+- [Spinach Wiki: hz2ppm.m](https://spindynamics.org/wiki/index.php?title=hz2ppm.m)

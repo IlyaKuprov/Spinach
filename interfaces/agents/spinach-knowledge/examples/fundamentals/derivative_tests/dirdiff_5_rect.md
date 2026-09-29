@@ -1,29 +1,23 @@
 # examples/fundamentals/derivative_tests/dirdiff_5_rect.m
 
+- MATLAB implementation: [examples/fundamentals/derivative_tests/dirdiff_5_rect.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/derivative_tests/dirdiff_5_rect.m)
+
 - Signature: `dirdiff_5_rect()`
 
-## Purpose
+## Question tested
 
-GRAPE Hessian internal consistency test: Newton against Goodwin algorithm.
+This is an internal-consistency comparison between the Newton and Goodwin GRAPE Hessians, not a finite-difference test. It checks both phase-modulated and Cartesian controls with the rectangular integrator.
 
-## Physical / mathematical content
+## Setup
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+For each of `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`, `dirdiff_test_system` supplies the spin system, states, operators, and drift. The controls use isotope `13C`, channel map `[1;1]`, drift `H`, controls `Lx` and `Ly`, initial states {Sx,Sy,Sz}, targets {-Sz,Sy,Sx}, and power levels `2*pi*linspace(50e3,70e3,10)`. The configuration also sets `max_iter=1000` and an empty plotting list. The rectangular grid is `12.8e-6*ones(1,5)`, and the amplitude vector has five entries. A phase guess `randn(1,5)/3` is used for `grape_phase`; a separate Cartesian guess `randn(2,5)/3` is used for `grape_xy`.
 
-## Numerical / algorithmic content
+For each modulation, the script obtains one Hessian with `control.method='newton'` and another with `control.method='goodwin'`, using the same waveform guess for both methods within that modulation.
 
-## Implementation structure
+## Comparison and observable
 
-- GRAPE Hessian internal consistency test: Newton
-- against Goodwin algorithm.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Pick initial guess, phase-modulated GRAPE
-- Get Newton Hessian
-- Get Goodwin Hessian
-- Pick initial guess, XY-modulated GRAPE
-- Run the comparisons
+For each pair, the Hessian arrays are flattened and their one-norm difference is compared with the one-norm of the Newton Hessian. The script raises an error when `norm(H_newton(:)-H_goodwin(:),1) > 1e-6*norm(H_newton(:),1)`. Otherwise it prints a formalism-specific consistency message. This comparison is performed once for the phase Hessians and once for the Cartesian Hessians.
+
+## Scope
+
+The check establishes only whether these two Hessian outputs agree within the coded relative one-norm threshold for these two random guesses and the configured control system. It does not compare either Hessian with an independent finite-difference reference.

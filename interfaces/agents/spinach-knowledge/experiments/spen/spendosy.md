@@ -1,66 +1,11 @@
 # experiments/spen/spendosy.m
 
-- Signature: `fid=spendosy(spin_system,parameters,H,R,K,G,F)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/spen/spendosy.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=spendosy.m)
 
-## Purpose
+Ultrafast DOSY with chirp-based spatial encoding and gradient acquisition. The source forms L = H + F + 1i*R + 1i*K, excites parameters.rho0 with a pi/2 pulse, selects +1 coherence, and applies a chirp pulse with positive Ge*G{1}. It selects -1 coherence, evolves under that encoding gradient for Tau, applies another pi/2 pulse and selects 0 coherence, then evolves without the encoding gradient for td-Tau-Te. A further pi/2 pulse selects -1 coherence; a second positive-gradient chirp is followed by +1 selection and a second Ge*G{1} interval of duration Tau. The chirp waveform is generated from pulsenpoints, Te, BW, smfactor, and chirptype ('wurst' or 'smoothed').
 
-Ultrafast DOSY pulse sequence. Syntax: fid=spendosy(spin_system,parameters,H,R,K,G,F)
+Acquisition prephasing uses the negative acquisition gradient for half of npoints*deltat. A loop increment combines positive and negative Ga*G{1} gradient readouts; within each trace the function records coil'*rho at npoints steps of deltat under the positive acquisition gradient. Thus fid is [npoints, nloops] (readout points by loop). The source requires td to be at least Tau+Te; the remaining interval td-Tau-Te is the diffusion evolution under L. Loop bodies run with parfor, and the source moves state, propagators, and coil to the GPU when GPU execution is enabled.
 
-## Physical / mathematical content
+Required settings checked in parameters are rho0, coil, scalar dims (m), scalar npts, spins, npoints, deltat, nloops, Ga, pulsenpoints, smfactor, Te, Tau, BW, Ge, chirptype, and td. Gradient amplitudes are specified in T/m. The `imaging()` context applies `parameters.offset` with `frqoffset` to `H` before calling `spendosy`; the sequence therefore includes that offset in `L` even though it does not read the field directly. The source header also names `cond` (boundary conditions), which the sequence body does not read directly. The required formalism is sphten-liouv; H, R, K, and F must be equal-sized matrices, G must be a cell array, and H, R, K, G, F are supplied by the imaging context.
 
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Parameters / inputs
-
-- parameters.dims size of the sample in m
-- parameters.npts number of spin packets
-- parameters.spins nuclei on which the sequence runs
-- parameters.deltat timestep for acquisition
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
-- parameters.offset offset
-- parameters.cond bondary conditions
-- parameters.Ga acquisition gradient in T/m
-- parameters.pulsenpoints number of points in the pulse shape
-- parameters.smfactor smoothing factor for the pulse
-- parameters.Te duration of the pulse
-- parameters.Tau duration extra dephasing gradient
-- parameters.BW bandwidth of the pulse
-- parameters.Ge encoding gradient in T/m
-- parameters.chirptype can be 'wurst' or 'smoothed'
-- parameters.td diffusion delay, at least
-- parameters.Tau+parameters.Te
-- H Fokker-Planck Hamiltonian
-- R Fokker-Planck relaxation superoperator
-- K Fokker-Planck kinetics superoperator
-- G Fokker-Planck gradient superoperators
-- F Fokker-Planck diffusion and flow superoperator
-
-## Outputs
-
-- fid -free induction decay
-- Note: the last five parameters are built automatically by the imaging
-- context function.
-
-## Implementation structure
-
-- Ultrafast DOSY pulse sequence. Syntax:
-- fid=spendosy(spin_system,parameters,H,R,K,G,F)
-- parameters.dims size of the sample in m
-- parameters.npts number of spin packets
-- parameters.spins nuclei on which the sequence runs
-- parameters.deltat timestep for acquisition
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
-- parameters.offset offset
-- parameters.cond bondary conditions
+Authors: jeannicolas.dumez@cnrs.fr, ilya.kuprov@weizmann.ac.il, ludmilla.guduff@cnrs.fr.

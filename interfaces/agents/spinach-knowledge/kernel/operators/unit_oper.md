@@ -1,38 +1,18 @@
 # kernel/operators/unit_oper.m
 
-- Signature: `A=unit_oper(spin_system)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/unit_oper.m
+Wiki: https://spindynamics.org/wiki/index.php?title=unit_oper.m
 
-## Purpose
+## Purpose and output
 
-Returns a unit operator in the current formalism and basis. The operator has dimension equal to the basis size in sphten-liouv formalism, the dimension equal to the product of all spin multi- plicities in zeeman-hilb and zeeman-wavef formalisms, and the dimension of square of the product of all spin multiplicities in zeeman-liouv formalism. Syntax: A=unit_oper(spin_system)
+`unit_oper(spin_system)` returns a sparse identity matrix for the selected formalism. It is diagonal in, and preserves, the current basis ordering; it does not construct a generator or time propagator.
 
-## Physical / mathematical content
+## Dimensions
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+Let `d=prod(spin_system.comp.mults)`. The function uses these dimensions:
 
-## Numerical / algorithmic content
+- `sphten-liouv`: `size(spin_system.bas.basis,1)`.
+- `zeeman-hilb` and `zeeman-wavef`: `d`.
+- `zeeman-liouv`: `prod(spin_system.comp.mults.^2)`, equal to `d^2`.
 
-## Parameters / inputs
-
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
-
-## Outputs
-
-- A -a sparse unit matrix of appropriate
-- dimension
-
-## Implementation structure
-
-- Returns a unit operator in the current formalism and basis. The
-- operator has dimension equal to the basis size in sphten-liouv
-- formalism, the dimension equal to the product of all spin multi-
-- plicities in zeeman-hilb and zeeman-wavef formalisms, and the
-- dimension of square of the product of all spin multiplicities in
-- zeeman-liouv formalism. Syntax:
-- A=unit_oper(spin_system)
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
-- A -a sparse unit matrix of appropriate
-- dimension
-- Check consistency
+For each supported formalism the returned matrix is `speye` of the specified dimension, so it acts as the identity in that representation. Any other `spin_system.bas.formalism` raises an error.

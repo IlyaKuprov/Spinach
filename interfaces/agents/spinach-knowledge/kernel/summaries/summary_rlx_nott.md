@@ -2,33 +2,13 @@
 
 - Signature: `summary_rlx_nott(spin_system)`
 
-## Purpose
+## Behaviour
 
-Prints Nottingham DNP relaxation-rate summary for a Spinach system. Syntax: summary_rlx_nott(spin_system)
+Reports four stored Nottingham DNP relaxation rates: electron R1 and R2, then nuclear R1 and R2, from `spin_system.rlx.nott_r1e`, `nott_r2e`, `nott_r1n` and `nott_r2n`. The report labels each value in Hz; this routine prints the values directly without converting them.
 
-## Physical / mathematical content
+The function returns nothing and routes its lines through `report(spin_system,...)`. Its local guard requires `spin_system` to be a structure.
 
-## Numerical / algorithmic content
+## References
 
-## Parameters / inputs
-
-- spin_system -Spinach spin system description object
-
-## Outputs
-
-- this function prints to the console or to the user-specified
-- output via report.m function
-
-## Implementation structure
-
-- Prints Nottingham DNP relaxation-rate summary for a Spinach system. Syntax:
-- summary_rlx_nott(spin_system)
-- spin_system -Spinach spin system description object
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the relaxation-rate table
-- Consistency enforcement
-- As a man, sometimes you have to make a choice
-- between mocking astrology and getting laid.
-- Internet wisdom
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_rlx_nott.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_rlx_nott.m)

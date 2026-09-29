@@ -1,32 +1,15 @@
 # examples/nmr_proteins/methyl_noesy_gb1.m
 
-- Signature: `methyl_noesy_gb1()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_proteins/methyl_noesy_gb1.m)
 
-## Purpose
+This example simulates a 1H-1H NOESY spectrum of GB1 with non-methyl positions deuterated. The source says deuteria remain in the spin system because they belong to the coupling network, while methyl-group rotation is not modelled; it estimates hours of calculation time.
 
-1H-1H NOESY spectrum of GB1 with everything deuterated except methyl groups. Deuteria are kept in the spin system because they are a part of the coupling network; methyl group rotati- on is not accounted for in this simulation. Calculation time: hours.
+## Protein model and sequence settings
 
-## Physical / mathematical content
+The input is 2N9K.pdb / 2N9K.bmrb with all atoms selected and the non-methyl positions deuterated. The code then removes 13C and 15N spins, stating that the protein is assumed to be unlabelled. The magnet parameter is sys.magnet=21.1356 (unit not annotated in this source). The interaction cutoff is 100, commented as retaining only significant dipolar couplings; the proximity cutoff is 5.0, with the comment “increase till convergence.” The model uses Redfield relaxation, rlx_keep='kite', zero equilibrium, and tau_c=5e-9 (unit not specified), with an IK-1 sphten-liouv scalar-coupling basis at inter/proximity levels 2/2.
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The sequence call uses liquid with noesy, tmix=200e-3, offset 750, sweep settings [3000 3000], 512 points per dimension, and zero-fill sizes [2048 2048]. The source does not annotate units for these numeric sequence settings or for tmix; the axes are specified in ppm. It gives no RF pulse widths or phases, contact time, or rotor parameters.
 
-## Numerical / algorithmic content
+## Simulation and output
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H-1H NOESY spectrum of GB1 with everything deuterated except
-- methyl groups. Deuteria are kept in the spin system because
-- they are a part of the coupling network; methyl group rotati-
-- on is not accounted for in this simulation.
-- Calculation time: hours.
-- Protein data import
-- Magnet field
-- Tolerances
-- Relaxation theory
-- Basis set
-- Algorithmic options
-- Create the spin system structure
+The simulation produces cosine and sine FIDs, which are squared-cosine apodised and transformed in F2. Their States combination is f1_cos-1i*f1_sin, followed by the F1 transform; the plotted quantity is the negative real part of the 2D spectrum. The PDB/BMRB files provide the protein-model input, not an experimental spectrum; no experimental coherence observation or DOI citation is supplied in the example.

@@ -4,33 +4,27 @@
 
 ## Purpose
 
-Plots the sparsity pattern of an RCV matrix. Syntax: spy(A)
+Plot the nonzero pattern of an RCV sparse matrix.
 
-## Physical / mathematical content
+## RCV representation
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+Here `rcv` means row-column-value: a sparse matrix stored as parallel `row`, `col`, and `val` vectors, with explicit `numRows` and `numCols` dimensions. The class declares the coordinate and dimension vectors as `int64` and values as `double`. This is coordinate-list matrix storage.
 
-## Numerical / algorithmic content
+Coordinates identify MATLAB matrix row and column positions. The `rcv` class folder defines no custom `subsref` overload; for ordinary element indexing, first convert with `sparse(A)`, then index the MATLAB sparse matrix. That conversion calls `sparse(A.row,A.col,A.val,A.numRows,A.numCols)`. Repeated row-column coordinates can remain as separate stored triplets; MATLAB's sparse constructor combines repeated coordinates by adding their values.
 
-## Parameters / inputs
+## Inputs
 
-- A -RCV sparse matrix
+- `A` - an `rcv` sparse matrix.
 
-## Outputs
+## Output
 
-- produces a sparsity plot
+A MATLAB sparsity plot; no matrix is returned.
 
-## Implementation structure
+## Implementation
 
-- Plots the sparsity pattern of an RCV matrix. Syntax:
-- spy(A)
-- A -RCV sparse matrix
-- produces a sparsity plot
-- Check consistency
-- Delegate to MATLAB
-- Consistency enforcement
-- Downloaded a virus for Linux lately and unpacked it. Tried to run it as
-- root, didn't work. Googled for 2 hours, found out that, instead of
-- /usr/local/bin, the virus unpacked to /usr/bin for which the user malware
-- doesn't have any write permissions, therefore the virus couldn't create a
-- process file. Found patched .configure and .make files on some Chinese
+The overload validates that `A` is an `rcv` object, converts it to MATLAB sparse form with `sparse(A)`, and delegates plotting to MATLAB's `spy`. Thus the plot reflects the matrix after MATLAB has combined any duplicate coordinates, rather than displaying a marker for each raw triplet. Matrix dimensions are retained in the sparse conversion.
+
+## Sources
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/spy.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/spy.m)

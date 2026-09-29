@@ -1,38 +1,32 @@
 # kernel/utilities/frob_chop.m
 
-- Signature: `r=frob_chop(s,tol)`
-
 ## Purpose
 
-Truncates SVD decomposition to the user-specified threshold in the Frobenius norm. Syntax: r=frob_chop(s,tol)
+Truncates an SVD decomposition to a user-specified tolerance in the Frobenius norm by returning the number of singular values to keep.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `r=frob_chop(s,tol)`.
+- The function first validates its inputs via an internal consistency check (`grumble`).
+- Singular values are reshaped into a real column vector; values with magnitude below `numel(s)*eps*max(abs(s))` — the standard numerical rank threshold — are set to zero because the SVD that produced them does not resolve them. Above that threshold the requested tolerance is honoured exactly.
+- Negative values are clipped to zero via `s=max(s,0)`.
+- The cutting point is found by computing the cumulative sum of squared singular values from the smallest upward (`cumsum(s(end:-1:1).^2)`) and locating the first index where it reaches `tol^2`.
+- If no such index exists, the returned rank is 0; otherwise `r=numel(s)-k+1`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
 
-- s -a vector of singular values for a matrix,
-- in descending order
-- tol -truncation threshold
+- `s` — a vector of singular values for a matrix, in descending order; must be a vector of non-negative real numbers (small imaginary parts up to `1e-10*max(abs(s))` and small negative real parts down to `-1e-10*max(abs(s))` are tolerated as "morally equal" to valid values).
+- `tol` — truncation threshold; must be a non-negative real scalar.
 
-## Outputs
+Outputs:
 
-- r -the number of singular values to keep
+- `r` — the number of singular values to keep.
 
-## Implementation structure
+Errors are raised with the messages `'tol must be a non-negative real scalar.'` and `'s must be a vector of non-negative real numbers.'`.
 
-- Truncates SVD decomposition to the user-specified threshold
-- in the Frobenius norm. Syntax:
-- r=frob_chop(s,tol)
-- s -a vector of singular values for a matrix,
-- in descending order
-- tol -truncation threshold
-- r -the number of singular values to keep
-- Remove tiny negative round-off artefacts
-- Check consistency
-- Project any remaining tiny negative round-off to zero
-- Find the cutting point
-- Treat the zero case
+## References
+
+- Source: [frob_chop.m on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/frob_chop.m)
+- [Spinach Wiki: frob_chop.m](https://spindynamics.org/wiki/index.php?title=frob_chop.m)

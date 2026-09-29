@@ -2,57 +2,30 @@
 
 - Signature: `efg_display(props,atoms,scaling,conmatrix,options)`
 
-## Purpose
+Plots selected nuclear EFG or NQI tensors on the molecular geometry in the current figure. It returns no MATLAB output arguments.
 
-Electric field gradient tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A unit sphere in a Cartesian space is scaled by abs(Axx) in the x direction, abs(Ayy) in the y direction and abs(Azz) in the z direction, where Axx, Ayy, Azz are the eigenvalues of the CST ten- sor in units of ppm. 2. A set of axes is drawn inside the sphere with a red axis for a positive eig
+## Inputs and selection
 
-## Physical / mathematical content
+- `props.std_geom` and `props.symbols` are required. The geometry rows identify the atoms used by the plot; `molplot` draws the molecular framework using `conmatrix`.
+- `atoms` may be a numeric array of positive integer atom indices (flattened by `atoms(:)`) or a cell array of element-symbol strings. For example, `{'N','O'}` selects atoms with those symbols and `[1 2 5]` selects those indices. A symbol selection includes every matching atom.
+- For each selected atom, a nonempty `props.nqi{n}` tensor takes precedence; otherwise the routine uses nonempty `props.efg{n}`. It errors if neither is available.
+- `scaling` is a positive real number. A nonempty `conmatrix` must be square with one row and column per atom.
 
-## Numerical / algorithmic content
+## Styles and options
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+The default style is `harmonics`; the alternative is `ellipsoids`. Defaults are `options.kill_iso=false`, `options.numbers=false`, and `options.symbols=true`.
 
-## Syntax
+- With `kill_iso=true`, the isotropic part is removed as `efg - eye(3)*trace(efg)/3` before plotting.
+- In `ellipsoids` style, the tensor eigensystem scales a sampled unit sphere along its three eigenvectors, translates it to the selected atom position, and draws it as a half-transparent grey surface. Principal-axis lines extend through the nucleus: positive eigenvalues are red and negative eigenvalues blue. This style requires an orthogonal eigensystem; the code switches to an error if `norm(V'*V-eye(3),2) > 1e-3` and recommends `harmonics`.
+- In `harmonics` style, `mat2sphten` supplies ranks 0, 1, and 2, which are combined with spherical harmonics to give a real radial value `R` on the sampled sphere. Coordinates are `scaling*R*[X;Y;Z]`, translated to the atom. The signed radial value sets RGB surface colour directly: positive is half-intensity red, negative is half-intensity blue, and zero has zero RGB; the surface alpha is 0.25. No additional normalisation of `R` is applied.
 
-```matlab
-efg_display(props,atoms,scaling,conmatrix,options)
-```
+The molecular framework is drawn before the tensor surfaces, and optional atom numbers and symbols are added at geometry positions. The helper also installs two lights for surface rendering. All graphical objects are added to the current figure.
 
-## Parameters / inputs
+## Existing syntax
 
-- props -output of c2spinach or gparse
-- atoms -a cell array of element symbols
-- or a vector of integers, indica-
-- ting the atoms for which EFG
-- tensors should be visualised,
-- e.g. {'N','O'} or [1 2 5]
-- scaling -a factor to scale the tensors
-- by for visualisation
-- conmatrix -binary connectivity matrix, 1
-- if a pair of atoms should be
-- connected by a bond. If an em-
-- pty vector is supplied, 1.6
-- Angstrom cutoff distance is used
-- options.style -'ellipsoids' or 'harmonics'
-- options.kill_iso -set to true() to eliminate the
-- isotropic parts of tensors be-
-- fore plotting
-- options.numbers -set to true() to display atom
-- numbers
-- options.symbols -set to false() to not display
-- atom symbols
+`efg_display(props,atoms,scaling,conmatrix,options)`
 
-## Implementation structure
+## References
 
-- Electric field gradient tensors and their eigensystems. Two
-- styles are implemented:
-- A. Ellipsoids (symmetric tensors only):
-- 1. A unit sphere in a Cartesian space is scaled by
-- abs(Axx) in the x direction, abs(Ayy) in the y
-- direction and abs(Azz) in the z direction, where
-- Axx, Ayy, Azz are the eigenvalues of the CST ten-
-- sor in units of ppm.
-- 2. A set of axes is drawn inside the sphere with a
-- red axis for a positive eigenvalue, and a blue
-- axis for a negative one.
-- 3. The sphere is translated to the point of corres-
+- [Source: `kernel/plotting/efg_display.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/efg_display.m)
+- [Spinach Wiki: `efg_display.m`](https://spindynamics.org/wiki/index.php?title=efg_display.m)

@@ -1,30 +1,11 @@
 # examples/relaxation_theory/scalar_relaxation_1.m
 
-- Signature: `scalar_relaxation_1()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/scalar_relaxation_1.m) · Signature: `scalar_relaxation_1()`
 
-## Purpose
+## Purpose and physical setting
 
-Redfield superoperator for the scalar relaxation of the first kind in a two-proton system with a noisy J-coupling. This si- tuation occurs in aziridines, where the slow nitrogen inversi- on jitters scalar couplings on a millisecond time scale. Set to demonstrate the effect described in: Calculation time: seconds
+Builds a relaxation superoperator for scalar relaxation of the first kind in a two-proton model with a noisy J-coupling. The source relates the example to aziridines, where slow nitrogen inversion jitters scalar couplings on a millisecond time scale, and cites [the described effect](https://doi.org/10.1002/ange.201410271). The model itself contains the two listed proton spins; it is not a simulated nitrogen-inversion trajectory.
 
-## Physical / mathematical content
+## Model and output
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Redfield superoperator for the scalar relaxation of the first
-- kind in a two-proton system with a noisy J-coupling. This si-
-- tuation occurs in aziridines, where the slow nitrogen inversi-
-- on jitters scalar couplings on a millisecond time scale. Set
-- to demonstrate the effect described in:
-- Calculation time: seconds
-- System specification
-- Basis set
-- Relaxation superoperator
-- Spinach housekeeping
-- Show a spy plot of R
+The source sets `sys.magnet=11.75` and `inter.zeeman.scalar={0.0 2.0}`; units for these scalar values are not identified. It uses the complete `sphten-liouv` basis without approximation and configures `inter.relaxation={'SRFK'}`, `inter.rlx_keep='kite'`, and zero equilibrium. The SRFK correlation-time input is `[1.0 1e-3]`, with off-diagonal modulation-depth entry `15.0`; the source does not label units for these values. After system and basis construction, it evaluates `relaxation(spin_system)` and displays the superoperator's nonzero pattern with `spy`. It does not set up an acquisition, pulse sequence, or spectrum calculation.

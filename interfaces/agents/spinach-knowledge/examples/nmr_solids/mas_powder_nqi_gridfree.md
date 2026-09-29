@@ -1,33 +1,17 @@
 # examples/nmr_solids/mas_powder_nqi_gridfree.m
 
-- Signature: `mas_powder_nqi_gridfree()`
+Source: [examples/nmr_solids/mas_powder_nqi_gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_nqi_gridfree.m)
 
 ## Purpose
 
-Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus using grid-free Fokker-Planck MAS formalism. Second order corrections to the rotating frame transformation are not applied. Calculation time: minutes
+Calculates a powder magic-angle-spinning NMR spectrum for one quadrupolar deuterium nucleus. The source describes this as grid-free Fokker-Planck MAS and notes that second-order corrections to the rotating-frame transformation are not applied. Its “minutes” runtime is a source comment estimate, not a recorded run time.
 
-## Physical / mathematical content
+## Model and acquisition
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The model contains `2H` at `sys.magnet=9.4` T, with a quadrupolar tensor specified by principal values `-1000 -2000 3000` rad/s and Euler angles `0 0 0` (the [Spinach NQI convention](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/agents/spinach-knowledge/kernel/conventions/transforms/ham2nqi.md) gives the quadrupolar tensor in rad/s). The interaction values are model inputs, not measured parameters in this example. The basis is `sphten-liouv`, approximation `none`, with projection `+1`.
 
-## Numerical / algorithmic content
+The rotor-axis vector is `1 1 1` and the MAS rate is `1000` Hz. The acquisition is set to a `20000` Hz sweep, 512 points, zero filling to 4096, zero offset, and ppm axis labelling. No RF field or pulse sequence is specified. The initial state and receiver are both `L+` on `2H`; there is no separately assigned dipolar interaction in this one-spin model.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Calculation and display
 
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a single quadrupolar
-- deuterium nucleus using grid-free Fokker-Planck MAS formalism.
-- Second order corrections to the rotating frame transformation
-- are not applied.
-- Calculation time: minutes
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
+The code calls `gridfree(spin_system,@acquire,parameters,'nmr')`. It exponentially apodises the calculated FID with parameter 6, Fourier transforms it using the 4096-point zero-fill, then plots the real spectrum with `plot_1d`. This is a simulated model spectrum; the source does not provide an experimental trace or a measured comparison.

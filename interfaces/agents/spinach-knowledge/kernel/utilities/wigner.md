@@ -1,50 +1,47 @@
 # kernel/utilities/wigner.m
 
-- Signature: `D=wigner(l,alp,bet,gam)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/wigner.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/wigner.m)
 
 ## Purpose
 
-Wigner D matrices, defined as (Brink & Satchler, Eq 2.13): D=expm(-1i*Lz*alp)*expm(-1i*Ly*bet)*expm(-1i*Lz*gam); where Lx, Ly, Lz are Pauli matrices. Syntax: D=wigner(l,alp,bet,gam)
+Computes Wigner D matrices for a given rank `l` and three Euler angles, following the definition (Brink & Satchler, Eq. 2.13):
 
-## Physical / mathematical content
+```
+D = expm(-1i*Lz*alp) * expm(-1i*Ly*bet) * expm(-1i*Lz*gam)
+```
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+where the generic branch takes the `(2*l+1)`-dimensional angular-momentum generators from `pauli(2*l+1)`. The ZYZ convention is used for the Euler angles (see Brink and Satchler, Figures 1 and 2).
 
-## Numerical / algorithmic content
+## Behaviour
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Syntax: `D = wigner(l, alp, bet, gam)`.
+- The rank `l` may be a non-negative integer or half-integer.
+- For `l == 1` and `l == 2`, the matrix elements are hard-coded explicitly for speed; the source comments note these run faster than a generic `expm` call.
+- For all other ranks, the function obtains Pauli matrices via `pauli(2*l+1)` and computes the matrix product of matrix exponentials directly.
+- Input validation is performed by an internal `grumble` subfunction:
+  - `l` must be a non-negative real scalar integer or half-integer, otherwise the function errors with `'l must be a non-negative real integer or half-integer.'`.
+  - `alp`, `bet` and `gam` must be real scalars, otherwise the function errors with `'alp, bet and gam must be real scalars.'`.
+- The output matrix `D` has rows and columns sorted by descending magnetic quantum numbers. For example, for `l = 2` the layout is:
 
-## Parameters / inputs
+```
+[D( 2, 2)  ...  D( 2,-2)
+   ...      ...    ...
+[D(-2, 2)  ...  D(-2,-2)]
+```
 
-- l -rank of the Wigner matrix, may be half-integer
-- alp -alp Euler angle, radians
-- bet -bet Euler angle, radians
-- gam -gam Euler angle, radians
-- ZYZ convention is used for Euler angles, see Brink and Satchler,
-- Figures 1 and 2.
+- The output is intended to be used as `y = D*x`, where `x` is a column vector of irreducible spherical tensor coefficients listed vertically in the order `T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2)` (for `l = 2`).
 
-## Outputs
+## Inputs and outputs
 
-- D -Wigner D matrix with rows and columns sorted
-- by descending ranks, for example (l=2):
-- [D( 2,2) ... D( 2,-2)
-- ... ... ...
-- D(-2,2) ... D(-2,-2)]
-- The output is to be used as y=D*x, where x is a column vector of
-- irreducible spherical tensor coefficients, listed vertically in
-- the order: T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2).
+| Name | Type | Description |
+|------|------|-------------|
+| `l` | scalar | Rank of the Wigner matrix; may be half-integer. Must be a non-negative real integer or half-integer. |
+| `alp` | scalar | Euler angle, radians. Must be a real scalar. |
+| `bet` | scalar | Euler angle, radians. Must be a real scalar. |
+| `gam` | scalar | Euler angle, radians. Must be a real scalar. |
+| `D` | matrix | Wigner D matrix of size `(2l+1) x (2l+1)`, with rows and columns ordered by descending magnetic quantum number. |
 
-## Implementation structure
+## References
 
-- Wigner D matrices, defined as (Brink & Satchler, Eq 2.13):
-- D=expm(-1i*Lz*alp)*expm(-1i*Ly*bet)*expm(-1i*Lz*gam);
-- where Lx, Ly, Lz are Pauli matrices. Syntax:
-- D=wigner(l,alp,bet,gam)
-- l -rank of the Wigner matrix, may be half-integer
-- alp -alp Euler angle, radians
-- bet -bet Euler angle, radians
-- gam -gam Euler angle, radians
-- ZYZ convention is used for Euler angles, see Brink and Satchler,
-- Figures 1 and 2.
-- D -Wigner D matrix with rows and columns sorted
-- by descending ranks, for example (l=2):
+- Brink, D. M. and Satchler, G. R., *Angular Momentum*, Eq. 2.13 and Figures 1 and 2 (cited in the source header for the definition and the ZYZ Euler angle convention).
+- Spinach Wiki page for `wigner.m`: [https://spindynamics.org/wiki/index.php?title=wigner.m](https://spindynamics.org/wiki/index.php?title=wigner.m)

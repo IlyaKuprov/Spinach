@@ -1,50 +1,28 @@
 # kernel/pulses/pulse_demod.m
 
-- Signature: `demod_pulse=pulse_demod(time_grid,in_phase,out_phase)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/pulse_demod.m
+Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=pulse_demod.m
 
 ## Purpose
 
-Interactive demodulation of a complex pulse waveform by a user- specified frequency. Syntax: demod_pulse=pulse_demod(time_grid,in_phase,out_phase)
+Interactively apply a user-selected frequency shift to an input complex pulse and return the shifted waveform.
 
-## Physical / mathematical content
+## Syntax
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+~~~matlab
+demod_pulse=pulse_demod(time_grid,in_phase,out_phase)
+~~~
 
-## Numerical / algorithmic content
+## Inputs and output
 
-## Parameters / inputs
+- time_grid: finite, strictly increasing real vector with at least two samples, in seconds.
+- in_phase, out_phase: finite real vectors with the same dimensions as the time grid. The source forms the complex input as in_phase+1i*out_phase; no amplitude unit is imposed.
+- demod_pulse: complex waveform with the same sample ordering and dimensions as the inputs.
 
-- time_grid -strictly increasing time grid, seconds
-- in_phase -in-phase pulse waveform component
-- out_phase -out-of-phase pulse waveform component
+The frequency entry and displayed frequency use Hz. At selected frequency freq, each sample is multiplied by exp(2*pi*1i*freq*time_grid) (positive sign). The initial frequency is zero, so the initially returned waveform is the input complex waveform unless the user changes the frequency.
 
-## Outputs
+## Plot and interaction
 
-- demod_pulse -demodulated complex pulse waveform
+A GUI figure plots unwrapped phase versus time (seconds) by default; the wrap control displays phase modulo 2*pi in the interval [0,2*pi]. The frequency view plots diff(phase)./(2*pi*diff(time_grid)) in Hz at the midpoints between adjacent time samples. The frequency slider starts at zero; GHz/MHz/kHz/Hz buttons change its step scale, not the selected frequency, and the slider uses a moving 100-step window. The editable frequency field accepts Hz.
 
-## Header notes
-
-- The frequency entry field uses Hz. The GHz, MHz, kHz, and Hz buttons
-- set the slider step size without changing the demodulation frequency.
-- The phase and frequency buttons switch the plot between unwrapped
-- phase in radians and instantaneous frequency in Hz. The sticky wrap
-- button switches the phase plot into the [0,2*pi] interval.
-- The slider range is a moving 100-step window in the selected units.
-- The save button returns the current demodulated waveform and exits.
-- The complex waveform in_phase+1i*out_phase is multiplied by
-- exp(2*pi*1i*freq*time_grid).
-
-## Implementation structure
-
-- Interactive demodulation of a complex pulse waveform by a user-
-- specified frequency. Syntax:
-- demod_pulse=pulse_demod(time_grid,in_phase,out_phase)
-- time_grid -strictly increasing time grid, seconds
-- in_phase -in-phase pulse waveform component
-- out_phase -out-of-phase pulse waveform component
-- demod_pulse -demodulated complex pulse waveform
-- The frequency entry field uses Hz. The GHz, MHz, kHz, and Hz buttons
-- set the slider step size without changing the demodulation frequency.
-- The phase and frequency buttons switch the plot between unwrapped
-- phase in radians and instantaneous frequency in Hz. The sticky wrap
-- button switches the phase plot into the [0,2*pi] interval.
+The save button accepts any pending frequency edit, resumes the modal UI, and returns the current shifted waveform. The figure is deleted after the UI wait ends. The source does not write a waveform or plot to a file; its visible side effect is the interactive figure.

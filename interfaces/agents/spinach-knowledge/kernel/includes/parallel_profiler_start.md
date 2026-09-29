@@ -1,30 +1,23 @@
 # kernel/includes/parallel_profiler_start.m
 
-- Signature: `(script file)`
+- Signature: script include; no function output.
 
 ## Purpose
 
-An include that starts profiling infrastructure around parallel stages. Should be invoked just before a parfor or an spmd.
+Start timing and, when requested, parallel-pool byte-counting/profiling immediately before a parallel stage. The source comment names `parfor` or `spmd` as the intended placement.
 
-## Physical / mathematical content
+## Execution and data mapping
 
-- Include scripts and shared setup fragments. These files implement tightly scoped runtime setup, parallel profiling, resource guards, or shared kernels included by other Spinach routines.
+- On a non-worker node, call `ticBytes(gcp)` to start byte counting for the current parallel pool.
+- Call `tic()` unconditionally on every node that executes the include, starting a local elapsed-time timer.
+- Only on a non-worker node, and only when `'dafuq'` is a member of `spin_system.sys.enable`, construct `parallel.internal.profiling.PoolProfiler()` and assign it to `parProfiler`.
+- This include starts measurements; it does not itself run the following parallel loop, stop the timers, report results, or modify the spin system or its operators.
 
-## Numerical / algorithmic content
+## Source comments
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The source also carries the unrelated Gauss-summation example: adding the integers 1 through 100 gives 5050. It is illustrative commentary, not profiler logic.
 
-## Implementation structure
+## References
 
-- An include that starts profiling infrastructure around parallel
-- stages. Should be invoked just before a parfor or an spmd.
-- Brief parallel profiler start
-- Detailed parallel profiler start
-- In late 1700s, a teacher in a German school asked a kid to
-- sum up the numbers from 1 to 100 as a punishment for misbe-
-- having. The teacher was astonished when the kid solved the
-- problem in seconds:
-- S = 1 + 2 + ... + 100
-- S = 100 + 99 + ... + 1
-- --------------------------
-- 2S = 101 + 101 + ... + 101 => S = 101*100/2 = 5050
+- MATLAB source: [`kernel/includes/parallel_profiler_start.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/includes/parallel_profiler_start.m)
+- Existing Wiki page: https://spindynamics.org/wiki/index.php?title=parallel_profiler_start.m

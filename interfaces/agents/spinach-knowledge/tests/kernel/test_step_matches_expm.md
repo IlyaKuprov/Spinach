@@ -1,33 +1,31 @@
 # tests/kernel/test_step_matches_expm.m
 
-- Signature: `result=test_step_matches_expm()`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_step_matches_expm.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_step_matches_expm.m)
 
 ## Purpose
 
-Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm()
+Regression test that verifies Hilbert-space propagation performed by `step()` against direct matrix exponentiation with `expm()`. The test checks the Spinach sign convention for density-matrix evolution:
 
-## Physical / mathematical content
+`rho(t) = exp(-iHt) rho(0) exp(+iHt)`
 
-## Numerical / algorithmic content
+## Behaviour
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Announces the test target with `fprintf('TESTING: Hilbert propagation against expm\n')`.
+- Initialises a regression test result via `new_test_result('kernel/step_matches_expm', 'Hilbert propagation against expm', 'step() must reproduce unitary density-matrix propagation.')`.
+- Builds a one-proton Hilbert-space spin system with `sys.magnet=0`, `sys.isotopes={'1H'}`, `inter.zeeman.scalar={0}`, `bas.formalism='zeeman-hilb'`, and `bas.approximation='none'`, using `test_spin_system(sys,inter,bas)`.
+- Defines the Hamiltonian `H = 2*pi*123*S.z` and the initial density matrix `rho = S.x + 0.25*S.y` from Pauli matrices `S=pauli(2)`, with a time step `dt = 2.5e-3`.
+- Constructs the independent exact propagator `P = expm(-1i*H*dt)` and computes the reference evolved state `rho_ref = P*rho*P'`.
+- Runs `rho_obs = step(spin_system,H,rho,dt)` and compares the two with `test_close(result,'step versus expm',rho_obs,rho_ref,1e-13,1e-13,'finite Hilbert-space propagation is exactly unitary')`.
 
-## Outputs
+## Inputs and outputs
 
-- result -regression test result with explanatory messages
-- The test checks the Spinach sign convention for density-matrix evolution:
-- rho(t)=exp(-iHt) rho(0) exp(+iHt).
+```matlab
+result = test_step_matches_expm()
+```
 
-## Implementation structure
+- **Output:** `result` — regression test result with explanatory messages.
+- **Input:** none.
 
-- Tests Hilbert-space propagation against matrix exponentiation. Syntax:
-- result=test_step_matches_expm()
-- result -regression test result with explanatory messages
-- The test checks the Spinach sign convention for density-matrix evolution:
-- rho(t)=exp(-iHt) rho(0) exp(+iHt).
-- Announce the test target
-- State the propagation target of the test
-- Build a one-proton Hilbert-space spin system
-- Define a Hamiltonian and an initial density matrix
-- Build the independent exact propagator
-- Check exact finite-dimensional propagation
+## References
+
+- Source file: [tests/kernel/test_step_matches_expm.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_step_matches_expm.m) in the Spinach repository.

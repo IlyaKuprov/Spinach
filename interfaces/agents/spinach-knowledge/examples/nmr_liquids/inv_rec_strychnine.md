@@ -1,32 +1,18 @@
 # examples/nmr_liquids/inv_rec_strychnine.m
 
 - Signature: `inv_rec_strychnine()`
+- Source: [`examples/nmr_liquids/inv_rec_strychnine.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/inv_rec_strychnine.m)
 
 ## Purpose
 
-1H inversion-recovery experiment on strychnine at 250 MHz. Calculation time: minutes
+A simulated homonuclear 1H inversion-recovery experiment for strychnine. The source identifies the example as 250 MHz and gives an estimated calculation time of minutes.
 
-## Physical / mathematical content
+## Spin system and relaxation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model comes from `strychnine({'1H'})`; the magnetic-field parameter is 5.9. The calculation enables greedy parallelisation and uses Redfield relaxation, Di Bari equilibrium, `rlx_keep='kite'`, a correlation-time entry of `200e-12`, and a temperature parameter of 298 (the source does not annotate units for these parameter values). The basis is `sphten-liouv` with the IK-2 scalar-coupling approximation, scalar-coupling connectivity, proximity level 1, and a proximity cutoff of 5.0.
 
-## Numerical / algorithmic content
+## Sequence and spectrum
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The liquid-NMR simulation calls `liquid(spin_system,@inv_rec,parameters,'nmr')` for the 1H channel. It sets offset 1250, sweep 2500, 4096 points, a maximum-delay parameter of 1.0, ten delays, ppm axis units, and axis inversion. The source does not annotate units for offset, sweep, or maximum delay, nor list the individual delay values. The resulting FIDs receive exponential apodisation with parameter 6; an FFT along the acquisition dimension is shifted and the real spectrum is plotted.
 
-## Implementation structure
-
-- 1H inversion-recovery experiment on strychnine at 250 MHz.
-- Calculation time: minutes
-- Read spin system properties
-- Magnetic induction
-- Maximum distance to consider
-- Greedy parallelisation
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+The source provides no fitted T1 value, measured spectrum, or DOI. Its numerical output is a simulation, not an experimental rate determination.

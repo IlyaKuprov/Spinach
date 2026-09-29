@@ -1,39 +1,30 @@
 # kernel/overloads/@rcv/vertcat.m
 
-- Signature: `A=vertcat(A,B)`
+- Signature: `A=vertcat(varargin)`
 
 ## Purpose
 
-Vertical concatenation for RCV sparse matrices. Syntax: A=vertcat(A,B)
+Vertically concatenate two or more RCV sparse matrices in operand order.
 
-## Physical / mathematical content
+## RCV representation
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+Here `rcv` means row-column-value: a sparse matrix stored as parallel `row`, `col`, and `val` vectors, with explicit `numRows` and `numCols` dimensions. The class declares the coordinate and dimension vectors as `int64` and values as `double`. This is coordinate-list matrix storage.
 
-## Numerical / algorithmic content
+Coordinates identify MATLAB matrix row and column positions. The `rcv` class folder defines no custom `subsref` overload; for ordinary element indexing, first convert with `sparse(A)`, then index the MATLAB sparse matrix. That conversion calls `sparse(A.row,A.col,A.val,A.numRows,A.numCols)`. Repeated row-column coordinates can remain as separate stored triplets; MATLAB's sparse constructor combines repeated coordinates by adding their values.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs
 
-## Parameters / inputs
+- One or more `rcv` matrices; all must have the same `numCols`.
 
-- A -top RCV matrix
-- B -bottom RCV matrix
+## Output
 
-## Outputs
+- `A` - the concatenated RCV matrix with row count equal to the sum of the input row counts and the shared column count.
 
-- A -concatenated RCV sparse matrix
+## Implementation
 
-## Implementation structure
+The overload rejects non-RCV inputs and mismatched column counts. If any operand is on the GPU, it converts all operands to GPU arrays before combining them. For each input in order, it adds the cumulative number of preceding rows to that input's `row` coordinates; it copies the `col` and `val` vectors unchanged, then concatenates each vector once. The result's `numRows` is the sum of the inputs' row counts; `numCols` stays the common input column count. Stored duplicates are retained as triplets, including when coordinates from different blocks overlap in column but their row offsets differ.
 
-- Vertical concatenation for RCV sparse matrices. Syntax:
-- A=vertcat(A,B)
-- A -top RCV matrix
-- B -bottom RCV matrix
-- A -concatenated RCV sparse matrix
-- Check consistency
-- Align locations
-- Shift row indices
-- Concatenate indices
-- Update row count in the result
-- Consistency enforcement
-- Frankly speaking, my dear Karl, I do not like this modern word, which all
+## Sources
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/vertcat.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/vertcat.m)

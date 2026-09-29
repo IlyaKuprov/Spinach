@@ -4,40 +4,20 @@
 
 ## Purpose
 
-Returns a two-spin singlet state; both particles must be spin-1/2. Syntax: rho=singlet(spin_system,spin_a,spin_b)
+Constructs the singlet projector for two distinct spin-1/2 particles. The spin indices must be distinct positive integers within the spin system, and both selected spins must have multiplicity 2.
 
-## Physical / mathematical content
+## Construction
 
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The function obtains pair operators from `state` in the caller's `spin_a,spin_b` order, then forms
 
-## Numerical / algorithmic content
+`S=EE/4-(XX+YY+ZZ)`
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+where `EE`, `XX`, `YY`, and `ZZ` are the identity, x-, y-, and z-operator products on that pair. In Hilbert space the selected two-spin factor is the unit-trace singlet projector; the function applies no additional rescaling. Any other spins retain their identity factors. In Liouville space, `S` is the state vector representing the same operator, with coordinates in the configured basis rather than a wavefunction amplitude vector.
 
-## Parameters / inputs
+## Output
 
-- spin_a -the number of the first spin in the
-- singlet state
-- spin_b -the number of the second spin in the
-- singlet state
+- `S` is a density matrix in Hilbert-space formalism or a state vector in Liouville-space formalism.
 
-## Outputs
-
-- S -a density matrix (Hilbert space) or
-- a state vector (Liouville space)
-
-## Implementation structure
-
-- Returns a two-spin singlet state; both particles must be
-- spin-1/2. Syntax:
-- rho=singlet(spin_system,spin_a,spin_b)
-- spin_a -the number of the first spin in the
-- singlet state
-- spin_b -the number of the second spin in the
-- S -a density matrix (Hilbert space) or
-- a state vector (Liouville space)
-- Check consistency
-- Build the component operators
-- Build the singlet state
-- Consistency enforcement
+- Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/singlet.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=singlet.m
+- Related: [state](../state.md)

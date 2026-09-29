@@ -1,76 +1,13 @@
 # interfaces/pdb_bmrb/protein.m
 
-- Signature: `[sys,inter,aux]=protein(pdb_file,bmrb_file,options)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/pdb_bmrb/protein.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=protein.m)
 
-## Purpose
+The protein importer reads a PDB structure and BMRB assignments, matches residue/atom identities, estimates scalar couplings and chemical-shift anisotropies, and returns Spinach system and interaction data. Its interface is `[sys,inter,aux]=protein(pdb_file,bmrb_file,options)`. Filenames must be MATLAB character arrays. The options select a PDB model, atom subset, handling of missing shifts, and optional deuteration.
 
-Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing guess, a CSA guess and outputs Spinach data structures. Syntax: [sys,inter]=protein(pdb_file,bmrb_file,options)
+When options is omitted, the function sets select='all', pdb_mol=1, noshift='keep', and deuterate={}. If an options structure is supplied, only a missing deuterate field is filled here; the other required fields must be present. pdb_mol must be a positive integer. select may be 'all', 'backbone', 'backbone-minimal', 'backbone-hsqc', or a nonempty array of positive integer PDB atom serials. backbone uses H, N, C, CA, HA, HA2, HA3, CB, HB, HB1, HB2, HB3; backbone-minimal omits CB and HB variants; backbone-hsqc adds NE2, HE21, HE22, CD, CG, ND2, HD21, and HD22. all selects every remaining parsed atom. Requested serials are checked against the selected PDB model. A fixed set of unsupported atom identifiers is discarded, so a requested serial can still be excluded. PDB and BMRB records are joined by residue number and atom identifier; a residue-type mismatch is an error. The import also applies residue/atom-specific fallback assignments where implemented.
 
-## Physical / mathematical content
+The importer estimates J couplings and CSAs on the parsed atom set before applying the requested subset. noshift='keep' assigns missing-shift atoms values spanning -1 to 0 ppm; 'delete' removes atoms without a BMRB shift. deuterate accepts PDB atom identifiers or 'non-Me'; the latter excludes the methyl protons explicitly listed in the code. Replaced nuclei are labelled as deuterons, retain their shifts, and have scalar couplings rescaled by spin('2H')/spin('1H').
 
-- PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+For the peptide NH CSA model, the source documents nh_csa='bax' with H [6.00, 0.00, -6.00] ppm and N [-108.0, 62.0, 46.0] ppm; 'tcb' with H [7.00, 0.00, -7.00] ppm and N [-125.0, 45.0, 80.0] ppm; and 'pol' with H [6.66, 0.66, -7.33] ppm and N [-92.4, 34.7, 57.7] ppm. The importer passes `options` to `guess_csa_pro`, which sets missing `options.nh_csa` to `'tcb'`; callers need not supply it unless selecting `'bax'` or `'pol'` explicitly.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- pdb_file -string containing the name of the PDB file
-- bmrb_file -string containing the name of the BMRB file
-- options.select -'backbone' imports protein backbone up to
-- CB and HB, 'backbone-minimal' only imports
-- the backbone, 'backbone-hsqc' is the same
-- as backbone, but with GLN and ASN side chain
-- amide groups included, 'all' imports every-
-- thing that is assigned in BMRB. If a list of
-- numbers is supplied, atoms with those serial
-- numbers in the PDB file are imported; every
-- number must be present in the file, atoms of
-- unsupported types (oxygen, sulphur, OH pro-
-- tons) are dropped with a warning, and those
-- without a BMRB assignment are kept or dele-
-- ted according to options.noshift.
-- options.pdb_mol -the number of molecule if there are multiple
-- molecules in the pdb file
-- options.noshift -'keep' places unassigned atoms between -1 and
-- 0 ppm, 'delete' removes them from the system
-- options.deuterate -a cell array of character strings, replaces
-- protons with the specified PDB identifiers
-- with deuterons; 'non-Me' deuterates every-
-- thing except methyl groups
-- options.nh_csa -peptide bond CSAs differ across literature,
-- the following options are available:
-- 'bax' for H:[6.00 0.00 -6.00], N:[-108.0 62.0 46.0] ppm
-- 'tcb' for H:[7.00 0.00 -7.00], N:[-125.0 45.0 80.0] ppm
-- 'pol' for H:[6.66 0.66 -7.33], N:[ -92.4 34.7 57.7] ppm
-- the default is 'tcb'.
-
-## Outputs
-
-- sys.isotopes -Nspins x 1 cell array of strings
-- sys.labels -Nspins x 1 cell array of strings containing
-- standard IUPAC protein atom labels
-- inter.coordinates -Nspins x 3 matrix, Angstrom.
-- inter.zeeman.iso -Nspins x 1 cell array of numbers, ppm.
-- Isotropic chemical shifts go here.
-- inter.zeeman.matrix -Nspins x 1 cell array of 3x3 matrices, ppm.
-- Chemical shift anisotropies go here.
-- inter.coupling.scalar -Nspins x Nspins cell array of scalar coup-
-- lings, all in Hz.
-- aux.pdb_aa_num -pdb amino acid number for each spin
-- aux.pdb_aa_typ -pdb amino acid type for each spin
-
-## Implementation structure
-
-- Protein data import function. Parses PDB and BMRB data, runs a J-coupl-
-- ing guess, a CSA guess and outputs Spinach data structures. Syntax:
-- [sys,inter]=protein(pdb_file,bmrb_file,options)
-- pdb_file -string containing the name of the PDB file
-- bmrb_file -string containing the name of the BMRB file
-- options.select -'backbone' imports protein backbone up to
-- CB and HB, 'backbone-minimal' only imports
-- the backbone, 'backbone-hsqc' is the same
-- as backbone, but with GLN and ASN side chain
-- amide groups included, 'all' imports every-
-- thing that is assigned in BMRB. If a list of
-- numbers is supplied, spins with those num-
+For N selected atoms, outputs include N-element isotope and label lists, inter.zeeman.scalar (chemical shifts in ppm) and inter.zeeman.matrix (3×3 CSA matrices in ppm) as N×1 cell arrays, an N×N cell array of scalar couplings in Hz, and inter.coordinates as an N×1 cell array of coordinate vectors in ångströms. aux.pdb_aa_num and aux.pdb_aa_typ carry residue numbers and residue types. The implementation assigns the shift field as inter.zeeman.scalar; the source header's inter.zeeman.iso name is not what this routine writes.

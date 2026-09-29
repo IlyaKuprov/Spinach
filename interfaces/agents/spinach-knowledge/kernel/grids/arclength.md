@@ -4,34 +4,19 @@
 
 ## Purpose
 
-Arc length between two points on the unit sphere specified by the unit vectors supplied. Syntax: sig=arclength(r1,r2)
+Returns the central angular distance between two directions on the unit sphere. For a unit sphere, this angle is also the great-circle arc length in sphere-radius units.
 
-## Physical / mathematical content
+## Rule and units
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
+After normalising each input, the routine evaluates `atan2(norm(cross(r1,r2)),dot(r1,r2))`. This gives the shorter central angle from zero to pi radians using the cross-product magnitude and dot product. The scalar result `sig` is in radians; the function does not calculate a weighted grid or a physical length for a sphere with a different radius.
 
 ## Parameters / inputs
 
-- r1,r2 -three-element unit vectors with Cartesian
-- coordinates of the arc endpoints
+- `r1`, `r2` — real numeric three-element vectors giving Cartesian endpoint directions. Each supplied vector must have a Euclidean norm within `sqrt(eps)` of one; after this check, the function normalises the vectors and uses column form internally.
 
-## Outputs
+## Output
 
-- sig -arc length
+- `sig` — scalar angular distance in radians.
 
-## Implementation structure
-
-- Arc length between two points on the unit sphere specified by
-- the unit vectors supplied. Syntax:
-- sig=arclength(r1,r2)
-- r1,r2 -three-element unit vectors with Cartesian
-- coordinates of the arc endpoints
-- sig -arc length
-- Check consistency
-- Normalise the vectors
-- Get the arc length
-- Consistency enforcement
-- Ah, there's nothing more exciting than science. You get all the
-- fun of sitting still, being quiet, writing down numbers, paying
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/arclength.m)
+<https://spindynamics.org/wiki/index.php?title=arclength.m>

@@ -1,26 +1,27 @@
 # fix_path.m
 
 - Signature: `fix_path(config_style)`
+- Return value: none; the function changes MATLAB's search path and reports status to the command window.
 
 ## Purpose
 
-Spinach setup script. Nobody ever reads the documentation, so hopefully they would see this function and run it. If no input arguments are supplied, that means the user did not even read this header -oy vey, then we assume a PhD student with a laptop. Otherwise, there are a few specific config options for different system types. Syntax: fix_path(config_style)
+Sets up or removes Spinach directories on the active MATLAB path. The Spinach root is located relative to `fix_path.m`; the four managed trees are `etc`, `experiments`, `interfaces`, and `kernel`, including their subdirectories.
 
-## Physical / mathematical content
+## Accepted input
 
-## Numerical / algorithmic content
+`config_style` must be a character array. If omitted, it defaults to `'noob'`. The accepted values and effects are:
 
-## Implementation structure
+- `'noob'` and `'reset'`: call MATLAB's `restoredefaultpath`, add the four Spinach trees to the beginning of the path, then run `existentials` checks. This resets the MATLAB path before adding Spinach.
+- `'add'`: preserve the existing MATLAB path, add those same Spinach trees at the beginning, then run `existentials` checks.
+- `'remove'`: remove those Spinach trees from the path and report the removal; it does not reset MATLAB's path or remove unrelated entries.
 
-- Spinach setup script. Nobody ever reads the documentation,
-- so hopefully they would see this function and run it. If
-- no input arguments are supplied, that means the user did
-- not even read this header -oy vey, then we assume a PhD
-- student with a laptop. Otherwise, there are a few specific
-- config options for different system types. Syntax:
-- fix_path(config_style)
-- Default config style
-- Check consistency
-- Resolve the Spinach root directory
-- Run the configuration
-- Status report
+An unrecognised style raises an error. Because the type check uses `ischar`, a MATLAB string scalar is not the documented character-array input.
+
+## Operational notes
+
+The path edits use `genpath` over each managed tree. The reset modes therefore replace the current path with MATLAB's default path before adding Spinach; use `'add'` when unrelated existing path entries should be retained. No value is returned.
+
+## Links
+
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/fix_path.m
+- [Spinach Wiki: fix_path.m](https://spindynamics.org/wiki/index.php?title=fix_path.m)

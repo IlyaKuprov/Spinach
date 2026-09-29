@@ -1,35 +1,21 @@
 # kernel/plotting/ksgtitle.m
 
-- Signature: `ksgtitle(x)`
+- MATLAB implementation: [kernel/plotting/ksgtitle.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/ksgtitle.m)
 
-## Purpose
+Apply the Spinach figure style to the overall title for the current plot grid.
 
-House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ksgtitle(x)
+## Call
 
-## Physical / mathematical content
+`ksgtitle(x)`
 
-## Numerical / algorithmic content
+Pass a MATLAB character vector for `x`. The function checks `ischar(x)`; other types, including MATLAB string scalars, raise `x must be a character string`. The text is inserted directly inside a LaTeX `\textbf{...}` wrapper, so it is rendered bold by the LaTeX interpreter and is not escaped or validated by this helper. It does not accept additional `sgtitle` options.
 
-## Parameters / inputs
+## Effect
 
-- x -a character string
+The helper calls `sgtitle` with the wrapped text and `'Interpreter','latex'`, creating or updating the overall title for the current grid. It returns no output; the effect is on the graphics title.
 
-## Outputs
+There is no physical or numerical calculation here: this is a plotting-style convenience wrapper.
 
-- creates or updates the overall title
-- of the current grid of plots
+## Source link
 
-## Implementation structure
-
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- ksgtitle(x)
-- x -a character string
-- creates or updates the overall title
-- of the current grid of plots
-- Check consistency
-- Bold title rendered by LaTeX
-- Consistency enforcement
-- "There is considerable overlap between the intelligence
-- of the smartest bears and the dumbest tourists."
-- A forest ranger at the Yosemite National
+[`ksgtitle.m` on the Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ksgtitle.m)

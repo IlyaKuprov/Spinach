@@ -1,32 +1,18 @@
 # examples/relaxation_theory/trosy_nh.m
 
+- Source: [examples/relaxation_theory/trosy_nh.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_nh.m)
 - Signature: `trosy_nh()`
 
 ## Purpose
 
-Transverse relaxation rate as a function of the applied magnetic field at a typical amide N-H group in a protein. Rotational cor- relation time set to 25 ns. Nitrogen CSA parameters from Nitrogen-proton bond length from DFT. Calculation time: minutes.
+Calculate transverse relaxation matrix elements across magnetic field for a two-spin amide `1H–15N` model. The source states a 25 ns rotational correlation time, nitrogen CSA parameters from [the cited study](https://doi.org/10.1021/ja0016194), and an N–H bond length taken from DFT. It estimates a runtime of minutes.
 
-## Physical / mathematical content
+## Model and relaxation pathway
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The spin system contains `1H` and `15N`. The source supplies Zeeman eigenvalues [6, 0, −6] for the proton and [−108, 62, 46] for nitrogen, with Euler-angle inputs [0, 0, 0] and [0, 0, −19] degrees (converted in the code to radians). Coordinates are [1.04, 0, 0] and [0, 0, 0]; the source does not state a unit for these coordinates. The tensors and internuclear geometry define the anisotropic-shielding and dipolar contributions used by the relaxation calculation; the source does not print a component-by-component decomposition of the resulting superoperator.
 
-## Numerical / algorithmic content
+The script explicitly calls the Redfield relaxation model (`inter.relaxation={'redfield'}`), keeps relaxation in the lab frame, sets equilibrium to zero, and uses `tau_c={25e-9}` (25 ns). It uses the `sphten-liouv` formalism with no basis approximation. For the TROSY-style comparison it evaluates normalised single-spin transverse coherences and paired operators with opposite-sign two-spin terms: proton raising coherence with proton-plus-nitrogen-longitudinal coherence, and nitrogen raising coherence with nitrogen-plus-proton-longitudinal coherence. These left/right branches expose the relaxation interference relevant to the TROSY comparison; the script does not separately label or export an individual cross-correlation term. It does not call a stochastic-Liouville solver.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Calculation and output
 
-## Implementation structure
-
-- Transverse relaxation rate as a function of the applied magnetic
-- field at a typical amide N-H group in a protein. Rotational cor-
-- relation time set to 25 ns. Nitrogen CSA parameters from
-- Nitrogen-proton bond length from DFT.
-- Calculation time: minutes.
-- Specify coordinates and CSAs
-- Relaxation theory
-- Formalism and approximation
-- Disable startup checks
-- Magnetic field grid
-- Loop over magnetic fields
-- Set the magnet field
+The script samples 30 proton Larmor frequencies from 200 to 1500 MHz, converts each to a field with `2*pi*lin_freq*1e6/spin('1H')`, rebuilds the spin system and basis, and evaluates the relaxation superoperator at that field. It projects the superoperator onto the single-spin and paired operators; the plotted vertical quantity is a relaxation matrix element in Hz. Two figures show the proton and nitrogen operator matrix elements, respectively; each compares the single-spin transverse coherence with its two opposite-sign branches against proton Larmor frequency. This is a calculation of operator relaxation elements, not a pulse sequence, acquired signal, or measured spectrum.

@@ -1,34 +1,10 @@
 # examples/relaxation_theory/dd_csa_xcorr_2.m
 
 - Signature: `dd_csa_xcorr_2()`
+- Source: [examples/relaxation_theory/dd_csa_xcorr_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/dd_csa_xcorr_2.m)
 
-## Purpose
+This example is labelled in its source as a reproduction of Fig. 5a from Grace and Kumar ([doi:10.1006/jmra.1995.1151](https://doi.org/10.1006/jmra.1995.1151)). It models DD–CSA cross-correlation in a high-field `1H`/`19F` liquid-state NMR system and plots simulated fluorine spectra over a set of mixing times. The reference identifies the reproduction target; the script alone does not establish quantitative agreement with experimental data.
 
-DD-CSA cross-correlation -a reproduction of Fig 5a from the paper by Grace and Kumar (http://dx.doi.org/10.1006/jmra.1995.1151). Calculation time: seconds
+The system's geometry and interaction parameters are imported from `../standard_systems/fdnb.log` using `gparse` and `g2spinach`, with atom mappings H to `1H` and F to `19F`, and conversion arguments `[32.0 270.0]`. The field is `9.4 T`. The source first assigns a proximity cutoff of `5 Å`, then overwrites it with `4.0 Å`; the latter is the effective value. Redfield relaxation uses `rlx_keep='secular'`, `equilibrium='dibari'`, temperature `298 K`, and a single correlation time `tau_c=9.6e-12 s`. The basis is `sphten-liouv` with no approximation. That single time sets the rotational-correlation timescale; for isotropic rank-2 tumbling the BRW spectral density is Lorentzian in frequency, proportional to `tau_c/[1 + (omega*tau_c)^2]`.
 
-## Physical / mathematical content
-
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- DD-CSA cross-correlation -a reproduction of Fig 5a from the paper
-- by Grace and Kumar (http://dx.doi.org/10.1006/jmra.1995.1151).
-- Calculation time: seconds
-- Read the spin system parameters (vacuum DFT calculation)
-- Set up the calculation
-- Proximity cut-off
-- Run Spinach housekeeping
-- Set simulation parameters
-- Set the assumptions to high-field NMR
-- Get the Hamiltonian superoperator
-- Add Redfield superoperator,
-- Apply the offset
+The simulation uses the `19F` spin channel, offset `-521 Hz`, sweep `50 Hz`, `128` points, and zero-fill to `512`. It adds the Redfield relaxation superoperator to the Hamiltonian, applies the NMR high-field assumption and frequency offset, and detects with `L+`. The initial state is thermal equilibrium from the lab-frame Hamiltonian. For each mixing time `[0.1, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 10] s`, the script applies an `Lx` pi pulse, evolves during mixing, applies an `Ly` pi/2 pulse, and acquires the FID. Exponential apodisation with coefficient `6` precedes the Fourier transform. The plotted quantity is the real spectrum versus `19F` linear frequency in Hz, with the frequency axis reversed.

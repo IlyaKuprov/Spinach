@@ -1,48 +1,25 @@
 # experiments/pseudocon/pms2chi.m
 
-- Signature: `[chi,err]=pms2chi(hfcs,shifts,isotopes)`
+Source: [MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/pms2chi.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=pms2chi.m)
 
 ## Purpose
 
-Runs a least squares fitting procedure on top of Equation 10 from tensor from DFT hyperfine coupling tensors and experimentally ob- served paramagnetic (contact + pseudocontact) shifts. Syntax: chi=pms2chi(hfcs,shifts,isotopes)
+Fits the magnetic-susceptibility tensor to observed paramagnetic shifts containing both contact and pseudocontact contributions, using Equation 10 of the cited model. Diamagnetic chemical shifts are not part of the fitted observations.
 
-## Physical / mathematical content
+## Inputs and units
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+- `hfcs`: cell array of real symmetric 3-by-3 hyperfine tensors in Gauss, one per observation. The source notes that Gauss avoids dependence on the electron g-tensor and requires normalisation per unpaired electron in the S*A*I spin-Hamiltonian convention (as returned by `gparse`).
+- `shifts`: real numeric vector of observed paramagnetic (contact plus pseudocontact) shifts in ppm.
+- `isotopes`: cell array of character strings, one isotope label per observation (for example, `'13C'`).
 
-## Numerical / algorithmic content
+The three arrays must have matching element counts. Each hyperfine tensor must be real, symmetric, and 3-by-3; isotope entries must be character strings.
 
-## Parameters / inputs
+## Fit and output
 
-- hfcs -cell array of 3x3 hyperfine coupling tensors
-- in Gauss
-- shifts -vector of the observed pseudocontact shifts,
-- excluding the diamagnetic contribution, ppm
-- isotopes -cell array of character strings specifying
-- isotopes that exhibit each of the chemical
-- shifts supplied, for example {'1H','13C'}
+The objective is the sum of squared differences between each observed shift and `hfc2pms(hfcs{n},chi,isotopes{n})`. `fminunc` uses quasi-Newton/BFGS, starts six independent parameters at zero, allows at most 100 iterations and unlimited function evaluations, displays iterations, and enables parallel evaluation. The code imposes no physical bounds or regularisation.
 
-## Outputs
+The fitted `chi` is a general symmetric 3-by-3 tensor parameterised by six independent entries, so unlike `pcs2chi` it is not constrained to be traceless. It is returned in cubic Angstroms; `err` is the least-squares sum of squares.
 
-- chi -the fitted magnetic susceptibility tensor,
-- cubic Angstroms
-- err -least squares error
-- Note: Gauss units are used for hyperfine couplings because they do
-- not depend on the electron g-tensor.
+## Reference
 
-## Implementation structure
-
-- Runs a least squares fitting procedure on top of Equation 10 from
-- tensor from DFT hyperfine coupling tensors and experimentally ob-
-- served paramagnetic (contact + pseudocontact) shifts. Syntax:
-- chi=pms2chi(hfcs,shifts,isotopes)
-- hfcs -cell array of 3x3 hyperfine coupling tensors
-- in Gauss
-- shifts -vector of the observed pseudocontact shifts,
-- excluding the diamagnetic contribution, ppm
-- isotopes -cell array of character strings specifying
-- isotopes that exhibit each of the chemical
-- shifts supplied, for example {'1H','13C'}
-- chi -the fitted magnetic susceptibility tensor,
+The source identifies Equation 10 in [DOI 10.1039/C4CP03106G](https://doi.org/10.1039/C4CP03106G).

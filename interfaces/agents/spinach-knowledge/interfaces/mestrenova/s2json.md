@@ -1,48 +1,18 @@
 # interfaces/mestrenova/s2json.m
 
-- Signature: `s2json(file_name,sys,inter,parameters,fid)`
+- Signature: `s2json(file_name,sys,inter,parameters,fid)` (all five inputs are required; the function defines no defaults).
 
-## Purpose
+## Purpose and data contract
 
-Writes the parameters structure and the free induction decay into a JSON file that can be imported by MestreNova. Syntax: s2json(file_name,parameters,fid_matrices)
+Serialises the supplied Spinach structures and FID through JSONLab's `savejson` for import into MestreNova. The arguments are placed in a MATLAB structure with fields `sys`, `inter`, `parameters`, and `fid`; `savejson('spinach',spinach,file_name)` writes that structure under the JSON root key `spinach`. The function returns no MATLAB output and performs no unit conversion or FID reshaping.
 
-## Physical / mathematical content
+- `file_name`: character array passed to JSONLab as the destination. The guard checks only `ischar`; it does not check that the path is writable or that its directory exists.
+- `sys`, `inter`, `parameters`: MATLAB structures. The implementation checks only that each is a structure; it does not validate fields, array shape, or numerical values.
+- `fid`: either numeric data of any shape or a structure. The documented Fourier-transform-only case is a complex matrix. For States quadrature data such as NOESY, supply a structure containing `fid.cos` and `fid.sin` matrices. The code accepts any structure here and does not check those fields or matrix dimensions.
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The serialised content retains the supplied parameter and signal representation; this function does not assign physical units. Invalid argument types raise the explicit input errors; serialisation and file-write behaviour are delegated to `savejson`.
 
-## Numerical / algorithmic content
+## References
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- file_name -output file name
-- sys -Spinach input data structure
-- inter -Spinach input data structure
-- parameters -Spinach input data structure
-- fid -a structure or a matrix representing
-- the free induction decay
-
-## Outputs
-
-- this function writes a file
-- Notes: for data that only requires a Fourier transform, fid
-- must be a complex matrix. For 2D States quadrature
-- data (e.g. NOESY), fid.cos and fid.sin matrices must
-- be supplied as a structure.
-
-## Implementation structure
-
-- Writes the parameters structure and the free induction decay
-- into a JSON file that can be imported by MestreNova. Syntax:
-- s2json(file_name,parameters,fid_matrices)
-- file_name -output file name
-- sys -Spinach input data structure
-- inter -Spinach input data structure
-- parameters -Spinach input data structure
-- fid -a structure or a matrix representing
-- the free induction decay
-- this function writes a file
-- must be a complex matrix. For 2D States quadrature
-- data (e.g. NOESY), fid.cos and fid.sin matrices must
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/mestrenova/s2json.m)
+- [Spin Dynamics Wiki: s2json.m](https://spindynamics.org/wiki/index.php?title=s2json.m)

@@ -1,29 +1,21 @@
 # examples/nmr_metabol/molecule_b.m
 
 - Signature: `molecule_b()`
+- Source: [examples/nmr_metabol/molecule_b.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_metabol/molecule_b.m)
 
-## Purpose
+## What it models and loads
 
-1H NMR spectrum of a molecule from the GISSMO database. Calculation time: seconds
+This example simulates a one-dimensional liquid-state `1H` NMR spectrum for a molecule identified in the source as a GISSMO-database entry. The source comment estimates calculation time as seconds; that is not a timing measurement from this review. The wrapper imports `molecule_b.xml` with `gissmo2spinach('molecule_b.xml',1)` to obtain `sys` and `inter`. That XML is an input to the spin-system simulation, not an acquired FID or spectrum loaded for plotting. This wrapper does not say whether the XML parameters were experimentally measured, calculated, or curated.
 
-## Physical / mathematical content
+## Spin system and acquisition setup
 
-- Metabolomics NMR examples. These files apply liquid-state NMR simulation workflows to small-molecule mixtures, spectral assignment, concentration inference, and database-style metabolite spin-system definitions.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The basis uses `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
+- The observed spins are `{'1H'}`; both the initial state and detection coil are set to `state(spin_system,'L+','1H')`. `parameters.decouple={}` specifies no decoupling entries.
+- The source sets offset `3500`, sweep `5000`, `4096` acquisition points, and `16536` zero-filled points. It labels the plotted axis `ppm` and sets `invert_axis=1`. The wrapper does not state units for offset, sweep, or the Gaussian parameter below; these numbers are the literal settings in the code, not inferred Hz or ppm values.
+- No relaxation parameters are assigned in this wrapper.
 
-## Numerical / algorithmic content
+Acquisition is delegated through `liquid(spin_system,@acquire,parameters,'nmr')`. The wrapper does not show the helper's internal pulse, phase, gradient, or receiver program, so those details are not asserted here.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Processing and output
 
-## Implementation structure
-
-- 1H NMR spectrum of a molecule from the GISSMO database.
-- Calculation time: seconds
-- Import GISSMO dataset
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The returned FID is apodised with `{'gauss',10}`, Fourier-transformed as `fftshift(fft(fid,parameters.zerofill))`, and displayed as `real(spectrum)` with `plot_1d`. The zero-argument function does not declare a returned value or write an output spectrum file in this source. No experimental spectrum is loaded or compared in the wrapper.

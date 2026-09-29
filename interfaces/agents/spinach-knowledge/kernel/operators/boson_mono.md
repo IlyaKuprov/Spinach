@@ -1,47 +1,23 @@
 # kernel/operators/boson_mono.m
 
+Direct source: [kernel/operators/boson_mono.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/boson_mono.m)
+
 - Signature: `B=boson_mono(nlevels)`
 
 ## Purpose
 
-Bosonic monomial operators of the following structure: B(k,q)=(Cr^k)*(An^q) obeying the following commutation relations with the po- pulation number operator N: [N,B(k,q)]=(k-q)*B(k,q)
+Construct the ordered monomials of the truncated bosonic creation and annihilation matrices returned by `weyl(nlevels)`. For each `k,q=0,...,nlevels-1`, the cell contains `A.c^k*A.a^q`, with creation powers on the left and annihilation powers on the right. This function adds no further scalar prefactor; the ladder-matrix convention comes from `weyl`. Its documented number-operator relation is `[N,B(k,q)]=(k-q)*B(k,q)`.
 
-## Physical / mathematical content
+## Ordering and dimensions
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The returned `B` is an `nlevels^2-by-1` cell array. Each `B{j}` is an `nlevels-by-nlevels` matrix. The cells are ordered by increasing `k+q` and, within each equal-sum group, decreasing `k`. For `nlevels=3` the 1-based cell-number map is: `1:(0,0), 2:(1,0), 3:(0,1), 4:(2,0), 5:(1,1), 6:(0,2), 7:(2,1), 8:(1,2), 9:(2,2)`.
 
-## Numerical / algorithmic content
+The function accepts a positive integer `nlevels`. The finite truncation and matrix conventions are those of [`weyl.m`](weyl.md).
 
-## Syntax
+## Operator action
 
-```matlab
-B=boson_mono(nlevels)
-```
+The output consists of Hilbert-space operator matrices formed by ordinary matrix products. The routine does not construct left-multiplication, right-multiplication, a commutator superoperator, or a propagator.
 
-## Parameters / inputs
+## Reference
 
-- nlevels -number of bosonic ladder population
-- levels, k and q go from 0 to nlevels-1
-
-## Outputs
-
-- B -a cell array with the following numbering
-- map between (k,q) and a single index:
-- (0,0)(0,1)(0,2) (1)(3)(6)
-- (1,0)(1,1)(1,2) <=> (2)(5)(8)
-- (2,0)(2,1)(2,2) (4)(7)(9)
-
-## Implementation structure
-
-- Bosonic monomial operators of the following structure:
-- B(k,q)=(Cr^k)*(An^q)
-- obeying the following commutation relations with the po-
-- pulation number operator N:
-- [N,B(k,q)]=(k-q)*B(k,q)
-- B=boson_mono(nlevels)
-- nlevels -number of bosonic ladder population
-- levels, k and q go from 0 to nlevels-1
-- B -a cell array with the following numbering
-- map between (k,q) and a single index:
-- (0,0)(0,1)(0,2) (1)(3)(6)
-- (1,0)(1,1)(1,2) <=> (2)(5)(8)
+- [Spin Dynamics documentation for `boson_mono.m`](https://spindynamics.org/wiki/index.php?title=boson_mono.m)

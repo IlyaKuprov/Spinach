@@ -1,35 +1,13 @@
 # kernel/plotting/kzlabel.m
 
-- Signature: `kzlabel(varargin)`
+[kzlabel.m on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/kzlabel.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=kzlabel.m)
 
-## Purpose
+## Purpose and inputs
 
-House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kzlabel(varargin)
+`kzlabel(varargin)` applies the supplied arguments to MATLAB's `zlabel` function, then sets the label interpreter to LaTeX. The arguments are those accepted by MATLAB `zlabel`; there are no Spinach-specific numerical inputs, and the function returns no value.
 
-## Physical / mathematical content
+## Axes effects
 
-## Numerical / algorithmic content
+After creating or updating the Z-axis label, it obtains the current axes with `gca` and sets `TickLabelInterpreter` to `latex` and `FontSize` to `12`. These are effects on the current axes, in addition to the Z-label update. It does not change axis limits, tick values, plotted data, or colormaps, and performs no plotting or physical calculation.
 
-## Parameters / inputs
-
-- varargin -same arguments as those accepted by
-- Matlab's zlabel function
-
-## Outputs
-
-- creates or updates the current axis system
-
-## Implementation structure
-
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- kzlabel(varargin)
-- varargin -same arguments as those accepted by
-- Matlab's zlabel function
-- creates or updates the current axis system
-- Display the label using LaTeX
-- Switch tick labels to LaTeX
-- In an age of crybabies and professional victims,
-- Rupert stood out like a saint in hell.
-- Taki Theodoracopulos,
-- about Rupert Hambro
+This function defines no axis-unit formula, `nfft` or dwell-time behaviour, data-array or coordinate shape, or default bounds. Errors and accepted label arguments are governed by MATLAB's `zlabel` and graphics property handling; this source adds no explicit validation guard.

@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Stationary state analysis for the spin system of allyl pyruvate, finding out which component of the singlet state commutes with the drift Hamiltonian.
+Analyses the part of an allyl-pyruvate singlet state that is stationary under the drift Hamiltonian, then repeats the projection after applying a proton offset and spin-lock term. It is a Hamiltonian/eigenstate analysis, not a relaxation or lifetime calculation.
 
-## Physical / mathematical content
+## Spin system and Hamiltonian
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The source obtains a fitted `1H/13C` system from `allyl_pyruvate({'1H','13C'})`, sets the field to `14.1 T`, dilutes to the `13C` isotopomer, and selects subsystem 4. It uses the singlet on spin labels 3 and 4, an unapproximated `zeeman-hilb` basis, and the isotropic NMR Hamiltonian. The full Hamiltonian is explicitly symmetrised before diagonalisation.
 
-## Numerical / algorithmic content
+## Stationary-state projections
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+For the singlet operator, the code reports its norm, applies `remncomm` using the Hamiltonian eigenvectors and eigenvalues to retain the commuting component, removes the identity component with `remtrace`, and reports that norm. It then removes the normalised `Lz–Lz` component on spins 3 and 4 and reports the remaining norm. These are reported projections; the source contains no printed numerical results here.
 
-## Implementation structure
+The second pass sets the proton offset parameter to `2850` (the source does not state its unit) and adds the documented `1 kHz` proton spin-lock term, `2*pi*1000*Lx`, before repeating the projections. No gradients, relaxation, storage interval, or time evolution are specified.
 
-- Stationary state analysis for the spin system of allyl pyruvate,
-- finding out which component of the singlet state commutes with
-- the drift Hamiltonian.
-- Get the spin system from Anu's fits
-- Set the magnet
-- Spinach housekeeping
-- Pick out the required 13C isotopomer
-- Generate the basis
-- Get isotropic Hamiltonian
-- Tidy up rounding errors
-- Get the singlet state
-- Report the norm
+## Source
+
+[examples/singlet_states/eigenstate_analysis.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/eigenstate_analysis.m)

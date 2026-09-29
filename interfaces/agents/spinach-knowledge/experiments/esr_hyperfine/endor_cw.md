@@ -1,44 +1,28 @@
 # experiments/esr_hyperfine/endor_cw.m
 
-- Signature: `fid=endor_cw(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_hyperfine/endor_cw.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_hyperfine/endor_cw.m)
 
-## Purpose
+Signature: fid=endor_cw(spin_system,parameters,H,R,K)
 
-Fast approximate simulation of isotropic continuous-wave ENDOR pulse sequence -essentially an NMR spectrum weighted by hyper- fine couplings is recorded. Syntax: fid=endor_cw(spin_system,parameters,H,R,K)
+## Purpose and physical meaning
 
-## Physical / mathematical content
+This routine is a fast approximate simulation of isotropic continuous-wave ENDOR. It models nuclear-spin response weighted by electron–nuclear hyperfine couplings; it returns a nuclear free-induction decay (FID), whose Fourier transform approximates a CW ENDOR spectrum. It is not a magnetic-field sweep: the supplied sweep is a nuclear-frequency sweep width. The routine does not model DNP, hyperpolarisation, or spatial imaging.
 
-- Hyperfine ESR experiment implementations. These sequences probe coupled electron-nuclear dynamics through ENDOR or HYSCORE-type manipulations of coherence pathways.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Inputs and required settings
 
-## Numerical / algorithmic content
+- spin_system supplies the spin specification and is used to construct states and operators.
+- parameters.sweep: nuclear frequency sweep width, in Hz. The sampled evolution step is 1/parameters.sweep seconds.
+- parameters.npoints: scalar number of FID points.
+- H, R, and K: Hamiltonian, relaxation, and kinetics matrices supplied by the context function. They must be matrices of identical dimensions. The function accepts the sphten-liouv and zeeman-liouv formalisms and converts to the adjoint representation when needed.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## State preparation, propagation, and signal
 
-## Parameters / inputs
+The routine forms L = H + 1i*R + 1i*K. For each electron–nucleus pair it computes the isotropic coupling amplitude from one third of the traces of the two coupling-matrix blocks, sums nuclear Lz states weighted by the absolute amplitudes, and normalises the resulting initial state. A nuclear Sy pulse of pi/2 radians excites the nuclei. Detection uses the nuclear L+ state. Propagation uses a dwell time of 1/sweep and npoints-1 further points; the routine returns the real part of the FID for frequency symmetrisation.
 
-- parameters.sweep nuclear frequency sweep width, Hz
-- parameters.npoints number of FID points to be computed
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+The numerical constants in the implementation are the pi/2 nuclear rotation and the sampling relation dt=1/sweep; the source does not provide a worked numeric sweep-width example. The returned value is simulated, not measured.
 
-## Outputs
+## Scope and limitations
 
-- fid -free induction decay whose Fourier transform
-- approximates a CW ENDOR spectrum
+This is an isotropic, approximate CW-ENDOR model, not a full field-dependent EPR acquisition. It returns an FID rather than performing the Fourier transform itself. No DOI or experimental measurement is specified by the source or the earlier page.
 
-## Implementation structure
-
-- Fast approximate simulation of isotropic continuous-wave ENDOR
-- pulse sequence -essentially an NMR spectrum weighted by hyper-
-- fine couplings is recorded. Syntax:
-- fid=endor_cw(spin_system,parameters,H,R,K)
-- parameters.sweep nuclear frequency sweep width, Hz
-- parameters.npoints number of FID points to be computed
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid -free induction decay whose Fourier transform
-- approximates a CW ENDOR spectrum
-- Move into adjoint representation if needed
+Source: https://spindynamics.org/wiki/index.php?title=endor_cw.m

@@ -1,32 +1,37 @@
 # tests/kernel/test_hilbert_operator.m
 
-- Signature: `result=test_hilbert_operator()`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_hilbert_operator.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_hilbert_operator.m)
 
 ## Purpose
 
-Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator()
+Regression test for Hilbert-space operator generation. It verifies that `operator()` builds the correct one-spin Hilbert-space angular momentum matrices from human-readable labels.
 
-## Physical / mathematical content
+## Behaviour
 
-## Numerical / algorithmic content
+- Announces the test target with `fprintf('TESTING: Hilbert-space operator generation\n')`.
+- Initialises a test result via `new_test_result('kernel/hilbert_operator', 'Hilbert-space operator generation', 'operator() must map Lx, Ly, Lz, L+, and L- labels to spin matrices.')`.
+- Builds a one-proton Hilbert-space spin system with:
+  - `sys.magnet = 0`
+  - `sys.isotopes = {'1H'}`
+  - `inter.zeeman.scalar = {0}`
+  - `bas.formalism = 'zeeman-hilb'`
+  - `bas.approximation = 'none'`
+  - The spin system is created with `test_spin_system(sys, inter, bas)`.
+- Uses `pauli(2)` to obtain textbook spin-half reference matrices.
+- Checks label-to-matrix mapping with `test_close` using tolerances `1e-15` (absolute) and `1e-15` (relative):
+  - `operator(spin_system, 'Lx', 1)` against `S.x` — 'a one-proton Lx operator is the spin-half Sx matrix'
+  - `operator(spin_system, 'Ly', 1)` against `S.y` — 'a one-proton Ly operator is the spin-half Sy matrix'
+  - `operator(spin_system, 'Lz', 1)` against `S.z` — 'a one-proton Lz operator is the spin-half Sz matrix'
+  - `operator(spin_system, 'L+', 1)` against `S.p` — 'L+ is the spin raising operator in the Zeeman basis'
+  - `operator(spin_system, 'L-', 1)` against `S.m` — 'L- is the spin lowering operator in the Zeeman basis'
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Inputs and outputs
 
-## Outputs
+- **Syntax:** `result = test_hilbert_operator()`
+- **Outputs:**
+  - `result` — regression test result with explanatory messages.
+- **Inputs:** None.
 
-- result -regression test result with explanatory messages
-- The test checks that operator() builds the correct one-spin Hilbert-space
-- angular momentum matrices from human-readable labels.
+## References
 
-## Implementation structure
-
-- Tests Hilbert-space operator generation. Syntax:
-- result=test_hilbert_operator()
-- result -regression test result with explanatory messages
-- The test checks that operator() builds the correct one-spin Hilbert-space
-- angular momentum matrices from human-readable labels.
-- Announce the test target
-- State the physical target of the test
-- Build a one-proton Hilbert-space spin system
-- Textbook spin-half reference matrices
-- Check label-to-matrix mapping
+- Source file: [tests/kernel/test_hilbert_operator.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_hilbert_operator.m) on GitHub.

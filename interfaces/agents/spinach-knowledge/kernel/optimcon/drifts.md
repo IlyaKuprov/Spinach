@@ -1,49 +1,24 @@
 # kernel/optimcon/drifts.m
 
-- Signature: `[drifts,spc_dim]=drifts(spin_system,context,...`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/drifts.m)
 
-## Purpose
+## Purpose and syntax
 
-Returns a cell array of drift Liouvillians suitable for the control.drifts variable in ensemble control optimisations.
+`[drifts,spc_dim]=drifts(spin_system,context,parameters,assumptions)` returns drift Liouvillians for `control.drifts` in ensemble-control optimisations. There are no optional arguments or defaults.
 
-## Physical / mathematical content
+## Inputs
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
+- `spin_system`: Spinach spin system passed to the context.
+- `context`: Required function handle for the ensemble context, for example `@powder` or `@singlerot`.
+- `parameters`: Parameters consumed by the context; the function sets `parameters.sum_up=0` before calling it.
+- `assumptions`: Character string passed to the context.
 
-## Numerical / algorithmic content
+The source validates that `context` is a function handle and `assumptions` is a character array. It provides no defaults, and does not validate `spin_system`, `parameters`, or the structure returned by the context.
 
-## Syntax
+## Outputs and construction
 
-```matlab
-[drifts,spc_dim]=drifts(spin_system,context,parameters)
-```
+The context is called with the spin system, an evolution-generator capture function, the modified parameters, and assumptions. For each returned ensemble member, the function forms `H+1i*R+1i*K`; if that member has exactly five entries, it adds `1i*systems{n}{5}` as the hydrodynamics contribution. The output is a cell array shaped as `{{La},{Lb},...}`, one single-Liouvillian cell per ensemble member.
 
-## Parameters / inputs
+`spc_dim` is calculated as `size(H,1)/size(spin_system.bas.basis,1)` after the member loop. It represents the classical-dynamics subspace dimension (for example, the rotor grid in MAS); it is a dimension ratio, not a physical unit. The source does not state physical units for the Liouvillian terms.
 
-- context -a function handle to Spinach context
-- responsible for handling the ensemble
-- parameters -parameters required by the context
-- assumptions -assumptions required by the context
-
-## Outputs
-
-- drifts -a cell array of Liouvillians format-
-- ted as {{La},{Lb},...}, one per en-
-- semble member
-- spc_dim -dimension of the classical dynamics
-- subspace (e.g. rotor grid in MAS)
-
-## Implementation structure
-
-- Returns a cell array of drift Liouvillians suitable for the
-- control.drifts variable in ensemble control optimisations.
-- [drifts,spc_dim]=drifts(spin_system,context,parameters)
-- context -a function handle to Spinach context
-- responsible for handling the ensemble
-- parameters -parameters required by the context
-- assumptions -assumptions required by the context
-- drifts -a cell array of Liouvillians format-
-- ted as {{La},{Lb},...}, one per en-
-- semble member
-- spc_dim -dimension of the classical dynamics
-- subspace (e.g. rotor grid in MAS)
+<https://spindynamics.org/wiki/index.php?title=drifts.m>

@@ -1,43 +1,20 @@
 # kernel/overloads/@ttclass/unit_like.m
 
-- Signature: `A=unit_like(A)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/unit_like.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/unit_like.m)
 
-## Purpose
+## Signature
 
-Returns a unit object of the same type as whatever is supplied.
+`A=unit_like(A)`
 
-## Physical / mathematical content
+## Purpose and behaviour
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Returns an identity in the same representation family as a square matrix or square-operator tensor train.
 
-## Numerical / algorithmic content
+For a `ttclass` input, the function checks that every core has equal row and column mode sizes. It then creates one local `eye(mode_size)` matrix per core and calls `ttclass(1,core,0)`. The result is a single rank-one tensor train with the same local mode dimensions, coefficient 1, and tolerance 0; input coefficients, buffered columns, and bond ranks are not copied.
 
-## Syntax
+For a square sparse matrix it returns `speye(size(A))`; for a square full matrix it returns `eye(size(A))`. A nonsquare matrix or a tensor train with any unequal local row and column mode size raises an error.
 
-```matlab
-A=unit_like(A)
-```
+## Input and output
 
-## Parameters / inputs
-
-- A -a full or sparse square matrix, or a tensor train
-- representation of a square matrix
-
-## Outputs
-
-- A -a unit matrix in the same format
-
-## Implementation structure
-
-- Returns a unit object of the same type as whatever is supplied.
-- A=unit_like(A)
-- A -a full or sparse square matrix, or a tensor train
-- representation of a square matrix
-- A -a unit matrix in the same format
-- Unit tensor train of the same topology
-- Unit sparse matrix of the same dimension
-- Unit dense matrix of the same dimension
-- Complain and bomb out
-- Briefly stated, the Gell-Mann Amnesia effect is as follows. You open the
-- newspaper to an article on some subject you know well. You read the arti-
-- cle and see the journalist has absolutely no understanding of either the
+- `A` — a full or sparse square matrix, or a `ttclass` representation whose local row and column mode sizes match.
+- `A` — an identity matrix or tensor-train identity in the corresponding representation family.

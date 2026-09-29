@@ -1,45 +1,21 @@
 # experiments/hyperpol/topdnp.m
 
 - Signature: `contact_curve=topdnp(spin_system,parameters,H,R,K)`
+- Canonical MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/topdnp.m
 
-## Purpose
+## Purpose and pulse cycle
 
-Time-optimised pulsed DNP experiment from: Syntax (call from powder context): contact_curve=topdnp(spin_system,parameters,H,R,K)
+Implements the time-optimised pulsed DNP loop described in the cited paper. The function combines context-supplied matrices as `L=H+1i*R+1i*K`, forms an electron (X)-directed microwave pulse by adding `2*pi*irr_powers*Ex`, then repeats pulse followed by delay. It records the detection-state overlap before the first pulse and after every completed loop. The supported propagation branches are `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
+`H`, `R`, and `K` are context-supplied matrices. Required fields are `irr_powers` (non-negative microwave amplitude in Hz), `rho0` (initial state), `coil` (detection state), `pulse_dur` and `delay_dur` (seconds), and `nloops` (positive integer). The `2*pi` factor converts the Hz amplitude in the driven generator to angular frequency; pulse and delay lengths are in seconds.
 
-## Numerical / algorithmic content
+`contact_curve` is a `1 x (nloops+1)` row: the initial `coil`–state overlap, followed by one detected value after each pulse–delay cycle. It is not an FID, MRI image, or k-space trajectory. The source has no gradient or spatial-encoding input.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The numeric examples directly encoded by the source are the x-axis microwave term and the initial-plus-one-sample-per-loop convention; neither the source nor baseline page supplies a numerical parameter set or calculated experiment result.
 
-## Parameters / inputs
+## References
 
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.pulse_dur -pulse duration, seconds
-- parameters.delay_dur -delay_duration, seconds
-- parameters.nloops -number of TOP DNP loops
-- Output:
-- contact_curve -time dependence of the coil state
-
-## Implementation structure
-
-- Time-optimised pulsed DNP experiment from:
-- Syntax (call from powder context):
-- contact_curve=topdnp(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.pulse_dur -pulse duration, seconds
-- parameters.delay_dur -delay_duration, seconds
+- TOP DNP paper: https://doi.org/10.1126/sciadv.aav6909
+- Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=topdnp.m

@@ -1,51 +1,17 @@
 # interfaces/comsol/conc_plot.m
 
-- Signature: `conc_plot(spin_system,conc,obs)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/conc_plot.m) · [Spinach Wiki: conc_plot.m](https://spindynamics.org/wiki/index.php?title=conc_plot.m)
 
-## Purpose
+## Purpose and call
 
-2D microfluidic concentration plotting function. Uses mesh tessellation information to plot concentrations as vertical bars. This function should be called after mesh_plot() has drawn the mesh. Syntax: conc_plot(spin_system,conc,obs)
+`conc_plot(spin_system,conc,obs)` draws a vertical bar over each active Voronoi cell, using the supplied concentration value as the bar top and zero as its base. The source describes it as a plotting step to call after `mesh_plot` has drawn the mesh. `obs` is optional.
 
-## Physical / mathematical content
+## Accepted data and geometry
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+`spin_system.mesh` must contain finite real two-element `zext` data and Voronoi data with `ncells`, `cells`, `vertices`, and `max_cell_size`. `conc` must be a finite real column vector with one value per Voronoi cell. A cell is drawn only when `abs(conc(n)) > 1e-3 * diff(spin_system.mesh.zext)`. Its vertical coordinate is the supplied `conc(n)`; the routine applies no concentration-unit conversion.
 
-## Numerical / algorithmic content
+When supplied, `obs` must be a finite real matrix with one row per cell and one, two, or three columns. The source treats its columns as phase, then optional amplitude, then optional longitudinal observable. Phase is wrapped with `wrapTo2Pi` and mapped to HSV hue. With one phase column, saturation and value are fixed at 0.75 and 0.50. With phase and amplitude, saturation is amplitude divided by the column maximum (or zero if that maximum is zero), and value is 0.50. With three columns, the same hue and saturation rules apply, while value is the longitudinal column scaled from its minimum-to-maximum range; a constant column maps to value 1. With no `obs`, cells use neutral mid-grey.
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Output and guardrails
 
-## Parameters / inputs
-
-- spin_system -Spinach spin system object containing
-- mesh and tessellation information
-- conc -concentrations as a column vector with
-- the same number of elements as the num-
-- ber of Voronoi cells; these will deter-
-- mine bar heights
-- obs -up to three observables as columns of
-- a matrix with the same number of rows
-- as conc; these will be normalised and
-- mapped into HSV colour space for each
-- Voronoi cell bar. Options:
-- one column: [xy_phases]
-- two columns: [xy_phases xy_amps]
-- three columns: [xy_phases xy_amps z]
-
-## Outputs
-
-- the function updates a figure created by mesh_plot()
-
-## Implementation structure
-
-- 2D microfluidic concentration plotting function. Uses mesh
-- tessellation information to plot concentrations as vertical
-- bars. This function should be called after mesh_plot() has
-- drawn the mesh. Syntax:
-- conc_plot(spin_system,conc,obs)
-- spin_system -Spinach spin system object containing
-- mesh and tessellation information
-- conc -concentrations as a column vector with
-- the same number of elements as the num-
-- ber of Voronoi cells; these will deter-
-- mine bar heights
-- obs -up to three observables as columns of
+There is no returned data structure or status value: the function builds top, bottom, and side faces and draws a flat-coloured patch in the current plotting axes. It checks for the required mesh and Voronoi fields, the shape and finiteness of `zext`, the finite real concentration column and its length, and the observable matrix's finiteness, row count, and column count.

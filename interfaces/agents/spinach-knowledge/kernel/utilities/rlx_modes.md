@@ -1,46 +1,39 @@
 # kernel/utilities/rlx_modes.m
 
-- Signature: `R=rlx_modes(spin_system)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rlx_modes.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rlx_modes.m)
 
 ## Purpose
 
-Bosonic mode dissipation superoperator. Builds thermalised GKSL dissipators for the amplitude damping and the pure dephasing of the bosonic modes declared in inter.modes, using the amplitude damping rates and the pure dephasing rates ingested by create.m and the Bose-Einstein thermal occupation numbers computed from the physical mode frequencies, meaning the sum of the declared carrier and the declared frequency wher
+Builds the bosonic mode dissipation superoperator: thermalised GKSL dissipators for amplitude damping and pure dephasing of the bosonic modes declared in `inter.modes`, using the amplitude damping rates and pure dephasing rates ingested by `create.m` and the Bose-Einstein thermal occupation numbers computed from the physical mode frequencies and the system temperature.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `R=rlx_modes(spin_system)`.
+- Runs a consistency check (`grumble`) that errors if `spin_system.inter.modes` is missing, if the basis formalism is not `zeeman-liouv` or `sphten-liouv` (bosonic mode dissipators are only available in Liouville space), or if `spin_system.rlx.temperature` is missing.
+- Preallocates the output with `mprealloc(spin_system,1)`.
+- Locates bosonic modes as components whose type is `C`, `V`, or `T`.
+- For each mode, reads the amplitude damping rate `kappa` from `spin_system.inter.modes.damp(k)` and the pure dephasing rate `gphi` from `spin_system.inter.modes.dephase(k)`; if both are zero, the mode is skipped.
+- Thermal occupation `nbar` is computed only when `kappa>0` and `spin_system.rlx.temperature>0`:
+  - The physical frequency is `carriers(k)+frqs(k)` when `spin_system.inter.modes.carriers(k)>0` (laboratory carrier included where declared), otherwise `abs(spin_system.inter.modes.frqs(k))`.
+  - If the physical frequency is below `2*pi*spin_system.tols.inter_cutoff`, the function errors: the thermal occupation of a zero-frequency mode is undefined and the laboratory frame frequency must be supplied.
+  - Otherwise `nbar=1/(exp(beta_factor)-1)` with `beta_factor=spin_system.tols.hbar*phys_frq/(spin_system.tols.kbol*spin_system.rlx.temperature)` (Bose-Einstein statistics at the physical frequency), and the used frequency and `nbar` are reported to the user.
+  - Without damping or at zero temperature, `nbar=0`. The Spinach convention that zero temperature means the high-temperature limit does not apply to bosonic modes: zero temperature here produces zero thermal occupation numbers.
+- Reports `kappa` (s^-1), `gamma_phi` (s^-1) and `nbar` for each dissipative mode.
+- Builds left/right ladder superoperators with `operator(spin_system,{'A'|'C'|'N'|'AC'},{k},'left'/'right')`, truncated to the level count of each mode, and accumulates:
+  - Cooling dissipator: `kappa*(1+nbar)*(a_left*c_right-0.5*(n_left+n_right))`, i.e. `kappa*(1+nbar)*D[a]` where `D[x]` is the GKSL dissipator of operator `x`.
+  - Heating dissipator, added only when `nbar>0`: `kappa*nbar*(c_left*a_right-0.5*(ac_left+ac_right))`, i.e. `kappa*nbar*D[c]`.
+  - Pure dephasing dissipator, added only when `gphi>0`: `2*gphi*(n_left*n_right-0.5*(n_left*n_left+n_right*n_right))`, i.e. `2*gamma_phi*D[n]`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+**Inputs**
 
-## Parameters / inputs
+- `spin_system` — Spinach spin system description object with bosonic mode information present.
 
-- spin_system -Spinach spin system description object
-- with bosonic mode information present
+**Outputs**
 
-## Outputs
+- `R` — bosonic mode dissipation superoperator.
 
-- R -bosonic mode dissipation superoperator
-- Note: the dissipators are kappa*(1+nbar)*D[a], kappa*nbar*D[c],
-- and 2*gamma_phi*D[n], where D[x] is the GKSL dissipator of
-- the operator x, built from ladder operators truncated to
-- the level count of each mode. The Spinach convention of
-- zero temperature meaning the high-temperature limit is not
-- applicable to bosonic modes: zero temperature here produces
-- zero thermal occupation numbers.
+## References
 
-## Implementation structure
-
-- Bosonic mode dissipation superoperator. Builds thermalised GKSL
-- dissipators for the amplitude damping and the pure dephasing of
-- the bosonic modes declared in inter.modes, using the amplitude
-- damping rates and the pure dephasing rates ingested by create.m
-- and the Bose-Einstein thermal occupation numbers computed from
-- the physical mode frequencies, meaning the sum of the declared
-- carrier and the declared frequency where inter.modes.carriers
-- is present, and the system temperature. Syntax:
-- R=rlx_modes(spin_system)
-- spin_system -Spinach spin system description object
-- with bosonic mode information present
-- R -bosonic mode dissipation superoperator
+- Spinach Wiki: [rlx_modes.m](https://spindynamics.org/wiki/index.php?title=rlx_modes.m)

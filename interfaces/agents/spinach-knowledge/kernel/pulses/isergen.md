@@ -1,45 +1,23 @@
 # kernel/pulses/isergen.m
 
-- Signature: `H=isergen(HL,HM,HR,dt)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/isergen.m) · [Spin Dynamics Wiki: isergen.m](https://spindynamics.org/wiki/index.php?title=isergen.m)
 
-## Purpose
+Signature: `H=isergen(HL,HM,HR,dt)`
 
-2nd and 4th order Iserles product quadrature generators for one time propagation step in the case of state-inde- pendent Hamiltonian. Syntax: H=isergen(HL,HM,HR,dt)
+## Purpose and interval data
 
-## Physical / mathematical content
+Builds the effective generator for one time-propagation interval with a state-independent Hamiltonian. `HL` and `HR` are the Hamiltonians at the left and right edges; `HM` is optional and, when nonempty, is the midpoint Hamiltonian. `dt` is the interval duration in seconds. The output is used in `exp(-1i*H*dt)`.
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+## Quadrature choice and ordering
 
-## Numerical / algorithmic content
+An empty `HM` selects the second-order product quadrature:
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+`H=(HL+HR)/2 + (1i*dt/6)*(HL*HR-HR*HL)`
 
-## Parameters / inputs
+A supplied `HM` selects the fourth-order product quadrature:
 
-- HL -Hamiltonian at the left edge of the interval
-- HM -[optional] Hamiltonian at the interval mid-
-- point; if this is empty, second order quad-
-- rature is used.
-- HR -Hamiltonian at the right edge of the interval
-- dt -interval duration, seconds
+`H=(HL+4*HM+HR)/6 + (1i*dt/12)*(HL*HR-HR*HL)`
 
-## Outputs
+The commutator correction is ordered as `HL*HR-HR*HL`; reversing its factors changes the expression. These are endpoint samples, plus a midpoint sample for the fourth-order option—not a waveform file or a sequence of pulse-amplitude samples. Any pulse amplitude or phase is represented through the supplied Hamiltonians; there are no separate pulse-control arguments. Plotting and file output are not handled here.
 
-- H -effective evolution generator, to be used
-- as exp(-1i*H*dt)
-
-## Implementation structure
-
-- 2nd and 4th order Iserles product quadrature generators
-- for one time propagation step in the case of state-inde-
-- pendent Hamiltonian. Syntax:
-- H=isergen(HL,HM,HR,dt)
-- HL -Hamiltonian at the left edge of the interval
-- HM -[optional] Hamiltonian at the interval mid-
-- point; if this is empty, second order quad-
-- rature is used.
-- HR -Hamiltonian at the right edge of the interval
-- dt -interval duration, seconds
-- H -effective evolution generator, to be used
-- as exp(-1i*H*dt)
+The source checks that each supplied Hamiltonian is square and that `dt` is a real numeric scalar. It does not explicitly check that the Hamiltonian dimensions match one another.

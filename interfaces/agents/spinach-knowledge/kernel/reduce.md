@@ -1,45 +1,31 @@
 # kernel/reduce.m
 
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/reduce.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=reduce.m
 - Signature: `projectors=reduce(spin_system,L,rho)`
 
 ## Purpose
 
-Symmetry and trajectory-level state space reduction. Tries all applicable reduction methods (unless disabled during the call to create.m) and returns a cell array of projectors into a set of independently evolving reduced subspaces. Syntax: projectors=reduce(spin_system,L,rho)
+Returns projectors into independently evolving reduced subspaces, selected using the supplied Liouvillian `L` and state `rho`. This is state-space reduction; this function does not construct a relaxation generator or define relaxation-term units.
 
-## Physical / mathematical content
+## Reduction path
 
-## Numerical / algorithmic content
+The source first checks whether trajectory-level reduction is disabled by `spin_system.sys.disable` containing `'trajlevel'`; if so, it reports the setting and returns the unit projector `1`. Otherwise the available operations depend on `spin_system.bas.formalism` and the disable settings.
 
-## Parameters / inputs
+For `zeeman-hilb` and `zeeman-wavef`, the code uses supplied permutation-symmetry irreducible-representation projectors when symmetry treatment is enabled and that information is available. Zero-dimensional irreps are dropped; the state contribution is also screened against `spin_system.tols.irrep_drop`. These formalisms use symmetry screening rather than the Liouville-space zero-track and path-tracing stages.
 
-- L -Liouvillian matrix
-- rho -initial state (source state screening) or
-- destination state (destination state screening)
+For `zeeman-liouv` and `sphten-liouv`, the code tries symmetry factorisation when available and not disabled, then applies zero-track elimination and path tracing to identify disconnected subspaces. Disabling symmetry skips that factorisation; the zero-track and path-tracing stages remain part of this formalism's route. The detailed reductions therefore depend on the chosen formalism, supplied symmetry data, input state, and configured tolerances.
 
-## Outputs
+## Inputs and returned projectors
 
-- projectors -a cell array of projectors into independently
-- evolving reduced subspaces. The projectors are
-- to be used as follows:
-- L_reduced=P'*L*P; (for matrices)
-- rho_reduced=P'*rho; (for state vectors)
-- Notes: further information on what this function does is avai-
-- lable in our papers on this subject
-- Briefly, the function tries symmetry factorisation, fol-
-- lowed by zero track elimination, followed by disconnect-
-- ed subspace identifcation by path tracing.
+- `L` - Liouvillian matrix
+- `rho` - initial state for source-state screening, or destination state for destination-state screening
+- `projectors` - cell array of projectors into the selected subspaces
 
-## Implementation structure
+Use each projector `P` as documented by the source: `L_reduced=P'*L*P` for matrices and `rho_reduced=P'*rho` for state vectors.
 
-- Symmetry and trajectory-level state space reduction. Tries all
-- applicable reduction methods (unless disabled during the call
-- to create.m) and returns a cell array of projectors into a set
-- of independently evolving reduced subspaces. Syntax:
-- projectors=reduce(spin_system,L,rho)
-- L - Liouvillian matrix
-- rho - initial state (source state screening) or
-- destination state (destination state screening)
-- projectors -a cell array of projectors into independently
-- evolving reduced subspaces. The projectors are
-- to be used as follows:
-- L_reduced=P'*L*P; (for matrices)
+## References
+
+- http://dx.doi.org/10.1016/j.jmr.2008.08.008
+- http://dx.doi.org/10.1063/1.3398146
+- http://dx.doi.org/10.1016/j.jmr.2011.03.010

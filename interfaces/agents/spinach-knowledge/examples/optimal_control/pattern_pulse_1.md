@@ -1,34 +1,15 @@
 # examples/optimal_control/pattern_pulse_1.m
 
-- Signature: `pattern_pulse_1()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/pattern_pulse_1.m)
 
 ## Purpose
 
-Nutation frequency selective excitation described in Glaser group paper (https://doi.org/10.1016/j.jmr.2004.12.005). User-specified nutation frequency intervals have magnetisation arriving into us- er specified states. The pulse is phase-modulated. Calculation time: minutes.
+This example designs a phase-modulated, nutation-frequency-selective excitation pulse. For an on-resonance 13C spin at 28.18 T with no basis approximation, it asks for an initial Sz state to reach Sz in three selected nutation-frequency bands and Sx at the other sampled frequencies. The source cites the Glaser-group paper at [doi:10.1016/j.jmr.2004.12.005](https://doi.org/10.1016/j.jmr.2004.12.005).
 
-## Physical / mathematical content
+## Target pattern and pulse design
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The drift Hamiltonian is zero for this single on-resonance spin. The target pattern is defined over 128 nutation frequencies from 6 to 14 kHz: Sz is targeted at indices 1-20, 54-73, and 109-128; Sx is targeted at the remaining samples. The source plots this requested pattern before optimisation. It keeps the amplitude profile fixed and optimises phase with GRAPE via `fmaxnewton` and `@grape_phase`, using the `lbfgs` method. The initial phase is constant at pi/4, the configured iteration limit is 200, and the pulse grid has 250 intervals of 20 microseconds (5 milliseconds total). The B1 levels are set from the 6-14 kHz range and represented in the controls as angular frequencies in rad/s.
 
-## Numerical / algorithmic content
+## Evaluation shown by the example
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Nutation frequency selective excitation described in Glaser group
-- paper (https://doi.org/10.1016/j.jmr.2004.12.005). User-specified
-- nutation frequency intervals have magnetisation arriving into us-
-- er specified states. The pulse is phase-modulated.
-- Calculation time: minutes.
-- Magnetic field
-- Single carbon spin
-- Transmitter is on resonance
-- No approximations
-- Run Spinach housekeeping
-- Get pertinent spin states
-- Get pertinent control operators
+For each nutation-frequency sample, the script simulates the shaped pulse and projects the final state onto Sx and Sz, then plots those projections against the target pattern. This defines how the example evaluates the design; the source contains no measured or reported post-optimisation values. Its calculation-time comment says minutes. Source contact: ilya.kuprov@weizmann.ac.il.

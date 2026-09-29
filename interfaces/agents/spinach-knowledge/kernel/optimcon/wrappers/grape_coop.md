@@ -2,27 +2,10 @@
 
 - Signature: `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)`
 
-## Purpose
+Builds a cooperative two-pulse phase cycle for a point-to-point transformation. The executable code divides `phi_profile` into row blocks: the first `ncontrols/2` rows feed pulse A and the remaining rows feed pulse B. Each block is evaluated by `grape_phase`; `traj_data` returns the two trajectory outputs as a pair.
 
-Pairs of cooperative pulses that may be used as components of a phase cycle. The pulses are designed to produce as much of the destination state as they can, and to have imputities of opposite sign. Adding the outcomes of the two experiments then destroys the impurities. Syntax: [traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)
+For each pulse, the wrapper removes the component of the final state parallel to the single target state. It sums the two residual impurities and subtracts the mean squared norm of that sum from the first fidelity slice; Hilbert-space states use `hdot`, while other formalisms use an explicit orthogonal projector. The reported fidelity averages the two pulse fidelities. The gradient stacks their phase gradients, averages them, and subtracts the impurity-cancellation gradient from the first slice; other penalty slices remain separate.
 
-## Physical / mathematical content
+The guards require exactly one initial state, one nonzero target, an even control count, and reject average-fidelity mode and trajectory penalties. The function is phase-modulated and does not run an optimiser or select a line-search method.
 
-The cooperative objective averages the requested primary transfer fidelities and subtracts the mean squared norm of the summed orthogonal impurities. Auxiliary impurity derivatives use real linear overlap, including when the primary fidelity is the absolute square of the overlap; target projection retains the target norm explicitly. Purely imaginary auxiliary overlaps and vanishing impurities have valid real-linear derivatives, including zero derivatives; the low-level engines return these without applying the optimiser's initial-gradient check.
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- phi_profile -phase profiles of the two pulses,
-- concatenated horizontally
-
-## Outputs
-
-- traj_data -trajectory information for both pulses
-- fidelity -cooperative fidelity measure
-- gradient -cooperative fidelity gradient
-- Note: only phase-modulated point-to-point transformations are supported.
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/wrappers/grape_coop.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grape_coop.m)

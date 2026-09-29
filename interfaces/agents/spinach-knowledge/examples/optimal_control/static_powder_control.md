@@ -1,35 +1,21 @@
 # examples/optimal_control/static_powder_control.m
 
+Source: [examples/optimal_control/static_powder_control.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/static_powder_control.m)
+
 - Signature: `static_powder_control()`
 
-## Purpose
+## Design objective and spin model
 
-Optimal control optimisation for a pulse that is designed to set deuterium magnetisation in a -CD3 group of alanine up for perfect rephasing 100 microseconds after the pulse is finished. The system is a powder (100 orientations) with a B1 dist- ribution (from 46 to 54 kHz per channel) and transmitter offset error within 1 kHz of the chemical shift. Goodwin's very efficient version of the GRAPE Hessian al- gorithm is 
+Design a deuterium pulse that prepares magnetisation in alanine's `-CD3` group for rephasing 100 microseconds after the pulse. The source describes a 600 MHz magnet, a single `2H` spin, and an alanine deuterium quadrupole-interaction tensor passed as `anas2mat(0,40e3,0,0,0,0)`. It uses the `sphten-liouv` basis without approximation. The normalised initial and target operators are deuterium `Lz` and `Lx`.
 
-## Physical / mathematical content
+## Powder and robustness ensemble
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The drift Liouvillians are built in the lab frame for the 100-orientation powder grid `rep_2ang_100pts_sph`. The settings specify no decoupled spins, zero central offset, and rotating frames `{{'2H',2}}`. RF power levels are `2*pi*[46,48,50,52,54]*1e3` rad/s (46–54 kHz when expressed as cycles per second), while five offset samples span −1 to +1 kHz. This tests the requested B1 and transmitter-offset spread across powder orientations.
 
-## Numerical / algorithmic content
+## Pulse design
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Goodwin's GRAPE Hessian method is selected, with 100 iterations, a 100 microsecond dead time, and `NS`/`SNS` penalties weighted 0.1 and 10. The pulse has 100 slices of 2 microseconds (200 microseconds total). A random 2-by-100 guess is optimised by `fmaxnewton` with `@grape_xy`; x/y components are then scaled by the mean power level.
 
-## Implementation structure
+## Observable and comparison
 
-- Optimal control optimisation for a pulse that is designed
-- to set deuterium magnetisation in a -CD3 group of alanine
-- up for perfect rephasing 100 microseconds after the pulse
-- is finished.
-- The system is a powder (100 orientations) with a B1 dist-
-- ribution (from 46 to 54 kHz per channel) and transmitter
-- offset error within 1 kHz of the chemical shift.
-- Goodwin's very efficient version of the GRAPE Hessian al-
-- gorithm is used because propagator dimensions are small;
-- it yields a sophisticated kind of spin echo.
-- Calculation time: minutes
-- 600 MHz magnet
+For every ensemble drift, the script applies the optimised pulse and then computes the target-observable evolution with 0.5 microsecond sampling and 499 intervals. It also computes an ideal free-induction reference initialised from the target state. The source plots the time-domain echo and compares Fourier transforms of the optimised half-echo (samples 201 onward) and the ideal FID (first 300 samples), with both spectra normalised by their own maxima. The header describes the design goal; no run output is included here to establish that rephasing was achieved. The source estimates minutes for calculation time.

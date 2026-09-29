@@ -4,53 +4,23 @@
 
 ## Purpose
 
-Emulates a strong homospoil pulse -only zero-frequency states with respect to the carrier frequencies (chemical shifts are not conside- red) survive the process. Syntax: rho=homospoil(spin_system,rho,zqc_flag)
+Projects the supplied state onto the components retained by the selected homospoil approximation. It filters state coefficients; it does not change a Hamiltonian or apply a phase evolution. Chemical-shift offsets are not part of the frequency test.
 
-## Physical / mathematical content
+## Inputs and shape
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- `rho` must be numeric; the source documentation describes a state vector or horizontal stack of states. In the Liouville paths, the implementation folds the spin-space basis rows against all remaining columns for filtering and restores the original input shape.
+- `zqc_flag` must be the character value `'keep'` or `'destroy'`. It affects the `sphten-liouv` path; the two Zeeman paths ignore it.
 
-## Numerical / algorithmic content
+## Formalisms and retained components
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+- In `sphten-liouv`, the basis labels are converted to projection indices `M`. With `'keep'`, a row survives when `abs(sum(basefrqs .* M,2)) <= 1e-6`; the signed carrier-frequency-weighted sum is used, so contributions from different spins can cancel. With `'destroy'`, only rows with `sum(abs(M),2) == 0` survive, i.e. longitudinal components with zero coherence order on every spin. The frequency test uses `spin_system.inter.basefrqs` directly, with no conversion in this function; the `1e-6` tolerance is in the units of those entries.
+- In `zeeman-hilb`, the implementation takes `diag(rho)` and returns a matrix with that diagonal and zero off-diagonal elements, for either flag.
+- In `zeeman-liouv`, the spin-space diagonal of every folded Liouville block is retained for either flag; off-diagonal spin-space elements are zeroed and the original state shape is restored.
+- Fokker–Planck direct-product dimensions are supported in the Liouville-space formalisms.
 
-## Parameters / inputs
+The implementation reports a warning if the retained state has 1-norm below `1e-10`.
 
-- rho -a state vector or a horizontal stack thereof
-- zqc_flag -a flag controlling the fate of zero-quantum
-- coherences. If set to 'keep', causes ZQCs to
-- survive the process, approximating experimen-
-- tal behaviour. If set to 'destroy', wipes the
-- zero-quantum coherences -only the longitudi-
-- nal states survive the process.
-- The flag is ignored in zeeman-hilb and zeeman-
-- liouv formalisms, where the effect is always
-- to destroy everything except the diagonal of
-- the density matrix.
+## Source links
 
-## Outputs
-
-- rho -the state vector(s) with only the longitudi-
-- nal or only the zero-quantum states kept
-- Note: this function is only available for sphten-liouv formalism; it
-- supports Fokker-Planck direct products.
-- Note: this is a purely mathematical filter that only mimics -in an
-- idealised way -the effect of a real homospoil pulse. Essenti-
-- ally, it searches the density matrix for any transverse state
-- populations and zeroes them out. If the flag is set, zero-qua-
-- ntum coherences are also erased.
-
-## Implementation structure
-
-- Emulates a strong homospoil pulse -only zero-frequency states with
-- respect to the carrier frequencies (chemical shifts are not conside-
-- red) survive the process. Syntax:
-- rho=homospoil(spin_system,rho,zqc_flag)
-- rho -a state vector or a horizontal stack thereof
-- zqc_flag -a flag controlling the fate of zero-quantum
-- coherences. If set to 'keep', causes ZQCs to
-- survive the process, approximating experimen-
-- tal behaviour. If set to 'destroy', wipes the
-- zero-quantum coherences -only the longitudi-
-- nal states survive the process.
-- The flag is ignored in zeeman-hilb and zeeman-
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/homospoil.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=homospoil.m)

@@ -1,50 +1,33 @@
 # experiments/acquire.m
 
+- Source: [experiments/acquire.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/acquire.m)
 - Signature: `fid=acquire(spin_system,parameters,H,R,K)`
 
 ## Purpose
 
-Simple forward time evolution with signal acquisition. Syntax: fid=acquire(spin_system,parameters,H,R,K)
+Acquire a free-induction decay from a caller-supplied Spinach model. This routine consumes the initial state, detection state, Hamiltonian, relaxation superoperator, and kinetics superoperator; it does not prescribe a particular radical-pair/CIDNP mechanism or construct those physical inputs.
 
-## Physical / mathematical content
+## Propagation and signal
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine composes `L = H + 1i*R + 1i*K`, applies configured analytical decoupling to `L` and `parameters.rho0`, and optionally adds the homodecoupling term `2*pi*homodec_pwr*homodec_oper` (after projecting the operator into the Fokker–Planck space). If `parameters.dead_time` is present, it first propagates the initial state for that many seconds under the composed Liouvillian. It then observes the evolving state with `parameters.coil`, using an acquisition interval of `1/parameters.sweep` seconds and `parameters.npoints - 1` evolution steps.
 
 ## Parameters / inputs
 
-- parameters.sweep sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.decouple spins to decouple, e.g. {'15N','13C'}
-- parameters.homodec_oper operator to add to the Liouvillian at
-- the detection stage
-- parameters.homodec_pwr power coefficient for the operator, Hz
-- parameters.dead_time the system will be evolved for this
-- time (seconds) before the signal
-- acquisition begins
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.rho0`: caller-provided initial state.
+- `parameters.coil`: caller-provided detection state.
+- `parameters.sweep`: sweep width in Hz.
+- `parameters.npoints`: number of FID points.
+- `parameters.decouple`: nuclei to decouple, for example `{'15N','13C'}`.
+- Optional `parameters.homodec_oper` and `parameters.homodec_pwr`: operator and power coefficient; the source documents the power in Hz.
+- Optional `parameters.dead_time`: pre-acquisition evolution time in seconds.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices supplied by the context function; these matrices must have matching dimensions.
 
-## Outputs
+The source defines a signal-acquisition operation, not a parameter sweep, a singlet-yield observable, or the chemistry encoded in `H`, `R`, and `K`.
 
-- fid -free induction decay as seen by the state specified
-- in parameters parameters.coil
+## Output
 
-## Implementation structure
+- `fid`: FID observed in the state specified by `parameters.coil`.
 
-- Simple forward time evolution with signal acquisition. Syntax:
-- fid=acquire(spin_system,parameters,H,R,K)
-- parameters.sweep sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.decouple spins to decouple, e.g. {'15N','13C'}
-- parameters.homodec_oper operator to add to the Liouvillian at
-- the detection stage
-- parameters.homodec_pwr power coefficient for the operator, Hz
-- parameters.dead_time the system will be evolved for this
-- time (seconds) before the signal
+## References and links
+
+- [Spinach documentation for acquire.m](https://spindynamics.org/wiki/index.php?title=acquire.m)

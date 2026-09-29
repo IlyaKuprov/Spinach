@@ -1,33 +1,15 @@
 # examples/quantum_tech/transmon_rabi_leakage.m
 
-- Signature: `transmon_rabi_leakage()`
+Source: [examples/quantum_tech/transmon_rabi_leakage.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_rabi_leakage.m)
 
-## Purpose
+## What it models
 
-Rabi dynamics of a driven four-level transmon in the Duffing approximation, including leakage into the second and third excited states. The resonant drive is a part of the rotating frame Hamiltonian, and all four level populations come from a single trajectory. Calculation time: seconds
+A closed, coherently driven four-level transmon in the Duffing approximation. The four truncated ladder states are reported as BL1 through BL4, so the higher two populations show leakage beyond the computational pair in this model. This is a calculated trajectory, not experimental data; the source estimates calculation time in seconds.
 
-## Physical / mathematical content
+## Hamiltonian and parameters
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The source sets the field to zero and declares one T4 mode, zero rotating-frame frequency, and anharmonicity -250e6 Hz. It uses the Zeeman-Hilbert formalism with no basis approximation and builds the cavity/Duffing drift Hamiltonian. A resonant quadrature drive is added as 2*pi*25e6*(C+A)/2, where C and A are the transmon ladder operators; the 25 MHz source parameter is converted to angular frequency in the Hamiltonian.
 
-## Numerical / algorithmic content
+## State, propagation, and plot
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Implementation structure
-
-- Rabi dynamics of a driven four-level transmon in the Duffing
-- approximation, including leakage into the second and third
-- excited states. The resonant drive is a part of the rotating
-- frame Hamiltonian, and all four level populations come from
-- a single trajectory.
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Resonantly driven transmon in the rotating frame
-- Formalism and basis
-- Spinach housekeeping
-- Drift Hamiltonian from the declared interactions
+The initial state is BL1. Spinach propagates a single trajectory with 1 ns steps for 400 ns. At each point the code evaluates the BL1, BL2, BL3, and BL4 populations using the corresponding state operators and plots all four against time in ns. The figure visualises leakage during ideal coherent Rabi dynamics; the source includes no relaxation, decoherence, rotational diffusion, correlation spectrum, cross-correlations, or secular approximation, and reports no comparison with an experiment.

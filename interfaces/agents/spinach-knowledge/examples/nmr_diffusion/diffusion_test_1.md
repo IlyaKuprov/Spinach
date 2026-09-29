@@ -1,30 +1,15 @@
 # examples/nmr_diffusion/diffusion_test_1.m
 
-- Signature: `diffusion_test_1()`
+Source: [examples/nmr_diffusion/diffusion_test_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_diffusion/diffusion_test_1.m)
 
-## Purpose
+## Model
 
-A standard diffusion equation solver with no spin dynamics present. Calculation time: seconds
+A one-dimensional diffusion-equation example without spin dynamics. It uses a ghost isotope `G`, zero magnet field, empty Zeeman and coupling matrices, and the `sphten-liouv` basis with no approximation. Flow is zero. The derivative setting is `{'period',7}`.
 
-## Physical / mathematical content
+## Geometry and initial profile
 
-- Diffusion examples. The dominant mathematics is diffusion or advection-diffusion PDE propagation, sometimes with additional spin phase accumulation under gradients.
+The sample length is `0.02 m`, represented by `100` points. The diffusion parameter is `5e-5` (the source does not state its unit; with position in metres and time in seconds, its dimensional unit is m^2/s). The dimensionless initial profile is `exp(-0.125*((1:100)-20).^2)`, a Gaussian-shaped concentration profile centred at grid index 20.
 
-## Numerical / algorithmic content
+## Propagation and observable
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- A standard diffusion equation solver with no spin
-- dynamics present.
-- Calculation time: seconds
-- Ghost spin
-- No spin interactions
-- Basis set
-- Spinach housekeeping
-- Sample geometry
-- Diffusion and flow parameters
-- Diffusion and flow generator
-- Initial condition
-- Timing parameters
+The transport generator is formed with `v2fplanck(spin_system,parameters)` and expanded with `inflate`. `evolution` records `90` trajectory steps at `5e-4 s` each. The script plots concentration against the physical coordinate from `-0.01 m` to `0.01 m`, with the display range fixed to 0–1. The source labels the calculation time as seconds.

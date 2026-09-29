@@ -1,74 +1,30 @@
 # experiments/pseudocon/ipcs.m
 
-- Signature: `[source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=ipcs(parameters,npoints,lambda)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/ipcs.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ipcs.m)
 
 ## Purpose
 
-Solves the inverse problem for pseudocontact shift by recovering the source term in the Kuprov equation using Tikhonov regularisation procedure. Syntax: [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=... ipcs(parameters,nxyz,expt_pcs,chi,npoints,... lambda,margins,box_centre,box_size)
+Reconstructs either the unpaired-electron probability density or a Poisson-equation source term from measured pseudocontact shifts (PCS). This is a three-dimensional inverse reconstruction utility, not a pulse-sequence simulator. The model equations and algorithms are documented in [10.1039/C4CP03106G](https://doi.org/10.1039/C4CP03106G).
 
-## Physical / mathematical content
+## Inputs and spatial model
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Call as `[source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b] = ipcs(parameters,npoints,lambda)`. `parameters.xyz` is an N-by-3 array of PCS-bearing nuclear coordinates in Å, paired row-for-row with the real N-element column `parameters.expt_pcs` in ppm. `parameters.xyz_all` supplies all molecular atom coordinates as M-by-3 Å values. `parameters.chi` is a real symmetric 3-by-3 magnetic-susceptibility tensor in Å³.
 
-## Numerical / algorithmic content
+`parameters.equation` selects `kuprov` (recover probability density) or `poisson` (recover the Poisson right-hand side). `parameters.box_cent` and `parameters.box_size` specify the centre and three side lengths in Å of the rectangular source-support box. The six `parameters.margins` extend the measured-nucleus bounding box on its lower and upper x, y, and z faces to define the returned grid `ranges`. `parameters.confine` gives two Å radii for excluding source points close to atoms and limiting support to the surrounding molecular region. These choices form a hard voxel mask; values outside the accepted region are fixed at zero.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+`npoints` sets each grid dimension, so the reconstructed cube is `npoints` cubed; the source requires an integer greater than 10. `lambda` weights the Tikhonov term. `parameters.sharpen` weights the contrast penalty. An optional `parameters.guess` density cube is interpolated onto the working grid as the starting point. `parameters.plot` is a cell array drawn from `diagnostics`, `density`, `molecule`, `tightzoom`, and `box`; `parameters.gpu` is a logical scalar requesting GPU arrays when a GPU is available.
 
-## Parameters / inputs
+## Objective and solver
 
-- nxyz -nuclear coordinates as [x y z] with multiple rows
-- at which PCS has been measured, in Angstroms
-- expt_pcs -pseudocontact shift in ppm at each nucleus
-- chi -electron magnetic susceptibility tensor, in units
-- of Angstrom^3
-- npoints -number of points in each dimension of the source
-- cube, a positive integer greater than 10
-- lambda -regularisation parameters, the first element is
-- the coefficient in front of the contrast term
-- and the second element is the coefficient in
-- front of the Tikhonov term
-- margins -a six-element vector specifying margins to take
-- around the bounding box of the nuclear coordina-
-- tes supplied, to account for the possibility that
-- some unpaired electron may be located on the pe-
-- riphery and require adequare margins
-- box_centre -a three-element vector in Angstrom specifying
-- the centre of the solution box
-- box_size -a three-element vector in Angstrom specifying
-- the size of the solution box
-- equation -'poisson' to recover the right hand side of the
-- Poisson's equation, 'kuprov' to recover the
-- unpaired electron probability density
-- gpu -set to 1 to enable GPU processing (much faster)
+The forward PCS field is evaluated on the regular cube using Fourier-space operators, and `interpmat` samples that field at the measured nuclear coordinates. The least-squares component is the sum of squared differences between those predicted and measured shifts. For `kuprov`, the Fourier multiplier is the Kuprov operator divided by the Laplacian; for `poisson`, it is the inverse Laplacian. The zero-frequency singularity is set to zero. The optimisation adds a contrast penalty proportional to `sharpen` and a Tikhonov penalty based on the squared Laplacian of the source, weighted by `lambda`.
+
+The implementation scales the optimised source variable by `1e3` for `kuprov` and `1e4` for `poisson`; the contrast and Tikhonov scale factors are respectively `1e3/npoints^3` and `0.640/npoints`. The PCS conversion uses `1e6`. `fmincon` uses the trust-region-reflective algorithm, supplied gradient and Hessian-vector product, and `1e-12` function, optimality, and step tolerances. The `kuprov` fit has a zero lower bound (non-negative density); the `poisson` source is unbounded. These are model and optimiser constraints, not evidence of a particular reconstruction quality.
 
 ## Outputs
 
-- source_cube -source term cube with dimensions ordered as
-- [X Y Z]
-- ranges -Cartesian axis extents for the source cube as
-- [xmin xmax ymin ymax zmin zmax] in Angstroms
-- pred_pcs -pseudocontact shifts produced by the source
-- cube returned in the first parameter
-- ls_err -least squares error in ppm^2
-- reg_a -contrast penalty term
-- reg_b -Tikhonov penalty term
-- Note: for further information on the equations and algorithms used
-- in this function see http://dx.doi.org/10.1039/C4CP03106G
+`source_cube` is the reconstructed source on the `npoints`-per-axis grid, and `ranges` is `[xmin xmax ymin ymax zmin zmax]` in Å. `pred_pcs` contains calculated shifts at the input nuclei. `err_ls` is the data-only squared residual in ppm²; `reg_a` and `reg_b` report the contrast and Tikhonov contributions to the objective, respectively.
 
-## Implementation structure
+## References
 
-- Solves the inverse problem for pseudocontact shift by recovering the
-- source term in the Kuprov equation using Tikhonov regularisation
-- procedure. Syntax:
-- [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=...
-- ipcs(parameters,nxyz,expt_pcs,chi,npoints,...
-- lambda,margins,box_centre,box_size)
-- nxyz -nuclear coordinates as [x y z] with multiple rows
-- at which PCS has been measured, in Angstroms
-- expt_pcs -pseudocontact shift in ppm at each nucleus
-- chi -electron magnetic susceptibility tensor, in units
-- of Angstrom^3
-- npoints -number of points in each dimension of the source
+- [10.1039/C4CP03106G](https://doi.org/10.1039/C4CP03106G)
+- [Spin Dynamics Wiki: ipcs.m](https://spindynamics.org/wiki/index.php?title=ipcs.m)

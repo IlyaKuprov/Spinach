@@ -1,34 +1,17 @@
 # examples/optimal_control/mas_powder_control.m
 
-- Signature: `mas_powder_control()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/mas_powder_control.m)
 
 ## Purpose
 
-Optimal control pulse starting with Lz and populating the Ly state on 87Rb in a quadrupolar rubidium system under magic angle spinning. A phase-modulated pulse is produced. Calculation time: hours.
+This example designs a phase-modulated 87Rb pulse to transfer Lz to Ly in a quadrupolar spin system under magic-angle spinning (MAS). It builds a powder-orientation drift ensemble and evaluates the target-state overlap across that ensemble and configured RF offsets and power levels.
 
-## Physical / mathematical content
+## Spin model and MAS conditions
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The model uses 87Rb at 9.413 T and a quadrupolar interaction passed to `eeqq2nqi` as `(1.68e6, 0.2, 3/2, [0 0 0])`. The example uses the `sphten-liouv` formalism without basis approximation. Its MAS settings specify the axis `[sqrt(2/3) 0 sqrt(1/3)]`, a -20 kHz spinning rate (the comment identifies the Bruker direction), the `rep_2ang_100pts_sph` powder grid, maximum spinner rank 8, and rotating-frame order 3 for 87Rb.
 
-## Numerical / algorithmic content
+## Control design and evaluation
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Drift Liouvillians are generated with `singlerot` for the qNMR experiment. Normalised Lz and Ly states are lifted over the classical subspace, defining the transfer objective for each drift. The phase-only GRAPE design keeps the amplitude profile fixed and uses 100 intervals of 0.5 microseconds, which the source describes as one rotor period. Three per-channel RF power levels are configured by `2*pi*[110 120 130]*1e3/sqrt(2)`; five equally spaced offset values span -1,000 to +1,000 (the source does not state their unit). The phase initial guess is constant at pi/2, the optimiser is configured as `lbfgs` through `fmaxnewton` and `@grape_phase`, and the iteration limit is 100.
 
-## Implementation structure
-
-- Optimal control pulse starting with Lz and populating the
-- Ly state on 87Rb in a quadrupolar rubidium system under
-- magic angle spinning. A phase-modulated pulse is produced.
-- Calculation time: hours.
-- System specification
-- Quadrupolar coupling
-- Basis set and formalism
-- Spinach housekeeping
-- MAS experiment parameters
-- Drift Liouvillians and classical subspace dimension for the ensemble
-- Initial state -Lz
-- Target state -Ly
+After pulse design, the script propagates the waveform for each drift Liouvillian and computes the real target-state overlap, then displays the mean fidelity. This is the example's evaluation procedure; no numerical fidelity or convergence result is reported here. The source comments estimate a calculation time of hours. Source contacts: ilya.kuprov@weizmann.ac.il and m.carravetta@soton.ac.uk.

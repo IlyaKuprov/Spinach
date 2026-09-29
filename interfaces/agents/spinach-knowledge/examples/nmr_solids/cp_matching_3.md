@@ -1,30 +1,15 @@
 # examples/nmr_solids/cp_matching_3.m
 
-- Signature: `cp_matching_3()`
+Signature: cp_matching_3()
 
-## Purpose
+## What the example computes
 
-Hartmann-Hahn matching condition test for a cross-polarisation experiment between a proton and a 15N nucleus. A 2D scan of power levels at a specific spinning rate. Calculation time: hours
+This example makes a two-parameter CP matching map for a ¹H–¹⁵N pair under MAS; it is a grid of RF settings, not a two-dimensional acquired NMR spectrum. The source sets sys.magnet=9.394, isotopes ¹H and ¹⁵N, Zeeman scalar entries 0.1495 and 0, and coordinates [−1.11551509, 1.65289357, −1.19927242] and [−2.67552180, 0.95825426, 0]. It uses the sphten-liouv basis with approximation none. No further interaction terms or units for these values are stated in this file.
 
-## Physical / mathematical content
+## Rotor, powder and RF settings
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
+The passed experiment parameters include rate 10000, axis [sqrt(2/3), 0, sqrt(1/3)], max_rank 3, powder grid rep_2ang_200pts_oct, ¹H Lx initial state, ¹⁵N Lx detection coil, zero excitation operators, and ten time-step entries of 4e-5. The contact experiment defines time-step durations in seconds, giving 400 µs total contact time; the example does not state rate units. Each RF axis uses 50 values from 0e3 to 50e3: the first row of irr_powers varies ¹H and the second varies ¹⁵N. Both plot labels use Hz, so each code range is 0–50,000 Hz.
 
-## Numerical / algorithmic content
+For each ¹H value, a parallel inner sweep evaluates all ¹⁵N values through singlerot with cp_contact_hard. The matrix stores real(fid(end)) as cp(n,k), where n is the first (¹H) setting and k the second (¹⁵N) setting. The image is rendered with imagesc and the source labels its horizontal axis ¹H spin-lock RF power, Hz, and vertical axis ¹⁵N spin-lock RF power, Hz. This note preserves both the matrix indexing and labels as written; it does not infer an axis correction or claim a validated interpretation. The output is a simulated final-contact signal map, not a measured spectrum. `cp_contact_hard` returns the initial coil expectation followed by ten 40 µs contact samples; `fid(end)` is the eleventh point at 400 µs. The source header estimates calculation time as hours; this is not a timing measurement made here.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Hartmann-Hahn matching condition test for a cross-polarisation
-- experiment between a proton and a 15N nucleus. A 2D scan of
-- power levels at a specific spinning rate.
-- Calculation time: hours
-- System specification
-- Interactions
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Relevant operators
-- Power levels
-- Experiment parameters
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_3.m

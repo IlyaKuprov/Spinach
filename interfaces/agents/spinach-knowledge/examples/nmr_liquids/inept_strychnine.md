@@ -1,32 +1,14 @@
 # examples/nmr_liquids/inept_strychnine.m
 
 - Signature: `inept_strychnine()`
+- Source: [examples/nmr_liquids/inept_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/inept_strychnine.m)
 
 ## Purpose
 
-INEPT experiment on strychnine. Calculation time: minutes
+An INEPT experiment on strychnine, not an INADEQUATE or NOE experiment. It models polarisation transfer between proton and carbon channels and plots the carbon response; the source estimates calculation time in minutes.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system comes from `strychnine({'1H','13C'})`, at `5.9` T and temperature `298` K. The scalar-coupling Liouville basis uses IK-2 with proximity level 1. Sequence channels are `13C` and `1H`, with transfer coupling `J=150` Hz, sweep value `10000`, offsets `[5000 0]`, 2048 points, and zero filling to 8196 points; source units are not stated for sweep or offsets.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- INEPT experiment on strychnine.
-- Calculation time: minutes
-- Read the spin system properties
-- Magnet field
-- Temperature
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+The code creates `13C` isotopomers and simulates each with `@inept`, exponentially apodises each FID with parameter 6, and sums their Fourier transforms. The plotted observable is the imaginary part of the summed spectrum on the `13C` channel, with the first offset used and the axis in ppm.

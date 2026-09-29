@@ -1,32 +1,18 @@
 # examples/relaxation_theory/dd_relaxation_1.m
 
+- MATLAB implementation: [examples/relaxation_theory/dd_relaxation_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/dd_relaxation_1.m)
+
 - Signature: `dd_relaxation_1()`
+- Source: [examples/relaxation_theory/dd_relaxation_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/dd_relaxation_1.m)
 
-## Purpose
+## Purpose and model
 
-Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with a dipolar coupling between two spins. Dipolar couplings are compu- ted from Cartesian coordinates of the two spins. Calculation time: seconds
+This short example builds a Bloch-Redfield-Wangsness relaxation superoperator for a two-spin heteronuclear pair coupled by a through-space dipolar interaction. The positions are supplied as Cartesian coordinates, so Spinach constructs the dipolar coupling from the geometry. The stochastic modulation is represented by a single correlation time, 5 ns, passed to the textbook dipolar-rate calculation; the source does not independently specify a spectral-density formula or compare alternative motional models.
 
-## Physical / mathematical content
+## System and relaxation settings
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The system is one proton and one carbon-13 at a field of 14.1 T, with coordinates [0, 0, 0] and [0, 0, 1.02]. The source does not label the coordinate unit. It selects Redfield relaxation, zero equilibrium, and lab-frame retention, and uses the full `sphten-liouv` basis (`approximation='none'`). It does not set an explicit secular restriction or select particular cross-correlation terms; no such setting should be inferred from this script.
 
-## Numerical / algorithmic content
+## Rates and operators
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Complete Bloch-Redfield-Wangsness relaxation superoperator in a system
-- with a dipolar coupling between two spins. Dipolar couplings are compu-
-- ted from Cartesian coordinates of the two spins.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
-- Textbook rates
-- Textbook and Spinach R1 for first spin
-- Textbook and Spinach R1 for second spin
+The script constructs `R=relaxation(spin_system)` and calls `rlx_dip` for reference `R1`, `R2`, and cross-relaxation (`Rx`) rates. It also evaluates superoperator matrix elements for normalised `Lz` states on each spin (`R1`), normalised `L+` states on each spin (`R2`), and a pair of normalised `Lz` states for the transfer rate, using `-rho'*R*rho` or `-rho_b'*R*rho_a`. The displayed rate units are Hz. It prints the complete relaxation superoperator in the IST basis. This is a rate/superoperator comparison, not a time-domain signal or an experimental measurement.

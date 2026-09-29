@@ -1,31 +1,18 @@
 # examples/extremes/difluoroheptane.m
 
 - Signature: `difluoroheptane()`
+- Source: [`examples/extremes/difluoroheptane.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/extremes/difluoroheptane.m)
 
-## Purpose
+## Purpose and molecular spin model
 
-19F NMR spectrum of anti-3,4-difluoroheptane (16 spins) by explicit time-domain evolution in Liouville space. WARNING: needs 32 CPU cores, 128 GB of RAM and a Titan V or later. Run time on the above: minutes
+The source describes the `19F` NMR spectrum of anti-3,4-difluoroheptane using explicit time-domain evolution in Liouville space. The MATLAB isotope list contains 23 sites: seven `12C` entries, fourteen `1H` spins and two `19F` spins. Thus the source header's “16 spins” refers to the magnetically active proton/fluorine spins; the listed carbon isotopes are spin-zero `12C` sites. The script sets `sys.magnet=11.7464` under a “Magnet induction” comment; the source does not state a unit for that assignment.
 
-## Physical / mathematical content
+The model specifies scalar Zeeman shifts and scalar couplings. For the basis it selects `sphten-liouv`, `IK-0`, and `inter_level=1`, with a manually specified three-block basis, two `S3` symmetry groups over spins `[14 15 16]` and `[21 22 23]`, proton zero-quantum order, and projection 1. The script enables greedy parallelisation. These are the source's explicit choices; the example does not use a Hilbert-space propagator.
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Acquisition and processing
 
-## Numerical / algorithmic content
+This is an acquisition/FID calculation rather than an explicitly programmed RF-pulse sequence. It selects `19F` observation, sets both initial state and receiver coil to `state(...,'L+','19F')`, leaves decoupling empty, and passes `offset=-86700`, `sweep=300`, `npoints=512`, and `zerofill=2048` to `liquid(spin_system,@acquire,parameters,'nmr')`. The source sets `axis_units='ppm'` and `invert_axis=1`; it does not annotate units for offset or sweep. The resulting FID receives exponential apodisation with parameter 6, is Fourier transformed, and is displayed with `plot_1d`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Resource note and scope
 
-## Implementation structure
-
-- 19F NMR spectrum of anti-3,4-difluoroheptane (16 spins) by
-- explicit time-domain evolution in Liouville space.
-- WARNING: needs 32 CPU cores, 128 GB of RAM and
-- a Titan V or later.
-- Run time on the above: minutes
-- Magnet induction
-- Isotopes
-- Shifts
-- J-couplings
-- Basis set
-- Greedy parallelisation
-- Spinach housekeeping
+The source warns that the run needs 32 CPU cores, 128 GB of RAM, and a Titan V or later, and estimates minutes on that setup. This is the source's hardware/runtime note, not a general performance guarantee. The page preserves the 16-active-spin description and the model's stated numerical field input without adding an unsupported tesla unit. No DOI or external literature source is supplied in the script.

@@ -1,45 +1,31 @@
 # kernel/utilities/scomponents.m
 
-- Signature: `sci=scomponents(A)`
-
 ## Purpose
 
-Strongly connected components of a graph, David Gleich's imple- mentation of Tarjan's algorithm:
+Computes the strongly connected components of a directed graph using David Gleich's implementation of Tarjan's algorithm.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Validates the input via an internal consistency check (`grumble`), which errors with `'the input must be a square logical matrix.'` if the input is not logical, not a matrix, or not square.
+- Converts the adjacency matrix to compressed sparse row (CSR) form via `sparse2csr(sparse(A))`, returning row pointers `rp` and column indices `ci`.
+- Runs an iterative (explicit-stack) form of Tarjan's algorithm over all nodes `sv = 1:n`, skipping nodes already assigned to a root (`root(v) > 0`).
+- Maintains per-node arrays: `root` (current component root), `dt` (discovery times, incremented by a counter `t`), and `sci` (component labels, set to `-1` while a node is on the stack).
+- Uses a call stack `rs` of size `2*n` storing (node, row-index) pairs, and a component stack `cs` of size `n`.
+- When a node's root equals itself, all nodes on the component stack down to that node are popped and assigned the current component number `cn`, which is then incremented.
+- Component numbering starts at `1` and increases in the order components are finalised.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Syntax
+**Input:**
 
-```matlab
-sci=scomponents(A)
-```
+- `A` — a logical square matrix with `1` (true) marking connected nodes in the graph.
 
-## Parameters / inputs
+**Output:**
 
-- A -a logical square matrix with 1 for the
-- connected nodes in the graph
+- `sci` — a column vector of integers specifying the strongly connected component each graph node belongs to.
 
-## Outputs
+## References
 
-- sci -a column vector with integers that spe-
-- cify the strongly conected component
-- that each node of the graph belongs to
-
-## Implementation structure
-
-- Strongly connected components of a graph, David Gleich's imple-
-- mentation of Tarjan's algorithm:
-- sci=scomponents(A)
-- A - a logical square matrix with 1 for the
-- connected nodes in the graph
-- sci - a column vector with integers that spe-
-- cify the strongly conected component
-- that each node of the graph belongs to
-- Check consistency
-- Get the CSR indices
-- Run Tarjan's algorithm
-- Consistency enforcement
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/scomponents.m>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=scomponents.m>
+- R. E. Tarjan, algorithm reference cited in the source: <http://dx.doi.org/10.1137/0201010>

@@ -1,31 +1,18 @@
 # examples/extremes/fluoroisooctane.m
 
 - Signature: `fluoroisooctane()`
+- Source: [`examples/extremes/fluoroisooctane.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/extremes/fluoroisooctane.m)
 
-## Purpose
+## Purpose and spin model
 
-A deliberately adversarial example from Art Bochevarov at Schodinger Inc. In this case, IK-2 approximation in Liou- ville space generates an exceedingly large basis set; the calculation must instead be performed in Hilbert space with permutation symmetry factorisation. Calculation time: hours.
+This is the source's deliberately adversarial large-spin-system example, attributed in its header to Art Bochevarov at Schrödinger Inc. The header explains the computational point: an IK-2 Liouville-space approximation would generate an exceedingly large basis, so the example instead uses Hilbert space with permutation-symmetry factorisation. The code contains 18 spins (17 `1H` and one `19F`), uses `sys.magnet=11.74` under a “Magnet induction” comment, and supplies chemical shifts and scalar couplings. The source does not annotate a unit for the magnet, shifts, or couplings.
 
-## Physical / mathematical content
+The basis is `zeeman-hilb` with `approximation='none'` and three `S3` groups over spin sets `[1 2 3]`, `[4 5 6]`, and `[7 8 9]`. In the coupling table, the source assigns values 48.2, 23.6, and 6.5 to the central larger couplings, 6.0 to the listed neighboring proton couplings, and 1.0 to the smaller couplings it labels tert-butyl and isopropyl. These are input values as written; their units are not stated in the file.
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Proton acquisition and spectrum
 
-## Numerical / algorithmic content
+The observable is a simulated `1H` NMR spectrum. The code sets both initial state and coil to proton `L+`, leaves decoupling empty, and calls `liquid(spin_system,@acquire,parameters,'nmr')`—there is no explicit pulse sequence. Acquisition settings are `offset=1290`, `sweep=2000`, `npoints=4096`, and `zerofill=8192`; the source explicitly requests a ppm axis and inverted display axis but does not label offset/sweep units. The FID is apodised with a Gaussian parameter of 6, Fourier transformed, and plotted with `plot_1d`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Scope and limitations
 
-## Implementation structure
-
-- A deliberately adversarial example from Art Bochevarov at
-- Schodinger Inc. In this case, IK-2 approximation in Liou-
-- ville space generates an exceedingly large basis set; the
-- calculation must instead be performed in Hilbert space
-- with permutation symmetry factorisation.
-- Calculation time: hours.
-- Magnet induction
-- Isotopes
-- Chemical shifts
-- Larger J-couplings
-- Smaller J-couplings, tert-butyl
-- Smaller J-couplings, isopropyl
+The source comment estimates a calculation time of hours and does not state a hardware configuration. This is an example of basis-size management for this model, not a measured comparison of alternative calculations; the file provides no output values, benchmark table, DOI, or experimental validation.

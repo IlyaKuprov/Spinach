@@ -1,37 +1,46 @@
 # tests/kernel/test_ctx_gridfree_acquire.m
 
-- Signature: `result=test_ctx_gridfree_acquire()`
-
 ## Purpose
 
-Tests the grid-free Fokker-Planck context with acquire(). Syntax: result=test_ctx_gridfree_acquire()
+Regression test for the grid-free Fokker-Planck context, verifying that `gridfree()` correctly projects spin system states into SLE (stochastic Liouville equation) space and runs `acquire()` on the resulting context.
 
-## Physical / mathematical content
+## Behaviour
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+The test announces its target with `fprintf('TESTING: Grid-free acquire path\n')` and registers a test result via `new_test_result()` with the identifier `kernel/ctx_gridfree_acquire`, description `'Grid-free acquire path'`, and the requirement that `gridfree()` must project states into SLE space and run `acquire()`.
 
-## Numerical / algorithmic content
+It then builds a one-spin anisotropic Liouville-space system using `test_spin_system()` with:
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- `sys.magnet = 14.1`
+- `sys.isotopes = {'1H'}`
+- `inter.zeeman.eigs = {[-2 -2 4]}` (anisotropic Zeeman eigenvalues)
+- `inter.zeeman.euler = {[0 0 0]}`
+- `bas.formalism = 'sphten-liouv'`
+- `bas.approximation = 'none'`
+- `bas.projections = {+1}`
 
-## Outputs
+A tiny grid-free acquisition is configured with `parameters` containing `spins = {'1H'}`, `rho0` and `coil` both set to `state(spin_system,'L+','1H')`, `decouple = {}`, `offset = 0`, `sweep = 2000`, `npoints = 3`, `rate = 1000`, `axis = [1 1 1]`, `max_rank = 2`, and `verbose = 0`.
 
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- gridfree() and checks the returned time-domain trace for basic physical
-- and dimensional invariants.
+The production grid-free context is invoked as:
 
-## Implementation structure
+```matlab
+fid = gridfree(spin_system,@acquire,parameters,'nmr');
+```
 
-- Tests the grid-free Fokker-Planck context with acquire(). Syntax:
-- result=test_ctx_gridfree_acquire()
-- result -regression test result with explanatory messages
-- The test runs a tiny anisotropic one-spin MAS calculation through
-- gridfree() and checks the returned time-domain trace for basic physical
-- and dimensional invariants.
-- Announce the test target
-- State the grid-free target of the test
-- Build a one-spin anisotropic Liouville-space system
-- Set up a tiny grid-free acquisition
-- Run the production grid-free context
-- Check the number of acquired points
+Three checks are then performed:
+
+1. **FID length**: `numel(fid)` is compared against `parameters.npoints` with zero tolerances, requiring `acquire()` to return one point per requested time sample.
+2. **Zero-time signal**: `fid(1)` is compared against `fid_zero = parameters.coil'*parameters.rho0` with absolute and relative tolerances of `1e-12`, verifying that SLE-space projection preserves the initial coil overlap.
+3. **Finite FID**: `all(isfinite(fid(:)))` is checked, ensuring short grid-free propagation produces no NaN or Inf values.
+
+## Inputs and outputs
+
+```matlab
+result = test_ctx_gridfree_acquire()
+```
+
+- **Output**: `result` — regression test result object with explanatory messages, accumulated through `test_close()` and `test_true()` checks.
+- **Input**: none.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_ctx_gridfree_acquire.m)

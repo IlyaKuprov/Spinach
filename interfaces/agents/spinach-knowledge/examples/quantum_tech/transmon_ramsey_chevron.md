@@ -1,31 +1,17 @@
 # examples/quantum_tech/transmon_ramsey_chevron.m
 
-- Signature: `transmon_ramsey_chevron()`
+Source: [examples/quantum_tech/transmon_ramsey_chevron.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_ramsey_chevron.m)
 
-## Purpose
+## What it models
 
-Ramsey chevron of a three-level transmon in the Duffing ap- proximation. A nominal pi/2 pulse prepares a coherence, and detuning during free evolution produces Ramsey fringes. Calculation time: seconds
+A closed, coherently controlled three-level transmon in the Duffing approximation. The plotted chevron is a simulated Ramsey sequence over detuning and free-evolution time, not an experimental measurement; the source estimates calculation time in seconds.
 
-## Physical / mathematical content
+## Hamiltonian and parameters
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The source sets the field to zero, uses a T3 mode with rotating-frame frequency 0 and anharmonicity -260e6 Hz, and selects the Zeeman-Hilbert formalism without basis approximation. The cavity/Duffing Hamiltonian supplies the anharmonic drift H0. For each detuning Δ in a 256-point grid from -20e6 to 20e6 Hz, the evolution Hamiltonian is H0 + 2*pi*Δ*N, symmetrised in the source; N is the transmon number operator. The 256 free-evolution times span 0 to 1.0e-6 s.
 
-## Numerical / algorithmic content
+## Pulse sequence and detection
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The initial BL1 state is acted on by a nominal pi/2 propagator made from the transmon quadrature (C+A)/2. At every detuning and time sample, the code propagates under the detuned drift, applies the same pi/2 propagator again, and detects BL2 population. The image uses time in seconds on the horizontal axis and detuning in Hz on the vertical axis, with colour encoding the calculated population.
 
-## Implementation structure
-
-- Ramsey chevron of a three-level transmon in the Duffing ap-
-- proximation. A nominal pi/2 pulse prepares a coherence, and
-- detuning during free evolution produces Ramsey fringes.
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Transmon in the rotating frame
-- Formalism and basis
-- Spinach housekeeping
-- Anharmonicity part from the declared interactions
-- Transmon operators
-- Free-evolution parameters
+No dissipative relaxation or dephasing term, rotational diffusion, correlation spectrum, cross-correlation, or secular approximation is specified. The sequence therefore illustrates ideal coherent Ramsey fringes; it does not establish experimental agreement or a coherence-time benchmark.

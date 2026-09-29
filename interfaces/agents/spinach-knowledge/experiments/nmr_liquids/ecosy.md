@@ -1,55 +1,25 @@
 # experiments/nmr_liquids/ecosy.m
 
 - Signature: `fid=ecosy(spin_system,parameters,H,R,K)`
+- Source: [`experiments/nmr_liquids/ecosy.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/ecosy.m)
 
-## Purpose
+## Purpose and sequence
 
-Phase-sensitive E.COSY pulse sequence from:
+This phase-sensitive E.COSY implementation begins with an `Lx` initial (post-pulse) state on the selected isotope and records its indirect-dimension (F1) trajectory. The second pulse is represented by States quadrature branches using `Lx` and `Ly`. Each branch is projected onto coherence orders +/-2 through +/-6; the code weights these orders 1, 2, 4, 6, and 9, respectively. A third `Lx` pulse is applied to the cosine branch and `Ly` to the sine branch, followed by direct-dimension (F2) propagation and observation using the selected isotope's `L+` coil state. These are code-defined sequence operations, not a measured spectrum or a run-verified result.
 
-## Physical / mathematical content
+The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters.sweep` seconds.
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+## Parameters and inputs
 
-## Numerical / algorithmic content
+- `parameters.sweep`: positive real scalar sweep width in Hz, for both dimensions.
+- `parameters.npoints`: two positive integer point counts, ordered F1 then F2.
+- `parameters.spins`: one-element cell array naming an isotope present in the system (for example, `{'1H'}` or `{'13C'}`).
+- `H`, `R`, and `K`: same-sized numeric Hamiltonian, relaxation, and kinetics matrices supplied by the context function. The function requires the `sphten-liouv` formalism.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Outputs and references
 
-## Syntax
-
-```matlab
-fid=ecosy(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- parameters.sweep sweep width in Hz
-- parameters.npoints number of points for both dimensions
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.cos, fid.sin -real and imaginary components of the
-- States quadrature signal
-- Notes: implemented up to six-quantum orders as per the original
-- paper. Let us know if you need more.
-
-## Implementation structure
-
-- Phase-sensitive E.COSY pulse sequence from:
-- fid=ecosy(spin_system,parameters,H,R,K)
-- parameters.sweep sweep width in Hz
-- parameters.npoints number of points for both dimensions
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid.cos, fid.sin -real and imaginary components of the
-- States quadrature signal
-- paper. Let us know if you need more.
+- `fid.cos` and `fid.sin`: real and imaginary States-quadrature FID components, as identified by the source header.
+- [E.COSY reference, DOI 10.1021/ja00308a042](https://doi.org/10.1021/ja00308a042)
+- [E.COSY reference, DOI 10.1063/1.451421](https://doi.org/10.1063/1.451421)
+- [E.COSY reference, DOI 10.1016/0022-2364(87)90102-8](https://doi.org/10.1016/0022-2364(87)90102-8)
+- [Spinach Wiki: `ecosy.m`](https://spindynamics.org/wiki/index.php?title=ecosy.m)

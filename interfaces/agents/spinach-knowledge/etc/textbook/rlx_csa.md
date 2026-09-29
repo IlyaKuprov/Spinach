@@ -1,45 +1,31 @@
 # etc/textbook/rlx_csa.m
 
-- Signature: `[r1,r2]=rlx_csa(B0,isotope,Z,tau_c)`
+- MATLAB implementation: [etc/textbook/rlx_csa.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/rlx_csa.m)
+
+**Signature:** `[r1,r2]=rlx_csa(B0,isotope,Z,tau_c)`
 
 ## Purpose
 
-Redfield theory expressions for CSA relaxation, including contributions from the antisymmetric part. Syntax: [r1,r2]=rlx_csa(B0,isotope,Z,tau_c)
+Calculates longitudinal and transverse Redfield relaxation rates for chemical-shift anisotropy (CSA), including the contributions associated with the antisymmetric part. The source notes that these rates do not depend on spin quantum number.
 
-## Physical / mathematical content
+## Inputs
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- `B0` — real scalar magnetic field in tesla.
+- `isotope` — character-array isotope label, for example `'15N'`.
+- `Z` — real 3-by-3 chemical-shift tensor in ppm.
+- `tau_c` — positive real scalar second-rank rotational correlation time, documented as `1/(6D)`, in seconds.
 
-## Numerical / algorithmic content
+The code checks that `B0` is a real numeric scalar, `tau_c` is positive, `isotope` is a character array, and `Z` is a real 3-by-3 matrix; it does not impose symmetry on `Z`.
 
-## Parameters / inputs
+## Calculation and outputs
 
-- B0 -magnet field, Tesla
-- isotope -the spins involved, e.g. '15N'
-- Z -chemical shift tensor, 3x3
-- matrix in ppm
-- tau_c -second rank (1/6D) rotational
-- correlation time, seconds
+The carrier-frequency expression is `omega=B0*(1+trace(1e-6*Z)/3)*spin(isotope)`. The tensor is converted from ppm by `1e-6`, then `blinv` supplies the invariants `Lsq` and `Dsq`. The implemented rates are
 
-## Outputs
+- `r1 = (1/2)Lsq*omega^2*tau_c/(1+9*tau_c^2*omega^2) + (2/15)Dsq*omega^2*tau_c/(1+tau_c^2*omega^2)`
+- `r2 = (1/4)Lsq*omega^2*tau_c/(1+9*tau_c^2*omega^2) + (1/45)Dsq*omega^2*tau_c*(4+3/(1+tau_c^2*omega^2))`
 
-- r1 -longitudinal relaxation rate, Hz
-- r2 -transverse relaxation rate, Hz
-- Note: CSA relaxation rate expressions do not depend on
-- the spin quantum number
+Outputs `r1` and `r2` are respectively longitudinal and transverse rates in Hz.
 
-## Implementation structure
+## Reference
 
-- Redfield theory expressions for CSA relaxation, including
-- contributions from the antisymmetric part. Syntax:
-- [r1,r2]=rlx_csa(B0,isotope,Z,tau_c)
-- B0 -magnet field, Tesla
-- isotope -the spins involved, e.g. '15N'
-- Z -chemical shift tensor, 3x3
-- matrix in ppm
-- tau_c -second rank (1/6D) rotational
-- correlation time, seconds
-- r1 -longitudinal relaxation rate, Hz
-- r2 -transverse relaxation rate, Hz
-- Note: CSA relaxation rate expressions do not depend on
+[Spinach Wiki: rlx_csa.m](https://spindynamics.org/wiki/index.php?title=rlx_csa.m)

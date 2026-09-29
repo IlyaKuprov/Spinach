@@ -1,41 +1,37 @@
 # kernel/utilities/expdrop.m
 
-- Signature: `drop=expdrop(from,to,duration,npoints,drop_rate)`
-
 ## Purpose
 
-Exponential drop function. Produces an exponential fall-off from a specified value to a specified value with the specified rate and the number of points. Syntax: drop=expdrop(from,to,duration,npoints,drop_rate)
+Generates an exponential fall-off (drop) from a specified starting value to a specified ending value over a given duration, with a specified exponential rate and number of discretisation points.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `drop=expdrop(from,to,duration,npoints,drop_rate)`
+- The function first validates all inputs via an internal consistency-checking subfunction `grumble`, which errors out with descriptive messages if any argument fails its checks.
+- The exponential parameters are computed as:
+  - `B=(from-to)/(1-exp(-drop_rate*duration))`
+  - `A=from-B`
+- The drop is then evaluated as `drop=A+B*exp(-drop_rate*linspace(0,duration,npoints))`, returning a row vector of `npoints` values spanning the interval `[0,duration]`.
+- Input validation rules enforced by `grumble`:
+  - `npoints` must be a positive real integer (numeric, real, scalar, at least 1, and integer-valued).
+  - `from` must be a real numeric scalar.
+  - `to` must be a real numeric scalar.
+  - `duration` must be a positive real numeric scalar.
+  - `drop_rate` must be a positive real numeric scalar.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
+- `from` — the value to drop from (real scalar).
+- `to` — the value to drop to (real scalar).
+- `duration` — drop duration, seconds (positive real scalar).
+- `npoints` — the number of discretisation points in the drop (positive integer).
+- `drop_rate` — exponential drop rate, Hz (positive real scalar).
 
-- from -the value to drop from
-- to -the value to drop to
-- duration -drop duration, seconds
-- npoints -the number of discretisation points
-- in the drop
-- drop_rate -exponential drop rate, Hz
+Output:
+- `drop` — a row vector with the fall-off.
 
-## Outputs
+## References
 
-- drop -a row vector with the fall-off
-
-## Implementation structure
-
-- Exponential drop function. Produces an exponential fall-off
-- from a specified value to a specified value with the specified
-- rate and the number of points. Syntax:
-- drop=expdrop(from,to,duration,npoints,drop_rate)
-- from -the value to drop from
-- to -the value to drop to
-- duration -drop duration, seconds
-- npoints -the number of discretisation points
-- in the drop
-- drop_rate -exponential drop rate, Hz
-- drop -a row vector with the fall-off
-- Check consistency
+- Source: [kernel/utilities/expdrop.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/expdrop.m)
+- Spin Dynamics Wiki: [expdrop.m](https://spindynamics.org/wiki/index.php?title=expdrop.m)

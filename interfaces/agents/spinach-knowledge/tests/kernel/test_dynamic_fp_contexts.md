@@ -1,36 +1,28 @@
 # tests/kernel/test_dynamic_fp_contexts.m
 
-- Signature: `result=test_dynamic_fp_contexts()`
+**Source**: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_fp_contexts.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_fp_contexts.m)
 
 ## Purpose
 
-Tests compact imaging() and meshflow() context hand-off paths. Syntax: result=test_dynamic_fp_contexts()
+Regression test for the compact `imaging()` and `meshflow()` context hand-off paths. It verifies that both contexts assemble finite, correctly sized generators and phantom-derived initial and detection states, and that spatial flow is conserved.
 
-## Physical / mathematical content
+## What the suite checks
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- The `imaging` context on a one-dimensional periodic grid and the `meshflow` context on a closed finite-volume mesh must pass the spin basis dimension and the product of spin and spatial dimensions into the pulse sequence. Their assembled generators must have that product dimension, be square and contain finite entries; the constructed initial state and detection coil must cover the active spatial cells.
+- A one-dimensional imaging setup must leave the transverse gradient operators empty. Both flow operators must conserve total spatial mass: their column sums vanish, within the test tolerances, for periodic imaging and closed-boundary mesh diffusion.
+- The checks exercise the production context hand-off and report structural and conservation assertions. They do not establish a particular image, spectrum or timed numerical benchmark.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+```matlab
+result = test_dynamic_fp_contexts()
+```
 
-## Outputs
+- **Output**: `result` — regression test result structure with explanatory messages, accumulated through `test_close` and `test_true` assertions.
+- Takes no inputs.
 
-- result -regression test result with explanatory messages
-- The test checks that both contexts assemble finite, correctly sized
-- generators and phantom-derived initial and detection states.
+## References
 
-## Implementation structure
-
-- Tests compact imaging() and meshflow() context hand-off paths. Syntax:
-- result=test_dynamic_fp_contexts()
-- result -regression test result with explanatory messages
-- The test checks that both contexts assemble finite, correctly sized
-- generators and phantom-derived initial and detection states.
-- Announce the test target
-- State the context target of the test
-- Exercise the Cartesian-grid imaging context
-- Exercise the unstructured-mesh flow context
-- Build a one-spin spherical-tensor Liouville-space system
-- Set a minimal one-dimensional imaging grid
-- Supply relaxation, initial-state, and coil phantoms
+- `imaging` — Cartesian-grid imaging context exercised by this test.
+- `meshflow` — unstructured-mesh flow context exercised by this test.
+- `new_test_result`, `test_close`, `test_true`, `test_spin_system`, `state` — test harness and spin-system utilities used by this test.

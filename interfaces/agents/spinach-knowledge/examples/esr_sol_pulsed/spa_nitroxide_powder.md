@@ -1,32 +1,17 @@
 # examples/esr_sol_pulsed/spa_nitroxide_powder.m
 
-- Signature: `spa_nitroxide_powder()`
+- Function: `spa_nitroxide_powder()`.
 
-## Purpose
+## Model
 
-A soft pulse simulation for a nitroxide radical powder. The soft pulse is simulated using the Fokker-Planck formalism; it is fol- lowed by time domain acquisition and Fourier transform. Calculation time: seconds
+This example calculates a soft-pulse powder EPR signal for a nitroxide radical. The source describes Fokker-Planck treatment of the soft pulse followed by time-domain acquisition and Fourier transform; its runtime estimate is seconds. Isotopes are `{'E','14N'}` and the electron Zeeman matrix is diagonal with values `[2.01045, 2.00641, 2.00211]`. The electron-`14N` coupling matrix is entered as `[1.2356 0 0.6322; 0 1.1266 0; 0.6322 0 8.2230]*1e7`. These interaction values and `sys.magnet=3.5` are reproduced as coded; the source does not annotate their units. The basis is `sphten-liouv` with no approximation, and trajectory-level SSR is disabled.
 
-## Physical / mathematical content
+## Excitation, acquisition, and plotted result
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The initial state and receiver operator are `Lz` and `L+` on electron `E`; `parameters.decouple={}`. The orientation grid is `rep_2ang_3200pts_sph`. Acquisition controls are offset `-2e8`, sweep `8e8`, 64 points, zero-fill 512, axis units MHz, derivative off, and axis inversion off. Raw offset and sweep units are not separately annotated.
 
-## Numerical / algorithmic content
+The soft pulse is rank 2, phase `-pi/2`, frequency `-300e6`, duration `100e-9` s (100 ns), and power `2*pi*16.5e6`; the method is `expm`. The source gives no unit labels for the raw pulse-frequency and power values. It calls `powder(spin_system,@sp_acquire,parameters,'esr')`, applies `crisp` apodisation, computes `fftshift(fft(fid,parameters.zerofill))`, and plots the real part with `plot_1d`. No numerical spectrum is stated in the source.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Source
 
-## Implementation structure
-
-- A soft pulse simulation for a nitroxide radical powder. The soft
-- pulse is simulated using the Fokker-Planck formalism; it is fol-
-- lowed by time domain acquisition and Fourier transform.
-- Calculation time: seconds
-- Isotopes
-- Magnet field
-- Interactions
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Soft pulse parameters
+[examples/esr_sol_pulsed/spa_nitroxide_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/spa_nitroxide_powder.m)

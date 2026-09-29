@@ -1,34 +1,18 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m
 
 - Signature: `bb_refocusing_pulse()`
+- Source: [examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m)
 
 ## Purpose
 
-Spinach implementation of the broadband refocusing example from GRAPE is used to design a 200 µs broadband x-phase π pulse: {Sx -> Sx, Sy -> -Sy, Sz -> -Sz} over an offset range of ±12.5 kHz.
+This example designs a broadband x-phase pi refocusing operation for liquid-state NMR. The specified Cartesian-state map is Sx to Sx, Sy to -Sy, and Sz to -Sz over the offset ensemble. The source identifies it as the broadband refocusing example associated with the Journal of Magnetic Resonance DOI [10.1016/j.jmr.2008.11.020](https://doi.org/10.1016/j.jmr.2008.11.020).
 
-## Physical / mathematical content
+## Model and optimisation
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The model is one 1H spin at 14.1 T, with zero scalar chemical shift, in the NMR rotating frame. It uses normalised Sx, Sy, and Sz states as its three initial states, with the corresponding target states Sx, -Sy, and -Sz. Cartesian Lx and Ly controls act in the presence of the Lz offset operator. The design ensemble contains 101 equally spaced offsets from -12.5 to +12.5 kHz.
 
-## Numerical / algorithmic content
+The waveform has 600 equal slices over 200 microseconds, so each slice is 200/600 microseconds. The control power scale is 2*pi*30 kHz in angular-frequency units. From a random 2-by-600 initial guess, the example configures L-BFGS with the NS and SNS penalties weighted 0.01 and 100, respectively, and a maximum of 200 iterations, then calls fmaxnewton with the GRAPE XY objective.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Fidelity profile
 
-## Implementation structure
-
-- Spinach implementation of the broadband refocusing example from
-- GRAPE is used to design a 200 µs broadband x-phase π pulse:
-- {Sx -> Sx, Sy -> -Sy, Sz -> -Sz}
-- over an offset range of ±12.5 kHz.
-- Magnetic field (Tesla)
-- Chemical shift (ppm)
-- Basis set
-- Spinach housekeeping
-- Normalised Cartesian basis states
-- RF controls and offset operator
-- Drift Hamiltonian
-- Control data structure
+The optimised channels are rescaled by the control power level and tested at 201 offsets from -25 to +25 kHz. For each offset, the script applies the pulse to all three Cartesian initial states and computes the real trace overlap of the three specified targets with their final states, averaged by division by three. It plots this fidelity profile. The wider test range is not the design range, and the source provides no numerical fidelity values here; no experimental validation is claimed.

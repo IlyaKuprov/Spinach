@@ -1,71 +1,39 @@
 # kernel/utilities/v2fplanck.m
 
-- Signature: `F=v2fplanck(spin_system,parameters)`
-
 ## Purpose
 
-Translates a stationary 3D velocity field and a diffusion tensor field into a Fokker-Planck evolution generator. Syntax: F=v2fplanck(spin_system,parameters)
+`v2fplanck.m` translates a stationary 3D velocity field and a diffusion tensor field into a Fokker-Planck evolution generator for use in Spinach spin dynamics simulations.
 
-## Physical / mathematical content
+## Mathematical action
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spatial generator represents advection and diffusion on one to three voxel axes. A uniform velocity component multiplies its translation generator `F_i`; a spatially varying component contributes `diag(F_i*u_i)+diag(u_i)*F_i`, including the velocity-gradient term. Missing velocity components are zero. An isotropic diffusion coefficient adds `-1i*D*F_i*F_i` for each active direction; a constant anisotropic tensor adds cross-direction terms, while voxel-dependent diffusion uses `-1i*F_i*diag(D_ij)*F_j`. These are spatial transport terms, not spin Hamiltonian terms.
 
-## Numerical / algorithmic content
+The spatial operator is tensored with the spin identity; in three dimensions its direct-product ordering is Z⊗Y⊗X⊗Spin. `F` is a sparse numeric matrix by default. Only when `spin_system.sys.enable` contains `'polyadic'` are the spatial derivative operators kept polyadic and the result polyadic; use `inflate()` to obtain its sparse matrix in that case.
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+## Valid parameter domain
 
-## Parameters / inputs
+`parameters.npts` contains one to three integer voxel counts, each at least 10; `parameters.dims` supplies the same number of positive spatial extents. The derivative scheme is `fourier` or periodic finite differences with a positive stencil size no greater than 7. Constant `parameters.diff` (nonnegative scalar or symmetric positive-semidefinite tensor) and voxel-wise tensor components are alternative specifications, not simultaneous inputs; a 3D voxel-wise tensor requires all nine Cartesian components.
 
-- parameters.u -X components of the velocity vectors
-- for each voxel in the sample, m/s;
-- a scalar specifies spatially uni-
-- form flow along X
-- parameters.v -Y components of the velocity vectors
-- for each voxel in the sample, m/s;
-- a scalar specifies spatially uni-
-- form flow along Y
-- parameters.w -Z components of the velocity vectors
-- for each voxel in the sample, m/s;
-- a scalar specifies spatially uni-
-- form flow along Z
-- parameters.diff -diffusion coefficient or 3x3 tensor, m^2/s
-- for situations when this parameter is the
-- same in every voxel
-- parameters.dxx -Cartesian components of the diffusion
-- parameters.dxy tensor for each voxel of the sample
-- ...
-- parameters.dzz
-- parameters.dims -dimensions of the 3D box, meters
-- parameters.npts -number of points in each dimension
-- of the 3D box
-- parameters.deriv -{'fourier'} uses Fourier diffe-
-- rentiation matrices; {'period',n}
-- requests n-point central finite-
-- difference matrices with periodic
-- boundary conditions
+## Inputs and outputs
 
-## Outputs
+**Inputs:**
 
-- F -spatial dynamics generator
-- Note: the direct product order is Z(x)Y(x)X(x)Spin, this cor-
-- responds to a column-wise vectorization of a 3D array
-- with dimensions ordered as [X Y Z].
-- Note: polyadic objects are returned, use inflate() to get the
-- corresponding sparse matrix.
+- `spin_system` — the Spinach spin system object.
+- `parameters` — a structure containing:
+  - `parameters.u` — X components of velocity vectors for each voxel, m/s; a scalar specifies spatially uniform flow along X.
+  - `parameters.v` — Y components of velocity vectors for each voxel, m/s; a scalar specifies spatially uniform flow along Y.
+  - `parameters.w` — Z components of velocity vectors for each voxel, m/s; a scalar specifies spatially uniform flow along Z.
+  - `parameters.diff` — diffusion coefficient or 3x3 tensor, m^2/s, for spatially uniform diffusion.
+  - `parameters.dxx` ... `parameters.dzz` — Cartesian components of the diffusion tensor for each voxel.
+  - `parameters.dims` — dimensions of the 3D box, meters.
+  - `parameters.npts` — number of points in each dimension of the 3D box.
+  - `parameters.deriv` — `{'fourier'}` uses Fourier differentiation matrices; `{'period',n}` requests n-point central finite-difference matrices with periodic boundary conditions.
 
-## Implementation structure
+**Outputs:**
 
-- Translates a stationary 3D velocity field and a diffusion tensor
-- field into a Fokker-Planck evolution generator. Syntax:
-- F=v2fplanck(spin_system,parameters)
-- parameters.u -X components of the velocity vectors
-- for each voxel in the sample, m/s;
-- a scalar specifies spatially uni-
-- form flow along X
-- parameters.v -Y components of the velocity vectors
-- form flow along Y
-- parameters.w -Z components of the velocity vectors
-- form flow along Z
-- parameters.diff -diffusion coefficient or 3x3 tensor, m^2/s
+- `F` — the spatial Fokker–Planck generator, sparse numeric by default or polyadic when that feature is enabled.
+
+## References
+
+- Source code: [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/v2fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/v2fplanck.m)
+- Spinach Wiki: [https://spindynamics.org/wiki/index.php?title=v2fplanck.m](https://spindynamics.org/wiki/index.php?title=v2fplanck.m)

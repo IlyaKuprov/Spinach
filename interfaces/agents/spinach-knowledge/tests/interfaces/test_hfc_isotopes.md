@@ -1,31 +1,31 @@
 # tests/interfaces/test_hfc_isotopes.m
 
-- Signature: `result=test_hfc_isotopes()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/tests/interfaces/test_hfc_isotopes.m)
 
 ## Purpose
 
-Isotope-resolved hyperfine import from Gaussian and ORCA fixtures.
+Regression test for isotope-resolved hyperfine coupling imports from Gaussian and ORCA electronic structure logs. It verifies that hyperfine tensors follow the requested nuclear gyromagnetic ratio during `g2spinach` conversion, including anisotropic and off-diagonal components, and that source isotopes are taken from the shipped logs rather than assumed from natural abundance.
 
-## Physical / mathematical content
+## What the suite checks
 
-Hyperfine tensors scale with nuclear gyromagnetic ratios, including sign changes and off-diagonal tensor components; same-isotope and NMR imports are controls.
+- Gaussian nitrogen hyperfine tensors must retain their source value for the printed isotope and rescale, including anisotropic components and the negative gyromagnetic-ratio sign, when a different target isotope is requested. Importing the same isotope must not alter the tensor. Hyperfine thresholding and purging must apply to the isotope-adjusted strength rather than silently changing the surviving interaction.
+- Nonempty imported hyperfine tensors require identifiable source-isotope provenance: missing, malformed or unprinted isotope metadata cannot be replaced by a natural-abundance guess. Ordinary NMR-only conversion must remain usable without hyperfine isotope provenance.
+- ORCA proton hyperfine tensors must use isotope metadata from the hyperfine records and rescale consistently for deuterium, including asymmetric components; invalid provenance is rejected without corrupting independent valid imports. The suite checks these import invariants, not a newly computed electronic-structure result.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-Exercises source-isotope provenance, conversion before threshold/purge, equality boundaries, partial outputs, and explicit refusal to guess missing provenance. Missing or malformed provenance must be rejected silently by the initial input guard, even when coordinate or g-tensor fields are unavailable. Empty tensors and direct zero-spin targets remain supported; zero-gamma sources are rejected before processing.
+**Syntax**
 
-## Syntax
+```matlab
+result = test_hfc_isotopes()
+```
 
-`result=test_hfc_isotopes()`
+The function takes no arguments.
 
-## Parameters / inputs
+**Outputs**
 
-None. The test constructs its own bounded physical fixtures.
+- `result` — regression check accumulator returned by `new_test_result` and progressively updated by `test_true` and `test_close`, covering tensor scaling, provenance, thresholding, purging, and unchanged NMR imports.
 
-## Outputs
+## References
 
-`result` is the regression record of checks, messages, and failures; the test runner determines its final status.
-
-## Header notes
-
-The regression is registered in `test_manifest` and is not an optimisation or performance benchmark.
+- Uses `new_test_result`, `test_true`, `test_close`, `gparse`, `oparse`, `g2spinach`, `isoswap`, `gauss2mhz`, and `spin`.

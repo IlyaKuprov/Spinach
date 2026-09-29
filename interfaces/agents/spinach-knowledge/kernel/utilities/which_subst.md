@@ -1,36 +1,30 @@
 # kernel/utilities/which_subst.m
 
-- Signature: `subst=which_subst(spin_system,spins)`
-
 ## Purpose
 
-Finds out which substance hosts the specified spins; throws an error if there is more than one. Syntax: subst=which_subst(spin_system,spins)
+Determines which substance in a spin system hosts a specified list of spins, throwing an error if the spins span more than one substance or belong to none. Source: [Spinach GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/which_subst.m).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `subst=which_subst(spin_system,spins)`.
+- Validates the spin list via an internal `grumble` subfunction: spins must be a real numeric vector of positive integers, must not exceed `spin_system.comp.nspins`, and must contain no repeated entries.
+- Builds a logical mask over `spin_system.chem.parts`, marking substances whose spin list contains any of the specified spins.
+- Errors with `'spin list crosses chemical boundaries.'` if more than one substance matches, or `'spins do not belong to any substance.'` if none matches.
+- Returns the index of the single matching substance via `find` on the mask.
+- Performs a final check that all specified spins are members of `spin_system.chem.parts{subst}`; otherwise errors again with `'spin list crosses chemical boundaries.'`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- spins -a list of positive integers
+- `spin_system` — spin system structure containing `chem.parts` (cell array of per-substance spin lists) and `comp.nspins` (total spin count).
+- `spins` — a list of positive integers identifying spins.
 
-## Outputs
+**Outputs**
 
-- subst -a positive integer
+- `subst` — a positive integer giving the substance number hosting all specified spins.
 
-## Implementation structure
+## References
 
-- Finds out which substance hosts the specified spins;
-- throws an error if there is more than one. Syntax:
-- subst=which_subst(spin_system,spins)
-- spins -a list of positive integers
-- subst -a positive integer
-- Check consistency
-- Find the substances hosting specified spins
-- Only one substance is permitted
-- Get substance number
-- Confirm that all spins are in the same substance
-- Consistency enforcement
-- I swear to you that to think too much is
+- [which_subst.m — Spinach Wiki](https://spindynamics.org/wiki/index.php?title=which_subst.m)
+- [which_subst.m — GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/which_subst.m)

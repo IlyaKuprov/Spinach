@@ -1,34 +1,20 @@
 # examples/relaxation_theory/dd_quad_xcorr_1.m
 
-- Signature: `dd_quad_xcorr_1()`
+- MATLAB implementation: [examples/relaxation_theory/dd_quad_xcorr_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/dd_quad_xcorr_1.m)
+
+- Signature: `dd_quad_xcorr_1()`.
+- Returns: no MATLAB output arguments; displays a simulated one-dimensional spectrum.
 
 ## Purpose
 
-Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with a quadrupolar coupling and a dipole coupling. Spinach relaxation theory module automatically accounts for all cross-correlations (dipole- quadrupole cross-correlation is present in this case). Dipolar couplings are computed from Cartesian coordinates of the two spins. Calculation time: seconds
+A two-spin liquid-state NMR example of Bloch–Redfield–Wangsness (Redfield) relaxation with a dipolar interaction and a quadrupolar interaction. The source notes that Spinach's relaxation module includes their cross-correlations automatically, including dipole–quadrupole cross-correlation; the dipolar interaction is computed from the supplied Cartesian coordinates. The script then simulates and plots an acquisition rather than returning the relaxation superoperator.
 
-## Physical / mathematical content
+## Model and setup
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The fixed system uses `sys.magnet=14.1`, isotopes `1H` and `14N`, a scalar-coupling matrix with off-diagonal entries 50, and a quadrupolar tensor with principal values `[1e4 1e4 -2e4]` and zero Euler angles. The two coordinate rows are `[0 0 0]` and `[0 0 1.02]`; the source does not annotate their length units. Relaxation is set to `{'redfield'}`, equilibrium to `'zero'`, retained terms to `'secular'`, and one correlation-time entry to `1e-9`. It uses the complete `sphten-liouv` basis with no approximation, then calls `create` and `basis`.
 
-## Numerical / algorithmic content
+For acquisition, the observed spin, initial state, and coil are all `1H` (the latter two use `L+`); decoupling is empty and offset is zero. The sweep is 500 Hz, with 128 points and zero-fill to 512 points; the axis is specified in Hz. `liquid(...,@acquire,...,'nmr')` generates the FID, exponential apodisation is applied with parameter 6, and a zero-filled FFT is shifted. The displayed signal is the real part of the spectrum via `plot_1d`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Limits
 
-## Implementation structure
-
-- Complete Bloch-Redfield-Wangsness relaxation superoperator in a system
-- with a quadrupolar coupling and a dipole coupling. Spinach relaxation
-- theory module automatically accounts for all cross-correlations (dipole-
-- quadrupole cross-correlation is present in this case). Dipolar couplings
-- are computed from Cartesian coordinates of the two spins.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis specification
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+This is one specified two-spin model and one acquisition; it does not vary the couplings, correlation time, or basis, or separately report the cross-correlation contribution. The script's numeric coupling, quadrupolar, coordinate, and correlation-time settings are literals rather than a reusable input interface. Coordinate units are not stated in the source.

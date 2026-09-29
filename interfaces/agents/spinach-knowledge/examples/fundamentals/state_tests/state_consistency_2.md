@@ -1,30 +1,21 @@
 # examples/fundamentals/state_tests/state_consistency_2.m
 
-- Signature: `state_consistency_2()`
+Source: [examples/fundamentals/state_tests/state_consistency_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/state_tests/state_consistency_2.m)
 
-## Purpose
+Signature: `state_consistency_2()`
 
-Test of consistency in the projection between spherical tensor basis set and Zeeman basis set.
+## Tested question
 
-## Physical / mathematical content
+Does one constructed two-spin operator give the same Hilbert-space matrix when built directly in Zeeman Hilbert space, built in Zeeman Liouville space, or built in spherical-tensor Liouville space and projected back to the Zeeman basis?
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+## System and state
 
-## Numerical / algorithmic content
+The source sets `sys.magnet=14.1`, isotopes `14N` and `235U`, and both scalar Zeeman entries to zero. It declares no couplings. The basis approximation is `none`. The test state is `state(...,{'Lz','Lx'},{1,2}) + state(...,{'L+'},{1})`: the product component has `Lz` on spin 1 and `Lx` on spin 2, with an additional `L+` component on spin 1.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Representation comparison
 
-## Implementation structure
+The source builds that state in `zeeman-hilb`, `zeeman-liouv`, and `sphten-liouv`. The Zeeman-Liouville vector is reshaped to a 24-by-24 matrix. The spherical-tensor vector is first multiplied by `sphten2zeeman(spin_system)`, then reshaped to the same dimensions. The three Hilbert-space matrices are compared pairwise using the matrix 1-norm; any difference greater than `1e-6` triggers the failure branch.
 
-- Test of consistency in the projection between spherical
-- tensor basis set and Zeeman basis set.
-- Magneti field
-- Isotopes
-- No interactions
-- Hilbert space, Zeeman basis
-- A suitably complicated state
-- Liouville space, Zeeman basis
-- Fold back into Hilbert space
-- Liouville space, IST basis
-- Project into Zeeman basis
-- Check the results
+## Output and scope
+
+The function prints either `State consistency test PASSED.` or raises `State consistency test FAILED.`; it does not return the matrices or report their residuals. This is a fixed state-space representation check, not a quadrature test, and does not establish agreement for other systems, states, or approximations.

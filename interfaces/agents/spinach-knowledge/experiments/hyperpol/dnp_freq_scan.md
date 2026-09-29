@@ -1,63 +1,37 @@
 # experiments/hyperpol/dnp_freq_scan.m
 
+- MATLAB implementation: [experiments/hyperpol/dnp_freq_scan.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/dnp_freq_scan.m)
+
 - Signature: `dnp=dnp_freq_scan(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and physical scope
 
-Microwave frequency scan steady-state DNP experiment. Returns the steady-state population of the user-specified states as a function of microwave irradiation frequency. Syntax: dnp=dnp_freq_scan(spin_system,parameters,H,R,K)
+This routine computes steady-state DNP detection signals across a supplied microwave-frequency-offset vector. It does not sweep the static magnetic field or propagate a time-domain pulse sequence. Microwave drive, electron offset and electron-nuclear couplings act through the spin system and operators supplied by the caller; the function does not construct hyperfine tensors. It is not an ESEEM/ENDOR sequence or image-reconstruction routine.
 
-## Physical / mathematical content
+## Inputs
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `parameters.mw_pwr`: scalar microwave power in radians per second.
+- `parameters.mw_frq`: vector of frequency offsets in radians per second, specified relative to `parameters.g_ref`.
+- `parameters.g_ref`: scalar reference g-factor (dimensionless).
+- `parameters.rho0`: thermal-equilibrium state; `parameters.coil`: one detection-state vector or a horizontal stack.
+- `parameters.mw_oper`: microwave irradiation operator. Liouville methods also require `parameters.ez_oper`, the electron `Lz` operator.
+- `parameters.method`: `'lvn-backs'`, `'lvn-gmres'`, `'fp-backs'` or `'fp-gmres'`. The Fokker-Planck methods additionally require integer `parameters.nphases`, the microwave-phase grid size.
+- H, R and K: Hamiltonian, relaxation and kinetics matrices supplied by the context function.
 
-## Numerical / algorithmic content
+## Calculation and output axes
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The Liouville-space paths convert offsets using the reference g-factor and magnet field, build the driven generator from H, R and K, then solve a steady-state linear system for each offset and project onto the `coil` states. The Fokker-Planck paths instead represent microwave phase on the `nphases` Fourier grid before solving. The output dnp has shape [numel(`parameters.mw_frq`), size(`parameters.coil`,2)]: rows follow the input frequency-vector order; columns follow the detection-state stack. The calculation returns expectation values, not a measured spectrum.
 
-## Parameters / inputs
+## Model limits
 
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.mw_frq -row vector of microwave frequ-
-- ency offsets (rad/s) relative
-- to the reference g-factor
-- parameters.g_ref -reference g-factor around which
-- frequency offsets are specified
-- parameters.rho0 -thermal equilibrium state
-- parameters.coil -coil state vector or a horizon-
-- tal stack thereof
-- parameters.mw_oper -microwave irradiation operator
-- parameters.ez_oper -Lz operator on the electrons
-- parameters.method -calculation method: 'fp-backs',
-- 'fp-gmres', 'lvn-backs', or
-- 'lvn-gmres'
-- parameters.nphases -number of microwave phase grid
-- points for the Fokker-Planck path
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+The source says R must not be thermalised for this calculation (`inter.equilibrium`='zero'). The supported formalisms are `sphten-liouv` and `zeeman-liouv`. The two solver choices in each method family are direct backslash and GMRES.
 
-## Outputs
+## Source-coded numerical example
 
-- dnp -an array of steady state expectation values for
-- the states specified in parameters.coil at each
-- of the microwave frequencies supplied
-- Note: the relaxation superoperator must NOT be thermalized for
-- this type of calculation (inter.equilibrium='zero').
+`examples/dnp_sol/solid_effect_freq_scan_1.m` uses `parameters.mw_pwr`=2*pi*100e3 radians per second and two 100-point offset bands written as 2*pi*[linspace(144.0,145.5,100), linspace(14.0,15.5,100)]*1e6 radians per second. It sets a fixed orientation [pi/4 pi/5 pi/6] and uses `'lvn-backs'` for a single-crystal 15N-urea example. This is an example configuration, not a measurement or reported result.
 
-## Implementation structure
+## Source and attribution
 
-- Microwave frequency scan steady-state DNP experiment. Returns the
-- steady-state population of the user-specified states as a function
-- of microwave irradiation frequency. Syntax:
-- dnp=dnp_freq_scan(spin_system,parameters,H,R,K)
-- parameters.mw_pwr - microwave power, rad/s
-- parameters.mw_frq - row vector of microwave frequ-
-- ency offsets (rad/s) relative
-- to the reference g-factor
-- parameters.g_ref - reference g-factor around which
-- frequency offsets are specified
-- parameters.rho0 - thermal equilibrium state
-- parameters.coil - coil state vector or a horizon-
+- Source: `experiments/hyperpol/dnp_freq_scan.m`
+- <https://spindynamics.org/wiki/index.php?title=dnp_freq_scan.m>
+- Source attributions: ilya.kuprov@weizmann.ac.il; alexander.karabanov@nottingham.ac.uk; walter.kockenberger@nottingham.ac.uk; mariagrazia.concilio@sjtu.edu.cn

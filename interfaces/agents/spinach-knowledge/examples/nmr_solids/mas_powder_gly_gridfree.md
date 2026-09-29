@@ -1,32 +1,19 @@
 # examples/nmr_solids/mas_powder_gly_gridfree.m
 
-- Signature: `mas_powder_gly_gridfree()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_gly_gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_gly_gridfree.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_gly_gridfree.m)
 
-13C MAS spectrum of glycine powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. All magnetic parameters are estimated from a DFT calculation. Calculation time: minutes
+## Purpose and model
 
-## Physical / mathematical content
+This example constructs a computed 13C MAS spectrum for glycine powder with the grid-free Fokker–Planck route: the source calls `gridfree(spin_system,@acquire,parameters,'nmr')`. Its header says the magnetic parameters are estimated from a DFT calculation and estimates minutes for calculation time; that duration is a source estimate, not a measured runtime.
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+`gparse` reads `../standard_systems/glycine.log`; `g2spinach` imports `13C` and `15N` with reference arguments `[182.1 264.5]` in isotope order. The `g2spinach` argument `references` denotes absolute shielding values for zero-ppm reference substances, not measured spectrum peaks. The source sets field `14.1 T`. The basis is `sphten-liouv`, approximation `none`, longitudinal `15N`, and projection `+1`; interaction and proximity cutoffs are `5.0` and `4.0`.
 
-## Numerical / algorithmic content
+## MAS acquisition and spectrum
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The MAS rotor axis is `[1 1 1]` and rate is `2000 Hz` (2 kHz); powder settings are `leb_2ang_rank_23` and `max_rank=23`. The acquisition sweep is `5e4 Hz` with 256 points, zero-fill 1024, and `offset=17000`. It selects `13C`, assigns `axis_units='ppm'`, sets `invert_axis=1`, and explicitly leaves `decouple={}`. Both initial state and receiver are `L+` on `13C`.
 
-## Implementation structure
+After `gridfree` returns the FID, the script applies exponential apodisation parameter `6`, Fourier transforms with `fftshift(fft(fid,parameters.zerofill))`, and plots the real spectrum via `plot_1d`. These are model and processing settings for a computed spectrum; this file does not provide experimental measured output or a numerical comparison.
 
-- 13C MAS spectrum of glycine powder (assuming decoupling of 1H),
-- computed using the grid-free Fokker-Planck MAS formalism. All
-- magnetic parameters are estimated from a DFT calculation.
-- Calculation time: minutes
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
+Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).

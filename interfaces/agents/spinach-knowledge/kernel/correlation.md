@@ -1,51 +1,36 @@
 # kernel/correlation.m
 
-- Signature: `rho=correlation(spin_system,rho,orders,spins)`
+Source: [kernel/correlation.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/correlation.m)
+Wiki: [Spin Dynamics Wiki: correlation.m](https://spindynamics.org/wiki/index.php?title=correlation.m)
+
+- Signature: `rho=correlation(spin_system,rho,correlation_orders,spins)`
 
 ## Purpose
 
-Correlation order selection function -keeps only the specified orders of spin correlation in the state vector. This is useful as an analyti- cal replacement for complicated phase cycles. Syntax: rho=correlation(spin_system,rho,correlation_orders,spins)
+Keeps the requested spin-correlation orders and zeros the other components in the supplied state. The header describes this as an analytical alternative to complicated phase cycles. The implementation uses a basis mask in spherical-tensor Liouville formalism and a discrete Fourier projector in Zeeman Liouville and Hilbert formalisms.
 
-## Physical / mathematical content
+## Inputs and output
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `spin_system` — Spinach system object; this routine reads its basis formalism and basis and the component isotope, multiplicity, and spin-count metadata.
+- `rho` — numeric state vector or horizontal stack of state vectors. In `zeeman-hilb`, it may instead be a density matrix or horizontal stack of density matrices. The original shape is restored on output.
+- `correlation_orders` — numeric vector of non-negative integer orders to retain. The header describes a row vector; executable validation accepts a numeric vector without requiring row orientation. Orders outside `0:numel(spins selected)` have no corresponding Zeeman Fourier component.
+- `spins` — optional selector: `'all'`, an isotope label such as `'1H'` or `'13C'`, or a vector of valid one-based spin indices. If omitted, it defaults to `'all'`.
+- Output `rho` has the input dimensions, with components at unrequested orders set to zero.
 
-## Numerical / algorithmic content
+## How the selection is applied
 
-## Parameters / inputs
+The code takes the basis-row count as the spin-space dimension, squares it for `zeeman-hilb`, and treats the remaining flattened columns as the space dimension. It reshapes `rho` for filtering and restores its original dimensions afterward.
 
-- rho -a state vector or a horizontal stack thereof;
-- in zeeman-hilb, a density matrix or a horizon-
-- tal stack thereof
-- correlation_orders -a row vector of correlation
-- orders to keep
-- spins -which spins to consider (e.g.
-- '1H', '13C', 'all')
+For `sphten-liouv`, the routine counts nonzero entries in the basis columns belonging to the selected spins. It retains basis rows whose selected-spin correlation order is requested and zeros all other rows across the input columns.
 
-## Outputs
+For `zeeman-liouv` and `zeeman-hilb`, it builds sparse identity-component channels for the selected spins, samples the generating operation at roots of unity, and combines the samples with discrete Fourier weights for the requested orders from zero through the number of selected spins. In Hilbert formalism the density matrix is processed through the corresponding squared spin-space dimension; the code restores the original input shape. The header notes that correlation order is not diagonal in the Zeeman basis and describes the Hilbert-space density-matrix handling as a Liouville-space stretch/filter/fold operation; the executable path performs the reshape and projection directly.
 
-- rho -the state vector with the undesired orders of
-- spin correlations zeroed out
-- Note: this function requires sphten-liouv, zeeman-liouv, or zeeman-
-- hilb formalism; Fokker-Planck direct products are supported in
-- the Liouville space formalisms. In the Zeeman formalisms the
-- selection is an exact projection built from per-spin identity
-- component channels because correlation order is not diagonal
-- in the Zeeman basis; zeeman-hilb density matrices are stretch-
-- ed into Liouville space, filtered there, and folded back.
+The routine accepts only `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms. It checks that `rho` is numeric, that orders are a numeric vector of non-negative integers, and that `spins` is either a numeric vector of valid integer indices or a character selector equal to `'all'` or an isotope label present in the system. After filtering it warns when `norm(rho,1)<1e-10`, reporting that all magnetisation appears to have been destroyed.
 
-## Implementation structure
+## Units and examples
 
-- Correlation order selection function -keeps only the specified orders
-- of spin correlation in the state vector. This is useful as an analyti-
-- cal replacement for complicated phase cycles. Syntax:
-- rho=correlation(spin_system,rho,correlation_orders,spins)
-- rho - a state vector or a horizontal stack thereof;
-- in zeeman-hilb, a density matrix or a horizon-
-- tal stack thereof
-- correlation_orders - a row vector of correlation
-- orders to keep
-- spins - which spins to consider (e.g.
-- '1H', '13C', 'all')
-- rho -the state vector with the undesired orders of
+Correlation orders and numeric spin selectors are integer indices; no physical units are specified. The source gives the call syntax and selector examples `'1H'`, `'13C'`, and `'all'`, but no worked numerical example. The header also notes support for Fokker–Planck direct-product spaces in Liouville formalisms; the executable switch handles those formalisms through its basis-space dimensions rather than a separate Fokker–Planck branch.
+
+## Signature clarification
+
+The header names the third argument `correlation_orders`; the executable declaration calls it `orders`. This is a parameter-name clarification only.

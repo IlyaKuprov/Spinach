@@ -1,36 +1,24 @@
 # kernel/plotting/bloch_axis.m
 
+Source: [kernel/plotting/bloch_axis.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/bloch_axis.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=bloch_axis.m)
+
 - Signature: `[ax,ay,az]=bloch_axis(x,y,z)`
 
 ## Purpose
 
-Reconstructs the instantaneous Bloch equation rotation axis of from a 3D magnetisation trajectory. Syntax: [ax,ay,az]=bloch_axis(x,y,z)
+Compute the instantaneous rotation-axis components from a three-dimensional magnetisation trajectory. The function returns numerical arrays only; it does not create a graphic or select colours.
 
-## Physical / mathematical content
+## Calculation
 
-## Numerical / algorithmic content
+For each coordinate, the source obtains first and second derivatives with `fdvec(component,5,1)` and `fdvec(component,5,2)`. It then forms the elementwise cross product of the first- and second-derivative vectors:
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+- `ax = dy_dt.*d2z_dt2 - dz_dt.*d2y_dt2`
+- `ay = dz_dt.*d2x_dt2 - dx_dt.*d2z_dt2`
+- `az = dx_dt.*d2y_dt2 - dy_dt.*d2x_dt2`
 
-## Parameters / inputs
+These are the raw cross-product components. The function does not divide by their norm, so the result is not a unit-normalised direction; no additional scaling is applied.
 
-- x, y, z -row vectors of equal length con-
-- taining the trajectory
-- Output:
-- ax, ay, az -row vectors of equal length con-
-- taining the instantaneous axis
+## Inputs and outputs
 
-## Implementation structure
-
-- Reconstructs the instantaneous Bloch equation rotation axis of
-- from a 3D magnetisation trajectory. Syntax:
-- [ax,ay,az]=bloch_axis(x,y,z)
-- x, y, z -row vectors of equal length con-
-- taining the trajectory
-- Output:
-- ax, ay, az -row vectors of equal length con-
-- taining the instantaneous axis
-- Check consistency
-- Get first and second derivatives
-- Get instantaneous rotation axis
-- Consistency enforcement
+- `x`, `y`, `z`: trajectory coordinate arrays. The source requires each to be numeric, real, finite, and a matrix; their dimensions must match. Its documented input/output convention is equal-length row vectors.
+- `ax`, `ay`, `az`: components calculated from the coordinate derivatives, with the row-vector convention described above.

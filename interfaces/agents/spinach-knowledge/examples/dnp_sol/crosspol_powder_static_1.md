@@ -1,29 +1,17 @@
 # examples/dnp_sol/crosspol_powder_static_1.m
 
-- Signature: `crosspol_powder_static_1()`
+- MATLAB implementation: [examples/dnp_sol/crosspol_powder_static_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/crosspol_powder_static_1.m)
 
 ## Purpose
 
-E-15N cross-polarization experiment in the doubly rotating frame. Static powder simulation. Calculation time: seconds
+This no-argument example models a static-powder, doubly rotating-frame electron–`15N` cross-polarisation contact experiment. It computes and plots the nitrogen `S_x` expectation value over the contact pulse. The source estimates the calculation time as seconds.
 
-## Physical / mathematical content
+## Model and sequence
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The system contains `15N` and an electron (`sys.isotopes={'15N','E'}`), with `sys.magnet=9.394`, Zeeman scalars 0 and 2.0023193043622, coordinates `[0,0,0]` and `[0,0,10.05]`, and `temperature=298`. No coordinate units are given in the script. It uses the full `sphten-liouv` basis (`approximation='none'`) and does not assign a relaxation model in this example.
 
-## Numerical / algorithmic content
+The sequence has 100 intervals, each `1e-5` seconds, so the plotted time axis runs from zero to 1 ms with 101 samples. Both rows of `irr_powers` contain 100 values of `5e4`. The supplied irradiation operators are electron `Ly` and nitrogen `Lx`; the excitation operators are electron `Lx` and nitrogen `Ly`. The detection state is nitrogen `Lx`, `spins={'15N'}`, and the powder grid is `rep_2ang_6400pts_sph`. The script requests `needs={'iso_eq'}` and comments that this is “Good enough here”; that qualification belongs to this example's chosen equilibrium treatment.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Calculation and output
 
-## Implementation structure
-
-- E-15N cross-polarization experiment in the doubly rotating
-- frame. Static powder simulation.
-- Calculation time: seconds
-- System specification
-- Interactions
-- Basis set
-- Spinach housekeeping
-- Experiment parameters
-- Simulation
-- Time axis generation
-- Plotting
+Spinach's `powder` driver calls `@cp_contact_hard` in NMR mode: `powder(spin_system,@cp_contact_hard,parameters,'nmr')`. The returned local variable `fid` is plotted as `real(fid)` against cumulative contact time in seconds; the vertical axis is labelled as the nitrogen `S_x` expectation value. The function itself declares no output argument, so its result is the generated figure rather than a returned FID. Running the example requires Spinach and the `cp_contact_hard` callback.

@@ -1,41 +1,32 @@
 # kernel/conventions/transforms/frac2cart.m
 
-- Signature: `[XYZ,va,vb,vc]=frac2cart(a,b,c,alp,bet,gam,ABC)`
+**MATLAB source:** [kernel/conventions/transforms/frac2cart.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/frac2cart.m)
+**Spinach Wiki:** [frac2cart.m](https://spindynamics.org/wiki/index.php?title=frac2cart.m)
 
-## Purpose
+## Purpose and units
 
-Converts fractional crystallographic coordinates to Cartesian coordinates. Syntax: [XYZ,va,vb,vc]=frac2cart(a,b,c,alpha,beta,gamma,ABC)
+Converts rows of fractional crystallographic coordinates to Cartesian coordinate rows using the transformation matrix computed from the unit-cell lengths and angles. The source expects positive unit-cell lengths `a,b,c` and angles `alp,bet,gam` in degrees. Its guard checks that each length is a numeric real scalar and rejects values `<= 0`, but does not test finiteness (so a `NaN` value is not screened by that comparison). It does not specify a particular length unit: if the three lengths use a chosen unit, Cartesian coordinates and lattice vectors have that same unit.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+Signature: `[XYZ,va,vb,vc]=frac2cart(a,b,c,alp,bet,gam,ABC)`
 
-## Numerical / algorithmic content
+- `a,b,c`: numeric real scalars, each rejected if `<= 0`; no separate finite-value check is made.
+- `alp,bet,gam`: numeric real scalars in degrees.
+- `ABC`: numeric real `N x 3` array of fractional coordinates.
+- `XYZ`: `N x 3` Cartesian coordinate array.
+- `va,vb,vc`: three-column lattice vectors (each is `3 x 1`).
 
-## Parameters / inputs
+Validation does not require finite angles or coordinates and does not impose an angle range or a separate cell-geometry check; the values are used directly by the trigonometric formulas below.
 
-- a,b,c -three unit cell dimensions
-- alp,bet,gam -three unit cell angles, degrees
-- ABC -fractional atomic coordinates as
-- Nx3 array of numbers
+## Transformation
 
-## Outputs
+The source computes the scalar
 
-- XYZ -Cartesian atomic coordinates as
-- Nx3 array of numbers
-- va, vb, vc -primitive lattice vectors
+`v = a*b*c*sqrt(1-cosd(alp)^2-cosd(bet)^2-cosd(gam)^2+2*cosd(alp)*cosd(bet)*cosd(gam))`
 
-## Implementation structure
+and the matrix
 
-- Converts fractional crystallographic coordinates to Cartesian
-- coordinates. Syntax:
-- [XYZ,va,vb,vc]=frac2cart(a,b,c,alpha,beta,gamma,ABC)
-- a,b,c -three unit cell dimensions
-- alp,bet,gam -three unit cell angles, degrees
-- ABC -fractional atomic coordinates as
-- Nx3 array of numbers
-- XYZ -Cartesian atomic coordinates as
-- va, vb, vc -primitive lattice vectors
-- Check consistency
-- Compute the transformation matrix
-- Apply the transformation matrix
+`T = [a, b*cosd(gam), c*cosd(bet); 0, b*sind(gam), c*(cosd(alp)-cosd(bet)*cosd(gam))/sind(gam); 0, 0, v/(a*b*sind(gam))]`.
+
+For each input row, the implemented mapping is `XYZ = (T*ABC')'`, equivalently `ABC*T'`. The primitive vectors are the columns of `T`: `va=T(:,1)`, `vb=T(:,2)`, and `vc=T(:,3)`.

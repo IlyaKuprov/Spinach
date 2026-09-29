@@ -4,34 +4,28 @@
 
 ## Purpose
 
-Multiplies an RCV sparse matrix by a numeric scalar, in either operand order. Syntax: C=times(A,B)
+Scale one RCV sparse matrix by a numeric scalar, with the scalar in either operand position.
 
-## Physical / mathematical content
+## RCV representation
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+Here `rcv` means row-column-value: a sparse matrix stored as parallel `row`, `col`, and `val` vectors, with explicit `numRows` and `numCols` dimensions. The class declares the coordinate and dimension vectors as `int64` and values as `double`. This is coordinate-list matrix storage.
 
-## Numerical / algorithmic content
+Coordinates identify MATLAB matrix row and column positions. The `rcv` class folder defines no custom `subsref` overload; for ordinary element indexing, first convert with `sparse(A)`, then index the MATLAB sparse matrix. That conversion calls `sparse(A.row,A.col,A.val,A.numRows,A.numCols)`. Repeated row-column coordinates can remain as separate stored triplets; MATLAB's sparse constructor combines repeated coordinates by adding their values.
 
-## Parameters / inputs
+## Inputs
 
-- A,B -an RCV sparse matrix and a numeric
-- scalar, in either order
+- Exactly one of `A` and `B` is an `rcv` matrix; the other must be a numeric scalar.
 
-## Outputs
+## Output
 
-- C -RCV sparse matrix
+- `C` - the scaled `rcv` matrix.
 
-## Implementation structure
+## Implementation
 
-- Multiplies an RCV sparse matrix by a numeric scalar,
-- in either operand order. Syntax:
-- C=times(A,B)
-- A,B -an RCV sparse matrix and a numeric
-- scalar, in either order
-- C -RCV sparse matrix
-- Check consistency
-- RCV sparse by a scalar
-- Scalar by RCV sparse
-- Consistency enforcement
-- They say that the fish that gets away
-- looks bigger than it really is.
+After validating the operand types and scalar size, the overload multiplies each stored `val` by the scalar and returns the RCV operand. The coordinate vectors `row` and `col` and the explicit dimensions `numRows` and `numCols` are unchanged. Repeated coordinates are scaled independently in storage; later conversion to MATLAB sparse form sums duplicate coordinates. This is scalar scaling, not elementwise multiplication of two matrices or matrix multiplication. For the distinct `mtimes` operation with two RCV operands, the implementation checks `A.numCols == B.numRows`, converts both operands to MATLAB sparse matrices, and returns their MATLAB sparse product, with shape `A.numRows`-by-`B.numCols`.
+
+## Sources
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/times.m)
+- [RCV `mtimes` source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/mtimes.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/times.m)

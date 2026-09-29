@@ -1,33 +1,21 @@
 # examples/nmr_solids/mas_powder_trp_gridfree.m
 
+- MATLAB implementation: [examples/nmr_solids/mas_powder_trp_gridfree.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_trp_gridfree.m)
+
+Source: [examples/nmr_solids/mas_powder_trp_gridfree.m](../../../../../examples/nmr_solids/mas_powder_trp_gridfree.m)
+
 - Signature: `mas_powder_trp_gridfree()`
 
-## Purpose
+## Model and data
 
-13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. Isotro- pic chemical shifts come from the experimental data. Coordinates and CSAs are estimated with DFT. A polyadic representation of the evolution generator is used, further particulars here: Calculation time: hours on a Tesla V100 GPU, much longer on CPU
+This example calculates the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling. It imports tryptophan data from `trp_xray.out`, mapping C and N to `13C` and `15N`, and sets 9.4 T. The source describes the coordinates as X-ray data, chemical-shift anisotropies as DFT estimates, and isotropic shifts as experimental inputs. These assigned shifts are model inputs, not calculated peak positions.
 
-## Physical / mathematical content
+For the two unit-cell molecules, the first eight indexed shift values are 124.2, 110.1, 114.7, 118.0, 119.3, 107.5, 134.9, and 125.0 ppm. The final three are 26.8, 54.6, and 174.4 ppm for the first molecule, and 28.0, 52.1, and 173.3 ppm for the second. The source cites [the paper at DOI 10.1126/sciadv.aaw8962](https://doi.org/10.1126/sciadv.aaw8962) for further particulars on the polyadic representation.
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+## Grid-free Fokker-Planck calculation
 
-## Numerical / algorithmic content
+The basis uses `sphten-liouv`, `IK-0`, longitudinal `15N`, projection +1, and interaction level 3. The rotor rate is 14 kHz about axis vector `[1 1 1]`; rank 11 is used without a named orientation-grid parameter. The first system enables `greedy` and `polyadic`; the second adds `gpu`. Each conformation is propagated by `gridfree` in NMR mode with the `nmr` assumption, and its FID is added to the first. Acquisition is on `13C` with `L+` initial and receiver states, 100 kHz sweep, 2048 points, 8192-point zero filling, and zero offset; the display axis is ppm and inverted.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Spectrum processing
 
-## Implementation structure
-
-- 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H),
-- computed using the grid-free Fokker-Planck MAS formalism. Isotro-
-- pic chemical shifts come from the experimental data. Coordinates
-- and CSAs are estimated with DFT. A polyadic representation of the
-- evolution generator is used, further particulars here:
-- Calculation time: hours on a Tesla V100 GPU,
-- much longer on CPU
-- % First molecule in the unit cell
-- Spin system properties (DFT calculation)
-- Magnet field
-- First conformation
-- Basis set
+The summed FID is exponentially apodised with parameter 6 and Fourier transformed. The plotted trace is the real part of the calculated spectrum.

@@ -4,33 +4,27 @@
 
 ## Purpose
 
-The transpose of an RCV sparse matrix. Syntax: A=transpose(A)
+Return the non-conjugating transpose of an RCV sparse matrix.
 
-## Physical / mathematical content
+## RCV representation
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+Here `rcv` means row-column-value: a sparse matrix stored as parallel `row`, `col`, and `val` vectors, with explicit `numRows` and `numCols` dimensions. The class declares the coordinate and dimension vectors as `int64` and values as `double`. This is coordinate-list matrix storage.
 
-## Numerical / algorithmic content
+Coordinates identify MATLAB matrix row and column positions. The `rcv` class folder defines no custom `subsref` overload; for ordinary element indexing, first convert with `sparse(A)`, then index the MATLAB sparse matrix. That conversion calls `sparse(A.row,A.col,A.val,A.numRows,A.numCols)`. Repeated row-column coordinates can remain as separate stored triplets; MATLAB's sparse constructor combines repeated coordinates by adding their values.
 
-## Parameters / inputs
+## Input
 
-- A -an RCV sparse matrix
+- `A` - an `rcv` sparse matrix.
 
-## Outputs
+## Output
 
-- A -transposed RCV matrix
+- `A` - the transposed RCV matrix.
 
-## Implementation structure
+## Implementation
 
-- The transpose of an RCV sparse matrix. Syntax:
-- A=transpose(A)
-- A -an RCV sparse matrix
-- A -transposed RCV matrix
-- Check consistency
-- Efficiently swap rows and columns
-- Update row and column dimension information
-- Consistency enforcement
-- Я Шойгу. Значит, объясняю. Если вы такой хороший хозяин, что у вас
-- котёнок умудрился свалиться в мусоропровод, то, во-первых, не надо
-- прыгать и вопить "Барсик, милый, сука, держись!" Потому что держаться там
-- не за что. Не надо пытаться пробить мусоропровод кувалдой, глухой
+After checking the input class, the overload swaps `row` with `col` and `numRows` with `numCols`. It leaves `val` unchanged, so an entry at `(i,j)` becomes an entry at `(j,i)`, and an `m`-by-`n` matrix becomes `n`-by-`m`. This is `transpose`, not conjugate transpose; use the separate `ctranspose` overload when conjugation is intended. Duplicate coordinates remain duplicated, with coordinates swapped in each triplet.
+
+## Sources
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/transpose.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/transpose.m)

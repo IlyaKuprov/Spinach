@@ -1,68 +1,23 @@
 # experiments/esr_dipolar/deer_3p_hard_deer.m
 
+- MATLAB implementation: [experiments/esr_dipolar/deer_3p_hard_deer.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_hard_deer.m)
+
 - Signature: `deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and sequence
 
-Three-pulse DEER pulse sequence. Idealized hard pulses are used, each pulse only affects its specific electron or transition, de- pending on the pulse operators supplied. Syntax: deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)
+This implementation returns a three-pulse DEER trace: the pump pulse perturbs the probe-spin evolution, and the probe-coil signal is the measured trace. The probe excitation starts with a `pi/2` pulse; after the first evolution interval the pump operator applies a `pi` pulse, evolution is refocused across the corresponding interval, and a final probe `pi` pulse precedes the detection evolution. Each interval is represented by `parameters.stepsize` and `parameters.nsteps`. The function implements this three-pulse timing only; it does not describe a four-pulse DEER sequence.
 
-## Physical / mathematical content
+## Inputs and pulse operators
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+`H`, `R`, and `K` must be same-sized matrices and form `H + 1i*R + 1i*K`. The parameter structure requires `rho0` (initial state), `coil_prob` (probe detection state), `stepsize` (time increment), `nsteps` (positive integer interval length), `ex_prob` and `ex_pump` (caller-supplied probe and pump excitation operators), and `output` set to `'brief'` or `'detailed'`. The pulse operators determine which spin or transition is affected; the routine does not construct the dipolar coupling, which must be represented in the supplied Hamiltonian if required by the model. The source does not state a unit for `stepsize`.
 
-## Numerical / algorithmic content
+Hard pulses are appropriate only for spin-1/2 systems in the source's stated contract; higher-spin cases require transition-selective pulse operators. The function does not build those operators from spin labels.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Output modes and detection
 
-## Parameters / inputs
+Both modes return a structure containing `deer_trace`, the probe-coil-detected trace. The trace is normalised by the coil norm; the Hilbert-space branch evaluates a trace against `coil_prob`, while the other branch uses the coil projection directly.
 
-- parameters.rho0 initial state
-- parameters.coil_prob detection state on probe spin
-- parameters.stepsize increment time for the pump pulse
-- sandwich
-- parameters.nsteps number of steps for the pump pulse
-- sandwich
-- parameters.ex_prob excitation operators to be used for
-- parameters.ex_pump the probe and pump electron respec-
-- tively.
-- parameters.output 'brief' returns just the DEER trace,
-- 'detailed' also returns excitation
-- profiles and the EPR spectrum.
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- If 'detailed' is selected as the output option, the following pa-
-- rameters are also required:
-- parameters.ex_hard hard pulse excitation operator
-- parameters.spectrum_sweep sweep width of the EPR spectrum, Hz
-- parameters.spectrum_nsteps number of time steps in the FID
-- parameters.coil_pump detection state on pump spin
+For `output='detailed'`, also provide `ex_hard`, `spectrum_sweep` (EPR sweep width in Hz), `spectrum_nsteps` (FID sample count), and `coil_pump`. The structure then additionally contains `hard_pulse_fid`, `prob_pulse_fid`, and `pump_pulse_fid`, the FIDs after the corresponding nonselective, probe-selective, and pump-selective `pi/2` pulses. Their sampling interval is `1/spectrum_sweep`.
 
-## Outputs
-
-- deer.hard_pulse_fid -('detailed') free induction decay
-- after a non-selective ideal pulse
-- deer.prob_pulse_fid -('detailed') free induction decay
-- after just the the probe pulse
-- deer.pump_pulse_fid -('detailed') free induction decay
-- after just the pump pulse
-- deer.deer_trace -DEER signal
-- Note: hard pulses are only appropriate for spin-1/2 systems; for
-- higher spin systems transition selective pulse operators
-- must be supplied.
-
-## Implementation structure
-
-- Three-pulse DEER pulse sequence. Idealized hard pulses are used,
-- each pulse only affects its specific electron or transition, de-
-- pending on the pulse operators supplied. Syntax:
-- deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)
-- parameters.rho0 initial state
-- parameters.coil_prob detection state on probe spin
-- parameters.stepsize increment time for the pump pulse
-- sandwich
-- parameters.nsteps number of steps for the pump pulse
-- parameters.ex_prob excitation operators to be used for
-- parameters.ex_pump the probe and pump electron respec-
-- tively.
+[Source page](https://spindynamics.org/wiki/index.php?title=deer_3p_hard_deer.m)

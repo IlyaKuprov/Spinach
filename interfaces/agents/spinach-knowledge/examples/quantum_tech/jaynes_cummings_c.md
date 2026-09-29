@@ -1,31 +1,20 @@
 # examples/quantum_tech/jaynes_cummings_c.m
 
 - Signature: `jaynes_cummings_c()`
+- Source: [`examples/quantum_tech/jaynes_cummings_c.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/jaynes_cummings_c.m)
 
 ## Purpose
 
-An exchange-coupled two-electron system with the electrons having independent Jaynes-Cummings couplings to the same mode of an electromagnetic cavity. A time-domain simulati- on starting with transverse spin magnetisation and empty cavity mode. Detected on the Lx operator of the spin and magnetic field operator of the cavity mode. Calculation time: seconds
+A time-domain two-electron, one-cavity calculation: each electron has a Jaynes–Cummings-type exchange with the shared mode, and the electrons also have a direct scalar exchange coupling. The source propagates initial transverse spin coherence with the cavity empty and plots the summed spin signal and a cavity-field quadrature.
 
-## Physical / mathematical content
+## Physical model and spin selection
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The physics is Jaynes-Cummings-like cavity QED: a two-level or few-level matter degree of freedom exchanges excitations with a quantised harmonic mode through rotating terms such as a†σ_- + aσ_+.
+The declared system is `sys.isotopes={'E','E','C5'}` at `sys.magnet=0.33` T. Here `E` is Spinach's generic electron-spin isotope, while `C5` is a five-level cavity oscillator. The electron–electron scalar coupling is `5e6` Hz. The cavity frequency is set from the electron resonance expression `-sys.magnet*spin('E')/(2*pi)`; its two unequal spin–cavity exchange values are `2.828e6` and `2.728e6` Hz. Thus this is a shared-mode two-emitter Jaynes–Cummings extension (Tavis–Cummings-like), with unequal couplings and an additional direct spin exchange, rather than the uncoupled ideal Tavis–Cummings limit.
 
-## Numerical / algorithmic content
+The source uses the `sphten-liouv` formalism with no basis approximation and calls `device(...,'cavity')`. It selects `parameters.spins={'E'}`, with offset `5e6` Hz, sweep `1e8` Hz, and `251` points. This selects modeled electron-spin transitions; no named defect, defect-specific nuclear isotope, hyperfine interaction, anisotropic g tensor, powder/orientation average, or measured EPR spectrum is specified.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Initial state and plotted observables
 
-## Implementation structure
+The initial state is the sum of the two electrons' `Lx` coherences, each paired with cavity state `BL1` (the empty-mode level). Detection adds the two electron `Lx` operators and separately projects the cavity onto `(C-A)/2i`. The source plots the real parts against a `251`-sample time axis from 0 to 2.5 μs.
 
-- An exchange-coupled two-electron system with the electrons
-- having independent Jaynes-Cummings couplings to the same
-- mode of an electromagnetic cavity. A time-domain simulati-
-- on starting with transverse spin magnetisation and empty
-- cavity mode. Detected on the Lx operator of the spin and
-- magnetic field operator of the cavity mode.
-- Calculation time: seconds
-- Magnet field
-- System
-- Exchange coupling between the electrons
-- Cavity resonant with the electrons
-- Basis set
+These curves are simulated spin-coherence and cavity-quadrature trajectories for the declared coupled model. The source sets no independent drive-amplitude parameter, cavity linewidth, or relaxation term; its cavity-device context comes through `device(...,'cavity')` and the listed sequence parameters. The plot is not a measured spectrum or device-fidelity assessment, and no quantitative vacuum-Rabi splitting is asserted here.

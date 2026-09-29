@@ -1,31 +1,16 @@
 # examples/relaxation_theory/dd_relaxation_2.m
 
-- Signature: `dd_relaxation_2()`
+- MATLAB implementation: [examples/relaxation_theory/dd_relaxation_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/dd_relaxation_2.m)
+
+- Signature: `dd_relaxation_2()`.
+- Returns: no MATLAB output arguments; prints the relaxation superoperator in full (dense) form.
 
 ## Purpose
 
-Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with dipolar coupling between spins. The dipolar couplings are computed from Cartesian coordinates of the spins. The result should not depend on the choice of the rotation angles below. Calculation time: seconds
+Build and display a complete Bloch–Redfield–Wangsness relaxation superoperator for three dipole-coupled spins. The dipolar couplings are derived from Cartesian coordinates. The source comment states that the result should be independent of the coordinate rotation; the script constructs one rotated geometry but does not itself compare multiple rotations or assert that invariance.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The example uses three `1H` spins, `sys.magnet=14.1`, and Zeeman scalar entries `{1.0,2.0,3.0}`. It rotates three fixed coordinate rows by `euler2dcm([pi/3 pi/4 pi/5])`; the coordinates are multiplied by the resulting matrix, and their units are not specified in this file. Relaxation is Redfield with `inter.equilibrium='zero'`, `inter.rlx_keep='labframe'`, one correlation-time entry `1e-9`, and integration tolerance `sys.tols.rlx_integration=1e-5`. It builds an untruncated `sphten-liouv` basis, creates the spin system, then evaluates `relaxation(spin_system)`; `full(...)` converts the result for display with `disp`.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Complete Bloch-Redfield-Wangsness relaxation superoperator in a system
-- with dipolar coupling between spins. The dipolar couplings are computed
-- from Cartesian coordinates of the spins. The result should not depend
-- on the choice of the rotation angles below.
-- Calculation time: seconds
-- System specification
-- Randomly rotated set of coordinates
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Relaxation superoperator
+The function takes no parameters, so changing the field, offsets, coordinates, relaxation settings, or basis requires editing the script. The header describes the run as taking seconds, but actual runtime depends on MATLAB and the host. The dense display is intended for this small three-spin example, not a scalable way to inspect large superoperators. No FID or spectrum is calculated.

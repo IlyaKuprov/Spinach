@@ -1,46 +1,14 @@
 # kernel/cache/bos_product_table.m
 
-- Signature: `[product_table_left,...`
+Enumerates the multiplication structure coefficients for the orthogonalised bosonic monomials produced by `boson_ortho(nlevels)`. The input `nlevels` is a positive integer number of bosonic ladder population levels.
 
-## Purpose
+For `nlevels` levels, the basis contains `nlevels^2` monomials and each output is an `nlevels^2`-by-`nlevels^2`-by-`nlevels^2` array. Indices `n`, `m`, and `k` range over that basis. The coefficients follow the source conventions:
 
-Structure coefficient tables for the associative envelopes of truncated Weyl algebras spanned by orthogonalised bosonic mo- nomials. Syntax: [product_table_left,... product_table_right]=bos_product_table(nlevels)
+- `product_table_left(n,m,k)` is the coefficient of `B{k}` in `B{n}*B{m}`.
+- `product_table_right(n,m,k)` is the coefficient of `B{k}` in `B{m}*B{n}`.
 
-## Physical / mathematical content
+The implementation evaluates these coefficients with `hdot` after scaling each monomial by its norm; for example, the left entry is `norms(n)*hdot(B{k}/norms(k),(B{n}/norms(n))*(B{m}/norms(m)))`. This left/right multiplicative-action convention is the one cited at Eq. 7.18 in the first edition of IK's book; the source notes that the book omits its normalisation.
 
-- Cache-management utilities. These files maintain Spinach temporary or persistent cache state used to avoid repeated expensive construction of large operators or metadata.
+The arrays are cached beside the function in `bos_product_table_<nlevels>.mat`. An existing file is loaded; otherwise the tables are built and saved as v7.3 when possible. A failed cache save warns that the Spinach directory appears write-protected but does not prevent returning the computed tables.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- nlevels -number of bosonic ladder population levels
-
-## Outputs
-
-- product_table_left
-- product_table_right -structure coefficients in
-- the following conventions:
-- B{n}*B{m}=...+product_table_left(n,m,k)*B{k}+...
-- B{m}*B{n}=...+product_table_right(n,m,k)*B{k}+...
-- corresponding to the expansion of the left and the right mul-
-- tiplicative action by B{n} on B{m} as given in Eq 7.18 of the
-- first edition of IK's book (normalisation is missing in the
-- book, that's a typo).
-- Note: these are expensive tables, a disk cache is created and
-- used automatically.
-
-## Implementation structure
-
-- Structure coefficient tables for the associative envelopes of
-- truncated Weyl algebras spanned by orthogonalised bosonic mo-
-- nomials. Syntax:
-- [product_table_left,...
-- product_table_right]=bos_product_table(nlevels)
-- nlevels -number of bosonic ladder population levels
-- product_table_left
-- product_table_right -structure coefficients in
-- the following conventions:
-- B{n}*B{m}=...+product_table_left(n,m,k)*B{k}+...
-- B{m}*B{n}=...+product_table_right(n,m,k)*B{k}+...
-- corresponding to the expansion of the left and the right mul-
+[MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cache/bos_product_table.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=bos_product_table.m)

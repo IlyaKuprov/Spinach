@@ -1,86 +1,25 @@
 # kernel/contexts/imaging.m
 
 - Signature: `answer=imaging(spin_system,pulse_sequence,parameters)`
+- Source: [kernel/contexts/imaging.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/imaging.m)
+- Wiki: [Imaging.m](https://spindynamics.org/wiki/index.php?title=Imaging.m)
 
-## Purpose
+## Contract
 
-Fokker-Planck imaging simulation context. Generates the Hamiltonian, the relaxation superoperator, the kinetics superoperator, the Fokker- Planck spatial dynamics generator (including diffusion and flow), gra- dient operators, and passes all of that to the pulse sequence, which should be supplied as a handle. Syntax: answer=imaging(spin_system,pulse_sequence,parameters)
+`imaging` builds spin Hamiltonian and kinetic operators, voxel-dependent relaxation, spatial gradient operators, and the spatial diffusion/flow generator. It passes `H`, `R`, `K`, `G`, and `F` to `pulse_sequence(spin_system,parameters,H,R,K,G,F)`; the context output is whatever that sequence returns. The context applies the `nmr` assumption and channel-frequency offsets.
 
-## Physical / mathematical content
+The spin-space dimension is `spn_dim=size(H,1)`; the spatial dimension is `spc_dim=prod(parameters.npts)`; the combined state-space dimension is their product. Spatial arrays are ordered as [X Y Z], while the direct-product factor order is Z, then Y, then X, then Spin. The corresponding vector is the column-wise vectorisation of a 3D [X Y Z] array with a spin-state component at each voxel. `parameters.spc_dim` and `parameters.spn_dim` are passed to the sequence.
 
-- Simulation-context constructors. These wrappers assemble Hamiltonians, Liouvillians, relaxation, kinetics, quadrature grids, and orientation/spatial machinery for a particular physical regime.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Grid, transport, and units
 
-## Numerical / algorithmic content
+`parameters.dims` gives box lengths in metres and `parameters.npts` gives point counts along the axes. The flow fields `u`, `v`, and `w` are X-, Y-, and Z-velocity components at each sample point, in m/s. For spatially uniform diffusion, `parameters.diff` is a diffusion coefficient or 3-by-3 tensor in m^2/s. For voxel-dependent diffusion, the source documents Cartesian tensor-component fields from `dxx` through `dzz`, specified at each voxel.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The documented derivative choices are `parameters.deriv={'fourier'}` for Fourier differentiation, or `parameters.deriv={'period',n}` for n-point central finite differences with periodic boundary conditions.
 
-## Parameters / inputs
+## Spin operators and phantoms
 
-- pulse_sequence -pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- parameters.u -X components of the velocity vectors
-- for each point in the sample, m/s
-- parameters.v -Y components of the velocity vectors
-- for each point in the sample, m/s
-- parameters.w -Z components of the velocity vectors
-- for each point in the sample, m/s
-- parameters.diff -diffusion coefficient or 3x3 tensor, m^2/s
-- for situations when this parameter is the
-- same in every voxel
-- parameters.dxx -Cartesian components of the diffusion
-- parameters.dxy tensor for each voxel of the sample
-- ...
-- parameters.dzz
-- parameters.dims -dimensions of the 3D box, meters
-- parameters.npts -number of points in each dimension
-- of the 3D box
-- parameters.deriv -{'fourier'} uses Fourier diffe-
-- rentiation matrices; {'period',n}
-- requests n-point central finite-
-- difference matrices with periodic
-- boundary conditions
-- Three types of phantoms must be specified. The relaxation theory phantom
-- contains relaxation superoperators and their coefficients in each voxel,
-- specified in the following way:
-- parameters.rlx_ph={Ph1,Ph2,...,PhN}
-- parameters.rlx_op={R1,R2,...,RN}
-- where PhN have the same dimension as the sample voxel grid and RN are re-
-- laxation superoperators. The initial condition phantom reflects the fact
-- that different voxels might start off in a different spin state. It must
-- be specified in the following way:
-- parameters.rho0_ph={Ph1,Ph2,...,PhN}
-- parameters.rho0_st={rho1,rho2,...,rhoN}
-- where PhN have the same dimension as the sample voxel grid and rhoN are
-- spin states obtained from state() function. The detection state phantom
-- reflects the fact that different voxels might be detected at different
-- angles and with different sensitivity. It must be specified in the follo-
-- wing way:
-- parameters.coil_ph={Ph1,Ph2,...,PhN}
-- parameters.coil_st={rho1,rho2,...,rhoN}
-- where PhN have the same dimension as the sample voxel grid and rhoN are
-- spin states obtained from state() function.
+The Hamiltonian and kinetics are shared across voxels. Relaxation is assembled from paired cell arrays `rlx_ph` and `rlx_op`: each `rlx_ph` entry is a spatial phantom with the same dimensions as the voxel grid, and the matching `rlx_op` entry is a spin relaxation superoperator. Initial states are assembled from `rho0_ph` and `rho0_st`; receiver/detection states are assembled from `coil_ph` and `coil_st`. Each phantom has the grid dimensions, and each paired state/operator is a spin-space object. The source requires the phantom and paired-state/operator lists to have matching lengths. A user-supplied `rho0` or `coil` can be used instead of building that object from phantoms.
 
-## Outputs
+## Example from the source documentation
 
-- This function returns whatever the pulse sequence returns.
-- Note: the direct product order is Z(x)Y(x)X(x)Spin, this cor-
-- responds to a column-wise vectorization of a 3D array
-- with dimensions ordered as [X Y Z].
-
-## Implementation structure
-
-- Fokker-Planck imaging simulation context. Generates the Hamiltonian,
-- the relaxation superoperator, the kinetics superoperator, the Fokker-
-- Planck spatial dynamics generator (including diffusion and flow), gra-
-- dient operators, and passes all of that to the pulse sequence, which
-- should be supplied as a handle. Syntax:
-- answer=imaging(spin_system,pulse_sequence,parameters)
-- pulse_sequence - pulse sequence function handle. See the
-- experiments directory for the list of
-- pulse sequences that ship with Spinach.
-- parameters.u -X components of the velocity vectors
-- for each point in the sample, m/s
-- parameters.v -Y components of the velocity vectors
+For example, choose `parameters.deriv={'fourier'}` or `parameters.deriv={'period',n}` according to the requested spatial derivative scheme; the source gives these selector forms but no complete numerical imaging setup.

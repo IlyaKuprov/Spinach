@@ -1,32 +1,18 @@
 # examples/relaxation_theory/trosy_proton.m
 
+- Source: [examples/relaxation_theory/trosy_proton.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_proton.m)
 - Signature: `trosy_proton()`
 
 ## Purpose
 
-Transverse relaxation rate as a function of the applied magnetic field at the C-H group in position 3 of the aromatic ring of tyrosine. Calculation time: minutes.
+Calculate transverse relaxation matrix elements versus field for the C–H group at position 3 of a tyrosine aromatic ring. The source estimates a runtime of minutes.
 
-## Physical / mathematical content
+## Model and relaxation pathway
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+This is a two-spin `1H`/`13C` model. The code parses `../standard_systems/amino_acids/tyr.log` as a 3-fluorotyrosine DFT calculation, maps carbon and hydrogen to `13C` and `1H` with conversion arguments `[186.38, 33.44]`, and takes the proton and carbon Zeeman matrices and coordinates from entries 10 and 5 of the converted DFT data, respectively. No unit for the imported tensor values or coordinates is stated in this source. Relaxation is explicitly set to Redfield, with lab-frame relaxation, zero equilibrium, and a 25 ns correlation time; the basis uses `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+At each field the code forms normalised proton and carbon raising-operator coherences, then their left/right combinations with two-spin terms (proton raising coherence paired with proton-plus-carbon-longitudinal coherence, and carbon raising coherence paired with carbon-plus-proton-longitudinal coherence). The opposite-sign branches compare the relaxation interference used in a TROSY-style analysis. The DFT shielding tensors and the C–H geometry supply the anisotropic-shielding and dipolar interaction information for the Redfield calculation; the source does not report separately resolved CSA–dipolar cross-correlation values. The script calls the Redfield model, not a stochastic-Liouville solver.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Calculation and output
 
-## Implementation structure
-
-- Transverse relaxation rate as a function of the applied magnetic field
-- at the C-H group in position 3 of the aromatic ring of tyrosine.
-- Calculation time: minutes.
-- Read 3-fluorotyrosine DFT calculation
-- Extract coordinates and CSAs
-- Relaxation theory
-- Basis set
-- Disable startup checks
-- Magnetic field grid
-- Loop over magnetic fields
-- Set the magnet field
-- Spinach housekeeping
+Twenty proton Larmor frequencies from 200 to 800 MHz are converted to fields using `2*pi*lin_freq*1e6/spin('1H')`. The script rebuilds the spin system and basis and evaluates the relaxation superoperator at each field. It plots the normalised proton and carbon operator matrix elements and their two opposite-sign branches in separate figures. The vertical axis is relaxation matrix element in Hz; the horizontal axis is proton Larmor frequency in MHz. There is no pulse sequence, time-domain acquisition, or measured spectrum in this example.

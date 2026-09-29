@@ -1,30 +1,17 @@
 # examples/fundamentals/convention_tests/rotations_2.m
 
+- MATLAB implementation: [examples/fundamentals/convention_tests/rotations_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/convention_tests/rotations_2.m)
+
 - Signature: `rotations_2()`
 
-## Purpose
+## Question tested
 
-A rotations test comparing the Hamiltonians for a manually rotated (at the interaction specification level) spin system with the Hamiltonian that has been rotated using Spinach operator rotation functionality.
+The test compares two ways to represent the same orientation in a two-spin Hamiltonian: leave the interaction tensors and coordinates in the input frame and apply Spinach's `orientation` operator to the Hamiltonian, or rotate the tensors and coordinates in the interaction input and evaluate at zero orientation.
 
-## Physical / mathematical content
+## Construction
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+It draws two shift matrices with `randn(3,3)` and a coupling matrix with `100*randn(3,3)`. The two spins are `1H` and `15N`; the magnet-field setting is `14.1`, the basis is `sphten-liouv` with approximation `none`, and the coordinates are `[0.7 0.8 0.9]` and `[1.5 2.5 3.5]`.
 
-## Numerical / algorithmic content
+For construction A, it forms the lab-frame Hamiltonian from these unrotated inputs and sets `H_A = H + orientation(Q,[1 2 3])`. For construction B, it sets `R=euler2dcm(1,2,3)`, replaces each interaction matrix `A` by `R*A*R'`, rotates each coordinate row `r` as `r*R'`, then forms the Hamiltonian with `orientation(Q,[0 0 0])`. The comparison is `norm(H_A-H_B,1)`; the code errors if the residual exceeds `1e-3` and otherwise reports the residual.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- A rotations test comparing the Hamiltonians for a manually rotated (at
-- the interaction specification level) spin system with the Hamiltonian
-- that has been rotated using Spinach operator rotation functionality.
-- Generate random matrices
-- % Kernel level rotation
-- Magnet field
-- Basis set
-- A pair of spins at a distance, A
-- Spinach housekeeping, A
-- Hamiltonian, A
-- % Input level rotation
-- A pair of spins at a distance, B
+The random matrices are not explicitly symmetrised in the source, so this is a convention-level comparison using generated matrices, not a validation of molecular interaction parameters. The source gives the numeric magnet-field setting but no unit annotation.

@@ -1,30 +1,15 @@
 # examples/imaging/diffusion_weighted_2d.m
 
-- Signature: `diffusion_weighted_2d()`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/diffusion_weighted_2d.m
 
-## Purpose
+## Experiment
 
-2D diffusion weighted image with an arbitrary geometric pattern serving as diffusion coefficient distribution. Simulation time: minutes, faster with a Tesla V100 GPU.
+Constructs a 2D phase-encoded diffusion-weighted image using a spatially varying geometric pattern as the diffusion-coefficient field. The source estimates minutes of runtime and notes a Tesla V100 may shorten it; GPU enablement is commented out, so this function does not request a GPU.
 
-## Physical / mathematical content
+## Spin and image model
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
+The model is a single 1H spin with `sys.magnet=5.9` and zero scalar Zeeman shift. The domain is configured as [0.30 0.25] with a [90 108] grid and third-order periodic derivatives; requested image size is [101 105]. The example loads pattern from ../../etc/phantoms/`pattern.mat`, sets `dxx=dyy=1e-3*pattern`, and sets the off-diagonal tensor components and both in-plane flow fields to zero. Initial magnetisation is `Lz`, detection is `L+`, and both spatial profiles are uniform. No relaxation phantom is provided.
 
-## Numerical / algorithmic content
+## Encoding and output
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- 2D diffusion weighted image with an arbitrary geometric
-- pattern serving as diffusion coefficient distribution.
-- Simulation time: minutes, faster with a Tesla V100 GPU.
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- This needs a GPU
-- sys.enable={'gpu'};
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Sample geometry
+The phase-encoded sequence is `phase_enc_2d`. Diffusion-gradient amplitudes are [1e-3 1e-3] T/m; readout and phase-encoding amplitudes are 4.3e-3 and 3.8e-3 T/m. The source sets their durations to 2e-3 and 1e-3, and the echo-time parameter to 1e-2; units for these durations are not annotated in this example. The resulting image is shown next to the loaded coefficient phantom. These are configured simulation parameters, not reported measured image values.

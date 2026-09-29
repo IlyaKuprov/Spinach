@@ -1,30 +1,14 @@
 # examples/quantum_tech/diamond_defects/diamond_gev0_epr_xw.m
 
+- Source: [diamond_gev0_epr_xw.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/diamond_defects/diamond_gev0_epr_xw.m)
 - Signature: `diamond_gev0_epr_xw()`
 
-## Purpose
+## Purpose and model
 
-Field-swept powder EPR spectra of GeV0 centre in diamond at X and W bands. Calculation time: seconds.
+Calculate field-swept powder EPR spectra for the neutral germanium-vacancy centre (GeV0) in diamond at X and W bands. The call to `diamond_gev0` sets `orientation='111'` and `germanium='none'`: the centre model retains its electron Zeeman and zero-field-splitting terms but does not add a germanium nuclear spin. The selected EPR signal is `parameters.spins={'E3'}`. Magnetic parameters for the builder are attributed to Nadolinny et al., *Phys. Status Solidi A* **213**, 2623 (2016), [doi:10.1002/pssa.201600211](https://doi.org/10.1002/pssa.201600211).
 
-## Physical / mathematical content
+The simulation uses a `zeeman-hilb` basis without approximation and powder grid `rep_2ang_100pts_sph`. Shared settings are `fwhm=1e-3`, `int_tol=1e-3`, `tm_tol=0.01`, `npoints=2048`, and `rspt_order=Inf`; the source assigns these values and does not describe them as fitted experimental parameters.
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+## Sweep sequence and output
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Field-swept powder EPR spectra of GeV0 centre
-- in diamond at X and W bands.
-- Calculation time: seconds.
-- Set GeV0 centre model parameters.
-- Build the spin system.
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- Set common EPR parameters
-- Set X-band parameters
-- Run the X-band simulation
-- Plot the X-band spectrum
+The model is swept at X band (9.5 GHz, `mw_freq=9.5e9`) over 0.05–0.45 T, then at W band (94 GHz, `mw_freq=94e9`) over 3.25–3.46 T. Each `fieldsweep` returns a spectrum and field axis; the plots use magnetic field in tesla and label intensity in arbitrary units. The outputs are calculated spectra, not recorded GeV0 measurements. The MATLAB source estimates seconds of calculation time; that estimate was not timed for this note.

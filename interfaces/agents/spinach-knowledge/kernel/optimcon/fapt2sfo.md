@@ -1,46 +1,19 @@
 # kernel/optimcon/fapt2sfo.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/fapt2sfo.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=fapt2sfo.m)
+
 - Signature: `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)`
 
-## Purpose
+## Purpose and units
 
-Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin waveform that is compatible with GRAPE optimisations. Syntax: [wave,dt,time_grid]=fapt2sfo(fapt,time_grid)
+Converts frequency-amplitude-phase-time pulse events to a two-row single-frequency-origin waveform for GRAPE. Each `fapt` cell contains a real five-element vector `[frequency, amplitude, phase, start_time, end_time]`: Hz, rad/s, radians, seconds, seconds. Amplitude must be nonnegative and end time must be strictly greater than start time. Events are active at grid ticks satisfying `start_time <= t <= end_time`; overlapping events add.
 
-## Physical / mathematical content
+For an event at frequency `f`, amplitude `a`, and phase `phi`, the X and Y rows accumulate `a*cos(2*pi*f*t+phi)` and `a*sin(2*pi*f*t+phi)` respectively. This is the documented anticlockwise rotation convention. With a drift offset `2*pi*f*Lz`, an event at `f` is on resonance; reversing the Y sign gives the opposite sense and an offset of `2*f` for nonzero `f`. At `f=0`, the sign change reflects the nutation axis to `-phi`.
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+## Time grid and outputs
 
-## Numerical / algorithmic content
+If `time_grid` is omitted, the function spans from 0 to the latest event end time. It chooses `dt_hN = 1/(4*max(abs(frequency)))`, sets `npts = ceil(end_time/dt_hN)+1`, and uses `linspace` to make the grid; the returned `dt` is the second grid tick. If every event frequency is zero, an explicit grid is required. If supplied, `time_grid` is checked to be a real numeric row vector and `dt` is empty.
 
-## Parameters / inputs
-
-- fapt -a cell array of 5-element row vectors with of
-- the following structure: [frequency (Hz), amp-
-- litude (rad/s), phase at t=0 (radians), start
-- time (seconds), end time (seconds)]
-- time_grid -optional vector of time grid ticks; when
-- not provided, the grid is made at twice
-- the Nyquist-Shannon minimum sampling ra-
-- te of the highest frequency present
-- Output:
-- wave -pulse sequence as a single waveform, a matrix
-- with two rows, corresponding to X and Y compo-
-- nents
-- dt -step duration of the time grid, seconds
-- time_grid -row vector of time grid ticks
-
-## Implementation structure
-
-- Converts a freq-ampl-phase-time specification of a pulse sequ-
-- uence into the corresponding single frequency origin waveform
-- that is compatible with GRAPE optimisations. Syntax:
-- [wave,dt,time_grid]=fapt2sfo(fapt,time_grid)
-- fapt -a cell array of 5-element row vectors with of
-- the following structure: [frequency (Hz), amp-
-- litude (rad/s), phase at t=0 (radians), start
-- time (seconds), end time (seconds)]
-- time_grid -optional vector of time grid ticks; when
-- not provided, the grid is made at twice
-- the Nyquist-Shannon minimum sampling ra-
-- te of the highest frequency present
+- `wave`: `2 x numel(time_grid)` array, with X then Y components, in rad/s.
+- `dt`: generated-grid step in seconds, or empty when the grid was supplied.
+- `time_grid`: row vector of sample times in seconds.

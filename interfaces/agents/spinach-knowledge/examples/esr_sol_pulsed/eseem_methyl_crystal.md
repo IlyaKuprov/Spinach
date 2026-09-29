@@ -1,31 +1,22 @@
 # examples/esr_sol_pulsed/eseem_methyl_crystal.m
 
-- Signature: `eseem_methyl_crystal()`
+## Experiment and spin system
 
-## Purpose
+This example computes a two-pulse X-band electron-spin-echo envelope modulation (ESEEM) response for a methyl radical at one fixed crystal orientation. The example imports vacuum-DFT magnetic parameters from `examples/standard_systems/methyl.log` with `g2spinach`; the Gaussian log contains four atoms (the carbon framework and three hydrogens), and the import maps the electron to `E` and the proton nuclei to `1H`. The imported model therefore carries the electron Zeeman and electron–proton hyperfine interactions from that calculation; their tensors are not literal assignments in this script. The field is 0.33 T. No powder average is performed. Ideal hard pulses are assumed.
 
-Two-pulse X-band ESEEM spectrum of a methyl radical at a specific orien- tation relative to the lab frame. Magnetic parameters taken from a DFT calculation. Ideal pulses are assumed. Calculation time: seconds
+## Sequence and sampling
 
-## Physical / mathematical content
+The system is built in the `sphten-liouv` formalism with no basis approximation. The initial state is electron `Lz`, the receiver coil is electron `L+`, the screen is electron `L-`, and the pulse operator is electron `Ly`. `crystal` calls the shared `eseem` sequence in the `esr` context at orientation `[pi/5 pi/4 pi/3]` (radians). The helper applies an ideal π/2 pulse, evolves for an interpulse interval, applies an ideal π pulse, evolves for the refocused interval, and projects onto the receiver.
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example requests 512 points, `timestep = 1e-8` s, and zero-fills to 4096 points. In the ESEEM helper each of the two evolution periods advances by `timestep/2` per sample, so the interpulse-delay increment is 5 ns and the full echo-time increment is 10 ns. The sequence is a single-orientation calculation at a fixed field and orientation, not a parameter sweep.
 
-## Numerical / algorithmic content
+## Signal and displayed spectrum
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The upper panel plots the real FID against sample index times `timestep`, labelled in microseconds. For the spectral panel the script subtracts the FID mean, applies Kaiser apodisation with parameter 6, computes a 4096-point FFT, applies `fftshift`, and plots its magnitude. Its frequency axis is constructed directly as `linspace(-1/timestep,1/timestep,zerofill)*1e-6` and labelled in MHz; this is the axis expression used by the example. The script plots the panels but contains no explicit data-file or figure-export call.
 
-## Implementation structure
+## Source links
 
-- Two-pulse X-band ESEEM spectrum of a methyl radical at a specific orien-
-- tation relative to the lab frame. Magnetic parameters taken from a DFT
-- calculation. Ideal pulses are assumed.
-- Calculation time: seconds
-- System properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Plot the time domain signal
-- Crude apodization
+- [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/eseem_methyl_crystal.m)
+- [Imported methyl DFT log](https://github.com/IlyaKuprov/Spinach/blob/main/examples/standard_systems/methyl.log)
+- [ESEEM sequence helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
+- [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)

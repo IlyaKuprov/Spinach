@@ -2,38 +2,22 @@
 
 - Signature: `C=plus(A,B)`
 
-## Purpose
+## Operation and storage
 
-Adds things to RCV sparse matrices. Syntax: C=plus(A,B)
+An RCV object stores column-vector coordinates `row` and `col` as `int64`, values in `val` as `double`, dimensions `numRows` and `numCols` as `int64`, and an `isGPU` flag. For two RCV matrices of equal size, the method implements `A+B` by concatenating their `row`, `col`, and `val` vectors; it does not merge equal coordinates in this method. If either operand is marked GPU-resident, both operands are converted to GPU arrays before concatenation. The output remains RCV and has the common input dimensions. This is an eager construction of the coordinate/value arrays, not a lazy sum operator.
 
-## Physical / mathematical content
+An RCV matrix may also be added to a MATLAB sparse matrix of the same dimensions. The overload checks the sizes, converts the sparse operand to RCV, and recursively uses the RCV-plus-RCV branch. Numeric scalar addition is explicitly rejected: a scalar would make the represented matrix non-sparse. No scalar broadcasting is provided. The implementation adds values directly and does not conjugate them.
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+## Input checks
 
-## Numerical / algorithmic content
+At least one operand must be RCV. The other operand must be RCV, MATLAB sparse, or a numeric scalar; the scalar cases then raise the explicit scalar-addition error. Two RCV operands and mixed RCV/sparse operands must have matching row and column dimensions. Other combinations fail the consistency check.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs and output
 
-## Parameters / inputs
+- `A`, `B`: equal-sized RCV matrices, or an RCV and a same-sized MATLAB sparse matrix.
+- `C`: RCV sum with the common input dimensions.
 
-- A -left operand
-- B -right operand
+## Source and Wiki
 
-## Outputs
-
-- C -sum A+B, RCV sparse matrix
-
-## Implementation structure
-
-- Adds things to RCV sparse matrices. Syntax:
-- C=plus(A,B)
-- A -left operand
-- B -right operand
-- C -sum A+B, RCV sparse matrix
-- Check consistency
-- Process the special cases
-- Explain the refusal to add a scalar to an RCV object
-- Add a scalar to an RCV sparse matrix
-- Add two RCV sparse matrices
-- Check for dimension match
-- Align locations
+- [Source: kernel/overloads/@rcv/plus.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/plus.m)
+- [Spinach Wiki: rcv/plus.m](https://spindynamics.org/wiki/index.php?title=rcv/plus.m)

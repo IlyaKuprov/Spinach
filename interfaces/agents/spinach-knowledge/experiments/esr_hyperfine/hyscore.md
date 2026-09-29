@@ -1,50 +1,24 @@
 # experiments/esr_hyperfine/hyscore.m
 
-- Signature: `fid=hyscore(spin_system,parameters,H,R,K)`
+- MATLAB implementation: [experiments/esr_hyperfine/hyscore.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_hyperfine/hyscore.m)
 
-## Purpose
+Source: https://spindynamics.org/wiki/index.php?title=hyscore.m
 
-HYSCORE experiment, implemented as described in Szosenfogel and Goldfarb (http://dx.doi.org/10.1080/00268979809483260). Syntax: fid=hyscore(spin_system,parameters,H,R,K)
+Signature: fid=hyscore(spin_system,parameters,H,R,K).
 
-## Physical / mathematical content
+This simulates a HYSCORE (hyperfine sublevel correlation) electron-spin-echo modulation experiment. It probes electron-nuclear couplings through two time dimensions of the echo modulation; the output is a free-induction decay, not a measured spectrum. The source attributes the implementation to Szosenfogel and Goldfarb, DOI https://doi.org/10.1080/00268979809483260.
 
-- Hyperfine ESR experiment implementations. These sequences probe coupled electron-nuclear dynamics through ENDOR or HYSCORE-type manipulations of coherence pathways.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The routine forms the Liouvillian L=H+1i*R+1i*K and electron Lx from the E raising/lowering operators. It applies an ideal x-axis pi/2 pulse, evolves for tau, applies another pi/2 pulse, and filters to zero electron coherence ({'E',0}) to select the relevant nuclear-modulation pathways. It records the indirect evolution trajectory, applies the third ideal electron pi pulse, propagates the detection state backward through tau, applies the corresponding backward pi/2 rotation, and records the direct-dimension observable trajectory.
 
-## Numerical / algorithmic content
+Required inputs:
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- parameters.nsteps: two positive integer counts, [n1 n2], for the indirect and direct time dimensions.
+- parameters.sweep: scalar sweep width in Hz. The source uses 1/sweep as the time increment in each dimension.
+- parameters.tau: echo delay in seconds.
+- parameters.rho0: initial state vector.
+- parameters.coil: detection state vector.
+- H, R, and K: same-size matrices defining Hamiltonian, relaxation, and kinetics contributions; the routine checks their matrix dimensions against one another and the states.
 
-## Parameters / inputs
+Return value: fid is the two-dimensional time-domain free-induction decay indexed by the two nsteps dimensions, with increments 1/sweep seconds. Fourier-transforming this array gives the HYSCORE spectrum; the transform is not performed by this routine.
 
-- parameters.nsteps number of points to be computed
-- in each dimension
-- parameters.sweep sweep width, Hz
-- parameters.tau tau delay, seconds
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid -two-dimensional free induction decay that Fourier
-- transforms into a HYSCORE spectrum
-- Note: the sequence uses ideal pulses, replace with shaped_pulse_af()
-- to have soft pulses instead.
-
-## Implementation structure
-
-- HYSCORE experiment, implemented as described in Szosenfogel and
-- Goldfarb (http://dx.doi.org/10.1080/00268979809483260). Syntax:
-- fid=hyscore(spin_system,parameters,H,R,K)
-- parameters.nsteps number of points to be computed
-- in each dimension
-- parameters.sweep sweep width, Hz
-- parameters.tau tau delay, seconds
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+Limit: all three electron pulses are ideal hard rotations. The source explicitly recommends replacing them with shaped_pulse_af() when soft pulses are required. No numerical defaults for tau, sweep, or nsteps are specified in the source.

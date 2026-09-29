@@ -1,54 +1,18 @@
 # experiments/nmr_solids/pdsd.m
 
-- Signature: `fid=pdsd(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/pdsd.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=pdsd.m)
 
-## Purpose
+## Purpose and inputs
 
-A simplified model of the PDSD experiment using NOESY type quadrature detection and phase cycle. To be cal- led from the singlerot context. Syntax: fid=pdsd(spin_system,parameters,H,R,K)
+A simplified model of the PDSD experiment with NOESY-type quadrature detection and a four-step phase cycle, called from the `singlerot` context. Signature: `fid=pdsd(spin_system,parameters,H,R,K)`. `H`, `R`, and `K` are square numeric matrices of equal size.
 
-## Physical / mathematical content
+- `parameters.sweep` is a positive real sweep width in Hz; the indirect and direct dwell is `1/sweep`.
+- `parameters.npoints` is a two-element vector of positive integers for indirect and direct samples.
+- `parameters.tmix` is a non-negative mixing duration in seconds.
+- `parameters.rate` is a real scalar in Hz, used as the amplitude of the proton irradiation term during mixing; `spc_dim` is a positive integer MAS spatial dimension.
 
-- Solid-state pulse sequence implementations. The core ingredients are anisotropic Hamiltonians, rotor synchronisation, cross-polarisation, recoupling/decoupling, and powder or rotor-stack propagation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+## Sequence outline
 
-## Numerical / algorithmic content
+The operators and states are hard-coded for `13C` and `1H`: the initial state is a spatially averaged `13C` `Ly` state, detection uses spatially averaged `13C` `L+`, and proton decoupling is requested for the indirect and direct evolution. For each of four phase-cycle pathways, the code evolves the indirect trajectory under the decoupled generator, applies one of the listed transverse `13C` rotations, evolves for `tmix` under `L+2*pi*rate*Hx` (`Hx` is the `1H` `Lx` control), then applies the pathway’s third rotation. It decouples `1H` again for detection evolution and subtracts paired pathway signals.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- spin_system -Spinach spin system object
-- parameters.sweep -sweep width in Hz
-- parameters.npoints -two-element vector giving the
-- number of complex points in the
-- indirect and direct dimensions
-- parameters.tmix -mixing time in seconds
-- parameters.rate -MAS rate in Hz, used to set
-- proton irradiation power
-- parameters.spc_dim -spatial dimension of the MAS
-- problem, received from the
-- context function
-- H, R, K -Hamiltonian, relaxation, and
-- kinetics superoperators, recei-
-- ved from the context function
-
-## Outputs
-
-- fid.cos, fid.sin -States quadrature components
-- of the 2D PDSD spectrum
-
-## Implementation structure
-
-- A simplified model of the PDSD experiment using NOESY
-- type quadrature detection and phase cycle. To be cal-
-- led from the singlerot context. Syntax:
-- fid=pdsd(spin_system,parameters,H,R,K)
-- spin_system -Spinach spin system object
-- parameters.sweep -sweep width in Hz
-- parameters.npoints -two-element vector giving the
-- number of complex points in the
-- indirect and direct dimensions
-- parameters.tmix -mixing time in seconds
-- parameters.rate -MAS rate in Hz, used to set
-- proton irradiation power
+The outputs `fid.cos=fids{1}-fids{3}` and `fid.sin=fids{2}-fids{4}` are 2D quadrature components, sampled with `npoints(1)` indirect and `npoints(2)` direct points. This source initialises directly on `13C`; it contains no CP-transfer block. It is a simplified sequence model, not a runtime or experimental-validation claim.

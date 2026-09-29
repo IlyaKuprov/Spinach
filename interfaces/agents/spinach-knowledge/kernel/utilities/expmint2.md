@@ -1,37 +1,45 @@
 # kernel/utilities/expmint2.m
 
-- Signature: `I=expmint2(spin_system,A,B,C,D,E,T)`
-
 ## Purpose
 
-Computes the nested matrix exponential double integral: Integrate[expm(-i*A*(T-t))*B* Integrate[expm(-i*C*(t-x))*D*expm(-i*E*x),{x,0,t}],{t,0,T}] This corresponds to the (1,3) block of the exponential of the auxiliary matrix (http://dx.doi.org/10.1109/TAC.1978.1101743). Syntax: I=expmint2(spin_system,A,B,C,D,E,T)
+`expmint2` computes the nested matrix exponential double integral
 
-## Physical / mathematical content
+`Integrate[expm(-i*A*(T-t))*B*Integrate[expm(-i*C*(t-x))*D*expm(-i*E*x),{x,0,t}],{t,0,T}]`
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+as documented in the function header. The result corresponds to the (1,3) block of the exponential of an auxiliary block matrix, following the method of Van Loan (http://dx.doi.org/10.1109/TAC.1978.1101743).
 
-## Numerical / algorithmic content
+## Behaviour
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Syntax: `I=expmint2(spin_system,A,B,C,D,E,T)`.
+- The function first runs an internal consistency check (`grumble`) on all arguments.
+- A zero filler block `Z` is created as a sparse matrix with the dimensions of `A`.
+- The auxiliary matrix is assembled as a 3-by-3 block matrix:
 
-## Parameters / inputs
+  `auxmat = [A  -1i*B,     Z; Z      C  -1i*D; Z      Z      E]`
 
-- A,B,C,D,E -square matrices
-- T -upper limit of the outer integral
-- Output:
-- I -the integral as above
+- The auxiliary matrix is exponentiated over the interval `T` using `propagator(spin_system,auxmat,T)`.
+- Block extractors `BE1=[speye(size(A))  Z  Z]` and `BE3=[Z; Z; speye(size(A))]` are built, and the integral is extracted as `I=BE1*P*BE3`, i.e. the (1,3) block of the propagated auxiliary matrix.
+- Consistency enforcement (`grumble`) requires:
+  - All of `A`, `B`, `C`, `D`, `E`, `T` to be numeric, otherwise `'all arguments must be numeric.'` is raised.
+  - `A`, `B`, `C`, `D`, `E` to be matrices, otherwise `'A, B, C, D, E must be matrices.'` is raised.
+  - All matrices to be square, otherwise `'all matrices must be square.'` is raised.
+  - All matrices to have the same dimension, otherwise `'all matrices must have the same dimension.'` is raised.
+  - `T` to be a real scalar, otherwise `'T must be a real scalar.'` is raised.
 
-## Implementation structure
+## Inputs and outputs
 
-- Computes the nested matrix exponential double integral:
-- Integrate[expm(-i*A*(T-t))*B*
-- Integrate[expm(-i*C*(t-x))*D*expm(-i*E*x),{x,0,t}],{t,0,T}]
-- This corresponds to the (1,3) block of the exponential of the auxiliary
-- matrix (http://dx.doi.org/10.1109/TAC.1978.1101743). Syntax:
-- I=expmint2(spin_system,A,B,C,D,E,T)
-- A,B,C,D,E -square matrices
-- T -upper limit of the outer integral
-- Output:
-- I -the integral as above
-- Check consistency
-- Zero filler block
+Inputs:
+
+- `spin_system` — spin system object passed through to `propagator`.
+- `A`, `B`, `C`, `D`, `E` — square matrices of the same dimension.
+- `T` — upper limit of the outer integral; a real scalar.
+
+Output:
+
+- `I` — the nested matrix exponential double integral as defined above.
+
+## References
+
+- Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/expmint2.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=expmint2.m
+- C. F. Van Loan, computing integrals involving the matrix exponential, IEEE Transactions on Automatic Control, http://dx.doi.org/10.1109/TAC.1978.1101743

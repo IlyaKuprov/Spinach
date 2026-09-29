@@ -1,30 +1,17 @@
 # examples/spin_chemistry/singlet_yield_2.m
 
-- Signature: `singlet_yield_2()`
-
 ## Purpose
 
-Liquid state magnetic field effect simulation on a radical pair with six equivalent nuclei using exponential recombi- nation kinetics model. Full S6 symmatry is used. Calculation time: seconds
+This example scans magnetic field and singlet recombination rate for a liquid-state radical pair with six equivalent protons. Its source comment describes an exponential recombination-kinetics model and full S6 symmetry, and estimates the example calculation time as seconds; that timing is a source comment, not a measured benchmark.
 
-## Physical / mathematical content
+## Spin model and observable
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The isotope list is two electrons and six protons (`{'E','E','1H','1H','1H','1H','1H','1H'}`). Both electron Zeeman factors are 2.002; nuclear Zeeman factors are set to zero. The coupling matrix connects electron 1 to each of the six protons with the same 0.295 mT scalar hyperfine value; electron 2 has no listed hyperfine coupling. The basis uses `sphten-liouv`, no approximation, projection 0, and full S6 permutation symmetry over spin indices 3–8.
 
-## Numerical / algorithmic content
+The shared `rydmr_exp` callback forms an electron singlet on the selected pair `[1 2]` and calculates singlet recombination yield. The script supplies no separate relaxation-rate parameter.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Sweep and plot
 
-## Implementation structure
+`parameters.fields` runs from 0 to 5 mT in 0.01 mT steps (501 field values, passed to the callback in tesla). The recombination-rate list is `[0.176 0.880 1.76 3.52 8.8 17.6 35.2 52.8] * 1e6` Hz. The plotted matrix `M` is the singlet yield versus field for these rate values; the field axis is labelled in tesla.
 
-- Liquid state magnetic field effect simulation on a radical
-- pair with six equivalent nuclei using exponential recombi-
-- nation kinetics model. Full S6 symmatry is used.
-- Calculation time: seconds
-- Unit magnet (field sweep)
-- System specification
-- Basis set
-- Fields and kinetics parameters
-- Spinach housekeeping
-- Simulation
-- Plot the answer
+Source: [examples/spin_chemistry/singlet_yield_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/spin_chemistry/singlet_yield_2.m).

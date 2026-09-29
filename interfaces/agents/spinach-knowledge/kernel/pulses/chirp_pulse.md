@@ -1,66 +1,31 @@
 # kernel/pulses/chirp_pulse.m
 
-- Signature: `[Cx,Cy,durs,ints,amps,phis,frqs]=...`
+[Source: `kernel/pulses/chirp_pulse.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/chirp_pulse.m)
+
+- Signature: `[Cx,Cy,durs,ints,amps,phis,frqs]=chirp_pulse(npts,dur,bwidth,smp,type)`
 
 ## Purpose
 
-Chirp pulse waveform with a sine bell power or a quarter-sine amplitude fade-in and fade-out. Generates unidirectional chir- ps or saltire chirps which are super-positions of two counter- sweeping chirps. Syntax: [Cx,Cy,durs,ints,amps,phis,frqs]=... chirp_pulse(npts,dur,bwidth,smp,type)
+Builds a frequency-swept RF waveform calibrated for an inversion pulse. The sweep is centred on zero and linear in time; its phase is quadratic in normalised time. The supported families are WURST, smoothed, and saltire chirps, with an optional `-adaptive` suffix for a nonlinear sample grid.
 
-## Physical / mathematical content
+## Inputs and discretisation
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+- `npts` — finite positive integer number of waveform points.
+- `dur` — finite positive pulse duration in seconds.
+- `bwidth` — finite positive sweep bandwidth in Hz, centred on zero.
+- `type` — `'wurst'`, `'smoothed'`, or `'saltire'`; append `'-adaptive'` to use the nonlinear normalised time grid instead of the uniform grid.
+- `smp` — WURST edge power for the WURST family (the source accepts values of at least 1); for smoothed and saltire it is the percentage of duration affected by the quarter-sine edge ramps, from 0 (square envelope) through 50 (sine-bell envelope).
 
-## Numerical / algorithmic content
+With a uniform grid the function returns N point samples, N piecewise-constant slice durations in `durs` summing to `dur`, and N−1 piecewise-linear interval durations in `ints`. The adaptive option uses a nonlinear normalised grid and returns the corresponding nonuniform durations. The phase is `pi*dur*bwidth*t.^2` and frequency is `bwidth*t` on normalised time `t`; the amplitude envelope is calibrated by `2*pi*sqrt(bwidth/dur)`.
 
-## Parameters / inputs
+## Outputs and checks
 
-- npts -number of discretization points in
-- the waveform
-- duration -pulse duration, seconds
-- bwidth -chirp sweep bandwidth around
-- zero frequency, Hz
-- type -'wurst', 'smoothed', or 'saltire'; the
-- default is uniform time grid, to get
-- adaptive sampling, add '-adaptive'
-- smp -smoothing parameter; for 'wurst', this
-- is the power in
-- 1-|sin(x)^smp|
-- as x approaches pi/2 at either the edge
-- of the pulse. For 'smoothed' and 'salti-
-- re', this is the fraction of the pulse
-- duration (in percent) that is affected
-- by a sine bell fade-in and fade-out: 0
-- means square amplitude envelope and 50
-- means sine bell envelope.
+- `Cx`, `Cy` — real and imaginary RF components in rad/s. For saltire, `Cy` is identically zero; the real waveform's sign is represented by phases of 0 or pi.
+- `durs`, `ints` — piecewise-constant slice durations and piecewise-linear interval durations, respectively, in seconds.
+- `amps`, `phis`, `frqs` — waveform amplitude in rad/s, phase in radians, and instantaneous frequency in Hz.
 
-## Outputs
+The routine checks the scalar/range constraints on its parameters and rejects inadequate phase sampling when a sample-to-sample phase jump exceeds pi and fewer than seven outputs are requested. Requesting the seventh output, `frqs`, bypasses that particular error check. The function returns waveforms and grids only; it does not write files or configure hardware.
 
-- Cx -real part of the waveform, calibrated to
-- produce an inversion pulse, rad/s
-- Cy -imag part of the waveform, calibrated to
-- produce an inversion pulse, rad/s
-- durs -slice durations for piecewise-constant
-- approximation, seconds
-- ints -interval durations for piecewise-linear
-- approximation, seconds
-- amps -waveform amplitudes, rad/s
-- phis -waveform phases, rad
-- frqs -waveform frequencies, Hz
-- intv_grid -normalised interval grid, npts-1 elements
-- Note: Cy is zero for the saltire pulse, this radically changes
-- its phase and amplitude profiles.
+## Reference
 
-## Implementation structure
-
-- Chirp pulse waveform with a sine bell power or a quarter-sine
-- amplitude fade-in and fade-out. Generates unidirectional chir-
-- ps or saltire chirps which are super-positions of two counter-
-- sweeping chirps. Syntax:
-- [Cx,Cy,durs,ints,amps,phis,frqs]=...
-- chirp_pulse(npts,dur,bwidth,smp,type)
-- npts -number of discretization points in
-- the waveform
-- duration -pulse duration, seconds
-- bwidth -chirp sweep bandwidth around
-- zero frequency, Hz
-- type -'wurst', 'smoothed', or 'saltire'; the
+[Spin Dynamics Wiki: `chirp_pulse.m`](https://spindynamics.org/wiki/index.php?title=chirp_pulse.m)

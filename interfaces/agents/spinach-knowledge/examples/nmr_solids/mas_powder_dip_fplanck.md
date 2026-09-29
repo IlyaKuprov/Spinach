@@ -1,32 +1,13 @@
 # examples/nmr_solids/mas_powder_dip_fplanck.m
 
-- Signature: `mas_powder_dip_fplanck()`
+Source: [examples/nmr_solids/mas_powder_dip_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_dip_fplanck.m)
 
-## Purpose
+## Model
 
-Spinning powder pulse-acquire experiment on a two-spin system with a dipolar coupling using Fokker-Planck formalism: Calculation time: seconds
+This is a simulated MAS powder pulse-acquire example for two dipole-coupled protons. The source comment cites DOI [10.1016/j.jmr.2016.07.005](https://doi.org/10.1016/j.jmr.2016.07.005) for its Fokker-Planck formalism. The system is set to 14.1 T; its `1H` isotropic Zeeman scalar values are 5.0 and -2.0, with positions [0, 0, 0] and [0, 3.9, 0.1]. The coordinates supply the dipolar geometry when `create` builds the system; there is no separate dipolar-coupling constant in the input. This file does not state units for the coordinates or Zeeman scalars. It does not include a quadrupolar spin or NQI, nor an explicit RF pulse or decoupling field.
 
-## Physical / mathematical content
+The basis is spherical-tensor Liouville space with no approximation and projection +1. The MAS axis is [1, 1, 1] and the rotor rate is 1000 Hz; maximum rank is 17 and the configured grid is `leb_2ang_rank_17`. Unlike the companion Floquet example, this script calls `singlerot(spin_system,@acquire,parameters,'nmr')`, the source's Fokker-Planck pulse-acquire path.
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+## Signal and display
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Spinning powder pulse-acquire experiment on a two-spin system
-- with a dipolar coupling using Fokker-Planck formalism:
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Pulse-acquire setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The initial state and coil are the proton `L+` state. The acquisition has 512 points, a sweep setting of 2e4, and zero filling to 4096. The resulting FID receives exponential apodisation parameter 6, is Fourier transformed with `fftshift`, and its real spectrum is plotted by `plot_1d`. This is the calculated spectrum from the model settings; the source does not present it as an experimental measurement.

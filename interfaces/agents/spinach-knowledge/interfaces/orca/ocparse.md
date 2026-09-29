@@ -1,43 +1,24 @@
 # interfaces/orca/ocparse.m
 
-- Signature: `[density,ext,dx,dy,dz]=ocparse(filename,pad_factor)`
+- Signature: `[density,ext,dx,dy,dz]=ocparse(filename,pad_factor)` (both inputs are required; `pad_factor` has no default).
 
-## Purpose
+## Purpose and input format
 
-ORCA cube file parser. Extracts the normalised probability density and the associated metric information from ORCA spin density in "3D simple format" (see ORCA manual). Syntax: [density,ext,dx,dy,dz]=ocparse(filename,pad_factor)
+Parses an ORCA cube file in the documented 3-D simple format and returns an absolute, numerically normalised density array and grid metrics. It imports the file with four header lines and interprets the text metadata as grid point counts, corner coordinates, and three grid-step components. The numeric cube data are reshaped and permuted to `[X Y Z]` order.
 
-## Physical / mathematical content
+- `filename`: nonempty character string naming an existing file. The guard checks existence, but does not validate that the file is a readable ORCA cube or that its header and data are internally consistent.
+- `pad_factor`: nonnegative real integer scalar. No padding is added at zero. At a positive value, each side of each dimension receives `pad_factor` times that dimension's point count in zeros, so the padded array shape is `(1+2*pad_factor)*[nx ny nz]`.
 
-- ORCA interfaces. They recover quantum-chemistry tensors and metadata and convert them to Spinach conventions.
+## Outputs and units
 
-## Numerical / algorithmic content
+- `density`: padded array in `[X Y Z]` axis order. The parser takes `abs(A.data)` and normalises the unpadded array by three trapezoidal integrations multiplied by `dx*dy*dz`; zero padding is then applied. The code does not separately guard against a zero or non-finite normalisation integral.
+- `ext`: six coordinate values in the order `[xmin xmax ymin ymax zmin zmax]`. Before padding, each pair is computed from the corresponding corner coordinate, point count, and grid step. Padding expands the pair by `npoints*step*pad_factor` on each side.
+- `dx`, `dy`, `dz`: the three grid-step components read from the cube metadata, in Angstrom. The coordinate extents are also in Angstrom. Density units are not separately declared by the function; its normalisation uses the numerical grid-step product.
 
-## Parameters / inputs
+The only explicit guards are for filename type/non-emptiness, file existence, and pad-factor type/reality/scalar/non-negativity/integrality. Malformed cube content or incompatible dimensions are left to the importer and subsequent MATLAB operations to reject.
 
-- filename -character string specifying the file to load
-- pad_factor -padding factor specifying how many multiples
-- the array dimension in zeros to add on each
-- side of the cube
+## References
 
-## Outputs
-
-- density -probability density cube with dimensions
-- ordered as [X Y Z]
-- ext -grid extents in Angstrom, ordered as
-- [xmin xmax ymin ymax zmin zmax]
-- dx,dy,dz -grid steps in the three directions, Angstrom
-
-## Implementation structure
-
-- ORCA cube file parser. Extracts the normalised probability density and
-- the associated metric information from ORCA spin density in "3D simple
-- format" (see ORCA manual). Syntax:
-- [density,ext,dx,dy,dz]=ocparse(filename,pad_factor)
-- filename -character string specifying the file to load
-- pad_factor -padding factor specifying how many multiples
-- the array dimension in zeros to add on each
-- side of the cube
-- density -probability density cube with dimensions
-- ordered as [X Y Z]
-- ext -grid extents in Angstrom, ordered as
-- [xmin xmax ymin ymax zmin zmax]
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/orca/ocparse.m)
+- [Spin Dynamics Wiki: ocparse.m](https://spindynamics.org/wiki/index.php?title=ocparse.m)
+- Authors credited by the source: Ilya Kuprov, Elizaveta Suturina, and Petra Pikulova.

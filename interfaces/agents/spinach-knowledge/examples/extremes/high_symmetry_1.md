@@ -1,31 +1,18 @@
 # examples/extremes/high_symmetry_1.m
 
 - Signature: `high_symmetry_1()`
+- Source: [`examples/extremes/high_symmetry_1.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/extremes/high_symmetry_1.m)
 
-## Purpose
+## Purpose and spin system
 
-1H NMR spectrum of a large and highly symmetric spin system with two tert-butyl groups supplied by Eberhard Matern. Done by brute force time-domain propagation in Hilbert space. WARNING: needs 32+ CPU cores and 128+ GB of RAM. Run time on the above: hours
+The source presents a large, highly symmetric `1H` NMR system with two tert-butyl groups, supplied by Eberhard Matern. Its isotope list comprises two `31P` spins and twenty `1H` spins (22 spin-1/2 sites total). The chemical-shift inputs include `-43.844` for both phosphorus sites and proton values of `4.090` and `1.354`; the coupling table includes `301.99` between the phosphorus sites and phosphorus–proton couplings including `-321.62`, `-19.15`, and `15.63`. Spinach interprets these nuclear scalar chemical shifts in ppm and scalar couplings in Hz. The “Magnetic induction” setting `sys.magnet=9.39798` is in tesla.
 
-## Physical / mathematical content
+## Method and acquisition
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Despite the molecular symmetry, this file deliberately uses brute-force time-domain propagation in Hilbert space: `bas.formalism='zeeman-hilb'` and `bas.approximation='none'`; no permutation-symmetry groups are declared. The observable is the proton FID/spectrum. Initial state and receiver coil are both proton `L+`, decoupling is empty, and the script invokes `liquid(spin_system,@acquire,parameters,'nmr')` rather than defining an RF-pulse sequence.
 
-## Numerical / algorithmic content
+The acquisition inputs are `offset=1150`, `sweep=2400`, `npoints=4096`, and `zerofill=32768`; the output axis is explicitly ppm and inverted. Offset and sweep units are not annotated in the source. The FID is exponentially apodised with parameter 5, Fourier transformed, converted to its real part, and plotted with `plot_1d`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Resource note and scope
 
-## Implementation structure
-
-- 1H NMR spectrum of a large and highly symmetric spin system
-- with two tert-butyl groups supplied by Eberhard Matern. Done
-- by brute force time-domain propagation in Hilbert space.
-- WARNING: needs 32+ CPU cores and 128+ GB of RAM.
-- Run time on the above: hours
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Scalar couplings
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
+The source warns that the calculation needs 32 or more CPU cores and 128 or more GB of RAM, and estimates a runtime of hours. These are source comments rather than a portable performance guarantee. The page makes no claim about an experimental assignment, computed peak positions, or failure of any Spinach kernel; the script supplies no DOI or external literature link.

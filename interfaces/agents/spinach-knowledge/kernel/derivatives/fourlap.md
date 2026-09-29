@@ -1,45 +1,17 @@
 # kernel/derivatives/fourlap.m
 
-- Signature: `L=fourlap(npoints,extents)`
+[Direct MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fourlap.m) · [Spinach Wiki documentation](https://spindynamics.org/wiki/index.php?title=fourlap.m)
 
-## Purpose
+## Purpose and signature
 
-Returns a Fourier spectral representation of the Laplacian acting on a 3D data array. Syntax: L=fourlap(npoints,extents)
+`L=fourlap(npoints,extents)` constructs a Fourier spectral Laplacian for a periodic rectangular grid. Axis order is `[X Y Z]`; the implementation has one-, two-, and three-axis branches. This is a matrix operator, not a routine that accepts or reshapes the data array itself.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- `npoints`: positive integer sample counts, one per axis, ordered `[X Y Z]` when three axes are supplied.
+- `extents`: positive real periodic lengths for the corresponding axes, in the same order.
+- `L`: square operator of size `prod(npoints)` by `prod(npoints)`, acting on the column-major vectorisation of the grid data. In one dimension the source assigns the second-derivative matrix directly; in two and three dimensions it builds Kronecker sums with sparse identity factors.
 
-## Numerical / algorithmic content
+Each axis second-derivative matrix comes from `fourdif(npoints(i),2)` and is scaled by `(2*pi/extents(i))^2`. The multidimensional Kronecker ordering makes X the fastest-varying index in the vectorised data. The resulting operator has inverse-length-squared scaling when `extents` are physical lengths; no physical unit is imposed by the function itself.
 
-## Parameters / inputs
-
-- npoints -a three-element vector specifying the number of
-- discretization points in each dimension of the
-- 3D cube of data that the operator will be acting
-- on, ordered as [X Y Z].
-- extents -a three-element vector specifying axis extents,
-- ordered as [X Y Z].
-
-## Outputs
-
-- L -Fourier spectral Laplacian, a sparse matrix designed to act
-- on the vectorization of the 3D data array. The dimensions of
-- the data array are assumed to be ordered as [X Y Z].
-- Note: periodic boundary conditions.
-
-## Implementation structure
-
-- Returns a Fourier spectral representation of the Laplacian acting
-- on a 3D data array. Syntax:
-- L=fourlap(npoints,extents)
-- npoints - a three-element vector specifying the number of
-- discretization points in each dimension of the
-- 3D cube of data that the operator will be acting
-- on, ordered as [X Y Z].
-- extents - a three-element vector specifying axis extents,
-- ordered as [X Y Z].
-- L -Fourier spectral Laplacian, a sparse matrix designed to act
-- on the vectorization of the 3D data array. The dimensions of
-- the data array are assumed to be ordered as [X Y Z].
+The boundary condition is periodic. The source validates positive real integer grid counts and positive real extents, selects branches by the number of entries in `npoints`, and errors for any other dimensionality. For the three-axis case the axis matrices are embedded and summed as the X, Y, and Z second derivatives. See also [`fourdif`](fourdif.md).

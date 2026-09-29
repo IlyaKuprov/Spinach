@@ -1,30 +1,16 @@
 # examples/fundamentals/state_spaces_2.m
 
 - Signature: `state_spaces_2()`
+- Source: [`examples/fundamentals/state_spaces_2.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/state_spaces_2.m)
 
-## Purpose
+## Model and question
 
-Contributions from different orders of spin correlation to the system trajectory in the pulse-acquire 1H NMR simulation of anti-3,5-difluo- roheptane (16 spins). Different curves correspond the norms of the pro- jection of the density matrix into the subspace of one-, two-, three-, etc. spin correlations. The two traces in the lower part of the figure correspond to nine-and ten-spin correlations it is clear that for 
+This pulse-acquire proton NMR example displays the density-operator content by spin-correlation order for anti-3,5-difluoroheptane. It concerns correlation-order state-space representation, not an angular or powder-quadrature test. The source comment calls the molecule a 16-spin example; the isotope array has 23 sites: seven spin-zero `12C`, fourteen `1H`, and two `19F`, so the listed spin-bearing nuclei number 16.
 
-## Physical / mathematical content
+The field is 11.7464 T. Chemical shifts and scalar couplings are specified explicitly in the source. The two `19F` shifts at sites 10 and 18 are set to zero, with source comments giving -184.1865 and explaining that zero is used because those values do not matter for this calculation and are faster. The basis uses `sphten-liouv`, `IK-0`, inter-level 1, manually populated projections at levels 1-3, two `S3` symmetry groups, longitudinal `19F` states, and projection `{1}`. Automatic `zte` state dropout is disabled. GPU enablement is commented out.
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+## Propagation and output
 
-## Numerical / algorithmic content
+The initial state is proton `L+`; the NMR-assumption Hamiltonian is propagated in trajectory mode with a 1 ms step for 1000 steps. The source does not apply an explicit RF pulse with `step`; it starts from the transverse initial condition. `trajan(...,'correlation_order')` plots the contributions, with a logarithmic y axis and display range 1e-6 to 3. Those plot limits are not pass/fail criteria.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Contributions from different orders of spin correlation to the system
-- trajectory in the pulse-acquire 1H NMR simulation of anti-3,5-difluo-
-- roheptane (16 spins). Different curves correspond the norms of the pro-
-- jection of the density matrix into the subspace of one-, two-, three-,
-- etc. spin correlations. The two traces in the lower part of the figure
-- correspond to nine-and ten-spin correlations it is clear that for
-- practical simulation purposes, even in the absence of relaxation, only
-- correlations of up to eight spins need to be accounted for.
-- Calculation time: minutes, faster with a GPU.
-- Magnet induction
-- Isotopes
-- Chemical shifts
+The source comments say nine- and ten-spin contributions appear in the lower part of the figure and suggest that correlations through order eight suffice for practical simulation without relaxation. This is a source-stated interpretation, not an independently verified bound or a general truncation rule. The code defines no acceptance tolerance or quadrature comparison. Runtime is estimated in the source as minutes, with a GPU noted as faster.

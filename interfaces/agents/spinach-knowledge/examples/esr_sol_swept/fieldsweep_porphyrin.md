@@ -1,30 +1,15 @@
 # examples/esr_sol_swept/fieldsweep_porphyrin.m
 
-- Signature: `fieldsweep_porphyrin()`
+[Source code](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_swept/fieldsweep_porphyrin.m) · Function: `fieldsweep_porphyrin()`
 
-## Purpose
+This example computes a field-swept EPR spectrum of a copper porphyrin complex by finding resonance fields and transition moments; the source estimates minutes for the calculation. The specified spins are four `14N` nuclei, an electron (`E`), and `63Cu`. The electron Zeeman principal values are `[2.0509, 2.0509, 2.1801]`. The electron–copper coupling principal values are `[-70.9257, -70.9257, -575.0219]*1e6`, with zero Euler angles; the four electron–nitrogen scalar couplings are each `46.0345*1e6`. The source supplies these numerical interaction values and scale factors without explicit unit annotations.
 
-Field swept EPR spectrum of copper porphyrin complex, computed by finding resonance fields and transition moments. Calculation time: minutes.
+## Calculation and scan
 
-## Physical / mathematical content
+The basis uses `zeeman-hilb` with no approximation. `S4` symmetry is assigned to spins `[1 2 3 4]`, the four nitrogens. The source sets the high-temperature initial state to `-state(spin_system,'Lz','E')` and calls `fieldsweep`, which returns a swept spectrum; this is not a pulse sequence.
 
-- Field-swept ESR examples. These files emphasise resonance-field finding, powder averaging, anisotropic g and hyperfine tensors, and intensity accumulation over orientation manifolds.
+Scan inputs are `mw_freq=9.39e9` (unit not annotated in this source), `window=[0.27 0.35]`, and `npoints=512`. The plotted magnetic-field axis is labelled tesla. The code also sets `fwhm=5e-4` (unit not stated), `int_tol=1e3`, `tm_tol=0.1`, `rspt_order=Inf`, and the powder orientation grid `rep_2ang_100pts_sph`. `sys.magnet=1` is set without an additional comment here.
 
-## Numerical / algorithmic content
+## Output and scope
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Field swept EPR spectrum of copper porphyrin complex, computed
-- by finding resonance fields and transition moments.
-- Calculation time: minutes.
-- Magnet field
-- Isotopes
-- Array preallocation
-- Zeeman interactions
-- Hyperfine interactions
-- Basis set
-- Symmetry
-- Spinach housekeeping
-- Experiment parameters
+The example plots `spec` intensity in arbitrary units versus `parameters.b_axis` in tesla. It is a compact six-spin model with the interactions listed above and the imposed nitrogen permutation symmetry; it does not specify additional molecular or environmental degrees of freedom. The source's runtime note is minutes.

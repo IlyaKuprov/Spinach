@@ -1,37 +1,25 @@
 # etc/textbook/lorentz.m
 
+- MATLAB implementation: [etc/textbook/lorentz.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/lorentz.m)
+
 - Signature: `[J,K,Kil]=lorentz(L)`
 
 ## Purpose
 
-The (L,0)(+)(0,L) irreducible matrix representation of the Lorentz group with inversion. Syntax: [J,K,Kil]=lorentz(L)
+Constructs the direct-sum (L,0) plus (0,L) matrix representation of the Lorentz group with inversion. Use it when explicit rotation and boost generators are needed; request only two outputs if the Killing form is not needed.
 
-## Physical / mathematical content
+## Input
 
-## Numerical / algorithmic content
+- L — required real numeric scalar representation rank; it must be an integer or half-integer with L >= 1/2. There are no defaults. The source sets D = 2L+1 and obtains the spin matrices from pauli(D).
 
-## Parameters / inputs
+## Construction and outputs
 
-- L -irreducible representation
-- rank, e.g. 1/2
+For each spin matrix s.x, s.y, s.z, J has s in both diagonal blocks, while K has +i s in the first block and -i s in the second. Each component is returned as a full 2D-by-2D matrix.
 
-## Outputs
+- J — structure with rotation generators J.x, J.y, J.z.
+- K — structure with boost generators K.x, K.y, K.z.
+- Kil — optional 6-by-6 Killing form. The code computes it only when a third output is requested (nargout > 2), by forming adjoint-representation matrices for the six generators and taking pairwise trace products. This is the expensive part; [J,K] avoids it.
 
-- J -three rotation generators
-- K -three boost generators
-- Kil -Killing form (expensive)
+## Source
 
-## Implementation structure
-
-- The (L,0)(+)(0,L) irreducible matrix representation of the
-- Lorentz group with inversion. Syntax:
-- [J,K,Kil]=lorentz(L)
-- L - irreducible representation
-- rank, e.g. 1/2
-- J - three rotation generators
-- K - three boost generators
-- Kil - Killing form (expensive)
-- Check consistency
-- Dimension and Pauli blocks
-- Rotation and boost generators
-- Collect generators
+[Spinach Wiki: lorentz.m](https://spindynamics.org/wiki/index.php?title=lorentz.m).

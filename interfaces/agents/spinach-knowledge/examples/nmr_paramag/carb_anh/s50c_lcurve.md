@@ -1,29 +1,12 @@
 # examples/nmr_paramag/carb_anh/s50c_lcurve.m
 
 - Signature: `s50c_lcurve()`
+- Source: [s50c_lcurve.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_paramag/carb_anh/s50c_lcurve.m)
 
-## Purpose
+## S50C regularisation-parameter selection
 
-L-curves for the S50C mutant dataset for human carbonic anhydrase II. The system and the method are described in: A step-by-step tutorial is available here:
+This is an L-curve companion to the S50C human carbonic anhydrase II distributed PCS reconstruction, not an independent point-centre fit. The source cites the [study](https://doi.org/10.1039/c6sc03736d) and the [PCS analysis tutorial](https://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 
-## Physical / mathematical content
+The script uses the `kuprov` equation, experimental PCS/coordinate arrays from `s50c_expt.mat`, and an effective susceptibility tensor from `s50c_chi_eff.mat`. It sets a box of size `[50.0 50.0 50.0]` about `[-27.4 13.3 18.8]`, confinement `[2.0 12.0]`, and sharpening 0.0, then evaluates 30 logarithmically spaced regularisation values from `10^-2` to `10^2` with `ipcs` at grid size 64. The regularisation measure returned by the solver is divided by its parameter before the error and regularisation arrays are passed to `lcurve` in log mode. The selected smoothing parameter is plotted and displayed.
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-
-## Implementation structure
-
-- L-curves for the S50C mutant dataset for human carbonic anhydrase
-- II. The system and the method are described in:
-- A step-by-step tutorial is available here:
-- Load experimental data
-- Load susceptibility tensor
-- Solver parameters
-- Regularisation parameter array
-- Result arrays
-- Run a parallel loop
-- L-curve analysis
+This script selects a regularisation setting; it does not report a final density or predicted PCS plot. It does not identify the observed nucleus or supply field/temperature values, and states no units for the box coordinates, confinement bounds, or tensor.

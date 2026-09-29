@@ -97,7 +97,7 @@ function echo=echo_sweep(spin_system,parameters,H,R,K)
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 
-% Fokker-Planck singlerot supplies a rotor-augmented Liouvillian.
+% Fokker-Planck singlerot supplies a rotor-augmented Liouvillian
 if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
 
     % Carrier offsets and microwave operators in the rotor-augmented space
@@ -106,8 +106,13 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     sz=kron(speye(parameters.spc_dim),operator(spin_system,'Lz',parameters.spins{1}));
     L=H+1i*R+1i*K;
 
-    % Rotor phase averaging is handled by singlerot, not by this sequence
+    % Keep the detection state and accumulator on the propagator device
+    coil=parameters.coil;
     echo=zeros(parameters.npoints,1);
+    if ismember('gpu',spin_system.sys.enable)
+        coil=gpuArray(coil);
+        echo=gpuArray(echo);
+    end
     echo_steps=round(parameters.echo_win/parameters.timestep);
     for k=1:parameters.npoints
 
@@ -132,12 +137,15 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
         % Only the finite detection window requires time samples
         for n=1:echo_steps
             rho=step(spin_system,L0,rho,parameters.timestep);
-            echo(k)=echo(k)+parameters.coil'*rho;
+            echo(k)=echo(k)+coil'*rho;
         end
     end
 
     % Echo integral has units of signal times seconds
     echo=echo*parameters.timestep;
+    if isa(echo,'gpuArray')
+        echo=gather(echo);
+    end
 
     return
 end
@@ -232,18 +240,15 @@ end
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
 
-% Liouville input has one Fokker-Planck generator, not a rotor stack
 if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    % The context supplies three conforming matrices, not a rotor stack
     if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
        (~ismatrix(H))||(~isequal(size(H),size(R),size(K)))||...
        (size(H,1)~=size(H,2))||...
        (~all(isfinite(nonzeros(H))))||(~all(isfinite(nonzeros(R))))||...
        (~all(isfinite(nonzeros(K))))
-        error('H, R and K must be finite, square, equal-sized matrices.');
+        error('H, R, and K must be finite, square, equal-sized matrices.');
     end
 
-    % Required common parameters, with a detection-only time step
     required={'spc_dim','spins','rho0','coil','pulse_dur','pulse_frq',...
               'tau','echo_win','timestep','sweep','npoints'};
     for n=1:numel(required)
@@ -405,3 +410,4 @@ if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
     error('parameters.npoints must be a real integer greater than 2.');
 end
 end
+

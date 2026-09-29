@@ -25,9 +25,9 @@ p1.orientation='111'; p1.nitrogen='14N';
 [sys,inter]=diamond_p1(p1);
 sys.magnet=6.9156;
 bas.formalism='zeeman-hilb'; bas.approximation='none';
-h=basis(create(sys,inter),bas);
+hilbert_system=basis(create(sys,inter),bas);
 bas.formalism='zeeman-liouv';
-l=basis(create(sys,inter),bas);
+liouville_system=basis(create(sys,inter),bas);
 
 % Integer-step timing permits an independent static Hilbert comparison
 parameters.rate=0;
@@ -44,15 +44,15 @@ parameters.sweep=2e6;
 parameters.npoints=5;
 parameters.verbose=0;
 parameters.nphases=1;
-parameters.rho0=state(h,'Lz','E');
-parameters.coil=state(h,'L+','E');
-hilbert=singlerot(h,@echo_sweep,parameters,'esr');
+parameters.rho0=state(hilbert_system,'Lz','E');
+parameters.coil=state(hilbert_system,'L+','E');
+hilbert=singlerot(hilbert_system,@echo_sweep,parameters,'esr');
 
 % The Liouville callback has no explicit rotor-phase stack
 parameters=rmfield(parameters,'nphases');
-parameters.rho0=state(l,'Lz','E');
-parameters.coil=state(l,'L+','E');
-liouville=singlerot(l,@echo_sweep,parameters,'esr');
+parameters.rho0=state(liouville_system,'Lz','E');
+parameters.coil=state(liouville_system,'L+','E');
+liouville=singlerot(liouville_system,@echo_sweep,parameters,'esr');
 result=test_close(result,'static Hilbert/Liouville agreement',...
                   hilbert,liouville,1e-15,1e-9,...
                   'echo integral and carrier offsets must agree');
@@ -60,13 +60,13 @@ result=test_close(result,'static Hilbert/Liouville agreement',...
 % A zero interpulse delay is valid and requires no free propagation
 parameters.tau=0;
 parameters.nphases=1;
-parameters.rho0=state(h,'Lz','E');
-parameters.coil=state(h,'L+','E');
-zero_hilbert=singlerot(h,@echo_sweep,parameters,'esr');
+parameters.rho0=state(hilbert_system,'Lz','E');
+parameters.coil=state(hilbert_system,'L+','E');
+zero_hilbert=singlerot(hilbert_system,@echo_sweep,parameters,'esr');
 parameters=rmfield(parameters,'nphases');
-parameters.rho0=state(l,'Lz','E');
-parameters.coil=state(l,'L+','E');
-zero_liouville=singlerot(l,@echo_sweep,parameters,'esr');
+parameters.rho0=state(liouville_system,'Lz','E');
+parameters.coil=state(liouville_system,'L+','E');
+zero_liouville=singlerot(liouville_system,@echo_sweep,parameters,'esr');
 result=test_close(result,'zero-delay Hilbert/Liouville agreement',...
                   zero_hilbert,zero_liouville,1e-15,1e-9,...
                   'tau=0 must skip free propagation in both formalisms');
@@ -79,9 +79,9 @@ parameters.pulse_frq=416e3;
 parameters.tau=300e-9;
 parameters.echo_win=100e-9;
 parameters.sweep=5e6;
-static=singlerot(l,@echo_sweep,parameters,'esr');
+static=singlerot(liouville_system,@echo_sweep,parameters,'esr');
 parameters.rate=37e3;
-mas=singlerot(l,@echo_sweep,parameters,'esr');
+mas=singlerot(liouville_system,@echo_sweep,parameters,'esr');
 result=test_true(result,'finite static and MAS signals',...
                  all(isfinite(static(:)))&&all(isfinite(mas(:)))&&...
                  any(abs(static)>0)&&any(abs(mas)>0),...
@@ -91,3 +91,4 @@ result=test_true(result,'rotor-dependent spectrum',...
                  'powder MAS must change the echo spectrum');
 
 end
+

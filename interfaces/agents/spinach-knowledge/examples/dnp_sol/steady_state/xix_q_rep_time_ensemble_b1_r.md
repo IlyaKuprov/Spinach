@@ -9,7 +9,7 @@ Scans XiX steady-state proton polarisation against shot repetition time while av
 
 ## Inputs and scan axes
 
-- Three Gauss–Legendre distance nodes over 3.5–20 Å and five B1 nodes over `10e6`–`20e6` Hz.
+- Four Gauss–Legendre distance nodes over 3.5–20 Å and six B1 nodes over `10e6`–`20e6` Hz (orders 3 and 5 yield one extra node each).
 - Thirty logarithmically spaced repetition times, `logspace(-5,-3,30)`; shot spacing is `rep_time-2*nloops*pulse_dur` with pulse duration explicitly set in seconds.
 - Fixed `parameters.el_offs=-39e6` and `parameters.addshift=-13e6`; no offset scan.
 
@@ -29,4 +29,4 @@ For each distance and B1 node the function builds the system, evaluates the 30 r
 
 ## Clarification
 
-This is the only one of these four repetition-time variants that combines the three-node 3.5–20 Å distance quadrature with the five-node 10–20 MHz B1 quadrature; it evaluates 30 repetition times for each distance/B1 pair.
+This is the only one of these four repetition-time variants that combines the four-node 3.5–20 Å distance quadrature with the six-node 10–20 MHz B1 quadrature; it evaluates 30 repetition times for each of 24 distance/B1 pairs.

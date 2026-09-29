@@ -1,7 +1,6 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m
 
 - Signature: `drifts=mqmas_drifts(spin_system,parameters)`
-- Historical status: the example source is absent from the current checkout. This page describes the implementation at the stable source path `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m` as preserved in repository history; it does not describe a currently runnable entry point.
 
 ## Purpose and returned ensemble
 

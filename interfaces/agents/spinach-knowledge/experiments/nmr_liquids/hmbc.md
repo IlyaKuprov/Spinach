@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Magnitude-mode HMBC acquisition. The implementation combines the supplied Hamiltonian, relaxation, and kinetics matrices into its Liouvillian.
+Magnitude-mode HMBC acquisition. The implementation combines the supplied Hamiltonian, relaxation, and kinetics matrices into its Liouvillian. For natural-abundance HMBC, use Spinach isotope dilution via [dilute.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dilute.m) to represent the isotopomer mixture, as recommended in the source header.
 
 ## Input contract
 

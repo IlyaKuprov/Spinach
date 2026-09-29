@@ -1,7 +1,6 @@
 # examples/benchmarks/iserstep_bench_hiord.m
 
 - Signature: `iserstep_bench_hiord()`
-- Historical status: the example was removed from the current source tree; its stable historical source path is `examples/benchmarks/iserstep_bench_hiord.m`. This page records the comparison implemented there, not a current benchmark or an available entry point.
 
 ## Problem and reference
 
@@ -13,4 +12,4 @@ A 4096-point RKMK-DP8 propagation over 0.5 s supplies a reference trajectory and
 
 Ten grid sizes are generated as `ceil(2.^linspace(8,10.5,10))`; the step is (0.5/(n_p-1)). The script compares PWCL, LG2, LG4 and LG4A through `iserstep`, and RKMK4, RKMK-DP5 and RKMK-DP8 through `step`. It plots the reference magnetisation trajectory and relative error against grid size. For each method it fits (log(error)) against (log(n_p)) over the last third of the grid sizes and prints the negative fitted slope as an empirical convergence order.
 
-The source describes the setup, comparison, plots, and printed orders; it does not provide fixed results in the source comments. Do not treat the page as a performance ranking or claim that a particular method wins without running the historical code under a specified environment. The source was removed as a duplicate example and is not runnable from the current checkout as-is.
+The source describes the setup, comparison, plots, and printed orders; it does not provide fixed results in the source comments. Do not treat the page as a performance ranking or claim that a particular method wins without running the historical code under a specified environment.

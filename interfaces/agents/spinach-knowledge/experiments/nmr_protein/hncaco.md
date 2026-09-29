@@ -21,7 +21,7 @@ The code initialises positive and negative 15N states to emulate the INEPT block
 
 ## Timing and output
 
-From the supplied `J_nh`, the source calculates `tau = abs(1/(4 J_nh))` and `delta = abs(1/(2 J_nh))`; J is in Hz and the resulting times are in seconds. `T` is divided into two `T/2` intervals around the N/CA inversion block. The supplied `delta2` is used for the two coherence-transfer intervals around the CO/CA pulses.
+From the supplied `J_nh`, the source calculates `tau=abs(1/(4*parameters.J_nh))` and `delta=abs(1/(2*parameters.J_nh))`; J is in Hz and the resulting times are in seconds. `T` is divided into two `T/2` intervals around the N/CA inversion block. The supplied `delta2` is used for the two coherence-transfer intervals around the CO/CA pulses.
 
 The returned structure has `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the four States sign combinations across F1 and F2. Each FID is permuted to `[n3 n2 n1]`, or `[t3 t2 t1]` in acquisition order.
 

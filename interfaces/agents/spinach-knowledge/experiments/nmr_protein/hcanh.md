@@ -22,7 +22,7 @@ The source starts from the labelled H-alpha sites, applies a proton pulse, and r
 
 ## Timing and output
 
-The J values are hard-coded: `J_ch = 140 Hz` and `J_nh = 92 Hz`. The corresponding `tau1` and `delta1` are `1/(4 J_ch)` (about 1.79 ms); `tau2` and `delta3` are `1/(4 J_nh)` (about 2.72 ms). The other fixed delays are `delta2 = 12.5 ms` and `delta4 = 23.0 ms`. These delays are in seconds in the implementation; the J values are in Hz.
+The J values are hard-coded: `J_ch=140` and `J_nh=92` (Hz). The corresponding `tau1=abs(1/(4*J_ch))` and `delta1=abs(1/(4*J_ch))` (about 1.79 ms); `tau2=abs(1/(4*J_nh))` and `delta3=abs(1/(4*J_nh))` (about 2.72 ms). The other fixed delays are `delta2 = 12.5 ms` and `delta4 = 23.0 ms`. These delays are in seconds in the implementation; the J values are in Hz.
 
 The returned structure has four FIDs: `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the two sign choices in each of the first two States dimensions. Each array is permuted to `[n3 n2 n1]`, corresponding to `[t3 t2 t1]` after acquisition/detection and stitching.
 

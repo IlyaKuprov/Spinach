@@ -1,7 +1,6 @@
 # examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m
 
 - Signature: `yusuke_optimal_vs_cw_demo()`
-- Historical status: the example source is absent from the current checkout. This page documents the historical implementation at the stable path `examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m`; it is not a current runnable-example guarantee.
 
 ## Aim and model boundary
 

@@ -14,7 +14,7 @@ It next tests `nnz`: if `a` has zero stored-factor count it returns `simplify(b)
 - Polyadic plus numeric matrix: symmetric handling, testing the polyadic operand's prefix and suffix.
 - Two polyadics with no prefix or suffix: concatenate their core-term lists, preserving the sum as separate Kronecker terms. If either has buffered actions, wrap the two operands as separate one-factor terms.
 
-The result is passed to `simplify` immediately. The mapped method does not call `full`, but `simplify` can merge adjacent eligible non-`opium` factors with `kron` and unwrap a lone factor from a buffer-free single-term result; some factor products can therefore be materialised eagerly. The mapped method uses ordinary addition and introduces no complex conjugation or non-scalar broadcasting.
+The result is passed to `simplify` immediately. The mapped method does not call `full`, but `simplify` can merge adjacent eligible non-`opium` factors with `kron` and unwrap a lone factor from a buffer-free single-term result; some factor products can therefore be materialised eagerly. The mapped method uses ordinary addition and introduces no complex conjugation or non-scalar broadcasting. Use repeated polyadic addition sparingly: sums are buffered as separate terms, and `simplify` does not expand the complete sum; later operations traverse a growing term list and can be slower.
 
 ## Inputs and output
 

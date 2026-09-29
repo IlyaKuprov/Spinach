@@ -21,7 +21,7 @@ The default initial state is on the labelled amide protons. A 1H pulse and the f
 
 ## Timing and output
 
-The couplings are fixed in the source: `J_nh = 92 Hz` and `J_nca = 11.5 Hz`. The corresponding delays are `tau = abs(1/(4 J_nh))` (about 2.72 ms) and `delta = abs(1/(4 J_nca))` (about 21.74 ms). Couplings are in Hz and delays in seconds.
+The couplings are fixed in the source: `J_nh=92` and `J_nca=11.5` (Hz). The corresponding delays are `tau=abs(1/(4*J_nh))` (about 2.72 ms) and `delta=abs(1/(4*J_nca))` (about 21.74 ms). Couplings are in Hz and delays in seconds.
 
 The returned structure has `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the four States sign combinations across F1 and F2. Each FID is permuted to `[n3 n2 n1]`, or `[t3 t2 t1]` in acquisition order.
 

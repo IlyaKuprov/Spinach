@@ -8,7 +8,7 @@ Calculates a high-temperature Curie-law magnetic-susceptibility tensor from an i
 
 ## Inputs
 
-- `g` is a real numeric 3-by-3 g-tensor matrix; the source describes it as being in Bohr magneton units.
+- `g` is a real numeric 3-by-3 dimensionless g tensor; the Curie-law prefactor already contains the square of the Bohr magneton, so do not multiply `g` by that constant.
 - `T` is a positive real scalar temperature in Kelvin.
 - `S` is a positive real scalar integer or half-integer spin. The source examples are 1/2, 1, and 3/2.
 

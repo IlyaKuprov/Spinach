@@ -5,7 +5,7 @@
 
 ## Purpose and spin system
 
-The source presents a large, highly symmetric `1H` NMR system with two tert-butyl groups, supplied by Eberhard Matern. Its isotope list comprises two `31P` spins and twenty `1H` spins (22 spin-1/2 sites total). The chemical-shift inputs include `-43.844` for both phosphorus sites and proton values of `4.090` and `1.354`; the coupling table includes `301.99` between the phosphorus sites and phosphorus–proton couplings including `-321.62`, `-19.15`, and `15.63`. The source labels these as chemical shifts and scalar couplings but does not state their units. It sets `sys.magnet=9.39798` under a “Magnetic induction” comment, without a unit annotation.
+The source presents a large, highly symmetric `1H` NMR system with two tert-butyl groups, supplied by Eberhard Matern. Its isotope list comprises two `31P` spins and twenty `1H` spins (22 spin-1/2 sites total). The chemical-shift inputs include `-43.844` for both phosphorus sites and proton values of `4.090` and `1.354`; the coupling table includes `301.99` between the phosphorus sites and phosphorus–proton couplings including `-321.62`, `-19.15`, and `15.63`. Spinach interprets these nuclear scalar chemical shifts in ppm and scalar couplings in Hz. The “Magnetic induction” setting `sys.magnet=9.39798` is in tesla.
 
 ## Method and acquisition
 

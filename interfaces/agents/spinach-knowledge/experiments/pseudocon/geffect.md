@@ -15,4 +15,4 @@ For every spin, the routine gets its g tensor with `gtensorof`, builds the `L+`,
 
 ## Output
 
-- `g` is a 3-by-3 effective g-tensor matrix, in the Bohr magneton units stated by the source header.
+- `g` is a dimensionless 3-by-3 effective g-tensor matrix; the source header’s Bohr-magneton wording does not make this output a magnetic moment.

@@ -2,7 +2,7 @@
 
 ## Model and kinetics
 
-This is a homogeneous, non-spatial reaction-NMR calculation: it integrates two competing cycloaddition channels, then couples the interpolated concentrations to chemical reaction generators during repeated proton pulse-acquire acquisitions. There is no flow or diffusion. The source comments give `k1=0.5` toward exo and `k2=0.1` toward endo, with rate units `mol/(L*s)`; the initial concentrations are `[0.6; 0.5; 0; 0; 18.1] mol/L`. Concentration kinetics run for 20 seconds in 200 `LG4` steps; makima interpolation supplies concentrations between those points. The file header identifies Redfield relaxation and describes runtime as hours, much faster on GPU; those are source descriptions, not measurements here.
+This is a homogeneous, non-spatial reaction-NMR calculation: it integrates two competing cycloaddition channels, then couples the interpolated concentrations to chemical reaction generators during repeated proton pulse-acquire acquisitions. There is no flow or diffusion. The source comments give `k1=0.5` toward exo and `k2=0.1` toward endo, with bimolecular rate units `L/(mol*s)` for mol/L concentrations and seconds; the initial concentrations are `[0.6; 0.5; 0; 0; 18.1] mol/L`. Concentration kinetics run for 20 seconds in 200 `LG4` steps; makima interpolation supplies concentrations between those points. The file header identifies Redfield relaxation and describes runtime as hours, much faster on GPU; those are source descriptions, not measurements here.
 
 ## NMR acquisition and output
 

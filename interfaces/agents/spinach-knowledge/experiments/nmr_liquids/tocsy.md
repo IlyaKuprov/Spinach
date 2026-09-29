@@ -4,7 +4,7 @@
 
 ## Purpose and sequence
 
-Amplitude-mode homonuclear TOCSY with the source's continuous-spin-lock model. Starting from `parameters.rho0`, the routine applies a `pi/2` pulse about `Lx` on the working spin, then records F1 evolution under `L = H + 1i*R + 1i*K`. During the mixing interval, it propagates two branches with `L + 2*pi*lamp*Lx` and `L + 2*pi*lamp*Ly`; these include the full Liouvillian as well as the spin-lock term. It detects with `L+` on the same spin during F2 and returns `fid.cos` and `fid.sin`, the States-quadrature components, each with shape `npoints(1) × npoints(2)`.
+Amplitude-mode homonuclear TOCSY with the source's continuous-spin-lock model. Starting from `parameters.rho0`, the routine applies a `pi/2` pulse about `Lx` on the working spin, then records F1 evolution under `L = H + 1i*R + 1i*K`. During the mixing interval, it propagates two branches with `L + 2*pi*lamp*Lx` and `L + 2*pi*lamp*Ly`; these include the full Liouvillian as well as the spin-lock term. It detects with `L+` on the same spin during F2 and returns `fid.cos` and `fid.sin`, the States-quadrature components, each with shape `npoints(2) × npoints(1)` (F2 direct-time samples in rows, F1 state-stack samples in columns).
 
 This is not an explicit MLEV, DIPSI, WALTZ, or clean-TOCSY pulse-train simulation.
 

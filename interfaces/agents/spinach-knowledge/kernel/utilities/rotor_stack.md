@@ -42,7 +42,7 @@ Inputs:
 - `spin_system` — spin system object.
 - `parameters` — structure with subfields:
   - `axis` — spinning axis, a normalised 3-element vector.
-  - `offset` — cell array of transmitter offsets in Hz on each of the spins listed in `parameters.spins`.
+  - `offset` — nonempty numeric array of transmitter offsets in Hz, with one element per spin in `parameters.spins`; a cell array is rejected.
   - `spins` — cell array of the spins the offsets refer to, e.g. `{'1H','13C'}`.
   - `max_rank` — maximum harmonic rank to retain in the solution (increase until convergence is achieved; approximately equal to the number of spinning sidebands in the spectrum).
   - `rframes` — rotating frame specification, e.g. `{{'13C',2},{'14N',3}}` requests second order rotating frame transformation with respect to carbon-13 and third order with respect to nitrogen-14. When this option is used, the assumptions on the respective spins should be laboratory frame.

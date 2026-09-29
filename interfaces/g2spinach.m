@@ -290,17 +290,17 @@ if (~isnumeric(references))||(numel(nuclei)~=numel(references))
 end
 source_gammas=[];
 if ismember('E',[nuclei{:}])
-    if (numel(nuclei)>1)&&isfield(props,'isotopes')&&...
-       (numel(props.isotopes)~=numel(props.symbols))
-        error(['EPR import requires an explicit HFC source isotope '...
-               'for each atom: props.isotopes and props.symbols must '...
-               'have the same length; subset both with the same indices.']);
-    end
     elements=cellfun(@(entry)entry{1},nuclei,'UniformOutput',false);
     source_gammas=zeros(size(props.symbols));
     for n=1:numel(props.symbols)
         if ~ismember(props.symbols{n},elements)||isempty(props.hfc.full.matrix{n})
             continue
+        end
+        if isfield(props,'isotopes')&&...
+           (numel(props.isotopes)~=numel(props.symbols))
+            error(['EPR import requires an explicit HFC source isotope '...
+                   'for each atom: props.isotopes and props.symbols must '...
+                   'have the same length; subset both with the same indices.']);
         end
         source_iso='';
         if isfield(props,'isotopes')&&(numel(props.isotopes)>=n)

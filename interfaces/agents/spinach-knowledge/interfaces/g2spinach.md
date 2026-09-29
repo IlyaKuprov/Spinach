@@ -84,3 +84,5 @@ The initial input guard resolves source gyromagnetic ratios only for selected, n
 ## Header notes
 
 The element/isotope list selects imported nuclei; including an electron selects EPR data (g-tensor and hyperfine tensors) instead of chemical shieldings and scalar couplings.
+
+For selected nonempty EPR hyperfine tensors, `props.isotopes` supplies the source isotope. Subset it with the same atom indices as `props.symbols` and `props.hfc.full.matrix`; a length mismatch now reports this alignment requirement instead of an unrelated isotope error. An unsupported source isotope identifies the atom and points to the two metadata fields. NMR, electron-only, and empty or unselected HFC imports need no source-isotope alignment.

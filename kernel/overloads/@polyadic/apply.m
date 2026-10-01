@@ -30,7 +30,7 @@ x=full(x);
 % Preallocate the core product result
 cores=core_specs(p);
 core_rows=prod(cellfun(@(x)core_size(x,1),cores{1}));
-answer=zeros(core_rows,size(x,2));
+answer=zeros(core_rows,size(x,2),'like',x);
 
 % Multiply by cores
 for n=1:numel(p.cores)

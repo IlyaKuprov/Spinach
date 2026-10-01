@@ -3,6 +3,10 @@
 %
 %    [result,fig]=toroid_oc_optim()
 %
+% Parameters:
+%
+%    No input parameters; the RF and offset ensemble is set below
+%
 % Outputs:
 %
 %    result - optimised RF waveform and physical response maps

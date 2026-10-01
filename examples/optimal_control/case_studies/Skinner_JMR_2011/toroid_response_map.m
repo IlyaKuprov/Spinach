@@ -30,57 +30,93 @@
 function [response,fig]=toroid_response_map(rf_hz,pulse_dt,...
                                                offset_hz,radii_m)
 
-% Build the rotating-frame single-spin model
+% Magnetic field and isotope
 sys.magnet=14.1;
 sys.isotopes={'1H'};
+
+% Chemical shift, ppm
 inter.zeeman.scalar={0};
+
+% Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-Sz=state(spin_system,'Lz',1);
-Sz=Sz/norm(full(Sz),2);
-Sx=state(spin_system,'Lx',1);
-Sx=Sx/norm(full(Sx),2);
-Lx=operator(spin_system,'Lx',1);
-Ly=operator(spin_system,'Ly',1);
-Lz=operator(spin_system,'Lz',1);
+
+% Normalised initial and target states
+rho_z=state(spin_system,'Lz',1);
+rho_z=rho_z/norm(full(rho_z),2);
+rho_x=state(spin_system,'Lx',1);
+rho_x=rho_x/norm(full(rho_x),2);
+
+% Control and offset operators
+lx=operator(spin_system,'Lx',1);
+ly=operator(spin_system,'Ly',1);
+lz=operator(spin_system,'Lz',1);
+
+% Drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));
 
-% Propagate each offset and physical radius independently
+% Preallocate the radius-by-offset response
 mag_x=zeros(numel(radii_m),numel(offset_hz));
+
+% Inverse-radius RF scaling
 rf_scale=6e-3./radii_m;
+
+% Loop over resonance offsets
 parfor n_offset=1:numel(offset_hz)
-    drift=H+2*pi*offset_hz(n_offset)*Lz;
+
+    % Offset Hamiltonian and response column
+    drift=H+2*pi*offset_hz(n_offset)*lz;
     column=zeros(numel(radii_m),1);
+
+    % Loop over sample radii
     for n_radius=1:numel(radii_m)
-        rf_x=2*pi*rf_scale(n_radius)*rf_hz(1,:);
+
+        % Scale the waveform at this radius
+        rf_x=2*pi*rf_scale(n_radius)*rf_hz(1,:); %#ok<PFBNS>
         rf_y=2*pi*rf_scale(n_radius)*rf_hz(2,:);
-        final_state=shaped_pulse_xy(spin_system,drift,{Lx,Ly},...
-                    {rf_x,rf_y},pulse_dt,Sz,'expv-pwc');
-        column(n_radius)=real(Sx'*final_state);
+
+        % Propagate the initial state
+        final_state=shaped_pulse_xy(spin_system,drift,{lx,ly},...
+                                    {rf_x,rf_y},pulse_dt,rho_z,'expv-pwc');
+
+        % Detect transverse x magnetisation
+        column(n_radius)=real(rho_x'*final_state);
+
     end
+
+    % Store the response column
     mag_x(:,n_offset)=column;
+
 end
 
-% Apply the paper's equal-radius detection integral
+% Package the radius-by-offset response
 response.radii_m=radii_m;
 response.offset_hz=offset_hz;
 response.mag_x=mag_x;
+
+% Apply the equal-radius detection integral
 response.detected=trapz(radii_m,mag_x,1)/(radii_m(end)-radii_m(1));
 
-% Display the spatial-offset surface and detected offset profile
+% Start the response figure
 fig=kfigure();
 tiledlayout(1,2);
+
+% Plot the spatial-offset surface
 nexttile;
 surf(offset_hz/1e3,rf_scale,mag_x,'EdgeColor','none');
-xlabel('offset (kHz)'); ylabel('relative B_1');
-zlabel('M_x'); title('toroid radial response'); colorbar;
+kxlabel('offset (kHz)'); kylabel('relative $B_1$');
+kzlabel('$M_x$'); ktitle('toroid radial response'); colorbar;
 view(35,25);
+
+% Plot the detected offset profile
 nexttile;
 plot(offset_hz/1e3,response.detected,'LineWidth',1.5);
-xlabel('offset (kHz)'); ylabel('detected M_x');
-title('radius-weighted signal'); ylim([-1 1]); grid on;
+kxlabel('offset (kHz)'); kylabel('detected $M_x$');
+ktitle('radius-weighted signal'); ylim([-1 1]); kgrid;
 
 end
 

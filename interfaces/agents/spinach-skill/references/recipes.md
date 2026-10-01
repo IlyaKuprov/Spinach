@@ -159,6 +159,27 @@ Cross polarisation is `cp_powder_static_nh.m` and
 `cp_contact_mas_nh_fplanck.m`; recoupling is `redor_curve.m` and
 `pdsd_simple.m`.
 
+For a direct single-crystal MAS route check, run
+`examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced
+`rotor_stack` evolution against `singlerot` in Fokker–Planck Liouville
+space while independently refining slice count and rotor rank. The cases
+are phase-sensitive `13C` L+ to Lz transfer under RF and the central
+transition of strongly quadrupolar `27Al` with third-order rotating-frame
+correction. For a positive rotor rate the FP phase delta moves toward
+decreasing phase; start sliced sampling at the negative half-step and
+visit rotor-stack phases in reverse order. The test asserts agreement of
+normalised complex signals and checks that the third-order term is nonzero. This is not a test of powder averaging, the complete
+satellite manifold, or optimal-control gradients.
+
+For a powder-average route check, run
+`examples/fundamentals/mas_fplanck_powder.m`. It uses the same weighted
+Lebedev crystallite grid for both routes, averaging rotor start phase
+explicitly in the sliced route and through the uniform FP phase state in
+`singlerot`. Evolve exactly one full period when visiting an entire
+rotor stack; refine FP rank, midpoint slices, and rotor-phase quadrature
+separately. The finite-grid CSA test does not cover quadrupolar powder
+satellites or optimal-control gradients.
+
 ## Quadrupolar nuclei and NQR
 
 Quadrupolar coupling is a self-coupling on the diagonal of the coupling cell

@@ -16,11 +16,6 @@
 
 function C=mtimes(A,B)
 
-% A scalar operator applied to a scalar probe must return a numeric action
-if isa(A,'polyadic')&&~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)&&isscalar(A)
-    C=apply(A,B); return
-end
-
 % When A is a number
 if ~isa(A,'polyadic')&&isnumeric(A)&&isscalar(A)
     
@@ -58,7 +53,7 @@ if ~isa(A,'polyadic')&&isnumeric(A)
 end
     
 % When B is a number
-if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)
+if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)&&(size(A,2)~=1)
 
     % Reuse scalar multiplication on the left
     C=B*A; return
@@ -66,7 +61,7 @@ if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)
 end
 
 % When B is a sparse matrix
-if ~isa(B,'polyadic')&&isnumeric(B)&&issparse(B)
+if ~isa(B,'polyadic')&&isnumeric(B)&&issparse(B)&&~isscalar(B)
     
     % Attach as a suffix to A
     A.suffix=[A.suffix {B}]; C=simplify(A); return
@@ -76,8 +71,29 @@ end
 % When B is a full matrix
 if ~isa(B,'polyadic')&&isnumeric(B)
     
-    % Apply the operator to the numeric block
-    C=apply(A,B); return
+    % Multiply by suffixes
+    for n=numel(A.suffix):-1:1
+        B=A.suffix{n}*B;
+    end
+    B=full(B);
+
+    % Sum tensor actions using constructor-owned dimensions
+    for n=1:numel(A.cores)
+        cores=A.cores{n};
+        for k=1:numel(cores)
+            if isa(cores{k},'function_handle')
+                cores{k}=struct('action',cores{k},'dims',A.core_dims{n}{k});
+            end
+        end
+        term=kronm(cores,B);
+        if n==1, C=term; else, C=C+term; end
+    end
+
+    % Multiply by prefixes
+    for n=numel(A.prefix):-1:1
+        C=A.prefix{n}*C;
+    end
+    C=full(C); return
 
 end
 

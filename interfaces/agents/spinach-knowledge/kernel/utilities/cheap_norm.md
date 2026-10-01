@@ -25,5 +25,3 @@ Syntax: `n=cheap_norm(A,t,itmax)`
 
 - Higham and Tisseur, algorithm referenced in the source: <https://doi.org/10.1137/S0895479899356080>
 - Spinach Wiki page: <https://spindynamics.org/wiki/index.php?title=cheap_norm.m>
-
-Polyadic forward and adjoint probes use `apply` to obtain numeric block actions even when a probe is scalar, as for one-row or one-column implicit operators. Scalar probes are therefore not confused with scalar operator scaling. The norm-estimation algorithm and its lower-bound guarantee are unchanged.

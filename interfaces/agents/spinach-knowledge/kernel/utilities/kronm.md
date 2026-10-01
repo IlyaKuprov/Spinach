@@ -10,6 +10,6 @@ The contraction reshapes each tensor dimension into matrix rows, applies the cor
 
 ## Implicit factors
 
-A factor may instead be a construction description with `action` and `dims` fields, as supplied to `polyadic`. `dims=[nrows ncols]` provides the tensor dimensions, and `action(block)` applies the factor to a numeric matrix with `ncols` rows. Polyadic arithmetic supplies these descriptions internally through `core_specs`; an FFT or other action needs no string-command protocol. The contraction itself does not need the adjoint field.
+A factor may instead be a construction description with `action` and `dims` fields, as supplied to `polyadic`. `dims=[nrows ncols]` provides the tensor dimensions, and `action(block)` applies the factor to a numeric matrix with `ncols` rows. The existing polyadic `mtimes` overload supplies the action and dimensions internally; an FFT or other action needs no string-command protocol. The contraction itself does not need the adjoint field.
 
 The function validates the cell structure, scalar implicit descriptions with function-handle actions, the factor dimensions, and the numeric right-hand side. The caller is responsible for matching dimensions and supplying linear actions with the documented output shape. No periodic-grid or spin-system assumptions are made here.

@@ -33,17 +33,11 @@ for n=1:numel(p.cores)
     end
 end
 for n=1:numel(p.prefix)
-    if isa(p.prefix{n},'function_handle')
-        error('function handle cores cannot be materialised.');
-    end
     if isa(p.prefix{n},'polyadic')
         p.prefix{n}=inflate(p.prefix{n});
     end
 end
 for n=1:numel(p.suffix)
-    if isa(p.suffix{n},'function_handle')
-        error('function handle cores cannot be materialised.');
-    end
     if isa(p.suffix{n},'polyadic')
         p.suffix{n}=inflate(p.suffix{n});
     end
@@ -94,6 +88,9 @@ end
 for n=1:numel(p.suffix)
     answer=answer*p.suffix{n};
 end
+
+% Materialise a scaled identity produced by singleton affixes
+if isa(answer,'opium'), answer=sparse(answer); end
 
 end
 

@@ -84,7 +84,7 @@ idx_hist=[]; idx=1:t; idx_best=1; est_old=0; S=zeros(row_dim,t);
 for k=1:(itmax+1)
 
     % Matrix-vector products with the operator
-    Y=apply(A,X); col_norms=sum(abs(Y),1);
+    Y=A*X; col_norms=sum(abs(Y),1);
 
     % Extract the current estimate
     [est,best_col]=max(col_norms);
@@ -128,7 +128,7 @@ for k=1:(itmax+1)
     end
 
     % Adjoint products with the phase matrix
-    Z=apply(A',S); row_scores=max(abs(Z),[],2);
+    Z=A'*S; row_scores=max(abs(Z),[],2);
 
     % Stop when the best column has been reached
     if (k>=2)&&(max(row_scores)==row_scores(idx_best))
@@ -179,5 +179,4 @@ end
 % when they are anything but.
 %
 % Rod Liddle
-
 

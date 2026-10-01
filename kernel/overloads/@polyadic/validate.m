@@ -50,14 +50,15 @@ for n=1:numel(p.suffix)
     if isa(p.suffix{n},'polyadic'), validate(p.suffix{n}); end
 end
     
-% Recover dimensions supplied at core construction
-cores=core_specs(p);
-
 % Check core dimensions
 core_dims=zeros(numel(p.cores),2);
 for n=1:numel(p.cores)
-    nrows=cellfun(@(x)core_size(x,1),cores{n});
-    ncols=cellfun(@(x)core_size(x,2),cores{n});
+    dims=p.core_dims{n};
+    for k=1:numel(dims)
+        if isempty(dims{k}), dims{k}=size(p.cores{n}{k}); end
+    end
+    nrows=cellfun(@(x)x(1),dims);
+    ncols=cellfun(@(x)x(2),dims);
     core_dims(n,1)=prod(nrows(:));
     core_dims(n,2)=prod(ncols(:));
 end

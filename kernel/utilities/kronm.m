@@ -33,8 +33,9 @@ ncols=size(x,2);
 row_dims=zeros(1,nmats); 
 col_dims=zeros(1,nmats);
 for n=1:nmats
-    row_dims(n)=core_size(Q{nmats-n+1},1);
-    col_dims(n)=core_size(Q{nmats-n+1},2);
+    core=Q{nmats-n+1};
+    if isstruct(core), dims=core.dims; else, dims=size(core); end
+    row_dims(n)=dims(1); col_dims(n)=dims(2);
 end
 
 % Dimension map for x
@@ -110,6 +111,11 @@ for n=1:numel(Q)
         if ~isscalar(Q{n})||~isfield(Q{n},'action')||...
            ~isa(Q{n}.action,'function_handle')
             error('implicit factors need a function handle action.');
+        end
+        if ~isfield(Q{n},'dims')||~isnumeric(Q{n}.dims)||~isreal(Q{n}.dims)||...
+           ~isequal(size(Q{n}.dims),[1 2])||any(~isfinite(Q{n}.dims))||...
+           any(Q{n}.dims<1)||any(mod(Q{n}.dims,1)~=0)
+            error('implicit factor dims must be a row of two positive integers.');
         end
     elseif ~ismatrix(Q{n})||~isnumeric(Q{n})
         error('Q must be a cell array of matrices or implicit factors.');

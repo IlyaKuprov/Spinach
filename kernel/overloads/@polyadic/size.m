@@ -21,8 +21,11 @@ function varargout=size(p,dim)
 % Check consistency
 if nargin==2, grumble(dim); end
 
-% Recover dimensions supplied at core construction
-cores=core_specs(p);
+% Combine stored implicit dimensions with matrix dimensions
+core_dims=p.core_dims{1};
+for k=1:numel(core_dims)
+    if isempty(core_dims{k}), core_dims{k}=size(p.cores{1}{k}); end
+end
 
 % Get row dimension
 if ~isempty(p.prefix)
@@ -33,7 +36,7 @@ if ~isempty(p.prefix)
 else
     
     % The cores of the polyadic
-    nrows=prod(cellfun(@(x)core_size(x,1),cores{1}));
+    nrows=prod(cellfun(@(dims)dims(1),core_dims));
     
 end
 
@@ -46,7 +49,7 @@ if ~isempty(p.suffix)
 else
     
     % The cores of the polyadic
-    ncols=prod(cellfun(@(x)core_size(x,2),cores{1}));
+    ncols=prod(cellfun(@(dims)dims(2),core_dims));
     
 end
 

@@ -25,30 +25,16 @@ function p=prefix(a,p)
 % Check consistency
 grumble(p);
 
-% Buffer implicit-core scalar prefix as a dimensioned scaled identity
-if ~isa(a,'polyadic')&&isscalar(a)&&any(cellfun(@(term)any(cellfun(@(core)isa(core,'function_handle'),term)),p.cores))
-    p.prefix=[{opium(size(p,1),a)} p.prefix]; return
+% Represent scalar prefix as a dimensioned scaled identity
+if ~isa(a,'polyadic')&&isscalar(a), a=opium(size(p,1),a); end
+
+% Check the dimensions
+if size(a,2)~=size(p,1)
+    error('matrix dimension mismatch.');
 end
 
-% Absorb the prefix
-if ~isa(a,'polyadic')&&isscalar(a)
-    
-    % Multiply the first core
-    for n=1:numel(p.cores)
-        p.cores{n}{1}=a*p.cores{n}{1};
-    end
-    
-else
-    
-    % Check the dimensions
-    if size(a,2)~=size(p,1)
-        error('matrix dimension mismatch.');
-    end
-
-    % Update prefix array
-    p.prefix=[{a} p.prefix];
-    
-end
+% Update prefix array
+p.prefix=[{a} p.prefix];
 
 end
 

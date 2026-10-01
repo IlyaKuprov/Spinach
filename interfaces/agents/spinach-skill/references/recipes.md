@@ -765,3 +765,21 @@ text (row strings or cell vectors of lines), not numeric arrays.
 Complex NMR quadratures use `ARBITRARY UNITS`; magnitude/power data must
 be real and already transformed. NMR assignments may omit heights and method
 comments; widths require a method description.
+
+## Snapshot POD for repeated parameter families
+
+For a defined system and parameter family, train explicitly with `pod_basis`,
+project fixed affine Liouvillian terms and initial/detection vectors once with
+`pod_project`, and evaluate their coefficients with `pod_evolve`. Supplied
+snapshot blocks or U*S factors share one Euclidean state ordering; weights
+are block-energy weights, not silently normalised case probabilities. Exact
+SVD and seeded randomised sketches have different optimality claims, and a
+pre-truncated factor cannot recover omitted snapshot information. Neither
+snapshot residual nor orthogonality establishes observable accuracy,
+positivity, or trace preservation. Compare independent full Spinach FIDs and
+identically processed spectra within the intended grid. Use
+`L=H+1i*R+1i*K` in rad/s, time in seconds, and conjugated detection. Training,
+projection, and repeated evaluation have separate costs. The maintained
+`snapshot_pod_nmr` example makes the sampling and ranks explicit; no automatic
+propagator truncation, methyl model, pulse fit, slow-mode selection, or offset
+interpolation is supplied by these utilities.

@@ -14,7 +14,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Each comment block must be preceded by a blank line. If the comment only contains one sentence, omit the full stop at the end of the sentence.
 
-* **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose, its usage syntax, input parameters, and outputs. Always format this documentation header exactly as seen in existing functions (refer to the `kernel` and `experiments` directories for examples). Do not omit any expected sections in the header. Helper functions should have a one-line comment above their signature with a description of what they do.
+* **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose and, where applicable, its usage syntax, input parameters, and outputs. For non-example functions, format this documentation header exactly as seen in the `kernel` and `experiments` directories, and do not omit any expected sections. For examples, follow the Spinach example coding style below; no-argument, no-output demonstrations must not acquire empty library-style sections. Helper functions should have a one-line comment above their signature with a description of what they do.
 
 * **Input Validation with `grumble`:** All non-example `.m` files must perform input argument validation at the start of the main function using the `grumble` helper. After the function definition and the setting of default argument values, call an internal helper function named `grumble` to check the validity of arguments. Define the full `grumble` helper at the end of the same file.
 
@@ -47,6 +47,105 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 * **Always RTFM:** Before writing code, check Matlab manual and Spinach knowledge base to see if some or all of the required features already exist somewhere in *Matlab* or *Spinach*. If they do, call existing functions to minimize the size and complexity of your code. Make sure that the functions you are calling actually exist in *Matlab* or *Spinach*. Never call functions that do not exist without making them first.
 
 * **Code overrules documentation:** Where code and documentation disagree, and the code is physically / mathematically correct, update the documentation to match the code.
+
+## Spinach example coding style
+
+### General character
+
+Spinach examples are compact, readable scientific demonstrations, not applications or general-purpose APIs. The reader should be able to follow the physical model, numerical choices, calculation, and result from top to bottom. Parameters are visible assignments; the calculation uses existing Spinach functions; plotting or a short numerical report completes the demonstration.
+
+The common shape is **physical specification → basis and numerical options → Spinach housekeeping → experiment or calculation → processing → presentation**. This is a dependency order, not a compulsory list of sections: a tensor visualisation or numerical benchmark should not acquire an irrelevant spin-system setup.
+
+### Instructions for future examples
+
+#### 1. Make the example a direct demonstration
+
+- Put the main example in a standalone `.m` function file whose name describes the experiment, system, or feature. Match the function name to the filename.
+- Normally use `function example_name()` with no inputs or outputs. Put the chosen physical parameters directly in the body, where the reader can edit them. These are the specification of the example, not fallback values for missing arguments.
+- If the demonstration genuinely needs inputs or returns results, use a fixed signature and document every argument, shape, and unit. Do not add optional arguments, `nargin` defaults, `varargin`, or silent shape adaptation.
+- Keep the scientific calculation in sight. Do not turn a short example into a driver framework, configuration parser, class, command-line interface, or collection of tiny helpers.
+- Call existing Spinach and MATLAB facilities. Put reusable pulse-sequence or general library functionality in its appropriate library location rather than burying a new implementation in an example.
+- Do not add a `grumble` merely because library functions have one: the repository's blanket `grumble` requirement explicitly excludes examples. Reusable non-example functions still follow the library validation rules.
+
+#### 2. Start with a scientific header
+
+- Before the function signature, describe the physical problem and what the example calculates or demonstrates. Name the experiment, molecule, material, algorithm, or observable precisely.
+- For a literature-based example, give the relevant DOI or source and identify the figure or result being demonstrated. State material differences, approximations, and omissions without implying an exact reproduction when it is not one.
+- Keep an ordinary header short. Use additional paragraphs when scientific interpretation requires them; do not move that discussion into long comment blocks in the executable body.
+- Include a `Calculation time:` line when known, with hardware or memory qualifications when important. Do not invent a timing or copy another example's timing without evidence.
+- Retain author attribution, normally the authors' email addresses or names, at the end of the header. Do not invent authorship.
+- For a no-argument, no-output demonstration, avoid empty library-style `Inputs`, `Outputs`, or `Syntax` sections. If arguments exist, document them properly.
+
+#### 3. Organise the body into small, captioned blocks
+
+- Separate conceptually distinct operations with one blank line and one explanatory comment line. Use a short purpose caption, such as `% Basis set`, `% Simulation`, or `% Fourier transform`.
+- Every body comment block above code is exactly one line. Omit the final full stop for a one-sentence comment. Put longer explanations in the header.
+- Group related assignments together: magnetic field and isotope specification; Zeeman and coupling data; coordinates; relaxation; basis; algorithmic options; experiment parameters. Use only the groups the demonstration needs.
+- Keep physical and numerical choices explicit. Preserve tensor component order, spin order, units, phase conventions, and normalisation. Comments should explain non-obvious choices, not merely translate assignment syntax into English.
+- Use inline comments sparingly for units, parameter roles, or labels within data arrays. Aligned inline captions are particularly characteristic of optimal-control parameter blocks.
+- Use `%%` only when a long example genuinely has separate major demonstrations. Ordinary operation blocks use `%`, without banners or numbered workflow narration.
+
+#### 4. Use the familiar Spinach data flow
+
+- Keep the conventional structure names: `sys`, `inter`, `bas`, `spin_system`, `parameters`, and, for optimal control, `control`.
+- Specify system and interaction data directly or obtain them from an existing Spinach importer or standard-system function. Use accompanying example data by relative filename; do not bake in a developer's absolute paths or introduce runtime downloads and installation machinery.
+- Set the formalism, approximation, relaxation model, grids, and important tolerances deliberately. Do not copy another system's numerical choices without understanding them.
+- Normally keep `create()` followed by `basis()` together under `% Spinach housekeeping`. Where necessary, perform spin selection or other system changes between them, and caption those operations explicitly.
+- Construct states and operators after the required basis is available. Make assumptions explicit where the example constructs Hamiltonians directly.
+- For standard experiments, call the appropriate context with an existing sequence handle, such as `liquid(spin_system,@acquire,parameters,'nmr')`. Direct Hamiltonian construction and propagation are appropriate when those operations are themselves the demonstration.
+- Keep acquisition, apodisation, Fourier transformation, coherence combination, and plotting distinct. Use the signal component and transform dimensions appropriate to the experiment; never make `real`, `imag`, or `abs` an interchangeable cosmetic choice.
+
+This familiar passage from an acquisition example illustrates the block rhythm:
+
+```matlab
+% Spinach housekeeping
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+
+% Simulation
+fid=liquid(spin_system,@acquire,parameters,'nmr');
+
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
+
+% Fourier transform
+spectrum=fftshift(fft(fid,parameters.zerofill));
+
+% Plotting
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
+```
+
+The intervening experiment-parameter block is omitted here; this is a layout excerpt, not a complete example.
+
+#### 5. Keep sweeps and optimal control readable
+
+- Use a straightforward `for` or `parfor` when scanning one physical parameter. Define the scan axis visibly, preallocate results, and caption the work inside the loop.
+- Reuse the spin system when only experiment parameters change; rebuild it when the scanned system or interaction data require that. Do not hide this distinction behind a generic runner.
+- For optimal control, show the initial and target states, their normalisation, drift and control operators, offsets or ensemble, pulse timing and powers, penalties, optimiser settings, and initial guess in a logical order.
+- Keep `control` assignments in one readable block, then call `optimcon()` and the appropriate existing optimiser. Make waveform rescaling and any subsequent propagation or fidelity calculation explicit.
+- A local callback is justified when it implements a substantive repeatedly evaluated objective or calculation. Do not create single-use or trivial helpers simply to shorten the visible body.
+
+#### 6. Match the typography and naming
+
+- Use four-space indentation inside control-flow blocks, no tabs, and no extra indentation for the entire main function body.
+- Do not put spaces around assignment, arithmetic, or logical operators: `a=b+c*d`, `x==y`, `k<=n`. Spaces used to separate or align entries in numerical arrays are not operator spacing.
+- End ordinary assignments with semicolons. Short, closely related operations may share a line; do not compress a scientific stage into a dense chain of unrelated statements.
+- Wrap long calls and expressions with `...`, aligning continuations with the relevant argument or expression. Align tensor and coordinate rows where that improves readability.
+- Use descriptive, lowercase, underscore-separated names of at most 20 characters. Simple loop counters such as `n` and `k` are acceptable; do not use `i` or `l` as variable names, and use `1i` for the imaginary unit.
+- The house rules permit uppercase textbook operator names `H`, `R`, `K`, `P`, and `Q`; other new variables should be descriptive and lowercase. Preserve required API field names and literal option strings rather than renaming them to satisfy a variable convention.
+- Use British spelling, preferring `s` to `z`, and the Oxford comma in prose. Do not alter an existing API spelling.
+- Finish each new or edited `.m` file with exactly two blank lines, as required by the house rules. Preserve existing end-of-file quotations when editing.
+
+#### 7. End with the scientific result
+
+- Prefer Spinach's plotting conventions: `kfigure`, `plot_1d` or `plot_2d` for spectra, and `kxlabel`, `kylabel`, `klegend`, and `kgrid` where appropriate. Use standard MATLAB plotting when the result is not a standard spectrum.
+- Give axes physical labels and units. Make normalisation and comparison conditions explicit; do not silently rescale away a physical difference.
+- Use a concise `disp` or `report` for quantities that are better reported numerically. Save a figure, waveform, or data file when it is part of the demonstrated workflow, not as automatic reporting boilerplate.
+- Keep assertions and reference comparisons when correctness, convergence, or benchmarking is the subject of the example. Do not graft a generic test harness or progress-reporting framework onto an ordinary simulation.
+
+### Applying the instructions
+
+Choose a nearby example from the same scientific family as the starting point, then apply the rules above. Preserve the existing scientific content when restyling: parameter values, data, references, approximations, ordering, and result interpretation must not change accidentally. Follow the current repository's `AGENTS.md` if its rules change. Legacy deviations are not instructions for new code.
 
 ## Wiki Instructions
 

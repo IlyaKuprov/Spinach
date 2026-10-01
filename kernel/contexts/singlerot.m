@@ -176,6 +176,7 @@ switch spin_system.bas.formalism
         if ismember('polyadic',spin_system.sys.enable)
             rotor_phases=fourdif(spc_dim,1);
             kern=fftdiff(1,spc_dim,2*pi/spc_dim).';
+            if ismember('gpu',spin_system.sys.enable), kern=gpuArray(kern); end
             d_dphi=struct('action',@(x)ifft(kern.*fft(x,[],1),[],1),...
                            'adjoint',@(x)ifft(conj(kern).*fft(x,[],1),[],1),...
                            'dims',[spc_dim spc_dim]);

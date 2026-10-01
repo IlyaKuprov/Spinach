@@ -40,3 +40,5 @@ A source-documented parameter pattern is `parameters.spins = {'1H','13C'}`, a si
 ## Optional FFT rotor derivative
 
 With `sys.enable={'polyadic'}`, the Liouville rotor term is kept as a polyadic product of an FFT action using the precomputed `fftdiff` multiplier and the spin identity. The Hamiltonian phase blocks remain explicit; relaxation and kinetics are lifted as before. The callback receives a polyadic generator and must support exponential-action propagation through `step` or `evolution`. This opt-in retains the same phase grid, rotor direction, and state averaging; it does not lower the chosen rotor rank. The default explicit path and Hilbert branch are unchanged.
+
+When GPU mode is also enabled, the FFT multiplier is uploaded before its action handles are constructed, so repeated forward and adjoint actions reuse a device-resident multiplier.

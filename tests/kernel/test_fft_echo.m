@@ -63,6 +63,20 @@ result=test_close(result,'decoupled acquisition',implicit,reference,...
                   1e-10*norm(reference),0,...
                   'projected implicit propagation matches analytical decoupling');
 
+% GPU acquisition exercises device-captured FFT actions and analytical decoupling
+if gpuDeviceCount('available')>0
+    spin_system.sys.enable={'gpu'};
+    gpu_exp=singlerot(spin_system,@acquire,acq_par,'nmr');
+    spin_system.sys.enable={'gpu','polyadic'};
+    gpu_fft=singlerot(spin_system,@acquire,acq_par,'nmr');
+    result=test_close(result,'GPU explicit acquisition',gather(gpu_exp),reference,...
+                      1e-10*norm(reference),0,'GPU propagation agrees with the CPU reference');
+    result=test_close(result,'GPU FFT acquisition',gather(gpu_fft),reference,...
+                      1e-10*norm(reference),0,'device-captured FFT propagation preserves decoupling');
+else
+    result.messages{end+1}='SKIP: GPU acquisitions require a usable GPU.';
+end
+
 % The motivating P1 ESR model uses the same small one-orientation grid
 p1.orientation='111'; p1.nitrogen='14N';
 [sys,inter]=diamond_p1(p1);

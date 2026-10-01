@@ -175,9 +175,18 @@ switch spin_system.bas.formalism
         % Make the rotor turning generator
         if ismember('polyadic',spin_system.sys.enable)
             rotor_phases=fourdif(spc_dim,1); max_rank=parameters.max_rank;
-            d_dphi=struct('action',@(x)ifft(fft(x,[],1).*(1i*[0:max_rank -max_rank:-1].'),[],1),...
-                           'adjoint',@(x)ifft(fft(x,[],1).*(-1i*[0:max_rank -max_rank:-1].'),[],1),...
-                           'dims',[spc_dim spc_dim]);
+
+            % Forward and inverse transforms with their normalised adjoints
+            fft_core=struct('action',@(x)fft(x,[],1),...
+                            'adjoint',@(x)spc_dim*ifft(x,[],1),'dims',[spc_dim spc_dim]);
+            ifft_core=struct('action',@(x)ifft(x,[],1),...
+                             'adjoint',@(x)fft(x,[],1)/spc_dim,'dims',[spc_dim spc_dim]);
+
+            % Build the diagonal multiplier once as a numeric CPU core
+            mult_core=spdiags(1i*[0:max_rank -max_rank:-1].',0,spc_dim,spc_dim);
+
+            % Compose three sequential factors through ordinary multiplication
+            d_dphi=polyadic({{ifft_core}})*polyadic({{mult_core}})*polyadic({{fft_core}});
             M=(2*pi*parameters.rate)*polyadic({{d_dphi,opium(spn_dim,1)}});
         else
             [rotor_phases,d_dphi]=fourdif(spc_dim,1);
@@ -325,6 +334,9 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
 
             % Assemble the Fokker-Planck evolution generator
             G=clean_up(spin_system,blkdiag(H{:})+1i*M,spin_system.tols.liouv_zero);
+
+            % Upload the polyadic once on this worker and reuse its GPU factors
+            if isa(G,'polyadic')&&ismember('gpu',spin_system.sys.enable), G=gpuArray(G); end
     
             % Run the pulse sequence
             ans_array{q}=pulse_sequence(spin_system,parameters,G,R,K);

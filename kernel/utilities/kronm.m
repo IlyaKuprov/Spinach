@@ -106,8 +106,13 @@ if (~iscell(Q))
     error('Q must be a cell array.');
 end
 for n=1:numel(Q)
-    if ~ismatrix(Q{n})||(~isnumeric(Q{n})&&~isstruct(Q{n}))
-        error('Q must be a cell array of matrices.');
+    if isstruct(Q{n})
+        if ~isscalar(Q{n})||~isfield(Q{n},'action')||...
+           ~isa(Q{n}.action,'function_handle')
+            error('implicit factors need a function handle action.');
+        end
+    elseif ~ismatrix(Q{n})||~isnumeric(Q{n})
+        error('Q must be a cell array of matrices or implicit factors.');
     end
 end
 if ~isnumeric(x)

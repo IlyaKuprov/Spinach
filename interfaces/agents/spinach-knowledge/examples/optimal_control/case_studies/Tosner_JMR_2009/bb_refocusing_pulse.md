@@ -1,5 +1,7 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m
 
+> Historical Spinach variant, not the article’s propagator-optimised 15 kHz pulse: this script uses a 30 kHz nominal RF scale and three state-transfer targets. For a source-deposited universal π rotation and a 2D RF/offset profile, use [UR180](../Kobzar_JMR_2012/ur180_profiles.md).
+
 - Signature: `bb_refocusing_pulse()`
 - Source: [examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m)
 

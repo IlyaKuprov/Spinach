@@ -123,8 +123,13 @@ if (nargout>0)&&(~isempty(L))
             report(spin_system,['zeroing ' num2str(nnz(fp_zero_mask))...
                                 ' rows and columns in the Liouvillian.']);
 
-            % Apply the zero mask
-            L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
+            % Apply the zero mask without opening implicit operators
+            if isa(L,'polyadic')
+                P=spdiags(double(~fp_zero_mask),0,size(L,1),size(L,2));
+                L=P*L*P;
+            else
+                L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
+            end
 
         case 'zeeman-liouv'
 
@@ -221,5 +226,6 @@ end
 % It's not worth doing something unless you were doing something that
 % someone, somewere, would much rather you weren't doing.
 %
-% Terry Pratchett 
+% Terry Pratchett
+
 

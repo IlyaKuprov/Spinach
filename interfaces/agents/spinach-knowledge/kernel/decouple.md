@@ -22,7 +22,7 @@ Removes selected-spin involvement from the supplied operator and/or state data. 
 
 ## Projection performed
 
-In `sphten-liouv`, the zero mask flags basis rows for which the sum of the selected-spin basis entries is nonzero. Those state components are zeroed in `rho`, and the matching rows and columns of `L` are zeroed. With a Fokker–Planck direct product, this mask is repeated across the spatial/orientational subspace.
+In `sphten-liouv`, the zero mask flags basis rows for which the sum of the selected-spin basis entries is nonzero. Those state components are zeroed in `rho`, and the matching rows and columns of `L` are zeroed. With a Fokker–Planck direct product, this mask is repeated across the spatial/orientational subspace. For polyadic Liouvillians, the same zero mask is applied as a diagonal projector on both sides, preserving unopened implicit cores rather than requiring indexed assignment.
 
 In the Zeeman formalisms, spin involvement is not diagonal in the Zeeman basis. The code instead constructs a projector onto the selected spins' identity components, using the spin multiplicities and matrix-unit factors. For `zeeman-liouv`, the projector is extended over any Fokker–Planck coordinates; it is applied to both sides of `L` and to `rho`. For `zeeman-hilb`, the Hamiltonian and density-matrix stack are reshaped into Liouville-space columns, projected, and reshaped back. Thus each selected-spin Hamiltonian/state factor is reduced to its identity-component average, as described in the source comments.
 

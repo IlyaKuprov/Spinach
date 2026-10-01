@@ -50,6 +50,19 @@ for formalism={'zeeman-liouv','sphten-liouv'}
 end
 
 
+% Analytical decoupling remains available for implicit acquisition
+acq_par=parameters; acq_par.grid='single_crystal';
+acq_par.max_rank=1; acq_par.rate=500; acq_par.serial=true;
+acq_par.npoints=4; acq_par.decouple={'13C'};
+acq_par.rho0=state(spin_system,'L+','1H'); acq_par.coil=acq_par.rho0;
+spin_system.sys.enable={};
+reference=singlerot(spin_system,@acquire,acq_par,'nmr');
+spin_system.sys.enable={'polyadic'};
+implicit=singlerot(spin_system,@acquire,acq_par,'nmr');
+result=test_close(result,'decoupled acquisition',implicit,reference,...
+                  1e-10*norm(reference),0,...
+                  'projected implicit propagation matches analytical decoupling');
+
 % The motivating P1 ESR model uses the same small one-orientation grid
 p1.orientation='111'; p1.nitrogen='14N';
 [sys,inter]=diamond_p1(p1);

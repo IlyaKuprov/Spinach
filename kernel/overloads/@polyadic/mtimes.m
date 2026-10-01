@@ -114,10 +114,12 @@ if isa(A,'polyadic')&&isa(B,'polyadic')
         for n=1:numel(A.cores{1})
             
             % Inner product compatibility check
+            can_proceed=~isa(A.cores{1}{n},'matfree')&&can_proceed;
+            can_proceed=~isa(B.cores{1}{n},'matfree')&&can_proceed;
             can_proceed=(size(A.cores{1}{n},2)==...
                          size(B.cores{1}{n},1))&&can_proceed;
 
-            % Opia are fine in any case...
+            % Opia are fine in any case
             if (~isa(A.cores{1}{n},'opium'))&&...
                (~isa(B.cores{1}{n},'opium'))
 
@@ -168,4 +170,5 @@ end
 % immediately, so I can work out who to blame."
 %
 % Preface to a cryptanalysis book
+
 

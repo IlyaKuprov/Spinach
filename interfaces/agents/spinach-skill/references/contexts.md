@@ -477,3 +477,9 @@ box, with its left edge and its cap line 10 points from the left and the top
 edge of the box; the offsets are computed when it is called, so call it after the
 figure has its final size and a tiled layout all of its tiles; `fig2tiles` re-applies the tagged letters on the
 retiled axes of a merged figure.
+
+### Matrix-free single-rotor propagation
+
+For a Liouville `singlerot` calculation, `sys.enable={'polyadic'}` applies the rotor derivative through FFTs at the same `2*max_rank+1` phase points. This changes storage and multiplication, not the rotor truncation or powder-phase averaging. The callback receives a polyadic generator: use `step` or `evolution` exponential actions, not explicit matrix exponentiation, indexing, or materialisation. `echo_sweep` supports this route. The default explicit derivative and the Hilbert Hamiltonian-stack route are unchanged.
+
+The FFT term is a `matfree` core with forward and adjoint block actions. Arbitrary action cores must supply correct dimensions, mutually adjoint finite linear actions, and a truthful reality flag. Captured data are not inspected or transferred by the wrapper; actions must preserve the input device. `full` and `inflate` reject opaque cores. Converge rotor rank independently of this storage choice.

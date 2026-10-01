@@ -96,6 +96,10 @@
 %
 % ilya.kuprov@weizmann.ac.il
 %
+% With sys.enable={'polyadic'}, the Liouville rotor derivative is applied
+% by FFT without forming its matrix. The callback must accept a polyadic
+% generator; use step or evolution exponential-action propagation.
+%
 % <https://spindynamics.org/wiki/index.php?title=singlerot.m>
 
 function [answer,sph_grid]=singlerot(spin_system,pulse_sequence,...
@@ -126,8 +130,7 @@ if ismember('iso_eq',parameters.needs)
     parameters.rho0=equilibrium(spin_system,I_labframe);
 end
 
-% Get carrier operators for numerical
-% rotating frame transformations
+% Get carrier operators for numerical rotating frame transformations
 C=cell(size(parameters.rframes));
 for n=1:numel(parameters.rframes)
     C{n}=carrier(spin_system,parameters.rframes{n}{1});
@@ -170,8 +173,13 @@ switch spin_system.bas.formalism
         report(spin_system,['Fokker-Planck problem dimension:  ' num2str(spc_dim*spn_dim)]);
 
         % Make the rotor turning generator
-        [rotor_phases,d_dphi]=fourdif(spc_dim,1);
-        M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
+        if ismember('polyadic',spin_system.sys.enable)
+            rotor_phases=fourdif(spc_dim,1);
+            M=(2*pi*parameters.rate)*polyadic({{fourdif_fft(spc_dim),opium(spn_dim,1)}});
+        else
+            [rotor_phases,d_dphi]=fourdif(spc_dim,1);
+            M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
+        end
 
         % Project relaxation and kinetics superoperators into the FP space
         R=kron(speye([spc_dim spc_dim]),R); K=kron(speye([spc_dim spc_dim]),K);
@@ -519,4 +527,5 @@ end
 % told that this is not correct and asked to amend it.
 % 
 % IK's contract at Southampton University, 2014
+
 

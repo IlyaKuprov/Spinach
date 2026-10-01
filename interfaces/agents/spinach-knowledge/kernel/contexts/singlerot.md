@@ -36,3 +36,7 @@ The grid provides one quadrature orientation per weight. At each orientation, Wi
 ## Source-supported setup pattern
 
 A source-documented parameter pattern is `parameters.spins = {'1H','13C'}`, a signed `parameters.rate` in hertz, a three-component `parameters.axis`, a grid filename appropriate to the formalism, and an experiment function handle as `pulse_sequence`. For an explicit rotating-frame example, the source gives `parameters.rframes = {{'13C',2},{'14N',3}}`. The source does not include a complete concrete pulse-sequence invocation; use a function from `experiments` for that part.
+
+## Optional FFT rotor derivative
+
+With `sys.enable={'polyadic'}`, the Liouville rotor term is kept as a polyadic product of the `fourdif_fft` action core and the spin identity. The Hamiltonian phase blocks remain explicit; relaxation and kinetics are lifted as before. The callback receives a polyadic generator and must support exponential-action propagation through `step` or `evolution`. This opt-in retains the same phase grid, rotor direction, and state averaging; it does not lower the chosen rotor rank. The default explicit path and Hilbert branch are unchanged.

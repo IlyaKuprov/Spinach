@@ -22,3 +22,5 @@ The Kronecker products are stored unopened: the source states that multiplicativ
 - `p`: the polyadic object containing the supplied factorisation.
 
 No complex conjugation, scalar broadcasting, or Kronecker-product expansion is performed by this constructor. Related overloads: [prefix](./prefix.md), [simplify](./simplify.md), and [size](./size.md).
+
+`matfree` factors extend this representation to opaque forward/adjoint matrix actions. They provide dimensions for the existing Kronecker contraction and remain implicit during multiplication. Both actions are needed by norm estimation. They cannot be expanded by `full` or `inflate`; see [matfree](../@matfree/matfree.md).

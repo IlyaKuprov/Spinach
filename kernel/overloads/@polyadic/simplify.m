@@ -168,7 +168,7 @@ end
 % Matricise single-core polyadics
 if isa(p,'polyadic')&&isempty(p.prefix)&&...
    isempty(p.suffix)&&isscalar(p.cores)&&...
-   isscalar(p.cores{1})
+   isscalar(p.cores{1})&&~isa(p.cores{1}{1},'matfree')
     p=p.cores{1}{1};
 end
 
@@ -187,4 +187,5 @@ end
 % tely starts with it.
 %
 % Max Planck
+
 

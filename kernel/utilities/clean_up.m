@@ -21,8 +21,8 @@
 
 function A=clean_up(spin_system,A,nonzero_tol)
 
-% Skip opium objects
-if isa(A,'opium'), return; end
+% Skip implicit cores
+if isa(A,'opium')||isa(A,'matfree'), return; end
 
 % Skip if disabled
 if (nonzero_tol==0)||isnan(nonzero_tol), return; end
@@ -95,4 +95,5 @@ end
 % and taboos.
 %
 % H.L. Mencken
+
 

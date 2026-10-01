@@ -23,8 +23,9 @@
 %                    that behaves in many respects like the
 %                    matrix it represents.
 %
-% Note: nested polyadics are permitted - the input matrices may be
-%       polyadics themselves.
+% Note: nested polyadics and matfree action cores are permitted. An
+%       implicit core supplies dimensions and forward/adjoint handles;
+%       it cannot be explicitly materialised by full or inflate.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -125,4 +126,5 @@ end
 % will be displayed.
 %
 % Times Higher Education Magazine, 26 Oct 2017
+
 

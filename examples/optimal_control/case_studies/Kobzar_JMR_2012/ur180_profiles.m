@@ -26,78 +26,120 @@
 %
 function [profiles,fig]=ur180_profiles(offset_hz,rf_scales)
 
-% Build the one-spin rotating-frame Spinach representation
+% Magnetic field and isotope
 sys.magnet=14.1;
 sys.isotopes={'1H'};
+
+% Chemical shift, ppm
 inter.zeeman.scalar={0};
+
+% Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-Sx=state(spin_system,'Lx',1);
-Sx=Sx/norm(full(Sx),2);
-Sy=state(spin_system,'Ly',1);
-Sy=Sy/norm(full(Sy),2);
-Sz=state(spin_system,'Lz',1);
-Sz=Sz/norm(full(Sz),2);
-Lx=operator(spin_system,'Lx',1);
-Ly=operator(spin_system,'Ly',1);
-Lz=operator(spin_system,'Lz',1);
+
+% Normalised Cartesian states
+rho_x=state(spin_system,'Lx',1);
+rho_x=rho_x/norm(full(rho_x),2);
+rho_y=state(spin_system,'Ly',1);
+rho_y=rho_y/norm(full(rho_y),2);
+rho_z=state(spin_system,'Lz',1);
+rho_z=rho_z/norm(full(rho_z),2);
+
+% Control and offset operators
+lx=operator(spin_system,'Lx',1);
+ly=operator(spin_system,'Ly',1);
+lz=operator(spin_system,'Lz',1);
+
+% Drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));
-initial=[Sx Sy Sz];
-target=[-Sx Sy -Sz];
+
+% Initial and target mappings for a y-axis pi rotation
+initial=[rho_x rho_y rho_z];
+target=[-rho_x rho_y -rho_z];
 
 % Read the deposited x/y RF frequencies and slice durations
 source_dir=fileparts(mfilename('fullpath'));
 waveform=readmatrix(fullfile(source_dir,'ur180_20khz_40pct.dat'));
 assert(size(waveform,2)==3);
+
+% Slice durations and Cartesian controls in rad/s
 pulse_dt=waveform(:,3).';
 xy_rad=2*pi*waveform(:,1:2).';
 
-% Score all three Cartesian mappings of a y-axis pi rotation
+% Preallocate the offset-by-RF response
 fidelity=zeros(numel(offset_hz),numel(rf_scales));
+
+% Loop over resonance offsets
 parfor n_offset=1:numel(offset_hz)
-    drift=H+2*pi*offset_hz(n_offset)*Lz;
+
+    % Offset Hamiltonian and response row
+    drift=H+2*pi*offset_hz(n_offset)*lz;
     row=zeros(1,numel(rf_scales));
+
+    % Loop over RF scalings
     for n_scale=1:numel(rf_scales)
-        rf_x=rf_scales(n_scale)*xy_rad(1,:);
+
+        % Scale the deposited waveform
+        rf_x=rf_scales(n_scale)*xy_rad(1,:); %#ok<PFBNS>
         rf_y=rf_scales(n_scale)*xy_rad(2,:);
-        final_state=shaped_pulse_xy(spin_system,drift,{Lx,Ly},...
-                    {rf_x,rf_y},pulse_dt,initial,'expv-pwc');
+
+        % Propagate all three Cartesian states
+        final_state=shaped_pulse_xy(spin_system,drift,{lx,ly},...
+                                    {rf_x,rf_y},pulse_dt,initial,'expv-pwc');
+
+        % Score the three-state rotation
         row(n_scale)=real(trace(target'*final_state))/3;
+
     end
+
+    % Store the response row
     fidelity(n_offset,:)=row;
+
 end
 
 % Convert the three-state SO(3) score to the source SU(2) overlap
 quality=sqrt(max(0,(1+3*fidelity)/4));
+
+% Package the grid and rotation scores
 profiles.offset_hz=offset_hz;
 profiles.rf_scales=rf_scales;
 profiles.fidelity=fidelity;
 profiles.quality=quality;
 
-% Display the source waveform and its simulated response
+% Start the waveform and response figure
 fig=kfigure();
 tiledlayout(2,2);
+
+% Plot the deposited Cartesian waveform
 time_us=1e6*cumsum(pulse_dt);
 nexttile;
-plot(time_us,xy_rad(1,:)/(2*pi*1e3),time_us,xy_rad(2,:)/(2*pi*1e3));
-xlabel('time (microseconds)'); ylabel('RF quadratures (kHz)');
-title('deposited UR180 pulse'); legend({'x','y'}); grid on;
+plot(time_us,xy_rad(1,:)/(2*pi*1e3),...
+     time_us,xy_rad(2,:)/(2*pi*1e3));
+kxlabel('time (microseconds)'); kylabel('RF quadratures (kHz)');
+ktitle('deposited UR180 pulse'); klegend({'x','y'}); kgrid;
+
+% Plot the nominal RF amplitude
 nexttile;
 plot(time_us,hypot(xy_rad(1,:),xy_rad(2,:))/(2*pi*1e3));
-xlabel('time (microseconds)'); ylabel('RF amplitude (kHz)');
-title('RF at nominal power'); grid on;
+kxlabel('time (microseconds)'); kylabel('RF amplitude (kHz)');
+ktitle('RF at nominal power'); kgrid;
+
+% Plot the offset-by-RF robustness map
 nexttile;
 imagesc(offset_hz/1e3,rf_scales,quality.'); axis xy;
-xlabel('offset (kHz)'); ylabel('relative B_1');
-title('y-axis 180 degree overlap'); colorbar;
+kxlabel('offset (kHz)'); kylabel('relative $B_1$');
+ktitle('y-axis 180 degree overlap'); colorbar;
 clim([min(quality(:)) 1]);
+
+% Plot the RF-scale response profiles
 nexttile;
 plot(offset_hz/1e3,quality);
-xlabel('offset (kHz)'); ylabel('propagator overlap');
-title('profiles by RF scale'); grid on;
+kxlabel('offset (kHz)'); kylabel('propagator overlap');
+ktitle('profiles by RF scale'); kgrid;
 
 end
-
 

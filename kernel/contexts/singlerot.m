@@ -174,11 +174,9 @@ switch spin_system.bas.formalism
 
         % Make the rotor turning generator
         if ismember('polyadic',spin_system.sys.enable)
-            rotor_phases=fourdif(spc_dim,1);
-            kern=fftdiff(1,spc_dim,2*pi/spc_dim).';
-            if ismember('gpu',spin_system.sys.enable), kern=gpuArray(kern); end
-            d_dphi=struct('action',@(x)ifft(kern.*fft(x,[],1),[],1),...
-                           'adjoint',@(x)ifft(conj(kern).*fft(x,[],1),[],1),...
+            rotor_phases=fourdif(spc_dim,1); max_rank=parameters.max_rank;
+            d_dphi=struct('action',@(x)ifft(fft(x,[],1).*(1i*[0:max_rank -max_rank:-1].'),[],1),...
+                           'adjoint',@(x)ifft(fft(x,[],1).*(-1i*[0:max_rank -max_rank:-1].'),[],1),...
                            'dims',[spc_dim spc_dim]);
             M=(2*pi*parameters.rate)*polyadic({{d_dphi,opium(spn_dim,1)}});
         else

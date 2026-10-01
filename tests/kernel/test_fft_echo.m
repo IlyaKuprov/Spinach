@@ -63,7 +63,7 @@ result=test_close(result,'decoupled acquisition',implicit,reference,...
                   1e-10*norm(reference),0,...
                   'projected implicit propagation matches analytical decoupling');
 
-% GPU acquisition exercises device-captured FFT actions and analytical decoupling
+% GPU acquisition exercises FFT actions and analytical decoupling
 if gpuDeviceCount('available')>0
     spin_system.sys.enable={'gpu'};
     gpu_exp=singlerot(spin_system,@acquire,acq_par,'nmr');
@@ -72,7 +72,7 @@ if gpuDeviceCount('available')>0
     result=test_close(result,'GPU explicit acquisition',gather(gpu_exp),reference,...
                       1e-10*norm(reference),0,'GPU propagation agrees with the CPU reference');
     result=test_close(result,'GPU FFT acquisition',gather(gpu_fft),reference,...
-                      1e-10*norm(reference),0,'device-captured FFT propagation preserves decoupling');
+                      1e-10*norm(reference),0,'FFT propagation preserves decoupling on the GPU');
 else
     result.messages{end+1}='SKIP: GPU acquisitions require a usable GPU.';
 end

@@ -23,4 +23,10 @@ The Kronecker products are stored unopened: the source states that multiplicativ
 
 No complex conjugation, scalar broadcasting, or Kronecker-product expansion is performed by this constructor. Related overloads: [prefix](./prefix.md), [simplify](./simplify.md), and [size](./size.md).
 
-`matfree` factors extend this representation to opaque forward/adjoint matrix actions. They provide dimensions for the existing Kronecker contraction and remain implicit during multiplication. Both actions are needed by norm estimation. They cannot be expanded by `full` or `inflate`; see [matfree](../@matfree/matfree.md).
+## Implicit cores
+
+At a core position, supply `struct('action',fwd,'adjoint',adj,'dims',[nrows ncols])`. Both handles are ordinary numerical actions on matrix columns: `fwd` maps an `ncols`-row block to an `nrows`-row block; `adj` applies the Hermitian adjoint in the reverse direction. `dims` must be a row of two positive integers. No action is executed during construction. Bare handles without dimensions and an adjoint are rejected.
+
+The constructor unpacks the description into a function handle in `p.cores`, with paired `core_dims` and `core_adj` metadata. Arithmetic, Kronecker products, and simplification carry this metadata internally. The adjoint swaps the two actions and reverses dimensions; the non-conjugating transpose conjugates the adjoint action. Existing numeric-core construction is unchanged.
+
+Implicit cores cannot be materialised by `full` or `inflate`. `isreal` conservatively returns false for them, `nnz` counts each opaque core as one structural entry rather than counting matrix non-zeroes, and `allfinite` checks numeric factors only. The caller supplies linear, finite, dimensionally correct actions and a matching adjoint. GPU upload moves numeric factors only; actions must preserve the device of their input themselves.

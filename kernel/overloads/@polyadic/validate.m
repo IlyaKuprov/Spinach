@@ -29,7 +29,7 @@ for n=1:numel(p.cores)
         error('p.cores structure must be {{numeric,...},...}');
     end
     for k=1:numel(p.cores{n})
-        if ~isnumeric(p.cores{n}{k})
+        if ~isnumeric(p.cores{n}{k})&&~isa(p.cores{n}{k},'function_handle')
             error('p.cores structure must be {{numeric,...},...}');
         end
         if isa(p.cores{n}{k},'polyadic'), validate(p.cores{n}{k}); end
@@ -50,11 +50,14 @@ for n=1:numel(p.suffix)
     if isa(p.suffix{n},'polyadic'), validate(p.suffix{n}); end
 end
     
+% Recover dimensions supplied at core construction
+cores=core_specs(p);
+
 % Check core dimensions
 core_dims=zeros(numel(p.cores),2);
 for n=1:numel(p.cores)
-    nrows=cellfun(@(x)size(x,1),p.cores{n});
-    ncols=cellfun(@(x)size(x,2),p.cores{n});
+    nrows=cellfun(@(x)core_size(x,1),cores{n});
+    ncols=cellfun(@(x)core_size(x,2),cores{n});
     core_dims(n,1)=prod(nrows(:));
     core_dims(n,2)=prod(ncols(:));
 end
@@ -102,4 +105,5 @@ end
 %
 % A notice on a couple of empty 
 % kennels in a street in Moscow.
+
 

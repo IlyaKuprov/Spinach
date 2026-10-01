@@ -33,7 +33,7 @@ if ~isa(a,'polyadic')
     
     % Matrix + polyadic
     if isempty(b.prefix)&&isempty(b.suffix)
-        c=b; c.cores=[c.cores {{a}}];
+        c=polyadic([core_specs(b) {{a}}]);
     else
         c=polyadic({{a},{b}});
     end
@@ -42,7 +42,7 @@ elseif ~isa(b,'polyadic')
     
     % Polyadic + matrix
     if isempty(a.prefix)&&isempty(a.suffix)
-        c=a; c.cores=[c.cores {{b}}];
+        c=polyadic([core_specs(a) {{b}}]);
     else
         c=polyadic({{a},{b}});
     end
@@ -52,7 +52,7 @@ else
     % Polyadic + polyadic 
     if isempty(a.prefix)&&isempty(a.suffix)&&...
        isempty(b.prefix)&&isempty(b.suffix)
-       c=polyadic([a.cores b.cores]);
+       c=polyadic([core_specs(a) core_specs(b)]);
     else
        c=polyadic({{a},{b}});
     end
@@ -78,4 +78,5 @@ end
 % The best revenge is massive success.
 %
 % Frank Sinatra
+
 

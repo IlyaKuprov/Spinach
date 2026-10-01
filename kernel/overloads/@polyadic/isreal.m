@@ -19,7 +19,7 @@ function answer=isreal(p)
 % Check the core array
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        if ~isreal(p.cores{n}{k})
+        if isa(p.cores{n}{k},'function_handle')||~isreal(p.cores{n}{k})
             answer=false; return
         end
     end
@@ -45,4 +45,5 @@ end
 % A little inaccuracy sometimes saves a ton of explanation.
 %
 % H.H. Munro
+
 

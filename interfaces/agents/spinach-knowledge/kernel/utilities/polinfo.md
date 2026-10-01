@@ -33,3 +33,5 @@ Outputs:
 
 - Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=polyadic/polinfo.m>
 - Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/polinfo.m>
+
+Implicit function-handle cores are labelled `handle`, with dimensions read from the paired metadata owned by the polyadic. The diagram does not invoke or materialise their actions.

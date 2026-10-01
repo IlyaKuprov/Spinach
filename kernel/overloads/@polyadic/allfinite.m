@@ -21,7 +21,7 @@ function answ=allfinite(p)
 % Check the core array
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        if ~allfinite(p.cores{n}{k})
+        if ~isa(p.cores{n}{k},'function_handle')&&~allfinite(p.cores{n}{k})
             answ=false; return
         end
     end
@@ -48,4 +48,5 @@ end
 % place in the world for ugly mathematics.
 %
 % G.H. Hardy
+
 

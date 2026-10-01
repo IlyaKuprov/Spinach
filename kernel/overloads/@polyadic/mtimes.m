@@ -21,8 +21,15 @@ if ~isa(A,'polyadic')&&isnumeric(A)&&isscalar(A)
     
     % Multiply smallest cores in the B buffer
     for n=1:numel(B.cores)
-        [~,smallest_core]=min(cellfun(@numel,B.cores{n}));
-        B.cores{n}{smallest_core}=A*B.cores{n}{smallest_core};
+        core_sizes=cellfun(@numel,B.cores{n});
+        core_sizes(cellfun(@(x)isa(x,'function_handle'),B.cores{n}))=Inf;
+        [~,smallest_core]=min(core_sizes);
+        if isinf(core_sizes(smallest_core))
+            B.cores{n}{end+1}=A;
+            B.core_dims{n}{end+1}=[]; B.core_adj{n}{end+1}=[];
+        else
+            B.cores{n}{smallest_core}=A*B.cores{n}{smallest_core};
+        end
     end
     C=simplify(B); return
 
@@ -48,12 +55,8 @@ end
 % When B is a number
 if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)
 
-    % Multiply smallest cores in the A buffer
-    for n=1:numel(A.cores)
-        [~,smallest_core]=min(cellfun(@numel,A.cores{n}));
-        A.cores{n}{smallest_core}=A.cores{n}{smallest_core}*B;
-    end
-    C=simplify(A); return
+    % Reuse scalar multiplication on the left
+    C=B*A; return
     
 end
 
@@ -75,12 +78,13 @@ if ~isa(B,'polyadic')&&isnumeric(B)
     B=full(B);
    
     % Preallocate the core product result
-    core_rows=prod(cellfun(@(x)size(x,1),A.cores{1}));
+    cores=core_specs(A);
+    core_rows=prod(cellfun(@(x)core_size(x,1),cores{1}));
     C=zeros(core_rows,size(B,2));
 
     % Multiply by cores
     for n=1:numel(A.cores)
-        C=C+kronm(A.cores{n},B);
+        C=C+kronm(cores{n},B);
     end
     
     % Multiply by prefixes
@@ -114,8 +118,8 @@ if isa(A,'polyadic')&&isa(B,'polyadic')
         for n=1:numel(A.cores{1})
             
             % Inner product compatibility check
-            can_proceed=~isa(A.cores{1}{n},'matfree')&&can_proceed;
-            can_proceed=~isa(B.cores{1}{n},'matfree')&&can_proceed;
+            can_proceed=~isa(A.cores{1}{n},'function_handle')&&can_proceed;
+            can_proceed=~isa(B.cores{1}{n},'function_handle')&&can_proceed;
             can_proceed=(size(A.cores{1}{n},2)==...
                          size(B.cores{1}{n},1))&&can_proceed;
 

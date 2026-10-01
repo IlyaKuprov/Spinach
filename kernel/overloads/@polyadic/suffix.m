@@ -25,8 +25,13 @@ function p=suffix(p,a)
 % Check consistency
 grumble(p);
 
+% Buffer implicit-core scalar suffix as a dimensioned scaled identity
+if ~isa(a,'polyadic')&&isscalar(a)&&any(cellfun(@(term)any(cellfun(@(core)isa(core,'function_handle'),term)),p.cores))
+    p.suffix=[p.suffix {opium(size(p,2),a)}]; return
+end
+
 % Absorb the suffix
-if isscalar(a)
+if ~isa(a,'polyadic')&&isscalar(a)
     
     % Multiply the last core
     for n=1:numel(p.cores)
@@ -58,4 +63,5 @@ end
 % will over time become left-wing.
 %
 % O'Sullivan's First Law
+
 

@@ -26,19 +26,21 @@ if isa(a,'polyadic')&&(~isa(b,'polyadic'))&&...
    isempty(a.prefix)&&isempty(a.suffix)
     
     % Append B to core lists of A
+    cores=core_specs(a);
     for n=1:numel(a.cores)
-        a.cores{n}=[a.cores{n} {b}]; 
+        cores{n}=[cores{n} {b}];
     end
-    c=a;
+    c=polyadic(cores);
     
 elseif (~isa(a,'polyadic'))&&isa(b,'polyadic')&&...
        isempty(b.prefix)&&isempty(b.suffix)
     
     % Prepend A to core lists of B
+    cores=core_specs(b);
     for n=1:numel(b.cores)
-        b.cores{n}=[{a} b.cores{n}];
+        cores{n}=[{a} cores{n}];
     end
-    c=b;
+    c=polyadic(cores);
     
 else
     
@@ -67,4 +69,5 @@ end
 %
 % Acknowledgement in 
 % http://dx.doi.org/10.1046/j.1365-294x.1998.00309.x
+
 

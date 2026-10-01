@@ -25,8 +25,13 @@ function p=prefix(a,p)
 % Check consistency
 grumble(p);
 
+% Buffer implicit-core scalar prefix as a dimensioned scaled identity
+if ~isa(a,'polyadic')&&isscalar(a)&&any(cellfun(@(term)any(cellfun(@(core)isa(core,'function_handle'),term)),p.cores))
+    p.prefix=[{opium(size(p,1),a)} p.prefix]; return
+end
+
 % Absorb the prefix
-if isscalar(a)
+if ~isa(a,'polyadic')&&isscalar(a)
     
     % Multiply the first core
     for n=1:numel(p.cores)
@@ -59,4 +64,5 @@ end
 % understanding it.
 %
 % Upton Sinclair
+
 

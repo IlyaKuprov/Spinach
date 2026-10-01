@@ -8,4 +8,4 @@ After summing terms, it multiplies by prefixes in stored product order and then 
 
 Source comment: [DOI 10.1016/j.evolhumbehav.2017.04.001](http://dx.doi.org/10.1016/j.evolhumbehav.2017.04.001).
 
-Opaque `matfree` cores or affixes are rejected before expansion. Nested polyadics containing such factors are likewise rejected; use operator actions rather than materialising their matrices.
+Function handle cores or affixes are rejected before expansion, including inside nested polyadics; use operator actions rather than materialising their matrices.

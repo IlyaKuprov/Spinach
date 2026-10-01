@@ -24,8 +24,8 @@ function answer=inflate(p)
 % Process nested polyadics
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        if isa(p.cores{n}{k},'matfree')
-            error('matrix-free cores cannot be materialised.');
+        if isa(p.cores{n}{k},'function_handle')
+            error('function handle cores cannot be materialised.');
         end
         if isa(p.cores{n}{k},'polyadic')
             p.cores{n}{k}=inflate(p.cores{n}{k});
@@ -33,16 +33,16 @@ for n=1:numel(p.cores)
     end
 end
 for n=1:numel(p.prefix)
-    if isa(p.prefix{n},'matfree')
-        error('matrix-free cores cannot be materialised.');
+    if isa(p.prefix{n},'function_handle')
+        error('function handle cores cannot be materialised.');
     end
     if isa(p.prefix{n},'polyadic')
         p.prefix{n}=inflate(p.prefix{n});
     end
 end
 for n=1:numel(p.suffix)
-    if isa(p.suffix{n},'matfree')
-        error('matrix-free cores cannot be materialised.');
+    if isa(p.suffix{n},'function_handle')
+        error('function handle cores cannot be materialised.');
     end
     if isa(p.suffix{n},'polyadic')
         p.suffix{n}=inflate(p.suffix{n});

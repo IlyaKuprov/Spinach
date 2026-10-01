@@ -22,7 +22,11 @@ answer=0;
 % Loop over cores
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        answer=answer+nnz(p.cores{n}{k});
+        if isa(p.cores{n}{k},'function_handle')
+            answer=answer+1;
+        else
+            answer=answer+nnz(p.cores{n}{k});
+        end
     end
 end
 
@@ -42,4 +46,5 @@ end
 % dismiss the potential importance of results with P=0.06,
 % while unquestioningly accepting the importance of results
 % with P=0.05 (see also: significosis).
+
 

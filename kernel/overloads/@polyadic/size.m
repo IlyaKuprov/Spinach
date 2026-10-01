@@ -21,6 +21,9 @@ function varargout=size(p,dim)
 % Check consistency
 if nargin==2, grumble(dim); end
 
+% Recover dimensions supplied at core construction
+cores=core_specs(p);
+
 % Get row dimension
 if ~isempty(p.prefix)
     
@@ -30,7 +33,7 @@ if ~isempty(p.prefix)
 else
     
     % The cores of the polyadic
-    nrows=prod(cellfun(@(x)size(x,1),p.cores{1}));
+    nrows=prod(cellfun(@(x)core_size(x,1),cores{1}));
     
 end
 
@@ -43,7 +46,7 @@ if ~isempty(p.suffix)
 else
     
     % The cores of the polyadic
-    ncols=prod(cellfun(@(x)size(x,2),p.cores{1}));
+    ncols=prod(cellfun(@(x)core_size(x,2),cores{1}));
     
 end
 
@@ -78,4 +81,5 @@ end
 % will lead to the perversion of truth, justice, and beauty.
 %
 % Hans-Hermann Hoppe
+
 

@@ -22,7 +22,7 @@
 function A=clean_up(spin_system,A,nonzero_tol)
 
 % Skip implicit cores
-if isa(A,'opium')||isa(A,'matfree'), return; end
+if isa(A,'opium')||isa(A,'function_handle'), return; end
 
 % Skip if disabled
 if (nonzero_tol==0)||isnan(nonzero_tol), return; end

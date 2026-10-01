@@ -19,4 +19,4 @@ After assembling the core sum, prefixes are left-multiplied in reverse cell orde
 
 No orientation variable or orientation-specific action is present in this function: it composes the matrix factors stored in the polyadic value.
 
-Opaque `matfree` cores or affixes are rejected before expansion. Nested polyadics containing such factors are likewise rejected; use operator actions rather than materialising their matrices.
+Function handle cores or affixes are rejected before expansion, including inside nested polyadics; use operator actions rather than materialising their matrices.

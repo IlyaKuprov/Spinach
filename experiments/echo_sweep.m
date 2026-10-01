@@ -1,16 +1,18 @@
 % Two-pulse echo-detected frequency-swept experiment, static or under
-% magic angle spinning, in Hilbert space, written for the EPR case of
+% magic angle spinning, in Hilbert or Liouville space, for the EPR case of
 % a spinning P1 centre in diamond. Two pulses of equal duration are
 % separated by a delay, the carrier is stepped across the sweep, and
-% the complex echo integral is returned at each carrier offset. The
-% sequence steps through the Hamiltonian rotor stack supplied by the
-% singlerot.m context: at each time step, the stack element nearest
+% the complex echo integral is returned at each carrier offset.
+% In Hilbert space the sequence steps through the Hamiltonian stack
+% supplied by singlerot.m: at each time step, the stack element nearest
 % to the rotor phase at the middle of the step is used, the phase de-
 % creasing with time for a positive rate as in the Liouville space
 % branch of singlerot.m, and only the elements visited are exponen-
 % tiated. The rotor phase at the start of the sequence, which stands
 % in for the crystallite azimuth about the rotor axis, is averaged
-% over. The coherence pathway of the pulsed spin (-1 after the first
+% over. In Liouville space, singlerot.m builds the Fokker-Planck
+% generator and handles powder rotor-phase averaging; only the echo
+% detection window is sampled. The coherence pathway (-1 after the first
 % pulse, +1 after the second) is selected in place of a phase cycle.
 % Syntax:
 %
@@ -21,9 +23,11 @@
 %    parameters.spins     - one-element cell array naming the spin
 %                           the pulses are applied to, e.g. {'E'}
 %
-%    parameters.rho0      - initial state, a density matrix
+%    parameters.rho0      - initial density matrix (Hilbert) or state
+%                           vector (Liouville)
 %
-%    parameters.coil      - detection state, a density matrix
+%    parameters.coil      - detection matrix (Hilbert) or vector
+%                           (Liouville)
 %
 %    parameters.pulse_dur - duration of each pulse, seconds
 %
@@ -36,32 +40,31 @@
 %    parameters.echo_win  - echo integration window after the end
 %                           of the second pulse, seconds
 %
-%    parameters.timestep  - propagation time step, seconds; the
-%                           pulses, the delay, and the echo win-
-%                           dow are rounded to whole steps
+%    parameters.timestep  - time step, seconds; in Hilbert space
+%                           pulses, delay, and window are rounded
+%                           to steps; in Liouville space only the
+%                           echo window is sampled
 %
 %    parameters.rate      - spinning rate, Hz, zero for a static
 %                           sample
 %
-%    parameters.nphases   - number of rotor phases at the start
-%                           of the sequence to average over
+%    parameters.nphases   - Hilbert only: number of initial rotor
+%                           phases to average over
 %
 %    parameters.sweep     - width of the carrier sweep, Hz
 %
 %    parameters.npoints   - number of carrier offsets, placed on
 %                           the ft_axis grid of the sweep
 %
-%    parameters.spc_dim   - number of elements in the rotor stack,
-%                           received from context function
+%    parameters.spc_dim   - number of rotor grid points supplied
+%                           by singlerot.m
 %
-%    H  - vector cell array of Hamiltonian matrices, one for each
-%         rotor phase, received from context function
+%    H  - Hilbert: cell array of rotor-phase Hamiltonians; Liou-
+%         ville: rotor-augmented Fokker-Planck generator
 %
-%    R  - relaxation superoperator, received from context func-
-%         tion, not used
+%    R  - relaxation superoperator, used in Liouville space
 %
-%    K  - kinetics superoperator, received from context function,
-%         not used
+%    K  - kinetics superoperator, used in Liouville space
 %
 % Outputs:
 %
@@ -89,10 +92,72 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=echo_sweep.m>
 
-function echo=echo_sweep(spin_system,parameters,H,~,~)
+function echo=echo_sweep(spin_system,parameters,H,R,K)
 
 % Check consistency
-grumble(spin_system,parameters,H);
+grumble(spin_system,parameters,H,R,K);
+
+% Fokker-Planck singlerot supplies a rotor-augmented Liouvillian
+if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+
+    % Carrier offsets and microwave operators in the rotor-augmented space
+    offsets=ft_axis(0,parameters.sweep,parameters.npoints);
+    sx=kron(speye(parameters.spc_dim),operator(spin_system,'Lx',parameters.spins{1}));
+    sz=kron(speye(parameters.spc_dim),operator(spin_system,'Lz',parameters.spins{1}));
+    L=H+1i*R+1i*K;
+
+    % Keep the detection state and accumulator on the propagator device
+    coil=parameters.coil;
+    echo=zeros(parameters.npoints,1);
+    if ismember('gpu',spin_system.sys.enable)
+        coil=gpuArray(coil);
+        echo=gpuArray(echo);
+    end
+    echo_steps=round(parameters.echo_win/parameters.timestep);
+    for k=1:parameters.npoints
+
+        % The free generator and the finite-pulse generator at this carrier
+        L0=L+2*pi*offsets(k)*sz;
+        Lp=L0+2*pi*parameters.pulse_frq*sx;
+
+        % First pulse, coherence selection, and interpulse delay
+        rho=step(spin_system,Lp,parameters.rho0,parameters.pulse_dur);
+        rho=coherence(spin_system,rho,{{parameters.spins{1},-1}});
+        if parameters.tau>0
+
+            % Match the CPU or GPU norm used by step for long delays
+            if ismember('gpu',spin_system.sys.enable)
+                generator_norm=norm(L0,inf);
+            else
+                generator_norm=norm(L0,1);
+            end
+            nsteps=max(1,ceil(generator_norm*parameters.tau/2e4));
+            for n=1:nsteps
+                rho=step(spin_system,L0,rho,parameters.tau/nsteps);
+            end
+        end
+
+        % Second pulse and refocused coherence
+        rho=step(spin_system,Lp,rho,parameters.pulse_dur);
+        rho=coherence(spin_system,rho,{{parameters.spins{1},+1}});
+
+        % Only the finite detection window requires time samples
+        for n=1:echo_steps
+            rho=step(spin_system,L0,rho,parameters.timestep);
+            echo(k)=echo(k)+coil'*rho;
+        end
+    end
+
+    % Echo integral has units of signal times seconds
+    echo=echo*parameters.timestep;
+
+    % Return the completed spectrum to CPU memory for powder averaging
+    if isa(echo,'gpuArray')
+        echo=gather(echo);
+    end
+
+    return
+end
 
 % Carrier offsets across the sweep
 offsets=ft_axis(0,parameters.sweep,parameters.npoints);
@@ -182,7 +247,54 @@ echo=parameters.timestep*echo/parameters.nphases;
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters,H)
+function grumble(spin_system,parameters,H,R,K)
+
+if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
+       (~ismatrix(H))||(~isequal(size(H),size(R),size(K)))||...
+       (size(H,1)~=size(H,2))||...
+       (~all(isfinite(nonzeros(H))))||(~all(isfinite(nonzeros(R))))||...
+       (~all(isfinite(nonzeros(K))))
+        error('H, R, and K must be finite, square, equal-sized matrices.');
+    end
+
+    required={'spc_dim','spins','rho0','coil','pulse_dur','pulse_frq',...
+              'tau','echo_win','timestep','sweep','npoints'};
+    for n=1:numel(required)
+        if ~isfield(parameters,required{n})
+            error('parameters.%s is required for echo_sweep.',required{n});
+        end
+    end
+    validateattributes(parameters.spc_dim,{'numeric'},...
+                       {'scalar','real','finite','integer','positive'});
+    if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+       (~ischar(parameters.spins{1}))||isempty(parameters.spins{1})
+        error('parameters.spins must contain one pulsed isotope.');
+    end
+    if mod(size(H,1),parameters.spc_dim)~=0
+        error('Liouvillian dimension must be divisible by parameters.spc_dim.');
+    end
+    for name={'rho0','coil'}
+        state_vec=parameters.(name{1});
+        if (~isnumeric(state_vec))||(~iscolumn(state_vec))||...
+           (numel(state_vec)~=size(H,1))||(~all(isfinite(nonzeros(state_vec))))
+            error('parameters.%s must be a finite rotor-augmented state.',name{1});
+        end
+    end
+    for name={'pulse_dur','pulse_frq','echo_win','timestep','sweep'}
+        validateattributes(parameters.(name{1}),{'numeric'},...
+                           {'scalar','real','finite','positive'});
+    end
+    validateattributes(parameters.tau,{'numeric'},...
+                       {'scalar','real','finite','nonnegative'});
+    validateattributes(parameters.npoints,{'numeric'},...
+                       {'scalar','real','finite','integer','>',2});
+    if round(parameters.echo_win/parameters.timestep)<1
+        error('parameters.echo_win must contain at least one time sample.');
+    end
+
+    return
+end
 if ~strcmp(spin_system.bas.formalism,'zeeman-hilb')
     error('this function is only available in zeeman-hilb formalism.');
 end

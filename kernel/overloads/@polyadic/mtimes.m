@@ -16,6 +16,11 @@
 
 function C=mtimes(A,B)
 
+% A scalar operator applied to a scalar probe must return a numeric action
+if isa(A,'polyadic')&&~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)&&isscalar(A)
+    C=apply(A,B); return
+end
+
 % When A is a number
 if ~isa(A,'polyadic')&&isnumeric(A)&&isscalar(A)
     
@@ -71,28 +76,9 @@ end
 % When B is a full matrix
 if ~isa(B,'polyadic')&&isnumeric(B)
     
-    % Multiply by suffixes
-    for n=numel(A.suffix):-1:1
-        B=A.suffix{n}*B;
-    end
-    B=full(B);
-   
-    % Preallocate the core product result
-    cores=core_specs(A);
-    core_rows=prod(cellfun(@(x)core_size(x,1),cores{1}));
-    C=zeros(core_rows,size(B,2));
+    % Apply the operator to the numeric block
+    C=apply(A,B); return
 
-    % Multiply by cores
-    for n=1:numel(A.cores)
-        C=C+kronm(cores{n},B);
-    end
-    
-    % Multiply by prefixes
-    for n=numel(A.prefix):-1:1
-        C=A.prefix{n}*C;
-    end
-    C=full(C); return
-    
 end
 
 % When both are polyadic

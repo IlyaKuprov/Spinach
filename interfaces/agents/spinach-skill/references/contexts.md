@@ -125,6 +125,8 @@ generator. All contexts that build a spatial subspace also set
 `parameters.spc_dim` and `parameters.spn_dim`, the spatial and spin subspace
 dimensions, before calling the sequence; `crystal` sets `spc_dim` to 1.
 
+For a standalone periodic Fourier Laplacian, call `fourlap_poly(spin_system,npoints,extents)` to honour the polyadic enable switch. The original two-argument `fourlap` remains explicit. The implicit second derivative retains the even-grid Nyquist mode; it is not a substitute for squaring a first derivative whose Nyquist action is zero.
+
 ## Writing a pulse sequence
 
 ```matlab

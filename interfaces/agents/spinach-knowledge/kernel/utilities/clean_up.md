@@ -9,7 +9,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/clean_
 ## Behaviour
 
 - Syntax: `A=clean_up(spin_system,A,nonzero_tol)`.
-- Objects of class `opium` are returned unchanged.
+- Objects of class `opium` are returned unchanged. Function handle cores are skipped only while processing a polyadic; opaque actions cannot be rounded entrywise, while numeric factors around them are still processed recursively. Standalone handles are not numerical inputs and are rejected when cleaning is enabled.
 - If `nonzero_tol` is `0` or `NaN`, the function returns immediately without cleaning.
 - Cell arrays are processed recursively, element by element.
 - `polyadic` objects are processed recursively through their `prefix`, `suffix`, and `cores` fields.

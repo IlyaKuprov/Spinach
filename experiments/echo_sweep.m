@@ -126,10 +126,10 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
         if parameters.tau>0
 
             % Match the CPU or GPU norm used by step for long delays
-            if ismember('gpu',spin_system.sys.enable)
+            if ismember('gpu',spin_system.sys.enable)&&~isa(L0,'polyadic')
                 generator_norm=norm(L0,inf);
             else
-                generator_norm=norm(L0,1);
+                generator_norm=cheap_norm(L0);
             end
             nsteps=max(1,ceil(generator_norm*parameters.tau/2e4));
             for n=1:nsteps
@@ -253,8 +253,8 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
        (~ismatrix(H))||(~isequal(size(H),size(R),size(K)))||...
        (size(H,1)~=size(H,2))||...
-       (~all(isfinite(nonzeros(H))))||(~all(isfinite(nonzeros(R))))||...
-       (~all(isfinite(nonzeros(K))))
+       (~allfinite(H))||(~allfinite(R))||...
+       (~allfinite(K))
         error('H, R, and K must be finite, square, equal-sized matrices.');
     end
 
@@ -419,4 +419,5 @@ if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
     error('parameters.npoints must be a real integer greater than 2.');
 end
 end
+
 

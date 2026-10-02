@@ -59,6 +59,9 @@ for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
         if isa(p.cores{n}{k},'polyadic')
             polinfo(p.cores{n}{k},level+2,sprintf('polyad %d',k));
+        elseif isa(p.cores{n}{k},'function_handle')
+            dims=p.core_dims{n}{k};
+            fprintf('%s        handle %d [%dx%d]\n',indent,k,dims(1),dims(2));
         elseif isa(p.cores{n}{k},'opium')
             [nrows,ncols]=size(p.cores{n}{k});
             fprintf('%s        opium  %d [%dx%d]\n',indent,k,nrows,ncols);
@@ -108,4 +111,5 @@ end
 % part of science. Think of it as a community service.
 %
 % Sabine Hossenfelder, "Lost in Math"
+
 

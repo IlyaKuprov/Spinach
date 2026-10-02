@@ -7,3 +7,5 @@
 After summing terms, it multiplies by prefixes in stored product order and then suffixes in stored product order. The accumulator is created with `zeros`, the first factor and final result are explicitly made full, and the source documentation states that full arithmetic is used even when cores are sparse. This is materialisation, not a contraction-only operation; it returns an ordinary full matrix rather than a polyadic. The overload contains no broadcasting or dimension-validation step beyond the matrix and `kron` operations it invokes.
 
 Source comment: [DOI 10.1016/j.evolhumbehav.2017.04.001](http://dx.doi.org/10.1016/j.evolhumbehav.2017.04.001).
+
+Function handle cores or affixes are rejected before expansion, including inside nested polyadics; use operator actions rather than materialising their matrices.

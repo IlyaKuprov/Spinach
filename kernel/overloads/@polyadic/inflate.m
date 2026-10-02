@@ -24,6 +24,9 @@ function answer=inflate(p)
 % Process nested polyadics
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
+        if isa(p.cores{n}{k},'function_handle')
+            error('function handle cores cannot be materialised.');
+        end
         if isa(p.cores{n}{k},'polyadic')
             p.cores{n}{k}=inflate(p.cores{n}{k});
         end
@@ -86,6 +89,9 @@ for n=1:numel(p.suffix)
     answer=answer*p.suffix{n};
 end
 
+% Materialise a scaled identity produced by singleton affixes
+if isa(answer,'opium'), answer=sparse(answer); end
+
 end
 
 % Planning to write is not writing. Outlining, researching, 
@@ -93,4 +99,5 @@ end
 % writing. Writing is writing.
 %
 % E.L. Doctorow
+
 

@@ -33,7 +33,8 @@ if ~isa(a,'polyadic')
     
     % Matrix + polyadic
     if isempty(b.prefix)&&isempty(b.suffix)
-        c=b; c.cores=[c.cores {{a}}];
+        c=b; c.cores=[b.cores {{a}}];
+        c.core_dims=[b.core_dims {{[]}}]; c.core_adj=[b.core_adj {{[]}}];
     else
         c=polyadic({{a},{b}});
     end
@@ -42,7 +43,8 @@ elseif ~isa(b,'polyadic')
     
     % Polyadic + matrix
     if isempty(a.prefix)&&isempty(a.suffix)
-        c=a; c.cores=[c.cores {{b}}];
+        c=a; c.cores=[a.cores {{b}}];
+        c.core_dims=[a.core_dims {{[]}}]; c.core_adj=[a.core_adj {{[]}}];
     else
         c=polyadic({{a},{b}});
     end
@@ -52,15 +54,16 @@ else
     % Polyadic + polyadic 
     if isempty(a.prefix)&&isempty(a.suffix)&&...
        isempty(b.prefix)&&isempty(b.suffix)
-       c=polyadic([a.cores b.cores]);
+       c=a; c.cores=[a.cores b.cores];
+       c.core_dims=[a.core_dims b.core_dims]; c.core_adj=[a.core_adj b.core_adj];
     else
        c=polyadic({{a},{b}});
     end
        
 end
 
-% Simplify the result
-c=simplify(c);
+% Validate the combined buffer and simplify
+validate(c); c=simplify(c);
 
 end
 
@@ -78,4 +81,5 @@ end
 % The best revenge is massive success.
 %
 % Frank Sinatra
+
 

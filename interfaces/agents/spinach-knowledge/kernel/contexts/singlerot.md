@@ -36,3 +36,9 @@ The grid provides one quadrature orientation per weight. At each orientation, Wi
 ## Source-supported setup pattern
 
 A source-documented parameter pattern is `parameters.spins = {'1H','13C'}`, a signed `parameters.rate` in hertz, a three-component `parameters.axis`, a grid filename appropriate to the formalism, and an experiment function handle as `pulse_sequence`. For an explicit rotating-frame example, the source gives `parameters.rframes = {{'13C',2},{'14N',3}}`. The source does not include a complete concrete pulse-sequence invocation; use a function from `experiments` for that part.
+
+## Optional FFT rotor derivative
+
+With `sys.enable={'polyadic'}`, the Liouville rotor derivative is a product of three sequential polyadic factors: FFT, Fourier multiplication, and inverse FFT. Ordinary `mtimes` composes them in the order `inverse_fft*multiplier*fft`; their tensor product with the spin identity gives the rotor term. The multiplier is the sparse diagonal matrix with entries `1i*[0:max_rank -max_rank:-1].'`, built once on the CPU as an ordinary numeric core. The FFT adjoint is `spc_dim*ifft`, and the inverse-FFT adjoint is `fft/spc_dim`, preserving MATLAB's transform normalisation. The Hamiltonian phase blocks remain explicit; relaxation and kinetics are lifted as before. The callback receives a polyadic generator and must support exponential-action propagation through `step` or `evolution`. This opt-in retains the same phase grid, rotor direction, and state averaging; it does not lower the chosen rotor rank. The default explicit path and Hilbert branch are unchanged.
+
+When GPU execution is requested, the assembled polyadic generator is uploaded on the executing orientation worker before the pulse-sequence callback. Its numeric multiplier and other uploaded factors are then reused; FFT handles operate on their input blocks without captured device data or per-action multiplier construction.

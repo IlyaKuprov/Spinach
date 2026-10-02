@@ -18,3 +18,5 @@ The dimensions are taken from `p.cores{1}`; this file does not add an explicit c
 After assembling the core sum, prefixes are left-multiplied in reverse cell order, so the resulting product is `prefix{1} * prefix{2} * core_sum` when there are two prefixes. Suffixes are right-multiplied in forward cell order, giving `core_sum * suffix{1} * suffix{2}`. The core accumulator is explicitly made sparse from triplets. The source header notes that full prefix or suffix factors may produce a full result; the function does not convert the final product back to sparse storage.
 
 No orientation variable or orientation-specific action is present in this function: it composes the matrix factors stored in the polyadic value.
+
+Function handle cores are rejected before expansion, including inside nested polyadics; use operator actions rather than materialising their matrices. A singleton affix can produce an `opium` identity during multiplication; the routine converts that result to an explicit sparse matrix before returning.

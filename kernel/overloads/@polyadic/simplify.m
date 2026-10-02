@@ -58,7 +58,7 @@ while changes_made
         end
 
         % Absorb scalar prefixes
-        if isnumeric(p.prefix{n})&&isscalar(p.prefix{n})
+        if ~isa(p.prefix{n},'polyadic')&&isnumeric(p.prefix{n})&&isscalar(p.prefix{n})
             coeff=p.prefix{n};
             p.prefix(n)=[]; p=coeff*p; return;
         end
@@ -90,7 +90,7 @@ while changes_made
         end
 
         % Absorb scalar suffixes
-        if isnumeric(p.suffix{n})&&isscalar(p.suffix{n})
+        if ~isa(p.suffix{n},'polyadic')&&isnumeric(p.suffix{n})&&isscalar(p.suffix{n})
             coeff=p.suffix{n};
             p.suffix(n)=[]; p=coeff*p; return;
         end
@@ -116,7 +116,12 @@ while changes_made
                    isempty(p.cores{n}{k}.suffix)&&...
                    isscalar(p.cores{n}{k}.cores)
                     
-                    % Elevate the singleton core
+                    % Elevate the singleton core and its metadata
+                    nested=p.cores{n}{k};
+                    p.core_dims{n}=[p.core_dims{n}(1:(k-1)) ...
+                                    nested.core_dims{1} p.core_dims{n}((k+1):end)];
+                    p.core_adj{n}=[p.core_adj{n}(1:(k-1)) ...
+                                   nested.core_adj{1} p.core_adj{n}((k+1):end)];
                     p.cores{n}=[p.cores{n}(1:(k-1)) ...
                                 p.cores{n}{k}.cores{1} ...
                                 p.cores{n}((k+1):end)];
@@ -125,6 +130,9 @@ while changes_made
                 end
 
             end
+
+            % Opaque actions cannot be tested for zero or identity
+            if isa(p.cores{n}{k},'function_handle'), continue; end
 
             % A zero core kills the term
             if nnz(p.cores{n}{k})==0
@@ -140,7 +148,9 @@ while changes_made
         end
         
     end
-    p.cores(cellfun(@isempty,p.cores))=[];
+    empty_terms=cellfun(@isempty,p.cores);
+    p.cores(empty_terms)=[];
+    p.core_dims(empty_terms)=[]; p.core_adj(empty_terms)=[];
     
     % If no terms left, into all-zero sparse matrix
     if isempty(p.cores), p=spalloc(nrows,ncols,0); return; end
@@ -156,7 +166,9 @@ while changes_made
                isa(p.cores{n}{k},'opium')&&...
                isa(p.cores{n}{k+1},'opium')
                 p.cores{n}{k}=kron(p.cores{n}{k},p.cores{n}{k+1});
-                p.cores{n}(k+1)=[]; changes_made=true(); break
+                p.cores{n}(k+1)=[];
+                p.core_dims{n}(k+1)=[]; p.core_adj{n}(k+1)=[];
+                changes_made=true(); break
             end
             
         end
@@ -168,7 +180,7 @@ end
 % Matricise single-core polyadics
 if isa(p,'polyadic')&&isempty(p.prefix)&&...
    isempty(p.suffix)&&isscalar(p.cores)&&...
-   isscalar(p.cores{1})
+   isscalar(p.cores{1})&&~isa(p.cores{1}{1},'function_handle')
     p=p.cores{1}{1};
 end
 
@@ -187,4 +199,5 @@ end
 % tely starts with it.
 %
 % Max Planck
+
 

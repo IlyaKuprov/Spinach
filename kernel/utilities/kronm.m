@@ -5,7 +5,8 @@
 %
 % Parameters:
 %
-%    Q -    cell array of Kronecker terms
+%    Q -    cell array of matrices or implicit core descriptions
+%           with action and dims fields, as in polyadic()
 %
 %    x -    a vector or a matrix of appropriate dimension
 %
@@ -32,7 +33,9 @@ ncols=size(x,2);
 row_dims=zeros(1,nmats); 
 col_dims=zeros(1,nmats);
 for n=1:nmats
-    [row_dims(n),col_dims(n)]=size(Q{nmats-n+1});
+    core=Q{nmats-n+1};
+    if isstruct(core), dims=core.dims; else, dims=size(core); end
+    row_dims(n)=dims(1); col_dims(n)=dims(2);
 end
 
 % Dimension map for x
@@ -56,7 +59,7 @@ for n=1:nmats
         x=reshape(x,[x_dims(1) prod(x_dims)/x_dims(1)]);
         
         % Run multiplication and update dimension map
-        x=Q{nmats}*x; x_dims(1)=row_dims(1);
+        x=core_apply(Q{nmats},x); x_dims(1)=row_dims(1);
         
         % Roll other dimensions back up
         x=reshape(full(x),x_dims);
@@ -72,7 +75,7 @@ for n=1:nmats
         x=reshape(x,[col_dims(n),numel(x)/col_dims(n)]);
         
         % Run multiplication and update dimension map
-        x=Q{nmats-n+1}*x; x_dims(n)=row_dims(n);
+        x=core_apply(Q{nmats-n+1},x); x_dims(n)=row_dims(n);
         
         % Roll other dimensions back up
         x=reshape(full(x),[row_dims(n),x_dims(dims(2:end))]);
@@ -89,14 +92,33 @@ x=reshape(x,[prod(row_dims),ncols]);
 
 end
 
+% Action of a matrix or an implicit core description
+function x=core_apply(Q,x)
+if isstruct(Q)
+    x=Q.action(x);
+else
+    x=Q*x;
+end
+end
+
 % Consistency enforcement
 function grumble(Q,x)
 if (~iscell(Q))
     error('Q must be a cell array.');
 end
 for n=1:numel(Q)
-    if ~ismatrix(Q{n})
-        error('Q must be a cell array of matrices.');
+    if isstruct(Q{n})
+        if ~isscalar(Q{n})||~isfield(Q{n},'action')||...
+           ~isa(Q{n}.action,'function_handle')
+            error('implicit factors need a function handle action.');
+        end
+        if ~isfield(Q{n},'dims')||~isnumeric(Q{n}.dims)||~isreal(Q{n}.dims)||...
+           ~isequal(size(Q{n}.dims),[1 2])||any(~isfinite(Q{n}.dims))||...
+           any(Q{n}.dims<1)||any(mod(Q{n}.dims,1)~=0)
+            error('implicit factor dims must be a row of two positive integers.');
+        end
+    elseif ~ismatrix(Q{n})||~isnumeric(Q{n})
+        error('Q must be a cell array of matrices or implicit factors.');
     end
 end
 if ~isnumeric(x)
@@ -108,4 +130,5 @@ end
 % a man, or kill him.
 %
 % Joseph Stalin
+
 

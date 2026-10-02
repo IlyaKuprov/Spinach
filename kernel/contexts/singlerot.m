@@ -96,6 +96,10 @@
 %
 % ilya.kuprov@weizmann.ac.il
 %
+% With sys.enable={'polyadic'}, the Liouville rotor derivative is applied
+% by FFT without forming its matrix. The callback must accept a polyadic
+% generator; use step or evolution exponential-action propagation.
+%
 % <https://spindynamics.org/wiki/index.php?title=singlerot.m>
 
 function [answer,sph_grid]=singlerot(spin_system,pulse_sequence,...
@@ -126,8 +130,7 @@ if ismember('iso_eq',parameters.needs)
     parameters.rho0=equilibrium(spin_system,I_labframe);
 end
 
-% Get carrier operators for numerical
-% rotating frame transformations
+% Get carrier operators for numerical rotating frame transformations
 C=cell(size(parameters.rframes));
 for n=1:numel(parameters.rframes)
     C{n}=carrier(spin_system,parameters.rframes{n}{1});
@@ -170,8 +173,25 @@ switch spin_system.bas.formalism
         report(spin_system,['Fokker-Planck problem dimension:  ' num2str(spc_dim*spn_dim)]);
 
         % Make the rotor turning generator
-        [rotor_phases,d_dphi]=fourdif(spc_dim,1);
-        M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
+        if ismember('polyadic',spin_system.sys.enable)
+            rotor_phases=fourdif(spc_dim,1); max_rank=parameters.max_rank;
+
+            % Forward and inverse transforms with their normalised adjoints
+            fft_core=struct('action',@(x)fft(x,[],1),...
+                            'adjoint',@(x)spc_dim*ifft(x,[],1),'dims',[spc_dim spc_dim]);
+            ifft_core=struct('action',@(x)ifft(x,[],1),...
+                             'adjoint',@(x)fft(x,[],1)/spc_dim,'dims',[spc_dim spc_dim]);
+
+            % Build the diagonal multiplier once as a numeric CPU core
+            mult_core=spdiags(1i*[0:max_rank -max_rank:-1].',0,spc_dim,spc_dim);
+
+            % Compose three sequential factors through ordinary multiplication
+            d_dphi=polyadic({{ifft_core}})*polyadic({{mult_core}})*polyadic({{fft_core}});
+            M=(2*pi*parameters.rate)*polyadic({{d_dphi,opium(spn_dim,1)}});
+        else
+            [rotor_phases,d_dphi]=fourdif(spc_dim,1);
+            M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
+        end
 
         % Project relaxation and kinetics superoperators into the FP space
         R=kron(speye([spc_dim spc_dim]),R); K=kron(speye([spc_dim spc_dim]),K);
@@ -314,6 +334,9 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
 
             % Assemble the Fokker-Planck evolution generator
             G=clean_up(spin_system,blkdiag(H{:})+1i*M,spin_system.tols.liouv_zero);
+
+            % Upload the polyadic once on this worker and reuse its GPU factors
+            if isa(G,'polyadic')&&ismember('gpu',spin_system.sys.enable), G=gpuArray(G); end
     
             % Run the pulse sequence
             ans_array{q}=pulse_sequence(spin_system,parameters,G,R,K);
@@ -519,4 +542,5 @@ end
 % told that this is not correct and asked to amend it.
 % 
 % IK's contract at Southampton University, 2014
+
 

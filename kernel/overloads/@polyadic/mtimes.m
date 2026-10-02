@@ -21,8 +21,15 @@ if ~isa(A,'polyadic')&&isnumeric(A)&&isscalar(A)
     
     % Multiply smallest cores in the B buffer
     for n=1:numel(B.cores)
-        [~,smallest_core]=min(cellfun(@numel,B.cores{n}));
-        B.cores{n}{smallest_core}=A*B.cores{n}{smallest_core};
+        core_sizes=cellfun(@numel,B.cores{n});
+        core_sizes(cellfun(@(x)isa(x,'function_handle'),B.cores{n}))=Inf;
+        [~,smallest_core]=min(core_sizes);
+        if isinf(core_sizes(smallest_core))
+            B.cores{n}{end+1}=A;
+            B.core_dims{n}{end+1}=[]; B.core_adj{n}{end+1}=[];
+        else
+            B.cores{n}{smallest_core}=A*B.cores{n}{smallest_core};
+        end
     end
     C=simplify(B); return
 
@@ -46,19 +53,15 @@ if ~isa(A,'polyadic')&&isnumeric(A)
 end
     
 % When B is a number
-if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)
+if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)&&(size(A,2)~=1)
 
-    % Multiply smallest cores in the A buffer
-    for n=1:numel(A.cores)
-        [~,smallest_core]=min(cellfun(@numel,A.cores{n}));
-        A.cores{n}{smallest_core}=A.cores{n}{smallest_core}*B;
-    end
-    C=simplify(A); return
+    % Reuse scalar multiplication on the left
+    C=B*A; return
     
 end
 
 % When B is a sparse matrix
-if ~isa(B,'polyadic')&&isnumeric(B)&&issparse(B)
+if ~isa(B,'polyadic')&&isnumeric(B)&&issparse(B)&&~isscalar(B)
     
     % Attach as a suffix to A
     A.suffix=[A.suffix {B}]; C=simplify(A); return
@@ -73,22 +76,25 @@ if ~isa(B,'polyadic')&&isnumeric(B)
         B=A.suffix{n}*B;
     end
     B=full(B);
-   
-    % Preallocate the core product result
-    core_rows=prod(cellfun(@(x)size(x,1),A.cores{1}));
-    C=zeros(core_rows,size(B,2));
 
-    % Multiply by cores
+    % Sum tensor actions using constructor-owned dimensions
     for n=1:numel(A.cores)
-        C=C+kronm(A.cores{n},B);
+        cores=A.cores{n};
+        for k=1:numel(cores)
+            if isa(cores{k},'function_handle')
+                cores{k}=struct('action',cores{k},'dims',A.core_dims{n}{k});
+            end
+        end
+        term=kronm(cores,B);
+        if n==1, C=term; else, C=C+term; end
     end
-    
+
     % Multiply by prefixes
     for n=numel(A.prefix):-1:1
         C=A.prefix{n}*C;
     end
     C=full(C); return
-    
+
 end
 
 % When both are polyadic
@@ -114,10 +120,12 @@ if isa(A,'polyadic')&&isa(B,'polyadic')
         for n=1:numel(A.cores{1})
             
             % Inner product compatibility check
+            can_proceed=~isa(A.cores{1}{n},'function_handle')&&can_proceed;
+            can_proceed=~isa(B.cores{1}{n},'function_handle')&&can_proceed;
             can_proceed=(size(A.cores{1}{n},2)==...
                          size(B.cores{1}{n},1))&&can_proceed;
 
-            % Opia are fine in any case...
+            % Opia are fine in any case
             if (~isa(A.cores{1}{n},'opium'))&&...
                (~isa(B.cores{1}{n},'opium'))
 
@@ -168,4 +176,5 @@ end
 % immediately, so I can work out who to blame."
 %
 % Preface to a cryptanalysis book
+
 

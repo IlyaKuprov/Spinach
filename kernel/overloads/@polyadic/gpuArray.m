@@ -29,7 +29,9 @@ grumble(p);
 % Upload cores
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        p.cores{n}{k}=gpuArray(p.cores{n}{k}); 
+        if ~isa(p.cores{n}{k},'function_handle')
+            p.cores{n}{k}=gpuArray(p.cores{n}{k});
+        end
     end
 end
 
@@ -56,4 +58,5 @@ end
 % are made stupid by education.
 %
 % Bertrand Russell
+
 

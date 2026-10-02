@@ -23,8 +23,12 @@
 %                    that behaves in many respects like the
 %                    matrix it represents.
 %
-% Note: nested polyadics are permitted - the input matrices may be
-%       polyadics themselves.
+% Note: nested polyadics are permitted. An implicit core is supplied
+%       as struct('action',fwd,'adjoint',adj,'dims',[nrows ncols]).
+%       Both handles accept a numeric matrix and act on its columns.
+%       The constructor stores the handles and dimensions internally;
+%       no special handle protocol is required. Implicit cores cannot
+%       be materialised by full() or inflate().
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -35,6 +39,8 @@ classdef (InferiorClasses={?gpuArray,?opium}) polyadic
     % Default properties
     properties
         cores={{[]}};
+        core_dims={};
+        core_adj={};
         prefix={};
         suffix={};
     end
@@ -50,6 +56,20 @@ classdef (InferiorClasses={?gpuArray,?opium}) polyadic
             
             % Store the cores
             p.cores=cores;
+
+            % Unpack implicit core descriptions into actions and metadata
+            p.core_dims=cell(size(cores)); p.core_adj=cell(size(cores));
+            for n=1:numel(cores)
+                p.core_dims{n}=cell(size(cores{n}));
+                p.core_adj{n}=cell(size(cores{n}));
+                for k=1:numel(cores{n})
+                    if isstruct(cores{n}{k})
+                        p.cores{n}{k}=cores{n}{k}.action;
+                        p.core_dims{n}{k}=cores{n}{k}.dims;
+                        p.core_adj{n}{k}=cores{n}{k}.adjoint;
+                    end
+                end
+            end
             
             % Validate the result
             validate(p);
@@ -105,6 +125,24 @@ for n=1:numel(cores)
     if ~iscell(cores{n})
         error('elements of cores must also be cell arrays.');
     end
+    for k=1:numel(cores{n})
+        core=cores{n}{k};
+        if isstruct(core)
+            if ~isscalar(core)||~all(isfield(core,{'action','adjoint','dims'}))
+                error('implicit cores need action, adjoint, and dims fields.');
+            end
+            if ~isa(core.action,'function_handle')||~isa(core.adjoint,'function_handle')
+                error('implicit core actions must be function handles.');
+            end
+            if ~isnumeric(core.dims)||~isreal(core.dims)||...
+               ~isequal(size(core.dims),[1 2])||any(~isfinite(core.dims))||...
+               any(core.dims<1)||any(mod(core.dims,1)~=0)
+                error('implicit core dims must be a row of two positive integers.');
+            end
+        elseif isa(core,'function_handle')
+            error('function handle cores need action, adjoint, and dims fields.');
+        end
+    end
 end
 end
 
@@ -125,4 +163,5 @@ end
 % will be displayed.
 %
 % Times Higher Education Magazine, 26 Oct 2017
+
 

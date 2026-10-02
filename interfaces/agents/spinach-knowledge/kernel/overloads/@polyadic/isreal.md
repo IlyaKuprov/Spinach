@@ -5,7 +5,7 @@ Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=polyadic/isreal.m>
 
 ## Meaning
 
-The overload checks the stored representation directly. It visits every factor in every `p.cores{n}` term, then every element of `p.prefix` and `p.suffix`, calling `isreal` on each. It returns `false` immediately when any checked element is not real; if all checks pass, it returns `true`.
+The overload checks the stored representation directly. It visits every factor in every `p.cores{n}` term, then every element of `p.prefix` and `p.suffix`, calling `isreal` on each numeric factor. A stored `opium` scaled identity is classified by its coefficient, including in prefix and suffix arrays; an opaque function-handle core conservatively returns `false` because its numerical values are not inspected. It returns `false` immediately when any checked element is not real; if all checks pass, it returns `true`.
 
 This is a representation-level predicate, not a test that first contracts or materialises the complete matrix. Consequently the function's criterion is that each stored factor passes `isreal`, rather than a separate check of the final product after possible cancellations. Calls on nested values use MATLAB method dispatch; this function itself contains no separate nested-polyadic traversal branch. It introduces no broadcasting or shape rule.
 

@@ -1,36 +1,15 @@
 # kernel/utilities/kronm.m
 
-## Purpose
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kronm.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=kronm.m)
 
-`kronm.m` calculates `(Q{1}(x)Q{2}(x)...(x)Q{n})*x` — the action of a Kronecker product of matrices on a vector or matrix — without explicitly opening (forming) the Kronecker products.
+## Purpose and interface
 
-Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kronm.m>
+`x=kronm(Q,x)` applies `kron(Q{1},kron(Q{2},...))*x` without forming the Kronecker product. `Q` is a cell array of matrix factors; `x` is a numeric vector or matrix whose row count equals the product of the factor column counts. The output has the product of their row counts and the same number of columns as the input. Rectangular factors are supported.
 
-## Behaviour
+The contraction reshapes each tensor dimension into matrix rows, applies the corresponding factor to all remaining columns, and restores the tensor layout. Factors are applied in reverse order to respect MATLAB column-major Kronecker ordering. `opium` factors use their scalar coefficient without forming identity matrices.
 
-- Syntax: `x=kronm(Q,x)`.
-- A consistency check (`grumble`) is run first: `Q` must be a cell array, every element of `Q` must be a matrix, and `x` must be numeric; otherwise errors are thrown (`'Q must be a cell array.'`, `'Q must be a cell array of matrices.'`, `'x must be numeric.'`).
-- The number of matrices in `Q` is `nmats=numel(Q)`; the number of columns of `x` is `ncols=size(x,2)`.
-- Row and column counts of each factor are collected in reverse order: for `n=1:nmats`, `[row_dims(n),col_dims(n)]=size(Q{nmats-n+1})`.
-- A dimension map for `x` is built as `x_dims=[col_dims,ncols]`, and `x` is reshaped (after `full`) into that map.
-- The products run over `n=1:nmats`:
-  - Shortcut for `opium` objects: if `isa(Q{nmats-n+1},'opium')` and its `coeff` is not equal to 1, the step is `x=Q{nmats-n+1}.coeff*x` and the loop continues.
-  - For `n==1` (the leading dimension), no permutation is needed: `x` is reshaped to `[x_dims(1) prod(x_dims)/x_dims(1)]`, multiplied as `x=Q{nmats}*x`, the dimension map is updated with `x_dims(1)=row_dims(1)`, and `x` is reshaped back with `full`.
-  - Otherwise, `permute` is used: the `n`-th dimension is brought forward via `dims=[n,setdiff(1:numel(x_dims),n)]`, `x` is reshaped to `[col_dims(n),numel(x)/col_dims(n)]`, multiplied as `x=Q{nmats-n+1}*x`, the dimension map is updated with `x_dims(n)=row_dims(n)`, `x` is reshaped to `[row_dims(n),x_dims(dims(2:end))]`, and `ipermute` restores the dimension order.
-- Finally, `x` is reshaped to `[prod(row_dims),ncols]` for output.
+## Implicit factors
 
-## Inputs and outputs
+A factor may instead be a construction description with `action` and `dims` fields, as supplied to `polyadic`. `dims=[nrows ncols]` provides the tensor dimensions, and `action(block)` applies the factor to a numeric matrix with `ncols` rows. The existing polyadic `mtimes` overload supplies the action and dimensions internally; an FFT or other action needs no string-command protocol. The contraction itself does not need the adjoint field.
 
-**Inputs**
-
-- `Q` — cell array of Kronecker terms (each element a matrix; `opium` objects are handled via the coefficient shortcut).
-- `x` — a vector or a matrix of appropriate dimension; must be numeric.
-
-**Output**
-
-- `x` — a vector or a matrix of appropriate dimension, the result of the Kronecker-product action.
-
-## References
-
-- Spinach Wiki page for `kronm.m`: <https://spindynamics.org/wiki/index.php?title=kronm.m>
-- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kronm.m>
+The function validates the cell structure, scalar implicit descriptions with function-handle actions, the factor dimensions, and the numeric right-hand side. The caller is responsible for matching dimensions and supplying linear actions with the documented output shape. No periodic-grid or spin-system assumptions are made here.

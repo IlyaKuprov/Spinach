@@ -19,7 +19,9 @@ function answer=isreal(p)
 % Check the core array
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        if ~isreal(p.cores{n}{k})
+        factor=p.cores{n}{k};
+        if isa(factor,'opium'), factor=factor.coeff; end
+        if isa(factor,'function_handle')||~isreal(factor)
             answer=false; return
         end
     end
@@ -27,12 +29,16 @@ end
 
 % Check prefix and suffix arrays
 for n=1:numel(p.prefix)
-    if ~isreal(p.prefix{n})
+    factor=p.prefix{n};
+    if isa(factor,'opium'), factor=factor.coeff; end
+    if ~isreal(factor)
         answer=false; return
     end
 end
 for n=1:numel(p.suffix)
-    if ~isreal(p.suffix{n})
+    factor=p.suffix{n};
+    if isa(factor,'opium'), factor=factor.coeff; end
+    if ~isreal(factor)
         answer=false; return
     end
 end
@@ -45,4 +51,5 @@ end
 % A little inaccuracy sometimes saves a ton of explanation.
 %
 % H.H. Munro
+
 

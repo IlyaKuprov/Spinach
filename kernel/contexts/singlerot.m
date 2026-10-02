@@ -174,19 +174,8 @@ switch spin_system.bas.formalism
 
         % Make the rotor turning generator
         if ismember('polyadic',spin_system.sys.enable)
-            rotor_phases=fourdif(spc_dim,1); max_rank=parameters.max_rank;
-
-            % Forward and inverse transforms with their normalised adjoints
-            fft_core=struct('action',@(x)fft(x,[],1),...
-                            'adjoint',@(x)spc_dim*ifft(x,[],1),'dims',[spc_dim spc_dim]);
-            ifft_core=struct('action',@(x)ifft(x,[],1),...
-                             'adjoint',@(x)fft(x,[],1)/spc_dim,'dims',[spc_dim spc_dim]);
-
-            % Build the diagonal multiplier once as a numeric CPU core
-            mult_core=spdiags(1i*[0:max_rank -max_rank:-1].',0,spc_dim,spc_dim);
-
-            % Compose three sequential factors through ordinary multiplication
-            d_dphi=polyadic({{ifft_core}})*polyadic({{mult_core}})*polyadic({{fft_core}});
+            rotor_phases=fourdif(spc_dim,1);
+            d_dphi=fourdif_poly(spc_dim,1,2*pi);
             M=(2*pi*parameters.rate)*polyadic({{d_dphi,opium(spn_dim,1)}});
         else
             [rotor_phases,d_dphi]=fourdif(spc_dim,1);

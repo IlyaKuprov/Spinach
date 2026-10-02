@@ -62,7 +62,10 @@
 %       of bugs when using this function.
 %
 % With polyadics enabled, expv and evolution use an implicit FFT
-% phase derivative. The expm method retains explicit generators.
+% phase derivative. The expm method retains an explicit phase
+% derivative and requires materialisable L0, Lx, and Ly. Action-only
+% Fourier-flow backgrounds are rejected; disable polyadics before
+% constructing the background when an explicit propagator is needed.
 %
 % ilya.kuprov@weizmann.ac.il
 %

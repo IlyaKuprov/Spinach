@@ -16,6 +16,8 @@ The spin-space dimension is `spn_dim=size(H,1)`; the spatial dimension is `spc_d
 
 The documented derivative choices are `parameters.deriv={'fourier'}` for Fourier differentiation, or `parameters.deriv={'period',n}` for n-point central finite differences with periodic boundary conditions.
 
+With Fourier derivatives and `sys.enable={'polyadic'}`, the spatial generator `F` contains implicit FFT actions. The pulse sequence must use exponential-action propagation; `full(F)` and `inflate(F)` cannot materialise those cores. Disable polyadics before calling `imaging` when the sequence requires explicit spatial matrices or propagators. Finite-difference polyadics retain materialisable numeric cores.
+
 ## Spin operators and phantoms
 
 The Hamiltonian and kinetics are shared across voxels. Relaxation is assembled from paired cell arrays `rlx_ph` and `rlx_op`: each `rlx_ph` entry is a spatial phantom with the same dimensions as the voxel grid, and the matching `rlx_op` entry is a spin relaxation superoperator. Initial states are assembled from `rho0_ph` and `rho0_st`; receiver/detection states are assembled from `coil_ph` and `coil_st`. Each phantom has the grid dimensions, and each paired state/operator is a spin-space object. The source requires the phantom and paired-state/operator lists to have matching lengths. A user-supplied `rho0` or `coil` can be used instead of building that object from phantoms.

@@ -30,4 +30,6 @@ The source warns that the sign convention for `rf_frq_list` must agree with the 
 
 ## Implicit phase differentiation
 
-Enabling `sys.enable={'polyadic'}` uses `fourdif` for the phase derivative in the `expv` and `evolution` methods. The phase grid, RF frequency sign, rotor rank, state-stack projection, and waveform slices are unchanged. The multiplier is constructed once and uploaded with the other generators before GPU propagation. The `expm` method always retains explicit generators so that the effective propagator remains available.
+Enabling `sys.enable={'polyadic'}` uses `fourdif` for the phase derivative in the `expv` and `evolution` methods. The phase grid, RF frequency sign, rotor rank, state-stack projection, and waveform slices are unchanged. The multiplier is constructed once and uploaded with the other generators before GPU propagation. The `expm` method retains an explicit phase derivative and materialises its generators so that the effective propagator remains available.
+
+The supplied `L0`, `Lx`, and `Ly` must also be materialisable for `expm`. In particular, a Fourier-flow background built with polyadics enabled contains action-only FFT cores and is rejected during materialisation. Build that background with polyadics disabled when an explicit pulse propagator is required; changing the option only at the pulse call does not convert an already constructed implicit background. Use `expv` or `evolution` for an action-only background when only state propagation is needed.

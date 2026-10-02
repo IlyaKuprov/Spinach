@@ -1,10 +1,12 @@
-% The function [x,DM] = fourdif(N,m) computes the m'th derivative 
+% The function computes the m'th derivative
 % Fourier spectral differentiation matrix on grid with N equispa-
 % ced points in [0,2pi). Syntax:
 %
-%                        [x,DM]=fourdif(N,m)
+%                        [x,DM]=fourdif(spin_system,N,m)
 % 
 % Parameters:
+%
+%     spin_system - Spinach system with the sys.enable option list
 %
 %     N - dimension of differentiation matrix
 %
@@ -14,7 +16,8 @@
 %
 %     x - equispaced points 0, 2*pi/N, 4*pi/N, ... , (N-1)*2*pi/N
 %
-%    DM - m-th order differentiation matrix
+%    DM - m-th order differentiation matrix, or an implicit polyadic
+%         when spin_system.sys.enable contains the polyadic option
 %
 %  Explicit formulae are used to compute the matrices for m=1 and
 %  m=2. A discrete Fourier approach is employed for m>2. The prog-
@@ -24,21 +27,45 @@
 %  For m=1 and 2 the code implements a "flipping trick" to improve
 %  accuracy as suggested in http://dx.doi.org/10.1137/0916073 
 %
+%  The polyadic option uses inverse FFT, a numeric CPU diagonal
+%  multiplier, and FFT factors with normalised adjoints. On even
+%  grids, odd derivatives annihilate the Nyquist mode; even ones
+%  retain it. Scale DM by (2*pi/extent)^m for another period. Upload
+%  the polyadic once with gpuArray for GPU actions; do not inflate it.
+%
 %  S.C. Reddy
 %  J.A.C. Weideman
 %
 % <https://spindynamics.org/wiki/index.php?title=fourdif.m>
 
-function [x,DM]=fourdif(N,m)
+function [x,DM]=fourdif(spin_system,N,m)
 
 % Check consistency
-grumble(N,m);
+grumble(spin_system,N,m);
 
 % Run the blob
 x=2*pi*(0:N-1)'/N;                           % grid points
 
 % Differentiation matrix
-if (nargout>1)    
+if (nargout>1)&&ismember('polyadic',spin_system.sys.enable)
+
+    % Build the spectral multiplier once on CPU
+    mult=fftdiff(m,N,2*pi/N).';
+    if (mod(N,2)==0)&&(mod(m,2)==1)
+        mult(N/2+1)=0;
+    end
+    mult=spdiags(mult,0,N,N);
+
+    % Define transforms and their normalised adjoints
+    fft_core=struct('action',@(x)fft(x,[],1),...
+                    'adjoint',@(x)N*ifft(x,[],1),'dims',[N N]);
+    ifft_core=struct('action',@(x)ifft(x,[],1),...
+                     'adjoint',@(x)fft(x,[],1)/N,'dims',[N N]);
+
+    % Compose inverse FFT, multiplication, and FFT factors
+    DM=polyadic({{ifft_core}})*polyadic({{mult}})*polyadic({{fft_core}});
+
+elseif nargout>1
     h=2*pi/N;                                % grid spacing
     kk=(1:N-1)';
     n1=floor((N-1)/2); 
@@ -81,11 +108,15 @@ end
 end
 
 % Consistency enforcement
-function grumble(N,m)
-if (~isnumeric(N))||(~isreal(N))||(numel(N)~=1)||(N<1)||(mod(N,1)~=0)
+function grumble(spin_system,N,m)
+if (~isstruct(spin_system))||(~isfield(spin_system,'sys'))||...
+   (~isfield(spin_system.sys,'enable'))||(~iscell(spin_system.sys.enable))
+    error('spin_system.sys.enable must be a cell array of option names.');
+end
+if (~isnumeric(N))||(~isreal(N))||(numel(N)~=1)||(~isfinite(N))||(N<1)||(mod(N,1)~=0)
     error('N must be a positive real integer');
 end
-if (~isnumeric(m))||(~isreal(m))||(numel(m)~=1)||(m<1)||(mod(m,1)~=0)
+if (~isnumeric(m))||(~isreal(m))||(numel(m)~=1)||(~isfinite(m))||(m<1)||(mod(m,1)~=0)
     error('m must be a positive real integer');
 end
 end
@@ -95,4 +126,5 @@ end
 % you on the face.
 %
 % One of IK's girlfriends
+
 

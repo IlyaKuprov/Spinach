@@ -150,8 +150,9 @@ report(spin_system,['spin space problem dimension    ' num2str(spn_dim)]);
 parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
 
 % Compute spectral derivative operators
-[traj_inner,d_dphi_inner]=fourdif(npoints_inner,1);
-[traj_outer,d_dphi_outer]=fourdif(npoints_outer,1);
+deriv_system=spin_system; deriv_system.sys.enable={};
+[traj_inner,d_dphi_inner]=fourdif(deriv_system,npoints_inner,1);
+[traj_outer,d_dphi_outer]=fourdif(deriv_system,npoints_outer,1);
 
 % Compute rotor phase tracks
 phases_outer=kron(traj_outer,ones(npoints_inner,1));
@@ -548,4 +549,5 @@ end
 % Show me a hero and I'll write you a tragedy.
 %
 % F. Scott Fitzgerald
+
 

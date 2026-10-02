@@ -63,17 +63,18 @@ switch parameters.deriv{1}
    case 'fourier'
         
         % Fourier derivatives
+        deriv_system=spin_system; deriv_system.sys.enable={};
         if isscalar(parameters.npts)
-            [~,Dx]=fourdif(parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
+            [~,Dx]=fourdif(deriv_system,parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
         end
         if numel(parameters.npts)==2
-            [~,Dx]=fourdif(parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
-            [~,Dy]=fourdif(parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
+            [~,Dx]=fourdif(deriv_system,parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
+            [~,Dy]=fourdif(deriv_system,parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
         end
         if numel(parameters.npts)==3
-            [~,Dx]=fourdif(parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
-            [~,Dy]=fourdif(parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
-            [~,Dz]=fourdif(parameters.npts(3),1); Dz=(2*pi/parameters.dims(3))*Dz;
+            [~,Dx]=fourdif(deriv_system,parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
+            [~,Dy]=fourdif(deriv_system,parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
+            [~,Dz]=fourdif(deriv_system,parameters.npts(3),1); Dz=(2*pi/parameters.dims(3))*Dz;
         end
         
     otherwise
@@ -162,4 +163,5 @@ end
 % blowing forlornly in the direction indicated.
 %
 % Viktor Shenderovich
+
 

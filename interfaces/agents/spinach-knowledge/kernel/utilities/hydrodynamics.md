@@ -10,7 +10,7 @@ A basic hydrodynamics infrastructure provider that returns first derivative oper
 - Input consistency is enforced by an internal `grumble` subfunction, which validates `parameters.dims`, `parameters.npts`, and `parameters.deriv` and errors out with specific messages on invalid input.
 - Derivative operators are built according to `parameters.deriv{1}`:
   - `'period'`: n-point central finite-difference matrices with periodic boundary conditions, obtained from `fdmat(...)` and divided by the grid spacing `parameters.dims(k)/parameters.npts(k)` for each dimension.
-  - `'fourier'`: Fourier differentiation matrices from `fourdif(...)`, scaled by `2*pi/parameters.dims(k)` for each dimension.
+  - `'fourier'`: Fourier differentiation matrices from `fourdif(spin_system,...)`, scaled by `2*pi/parameters.dims(k)` for each dimension.
   - Any other value raises the error `'unrecognized derivative operator type.'`.
 - The 1D derivative matrices are combined into full-space operators via `polyadic`, with identity matrices from `opium(...)` in the other dimensions, and multiplied by `-1i`:
   - 1D: `Fx=-1i*polyadic({{Dx}})`.

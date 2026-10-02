@@ -16,8 +16,9 @@ result=new_test_result('kernel/fft_polyadic','FFT polyadic cores',...
                        'Function handle cores must agree with explicit Fourier differentiation and exponentiation.');
 
 % Exercise odd and even grids, including the zero Nyquist convention
+spin_system.sys.enable={};
 for npoints=[1 2 3 8 9]
-    [~,explicit]=fourdif(npoints,1);
+    [~,explicit]=fourdif(spin_system,npoints,1);
     core=fft_core(npoints);
     block=reshape(sin(1:(3*npoints)),npoints,3)+...
           1i*reshape(cos(1:(3*npoints)),npoints,3);
@@ -191,7 +192,7 @@ result=test_close(result,'singleton scaling',(polyadic({{core}})*2*1i)'*ones(2,1
                   'singleton implicit cores support scalar multiplication');
 
 % Build a small Hermitian rotor generator with a noncommuting spin term
-[~,explicit]=fourdif(9,1); core=fft_core(9);
+[~,explicit]=fourdif(spin_system,9,1); core=fft_core(9);
 spin_term=[1 0.3;0.3 -1];
 reference=kron(diag(cos(2*pi*(0:8)/9)),spin_term)+...
           1i*kron(explicit,eye(2));

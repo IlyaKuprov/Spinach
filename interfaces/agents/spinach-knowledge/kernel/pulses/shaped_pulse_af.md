@@ -30,4 +30,4 @@ The source warns that the sign convention for `rf_frq_list` must agree with the 
 
 ## Implicit phase differentiation
 
-Enabling `sys.enable={'polyadic'}` uses `fourdif_poly` for the phase derivative in the `expv` and `evolution` methods. The phase grid, RF frequency sign, rotor rank, state-stack projection, and waveform slices are unchanged. The multiplier is constructed once and uploaded with the other generators before GPU propagation. The `expm` method always retains explicit generators so that the effective propagator remains available.
+Enabling `sys.enable={'polyadic'}` uses `fourdif` for the phase derivative in the `expv` and `evolution` methods. The phase grid, RF frequency sign, rotor rank, state-stack projection, and waveform slices are unchanged. The multiplier is constructed once and uploaded with the other generators before GPU propagation. The `expm` method always retains explicit generators so that the effective propagator remains available.

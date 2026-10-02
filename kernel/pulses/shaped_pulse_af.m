@@ -88,12 +88,11 @@ report(spin_system,['Fokker-Planck problem dimension ' num2str(spc_dim*spn_dim)]
 
 % Select the phase derivative without changing explicit propagation
 use_poly=ismember('polyadic',spin_system.sys.enable)&&~strcmp(method,'expm');
-if use_poly
-    phases=fourdif(spc_dim,1);
-    d_dphi=fourdif_poly(spc_dim,1,2*pi);
-else
-    [phases,d_dphi]=fourdif(spc_dim,1);
+deriv_system=spin_system;
+if strcmp(method,'expm')
+    deriv_system.sys.enable=setdiff(spin_system.sys.enable,{'polyadic'});
 end
+[phases,d_dphi]=fourdif(deriv_system,spc_dim,1);
 
 % Add the overall phase
 phases=phases+rf_phi;

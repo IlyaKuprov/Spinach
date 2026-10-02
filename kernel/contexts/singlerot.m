@@ -173,12 +173,10 @@ switch spin_system.bas.formalism
         report(spin_system,['Fokker-Planck problem dimension:  ' num2str(spc_dim*spn_dim)]);
 
         % Make the rotor turning generator
+        [rotor_phases,d_dphi]=fourdif(spin_system,spc_dim,1);
         if ismember('polyadic',spin_system.sys.enable)
-            rotor_phases=fourdif(spc_dim,1);
-            d_dphi=fourdif_poly(spc_dim,1,2*pi);
             M=(2*pi*parameters.rate)*polyadic({{d_dphi,opium(spn_dim,1)}});
         else
-            [rotor_phases,d_dphi]=fourdif(spc_dim,1);
             M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
         end
 
@@ -212,7 +210,7 @@ switch spin_system.bas.formalism
     case {'zeeman-hilb','zeeman-wavef'}
 
         % Get rotor phases and avoid parfor bug
-        rotor_phases=fourdif(spc_dim,1); M=[];
+        rotor_phases=fourdif(spin_system,spc_dim,1); M=[];
 
     otherwise
 

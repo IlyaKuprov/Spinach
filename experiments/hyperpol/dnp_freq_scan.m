@@ -96,7 +96,8 @@ switch parameters.method
         spc_dim=parameters.nphases; spn_dim=size(H,1);
         
         % Get phases and Fourier derivative operator
-        [phases,d_dphi]=fourdif(spc_dim,1);
+        deriv_system=spin_system; deriv_system.sys.enable={};
+        [phases,d_dphi]=fourdif(deriv_system,spc_dim,1);
         
         % Build the phase turning operator
         PT=kron(d_dphi,speye(spn_dim,spn_dim));
@@ -279,4 +280,5 @@ end
 % Too many people want to *have written*.
 %
 % Terry Pratchett
+
 

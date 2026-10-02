@@ -97,7 +97,8 @@ result=test_close(result,'fdkup isotropic identity',Kfd,-L3/3,1e-13,1e-13,...
                   'with an isotropic tensor, fdkup is minus one third of the finite-difference Laplacian');
 
 % Fourier spectral differentiation is exact for a represented sine wave
-N=16; [grid,D1]=fourdif(N,1); [~,D2]=fourdif(N,2);
+spin_system.sys.enable={};
+N=16; [grid,D1]=fourdif(spin_system,N,1); [~,D2]=fourdif(spin_system,N,2);
 s=sin(grid);
 result=test_close(result,'fourdif first derivative',D1*s,cos(grid),1e-12,1e-12,...
                   'Fourier differentiation exactly differentiates sin(x) to cos(x) on the spectral grid');
@@ -168,3 +169,5 @@ result=test_close(result,'dirdiff commuting derivative',D{2},dP,1e-14,1e-14,...
                   'for commuting A and B, the first derivative is -i*T*B*exp(-i*A*T)');
 
 end
+
+

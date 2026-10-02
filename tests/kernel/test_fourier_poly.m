@@ -15,11 +15,13 @@ result=new_test_result('kernel/fourier_poly','Spectral polyadic derivatives',...
                        'Fourier actions and RF pulse observables must retain explicit-path results.');
 
 % Compare arbitrary complex blocks on odd and even periodic grids
+spin_system.sys.enable={'polyadic'}; explicit_system.sys.enable={};
 for npoints=[1 2 3 8 9 32]
     for order=1:4
-        [~,D]=fourdif(npoints,order);
+        [~,D]=fourdif(explicit_system,npoints,order);
         D=(2*pi/3)^order*D;
-        implicit=fourdif_poly(npoints,order,3);
+        [~,implicit]=fourdif(spin_system,npoints,order);
+        implicit=(2*pi/3)^order*implicit;
         rhs=reshape(sin(1:(3*npoints))+1i*cos(1:(3*npoints)),npoints,3);
         label=[num2str(npoints) '/' num2str(order)];
         result=test_close(result,['action ' label],implicit*rhs,D*rhs,...

@@ -8,7 +8,9 @@ description: Expert use of the Spinach library for magnetic resonance simulation
 Spinach is a MATLAB library for spin dynamics simulation, covering liquid- and
 solid-state NMR, EPR, DNP, MRI, and optimal control. This skill is about *using*
 Spinach to answer physical questions. Editing the Spinach source is a different
-task with different rules: see `AGENTS.md` in the repository root.
+task with different rules: see `AGENTS.md` in the repository root. Extend an
+existing function when the required behaviour fits it elegantly; do not create
+a new function in that case.
 
 ## Loading Spinach
 

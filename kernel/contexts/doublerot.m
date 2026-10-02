@@ -101,6 +101,10 @@
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different labs.
 %
+% Note: enabling polyadics uses FFT derivatives in Liouville space
+%       and retains Hamiltonian, relaxation, and kinetics factors.
+%       The sequence must support implicit exponential actions.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=doublerot.m>
@@ -149,8 +153,13 @@ report(spin_system,['lab space problem dimension     ' num2str(spc_dim)]);
 report(spin_system,['spin space problem dimension    ' num2str(spn_dim)]);
 parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
 
-% Compute spectral derivative operators
-deriv_system=spin_system; deriv_system.sys.enable={};
+% Select implicit Fourier derivatives only in the Liouville polyadic route
+use_poly=ismember('polyadic',spin_system.sys.enable)&&...
+         ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'});
+deriv_system=spin_system;
+if ~use_poly
+    deriv_system.sys.enable=setdiff(spin_system.sys.enable,{'polyadic'});
+end
 [traj_inner,d_dphi_inner]=fourdif(deriv_system,npoints_inner,1);
 [traj_outer,d_dphi_outer]=fourdif(deriv_system,npoints_outer,1);
 
@@ -168,8 +177,13 @@ switch spin_system.bas.formalism
         report(spin_system,['Fokker-Planck problem dimension ' num2str(spc_dim*spn_dim)]);
 
         % Compute double spinning operator
-        M=2*pi*kron((parameters.rate_outer*kron(d_dphi_outer,speye(size(d_dphi_inner)))+...
-                     parameters.rate_inner*kron(speye(size(d_dphi_outer)),d_dphi_inner)),speye(size(H)));
+        if use_poly
+            M=2*pi*(parameters.rate_outer*polyadic({{d_dphi_outer,opium(npoints_inner,1),opium(spn_dim,1)}})+...
+                    parameters.rate_inner*polyadic({{opium(npoints_outer,1),d_dphi_inner,opium(spn_dim,1)}}));
+        else
+            M=2*pi*kron((parameters.rate_outer*kron(d_dphi_outer,speye(size(d_dphi_inner)))+...
+                         parameters.rate_inner*kron(speye(size(d_dphi_outer)),d_dphi_inner)),speye(size(H)));
+        end
 
     % Hilbert space
     case {'zeeman-hilb','zeeman-wavef'}
@@ -220,7 +234,11 @@ end
 if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
 
     % Project relaxation and kinetics
-    R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);
+    if use_poly
+        R=polyadic({{opium(spc_dim,1),R}}); K=polyadic({{opium(spc_dim,1),K}});
+    else
+        R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);
+    end
 
     % Project the initial state
     if isfield(parameters,'rho0')&&strcmp(parameters.grid,'single_crystal')
@@ -253,15 +271,15 @@ ans_array=cell(numel(weights),1);
 % Run serially if needed
 if isfield(parameters,'serial')&&...
            parameters.serial
-       
+
     % Serial execution
     nworkers=0;
-    
+
     % Inform the user
     report(spin_system,'WARNING: parallelisation turned off by the user.');
-    
+
 else
-    
+
     % Parallel execution
     nworkers=min([poolsize numel(weights)]);
 
@@ -280,55 +298,53 @@ parallel_profiler_start;
 
 % Powder averaged spectrum
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
-    
+
     % Preallocate Liouvillian blocks
-    L=cell(npoints_total,npoints_total);
+    L=cell(npoints_total,1);
     for n=1:npoints_total
-        for k=1:npoints_total
-            L{n,k}=krondelta(n,k)*H;
-        end
+        L{n}=H;
     end
-    
+
     % Build Liouvillian blocks
     for n=1:npoints_total
-        
+
         % Loop over spherical ranks
         for r=1:numel(Q)
-            
+
             % Compute outer rotor axis tilt
             D_lab2out=wigner(r,phi_outer,theta_outer,0);
 
             % Compute inner rotor axis tilt
             D_out2inn=wigner(r,phi_inner,theta_inner,0);
-    
+
             % Compute crystallite orientation
             D_mol2inn=wigner(r,alphas(q),betas(q),gammas(q));
-            
+
             % Compute outer rotor rotation
             D_outer=wigner(r,0,0,phases_outer(n));
-            
+
             % Compute inner rotor rotation
             D_inner=wigner(r,0,0,phases_inner(n));
-            
+
             % Compose rotations
             D=D_lab2out*D_outer*D_out2inn*D_inner*D_mol2inn;
-            
+
             % Build the block
             for k=1:(2*r+1)
                 for m=1:(2*r+1)
-                    L{n,n}=L{n,n}+D(k,m)*Q{r}{k,m};
+                    L{n}=L{n}+D(k,m)*Q{r}{k,m};
                 end
             end
-            
+
         end
-        
+
         % Apply rotating frames
         for k=1:numel(parameters.rframes)
-            L{n,n}=rotframe(spin_system,C{k},(L{n,n}+L{n,n}')/2,parameters.rframes{k}{1},parameters.rframes{k}{2});
+            L{n}=rotframe(spin_system,C{k},(L{n}+L{n}')/2,parameters.rframes{k}{1},parameters.rframes{k}{2});
         end
-        
+
     end
-    
+
     % Report to the user
     report(spin_system,'running the pulse sequence...');
 
@@ -339,10 +355,25 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
         case {'sphten-liouv','zeeman-liouv'}
 
             % Assemble the Liouvillian
-            L=clean_up(spin_system,cell2mat(L),spin_system.tols.liouv_zero);
+            if use_poly
+                terms=cell(1,npoints_total);
+                for n=1:npoints_total
+                    terms{n}={sparse(n,n,1,spc_dim,spc_dim),...
+                              clean_up(spin_system,L{n},spin_system.tols.liouv_zero)};
+                end
+                L=polyadic(terms)+1i*M;
+            else
+                L=clean_up(spin_system,blkdiag(L{:}),spin_system.tols.liouv_zero)+1i*M;
+            end
+
+            % Upload implicit factors once on the executing orientation worker
+            R_loc=R; K_loc=K;
+            if use_poly&&ismember('gpu',spin_system.sys.enable)
+                L=gpuArray(L); R_loc=gpuArray(R_loc); K_loc=gpuArray(K_loc);
+            end
 
             % Run the pulse sequence
-            ans_array{q}=pulse_sequence(spin_system,parameters,L+1i*M,R,K);
+            ans_array{q}=pulse_sequence(spin_system,parameters,L,R_loc,K_loc);
 
         % Hilbert space
         case {'zeeman-hilb','zeeman-wavef'}
@@ -350,7 +381,7 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
             % Extract the Hamiltonian rotor stack
             ham_stack=cell(npoints_total,1);
             for n=1:npoints_total
-                ham_stack{n}=sparse(L{n,n});
+                ham_stack{n}=sparse(L{n});
             end
 
             % Run the pulse sequence with a Hamiltonian stack
@@ -362,7 +393,7 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
             error('unknown formalism specification.');
 
     end
-    
+
 end
 
 % Unsilence the output
@@ -373,24 +404,24 @@ parallel_profiler_report;
 
 % Decide the return array
 if parameters.sum_up
-    
+
     % Return weighted sum
     answer=weights(1)*ans_array{1};
     for n=2:numel(ans_array)
         answer=answer+weights(n)*ans_array{n};
     end
-    
+
     % Inform the user
     report(spin_system,'returning powder averaged pulse sequence output...');
-    
+
 else
-    
+
     % Return components
     answer=ans_array;
-   
+
     % Inform the user
     report(spin_system,'returning pulse sequence outputs at each orientation...');
-    
+
 end
 
 end
@@ -424,13 +455,11 @@ end
 % Consistency enforcement
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
 
-% Wavefunctions cannot represent thermal equilibria
 if strcmp(spin_system.bas.formalism,'zeeman-wavef')&&isfield(parameters,'needs')&&...
    ismember('iso_eq',parameters.needs)
     error('thermal equilibrium state cannot be represented by a wavefunction.');
 end
 
-% Rotor ranks
 if ~isfield(parameters,'rank_outer')
     error('parameters.rank_outer subfield must be present.');
 elseif (~isnumeric(parameters.rank_outer))||(~isreal(parameters.rank_outer))||...
@@ -444,7 +473,6 @@ elseif (~isnumeric(parameters.rank_inner))||(~isreal(parameters.rank_inner))||..
     error('parameters.rank_inner must be a positive real integer.');
 end
 
-% Spinning rates
 if ~isfield(parameters,'rate_outer')
     error('parameters.rate_outer subfield must be present.');
 elseif (~isnumeric(parameters.rate_outer))||(~isreal(parameters.rate_outer))
@@ -456,7 +484,6 @@ elseif (~isnumeric(parameters.rate_inner))||(~isreal(parameters.rate_inner))
     error('parameters.rate_inner must be a real number.');
 end
 
-% Spinning axes
 if ~isfield(parameters,'axis_outer')
     error('parameters.axis_outer subfield must be present.');
 elseif (~isnumeric(parameters.axis_outer))||(~isreal(parameters.axis_outer))||...
@@ -470,7 +497,6 @@ elseif (~isnumeric(parameters.axis_inner))||(~isreal(parameters.axis_inner))||..
     error('parameters.axis_inner must be a row vector of three real numbers.');
 end
 
-% Spherical grid
 if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');
 elseif isempty(parameters.grid)
@@ -479,17 +505,14 @@ elseif ~ischar(parameters.grid)
     error('parameters.grid variable must be a character string.');
 end
 
-% Pulse sequence
 if ~isa(pulse_sequence,'function_handle')
     error('pulse_sequence argument must be a function handle.');
 end
 
-% Assumptions
 if ~ischar(assumptions)
     error('assumptions argument must be a character string.');
 end
 
-% Active spins
 if ~isfield(parameters,'spins')
     error('working spins must be specified in parameters.spins field.');
 elseif isempty(parameters.spins)
@@ -502,7 +525,6 @@ elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
     error('parameters.spins refers to a spin that is not present in the system.');
 end
 
-% Offsets
 if isempty(parameters.offset)
     error('parameters.offset variable cannot be empty.');
 elseif ~isnumeric(parameters.offset)
@@ -513,7 +535,6 @@ elseif numel(parameters.offset)~=numel(parameters.spins)
     error('parameters.offset variable must have the same number of elements as parameters.spins.');
 end
 
-% Rotating frame transformations
 if ~isfield(parameters,'rframes')
     error('parameters.rframes variable must be specified.');
 elseif ~iscell(parameters.rframes)
@@ -545,6 +566,7 @@ if any(~ismember(parameters.needs(:),{'iso_eq'}))
 end
 
 end
+
 
 % Show me a hero and I'll write you a tragedy.
 %

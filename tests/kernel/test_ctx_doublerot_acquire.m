@@ -66,6 +66,46 @@ result=test_close(result,'doublerot zero-time signal',fid(1),fid_zero,1e-12,1e-1
 result=test_true(result,'doublerot finite FID',all(isfinite(fid(:))),...
                  'short double-rotor propagation should not produce NaN or Inf values');
 
+% Add finite relaxation to the representation-parity cases
+inter.relaxation={'t1_t2'}; inter.equilibrium='zero'; inter.rlx_keep='secular';
+inter.r1_rates={13}; inter.r2_rates={7};
+
+% Compare full FIDs in both Liouville bases with unequal rotor ranks
+for formalism={'sphten-liouv','zeeman-liouv'}
+    bas.formalism=formalism{1}; bas=rmfield(bas,'projections');
+    inter_form=inter;
+    if strcmp(formalism{1},'zeeman-liouv')
+        inter_form=rmfield(inter_form,{'r1_rates','r2_rates'});
+        inter_form.relaxation={};
+    end
+    spin_system=test_spin_system(sys,inter_form,bas);
+    parameters.rho0=state(spin_system,'L+','1H');
+    parameters.coil=state(spin_system,'L+','1H');
+    parameters.rank_outer=1; parameters.rank_inner=2;
+    parameters.npoints=8;
+    for grid={'single_crystal','rep_2ang_100pts_oct'}
+        parameters.grid=grid{1};
+        for rates=[800 -800 0;2400 1300 -1100]
+            parameters.rate_outer=rates(1); parameters.rate_inner=rates(2);
+            spin_system.sys.enable={};
+            reference=doublerot(spin_system,@acquire,parameters,'nmr');
+            spin_system.sys.enable={'polyadic'};
+            observed=doublerot(spin_system,@acquire,parameters,'nmr');
+            label=[formalism{1} '/' grid{1} '/' num2str(rates(1))];
+            result=test_close(result,label,observed,reference,1e-8,1e-8,...
+                              'signed rotor actions preserve the complete anisotropic FID');
+        end
+    end
+    parameters.grid='single_crystal'; parameters.rank_outer=0;
+    spin_system.sys.enable={};
+    reference=doublerot(spin_system,@acquire,parameters,'nmr');
+    spin_system.sys.enable={'polyadic'};
+    observed=doublerot(spin_system,@acquire,parameters,'nmr');
+    result=test_close(result,'zero-rank rotor',observed,reference,1e-8,1e-8,...
+                      'a one-point rotor axis retains its zero derivative');
+    bas.projections={+1};
+end
+
 end
 
 

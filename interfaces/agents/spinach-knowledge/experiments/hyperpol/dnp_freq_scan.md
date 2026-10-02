@@ -35,3 +35,9 @@ The source says R must not be thermalised for this calculation (`inter.equilibri
 - Source: `experiments/hyperpol/dnp_freq_scan.m`
 - <https://spindynamics.org/wiki/index.php?title=dnp_freq_scan.m>
 - Source attributions: ilya.kuprov@weizmann.ac.il; alexander.karabanov@nottingham.ac.uk; walter.kockenberger@nottingham.ac.uk; mariagrazia.concilio@sjtu.edu.cn
+
+## Implicit Fokker-Planck GMRES
+
+With polyadics enabled, `fp-gmres` retains the phase derivative as FFT factors and applies the full generator through a function action. Its preconditioner solves independent spin-sized static-generator blocks in the Fourier phase basis, including the frequency-dependent derivative eigenvalues but not microwave phase mixing. LU decompositions are prepared once per frequency and reused by GMRES. Nonconvergence is reported as an error rather than accepted as a steady state. Odd and even phase counts retain the original `fourdif` Nyquist convention.
+
+`fp-backs` still uses an explicit matrix and direct backslash, and both LvN methods are unchanged. The implicit route is a CPU iterative solver; it does not make a GPU steady-state solver available.

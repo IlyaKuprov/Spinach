@@ -24,3 +24,5 @@ result = test_ctx_doublerot_acquire()
 ## References
 
 - Source file: [tests/kernel/test_ctx_doublerot_acquire.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_ctx_doublerot_acquire.m) (Spinach repository, main branch).
+
+The suite also compares complete explicit and FFT-polyadic FIDs in both Liouville bases, with unequal rotor ranks, positive/negative/zero spinning rates, finite relaxation, single-crystal and powder grids, and a zero-rank one-point rotor axis.

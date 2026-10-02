@@ -21,3 +21,7 @@ The powder weights combine orientation-level sequence outputs when `parameters.s
 ## Source-supported example
 
 `examples/nmr_solids/dor_powder_nav_fplanck_time.m` uses the Liouville route for 14N, with outer/inner rates of 1 MHz and 5 MHz, ranks 7 and 4, and the `rep_2ang_100pts_oct` orientation grid. Its header explicitly says those spinning frequencies are intentionally high to shorten this example, not representative experimental settings. The related frequency-domain example is `examples/nmr_solids/dor_powder_nav_fplanck_freq.m`.
+
+## Polyadic Liouville route
+
+With `sys.enable={'polyadic'}`, both phase derivatives are three-factor FFT polyadics. Their Kronecker sum retains outer-phase, inner-phase, and spin ordering, with each rate in Hz multiplied by `2*pi`. Rotor-dependent Hamiltonian blocks and lifted relaxation/kinetics remain polyadic. The callback must support implicit exponential actions such as `step` or `evolution`. GPU factors are uploaded once per executing orientation worker before the callback. The explicit route, rotor ranks, powder projection, and Hilbert rotor stacks retain their previous meaning.

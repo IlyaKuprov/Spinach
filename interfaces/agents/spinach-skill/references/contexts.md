@@ -65,6 +65,8 @@ In `powder`, `parameters.rho0` may be a function handle of the three ZYZ
 active Euler angles. In `singlerot`, two-angle grids belong in Liouville
 space and three-angle grids in Hilbert space; `singlerot` supports
 arbitrary-order rotating-frame corrections and `floquet` does not.
+`doublerot` supports the same opt-in FFT differentiation in both Liouville formalisms. It uses independent outer and inner phase axes, keeps their specified ranks, and passes polyadic Hamiltonian/rotor, relaxation, and kinetics generators to the callback. Use implicit exponential actions; the Hilbert Hamiltonian-stack route is unchanged.
+
 For traditional MAS stacks, `rotor_stack` applies its explicit assumptions
 to both Hamiltonian construction and numerical `parameters.rframes`,
 regardless of prior assumptions on the input object. Numerical frames reject

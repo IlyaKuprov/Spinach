@@ -48,8 +48,9 @@
 %       responds to a column-wise vectorization of a 3D array
 %       with dimensions ordered as [X Y Z].
 %
-% Note: polyadic objects are returned, use inflate() to get the
-%       corresponding sparse matrix.
+% Note: Fourier/polyadic output is action-only and cannot be
+%       inflated. Disable polyadics to obtain a sparse matrix;
+%       finite-difference polyadics remain materialisable.
 %
 % a.j.allami@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

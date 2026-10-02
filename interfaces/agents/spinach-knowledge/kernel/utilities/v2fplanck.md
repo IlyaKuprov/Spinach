@@ -8,7 +8,7 @@
 
 The spatial generator represents advection and diffusion on one to three voxel axes. A uniform velocity component multiplies its translation generator `F_i`; a spatially varying component contributes `diag(F_i*u_i)+diag(u_i)*F_i`, including the velocity-gradient term. Missing velocity components are zero. An isotropic diffusion coefficient adds `-1i*D*F_i*F_i` for each active direction; a constant anisotropic tensor adds cross-direction terms, while voxel-dependent diffusion uses `-1i*F_i*diag(D_ij)*F_j`. These are spatial transport terms, not spin Hamiltonian terms.
 
-The spatial operator is tensored with the spin identity; in three dimensions its direct-product ordering is Z⊗Y⊗X⊗Spin. `F` is a sparse numeric matrix by default. Only when `spin_system.sys.enable` contains `'polyadic'` are the spatial derivative operators kept polyadic and the result polyadic; use `inflate()` to obtain its sparse matrix in that case.
+The spatial operator is tensored with the spin identity; in three dimensions its direct-product ordering is Z⊗Y⊗X⊗Spin. `F` is a sparse numeric matrix by default. Only when `spin_system.sys.enable` contains `'polyadic'` are the spatial derivative operators kept polyadic and the result polyadic. With Fourier derivatives, that result has implicit FFT cores and is action-only: `inflate()` cannot materialise it. Disable polyadics for a sparse numeric generator. Finite-difference polyadics remain materialisable.
 
 ## Valid parameter domain
 

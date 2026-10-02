@@ -105,6 +105,8 @@ context on an imported mesh, needs five phantom pairs on the same pattern:
 `H_ph`/`H_op`, `R_ph`/`R_op`, `K_ph`/`K_op`, `rho0_ph`/`rho0_st`,
 `coil_ph`/`coil_st`.
 
+For imaging flow/diffusion with `parameters.deriv={'fourier'}` and polyadics enabled, `hydrodynamics` retains FFT derivative cores rather than dense matrices. These outputs and the inherited `v2fplanck` flow/diffusion generators are action-only: neither `inflate` nor `full` can materialise them. Disable polyadics when a sparse numeric operator is required. Tensor ordering, physical lengths, and products of first derivatives in `v2fplanck` are unchanged, including even-grid Nyquist treatment. The periodic finite-difference option is unchanged.
+
 ### What the context hands to the sequence
 
 The three or five positional arguments after `parameters` are not always what

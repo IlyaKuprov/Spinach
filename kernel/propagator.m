@@ -44,8 +44,11 @@ end
 % Load the cache record if one exists
 if ismember('prop_cache',spin_system.sys.enable)
 
-    % Hash the generator, the step, and the tolerance
-    prop_hash=md5_hash({L,timestep,spin_system.tols.prop_chop});
+    % Hash the generator, the step, and the numerical policy
+    prop_hash=md5_hash({L,timestep,spin_system.tols.prop_chop,...
+                        spin_system.tols.small_matrix,spin_system.tols.dense_matrix,...
+                        ismember('clean-up',spin_system.sys.disable),...
+                        ismember('gpu',spin_system.sys.enable)});
     prop_hash=[prop_hash ':P']; % Mark as propagator
 
     % Get ValueStore, unless the client has no parallel pool

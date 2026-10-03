@@ -223,6 +223,8 @@ spectrum (missing multiplet components, distorted powder lineshapes, phase
 errors). Convergence is established by refinement, never by appearance - see
 the validation procedure below.
 
+With `prop_cache`, `propagator()` separates cache entries by cleanup, storage-threshold, and GPU policy as well as generator, timestep, and chop tolerance; changing those settings within a pool cannot retrieve an entry built under a different policy.
+
 ## Scaling and memory
 
 The Liouville-space dimension grows as 4^N for N spin-1/2 particles (2^N in

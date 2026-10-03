@@ -14,4 +14,4 @@ For matrices with dimension below `spin_system.tols.small_matrix`, it calls MATL
 
 ## Caching and side effects
 
-When `prop_cache` is enabled, the non-small-matrix path checks a ValueStore entry keyed by `L`, `timestep`, and `prop_chop`, and stores a newly computed propagator when a store is available. The function can emit progress and warning messages through Spinach's `report`; it does not export a file. The source notes the caching method in [DOI: 10.1063/1.4928978](https://doi.org/10.1063/1.4928978).
+When `prop_cache` is enabled, the non-small-matrix path checks a ValueStore entry keyed by `L`, `timestep`, `prop_chop`, the `small_matrix` and `dense_matrix` storage thresholds, and the cleanup-disable and GPU-enable flags, and stores a newly computed propagator when a store is available. The function can emit progress and warning messages through Spinach's `report`; it does not export a file. The source notes the caching method in [DOI: 10.1063/1.4928978](https://doi.org/10.1063/1.4928978).

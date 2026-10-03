@@ -30,9 +30,13 @@ collect the eventual exit status, error/warning text, and expected outputs.
 A process identifier or scheduler submission is not evidence of completion.
 
 Place a distinctive success marker only after scientific assertions and
-required file writes. Require the marker, a successful process exit, and the
-expected artefacts together. Never catch an error merely to print success.
-Record which checks ran; static inspection cannot substitute for execution.
+required file writes. Check the marker, expected artefacts, and process exit
+together. A nonzero exit is not a clean run: inspect whether computation
+failed or a later shutdown failed. Independently verified saved results may
+remain useful after a shutdown failure, but report that distinction and keep
+the failing log; never silently waive the exit status or catch an error
+merely to print success. Record which checks ran; static inspection cannot
+substitute for execution.
 
 For a reproducible script, retain its physical parameters, data sources,
 initial conditions, numerical tolerances, random seed when relevant, and

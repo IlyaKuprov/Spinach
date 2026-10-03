@@ -32,7 +32,7 @@ given. The accepted set is exactly `'damp'`, `'t1_t2'`, `'redfield'`,
 `'naka-zwan'`, `'lindblad'`, `'nottingham'`, `'weizmann'`, `'SRFK'`,
 `'SRSK'`; anything else is refused by `create`. If the field is absent, `R` is zero only when there are also no dissipative
 bosonic modes. Mode damping or dephasing can contribute automatically; see
-`kernel/relaxation.m` and `kernel/bosons/boson_lindblad.m`.
+`kernel/relaxation.m` and `kernel/utilities/rlx_modes.m`.
 
 | Theory | Physical model | Required inputs | Typical use |
 |---|---|---|---|

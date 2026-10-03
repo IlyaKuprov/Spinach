@@ -38,6 +38,15 @@ result=test_true(result,'integer metadata',contains(text,'##$COUNT=1844674407370
                  'integer metadata retains every decimal digit, including values outside the double exact-integer range');
 block.metadata=block.metadata(1:2,:);
 
+% JCAMP 5.01 permits magnitude and power labels without recomputing samples
+transformed=block; transformed.y=[1;2;3;4;5]; valid=true;
+for units={'MAGNITUDE','POWER'}
+    transformed.yunits=units{1}; data.blocks={transformed}; text=jcamp_export(data);
+    valid=valid&&contains(text,['##YUNITS=' units{1}])&&isequal(read_pairs(text),[transformed.x transformed.y]);
+end
+result=test_true(result,'NMR transformed units',valid,...
+                 'magnitude and power ordinate units retain the already transformed caller samples');
+
 % Irregular, non-monotonic, and singleton axes must retain explicit coordinates
 block.x=[7;2;pi;-5;0]; data.blocks={block}; text=jcamp_export(data);
 result=test_true(result,'irregular coordinates',contains(text,'##DATA CLASS=XYPOINTS')&&...
@@ -72,6 +81,12 @@ result=test_true(result,'ragged multidimensional pages',contains(text,'##PAGE=T=
                  contains(text,'##NPOINTS=4')&&contains(text,'##DATA TABLE=(XY..XY), PROFILE')&&...
                  isequal(read_pairs(text),[1 4;2 5;3 6;1 7;pi 8;4 9;5 10]),...
                  'physical page coordinates and each page point count are explicit');
+
+% Repeated coordinate sets retain separately supplied traces in page order
+repeated=general; repeated.pages(2).coordinates={'T',0}; data.blocks={repeated}; text=jcamp_export(data);
+result=test_true(result,'repeated page coordinates',count(text,'##PAGE=T=0')==2&&...
+                 isequal(read_pairs(text),[1 4;2 5;3 6;1 7;pi 8;4 9;5 10]),...
+                 'repeated coordinates do not merge, replace, or reorder independent page tables');
 
 % Different regular grids cannot share an implicit NTUPLES abscissa
 shifted=general;
@@ -133,6 +148,11 @@ data.blocks={emr}; text=jcamp_export(data);
 result=test_true(result,'multiline metadata',all(cellfun(@numel,strsplit(text,char([13 10])))<=80),...
                  'long textual LDRs wrap on spaces within the record limit');
 
+% Private metadata may use its own dotted identifier namespace
+emr.metadata(end+1,:)={'$SAMPLE.DESCRIPTION','Private note'}; data.blocks={emr}; text=jcamp_export(data);
+result=test_true(result,'private dotted label',contains(text,'##$SAMPLE.DESCRIPTION=Private note'),...
+                 'private labels retain their user-defined namespace rather than impersonating reserved labels');
+
 % A long value must not split the spaces inside its label
 emr.metadata(end+1,:)={'SPECTROMETER/DATA SYSTEM',repmat('a',1,70)};
 data.blocks={emr}; text=jcamp_export(data);
@@ -175,6 +195,12 @@ bad=data; bad.blocks={block}; bad.blocks{1}.metadata{3,2}='(1i, 0)'; invalid{end
 bad=data; bad.blocks={block}; bad.blocks{1}.xunits='HZ'; invalid{end+1}=bad;
 bad=data; bad.blocks={general}; bad.blocks{1}.variables(1).units='SECONDS'; invalid{end+1}=bad;
 bad=data; bad.blocks={emr_peaks}; bad.blocks{1}.peaks.multiplicity={'S';'D'}; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.yunits='TESLA'; invalid{end+1}=bad;
+bad=data; bad.blocks={general}; bad.blocks{1}.variables(2).units='TESLA'; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.metadata{2,2}=42; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.metadata{2,2}='NOT-A-METHOD'; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.metadata{2,2}={'SPECTRUM';'FID'}; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.metadata(end+1,:)={'SAMPLE.DESCRIPTION','Invalid reserved label'}; invalid{end+1}=bad;
 for n=1:numel(invalid)
     refused=false;
     try

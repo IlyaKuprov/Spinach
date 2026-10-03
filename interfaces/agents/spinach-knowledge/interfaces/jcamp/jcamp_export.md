@@ -15,6 +15,8 @@ NTUPLES with distinct real and imaginary pages. General variable/page inputs
 represent multidimensional coordinates, ragged sampling, and additional
 quadrature or receiver channels without guessing dimension order. Explicit
 pairs use the NTUPLES PROFILE display method. Shared attributes cannot force a different sampling grid onto an individual page.
+Repeated coordinate sets retain distinct tables in input order; an explicit
+PAGE coordinate can label replicate identity for coordinate-keyed readers.
 Peaks can contain heights, widths, NMR multiplicities, and assignments. Multiple
 independent datasets are enclosed in a LINK block.
 
@@ -28,9 +30,12 @@ replaced only after a complete successful write.
 
 NMR observation frequencies are in MHz; EMR microwave frequencies are in Hz.
 EPR uses `EMR SIMULATION` or `EMR MEASUREMENT`, with explicit detection mode
-and method. Required identifiers, NMR delay pairs, and tabulated abscissa units
-are checked, but the caller supplies the full acquisition, sample, reference, and simulation metadata relevant to the
+and a core method identifier. Required identifiers, NMR delay pairs, and
+tabulated axis units are checked, but the caller supplies the full acquisition, sample, reference, and simulation metadata relevant to the
 experiment. Generated structural records cannot be overridden by aliases.
+NMR ordinate units include MAGNITUDE and POWER under JCAMP 5.01; supplying
+a unit label does not calculate the corresponding transform. Embedded label
+periods are supported in the private namespace, not ordinary reserved labels.
 The exporter does not provide integer ASDF compression, molecular structure
 export, or universal vendor compatibility; JCAMP readers differ in their
 support for multidimensional and irregular NTUPLES.

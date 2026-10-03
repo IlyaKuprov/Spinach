@@ -687,5 +687,8 @@ integer quantisation is performed. NMR observation frequency is in MHz; EMR
 microwave frequency is in Hz. The caller supplies the experiment-specific
 metadata, including pulse sequences and quadrature conventions. Tabulated
 abscissa units must match the declared NMR/EMR type; NMR delay text must
-contain the finite numeric pair `(RD, ID)`. Multiplicity applies only to NMR
-peaks.
+contain the finite real numeric pair `(RD, ID)`. Multiplicity applies only to NMR
+peaks. Axis units and core EMR methods are validated; NMR 5.01 permits
+`MAGNITUDE` and `POWER` alongside `ARBITRARY UNITS`, without applying a
+transform. Add a PAGE variable when replicate identity must be explicit to
+coordinate-keyed readers.

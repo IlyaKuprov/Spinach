@@ -6,7 +6,9 @@ axes, floating-point precision, complex channels, ragged multidimensional
 pages, differing page grids, assigned peaks, EMR peak descriptors, linked
 NMR/EPR blocks, missing observations, record wrapping, byte-identical file output, and refusal of
 invalid inputs (including malformed delays, isotope labels, units, and EMR
-multiplicity) without overwriting an existing destination.
+multiplicity, ordinate units, methods, and labels) without overwriting an
+existing destination. Repeated page coordinates remain distinct, and JCAMP
+5.01 magnitude/power unit labels do not recompute caller data.
 
 This regression test is not a spectrometer-vendor acceptance test. Its
 uncompressed pair reader checks the samples emitted by the exporter; external

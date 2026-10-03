@@ -395,6 +395,9 @@ for n=1:numel(data.blocks)
         if ~ischar(label)||isempty(regexp(label,'^[.$]?[A-Za-z][A-Za-z0-9 _/.-]*$','once'))||numel(label)>77
             error('metadata labels must be ASCII JCAMP identifiers, without ## or =.');
         end
+        if ~startsWith(label,'$')&&contains(label(2:end),'.')
+            error('periods may only prefix technique-specific labels; use $ for private labels.');
+        end
         labels{k}=upper(regexprep(label,'[ _/-]',''));
         if ismember(labels{k},reserved), error('metadata must not override generated label %s.',label); end
         if ischar(value)
@@ -447,6 +450,12 @@ for n=1:numel(data.blocks)
             if ~valid, error('.DELAY must contain two finite real pre-acquisition delays, numeric or (RD, ID) text.'); end
         end
     end
+    if startsWith(block.type,'EMR')
+        methods={'DYNAMIC','ELDOR','ENDOR','ESEEM','ODMR','GONIOMETER','HYSCORE',...
+                 'KINETIC','SATURATION','SPECTRUM','FID','TRIPLE','IMAGING','SPECTRAL SPATIAL'};
+        value=block.metadata{strcmp(labels,'.METHOD'),2};
+        if ~ischar(value)||~ismember(value,methods), error('.METHOD must be a documented EMR method identifier.'); end
+    end
     modes={'.ACQUISITIONMODE',{'SIMULTANEOUS','SEQUENTIAL','SINGLE'}; '.DETECTIONMODE',{'CW','PULSE'}};
     for k=1:size(modes,1)
         idx=strcmp(modes{k,1},labels);
@@ -466,6 +475,11 @@ for n=1:numel(data.blocks)
     else
         allowed_units={'DEGREE','HERTZ','KELVIN','SECOND','TESLA','WATT'};
     end
+    if startsWith(block.type,'NMR')
+        allowed_yunits={'ARBITRARY UNITS','MAGNITUDE','POWER'};
+    else
+        allowed_yunits={'ARBITRARY UNITS','INTENSITY','POWER'};
+    end
     if ~choices(2)
         for field={'xunits','yunits'}
             if ~isfield(block,field{1})||~ascii_text(block.(field{1}))||isempty(strtrim(block.(field{1})))||contains(block.(field{1}),',')
@@ -473,6 +487,7 @@ for n=1:numel(data.blocks)
             end
         end
         if ~ismember(block.xunits,allowed_units), error('xunits must match the declared NMR or EMR data type.'); end
+        if ~ismember(block.yunits,allowed_yunits), error('yunits must match the declared NMR or EMR data type.'); end
         for field={'xname','yname'}
             if isfield(block,field{1})&&(~ascii_text(block.(field{1}))||isempty(block.(field{1}))||contains(block.(field{1}),','))
                 error('axis names must be non-empty ASCII row strings without commas.');
@@ -525,6 +540,9 @@ for n=1:numel(data.blocks)
             end
             if ~ismember(variables(xidx).units,allowed_units)
                 error('tabulated abscissa units must match the declared NMR or EMR data type.');
+            end
+            if ~ismember(variables(yidx).units,allowed_yunits)
+                error('tabulated ordinate units must match the declared NMR or EMR data type.');
             end
             if ~iscell(page.coordinates)||size(page.coordinates,2)~=2||~ismatrix(page.coordinates)
                 error('page.coordinates must be an N-by-2 cell array.');

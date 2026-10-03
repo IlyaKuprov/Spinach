@@ -32,6 +32,8 @@ Every block also has:
   are written as AFFN; numeric NMR `.DELAY` pairs acquire parentheses.
   Textual NMR delays must be a finite real numeric pair `(RD, ID)`.
   Generic, technique-specific (`.`), and private (`$`) labels are preserved.
+  A period may prefix a technique-specific label; embedded periods are
+  permitted only in the user-defined private namespace.
   Duplicate labels, including aliases differing only in spaces, dashes,
   slashes, underscores, or case, are refused. Generated structural labels
   and numeric scaling attributes cannot be overridden.
@@ -61,7 +63,12 @@ than silently changing the abscissa units. EMR axis keywords include `TESLA`,
 are in **Hz**, unlike NMR observation frequencies, which are in **MHz**.
 Tabulated abscissa units are checked against the declared data type, including
 the abscissa variable used by each NTUPLES page. Fixed coordinate variables
-retain their explicit units. The exporter performs no unit conversion or processing.
+retain their explicit units. NMR ordinate units are `ARBITRARY UNITS`,
+`MAGNITUDE`, or `POWER` (JCAMP 5.01); EMR ordinate units are `ARBITRARY UNITS`,
+`INTENSITY`, or `POWER`. These units are also checked for each dependent
+page variable. The exporter never computes a magnitude or power merely
+because the corresponding label is supplied, and performs no unit conversion
+or processing.
 
 Example: a complex FID already calculated by Spinach:
 
@@ -119,6 +126,9 @@ quadrature conventions are explicit, rather than inferred from a MATLAB array.
 A page table contains one ordinate component. Supply separate pages and
 separately named dependent variables for real/imaginary, cosine/sine,
 echo/antiecho, receiver channels, etc. All declared variables must occur.
+Pages retain their input order, including repeated coordinate sets. To label
+replicates for readers keyed by coordinate, declare an additional `PAGE`
+variable and fix its value in every page.
 Attribute lists (`VAR_DIM`, `FIRST`, `LAST`, `MIN`, `MAX`, `FACTOR`) are derived
 from the supplied samples and coordinates. A tabulated variable's `VAR_DIM`
 is its maximum page length; a coordinate variable's is the number of distinct
@@ -196,7 +206,12 @@ The exporter checks the minimal technique identifiers: NMR observation
 frequency and nucleus; additionally `.DELAY` and `.ACQUISITION MODE` for FIDs;
 EMR `.DETECTION MODE` and `.METHOD`; additionally `.SIMULATION SOURCE` and
 `.SIMULATION PARAMETERS` for simulations. Acquisition mode is `SIMULTANEOUS`,
-`SEQUENTIAL`, or `SINGLE`; EMR detection is `CW` or `PULSE`.
+`SEQUENTIAL`, or `SINGLE`; EMR detection is `CW` or `PULSE`. The EMR method
+is one of the protocol's core identifiers: `DYNAMIC`, `ELDOR`, `ENDOR`, `ESEEM`,
+`ODMR`, `GONIOMETER`, `HYSCORE`, `KINETIC`, `SATURATION`, `SPECTRUM`, `FID`,
+`TRIPLE`, `IMAGING`, or `SPECTRAL SPATIAL`. Additional experiment abbreviations
+can be described using referenced private metadata as suggested by the EMR
+protocol, while selecting the applicable core method.
 
 This is not an experiment-completeness validator. Supply the full metadata
 required by the applicable IUPAC method, including where applicable:

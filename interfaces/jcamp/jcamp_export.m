@@ -35,9 +35,10 @@
 %    peaks, xunits, yunits - peaks is a scalar structure with x and
 %       optionally y, width (real column vectors), multiplicity (cell
 %       column of S,D,T,Q,M,U for NMR), assignment (cell column of ASCII strings),
-%       and method (ASCII string). Width and multiplicity require y;
-%       assignment permits x-only EMR assignments. method is required
-%       when width or assignment is supplied, and describes the peak
+%       and method (ASCII string). Unassigned widths/multiplicity require y;
+%       EMR widths also require y. Assignments permit x-only NMR/EMR data.
+%       method is required
+%       for widths or EMR assignments, and describes the peak
 %       finding/width convention. Width uses xunits. Assignment text
 %       is enclosed in angle brackets; delimiters must not occur in it.
 %
@@ -505,6 +506,9 @@ for n=1:numel(data.blocks)
            numel(block.x)~=numel(block.y)||any(isinf(real(block.y))|isinf(imag(block.y)))
             error('x/y must be equally sized floating-point columns; x finite real, y finite or missing.');
         end
+        if startsWith(block.type,'NMR')&&~isreal(block.y)&&~strcmp(block.yunits,'ARBITRARY UNITS')
+            error('complex NMR traces require ARBITRARY UNITS; supply real transformed magnitude or power data.');
+        end
         if contains(block.type,'PEAK'), error('NMR peak data types require a peaks structure.'); end
     elseif choices(2)
         if contains(block.type,'PEAK'), error('NMR peak data types require a peaks structure.'); end
@@ -579,15 +583,19 @@ for n=1:numel(data.blocks)
                 error('peak numeric columns must be finite real and match peaks.x.');
             end
         end
-        if isfield(peaks,'width')&&(any(peaks.width<0)||~isfield(peaks,'y')), error('peak widths must be non-negative and require y.'); end
+        if isfield(peaks,'width')&&(any(peaks.width<0)||(~isfield(peaks,'y')&&...
+           (~isfield(peaks,'assignment')||startsWith(block.type,'EMR'))))
+            error('widths must be non-negative; unassigned and EMR peaks require y.');
+        end
         for field={'multiplicity','assignment'}
             if isfield(peaks,field{1})&&(~iscell(peaks.(field{1}))||~iscolumn(peaks.(field{1}))||...
                numel(peaks.(field{1}))~=numel(peaks.x)||~all(cellfun(@ascii_text,peaks.(field{1}))))
                 error('peak text columns must be ASCII cell columns matching peaks.x.');
             end
         end
-        if isfield(peaks,'multiplicity')&&(~isfield(peaks,'y')||~all(ismember(peaks.multiplicity,{'S','D','T','Q','M','U'})))
-            error('peak multiplicity requires y and uses S,D,T,Q,M,U.');
+        if isfield(peaks,'multiplicity')&&((~isfield(peaks,'y')&&~isfield(peaks,'assignment'))||...
+           ~all(ismember(peaks.multiplicity,{'S','D','T','Q','M','U'})))
+            error('unassigned multiplicity requires y; NMR multiplicity uses S,D,T,Q,M,U.');
         end
         if startsWith(block.type,'EMR')&&isfield(peaks,'multiplicity'), error('multiplicity is defined only for NMR peaks.'); end
         if ~isfield(peaks,'assignment')&&isfield(peaks,'width')&&isfield(peaks,'multiplicity')
@@ -596,8 +604,8 @@ for n=1:numel(data.blocks)
         if isfield(peaks,'assignment')&&any(cellfun(@(s)~isempty(regexp(s,'[<>\r\n]','once')),peaks.assignment))
             error('assignment strings must not contain angle brackets or newlines.');
         end
-        if (isfield(peaks,'width')||isfield(peaks,'assignment'))&&~isfield(peaks,'method')
-            error('peak widths and assignments require a method description.');
+        if (isfield(peaks,'width')||(isfield(peaks,'assignment')&&startsWith(block.type,'EMR')))&&~isfield(peaks,'method')
+            error('peak widths and EMR assignments require a method description.');
         end
         if isfield(peaks,'method')&&(~ascii_text(peaks.method)||isempty(strtrim(peaks.method)))
             error('peak method must be a non-empty ASCII row string.');
@@ -607,7 +615,6 @@ for n=1:numel(data.blocks)
            (isfield(peaks,'assignment')~=strcmp(block.type,'NMR PEAK ASSIGNMENTS')))
             error('NMR peak data type must agree with the presence of assignments.');
         end
-        if startsWith(block.type,'NMR')&&~isfield(peaks,'y'), error('NMR peak assignments require y.'); end
     end
 end
 end

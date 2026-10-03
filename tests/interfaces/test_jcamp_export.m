@@ -111,6 +111,22 @@ peak_block.peaks.assignment{1}='H1(CH3), methyl'; data.blocks={peak_block}; text
 result=test_true(result,'assignment punctuation',contains(text,'<H1(CH3), methyl>'),...
                  'parentheses and commas inside an angle-bracketed string do not become group delimiters');
 
+% NMR assignment heights, multiplicity, and widths are independently optional
+assigned=peak_block; assigned.peaks=struct('x',peaks.x,'assignment',{peaks.assignment});
+data.blocks={assigned}; text=jcamp_export(data);
+result=test_true(result,'position-only NMR assignments',contains(text,'##PEAK ASSIGNMENTS=(XA)'),...
+                 'assigned NMR positions do not require heights or a method comment');
+assigned.peaks.y=peaks.y; data.blocks={assigned}; text=jcamp_export(data);
+result=test_true(result,'NMR assignments without method',contains(text,'##PEAK ASSIGNMENTS=(XYA)'),...
+                 'an NMR method comment is required for widths, not ordinary assignments');
+assigned.peaks.multiplicity=peaks.multiplicity; data.blocks={assigned}; text=jcamp_export(data);
+result=test_true(result,'NMR multiplicity without method',contains(text,'##PEAK ASSIGNMENTS=(XYMA)'),...
+                 'multiplicity does not introduce a width-convention requirement');
+assigned.peaks=rmfield(assigned.peaks,'y'); assigned.peaks.width=peaks.width; assigned.peaks.method=peaks.method;
+data.blocks={assigned}; text=jcamp_export(data);
+result=test_true(result,'NMR width without height',contains(text,'##PEAK ASSIGNMENTS=(XMWA)'),...
+                 'assigned widths and multiplicities remain optional independently of heights');
+
 % A compound file keeps its own headers and balanced block terminators
 emr=struct('title','EPR simulation','type','EMR SIMULATION',...
            'metadata',{{'.DETECTION MODE','CW'; '.METHOD','SPECTRUM';...
@@ -211,6 +227,8 @@ bad=data; bad.blocks{1}.metadata{2,2}={'SPECTRUM';'FID'}; invalid{end+1}=bad;
 bad=data; bad.blocks{1}.metadata(end+1,:)={'SAMPLE.DESCRIPTION','Invalid reserved label'}; invalid{end+1}=bad;
 bad=data; bad.blocks{1}.metadata{3,2}=42; invalid{end+1}=bad;
 bad=data; bad.blocks{1}.metadata{4,2}=[1 2]; invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.y=block.y+1i; bad.blocks{1}.yunits='MAGNITUDE'; invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.y=block.y+1i; bad.blocks{1}.yunits='POWER'; invalid{end+1}=bad;
 for n=1:numel(invalid)
     refused=false;
     try

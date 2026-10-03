@@ -695,3 +695,7 @@ coordinate-keyed readers.
 
 Supply `.SIMULATION SOURCE` and `.SIMULATION PARAMETERS` as non-empty ASCII
 text (row strings or cell vectors of lines), not numeric arrays.
+
+Complex NMR quadratures use `ARBITRARY UNITS`; magnitude/power data must
+be real and already transformed. NMR assignments may omit heights and method
+comments; widths require a method description.

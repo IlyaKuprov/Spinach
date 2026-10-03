@@ -8,7 +8,9 @@ NMR/EPR blocks, missing observations, record wrapping, byte-identical file outpu
 invalid inputs (including malformed delays, isotope labels, units, and EMR
 multiplicity, ordinate units, methods, and labels) without overwriting an
 existing destination. Repeated page coordinates remain distinct, and JCAMP
-5.01 magnitude/power unit labels do not recompute caller data.
+5.01 magnitude/power unit labels do not recompute caller data and are rejected
+for complex NMR traces. NMR assignments cover optional heights, widths,
+multiplicity, and method comments.
 
 This regression test is not a spectrometer-vendor acceptance test. Its
 uncompressed pair reader checks the samples emitted by the exporter; external

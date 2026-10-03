@@ -66,7 +66,8 @@ the abscissa variable used by each NTUPLES page. Fixed coordinate variables
 retain their explicit units. NMR ordinate units are `ARBITRARY UNITS`,
 `MAGNITUDE`, or `POWER` (JCAMP 5.01); EMR ordinate units are `ARBITRARY UNITS`,
 `INTENSITY`, or `POWER`. These units are also checked for each dependent
-page variable. The exporter never computes a magnitude or power merely
+page variable. Complex NMR traces require `ARBITRARY UNITS`; magnitude/power
+labels describe already-real transformed data. The exporter never computes a magnitude or power merely
 because the corresponding label is supplied, and performs no unit conversion
 or processing.
 
@@ -174,12 +175,14 @@ NMR profile; individual readers may support only a subset of these layouts.
 `peaks` is a scalar structure with `x` (finite real floating-point column) and:
 
 - `y`: finite real peak heights, same column shape;
-- `width`: optional non-negative finite column, in `xunits`, requiring `y`;
+- `width`: optional non-negative finite column, in `xunits`; unassigned and
+  EMR widths require `y`;
 - `multiplicity`: optional NMR-only cell column of `S`, `D`, `T`, `Q`, `M`, or `U`,
-  requiring `y`;
+  requiring `y` only in unassigned tables;
 - `assignment`: optional cell column of ASCII assignment strings;
 - `method`: ASCII description of peak finding and width convention, required
-  whenever width or assignment is supplied.
+  whenever width or EMR assignment is supplied. NMR assignments without
+  widths do not require a method comment.
 
 Without assignments, a `PEAK TABLE` contains heights and optionally either
 width or multiplicity. With assignments, `PEAK ASSIGNMENTS` contains angle-
@@ -190,8 +193,8 @@ as defined in Section 4.1.4 (the protocol's summary table instead lists
 Unassigned EMR lists are `(XY)` or `(XYW)`; NMR lists use repeated markers,
 such as `(XY..XY)` or `(XYW..XYW)`.
 NMR widths and multiplicities may both be supplied, in the standard's `XYMWA`
-order. NMR assignments require
-heights. EMR also permits x-only assignments. Assignment strings cannot contain
+order. Both NMR and EMR permit x-only assignments. NMR assigned heights, widths,
+and multiplicities are independently optional; EMR widths require heights. Assignment strings cannot contain
 angle brackets; parentheses and commas are permitted inside the brackets. Atom-number assignments require the appropriate
 `CROSS REFERENCE` metadata pointing to a separately available chemical structure;
 this exporter does not create molecular structures or invent assignments.

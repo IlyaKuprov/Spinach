@@ -43,6 +43,10 @@ support for multidimensional and irregular NTUPLES.
 EMR simulation source and parameter descriptions are non-empty ASCII text,
 including multiline cell vectors; numeric arrays are not descriptions.
 
+Complex NMR quadratures use `ARBITRARY UNITS`; magnitude/power data must
+be real and already transformed. NMR assignments may omit heights and method
+comments; widths require a method description.
+
 ## References
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jcamp/jcamp_export.m)

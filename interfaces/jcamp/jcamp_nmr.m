@@ -87,9 +87,11 @@ metadata={'.OBSERVE FREQUENCY',observe(nd); '.OBSERVE NUCLEUS',['^' nuclei{nd}];
           '$AXIS DOMAINS',strjoin(domains,', ')};
 if strcmp(domains{order(1)},'time')
     data_type='NMR FID';
-    metadata=[metadata; {'.DELAY',info.delay; '.ACQUISITION MODE',info.acquisition}];
 else
     data_type='NMR SPECTRUM';
+end
+if any(strcmp(domains,'time'))
+    metadata=[metadata; {'.DELAY',info.delay; '.ACQUISITION MODE',info.acquisition}];
 end
 
 % Build the writer input and delegate the final serialisation
@@ -118,6 +120,9 @@ end
 if ~ischar(info.filename)||(~isempty(info.filename)&&~isrow(info.filename))||...
    ~iscell(info.metadata)||size(info.metadata,2)~=2
     error('info.filename must be a character row and metadata an N-by-2 cell table.');
+end
+if ~ischar(info.sequence)||~isrow(info.sequence)||isempty(strtrim(info.sequence))
+    error('info.sequence must be a non-empty pulse-sequence character row.');
 end
 if any(strcmp(domains,'time'))&&~all(isfield(info,{'delay','acquisition'}))
     error('time-domain export requires info.delay and info.acquisition.');

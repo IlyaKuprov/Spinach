@@ -48,6 +48,44 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Code overrules documentation:** Where code and documentation disagree, and the code is physically / mathematically correct, update the documentation to match the code.
 
+## Spinach Kernel Coding Elegance
+
+Keep the scientific model, algorithm, and numerical costs directly readable. Apply these rules alongside the programming style above; retain established API behaviour. Read this section before writing or refactoring a Spinach function, and apply the final review before delivery.
+
+### Write the calculation, not a framework
+
+1. **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change. Search for existing Spinach and MATLAB capabilities. Extend an existing function when the requested behaviour fits it naturally; do not add a parallel implementation or an unsolicited feature.
+
+2. **Keep the mathematics visible.** Use expressions that a domain scientist can match to the defining equation. Keep small fixed transforms explicit when that is clearer than a generic implementation. Introduce an intermediate when it names a physical quantity, exposes a numerical stage, or avoids meaningful repeated work—not merely to rename an expression.
+
+3. **Use direct data flow.** Arrange the body in dependency order, with one conceptually distinct operation per captioned block. Prefer ordinary matrices, arrays, cells, and existing Spinach structures. Do not introduce a class, dispatcher framework, configuration parser, or mutable cache for a routine calculation.
+
+4. **Abstract scientific reuse, not typing effort.** Reuse established domain operations. Do not extract a trivial or single-use helper just to shorten the caller. The required local `grumble` is an explicit exception; substantive repeatedly evaluated numerical callbacks are also legitimate. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
+
+### Make the numerical representation earn its cost
+
+5. **Compute only what the caller needs.** If an operator action suffices, do not materialise the full operator or exponential. Do not allocate a trajectory, Hessian, or accumulated propagator unless requested. Preserve sparse, factorised, or matrix-free structure until an operation genuinely requires expansion.
+
+6. **Use MATLAB operations where they express the mathematics clearly.** Prefer direct array algebra and established sparse constructors to hand-built bookkeeping. Keep loops when they naturally traverse spins, tensor ranks, pulse slices, or independent cases. Do not replace a readable loop with dense broadcasting, elaborate indexing, or a large temporary merely to call the result vectorised. Preallocate growing results and avoid repeating expensive conversions inside loops.
+
+7. **Give numerical decisions a reason.** Derive scales, convergence decisions, and bounds from the algorithm and data where possible; reuse the relevant Spinach tolerance policy. Distinguish exact mathematical constants from numerical tolerances and performance cutoffs. Do not introduce an unexplained epsilon, iteration cap, size threshold, or regulariser. Do not silently change established thresholds during restyling, and do not claim a performance improvement without measurement.
+
+8. **Preserve the scientific contract.** Keep units, signs, normalisation, basis order, shapes, and operator conventions explicit. For propagation, retain the convention `exp(-1i*L*t)`. Do not silently symmetrise, renormalise, clip, transpose, or regularise an input to make the calculation work; such operations need a documented mathematical role and compatibility with the requested behaviour.
+
+### Keep interfaces and validation disciplined
+
+9. **Use a fixed, documented interface.** Require all new inputs; do not add `nargin` defaults, optional arguments, `varargin`, `varargout`, or silent shape adaptation. State shapes, units, and meanings in the header. Preserve existing documented call patterns when modifying a legacy function; do not turn this rule into an unsolicited API break. Conditional work based on requested outputs is compatible with a fixed signature.
+
+10. **Validate at the appropriate boundary.** Put ordinary input checks in the local `grumble` for non-example functions, with concise informative errors and no comments inside that helper. Validate caller-controlled properties needed by the algorithm. Do not recursively revalidate a Spinach structure or recheck properties already guaranteed by its producer. Keep genuinely computed-domain checks beside the quantity they inspect, as in relaxation calibration. Reject unsupported cases clearly; do not catch an error and silently substitute different physics.
+
+### Make the result look and read like Spinach
+
+11. **Follow the house typography exactly.** Use four-space control-flow indentation, no tabs, no spaces around operators, and concise descriptive lowercase underscore-separated names of at most 20 characters. Use uppercase textbook operator names only where the house rules permit them; avoid `i` and `l` as variable names, and write `1i` for the imaginary unit. Place exactly one purpose-comment line above each operation block, preceded by a blank line; omit a trailing full stop for a one-sentence caption. Put extended explanation in the header. Use British spelling and the Oxford comma, preserve existing attribution and closing quotations, and end each MATLAB file with exactly two blank lines.
+
+12. **Review for subtraction before delivery.** Remove dead code, unused variables, redundant conversions, unnecessary aliases, speculative branches, and unrequested options. Keep the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For changed MATLAB files, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
+
+**Final review question:** Can a Spinach scientist see the model, the algorithm, and the numerical costs directly, without mentally dismantling software scaffolding? If not, simplify the design before polishing its formatting.
+
 ## Spinach example coding style
 
 ### General character

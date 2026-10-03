@@ -9,6 +9,9 @@
 % The test runs short liquid-state NMR calculations adapted from plotting
 % examples, processes the deterministic signals, and verifies the plotted
 % graphics objects under invisible offscreen figures.
+% Proton carriers are fixed at the original regression values,
+% 3772062842.904 and 1578380905.8960001 rad/s (nominally 14.1 and 5.9 T),
+% independently of isotope-data revisions; all spectral targets remain fixed.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -39,7 +42,7 @@ end
 function result=local_test_acquire_1d(result)
 
 % Build a zero-offset one-spin Liouville-space system
-sys.magnet=14.1;
+sys.magnet=3772062842.904/spin('1H');
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
@@ -87,7 +90,7 @@ function result=local_test_ct_cosy_2d(result)
 
 % Build the two-spin system used in the CT-COSY plotting example
 sys.isotopes={'1H','1H'};
-sys.magnet=5.9;
+sys.magnet=1578380905.8960001/spin('1H');
 inter.zeeman.scalar={1.00 3.00};
 inter.coupling.scalar{1,2}=7.0;
 inter.coupling.scalar{2,2}=0;
@@ -146,4 +149,5 @@ close all force;
 set(groot,'defaultFigureVisible',old_visibility);
 
 end
+
 

@@ -22,6 +22,8 @@ For scalar couplings, `k_couplings` takes precedence when present: the isotope-i
 
 The electron's `props.g_tensor.matrix` is the only nonzero Zeeman tensor. Nuclear shifts and offsets are ignored. Each selected nucleus is coupled symmetrically to the electron using its full hyperfine tensor: the source Gauss tensor is converted to Hz with `gauss2mhz`, then scaled by target/source gyromagnetic ratio. Nonempty HFCs require an explicit source isotope in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); missing, invalid, or zero-gyromagnetic-ratio sources are rejected. The converter uses Spinach's `spin` and `gauss2mhz` routines for isotope and field-unit conversions.
 
+An unsupported source isotope and a known row with unavailable numerical spin/gamma data have separate atom-specific provenance diagnostics. These use the stable `spin:unknown_isotope` and `spin:data_unavailable` identifiers rather than matching display text; both identify `props.isotopes` and atom order.
+
 `options.min_hfc` clears each coupling whose scaled tensor's Frobenius norm is below the threshold. With `options.purge='on'`, nuclei with no remaining coupling to the electron are removed from the isotope, Zeeman, coupling, and coordinate data. Without purge, these entries remain in the returned system.
 
 ## Outputs and reference values

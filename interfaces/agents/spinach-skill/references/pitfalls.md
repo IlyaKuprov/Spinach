@@ -223,6 +223,8 @@ spectrum (missing multiplet components, distorted powder lineshapes, phase
 errors). Convergence is established by refinement, never by appearance - see
 the validation procedure below.
 
+Disabling `clean-up` or setting `prop_chop=0` leaves Taylor terms unrounded; `propagator()` then checks numerical nonzeros so that explicitly stored sparse zeros do not prevent termination. This does not enable an approximation tolerance for the unrounded series.
+
 ## Scaling and memory
 
 The Liouville-space dimension grows as 4^N for N spin-1/2 particles (2^N in

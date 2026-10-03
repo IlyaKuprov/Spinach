@@ -10,6 +10,159 @@ There is no JSONLab dependency. Existing files are replaced only after the
 complete output has been serialised and written successfully. A directory
 cannot be used as `data.filename`.
 
+## Export directly from Spinach results
+
+The wrappers build `data` internally and call `jcamp_export` as the final
+writer. Use them with the same `spin_system`, `parameters`, and result arrays
+as the example calculations; no manual variables or pages are needed.
+
+```matlab
+info.title='Proton pulse acquisition';
+info.origin='Your institution';
+info.owner='Your name';
+info.filename='proton.jdx';    % '' returns text only
+info.sequence='Pulse acquisition';
+info.metadata=cell(0,2);      % additional JCAMP records, if needed
+info.delay=[0 0];            % simulated RD and ID in microseconds
+info.acquisition='SIMULTANEOUS';
+text=jcamp_nmr(spin_system,parameters,fid,{'time'},info);
+text=jcamp_nmr(spin_system,parameters,spectrum,{'frequency'},info);
+```
+
+The two delay values and acquisition convention are explicit scientific
+metadata, not inferred from a sequence name. Frequency-only results do not
+require them. The time axes start at acquisition zero; pre-acquisition evolution
+such as `parameters.dead_time` belongs in the delay/sequence description.
+`info.metadata` can add sample, referencing, and processing records; generated
+records cannot be overridden. Use ASCII descriptions, as required by JCAMP.
+
+### NMR arrays and quadrature structures
+
+`jcamp_nmr(spin_system,parameters,signal,domains,info)` supports:
+
+- 1D column FIDs and spectra, as in `acquire` and `plot_1d`.
+- 2D `[F2,F1]` arrays, as in COSY and `plot_2d`; `fid.pos/fid.neg` from
+  HSQC and `fid.cos/fid.sin` from NOESY are accepted directly.
+- 3D `[F1,F2,F3]` arrays, as in HNCO, HNCACO, and `plot_3d`; the four
+  `pos_pos/pos_neg/neg_pos/neg_neg` components are accepted directly.
+- Mixed-domain arrays and singleton time dimensions. `domains` always lists
+  the **physical** F1/F2/F3 order, even for the reversed 2D array order.
+
+```matlab
+text=jcamp_nmr(spin_system,parameters,fid,{'time','time'},info);
+text=jcamp_nmr(spin_system,parameters,spectrum,{'frequency','frequency'},info);
+text=jcamp_nmr(spin_system,parameters,fid,{'time','time','time'},info);
+text=jcamp_nmr(spin_system,parameters,spectrum,...
+               {'frequency','frequency','frequency'},info);
+```
+
+`parameters.sweep`, `offset`, and `spins` follow physical-dimension order.
+A scalar entry is shared across dimensions, matching homonuclear examples.
+Array dimensions determine sample counts; no resizing to `npoints` or
+`zerofill` occurs. All component arrays must have the same declared shape.
+Named components become separate LINK blocks with their names in titles and
+`$SPINACH COMPONENT`; complex values become signed real/imaginary pages.
+No echo/antiecho or States recombination occurs: those operations are
+sequence-specific and remain in the caller's processing code.
+
+Time coordinates are `(0:N-1)/sweep`. Frequency coordinates use `ft_axis`,
+including odd/even FFT lengths and the non-duplicated periodic edge, exactly
+as Spinach's spectral plots. These frequency dimensions require at least
+three points, following `ft_axis`'s contract. Exported frequency axes are Hz,
+not `parameters.axis_units` display conversions; observation frequencies are
+computed from the field and nuclei in MHz. Private axis records identify
+all nuclei, frequencies, offsets, and domains in physical order. The ordinary
+observe record identifies the directly detected nucleus. Mixed-domain blocks
+use the data type of their tabulated, first-array-dimension axis.
+
+### EPR acquisitions, spectra, and scans
+
+`jcamp_epr(spin_system,parameters,signal,kind,info)` covers common outputs.
+EMR uses the same ownership/file fields, plus explicit method metadata:
+
+```matlab
+info.title='Nitroxide field sweep';
+info.origin='Your institution';
+info.owner='Your name';
+info.filename='nitroxide.jdx';
+info.metadata=cell(0,2);
+info.detection='CW';
+info.method='SPECTRUM';
+info.description='Nitroxide model and numerical settings used for this run';
+[spec,parameters]=fieldsweep(spin_system,parameters);
+text=jcamp_epr(spin_system,parameters,spec,'field',info);
+```
+
+Kinds and native shapes:
+
+- `'field'`: `fieldsweep` row result and its **returned** `parameters.b_axis`
+  row in tesla; `parameters.mw_freq` is recorded in Hz.
+- `'endor'`: `endor_davies`/`endor_mims` row result and `parameters.n_frq`
+  row in Hz. Signed RF coordinates are preserved, not absolute-value folded.
+  Set `info.detection='PULSE'` and `info.method='ENDOR'`.
+- `'time'`: column pulse-acquire FID or `[F2,F1]` pulse array; dimensionality
+  comes from `parameters.npoints`, or `parameters.nsteps` for HYSCORE.
+  Dwell times are `1/parameters.sweep`. Set the actual method explicitly.
+- `'frequency'`: already processed column spectrum or `[F2,F1]` spectrum;
+  dimensionality comes from `parameters.zerofill`, actual lengths from the
+  signal, and axes from `sweep`, `offset`, and `ft_axis`.
+
+```matlab
+text=jcamp_epr(spin_system,parameters,answer,'endor',info);
+text=jcamp_epr(spin_system,parameters,fid,'time',info);
+text=jcamp_epr(spin_system,parameters,spectrum,'frequency',info);
+```
+
+The scan wrappers explicitly translate the native row storage into column
+traces; they reject other shapes. Regular acquisition wrappers do not transpose
+or reshape their input. Named component structures also work. Results are
+`EMR SIMULATION`, with Spinach as the simulation source and the supplied
+physical description as simulation parameters. Method names are JCAMP core
+identifiers, not MATLAB sequence names. For example, DEER uses `ELDOR` and
+its particular pulse sequence is described in the metadata. The wrappers
+never infer detection mode, pulse timings, reference conventions, or
+instrument settings merely from an array.
+
+### Explicit sampling and other magnetic resonance data
+
+For DEER/ESEEM delay traces, echo trajectories, irregular time grids, or
+custom EMR maps, use physical axes directly:
+
+```matlab
+info.detection='PULSE';
+info.method='ELDOR';
+info.description='Four-pulse DEER; actual model and pulse settings';
+text=jcamp_signal(spin_system,{delays_seconds},deer_signal,...
+                  {'SECOND'},{'DEER delay'},info);
+```
+
+`jcamp_signal(spin_system,axes,signal,units,names,info)` accepts one to three
+axis **columns**, in MATLAB array-dimension order. Units and names are cell
+rows with one entry per axis. A 1D signal is a column; in higher dimensions,
+`size(signal,n)==numel(axes{n})`. Explicit EMR axes use `SECOND`, `HERTZ`,
+`TESLA`, and the other protocol keywords, not plot display units such as
+microseconds or MHz. Numeric arrays and named component structures are both
+accepted. This covers custom ENDOR/HYSCORE/ELDOR/ESEEM, angular scans, and
+other sampled EMR results within the EMR unit/method vocabulary, without
+inventing a new sampling convention. Diagnostic routines that only plot and
+return no results cannot be exported until the caller obtains their arrays.
+
+For non-standard NMR sampling/layouts, `jcamp_grid(axes,signal,units,names,block)`
+is the shared sampled-array translator: supply a typed NMR block with its
+metadata, then put the returned blocks into `jcamp_export`'s file structure.
+Use the low-level writer directly for peak tables, assignments, or ragged
+pages. A JCAMP magnetic-resonance file is not a general replacement for MRI
+image formats or a format for spin-state trajectories with no observable.
+
+All wrapper outputs share the precision and reader-compatibility limitations
+below. Multidimensional JCAMP support is reader-dependent; preserving all
+Spinach components does not imply a vendor can reconstruct their quadratures.
+MATLAB `jcampread` recovered the native 1D FID/spectrum in the wrapper checks,
+but rejected the linked NOESY output. Not all native explicit-pair or
+multidimensional NTUPLES were recovered by nmrglue and jcampconverter either.
+Use a reader whose support covers the required layout; these wrappers do not
+claim universal vendor import compatibility.
+
 ## File and block structure
 
 Required file fields are `title`, `origin`, `owner` (non-empty ASCII character

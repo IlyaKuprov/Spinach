@@ -676,6 +676,17 @@ requires a GPU.
 
 ## Exporting NMR and EPR data
 
+For native Spinach outputs, prefer `jcamp_nmr(spin_system,parameters,signal,domains,info)`
+for 1D/2D/3D NMR arrays and named quadrature structures, or
+`jcamp_epr(spin_system,parameters,signal,kind,info)` for electron acquisitions,
+processed spectra, returned field sweeps, and ENDOR RF scans. NMR domains are
+in physical F1/F2/F3 order; 2D arrays are [F2,F1], while 3D arrays are [F1,F2,F3].
+No phase cycling or quadrature recombination is performed. Frequency axes use
+`ft_axis` in Hz; NMR observation frequencies come from nuclei and the field.
+For non-uniform EMR times or custom maps, use `jcamp_signal` with explicit
+axis columns in MATLAB array order. See the [wrapper examples](../../../jcamp/README.md#export-directly-from-spinach-results)
+for required ownership and method metadata, units, and native row scan shapes.
+
 Use `text=jcamp_export(data)` in `interfaces/jcamp/` for JCAMP-DX export.
 Its [documented structure](../../../jcamp/README.md) supplies ownership, typed
 blocks, metadata, and either explicit traces, general NTUPLES pages, or peaks.

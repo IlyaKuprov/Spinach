@@ -673,3 +673,16 @@ hand instead of using a context, and the symmetry and state-space restriction
 files for basis-truncation behaviour. `extremes/high_symmetry_1.m` needs tens
 of cores and over a hundred gigabytes; `nmr_stochastic/snmr_strychnine.m`
 requires a GPU.
+
+## Exporting NMR and EPR data
+
+Use `text=jcamp_export(data)` in `interfaces/jcamp/` for JCAMP-DX export.
+Its [documented structure](../../../jcamp/README.md) supplies ownership, typed
+blocks, metadata, and either explicit traces, general NTUPLES pages, or peaks.
+Complex traces retain separate real/imaginary channels; multidimensional and
+hypercomplex data require explicit page coordinates and component names.
+Multiple datasets become a LINK file. Set `data.filename` to also write the
+returned text. No FFT, referencing, normalisation, unit conversion, or
+integer quantisation is performed. NMR observation frequency is in MHz; EMR
+microwave frequency is in Hz. The caller supplies the experiment-specific
+metadata, including pulse sequences and quadrature conventions.

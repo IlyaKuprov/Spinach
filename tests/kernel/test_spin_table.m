@@ -92,12 +92,24 @@ end
 result=test_true(result,'unsigned moment',isnan(data('139Ce',:).gamma),...
                  'an experimentally unsigned moment is not given a positive default');
 
-% Retain source conditions for the thorium clock isomer
-thorium=data('229Th_m',:);
-result=test_true(result,'conditional thorium lifetime',...
-                 thorium.half_life==7e-6&&contains(thorium.notes,"CaF2")&&...
-                 contains(thorium.notes,"MgF2"),...
-                 'crystal radiative lifetimes must not replace neutral-atom internal conversion');
+% Exclude subsecond nuclear states without guessing unresolved lifetimes
+is_nucleus=data.kind=="nuclide";
+subsecond=is_nucleus&data.half_life<1;
+result=test_true(result,'isotope lifetime cutoff',...
+                 all(data.half_life_kind(subsecond)=="lower limit"),...
+                 'a lower bound below one second does not establish a subsecond lifetime');
+result=test_true(result,'one-second boundary',data('128Pm',:).half_life==1,...
+                 'exactly one second is not shorter than one second');
+for name={'6He','229Th_m'}
+    caught=false();
+    try
+        spin(name{1});
+    catch fault
+        caught=strcmp(fault.identifier,'spin:unknown_isotope');
+    end
+    result=test_true(result,['excluded ' name{1}],caught,...
+                     'the adopted lifetime determines inclusion, not alternative environments');
+end
 
 % Preserve synthetic modes and isolate returned metadata from the cache
 [gamma,mult,abstract]=spin('G');

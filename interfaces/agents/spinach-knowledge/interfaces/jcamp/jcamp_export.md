@@ -9,13 +9,13 @@ cover file ownership, block metadata, traces, general pages, and peak tables.
 
 ## Data and numerical behaviour
 
-Real traces select incremental XYDATA only for an exactly regular axis;
-otherwise XYPOINTS preserves the explicit coordinates. Complex traces become
+Real traces select incremental XYDATA only for an exactly regular axis with
+a finite initial ordinate; otherwise XYPOINTS preserves the explicit coordinates. Complex traces become
 NTUPLES with distinct real and imaginary pages. General variable/page inputs
 represent multidimensional coordinates, ragged sampling, and additional
-quadrature or receiver channels without guessing dimension order. Shared
-attributes cannot force a different sampling grid onto an individual page.
-Peaks can contain heights, widths, multiplicities, and assignments. Multiple
+quadrature or receiver channels without guessing dimension order. Explicit
+pairs use the NTUPLES PROFILE display method. Shared attributes cannot force a different sampling grid onto an individual page.
+Peaks can contain heights, widths, NMR multiplicities, and assignments. Multiple
 independent datasets are enclosed in a LINK block.
 
 Floating-point column inputs retain their order and amplitudes. AFFN uses
@@ -28,8 +28,8 @@ replaced only after a complete successful write.
 
 NMR observation frequencies are in MHz; EMR microwave frequencies are in Hz.
 EPR uses `EMR SIMULATION` or `EMR MEASUREMENT`, with explicit detection mode
-and method. Required identifiers are checked, but the caller supplies the
-full acquisition, sample, reference, and simulation metadata relevant to the
+and method. Required identifiers, NMR delay pairs, and tabulated abscissa units
+are checked, but the caller supplies the full acquisition, sample, reference, and simulation metadata relevant to the
 experiment. Generated structural records cannot be overridden by aliases.
 The exporter does not provide integer ASDF compression, molecular structure
 export, or universal vendor compatibility; JCAMP readers differ in their

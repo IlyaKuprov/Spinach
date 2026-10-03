@@ -47,7 +47,7 @@ result=test_true(result,'singleton',contains(text,'##DATA CLASS=XYPOINTS')&&...
                  isequal(read_pairs(text),[pi -2]),'a single point has no undefined incremental spacing');
 
 % Complex FIDs must contain two independent component pages
-block.x=(0:3)'/4; block.y=[1+2*1i;-3+4*1i;5-6*1i;-7-8*1i]; block.type='NMR FID';
+block.xunits='SECONDS'; block.x=(0:3)'/4; block.y=[1+2*1i;-3+4*1i;5-6*1i;-7-8*1i]; block.type='NMR FID';
 block.metadata=[block.metadata; {'.DELAY','(0, 0)'; '.ACQUISITION MODE','SIMULTANEOUS'}];
 data.blocks={block}; text=jcamp_export(data); pairs=read_pairs(text);
 result=test_true(result,'complex channels',contains(text,'##DATA TABLE=(X++(R..R)), XYDATA')&&...
@@ -55,7 +55,7 @@ result=test_true(result,'complex channels',contains(text,'##DATA TABLE=(X++(R..R
                  isequal(pairs,[block.x real(block.y); block.x imag(block.y)]),...
                  'real and imaginary amplitudes retain their signs and order');
 block.x=[0;0.1;0.3;1]; data.blocks={block}; text=jcamp_export(data);
-result=test_true(result,'irregular complex FID',contains(text,'##DATA TABLE=(XR..XR), XYPOINTS')&&...
+result=test_true(result,'irregular complex FID',contains(text,'##DATA TABLE=(XR..XR), PROFILE')&&...
                  isequal(read_pairs(text),[block.x real(block.y); block.x imag(block.y)]),...
                  'irregular quadrature samples use explicit pairs in NTUPLES');
 
@@ -69,7 +69,7 @@ general=struct('title','General pages','type','NMR SPECTRUM',...
                'metadata',{block.metadata(1:2,:)},'variables',variables,'pages',pages);
 data.blocks={general}; text=jcamp_export(data);
 result=test_true(result,'ragged multidimensional pages',contains(text,'##PAGE=T=2')&&...
-                 contains(text,'##NPOINTS=4')&&contains(text,'##DATA TABLE=(XY..XY), XYPOINTS')&&...
+                 contains(text,'##NPOINTS=4')&&contains(text,'##DATA TABLE=(XY..XY), PROFILE')&&...
                  isequal(read_pairs(text),[1 4;2 5;3 6;1 7;pi 8;4 9;5 10]),...
                  'physical page coordinates and each page point count are explicit');
 
@@ -77,7 +77,7 @@ result=test_true(result,'ragged multidimensional pages',contains(text,'##PAGE=T=
 shifted=general;
 shifted.pages(2).x=[10;11;12]; shifted.pages(2).y=[7;8;9];
 data.blocks={shifted}; text=jcamp_export(data);
-result=test_true(result,'different regular page axes',count(text,'##DATA TABLE=(XY..XY), XYPOINTS')==2,...
+result=test_true(result,'different regular page axes',count(text,'##DATA TABLE=(XY..XY), PROFILE')==2,...
                  'page-specific endpoints are explicit when shared FIRST/LAST attributes would change them');
 
 % Assigned peaks carry widths, multiplicity, and the peak-finding convention
@@ -108,8 +108,24 @@ result=test_true(result,'linked NMR/EPR',contains(text,'##DATA TYPE=LINK')&&cont
 
 % Missing observations are explicit rather than discarded or converted to zero
 emr.y=[NaN;1]; data.blocks={emr}; text=jcamp_export(data);
-result=test_true(result,'missing observation',contains(text,'0.29999999999999999 ?')&&...
+result=test_true(result,'missing observation',contains(text,'##DATA CLASS=XYPOINTS')&&contains(text,'0.29999999999999999, ?')&&...
                  ~contains(text,'NaN'),'missing ordinates are represented by the JCAMP question mark');
+
+% EMR peak descriptors follow the technique's single-group grammar
+emr_peaks=rmfield(emr,{'x','y'}); emr_peaks.peaks=struct('x',[0.3;0.4],'y',[1;2]);
+data.blocks={emr_peaks}; text=jcamp_export(data);
+result=test_true(result,'EMR peak table',contains(text,'##PEAK TABLE=(XY)')&&~contains(text,'##PEAK TABLE=(XY..XY)'),...
+                 'EMR peak tables use the variable list defined in the EMR protocol');
+emr_peaks.peaks.assignment={'radical1';'radical2'}; emr_peaks.peaks.method='analytic';
+data.blocks={emr_peaks}; text=jcamp_export(data);
+result=test_true(result,'EMR assignment class',contains(text,'##DATA CLASS=PEAK ASSIGNMENTS')&&contains(text,'##PEAK ASSIGNMENTS=(XYA)'),...
+                 'EMR assignments follow the explicit core-header definition and assignment grammar');
+
+% A missing first quadrature sample must not require a finite FIRST ordinate
+missing=block; missing.x=(0:3)'/4; missing.y(1)=complex(NaN,NaN);
+data.blocks={missing}; text=jcamp_export(data);
+result=test_true(result,'missing initial quadrature',~contains(text,')), XYDATA')&&contains(text,', PROFILE'),...
+                 'leading missing samples use explicit pairs instead of incremental pages');
 
 % Long metadata wraps into continuation records without introducing new labels
 emr.metadata=[emr.metadata; {'COMMENT',repmat('sample description ',1,15)}];
@@ -152,6 +168,13 @@ bad=data; bad.blocks={general}; bad.blocks{1}.pages(2).coordinates=cell(0,2); in
 bad=data; bad.blocks={general}; bad.blocks{1}.variables(2).symbol='X'; invalid{end+1}=bad;
 bad=data; bad.blocks={peak_block}; bad.blocks{1}.peaks.assignment{1}='<H1>'; invalid{end+1}=bad;
 bad=data; bad.blocks={block}; bad.blocks{1}.metadata=cell(0,2); invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.metadata{2,2}='^1Hgarbage'; invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.metadata{3,2}='not-a-delay'; invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.metadata{3,2}='(0, 0) trailing'; invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.metadata{3,2}='(1i, 0)'; invalid{end+1}=bad;
+bad=data; bad.blocks={block}; bad.blocks{1}.xunits='HZ'; invalid{end+1}=bad;
+bad=data; bad.blocks={general}; bad.blocks{1}.variables(1).units='SECONDS'; invalid{end+1}=bad;
+bad=data; bad.blocks={emr_peaks}; bad.blocks{1}.peaks.multiplicity={'S';'D'}; invalid{end+1}=bad;
 for n=1:numel(invalid)
     refused=false;
     try

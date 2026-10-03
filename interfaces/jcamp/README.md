@@ -29,7 +29,8 @@ Every block also has:
   Use `cell(0,2)` for an empty table, though technique-specific identifiers
   described below are required. A value is a printable ASCII character row,
   a cell vector of ASCII lines, or a finite real numeric vector. Numbers
-  are written as AFFN; numeric `.DELAY` pairs acquire parentheses.
+  are written as AFFN; numeric NMR `.DELAY` pairs acquire parentheses.
+  Textual NMR delays must be a finite real numeric pair `(RD, ID)`.
   Generic, technique-specific (`.`), and private (`$`) labels are preserved.
   Duplicate labels, including aliases differing only in spaces, dashes,
   slashes, underscores, or case, are refused. Generated structural labels
@@ -44,8 +45,9 @@ Supply exactly one of the following data representations in each block.
 missing observations. Infinity is refused. Units are explicit non-empty ASCII strings without commas.
 Optional `xname` and `yname` label the axes.
 
-An axis exactly matching `linspace(x(1),x(end),numel(x))'` uses `XYDATA`;
-otherwise, including a singleton, it uses `XYPOINTS`. This conservative choice
+An axis exactly matching `linspace(x(1),x(end),numel(x))'` with a finite first
+ordinate uses `XYDATA`; otherwise, including a singleton or leading missing
+ordinate, it uses `XYPOINTS`. This conservative choice
 avoids fitting or rounding genuinely irregular coordinates. Ascending,
 descending, and non-monotonic explicit coordinates retain their input order.
 Complex traces use NTUPLES with separate `R` and `I` pages and a page counter
@@ -57,7 +59,9 @@ NMR frequencies use `HZ`, FID times use `SECONDS`, and peak positions may use
 than silently changing the abscissa units. EMR axis keywords include `TESLA`,
 `HERTZ`, `SECOND`, `DEGREE`, `KELVIN`, and `WATT`. EMR microwave frequencies
 are in **Hz**, unlike NMR observation frequencies, which are in **MHz**.
-The exporter performs no unit conversion or processing.
+Tabulated abscissa units are checked against the declared data type, including
+the abscissa variable used by each NTUPLES page. Fixed coordinate variables
+retain their explicit units. The exporter performs no unit conversion or processing.
 
 Example: a complex FID already calculated by Spinach:
 
@@ -120,7 +124,8 @@ from the supplied samples and coordinates. A tabulated variable's `VAR_DIM`
 is its maximum page length; a coordinate variable's is the number of distinct
 coordinates. Every page also carries its actual `NPOINTS`. The table is
 incremental only for an exactly regular axis whose length and endpoints agree
-with the shared variable attributes; otherwise explicit pairs are used. This
+with the shared variable attributes and a finite initial ordinate; otherwise
+explicit pairs with the NTUPLES `PROFILE` display method are used. This
 prevents shared NTUPLES attributes from changing a page-specific sampling grid.
 
 Example: a real 2D spectrum `spectrum` with rows indexed by `f2_hz` and columns
@@ -160,7 +165,7 @@ NMR profile; individual readers may support only a subset of these layouts.
 
 - `y`: finite real peak heights, same column shape;
 - `width`: optional non-negative finite column, in `xunits`, requiring `y`;
-- `multiplicity`: optional cell column of `S`, `D`, `T`, `Q`, `M`, or `U`,
+- `multiplicity`: optional NMR-only cell column of `S`, `D`, `T`, `Q`, `M`, or `U`,
   requiring `y`;
 - `assignment`: optional cell column of ASCII assignment strings;
 - `method`: ASCII description of peak finding and width convention, required
@@ -169,9 +174,13 @@ NMR profile; individual readers may support only a subset of these layouts.
 Without assignments, a `PEAK TABLE` contains heights and optionally either
 width or multiplicity. With assignments, `PEAK ASSIGNMENTS` contains angle-
 bracketed strings inside parenthesised groups. NMR uses `DATA CLASS=ASSIGNMENTS`
-and the `PEAK ASSIGNMENTS` table label; EMR uses `DATA CLASS=PEAK ASSIGNMENTS`.
-Widths and multiplicities may
-both be supplied, in the NMR standard's `XYMWA` order. NMR assignments require
+and the `PEAK ASSIGNMENTS` table label; EMR uses `DATA CLASS=PEAK ASSIGNMENTS`
+as defined in Section 4.1.4 (the protocol's summary table instead lists
+`ASSIGNMENTS`).
+Unassigned EMR lists are `(XY)` or `(XYW)`; NMR lists use repeated markers,
+such as `(XY..XY)` or `(XYW..XYW)`.
+NMR widths and multiplicities may both be supplied, in the standard's `XYMWA`
+order. NMR assignments require
 heights. EMR also permits x-only assignments. Assignment strings cannot contain
 angle brackets; parentheses and commas are permitted inside the brackets. Atom-number assignments require the appropriate
 `CROSS REFERENCE` metadata pointing to a separately available chemical structure;
@@ -227,6 +236,7 @@ exporter, not a JCAMP importer or a spectrometer-vendor compatibility shim.
 - [Lampen et al., JCAMP-DX 5.01 (1999)](https://doi.org/10.1351/pac199971081549)
 - [Cammack et al., JCAMP-DX for EMR (2006)](https://doi.org/10.1351/pac200678030613)
 - [McDonald and Wilks, base JCAMP-DX protocol (1988)](https://iupac.org/wp-content/uploads/2021/08/JCAMP-DX_IR_1988.pdf)
+- [Lampen et al., generic NTUPLES display methods in the MS protocol (1994)](https://iupac.org/wp-content/uploads/2021/08/JCAMP-DX_MS_1994.pdf)
 - [IUPAC's original reference files](https://github.com/IUPAC/JCAMP-DX)
 - [nmrglue's NMR JCAMP reader](https://github.com/jjhelmus/nmrglue/blob/master/nmrglue/fileio/jcampdx.py)
 - [nzhagen's JCAMP reader/writer](https://github.com/nzhagen/jcamp)

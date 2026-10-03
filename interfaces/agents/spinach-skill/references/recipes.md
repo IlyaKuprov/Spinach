@@ -685,4 +685,7 @@ Multiple datasets become a LINK file. Set `data.filename` to also write the
 returned text. No FFT, referencing, normalisation, unit conversion, or
 integer quantisation is performed. NMR observation frequency is in MHz; EMR
 microwave frequency is in Hz. The caller supplies the experiment-specific
-metadata, including pulse sequences and quadrature conventions.
+metadata, including pulse sequences and quadrature conventions. Tabulated
+abscissa units must match the declared NMR/EMR type; NMR delay text must
+contain the finite numeric pair `(RD, ID)`. Multiplicity applies only to NMR
+peaks.

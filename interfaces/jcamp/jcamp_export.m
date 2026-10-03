@@ -17,7 +17,8 @@
 %    x, y, xunits, yunits - equally sized column vectors and unit strings;
 %       x is finite and real, y is real or complex and may contain NaN
 %       (missing observations). Optional xname and yname label the axes.
-%       Exact linspace axes use XYDATA; others use XYPOINTS. Complex y
+%       Exact linspace axes with a finite first ordinate use XYDATA;
+%       others use XYPOINTS. Complex y
 %       uses NTUPLES, with separate real (R) and imaginary (I) pages.
 %
 %    variables, pages - general NTUPLES. variables is a structure vector
@@ -33,7 +34,7 @@
 %
 %    peaks, xunits, yunits - peaks is a scalar structure with x and
 %       optionally y, width (real column vectors), multiplicity (cell
-%       column of S,D,T,Q,M,U), assignment (cell column of ASCII strings),
+%       column of S,D,T,Q,M,U for NMR), assignment (cell column of ASCII strings),
 %       and method (ASCII string). Width and multiplicity require y;
 %       assignment permits x-only EMR assignments. method is required
 %       when width or assignment is supplied, and describes the peak
@@ -55,7 +56,7 @@
 %    text - ASCII character row containing the complete JCAMP file;
 %           multiple blocks are enclosed in a LINK block
 %
-% Notes: AFFN numbers have 17 significant digits and unit scale factors;
+% Notes: floating-point AFFN has 17 significant digits and unit factors;
 % no FFT, normalisation, quantisation, or unit conversion is performed.
 % Infinity is rejected. NaN ordinates are written as ?; unavailable
 % scalar statistics are omitted and NTUPLES attributes are left empty.
@@ -93,7 +94,7 @@ for n=1:numel(data.blocks)
         if isfield(block.peaks,'assignment'), data_class='PEAK ASSIGNMENTS'; end
     elseif isfield(block,'variables')||~isreal(block.y)
         data_class='NTUPLES';
-    elseif numel(block.x)>1&&isequal(block.x,linspace(block.x(1),block.x(end),numel(block.x))')
+    elseif numel(block.x)>1&&isfinite(block.y(1))&&isequal(block.x,linspace(block.x(1),block.x(end),numel(block.x))')
         data_class='XYDATA';
     else
         data_class='XYPOINTS';
@@ -159,7 +160,7 @@ for n=1:numel(data.blocks)
             if isfield(peaks,'multiplicity'), symbols=[symbols 'M']; end %#ok<AGROW>
             if isfield(peaks,'width'), symbols=[symbols 'W']; end %#ok<AGROW>
             if isfield(peaks,'assignment'), symbols=[symbols 'A']; end %#ok<AGROW>
-            if strcmp(data_class,'PEAK TABLE'), symbols=[symbols '..' symbols]; end %#ok<AGROW>
+            if strcmp(data_class,'PEAK TABLE')&&startsWith(block.type,'NMR'), symbols=[symbols '..' symbols]; end %#ok<AGROW>
             lines=[lines; record(data_class,['(' symbols ')'])]; %#ok<AGROW>
             if isfield(peaks,'method'), lines=[lines; cellfun(@(s)['$$ ' s],wrap_record(peaks.method,77,0),'UniformOutput',false)]; end %#ok<AGROW>
             for k=1:numel(peaks.x)
@@ -247,8 +248,8 @@ for n=1:numel(pages)
         coords{k}=[page.coordinates{k,1} '=' number(page.coordinates{k,2})];
     end
     lines=[lines; record('PAGE',strjoin(coords,', ')); record('NPOINTS',numel(page.x))]; %#ok<AGROW>
-    xidx=find(strcmp(page.xvar,{variables.symbol}));
-    if numel(page.x)>1&&numel(page.x)==dimensions(xidx)&&...
+    xidx=find(strcmp(page.xvar,{variables.symbol})); yidx=strcmp(page.yvar,{variables.symbol});
+    if numel(page.x)>1&&isfinite(page.y(1))&&isfinite(first(yidx))&&numel(page.x)==dimensions(xidx)&&...
        page.x(1)==first(xidx)&&page.x(end)==last(xidx)&&...
        isequal(page.x,linspace(page.x(1),page.x(end),numel(page.x))')
         data_class='XYDATA';
@@ -270,7 +271,9 @@ if strcmp(data_class,'XYDATA')
 else
     descriptor=['(' xvar yvar '..' xvar yvar ')'];
 end
-if strcmp(label,'DATA TABLE'), descriptor=[descriptor ', ' data_class]; end
+if strcmp(label,'DATA TABLE')
+    if strcmp(data_class,'XYDATA'), descriptor=[descriptor ', XYDATA']; else, descriptor=[descriptor ', PROFILE']; end
+end
 lines=record(label,descriptor);
 
 % One pair per line preserves every explicit abscissa and fits the record limit
@@ -432,8 +435,16 @@ for n=1:numel(data.blocks)
             error('.OBSERVE NUCLEUS must use a JCAMP isotope label such as ^1H.');
         end
         idx=strcmp(labels,'.DELAY');
-        if any(idx)&&isnumeric(block.metadata{idx,2})&&numel(block.metadata{idx,2})~=2
-            error('numeric .DELAY must contain the real and imaginary pre-acquisition delays.');
+        if any(idx)
+            value=block.metadata{idx,2};
+            if ischar(value)
+                values=regexp(value,'^\(\s*([^,]+),\s*([^,]+)\)$','tokens','once');
+                values=str2double(values);
+                valid=numel(values)==2&&isreal(values)&&all(isfinite(values));
+            else
+                valid=isnumeric(value)&&numel(value)==2;
+            end
+            if ~valid, error('.DELAY must contain two finite real pre-acquisition delays, numeric or (RD, ID) text.'); end
         end
     end
     modes={'.ACQUISITIONMODE',{'SIMULTANEOUS','SEQUENTIAL','SINGLE'}; '.DETECTIONMODE',{'CW','PULSE'}};
@@ -446,12 +457,22 @@ for n=1:numel(data.blocks)
     choices=[isfield(block,'x')||isfield(block,'y'),...
              isfield(block,'variables')||isfield(block,'pages'),isfield(block,'peaks')];
     if sum(choices)~=1, error('each block must supply exactly one of x/y, variables/pages, or peaks.'); end
+    if strcmp(block.type,'NMR FID')
+        allowed_units={'SECONDS'};
+    elseif strcmp(block.type,'NMR SPECTRUM')
+        allowed_units={'HZ'};
+    elseif startsWith(block.type,'NMR')
+        allowed_units={'HZ','PPM'};
+    else
+        allowed_units={'DEGREE','HERTZ','KELVIN','SECOND','TESLA','WATT'};
+    end
     if ~choices(2)
         for field={'xunits','yunits'}
             if ~isfield(block,field{1})||~ascii_text(block.(field{1}))||isempty(strtrim(block.(field{1})))||contains(block.(field{1}),',')
                 error('each two-variable block needs non-empty ASCII xunits and yunits without commas.');
             end
         end
+        if ~ismember(block.xunits,allowed_units), error('xunits must match the declared NMR or EMR data type.'); end
         for field={'xname','yname'}
             if isfield(block,field{1})&&(~ascii_text(block.(field{1}))||isempty(block.(field{1}))||contains(block.(field{1}),','))
                 error('axis names must be non-empty ASCII row strings without commas.');
@@ -502,6 +523,9 @@ for n=1:numel(data.blocks)
                ~strcmp(variables(yidx).type,'DEPENDENT')
                 error('page xvar/yvar must name an independent/dependent variable pair.');
             end
+            if ~ismember(variables(xidx).units,allowed_units)
+                error('tabulated abscissa units must match the declared NMR or EMR data type.');
+            end
             if ~iscell(page.coordinates)||size(page.coordinates,2)~=2||~ismatrix(page.coordinates)
                 error('page.coordinates must be an N-by-2 cell array.');
             end
@@ -542,6 +566,7 @@ for n=1:numel(data.blocks)
         if isfield(peaks,'multiplicity')&&(~isfield(peaks,'y')||~all(ismember(peaks.multiplicity,{'S','D','T','Q','M','U'})))
             error('peak multiplicity requires y and uses S,D,T,Q,M,U.');
         end
+        if startsWith(block.type,'EMR')&&isfield(peaks,'multiplicity'), error('multiplicity is defined only for NMR peaks.'); end
         if ~isfield(peaks,'assignment')&&isfield(peaks,'width')&&isfield(peaks,'multiplicity')
             error('unassigned peak tables support either width or multiplicity, not both.');
         end

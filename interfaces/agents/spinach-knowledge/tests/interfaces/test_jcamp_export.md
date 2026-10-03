@@ -3,9 +3,10 @@
 `result=test_jcamp_export()` exercises the JCAMP exporter on synthetic data
 with explicit coordinates and amplitudes. It checks descending and irregular
 axes, floating-point precision, complex channels, ragged multidimensional
-pages, differing page grids, assigned peaks, linked NMR/EPR blocks, missing
-observations, record wrapping, byte-identical file output, and refusal of
-invalid inputs without overwriting an existing destination.
+pages, differing page grids, assigned peaks, EMR peak descriptors, linked
+NMR/EPR blocks, missing observations, record wrapping, byte-identical file output, and refusal of
+invalid inputs (including malformed delays, isotope labels, units, and EMR
+multiplicity) without overwriting an existing destination.
 
 This regression test is not a spectrometer-vendor acceptance test. Its
 uncompressed pair reader checks the samples emitted by the exporter; external

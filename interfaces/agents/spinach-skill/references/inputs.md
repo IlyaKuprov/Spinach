@@ -79,7 +79,10 @@ per process and `clear spin` reloads an updated payload. Natural tantalum-180 is
 `180Ta_m` isomer, not the short-lived `180Ta` ground state. Antiparticle values under
 CPT are explicitly qualified, not independent measurements. Spin below one forbids
 a spectroscopic quadrupole moment; higher-spin missing values, including Omega,
-remain unknown rather than zero.
+remain unknown rather than zero. Nuclear states with adopted half-lives below one
+second (values, estimates, or upper limits) are excluded; stable nuclei, exactly
+one second, unknown lifetimes, unresolved lower limits, and magnetic particles
+are retained. Alternative environmental lifetimes do not override this cutoff.
 
 `iselectron` and `isnucleus` test a specification string. `isoswap(sys,inter,
 spins,new_iso)` performs isotope replacement and rescales all interactions

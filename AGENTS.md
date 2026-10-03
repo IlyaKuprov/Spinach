@@ -8,32 +8,29 @@
 
 All code contributions must follow *Spinach*’s existing coding style and structure. When writing code, adhere to the following rules:
 
-* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits.
+* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits.
 
-* **Naming Conventions:** Use descriptive, abbreviated, all-lowercase names with underscores for variables and function names. One-letter variables commonly used in physics textbooks to denote operators or matrices (H, R, K, P, Q) are premitted; variables holding matrices are allowed to use uppercase letters matching their mathematical notation. If in doubt, follow naming patterns seen in the proximate code. Avoid ambiguous or vague variable names. Variable and function names should not be longer than 20 characters; use abbreviations as necessary to make this possible.
-Use clear and descriptive variable names that reflect their content or purpose. Loop counters should be single lowecase letters (e.g. `n`, `k`). Do not use `i` and `l` as variables.  When introducing a new variable, determine its name by considering the context and role. Read the current function documentation and understand what the function does and what the variable represents. Then choose a concise name that conveys its meaning. Keep variable names concise by using standard abbreviations where appropriate. For example, a variable holding a property index may be named `prop_idx`. Ensure any abbreviation used is commonly understood or documented in the codebase. In all function names, variable names, and comments, use British spelling. Where British spelling allows both `s` and `z`, use `s`. Oxford comma is also mandatory. 
+* **Naming Conventions:** Use descriptive, concise, all-lowercase, underscore-separated variable and function names of at most 20 characters. Read the current function documentation and consider each variable’s context, content, and role before naming it; avoid ambiguous or vague names. Use standard, commonly understood or documented abbreviations, such as `prop_idx` for a property index. Follow nearby naming patterns when in doubt. Uppercase textbook operator names (`H`, `R`, `K`, `P`, `Q`) and matrix names matching their mathematical notation are permitted. Loop counters should be single lowercase letters, such as `n` and `k`; do not use `i` or `l` as variables, and use `1i` for the imaginary unit. Use British spelling in function names, variable names, and comments, preferring `s` to `z` where both are allowed, and use the Oxford comma. Preserve required API field names, literal option strings, and existing API spellings rather than renaming them to satisfy these conventions.
 
-* **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Each comment block must be preceded by a blank line. If the comment only contains one sentence, omit the full stop at the end of the sentence.
+* **Code Comments:** Above every conceptually distinct operation, write exactly one line explaining its purpose, preceded by one blank line. Omit the final full stop for a one-sentence comment. Put extended explanations in the function header rather than long body comment blocks.
 
-* **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose and, where applicable, its usage syntax, input parameters, and outputs. For non-example functions, format this documentation header exactly as seen in the `kernel` and `experiments` directories, and do not omit any expected sections. For examples, follow the Spinach example coding style below; no-argument, no-output demonstrations must not acquire empty library-style sections. Helper functions should have a one-line comment above their signature with a description of what they do.
+* **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose and, where applicable, its usage syntax, input parameters, and outputs. For non-example functions, format this documentation header exactly as seen in the `kernel` and `experiments` directories, and do not omit any expected sections. For examples, follow the Spinach example coding style below; no-argument, no-output demonstrations must not acquire empty library-style `Inputs`, `Outputs`, or `Syntax` sections. Helper functions should have a one-line comment above their signature with a description of what they do. Preserve existing author attribution.
 
-* **Input Validation with `grumble`:** All non-example `.m` files must perform input argument validation at the start of the main function using the `grumble` helper. After the function definition and the setting of default argument values, call an internal helper function named `grumble` to check the validity of arguments. Define the full `grumble` helper at the end of the same file.
+* **Input Validation with `grumble`:** All non-example `.m` files must perform input argument validation at the start of the main function using the `grumble` helper. After the function definition and the setting of default argument values, call an internal helper function named `grumble` to check the validity of arguments. Define the full `grumble` helper at the end of the same file. Do not add a `grumble` to an example merely because library functions have one; reusable non-example functions still require it.
 
-* **Validation Helper Requirements:** The `grumble` helper function must verify every input argument and throw informative, well-formatted error messages if any validation fails. Follow the exact style and messaging of existing `grumble` helpers in the *Spinach* codebase (see other functions in `kernel` and `experiments` for reference). There should be no code comments inside the grumble helper function.
+* **Validation Helper Requirements:** Put ordinary input checks in the local `grumble`, verifying every input argument’s caller-controlled properties needed by the algorithm. Follow the exact style and messaging of existing helpers in `kernel` and `experiments`: concise, informative, well-formatted errors, and no comments inside the helper. Keep genuinely computed-domain checks beside the quantity they inspect, as in relaxation calibration. Reject unsupported cases clearly; do not catch an error and silently substitute different physics.
 
-* **Do not validate guaranteed aspects:** If the input is received from another Spinach function that sets specific shapes and types, there is no need to re-check those shapes and types. Only values of input variables should be checked if appropriate. Do not over-check or introduce pointless ass-cover checking.
+* **Do not validate guaranteed aspects:** Do not recursively revalidate a Spinach structure or recheck properties already guaranteed by its producer. If another Spinach function sets specific shapes and types, check only input values where appropriate. Do not over-check or introduce pointless ass-cover checking.
 
-* **Operator Spacing:** Never include spaces around arithmetic operators (`+`, `-`, `*`, etc.), logical operators (`==`, `>`, `<=`, etc.), or the assignment operator (`=`). Write expressions like `a=b+c*d` without spaces.
+* **Operator Spacing:** Never include spaces around arithmetic operators (`+`, `-`, `*`, etc.), logical operators (`==`, `>`, `<=`, etc.), or the assignment operator (`=`). Write expressions like `a=b+c*d` without spaces. Spaces used to separate or align entries in numerical arrays are not operator spacing.
 
 * **General Formatting:** When in doubt about formatting, mimic the existing code. Refer to functions in the `kernel` and `experiments` folders for the correct style and structure if unsure.
 
-* **Content preservation:** Before proposing any code rewrite, run an information-preservation gate: compare proposed code against existing code, flag content-drop risks, and block any edit that removes substantial existing code unless the user explicitly approves that removal.
-
-* **Optional arguments and shapes:** Avoid optional arguments if possible. Functions should ideally have fixed signatures. Do not write array shape adaptation code, simply tell the user what the function input and output shapes are. Explain inputs and outputs in the documentation header and validate them in the grumbler. The use of `varargin` and `varargout` is discouraged: write a fixed signature wherever one is possible. 
+* **Optional arguments and shapes:** Prefer fixed signatures; avoid optional arguments, `varargin`, and `varargout` wherever a fixed signature is possible. For new inputs, require all arguments: do not add `nargin` defaults, optional arguments, `varargin`, or `varargout`. Do not write array shape adaptation code. Document input and output shapes, units, and meanings in the header and validate them in the grumbler where required. Preserve existing documented call patterns when modifying a legacy function; do not introduce unsolicited API breaks.
 
 * **Default values:** Defaults are discouraged: *Spinach* has a policy of not guessing or assuming anything unobvious. If some variable is missing from the user input, that is normally an error, rely on *Matlab* to catch it, do not set a default value unless specifically told to do so.
 
-* **No bloat, no garbage:** Your code must be minimalist. Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit. Trivial helper functions are forbidden. Never create a separate function or a helper that is only called once. Do not create a new function when an existing function can be elegantly extended. Do not create new features where existing *Spinach* features may be used. Never implement any option or structure you have not been directly asked to implement. Never add anything that does not need to be added. Avoid object-oriented nonsense and use strict functional programming everywhere.
+* **No bloat, no garbage:** Your code must be minimalist. Remove dead code, unused variables, redundant conversions, unnecessary aliases, speculative branches, unrequested options, and other redundant items from functions you create or edit. Do not create trivial or single-use helpers; the required local `grumble` and substantive repeatedly evaluated numerical callbacks, objectives, or calculations are explicit exceptions. Elegantly extend an existing function or reuse existing Spinach features instead of adding a parallel implementation. Never implement an option or structure you have not been directly asked to implement, and never add anything unnecessary. Avoid object-oriented nonsense and use strict functional programming everywhere.
 
 * **Preserve correct physics:** When making code changes, do not break the physics behind the code. Before making an edit or a refactor, understand the physical meaning of the code you are touching and confirm that the edit you are about to make is appropriate and correct from the physics point of view. Run a direct function-load/call check for every changed function after you touch that function's structure. Do not treat compact probes as acceptance.
 
@@ -47,13 +44,13 @@ Keep the scientific model, algorithm, and numerical costs directly readable. App
 
 ### Write the calculation, not a framework
 
-1. **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change. Search for existing Spinach and MATLAB capabilities. Extend an existing function when the requested behaviour fits it naturally; do not add a parallel implementation or an unsolicited feature.
+1. **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change; apply the existing-capability and minimalism rules above.
 
 2. **Keep the mathematics visible.** Use expressions that a domain scientist can match to the defining equation. Keep small fixed transforms explicit when that is clearer than a generic implementation. Introduce an intermediate when it names a physical quantity, exposes a numerical stage, or avoids meaningful repeated work—not merely to rename an expression.
 
 3. **Use direct data flow.** Arrange the body in dependency order, with one conceptually distinct operation per captioned block. Prefer ordinary matrices, arrays, cells, and existing Spinach structures. Do not introduce a class, dispatcher framework, configuration parser, or mutable cache for a routine calculation.
 
-4. **Abstract scientific reuse, not typing effort.** Reuse established domain operations. Do not extract a trivial or single-use helper just to shorten the caller. The required local `grumble` is an explicit exception; substantive repeatedly evaluated numerical callbacks are also legitimate. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
+4. **Abstract scientific reuse, not typing effort.** Apply the helper and reuse rules above. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
 
 ### Make the numerical representation earn its cost
 
@@ -65,17 +62,9 @@ Keep the scientific model, algorithm, and numerical costs directly readable. App
 
 8. **Preserve the scientific contract.** Keep units, signs, normalisation, basis order, shapes, and operator conventions explicit. For propagation, retain the convention `exp(-1i*L*t)`. Do not silently symmetrise, renormalise, clip, transpose, or regularise an input to make the calculation work; such operations need a documented mathematical role and compatibility with the requested behaviour.
 
-### Keep interfaces and validation disciplined
+### Review before delivery
 
-9. **Use a fixed, documented interface.** Require all new inputs; do not add `nargin` defaults, optional arguments, `varargin`, `varargout`, or silent shape adaptation. Describe shapes, units, and meanings in the header. Preserve existing documented call patterns when modifying a legacy function. Do not introduce unsolicited API breaks. 
-
-10. **Validate at the appropriate boundary.** Put ordinary input checks in the local `grumble` for non-example functions, with concise informative errors and no comments inside that helper. Validate caller-controlled properties needed by the algorithm. Do not recursively revalidate a Spinach structure or recheck properties already guaranteed by its producer. Keep genuinely computed-domain checks beside the quantity they inspect, as in relaxation calibration. Reject unsupported cases clearly; do not catch an error and silently substitute different physics.
-
-### Make the result look and read like Spinach
-
-11. **Follow the house typography exactly.** Use four-space control-flow indentation, no tabs, no spaces around operators, and concise descriptive lowercase underscore-separated names of at most 20 characters. Use uppercase textbook operator names only where the house rules permit them; avoid `i` and `l` as variable names, and write `1i` for the imaginary unit. Place exactly one purpose-comment line above each operation block, preceded by a blank line; omit a trailing full stop for a one-sentence caption. Put extended explanation in the header. Use British spelling and the Oxford comma, preserve existing attribution and closing quotations, and end each MATLAB file with exactly two blank lines.
-
-12. **Review for subtraction before delivery.** Remove dead code, unused variables, redundant conversions, unnecessary aliases, speculative branches, and unrequested options. Keep the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For changed MATLAB files, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
+9. **Review for subtraction before delivery.** Apply the minimalism rules above while keeping the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For every changed MATLAB file, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
 
 **Final review question:** Can a Spinach scientist see the model, the algorithm, and the numerical costs directly, without mentally dismantling software scaffolding? If not, simplify the design before polishing its formatting.
 
@@ -95,13 +84,11 @@ The common shape is **physical specification → basis and numerical options →
 
 - Normally use `function example_name()` with no inputs or outputs. Put the chosen physical parameters directly in the body, where the reader can edit them. These are the specification of the example, not fallback values for missing arguments.
 
-- If the demonstration genuinely needs inputs or returns results, use a fixed signature and document every argument, shape, and unit. Do not add optional arguments, `nargin` defaults, `varargin`, or silent shape adaptation.
+- If the demonstration genuinely needs inputs or returns results, use a fixed signature and document every argument, shape, and unit, following the interface rules above.
 
 - Keep the scientific calculation in sight. Do not turn a short example into a driver framework, configuration parser, class, command-line interface, or collection of tiny helpers.
 
-- Call existing Spinach and MATLAB facilities. Put reusable pulse-sequence or general library functionality in its appropriate library location rather than burying a new implementation in an example.
-
-- Do not add a `grumble` merely because library functions have one: the repository's blanket `grumble` requirement explicitly excludes examples. Reusable non-example functions still follow the library validation rules.
+- Put reusable pulse-sequence or general library functionality in its appropriate library location rather than burying a new implementation in an example.
 
 #### 2. Start with a scientific header
 
@@ -115,13 +102,9 @@ The common shape is **physical specification → basis and numerical options →
 
 - Retain author attribution, normally the authors' email addresses or names, at the end of the header. Do not invent authorship.
 
-- For a no-argument, no-output demonstration, avoid empty library-style `Inputs`, `Outputs`, or `Syntax` sections. If arguments exist, document them properly.
-
 #### 3. Organise the body into small, captioned blocks
 
-- Separate conceptually distinct operations with one blank line and one explanatory comment line. Use a short purpose caption, such as `% Basis set`, `% Simulation`, or `% Fourier transform`.
-
-- Every body comment block above code is exactly one line. Omit the final full stop for a one-sentence comment. Put longer explanations in the header.
+- Follow the one-line body-comment rule above, using short purpose captions such as `% Basis set`, `% Simulation`, or `% Fourier transform`.
 
 - Group related assignments together: magnetic field and isotope specification; Zeeman and coupling data; coordinates; relaxation; basis; algorithmic options; experiment parameters. Use only the groups the demonstration needs.
 
@@ -179,25 +162,13 @@ The intervening experiment-parameter block is omitted here; this is a layout exc
 
 - Keep `control` assignments in one readable block, then call `optimcon()` and the appropriate existing optimiser. Make waveform rescaling and any subsequent propagation or fidelity calculation explicit.
 
-- A local callback is justified when it implements a substantive repeatedly evaluated objective or calculation. Do not create single-use or trivial helpers simply to shorten the visible body.
-
 #### 6. Match the typography and naming
 
-- Use four-space indentation inside control-flow blocks, no tabs, and no extra indentation for the entire main function body.
-
-- Do not put spaces around assignment, arithmetic, or logical operators: `a=b+c*d`, `x==y`, `k<=n`. Spaces used to separate or align entries in numerical arrays are not operator spacing.
+- Apply the programming style above, with no extra indentation for the entire main function body.
 
 - End ordinary assignments with semicolons. Short, closely related operations may share a line; do not compress a scientific stage into a dense chain of unrelated statements.
 
 - Wrap long calls and expressions with `...`, aligning continuations with the relevant argument or expression. Align tensor and coordinate rows where that improves readability.
-
-- Use descriptive, lowercase, underscore-separated names of at most 20 characters. Simple loop counters such as `n` and `k` are acceptable; do not use `i` or `l` as variable names, and use `1i` for the imaginary unit.
-
-- The house rules permit uppercase textbook operator names `H`, `R`, `K`, `P`, and `Q`; other new variables should be descriptive and lowercase. Preserve required API field names and literal option strings rather than renaming them to satisfy a variable convention.
-
-- Use British spelling, preferring `s` to `z`, and the Oxford comma in prose. Do not alter an existing API spelling.
-
-- Finish each new or edited `.m` file with exactly two blank lines, as required by the house rules. Preserve existing end-of-file quotations when editing.
 
 #### 7. End with the scientific result
 
@@ -213,9 +184,15 @@ The intervening experiment-parameter block is omitted here; this is a layout exc
 
 Choose a nearby example from the same scientific family as the starting point, then apply the rules above. Preserve the existing scientific content when restyling: parameter values, data, references, approximations, ordering, and result interpretation must not change accidentally. Follow the current repository's `AGENTS.md` if its rules change. Legacy deviations are not instructions for new code.
 
+## Shared Preservation and Documentation Rules
+
+* **Preserve content:** Before proposing a code or documentation rewrite or updating the agent skill or knowledge base, run an information-preservation gate: compare proposed content against existing content and flag content-drop risks. Block removal of substantial existing code or documentation, or useful existing skill or knowledge-base records, unless the user explicitly approves that removal.
+
+* **Accurate Description:** Before writing a Wiki narrative, agent skill entry, or knowledge-base entry for a Spinach function, thoroughly analyse its implementation and understand what it does, how it works, and its key algorithms. Only then write a brief but informative explanation of the function’s behaviour and important operational details. Keep Wiki narratives factual and clear; never speculate or introduce information not present in the code.
+
 ## Wiki Instructions
 
-*Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:
+*Spinach* maintains a Wiki for function documentation. When asked (or required) to create or update a function’s Wiki page, apply the shared rules above and the following requirements:
 
 * **Use the Template:** Always use the provided `wiki_template.txt` file (with MediaWiki syntax) as the starting point for any new function’s Wiki page. This template defines the required sections and formatting.
 
@@ -223,25 +200,9 @@ Choose a nearby example from the same scientific family as the starting point, t
 
 * **Preserve Formatting:** Keep the line breaks and general formatting of the original function’s documentation header intact in the Wiki page. This ensures consistency between the code and its documentation. For example, if the code’s documentation has separate lines for each parameter, the Wiki should reflect the same line structure.
 
-* **Accurate Description:** When writing the descriptive narrative of what the function does (outside of the straight copy-paste sections), thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative description in the Wiki entry, explaining the function’s behavior and any important details of its operation. Always maintain a factual and clear tone – never speculate or introduce information not present in the code.
+## Agentic Skill and Knowledge Base
 
-* **Preserve content:** Before proposing any documentation rewrite, you must run an information-preservation gate: compare proposed code against existing documentation, flag content-drop risks, and block any edit that removes substantial existing documentation unless the user explicitly approves that removal.
-
-## Agentic skill instructions
-
-*Spinach* maintains an AI agent skill in `interfaces\agents\spinach-skill` directory. The purpose of that skill is to enable third-party AI agents to use Spinach competently. AI agents using Spinach should suggest to their user that the skill is installed locally. After each Spinach code change, update that skill appropriately. Follow these instructions:
-
-* **Accurate Description:** When writing an entry for a Spinach function, thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative skill entry, explaining the function’s behavior and any important details of its operation.
-
-* **Preserve content:** Before updating the skill, you must run an information-preservation gate: compare proposed text against existing text, flag content-drop risks, and block any edit that removes useful existing records unless the user explicitly approves that removal.
-
-## Agentic knowledge base
-
-*Spinach* maintains an AI agent knowledge base in `interfaces\agents\spinach-knowledge` directory. The purpose of that knowledge base is to enable third-party AI agents to use Spinach competently. AI agents using Spinach should suggest to their user that the knowledge base is installed locally. After each Spinach code change, update that knowledge base appropriately. Follow these instructions:
-
-* **Accurate Description:** When writing an entry for a Spinach function, thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative knowledge entry, explaining the function’s behavior and any important details of its operation.
-
-* **Preserve content:** Before updating the knowledge base, you must run an information-preservation gate: compare proposed text against existing text, flag content-drop risks, and block any edit that removes useful existing records unless the user explicitly approves that removal.
+*Spinach* maintains an AI agent skill in `interfaces\agents\spinach-skill` and an AI agent knowledge base in `interfaces\agents\spinach-knowledge`, both to enable third-party AI agents to use Spinach competently. Suggest that the user install both locally. After each Spinach code change, update both appropriately, applying the shared preservation and description rules above. The following additional rules apply to the knowledge base:
 
 * **No line-by-line code regurgitation:** A knowledge entry explains what a function or example does and why; it never restates the source one line at a time. Bullets of the form "Lines 40-41: magnet field; implemented by `sys.magnet=6.9156`" or "Line 18: computes `root_dir` using `root_dir=fileparts(...)`", and sections that list execution stages, control flow, state assignments, or local helper signatures with line numbers, carry no information beyond the source file and are prohibited. Do not add a "Code-derived implementation details" section or any of its subsections to an entry; mechanically generated text of that kind must be deleted before the entry is committed.
 
@@ -255,13 +216,7 @@ Choose a nearby example from the same scientific family as the starting point, t
 
 * **No inconsequential PR or documentation entries:** Do not add mechanically derived or transient metadata to pull-request changes, the shipped knowledge base, the agent skill, or Wiki documentation when it adds no useful explanation and creates avoidable merge conflicts. This includes LOC and source-line counts, indexed-file and aggregate-line counts, generation timestamps, source commit IDs, transient branch/snapshot labels, checkout-specific absolute paths, and duplicate source-header or call-list restatements. Keep stable file paths, signatures, scientific and numerical facts, meaningful references, and substantive descriptions. Commit IDs needed for review or provenance belong in PR discussion or job records, not in shipped documentation. When updating an entry, remove existing low-value metadata without refreshing unrelated content.
 
-* **Follow Instructions:** You must do everything the user asks, and produce all requested outputs (e.g. multiple functions or files) exactly as specified by the user. Do not ignore any part of the request. Each task in the user instructions must be completed fully.
-
-* **Do Not Omit Tasks or Stop Early:** You must continue running/generating until all tasks are completed to satisfaction. You must not terminate or cut off the output prematurely. If multiple files or sections are requested by the user, you must output all of them before finishing. If in doubt, ask the user for clarifications.
-
-* **Verify Completion of All Tasks:** After generating the output, you must double-check user instructions against the output produced. If anything is missing, incomplete, or does not strictly follow the instructions and style guidelines, you must continue working. The process is not complete until you have produced everything requested by the user, in full compliance with the guidelines above.
-
-* **Strict quality control:** After generating the output, you must evaluate the quality and correctness of what you have produced. If the output is of low quality (from academic, software engineering, or numerical efficiency point of view) or incorrect, you must continue improving the code until its quality is high.
+* **Follow Instructions and Verify Completion:** Do everything the user asks, producing every requested file, function, section, and other output exactly as specified. Do not ignore any part of the request, cut off the output, or stop early. If in doubt, ask the user for clarification. Before finishing, double-check the output against every user instruction and the guidelines above, and evaluate its correctness and academic, software-engineering, and numerical-efficiency quality. Continue working until nothing is missing, incomplete, incorrect, non-compliant, or low-quality.
 
 ## Confession After Work is Done
 

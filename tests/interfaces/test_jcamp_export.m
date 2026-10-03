@@ -153,6 +153,14 @@ emr.metadata(end+1,:)={'$SAMPLE.DESCRIPTION','Private note'}; data.blocks={emr};
 result=test_true(result,'private dotted label',contains(text,'##$SAMPLE.DESCRIPTION=Private note'),...
                  'private labels retain their user-defined namespace rather than impersonating reserved labels');
 
+% Simulation descriptions may contain multiple lines of text
+simulation=emr; simulation.metadata{3,2}={'Spinach';'Numerical simulation'};
+simulation.metadata{4,2}={'Field: 0.3 T';'Linewidth: 0.001 T'};
+data.blocks={simulation}; text=jcamp_export(data);
+result=test_true(result,'multiline simulation descriptions',contains(text,['##.SIMULATION SOURCE=Spinach' char([13 10]) 'Numerical simulation'])&&...
+                 contains(text,['##.SIMULATION PARAMETERS=Field: 0.3 T' char([13 10]) 'Linewidth: 0.001 T']),...
+                 'simulation descriptions preserve explicitly supplied lines of ASCII text');
+
 % A long value must not split the spaces inside its label
 emr.metadata(end+1,:)={'SPECTROMETER/DATA SYSTEM',repmat('a',1,70)};
 data.blocks={emr}; text=jcamp_export(data);
@@ -201,6 +209,8 @@ bad=data; bad.blocks{1}.metadata{2,2}=42; invalid{end+1}=bad;
 bad=data; bad.blocks{1}.metadata{2,2}='NOT-A-METHOD'; invalid{end+1}=bad;
 bad=data; bad.blocks{1}.metadata{2,2}={'SPECTRUM';'FID'}; invalid{end+1}=bad;
 bad=data; bad.blocks{1}.metadata(end+1,:)={'SAMPLE.DESCRIPTION','Invalid reserved label'}; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.metadata{3,2}=42; invalid{end+1}=bad;
+bad=data; bad.blocks{1}.metadata{4,2}=[1 2]; invalid{end+1}=bad;
 for n=1:numel(invalid)
     refused=false;
     try

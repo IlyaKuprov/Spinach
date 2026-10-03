@@ -205,7 +205,9 @@ peak rows, so it cannot terminate the peak data record.
 The exporter checks the minimal technique identifiers: NMR observation
 frequency and nucleus; additionally `.DELAY` and `.ACQUISITION MODE` for FIDs;
 EMR `.DETECTION MODE` and `.METHOD`; additionally `.SIMULATION SOURCE` and
-`.SIMULATION PARAMETERS` for simulations. Acquisition mode is `SIMULTANEOUS`,
+`.SIMULATION PARAMETERS` for simulations; both descriptions must be non-empty
+ASCII text, either a row string or a cell vector of lines, not numeric arrays.
+Acquisition mode is `SIMULTANEOUS`,
 `SEQUENTIAL`, or `SINGLE`; EMR detection is `CW` or `PULSE`. The EMR method
 is one of the protocol's core identifiers: `DYNAMIC`, `ELDOR`, `ENDOR`, `ESEEM`,
 `ODMR`, `GONIOMETER`, `HYSCORE`, `KINETIC`, `SATURATION`, `SPECTRUM`, `FID`,

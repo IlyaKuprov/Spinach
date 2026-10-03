@@ -692,3 +692,6 @@ peaks. Axis units and core EMR methods are validated; NMR 5.01 permits
 `MAGNITUDE` and `POWER` alongside `ARBITRARY UNITS`, without applying a
 transform. Add a PAGE variable when replicate identity must be explicit to
 coordinate-keyed readers.
+
+Supply `.SIMULATION SOURCE` and `.SIMULATION PARAMETERS` as non-empty ASCII
+text (row strings or cell vectors of lines), not numeric arrays.

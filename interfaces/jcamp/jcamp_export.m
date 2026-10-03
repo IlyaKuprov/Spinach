@@ -455,6 +455,11 @@ for n=1:numel(data.blocks)
                  'KINETIC','SATURATION','SPECTRUM','FID','TRIPLE','IMAGING','SPECTRAL SPATIAL'};
         value=block.metadata{strcmp(labels,'.METHOD'),2};
         if ~ischar(value)||~ismember(value,methods), error('.METHOD must be a documented EMR method identifier.'); end
+        for k=find(ismember(labels,{'.SIMULATIONSOURCE','.SIMULATIONPARAMETERS'}))'
+            if ~ischar(block.metadata{k,2})&&~iscell(block.metadata{k,2})
+                error('EMR simulation source and parameters must contain ASCII text.');
+            end
+        end
     end
     modes={'.ACQUISITIONMODE',{'SIMULTANEOUS','SEQUENTIAL','SINGLE'}; '.DETECTIONMODE',{'CW','PULSE'}};
     for k=1:size(modes,1)

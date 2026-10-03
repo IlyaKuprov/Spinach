@@ -40,6 +40,9 @@ The exporter does not provide integer ASDF compression, molecular structure
 export, or universal vendor compatibility; JCAMP readers differ in their
 support for multidimensional and irregular NTUPLES.
 
+EMR simulation source and parameter descriptions are non-empty ASCII text,
+including multiline cell vectors; numeric arrays are not descriptions.
+
 ## References
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jcamp/jcamp_export.m)

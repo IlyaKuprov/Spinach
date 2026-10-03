@@ -19,13 +19,8 @@ function verdict=isnucleus(spin_spec)
 % Check consistency
 grumble(spin_spec);
 
-% A simple name matching check
-if ismember(spin_spec(1),{'E','C','V','T'})||...
-   ismember(spin_spec,{'G','E','N','M'})
-    verdict=false();
-else
-    verdict=true();
-end
+% Valid physical nuclear labels begin with their mass number
+verdict=isstrprop(spin_spec(1),'digit');
 
 end
 
@@ -43,4 +38,5 @@ end
 % the other vilified.
 %
 % Barbara Einhorn
+
 

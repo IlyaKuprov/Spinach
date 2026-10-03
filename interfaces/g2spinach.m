@@ -321,11 +321,10 @@ if ismember('E',[nuclei{:}])
         try
             source_gammas(n)=spin(source_iso);
         catch exception
-            if strcmp(exception.message,[source_iso ' - unknown isotope.'])
+            if strcmp(exception.identifier,'spin:unknown_isotope')
                 error(['invalid HFC source isotope ' source_iso ' at atom '...
                        num2str(n) '; check props.isotopes and props.symbols atom order.']);
-            elseif strcmp(exception.message,...
-                          [source_iso ' - no data available in the current NMR literature.'])
+            elseif strcmp(exception.identifier,'spin:data_unavailable')
                 error(['no spin data for HFC source isotope ' source_iso ' at atom '...
                        num2str(n) '; check props.isotopes and props.symbols atom order.']);
             end

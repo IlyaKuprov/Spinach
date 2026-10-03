@@ -77,7 +77,9 @@ abundance has no invented midpoint. The editable literature TSV and offline MAT
 builder are documented in `etc/isotopes_sources.md`; the runtime table loads once
 per process and `clear spin` reloads an updated payload. Natural tantalum-180 is the
 `180Ta_m` isomer, not the short-lived `180Ta` ground state. Antiparticle values under
-CPT are explicitly qualified, not independent measurements.
+CPT are explicitly qualified, not independent measurements. Spin below one forbids
+a spectroscopic quadrupole moment; higher-spin missing values, including Omega,
+remain unknown rather than zero.
 
 `iselectron` and `isnucleus` test a specification string. `isoswap(sys,inter,
 spins,new_iso)` performs isotope replacement and rescales all interactions

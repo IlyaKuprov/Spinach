@@ -1,5 +1,13 @@
 # Contexts, pulse sequences, and processing
 
+## Contents
+
+- [The context call](#the-context-call)
+- [Writing a pulse sequence](#writing-a-pulse-sequence)
+- [The `state` and `operator` grammar](#the-state-and-operator-grammar)
+- [The experiments library](#the-experiments-library)
+- [Acquisition and processing conventions](#acquisition-and-processing-conventions)
+
 The context sits between the spin system and the pulse sequence: it builds
 the Hamiltonian, the relaxation and kinetics superoperators, performs
 whatever orientational or spatial averaging the physical situation demands,
@@ -120,7 +128,7 @@ run under another.
 | `liquid`, `crystal`, `gridfree` | `pulse_sequence(spin_system,parameters,H,R,K)` |
 | `powder` | `pulse_sequence(spin_system,localpar,H,R,K)`, once per orientation |
 | `singlerot` | Liouville space: the third argument is the Fokker-Planck generator; Hilbert space: a stack of Hamiltonians, one per rotor phase |
-| `doublerot` | third argument is `L+1i*M`, the Fokker-Planck generator including the two rotor turning terms |
+| `doublerot` | Liouville space: third argument is `L+1i*M`, including both rotor turning terms; `zeeman-hilb`/`zeeman-wavef`: a cell stack of Hamiltonians over the two rotor phases |
 | `floquet` | third argument is the Floquet generator |
 | `imaging`, `meshflow` | `pulse_sequence(spin_system,parameters,H,R,K,G,F)` |
 

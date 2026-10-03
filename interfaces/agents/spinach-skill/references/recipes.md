@@ -1,5 +1,33 @@
 # Starting points by physical problem
 
+## Contents
+
+- [Index of `examples/`](#index-of-examples)
+- [Optimal-control case studies](#optimal-control-case-studies)
+- [Liquid-state NMR, one dimension](#liquid-state-nmr-one-dimension)
+- [Liquid-state NMR, homonuclear 2D](#liquid-state-nmr-homonuclear-2d)
+- [Liquid-state NMR, heteronuclear 2D](#liquid-state-nmr-heteronuclear-2d)
+- [Proteins and nucleic acids](#proteins-and-nucleic-acids)
+- [Solid-state NMR, static powder and MAS](#solid-state-nmr-static-powder-and-mas)
+- [Quadrupolar nuclei and NQR](#quadrupolar-nuclei-and-nqr)
+- [EPR, field-swept and CW](#epr-field-swept-and-cw)
+- [EPR, pulsed: ESEEM, HYSCORE, ENDOR](#epr-pulsed-eseem-hyscore-endor)
+- [DEER](#deer)
+- [DNP](#dnp)
+- [PHIP and SABRE](#phip-and-sabre)
+- [Radical pairs, magnetic field effects, CIDNP](#radical-pairs-magnetic-field-effects-cidnp)
+- [Relaxation studies](#relaxation-studies)
+- [Chemical kinetics and exchange](#chemical-kinetics-and-exchange)
+- [MRI, imaging, flow and diffusion](#mri-imaging-flow-and-diffusion)
+- [Optimal control](#optimal-control)
+- [Fitting to experimental data](#fitting-to-experimental-data)
+- [Singlet states](#singlet-states)
+- [Zero-field and low-field NMR](#zero-field-and-low-field-nmr)
+- [Paramagnetic NMR and partial alignment](#paramagnetic-nmr-and-partial-alignment)
+- [Giant spin, lanthanides and molecular magnets](#giant-spin-lanthanides-and-molecular-magnets)
+- [Tensor visualisation, quantum technology, fundamentals](#tensor-visualisation-quantum-technology-fundamentals)
+- [Exporting NMR and EPR data](#exporting-nmr-and-epr-data)
+
 Paths are relative to the Spinach repository root. Every simulation follows the
 seven-part shape given in `SKILL.md`; what changes between problem classes is
 the context, the assumptions string, the basis, the pulse sequence, and the

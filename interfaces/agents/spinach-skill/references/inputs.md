@@ -1,5 +1,21 @@
 # Spinach input specification
 
+## Contents
+
+- [The `sys` structure](#the-sys-structure)
+- [Isotope naming](#isotope-naming)
+- [Zeeman interactions](#zeeman-interactions)
+- [Couplings](#couplings)
+- [Coordinates, dipolar couplings, periodic boundaries](#coordinates-dipolar-couplings-periodic-boundaries)
+- [Magnetic susceptibility and paramagnetic shifts](#magnetic-susceptibility-and-paramagnetic-shifts)
+- [Giant spin (ligand field) terms](#giant-spin-ligand-field-terms)
+- [Chemistry and kinetics](#chemistry-and-kinetics)
+- [Partial ordering, temperature and relaxation inputs](#partial-ordering-temperature-and-relaxation-inputs)
+- [The `bas` structure](#the-bas-structure)
+- [Unit conversions on the way in](#unit-conversions-on-the-way-in)
+- [Importing from quantum chemistry](#importing-from-quantum-chemistry)
+- [Importing structures and databases](#importing-structures-and-databases)
+
 Everything a simulation knows about physics enters through two structures,
 `sys` and `inter`, which are consumed by `create`, and one structure, `bas`,
 consumed by `basis`. There are no defaults for physical quantities: a missing

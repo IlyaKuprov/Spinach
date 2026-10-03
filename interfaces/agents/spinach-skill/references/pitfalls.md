@@ -1,5 +1,13 @@
 # Failure modes and diagnostics
 
+## Contents
+
+- [Crash catalogue](#crash-catalogue)
+- [Silent wrong-result traps](#silent-wrong-result-traps)
+- [Scaling and memory](#scaling-and-memory)
+- [The headless validation harness](#the-headless-validation-harness)
+- [What counts as evidence that a simulation is right](#what-counts-as-evidence-that-a-simulation-is-right)
+
 Almost every kernel function has a `grumble()` input checker that stops with a
 specific message, and the no-defaults policy means a missing physical input is
 an error, not a guess. Crashes are therefore usually self-explanatory once the
@@ -242,7 +250,9 @@ spins; beyond that, the basis restriction is the tool, not a bigger machine:
   and observable cannot enter the discarded blocks, and validate against an
   unfiltered basis when practical.
 - `bas.sym_group`/`bas.sym_spins` exploit permutation symmetry - large
-  savings for methyl groups and symmetric aromatics.
+  savings for methyl groups and symmetric aromatics where the context supports
+  them. `imaging` rejects symmetry groups; do not carry this setting blindly
+  from a liquid-state example into spatially resolved simulations.
 
 At run time Spinach reduces dimension further on its own: zero-track
 elimination and path tracing routinely cut the active space by an order of

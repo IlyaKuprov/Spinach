@@ -1,5 +1,16 @@
 # Relaxation, equilibrium, kinetics, and orientational averaging
 
+## Contents
+
+- [Selecting a relaxation theory](#selecting-a-relaxation-theory)
+- [Redfield theory](#redfield-theory)
+- [User-supplied rates](#user-supplied-rates)
+- [Scalar relaxation](#scalar-relaxation)
+- [Which terms of R survive](#which-terms-of-r-survive)
+- [Thermal equilibrium and temperature](#thermal-equilibrium-and-temperature)
+- [Chemical kinetics](#chemical-kinetics)
+- [Powder grids](#powder-grids)
+
 Relaxation and chemical kinetics enter the Liouvillian as dissipative
 generators:
 
@@ -19,8 +30,9 @@ rates have no effect there.
 `inter.relaxation` is a cell array of strings and more than one may be
 given. The accepted set is exactly `'damp'`, `'t1_t2'`, `'redfield'`,
 `'naka-zwan'`, `'lindblad'`, `'nottingham'`, `'weizmann'`, `'SRFK'`,
-`'SRSK'`; anything else is refused by `create`. If the field is absent,
-`R` is zero.
+`'SRSK'`; anything else is refused by `create`. If the field is absent, `R` is zero only when there are also no dissipative
+bosonic modes. Mode damping or dephasing can contribute automatically; see
+`kernel/relaxation.m` and `kernel/utilities/rlx_modes.m`.
 
 | Theory | Physical model | Required inputs | Typical use |
 |---|---|---|---|

@@ -1,5 +1,26 @@
 # Literature
 
+## Contents
+
+- [Citing the library](#citing-the-library)
+- [State space restriction and basis construction](#state-space-restriction-and-basis-construction)
+- [Large matrix representations](#large-matrix-representations)
+- [Fokker-Planck formalism and spatial dynamics](#fokker-planck-formalism-and-spatial-dynamics)
+- [Propagation](#propagation)
+- [Relaxation theory](#relaxation-theory)
+- [Optimal control](#optimal-control)
+- [Fitting and inverse problems](#fitting-and-inverse-problems)
+- [Applications: hyperpolarisation, PHIP and SABRE](#applications-hyperpolarisation-phip-and-sabre)
+- [Applications: dynamic nuclear polarisation](#applications-dynamic-nuclear-polarisation)
+- [Applications: solid-state NMR and magic angle spinning](#applications-solid-state-nmr-and-magic-angle-spinning)
+- [Applications: EPR, DEER and spin labels](#applications-epr-deer-and-spin-labels)
+- [Applications: paramagnetic NMR](#applications-paramagnetic-nmr)
+- [Applications: radical pairs and spin chemistry](#applications-radical-pairs-and-spin-chemistry)
+- [Applications: singlet order and long-lived states](#applications-singlet-order-and-long-lived-states)
+- [Applications: zero, ultralow and Earth field NMR](#applications-zero-ultralow-and-earth-field-nmr)
+- [Applications: imaging, flow and diffusion](#applications-imaging-flow-and-diffusion)
+- [Applications: pulse design and quantum simulation](#applications-pulse-design-and-quantum-simulation)
+
 Theory implemented in Spinach, and representative published work that used it.
 Format is `Authors, "Title", Journal Volume, Pages/Article (Year), DOI`; an
 absent field was not available from a checkable record and must not be filled

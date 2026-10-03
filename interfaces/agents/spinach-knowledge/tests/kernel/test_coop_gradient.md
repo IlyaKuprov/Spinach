@@ -6,6 +6,8 @@ Source: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_coop_
 
 Regression test for cooperative phase gradients and the initial gradient guard in Spinach's optimal control module. It verifies that the primary fidelity and the squared impurity penalty share one gradient, that the cooperative objective matches independent matrix propagation, and that the optimiser's assembled-initial-guess safeguards behave correctly.
 
+Distinct pulse masks are also checked for unit and complex nonunit targets in both formalisms and fidelity measures. All-false, asymmetric partial, and complementary masks must leave the objective unchanged, give exact zeros at frozen coordinates, and retain unfrozen derivatives against centred differences. The all-frozen optimiser check must reach the assembled-gradient guard rather than a mask-shape failure.
+
 ## Behaviour
 
 - Creates a regression result via `new_test_result('kernel/coop_gradient','Cooperative phase gradients','The primary fidelity and squared impurity must share one gradient.')`.

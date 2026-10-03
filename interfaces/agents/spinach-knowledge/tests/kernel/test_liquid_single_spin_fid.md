@@ -11,7 +11,7 @@ Regression test for a one-spin liquid-state free induction decay (FID). The test
 - Announces the test target with `fprintf('TESTING: Single-spin liquid-state FID\n')`.
 - Registers a new test result via `new_test_result` under the name `kernel/liquid_single_spin_fid`, described as "Single-spin liquid-state FID", with the property that "a zero-offset isolated spin has a constant free induction decay."
 - Builds a one-spin Liouville-space spin system:
-  - `sys.magnet=14.1` (14.1 T magnet), `sys.isotopes={'1H'}`.
+  - The proton carrier angular frequency is fixed at `3772062842.904` rad/s, the original 14.1 T regression value; the field is obtained by dividing by `spin('1H')`. This preserves the numerical model when literature magnetic moments are updated. `sys.isotopes={'1H'}`.
   - `inter.zeeman.scalar={0}` (zero Zeeman scalar coupling).
   - `bas.formalism='sphten-liouv'`, `bas.approximation='none'`.
   - The system is constructed with `test_spin_system(sys,inter,bas)`.

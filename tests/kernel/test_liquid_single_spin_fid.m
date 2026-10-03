@@ -8,6 +8,8 @@
 %
 % The test simulates a zero-offset one-spin FID. With no Hamiltonian and no
 % relaxation, transverse magnetisation is constant in time.
+% The proton carrier is fixed at its original 14.1 T regression value,
+% 3772062842.904 rad/s, independently of isotope-data revisions.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -22,7 +24,7 @@ result=new_test_result('kernel/liquid_single_spin_fid',...
                        'a zero-offset isolated spin has a constant free induction decay.');
 
 % Build a one-spin Liouville-space system
-sys.magnet=14.1;
+sys.magnet=3772062842.904/spin('1H');
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
@@ -49,4 +51,5 @@ result=test_close(result,'constant zero-offset FID',fid,fid(1)*ones(size(fid)),1
                   'without precession or relaxation the detected coherence is time-independent');
 
 end
+
 

@@ -106,13 +106,17 @@ report(spin_system,['scaling -i*L*dt down by ' num2str(scaling_factor) ...
 % Scale the matrix
 if scaling_factor>1, A=(1/scaling_factor)*A; end
 
+% Identify series that eliminate numerical zeros through chopping
+terms_chopped=(spin_system.tols.prop_chop>0)&&...
+              (~ismember('clean-up',spin_system.sys.disable));
+
 % Get the propagator
 if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
     
     % Run Taylor series procedure on the GPU
     A=gpuArray(A); P=speye(size(A));
     next_term=gpuArray.speye(size(A)); n=1;
-    while nnz(next_term)>0
+    while (nnz(next_term)>0)&&(terms_chopped||any(nonzeros(next_term)))
         
         % Compute the next term
         if issparse(A)
@@ -136,7 +140,7 @@ else
     
     % Run Taylor series procedure on the CPU
     P=speye(size(A)); next_term=P; n=1;
-    while nnz(next_term)>0
+    while (nnz(next_term)>0)&&(terms_chopped||any(nonzeros(next_term)))
         
         % Compute the next term
         if issparse(A)

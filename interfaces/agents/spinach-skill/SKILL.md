@@ -11,13 +11,29 @@ writing a pulse sequence. Keep the physical model, numerical approximation,
 and measured result distinct. Never substitute a plausible spectrum for a
 validated calculation.
 
+## Mandatory repository instructions
+
+Before any Spinach task, locate the Spinach distribution being used and read
+and follow `AGENTS.md` in its root folder in full. These instructions are
+mandatory for simulations, source edits, examples, documentation, and
+repository work, not just editing. For this shipped skill, the distribution
+root is three directories above `interfaces/agents/spinach-skill`; when the
+skill is installed or mirrored elsewhere, locate the actual distribution
+rather than resolving the file relative to the installed skill. If
+`AGENTS.md` cannot be read, stop and report the missing mandatory instructions.
+
+The distribution-root `AGENTS.md` is the sole authoritative source for
+Spinach programming style, kernel coding elegance, example coding, Wiki
+documentation, and task-execution policy. Consult it directly; do not keep
+independent copies or paraphrases in this skill or its references.
+
 ## Establish the task and the checkout
 
 1. Identify the requested observable, physical system, experimental conditions,
    accuracy target, and deliverables. Reuse supplied inputs; ask only for missing
    physical choices that affect the answer. Do not silently guess a field,
    temperature, geometry, relaxation model, or pulse calibration.
-2. Locate the intended Spinach root and read its `AGENTS.md` before editing.
+2. Use the Spinach root established by the mandatory instructions above.
    Inspect branch, revision, and local changes. Do not overwrite another task
    file. For code changes, use [development](references/development.md).
 3. Find the closest shipped example and read it, its pulse sequence, and the

@@ -2,9 +2,11 @@
 
 ## Scope and source of truth
 
-Read the checkout `AGENTS.md` and applicable local instructions before edits.
-This skill routes the work; it does not replace repository coding style or
-maintainer instructions. Preserve unrelated changes and compiled MEX files.
+Read and follow the distribution-root `AGENTS.md` as mandatory instructions
+for every task, as required by [the skill entrypoint](../SKILL.md#mandatory-repository-instructions).
+Consult that file directly for repository policy; this reference does not
+maintain an independent version of its instructions. Preserve unrelated
+changes and compiled MEX files.
 Use a separate branch/worktree when the current checkout belongs to another
 task. Do not submit scientific or personal data that were not authorised for
 publication.
@@ -21,19 +23,9 @@ the derivation. Without that evidence, report a question, not a defect.
 
 ## Make the smallest coherent change
 
-- Reuse an existing kernel operation or experiment where possible. Do not
-  introduce a dispatcher, cache, wrapper framework, or new user API for a
-  local calculation. Preserve established defaults and error behaviour unless
-  their change is part of the request.
-- Follow `AGENTS.md` for MATLAB typography, comments, naming, validation, and
-  example structure. Library input checks and example scripts have different
-  rules; do not add library boilerplate to examples by habit.
 - Keep physical and numerical choices visible. Do not replace a problem by
   an easier one merely to obtain a passing test. Keep sparse/matrix-free
   representations and tensor ordering intact.
-- Run `checkcode` on changed MATLAB files and review the diff against the
-  house style. A clean analyser report does not prove scientific correctness
-  or compliance with every formatting rule.
 
 ## Tests, examples, and documentation
 
@@ -43,13 +35,9 @@ exercise a different regime from the unit tests. Capture assertions and
 observable comparisons, not only screenshots or log tails. Follow
 [execution and validation](validation.md) for runtime evidence.
 
-After a code change, update the relevant skill reference and mirrored
-`interfaces/agents/spinach-knowledge` entry when behaviour or operational
-guidance changes. Preserve existing valid explanations; replace stale
-claims explicitly rather than appending contradictory notes. Knowledge entries
-are concise function explanations, not copied source, process logs, or line
-number inventories. The repository intentionally has no knowledge entry for
-`tests/lib/test_manifest.m` and no section-wide knowledge indexes.
+Follow the distribution-root `AGENTS.md` for required skill and knowledge-base
+updates, content preservation, and documentation policy. It is the sole
+source of those instructions.
 
 For a documentation-only change, validate local links, frontmatter, code
 examples, and claims against the current source. Do not claim numerical

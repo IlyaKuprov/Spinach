@@ -70,7 +70,8 @@
 %           Sin^n      @(tau)1-abs(sin(pi*tau/2)).^n
 %
 %       and the hand drawn pulse in Figure 3 of the paper is any
-%       smooth non-negative function that starts and ends at zero.
+%       smooth function that is positive inside the pulse and
+%       may vanish only at its two ends.
 %
 % Note: the frequency sweep runs from -bwidth/2 to +bwidth/2; for
 %       a chirp pulse, which has a constant amplitude function, the
@@ -124,17 +125,17 @@ end
 
 % Consistency enforcement
 function grumble(npts,dur,bwidth,am_fun)
-if (~isnumeric(npts))||(~isreal(npts))||(numel(npts)~=1)||...
+if (~isfloat(npts))||(~isreal(npts))||(numel(npts)~=1)||...
    (~isfinite(npts))||(npts<2)||(mod(npts,1)~=0)
-    error('npts must be a finite real integer greater than 1.');
+    error('npts must be a finite real floating-point integer greater than 1.');
 end
-if (~isnumeric(dur))||(~isreal(dur))||...
+if (~isfloat(dur))||(~isreal(dur))||...
    (numel(dur)~=1)||(~isfinite(dur))||(dur<=0)
-    error('dur must be a finite positive real number.');
+    error('dur must be a finite positive real floating-point number.');
 end
-if (~isnumeric(bwidth))||(~isreal(bwidth))||...
+if (~isfloat(bwidth))||(~isreal(bwidth))||...
    (numel(bwidth)~=1)||(~isfinite(bwidth))||(bwidth<=0)
-    error('bwidth must be a finite positive real number.');
+    error('bwidth must be a finite positive real floating-point number.');
 end
 if ~isa(am_fun,'function_handle')
     error('am_fun must be a function handle.');
@@ -148,4 +149,5 @@ end
 %
 % Alberto Tannus and Michael Garwood,
 % J. Magn. Reson. A 120, 133 (1996)
+
 

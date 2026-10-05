@@ -47,7 +47,7 @@ npts=1000; dur=2e-3; bwidth=50e3;
 offsets=linspace(-1.2,1.2,121)*bwidth/2;
 
 % Loop over the amplitude functions
-kfigure(); scale_figure([2.0 1.6]);
+kfigure(); scale_figure([2.00 0.75]);
 for n=1:numel(am_funs)
 
     % Make the pulse
@@ -69,11 +69,11 @@ for n=1:numel(am_funs)
 end
 
 % Axis labels and legends
-subplot(1,3,1); kxlabel('time, ms'); kylabel('amplitude, kHz');
+subplot(1,3,1); kxlabel('time, ms'); kylabel('amplitude, kHz'); ylim padded;
 ktitle('amplitude modulation'); klegend(am_names,'Location','northeast'); kgrid; xlim tight;
-subplot(1,3,2); kxlabel('time, ms'); kylabel('frequency, kHz');
+subplot(1,3,2); kxlabel('time, ms'); kylabel('frequency, kHz'); ylim padded;
 ktitle('frequency modulation'); klegend(am_names,'Location','northwest'); kgrid; xlim tight;
-subplot(1,3,3); kxlabel('offset, kHz'); kylabel('Mz/M0');
+subplot(1,3,3); kxlabel('offset, kHz'); kylabel('Mz/M0'); ylim padded;
 ktitle('inversion profile'); klegend(am_names,'Location','north'); kgrid; xlim tight;
 
 end

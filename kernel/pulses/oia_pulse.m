@@ -22,8 +22,10 @@
 %                  F1(tau) in Table 1 of the paper, that
 %                  accepts a row vector of normalised ti-
 %                  mes in the [-1,1] interval and returns
-%                  a row vector of non-negative amplitudes,
-%                  the scale of which does not matter
+%                  a row vector of non-negative floating-
+%                  point amplitudes that are positive at
+%                  all interior points, the scale of which
+%                  does not matter
 %                  because the envelope is normalised to
 %                  unit peak amplitude internally
 %
@@ -90,9 +92,10 @@ durs=(dur/npts)*ones(1,npts);
 
 % Amplitude function on the [-1,1] interval, unit peak
 am_vals=am_fun(2*time_grid);
-if (~isnumeric(am_vals))||(~isreal(am_vals))||(~isrow(am_vals))||...
-   (numel(am_vals)~=npts)||(~all(isfinite(am_vals)))||any(am_vals<0)||all(am_vals==0)
-    error('am_fun must return a row of non-negative finite real numbers, not all zero.');
+if (~isfloat(am_vals))||(~isreal(am_vals))||(~isrow(am_vals))||...
+   (numel(am_vals)~=npts)||(~all(isfinite(am_vals)))||any(am_vals<0)||...
+   all(am_vals==0)||any(am_vals(2:end-1)==0)
+    error('am_fun must return a row of non-negative finite floating-point numbers, positive inside the pulse.');
 end
 am_vals=am_vals/max(am_vals);
 

@@ -11,12 +11,15 @@
 % Parameters:
 %
 %        npts    - number of discretisation points in
-%                  the waveform, at least 2
+%                  the waveform, a floating-point sca-
+%                  lar integer not smaller than 2
 %
-%        dur     - pulse duration, seconds
+%        dur     - pulse duration, seconds, a positive
+%                  floating-point scalar
 %
 %      bwidth    - sweep bandwidth around zero frequ-
-%                  ency, Hz
+%                  ency, Hz, a positive floating-point
+%                  scalar
 %
 %      am_fun    - amplitude modulation function handle,
 %                  F1(tau) in Table 1 of the paper, that

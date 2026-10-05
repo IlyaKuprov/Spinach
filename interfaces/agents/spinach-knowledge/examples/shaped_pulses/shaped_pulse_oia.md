@@ -10,7 +10,7 @@ A single `1H` spin is built in `sphten-liouv`. For each envelope, `oia_pulse(100
 
 ## Expected result
 
-All six profiles are flat at Mz/M0 = −1 inside the sweep and return to +1 outside it; the Lorentz envelope has the steepest edges and the highest peak amplitude, the HS8 and Sin40 envelopes the lowest peak amplitude. Relative peak amplitudes across the six envelopes agree with the B1(99%) column of Table 1 to within 3%.
+All six profiles are inverted to better than 98% over the central 80% of the sweep (|offset| up to 20 kHz) and retain more than 90% of Mz at 30% beyond the sweep edge (|offset| of 32.5 kHz); the transition bands around |offset| = 25 kHz differ between envelopes, with the Lorentz envelope giving the steepest edges and the highest peak amplitude and the HS8 and Sin40 envelopes the lowest peak amplitude. Relative peak amplitudes across the six envelopes agree with the B1(99%) column of Table 1 to within 3%.
 
 ## References
 

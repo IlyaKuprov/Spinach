@@ -10,7 +10,7 @@ A single `1H` spin is built in `sphten-liouv`. For each envelope, `oia_pulse(100
 
 ## Expected result
 
-All six profiles are inverted to better than 98% over the central 80% of the sweep (|offset| up to 20 kHz) and retain more than 90% of Mz at 30% beyond the sweep edge (|offset| of 32.5 kHz); the transition bands around |offset| = 25 kHz differ between envelopes, with the Lorentz envelope giving the steepest edges and the highest peak amplitude and the HS8 and Sin40 envelopes the lowest peak amplitude. Relative peak amplitudes across the six envelopes agree with the B1(99%) column of Table 1 to within 3%.
+Within the ±30 kHz offset grid of the example, all six profiles are inverted to better than 98% over the central 80% of the sweep (|offset| up to 20 kHz) and rise back towards +1 beyond the 25 kHz sweep edge; the transition bands around |offset| = 25 kHz differ between envelopes, with the Lorentz envelope giving the steepest edges and the highest peak amplitude and the HS8 and Sin40 envelopes the lowest peak amplitude. Retention of Mz beyond the plotted grid (more than 90% at 32.5 kHz) is checked by the regression test, not by this example. Relative peak amplitudes across the six envelopes agree with the B1(99%) column of Table 1 to within 3%.
 
 ## References
 

@@ -1,7 +1,8 @@
 % Offset-independent adiabaticity inversion pulses from Table 1 of
 % Tannus and Garwood (JMR A 120, 133 (1996)): amplitude and frequ-
 % ency modulation functions, and the inversion profiles of a single
-% proton, for a 50 kHz sweep in 2 ms.
+% proton, for a 50 kHz sweep in 2 ms. Reproduces Figure 1 of the
+% paper on a +/-30 kHz offset grid.
 %
 % Calculation time: 16 seconds on 11 workers, most of
 %                   it the parallel pool startup

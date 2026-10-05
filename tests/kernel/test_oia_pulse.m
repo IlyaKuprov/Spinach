@@ -11,8 +11,10 @@
 % quency sweeps match the closed-form sweeps in Table 1 of Tannus
 % and Garwood (JMR A 120, 133 (1996)), and that every amplitude
 % function from that table, as well as an arbitrary smooth one,
-% inverts a single spin uniformly inside the sweep bandwidth and
-% leaves it alone outside.
+% inverts a single spin to better than 98% at 17 offsets across
+% the central 80% of the sweep bandwidth and leaves it at least
+% 90% longitudinal at offsets 30% beyond the sweep edges; the
+% transition bands are not tested.
 %
 % ilya.kuprov@weizmann.ac.il
 

@@ -10,8 +10,8 @@
 %
 % Parameters:
 %
-%        npts    - number of discretization points in
-%                  the waveform
+%        npts    - number of discretisation points in
+%                  the waveform, at least 2
 %
 %        dur     - pulse duration, seconds
 %
@@ -24,28 +24,38 @@
 %                  mes in the [-1,1] interval and returns
 %                  a row vector of non-negative amplitudes,
 %                  the scale of which does not matter
+%                  because the envelope is normalised to
+%                  unit peak amplitude internally
 %
 % Outputs:
 %
 %          Cx    - real part of the waveform, calibrated to
 %                  the same adiabaticity factor as the
-%                  inversion pulse in chirp_pulse.m, rad/s
+%                  inversion pulse in chirp_pulse.m, rad/s,
+%                  a row vector with npts elements
 %
 %          Cy    - imag part of the waveform, calibrated to
 %                  the same adiabaticity factor as the
-%                  inversion pulse in chirp_pulse.m, rad/s
+%                  inversion pulse in chirp_pulse.m, rad/s,
+%                  a row vector with npts elements
 %
 %        durs    - slice durations for piecewise-constant
-%                  approximation, seconds
+%                  approximation, seconds, a row vector
+%                  with npts elements
 %
 %        ints    - interval durations for piecewise-linear
-%                  approximation, seconds
+%                  approximation, seconds, a row vector
+%                  with npts-1 elements
 %
-%        amps    - waveform amplitudes, rad/s
+%        amps    - waveform amplitudes, rad/s, a row
+%                  vector with npts elements
 %
-%        phis    - waveform phases, radians
+%        phis    - waveform phases, radians, zero at the
+%                  centre of the pulse, a row vector with
+%                  npts elements
 %
-%        frqs    - waveform frequencies, Hz
+%        frqs    - waveform frequencies, Hz, a row vector
+%                  with npts elements
 %
 % Note: the amplitude functions in Table 1 of the paper, written
 %       with the 1% edge truncation used there, are
@@ -78,12 +88,13 @@ time_grid=linspace(-0.5,0.5,npts);
 ints=dur*diff(time_grid);
 durs=(dur/npts)*ones(1,npts);
 
-% Amplitude function on the [-1,1] interval
+% Amplitude function on the [-1,1] interval, unit peak
 am_vals=am_fun(2*time_grid);
 if (~isnumeric(am_vals))||(~isreal(am_vals))||(~isrow(am_vals))||...
    (numel(am_vals)~=npts)||(~all(isfinite(am_vals)))||any(am_vals<0)||all(am_vals==0)
     error('am_fun must return a row of non-negative finite real numbers, not all zero.');
 end
+am_vals=am_vals/max(am_vals);
 
 % Sweep rate proportional to the amplitude squared, Eq. 6 in the paper
 sweep_cdf=cumtrapz(time_grid,am_vals.^2);
@@ -95,7 +106,7 @@ phis=2*pi*dur*cumtrapz(time_grid,frqs);
 phis=phis-interp1(time_grid,phis,0,'spline');
 
 % Check sampling adequacy
-phi_jumps=pi*abs(frqs(1:end-1)+frqs(2:end)).*ints;
+phi_jumps=2*pi*max(abs(frqs(1:end-1)),abs(frqs(2:end))).*ints;
 if any(abs(phi_jumps)>pi,'all')&&(nargout<7)
     error('insufficient number of points to sample the pulse.');
 end

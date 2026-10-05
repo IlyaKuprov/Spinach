@@ -3,7 +3,8 @@
 % ency modulation functions, and the inversion profiles of a single
 % proton, for a 50 kHz sweep in 2 ms.
 %
-% Calculation time: seconds
+% Calculation time: 16 seconds on 11 workers, most of
+%                   it the parallel pool startup
 %
 % ilya.kuprov@weizmann.ac.il
 

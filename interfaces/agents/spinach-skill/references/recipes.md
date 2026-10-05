@@ -510,6 +510,14 @@ Four-output Hessian requests with nonempty state-vector keyholes are refused
 even when the configured optimisation method is `lbfgs` or `rbfgs`.
 Analytically designed rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
+Offset-independent adiabaticity inversion pulses (Tannus and Garwood, 1996)
+come from `oia_pulse(npts,dur,bwidth,am_fun)`: an envelope handle that maps a
+`1 x npts` row of times on `[-1,1]` to a finite floating-point row that is
+non-negative and strictly positive at interior samples (zeros allowed only
+at the two ends) in, Eq. 6 frequency sweep out, same output format and
+adiabaticity calibration as `chirp_pulse`; the Table 1 envelopes are one-line
+handles in its header and `shaped_pulses/shaped_pulse_oia.m` reproduces
+Figure 1 of the paper.
 In `zeeman-hilb`, the third output of `shaped_pulse_xy` is the one-sided
 ordered propagator for every method: reuse it as `P*rho*P'`, not `P*rho`;
 requesting it leaves the chosen two-sided state-propagation method unchanged.

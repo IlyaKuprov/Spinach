@@ -31,7 +31,7 @@
 %       state error tolerance; it does not affect track selection.
 %       zte_warr reports a cheap leakage-based time estimate for
 %       this supplied vector and fixed generator. It is not a
-%       guarantee under amplifying dynamics and does not
+%       guarantee, even for unitary dynamics, and does not
 %       certify frequency-domain spectra.
 %
 % Note: further information on how this function works is available 

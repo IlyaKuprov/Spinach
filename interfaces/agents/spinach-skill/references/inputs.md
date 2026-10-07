@@ -498,9 +498,12 @@ be reported as one.
 `sys.tols.zte_tol` selects tracks to discard; `sys.tols.zte_warr` independently
 sets the positive finite absolute state 2-norm tolerance (default `1e-6`).
 After selection, `zte` calls `zte_warr` for a cheap leakage-based time estimate
-in seconds. Initial discarded mass consumes the tolerance; a Frobenius norm
-of the retained-to-discarded Liouvillian block estimates the leakage rate.
-This never changes the projector. The estimate neglects subsequent
-amplification and is not guaranteed under amplifying dynamics. It
-concerns the supplied vector and fixed generator only, not other input
-vectors, numerical propagation error, roundoff, or a `slowpass` spectrum.
+in seconds. Initial discarded mass consumes the tolerance; one `L*x` action
+on the retained initial state supplies the discarded leakage norm. The local
+linear time estimate is capped at the existing `1/cheap_norm(L)` exploration
+step, so zero initial leakage cannot imply infinite validity. This uses one
+matvec plus the explicitly cheap norm, without extracting Liouvillian blocks.
+It never changes the projector and is not a bound even for unitary dynamics:
+later leakage, delayed transfer, cancellation, and amplification are not
+controlled. It concerns only the supplied vector and fixed generator, not
+other preparations, spectra, propagation error, or roundoff.

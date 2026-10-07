@@ -19,17 +19,23 @@
 %    duration    - estimated time in seconds before the absolute
 %                  state 2-norm error reaches tols.zte_warr
 %
-% Notes: for retained coordinates S and discarded coordinates D,
-%        the estimate is max(0,tolerance-d)/(b*r), with d=norm(rho(D)),
-%        r=norm(rho(S)), and b=norm(L(D,S),'fro'). The Frobenius norm
-%        cheaply bounds the leakage block's spectral norm. This
-%        linear leakage estimate neglects subsequent amplification;
-%        it is not guaranteed under amplifying dynamics.
-%        Initial discard at or above tolerance gives zero seconds;
-%        zero estimated leakage otherwise gives Inf. No reduction
-%        or a zero input state gives Inf. Only the supplied vector
-%        and fixed generator are covered, not a slowpass spectrum,
-%        numerical propagation error, or roundoff.
+% Notes: initial discarded norm d consumes the error tolerance. The
+%        leakage rate r is the discarded norm of L acting on the
+%        retained initial state. The local estimate (tolerance-d)/r
+%        is capped at 1/cheap_norm(L), the ZTE exploration step.
+%        The cap prevents extrapolation beyond this short probe
+%        scale when initial leakage vanishes or cancels; it is NOT
+%        an error bound. Later leakage and amplification are not
+%        controlled, even for unitary dynamics. Zero initial rate
+%        gives the exploration step, not infinite validity.
+%        Initial discard at or above tolerance gives zero; no
+%        reduction or a zero input state gives Inf. A zero generator
+%        with nonzero state gives NaN (no informative leakage time).
+%        Only the supplied vector and fixed generator are covered,
+%        not spectra, numerical propagation error, or roundoff.
+%        L must be finite; only its action and cheap norm are checked.
+%        Apart from cheap_norm (CPU 1-norm, GPU infinity-norm),
+%        only one matrix-vector product and vector operations occur.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -45,17 +51,28 @@ else
     retained=any(projector,2);
 end
 
-% Estimate the initial error and the retained-to-discarded leakage rate
-discarded=norm(rho(~retained));
-rate=norm(L(~retained,retained),'fro')*norm(rho(retained));
-duration=Inf;
+% Account for initial discard and exact unchanged-state cases
+discarded=norm(rho(~retained)); duration=NaN;
 if discarded>=spin_system.tols.zte_warr
     duration=0;
-elseif rate>0
-    duration=(spin_system.tols.zte_warr-discarded)/rate;
+elseif all(retained)||~any(rho)
+    duration=Inf;
+else
+
+    % Evaluate the initial leakage using only the retained state
+    rho(~retained)=0; action=L*rho;
+    rate=norm(action(~retained)); scale=cheap_norm(L);
+    if any(~isfinite(action))||~isfinite(scale)
+        error('non-finite ZTE leakage probe; L must be finite.');
+    end
+
+    % Cap the local extrapolation at the ZTE exploration step
+    if scale>0
+        duration=min((spin_system.tols.zte_warr-discarded)/rate,1/scale);
+    end
 end
 
-% Report the estimate without claiming a error guarantee
+% Report the estimate without claiming an error guarantee
 report(spin_system,['ZTE warranty estimate: absolute 2-norm tolerance ' ...
                     num2str(spin_system.tols.zte_warr,17) ', estimated time ' ...
                     num2str(duration,17) ' seconds (supplied vector, fixed generator; not a guarantee).']);
@@ -64,9 +81,8 @@ end
 
 % Input validation function
 function grumble(spin_system,L,rho,projector)
-if (~isnumeric(L))||(~ismatrix(L))||(size(L,1)~=size(L,2))||...
-   any(~isfinite(nonzeros(L)))
-    error('L must be a finite square numeric matrix.');
+if (~isnumeric(L))||(~ismatrix(L))||(size(L,1)~=size(L,2))
+    error('L must be a square numeric matrix.');
 end
 if (~isnumeric(rho))||(size(rho,2)~=1)||(size(rho,1)~=size(L,1))||...
    any(~isfinite(nonzeros(rho)))

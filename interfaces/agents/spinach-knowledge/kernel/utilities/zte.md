@@ -26,9 +26,10 @@ After selection, `zte` calls `zte_warr(spin_system,L,rho,projector)` to report
 a cheap leakage-based time estimate for the absolute state 2-norm tolerance
 `sys.tols.zte_warr` (default `1e-6`). This independent positive finite tolerance
 never changes pruning. The helper uses the initial discarded norm and the
-Frobenius norm of the retained-to-discarded Liouvillian block; see `zte_warr.md`.
-The estimate neglects subsequent amplification and is not guaranteed under
-amplifying dynamics. It concerns only the supplied vector and fixed
+discarded norm of one Liouvillian action on the retained initial state,
+capped at the ZTE exploration time step; see `zte_warr.md`.
+The local extrapolation is not a bound, even for unitary dynamics; later
+leakage, cancellation, and amplification are uncontrolled. It concerns only the supplied vector and fixed
 generator, not other preparations or a frequency-domain `slowpass` spectrum.
 
 ## Inputs and outputs

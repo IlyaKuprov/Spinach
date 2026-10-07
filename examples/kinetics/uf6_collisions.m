@@ -13,9 +13,10 @@
 % elimination. Each absorptive spectrum is divided by its own maximum
 % to compare line shapes, not absolute peak intensities.
 %
-% Calculation time: about two minutes with four Xeon Gold 5118 workers.
+% Calculation time: minutes.
 %
-% talos@spindynamics.org
+% kjfritz@sandia.gov
+% ilya.kuprov@weizmann.ac.il
 
 function uf6_collisions()
 

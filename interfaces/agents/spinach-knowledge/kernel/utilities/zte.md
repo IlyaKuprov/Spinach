@@ -20,10 +20,43 @@
 - The default tolerance may be altered by setting `sys.tols.zte_tol` before calling `create.m`.
 - If tiny interactions or nearly equivalent spins are present, it is best to disable zero track elimination by adding `'zte'` to the `sys.disable` cell array.
 
+## Supplied-vector warranty
+
+After selection, `zte` reports a conservative validity time in seconds for the
+absolute state 2-norm error, using `sys.tols.zte_warr` (default `1e-6`). This
+independent positive finite tolerance never changes pruning decisions. A bound
+on the total 2-norm also bounds each component; it is not normalised by the
+input norm or the Liouvillian norm.
+
+For `A=-1i*L`, retained coordinates S, discarded coordinates D, and coordinate
+embedding P, compare `exp(A*t)*rho` with `P*exp(P'*A*P*t)*P'*rho`. Let
+d=`norm(rho(D),2)`, r=`norm(rho(S),2)`, and
+b=`sqrt(norm(A(D,S),1))*sqrt(norm(A(D,S),inf))`. A non-negative Gershgorin
+upper bound alpha on the largest eigenvalue of `(A+A')/2` bounds both full
+and compressed semigroup norms. Duhamel's formula then gives the error bound
+`exp(alpha*t)*(d+b*r*t)`. The reported interval starts at zero and ends at a
+conservative scalar root for the warranty tolerance, evaluated in the log
+domain. Sparse scans require no eigensolver or dense matrix temporary.
+
+Skipped elimination, an unchanged space, and an exact invariant retained
+space with no initial discarded mass have infinite truncation warranty.
+Initial discarded mass above the warranty tolerance gives no interval, not
+even at zero. Positive initial discard with zero leakage and zero growth
+has infinite warranty when that discard is within tolerance. An unrepresentably
+large finite root is capped at the largest representable finite time.
+
+This is an exact-arithmetic truncation bound, not a certification of roundoff
+or propagation accuracy. It applies only to the supplied vector evolving under
+the same fixed generator. In particular, a coil-seeded call from `reduce`
+does not certify an arbitrary preparation, observable, or frequency-domain
+`slowpass` spectrum. Non-normal amplification is included through alpha;
+Gershgorin can make the interval very short without implying that the actual
+error becomes large after that time.
+
 ## Inputs and outputs
 
 Inputs:
-- `spin_system` — spin system object supplying tolerances (`zte_tol`, `zte_maxden`, `zte_nsteps`), formalism, and the `sys.disable` list.
+- `spin_system` — spin system object supplying tolerances (`zte_tol`, `zte_warr`, `zte_maxden`, `zte_nsteps`), formalism, and the `sys.disable` list.
 - `L` — the Liouvillian used for time propagation; must be square and dimensionally consistent with `rho`.
 - `rho` — the initial state vector for time propagation.
 - `nstates` (optional) — if specified, only the `nstates` most populated states are kept, irrespective of the tolerance parameter.

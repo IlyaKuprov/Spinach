@@ -203,6 +203,17 @@ else
                         pad(num2str(spin_system.tols.zte_tol,'%0.8e'),20) ' (safe default)']);
 end
 
+% ZTE absolute state error warranty tolerance
+if isfield(sys,'tols')&&isfield(sys.tols,'zte_warr')
+    spin_system.tols.zte_warr=sys.tols.zte_warr; sys.tols=rmfield(sys.tols,'zte_warr');
+    report(spin_system,[pad('ZTE absolute state error warranty tolerance',65) ...
+                        pad(num2str(spin_system.tols.zte_warr,'%0.8e'),20) ' (user-specified)']);
+else
+    spin_system.tols.zte_warr=1e-6;
+    report(spin_system,[pad('ZTE absolute state error warranty tolerance',65) ...
+                        pad(num2str(spin_system.tols.zte_warr,'%0.8e'),20) ' (safe default)']);
+end
+
 % ZTE state vector density threshold 
 if isfield(sys,'tols')&&isfield(sys.tols,'zte_maxden')
     spin_system.tols.zte_maxden=sys.tols.zte_maxden; sys.tols=rmfield(sys.tols,'zte_maxden');
@@ -437,6 +448,13 @@ if isfield(sys,'tols')&&isfield(sys.tols,'zte_nsteps')
         error('sys.tols.zte_tol must be a positive real integer.');
     end
 end
+if isfield(sys,'tols')&&isfield(sys.tols,'zte_warr')
+    if (~isnumeric(sys.tols.zte_warr))||(~isreal(sys.tols.zte_warr))||...
+       (~isscalar(sys.tols.zte_warr))||(~isfinite(sys.tols.zte_warr))||...
+       (sys.tols.zte_warr<=0)
+        error('sys.tols.zte_warr must be a finite positive real scalar.');
+    end
+end
 if isfield(sys,'tols')&&isfield(sys.tols,'zte_maxden')
     if (~isnumeric(sys.tols.zte_maxden))||(~isreal(sys.tols.zte_maxden))||...
        (~isscalar(sys.tols.zte_maxden))||(sys.tols.zte_maxden<0)||...
@@ -516,4 +534,5 @@ end
 % is the sport of every wind. 
 %
 % Thomas Jefferson
+
 

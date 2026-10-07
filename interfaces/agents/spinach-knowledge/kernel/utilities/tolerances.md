@@ -20,6 +20,7 @@ Sets the accuracy cut-offs, constants and tolerances used by the Spinach kernel.
 - Steady state convergence tolerance `stst_tol`: `eps()` when paranoid, `1e-6` when cowboy, `1e-8` safe default.
 - ZTE sample length `zte_nsteps`: `16` when cowboy, `NaN` (ZTE disabled) when paranoid, `32` safe default.
 - ZTE zero track tolerance `zte_tol`: `1e-6` when cowboy, `NaN` (ZTE disabled) when paranoid, `1e-24` safe default.
+- ZTE absolute state error warranty `zte_warr`: finite positive real scalar, `1e-6` default in every preset; independent of the track drop threshold and overridden through `sys.tols.zte_warr`.
 - ZTE state vector density threshold `zte_maxden`: `NaN` (ZTE disabled) when paranoid, `0.5` safe default; there is no cowboy branch.
 - Proximity tolerance for dipolar couplings `prox_cutoff` (Angstrom): `inf()` when paranoid, `3.5` when cowboy, `100` safe default. The source carries a TODO note to replace this with an energy tolerance.
 - Krylov method switchover `krylov_tol`: `10000` safe default; no paranoid or cowboy branches.

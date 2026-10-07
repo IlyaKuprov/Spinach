@@ -496,12 +496,11 @@ be reported as one.
 ### Zero track elimination warranty
 
 `sys.tols.zte_tol` selects tracks to discard; `sys.tols.zte_warr` independently
-sets the positive finite absolute state-error budget (default `1e-6`). After
-selection, `zte` reports a conservative time interval in seconds over which
-its Duhamel bound on the supplied vector's total 2-norm error stays within
-that budget. The same bound covers each component without normalisation.
-This report never changes the projector. It assumes the same fixed generator
-and excludes numerical roundoff and propagation error. A coil-seeded reduction
-does not certify other input vectors or a frequency-domain spectrum. A short
-interval can reflect conservative non-normal growth bounds rather than a
-large measured error.
+sets the positive finite absolute state 2-norm tolerance (default `1e-6`).
+After selection, `zte` calls `zte_warr` for a cheap leakage-based time estimate
+in seconds. Initial discarded mass consumes the tolerance; a Frobenius norm
+of the retained-to-discarded Liouvillian block estimates the leakage rate.
+This never changes the projector. The estimate neglects subsequent
+amplification and is not guaranteed under general non-normal growth. It
+concerns the supplied vector and fixed generator only, not other input
+vectors, numerical propagation error, roundoff, or a `slowpass` spectrum.

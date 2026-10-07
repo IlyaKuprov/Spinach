@@ -257,6 +257,18 @@ species are at exchange equilibrium, their concentrations in inverse ratio
 to the forward and backward rates. `equilibrate(K,c0)` returns the
 equilibrium concentrations of the linear network `dc/dt=K*c`.
 
+For a compact exchange-plus-quadrupolar-relaxation demonstration, see
+`examples/relaxation/uf6_collisions.m`. It sweeps the forward collision
+rate while holding the reverse lifetime and rotational correlation time
+fixed, recomputes stationary populations, and uses chemical-population-
+weighted excitation. The full laboratory-frame `slowpass` calculation
+explicitly disables ZTE and plots individually peak-normalised spectra.
+Its representative F/U pair and phenomenological distorted state are not
+a full UF6 molecule or calibrated liquid-state prediction. Keep collision
+frequency, distorted-state lifetime, and rotational correlation time
+separate when adapting this model; scaling both exchange rates preserves
+populations but is a different physical scan.
+
 Magnetisation transport between individual spins, as opposed to conversion
 between whole species, uses a different pair of fields:
 

@@ -15,6 +15,7 @@ function noesyhsqc_ubiquitin_deut()
 options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
+options.csa_file='1D3Z.csa';
 options.deuterate={'HA','HB','HB1','HB2','HB3','HG','HG1','HG2','HG3',...
                    'HD','HD1','HD2','HD3','HE','HE1','HE2','HE3','HZ',...
                    'HZ1','HZ2','HZ3','HH','HH1','HH2','HH3'};

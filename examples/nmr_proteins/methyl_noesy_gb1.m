@@ -14,6 +14,7 @@ options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
 options.deuterate='non-Me';
+options.csa_file='2N9K.csa';
 [sys,inter]=protein('2N9K.pdb','2N9K.bmrb',options);
 
 % Magnet field

@@ -13,6 +13,7 @@ function noesyhsqc_ubiquitin_prot()
 options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
+options.csa_file='1D3Z.csa';
 [sys,inter]=protein('1D3Z.pdb','1D3Z.bmrb',options);
 
 % Magnet field

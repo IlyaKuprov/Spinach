@@ -41,7 +41,21 @@
 %          'tcb' for H:[7.00 0.00 -7.00], N:[-125.0 45.0 80.0] ppm
 %          'pol' for H:[6.66 0.66 -7.33], N:[ -92.4 34.7 57.7] ppm
 %
-%                     the default is 'tcb'.
+%                     the default is 'tcb' without csa_file. When
+%                     explicitly set with csa_file, guessed amide N/H
+%                     tensors override imported anisotropy, with a warning.
+%
+% options.csa_file  - character string naming a canonical AFNMR CSA
+%                     table in ppm: five # comment lines, followed by
+%                     four-line blocks (serial name resname resnum, then
+%                     three rows of three numbers). Tensors must be finite
+%                     and traceless within four-decimal rounding. Full
+%                     non-symmetric Gaussian printed rows are kept as
+%                     supplied, without transposition or symmetrisation.
+%                     Every retained atom must match its PDB serial and
+%                     labels; unretained table atoms are allowed. BMRB
+%                     isotropic shifts are unchanged; CSA guessing is
+%                     disabled unless nh_csa is explicitly specified.
 %
 % Outputs:
 %
@@ -286,8 +300,12 @@ end
 % Estimate J-couplings
 scalar_couplings=guess_j_pro(pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords);
 
-% Estimate chemical shielding anisotropies
-CSAs=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords,options);
+% Estimate chemical shielding anisotropies only when requested
+if ~isfield(options,'csa_file')
+    CSAs=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords,options);
+else
+    CSAs=cell(numel(pdb_atom_id),1);
+end
 
 % Assign isotopes and labels
 isotopes=cell(1,numel(pdb_atom_id));
@@ -372,6 +390,85 @@ else
     % Complain and bomb out
     error('incorrect value of options.noshift parameter.');
     
+end
+
+% Import CSA tensors for retained atoms without changing isotropic shifts
+if isfield(options,'csa_file')
+
+    % Check the canonical five-line header and four-line block layout
+    csa_lines=splitlines(string(strtrim(fileread(options.csa_file))));
+    if (numel(csa_lines)<9)||(~all(startsWith(csa_lines(1:5),'#')))||...
+       (mod(numel(csa_lines)-5,4)~=0)
+        error('CSA file must have five # comment lines and four-line atom blocks.');
+    end
+
+    % Allocate identifiers and full Gaussian-row tensors
+    nblocks=(numel(csa_lines)-5)/4;
+    csa_ser=zeros(nblocks,1); csa_num=zeros(nblocks,1);
+    csa_id=cell(nblocks,1); csa_typ=cell(nblocks,1);
+    csa_mat=cell(nblocks,1);
+    for n=1:nblocks
+
+        % Read the serial number and original PDB labels
+        tokens=strsplit(char(strtrim(csa_lines(4*n+2))));
+        if numel(tokens)~=4
+            error('CSA atom header must contain serial name resname resnum.');
+        end
+        csa_ser(n)=str2double(tokens{1}); csa_num(n)=str2double(tokens{4});
+        csa_id{n}=tokens{2}; csa_typ{n}=tokens{3};
+        if (~isreal(csa_ser(n)))||(~isreal(csa_num(n)))||...
+           (~isfinite(csa_ser(n)))||(csa_ser(n)<=0)||(mod(csa_ser(n),1)~=0)||...
+           (~isfinite(csa_num(n)))||(mod(csa_num(n),1)~=0)
+            error('CSA atom serial and residue numbers must be finite integers, with positive serials.');
+        end
+
+        % Read three complete finite rows without transposition
+        csa_mat{n}=zeros(3);
+        for k=1:3
+            tokens=strsplit(char(strtrim(csa_lines(4*n+2+k))));
+            values=str2double(tokens);
+            if (numel(values)~=3)||(~isreal(values))||(~all(isfinite(values)))
+                error('CSA tensor rows must contain three finite real numbers.');
+            end
+            csa_mat{n}(k,:)=values;
+        end
+
+        % Allow only the trace residual from four-decimal rounding
+        if abs(trace(csa_mat{n}))>1.5e-4+3*eps(max(abs(diag(csa_mat{n}))))
+            error('CSA tensors must be traceless within four-decimal rounding.');
+        end
+    end
+
+    % Reject ambiguous serial numbers rather than merging atoms
+    if numel(unique(csa_ser))~=nblocks
+        error('CSA file contains duplicate atom serial numbers.');
+    end
+    if numel(unique(pdb_ser(subset)))~=nnz(subset)
+        error('Retained PDB atoms have ambiguous duplicate serial numbers.');
+    end
+
+    % Match serials and labels after selection and missing-shift deletion
+    for n=find(subset)'
+        atom=find(csa_ser==pdb_ser(n));
+        if isempty(atom)
+            error(['CSA tensor missing for retained PDB atom ' num2str(pdb_ser(n)) '.']);
+        end
+        if (csa_num(atom)~=pdb_aa_num(n))||...
+           (~strcmp(csa_id{atom},pdb_atom_id{n}))||...
+           (~strcmp(csa_typ{atom},pdb_aa_typ{n}))
+            error(['CSA labels do not match PDB atom ' num2str(pdb_ser(n)) '.']);
+        end
+        CSAs{n}=csa_mat{atom};
+    end
+
+    % Override only amide N/H tensors that the existing estimator supplies
+    if isfield(options,'nh_csa')
+        warning('protein:nh_csa_override',...
+                'options.nh_csa overrides imported amide N/H anisotropy; isotropic shifts are unchanged.');
+        guessed_csa=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords,options);
+        override=ismember(pdb_atom_id,{'N','H'})&(~cellfun(@isempty,guessed_csa));
+        CSAs(override)=guessed_csa(override);
+    end
 end
 
 % Deuterate specified protons
@@ -506,6 +603,16 @@ elseif (~ischar(options.noshift))||...
        (~ismember(options.noshift,{'keep','delete'}))
     error('options.noshift must be ''keep'' or ''delete''.');
 end
+if isfield(options,'csa_file')
+    if (~ischar(options.csa_file))||isempty(options.csa_file)||...
+       (~isrow(options.csa_file))||(~isfile(options.csa_file))
+        error('options.csa_file must name an existing file as a non-empty character row vector.');
+    end
+end
+if isfield(options,'nh_csa')&&((~ischar(options.nh_csa))||...
+   (~ismember(options.nh_csa,{'tcb','bax','pol'})))
+    error('options.nh_csa must be ''tcb'', ''bax'', or ''pol''.');
+end
 if iscell(options.deuterate)
     if ~all(cellfun(@ischar,options.deuterate),'all')
         error('options.deuterate cell array must contain character strings.');
@@ -521,4 +628,5 @@ end
 % it, the bigger reward you got.
 %
 % Ayn Rand, "Atlas Shrugged"
+
 

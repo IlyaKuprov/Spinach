@@ -159,7 +159,7 @@ else
 end
 
 % Estimate the supplied-vector truncation time
-zte_warr(spin_system,L,rho,projector);
+if ~strcmp(spin_system.sys.output,'hush'), zte_warr(spin_system,L,rho,projector); end
 
 end
 

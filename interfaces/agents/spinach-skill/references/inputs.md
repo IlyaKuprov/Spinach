@@ -439,7 +439,14 @@ Karplus curves and literature values and CSAs from local geometry.
 from a multi-molecule PDB; `options.noshift` is `'keep'` (unassigned atoms
 placed between -1 and 0 ppm) or `'delete'`; `options.deuterate` is a cell array
 of PDB identifiers, or `'non-Me'`; `options.nh_csa` selects the peptide bond
-CSA set, `'bax'`, `'tcb'` (default) or `'pol'`. Outputs include `sys.labels`
+CSA set, `'bax'`, `'tcb'` (default without a CSA file) or `'pol'`.
+`options.csa_file` imports canonical AFNMR traceless tensors in ppm (five
+comment lines, then atom header `serial name resname resnum` and three
+matrix rows per atom). Every retained atom must match its PDB serial and
+labels. Full Gaussian-row matrices are preserved, and BMRB scalar shifts
+are unchanged. With a file, only an explicitly supplied `nh_csa` triggers
+guessing: it warns and overwrites available amide N/H tensors, keeping
+other imported anisotropies. Outputs include `sys.labels`
 with IUPAC atom labels, `inter.coordinates` in angstrom, `inter.zeeman.scalar`
 and `inter.zeeman.matrix` in ppm, `inter.coupling.scalar` in Hz, and `aux` with
 residue numbers and types.

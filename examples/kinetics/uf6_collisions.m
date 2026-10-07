@@ -46,8 +46,8 @@ bas.approximation='none';
 sys.disable={'zte'};
 sys.parallel={'processes',4};
 
-% Forward collision rates and fixed reverse rate, in inverse seconds
-collision_rates=[1e10 3e10 9e10 3e11 1e12 3e12 1e13 9e13];
+% Forward collision rates and fixed reverse rate, in Hz
+collision_rates=[1e10 3e10 1e11 3e11 1e12 3e12 1e13 3e13];
 reverse_rate=1e12;
 
 % Laboratory frequency window about the unshifted fluorine resonance

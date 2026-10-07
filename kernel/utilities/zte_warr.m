@@ -64,11 +64,13 @@ end
 
 % Input validation function
 function grumble(spin_system,L,rho,projector)
-if (~isnumeric(L))||(~ismatrix(L))||(size(L,1)~=size(L,2))
-    error('L must be a square numeric matrix.');
+if (~isnumeric(L))||(~ismatrix(L))||(size(L,1)~=size(L,2))||...
+   any(~isfinite(nonzeros(L)))
+    error('L must be a finite square numeric matrix.');
 end
-if (~isnumeric(rho))||(size(rho,2)~=1)||(size(rho,1)~=size(L,1))
-    error('rho must be a column vector matching L.');
+if (~isnumeric(rho))||(size(rho,2)~=1)||(size(rho,1)~=size(L,1))||...
+   any(~isfinite(nonzeros(rho)))
+    error('rho must be a finite column vector matching L.');
 end
 if (~isnumeric(projector))||(~ismatrix(projector))||...
    (~isequal(projector,1)&&(size(projector,1)~=size(L,1)))

@@ -501,6 +501,6 @@ After selection, `zte` calls `zte_warr` for a cheap leakage-based time estimate
 in seconds. Initial discarded mass consumes the tolerance; a Frobenius norm
 of the retained-to-discarded Liouvillian block estimates the leakage rate.
 This never changes the projector. The estimate neglects subsequent
-amplification and is not guaranteed under general non-normal growth. It
+amplification and is not guaranteed under amplifying dynamics. It
 concerns the supplied vector and fixed generator only, not other input
 vectors, numerical propagation error, roundoff, or a `slowpass` spectrum.

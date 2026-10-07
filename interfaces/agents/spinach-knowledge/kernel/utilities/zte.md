@@ -28,7 +28,7 @@ a cheap leakage-based time estimate for the absolute state 2-norm tolerance
 never changes pruning. The helper uses the initial discarded norm and the
 Frobenius norm of the retained-to-discarded Liouvillian block; see `zte_warr.md`.
 The estimate neglects subsequent amplification and is not guaranteed under
-general non-normal growth. It concerns only the supplied vector and fixed
+amplifying dynamics. It concerns only the supplied vector and fixed
 generator, not other preparations or a frequency-domain `slowpass` spectrum.
 
 ## Inputs and outputs

@@ -24,7 +24,7 @@
 %        r=norm(rho(S)), and b=norm(L(D,S),'fro'). The Frobenius norm
 %        cheaply bounds the leakage block's spectral norm. This
 %        linear leakage estimate neglects subsequent amplification;
-%        it is not guaranteed under general non-normal growth.
+%        it is not guaranteed under amplifying dynamics.
 %        Initial discard at or above tolerance gives zero seconds;
 %        zero estimated leakage otherwise gives Inf. No reduction
 %        or a zero input state gives Inf. Only the supplied vector
@@ -55,7 +55,7 @@ elseif rate>0
     duration=(spin_system.tols.zte_warr-discarded)/rate;
 end
 
-% Report the estimate without claiming a general error guarantee
+% Report the estimate without claiming a error guarantee
 report(spin_system,['ZTE warranty estimate: absolute 2-norm tolerance ' ...
                     num2str(spin_system.tols.zte_warr,17) ', estimated time ' ...
                     num2str(duration,17) ' seconds (supplied vector, fixed generator; not a guarantee).']);

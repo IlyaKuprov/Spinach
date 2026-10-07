@@ -13,7 +13,7 @@ or above the tolerance gives zero; zero estimated leakage otherwise gives
 `Inf`. No reduction and zero input states give `Inf`.
 
 This is a linear leakage estimate, not a general guarantee: subsequent
-amplification, including non-normal growth, is neglected. An `Inf` estimate
+amplification, whether the generator is normal or non-normal, is neglected. An `Inf` estimate
 with nonzero initial discard does not certify its later evolution. Only the
 supplied vector and fixed generator are considered; other preparations,
 frequency-domain `slowpass` spectra, propagation error, and roundoff are not

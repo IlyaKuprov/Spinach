@@ -16,6 +16,9 @@ inter.coupling.scalar{2,1}=10;
 % Preallocate the answer
 answer=zeros(7,3,'like',1i);
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Run the tests
 formalisms={'zeeman-hilb','zeeman-liouv','sphten-liouv'};
 for n=1:numel(formalisms)

@@ -34,6 +34,9 @@ inter.tau_c={200e-12};
 % Proximity cut-off
 sys.tols.prox_cutoff=4.0;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

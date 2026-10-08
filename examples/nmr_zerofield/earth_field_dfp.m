@@ -76,6 +76,9 @@ for n=1:numel(R_14N)
     inter.r1_rates={0.22 0.22 0.22 0.22 0.22 R_14N(n)};
     inter.r2_rates={0.22 0.22 0.22 0.22 0.22 R_14N(n)};
 
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);

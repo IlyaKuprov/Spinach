@@ -58,6 +58,9 @@ for n=1:numel(field_grid)
         % Set correlation time      
         inter.tau_c={tau_c(k)};
   
+        % Enable zero track elimination
+        sys.enable={'zte'};
+
         % Spinach housekeeping
         spin_system=create(sys,inter);  
         spin_system=basis(spin_system,bas);

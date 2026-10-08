@@ -46,7 +46,7 @@ bas.inter_level=3;
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
-sys.enable={'greedy','polyadic'}; % 'gpu'
+sys.enable={'zte','greedy','polyadic'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -83,7 +83,7 @@ sys.magnet=9.4;
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
-sys.enable={'greedy','polyadic','gpu'};
+sys.enable={'zte','greedy','polyadic','gpu'};
 
 % Second conformation
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,2,124.2);

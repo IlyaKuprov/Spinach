@@ -52,6 +52,9 @@ bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
 bas.inter_level=4;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

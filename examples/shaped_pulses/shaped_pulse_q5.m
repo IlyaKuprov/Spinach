@@ -29,6 +29,9 @@ bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
 bas.prox_level=1;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

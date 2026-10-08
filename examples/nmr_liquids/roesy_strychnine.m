@@ -25,7 +25,7 @@ inter.rlx_keep='secular';
 inter.tau_c={200e-12};
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 sys.disable={'krylov'};
 sys.tols.prox_cutoff=4.0;
 

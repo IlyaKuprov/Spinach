@@ -29,7 +29,7 @@ sys.tols.rlx_integration=1e-5;
 sys.tols.rlx_zero=1e-5;
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';

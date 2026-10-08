@@ -62,6 +62,9 @@ inter.chem.flux_rate(1:4,11:20)=20;
 inter.chem.flux_rate(11:20,1:4)=20;
 inter.chem.flux_type='intermolecular';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

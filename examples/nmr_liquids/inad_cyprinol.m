@@ -17,7 +17,7 @@ function inad_cyprinol()
 sys.magnet=11.7;
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set

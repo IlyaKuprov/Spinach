@@ -74,6 +74,9 @@ errfun(best_fit);
         inter.equilibrium='zero';
         inter.rlx_keep='diagonal';
 
+        % Enable zero track elimination
+        sys.enable={'zte'};
+
         % Spinach housekeeping
         spin_system=create(sys,inter);
         spin_system=basis(spin_system,bas);

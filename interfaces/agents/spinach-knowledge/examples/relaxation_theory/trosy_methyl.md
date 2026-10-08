@@ -6,7 +6,7 @@
 
 Simulates methyl TROSY for a rapidly rotating `13CH3` group in a slowly tumbling protein using the source's Fokker-Planck formalism. The source estimates a calculation time of minutes and sets the field parameter to `14.1`; no unit is annotated. It represents the three methyl orientations as three four-spin rotamers, for a 12-spin system containing one carbon and three protons in each rotamer. The proton positions are cyclically permuted between rotamers, their populations are equal, and the source supplies a three-state jump-rate matrix. It sets `tau_m = 1e-11` and `k_jump = 1/(2*tau_m)`; no unit is annotated for these values.
 
-The shielding tensors are source-provided DFT values converted to chemical-shift tensors. The three methyl-proton shifts are described in the source as guesses and adjusted by `0.8`, `1.0`, and `1.2`. Intramethyl scalar-coupling entries are set to `125` for each carbon-proton pair and `-12` for each proton-proton pair; the source does not annotate units for these entries. The system uses the full `sphten-liouv` basis, disables `zte`, and sets `tau_c = 50e-9` (no unit is annotated for this parameter) with maximum rank 3.
+The shielding tensors are source-provided DFT values converted to chemical-shift tensors. The three methyl-proton shifts are described in the source as guesses and adjusted by `0.8`, `1.0`, and `1.2`. Intramethyl scalar-coupling entries are set to `125` for each carbon-proton pair and `-12` for each proton-proton pair; the source does not annotate units for these entries. The system uses the full `sphten-liouv` basis, leaves `zte` off by default, and sets `tau_c = 50e-9` (no unit is annotated for this parameter) with maximum rank 3.
 
 ## Simulated spectra
 

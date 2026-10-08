@@ -16,6 +16,9 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'E','C3'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Formalism and basis
 bas.formalism='zeeman-liouv';
 bas.approximation='none';

@@ -51,6 +51,9 @@ sys.parallel={'processes',240};
 sys.tols.prop_chop=1e-14;
 sys.tols.stst_tol=1e-10;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

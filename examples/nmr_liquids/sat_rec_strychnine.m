@@ -17,7 +17,7 @@ sys.magnet=5.9;
 sys.tols.prox_cutoff=5.0;
 
 % Greedy parallelisation
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};

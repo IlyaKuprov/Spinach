@@ -375,7 +375,7 @@ for normalisation and the real sweep is `parameters.fields` in tesla, alongside
 `parameters.rates` in hertz, `parameters.electrons` and
 `parameters.needs={'zeeman_op'}`. The basis carries `bas.projections={0}` and
 permutation symmetry on equivalent protons via `bas.sym_spins`/`bas.sym_group`,
-and `sys.disable={'zte'}` is required because the singlet start state is not
+and ZTE must remain off (do not add `'zte'` to `sys.enable`) because the singlet start state is not
 the thermal one. For Haberkorn or Jones-Hore kinetics use `@rydmr` with
 `inter.chem.rp_theory`, `rp_electrons` and `rp_rates` (Hz) supplied together;
 the two routes must not be mixed. Yield anisotropy uses `powder` with

@@ -62,6 +62,9 @@ field_grid=linspace(1,10,64);
 % Preallocate result
 answer=zeros(numel(parameters.mw_frq),numel(field_grid));
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Loop over magnet fields
 parfor n=1:numel(field_grid)
     

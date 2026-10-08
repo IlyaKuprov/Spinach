@@ -55,6 +55,9 @@ inter.r2_rates={200000 50e3};
 inter.rlx_keep='diagonal';
 inter.equilibrium='dibari';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

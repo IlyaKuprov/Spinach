@@ -37,7 +37,7 @@ bas.connectivity='scalar_couplings';
 bas.inter_level=2; bas.prox_level=2;         % Pairwise approximation
 
 % Algorithmic options
-sys.enable={'prop_cache','op_cache','greedy'};
+sys.enable={'zte','prop_cache','op_cache','greedy'};
 
 % Create the spin system structure
 spin_system=create(sys,inter);

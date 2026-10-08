@@ -40,7 +40,7 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Do the housekeeping
 sys.magnet=polarization_field;

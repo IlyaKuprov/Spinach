@@ -5,6 +5,9 @@
 
 function normalization_1()
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % System specification
 sys.magnet=14.1;
 sys.isotopes={'1H','235U'};

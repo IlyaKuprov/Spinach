@@ -26,7 +26,7 @@ bas.approximation='none';
 sys.disable={'pt'};
 
 % This is here essential
-sys.enable={'polyadic'}; % 'gpu'
+sys.enable={'zte','polyadic'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

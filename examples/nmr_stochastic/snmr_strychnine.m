@@ -32,6 +32,9 @@ inter.tau_c={200e-12};
 % Use GPU arithmetic
 % sys.enable={'gpu'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

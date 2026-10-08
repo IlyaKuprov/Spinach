@@ -14,7 +14,7 @@ The source first checks whether trajectory-level reduction is disabled by `spin_
 
 For `zeeman-hilb` and `zeeman-wavef`, the code uses supplied permutation-symmetry irreducible-representation projectors when symmetry treatment is enabled and that information is available. Zero-dimensional irreps are dropped; the state contribution is also screened against `spin_system.tols.irrep_drop`. These formalisms use symmetry screening rather than the Liouville-space zero-track and path-tracing stages.
 
-For `zeeman-liouv` and `sphten-liouv`, the code tries symmetry factorisation when available and not disabled, then applies zero-track elimination and path tracing to identify disconnected subspaces. Disabling symmetry skips that factorisation; the zero-track and path-tracing stages remain part of this formalism's route. The detailed reductions therefore depend on the chosen formalism, supplied symmetry data, input state, and configured tolerances.
+For `zeeman-liouv` and `sphten-liouv`, the code tries symmetry factorisation when available and not disabled, then applies zero-track elimination when enabled and path tracing to identify disconnected subspaces. Disabling symmetry skips that factorisation; the zero-track and path-tracing stages remain part of this formalism's route, but zero-track elimination returns an identity projector unless `'zte'` is present in `sys.enable`. The detailed reductions therefore depend on the chosen formalism, supplied symmetry data, input state, and configured tolerances.
 
 ## Inputs and returned projectors
 

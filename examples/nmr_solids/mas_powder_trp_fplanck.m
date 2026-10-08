@@ -44,6 +44,9 @@ sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
 % sys.enable={'gpu'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -75,7 +78,7 @@ sys.magnet=9.4;
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
-sys.enable={'gpu'};
+sys.enable={'zte','gpu'};
 
 % Experimental chemical shifts, second conformation
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,2,124.2);

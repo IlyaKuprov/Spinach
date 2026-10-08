@@ -44,6 +44,9 @@ for n=1:numel(field_grid)
     proton_zeeman_iso=sys.magnet*spin('1H')/(2*pi);
     inter.coupling.scalar{2,3}=electron_zeeman_iso+proton_zeeman_iso;
         
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping
     spin_system=create(sys,inter);  
     spin_system=basis(spin_system,bas);

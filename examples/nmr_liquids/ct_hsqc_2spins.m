@@ -30,6 +30,9 @@ parameters.spins={'13C','1H'};
 parameters.decouple_f2={'13C'};
 parameters.axis_units='ppm';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Create the spin system structure
 spin_system=create(sys,inter);
 

@@ -17,7 +17,7 @@ function reacting_nmr()
 sys.magnet=14.1;
 
 % Greedy parallelisation
-sys.enable={'greedy'}; % 'gpu'
+sys.enable={'zte','greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

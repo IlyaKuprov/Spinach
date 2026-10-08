@@ -30,6 +30,9 @@ sys.disable={'pt','krylov'};
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

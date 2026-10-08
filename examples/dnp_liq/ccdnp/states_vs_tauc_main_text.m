@@ -62,6 +62,9 @@ answer=zeros(12,numel(tau_c),'like',1i);
 % Disable excessive printing and checking
 sys.disable={'hygiene'}; sys.output='hush';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Loop over correlation time
 parfor n=1:numel(tau_c)
 

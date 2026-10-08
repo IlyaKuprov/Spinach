@@ -20,6 +20,9 @@ inter.coupling.matrix{1,1}=eeqq2nqi(1.68e6,0.2,3/2,[0 0 0]);
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

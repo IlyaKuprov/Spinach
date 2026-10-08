@@ -24,7 +24,7 @@ g3v=[1.497265940 1.494866241 1.481858735];
 
 % Spin-orbit corrections
 % to the DD couplings
-sys.enable={'sodd'};
+sys.enable={'zte','sodd'};
 
 % g-tensor eigenvalues (rows)
 U1=[-0.847221 -0.510119 -0.148306

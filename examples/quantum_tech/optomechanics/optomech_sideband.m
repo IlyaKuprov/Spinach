@@ -30,6 +30,9 @@ inter.modes.longitudinal{1,2}=-sqrt(2)/(2*pi);
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

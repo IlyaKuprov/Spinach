@@ -44,6 +44,9 @@ kfigure(); scale_figure([1.75 1.0]);
 xy_dnp=nan(numel(X),numel(Y));
 xz_dnp=nan(numel(X),numel(Z));
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % XY plane scan, Z=0
 for n=1:numel(X)
 

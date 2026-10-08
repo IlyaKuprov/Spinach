@@ -78,6 +78,9 @@ inter.r2_rates=num2cell(34.0359*ones(1,8));
 % Do not draw colorbars
 sys.disable={'colorbar'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

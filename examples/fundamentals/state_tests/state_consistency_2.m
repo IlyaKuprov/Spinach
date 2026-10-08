@@ -14,6 +14,9 @@ sys.isotopes={'14N','235U'};
 % No interactions
 inter.zeeman.scalar={0 0};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Hilbert space, Zeeman basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';

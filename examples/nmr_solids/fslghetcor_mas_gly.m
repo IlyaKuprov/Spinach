@@ -34,6 +34,9 @@ sys.tols.inter_cutoff=2*pi*200;
 % Use GPU arithmetic
 % sys.enable={'gpu'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

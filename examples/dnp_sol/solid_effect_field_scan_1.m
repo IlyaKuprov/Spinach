@@ -44,6 +44,9 @@ inter.rlx_keep='diagonal';
 inter.equilibrium='zero';
 inter.temperature=40.2;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

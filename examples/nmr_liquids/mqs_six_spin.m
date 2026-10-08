@@ -47,7 +47,7 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

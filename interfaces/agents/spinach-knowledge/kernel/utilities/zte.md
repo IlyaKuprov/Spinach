@@ -9,7 +9,7 @@
 - Syntax: `projector=zte(spin_system,L,rho,nstates)`.
 - Input validation (`grumble`) requires the basis formalism to be `zeeman-liouv` or `sphten-liouv`, both `L` and `rho` to be numeric, `rho` to be a single vector (not a stack), `L` to be square, and `size(L,2)==size(rho,1)`.
 - If `nstates` is supplied, it must be a real positive integer scalar not exceeding `numel(rho)`; otherwise an error is raised.
-- If `'zte'` is listed in `spin_system.sys.disable`, the function prints a warning that zero track elimination is disabled, the basis is left unchanged, and `projector=1` is returned.
+- Unless `'zte'` is listed in `spin_system.sys.enable`, the function reports that zero track elimination is not enabled, the basis is left unchanged, and `projector=1` is returned.
 - If `nnz(rho)/numel(rho) > spin_system.tols.zte_maxden`, the function skips elimination (too few zeros in the state vector) and returns `projector=1`.
 - If `norm(rho,1) < spin_system.tols.zte_tol`, the function skips elimination (state vector norm below drop tolerance, too small for the Krylov procedure) and returns `projector=1`.
 - Otherwise, the time step is set to `1/cheap_norm(L)`; if this is infinite (zero Liouvillian), a unit time step is used with a report.
@@ -18,12 +18,12 @@
 - Track selection: if `nstates` is given, states are ranked by their maximum absolute amplitude over the trajectory (descending) and only the top `nstates` are kept; otherwise all states whose maximum absolute amplitude is below `spin_system.tols.zte_tol` are dropped.
 - The projector is built as `speye(size(L))` with the columns corresponding to zero tracks deleted. The intended usage is `L_reduced=P'*L*P` and `rho_reduced=P'*rho`.
 - The default tolerance may be altered by setting `sys.tols.zte_tol` before calling `create.m`.
-- If tiny interactions or nearly equivalent spins are present, it is best to disable zero track elimination by adding `'zte'` to the `sys.disable` cell array.
+- If tiny interactions or nearly equivalent spins are present, it is best to leave zero track elimination off by omitting `'zte'` from the `sys.enable` cell array.
 
 ## Inputs and outputs
 
 Inputs:
-- `spin_system` — spin system object supplying tolerances (`zte_tol`, `zte_maxden`, `zte_nsteps`), formalism, and the `sys.disable` list.
+- `spin_system` — spin system object supplying tolerances (`zte_tol`, `zte_maxden`, `zte_nsteps`), formalism, and the `sys.enable` list.
 - `L` — the Liouvillian used for time propagation; must be square and dimensionally consistent with `rho`.
 - `rho` — the initial state vector for time propagation.
 - `nstates` (optional) — if specified, only the `nstates` most populated states are kept, irrespective of the tolerance parameter.

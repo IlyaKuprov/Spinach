@@ -37,6 +37,9 @@ parameters.spins={'1H'};
 parameters.axis_units='MHz';
 parameters.derivative=1;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

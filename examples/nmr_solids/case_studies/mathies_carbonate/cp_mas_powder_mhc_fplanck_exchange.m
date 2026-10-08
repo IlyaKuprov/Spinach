@@ -89,6 +89,9 @@ for n=1:numel(exch_rates)
     inter.chem.rates=exch_rates(n)*[-1  1;
                                      1 -1];
 
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);

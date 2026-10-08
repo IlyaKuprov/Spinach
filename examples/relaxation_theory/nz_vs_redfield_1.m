@@ -38,6 +38,9 @@ inter.rlx_dfs='keep';
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Redfield superoperator
 inter_rf=inter; inter_rf.relaxation={'redfield'}; inter_rf.tau_c={200e-12};
 R_rf=full(relaxation(basis(create(sys,inter_rf),bas)));

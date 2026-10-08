@@ -25,6 +25,9 @@ sys.tols.krylov_tol=1000;
 % This needs a GPU
 % sys.enable={'gpu'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

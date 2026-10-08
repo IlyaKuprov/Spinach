@@ -54,6 +54,9 @@ switch formalism
 
 end
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

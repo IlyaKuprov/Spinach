@@ -62,6 +62,9 @@ inter.chem.flux_rate(5:(5+n_water_protons-1),...
                      5:(5+n_water_protons-1))=wt_wt_exch_rate;
 inter.chem.flux_type='intermolecular';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

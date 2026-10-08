@@ -59,7 +59,7 @@ inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 sys.magnet=14.1;
 
 % Greedy parallelisation
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};

@@ -23,7 +23,7 @@ inter.zeeman.matrix{1}=V'*diag(D)*V;
 
 % Spin-orbit corrections
 % to the DD couplings
-sys.enable={'sodd'};
+sys.enable={'zte','sodd'};
 
 % Nuclear shift tensor
 inter.zeeman.matrix{2}=zeros(3,3);

@@ -22,7 +22,7 @@ bas.approximation='none';
 
 % Algorithmic options
 sys.disable={'trajlevel'};
-sys.enable={'prop_cache'};
+sys.enable={'zte','prop_cache'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

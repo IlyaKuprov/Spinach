@@ -48,6 +48,9 @@ sys.disable={'hygiene'};
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

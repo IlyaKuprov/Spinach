@@ -22,7 +22,7 @@ g_eigs=[1.325781502 1.322640525 1.317917615];
 
 % Spin-orbit corrections
 % to the DD couplings
-sys.enable={'sodd'};
+sys.enable={'zte','sodd'};
 
 % g-tensor eigenvectors
 U3=[-0.507708  0.520032  0.686877

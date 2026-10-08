@@ -12,6 +12,9 @@ function eigenstate_analysis()
 % Set the magnet
 sys.magnet=14.1;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 

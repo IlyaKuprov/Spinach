@@ -20,6 +20,9 @@ inter.coupling.scalar{1,2}=100;
 inter.coupling.scalar{3,4}=50;
 inter.coupling.scalar{4,4}=0;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

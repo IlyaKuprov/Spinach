@@ -35,7 +35,7 @@ bas.approximation='IK-0';
 bas.inter_level=4;
 
 % This needs a GPU
-sys.enable={'greedy'}; % 'gpu'
+sys.enable={'zte','greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

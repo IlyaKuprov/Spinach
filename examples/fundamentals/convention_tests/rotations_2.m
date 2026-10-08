@@ -30,6 +30,9 @@ inter.coordinates={[0.7 0.8 0.9];
 inter.coupling.matrix=cell(2,2);
 inter.coupling.matrix{1,2}=coupl_tensor_a;
                
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping, A
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

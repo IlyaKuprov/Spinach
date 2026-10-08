@@ -22,7 +22,7 @@ bas.prox_level=1;
 bas.connectivity='scalar_couplings';
 
 % Algorithmic options
-sys.enable={'greedy','prop_cache'};
+sys.enable={'zte','greedy','prop_cache'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -102,6 +102,9 @@ labels={{'$T=2$ K','time step $=1\times10^{4}$ ps'},...
 kfigure(); scale_figure([2.0 1.6]); answers=cell(1,4);
 for n=1:4
 
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping at 
     % the temperature of the panel
     inter.temperature=temps(n);

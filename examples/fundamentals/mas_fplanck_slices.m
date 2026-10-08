@@ -25,6 +25,9 @@ inter.zeeman.euler={[0.4 0.7 0.2]};
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spin system
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -63,6 +66,9 @@ inter.zeeman.euler={[0 0 0]};
 % Basis set
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spin system
 spin_system=create(sys,inter);

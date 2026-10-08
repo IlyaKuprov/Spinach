@@ -52,6 +52,9 @@ for n=1:numel(delta_bd)
     inter.modes.anharms={anharm []};
     inter.modes.kerr=cell(2,2); inter.modes.kerr{1,2}=chi;
 
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);

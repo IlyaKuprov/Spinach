@@ -50,8 +50,10 @@ function err=errfun(axis_expt_f, spec_expt_f,  ...
 sys.output='hush';
 sys.disable={'hygiene'};
 
-% Run on GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Magnet induction 
 sys.magnet=11.7464;
@@ -105,9 +107,6 @@ bas.formalism='zeeman-hilb';
 bas.approximation='none';
 bas.sym_group={'S3','S3'};
 bas.sym_spins={[1 2 3],[10 11 12]};
-
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

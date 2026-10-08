@@ -14,7 +14,7 @@ For the two unit-cell molecules, the first eight indexed shift values are 124.2,
 
 ## Grid-free Fokker-Planck calculation
 
-The basis uses `sphten-liouv`, `IK-0`, longitudinal `15N`, projection +1, and interaction level 3. The rotor rate is 14 kHz about axis vector `[1 1 1]`; rank 11 is used without a named orientation-grid parameter. The first system enables `greedy` and `polyadic`; the second adds `gpu`. Each conformation is propagated by `gridfree` in NMR mode with the `nmr` assumption, and its FID is added to the first. Acquisition is on `13C` with `L+` initial and receiver states, 100 kHz sweep, 2048 points, 8192-point zero filling, and zero offset; the display axis is ppm and inverted.
+The basis uses `sphten-liouv`, `IK-0`, longitudinal `15N`, projection +1, and interaction level 3. The rotor rate is 14 kHz about axis vector `[1 1 1]`; rank 11 is used without a named orientation-grid parameter. The first system enables `zte` and `greedy` and `polyadic`; the second adds `gpu`. Each conformation is propagated by `gridfree` in NMR mode with the `nmr` assumption, and its FID is added to the first. Acquisition is on `13C` with `L+` initial and receiver states, 100 kHz sweep, 2048 points, 8192-point zero filling, and zero offset; the display axis is ppm and inverted.
 
 ## Spectrum processing
 

@@ -8,7 +8,7 @@ The function `triple_tb_eqmag_temp()` calculates temperature-dependent equilibri
 
 ## Physical model and parameters
 
-The system has three `E13` sites representing J=6 Tb centres. As in the companion field scan, the source builds each g tensor from a site eigenvalue triplet and orientation matrix via `g=U*diag(g_values)*U'`. The triplets are `[1.497075749,1.495252923,1.481370349]`, `[1.496540374,1.494559188,1.482686210]`, and `[1.497265940,1.494866241,1.481858735]`. Orientations, Tb coordinates, and site-specific rank-2, rank-4 and rank-6 Stevens coefficients are defined in the source; it does not state units for the g eigenvalues or coordinates. Exchange is set as `J=icm2hz(0.003)`, with spin-orbit corrections to dipolar couplings enabled by `sys.enable={'sodd'}`. Stevens coefficients are converted with `icm2hz` and `stev2sph`, then rotated by Wigner matrices and passed through `inter.giant.coeff`.
+The system has three `E13` sites representing J=6 Tb centres. As in the companion field scan, the source builds each g tensor from a site eigenvalue triplet and orientation matrix via `g=U*diag(g_values)*U'`. The triplets are `[1.497075749,1.495252923,1.481370349]`, `[1.496540374,1.494559188,1.482686210]`, and `[1.497265940,1.494866241,1.481858735]`. Orientations, Tb coordinates, and site-specific rank-2, rank-4 and rank-6 Stevens coefficients are defined in the source; it does not state units for the g eigenvalues or coordinates. Exchange is set as `J=icm2hz(0.003)`, with spin-orbit corrections to dipolar couplings enabled by `sys.enable={'zte','sodd'}`. Stevens coefficients are converted with `icm2hz` and `stev2sph`, then rotated by Wigner matrices and passed through `inter.giant.coeff`.
 
 ## Calculation and output
 

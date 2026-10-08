@@ -60,8 +60,10 @@ parameters.invert_axis=0;
 parameters.detection='uniaxial';
 parameters.flip_angle=pi/2;
 
-% This needs a GPU
-% sys.enable={'gpu'}; 
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % 14N relaxation rates, Hz
 R_14N=[0 10 100 500 1e3 1e4 1e5 1e6];
@@ -75,9 +77,6 @@ for n=1:numel(R_14N)
     % Set relaxation rates
     inter.r1_rates={0.22 0.22 0.22 0.22 0.22 R_14N(n)};
     inter.r2_rates={0.22 0.22 0.22 0.22 0.22 R_14N(n)};
-
-    % Enable zero track elimination
-    sys.enable={'zte'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);

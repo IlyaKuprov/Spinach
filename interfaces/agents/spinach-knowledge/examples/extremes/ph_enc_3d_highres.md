@@ -7,7 +7,7 @@
 
 ## Imaging task and phantom
 
-The source describes 3D slice selection followed by phase-encoded imaging of the selected slice. The spin system contains `1H` only, has `sys.magnet=5.9` and zero scalar Zeeman offset, and uses the `t1_t2` relaxation model with both rate arrays set to `1.0`, zero equilibrium, and diagonal relaxation retention. The magnetic-field and relaxation-rate units are not annotated in the script. Path tracing is disabled; `greedy` and `polyadic` are enabled (the `gpu` token shown in a comment is not enabled in the assignment).
+The source describes 3D slice selection followed by phase-encoded imaging of the selected slice. The spin system contains `1H` only, has `sys.magnet=5.9` and zero scalar Zeeman offset, and uses the `t1_t2` relaxation model with both rate arrays set to `1.0`, zero equilibrium, and diagonal relaxation retention. The magnetic-field and relaxation-rate units are not annotated in the script. Path tracing is disabled; `zte`, `greedy`, and `polyadic` are enabled (the `gpu` token shown in a comment is not enabled in the assignment).
 
 The code obtains R1, R2, proton-density, dimensions and grid-point counts from `phantoms('brain-highres')`; it does not hard-code the returned phantom dimensions. Those maps feed the relaxation-operator and image-state/coil phantom parameters. The image grid is `[129 129]`, with derivative setting `{'period',3}`, proton offset `0.0`, zero velocity fields and `diff=0`.
 

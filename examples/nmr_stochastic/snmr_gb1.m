@@ -33,11 +33,10 @@ inter.equilibrium='IME';
 inter.tau_c={5e-9};
 inter.temperature=298;
 
-% Use GPU arithmetic
-% sys.enable={'gpu'};
-
-% Enable zero track elimination
+% Enable zero track elimination, with optional GPU arithmetic
 sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

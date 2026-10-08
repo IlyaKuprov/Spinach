@@ -10,7 +10,7 @@ The function `triple_tb_eqmag_field()` calculates the field dependence of the eq
 
 The three giant-spin sites are entered as `E13` isotopes, each representing a J=6 Tb centre. Site g tensors are assembled as `g=U*diag(g_values)*U'`. The three eigenvalue triplets in the source are `[1.497075749,1.495252923,1.481370349]`, `[1.496540374,1.494559188,1.482686210]`, and `[1.497265940,1.494866241,1.481858735]`; the corresponding orientation matrices and coordinates are defined in the source. The source does not assign units to those tensor or coordinate entries.
 
-Equal pairwise scalar exchange couplings are set with `J=icm2hz(0.003)`; the stated conversion uses the Spinach NMR convention. `sys.enable={'sodd'}` enables the source-commented spin-orbit corrections to dipolar couplings. Site-specific Stevens coefficients of ranks 2, 4 and 6 are converted with `icm2hz`, converted to irreducible spherical tensors with `stev2sph`, and rotated with Wigner matrices before assignment to `inter.giant.coeff`. The source also defines site Euler data in `inter.giant.euler`.
+Equal pairwise scalar exchange couplings are set with `J=icm2hz(0.003)`; the stated conversion uses the Spinach NMR convention. `sys.enable={'zte','sodd'}` enables the source-commented spin-orbit corrections to dipolar couplings. Site-specific Stevens coefficients of ranks 2, 4 and 6 are converted with `icm2hz`, converted to irreducible spherical tensors with `stev2sph`, and rotated with Wigner matrices before assignment to `inter.giant.coeff`. The source also defines site Euler data in `inter.giant.euler`.
 
 ## Calculation and output
 

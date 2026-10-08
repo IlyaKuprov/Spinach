@@ -10,7 +10,7 @@ Simulates the `1H -> 19F` HOESY experiment for 3-fluorotyrosine. The source sele
 
 ## Spin system and model
 
-The source reads `../standard_systems/3_fluoro_tyr.log` through `gparse` and `g2spinach`, requesting only `1H` and `19F` spins and passing `[31.82 192.97]` as the absolute isotropic shielding references for `1H` and `19F`, respectively, to place the reference substances at zero ppm. Thus this simulation's explicit spin network is proton plus fluorine-19; it does not request carbon, nitrogen, or oxygen spins. The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-2`, scalar-coupling connectivity, and proximity level 3. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `10e-9` s (commented as a large protein) and temperature `298` K. Algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
+The source reads `../standard_systems/3_fluoro_tyr.log` through `gparse` and `g2spinach`, requesting only `1H` and `19F` spins and passing `[31.82 192.97]` as the absolute isotropic shielding references for `1H` and `19F`, respectively, to place the reference substances at zero ppm. Thus this simulation's explicit spin network is proton plus fluorine-19; it does not request carbon, nitrogen, or oxygen spins. The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-2`, scalar-coupling connectivity, and proximity level 3. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `10e-9` s (commented as a large protein) and temperature `298` K. Algorithm options are `zte` and `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
 
 ## Acquisition and processing
 

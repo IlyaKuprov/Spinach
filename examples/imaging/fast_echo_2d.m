@@ -27,15 +27,14 @@ inter.r2_rates={1};
 % Disable path tracing
 sys.disable={'pt'};
 
-% This needs a GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

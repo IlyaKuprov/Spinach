@@ -53,11 +53,10 @@ parameters.tol=1e-2;
 parameters.verbose=0;
 parameters.sum_up=0;
 
-% Enable GPU arithmetic
-% sys.enable={'gpu'};
-
-% Enable zero track elimination
+% Enable zero track elimination, with optional GPU arithmetic
 sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

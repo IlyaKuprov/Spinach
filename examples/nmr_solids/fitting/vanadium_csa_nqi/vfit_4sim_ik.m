@@ -58,7 +58,9 @@ disp(params);
 % Silence Spinach
 sys.output='hush';
 sys.disable={'hygiene'};
-% sys.enable={'gpu'};
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Data dimensions
 sfO1 = 157.7815; nrpointsb = 4096;
@@ -96,9 +98,6 @@ inter.coupling.matrix{1,1}=eeqq2nqi(Qcc,Qeta,3.5,[0 0 0]);
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 bas.projections={+1};
-
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

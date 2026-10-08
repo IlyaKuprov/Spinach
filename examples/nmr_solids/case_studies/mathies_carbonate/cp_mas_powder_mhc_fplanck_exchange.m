@@ -58,8 +58,10 @@ bas.approximation='none';
 % Disable start-up checks
 sys.disable={'hygiene'};
 
-% Enable GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Exchange rate constant array
 exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz
@@ -88,9 +90,6 @@ for n=1:numel(exch_rates)
     % Set the exchange rates
     inter.chem.rates=exch_rates(n)*[-1  1;
                                      1 -1];
-
-    % Enable zero track elimination
-    sys.enable={'zte'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);

@@ -13,3 +13,5 @@ The basis is sphten-liouv with no approximation and projection +1. A possible GP
 The acquisition parameters include rate 100000, axis [√(2/3), 0, √(1/3)], maximum rank 30, a 200-point spherical grid, sweep 5 × 10⁶, 1,024 points, zero-fill to 4,096, and offset zero. The source does not state a unit for rate, sweep, or offset; it explicitly sets the plotted axis units to MHz. It selects the ¹⁷O L+ state for both initial state and receiver coil, with no decoupling list and no RF or CP pulse sequence specified.
 
 Spinach performs single-rotor acquisition, applies exponential apodisation with parameter 6, Fourier transforms the signal, and plots the real spectrum. This is a simulation, not an experimental spectrum supplied by the source. The pair is dipole-coupled through its coordinates: `create()` invokes `dipolar()` to generate the ²³Na–¹⁷O point-dipolar tensor automatically. The explicit diagonal NQI assignments are separate; adding another off-diagonal dipolar tensor would double-count the interaction.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

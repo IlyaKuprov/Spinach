@@ -19,3 +19,5 @@ The acquisition array is ordered as F1 then F2: 128 and 512 points, zero-filled 
 The simulation returns cosine and sine channels, each apodised with squared-cosine windows in both dimensions. The script Fourier-transforms the indirect dimension for both channels, forms States quadrature from their real parts, then Fourier-transforms the direct dimension. It plots the real 2D spectrum. The source comment estimates hours on an NVIDIA Tesla A100 and longer on CPU, but GPU arithmetic is commented out in this function. The wrapper call defines the FSLG-HETCOR simulation settings but does not document unlisted sequence internals. The source reports no measured spectrum or transfer-efficiency result. No DOI is given in the source.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fslghetcor_mas_gly.m
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

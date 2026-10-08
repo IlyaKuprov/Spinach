@@ -13,3 +13,5 @@ The basis is sphten-liouv with approximation none. The experiment setup assigns 
 The wrapper calls singlerot with @cn2d_sq and the qnmr mode. That selects the SQ sequence callback but does not define its pulse/transfer internals in this example; those details should not be inferred from the wrapper. The cosine and sine FIDs are each apodised with sqcos in both dimensions, Fourier transformed in the two dimensions, combined as a States signal, and the real spectrum is passed to plot_2d.
 
 The source comment estimates hours on CPU or minutes on a Tesla V100 GPU. This is a code comment, not a measured result reported by this page; the example does not supply a measured spectrum, benchmark record, or validation claim. The source differs from the DQ companion in its function name and selected sequence callback; the other assignments and processing are the same.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

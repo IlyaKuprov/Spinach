@@ -12,3 +12,5 @@ The source labels its scalar couplings experimental and encodes (in Hz): F2–N1
 ## Relaxation sweep and spectrum
 
 The sphten-liouv basis is exact (no approximation). Relaxation uses T1/T2 rates, diagonal retention and zero equilibrium. The sequence uses a 90-degree flip, uniaxial detection, 1H channel, zero offset, 10 kHz sweep, 60,000 acquired points and zero filling to 2¹⁹ points. For each 14N relaxation rate in [0, 10, 100, 500, 1,000, 10,000, 100,000, 1,000,000] Hz, the five non-nitrogen sites receive R1 = R2 = 0.22 Hz and 14N receives the swept rate. The script calls the liquid simulator with the zero-field sequence function in the lab frame, Fourier transforms the FID, normalises the real spectrum to its maximum, offsets each trace vertically, and plots 2303–2322 Hz. The source comments that a GPU is needed and estimates seconds, but its explicit GPU-enable line is commented out; neither hardware requirement nor runtime was validated here. It does not report a field-drop schedule.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

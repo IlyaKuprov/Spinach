@@ -13,3 +13,5 @@ The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and p
 ## Processing and plot
 
 Cosine apodisation is applied to both cosine and sine FID components in both dimensions. After the F2 transform, the States signal is formed as `real(f1_cos)-1i*real(f1_sin)` and Fourier-transformed along F1. The plot uses `-real(spectrum)` and displays both signs.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

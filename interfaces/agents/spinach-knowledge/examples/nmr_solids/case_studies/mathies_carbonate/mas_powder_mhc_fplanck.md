@@ -18,3 +18,5 @@ The source sets the MAS rate parameter to 10,000 (no unit is written beside this
 ## Inputs and outputs
 
 The code simulates an FID, applies exponential apodisation with parameter 6, Fourier transforms it, and plots the real spectrum with `plot_1d`. The input is the CASTEP-derived `mhc.magres` data; no experimental FID or measured spectrum is loaded here. The output is the simulated MAS spectrum. The source's GPU-enable line is commented out.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

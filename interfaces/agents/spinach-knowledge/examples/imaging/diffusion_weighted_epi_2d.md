@@ -13,3 +13,5 @@ A single 1H spin at `sys.magnet=5.9` and zero scalar Zeeman shift is combined wi
 ## Encoding and output
 
 The `epi_2d` sequence uses readout and phase-encoding gradient amplitudes 5.3e-3 and 4.8e-3 T/m, both with configured duration 2e-3; diffusion-gradient amplitude is [1e-3 1e-3] T/m with duration 1e-2. The source does not annotate duration units. The displayed panels are the recorded image and the slice's R1 and R2 maps. After simulation, the example halves the phase-encoding amplitude for the plotting FOV calculation; this is a display adjustment, not a change to the simulated encoding. The cited DOI is retained from the source.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

@@ -21,3 +21,5 @@ The configured spectrum has offset 800, sweep 1200, 512 acquired points, zero-fi
 ## Source
 
 [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/dpfgse_signal_suppress.m)
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

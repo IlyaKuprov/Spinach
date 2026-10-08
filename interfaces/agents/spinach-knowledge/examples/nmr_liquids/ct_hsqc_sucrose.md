@@ -15,3 +15,5 @@ At 5.9 T, the liquid-state simulation enumerates 13C isotopomers and uses a spht
 F1/F2 sweep widths are 3350/950 Hz, transmitter offsets 5000/1100 Hz, and the acquired matrix is 128 x 128 points; zero filling gives 512 points in each dimension. The 13C channel is configured for decoupling during F2 acquisition. The positive and negative FIDs each receive squared-cosine apodisation; their transformed components are combined as a States signal before the second Fourier transform. The plotted output is the real two-dimensional spectrum in ppm, using the negative-contour plotting option.
 
 The source comments estimate seconds for the calculation. The example reports no peak assignments or experimental comparison; the hard-coded shift substitutions are spin-system inputs, not measurements from this example.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

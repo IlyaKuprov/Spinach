@@ -21,3 +21,5 @@ The caller sets offset 2400 Hz, sweeps [9000, 9000] Hz, 256 x 256 acquisition po
 
 - Imports the PDB/BMRB protein inputs, sets the field, cutoffs, basis, and greedy algorithm option.
 - Builds the spin system and basis, simulates the COSY FID, apodises and Fourier-transforms it, then plots `abs(spectrum)`.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

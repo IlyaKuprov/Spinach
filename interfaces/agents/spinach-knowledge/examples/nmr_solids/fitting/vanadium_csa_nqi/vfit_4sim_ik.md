@@ -19,3 +19,5 @@ The same model is simulated at code-set rate values 41000 for the 35 spectrum, 3
 This is a four-spectrum fitting wrapper around singlerot and acquire, not a CP or HMQC sequence; it specifies no RF/contact-transfer condition. It describes input spectra and a model objective, but contains no saved best-fit result. No DOI is given in the source.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

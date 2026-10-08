@@ -19,3 +19,5 @@ No separate mixing-time, phase-cycle table, or receiver-phase setting appears in
 ## Processing and output
 
 A cosine window is applied along both dimensions, followed by a shifted 2D FFT. The plotted quantity is the spectrum magnitude in positive mode. This is a calculated spectrum for the cited assigned spin system; the script does not load a measured rotenone spectrum or provide a simulated-versus-experimental comparison. Its reduced-basis and symmetry settings are part of this example's computational model.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

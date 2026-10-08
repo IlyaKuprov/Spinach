@@ -13,3 +13,5 @@ The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and p
 ## Processing and plot
 
 The wrapper applies squared-cosine apodisation to the cosine and sine FID components in both dimensions. It Fourier-transforms F2, combines the components as `real(f1_cos)+1i*imag(f1_sin)`, then Fourier-transforms F1. It plots `real(spectrum)` with both signs displayed.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

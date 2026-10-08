@@ -13,3 +13,5 @@ The model is a single 1H spin with `sys.magnet=5.9` and zero scalar Zeeman shift
 ## Encoding and output
 
 The phase-encoded sequence is `phase_enc_2d`. Diffusion-gradient amplitudes are [1e-3 1e-3] T/m; readout and phase-encoding amplitudes are 4.3e-3 and 3.8e-3 T/m. The source sets their durations to 2e-3 and 1e-3, and the echo-time parameter to 1e-2; units for these durations are not annotated in this example. The resulting image is shown next to the loaded coefficient phantom. These are configured simulation parameters, not reported measured image values.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

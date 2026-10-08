@@ -12,7 +12,6 @@ function eigenstate_analysis()
 % Set the magnet
 sys.magnet=14.1;
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 

@@ -28,7 +28,6 @@ inter.tau_c={200e-12};
 % Distance cut-off
 sys.tols.prox_cutoff=4.0;
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

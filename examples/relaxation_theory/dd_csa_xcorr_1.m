@@ -33,7 +33,6 @@ inter.equilibrium='zero';
 inter.rlx_keep='labframe';
 inter.tau_c={1e-9};
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

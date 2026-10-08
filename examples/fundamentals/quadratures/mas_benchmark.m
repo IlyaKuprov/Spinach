@@ -21,7 +21,6 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 bas.projections={+1};
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

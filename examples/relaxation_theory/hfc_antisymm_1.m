@@ -25,7 +25,6 @@ inter.tau_c={10e-12};
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

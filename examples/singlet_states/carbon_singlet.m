@@ -34,7 +34,6 @@ bas.approximation='none';
 sys.tols.rlx_integration=1e-5;
 sys.tols.rlx_zero=1e-5;
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

@@ -28,7 +28,6 @@ bas.formalism='zeeman-hilb';
 % Temperature
 inter.temperature=1.0;
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

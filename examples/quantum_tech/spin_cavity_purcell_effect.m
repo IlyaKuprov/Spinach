@@ -16,7 +16,6 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'E','C3'};
 
-
 % Formalism and basis
 bas.formalism='zeeman-liouv';
 bas.approximation='none';

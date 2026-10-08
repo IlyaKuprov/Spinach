@@ -25,7 +25,6 @@ inter.modes.exchange{1,2}=8e6;
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

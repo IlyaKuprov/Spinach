@@ -38,7 +38,6 @@ parameters.electrons=[1 2];
 parameters.spins={'E'};
 parameters.needs={'zeeman_op'};
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

@@ -8,7 +8,6 @@
 
 function normalization_2()
 
-
 % System specification
 sys.magnet=14.1;
 sys.isotopes={'1H','235U'};

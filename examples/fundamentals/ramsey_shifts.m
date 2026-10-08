@@ -60,7 +60,6 @@ end
 % Phases accumulated by the off-resonant nuclei under a proton drive
 function [ph_c,ph_n,ph_ca,ph_na]=shift_phases(b_field,amp)
 
-
 % Three-spin system with two off-resonant isotopes
 sys.magnet=b_field; sys.isotopes={'1H','13C','15N'};
 sys.output='hush';

@@ -24,7 +24,6 @@ inter.zeeman.euler={[0.4 0.7 0.2]};
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
 
-
 % Spin system
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

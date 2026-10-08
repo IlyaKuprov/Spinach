@@ -22,7 +22,6 @@ inter.coordinates={[-1.11551509    1.65289357   -1.19927242]
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

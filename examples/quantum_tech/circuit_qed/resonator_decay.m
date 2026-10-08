@@ -40,7 +40,6 @@ inter.modes.t2_times={1/(1/5e-6+(1+2*n_eq)/(2*inter.modes.lifetimes{1}))};
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

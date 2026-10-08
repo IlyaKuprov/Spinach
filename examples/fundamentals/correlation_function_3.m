@@ -68,7 +68,6 @@ cf_mc=(1/(2*L+1))*ifftshift(cf_mc); lags=ifftshift(lags);
 
 %% Analytical Spinach calculation
 
-
 % Create a dummy spin system
 sys.magnet=0; sys.isotopes={'G'};
 inter.relaxation={'redfield'};

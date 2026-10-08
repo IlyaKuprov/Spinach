@@ -29,7 +29,6 @@ inter.coupling.scalar{3,5}=0.2;
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

@@ -38,7 +38,6 @@ inter.coupling.matrix{1,5}=1e6*gauss2mhz(R3*A3*R3');
 % Zeeman interactions
 inter.zeeman.scalar={2.0023 2.0023 0 0 0};
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

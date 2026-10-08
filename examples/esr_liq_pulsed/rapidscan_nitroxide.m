@@ -33,7 +33,6 @@ inter.equilibrium='dibari';
 inter.temperature=100;
 inter.tau_c={2e-11};
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

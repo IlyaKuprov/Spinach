@@ -36,7 +36,6 @@ inter.rlx_keep='labframe';
 inter.tau_c={37e-12};
 inter.temperature=298;
 
-
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

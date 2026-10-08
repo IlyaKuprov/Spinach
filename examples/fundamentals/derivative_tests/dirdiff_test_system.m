@@ -54,7 +54,6 @@ switch formalism
 
 end
 
-
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

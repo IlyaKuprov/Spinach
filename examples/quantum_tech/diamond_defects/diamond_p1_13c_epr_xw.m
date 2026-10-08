@@ -21,7 +21,6 @@ sys.magnet=1;
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 

@@ -1,7 +1,7 @@
 % Symmetry and trajectory-level state space reduction. Tries all 
-% applicable reduction methods (unless disabled during the call
-% to create.m) and returns a cell array of projectors into a set
-% of independently evolving reduced subspaces. Syntax:
+% applicable enabled reduction methods and returns a cell array
+% of projectors into independently evolving reduced subspaces.
+% Syntax:
 %
 %              projectors=reduce(spin_system,L,rho)
 %
@@ -29,8 +29,9 @@
 %              http://dx.doi.org/10.1016/j.jmr.2011.03.010
 %
 %        Briefly, the function tries symmetry factorisation, fol-
-%        lowed by zero track elimination, followed by disconnect-
-%        ed subspace identifcation by path tracing.
+%        lowed by zero track elimination when sys.enable contains
+%        'zte', then disconnected subspace identification by path
+%        tracing.
 %
 % ilya.kuprov@weizmann.ac.il
 % matthew.krzystyniak@oerc.ox.ac.uk

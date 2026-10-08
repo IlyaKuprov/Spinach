@@ -14,7 +14,6 @@ inter.zeeman.scalar={0};
 % Preallocate the answer
 answer=zeros(3,3,'like',1i);
 
-
 % Run the tests
 formalisms={'zeeman-hilb','zeeman-liouv','sphten-liouv'};
 for n=1:numel(formalisms)

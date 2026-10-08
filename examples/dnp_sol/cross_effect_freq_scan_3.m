@@ -44,7 +44,6 @@ inter.nott_r1n=0.1;
 inter.nott_r2n=1e3;
 inter.temperature=10;
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

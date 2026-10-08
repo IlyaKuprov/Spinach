@@ -36,7 +36,6 @@ bas.approximation='none';
 % Algorithmic options
 sys.disable={'krylov','trajlevel'};
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

@@ -54,7 +54,6 @@ inter.rlx_keep='diagonal';
 inter.equilibrium='zero';
 inter.temperature=10;
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

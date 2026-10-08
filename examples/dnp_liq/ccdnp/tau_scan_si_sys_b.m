@@ -65,7 +65,6 @@ tau_c=linspace(50e-12,500e-12,128);
 % Preallocate results
 answer=zeros(numel(parameters.mw_frq),numel(tau_c),'like',1i);
 
-
 % Loop over correlation time
 parfor n=1:numel(tau_c)
 

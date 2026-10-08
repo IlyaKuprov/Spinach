@@ -66,7 +66,6 @@ field_grid=linspace(1,30,128);
 % Preallocate result
 answer=zeros(numel(parameters.mw_frq),numel(field_grid),'like',1i);
 
-
 % Loop over magnet fields
 parfor n=1:numel(field_grid)
 

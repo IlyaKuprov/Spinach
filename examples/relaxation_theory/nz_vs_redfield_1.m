@@ -38,7 +38,6 @@ inter.rlx_dfs='keep';
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-
 % Redfield superoperator
 inter_rf=inter; inter_rf.relaxation={'redfield'}; inter_rf.tau_c={200e-12};
 R_rf=full(relaxation(basis(create(sys,inter_rf),bas)));

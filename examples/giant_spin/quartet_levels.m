@@ -25,7 +25,6 @@ inter.coupling.matrix{1,1}=zfs2mat(D,E,0,0,0);
 bas.approximation='none';
 bas.formalism='zeeman-hilb';
 
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

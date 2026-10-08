@@ -17,7 +17,6 @@ bas.approximation='none';
 bas.sym_spins={[3 4 5 6]};
 bas.sym_group={'S4'};
 
-
 % Interactions
 inter.zeeman.scalar={2.002 2.002 0 0 0 0};
 inter.coupling.scalar=num2cell(mt2hz([0      0   0.295 0.295 0.295 0.295

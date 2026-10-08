@@ -4,7 +4,7 @@ Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/diffusi
 
 ## Experiment
 
-Simulates 3D echo-planar imaging with spatially uniform, isotropic diffusion and a brain phantom. The source estimates hours of runtime and says a Tesla V100 can accelerate it. `greedy` is enabled; the GPU setting is not—the code's GPU line is commented out.
+Simulates 3D echo-planar imaging with spatially uniform, isotropic diffusion and a brain phantom. The source estimates hours of runtime and says a Tesla V100 can accelerate it. `greedy` is enabled; the GPU setting is not—the code's GPU line is commented out. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Spin, RF, and image model
 

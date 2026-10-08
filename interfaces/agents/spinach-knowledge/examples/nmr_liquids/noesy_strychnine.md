@@ -8,7 +8,7 @@ Simulates a two-dimensional proton NOESY spectrum of strychnine. The system is s
 
 ## Spin model and sequence
 
-The field setting is `5.9`. The basis uses the `sphten-liouv` formalism, `IK-2` approximation, scalar-coupling connectivity, and proximity level `3`. Redfield relaxation uses IME equilibrium, temperature `298`, `rlx_keep='kite'`, and `tau_c={200e-12}`. The script enables the greedy algorithm, disables Krylov, and sets the proximity cutoff to `4.0`.
+The field setting is `5.9`. The basis uses the `sphten-liouv` formalism, `IK-2` approximation, scalar-coupling connectivity, and proximity level `3`. Redfield relaxation uses IME equilibrium, temperature `298`, `rlx_keep='kite'`, and `tau_c={200e-12}`. The script enables the greedy algorithm, disables Krylov, and sets the proximity cutoff to `4.0`. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 The NOESY mixing time is `0.5`; offset is `1200`; sweep is `[2500 2500]`; acquired points are `[512 512]`; and zero-fill sizes are `[2048 2048]`. The selected spins are `{'1H'}`, axes are in ppm, and the simulation requests the equilibrium density with `needs={'rho_eq'}`. The code does not label units for the mixing-time, offset, or sweep values.
 

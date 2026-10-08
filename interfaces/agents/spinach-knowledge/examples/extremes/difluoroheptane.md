@@ -7,7 +7,7 @@
 
 The source describes the `19F` NMR spectrum of anti-3,4-difluoroheptane using explicit time-domain evolution in Liouville space. The MATLAB isotope list contains 23 sites: seven `12C` entries, fourteen `1H` spins and two `19F` spins. Thus the source header's “16 spins” refers to the magnetically active proton/fluorine spins; the listed carbon isotopes are spin-zero `12C` sites. The script sets `sys.magnet=11.7464` under a “Magnet induction” comment; the source does not state a unit for that assignment.
 
-The model specifies scalar Zeeman shifts and scalar couplings. For the basis it selects `sphten-liouv`, `IK-0`, and `inter_level=1`, with a manually specified three-block basis, two `S3` symmetry groups over spins `[14 15 16]` and `[21 22 23]`, proton zero-quantum order, and projection 1. The script enables greedy parallelisation. These are the source's explicit choices; the example does not use a Hilbert-space propagator.
+The model specifies scalar Zeeman shifts and scalar couplings. For the basis it selects `sphten-liouv`, `IK-0`, and `inter_level=1`, with a manually specified three-block basis, two `S3` symmetry groups over spins `[14 15 16]` and `[21 22 23]`, proton zero-quantum order, and projection 1. The script enables greedy parallelisation. These are the source's explicit choices; the example does not use a Hilbert-space propagator. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Acquisition and processing
 

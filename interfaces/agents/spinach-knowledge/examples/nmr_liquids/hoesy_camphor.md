@@ -12,7 +12,7 @@ Simulates the `13C{1H}` HOESY spectrum of camphor at natural `13C` content. The 
 
 The example reads `../standard_systems/camphor.log` with `gparse` and `g2spinach`, requesting `1H` and `13C` spins with the source arguments `[31.5 189.2]`; `options.min_j=3.0` and `options.no_xyz=0`. The spin model therefore tracks the specified proton and carbon-13 network, not the other molecular nuclei. `dilute(spin_system,'13C')` generates the carbon-13 isotopomer subsystems; the script simulates each and accumulates their spectra.
 
-The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-2`, scalar-coupling connectivity, and proximity level 3. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `50e-12` s and temperature `298` K. The algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
+The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-2`, scalar-coupling connectivity, and proximity level 3. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `50e-12` s and temperature `298` K. The algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Acquisition and processing
 

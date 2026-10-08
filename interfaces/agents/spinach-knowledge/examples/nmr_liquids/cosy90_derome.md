@@ -10,7 +10,7 @@ A three-proton 90-degree COSY simulation identified in the source as Figure 8.26
 
 ## Spin system and COSY pathway
 
-The system contains three 1H spins at 16.1 T. Their isotropic shifts are 3.70, 3.92 and 4.50 ppm; the explicitly assigned scalar couplings are J(1,2)=10 Hz, J(2,3)=12 Hz and J(1,3)=4 Hz. A zero diagonal coupling is also assigned to spin 3. The driver uses the full sphten-Liouville basis (approximation 'none'), with greedy selection enabled and proximity cutoff 4.0.
+The system contains three 1H spins at 16.1 T. Their isotropic shifts are 3.70, 3.92 and 4.50 ppm; the explicitly assigned scalar couplings are J(1,2)=10 Hz, J(2,3)=12 Hz and J(1,3)=4 Hz. A zero diagonal coupling is also assigned to spin 3. The driver uses the full sphten-Liouville basis (approximation 'none'), with greedy selection enabled and proximity cutoff 4.0. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 The driver runs the COSY pulse program through liquid in NMR mode. It begins with proton longitudinal magnetisation and applies a 90-degree first pulse. It evolves the spin state over F1, selects +1 proton coherence, applies a second 90-degree pulse (angle pi/2), then records F2 using the proton L+ detection operator. No separate receiver phase or additional phase cycle is set in the example driver.
 

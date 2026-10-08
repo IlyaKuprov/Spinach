@@ -9,7 +9,7 @@ A liquid-state 1H pulse-acquire spectrum for the strychnine spin system. The wra
 
 ## Spin system and relaxation
 
-The field is set to 14.1 (the source labels this as the magnetic field but does not state a unit). The basis uses the spherical-tensor Liouville formalism, IK-2 approximation, scalar-coupling connectivity and proximity level 1. Redfield relaxation is enabled with zero equilibrium, retained terms set to `kite`, and a correlation time of 200e-12 s (200 ps). The greedy option is enabled and the proximity cutoff is 4.0; the wrapper gives no unit for that cutoff.
+The field is set to 14.1 (the source labels this as the magnetic field but does not state a unit). The basis uses the spherical-tensor Liouville formalism, IK-2 approximation, scalar-coupling connectivity and proximity level 1. Redfield relaxation is enabled with zero equilibrium, retained terms set to `kite`, and a correlation time of 200e-12 s (200 ps). The greedy option is enabled and the proximity cutoff is 4.0; the wrapper gives no unit for that cutoff. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Acquisition and processing
 

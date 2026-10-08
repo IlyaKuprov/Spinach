@@ -10,7 +10,7 @@ A liquid-state homonuclear proton COSY-90 calculation for strychnine. The source
 
 ## Spin system and basis
 
-Rather than listing shifts and couplings locally, the function imports the proton model with `strychnine({'1H'})`; that helper supplies `sys` and `inter`. The field is set to 5.9 T. The basis is Liouville-space IK-2 with scalar-coupling connectivity and proximity level 1. The greedy option is enabled, with a proximity cutoff of 4.0 (the example does not specify a unit for this cutoff).
+Rather than listing shifts and couplings locally, the function imports the proton model with `strychnine({'1H'})`; that helper supplies `sys` and `inter`. The field is set to 5.9 T. The basis is Liouville-space IK-2 with scalar-coupling connectivity and proximity level 1. The greedy option is enabled, with a proximity cutoff of 4.0 (the example does not specify a unit for this cutoff). Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## COSY acquisition and processing
 

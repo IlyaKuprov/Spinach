@@ -73,4 +73,3 @@ kfigure(); contour(abs(spectrum)); kgrid;
 
 end
 
-

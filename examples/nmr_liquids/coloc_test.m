@@ -55,4 +55,3 @@ plot_2d(spin_system,abs(spec),parameters,...
 
 end
 
-

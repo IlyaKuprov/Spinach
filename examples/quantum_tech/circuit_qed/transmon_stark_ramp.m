@@ -127,4 +127,3 @@ klegend({'$-\Delta_{bd}/2\pi=6$ MHz (DRAG)','$-\Delta_{bd}/2\pi=12$ MHz (DRAG)',
 
 end
 
-

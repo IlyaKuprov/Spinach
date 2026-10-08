@@ -42,4 +42,3 @@ disp(full(relaxation(spin_system)));
 
 end
 
-

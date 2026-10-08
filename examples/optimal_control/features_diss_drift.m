@@ -133,4 +133,3 @@ report(spin_system,['Re[<target|rho(T)>] = ' num2str(fidelity)]);
 
 end
 
-

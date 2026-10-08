@@ -45,4 +45,3 @@ kxlabel('$\omega/a$'); axis([0 0.5 0.46 0.58]);
 
 end
 
-

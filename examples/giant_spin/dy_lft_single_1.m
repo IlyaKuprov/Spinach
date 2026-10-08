@@ -95,4 +95,3 @@ disp('Eigenvalues: 19.2967    0.0529       0.0579');
 
 end
 
-

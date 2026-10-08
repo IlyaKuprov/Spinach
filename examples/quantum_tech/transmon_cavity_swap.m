@@ -63,4 +63,3 @@ klegend({'transmon','cavity'},'Location','Best');
 
 end
 
-

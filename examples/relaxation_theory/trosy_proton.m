@@ -98,4 +98,4 @@ klegend({'${\hat C_ + } - 2{\hat C_ + }{\hat H_{\rm{Z}}}$',...
 
 end
 
-
+                         

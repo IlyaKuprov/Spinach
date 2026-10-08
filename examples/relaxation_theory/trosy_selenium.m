@@ -99,4 +99,4 @@ klegend({'${\hat C_ + } - 2{\hat C_ + }{\hat Se_{\rm{Z}}}$',...
 
 end
 
-
+                         

@@ -194,4 +194,3 @@ err=norm(real(expt_h)-real(sim_h))^2+...
 
 end
 
-

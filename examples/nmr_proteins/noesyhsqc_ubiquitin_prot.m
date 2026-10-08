@@ -93,4 +93,3 @@ kfigure(); plot_3d(spin_system,-real(spectrum),parameters,...
 
 end
 
-

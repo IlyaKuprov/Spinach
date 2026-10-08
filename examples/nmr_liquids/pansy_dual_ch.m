@@ -80,4 +80,3 @@ plot_2d(spin_system,abs(spec_a),parameters,20,...
 
 end
 
-

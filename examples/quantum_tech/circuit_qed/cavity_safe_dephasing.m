@@ -191,4 +191,3 @@ end
 dnm=(frqs(2)-frqs(1))/(2*dw);
 end
 
-

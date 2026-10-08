@@ -44,4 +44,3 @@ disp(eigs(R-speye(size(R)),20,'SM')+1);
 
 end
 
-

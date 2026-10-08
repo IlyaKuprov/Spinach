@@ -145,4 +145,3 @@ klegend({'Adiabatic, tan ramp','GRAPE, same time',...
 
 end
 
-

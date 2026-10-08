@@ -74,5 +74,3 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 1.0 0.05 1.0],2,256,6,'negative');
 
 end
-
-

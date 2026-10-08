@@ -70,4 +70,3 @@ kylabel('$a+a^+$'); ktitle('conditional displacement');
 
 end
 
-

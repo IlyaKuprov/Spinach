@@ -146,4 +146,3 @@ disp(['1H DFS: ' num2str(imag(-Np'*R*Np)) ' Hz']);
 
 end
 
-

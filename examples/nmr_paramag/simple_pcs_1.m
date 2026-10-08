@@ -48,4 +48,3 @@ disp(['R2 rate, Spinach: ' num2str(R2Sp)]);
 
 end
 
-

@@ -230,4 +230,3 @@ end
 suscept=(energies(2,:)-energies(1,:))/(2*dw);
 end
 
-

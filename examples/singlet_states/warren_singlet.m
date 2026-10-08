@@ -43,4 +43,3 @@ sort(eig(full(R)))
 
 end
 
-

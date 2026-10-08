@@ -56,4 +56,3 @@ kylabel('singlet recombination yield');
 
 end
 
-

@@ -122,4 +122,3 @@ fieldscan_enlev(spin_system,parameters);
 
 end
 
-

@@ -132,4 +132,3 @@ err=norm(spec_expt_h-spec_theo_h)^2+...
 
 end
 
-

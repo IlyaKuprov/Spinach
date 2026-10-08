@@ -132,4 +132,3 @@ plot3(nu*ones(1,numel(offsets))/1e6,...
 
 end
 
-

@@ -70,4 +70,3 @@ kxlabel('time, $\mu$s'); kylabel('energy, GHz'); kgrid;
 
 end
 
-

@@ -90,4 +90,3 @@ subplot(1,3,3); mri_2d_plot(R2Ph,parameters,'phantom'); ktitle('$R_2$ phantom');
 
 end
 
-

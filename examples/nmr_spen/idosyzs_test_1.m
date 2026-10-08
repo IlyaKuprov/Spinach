@@ -102,5 +102,3 @@ disp(['Fitted D:       ' num2str(x(2)*1e-10)]);
 disp(['Gradient shift: ' num2str(x(3))]);
 
 end
-
-

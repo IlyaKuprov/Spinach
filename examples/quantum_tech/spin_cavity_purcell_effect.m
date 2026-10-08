@@ -122,4 +122,3 @@ Hjc=hamiltonian(assume(spin_system,'cavity'));
 R=relaxation(spin_system);
 end
 
-

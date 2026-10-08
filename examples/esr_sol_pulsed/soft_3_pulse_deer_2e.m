@@ -77,4 +77,3 @@ deer_3p_soft_diag(spin_system,parameters);
 
 end
 
-

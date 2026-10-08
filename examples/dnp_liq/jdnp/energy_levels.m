@@ -50,4 +50,3 @@ kylabel('$\omega/\omega_{E}$'); kgrid;
 
 end
 
-

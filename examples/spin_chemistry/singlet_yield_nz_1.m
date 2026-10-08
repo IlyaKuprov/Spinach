@@ -128,4 +128,3 @@ yield=real((k_cage/2)*imag(S'*x)/(k_cage*imag(EE'*x)));
 
 end
 
-

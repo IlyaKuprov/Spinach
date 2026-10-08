@@ -89,4 +89,3 @@ ktitle('Bright fat effect under CPMG echo train');
 
 end
 
-

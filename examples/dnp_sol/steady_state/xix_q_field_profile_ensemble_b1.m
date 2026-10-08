@@ -98,4 +98,3 @@ savefig(gcf,'xix_q_field_profile_ensemble_b1.fig');
 
 end
 
-

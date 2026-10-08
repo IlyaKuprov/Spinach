@@ -43,4 +43,3 @@ disp(['Singlet population: ' num2str(coil'*rho)]);
 
 end
 
-

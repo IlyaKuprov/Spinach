@@ -156,4 +156,3 @@ err=norm(real(expt_data)-real(sim_spec))^2;
 
 end
 
-

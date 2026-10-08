@@ -65,4 +65,3 @@ stateinfo(spin_system,v(:,2),100);
 
 end
 
-

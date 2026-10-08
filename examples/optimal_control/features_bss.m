@@ -97,4 +97,3 @@ report(spin_system,['uncorrected pulse, corrected model: ' ...
 
 end
 
-

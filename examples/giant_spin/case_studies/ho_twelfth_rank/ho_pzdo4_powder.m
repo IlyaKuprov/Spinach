@@ -125,4 +125,3 @@ klegend([h_one h_avg h_eq],{'QME per orientation',...
 
 end
 
-

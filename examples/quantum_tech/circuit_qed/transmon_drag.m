@@ -127,4 +127,3 @@ klegend({'$|0\rangle$','$|1\rangle$','$|2\rangle$'},'Location','Best');
 
 end
 
-

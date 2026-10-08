@@ -104,4 +104,3 @@ disp(['Average fidelity ' num2str(mean(fid))]);
 
 end
 
-

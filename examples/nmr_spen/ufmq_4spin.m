@@ -112,4 +112,3 @@ plot_uf(spin_system,abs(kwdata_sim),parameters);
 
 end
 
-

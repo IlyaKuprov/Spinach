@@ -111,4 +111,3 @@ savefig(gcf,'xix_w_pulse_dur_ensemble_r.fig');
 
 end
 
-

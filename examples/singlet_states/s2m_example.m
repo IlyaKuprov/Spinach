@@ -43,4 +43,3 @@ disp(['Longitudinal magnetisation: ' num2str(coil'*rho)]);
 
 end
 
-

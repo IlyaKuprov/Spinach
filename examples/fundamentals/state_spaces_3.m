@@ -62,4 +62,3 @@ kfigure(); trajan(spin_system,traj,'correlation_order');
 
 end
 
-

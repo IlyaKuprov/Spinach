@@ -80,4 +80,3 @@ stack_2d(spin_system,real(spectrum),parameters,1);
 
 end
 
-

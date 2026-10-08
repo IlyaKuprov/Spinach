@@ -63,4 +63,3 @@ klegend({'spin','cavity'},'Location','Best');
 
 end
 
-

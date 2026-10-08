@@ -127,4 +127,3 @@ plot(1e6*contact_times,real(dnp)); drawnow;
 
 end
 
-

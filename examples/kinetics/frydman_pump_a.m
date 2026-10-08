@@ -130,4 +130,3 @@ traj=krylov(spin_system,L_CP1,[],rho,time_step,...
 
 end
 
-

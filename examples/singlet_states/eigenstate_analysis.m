@@ -98,4 +98,3 @@ report(spin_system,['...of which is not ZZ: ' ...
 
 end
 
-

@@ -52,4 +52,3 @@ kylabel('$\Delta S/S_0$'); kgrid; xlim tight;
 
 end
 
-

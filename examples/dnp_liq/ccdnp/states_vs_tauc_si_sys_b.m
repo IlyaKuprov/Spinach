@@ -141,5 +141,3 @@ legend({'${ 2 \hat N_ {z} \hat E_ {1z} }$',...
 xlim([min(tau_c) max(tau_c)]*1e12);
 
 end
-
-

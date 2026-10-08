@@ -146,4 +146,3 @@ plot_2d(spin_system,-real(spectrum),parameters,...
 
 end
 
-

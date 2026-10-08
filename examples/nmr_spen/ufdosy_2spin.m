@@ -98,6 +98,5 @@ npoints=size(squarespectrum,1); dispaxis=FOV*(-npoints/2:npoints/2-1)/npoints;
 kfigure(); imagesc(ppm_axis,1000*dispaxis,abs(squarespectrum));
 kxlabel('chemical shift / ppm'); kylabel('FOV / mm');
 
-end
-
+end 
 

@@ -104,4 +104,3 @@ klegend('$\tau_m = 0.1$ s','$\tau_m = 1.4$ s','$\tau_m = 1.6$ s',...
 
 end
 
-

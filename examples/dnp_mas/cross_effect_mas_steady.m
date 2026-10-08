@@ -110,4 +110,3 @@ disp(['Enhancement factor: ' num2str(enh_factor)]);
 
 end
 
-

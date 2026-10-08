@@ -67,4 +67,3 @@ plot_1d(spin_system,imag(spectrum),parameters);
 
 end
 
-

@@ -62,4 +62,3 @@ klegend({'spin','phonon'},'Location','Best');
 
 end
 
-

@@ -47,4 +47,3 @@ disp(['R2 rate, textbook: ' num2str(R2Book)]);
    
 end
 
-

@@ -79,4 +79,3 @@ klegend({'constant ampl.','linear ramp','tangent ramp'},...
 
 end
 
-

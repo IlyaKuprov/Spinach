@@ -78,5 +78,3 @@ if (~ischar(formalism))||(~ismember(formalism,{'sphten-liouv','zeeman-liouv','ze
     error('formalism must be ''sphten-liouv'', ''zeeman-liouv'', or ''zeeman-hilb''.');
 end
 end
-
-

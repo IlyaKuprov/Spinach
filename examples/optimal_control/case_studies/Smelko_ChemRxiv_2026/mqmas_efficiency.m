@@ -148,4 +148,3 @@ disp(['Signal enhancement factor:            ' num2str(efficiency(2)/efficiency(
 
 end
 
-

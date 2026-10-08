@@ -130,4 +130,3 @@ pulse_profile=fmaxnewton(spin_system,@grape_phase,guess); %#ok<NASGU>
 
 end
 
-

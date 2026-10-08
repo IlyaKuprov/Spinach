@@ -87,4 +87,3 @@ kylabel('$S_\textrm{z}$ expectation value on $^{15}$N');
 
 end
 
-

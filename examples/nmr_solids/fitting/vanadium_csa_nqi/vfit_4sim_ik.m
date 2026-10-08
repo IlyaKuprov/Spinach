@@ -168,4 +168,3 @@ err=norm(real(S35)-real(sim_speca))^2+...
 
 end
 
-

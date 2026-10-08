@@ -173,4 +173,3 @@ err=norm(spec_expt_f-spec_theo_f)^2+...
 
 end
 
-

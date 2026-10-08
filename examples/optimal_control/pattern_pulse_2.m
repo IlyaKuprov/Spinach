@@ -104,5 +104,3 @@ figure(2); hold on; plot(toff_range,[X; Z],'o');
 klegend({'X (target)','Z (target)','X (result)','Z (result)'});
 
 end
-
-

@@ -141,4 +141,3 @@ klegend({'$\sigma_x$','$\sigma_y$','$\sigma_z$'},'Location','Best');
 
 end
 
-

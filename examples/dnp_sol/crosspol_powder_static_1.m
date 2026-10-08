@@ -51,4 +51,3 @@ kxlabel('Contact pulse duration, seconds'); xlim tight;
 
 end
 
-

@@ -87,4 +87,3 @@ disp(full([outcome_a outcome_b (outcome_a+outcome_b)/2 rho_targ]));
 
 end
 
-

@@ -74,4 +74,3 @@ disp(['R1 rate ratio, textbook: ' num2str(ratio)]);
 
 end
 
-

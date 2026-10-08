@@ -82,4 +82,3 @@ savefig(gcf,'xix_q_field_profile_single.fig');
 
 end
 
-

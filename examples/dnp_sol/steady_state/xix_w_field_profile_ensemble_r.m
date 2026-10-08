@@ -92,4 +92,3 @@ savefig(gcf,'xix_w_field_profile_ensemble_r.fig');
 
 end
 
-

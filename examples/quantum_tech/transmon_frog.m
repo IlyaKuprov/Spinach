@@ -83,4 +83,3 @@ fmaxnewton(spin_system,@grape_xy,pulse);
 
 end
 
-

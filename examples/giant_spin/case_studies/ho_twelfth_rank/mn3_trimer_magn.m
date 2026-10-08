@@ -119,4 +119,3 @@ klegend({'Equilibrium','QME - 16 states','QME - 26 states'},...
 
 end
 
-

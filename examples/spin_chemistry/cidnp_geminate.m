@@ -60,4 +60,3 @@ disp(['Nuclear magnetisation in products:  ' num2str(real(Nz'*rho_prod))]);
 
 end
 
-

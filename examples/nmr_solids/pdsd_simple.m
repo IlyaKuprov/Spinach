@@ -72,4 +72,3 @@ plot_2d(spin_system,spectrum,parameters,...
 
 end
 
-

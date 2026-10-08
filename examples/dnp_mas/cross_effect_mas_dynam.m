@@ -92,4 +92,3 @@ kfigure(); trajan(spin_system,rho,'level_populations');
 
 end
 
-

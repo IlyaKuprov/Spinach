@@ -61,4 +61,3 @@ kylabel('$I_\textrm{z}$ expectation value on $^{1}$H'); axis tight; kgrid;
 
 end
 
-

@@ -46,4 +46,3 @@ disp(full(R));
 
 end
 
-

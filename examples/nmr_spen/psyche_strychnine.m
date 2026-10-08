@@ -99,5 +99,3 @@ parameters.zerofill=parameters.zerofill(2);
 plot_1d(spin_system,imag(spectrum_ps),parameters);
 
 end
-
-

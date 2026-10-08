@@ -121,4 +121,3 @@ savefig(gcf,'novel_x_rep_time_ensemble_r.fig');
 
 end
 
-

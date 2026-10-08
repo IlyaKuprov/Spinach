@@ -67,4 +67,3 @@ disp('Kuprov''s matrix in Equation 2:'); disp(P'*R*P);
 
 end
 
-

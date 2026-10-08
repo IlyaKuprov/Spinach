@@ -97,4 +97,3 @@ disp(['R(NzE1zE2z -> Nz): ' num2str(Nz'*R*NzE1zE2z)]);
 
 end
 
-

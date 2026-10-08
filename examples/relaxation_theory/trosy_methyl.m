@@ -150,4 +150,3 @@ subplot(1,2,2); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 
-

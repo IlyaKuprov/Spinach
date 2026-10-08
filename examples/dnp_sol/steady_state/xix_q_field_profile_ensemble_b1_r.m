@@ -109,4 +109,3 @@ savefig(gcf,'xix_q_field_profile_ensemble_b1_r.fig');
 
 end
 
-

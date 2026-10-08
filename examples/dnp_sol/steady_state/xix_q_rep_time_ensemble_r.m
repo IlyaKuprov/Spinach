@@ -106,4 +106,3 @@ savefig(gcf,'xix_q_rep_time_ensemble_r.fig');
 
 end
 
-

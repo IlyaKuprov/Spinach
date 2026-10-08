@@ -125,4 +125,3 @@ end
 fid=real(trace(rho_targ'*rho));
 end
 
-

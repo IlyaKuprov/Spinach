@@ -62,4 +62,3 @@ xlim tight; ylim padded; drawnow;
 
 end
 
-

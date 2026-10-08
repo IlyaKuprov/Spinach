@@ -37,4 +37,3 @@ relaxan(spin_system);
 
 end
 
-

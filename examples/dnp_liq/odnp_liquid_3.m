@@ -93,4 +93,3 @@ kcolourbar('$\langle H_{\rm{Z}} \rangle$ at the steady state');
 
 end
 
-

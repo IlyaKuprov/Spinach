@@ -89,4 +89,3 @@ kfigure(); plot_1d(spin_system,mri,parameters);
 
 end
 
-

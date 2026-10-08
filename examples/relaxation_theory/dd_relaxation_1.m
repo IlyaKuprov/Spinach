@@ -71,4 +71,3 @@ disp('Complete relaxation superoperator, IST basis:'); disp(full(R));
 
 end
 
-

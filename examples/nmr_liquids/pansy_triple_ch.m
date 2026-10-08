@@ -112,4 +112,3 @@ plot_2d(spin_system,real(spec_a),parameters,20,...
 
 end
 
-

@@ -103,4 +103,3 @@ stateinfo(spin_system,rho,5);
 
 end
 
-

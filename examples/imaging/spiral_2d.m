@@ -86,4 +86,3 @@ subplot(1,3,3); mri_2d_plot(R2Ph,parameters,'phantom'); title('R2 phantom');
 
 end
 
-

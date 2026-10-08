@@ -76,4 +76,3 @@ ktitle('spin-phonon avoided crossing');
 
 end
 
-

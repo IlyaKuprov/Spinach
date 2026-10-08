@@ -188,4 +188,3 @@ subplot(2,3,3); klegend({[num2str(grid_sizes(3))  ' points'],...
 
 end
 
-

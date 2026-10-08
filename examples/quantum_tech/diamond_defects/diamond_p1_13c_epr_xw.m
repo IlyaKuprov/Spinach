@@ -69,5 +69,3 @@ ktitle('13C-enriched P1 W-band EPR');
 xlim tight; ylim padded; kgrid;
 
 end
-
-

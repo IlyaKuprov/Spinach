@@ -82,4 +82,3 @@ plot_2d(spin_system,-real(spec),parameters,...
 
 end
 
-

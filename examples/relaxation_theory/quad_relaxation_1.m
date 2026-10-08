@@ -49,4 +49,3 @@ disp([sys.isotopes{1} ' transverse relaxation rate, textbook:   ' num2str(r2)]);
 
 end
 
-

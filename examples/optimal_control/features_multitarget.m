@@ -108,4 +108,3 @@ report(spin_system,['TS->ST: Re[<target|rho(T)>] = ' num2str(fidelity_b)]);
 
 end
 
-

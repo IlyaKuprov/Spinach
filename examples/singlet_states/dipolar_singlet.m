@@ -46,4 +46,3 @@ disp(['Norm of R|S>: ' num2str(norm(R*S))]);
 
 end
 
-

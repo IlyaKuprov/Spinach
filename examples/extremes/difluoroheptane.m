@@ -120,4 +120,3 @@ kfigure(); plot_1d(spin_system,spectrum,parameters);
 
 end
 
-

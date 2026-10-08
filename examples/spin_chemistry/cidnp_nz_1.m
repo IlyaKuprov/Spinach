@@ -125,4 +125,3 @@ pol=real(Nz'*rho_prod);
 
 end
 
-

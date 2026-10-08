@@ -52,4 +52,3 @@ kxlabel('log(magnetic induction / mT)');
 
 end
 
-

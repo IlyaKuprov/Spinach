@@ -51,4 +51,3 @@ report(spin_system,['<singlet|R|singlet> matrix element: ' num2str(S'*R*S)]);
 
 end
 
-

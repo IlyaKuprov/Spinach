@@ -80,4 +80,3 @@ savefig(gcf,'xix_w_field_profile_single.fig');
 
 end
 
-

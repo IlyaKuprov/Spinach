@@ -101,5 +101,3 @@ figure(2); hold on; plot(nutf_range,[X; Z],'o');
 klegend({'X (target)','Z (target)','X (result)','Z (result)'});
 
 end
-
-

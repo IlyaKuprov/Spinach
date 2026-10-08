@@ -128,4 +128,3 @@ klegend(variants,'Location','northwest');
 
 end
 
-

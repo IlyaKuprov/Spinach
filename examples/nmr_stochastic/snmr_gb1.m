@@ -164,4 +164,3 @@ kxlabel('time, seconds'); kylabel('expect. value');
 
 end
 
-

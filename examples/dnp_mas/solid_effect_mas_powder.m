@@ -66,4 +66,3 @@ disp(['Steady state DNP enhancement: ' num2str(answer)]);
 
 end
 
-

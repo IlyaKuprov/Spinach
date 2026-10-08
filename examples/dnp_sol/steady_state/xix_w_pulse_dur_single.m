@@ -100,4 +100,3 @@ savefig(gcf,'xix_w_pulse_dur_single.fig');
 
 end
 
-

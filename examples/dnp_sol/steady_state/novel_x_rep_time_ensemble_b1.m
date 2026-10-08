@@ -128,4 +128,3 @@ savefig(gcf,'novel_x_rep_time_ensemble_b1.fig');
 
 end
 
-

@@ -97,4 +97,4 @@ klegend({'${\hat N_ + } - 2{\hat N_ + }{\hat H_{\rm{Z}}}$',...
 
 end
 
-
+                         

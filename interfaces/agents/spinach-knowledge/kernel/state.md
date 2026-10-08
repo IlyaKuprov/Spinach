@@ -19,9 +19,11 @@ For example, `psi=state(spin_system,[-1/2 1/2 0])` specifies the projections for
 ## Inputs and state construction
 
 - In the general call, `states` names operator components and `spins` selects the target spins. A string isotope selector sums the requested one-spin operator over every matching spin, e.g. `state(spin_system,'Lz','13C')`; the selectors `'electrons'`, `'nuclei'`, and `'all'` are also documented. A numeric spin-index vector such as `[1 2 4]` likewise requests a sum over those sites.
-- To form a product operator, pass matching cell arrays, e.g. `states={'Lz','L+'}; spins={1,2}`. The operators act on the listed sites as a product, not a sum; cell-array spin indices must be positive integers and cannot repeat.
+- To form a product operator, pass matching cell arrays, e.g. `states={'Lz','L+'}; spins={1,2}`. The operators act on the listed sites as a product, not a sum; cell-array spin indices must be positive integers, cannot repeat, and must belong to one substance. Cross-substance products raise `Spinach:which_subst:crossSubstance`.
 - Supported operator labels are `'E'` (identity), `'Lz'`, `'Lx'`, `'Ly'`, `'L+'`, `'L-'`, `'Tl,m'` (irreducible spherical tensor, integer `l,m`), and `'CTx'`, `'CTy'`, `'CTz'`, `'CT+'`, `'CT-'` (central-transition operators in the Zeeman basis). The source routes these descriptions through `human2opspec` and constructs the corresponding basis representation.
 - In `sphten-liouv`, `method` may be `'exact'` (default; correct normalisation), `'cheap'` (faster for large systems, but deliberately unnormalised), or `'chem'` (exact state weighted by concentrations in `inter.chem.concs`). The method choice is ignored by the Zeeman Hilbert and Liouville formalisms; those modes do not provide these shortcuts/chemical-kinetics weighting.
+
+The `exact` and `cheap` sphten constructors return unweighted direct-sum vectors. Descriptor lookup uses local columns of the hosting substance; isotope sums accumulate contributions in all matching blocks. Identity requests populate the substance unit coordinates.
 
 ## Output and limitations
 

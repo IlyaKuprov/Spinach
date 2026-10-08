@@ -25,6 +25,11 @@ every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic
 rates have no effect there.
 
+In the sphten direct sum, `unit_state` populates every substance unit coordinate,
+and `equilibrium` returns independently normalised, unweighted blocks. IME acts
+on each block separately. T1/T2 rates use the local descriptor columns and
+`chem.parts` spin map; diagonal retention and damping preserve every unit.
+
 ## Selecting a relaxation theory
 
 `inter.relaxation` is a cell array of strings and more than one may be

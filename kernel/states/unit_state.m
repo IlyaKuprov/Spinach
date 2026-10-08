@@ -29,7 +29,8 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
         
         % Unit population of T(0,0) state
-        rho=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+        rho=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+                   spin_system.bas.offsets(end),1);
         
     case 'zeeman-liouv'
         

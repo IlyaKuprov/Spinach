@@ -8,7 +8,7 @@ Constructs the unit-state representation for the basis already stored in `spin_s
 
 ## Representations
 
-- In `sphten-liouv`, returns a sparse column vector with the first basis coordinate set to 1. The source identifies this as the population of `T(0,0)`; the remaining basis ordering is whatever `spin_system.bas.basis` contains.
+- In `sphten-liouv`, returns a sparse direct-sum column vector with every substance unit coordinate `bas.offsets(n)+1` set to 1, without concentration weighting. These coordinates represent `T(0,0)`.
 - In `zeeman-liouv`, vectorises the identity on the spin Hilbert space using MATLAB column-major `(:)` ordering and divides by its Euclidean 2-norm, so the returned vector has unit 2-norm.
 - In `zeeman-hilb`, returns the sparse identity matrix without an additional normalisation.
 - Other formalism values raise an error.

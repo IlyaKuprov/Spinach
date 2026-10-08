@@ -83,6 +83,9 @@ if ~exist('spins','var'), spins=[]; end
 % Check consistency
 grumble(spin_system,states,spins,method);
 
+% Reject product states spanning substances
+if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
+
 % Get the unit state
 switch spin_system.bas.formalism
 
@@ -91,7 +94,7 @@ switch spin_system.bas.formalism
         % Unit population of T(0,0) state, normalisation is
         % such because prod(spin_system.comp.mults) can be-
         % come too large for double precision arithmetic
-        unit=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+        unit=unit_state(spin_system);
         
     case 'zeeman-liouv'
 
@@ -115,36 +118,25 @@ switch spin_system.bas.formalism
                 % Parse the specification
                 [opspecs,coeffs]=human2opspec(spin_system,states,spins);
                 
-                % Compute correlation orders
-                correlation_orders=sum(logical(spin_system.bas.basis),2);
-                
-                % Locate each operator in the basis
-                indices=zeros(size(coeffs));
-                parfor n=1:numel(opspecs) %#ok<*PFBNS>
-                    
-                    % Find states with the same correlation order
-                    possibilities=(correlation_orders==nnz(opspecs{n}));
-                    
-                    % Pin down the required state
-                    for k=find(opspecs{n})
-                        possibilities=and(possibilities,spin_system.bas.basis(:,k)==opspecs{n}(k)); 
-                    end
+                % Allocate the unweighted direct-sum state
+                rho=sparse(spin_system.bas.offsets(end),1);
 
-                    % Double-check
-                    if nnz(possibilities)>1
-                        error('basis descriptor ambiguity detected.');
-                    elseif nnz(possibilities)<1
+                % Locate each operator in its hosting descriptor
+                for n=1:numel(opspecs)
+                    active_spins=find(opspecs{n});
+                    if isempty(active_spins)
+                        rho=rho+coeffs(n)*unit;
+                        continue;
+                    end
+                    subst=which_subst(spin_system,active_spins);
+                    descriptor=opspecs{n}(spin_system.chem.parts{subst});
+                    [present,index]=ismember(descriptor,spin_system.bas.basis{subst},'rows');
+                    if ~present
                         error('the requested state is not present in the basis.');
                     end
-                    
-                    % Locate the state 
-                    indices(n)=find(possibilities);
-                    
+                    index=index+spin_system.bas.offsets(subst);
+                    rho(index)=rho(index)+coeffs(n);
                 end
-                
-                % Assemble the state vector
-                nrows=size(spin_system.bas.basis,1); ncols=1;
-                rho=sparse(indices,ones(size(indices)),coeffs,nrows,ncols);
 
             % Careful normalisation
             case 'exact'
@@ -159,10 +151,10 @@ switch spin_system.bas.formalism
                 [opspecs,coeffs]=human2opspec(spin_system,states,spins);
                 
                 % Preallocate the state vector
-                rho=spalloc(size(spin_system.bas.basis,1),1,0);
+                rho=spalloc(spin_system.bas.offsets(end),1,0);
 
                 % Get the basis dimension
-                matrix_dim=size(spin_system.bas.basis,1);
+                matrix_dim=spin_system.bas.offsets(end);
                 
                 % Sum the states with concentrations
                 for n=1:numel(opspecs)

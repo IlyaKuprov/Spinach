@@ -92,7 +92,7 @@ switch spin_system.bas.formalism
                 % Unit population of T(0,0) state, normalisation is
                 % such because prod(spin_system.comp.mults) can be-
                 % come too large for double precision arithmetic
-                unit=sparse(1,1,1,size(I,2),1);
+                unit=unit_state(spin_system);
 
             case 'zeeman-liouv'
 
@@ -119,7 +119,10 @@ switch spin_system.bas.formalism
         end
         
         % Divide by partition function
-        rho=rho/dot(unit,rho);
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            rho(idx)=rho(idx)/dot(unit(idx),rho(idx));
+        end
         
     % Hilbert space
     case {'zeeman-hilb'}

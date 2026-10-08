@@ -235,9 +235,6 @@ end
 % Build one local spherical-tensor descriptor using subgraph enumeration
 function descriptor=substance_basis(spin_system,bas)
 
-% Check local settings before connectivity analysis
-grumble_local(spin_system,bas);
-
 % Find electrons and nuclei
 e_idx=cellfun(@iselectron,spin_system.comp.isotopes);
 n_idx=cellfun(@isnucleus,spin_system.comp.isotopes);

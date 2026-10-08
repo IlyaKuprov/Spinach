@@ -32,9 +32,6 @@ inter.coupling.scalar{1,4}=8.0;
 bas.formalism='sphten-liouv';
 bas.approximation='none'; 
 
-% Enable zero track elimination
-sys.enable={'zte'};
-
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

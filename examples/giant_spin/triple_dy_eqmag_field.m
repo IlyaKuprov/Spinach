@@ -101,7 +101,7 @@ inter.giant.euler={{[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spherical powder grid
 parameters.grid='leb_2ang_rank_11';
@@ -145,4 +145,5 @@ for n=1:numel(B0)
 end
 
 end
+
 

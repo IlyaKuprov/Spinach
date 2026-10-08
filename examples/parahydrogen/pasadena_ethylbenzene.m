@@ -30,11 +30,11 @@ inter.coupling.scalar{8,10}=7.44;  inter.coupling.scalar{9,10}=7.44;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
-bas.sym_group={'S3','S2'};
-bas.sym_spins={[1 2 3],[4 5]};
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
+bas.sym_group={{'S3','S2'}};
+bas.sym_spins={{[1 2 3],[4 5]}};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -70,4 +70,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

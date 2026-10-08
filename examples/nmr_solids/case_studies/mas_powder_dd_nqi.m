@@ -24,7 +24,7 @@ inter.coupling.matrix{2,2}=castep2nqi([ 0.1580  0.0340 -0.5562
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Enable zero track elimination, with optional GPU arithmetic
@@ -66,4 +66,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

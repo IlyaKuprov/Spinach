@@ -37,7 +37,7 @@ inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Disable path tracing
 sys.disable={'pt'};
@@ -88,4 +88,5 @@ kxlabel('FOV1, px'); kylabel('FOV2, px'); kgrid;
 ktitle('Bright fat effect under CPMG echo train');
 
 end
+
 

@@ -37,7 +37,7 @@ inter.coordinates{2}=props.std_geom(4,:);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination, with optional GPU arithmetic
 sys.enable={'zte'};
@@ -100,4 +100,5 @@ klegend('$\tau_c = 10^{-7}$ s',...
 kylabel('amplitude, a.u.');
 
 end
+
 

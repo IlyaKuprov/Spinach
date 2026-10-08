@@ -19,7 +19,7 @@ inter.coupling.scalar{1,2}=7.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -67,4 +67,5 @@ for ppm=[0.2 0.05 0.0125 0.00625]
 end
 
 end
+
 

@@ -32,7 +32,7 @@ inter.coordinates={[ 0.00   0.00   0.00];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'nottingham'};
@@ -69,4 +69,5 @@ axis tight; kxlabel('Microwave frequency offset, MHz');
 kylabel('$S_\textrm{z}$ expectation value on $^{1}$H'); 
 
 end
+
 

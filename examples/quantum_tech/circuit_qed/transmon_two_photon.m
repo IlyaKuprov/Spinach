@@ -24,7 +24,7 @@ inter.modes.anharms={-200e6};
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -92,4 +92,5 @@ klegend({'$|0\rangle$','$|1\rangle$','$|2\rangle$','$|3\rangle$'},...
         'Location','Best');
 
 end
+
 

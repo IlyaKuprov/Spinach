@@ -31,7 +31,7 @@ sys.tols.rlx_zero=1e-5;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -42,4 +42,5 @@ R=relaxation(spin_system);
 sort(eig(full(R)))
 
 end
+
 

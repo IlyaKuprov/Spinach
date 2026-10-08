@@ -16,7 +16,7 @@ inter.zeeman.scalar={1.5};
 
 % Complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
                
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -63,4 +63,5 @@ kxlabel('time, seconds');
 xlim tight; ylim padded; kgrid;
 
 end
+
 

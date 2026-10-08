@@ -140,10 +140,10 @@ inter.tau_c={50e-12 50e-12};
               
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4;
-bas.prox_level=3;
+bas.approximation={'IK-1', 'IK-1'};
+bas.connectivity={'scalar_couplings', 'scalar_couplings'};
+bas.inter_level={4, 4};
+bas.prox_level={3, 3};
 
 % Algorithmic options
 sys.disable={'krylov'};
@@ -191,4 +191,5 @@ plot_2d(spin_system,-real(spectrum),parameters,...
         20,[0.01 0.1 0.05 0.5],2,256,6,'both');
 
 end
+
 

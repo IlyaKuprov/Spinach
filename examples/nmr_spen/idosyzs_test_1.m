@@ -23,7 +23,7 @@ inter.zeeman.scalar={4.6};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'pt'};
@@ -102,3 +102,5 @@ disp(['Fitted D:       ' num2str(x(2)*1e-10)]);
 disp(['Gradient shift: ' num2str(x(3))]);
 
 end
+
+

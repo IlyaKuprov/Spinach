@@ -26,7 +26,7 @@ inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
                        
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -116,4 +116,5 @@ kgrid; axis tight; kxlabel('Nuclear frequency, MHz');
 kylabel('(RF on)/(RF off)'); ktitle('Single crystal ENDOR');
 
 end
+
 

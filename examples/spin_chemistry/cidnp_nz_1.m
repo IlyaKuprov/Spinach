@@ -87,7 +87,7 @@ end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -124,4 +124,5 @@ rho_prod=rho((numel(rho)/2+1):end);
 pol=real(Nz'*rho_prod);
 
 end
+
 

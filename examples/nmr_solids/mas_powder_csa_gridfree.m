@@ -16,7 +16,7 @@ inter.zeeman.euler={[0 0 0],[0 0 0]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Enable zero track elimination
@@ -55,4 +55,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

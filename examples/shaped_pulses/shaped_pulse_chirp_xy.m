@@ -25,9 +25,9 @@ end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -86,4 +86,5 @@ subplot(1,2,2); plot_1d(spin_system,spectrum,parameters);
 ktitle('band-selective inversion');
 
 end
+
 

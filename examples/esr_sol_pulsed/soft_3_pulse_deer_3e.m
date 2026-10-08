@@ -35,7 +35,7 @@ inter.coordinates{3}=[0.00 0.00 20.00];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -79,4 +79,5 @@ parameters.echo_npts=100;
 deer_3p_soft_diag(spin_system,parameters);
 
 end
+
 

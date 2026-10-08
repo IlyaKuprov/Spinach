@@ -41,9 +41,9 @@ inter.coupling.scalar{22,22}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Algorithmic options
 sys.disable={'pt','colorbar'};
@@ -121,3 +121,5 @@ parameters.zerofill=parameters.zerofill(2);
 plot_1d(spin_system,imag(spectrum_ps),parameters);
 
 end
+
+

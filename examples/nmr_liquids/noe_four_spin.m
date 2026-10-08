@@ -23,7 +23,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -84,4 +84,5 @@ scale_figure([2.0 0.85]); xlim([0.8 4.2]);
 kylabel('intensity, a.u.');
 
 end
+
 

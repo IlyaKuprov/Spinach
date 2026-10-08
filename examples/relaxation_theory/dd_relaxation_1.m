@@ -22,7 +22,7 @@ inter.tau_c={5e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -70,4 +70,5 @@ disp(['(1) -> (2) Rx, textbook: ' num2str(rx,'%10.6f') ' Hz, Spinach: ' ...
 disp('Complete relaxation superoperator, IST basis:'); disp(full(R));
 
 end
+
 

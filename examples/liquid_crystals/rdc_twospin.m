@@ -19,7 +19,7 @@ inter.order_matrix={diag([1e-3 2e-3 -3e-3])};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'colorbar'};
@@ -64,4 +64,5 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 1.0 0.05 1.0],2,256,6,'negative');
 
 end
+
 

@@ -27,7 +27,7 @@ sys.magnet=0.33;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -70,4 +70,5 @@ subplot(2,1,2); plot(freq_axis,abs(spectrum));
 kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end
+
 

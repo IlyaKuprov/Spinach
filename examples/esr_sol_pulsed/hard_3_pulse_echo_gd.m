@@ -27,7 +27,7 @@ inter.coupling.euler{2,2}=[0 pi/2 0];
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
                
 
 % Spinach housekeeping
@@ -66,4 +66,5 @@ kfigure(); plot(1e6*time_axis,imag(echo)); kgrid;
 kxlabel('time, microseconds'); axis tight;
 
 end
+
 

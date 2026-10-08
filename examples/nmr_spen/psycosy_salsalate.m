@@ -29,9 +29,9 @@ sys.tols.merge_dim=500;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -89,4 +89,5 @@ plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.02 0.2 0.02 0.2],2,256,6,'positive');
               
 end
+
 

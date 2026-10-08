@@ -46,7 +46,7 @@ inter.giant.euler={euler};
 
 % Formalism and basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Super-Ohmic bath, lambda^2*I0 of the paper 
 % (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
@@ -144,4 +144,5 @@ for n=1:4
 end
 
 end
+
 

@@ -19,7 +19,7 @@ sys.magnet=3.5;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % RElaxation theory
 inter.relaxation={'redfield'};
@@ -60,4 +60,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

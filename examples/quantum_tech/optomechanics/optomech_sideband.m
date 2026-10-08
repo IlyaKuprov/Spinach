@@ -28,7 +28,7 @@ inter.modes.longitudinal{1,2}=-sqrt(2)/(2*pi);
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -86,4 +86,5 @@ ktitle('optomechanical sideband transfer');
 klegend({'cavity','mechanical mode'},'Location','Best');
 
 end
+
 

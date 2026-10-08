@@ -22,7 +22,7 @@ inter.coordinates={[0.00 0.00 0.00]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination, with optional GPU arithmetic
 sys.enable={'zte'};
@@ -73,4 +73,5 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 0.5 0.05 0.5],2,256,6,'positive');
 
 end
+
 

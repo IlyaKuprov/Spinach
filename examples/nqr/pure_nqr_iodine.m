@@ -13,7 +13,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(560e6,0.01,5/2,[0 0 0]);
 
 % Formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -53,4 +53,5 @@ spec=imag(fftshift(fft(fid)));
 kfigure(); plot_1d(spin_system,spec,parameters);
 
 end
+
 

@@ -28,7 +28,7 @@ inter.tau_c={100e-12};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation superoperator accuracy
 sys.tols.rlx_integration=1e-5;
@@ -50,4 +50,5 @@ S=singlet(spin_system,1,2); S=S/norm(S);
 report(spin_system,['<singlet|R|singlet> matrix element: ' num2str(S'*R*S)]);
 
 end
+
 

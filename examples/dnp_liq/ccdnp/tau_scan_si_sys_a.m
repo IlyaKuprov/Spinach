@@ -37,7 +37,7 @@ inter.coordinates={[ 0.00  0.0000  0.0000];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -101,4 +101,5 @@ kxlabel('$\tau_c$ / ps'); kcolourbar('Steady state $^{1}$H DNP');
 kylabel('MW freq offset from $g_{iso}^{(1)}$, MHz');
 
 end
+
 

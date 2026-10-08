@@ -103,7 +103,7 @@ end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -127,4 +127,5 @@ x=bicg(L,rho0,1e-8,numel(rho0));
 yield=real((k_cage/2)*imag(S'*x)/(k_cage*imag(EE'*x)));
 
 end
+
 

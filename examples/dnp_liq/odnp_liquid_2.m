@@ -24,7 +24,7 @@ inter.coordinates={[0.0 0.0 0.0]
                
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -80,4 +80,5 @@ klegend({'1.5 Angstrom from electron',...
 xlim tight; ylim padded;
 
 end
+
 

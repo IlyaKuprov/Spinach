@@ -31,9 +31,9 @@ inter.tau_c={5e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4; bas.prox_level=3;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4}; bas.prox_level={3};
 
 % Algorithmic options
 sys.enable={'zte','prop_cache','greedy'};
@@ -92,4 +92,5 @@ kfigure(); plot_3d(spin_system,-real(spectrum),parameters,...
                    10,[0.01 0.1 0.01 0.1],2,'positive');
 
 end
+
 

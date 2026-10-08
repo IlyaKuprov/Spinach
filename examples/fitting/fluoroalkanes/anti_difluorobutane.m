@@ -109,9 +109,9 @@ inter.coupling.scalar{9,10}=j3_f_f;
 
 % Basis set and symmetry
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
-bas.sym_group={'S3','S3'};
-bas.sym_spins={[1 2 3],[4 5 6]};
+bas.approximation={'none'};
+bas.sym_group={{'S3','S3'}};
+bas.sym_spins={{[1 2 3],[4 5 6]}};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -155,4 +155,5 @@ kxlabel('Frequency, Hz'); klegend({'experiment','simulation'}); drawnow;
 err=norm(real(expt_data)-real(sim_spec))^2;
 
 end
+
 

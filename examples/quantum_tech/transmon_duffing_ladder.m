@@ -20,7 +20,7 @@ inter.modes.frqs={5.0e9};
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -59,4 +59,5 @@ ktitle('Duffing transmon ladder');
 klegend({'0-1','1-2','2-3','3-4'},'Location','Best');
 
 end
+
 

@@ -19,7 +19,7 @@ sys.magnet=1;
 
 % Define the basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
@@ -69,3 +69,5 @@ ktitle('13C-enriched P1 W-band EPR');
 xlim tight; ylim padded; kgrid;
 
 end
+
+

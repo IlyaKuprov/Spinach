@@ -26,7 +26,7 @@ inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -70,4 +70,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

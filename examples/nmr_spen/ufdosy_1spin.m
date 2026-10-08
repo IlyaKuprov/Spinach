@@ -16,7 +16,7 @@ inter.zeeman.scalar={7.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'pt'};
@@ -83,5 +83,6 @@ npoints=size(squarespectrum,1); dispaxis=FOV*(-npoints/2:npoints/2-1)/npoints;
 kfigure(); imagesc(ppm_axis,1000*dispaxis,abs(squarespectrum));
 kxlabel('chemical shift / ppm'); kylabel('FOV / mm');
 
-end 
+end
+
 

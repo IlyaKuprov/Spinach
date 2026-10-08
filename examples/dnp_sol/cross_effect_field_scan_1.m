@@ -44,7 +44,7 @@ inter.coupling.scalar{1,2}=2*(-73e6);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -79,4 +79,5 @@ axis tight; kxlabel('Magnetic field offset, Tesla');
 kylabel('$S_\textrm{z}$ expectation value on $^{1}$H'); 
 
 end
+
 

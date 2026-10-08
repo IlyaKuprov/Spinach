@@ -21,7 +21,7 @@ sys.isotopes={'E','14N'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Interactions
 inter.zeeman.eigs=cell(2,1);
@@ -72,4 +72,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

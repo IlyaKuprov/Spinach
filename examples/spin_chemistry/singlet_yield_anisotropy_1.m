@@ -21,7 +21,7 @@ inter.coupling.matrix{1,3}=gauss2mhz([5e6   0    0;
                                       0     0 10e6]);
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -54,4 +54,5 @@ kgrid; axis square; axis equal;
 axis tight; box on;
 
 end
+
 

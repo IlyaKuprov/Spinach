@@ -67,15 +67,15 @@ end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 bas.longitudinal={{'1H'}};
 bas.projections={1};
 
 % Symmetry
-bas.sym_group={'S3','S3','S3'};
-bas.sym_spins={[8 9 10],[17 18 19],[26 27 28]};
+bas.sym_group={{'S3','S3','S3'}};
+bas.sym_spins={{[8 9 10],[17 18 19],[26 27 28]}};
 
 % Greedy parallelisation
 sys.enable={'zte','greedy'}; % 'gpu'
@@ -109,4 +109,5 @@ spectrum=real(fftshift(fft(fid,parameters.zerofill)));
 kfigure(); plot_1d(spin_system,spectrum,parameters);
 
 end
+
 

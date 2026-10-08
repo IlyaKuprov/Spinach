@@ -63,7 +63,7 @@ inter.chem.concs=[1 1 1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -167,4 +167,5 @@ klegend({'Acetylene $\hat L_{\rm{Z}}$',...
 scale_figure([1.00 0.75]); axis tight;
 
 end
+
 

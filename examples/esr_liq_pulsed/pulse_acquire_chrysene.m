@@ -27,13 +27,13 @@ inter.damp_rate=1e6;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'1H'}};
 bas.projections={+1};
 
 % Symmetry
-bas.sym_spins={[1 7],[2 8],[3 9],[4 10],[5 11],[6 12]};
-bas.sym_group={'S2','S2','S2','S2','S2','S2'};
+bas.sym_spins={{[1 7],[2 8],[3 9],[4 10],[5 11],[6 12]}};
+bas.sym_group={{'S2','S2','S2','S2','S2','S2'}};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -68,4 +68,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

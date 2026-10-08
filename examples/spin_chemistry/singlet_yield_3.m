@@ -18,7 +18,7 @@ sys.isotopes={'E','E','1H'};
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Couplings
 inter.zeeman.scalar={2.0023 2.0023 0};
@@ -46,4 +46,5 @@ kylabel('singlet recombination yield');
 kxlabel('$\omega/a$'); axis([0 3 0.2 1.0]);
 
 end
+
 

@@ -32,7 +32,7 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % This needs a GPU
 sys.enable={'greedy'}; % 'gpu'
@@ -64,4 +64,5 @@ kylabel('$S_{\rm{X}}$ expectation value on $^{15}N$');
 kxlabel('time, seconds'); xlim tight;
 
 end
+
 

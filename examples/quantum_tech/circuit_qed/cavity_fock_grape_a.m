@@ -40,7 +40,7 @@ for m=1:2
 
     % Formalism and basis
     bas.formalism='zeeman-hilb';
-    bas.approximation='none';
+    bas.approximation={'none'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
@@ -124,4 +124,5 @@ for n=1:size(pulse,2)
 end
 fid=real(trace(rho_targ'*rho));
 end
+
 

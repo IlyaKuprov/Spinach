@@ -21,7 +21,7 @@ inter.temperature=298;           % Work at room tempearture
 inter.tau_c={9.6e-12};           % Correlation time
 
 bas.formalism='sphten-liouv';    % Liouville space formalism
-bas.approximation='none';        % Complete basis set
+bas.approximation={'none'};        % Complete basis set
 
 % Proximity cut-off
 sys.tols.prox_cutoff=4.0;
@@ -103,4 +103,5 @@ klegend('$\tau_m = 0.1$ s','$\tau_m = 1.4$ s','$\tau_m = 1.6$ s',...
         '$\tau_m = 2.4$ s','$\tau_m = 10$ s');
 
 end
+
 

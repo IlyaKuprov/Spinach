@@ -44,7 +44,7 @@ parameters.mqorder=[+6 -1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -87,4 +87,5 @@ plot_2d(spin_system,abs(spectrum_conv),parameters,...
 kxlabel('1Q / ppm'); kylabel('6Q / ppm');
     
 end
+
 

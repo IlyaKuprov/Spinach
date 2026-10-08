@@ -33,7 +33,7 @@ inter.coupling.euler{1,3}=[0.00 0.00 0.00];
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -69,4 +69,5 @@ subplot(3,1,1); plot(time_axis,energies(7:8,:)','b-'); axis tight;
 kxlabel('time, $\mu$s'); kylabel('energy, GHz'); kgrid;
 
 end
+
 

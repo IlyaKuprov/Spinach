@@ -30,7 +30,7 @@ inter.coupling.scalar{4,5}=4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -81,4 +81,5 @@ kfigure(); plot_3d(spin_system,real(spectrum),parameters,...
                    10,[0.05 0.5 0.05 0.5],2,'positive');
 
 end
+
 

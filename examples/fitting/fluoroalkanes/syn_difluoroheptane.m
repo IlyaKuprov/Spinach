@@ -119,7 +119,7 @@ inter.coupling.scalar{20, 23}= 7.45;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 
@@ -205,4 +205,5 @@ err=10*norm(spec_expt_f-spec_theo_f)^2+   ...
        norm(spec_expt_hb-spec_theo_hb)^2;
 
 end
+
 

@@ -31,7 +31,7 @@ inter.coupling.matrix{1,3}=[1.00 0.00 0.00
                        
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -57,4 +57,5 @@ kfigure(); plot(1e9*time_axis,real(answer)); xlim tight;
 kgrid; kxlabel('time, ns'); kylabel('intensity, a.u.');
 
 end
+
 

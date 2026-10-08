@@ -31,7 +31,7 @@ sys.tols.rlx_zero=1e-5;
 
 % Use complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -49,4 +49,5 @@ disp(['Norm of R|Lz>: ' num2str(norm(R*Lz)/norm(Lz))]);
 disp(['Norm of R|S>:  ' num2str(norm(R*S)/norm(S))]);
 
 end
+
 

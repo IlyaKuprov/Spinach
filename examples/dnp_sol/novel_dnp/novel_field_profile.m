@@ -34,7 +34,7 @@ sys.output='hush';
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -80,4 +80,5 @@ kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
 kxlabel('Microwave resonance offset, MHz'); kgrid;
 
 end
+
 

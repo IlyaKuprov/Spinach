@@ -36,7 +36,7 @@ inter.srfk_mdepth{2,3}=3e9;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Tolerance settings
 sys.tols.rlx_integration=1e-10;
@@ -48,3 +48,5 @@ parameters.g_ref=2.00231930436256;
 parameters.g_trityl=mean(diag(inter.zeeman.matrix{2}));
 
 end
+
+

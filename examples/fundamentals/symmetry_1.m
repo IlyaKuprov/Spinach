@@ -13,10 +13,10 @@ sys.isotopes ={'E','E','1H','1H','1H','1H'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_spins={[3 4 5 6]};
-bas.sym_group={'S4'};
-bas.sym_a1g_only=0;
+bas.approximation={'none'};
+bas.sym_spins={{[3 4 5 6]}};
+bas.sym_group={{'S4'}};
+bas.sym_a1g_only={0};
 
 % Interactions
 inter.zeeman.scalar={2.002 2.002 0 0 0 0};
@@ -49,4 +49,5 @@ xline(560); yline(560);
 xline(1216); yline(1216); xline(1936); yline(1936);
 
 end
+
 

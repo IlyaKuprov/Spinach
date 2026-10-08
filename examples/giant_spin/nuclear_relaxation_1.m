@@ -96,7 +96,7 @@ inter.equilibrium='zero';
 
 % Formalism specification
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -145,4 +145,5 @@ disp(['1H R2:  ' num2str(real(-Np'*R*Np)) ' Hz']);
 disp(['1H DFS: ' num2str(imag(-Np'*R*Np)) ' Hz']);
 
 end
+
 

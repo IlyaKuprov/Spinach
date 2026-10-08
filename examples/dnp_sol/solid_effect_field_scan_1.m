@@ -33,7 +33,7 @@ inter.coordinates={[0.00   0.00   0.00];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={[-2 -1 0 1 2]};
 
 % Relaxation theory
@@ -69,4 +69,5 @@ axis tight; kxlabel('Magnetic field offset, Tesla');
 kylabel('$S_\textrm{z}$ expectation value on $^{15}$N');
 
 end
+
 

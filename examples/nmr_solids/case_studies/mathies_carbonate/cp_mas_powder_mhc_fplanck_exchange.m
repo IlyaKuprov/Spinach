@@ -53,7 +53,7 @@ inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Disable start-up checks
 sys.disable={'hygiene'};
@@ -114,4 +114,5 @@ legend('10 Hz','100 Hz','1 kHz','10 kHz',...
        '100 kHz','1 MHz','Location','Best');
 
 end
+
 

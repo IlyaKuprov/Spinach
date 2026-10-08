@@ -27,7 +27,7 @@ inter.coupling.scalar{2,3}=-160;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -91,4 +91,5 @@ fidelity=real(rho_targ'*rho);
 report(spin_system,['Re[<target|rho(T)>] = ' num2str(fidelity)]);
 
 end
+
 

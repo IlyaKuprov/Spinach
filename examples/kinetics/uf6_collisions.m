@@ -43,7 +43,7 @@ inter.tau_c={1e-14,1e-14};
 
 % Complete basis and explicit numerical options
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 sys.parallel={'processes',4};
 
 % Forward collision rates and fixed reverse rate, in Hz

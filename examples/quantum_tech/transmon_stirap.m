@@ -24,7 +24,7 @@ inter.modes.anharms={-20e6};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -82,4 +82,5 @@ pulse=[omega01_t; omega12_t];
 fmaxnewton(spin_system,@grape_xy,pulse);
 
 end
+
 

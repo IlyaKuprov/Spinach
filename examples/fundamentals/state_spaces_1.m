@@ -18,9 +18,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.inter_level=7; bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-1'};
+bas.inter_level={7}; bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 bas.projections={1};
 
 % Proximity cut-off
@@ -57,4 +57,5 @@ kfigure(); trajan(spin_system,traj,'correlation_order');
 axis([0 1000 1e-7 10]); set(gca,'YScale','log');
 
 end
+
 

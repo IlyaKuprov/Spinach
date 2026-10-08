@@ -39,7 +39,7 @@ inter.rlx_keep='secular';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -65,4 +65,5 @@ answer=masdnp(spin_system,parameters);
 disp(['Steady state DNP enhancement: ' num2str(answer)]);
 
 end
+
 

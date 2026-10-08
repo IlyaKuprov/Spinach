@@ -49,7 +49,7 @@ sys.magnet=7.05;
 
 % Simulation formalsim
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield','t1_t2'};
@@ -122,4 +122,5 @@ plot_1d(spin_system,real(spectrum),parameters);
 kylabel('NMR intensity, a.u.'); xlim([4.40 4.70]);
 
 end
+
 

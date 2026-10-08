@@ -19,7 +19,7 @@ inter.coupling.scalar{1,2}=7.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -66,4 +66,5 @@ plot3(answer(:,4),answer(:,5),answer(:,6),'r-');
 axis([-1 1 -1 1 -1 1]); axis square;
 
 end
+
 

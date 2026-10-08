@@ -39,9 +39,9 @@ inter.coupling.scalar{7,7}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_group={'S2','S2','S3'};
-bas.sym_spins={[1 2],[3 4],[5 6 7]};
+bas.approximation={'none'};
+bas.sym_group={{'S2','S2','S3'}};
+bas.sym_spins={{[1 2],[3 4],[5 6 7]}};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -98,4 +98,5 @@ for n=1:numel(tau_max)
 end
 
 end
+
 

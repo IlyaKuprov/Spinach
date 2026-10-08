@@ -43,14 +43,14 @@ switch formalism
     case 'sphten-liouv'
 
         % Keep complete single-spin terms only
-        bas.approximation='IK-2';
-        bas.prox_level=1;
-        bas.connectivity='scalar_couplings';
+        bas.approximation={'IK-2'};
+        bas.prox_level={1};
+        bas.connectivity={'scalar_couplings'};
 
     case {'zeeman-liouv','zeeman-hilb'}
 
         % Keep the full Zeeman basis
-        bas.approximation='none';
+        bas.approximation={'none'};
 
 end
 
@@ -78,3 +78,5 @@ if (~ischar(formalism))||(~ismember(formalism,{'sphten-liouv','zeeman-liouv','ze
     error('formalism must be ''sphten-liouv'', ''zeeman-liouv'', or ''zeeman-hilb''.');
 end
 end
+
+

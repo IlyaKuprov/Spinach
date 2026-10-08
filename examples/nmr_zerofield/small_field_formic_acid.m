@@ -19,7 +19,7 @@ inter.coupling.scalar{1,2}=221;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.sweep=600;
@@ -49,4 +49,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

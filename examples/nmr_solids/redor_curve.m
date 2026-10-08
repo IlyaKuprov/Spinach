@@ -18,7 +18,7 @@ inter.coordinates={[0.00 0.00 0.00]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -51,4 +51,5 @@ kxlabel('REDOR evolution time, rotor cycles');
 kylabel('$\Delta S/S_0$'); kgrid; xlim tight;
 
 end
+
 

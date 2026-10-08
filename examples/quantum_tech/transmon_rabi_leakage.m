@@ -22,7 +22,7 @@ inter.modes.anharms={-250e6};
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -58,4 +58,5 @@ ktitle('transmon Rabi dynamics with leakage');
 klegend({'L1','L2','L3','L4'},'Location','Best');
 
 end
+
 

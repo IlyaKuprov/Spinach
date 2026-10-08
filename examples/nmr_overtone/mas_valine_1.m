@@ -20,7 +20,7 @@ inter.zeeman.euler={[-90 -90 -17]*(pi/180)};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -69,4 +69,5 @@ spectrum=exp(1i*1.75)*spectrum;
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

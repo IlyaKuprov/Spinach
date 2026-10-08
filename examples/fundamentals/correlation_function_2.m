@@ -74,7 +74,7 @@ inter.rlx_keep='labframe';
 inter.equilibrium='zero';
 inter.tau_c={1./(3*[sigma_ax sigma_eq].^2)};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
@@ -93,4 +93,5 @@ kylabel('correlation function'); kxlabel('lag, points');
 klegend({'Monte-Carlo','Spinach'},'Location','Best');
 
 end
+
 

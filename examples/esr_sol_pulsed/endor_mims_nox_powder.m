@@ -25,7 +25,7 @@ inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
                        
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -58,4 +58,5 @@ kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 kxlabel('Nuclear frequency, MHz');
 
 end
+
 

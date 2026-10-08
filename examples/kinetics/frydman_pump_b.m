@@ -45,10 +45,10 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4;
-bas.prox_level=1;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4};
+bas.prox_level={1};
 
 % Exchange rates
 nh_wt_exch_rate=1000; % between NH and nearest water
@@ -173,4 +173,5 @@ for n=1:parameters.nloops
 end
 
 end
+
 

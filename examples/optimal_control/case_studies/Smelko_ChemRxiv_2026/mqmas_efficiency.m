@@ -46,7 +46,7 @@ inter.zeeman.euler={[0 0 0]};
 
 % Hilbert space formalism
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -147,4 +147,5 @@ disp(['Optimal control ' num2str(mq_order) 'QMAS efficiency: ' num2str(efficienc
 disp(['Signal enhancement factor:            ' num2str(efficiency(2)/efficiency(1))]);
 
 end
+
 

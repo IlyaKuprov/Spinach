@@ -18,9 +18,9 @@ sys.magnet=11.7;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.connectivity='scalar_couplings';
-bas.approximation='IK-2';
-bas.prox_level=1;
+bas.connectivity={'scalar_couplings'};
+bas.approximation={'IK-2'};
+bas.prox_level={1};
 
 % Algorithmic options
 sys.tols.inter_cutoff=2.0;
@@ -99,3 +99,5 @@ parameters.zerofill=parameters.zerofill(2);
 plot_1d(spin_system,imag(spectrum_ps),parameters);
 
 end
+
+

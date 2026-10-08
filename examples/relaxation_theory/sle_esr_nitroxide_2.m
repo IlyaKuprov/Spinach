@@ -30,7 +30,7 @@ inter.zeeman.matrix{2}=[2.0065794 -0.0007548 -0.0032848;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -60,4 +60,5 @@ spectrum_sle=gridfree(spin_system,@slowpass,parameters,'esr');
 kfigure(); plot_1d(spin_system,real(spectrum_sle),parameters);
 
 end
+
 

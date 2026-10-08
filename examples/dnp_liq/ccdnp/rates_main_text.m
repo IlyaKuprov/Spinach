@@ -35,7 +35,7 @@ inter.coordinates={[ 0.000  0.000  0.000];
                    [-5.090  0.061  1.032]};   
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -96,4 +96,5 @@ disp(['R(NzE2z -> Nz): ' num2str(Nz'*R*NzE2z)]);
 disp(['R(NzE1zE2z -> Nz): ' num2str(Nz'*R*NzE1zE2z)]);
 
 end
+
 

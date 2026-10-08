@@ -29,7 +29,7 @@ inter.tau_c={25e-9};
 
 % Formalism and approximation
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable startup checks
 sys.disable={'hygiene'};
@@ -97,4 +97,4 @@ klegend({'${\hat N_ + } - 2{\hat N_ + }{\hat H_{\rm{Z}}}$',...
 
 end
 
-                         
+

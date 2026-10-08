@@ -23,7 +23,7 @@ inter.modes.exchange{1,2}=2.828e6;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -67,4 +67,5 @@ axis tight; kxlabel('detuning, MHz');
 kylabel('energy levels, MHz'); kgrid;
 
 end
+
 

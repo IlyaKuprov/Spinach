@@ -20,7 +20,7 @@ inter.zeeman.scalar{1}=0;
 
 % No approximations
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
@@ -101,3 +101,5 @@ figure(2); hold on; plot(nutf_range,[X; Z],'o');
 klegend({'X (target)','Z (target)','X (result)','Z (result)'});
 
 end
+
+

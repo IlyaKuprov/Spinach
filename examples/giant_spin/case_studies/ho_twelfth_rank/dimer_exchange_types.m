@@ -30,7 +30,7 @@ inter.temperature=0.2;
 
 % Formalism and basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Exchange coupling tensors of the paper, cm^-1, in its H=-2*S1*J*S2 convention
 tensors={[0.2 0 0; 0 0.2 0; 0 0 0.2], ...
@@ -111,4 +111,5 @@ kxlabel('$B$ (T)'); kylabel('Magnetisation ($\mu_B$)');
 klegend(labels,'Location','east');
 
 end
+
 

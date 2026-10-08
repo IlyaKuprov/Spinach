@@ -27,9 +27,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -88,4 +88,5 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.02 0.2 0.02 0.2],2,256,6,'negative');
 
 end
+
 

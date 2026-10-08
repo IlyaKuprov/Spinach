@@ -25,7 +25,7 @@ inter.zeeman.scalar{1}=32.4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none'; 
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
@@ -86,4 +86,5 @@ disp('   Outcome A          Outcome B          (A+B)/2            Target');
 disp(full([outcome_a outcome_b (outcome_a+outcome_b)/2 rho_targ]));
 
 end
+
 

@@ -49,7 +49,7 @@ inter.temperature=2.0;
 
 % Formalism and basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -124,4 +124,5 @@ klegend([h_one h_avg h_eq],{'QME per orientation',...
         'Location','southeast');
 
 end
+
 

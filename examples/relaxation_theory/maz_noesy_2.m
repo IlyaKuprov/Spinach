@@ -89,9 +89,9 @@ sys.disable={'krylov'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=4;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={4};
+bas.connectivity={'scalar_couplings'};
 
 % Relaxation superoperator
 inter.relaxation={'redfield','SRFK','SRSK'};
@@ -145,4 +145,5 @@ plot_2d(spin_system,-real(spectrum),parameters,...
         40,[0.025 0.50 0.025 0.50],2,256,6,'both');
 
 end
+
 

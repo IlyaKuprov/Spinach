@@ -64,7 +64,7 @@ function [ph_c,ph_n,ph_ca,ph_na]=shift_phases(b_field,amp)
 sys.magnet=b_field; sys.isotopes={'1H','13C','15N'};
 sys.output='hush';
 inter.zeeman.scalar={0.0,0.0,0.0};
-bas.formalism='sphten-liouv'; bas.approximation='none';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 dim=size(spin_system.bas.basis,1);
@@ -104,4 +104,5 @@ ph_ca=angle(exp(-1i*delta_c*t_tot));
 ph_na=angle(exp(-1i*delta_n*t_tot));
 
 end
+
 

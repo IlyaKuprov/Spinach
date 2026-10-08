@@ -18,9 +18,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -79,4 +79,5 @@ plot_2d(spin_system,abs(spec_a),parameters,20,...
         [0.05 0.25 0.05 0.25],2,256,6,'positive');
 
 end
+
 

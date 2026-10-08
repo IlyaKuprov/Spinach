@@ -31,7 +31,7 @@ for n=1:numel(W)
     
     % Basis set
     bas.formalism='sphten-liouv';
-    bas.approximation='none';
+    bas.approximation={'none'};
     bas.projections={-3:3};
     
     % Disable trajectory-level SSR algorithms
@@ -80,4 +80,5 @@ for n=1:numel(W)
 end
 
 end
+
 

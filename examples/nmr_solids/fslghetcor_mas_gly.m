@@ -25,8 +25,8 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,7,8.0);   % H_N
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=4;
+bas.approximation={'IK-0'};
+bas.inter_level={4};
 
 % Ignore interactions below 200 Hz
 sys.tols.inter_cutoff=2*pi*200;
@@ -90,4 +90,5 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 0.95 0.05 0.95],2,256,6,'both');
 
 end
+
 

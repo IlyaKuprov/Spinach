@@ -25,7 +25,7 @@ inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -53,4 +53,5 @@ kylabel('intensity, a.u.');
 xlim tight; ylim padded; 
 
 end
+
 

@@ -36,7 +36,7 @@ inter.modes.anharms={anharm};
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -126,4 +126,5 @@ ktitle('analytical DRAG pulse');
 klegend({'$|0\rangle$','$|1\rangle$','$|2\rangle$'},'Location','Best');
 
 end
+
 

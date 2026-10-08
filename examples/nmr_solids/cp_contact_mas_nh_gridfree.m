@@ -23,7 +23,7 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Optional GPU arithmetic
 
@@ -62,4 +62,5 @@ kylabel('$S_{\rm{X}}$ expectation value on $^{15}N$');
 kxlabel('time, seconds'); xlim tight;
 
 end
+
 

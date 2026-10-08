@@ -26,7 +26,7 @@ inter.coupling.scalar{1,2}=60.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
@@ -102,4 +102,5 @@ rho=correlation(spin_system,rho,2,'13C');
 stateinfo(spin_system,rho,5);
 
 end
+
 

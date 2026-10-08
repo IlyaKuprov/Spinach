@@ -37,7 +37,7 @@ inter.zeeman.euler={[0 0 0]};
 
 % Hilbert space formalism
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -102,4 +102,5 @@ pulse=control.pwr_levels*pulse; pulse_dt=control.pulse_dt;
 save('ct_pulse.mat','pulse','pulse_dt');
 
 end
+
 

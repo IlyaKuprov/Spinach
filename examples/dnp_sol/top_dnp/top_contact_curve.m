@@ -30,7 +30,7 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -60,4 +60,5 @@ kfigure(); plot(time_axis,real(contact_curve)); kxlabel('contact time, seconds')
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H'); axis tight; kgrid;
 
 end
+
 

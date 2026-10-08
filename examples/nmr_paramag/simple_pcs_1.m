@@ -29,7 +29,7 @@ inter.tau_c={10e-12};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -47,4 +47,5 @@ disp(['R1 rate, Spinach: ' num2str(R1Sp)]);
 disp(['R2 rate, Spinach: ' num2str(R2Sp)]);
 
 end
+
 

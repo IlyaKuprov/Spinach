@@ -41,7 +41,7 @@ inter.damp_rate=1.7e6;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -72,4 +72,5 @@ kxlabel('time, $\mu$s'); xlim tight;
 kylabel('echo intensity, a.u.'); kgrid;
 
 end
+
 

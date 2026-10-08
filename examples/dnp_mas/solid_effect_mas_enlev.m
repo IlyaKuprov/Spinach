@@ -27,7 +27,7 @@ inter.coordinates={[0.00 0.00 0.00],...
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -59,4 +59,5 @@ axis tight; kxlabel('rotor phase, rad');
 kylabel('level energy, rad/s');
 
 end
+
 

@@ -50,7 +50,7 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
@@ -125,4 +125,5 @@ dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2)
 plot(rep_time*1e3,-real(dnp)); drawnow;
 
 end
+
 

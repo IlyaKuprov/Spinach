@@ -99,7 +99,7 @@ inter.coupling.scalar(9:12,9:12)=j_coupling;
 
 % Formalism and basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none'};
 
 % Methyl turning generator
 tau_m=1e-11; k_jump=1/(2*tau_m);
@@ -149,4 +149,5 @@ spectrum=gridfree(spin_system,@slowpass,parameters,'nmr');
 subplot(1,2,2); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

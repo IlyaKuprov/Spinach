@@ -28,7 +28,7 @@ sys.disable={'pt'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -85,4 +85,5 @@ subplot(1,3,2); mri_2d_plot(R1Ph,parameters,'phantom'); title('R1 phantom');
 subplot(1,3,3); mri_2d_plot(R2Ph,parameters,'phantom'); title('R2 phantom');
 
 end
+
 

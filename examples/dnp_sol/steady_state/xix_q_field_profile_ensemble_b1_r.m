@@ -25,7 +25,7 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
@@ -108,4 +108,5 @@ kgrid; xlim tight; ylim padded;
 savefig(gcf,'xix_q_field_profile_ensemble_b1_r.fig');
 
 end
+
 

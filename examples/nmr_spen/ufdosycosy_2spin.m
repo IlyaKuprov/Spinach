@@ -18,7 +18,7 @@ inter.coupling.scalar{2,2}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'pt'};
@@ -96,5 +96,6 @@ spectrum=fftshift(fft(spectrum,[],3),3);
 % Plotting
 kfigure(); volplot(abs(spectrum).^(1/2),[-1 1 -1 1 -1 1]);
     
-end 
+end
+
 

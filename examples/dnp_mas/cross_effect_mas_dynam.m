@@ -44,7 +44,7 @@ inter.rlx_keep='secular';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -91,4 +91,5 @@ end
 kfigure(); trajan(spin_system,rho,'level_populations');
 
 end
+
 

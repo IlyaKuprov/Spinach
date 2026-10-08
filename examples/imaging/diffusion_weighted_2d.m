@@ -24,7 +24,7 @@ sys.enable={'zte'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -79,4 +79,5 @@ subplot(1,2,2); mri_2d_plot(pattern,parameters,'phantom');
 ktitle('diff. coeff. distribution');
 
 end
+
 

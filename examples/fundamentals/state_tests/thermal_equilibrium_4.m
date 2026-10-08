@@ -38,7 +38,7 @@ for n=1:numel(formalisms)
 
     % Basis set
     bas.formalism=formalisms{n};
-    bas.approximation='none';
+    bas.approximation={'none'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
@@ -69,4 +69,5 @@ end
 disp('R*rho_eq action test PASSED.');
 
 end
+
 

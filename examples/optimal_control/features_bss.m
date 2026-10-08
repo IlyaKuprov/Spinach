@@ -32,7 +32,7 @@ inter.zeeman.scalar={0.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -96,4 +96,5 @@ report(spin_system,['uncorrected pulse, corrected model: ' ...
                      num2str(fid_off,'%.6f')]);
 
 end
+
 

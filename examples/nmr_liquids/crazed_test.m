@@ -22,7 +22,7 @@ inter.temperature=100;
                               
 % Use the complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -60,4 +60,5 @@ plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.02 0.2 0.02 0.2],2,256,6,'positive');
 
 end
+
 

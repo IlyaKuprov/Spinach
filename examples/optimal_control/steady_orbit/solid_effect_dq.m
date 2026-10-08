@@ -42,7 +42,7 @@ inter.equilibrium='dibari';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Parallelisation settings
 sys.parallel={'processes',240};
@@ -126,4 +126,5 @@ guess=[phases zeros(1,20) zeros(1,1)];
 pulse_profile=fmaxnewton(spin_system,@grape_phase,guess); %#ok<NASGU>
 
 end
+
 

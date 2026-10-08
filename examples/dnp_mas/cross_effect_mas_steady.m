@@ -44,7 +44,7 @@ inter.rlx_keep='secular';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -109,4 +109,5 @@ enh_factor=real(Hz_dnp/Hz_eq);
 disp(['Enhancement factor: ' num2str(enh_factor)]);
 
 end
+
 

@@ -26,7 +26,7 @@ inter.coupling.scalar{5,5}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.J_ch=140;
@@ -81,4 +81,5 @@ kfigure(); plot_3d(spin_system,imag(spectrum),parameters,...
                    10,[0.05 0.25 0.05 0.25],2,'positive');
 
 end
+
 

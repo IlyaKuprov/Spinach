@@ -96,7 +96,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(Qcc,Qeta,3.5,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Spinach housekeeping
@@ -167,4 +167,5 @@ err=norm(real(S35)-real(sim_speca))^2+...
     norm(real(S29)-real(sim_specd))^2;
 
 end
+
 

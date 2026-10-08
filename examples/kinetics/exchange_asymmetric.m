@@ -17,7 +17,7 @@ inter.chem.concs=[2e3 5e2];
 
 % Basis specification
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -51,4 +51,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

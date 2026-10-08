@@ -52,7 +52,7 @@ inter.modes.anharms={anharm []};
 inter.modes.lifetimes={t1_b t1_c};
 inter.modes.kerr=cell(2,2); inter.modes.kerr{1,2}=chi;
 inter.temperature=0;
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Hilbert space twin for the dressed states
 bas.formalism='zeeman-hilb';
@@ -190,4 +190,5 @@ for k=1:2
 end
 dnm=(frqs(2)-frqs(1))/(2*dw);
 end
+
 

@@ -16,7 +16,7 @@ inter.zeeman.scalar={1.9 2.1};
 
 % Hilbert space calculation
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -49,4 +49,5 @@ kxlabel('$\omega_{J}/\omega_{E}$');
 kylabel('$\omega/\omega_{E}$'); kgrid;
 
 end
+
 

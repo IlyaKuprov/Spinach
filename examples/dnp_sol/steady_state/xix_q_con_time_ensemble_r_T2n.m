@@ -50,7 +50,7 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
@@ -128,4 +128,5 @@ contact_times=2*parameters.pulse_dur*loop_counts;
 plot(1e6*contact_times,real(dnp)); drawnow;
 
 end
+
 

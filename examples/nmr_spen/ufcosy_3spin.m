@@ -18,7 +18,7 @@ inter.coupling.scalar{3,3}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'pt'};
@@ -74,4 +74,5 @@ spectrum=fftshift(fft(fid,[],2),2);
 kfigure(); contour(abs(spectrum)); kgrid;
 
 end
+
 

@@ -40,7 +40,7 @@ inter.equilibrium='dibari';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'hygiene'};
@@ -97,4 +97,5 @@ kgrid; xlim tight; ylim padded;
 savefig(gcf,'xix_q_field_profile_ensemble_b1.fig');
 
 end
+
 

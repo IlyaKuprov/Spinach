@@ -38,7 +38,7 @@ inter.temperature=298;
 
 % Formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -66,4 +66,5 @@ P=[U Hz Fz -HzFz];
 disp('Kuprov''s matrix in Equation 2:'); disp(P'*R*P);
 
 end
+
 

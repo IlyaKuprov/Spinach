@@ -84,9 +84,9 @@ inter.coordinates={[-1.812977   -1.098554    0.444452]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 
 % Relaxation superoperator
 inter.relaxation={'redfield','SRSK'};
@@ -132,4 +132,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

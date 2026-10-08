@@ -24,7 +24,7 @@ inter.coupling.euler{1,2}=[0 0 0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -68,4 +68,5 @@ subplot(2,1,2); plot(freq_axis,real(spectrum));
 kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end
+
 

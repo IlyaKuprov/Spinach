@@ -17,7 +17,7 @@ inter.zeeman.scalar{1}=32.4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -132,4 +132,5 @@ kgrid; xlim tight; ylim([1e-10 1e-2]);
 scale_figure([1.00 0.65]);
 
 end
+
 

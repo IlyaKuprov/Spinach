@@ -22,7 +22,7 @@ inter.coupling.scalar{2,3}=20*rand(1);
 
 % Set the basis 
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -86,4 +86,5 @@ trajan(spin_system,rho_stack,'coherence_order');
 set(gca,'yscale','linear');
 
 end
+
 

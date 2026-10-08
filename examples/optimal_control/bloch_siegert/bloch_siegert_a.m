@@ -21,7 +21,7 @@ inter.zeeman.scalar={0.0};
 
 % Set formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
@@ -103,4 +103,5 @@ kylabel('terminal infidelity'); ylim padded;
 klegend({'GRAPE','GRAPE + BSS'},'Location','East');
 
 end
+
 

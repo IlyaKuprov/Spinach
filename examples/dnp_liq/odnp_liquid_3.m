@@ -33,7 +33,7 @@ inter.coordinates={[0.0 0.0 0.0]
                
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -92,4 +92,5 @@ kylabel('MW freq offset from $g_{iso}$, MHz');
 kcolourbar('$\langle H_{\rm{Z}} \rangle$ at the steady state');  
 
 end
+
 

@@ -18,7 +18,7 @@ inter.coupling.scalar{3,3}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -52,4 +52,5 @@ plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.05 0.25 0.05 0.25],2,256,6,'positive');
 
 end
+
 

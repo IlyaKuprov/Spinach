@@ -25,7 +25,7 @@ inter.coordinates={[ 0.00 0.00 0.00]
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
                
 
 % Spinach housekeeping
@@ -54,4 +54,5 @@ kfigure(); plot(1e6*time_axis,imag(deer.deer_trace));
 kxlabel('time, microseconds'); axis tight; kgrid; 
 
 end
+
 

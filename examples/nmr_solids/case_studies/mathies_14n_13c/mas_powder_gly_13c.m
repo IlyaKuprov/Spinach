@@ -69,7 +69,7 @@ for m=1:numel(fields)
     
     % Basis set
     bas.formalism='sphten-liouv';
-    bas.approximation='none';
+    bas.approximation={'none'};
     
     % Enable zero track elimination
     sys.enable={'zte'};
@@ -103,4 +103,5 @@ klegend({'4.7 Tesla','9.4 Tesla','14.1 Tesla'},...
         'Location','Best');
 
 end
+
 

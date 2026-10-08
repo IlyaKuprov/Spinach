@@ -20,7 +20,7 @@ inter.coupling.scalar{3,3}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory parameters 
 inter.relaxation={'t1_t2'}; 
@@ -85,4 +85,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,-real(spectrum),parameters);
 
 end
+
 

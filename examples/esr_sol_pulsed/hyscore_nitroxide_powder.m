@@ -22,7 +22,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(2.4e6,0.5,1,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel','colorbar'};
@@ -62,4 +62,5 @@ plot_2d(spin_system,abs(spectrum),parameters,20,...
         [0.025 0.5 0.025 0.5],2,256,6,'positive');
 
 end
+
 

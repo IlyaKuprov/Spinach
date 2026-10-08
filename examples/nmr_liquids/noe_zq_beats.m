@@ -19,7 +19,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -60,4 +60,5 @@ kylabel('$S_{\rm{Z}}$ expectation value');
 klegend({'Proton A','Proton B'},'Location','Best');
 
 end
+
 

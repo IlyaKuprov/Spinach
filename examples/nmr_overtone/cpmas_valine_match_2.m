@@ -32,7 +32,7 @@ inter.damp_rate=10000;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -110,4 +110,5 @@ kxlabel('1H RF power, Hz'); set(gca,'YDir','normal');
 kylabel('Sample spinning rate, Hz');
 
 end
+
 

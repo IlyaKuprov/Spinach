@@ -39,7 +39,7 @@ inter.coupling.matrix{2,2}=[1e8  0   0
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -91,4 +91,5 @@ kxlabel('time, seconds'); xlim tight; kgrid;
 ktitle('DEER trace'); 
 
 end
+
 

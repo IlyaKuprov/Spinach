@@ -22,7 +22,7 @@ inter.coordinates={[-2.26  0.15  0.00],...
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','prop_cache'}; % 'gpu'
@@ -71,4 +71,5 @@ plot_2d(spin_system,spectrum,parameters,...
         20,[0.05 0.25 0.05 0.25],2,256,6,'positive'); 
 
 end
+
 

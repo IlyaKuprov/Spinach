@@ -34,11 +34,11 @@ inter.coupling.scalar{4,5}=46.0345*1e6;
                         
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Symmetry
-bas.sym_group={'S4'};
-bas.sym_spins={[1 2 3 4]};
+bas.sym_group={{'S4'}};
+bas.sym_spins={{[1 2 3 4]}};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -66,4 +66,5 @@ kylabel('intensity, a.u.');
 xlim tight; ylim padded; kgrid;
 
 end
+
 

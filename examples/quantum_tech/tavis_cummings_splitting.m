@@ -36,7 +36,7 @@ for n=spin_counts
 
     % Formalism and basis
     bas.formalism='zeeman-hilb';
-    bas.approximation='none';
+    bas.approximation={'none'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
@@ -83,4 +83,5 @@ ktitle('Tavis-Cummings square-root scaling');
 klegend({'numerical','analytical'},'Location','Best');
 
 end
+
 

@@ -29,7 +29,7 @@ inter.damp_rate=100;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'krylov','trajlevel'};
@@ -75,4 +75,5 @@ spectrum=exp(1i*1.49)*spectrum;
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

@@ -26,7 +26,7 @@ parameters.mqorder=+2;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'pt'};
@@ -103,4 +103,5 @@ parameters.offset=[0 0];
 plot_uf(spin_system,abs(kwdata_sim),parameters);
 
 end
+
 

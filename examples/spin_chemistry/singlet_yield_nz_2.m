@@ -90,7 +90,7 @@ end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -109,4 +109,5 @@ mode_rates=-imag(eig(L));
 decay=min(mode_rates(mode_rates>1));
 
 end
+
 

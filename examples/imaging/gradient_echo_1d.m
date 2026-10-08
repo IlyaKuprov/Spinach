@@ -19,7 +19,7 @@ inter.zeeman.scalar={1.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -64,4 +64,5 @@ kfigure(); plot(time_axis,real(echo)); axis('tight'); kgrid;
 kxlabel('time, seconds'); kylabel('intensity, a.u.');
  
 end
+
 

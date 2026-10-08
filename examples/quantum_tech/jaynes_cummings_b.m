@@ -24,7 +24,7 @@ inter.modes.exchange{1,2}=2.828e6;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -79,4 +79,5 @@ axis tight; ktitle('cavity level populations');
 klegend({'BL1','BL2','BL3'},'Location','Best');
 
 end
+
 

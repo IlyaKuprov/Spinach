@@ -27,7 +27,7 @@ sys.magnet=11.7464;
 
 % Formalism and basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
@@ -144,4 +144,5 @@ subplot(1,2,2); plot_1d(spin_system,real(spectrum),parameters);
 xlim tight; ylim([-40 40]);
 
 end
+
 

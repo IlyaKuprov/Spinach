@@ -24,7 +24,7 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
@@ -110,4 +110,5 @@ kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');
 savefig(gcf,'xix_w_pulse_dur_ensemble_r.fig');
 
 end
+
 

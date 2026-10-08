@@ -20,7 +20,7 @@ inter.coupling.scalar{1,2}=10;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable path tracing
 sys.disable={'pt'};
@@ -76,4 +76,5 @@ volplot(phan,[-parameters.dims(1)/2 parameters.dims(1)/2 ...
 kxlabel('FOV1 / m'); kylabel('FOV2 / m'); kzlabel('FOV3 / m');
 
 end
+
 

@@ -47,7 +47,7 @@ sys.magnet=7.05;
 
 % Simulation formalsim
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield','t1_t2'};
@@ -115,4 +115,5 @@ klegend('$S$','$T_{\pm1}$','$T_{0}$',...
         '$Q_{\pm2}$','$Q_{\pm1}$','$Q_{0}$');
 
 end
+
 

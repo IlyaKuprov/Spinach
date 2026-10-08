@@ -16,10 +16,10 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
-bas.inter_level=4;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
+bas.inter_level={4};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -85,4 +85,5 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 0.25 0.05 0.25],2,256,6,'positive');
 
 end
+
 

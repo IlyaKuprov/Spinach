@@ -25,7 +25,7 @@ inter.tau_c={1e-12};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -54,7 +54,7 @@ inter.tau_c={1e-12};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -73,4 +73,5 @@ ratio=(((1/2)*(1/2+1))/(1*(1+1)))*(spin('1H')/spin('2H'))^2;
 disp(['R1 rate ratio, textbook: ' num2str(ratio)]);
 
 end
+
 

@@ -20,10 +20,10 @@ sys.tols.inter_cutoff=5.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.inter_level=3;
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-1'};
+bas.inter_level={3};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Sequence parameters
 parameters.J=150;
@@ -77,4 +77,5 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 1.0 0.05 1.0],2,256,6,'positive');
 
 end
+
 

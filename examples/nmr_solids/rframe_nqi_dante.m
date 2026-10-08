@@ -19,7 +19,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(1.18e6,0.50,1,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -62,4 +62,5 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 kfigure(); plot_1d(spin_system,abs(spectrum),parameters);
 
 end
+
 

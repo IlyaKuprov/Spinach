@@ -30,7 +30,7 @@ inter.coupling.scalar{2,3}=-160;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -108,4 +108,5 @@ for n=1:size(control.phase_cycle,1)
 end
 
 end
+
 

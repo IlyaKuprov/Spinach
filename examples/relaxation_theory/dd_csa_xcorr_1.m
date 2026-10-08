@@ -16,7 +16,7 @@ sys.isotopes={'1H','13C'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Interactions
 sys.magnet=14.1;
@@ -41,4 +41,5 @@ spin_system=basis(spin_system,bas);
 disp(full(relaxation(spin_system)));
 
 end
+
 

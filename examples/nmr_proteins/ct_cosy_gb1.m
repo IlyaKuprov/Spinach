@@ -23,9 +23,9 @@ sys.tols.prox_cutoff=3.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4; bas.prox_level=1;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4}; bas.prox_level={1};
 
 % Algorithmic options
 sys.enable={'zte','greedy'}; % 'gpu'
@@ -64,4 +64,5 @@ plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.01 0.125 0.01 0.125],2,256,6,'positive');
 
 end
+
 

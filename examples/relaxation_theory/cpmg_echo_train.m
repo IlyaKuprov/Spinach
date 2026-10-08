@@ -14,7 +14,7 @@ inter.zeeman.euler={[0 0 0],[0 0 0]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -52,4 +52,5 @@ kylabel('$S_{\rm{X}}$ expectation value');
 xlim tight; ylim padded; kgrid;
 
 end
+
 

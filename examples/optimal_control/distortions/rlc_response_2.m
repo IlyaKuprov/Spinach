@@ -27,7 +27,7 @@ inter.coupling.matrix{1,1}=anas2mat(0,40e3,0,0,0,0);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none'; 
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -99,4 +99,5 @@ kfigure(); restrans(CLx',CLy',control.pulse_dt(1),...
                     sys.magnet*spin('2H'),200,'pwc',100);
 
 end
+
 

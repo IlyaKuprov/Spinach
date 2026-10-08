@@ -21,7 +21,7 @@ spin_system=subsystems{4};
 
 % Generate the basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=basis(spin_system,bas);
 
 % Get isotropic Hamiltonian
@@ -97,4 +97,5 @@ report(spin_system,['...of which is not ZZ: ' ...
                      num2str(norm(full(rho_inv),2))]);
 
 end
+
 

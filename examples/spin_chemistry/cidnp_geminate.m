@@ -20,7 +20,7 @@ inter.chem.rp_rates=[1e7 0];
                      
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -59,4 +59,5 @@ disp(['Nuclear magnetisation in reactants: ' num2str(real(Nz'*rho_reac))]);
 disp(['Nuclear magnetisation in products:  ' num2str(real(Nz'*rho_prod))]);
 
 end
+
 

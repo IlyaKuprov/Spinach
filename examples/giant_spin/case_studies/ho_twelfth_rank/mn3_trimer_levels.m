@@ -42,7 +42,7 @@ end
 
 % Formalism and basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -82,4 +82,5 @@ klegend(handles,{'All states','16 states','26 states'},...
         'Location','southwest');
 
 end
+
 

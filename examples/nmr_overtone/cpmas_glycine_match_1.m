@@ -31,7 +31,7 @@ inter.damp_rate=300;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -92,4 +92,5 @@ for n=1:15
 end
 
 end
+
 

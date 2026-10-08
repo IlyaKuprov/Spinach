@@ -78,7 +78,7 @@ inter.giant.euler={{[0 0 0],[0 0 0],[0 0 0],...
 
 % Formalism specification
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -94,4 +94,5 @@ disp('  '); disp('MOLCAS results:');
 disp('Eigenvalues: 19.2967    0.0529       0.0579');
 
 end
+
 

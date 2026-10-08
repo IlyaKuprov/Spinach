@@ -38,7 +38,7 @@ inter.modes.exchange{2,3}=50e6;
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -142,4 +142,5 @@ ktitle('parametric modulation at $\tilde{\omega}_c-\tilde{\omega}_a$');
 klegend({'mode a','mode b','mode c'},'Location','Best');
 
 end
+
 

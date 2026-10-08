@@ -87,9 +87,9 @@ inter.coupling.scalar{5,6}=params(6);
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
-bas.sym_group={'S2','S2'};
-bas.sym_spins={[1 2],[7 8]};
+bas.approximation={'none'};
+bas.sym_group={{'S2','S2'}};
+bas.sym_spins={{[1 2],[7 8]}};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 
@@ -172,4 +172,5 @@ err=norm(spec_expt_f-spec_theo_f)^2+...
     norm(spec_expt_hb-spec_theo_hb)^2;
 
 end
+
 

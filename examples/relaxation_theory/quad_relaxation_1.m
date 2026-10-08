@@ -24,7 +24,7 @@ inter.tau_c={1e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -48,4 +48,5 @@ disp([sys.isotopes{1} ' transverse relaxation rate, Spinach:    ' num2str(-Lp'*R
 disp([sys.isotopes{1} ' transverse relaxation rate, textbook:   ' num2str(r2)]);
 
 end
+
 

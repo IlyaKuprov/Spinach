@@ -65,9 +65,9 @@ inter.modes.longitudinal{3,6}=+2*sqrt(2)*kappa_egypt;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-SBS';
-bas.connectivity='full_tensors';
-bas.inter_level=[2 3 2];
+bas.approximation={'IK-SBS'};
+bas.connectivity={'full_tensors'};
+bas.inter_level={[2 3 2]};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -143,4 +143,5 @@ for n=1:numel(answer.phases)
 end
 
 end
+
 

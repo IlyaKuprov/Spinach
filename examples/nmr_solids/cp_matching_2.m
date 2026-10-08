@@ -20,7 +20,7 @@ inter.coordinates={[-1.11551509    1.65289357   -1.19927242]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -67,4 +67,5 @@ kylabel('$^{15}$N signal, a.u.'); kgrid;
 kxlabel('$^{1}$H spin-lock RF power, kHz');
 
 end
+
 

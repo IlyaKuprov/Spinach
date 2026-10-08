@@ -102,7 +102,7 @@ inter.giant.euler={{[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % This must be set to 1 Tesla
 sys.magnet=1.0;
@@ -121,4 +121,5 @@ parameters.nstates=8;
 fieldscan_enlev(spin_system,parameters);
 
 end
+
 

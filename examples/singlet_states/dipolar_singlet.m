@@ -31,7 +31,7 @@ sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -45,4 +45,5 @@ S=singlet(spin_system,1,2); S=S/norm(S);
 disp(['Norm of R|S>: ' num2str(norm(R*S))]);
 
 end
+
 

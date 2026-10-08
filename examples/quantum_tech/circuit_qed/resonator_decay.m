@@ -38,7 +38,7 @@ inter.modes.t2_times={1/(1/5e-6+(1+2*n_eq)/(2*inter.modes.lifetimes{1}))};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -114,4 +114,5 @@ klegend({'$|0\rangle$','$|1\rangle$','$|2\rangle$',...
          '$|3\rangle$','$|4\rangle$'},'Location','Best');
 
 end
+
 

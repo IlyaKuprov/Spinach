@@ -29,7 +29,7 @@ inter.zeeman.scalar={0.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic switches
 sys.disable={'trajlevel'};
@@ -112,4 +112,5 @@ for n=1:size(traj,2)
 end 
 
 end
+
 

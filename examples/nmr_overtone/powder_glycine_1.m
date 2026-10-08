@@ -19,7 +19,7 @@ inter.zeeman.scalar{1}=32.4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -62,4 +62,5 @@ spectrum=powder(spin_system,@overtone_pa,parameters,'qnmr');
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
+
 

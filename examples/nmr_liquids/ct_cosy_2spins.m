@@ -20,7 +20,7 @@ inter.coupling.scalar{2,2}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.offset=500;
@@ -53,4 +53,5 @@ plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.1 0.5 0.1 0.5],2,256,6,'positive');
 
 end
+
 

@@ -35,7 +35,7 @@ inter.coupling.scalar{2,4}=-11;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -85,4 +85,5 @@ plot_2d(spin_system,-real(spectrum),parameters,...
         20,[0.05 0.5 0.05 0.5],2,256,6,'both');
 
 end
+
 

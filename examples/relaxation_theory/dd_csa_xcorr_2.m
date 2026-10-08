@@ -26,6 +26,9 @@ bas.approximation='none';        % Complete basis set
 % Proximity cut-off
 sys.tols.prox_cutoff=4.0;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

@@ -13,3 +13,5 @@ The basis is `sphten-liouv` / `IK-2`, with `scalar_couplings` connectivity and p
 ## Processing and plot
 
 The wrapper applies squared-cosine apodisation to the positive and negative pathway FIDs, Fourier-transforms F2, combines them as `f1_pos+conj(f1_neg)`, then Fourier-transforms F1. It plots `abs(spectrum)` with positive contours.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

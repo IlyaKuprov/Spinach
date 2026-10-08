@@ -33,7 +33,8 @@ inter.equilibrium='IME';
 inter.tau_c={5e-9};
 inter.temperature=298;
 
-% Use GPU arithmetic
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Spinach housekeeping

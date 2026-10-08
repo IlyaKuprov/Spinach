@@ -30,6 +30,9 @@ parameters.zerofill=8196;
 parameters.spins={'13C','1H'};
 parameters.J=150;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Create the spin system structure
 spin_system=create(sys,inter);
 

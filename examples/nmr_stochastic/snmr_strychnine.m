@@ -29,7 +29,8 @@ inter.temperature=298;
 inter.rlx_keep='kite';
 inter.tau_c={200e-12};
 
-% Use GPU arithmetic
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Spinach housekeeping

@@ -27,7 +27,8 @@ inter.r2_rates={1};
 % Disable path tracing
 sys.disable={'pt'};
 
-% This needs a GPU
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Basis set

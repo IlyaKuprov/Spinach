@@ -43,7 +43,7 @@ bas.connectivity='scalar_couplings';
 bas.inter_level=4; bas.prox_level=3;
 
 % Algorithmic options
-sys.enable={'prop_cache','greedy'};
+sys.enable={'zte','prop_cache','greedy'};
 sys.disable={'asyredf'};
 
 % Create the spin system structure

@@ -21,3 +21,5 @@ The simulation calls `imaging` with `epi_2d`. Before plotting, the code halves `
 ## Source
 
 [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/echo_planar_2d.m)
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

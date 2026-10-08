@@ -31,8 +31,10 @@ bas.inter_level=4;
 % Ignore interactions below 200 Hz
 sys.tols.inter_cutoff=2*pi*200;
 
-% Use GPU arithmetic
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -9,7 +9,7 @@ Simulates a liquid-state menthol 1H NMR FID and illustrates effects labelled as 
 
 ## System and basis
 
-The example loads `sys` and `inter` from `menthol.mat`; their numerical shifts, couplings, isotope inventory, and field are not stated in this MATLAB file. It builds a scalar-coupling-connected `sphten-liouv` basis with `IK-2` approximation, proximal level 1, projection +1, and three S3 symmetry groups. The source enables the greedy algorithm.
+The example loads `sys` and `inter` from `menthol.mat`; their numerical shifts, couplings, isotope inventory, and field are not stated in this MATLAB file. It builds a scalar-coupling-connected `sphten-liouv` basis with `IK-2` approximation, proximal level 1, projection +1, and three S3 symmetry groups. The source enables the greedy algorithm. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Acquisition and processing
 

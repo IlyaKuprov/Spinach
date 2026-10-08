@@ -53,7 +53,8 @@ parameters.tol=1e-2;
 parameters.verbose=0;
 parameters.sum_up=0;
 
-% Enable GPU arithmetic
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Spinach housekeeping

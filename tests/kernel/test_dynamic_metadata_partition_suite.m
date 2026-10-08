@@ -66,12 +66,28 @@ projectors=path_trace(spin_system,speye(3),[]);
 result=test_true(result,'path_trace disabled projector',iscell(projectors)&&isscalar(projectors)&&isequal(projectors{1},1),...
                  'disabled path tracing must return a unit projector placeholder');
 
-% Check zero-track elimination disabled exit without Krylov propagation
+% Check zero-track elimination default exit without Krylov propagation
 spin_system.bas.formalism='sphten-liouv';
-spin_system.sys.disable={'zte'};
+spin_system.sys.enable={};
 projector=zte(spin_system,speye(3),[1;0;0]);
-result=test_true(result,'zte disabled projector',isequal(projector,1),...
-                 'disabled zero-track elimination must return a unit projector placeholder');
+result=test_true(result,'zte default projector',isequal(projector,1),...
+                 'zero-track elimination must be opt-in and return a unit projector placeholder by default');
+
+% Check explicit zero-track elimination on an invariant coordinate subspace
+spin_system.sys.enable={'zte'};
+[spin_system,~]=tolerances(spin_system,struct());
+projector=zte(spin_system,spdiags((1:4)',0,4,4),sparse([0;1;0;0]));
+result=test_true(result,'zte enabled reduction',isequal(size(projector),[4 1])&&...
+                 isequal(projector*projector'*[0;1;0;0],[0;1;0;0]),...
+                 'enabled zero-track elimination must retain the populated coordinate and remove three empty tracks');
+
+% Check that paranoia overrides an explicit zero-track elimination request
+spin_system.sys.enable={'zte','paranoia'};
+[spin_system,~]=tolerances(spin_system,struct());
+projector=zte(spin_system,speye(3),[1;0;0]);
+result=test_true(result,'zte paranoia override',isequal(projector,1)&&...
+                 ~ismember('zte',spin_system.sys.enable),...
+                 'paranoid tolerances must leave zero-track elimination disabled');
 
 end
 

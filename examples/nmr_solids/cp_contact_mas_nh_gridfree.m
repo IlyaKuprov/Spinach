@@ -25,7 +25,8 @@ inter.temperature=298;
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% This needs a GPU
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Spinach housekeeping

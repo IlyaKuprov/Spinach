@@ -10,7 +10,7 @@ Simulates a one-dimensional pulse-acquire 1H NMR spectrum for anti-3,5-difluoroh
 
 The field setting is `11.7464`. The source assigns proton chemical-shift values `1.0092` and `4.6834`. It sets the two 19F shift entries to `0.0000` and comments that the actual value is `-184.1865`, but is zeroed because that value does not matter here and the calculation is faster. Scalar couplings are entered explicitly in the example; their units are not labelled.
 
-The basis is `sphten-liouv` with `IK-0` and `inter_level=1`. Three manual fragment memberships are specified, with `S3` symmetry for spin groups `[14 15 16]` and `[21 22 23]`; the basis also sets `longitudinal={{'19F'}}` and `projections={1}`. The code disables ZTE. A GPU enable statement is present only as a comment and is not active. No relaxation model is configured in this example.
+The basis is `sphten-liouv` with `IK-0` and `inter_level=1`. Three manual fragment memberships are specified, with `S3` symmetry for spin groups `[14 15 16]` and `[21 22 23]`; the basis also sets `longitudinal={{'19F'}}` and `projections={1}`. The code leaves ZTE off by default. A GPU enable statement is present only as a comment and is not active. No relaxation model is configured in this example.
 
 The acquisition selects `{'1H'}`, sets both initial state and receiver coil to `state(spin_system,'L+','1H')`, and leaves the decoupling list empty. Offset is `1400`, sweep `2500`, acquired points `4096`, zero fill `16536`, and the axis is in ppm with `invert_axis=1`. The code does not label units for the field, offset, or sweep literals.
 

@@ -254,11 +254,15 @@ spins; beyond that, the basis restriction is the tool, not a bigger machine:
   them. `imaging` rejects symmetry groups; do not carry this setting blindly
   from a liquid-state example into spatially resolved simulations.
 
-At run time Spinach reduces dimension further on its own: zero-track
-elimination and path tracing routinely cut the active space by an order of
-magnitude, visible in the log as "state space dimension reduced from 64 to
-15". These reductions can be switched off through
-`sys.disable={'zte','pt','symmetry',...}` for debugging, at a large cost.
+At run time path tracing can reduce the active dimension further. Zero-track
+elimination is opt-in: add `'zte'` to `sys.enable` to activate it, and omit
+it to leave that reduction off. Enable it only for examples whose actual
+propagation path reaches Liouville-space trajectory reduction. Hilbert-space
+symmetry reduction, direct `step` or `krylov` propagation, polyadic generators,
+and `trajlevel`-disabled calculations do not use ZTE. A shaped-pulse call alone
+is insufficient: its selected method must reach `evolution`, or a subsequent
+acquisition must do so. Path tracing and symmetry can be disabled
+with `sys.disable={'pt','symmetry'}` for debugging, potentially at a large cost.
 
 Matrices switch to sparse algebra automatically, and above a state-space
 dimension of 10000 (a tunable tolerance) Spinach uses Krylov propagation

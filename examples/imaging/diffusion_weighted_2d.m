@@ -17,8 +17,10 @@ sys.magnet=5.9;
 % Chemical shifts
 inter.zeeman.scalar={0.0};
 
-% This needs a GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Basis set
 bas.formalism='sphten-liouv';

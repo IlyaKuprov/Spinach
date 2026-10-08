@@ -29,6 +29,9 @@ inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={1e-10};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

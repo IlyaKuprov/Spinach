@@ -108,6 +108,9 @@ inter.tau_c={4.137e-9 ...  % Alpha, inside
 % Do not draw colorbars
 sys.disable={'colorbar'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

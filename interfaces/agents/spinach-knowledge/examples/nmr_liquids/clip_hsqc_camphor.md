@@ -17,3 +17,5 @@ The example calls `liquid(subsystem,@clip_hsqc,parameters,'nmr')` for each isoto
 ## Processing and plotted result
 
 The positive and negative FIDs each receive cosine-squared apodisation in both dimensions. The code Fourier transforms the direct dimension, combines the components as a States signal, Fourier transforms the indirect dimension, sums the isotopomer spectra, and plots the real part with `plot_2d`. The output is a calculated contour plot, not an experimental spectrum or a reported fit. The example provides no line-shape comparison, error metric, or claim that the simulated intensities reproduce a measured result.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

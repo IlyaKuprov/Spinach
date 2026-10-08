@@ -48,11 +48,10 @@ fields it understands and errors on whatever is left.
 | `sys.parallel` | `{pool_type,nworkers}` | Parallel pool specification, e.g. `{'processes',8}`; defaults to a local process pool leaving one core to the OS. |
 | `sys.parprops` | cell array of name-value pairs | Extra properties passed to the parallel cluster object. |
 
-Legal `sys.disable` entries, anything else being an error: `'zte'`
-(unpopulated-state elimination), `'pt'` (non-interacting subspace detection),
+Legal `sys.disable` entries, anything else being an error: `'pt'` (non-interacting subspace detection),
 `'symmetry'`, `'krylov'`, `'clean-up'`, `'hygiene'` (start-up health checks),
 `'dss'`, `'expv'`, `'trajlevel'`, `'merge'`, `'colorbar'`, `'asyredf'`. Legal
-`sys.enable` entries: `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
+`sys.enable` entries: `'zte'` (zero track elimination, off by default), `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
 `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
 couplings), `'dafuq'`. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.

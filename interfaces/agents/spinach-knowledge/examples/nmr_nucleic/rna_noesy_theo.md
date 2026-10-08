@@ -7,7 +7,7 @@
 
 This wrapper simulates a theoretical 1H-1H NOESY spectrum for the example RNA provided by Gerhard Wagner's group at Harvard University. It imports `example.pdb` and `example.txt` with `nuclacid`, deletes shifts, and lists exchangeable protons for deuteration: GUA:H1, GUA:H21, GUA:H22, CYT:H41, CYT:H42, URI:H3, ADE:H61, and ADE:H62. After system construction it removes 13C and 15N spins, reflecting the source comment's assumption that the RNA is unlabelled; the simulated spin set is therefore proton-only.
 
-The source sets the field to 17.62 T. Relaxation is Redfield, with `rlx_keep='kite'`, zero equilibrium, and `tau_c={3e-9}`. The basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, interaction level 5, and proximity level 3. Interaction/proximity cutoffs are 1.0 and 5.0. Krylov propagation and colorbar are disabled; propagator caching and greedy are enabled. Units for these numeric settings, including `tau_c`, are not stated in this wrapper.
+The source sets the field to 17.62 T. Relaxation is Redfield, with `rlx_keep='kite'`, zero equilibrium, and `tau_c={3e-9}`. The basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, interaction level 5, and proximity level 3. Interaction/proximity cutoffs are 1.0 and 5.0. Krylov propagation and colorbar are disabled; propagator caching and greedy are enabled. Units for these numeric settings, including `tau_c`, are not stated in this wrapper. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Sequence parameters and processing
 

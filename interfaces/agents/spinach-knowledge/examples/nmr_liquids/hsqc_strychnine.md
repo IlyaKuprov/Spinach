@@ -26,3 +26,5 @@ Strychnine parameters are attributed in the molecule source to Berger and Braun'
 http://dx.doi.org/10.1016/j.jmr.2014.02.003
 http://dx.doi.org/10.1039/C0CC04114A
 HSQC sequence sources: https://doi.org/10.1016/0009-2614(80)80041-8 and https://doi.org/10.1002/cmr.a.10095
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

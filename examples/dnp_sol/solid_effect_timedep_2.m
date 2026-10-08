@@ -59,7 +59,9 @@ bas.projections={[+2 +1 0 -1 -2]};
 
 % Algorithmic options
 sys.disable={'krylov'};
-% sys.enable={'gpu'};
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

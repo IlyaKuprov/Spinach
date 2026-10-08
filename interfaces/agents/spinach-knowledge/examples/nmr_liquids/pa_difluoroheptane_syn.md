@@ -9,7 +9,7 @@ Simulates a liquid-state, pulse-acquire 1H NMR FID for syn-3,5-difluoroheptane. 
 
 ## System and basis
 
-The source defines 23 spins: seven 12C, fourteen 1H, and two 19F, at `sys.magnet=11.7464` T. It specifies scalar shifts and scalar couplings in the source; examples of the coded shift values are 1.0189, 4.6138, and 0.0000. The basis is manually partitioned into three fragment subspaces (`bas.manual`, `inter_level=1`) in the `sphten-liouv` formalism with `IK-0` approximation. It applies S3 symmetry to the two three-proton groups, includes 19F longitudinal terms, and sets projection 1. The source disables ZTE; its GPU enable line is commented out.
+The source defines 23 spins: seven 12C, fourteen 1H, and two 19F, at `sys.magnet=11.7464` T. It specifies scalar shifts and scalar couplings in the source; examples of the coded shift values are 1.0189, 4.6138, and 0.0000. The basis is manually partitioned into three fragment subspaces (`bas.manual`, `inter_level=1`) in the `sphten-liouv` formalism with `IK-0` approximation. It applies S3 symmetry to the two three-proton groups, includes 19F longitudinal terms, and sets projection 1. The source leaves ZTE off by default; its GPU enable line is commented out.
 
 ## Acquisition and processing
 

@@ -10,7 +10,7 @@ A theoretical 3D HN(CO)CA simulation for human ubiquitin. The source assumes onl
 
 ## Protein, spin system, and acquisition
 
-The code imports `1D3Z.pdb` and `1D3Z.bmrb` through `protein`, with molecule 1, `noshift='delete'`, and the `backbone-minimal` selection. The field is 14.1 T. Interaction/proximity cutoffs are 2.0/4.0; their units are not stated in the assignments. The basis uses `sphten-liouv`, IK-1, scalar-coupling connectivity, and interaction/proximity levels 4/1. It enables `greedy` and disables `krylov`.
+The code imports `1D3Z.pdb` and `1D3Z.bmrb` through `protein`, with molecule 1, `noshift='delete'`, and the `backbone-minimal` selection. The field is 14.1 T. Interaction/proximity cutoffs are 2.0/4.0; their units are not stated in the assignments. The basis uses `sphten-liouv`, IK-1, scalar-coupling connectivity, and interaction/proximity levels 4/1. It enables `zte` and `greedy` and disables `krylov`.
 
 The 3D sequence simulation calls `liquid(...,@hncoca,...,'nmr')` with declared spins `15N`, `13C`, and `1H`. The delay values are [2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3] s. Offsets are [-7100, 8450, 4850], sweeps [2500, 4500, 3000], acquired points [64, 64, 64], and zero-fill sizes [256, 256, 256]. Axes are displayed in ppm.
 

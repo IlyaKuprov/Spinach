@@ -18,7 +18,7 @@ The suite then performs the following checks:
 - **Transfer matrix recovery:** with `T_ref=[2 1;0 -1]`, `amp_inps=[1 0 1;0 1 1]`, and `amp_outs=T_ref*amp_inps`, checks `transfermat(amp_inps,amp_outs)` against `T_ref` with tolerances `1e-14` (absolute and relative), verifying that linearly complete input-output samples recover the exact linear transfer matrix.
 - **Strongly connected components:** with `G=logical([1 1 0;1 1 0;0 0 1])`, checks `scomponents(G)` so that `sci(1)==sci(2)`, `sci(3)~=sci(1)`, and `numel(unique(sci))==2`; nodes one and two are mutually reachable and node three is a separate component.
 - **Path tracing disabled exit:** sets `spin_system.sys.output='hush'` and `spin_system.sys.disable={'pt'}`, then calls `path_trace(spin_system,speye(3),[])`; the result must be a scalar cell whose first element equals `1`, i.e. a unit projector placeholder returned without graph partition work.
-- **Zero-track elimination disabled exit:** sets `spin_system.bas.formalism='sphten-liouv'` and `spin_system.sys.disable={'zte'}`, then calls `zte(spin_system,speye(3),[1;0;0])`; the result must equal `1`, i.e. a unit projector placeholder returned without Krylov propagation.
+- **Zero-track elimination disabled exit:** sets `spin_system.bas.formalism='sphten-liouv'` and `spin_system.sys.enable={}`, then calls `zte(spin_system,speye(3),[1;0;0])`; the result must equal `1`, i.e. a unit projector placeholder returned without Krylov propagation.
 
 ## Inputs and outputs
 
@@ -33,3 +33,5 @@ The function takes no inputs. It returns `result`, a regression test result stru
 ## References
 
 - [Spinach source: tests/kernel/test_dynamic_metadata_partition_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_metadata_partition_suite.m)
+
+The suite also verifies that explicit ZTE enablement removes three empty tracks from a four-coordinate invariant system, and that paranoia overrides the enablement.

@@ -12,7 +12,7 @@ A liquid-state, homonuclear proton COSY-90 simulation for a 22-site rotenone spi
 
 All 22 sites are `1H`. The source assigns chemical shifts (ppm) of 6.72, 6.40, 4.13, 4.56, 4.89, 6.46, 7.79, 3.79, 2.91, 3.27, 5.19, 4.89, 5.03, 1.72, 1.72, 1.72, 3.72, 3.72, 3.72, 3.76, 3.76, and 3.76. Pairwise scalar couplings are specified in the source in Hz, with listed nonzero values from 0.7 to 15.8 Hz; for example, J(3,4)=12.1 Hz, J(9,10)=15.8 Hz, J(10,11)=9.8 Hz, and J(9,11)=8.1 Hz. The field is 5.9 T.
 
-The Liouville-space basis uses the IK-2 approximation, scalar-coupling connectivity, and proximity level 1. The source enables the greedy system-building option and groups sites 14-16, 17-19, and 20-22 as three S3 symmetry groups.
+The Liouville-space basis uses the IK-2 approximation, scalar-coupling connectivity, and proximity level 1. The source enables the greedy system-building option and groups sites 14-16, 17-19, and 20-22 as three S3 symmetry groups. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## COSY acquisition and processing
 

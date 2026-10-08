@@ -92,9 +92,6 @@ bas.projections={1};
 % GPU is useful here
 % sys.enable={'gpu'};
 
-% ZTE not useful here
-sys.disable={'zte'};
-
 % Spinach housekeeping 
 spin_system=create(sys,inter); 
 spin_system=basis(spin_system,bas);

@@ -15,3 +15,5 @@ The single-dimensional acquisition uses offset `2328`, sweep `3500`, `4096` poin
 ## Scope
 
 This is a single liquid-state spectrum calculation: it does not propagate reaction kinetics or a spatially varying signal.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

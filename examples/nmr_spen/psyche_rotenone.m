@@ -47,7 +47,7 @@ bas.prox_level=1;
 
 % Algorithmic options
 sys.disable={'pt','colorbar'};
-sys.enable={'greedy'}; % 'gpu'
+sys.enable={'zte','greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

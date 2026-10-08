@@ -50,7 +50,8 @@ function err=errfun(axis_expt_f, spec_expt_f,  ...
 sys.output='hush';
 sys.disable={'hygiene'};
 
-% Run on GPU
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Magnet induction 

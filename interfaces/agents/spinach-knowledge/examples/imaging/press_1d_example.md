@@ -23,3 +23,5 @@ The source comments describe possible excitation assignments at +100e3 for B and
 [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/press_1d_example.m) · [PRESS callback](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_1d.m) · [Voxel diagnostic](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_voxel_1d.m)
 
 The source credits Ahmed Allami and Ilya Kuprov.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

@@ -40,6 +40,9 @@ parameters.zerofill=[256 256 256];
 parameters.decouple_f3={'13C'};
 parameters.axis_units='ppm';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

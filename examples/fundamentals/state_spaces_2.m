@@ -89,9 +89,6 @@ bas.sym_spins={[14 15 16],[21 22 23]};
 bas.longitudinal={{'19F'}};
 bas.projections={1};
 
-% Prevent automatic state dropout
-sys.disable={'zte'};
-
 % GPU is useful here
 % sys.enable={'gpu'};
 

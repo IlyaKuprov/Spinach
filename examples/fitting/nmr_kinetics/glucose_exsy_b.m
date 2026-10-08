@@ -40,7 +40,7 @@ function err=exsy_err(params)
 % Hush up Spinach
 sys.output='hush';
 sys.disable={'hygiene'};
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Magnet field
 sys.magnet=9.3933;

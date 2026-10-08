@@ -14,3 +14,5 @@ Inputs are a 7.05 T field, shifts [4.55, 4.55, −13.5, −16.5], and within-pai
 The initial density is the unit state. A bubbling Liouvillian adds a `magpump` term targeting singlet and quintet components, with rate 0.1; the source comments that this bubbling rate is a guess that needs a proper value. After storing the bubbling and free-evolution trajectories, the script projects the real singlet, selected triplet, and quintet coefficients. It also applies a 45-degree deuterium rotation to the stored trajectory and plots three transition-coherence projections: T1 to T0, Q1 to Q0, and Q2 to Q1. These are spin-state observables in arbitrary units, not a pulse-acquire NMR spectrum.
 
 The trajectory calls use step intervals of 0.007 and 0.03 with 1,000 steps each, giving 7 seconds of bubbling followed by 30 seconds of free evolution, consistent with the plotted 0–7 and 7–37 second axis. These values are step intervals, not total segment durations. The MATLAB header says a paper link will follow, and supplies no DOI.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

@@ -6,7 +6,7 @@ Source: [examples/nmr_solids/cp_acquire_mas_gly.m](https://github.com/IlyaKuprov
 
 This example simulates 1H-to-13C cross-polarisation (CP), followed by acquisition under MAS in alpha-glycine powder. Spin-system properties are read from a Gaussian log parsed with `gparse` and passed to `g2spinach`; the source labels these properties as PCM DFT. It then labels the spectrometer 400 MHz, sets `sys.magnet=9.4`, and assigns alpha-glycine isotropic shifts: CO 176.4, CA 43.6, the two H_CA sites 2.6 and 3.8, and three H_N sites 8.0. The source does not label units for these shift values. The spin temperature parameter is 298, with no unit stated in this file.
 
-The basis is `sphten-liouv` with the `IK-0` approximation and `inter_level=3`, retaining correlations up to and including three-spin correlations as stated in the header. The source enables the greedy option, disables `pt`, and sets an interaction cutoff expression `2*pi*200`; its comment describes the cutoff as neglecting interactions below 200 Hz. No claim about a measured spectrum is made by these settings.
+The basis is `sphten-liouv` with the `IK-0` approximation and `inter_level=3`, retaining correlations up to and including three-spin correlations as stated in the header. The source enables the greedy option, disables `pt`, and sets an interaction cutoff expression `2*pi*200`; its comment describes the cutoff as neglecting interactions below 200 Hz. No claim about a measured spectrum is made by these settings. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## CP, MAS, and readout
 

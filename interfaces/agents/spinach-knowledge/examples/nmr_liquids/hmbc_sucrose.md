@@ -8,7 +8,7 @@
 
 Builds a sucrose spin system from `../standard_systems/sucrose.log` using vacuum-DFT parameters, mapping H to `1H` and C to `13C`; the `g2spinach` call also receives `[31.8 182.1]`. The wrapper sets `min_j=3.0` and `no_xyz=1`, then replaces isotropic shielding entries at spin indices `[1:19 24:30]` with `[94.5 73.4 74.9 71.5 74.7 62.4 63.6 106.0 78.7 76.3 83.7 64.7 5.49 3.63 3.83 3.54 3.90 3.90 3.90 3.75 3.75 4.29 4.12 3.96 3.90 3.90]`. The source labels these as experimental isotropic shielding values but does not give their units.
 
-The source comment describes natural 13C content; the wrapper generates 13C isotopomers with `dilute`. It sets `sys.magnet=5.9`, enables `greedy`, and uses `prox_cutoff=4.0`. The basis is `sphten-liouv` / `IK-2`, connected by scalar couplings with proximity level 1.
+The source comment describes natural 13C content; the wrapper generates 13C isotopomers with `dilute`. It sets `sys.magnet=5.9`, enables `zte` and `greedy`, and uses `prox_cutoff=4.0`. The basis is `sphten-liouv` / `IK-2`, connected by scalar couplings with proximity level 1.
 
 ## Acquisition and processing
 

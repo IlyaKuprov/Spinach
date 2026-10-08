@@ -9,7 +9,7 @@ A three-dimensional HCCH COSY forward simulation using GB1 protein input. The co
 
 ## Spin model and basis
 
-The field literal is `14.1` (unit not stated). Interaction and proximity cutoffs are `20.0` and `4.0`. The basis is `sphten-liouv`, approximation `IK-1`, connectivity `scalar_couplings`, interaction level `4`, and proximity level `1`. Algorithmic options enabled are `greedy` and `prop_cache`.
+The field literal is `14.1` (unit not stated). Interaction and proximity cutoffs are `20.0` and `4.0`. The basis is `sphten-liouv`, approximation `IK-1`, connectivity `scalar_couplings`, interaction level `4`, and proximity level `1`. Algorithmic options enabled are `zte` and `greedy` and `prop_cache`.
 
 ## Sequence, acquisition, and processing
 

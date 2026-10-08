@@ -17,3 +17,5 @@ The seven-spin system is generated from the PCM-DFT glycine structure: two 13C a
 The wise sequence uses 1H and 13C channels, offsets [2000, 10000] Hz, high-power irradiation of 83000 Hz, cross-polarisation powers [60000, 50000] Hz, and a 0.0001-second contact duration. The two sweeps are [1/(6e-6), 1/(33e-6)] Hz, with [128, 512] acquired points and [512, 2048] zero-filled points. Detection is on the 13C L+ state.
 
 singlerot returns cosine and sine FIDs. Each is apodised with a squared-cosine window; the first-dimension transforms are combined as real cosine plus i times real sine, then Fourier transformed in the second dimension. The plotted observable is the real part of the resulting two-dimensional spectrum.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

@@ -20,3 +20,5 @@ Exponential apodisation uses parameter `5`; the FID is Fourier-transformed with 
 ## Practical limit
 
 The source describes brute-force Liouville-space time propagation and warns of 32+ CPU cores, 128+ GB RAM, a strong FP64-capable Nvidia GPU, and a run time of hours.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

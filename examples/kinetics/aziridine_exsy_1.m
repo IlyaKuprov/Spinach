@@ -147,7 +147,7 @@ bas.prox_level=3;
 
 % Algorithmic options
 sys.disable={'krylov'};
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Proximity cut-off
 sys.tols.prox_cutoff=10.0;

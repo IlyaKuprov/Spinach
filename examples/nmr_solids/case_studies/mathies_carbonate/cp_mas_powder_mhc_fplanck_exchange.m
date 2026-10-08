@@ -58,8 +58,10 @@ bas.approximation='none';
 % Disable start-up checks
 sys.disable={'hygiene'};
 
-% Enable GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Exchange rate constant array
 exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz

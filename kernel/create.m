@@ -182,7 +182,6 @@ if ~isempty(spin_system.sys.disable)
     report(spin_system,'WARNING: the following functionality is disabled by the user');
     if ismember('hygiene',spin_system.sys.disable),   report(spin_system,'         > health checks at start-up'); end
     if ismember('pt',spin_system.sys.disable),        report(spin_system,'         > detection of non-interacting subspaces'); end
-    if ismember('zte',spin_system.sys.disable),       report(spin_system,'         > elimination of unpopulated states'); end
     if ismember('symmetry',spin_system.sys.disable),  report(spin_system,'         > permutation symmetry factorisation'); end
     if ismember('krylov',spin_system.sys.disable),    report(spin_system,'         > Krylov propagation inside evolution() function'); end
     if ismember('clean-up',spin_system.sys.disable),  report(spin_system,'         > sparse array clean-up'); end
@@ -197,6 +196,7 @@ end
 % Enabled features report
 if ~isempty(spin_system.sys.enable)
     report(spin_system,'WARNING: the following functionality is enabled by the user');
+    if ismember('zte',spin_system.sys.enable),       report(spin_system,'         > elimination of unpopulated states'); end
     if ismember('gpu',spin_system.sys.enable),        report(spin_system,'         > GPU arithmetic'); end
     if ismember('op_cache',spin_system.sys.enable),   report(spin_system,'         > operator caching'); end
     if ismember('ham_cache',spin_system.sys.enable),  report(spin_system,'         > Hamiltonian caching'); end
@@ -1545,7 +1545,7 @@ if isfield(sys,'disable')
     if (~iscell(sys.disable))||any(~cellfun(@ischar,sys.disable))
         error('sys.disable must be a cell array of strings.');
     end
-    if any(~ismember(sys.disable,{'zte','pt','symmetry','krylov','clean-up','hygiene',...
+    if any(~ismember(sys.disable,{'pt','symmetry','krylov','clean-up','hygiene',...
                                   'dss','expv','trajlevel','merge','colorbar','asyredf'}))
         error('unrecognised switch in sys.disable field.');
     end
@@ -1556,7 +1556,7 @@ if isfield(sys,'enable')
     if (~iscell(sys.enable))||any(~cellfun(@ischar,sys.enable))
         error('sys.enable must be a cell array of strings.');
     end
-    if any(~ismember(sys.enable,{'gpu','op_cache','greedy','paranoia','sodd',...
+    if any(~ismember(sys.enable,{'zte','gpu','op_cache','greedy','paranoia','sodd',...
                                  'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end

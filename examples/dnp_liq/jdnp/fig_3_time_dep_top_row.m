@@ -46,6 +46,9 @@ for n=1:numel(field_grid)
     f_trityl=g2freq(parameters.g_trityl,sys.magnet);
     parameters.mw_off=2*pi*(f_trityl-f_free);      
         
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping
     spin_system=create(sys,inter);  
     spin_system=basis(spin_system,bas);

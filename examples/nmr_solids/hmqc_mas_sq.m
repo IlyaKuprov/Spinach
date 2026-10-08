@@ -24,8 +24,10 @@ inter.coordinates={[0.00 0.00 0.00]
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% Use GPU if present
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

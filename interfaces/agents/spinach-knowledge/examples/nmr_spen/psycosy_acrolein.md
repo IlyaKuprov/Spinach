@@ -16,3 +16,5 @@ The `@psycosy` sequence is simulated with `imaging` on a 15 mm sample with 100 s
 The sequence parameters are offset 4392, sweep 3000, [512, 512] acquisition points, [1024, 1024] zero-fill points, and `axis_units='ppm'`. The mixing time is 70e-3 s and gradient amplitude 1e-2 T/m. The saltire chirp uses a 20-degree flip angle, 0.015 s pulse duration, 0.05 s chirp-gradient duration, and 10000 Hz sweep width. The source does not annotate units for the offset or the `sweep` assignment.
 
 The simulated 2D FID is square-sine apodised in both dimensions and transformed with a zero-filled 2D FFT. The plot displays the magnitude of the spectrum. The source header estimates hours of calculation and notes faster execution on a GPU; GPU enablement is commented out.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

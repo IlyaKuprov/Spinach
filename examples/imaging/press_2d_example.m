@@ -36,8 +36,10 @@ bas.connectivity='scalar_couplings';
 % Disable path tracing
 sys.disable={'pt'};
 
-% This needs a GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

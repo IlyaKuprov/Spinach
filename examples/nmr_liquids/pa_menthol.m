@@ -20,7 +20,7 @@ bas.sym_group={'S3','S3','S3'};
 bas.sym_spins={[4 5 6],[9 10 11],[12 13 14]};
 
 % Algorithms
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

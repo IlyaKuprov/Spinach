@@ -42,7 +42,8 @@ bas.approximation='none';
 % Disable path tracing
 sys.disable={'pt'};
 
-% This needs a GPU
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Spinach housekeeping

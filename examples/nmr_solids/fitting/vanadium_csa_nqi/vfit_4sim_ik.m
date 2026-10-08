@@ -58,7 +58,9 @@ disp(params);
 % Silence Spinach
 sys.output='hush';
 sys.disable={'hygiene'};
-% sys.enable={'gpu'};
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Data dimensions
 sfO1 = 157.7815; nrpointsb = 4096;

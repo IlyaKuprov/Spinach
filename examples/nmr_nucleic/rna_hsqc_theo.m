@@ -22,7 +22,7 @@ sys.magnet=17.62;
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=5.0;
 sys.disable={'krylov','colorbar'};
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';

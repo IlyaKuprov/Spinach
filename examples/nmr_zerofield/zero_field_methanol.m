@@ -35,6 +35,9 @@ parameters.invert_axis=0;
 parameters.flip_angle=pi/2;
 parameters.detection='uniaxial';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

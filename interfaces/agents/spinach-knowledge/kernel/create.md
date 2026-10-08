@@ -39,3 +39,5 @@ For bosonic modes, `inter.modes.carriers` declares the laboratory rotating-frame
 ## Call syntax
 
 The source gives the call syntax `spin_system=create(sys,inter)`; when there are no interaction specifications, `create(sys)` is also accepted by the executable code.
+
+Zero track elimination is off by default. Add `'zte'` to `sys.enable` to opt in; `'zte'` is no longer accepted in `sys.disable`. Paranoia overrides the opt-in and leaves ZTE off.

@@ -24,6 +24,9 @@ inter.coupling.scalar{2,3}=20*rand(1);
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

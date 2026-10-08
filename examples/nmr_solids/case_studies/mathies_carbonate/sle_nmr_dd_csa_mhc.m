@@ -39,8 +39,10 @@ inter.coordinates{2}=props.std_geom(4,:);
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% This needs a GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

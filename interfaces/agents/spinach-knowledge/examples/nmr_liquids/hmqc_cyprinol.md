@@ -8,7 +8,7 @@
 
 Loads the helper-defined cyprinol spin system with `cyprinol()`. That helper declares 42 `1H` spins and 27 `13C` sites; the wrapper describes natural 13C abundance and enumerates 13C isotopomers with `dilute`. The helper comments attribute isotropic shifts and J-couplings to http://dx.doi.org/10.1002/mrc.4782, with unspecified values estimated rather than reported in that source.
 
-The wrapper sets `sys.magnet=11.7`, enables `greedy`, and sets proximity and interaction cutoffs to `4.0` and `5.0`. It uses a `sphten-liouv` / `IK-1` basis with interaction level 3, proximity level 1, and scalar-coupling connectivity.
+The wrapper sets `sys.magnet=11.7`, enables `zte` and `greedy`, and sets proximity and interaction cutoffs to `4.0` and `5.0`. It uses a `sphten-liouv` / `IK-1` basis with interaction level 3, proximity level 1, and scalar-coupling connectivity.
 
 ## Acquisition and processing
 

@@ -278,10 +278,19 @@ Relaxation enters through `inter.relaxation`, `inter.rlx_keep`,
 
 ```matlab
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 ```
+
+Every field except `formalism` is a cell with exactly one entry per chemical
+substance, even when there is only one. The table gives the contents of each
+entry (the filter rows already describe the outer cell). There is no scalar
+broadcast. `manual{n}` has local spin columns; `sym_spins{n}` is a cell of local
+spin-index vectors. Numeric longitudinal and zero-quantum filter labels remain
+global. Empty depth/connectivity entries are used where the local approximation
+does not need that setting. The compiled descriptors are `bas.basis{n}`, with
+unit rows first and `bas.offsets` delimiting the direct-sum blocks.
 
 | Field | Legal values | Notes |
 |---|---|---|
@@ -293,7 +302,7 @@ bas.prox_level=3;
 | `projections` | cell array with one row vector of integers per chemical substance | Keeps only the listed total projection quantum numbers in that substance; an empty element means no filter. `sphten-liouv` only. Single substance: `bas.projections={+1}`. |
 | `longitudinal` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only longitudinal states on those spins of that substance. `sphten-liouv` only. Single substance: `bas.longitudinal={{'15N'}}`. |
 | `zero_quantum` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only states that are zero-quantum over the union of the listed spins of that substance. `sphten-liouv` only. Single substance: `bas.zero_quantum={{'1H'}}`. |
-| `manual` | logical matrix with `nspins` columns | Explicit subgraph list, one subgraph per row; a row may not span two chemical substances. |
+| `manual` | logical matrix with `numel(chem.parts{n})` columns | Explicit local subgraph list, one subgraph per row. |
 | `sym_group` | cell array from `S2`, `S3`, `S4`, `S4A`, `S5`, `S6`, `S6A`, `S8A` | Permutation symmetry groups. |
 | `sym_spins` | cell array of index vectors | One vector per group, at least two spins each, no spin in two groups, no group spanning two chemical substances. Mandatory alongside `sym_group`. |
 | `sym_a1g_only` | logical | Keep only the fully symmetric irreducible representation. |

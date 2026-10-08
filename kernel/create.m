@@ -75,6 +75,14 @@ autoexec;
 % Rare, but it can happen
 if nargin==1, inter=[]; end
 
+% Default to one substance at unit concentration
+if ~isfield(inter,'chem')||~isfield(inter.chem,'parts')
+    inter.chem.parts={1:numel(sys.isotopes)};
+end
+if isscalar(inter.chem.parts)&&~isfield(inter.chem,'concs')
+    inter.chem.concs=1;
+end
+
 % Validate input
 grumble(sys,inter);
 
@@ -872,7 +880,7 @@ if isfield(inter,'chem')&&isfield(inter.chem,'parts')
     
     % Sort spin indices within part specifications
     for n=1:numel(inter.chem.parts)
-        inter.chem.parts{n}=sort(inter.chem.parts{n},'ascend');
+        spin_system.chem.parts{n}=sort(inter.chem.parts{n},'ascend');
     end
     
 else
@@ -2782,8 +2790,9 @@ if isfield(inter,'chem')
     if isfield(inter.chem,'parts')
 
         % Basic type checks
-        if ~iscell(inter.chem.parts)||(~all(cellfun(@isvector,inter.chem.parts)))
-            error('inter.chem.parts must be a cell array of vectors.');
+        if ~iscell(inter.chem.parts)||isempty(inter.chem.parts)||...
+           ~all(cellfun(@(x)isnumeric(x)&&isreal(x)&&(isvector(x)||isempty(x)),inter.chem.parts))
+            error('inter.chem.parts must be a non-empty cell array of numeric vectors or empty arrays.');
         end
 
         % Chemiscal subsystem specification
@@ -3188,4 +3197,5 @@ end
 % the soil for those who did not.
 %
 % Benjamin Franklin
+
 

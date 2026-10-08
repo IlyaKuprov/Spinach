@@ -41,3 +41,7 @@ For bosonic modes, `inter.modes.carriers` declares the laboratory rotating-frame
 The source gives the call syntax `spin_system=create(sys,inter)`; when there are no interaction specifications, `create(sys)` is also accepted by the executable code.
 
 Zero track elimination is off by default. Add `'zte'` to `sys.enable` to opt in; `'zte'` is no longer accepted in `sys.disable`. Paranoia overrides the opt-in and leaves ZTE off.
+
+## Substance defaults
+
+Absent `inter.chem.parts` defaults to a single block containing all spins. A single substance defaults to concentration 1. Empty parts are accepted as spin-free substances; spin lists are sorted in the compiled object. Basis settings are supplied subsequently to `basis`, which validates their per-substance cell cardinality.

@@ -1,9 +1,5 @@
-% Returns a unit operator in the current formalism and basis. The
-% operator has dimension equal to the basis size in sphten-liouv
-% formalism, the dimension equal to the product of all spin multi-
-% plicities in zeeman-hilb and zeeman-wavef formalisms, and the
-% dimension of square of the product of all spin multiplicities in
-% zeeman-liouv formalism. Syntax:
+% Returns the identity on the compiled direct-sum basis. Its dimension
+% is bas.offsets(end), the sum of the substance dimensions. Syntax:
 %
 %                      A=unit_oper(spin_system)
 %
@@ -27,30 +23,8 @@ function A=unit_oper(spin_system)
 % Check consistency
 grumble(spin_system);
 
-% Decide how to proceed
-switch spin_system.bas.formalism
-    
-    case 'sphten-liouv'
-        
-        % Unit matrix
-        A=speye(size(spin_system.bas.basis,1));
-        
-    case 'zeeman-liouv'
-        
-        % Unit matrix
-        A=speye(prod(spin_system.comp.mults.^2));
-        
-    case {'zeeman-hilb','zeeman-wavef'}
-
-        % Unit matrix
-        A=speye(prod(spin_system.comp.mults));
-
-    otherwise
-
-        % Complain and bomb out
-        error('unknown formalism specification.');
-        
-end
+% Unit matrix on the direct sum
+A=speye(spin_system.bas.offsets(end));
 
 end
 

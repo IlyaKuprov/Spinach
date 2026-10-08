@@ -500,3 +500,12 @@ Complete ready-made systems live in `etc/molecules/` (`strychnine(spins)`,
 `guess_j_pro`, `guess_j_nuc` and `guess_csa_pro` are the estimators `protein`
 and `nuclacid` call internally; everything they return is an estimate and must
 be reported as one.
+
+## Direct-sum operator addressing
+
+In `sphten-liouv`, a product operator acts only in the substance hosting its
+spins; cross-substance product specifications raise
+`Spinach:which_subst:crossSubstance`. Isotope selections sum single-spin
+operators across the hosting blocks. Operator and identity dimensions come
+from `bas.offsets(end)`, not from the number of descriptor cells.
+Multi-substance Zeeman operator construction remains explicitly unsupported.

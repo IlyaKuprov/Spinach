@@ -10,14 +10,8 @@ Allocates an all-zero sparse square matrix sized for the active Spinach formalis
 
 ## Dimension and formalism
 
-The function reads `spin_system.bas.formalism` and chooses the square dimension as follows:
-
-- `sphten-liouv`: `size(spin_system.bas.basis,1)`.
-- `zeeman-wavef` and `zeeman-hilb`: `prod(spin_system.comp.mults)`.
-- `zeeman-liouv`: `prod(spin_system.comp.mults.^2)`.
-
-For the first case the dimension is the row count of the supplied basis matrix; in the other cases it is calculated from the spin multiplicities. The routine does not create or reorder any basis, so the basis ordering is whatever the selected formalism already uses.
+The dimension is `spin_system.bas.offsets(end)`, compiled by `basis` as the sum of the substance dimensions in the selected formalism. No basis is constructed or reordered.
 
 ## Allocation and input checks
 
-For the selected dimension `d`, the implementation calls `spalloc(d,d,nnzpc*d)`; the third argument is reserved sparse storage, not a count of nonzeros already present. The function checks that `spin_system.bas.formalism` exists and that `nnzpc` is numeric, real, scalar, and integer-valued before allocation. An unrecognised formalism raises an error. The documentation describes `nnzpc` as the expected nonzero count per column.
+For the selected dimension `d`, the implementation calls `spalloc(d,d,nnzpc*d)`; the third argument is reserved sparse storage, not a count of nonzeros already present. The function checks that `spin_system.bas.formalism` exists and that `nnzpc` is numeric, real, scalar, and integer-valued before allocation. The documentation describes `nnzpc` as the expected nonzero count per column.

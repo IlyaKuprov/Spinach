@@ -59,6 +59,10 @@ if isempty(active_spins)
     return;
 end
 
+% Locate the hosting block and translate global spin indices
+subst=which_subst(spin_system,active_spins);
+[~,local_spins]=ismember(active_spins,spin_system.chem.parts{subst});
+
 % Preallocate source state index
 source=cell(1,numel(active_spins));
 
@@ -114,7 +118,7 @@ for n=2:numel(active_spins)
 end
 
 % Lift the basis columns corresponding to the relevant spins
-basis_cols=spin_system.bas.basis(:,active_spins);
+basis_cols=spin_system.bas.basis{subst}(:,local_spins);
 
 % For commutation superoperators remove commuting paths
 if ismember(side,{'leftofcomm','rightofcomm'})
@@ -133,9 +137,9 @@ for n=1:size(from,1)
     for m=1:size(from,2)
         source_subsp_idx=and(source_subsp_idx,(basis_cols(:,m)==from(n,m)));
     end
-    source_subsp=spin_system.bas.basis(source_subsp_idx,:);
+    source_subsp=spin_system.bas.basis{subst}(source_subsp_idx,:);
     source_subsp_idx=find(source_subsp_idx);
-    source_subsp(:,active_spins)=[];
+    source_subsp(:,local_spins)=[];
     
     % Get source subspace dimension
     subsp_dim=size(source_subsp,1);
@@ -148,9 +152,9 @@ for n=1:size(from,1)
         for m=1:size(to,2)
             destin_subsp_idx=and(destin_subsp_idx,(basis_cols(:,m)==to(n,m)));
         end
-        destin_subsp=spin_system.bas.basis(destin_subsp_idx,:);
+        destin_subsp=spin_system.bas.basis{subst}(destin_subsp_idx,:);
         destin_subsp_idx=find(destin_subsp_idx);
-        destin_subsp(:,active_spins)=[];
+        destin_subsp(:,local_spins)=[];
         
         % Fill the operator
         if isequal(source_subsp,destin_subsp)
@@ -180,6 +184,7 @@ if isempty(A)
     A=[1 1 0];
 else
     A=cell2mat(A);
+    A(:,1:2)=A(:,1:2)+spin_system.bas.offsets(subst);
 end
 
 end

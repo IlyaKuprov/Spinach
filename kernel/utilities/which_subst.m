@@ -26,7 +26,8 @@ subst_mask=cellfun(@(x)any(ismember(spins,x)),...
 
 % Only one substance is permitted
 if nnz(subst_mask)>1
-    error('spin list crosses chemical boundaries.');
+    error('Spinach:which_subst:crossSubstance',...
+          'spin list crosses chemical boundaries.');
 elseif nnz(subst_mask)==0
     error('spins do not belong to any substance.');
 end
@@ -36,7 +37,8 @@ subst=find(subst_mask);
 
 % Confirm that all spins are in the same substance
 if ~all(ismember(spins,spin_system.chem.parts{subst}))
-    error('spin list crosses chemical boundaries.');
+    error('Spinach:which_subst:crossSubstance',...
+          'spin list crosses chemical boundaries.');
 end
 
 end

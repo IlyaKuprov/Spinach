@@ -16,9 +16,10 @@ For Liouville calculations the documented `operator_type` values are `left`, `ri
 
 ## Output and guards
 
-- `format='csc'` (default) returns a sparse square matrix. Its dimension is the Spinach basis dimension in `sphten-liouv`, the product of spin multiplicities in Hilbert and wavefunction formalisms, or that Hilbert dimension squared in `zeeman-liouv`.
+- `format='csc'` (default) returns a sparse square matrix. Its dimension is `bas.offsets(end)`, the compiled direct-sum dimension.
 - `format='xyz'` returns the nonzero entries as `[row,column,value]` triplets, with row and column indices from MATLAB `find`.
 - It requires basis information, nonempty spin selections, and unique positive integer spin indices; paired cell arrays must have matching lengths and character operator labels. The format must be `csc` or `xyz`. The local guard requires `operator_type` to be a character string; the downstream superoperator/conversion routines handle its meaning.
+- Product specifications must lie within one substance, including explicitly specified identity factors. Isotope and numeric-vector requests remain sums of single-spin operators. Multi-substance Zeeman operator assembly is explicitly rejected pending the non-sphten work package.
 - Caching is optional: `op_cache` in `spin_system.sys.enable` enables the cache path when its ValueStore is available.
 
 ## References

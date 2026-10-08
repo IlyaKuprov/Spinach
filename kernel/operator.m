@@ -106,6 +106,9 @@ if ismember('op_cache',spin_system.sys.enable)
     
 end
 
+% Product specifications must belong to one substance
+if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
+
 % Parse the human specification into Spinach notation
 [opspecs,coeffs]=human2opspec(spin_system,operators,spins);
 
@@ -133,6 +136,12 @@ switch spin_system.bas.formalism
     case {'zeeman-wavef',...
           'zeeman-hilb',...
           'zeeman-liouv'}
+
+        % Other direct-sum formalisms are implemented in WP4
+        if spin_system.bas.nsubst>1
+            error('Spinach:operator:formalism',...
+                  'multi-substance Zeeman operators are not yet supported.');
+        end
 
         % Parallelisation efficiency
         mults=spin_system.comp.mults;
@@ -181,30 +190,8 @@ A=cell2mat(A);
 % Convert to CSC format
 if strcmp(format,'csc')
 
-    % Decide operator dimension
-    switch spin_system.bas.formalism
-
-        case 'sphten-liouv'
-
-            % As per the basis set specification
-            matrix_dim=size(spin_system.bas.basis,1);
-
-        case {'zeeman-wavef','zeeman-hilb'}
-            
-            % Entire Hilbert space
-            matrix_dim=prod(spin_system.comp.mults);
-
-        case 'zeeman-liouv'
-            
-            % Entire Liouville space
-            matrix_dim=prod(spin_system.comp.mults)^2;
-
-        otherwise
-        
-            % Complain and bomb out
-            error('unknown formalism.');
-
-    end
+    % Use the compiled direct-sum dimension
+    matrix_dim=spin_system.bas.offsets(end);
 
     % Make a sparse matrix, making sure it's complex for later
     A=sparse(A(:,1),A(:,2),complex(A(:,3)),matrix_dim,matrix_dim);

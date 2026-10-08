@@ -9,10 +9,4 @@ Wiki: https://spindynamics.org/wiki/index.php?title=unit_oper.m
 
 ## Dimensions
 
-Let `d=prod(spin_system.comp.mults)`. The function uses these dimensions:
-
-- `sphten-liouv`: `size(spin_system.bas.basis,1)`.
-- `zeeman-hilb` and `zeeman-wavef`: `d`.
-- `zeeman-liouv`: `prod(spin_system.comp.mults.^2)`, equal to `d^2`.
-
-For each supported formalism the returned matrix is `speye` of the specified dimension, so it acts as the identity in that representation. Any other `spin_system.bas.formalism` raises an error.
+The dimension is `spin_system.bas.offsets(end)`, the sum of the compiled substance dimensions. The result is `speye` of that dimension in every formalism, including a one-dimensional block for each spin-free substance.

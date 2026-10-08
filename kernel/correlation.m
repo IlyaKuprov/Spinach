@@ -43,7 +43,7 @@ if ~exist('spins','var'), spins='all'; end
 grumble(spin_system,rho,orders,spins)
 
 % Store dimension statistics
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     spn_dim=spn_dim^2;
 end
@@ -68,10 +68,15 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
 
         % Compute the order of correlation for each basis state
-        orders_present=sum(logical(spin_system.bas.basis(:,spins)),2);
+        orders_present=zeros(spn_dim,1);
+        for n=1:spin_system.bas.nsubst
+            local_spins=ismember(spin_system.chem.parts{n},spins);
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            orders_present(idx)=sum(logical(spin_system.bas.basis{n}(:,local_spins)),2);
+        end
 
         % Wipe all correlation orders except those specified by the user
-        state_mask=false(size(spin_system.bas.basis,1),1);
+        state_mask=false(spin_system.bas.offsets(end),1);
         for n=orders
             state_mask=state_mask|(orders_present==n);
         end

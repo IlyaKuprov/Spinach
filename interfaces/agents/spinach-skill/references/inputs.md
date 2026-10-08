@@ -291,6 +291,9 @@ spin-index vectors. Numeric longitudinal and zero-quantum filter labels remain
 global. Empty depth/connectivity entries are used where the local approximation
 does not need that setting. The compiled descriptors are `bas.basis{n}`, with
 unit rows first and `bas.offsets` delimiting the direct-sum blocks.
+Coherence, correlation, homospoil, and decoupling selections retain global
+spin labels at their interface; they map those labels into each substance’s
+local descriptor and apply the resulting masks at its offset.
 
 | Field | Legal values | Notes |
 |---|---|---|

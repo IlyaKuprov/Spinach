@@ -31,8 +31,6 @@ parameters.electrons=[1 2];
 parameters.spins={'E'};
 parameters.needs={'zeeman_op'};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach run
 spin_system=create(sys,inter);

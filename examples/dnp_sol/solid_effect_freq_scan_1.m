@@ -49,8 +49,6 @@ inter.weiz_r1d=1e-3*ones(7,7);
 inter.weiz_r2d=1e-3*ones(7,7);
 inter.temperature=4.2;
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

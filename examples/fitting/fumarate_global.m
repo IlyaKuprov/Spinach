@@ -74,8 +74,6 @@ inter.coupling.scalar={0.0   j_ch_near   j_ch_far   j_hh;
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

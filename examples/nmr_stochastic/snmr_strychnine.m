@@ -29,10 +29,9 @@ inter.temperature=298;
 inter.rlx_keep='kite';
 inter.tau_c={200e-12};
 
-% Enable zero track elimination, with optional GPU arithmetic
-sys.enable={'zte'};
+% Optional GPU arithmetic
 
-% sys.enable={'zte','gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

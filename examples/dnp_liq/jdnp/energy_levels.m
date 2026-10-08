@@ -18,8 +18,6 @@ inter.zeeman.scalar={1.9 2.1};
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

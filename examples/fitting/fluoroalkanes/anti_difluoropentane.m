@@ -50,10 +50,9 @@ function err=errfun(axis_expt_f, spec_expt_f,  ...
 sys.output='hush';
 sys.disable={'hygiene'};
 
-% Enable zero track elimination, with optional GPU arithmetic
-sys.enable={'zte'};
+% Optional GPU arithmetic
 
-% sys.enable={'zte','gpu'};
+% sys.enable={'gpu'};
 
 % Magnet induction 
 sys.magnet=11.7464;

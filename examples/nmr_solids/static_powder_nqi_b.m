@@ -33,8 +33,6 @@ bas.inter_level=1; bas.projections={+1};
 % Algorithmic options
 sys.disable={'trajlevel'};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

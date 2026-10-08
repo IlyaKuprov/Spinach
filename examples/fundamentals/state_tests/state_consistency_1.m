@@ -25,9 +25,6 @@ for n=1:numel(Fs)
     sys.output='hush';
     sys.disable={'hygiene'};
 
-    % Enable zero track elimination
-    sys.enable={'zte'};
-
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);

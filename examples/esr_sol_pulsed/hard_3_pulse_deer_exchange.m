@@ -54,9 +54,6 @@ for n=1:numel(weights)
     % Disable trajectory level SSR algorithms
     sys.disable={'hygiene','trajlevel'};
     
-    % Enable zero track elimination
-    sys.enable={'zte'};
-
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);

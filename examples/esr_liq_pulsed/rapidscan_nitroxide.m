@@ -33,8 +33,6 @@ inter.equilibrium='dibari';
 inter.temperature=100;
 inter.tau_c={2e-11};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

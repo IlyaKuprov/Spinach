@@ -12,8 +12,6 @@ H_T=H_T+H_T'; H_T=remtrace(H_T);
 % Translate back
 [omega,Q]=ham2nqi(H_T);
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Set up Spinach
 sys.magnet=0;

@@ -7,7 +7,7 @@
 
 ## Model and tensors
 
-The model couples a Dy(III) `E16` giant spin to a proton (`1H`) at the source-specified field value `14.1`; the source does not state a unit for this value. The electron Zeeman tensor is assembled from principal values `[1.325781, 1.322640, 1.317917]` and the supplied direction-cosine matrix `V`. The proton shift tensor is the zero matrix. `sys.enable={'zte','sodd'}` enables the source-described spin-orbit corrections to dipolar couplings.
+The model couples a Dy(III) `E16` giant spin to a proton (`1H`) at the source-specified field value `14.1`; the source does not state a unit for this value. The electron Zeeman tensor is assembled from principal values `[1.325781, 1.322640, 1.317917]` and the supplied direction-cosine matrix `V`. The proton shift tensor is the zero matrix. `sys.enable={'sodd'}` enables the source-described spin-orbit corrections to dipolar couplings.
 
 The source supplies Cartesian coordinates `[0.00 0.00 0.00]` and `[0.00 5.00 7.00]` for the two spins; it does not state coordinate units. MOLCAS ligand-field coefficients are supplied at ranks 2, 4, and 6. The code converts each set with `icm2hz` and `stev2sph`, then applies Wigner rotations from the supplied ligand-frame and molecular-frame direction-cosine matrices before assigning the resulting spherical tensors to `inter.giant.coeff`. The input-coefficient units are not stated in the source.
 

@@ -45,8 +45,6 @@ inter.temperature=298;
 inter.tau_c={100e-12};          
 sys.tols.rlx_integration=1e-10;
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

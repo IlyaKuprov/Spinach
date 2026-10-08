@@ -91,8 +91,6 @@ bas.approximation='none';
 bas.sym_group={'S2','S2'};
 bas.sym_spins={[1 2],[7 8]};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

@@ -25,7 +25,7 @@ inter.zeeman.euler{3}=[60 40 20]*(pi/180);
 
 % Spin-orbit corrections
 % to the DD couplings
-sys.enable={'zte','sodd'};
+sys.enable={'sodd'};
 
 % Coordinates (Angstrom)
 inter.coordinates=cell(3,1);

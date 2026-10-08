@@ -17,8 +17,6 @@ inter.coupling.scalar{3,4}=1e3; % precision
 inter.coupling.scalar{1,4}=1e2; % match
 inter.temperature=4.2;
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Get thermal equilibrium states at finite temperature
 formalisms={'zeeman-hilb','zeeman-liouv','sphten-liouv'};

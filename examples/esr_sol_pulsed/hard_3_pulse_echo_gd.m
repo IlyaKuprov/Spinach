@@ -29,8 +29,6 @@ inter.coupling.euler{2,2}=[0 pi/2 0];
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
                
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

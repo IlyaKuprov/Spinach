@@ -37,9 +37,6 @@ for n=1:numel(b20)
     inter.giant.coeff={{[0 0 0],[0 0 icm2hz(b20(n)) 0 0]}};
     inter.giant.euler={{[0 0 0],[0 0 0]}};
     
-    % Enable zero track elimination
-    sys.enable={'zte'};
-
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);

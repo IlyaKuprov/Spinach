@@ -4,7 +4,7 @@
 
 ## Model
 
-This is the three-electron counterpart of the four-pulse DEER example. The source identifies soft-pulse Fokker-Planck simulation and estimates a runtime of hours. The field setting is `sys.magnet=0.3451805`; isotopes are `{'E','E','E'}`. Zeeman principal-value triplets are `[2.284 2.123 2.075]`, `[2.035 2.013 1.975]`, and `[1.935 1.895 1.895]`. Their Euler-angle triplets are `[135 90 45]`, `[30 60 120]`, and `[60 40 20]` degrees (converted to radians in the code). Coordinates in Angstrom are `[0 0 0]`, `[20 0 0]`, and `[0 0 20]`. Spin-orbit corrections to dipole-dipole couplings are enabled by `sys.enable={'zte','sodd'}`.
+This is the three-electron counterpart of the four-pulse DEER example. The source identifies soft-pulse Fokker-Planck simulation and estimates a runtime of hours. The field setting is `sys.magnet=0.3451805`; isotopes are `{'E','E','E'}`. Zeeman principal-value triplets are `[2.284 2.123 2.075]`, `[2.035 2.013 1.975]`, and `[1.935 1.895 1.895]`. Their Euler-angle triplets are `[135 90 45]`, `[30 60 120]`, and `[60 40 20]` degrees (converted to radians in the code). Coordinates in Angstrom are `[0 0 0]`, `[20 0 0]`, and `[0 0 20]`. Spin-orbit corrections to dipole-dipole couplings are enabled by `sys.enable={'sodd'}`.
 
 ## Sequence and acquisition
 

@@ -42,10 +42,9 @@ bas.approximation='none';
 % Disable path tracing
 sys.disable={'pt'};
 
-% Enable zero track elimination, with optional GPU arithmetic
-sys.enable={'zte'};
+% Optional GPU arithmetic
 
-% sys.enable={'zte','gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

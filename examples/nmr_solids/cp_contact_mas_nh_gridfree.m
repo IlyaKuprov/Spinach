@@ -25,10 +25,9 @@ inter.temperature=298;
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% Enable zero track elimination, with optional GPU arithmetic
-sys.enable={'zte'};
+% Optional GPU arithmetic
 
-% sys.enable={'zte','gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

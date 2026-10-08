@@ -31,8 +31,6 @@ inter.damp_rate=2000;
 % Algorithmic options
 sys.disable={'krylov','trajlevel'};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

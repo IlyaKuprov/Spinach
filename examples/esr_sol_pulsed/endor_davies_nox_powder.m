@@ -40,8 +40,6 @@ inter.r2_rates={20e6 0.5e6};
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

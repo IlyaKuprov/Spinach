@@ -31,8 +31,6 @@ inter.srfk_tau_c={[1.0 1e-3]};
 inter.srfk_mdepth=cell(2);
 inter.srfk_mdepth{1,2}=15.0;
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

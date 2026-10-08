@@ -33,8 +33,6 @@ inter.equilibrium='zero';
 inter.rlx_keep='labframe';
 inter.tau_c={1e-9};
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -27,10 +27,9 @@ inter.r2_rates={1};
 % Disable path tracing
 sys.disable={'pt'};
 
-% Enable zero track elimination, with optional GPU arithmetic
-sys.enable={'zte'};
+% Optional GPU arithmetic
 
-% sys.enable={'zte','gpu'};
+% sys.enable={'gpu'};
 
 % Basis set
 bas.formalism='sphten-liouv';

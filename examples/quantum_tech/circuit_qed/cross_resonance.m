@@ -44,8 +44,6 @@ inter.modes.exchange{1,2}=25e6;
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

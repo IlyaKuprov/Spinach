@@ -68,8 +68,6 @@ b_vector=[logspace(-2,1,30) 15 20 25 30];
 % Prevent excessive output
 sys.disable={'hygiene'}; sys.output='hush';
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Loop over magnet fields
 Rx=zeros(1,34); R1n=zeros(1,34);

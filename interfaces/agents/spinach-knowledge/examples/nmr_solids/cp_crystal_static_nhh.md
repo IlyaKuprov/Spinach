@@ -16,7 +16,7 @@ The call to crystal uses the generic cp_contact_hard experiment function: the he
 
 ## Output and interpretation
 
-The returned simulated signal is plotted as its real part against cumulative time in seconds, labelled as the 15N SX expectation value. This is simulated output, not a measured spectrum. Although a source comment says a GPU is needed, the active setting is sys.enable={'zte','greedy'}; 'gpu' appears only in a comment.
+The returned simulated signal is plotted as its real part against cumulative time in seconds, labelled as the 15N SX expectation value. This is simulated output, not a measured spectrum. Although a source comment says a GPU is needed, the active setting is sys.enable={'greedy'}; 'gpu' appears only in a comment.
 
 ## Source
 

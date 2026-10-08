@@ -25,8 +25,6 @@ inter.coupling.matrix={zfs2mat(D,E,0,0,0)};
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

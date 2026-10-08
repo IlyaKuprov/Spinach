@@ -256,7 +256,12 @@ spins; beyond that, the basis restriction is the tool, not a bigger machine:
 
 At run time path tracing can reduce the active dimension further. Zero-track
 elimination is opt-in: add `'zte'` to `sys.enable` to activate it, and omit
-it to leave that reduction off. Path tracing and symmetry can be disabled
+it to leave that reduction off. Enable it only for examples whose actual
+propagation path reaches Liouville-space trajectory reduction. Hilbert-space
+symmetry reduction, direct `step` or `krylov` propagation, polyadic generators,
+and `trajlevel`-disabled calculations do not use ZTE. A shaped-pulse call alone
+is insufficient: its selected method must reach `evolution`, or a subsequent
+acquisition must do so. Path tracing and symmetry can be disabled
 with `sys.disable={'pt','symmetry'}` for debugging, potentially at a large cost.
 
 Matrices switch to sparse algebra automatically, and above a state-space

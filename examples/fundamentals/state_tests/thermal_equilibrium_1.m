@@ -21,8 +21,6 @@ inter.temperature=4.2;
 eq_mags_spinach=zeros(4,3,'like',1i);
 eq_mags_textbook=zeros(4,1,'like',1i);
 
-% Enable zero track elimination
-sys.enable={'zte'};
 
 % Get numerical equilibrium magnetisation
 formalisms={'zeeman-hilb','zeeman-liouv','sphten-liouv'};

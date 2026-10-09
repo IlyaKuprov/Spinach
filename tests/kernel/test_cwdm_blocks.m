@@ -9,8 +9,8 @@
 %
 % Independent substances cannot acquire cross-substance coherences under
 % Hamiltonian, relaxation, or pulse action. Individual coils must have
-% support only in their hosting block. State constructors are unweighted
-% at this stage; concentration semantics are tested separately.
+% support only in their hosting block. State constructors carry their substance concentrations;
+% unweighted detection vectors are constructed with coil_state.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -52,7 +52,7 @@ for method={'exact','cheap'}
         rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
         outside=setdiff(1:s.bas.offsets(end),rows);
         for k=s.chem.parts{n}
-            coil=state(s,'L+',k,method{1});
+            coil=coil_state(s,'L+',k,method{1});
             result=test_true(result,['coil ' method{1} ' ' int2str(k)],...
                              nnz(coil(outside))==0&&nnz(coil(rows))>0,...
                              'a detection state occupies only its hosting substance');
@@ -102,8 +102,7 @@ end
 
 % Identity factors retain their selected block and per-spin multiplicity
 for method={'cheap','exact','chem'}
-    weights=ones(1,2);
-    if strcmp(method{1},'chem'), weights=s.chem.concs; end
+    weights=s.chem.concs;
     for n=1:2
         expected=sparse(s.bas.offsets(n)+1,1,weights(n),s.bas.offsets(end),1);
         for label={'E','T0,0'}

@@ -15,7 +15,7 @@
 %          a good one can significantly accelerate this
 %          function (leave empty otherwise); the state
 %          must have unit trace, which in sphten-liouv
-%          means a first element equal to 1
+%          means a unit coordinate equal to 1 in each substance
 %
 %    method - 'newton' (default) for the Newton-Raphson
 %             steady state solver, 'squaring' for propa-
@@ -28,7 +28,7 @@
 %          on of the propagator P
 %
 % Note: available for sphten-liouv and zeeman-liouv formalisms; the
-%       Newton-Raphson solver pins the first state vector element in
+%       Newton-Raphson solver pins every substance unit coordinate in
 %       sphten-liouv and the density matrix trace in zeeman-liouv.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -41,7 +41,8 @@ function rho=steady(spin_system,P,rho,method)
 if (~exist('rho','var'))||isempty(rho)
     switch spin_system.bas.formalism
         case 'sphten-liouv'
-            rho=zeros([size(P,2) 1],'like',1i); rho(1)=1;
+            rho=zeros([size(P,2) 1],'like',1i);
+            rho(spin_system.bas.offsets(1:end-1)+1)=1;
         case 'zeeman-liouv'
             dim=sqrt(size(P,2));
             rho=speye(dim); rho=complex(full(rho(:))/dim);
@@ -102,8 +103,12 @@ switch method
 
             case 'sphten-liouv'
 
+                % Exclude every conserved substance unit coordinate
+                active=true(size(rho));
+                active(spin_system.bas.offsets(1:end-1)+1)=false;
+
                 % Pre-factor the Jacobian
-                [LF,UF,RP]=lu(J(2:end,2:end));
+                [LF,UF,RP]=lu(J(active,active));
 
                 % Iteration counter
                 n_iter=0;
@@ -112,13 +117,13 @@ switch method
                 while norm(du,2)>spin_system.tols.stst_tol
 
                     % Compute the residual
-                    r=P*rho-rho; r=r(2:end);
+                    r=P*rho-rho; r=r(active);
 
                     % Re-use LU factors
                     du=-UF\(LF\(RP*r));
 
                     % Update the steady state
-                    rho(2:end)=rho(2:end)+du; n_iter=n_iter+1;
+                    rho(active)=rho(active)+du; n_iter=n_iter+1;
 
                     % Detect algorithm stagnation
                     if n_iter>10, error('steady state convergence failure.'); end
@@ -182,10 +187,13 @@ if (~ischar(method))||(~ismember(method,{'newton','squaring'}))
     error('method must be ''newton'' or ''squaring''.');
 end
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
-    if (P(1,1)~=1)||(norm(P(1,2:end),2)~=0)
-        error('P(1,:) must be [1 0 0 0 ...]');
+    units=spin_system.bas.offsets(1:end-1)+1;
+    traces=sparse(1:numel(units),units,1,numel(units),size(P,2));
+    if nnz(P(units,:)-traces)~=0
+        error('P must conserve every substance unit coordinate.');
     end
-    if norm(P(2:end,1),2)==0
+    active=true(size(P,1),1); active(units)=false;
+    if norm(P(active,units),'fro')==0
         error('the relaxation superoperator must be thermalised.');
     end
 else
@@ -201,8 +209,8 @@ if ~iscolumn(rho)
     error('rho must be a column vector.');
 end
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
-    if rho(1)~=1
-        error('rho(1) must be equal to 1.');
+    if any(rho(spin_system.bas.offsets(1:end-1)+1)~=1)
+        error('every substance unit coordinate of rho must be equal to 1.');
     end
 else
     dim=sqrt(size(P,2)); u0=speye(dim); u0=u0(:);

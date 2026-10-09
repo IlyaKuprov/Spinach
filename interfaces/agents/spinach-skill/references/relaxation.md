@@ -222,6 +222,9 @@ is how inverted spin temperatures are specified.
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
 state population to be exactly 1, which Spinach cannot check, so a badly
 normalised initial condition gives a silently wrong steady state.
+In segmented `sphten-liouv`, `steady` initialises and pins the unit coordinate
+`bas.offsets(n)+1` of every substance to one; supplied guesses must obey the
+same unweighted normalisation. Both Newton and squaring methods accept this layout.
 DiBari-Levitt is more expensive but better behaved in exotic regimes; it
 demands a positive real temperature and refuses the high-temperature
 approximation (`inter.temperature=0`), and `equilibrium.m` refuses absolute

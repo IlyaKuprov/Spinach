@@ -250,7 +250,7 @@ for fixture=1:2
 end
 
 % Frozen long intervals must not request unreachable physical derivatives
-spin_system.bas.formalism='sphten-liouv';
+spin_system.bas.formalism='sphten-liouv'; spin_system.bas.offsets=[0;4];
 spin_system.tols.stst_tol=1e-10; control=struct();
 control.isotopes={'1H'}; control.channels=[1;1];
 control.operators={0.2*diag([0 1 -1 0]),0.3*diag([0 0 1 -1])};

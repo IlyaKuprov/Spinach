@@ -150,6 +150,55 @@ result=test_true(result,'Nottingham single substance',...
                  'a supported two-electron substance retains nonzero trace-preserving relaxation');
 fprintf('CWDM_NOTTINGHAM single_substance_norm=%.16g\n',norm(R,'fro'));
 
+% Compare two thermalised steady states against independently built substances
+sys=struct('magnet',1,'isotopes',{{'1H','13C'}});
+inter=struct(); inter.chem.parts={1,2}; inter.chem.concs=[0.7 0.3];
+inter.relaxation={'t1_t2'}; inter.r1_rates={1,2}; inter.r2_rates={3,4};
+inter.equilibrium='IME'; inter.temperature=298; inter.rlx_keep='secular';
+bas=struct('formalism','sphten-liouv','approximation',{{'none','none'}});
+s=assume(test_spin_system(sys,inter,bas),'nmr');
+P=expm(full(relaxation(s))); units=s.bas.offsets(1:end-1)+1;
+for method={'newton','squaring'}
+    reference=cell(2,1);
+    for n=1:2
+        local_sys=sys; local_sys.isotopes=sys.isotopes(n);
+        local_inter=inter; local_inter.chem.parts={1}; local_inter.chem.concs=1;
+        local_inter.r1_rates=inter.r1_rates(n); local_inter.r2_rates=inter.r2_rates(n);
+        local_bas=bas; local_bas.approximation={'none'};
+        local=assume(test_spin_system(local_sys,local_inter,local_bas),'nmr');
+        reference{n}=steady(local,expm(full(relaxation(local))),[],method{1});
+    end
+    actual=steady(s,P,[],method{1}); reference=vertcat(reference{:});
+    result=test_close(result,['steady direct sum ' method{1}],actual,reference,1e-12,1e-12,...
+                      'both substance blocks equal their independently normalised steady states');
+    result=test_true(result,['steady units ' method{1}],all(actual(units)==1),...
+                     'each substance has unit population independently of chemical concentration');
+    guess=full(unit_state(s)); guess(3)=0.1; guess(7)=-0.2;
+    result=test_close(result,['steady initial guess ' method{1}],...
+                      steady(s,P,guess,method{1}),reference,1e-12,1e-12,...
+                      'a non-equilibrium initial guess converges with both unit constraints');
+    fprintf('CWDM_STEADY %s error=%.16g units=%s\n',...
+            method{1},norm(actual-reference),mat2str(actual(units)'));
+end
+
+% Refuse loss of trace conservation or normalisation in a later substance
+bad=P; bad(units(2),units(2)+1)=0.1; rejected=false;
+try
+    steady(s,bad,[],'newton');
+catch err
+    rejected=contains(err.message,'conserve every substance unit coordinate');
+end
+result=test_true(result,'steady later trace row',rejected,...
+                 'every conserved unit row is validated, not only the first');
+guess=full(unit_state(s)); guess(units(2))=0; rejected=false;
+try
+    steady(s,P,guess,'newton');
+catch err
+    rejected=contains(err.message,'every substance unit coordinate of rho');
+end
+result=test_true(result,'steady later normalisation',rejected,...
+                 'an initial guess must have unit population in every substance');
+
 end
 
 

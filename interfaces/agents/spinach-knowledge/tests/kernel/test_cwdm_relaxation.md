@@ -15,3 +15,9 @@ electrons split between substances, must raise the documented substance-local
 error. An ordinary two-electron-plus-nucleus substance must still produce
 nonzero relaxation with a conserved unit coordinate. This tests an explicit
 unsupported-domain boundary, not a Nottingham direct-sum numerical equality.
+
+A two-substance IME T1/T2 fixture checks both `steady` methods against
+independently constructed single-substance equilibria, with empty and nonzero
+initial guesses. Every unit coordinate stays exactly one despite unequal
+chemical concentrations. Later-block trace-row and initial-normalisation
+violations are rejected.

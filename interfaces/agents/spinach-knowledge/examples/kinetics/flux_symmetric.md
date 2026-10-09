@@ -6,11 +6,11 @@
 
 ## Purpose and model
 
-This is a two-site symmetric intermolecular magnetisation-flux simulation for two `1H` environments. The source sets `sys.magnet=14.1`, scalar Zeeman values `{0.0,3.0}`, and equal directed `inter.chem.flux_rate` entries of 2000 from site 1 to site 2 and from site 2 to site 1, with `inter.chem.flux_type=intermolecular`. The initial state is the sum of site-1 and site-2 `L+` operators, each weighted by 1.0. Units for the field, scalar values, and flux-rate entries are not stated in this source and are not supplied here.
+This is a two-site intermolecular magnetisation-exchange simulation for two `1H` environments. The spins are separate substances undergoing additive `A+B -> A+B` replacement with swapped atom matching. Concentrations `[1 1]` and event rate `2e3` reproduce the former directed rates: 2000 in both directions. The initial `L+` state is weighted once by these concentrations; detection is unweighted. Both concentrations are invariant, so the acquisition callback freezes the additive generator at `unit_state` before ordinary linear propagation. No cross-molecular correlations are represented.
 
 ## Acquisition and observable
 
-The full `sphten-liouv` basis is used (`bas.approximation=none`). The function passes the system, `@acquire` callback, and NMR parameters to `liquid`, with the `1H` `L+` coil and no decoupled spins. Acquisition uses `offset=900`, `sweep=5000`, 512 points, and zero filling to 1024; its plotted axis is labelled in ppm and inverted. The FID is exponentially apodised with parameter 6, transformed with a shifted FFT, and its real spectrum is plotted with `plot_1d`.
+The full `sphten-liouv` basis is used (`bas.approximation=none`). The function passes the system, frozen-replacement acquisition callback, and NMR parameters to `liquid`, with the `1H` `L+` coil and no decoupled spins. Acquisition uses `offset=900`, `sweep=5000`, 512 points, and zero filling to 1024; its plotted axis is labelled in ppm and inverted. The FID is exponentially apodised with parameter 6, transformed with a shifted FFT, and its real spectrum is plotted with `plot_1d`.
 
 ## Scope
 

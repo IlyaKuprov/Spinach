@@ -399,7 +399,8 @@ To extract one rate by hand:
 
 ```matlab
 R=relaxation(spin_system);
-Lz=state(spin_system,'Lz','<isotope>'); Lp=state(spin_system,'L+','<isotope>');
+Lz=coil_state(spin_system,'Lz','<isotope>','exact');
+Lp=coil_state(spin_system,'L+','<isotope>','exact');
 R1=-(Lz'*R*Lz)/(Lz'*Lz);  R2=-(Lp'*R*Lp)/(Lp'*Lp);
 ```
 
@@ -412,27 +413,34 @@ functions from molecular dynamics are in `relaxation_theory/from_md`.
 ## Chemical kinetics and exchange
 
 `kinetics/exchange_symmetric.m` is the two-site template. Sites are chemical
-substances and reciprocal first-order records match their corresponding spins.
+substances, and each directed reaction declares its atom matching explicitly.
+For two copies of the same isotope:
 
 ```matlab
 inter.chem.parts={1,2};
-inter.chem.concs=[<c1> <c2>];
+inter.chem.concs=[1 1];
 inter.chem.reactions={struct('reactants',1,'products',2,...
-                            'matching',[1 2],'rate',<k12>),...
+                            'matching',[1 2],'rate',2e3),...
                       struct('reactants',2,'products',1,...
-                            'matching',[2 1],'rate',<k21>)};
-parameters.rho0=state(spin_system,'L+','<isotope>');
-parameters.coil=coil_state(spin_system,'L+','<isotope>','exact');
+                            'matching',[2 1],'rate',2e3)};
 ```
 
-Every `state` method weights each substance by its concentration; detection
-uses unweighted `coil_state`. The former `'chem'` method is deprecated.
-Varying rates through coalescence is a useful exchange-model check.
-`exchange_asymmetric.m` handles unequal populations, `flux_symmetric.m`
-symmetric intermolecular replacement, `glucose_exsy_a.m` two-dimensional
-EXSY, and `relayed_hyperpol.m` polarisation relayed through replacement.
-`equilibrate(rates,concs)` still accepts a standalone linear population-rate
-matrix; it is not a chemistry input to `create`.
+After `create` and `basis`, prepare with `state(spin_system,'L+','1H')` and
+detect with `coil_state(spin_system,'L+','1H','exact')`. All `state` methods
+are concentration-weighted; no chemistry qualifier is needed. Varying the
+rates through coalescence tests an exchange model. `exchange_asymmetric.m`
+handles unequal populations, `glucose_exsy_a.m` demonstrates two-dimensional
+EXSY, and `relayed_hyperpol.m` relays polarisation through reactions.
+`equilibrate(rates,concs)` still solves a separate classical linear network;
+its matrix is not an input field for `create`.
+
+For spin replacement rather than whole-species conversion, use an additive
+`A+B -> A+B` record matching the departing spin to the pool and the pool spin
+back to the molecule. `tests/kernel/test_cwdm_flux.m` checks transfer,
+departing-spin correlation loss, and invariant concentrations. Do not infer
+that a permutation record preserves the old phenomenological flux model's
+correlations. Nonlinear examples use `kinetics` and the state-dependent `step`
+route; `react_gen` returns product-row maps, not propagation matrices.
 
 ## MRI, imaging, flow and diffusion
 

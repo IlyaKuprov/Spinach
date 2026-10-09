@@ -78,7 +78,7 @@ parameters.rho0_st={state(spin_system,{'Lz'},{1})+state(spin_system,{'Lz'},{2});
                     state(spin_system,{'Lz'},{3})+state(spin_system,{'Lz'},{4});
                     state(spin_system,{'Lz'},{5})+state(spin_system,{'Lz'},{6})};
 parameters.coil_ph={ones(parameters.npts,1)};
-parameters.coil_st={state(spin_system,'L+','all')};
+parameters.coil_st={coil_state(spin_system,'L+','all','exact')};
 
 % Show the phantom
 kfigure(); scale_figure([1.50 0.75]); 

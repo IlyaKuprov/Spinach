@@ -86,7 +86,7 @@ COx=(COp+COp')/2;
 
 % Detection state - NH protons
 HNs=strcmp('H',spin_system.comp.labels);
-coil=state(spin_system,'L+',find(HNs));
+coil=coil_state(spin_system,'L+',find(HNs),'exact');
 
 %% Run the first half forward
 

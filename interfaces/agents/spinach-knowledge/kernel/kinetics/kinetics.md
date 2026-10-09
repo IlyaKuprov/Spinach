@@ -26,4 +26,6 @@ Legacy rate, flux, and radical-pair fields are rejected by `create`; this routin
 
 Nonempty wavefunction reaction records raise `Spinach:kinetics:wavefunction`, naming zeeman-wavef explicitly; this covers first-order and mass-action chemistry.
 
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
+The kinetics consumer also rejects all six retired chemistry fields, even when empty, with `Spinach:kinetics:retiredChemistry` pointing to `chem.reactions`; this covers manually modified or saved legacy structures that bypass `create`.
 Reporting accepts mixed row/column substance memberships by formatting local spin lists as rows; the stored memberships and generator are unchanged.

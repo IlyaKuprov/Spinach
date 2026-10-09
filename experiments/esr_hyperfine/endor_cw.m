@@ -45,13 +45,13 @@ for n=find(cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes))
     for k=find(~cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes))
         amplitude=trace(spin_system.inter.coupling.matrix{n,k})/3+...
                   trace(spin_system.inter.coupling.matrix{k,n})/3;
-        rho=rho+abs(amplitude)*state(spin_system,{'Lz'},{k});
+        rho=rho+abs(amplitude)*coil_state(spin_system,{'Lz'},{k},'exact');
     end
 end
 rho=rho/norm(rho,2);
 
 % Detect the nuclei
-coil=state(spin_system,'L+','nuclei','cheap');
+coil=coil_state(spin_system,'L+','nuclei','cheap');
         
 % Evolution time step
 timestep=1/parameters.sweep;

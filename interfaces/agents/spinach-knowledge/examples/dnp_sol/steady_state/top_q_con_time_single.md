@@ -10,7 +10,7 @@ How does the steady-state proton longitudinal polarisation vary with TOP contact
 
 ## Scan and sequence settings
 
-The scan is `nloops=1:256` TOP blocks, each with a 10 ns pulse and 14 ns delay, so the plotted contact time is 24 ns times the loop count. Setting A uses 18 MHz irradiation and 95 MHz electron offset; setting B uses 33 MHz and 92 MHz. Their shot spacings are 102 μs and 153 μs, respectively, less the full pulse-train duration. The proton detector is `state(spin_system,'Lz','1H')`. The experiment uses spins `E` and `1H`, grid `rep_2ang_800pts_sph`, and `addshift=-13e6`; the source assigns R1 entries `1e3` and R2 values `200e3` and `50e3` (units are not annotated). `hygiene` is disabled.
+The scan is `nloops=1:256` TOP blocks, each with a 10 ns pulse and 14 ns delay, so the plotted contact time is 24 ns times the loop count. Setting A uses 18 MHz irradiation and 95 MHz electron offset; setting B uses 33 MHz and 92 MHz. Their shot spacings are 102 μs and 153 μs, respectively, less the full pulse-train duration. The proton detector is `coil_state(spin_system,'Lz','1H','exact')`. The experiment uses spins `E` and `1H`, grid `rep_2ang_800pts_sph`, and `addshift=-13e6`; the source assigns R1 entries `1e3` and R2 values `200e3` and `50e3` (units are not annotated). `hygiene` is disabled.
 
 For each loop count and setting, the steady state is obtained with `powder(spin_system,@topdnp_steady,localpar,'esr')`. The orientation-dependent proton R1 function `r1n_dnp` uses the fixed distance 3.5 Å. The relaxation model is `t1_t2`, with diagonal terms retained and `dibari` equilibrium; the basis is `sphten-liouv` with no approximation and propagator chopping tolerance `1e-12`.
 

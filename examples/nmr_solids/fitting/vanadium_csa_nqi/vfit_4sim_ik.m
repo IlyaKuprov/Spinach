@@ -116,7 +116,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','51V');
-parameters.coil=state(spin_system,'L+','51V');
+parameters.coil=coil_state(spin_system,'L+','51V','exact');
 
 % Simulation A
 parameters.rate=41000;

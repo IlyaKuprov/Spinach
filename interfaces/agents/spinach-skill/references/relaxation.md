@@ -273,61 +273,80 @@ frequency shifts dropped. Compare against measurement first.
 
 ## Chemical kinetics
 
-The implemented reaction-record path uses `sphten-liouv`. Declare the
-substances and explicit atom-matched first-order records:
+Reaction records currently require `sphten-liouv`. Declare each species and
+each directed first-order exchange channel explicitly:
 
 ```matlab
 inter.chem.parts={[1 2 3 4 5],[6 7 8 9 10]};
 inter.chem.concs=[20 4];
 inter.chem.reactions={struct('reactants',1,'products',2,...
-                            'matching',[(1:5)' (6:10)'],'rate',4),...
+                            'matching',[1 6;2 7;3 8;4 9;5 10],'rate',4),...
                       struct('reactants',2,'products',1,...
-                            'matching',[(6:10)' (1:5)'],'rate',20)};
+                            'matching',[6 1;7 2;8 3;9 4;10 5],'rate',20)};
 ```
 
-Parts are disjoint spin-index vectors; a spin-free part is `[]`. Matched
-spins must have identical isotopes, but reactions need not preserve spin
-count or basis topology: unmatched source spins are traced out, unmatched
-product spins arrive unpolarised, and absent source descriptors are reported.
-Cross-substance spin couplings are rejected; `inter.tau_c` is per substance.
-The example populations are at exchange equilibrium. `state` weights them
-once, while detection uses `coil_state(...,'exact')`. `equilibrate(K,c0)`
-remains a standalone solver for the linear population network `dc/dt=K*c`;
-do not pass that matrix as a retired chemistry input.
+`inter.chem.parts` contains disjoint numeric vectors of global spin indices;
+empty entries are spin-free substances. Matching pairs must have identical
+isotopes, but different species need not have identical spin counts or basis
+topologies. Unmatched source spins are traced out; unmatched product spins
+arrive at identity. Missing source descriptors are reported rather than
+invented. Couplings across species are rejected by `create`; relaxation
+parameters such as `inter.tau_c` remain per substance.
 
-For collision/exchange plus quadrupolar relaxation, see
-`examples/kinetics/uf6_collisions.m`. Its representative F/U pair and
-phenomenological distorted state are not a full UF6 molecule or calibrated
-liquid-state prediction. Keep collision frequency, distorted-state lifetime,
-and rotational correlation time separate; scaling both exchange rates
-preserves populations but represents a different physical scan. The full
-laboratory-frame slowpass calculation leaves ZTE off and plots individually
-peak-normalised spectra. Use reaction records as above when adapting it.
+The example is at exchange equilibrium because forward and reverse event
+fluxes are equal. `state(spin_system,'Lz','1H')` applies initial concentrations
+without a chemistry qualifier; `coil_state(spin_system,'Lz','1H','exact')`
+is unweighted detection. `equilibrate(K,c0)` may still calculate stationary
+concentrations of the separate classical network `dc/dt=K*c`; the classical
+matrix is not a chemistry input field. First-order reaction rates have units
+of inverse seconds. Higher-order rates multiply the other reactant
+concentrations, so their units depend on the chosen concentration unit.
+`kinetics` returns a sparse matrix for constant first-order records, or
+`K(t,eta)` for mass action and time-dependent rates. It reads instantaneous
+concentrations from unit coordinates, including initially empty products.
 
-Intermolecular spin replacement uses the same record interface. For two
-one-spin substances, this symmetric event reproduces directed rates 500 and
-2000 inverse seconds at the specified invariant concentrations:
+For a compact exchange-plus-quadrupolar-relaxation demonstration, see
+`examples/kinetics/uf6_collisions.m`. It sweeps the forward collision
+rate while holding the reverse lifetime and rotational correlation time
+fixed, recomputes stationary populations, and uses chemical-population-
+weighted excitation. The full laboratory-frame `slowpass` calculation
+leaves ZTE off by default and plots individually peak-normalised spectra.
+Its representative F/U pair and phenomenological distorted state are not
+a full UF6 molecule or calibrated liquid-state prediction. Keep collision
+frequency, distorted-state lifetime, and rotational correlation time
+separate when adapting this model; scaling both exchange rates preserves
+populations but is a different physical scan.
+
+Spin replacement between molecules uses matching rather than a flux matrix.
+For a two-proton molecule exchanging its first proton with a one-proton pool:
 
 ```matlab
-inter.chem.parts={1,2}; inter.chem.concs=[2000 500];
+inter.chem.parts={1:2,3}; inter.chem.concs=[1 1];
 inter.chem.reactions={struct('reactants',[1 2],'products',[1 2],...
-                            'matching',[1 2;2 1],'rate',1,...
+                            'matching',[1 3;2 2;3 1],'rate',2,...
                             'closure','additive')};
 ```
 
-For a multi-spin molecule, also match the spins that remain on that molecule.
-Orders involving a departing spin are lost when that spin is traced out;
-unaffected internal orders survive. A spin-permuting self-reaction instead
-transports the matched internal orders and must not be assumed equivalent to
-every old phenomenological intramolecular flux model. Additive invariant-
-population replacement can be frozen at `unit_state`; general mass action
-or product closure cannot. Rate units for an order-m event are
-concentration^(1-m)/s, not universally hertz.
+Both populations are invariant because the reactant and product stoichiometries
+coincide. The additive arrival keeps each reactant's internal orders but not
+cross-reactant polarisation products: the retained molecular spin survives,
+while correlations involving the departing spin are lost. Intramolecular
+permutation records instead transport the mapped multi-spin orders. These are
+physical matching models, not an automatic translation of every retired flux
+matrix. `test_cwdm_flux` supplies an analytic replacement check. Freezing an
+additive generator is justified only when its concentrations and rates remain
+constant, not for general mass-action or product-closure networks.
 
-Radical-pair recombination is first-order loss with optional selectors:
+For two one-spin substances, the additive event with `parts={1,2}`,
+`concs=[2000 500]`, `reactants=[1 2]`, `products=[1 2]`,
+`matching=[1 2;2 1]`, and rate 1 reproduces directed rates 500 and 2000
+inverse seconds. An order-m rate constant has units concentration^(1-m)/s.
+
+Radical-pair loss uses one first-order reaction record per channel. For a
+single species whose first two spins are electrons:
 
 ```matlab
-inter.chem.parts={1:numel(sys.isotopes)}; inter.chem.concs=1;
+inter.chem.parts={1:3}; inter.chem.concs=1;
 inter.chem.reactions={struct('reactants',1,'products',[],...
                             'matching',zeros(0,2),'rate',1e6,...
                             'selector',{{'singlet',[1 2]}}),...
@@ -336,16 +355,20 @@ inter.chem.reactions={struct('reactants',1,'products',[],...
                             'selector',{{'triplet',[1 2]}})};
 ```
 
-These Haberkorn channels use half the left/right projector sum for loss.
-The names `jones-hore-singlet` and `jones-hore-triplet` use identity minus
-the complementary projector product. Tracked products additionally receive
-the projected source through atom matching. Uniform exponential loss is one
-unselected empty-product record at the sum of the channel rates. These are
-physical model choices, not numerical switches. Set `nz_shift` explicitly:
-the legacy exponential scalar is the summed rate, while the legacy
-Haberkorn/Jones–Hore scalar approximation is half that sum; a general network
-does not define a unique scalar lifetime. Legacy rates, flux, and radical-
-pair fields are rejected rather than accepted alongside the records.
+The third spin may be a nucleus. These selectors give Haberkorn loss via the
+projector anticommutators. Select `jones-hore-singlet` and
+`jones-hore-triplet` for Jones–Hore loss; each channel then subtracts the
+complementary projected density from the full density. For nonselective
+exponential loss, omit selectors and use one empty-product record with the
+sum of the two rates. This choice changes the physics, not only numerics.
+To track products, declare their parts and matching: selective arrival uses
+the projected source before tracing unmatched spins, as tested by
+`test_cwdm_selectors`. Use an explicit scalar `inter.nz_shift` when required;
+a general reaction network does not determine a unique scalar lifetime.
+
+For the legacy exponential scalar use the summed channel rates; the legacy
+Haberkorn/Jones-Hore scalar approximation uses half their sum. Retired chemistry
+fields are rejected rather than accepted alongside reaction records.
 
 ## Powder grids
 

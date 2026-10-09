@@ -50,7 +50,7 @@ parameters.zerofill=4096;   % zerofill to
 parameters.rho0=40*state(spin_system,{'L+'},{1})+...
                 32*state(spin_system,{'L+'},{2})+...
                 28*state(spin_system,{'L+'},{3});
-parameters.coil=state(spin_system,'L+','79Br');
+parameters.coil=coil_state(spin_system,'L+','79Br','exact');
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');

@@ -60,7 +60,7 @@ parameters.spins={'1H','15N'};
 parameters.irr_opers={Hy Nx};
 parameters.exc_opers={Hx Ny};
 parameters.needs={'iso_eq'};
-parameters.coil=state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.time_steps=1e-5*ones(1,100);
 parameters.grid='rep_2ang_100pts_sph';
 

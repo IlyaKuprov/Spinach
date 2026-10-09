@@ -44,7 +44,7 @@ Zero track elimination is off by default. Add `'zte'` to `sys.enable` to opt in;
 
 ## Substance defaults
 
-Absent `inter.chem.parts` defaults to a single block containing all spins. A single substance defaults to concentration 1. Empty parts are accepted as spin-free substances; spin lists are sorted in the compiled object. Basis settings are supplied subsequently to `basis`, which validates their per-substance cell cardinality.
+Absent `inter.chem.parts` defaults to a single block containing all spins. A single substance defaults to concentration 1. Empty parts are accepted as spin-free substances; non-empty parts must be numeric vectors, and spin lists are sorted in the compiled object. Chemistry summaries and reaction reporting format column memberships without changing stored inputs. Basis settings are supplied subsequently to `basis`, which validates their per-substance cell cardinality.
 
 ## Explicit reaction records
 

@@ -44,7 +44,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.method='expm';
 parameters.verbose=0;

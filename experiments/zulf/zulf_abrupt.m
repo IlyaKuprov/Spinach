@@ -75,7 +75,7 @@ weights=spin_system.inter.gammas/spin('1H');
 % Get gamma-weighted detection state
 coil=sparse(0);
 for n=1:spin_system.comp.nspins
-    coil=coil+weights(n)*state(spin_system,{'L+'},{n});
+    coil=coil+weights(n)*coil_state(spin_system,{'L+'},{n},'exact');
 end
 
 % Get gamma-weighted pulse operator

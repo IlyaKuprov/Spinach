@@ -20,3 +20,5 @@ The state array must be numeric. The implementation warns through `report` if th
 ## Reference
 
 - [Spinach Wiki: `coherence.m`](https://spindynamics.org/wiki/index.php?title=coherence.m)
+
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.

@@ -224,6 +224,14 @@ function grumble(spin_system,bas)
 if ~isstruct(bas)||~isscalar(bas)
     error('bas must be a scalar structure.');
 end
+if isfield(bas,'basis')&&~iscell(bas.basis)
+    error('Spinach:basis:retiredGlobalBasis',...
+          'the global bas.basis matrix is retired; use bas.basis{n} and bas.offsets from basis().');
+end
+if isfield(bas,'irrep')
+    error('Spinach:basis:retiredIrrep',...
+          'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
+end
 if ~isfield(bas,'formalism')||~ischar(bas.formalism)||...
    ~ismember(bas.formalism,{'sphten-liouv','zeeman-hilb','zeeman-liouv','zeeman-wavef'})
     error('a supported bas.formalism string is required.');

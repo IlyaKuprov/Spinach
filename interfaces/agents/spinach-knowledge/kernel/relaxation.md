@@ -19,7 +19,7 @@ The function starts with a zero superoperator and adds the enabled spin-relaxati
 
 Retention by longitudinal order or base frequency uses each substance’s local descriptor. Diagonal retention and uniform damping exempt the unit coordinate of every block separately.
 
-Nottingham's four-level electron manifold requires exactly two electrons in each substance. A nucleus-only, spin-free, or split-electron substance raises `Spinach:relaxation:nottinghamSubstance`; it is not silently assigned a partial Nottingham model. The existing `create` restriction of two electrons overall is unchanged, so multi-substance Nottingham input is currently unsupported.
+Nottingham's four-level electron manifold is implemented for a single substance with exactly two electrons. `relaxation` rejects every segmented Nottingham descriptor with `Spinach:relaxation:nottinghamSubstance`, including separate two-electron substances; nucleus-only, spin-free, and split-electron partners are not assigned partial models. The existing `create` restriction of two electrons overall is unchanged.
 
 ## Parameters / inputs
 

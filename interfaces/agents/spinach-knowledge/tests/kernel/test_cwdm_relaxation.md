@@ -15,6 +15,11 @@ electrons split between substances, must raise the documented substance-local
 error. An ordinary two-electron-plus-nucleus substance must still produce
 nonzero relaxation with a conserved unit coordinate. This tests an explicit
 unsupported-domain boundary, not a Nottingham direct-sum numerical equality.
+Compiled descriptors with two electron pairs also exercise the rejection,
+with contiguous and interleaved global electron ordering. These are built
+without a relaxation theory, then given the supported single-substance
+Nottingham relaxation settings to test the consumer independently of
+`create`'s existing two-electron restriction.
 
 A two-substance IME T1/T2 fixture checks both `steady` methods against
 independently constructed single-substance equilibria, with empty and nonzero

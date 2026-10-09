@@ -11,8 +11,8 @@
 % distinct correlation times, and distinct phenomenological rates. Full
 % matrices, including every unit row and column, are compared at 1e-12
 % relative tolerance. Both Redfield integration paths are exercised.
-% Nottingham requires a two-electron manifold in every substance; a
-% nucleus-only partner is an unsupported specification, not a zero block.
+% Nottingham requires a single two-electron substance; segmented input
+% is unsupported even when each substance has its own electron pair.
 % There is no relaxation theory named weak in the supported input API.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -128,7 +128,7 @@ catch err
     rejected=strcmp(err.identifier,'Spinach:relaxation:nottinghamSubstance');
 end
 result=test_true(result,'Nottingham nucleus-only substance',rejected,...
-                 'every Nottingham substance must contain its own two-electron manifold');
+                 'Nottingham does not support a separate nucleus-only substance');
 fprintf('CWDM_NOTTINGHAM nucleus_only_named_rejection=%d\n',rejected);
 
 % Reject electrons split across substances before building their products
@@ -149,6 +149,25 @@ result=test_true(result,'Nottingham single substance',...
                  norm(R,'fro')>0&&nnz(R(1,:))==0&&nnz(R(:,1))==0,...
                  'a supported two-electron substance retains nonzero trace-preserving relaxation');
 fprintf('CWDM_NOTTINGHAM single_substance_norm=%.16g\n',norm(R,'fro'));
+
+% Reject compiled two-pair Nottingham input regardless of global spin ordering
+local_sys=struct('magnet',1,'isotopes',{{'E','E','E','E'}});
+local_bas=bas; local_bas.approximation={'none','none'};
+partitions={{1:2,3:4},{[1 3],[2 4]}};
+for n=1:numel(partitions)
+    local_inter=struct(); local_inter.chem.parts=partitions{n};
+    local_inter.chem.concs=[1 1];
+    multi=assume(test_spin_system(local_sys,local_inter,local_bas),'nmr');
+    multi.rlx=s.rlx; rejected=false;
+    try
+        relaxation(multi);
+    catch err
+        rejected=strcmp(err.identifier,'Spinach:relaxation:nottinghamSubstance');
+    end
+    result=test_true(result,sprintf('Nottingham two pairs %d',n),rejected,...
+                     'the relaxation consumer rejects segmented Nottingham descriptors');
+    fprintf('CWDM_NOTTINGHAM two_pairs_order=%d named_rejection=%d\n',n,rejected);
+end
 
 % Compare two thermalised steady states against independently built substances
 sys=struct('magnet',1,'isotopes',{{'1H','13C'}});

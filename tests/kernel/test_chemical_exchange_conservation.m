@@ -1,4 +1,4 @@
-% Tests conservation in two-site chemical exchange. Syntax:
+% Tests the two-site chemical exchange implementation boundary. Syntax:
 %
 %                    result=test_chemical_exchange_conservation()
 %
@@ -6,20 +6,21 @@
 %
 %     result  - regression test result with explanatory messages
 %
-% The test builds a symmetric two-site exchange model and checks that the
-% kinetics generator conserves the total population over the two sites.
+% The test retains a symmetric two-site exchange fixture and checks the
+% named rejection until segmented reaction-record chemistry is available.
+% It does not assert numerical conservation for unsupported chemistry.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_chemical_exchange_conservation()
 
 % Announce the test target
-fprintf('TESTING: Chemical exchange conservation\n');
+fprintf('TESTING: Chemical exchange implementation boundary\n');
 
 % State the kinetics target of the test
 result=new_test_result('kernel/chemical_exchange_conservation',...
-                       'Chemical exchange conservation',...
-                       'closed two-site exchange must conserve total spin population.');
+                       'Chemical exchange implementation boundary',...
+                       'unsupported two-site exchange must raise the named chemistry boundary error.');
 
 % Build a symmetric two-site exchange system
 sys.magnet=14.1;
@@ -32,13 +33,16 @@ bas.formalism='sphten-liouv';
 bas.approximation={'none','none'};
 spin_system=test_spin_system(sys,inter,bas);
 
-% Build the kinetics generator
-K=kinetics(spin_system);
-
-% Closed Markov kinetics conserve total population by zero column sums
-col_sums=sum(full(K),1);
-result=test_close(result,'zero column sums',col_sums,zeros(size(col_sums)),1e-15,1e-15,...
-                  'probability leaving each site must enter the other site');
+% Require the explicit boundary rather than a numerical exchange generator
+rejected=false;
+try
+    kinetics(spin_system);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:kinetics:segmentedChemistry')&&...
+             contains(err.message,'reaction-record implementation (WP3)');
+end
+result=test_true(result,'kinetics WP3 boundary',rejected,...
+                 'unsupported multi-substance chemistry raises the named boundary error');
 
 end
 

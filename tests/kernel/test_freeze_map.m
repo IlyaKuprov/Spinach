@@ -251,6 +251,7 @@ end
 
 % Frozen long intervals must not request unreachable physical derivatives
 spin_system.bas.formalism='sphten-liouv'; spin_system.bas.offsets=[0;4];
+spin_system.chem.concs=1;
 spin_system.tols.stst_tol=1e-10; control=struct();
 control.isotopes={'1H'}; control.channels=[1;1];
 control.operators={0.2*diag([0 1 -1 0]),0.3*diag([0 0 1 -1])};
@@ -299,6 +300,7 @@ reference=zeros(size(gradient)); ref_fidelity=0;
 for n=1:2
     idx=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
     local=s; local.bas.offsets=[0;4]; local.bas.nsubst=1;
+    local.chem.concs=s.chem.concs(n); local.chem.parts={1};
     [~,local_fid,reference(n,:)]=grape_liouv(local,{1i*R(idx,idx)},...
         {control.operators{n}(idx,idx)},waveform(n,:),...
         control.rho_init{1}(idx),control.rho_targ{1}(idx),'real');

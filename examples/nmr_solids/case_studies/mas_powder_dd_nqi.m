@@ -50,7 +50,7 @@ parameters.decouple={};
 parameters.axis_units='MHz';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','17O');
-parameters.coil=state(spin_system,'L+','17O');
+parameters.coil=coil_state(spin_system,'L+','17O','exact');
 parameters.verbose=0;
 
 % Simulation

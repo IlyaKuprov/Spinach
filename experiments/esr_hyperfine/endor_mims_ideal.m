@@ -66,7 +66,7 @@ Ey=operator(spin_system,'Ly',parameters.electrons);
 
 % Ideal initial and detection states
 rho0=state(spin_system,'Lz',parameters.electrons);
-coil=state(spin_system,'L+',parameters.electrons);
+coil=coil_state(spin_system,'L+',parameters.electrons,'exact');
 
 % Nutation frequencies at the specified RF B1 field
 nut_freqs=-spin_system.inter.gammas*parameters.rf_b1_field;

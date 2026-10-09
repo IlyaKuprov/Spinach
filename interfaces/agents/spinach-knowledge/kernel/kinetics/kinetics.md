@@ -18,4 +18,6 @@ Named singlet/triplet selectors use the left/right electronic projectors: Haberk
 
 Legacy rate, flux, and radical-pair fields are rejected by `create`; this routine only reads explicit reaction records. First-order exchange is a directed record with matching, untracked exponential loss has empty products, and radical-pair channels use selectors. A permutation reaction changes all mapped orders; it must not be assumed identical to a legacy phenomenological flux model that left some correlations stationary.
 
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
+The kinetics consumer also rejects all six retired chemistry fields, even when empty, with `Spinach:kinetics:retiredChemistry` pointing to `chem.reactions`; this covers manually modified or saved legacy structures that bypass `create`.
 Reporting accepts mixed row/column substance memberships by formatting local spin lists as rows; the stored memberships and generator are unchanged.

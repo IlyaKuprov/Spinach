@@ -11,7 +11,7 @@ Computes the proton longitudinal signal at the end of a NOVEL contact sequence o
 
 The function sets `sys.magnet=0.34` (described in the source as an X-band magnet) and models one electron and two 1H spins. The electron principal g values are `[2.00319 2.00319 2.00258]`; the two proton Zeeman entries are the source's “ppm guess” tensors `[0 0 5]` and `[0 5 0]`. Their Euler-angle entries are supplied as `(pi/180)*{[0 10 0],[0 0 10],[100 0 0]}`. The three Cartesian coordinate rows are `[0 0 0]`, `[0 3.5 0]`, and `[2.475 2.475 0]`; the source does not label their units. It sets `inter.temperature=80` without annotating a unit.
 
-The basis is `zeeman-hilb` with `approximation='none'`. Detection uses the proton state `state(spin_system,'Lz','1H')`.
+The basis is `zeeman-hilb` with `approximation='none'`. Detection uses the proton state `coil_state(spin_system,'Lz','1H','exact')`.
 
 ## Sequence and offset scan
 

@@ -19,3 +19,5 @@ Each substance is reported separately using `bas.nstates(n)` and its local descr
 ## Output and side effects
 
 Writes the heading, optional per-state `(L,M)` table, and final dimension/percentage through `report.m`, which routes the text to the console or the configured output. The function checks that `spin_system` is a structure and otherwise does not modify it.
+
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.

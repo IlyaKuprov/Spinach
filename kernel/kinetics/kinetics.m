@@ -24,6 +24,8 @@
 % is used. Spinless reactants are dynamic pools, not fixed reservoirs.
 % Named selectors implement Haberkorn or Jones-Hore loss and projected
 % product arrival. User selector pairs are local left/right projectors.
+% Each time-rate callback is evaluated once per generator evaluation;
+% the resulting rate is shared by all spatial voxels at that stage time.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -191,6 +193,20 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,mode)
+for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
+    if isfield(spin_system.chem,field{1})
+        error('Spinach:kinetics:retiredChemistry',...
+              ['chem.' field{1} ' is retired; use chem.reactions records.']);
+    end
+end
+if isfield(spin_system.bas,'basis')&&~iscell(spin_system.bas.basis)
+    error('Spinach:basis:retiredGlobalBasis',...
+          'the global bas.basis matrix is retired; use bas.basis{n} and bas.offsets from basis().');
+end
+if isfield(spin_system.bas,'irrep')
+    error('Spinach:basis:retiredIrrep',...
+          'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
+end
 if ~ischar(mode)||(~isempty(mode)&&~strcmp(mode,'report'))
     error('Spinach:kinetics:mode','the optional kinetics mode must be ''report''.');
 end

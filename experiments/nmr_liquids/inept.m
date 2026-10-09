@@ -52,7 +52,7 @@ timestep=1/parameters.sweep;
 rho=equilibrium(spin_system);
 
 % Detection state
-coil=state(spin_system,'L+',parameters.spins{1},'cheap');
+coil=coil_state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
 Cx=operator(spin_system,'Lx',parameters.spins{1});  

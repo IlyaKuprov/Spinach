@@ -57,7 +57,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Detect the proton
-parameters.coil=state(spin_system,'Lz','1H');
+parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 
 % Experiment parameters
 parameters.spins={'E','1H'};

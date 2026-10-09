@@ -233,7 +233,7 @@ convention with `stev2sph(k,Bkq)`.
 ## Chemistry and kinetics
 
 ```matlab
-inter.chem.parts={1,2};
+inter.chem.parts={1,2};                        % one spin per species
 inter.chem.concs=[1.0 1.0];
 inter.chem.reactions={struct('reactants',1,'products',2,...
                             'matching',[1 2],'rate',2e4),...
@@ -241,21 +241,31 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
                             'matching',[2 1],'rate',2e4)};
 ```
 
-- `parts` — disjoint spin-index vectors, one per substance; `[]` is a
-  spin-free pool. Reaction-bearing inputs require explicit parts.
-- `concs` — non-negative initial concentrations, one per substance;
-  thereafter concentrations are read from the propagated unit coordinates.
-- `reactions` — directed records with reactants, products, atom matching,
-  and rate. Matched spins must have identical isotopes; unmatched source
-  spins are traced out and new product spins arrive unpolarised. First-order
-  rates are in inverse seconds; order-m rates use concentration^(1-m)/s.
-- `closure` — additive by default, or product to retain cross-reactant
-  polarisation products. Selectors describe first-order spin-selective loss
-  and projected arrival; see the explicit-record section below.
+- `parts` — cell array of numeric index vectors, one per chemical subsystem,
+  disjoint and within the spin count; an empty entry denotes a spin-free substance.
+  Reaction-bearing inputs require explicit parts; otherwise the default is one
+  subsystem containing everything.
+- `concs` — non-negative initial concentrations, one per subsystem; required
+  for multiple substances. Propagated unit coordinates carry subsequent
+  concentrations. `state` weights each block by its initial concentration;
+  `coil_state(...,'exact')` constructs unweighted detection vectors.
+- `reactions` — cell array of scalar records with row-vector `reactants` and
+  `products`, two-column global-spin `matching`, and non-negative scalar or
+  time-dependent `rate`. First-order rates are in inverse seconds; order-m rates
+  use concentration^(1-m)/s. Matched spins must have identical isotopes. Empty
+  products denote untracked loss; repeated substance indices give stoichiometry.
+  Unmatched source spins are traced out and new product spins arrive unpolarised.
+- `closure` — per-record `additive` default, or `product` to retain cross-reactant
+  polarisation products. Higher-order rates multiply the other reactant
+  concentrations in the instantaneous state; their units depend on reaction order.
+- `selector` — optional named singlet/triplet channel (including Jones–Hore
+  variants) and two electron indices on a single reactant, or a pair of local
+  left/right projector matrices. See the selective-loss recipe in relaxation.md.
 
-Legacy rates, flux, and radical-pair fields are rejected. The implemented
-reaction-record path requires `bas.formalism='sphten-liouv'`; chemistry-free
-systems remain available in the other formalisms.
+Spin replacement uses explicit matching records, not a flux matrix. Reaction
+records currently require `bas.formalism='sphten-liouv'`; specifying parts and
+concentrations without reactions does not impose that restriction. Retired
+rates, flux, and radical-pair fields are rejected, not translated automatically.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
@@ -621,7 +631,10 @@ Use `inter.chem.reactions`, a cell array of records containing `reactants`, `pro
 
 `unit_state`, `state`, and `equilibrium` return concentration-weighted density
 matrices and Liouville states; storage-only wavefunctions remain unweighted.
-Geometric detection and normalised operator vectors use `coil_state`. IME
+Geometric detection and normalised operator vectors use `coil_state`, including
+pulse-sequence receivers, voxel projection operators, normalised ENDOR sums,
+relaxation-analysis probes, and microwave transition operators. Prepared densities
+retain `state`; do not apply concentration factors to receivers. IME
 `thermalize` instead takes unit-concentration target shapes: request equilibrium
 on a copy with all `chem.concs` entries one, as `relaxation` does internally.
 The propagated unit coordinates supply the instantaneous concentrations; neither
@@ -666,3 +679,10 @@ boundary also covers the adjoint generator passed by destination screening.
 The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
 with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
 spin lists. Only the legacy `state` wrapper retains optional arguments.
+
+Retired global basis matrices and `bas.irrep` are rejected at the `basis`,
+`coherence`, `correlation`, `summary_basis`, and `kinetics` boundaries. Use
+`bas.basis{n}` with `bas.offsets`, and `bas.sym_fact(n).irr_projectors`/
+`irr_dimensions`. `kinetics` also rejects retired chemistry fields inserted
+after `create`; use `chem.reactions`. These are consumer checks, not custom
+dot-read interception: the compiled objects remain ordinary MATLAB structs.

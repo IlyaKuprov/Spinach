@@ -11,7 +11,7 @@ The model specifies scalar Zeeman shifts and scalar couplings. For the basis it 
 
 ## Acquisition and processing
 
-This is an acquisition/FID calculation rather than an explicitly programmed RF-pulse sequence. It selects `19F` observation, sets both initial state and receiver coil to `state(...,'L+','19F')`, leaves decoupling empty, and passes `offset=-86700`, `sweep=300`, `npoints=512`, and `zerofill=2048` to `liquid(spin_system,@acquire,parameters,'nmr')`. The source sets `axis_units='ppm'` and `invert_axis=1`; it does not annotate units for offset or sweep. The resulting FID receives exponential apodisation with parameter 6, is Fourier transformed, and is displayed with `plot_1d`.
+This is an acquisition/FID calculation rather than an explicitly programmed RF-pulse sequence. It selects `19F` observation, sets the initial state to `state(...,'L+','19F')`, leaves decoupling empty, and passes `offset=-86700`, `sweep=300`, `npoints=512`, and `zerofill=2048` to `liquid(spin_system,@acquire,parameters,'nmr')`. The source sets `axis_units='ppm'` and `invert_axis=1`; it does not annotate units for offset or sweep. The resulting FID receives exponential apodisation with parameter 6, is Fourier transformed, and is displayed with `plot_1d`. The receiver uses the same operator description with `coil_state` instead.
 
 ## Resource note and scope
 

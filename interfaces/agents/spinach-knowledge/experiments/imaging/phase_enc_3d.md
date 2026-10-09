@@ -8,7 +8,7 @@ This is an imaging callback, normally invoked as imaging(spin_system,@phase_enc_
 
 ## Sequence and spatial encoding
 
-The background generator is B = H + F + iR + iK. G{1} is the slice-select axis: a shaped RF pulse acts through the 1H Lx and Ly operators while the slice gradient is on, followed by evolution with the opposite gradient to roll it back. The sequence evolves for t_echo, applies a 180-degree y rotation, then evolves for a second t_echo. Projection onto 1H L+ produces an internal slice profile for plotting; that intermediate is not the returned image.
+The background generator is B = H + F + iR + iK. G{1} is the slice-select axis: a shaped RF pulse acts through the 1H Lx and Ly operators while the slice gradient is on, followed by evolution with the opposite gradient to roll it back. The sequence evolves for t_echo, applies a 180-degree y rotation, then evolves for a second t_echo. Projection onto the unweighted 1H L+ vector from `coil_state` produces an internal slice profile for plotting; that intermediate is not the returned image.
 
 The returned signal is acquired in a two-dimensional phase-encode/readout loop. For each of image_size(1) linearly spaced amplitudes from -pe_grad_amp to +pe_grad_amp, the sequence evolves with that amplitude on G{2} for pe_grad_dur. G{3} supplies the readout gradient: it first runs at negative amplitude for half ro_grad_dur, then the coil is observed under the positive readout gradient. Thus the input sample grid is three-dimensional for slice selection, while the acquired k-space array is two-dimensional.
 

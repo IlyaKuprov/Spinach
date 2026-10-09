@@ -17,7 +17,7 @@ The spherical-tensor Liouville basis uses the IK-2 approximation and three S3 gr
 
 ## Acquisition and processing
 
-The initial state and receiver coil are both `state(spin_system,'L+','1H')`; no decoupled spins are specified. `liquid(...,@acquire,...,'nmr')` generates a 2048-point FID with sweep 2000 Hz and offset 800 Hz. The FID is apodised with `{'exp',6}`, zero-filled to 8196 points, Fourier-transformed with `fftshift(fft(...))`, and plotted as its real part with axis units set to ppm and the axis inverted.
+The initial state uses `state(spin_system,'L+','1H')`; no decoupled spins are specified. `liquid(...,@acquire,...,'nmr')` generates a 2048-point FID with sweep 2000 Hz and offset 800 Hz. The FID is apodised with `{'exp',6}`, zero-filled to 8196 points, Fourier-transformed with `fftshift(fft(...))`, and plotted as its real part with axis units set to ppm and the axis inverted. The receiver uses the same operator description with `coil_state` instead.
 
 ## Scope
 

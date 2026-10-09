@@ -9,7 +9,7 @@ Spinach Wiki: https://spindynamics.org/wiki/index.php?title=relaxan.m
 
 ## Calculation
 
-The routine converts the supplied system to the adjoint representation with `sim2liouv` and calls `relaxation`, with the optional orientation argument when supplied. For each spin it constructs `Lz` and `L+` state vectors, then computes the respective rate as `-real((S'*R*S)/(S'*S))`; each reported time is the reciprocal of its rate. The printed rate columns are labelled Hz and the time columns seconds. Dynamic frequency shifts are dropped.
+The routine converts the supplied system to the adjoint representation with `sim2liouv` and calls `relaxation`, with the optional orientation argument when supplied. For each spin it constructs unweighted `Lz` and `L+` vectors with `coil_state`, which remain nonzero even for a zero-population substance, then computes the respective rate as `-real((S'*R*S)/(S'*S))`; each reported time is the reciprocal of its rate. The printed rate columns are labelled Hz and the time columns seconds. Dynamic frequency shifts are dropped.
 
 `euler_angles` is optional and is documented for orientation-dependent relaxation. The source checks for a real three-element value when it is supplied.
 

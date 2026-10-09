@@ -76,7 +76,7 @@ end
 % Detection state - NH protons
 if ~isfield(parameters,'coil')
     HNs=ismember(spin_system.comp.labels,{'H'});
-    parameters.coil=state(spin_system,'L+',find(HNs),'cheap');
+    parameters.coil=coil_state(spin_system,'L+',find(HNs),'cheap');
 end
 
 % Pulse operators all protons

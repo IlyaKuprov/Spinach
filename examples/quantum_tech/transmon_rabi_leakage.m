@@ -45,7 +45,7 @@ traj=evolution(spin_system,H,[],rho,1e-9,400,'trajectory');
 % Level populations
 pops=zeros(4,401);
 for n=1:4
-    coil=state(spin_system,['BL' int2str(n)],1);
+    coil=coil_state(spin_system,['BL' int2str(n)],1,'exact');
     pops(n,:)=real(cellfun(@(rho)full(hdot(coil,rho)),traj));
 end
 

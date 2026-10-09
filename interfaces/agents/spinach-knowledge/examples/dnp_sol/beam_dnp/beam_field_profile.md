@@ -12,7 +12,7 @@ Calculates the proton $I_z$ expectation at the end of a BEAM DNP contact as a fu
 
 The X-band model sets `sys.magnet=0.3483`, with one electron and two protons (`{'E','1H','1H'}`). The electron trityl g-tensor is `[2.00319 2.00319 2.00258]`; the two proton Zeeman entries are `[0 0 5]` and `[0 5 0]`, described in the source as ppm guesses. The Euler-angle entries are `[0 10 0]`, `[0 0 10]`, and `[100 0 0]` degrees. Cartesian coordinates are `[0,0,0]`, `[0,3.500,0]`, and `[2.475,2.475,0]`; the source gives no coordinate unit. The source sets `inter.temperature=80` without stating a unit.
 
-The full Zeeman-Hilbert basis uses `bas.formalism='zeeman-hilb'` and `bas.approximation='none'`. The detected state is `state(spin_system,'Lz','1H')`. BEAM sequence parameters are `parameters.spins={'E','1H'}`, electron nutation frequency `32.0 MHz` (documented as `32.0e6 Hz`), pulse durations `20.0 ns` and `28.7 ns`, and `165` BEAM blocks. Powder averaging uses `rep_2ang_800pts_sph`; `parameters.needs={'aniso_eq'}` is accompanied by the source comment “Sequence needs rho_eq”.
+The full Zeeman-Hilbert basis uses `bas.formalism='zeeman-hilb'` and `bas.approximation='none'`. The detected state is `coil_state(spin_system,'Lz','1H','exact')`. BEAM sequence parameters are `parameters.spins={'E','1H'}`, electron nutation frequency `32.0 MHz` (documented as `32.0e6 Hz`), pulse durations `20.0 ns` and `28.7 ns`, and `165` BEAM blocks. Powder averaging uses `rep_2ang_800pts_sph`; `parameters.needs={'aniso_eq'}` is accompanied by the source comment “Sequence needs rho_eq”.
 
 ## Scan, calculation, and output
 

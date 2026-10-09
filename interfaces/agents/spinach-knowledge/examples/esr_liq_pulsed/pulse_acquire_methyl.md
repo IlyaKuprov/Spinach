@@ -14,7 +14,7 @@ The simple common-linewidth model uses relaxation **'damp'**, diagonal retention
 
 ## ESR acquisition
 
-Detected spin is **E**; initial state and receiver are both **state(spin_system,'L+','E')**, with an empty decoupling list. Offset is **0**, sweep **5e8**, point count 256, zero-fill 1024, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies **'none'** apodisation, Fourier-transforms using the zero-fill length, and plots the real spectrum.
+Detected spin is **E**; the initial state uses **state(spin_system,'L+','E')**, with an empty decoupling list. Offset is **0**, sweep **5e8**, point count 256, zero-fill 1024, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies **'none'** apodisation, Fourier-transforms using the zero-fill length, and plots the real spectrum. The receiver uses the same operator description with `coil_state` instead.
 
 ## Dependencies and limits
 

@@ -80,7 +80,7 @@ rho=evolution(spin_system,L-parameters.ss_grad_amp(2)*G{2},[],...
 rho=coherence(spin_system,rho,{{parameters.spins{1},0}});
                 
 % Get the phantom
-Lz=state(spin_system,'Lz',parameters.spins{1});
+Lz=coil_state(spin_system,'Lz',parameters.spins{1},'exact');
 phan=real(fpl2phan(rho,Lz,parameters.npts));
             
 end

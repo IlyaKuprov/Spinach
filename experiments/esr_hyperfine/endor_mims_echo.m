@@ -62,7 +62,7 @@ Ey=operator(spin_system,'Ly',parameters.electrons);
 
 % Ideal initial and detection states
 rho0=state(spin_system,'Lz',parameters.electrons);
-coil=state(spin_system,'L+',parameters.electrons);
+coil=coil_state(spin_system,'L+',parameters.electrons,'exact');
 
 % Ideal pi/2 pulse on the electrons
 rho=step(spin_system,Ex,rho0,pi/2);

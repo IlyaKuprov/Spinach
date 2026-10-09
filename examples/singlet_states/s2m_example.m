@@ -33,7 +33,7 @@ Cy=operator(spin_system,'Ly','13C');
 rho0=singlet(spin_system,1,2);
 
 % Detect longitudinal magnetisation
-coil=state(spin_system,'Lz','all');
+coil=coil_state(spin_system,'Lz','all','exact');
 
 % Call the S2M sequence
 rho=s2m(spin_system,H,Cx,Cy,rho0,55,6.0);

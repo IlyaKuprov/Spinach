@@ -46,3 +46,5 @@ The source points to [10.1063/1.3624564](http://link.aip.org/link/doi/10.1063/1.
 Each substance starts with fresh local options. In particular, deriving `prox_level` from a nonempty `space_level` entry cannot leak that derived value into a later empty entry.
 
 Before compilation, the union of `chem.parts` must equal every global spin index; an omitted spin raises `Spinach:basis:incompletePartition`. Empty spin-free substances remain valid when the other parts cover all spins.
+
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.

@@ -14,7 +14,7 @@ Relaxation is **'damp'** with diagonal retention, zero equilibrium, and damping 
 
 ## ESR acquisition
 
-The initial state and receiver are both **state(spin_system,'L+','E')**; detected spin is **E** and decoupling is empty. Acquisition settings are offset **0**, sweep **3e8**, 4096 points, zero-fill 16384, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies no apodisation, Fourier-transforms the FID with the configured zero-fill, and plots its real part.
+The initial state uses **state(spin_system,'L+','E')**; detected spin is **E** and decoupling is empty. Acquisition settings are offset **0**, sweep **3e8**, 4096 points, zero-fill 16384, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies no apodisation, Fourier-transforms the FID with the configured zero-fill, and plots its real part. The receiver uses the same operator description with `coil_state` instead.
 
 ## Dependencies and limits
 

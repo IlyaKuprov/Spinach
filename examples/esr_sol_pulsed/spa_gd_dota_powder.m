@@ -44,7 +44,7 @@ for n=1:numel(W)
     % Sequence parameters
     parameters.spins={'E8'};
     parameters.rho0=state(spin_system,'Lz','E8');
-    parameters.coil=state(spin_system,'L+','E8');
+    parameters.coil=coil_state(spin_system,'L+','E8','exact');
     parameters.decouple={};
     parameters.offset=0;
     parameters.sweep=0.8e10;

@@ -41,7 +41,7 @@ parameters.offset=15000;
 parameters.spins={'13C'};
 parameters.grid='rep_2ang_200pts_sph';
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.verbose=1;
 
 % Get the trajectory

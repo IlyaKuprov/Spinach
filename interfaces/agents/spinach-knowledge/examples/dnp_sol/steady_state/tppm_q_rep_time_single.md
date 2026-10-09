@@ -14,4 +14,4 @@ The sequence parameters are spins `{'E','1H'}`, orientation grid `rep_2ang_800pt
 
 ## Calculation and output
 
-The proton detection operator is `state(spin_system,'Lz','1H')`. Each repetition-time point is evaluated with `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The script plots the real proton `Lz` expectation value against repetition time in ms and saves `tppm_q_rep_time_single.fig` in the current working directory. The function declares no output argument.
+The proton detection operator is `coil_state(spin_system,'Lz','1H','exact')`. Each repetition-time point is evaluated with `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The script plots the real proton `Lz` expectation value against repetition time in ms and saves `tppm_q_rep_time_single.fig` in the current working directory. The function declares no output argument.

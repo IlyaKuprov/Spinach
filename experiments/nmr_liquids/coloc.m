@@ -62,7 +62,7 @@ t1_grid=(0:(parameters.npoints(1)-1))*timestep(1);
 rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 
 % Detection state
-coil=state(spin_system,'L+',parameters.spins{2},'cheap');
+coil=coil_state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Pulse operators
 Hx=operator(spin_system,'Lx',parameters.spins{1}); 

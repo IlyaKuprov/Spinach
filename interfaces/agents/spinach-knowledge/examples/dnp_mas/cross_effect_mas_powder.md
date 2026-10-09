@@ -16,4 +16,4 @@ Nottingham relaxation is specified by `nott_r1e=1/0.3e-3`, `nott_r1n=1/4.0`, `no
 
 ## Powder calculation and output
 
-The call `masdnp(spin_system,parameters)` uses electron spins `{'E'}`, rotor axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate `12.5e3`, and `max_rank=800`. Microwave settings are `mw_pwr=2*pi*0.85e6`, `mw_frq=-263.366e9`, and `mw_time=1.0`; powder orientations use `'rep_2ang_100pts_sph'`. The proton detection coil is set to `state(spin_system,'Lz','1H')`, and verbosity is zero. The returned value is printed as the steady-state DNP enhancement. The example reports a powder enhancement rather than a plotted rotor-period trajectory.
+The call `masdnp(spin_system,parameters)` uses electron spins `{'E'}`, rotor axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate `12.5e3`, and `max_rank=800`. Microwave settings are `mw_pwr=2*pi*0.85e6`, `mw_frq=-263.366e9`, and `mw_time=1.0`; powder orientations use `'rep_2ang_100pts_sph'`. The proton detection coil is set to `coil_state(spin_system,'Lz','1H','exact')`, and verbosity is zero. The returned value is printed as the steady-state DNP enhancement. The example reports a powder enhancement rather than a plotted rotor-period trajectory.

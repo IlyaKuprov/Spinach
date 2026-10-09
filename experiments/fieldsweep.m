@@ -70,7 +70,7 @@ parameters.pp_tol=0.25*window_size/(parameters.npoints-1);
 Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2; 
 
 % Get the microwave operator (state in Liouville space)
-Hmw=state(spin_system,'Lx',parameters.spins{1});
+Hmw=coil_state(spin_system,'Lx',parameters.spins{1},'exact');
 
 % Get the initial grid and compute its convex hull
 load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 

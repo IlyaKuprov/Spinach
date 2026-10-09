@@ -7,7 +7,7 @@
 
 Call from `imaging()`, which supplies `H`, `R`, `K`, `G`, and `F`. The function combines `B=H+F+1i*R+1i*K`. It applies a shaped RF pulse with slice selection along `G{1}` to the hard-coded `1H` channel, rolls back the slice gradient, then evolves for `t_echo`. Optional `diff_g_amp` adds a simultaneous three-axis diffusion-gradient vector during that interval; without it the interval is unweighted evolution. An ideal `Ly` 180-degree pulse then refocuses the transverse magnetisation.
 
-The source projects the post-echo state into a voxel-resolved `1H` signal for display, then samples a two-dimensional EPI k-space grid: `G{2}` is stepped for phase encoding and `G{3}` is the alternating-polarity readout. The coil state detects each sample. The returned object is the sampled complex k-space array, not a reconstructed image. DNP polarisation is not prepared or measured here: `parameters.rho0` is caller-supplied, so no polarisation magnitude or image value is implied.
+The source projects the post-echo state onto an unweighted `coil_state` vector, giving a voxel-resolved `1H` signal for display, then samples a two-dimensional EPI k-space grid: `G{2}` is stepped for phase encoding and `G{3}` is the alternating-polarity readout. The coil state detects each sample. The returned object is the sampled complex k-space array, not a reconstructed image. DNP polarisation is not prepared or measured here: `parameters.rho0` is caller-supplied, so no polarisation magnitude or image value is implied.
 
 ## Parameters and units
 

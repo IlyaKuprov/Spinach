@@ -103,7 +103,7 @@ else
     % Set detection states to Lz on every spin
     coils=cell(1,spin_system.comp.nspins);
     for n=1:spin_system.comp.nspins              
-        coils{n}=state(spin_system,{'Lz'},{n});        
+        coils{n}=coil_state(spin_system,{'Lz'},{n},'exact');        
     end
     coils=cell2mat(coils);
     

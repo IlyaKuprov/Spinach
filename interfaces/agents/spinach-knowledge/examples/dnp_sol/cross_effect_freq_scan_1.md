@@ -16,7 +16,7 @@ Relaxation is `nottingham` with `rlx_keep='secular'` and `equilibrium='zero'`. T
 
 ## Frequency scan and output
 
-The irradiation spin is `'E'`, with `mw_pwr=2*pi*100e3` and `mw_frq=2*pi*linspace(-350,350,5e4)*1e6`. The scan therefore has 50,000 values over the plotted range `-350` to `+350 MHz`; the source's frequency assignment includes the `2*pi` factor. Detection is `state(spin_system,'Lz','1H')`; the microwave and electron-Zeeman operators are `operator(spin_system,'Lx','E')` and `operator(spin_system,'Lz','E')`. The fixed orientation is `[0 0 0]`; method is `lvn-backs`, `g_ref` is the first electron Zeeman scalar, and `needs={'aniso_eq'}`. The function calls `crystal(spin_system,@dnp_freq_scan,parameters,'esr')` and plots `real(answer)` against frequency offset.
+The irradiation spin is `'E'`, with `mw_pwr=2*pi*100e3` and `mw_frq=2*pi*linspace(-350,350,5e4)*1e6`. The scan therefore has 50,000 values over the plotted range `-350` to `+350 MHz`; the source's frequency assignment includes the `2*pi` factor. Detection is `coil_state(spin_system,'Lz','1H','exact')`; the microwave and electron-Zeeman operators are `operator(spin_system,'Lx','E')` and `operator(spin_system,'Lz','E')`. The fixed orientation is `[0 0 0]`; method is `lvn-backs`, `g_ref` is the first electron Zeeman scalar, and `needs={'aniso_eq'}`. The function calls `crystal(spin_system,@dnp_freq_scan,parameters,'esr')` and plots `real(answer)` against frequency offset.
 
 **Observable-label note:** as in the source, the receiver is set to `Lz` on `1H`, whereas the plotted axis is labelled as an $S_z$ expectation on $^1$H; these are retained as distinct source details, not reconciled here.
 

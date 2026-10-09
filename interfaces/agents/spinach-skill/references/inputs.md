@@ -535,3 +535,7 @@ generators in `reduce`; those use the usual trajectory-level reductions.
 `summary_basis` reports substances separately; `stateinfo` identifies the
 hosting substance and global spin labels of every reported coefficient.
 State numbers retain the global direct-sum offsets.
+
+`zte` preserves all compiled spherical-tensor unit coordinates, even for
+zero-population substances. `reduce` transports their support through the
+symmetry projection and keeps it during subsequent population screening.

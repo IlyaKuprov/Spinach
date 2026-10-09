@@ -63,6 +63,14 @@ if size(L,1)==spin_system.bas.offsets(end)
     end
 end
 
+% Identify unit directions only in the compiled spherical-tensor space
+unit_states=sparse(size(L,1),0);
+if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
+   (size(L,1)==spin_system.bas.offsets(end))
+    unit_states=sparse(spin_system.bas.offsets(1:end-1)+1,...
+                       1:spin_system.bas.nsubst,1,size(L,1),spin_system.bas.nsubst);
+end
+
 % Decide how to proceed
 switch spin_system.bas.formalism
     
@@ -240,7 +248,8 @@ switch spin_system.bas.formalism
                     % Flag the irrep for dropping
                     irrep_keep_index(n)=0;
                     
-                elseif norm(irr_projectors{n}'*rho,1)<spin_system.tols.irrep_drop
+                elseif norm(irr_projectors{n}'*rho,1)<spin_system.tols.irrep_drop&&...
+                       (nnz(irr_projectors{n}'*unit_states)==0)
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ', dimension '...
@@ -269,8 +278,13 @@ switch spin_system.bas.formalism
                 % Report to the user
                 report(spin_system,['irrep #' num2str(n) ', attempting zero track elimination...']);
                 
+                % Mark unit support in the projected coordinates, not the original offsets
+                local_system=spin_system;
+                unit_rows=find(any(projectors{n}'*unit_states,2));
+                local_system.bas.offsets=[unit_rows-1; size(projectors{n},2)];
+
                 % Run zero track elimination
-                zte_projector=zte(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
+                zte_projector=zte(local_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
                 
                 % Project the projectors
                 projectors{n}=projectors{n}*zte_projector;
@@ -285,19 +299,22 @@ switch spin_system.bas.formalism
             % Inform the user
             report(spin_system,['path-tracing subspace #' num2str(n) '...']);
             
+            % Include unit support in population screening after projection
+            rho_screen=abs(projectors{n}'*rho)+sum(abs(projectors{n}'*unit_states),2);
+
             % Run the path tracing
-            pt_projectors=path_trace(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
+            pt_projectors=path_trace(spin_system,projectors{n}'*L*projectors{n},rho_screen);
             
             % Project the projectors
             for k=1:numel(pt_projectors)
                 pt_projectors{k}=projectors{n}*pt_projectors{k};
             end
-            projectors{n}=pt_projectors; %#ok<AGROW>
+            projectors{n}=pt_projectors(:); %#ok<AGROW>
             
         end
         
         % Flatten out the cell array
-        projectors=[projectors{:}];
+        projectors=vertcat(projectors{:});
         
     otherwise
         

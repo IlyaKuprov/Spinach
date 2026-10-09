@@ -79,7 +79,7 @@ end
 result=test_true(result,'cross symmetry',rejected,...
                  'symmetry indices must be local to the declared substance');
 
-% Segmented Zeeman filters and thermal states reject unsupported constructions
+% Segmented Zeeman filters reject unsupported constructions
 sys.isotopes={'1H','1H'}; inter.chem.parts={1,2};
 for formalism={'zeeman-hilb','zeeman-liouv'}
     bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas);
@@ -102,27 +102,6 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
         result=test_true(result,[selector{1} ' ' formalism{1}],rejected,...
                          'unsupported direct-sum Zeeman filtering raises the named error');
     end
-    for constructor={'unit_state','equilibrium'}
-        for nargs=[1 2 4]
-            if strcmp(constructor{1},'unit_state')&&(nargs~=1), continue; end
-            rejected=false;
-            try
-                if strcmp(constructor{1},'unit_state')
-                    unit_state(s);
-                elseif nargs==1
-                    equilibrium(s);
-                elseif nargs==2
-                    equilibrium(s,speye(s.bas.offsets(end)));
-                else
-                    equilibrium(s,speye(s.bas.offsets(end)),cell(5),[0 0 0]);
-                end
-            catch err
-                rejected=strcmp(err.identifier,['Spinach:' constructor{1} ':segmentedZeeman']);
-            end
-            result=test_true(result,[constructor{1} ' ' formalism{1} ' ' num2str(nargs)],...
-                             rejected,'unsupported Zeeman states raise the named error before construction');
-        end
-    end
     bad=bas; bad.sym_group={{'S2'},{}}; bad.sym_spins={{1},{}};
     rejected=false;
     try
@@ -133,18 +112,6 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
     result=test_true(result,['Zeeman symmetry rejection ' formalism{1}],rejected,...
                      'only genuinely segmented Zeeman symmetry is rejected');
 end
-
-% Segmented Zeeman-Liouville states reject before allocating a global identity
-bas.formalism='zeeman-liouv'; s=test_spin_system(sys,inter,bas);
-rejected=false;
-try
-    state(s,'Lz',1);
-catch err
-    rejected=strcmp(err.identifier,'Spinach:state:segmentedZeeman');
-end
-result=test_true(result,'segmented Liouville state',rejected,...
-                 'state rejects before constructing the tensor-product identity');
-fprintf('CWDM_STATE_LIOUV named_rejection=%d\n',rejected);
 
 % Segmented wavefunctions cannot represent the compiled direct sum
 sys.isotopes={'1H','1H','1H'};

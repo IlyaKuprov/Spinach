@@ -37,6 +37,20 @@ for formalism={'zeeman-liouv','zeeman-hilb','zeeman-wavef'}
     fprintf('CWDM_FORMALISM_DIM %s %s\n',formalism{1},mat2str(dims'));
 end
 
+% Store local pure kets without assigning concentrations to their amplitudes
+ket=coil_state(s,[0.5 0.5 0.5],[],'exact');
+result=test_close(result,'unweighted wavefunction storage',ket,[1;0;1;0;0;0;1],0,0,...
+                  'each substance stores its own product ket, including the scalar empty block');
+rejected=false;
+try
+    state(s,[0.5 0.5 0.5]);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:state:segmentedZeeman')&&...
+             strcmp(err.message,'concentration-weighted states are not supported in segmented zeeman-wavef formalism.');
+end
+result=test_true(result,'wavefunction concentration weighting',rejected,...
+                 'the weighted wrapper does not reinterpret pure-state amplitudes as concentrations');
+
 % Check thermal and concentration-weighted wavefunction requests explicitly
 calls={@()equilibrium(s),@()unit_state(s),...
        @()thermalize(s,sparse(7,7),[],[],[], 'IME')};

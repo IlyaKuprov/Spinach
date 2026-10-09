@@ -21,6 +21,8 @@
 %       substance is converted separately, with destination dimension
 %       D_n^2. The unit coordinate maps to vec(I_D_n), so the source
 %       unit coordinate equals the Hilbert trace divided by D_n.
+%       For trace-equals-concentration CWDM coordinates, divide each
+%       destination substance block of P by its local D_n explicitly.
 %
 % ilya.kuprov@weizmann.ac.il
 % enu.jamila@proton.me

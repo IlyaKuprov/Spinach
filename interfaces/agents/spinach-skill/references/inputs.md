@@ -514,7 +514,7 @@ from `bas.offsets(end)`, not from the number of descriptor cells.
 Explicit identity requests act only on the selected substance; numeric and
 isotope sums contribute once per matching spin. Left/right identity actions
 give the local identity, anticommutators twice it, and commutators zero.
-Multi-substance Zeeman operator construction remains explicitly unsupported.
+Multi-substance Zeeman operators are local tensor products placed into their hosting direct-sum blocks. Isotope sums cover all matching substances.
 
 Symmetry factorisations live in `bas.sym_fact(n)`. `reduce` and `rspt_eig`
 embed their local projector columns using `bas.offsets`; do not read the
@@ -583,8 +583,9 @@ flux and empty reaction maps; the generator suite explicitly asserts the WP3
 rejection boundary instead of claiming numerical exchange validation.
 
 Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
-multi-substance Zeeman symmetry, analytical filters, unit states, and equilibrium
-states are explicitly rejected. Single-substance Zeeman behaviour is retained.
+multi-substance Zeeman symmetry and analytical filters remain explicitly rejected.
+Zeeman units and equilibrium states are assembled independently per substance;
+geometric units retain stock normalisations, while thermal blocks have trace c_n.
 Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
 use `bas.offsets(end)`. Identity states retain the selected substance: each
 selected spin contributes one local unit in a sum, a local product contributes
@@ -598,8 +599,10 @@ through `sys.disable` does not prevent an imaging calculation.
 Per-substance `space_level` aliases are derived independently; an empty entry
 does not inherit the preceding substance's proximity depth.
 
-Segmented wavefunction and Zeeman-Liouville state construction is deferred and raises
-`Spinach:state:segmentedZeeman` before global tensor allocation; single-substance states are unchanged.
+Segmented Zeeman-Liouville states use local identities. The weighted `state`
+wrapper rejects segmented wavefunctions with `Spinach:state:segmentedZeeman`;
+`coil_state` can store the unweighted direct sum of local product kets.
+Single-substance state numerics are unchanged.
 
 Before basis compilation, `chem.parts` must cover every global spin; omitted
 spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.

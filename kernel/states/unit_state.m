@@ -13,7 +13,8 @@
 %    rho          - vector or matrix representation of
 %                   the unit state 
 %
-% Note: multi-substance Zeeman unit states are not yet supported.
+% Note: Zeeman blocks retain the stock geometric identity normalisation.
+%       Use equilibrium for trace-one density matrices before weighting.
 %
 % ilya.kuprov@weizmann.ac.il
 % d.savostyanov@soton.ac.uk
@@ -36,14 +37,23 @@ switch spin_system.bas.formalism
         
     case 'zeeman-liouv'
         
-        % Normalized stretched unit matrix
-        rho=speye(prod(spin_system.comp.mults));
-        rho=rho(:); rho=spin_system.chem.concs(1)*rho/norm(rho,2);
+        % Stack locally normalised stretched identities
+        blocks=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+            block=block(:); blocks{n}=spin_system.chem.concs(n)*block/norm(block,2);
+        end
+        rho=vertcat(blocks{:});
         
     case 'zeeman-hilb'
         
-        % Sparse unit matrix
-        rho=spin_system.chem.concs(1)*speye(prod(spin_system.comp.mults));
+        % Place weighted geometric identities on the Hilbert diagonal
+        blocks=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            blocks{n}=spin_system.chem.concs(n)*...
+                      speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+        end
+        rho=blkdiag(blocks{:});
         
     otherwise
         
@@ -62,11 +72,6 @@ if strcmp(spin_system.bas.formalism,'zeeman-wavef')
 end
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('the spin_system object does not contain the required information.');
-end
-if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})&&...
-   (spin_system.bas.nsubst>1)
-    error('Spinach:unit_state:segmentedZeeman',...
-          'multi-substance Zeeman unit states are not yet supported.');
 end
 end
 

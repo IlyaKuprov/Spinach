@@ -40,8 +40,7 @@
 %          zero temperatures are not supported.
 %
 % Each returned substance block is weighted by chem.concs.
-% Note: multi-substance Zeeman equilibrium states are not yet supported.
-%       Segmented Hamiltonians must have no cross-substance blocks after
+% Note: segmented Hamiltonians must have no cross-substance blocks after
 %       the orientation-dependent contribution has been added.
 %
 % ledwards@cbs.mpg.de
@@ -115,15 +114,19 @@ switch spin_system.bas.formalism
 
                 % Stretched unit matrix, normalisation matched to
                 % the Hilbert space because systems are small
-                unit=speye(prod(spin_system.comp.mults)); unit=unit(:);
+                blocks=cell(spin_system.bas.nsubst,1);
+                for n=1:spin_system.bas.nsubst
+                    block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+                    blocks{n}=block(:);
+                end
+                unit=vertcat(blocks{:});
 
         end
 
         % Check the Hamiltonian action on each substance's own unit state
         for n=1:spin_system.bas.nsubst
             idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
-            if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
-               (spin_system.bas.nsubst>1)&&(nnz(I(idx,idx))==0)
+            if (spin_system.bas.nsubst>1)&&(nnz(I(idx,idx))==0)
                 continue
             end
             if norm(I(idx,idx)*unit(idx),1)<1e-10
@@ -151,6 +154,19 @@ switch spin_system.bas.formalism
         
     % Hilbert space
     case {'zeeman-hilb'}
+
+        % Apply the stock trace normalisation independently to each block
+        if spin_system.bas.nsubst>1
+            blocks=cell(spin_system.bas.nsubst,1);
+            for n=1:spin_system.bas.nsubst
+                idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+                local_system=spin_system; local_system.bas.nsubst=1;
+                local_system.bas.nstates=numel(idx); local_system.bas.offsets=[0;numel(idx)];
+                local_system.chem.concs=spin_system.chem.concs(n);
+                blocks{n}=equilibrium(local_system,I(idx,idx));
+            end
+            rho=blkdiag(blocks{:}); return
+        end
         
         % Estimate the norm
         mat_norm=abs(beta_factor)*cheap_norm(I);
@@ -188,11 +204,6 @@ function grumble(spin_system,I,Q,euler_angles)
 if strcmp(spin_system.bas.formalism,'zeeman-wavef')
     error('Spinach:equilibrium:wavefunction',...
           'thermal equilibrium is not supported in zeeman-wavef formalism.');
-end
-if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})&&...
-   (spin_system.bas.nsubst>1)
-    error('Spinach:equilibrium:segmentedZeeman',...
-          'multi-substance Zeeman equilibrium states are not yet supported.');
 end
 if (nargin>=2)&&~isnumeric(I)
     error('isotropic Hamiltonian I must be numeric.');

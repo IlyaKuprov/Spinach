@@ -111,7 +111,7 @@ subst=[];
 if iscell(spins), subst=which_subst(spin_system,cell2mat(spins)); end
 
 % Retain spin selection before identity descriptors lose their labels
-if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
+if spin_system.bas.nsubst>1
     if ischar(spins)
         switch spins
             case 'all'
@@ -174,14 +174,13 @@ switch spin_system.bas.formalism
           'zeeman-hilb',...
           'zeeman-liouv'}
 
-        % Other direct-sum formalisms are implemented in WP4
+        % Restrict tensor products to the hosting substance
+        mults=spin_system.comp.mults; offset=0;
         if spin_system.bas.nsubst>1
-            error('Spinach:operator:formalism',...
-                  'multi-substance Zeeman operators are not yet supported.');
+            spins=spin_system.chem.parts{subst};
+            mults=mults(spins); offset=spin_system.bas.offsets(subst);
+            for n=1:numel(opspecs), opspecs{n}=opspecs{n}(spins); end
         end
-
-        % Parallelisation efficiency
-        mults=spin_system.comp.mults;
         formalism=spin_system.bas.formalism;
         
         % Build summation terms
@@ -210,7 +209,7 @@ switch spin_system.bas.formalism
             end
 
             % Convert sparse array from CSC to XYZ indexing
-            [rows,cols,vals]=find(B); A{n}=[rows cols vals];
+            [rows,cols,vals]=find(B); A{n}=[rows+offset cols+offset vals];
 
         end
         

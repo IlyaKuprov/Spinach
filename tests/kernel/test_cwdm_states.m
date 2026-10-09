@@ -29,6 +29,21 @@ inter.temperature=298;
 bas.formalism='sphten-liouv'; bas.approximation={'none','none','none'};
 s=test_spin_system(sys,inter,bas); units=s.bas.offsets(1:end-1)+1;
 
+% Reject malformed caller descriptions at the public state boundary
+for args={{s,'Lz',[1 1],'exact'},{s,{'Lz','Lx'},{1},'exact'},...
+          {s,'Lz',1,'unknown'},{s,[0 0],[],'exact'}}
+    rejected=false;
+    try
+        state(args{1}{:});
+    catch err
+        fprintf('WRAPPER_REJECTION %s %s\n',err.stack(1).name,err.message);
+        rejected=strcmp(err.stack(1).name,'grumble')&&...
+                 strcmp(err.stack(1).file,which('state'));
+    end
+    result=test_true(result,'wrapper-local argument rejection',rejected,...
+                     'invalid descriptions are rejected by the public wrapper grumbler');
+end
+
 % Compare operator shapes with independent unit-concentration substances
 reference=cell(3,1);
 for n=1:2
@@ -62,7 +77,7 @@ result=test_true(result,'unit coordinates',...
                  'the identity contains exactly one concentration per substance');
 
 % Check an all-spin sum is weighted separately in each hosting block
-coil=coil_state(s,'Lz','all'); expected=full(coil);
+coil=coil_state(s,'Lz','all','exact'); expected=full(coil);
 for n=1:s.bas.nsubst
     rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
     expected(rows)=s.chem.concs(n)*expected(rows);
@@ -74,12 +89,37 @@ result=test_true(result,'all-spin weighting',isequal(state(s,'Lz','all'),expecte
 empty=s; empty.chem.concs=[0 0 1];
 result=test_true(result,'zero-population state',nnz(state(empty,'Lz','all'))==0,...
                  'absent substances carry no spin order');
-result=test_true(result,'zero-population coil',isequal(coil_state(empty,'Lz','all'),coil),...
+result=test_true(result,'zero-population coil',isequal(coil_state(empty,'Lz','all','exact'),coil),...
                  'detection is independent of concentration');
 result=test_true(result,'spin-free equilibrium',isequal(equilibrium(empty),unit_state(empty)),...
                  'the populated spin-free substance carries only its unit coordinate');
 fprintf('CWDM_T6 exact_weighting=1 zero_population=1 spin_free=1 thermal_error=%.16g\n',...
         norm(equilibrium(s)-vertcat(reference{:}),inf));
+
+% Keep storage-only wavefunction probabilities independent of concentration
+sys=struct('magnet',0,'isotopes',{{'1H'}}); inter=struct();
+inter.chem.parts={1};
+bas=struct('formalism','zeeman-wavef','approximation',{{'none'}});
+for concentration=[0 0.3 2]
+    inter.chem.concs=concentration;
+    s=test_spin_system(sys,inter,bas); psi=state(s,0.5);
+    result=test_true(result,'unweighted wavefunction',isequal(psi,[1;0]),...
+                     'storage-only kets retain unit probability at every concentration');
+end
+fprintf('CWDM_WAVEFUNCTION norm_squared=%.16g\n',norm(psi)^2);
+
+% Require all four arguments on the new unweighted primitive
+rejected=false;
+try
+    coil_state(s,0.5,[]);
+catch err
+    rejected=strcmp(err.identifier,'MATLAB:minrhs');
+end
+result=test_true(result,'fixed coil signature',rejected,...
+                 'coil_state has no implicit method or spin-list defaults');
+result=test_true(result,'explicit wavefunction coil',...
+                 isequal(coil_state(s,0.5,[],'exact'),[1;0]),...
+                 'the explicit four-argument wavefunction API remains supported');
 
 end
 

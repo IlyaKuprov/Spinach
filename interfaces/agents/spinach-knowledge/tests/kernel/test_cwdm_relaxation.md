@@ -1,0 +1,17 @@
+# tests/kernel/test_cwdm_relaxation.m
+
+Compares two distinct heteronuclear substances with CSA and dipolar couplings
+against independently constructed single-substance spin systems. Complete
+relaxation matrices agree within 1e-12 relative Frobenius norm for Redfield
+(kite and secular retention, asynchronous and serial integration), Lindblad,
+SRFK, and combined T1/T2 plus Redfield. The substances have different isotopes,
+interaction tensors, Redfield correlation times, and phenomenological rates.
+The same fixture checks the Hamiltonian direct sum and exactly zero unit rows
+and columns in every unthermalised relaxation block.
+
+The test records that `weak` is not a supported relaxation theory. Nottingham
+with two electrons in one substance and a nucleus in another, or with the
+electrons split between substances, must raise the documented substance-local
+error. An ordinary two-electron-plus-nucleus substance must still produce
+nonzero relaxation with a conserved unit coordinate. This tests an explicit
+unsupported-domain boundary, not a Nottingham direct-sum numerical equality.

@@ -52,6 +52,12 @@ bosonic modes. Mode damping or dephasing can contribute automatically; see
 | `SRSK` | Scalar relaxation of the second kind, Abragam's expressions | `inter.srsk_sources` | Quadrupolar neighbours (14N, 35Cl, 79Br) broadening their partners |
 | `naka-zwan` | Nakajima-Zwanzig evaluation of the same rotational-modulation kernel as `redfield`; the two are mutually exclusive | `inter.tau_c`, `inter.nz_shift`, `inter.nz_onshell` | Relaxation beyond the Redfield evaluation of the memory kernel |
 
+Nottingham requires its two electrons to belong to each substance individually.
+`relaxation` raises `Spinach:relaxation:nottinghamSubstance` for a nucleus-only,
+spin-free, or split-electron substance. Because `create` still requires exactly
+two electrons overall, multi-substance Nottingham input is unsupported; do not
+interpret its nuclear rate parameters as a standalone nucleus-only model.
+
 Two settings become mandatory the moment `inter.relaxation` is present:
 
 ```matlab

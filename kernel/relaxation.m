@@ -21,6 +21,10 @@
 % Note: a variety of relaxation theories are supported, see the relax-
 %       ation theory parameters section of the online manual.
 %
+% Note: Nottingham theory requires exactly two electrons in every
+%       substance. A nucleus-only or spin-free partner is unsupported
+%       and raises Spinach:relaxation:nottinghamSubstance.
+%
 % Note: Spinach context functions include relaxation and kinetics
 %       superoperators into the total Liovillian automatically.
 %
@@ -890,6 +894,14 @@ end
 if ( ismember('nottingham',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))
     error('Nottingham relaxation theory is only available in Liouville space.');
+end
+if ismember('nottingham',spin_system.rlx.theories)
+    for n=1:numel(spin_system.chem.parts)
+        if nnz(strcmp('E',spin_system.comp.isotopes(spin_system.chem.parts{n})))~=2
+            error('Spinach:relaxation:nottinghamSubstance',...
+                  'Nottingham relaxation requires exactly two electrons in every substance.');
+        end
+    end
 end
 if ( ismember('weizmann',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))

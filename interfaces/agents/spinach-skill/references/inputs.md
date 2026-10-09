@@ -255,7 +255,7 @@ inter.chem.concs=[1.0 1.0];
   electron indices; and `[singlet_rate triplet_rate]` in hertz. All three
   fields must appear together.
 
-Any chemistry at all forces `bas.formalism='sphten-liouv'`.
+Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
@@ -633,7 +633,7 @@ unweighted `coil_state` target, and `steady` pins the supplied concentrations.
 
 ### Reaction propagation
 
-`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
+`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates or Zeeman trace functionals without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
 
 Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for a general reaction network. `kill_spin` rebuilds reaction matching and basis data, but refuses removal of selector electrons or changes to a substance carrying user-supplied selector matrices.
 
@@ -664,3 +664,20 @@ Zeeman-wavefunction direct sums provide storage only. Nonempty reaction records
 are rejected by `basis` and `kinetics`; `equilibrium`, `unit_state`, and
 `thermalize` reject mixed-state or concentration-weighted requests explicitly
 with messages naming `zeeman-wavef`. Legacy unweighted singleton kets remain available.
+
+### Zeeman chemistry and matrix IME
+
+Zeeman Liouville chemistry uses complete local bases and dense transformations
+of the shared reaction compiler, so it is intended as a small-system reference
+backend. Both closures, atom matching, spin-free products, selectors, and spatial
+state-dependent maps retain the same physical contract. User selector pairs
+remain local Liouville product superoperators even for Hilbert input.
+
+With Hilbert reaction records, `K=kinetics(s)` returns `K(t,rho)` as a matrix
+derivative, not a conjugation Hamiltonian. Only first-order records are accepted;
+mass action raises `Spinach:kinetics:hilbertMassAction`. `thermalize` supports
+Hilbert IME from an explicit direct-sum Liouville relaxation matrix and a
+block-diagonal unit-trace target, returning the same matrix-RHS interface. These
+handles are not `step` generators, and the stock Hilbert relaxation constructor
+is unchanged. `chem_concs` extracts each Hilbert block trace and rejects
+inter-substance coherences.

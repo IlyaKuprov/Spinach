@@ -28,6 +28,8 @@ inter.temperature=298; inter.zeeman.scalar={1,2,3,4};
 inter.coupling.scalar=cell(4); inter.coupling.scalar{1,2}=10;
 inter.coupling.scalar{3,4}=8; inter.chem.parts={1:2,3:4};
 inter.chem.concs=[0.4 0.6]; inter.relaxation={'t1_t2'};
+inter.chem.reactions={struct('reactants',1,'products',2,'matching',[1 3;2 4],'rate',20),...
+                      struct('reactants',2,'products',1,'matching',[3 1;4 2],'rate',10)};
 inter.r1_rates={1,1.5,1,1.5}; inter.r2_rates={3,4,3,4};
 inter.rlx_keep='labframe'; inter.equilibrium='IME';
 bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
@@ -51,7 +53,9 @@ result=test_close(result,'T16 thermalised relaxation',r_error,0,1e-10,0,...
                   'production Zeeman IME matches transformed spherical-tensor IME');
 
 % Test the probe exchange on every component including the trace
-exchange=[-20 10;20 -10]; K=kron(exchange,speye(16));
+exchange=[-20 10;20 -10]; K=kinetics(z); ks=kinetics(s);
+result=test_close(result,'T16 production exchange map',K,kron(exchange,speye(16)),1e-12,0,...
+                  'reaction records transport every local Zeeman density-matrix component');
 tau=kron(speye(2),reshape(speye(4),1,16));
 generator=-1i*hz+rz+K; generator_error=norm(tau*generator-exchange*tau);
 result=test_close(result,'T16 concentration generator',tau*generator,exchange*tau,1e-12,0,...
@@ -66,7 +70,7 @@ pulse_s=operator(s,'Ly','1H'); pulse_z=operator(z,'Ly','1H');
 rho_s=expm(full(-1i*pulse_s*pi/2))*rho_s;
 rho_z=expm(full(-1i*pulse_z*pi/2))*rho_z;
 coil_s=coil_state(s,'L+','1H','exact'); coil_z=coil_state(z,'L+','1H','exact');
-prop_s=expm(full(-1i*H+R+K)*0.0002); prop_z=expm(full(generator)*0.0002);
+prop_s=expm(full(-1i*H+R+ks)*0.0002); prop_z=expm(full(generator)*0.0002);
 fid_s=zeros(256,1); fid_z=zeros(256,1);
 for n=1:256
     fid_s(n)=coil_s'*rho_s; fid_z(n)=coil_z'*rho_z;

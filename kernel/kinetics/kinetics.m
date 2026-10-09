@@ -15,15 +15,21 @@
 %                  a sparse generator for mass action or time-dependent
 %                  rates. eta is a space-times-spin column; the handle
 %                  assembles chemistry independently in each voxel.
+%                  In zeeman-hilb with reactions, K(t,rho) instead returns
+%                  the block-diagonal matrix derivative; only first-order
+%                  reactions are supported. This is not a step generator.
 %
-% K enters the Liouvillian as 1i*K: L=H+1i*R+1i*K. Nonlinear propagation
+% In Liouville space, K enters as 1i*K: L=H+1i*R+1i*K. Nonlinear propagation
 % uses step(spin_system,{@(t,eta)1i*K(t,eta),t,'RKMK4'},eta,dt).
 % Reaction maps are compiled once per kinetics call. Additive closure
 % carries the unit once and each reactant's internal orders; product
 % closure also carries cross-reactant orders. No concentration division
 % is used. Spinless reactants are dynamic pools, not fixed reservoirs.
 % Named selectors implement Haberkorn or Jones-Hore loss and projected
-% product arrival. User selector pairs are local left/right projectors.
+% product arrival. User selector pairs are local left/right product super-
+% operators, including in zeeman-hilb (Liouville block dimensions). Zeeman
+% maps use the complete spherical-tensor compiler and explicit dense local
+% basis transformations; this reference path is intended for small systems.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -40,6 +46,49 @@ grumble(spin_system,mode);
 % Leave chemistry-free systems available in every formalism
 if isempty(spin_system.chem.reactions)
     K=mprealloc(spin_system,0); return
+end
+
+% Use the same reaction compiler in complete spherical-tensor coordinates
+if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})
+    bas.formalism='sphten-liouv';
+    bas.approximation=repmat({'none'},1,spin_system.bas.nsubst);
+    source=basis(spin_system,bas); P=sphten2zeeman(source);
+    for n=1:source.bas.nsubst
+        idx=(source.bas.offsets(n)+1):source.bas.offsets(n+1);
+        dim=prod(source.comp.mults(source.chem.parts{n}));
+        P(idx,:)=P(idx,:)/dim;
+    end
+    Q=P\speye(size(P));
+
+    % Express caller-supplied Zeeman product superoperators in the compiler basis
+    for n=1:numel(source.chem.reactions)
+        reaction=source.chem.reactions{n};
+        if isfield(reaction,'selector')&&~ischar(reaction.selector{1})
+            subst=reaction.reactants(1);
+            idx=(source.bas.offsets(subst)+1):source.bas.offsets(subst+1);
+            if ~isequal(size(reaction.selector{1}),[numel(idx) numel(idx)])
+                error('Spinach:kinetics:selectorSize','selector matrices must have the reactant Liouville block dimensions.');
+            end
+            for k=1:2
+                reaction.selector{k}=Q(idx,idx)*reaction.selector{k}*P(idx,idx);
+            end
+            source.chem.reactions{n}=reaction;
+        end
+    end
+
+    % Transform fixed maps once and state-dependent maps at each stage state
+    K=kinetics(source,mode);
+    if isnumeric(K)
+        K=P*K*Q;
+    else
+        zeeman=spin_system; zeeman.bas.formalism='zeeman-liouv';
+        zeeman.bas.nstates=source.bas.nstates; zeeman.bas.offsets=source.bas.offsets;
+        K=@(t,eta)zeeman_gen(zeeman,K,P,Q,t,eta);
+    end
+    if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+        K=@(t,rho)hilb_action(spin_system,K,t,rho);
+    end
+    return
 end
 
 % Compile immutable maps and selector products outside the time-step loop
@@ -118,6 +167,19 @@ end
 
 end
 
+% Transform the shared reaction generator independently in every voxel
+function K=zeeman_gen(spin_system,generator,P,Q,t,eta)
+
+% Validate the physical state and determine its spatial multiplicity
+concs=chem_concs(spin_system,eta); nvoxels=size(concs,1);
+source=Q*reshape(eta,size(Q,1),nvoxels);
+
+% Apply the direct-sum basis transformation on both sides of the map
+K=generator(t,source(:));
+K=kron(speye(nvoxels),P)*K*kron(speye(nvoxels),Q);
+
+end
+
 % Assemble polynomial drains and product-row fills at each stage state
 function K=assemble(spin_system,reactions,t,eta)
 
@@ -188,11 +250,12 @@ if ~isempty(spin_system.chem.reactions)&&strcmp(spin_system.bas.formalism,'zeema
     error('Spinach:kinetics:wavefunction',...
           'chemical reactions are not supported in zeeman-wavef formalism.');
 end
-if ~isempty(spin_system.chem.reactions)&&~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('Spinach:kinetics:formalism','reaction records currently require sphten-liouv formalism.');
-end
 for n=1:numel(spin_system.chem.reactions)
     reaction=spin_system.chem.reactions{n};
+    if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&numel(reaction.reactants)>1
+        error('Spinach:kinetics:hilbertMassAction',...
+              'mass-action chemistry is not supported in zeeman-hilb formalism.');
+    end
     if isfield(reaction,'selector')&&ischar(reaction.selector{1})&&...
        any(spin_system.comp.mults(reaction.selector{2})~=2)
         error('Spinach:kinetics:selectorSpin','named singlet/triplet selectors require two spin-half electrons.');

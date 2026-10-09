@@ -26,7 +26,7 @@ The kernel entry point constructs the `spin_system` object used by the rest of S
 
 ## Couplings, decoupling, and guards
 
-`inter.ignore` is specifically a coupling drop list: for each listed pair the source clears both `{i,j}` and `{j,i}` entries after assembly. It does not remove spins or other interaction families. Pair couplings below the configured cutoff are cleared; couplings involving multiplicity-one ghost spins are also cleared. A populated coupling between different chemical subsystems is rejected.
+`inter.ignore` is specifically a coupling drop list: for each listed pair the source clears both `{i,j}` and `{j,i}` entries after assembly. It does not remove spins or other interaction families. Pair couplings below the configured cutoff are cleared; couplings involving multiplicity-one ghost spins are also cleared. A populated coupling between different chemical subsystems is rejected with `Spinach:create:crossSubstanceCoupling`.
 
 Field validation is delegated substantially to `grumble` and the helper routines. The source checks the required isotope/magnet inputs and applies field-specific checks for modes, tensors, coordinates and periodic boundaries, chemistry, relaxation, recombination, and ignore-pair indices. In particular, damped bosonic modes require an explicit `inter.temperature`; bosonic particle combinations are restricted for mode couplings and modulation; and an unconsumed system option is an error. This function assembles the model specification; it does not solve an eigenfield problem or compute numerical derivatives.
 

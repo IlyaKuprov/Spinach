@@ -1112,7 +1112,8 @@ for n=1:numel(spin_system.chem.parts)
         if (n~=k)
             coupling_block=spin_system.inter.coupling.matrix(spin_system.chem.parts{n},spin_system.chem.parts{k});
             if ~all(cellfun(@isempty,coupling_block(:)))
-                error('couplings detected between spins in different chemical species.');
+                error('Spinach:create:crossSubstanceCoupling',...
+                      'couplings detected between spins in different chemical species.');
             end
         end
     end

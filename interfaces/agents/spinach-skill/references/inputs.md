@@ -548,3 +548,6 @@ removes each unit independently and converts level populations per substance;
 Local manual columns and global numeric filter labels are reindexed; empty
 substances keep their unit coordinate. Symmetry and Hamiltonian assumptions
 are cleared, so reapply `assume` before constructing a Hamiltonian.
+
+Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
+product operators and states raise `Spinach:which_subst:crossSubstance`.

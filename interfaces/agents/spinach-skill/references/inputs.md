@@ -561,12 +561,8 @@ are cleared, so reapply `assume` before constructing a Hamiltonian.
 Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
 product operators and states raise `Spinach:which_subst:crossSubstance`.
 
-Legacy `kinetics` remains available for single-substance flux and radical-pair
-models. Nonzero multi-substance chemistry is explicitly rejected until the
-reaction-record implementation; absent chemistry gives the direct-sum zero.
-`react_gen` uses the single local descriptor and rejects multi-substance calls
-with `Spinach:react_gen:segmentedChemistry`, rather than reading the retired
-global matrix.
+Chemistry uses explicit `chem.reactions` records through `kinetics` and
+`react_gen`; retired rates, flux, and radical-pair fields are rejected.
 
 Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
 block must use `none`, as enforced by `basis`.
@@ -644,3 +640,7 @@ For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B`
 Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_network`, and `cidnp_transport`; their corresponding registered tests cover mass action, the two closures, selective loss, and integrated nuclear product arrival.
 
 Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.
+
+### Spatial two-stage chemistry
+
+`reacting_flow_nmr` traces all spins with `kill_spin` for its concentration-only stage: the resulting five unit blocks include the spin-free solvent, and the same reaction records generate both concentration and spin transport. Its frozen-rate stepping workflow and `makima` history are retained, but equal sharing of product unit arrival changes finite frozen concentration steps relative to the old asymmetric generator; do not claim numerical history equivalence from the equal instantaneous mass-action derivative. In the NMR stage, history values are placed into voxel unit coordinates before evaluating `K(t,eta)`; additive closure then depends only on those coordinates, not the spin orders. The actual propagated state includes unit populations, while detection and reference longitudinal vectors use `coil_state`. The solvent is not excited or detected.

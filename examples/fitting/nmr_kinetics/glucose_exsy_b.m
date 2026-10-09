@@ -30,11 +30,9 @@ answer=fminsearch(@exsy_err,guess,options);
 % Display the result
 disp(answer);
 
-% Save figure
-savefig(gcf,'glucose_exsy_b.fig');
-
 end
 
+% Fitting error functional
 function err=exsy_err(params)
 
 % Hush up Spinach

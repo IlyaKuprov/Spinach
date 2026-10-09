@@ -34,6 +34,7 @@ disp(answer);
 
 end
 
+% Fitting error functional
 function err=exsy_err(params)
 
 % Hush up Spinach

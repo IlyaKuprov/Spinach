@@ -3,6 +3,14 @@
 % exact zero frequency where the unit states used to make the linear
 % solve singular. The slowpass spectrum must be finite on the whole
 % grid and must agree with the FFT of the acquired FID at the peaks.
+% Also checks spatial embedding, selective reaction coupling, and the
+% unchanged wavefunction resolvent. Syntax:
+%
+%                    result=test_slowpass_unit_states()
+%
+% Outputs:
+%
+%     result  - regression test result with explanatory messages
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -44,9 +52,7 @@ result=test_true(result,'slowpass finite on a grid containing zero frequency',..
                  all(isfinite(spectrum_slow)),...
                  'stationary unit states must not make the frequency domain solve singular');
 
-% Amplitude parity at the zero-frequency bin and at the second
-% resonance; the FFT of a truncated FID carries a constant base-
-% line of half the first point, which bounds the absolute error
+% Compare the peaks allowing for the discrete-transform baseline
 zero_idx=parameters.npoints/2+1;
 second_frq=1e-6*inter.zeeman.scalar{2}*spin_system.inter.basefrqs(2)/(2*pi);
 [~,second_idx]=min(abs(frq_axis-second_frq)); baseline=abs(fid(1))/2;
@@ -107,7 +113,6 @@ spectrum_wf=slowpass(spin_system,parameters,sparse(diag([1 -1])),-speye(2),spars
 reference=3./(1+1i*(1+2*pi*linspace(-1,1,3)'));
 result=test_close(result,'wavefunction resolvent',spectrum_wf,reference,1e-12,1e-12,...
                   'wavefunction inputs have no Liouville identity sector to remove');
-
 
 end
 

@@ -13,7 +13,3 @@ The model uses secular Redfield relaxation, zero equilibrium, and `tau_c = 20e-9
 The source acquires a liquid-state NMR signal, applies Gaussian apodisation with parameter `6`, Fourier transforms it, and plots the real spectrum. It then rebuilds the system after clearing both proton coordinates and repeats the acquisition; the source describes this comparison as removing proton dipolar relaxation. These are simulated spectra, not measurements.
 
 Source: [examples/relaxation_theory/trosy_double.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_double.m).
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

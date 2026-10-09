@@ -11,7 +11,3 @@ The six-slice Cartesian waveform is `2π×25 kHz` times x-coefficients [−1, 1,
 ## Simulated observables
 
 The source propagates both the initial and optimised durations with `step`. For each, it applies a 90° `Ly` readout rotation, simulates 13C acquisition with `liquid`/`acquire`, applies Gaussian apodisation (parameter 10), zero-fills to 16384 points, and forms the shifted FFT on an inverted Hz axis. The script plots initial and optimised spectra side by side and prints the duration vectors in microseconds. The DOI and the source comment's “slightly better” design motivation are retained, but the file contains no numerical improvement or experimental validation; none is asserted here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

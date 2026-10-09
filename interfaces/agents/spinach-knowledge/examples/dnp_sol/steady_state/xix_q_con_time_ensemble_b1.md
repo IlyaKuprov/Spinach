@@ -21,7 +21,3 @@ The basis is `sphten-liouv` with `approximation='none'`; the propagator chop tol
 ## Calculation and output
 
 The proton detector is `coil_state(spin_system,'Lz','1H','exact')`. Each field/contact-time point is evaluated by `powder(spin_system,@xixdnp_steady,localpar,'esr')`; the resulting signal is reduced over B1 using the quadrature weights. The function plots the real proton (L_z) expectation value against total contact time in μs and saves `xix_q_con_time_ensemble_b1.fig`. It returns no explicit MATLAB output. The source comment estimates calculation time as hours; this is not a measured runtime here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

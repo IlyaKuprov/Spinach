@@ -18,7 +18,3 @@ The sequence assignments are offset 2460, sweep 600, acquisition sizes [512, 512
 The two-dimensional FID is apodised with square-sine windows in both dimensions, transformed with a zero-filled 2D FFT, and plotted as its magnitude. The source header estimates minutes on an NVIDIA Tesla A100 and says CPU execution takes much longer; this is the source's estimate, not a run result.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

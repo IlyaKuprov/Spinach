@@ -17,7 +17,3 @@ The single-dimensional acquisition uses offset `2328`, sweep `3500`, `4096` poin
 This is a single liquid-state spectrum calculation: it does not propagate reaction kinetics or a spatially varying signal.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

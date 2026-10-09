@@ -17,7 +17,3 @@ It samples 120 ¹H irradiation settings from 20e3 to 80e3, holding the ¹⁵N ir
 This is a computed final-contact signal-versus-power curve, not an experimental spectrum or a validation result. `cp_contact_hard` returns the coil expectation before contact and after each of ten 40 µs slices: eleven points per setting, with `fid(end)` at 400 µs. No further sequence internals are inferred here. The source header estimates calculation time as seconds; that is a source comment, not a timed run in this note.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_1.m
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

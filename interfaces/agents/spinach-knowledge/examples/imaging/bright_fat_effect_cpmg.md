@@ -17,7 +17,3 @@ The basis uses `sphten-liouv` with no approximation, and path tracing is disable
 The sequence uses `parameters.spins={'1H'}`, no decoupling, zero offset, 48 pulses and `dec_time=80e-3`. The source does not specify a unit for `dec_time`. Sample geometry is `dims=[0.30,0.25]` on `npts=[100,200]`, with derivative setting `{'period',3}`. It loads `left` and `right` from `../../etc/phantoms/bright_fat_left.mat` and `../../etc/phantoms/bright_fat_right.mat`, uses phantom initial states `{1-left,1-right}` and Lz states for the two three-spin groups, and detects the 1H Lx state with a uniform coil phantom. Flow fields `u` and `v` are zero and `diff=0`.
 
 The simulation call is `imaging(spin_system,@cpmg_dec,parameters)`. The source plots `surf(abs(mri))`, reverses the X direction, and labels the axes in pixels. No numerical image result is stated in the source page.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

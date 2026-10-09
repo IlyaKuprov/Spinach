@@ -17,7 +17,3 @@ Every offset/B1 point calls `powder(spin_system,@topdnp_steady,parameters,'esr')
 ## Output and limits
 
 The result is averaged over B1 weights and then distance weights with radial Jacobian `r^2`. Each curve plots the real proton `I_z` expectation against microwave offset; the 3-D axes are nutation frequency, offset, and steady-state expectation. The figure is saved as `top_q_nutation_ensemble_b1_r.fig`. The source estimates minutes of calculation; no numeric results table is written.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

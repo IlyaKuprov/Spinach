@@ -22,7 +22,3 @@ Exponential apodisation uses parameter `5`; the FID is Fourier-transformed with 
 The source describes brute-force Liouville-space time propagation and warns of 32+ CPU cores, 128+ GB RAM, a strong FP64-capable Nvidia GPU, and a run time of hours.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

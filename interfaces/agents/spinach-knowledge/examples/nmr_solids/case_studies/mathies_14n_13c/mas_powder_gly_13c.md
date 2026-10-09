@@ -13,7 +13,3 @@ The script reads CASTEP data from glycine.magres, removes H and O atoms, and ret
 The script computes fields of 4.7, 9.4, and 14.1 Tesla, as stated in its plot legend. It sets the MAS rate parameter to 10000 without stating a unit, uses the rep_2ang_200pts_sph grid and maximum rank 5, and configures 128 acquired points with zero-fill to 1,024. The sweep is 200 times the field; the source comments that this is unchanged in ppm. Numerical rotating-frame transforms are set for ¹³C harmonic 1 and ¹⁴N harmonic 2. No RF pulse or CP-contact sequence is specified; ¹H decoupling is the stated simulation assumption.
 
 At each field, the initial state and receiver coil are ¹³C L+. A single-rotor acquisition is run in the lab-frame mode, followed by exponential apodisation with parameter 6 and a Fourier transform. The plotted real spectra are overlaid and labelled 4.7, 9.4, and 14.1 Tesla. This is a field-dependent simulation; the only explicitly identified experimental inputs are the two isotropic shift values.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

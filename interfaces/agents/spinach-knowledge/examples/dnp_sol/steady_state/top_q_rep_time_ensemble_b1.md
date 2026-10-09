@@ -21,7 +21,3 @@ The source sets `inter.relaxation={'t1_t2'}`, callback `r1n_dnp(sys.magnet,inter
 ## Output and limits
 
 Plots the real part of proton `I_z` expectation against repetition time in ms and saves `top_q_rep_time_ensemble_b1.fig` in the MATLAB current folder; no separate numerical data file is saved. TOP steady-state dynamics are delegated to `topdnp_steady`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

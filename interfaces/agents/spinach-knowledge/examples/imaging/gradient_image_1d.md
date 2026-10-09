@@ -11,7 +11,3 @@ The sample uses `dims=0.30`, 100 points and `{'period',3}` differentiation. The 
 ## Output and interpretation
 
 The imaging result is square-sine apodised, then transformed with a centred 1D FFT; the real spectrum is passed to `plot_1d`. The source gives the display axis unit (`kHz`), but does not label the gradient amplitude, flow, diffusion, or geometry units. It specifies the hard-pulse sequence helper but no independent RF amplitude or duration.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

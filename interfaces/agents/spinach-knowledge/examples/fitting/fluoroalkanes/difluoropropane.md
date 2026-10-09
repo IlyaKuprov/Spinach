@@ -21,7 +21,3 @@ The initial vector is `[0.3023 1.1605 0.7390 47.0061 5.7870 25.7705]`. Parameter
 The three non-decoupled liquid acquisitions declare ppm axes and reverse their direction. The 19F sequence sets offset `-105059`, sweep `600`, 2048 points, and zero filling to 4096; 1H A sets offset `2300`, sweep `128`, 512 points, and zero filling to 1024; 1H B sets offset `1050`, sweep `300`, 1024 points, and zero filling to 2048. The source does not label the numeric offset units. The FIDs receive exponential apodisation with source values `8.0`, `9.0`, and `6`; each spectrum is Fourier transformed, reversed to match the axis convention, and interpolated onto its experimental axis with `pchip`. Each objective evaluation plots all three experiment/simulation comparisons and displays the trial vector; the final vector is displayed after optimisation.
 
 The entry point has no output argument, and source code alone supplies no measured best-fit result, uncertainty estimate, or validation claim.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

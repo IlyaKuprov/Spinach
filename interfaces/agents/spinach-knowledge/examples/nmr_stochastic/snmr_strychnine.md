@@ -12,7 +12,3 @@ This Primas-style example simulates a stochastic proton NMR trajectory for stryc
 Two independent uniform random control arrays, Cx and Cy, are formed as 100 rad/s × (2 rand − 1), so their values lie in [−100, +100] rad/s. With dt = 10 μs and 10,000 steps, the state is propagated for 0.1 s using the NMR Hamiltonian, relaxation superoperator and the two 1H transverse control operators. The code places the state, operators and trajectory on GPU arrays, then gathers the trajectory and computes the signal with the 1H L+ receiver. The right-hand plot shows its real and imaginary parts; the left-hand plot shows the two control tracks.
 
 No pulse sequence, spatial gradient, chirp or field-drop schedule is specified. The source comments say a Titan V GPU is required at minimum and estimate minutes, but those hardware and runtime statements are not validation results. The explicit GPU-enable setting is commented out even though the code subsequently uses `gpuArray`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

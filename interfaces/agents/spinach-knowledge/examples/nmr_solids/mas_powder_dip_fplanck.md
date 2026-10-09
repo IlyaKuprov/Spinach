@@ -11,7 +11,3 @@ The basis is spherical-tensor Liouville space with no approximation and projecti
 ## Signal and display
 
 The initial state and coil are the proton `L+` state. The acquisition has 512 points, a sweep setting of 2e4, and zero filling to 4096. The resulting FID receives exponential apodisation parameter 6, is Fourier transformed with `fftshift`, and its real spectrum is plotted by `plot_1d`. This is the calculated spectrum from the model settings; the source does not present it as an experimental measurement.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

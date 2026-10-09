@@ -17,7 +17,3 @@ For each T1, `gaussleg(3.5,20,3)` supplies four distance nodes over 3.5–20 Å;
 Run from a Spinach MATLAB environment with `gaussleg`, `powder`, and the usual Spinach system/basis/state and plotting functions available. The steady-state experiment is supplied by [`xixdnp_steady`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/xixdnp_steady.m); unlike its T2e/T2n siblings, this file does not call `r1n_dnp`. The source file is [`xix_q_con_time_ensemble_r_T1n.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_con_time_ensemble_r_T1n.m).
 
 The no-argument function returns no MATLAB output. It plots the real part of the distance-averaged proton `Lz` expectation value against contact time and saves `xix_q_con_time_ensemble_r_T1n.fig` in the current directory. The plotted family differs only by nuclear T1; the four-node distance quadrature and remaining model/protocol settings stay fixed.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

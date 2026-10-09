@@ -17,7 +17,3 @@ The model has ten `1H` and two `19F` spins at `sys.magnet=11.7464`, with a Zeema
 ## Entry point and output
 
 Run `syn_difluoropentane()` with all three MAT files available. The objective is the unweighted sum of squared residual norms over the three spectra. The function returns no declared output; it displays the parameter vector and produces three reversed-ppm panels comparing experiment and simulation. No fitted numerical outcome, uncertainty estimate, or success criterion is given in the source. The source does not attach units to its Gaussian apodisation arguments.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

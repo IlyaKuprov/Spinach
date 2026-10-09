@@ -17,7 +17,3 @@ The basis is `sphten-liouv` without approximation; propagator chopping tolerance
 ## Output and limits
 
 Each setting is averaged over distance using the quadrature weights and radial Jacobian `r^2`. The real proton `I_z` expectation is plotted against total contact time, with curves labelled TOP, 18 MHz and TOP, 33 MHz, and saved as `top_q_con_time_ensemble_r.fig`. The source estimates hours of calculation; only a figure is saved, not a numeric results table.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

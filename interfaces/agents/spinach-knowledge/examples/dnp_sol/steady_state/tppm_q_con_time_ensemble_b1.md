@@ -15,7 +15,3 @@ The TPPM calculation starts with irr_powers=33e6 Hz, which is replaced at each B
 ## Result and scope
 
 B1-node results are combined with the Gauss–Legendre weights and normalised. The figure plots the real part of the proton Lz expectation value against 2*pulse_dur*loop_counts in microseconds and saves tppm_q_con_time_ensemble_b1.fig. The source describes the calculation as taking hours. It is a finite six-node B1 quadrature at one fixed separation; the function saves a figure, not a separate numerical data file. The source does not state units for the magnet, spin temperature, relaxation-rate entries, addshift, or el_offs.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

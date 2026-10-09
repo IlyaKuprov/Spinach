@@ -17,5 +17,3 @@ The full `sphten-liouv` basis is used (`bas.approximation=none`). The initial st
 The source header estimates a calculation time of seconds; this is not a measured runtime. The source defines a simulation and plotting procedure but supplies no numerical spectrum or fitted exchange result, so no line positions, intensities, or fit outcomes are asserted.
 
 Exchange is declared as two first-order reaction records with explicit reciprocal spin matching. Preparation is concentration weighted; detection uses unweighted `coil_state`. Rates and equilibrium concentration ratios are unchanged.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

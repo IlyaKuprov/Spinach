@@ -14,7 +14,3 @@ The pair comprises two 1H spins with scalar Zeeman entries 5.0 and -2.0 and coor
 ## Acquisition and processing
 
 The 1H channel starts from and detects `L+`, with no decoupling. Acquisition uses offset 1000, sweep 12000, 128 points, and zero filling to 512. The display axis is configured in ppm; units for offset and sweep are not stated. The FID is exponentially apodised with parameter 6, Fourier transformed with the specified zero fill, and plotted as its real part.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -29,5 +29,3 @@ The source projects the post-echo state onto an unweighted `coil_state` vector, 
 
 - [Spinach documentation: `epi_3d.m`](https://spindynamics.org/wiki/index.php?title=epi_3d.m).
 - [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/epi_3d.m).
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

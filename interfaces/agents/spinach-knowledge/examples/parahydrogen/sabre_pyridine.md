@@ -17,7 +17,3 @@ The model starts with a singlet on spins 6–7 at 25 mT and evolves the coupled 
 ## Detection and interpretation
 
 A proton `pi/2` pulse about y is followed by a simulated FID with 1024 samples, zero-filled to 4096 and exponentially apodised with factor 6 before Fourier transformation. The code sets `offset=2400`, `sweep=600`, and `axis_units='kHz'`; the two numeric acquisition settings are not given units in the source, so they are left as source values rather than relabelled. The plotted spectrum is a calculated signal from the idealised model, not an experimental hyperpolarisation measurement; apodisation is not a relaxation model.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -25,5 +25,3 @@ The supplied high-resolution example uses image_size [129 129], 32 mT/m for slic
 - [Spinach Wiki: phase_enc_3d.m](https://spindynamics.org/wiki/index.php?title=phase_enc_3d.m)
 - [Canonical MATLAB source: experiments/imaging/phase_enc_3d.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/phase_enc_3d.m)
 - [Example configuration: ph_enc_3d_highres.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/extremes/ph_enc_3d_highres.m)
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

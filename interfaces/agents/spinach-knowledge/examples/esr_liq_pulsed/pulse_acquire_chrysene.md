@@ -19,7 +19,3 @@ The initial state uses **state(spin_system,'L+','E')**; **E** is detected and de
 ## Dependencies and limits
 
 Requires the relative standard-system log, Spinach **gparse**/**g2spinach** import helpers, and system/basis/state, liquid ESR/acquire, apodisation, FFT, and plotting routines. The source cites no paper DOI. It specifies no pulse shape or duration, so do not infer timing or RF details from the pulse-acquire label; the implemented acquisition is the **@acquire** call. The source values for field, damping, offset, and sweep carry no inline units; the axis-unit setting is explicit.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

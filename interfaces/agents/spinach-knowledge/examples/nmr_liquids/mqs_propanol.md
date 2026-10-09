@@ -12,7 +12,3 @@ A simulated multiple-quantum NMR experiment for the source's seven-proton propan
 The initial state is proton `Lz` and the detected state is proton `L+`. The sequence parameters set an angle of `pi/2`, offsets `[1200 1200]`, sweeps `[6000 2700]`, 512 points and 2048 zero-filled points in each dimension, two 1H dimensions, and kHz axis units. The offset and sweep units are not stated in the source. The selected coherence order is +3.
 
 The `@mqs` liquid-NMR sequence is simulated at three tau delays: 0.0333, 0.0710, and 0.5000 s. Each 2D FID is sine-apodised in both dimensions, transformed with a zero-filled 2D FFT, and displayed as an absolute-value spectrum. Thus the three panels compare the selected +3 coherence response across tau; the source does not supply experimental intensities or a fitted transfer rate. No DOI is cited.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

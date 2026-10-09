@@ -13,7 +13,3 @@ Slice selection is set by a phase of `pi/2` and 50 pulse steps over `2.0e-4` tot
 ## Output and interpretation
 
 The script first plots the 3D `R1` phantom, then calls `imaging(spin_system,@phase_enc_3d,parameters)` for slice data. It displays the raw data as `fid.^(1/4)` in k-space, applies square-sine apodisation in both dimensions, computes `real(fftshift(fft2(ifftshift(fid))))`, and displays the reconstructed 2D slice. The transformed display is a 2D slice result, not a 3D Fourier reconstruction.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

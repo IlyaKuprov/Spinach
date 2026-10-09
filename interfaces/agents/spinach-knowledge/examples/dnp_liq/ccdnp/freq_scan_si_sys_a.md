@@ -9,7 +9,3 @@ The three spins are 1H, E, E. Proton Zeeman eigenvalues are [0 10 20]; the elect
 The model uses sphten-liouv with no approximation and Redfield relaxation with zero equilibrium, secular retention, temperature 298, correlation time 100e-12 (commented as TEMPOL in water), and relaxation-integration tolerance 1e-10. Electron irradiation uses mw_pwr=2*pi*1e6, method lvn-backs, and needs={'rho_eq'}; the reference g value is the mean of electron 1's g eigenvalues. The offset grid is 2*pi*linspace(-10,30,512)*1e6, wider than the main-text example's range; the field grid is linspace(1,20,128) Tesla. Each field's frequency trace is computed via liquid(...,@dnp_freq_scan,...,'esr') and normalised by coil'*rho_eq.
 
 The figure plots the real normalised response against field and microwave-frequency offset, converted to MHz relative to the isotropic electron-1 g reference. No data array is written. Unlike the main-text parameterisation, this SI file sets the electron g tensors near 1.978, exchange to 6.2e6, and scans offsets from -10 to 30 MHz; use this file when the system-A parameter set, rather than the main-text set, is intended. The source's “Calculation time: seconds” is an estimate, not a reproduced runtime.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

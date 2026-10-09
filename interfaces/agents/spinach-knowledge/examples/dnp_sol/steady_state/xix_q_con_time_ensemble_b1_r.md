@@ -21,7 +21,3 @@ At each distance and B1 node the function scans `nloops=1:64`. XiX uses a 48 ns 
 ## Calculation and output
 
 The proton detector is `coil_state(spin_system,'Lz','1H','exact')`; each scan point is computed with `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The code first averages over B1 using its quadrature weights, then averages over distance using weights multiplied by the radial (r^2) Jacobian and normalises by the weighted (r^2) sum. It plots the real proton (L_z) expectation value against total contact time in μs and saves `xix_q_con_time_ensemble_b1_r.fig`; there is no explicit MATLAB return value. The source comment estimates hours of calculation time, not a measured runtime here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

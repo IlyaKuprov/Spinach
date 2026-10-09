@@ -25,7 +25,3 @@ The 64-point correlation-time grid runs from `50e-12` to `500e-12` (the plot lab
 ## Output and limits
 
 The three panels make the 12 plotted states explicit: panel 1 contains `E1+ + 2 E1+E2z`, `E1+ - 2 E1+E2z`, `E2+ + 2 E1zE2+`, and `E2+ - 2 E1zE2+`; panel 2 contains `2 NzE1+`, `2 NzE2+`, `4 NzE1+E2z`, and `4 NzE1zE2+`; panel 3 contains `2 NzE1z`, `2 NzE2z`, `4 NzE1zE2z`, and `Nz`. Each curve is the absolute value of its corresponding result entry, plotted as steady-state amplitude in arbitrary units against correlation time in ps. The function does not return the result array or save a data file; the source only creates the figure. It samples the specified single model and fixed microwave setting, not a frequency or field map. Numerical curves have not been reproduced here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

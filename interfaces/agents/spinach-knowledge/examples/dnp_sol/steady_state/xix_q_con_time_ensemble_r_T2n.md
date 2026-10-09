@@ -17,7 +17,3 @@ Each curve scans XiX loop counts 1–64. Pulses are 48 ns, with `phase=pi` for t
 Requires Spinach MATLAB functions including `gaussleg`, `powder`, and system/basis/state and plotting routines; also requires [`r1n_dnp`](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/r1n_dnp.m) and the steady-state sequence [`xixdnp_steady`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/xixdnp_steady.m). The mapped source is [`xix_q_con_time_ensemble_r_T2n.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_sol/steady_state/xix_q_con_time_ensemble_r_T2n.m).
 
 The no-argument function returns no MATLAB output. It plots the real proton `Lz` expectation value after distance averaging and saves `xix_q_con_time_ensemble_r_T2n.fig` in the current directory. Only nuclear T2 varies among the five curves; the electron R2 entry, nuclear R1 model, distance quadrature, and pulse protocol are shared.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

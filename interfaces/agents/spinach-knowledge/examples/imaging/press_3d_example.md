@@ -23,7 +23,3 @@ Unlike the 1D and 2D examples, this file calls imaging with press_voxel_3d only.
 [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/press_3d_example.m) · [Voxel diagnostic](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_voxel_3d.m)
 
 The source credits Ahmed Allami and Ilya Kuprov.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

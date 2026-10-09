@@ -15,7 +15,3 @@ The TPPM parameters are spins={E,1H}, electron nutation frequency 33e6 Hz, pulse
 ## Result and scope
 
 The saved figure, tppm_q_con_time_single.fig, plots the real proton Lz expectation value against total contact time 2*pulse_dur*loop_counts in microseconds. The function does not save a separate numerical data file. This is a single geometry and single B1 setting, not an ensemble calculation. The source does not label the coordinate unit in this file, and it does not state units for magnet, temperature, relaxation-rate entries, addshift, or el_offs.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

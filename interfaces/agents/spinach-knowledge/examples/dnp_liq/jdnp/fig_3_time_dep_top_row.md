@@ -15,7 +15,3 @@ Run with MATLAB and Spinach, the JDNP helper, and Spinach plotting routines avai
 ## Output and limits
 
 It opens a 1-by-3 figure with time in seconds and one panel per field; the time grid runs from zero through t_step*nsteps (301 samples). It plots normalised real proton Lz expectation values and does not save/export data. The helper supplies the starting system and parameters; the source does not list all helper defaults. The file's intended “vanishing JDNP” comparison has not been independently validated here, and mw_pwr has no unit stated in the source.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

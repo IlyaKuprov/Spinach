@@ -23,7 +23,3 @@ The simulation calls `imaging` with `epi_2d`. Before plotting, the code halves `
 [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/echo_planar_2d.m)
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

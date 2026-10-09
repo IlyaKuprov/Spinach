@@ -19,7 +19,3 @@ The initial state uses **state(spin_system,'L+','E')**; detected spin is **E** a
 ## Dependencies and limits
 
 Requires Spinach system/basis/state, liquid ESR/acquire, apodisation, FFT, and plotting routines; all spin-system values are in the function, with no external log input. The source describes explicit time propagation in Liouville space and full **S2xS2xS2xS2xS2xS2** direct-product symmetry. It supplies no DOI or direct URL for the EasySpin test it references. No pulse shape or duration is defined; the implemented sequence path is **@acquire** through liquid ESR. Numeric settings are transcribed from the source without inferred physical units.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

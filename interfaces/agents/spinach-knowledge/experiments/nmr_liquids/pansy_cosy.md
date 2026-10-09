@@ -20,5 +20,3 @@ The F1 trajectory contains `npoints(1)` states. The output fields are two-dimens
 - [PANSY paper](https://doi.org/10.1016/j.pnmrs.2021.03.001)
 - [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/pansy_cosy.m)
 - [Spinach Wiki: pansy_cosy.m](https://spindynamics.org/wiki/index.php?title=pansy_cosy.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

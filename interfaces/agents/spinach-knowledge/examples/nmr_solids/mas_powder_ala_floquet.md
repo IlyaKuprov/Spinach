@@ -11,7 +11,3 @@ The basis is sphten-liouv with approximation none, longitudinal 15N, and project
 ## Calculation and displayed signal
 
 The initial state and receiver are both 13C L+. The example calls floquet with @acquire in nmr mode, applies exponential apodisation with parameter 6, Fourier transforms the FID with the 1024-point zero-fill, shifts the spectrum, and plots its real part with plot_1d. The source comment estimates a calculation time of minutes; it does not report a measured spectrum or a separate validation result. No DOI is supplied in the source or the inspected page baseline.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

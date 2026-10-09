@@ -25,5 +25,3 @@ The implementation requires the `sphten-liouv` formalism and matrix-valued `H`, 
 ## Output
 
 `fid` has four fields: `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg`, the paired coherence-sign components for States quadrature. Each stitched 3D array is permuted with `[3 2 1]`, so its dimension order is `[t3,t2,t1]` (nominal extents `[npoints(3),npoints(2),npoints(1)]`); the corresponding frequency labels are H, CO, and N.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -21,5 +21,3 @@ The code evolves the NOESY t1 period with nitrogen decoupled, explicitly branche
 ## Output
 
 The four fields `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg` are used for subsequent States quadrature processing. Each sampled three-dimensional FID is permuted by the source to [t3 t2 t1], i.e. array dimensions `[npoints(3), npoints(2), npoints(1)]`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

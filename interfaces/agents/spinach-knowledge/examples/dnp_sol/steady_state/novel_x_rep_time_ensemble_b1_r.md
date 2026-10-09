@@ -25,7 +25,3 @@ The source uses Spinach system construction and propagation functions `create`, 
 ## Output and scope
 
 The saved figure `novel_x_rep_time_ensemble_b1_r.fig` plots the real proton longitudinal expectation value against repetition time, with separate curves for no flipback and flipback. It depicts this specified pair, relaxation model, and finite distance/B1 quadratures; it is not a result independent of those choices. The code uses `parfor` over repetition times and does not configure a worker count.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -22,7 +22,3 @@ The calculation is `powder(spin_system,@dnp_field_scan,parameters,'esr')`. The r
 ## Result and scope
 
 The no-argument function creates a field-profile plot and does not declare a MATLAB return value. Its output is tied to the specified two-spin model, relaxation settings, single electron drive setting, 512-point field grid, and spherical powder grid; the source gives no numerical spectrum in the file. It depends on Spinach and its `dnp_field_scan`, steady-state, and powder-averaging routines.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

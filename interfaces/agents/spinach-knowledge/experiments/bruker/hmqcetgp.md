@@ -33,5 +33,3 @@ The source recommends isotope dilution for natural-abundance simulations; see [d
 
 - [Standard HMQC sequence cited in the source](https://doi.org/10.1016/0022-2364(83)90241-X)
 - [Spinach documentation for hmqcetgp.m](https://spindynamics.org/wiki/index.php?title=hmqcetgp.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

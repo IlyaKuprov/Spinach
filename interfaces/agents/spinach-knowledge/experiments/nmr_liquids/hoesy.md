@@ -22,5 +22,3 @@ Starting from `rho0`, a +90° F1 x-pulse precedes the first half of sampled F1 e
 
 - [HOESY sequence reference](https://doi.org/10.1021/ja00353a071)
 - [HOESY sequence reference](https://doi.org/10.1039/C8CP00911B)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

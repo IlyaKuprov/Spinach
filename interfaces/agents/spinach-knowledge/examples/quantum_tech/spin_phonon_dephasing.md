@@ -16,7 +16,3 @@ At each trajectory point it projects the spin coherence `Lx` and the phonon disp
 ## Interpretation
 
 The plots illustrate modelled coherence modulation and spin-conditioned oscillator displacement under longitudinal coupling. The example supplies no measured parameters, stochastic bath, or defect-specific isotope selection, so the curves should not be read as measured NV-centre data or a prediction of device fidelity. Its “Calculation time: seconds” comment is not a runtime validation or convergence claim.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -16,7 +16,3 @@ The two controls are the 13C `Lx` and `Ly` operators on one channel, with the dr
 ## Simulated signal and output
 
 The resulting pulse is propagated with `shaped_pulse_xy(...,'expv-pwc')` from a 13C `Lz` state. The resulting state is used for a simulated liquid-state NMR FID with the 13C `L+` coil, zero offset, a 55,000-Hz sweep, 2,048 acquired points, and zero filling to 16,384 points. The axis is inverted and labelled in ppm; the FID is Gaussian-apodised with the source parameter 10, Fourier transformed, and plotted with reference lines at −96 and +96 ppm. The script specifies a design and simulated spectrum but supplies no reported excitation profile or numerical optimisation result, so no achieved performance should be inferred from the example alone.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

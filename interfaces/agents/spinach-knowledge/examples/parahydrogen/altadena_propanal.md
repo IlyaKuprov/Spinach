@@ -14,7 +14,3 @@ The model has six spin-1/2 protons at 7.05 T and uses the `sphten-liouv` formali
 The initial operator weights the two-spin longitudinal term for spins 1 and 4 by 1.0, the spin-1 longitudinal term by −0.5, and the spin-4 term by +0.5. A small 1H pulse of `pi/100` (1.8 degrees) converts part of the resulting order into a detectable transverse signal. `liquid` with `hp_acquire` computes the simulated free-induction signal; exponential apodisation (parameter 6), Fourier transformation, zero filling to 8192 points, and plotting produce the spectrum. Acquisition is set to a 500 Hz offset, 1000 Hz sweep, and 1024 acquired points, with the display axis in ppm and reversed orientation. The source comments estimate seconds of calculation time; this is a code comment, not a benchmark performed here.
 
 Source authors in the existing entry are Ronghui Zhou (hui@ufl.edu) and Ilya Kuprov (ilya.kuprov@weizmann.ac.il). No DOI or published hyperpolarisation measurement is given in this example. The result should therefore be read as an idealised simulated ALTADENA spectrum, not experimental evidence for a measured polarisation level.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

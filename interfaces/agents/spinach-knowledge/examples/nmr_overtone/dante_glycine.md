@@ -17,7 +17,3 @@ The magic-angle parameter is atan(sqrt(2)); the spectrum axis input is [sqrt(2/3
 The sequence uses average treatment, four periods, and two pulses. The source sets pulse amplitude to 2*pi*55e3/sin(theta), pulse duration to 10e-6, and RF-frequency input to 48e3; it selects 14N as the irradiated spin. The simulated spectrum is calculated with singlerot and overtone_dante, then multiplied by exp(-1i*2.12) before its real part is plotted with plot_1d.
 
 This is a single-spin nitrogen overtone DANTE calculation, not a proton-to-nitrogen cross-polarisation scan. The phase multiplication is part of the source's plotting workflow; it is not evidence of a fitted experimental phase.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

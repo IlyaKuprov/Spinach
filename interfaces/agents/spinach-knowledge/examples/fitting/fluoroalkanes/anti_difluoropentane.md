@@ -19,7 +19,3 @@ The twelve-entry starting vector is `[6.2155 23.8923 9.8426 2.4324 13.7379 36.42
 Three non-decoupled acquisitions use the source's ppm-axis and reversed-axis convention. The 19F sequence sets offset `-82646`, sweep `300`, 512 points, and zero filling to 2048; 1H A sets offset `2450`, sweep `180`, 256 points, and zero filling to 1024; 1H B sets offset `915`, sweep `150`, 256 points, and zero filling to 1024. The source does not label the numeric offset units. The FIDs are Gaussian-apodised (source values 7.0, 7.0, and 6.0), Fourier transformed, converted to simulated ppm axes, and interpolated onto the experimental axes with `pchip`. The objective evaluation plots the three experiment/simulation comparisons in stacked panels; the final fit vector is displayed.
 
 The function declares no output argument and the source reports no measured fit outcome, uncertainty, or fit-quality statistic. Numeric offsets are assigned in the acquisition setup, but no offset units are inferred here; the code explicitly sets `axis_units='ppm'`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

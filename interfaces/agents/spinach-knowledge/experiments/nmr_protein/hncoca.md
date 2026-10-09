@@ -26,5 +26,3 @@ The routine requires the `sphten-liouv` formalism and matching matrix dimensions
 ## Output
 
 `fid` contains `pos_pos`, `pos_neg`, `neg_pos`, and `neg_neg` for States quadrature. The four 3D arrays are permuted with `[3 2 1]`, giving dimension order `[t3,t2,t1]` and nominal extents `[npoints(3),npoints(2),npoints(1)]`; these correspond to H, CA, and N, respectively.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

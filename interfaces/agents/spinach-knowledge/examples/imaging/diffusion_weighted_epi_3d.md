@@ -15,7 +15,3 @@ Slice selection is represented explicitly by 50 Gaussian RF steps: total `pulse_
 ## Processing and caveats
 
 The example plots the phantom R1 map, runs `epi_3d`, halves the phase-encoding amplitude for the subsequent FOV/k-space display, and shows the fourth root of the acquired signal to improve fringe visibility. It then applies squared-sine apodisation in both dimensions, computes a shifted 2D Fourier transform, takes its real part, and plots the reconstructed image. The reconstruction is thus the example's 2D display of data from the 3D acquisition, not a claim of a separately validated volumetric reconstruction. Runtime is source-estimated, not benchmarked here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

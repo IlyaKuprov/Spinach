@@ -17,7 +17,3 @@ The imaging call runs st_ideal for each gradient amplitude. Acquisition uses a s
 ## Observable and comparison
 
 For each grid/stencil pair, the simulated intensities are normalised to the zero-gradient signal. The code computes the diffusion estimate from the logarithm of the nonzero-gradient signals divided by the Stejskal–Tanner factors, using the small-gradient duration and the delay corrected by one third of that duration. It plots the estimate against grid size with a reference line at 18 in units of 10⁻¹⁰ m²/s, and also plots elapsed time and the absolute difference between simulated attenuation and the ideal curve on a logarithmic scale.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -21,5 +21,3 @@ This idealised model does not represent finite RF amplitude, RF offset, Hartmann
 - [ROESY paper](https://doi.org/10.1016/0022-2364(85)90171-4)
 - [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/roesy.m)
 - [Spinach Wiki: roesy.m](https://spindynamics.org/wiki/index.php?title=roesy.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

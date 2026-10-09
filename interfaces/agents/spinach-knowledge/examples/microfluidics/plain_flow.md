@@ -19,7 +19,3 @@ The initial Lz profile is `2` in cells `140:160`, zero elsewhere; detection uses
 ## Scope
 
 The example transports one injected Lz profile through a prescribed COMSOL velocity field; chemical conversion is outside this model.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

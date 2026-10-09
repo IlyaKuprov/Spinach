@@ -15,7 +15,3 @@ The full `sphten-liouv` basis is used (`bas.approximation=none`). The function p
 ## Scope
 
 The source header estimates a calculation time of seconds; this is not a measured runtime. The file specifies a symmetric flux setup rather than a fitted exchange result, and it contains no numerical spectrum from which to report peak positions or intensities.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

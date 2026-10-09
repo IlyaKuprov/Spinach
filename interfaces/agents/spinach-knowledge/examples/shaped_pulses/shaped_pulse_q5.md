@@ -17,7 +17,3 @@ The waveform is read from q5_1000.pk as amplitude and phase samples. It uses 200
 The initial state is 1H Lz; the RF controls are Lx/Ly. Liquid-state acquisition uses a 5000 Hz sweep, 2048 points, zero filling to 16384 points, and a Hz axis. The FID is exponentially apodised with parameter 6 and Fourier transformed; the imaginary spectrum is plotted. No explicit spatial-gradient or homospoil stage or relaxation-superoperator construction appears in this script.
 
 The shaped_pulse_xy implementation cites DOI [10.1016/j.jmr.2004.08.017](https://doi.org/10.1016/j.jmr.2004.08.017). See [shaped_pulse_q5.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_q5.m) and [shaped_pulse_xy.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_xy.m).
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

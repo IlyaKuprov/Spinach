@@ -23,7 +23,3 @@ The two axes are 120 resonance offsets from `-100e6` to `100e6` and 30 electron 
 ## Output and scope
 
 The values fill a `numel(nutfrqs)` by `numel(offsets)` surface and are drawn as a 100-level filled contour: offset (MHz) horizontally, electron nutation frequency (MHz) vertically, and proton `I_z` expectation value by colour. The script plots the finite 120-by-30 grid; it does not save a separate numeric result file. Its TOP sequence settings and orientation grid remain fixed across that scan.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

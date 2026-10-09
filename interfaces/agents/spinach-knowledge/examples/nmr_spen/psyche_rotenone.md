@@ -16,7 +16,3 @@ The sequence uses zero offset, sweeps [100, 5000] Hz, acquisition sizes [32, 204
 After imaging, the script reshapes the first `5000/100` rows of the FID into a pure-shift FID, applies Gaussian apodisation with parameter 6, and computes a zero-filled 2D FFT of the full data and a 1D FFT of the reconstructed signal. It plots the 2D magnitude and the imaginary part of the 1D spectrum. The source header estimates hours of calculation and says a GPU is faster; GPU enablement is commented out in this example.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

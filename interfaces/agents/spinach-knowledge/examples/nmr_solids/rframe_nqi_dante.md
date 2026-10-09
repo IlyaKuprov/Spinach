@@ -14,7 +14,3 @@ The field parameter is 18.8 and the quadrupolar interaction is constructed as `e
 ## DANTE acquisition and processing
 
 The initial state is the 14N `Lz` state and the receiver is `L+`. The sequence parameters are pulse duration 1.2e-6, pulse amplitude 88e3, two pulses, and two periods. Acquisition uses sweep 2000000, 1024 points, zero-fill to 4096, and offset 2200; the frequency-axis units are explicitly set to Hz. The FID receives exponential apodisation with parameter 6, is Fourier transformed, and the plotted spectrum is its magnitude.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

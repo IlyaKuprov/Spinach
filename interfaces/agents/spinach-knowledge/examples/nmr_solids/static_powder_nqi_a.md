@@ -12,7 +12,3 @@ Two 14N spins are assigned separate quadrupolar interactions with `eeqq2nqi`: va
 ## Acquisition and processing
 
 The NMR acquisition selects 14N with offset 0, sweep 6e6, 512 acquired points, and 2048-point zero-fill. The frequency-axis setting is MHz and the axis is inverted. The initial and detection states are both 14N `L+`. The powder FID is exponentially apodised with parameter 6, Fourier transformed, and plotted using its real part.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

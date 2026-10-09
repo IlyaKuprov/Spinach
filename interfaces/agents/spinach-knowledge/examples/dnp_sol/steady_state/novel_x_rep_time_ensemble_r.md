@@ -25,7 +25,3 @@ The source uses Spinach system construction and propagation functions `create`, 
 ## Output and scope
 
 The figure `novel_x_rep_time_ensemble_r.fig` plots the real proton longitudinal expectation value versus repetition time for the two flipback conditions. It is the result of the stated four-node distance quadrature, not a single-pair result or an experimental curve. The source uses `parfor` across repetition-time points and does not set a worker count.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

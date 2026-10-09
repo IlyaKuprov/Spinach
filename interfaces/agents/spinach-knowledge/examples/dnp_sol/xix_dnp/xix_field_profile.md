@@ -21,7 +21,3 @@ The nominal offset array has 120 points spanning -150e6 to +150e6 Hz. The simula
 With Spinach available on the MATLAB path, call `xix_field_profile()`. It builds the system and basis, evaluates the powder-averaged XiX contact at each offset, and opens a plot of the final proton `I_z` expectation value versus nominal microwave offset. The function declares no return value; the profile is used locally for plotting. This is a one-dimensional offset profile at fixed nutation frequency and fixed sequence/system settings, rather than a two-parameter optimisation or a returned dataset.
 
 The calculation uses Spinach system/basis/state construction, the `xixdnp` sequence and `powder` ESR averaging, plus the Spinach plotting helpers. The offset loop uses MATLAB `parfor`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

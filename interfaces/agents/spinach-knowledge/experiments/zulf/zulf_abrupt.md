@@ -33,7 +33,3 @@ The source checks that `H`, `R`, and `K` are numeric matrices with matching dime
 
 - MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/zulf/zulf_abrupt.m
 - [Spinach Wiki: zulf_abrupt.m](https://spindynamics.org/wiki/index.php?title=zulf_abrupt.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

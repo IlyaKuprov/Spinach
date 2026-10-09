@@ -14,7 +14,3 @@ The parsed glycine model includes 13C and 15N spins; protons are not included, s
 ## Acquisition and processing
 
 The selected 13C channel starts from and detects `L+`; no spins are listed for decoupling. Acquisition uses sweep 5e4, offset 18000, 128 points, and zero filling to 512. The displayed axis is configured in ppm; units for sweep and offset are not stated. The FID receives exponential apodisation with parameter 6, then a zero-filled Fourier transform; the real spectrum is plotted.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

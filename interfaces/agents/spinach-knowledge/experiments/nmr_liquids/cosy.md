@@ -23,5 +23,3 @@ Signature: fid=cosy(spin_system,parameters,H,R,K)
 The routine starts from Lz magnetisation and an L+ detection state on the selected spin. It applies a 90-degree x pulse, records the F1 trajectory at 1/sweep spacing, and explicitly selects F1 coherence order +1. The second x pulse uses parameters.angle; direct F2 evolution is then detected with the L+ observable at the same reciprocal-sweep spacing. Thus the code retains a single phase-sensitive pathway rather than summing all F1 coherence orders.
 
 The source advises magnitude-mode plotting when the second pulse differs from 90 degrees. No MATLAB execution or experimental signal is claimed here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -23,7 +23,3 @@ The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters
 - [E.COSY reference, DOI 10.1063/1.451421](https://doi.org/10.1063/1.451421)
 - [E.COSY reference, DOI 10.1016/0022-2364(87)90102-8](https://doi.org/10.1016/0022-2364(87)90102-8)
 - [Spinach Wiki: `ecosy.m`](https://spindynamics.org/wiki/index.php?title=ecosy.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

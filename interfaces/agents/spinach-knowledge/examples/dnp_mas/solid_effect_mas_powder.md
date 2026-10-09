@@ -15,7 +15,3 @@ The calculation sets the MAS rate to `12.5e3`, rotor axis to `[sqrt(2/3) 0 sqrt(
 ## Output and scope
 
 The returned scalar is displayed with the label “Steady state DNP enhancement”. This is the powder calculation; unlike the companion energy-level example, it returns an enhancement rather than plotting rotor-phase eigenvalues.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

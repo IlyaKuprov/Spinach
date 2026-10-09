@@ -18,7 +18,3 @@ The source sets the MAS rate parameter to 10,000 (no unit is written beside this
 ## Inputs and outputs
 
 The simulation applies exponential apodisation with parameter 6 to the computed FID, Fourier transforms it, and plots the real spectrum with `plot_1d`. Its input is the CASTEP-derived structural/shielding data in `mhc.magres`; it does not load an experimental FID or measured spectrum. The output is a simulated MAS spectrum.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -11,7 +11,3 @@ This is a simulated 15N-1H powder CP contact experiment in the doubly rotating f
 The MAS settings are rate 10000, axis `[sqrt(2/3) 0 sqrt(1/3)]`, maximum rank 4, and powder grid `rep_2ang_800pts_sph`. The rate value has no unit attached in the source. The spin order is `{'1H','15N'}`; across 100 steps the irradiation powers are 5e4 for 1H and 4e4 for 15N, with irradiation operators `{Hy Nx}` and excitation operators `{Hx Ny}`. Each time step is 1e-5, and the source labels the plotted cumulative time axis in seconds. It requests `iso_eq` and detects on the 15N `Lx` state.
 
 The sequence is propagated by `floquet` with `@cp_contact_hard` in NMR mode. The program plots the real signal against cumulative contact time and labels the ordinate as the 15N `S_X` expectation value. This is a contact-time transfer trace, not a frequency-domain spectrum; the file supplies a simulated curve rather than measured data. The source estimates a runtime of seconds and does not report numerical transfer values or an experimental comparison.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

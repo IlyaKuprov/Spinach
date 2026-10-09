@@ -25,7 +25,3 @@ Each state is propagated for 100 steps of 0.01 s in the imaging context. The sin
 ## Citation
 
 The source file does not identify a DOI or publication citation.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -20,7 +20,3 @@ The initial state uses `state(spin_system,'L+','1H')`, and the decoupling list i
 ## Scope
 
 The page records the model and processing parameters present in the source. It does not claim observed peak positions, a measured spectrum, or a run result.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

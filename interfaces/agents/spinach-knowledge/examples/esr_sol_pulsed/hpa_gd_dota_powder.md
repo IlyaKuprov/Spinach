@@ -17,7 +17,3 @@ The script sets both initial state and detection operator to `L+` on `E8`, the s
 ## Observable and output
 
 The powder-averaged FID is exponentially apodised with parameter 6, Fourier transformed, and its real spectrum is plotted. No output file is written by the example. The source estimates a calculation time of minutes; its stated ideal-pulse and second-order rotating-frame assumptions delimit the simulation.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

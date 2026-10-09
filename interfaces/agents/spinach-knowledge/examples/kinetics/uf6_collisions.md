@@ -7,7 +7,3 @@ The symmetric species has zero uranium quadrupolar coupling; the distorted speci
 The calculation uses the complete spherical-tensor Liouville basis, full laboratory-frame relaxation, and `liquid(...,@slowpass,...,'labframe')`. Zero-track elimination is left off by default: the fast exchange scale must not be used to discard slowly developing J-coupled coherences in this demonstration. The spectrum is sampled directly at 0.5 Hz spacing across ±1200 Hz about the unshifted fluorine resonance. The waterfall shows frequency offset against the base-10 logarithm of the forward rate. Each absorptive trace is divided by its own maximum, so heights compare line shapes rather than absolute intensities.
 
 The independent two-state exchange and rotational Redfield descriptions are phenomenological approximations. Collision trajectories, the other fluorines, and other relaxation mechanisms are omitted; the fastest rates are illustrative rather than calibrated liquid-state parameters. The example neither downloads inputs nor saves files automatically.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

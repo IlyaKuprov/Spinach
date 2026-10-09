@@ -15,7 +15,3 @@ It sets parameters.mw_pwr=2*pi*250e3, t_step=1e-3, and nsteps=300. The field gri
 ## Output and limits
 
 The output is a 1-by-3 figure, with one panel per field. The time axis has 301 samples from zero through t_step*nsteps and is plotted in seconds; each panel uses ylim([-150 10]). There is no file export in the function. The scalar-coupling assignment and the 0.3-second end time follow directly from the source settings; no simulation result has been independently reproduced. mw_pwr is retained as the source expression because no unit is given there.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

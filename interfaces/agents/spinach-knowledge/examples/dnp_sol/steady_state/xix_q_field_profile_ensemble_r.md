@@ -17,7 +17,3 @@ The script uses the unapproximated `sphten-liouv` basis, proton `Lz` detection, 
 ## Dependencies and output
 
 Requires Spinach and `r1n_dnp`, `gaussleg`, `powder`, and `xixdnp_steady`. The three profiles are combined with distance quadrature weights and the radial `r^2` factor, then normalised by the corresponding weighted sum. The plot shows real proton `Lz` against offset in MHz and saves `xix_q_field_profile_ensemble_r.fig` in the MATLAB current directory. Only the figure is saved; the distance ensemble is finite and discretely sampled.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

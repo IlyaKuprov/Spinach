@@ -17,7 +17,3 @@ The model is one 1H at field parameter 11.7426, with shift value 4.6 and a refer
 The soft-pulse shape is gaussian_1000.pk, sampled at 100 points with duration parameter 0.045; the inversion-pulse phase is pi. The sequence sets transmitter offset 2500, small-gradient-duration parameter 0.002, diffusion-delay parameter 0.1, and Zangger–Sterk selection-gradient amplitude 0.0053. It runs idosyzs for 20 diffusion-gradient amplitudes spanning 0.01–0.40 T/m.
 
 The simulated intensities are normalised to the first point and fitted to an exponential attenuation with an amplitude, diffusion coefficient, and fitted gradient shift. The fit factor uses the spin, gradient duration, and delay corrected by one third of the gradient duration, with the source’s 10⁻¹⁰ scaling; the reported diffusion coefficient is the fitted coefficient multiplied by 10⁻¹⁰. The page plots simulated points and the fitted curve and reports the fitted diffusion coefficient and gradient shift.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

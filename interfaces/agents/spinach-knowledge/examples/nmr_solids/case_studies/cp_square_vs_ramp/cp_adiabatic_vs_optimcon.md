@@ -11,7 +11,3 @@ The common experiment uses 500 time steps of 2e-6 seconds each, for a 1 ms conta
 For the GRAPE comparison, the initial state is normalised Ly on ¹H and the target is normalised Lx on ¹⁵N. The two control channels use a power level of 2π × 5e4 rad/s, the same 500 slice durations, an SNS penalty with weight 100, L-BFGS optimisation, and a 30-iteration limit. The initial guess is the tangent-ramp waveform. A second optimisation halves each slice duration, giving a 0.5 ms contact while retaining the same number of slices. The resulting controls are simulated with the same powder-averaged CP routine.
 
 The figure compares the two-channel nutation-frequency waveforms and the real ¹⁵N X-expectation trajectory for the tangent ramp, the same-duration GRAPE pulse, and the half-duration GRAPE pulse. The code does not report an experimental transfer measurement or a quantitative agreement statistic.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

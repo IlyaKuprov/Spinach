@@ -20,7 +20,3 @@ The upper panel plots the real FID against sample index times `timestep`, labell
 - [Imported methyl DFT log](https://github.com/IlyaKuprov/Spinach/blob/main/examples/standard_systems/methyl.log)
 - [ESEEM sequence helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
 - [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

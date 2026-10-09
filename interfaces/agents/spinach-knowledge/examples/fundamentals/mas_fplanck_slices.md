@@ -16,7 +16,3 @@ A single normalised complex signal is evaluated after one rotor period. The FP c
 ## Output and limits
 
 The script prints `MAS_FPLANCK_SLICES_SUCCESS` only after both assertions and the third-order-term check pass; it produces no figure. These tests establish equivalence for the specified single-crystal observables and settings, not for a powder average, the entire strongly quadrupolar satellite manifold, or a complete optimal-control gradient. The separate [`mas_fplanck_powder.m`](mas_fplanck_powder.md) checks powder-averaged CSA on a weighted Lebedev grid.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

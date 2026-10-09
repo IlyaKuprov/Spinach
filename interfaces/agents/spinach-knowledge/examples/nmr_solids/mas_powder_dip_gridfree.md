@@ -11,7 +11,3 @@ The basis uses spherical-tensor Liouville space, no approximation, and projectio
 ## Signal and display
 
 The initial state and receiver coil are both the proton `L+` state. The sweep setting is 2e4, offset is 0, zero filling is 4096, and the plotted axis is configured in ppm with inversion enabled. After `gridfree` produces the FID, the code applies exponential apodisation parameter 6, Fourier transforms using `fftshift`, and plots the real spectrum through `plot_1d`. The plot is a simulation output, not an experimental measurement reported by the source.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

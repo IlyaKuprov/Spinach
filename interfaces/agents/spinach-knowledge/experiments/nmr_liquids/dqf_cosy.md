@@ -22,5 +22,3 @@ The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters
 - [Double-quantum-filtered COSY reference, DOI 10.1016/0006-291X(83)91225-1](https://doi.org/10.1016/0006-291X(83)91225-1)
 - [COSY reference, DOI 10.1021/ja00388a062](https://doi.org/10.1021/ja00388a062)
 - [Spinach Wiki: `dqf_cosy.m`](https://spindynamics.org/wiki/index.php?title=dqf_cosy.m)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

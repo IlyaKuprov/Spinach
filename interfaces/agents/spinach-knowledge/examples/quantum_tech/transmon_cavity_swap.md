@@ -15,7 +15,3 @@ The Zeeman-Hilbert basis is used without approximation. The initial state is tra
 The code evaluates transmon and cavity excitation populations from separate coil operators and plots both against time. It also checks that cavity population reaches at least 0.95, transmon population falls to at most 0.05, and the two populations sum to one within `1e-6`. The curves represent ideal coherent excitation exchange in this finite model; these source-level checks do not establish measured device performance or fidelity.
 
 The source relates the example to the circuit-QED Jaynes–Cummings model and cites Blais et al., *Reviews of Modern Physics* **93**, 025005 (2021) ([DOI](https://doi.org/10.1103/RevModPhys.93.025005)).
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

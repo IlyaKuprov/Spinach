@@ -23,7 +23,3 @@ The field grid is `linspace(1,10,64)` Tesla. At each field, a `parfor` iteration
 ## Output and scope
 
 The result is a 512-by-64 array. The image plot displays its real part versus field and microwave-frequency offset; the colour bar is the steady-state proton longitudinal signal, labelled as `<H_Z>`. This is a steady-state scan over the specified single-spin-pair model and field/frequency grids; the source does not present a time-domain trajectory.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

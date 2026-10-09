@@ -26,5 +26,3 @@ The dwell times are `1./parameters.sweep(1)` in F1 and `1./parameters.sweep(2)` 
 Natural-abundance simulations should use isotope dilution; see `dilute.m`.
 
 [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/hsqc.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=hsqc.m).
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

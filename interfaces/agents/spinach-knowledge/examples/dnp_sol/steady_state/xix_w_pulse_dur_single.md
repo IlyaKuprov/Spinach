@@ -23,7 +23,3 @@ Electron pulse duration is sampled at 200 points from 2 to 21 ns. The 101-point 
 ## Output and scope
 
 The powder calculation fills a complex-valued array over offset and pulse duration; the image displays its real part as the proton `I_z` expectation value. The axes are microwave resonance offset (MHz) and pulse duration (ns). The figure is saved as `xix_w_pulse_dur_single.fig` in the current working directory. This is the source's finite two-parameter grid and steady-state XiX callback, not a result for unscanned settings.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

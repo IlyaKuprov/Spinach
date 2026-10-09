@@ -27,7 +27,3 @@ The source comments list alternative RF frequencies for components B (`{-80e3, -
 The source credits Ahmed Allami and Ilya Kuprov.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

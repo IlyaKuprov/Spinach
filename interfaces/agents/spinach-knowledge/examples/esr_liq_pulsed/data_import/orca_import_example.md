@@ -19,7 +19,3 @@ The simulation call is `liquid(spin_system,@acquire,parameters,'esr')`. Acquisit
 ## Processing, dependencies, and scope
 
 The FID uses `apodisation` with `{{'none'}}`, then `fftshift(fft(fid,parameters.zerofill))`; the plotted spectrum is its real part. With Spinach on the MATLAB path and the named ORCA output available, call `orca_import_example()`. The import uses `oparse` and `gauss2mhz`; simulation and display use Spinach system/basis/state construction, `liquid`, `acquire`, `apodisation`, and plotting helpers. The function opens a plot and declares no return value; FID and spectrum are local. This page describes the example's explicit tensor-transfer route and configured input, not universal coverage of ORCA output variants.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

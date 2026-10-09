@@ -13,7 +13,3 @@ The passed experiment parameters include rate 10000, axis [sqrt(2/3), 0, sqrt(1/
 For each ¹H value, a parallel inner sweep evaluates all ¹⁵N values through singlerot with cp_contact_hard. The matrix stores real(fid(end)) as cp(n,k), where n is the first (¹H) setting and k the second (¹⁵N) setting. The image is rendered with imagesc and the source labels its horizontal axis ¹H spin-lock RF power, Hz, and vertical axis ¹⁵N spin-lock RF power, Hz. This note preserves both the matrix indexing and labels as written; it does not infer an axis correction or claim a validated interpretation. The output is a simulated final-contact signal map, not a measured spectrum. `cp_contact_hard` returns the initial coil expectation followed by ten 40 µs contact samples; `fid(end)` is the eleventh point at 400 µs. The source header estimates calculation time as hours; this is not a timing measurement made here.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_3.m
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

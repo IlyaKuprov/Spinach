@@ -17,7 +17,3 @@ Both settings use electron offset 95 MHz (A) or 92 MHz (B); their shot spacings 
 ## Output and limits
 
 B1 quadrature weights are applied first, then distance weights with the radial Jacobian `r^2`. The figure plots the real proton `I_z` expectation against total contact time for both ensembles and is saved as `top_q_con_time_ensemble_b1_r.fig`. The source estimates hours of calculation; it writes a figure, not a numeric results table.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

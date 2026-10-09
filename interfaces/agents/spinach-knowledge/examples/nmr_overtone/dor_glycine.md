@@ -9,7 +9,3 @@ The system has a single isotope, 14N, and a magnet setting of 14.1. The coupling
 The DOR setup sets `theta=atan(sqrt(2))`, outer and inner rates 1425 and 6950, and rank 5 for each rotor. The axes are `[sin(theta) 0 cos(theta)]` and `[sqrt(20-2*sqrt(30)) 0 sqrt(15+2*sqrt(30))]`, commented as 54.74 and 30.56 degrees. The orientation grid is `rep_2ang_200pts_sph`. The spectrum settings are sweep `[-2e4 3e4]`, 1024 points, 1024-point zero-fill, and `axis_units='kHz'`. The initial state is 14N `Lz`; the receiver and Lx operator are the theta-weighted Lz/Lx combinations defined in the source.
 
 Average treatment is selected with `rf_pwr=2*pi*3.0e6`, `rf_dur=1.0e-6`, and `rf_frq=-10e3`. The code calls `doublerot` with `overtone_pa` and `qnmr`, multiplies the result by `exp(1i*1.49)`, then plots its real part with `plot_1d`. The page records the inputs and output path in the example; it does not claim that the plotted trace reproduces the cited figure.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

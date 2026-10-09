@@ -18,7 +18,3 @@ The sequence parameters are offset 4392, sweep 3000, [512, 512] acquisition poin
 The simulated 2D FID is square-sine apodised in both dimensions and transformed with a zero-filled 2D FFT. The plot displays the magnitude of the spectrum. The source header estimates hours of calculation and notes faster execution on a GPU; GPU enablement is commented out.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

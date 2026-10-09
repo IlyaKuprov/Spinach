@@ -14,7 +14,3 @@ The calculation uses the exact `sphten-liouv` basis with `bas.approximation='non
 The acquisition requests anisotropic equilibrium, uses a 5e6 Hz sweep, 512 points, and the `rep_2ang_200pts_sph` powder grid. The receiver operator is the `14N` `L+` state; the pulse is an `Lx` operator with flip angle `pi/2`. Spinach's `powder` acquisition calls `hp_acquire` in the lab frame. The returned FID is exponentially apodised with parameter 6, then transformed as `imag(fftshift(fft(fid)))`; plotting uses MHz axis units.
 
 Estimated calculation time: seconds.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

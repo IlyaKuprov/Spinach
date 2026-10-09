@@ -30,7 +30,3 @@ The frequency vector concatenates two 100-point ranges: `linspace(144.0,145.5,10
 ## Result and scope
 
 The function makes a 2-by-2 figure: rows correspond to the 1H and 15N signal columns, and columns show the 144.0–145.5 MHz and 14.0–15.5 MHz windows. Each panel plots the real part of the corresponding 100-row segment of `answer`. The no-argument function has no declared MATLAB return value; its visible result is the figure. Its result depends on the explicit seven-spin model, the basis/relaxation truncations, the selected orientation, and the two frequency windows.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

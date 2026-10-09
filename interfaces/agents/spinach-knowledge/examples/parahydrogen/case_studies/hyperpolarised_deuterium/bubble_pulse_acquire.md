@@ -16,7 +16,3 @@ The `sphten-liouv` model uses no basis approximation and combines the spin Hamil
 The simulated `hp_acquire` acquisition uses a deuterium coil, offset 209.6554 Hz, sweep 60 Hz, 256 points, and 1024-point zero filling. The ppm-axis spectrum is exponentially apodised (parameter 6), Fourier transformed, and normalised to unit maximum magnitude; the displayed region is 4.40–4.70 ppm and intensity is labelled in arbitrary units. The source says a paper link will follow; it supplies no DOI or experimental spectrum.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

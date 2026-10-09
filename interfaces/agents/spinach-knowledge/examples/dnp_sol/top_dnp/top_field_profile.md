@@ -23,7 +23,3 @@ The electron nutation frequency is held at `17.8e6` Hz; the pulse and delay are 
 ## Output and scope
 
 A `parfor` loop evaluates the contact curve at each offset and stores `real(contact_curve(end))` as the profile value. The line plot uses the 120 scan offsets in MHz on the horizontal axis and the proton `I_z` expectation value on the vertical axis. This profile is limited to the configured offset grid, fixed pulse settings, TOP sequence, and powder grid.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

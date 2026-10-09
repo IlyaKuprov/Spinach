@@ -15,7 +15,3 @@ Call the no-argument function **tppm_q_con_time_ensemble_b1_r()** from MATLAB wi
 ## Result and scope
 
 The source first averages over B1 weights, then averages over distance weights multiplied by r^2 (the radial Jacobian), normalising each weighted sum. It plots the real proton Lz expectation value against total contact time 2*pulse_dur*loop_counts in microseconds and saves tppm_q_con_time_ensemble_b1_r.fig. The source describes the calculation as taking hours. This is a four-node distance and six-node B1 quadrature (24 distance/B1 pairs), not a continuous distribution; no separate numerical data file is saved. Units for magnet, temperature, relaxation-rate entries, addshift, and el_offs are not stated in this source.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

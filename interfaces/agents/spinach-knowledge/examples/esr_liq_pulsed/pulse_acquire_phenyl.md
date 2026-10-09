@@ -20,7 +20,3 @@ The ESR acquisition uses `liquid(spin_system,@acquire,parameters,'esr')`: the in
 Requires Spinach import, system/basis, ESR acquisition, apodisation, and plotting functions (`gparse`, `g2spinach`, `create`, `basis`, `state`, `liquid`, `acquire`, `apodisation`, `kfigure`, `plot_1d`). Run where the relative phenyl-log path resolves. The source supplies no numeric hyperfine table; those couplings come from the log. The magnetic-field value is assigned as 3.5 without an inline unit annotation.
 
 [Source: `pulse_acquire_phenyl.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/pulse_acquire_phenyl.m).
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

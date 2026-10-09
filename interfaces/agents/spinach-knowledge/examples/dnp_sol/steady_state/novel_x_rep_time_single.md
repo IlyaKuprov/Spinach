@@ -25,7 +25,3 @@ The source uses Spinach system construction and propagation functions `create`, 
 ## Output and scope
 
 The saved figure `novel_x_rep_time_single.fig` plots the real proton longitudinal expectation value for both flipback conditions. It is the selected 3.5 Å pair under this parameterisation, not the distance-averaged result from companion ensemble examples. The source uses `parfor` over repetition times and does not configure a worker count.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

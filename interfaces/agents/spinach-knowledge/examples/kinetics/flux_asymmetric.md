@@ -15,7 +15,3 @@ The calculation uses the full `sphten-liouv` basis (`bas.approximation=none`). `
 ## Scope
 
 The source header estimates a calculation time of seconds, not an independently measured runtime. No simulated spectral values or fit result are included in the source; no specific line shape, peak intensity, or fitted flux is claimed.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

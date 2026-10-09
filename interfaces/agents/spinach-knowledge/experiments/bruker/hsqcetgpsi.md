@@ -26,5 +26,3 @@ The initial operator is longitudinal magnetisation on F2 and the receive state i
 No gradient amplitudes, durations, or hardware waveform are specified: pathway selection is by coherence filtering. The source supplies no receiver phase-cycle table or calibration procedure beyond the listed parameters.
 
 Source implementation: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/bruker/hsqcetgpsi.m
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

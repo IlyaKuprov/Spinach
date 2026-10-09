@@ -12,7 +12,3 @@ A simulated multiple-quantum NMR experiment on six coupled 1H spins; the source 
 The initial proton state is `Lz`, the detected state is `L+`, and the pulse angle is `pi/2`. The selected coherence orders are `[+6 -1]`; the sequence uses two 1H dimensions, zero offsets (explicitly in Hz), sweeps `[2400 2400]` Hz, 512 points per dimension, and zero-filling to 2048 per dimension. The axis units are ppm. The two delays are each 0.1 s.
 
 The example calls `liquid(spin_system,@mqs_refocus,parameters,'nmr')`, applies squared-cosine apodisation in both dimensions, and computes a zero-filled 2D FFT. It plots the absolute spectrum with axes labelled 1Q / ppm and 6Q / ppm. No relaxation model, experimental dataset, measured transfer rate, or DOI is specified in this source.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

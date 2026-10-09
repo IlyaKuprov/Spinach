@@ -25,5 +25,3 @@ The sequence applies a 90-degree x pulse and selects +1 coherence. For each F1 p
 ## Output and scope
 
 - `fid`: two-dimensional free induction decay with F1 and F2 evolution; its F1 direction is reversed by the source's final `fliplr` operation.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

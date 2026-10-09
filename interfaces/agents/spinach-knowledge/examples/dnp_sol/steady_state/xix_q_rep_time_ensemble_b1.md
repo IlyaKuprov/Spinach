@@ -30,7 +30,3 @@ For each B1 node, the script sets `parameters.irr_powers=b1(k)`, evaluates all r
 ## Clarification
 
 The fixed 3.500 Å separation comes directly from the coordinates; the “ensemble” here is B1 alone. The script holds the offset field at `-39e6` rather than sweeping offsets.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

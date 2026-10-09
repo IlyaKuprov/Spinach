@@ -15,7 +15,3 @@ The rotor-axis vector is `1 1 1`, MAS rate is `6000` Hz, maximum rank is 23, swe
 ## Calculation and display
 
 Despite the filename and Fokker-Planck description, the code calls `singlerot(spin_system,@acquire,parameters,'nmr')`, with `parameters.grid='leb_2ang_rank_23'`; it does not call a function named `fplanck`. The initial state and receiver are both `L+` on `13C`. It exponentially apodises the calculated FID with parameter 6, Fourier transforms to 1024 points, and plots the real spectrum with `plot_1d`. The settings and resulting spectrum are a simulation, not an experimental measurement.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

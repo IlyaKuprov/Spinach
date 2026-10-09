@@ -31,7 +31,3 @@ The function constructs and plots four simulated 13C spectra, labelled for the h
 ## Header notes
 
 The source labels this as Figure 3 from a paper by Rasulov and Kuprov and links [arXiv:2502.02198](https://arxiv.org/abs/2502.02198).
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -9,7 +9,3 @@ The header calls this a powder MAS spectrum of a single anisotropically shielded
 ## Calculation and display
 
 The basis is `sphten-liouv` with no approximation and the `+1` projection. The MAS axis is `[1 1 1]` and the rotor rate is 500 Hz. The source selects the `leb_2ang_rank_17` grid and maximum rank 17, then calls `floquet(spin_system,@acquire,parameters,'nmr')`. Acquisition is on `1H` from an `L+` initial state with an `L+` receiver. The sweep is 20 kHz, with 512 acquired points, zero-filled to 4096, zero offset, ppm axis units, and inverted axis. Exponential apodisation uses parameter 6 before Fourier transformation; the plotted trace is the real spectrum. These are simulation and display settings, not an experimentally measured spectrum.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

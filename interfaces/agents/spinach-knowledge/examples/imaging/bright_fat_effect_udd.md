@@ -17,7 +17,3 @@ The basis is `sphten-liouv` with no approximation; path tracing is disabled. GPU
 The sequence uses the 1H channel, no decoupling, zero offset, 48 pulses, and `dec_time=80e-3`; the source does not give the time unit. Geometry is `dims=[0.30,0.25]` with `npts=[100,200]` and derivative setting `{'period',3}`. It loads the left and right bright-fat phantoms from `../../etc/phantoms/bright_fat_left.mat` and `../../etc/phantoms/bright_fat_right.mat`, assigns `{1-left,1-right}` as phantom initial states, uses Lz states for the two molecule spin groups, and detects the 1H Lx state with a uniform coil phantom. Flow fields are zero and `diff=0`.
 
 The distinctive sequence call is `imaging(spin_system,@udd_dec,parameters)`. The script plots `surf(abs(mri))` with the X direction reversed and pixel-labelled axes, under the title 'Bright fat effect under UDD echo train'. It defines no numerical image result in the page.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -20,7 +20,3 @@ The B1 quadrature nodes and weights come from `gaussleg(14e6,16e6,5)`, with the 
 ## Result and limits
 
 The two result arrays are integrated over B1 using the quadrature weights normalised by their sum. The figure plots the real proton longitudinal expectation value against repetition time for the no-flipback and flipback cases, and is saved as `novel_x_rep_time_ensemble_b1.fig`. The source specifies the computation and plot but contains no numerical polarisation results.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

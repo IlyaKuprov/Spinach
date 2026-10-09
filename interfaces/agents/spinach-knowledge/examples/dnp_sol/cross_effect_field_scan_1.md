@@ -21,7 +21,3 @@ The ESR parameters set `mw_pwr=10e6`, `mw_frq=0`, electron irradiation spins `{'
 **Observable-label note:** the receiver is assigned as `coil_state(spin_system,'Lz','1H','exact')`, while the plot's vertical label says “$S_z$ expectation value on $^1$H”. The page reports both source statements without resolving their notation.
 
 **Dependencies:** Spinach create/basis/state/operator, powder and plotting routines; the `dnp_field_scan` sequence and `rep_2ang_1600pts_sph` grid.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

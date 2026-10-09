@@ -19,7 +19,3 @@ The function calls <code>liquid(spin_system,@acquire,parameters,'esr')</code>, a
 ## Requirements and scope
 
 Run with Spinach and the example's relative input layout available (the relative <code>../standard_systems/nitroxide.log</code> path must resolve). The source uses <code>gparse</code>, <code>g2spinach</code>, <code>create</code>, <code>basis</code>, <code>state</code>, <code>liquid</code>, <code>acquire</code>, <code>apodisation</code>, <code>kfigure</code>, and <code>plot_1d</code>, plus MATLAB FFT routines. The .m file supplies no DOI or bibliography entry; the stable source and input links above are the cited records.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

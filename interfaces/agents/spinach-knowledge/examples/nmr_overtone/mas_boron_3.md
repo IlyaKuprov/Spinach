@@ -9,7 +9,3 @@ The model uses isotope 10B, magnet setting 16.4, and coupling input `eeqq2nqi(0.
 The sequence parameters are rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and grid `rep_2ang_200pts_oct`. The spectrum uses sweep `[-200e3 200e3]`, 4096 points, 4096-point zero-fill, and `axis_units='kHz'`. Both the initial state and receiver are 10B `Lz`. The code calls `singlerot` with `overtone_a` and `qnmr`, then plots `real(spectrum)` with `plot_1d`.
 
 Although the header mentions an unphysically strong pulse, this file assigns no explicit `rf_pwr`, `rf_dur`, `rf_frq`, or `method` field. It therefore documents no numerical pulse setting; the executable setup shown is the `singlerot`/`overtone_a` call and the panoramic sweep. This avoids transferring the separate overtone_pa average-treatment RF settings from mas_boron_2.m to this example.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

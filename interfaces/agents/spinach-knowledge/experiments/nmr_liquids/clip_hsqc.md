@@ -25,5 +25,3 @@ The initial state is longitudinal magnetisation on spin F2 and the receiver is i
 The forward states are coherence-selected for F2 order 0 together with F1 order +1 or -1. The backward-evolved coil branches are selected for F1 order 0 and F2 order +1. Inner products combine the paired branches into fid.pos and fid.neg, the two States-quadrature components over the F1 and F2 sampling dimensions.
 
 No MATLAB execution or experimental signal is claimed here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

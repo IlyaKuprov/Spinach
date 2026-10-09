@@ -19,7 +19,3 @@ The basis is `sphten-liouv` with no approximation, propagator chop tolerance `1e
 For each T1e and distance node, the helper uses fixed 18 MHz electron nutation, grid `rep_2ang_800pts_sph`, 48 ns pulse duration, π second-pulse phase, `addshift=-13e6`, and `el_offs=61e6`. It scans `nloops=1:64` and sets shot spacing to 153 μs minus total pulse duration. Each point calls `powder(spin_system,@xixdnp_steady,localpar,'esr')`; the distance result is averaged using quadrature weights and the radial (r^2) Jacobian. Total contact time is `2*nloops*48e-9` s (96 ns to 6.144 μs).
 
 The five real proton (L_z) expectation-value curves are overlaid and labelled by T1e. The figure limits are 0–6 μs horizontally and 0–1.7e-3 vertically; it is saved as `xix_q_con_time_ensemble_r_T1e.fig`. The function returns no explicit MATLAB output. The source comment estimates hours of calculation time, not a measured runtime here.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

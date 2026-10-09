@@ -15,7 +15,3 @@ The acquisition parameters include rate 100000, axis [√(2/3), 0, √(1/3)], ma
 Spinach performs single-rotor acquisition, applies exponential apodisation with parameter 6, Fourier transforms the signal, and plots the real spectrum. This is a simulation, not an experimental spectrum supplied by the source. The pair is dipole-coupled through its coordinates: `create()` invokes `dipolar()` to generate the ²³Na–¹⁷O point-dipolar tensor automatically. The explicit diagonal NQI assignments are separate; adding another off-diagonal dipolar tensor would double-count the interaction.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

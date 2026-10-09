@@ -16,7 +16,3 @@ In the `zeeman-hilb` formalism with no basis approximation, the initial state `{
 ## Interpretation
 
 The figure shows the ideal time-domain exchange of a single excitation between the two modeled subsystems. It does not show a driven EPR spectrum, an isotope-resolved defect transition, or loss-limited cavity dynamics. The source labels the calculation time as seconds, but that comment is not a measured runtime or a convergence claim.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -17,7 +17,3 @@ The normalised Lx, Ly, and Lz states define the three transfer targets. As in th
 The optimised phase and fixed amplitude are converted to Cartesian x/y controls and applied to an initial Lz state using the piecewise-constant exponential propagator. The resulting 13C signal is acquired with an L+ coil, a 70 kHz sweep, 2,048 points, 16,384-point zero filling, and a ppm axis; Gaussian apodisation with parameter 10 precedes the shifted Fourier transform. The script plots the real spectrum and compares it with a conventional hard-pulse spectrum configured with `2*pi*60e3` power, 4.2 microsecond duration, phase pi/2, and rank 3.
 
 The source defines the design and plotting, but does not supply an observed waveform or convergence result. Its calculation-time comment says minutes. Source contacts: ilya.kuprov@weizmann.ac.il and david.goodwin@inano.au.dk.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

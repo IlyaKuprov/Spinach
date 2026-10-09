@@ -17,7 +17,3 @@ The DOR propagation uses the one-dimensional Fokker–Planck method on the rep_2
 The script sets a sweep of 1e5, 256 acquired points, and zero-fills to 1024; the displayed axis unit is kHz. Both initial state and receiver coil are ¹⁴N L+, and the rotating-frame entry is ¹⁴N, frame 3. It passes these settings and the acquire callback to doublerot in the lab frame, Fourier-transforms the resulting FID, and plots the real spectrum. The script defines that calculated observable. The wrapper call does not add an RF pulse, Hartmann–Hahn condition, or additional experimental internals.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/dor_powder_nav_fplanck_time.m
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

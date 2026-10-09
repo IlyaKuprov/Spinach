@@ -19,7 +19,3 @@ Both the initial state and the coil are the 14N `Lz` state. The source sets `spi
 ## Output and limits
 
 The script plots `real(spectrum)` with `plot_1d`; it does not save a spectrum file or state its numerical values. The absence of pulse and phase assignments here is a source-level distinction, not a claim about how a measured experiment was acquired.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

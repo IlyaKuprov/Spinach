@@ -21,5 +21,3 @@ The initial state is `Lz` on F2 and detection uses `L+` on F2. A +90° F2 x-puls
 ## Reference
 
 - [HMQC sequence reference](https://doi.org/10.1016/0022-2364(83)90241-X)
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

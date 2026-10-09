@@ -21,7 +21,3 @@ The basis is spherical-tensor Liouville space without approximation. The source 
 The frequency axis spans 70-105 kHz, with 256 points and 256-point zero filling. The initial state is for `1H`; receiver and overtone operators are for `14N`. The script uses `rf_frq=86.30e3` (86.30 kHz) and an RF power vector `2*pi*[55.0e3,35.1e3]/sin(theta)`, where `theta=atan(sqrt(2))`. In a 10-panel loop it sets `rf_dur=1e-5*n` s, so the encoded contact-duration values are 10, 20, ..., 100 microseconds.
 
 Each panel plots the real part of a simulated spectrum. The displayed intensity limits, from `-1.7569e-3` to `1.7569e-3`, are plotting limits set by the source, not measured bounds. The source header's “hours” is an estimate; this task did not run the example or observe experimental data.
-
-Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
-
-Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

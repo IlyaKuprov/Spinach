@@ -237,6 +237,8 @@ In segmented `sphten-liouv`, `steady` initialises and pins the unit coordinate
 same unweighted normalisation. Both Newton and squaring methods accept this layout.
 Each unit column must drive an active coordinate in its own substance block;
 `Spinach:steady:unthermalisedSubstance` names any block that fails this check.
+Steady-state GRAPE dressing likewise removes every conserved unit direction from
+the adjoint solve and requires a traceless target in each substance.
 `magpump` likewise sources each target block through its own unit coordinate,
 including targets spanning several substances, and rejects unit-state pumping
 in every block.

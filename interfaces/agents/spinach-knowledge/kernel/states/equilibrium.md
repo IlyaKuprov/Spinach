@@ -14,6 +14,7 @@ A three-argument call is not implemented.
 
 ## Inputs and constraints
 
+- Multi-substance Zeeman systems raise `Spinach:equilibrium:segmentedZeeman` in all supported call forms, before identity construction or Hamiltonian assembly. Single-substance Zeeman behaviour is retained.
 - `spin_system` must have a temperature in `spin_system.rlx.temperature` (configured through `inter.temperature`); an empty or exactly zero temperature is rejected. The routine uses `hbar/(kbol*T)` from the configured physical constants.
 - `I` is numeric: the isotropic Hamiltonian in Hilbert space, or its **left-side product superoperator** in Liouville space. In Liouville calculations, neither `I` nor anisotropic terms may be supplied as commutation superoperators.
 - For the four-argument form, `Q` is a cell array of anisotropic Hamiltonian terms and `euler_angles` is a real three-element vector in radians, giving the system orientation relative to the input orientation. The orientation-dependent term is added to `I`.

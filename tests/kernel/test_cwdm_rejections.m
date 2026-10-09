@@ -63,7 +63,7 @@ end
 result=test_true(result,'cross symmetry',rejected,...
                  'symmetry indices must be local to the declared substance');
 
-% Segmented Zeeman filters reject before any tensor-product construction
+% Segmented Zeeman filters and thermal states reject unsupported constructions
 sys.isotopes={'1H','1H'}; inter.chem.parts={1,2};
 for formalism={'zeeman-hilb','zeeman-liouv'}
     bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas);
@@ -86,6 +86,27 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
         result=test_true(result,[selector{1} ' ' formalism{1}],rejected,...
                          'unsupported direct-sum Zeeman filtering raises the named error');
     end
+    for constructor={'unit_state','equilibrium'}
+        for nargs=[1 2 4]
+            if strcmp(constructor{1},'unit_state')&&(nargs~=1), continue; end
+            rejected=false;
+            try
+                if strcmp(constructor{1},'unit_state')
+                    unit_state(s);
+                elseif nargs==1
+                    equilibrium(s);
+                elseif nargs==2
+                    equilibrium(s,speye(s.bas.offsets(end)));
+                else
+                    equilibrium(s,speye(s.bas.offsets(end)),cell(5),[0 0 0]);
+                end
+            catch err
+                rejected=strcmp(err.identifier,['Spinach:' constructor{1} ':segmentedZeeman']);
+            end
+            result=test_true(result,[constructor{1} ' ' formalism{1} ' ' num2str(nargs)],...
+                             rejected,'unsupported Zeeman states raise the named error before construction');
+        end
+    end
     bad=bas; bad.sym_group={{'S2'},{}}; bad.sym_spins={{1},{}};
     rejected=false;
     try
@@ -95,6 +116,25 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
     end
     result=test_true(result,['Zeeman symmetry rejection ' formalism{1}],rejected,...
                      'only genuinely segmented Zeeman symmetry is rejected');
+end
+
+% Single-substance Zeeman units and Boltzmann states retain stock normalisation
+inter=struct('temperature',298); bas.approximation={'none'};
+for formalism={'zeeman-hilb','zeeman-liouv'}
+    bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas);
+    beta=s.tols.hbar/(s.tols.kbol*inter.temperature);
+    H=diag([-3 -1 1 3])/beta;
+    expected=diag(exp(-beta*diag(H))); expected=expected/trace(expected);
+    unit=speye(4);
+    if strcmp(formalism{1},'zeeman-liouv')
+        H=kron(speye(4),H); expected=expected(:);
+        unit=unit(:)/norm(unit(:));
+    end
+    result=test_close(result,['single-substance unit ' formalism{1}],...
+                      unit_state(s),unit,0,0,'single-substance unit normalisation is unchanged');
+    result=test_close(result,['single-substance equilibrium ' formalism{1}],...
+                      equilibrium(s,H),expected,1e-10,1e-10,...
+                      'the state equals the trace-normalised Boltzmann exponential');
 end
 
 end

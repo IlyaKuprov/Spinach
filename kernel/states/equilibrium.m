@@ -39,6 +39,8 @@
 % WARNING: spin system ground states are commonly degenerate; absolute
 %          zero temperatures are not supported.
 %
+% Note: multi-substance Zeeman equilibrium states are not yet supported.
+%
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
 %
@@ -62,11 +64,11 @@ elseif nargin==2
 
 elseif nargin==1
 
+    % Check consistency before building the Hamiltonian
+    grumble(spin_system);
+
     % Build the isotropic Hamiltonian
     I=hamiltonian(assume(spin_system,'labframe'),'left');
-
-    % Check consistency
-    grumble(spin_system,I);
     
 else
     
@@ -159,7 +161,12 @@ end
     
 % Consistency enforcement
 function grumble(spin_system,I,Q,euler_angles)
-if ~isnumeric(I)
+if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})&&...
+   (spin_system.bas.nsubst>1)
+    error('Spinach:equilibrium:segmentedZeeman',...
+          'multi-substance Zeeman equilibrium states are not yet supported.');
+end
+if (nargin>=2)&&~isnumeric(I)
     error('isotropic Hamiltonian I must be numeric.');
 end
 if isempty(spin_system.rlx.temperature)

@@ -555,6 +555,9 @@ product operators and states raise `Spinach:which_subst:crossSubstance`.
 Legacy `kinetics` remains available for single-substance flux and radical-pair
 models. Nonzero multi-substance chemistry is explicitly rejected until the
 reaction-record implementation; absent chemistry gives the direct-sum zero.
+`react_gen` uses the single local descriptor and rejects multi-substance calls
+with `Spinach:react_gen:segmentedChemistry`, rather than reading the retired
+global matrix.
 
 Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
 block must use `none`, as enforced by `basis`.
@@ -568,10 +571,13 @@ cells too; bypassing `basis` does not restore the retired global layout.
 `bootstrap` follows the same one-cell approximation contract as physical systems.
 
 Legacy two-substance chemistry test fixtures also require two approximation
-cells, even while their numerical chemistry assertions await WP3.
+cells. The generator and invariant suites test supported single-substance
+flux and empty reaction maps; the generator suite explicitly asserts the WP3
+rejection boundary instead of claiming numerical exchange validation.
 
 Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
-only multi-substance Zeeman symmetry and analytical filters are rejected.
+multi-substance Zeeman symmetry, analytical filters, unit states, and equilibrium
+states are explicitly rejected. Single-substance Zeeman behaviour is retained.
 Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
 use `bas.offsets(end)`. Identity states retain the selected substance: each
 selected spin contributes one local unit in a sum, a local product contributes

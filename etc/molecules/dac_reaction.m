@@ -16,8 +16,9 @@
 %     sys, inter, bas - Spinach input data structures, remember
 %                       to specify the field in sys.magnet
 %
-%     kin - reaction records with matching tables and additive closure;
-%           set the two rate constants in the caller before create()
+%     kin - independent copy of the additive reaction records;
+%           set rates in inter.chem.reactions before create(), or
+%           assign modified kin back to inter.chem.reactions
 %
 % Acetonitrile is represented by a spin-free solvent pool. The model
 % does not excite or detect solvent protons. Rates in the returned

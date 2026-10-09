@@ -69,6 +69,11 @@ for n=1:spin_system.bas.nsubst
 end
 U=[U{:}];
 
+% Embed the spin identities in every spatial basis coordinate
+if isfield(parameters,'spc_dim')
+    U=kron(speye(parameters.spc_dim),U);
+end
+
 % Loop over subspaces
 for k=1:numel(projectors)
     

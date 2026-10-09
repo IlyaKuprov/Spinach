@@ -57,5 +57,21 @@ result=test_close(result,'slowpass FFT amplitude at the second resonance',...
                   spectrum_slow(second_idx),spectrum_fft(second_idx),2*baseline,2e-3,...
                   'the second substance resonance must match the FFT of the same damped FID');
 
+% Check a damped anisotropic spin in the gridfree spatial basis
+clear sys inter bas parameters;
+sys.magnet=14.1; sys.isotopes={'1H'};
+inter.zeeman.eigs={[-2 -2 4]}; inter.zeeman.euler={[0 0 0]};
+inter.relaxation={'damp'}; inter.damp_rate=8;
+inter.equilibrium='zero'; inter.rlx_keep='labframe';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
+spin_system=test_spin_system(sys,inter,bas);
+parameters.spins={'1H'}; parameters.offset=0;
+parameters.rho0=state(spin_system,'L+','1H'); parameters.coil=parameters.rho0;
+parameters.decouple={}; parameters.sweep=[-100 100]; parameters.npoints=3;
+parameters.max_rank=2; parameters.tau_c=1e-3; parameters.verbose=0;
+spectrum_sle=gridfree(spin_system,@slowpass,parameters,'nmr');
+result=test_true(result,'gridfree slowpass finite',all(isfinite(spectrum_sle)),...
+                 'spatially expanded unit directions must match the gridfree Liouvillian');
+
 end
 

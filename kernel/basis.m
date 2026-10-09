@@ -52,7 +52,7 @@ fields=setdiff(fieldnames(bas),{'formalism'});
 for s=1:nsubst
 
     % Extract this substance's input options
-    local_bas.formalism=bas.formalism;
+    local_bas=struct('formalism',bas.formalism);
     for n=1:numel(fields)
         local_bas.(fields{n})=bas.(fields{n}){s};
         if isempty(local_bas.(fields{n}))&&...

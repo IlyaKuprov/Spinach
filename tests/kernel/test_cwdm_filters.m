@@ -71,6 +71,18 @@ for n=1:numel(settings)
                      'filters retain the unit as the first row of every block');
 end
 
+% Derive a proximity alias independently for heterogeneous substances
+options=bas; options.approximation={'IK-1','none','none'};
+options.inter_level={2,[],[]}; options.space_level={3,[],[]};
+options.connectivity={'scalar_couplings',[],[]};
+actual=basis(reference,options);
+options=rmfield(options,'space_level'); options.prox_level={3,[],[]};
+expected=basis(reference,options);
+result=test_true(result,'heterogeneous proximity alias',...
+                 isequal(actual.bas.basis,expected.bas.basis)&&...
+                 isequal(actual.bas.basis(2:3),reference.bas.basis(2:3)),...
+                 'a derived proximity depth does not leak into later substances');
+
 % Check the local manual addition independently of its truncation
 options=bas; options.approximation={'IK-0','none','none'};
 options.inter_level={1,[],[]}; truncated=basis(reference,options);

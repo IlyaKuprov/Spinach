@@ -42,3 +42,5 @@ For `sphten-liouv`, the routine prepares `spin_system.bas.lpst` and `spin_system
 The source points to [10.1063/1.3624564](http://link.aip.org/link/doi/10.1063/1.3624564) for discussion of basis-set selection.
 
 [Spin Dynamics Wiki: basis.m](https://spindynamics.org/wiki/index.php?title=basis.m)
+
+Each substance starts with fresh local options. In particular, deriving `prox_level` from a nonempty `space_level` entry cannot leak that derived value into a later empty entry.

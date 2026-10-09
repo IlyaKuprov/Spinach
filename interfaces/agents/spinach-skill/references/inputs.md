@@ -591,3 +591,6 @@ once, and `chem` weights that unit by its hosting concentration.
 
 Imaging tests the compiled symmetry projectors, so a declared group disabled
 through `sys.disable` does not prevent an imaging calculation.
+
+Per-substance `space_level` aliases are derived independently; an empty entry
+does not inherit the preceding substance's proximity depth.

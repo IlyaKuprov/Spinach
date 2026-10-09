@@ -21,3 +21,8 @@ independently constructed single-substance equilibria, with empty and nonzero
 initial guesses. Every unit coordinate stays exactly one despite unequal
 chemical concentrations. Later-block trace-row and initial-normalisation
 violations are rejected.
+
+Pumping targets in the second substance and both substances are checked
+against their own unit columns. Unequal unit populations distinguish local
+pumping from an accidental source through the first substance. Identity
+components in a later block must be rejected.

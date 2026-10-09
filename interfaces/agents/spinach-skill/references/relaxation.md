@@ -220,11 +220,16 @@ is how inverted spin temperatures are specified.
 | `'dibari'` | DiBari-Levitt: R is multiplied by the imaginary-time propagator of the lab frame Hamiltonian left side product superoperator |
 
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
-state population to be exactly 1, which Spinach cannot check, so a badly
-normalised initial condition gives a silently wrong steady state.
+state population to be exactly 1; general propagation does not enforce initial
+normalisation, so a badly normalised state gives incorrect source amplitudes.
+
 In segmented `sphten-liouv`, `steady` initialises and pins the unit coordinate
 `bas.offsets(n)+1` of every substance to one; supplied guesses must obey the
 same unweighted normalisation. Both Newton and squaring methods accept this layout.
+`magpump` likewise sources each target block through its own unit coordinate,
+including targets spanning several substances, and rejects unit-state pumping
+in every block.
+
 DiBari-Levitt is more expensive but better behaved in exotic regimes; it
 demands a positive real temperature and refuses the high-temperature
 approximation (`inter.temperature=0`), and `equilibrium.m` refuses absolute

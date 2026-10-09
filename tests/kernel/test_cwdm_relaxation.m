@@ -199,6 +199,30 @@ end
 result=test_true(result,'steady later normalisation',rejected,...
                  'an initial guess must have unit population in every substance');
 
+% Drive each pumped state from only its own substance population
+R=sparse(s.bas.offsets(end),s.bas.offsets(end));
+rho=state(s,'Lz',2); pumped=magpump(s,R,rho,2);
+reference=R; reference(:,units(2))=2*rho;
+result=test_close(result,'pump second substance',pumped,reference,0,0,...
+                  'a spin selected in the second substance is sourced by its own unit column');
+source=full(unit_state(s)); source(units)=[0.2;0.8];
+result=test_close(result,'pump unequal populations',pumped*source,1.6*rho,0,1e-14,...
+                  'the second target is driven by the second population, not the first');
+rho=state(s,'Lz',1)+state(s,'Lz',2); pumped=magpump(s,R,rho,2);
+reference=2*(0.2*state(s,'Lz',1)+0.8*state(s,'Lz',2));
+result=test_close(result,'pump both substances',pumped*source,reference,0,1e-14,...
+                  'a state spanning several substances is sourced independently in each block');
+rejected=false; rho(units(2))=1;
+try
+    magpump(s,R,rho,2);
+catch err
+    rejected=strcmp(err.message,'unit state cannot be pumped.');
+end
+result=test_true(result,'pump later identity rejection',rejected,...
+                 'an identity component in any substance is rejected');
+fprintf('CWDM_MAGPUMP population_error=%.16g later_identity_rejected=%d\n',...
+        norm(pumped*source-reference),rejected);
+
 end
 
 

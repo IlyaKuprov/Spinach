@@ -31,6 +31,6 @@ The output variable is conventionally `rho` (or `psi` in the wavefunction exampl
 
 Source and credits: [Spinach Wiki: state.m](https://spindynamics.org/wiki/index.php?title=state.m). D. Savostyanov, Luke Edwards, and Ilya Kuprov (contact details are in the source file).
 
-Segmented `zeeman-wavef` calls raise `Spinach:state:segmentedZeeman` before construction: the global tensor product is not a state in the substance direct sum. Single-substance wavefunctions retain their existing projection-number API.
+Segmented `zeeman-wavef` and `zeeman-liouv` calls raise `Spinach:state:segmentedZeeman` before construction or global identity allocation: the global tensor product is not a state in the substance direct sum. Single-substance wavefunctions retain their existing projection-number API.
 
 Mixed identity/non-identity expansions, including level projectors, retain the hosting substance for every term. Their identity coefficient populates only the local unit coordinate; `chem` weights the complete expansion by the hosting concentration.

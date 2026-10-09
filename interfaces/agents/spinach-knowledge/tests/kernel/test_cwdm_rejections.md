@@ -23,3 +23,5 @@ Mixed left-product/commutator equilibrium inputs are rejected in both block orde
 Exactly zero spinful Hamiltonian blocks in both positions retain the local unit state while the other block retains its independently normalised Boltzmann state.
 
 Cross-substance Hamiltonian entries in either direction, supplied through `I` or the oriented `Q`, must raise `Spinach:equilibrium:crossSubstanceHamiltonian`.
+
+A segmented Zeeman-Liouville state request must raise `Spinach:state:segmentedZeeman` directly, rather than reaching the later operator rejection after global identity allocation.

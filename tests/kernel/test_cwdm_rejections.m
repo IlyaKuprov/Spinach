@@ -134,6 +134,18 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
                      'only genuinely segmented Zeeman symmetry is rejected');
 end
 
+% Segmented Zeeman-Liouville states reject before allocating a global identity
+bas.formalism='zeeman-liouv'; s=test_spin_system(sys,inter,bas);
+rejected=false;
+try
+    state(s,'Lz',1);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:state:segmentedZeeman');
+end
+result=test_true(result,'segmented Liouville state',rejected,...
+                 'state rejects before constructing the tensor-product identity');
+fprintf('CWDM_STATE_LIOUV named_rejection=%d\n',rejected);
+
 % Segmented wavefunctions cannot represent the compiled direct sum
 sys.isotopes={'1H','1H','1H'};
 inter=struct(); inter.chem.parts={1,2:3}; inter.chem.concs=[1 0];

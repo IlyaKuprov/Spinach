@@ -25,6 +25,15 @@ every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic
 rates have no effect there.
 
+For a rigid molecular geometry without measured tumbling data, `rotcorr`
+provides a surface-ellipsoid estimate. Supply atom radii, hydration thickness,
+solvent probe radius, temperature, and viscosity explicitly, and converge its
+surface sampling. Its scalar output is an isotropic-equivalent rank-2 time;
+its tensor output retains anisotropy in the input Cartesian frame. Do not
+interpret the scalar as every anisotropic correlation time or transfer
+protein hydration parameters uncritically to small molecules. See the
+`kernel/utilities/rotcorr` knowledge entry for model limitations and sources.
+
 ## Selecting a relaxation theory
 
 `inter.relaxation` is a cell array of strings and more than one may be

@@ -64,5 +64,3 @@ result=test_true(result,'cross symmetry',rejected,...
                  'symmetry indices must be local to the declared substance');
 
 end
-
-

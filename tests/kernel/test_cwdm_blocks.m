@@ -61,5 +61,3 @@ for method={'exact','cheap'}
 end
 
 end
-
-

@@ -80,5 +80,3 @@ if ~ischar(record_root)||~isfolder(record_root)
     error('record_root must name a WP0 record directory.');
 end
 end
-
-

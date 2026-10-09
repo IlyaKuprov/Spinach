@@ -127,5 +127,3 @@ result=test_true(result,'membership hash',...
                  'equal descriptors with different global membership have different hashes');
 
 end
-
-

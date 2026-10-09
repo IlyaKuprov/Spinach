@@ -56,9 +56,10 @@
 %
 %    'chem'   - deprecated alias for 'exact', accepted for one release
 %
-% Every method weights each substance block by chem.concs. Use coil_state
-% for unweighted detection operators. The method is ignored in Zeeman
-% Hilbert and Liouville formalisms, but concentration weighting is not.
+% Every density-matrix and Liouville method weights each substance block
+% by chem.concs. Use coil_state for unweighted detection operators.
+% Storage-only wavefunctions remain unweighted. The method is ignored in
+% Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
 %
 % Outputs:
 %
@@ -78,7 +79,7 @@ if ~exist('method','var'), method='exact'; end
 if ~exist('spins','var'), spins=[]; end
 
 % Check the wrapper-specific option
-grumble(method);
+grumble(spin_system,states,spins,method);
 
 % Retain the retired keyword for one release
 if strcmp(method,'chem')
@@ -90,6 +91,9 @@ end
 % Construct the unweighted operator representation
 rho=coil_state(spin_system,states,spins,method);
 
+% Keep storage-only wavefunctions normalised independently of concentration
+if strcmp(spin_system.bas.formalism,'zeeman-wavef'), return; end
+
 % Weight each substance without dividing by any concentration
 for n=1:spin_system.bas.nsubst
     rows=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
@@ -99,9 +103,75 @@ end
 end
 
 % Input validation function
-function grumble(method)
+function grumble(spin_system,states,spins,method)
+
+if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
+    error('basis set information is missing, run basis() before calling this function.');
+end
+if ~ischar(spin_system.bas.formalism)
+    error('formalism specification must be a character string.');
+end
+if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
+                                        'sphten-liouv','zeeman-wavef'})
+    error('unknown formalism specification.');
+end
+if ismember(spin_system.bas.formalism,{'zeeman-wavef','zeeman-liouv'})&&...
+   spin_system.bas.nsubst>1
+    error('Spinach:state:segmentedZeeman',...
+          'segmented Zeeman wavefunction and Liouville states are not implemented.');
+end
+
 if ~ischar(method)
-    error('method must be a character string.');
+    error('method must be a character string.')
+elseif ~ismember(method, {'cheap', 'exact', 'chem'})
+    error('unknown method specification.');
+end
+
+if (~(ischar(states)&&ischar(spins)))&&...
+   (~(iscell(states)&&iscell(spins)))&&...
+   (~(ischar(states)&&isnumeric(spins)))&&...
+   (~(isnumeric(states)&&isempty(spins)))
+    error('invalid state specification.');
+end
+if isnumeric(states)&&(numel(states)~=spin_system.comp.nspins)
+    error('numel(states) must match number of spins in the system.')
+end
+if isnumeric(states)&&any(mod(states,0.5)~=0,'all')
+    error('spin projection numbers must be integer or half-integer.');
+end
+if isnumeric(states)
+    spin_qn=(spin_system.comp.mults(:).'-1)/2;
+    if any(abs(states(:).')>spin_qn)||any(mod(states(:).'+spin_qn,1)~=0)
+        error('each projection quantum number must be an allowed level of its spin.');
+    end
+end
+if iscell(states)&&iscell(spins)&&(numel(states)~=numel(spins))
+    error('spins and operators cell arrays should have the same number of elements.');
+end
+if iscell(states)&&any(~cellfun(@ischar,states))
+    error('all elements of the operators cell array should be strings.');
+end
+if isnumeric(spins)&&(~isempty(spins))
+    if (~isreal(spins))||(~isrow(spins))||any(mod(spins,1)~=0)||any(spins<1)
+        error('when numeric, spins must be a row of positive integers.');
+    end
+    if numel(spins)~=numel(unique(spins))
+        error('spin list must not have any repetitions.');
+    end
+end
+if iscell(spins)
+    if isempty(spins)
+        error('when a cell array, spin list cannot be empty.');
+    end
+    for n=1:numel(spins)
+        if (~isreal(spins{n}))||(mod(spins{n},1)~=0)||(spins{n}<1)
+            error('when a cell array, spins must contain positive integers.');
+        end
+    end
+    spins=cell2mat(spins(:));
+    if numel(spins)~=numel(unique(spins))
+        error('spin list must not have any repetitions.');
+    end
 end
 end
 

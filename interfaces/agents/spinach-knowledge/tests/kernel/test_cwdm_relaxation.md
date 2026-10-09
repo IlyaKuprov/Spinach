@@ -47,3 +47,5 @@ Both DNP scan functions are called with complete two-substance inputs and must r
 Steady-state comparisons and guesses carry the specified concentrations, including the spin-free pool. Pumping targets use unweighted coil_state; their source columns act on the instantaneous populations.
 
 A symmetric relaxation fixture with cross-substance active-state entries and exactly zero unit action must raise `Spinach:thermalize:crossSubstanceRelaxation` in IME. The corresponding supported block-diagonal operator must annihilate the supplied polarised unweighted target within `10*eps*norm(R_therm,'fro')*norm(rho_eq)` in the whole-vector two-norm.
+
+Pumping reference shapes use the explicit four-argument `coil_state` API.

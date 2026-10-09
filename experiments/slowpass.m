@@ -35,6 +35,15 @@
 %       matrix inversion operation would fail to converge. The re-
 %       laxation matrix R must *not* be thermalized.
 %
+% Note: Liouville-space identity components are excluded only when
+%       the identity sector is decoupled from spin order in both
+%       directions, to within tols.liouv_zero. Its resolvent block
+%       is shifted by 1 inverse second to remove stationary poles;
+%       the spin-order block is unchanged. Spatial contexts supply
+%       parameters.spc_dim for the space-times-spin embedding.
+%       Coupled identity sectors, including selective reactions,
+%       and wavefunction inputs retain their original resolvent.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=slowpass.m>

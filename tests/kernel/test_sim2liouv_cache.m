@@ -18,7 +18,7 @@ result=new_test_result('kernel/sim2liouv_cache','Converted basis cache identity'
 % Build small systems with a real one-worker cache store
 sys.magnet=1; sys.isotopes={'1H'}; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.parprops={};
-inter.zeeman.scalar={1}; bas.formalism='zeeman-hilb'; bas.approximation='none';
+inter.zeeman.scalar={1}; bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 flags={{'op_cache'},{'ham_cache'},{'op_cache','ham_cache'}};
 nuclei={'1H','13C'};
 for flag_idx=1:numel(flags)

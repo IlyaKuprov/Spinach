@@ -31,7 +31,7 @@ inter.zeeman.eigs={[-12 5 20],[-30 10 45]};
 inter.zeeman.euler={[0.2 0.5 0.7],[0.6 0.4 0.3]};
 inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=150;
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Specify a tilted rotor and a nonzero transmitter offset
 parameters.axis=[1 2 3]/sqrt(14);

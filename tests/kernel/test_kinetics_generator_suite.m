@@ -38,7 +38,7 @@ inter.zeeman.scalar={0 0};
 inter.chem.parts={1,2};
 inter.chem.rates=[-1 1;1 -1];
 inter.chem.concs=[1 1];
-bas.formalism='sphten-liouv'; bas.approximation='none';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % react_gen must build a conservative drain/fill mapping for a specified reaction

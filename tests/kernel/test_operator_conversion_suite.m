@@ -44,7 +44,7 @@ sys.magnet=0;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 result=test_close(result,'zeeman-hilb unit_oper',unit_oper(spin_system),speye(2),1e-15,1e-15,...
                   'Hilbert-space unit dimension is the spin multiplicity product');

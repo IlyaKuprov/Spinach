@@ -26,7 +26,7 @@ inter.relaxation={'lindblad','SRSK'}; inter.srsk_sources=2;
 inter.lind_r1_rates=[1,1e5]; inter.lind_r2_rates=[1,1e5];
 inter.equilibrium='zero'; inter.temperature=298;
 inter.rlx_keep='labframe'; inter.rlx_dfs='keep';
-bas.formalism='zeeman-liouv'; bas.approximation='none';
+bas.formalism='zeeman-liouv'; bas.approximation={'none'};
 spin_z=test_spin_system(sys,inter,bas);
 
 % Require the explicit refusal across retention and equilibrium choices

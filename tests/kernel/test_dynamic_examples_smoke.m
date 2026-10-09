@@ -46,7 +46,7 @@ sys.magnet=3772062842.904/spin('1H');
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Set up a compact free-induction acquisition
@@ -95,7 +95,7 @@ inter.zeeman.scalar={1.00 3.00};
 inter.coupling.scalar{1,2}=7.0;
 inter.coupling.scalar{2,2}=0;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Use compact point counts while preserving the production example stages

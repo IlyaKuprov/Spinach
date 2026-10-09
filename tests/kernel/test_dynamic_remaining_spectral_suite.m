@@ -184,7 +184,7 @@ sys.magnet=magnet;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism=formalism;
-bas.approximation='none';
+bas.approximation={'none'};
 if strcmp(formalism,'sphten-liouv')
     bas.projections={+1};
 end

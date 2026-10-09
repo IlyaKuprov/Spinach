@@ -71,7 +71,7 @@ result=test_close(result,'enlev2bm reconstruction',bm_reconstruct(3,states,coeff
 sys.magnet=0;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Check Hilbert-space unit and sparse preallocation dimensions
 bas.formalism='zeeman-hilb';
@@ -94,7 +94,7 @@ result=test_true(result,'mprealloc zeeman-liouv size',isequal(size(A),[4 4])&&(n
 % Check spherical-tensor Liouville dimensions without assuming a fixed basis size literal
 bas.formalism='sphten-liouv';
 spin_system=test_spin_system(sys,inter,bas);
-basis_dim=size(spin_system.bas.basis,1);
+basis_dim=spin_system.bas.offsets(end);
 result=test_close(result,'unit_oper sphten-liouv',unit_oper(spin_system),speye(basis_dim),1e-15,1e-15,...
                   'spherical-tensor Liouville unit dimension is the number of retained basis states');
 A=mprealloc(spin_system,2);

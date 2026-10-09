@@ -29,7 +29,7 @@ inter.chem.parts={1,2};
 inter.chem.rates=[-3 3;3 -3];
 inter.chem.concs=[1 1];
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Build the kinetics generator

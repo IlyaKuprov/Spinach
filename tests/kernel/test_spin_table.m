@@ -129,7 +129,7 @@ result=test_true(result,'metadata value semantics',again==gamma&&meta.gamma==gam
 
 % Compare a spin-zero-plus-proton Hilbert system with the proton alone
 sys.magnet=1; sys.isotopes={'12C','1H'};
-inter.zeeman.scalar={0,1}; bas.formalism='zeeman-hilb'; bas.approximation='none';
+inter.zeeman.scalar={0,1}; bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 spin_zero=test_spin_system(sys,inter,bas);
 sys.isotopes={'1H'}; inter.zeeman.scalar={1};
 spin_half=test_spin_system(sys,inter,bas);

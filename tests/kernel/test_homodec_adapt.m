@@ -30,7 +30,7 @@ sys.disable={'hygiene'};
 sys.parallel={'processes',1};
 inter.zeeman.scalar={1 3};
 inter.coupling.scalar={0 150;0 0};
-bas.approximation='none';
+bas.approximation={'none'};
 formalisms={'zeeman-hilb','zeeman-liouv','sphten-liouv','zeeman-wavef'};
 fids=cell(2,3);
 

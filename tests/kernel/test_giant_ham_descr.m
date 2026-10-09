@@ -44,7 +44,7 @@ inter.giant.euler={{[0.11 0.13 0.17],...
                     [0.19 0.23 0.29],...
                     [0.31 0.37 0.41]}};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Apply the requested Hamiltonian assumption

@@ -37,9 +37,9 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 
 % Set a minimal one-dimensional imaging grid
 parameters.spins={'1H'};
@@ -94,9 +94,9 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 
 % Attach a two-cell Voronoi mesh with one shared boundary
 spin_system.mesh=local_two_cell_mesh();

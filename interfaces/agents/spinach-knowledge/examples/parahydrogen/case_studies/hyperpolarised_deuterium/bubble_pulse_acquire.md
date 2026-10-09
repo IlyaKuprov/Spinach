@@ -20,3 +20,7 @@ Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
 All local unit coordinates are excluded from the pumping shape and traceless detection coils. Initial units carry [1, 0]; chemical transfer evolves these populations, and magpump scales each substance source by its instantaneous population.
 
 The former shared-unit pumping source remained constant as D2 bound to catalyst. The concentration-weighted source instead follows the free-D2 population (equilibrium 5000/5001 of the total). This is an intentional physical change, not exact parity with that constant-source trajectory.
+
+## Weak-signal numerical sensitivity
+
+A constant-source comparison separates the population-dependent pumping change from floating-point sensitivity. Its prepared traceless state differs from the archived state by 2.93223e-13 relative; the mapped acquisition generator, receiver, and pulse generator agree exactly. The detected signal is much smaller than the prepared state (maximum FID magnitude 1.47252e-8). Using one common dense exponential and arithmetic ordering for both preparations gives a 2.77915e-8 relative FID difference. Reversing only the coordinate order of the same physical model gives a 4.13135e-8 relative FID change. Thus the residual 3.41135e-8 after constant-source restoration is within the measured double-precision sensitivity of this weak observable, not evidence of a different acquisition generator. This numerical effect is separate from the approximately 2e-4 instantaneous-population pumping effect.

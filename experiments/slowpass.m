@@ -61,17 +61,22 @@ L=H+1i*R+1i*K;
 % Compute subspace projectors
 projectors=reduce(spin_system,L,parameters.coil);
 
-% Get normalised unit states, one per substance
-U=cell(1,spin_system.bas.nsubst);
-for n=1:spin_system.bas.nsubst
-    unit_system=spin_system; unit_system.chem.concs(:)=0;
-    unit_system.chem.concs(n)=1; U{n}=unit_state(unit_system);
-end
-U=[U{:}];
+% Get identity directions only in Liouville-space formalisms
+U=sparse(size(L,1),0);
+if ~strcmp(spin_system.bas.formalism,'zeeman-wavef')
 
-% Embed the spin identities in every spatial basis coordinate
-if isfield(parameters,'spc_dim')
-    U=kron(speye(parameters.spc_dim),U);
+    % Get normalised unit states, one per substance
+    U=cell(1,spin_system.bas.nsubst);
+    for n=1:spin_system.bas.nsubst
+        unit_system=spin_system; unit_system.chem.concs(:)=0;
+        unit_system.chem.concs(n)=1; U{n}=unit_state(unit_system);
+    end
+    U=[U{:}];
+
+    % Embed the spin identities in every spatial basis coordinate
+    if isfield(parameters,'spc_dim')
+        U=kron(speye(parameters.spc_dim),U);
+    end
 end
 
 % Loop over subspaces

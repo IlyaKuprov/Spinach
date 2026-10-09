@@ -96,5 +96,18 @@ end
 result=test_close(result,'selective reaction resolvent',spectrum_rx,reference,1e-12,1e-12,...
                   'identity and spin order must retain their physical reaction coupling');
 
+% Preserve the direct wavefunction resolvent without calling unit_state
+clear sys bas parameters;
+sys.magnet=1; sys.isotopes={'1H'};
+bas.formalism='zeeman-wavef'; bas.approximation={'none'};
+spin_system=test_spin_system(sys,struct(),bas);
+parameters.rho0=[1;0]; parameters.coil=parameters.rho0;
+parameters.sweep=[-1 1]; parameters.npoints=3;
+spectrum_wf=slowpass(spin_system,parameters,sparse(diag([1 -1])),-speye(2),sparse(2,2));
+reference=3./(1+1i*(1+2*pi*linspace(-1,1,3)'));
+result=test_close(result,'wavefunction resolvent',spectrum_wf,reference,1e-12,1e-12,...
+                  'wavefunction inputs have no Liouville identity sector to remove');
+
+
 end
 

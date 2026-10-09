@@ -128,4 +128,22 @@ for method={'cheap','exact','chem'}
                      'a numeric sum leaves unrelated blocks empty');
 end
 
+% Level projectors retain the hosting block throughout their tensor expansion
+for method={'cheap','exact','chem'}
+    for n=1:2
+        spins=s.chem.parts{n}; rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+        local_sys=sys; local_sys.isotopes=sys.isotopes(spins);
+        local_inter=struct(); local_inter.chem.concs=s.chem.concs(n);
+        local_bas=bas; local_bas.approximation={'none'};
+        local=test_spin_system(local_sys,local_inter,local_bas);
+        expected=sparse(rows,1,state(local,'ZL1',1,method{1}),...
+                        s.bas.offsets(end),1);
+        actual=state(s,'ZL1',spins(1),method{1});
+        result=test_close(result,['level projector ' method{1} ' ' int2str(n)],...
+                          actual,expected,1e-14,1e-14,...
+                          'identity and non-identity terms equal an independent local state');
+        fprintf('CWDM_PROJECTOR %s block=%d error=%.16g\n',method{1},n,norm(actual-expected));
+    end
+end
+
 end

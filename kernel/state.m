@@ -109,13 +109,6 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
         return;
     end
     subst=which_subst(spin_system,cell2mat(spins));
-    [opspecs,coeffs]=human2opspec(spin_system,states,spins);
-    if all(cellfun(@(x)nnz(x)==0,opspecs))
-        rho=sparse(spin_system.bas.offsets(subst)+1,1,sum(coeffs),...
-                   spin_system.bas.offsets(end),1);
-        if strcmp(method,'chem'), rho=spin_system.chem.concs(subst)*rho; end
-        return;
-    end
 end
 
 % Get the unit state
@@ -127,6 +120,10 @@ switch spin_system.bas.formalism
         % such because prod(spin_system.comp.mults) can be-
         % come too large for double precision arithmetic
         unit=unit_state(spin_system);
+        if spin_system.bas.nsubst>1
+            unit=sparse(spin_system.bas.offsets(subst)+1,1,1,...
+                        spin_system.bas.offsets(end),1);
+        end
         
     case 'zeeman-liouv'
 
@@ -195,7 +192,10 @@ switch spin_system.bas.formalism
                     active_spins=find(opspecs{n});
                     
                     % Find out which chemical species they are in
-                    species=true(1,numel(spin_system.chem.parts)); 
+                    species=true(1,numel(spin_system.chem.parts));
+                    if isempty(active_spins)&&spin_system.bas.nsubst>1
+                        species=(1:spin_system.bas.nsubst)==subst;
+                    end
                     for k=1:numel(active_spins)
                         species=species&cellfun(@(x)ismember(active_spins(k),x),spin_system.chem.parts);
                     end

@@ -8,3 +8,5 @@ are exact sparse-pattern assertions, not tolerance-based norm comparisons.
 Identity checks cover individual spins, local products, numeric sums, isotope sums, and all-spin sums, with both `E` and `T0,0` local requests. Exact and cheap identities are unweighted; chemical identities carry the hosting substance concentration. These checks do not establish the broader concentration semantics of thermal equilibrium or detection.
 
 Identity operator checks cover left, right, commutator, and anticommutator actions, with individual `E`/`T0,0` requests and local products in CSC and XYZ formats. Isotope, all-spin, and numeric sums check per-spin multiplicity and exact hosting-block support.
+
+Level-projector checks compare both hosting blocks with independently built single-substance `ZL1` states for cheap, exact, and chemical construction, including the identity term and concentration weighting.

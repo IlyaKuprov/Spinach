@@ -605,3 +605,6 @@ Segmented wavefunction state construction is deferred and raises
 
 Before basis compilation, `chem.parts` must cover every global spin; omitted
 spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.
+
+Level projectors retain their substance through mixed identity and non-identity
+tensor expansions, including chemical concentration weighting.

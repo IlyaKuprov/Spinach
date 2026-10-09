@@ -21,3 +21,5 @@ Coherent-state tests use local Hilbert dimensions two and three in both Zeeman f
 Mixed left-product/commutator equilibrium inputs are rejected in both block orderings with `Spinach:equilibrium:notLeftProduct` and the invalid substance number. Valid left-product blocks are compared against independently normalised Boltzmann exponentials at absolute and relative whole-vector tolerances of `1e-14`.
 
 Exactly zero spinful Hamiltonian blocks in both positions retain the local unit state while the other block retains its independently normalised Boltzmann state.
+
+Cross-substance Hamiltonian entries in either direction, supplied through `I` or the oriented `Q`, must raise `Spinach:equilibrium:crossSubstanceHamiltonian`.

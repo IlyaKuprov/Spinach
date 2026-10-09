@@ -40,6 +40,8 @@
 %          zero temperatures are not supported.
 %
 % Note: multi-substance Zeeman equilibrium states are not yet supported.
+%       Segmented Hamiltonians must have no cross-substance blocks after
+%       the orientation-dependent contribution has been added.
 %
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
@@ -75,6 +77,17 @@ else
     % Complain and bomb out
     error('incorrect number of input arguments.');
     
+end
+
+% Reject coupling between independent substance blocks after orientation assembly
+if spin_system.bas.nsubst>1
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        if nnz(I(idx,:))~=nnz(I(idx,idx))
+            error('Spinach:equilibrium:crossSubstanceHamiltonian',...
+                  'Hamiltonian must not contain cross-substance blocks (substance %d).',n);
+        end
+    end
 end
 
 % Get the temperature factor

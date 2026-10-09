@@ -18,6 +18,7 @@ A three-argument call is not implemented.
 - `spin_system` must have a temperature in `spin_system.rlx.temperature` (configured through `inter.temperature`); an empty or exactly zero temperature is rejected. The routine uses `hbar/(kbol*T)` from the configured physical constants.
 - `I` is numeric: the isotropic Hamiltonian in Hilbert space, or its **left-side product superoperator** in Liouville space. In Liouville calculations, neither `I` nor anisotropic terms may be supplied as commutation superoperators.
 - For the four-argument form, `Q` is a cell array of anisotropic Hamiltonian terms and `euler_angles` is a real three-element vector in radians, giving the system orientation relative to the input orientation. The orientation-dependent term is added to `I`.
+- In segmented systems, the assembled Hamiltonian (after adding the orientation-dependent contribution, when supplied) must be block diagonal by substance. Any nonzero cross-substance block raises `Spinach:equilibrium:crossSubstanceHamiltonian` before propagation.
 - Hamiltonians `I` and `Q` generated with `hamiltonian.m` must use the `'labframe'` assumption.
 
 ## Numerical mechanism and limitations

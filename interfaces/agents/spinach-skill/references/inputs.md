@@ -648,7 +648,7 @@ Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: ch
 
 ### Two-stage chemistry histories
 
-`diels_alder_zmag` puts true initial concentrations in `chem.concs`, traces spins for its LG4 concentration history, and compiles the full additive maps once for the two-point spin steps. Embed the prescribed history into unit coordinates when evaluating `K(t,eta)`; initialise spin magnetisation with weighted `state`, add `unit_state`, and detect with unweighted `coil_state`. Do not multiply the initial state by the concentrations a second time.
+`diels_alder_zmag` and `diels_alder_spec` put true initial concentrations in `chem.concs`, trace spins for their LG4 concentration histories, and compile the full additive maps once for the two-point spin steps. Embed the prescribed history into unit coordinates when evaluating `K(t,eta)`; initialise spin magnetisation with weighted `state`, add `unit_state`, and detect with unweighted `coil_state`. Do not multiply the initial state by the concentrations a second time.
 
 ### Spatial two-stage chemistry
 

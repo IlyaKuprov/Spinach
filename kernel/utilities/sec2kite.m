@@ -57,7 +57,8 @@ end
 if (~isnumeric(R))||(size(R,1)~=size(R,2))
     error('R must be a square matrix.');
 end
-unit=unit_state(spin_system);
+unit=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+            spin_system.bas.offsets(end),1);
 if norm(R*unit,2)>1e-10
     error('R appears to be thermalised, cannot proceed.');
 end

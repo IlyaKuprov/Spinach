@@ -54,12 +54,12 @@
 %               this is the default when the last argument is
 %               skipped in the function call
 %
-%    'chem'   - the exact state vector weighted with the 
-%               concentrations specified in inter.chem.concs
-%               field under chemical kinetics parameters
+%    'chem'   - deprecated alias for 'exact', accepted for one release
 %
-% This option is ignored in zeeman-hilb and zeeman-liouv formalisms
-% because there are no cheap shortcuts and kinetics is not available.
+% Every density-matrix and Liouville method weights each substance block
+% by chem.concs. Use coil_state for unweighted detection operators.
+% Storage-only wavefunctions remain unweighted. The method is ignored in
+% Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
 %
 % Outputs:
 %
@@ -74,195 +74,30 @@
 
 function rho=state(spin_system,states,spins,method)
 
-% Default is to use consistent state norms
+% Preserve the established optional arguments
 if ~exist('method','var'), method='exact'; end
-
-% In wavefunction space, empty set here
 if ~exist('spins','var'), spins=[]; end
 
-% Check consistency
+% Check the formalism and wrapper-specific option
 grumble(spin_system,states,spins,method);
 
-% Reject product states spanning substances
-if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
-
-% Preserve substance membership before identity factors lose their spin labels
-if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
-    if ischar(spins)
-        switch spins
-            case 'all'
-                spins=1:spin_system.comp.nspins;
-            case 'electrons'
-                spins=find(cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes));
-            case 'nuclei'
-                spins=find(~cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes));
-            otherwise
-                spins=find(strcmp(spins,spin_system.comp.isotopes));
-        end
-        if isempty(spins), error('no such spins in the system.'); end
-    end
-    if isnumeric(spins)
-        rho=sparse(spin_system.bas.offsets(end),1);
-        for n=1:numel(spins)
-            rho=rho+state(spin_system,{states},{spins(n)},method);
-        end
-        return;
-    end
-    subst=which_subst(spin_system,cell2mat(spins));
+% Retain the retired keyword for one release
+if strcmp(method,'chem')
+    warning('Spinach:state:deprecatedChem',...
+            '''chem'' is deprecated: use state for weighted states and coil_state for unweighted coils.');
+    method='exact';
 end
 
-% Get the unit state
-switch spin_system.bas.formalism
+% Construct the unweighted operator representation
+rho=coil_state(spin_system,states,spins,method);
 
-    case 'sphten-liouv'
+% Keep storage-only wavefunctions normalised independently of concentration
+if strcmp(spin_system.bas.formalism,'zeeman-wavef'), return; end
 
-        % Unit population of T(0,0) state, normalisation is
-        % such because prod(spin_system.comp.mults) can be-
-        % come too large for double precision arithmetic
-        unit=unit_state(spin_system);
-        if spin_system.bas.nsubst>1
-            unit=sparse(spin_system.bas.offsets(subst)+1,1,1,...
-                        spin_system.bas.offsets(end),1);
-        end
-        
-    case 'zeeman-liouv'
-
-        % Stretched unit matrix, normalisation matched to 
-        % the Hilbert space because systems are small
-        unit=speye(prod(spin_system.comp.mults)); unit=unit(:);
-
-end
-
-% Decide how to proceed
-switch spin_system.bas.formalism
-    
-    case 'sphten-liouv'
-        
-        % Choose the state vector generation methos
-        switch method
-            
-            % Careless normalisation
-            case 'cheap'
-                
-                % Parse the specification
-                [opspecs,coeffs]=human2opspec(spin_system,states,spins);
-                
-                % Allocate the unweighted direct-sum state
-                rho=sparse(spin_system.bas.offsets(end),1);
-
-                % Locate each operator in its hosting descriptor
-                for n=1:numel(opspecs)
-                    active_spins=find(opspecs{n});
-                    if isempty(active_spins)
-                        rho=rho+coeffs(n)*unit;
-                        continue;
-                    end
-                    subst=which_subst(spin_system,active_spins);
-                    descriptor=opspecs{n}(spin_system.chem.parts{subst});
-                    [present,index]=ismember(descriptor,spin_system.bas.basis{subst},'rows');
-                    if ~present
-                        error('the requested state is not present in the basis.');
-                    end
-                    index=index+spin_system.bas.offsets(subst);
-                    rho(index)=rho(index)+coeffs(n);
-                end
-
-            % Careful normalisation
-            case 'exact'
-                
-                % Apply a left side product superoperator to the unit state
-                rho=operator(spin_system,states,spins,'left')*unit;
-            
-            % Chemical weighing
-            case 'chem'
-                
-                % Parse the specification
-                [opspecs,coeffs]=human2opspec(spin_system,states,spins);
-                
-                % Preallocate the state vector
-                rho=spalloc(spin_system.bas.offsets(end),1,0);
-
-                % Get the basis dimension
-                matrix_dim=spin_system.bas.offsets(end);
-                
-                % Sum the states with concentrations
-                for n=1:numel(opspecs)
-                    
-                    % Identify active spins
-                    active_spins=find(opspecs{n});
-                    
-                    % Find out which chemical species they are in
-                    species=true(1,numel(spin_system.chem.parts));
-                    if isempty(active_spins)&&spin_system.bas.nsubst>1
-                        species=(1:spin_system.bas.nsubst)==subst;
-                    end
-                    for k=1:numel(active_spins)
-                        species=species&cellfun(@(x)ismember(active_spins(k),x),spin_system.chem.parts);
-                    end
-                    
-                    % Check state validity
-                    if nnz(species)~=1
-                        error('the spin state requested crosses chemical species boundaries.');
-                    end
-                    
-                    % Adjust the coefficient
-                    coeffs(n)=coeffs(n)*spin_system.chem.concs(species);
-                    
-                    % Get the operator
-                    A=superop(spin_system,opspecs{n},'left');
-                    A=sparse(A(:,1),A(:,2),A(:,3),matrix_dim,matrix_dim);
-
-                    % Get the state vector
-                    rho=rho+coeffs(n)*A*unit;
-                    
-                end
-                
-            otherwise
-                
-                % Complain and bomb out
-                error('unknown state generation method.');
-                
-        end
-        
-    case 'zeeman-liouv'
-
-        % Apply a left side product superoperator to the unit state
-        rho=operator(spin_system,states,spins,'left')*unit; 
-                
-    case 'zeeman-hilb'
-        
-        % Generate a Hilbert space operator
-        rho=operator(spin_system,states,spins);
-
-    case 'zeeman-wavef'
-
-        % Start the wavefunction
-        psi=1;
-
-        % Loop over spins
-        for n=1:spin_system.comp.nspins
-
-            % Find out the multiplicity and spin
-            current_mult=spin_system.comp.mults(n);
-            current_spin=(current_mult-1)/2;
-
-            % Find out which level we are in
-            levels=fliplr((-current_spin):(current_spin));
-            current_psi=double(levels==states(n));
-            
-            % Kronecker the spin in
-            psi=kron(psi,transpose(current_psi));
-
-        end
-
-        % Adapt to the output
-        rho=psi;
-
-    otherwise
-        
-        % Complain and bomb out
-        error('unknown formalism specification.');
-    
+% Weight each substance without dividing by any concentration
+for n=1:spin_system.bas.nsubst
+    rows=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+    rho(rows,:)=spin_system.chem.concs(n)*rho(rows,:);
 end
 
 end
@@ -270,7 +105,6 @@ end
 % Input validation function
 function grumble(spin_system,states,spins,method)
 
-% Check the formalism
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('basis set information is missing, run basis() before calling this function.');
 end
@@ -287,14 +121,12 @@ if ismember(spin_system.bas.formalism,{'zeeman-wavef','zeeman-liouv'})&&...
           'segmented Zeeman wavefunction and Liouville states are not implemented.');
 end
 
-% Check method
 if ~ischar(method)
     error('method must be a character string.')
 elseif ~ismember(method, {'cheap', 'exact', 'chem'})
     error('unknown method specification.');
 end
 
-% Make sure state specification is valid
 if (~(ischar(states)&&ischar(spins)))&&...
    (~(iscell(states)&&iscell(spins)))&&...
    (~(ischar(states)&&isnumeric(spins)))&&...
@@ -330,7 +162,7 @@ end
 if iscell(spins)
     if isempty(spins)
         error('when a cell array, spin list cannot be empty.');
-    end  
+    end
     for n=1:numel(spins)
         if (~isreal(spins{n}))||(mod(spins{n},1)~=0)||(spins{n}<1)
             error('when a cell array, spins must contain positive integers.');

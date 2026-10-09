@@ -592,7 +592,9 @@ states are explicitly rejected. Single-substance Zeeman behaviour is retained.
 Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
 use `bas.offsets(end)`. Identity states retain the selected substance: each
 selected spin contributes one local unit in a sum, a local product contributes
-once, and `chem` weights that unit by its hosting concentration.
+once, and every `state` method weights that unit by its hosting concentration.
+Use `coil_state` with the same description for unweighted detection vectors;
+`state(...,'chem')` is a deprecated alias of the weighted exact method.
 
 Imaging tests the compiled symmetry projectors, so a declared group disabled
 through `sys.disable` does not prevent an imaging calculation.
@@ -617,9 +619,22 @@ Segmented coherent states and Zeeman steady solves are explicitly deferred.
 Steady-state `solid_effect` and both DNP scans require a single substance;
 these experiments retain their supported single-substance algorithms.
 
+`unit_state`, `state`, and `equilibrium` return concentration-weighted density
+matrices and Liouville states; storage-only wavefunctions remain unweighted.
+Geometric detection and normalised operator vectors use `coil_state`. IME
+`thermalize` instead takes unit-concentration target shapes: request equilibrium
+on a copy with all `chem.concs` entries one, as `relaxation` does internally.
+The propagated unit coordinates supply the instantaneous concentrations; neither
+thermalisation nor pumping divides by a concentration. `magpump` takes an
+unweighted `coil_state` target, and `steady` pins the supplied concentrations.
+
 `create(sys)` without interaction input remains supported; it uses an empty
 interaction structure and the ordinary one-substance/unit-concentration defaults.
 
 `reduce` rejects cross-substance entries in caller-supplied generators at the
 compiled spin dimension before building substance-local projectors. This
 boundary also covers the adjoint generator passed by destination screening.
+
+The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
+with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
+spin lists. Only the legacy `state` wrapper retains optional arguments.

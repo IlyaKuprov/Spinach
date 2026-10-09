@@ -181,7 +181,7 @@ for method={'newton','squaring'}
     reference=cell(2,1);
     for n=1:2
         local_sys=sys; local_sys.isotopes=sys.isotopes(n);
-        local_inter=inter; local_inter.chem.parts={1}; local_inter.chem.concs=1;
+        local_inter=inter; local_inter.chem.parts={1}; local_inter.chem.concs=s.chem.concs(n);
         local_inter.r1_rates=inter.r1_rates(n); local_inter.r2_rates=inter.r2_rates(n);
         local_bas=bas; local_bas.approximation={'none'};
         local=assume(test_spin_system(local_sys,local_inter,local_bas),'nmr');
@@ -189,9 +189,9 @@ for method={'newton','squaring'}
     end
     actual=steady(s,P,[],method{1}); reference=vertcat(reference{:});
     result=test_close(result,['steady direct sum ' method{1}],actual,reference,1e-12,1e-12,...
-                      'both substance blocks equal their independently normalised steady states');
-    result=test_true(result,['steady units ' method{1}],all(actual(units)==1),...
-                     'each substance has unit population independently of chemical concentration');
+                      'both substance blocks equal their independently concentration-weighted steady states');
+    result=test_true(result,['steady units ' method{1}],all(actual(units)==s.chem.concs(:)),...
+                     'each substance carries its specified concentration');
     guess=full(unit_state(s)); guess(3)=0.1; guess(7)=-0.2;
     result=test_close(result,['steady initial guess ' method{1}],...
                       steady(s,P,guess,method{1}),reference,1e-12,1e-12,...
@@ -261,19 +261,19 @@ catch err
     rejected=contains(err.message,'every substance unit coordinate of rho');
 end
 result=test_true(result,'steady later normalisation',rejected,...
-                 'an initial guess must have unit population in every substance');
+                 'an initial guess must carry the specified substance concentrations');
 
 % Drive each pumped state from only its own substance population
 R=sparse(s.bas.offsets(end),s.bas.offsets(end));
-rho=state(s,'Lz',2); pumped=magpump(s,R,rho,2);
+rho=coil_state(s,'Lz',2,'exact'); pumped=magpump(s,R,rho,2);
 reference=R; reference(:,units(2))=2*rho;
 result=test_close(result,'pump second substance',pumped,reference,0,0,...
                   'a spin selected in the second substance is sourced by its own unit column');
 source=full(unit_state(s)); source(units)=[0.2;0.8];
 result=test_close(result,'pump unequal populations',pumped*source,1.6*rho,0,1e-14,...
                   'the second target is driven by the second population, not the first');
-rho=state(s,'Lz',1)+state(s,'Lz',2); pumped=magpump(s,R,rho,2);
-reference=2*(0.2*state(s,'Lz',1)+0.8*state(s,'Lz',2));
+rho=coil_state(s,'Lz',1,'exact')+coil_state(s,'Lz',2,'exact'); pumped=magpump(s,R,rho,2);
+reference=2*(0.2*coil_state(s,'Lz',1,'exact')+0.8*coil_state(s,'Lz',2,'exact'));
 result=test_close(result,'pump both substances',pumped*source,reference,0,1e-14,...
                   'a state spanning several substances is sourced independently in each block');
 rejected=false; rho(units(2))=1;
@@ -383,7 +383,7 @@ P=expm(full(relaxation(pool))); units=pool.bas.offsets(1:end-1)+1;
 for method={'newton','squaring'}
     actual=steady(pool,P,[],method{1});
     result=test_true(result,['steady spin-free pool ' method{1}],...
-                     all(actual(units)==1)&&(numel(actual)==pool.bas.offsets(end)),...
+                     all(actual(units)==pool.chem.concs(:))&&(numel(actual)==pool.bas.offsets(end)),...
                      'a spin-free pool keeps its unit coordinate without a thermalisation source');
     fprintf('CWDM_STEADY_POOL method=%s units=%s\n',method{1},mat2str(actual(units)'));
 end

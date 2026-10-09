@@ -45,3 +45,5 @@ Zero track elimination is off by default. Add `'zte'` to `sys.enable` to opt in;
 ## Substance defaults
 
 Absent `inter.chem.parts` defaults to a single block containing all spins. A single substance defaults to concentration 1. Empty parts are accepted as spin-free substances; spin lists are sorted in the compiled object. Basis settings are supplied subsequently to `basis`, which validates their per-substance cell cardinality.
+
+Concentrations must be a finite, real, non-negative vector with one entry per substance, including spin-free substances. Zero concentrations are valid.

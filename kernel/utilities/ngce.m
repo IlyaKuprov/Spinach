@@ -107,7 +107,8 @@ H1=H1(1:nstripes*n_tau_int_steps);
 H1=reshape(H1,[n_tau_int_steps nstripes]);
 
 % Get the unit state projector
-U=unit_state(spin_system); USP=U*U';
+unit_system=spin_system; unit_system.chem.concs(:)=1;
+U=unit_state(unit_system); USP=U*U';
 
 % Error analysis switch
 calc_err=nargout>1;

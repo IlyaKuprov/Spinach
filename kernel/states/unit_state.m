@@ -1,5 +1,5 @@
 % Returns the unit state vector or matrix in the current formalism
-% and basis. Syntax:
+% and basis, weighted by each substance concentration. Syntax:
 %
 %                     rho=unit_state(spin_system)
 %
@@ -30,20 +30,20 @@ switch spin_system.bas.formalism
     
     case 'sphten-liouv'
         
-        % Unit population of T(0,0) state
-        rho=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+        % Concentration at each T(0,0) coordinate
+        rho=sparse(spin_system.bas.offsets(1:end-1)+1,1,spin_system.chem.concs,...
                    spin_system.bas.offsets(end),1);
         
     case 'zeeman-liouv'
         
         % Normalized stretched unit matrix
         rho=speye(prod(spin_system.comp.mults));
-        rho=rho(:); rho=rho/norm(rho,2);
+        rho=rho(:); rho=spin_system.chem.concs(1)*rho/norm(rho,2);
         
     case 'zeeman-hilb'
         
         % Sparse unit matrix
-        rho=speye(prod(spin_system.comp.mults));
+        rho=spin_system.chem.concs(1)*speye(prod(spin_system.comp.mults));
         
     otherwise
         

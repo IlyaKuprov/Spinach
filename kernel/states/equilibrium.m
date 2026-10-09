@@ -39,6 +39,7 @@
 % WARNING: spin system ground states are commonly degenerate; absolute
 %          zero temperatures are not supported.
 %
+% Each returned substance block is weighted by chem.concs.
 % Note: multi-substance Zeeman equilibrium states are not yet supported.
 %       Segmented Hamiltonians must have no cross-substance blocks after
 %       the orientation-dependent contribution has been added.
@@ -107,7 +108,8 @@ switch spin_system.bas.formalism
                 % Unit population of T(0,0) state, normalisation is
                 % such because prod(spin_system.comp.mults) can be-
                 % come too large for double precision arithmetic
-                unit=unit_state(spin_system);
+                unit=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+                            spin_system.bas.offsets(end),1);
 
             case 'zeeman-liouv'
 
@@ -144,7 +146,7 @@ switch spin_system.bas.formalism
         % Divide by partition function
         for n=1:spin_system.bas.nsubst
             idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
-            rho(idx)=rho(idx)/dot(unit(idx),rho(idx));
+            rho(idx)=spin_system.chem.concs(n)*rho(idx)/dot(unit(idx),rho(idx));
         end
         
     % Hilbert space
@@ -173,8 +175,9 @@ switch spin_system.bas.formalism
             end
         end
             
-        % Return to CPU if appropriate
+        % Return the concentration-weighted state on the CPU
         if isa(rho,'gpuArray'), rho=gather(rho); end
+        rho=spin_system.chem.concs(1)*rho;
             
 end
         

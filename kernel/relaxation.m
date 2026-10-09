@@ -464,8 +464,8 @@ if ismember('SRSK',spin_system.rlx.theories)
     for k=spin_system.rlx.srsk_sources
 
         % Relaxation rates of the source spin
-        Lz_k=state(spin_system,{'Lz'},{k}); Lz_k=Lz_k/norm(Lz_k,2);
-        Lp_k=state(spin_system,{'L+'},{k}); Lp_k=Lp_k/norm(Lp_k,2);
+        Lz_k=coil_state(spin_system,{'Lz'},{k},'exact'); Lz_k=Lz_k/norm(Lz_k,2);
+        Lp_k=coil_state(spin_system,{'L+'},{k},'exact'); Lp_k=Lp_k/norm(Lp_k,2);
         T1k=-1/real(Lz_k'*R*Lz_k); T2k=-1/real(Lp_k'*R*Lp_k);
 
         % Source spin quantum number
@@ -574,7 +574,8 @@ switch spin_system.rlx.keep
         R=diag(diag(R));
 
         % Still make sure the unit state is not damped
-        U=unit_state(spin_system);
+        unit_system=spin_system; unit_system.chem.concs(:)=1;
+        U=unit_state(unit_system);
         for n=1:spin_system.bas.nsubst
             idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
             R(idx,idx)=R(idx,idx)-(U(idx)'*R(idx,idx)*U(idx))*(U(idx)*U(idx)');
@@ -707,7 +708,8 @@ if ismember('damp',spin_system.rlx.theories)
 
             % Damp everything except unit state
             RD=-rate*unit_oper(spin_system);
-            U=unit_state(spin_system);
+            unit_system=spin_system; unit_system.chem.concs(:)=1;
+            U=unit_state(unit_system);
             for n=1:spin_system.bas.nsubst
                 idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
                 RD(idx,idx)=RD(idx,idx)-(U(idx)'*RD(idx,idx)*U(idx))*(U(idx)*U(idx)');
@@ -731,6 +733,9 @@ switch spin_system.rlx.equilibrium
         % Inform the user
         report(spin_system,'thermalisation method: inhomogeneous master equation');
         
+        % Request unit-concentration target shapes independently of populations
+        unit_system=spin_system; unit_system.chem.concs(:)=1;
+
         % Get the equilibrium state
         if exist('euler_angles','var')
             
@@ -743,7 +748,7 @@ switch spin_system.rlx.equilibrium
             report(spin_system,['  alpha=' num2str(euler_angles(1)) ...
                                 ', beta='  num2str(euler_angles(2)) ...
                                 ', gamma=' num2str(euler_angles(3)) '...']);
-            rho_eq=equilibrium(spin_system,H,Q,euler_angles);
+            rho_eq=equilibrium(unit_system,H,Q,euler_angles);
             
         else
             
@@ -753,7 +758,7 @@ switch spin_system.rlx.equilibrium
             
             % Get the equilibrium state
             report(spin_system,'getting the equilibrium state using isotropic Hamiltonian...');
-            rho_eq=equilibrium(spin_system,H);
+            rho_eq=equilibrium(unit_system,H);
             
         end
         

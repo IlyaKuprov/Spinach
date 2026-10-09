@@ -24,6 +24,9 @@
 %        ping each state of the reactant state space into
 %        its destination in the product state space
 %
+% Note: multi-substance reactions require the WP3 reaction-record
+%       implementation and are explicitly rejected here.
+%
 % i.kuproprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=react_gen.m>
@@ -39,7 +42,7 @@ timer_react_gen=tic;
 
 % Preallocate reaction generator arrays
 % to be [reactant destin source coeff] 
-nstates=size(spin_system.bas.basis,1);
+nstates=spin_system.bas.offsets(end);
 drain_gen_idx=zeros(nstates,4); 
 fill_gen_idx=zeros(nstates,4);
 
@@ -47,7 +50,7 @@ fill_gen_idx=zeros(nstates,4);
 parfor n=1:nstates %#ok<*PFBNS>
     
     % Extract the state
-    source_state=spin_system.bas.basis(n,:); 
+    source_state=spin_system.bas.basis{1}(n,:);
 
     % Find participating spins
     [~,spins_involved]=find(source_state);
@@ -85,7 +88,7 @@ parfor n=1:nstates %#ok<*PFBNS>
             destin_state=sparse(destin_state);
 
             % Look for the destination state in the basis set and double-check indexing
-            [destin_exists,destin_index]=ismember(destin_state,spin_system.bas.basis,'rows');
+            [destin_exists,destin_index]=ismember(destin_state,spin_system.bas.basis{1},'rows');
             if numel(destin_index)>1, error('invalid basis set specification'); end
 
             % Build product fill generator
@@ -136,6 +139,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,reaction)
+if spin_system.bas.nsubst>1
+    error('Spinach:react_gen:segmentedChemistry',...
+          'multi-substance chemistry requires the reaction-record implementation (WP3).');
+end
 if ~isempty(intersect(reaction.reactants,...
                       reaction.products))
     error('reactants and products must contain different substances.');

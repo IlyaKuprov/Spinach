@@ -29,3 +29,5 @@ result=test_dynamic_spin_edit_suite()
 
 The basis-bearing removal fixture is built by `test_spin_system`; removal must
 rebuild its 16-state two-spin basis while clearing stale symmetry and assumptions.
+
+Longitudinal and zero-quantum isotope filters are tested after partial isotope removal, loss of the last local match while another substance retains it, removal of all matching isotopes globally, and creation of a spin-free substance. Rebuilt descriptors, offsets, and hashes must equal an explicit rebuild with the surviving numeric and isotope filters.

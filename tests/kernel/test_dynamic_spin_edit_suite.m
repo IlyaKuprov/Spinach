@@ -64,6 +64,33 @@ result=test_true(result,'kill_spin stale metadata',isequal(stale.bas.nstates,16)
                  ~isfield(stale.inter.giant,'strength')&&~isfield(stale.inter.coupling,'strength'),...
                  'the basis must be rebuilt, and stale symmetry and assumptions cleared on spin removal');
 
+% Remove isotope filters only when their substance loses the last match
+sys.magnet=0; sys.isotopes={'1H','13C','13C','1H','13C'};
+inter.chem.parts={1:3,4:5}; inter.chem.concs=[1,1];
+bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
+for field={'longitudinal','zero_quantum'}
+    filtered=bas; filtered.(field{1})={{'13C',1},{'13C'}};
+    based=test_spin_system(sys,inter,filtered);
+    retained=kill_spin(based,2);
+    result=test_true(result,['kill_spin retained ' field{1}],...
+                     isequal(retained.bas.(field{1}),filtered.(field{1})),...
+                     'the isotope filter survives while a matching local spin remains');
+    for removed={[2 3],1:3,[2 3 5]}
+        actual=kill_spin(based,removed{1});
+        expected=filtered; expected.(field{1}){1}={1};
+        if ismember(1,removed{1}), expected.(field{1}){1}={}; end
+        if ismember(5,removed{1}), expected.(field{1}){2}={}; end
+        rebuilt=basis(actual,expected);
+        result=test_true(result,['kill_spin stale ' field{1} ' ' mat2str(removed{1})],...
+                         all(cellfun(@(x,y)isequal(x,y)||(isempty(x)&&isempty(y)),...
+                                     actual.bas.(field{1}),expected.(field{1})))&&...
+                         isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                         isequal(actual.bas.offsets,rebuilt.bas.offsets)&&...
+                         strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                         'stale isotope filters are dropped locally and the rebuilt basis matches fresh settings');
+    end
+end
+
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);
 result=test_true(result,'kill_spin logical mask',isequal(logical_trimmed.comp.isotopes,trimmed.comp.isotopes)&&...

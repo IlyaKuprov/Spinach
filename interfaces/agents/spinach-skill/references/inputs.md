@@ -511,6 +511,9 @@ spins; cross-substance product specifications raise
 `Spinach:which_subst:crossSubstance`. Isotope selections sum single-spin
 operators across the hosting blocks. Operator and identity dimensions come
 from `bas.offsets(end)`, not from the number of descriptor cells.
+Explicit identity requests act only on the selected substance; numeric and
+isotope sums contribute once per matching spin. Left/right identity actions
+give the local identity, anticommutators twice it, and commutators zero.
 Multi-substance Zeeman operator construction remains explicitly unsupported.
 
 Symmetry factorisations live in `bas.sym_fact(n)`. `reduce` and `rspt_eig`
@@ -545,8 +548,9 @@ removes each unit independently and converts level populations per substance;
 `trajsimil` groups equivalent tracks only within the same substance.
 
 `kill_spin` and `dilute` rebuild an existing basis after particle removal.
-Local manual columns and global numeric filter labels are reindexed; empty
-substances keep their unit coordinate. Symmetry and Hamiltonian assumptions
+Local manual columns and global numeric filter labels are reindexed. Isotope
+filters are removed when no matching spin survives in their own substance;
+empty substances keep their unit coordinate. Symmetry and Hamiltonian assumptions
 are cleared, so reapply `assume` before constructing a Hamiltonian.
 
 Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;

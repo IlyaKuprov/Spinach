@@ -19,6 +19,7 @@
 %
 % Notes: an existing basis is rebuilt from its input settings, with
 %        local manual columns and global filter labels reindexed.
+%        Isotope filters with no surviving local spins are removed.
 %        Symmetry and assumption information is cleared; call assume
 %        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
@@ -47,7 +48,7 @@ if isfield(spin_system,'bas')
         bas.(fields{n})=spin_system.bas.(fields{n});
     end
 
-    % Reindex local manual columns and global numeric filter labels
+    % Reindex retained filter labels and remove empty isotope selections
     keep=setdiff(1:spin_system.comp.nspins,hit_list);
     for n=1:numel(spin_system.chem.parts)
         local_keep=~ismember(spin_system.chem.parts{n},hit_list);
@@ -61,6 +62,9 @@ if isfield(spin_system,'bas')
                     if isnumeric(labels)
                         [present,labels]=ismember(labels,keep);
                         bas.(field{1}){n}{k}=labels(present);
+                    elseif ~ismember(labels,spin_system.comp.isotopes(...
+                                     spin_system.chem.parts{n}(local_keep)))
+                        bas.(field{1}){n}{k}=[];
                     end
                 end
                 bas.(field{1}){n}=bas.(field{1}){n}(~cellfun(@isempty,bas.(field{1}){n}));

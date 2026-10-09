@@ -29,6 +29,9 @@
 %
 %  dR - standard deviation of the mean of R, element by element
 %
+% Note: only a single chemical substance is supported. Segmented
+%       input raises Spinach:ngce:segmentedSubstances.
+%
 % Note: enough trajectory points must be present to converge 
 %       the ensemble averages and Redfield's integral.
 %
@@ -43,7 +46,7 @@
 function [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
 
 % Check consistency
-grumble(H0,H1,dt,tau_est);
+grumble(spin_system,H0,H1,dt,tau_est);
 
 % Coherent dynamics timescale
 timescale=2*pi/normest(H0);
@@ -167,7 +170,11 @@ R=R-(U'*R*U)*USP;
 end
 
 % Consistency enforcement
-function grumble(H0,H1,dt,tau_est)
+function grumble(spin_system,H0,H1,dt,tau_est)
+if numel(spin_system.chem.parts)>1
+    error('Spinach:ngce:segmentedSubstances',...
+          'NGCE does not support multiple chemical substances.');
+end
 if ~isnumeric(H0)
     error('H0 must be a matrix.');
 end

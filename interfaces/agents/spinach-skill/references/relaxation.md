@@ -58,6 +58,11 @@ even when every substance contains an electron pair. The `create` restriction
 of two electrons overall is unchanged. Do not interpret Nottingham nuclear
 rate parameters as a standalone nucleus-only model.
 
+The trajectory-integral utility `ngce` supports a single chemical substance.
+Segmented inputs raise `Spinach:ngce:segmentedSubstances`, with or without
+regularisation; its scalar unit-state projection must not be applied to a
+direct sum of substances.
+
 Two settings become mandatory the moment `inter.relaxation` is present:
 
 ```matlab

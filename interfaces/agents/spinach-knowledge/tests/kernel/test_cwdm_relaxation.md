@@ -32,3 +32,8 @@ Pumping targets in the second substance and both substances are checked
 against their own unit columns. Unequal unit populations distinguish local
 pumping from an accidental source through the first substance. Identity
 components in a later block must be rejected.
+
+NGCE rejects the segmented two-substance system with both zero and nonzero
+regularisation using `Spinach:ngce:segmentedSubstances`. A supported
+single-substance zero stochastic trajectory retains zero uncertainty and
+regularises only the non-unit directions.

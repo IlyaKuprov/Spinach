@@ -219,6 +219,32 @@ for n=1:2
     end
 end
 
+% Reject segmented NGCE before its single-unit projection can couple substances
+H0=1e-3*operator(s,'Lz','all'); H1=repmat({sparse(size(H0,1),size(H0,2))},2001,1);
+for rate=[0 2]
+    rejected=false;
+    try
+        ngce(s,H0,H1,1,10,rate);
+    catch err
+        rejected=strcmp(err.identifier,'Spinach:ngce:segmentedSubstances');
+    end
+    result=test_true(result,sprintf('NGCE segmented rate %g',rate),rejected,...
+                     'NGCE rejects multiple substances with and without regularisation');
+    fprintf('CWDM_NGCE segmented_reg=%g named_rejection=%d\n',rate,rejected);
+end
+
+% Retain regularised NGCE for a supported single-substance zero trajectory
+H0=1e-3*operator(local,'Lz','all');
+H1=repmat({sparse(size(H0,1),size(H0,2))},2001,1);
+[R,dR]=ngce(local,H0,H1,1,10,2);
+reference=-2*speye(size(H0)); reference(1,1)=0;
+result=test_close(result,'NGCE single regularisation',R,reference,0,1e-14,...
+                  'regularisation damps active states but leaves the single unit direction undamped');
+result=test_close(result,'NGCE single zero uncertainty',dR,sparse(size(H0,1),size(H0,2)),0,0,...
+                  'a zero stochastic trajectory has zero uncertainty');
+fprintf('CWDM_NGCE single_regularisation_error=%.16g uncertainty=%.16g\n',...
+        norm(R-reference,'fro'),norm(dR,'fro'));
+
 % Refuse loss of trace conservation or normalisation in a later substance
 bad=P; bad(units(2),units(2)+1)=0.1; rejected=false;
 try

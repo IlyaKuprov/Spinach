@@ -531,3 +531,7 @@ Spatial phantom operators and states use the entire substance direct sum.
 Spin-only symmetry projectors are not applied to enlarged spatial-spin
 generators in `reduce`; those use the usual trajectory-level reductions.
 `v2fplanck` tensors the spatial transport with the full direct-sum identity.
+
+`summary_basis` reports substances separately; `stateinfo` identifies the
+hosting substance and global spin labels of every reported coefficient.
+State numbers retain the global direct-sum offsets.

@@ -621,7 +621,8 @@ Use `inter.chem.reactions`, a cell array of records containing `reactants`, `pro
 
 `unit_state`, `state`, and `equilibrium` return concentration-weighted states.
 Geometric detection and normalised operator vectors use `coil_state`, including
-pulse-sequence receivers and voxel projection operators. Prepared densities
+pulse-sequence receivers, voxel projection operators, normalised ENDOR sums,
+relaxation-analysis probes, and microwave transition operators. Prepared densities
 retain `state`; do not apply concentration factors to receivers. IME
 `thermalize` instead takes unit-concentration target shapes: request equilibrium
 on a copy with all `chem.concs` entries one, as `relaxation` does internally.

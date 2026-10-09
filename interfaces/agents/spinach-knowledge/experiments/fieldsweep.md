@@ -21,7 +21,7 @@ Computes a simulated field-swept powder EPR spectrum by locating spin transition
 
 ## Calculation and returned axes
 
-The function obtains coupling and Zeeman Hamiltonian terms, constructs the microwave Lx state for the selected spin, loads the named spherical grid, and forms its convex hull. It builds parameters.b_axis as linspace(window(1),window(2),npoints). At each grid vertex it calls eigenfields for the specified microwave frequency and orientation; it then integrates contributions triangle by triangle with the recursive Voitlander integrator and sums the triangle spectra. The source describes the line shape as Lorentzian.
+The function obtains coupling and Zeeman Hamiltonian terms, constructs the unweighted microwave Lx operator vector with `coil_state` for the selected spin, loads the named spherical grid, and forms its convex hull. It builds parameters.b_axis as linspace(window(1),window(2),npoints). At each grid vertex it calls eigenfields for the specified microwave frequency and orientation; it then integrates contributions triangle by triangle with the recursive Voitlander integrator and sums the triangle spectra. The source describes the line shape as Lorentzian.
 
 The first output spec is the field-sampled spectrum, with its field coordinates in the returned parameters.b_axis (tesla). The second output is the updated parameter structure, including that axis; the source signature does not return b_axis as a separate first or second output.
 

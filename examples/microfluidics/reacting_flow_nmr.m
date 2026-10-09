@@ -1,7 +1,7 @@
 % Complete microfluidic simulation: diffusion, flow, two second-
 % order chemical reactions, and NMR detection in a narrow strip
 % of the chip where the coil is assumed to be located. Solvent is a
-% spin-free pool. The concentration history and spin evolution both
+% spin-bearing pool. The concentration history and spin evolution both
 % use the kernel reaction records; the two-stage history workflow is
 % retained, with the original frozen-rate concentration time steps.
 % Product unit arrival is now shared equally between reactants; this
@@ -161,7 +161,7 @@ parfor j=1:numel(n_vals)
     % dereference
     n=n_vals(j);
 
-    % Build the initial condition
+    % Prepare only reacting-species magnetisation, leaving solvent spins unexcited
     eta=cell(spin_system.mesh.vor.ncells,1);
     start_time=chem_time_grid(n);
     for k=1:spin_system.mesh.vor.ncells

@@ -20,9 +20,9 @@
 %           set rates in inter.chem.reactions before create(), or
 %           assign modified kin back to inter.chem.reactions
 %
-% Acetonitrile is represented by a spin-free solvent pool. The model
-% does not excite or detect solvent protons. Rates in the returned
-% records are zero until the caller specifies them, in L/(mol*s).
+% Acetonitrile retains its three solvent protons and T1/T2 relaxation.
+% Rates in the returned records are zero until the caller specifies
+% them, in L/(mol*s); the solvent takes no part in either reaction.
 %
 % a.acharya@soton.ac.uk
 % bruno.linclau@ugent.be
@@ -144,23 +144,31 @@ inter_d.coupling.scalar(idxof(sys_d,'H19'), idxof(sys_d,'H20'))= 5.7;
 inter_d.coupling.scalar(idxof(sys_d,'H19'), idxof(sys_d,'H25'))= 3.1;
 inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 
-% Merge the four spin-bearing molecules
-[sys,inter]=merge_inp({sys_a,sys_b,sys_c,sys_d},...
-                      {inter_a,inter_b,inter_c,inter_d});
+% Acetonitrile (substance E, solvent)
+sys_e.isotopes={'1H','1H','1H'};
+sys_e.labels={'H28','H29','H30'};
+inter_e.zeeman.matrix={2.0, 2.0, 2.0}*eye(3);
+inter_e.coordinates={[]; []; []};
+inter_e.coupling.scalar=zeros(3,3);
+inter_e.coupling.scalar=num2cell(inter_e.coupling.scalar);
 
-% Add the spin-free solvent pool with unit reference concentrations
-inter.chem.parts={1:6,7:9,10:18,19:27,[]};
+% Merge the spin systems
+[sys,inter]=merge_inp({sys_a,   sys_b,   sys_c,   sys_d,   sys_e},...
+                      {inter_a, inter_b, inter_c, inter_d, inter_e});
+
+% Chemical parts and unit concentrations
+inter.chem.parts={1:6, 7:9, 10:18, 19:27, 28:30};
 inter.chem.concs=[1 1 1 1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation={'IK-2','IK-2','IK-2','IK-2','none'};
+bas.approximation={'IK-2','IK-2','IK-2','IK-2','IK-2'};
 bas.connectivity={'scalar_couplings','scalar_couplings',...
-                  'scalar_couplings','scalar_couplings',[]};
-bas.prox_level={1,1,1,1,[]};
+                  'scalar_couplings','scalar_couplings','scalar_couplings'};
+bas.prox_level={1,1,1,1,1};
 
 % Relaxation theory parameters
-inter.relaxation={'redfield'};
+inter.relaxation={'redfield','t1_t2'};
 inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={ 5e-12 ... % Cyclopentadiene
@@ -168,6 +176,10 @@ inter.tau_c={ 5e-12 ... % Cyclopentadiene
              50e-12 ... % Exo-norbornene carbonitrile
              50e-12 ... % Endo-norbornene carbonitrile
               1e-12};   % Acetonitrile
+inter.r1_rates=cell(30,1); inter.r1_rates(:)={0};
+inter.r2_rates=cell(30,1); inter.r2_rates(:)={0};
+inter.r1_rates(28:30)={0.5}; % Solvent
+inter.r2_rates(28:30)={0.5}; % Solvent
 
 % Matching tables for the chemical reactions
 kin{1}.reactants=[1 2];  % cyclopentadiene and acrylonitrile

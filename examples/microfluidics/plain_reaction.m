@@ -12,7 +12,7 @@
 
 function plain_reaction()
 
-% Ghost seed permits construction before tracing to five spin-free pools
+% Trace a ghost seed to five concentration pools, independent of solvent spins
 sys.magnet=0; sys.isotopes={'G'};
 inter.chem.parts={1,[],[],[],[]};
 inter.chem.concs=[0.6 0.5 0.0 0.0 18.1];

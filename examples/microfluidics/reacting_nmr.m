@@ -2,7 +2,7 @@
 % (repeated pulse-acquire NMR) and relaxation (Redfield theory).
 % The same additive reaction records generate concentration and spin
 % transport; product unit arrival is shared equally between reactants.
-% Solvent is an unexcited spin-free concentration pool.
+% Solvent retains its three protons and remains unexcited.
 %
 % Calculation time: hours, much faster on GPU.
 %
@@ -74,7 +74,7 @@ unit_embed=sparse(unit_idx,1:5,ones(1,5),spin_system.bas.offsets(end),5);
 concs=@(t)[A(t);B(t);C(t);D(t);inter.chem.concs(5)];
 
 % Concentration-weighted longitudinal preparation without solvent excitation
-eta=state(spin_system,'Lz','1H');
+eta=state(spin_system,'Lz',[spin_system.chem.parts{1:4}]);
 [~,P]=levelpop('1H',sys.magnet,300);
 eta=unit_state(spin_system)+(0.5*P(1)-0.5*P(2))*eta;
 

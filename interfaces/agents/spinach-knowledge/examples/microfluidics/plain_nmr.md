@@ -6,7 +6,7 @@ Source: [examples/microfluidics/plain_nmr.m](https://github.com/IlyaKuprov/Spina
 
 This is a homogeneous liquid-state proton NMR calculation for a Diels–Alder reaction mixture assembled by `dac_reaction()`. The source sets the five concentration entries to `[1 1 1 1 0]` and comments that the four chemical species have equal concentrations with no solvent. Despite its location alongside microfluidics examples, this script includes neither spatial transport nor chemical kinetics. It explicitly removes the builder's reaction records before calling the linear acquisition context.
 
-The field parameter is `sys.magnet=14.1`; this file does not annotate its unit. Greedy parallelisation is enabled. Preparation uses concentration-weighted `state`; detection uses unweighted `coil_state` for `1H`. The solvent block is spin-free and has zero concentration, so it contributes neither preparation nor signal.
+The field parameter is `sys.magnet=14.1`; this file does not annotate its unit. Greedy parallelisation is enabled. Preparation uses concentration-weighted `state`; detection uses unweighted `coil_state` for `1H`. The solvent retains three protons with T1/T2 relaxation but has zero concentration, so it contributes neither preparation nor signal.
 
 ## Acquisition and processing
 

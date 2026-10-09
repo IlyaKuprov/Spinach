@@ -21,7 +21,7 @@ function plain_nmr()
 % Disable reactions for the static mixture spectrum
 inter.chem.reactions={};
 
-% Equal concentrations, no solvent
+% Equal reacting-species concentrations, unpopulated solvent protons
 inter.chem.concs=[1 1 1 1 0];
 
 % Magnet field

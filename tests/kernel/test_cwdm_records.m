@@ -101,6 +101,14 @@ valid{4}.selector={'singlet',[1 2]}; valid{5}.selector={speye(64),speye(64)};
 inter.chem.reactions=valid; s=create(sys,inter);
 result=test_true(result,'valid records',numel(s.chem.reactions)==5,'valid record variants are retained');
 
+% Preserve the default single substance when chemistry groups are empty
+empty.chem=struct();
+[empty_sys,empty_inter]=merge_inp({sys,sys},{empty,empty});
+empty_system=create(empty_sys,empty_inter);
+result=test_true(result,'empty chemistry merge',isempty(fieldnames(empty_inter.chem))&&...
+                 isequal(empty_system.chem.parts,{1:10})&&isempty(empty_system.chem.reactions),...
+                 'merging absent partitions must not invent a reaction field requiring explicit parts');
+
 % Merge independent records with substance and spin offsets
 [merged_sys,merged]=merge_inp({sys,sys},{inter,inter});
 s=create(merged_sys,merged);

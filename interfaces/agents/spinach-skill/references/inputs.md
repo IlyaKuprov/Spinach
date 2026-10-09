@@ -617,7 +617,7 @@ these experiments retain their supported single-substance algorithms.
 
 ### Explicit chemistry records
 
-Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices.
+Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
 
 `unit_state`, `state`, and `equilibrium` return concentration-weighted density
 matrices and Liouville states; storage-only wavefunctions remain unweighted.

@@ -689,3 +689,5 @@ block-diagonal unit-trace target, returning the same matrix-RHS interface. These
 handles are not `step` generators, and the stock Hilbert relaxation constructor
 is unchanged. `chem_concs` extracts each Hilbert block trace and rejects
 inter-substance coherences.
+
+`unit_state` requires a compiled basis; absent basis metadata is rejected before formalism capability checks.

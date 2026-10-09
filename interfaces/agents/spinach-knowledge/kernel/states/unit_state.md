@@ -27,3 +27,5 @@ Thus, “unit” does not mean a trace-one identity in every representation: the
 - Wiki: [`unit_state.m`](https://spindynamics.org/wiki/index.php?title=unit_state.m).
 
 Wavefunction concentration-weighted units are explicitly rejected by `Spinach:unit_state:wavefunction`.
+
+Absent basis metadata or a missing formalism field is rejected by the existing explicit input-validation error before any formalism-specific capability check.

@@ -19,6 +19,18 @@ function result=test_cwdm_formalisms()
 result=new_test_result('kernel/cwdm_formalisms','CWDM formalism capabilities',...
                        'Zeeman storage uses local dimensions and explicit capability limits.');
 
+% Reject absent basis metadata before inspecting formalism capabilities
+for incomplete={struct(),struct('bas',struct())}
+    rejected=false;
+    try
+        unit_state(incomplete{1});
+    catch err
+        rejected=strcmp(err.message,'the spin_system object does not contain the required information.');
+    end
+    result=test_true(result,'unit basis metadata',rejected,...
+                     'missing basis or formalism retains the explicit input-validation error');
+end
+
 % Include unequal spin-bearing blocks and a spin-free substance
 sys.magnet=14.1; sys.isotopes={'1H','1H','1H'};
 inter.temperature=298; inter.zeeman.scalar={1,2,3};

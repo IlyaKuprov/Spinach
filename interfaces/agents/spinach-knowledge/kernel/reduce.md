@@ -8,6 +8,8 @@
 
 Returns projectors into independently evolving reduced subspaces, selected using the supplied Liouvillian `L` and state `rho`. This is state-space reduction; this function does not construct a relaxation generator or define relaxation-term units.
 
+The local projector cells in `bas.sym_fact(n)` are embedded at `bas.offsets(n)` before screening. Each projector therefore acts on one substance; no tensor products between substances are formed.
+
 ## Reduction path
 
 The source first checks whether trajectory-level reduction is disabled by `spin_system.sys.disable` containing `'trajlevel'`; if so, it reports the setting and returns the unit projector `1`. Otherwise the available operations depend on `spin_system.bas.formalism` and the disable settings.

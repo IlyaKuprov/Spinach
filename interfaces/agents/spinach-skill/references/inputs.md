@@ -512,3 +512,7 @@ spins; cross-substance product specifications raise
 operators across the hosting blocks. Operator and identity dimensions come
 from `bas.offsets(end)`, not from the number of descriptor cells.
 Multi-substance Zeeman operator construction remains explicitly unsupported.
+
+Symmetry factorisations live in `bas.sym_fact(n)`. `reduce` and `rspt_eig`
+embed their local projector columns using `bas.offsets`; do not read the
+retired global `bas.irrep` field.

@@ -151,12 +151,9 @@ for s=1:nsubst
            isfield(local_bas,'sym_group')&&~isempty(local_bas.sym_group)
             error('segmented Zeeman symmetry is not implemented.');
         end
-        local_system.bas.basis=spin_system.bas.basis{s};
+        local_system.bas.basis=spin_system.bas.basis(s);
         local_system=symmetry(local_system,local_bas);
-        if isfield(local_system.bas,'irrep')
-            spin_system.bas.sym_fact(s).irr_dimensions=[local_system.bas.irrep.dimension]';
-            spin_system.bas.sym_fact(s).irr_projectors={local_system.bas.irrep.projector}';
-        end
+        spin_system.bas.sym_fact(s)=local_system.bas.sym_fact;
     end
     if isempty(spin_system.bas.sym_fact(s).irr_dimensions)
         spin_system.bas.sym_fact(s).irr_dimensions=spin_system.bas.nstates(s);

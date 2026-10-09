@@ -32,7 +32,7 @@ K=kinetics(spin_system,'report');
 
 % Unit-concentration electron singlet with an unpolarised nucleus
 rho=4*singlet(spin_system,1,2);
-coil=coil_state(spin_system,'Lz',4);
+coil=coil_state(spin_system,'Lz',4,'exact');
 time_grid=linspace(0,3,301); dt=time_grid(2)-time_grid(1);
 traj=evolution(spin_system,H+1i*K,[],rho,dt,numel(time_grid)-1,'trajectory');
 

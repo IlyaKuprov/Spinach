@@ -7,3 +7,5 @@ The integrated CIDNP transport test adds a noncommuting electron–nuclear Hamil
 This is a small analytic T14/T15 acceptance case, not the seven-example WP0 radical-pair regression.
 
 The same selective product-arrival trajectory is checked through `evolution` with default reductions and with ZTE enabled. Initially empty product blocks must remain reachable; the comparison detects inappropriate factorisation into independent substance irreps.
+
+Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.

@@ -13,3 +13,5 @@ Acquisitions begin at every 25th chemistry-grid index (21 sampled starts, from 0
 ## Source
 
 https://github.com/IlyaKuprov/Spinach/blob/main/examples/microfluidics/reacting_flow_nmr.m
+
+Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.

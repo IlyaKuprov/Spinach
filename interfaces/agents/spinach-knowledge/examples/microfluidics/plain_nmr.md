@@ -17,3 +17,9 @@ The single-dimensional acquisition uses offset `2328`, sweep `3500`, `4096` poin
 This is a single liquid-state spectrum calculation: it does not propagate reaction kinetics or a spatially varying signal.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+## Numerical batching
+
+Direct-sum reduction propagates the small acrylonitrile block separately, using the small-matrix `expm` path. The former global reduction batched it with cyclopentadiene and used the rounded Taylor/scaling-and-squaring path. At the default `prop_chop=1e-10`, this produces a relative full-FID difference of about `1.63e-6` despite identical represented descriptors, relaxation, preparation, and detection, and Hamiltonians equal to round-off. Reconstructing the acrylonitrile propagator with the former batch scaling accounts for that difference to `7.4e-14` relative full-FID residual. This is numerical batching dependence, not a changed chemical model; the example retains its original physical parameters and numerical defaults.
+
+Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.

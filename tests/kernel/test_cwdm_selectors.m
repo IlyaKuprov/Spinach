@@ -109,7 +109,7 @@ result=test_close(result,'T15 ZTE product arrival',reduced,final,1e-10,0,...
                   'full-generator reductions retain initially empty reachable product coordinates');
 
 % Detect the independently integrated nuclear product polarisation
-coil=coil_state(s,'Lz',4);
+coil=coil_state(s,'Lz',4,'exact');
 expected=trace(spin.z*reshape(reference(product),2,2));
 result=test_close(result,'T15 nuclear polarisation',coil'*final,expected,1e-10,0,...
                   'the product coil detects the transported nuclear expectation value');

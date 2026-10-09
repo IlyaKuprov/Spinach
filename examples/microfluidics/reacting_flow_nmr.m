@@ -118,7 +118,7 @@ Ly=operator(spin_system,'Ly','1H'); dim=numel(coil_ph);
 Ly=polyadic({{spdiags(coil_ph,0,dim,dim),Ly}});
 
 % Build detection states
-coil=coil_state(spin_system,'L+','1H');
+coil=coil_state(spin_system,'L+','1H','exact');
 coil=kron(coil_ph,coil);
 
 % NMR simulation parameters
@@ -144,10 +144,10 @@ if ismember('gpu',sys.enable)
 end
 
 % Build state operators
-LzA=coil_state(spin_system,'Lz',spin_system.chem.parts{1});
-LzB=coil_state(spin_system,'Lz',spin_system.chem.parts{2});
-LzC=coil_state(spin_system,'Lz',spin_system.chem.parts{3});
-LzD=coil_state(spin_system,'Lz',spin_system.chem.parts{4});
+LzA=coil_state(spin_system,'Lz',spin_system.chem.parts{1},'exact');
+LzB=coil_state(spin_system,'Lz',spin_system.chem.parts{2},'exact');
+LzC=coil_state(spin_system,'Lz',spin_system.chem.parts{3},'exact');
+LzD=coil_state(spin_system,'Lz',spin_system.chem.parts{4},'exact');
 
 % Preallocate fids array
 fids=cell(chem_nsteps,1);

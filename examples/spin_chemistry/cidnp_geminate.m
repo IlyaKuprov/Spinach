@@ -53,7 +53,7 @@ L=H+1i*K;
 rho=evolution(spin_system,L,[],rho,1e-6,1,'final');
 
 % Check the nuclear magnetisation
-Nz=coil_state(spin_system,'Lz','1H');
+Nz=coil_state(spin_system,'Lz','1H','exact');
 rho_reac=rho(1:(numel(rho)/2));
 rho_prod=rho((numel(rho)/2+1):end);
 disp(['Nuclear magnetisation in reactants: ' num2str(real(Nz'*rho_reac))]);

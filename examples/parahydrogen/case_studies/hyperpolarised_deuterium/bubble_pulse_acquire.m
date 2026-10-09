@@ -100,7 +100,7 @@ rho=evolution(spin_system,H+1i*R+1i*KB,[],rho0,7,1,'final');
 % Pulse-acquire settings
 parameters.spins={'2H'};
 parameters.rho0=rho;
-parameters.coil=coil_state(spin_system,'L+',[1 2]);
+parameters.coil=coil_state(spin_system,'L+',[1 2],'exact');
 parameters.pulse_op=operator(spin_system,'Ly','2H');
 parameters.pulse_angle=pi/4;
 parameters.decouple={};

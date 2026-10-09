@@ -120,7 +120,7 @@ L=H+1i*R+1i*K;
 rho=evolution(spin_system,L,[],rho,200e-9,1,'final');
 
 % Nuclear magnetisation in the product block
-Nz=coil_state(spin_system,'Lz','1H');
+Nz=coil_state(spin_system,'Lz','1H','exact');
 rho_prod=rho((numel(rho)/2+1):end);
 pol=real(Nz'*rho_prod);
 

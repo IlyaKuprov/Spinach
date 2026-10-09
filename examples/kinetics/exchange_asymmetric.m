@@ -11,8 +11,10 @@ sys.magnet=14.1;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,3};
 inter.chem.parts={1,2};
-inter.chem.rates=[-5e2  2e3; 
-                   5e2 -2e3];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',5e2),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',2e3)};
 inter.chem.concs=[2e3 5e2];
 
 % Basis specification

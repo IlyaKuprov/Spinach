@@ -11,6 +11,9 @@ function plain_nmr()
 % Import Diels-Alder cycloaddition
 [sys,inter,bas]=dac_reaction();
 
+% Disable reactions for the static mixture spectrum
+inter.chem.reactions={};
+
 % Equal concentrations, no solvent
 inter.chem.concs=[1 1 1 1 0];
 

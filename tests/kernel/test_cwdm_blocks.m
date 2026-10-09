@@ -146,4 +146,30 @@ for method={'cheap','exact','chem'}
     end
 end
 
+% Partner expansion keeps full descriptors while constructing local states
+for n=1:2
+    spins=s.chem.parts{n};
+    [actual,descr]=partner_state(s,{{'L+',spins(1)}},{{{'E','Lz'},spins(2)}});
+    for k=1:2
+        labels={'E','Lz'}; expected=repmat({'E'},1,4);
+        expected(spins)={'L+',labels{k}};
+        result=test_true(result,['partner descriptor ' int2str(n) ' ' int2str(k)],...
+                         isequal(descr{k},expected),'descriptors retain global spin positions');
+        reference=state(s,expected(spins),num2cell(spins));
+        result=test_close(result,['partner state ' int2str(n) ' ' int2str(k)],...
+                          actual{k},reference,0,0,'each partner combination stays within its substance');
+    end
+    fprintf('CWDM_PARTNER block=%d states=%d\n',n,numel(actual));
+end
+
+% Genuinely cross-substance partner specifications remain invalid
+rejected=false;
+try
+    partner_state(s,{{'L+',1}},{{{'E','Lz'},3}});
+catch err
+    rejected=strcmp(err.identifier,'Spinach:which_subst:crossSubstance');
+end
+result=test_true(result,'cross-substance partners',rejected,...
+                 'active and partner spins must share a substance');
+
 end

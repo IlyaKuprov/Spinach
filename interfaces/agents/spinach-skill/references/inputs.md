@@ -608,3 +608,11 @@ spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.
 
 Level projectors retain their substance through mixed identity and non-identity
 tensor expansions, including chemical concentration weighting.
+
+`partner_state` keeps global descriptor positions but constructs states only in
+the substance hosting the fixed and partner spins. Padding identities in its
+returned descriptors do not imply populations in other substances.
+
+Segmented coherent states and Zeeman steady solves are explicitly deferred.
+Steady-state `solid_effect` and both DNP scans require a single substance;
+these experiments retain their supported single-substance algorithms.

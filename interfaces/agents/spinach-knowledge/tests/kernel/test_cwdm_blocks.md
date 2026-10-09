@@ -10,3 +10,5 @@ Identity checks cover individual spins, local products, numeric sums, isotope su
 Identity operator checks cover left, right, commutator, and anticommutator actions, with individual `E`/`T0,0` requests and local products in CSC and XYZ formats. Isotope, all-spin, and numeric sums check per-spin multiplicity and exact hosting-block support.
 
 Level-projector checks compare both hosting blocks with independently built single-substance `ZL1` states for cheap, exact, and chemical construction, including the identity term and concentration weighting.
+
+Partner-state checks exercise both hosting substances, preserve full global descriptor arrays, compare every returned state with its local product, and reject a genuinely cross-substance partner specification.

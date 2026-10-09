@@ -60,7 +60,7 @@ for n=1:numel(systems)
 end
 
 % Return classical subspace dimension
-spc_dim=size(H,1)/size(spin_system.bas.basis,1);
+spc_dim=size(H,1)/spin_system.bas.offsets(end);
 
 end
 

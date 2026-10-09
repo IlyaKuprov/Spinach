@@ -27,15 +27,16 @@ function [R1,R2,Rm]=rlx_split(spin_system,R)
 % Check consistency
 grumble(spin_system,R);
 
-% Interpret the basis
-[L,M]=lin2lm(spin_system.bas.basis);
-
-% Index single-spin orders
-sso_mask=(sum(logical(spin_system.bas.basis),2)==1);
-
-% Index longitudinal and transverse states
-long_sso_mask=any((L>0)&(M==0),2)&sso_mask;
-tran_sso_mask=any((L>0)&(M~=0),2)&sso_mask;
+% Index longitudinal and transverse single-spin states in each block
+long_sso_mask=false(spin_system.bas.offsets(end),1);
+tran_sso_mask=false(spin_system.bas.offsets(end),1);
+for n=1:spin_system.bas.nsubst
+    [L,M]=lin2lm(spin_system.bas.basis{n});
+    sso_mask=spin_system.bas.tot_cord{n}==1;
+    idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+    long_sso_mask(idx)=any((L>0)&(M==0),2)&sso_mask;
+    tran_sso_mask(idx)=any((L>0)&(M~=0),2)&sso_mask;
+end
 
 % Split the relaxation superoperator
 R1=0*R; R1(long_sso_mask,long_sso_mask)=R(long_sso_mask,long_sso_mask);

@@ -44,7 +44,7 @@ parameters.mqorder=[+6 -1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};

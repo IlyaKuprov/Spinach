@@ -18,16 +18,14 @@
 %
 % Outputs:
 %
-%    spin_system.bas.irrep(n).projector - projector matrices
-%                                         into each irreducible
-%                                         representation
+%    spin_system.bas.sym_fact.irr_projectors - cell of local
+%                    state-by-irrep projector matrices
 %
-%    spin_system.bas.irrep(n).dimension - dimension of each ir-
-%                                         reducible representa-
-%                                         tion
+%    spin_system.bas.sym_fact.irr_dimensions - irrep dimensions
 %
 % Note: this is a service function of the Spinach kernel that
-%       should not be called directly; it is called by basis.m
+%       should not be called directly; basis.m calls it on one
+%       substance with local spin indices and bas.basis{1}
 %
 % Note: non-Abelian groups and multi-dimensional irreps are sup-
 %       ported - edit perm_group.m to add your own groups.
@@ -41,6 +39,9 @@ function spin_system=symmetry(spin_system,bas)
 
 % Check consistency
 grumble(spin_system,bas);
+
+% Initialise the local symmetry factorisation
+spin_system.bas.sym_fact=struct('irr_dimensions',[],'irr_projectors',{{}});
 
 % Check the disable switch
 if ismember('symmetry',spin_system.sys.disable)
@@ -136,7 +137,7 @@ else
     if exist('group','var')
         
         % Preallocate the permutation table
-        permutation_table=zeros(size(spin_system.bas.basis,1),group.order);
+        permutation_table=zeros(size(spin_system.bas.basis{1},1),group.order);
         
         % Compute the permutation table
         parfor n=1:group.order %#ok<*PFBNS>
@@ -145,7 +146,7 @@ else
             if strcmp(spin_system.bas.formalism,'zeeman-liouv')
                 group_element=[group_element group_element+spin_system.comp.nspins];
             end
-            permuted_basis=spin_system.bas.basis(:,group_element);
+            permuted_basis=spin_system.bas.basis{1}(:,group_element);
             index=spsortrows(sparse(permuted_basis));
             permutation_table(:,n)=index;
         end
@@ -162,7 +163,7 @@ else
             
             % Populate the coefficient matrix
             index=unique([kron(ones(group.order,1),(1:dimension)') symmetry_related_states(:) ones(dimension*group.order,1)],'rows');
-            coeff_matrix=sparse(index(:,1),index(:,2),index(:,3),dimension,size(spin_system.bas.basis,1));
+            coeff_matrix=sparse(index(:,1),index(:,2),index(:,3),dimension,size(spin_system.bas.basis{1},1));
             
             % Normalize the coefficient matrix
             norms=sqrt(sum(coeff_matrix.^2,2));
@@ -172,8 +173,8 @@ else
             report(spin_system,['A1g irrep, ' num2str(dimension) ' states.']);
             
             % Return the projector and dimension
-            spin_system.bas.irrep.projector=coeff_matrix';
-            spin_system.bas.irrep.dimension=dimension;
+            spin_system.bas.sym_fact.irr_projectors{1}=coeff_matrix';
+            spin_system.bas.sym_fact.irr_dimensions(1)=dimension;
             
         else
             
@@ -182,7 +183,7 @@ else
             report(spin_system,'processing irreducible representations...');
             
             % Determine the problem dimension
-            basis_dim=size(spin_system.bas.basis,1);
+            basis_dim=size(spin_system.bas.basis{1},1);
             
             % Loop over irreducible representations
             for n=1:group.n_irreps
@@ -254,14 +255,15 @@ else
                 report(spin_system,['irreducible representation #' num2str(n) ...
                                     ', ' num2str(group.irrep_dims(n)) '-dimensional, ' ...
                                          num2str(size(coeff_matrix,2)) ' states.']);
-                spin_system.bas.irrep(n).projector=coeff_matrix;
-                spin_system.bas.irrep(n).dimension=size(coeff_matrix,2);
+                spin_system.bas.sym_fact.irr_projectors{n}=coeff_matrix;
+                spin_system.bas.sym_fact.irr_dimensions(n,1)=size(coeff_matrix,2);
                 
             end
             
             % Remove zero-dimensional irreps
-            kill_mask=([spin_system.bas.irrep.dimension]==0);
-            spin_system.bas.irrep(kill_mask)=[];
+            kill_mask=(spin_system.bas.sym_fact.irr_dimensions==0);
+            spin_system.bas.sym_fact.irr_dimensions(kill_mask)=[];
+            spin_system.bas.sym_fact.irr_projectors(kill_mask)=[];
             if nnz(kill_mask)>0
                 report(spin_system,'zero-dimensional irreps removed.');
             end

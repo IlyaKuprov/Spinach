@@ -29,3 +29,11 @@ Chemical reaction and flux terms each explicitly require `sphten-liouv`. Reactio
 ## Implementation lifecycle
 
 The routine initialises `K`, adds reaction blocks, processes fluxes if present, then adds the configured radical-pair term if enabled. If the assembled matrix has no nonzero entries, it reports that no significant kinetics was specified.
+
+## Segmented-layout boundary
+
+The retained legacy chemistry algorithms operate on `bas.basis{1}` for a
+single substance. Multi-substance systems without kinetics return the full
+direct-sum zero matrix; nonzero legacy chemistry on multiple substances
+raises `Spinach:kinetics:segmentedChemistry` pending the reaction-record
+implementation. No multi-substance compatibility mapping is constructed.

@@ -76,7 +76,7 @@ function result=local_test_frqoffset(result)
 
 % Build the offset test system and start from a zero Hamiltonian
 spin_system=local_sphten_system();
-H0=sparse(size(spin_system.bas.basis,1),size(spin_system.bas.basis,1));
+H0=sparse(spin_system.bas.offsets(end),spin_system.bas.offsets(end));
 
 % Apply independent offsets to both isotopes
 parameters.spins={'1H','13C'};
@@ -104,7 +104,7 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0.0};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 spin_system=assume(spin_system,'labframe');
 
@@ -189,7 +189,7 @@ inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=10.0;
 inter.coupling.scalar{2,2}=0.0;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 end

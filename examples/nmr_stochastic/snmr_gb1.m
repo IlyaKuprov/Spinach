@@ -22,9 +22,9 @@ sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4; bas.prox_level=3;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4}; bas.prox_level={3};
 
 % Relaxation theory
 inter.relaxation={'redfield'};

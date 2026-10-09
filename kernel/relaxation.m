@@ -21,6 +21,10 @@
 % Note: a variety of relaxation theories are supported, see the relax-
 %       ation theory parameters section of the online manual.
 %
+% Note: Nottingham theory requires a single substance with exactly
+%       two electrons. Segmented input is unsupported and raises
+%       Spinach:relaxation:nottinghamSubstance.
+%
 % Note: Spinach context functions include relaxation and kinetics
 %       superoperators into the total Liovillian automatically.
 %
@@ -570,7 +574,11 @@ switch spin_system.rlx.keep
         R=diag(diag(R));
 
         % Still make sure the unit state is not damped
-        U=unit_state(spin_system); R=R-(U'*R*U)*(U*U');
+        U=unit_state(spin_system);
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            R(idx,idx)=R(idx,idx)-(U(idx)'*R(idx,idx)*U(idx))*(U(idx)*U(idx)');
+        end
         
         % Inform the user
         report(spin_system,'all cross-relaxation terms have been ignored.');
@@ -583,8 +591,13 @@ switch spin_system.rlx.keep
         end
         
         % Compile the index of all longitudinal spin orders
-        [~,M]=lin2lm(spin_system.bas.basis);
-        long_states=find(sum(abs(M),2)==0);
+        long_mask=false(spin_system.bas.offsets(end),1);
+        for n=1:spin_system.bas.nsubst
+            [~,M]=lin2lm(spin_system.bas.basis{n});
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            long_mask(idx)=sum(abs(M),2)==0;
+        end
+        long_states=find(long_mask);
         
         % Index the relaxation superoperator
         [rows,cols,vals]=find(R);
@@ -606,8 +619,12 @@ switch spin_system.rlx.keep
         end
         
         % Compute base frequencies of basis states
-        [~,M]=lin2lm(spin_system.bas.basis);
-        frequencies=sum(spin_system.inter.basefrqs.*M,2);
+        frequencies=zeros(spin_system.bas.offsets(end),1);
+        for n=1:spin_system.bas.nsubst
+            [~,M]=lin2lm(spin_system.bas.basis{n});
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            frequencies(idx)=sum(M.*spin_system.inter.basefrqs(1,spin_system.chem.parts{n}),2);
+        end
         
         % Index the relaxation superoperator
         [rows,cols,vals]=find(R);
@@ -691,7 +708,11 @@ if ismember('damp',spin_system.rlx.theories)
             % Damp everything except unit state
             RD=-rate*unit_oper(spin_system);
             U=unit_state(spin_system);
-            R=R+RD-(U'*RD*U)*(U*U');
+            for n=1:spin_system.bas.nsubst
+                idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+                RD(idx,idx)=RD(idx,idx)-(U(idx)'*RD(idx,idx)*U(idx))*(U(idx)*U(idx)');
+            end
+            R=R+RD;
 
     end
     
@@ -873,6 +894,12 @@ end
 if ( ismember('nottingham',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))
     error('Nottingham relaxation theory is only available in Liouville space.');
+end
+if ismember('nottingham',spin_system.rlx.theories)&&...
+   ((numel(spin_system.chem.parts)~=1)||...
+    (nnz(strcmp('E',spin_system.comp.isotopes))~=2))
+    error('Spinach:relaxation:nottinghamSubstance',...
+          'Nottingham relaxation requires a single substance with exactly two electrons.');
 end
 if ( ismember('weizmann',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))

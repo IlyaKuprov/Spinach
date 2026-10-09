@@ -128,7 +128,7 @@ inter.chem.concs=equilibrate(inter.chem.rates,[6-params(32);
               
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};

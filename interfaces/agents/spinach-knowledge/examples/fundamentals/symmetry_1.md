@@ -15,7 +15,7 @@ The source defines two electron spins followed by four protons, with `sys.magnet
 
 ## Construction and display
 
-After creating the system and basis, the example applies the `labframe` assumption and obtains `H=hamiltonian(spin_system)`. It concatenates the irrep projectors as `S` and displays sparsity masks for `abs(H)>1e3` and `abs(S'*H*S)>1e3`. Guide lines mark indices 560, 1216, and 1936. These are plot settings, not reported dimensions or measured results.
+After creating the system and basis, the example applies the `labframe` assumption and obtains `H=hamiltonian(spin_system)`. It concatenates `bas.sym_fact(1).irr_projectors` as `S` and displays sparsity masks for `abs(H)>1e3` and `abs(S'*H*S)>1e3`. Guide lines mark indices 560, 1216, and 1936. These are plot settings, not reported dimensions or measured results.
 
 ## Scope
 

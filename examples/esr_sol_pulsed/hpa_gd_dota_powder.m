@@ -21,7 +21,7 @@ sys.magnet=9.40;
 
 % Basis set
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};

@@ -18,7 +18,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(1.68e6,0.2,3/2,[0 0 0]);
 
 % Basis set and formalism
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

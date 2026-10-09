@@ -99,7 +99,7 @@ inter.coupling.scalar(9:12,9:12)=j_coupling;
 
 % Formalism and basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none'};
 
 % Methyl turning generator
 tau_m=1e-11; k_jump=1/(2*tau_m);

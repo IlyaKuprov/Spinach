@@ -40,7 +40,7 @@ inter.equilibrium='dibari';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;

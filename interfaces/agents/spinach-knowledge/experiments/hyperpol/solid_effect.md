@@ -19,3 +19,5 @@ There are no gradient, field-of-view, k-space, or FID parameters or outputs in t
 
 - Large-scale solid-effect formalism: https://doi.org/10.1039/C2CP23233B
 - Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=solid_effect.m
+
+The steady-state branch requires one substance and raises `Spinach:solid_effect:segmentedSubstances` on segmented input, before constructing Hamiltonians or the single-unit relaxation projector. This restriction is specific to `steady_state`; the time-dependent branches retain their existing domain.

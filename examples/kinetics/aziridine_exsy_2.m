@@ -151,10 +151,10 @@ inter.srfk_mdepth{11,13}=2.5;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4;
-bas.prox_level=3;
+bas.approximation={'IK-1', 'IK-1'};
+bas.connectivity={'scalar_couplings', 'scalar_couplings'};
+bas.inter_level={4, 4};
+bas.prox_level={3, 3};
 
 % Disable Krylov algorithm
 sys.disable={'krylov'};

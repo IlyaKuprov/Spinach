@@ -22,7 +22,7 @@ D=icm2hz(-0.5); E=0.3*D;
 inter.coupling.matrix{1,1}=zfs2mat(D,E,0,0,0);
 
 % Formalism and basis set
-bas.approximation='none';
+bas.approximation={'none'};
 bas.formalism='zeeman-hilb';
 
 % Spinach housekeeping

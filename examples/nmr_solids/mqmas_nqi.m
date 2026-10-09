@@ -13,7 +13,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(5e6,0.50,3/2,[0 0 0]);
 
 % Formalism and basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};

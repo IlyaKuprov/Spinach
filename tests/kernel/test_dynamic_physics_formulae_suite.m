@@ -92,7 +92,8 @@ result=test_true(result,'hydrodynamics empty transverse axes',isempty(Fy)&&isemp
 % Check spherical-tensor to Zeeman projection metadata on one spin-half
 spin_system.comp.mults=2;
 spin_system.bas.formalism='sphten-liouv';
-spin_system.bas.basis=(0:3)';
+spin_system.bas.basis={(0:3)'}; spin_system.bas.nsubst=1;
+spin_system.bas.offsets=[0;4]; spin_system.bas.nstates=4; spin_system.chem.parts={1};
 P=sphten2zeeman(spin_system);
 result=test_true(result,'sphten2zeeman dimensions',isequal(size(P),[4 4])&&rank(full(P))==4,...
                  'one spin-half has four spherical-tensor basis states and four Zeeman-Liouville states');

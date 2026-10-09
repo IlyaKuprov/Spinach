@@ -39,7 +39,7 @@ ramp_times=1e-9*(50:10:200); dt=0.5e-9;
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Preallocate the infidelities
 infid=zeros(numel(delta_bd),numel(ramp_times));

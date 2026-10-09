@@ -18,7 +18,7 @@ sys.magnet=3.5;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'1H'}};
 bas.projections={+1};
 

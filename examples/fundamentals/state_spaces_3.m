@@ -17,9 +17,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Algorithmic options
 sys.enable={'zte','greedy','prop_cache'};

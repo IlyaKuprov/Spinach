@@ -44,7 +44,7 @@ inter.coupling.scalar{1,2}=2*(-73e6);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};

@@ -13,6 +13,8 @@
 %    rho          - vector or matrix representation of
 %                   the unit state 
 %
+% Note: multi-substance Zeeman unit states are not yet supported.
+%
 % ilya.kuprov@weizmann.ac.il
 % d.savostyanov@soton.ac.uk
 %
@@ -29,7 +31,8 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
         
         % Unit population of T(0,0) state
-        rho=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+        rho=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+                   spin_system.bas.offsets(end),1);
         
     case 'zeeman-liouv'
         
@@ -55,6 +58,11 @@ end
 function grumble(spin_system)
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('the spin_system object does not contain the required information.');
+end
+if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})&&...
+   (spin_system.bas.nsubst>1)
+    error('Spinach:unit_state:segmentedZeeman',...
+          'multi-substance Zeeman unit states are not yet supported.');
 end
 end
 

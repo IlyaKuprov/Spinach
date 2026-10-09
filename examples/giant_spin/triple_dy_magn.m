@@ -101,7 +101,7 @@ inter.giant.euler={{[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*pi/3 0 0],[+2*
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Temperature in Kelvin
 inter.temperature=0.03;

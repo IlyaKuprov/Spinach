@@ -29,7 +29,7 @@ sys.tols.rlx_zero=1e-5;
 
 % Use complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -53,11 +53,11 @@ inter.equilibrium='zero';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
-bas.sym_group={'S3','S3','S3'};
-bas.sym_spins={[14 15 16],[17 18 19],[20 21 22]};
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
+bas.sym_group={{'S3','S3','S3'}};
+bas.sym_spins={{[14 15 16],[17 18 19],[20 21 22]}};
 
 % Enable zero track elimination
 sys.enable={'zte'};

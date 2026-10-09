@@ -16,7 +16,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'15N','13C'}};
 
 % Force Krylov propagation

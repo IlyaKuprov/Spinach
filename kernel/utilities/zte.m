@@ -14,7 +14,8 @@
 %
 %      nstates - if this parameter is specified, only
 %                nstates most populated states are kept,
-%                irrespective of the tolerance parameter
+%                irrespective of the tolerance parameter; unit
+%                coordinates are retained in addition
 %
 % Output:
 %
@@ -23,6 +24,10 @@
 %
 %                            L_reduced=P'*L*P
 %                            rho_reduced=P'*rho;
+%
+% Note: in the compiled sphten-liouv space, unit coordinates of every
+%       substance survive elimination, including zero-population blocks.
+%       reduce.m supplies their support in projected irrep coordinates.
 %
 % Note: default tolerance may be altered by setting sys.tols.zte_tol
 %       variable before calling create.m 
@@ -142,6 +147,12 @@ else
         
     end
     
+    % Preserve every substance unit coordinate in the compiled spin space
+    if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
+       (size(L,1)==spin_system.bas.offsets(end))
+        zero_track_mask(spin_system.bas.offsets(1:end-1)+1)=false;
+    end
+
     % Take a unit matrix and delete the columns corresponding to zero tracks
     projector=speye(size(L)); projector(:,zero_track_mask)=[];
      

@@ -22,7 +22,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(2.4e6,0.5,1,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel','colorbar'};

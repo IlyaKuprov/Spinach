@@ -718,7 +718,7 @@ switch spin_system.bas.formalism
                 total_time=timestep*nsteps;
                 
                 % Decide how to proceed
-                switch spin_system.bas.approximation
+                switch spin_system.bas.approximation{1}
                     
                     case 'none'
                         
@@ -759,7 +759,7 @@ switch spin_system.bas.formalism
             case 'observable'
                 
                 % Decide how to proceed
-                switch spin_system.bas.approximation
+                switch spin_system.bas.approximation{1}
                     
                     case 'none'
                         
@@ -900,7 +900,7 @@ switch spin_system.bas.formalism
             case 'trajectory'
                 
                 % Decide how to proceed
-                switch spin_system.bas.approximation
+                switch spin_system.bas.approximation{1}
                     
                     case 'none'
                         
@@ -927,7 +927,7 @@ switch spin_system.bas.formalism
             case 'refocus'
                 
                 % Decide how to proceed
-                switch spin_system.bas.approximation
+                switch spin_system.bas.approximation{1}
                     
                     case 'none'
                         

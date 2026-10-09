@@ -29,7 +29,7 @@ inter.damp_rate=2000;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'krylov','trajlevel'};

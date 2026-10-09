@@ -24,7 +24,7 @@ inter.coordinates={[0.0 0.0 0.0]
                
 % Complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
                
 % Relaxation theory
 inter.relaxation={'redfield'};

@@ -22,3 +22,5 @@ The file supplies a plotted trajectory and a source-stated runtime estimate, but
 ## Callable context
 
 Run `pfg_test_2()` with the Spinach system, basis, Hamiltonian, operator, propagator, gradient-sandwich, coherence-analysis, and plotting functions used in the source. It accepts no arguments and produces a figure.
+
+Coherence labels come from the single-substance descriptor `bas.basis{1}`, not the descriptor-cell container.

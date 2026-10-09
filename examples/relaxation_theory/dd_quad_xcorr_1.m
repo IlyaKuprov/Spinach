@@ -27,7 +27,7 @@ inter.tau_c={1e-9};
 
 % Basis specification
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};

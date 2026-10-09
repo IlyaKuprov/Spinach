@@ -17,6 +17,10 @@ Builds a relaxation superoperator by accumulating the terms selected in `spin_sy
 
 The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no spin theory is selected and no dissipative mode term is present, the result is set to zero.
 
+Retention by longitudinal order or base frequency uses each substance’s local descriptor. Diagonal retention and uniform damping exempt the unit coordinate of every block separately.
+
+Nottingham's four-level electron manifold is implemented for a single substance with exactly two electrons. `relaxation` rejects every segmented Nottingham descriptor with `Spinach:relaxation:nottinghamSubstance`, including separate two-electron substances; nucleus-only, spin-free, and split-electron partners are not assigned partial models. The existing `create` restriction of two electrons overall is unchanged.
+
 ## Parameters / inputs
 
 - `spin_system` — Spinach system containing the selected relaxation theories and their parameters.

@@ -64,8 +64,8 @@ errfun(best_fit);
 
         % Basis set
         bas.formalism='sphten-liouv';
-        bas.approximation='IK-0';
-        bas.inter_level=1; bas.projections={+1};
+        bas.approximation={'IK-0'};
+        bas.inter_level={1}; bas.projections={+1};
 
         % Relaxation theory
         inter.relaxation={'t1_t2'};

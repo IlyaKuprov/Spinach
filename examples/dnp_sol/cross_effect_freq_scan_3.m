@@ -32,7 +32,7 @@ inter.coordinates={[ 0.00   0.00   0.00];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'nottingham'};

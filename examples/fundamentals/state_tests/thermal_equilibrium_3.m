@@ -31,7 +31,7 @@ for n=1:numel(formalisms)
 
     % Formalism and basis set
     bas.formalism=formalisms{n};
-    bas.approximation='none';
+    bas.approximation={'none'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);

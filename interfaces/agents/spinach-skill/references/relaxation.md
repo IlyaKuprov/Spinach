@@ -25,6 +25,11 @@ every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic
 rates have no effect there.
 
+In the sphten direct sum, `unit_state` populates every substance unit coordinate,
+and `equilibrium` returns independently normalised, unweighted blocks. IME acts
+on each block separately. T1/T2 rates use the local descriptor columns and
+`chem.parts` spin map; diagonal retention and damping preserve every unit.
+
 ## Selecting a relaxation theory
 
 `inter.relaxation` is a cell array of strings and more than one may be
@@ -46,6 +51,17 @@ bosonic modes. Mode damping or dephasing can contribute automatically; see
 | `SRFK` | Scalar relaxation of the first kind: stochastic modulation of a coupling | `inter.srfk_tau_c`, `inter.srfk_mdepth` | Exchange fast enough to modulate J; conformational averaging |
 | `SRSK` | Scalar relaxation of the second kind, Abragam's expressions | `inter.srsk_sources` | Quadrupolar neighbours (14N, 35Cl, 79Br) broadening their partners |
 | `naka-zwan` | Nakajima-Zwanzig evaluation of the same rotational-modulation kernel as `redfield`; the two are mutually exclusive | `inter.tau_c`, `inter.nz_shift`, `inter.nz_onshell` | Relaxation beyond the Redfield evaluation of the memory kernel |
+
+Nottingham requires one substance with exactly two electrons. `relaxation`
+raises `Spinach:relaxation:nottinghamSubstance` for every segmented descriptor,
+even when every substance contains an electron pair. The `create` restriction
+of two electrons overall is unchanged. Do not interpret Nottingham nuclear
+rate parameters as a standalone nucleus-only model.
+
+The trajectory-integral utility `ngce` supports a single chemical substance.
+Segmented inputs raise `Spinach:ngce:segmentedSubstances`, with or without
+regularisation; its scalar unit-state projection must not be applied to a
+direct sum of substances.
 
 Two settings become mandatory the moment `inter.relaxation` is present:
 
@@ -208,9 +224,30 @@ is how inverted spin temperatures are specified.
 | `'IME'` | Inhomogeneous master equation: `equilibrium.m` supplies the lab frame equilibrium state and R is corrected to drive the system there |
 | `'dibari'` | DiBari-Levitt: R is multiplied by the imaginary-time propagator of the lab frame Hamiltonian left side product superoperator |
 
+`equilibrium` checks each Liouville Hamiltonian block on its own unit state;
+a vanishing action raises `Spinach:equilibrium:notLeftProduct` with the substance
+number. Exactly zero blocks in segmented spherical-tensor systems are exempt,
+including spinful zero-Hamiltonian substances; they retain the local unit state.
+Any cross-substance entries in the Hamiltonian assembled from `I` and oriented
+`Q` raise `Spinach:equilibrium:crossSubstanceHamiltonian` before propagation.
+
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
-state population to be exactly 1, which Spinach cannot check, so a badly
-normalised initial condition gives a silently wrong steady state.
+state population to be exactly 1; general propagation does not enforce initial
+normalisation, so a badly normalised state gives incorrect source amplitudes.
+IME requires block-diagonal relaxation: cross-substance entries of `R` raise
+`Spinach:thermalize:crossSubstanceRelaxation` even when they preserve unit states.
+
+In segmented `sphten-liouv`, `steady` initialises and pins the unit coordinate
+`bas.offsets(n)+1` of every substance to one; supplied guesses must obey the
+same unweighted normalisation. Both Newton and squaring methods accept this layout.
+Each unit column must drive an active coordinate in its own substance block;
+`Spinach:steady:unthermalisedSubstance` names any block that fails this check.
+Steady-state GRAPE dressing likewise removes every conserved unit direction from
+the adjoint solve and requires a traceless target in each substance.
+`magpump` likewise sources each target block through its own unit coordinate,
+including targets spanning several substances, and rejects unit-state pumping
+in every block.
+
 DiBari-Levitt is more expensive but better behaved in exotic regimes; it
 demands a positive real temperature and refuses the high-temperature
 approximation (`inter.temperature=0`), and `equilibrium.m` refuses absolute

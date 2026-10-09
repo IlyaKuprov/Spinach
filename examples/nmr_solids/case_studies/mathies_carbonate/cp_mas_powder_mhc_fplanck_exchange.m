@@ -53,7 +53,7 @@ inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Disable start-up checks
 sys.disable={'hygiene'};

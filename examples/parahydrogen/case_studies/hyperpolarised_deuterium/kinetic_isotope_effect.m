@@ -47,7 +47,7 @@ sys.magnet=7.05;
 
 % Simulation formalsim
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield','t1_t2'};

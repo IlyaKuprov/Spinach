@@ -35,3 +35,6 @@ The function takes no inputs. It returns `result`, a regression test result stru
 - [Spinach source: tests/kernel/test_dynamic_metadata_partition_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_metadata_partition_suite.m)
 
 The suite also verifies that explicit ZTE enablement removes three empty tracks from a four-coordinate invariant system, and that paranoia overrides the enablement.
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.
+Zero-track elimination retains the unit coordinate even when it has no population.

@@ -15,7 +15,7 @@ Turns specified states of a spin system into sinkholes: any population reaching 
 - Consistency enforcement errors if:
   - `spin_system.bas.formalism` is not `'sphten-liouv'`.
   - `L` is not numeric or not a square matrix.
-  - The dimension of `L` does not match the dimension of the basis set (`spin_system.bas.basis`).
+  - The dimension of `L` does not match the dimension of the basis set (`spin_system.bas.offsets(end)`).
   - `states` is not a numeric, real vector of positive integers.
   - Any element of `states` exceeds the state space dimension.
 

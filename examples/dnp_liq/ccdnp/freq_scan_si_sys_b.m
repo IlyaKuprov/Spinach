@@ -34,7 +34,7 @@ inter.coordinates={[ 0.000  0.000  0.000];
                    
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable start-up checks
 sys.disable={'hygiene'};

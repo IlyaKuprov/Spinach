@@ -34,12 +34,9 @@ function [R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)
 % Check consistency
 grumble(spin_system);
 
-% Compute ranks and projections
-[L,M]=lin2lm(spin_system.bas.basis);
-
 % Preallocate relaxation rates
-r1_rates=zeros(size(spin_system.comp.isotopes));
-r2_rates=zeros(size(spin_system.comp.isotopes));
+r1_rates=zeros(spin_system.comp.nspins,1);
+r2_rates=zeros(spin_system.comp.nspins,1);
 
 % Fill in R1 relaxation rates
 for n=1:numel(spin_system.comp.isotopes)
@@ -142,33 +139,18 @@ if any(~isreal(r1_rates),'all')||any(~isreal(r2_rates),'all')
     error('all R1 and R2 relaxation rates must be real numbers.');
 end
 
-% Preallocate superoperator diagonals
-matrix_dim=size(spin_system.bas.basis,1);
+% Preallocate direct-sum relaxation diagonals
+matrix_dim=spin_system.bas.offsets(end);
 r1_diagonal=zeros(matrix_dim,1);
 r2_diagonal=zeros(matrix_dim,1);
 
-% Inspect every state and assign its relaxation rate
-parfor n=1:matrix_dim
-    
-    % Copy rate vectors to nodes
-    local_r1_rates=r1_rates;
-    local_r2_rates=r2_rates;
-    
-    % Spins in unit state do not contribute
-    mask=(L(n,:)~=0);
-    
-    % Spins in longitudinal states contribute their R1
-    r1_spins=(~logical(M(n,:)))&mask;
-    r1_sum=sum(local_r1_rates(r1_spins));
-    
-    % Spins in transverse states contribute their R2
-    r2_spins=(logical(M(n,:)))&mask;
-    r2_sum=sum(local_r2_rates(r2_spins));
-    
-    % Total relaxation rate for the state
-    r1_diagonal(n)=r1_sum;
-    r2_diagonal(n)=r2_sum;
-    
+% Sum the local single-spin rates within each substance
+for n=1:spin_system.bas.nsubst
+    [L,M]=lin2lm(spin_system.bas.basis{n});
+    spins=spin_system.chem.parts{n};
+    idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+    r1_diagonal(idx)=((L~=0)&(M==0))*r1_rates(spins,1);
+    r2_diagonal(idx)=((L~=0)&(M~=0))*r2_rates(spins,1);
 end
 
 % Build relaxation superoperators

@@ -28,7 +28,7 @@ inter.coordinates={[0 0 0]; 30*[sind(20) 0 cosd(20)]};
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
                
 
 % Spinach housekeeping

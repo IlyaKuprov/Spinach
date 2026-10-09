@@ -103,9 +103,9 @@ inter.coupling.scalar{6,7}=params(9);
 
 % Basis set and symmetry
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
-bas.sym_group={'S3','S3'};
-bas.sym_spins={[1 2 3],[10 11 12]};
+bas.approximation={'none'};
+bas.sym_group={{'S3','S3'}};
+bas.sym_spins={{[1 2 3],[10 11 12]}};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

@@ -59,7 +59,7 @@ end
 % Single proton in Liouville space
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0.0};
-bas.formalism='sphten-liouv'; bas.approximation='none';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Operators and the initial state

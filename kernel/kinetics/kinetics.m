@@ -33,6 +33,9 @@
 
 function K=kinetics(spin_system)
 
+% Check the implemented chemistry scope
+grumble(spin_system);
+
 % Preallocate the answer
 K=mprealloc(spin_system,0);
 
@@ -52,12 +55,12 @@ for n=1:numel(rates)
     destin_spins=spin_system.chem.parts{destins(n)};
     
     % Get the states involved
-    source_states=logical(sum(spin_system.bas.basis(:,source_spins),2));
-    destin_states=logical(sum(spin_system.bas.basis(:,destin_spins),2));
+    source_states=logical(sum(spin_system.bas.basis{1}(:,source_spins),2));
+    destin_states=logical(sum(spin_system.bas.basis{1}(:,destin_spins),2));
     
     % Make sure basis tables match
-    if ~isequal(spin_system.bas.basis(source_states,source_spins),...
-                spin_system.bas.basis(destin_states,destin_spins))
+    if ~isequal(spin_system.bas.basis{1}(source_states,source_spins),...
+                spin_system.bas.basis{1}(destin_states,destin_spins))
         error('spin systems on either side of the reaction arrow have different topologies or basis sets.');
     end
 
@@ -82,8 +85,8 @@ if ~isempty(flux_rate)
     end
     
     % Index single- and multi-spin orders (sso and mso)
-    sso_state_mask=(sum(logical(spin_system.bas.basis),2)==1);
-    mso_state_mask=(sum(logical(spin_system.bas.basis),2)>1 );
+    sso_state_mask=(sum(logical(spin_system.bas.basis{1}),2)==1);
+    mso_state_mask=(sum(logical(spin_system.bas.basis{1}),2)>1 );
     
     % Decide how to proceed
     switch spin_system.chem.flux_type
@@ -99,8 +102,8 @@ if ~isempty(flux_rate)
     for n=1:numel(flux_rate)
         
         % Find single-spin sources and destinations
-        sso_source_state_mask=sso_state_mask&(spin_system.bas.basis(:,source_spins(n))~=0);
-        sso_destin_state_mask=sso_state_mask&(spin_system.bas.basis(:,destin_spins(n))~=0);
+        sso_source_state_mask=sso_state_mask&(spin_system.bas.basis{1}(:,source_spins(n))~=0);
+        sso_destin_state_mask=sso_state_mask&(spin_system.bas.basis{1}(:,destin_spins(n))~=0);
         
         % Identify stationary states
         sso_static_state_mask=sso_source_state_mask&sso_destin_state_mask;
@@ -108,8 +111,8 @@ if ~isempty(flux_rate)
         sso_destin_state_mask=xor(sso_destin_state_mask,sso_static_state_mask);
         
         % Make sure subspaces match
-        if ~isequal(spin_system.bas.basis(sso_source_state_mask,source_spins(n)),...
-                    spin_system.bas.basis(sso_destin_state_mask,destin_spins(n)))
+        if ~isequal(spin_system.bas.basis{1}(sso_source_state_mask,source_spins(n)),...
+                    spin_system.bas.basis{1}(sso_destin_state_mask,destin_spins(n)))
             error('spin systems on either side of the reaction arrow have different topology or basis sets.');
         end
         
@@ -131,8 +134,8 @@ if ~isempty(flux_rate)
             case 'intramolecular' 
         
                 % Find multi-spin sources and destinations
-                mso_source_state_mask=mso_state_mask&(spin_system.bas.basis(:,source_spins(n))~=0);
-                mso_destin_state_mask=mso_state_mask&(spin_system.bas.basis(:,destin_spins(n))~=0);
+                mso_source_state_mask=mso_state_mask&(spin_system.bas.basis{1}(:,source_spins(n))~=0);
+                mso_destin_state_mask=mso_state_mask&(spin_system.bas.basis{1}(:,destin_spins(n))~=0);
                 
                 % Identify stationary states
                 mso_static_state_mask=mso_source_state_mask&mso_destin_state_mask;
@@ -140,8 +143,8 @@ if ~isempty(flux_rate)
                 mso_destin_state_mask=xor(mso_destin_state_mask,mso_static_state_mask);
                 
                 % Make sure subspaces match
-                if ~isequal(spin_system.bas.basis(mso_source_state_mask,source_spins(n)),...
-                            spin_system.bas.basis(mso_destin_state_mask,destin_spins(n)))
+                if ~isequal(spin_system.bas.basis{1}(mso_source_state_mask,source_spins(n)),...
+                            spin_system.bas.basis{1}(mso_destin_state_mask,destin_spins(n)))
                     error('spin systems on either side of the reaction arrow have different topology or basis sets.');
                 end
                 
@@ -160,7 +163,7 @@ if ~isempty(flux_rate)
             case 'intermolecular'
                 
                 % Find multi-spin sources 
-                mso_source_state_mask=mso_state_mask&(spin_system.bas.basis(:,source_spins(n))~=0);
+                mso_source_state_mask=mso_state_mask&(spin_system.bas.basis{1}(:,source_spins(n))~=0);
                 
                 % Generate indices
                 mso_source_state_index=find(mso_source_state_mask);
@@ -233,6 +236,16 @@ if nnz(K)==0
     report(spin_system,'kinetics superoperator set to zero.');
 end
 
+end
+
+% Consistency enforcement
+function grumble(spin_system)
+if (spin_system.bas.nsubst>1)&&...
+   (nnz(spin_system.chem.rates)||nnz(spin_system.chem.flux_rate)||...
+    (~isempty(spin_system.chem.rp_theory)&&~strcmp(spin_system.chem.rp_theory,'off')))
+    error('Spinach:kinetics:segmentedChemistry',...
+          'multi-substance chemistry requires the reaction-record implementation (WP3).');
+end
 end
 
 % The egoist is the absolute sense is not the man who sacrifices others. He

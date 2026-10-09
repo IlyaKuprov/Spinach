@@ -17,7 +17,7 @@ sys.disable={'trajlevel'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Spinach housekeeping

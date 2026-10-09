@@ -6,7 +6,7 @@
 
 Modifies a relaxation superoperator `R` to drive a chosen stationary state. The two accepted methods modify `R` differently:
 
-- `method='IME'`: requires a nonempty numeric column `rho_eq` and a Liouville-space formalism. In `sphten-liouv`, `U` selects the first basis coordinate; in `zeeman-liouv`, `U` is the vectorised identity. The update is `R=R-kron(U',R*rho_eq)`. For this IME correction to work, the propagated state’s unit-state population must be exactly 1; Spinach cannot check or enforce this requirement. Otherwise the rank-one correction drives towards a mis-scaled equilibrium rather than `rho_eq`.
+- `method='IME'`: requires a nonempty numeric column `rho_eq` and a Liouville-space formalism. The correction is applied independently within each substance block: `R_n=R_n-(R_n*rho_eq_n)*U_n'`. In `sphten-liouv`, `U_n` selects that block’s first coordinate; in `zeeman-liouv`, it is the vectorised local identity. The supplied target blocks are unweighted. This preserves the direct-sum structure rather than connecting different unit coordinates. Nonzero cross-substance blocks of `R` are unsupported and raise `Spinach:thermalize:crossSubstanceRelaxation` before correction, even if they annihilate the unit state.
 - `method='dibari'`: requires a nonempty square `HLSPS` and positive real scalar temperature `T`. With `beta=spin_system.tols.hbar/(spin_system.tols.kbol*T)`, the update is `R=R*propagator(spin_system,HLSPS,1i*beta)`. This branch uses the lab-frame Hamiltonian supplied by the caller.
 
 ## Input checks

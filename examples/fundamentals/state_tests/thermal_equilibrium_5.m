@@ -44,7 +44,7 @@ for n=1:numel(formalisms)
 
         % Basis set
         bas.formalism=formalisms{n};
-        bas.approximation='none';
+        bas.approximation={'none'};
 
         % Enable zero track elimination
         sys.enable={'zte'};

@@ -278,10 +278,22 @@ Relaxation enters through `inter.relaxation`, `inter.rlx_keep`,
 
 ```matlab
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 ```
+
+Every field except `formalism` is a cell with exactly one entry per chemical
+substance, even when there is only one. The table gives the contents of each
+entry (the filter rows already describe the outer cell). There is no scalar
+broadcast. `manual{n}` has local spin columns; `sym_spins{n}` is a cell of local
+spin-index vectors. Numeric longitudinal and zero-quantum filter labels remain
+global. Empty depth/connectivity entries are used where the local approximation
+does not need that setting. The compiled descriptors are `bas.basis{n}`, with
+unit rows first and `bas.offsets` delimiting the direct-sum blocks.
+Coherence, correlation, homospoil, and decoupling selections retain global
+spin labels at their interface; they map those labels into each substance’s
+local descriptor and apply the resulting masks at its offset.
 
 | Field | Legal values | Notes |
 |---|---|---|
@@ -293,7 +305,7 @@ bas.prox_level=3;
 | `projections` | cell array with one row vector of integers per chemical substance | Keeps only the listed total projection quantum numbers in that substance; an empty element means no filter. `sphten-liouv` only. Single substance: `bas.projections={+1}`. |
 | `longitudinal` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only longitudinal states on those spins of that substance. `sphten-liouv` only. Single substance: `bas.longitudinal={{'15N'}}`. |
 | `zero_quantum` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only states that are zero-quantum over the union of the listed spins of that substance. `sphten-liouv` only. Single substance: `bas.zero_quantum={{'1H'}}`. |
-| `manual` | logical matrix with `nspins` columns | Explicit subgraph list, one subgraph per row; a row may not span two chemical substances. |
+| `manual` | logical matrix with `numel(chem.parts{n})` columns | Explicit local subgraph list, one subgraph per row. |
 | `sym_group` | cell array from `S2`, `S3`, `S4`, `S4A`, `S5`, `S6`, `S6A`, `S8A` | Permutation symmetry groups. |
 | `sym_spins` | cell array of index vectors | One vector per group, at least two spins each, no spin in two groups, no group spanning two chemical substances. Mandatory alongside `sym_group`. |
 | `sym_a1g_only` | logical | Keep only the fully symmetric irreducible representation. |
@@ -491,3 +503,123 @@ Complete ready-made systems live in `etc/molecules/` (`strychnine(spins)`,
 `guess_j_pro`, `guess_j_nuc` and `guess_csa_pro` are the estimators `protein`
 and `nuclacid` call internally; everything they return is an estimate and must
 be reported as one.
+
+## Direct-sum operator addressing
+
+In `sphten-liouv`, a product operator acts only in the substance hosting its
+spins; cross-substance product specifications raise
+`Spinach:which_subst:crossSubstance`. Isotope selections sum single-spin
+operators across the hosting blocks. Operator and identity dimensions come
+from `bas.offsets(end)`, not from the number of descriptor cells.
+Explicit identity requests act only on the selected substance; numeric and
+isotope sums contribute once per matching spin. Left/right identity actions
+give the local identity, anticommutators twice it, and commutators zero.
+Multi-substance Zeeman operator construction remains explicitly unsupported.
+
+Symmetry factorisations live in `bas.sym_fact(n)`. `reduce` and `rspt_eig`
+embed their local projector columns using `bas.offsets`; do not read the
+retired global `bas.irrep` field.
+
+Converters preserve the substance direct sum. `sphten2zeeman` maps each
+unit coordinate to `vec(I_D)` (Hilbert trace divided by `D` is the source
+unit coordinate). `hilb2liouv` accepts explicit cells of Hilbert blocks;
+numeric matrices retain their single-block meaning. `sim2liouv` uses
+compiled block dimensions, migrates `sym_fact`, and refreshes the hash
+from the descriptor cells, new dimensions, and substance membership.
+
+Spatial phantom operators and states use the entire substance direct sum.
+`imaging` and `meshflow` obtain its dimension from `bas.offsets(end)`;
+`gridfree` checks extra isotropic terms against the same dimension.
+
+Spin-only symmetry projectors are not applied to enlarged spatial-spin
+generators in `reduce`; those use the usual trajectory-level reductions.
+`v2fplanck` tensors the spatial transport with the full direct-sum identity.
+
+`summary_basis` reports substances separately; `stateinfo` identifies the
+hosting substance and global spin labels of every reported coefficient.
+State numbers retain the global direct-sum offsets.
+
+`zte` preserves all compiled spherical-tensor unit coordinates, even for
+zero-population substances. `reduce` transports their support through the
+symmetry projection and keeps it during subsequent population screening.
+
+Trajectory analysis uses local descriptors and global spin labels. `trajan`
+removes each unit independently and converts level populations per substance;
+`trajsimil` groups equivalent tracks only within the same substance.
+
+`kill_spin` and `dilute` rebuild an existing basis after particle removal.
+Local manual columns and global numeric filter labels are reindexed. Isotope
+filters are removed when no matching spin survives in their own substance;
+empty substances keep their unit coordinate. Retained `inter_level`, `prox_level`,
+and `space_level` depths are capped by each substance's surviving particle count
+before the rebuild. IK-DNP vector components also respect electron and nucleus
+counts; IK-SBS components respect mode, total active-particle, and spin counts.
+Losing a required class in IK-DNP or IK-SBS selects IK-0 at the surviving
+class depth (at least one), without connectivity pruning. Symmetry and Hamiltonian assumptions
+are cleared, so reapply `assume` before constructing a Hamiltonian.
+
+Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
+product operators and states raise `Spinach:which_subst:crossSubstance`.
+
+Legacy `kinetics` remains available for single-substance flux and radical-pair
+models. Nonzero multi-substance chemistry is explicitly rejected until the
+reaction-record implementation; absent chemistry gives the direct-sum zero.
+`react_gen` uses the single local descriptor and rejects multi-substance calls
+with `Spinach:react_gen:segmentedChemistry`, rather than reading the retired
+global matrix.
+
+Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
+block must use `none`, as enforced by `basis`.
+
+`sim2liouv` accepts sparse horizontal density-matrix stacks and preserves their
+column order while extracting each substance block. Segmented generators,
+operator-like parameters, and state stacks must be block diagonal in substance;
+nonzero cross-substance entries raise `Spinach:sim2liouv:crossSubstance`.
+
+Synthetic compiled-system fixtures must supply offsets and local descriptor
+cells too; bypassing `basis` does not restore the retired global layout.
+
+`bootstrap` follows the same one-cell approximation contract as physical systems.
+
+Legacy two-substance chemistry test fixtures also require two approximation
+cells. The generator and invariant suites test supported single-substance
+flux and empty reaction maps; the generator suite explicitly asserts the WP3
+rejection boundary instead of claiming numerical exchange validation.
+
+Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
+multi-substance Zeeman symmetry, analytical filters, unit states, and equilibrium
+states are explicitly rejected. Single-substance Zeeman behaviour is retained.
+Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
+use `bas.offsets(end)`. Identity states retain the selected substance: each
+selected spin contributes one local unit in a sum, a local product contributes
+once, and `chem` weights that unit by its hosting concentration.
+
+Imaging tests the compiled symmetry projectors, so a declared group disabled
+through `sys.disable` does not prevent an imaging calculation.
+
+Per-substance `space_level` aliases are derived independently; an empty entry
+does not inherit the preceding substance's proximity depth.
+
+Segmented wavefunction and Zeeman-Liouville state construction is deferred and raises
+`Spinach:state:segmentedZeeman` before global tensor allocation; single-substance states are unchanged.
+
+Before basis compilation, `chem.parts` must cover every global spin; omitted
+spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.
+
+Level projectors retain their substance through mixed identity and non-identity
+tensor expansions, including chemical concentration weighting.
+
+`partner_state` keeps global descriptor positions but constructs states only in
+the substance hosting the fixed and partner spins. Padding identities in its
+returned descriptors do not imply populations in other substances.
+
+Segmented coherent states and Zeeman steady solves are explicitly deferred.
+Steady-state `solid_effect` and both DNP scans require a single substance;
+these experiments retain their supported single-substance algorithms.
+
+`create(sys)` without interaction input remains supported; it uses an empty
+interaction structure and the ordinary one-substance/unit-concentration defaults.
+
+`reduce` rejects cross-substance entries in caller-supplied generators at the
+compiled spin dimension before building substance-local projectors. This
+boundary also covers the adjoint generator passed by destination screening.

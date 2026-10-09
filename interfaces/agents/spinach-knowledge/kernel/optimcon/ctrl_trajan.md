@@ -24,3 +24,5 @@ The time axis is either slice number or cumulative <code>pulse_dt</code> in seco
 Spectrogram and instantaneous-frequency plots use only the initial run of exactly equal <code>pulse_dt</code> values, and require at least five such slices. The spectrogram is formed from the complex control <code>X-iY</code>; instantaneous frequency is evaluated from <code>X-iY</code> using the first slice duration. The fidelity-robustness display is a probability-density-normalised histogram.
 
 The plotting routine is diagnostic: its displayed amplitudes, bounds, trajectory summaries and fidelity histogram are not a complete specification of optimisation constraints or the objective's gradient.
+
+Trajectory panels trace out spatial degrees of freedom using the full compiled spin dimension `bas.offsets(end)`, then analyse the direct-sum trajectory with `trajan`.

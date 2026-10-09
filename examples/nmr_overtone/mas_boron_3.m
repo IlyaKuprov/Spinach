@@ -15,7 +15,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(0.7e6,0.0,3,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};

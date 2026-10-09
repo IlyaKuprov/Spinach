@@ -22,7 +22,7 @@ inter.coordinates={[-2.26  0.15  0.00],...
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','prop_cache'}; % 'gpu'

@@ -34,7 +34,7 @@ inter.coupling.euler{2,4}=[0 0 0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'14N'}};
 
 % Enable zero track elimination

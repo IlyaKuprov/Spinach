@@ -15,9 +15,9 @@ sys.magnet=5.9;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};

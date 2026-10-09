@@ -47,7 +47,7 @@ sys.magnet=0;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Define an unmodulated Hamiltonian decomposition

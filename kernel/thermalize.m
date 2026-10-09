@@ -30,9 +30,10 @@
 %
 %     R       - thermalized relaxation superoperator
 %
-% Note: to work correctly, IME requires the population of the unit state 
-%       in the state vector to be exactly 1. Spinach has no way of check-
-%       ing or enforcing this requirement - take due care.
+% Note: IME is applied independently to each substance block. The target
+%       states in this construction are unweighted, with unit population
+%       at every substance unit coordinate. Cross-substance blocks of R
+%       are not supported in IME.
 %
 % Note: DiBari-Levitt method is computationally expensive, but tends to
 %       work better than IME, particularly in exotic regimes.
@@ -52,29 +53,21 @@ switch method
     
     case 'IME'
 
-        % This is formalism-dependent
-        switch spin_system.bas.formalism
-
-            case 'sphten-liouv'
-
-                % Unit state has unit population of T(0,0) state
-                U=sparse(1,1,1,size(R,2),1);
-
-            case 'zeeman-liouv'
-
-                % Unit state is a stretched unit matrix
-                U=speye(prod(spin_system.comp.mults)); U=U(:);
-
-            otherwise
-
-                % Complain and bomb out
-                error('this function is only available in Liouville space.');
-
+        % Apply IME independently within each substance block
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            switch spin_system.bas.formalism
+                case 'sphten-liouv'
+                    U=sparse(1,1,1,numel(idx),1);
+                case 'zeeman-liouv'
+                    U=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+                    U=U(:);
+                otherwise
+                    error('this function is only available in Liouville space.');
+            end
+            R(idx,idx)=R(idx,idx)-(R(idx,idx)*rho_eq(idx))*U';
         end
-        
-        % Apply IME correction
-        R=R-kron(U',R*rho_eq);
-        
+
     case 'dibari'
         
         % Get the temperature factor
@@ -108,6 +101,15 @@ if ~ismember(method,{'IME','dibari'})
     error('method must be ''IME'' or ''dibari''.');
 end
 if strcmp(method,'IME')
+    if spin_system.bas.nsubst>1
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            if nnz(R(idx,:))~=nnz(R(idx,idx))
+                error('Spinach:thermalize:crossSubstanceRelaxation',...
+                      'IME relaxation must not contain cross-substance blocks (substance %d).',n);
+            end
+        end
+    end
     if isempty(rho_eq)
         error('rho_eq cannot be empty for IME formalism.');
     end

@@ -148,7 +148,7 @@ inter.zeeman.scalar={0};
 
 % Specify a full Liouville basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Build the quiet regression-test system
 spin_system=test_spin_system(sys,inter,bas);
@@ -165,7 +165,7 @@ inter.zeeman.scalar={0};
 
 % Specify a full Hilbert basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Build the quiet regression-test system
 spin_system=test_spin_system(sys,inter,bas);

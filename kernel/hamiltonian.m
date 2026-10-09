@@ -655,6 +655,7 @@ oper=cell(size(descr,1),1);
 % Strip the spin system object down to minimum size
 parfor_ss.sys=spin_system.sys; parfor_ss.tols=spin_system.tols;
 parfor_ss.bas=spin_system.bas; parfor_ss.comp=spin_system.comp;
+parfor_ss.chem.parts=spin_system.chem.parts;
 
 % Parfor timing
 if ~isworkernode

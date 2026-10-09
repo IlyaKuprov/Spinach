@@ -24,7 +24,7 @@ inter.coordinates={[0 0 0]; [20 0 0]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory level SSR algorithms
 sys.disable={'trajlevel'};

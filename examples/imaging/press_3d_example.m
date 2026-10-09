@@ -20,7 +20,7 @@ inter.coupling.scalar{1,2}=10;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable path tracing
 sys.disable={'pt'};

@@ -7,7 +7,8 @@
 %
 % Parameters:
 %
-%     L   -  Liouvillian matrix
+%     L   -  Liouvillian matrix; in the compiled substance space,
+%            cross-substance blocks must be zero
 %
 %     rho -  initial state (source state screening) or
 %            destination state (destination state screening)
@@ -50,6 +51,27 @@ if ismember('trajlevel',spin_system.sys.disable)
     projectors{1}=1; return
 end
 
+% Embed spin irreps only for generators in the compiled spin space
+irr_projectors={}; irr_dimensions=[];
+if size(L,1)==spin_system.bas.offsets(end)
+    for s=1:spin_system.bas.nsubst
+        for n=1:numel(spin_system.bas.sym_fact(s).irr_dimensions)
+            P=spin_system.bas.sym_fact(s).irr_projectors{n};
+            irr_projectors{end+1}=[sparse(spin_system.bas.offsets(s),size(P,2)); P;...
+                sparse(spin_system.bas.offsets(end)-spin_system.bas.offsets(s+1),size(P,2))]; %#ok<AGROW>
+        end
+        irr_dimensions=[irr_dimensions; spin_system.bas.sym_fact(s).irr_dimensions(:)]; %#ok<AGROW>
+    end
+end
+
+% Identify unit directions only in the compiled spherical-tensor space
+unit_states=sparse(size(L,1),0);
+if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
+   (size(L,1)==spin_system.bas.offsets(end))
+    unit_states=sparse(spin_system.bas.offsets(1:end-1)+1,...
+                       1:spin_system.bas.nsubst,1,size(L,1),spin_system.bas.nsubst);
+end
+
 % Decide how to proceed
 switch spin_system.bas.formalism
     
@@ -73,7 +95,7 @@ switch spin_system.bas.formalism
             % Return unit matrix
             projectors{1}=1;
             
-        elseif ~isfield(spin_system.bas,'irrep')
+        elseif isempty(irr_projectors)
             
             % Inform the user
             report(spin_system,'no permutation symmetry information has been supplied.');
@@ -84,12 +106,12 @@ switch spin_system.bas.formalism
         else
             
             % Decide which irreps to keep
-            n_irreps=numel(spin_system.bas.irrep); 
+            n_irreps=numel(irr_projectors);
             irrep_keep_index=true(n_irreps,1);
             for n=1:n_irreps
                 
                 % Check the irrep contribution to the total norm
-                if spin_system.bas.irrep(n).dimension==0
+                if irr_dimensions(n)==0
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ...
@@ -98,8 +120,8 @@ switch spin_system.bas.formalism
                     % Flag the irrep for dropping
                     irrep_keep_index(n)=0;
                     
-                elseif norm(spin_system.bas.irrep(n).projector'*rho*... %#NORMOK
-                            spin_system.bas.irrep(n).projector,1)<spin_system.tols.irrep_drop
+                elseif norm(irr_projectors{n}'*rho*... %#NORMOK
+                            irr_projectors{n},1)<spin_system.tols.irrep_drop
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ' has less than '...
@@ -113,7 +135,7 @@ switch spin_system.bas.formalism
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ' contains '...
-                                        num2str(spin_system.bas.irrep(n).dimension) ...
+                                        num2str(irr_dimensions(n)) ...
                                         ' states - kept.']);
                     
                 end
@@ -121,7 +143,7 @@ switch spin_system.bas.formalism
             end
             
             % Compile the projector array
-            projectors={spin_system.bas.irrep(irrep_keep_index).projector};
+            projectors=irr_projectors(irrep_keep_index);
         
         end
         
@@ -139,7 +161,7 @@ switch spin_system.bas.formalism
             % Return unit matrix
             projectors{1}=1;
 
-        elseif ~isfield(spin_system.bas,'irrep')
+        elseif isempty(irr_projectors)
 
             % Inform the user
             report(spin_system,'no permutation symmetry information has been supplied.');
@@ -150,12 +172,12 @@ switch spin_system.bas.formalism
         else
 
             % Decide which irreps to keep
-            n_irreps=numel(spin_system.bas.irrep);
+            n_irreps=numel(irr_projectors);
             irrep_keep_index=true(n_irreps,1);
             for n=1:n_irreps
 
                 % Check the irrep contribution to the total norm
-                if spin_system.bas.irrep(n).dimension==0
+                if irr_dimensions(n)==0
 
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ' has dimension zero - dropped.']);
@@ -163,11 +185,11 @@ switch spin_system.bas.formalism
                     % Flag the irrep for dropping
                     irrep_keep_index(n)=0;
 
-                elseif norm(spin_system.bas.irrep(n).projector'*rho,1)<spin_system.tols.irrep_drop
+                elseif norm(irr_projectors{n}'*rho,1)<spin_system.tols.irrep_drop
 
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ', dimension '...
-                                        num2str(spin_system.bas.irrep(n).dimension) ' has less than '...
+                                        num2str(irr_dimensions(n)) ' has less than '...
                                         num2str(spin_system.tols.irrep_drop) ' of the state norm - dropped.']);
 
                     % Flag the irrep for dropping
@@ -177,14 +199,14 @@ switch spin_system.bas.formalism
 
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ', dimension '...
-                                        num2str(spin_system.bas.irrep(n).dimension) ' is active - kept.']);
+                                        num2str(irr_dimensions(n)) ' is active - kept.']);
 
                 end
 
             end
 
             % Compile the projector array
-            projectors={spin_system.bas.irrep(irrep_keep_index).projector};
+            projectors=irr_projectors(irrep_keep_index);
 
         end
 
@@ -203,7 +225,7 @@ switch spin_system.bas.formalism
             report(spin_system,'attempting zero track elimination...');
             projectors{1}=zte(spin_system,L,rho);
             
-        elseif ~isfield(spin_system.bas,'irrep')
+        elseif isempty(irr_projectors)
             
             % Inform the user
             report(spin_system,'no permutation symmetry information has been supplied.');
@@ -215,11 +237,11 @@ switch spin_system.bas.formalism
         else
             
             % Decide which irreps to keep
-            n_irreps=numel(spin_system.bas.irrep); irrep_keep_index=true(n_irreps,1);
+            n_irreps=numel(irr_projectors); irrep_keep_index=true(n_irreps,1);
             for n=1:n_irreps
                 
                 % Check the irrep contribution to the total norm
-                if spin_system.bas.irrep(n).dimension==0
+                if irr_dimensions(n)==0
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ' has dimension zero - dropped.']);
@@ -227,11 +249,12 @@ switch spin_system.bas.formalism
                     % Flag the irrep for dropping
                     irrep_keep_index(n)=0;
                     
-                elseif norm(spin_system.bas.irrep(n).projector'*rho,1)<spin_system.tols.irrep_drop
+                elseif norm(irr_projectors{n}'*rho,1)<spin_system.tols.irrep_drop&&...
+                       (nnz(irr_projectors{n}'*unit_states)==0)
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ', dimension '...
-                                        num2str(spin_system.bas.irrep(n).dimension) ' has less than '...
+                                        num2str(irr_dimensions(n)) ' has less than '...
                                         num2str(spin_system.tols.irrep_drop) ' of the state norm - dropped.']);
                     
                     % Flag the irrep for dropping
@@ -241,14 +264,14 @@ switch spin_system.bas.formalism
                     
                     % Update the user
                     report(spin_system,['irrep #' num2str(n) ', dimension '...
-                                        num2str(spin_system.bas.irrep(n).dimension) ' is active - kept.']);
+                                        num2str(irr_dimensions(n)) ' is active - kept.']);
                     
                 end
                 
             end
             
             % Compile the projector array
-            projectors={spin_system.bas.irrep(irrep_keep_index).projector};
+            projectors=irr_projectors(irrep_keep_index);
             
             % Loop over permutation group irreps
             for n=1:numel(projectors)
@@ -256,8 +279,13 @@ switch spin_system.bas.formalism
                 % Report to the user
                 report(spin_system,['irrep #' num2str(n) ', attempting zero track elimination...']);
                 
+                % Mark unit support in the projected coordinates, not the original offsets
+                local_system=spin_system;
+                unit_rows=find(any(projectors{n}'*unit_states,2));
+                local_system.bas.offsets=[unit_rows-1; size(projectors{n},2)];
+
                 % Run zero track elimination
-                zte_projector=zte(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
+                zte_projector=zte(local_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
                 
                 % Project the projectors
                 projectors{n}=projectors{n}*zte_projector;
@@ -272,19 +300,22 @@ switch spin_system.bas.formalism
             % Inform the user
             report(spin_system,['path-tracing subspace #' num2str(n) '...']);
             
+            % Include unit support in population screening after projection
+            rho_screen=abs(projectors{n}'*rho)+sum(abs(projectors{n}'*unit_states),2);
+
             % Run the path tracing
-            pt_projectors=path_trace(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
+            pt_projectors=path_trace(spin_system,projectors{n}'*L*projectors{n},rho_screen);
             
             % Project the projectors
             for k=1:numel(pt_projectors)
                 pt_projectors{k}=projectors{n}*pt_projectors{k};
             end
-            projectors{n}=pt_projectors; %#ok<AGROW>
+            projectors{n}=pt_projectors(:); %#ok<AGROW>
             
         end
         
         % Flatten out the cell array
-        projectors=[projectors{:}];
+        projectors=vertcat(projectors{:});
         
     otherwise
         
@@ -302,6 +333,15 @@ if ~isnumeric(L)
 end
 if size(L,1)~=size(L,2)
     error('L must be a square matrix.');
+end
+if spin_system.bas.nsubst>1&&size(L,1)==spin_system.bas.offsets(end)
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        if nnz(L(idx,:))~=nnz(L(idx,idx))
+            error('Spinach:reduce:crossSubstanceGenerator',...
+                  'L must not contain cross-substance blocks (substance %d).',n);
+        end
+    end
 end
 end
 

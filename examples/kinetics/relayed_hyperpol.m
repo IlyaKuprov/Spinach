@@ -51,10 +51,10 @@ inter.r2_rates=num2cell([zeros(1,10) 0.1*ones(1,20)]);
 % Basis set, single-spin for water, up to 
 % three-spin orders for the molecule
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='full_tensors';
-bas.prox_level=3;
-bas.inter_level=1;
+bas.approximation={'IK-1'};
+bas.connectivity={'full_tensors'};
+bas.prox_level={3};
+bas.inter_level={1};
 
 % Exchange flux matrix
 inter.chem.flux_rate=zeros(30,30);

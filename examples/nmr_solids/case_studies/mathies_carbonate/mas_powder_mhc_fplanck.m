@@ -45,8 +45,8 @@ inter.coordinates=mat2cell(props.std_geom,ones(18,1));
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3; 
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 bas.projections={+1};
 
 % Interaction cut-off, Hz

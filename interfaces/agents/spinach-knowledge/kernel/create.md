@@ -10,7 +10,7 @@ Wiki: [Spin Dynamics Wiki: create.m](https://spindynamics.org/wiki/index.php?tit
 The kernel entry point constructs the `spin_system` object used by the rest of Spinach. It validates and absorbs system and interaction specifications, then reports diagnostics.
 
 - `sys` — spin-system and instrument specification structure. The source requires isotope labels and a scalar magnet field; consult the Spin System Specification section of the manual for the complete input specification.
-- `inter` — interaction specification structure. It may be omitted; the executable code then sets it to `[]` before validation.
+- `inter` — interaction specification structure. It may be omitted; the executable code then uses an empty scalar structure before installing the single-substance defaults and validating input.
 - `spin_system` — assembled system object, including system, component, interaction, chemistry, and relaxation data. For `N=numel(sys.isotopes)`, particle metadata is held per particle and pairwise couplings in `N-by-N` cells, with populated spin-coupling entries represented by `3x3` tensors.
 
 ## Assembly in execution order
@@ -26,7 +26,7 @@ The kernel entry point constructs the `spin_system` object used by the rest of S
 
 ## Couplings, decoupling, and guards
 
-`inter.ignore` is specifically a coupling drop list: for each listed pair the source clears both `{i,j}` and `{j,i}` entries after assembly. It does not remove spins or other interaction families. Pair couplings below the configured cutoff are cleared; couplings involving multiplicity-one ghost spins are also cleared. A populated coupling between different chemical subsystems is rejected.
+`inter.ignore` is specifically a coupling drop list: for each listed pair the source clears both `{i,j}` and `{j,i}` entries after assembly. It does not remove spins or other interaction families. Pair couplings below the configured cutoff are cleared; couplings involving multiplicity-one ghost spins are also cleared. A populated coupling between different chemical subsystems is rejected with `Spinach:create:crossSubstanceCoupling`.
 
 Field validation is delegated substantially to `grumble` and the helper routines. The source checks the required isotope/magnet inputs and applies field-specific checks for modes, tensors, coordinates and periodic boundaries, chemistry, relaxation, recombination, and ignore-pair indices. In particular, damped bosonic modes require an explicit `inter.temperature`; bosonic particle combinations are restricted for mode couplings and modulation; and an unconsumed system option is an error. This function assembles the model specification; it does not solve an eigenfield problem or compute numerical derivatives.
 
@@ -41,3 +41,7 @@ For bosonic modes, `inter.modes.carriers` declares the laboratory rotating-frame
 The source gives the call syntax `spin_system=create(sys,inter)`; when there are no interaction specifications, `create(sys)` is also accepted by the executable code.
 
 Zero track elimination is off by default. Add `'zte'` to `sys.enable` to opt in; `'zte'` is no longer accepted in `sys.disable`. Paranoia overrides the opt-in and leaves ZTE off.
+
+## Substance defaults
+
+Absent `inter.chem.parts` defaults to a single block containing all spins. A single substance defaults to concentration 1. Empty parts are accepted as spin-free substances; spin lists are sorted in the compiled object. Basis settings are supplied subsequently to `basis`, which validates their per-substance cell cardinality.

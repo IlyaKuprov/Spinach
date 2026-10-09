@@ -29,8 +29,8 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3;
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 
 % Algorithmic options
 sys.enable={'zte','greedy'}; % 'gpu'

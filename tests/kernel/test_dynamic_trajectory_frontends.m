@@ -125,7 +125,7 @@ inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=10.0;
 inter.coupling.scalar{2,2}=0.0;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Assemble a deterministic mixed-order trajectory from physical states

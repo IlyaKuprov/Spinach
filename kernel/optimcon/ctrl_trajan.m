@@ -544,7 +544,7 @@ if ismember('correlation_order',spin_system.control.plotting)
         trajectory=traj_data{n}.forward;
         
         % Trace over the spatial degrees of freedom
-        spn_dim=size(spin_system.bas.basis,1);
+        spn_dim=spin_system.bas.offsets(end);
         spc_dim=size(trajectory,1)/spn_dim;
         trajectory=fpl2rho(trajectory,spc_dim);
         
@@ -583,7 +583,7 @@ if ismember('coherence_order',spin_system.control.plotting)
         trajectory=traj_data{n}.forward;
         
         % Trace over the spatial degrees of freedom
-        spn_dim=size(spin_system.bas.basis,1);
+        spn_dim=spin_system.bas.offsets(end);
         spc_dim=size(trajectory,1)/spn_dim;
         trajectory=fpl2rho(trajectory,spc_dim);
         
@@ -622,7 +622,7 @@ if ismember('local_each_spin',spin_system.control.plotting)
         trajectory=traj_data{n}.forward;
         
         % Trace over the spatial degrees of freedom
-        spn_dim=size(spin_system.bas.basis,1);
+        spn_dim=spin_system.bas.offsets(end);
         spc_dim=size(trajectory,1)/spn_dim;
         trajectory=fpl2rho(trajectory,spc_dim);
         
@@ -661,7 +661,7 @@ if ismember('total_each_spin',spin_system.control.plotting)
         trajectory=traj_data{n}.forward;
         
         % Trace over the spatial degrees of freedom
-        spn_dim=size(spin_system.bas.basis,1);
+        spn_dim=spin_system.bas.offsets(end);
         spc_dim=size(trajectory,1)/spn_dim;
         trajectory=fpl2rho(trajectory,spc_dim);
         
@@ -700,7 +700,7 @@ if ismember('level_populations',spin_system.control.plotting)
         trajectory=traj_data{n}.forward;
         
         % Trace over the spatial degrees of freedom
-        spn_dim=size(spin_system.bas.basis,1);
+        spn_dim=spin_system.bas.offsets(end);
         spc_dim=size(trajectory,1)/spn_dim;
         trajectory=fpl2rho(trajectory,spc_dim);
         

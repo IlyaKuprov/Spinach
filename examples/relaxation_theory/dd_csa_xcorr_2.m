@@ -21,7 +21,7 @@ inter.temperature=298;           % Work at room tempearture
 inter.tau_c={9.6e-12};           % Correlation time
 
 bas.formalism='sphten-liouv';    % Liouville space formalism
-bas.approximation='none';        % Complete basis set
+bas.approximation={'none'};        % Complete basis set
 
 % Proximity cut-off
 sys.tols.prox_cutoff=4.0;

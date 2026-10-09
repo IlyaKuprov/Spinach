@@ -24,7 +24,7 @@ inter.coupling.euler{1,2}=[0 0 0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};

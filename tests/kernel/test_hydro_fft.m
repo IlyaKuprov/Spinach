@@ -15,7 +15,7 @@ result=new_test_result('kernel/hydro_fft','FFT hydrodynamics',...
                        'Implicit spatial derivatives must preserve flow and diffusion actions.');
 
 % Set the spin-space lift and numerical cleanup tolerance
-spin_system.bas.basis=speye(2); spin_system.tols.liouv_zero=1e-14;
+spin_system.bas.basis={speye(2)}; spin_system.bas.offsets=[0;2]; spin_system.tols.liouv_zero=1e-14;
 spin_system.tols.dense_matrix=0.5; spin_system.tols.small_matrix=200; spin_system.sys.disable={};
 
 % Exercise tensor ordering and odd/even grids in one to three dimensions

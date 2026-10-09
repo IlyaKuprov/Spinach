@@ -33,7 +33,7 @@ inter.equilibrium='zero';
 
 % Formalism
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory level SSR algorithms
 sys.disable={'trajlevel'};

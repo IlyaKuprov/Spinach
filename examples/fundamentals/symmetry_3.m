@@ -21,9 +21,9 @@ inter.coupling.scalar{8,8}=0.00;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_spins={[3 4 5],[6 7 8]};
-bas.sym_group={'S3','S3'};
+bas.approximation={'none'};
+bas.sym_spins={{[3 4 5],[6 7 8]}};
+bas.sym_group={{'S3','S3'}};
 
 % Enable zero track elimination
 sys.enable={'zte'};

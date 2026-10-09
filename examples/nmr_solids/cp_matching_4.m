@@ -27,7 +27,7 @@ inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

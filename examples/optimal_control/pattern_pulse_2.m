@@ -20,7 +20,7 @@ inter.zeeman.scalar{1}=0;
 
 % No approximations
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);

@@ -49,7 +49,7 @@ for n=1:numel(weights)
     
     % Basis set
     bas.formalism='sphten-liouv';
-    bas.approximation='none';
+    bas.approximation={'none'};
     
     % Disable trajectory level SSR algorithms
     sys.disable={'hygiene','trajlevel'};

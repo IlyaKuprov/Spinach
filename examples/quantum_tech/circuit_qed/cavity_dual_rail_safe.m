@@ -38,7 +38,7 @@ inter.modes.frqs={0 0 0};
 inter.modes.anharms={anharm [] []};
 inter.modes.kerr=cell(3,3); inter.modes.kerr{1,2}=chi(1); inter.modes.kerr{1,3}=chi(2);
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

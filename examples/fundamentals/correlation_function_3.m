@@ -75,7 +75,7 @@ inter.rlx_keep='labframe';
 inter.equilibrium='zero';
 inter.tau_c={1./(3*[sigma_x sigma_y sigma_z].^2)};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 

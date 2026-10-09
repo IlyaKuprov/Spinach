@@ -6,6 +6,10 @@
 
 Numerical integral route to the Redfield relaxation superoperator. The function computes a laboratory-frame relaxation superoperator `R` directly from a molecular dynamics trajectory of stochastic Hamiltonian superoperators, using numerical evaluation of Redfield's time integral, and optionally returns the element-by-element standard deviation of the mean of `R`.
 
+Only a single chemical substance is supported. Segmented input raises
+`Spinach:ngce:segmentedSubstances` before integration; the scalar unit-state
+projection is not a direct-sum projector, including when regularisation is used.
+
 ## Numerical method and sampling regime
 
 The zero-mean stochastic superoperators in `H1` are correlated across the molecular-dynamics trajectory while `H0` supplies the coherent propagator. A trapezium-rule lag integral over the estimated correlation time `tau_est` is averaged across trajectory stripes to form the real symmetric laboratory-frame Redfield relaxation superoperator. The unit-state component is protected from damping; optional `reg` regularises very small rates, and requesting `dR` returns an elementwise uncertainty of the mean across stripes. The result retains non-secular terms: any secular approximation is the caller’s responsibility.

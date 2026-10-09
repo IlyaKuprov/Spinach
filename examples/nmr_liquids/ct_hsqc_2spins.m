@@ -18,7 +18,7 @@ inter.coupling.scalar{2,2}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.J=140;

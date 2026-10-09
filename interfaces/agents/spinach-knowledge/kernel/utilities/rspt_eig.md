@@ -10,7 +10,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
 
 - Syntax: `[E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)`.
 - Input consistency is enforced by an internal `grumble` subfunction, which requires `parameters.rspt_order` to be present and to be a positive real scalar or `Inf`, requires `Hz`, `Hc`, and `Hmw` to be square numeric matrices, and requires `B` to be a real scalar.
-- If the basis contains an `irrep` subfield (symmetry-adapted basis), the function loops over irreps: each Hamiltonian component (`Hz`, `Hc`) and the microwave operator `Hmw` are projected with the irrep projector `P` and symmetrised as `(X+X')/2`; a recursive call is made with the `irrep` field removed from the basis, and the resulting eigenvectors are projected back with `P`. Irrep blocks are concatenated.
+- If the basis contains `sym_fact`, its substance-local irrep projectors are embedded at the compiled offsets and the function loops over them: each Hamiltonian component (`Hz`, `Hc`) and the microwave operator `Hmw` are projected with the irrep projector `P` and symmetrised as `(X+X')/2`; a recursive call is made with the `sym_fact` field removed from the basis, and the resulting eigenvectors are projected back with `P`. Irrep blocks are concatenated.
 - Otherwise, the Hamiltonian is formed as `H = B*Hz + Hc` and symmetrised (`full((H+H')/2)`), and the method is selected by `parameters.rspt_order`:
   - Orders 1–4: the Hamiltonian is split into diagonal and off-diagonal parts, and `rspert` is called with the specified order.
   - `Inf`: full diagonalisation via `eig(H,'vector')`.

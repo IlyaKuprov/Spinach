@@ -27,7 +27,7 @@ inter.modes.longitudinal{1,2}=4e6*sqrt(2);
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

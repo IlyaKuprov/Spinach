@@ -622,3 +622,11 @@ these experiments retain their supported single-substance algorithms.
 ### Explicit chemistry records
 
 Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices.
+
+`unit_state`, `state`, and `equilibrium` return concentration-weighted states.
+Geometric detection and normalised operator vectors use `coil_state`. IME
+`thermalize` instead takes unit-concentration target shapes: request equilibrium
+on a copy with all `chem.concs` entries one, as `relaxation` does internally.
+The propagated unit coordinates supply the instantaneous concentrations; neither
+thermalisation nor pumping divides by a concentration. `magpump` takes an
+unweighted `coil_state` target, and `steady` pins the supplied concentrations.

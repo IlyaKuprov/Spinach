@@ -23,8 +23,8 @@ Nottingham relaxation settings to test the consumer independently of
 
 A two-substance IME T1/T2 fixture checks both `steady` methods against
 independently constructed single-substance equilibria, with empty and nonzero
-initial guesses. Every unit coordinate stays exactly one despite unequal
-chemical concentrations. Later-block trace-row and initial-normalisation
+initial guesses. Every unit coordinate stays at its specified
+chemical concentration. Later-block trace-row and initial-normalisation
 violations are rejected. Both solvers must also reject an identity-propagator
 block paired with a thermalised block, with each substance tested in turn.
 
@@ -43,3 +43,5 @@ Solid-effect coverage asserts the named segmented steady-state boundary with an 
 A two-substance Hilbert fixture converted by `sim2liouv` checks the named segmented Zeeman steady boundary for both methods, with empty and supplied initial guesses.
 
 Both DNP scan functions are called with complete two-substance inputs and must raise their named segmented-substance boundary rather than attempting a singular single-trace solve.
+
+Steady-state comparisons and guesses carry the specified concentrations, including the spin-free pool. Pumping targets use unweighted coil_state; their source columns act on the instantaneous populations.

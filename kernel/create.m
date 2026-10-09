@@ -2786,8 +2786,10 @@ if isfield(inter,'chem')
     
     % Check initial concentrations
     if isfield(inter.chem,'concs')
-        if (~isnumeric(inter.chem.concs))||(~isreal(inter.chem.concs))||any(inter.chem.concs(:)<0)
-            error('inter.chem.concs must be a vector of non-negative real numbers.');
+        if (~isnumeric(inter.chem.concs))||(~isreal(inter.chem.concs))||...
+           (~isvector(inter.chem.concs))||any(~isfinite(inter.chem.concs(:)))||...
+           any(inter.chem.concs(:)<0)
+            error('inter.chem.concs must be a vector of finite non-negative real numbers.');
         end
         if numel(inter.chem.concs)~=numel(inter.chem.parts)
             error('the number of initial concentrations must be equal to the number of chemical species.');

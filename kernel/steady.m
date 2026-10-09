@@ -14,8 +14,8 @@
 %    rho - optional initial guess for the steady state,
 %          a good one can significantly accelerate this
 %          function (leave empty otherwise); the state
-%          must have unit trace, which in sphten-liouv
-%          means a unit coordinate equal to 1 in each substance
+%          must carry chem.concs in the substance trace coordinates,
+%          which are the local unit coordinates in sphten-liouv
 %
 %    method - 'newton' (default) for the Newton-Raphson
 %             steady state solver, 'squaring' for propa-
@@ -54,10 +54,10 @@ if isempty(rho)
     switch spin_system.bas.formalism
         case 'sphten-liouv'
             rho=zeros([size(P,2) 1],'like',1i);
-            rho(spin_system.bas.offsets(1:end-1)+1)=1;
+            rho(spin_system.bas.offsets(1:end-1)+1)=spin_system.chem.concs;
         case 'zeeman-liouv'
             dim=sqrt(size(P,2));
-            rho=speye(dim); rho=complex(full(rho(:))/dim);
+            rho=speye(dim); rho=spin_system.chem.concs(1)*complex(full(rho(:))/dim);
     end
 end
 
@@ -152,7 +152,7 @@ switch method
                 while norm(du,2)>spin_system.tols.stst_tol
 
                     % Compute the bordered residual
-                    r=[P*rho-rho; u0'*rho-1];
+                    r=[P*rho-rho; u0'*rho-spin_system.chem.concs(1)];
 
                     % Re-use LU factors
                     du=-UF\(LF\(RP*r)); du=du(1:(end-1));
@@ -221,13 +221,13 @@ if ~iscolumn(rho)
     error('rho must be a column vector.');
 end
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
-    if any(rho(spin_system.bas.offsets(1:end-1)+1)~=1)
-        error('every substance unit coordinate of rho must be equal to 1.');
+    if any(rho(spin_system.bas.offsets(1:end-1)+1)~=spin_system.chem.concs(:))
+        error('every substance unit coordinate of rho must equal its concentration.');
     end
 else
     dim=sqrt(size(P,2)); u0=speye(dim); u0=u0(:);
-    if abs(u0'*rho-1)>1e-10
-        error('rho must have unit trace.');
+    if abs(u0'*rho-spin_system.chem.concs(1))>1e-10
+        error('rho trace must equal its substance concentration.');
     end
 end
 end

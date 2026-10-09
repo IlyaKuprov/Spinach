@@ -36,3 +36,5 @@ This numerical estimate requires resolved dynamics rather than merely positive i
 
 1. Spinach Wiki page for `ngce.m`: <https://spindynamics.org/wiki/index.php?title=ngce.m>
 2. Spinach GitHub source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/ngce.m>
+
+The geometric unit-state projector is built with concentration one, independently of the initial population, including a zero-population single substance.

@@ -20,7 +20,8 @@
 %     T       - absolute temperature, not required for the 
 %               IME formalism (pass empty array)
 %
-%     rho_eq  - thermal equilibrium state, not required for 
+%     rho_eq  - unit-concentration target in each substance block,
+%               from equilibrium with chem.concs set to ones; not required for
 %               the DiBari-Levitt formalism (pass empty array)
 %
 %     method  - 'dibari' for DiBari-Levitt thermalisation,
@@ -32,7 +33,8 @@
 %
 % Note: IME is applied independently to each substance block. The target
 %       states in this construction are unweighted, with unit population
-%       at every substance unit coordinate.
+%       at every substance unit coordinate. Acting on weighted states
+%       scales the target by the instantaneous population, including zero.
 %
 % Note: DiBari-Levitt method is computationally expensive, but tends to
 %       work better than IME, particularly in exotic regimes.
@@ -89,7 +91,8 @@ function grumble(spin_system,R,HLSPS,T,rho_eq,method)
 if (~isnumeric(R))||(size(R,1)~=size(R,2))
     error('R must be a square matrix.');
 end
-unit=unit_state(spin_system);
+unit_system=spin_system; unit_system.chem.concs(:)=1;
+unit=unit_state(unit_system);
 if norm(R*unit,2)>1e-10
     error('R appears to be thermalized already.');
 end
@@ -105,6 +108,14 @@ if strcmp(method,'IME')
     end
     if (~isnumeric(rho_eq))||(~iscolumn(rho_eq))
         error('rho_eq must be a column vector.');
+    end
+    if size(rho_eq,1)~=size(R,1)
+        error('rho_eq and R must have matching dimensions.');
+    end
+    if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
+       any(abs(rho_eq(spin_system.bas.offsets(1:end-1)+1)-1)>1e-10)
+        error('Spinach:thermalize:targetConcentration',...
+              'IME requires unit-concentration target blocks; request equilibrium with chem.concs set to ones.');
     end
 end
 if strcmp(method,'dibari')

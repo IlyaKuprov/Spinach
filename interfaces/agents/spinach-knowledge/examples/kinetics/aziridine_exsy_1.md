@@ -8,7 +8,7 @@ The no-argument MATLAB example simulates a two-dimensional NOESY/EXSY experiment
 
 The system contains two 10-spin conformational blocks (20 spins total), each with a 14N at spin positions 4 and 14 and otherwise 1H nuclei. The coordinates are explicitly labelled Angstrom in the source; the Zeeman and coupling tensors, including the 14N quadrupolar tensors, are entered as matrices. The source says parameters other than isotropic chemical shifts, exchange rates and correlation times come from a DFT calculation. Isotropic shifts are set in an explicit two-conformer list and the two blocks exchange through `inter.chem.parts`.
 
-The kinetic inputs are `kplus=4` and `kminus=20`, with rate matrix `[-kplus kminus; kplus -kminus]` and concentration weights `[kminus kplus]`. The source does not annotate units for these rate values. Relaxation is configured as Redfield plus SRSK, with SRSK sources at spins 4 and 14, `tau_c={50e-12 50e-12}`, zero equilibrium, and `rlx_keep='kite'`. The spin basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, inter-level 4 and proximity level 3; Krylov is disabled, greedy is enabled, and the proximity cutoff is 10.0. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
+The kinetic inputs are `kplus=4` and `kminus=20`, with two directed first-order reaction records matching spins 1–10 to 11–20 and back and concentration weights `[kminus kplus]`. The source does not annotate units for these rate values. Relaxation is configured as Redfield plus SRSK, with SRSK sources at spins 4 and 14, `tau_c={50e-12 50e-12}`, zero equilibrium, and `rlx_keep='kite'`. The spin basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, inter-level 4 and proximity level 3; Krylov is disabled, greedy is enabled, and the proximity cutoff is 10.0. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Sequence, observable, and limits
 
@@ -19,3 +19,5 @@ The concentration-aware initial state is 1H longitudinal magnetisation. The exam
 [Article DOI](https://doi.org/10.1002/ange.201410271)
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/aziridine_exsy_1.m)
+
+Initial magnetisation uses concentration-weighted `state` directly; no retired `chem` method or hand weighting is needed. Atom matching preserves every corresponding internal spin order during conformer exchange.

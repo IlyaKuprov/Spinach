@@ -11,6 +11,9 @@ function plain_nmr()
 % Import Diels-Alder cycloaddition
 [sys,inter,bas]=dac_reaction();
 
+% Disable reactions for the static mixture spectrum
+inter.chem.reactions={};
+
 % Equal concentrations, no solvent
 inter.chem.concs=[1 1 1 1 0];
 
@@ -26,8 +29,8 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters - 1H
 parameters.spins={'1H'};
-parameters.rho0=state(spin_system,'L+','1H','chem');
-parameters.coil=state(spin_system,'L+','1H','chem');
+parameters.rho0=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=2328;
 parameters.sweep=3500;

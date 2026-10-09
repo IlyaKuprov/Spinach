@@ -47,8 +47,10 @@ multipart=kill_spin(multipart,3);
 result=test_true(result,'kill_spin multi-part update',isequal(multipart.chem.parts,{[1 2],zeros(1,0)}),...
                  'killing the last spin must renumber every chemical subsystem without an error');
 
-% Check destruction of stale basis, connectivity, symmetry, and assumption data
-stale=spin_system; stale.bas.formalism='sphten-liouv';
+% Check basis rebuilding and destruction of stale symmetry and assumptions
+sys.magnet=0; sys.isotopes=spin_system.comp.isotopes;
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
+stale=test_spin_system(sys,struct(),bas);
 stale.inter.conmatrix=logical(speye(3));
 stale.comp.sym_group={'S2'}; stale.comp.sym_spins={[2 3]}; stale.comp.sym_a1g_only=true();
 stale.inter.assumptions='nmr';
@@ -56,11 +58,11 @@ stale.inter.zeeman.strength={'secular','secular','secular'};
 stale.inter.giant.strength={[],[],[]};
 stale.inter.coupling.strength=cell(3,3);
 stale=kill_spin(stale,2);
-result=test_true(result,'kill_spin stale metadata',~isfield(stale,'bas')&&...
-                 ~isfield(stale.inter,'conmatrix')&&~isfield(stale.comp,'sym_group')&&...
+result=test_true(result,'kill_spin stale metadata',isequal(stale.bas.nstates,16)&&...
+                 isequal(stale.bas.offsets,[0;16])&&~isfield(stale.comp,'sym_group')&&...
                  ~isfield(stale.inter,'assumptions')&&~isfield(stale.inter.zeeman,'strength')&&...
                  ~isfield(stale.inter.giant,'strength')&&~isfield(stale.inter.coupling,'strength'),...
-                 'basis, connectivity, symmetry, and assumption data must be destroyed on spin removal');
+                 'the basis must be rebuilt, and stale symmetry and assumptions cleared on spin removal');
 
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);

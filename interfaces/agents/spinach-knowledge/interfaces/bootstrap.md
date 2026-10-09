@@ -14,7 +14,7 @@ Builds a minimal, valid Spinach system for calling Spinach functions that requir
 
 ## Construction and return value
 
-The routine sets `sys.magnet=0` and `sys.isotopes={'G'}` (a ghost spin), and provides empty Zeeman and coupling matrices through `inter.zeeman.matrix=cell(1)` and `inter.coupling.matrix=cell(1)`. It disables the hygiene check via `sys.disable={'hygiene'}`. The basis specification is `bas.formalism='sphten-liouv'` and `bas.approximation='none'`.
+The routine sets `sys.magnet=0` and `sys.isotopes={'G'}` (a ghost spin), and provides empty Zeeman and coupling matrices through `inter.zeeman.matrix=cell(1)` and `inter.coupling.matrix=cell(1)`. It disables the hygiene check via `sys.disable={'hygiene'}`. The basis specification is `bas.formalism='sphten-liouv'` and `bas.approximation={'none'}`.
 
 It calls `create(sys,inter)`, then `basis(spin_system,bas)`, and returns that basis-initialised object as `spin_system`. The single ghost spin and absent interactions make this a structural placeholder; they do not encode a sample's spin Hamiltonian.
 

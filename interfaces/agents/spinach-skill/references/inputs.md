@@ -564,3 +564,5 @@ column order while extracting each substance block.
 
 Synthetic compiled-system fixtures must supply offsets and local descriptor
 cells too; bypassing `basis` does not restore the retired global layout.
+
+`bootstrap` follows the same one-cell approximation contract as physical systems.

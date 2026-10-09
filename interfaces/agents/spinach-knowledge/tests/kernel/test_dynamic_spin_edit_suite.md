@@ -26,3 +26,6 @@ result=test_dynamic_spin_edit_suite()
 - Tested functions: `kill_spin`, `dilute`, `dictum`, `merge_inp`.
 - Test infrastructure: `new_test_result`, `test_true`.
 - Support utilities referenced by the fixture: `spin`, `md5_hash`.
+
+The basis-bearing removal fixture is built by `test_spin_system`; removal must
+rebuild its 16-state two-spin basis while clearing stale symmetry and assumptions.

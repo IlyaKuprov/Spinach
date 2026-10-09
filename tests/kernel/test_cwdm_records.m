@@ -30,6 +30,21 @@ result=test_true(result,'default closure',strcmp(s.chem.reactions{1}.closure,'ad
                  'the declared default closure is additive');
 summary_chemistry(s);
 
+% Reject column parts before their orientation reaches reporting consumers
+bad=inter; bad.chem.parts{1}=[1;2;3]; rejected=false;
+try
+    create(sys,bad);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:create:chemicalParts')&&...
+             contains(err.message,'numeric row vectors or empty arrays');
+end
+result=test_true(result,'column part rejection',rejected,...
+                 'the producer requires row parts for chemistry reporting');
+bas.formalism='sphten-liouv'; bas.approximation={'none','none','none','none'};
+s=basis(s,bas); quiet=kinetics(s); printed=kinetics(s,'report');
+result=test_close(result,'row parts report',printed,quiet,0,0,...
+                  'unequal row parts and a spin-free part preserve the reported generator');
+
 % Assert every retired input even when its value is empty
 for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
     bad=inter; bad.chem.(field{1})=[]; rejected=false;

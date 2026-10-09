@@ -239,8 +239,9 @@ inter.chem.rates=[-2e4   2e4
 inter.chem.concs=[1.0 1.0];
 ```
 
-- `parts` — cell array of index vectors, one per chemical subsystem, disjoint
-  and within the spin count. The default is one subsystem containing everything.
+- `parts` — cell array of numeric row index vectors, one per chemical subsystem,
+  disjoint and within the spin count; an empty entry denotes a spin-free substance.
+  Column vectors raise `Spinach:create:chemicalParts` before chemistry reporting. The default is one subsystem containing everything.
 - `concs` — initial concentrations, one per subsystem, non-negative; mandatory
   as soon as there is more than one subsystem.
 - `rates` — square first-order rate matrix in hertz, one row and column per

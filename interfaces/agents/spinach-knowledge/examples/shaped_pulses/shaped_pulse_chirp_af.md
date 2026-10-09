@@ -16,3 +16,5 @@ The initial state is longitudinal magnetisation from `state(spin_system,'Lz','1H
 ## Signal processing and output
 
 The simulated FID is exponentially apodised with parameter 6, Fourier transformed with an 8192-point zero-filled FFT, shifted, and plotted using the real part of the spectrum. The output is a calculated spectrum from the stated spin model and pulse/acquisition sequence, not experimental data. Units for the chirp-generator arguments and the numerical Zeeman/coupling values are not specified in the source beyond the explicitly labelled acquisition axis in Hz.
+
+This is a single-substance, chemistry-free example: `kinetics` supplies a zero generator. Initial states use `state`, and detection uses unweighted `coil_state`.

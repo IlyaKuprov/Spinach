@@ -59,6 +59,26 @@ result=test_close(result,'selective concentration balance',chem_concs(s,deriv),e
 result=test_close(result,'tracked selective conservation',sum(chem_concs(s,deriv)),0,1e-12,0,...
                   'every lost radical pair arrives in one tracked product');
 
+% Reject stationary tracked products in the full-space RYDMR resolvent
+parameters.tol=1e-12; zero=sparse(size(K,1),size(K,2)); rejected=false;
+try
+    rydmr(s,parameters,zero,zero,K);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:rydmr:trackedProducts');
+end
+result=test_true(result,'RYDMR tracked product guard',rejected,...
+                 'tracked populations require time-domain propagation rather than a stationary full-space source');
+
+% Retain the analytic singlet yield for an untracked recombination sink
+loss_system=s;
+for n=1:numel(loss_system.chem.reactions)
+    loss_system.chem.reactions{n}.products=[];
+    loss_system.chem.reactions{n}.matching=zeros(0,2);
+end
+yield=rydmr(loss_system,parameters,zero,zero,kinetics(loss_system));
+result=test_close(result,'RYDMR untracked singlet yield',yield,1,1e-12,0,...
+                  'without spin mixing the prepared singlet recombines entirely through its channel');
+
 % Compare Jones-Hore loss on a density with singlet-triplet coherences
 jones=s; jones.chem.reactions{1}.selector{1}='jones-hore-singlet';
 jones.chem.reactions{2}.selector{1}='jones-hore-triplet';

@@ -13,7 +13,9 @@
 %
 % Chemistry must contain exactly one named singlet-selector record
 % with a numeric rate; its electron indices define the initial pair.
-% Both Haberkorn and Jones-Hore singlet selectors are accepted.
+% Both Haberkorn and Jones-Hore singlet selectors are accepted. All
+% reaction records must have empty products: this full-space resolvent
+% requires untracked loss, not population stored in a stationary product.
 %
 % Outputs:
 %
@@ -68,6 +70,10 @@ channels=cellfun(@(r)isfield(r,'selector')&&ischar(r.selector{1})&&...
                 spin_system.chem.reactions);
 if nnz(channels)~=1
     error('exactly one named singlet-selector reaction is required.');
+end
+if any(cellfun(@(r)~isempty(r.products),spin_system.chem.reactions))
+    error('Spinach:rydmr:trackedProducts',...
+          'rydmr requires empty reaction products; propagate tracked products in the time domain.');
 end
 if ~isnumeric(spin_system.chem.reactions{channels}.rate)
     error('the singlet reaction rate must be numeric.');

@@ -2,7 +2,7 @@
 
 ## Direct-sum chemistry
 
-`K=kinetics(spin_system)` compiles `chem.reactions` into sparse drains and product-row maps. Numeric first-order records return a constant sparse matrix. Higher-order reactions or time-dependent rate handles return `K(t,eta)`, evaluated on the instantaneous concentration-weighted state. Chemistry-free systems retain a zero generator in every formalism; reaction records currently require `sphten-liouv`.
+`K=kinetics(spin_system)` compiles `chem.reactions` into sparse drains and product-row maps. Numeric first-order records return a constant sparse matrix. Numeric zero-rate higher-order records also permit the static route; an entirely zero-rate network yields a sparse zero matrix usable by ordinary linear contexts. Rate callbacks remain dynamic even if a sampled value is zero. Higher-order reactions or time-dependent rate handles return `K(t,eta)`, evaluated on the instantaneous concentration-weighted state. Chemistry-free systems retain a zero generator in every formalism; reaction records currently require `sphten-liouv`.
 
 The dissipative convention is `L=H+1i*R+1i*K`. A state-dependent generator uses the existing `step` handle route, for example `{ @(t,eta)1i*K(t,eta), t, 'RKMK4' }`. No block is normalised or divided by concentration. Every reactant occurrence contributes a drain multiplied by the concentrations of the other occurrences. Repeated products contribute repeated fills. Spin-free reactants are dynamic pools, not fixed-concentration reservoirs.
 

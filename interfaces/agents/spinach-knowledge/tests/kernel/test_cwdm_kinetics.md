@@ -7,3 +7,5 @@ The cases cover additive bimolecular arrival, arbitrary spin orders at independe
 This compact analytic network is not a substitute for regression of the migrated chemistry examples.
 
 Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.
+
+Zero numeric higher-order rates give a sparse zero generator and the same ordinary liquid/acquire FID as absent chemistry; a zero-valued rate callback still returns a dynamic handle.

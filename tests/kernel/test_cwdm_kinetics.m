@@ -108,6 +108,27 @@ result=test_close(result,'time rate across voxels',...
                   [1;2;3]*[-1.75 1.75 0 0],1e-12,0,...
                   'the same schedule rate acts on each local concentration');
 
+% Static zero-rate higher-order records remain usable in linear contexts
+inactive=s; inactive.chem.reactions={reaction};
+inactive.chem.reactions{1}.rate=0;
+inactive.chem.reactions{1}.closure='additive';
+zero_gen=kinetics(inactive);
+result=test_true(result,'zero higher-order matrix',issparse(zero_gen)&&nnz(zero_gen)==0,...
+                 'numeric zero rates give the exact static zero generator');
+parameters.spins={'1H'}; parameters.offset=0;
+parameters.sweep=100; parameters.npoints=4; parameters.decouple={};
+parameters.rho0=state(inactive,'L+','1H');
+parameters.coil=coil_state(inactive,'L+','1H','exact');
+zero_fid=liquid(inactive,@acquire,parameters,'nmr');
+inactive.chem.reactions={};
+empty_fid=liquid(inactive,@acquire,parameters,'nmr');
+result=test_close(result,'zero higher-order acquisition',zero_fid,empty_fid,1e-12,0,...
+                  'a standard linear acquisition agrees with absent reactions');
+inactive.chem.reactions={reaction}; inactive.chem.reactions{1}.rate=@(t)0*t;
+inactive.chem.reactions{1}.closure='additive';
+result=test_true(result,'zero callback stays dynamic',isa(kinetics(inactive),'function_handle'),...
+                 'a callback cannot be classified from a single sampled rate');
+
 % Product closure adds cross-reactant order without altering concentrations
 inter.chem.reactions={reaction}; inter.chem.reactions{1}.closure='product';
 s=basis(create(sys,inter),bas); K=kinetics(s);

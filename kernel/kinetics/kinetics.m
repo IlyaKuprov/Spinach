@@ -109,8 +109,8 @@ if strcmp(mode,'report')
     end
 end
 
-% Constant first-order chemistry remains an ordinary sparse matrix
-if all(cellfun(@(r)isscalar(r.reactants)&&isnumeric(r.rate),reactions))
+% Numeric zero-rate records do not make first-order chemistry nonlinear
+if all(cellfun(@(r)isnumeric(r.rate)&&(isscalar(r.reactants)||r.rate==0),reactions))
     K=assemble(spin_system,reactions,0,unit_state(spin_system));
 else
     K=@(t,eta)assemble(spin_system,reactions,t,eta);

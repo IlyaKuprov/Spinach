@@ -638,11 +638,19 @@ Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for
 
 For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B` record with matching that swaps those spins and retains the others. Departing-spin intramolecular correlations are destroyed; unaffected internal orders are retained. The concentrations are invariant because both sides have identical stoichiometry. With time-independent rates and no other concentration-changing reactions, evaluate the returned handle once at `unit_state(spin_system)` to obtain the constant additive generator for ordinary linear propagation. Do not freeze general mass-action or product-closure chemistry this way. `relayed_hyperpol` applies this construction to one ten-proton peptide block and twenty independent water pools; only water spins 11–20 participate in its forty replacement records.
 
+`uf6_collisions` uses two first-order records with both nuclei matched in each direction; stationary concentrations weight excitation once, and `coil_state` detects both species without another population factor.
+
 Worked replacements are `flux_asymmetric`/`flux_symmetric` and `frydman_pump_a`/`frydman_pump_b`: store each independent pool as its own substance, use one symmetric replacement per distinct pair, and use unweighted detection vectors. A one-spin pool has a complete level-one basis. Changes in thermal preparation must be checked separately from reaction-map equivalence.
+
+`plain_reaction` demonstrates an entirely spin-free network: construct a ghost seed with explicit substance records, then trace it with `kill_spin` before calling `kinetics`. All five remaining coordinates are concentrations.
 
 Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_network`, and `cidnp_transport`; their corresponding registered tests cover mass action, the two closures, selective loss, and integrated nuclear product arrival.
 
 Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.
+
+### Two-stage chemistry histories
+
+`diels_alder_zmag`, `diels_alder_spec`, and `reacting_nmr` put true initial concentrations in `chem.concs`, trace spins for their LG4 concentration histories, and compile the full additive maps once for the two-point spin steps. Embed the prescribed history into unit coordinates when evaluating `K(t,eta)`; initialise spin magnetisation with weighted `state`, add `unit_state`, and detect with unweighted `coil_state`. Do not multiply the initial state by the concentrations a second time.
 
 ### Spatial two-stage chemistry
 

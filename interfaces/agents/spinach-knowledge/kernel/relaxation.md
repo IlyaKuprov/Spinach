@@ -36,3 +36,5 @@ The function header does not state units for the relaxation-rate or correlation-
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/relaxation.m)
 - [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=relaxation.m)
+
+SRSK normalised source vectors use unweighted `coil_state`, so zero concentration never makes their norm vanish. Diagonal retention and uniform damping use geometric units independent of concentration. IME requests unit-concentration equilibrium shapes before adding unit-column sources; propagated populations provide the concentration weighting.

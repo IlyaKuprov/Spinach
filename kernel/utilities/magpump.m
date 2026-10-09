@@ -8,7 +8,7 @@
 %
 %    R    - relaxation superoperator, from relaxation()
 %
-%    rho  - the state to be pumped, from state()
+%    rho  - unweighted polarisation shape to pump, from coil_state()
 %
 %    rate - pumping rate, Hz
 %
@@ -18,7 +18,8 @@
 %
 % Note: each substance is pumped through its own unit coordinate at
 %       bas.offsets(n)+1. That population in the state vector on which
-%       R acts must be 1 for an unweighted pumping rate.
+%       R acts supplies the instantaneous concentration, so pumping
+%       scales with population without division by concentrations.
 %
 % Note: this function is only available in sphten-liouv formalism, and
 %       may be called repeatedly if multiple states are pumped.

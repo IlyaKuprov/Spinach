@@ -28,3 +28,5 @@ No input arguments.
 - Source: [tests/kernel/test_dynamic_remaining_parallel_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_remaining_parallel_suite.m)
 
 The synthetic compiled fixtures use per-substance descriptor cells and offsets.
+
+The synthetic NGCE fixture supplies unit concentration, as required by the compiled chemistry contract.

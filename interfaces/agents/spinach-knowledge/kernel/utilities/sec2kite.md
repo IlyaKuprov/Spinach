@@ -20,7 +20,7 @@ Consistency checks performed by the internal `grumble` function:
 
 - Requires `spin_system.bas.formalism` to be `'sphten-liouv'`; otherwise errors with `this function requires sphten-liouv formalism.`
 - Requires `R` to be numeric and square; otherwise errors with `R must be a square matrix.`
-- Computes the unit state via `unit_state(spin_system)` and errors with `R appears to be thermalised, cannot proceed.` if `norm(R*unit,2)` exceeds `1e-10`.
+- Builds an unweighted geometric unit vector from the substance offsets and errors with `R appears to be thermalised, cannot proceed.` if `norm(R*unit,2)` exceeds `1e-10`.
 
 ## Inputs and outputs
 

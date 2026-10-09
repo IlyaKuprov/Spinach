@@ -12,7 +12,7 @@ The function adds pumping as a coupling to the unit state: each substance block 
 R=magpump(spin_system,R,rho,rate)
 ```
 
-For the pumping to work correctly, each substance unit population in the state vector that `R` will be acting on must be set to 1 for an unweighted pumping rate. A target state may contain components in several substances; each is driven only by its own unit population.
+For the pumping to work correctly, `rho` must be the unweighted per-molecule polarisation shape from `coil_state`; the unit populations of the propagated state provide the instantaneous concentrations. A target state may contain components in several substances; each is driven only by its own unit population.
 
 The function is only available in the `sphten-liouv` formalism, and may be called repeatedly if multiple states are pumped.
 
@@ -30,7 +30,7 @@ Consistency checks are enforced by an internal `grumble` function:
 
 - `spin_system` — spin system object.
 - `R` — relaxation superoperator, from `relaxation()`.
-- `rho` — the state to be pumped, from `state()`.
+- `rho` — the state to be pumped, from `coil_state()`.
 - `rate` — pumping rate, Hz.
 
 **Outputs**

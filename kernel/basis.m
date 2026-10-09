@@ -242,6 +242,10 @@ if isfield(bas,'sym_a1g_only')
         end
     end
 end
+if sum(cellfun(@numel,spin_system.chem.parts))~=spin_system.comp.nspins
+    error('Spinach:basis:incompletePartition',...
+          'chemical substance parts must include every spin exactly once.');
+end
 if isfield(bas,'space_level')&&isfield(bas,'prox_level')
     error('specify only one of bas.space_level and bas.prox_level.');
 end

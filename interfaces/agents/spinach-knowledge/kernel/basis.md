@@ -44,3 +44,5 @@ The source points to [10.1063/1.3624564](http://link.aip.org/link/doi/10.1063/1.
 [Spin Dynamics Wiki: basis.m](https://spindynamics.org/wiki/index.php?title=basis.m)
 
 Each substance starts with fresh local options. In particular, deriving `prox_level` from a nonempty `space_level` entry cannot leak that derived value into a later empty entry.
+
+Before compilation, the union of `chem.parts` must equal every global spin index; an omitted spin raises `Spinach:basis:incompletePartition`. Empty spin-free substances remain valid when the other parts cover all spins.

@@ -600,3 +600,6 @@ does not inherit the preceding substance's proximity depth.
 
 Segmented wavefunction state construction is deferred and raises
 `Spinach:state:segmentedZeeman`; single-substance wavefunctions are unchanged.
+
+Before basis compilation, `chem.parts` must cover every global spin; omitted
+spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.

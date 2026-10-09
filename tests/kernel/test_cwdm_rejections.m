@@ -25,6 +25,22 @@ inter.chem.parts={1:2,3:4}; inter.chem.concs=[1 0];
 bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
 s=test_spin_system(sys,inter,bas);
 
+% Every spin must belong to one of the compiled substances
+bad=inter; bad.chem.parts={1:2,3}; rejected=false;
+try
+    test_spin_system(sys,bad,bas);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:basis:incompletePartition');
+end
+result=test_true(result,'incomplete partition',rejected,...
+                 'an unassigned spin is rejected before direct-sum compilation');
+
+% Column-vector parts are valid complete partitions too
+columns=s; columns.chem.parts={[1;2],[3;4]};
+by_columns=basis(columns,bas);
+result=test_true(result,'column partition',isequal(by_columns.bas.basis,s.bas.basis),...
+                 'partition coverage does not depend on spin-index vector orientation');
+
 % Reject a scalar coupling between different substances
 bad=inter; bad.coupling.scalar=cell(4); bad.coupling.scalar{2,3}=10;
 rejected=false;

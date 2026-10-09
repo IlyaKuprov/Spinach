@@ -39,3 +39,5 @@ single-substance zero stochastic trajectory retains zero uncertainty and
 regularises only the non-unit directions.
 
 Solid-effect coverage asserts the named segmented steady-state boundary with an electron and an independent nucleus. A supported single-substance zero-drive calculation is compared with thermal-equilibrium detection.
+
+A two-substance Hilbert fixture converted by `sim2liouv` checks the named segmented Zeeman steady boundary for both methods, with empty and supplied initial guesses.

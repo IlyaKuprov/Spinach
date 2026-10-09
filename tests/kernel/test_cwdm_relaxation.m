@@ -313,6 +313,27 @@ coils=[state(s,'Lz',1) state(s,'Lz',2)];
 result=test_close(result,'single solid effect zero drive',actual,coils'*rho,...
                   1e-12,1e-12,'without microwave drive the steady state is thermal');
 
+% Reject converted segmented Zeeman steady solves before default initialisation
+sys=struct('magnet',1,'isotopes',{{'1H','1H'}});
+inter=struct(); inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+bas=struct('formalism','zeeman-hilb','approximation',{{'none','none'}});
+s=test_spin_system(sys,inter,bas);
+[s,~,~]=sim2liouv(s,struct(),sparse(4,4),[],[]);
+for method={'newton','squaring'}
+    for guess={[],ones(8,1)}
+        rejected=false;
+        try
+            steady(s,speye(8),guess{1},method{1});
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:steady:segmentedZeeman');
+        end
+        result=test_true(result,['Zeeman steady ' method{1} ' ' int2str(numel(guess{1}))],...
+                         rejected,'segmented Zeeman initialisation raises the named boundary');
+        fprintf('CWDM_ZEEMAN_STEADY %s guess=%d named_rejection=%d\n',...
+                method{1},numel(guess{1}),rejected);
+    end
+end
+
 end
 
 

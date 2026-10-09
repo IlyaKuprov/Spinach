@@ -29,7 +29,8 @@
 %
 % Note: available for sphten-liouv and zeeman-liouv formalisms; the
 %       Newton-Raphson solver pins every substance unit coordinate in
-%       sphten-liouv and the density matrix trace in zeeman-liouv.
+%       sphten-liouv and the density matrix trace in single-substance
+%       zeeman-liouv. Segmented Zeeman solves are not yet supported.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -38,7 +39,18 @@
 function rho=steady(spin_system,P,rho,method)
 
 % Default initial guess
-if (~exist('rho','var'))||isempty(rho)
+if ~exist('rho','var'), rho=[]; end
+
+% Default method
+if (~exist('method','var'))||isempty(method)
+    method='newton';
+end
+
+% Check consistency before formalism-specific initialisation
+grumble(spin_system,P,rho,method);
+
+% Initialise the formalism-specific unit state
+if isempty(rho)
     switch spin_system.bas.formalism
         case 'sphten-liouv'
             rho=zeros([size(P,2) 1],'like',1i);
@@ -48,14 +60,6 @@ if (~exist('rho','var'))||isempty(rho)
             rho=speye(dim); rho=complex(full(rho(:))/dim);
     end
 end
-
-% Default method
-if (~exist('method','var'))||isempty(method)
-    method='newton';
-end
-
-% Check consistency
-grumble(spin_system,P,rho,method);
 
 % Pick the method
 switch method
@@ -177,6 +181,10 @@ function grumble(spin_system,P,rho,method)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('steady state is only available for sphten-liouv and zeeman-liouv formalisms.');
 end
+if strcmp(spin_system.bas.formalism,'zeeman-liouv')&&spin_system.bas.nsubst>1
+    error('Spinach:steady:segmentedZeeman',...
+          'multi-substance Zeeman steady-state solves are not yet supported.');
+end
 if (~isnumeric(rho))||(~isnumeric(P))
     error('P and rho must be numeric.');
 end
@@ -208,6 +216,7 @@ else
         error('the relaxation superoperator must be thermalised.');
     end
 end
+if isempty(rho), return; end
 if ~iscolumn(rho)
     error('rho must be a column vector.');
 end

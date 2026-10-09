@@ -23,3 +23,5 @@ The returned `rho` is a column vector in the selected Liouville representation. 
 
 - Source: [`kernel/steady.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/steady.m).
 - Wiki: [`steady.m`](https://spindynamics.org/wiki/index.php?title=steady.m).
+
+Segmented `zeeman-liouv` solves raise `Spinach:steady:segmentedZeeman` before any default state or trace-functional construction. This includes contexts converted by `sim2liouv`; single-substance Zeeman normalisation is unchanged.

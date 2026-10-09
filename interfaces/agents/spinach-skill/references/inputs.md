@@ -543,3 +543,8 @@ symmetry projection and keeps it during subsequent population screening.
 Trajectory analysis uses local descriptors and global spin labels. `trajan`
 removes each unit independently and converts level populations per substance;
 `trajsimil` groups equivalent tracks only within the same substance.
+
+`kill_spin` and `dilute` rebuild an existing basis after particle removal.
+Local manual columns and global numeric filter labels are reindexed; empty
+substances keep their unit coordinate. Symmetry and Hamiltonian assumptions
+are cleared, so reapply `assume` before constructing a Hamiltonian.

@@ -1,7 +1,7 @@
 % Splits the spin system into several independent subsystems, each
 % containing only one instance of a user specified isotope or iso-
 % tope tuple that is deemed "dilute". All spin system data is upda-
-% ted accordingly. Basis set information, if found, is destroyed.
+% ted accordingly. An existing basis is rebuilt for each isotopomer.
 % Syntax:
 %
 %          subsystems=dilute(spin_system,isotope,tuples)

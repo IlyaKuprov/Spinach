@@ -22,7 +22,7 @@ Removes specified particles (spins or bosonic modes) from the `spin_system` stru
 - Reindexes scalar relaxation source spins (`spin_system.rlx.srsk_sources`) by rebuilding the source mask over the pre-removal spin count and deleting `hit_list` positions.
 - Reindexes each subsystem in `spin_system.chem.parts` the same way, and removes rows and columns from `spin_system.chem.flux_rate` when non-empty.
 - Reindexes `spin_system.chem.rp_electrons`; if `spin_system.chem.rp_rates` is non-empty and fewer than two electrons remain, raises the error `cannot destroy an essential electron in a radical pair system system.`
-- Removes `spin_system.bas` if present, with a warning that basis set information must be re-created.
+- Rebuilds an existing basis from its input settings after removing the particles. Manual columns and numeric longitudinal/zero-quantum labels are reindexed; IK-0/IK-1 depths are capped by the remaining local spin count. Empty substances retain their unit coordinate with the `none` approximation. The rebuild regenerates descriptors, offsets, projectors, and the cache hash rather than patching compiled arrays. Symmetry settings are discarded, as before; assumptions must be reapplied.
 - Removes `spin_system.inter.conmatrix` if present.
 - Removes `spin_system.comp` fields `sym_group`, `sym_spins`, `sym_a1g_only` if `sym_group` is present.
 - Removes `spin_system.inter.assumptions` if present, and removes `strength` subfields from `spin_system.inter.zeeman`, `spin_system.inter.giant`, and `spin_system.inter.coupling` when present, each with a warning that assumption information must be re-created.
@@ -42,7 +42,7 @@ spin_system = kill_spin(spin_system, hit_list)
 
 **Outputs**
 
-- `spin_system` — the data structure with the indicated particles and dependent information (basis, assumptions) removed.
+- `spin_system` — the data structure with the indicated particles removed and an existing basis rebuilt; assumptions are cleared.
 
 ## References
 

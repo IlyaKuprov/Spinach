@@ -15,13 +15,14 @@
 %
 %     spin_system   - the data structure with the indica-
 %                     ted particles and dependent infor-
-%                     mation (basis, assumptions) removed
+%                     mation updated; an existing basis is rebuilt
 %
-% Notes: basis, connectivity, symmetry, and assumption information
-%        is destroyed by this function; you would need to call the
-%        basis.m and assume.m functions again. Mode strengths are
+% Notes: an existing basis is rebuilt from its input settings, with
+%        local manual columns and global filter labels reindexed.
+%        Symmetry and assumption information is cleared; call assume
+%        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
-%        particles remain.
+%        particles remain. Spin-free substances are retained.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -35,6 +36,49 @@ grumble(spin_system,hit_list)
 
 % Catch logical indexing
 if islogical(hit_list), hit_list=find(hit_list); end
+
+% Retain input settings rather than patching compiled basis data
+if isfield(spin_system,'bas')
+    fields={'formalism','approximation','inter_level','prox_level',...
+            'space_level','connectivity','manual','projections',...
+            'longitudinal','zero_quantum'};
+    fields=intersect(fields,fieldnames(spin_system.bas));
+    for n=1:numel(fields)
+        bas.(fields{n})=spin_system.bas.(fields{n});
+    end
+
+    % Reindex local manual columns and global numeric filter labels
+    keep=setdiff(1:spin_system.comp.nspins,hit_list);
+    for n=1:numel(spin_system.chem.parts)
+        local_keep=~ismember(spin_system.chem.parts{n},hit_list);
+        if isfield(bas,'manual')
+            bas.manual{n}=bas.manual{n}(:,local_keep);
+        end
+        for field={'longitudinal','zero_quantum'}
+            if isfield(bas,field{1})
+                for k=1:numel(bas.(field{1}){n})
+                    labels=bas.(field{1}){n}{k};
+                    if isnumeric(labels)
+                        [present,labels]=ismember(labels,keep);
+                        bas.(field{1}){n}{k}=labels(present);
+                    end
+                end
+                bas.(field{1}){n}=bas.(field{1}){n}(~cellfun(@isempty,bas.(field{1}){n}));
+            end
+        end
+
+        % A substance losing its last spin retains only its unit coordinate
+        if ~any(local_keep)
+            bas.approximation{n}='none';
+            for field={'inter_level','prox_level','space_level','connectivity'}
+                if isfield(bas,field{1}), bas.(field{1}){n}=[]; end
+            end
+        elseif isfield(bas,'inter_level')&&...
+               ismember(bas.approximation{n},{'IK-0','IK-1'})
+            bas.inter_level{n}=min(bas.inter_level{n},nnz(local_keep));
+        end
+    end
+end
 
 % Inform the user
 report(spin_system,['removing ' num2str(numel(hit_list)) ...
@@ -179,7 +223,6 @@ end
 % If any basis set information is found, destroy it
 if isfield(spin_system,'bas')
     spin_system=rmfield(spin_system,'bas');
-    report(spin_system,'WARNING - basis set information must be re-created.');
 end
 
 % If any connectivity information is found, destroy it
@@ -209,6 +252,9 @@ if isfield(spin_system.inter.coupling,'strength')
     spin_system.inter.coupling=rmfield(spin_system.inter.coupling,'strength');
     report(spin_system,'WARNING - assumption information must be re-created.');
 end
+
+% Rebuild descriptors, symmetry projectors, dimensions, offsets, and cache identity
+if exist('bas','var'), spin_system=basis(spin_system,bas); end
 
 end
 

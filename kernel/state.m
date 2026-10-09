@@ -56,10 +56,10 @@
 %
 %    'chem'   - deprecated alias for 'exact', accepted for one release
 %
-% Every method weights each substance block by chem.concs. Use coil_state
-% for unweighted detection operators. Wavefunctions remain unweighted.
-% The method is ignored in Zeeman
-% Hilbert and Liouville formalisms, but concentration weighting is not.
+% Every density-matrix and Liouville method weights each substance block
+% by chem.concs. Use coil_state for unweighted detection operators.
+% Storage-only wavefunctions remain unweighted. The method is ignored in
+% Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
 %
 % Outputs:
 %

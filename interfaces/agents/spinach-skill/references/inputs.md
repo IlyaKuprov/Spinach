@@ -642,6 +642,8 @@ For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B`
 
 Worked replacements are `flux_asymmetric`/`flux_symmetric` and `frydman_pump_a`/`frydman_pump_b`: store each independent pool as its own substance, use one symmetric replacement per distinct pair, and use unweighted detection vectors. A one-spin pool has a complete level-one basis. Changes in thermal preparation must be checked separately from reaction-map equivalence.
 
+`plain_reaction` demonstrates an entirely spin-free network: construct a ghost seed with explicit substance records, then trace it with `kill_spin` before calling `kinetics`. All five remaining coordinates are concentrations.
+
 Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_network`, and `cidnp_transport`; their corresponding registered tests cover mass action, the two closures, selective loss, and integrated nuclear product arrival.
 
 Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.

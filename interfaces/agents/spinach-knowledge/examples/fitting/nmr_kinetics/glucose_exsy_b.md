@@ -33,3 +33,5 @@ The scalar objective is `1e-6*sum(sum((spectrum-expt_spec).^2))`, using the tran
 ## Entry-point output
 
 `glucose_exsy_b()` displays the optimiser's final vector and saves the current figure as `glucose_exsy_b.fig` in the MATLAB working directory. On non-worker evaluations, the two-panel comparison labels the simulated plot “both” and the denoised experimental display “positive”. The function declares no output argument, and the saved figure is not a saved fit-parameter file.
+
+Every objective evaluation rebuilds four directed reaction records from the fitted rates, with corresponding fluorines matched between inside/outside pools. The local rate matrix is retained only for the concentration equilibrium calculation; it is not passed as a retired chemistry input. The initial state uses concentration-weighted `state` without the retired `chem` method.

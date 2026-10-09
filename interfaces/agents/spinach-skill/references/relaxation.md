@@ -19,11 +19,23 @@ L=H+1i*R+1i*K;
 ```
 
 `R=relaxation(spin_system,euler_angles)` and `K=kinetics(spin_system)`;
-contexts assemble this for you. The Euler angles are optional and used only
+standard contexts supply these terms to their sequence when `K` is a matrix.
+A nonzero higher-order network or time-dependent rate produces `K(t,eta)`,
+which ordinary sequences such as COSY and NOESY cannot add to matrices.
+Use the `step`/`iserstep` generator-handle route, or a custom sequence that
+evaluates the handle at the required stage time and state; passing such a
+network to a standard linear sequence is not supported. For example, a
+chemistry-only step uses `{ @(t,eta)1i*K(t,eta), t, 'RKMK4' }`.
+The Euler angles are optional and used only
 by theories supporting relaxation anisotropy: `powder` recomputes `R` at
 every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic
 rates have no effect there.
+
+In the sphten direct sum, `unit_state` populates every substance unit coordinate,
+and `equilibrium` returns independently normalised, unweighted blocks. IME acts
+on each block separately. T1/T2 rates use the local descriptor columns and
+`chem.parts` spin map; diagonal retention and damping preserve every unit.
 
 ## Selecting a relaxation theory
 
@@ -46,6 +58,17 @@ bosonic modes. Mode damping or dephasing can contribute automatically; see
 | `SRFK` | Scalar relaxation of the first kind: stochastic modulation of a coupling | `inter.srfk_tau_c`, `inter.srfk_mdepth` | Exchange fast enough to modulate J; conformational averaging |
 | `SRSK` | Scalar relaxation of the second kind, Abragam's expressions | `inter.srsk_sources` | Quadrupolar neighbours (14N, 35Cl, 79Br) broadening their partners |
 | `naka-zwan` | Nakajima-Zwanzig evaluation of the same rotational-modulation kernel as `redfield`; the two are mutually exclusive | `inter.tau_c`, `inter.nz_shift`, `inter.nz_onshell` | Relaxation beyond the Redfield evaluation of the memory kernel |
+
+Nottingham requires one substance with exactly two electrons. `relaxation`
+raises `Spinach:relaxation:nottinghamSubstance` for every segmented descriptor,
+even when every substance contains an electron pair. The `create` restriction
+of two electrons overall is unchanged. Do not interpret Nottingham nuclear
+rate parameters as a standalone nucleus-only model.
+
+The trajectory-integral utility `ngce` supports a single chemical substance.
+Segmented inputs raise `Spinach:ngce:segmentedSubstances`, with or without
+regularisation; its scalar unit-state projection must not be applied to a
+direct sum of substances.
 
 Two settings become mandatory the moment `inter.relaxation` is present:
 
@@ -208,9 +231,30 @@ is how inverted spin temperatures are specified.
 | `'IME'` | Inhomogeneous master equation: `equilibrium.m` supplies the lab frame equilibrium state and R is corrected to drive the system there |
 | `'dibari'` | DiBari-Levitt: R is multiplied by the imaginary-time propagator of the lab frame Hamiltonian left side product superoperator |
 
+`equilibrium` checks each Liouville Hamiltonian block on its own unit state;
+a vanishing action raises `Spinach:equilibrium:notLeftProduct` with the substance
+number. Exactly zero blocks in segmented spherical-tensor systems are exempt,
+including spinful zero-Hamiltonian substances; they retain the local unit state.
+Any cross-substance entries in the Hamiltonian assembled from `I` and oriented
+`Q` raise `Spinach:equilibrium:crossSubstanceHamiltonian` before propagation.
+
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
-state population to be exactly 1, which Spinach cannot check, so a badly
-normalised initial condition gives a silently wrong steady state.
+state population to be exactly 1; general propagation does not enforce initial
+normalisation, so a badly normalised state gives incorrect source amplitudes.
+IME requires block-diagonal relaxation: cross-substance entries of `R` raise
+`Spinach:thermalize:crossSubstanceRelaxation` even when they preserve unit states.
+
+In segmented `sphten-liouv`, `steady` initialises and pins the unit coordinate
+`bas.offsets(n)+1` of every substance to one; supplied guesses must obey the
+same unweighted normalisation. Both Newton and squaring methods accept this layout.
+Each unit column must drive an active coordinate in its own substance block;
+`Spinach:steady:unthermalisedSubstance` names any block that fails this check.
+Steady-state GRAPE dressing likewise removes every conserved unit direction from
+the adjoint solve and requires a traceless target in each substance.
+`magpump` likewise sources each target block through its own unit coordinate,
+including targets spanning several substances, and rejects unit-state pumping
+in every block.
+
 DiBari-Levitt is more expensive but better behaved in exotic regimes; it
 demands a positive real temperature and refuses the high-temperature
 approximation (`inter.temperature=0`), and `equilibrium.m` refuses absolute
@@ -229,36 +273,40 @@ frequency shifts dropped. Compare against measurement first.
 
 ## Chemical kinetics
 
-Chemical processes are only available in `sphten-liouv`. Declare the species
-first:
+Reaction records currently require `sphten-liouv`. Declare each species and
+each directed first-order exchange channel explicitly:
 
 ```matlab
 inter.chem.parts={[1 2 3 4 5],[6 7 8 9 10]};
-inter.chem.rates=[-4 +20; +4 -20];
 inter.chem.concs=[20 4];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 6;2 7;3 8;4 9;5 10],'rate',4),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[6 1;7 2;8 3;9 4;10 5],'rate',20)};
 ```
 
-`inter.chem.parts` is a cell array of disjoint vectors of spin indices, one
-per chemical species. When reactions are declared, all parts must have the
-same number of spins in matching isotope order, and the basis subspaces on
-either side of the reaction arrow must have identical topology; otherwise
-`kinetics` stops with `spin systems on either side of the reaction arrow
-have different topologies or basis sets`. Couplings across species are
-refused by `create`, and `inter.tau_c` must carry one element per part.
+`inter.chem.parts` contains disjoint numeric vectors of global spin indices;
+empty entries are spin-free substances. Matching pairs must have identical
+isotopes, but different species need not have identical spin counts or basis
+topologies. Unmatched source spins are traced out; unmatched product spins
+arrive at identity. Missing source descriptors are reported rather than
+invented. Couplings across species are rejected by `create`; relaxation
+parameters such as `inter.tau_c` remain per substance.
 
-`inter.chem.rates` is a real square matrix of side equal to the number of
-parts, in hertz, column-stochastic: element `(i,j)` is the rate of
-conversion of species `j` into species `i`, the diagonal carries the total
-outflow as a negative number, and column sums must vanish, enforced as
-conservation of matter. `inter.chem.concs` holds non-negative initial
-concentrations, one per part, required whenever rates are given, and is
-applied by `state(spin_system,'Lz','1H','chem')`. In the example above the
-species are at exchange equilibrium, their concentrations in inverse ratio
-to the forward and backward rates. `equilibrate(K,c0)` returns the
-equilibrium concentrations of the linear network `dc/dt=K*c`.
+The example is at exchange equilibrium because forward and reverse event
+fluxes are equal. `state(spin_system,'Lz','1H')` applies initial concentrations
+without a chemistry qualifier; `coil_state(spin_system,'Lz','1H','exact')`
+is unweighted detection. `equilibrate(K,c0)` may still calculate stationary
+concentrations of the separate classical network `dc/dt=K*c`; the classical
+matrix is not a chemistry input field. First-order reaction rates have units
+of inverse seconds. Higher-order rates multiply the other reactant
+concentrations, so their units depend on the chosen concentration unit.
+`kinetics` returns a sparse matrix for constant first-order records, or
+`K(t,eta)` for mass action and time-dependent rates. It reads instantaneous
+concentrations from unit coordinates, including initially empty products.
 
 For a compact exchange-plus-quadrupolar-relaxation demonstration, see
-`examples/relaxation/uf6_collisions.m`. It sweeps the forward collision
+`examples/kinetics/uf6_collisions.m`. It sweeps the forward collision
 rate while holding the reverse lifetime and rotational correlation time
 fixed, recomputes stationary populations, and uses chemical-population-
 weighted excitation. The full laboratory-frame `slowpass` calculation
@@ -269,36 +317,58 @@ frequency, distorted-state lifetime, and rotational correlation time
 separate when adapting this model; scaling both exchange rates preserves
 populations but is a different physical scan.
 
-Magnetisation transport between individual spins, as opposed to conversion
-between whole species, uses a different pair of fields:
+Spin replacement between molecules uses matching rather than a flux matrix.
+For a two-proton molecule exchanging its first proton with a one-proton pool:
 
 ```matlab
-inter.chem.flux_rate=zeros(2);
-inter.chem.flux_rate(1,2)=5e2;    % from spin 1 to spin 2
-inter.chem.flux_rate(2,1)=2e3;    % from spin 2 to spin 1
-inter.chem.flux_type='intermolecular';
+inter.chem.parts={1:2,3}; inter.chem.concs=[1 1];
+inter.chem.reactions={struct('reactants',[1 2],'products',[1 2],...
+                            'matching',[1 3;2 2;3 1],'rate',2,...
+                            'closure','additive')};
 ```
 
-The indexing is the transpose of `inter.chem.rates`: `flux_rate(i,j)` is the
-rate at which magnetisation moves from spin `i` to spin `j`, in hertz. The
-matrix is nspins by nspins and `flux_type` must accompany it.
-`'intramolecular'` transports multi-spin orders along with the single-spin
-orders and keeps the correlations; `'intermolecular'` damps them instead,
-correct when the transported spin lands in a different molecule.
+Both populations are invariant because the reactant and product stoichiometries
+coincide. The additive arrival keeps each reactant's internal orders but not
+cross-reactant polarisation products: the retained molecular spin survives,
+while correlations involving the departing spin are lost. Intramolecular
+permutation records instead transport the mapped multi-spin orders. These are
+physical matching models, not an automatic translation of every retired flux
+matrix. `test_cwdm_flux` supplies an analytic replacement check. Freezing an
+additive generator is justified only when its concentrations and rates remain
+constant, not for general mass-action or product-closure networks.
 
-Radical pair recombination is a triple, all three fields required together:
+For two one-spin substances, the additive event with `parts={1,2}`,
+`concs=[2000 500]`, `reactants=[1 2]`, `products=[1 2]`,
+`matching=[1 2;2 1]`, and rate 1 reproduces directed rates 500 and 2000
+inverse seconds. An order-m rate constant has units concentration^(1-m)/s.
+
+Radical-pair loss uses one first-order reaction record per channel. For a
+single species whose first two spins are electrons:
 
 ```matlab
-inter.chem.rp_theory='haberkorn';       % or 'jones-hore', 'exponential'
-inter.chem.rp_electrons=[1 2];
-inter.chem.rp_rates=[1e6 1e5];          % [singlet triplet], Hz
+inter.chem.parts={1:3}; inter.chem.concs=1;
+inter.chem.reactions={struct('reactants',1,'products',[],...
+                            'matching',zeros(0,2),'rate',1e6,...
+                            'selector',{{'singlet',[1 2]}}),...
+                      struct('reactants',1,'products',[],...
+                            'matching',zeros(0,2),'rate',1e5,...
+                            'selector',{{'triplet',[1 2]}})};
 ```
 
-`'exponential'` removes population uniformly at the sum of the two rates
-with no spin selectivity; `'haberkorn'` applies the singlet and triplet
-projectors symmetrically from both sides; `'jones-hore'` adds the
-cross-terms coupling the two channels. The choice changes the predicted
-magnetic field effect, so it is a physical decision, not a numerical one.
+The third spin may be a nucleus. These selectors give Haberkorn loss via the
+projector anticommutators. Select `jones-hore-singlet` and
+`jones-hore-triplet` for Jones–Hore loss; each channel then subtracts the
+complementary projected density from the full density. For nonselective
+exponential loss, omit selectors and use one empty-product record with the
+sum of the two rates. This choice changes the physics, not only numerics.
+To track products, declare their parts and matching: selective arrival uses
+the projected source before tracing unmatched spins, as tested by
+`test_cwdm_selectors`. Use an explicit scalar `inter.nz_shift` when required;
+a general reaction network does not determine a unique scalar lifetime.
+
+For the legacy exponential scalar use the summed channel rates; the legacy
+Haberkorn/Jones-Hore scalar approximation uses half their sum. Retired chemistry
+fields are rejected rather than accepted alongside reaction records.
 
 ## Powder grids
 

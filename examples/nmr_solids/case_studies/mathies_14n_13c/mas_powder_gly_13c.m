@@ -69,7 +69,7 @@ for m=1:numel(fields)
     
     % Basis set
     bas.formalism='sphten-liouv';
-    bas.approximation='none';
+    bas.approximation={'none'};
     
     % Enable zero track elimination
     sys.enable={'zte'};
@@ -82,7 +82,7 @@ for m=1:numel(fields)
     parameters.sweep=200*sys.magnet;      % unchanged in ppm
     parameters.offset=43.6*sys.magnet*spin('13C')/(2*pi*1e6);
     parameters.rho0=state(spin_system,'L+','13C');
-    parameters.coil=state(spin_system,'L+','13C');
+    parameters.coil=coil_state(spin_system,'L+','13C','exact');
         
     % Lab frame Hamiltonian, then numerical rotating frames
     fid=singlerot(spin_system,@acquire,parameters,'labframe');

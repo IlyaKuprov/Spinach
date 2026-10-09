@@ -19,3 +19,10 @@ The reported observables are real projections of the trajectory onto H-z, H-x, N
 ## Scope
 
 The script supplies a simulation setup and identifies the cited figure, but no trajectory values or comparison with Figure 2. Accordingly, it does not support claims about quantitative reproduction, transfer efficiency, or a measured exchange result.
+## Reaction-record representation
+
+The peptide is one substance and every water proton has its own unit-concentration substance. An additive replacement swaps the amide proton with the nearest water proton while retaining the other peptide spins; each distinct water pair has one symmetric replacement record. Internal peptide correlations involving the departing proton decay, while no cross-molecular correlations are stored. Concentrations are invariant, permitting the sequence to freeze the additive generator once at `unit_state`. Observable vectors use unweighted `coil_state`; thermal equilibrium and IME remain concentration-aware.
+
+## Thermal preparation and numerical comparison
+
+The represented non-unit Hamiltonian, dissipative relaxation, reaction generator, and pulse operators are identical to the former flux model. The full mapped trajectory differs by `1.0592e-8` relative. Replacing only the initial molecular thermal state by the former mapped initial state, retaining every new concentration-source column, reduces the dense-exponential trajectory discrepancy to `8.3e-12`. A complete molecular-basis dense-exponential thermal reference gives initial-state errors of `1.0804e-8` for the former preparation and `4.6898e-11` for the molecular preparation. The migration therefore improves the thermal preparation rather than changing the measured exchange generator. This measured preparation difference is documented; it is not a claim of literal `1e-10` stock-trajectory parity.

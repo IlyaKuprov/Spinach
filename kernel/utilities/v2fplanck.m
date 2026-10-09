@@ -225,7 +225,7 @@ end
 F=clean_up(spin_system,F,spin_system.tols.liouv_zero);
 
 % Kron up with the spin
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 F=kron(F,opium(spn_dim,1));
 
 end

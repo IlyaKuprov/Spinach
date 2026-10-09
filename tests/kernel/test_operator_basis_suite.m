@@ -104,7 +104,7 @@ result=test_close(result,'enlev2bm projector',bm_reconstruct(3,states,coeffs),P,
 sys.magnet=0;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,0};
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 T20=twospinist(spin_system,1,2,[2 0],'comm');
 T20_ref=sqrt(2/3)*(operator(spin_system,{'Lz','Lz'},{1 2})-...

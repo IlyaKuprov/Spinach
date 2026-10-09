@@ -14,7 +14,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(560e6,0.01,5/2,[0 0 0]);
 
 % Formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -36,7 +36,7 @@ parameters.needs={'aniso_eq'};
 parameters.sweep=[83.5e6 84.5e6];
 parameters.npoints=512;
 parameters.grid='rep_2ang_200pts_sph';
-parameters.coil=state(spin_system,'L+','127I');
+parameters.coil=coil_state(spin_system,'L+','127I','exact');
 parameters.Lx=operator(spin_system,'Lx','127I');
 parameters.Ly=operator(spin_system,'Ly','127I');
 parameters.rf_frq=84.0e6;

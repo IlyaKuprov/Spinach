@@ -9,12 +9,9 @@ Returns a projector matrix `P` that converts state vectors written in the spheri
 ## Behaviour
 
 - The function first calls an internal consistency check (`grumble`) that errors with `'this function is only available for sphten-liouv formalism.'` unless `spin_system.bas.formalism` is `'sphten-liouv'`.
-- The projector is preallocated as a sparse matrix with `prod(spin_system.comp.mults.^2)` rows and `size(spin_system.bas.basis,1)` columns, initially with zero nonzeros, using `spalloc`.
-- The destination (Zeeman) basis is not normalised; a destination normalisation factor `destin_norm = sqrt(prod(spin_system.comp.mults))` is computed once.
-- A `parfor` loop runs over the rows of `spin_system.bas.basis` (the source basis set). For each basis element:
-  - The state `rho` is built as a Kronecker product over all spins `k`, using the irreducible spherical tensors `irr_sph_ten(spin_system.comp.mults(k))` selected by the basis-set index `spin_system.bas.basis(n,k)+1`.
-  - The source basis is not normalised; a per-column source normalisation `source_norm = norm(rho(:),2)` is computed.
-  - The column of the projector is written as `P(:,n) = destin_norm * rho(:) / source_norm`.
+- Each substance is converted independently from `bas.basis{n}`, using the multiplicities of `chem.parts{n}`. The resulting sparse matrices are assembled as a direct sum: no inter-substance coherences are introduced.
+- Each local tensor product is divided by its Frobenius norm and multiplied by `sqrt(D_n)`, where `D_n` is the local Hilbert dimension. Consequently the unit coordinate maps to `vec(I_D_n)`, and its value equals the Hilbert trace divided by `D_n`.
+- To convert concentration-weighted spherical-tensor states into physical trace-equals-concentration Zeeman vectors, divide each destination block of P by its local Hilbert dimension D_n. The returned P retains the stock operator-normalisation convention.
 - The projector need not be square and may be huge.
 
 ## Inputs and outputs

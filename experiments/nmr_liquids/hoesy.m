@@ -60,7 +60,7 @@ L=H+1i*R+1i*K;
 timestep=1./parameters.sweep;
 
 % Detection state up to a constant multiplier
-coil=state(spin_system,'L+',parameters.spins{2},'cheap');
+coil=coil_state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Pulse operators
 Hx=operator(spin_system,'Lx',parameters.spins{1});

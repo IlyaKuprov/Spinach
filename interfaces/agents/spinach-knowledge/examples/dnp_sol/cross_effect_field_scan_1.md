@@ -18,6 +18,6 @@ The full `sphten-liouv` basis has no approximation. Relaxation uses `{'t1_t2'}` 
 
 The ESR parameters set `mw_pwr=10e6`, `mw_frq=0`, electron irradiation spins `{'E'}`, `mw_oper=operator(spin_system,'Lx','E')/2`, and `ez_oper=operator(spin_system,'Lz','E')`. The script sets `parameters.fields=linspace(-0.08,0.04,256)`; this scanned offset axis is labelled Tesla in the plot. Powder averaging uses `rep_2ang_1600pts_sph`, method `backslash`, and `needs={'aniso_eq'}`. It evaluates `powder(spin_system,@dnp_field_scan,parameters,'esr')`, then plots `real(answer)` against the field offsets.
 
-**Observable-label note:** the receiver is assigned as `state(spin_system,'Lz','1H')`, while the plot's vertical label says “$S_z$ expectation value on $^1$H”. The page reports both source statements without resolving their notation.
+**Observable-label note:** the receiver is assigned as `coil_state(spin_system,'Lz','1H','exact')`, while the plot's vertical label says “$S_z$ expectation value on $^1$H”. The page reports both source statements without resolving their notation.
 
 **Dependencies:** Spinach create/basis/state/operator, powder and plotting routines; the `dnp_field_scan` sequence and `rep_2ang_1600pts_sph` grid.

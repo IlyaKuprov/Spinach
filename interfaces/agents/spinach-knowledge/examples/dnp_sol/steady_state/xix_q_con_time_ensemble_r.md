@@ -16,7 +16,7 @@ The basis is `sphten-liouv` with no approximation; propagator chop tolerance is 
 
 ## Experiment and scan
 
-The proton detector is `state(spin_system,'Lz','1H')`. XiX settings are `parameters.spins={'E','1H'}`, fixed electron nutation frequency 18 MHz, grid `rep_2ang_800pts_sph`, pulse duration 48 ns, and second-pulse phase π. The source sets `addshift=-13e6`, `el_offs=61e6`, and scans `nloops=1:64`, with shot spacing set to 153 μs minus the total pulse duration. Total contact time is `2*nloops*48e-9` s (96 ns to 6.144 μs).
+The proton detector is `coil_state(spin_system,'Lz','1H','exact')`. XiX settings are `parameters.spins={'E','1H'}`, fixed electron nutation frequency 18 MHz, grid `rep_2ang_800pts_sph`, pulse duration 48 ns, and second-pulse phase π. The source sets `addshift=-13e6`, `el_offs=61e6`, and scans `nloops=1:64`, with shot spacing set to 153 μs minus the total pulse duration. Total contact time is `2*nloops*48e-9` s (96 ns to 6.144 μs).
 
 ## Calculation and output
 

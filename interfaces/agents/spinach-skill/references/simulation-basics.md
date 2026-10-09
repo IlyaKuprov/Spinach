@@ -127,7 +127,7 @@ internally, but the *input* units are fixed by convention:
 | Correlation time | `inter.tau_c` | seconds |
 | Temperature | `inter.temperature` | kelvin |
 | Relaxation rates | `inter.r1_rates`, `inter.r2_rates` | hertz |
-| Chemical exchange rates | `inter.chem.rates` | hertz |
+| Reaction rate constants | `inter.chem.reactions{n}.rate` | inverse seconds for first order; concentration^(1-m)/s for order m |
 | Offsets, sweeps, J in sequences | `parameters.offset/sweep/J` | hertz |
 | Euler angles | `inter.*.euler`, `parameters.orientation` | radians |
 | Times | `parameters.tau`, `tmix`, `timestep` | seconds |

@@ -25,7 +25,7 @@ inter.tau_c={1e-15};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Linearly spaced B20 in cm^-1
 b20=linspace(0.1,10,10)';

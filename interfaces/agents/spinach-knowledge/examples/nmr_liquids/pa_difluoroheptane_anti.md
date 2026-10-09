@@ -12,7 +12,7 @@ The field setting is `11.7464`. The source assigns proton chemical-shift values 
 
 The basis is `sphten-liouv` with `IK-0` and `inter_level=1`. Three manual fragment memberships are specified, with `S3` symmetry for spin groups `[14 15 16]` and `[21 22 23]`; the basis also sets `longitudinal={{'19F'}}` and `projections={1}`. The code leaves ZTE off by default. A GPU enable statement is present only as a comment and is not active. No relaxation model is configured in this example.
 
-The acquisition selects `{'1H'}`, sets both initial state and receiver coil to `state(spin_system,'L+','1H')`, and leaves the decoupling list empty. Offset is `1400`, sweep `2500`, acquired points `4096`, zero fill `16536`, and the axis is in ppm with `invert_axis=1`. The code does not label units for the field, offset, or sweep literals.
+The acquisition selects `{'1H'}`, sets the initial state to `state(spin_system,'L+','1H')`, and leaves the decoupling list empty. Offset is `1400`, sweep `2500`, acquired points `4096`, zero fill `16536`, and the axis is in ppm with `invert_axis=1`. The code does not label units for the field, offset, or sweep literals. The receiver uses the same operator description with `coil_state` instead.
 
 ## Propagation and processing
 

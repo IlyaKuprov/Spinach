@@ -23,7 +23,7 @@ sys.isotopes={'E','E','1H','1H'};
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Couplings
 inter.zeeman.scalar={2.0023 2.0044 0 0};

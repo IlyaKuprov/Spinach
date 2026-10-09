@@ -41,7 +41,7 @@ inter.coupling.scalar{idxof(sys,'H3'),idxof(sys,'H5')} =   0.55;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};

@@ -24,9 +24,9 @@ end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -54,7 +54,7 @@ rho=shaped_pulse_xy(spin_system,H,{Lx,Ly},{Cx,Cy},...
 % Set up acquisition
 parameters.spins={'1H'};
 parameters.rho0=rho;
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=5000;

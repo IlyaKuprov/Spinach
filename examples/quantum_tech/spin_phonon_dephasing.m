@@ -27,7 +27,7 @@ inter.modes.longitudinal{1,2}=4e6*sqrt(2);
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -43,8 +43,8 @@ parameters.rho0=state(spin_system,{'Lx','BL1'},{1,2})+...
 traj=device(spin_system,@traject,parameters,'spin-phonon');
 
 % Project out the spin coherence and the conditional displacement
-coil_s=state(spin_system,'Lx',1);
-coil_q=state(spin_system,'C',2)+state(spin_system,'A',2);
+coil_s=coil_state(spin_system,'Lx',1,'exact');
+coil_q=coil_state(spin_system,'C',2,'exact')+coil_state(spin_system,'A',2,'exact');
 traj_s=cellfun(@(rho)full(hdot(coil_s,rho)),traj);
 traj_q=cellfun(@(rho)full(hdot(coil_q,rho)),traj);
 

@@ -20,3 +20,7 @@ There is no spatial-motion axis in this context: `parameters.spc_dim=1`, and `pa
 ## Source-supported example
 
 `examples/nqr/pure_nqr_iodine.m` runs a static powder NQR calculation for one 127I nucleus (spin 5/2), using a 560 MHz quadrupole interaction, asymmetry 0.01, the `rep_2ang_200pts_sph` grid, and 512 points. It requests orientation-dependent equilibrium with `parameters.needs={'aniso_eq'}`.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:powder:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

@@ -15,7 +15,8 @@
 - Otherwise, the time step is set to `1/cheap_norm(L)`; if this is infinite (zero Liouvillian), a unit time step is used with a report.
 - The trajectory is preallocated as a complex matrix of size `numel(rho)`-by-`spin_system.tols.zte_nsteps`, with `trajectory(:,1)=rho`.
 - Steps 2 through `spin_system.tols.zte_nsteps` are computed with the Krylov `step` function. After each step, the active space dimension (number of states whose maximum absolute amplitude over the trajectory exceeds `spin_system.tols.zte_tol`) is compared with the previous value; the loop terminates early when the dimension stops changing.
-- Track selection: if `nstates` is given, states are ranked by their maximum absolute amplitude over the trajectory (descending) and only the top `nstates` are kept; otherwise all states whose maximum absolute amplitude is below `spin_system.tols.zte_tol` are dropped.
+- Track selection: if `nstates` is given, states are ranked by their maximum absolute amplitude over the trajectory (descending) and the top `nstates` are kept; otherwise all states whose maximum absolute amplitude is below `spin_system.tols.zte_tol` are dropped.
+- In the compiled spherical-tensor space, every substance unit coordinate is retained regardless of its trajectory weight. This also applies to zero-population and spin-free substances; these mandatory coordinates may increase the retained dimension beyond `nstates`. For symmetry-reduced calls, `reduce` supplies the support of the projected unit directions instead of the original offsets.
 - The projector is built as `speye(size(L))` with the columns corresponding to zero tracks deleted. The intended usage is `L_reduced=P'*L*P` and `rho_reduced=P'*rho`.
 - The default tolerance may be altered by setting `sys.tols.zte_tol` before calling `create.m`.
 - If tiny interactions or nearly equivalent spins are present, it is best to leave zero track elimination off by omitting `'zte'` from the `sys.enable` cell array.
@@ -26,7 +27,7 @@ Inputs:
 - `spin_system` — spin system object supplying tolerances (`zte_tol`, `zte_maxden`, `zte_nsteps`), formalism, and the `sys.enable` list.
 - `L` — the Liouvillian used for time propagation; must be square and dimensionally consistent with `rho`.
 - `rho` — the initial state vector for time propagation.
-- `nstates` (optional) — if specified, only the `nstates` most populated states are kept, irrespective of the tolerance parameter.
+- `nstates` (optional) — if specified, the `nstates` most populated states and all mandatory unit coordinates are kept, irrespective of the tolerance parameter.
 
 Output:
 - `projector` — projector matrix into the reduced space (a column-subset of the identity, or the scalar `1` when elimination is skipped).

@@ -37,7 +37,7 @@ nmr_field=7.05;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -89,7 +89,7 @@ parameters.axis_units='kHz';
 parameters.invert_axis=1;
 
 % Set the detection state
-coil=state(spin_system,'L+',parameters.spins{1});
+coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
 
 % Get the pulse operator
 Ly=operator(spin_system,'Ly',parameters.spins{1});

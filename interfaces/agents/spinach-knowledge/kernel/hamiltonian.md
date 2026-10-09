@@ -7,6 +7,8 @@
 
 Builds the Hamiltonian terms represented by a configured Spinach spin system. `I` contains the rotationally invariant terms; when a second output is requested, `Q` contains irreducible components of the anisotropic spin Hamiltonian. It is a cell array by rank; `Q{r}` is a `(2r+1)-by-(2r+1)` cell array indexed by operator and coefficient projections, and `Q{r}{k,m}` stores the corresponding basis-space matrix. Use `orientation.m` to combine those components at a chosen spin-system orientation. A one-output call skips construction of `Q` and the anisotropic blocks guarded by `nargout>1`.
 
+In the sphten direct sum, interaction operators are placed in their hosting substance blocks. The parallel construction retains `chem.parts` so global interaction indices can be translated into local descriptor columns.
+
 The routine uses the active basis and formalism in `spin_system`; it does not select a basis. It requires basis information and the interaction-strength assumptions established by `assume()`.
 
 ## Interactions handled

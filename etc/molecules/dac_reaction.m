@@ -16,8 +16,13 @@
 %     sys, inter, bas - Spinach input data structures, remember
 %                       to specify the field in sys.magnet
 %
-%     kin - matching tables for which nuclei go where in which
-%           of the two chemical reactions
+%     kin - independent copy of the additive reaction records;
+%           set rates in inter.chem.reactions before create(), or
+%           assign modified kin back to inter.chem.reactions
+%
+% Acetonitrile retains its three solvent protons and T1/T2 relaxation.
+% Rates in the returned records are zero until the caller specifies
+% them, in L/(mol*s); the solvent takes no part in either reaction.
 %
 % a.acharya@soton.ac.uk
 % bruno.linclau@ugent.be
@@ -157,9 +162,10 @@ inter.chem.concs=[1 1 1 1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2','IK-2','IK-2','IK-2','IK-2'};
+bas.connectivity={'scalar_couplings','scalar_couplings',...
+                  'scalar_couplings','scalar_couplings','scalar_couplings'};
+bas.prox_level={1,1,1,1,1};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
@@ -180,8 +186,13 @@ kin{1}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
 kin{1}.products=3;       % into endo-norbornene carbonitrile
 kin{1}.matching=[1 12; 2 17; 3 18; 4 16; 5 10; 6 11; 7 14; 8 15; 9 13];
 kin{2}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
-kin{2}.products=4;       % into endo-norbornene carbonitrile
+kin{2}.products=4;       % into exo-norbornene carbonitrile
 kin{2}.matching=[1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]; 
+
+% Declare additive channels and leave rate selection to the caller
+kin{1}.rate=0; kin{1}.closure='additive';
+kin{2}.rate=0; kin{2}.closure='additive';
+inter.chem.reactions=kin;
 
 end
 

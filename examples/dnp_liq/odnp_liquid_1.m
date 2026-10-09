@@ -24,7 +24,7 @@ inter.coordinates={[0.0 0.0 0.0]
                
 % Complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
                
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -43,9 +43,9 @@ spin_system=basis(spin_system,bas);
 % Experiment paramaters
 parameters.spins={'E'};
 parameters.needs={'rho_eq'};
-parameters.coil=[state(spin_system,{'Lz'},{1})...
-                 state(spin_system,{'Lz'},{2})...
-                 state(spin_system,{'Lz'},{3})];
+parameters.coil=[coil_state(spin_system,{'Lz'},{1},'exact')...
+                 coil_state(spin_system,{'Lz'},{2},'exact')...
+                 coil_state(spin_system,{'Lz'},{3},'exact')];
 parameters.mw_pwr=2*pi*1e6;
 parameters.mw_off=0;
 parameters.mw_oper=operator(spin_system,'Lx','E');

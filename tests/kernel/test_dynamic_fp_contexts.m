@@ -37,9 +37,9 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 
 % Set a minimal one-dimensional imaging grid
 parameters.spins={'1H'};
@@ -62,6 +62,32 @@ parameters.coil_st={state(spin_system,'L+','1H')};
 % Run the production context into a probe pulse sequence
 answer=imaging(spin_system,@local_context_probe,parameters);
 problem_dim=parameters.npts*spn_dim;
+
+% A declared but disabled symmetry must leave imaging unchanged
+sys.isotopes={'1H','1H'}; sys.disable={'symmetry'};
+inter.zeeman.scalar={0,0}; bas.sym_group={{'S2'}};
+bas.sym_spins={{[1 2]}};
+disabled=test_spin_system(sys,inter,bas);
+plain=test_spin_system(sys,inter,rmfield(bas,{'sym_group','sym_spins'}));
+phantoms=parameters; dim=disabled.bas.offsets(end);
+phantoms.rlx_op={sparse(dim,dim)};
+phantoms.rho0_st={state(disabled,'Lz','1H')};
+phantoms.coil_st={state(disabled,'L+','1H')};
+observed=imaging(disabled,@local_context_probe,phantoms);
+expected=imaging(plain,@local_context_probe,phantoms);
+for field={'H','R','K','F','rho0','coil'}
+    result=test_close(result,['disabled symmetry ' field{1}],...
+                      observed.(field{1}),expected.(field{1}),0,0,...
+                      'disabled symmetry gives the same context as an undeclared group');
+end
+sys.disable={}; active=test_spin_system(sys,inter,bas); rejected=false;
+try
+    imaging(active,@local_context_probe,phantoms);
+catch err
+    rejected=contains(err.message,'symmetry treatment is not supported');
+end
+result=test_true(result,'active imaging symmetry',rejected,...
+                 'an active symmetry factorisation remains unsupported');
 
 % Check dimensions of all assembled generators
 result=test_close(result,'imaging spin dimension',answer.spn_dim,spn_dim,0,0,...
@@ -94,9 +120,9 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 
 % Attach a two-cell Voronoi mesh with one shared boundary
 spin_system.mesh=local_two_cell_mesh();

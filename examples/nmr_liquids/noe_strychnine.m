@@ -20,9 +20,9 @@ sys.disable={'krylov'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -60,7 +60,7 @@ rho=rho-rho_eq;
 % Set up a pulse-acquire sequence with the resulting state set as initial
 parameters.spins={'1H'};
 parameters.rho0=rho;
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.pulse_op=operator(spin_system,'Ly','1H');
 parameters.pulse_angle=pi/2;
 parameters.decouple={};

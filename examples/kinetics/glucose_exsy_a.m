@@ -84,17 +84,27 @@ inter.chem.parts={[1  2  3  4],...  % Alpha, inside
                   [13 14 15 16]};   % Beta,  outside
 
 % Reaction rate matrix
-inter.chem.rates=[-1.0045  1.7738  0       0;          
+rates=[-1.0045  1.7738  0       0;
                    1.0045 -1.7738  0       0;         
                    0       0      -0.9304  1.4586; 
                    0       0       0.9304 -1.4586];
 
+% Directed translocation records preserve corresponding fluorine spins
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[(1:4)' (5:8)'],'rate',rates(2,1)),...
+    struct('reactants',2,'products',1,...
+    'matching',[(5:8)' (1:4)'],'rate',rates(1,2)),...
+    struct('reactants',3,'products',4,...
+    'matching',[(9:12)' (13:16)'],'rate',rates(4,3)),...
+    struct('reactants',4,'products',3,...
+    'matching',[(13:16)' (9:12)'],'rate',rates(3,4))};
+
 % Equilibrate translocation with alpha-beta imbalance as the start
-inter.chem.concs=equilibrate(inter.chem.rates,[3.2258; 0; 3.1902; 0]);
+inter.chem.concs=equilibrate(rates,[3.2258; 0; 3.1902; 0]);
               
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -123,7 +133,7 @@ parameters.npoints=[256 256];
 parameters.zerofill=[1024 512];
 parameters.spins={'19F'};
 parameters.axis_units='ppm';
-parameters.rho0=state(spin_system,'Lz','19F','chem');
+parameters.rho0=state(spin_system,'Lz','19F');
 
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');

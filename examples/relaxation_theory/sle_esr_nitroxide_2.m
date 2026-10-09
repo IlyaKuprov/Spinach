@@ -30,7 +30,7 @@ inter.zeeman.matrix{2}=[2.0065794 -0.0007548 -0.0032848;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -43,7 +43,7 @@ spin_system=basis(spin_system,bas);
 parameters.max_rank=7;
 parameters.tau_c=17e-9;
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.spins={'E'};
 parameters.sweep=[-2.2e8 2e8];

@@ -10,7 +10,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sec2ki
 
 - Calls `grumble(spin_system,R)` to enforce consistency before processing.
 - Records the nonzero count of the input superoperator (`nnz_before`).
-- Uses `lin2lm(spin_system.bas.basis)` to compile the index of all longitudinal product states in the basis; longitudinal states are those where the sum of absolute values of the corresponding rows of `M` is zero.
+- Uses `lin2lm(spin_system.bas.basis{n})` within each substance and the block offsets to compile the index of all longitudinal product states in the basis; longitudinal states are those where the sum of absolute values of the corresponding rows of `M` is zero.
 - Converts `R` to XYZ format via `find(R)`.
 - Zeros all rates except self-relaxation and longitudinal cross-relaxation terms, keeping entries where both row and column indices are longitudinal states, or where the row and column indices are equal.
 - Recomposes the relaxation superoperator with `sparse(rows,cols,vals,length(R),length(R))` and records the new nonzero count (`nnz_after`).
@@ -20,7 +20,7 @@ Consistency checks performed by the internal `grumble` function:
 
 - Requires `spin_system.bas.formalism` to be `'sphten-liouv'`; otherwise errors with `this function requires sphten-liouv formalism.`
 - Requires `R` to be numeric and square; otherwise errors with `R must be a square matrix.`
-- Computes the unit state via `unit_state(spin_system)` and errors with `R appears to be thermalised, cannot proceed.` if `norm(R*unit,2)` exceeds `1e-10`.
+- Builds an unweighted geometric unit vector from the substance offsets and errors with `R appears to be thermalised, cannot proceed.` if `norm(R*unit,2)` exceeds `1e-10`.
 
 ## Inputs and outputs
 

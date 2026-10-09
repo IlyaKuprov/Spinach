@@ -25,14 +25,23 @@ inter.coupling.matrix{3,3}=Q3;
 inter.chem.parts={1,2,3};
 
 % Kinetics
-inter.chem.rates=1e4*[-2   1   1
-                       1  -2   1
-                       1   1  -2];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',1e4),...
+                      struct('reactants',1,'products',3,...
+                            'matching',[1 3],'rate',1e4),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',1e4),...
+                      struct('reactants',2,'products',3,...
+                            'matching',[2 3],'rate',1e4),...
+                      struct('reactants',3,'products',1,...
+                            'matching',[3 1],'rate',1e4),...
+                      struct('reactants',3,'products',2,...
+                            'matching',[3 2],'rate',1e4)};
 inter.chem.concs=[1.0 1.0 1.0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -43,8 +52,8 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'2H'};
-parameters.rho0=state(spin_system,'L+','2H','chem');
-parameters.coil=state(spin_system,'L+','2H');
+parameters.rho0=state(spin_system,'L+','2H');
+parameters.coil=coil_state(spin_system,'L+','2H','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=0.4e6;

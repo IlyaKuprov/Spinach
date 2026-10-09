@@ -27,13 +27,13 @@ inter.damp_rate=1e6;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'1H'}};
 bas.projections={+1};
 
 % Symmetry
-bas.sym_spins={[1 7],[2 8],[3 9],[4 10],[5 11],[6 12]};
-bas.sym_group={'S2','S2','S2','S2','S2','S2'};
+bas.sym_spins={{[1 7],[2 8],[3 9],[4 10],[5 11],[6 12]}};
+bas.sym_group={{'S2','S2','S2','S2','S2','S2'}};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -45,7 +45,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.offset=-2e7;
 parameters.sweep=1e8;

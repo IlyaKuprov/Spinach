@@ -22,7 +22,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(2.4e6,0.5,1,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel','colorbar'};
@@ -34,7 +34,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.offset=0;
 parameters.nsteps=[128 128];
 parameters.zerofill=[256 256];

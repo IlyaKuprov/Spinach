@@ -41,7 +41,7 @@ inter.coupling.scalar{7,7}=0;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.sweep=400;

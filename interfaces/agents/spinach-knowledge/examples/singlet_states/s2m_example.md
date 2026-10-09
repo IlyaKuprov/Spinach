@@ -12,7 +12,7 @@ The model has two `13C` spins at `9.4 T`, scalar Zeeman values `0.03` and `-0.03
 
 ## Preparation and observable
 
-The input is the singlet on spins 1 and 2; the detector is `state(spin_system,'Lz','all')`. The code calls `s2m` with arguments `55` and `6.0`, then displays the detector overlap with the returned state as longitudinal magnetisation. These are sequence arguments as supplied by the example; this file does not define a pulse waveform, phase/amplitude/time discretisation, gradient, relaxation, or storage model. The source labels the calculation time as seconds but does not report a numerical overlap.
+The input is the singlet on spins 1 and 2; the detector is `coil_state(spin_system,'Lz','all','exact')`. The code calls `s2m` with arguments `55` and `6.0`, then displays the detector overlap with the returned state as longitudinal magnetisation. These are sequence arguments as supplied by the example; this file does not define a pulse waveform, phase/amplitude/time discretisation, gradient, relaxation, or storage model. The source labels the calculation time as seconds but does not report a numerical overlap.
 
 ## Source
 

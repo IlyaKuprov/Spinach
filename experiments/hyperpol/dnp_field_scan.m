@@ -43,7 +43,8 @@
 %              of the fields supplied
 % 
 % Note: the relaxation superoperator should NOT be thermalized
-%       for this type of calculation.
+%       for this type of calculation. Segmented substance inputs
+%       are not yet supported.
 %
 % Note: thermal equilibrium state and relaxation superoperator are
 %       assumed to be the same at all fields in the sweep - DO NOT
@@ -134,6 +135,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
+if spin_system.bas.nsubst>1
+    error('Spinach:dnp_field_scan:segmentedSubstances',...
+          'DNP scans require a single substance.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('this function is only available for sphten-liouv and zeeman-liouv formalisms.');
 end

@@ -34,7 +34,7 @@ inter.coupling.euler{2,4}=[0 0 0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'14N'}};
 
 % Enable zero track elimination
@@ -47,7 +47,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.pulse_opy=operator(spin_system,'Ly','E');
 parameters.pulse_opx=operator(spin_system,'Lx','E');
 parameters.offset=0;

@@ -27,7 +27,7 @@ inter.coupling.euler{2,2}=[0 pi/2 0];
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
                
 
 % Spinach housekeeping
@@ -46,7 +46,7 @@ Ep_pump=kron(speye(size(sigma.p)),sigma.p);
 parameters.rho0=state(spin_system,'Lz','E8');
 parameters.ex_prob=(Ep_prob+Ep_prob')/2; 
 parameters.ex_pump=(Ep_pump+Ep_pump')/2;
-parameters.coil=state(spin_system,{'L+'},{1});
+parameters.coil=coil_state(spin_system,{'L+'},{1},'exact');
 parameters.spins={'E8'};
 parameters.ta=2e-6;
 parameters.tb=1e-6;

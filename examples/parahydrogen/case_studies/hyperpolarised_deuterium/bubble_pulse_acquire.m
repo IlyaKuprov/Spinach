@@ -3,6 +3,9 @@
 % tion catalyst. Bubbling is followed by a 45-degree
 % pulse. Paper link to follow in due course.
 %
+% Pumping scales with the instantaneous free-D2 population. Unlike
+% the former shared-unit source, it decreases as D2 binds to catalyst.
+%
 % thhu@mpinat.mpg.de
 % anakin.aden@mpinat.mpg.de
 % denismoll@hotmail.de
@@ -40,8 +43,10 @@ inter.coordinates={[]; []; % None for D2
 
 % Kinetics
 inter.chem.parts={[1 2],[3 4]};
-inter.chem.rates=[-1  5000;...
-                   1 -5000];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 3; 2 4],'rate',1),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[3 1; 4 2],'rate',5000)};
 inter.chem.concs=[1 0];
 
 % Magnet field
@@ -49,7 +54,7 @@ sys.magnet=7.05;
 
 % Simulation formalsim
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield','t1_t2'};
@@ -86,7 +91,7 @@ R=relaxation(spin_system);
 KF=kinetics(spin_system);
 
 % Kinetics with bubbling (a guess, needs proper rate)
-pumped_state=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5}; pumped_state(1)=0;
+pumped_state=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5}; pumped_state(spin_system.bas.offsets(1:end-1)+1)=0;
 KB=magpump(spin_system,KF,pumped_state,1e-1);
 
 % Run the bubbling for 7 seconds
@@ -95,7 +100,7 @@ rho=evolution(spin_system,H+1i*R+1i*KB,[],rho0,7,1,'final');
 % Pulse-acquire settings
 parameters.spins={'2H'};
 parameters.rho0=rho;
-parameters.coil=state(spin_system,'L+',[1 2]);
+parameters.coil=coil_state(spin_system,'L+',[1 2],'exact');
 parameters.pulse_op=operator(spin_system,'Ly','2H');
 parameters.pulse_angle=pi/4;
 parameters.decouple={};

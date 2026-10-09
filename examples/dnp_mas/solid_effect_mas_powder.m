@@ -39,7 +39,7 @@ inter.rlx_keep='secular';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -57,7 +57,7 @@ parameters.mw_pwr=2*pi*0.85e6;
 parameters.mw_frq=-263.366e9;
 parameters.mw_time=1.0;
 parameters.grid='rep_2ang_100pts_sph';
-parameters.coil=state(spin_system,'Lz','1H');
+parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 parameters.verbose=0;
 
 % Run the MAS DNP simulation

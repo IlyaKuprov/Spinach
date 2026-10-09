@@ -19,7 +19,7 @@ inter.coupling.scalar{1,2}=7.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -32,12 +32,12 @@ spin_system=basis(spin_system,bas);
 rho=4*state(spin_system,'Lz','all');
 
 % Observable states
-coil_x1=state(spin_system,{'Lx'},{1});
-coil_x2=state(spin_system,{'Lx'},{2});
-coil_y1=state(spin_system,{'Ly'},{1});
-coil_y2=state(spin_system,{'Ly'},{2});
-coil_z1=state(spin_system,{'Lz'},{1});
-coil_z2=state(spin_system,{'Lz'},{2});
+coil_x1=coil_state(spin_system,{'Lx'},{1},'exact');
+coil_x2=coil_state(spin_system,{'Lx'},{2},'exact');
+coil_y1=coil_state(spin_system,{'Ly'},{1},'exact');
+coil_y2=coil_state(spin_system,{'Ly'},{2},'exact');
+coil_z1=coil_state(spin_system,{'Lz'},{1},'exact');
+coil_z2=coil_state(spin_system,{'Lz'},{2},'exact');
 
 % Pulse operators
 Lx=operator(spin_system,'Lx','all');

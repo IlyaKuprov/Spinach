@@ -39,9 +39,9 @@ inter.coupling.scalar{7,7}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_group={'S2','S2','S3'};
-bas.sym_spins={[1 2],[3 4],[5 6 7]};
+bas.approximation={'none'};
+bas.sym_group={{'S2','S2','S3'}};
+bas.sym_spins={{[1 2],[3 4],[5 6 7]}};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -52,7 +52,7 @@ spin_system=basis(spin_system,bas);
 
 % Initial and detection states
 parameters.rho0=state(spin_system,'Lz','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Sequence parameters
 parameters.angle=pi/2;

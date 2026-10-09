@@ -39,6 +39,10 @@
 % WARNING: spin system ground states are commonly degenerate; absolute
 %          zero temperatures are not supported.
 %
+% Each returned substance block is weighted by chem.concs.
+% Note: segmented Hamiltonians must have no cross-substance blocks after
+%       the orientation-dependent contribution has been added.
+%
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
 %
@@ -62,17 +66,28 @@ elseif nargin==2
 
 elseif nargin==1
 
+    % Check consistency before building the Hamiltonian
+    grumble(spin_system);
+
     % Build the isotropic Hamiltonian
     I=hamiltonian(assume(spin_system,'labframe'),'left');
-
-    % Check consistency
-    grumble(spin_system,I);
     
 else
     
     % Complain and bomb out
     error('incorrect number of input arguments.');
     
+end
+
+% Reject coupling between independent substance blocks after orientation assembly
+if spin_system.bas.nsubst>1
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        if nnz(I(idx,:))~=nnz(I(idx,idx))
+            error('Spinach:equilibrium:crossSubstanceHamiltonian',...
+                  'Hamiltonian must not contain cross-substance blocks (substance %d).',n);
+        end
+    end
 end
 
 % Get the temperature factor
@@ -92,19 +107,32 @@ switch spin_system.bas.formalism
                 % Unit population of T(0,0) state, normalisation is
                 % such because prod(spin_system.comp.mults) can be-
                 % come too large for double precision arithmetic
-                unit=sparse(1,1,1,size(I,2),1);
+                unit=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+                            spin_system.bas.offsets(end),1);
 
             case 'zeeman-liouv'
 
                 % Stretched unit matrix, normalisation matched to
                 % the Hilbert space because systems are small
-                unit=speye(prod(spin_system.comp.mults)); unit=unit(:);
+                blocks=cell(spin_system.bas.nsubst,1);
+                for n=1:spin_system.bas.nsubst
+                    block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+                    blocks{n}=block(:);
+                end
+                unit=vertcat(blocks{:});
 
         end
 
-        % Catch silly calls
-        if norm(I*unit,1)<1e-10
-            error('H and Q must be left side product superops, not commutation superops.');
+        % Check the Hamiltonian action on each substance's own unit state
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            if (spin_system.bas.nsubst>1)&&(nnz(I(idx,idx))==0)
+                continue
+            end
+            if norm(I(idx,idx)*unit(idx),1)<1e-10
+                error('Spinach:equilibrium:notLeftProduct',...
+                      'H and Q must be left side product superops, not commutation superops (substance %d).',n);
+            end
         end
 
         % Propagate unit state in imaginary time
@@ -119,10 +147,26 @@ switch spin_system.bas.formalism
         end
         
         % Divide by partition function
-        rho=rho/dot(unit,rho);
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            rho(idx)=spin_system.chem.concs(n)*rho(idx)/dot(unit(idx),rho(idx));
+        end
         
     % Hilbert space
     case {'zeeman-hilb'}
+
+        % Apply the stock trace normalisation independently to each block
+        if spin_system.bas.nsubst>1
+            blocks=cell(spin_system.bas.nsubst,1);
+            for n=1:spin_system.bas.nsubst
+                idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+                local_system=spin_system; local_system.bas.nsubst=1;
+                local_system.bas.nstates=numel(idx); local_system.bas.offsets=[0;numel(idx)];
+                local_system.chem.concs=spin_system.chem.concs(n);
+                blocks{n}=equilibrium(local_system,I(idx,idx));
+            end
+            rho=blkdiag(blocks{:}); return
+        end
         
         % Estimate the norm
         mat_norm=abs(beta_factor)*cheap_norm(I);
@@ -147,8 +191,9 @@ switch spin_system.bas.formalism
             end
         end
             
-        % Return to CPU if appropriate
+        % Return the concentration-weighted state on the CPU
         if isa(rho,'gpuArray'), rho=gather(rho); end
+        rho=spin_system.chem.concs(1)*rho;
             
 end
         
@@ -156,7 +201,11 @@ end
     
 % Consistency enforcement
 function grumble(spin_system,I,Q,euler_angles)
-if ~isnumeric(I)
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:equilibrium:wavefunction',...
+          'thermal equilibrium is not supported in zeeman-wavef formalism.');
+end
+if (nargin>=2)&&~isnumeric(I)
     error('isotropic Hamiltonian I must be numeric.');
 end
 if isempty(spin_system.rlx.temperature)

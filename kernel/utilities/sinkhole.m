@@ -40,14 +40,14 @@ end
 if (~isnumeric(L))||(size(L,1)~=size(L,2))
     error('L must be a square matrix.');
 end
-if any(size(L)~=size(spin_system.bas.basis,1))
+if any(size(L)~=spin_system.bas.offsets(end))
     error('dimension of the Liouvillian must match the dimension of the basis set.');
 end
 if (~isnumeric(states))||(~isvector(states))||(~isreal(states))||...
    any(mod(states,1)~=0)||any(states<=0)
     error('states must be a vector of positive integers.');
 end
-if any(states>size(spin_system.bas.basis,1))
+if any(states>spin_system.bas.offsets(end))
     error('an element of the states vector exceeds the state space dimension.');
 end
 end

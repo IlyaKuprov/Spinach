@@ -18,7 +18,7 @@ sys.isotopes={'E','C3'};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Purcell parameters
 coupling=0.35e6;

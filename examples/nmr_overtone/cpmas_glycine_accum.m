@@ -31,7 +31,7 @@ inter.damp_rate=300;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'krylov','trajlevel'};
@@ -53,8 +53,8 @@ parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=cos(theta)*state(spin_system,'Lz','1H')+...
                 sin(theta)*state(spin_system,'Lx','1H');
-parameters.coil=cos(theta)*state(spin_system,'Lz','14N')+...
-                sin(theta)*state(spin_system,'Lx','14N');
+parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N','exact')+...
+                sin(theta)*coil_state(spin_system,'Lx','14N','exact');
 parameters.Nx=cos(theta)*operator(spin_system,'Lz','14N')+...
               sin(theta)*operator(spin_system,'Lx','14N');
 parameters.Hx=cos(theta)*operator(spin_system,'Lz','1H')+...

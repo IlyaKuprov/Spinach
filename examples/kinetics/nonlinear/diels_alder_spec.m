@@ -1,6 +1,7 @@
 % Repeated pulse-acquire experiment during the Diels-Alder cyclo-
 % addition of acetylene to butadiene, demonstrating the non-linear
-% kinetics module.
+% kinetics module. Concentrations are unit coordinates, and additive
+% product unit arrival is shared equally between the two reactants.
 %
 % Calculation time: hours, GPU is hard-coded.
 %
@@ -74,26 +75,26 @@ inter.r2_rates=cell(22,1); inter.r2_rates(:)={0};
 inter.r1_rates(17:22)={0.5}; % Solvent
 inter.r2_rates(17:22)={0.5}; % Solvent
 
-% Chemical parts and unit concentrations
+% Chemical parts and initial concentrations, mol/L
 inter.chem.parts={1:2, 3:8, 9:16, 17:22};
-inter.chem.concs=[1 1 1 1];
+inter.chem.concs=[1e-2 2e-2 0 17.1];
+
+% Additive cycloaddition with rate constant in L/(mol*s)
+inter.chem.reactions={struct('reactants',[1 2],'products',3,...
+    'matching',[1 9;2 12;3 15;4 16;5 10;6 11;7 14;8 13],...
+    'rate',25.0,'closure','additive')};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Reaction rate constant
-rrc=25.0;    % mol/(L*s)
-
-% 2nd order reaction generator
-K=@(t,x)(1i*[-rrc*x(2)   0       0        0; 
-              0       -rrc*x(1)  0        0;
-              0        rrc*x(1)  0        0;
-              0        0         0        0]);
+% Trace all spins for concentration dynamics with the same reaction record
+chem_system=kill_spin(spin_system,1:spin_system.comp.nspins);
+K_chem=kinetics(chem_system);
 
 % Kinetic time grid, 10 seconds
 chem_nsteps=100; chem_tmax=10; 
@@ -104,11 +105,11 @@ chem_time_grid=linspace(0,chem_tmax,chem_nsteps+1);
 conc_traj=zeros(4,chem_nsteps+1);
 
 % Initial concentrations, mol/L
-conc_traj(:,1)=[1e-2; 2e-2; 0.0; 17.1]; 
+conc_traj(:,1)=unit_state(chem_system);
 
 % Stage 1: concentration dynamics
 for n=1:chem_nsteps 
-    conc_traj(:,n+1)=step(spin_system,{K,(n-1)*chem_dt,'LG4'},...
+    conc_traj(:,n+1)=step(chem_system,{@(t,y)1i*K_chem(t,y),(n-1)*chem_dt,'LG4'},...
                               conc_traj(:,n),chem_dt); 
 end
 
@@ -125,25 +126,16 @@ A=griddedInterpolant(chem_time_grid,conc_traj(1,:),'makima','none');
 B=griddedInterpolant(chem_time_grid,conc_traj(2,:),'makima','none');
 C=griddedInterpolant(chem_time_grid,conc_traj(3,:),'makima','none');
 
-% Build chemical reaction generators
-reaction.reactants=[1 2];  % which substances are reactants
-reaction.products=3;       % which substances are products
-reaction.matching=[1  9;  
-                   2 12;   % which spin on the left hand
-                   3 15;   % side of the reaction arrow
-                   4 16;   % goes into which spin on the
-                   5 10;   % right hand side
-                   6 11;
-                   7 14;
-                   8 13];
-G=react_gen(spin_system,reaction); 
+% Compile spin transport and embed prescribed concentrations in unit coordinates
+K_spin=kinetics(spin_system);
+unit_idx=spin_system.bas.offsets(1:end-1)+1;
+unit_embed=sparse(unit_idx,1:4,ones(1,4),spin_system.bas.offsets(end),4);
+concs=@(t)[A(t);B(t);C(t);inter.chem.concs(4)];
 
-% Get concentration-weighted initial condition, no solvent
-eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
-    +B(0)*state(spin_system,'Lz',spin_system.chem.parts{2}) ...
-    +C(0)*state(spin_system,'Lz',spin_system.chem.parts{3});
+% Concentration-weighted longitudinal preparation without solvent excitation
+eta=state(spin_system,'Lz',1:16);
 [~,P]=levelpop('1H',sys.magnet,300);
-eta=(0.5*P(1)-0.5*P(2))*eta;
+eta=unit_state(spin_system)+(0.5*P(1)-0.5*P(2))*eta;
 
 % Preallocate the trajectory and get it started
 chem_traj=zeros([numel(eta) chem_nsteps+1]); chem_traj(:,1)=eta;
@@ -155,13 +147,9 @@ for n=1:chem_nsteps
     report(spin_system,['chemistry time step ' int2str(n) ...
                         '/' int2str(chem_nsteps)]);
 
-    % Build the left interval edge composite evolution generator
-    F_L=1i*rrc*B(chem_time_grid(n))*G{1}   ... % Reaction from substance A
-       +1i*rrc*A(chem_time_grid(n))*G{2};      % Reaction from substance B
-
-    % Build the right interval edge composite evolution generator
-    F_R=1i*rrc*B(chem_time_grid(n+1))*G{1} ... % Reaction from substance A
-       +1i*rrc*A(chem_time_grid(n+1))*G{2};    % Reaction from substance B
+    % Evaluate additive chemistry at the prescribed interval-edge populations
+    F_L=1i*K_spin(chem_time_grid(n),unit_embed*concs(chem_time_grid(n)));
+    F_R=1i*K_spin(chem_time_grid(n+1),unit_embed*concs(chem_time_grid(n+1)));
 
     % Take the time step using the two-point Lie quadrature
     chem_traj(:,n+1)=step(spin_system,{F_L,F_R},chem_traj(:,n),chem_dt);
@@ -186,7 +174,7 @@ R=relaxation(spin_system);
 Hy=operator(spin_system,'Ly','1H');
 
 % Detect transverse magnetisation
-Hp=state(spin_system,'L+','1H');
+Hp=coil_state(spin_system,'L+','1H','exact');
 
 % Preallocate FID array
 fids=cell(9,1);
@@ -205,8 +193,7 @@ parfor n=0:8 %#ok<*PFBNS>
                          parameters.nsteps+1);
 
     % Get everything to the GPU
-    L=gpuArray(H+1i*R); G1=gpuArray(G{1});
-    G2=gpuArray(G{2}); eta=gpuArray(eta); coil=gpuArray(Hp);
+    L=gpuArray(H+1i*R); eta=gpuArray(eta); coil=gpuArray(Hp);
 
     % Get the fid started
     current_fid=gpuArray.zeros(1,parameters.nsteps+1);
@@ -219,13 +206,10 @@ parfor n=0:8 %#ok<*PFBNS>
         report(spin_system,['NMR time step ' int2str(k) ...
                             '/' int2str(parameters.nsteps)]);
 
-        % Build the left interval edge composite evolution generator
-        F_L=L+1i*rrc*G1*B(timing_grid(k))   ... % Reaction from substance A
-             +1i*rrc*A(timing_grid(k))*G2;      % Reaction from substance B
-
-        % Build the right interval edge composite evolution generator
-        F_R=L+1i*rrc*G1*B(timing_grid(k+1)) ... % Reaction from substance A
-             +1i*rrc*A(timing_grid(k+1))*G2;    % Reaction from substance B
+        % Evaluate kernel chemistry on the CPU and transfer each sparse generator
+        K_L=K_spin(timing_grid(k),unit_embed*concs(timing_grid(k)));
+        K_R=K_spin(timing_grid(k+1),unit_embed*concs(timing_grid(k+1)));
+        F_L=L+1i*gpuArray(K_L); F_R=L+1i*gpuArray(K_R);
 
         % Take the time step using the two-point Lie quadrature
         eta=step(spin_system,{F_L,F_R},eta,nmr_dt);

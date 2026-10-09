@@ -25,3 +25,7 @@ The powder weights combine orientation-level sequence outputs when `parameters.s
 ## Polyadic Liouville route
 
 With `sys.enable={'polyadic'}`, both phase derivatives are three-factor FFT polyadics. Their Kronecker sum retains outer-phase, inner-phase, and spin ordering, with each rate in Hz multiplied by `2*pi`. Rotor-dependent Hamiltonian blocks and lifted relaxation/kinetics remain polyadic. The callback must support implicit exponential actions such as `step` or `evolution`. GPU factors are uploaded once per executing orientation worker before the callback. The explicit route, rotor ranks, powder projection, and Hilbert rotor stacks retain their previous meaning.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:doublerot:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

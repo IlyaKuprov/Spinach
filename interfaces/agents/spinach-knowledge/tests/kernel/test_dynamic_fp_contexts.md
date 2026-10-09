@@ -26,3 +26,5 @@ result = test_dynamic_fp_contexts()
 - `imaging` — Cartesian-grid imaging context exercised by this test.
 - `meshflow` — unstructured-mesh flow context exercised by this test.
 - `new_test_result`, `test_close`, `test_true`, `test_spin_system`, `state` — test harness and spin-system utilities used by this test.
+
+A two-proton fixture compares disabled declared symmetry with no declared group: H, R, K, F, the initial state, and the coil must agree exactly. The same group enabled must still be rejected by imaging.

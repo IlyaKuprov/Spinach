@@ -275,14 +275,16 @@ switch spin_system.control.integrator
             fwd_traj(:,1)=rho_init;
 
             % Make sure the target state is a valid observable
-            if rho_targ(1)~=0 
+            units=spin_system.bas.offsets(1:end-1)+1;
+            if any(rho_targ(units)~=0)
                 error('target state must have a zero trace.'); 
             end
 
-            % Tiptoe around the unit state singularity
-            Q=(speye(size(P_tot))-P_tot)'; Q=Q(2:end,2:end);
+            % Exclude every conserved substance unit coordinate
+            active=true(size(rho_targ)); active(units)=false;
+            Q=(speye(size(P_tot))-P_tot)'; Q=Q(active,active);
             rho_targ_dressed=zeros(size(rho_targ),'like',1i);
-            rho_targ_dressed(2:end)=Q\rho_targ(2:end);
+            rho_targ_dressed(active)=Q\rho_targ(active);
             
             % Check if destination state dressing succeeded
             if any(~isfinite(rho_targ_dressed))

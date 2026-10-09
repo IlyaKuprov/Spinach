@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Splits a spin system into several independent subsystems, each containing only one instance (or one tuple) of a user-specified isotope that is deemed "dilute". All spin system data is updated accordingly. Basis set information, if found, is destroyed.
+Splits a spin system into several independent subsystems, each containing only one instance (or one tuple) of a user-specified isotope that is deemed "dilute". All spin system data is updated accordingly. An existing basis is rebuilt for every isotopomer through `kill_spin`, including the local descriptors, offsets, and cache hash. Spin-free substance blocks are retained.
 
 Source: [kernel/utilities/dilute.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dilute.m)
 

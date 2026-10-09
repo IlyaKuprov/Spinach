@@ -11,8 +11,8 @@ Compares the field dependence of geminate CIDNP from a singlet-born radical pair
 
 - The spin system is two electrons and one proton, `{'E','E','1H'}`. The initial reactant state is the electron singlet `singlet(spin_system,1,2)`; the proton is included in the coupled spin system.
 - The field grid is `[0.002 0.005 0.01 0.02 0.035 0.05 0.075]` T (2–75 mT). The source sets the singlet recombination rate to `3e8` Hz and the rotational correlation time to `1e-9` s (1 ns).
-- Electron Zeeman factors are `2.0023` and `2.0034`. The proton has an anisotropic hyperfine tensor entered through `mt2hz([0.6 0.6 3.6])`, with zero Euler angles. Recombination uses the Haberkorn radical-pair model, with the singlet channel rate `k_rec` and the second channel set to zero.
-- For each field, the source constructs the Hamiltonian, relaxation and kinetics superoperators, then compares `redfield` with `naka-zwan`. For the latter it sets `nz_shift='chem'` and `nz_onshell=false`. It propagates the singlet in a doubled reactant/product space for `200e-9` s; only the reactant block has Hamiltonian and relaxation dynamics, and the kinetics operator transfers population out of the reactants.
+- Electron Zeeman factors are `2.0023` and `2.0034`. The proton has an anisotropic hyperfine tensor entered through `mt2hz([0.6 0.6 3.6])`, with zero Euler angles. Recombination uses an explicit first-order singlet-selector loss record at rate `k_rec`, giving the Haberkorn singlet drain; no triplet drain is present.
+- For each field, the source constructs the Hamiltonian, relaxation and kinetics superoperators, then compares `redfield` with `naka-zwan`. For the latter it explicitly sets `nz_shift=k_rec/2` (the legacy half-sum Haberkorn scalar approximation) and `nz_onshell=false`. It propagates the singlet in a doubled reactant/product space for `200e-9` s; only the reactant block has Hamiltonian and relaxation dynamics, and the kinetics operator transfers population out of the reactants.
 
 ## Observable and plot
 

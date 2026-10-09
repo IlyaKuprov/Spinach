@@ -28,7 +28,7 @@ inter.coordinates={[0 0 0]; 30*[sind(20) 0 cosd(20)]};
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
                
 
 % Spinach housekeeping
@@ -47,8 +47,8 @@ Ep_pump=kron(speye(size(sigma.p)),sigma.p);
 parameters.rho0=state(spin_system,'Lz','E8');
 parameters.ex_prob=(Ep_prob+Ep_prob')/2; 
 parameters.ex_pump=(Ep_pump+Ep_pump')/2;
-parameters.coil_prob=state(spin_system,{'L+'},{1});
-parameters.coil_pump=state(spin_system,{'L+'},{2});
+parameters.coil_prob=coil_state(spin_system,{'L+'},{1},'exact');
+parameters.coil_pump=coil_state(spin_system,{'L+'},{2},'exact');
 parameters.spectrum_sweep=5e10;
 parameters.spectrum_nsteps=1024;
 parameters.ex_hard=operator(spin_system,'Lx','electrons');

@@ -26,8 +26,8 @@ sys.isotopes={'1H','1H','1H','1H','1H','1H','1H','1H'};
 
 % Reduced basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3;
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 
 % Analytical relaxation theory
 inter.relaxation={'redfield'};

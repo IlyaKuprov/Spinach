@@ -23,7 +23,7 @@ inter.zeeman.euler={[0.4 0.7 0.2]};
 
 % Basis set
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spin system
 spin_system=create(sys,inter);
@@ -37,7 +37,7 @@ parameters.spins={'13C'};
 parameters.offset=0;
 parameters.rframes={{'13C',1}};
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'Lz','13C');
+parameters.coil=coil_state(spin_system,'Lz','13C','exact');
 parameters.ref_norm=norm(parameters.rho0)*norm(parameters.coil);
 parameters.rf_op=operator(spin_system,'Lx','13C');
 parameters.rf_amp=2*pi*3500;
@@ -62,7 +62,7 @@ inter.zeeman.euler={[0 0 0]};
 
 % Basis set
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spin system
 spin_system=create(sys,inter);

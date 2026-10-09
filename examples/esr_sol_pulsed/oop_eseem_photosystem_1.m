@@ -41,7 +41,7 @@ inter.damp_rate=1.7e6;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -53,7 +53,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,{'Lz','Lz'},{1,2});
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.pulse_op=operator(spin_system,'Ly','E');
 parameters.offset=0;
 parameters.npoints=200;

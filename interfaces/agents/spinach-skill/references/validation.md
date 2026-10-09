@@ -95,3 +95,12 @@ Say exactly what was checked and what could not run: missing MATLAB/license,
 unsupported binary, absent input data, or unavailable allocated resources.
 Deliver a source-grounded script when useful, labelled unexecuted. Do not
 invent measured accuracy, expected output files, or a successful test result.
+
+For concentration-weighted spherical-tensor states, `test_cwdm_states` checks
+exact block-wise weighting and independent thermal references, while
+`test_cwdm_thermalisation` checks 20-second population conservation and IME
+recovery, including zero-population and spin-free blocks. Its shared-identity
+comparison isolates the unit-column source difference algebraically; an actual
+old-kernel comparison additionally requires a separately captured stock result
+and an explicit descriptor embedding. Do not treat the algebraic test as a
+stock execution.

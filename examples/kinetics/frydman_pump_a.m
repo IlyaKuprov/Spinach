@@ -1,6 +1,10 @@
 % Lucio Frydman's water exchange based spin-lock pump, Figure 2
 % from https://doi.org/10.1016/j.jmr.2021.107083
 %
+% Molecular thermal preparation changes the original trajectory by about
+% 1.06e-8 relative. A complete molecular expm reference finds this initial
+% state closer to equilibrium than the former globally truncated state.
+%
 % Calculation time: seconds.
 %
 % mihajlo.novakovic@weizmann.ac.il
@@ -42,24 +46,33 @@ inter.rlx_keep='diagonal';
 inter.equilibrium='IME';
 inter.temperature=298;
 
-% Basis set
+% Peptide and independent water-pool substances
+inter.chem.parts=[{1:4} num2cell(5:(n_water_protons+4))];
+inter.chem.concs=ones(1,n_water_protons+1);
+
+% Per-substance basis settings retain each internal spin space
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4;
-bas.prox_level=1;
+bas.approximation=repmat({'IK-1'},1,n_water_protons+1);
+bas.connectivity=repmat({'scalar_couplings'},1,n_water_protons+1);
+bas.inter_level=[{4} repmat({1},1,n_water_protons)];
+bas.prox_level=repmat({1},1,n_water_protons+1);
 
-% Exchange rates, Hz
-nh_wt_exch_rate=10;  % between NH and nearest water
-wt_wt_exch_rate=1e4; % between all water protons
+% Exchange rates in Hz: NH to nearest water, and between water protons
+nh_wt_exch_rate=10; wt_wt_exch_rate=1e4;
 
-% Exchange rate matrix
-inter.chem.flux_rate=zeros(n_water_protons+4);
-inter.chem.flux_rate(1,5)=nh_wt_exch_rate;
-inter.chem.flux_rate(5,1)=nh_wt_exch_rate;
-inter.chem.flux_rate(5:(5+n_water_protons-1),...
-                     5:(5+n_water_protons-1))=wt_wt_exch_rate;
-inter.chem.flux_type='intermolecular';
+% Replacement swaps the amide proton while retaining the peptide core
+inter.chem.reactions={struct('reactants',[1 2],'products',[1 2],...
+                            'matching',[1 5;2 2;3 3;4 4;5 1],...
+                            'rate',nh_wt_exch_rate)};
+
+% Every water pair exchanges once as a symmetric replacement event
+for n=1:n_water_protons
+    for k=(n+1):n_water_protons
+        inter.chem.reactions{end+1}=struct('reactants',[n+1 k+1],...
+            'products',[n+1 k+1],'matching',[n+4 k+4;k+4 n+4],...
+            'rate',wt_wt_exch_rate);
+    end
+end
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -74,10 +87,10 @@ parameters.cp_npt=100;
 traj=liquid(spin_system,@frydman_pump,parameters,'nmr');
 
 % Observables: peptide bond N-H
-Hz=state(spin_system,{'Lz'},{1});
-Hx=state(spin_system,{'Lx'},{1}); 
-Nz=state(spin_system,{'Lz'},{2});
-Nx=state(spin_system,{'Lx'},{2});
+Hz=coil_state(spin_system,{'Lz'},{1},'exact');
+Hx=coil_state(spin_system,{'Lx'},{1},'exact');
+Nz=coil_state(spin_system,{'Lz'},{2},'exact');
+Nx=coil_state(spin_system,{'Lx'},{2},'exact');
 
 % Project out the observables
 Hz=real(Hz'*traj); Hx=real(Hx'*traj);  
@@ -103,6 +116,9 @@ Ny=operator(spin_system,'Ly',parameters.spins{2});
 
 % Isotropic thermal equilibrium
 rho=equilibrium(spin_system);
+
+% Freeze additive replacement because all concentrations are invariant
+K=K(0,unit_state(spin_system));
 
 % Effective spin-lock Hamiltonian
 spin_system=dictum(spin_system,{'1H'},'ignore');         % Kill Zeeman on H

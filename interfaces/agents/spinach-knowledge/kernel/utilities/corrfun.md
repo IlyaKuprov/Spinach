@@ -28,7 +28,7 @@ Inputs:
 Outputs:
 - `weights` — cell array (one element per chemical species) of vectors listing the weights of the exponential components of the decays.
 - `rates` — cell array (one element per chemical species) of vectors listing the decay rates (negative numbers) of the exponential components.
-- `states` — cell array (one element per chemical species) of logical vectors indicating which states in the basis set belong to which chemical species.
+- `states` — cell array (one element per chemical species) of logical vectors over the direct-sum space. Each vector selects the non-unit states of its substance using `bas.tot_cord{s}>0` and the block offsets; unit coordinates remain excluded.
 
 ## References
 

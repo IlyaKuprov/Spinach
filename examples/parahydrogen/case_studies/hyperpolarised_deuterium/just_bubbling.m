@@ -3,6 +3,9 @@
 % lyst. No pulses, just evolution. Paper link to follow
 % in due course.
 %
+% Pumping scales with the instantaneous free-D2 population. Unlike
+% the former shared-unit source, it decreases as D2 binds to catalyst.
+%
 % thhu@mpinat.mpg.de
 % anakin.aden@mpinat.mpg.de
 % denismoll@hotmail.de
@@ -38,8 +41,10 @@ inter.coordinates={[]; []; % None for D2
 
 % Kinetics
 inter.chem.parts={[1 2],[3 4]};
-inter.chem.rates=[-1  5000;...
-                   1 -5000];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 3; 2 4],'rate',1),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[3 1; 4 2],'rate',5000)};
 inter.chem.concs=[1 0];
 
 % Magnet field
@@ -47,7 +52,7 @@ sys.magnet=7.05;
 
 % Simulation formalsim
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield','t1_t2'};
@@ -76,7 +81,7 @@ rho0=unit_state(spin_system);
 % Detection: all relevant states, traceless
 coils=[S    T{1} T{2} T{3} ...
        Q{1} Q{2} Q{3} Q{4} Q{5}]; 
-coils(1,:)=0;
+coils(spin_system.bas.offsets(1:end-1)+1,:)=0;
 
 % Assumptions
 spin_system=assume(spin_system,'nmr');
@@ -89,7 +94,7 @@ R=relaxation(spin_system);
 KF=kinetics(spin_system);
 
 % Kinetics with bubbling (a guess, needs proper rate)
-pumped_state=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5}; pumped_state(1)=0;
+pumped_state=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5}; pumped_state(spin_system.bas.offsets(1:end-1)+1)=0;
 KB=magpump(spin_system,KF,pumped_state,1e-1);
 
 % Assemble the Liouvillians

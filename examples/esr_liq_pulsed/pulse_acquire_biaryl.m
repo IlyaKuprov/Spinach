@@ -21,11 +21,11 @@ sys.isotopes={'E','14N','1H','1H','1H','1H','1H',...
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'1H','14N'}};
 bas.projections={+1};
-bas.sym_group={'S2','S2','S2','S2','S2','S2'};
-bas.sym_spins={[2 8],[3 9],[4 10],[5 11],[6 12],[7 13]};
+bas.sym_group={{'S2','S2','S2','S2','S2','S2'}};
+bas.sym_spins={{[2 8],[3 9],[4 10],[5 11],[6 12],[7 13]}};
 
 % Zeeman interactions
 inter.zeeman.scalar=cell(13,1);
@@ -62,7 +62,7 @@ spin_system=basis(spin_system,bas);
 % Experiment parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=3e8;

@@ -22,7 +22,7 @@ inter.zeeman.scalar={60.0933};
 
 % Formalism and basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Enable zero track elimination
@@ -44,7 +44,7 @@ parameters.offset=6000;
 parameters.axis_units='Hz';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','79Br');
-parameters.coil=state(spin_system,'L+','79Br');
+parameters.coil=coil_state(spin_system,'L+','79Br','exact');
 
 % Convert magic angle errors to radians
 ma_errors=deg2rad([-1.00 -0.25  0.00  0.25  1.00]);

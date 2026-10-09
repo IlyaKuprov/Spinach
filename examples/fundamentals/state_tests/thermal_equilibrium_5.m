@@ -44,7 +44,7 @@ for n=1:numel(formalisms)
 
         % Basis set
         bas.formalism=formalisms{n};
-        bas.approximation='none';
+        bas.approximation={'none'};
 
         % Enable zero track elimination
         sys.enable={'zte'};
@@ -65,7 +65,7 @@ for n=1:numel(formalisms)
         L=hamiltonian(spin_system)+1i*relaxation(spin_system);
 
         % Get recovery trajectories
-        coil=state(spin_system,'Lz','19F');
+        coil=coil_state(spin_system,'Lz','19F','exact');
         traj{n,k}=evolution(spin_system,L,coil,rho,1e-3,1000,'observable');
 
     end

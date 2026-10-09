@@ -24,7 +24,7 @@ inter.coupling.matrix{2,2}=castep2nqi([ 0.1580  0.0340 -0.5562
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Enable zero track elimination, with optional GPU arithmetic
@@ -50,7 +50,7 @@ parameters.decouple={};
 parameters.axis_units='MHz';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','17O');
-parameters.coil=state(spin_system,'L+','17O');
+parameters.coil=coil_state(spin_system,'L+','17O','exact');
 parameters.verbose=0;
 
 % Simulation

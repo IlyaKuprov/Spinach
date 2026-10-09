@@ -156,19 +156,19 @@ spin_system.chem.parts={[1 2]};
 spin_system.inter.zeeman.matrix={zeros(3);zeros(3)};
 spin_system.inter.giant.coeff=cell(2,1);
 spin_system.inter.coupling.matrix=cell(2,2);
-spin_system.bas.basis=[0 0;1 0;0 1;1 1];
+spin_system.bas.basis={[0 0;1 0;0 1;1 1]};
 bas.sym_group={'S2'};
 bas.sym_spins={[1 2]};
 bas.sym_a1g_only=true;
 spin_system=symmetry(spin_system,bas);
-projector=spin_system.bas.irrep.projector;
+projector=spin_system.bas.sym_fact.irr_projectors{1};
 result=test_close(result,'symmetry projector orthonormality',projector'*projector,eye(3),...
                   1e-14,1e-14,...
                   'A1g orbit projectors should be orthonormal after orbit normalisation');
 result=test_close(result,'symmetry mixed orbit',abs(projector(:,2)),[0;1;1;0]/sqrt(2),...
                   1e-14,1e-14,...
                   'the mixed S2 orbit must symmetrise the two exchanged basis states');
-result=test_close(result,'symmetry irrep dimension',spin_system.bas.irrep.dimension,3,...
+result=test_close(result,'symmetry irrep dimension',spin_system.bas.sym_fact.irr_dimensions,3,...
                   1e-14,1e-14,...
                   'the four-state basis has three S2 orbit representatives in the A1g irrep');
 
@@ -184,7 +184,7 @@ sys.magnet=magnet;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism=formalism;
-bas.approximation='none';
+bas.approximation={'none'};
 if strcmp(formalism,'sphten-liouv')
     bas.projections={+1};
 end
@@ -200,7 +200,9 @@ spin_system.sys.output='hush';
 spin_system.sys.enable={};
 spin_system.sys.disable={};
 spin_system.bas.formalism=formalism;
-spin_system.bas.basis=zeros(dim,1);
+spin_system.bas.basis={zeros(dim,1)};
+spin_system.bas.offsets=[0;dim]; spin_system.bas.nsubst=1;
+spin_system.bas.nstates=dim; spin_system.chem.parts={1};
 spin_system.comp.mults=2;
 spin_system.tols.inter_cutoff=1e-10;
 spin_system.tols.liouv_zero=1e-12;

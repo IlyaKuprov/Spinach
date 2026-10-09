@@ -19,7 +19,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % A pair of spins at a distance, A
 sys.isotopes={'1H','15N'};
@@ -46,7 +46,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % A pair of spins at a distance, B
 sys.isotopes={'1H','15N'};

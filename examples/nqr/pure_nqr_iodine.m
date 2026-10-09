@@ -13,7 +13,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(560e6,0.01,5/2,[0 0 0]);
 
 % Formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -35,7 +35,7 @@ parameters.needs={'aniso_eq'};
 parameters.sweep=5e8;
 parameters.npoints=512;
 parameters.grid='rep_2ang_200pts_sph';
-parameters.coil=state(spin_system,'L+','127I');
+parameters.coil=coil_state(spin_system,'L+','127I','exact');
 parameters.pulse_op=operator(spin_system,'Lx','127I');
 parameters.pulse_angle=pi/2;               
 parameters.axis_units='MHz';

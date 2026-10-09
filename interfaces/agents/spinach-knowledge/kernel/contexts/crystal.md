@@ -25,3 +25,7 @@ The source states the angle and offset units explicitly: radians for orientation
 ## Source-supported examples
 
 Use a single orientation such as `[0 0 0]` for the input orientation. The header's channel example is `{'1H','13C'}`; its rotating-frame example specifies order 2 for carbon-13 and order 3 for nitrogen-14. Those examples describe channel/frame choices, not simulated outputs.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:crystal:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

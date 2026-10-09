@@ -26,7 +26,7 @@ sys.magnet=1;
 sys.isotopes={'E'};
 inter.zeeman.matrix={2.0023*eye(3)};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Set field-swept EPR parameters with a deliberately loose recursion gate

@@ -26,7 +26,7 @@ result=new_test_result('kernel/hilb_pulse_prop',...
 % Build a quiet spin-half system
 sys.magnet=0; sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Define complex noncommuting generators and two positive density matrices

@@ -30,13 +30,13 @@ inter.coupling.scalar{5,6}=23;
 % Spins 1,2,3 are molecule A; spins 4,5,6 are molecule B
 inter.chem.parts={[1 2 3],[4 5 6]};
 
-% Kinetic rate matrix (Hz)
-inter.chem.rates=[0 0; 0 0];
+% Independent substances without chemical exchange
+inter.chem.reactions={};
 inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Disable path tracing
 sys.disable={'pt'};
@@ -71,7 +71,7 @@ parameters.rho0_ph={1-left,1-right};
 parameters.rho0_st={state(spin_system,'Lz',[1 2 3]),...
                     state(spin_system,'Lz',[4 5 6])};
 parameters.coil_ph={ones(parameters.npts)};
-parameters.coil_st={state(spin_system,'Lx','1H')};
+parameters.coil_st={coil_state(spin_system,'Lx','1H','exact')};
 
 % No diffusion or flow
 parameters.u=zeros(parameters.npts);

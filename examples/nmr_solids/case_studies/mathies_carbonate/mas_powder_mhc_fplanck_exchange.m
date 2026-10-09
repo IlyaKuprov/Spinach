@@ -44,16 +44,18 @@ inter.coordinates{4}=props.std_geom(1,:);
 % Chemical kinetics endpoints
 inter.chem.parts={[1 2],[3 4]};
 
-% Reaction rate matrix, Hz
-inter.chem.rates=2e3*[-1  1; 
-                       1 -1];
+% Directed first-order exchange, Hz
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 3; 2 4],'rate',2e3),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[3 1; 4 2],'rate',2e3)};
 
 % Initial concentrations (arb. units)
 inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -72,7 +74,7 @@ parameters.npoints=512;
 parameters.zerofill=1024;
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Simulation
 fid=singlerot(spin_system,@acquire,parameters,'nmr');

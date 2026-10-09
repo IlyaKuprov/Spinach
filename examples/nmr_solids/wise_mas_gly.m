@@ -24,8 +24,8 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,7,8.0);   % H_N
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3;
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 
 % Ignore interactions below 200 Hz
 sys.tols.inter_cutoff=200;
@@ -55,7 +55,7 @@ parameters.invert_axis=1;
 parameters.verbose=0;
 
 % Detection state
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 
 % Simulation
 fid=singlerot(spin_system,@wise,parameters,'nmr');

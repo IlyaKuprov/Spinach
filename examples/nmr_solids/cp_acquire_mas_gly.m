@@ -29,8 +29,8 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3;
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 
 % Algorithmic options
 sys.enable={'zte','greedy'}; % 'gpu'
@@ -60,7 +60,7 @@ parameters.needs={'iso_eq'};   % initial condition
 parameters.verbose=1;
 
 % Detection state
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 
 % Simulation
 fid=singlerot(spin_system,@cp_acquire_soft,parameters,'nmr');

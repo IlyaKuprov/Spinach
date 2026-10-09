@@ -29,7 +29,7 @@ inter.tau_c={25e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable startup checks
 sys.disable={'hygiene'};

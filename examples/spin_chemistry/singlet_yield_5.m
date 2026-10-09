@@ -22,7 +22,7 @@ inter.coupling.scalar{4,4}=0;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Magnetic field and kinetics
 parameters.fields=linspace(0,0.5*20/1e4,200);

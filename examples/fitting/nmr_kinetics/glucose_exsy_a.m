@@ -115,20 +115,32 @@ inter.chem.parts={[1  2  3  4],...  % Alpha, inside
                   [13 14 15 16]};   % Beta,  outside
 
 % Reaction rate matrix
-inter.chem.rates=[-params(1)  params(2)  0           0;          
+rates=[-params(1)  params(2)  0           0;
                    params(1) -params(2)  0           0;         
                    0          0         -params(33)  params(34); 
                    0          0          params(33) -params(34)];
 
+% Directed reaction records from the trial rates
+source=[1 2 3 4]; target=[2 1 4 3];
+inter.chem.reactions=cell(1,numel(source));
+for n=1:numel(source)
+
+    % Preserve corresponding fluorines between the exchanging pools
+    inter.chem.reactions{n}=struct('reactants',source(n),...
+        'products',target(n),'rate',rates(target(n),source(n)),...
+        'matching',[inter.chem.parts{source(n)}' inter.chem.parts{target(n)}']);
+
+end
+
 % Equilibrium concentrations with alpha-beta imbalance
-inter.chem.concs=equilibrate(inter.chem.rates,[6-params(32);
+inter.chem.concs=equilibrate(rates,[6-params(32);
                                                0; 
                                                4+params(32); 
                                                0]);
               
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
@@ -150,7 +162,7 @@ parameters.npoints=[256 256];
 parameters.zerofill=[1024 512];
 parameters.spins={'19F'};
 parameters.axis_units='ppm';
-parameters.rho0=state(spin_system,'Lz','19F','chem');
+parameters.rho0=state(spin_system,'Lz','19F');
 
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');

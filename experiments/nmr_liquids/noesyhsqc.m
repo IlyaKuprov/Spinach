@@ -73,7 +73,7 @@ delta=abs(1/(4*parameters.J));
 
 % Initial and detection states
 rho=state(spin_system,'Lz','1H','cheap');
-coil=state(spin_system,'L+','1H','cheap');
+coil=coil_state(spin_system,'L+','1H','cheap');
 
 % Pulse operators
 Hx=operator(spin_system,'Lx','1H'); 

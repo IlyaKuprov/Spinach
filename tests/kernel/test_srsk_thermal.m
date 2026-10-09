@@ -28,7 +28,7 @@ inter.relaxation={'t1_t2','SRSK'}; inter.srsk_sources=2;
 inter.r1_rates={1,1e5}; inter.r2_rates={1,1e5};
 inter.equilibrium='zero'; inter.temperature=1;
 inter.rlx_keep='labframe'; inter.rlx_dfs='keep';
-bas.formalism='sphten-liouv'; bas.approximation='none';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 keep_modes={'labframe','diagonal','kite','secular'};
 methods={'IME','dibari'}; angles=[0.3 0.7 0.2];
 

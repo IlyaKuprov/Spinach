@@ -43,7 +43,7 @@ inter.tau_c={1e-14,1e-14};
 
 % Complete basis and explicit numerical options
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 sys.parallel={'processes',4};
 
 % Forward collision rates and fixed reverse rate, in Hz
@@ -65,8 +65,11 @@ for n=1:numel(collision_rates)
 
     % Column-conserving kinetics and normalised stationary populations
     forward_rate=collision_rates(n);
-    inter.chem.rates=[-forward_rate reverse_rate;...
-                      forward_rate -reverse_rate];
+    inter.chem.reactions={...
+        struct('reactants',1,'products',2,'matching',[1 3;2 4],...
+               'rate',forward_rate),...
+        struct('reactants',2,'products',1,'matching',[3 1;4 2],...
+               'rate',reverse_rate)};
     inter.chem.concs=[reverse_rate forward_rate]/(forward_rate+reverse_rate);
 
     % Spinach housekeeping
@@ -74,8 +77,8 @@ for n=1:numel(collision_rates)
     spin_system=basis(spin_system,bas);
 
     % Chemical-population-weighted excitation and unweighted detection
-    parameters.rho0=state(spin_system,'L+','19F','chem');
-    parameters.coil=state(spin_system,'L+','19F');
+    parameters.rho0=state(spin_system,'L+','19F');
+    parameters.coil=coil_state(spin_system,'L+','19F','exact');
 
     % Laboratory-frame frequency-domain spectrum
     spectrum=liquid(spin_system,@slowpass,parameters,'labframe');

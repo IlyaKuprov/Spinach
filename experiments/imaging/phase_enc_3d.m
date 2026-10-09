@@ -89,7 +89,7 @@ parameters.rho0=step(spin_system,Sy,parameters.rho0,pi);
 parameters.rho0=evolution(spin_system,B,[],parameters.rho0,parameters.t_echo,1,'final');
      
 % Project out Hx+1i*Hy in every voxel
-mri_slice=fpl2phan(parameters.rho0,state(spin_system,'L+','1H'),parameters.npts);
+mri_slice=fpl2phan(parameters.rho0,coil_state(spin_system,'L+','1H','exact'),parameters.npts);
 
 % Get sample dimension information
 dims=zeros(1,6); 

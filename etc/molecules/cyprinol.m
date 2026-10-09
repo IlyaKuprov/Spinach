@@ -178,10 +178,10 @@ inter.coupling.scalar((numH+1):end,(numH+1):end)=CC_J;
 inter.coupling.scalar((numH+1):end,1:numH)=CH_J;
 
 % Symmetry settings
-bas.sym_group={'S3','S3','S3'};
-bas.sym_spins={[H21a H21b H21c],...
+bas.sym_group={{'S3','S3','S3'}};
+bas.sym_spins={{[H21a H21b H21c],...
                [H18a H18b H18c],...
-               [H19a H19b H19c]};
+               [H19a H19b H19c]}};
 
 end
 

@@ -22,7 +22,7 @@ inter.coupling.scalar{2,3}=20*rand(1);
 
 % Set the basis 
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -44,7 +44,7 @@ rho=rand(size(H,1),1);
 rho(1)=1; rho=rho./norm(rho);
  
 % Determine projection quantum numbers of the basis
-[~,M]=lin2lm(spin_system.bas.basis);
+[~,M]=lin2lm(spin_system.bas.basis{1});
 
 % Determine the coherence order of each state
 coherence_orders=sum(M,2);

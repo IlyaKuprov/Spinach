@@ -28,7 +28,7 @@ sys.magnet=3772062842.904/spin('1H');
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Set up a zero-offset acquisition

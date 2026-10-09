@@ -29,7 +29,7 @@ inter.tau_c={10e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -41,7 +41,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters - 1H
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=6.9*500;
 parameters.sweep=50;

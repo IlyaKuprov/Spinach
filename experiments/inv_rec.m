@@ -45,7 +45,7 @@ L=H+1i*R+1i*K;
 rho0=equilibrium(spin_system);
 
 % Get the detection state
-coil=state(spin_system,'L+',parameters.spins{1});
+coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
 
 % Get the pulse operator
 Lp=operator(spin_system,'L+',parameters.spins{1}); Ly=(Lp-Lp')/2i;

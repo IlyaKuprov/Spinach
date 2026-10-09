@@ -27,10 +27,10 @@ inter.coupling.scalar=num2cell(mt2hz([0       0   0.295  0.295  0.295  0.295  0.
                                  
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={0};
-bas.sym_spins={[3 4 5 6 7 8]};
-bas.sym_group={'S6'};
+bas.sym_spins={{[3 4 5 6 7 8]}};
+bas.sym_group={{'S6'}};
                                   
 % Fields and kinetics parameters
 parameters.rates=[0.176 0.880 1.76 3.52 8.8 17.6 35.2 52.8]*1e6;

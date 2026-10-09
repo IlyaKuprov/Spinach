@@ -516,3 +516,10 @@ Multi-substance Zeeman operator construction remains explicitly unsupported.
 Symmetry factorisations live in `bas.sym_fact(n)`. `reduce` and `rspt_eig`
 embed their local projector columns using `bas.offsets`; do not read the
 retired global `bas.irrep` field.
+
+Converters preserve the substance direct sum. `sphten2zeeman` maps each
+unit coordinate to `vec(I_D)` (Hilbert trace divided by `D` is the source
+unit coordinate). `hilb2liouv` accepts explicit cells of Hilbert blocks;
+numeric matrices retain their single-block meaning. `sim2liouv` uses
+compiled block dimensions, migrates `sym_fact`, and refreshes the hash
+from the descriptor cells, new dimensions, and substance membership.

@@ -224,6 +224,10 @@ is how inverted spin temperatures are specified.
 | `'IME'` | Inhomogeneous master equation: `equilibrium.m` supplies the lab frame equilibrium state and R is corrected to drive the system there |
 | `'dibari'` | DiBari-Levitt: R is multiplied by the imaginary-time propagator of the lab frame Hamiltonian left side product superoperator |
 
+`equilibrium` checks each Liouville Hamiltonian block on its own unit state;
+a vanishing action raises `Spinach:equilibrium:notLeftProduct` with the substance
+number. Spin-free blocks in segmented spherical-tensor systems are exempt.
+
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
 state population to be exactly 1; general propagation does not enforce initial
 normalisation, so a badly normalised state gives incorrect source amplitudes.

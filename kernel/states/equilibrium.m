@@ -104,9 +104,17 @@ switch spin_system.bas.formalism
 
         end
 
-        % Catch silly calls
-        if norm(I*unit,1)<1e-10
-            error('H and Q must be left side product superops, not commutation superops.');
+        % Check the Hamiltonian action on each substance's own unit state
+        for n=1:spin_system.bas.nsubst
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
+               (spin_system.bas.nsubst>1)&&isempty(spin_system.chem.parts{n})
+                continue
+            end
+            if norm(I(idx,idx)*unit(idx),1)<1e-10
+                error('Spinach:equilibrium:notLeftProduct',...
+                      'H and Q must be left side product superops, not commutation superops (substance %d).',n);
+            end
         end
 
         % Propagate unit state in imaginary time

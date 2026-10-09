@@ -194,4 +194,36 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
                       expected,1e-14,1e-14,'the supported truncated coherent product is unchanged');
 end
 
+% Validate the Hamiltonian action independently in both equilibrium blocks
+sys=struct('magnet',1,'isotopes',{{'1H','1H'}}); inter=struct();
+inter.chem.parts={1,2}; inter.chem.concs=[1 1]; inter.temperature=298;
+bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
+s=test_spin_system(sys,inter,bas);
+left=operator(s,'Lz',1,'left')+operator(s,'Lz',2,'left');
+for n=1:2
+    idx=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    mixed=left; comm=operator(s,'Lz',n); mixed(idx,idx)=comm(idx,idx);
+    rejected=false;
+    try
+        equilibrium(s,mixed);
+    catch err
+        rejected=strcmp(err.identifier,'Spinach:equilibrium:notLeftProduct')&&...
+                 contains(err.message,['substance ' int2str(n)]);
+    end
+    result=test_true(result,['mixed equilibrium block ' int2str(n)],rejected,...
+                     'a valid left product cannot hide a commutator in another substance');
+    fprintf('CWDM_EQUILIBRIUM_MIXED block=%d named_rejection=%d\n',n,rejected);
+end
+
+% Proper left products retain their independently normalised Boltzmann states
+rho=equilibrium(s,left); unit=unit_state(s);
+beta=s.tols.hbar/(s.tols.kbol*s.rlx.temperature);
+for n=1:2
+    idx=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    expected=expm(-beta*full(left(idx,idx)))*unit(idx);
+    expected=expected/dot(unit(idx),expected);
+    result=test_close(result,['valid equilibrium block ' int2str(n)],rho(idx),expected,...
+                      1e-14,1e-14,'each valid block retains its Boltzmann state');
+end
+
 end

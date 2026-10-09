@@ -29,13 +29,17 @@
 %
 % Outputs:
 %
-%     R       - thermalized relaxation superoperator
+%     R       - thermalized relaxation superoperator; in zeeman-hilb
+%               IME, @(t,rho) returns the matrix derivative instead
 %
 % Note: IME is applied independently to each substance block. The target
 %       states in this construction are unweighted, with unit population
 %       at every substance unit coordinate. Acting on weighted states
 %       scales the target by the instantaneous population, including zero.
 %       Cross-substance blocks of R are not supported in IME.
+%       Hilbert IME takes R in vectorised per-substance Liouville blocks
+%       (dimension sum(D_n^2)) and a block-diagonal unit-trace rho_eq. Its
+%       output is a matrix RHS, not a Hamiltonian or a step generator.
 %
 % Note: DiBari-Levitt method is computationally expensive, but tends to
 %       work better than IME, particularly in exotic regimes.
@@ -49,6 +53,21 @@ function R=thermalize(spin_system,R,HLSPS,T,rho_eq,method)
 
 % Check consistency
 grumble(spin_system,R,HLSPS,T,rho_eq,method);
+
+% Expose Hilbert IME as a matrix derivative rather than a Hamiltonian
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&strcmp(method,'IME')
+    blocks=cell(spin_system.bas.nsubst,1);
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        blocks{n}=rho_eq(idx,idx);
+    end
+    zeeman=spin_system; zeeman.bas.formalism='zeeman-liouv';
+    zeeman.bas.nstates=spin_system.bas.nstates.^2;
+    zeeman.bas.offsets=[0;cumsum(zeeman.bas.nstates)];
+    R=thermalize(zeeman,R,[],[],hilb2liouv(blocks,'statevec'),'IME');
+    R=@(t,rho)hilb_action(spin_system,R,t,rho);
+    return
+end
 
 % Choose the method
 switch method
@@ -89,8 +108,28 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,R,HLSPS,T,rho_eq,method)
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:thermalize:wavefunction',...
+          'thermalisation is not supported in zeeman-wavef formalism.');
+end
 if (~isnumeric(R))||(size(R,1)~=size(R,2))
     error('R must be a square matrix.');
+end
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&ischar(method)&&strcmp(method,'IME')
+    dim=spin_system.bas.offsets(end);
+    if size(R,1)~=sum(spin_system.bas.nstates.^2)||any(~isfinite(R),'all')
+        error('Spinach:thermalize:hilbertMap','Hilbert IME requires a finite direct-sum Liouville relaxation map.');
+    end
+    if ~isnumeric(rho_eq)||~isequal(size(rho_eq),[dim dim])||any(~isfinite(rho_eq),'all')
+        error('Spinach:thermalize:hilbertTarget','Hilbert IME requires a finite block-diagonal target matrix.');
+    end
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        if nnz(rho_eq(idx,:))~=nnz(rho_eq(idx,idx))
+            error('Spinach:thermalize:hilbertTarget','Hilbert IME requires a finite block-diagonal target matrix.');
+        end
+    end
+    return
 end
 unit_system=spin_system; unit_system.chem.concs(:)=1;
 unit=unit_state(unit_system);

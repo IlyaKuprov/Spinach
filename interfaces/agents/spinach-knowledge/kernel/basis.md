@@ -47,4 +47,6 @@ Each substance starts with fresh local options. In particular, deriving `prox_le
 
 Before compilation, the union of `chem.parts` must equal every global spin index; an omitted spin raises `Spinach:basis:incompletePartition`. Empty spin-free substances remain valid when the other parts cover all spins.
 
+Wavefunction direct-sum storage uses the local Hilbert dimensions, including scalar spin-free blocks. Nonempty reaction records raise `Spinach:basis:wavefunctionChemistry`: chemical reactions are not supported in zeeman-wavef formalism.
+
 Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.

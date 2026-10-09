@@ -236,6 +236,10 @@ if ~isfield(bas,'formalism')||~ischar(bas.formalism)||...
    ~ismember(bas.formalism,{'sphten-liouv','zeeman-hilb','zeeman-liouv','zeeman-wavef'})
     error('a supported bas.formalism string is required.');
 end
+if strcmp(bas.formalism,'zeeman-wavef')&&~isempty(spin_system.chem.reactions)
+    error('Spinach:basis:wavefunctionChemistry',...
+          'chemical reactions are not supported in zeeman-wavef formalism.');
+end
 fields=setdiff(fieldnames(bas),{'formalism'});
 for n=1:numel(fields)
     if ~iscell(bas.(fields{n}))||numel(bas.(fields{n}))~=numel(spin_system.chem.parts)

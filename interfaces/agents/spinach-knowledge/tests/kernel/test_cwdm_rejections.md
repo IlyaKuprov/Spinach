@@ -8,7 +8,7 @@ local symmetry index is rejected with the local spin-label error message.
 
 Both Hilbert and Liouville segmented Zeeman systems must raise the named `segmentedZeeman` error from `correlation`, `decouple`, and `homospoil`, as well as from `basis` when permutation symmetry is requested.
 
-The same named rejection is required from `unit_state` and all three accepted call forms of `equilibrium`, for both Zeeman formalisms. Single-substance units are compared exactly with their stock normalisations; single-substance equilibrium is compared with an explicit trace-normalised Boltzmann exponential at absolute and relative whole-array tolerances of `1e-10`.
+Single-substance units are compared exactly with their stock normalisations; single-substance equilibrium is compared with an explicit trace-normalised Boltzmann exponential at absolute and relative whole-array tolerances of `1e-10`.
 
 A two-substance wavefunction fixture with local dimensions two and four requires `Spinach:state:segmentedZeeman`; the corresponding single-substance fully polarised three-spin wavefunction is compared exactly with its eight-component reference.
 
@@ -23,7 +23,5 @@ Mixed left-product/commutator equilibrium inputs are rejected in both block orde
 Exactly zero spinful Hamiltonian blocks in both positions retain the local unit state while the other block retains its independently normalised Boltzmann state.
 
 Cross-substance Hamiltonian entries in either direction, supplied through `I` or the oriented `Q`, must raise `Spinach:equilibrium:crossSubstanceHamiltonian`.
-
-A segmented Zeeman-Liouville state request must raise `Spinach:state:segmentedZeeman` directly, rather than reaching the later operator rejection after global identity allocation.
 
 Cross-substance generator entries in either direction must raise `Spinach:reduce:crossSubstanceGenerator` through both `reduce` and `evolution`. With numerical clean-up disabled, supported block-diagonal evolution is compared with the full matrix exponential at absolute and relative whole-vector tolerances of `1e-12`.

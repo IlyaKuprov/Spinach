@@ -55,7 +55,9 @@
 % All four arguments are required; method is ignored in Zeeman formalisms.
 %
 % The result is unweighted in every formalism. Use state for initial
-% populations weighted by substance concentrations.
+% populations weighted by substance concentrations. Wavefunction output is
+% a direct sum of unweighted product kets, one per substance; this storage
+% representation does not support concentration weighting or chemistry.
 %
 % Outputs:
 %
@@ -117,7 +119,12 @@ switch spin_system.bas.formalism
     case 'zeeman-liouv'
 
         % Vectorise the unweighted Hilbert identity
-        unit=speye(prod(spin_system.comp.mults)); unit=unit(:);
+        blocks=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+            blocks{n}=block(:);
+        end
+        unit=vertcat(blocks{:});
 
 end
 
@@ -180,27 +187,23 @@ switch spin_system.bas.formalism
 
     case 'zeeman-wavef'
 
-        % Start the wavefunction
-        psi=1;
+        % Store one unweighted product ket per substance
+        blocks=cell(spin_system.bas.nsubst,1);
+        for s=1:spin_system.bas.nsubst
+            psi=1;
+            for n=spin_system.chem.parts{s}
 
-        % Loop over spins
-        for n=1:spin_system.comp.nspins
+                % Select the requested local projection eigenstate
+                current_mult=spin_system.comp.mults(n);
+                current_spin=(current_mult-1)/2;
+                levels=fliplr((-current_spin):(current_spin));
+                current_psi=double(levels==states(n));
+                psi=kron(psi,transpose(current_psi));
 
-            % Find out the multiplicity and spin
-            current_mult=spin_system.comp.mults(n);
-            current_spin=(current_mult-1)/2;
-
-            % Find out which level we are in
-            levels=fliplr((-current_spin):(current_spin));
-            current_psi=double(levels==states(n));
-            
-            % Kronecker the spin in
-            psi=kron(psi,transpose(current_psi));
-
+            end
+            blocks{s}=psi;
         end
-
-        % Adapt to the output
-        rho=psi;
+        rho=vertcat(blocks{:});
 
     otherwise
         
@@ -223,11 +226,6 @@ end
 if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
                                         'sphten-liouv','zeeman-wavef'})
     error('unknown formalism specification.');
-end
-if ismember(spin_system.bas.formalism,{'zeeman-wavef','zeeman-liouv'})&&...
-   spin_system.bas.nsubst>1
-    error('Spinach:state:segmentedZeeman',...
-          'segmented Zeeman wavefunction and Liouville states are not implemented.');
 end
 
 if ~ischar(method)

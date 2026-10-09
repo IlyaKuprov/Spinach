@@ -58,7 +58,8 @@
 %
 % Every density-matrix and Liouville method weights each substance block
 % by chem.concs. Use coil_state for unweighted detection operators.
-% Storage-only wavefunctions remain unweighted. The method is ignored in
+% Single-substance wavefunctions remain unweighted; segmented wavefunction
+% requests are rejected (use coil_state for unweighted ket storage). The method is ignored in
 % Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
 %
 % Outputs:
@@ -115,10 +116,10 @@ if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
                                         'sphten-liouv','zeeman-wavef'})
     error('unknown formalism specification.');
 end
-if ismember(spin_system.bas.formalism,{'zeeman-wavef','zeeman-liouv'})&&...
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')&&...
    spin_system.bas.nsubst>1
     error('Spinach:state:segmentedZeeman',...
-          'segmented Zeeman wavefunction and Liouville states are not implemented.');
+          'concentration-weighted states are not supported in segmented zeeman-wavef formalism.');
 end
 
 if ~ischar(method)

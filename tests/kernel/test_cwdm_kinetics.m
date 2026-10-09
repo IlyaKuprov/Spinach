@@ -190,6 +190,20 @@ catch err
 end
 result=test_true(result,'voxel length guard',rejected,'each voxel must contain a complete spin block');
 
+% Reject ambiguous matched product copies but retain spin-free stoichiometry
+repeated=s.chem.reactions{1}; repeated.products=[3 3]; rejected=false;
+try
+    react_gen(s,repeated);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:react_gen:repeatedProductMatching');
+end
+result=test_true(result,'repeated product matching guard',rejected,...
+                 'global destination labels cannot distinguish molecular product occurrences');
+repeated.products=[4 4]; repeated.matching=zeros(0,2);
+free=s; free.chem.reactions={repeated}; free_gen=kinetics(free); free_eta=unit_state(free);
+result=test_close(result,'repeated spin-free products',chem_concs(free,free_gen(0,free_eta)*free_eta),...
+                  [-10.5 -10.5 0 21],1e-12,0,'two unlabelled product occurrences carry twice the event population');
+
 % Fourth-order convergence through the shipped state-dependent stepper
 eta=unit_state(s); rhs=@(t,y)K(t,y)*y;
 [~,trajectory]=ode45(rhs,[0 0.02],full(eta),odeset('RelTol',1e-12,'AbsTol',1e-14));

@@ -577,10 +577,10 @@ cells too; bypassing `basis` does not restore the retired global layout.
 
 `bootstrap` follows the same one-cell approximation contract as physical systems.
 
-Legacy two-substance chemistry test fixtures also require two approximation
-cells. The generator and invariant suites test supported single-substance
-flux and empty reaction maps; the generator suite explicitly asserts the WP3
-rejection boundary instead of claiming numerical exchange validation.
+Two-substance chemistry fixtures require two approximation cells. The
+generator and invariant suites cover positive matched multi-substance
+reaction maps, explicit first-order exchange, routing, and conservation,
+alongside single-substance spin permutations and empty reaction maps.
 
 Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
 multi-substance Zeeman symmetry, analytical filters, unit states, and equilibrium

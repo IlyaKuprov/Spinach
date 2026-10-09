@@ -20,7 +20,8 @@ A two-substance IME T1/T2 fixture checks both `steady` methods against
 independently constructed single-substance equilibria, with empty and nonzero
 initial guesses. Every unit coordinate stays exactly one despite unequal
 chemical concentrations. Later-block trace-row and initial-normalisation
-violations are rejected.
+violations are rejected. Both solvers must also reject an identity-propagator
+block paired with a thermalised block, with each substance tested in turn.
 
 Pumping targets in the second substance and both substances are checked
 against their own unit columns. Unequal unit populations distinguish local

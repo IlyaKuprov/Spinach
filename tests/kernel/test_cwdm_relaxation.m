@@ -181,6 +181,25 @@ for method={'newton','squaring'}
             method{1},norm(actual-reference),mat2str(actual(units)'));
 end
 
+% Reject either unthermalised block even when its partner is thermalised
+for n=1:2
+    block=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    bad=P; bad(block,block)=eye(numel(block));
+    for method={'newton','squaring'}
+        rejected=false;
+        try
+            steady(s,bad,[],method{1});
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:steady:unthermalisedSubstance')&&...
+                     contains(err.message,sprintf('substance %d',n));
+        end
+        result=test_true(result,sprintf('steady mixed %d %s',n,method{1}),rejected,...
+                         'every substance must have its own thermalisation source');
+        fprintf('CWDM_STEADY_MIXED block=%d method=%s named_rejection=%d\n',...
+                n,method{1},rejected);
+    end
+end
+
 % Refuse loss of trace conservation or normalisation in a later substance
 bad=P; bad(units(2),units(2)+1)=0.1; rejected=false;
 try

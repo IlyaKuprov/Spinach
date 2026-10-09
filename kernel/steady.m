@@ -192,9 +192,12 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     if nnz(P(units,:)-traces)~=0
         error('P must conserve every substance unit coordinate.');
     end
-    active=true(size(P,1),1); active(units)=false;
-    if norm(P(active,units),'fro')==0
-        error('the relaxation superoperator must be thermalised.');
+    for n=1:numel(units)
+        active=(units(n)+1):spin_system.bas.offsets(n+1);
+        if norm(P(active,units(n)),2)==0
+            error('Spinach:steady:unthermalisedSubstance',...
+                  'the relaxation superoperator must be thermalised in substance %d.',n);
+        end
     end
 else
     dim=sqrt(size(P,2)); u0=speye(dim); u0=u0(:);

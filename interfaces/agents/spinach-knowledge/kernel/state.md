@@ -30,3 +30,5 @@ The `exact` and `cheap` sphten constructors return unweighted direct-sum vectors
 The output variable is conventionally `rho` (or `psi` in the wavefunction example); its representation is determined by the formalism. In `sphten-liouv`, a requested state must be present unambiguously in the configured basis; absent or ambiguous basis descriptors raise an error. Wavefunction mode requires one projection value per spin. Do not use the `'cheap'` result when correctly normalised state amplitudes are required.
 
 Source and credits: [Spinach Wiki: state.m](https://spindynamics.org/wiki/index.php?title=state.m). D. Savostyanov, Luke Edwards, and Ilya Kuprov (contact details are in the source file).
+
+Segmented `zeeman-wavef` calls raise `Spinach:state:segmentedZeeman` before construction: the global tensor product is not a state in the substance direct sum. Single-substance wavefunctions retain their existing projection-number API.

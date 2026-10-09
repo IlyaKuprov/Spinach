@@ -594,3 +594,6 @@ through `sys.disable` does not prevent an imaging calculation.
 
 Per-substance `space_level` aliases are derived independently; an empty entry
 does not inherit the preceding substance's proximity depth.
+
+Segmented wavefunction state construction is deferred and raises
+`Spinach:state:segmentedZeeman`; single-substance wavefunctions are unchanged.

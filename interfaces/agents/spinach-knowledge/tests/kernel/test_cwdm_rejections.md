@@ -9,3 +9,5 @@ local symmetry index is rejected with the local spin-label error message.
 Both Hilbert and Liouville segmented Zeeman systems must raise the named `segmentedZeeman` error from `correlation`, `decouple`, and `homospoil`, as well as from `basis` when permutation symmetry is requested.
 
 The same named rejection is required from `unit_state` and all three accepted call forms of `equilibrium`, for both Zeeman formalisms. Single-substance units are compared exactly with their stock normalisations; single-substance equilibrium is compared with an explicit trace-normalised Boltzmann exponential at absolute and relative whole-array tolerances of `1e-10`.
+
+A two-substance wavefunction fixture with local dimensions two and four requires `Spinach:state:segmentedZeeman`; the corresponding single-substance fully polarised three-spin wavefunction is compared exactly with its eight-component reference.

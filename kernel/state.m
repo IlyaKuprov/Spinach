@@ -281,6 +281,10 @@ if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
                                         'sphten-liouv','zeeman-wavef'})
     error('unknown formalism specification.');
 end
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')&&spin_system.bas.nsubst>1
+    error('Spinach:state:segmentedZeeman',...
+          'segmented Zeeman wavefunction states are not implemented.');
+end
 
 % Check method
 if ~ischar(method)

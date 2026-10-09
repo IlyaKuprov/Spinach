@@ -118,6 +118,25 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
                      'only genuinely segmented Zeeman symmetry is rejected');
 end
 
+% Segmented wavefunctions cannot represent the compiled direct sum
+sys.isotopes={'1H','1H','1H'};
+inter=struct(); inter.chem.parts={1,2:3}; inter.chem.concs=[1 0];
+bas=struct('formalism','zeeman-wavef','approximation',{{'none','none'}});
+s=test_spin_system(sys,inter,bas); rejected=false;
+try
+    state(s,[0.5 0.5 0.5]);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:state:segmentedZeeman');
+end
+result=test_true(result,'segmented wavefunction',rejected,...
+                 'unsupported segmented wavefunctions raise a named error');
+inter=struct(); bas.approximation={'none'};
+s=test_spin_system(sys,inter,bas);
+result=test_close(result,'single-substance wavefunction',...
+                  state(s,[0.5 0.5 0.5]),sparse(1,1,1,8,1),0,0,...
+                  'the existing tensor-product wavefunction is retained for one substance');
+sys.isotopes={'1H','1H'};
+
 % Single-substance Zeeman units and Boltzmann states retain stock normalisation
 inter=struct('temperature',298); bas.approximation={'none'};
 for formalism={'zeeman-hilb','zeeman-liouv'}

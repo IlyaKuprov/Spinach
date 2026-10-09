@@ -169,6 +169,30 @@ for formalism={'zeeman-liouv','zeeman-hilb'}
                           inter.chem.concs(n),1e-14,0,'spin-free and empty-population blocks retain their traces');
     end
 end
+
+% Keep molar equilibrium magnetisation within its single-substance contract
+sys.magnet=1; sys.isotopes={'E','E','E','E'}; inter=struct();
+inter.temperature=298; inter.zeeman.scalar={2,2,2,2};
+inter.chem.parts={1:2,3:4}; inter.chem.concs=[0.4 0.6];
+bas.formalism='zeeman-hilb'; bas.approximation={'none','none'};
+z=test_spin_system(sys,inter,bas); parameters.grid='single_crystal';
+rejected=false;
+try
+    eqmag(z,parameters);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:eqmag:multipleSubstances')&&...
+             strcmp(err.message,'eqmag requires a single substance; mixture molar normalisation is not supported.');
+end
+result=test_true(result,'eqmag mixture boundary',rejected,...
+                 'two four-state molecules require an explicit mixture molar-normalisation contract');
+inter.chem.parts={1:4}; inter.chem.concs=1; bas.approximation={'none'};
+z=test_spin_system(sys,inter,bas); rho=equilibrium(z);
+expected=zeros(1,3); labels={'Lx','Ly','Lz'};
+for n=1:3
+    expected(n)=-2*real(trace(rho*operator(z,labels{n},'E')))/real(trace(rho));
+end
+result=test_close(result,'eqmag singleton',eqmag(z,parameters),expected,1e-12,0,...
+                  'the isotropic single-substance magnetisation retains the explicit thermal trace');
 fprintf('CWDM_ZEEMAN_FAILURES %d\n',numel(result.failures));
 end
 

@@ -13,7 +13,8 @@
 %
 %       magn - molar magnetization vector [Mx My Mz] in [Na*mu_bohr]
 %
-% Note: the use of bas.formalism='zeeman-hilb' is required.
+% Note: a single substance and bas.formalism='zeeman-hilb' are required.
+%       Mixture molar normalisation is not defined by this interface.
 %
 % Note: Spinach uses NMR convention for the exchange coupling: exchange
 %       interaction term in the Hamiltonian is 2*pi*J*(LxSx+LySy+LzSz)
@@ -103,6 +104,10 @@ end
 function grumble(spin_system,parameters)
 if ~strcmp(spin_system.bas.formalism,'zeeman-hilb')
     error('zeeman-hilb formalism is required.');
+end
+if spin_system.bas.nsubst>1
+    error('Spinach:eqmag:multipleSubstances',...
+          'eqmag requires a single substance; mixture molar normalisation is not supported.');
 end
 if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');

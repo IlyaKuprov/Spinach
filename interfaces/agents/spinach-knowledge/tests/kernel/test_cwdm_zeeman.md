@@ -5,3 +5,5 @@ The two-species proton-pair fixture follows the independent formalism probe: 14.
 A common pi/2 pulse and 256-point FID compare unweighted coils without signal rescaling. Hilbert blocks are separately trace-normalised and converted through the production cell-array converter. An explicit first-order matrix-exchange reference conserves total trace; a strongly polarised bimolecular tensor-product source with a nonidentity spin permutation conserves both atom equivalents with extent 1.68. This tensor product is a reference construction, not support for Hilbert mass-action propagation.
 
 Unequal dimensions, a zero-concentration spin-bearing block, and a spin-free block check actual operator, state, coil, unit, and equilibrium calls. Geometric unit states preserve stock local normalisations; thermal states have physical trace equal to concentration.
+
+The molar-magnetisation check asserts the complete named `eqmag` rejection for two four-state substances, whose direct-sum and tensor-product dimensions differ. A supported isotropic four-electron singleton is compared with the explicit thermal magnetic-moment trace.

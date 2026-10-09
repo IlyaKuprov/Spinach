@@ -695,7 +695,8 @@ giving a rotation per rank. Stevens parameters from a ligand-field calculation
 are converted with `icm2hz` then `stev2sph` and rotated with `wigner`
 (`dy_lft_single_1.m`). Drivers: `fieldscan_enlev` for Zeeman diagrams,
 `fieldscan_magn` for finite-speed sweep magnetisation and hysteresis, `eqmag`
-for equilibrium molar magnetisation (`create` and `basis` must be re-run inside
+for single-substance equilibrium molar magnetisation (mixture molar normalisation
+is not supported; `create` and `basis` must be re-run inside
 the loop when field or temperature changes), `fieldsweep` for powder EPR
 (`lanthanide_powder.m`), `geffect` for the effective g-tensor of a Kramers
 doublet. Relaxation work needs `sphten-liouv`: `lanthanide_redfield.m` for

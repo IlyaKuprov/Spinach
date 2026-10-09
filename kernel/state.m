@@ -77,8 +77,8 @@ function rho=state(spin_system,states,spins,method)
 if ~exist('method','var'), method='exact'; end
 if ~exist('spins','var'), spins=[]; end
 
-% Check the wrapper-specific option
-grumble(method);
+% Check the formalism and wrapper-specific option
+grumble(spin_system,states,spins,method);
 
 % Retain the retired keyword for one release
 if strcmp(method,'chem')
@@ -99,7 +99,24 @@ end
 end
 
 % Input validation function
-function grumble(method)
+function grumble(spin_system,states,spins,method) %#ok<INUSD>
+
+if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
+    error('basis set information is missing, run basis() before calling this function.');
+end
+if ~ischar(spin_system.bas.formalism)
+    error('formalism specification must be a character string.');
+end
+if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
+                                        'sphten-liouv','zeeman-wavef'})
+    error('unknown formalism specification.');
+end
+if ismember(spin_system.bas.formalism,{'zeeman-wavef','zeeman-liouv'})&&...
+   spin_system.bas.nsubst>1
+    error('Spinach:state:segmentedZeeman',...
+          'segmented Zeeman wavefunction and Liouville states are not implemented.');
+end
+
 if ~ischar(method)
     error('method must be a character string.');
 end

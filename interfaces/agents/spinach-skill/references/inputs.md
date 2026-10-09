@@ -602,8 +602,8 @@ through `sys.disable` does not prevent an imaging calculation.
 Per-substance `space_level` aliases are derived independently; an empty entry
 does not inherit the preceding substance's proximity depth.
 
-Segmented wavefunction state construction is deferred and raises
-`Spinach:state:segmentedZeeman`; single-substance wavefunctions are unchanged.
+Segmented wavefunction and Zeeman-Liouville state construction is deferred and raises
+`Spinach:state:segmentedZeeman` before global tensor allocation; single-substance states are unchanged.
 
 Before basis compilation, `chem.parts` must cover every global spin; omitted
 spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.
@@ -626,3 +626,10 @@ on a copy with all `chem.concs` entries one, as `relaxation` does internally.
 The propagated unit coordinates supply the instantaneous concentrations; neither
 thermalisation nor pumping divides by a concentration. `magpump` takes an
 unweighted `coil_state` target, and `steady` pins the supplied concentrations.
+
+`create(sys)` without interaction input remains supported; it uses an empty
+interaction structure and the ordinary one-substance/unit-concentration defaults.
+
+`reduce` rejects cross-substance entries in caller-supplied generators at the
+compiled spin dimension before building substance-local projectors. This
+boundary also covers the adjoint generator passed by destination screening.

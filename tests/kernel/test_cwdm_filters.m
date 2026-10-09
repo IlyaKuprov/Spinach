@@ -20,6 +20,19 @@ fprintf('TESTING: CWDM per-substance basis filters (T4)\n');
 result=new_test_result('kernel/cwdm_filters','CWDM basis filters',...
                       'Local basis settings cannot change another substance.');
 
+% Omitted interactions retain the one-argument create contract
+sys=struct('magnet',0,'isotopes',{{'1H'}},'output','hush',...
+           'disable',{{'hygiene'}},'parallel',{{'local',1}},'parprops',{{}});
+bas=struct('formalism','sphten-liouv','approximation',{{'none'}});
+single=basis(create(sys),bas); explicit=test_spin_system(sys,struct(),bas);
+result=test_true(result,'one-argument create',single.bas.nsubst==1&&...
+                 isequal(single.chem.parts,{1})&&single.chem.concs==1,...
+                 'omitted interactions compile one substance at unit concentration');
+result=test_true(result,'one-argument descriptor',...
+                 isequal(single.bas.basis,explicit.bas.basis),...
+                 'omitting interactions matches an explicit empty structure');
+fprintf('CWDM_CREATE_ONE_ARG nsubst=%d dimension=%d\n',single.bas.nsubst,single.bas.offsets(end));
+
 % Build two identical proton substances and one spin-free pool
 sys.magnet=0; sys.isotopes=repmat({'1H'},1,6);
 inter.chem.parts={[1 2 3],[4 5 6],[]}; inter.chem.concs=[1 0 0];

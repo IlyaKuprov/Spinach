@@ -134,6 +134,18 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
                      'only genuinely segmented Zeeman symmetry is rejected');
 end
 
+% Segmented Zeeman-Liouville states reject before allocating a global identity
+bas.formalism='zeeman-liouv'; s=test_spin_system(sys,inter,bas);
+rejected=false;
+try
+    state(s,'Lz',1);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:state:segmentedZeeman');
+end
+result=test_true(result,'segmented Liouville state',rejected,...
+                 'state rejects before constructing the tensor-product identity');
+fprintf('CWDM_STATE_LIOUV named_rejection=%d\n',rejected);
+
 % Segmented wavefunctions cannot represent the compiled direct sum
 sys.isotopes={'1H','1H','1H'};
 inter=struct(); inter.chem.parts={1,2:3}; inter.chem.concs=[1 0];
@@ -193,6 +205,38 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
     result=test_close(result,['single coherent ' formalism{1}],coherent(local,2,.5),...
                       expected,1e-14,1e-14,'the supported truncated coherent product is unchanged');
 end
+
+% Caller-supplied generators must not transfer between compiled substances
+sys=struct('magnet',1,'isotopes',{{'1H','1H'}}); inter=struct();
+inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+bas=struct('formalism','sphten-liouv','approximation',{{'none','none'}});
+s=test_spin_system(sys,inter,bas); rho=state(s,'Lz',1)+state(s,'Lz',2);
+for n=1:2
+    cross=sparse(3,7,1,8,8); if n==2, cross=cross'; end
+    for caller={'reduce','evolution'}
+        rejected=false;
+        try
+            if strcmp(caller{1},'reduce')
+                reduce(s,cross,rho);
+            else
+                evolution(s,cross,[],rho,0.1,1,'final');
+            end
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:reduce:crossSubstanceGenerator');
+        end
+        result=test_true(result,['cross generator ' caller{1} ' ' int2str(n)],rejected,...
+                         'cross-substance input is rejected before projector construction');
+        fprintf('CWDM_REDUCE_CROSS caller=%s direction=%d named_rejection=%d\n',caller{1},n,rejected);
+    end
+end
+
+% Independent blocks retain full-generator dynamics without numerical rounding
+s.sys.disable=[s.sys.disable {'clean-up'}];
+L=operator(s,'Lx',1)+2*operator(s,'Lx',2);
+actual=evolution(s,L,[],rho,0.1,1,'final'); expected=expm(-0.1i*full(L))*rho;
+result=test_close(result,'independent generator evolution',actual,expected,1e-12,1e-12,...
+                  'per-substance reduction preserves block-diagonal generator action');
+fprintf('CWDM_REDUCE_BLOCKS state_error=%.16g\n',norm(actual-expected));
 
 % Validate the Hamiltonian action independently in both equilibrium blocks
 sys=struct('magnet',1,'isotopes',{{'1H','1H'}}); inter=struct();

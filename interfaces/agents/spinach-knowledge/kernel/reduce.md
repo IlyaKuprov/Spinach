@@ -12,7 +12,9 @@ The local projector cells in `bas.sym_fact(n)` are embedded at `bas.offsets(n)` 
 
 ## Reduction path
 
-The source first checks whether trajectory-level reduction is disabled by `spin_system.sys.disable` containing `'trajlevel'`; if so, it reports the setting and returns the unit projector `1`. Otherwise the available operations depend on `spin_system.bas.formalism` and the disable settings.
+Input validation rejects nonzero cross-substance blocks with `Spinach:reduce:crossSubstanceGenerator` when `L` has the compiled spin dimension and there is more than one substance. This check precedes projector construction and applies also to adjoint generators supplied by destination screening. Enlarged spatial-spin inputs are not interpreted using spin-only offsets.
+
+After validation, the source checks whether trajectory-level reduction is disabled by `spin_system.sys.disable` containing `'trajlevel'`; if so, it reports the setting and returns the unit projector `1`. Otherwise the available operations depend on `spin_system.bas.formalism` and the disable settings.
 
 For `zeeman-hilb` and `zeeman-wavef`, the code uses supplied permutation-symmetry irreducible-representation projectors when symmetry treatment is enabled and that information is available. Zero-dimensional irreps are dropped; the state contribution is also screened against `spin_system.tols.irrep_drop`. These formalisms use symmetry screening rather than the Liouville-space zero-track and path-tracing stages.
 

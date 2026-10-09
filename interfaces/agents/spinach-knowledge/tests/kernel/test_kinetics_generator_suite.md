@@ -25,3 +25,7 @@ Regression test suite for the kinetics and flow generator helpers in Spinach. It
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_kinetics_generator_suite.m)
+
+The two-substance input supplies two approximation cells. Legacy exchange and
+reaction-map assertions require the WP3 chemistry implementation; they are not
+changed into passing rejection tests by the basis migration.

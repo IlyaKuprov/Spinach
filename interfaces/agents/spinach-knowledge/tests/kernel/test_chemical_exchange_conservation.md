@@ -39,3 +39,7 @@ result = test_chemical_exchange_conservation()
 - Spinach `kinetics()` function — builds the chemical kinetics generator.
 - Spinach `test_spin_system()` function — constructs a spin system from `sys`, `inter`, and `bas` specifications.
 - Spinach testing framework functions `new_test_result()` and `test_close()`.
+
+The two-substance input supplies two approximation cells. Legacy exchange and
+reaction-map assertions require the WP3 chemistry implementation; they are not
+changed into passing rejection tests by the basis migration.

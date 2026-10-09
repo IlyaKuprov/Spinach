@@ -566,3 +566,6 @@ Synthetic compiled-system fixtures must supply offsets and local descriptor
 cells too; bypassing `basis` does not restore the retired global layout.
 
 `bootstrap` follows the same one-cell approximation contract as physical systems.
+
+Legacy two-substance chemistry test fixtures also require two approximation
+cells, even while their numerical chemistry assertions await WP3.

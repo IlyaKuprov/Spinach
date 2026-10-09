@@ -24,3 +24,7 @@ It then performs the following checks, each through `test_close` with explanator
 ## References
 
 - Source: [tests/kernel/test_kinetics_invariants_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_kinetics_invariants_suite.m)
+
+The two-substance input supplies two approximation cells. Legacy exchange and
+reaction-map assertions require the WP3 chemistry implementation; they are not
+changed into passing rejection tests by the basis migration.

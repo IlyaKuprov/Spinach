@@ -551,3 +551,7 @@ are cleared, so reapply `assume` before constructing a Hamiltonian.
 
 Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
 product operators and states raise `Spinach:which_subst:crossSubstance`.
+
+Legacy `kinetics` remains available for single-substance flux and radical-pair
+models. Nonzero multi-substance chemistry is explicitly rejected until the
+reaction-record implementation; absent chemistry gives the direct-sum zero.

@@ -646,6 +646,10 @@ Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_netw
 
 Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.
 
+### Two-stage chemistry histories
+
+`diels_alder_zmag` puts true initial concentrations in `chem.concs`, traces spins for its LG4 concentration history, and compiles the full additive maps once for the two-point spin steps. Embed the prescribed history into unit coordinates when evaluating `K(t,eta)`; initialise spin magnetisation with weighted `state`, add `unit_state`, and detect with unweighted `coil_state`. Do not multiply the initial state by the concentrations a second time.
+
 ### Spatial two-stage chemistry
 
 `reacting_flow_nmr` traces all spins with `kill_spin` for its concentration-only stage: the resulting five unit blocks include the spin-free solvent, and the same reaction records generate both concentration and spin transport. Its frozen-rate stepping workflow and `makima` history are retained, but equal sharing of product unit arrival changes finite frozen concentration steps relative to the old asymmetric generator. Equal sharing is the specified additive closure, not a claim of improved frozen-step accuracy: both allocations converge to the same mass-action ODE. Do not claim numerical history equivalence from the equal instantaneous derivative. In the NMR stage, history values are placed into voxel unit coordinates before evaluating `K(t,eta)`; additive closure then depends only on those coordinates, not the spin orders. The actual propagated state includes unit populations, while detection and reference longitudinal vectors use `coil_state`. The solvent is not excited or detected.

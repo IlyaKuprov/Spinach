@@ -17,3 +17,5 @@ Modifies a relaxation superoperator `R` to drive a chosen stationary state. The 
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/thermalize.m)
 - [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=thermalize.m)
+
+Wavefunction thermalisation is explicitly rejected before constructing any unit state, with `Spinach:thermalize:wavefunction`.

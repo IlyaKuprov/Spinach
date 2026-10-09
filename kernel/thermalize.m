@@ -89,6 +89,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,R,HLSPS,T,rho_eq,method)
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:thermalize:wavefunction',...
+          'thermalisation is not supported in zeeman-wavef formalism.');
+end
 if (~isnumeric(R))||(size(R,1)~=size(R,2))
     error('R must be a square matrix.');
 end

@@ -17,3 +17,5 @@ Named singlet/triplet selectors use the left/right electronic projectors: Haberk
 ## Retired mechanisms
 
 Legacy rate, flux, and radical-pair fields are rejected by `create`; this routine only reads explicit reaction records. First-order exchange is a directed record with matching, untracked exponential loss has empty products, and radical-pair channels use selectors. A permutation reaction changes all mapped orders; it must not be assumed identical to a legacy phenomenological flux model that left some correlations stationary.
+
+Nonempty wavefunction reaction records raise `Spinach:kinetics:wavefunction`, naming zeeman-wavef explicitly; this covers first-order and mass-action chemistry.

@@ -26,3 +26,5 @@ Thus, “unit” does not mean a trace-one identity in every representation: the
 - Basis setup: [`basis.m` page](../basis.md).
 - Source: [`kernel/states/unit_state.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/unit_state.m).
 - Wiki: [`unit_state.m`](https://spindynamics.org/wiki/index.php?title=unit_state.m).
+
+Wavefunction concentration-weighted units are explicitly rejected by `Spinach:unit_state:wavefunction`.

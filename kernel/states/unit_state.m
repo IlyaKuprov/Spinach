@@ -56,6 +56,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system)
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:unit_state:wavefunction',...
+          'concentration-weighted unit states are not supported in zeeman-wavef formalism.');
+end
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('the spin_system object does not contain the required information.');
 end

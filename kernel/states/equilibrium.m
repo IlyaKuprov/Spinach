@@ -185,6 +185,10 @@ end
     
 % Consistency enforcement
 function grumble(spin_system,I,Q,euler_angles)
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:equilibrium:wavefunction',...
+          'thermal equilibrium is not supported in zeeman-wavef formalism.');
+end
 if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})&&...
    (spin_system.bas.nsubst>1)
     error('Spinach:equilibrium:segmentedZeeman',...

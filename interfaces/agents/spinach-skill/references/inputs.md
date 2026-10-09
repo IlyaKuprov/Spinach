@@ -656,3 +656,8 @@ boundary also covers the adjoint generator passed by destination screening.
 The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
 with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
 spin lists. Only the legacy `state` wrapper retains optional arguments.
+
+Zeeman-wavefunction direct sums provide storage only. Nonempty reaction records
+are rejected by `basis` and `kinetics`; `equilibrium`, `unit_state`, and
+`thermalize` reject mixed-state or concentration-weighted requests explicitly
+with messages naming `zeeman-wavef`. Legacy unweighted singleton kets remain available.

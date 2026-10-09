@@ -184,6 +184,10 @@ function grumble(spin_system,mode)
 if ~ischar(mode)||(~isempty(mode)&&~strcmp(mode,'report'))
     error('Spinach:kinetics:mode','the optional kinetics mode must be ''report''.');
 end
+if ~isempty(spin_system.chem.reactions)&&strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:kinetics:wavefunction',...
+          'chemical reactions are not supported in zeeman-wavef formalism.');
+end
 if ~isempty(spin_system.chem.reactions)&&~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('Spinach:kinetics:formalism','reaction records currently require sphten-liouv formalism.');
 end

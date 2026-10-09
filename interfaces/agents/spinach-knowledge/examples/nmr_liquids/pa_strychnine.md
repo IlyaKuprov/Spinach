@@ -20,3 +20,5 @@ The initial density operator and receiver are both the 1H raising state; decoupl
 The source produces an interactive 1D plot; it does not save a spectrum or report numerical peak/line-width results. The exact spin parameters supplied by the `strychnine` helper and the internals of the `acquire` callback are outside this wrapper and are not inferred here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

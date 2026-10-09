@@ -22,3 +22,5 @@ The proton initial state and 14N coil state are each built from the correspondin
 The wrapper exposes the prepared/detected operators, MAS settings, RF parameters, contact-duration sweep, simulation call, and plotted spectra. It does not show the internal pulse program behind `@overtone_cp`, so pulse ordering, gradients, and receiver cycling are not inferred. The source comment estimates minutes of computation; no measured runtime or experimental comparison is reported.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

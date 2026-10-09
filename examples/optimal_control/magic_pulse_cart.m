@@ -94,7 +94,7 @@ rho=shaped_pulse_xy(spin_system,D,{Lx,Ly},{CLx,CLy},...
 % Set acquisition parameters
 parameters.spins={'13C'};
 parameters.rho0=rho;
-parameters.coil=coil_state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=70000;

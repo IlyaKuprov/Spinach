@@ -23,3 +23,5 @@ The code models a one-dimensional MAS spectrum; it does not define a CP, HMQC, o
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

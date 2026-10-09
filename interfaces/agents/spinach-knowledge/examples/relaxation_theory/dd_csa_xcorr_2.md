@@ -10,3 +10,5 @@ The system's geometry and interaction parameters are imported from `../standard_
 The simulation uses the `19F` spin channel, offset `-521 Hz`, sweep `50 Hz`, `128` points, and zero-fill to `512`. It adds the Redfield relaxation superoperator to the Hamiltonian, applies the NMR high-field assumption and frequency offset, and detects with `L+`. The initial state is thermal equilibrium from the lab-frame Hamiltonian. For each mixing time `[0.1, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 10] s`, the script applies an `Lx` pi pulse, evolves during mixing, applies an `Ly` pi/2 pulse, and acquires the FID. Exponential apodisation with coefficient `6` precedes the Fourier transform. The plotted quantity is the real spectrum versus `19F` linear frequency in Hz, with the frequency axis reversed.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

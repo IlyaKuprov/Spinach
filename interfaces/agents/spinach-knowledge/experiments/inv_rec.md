@@ -23,3 +23,5 @@ The pulse/detection states are formed from `L+` of the selected first spin: `Ly`
 `fids` contains the acquired FIDs as columns, with one column per relaxation-trajectory state; the row dimension is the FID time-point dimension (`npoints`). The trajectory starts at zero delay, and each propagation interval is `max_delay/n_delays`. The function returns the matrix only, not explicit time or delay-axis vectors. No DOI or numerical experimental data are supplied in the source page.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

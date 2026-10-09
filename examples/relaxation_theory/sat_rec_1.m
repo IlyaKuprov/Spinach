@@ -36,7 +36,7 @@ spin_system=basis(spin_system,bas);
 rho=state(spin_system,'E','1H');
 
 % Detection state
-coil=coil_state(spin_system,'Lz','1H');
+coil=coil_state(spin_system,'Lz','1H','exact');
 
 % Static Hamiltonian superoperator
 H=hamiltonian(assume(spin_system,'nmr'));

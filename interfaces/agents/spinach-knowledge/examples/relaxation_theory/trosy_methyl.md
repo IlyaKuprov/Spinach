@@ -15,3 +15,5 @@ Frequency-domain `gridfree` detection with `slowpass` produces separate carbon a
 Source: [examples/relaxation_theory/trosy_methyl.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_methyl.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -17,3 +17,5 @@ Relaxation uses `t1_t2`, R1 assignments `{1e3,r1n_rate}`, R2 assignments `{200e3
 The example calls `r1n_dnp`, Spinach `create`, `basis`, `state`, and `powder`, and kernel `xixdnp_steady`. It plots the real proton (I_Z) expectation value against offset in MHz with padded vertical limits, then saves `xix_q_field_profile_single.fig`. The function declares no numeric output. This source explicitly labels offsets and electron nutation frequency in Hz and pulse duration in seconds; units for `sys.magnet`, `inter.temperature`, the coordinate 3.500, relaxation-rate values, and `addshift` are not stated.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

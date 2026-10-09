@@ -19,3 +19,5 @@ The basis is `sphten-liouv` with no approximation. The no-argument function sets
 The page describes the simulated spectrum only; it does not claim a measured line shape, fitted exchange rate, or quantitative match to data. See the [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/mas_exchange_1.m) for the complete interaction and sequence setup.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

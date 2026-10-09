@@ -14,3 +14,5 @@ The powder calculation uses the `rep_2ang_200pts_sph` grid, the 127I channel, an
 The file defines a single-spin powder simulation. The file does not import measured data or specify a spatial model, gradient/chirp schedule, SPEN, ultrafast DOSY, or multiple-quantum selection.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

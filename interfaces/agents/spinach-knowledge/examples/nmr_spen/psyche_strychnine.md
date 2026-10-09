@@ -18,3 +18,5 @@ The output FID is reduced to the pure-shift signal by reshaping its first `5000/
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

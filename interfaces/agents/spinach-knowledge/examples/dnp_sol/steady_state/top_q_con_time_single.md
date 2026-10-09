@@ -19,3 +19,5 @@ For each loop count and setting, the steady state is obtained with `powder(spin_
 The figure compares the real proton `I_z` expectation for the two settings against total contact time and is saved as `top_q_con_time_single.fig`. There is no distance or B1 averaging in this script. The source estimates hours of calculation and saves a figure rather than a numeric results table.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

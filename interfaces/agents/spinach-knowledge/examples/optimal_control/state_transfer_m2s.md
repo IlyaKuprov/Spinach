@@ -20,3 +20,5 @@ The design samples five offsets from −10 to 10 and five configured power level
 The example first simulates and plots a pulse-acquire spectrum from the initial state, using `parameters.sweep=1000`, 2048 points, 4096-point zero filling, and Hz axis units. It then scales the optimised pulse by the mean configured power level, propagates it with `shaped_pulse_xy`, applies homospoil, and computes `real(rho_targ'*rho)` as a fidelity diagnostic. A second pulse-acquire spectrum is generated from that propagated state for comparison. These are operations encoded in the source; no numerical fidelity or successful run is asserted here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

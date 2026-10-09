@@ -30,3 +30,5 @@ The first output spec is the field-sampled spectrum, with its field coordinates 
 This is a computational powder integration over a finite spherical grid, with a potentially expensive eigenfields calculation. The source's example settings are starting points, not validated accuracy guarantees; increase grid density or adjust tolerances as required by convergence. Use rspt_order=Inf when exact diagonalisation is desired instead of the suggested perturbative order 2. The function must be called directly, without an experiment context.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/fieldsweep.m
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

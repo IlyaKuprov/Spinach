@@ -22,3 +22,5 @@ The routine starts from isotropic thermal equilibrium. It forms the electron mic
 The sweep offsets are `linspace(sweep(1),sweep(2),nsteps)`; adding `spin_system.inter.magnet` gives `b_axis` in Tesla. The Zeeman Hamiltonian is normalised by the centre field, then each point samples the current `L+` expectation and advances the state for one timestep under the offset-field generator using `step`. The outputs are a Tesla field-axis column and the corresponding complex `L+` amplitudes in `spectrum`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

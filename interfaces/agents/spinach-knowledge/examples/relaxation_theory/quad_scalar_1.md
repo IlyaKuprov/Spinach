@@ -15,3 +15,5 @@ The spin list is two `1H` spins and one `17O` spin, with `sys.magnet=14.1`. The 
 The acquisition uses `1H` for both `rho0` and the coil, no decoupling, zero offset, sweep `500`, `512` points, zero-fill `2048`, and axis units `Hz`. `liquid(...,'nmr')` produces the FID; the script applies `fftshift(fft(fid,parameters.zerofill))` and plots its real part with `plot_1d`. The source specifies the initial and detection operators as `L+` on `1H`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

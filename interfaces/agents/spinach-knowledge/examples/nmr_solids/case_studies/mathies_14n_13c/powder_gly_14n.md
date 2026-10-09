@@ -20,3 +20,5 @@ Computes a static ¹⁴N powder spectrum of glycine, assuming ¹H and ¹³C deco
 The overlaid second trace is also simulated, not an experimental spectrum: the source replaces the quadrupolar matrix with `2*pi*eeqq2nqi(1.18e6,0.53,1,[0 0 0])`, using the O'Dell PCCP 2009 measured quadrupolar parameters, then repeats the powder simulation and processing. The plot legend labels the two simulations `CASTEP` and `O'Dell PCCP 2009`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

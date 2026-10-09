@@ -142,6 +142,14 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,spec)
+if isfield(spin_system.bas,'basis')&&~iscell(spin_system.bas.basis)
+    error('Spinach:basis:retiredGlobalBasis',...
+          'the global bas.basis matrix is retired; use bas.basis{n} and bas.offsets from basis().');
+end
+if isfield(spin_system.bas,'irrep')
+    error('Spinach:basis:retiredIrrep',...
+          'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
     error('analytical coherence order selection is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end

@@ -14,3 +14,5 @@ The calculation uses the spherical powder grid `rep_2ang_200pts_sph`, a 127I cha
 For each duration, the code demodulates by multiplying by the transmitter-offset phase, constructs a 512-point frequency axis, and plots the imaginary spectrum in MHz. The panels are labelled in 0.5 μs increments and use vertical limits of −3.0059e−5 to 3.0059e−5. The source comment estimates calculation time as seconds; that is a source note, not a runtime measured here. This is a simulated single-spin powder NQR nutation series; no imported measurement, spatial gradient, chirp, or SPEN/DOSY encoding is specified.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

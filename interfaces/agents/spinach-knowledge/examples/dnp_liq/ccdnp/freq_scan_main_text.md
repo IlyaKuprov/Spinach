@@ -11,3 +11,5 @@ Sequence settings are electron irradiation, mw_pwr=2*pi*1e6, method lvn-backs, a
 The output is a figure of real(answer) against field and frequency offset, with a colorbar labelled steady-state 1H DNP; the plotted offset is converted to MHz relative to the isotropic g reference. No result array is saved. The source comments “Calculation time: seconds”; this is not a reproduced runtime or a performance guarantee.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

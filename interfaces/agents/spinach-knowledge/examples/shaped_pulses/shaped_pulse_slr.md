@@ -25,3 +25,5 @@ The source comment gives a calculation time of seconds.
 Source: [examples/shaped_pulses/shaped_pulse_slr.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_slr.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

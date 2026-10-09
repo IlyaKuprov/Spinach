@@ -20,3 +20,5 @@ The basis uses `approximation='none'` and successively tests `zeeman-hilb`, `zee
 This is an assertion-style test, not a spectrum simulation. The source contains a success message, but that message is not evidence that the test was run here. The field, temperature, and coordinate values above are reported as source inputs; the file does not declare units for the temperature or coordinates.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

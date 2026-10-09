@@ -19,3 +19,5 @@ The sequence parameters select electron irradiation, set `mw_pwr=2*pi*100e3`, an
 The calculation is `crystal(spin_system,@dnp_freq_scan,parameters,'esr')`. It stores the result in the local variable `answer` and plots `real(answer)` against microwave-frequency offset, with the proton `S_z` expectation value on the vertical axis. The function declares no output argument; the observable is presented in the figure. The source estimates calculation time as seconds. Running it requires Spinach and its `dnp_freq_scan` sequence callback.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

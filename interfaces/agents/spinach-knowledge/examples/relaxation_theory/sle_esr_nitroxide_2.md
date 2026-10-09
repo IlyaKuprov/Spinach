@@ -23,3 +23,5 @@ The Stochastic Liouville Equation (SLE) calculation uses maximum rank 7 and `par
 The sweep is `[-2.2e8, 2e8]` on the `GHz-labframe` axis, with 1650 points and 1650 zero-fill points. The axis is inverted and the first derivative is requested. The script plots the real part of the calculated signal with `plot_1d`; the example specifies no measured line positions or intensities.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

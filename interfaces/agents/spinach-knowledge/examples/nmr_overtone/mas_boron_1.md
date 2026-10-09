@@ -11,3 +11,5 @@ The sequence uses rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and grid 
 The simulation call is `singlerot` with `overtone_a` and `qnmr`. The script plots `real(spectrum)` through `plot_1d`; it does not apply a separate phase factor. Its narrow sweep and spherical 800-point grid distinguish this sideband-focused setup from the two panoramic 10B examples in this group.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

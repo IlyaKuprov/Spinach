@@ -13,3 +13,5 @@ The MAS settings are rate 10000, axis `[sqrt(2/3) 0 sqrt(1/3)]`, maximum rank 4,
 The sequence is propagated by `floquet` with `@cp_contact_hard` in NMR mode. The program plots the real signal against cumulative contact time and labels the ordinate as the 15N `S_X` expectation value. This is a contact-time transfer trace, not a frequency-domain spectrum; the file supplies a simulated curve rather than measured data. The source estimates a runtime of seconds and does not report numerical transfer values or an experimental comparison.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

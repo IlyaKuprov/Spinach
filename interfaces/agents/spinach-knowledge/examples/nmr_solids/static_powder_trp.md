@@ -12,3 +12,5 @@ Calculates a static powder 13C NMR spectrum of tryptophan; the source estimates 
 The static powder average uses `rep_2ang_6400pts_sph`. Acquisition selects 13C with sweep 6e4, 128 points, 512-point zero-fill, and offset 18000; the frequency axis is labelled ppm and inverted. Initial and detection states are both 13C `L+`. The source assumes proton decoupling, but sets `decouple` to empty and specifies no explicit pulse sequence, rotor, or gradient. The FID is exponentially apodised with parameter 6, Fourier transformed, and plotted as its real spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

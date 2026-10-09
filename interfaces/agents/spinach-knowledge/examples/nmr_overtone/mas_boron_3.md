@@ -11,3 +11,5 @@ The sequence parameters are rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000,
 Although the header mentions an unphysically strong pulse, this file assigns no explicit `rf_pwr`, `rf_dur`, `rf_frq`, or `method` field. It therefore documents no numerical pulse setting; the executable setup shown is the `singlerot`/`overtone_a` call and the panoramic sweep. This avoids transferring the separate overtone_pa average-treatment RF settings from mas_boron_2.m to this example.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

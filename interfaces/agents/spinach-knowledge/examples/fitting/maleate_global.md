@@ -25,3 +25,5 @@ The trial vector is used for both nuclei in a four-spin `1H/13C/13C/1H` liquid-s
 This is the maleate dataset and uses its own starting vector and the source's hours estimate; the common model structure does not make its guesses transferable fit results for fumarate.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

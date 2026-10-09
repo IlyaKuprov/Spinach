@@ -19,3 +19,5 @@ The pulse-prepared state is passed to liquid-state NMR acquisition with a 7000 H
 Sources: [shaped_pulse_fp.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_fp.m) and [shaped_pulse_af.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_af.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

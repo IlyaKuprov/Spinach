@@ -15,3 +15,5 @@ Relaxation operators come from `rlx_t1_t2`; the spatial maps `R1Ph` and `R2Ph` a
 The returned image is displayed beside the two loaded relaxation maps using `mri_2d_plot`. The sequence's `image_size` and spatial `npts` are distinct configured arrays (`[101 105]` versus `[108 90]`); do not conflate image matrix size with the phantom grid. This example has no explicit post-call FFT or apodisation block.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

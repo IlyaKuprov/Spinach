@@ -16,3 +16,5 @@ The initial operator weights the two-spin longitudinal term for spins 1 and 4 by
 Source authors in the existing entry are Ronghui Zhou (hui@ufl.edu) and Ilya Kuprov (ilya.kuprov@weizmann.ac.il). No DOI or published hyperpolarisation measurement is given in this example. The result should therefore be read as an idealised simulated ALTADENA spectrum, not experimental evidence for a measured polarisation level.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

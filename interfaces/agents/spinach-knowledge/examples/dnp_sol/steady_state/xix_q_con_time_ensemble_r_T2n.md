@@ -19,3 +19,5 @@ Requires Spinach MATLAB functions including `gaussleg`, `powder`, and system/bas
 The no-argument function returns no MATLAB output. It plots the real proton `Lz` expectation value after distance averaging and saves `xix_q_con_time_ensemble_r_T2n.fig` in the current directory. Only nuclear T2 varies among the five curves; the electron R2 entry, nuclear R1 model, distance quadrature, and pulse protocol are shared.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

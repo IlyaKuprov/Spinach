@@ -18,3 +18,5 @@ The basis uses spherical-tensor Liouville space, the `IK-2` approximation, scala
 The code simulates a proton FID with a `-pi/4` y pulse, 500 Hz transmitter offset, 1000 Hz sweep, and 1024 acquired points. It zero-fills to 8192 points, applies Gaussian apodisation with parameter 10, Fourier transforms, and plots the real spectrum with the ppm axis inverted. This is a computed PASADENA-style product spectrum; no catalyst, hydrogenation time course, exchange rate, or relaxation superoperator is specified in the script, and the plotted trace is not itself an experimental measurement.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

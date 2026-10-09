@@ -19,3 +19,5 @@ The soft-pulse shape is gaussian_1000.pk, sampled at 100 points with duration pa
 The simulated intensities are normalised to the first point and fitted to an exponential attenuation with an amplitude, diffusion coefficient, and fitted gradient shift. The fit factor uses the spin, gradient duration, and delay corrected by one third of the gradient duration, with the source’s 10⁻¹⁰ scaling; the reported diffusion coefficient is the fitted coefficient multiplied by 10⁻¹⁰. The page plots simulated points and the fitted curve and reports the fitted diffusion coefficient and gradient shift.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

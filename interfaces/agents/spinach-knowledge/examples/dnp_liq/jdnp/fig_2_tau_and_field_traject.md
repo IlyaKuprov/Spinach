@@ -17,3 +17,5 @@ The source sets parameters.mw_pwr=2*pi*250e3, t_step=1e-3, and nsteps=200. The s
 The routine opens a 2-by-3 figure, one panel per field, with four correlation-time traces in each. It constructs 201 times from zero through t_step*nsteps, displays them as milliseconds (1e3*t_axis), and fixes the plotted vertical range to [-250, 50]. It creates a figure only; it does not save the trace or export the plot. The numeric setting mw_pwr is recorded as written because the source does not state its unit. No simulation or numerical result is claimed to have been reproduced here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

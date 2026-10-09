@@ -37,7 +37,7 @@ spin_system=basis(spin_system,bas);
 
 % SLE parameters
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=coil_state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.spins={'E'};
 parameters.sweep=[-2.2e8 2e8];

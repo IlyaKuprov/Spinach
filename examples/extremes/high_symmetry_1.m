@@ -64,7 +64,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=coil_state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=1150;
 parameters.sweep=2400;

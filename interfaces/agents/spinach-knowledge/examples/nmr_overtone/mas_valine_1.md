@@ -21,3 +21,5 @@ The initial state is 14N `Lz`; both the coil and the `Lx` operator are the angle
 The result is multiplied by `exp(1i*1.75)` and `real(spectrum)` is plotted using `plot_1d`. The source does not save a spectrum file or report numerical output. This is the pulse-driven, angle-weighted preparation/detection path. In `mas_valine_2.m`, the stated initial state and coil are both 14N `Lz`, no RF pulse or phase multiplication is assigned, and the propagator is `@overtone_a`; those are distinct source-defined sequences, not interchangeable descriptions of one calculation.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

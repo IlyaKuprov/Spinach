@@ -21,7 +21,7 @@ spin_system=basis(spin_system,bas);
 % Concentration-weighted initial state and unweighted product detector
 rho0=unit_state(spin_system)+0.1*state(spin_system,'Lz',1)...
                             +0.2*state(spin_system,'Lz',2);
-coil=coil_state(spin_system,{'Lz','Lz'},{3,4});
+coil=coil_state(spin_system,{'Lz','Lz'},{3,4},'exact');
 time_grid=linspace(0,0.02,41); dt=time_grid(2)-time_grid(1);
 closures={'additive','product'}; signal=zeros(2,numel(time_grid));
 

@@ -25,3 +25,5 @@ The frequency-offset vector is `2*pi*linspace(-10,30,512)*1e6`; the figure expre
 **Caveats:** the example suppresses hygiene checks and uses hush output.  The listed Euler/coordinate/scalar-coupling conventions must be checked against the surrounding Spinach model if changing the parameter set.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

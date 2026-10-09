@@ -11,3 +11,5 @@ The MAS settings are rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and gr
 Average treatment uses `rf_pwr=2*pi*50e3/sin(theta)`, `rf_dur=2e-3`, and `rf_frq=-140e3`. The code calls `singlerot` with `overtone_pa` and `qnmr`, multiplies the spectrum by `exp(1i*1.45)`, and plots its real part using `plot_1d`. The source values are recorded as written; only the spectral-axis setting is explicitly labelled kHz.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

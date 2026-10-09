@@ -71,7 +71,7 @@ parameters.rho0_ph={1-left,1-right};
 parameters.rho0_st={state(spin_system,'Lz',[1 2 3]),...
                     state(spin_system,'Lz',[4 5 6])};
 parameters.coil_ph={ones(parameters.npts)};
-parameters.coil_st={coil_state(spin_system,'Lx','1H')};
+parameters.coil_st={coil_state(spin_system,'Lx','1H','exact')};
 
 % No diffusion or flow
 parameters.u=zeros(parameters.npts);

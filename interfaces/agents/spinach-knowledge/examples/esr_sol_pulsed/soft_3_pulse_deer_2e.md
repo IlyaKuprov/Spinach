@@ -21,3 +21,5 @@ Execution and diagnostic plotting are delegated to `deer_3p_soft_diag(spin_syste
 Source code: [`examples/esr_sol_pulsed/soft_3_pulse_deer_2e.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/soft_3_pulse_deer_2e.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

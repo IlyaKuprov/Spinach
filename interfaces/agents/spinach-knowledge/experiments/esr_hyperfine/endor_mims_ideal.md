@@ -25,3 +25,5 @@ Return value: endor_spec is one signal value per entry of n_frq, in the same ord
 Limits: the electron pulses are ideal instantaneous rotations, whereas only the nuclear RF pulse is shaped. Interpretation therefore depends on the supplied spin system and context matrices, the chosen powder/orientation treatment, and the frequency grid; this routine itself does not add experimental data or perform a separate Fourier transform.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

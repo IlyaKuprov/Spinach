@@ -19,3 +19,5 @@ Each profile uses 201 microwave offsets from `-100e6` to `100e6` Hz, an `18e6` H
 The example calls local helper `xix_field_profile_ensemble_r`, Spinach's `gaussleg`, `create`, `basis`, `state`, and `powder`, and steady-state kernel `xixdnp_steady`. It plots the real proton (I_Z) response against offset in MHz, with a fixed vertical range of ([-1.3×10^{-3},1.3×10^{-3}]), and saves `xix_q_field_profile_ensemble_r_T1n.fig`. The function has no declared data output. The source labels T1n, pulse duration, and offset units, but does not give units for the magnet value, spin-temperature value, distance coordinates, relaxation-rate values, or `addshift`; those numbers are therefore left unitless here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

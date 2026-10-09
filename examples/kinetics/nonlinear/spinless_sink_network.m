@@ -21,7 +21,7 @@ spin_system=basis(spin_system,bas);
 
 % Initial polarisation and concentration-weighted populations
 rho=unit_state(spin_system)+0.2*state(spin_system,'Lz',1);
-coil=coil_state(spin_system,'Lz',1);
+coil=coil_state(spin_system,'Lz',1,'exact');
 K=kinetics(spin_system,'report');
 time_grid=linspace(0,1,201); dt=time_grid(2)-time_grid(1);
 concs=zeros(numel(time_grid),3); signal=zeros(size(time_grid));

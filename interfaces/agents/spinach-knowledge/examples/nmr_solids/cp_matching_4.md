@@ -15,3 +15,5 @@ A parfor loop scans 60 ¹H irradiation settings from 20e3 to 80e3 while holding 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_4.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

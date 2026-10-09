@@ -17,3 +17,5 @@ The field is 6.9156 T (the source identifies the central line at 193.797 GHz). T
 Relaxation is omitted, and the plot is the only output (no spectrum file is saved). The source header's comparison describes static outer edges at 0.2 of the central peak versus about 0.4 in the paper, and about 0.8 of the central-line echo remaining at 37 kHz; it notes that the paper's simulated result differs. The header estimates hours on a 256-core node.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

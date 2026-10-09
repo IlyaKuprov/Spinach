@@ -16,3 +16,5 @@ Trajectory-mode `evolution` first propagates 50 points at 4e-5 s per point. Eigh
 The source defines no numerical pass/fail threshold, convergence test, or reference trace; any visual axis scaling is not an acceptance criterion. The page therefore describes the sequence and diagnostic output without claiming that the trajectory was run or that a particular correlation order is sufficient.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -12,3 +12,5 @@ The acquisition is 1H-selective, with zero offset, 0.5 microsecond dwell, 512 po
 After imaging, the code Fourier-transforms the FID along dimension 2, shifts the spectrum, and plots its magnitude as contours. The basis uses the sphten-liouv formalism without an approximation; the example disables the PT option and enables the greedy algorithm. No measured spectrum, fit, or accuracy limit is supplied, and the source's A100/CPU timing comment is not a validated runtime result.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

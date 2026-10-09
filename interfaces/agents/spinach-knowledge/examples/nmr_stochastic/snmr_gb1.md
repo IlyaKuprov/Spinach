@@ -14,3 +14,5 @@ The script constructs the NMR Hamiltonian and relaxation superoperator, then evo
 The output is a 6-by-2 plot pairing each control in Hz with its calculated expectation-value trajectory. There is no pulse, gradient, chirp or field-drop schedule in this example. GPU arrays are used in the trajectory section, while the explicit `sys.enable={'gpu'}` line is commented out. The source warns of terabyte-scale memory, an NVIDIA A100 and hours of calculation; those are source comments, not independently verified resource measurements.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

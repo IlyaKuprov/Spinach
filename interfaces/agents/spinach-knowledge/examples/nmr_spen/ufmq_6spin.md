@@ -16,3 +16,5 @@ The imaging phantom is 0.015 m long with 300 points, uniform initial and receive
 The script calls `imaging(...,@ufmq,...)`, displays the real k-space echo array, Fourier transforms along the conventional dimension, and plots the magnitude spectrum in ppm. The source comments estimate hours on an NVIDIA Tesla A100 and much longer on CPU; this is a source estimate, not a measured runtime. The GPU-enable setting is commented out; the active algorithm options disable `pt` and enable `zte` and `greedy`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

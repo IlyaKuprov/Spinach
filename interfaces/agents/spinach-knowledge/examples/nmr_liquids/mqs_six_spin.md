@@ -14,3 +14,5 @@ The initial proton state is `Lz`, the detected state is `L+`, and the pulse angl
 The example calls `liquid(spin_system,@mqs_refocus,parameters,'nmr')`, applies squared-cosine apodisation in both dimensions, and computes a zero-filled 2D FFT. It plots the absolute spectrum with axes labelled 1Q / ppm and 6Q / ppm. No relaxation model, experimental dataset, measured transfer rate, or DOI is specified in this source.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

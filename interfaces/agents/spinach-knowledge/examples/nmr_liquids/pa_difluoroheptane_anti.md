@@ -23,3 +23,5 @@ The pulse-acquire sequence is propagated with `liquid(...,@acquire,...,'nmr')`. 
 [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pa_difluoroheptane_anti.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

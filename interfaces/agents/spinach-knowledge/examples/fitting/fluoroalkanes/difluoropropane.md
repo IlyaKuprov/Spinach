@@ -23,3 +23,5 @@ The three non-decoupled liquid acquisitions declare ppm axes and reverse their d
 The entry point has no output argument, and source code alone supplies no measured best-fit result, uncertainty estimate, or validation claim.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

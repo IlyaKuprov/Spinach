@@ -23,3 +23,5 @@ The wrapper fixes the encoded rotor-rate parameter at `-19840` and selects the r
 The `14N` RF frequency is `48e3` (48 kHz). The contact-duration input is `1e-4` s. For each of 15 settings, the source scans the `1H` RF nutation-frequency input from 25 to 39 kHz in equal steps and supplies the two-channel power vector as `2*pi*[55e3,rf_powers(n)]/sin(theta)`. Each call produces one simulated spectrum; the code plots its real part in a 1-by-15 panel layout and fixes the display window to x=44-52 and y=-9e-4 to 9e-4. The y limits are plotting choices, not measured signal bounds. These axes and traces are calculation outputs, not reported experimental measurements. The header's “minutes” is a runtime estimate, not a timing measured in this task.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

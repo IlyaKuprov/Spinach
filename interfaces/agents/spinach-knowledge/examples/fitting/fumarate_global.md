@@ -31,3 +31,5 @@ The objective builds one four-spin `1H/13C/13C/1H` system at the field expressio
 `fumarate_global()` calls `fminsearch` from the vector above, with iterative display, a 5000-iteration cap, and no finite function-evaluation cap. Its local objective is the sum of the squared Euclidean residual norms for the normalised proton and carbon spectra. It draws a two-panel comparison during objective evaluation (experimental points in red; simulated curves in blue) with both axes labelled “Chemical shift, Hz”. The top-level function declares no output argument: it displays the optimiser's final vector; the scalar objective is internal. The file contains no saved-fit or fit-quality result, and reaching a displayed endpoint alone is not a source-supported claim of convergence.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

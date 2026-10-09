@@ -19,3 +19,5 @@ For each distance, the XiX kernel is run on 201 offsets from `-100e6` to `100e6`
 Dependencies are local helper `xix_field_profile_ensemble_r`, `r1n_dnp`, `gaussleg`, Spinach `create`, `basis`, `state`, and `powder`, plus `xixdnp_steady`. The plot shows the real proton (I_Z) response versus offset in MHz, uses vertical limits ([-3×10^{-3},3×10^{-3}]), and is saved as `xix_q_field_profile_ensemble_r_T2e.fig`; no numeric array is declared as a function output. The source explicitly gives seconds for T2e and pulse duration and Hz for offsets and nutation frequency. It does not state units for the magnet, spin-temperature, distance, relaxation-rate, or additional-shift values.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

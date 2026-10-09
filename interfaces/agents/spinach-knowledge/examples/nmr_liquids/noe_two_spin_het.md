@@ -19,3 +19,5 @@ After constructing the relaxation superoperator and thermal equilibrium state, t
 [examples/nmr_liquids/noe_two_spin_het.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_two_spin_het.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

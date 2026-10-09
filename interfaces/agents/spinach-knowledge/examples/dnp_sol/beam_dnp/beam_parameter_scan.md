@@ -23,3 +23,5 @@ The offset axis has `120` points from `-60e6` to `60e6` Hz; `reference_point=-3.
 **Use when:** the dependence on both microwave offset and electron nutation frequency is required. The script does not return the calculated surface as a function output; it builds the local `dnp_surf` array and presents it in the contour plot.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

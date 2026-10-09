@@ -11,3 +11,5 @@ The experiment is a simulated one-dimensional rotor-synchronised ²H acquisition
 No apodisation is applied. The output plot is the real part of the Fourier-transformed simulated FID. The source cites Figure 2 of Umit Akbey et al., Journal of Magnetic Resonance (2021), DOI: https://doi.org/10.1016/j.jmr.2021.106974.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

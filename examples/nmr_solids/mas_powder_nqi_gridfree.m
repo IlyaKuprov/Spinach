@@ -40,7 +40,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','2H');
-parameters.coil=coil_state(spin_system,'L+','2H');
+parameters.coil=coil_state(spin_system,'L+','2H','exact');
 parameters.verbose=1;
 
 % Simulation

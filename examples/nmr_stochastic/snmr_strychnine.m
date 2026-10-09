@@ -84,7 +84,7 @@ disp(['Steps per second: ' num2str(nsteps/toc)]);
 traj=gather(traj);
 
 % Observables
-coil=coil_state(spin_system,'L+','1H'); fid=coil'*traj;
+coil=coil_state(spin_system,'L+','1H','exact'); fid=coil'*traj;
 
 % Plotting - control sequence
 kfigure(); subplot(1,2,1);

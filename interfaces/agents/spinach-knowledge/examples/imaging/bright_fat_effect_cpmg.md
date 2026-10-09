@@ -19,3 +19,5 @@ The sequence uses `parameters.spins={'1H'}`, no decoupling, zero offset, 48 puls
 The simulation call is `imaging(spin_system,@cpmg_dec,parameters)`. The source plots `surf(abs(mri))`, reverses the X direction, and labels the axes in pixels. No numerical image result is stated in the source page.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

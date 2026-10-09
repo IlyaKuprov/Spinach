@@ -24,3 +24,5 @@ https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_contact_m
 https://github.com/IlyaKuprov/Spinach/blob/main/experiments/cp_contact_hard.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

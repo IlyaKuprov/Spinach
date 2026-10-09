@@ -35,7 +35,7 @@ parameters.time_steps=2e-6*ones(1,500);
 parameters.irr_opers={operator(spin_system,'Ly','1H') ...
                       operator(spin_system,'Lx','15N')};
 parameters.exc_opers={operator(spin_system,'Lx','1H')};
-parameters.coil=coil_state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.needs={'aniso_eq'};
 parameters.spins={'15N'};

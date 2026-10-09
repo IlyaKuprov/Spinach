@@ -23,3 +23,5 @@ It calls <code>liquid(spin_system,@acquire,parameters,'esr')</code>, applies <co
 Requires MATLAB and Spinach routines used by the script (<code>create</code>, <code>basis</code>, <code>state</code>, <code>liquid</code>, <code>acquire</code>, <code>apodisation</code>, <code>kfigure</code>, <code>plot_1d</code>) and MATLAB FFT routines. Unlike the DFT-import examples, its spin tensors are entered directly, so it has no auxiliary system-file dependency. The source describes it as an EasySpin test-file version but supplies no DOI or external citation URL; the stable source link above is provided instead.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

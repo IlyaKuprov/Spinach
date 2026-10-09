@@ -659,3 +659,10 @@ boundary also covers the adjoint generator passed by destination screening.
 The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
 with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
 spin lists. Only the legacy `state` wrapper retains optional arguments.
+
+Retired global basis matrices and `bas.irrep` are rejected at the `basis`,
+`coherence`, `correlation`, `summary_basis`, and `kinetics` boundaries. Use
+`bas.basis{n}` with `bas.offsets`, and `bas.sym_fact(n).irr_projectors`/
+`irr_dimensions`. `kinetics` also rejects retired chemistry fields inserted
+after `create`; use `chem.reactions`. These are consumer checks, not custom
+dot-read interception: the compiled objects remain ordinary MATLAB structs.

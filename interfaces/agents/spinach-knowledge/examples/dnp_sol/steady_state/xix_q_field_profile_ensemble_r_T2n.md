@@ -19,3 +19,5 @@ The steady-state XiX calculation uses 201 offsets from `-100e6` to `100e6` Hz, g
 The example depends on `xix_field_profile_ensemble_r`, `r1n_dnp`, `gaussleg`, Spinach `create`, `basis`, `state`, and `powder`, and kernel `xixdnp_steady`. It plots the real proton (I_Z) response versus offset in MHz with vertical limits ([-3×10^{-3},3×10^{-3}]), and saves `xix_q_field_profile_ensemble_r_T2n.fig`. No numerical result is declared as a function output. Units for the magnet value, spin-temperature value, quadrature coordinates, relaxation-rate values, and `addshift` are not specified in this source.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

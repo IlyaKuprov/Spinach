@@ -25,3 +25,5 @@ The accumulated map is averaged over B1 with `wb1`, then over distance with weig
 Dependencies are Spinach system, basis, state, powder, and plotting functions, `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. The result includes the two stated quadratures and the configured powder orientation grid; it does not describe a measured experimental profile.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

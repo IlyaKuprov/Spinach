@@ -28,3 +28,5 @@ The source applies a 90-degree y pulse to the selected spin, evolves the F1 traj
 This is a description of the parameterised sequence implementation, not a measured spectrum or a claim that a simulation was run and validated.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

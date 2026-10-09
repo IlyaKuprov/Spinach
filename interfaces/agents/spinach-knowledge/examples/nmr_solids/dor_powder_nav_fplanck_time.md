@@ -19,3 +19,5 @@ The script sets a sweep of 1e5, 256 acquired points, and zero-fills to 1024; the
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/dor_powder_nav_fplanck_time.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

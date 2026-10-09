@@ -32,3 +32,5 @@ The returned structure has `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid
 - [Spin Dynamics Wiki: hncaco.m](https://spindynamics.org/wiki/index.php?title=hncaco.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -17,3 +17,5 @@ TPPM settings are spins `{'E','1H'}`, grid `rep_2ang_800pts_sph`, 16 ns pulse du
 The detected operator is proton `Lz`, set with `coil_state(spin_system,'Lz','1H')`. Each distance/B1/repetition-time point is evaluated by `powder(spin_system,@xixdnp_steady,localpar,'esr')`. Results are averaged over B1 with its quadrature weights and over distance with the source's explicit `r^2,wr` weighting (radial Jacobian), normalised by `sum(r.^2.*wr)`. The real proton expectation is plotted against repetition time in ms and saved as `tppm_q_rep_time_ensemble_b1_r.fig` in the current working directory. There is no declared function output.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

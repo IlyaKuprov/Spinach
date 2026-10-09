@@ -23,3 +23,5 @@ There are no gradient, field-of-view, k-space, or FID parameters or outputs in t
 The steady-state branch requires one substance and raises `Spinach:solid_effect:segmentedSubstances` on segmented input, before constructing Hamiltonians or the single-unit relaxation projector. This restriction is specific to `steady_state`; the time-dependent branches retain their existing domain.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

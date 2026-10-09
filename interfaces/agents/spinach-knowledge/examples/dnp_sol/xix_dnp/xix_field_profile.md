@@ -23,3 +23,5 @@ With Spinach available on the MATLAB path, call `xix_field_profile()`. It builds
 The calculation uses Spinach system/basis/state construction, the `xixdnp` sequence and `powder` ESR averaging, plus the Spinach plotting helpers. The offset loop uses MATLAB `parfor`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

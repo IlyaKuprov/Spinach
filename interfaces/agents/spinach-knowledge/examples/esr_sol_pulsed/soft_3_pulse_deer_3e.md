@@ -25,3 +25,5 @@ This version adds an electron at `[0,0,20]` Å with its own Zeeman tensor and or
 Source code: [`examples/esr_sol_pulsed/soft_3_pulse_deer_3e.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/soft_3_pulse_deer_3e.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -19,3 +19,5 @@ The fixed profile assigns 5 × 10⁴ to both irradiation channels for all 500 st
 Spinach powder simulations produce three signals. The figure plots their real time-domain signals and the corresponding ¹⁵N Sx expectation values, with separate traces for constant, linear-ramp, and tangent-ramp CP. The source does not supply measured data or a numerical comparison metric.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

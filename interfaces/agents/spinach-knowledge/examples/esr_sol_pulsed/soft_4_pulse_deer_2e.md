@@ -19,3 +19,5 @@ The final call is `deer_4p_soft_diag(spin_system,parameters)` under a “Simulat
 [examples/esr_sol_pulsed/soft_4_pulse_deer_2e.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/soft_4_pulse_deer_2e.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -21,3 +21,5 @@ The Spinach model uses eight `1H` and two `19F` spins at `sys.magnet=11.7464`, a
 Run `syn_difluorobutane()` with the MAT file available. The function has no declared return value; it displays the optimiser vector and plots experimental points against the simulated line, including a full-spectrum panel and a 645–700 Hz zoom. Source comments estimate hours of calculation. No fit outcome, parameter uncertainty, or acceptance threshold is stated in the source.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -17,3 +17,5 @@ The model has one 1H spin at 14.1 T and sets inter.zeeman.scalar={1.5}; the sour
 The initial density operator is equilibrium(spin_system). The script defines an Lz detection state and an Lx pulse operator, applies a pi pulse, and evolves under L+1i*R with a 1 ms step for 1000 steps. The resulting real observable is plotted against linspace(0,1,1001) seconds with the axis labelled as the S_Z expectation value. Thus the figure is a simulated recovery trace from the configured model; no experimental curve or comparison is supplied by this source.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

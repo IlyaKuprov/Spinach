@@ -18,3 +18,5 @@ This is a simulation, not a spectrum read from an experimental acquisition: the 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

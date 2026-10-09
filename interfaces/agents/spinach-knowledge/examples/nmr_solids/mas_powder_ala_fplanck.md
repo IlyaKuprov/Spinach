@@ -15,3 +15,5 @@ The initial state and receiver are both 13C L+. The example calls singlerot with
 The Floquet companion shares the alanine spin-system, basis, and core acquisition values, but additionally sets decouple={} and explicit axis_units=ppm and invert_axis=1 assignments. It calls floquet rather than singlerot. These are wrapper-level differences; neither file specifies a proton decoupling pulse sequence.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

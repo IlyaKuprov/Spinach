@@ -19,3 +19,5 @@ The acquisition sweep is 5000 Hz with 1024 points, zero-filled to 32768; the axi
 The reference diffusion coefficient is 18.55 × 10⁻¹⁰ m²/s. The dosy_oneshot imaging sequence uses gradient amplitude 0.255 T/m, kappa 0.2, gradient duration 0.001 seconds, diffusion delay 0.05 seconds, and gradient-stabilisation delay 0.0005 seconds. The resulting FID is exponentially apodised with parameter 5, Fourier transformed with the specified zero filling, and plotted as the negative real spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

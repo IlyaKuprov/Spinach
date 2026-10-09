@@ -25,3 +25,5 @@ The microwave offset vector is `2*pi*linspace(-15,15,512)*1e6`, shown in MHz. Th
 **Caveats:** the source provides a runtime estimate and resulting DNP surface, which are estimates rather than guarantees. Values whose units or angular conventions are not documented above are kept as source values rather than assigned inferred units.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

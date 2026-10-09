@@ -15,3 +15,5 @@ The source sets sys.magnet to 11.7 and places 1H and 13C at [0, 0, 0] and [0, 0,
 The wrapper requests 512 points, zerofill to 16384, sweep=40000, and axis_units=kHz. It applies exponential apodisation with parameter 5, Fourier-transforms the FID, and plots the real spectrum. The code specifies the plotted frequency axis as kHz but does not annotate units for rate, sweep, or the apodisation parameter. This is a simulated output path, not a claim about a measured spectrum or a validation run.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -23,3 +23,5 @@ The script forms `120` offsets from `-60e6` to `60e6` Hz and adds `reference_poi
 **Use when:** an offset profile at the specified fixed BEAM pulse amplitude is wanted. The source does not expose the profile array as a function return value or set a separately named contact-time parameter; the endpoint is the last value returned by the sequence calculation.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

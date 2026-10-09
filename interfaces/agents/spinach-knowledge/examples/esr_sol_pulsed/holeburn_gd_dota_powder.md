@@ -25,3 +25,5 @@ For each ZFS sample, the two FIDs receive exponential apodisation with parameter
 The source notes that non-central Gd(III) transition holes are very shallow and estimates a calculation time of minutes. The cited distribution source is Raitsimring et al., *Applied Magnetic Resonance* 28, 281–295 (2005), Figure 5 ([DOI](https://doi.org/10.1007/BF03166762)).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

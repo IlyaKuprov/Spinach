@@ -17,3 +17,5 @@ The script sets a 62.5 kHz rotor rate about axis vector `[1 1 1]`, rank 7, and p
 The experiment is run with `singlerot` and `mqmas` in the lab frame. The two acquisition dimensions use 128 points each and are zero-filled to 256 each. Both dimensions receive squared-cosine apodisation before a two-dimensional Fourier transform; the magnitude spectrum is plotted. These settings define a calculation, not an experimentally measured spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

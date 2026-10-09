@@ -23,3 +23,5 @@ The irradiation spin is `'E'`, with `mw_pwr=2*pi*100e3` and `mw_frq=2*pi*linspac
 **Dependencies:** Spinach system/basis/relaxation/state/operator and crystal routines; the `dnp_freq_scan` sequence and plotting helpers `kfigure`, `kgrid`, `kxlabel`, and `kylabel`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -15,3 +15,5 @@ The source sets `sys.magnet=14.1`, one `1H`, and Zeeman scalar `1.5`. It assigns
 The initial state is `E` on `1H`; the detection coil is `Lz` on `1H`. The script constructs the static NMR Hamiltonian and relaxation superoperator, obtains an `Lx` pulse operator, then calls `step(...,pi)` on the initial state (the source comment calls this an inversion pulse). It evolves with `H+1i*R` for `1000` steps of `1e-3 s`, requesting the observable. The real answer is plotted against a `0–1 s` axis and labelled as the `S_Z` expectation value. The page reports the actual initial state and pulse operation without interpreting an uncomputed result.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

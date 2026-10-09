@@ -19,3 +19,5 @@ The optimised phase and fixed amplitude are converted to Cartesian x/y controls 
 The source defines the design and plotting, but does not supply an observed waveform or convergence result. Its calculation-time comment says minutes. Source contacts: ilya.kuprov@weizmann.ac.il and david.goodwin@inano.au.dk.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

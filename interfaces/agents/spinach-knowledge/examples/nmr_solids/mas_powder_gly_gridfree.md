@@ -19,3 +19,5 @@ After `gridfree` returns the FID, the script applies exponential apodisation par
 Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

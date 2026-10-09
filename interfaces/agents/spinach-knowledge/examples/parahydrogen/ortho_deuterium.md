@@ -20,3 +20,5 @@ For the acquisition, the detected spins and coil are `2H`; the pulse operator is
 This is a simulated deuterium spectrum, not an experimental dataset. The source's `options.dephasing=1` is retained as a code setting; the script does not state that it is an exchange rate or a measured dephasing constant. Its placement in the parahydrogen examples directory does not make the modeled initial state a parahydrogen singlet.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

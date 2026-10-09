@@ -22,3 +22,5 @@ The source initialises longitudinal magnetisation on the configured nucleus and 
 [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/inadequate_2d.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inadequate_2d.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

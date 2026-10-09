@@ -14,3 +14,5 @@ For each orientation on `rep_2ang_6400pts_sph`, the initial triplet state is bui
 The script creates a figure; it does not save a spectrum file. The model assumes isotropic `g=2` and is explicitly hypothetical. The source header estimates a calculation time of seconds.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

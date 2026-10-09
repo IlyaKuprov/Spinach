@@ -22,3 +22,5 @@ Before the FFT, the script passes `mean(fid)-fid` to exponential apodisation wit
 - [Cited DOI](https://doi.org/10.1063/1.453532)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

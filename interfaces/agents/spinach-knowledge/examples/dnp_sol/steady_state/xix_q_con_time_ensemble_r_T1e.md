@@ -21,3 +21,5 @@ For each T1e and distance node, the helper uses fixed 18 MHz electron nutation, 
 The five real proton (L_z) expectation-value curves are overlaid and labelled by T1e. The figure limits are 0–6 μs horizontally and 0–1.7e-3 vertically; it is saved as `xix_q_con_time_ensemble_r_T1e.fig`. The function returns no explicit MATLAB output. The source comment estimates hours of calculation time, not a measured runtime here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

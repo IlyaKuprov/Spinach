@@ -15,3 +15,5 @@ The example sets `parameters.spins={'1H','13C'}`, `rate=10000`, axis `[sqrt(2/3)
 The simulation calls `singlerot` with `@cp_acquire_soft` in NMR mode, applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots its real part for 13C using the second configured offset. Thus the plotted result is a simulated carbon spectrum after CP and MAS, not an experimental input spectrum. The source reports minutes on a Tesla A100 and much longer on CPU; it gives no peak values or comparison to measured data.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -17,3 +17,5 @@ The electron nutation frequency is fixed at 20e6 Hz; this variant averages dista
 The real part of the distance-averaged DNP value is plotted as the proton `Lz` expectation value against microwave offset in MHz and saved to `xix_w_field_profile_ensemble_r.fig`. The driver uses Spinach's system, basis, detection, and powder functions and calls `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. It saves the plot as a MATLAB figure, not a separate numeric result file.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

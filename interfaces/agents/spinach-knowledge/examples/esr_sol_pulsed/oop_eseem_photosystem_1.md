@@ -15,3 +15,5 @@ This is a powder-averaged, time-domain Liouville-space simulation of two-pulse o
 The initial state is `Lz⊗Lz`; the detected state is `L+` on the first electron, and `Ly` is the pulse operator. The `oopeseem` helper applies its π/4 pulse and computes the refocused echo trajectory. Powder averaging uses `rep_2ang_1600pts_sph`; 200 points are calculated at a 20 ns timestep. The plotted signal is `−Im(FID)` against the code-defined time `i × timestep/2` (in microseconds), where (i=0,ldots,199); the plot labels intensity in arbitrary units. The script creates a figure but does not save a data file. Its header estimates a calculation time of seconds.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

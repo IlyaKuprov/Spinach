@@ -19,3 +19,5 @@ The first plot shows the three ion σx expectation values and stretch-mode occup
 The source cites Leibfried et al. (2003) for the geometric gate and James, *Appl. Phys. B* 66, 181 (1998) for the three-ion mode frequencies.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

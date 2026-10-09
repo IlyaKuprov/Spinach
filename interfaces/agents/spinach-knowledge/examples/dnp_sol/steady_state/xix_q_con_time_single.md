@@ -17,3 +17,5 @@ Requires Spinach MATLAB functions including `powder` and system/basis/state and 
 The no-argument function returns no MATLAB output. It plots the real proton `Lz` expectation value against contact time and saves `xix_q_con_time_single.fig` in the current directory. This is one fixed-separation result, not a distance-distribution average; the source does not emit a table or array of values as a function output.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

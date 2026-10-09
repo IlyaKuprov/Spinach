@@ -13,3 +13,5 @@ The one-spin model uses sys.magnet=14.1 and constructs its quadrupolar coupling 
 The wrapper sets rate_outer=1e6 and rate_inner=5e6, with ranks 7 and 4. Its axis comments identify 54.74° for the outer rotor and 30.56° for the inner rotor. It uses rep_2ang_100pts_oct, a sweep parameter of [-50000, 50000], 1024 points, 1024-point zero filling, and kHz as the axis unit. Initial state and coil are both 14N L+, with the 14N rotating frame set to 3. The calculation calls doublerot with slowpass in the lab frame and plots the real frequency-domain spectrum. This wrapper does not define the slowpass sequence internals; its source parameters are not experimental measurements or a validation result.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

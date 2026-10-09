@@ -21,3 +21,5 @@ The powder average uses the rep_2ang_3200pts_sph spherical grid. The plotted qua
 The example gives the nitroxide g-tensor reference as [DOI: 10.1063/1.1697233](http://dx.doi.org/10.1063/1.1697233). See the [example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/hard_3_pulse_deer_no.m) and the [three-pulse DEER helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_hard_deer.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

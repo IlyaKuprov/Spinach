@@ -23,3 +23,5 @@ The file specifies the spin-system entries and sequence inputs for this illustra
 Source code: [`examples/esr_sol_pulsed/sifter_nitroxide_powder.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/sifter_nitroxide_powder.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

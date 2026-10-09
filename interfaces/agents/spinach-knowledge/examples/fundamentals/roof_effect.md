@@ -19,3 +19,5 @@ The output is a four-panel set of spectra for the four offset settings. The sour
 [Source example](../../../../../examples/fundamentals/roof_effect.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -69,6 +69,14 @@ function grumble(spin_system)
 if ~isstruct(spin_system)
     error('spin_system must be a structure.');
 end
+if isfield(spin_system.bas,'basis')&&~iscell(spin_system.bas.basis)
+    error('Spinach:basis:retiredGlobalBasis',...
+          'the global bas.basis matrix is retired; use bas.basis{n} and bas.offsets from basis().');
+end
+if isfield(spin_system.bas,'irrep')
+    error('Spinach:basis:retiredIrrep',...
+          'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
+end
 end
 
 % Linux is only free if your time has no value.

@@ -13,3 +13,5 @@ The source describes the target as a `13C` MAS spectrum assuming `1H` decoupling
 The basis uses `sphten-liouv` with no approximation, a `15N` longitudinal subspace, and the `+1` projection. The source sets interaction and proximity cutoffs to 5.0 and 4.0, disables trajectory-level storage, and uses maximum rank 17. It calls `gridfree(spin_system,@acquire,parameters,'nmr')`, then applies exponential apodisation with parameter 6, Fourier transforms the FID after zero-filling 256 points to 1024, and plots the real spectrum. The sweep is 50 kHz, the offset is 15 kHz, and the ppm axis is inverted. These are simulation and display settings; the file does not present an experimentally measured spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

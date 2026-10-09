@@ -23,3 +23,5 @@ The spectral sweep is 44-52 kHz with 256 points and 256-point zero filling. The 
 The program runs one `singlerot` calculation, plots the real part of the simulated spectrum, and does not report any measured signal or fitted parameter. “Hours” in the source header is a runtime estimate only.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -21,3 +21,5 @@ The initial state is `Lz` and the coil operator is `L+` for the electron; no spi
 Each FID is exponentially apodised with parameter 6 and Fourier transformed. The real spectra are overlaid in a figure: red for the chirp, blue for the fixed-frequency soft pulse, and black for the reference. The source does not save a data or figure file and estimates a calculation time of seconds. This is a simulated powder-averaged signal with an ideal observation pulse; it is not a measured spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

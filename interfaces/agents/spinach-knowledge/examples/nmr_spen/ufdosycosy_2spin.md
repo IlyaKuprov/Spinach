@@ -22,3 +22,5 @@ The source also sets diffusion scale dscale=1.0e-10, FOV limits -0.0041 and +0.0
 The returned array is Fourier transformed, with shifts, along all three dimensions. The plotted quantity is the magnitude raised to the one-half power, displayed as a volume over limits [-1, 1] for each plotted coordinate. The source does not name physical units for those three plotted limits, so they are not interpreted here. It estimates hours on an NVIDIA Tesla A100 and much longer on CPU; this is not a measured runtime. The file specifies a three-dimensional processing path but does not explicitly label the physical meaning of each transformed axis beyond its DOSY-COSY context and the listed acquisition parameters.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

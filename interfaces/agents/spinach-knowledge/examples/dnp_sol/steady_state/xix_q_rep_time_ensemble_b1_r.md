@@ -32,3 +32,5 @@ For each distance and B1 node the function builds the system, evaluates the 30 r
 This is the only one of these four repetition-time variants that combines the four-node 3.5–20 Å distance quadrature with the six-node 10–20 MHz B1 quadrature; it evaluates 30 repetition times for each of 24 distance/B1 pairs.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

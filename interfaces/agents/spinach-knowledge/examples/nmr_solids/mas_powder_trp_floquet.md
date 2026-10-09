@@ -21,3 +21,5 @@ Both systems use the `sphten-liouv` formalism with the `IK-0` approximation, lon
 The summed FID receives exponential apodisation with parameter 6, then a Fourier transform. The plotted trace is the real part of the calculated spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

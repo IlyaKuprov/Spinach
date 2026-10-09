@@ -54,7 +54,7 @@ mixing_time=[0.01; 0.1; 0.5; 1; 5; 10]; % s
 parameters.rho_eq=equilibrium(spin_system);
 
 % Detection state
-parameters.coil=coil_state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Rotating frame Liouvillian
 L=hamiltonian(assume(spin_system,'nmr'))+...

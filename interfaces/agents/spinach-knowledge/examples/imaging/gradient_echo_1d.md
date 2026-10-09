@@ -13,3 +13,5 @@ The one-dimensional geometry is `dims=0.30` with 100 points and `{'period',3}` d
 The returned echo is plotted as its real part against a 401-point axis from `-0.04` to `+0.04` seconds (the range is calculated from the configured step duration and step count). The plot labels signal intensity in arbitrary units. The example does not define an RF-pulse amplitude or duration separately; avoid attributing either to this sequence from this file alone.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

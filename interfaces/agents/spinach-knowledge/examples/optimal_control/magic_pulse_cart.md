@@ -19,3 +19,5 @@ After optimisation, the waveform is simulated on an initial Lz state with the pi
 These are design and evaluation settings in the example source, not a reported optimisation outcome or a kernel-test result. The source comments estimate a calculation time of minutes. Source contacts: ilya.kuprov@weizmann.ac.il and david.goodwin@inano.au.dk.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -27,3 +27,5 @@ The source uses Spinach system construction and propagation functions `create`, 
 The saved figure `top_q_con_time_ensemble_b1.fig` plots the real proton longitudinal expectation value against total contact time for the two B1 ensembles. It represents the specified pair, TOP helper, relaxation model, and six-node quadratures; the source provides no numerical result array as a function return.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

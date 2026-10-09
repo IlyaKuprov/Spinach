@@ -15,3 +15,5 @@ The sequence parameters are spins `{'E','1H'}`, offset assignment `[(-3.3+5.0)*1
 The powder-averaged simulation call is `contact_curve=powder(spin_system,@beamdnp,parameters,'esr')`. The plotted time samples span zero to `sum(parameters.pulse_dur)*parameters.nloops` using `nloops+1` points; the plot is `real(contact_curve)`, with contact time in seconds and the `^1H I_z` expectation on the vertical axis.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

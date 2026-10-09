@@ -22,3 +22,5 @@ The shared spin/pulse setup is: `sys.magnet=1.2142`; Zeeman eigenvalues `[2.0031
 Run the zero-argument function with Spinach and the example helpers on the MATLAB path. It calls `create`, `basis`, `state`, `powder`, and `xixdnp_steady`; plotting uses `kfigure`, `kgrid`, `kxlabel`, `kylabel`, and `klegend`. The distance integration uses [`gaussleg.m`](../../../../../../kernel/grids/gaussleg.m); no external parameter file is read. The function plots `-real(dnp)` and saves `xix_q_rep_time_ensemble_r_T1n.fig` in the current working directory; it does not write a separate numeric-results file. The source estimates calculation time in hours. The scanned T1n is converted directly to the proton longitudinal rate `1/T1n`; the electron longitudinal rate stays at `1e3`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

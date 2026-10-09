@@ -29,3 +29,5 @@ The implementation constructs the probe-spin X/Y pulse operators and real/imagin
 The result has four phase-cycle channels: `answer.pxpxpx`, `answer.pypypx`, `answer.mxmxpx`, and `answer.mymypx`; each has `real` and `imag` quadrature components. The code projects and normalises by the corresponding probe-spin coil-state norm. Every real/imaginary component is a row vector of length `nsteps(1)+nsteps(2)+1`, including the initial trajectory point; no separate named delay-axis vectors are returned. The source supplies pulse angles and parameter constraints, but no example numerical times, measured data, or DOI.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

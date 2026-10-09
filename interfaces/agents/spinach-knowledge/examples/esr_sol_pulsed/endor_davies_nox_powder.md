@@ -16,3 +16,5 @@ This example is specifically the soft-pulse Davies variant: its orientation-sele
 Source: [examples/esr_sol_pulsed/endor_davies_nox_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/endor_davies_nox_powder.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

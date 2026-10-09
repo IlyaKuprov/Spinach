@@ -58,8 +58,8 @@ parameters.spins={'E'};
 parameters.mw_pwr=2*pi*100e3;
 parameters.mw_frq=2*pi*[linspace(144.0,145.5,100)...
                         linspace(14.0,15.5,100)]*1e6;
-parameters.coil=[coil_state(spin_system,'Lz','1H')...
-                 coil_state(spin_system,'Lz','15N')];
+parameters.coil=[coil_state(spin_system,'Lz','1H','exact')...
+                 coil_state(spin_system,'Lz','15N','exact')];
 parameters.mw_oper=operator(spin_system,'Lx','E');
 parameters.ez_oper=operator(spin_system,'Lz','E');
 parameters.orientation=[pi/4 pi/5 pi/6];

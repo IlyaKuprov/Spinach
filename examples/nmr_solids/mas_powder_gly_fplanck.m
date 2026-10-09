@@ -41,7 +41,7 @@ parameters.offset=17000;
 parameters.spins={'13C'};
 parameters.grid='leb_2ang_rank_23';
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=coil_state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.verbose=0;
 
 % Simulation

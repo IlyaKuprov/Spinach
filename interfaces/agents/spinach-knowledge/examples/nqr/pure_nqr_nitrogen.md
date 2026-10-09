@@ -16,3 +16,5 @@ The acquisition requests anisotropic equilibrium, uses a 5e6 Hz sweep, 512 point
 Estimated calculation time: seconds.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

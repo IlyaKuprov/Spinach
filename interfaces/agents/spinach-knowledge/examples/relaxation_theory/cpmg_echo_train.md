@@ -7,3 +7,5 @@ This script computes a powder-averaged CPMG echo train for two protons at 14.1 T
 The powder grid is rep_2ang_200pts_sph. The selected channel is 1H, with L+ for both the initial state and receiver coil and Lx as the pulse operator. The parameters set 10 loops, a 1e-5 s timestep and 100 points. The powder NMR simulation returns fid; the plotted observable is real(fid) against the constructed time axis, labelled as the S_X expectation value. No measured echo train is supplied for comparison.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

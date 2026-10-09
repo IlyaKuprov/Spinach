@@ -20,3 +20,5 @@ For acquisition, the observed spin, initial state, and coil are all `1H` (the la
 This is one specified two-spin model and one acquisition; it does not vary the couplings, correlation time, or basis, or separately report the cross-correlation contribution. The script's numeric coupling, quadrupolar, coordinate, and correlation-time settings are literals rather than a reusable input interface. Coordinate units are not stated in the source.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

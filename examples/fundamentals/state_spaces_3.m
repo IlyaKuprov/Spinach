@@ -31,7 +31,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'Lx','1H');
-parameters.coil=coil_state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Assumptions
 spin_system=assume(spin_system,'nmr');

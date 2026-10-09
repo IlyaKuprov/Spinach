@@ -20,3 +20,5 @@ The initial state and receiver are both the `1H` `L+` state. The acquisition use
 The result is a plotted, processed 1D spectrum; the source does not provide an expected numerical spectrum or assertion threshold. The acquisition sweep and displayed axis use hertz as specified by `axis_units='Hz'`; other units are not stated in the file.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

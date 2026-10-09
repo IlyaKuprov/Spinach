@@ -19,3 +19,5 @@ The magic-angle parameter is atan(sqrt(2)); the spectrum axis input is [sqrt(2/3
 This is one parameter setting, not a power or spinning-rate scan: the proton RF-power input is 2*pi*[55.0e3 35.1e3]/sin(theta), the 14N overtone RF-frequency input is 86.30e3, and rf_dur=1e-4. The source calculates the spectrum with singlerot and overtone_cp, then plots its real part with plot_1d.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

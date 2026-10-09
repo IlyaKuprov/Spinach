@@ -15,3 +15,5 @@ The acquisition observes `1H`, starts from the `L+` state for `1H`, and uses the
 The source comment states the expected qualitative outcome, namely splitting from the hypothetical uranium coupling; the script does not encode a numeric peak-position check or report a measured spectrum. Exact plotted output depends on the simulation and processing settings above. Source: [examples/fundamentals/high_spin_system_1.m](../../../../../examples/fundamentals/high_spin_system_1.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

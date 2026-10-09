@@ -60,7 +60,7 @@ rho=rho-rho_eq;
 % Set up a pulse-acquire sequence with the resulting state set as initial
 parameters.spins={'1H'};
 parameters.rho0=rho;
-parameters.coil=coil_state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.pulse_op=operator(spin_system,'Ly','1H');
 parameters.pulse_angle=pi/2;
 parameters.decouple={};

@@ -13,3 +13,5 @@ For the GRAPE comparison, the initial state is normalised Ly on ¹H and the targ
 The figure compares the two-channel nutation-frequency waveforms and the real ¹⁵N X-expectation trajectory for the tangent ramp, the same-duration GRAPE pulse, and the half-duration GRAPE pulse. The code does not report an experimental transfer measurement or a quantitative agreement statistic.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

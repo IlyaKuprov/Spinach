@@ -19,3 +19,5 @@ This is a computed final-contact signal-versus-power curve, not an experimental 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_1.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

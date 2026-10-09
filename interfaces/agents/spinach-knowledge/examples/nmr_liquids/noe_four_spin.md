@@ -16,3 +16,5 @@ The code builds the relaxation superoperator and thermal-equilibrium state, then
 The liquid simulation uses `@hp_acquire`; exponential apodisation with parameter 6 precedes a shifted FFT, and the real spectrum is plotted over 0.8–4.2 ppm. The source provides no experimental NOE rates, calibrated intensities, or DOI.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

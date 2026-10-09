@@ -15,3 +15,5 @@ The initial density operator is the concentration-weighted 1H raising operator, 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/exchange_asymmetric.m)
 
 Exchange is declared as two first-order reaction records with explicit reciprocal spin matching. Preparation is concentration weighted; detection uses unweighted `coil_state`. Rates and equilibrium concentration ratios are unchanged.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

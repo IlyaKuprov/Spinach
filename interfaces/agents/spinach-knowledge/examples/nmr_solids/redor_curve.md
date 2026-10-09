@@ -16,3 +16,5 @@ The two spins have zero scalar Zeeman entries, with coordinates `[0,0,0]` and `[
 The initial state and receiver are both the 13C `Lx` state. The source evaluates cycle counts 0 through 48 and plots `real(curve(3,:)./curve(1,:))`, labelled as the normalised REDOR difference. The horizontal axis is labelled REDOR evolution time in rotor cycles. The example sets no explicit pulse-duration or pulse-amplitude parameters.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -18,3 +18,5 @@ This is an acquisition/FID calculation rather than an explicitly programmed RF-p
 The source warns that the run needs 32 CPU cores, 128 GB of RAM, and a Titan V or later, and estimates minutes on that setup. This is the source's hardware/runtime note, not a general performance guarantee. The page preserves the 16-active-spin description and the model's stated numerical field input without adding an unsupported tesla unit. No DOI or external literature source is supplied in the script.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

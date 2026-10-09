@@ -25,3 +25,5 @@ Each objective evaluation constructs one 1H liquid-acquisition simulation at off
 The entry point has no output argument. The source defines a local unconstrained search and a residual objective, but does not provide a measured fit result or parameter uncertainties. The two input regions form one concatenated fit against a single simulated spectrum, rather than two independently optimised experiments.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -17,3 +17,5 @@ The rotor axis is `[1 1 1]` and rate `1000 Hz`; powder settings are `leb_2ang_ra
 The returned FID is exponentially apodised with parameter `6`, Fourier transformed with `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted using `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

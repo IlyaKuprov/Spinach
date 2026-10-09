@@ -16,3 +16,5 @@ The system is two `1H` spins at 5.9 T, with scalar shifts 1.0 and 1.5 and a 7.0 
 The source defines no pass/fail tolerance, convergence criterion, or comparison target; the sphere limits are plot bounds, not acceptance thresholds. The code displays trajectories but does not report a numerical fit or claim a measured spin-lock efficiency.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

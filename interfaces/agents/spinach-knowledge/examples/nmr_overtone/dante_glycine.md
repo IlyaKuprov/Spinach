@@ -19,3 +19,5 @@ The sequence uses average treatment, four periods, and two pulses. The source se
 This is a single-spin nitrogen overtone DANTE calculation, not a proton-to-nitrogen cross-polarisation scan. The phase multiplication is part of the source's plotting workflow; it is not evidence of a fitted experimental phase.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

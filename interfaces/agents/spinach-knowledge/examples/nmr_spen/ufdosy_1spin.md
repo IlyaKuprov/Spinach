@@ -12,3 +12,5 @@ Acquisition inputs are 1H, `td=100 ms`, dwell 1.5 microseconds, 128 points, 256 
 The code runs imaging with `@spendosy`, Fourier-transforms both FID dimensions, and plots the magnitude. It computes the chemical-shift axis from the offset, acquisition width, and magnet frequency, and the displacement axis from the dwell and acquisition gradient; the latter is displayed in millimetres. This gives a shift-versus-position image for the specified diffusion simulation. No experimental comparison, diffusion-fit validation, or accuracy limit is included. The source's A100/CPU time comment is not a validated runtime.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

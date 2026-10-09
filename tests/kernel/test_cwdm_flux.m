@@ -30,8 +30,8 @@ s=basis(create(sys,inter),bas); generator=kinetics(s);
 eta=unit_state(s); K=generator(0,eta);
 
 % Assert transfer and conservation of single-spin magnetisation
-molecule=coil_state(s,'Lz',1); partner=coil_state(s,'Lz',2);
-pool=coil_state(s,'Lz',3); correlation=coil_state(s,{'Lz','Lz'},{1,2});
+molecule=coil_state(s,'Lz',1,'exact'); partner=coil_state(s,'Lz',2,'exact');
+pool=coil_state(s,'Lz',3,'exact'); correlation=coil_state(s,{'Lz','Lz'},{1,2},'exact');
 result=test_close(result,'molecule to pool',K*molecule,2*(pool-molecule),1e-12,0,...
                   'the departing spin enters the pool at the reaction rate');
 result=test_close(result,'pool to molecule',K*pool,2*(molecule-pool),1e-12,0,...

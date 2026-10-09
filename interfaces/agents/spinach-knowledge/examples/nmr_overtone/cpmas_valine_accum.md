@@ -23,3 +23,5 @@ The frequency axis spans 70-105 kHz, with 256 points and 256-point zero filling.
 Each panel plots the real part of a simulated spectrum. The displayed intensity limits, from `-1.7569e-3` to `1.7569e-3`, are plotting limits set by the source, not measured bounds. The source header's “hours” is an estimate; this task did not run the example or observe experimental data.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

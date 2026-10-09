@@ -21,3 +21,5 @@ Acquisition is delegated through `liquid(spin_system,@acquire,parameters,'nmr')`
 The returned FID is apodised with `{'gauss',10}`, Fourier-transformed as `fftshift(fft(fid,parameters.zerofill))`, and displayed as `real(spectrum)` with `plot_1d`. The zero-argument function does not declare a returned value or write an output spectrum file in this source. No experimental spectrum is loaded or compared in the wrapper.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

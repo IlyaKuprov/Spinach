@@ -28,3 +28,5 @@ This describes the implemented sequence, not simulated or measured recovery curv
 - [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=sat_rec.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

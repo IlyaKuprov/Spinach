@@ -57,7 +57,7 @@ Lx=operator(spin_system,'Lx','19F');
 Ly=operator(spin_system,'Ly','19F');
 
 % Set detection state to L+
-coil=coil_state(spin_system,'L+','19F');
+coil=coil_state(spin_system,'L+','19F','exact');
 
 % Calculate the time step of the simulation
 timestep=1/parameters.sweep;

@@ -18,3 +18,5 @@ The comparison crosses `sphten-liouv` and `zeeman-liouv` with the `dibari` and `
 Four relative norm differences compare the trajectories between formalisms for each method and between the two methods for each formalism. The test's threshold is `1e-3`; exceeding it raises an error. Its output is this numerical cross-check, not a plotted spectrum. The source contains a success message, but no successful execution is claimed here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

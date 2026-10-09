@@ -23,3 +23,5 @@ Run `fluorobutane()` with both MAT files available to MATLAB. It has no declared
 The source specifies no parameter bounds, uncertainty estimates, or fit-success criterion; the displayed vector is an optimiser result, not a reported measured fit outcome.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

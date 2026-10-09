@@ -13,3 +13,5 @@ The source requests Redfield relaxation together with SRSK, sets the equilibrium
 The source runs `liquid(spin_system,@acquire,parameters,'nmr')`. The `@acquire` simulation observes `1H`, initialises and detects with proton `L+`, and has no decoupling spins configured. It uses offset 500 Hz, sweep 1400, 4096 acquired points, zero-filling to 16536, ppm axis units, and an inverted axis. The FID is exponentially apodised with the source's value 6, Fourier transformed, and the real part of the calculated spectrum is plotted with `plot_1d`. The resulting line shape and intensities are simulated, not a digitised or measured pulse-acquire spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

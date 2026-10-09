@@ -21,3 +21,5 @@ Three non-decoupled acquisitions use the source's ppm-axis and reversed-axis con
 The function declares no output argument and the source reports no measured fit outcome, uncertainty, or fit-quality statistic. Numeric offsets are assigned in the acquisition setup, but no offset units are inferred here; the code explicitly sets `axis_units='ppm'`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

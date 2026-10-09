@@ -9,3 +9,5 @@ The calculation uses the complete spherical-tensor Liouville basis, full laborat
 The independent two-state exchange and rotational Redfield descriptions are phenomenological approximations. Collision trajectories, the other fluorines, and other relaxation mechanisms are omitted; the fastest rates are illustrative rather than calibrated liquid-state parameters. The example neither downloads inputs nor saves files automatically.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

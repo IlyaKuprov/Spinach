@@ -23,3 +23,5 @@ The function makes separate, non-decoupled liquid acquisitions for 19F and the t
 This is a source-described local search, not a report of a measured optimum: the entry point has no output argument and the source supplies no uncertainty estimate or fit-quality result. The 1H residuals receive twice the weight of the 19F residual in the objective, so the three plotted panels do not contribute equally to the stated error functional.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

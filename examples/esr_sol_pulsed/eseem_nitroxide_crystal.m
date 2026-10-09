@@ -39,7 +39,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=coil_state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.screen=state(spin_system,'L-','E');
 parameters.pulse_op=operator(spin_system,'Ly','E');
 parameters.npoints=1024;

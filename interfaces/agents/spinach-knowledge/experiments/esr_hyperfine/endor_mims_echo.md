@@ -24,3 +24,5 @@ stim_echo is the time-sampled stimulated echo in the absence of nuclear RF. The 
 Source: https://spindynamics.org/wiki/index.php?title=endor_mims_echo.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

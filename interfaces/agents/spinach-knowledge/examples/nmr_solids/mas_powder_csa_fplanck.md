@@ -13,3 +13,5 @@ The basis is `sphten-liouv` with no approximation and the `+1` projection. The r
 The signal is acquired on `1H` from and to `L+` states. The sweep is 20 kHz, with 512 points and zero-fill to 4096. The source applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots the real spectrum. It does not set offset, axis units, or axis inversion in this file. The settings define a simulation and processing pipeline, not an experimentally measured spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

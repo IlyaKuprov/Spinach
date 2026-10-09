@@ -19,3 +19,5 @@ For each distance and each of six Gauss–Legendre B1 points spanning 10e6–20e
 Requires Spinach and `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`. First the B1 results are quadrature-weighted; the distance average then applies the radial `r^2` factor with its quadrature weights and normalisation. It plots the real proton `Lz` signal against microwave offset in MHz and saves `xix_q_field_profile_ensemble_b1_r.fig` in the MATLAB current directory. No numerical profile is saved, and both ensembles use finite quadrature grids.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

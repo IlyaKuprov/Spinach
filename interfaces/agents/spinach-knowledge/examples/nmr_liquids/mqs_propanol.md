@@ -14,3 +14,5 @@ The initial state is proton `Lz` and the detected state is proton `L+`. The sequ
 The `@mqs` liquid-NMR sequence is simulated at three tau delays: 0.0333, 0.0710, and 0.5000 s. Each 2D FID is sine-apodised in both dimensions, transformed with a zero-filled 2D FFT, and displayed as an absolute-value spectrum. Thus the three panels compare the selected +3 coherence response across tau; the source does not supply experimental intensities or a fitted transfer rate. No DOI is cited.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

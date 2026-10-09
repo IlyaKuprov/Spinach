@@ -19,3 +19,5 @@ The later signal-generation section is distinct from the design objective: it in
 Source: [examples/optimal_control/features_wave_basis.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_wave_basis.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -20,3 +20,5 @@ Relaxation is {'redfield'}, equilibrium is dibari, the retained relaxation terms
 The simulation call is liquid(spin_system,@dnp_time_dep,parameters,'esr'). The figure plots the electron longitudinal signal (answer row 3) and both proton longitudinal signals (rows 1–2) over 0–1000 microseconds. The proton legend labels the traces as 1.5 Å and 2.5 Å from the electron. The source plots these time traces; it does not provide a separate analytical enhancement value or a static-field comparison.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

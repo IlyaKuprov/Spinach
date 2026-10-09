@@ -16,3 +16,5 @@ Using `zeeman-hilb` with no basis approximation, the initial state `{'ZL2','BL1'
 The curves represent ideal resonant exchange between one modelled electronic excitation and one phonon quantum. They are neither an EPR spectrum nor a measured spin-qubit swap or fidelity result. The source's “Calculation time: seconds” note is not measured here and does not establish runtime or convergence.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -19,3 +19,5 @@ The code calls `singlerot`, applies exponential apodisation with parameter `6`, 
 Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

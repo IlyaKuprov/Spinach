@@ -20,3 +20,5 @@ The encoding uses 500 pulse points and 40 WURST cycles, with Te=0.015 s, bandwid
 The imaginary part of the simulated k-space echo array is plotted against its t2-point and k-space-point indices. The conventional dimension is Fourier transformed with a shift along dimension 2; the magnitude is then plotted in ppm for the two 1H spins. The source estimates minutes on an NVIDIA Tesla A100 and much longer on CPU; this is not a reproduced timing. No DOI, imported measurement, or experimental validation is specified in the example.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

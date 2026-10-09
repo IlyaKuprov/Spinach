@@ -10,3 +10,5 @@ The spin system is `1H, 103Rh, 103Rh` at `11.75 T`. The proton shielding matrix 
 For acquisition, the source sets both the initial state and receiver to the proton `L+` operator, with no decoupling. It specifies offset `6.9*500 Hz`, sweep width `50 Hz`, `2048` points, zero-fill to `16384`, ppm axis units, and an inverted axis. `liquid(...,@acquire,...,'nmr')` generates the FID; exponential apodisation with coefficient `20` precedes the Fourier transform and plot. These are simulation settings, not experimental acquisition metadata.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

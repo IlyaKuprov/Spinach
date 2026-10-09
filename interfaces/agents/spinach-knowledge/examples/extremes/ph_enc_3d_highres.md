@@ -24,3 +24,5 @@ The image sequence is `imaging(spin_system,@phase_enc_3d,parameters)`. The outpu
 The source warns of an eight-H200, 4-TB system footprint and hours of runtime if the calculation starts. The setup is a resource-intensive high-resolution imaging example; the exact grid dimensions come from the named phantom at runtime.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

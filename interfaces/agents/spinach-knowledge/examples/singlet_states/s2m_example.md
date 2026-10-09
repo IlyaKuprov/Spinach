@@ -19,3 +19,5 @@ The input is the singlet on spins 1 and 2; the detector is `coil_state(spin_syst
 [examples/singlet_states/s2m_example.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/s2m_example.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

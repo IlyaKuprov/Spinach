@@ -15,3 +15,5 @@ The source uses the Floquet route directly: `floquet(spin_system,@acquire,parame
 The returned FID is exponentially apodised with parameter `6`, Fourier transformed using `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted with `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

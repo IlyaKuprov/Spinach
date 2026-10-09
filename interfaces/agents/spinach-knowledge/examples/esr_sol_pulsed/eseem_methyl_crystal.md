@@ -22,3 +22,5 @@ The upper panel plots the real FID against sample index times `timestep`, labell
 - [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

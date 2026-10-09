@@ -21,3 +21,5 @@ The basis uses `sphten-liouv`, `IK-0`, longitudinal `15N`, projection +1, and in
 The summed FID is exponentially apodised with parameter 6 and Fourier transformed. The plotted trace is the real part of the calculated spectrum.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

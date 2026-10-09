@@ -14,3 +14,5 @@ Two independent uniform random control arrays, Cx and Cy, are formed as 100 rad/
 No pulse sequence, spatial gradient, chirp or field-drop schedule is specified. The source comments say a Titan V GPU is required at minimum and estimate minutes, but those hardware and runtime statements are not validation results. The explicit GPU-enable setting is commented out even though the code subsequently uses `gpuArray`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

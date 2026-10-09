@@ -19,3 +19,5 @@ Run from a Spinach MATLAB environment with `gaussleg`, `powder`, and the usual S
 The no-argument function returns no MATLAB output. It plots the real part of the distance-averaged proton `Lz` expectation value against contact time and saves `xix_q_con_time_ensemble_r_T1n.fig` in the current directory. The plotted family differs only by nuclear T1; the four-node distance quadrature and remaining model/protocol settings stay fixed.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

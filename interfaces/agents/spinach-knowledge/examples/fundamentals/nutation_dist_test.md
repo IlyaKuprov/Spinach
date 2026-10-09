@@ -25,3 +25,5 @@ The inverse call is `nutation_dist(curve,dt,lambda)` with `lambda = 3e2`; the so
 The example is a one-spin, on-resonance synthetic recovery with a selected distribution, noise level, and regularisation parameter. It contains no numerical recovery-error metric or pass/fail assertion, and it does not establish performance on experimental data or other distributions. No MATLAB execution or recovered numerical values are claimed here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

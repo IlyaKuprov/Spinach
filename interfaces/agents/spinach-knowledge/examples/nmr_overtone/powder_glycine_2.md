@@ -19,3 +19,5 @@ The source sets the magic angle to `atan(sqrt(2))`, initialises `rho0` as the 14
 The header describes a static-sample spectrum. This script specifies no MAS or DOR rotor rate, RF pulse sequence, or contact-time parameter. No experimental comparison or fitted spectrum is produced by this file.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

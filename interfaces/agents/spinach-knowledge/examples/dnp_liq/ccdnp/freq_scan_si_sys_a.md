@@ -11,3 +11,5 @@ The model uses sphten-liouv with no approximation and Redfield relaxation with z
 The figure plots the real normalised response against field and microwave-frequency offset, converted to MHz relative to the isotropic electron-1 g reference. No data array is written. Unlike the main-text parameterisation, this SI file sets the electron g tensors near 1.978, exchange to 6.2e6, and scans offsets from -10 to 30 MHz; use this file when the system-A parameter set, rather than the main-text set, is intended. The source's “Calculation time: seconds” is an estimate, not a reproduced runtime.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -21,3 +21,5 @@ Preparation starts from `state(...,'Lz','14N')`. Both the coil and the `Lx` oper
 The script phases the returned spectrum by `exp(1i*1.35)` and plots `real(spectrum)` with `plot_1d`. The source labels the calculation time as minutes. It defines a plotted simulation, not a saved data product; it does not report a fit, validation, or the numerical spectrum values.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

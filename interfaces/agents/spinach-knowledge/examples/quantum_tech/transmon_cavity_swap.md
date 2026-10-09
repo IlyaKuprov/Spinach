@@ -17,3 +17,5 @@ The code evaluates transmon and cavity excitation populations from separate coil
 The source relates the example to the circuit-QED Jaynes–Cummings model and cites Blais et al., *Reviews of Modern Physics* **93**, 025005 (2021) ([DOI](https://doi.org/10.1103/RevModPhys.93.025005)).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

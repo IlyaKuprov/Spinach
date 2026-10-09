@@ -23,3 +23,5 @@ With Spinach available on the MATLAB path, call `xix_parameter_scan()`. It evalu
 The example depends on Spinach system/basis/state construction, the `xixdnp` sequence, `powder` ESR averaging, and Spinach plotting helpers; its inner scan uses MATLAB `parfor`.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

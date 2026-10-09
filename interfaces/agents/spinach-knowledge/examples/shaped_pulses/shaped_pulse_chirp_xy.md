@@ -19,3 +19,5 @@ After the chirp, homospoil with the destroy option removes the remaining transve
 The shaped_pulse_xy implementation cites DOI [10.1016/j.jmr.2004.08.017](https://doi.org/10.1016/j.jmr.2004.08.017). The example and implementation can be inspected at [shaped_pulse_chirp_xy.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_chirp_xy.m) and [shaped_pulse_xy.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_xy.m).
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

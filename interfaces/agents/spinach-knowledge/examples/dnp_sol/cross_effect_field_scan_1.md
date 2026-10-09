@@ -23,3 +23,5 @@ The ESR parameters set `mw_pwr=10e6`, `mw_frq=0`, electron irradiation spins `{'
 **Dependencies:** Spinach create/basis/state/operator, powder and plotting routines; the `dnp_field_scan` sequence and `rep_2ang_1600pts_sph` grid.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

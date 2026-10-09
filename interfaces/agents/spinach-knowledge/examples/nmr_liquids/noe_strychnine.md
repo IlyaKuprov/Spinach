@@ -21,3 +21,5 @@ Pulse-acquire observes `1H`: the initial state is the difference operator, the c
 [examples/nmr_liquids/noe_strychnine.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_strychnine.m)
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

@@ -22,3 +22,5 @@ The implementation uses pi/2 rotations and propagates npoints-1 further indirect
 Source: https://spindynamics.org/wiki/index.php?title=endor_mims.m
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

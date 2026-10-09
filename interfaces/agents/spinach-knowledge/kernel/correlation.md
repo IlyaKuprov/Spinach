@@ -36,3 +36,5 @@ Correlation orders and numeric spin selectors are integer indices; no physical u
 The header names the third argument `correlation_orders`; the executable declaration calls it `orders`. This is a parameter-name clarification only.
 
 Multi-substance Zeeman filtering is unsupported and raises `Spinach:correlation:segmentedZeeman` before constructing a tensor-product channel or applying a diagonal mask. Single-substance Zeeman and segmented spherical-tensor paths remain available.
+
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.

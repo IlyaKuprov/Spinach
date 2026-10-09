@@ -19,3 +19,5 @@ The sequence uses the 1H channel, no decoupling, zero offset, 48 pulses, and `de
 The distinctive sequence call is `imaging(spin_system,@udd_dec,parameters)`. The script plots `surf(abs(mri))` with the X direction reversed and pixel-labelled axes, under the title 'Bright fat effect under UDD echo train'. It defines no numerical image result in the page.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

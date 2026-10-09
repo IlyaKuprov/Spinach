@@ -23,3 +23,5 @@ The wrapper samples 50 proton RF settings from 10 to 200 kHz and 50 sample spinn
 For each condition the program reduces the real spectrum to `sum(real(spectrum))`, then plots the resulting values as an image: proton RF nutation frequency in kHz horizontally and sample spinning rate in kHz vertically. The image is a computed matching-profile map; this source contains no measured intensity array or displayed numerical optimum. The header's “hours” describes expected calculation time, not a measured runtime here.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

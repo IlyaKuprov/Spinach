@@ -18,3 +18,5 @@ The observable is a simulated `1H` NMR spectrum. The code sets both initial stat
 The source comment estimates a calculation time of hours and does not state a hardware configuration. This is an example of basis-size management for this model, not a measured comparison of alternative calculations; the file provides no output values, benchmark table, DOI, or experimental validation.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

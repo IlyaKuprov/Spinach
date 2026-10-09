@@ -11,3 +11,5 @@ The DOR setup sets `theta=atan(sqrt(2))`, outer and inner rates 1425 and 6950, a
 Average treatment is selected with `rf_pwr=2*pi*3.0e6`, `rf_dur=1.0e-6`, and `rf_frq=-10e3`. The code calls `doublerot` with `overtone_pa` and `qnmr`, multiplies the result by `exp(1i*1.49)`, then plots its real part with `plot_1d`. The page records the inputs and output path in the example; it does not claim that the plotted trace reproduces the cited figure.
 
 Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.
+
+Unweighted receiver calls explicitly supply the `exact` method required by the four-argument `coil_state` API.

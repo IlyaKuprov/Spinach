@@ -101,7 +101,8 @@ if strcmp(mode,'report')
     summary_chemistry(spin_system);
     for n=1:numel(reactions)
         reaction=reactions{n};
-        source_spins=cell2mat(spin_system.chem.parts(reaction.reactants));
+        source_spins=cellfun(@(x)x(:)',spin_system.chem.parts(reaction.reactants),'UniformOutput',false);
+        source_spins=[source_spins{:}];
         report(spin_system,['reaction ' num2str(n) ': matched spins ' ...
                mat2str(reaction.matching(:,1)') ', traced spins ' ...
                mat2str(setdiff(source_spins,reaction.matching(:,1))) ...

@@ -50,6 +50,17 @@ for n=1:8
                       'the product contains two reactant atom equivalents');
 end
 
+% Report mixed row and column memberships without changing the generator
+mixed=s; mixed.chem.parts={1,2,[3;4],[]};
+mixed.chem.reactions={struct('reactants',[3 1],'products',[],...
+                            'matching',zeros(0,2),'rate',2,'closure','additive')};
+ordinary=kinetics(mixed); mixed.sys.output=1;
+[text,reported]=evalc('kinetics(mixed,''report'');');
+result=test_true(result,'mixed membership reporting',contains(text,'traced spins [1 3 4]'),...
+                 'reporting accepts row and column spin memberships in the same reaction');
+result=test_close(result,'report generator invariance',reported(0,eta),ordinary(0,eta),0,0,...
+                  'formatting reaction membership does not change the assembled generator');
+
 % Check a reverse first-order reaction and a tracked spin-free sink
 reverse=struct('reactants',3,'products',[1 2],'matching',[3 1;4 2],'rate',2);
 sink=struct('reactants',3,'products',4,'matching',zeros(0,2),'rate',3);

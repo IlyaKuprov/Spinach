@@ -9,3 +9,5 @@ This compact analytic network is not a substitute for regression of the migrated
 Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.
 
 Zero numeric higher-order rates give a sparse zero generator and the same ordinary liquid/acquire FID as absent chemistry; a zero-valued rate callback still returns a dynamic handle.
+
+The reporting regression combines column and row memberships in one reaction, checks the traced-spin text, and verifies exact equality with the ordinary-call generator.

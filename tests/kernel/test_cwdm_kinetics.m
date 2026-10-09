@@ -50,6 +50,17 @@ for n=1:8
                       'the product contains two reactant atom equivalents');
 end
 
+% Report mixed row and column memberships without changing the generator
+mixed=s; mixed.chem.parts={1,2,[3;4],[]};
+mixed.chem.reactions={struct('reactants',[3 1],'products',[],...
+                            'matching',zeros(0,2),'rate',2,'closure','additive')};
+ordinary=kinetics(mixed); mixed.sys.output=1;
+[text,reported]=evalc('kinetics(mixed,''report'');');
+result=test_true(result,'mixed membership reporting',contains(text,'traced spins [1 3 4]'),...
+                 'reporting accepts row and column spin memberships in the same reaction');
+result=test_close(result,'report generator invariance',reported(0,eta),ordinary(0,eta),0,0,...
+                  'formatting reaction membership does not change the assembled generator');
+
 % Check a reverse first-order reaction and a tracked spin-free sink
 reverse=struct('reactants',3,'products',[1 2],'matching',[3 1;4 2],'rate',2);
 sink=struct('reactants',3,'products',4,'matching',zeros(0,2),'rate',3);
@@ -94,6 +105,40 @@ inter.chem.reactions={forward}; inter.chem.reactions{1}.rate=@(t)2+t;
 s=basis(create(sys,inter),bas); K=kinetics(s); eta=unit_state(s);
 result=test_close(result,'time rate',chem_concs(s,K(0.5,eta)*eta),[-1.75 1.75 0 0],1e-12,0,...
                   'the first-order rate at t=0.5 is 2.5');
+
+% Share each time schedule across unequal voxel populations
+profile clear; profile on;
+spatial=K(0.5,[eta;2*eta;3*eta]);
+profile off; timing=profile('info');
+callback=contains({timing.FunctionTable.FunctionName},'@(t)2+t');
+calls=sum([timing.FunctionTable(callback).NumCalls]);
+result=test_true(result,'one schedule call',calls==1,...
+                 'the shared stage time requires one callback evaluation, not one per voxel');
+result=test_close(result,'time rate across voxels',...
+                  chem_concs(s,spatial*[eta;2*eta;3*eta]),...
+                  [1;2;3]*[-1.75 1.75 0 0],1e-12,0,...
+                  'the same schedule rate acts on each local concentration');
+
+% Static zero-rate higher-order records remain usable in linear contexts
+inactive=s; inactive.chem.reactions={reaction};
+inactive.chem.reactions{1}.rate=0;
+inactive.chem.reactions{1}.closure='additive';
+zero_gen=kinetics(inactive);
+result=test_true(result,'zero higher-order matrix',issparse(zero_gen)&&nnz(zero_gen)==0,...
+                 'numeric zero rates give the exact static zero generator');
+parameters.spins={'1H'}; parameters.offset=0;
+parameters.sweep=100; parameters.npoints=4; parameters.decouple={};
+parameters.rho0=state(inactive,'L+','1H');
+parameters.coil=coil_state(inactive,'L+','1H','exact');
+zero_fid=liquid(inactive,@acquire,parameters,'nmr');
+inactive.chem.reactions={};
+empty_fid=liquid(inactive,@acquire,parameters,'nmr');
+result=test_close(result,'zero higher-order acquisition',zero_fid,empty_fid,1e-12,0,...
+                  'a standard linear acquisition agrees with absent reactions');
+inactive.chem.reactions={reaction}; inactive.chem.reactions{1}.rate=@(t)0*t;
+inactive.chem.reactions{1}.closure='additive';
+result=test_true(result,'zero callback stays dynamic',isa(kinetics(inactive),'function_handle'),...
+                 'a callback cannot be classified from a single sampled rate');
 
 % Product closure adds cross-reactant order without altering concentrations
 inter.chem.reactions={reaction}; inter.chem.reactions{1}.closure='product';
@@ -144,6 +189,20 @@ catch err
     rejected=strcmp(err.identifier,'Spinach:chem_concs:state');
 end
 result=test_true(result,'voxel length guard',rejected,'each voxel must contain a complete spin block');
+
+% Reject ambiguous matched product copies but retain spin-free stoichiometry
+repeated=s.chem.reactions{1}; repeated.products=[3 3]; rejected=false;
+try
+    react_gen(s,repeated);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:react_gen:repeatedProductMatching');
+end
+result=test_true(result,'repeated product matching guard',rejected,...
+                 'global destination labels cannot distinguish molecular product occurrences');
+repeated.products=[4 4]; repeated.matching=zeros(0,2);
+free=s; free.chem.reactions={repeated}; free_gen=kinetics(free); free_eta=unit_state(free);
+result=test_close(result,'repeated spin-free products',chem_concs(free,free_gen(0,free_eta)*free_eta),...
+                  [-10.5 -10.5 0 21],1e-12,0,'two unlabelled product occurrences carry twice the event population');
 
 % Fourth-order convergence through the shipped state-dependent stepper
 eta=unit_state(s); rhs=@(t,y)K(t,y)*y;

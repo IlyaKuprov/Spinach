@@ -13,7 +13,7 @@ The code reads the CASTEP-derived `mhc.magres` file and removes C, O, and Ca. It
 
 ## MAS and pulse-acquire settings
 
-The source sets the MAS rate parameter to 10,000 (no unit is written beside this assignment) about axis `[1 1 1]`, with powder grid `rep_2ang_100pts_sph` and maximum rank 13. The sweep is set as `1/(5e-6)`; the source does not annotate a unit on this assignment. It uses 512 points and 1,024-point zero filling. The initial state is `state(spin_system,'L+','1H')`, and detection uses `coil_state(spin_system,'L+','1H')`, and the sequence callback is `@acquire` inside `singlerot`. No RF pulse duration or power is specified in this source.
+The source sets the MAS rate parameter to 10,000 (no unit is written beside this assignment) about axis `[1 1 1]`, with powder grid `rep_2ang_100pts_sph` and maximum rank 13. The sweep is set as `1/(5e-6)`; the source does not annotate a unit on this assignment. It uses 512 points and 1,024-point zero filling. The initial state is `state(spin_system,'L+','1H')`, and detection uses `coil_state(spin_system,'L+','1H','exact')`, and the sequence callback is `@acquire` inside `singlerot`. No RF pulse duration or power is specified in this source.
 
 ## Inputs and outputs
 

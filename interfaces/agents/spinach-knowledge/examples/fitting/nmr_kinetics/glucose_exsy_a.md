@@ -36,3 +36,9 @@ The field is 9.4; the 16 fluorines are partitioned into those four chemical subs
 `glucose_exsy_a()` displays the optimiser's final vector but declares no MATLAB output argument. On non-worker evaluations it plots simulated and experimental spectra in adjacent panels using `plot_2d`; the experimental display is labelled positive, and the simulated display both. The script has no figure-save call. The capped search and displayed vector are not evidence of a converged fit.
 
 Every objective evaluation rebuilds four directed reaction records from the fitted rates, with corresponding fluorines matched between inside/outside pools. The local rate matrix is retained only for the concentration equilibrium calculation; it is not passed as a retired chemistry input. The initial state uses concentration-weighted `state` without the retired `chem` method.
+
+## Receiver weighting and objective equivalence
+
+The NOESY detection operator must use unweighted `coil_state`; the initial state already carries the equilibrium chemical concentrations. Weighting the receiver again changes the fitted objective. In an integration check with the unweighted production NOESY receiver and the original full acquisition grid, the initial parameter vector gives objective 8266.8556850427667, matching the stock concentration convention. This validates the initial objective, not convergence or equivalence of the final optimiser vector; the ten-iteration cap remains unchanged.
+
+This objective requires the unweighted receiver: the reaction-record driver alone does not provide it. A checkout whose `noesy` still constructs detection with `state` weights the concentrations twice and will not reproduce the quoted value; receiver migration is a separate integration prerequisite.

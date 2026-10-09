@@ -233,29 +233,27 @@ convention with `stev2sph(k,Bkq)`.
 ## Chemistry and kinetics
 
 ```matlab
-inter.chem.parts={1,2};                        % spin index sets per species
-inter.chem.rates=[-2e4   2e4
-                   2e4  -2e4];                 % Hz, columns sum to zero
+inter.chem.parts={1,2};
 inter.chem.concs=[1.0 1.0];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',2e4),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',2e4)};
 ```
 
-- `parts` — cell array of index vectors, one per chemical subsystem, disjoint
-  and within the spin count. The default is one subsystem containing everything.
-- `concs` — initial concentrations, one per subsystem, non-negative; mandatory
-  as soon as there is more than one subsystem.
-- `rates` — square first-order rate matrix in hertz, one row and column per
-  subsystem, column sums negligible (conservation of matter is checked). In
-  exchange mode all subsystems must have the same number of spins and identical
-  isotope sequences, so that spin *k* of species A maps onto spin *k* of B.
-- `flux_rate` and `flux_type` — magnetisation flux between individual spins;
-  an `nspins x nspins` real matrix and either `'intermolecular'` or
-  `'intramolecular'`. Both must be supplied together.
-- `rp_theory`, `rp_electrons`, `rp_rates` — radical pair recombination:
-  `'haberkorn'`, `'jones-hore'` or `'exponential'`; the two recombining
-  electron indices; and `[singlet_rate triplet_rate]` in hertz. All three
-  fields must appear together.
+- `parts` — disjoint spin-index vectors, one per substance; `[]` is a
+  spin-free pool. Reaction-bearing inputs require explicit parts.
+- `concs` — non-negative initial concentrations, one per substance;
+  thereafter concentrations are read from the propagated unit coordinates.
+- `reactions` — directed records with reactants, products, atom matching,
+  and rate. Matched spins must have identical isotopes; unmatched source
+  spins are traced out and new product spins arrive unpolarised. First-order
+  rates are in inverse seconds; order-m rates use concentration^(1-m)/s.
+- `closure` — additive by default, or product to retain cross-reactant
+  polarisation products. Selectors describe first-order spin-selective loss
+  and projected arrival; see the explicit-record section below.
 
-Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
+Legacy rates, flux, and radical-pair fields are rejected. Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
@@ -577,10 +575,10 @@ cells too; bypassing `basis` does not restore the retired global layout.
 
 `bootstrap` follows the same one-cell approximation contract as physical systems.
 
-Legacy two-substance chemistry test fixtures also require two approximation
-cells. The generator and invariant suites test supported single-substance
-flux and empty reaction maps; the generator suite explicitly asserts the WP3
-rejection boundary instead of claiming numerical exchange validation.
+Two-substance chemistry fixtures require two approximation cells. The
+generator and invariant suites cover positive matched multi-substance
+reaction maps, explicit first-order exchange, routing, and conservation,
+alongside single-substance spin permutations and empty reaction maps.
 
 Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
 multi-substance Zeeman symmetry and analytical filters remain explicitly rejected.
@@ -620,7 +618,7 @@ these experiments retain their supported single-substance algorithms.
 
 ### Explicit chemistry records
 
-Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices.
+Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
 
 `unit_state`, `state`, and `equilibrium` return concentration-weighted density
 matrices and Liouville states; storage-only wavefunctions remain unweighted.
@@ -633,17 +631,27 @@ unweighted `coil_state` target, and `steady` pins the supplied concentrations.
 
 ### Reaction propagation
 
-`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates or Zeeman trace functionals without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
+`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix (zero numeric higher-order records do not change that classification); mass action and time-rate records give `K(t,eta)`. Time-only rate callbacks are evaluated once per assembly and shared across voxels. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates or Zeeman trace functionals without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants or products require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
 
 Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for a general reaction network. `kill_spin` rebuilds reaction matching and basis data, but refuses removal of selector electrons or changes to a substance carrying user-supplied selector matrices.
 
 ### Intermolecular spin replacement
 
-For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B` record with matching that swaps those spins and retains the others. Departing-spin intramolecular correlations are destroyed; unaffected internal orders are retained. The concentrations are invariant because both sides have identical stoichiometry. With time-independent rates and no other concentration-changing reactions, evaluate the returned handle once at `unit_state(spin_system)` to obtain the constant additive generator for ordinary linear propagation. Do not freeze general mass-action or product-closure chemistry this way.
+For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B` record with matching that swaps those spins and retains the others. Departing-spin intramolecular correlations are destroyed; unaffected internal orders are retained. The concentrations are invariant because both sides have identical stoichiometry. With time-independent rates and no other concentration-changing reactions, evaluate the returned handle once at `unit_state(spin_system)` to obtain the constant additive generator for ordinary linear propagation. Do not freeze general mass-action or product-closure chemistry this way. `relayed_hyperpol` applies this construction to one ten-proton peptide block and twenty independent water pools; only water spins 11–20 participate in its forty replacement records.
+
+`uf6_collisions` uses two first-order records with both nuclei matched in each direction; stationary concentrations weight excitation once, and `coil_state` detects both species without another population factor.
+
+Worked replacements are `flux_asymmetric`/`flux_symmetric` and `frydman_pump_a`/`frydman_pump_b`: store each independent pool as its own substance, use one symmetric replacement per distinct pair, and use unweighted detection vectors. A one-spin pool has a complete level-one basis. Changes in thermal preparation must be checked separately from reaction-map equivalence.
+
+`plain_reaction` demonstrates an entirely spin-free network: construct a ghost seed with explicit substance records, then trace it with `kill_spin` before calling `kinetics`. All five remaining coordinates are concentrations.
 
 Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_network`, and `cidnp_transport`; their corresponding registered tests cover mass action, the two closures, selective loss, and integrated nuclear product arrival.
 
 Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.
+
+### Two-stage chemistry histories
+
+`diels_alder_zmag`, `diels_alder_spec`, and `reacting_nmr` put true initial concentrations in `chem.concs`, trace spins for their LG4 concentration histories, and compile the full additive maps once for the two-point spin steps. Embed the prescribed history into unit coordinates when evaluating `K(t,eta)`; initialise spin magnetisation with weighted `state`, add `unit_state`, and detect with unweighted `coil_state`. Do not multiply the initial state by the concentrations a second time.
 
 ### Spatial two-stage chemistry
 

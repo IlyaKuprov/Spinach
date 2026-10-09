@@ -19,3 +19,7 @@ The initial operator is constructed explicitly as rho0=(EE-S)/3, where S is the 
 ## Parameter sweeps and plots
 
 The main field grid contains 15 points from 0.5e-3 to 50e-3 T, displayed in mT. At each field the code evaluates both theories and prints a table headed with field in T and the Redfield and NZ yields. A second sweep uses drain rates [1e6 3e6 1e7 3e7 1e8] Hz at 3e-3 T, reporting both yields and plotting NZ minus Redfield yield against tau_c*drains. The figures visualise calculated outputs; the source file itself does not provide a measured yield dataset.
+
+## Linear-solver accuracy
+
+The shipped `bicg` relative residual target is 1e-8. Comparing the full five-rate ladder before and after reaction-record migration gives relative yield differences of 4.52030e-10 (Redfield) and 4.19909e-10 (NZ). Changing only that target to 1e-12 in both calculations reduces these differences to 1.03858e-14 and 5.50697e-15, respectively. This measured tolerance refinement identifies the ladder residual as linear-solver accuracy rather than a resolved physical change; the example retains its original solver target. The complete 15-field curves at the shipped target differ by 1.39748e-11 and 4.50731e-11.

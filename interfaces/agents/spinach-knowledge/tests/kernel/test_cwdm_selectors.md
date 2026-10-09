@@ -9,3 +9,5 @@ This is a small analytic T14/T15 acceptance case, not the seven-example WP0 radi
 The same selective product-arrival trajectory is checked through `evolution` with default reductions and with ZTE enabled. Initially empty product blocks must remain reachable; the comparison detects inappropriate factorisation into independent substance irreps.
 
 Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.
+
+The RYDMR boundary checks reject tracked products by identifier and retain the analytic unit singlet yield for untracked recombination without spin mixing.

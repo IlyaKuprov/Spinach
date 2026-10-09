@@ -31,7 +31,7 @@
 %           parameters.fields
 %
 % Note: exponential recombination kinetics is built into this func-
-%       tion, do not combine with inter.chem.rp_rates parameter.
+%       tion, do not add another recombination loss in inter.chem.reactions.
 %
 % Note: in Hilbert space, R must be a multiple of the unit matrix
 %       (this is what the kernel builds for damp relaxation); as in

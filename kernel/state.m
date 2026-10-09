@@ -79,7 +79,7 @@ function rho=state(spin_system,states,spins,method)
 if ~exist('method','var'), method='exact'; end
 if ~exist('spins','var'), spins=[]; end
 
-% Check the wrapper-specific option
+% Check the formalism and wrapper-specific option
 grumble(spin_system,states,spins,method);
 
 % Retain the retired keyword for one release

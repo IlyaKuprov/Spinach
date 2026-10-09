@@ -226,4 +226,14 @@ for n=1:2
                       1e-14,1e-14,'each valid block retains its Boltzmann state');
 end
 
+% Exactly zero spinful Hamiltonian blocks retain their unit state
+for n=1:2
+    idx=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    zero=left; zero(idx,idx)=0; actual=equilibrium(s,zero);
+    expected=rho; expected(idx)=unit(idx);
+    result=test_close(result,['zero equilibrium block ' int2str(n)],actual,expected,...
+                      1e-14,1e-14,'a zero block is a valid left product, not a nonzero commutator');
+    fprintf('CWDM_EQUILIBRIUM_ZERO block=%d unit_error=%.16g\n',n,norm(actual(idx)-unit(idx)));
+end
+
 end

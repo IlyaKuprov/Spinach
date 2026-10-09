@@ -19,3 +19,5 @@ Complete compiled column-vector partitions must yield the same descriptors as ro
 Coherent-state tests use local Hilbert dimensions two and three in both Zeeman formalisms, asserting the named segmented rejection and comparing the corresponding single-substance state with the explicit normalised truncated coherent product.
 
 Mixed left-product/commutator equilibrium inputs are rejected in both block orderings with `Spinach:equilibrium:notLeftProduct` and the invalid substance number. Valid left-product blocks are compared against independently normalised Boltzmann exponentials at absolute and relative whole-vector tolerances of `1e-14`.
+
+Exactly zero spinful Hamiltonian blocks in both positions retain the local unit state while the other block retains its independently normalised Boltzmann state.

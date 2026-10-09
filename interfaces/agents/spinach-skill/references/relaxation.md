@@ -226,7 +226,8 @@ is how inverted spin temperatures are specified.
 
 `equilibrium` checks each Liouville Hamiltonian block on its own unit state;
 a vanishing action raises `Spinach:equilibrium:notLeftProduct` with the substance
-number. Spin-free blocks in segmented spherical-tensor systems are exempt.
+number. Exactly zero blocks in segmented spherical-tensor systems are exempt,
+including spinful zero-Hamiltonian substances; they retain the local unit state.
 
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
 state population to be exactly 1; general propagation does not enforce initial

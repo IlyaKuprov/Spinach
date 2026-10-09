@@ -108,7 +108,7 @@ switch spin_system.bas.formalism
         for n=1:spin_system.bas.nsubst
             idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
             if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
-               (spin_system.bas.nsubst>1)&&isempty(spin_system.chem.parts{n})
+               (spin_system.bas.nsubst>1)&&(nnz(I(idx,idx))==0)
                 continue
             end
             if norm(I(idx,idx)*unit(idx),1)<1e-10

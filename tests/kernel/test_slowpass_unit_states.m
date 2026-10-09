@@ -73,5 +73,28 @@ spectrum_sle=gridfree(spin_system,@slowpass,parameters,'nmr');
 result=test_true(result,'gridfree slowpass finite',all(isfinite(spectrum_sle)),...
                  'spatially expanded unit directions must match the gridfree Liouvillian');
 
+% Compare selective singlet and triplet loss against the unchanged resolvent
+clear sys inter bas parameters;
+sys.magnet=1; sys.isotopes={'E','E'};
+inter.chem.parts={1:2}; inter.chem.concs=1;
+inter.chem.reactions={struct('reactants',1,'products',[],'matching',zeros(0,2),...
+    'rate',2,'selector',{{'singlet',[1 2]}}),...
+    struct('reactants',1,'products',[],'matching',zeros(0,2),...
+    'rate',3,'selector',{{'triplet',[1 2]}})};
+inter.relaxation={'damp'}; inter.damp_rate=8;
+inter.equilibrium='zero'; inter.rlx_keep='labframe';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
+spin_system=test_spin_system(sys,inter,bas);
+K=kinetics(spin_system); R=relaxation(spin_system); H=sparse(size(K,1),size(K,2));
+parameters.rho0=state(spin_system,{'Lz','Lz'},{1,2});
+parameters.coil=parameters.rho0; parameters.sweep=[-1 1]; parameters.npoints=3;
+spectrum_rx=slowpass(spin_system,parameters,H,R,K);
+reference=zeros(3,1); freq_grid=2*pi*linspace(-1,1,3);
+for n=1:3
+    reference(n)=3*parameters.coil'*((-R-K+1i*freq_grid(n)*speye(size(K)))\parameters.rho0);
+end
+result=test_close(result,'selective reaction resolvent',spectrum_rx,reference,1e-12,1e-12,...
+                  'identity and spin order must retain their physical reaction coupling');
+
 end
 

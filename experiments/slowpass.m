@@ -83,15 +83,18 @@ for k=1:numel(projectors)
     L_subs=projectors{k}'*L*projectors{k};
     Id_subs=speye(size(L_subs));
 
-    % Unit states are stationary and make the solve singular
-    % at zero frequency: project them out of the initial and
-    % detection states, and shift them in the Liouvillian so
-    % that the solve is non-singular on every frequency grid
+    % Normalise the projected identity directions
     U_subs=projectors{k}'*U; U_subs=U_subs(:,any(U_subs,1));
     U_subs=U_subs./sqrt(sum(abs(U_subs).^2,1));
-    rho0_subs=rho0_subs-U_subs*(U_subs'*rho0_subs);
-    coil_subs=coil_subs-U_subs*(U_subs'*coil_subs);
-    L_subs=L_subs-1i*(U_subs*U_subs');
+
+    % Remove identities only when they decouple from spin order in both directions
+    unit_block=U_subs'*L_subs*U_subs;
+    if norm(L_subs*U_subs-U_subs*unit_block,1)<=spin_system.tols.liouv_zero&&...
+       norm(U_subs'*L_subs-unit_block*U_subs',1)<=spin_system.tols.liouv_zero
+        rho0_subs=rho0_subs-U_subs*(U_subs'*rho0_subs);
+        coil_subs=coil_subs-U_subs*(U_subs'*coil_subs);
+        L_subs=L_subs-1i*(U_subs*U_subs');
+    end
     
     % Run backslash on the GPU if instructed
     if ismember('gpu',spin_system.sys.enable)

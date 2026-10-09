@@ -25,7 +25,7 @@ Merges multiple `sys` and `inter` structures into one. Useful for setting up che
   - `coupling`: `matrix`, `scalar`, `eigs`, `euler` merged as square (block-diagonal) arrays.
   - `giant`: `coeff`, `euler` merged as row cell arrays.
   - `suscept`: `chi`, `xyz` merged as row cell arrays.
-  - `chem`: `parts` merged as cell arrays of spin index vectors with offsets; `rates` and `flux_rate` merged as square arrays; `concs` merged as a row cell array; `flux_type`, `rp_theory`, `rp_rates` merged as common values that must be equal; `rp_electrons` merged as spin index vectors with offsets.
+  - `chem`: `parts` carries spin-index offsets and `concs` is concatenated. Reaction records are concatenated with substance offsets on reactants/products, spin offsets on matching pairs and named selectors, and unchanged substance-local user selector matrices. A subsystem without reactions contributes none. Retired chemistry fields are not merged.
 - Any field remaining in `sys_parts` or `inter_parts` after all merges triggers an error (`unhandled subfield in sys.` / `unhandled subfield in inter.`); similarly, unhandled subfields inside a nested group trigger an error naming the group.
 - Coordinates and susceptibility centres from all subsystems are assumed to refer to one common frame of reference; spin index lists are returned as row vectors.
 

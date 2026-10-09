@@ -42,7 +42,7 @@
 function rho=homospoil(spin_system,rho,zqc_flag)
 
 % Check consistency
-grumble(rho,zqc_flag);
+grumble(spin_system,rho,zqc_flag);
 
 % In Hilbert space, only keep the diagonal
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
@@ -91,7 +91,11 @@ end
 end
 
 % Consistency enforcement
-function grumble(rho,zqc_flag)
+function grumble(spin_system,rho,zqc_flag)
+if (~strcmp(spin_system.bas.formalism,'sphten-liouv'))&&(spin_system.bas.nsubst>1)
+    error('Spinach:homospoil:segmentedZeeman',...
+          'multi-substance Zeeman homospoil filtering is not yet supported.');
+end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');
 end

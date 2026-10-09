@@ -24,3 +24,5 @@ The implementation reports a warning if the retained state has 1-norm below `1e-
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/homospoil.m)
 - [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=homospoil.m)
+
+Multi-substance Zeeman filtering is unsupported and raises `Spinach:homospoil:segmentedZeeman` before constructing a tensor-product channel or applying a diagonal mask. Single-substance Zeeman and segmented spherical-tensor paths remain available.

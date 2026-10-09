@@ -31,3 +31,5 @@ After a requested nonempty `L` is projected, the routine calls `clean_up` with `
 ## Guards
 
 The source rejects unsupported formalisms, nonsquare `L`, incompatible nonempty `L`/`rho` dimensions, unknown isotope labels, and numeric spin indices that are non-real, below 1, nonintegral, or above the system spin count. The call may omit either data argument by passing it empty.
+
+Multi-substance Zeeman filtering is unsupported and raises `Spinach:decouple:segmentedZeeman` before constructing a tensor-product channel or applying a diagonal mask. Single-substance Zeeman and segmented spherical-tensor paths remain available.

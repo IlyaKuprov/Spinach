@@ -140,6 +140,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,correlation_orders,spins)
+if (~strcmp(spin_system.bas.formalism,'sphten-liouv'))&&(spin_system.bas.nsubst>1)
+    error('Spinach:correlation:segmentedZeeman',...
+          'multi-substance Zeeman correlation filtering is not yet supported.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
     error('analytical correlation order selection is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end

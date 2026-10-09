@@ -34,3 +34,5 @@ Correlation orders and numeric spin selectors are integer indices; no physical u
 ## Signature clarification
 
 The header names the third argument `correlation_orders`; the executable declaration calls it `orders`. This is a parameter-name clarification only.
+
+Multi-substance Zeeman filtering is unsupported and raises `Spinach:correlation:segmentedZeeman` before constructing a tensor-product channel or applying a diagonal mask. Single-substance Zeeman and segmented spherical-tensor paths remain available.

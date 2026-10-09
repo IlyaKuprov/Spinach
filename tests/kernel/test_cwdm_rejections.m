@@ -63,4 +63,38 @@ end
 result=test_true(result,'cross symmetry',rejected,...
                  'symmetry indices must be local to the declared substance');
 
+% Segmented Zeeman filters reject before any tensor-product construction
+sys.isotopes={'1H','1H'}; inter.chem.parts={1,2};
+for formalism={'zeeman-hilb','zeeman-liouv'}
+    bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas);
+    rho=ones(s.bas.offsets(end),1);
+    if strcmp(formalism{1},'zeeman-hilb'), rho=diag(rho); end
+    for selector={'correlation','decouple','homospoil'}
+        rejected=false;
+        try
+            switch selector{1}
+                case 'correlation'
+                    correlation(s,rho,0,1);
+                case 'decouple'
+                    [~,rho]=decouple(s,[],rho,1);
+                case 'homospoil'
+                    homospoil(s,rho,'destroy');
+            end
+        catch err
+            rejected=strcmp(err.identifier,['Spinach:' selector{1} ':segmentedZeeman']);
+        end
+        result=test_true(result,[selector{1} ' ' formalism{1}],rejected,...
+                         'unsupported direct-sum Zeeman filtering raises the named error');
+    end
+    bad=bas; bad.sym_group={{'S2'},{}}; bad.sym_spins={{1},{}};
+    rejected=false;
+    try
+        basis(s,bad);
+    catch err
+        rejected=strcmp(err.identifier,'Spinach:basis:segmentedZeeman');
+    end
+    result=test_true(result,['Zeeman symmetry rejection ' formalism{1}],rejected,...
+                     'only genuinely segmented Zeeman symmetry is rejected');
+end
+
 end

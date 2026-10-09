@@ -62,6 +62,42 @@ result=test_true(result,'distinct frozen trajectories',norm(new_next-old_next)>1
 result=test_close(result,'kernel frozen expm',new_next,expm(G*dt)*concs(:),1e-12,0,...
                   'the production step applies the compiled frozen generator');
 
+% Compare both allocations with exact homogeneous bimolecular kinetics
+initial=[0.6;0.5;0;0;18.1]; elapsed=0.4; delta=initial(1)-initial(2);
+b_final=delta*initial(2)*exp(-3*delta*elapsed)/...
+        (initial(1)-initial(2)*exp(-3*delta*elapsed));
+extent=initial(2)-b_final;
+exact=[b_final+delta;b_final;2*extent/3;extent/3;initial(5)];
+errors=zeros(2,3); differences=zeros(1,3);
+for k=1:3
+    nsteps=10*2^(k-1); time_step=elapsed/nsteps;
+    old=initial; new=initial;
+    for n=1:nsteps
+        a=old(1); b=old(2);
+        old_gen=[-3*b 0 0 0 0;0 -3*a 0 0 0;...
+                 0 2*a 0 0 0;0 a 0 0 0;0 0 0 0 0];
+        old=expm(old_gen*time_step)*old;
+        new=step(chem,1i*K_chem((n-1)*time_step,new),new,time_step);
+    end
+    errors(:,k)=[norm(old-exact);norm(new-exact)];
+    differences(k)=norm(old-new);
+end
+fprintf('CWDM_SPATIAL_ANALYTIC_OLD %.12g %.12g %.12g\n',errors(1,:));
+fprintf('CWDM_SPATIAL_ANALYTIC_NEW %.12g %.12g %.12g\n',errors(2,:));
+fprintf('CWDM_SPATIAL_CONVERGENCE_DIFFERENCE %.12g %.12g %.12g\n',differences);
+result=test_true(result,'both frozen allocations converge',...
+                 all(errors(:,1)>errors(:,2))&&all(errors(:,2)>errors(:,3)),...
+                 'both frozen methods approach the exact mass-action trajectory');
+result=test_true(result,'allocation difference converges away',...
+                 all(differences(1:2)>differences(2:3)),...
+                 'allocation is a finite-step difference, not a different mass-action ODE');
+
+% Verify the prescribed equal sharing of product unit arrival
+compiled=K_chem(0,initial);
+result=test_close(result,'equal unit sharing',full(compiled(3:4,1:2)),...
+                  [initial(2) initial(1);initial(2)/2 initial(1)/2],...
+                  1e-12,0,'the additive closure transports half the identity from each reactant');
+
 % Embed voxel concentrations and polarisation in the full direct sum
 units=s.bas.offsets(1:end-1)+1; dim=s.bas.offsets(end);
 eta=zeros(dim,2); eta(units,:)=concs;

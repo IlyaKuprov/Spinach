@@ -7,3 +7,5 @@ T6 compares two proton-pair blocks with independent unit-concentration molecules
 Malformed methods, repeated spin indices, mismatched product descriptions, and wrong projection-array lengths must be rejected by the public `state` grumbler.
 
 Single-substance wavefunction construction must return the same unit ket at concentrations zero, 0.3, and two.
+
+The fixed four-argument `coil_state` API is tested: an omitted method is rejected, and an explicit wavefunction call returns the unit ket.

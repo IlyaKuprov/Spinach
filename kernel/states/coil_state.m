@@ -39,10 +39,10 @@
 % above.
 %
 % 4. For wavefunction formalism, states must be specified as an array
-%    of projection quantum numbers on all spins; in that case only two
-%    arguments are needed, for example, in a {'1H','1H','14N'} system:
+%    of projection quantum numbers on all spins; pass an empty spin list,
+%    for example, in a {'1H','1H','14N'} system:
 %
-%                   psi=coil_state(spin_system,[-1/2 1/2 0])
+%                   psi=coil_state(spin_system,[-1/2 1/2 0],[],'exact')
 %
 % Method argument has the following effect in sphten-liouv formalism:
 %
@@ -50,9 +50,9 @@
 %               normalisation. For very large spin sys-
 %               tems this is much faster
 %
-%    'exact'  - exact state vector with correct normalisation,
-%               this is the default when the last argument is
-%               skipped in the function call
+%    'exact'  - exact state vector with correct normalisation
+%
+% All four arguments are required; method is ignored in Zeeman formalisms.
 %
 % The result is unweighted in every formalism. Use state for initial
 % populations weighted by substance concentrations.
@@ -69,12 +69,6 @@
 % <https://spindynamics.org/wiki/index.php?title=coil_state.m>
 
 function rho=coil_state(spin_system,states,spins,method)
-
-% Default is to use consistent state norms
-if ~exist('method','var'), method='exact'; end
-
-% In wavefunction space, empty set here
-if ~exist('spins','var'), spins=[]; end
 
 % Check consistency
 grumble(spin_system,states,spins,method);

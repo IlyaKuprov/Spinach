@@ -464,8 +464,8 @@ if ismember('SRSK',spin_system.rlx.theories)
     for k=spin_system.rlx.srsk_sources
 
         % Relaxation rates of the source spin
-        Lz_k=coil_state(spin_system,{'Lz'},{k}); Lz_k=Lz_k/norm(Lz_k,2);
-        Lp_k=coil_state(spin_system,{'L+'},{k}); Lp_k=Lp_k/norm(Lp_k,2);
+        Lz_k=coil_state(spin_system,{'Lz'},{k},'exact'); Lz_k=Lz_k/norm(Lz_k,2);
+        Lp_k=coil_state(spin_system,{'L+'},{k},'exact'); Lp_k=Lp_k/norm(Lp_k,2);
         T1k=-1/real(Lz_k'*R*Lz_k); T2k=-1/real(Lp_k'*R*Lp_k);
 
         % Source spin quantum number

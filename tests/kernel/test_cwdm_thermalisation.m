@@ -91,7 +91,7 @@ result=test_true(result,'T7 source discrepancy',source_error>0,...
 
 % Measure the longitudinal recovery of the common-source representation
 merged_final=expm(full(20*merged_r))*(embedding*rho);
-coil=coil_state(s,'Lz','all'); merged_coil=embedding*coil;
+coil=coil_state(s,'Lz','all','exact'); merged_coil=embedding*coil;
 direct_signal=real(coil'*evolved); merged_signal=real(merged_coil'*merged_final);
 ratio=merged_signal/direct_signal;
 result=test_true(result,'T7 factor two',abs(ratio-2)<1e-5,...

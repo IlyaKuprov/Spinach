@@ -77,7 +77,7 @@ result=test_true(result,'unit coordinates',...
                  'the identity contains exactly one concentration per substance');
 
 % Check an all-spin sum is weighted separately in each hosting block
-coil=coil_state(s,'Lz','all'); expected=full(coil);
+coil=coil_state(s,'Lz','all','exact'); expected=full(coil);
 for n=1:s.bas.nsubst
     rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
     expected(rows)=s.chem.concs(n)*expected(rows);
@@ -89,7 +89,7 @@ result=test_true(result,'all-spin weighting',isequal(state(s,'Lz','all'),expecte
 empty=s; empty.chem.concs=[0 0 1];
 result=test_true(result,'zero-population state',nnz(state(empty,'Lz','all'))==0,...
                  'absent substances carry no spin order');
-result=test_true(result,'zero-population coil',isequal(coil_state(empty,'Lz','all'),coil),...
+result=test_true(result,'zero-population coil',isequal(coil_state(empty,'Lz','all','exact'),coil),...
                  'detection is independent of concentration');
 result=test_true(result,'spin-free equilibrium',isequal(equilibrium(empty),unit_state(empty)),...
                  'the populated spin-free substance carries only its unit coordinate');
@@ -107,6 +107,19 @@ for concentration=[0 0.3 2]
                      'storage-only kets retain unit probability at every concentration');
 end
 fprintf('CWDM_WAVEFUNCTION norm_squared=%.16g\n',norm(psi)^2);
+
+% Require all four arguments on the new unweighted primitive
+rejected=false;
+try
+    coil_state(s,0.5,[]);
+catch err
+    rejected=strcmp(err.identifier,'MATLAB:minrhs');
+end
+result=test_true(result,'fixed coil signature',rejected,...
+                 'coil_state has no implicit method or spin-list defaults');
+result=test_true(result,'explicit wavefunction coil',...
+                 isequal(coil_state(s,0.5,[],'exact'),[1;0]),...
+                 'the explicit four-argument wavefunction API remains supported');
 
 end
 

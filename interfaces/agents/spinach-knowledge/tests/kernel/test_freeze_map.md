@@ -33,3 +33,5 @@ result=test_freeze_map()
 ## References
 
 - Spinach optimal control module functions used here: `optimcon`, `grape_xy`, `grape_curv`, `grape_phase`, `grape_liouv`, `grape_hilb`, `new_test_result`, `test_close`, `test_true`, `firf`, `spf`, `pauli`.
+
+The synthetic steady-state fixture supplies its unit concentration explicitly. Single-substance references sliced from the segmented fixture retain only the corresponding concentration and local spin membership, matching the compiled steady-state contract.

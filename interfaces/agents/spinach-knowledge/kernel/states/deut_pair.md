@@ -38,3 +38,5 @@ For 'zeeman-hilb', each generated state rho is normalised by its Frobenius norm.
 The returned population and coherence entries are Spinach states in the selected formalism, not scalar probabilities. Coherence lists use the labels and ordering in the source.
 
 The tensor expansion uses unweighted `coil_state` before normalising each basis tensor. Outputs retain the existing projector normalisation independently of concentration, including a zero-population substance.
+
+Operator-shape expansions explicitly request `coil_state` with the `exact` method.

@@ -2038,15 +2038,11 @@ if isfield(inter,'relaxation')
             error('inter.nz_shift requires naka-zwan relaxation theory.');
         end
         if ischar(inter.nz_shift)
-            if ~strcmp(inter.nz_shift,'chem')
-                error('the only character value allowed in inter.nz_shift is ''chem''.');
-            end
-            if (~isfield(inter,'chem'))||(~isfield(inter.chem,'rp_rates'))
-                error('inter.nz_shift=''chem'' requires radical pair kinetics in inter.chem.');
-            end
+            error('Spinach:create:explicitNZShift',...
+                  'inter.nz_shift must be an explicit scalar; reaction records do not define a unique scalar lifetime.');
         elseif (~isnumeric(inter.nz_shift))||(~isscalar(inter.nz_shift))||...
                (~isfinite(inter.nz_shift))||(real(inter.nz_shift)<0)
-            error('inter.nz_shift must be ''chem'' or a finite scalar with a non-negative real part.');
+            error('inter.nz_shift must be a finite scalar with a non-negative real part.');
         end
     end
 

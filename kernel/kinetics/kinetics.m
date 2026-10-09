@@ -1,29 +1,29 @@
-% Chemical kinetics superoperator. Syntax:
+% Direct-sum chemical kinetics from explicit reaction records. Syntax:
 %
-%                      K=kinetics(spin_system)
+%                  K=kinetics(spin_system)
+%                  K=kinetics(spin_system,'report')
 %
 % Parameters:
 %
-%    spin_system  -  Spinach spin system description object
-%                    produced as described in the spin system
-%                    and basis specification sections, of the
-%                    of the online manual. All adjustable pa-
-%                    rameters are described in the chemical 
-%                    kinetics parameters section.
+%    spin_system - Spinach object with chem.reactions and a compiled basis
+%
+%    mode        - optional 'report' prints the reaction maps and closures
 %
 % Outputs:
 %
-%    K            -  kinetics superoperator. If a Liouvillian is
-%                    assembled manually, this dissipative super-
-%                    operator must enter as 1i*K, for example 
-%                    L=H+1i*R+1i*K
+%    K           - sparse first-order superoperator, or @(t,eta) returning
+%                  a sparse generator for mass action or time-dependent
+%                  rates. eta is a space-times-spin column; the handle
+%                  assembles chemistry independently in each voxel.
 %
-% Note: a large variety of chemical reaction models is supported,
-%       see the chemical kinetics parameters section of the onli-
-%       ne manual.
-%
-% Note: Spinach context functions include relaxation and kinetics
-%       superoperators into the total Liovillian automatically.
+% K enters the Liouvillian as 1i*K: L=H+1i*R+1i*K. Nonlinear propagation
+% uses step(spin_system,{@(t,eta)1i*K(t,eta),t,'RKMK4'},eta,dt).
+% Reaction maps are compiled once per kinetics call. Additive closure
+% carries the unit once and each reactant's internal orders; product
+% closure also carries cross-reactant orders. No concentration division
+% is used. Spinless reactants are dynamic pools, not fixed reservoirs.
+% Named selectors implement Haberkorn or Jones-Hore loss and projected
+% product arrival. User selector pairs are local left/right projectors.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -31,220 +31,168 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kinetics.m>
 
-function K=kinetics(spin_system)
+function K=kinetics(spin_system,mode)
 
-% Check the implemented chemistry scope
-grumble(spin_system);
+% Preserve the ordinary call and the explicitly requested reporting form
+if nargin==1, mode=''; end
+grumble(spin_system,mode);
 
-% Preallocate the answer
-K=mprealloc(spin_system,0);
+% Leave chemistry-free systems available in every formalism
+if isempty(spin_system.chem.reactions)
+    K=mprealloc(spin_system,0); return
+end
 
-% Find chemical reactions
-[sources,destins,rates]=find(spin_system.chem.rates);
-
-% Loop over chemical reactions
-for n=1:numel(rates)
-    
-    % Catch incorrect calls
-    if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-        error('chemical reaction treatment is only available for sphten-liouv formalism.');
+% Compile immutable maps and selector products outside the time-step loop
+reactions=spin_system.chem.reactions; dim=spin_system.bas.offsets(end);
+for n=1:numel(reactions)
+    reaction=reactions{n};
+    reaction.maps=react_gen(spin_system,reaction);
+    reaction.drain=cell(size(reaction.reactants));
+    for k=1:numel(reaction.reactants)
+        reactant=reaction.reactants(k);
+        block=(spin_system.bas.offsets(reactant)+1):spin_system.bas.offsets(reactant+1);
+        reaction.drain{k}=sparse(block,block,ones(size(block)),dim,dim);
     end
-    
-    % Get the spins involved
-    source_spins=spin_system.chem.parts{sources(n)};
-    destin_spins=spin_system.chem.parts{destins(n)};
-    
-    % Get the states involved
-    source_states=logical(sum(spin_system.bas.basis{1}(:,source_spins),2));
-    destin_states=logical(sum(spin_system.bas.basis{1}(:,destin_spins),2));
-    
-    % Make sure basis tables match
-    if ~isequal(spin_system.bas.basis{1}(source_states,source_spins),...
-                spin_system.bas.basis{1}(destin_states,destin_spins))
-        error('spin systems on either side of the reaction arrow have different topologies or basis sets.');
-    end
+    if isfield(reaction,'selector')
 
-    % Move to integer indexing
-    source_states=find(source_states);
-    destin_states=find(destin_states);
-    
-    % Update the kinetics superoperator
-    K=K+rates(n)*sparse(source_states,destin_states,ones(size(source_states)),size(K,1),size(K,2));
+        % Build substance-local singlet or triplet projector products
+        reactant=reaction.reactants(1);
+        block=(spin_system.bas.offsets(reactant)+1):spin_system.bas.offsets(reactant+1);
+        unit=speye(numel(block)); selector=reaction.selector;
+        if ischar(selector{1})
+            electrons=num2cell(selector{2}); projectors=cell(1,2);
+            for k=1:2
+                sides={'left','right'};
+                P=operator(spin_system,{'Lz','Lz'},electrons,sides{k});
+                P=P+0.5*operator(spin_system,{'L+','L-'},electrons,sides{k});
+                P=P+0.5*operator(spin_system,{'L-','L+'},electrons,sides{k});
+                projectors{k}=unit/4-P(block,block);
+                if endsWith(selector{1},'triplet'), projectors{k}=unit-projectors{k}; end
+            end
+        else
+            projectors=selector;
+            if ~isequal(size(projectors{1}),size(unit))
+                error('Spinach:kinetics:selectorSize','selector matrices must have the reactant block dimensions.');
+            end
+        end
+
+        % Separate selective loss from the projected arrival source
+        drain=(projectors{1}+projectors{2})/2;
+        if ischar(selector{1})&&startsWith(selector{1},'jones-hore')
+            drain=unit-(unit-projectors{1})*(unit-projectors{2});
+        end
+        [rows,cols,values]=find(drain); offset=spin_system.bas.offsets(reactant);
+        reaction.drain{1}=sparse(rows+offset,cols+offset,values,dim,dim);
+
+        % Compile projected arrival into the full direct sum once
+        reaction.fill=cell(size(reaction.maps));
+        for p=1:numel(reaction.maps)
+            rows=reaction.maps{p};
+            fill=sparse(rows(:,1),rows(:,2)-offset,ones(size(rows,1),1),dim,numel(block));
+            [rows,cols,values]=find(fill*projectors{1}*projectors{2});
+            reaction.fill{p}=sparse(rows,cols+offset,values,dim,dim);
+        end
+    end
+    reactions{n}=reaction;
+end
+
+% Print the declared network and its atom transport
+if strcmp(mode,'report')
+    summary_chemistry(spin_system);
+    for n=1:numel(reactions)
+        reaction=reactions{n};
+        source_spins=cell2mat(spin_system.chem.parts(reaction.reactants));
+        report(spin_system,['reaction ' num2str(n) ': matched spins ' ...
+               mat2str(reaction.matching(:,1)') ', traced spins ' ...
+               mat2str(setdiff(source_spins,reaction.matching(:,1))) ...
+               ', closure ' reaction.closure]);
+    end
+end
+
+% Constant first-order chemistry remains an ordinary sparse matrix
+if all(cellfun(@(r)isscalar(r.reactants)&&isnumeric(r.rate),reactions))
+    K=assemble(spin_system,reactions,0,unit_state(spin_system));
+else
+    K=@(t,eta)assemble(spin_system,reactions,t,eta);
+end
 
 end
 
-% Find magnetization fluxes
-[source_spins,destin_spins,flux_rate]=find(spin_system.chem.flux_rate);
+% Assemble polynomial drains and product-row fills at each stage state
+function K=assemble(spin_system,reactions,t,eta)
 
-% Process magnetization fluxes
-if ~isempty(flux_rate)
-    
-    % Catch incorrect calls
-    if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-        error('magnetization flux treatment is only available for sphten-liouv formalism.');
-    end
-    
-    % Index single- and multi-spin orders (sso and mso)
-    sso_state_mask=(sum(logical(spin_system.bas.basis{1}),2)==1);
-    mso_state_mask=(sum(logical(spin_system.bas.basis{1}),2)>1 );
-    
-    % Decide how to proceed
-    switch spin_system.chem.flux_type
-        case 'intramolecular'
-            report(spin_system,'intramolecular magnetization flux, correlations will be kept.');
-        case 'intermolecular'
-            report(spin_system,'intermolecular magnetization flux, correlations will be damped.');
-        otherwise
-            error('unrecognized magnetization flux type.')
-    end
-    
-    % Loop over the fluxes
-    for n=1:numel(flux_rate)
-        
-        % Find single-spin sources and destinations
-        sso_source_state_mask=sso_state_mask&(spin_system.bas.basis{1}(:,source_spins(n))~=0);
-        sso_destin_state_mask=sso_state_mask&(spin_system.bas.basis{1}(:,destin_spins(n))~=0);
-        
-        % Identify stationary states
-        sso_static_state_mask=sso_source_state_mask&sso_destin_state_mask;
-        sso_source_state_mask=xor(sso_source_state_mask,sso_static_state_mask);
-        sso_destin_state_mask=xor(sso_destin_state_mask,sso_static_state_mask);
-        
-        % Make sure subspaces match
-        if ~isequal(spin_system.bas.basis{1}(sso_source_state_mask,source_spins(n)),...
-                    spin_system.bas.basis{1}(sso_destin_state_mask,destin_spins(n)))
-            error('spin systems on either side of the reaction arrow have different topology or basis sets.');
+% Read all local concentrations without normalising any state
+concs=chem_concs(spin_system,eta);
+dim=spin_system.bas.offsets(end);
+eta=reshape(eta,dim,[]);
+blocks=cell(size(concs,1),1);
+for v=1:size(concs,1)
+    K=sparse(dim,dim);
+    for n=1:numel(reactions)
+        reaction=reactions{n}; reactants=reaction.reactants;
+        rate=reaction.rate;
+        if isa(rate,'function_handle'), rate=rate(t); end
+        if ~isnumeric(rate)||~isscalar(rate)||~isreal(rate)||~isfinite(rate)||rate<0
+            error('Spinach:kinetics:rateValue','time-dependent rates must return a finite non-negative scalar.');
         end
-        
-        % Move to integer indexing
-        sso_source_state_index=find(sso_source_state_mask);
-        sso_destin_state_index=find(sso_destin_state_mask);
-        
-        % Update the kinetics superoperator
-        K=K+flux_rate(n)*sparse(sso_destin_state_index,...
-                                sso_source_state_index,...
-                                ones(size(sso_source_state_index)),size(K,1),size(K,2));
-        K=K-flux_rate(n)*sparse(sso_source_state_index,...
-                                sso_source_state_index,...
-                                ones(size(sso_source_state_index)),size(K,1),size(K,2));
-        
-        % Decide the fate of multi-spin orders
-        switch spin_system.chem.flux_type
-            
-            case 'intramolecular' 
-        
-                % Find multi-spin sources and destinations
-                mso_source_state_mask=mso_state_mask&(spin_system.bas.basis{1}(:,source_spins(n))~=0);
-                mso_destin_state_mask=mso_state_mask&(spin_system.bas.basis{1}(:,destin_spins(n))~=0);
-                
-                % Identify stationary states
-                mso_static_state_mask=mso_source_state_mask&mso_destin_state_mask;
-                mso_source_state_mask=xor(mso_source_state_mask,mso_static_state_mask);
-                mso_destin_state_mask=xor(mso_destin_state_mask,mso_static_state_mask);
-                
-                % Make sure subspaces match
-                if ~isequal(spin_system.bas.basis{1}(mso_source_state_mask,source_spins(n)),...
-                            spin_system.bas.basis{1}(mso_destin_state_mask,destin_spins(n)))
-                    error('spin systems on either side of the reaction arrow have different topology or basis sets.');
+
+        % Each occurrence loses its own state times the other concentrations
+        for k=1:numel(reactants)
+            others=[1:k-1 k+1:numel(reactants)];
+            coeff=rate*prod(concs(v,reactants(others)));
+            K=K-coeff*reaction.drain{k};
+        end
+        units=spin_system.bas.offsets(reactants)+1;
+        for p=1:numel(reaction.maps)
+            rows=reaction.maps{p};
+            if isfield(reaction,'selector')
+
+                % Trace the projected reactant into each product block
+                K=K+rate*reaction.fill{p};
+            elseif strcmp(reaction.closure,'product')
+
+                % Gather all but the last factor into a state-dependent matrix
+                coeff=rate*ones(size(rows,1),1);
+                for k=1:numel(reactants)-1
+                    coeff=coeff.*eta(rows(:,k+1),v);
                 end
-                
-                % Move to integer indexing
-                mso_source_state_index=find(mso_source_state_mask);
-                mso_destin_state_index=find(mso_destin_state_mask);
-                
-                % Update the kinetics superoperator
-                K=K+flux_rate(n)*sparse(mso_destin_state_index,...
-                                        mso_source_state_index,...
-                                        ones(size(mso_source_state_index)),size(K,1),size(K,2));
-                K=K-flux_rate(n)*sparse(mso_source_state_index,...
-                                        mso_source_state_index,...
-                                        ones(size(mso_source_state_index)),size(K,1),size(K,2));
-        
-            case 'intermolecular'
-                
-                % Find multi-spin sources 
-                mso_source_state_mask=mso_state_mask&(spin_system.bas.basis{1}(:,source_spins(n))~=0);
-                
-                % Generate indices
-                mso_source_state_index=find(mso_source_state_mask);
-        
-                % Update the kinetics superoperator
-                K=K-flux_rate(n)*sparse(mso_source_state_index,...
-                                        mso_source_state_index,...
-                                        ones(size(mso_source_state_index)),size(K,1),size(K,2));
-        
-            otherwise
-                
-                % Complain and bomb out
-                error('unrecognized type of magnetization flux.');
-                
+                K=K+sparse(rows(:,1),rows(:,end),coeff,dim,dim);
+            else
+
+                % Retain internal orders and share the unit among occurrences
+                active=rows(:,2:end)~=units(:)';
+                for k=1:numel(reactants)
+                    others=[1:k-1 k+1:numel(reactants)];
+                    present=~any(active(:,others),2);
+                    coeff=rate*prod(concs(v,reactants(others)))*ones(nnz(present),1);
+                    coeff(~any(active(present,:),2))=coeff(~any(active(present,:),2))/numel(reactants);
+                    K=K+sparse(rows(present,1),rows(present,k+1),coeff,dim,dim);
+                end
+            end
         end
-        
     end
-
+    blocks{v}=K;
 end
 
-% Process radical pair recombination
-if (~isempty(spin_system.chem.rp_theory))&&...
-   (~strcmp(spin_system.chem.rp_theory,'off'))
-    
-    % Catch incorrect calls
-    if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-        error('magnetization flux treatment is only available for sphten-liouv formalism.');
-    end
-
-    % Report to the user
-    report(spin_system,['generating kinetics superoperator using the ' spin_system.chem.rp_theory ' model...'])
-    
-    % Get the singlet and triplet projector product superoperators
-    unit=unit_oper(spin_system);
-    LzSz_l=operator(spin_system,{'Lz','Lz'},num2cell(spin_system.chem.rp_electrons),'left');
-    LzSz_r=operator(spin_system,{'Lz','Lz'},num2cell(spin_system.chem.rp_electrons),'right');
-    LpSm_l=operator(spin_system,{'L+','L-'},num2cell(spin_system.chem.rp_electrons),'left');
-    LpSm_r=operator(spin_system,{'L+','L-'},num2cell(spin_system.chem.rp_electrons),'right');
-    LmSp_l=operator(spin_system,{'L-','L+'},num2cell(spin_system.chem.rp_electrons),'left');
-    LmSp_r=operator(spin_system,{'L-','L+'},num2cell(spin_system.chem.rp_electrons),'right');
-    singlet_l=unit/4-(LzSz_l+0.5*(LpSm_l+LmSp_l)); triplet_l=unit-singlet_l;
-    singlet_r=unit/4-(LzSz_r+0.5*(LpSm_r+LmSp_r)); triplet_r=unit-singlet_r;
-    
-    % Assemble the recombination kinetics superoperator
-    switch spin_system.chem.rp_theory
-        
-        case 'exponential'
-            
-            K=K-sum(spin_system.chem.rp_rates)*speye(size(K));
-        
-        case 'haberkorn'
-            
-            K=K-0.5*(spin_system.chem.rp_rates(1)*(singlet_l+singlet_r)+spin_system.chem.rp_rates(2)*(triplet_l+triplet_r));
-            
-        case 'jones-hore'
-            
-            K=K-sum(spin_system.chem.rp_rates)*unit+spin_system.chem.rp_rates(1)*triplet_l*triplet_r+spin_system.chem.rp_rates(2)*singlet_l*singlet_r;
-            
-        otherwise
-            
-            error('unknown radical pair kinetics model.');
-            
-    end
-    
-end
-
-% Warn if no kinetics
-if nnz(K)==0
-    report(spin_system,'no significant kinetics specified.');
-    report(spin_system,'kinetics superoperator set to zero.');
-end
+% Spatial transport is separate from the block-diagonal local chemistry
+K=blkdiag(blocks{:});
 
 end
 
 % Consistency enforcement
-function grumble(spin_system)
-if (spin_system.bas.nsubst>1)&&...
-   (nnz(spin_system.chem.rates)||nnz(spin_system.chem.flux_rate)||...
-    (~isempty(spin_system.chem.rp_theory)&&~strcmp(spin_system.chem.rp_theory,'off')))
-    error('Spinach:kinetics:segmentedChemistry',...
-          'multi-substance chemistry requires the reaction-record implementation (WP3).');
+function grumble(spin_system,mode)
+if ~ischar(mode)||(~isempty(mode)&&~strcmp(mode,'report'))
+    error('Spinach:kinetics:mode','the optional kinetics mode must be ''report''.');
+end
+if ~isempty(spin_system.chem.reactions)&&~strcmp(spin_system.bas.formalism,'sphten-liouv')
+    error('Spinach:kinetics:formalism','reaction records currently require sphten-liouv formalism.');
+end
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
+    if isfield(reaction,'selector')&&ischar(reaction.selector{1})&&...
+       any(spin_system.comp.mults(reaction.selector{2})~=2)
+        error('Spinach:kinetics:selectorSpin','named singlet/triplet selectors require two spin-half electrons.');
+    end
 end
 end
 

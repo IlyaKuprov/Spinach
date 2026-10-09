@@ -156,20 +156,8 @@ if ismember('naka-zwan',spin_system.rlx.theories)
         end
     end
 
-    % Resolve the kernel evaluation point from radical pair kinetics
-    if ischar(spin_system.rlx.nz_shift)
-        switch spin_system.chem.rp_theory
-            case 'exponential'
-                rlx_shift=sum(spin_system.chem.rp_rates);
-            case {'haberkorn','jones-hore'}
-                rlx_shift=sum(spin_system.chem.rp_rates)/2;
-                report(spin_system,'scalar lifetime shift, state-selective recombination approximated');
-            otherwise
-                error('nz_shift=''chem'' requires radical pair kinetics in inter.chem.');
-        end
-    else
-        rlx_shift=spin_system.rlx.nz_shift;
-    end
+    % Use the explicitly specified scalar kernel evaluation point
+    rlx_shift=spin_system.rlx.nz_shift;
 
     % Absorb the kernel form switch
     rlx_onshell=spin_system.rlx.nz_onshell;

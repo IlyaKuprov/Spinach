@@ -242,17 +242,18 @@ for n=1:numel(spin_system.chem.parts)
     subsystem_idx(hit_list)=[];
     spin_system.chem.parts{n}=find(subsystem_idx);
 end
-if ~isempty(spin_system.chem.flux_rate)
-    spin_system.chem.flux_rate(hit_list,:)=[];
-    spin_system.chem.flux_rate(:,hit_list)=[];
-end
 
-% Update radical recombination parameters
-reacting_spins=zeros(1,spin_system.comp.nspins+numel(hit_list));
-reacting_spins(spin_system.chem.rp_electrons)=1; reacting_spins(hit_list)=[];
-spin_system.chem.rp_electrons=find(reacting_spins);
-if (~isempty(spin_system.chem.rp_rates))&&(numel(spin_system.chem.rp_electrons)<2)
-    error('cannot destroy an essential electron in a radical pair system.');
+% Rebuild the reaction atom maps in the surviving global spin index
+keep=setdiff(1:spin_system.comp.nspins+numel(hit_list),hit_list);
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
+    matching=reaction.matching;
+    matching(any(ismember(matching,hit_list),2),:)=[];
+    [~,reaction.matching]=ismember(matching,keep);
+    if isfield(reaction,'selector')&&ischar(reaction.selector{1})
+        [~,reaction.selector{2}]=ismember(reaction.selector{2},keep);
+    end
+    spin_system.chem.reactions{n}=reaction;
 end
 
 % If any basis set information is found, destroy it
@@ -305,6 +306,19 @@ else
     end
     if any(hit_list>spin_system.comp.nspins)
         error('at least one number in hit_list exceeds the number of spins.');
+    end
+end
+if islogical(hit_list), hit_list=find(hit_list); end
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
+    if isfield(reaction,'selector')
+        if ischar(reaction.selector{1})
+            if any(ismember(reaction.selector{2},hit_list))
+                error('Spinach:kill_spin:selectorElectron','cannot remove an electron used by a reaction selector.');
+            end
+        elseif any(ismember(spin_system.chem.parts{reaction.reactants},hit_list))
+            error('Spinach:kill_spin:selectorMatrix','rebuild user selector matrices before removing spins from their substance.');
+        end
     end
 end
 end

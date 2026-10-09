@@ -630,3 +630,9 @@ on a copy with all `chem.concs` entries one, as `relaxation` does internally.
 The propagated unit coordinates supply the instantaneous concentrations; neither
 thermalisation nor pumping divides by a concentration. `magpump` takes an
 unweighted `coil_state` target, and `steady` pins the supplied concentrations.
+
+### Reaction propagation
+
+`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
+
+Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for a general reaction network. `kill_spin` rebuilds reaction matching and basis data, but refuses removal of selector electrons or changes to a substance carrying user-supplied selector matrices.

@@ -5,4 +5,4 @@ T1/T2 relaxation, commutation pulse generators, and left/right product actions
 have no stored nonzero outside their compiled offsets blocks. Exact and cheap
 single-spin detection states have support only in their hosting block. These
 are exact sparse-pattern assertions, not tolerance-based norm comparisons.
-Concentration weighting is outside this test's scope.
+Identity checks cover individual spins, local products, numeric sums, isotope sums, and all-spin sums, with both `E` and `T0,0` local requests. Exact and cheap identities are unweighted; chemical identities carry the hosting substance concentration. These checks do not establish the broader concentration semantics of thermal equilibrium or detection.

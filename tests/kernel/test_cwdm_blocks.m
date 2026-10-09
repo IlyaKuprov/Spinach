@@ -60,4 +60,32 @@ for method={'exact','cheap'}
     end
 end
 
+% Identity factors retain their selected block and per-spin multiplicity
+for method={'cheap','exact','chem'}
+    weights=ones(1,2);
+    if strcmp(method{1},'chem'), weights=s.chem.concs; end
+    for n=1:2
+        expected=sparse(s.bas.offsets(n)+1,1,weights(n),s.bas.offsets(end),1);
+        for label={'E','T0,0'}
+            actual=state(s,label{1},s.chem.parts{n}(1),method{1});
+            result=test_true(result,['identity ' method{1} ' ' label{1} ' ' int2str(n)],...
+                             isequal(actual,expected),'identity occupies only the selected unit coordinate');
+        end
+        actual=state(s,{'E','E'},num2cell(s.chem.parts{n}),method{1});
+        result=test_true(result,['identity product ' method{1} ' ' int2str(n)],...
+                         isequal(actual,expected),'a local identity product contributes once');
+    end
+    expected=sparse(s.bas.offsets(1:2)+1,1,weights,s.bas.offsets(end),1);
+    actual=state(s,'E','1H',method{1});
+    result=test_true(result,['identity isotope ' method{1}],isequal(actual,expected),...
+                     'an isotope sum contributes once for each matching spin');
+    actual=state(s,'E','all',method{1});
+    result=test_true(result,['identity all ' method{1}],isequal(actual,2*expected),...
+                     'two selected spins in a substance contribute twice its unit');
+    actual=state(s,'E',[1 2],method{1});
+    expected=sparse(1,1,weights(1),s.bas.offsets(end),1);
+    result=test_true(result,['identity numeric ' method{1}],isequal(actual,2*expected),...
+                     'a numeric sum leaves unrelated blocks empty');
+end
+
 end

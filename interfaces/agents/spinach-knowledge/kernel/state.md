@@ -23,7 +23,7 @@ For example, `psi=state(spin_system,[-1/2 1/2 0])` specifies the projections for
 - Supported operator labels are `'E'` (identity), `'Lz'`, `'Lx'`, `'Ly'`, `'L+'`, `'L-'`, `'Tl,m'` (irreducible spherical tensor, integer `l,m`), and `'CTx'`, `'CTy'`, `'CTz'`, `'CT+'`, `'CT-'` (central-transition operators in the Zeeman basis). The source routes these descriptions through `human2opspec` and constructs the corresponding basis representation.
 - In `sphten-liouv`, `method` may be `'exact'` (default; correct normalisation), `'cheap'` (faster for large systems, but deliberately unnormalised), or `'chem'` (exact state weighted by concentrations in `inter.chem.concs`). The method choice is ignored by the Zeeman Hilbert and Liouville formalisms; those modes do not provide these shortcuts/chemical-kinetics weighting.
 
-The `exact` and `cheap` sphten constructors return unweighted direct-sum vectors. Descriptor lookup uses local columns of the hosting substance; isotope sums accumulate contributions in all matching blocks. Identity requests populate the substance unit coordinates.
+The `exact` and `cheap` sphten constructors return unweighted direct-sum vectors. Descriptor lookup uses local columns of the hosting substance; isotope sums accumulate contributions in all matching blocks. An explicit identity request retains the originating spin selection: a product of identities contributes once at its substance unit coordinate, while a numeric or isotope sum contributes once per selected spin in each hosting block. Unrelated blocks remain empty. The `chem` method multiplies each such local identity by its substance concentration.
 
 ## Output and limitations
 

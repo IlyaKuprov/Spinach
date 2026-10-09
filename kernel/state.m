@@ -86,6 +86,38 @@ grumble(spin_system,states,spins,method);
 % Reject product states spanning substances
 if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
 
+% Preserve substance membership before identity factors lose their spin labels
+if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
+    if ischar(spins)
+        switch spins
+            case 'all'
+                spins=1:spin_system.comp.nspins;
+            case 'electrons'
+                spins=find(cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes));
+            case 'nuclei'
+                spins=find(~cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes));
+            otherwise
+                spins=find(strcmp(spins,spin_system.comp.isotopes));
+        end
+        if isempty(spins), error('no such spins in the system.'); end
+    end
+    if isnumeric(spins)
+        rho=sparse(spin_system.bas.offsets(end),1);
+        for n=1:numel(spins)
+            rho=rho+state(spin_system,{states},{spins(n)},method);
+        end
+        return;
+    end
+    subst=which_subst(spin_system,cell2mat(spins));
+    [opspecs,coeffs]=human2opspec(spin_system,states,spins);
+    if all(cellfun(@(x)nnz(x)==0,opspecs))
+        rho=sparse(spin_system.bas.offsets(subst)+1,1,sum(coeffs),...
+                   spin_system.bas.offsets(end),1);
+        if strcmp(method,'chem'), rho=spin_system.chem.concs(subst)*rho; end
+        return;
+    end
+end
+
 % Get the unit state
 switch spin_system.bas.formalism
 

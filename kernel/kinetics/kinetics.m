@@ -126,15 +126,24 @@ concs=chem_concs(spin_system,eta);
 dim=spin_system.bas.offsets(end);
 eta=reshape(eta,dim,[]);
 blocks=cell(size(concs,1),1);
+
+% Evaluate each spatially uniform schedule once at the shared stage time
+rates=zeros(size(reactions));
+for n=1:numel(reactions)
+    rate=reactions{n}.rate;
+    if isa(rate,'function_handle'), rate=rate(t); end
+    if ~isnumeric(rate)||~isscalar(rate)||~isreal(rate)||~isfinite(rate)||rate<0
+        error('Spinach:kinetics:rateValue','time-dependent rates must return a finite non-negative scalar.');
+    end
+    rates(n)=rate;
+end
+
+% Reuse the stage rates in every voxel
 for v=1:size(concs,1)
     K=sparse(dim,dim);
     for n=1:numel(reactions)
         reaction=reactions{n}; reactants=reaction.reactants;
-        rate=reaction.rate;
-        if isa(rate,'function_handle'), rate=rate(t); end
-        if ~isnumeric(rate)||~isscalar(rate)||~isreal(rate)||~isfinite(rate)||rate<0
-            error('Spinach:kinetics:rateValue','time-dependent rates must return a finite non-negative scalar.');
-        end
+        rate=rates(n);
 
         % Each occurrence loses its own state times the other concentrations
         for k=1:numel(reactants)

@@ -95,6 +95,19 @@ s=basis(create(sys,inter),bas); K=kinetics(s); eta=unit_state(s);
 result=test_close(result,'time rate',chem_concs(s,K(0.5,eta)*eta),[-1.75 1.75 0 0],1e-12,0,...
                   'the first-order rate at t=0.5 is 2.5');
 
+% Share each time schedule across unequal voxel populations
+profile clear; profile on;
+spatial=K(0.5,[eta;2*eta;3*eta]);
+profile off; timing=profile('info');
+callback=contains({timing.FunctionTable.FunctionName},'@(t)2+t');
+calls=sum([timing.FunctionTable(callback).NumCalls]);
+result=test_true(result,'one schedule call',calls==1,...
+                 'the shared stage time requires one callback evaluation, not one per voxel');
+result=test_close(result,'time rate across voxels',...
+                  chem_concs(s,spatial*[eta;2*eta;3*eta]),...
+                  [1;2;3]*[-1.75 1.75 0 0],1e-12,0,...
+                  'the same schedule rate acts on each local concentration');
+
 % Product closure adds cross-reactant order without altering concentrations
 inter.chem.reactions={reaction}; inter.chem.reactions{1}.closure='product';
 s=basis(create(sys,inter),bas); K=kinetics(s);

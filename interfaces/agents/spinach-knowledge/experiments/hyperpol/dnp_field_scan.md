@@ -36,3 +36,5 @@ The source explicitly requires an unthermalised relaxation superoperator. It als
 - Source: `experiments/hyperpol/dnp_field_scan.m`
 - <https://spindynamics.org/wiki/index.php?title=dnp_field_scan.m>
 - Source attribution: ilya.kuprov@weizmann.ac.il
+
+Segmented inputs raise `Spinach:dnp_field_scan:segmentedSubstances` before trace regularisation or the steady-state solve. The current single-trace algorithm requires one substance in either supported formalism.

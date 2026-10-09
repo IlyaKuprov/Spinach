@@ -41,3 +41,5 @@ The source says R must not be thermalised for this calculation (`inter.equilibri
 With polyadics enabled, `fp-gmres` retains the phase derivative as FFT factors and applies the full generator through a function action. Its preconditioner solves independent spin-sized static-generator blocks in the Fourier phase basis, including the frequency-dependent derivative eigenvalues but not microwave phase mixing. LU decompositions are prepared once per frequency and reused by GMRES. Nonconvergence is reported as an error rather than accepted as a steady state. Odd and even phase counts retain the original `fourdif` Nyquist convention.
 
 `fp-backs` still uses an explicit matrix and direct backslash, and both LvN methods are unchanged. The implicit route is a CPU iterative solver; it does not make a GPU steady-state solver available.
+
+Segmented inputs raise `Spinach:dnp_freq_scan:segmentedSubstances` before trace regularisation or the steady-state solve. The current single-trace algorithm requires one substance in either supported formalism.

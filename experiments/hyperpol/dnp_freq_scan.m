@@ -37,6 +37,8 @@
 %
 %    K - kinetics superoperator, received from context function
 %
+% Note: segmented substance inputs are not yet supported.
+%
 % Outputs:
 %
 %    dnp    -  an array of steady state expectation values for
@@ -263,6 +265,10 @@ end
 
 % Consistency checking
 function grumble(spin_system,parameters,H,R,K)
+if spin_system.bas.nsubst>1
+    error('Spinach:dnp_freq_scan:segmentedSubstances',...
+          'DNP scans require a single substance.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('this function is only available for sphten-liouv and zeeman-liouv formalisms.');
 end

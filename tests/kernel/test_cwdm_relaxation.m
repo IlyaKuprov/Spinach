@@ -334,6 +334,43 @@ for method={'newton','squaring'}
     end
 end
 
+% DNP scans reject multiple independent trace null directions before solving
+sys=struct('magnet',1,'isotopes',{{'E','1H'}});
+inter=struct(); inter.chem.parts={1,2}; inter.chem.concs=[.7 .3];
+inter.relaxation={'t1_t2'}; inter.r1_rates={10,1}; inter.r2_rates={20,2};
+inter.rlx_keep='secular'; inter.equilibrium='zero';
+bas=struct('formalism','sphten-liouv','approximation',{{'none','none'}});
+s=assume(test_spin_system(sys,inter,bas),'esr');
+H=hamiltonian(s); R=relaxation(s); K=sparse(size(R,1),size(R,2));
+parameters=struct('mw_pwr',0,'mw_frq',0,'g_ref',s.tols.freeg,...
+                  'rho0',unit_state(s),'coil',state(s,'Lz',2),...
+                  'mw_oper',operator(s,'Lx',1),'ez_oper',operator(s,'Lz',1),...
+                  'method','lvn-backs','fields',0);
+for scan={@dnp_freq_scan,@dnp_field_scan}
+    if isequal(scan{1},@dnp_field_scan), parameters.method='backslash'; end
+    rejected=false;
+    try
+        scan{1}(s,parameters,H,R,K);
+    catch err
+        rejected=strcmp(err.identifier,['Spinach:' func2str(scan{1}) ':segmentedSubstances']);
+    end
+    result=test_true(result,['segmented ' func2str(scan{1})],rejected,...
+                     'the single-trace scan algorithm rejects segmented input');
+    fprintf('CWDM_DNP_SCAN %s named_rejection=%d\n',func2str(scan{1}),rejected);
+end
+
+% A supported single-substance field scan retains its zero-drive equilibrium
+inter.chem.parts={1:2}; inter.chem.concs=1; bas.approximation={'none'};
+s=assume(test_spin_system(sys,inter,bas),'esr');
+H=hamiltonian(s); R=relaxation(s); K=sparse(size(R,1),size(R,2));
+parameters.rho0=unit_state(s)+.1*state(s,'Lz',2);
+parameters.coil=state(s,'Lz',2); parameters.mw_oper=operator(s,'Lx',1);
+parameters.ez_oper=operator(s,'Lz',1); parameters.fields=[-.001 0 .001];
+actual=dnp_field_scan(s,parameters,H,R,K);
+expected=repmat(parameters.coil'*parameters.rho0,3,1);
+result=test_close(result,'single field scan zero drive',actual,expected,...
+                  1e-12,1e-12,'longitudinal equilibrium survives a zero-drive field scan');
+
 end
 
 

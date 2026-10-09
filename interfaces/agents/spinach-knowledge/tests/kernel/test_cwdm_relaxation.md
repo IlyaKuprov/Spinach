@@ -41,3 +41,5 @@ regularises only the non-unit directions.
 Solid-effect coverage asserts the named segmented steady-state boundary with an electron and an independent nucleus. A supported single-substance zero-drive calculation is compared with thermal-equilibrium detection.
 
 A two-substance Hilbert fixture converted by `sim2liouv` checks the named segmented Zeeman steady boundary for both methods, with empty and supplied initial guesses.
+
+Both DNP scan functions are called with complete two-substance inputs and must raise their named segmented-substance boundary rather than attempting a singular single-trace solve.

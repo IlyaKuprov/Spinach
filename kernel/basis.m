@@ -147,11 +147,29 @@ for s=1:nsubst
 
     % Compile local permutation symmetry with the existing SALC algorithm
     if isfield(local_bas,'sym_group')||isfield(local_bas,'sym_spins')||isfield(local_bas,'sym_a1g_only')
-        if ~strcmp(bas.formalism,'sphten-liouv')&&...
+        if nsubst>1&&~strcmp(bas.formalism,'sphten-liouv')&&...
            isfield(local_bas,'sym_group')&&~isempty(local_bas.sym_group)
-            error('segmented Zeeman symmetry is not implemented.');
+            error('Spinach:basis:segmentedZeeman',...
+                  'segmented Zeeman symmetry is not implemented.');
         end
         local_system.bas.basis=spin_system.bas.basis(s);
+
+        % Build the stock Zeeman labels only for the local SALC calculation
+        if ~strcmp(bas.formalism,'sphten-liouv')&&...
+           isfield(local_bas,'sym_group')&&~isempty(local_bas.sym_group)
+            mults=local_system.comp.mults; dim=prod(mults);
+            descriptor=zeros(dim,numel(mults));
+            for n=1:numel(mults)
+                descriptor(:,n)=kron(ones(prod(mults(1:(n-1))),1),...
+                                     kron((1:mults(n))',ones(prod(mults((n+1):end)),1)));
+            end
+            if strcmp(bas.formalism,'zeeman-liouv')
+                descriptor=[repmat(descriptor,[dim 1]) kron(descriptor,ones(dim,1))];
+            end
+            local_system.bas.basis={descriptor};
+        end
+
+        % Store the local irreducible projectors without retaining Zeeman labels
         local_system=symmetry(local_system,local_bas);
         spin_system.bas.sym_fact(s)=local_system.bas.sym_fact;
     end

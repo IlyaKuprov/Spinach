@@ -36,7 +36,7 @@ spin_system=assume(spin_system,'labframe');
 H=hamiltonian(spin_system);
 
 % Symmetry factorization
-S=horzcat(spin_system.bas.irrep.projector);
+S=horzcat(spin_system.bas.sym_fact(1).irr_projectors{:});
 
 % Plotting
 kfigure(); scale_figure([1.5 1]);

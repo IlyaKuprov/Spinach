@@ -126,4 +126,26 @@ result=test_true(result,'membership hash',...
                  ~strcmp(actual.bas.basis_hash,reference.bas.basis_hash),...
                  'equal descriptors with different global membership have different hashes');
 
+% Single-substance Zeeman symmetry retains its stock SALC dimensions
+sys=struct('magnet',0,'isotopes',{{'1H','1H'}}); inter=struct();
+for formalism={'zeeman-hilb','zeeman-wavef','zeeman-liouv'}
+    options=struct('formalism',formalism{1},'approximation',{{'none'}},...
+                   'sym_group',{{{'S2'}}},'sym_spins',{{{[1 2]}}});
+    actual=test_spin_system(sys,inter,options);
+    if strcmp(formalism{1},'zeeman-liouv')
+        expected=10;
+    else
+        expected=[3;1];
+    end
+    result=test_true(result,['Zeeman symmetry ' formalism{1}],...
+                     isequal(actual.bas.sym_fact(1).irr_dimensions,expected),...
+                     'two identical spin halves give triplet/singlet or symmetric Liouville sectors');
+    Q=horzcat(actual.bas.sym_fact(1).irr_projectors{:});
+    result=test_true(result,['Zeeman projectors ' formalism{1}],...
+                     norm(Q'*Q-speye(size(Q,2)),1)<1e-12,...
+                     'the SALC projector columns are orthonormal');
+    result=test_true(result,['Zeeman labels ' formalism{1}],isempty(actual.bas.basis{1}),...
+                     'temporary permutation labels do not change the compiled descriptor contract');
+end
+
 end

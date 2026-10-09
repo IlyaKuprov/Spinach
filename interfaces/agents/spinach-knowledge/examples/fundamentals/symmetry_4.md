@@ -15,7 +15,7 @@ The source sets `sys.magnet=0` for two electrons and four protons, groups proton
 
 ## Construction and display
 
-The system and basis are built, the `labframe` assumption is applied, and the source calls `hamiltonian(spin_system)` and concatenates the irrep projectors into `S`. The source labels this section “Hamiltonian superoperator”, while the selected basis formalism is `zeeman-hilb`; this page reports both source details without resolving that terminology. The plotted masks use `abs(H)>1e3` and `abs(S'*H*S)>1e3`, with guide lines at indices 20 and 28.
+The system and basis are built, the `labframe` assumption is applied, and the source calls `hamiltonian(spin_system)` and concatenates `bas.sym_fact(1).irr_projectors` into `S`. The source labels this section “Hamiltonian superoperator”, while the selected basis formalism is `zeeman-hilb`; this page reports both source details without resolving that terminology. The plotted masks use `abs(H)>1e3` and `abs(S'*H*S)>1e3`, with guide lines at indices 20 and 28.
 
 ## Scope
 

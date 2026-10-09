@@ -41,6 +41,8 @@
 %
 % Each returned substance block is weighted by chem.concs.
 % Note: multi-substance Zeeman equilibrium states are not yet supported.
+%       Segmented Hamiltonians must have no cross-substance blocks after
+%       the orientation-dependent contribution has been added.
 %
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
@@ -78,6 +80,17 @@ else
     
 end
 
+% Reject coupling between independent substance blocks after orientation assembly
+if spin_system.bas.nsubst>1
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        if nnz(I(idx,:))~=nnz(I(idx,idx))
+            error('Spinach:equilibrium:crossSubstanceHamiltonian',...
+                  'Hamiltonian must not contain cross-substance blocks (substance %d).',n);
+        end
+    end
+end
+
 % Get the temperature factor
 beta_factor=spin_system.tols.hbar/(spin_system.tols.kbol*spin_system.rlx.temperature);
 
@@ -110,7 +123,7 @@ switch spin_system.bas.formalism
         for n=1:spin_system.bas.nsubst
             idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
             if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
-               (spin_system.bas.nsubst>1)&&isempty(spin_system.chem.parts{n})
+               (spin_system.bas.nsubst>1)&&(nnz(I(idx,idx))==0)
                 continue
             end
             if norm(I(idx,idx)*unit(idx),1)<1e-10

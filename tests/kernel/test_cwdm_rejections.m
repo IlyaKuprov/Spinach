@@ -226,4 +226,37 @@ for n=1:2
                       1e-14,1e-14,'each valid block retains its Boltzmann state');
 end
 
+% Exactly zero spinful Hamiltonian blocks retain their unit state
+for n=1:2
+    idx=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    zero=left; zero(idx,idx)=0; actual=equilibrium(s,zero);
+    expected=rho; expected(idx)=unit(idx);
+    result=test_close(result,['zero equilibrium block ' int2str(n)],actual,expected,...
+                      1e-14,1e-14,'a zero block is a valid left product, not a nonzero commutator');
+    fprintf('CWDM_EQUILIBRIUM_ZERO block=%d unit_error=%.16g\n',n,norm(actual(idx)-unit(idx)));
+end
+
+% Reject cross-substance terms in either direction, including anisotropic input
+for n=1:2
+    cross=sparse(3,5,1,s.bas.offsets(end),s.bas.offsets(end));
+    if n==2, cross=cross'; end
+    for anisotropic=[false true]
+        rejected=false;
+        try
+            if anisotropic
+                Q={cell(3)}; Q{1}{2,2}=cross;
+                equilibrium(s,left,Q,[0 0 0]);
+            else
+                equilibrium(s,left+cross);
+            end
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:equilibrium:crossSubstanceHamiltonian');
+        end
+        result=test_true(result,['cross equilibrium ' int2str(n) ' ' int2str(anisotropic)],...
+                         rejected,'the assembled Hamiltonian must not transfer between substances');
+        fprintf('CWDM_EQUILIBRIUM_CROSS direction=%d anisotropic=%d named_rejection=%d\n',...
+                n,anisotropic,rejected);
+    end
+end
+
 end

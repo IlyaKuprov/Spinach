@@ -107,7 +107,36 @@ if ismember('op_cache',spin_system.sys.enable)
 end
 
 % Product specifications must belong to one substance
-if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
+if iscell(spins), subst=which_subst(spin_system,cell2mat(spins)); end
+
+% Retain spin selection before identity descriptors lose their labels
+if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
+    if ischar(spins)
+        switch spins
+            case 'all'
+                spins=1:spin_system.comp.nspins;
+            case 'electrons'
+                spins=find(cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes));
+            case 'nuclei'
+                spins=find(~cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes));
+            otherwise
+                spins=find(strcmp(spins,spin_system.comp.isotopes));
+        end
+        if isempty(spins), error('no such spins in the system.'); end
+    end
+    if isnumeric(spins)
+        A=cell(numel(spins),1);
+        for n=1:numel(spins)
+            A{n}=operator(spin_system,{operators},{spins(n)},operator_type,'xyz');
+        end
+        A=cell2mat(A);
+        if strcmp(format,'csc')
+            matrix_dim=spin_system.bas.offsets(end);
+            A=sparse(A(:,1),A(:,2),complex(A(:,3)),matrix_dim,matrix_dim);
+        end
+        return;
+    end
+end
 
 % Parse the human specification into Spinach notation
 [opspecs,coeffs]=human2opspec(spin_system,operators,spins);
@@ -126,6 +155,13 @@ switch spin_system.bas.formalism
 
             % Get the superoperator
             A{n}=superop(spin_system,opspecs{n},operator_type);
+
+            % Confine identity terms to the explicitly selected substance
+            if spin_system.bas.nsubst>1&&~any(opspecs{n})
+                rows=A{n}(:,1);
+                A{n}=A{n}((rows>spin_system.bas.offsets(subst))&...
+                          (rows<=spin_system.bas.offsets(subst+1)),:);
+            end
 
             % Apply the coefficient
             A{n}(:,3)=coeffs(n)*A{n}(:,3);

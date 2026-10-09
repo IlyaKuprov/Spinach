@@ -60,6 +60,46 @@ for method={'exact','cheap'}
     end
 end
 
+% Identity actions retain their selected block in both sparse formats
+for side={'left','right','acomm','comm'}
+    scale=1+strcmp(side{1},'acomm');
+    if strcmp(side{1},'comm'), scale=0; end
+    for format={'csc','xyz'}
+        for n=1:2
+            rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+            expected=sparse(rows,rows,scale,s.bas.offsets(end),s.bas.offsets(end));
+            for label={'E','T0,0'}
+                actual=operator(s,label{1},s.chem.parts{n}(1),side{1},format{1});
+                if strcmp(format{1},'xyz')
+                    actual=sparse(actual(:,1),actual(:,2),actual(:,3),...
+                                  s.bas.offsets(end),s.bas.offsets(end));
+                end
+                result=test_true(result,['identity action ' side{1} ' ' format{1} ' ' label{1} ' ' int2str(n)],...
+                                 isequal(actual,expected),'identity acts only in the selected substance');
+            end
+            actual=operator(s,{'E','E'},num2cell(s.chem.parts{n}),side{1},format{1});
+            if strcmp(format{1},'xyz')
+                actual=sparse(actual(:,1),actual(:,2),actual(:,3),...
+                              s.bas.offsets(end),s.bas.offsets(end));
+            end
+            result=test_true(result,['identity product action ' side{1} ' ' format{1} ' ' int2str(n)],...
+                             isequal(actual,expected),'a local identity product contributes once');
+        end
+    end
+    expected=scale*speye(s.bas.offsets(end));
+    result=test_true(result,['identity isotope action ' side{1}],...
+                     isequal(operator(s,'E','1H',side{1}),expected),...
+                     'one matching spin per substance contributes one local identity');
+    result=test_true(result,['identity all action ' side{1}],...
+                     isequal(operator(s,'E','all',side{1}),2*expected),...
+                     'two matching spins per substance contribute two local identities');
+    rows=1:s.bas.offsets(2);
+    expected=sparse(rows,rows,2*scale,s.bas.offsets(end),s.bas.offsets(end));
+    result=test_true(result,['identity numeric action ' side{1}],...
+                     isequal(operator(s,'E',[1 2],side{1}),expected),...
+                     'a numeric sum leaves unrelated substances empty');
+end
+
 % Identity factors retain their selected block and per-spin multiplicity
 for method={'cheap','exact','chem'}
     weights=ones(1,2);

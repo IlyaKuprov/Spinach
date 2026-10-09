@@ -9,3 +9,5 @@ The system has isotope 10B and magnet setting 16.4. Its only listed coupling is 
 The sequence uses rank 12, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate 70000, and grid `rep_2ang_800pts_sph`. It sets sweep `[-141e3 -139e3]`, 256 points, 256-point zero-fill, and `axis_units='kHz'`. Both initial state and receiver are 10B `Lz`, matching the source's Z-detection description. The source does not set explicit RF power, duration, frequency, or an average-treatment field in this file.
 
 The simulation call is `singlerot` with `overtone_a` and `qnmr`. The script plots `real(spectrum)` through `plot_1d`; it does not apply a separate phase factor. Its narrow sweep and spherical 800-point grid distinguish this sideband-focused setup from the two panoramic 10B examples in this group.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -22,3 +22,5 @@ This routine computes a stimulated-echo diagnostic for the Mims ENDOR sequence w
 stim_echo is the time-sampled stimulated echo in the absence of nuclear RF. The sequence uses ideal rotations and provides a baseline diagnostic; it does not by itself calculate ENDOR modulation, DNP/hyperpolarisation, a magnetic-field sweep, or spatial imaging.
 
 Source: https://spindynamics.org/wiki/index.php?title=endor_mims_echo.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

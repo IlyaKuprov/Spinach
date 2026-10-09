@@ -17,3 +17,5 @@ The controls are `Lx` and `Ly` on ¹³C. The time grid has 125 slices of 4 μs (
 The later signal-generation section is distinct from the design objective: it initialises a new `Lz` state using the isotope label `13C`, simulates the shaped pulse, acquires with an `L+` coil, applies Gaussian apodisation, zero-fills and Fourier-transforms the FID, and plots the real spectrum. The acquisition settings are offset 0, sweep 55000, 2048 points and zero-fill 16384, with the axis labelled in ppm; the Gaussian apodisation argument is 10. The source does not annotate units for the sweep or apodisation value. The script requests a plot, but the source does not include the resulting spectrum or a convergence result, so neither outcome can be inferred from the setup.
 
 Source: [examples/optimal_control/features_wave_basis.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_wave_basis.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

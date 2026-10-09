@@ -23,3 +23,5 @@ Fifteen proton-power settings span linspace(26e3,40e3,15). At each setting, the 
 ## Output and scope
 
 Each simulated spectrum is plotted as its real part against the configured sweep, with the displayed x limits set to 70-105 and y limits to -8.7843e-4 through 8.7843e-4. The loop labels panels with the scanned proton power in kHz. This is a one-dimensional simulated spectrum for each power setting; the source does not report a measured match or a fit statistic.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -23,3 +23,5 @@ The initial state is `Lz` on `E8`, the detection operator is `L+`, and no spins 
 For each ZFS sample, the two FIDs receive exponential apodisation with parameter 10, are Fourier transformed, and are accumulated with that sample's weight. The real accumulated spectrum for A is plotted in red and B in blue, with the plot refreshed during the weighted ZFS loop. The example plots the spectra and does not write a data or figure file.
 
 The source notes that non-central Gd(III) transition holes are very shallow and estimates a calculation time of minutes. The cited distribution source is Raitsimring et al., *Applied Magnetic Resonance* 28, 281–295 (2005), Figure 5 ([DOI](https://doi.org/10.1007/BF03166762)).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

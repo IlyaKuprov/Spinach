@@ -177,7 +177,7 @@ parameters.axis_units='ppm';
 parameters.tmix=0.800;
 
 % Concentration-aware initial state
-parameters.rho0=state(spin_system,'Lz','1H','chem');
+parameters.rho0=state(spin_system,'Lz','1H');
 
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');

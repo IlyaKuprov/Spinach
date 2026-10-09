@@ -23,3 +23,5 @@ For each grid point, singlerot runs overtone_cp with qnmr; the stored value is s
 ## Output and scope
 
 The plotted image has proton RF power in Hz on the x axis and sample spinning rate in Hz on the y axis, with the code setting the y direction to normal. Pixel values are the summed real parts of the simulated spectra, not fitted parameters or experimental intensities. In particular, this output is a coarse scan on the specified powder grid rather than a plotted collection of full spectra.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

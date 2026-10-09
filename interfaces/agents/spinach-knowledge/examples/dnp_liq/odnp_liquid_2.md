@@ -21,3 +21,5 @@ The script creates the spin system and basis, obtains `rho_eq=equilibrium(spin_s
 ## Output and scope
 
 The first plot is the real electron longitudinal signal (the third coil channel); the second plots the two proton longitudinal signals. The plotted abscissa is `linspace(0,1000,1001)`, labelled in microseconds, and the ordinates are longitudinal `Lz` signals. This is a fixed three-spin geometry with one correlation time and no microwave drive; it is not a field or frequency sweep.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -17,3 +17,5 @@ The stretch mode is set to 6.1 MHz. The force is detuned from it by 26 kHz, so t
 The first plot shows the three ion σx expectation values and stretch-mode occupation ⟨a†a⟩ during the simulated gate interval. The second is a calculated parity scan of the outer ions versus analysis-pulse phase after the gate. The script includes checks for the spectator coherence, return of the stretch mode to its ground state, and parity contrast; listing those checks does not establish that a run passed them. These are simulated observables, not measurements or a reported gate fidelity.
 
 The source cites Leibfried et al. (2003) for the geometric gate and James, *Appl. Phys. B* 66, 181 (1998) for the three-ion mode frequencies.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

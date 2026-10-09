@@ -60,7 +60,7 @@ parameters.needs={'iso_eq'};   % initial condition
 parameters.verbose=1;
 
 % Detection state
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Simulation
 fid=singlerot(spin_system,@cp_acquire_soft,parameters,'nmr');

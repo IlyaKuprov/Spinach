@@ -18,3 +18,5 @@ The source sets `parameters.spins={'1H'}`, with 1H `L+` initial state and receiv
 ## Source limits
 
 The source cites [the reported synthesis and NMR study](https://doi.org/10.1021/acs.joc.4c00670) and estimates minutes of calculation, faster with a GPU. It provides a spin model and processing recipe, not a measured spectrum, reported rate, or peak list. The source code does not specify an explicit relaxation model.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

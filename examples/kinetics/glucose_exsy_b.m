@@ -93,7 +93,7 @@ parameters.npoints=[512 1024];
 parameters.zerofill=[1024 1024];
 parameters.spins={'19F'};
 parameters.axis_units='ppm';
-parameters.rho0=state(spin_system,'Lz','19F','chem');
+parameters.rho0=state(spin_system,'Lz','19F');
 
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');

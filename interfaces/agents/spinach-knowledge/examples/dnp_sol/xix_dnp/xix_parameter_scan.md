@@ -21,3 +21,5 @@ The scan contains 120 nominal offsets from -100e6 to +100e6 Hz and 30 electron n
 With Spinach available on the MATLAB path, call `xix_parameter_scan()`. It evaluates the powder-averaged XiX contact over both parameter grids and displays a 100-level contour plot with offset and electron nutation frequency in MHz. The function declares no return value and does not save a scan matrix; its result is the figure. This scan changes offset and nutation frequency only, with the model, sequence length, pulse duration, phase, and powder grid held fixed.
 
 The example depends on Spinach system/basis/state construction, the `xixdnp` sequence, `powder` ESR averaging, and Spinach plotting helpers; its inner scan uses MATLAB `parfor`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

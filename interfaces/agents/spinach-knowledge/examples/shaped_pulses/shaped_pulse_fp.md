@@ -17,3 +17,5 @@ The call `shaped_pulse_af(spin_system,H,Lx,Ly,rho,1922.4,50.0,5e-3,-pi/2,2)` sup
 The pulse-prepared state is passed to liquid-state NMR acquisition with a 7000 Hz sweep, 2048 acquired points, zero filling to 8192 points, and a Hz axis. The FID is phase-corrected by exp(−i × 0.67), exponentially apodised with parameter 6, Fourier transformed, and plotted as a real spectrum. The script does not explicitly construct a relaxation superoperator or apply a gradient or homospoil step before this acquisition.
 
 Sources: [shaped_pulse_fp.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_fp.m) and [shaped_pulse_af.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_af.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

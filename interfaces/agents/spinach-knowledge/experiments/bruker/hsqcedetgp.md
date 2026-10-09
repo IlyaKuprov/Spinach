@@ -32,3 +32,5 @@ Natural-abundance simulations should use Spinach isotope-dilution functionality,
 - Multiplicity-editing reference: https://doi.org/10.1002/mrc.1260310315
 - Spinach documentation: https://spindynamics.org/wiki/index.php?title=hsqcedetgp.m
 - Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/bruker/hsqcedetgp.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

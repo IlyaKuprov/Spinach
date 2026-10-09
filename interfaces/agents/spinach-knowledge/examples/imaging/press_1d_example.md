@@ -25,3 +25,5 @@ The source comments describe possible excitation assignments at +100e3 for B and
 The source credits Ahmed Allami and Ilya Kuprov.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

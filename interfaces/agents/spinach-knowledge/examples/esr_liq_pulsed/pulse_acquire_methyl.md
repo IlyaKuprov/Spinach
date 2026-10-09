@@ -14,8 +14,10 @@ The simple common-linewidth model uses relaxation **'damp'**, diagonal retention
 
 ## ESR acquisition
 
-Detected spin is **E**; initial state and receiver are both **state(spin_system,'L+','E')**, with an empty decoupling list. Offset is **0**, sweep **5e8**, point count 256, zero-fill 1024, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies **'none'** apodisation, Fourier-transforms using the zero-fill length, and plots the real spectrum.
+Detected spin is **E**; the initial state uses **state(spin_system,'L+','E')**, with an empty decoupling list. Offset is **0**, sweep **5e8**, point count 256, zero-fill 1024, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The function calls **liquid(spin_system,@acquire,parameters,'esr')**, applies **'none'** apodisation, Fourier-transforms using the zero-fill length, and plots the real spectrum. The receiver uses the same operator description with `coil_state` instead.
 
 ## Dependencies and limits
 
 Requires the relative **standard_systems/methyl.log** input, Spinach **gparse**/**g2spinach** import helpers, and system/basis/state, liquid ESR/acquire, apodisation, FFT, and plotting routines. The DOI cited by the source is linked above. The source values for field, damping, offset, and sweep have no units annotated in the file; the axis-unit field is explicitly **'GHz-labframe'**. No pulse shape or duration is specified: pulse-acquire is implemented through **@acquire**, not a pulse-program block in this function.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

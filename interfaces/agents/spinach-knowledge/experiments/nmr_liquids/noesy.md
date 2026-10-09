@@ -23,3 +23,5 @@ By default, a homospoil step destroys all but longitudinal magnetisation before 
 ## Output
 
 `fid.cos` and `fid.sin` are the two F1 hypercomplex components. Each is a two-dimensional FID with array shape `[npoints(2), npoints(1)]`: the direct t2 samples are rows and the t1 trajectory samples are columns.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

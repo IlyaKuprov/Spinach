@@ -15,3 +15,5 @@ The rotor-axis vector is `1 1 1` and the MAS rate is `1000` Hz. The acquisition 
 ## Calculation and display
 
 The code calls `gridfree(spin_system,@acquire,parameters,'nmr')`. It exponentially apodises the calculated FID with parameter 6, Fourier transforms it using the 4096-point zero-fill, then plots the real spectrum with `plot_1d`. This is a simulated model spectrum; the source does not provide an experimental trace or a measured comparison.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

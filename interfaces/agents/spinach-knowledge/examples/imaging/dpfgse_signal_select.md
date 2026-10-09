@@ -17,3 +17,5 @@ Acquisition parameters are offset 800, sweep 1200, 512 points, and zero-fill to 
 imaging runs `dpfgse_select`; the returned FID is exponentially apodised with parameter 6, Fourier-transformed after zero-filling and shifted, then plotted as the real spectrum. These are processing settings, not a reported experimental spectrum or measured signal.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

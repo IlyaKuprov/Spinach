@@ -15,3 +15,5 @@ The initial state and detection coil are both the electron raising state `L+`; t
 ## Rank and correlation-time series
 
 The script pairs four maximum ranks with four correlation times in order: ranks 3, 7, 15, and 30 with correlation-time settings `1e-9`, `1e-8`, `1e-7`, and `1e-6`, respectively. It calculates and plots the real signal for each pair in its own panel. Each panel is titled with its correlation time and labelled with electron Zeeman frequency in GHz. The source defines this comparison; it does not establish convergence or claim specific simulated intensities.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

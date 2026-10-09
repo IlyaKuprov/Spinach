@@ -14,3 +14,5 @@ The field parameter is 14.1. The quadrupolar interaction is `eeqq2nqi(3.06e6, 0.
 ## Acquisition and processing
 
 Both the initial state and receiver are the 14N `L+` state. Acquisition uses sweep 50000, 256 points, zero-fill to 1024, and offset 18000; the frequency-axis units are explicitly set to Hz. The FID receives exponential apodisation with parameter 6, is Fourier transformed, and the real part is plotted.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

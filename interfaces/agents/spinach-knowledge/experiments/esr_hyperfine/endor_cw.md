@@ -26,3 +26,5 @@ The numerical constants in the implementation are the pi/2 nuclear rotation and 
 This is an isotropic, approximate CW-ENDOR model, not a full field-dependent EPR acquisition. It returns an FID rather than performing the Fourier transform itself. No DOI or experimental measurement is specified by the source or the earlier page.
 
 Source: https://spindynamics.org/wiki/index.php?title=endor_cw.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

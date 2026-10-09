@@ -20,3 +20,5 @@ The function builds the spin system and basis with `create` and `basis`, then ca
 ## Result and scope
 
 The returned array is plotted in four panels: 1H then 15N longitudinal expectation values over each of the two frequency windows, using the real parts of the corresponding result column and frequency block. The axes are labelled microwave frequency in MHz; no output array or figure is saved by the function. The source supplies no computed polarisation values or performance result beyond its hours estimate.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

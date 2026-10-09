@@ -23,3 +23,5 @@ The frequency offset is part of the pulse Hamiltonian, not a gradient. The examp
 The source comment gives a calculation time of seconds.
 
 Source: [examples/shaped_pulses/shaped_pulse_vg.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_vg.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

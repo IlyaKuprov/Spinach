@@ -17,3 +17,5 @@ It uses an unapproximated `sphten-liouv` basis, proton `Lz` detection, propagato
 ## Dependencies and output
 
 Requires Spinach setup/functions plus `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`. B1 profiles are combined with the quadrature weights; the script plots `real(dnp)` (the real proton signal) against offset in MHz and saves `xix_q_field_profile_ensemble_b1.fig` in the MATLAB current directory. It saves no tabulated profile; the scan is a finite quadrature on the stated grid and offsets.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -18,3 +18,5 @@ The initial density operator and receiver are the 1H raising state, with no deco
 ## Output and limits
 
 The source produces a plotted simulation, not a measured spectrum or saved data file. It does not report numerical peaks or relaxation rates. The positional `g2spinach` argument 31.8 is recorded without assigning it a meaning the wrapper does not specify; details of the parser and acquisition callback are likewise outside this file.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -17,3 +17,5 @@ The relaxation model is damp, with diagonal retention, zero equilibrium, and dam
 The magic-angle parameter is atan(sqrt(2)); the spectrum axis input is [sqrt(2/3) 0 sqrt(1/3)]. The overtone irradiation spin is 14N. The spectrum uses max_rank=9, rotor-rate input -19840, grid rep_2ang_6400pts_sph, sweep [70.0e3 105.0e3], 256 points, and 256-point zero-fill. The source sets axis_units=kHz. Initial state, receiver, and RF operators use the stated magic-angle combinations of Lz and Lx for the relevant spin.
 
 This is one parameter setting, not a power or spinning-rate scan: the proton RF-power input is 2*pi*[55.0e3 35.1e3]/sin(theta), the 14N overtone RF-frequency input is 86.30e3, and rf_dur=1e-4. The source calculates the spectrum with singlerot and overtone_cp, then plots its real part with plot_1d.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

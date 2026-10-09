@@ -41,9 +41,9 @@ for n=1:numel(formalisms)
     rho_eq=equilibrium(spin_system);
 
     % Detection states
-    coil_a=state(spin_system,{'Lz'},{1});
-    coil_b=state(spin_system,{'Lz'},{2});
-    coil_c=state(spin_system,{'Lz'},{3});
+    coil_a=coil_state(spin_system,{'Lz'},{1});
+    coil_b=coil_state(spin_system,{'Lz'},{2});
+    coil_c=coil_state(spin_system,{'Lz'},{3});
 
     % Get the expectation values from Spinach
     expt_a_spinach=trace(coil_a'*rho_eq);

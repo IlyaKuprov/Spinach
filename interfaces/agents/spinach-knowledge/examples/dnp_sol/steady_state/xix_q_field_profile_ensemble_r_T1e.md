@@ -17,3 +17,5 @@ Each run uses fixed electron nutation frequency 18e6 Hz, 201 microwave offsets s
 ## Dependencies and output
 
 Requires Spinach and `gaussleg`, `r1n_dnp`, `powder`, and `xixdnp_steady`; the five-curve wrapper calls its own local profile helper. It plots real proton `Lz` versus offset in MHz, fixes y limits to [−3e−3,3e−3], adds a T1e legend, and saves `xix_q_field_profile_ensemble_r_T1e.fig` in the MATLAB current directory. It saves no tabulated profiles; both distance and T1e scans are finite.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

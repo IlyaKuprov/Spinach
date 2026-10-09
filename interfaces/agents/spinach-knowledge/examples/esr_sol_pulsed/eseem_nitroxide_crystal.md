@@ -19,3 +19,5 @@ The upper panel plots the real time-domain signal against sample index times `ti
 - [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/eseem_nitroxide_crystal.m)
 - [ESEEM sequence helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
 - [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

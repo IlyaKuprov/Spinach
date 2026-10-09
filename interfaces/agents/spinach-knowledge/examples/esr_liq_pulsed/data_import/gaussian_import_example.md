@@ -19,3 +19,5 @@ The exact simulation call is `liquid(spin_system,@acquire,parameters,'esr')`. Ac
 ## Processing, dependencies, and scope
 
 The FID is passed through `apodisation` with `{{'none'}}`, transformed as `fftshift(fft(fid,parameters.zerofill))`, and plotted as the real spectrum. With Spinach on the MATLAB path and the named Gaussian output available, call `gaussian_import_example()`. The import path uses Spinach's `gparse`/`g2spinach` interfaces; simulation and display use `create`, `basis`, `state`, `liquid`, `acquire`, `apodisation`, and the Spinach plotting helpers. It opens a plot and declares no return value; the FID and spectrum are local variables. The example demonstrates this specific imported parameter set and acquisition configuration, not a general Gaussian-output compatibility guarantee.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

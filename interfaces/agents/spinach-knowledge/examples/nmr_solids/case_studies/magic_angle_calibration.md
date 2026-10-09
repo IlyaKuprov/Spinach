@@ -15,3 +15,5 @@ For each tilt, the code calculates a FID, applies exponential apodisation with p
 ## Output and scope
 
 The figure shows the real FID against time in seconds and its real spectrum against frequency in Hz for each angle error. This is a simulated angle-error series, not a plotted experimental calibration dataset. The code comments give the physical motivation but do not quantify a measured sideband change.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

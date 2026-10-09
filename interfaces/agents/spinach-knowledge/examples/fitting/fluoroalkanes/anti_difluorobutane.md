@@ -23,3 +23,5 @@ The initial vector is `[24.08 6.49 1.44 3.59 15.73 47.76 -13.58 26.56 1.7]`. Its
 Each objective evaluation constructs one 1H liquid-acquisition simulation at offset `1500`, sweep `1800`, with `4096` acquired points and zero filling to `32768`; the source declares Hz axes and reverses the axis direction. It applies Gaussian apodisation using the fitted linewidth, Fourier transforms and scales by the fitted amplitude, then uses `pchip` interpolation onto the concatenated experimental axis. The figure compares the experiment and simulation in the two frequency windows `[2255 2355]` and `[635 690]` Hz; the final parameter vector is displayed.
 
 The entry point has no output argument. The source defines a local unconstrained search and a residual objective, but does not provide a measured fit result or parameter uncertainties. The two input regions form one concatenated fit against a single simulated spectrum, rather than two independently optimised experiments.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

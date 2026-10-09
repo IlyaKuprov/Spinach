@@ -30,3 +30,5 @@ The returned structure has `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid
 - *Protein NMR Spectroscopy*, 2nd edition, Figure 7.31a.
 - [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002).
 - [Spin Dynamics Wiki: hnca.m](https://spindynamics.org/wiki/index.php?title=hnca.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

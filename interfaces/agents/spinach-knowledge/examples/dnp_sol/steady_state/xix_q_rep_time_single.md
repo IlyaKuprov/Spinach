@@ -15,3 +15,5 @@ The driver uses the `rep_2ang_800pts_sph` powder grid, `sphten-liouv` with no ba
 ## Output and dependencies
 
 The plotted quantity is the real part of the returned DNP value, labelled as the proton `Lz` expectation value, against repetition time in ms. The figure is saved as `xix_q_rep_time_single.fig`. The driver uses Spinach system/basis/detection and powder functions plus the example helpers `r1n_dnp` and `xixdnp_steady`; it writes a MATLAB figure rather than a separate numeric data file.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

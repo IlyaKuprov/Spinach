@@ -16,3 +16,5 @@ The acquisition inputs are `offset=1150`, `sweep=2400`, `npoints=4096`, and `zer
 ## Resource note and scope
 
 The source warns that the calculation needs 32 or more CPU cores and 128 or more GB of RAM, and estimates a runtime of hours. These are source comments rather than a portable performance guarantee. The page makes no claim about an experimental assignment, computed peak positions, or failure of any Spinach kernel; the script supplies no DOI or external literature link.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

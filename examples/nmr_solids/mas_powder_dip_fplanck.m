@@ -38,7 +38,7 @@ parameters.npoints=512;
 parameters.zerofill=4096;
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.verbose=0;
 
 % Simulation

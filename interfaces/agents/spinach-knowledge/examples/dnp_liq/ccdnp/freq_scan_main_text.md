@@ -9,3 +9,5 @@ The model uses proton Zeeman eigenvalues [0 10 20], electron g-tensor eigenvalue
 Sequence settings are electron irradiation, mw_pwr=2*pi*1e6, method lvn-backs, and needs={'rho_eq'}; g_ref is the mean of the first electron's g eigenvalues. The frequency-offset grid is 2*pi*linspace(-5,10,512)*1e6; the field grid is linspace(1,20,128) Tesla. A parfor loop builds the system and steady state at each field, calls liquid(...,@dnp_freq_scan,...,'esr'), then divides each frequency trace by the equilibrium coil projection coil'*rho_eq.
 
 The output is a figure of real(answer) against field and frequency offset, with a colorbar labelled steady-state 1H DNP; the plotted offset is converted to MHz relative to the isotropic g reference. No result array is saved. The source comments “Calculation time: seconds”; this is not a reproduced runtime or a performance guarantee.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

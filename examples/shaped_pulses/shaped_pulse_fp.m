@@ -55,7 +55,7 @@ rho=shaped_pulse_af(spin_system,H,Lx,Ly,rho,1922.4,50.0,5e-3,-pi/2,2);
 % Set up acquisition
 parameters.spins={'1H'};
 parameters.rho0=rho;
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=7000;

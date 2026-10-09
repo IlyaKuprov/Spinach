@@ -74,8 +74,8 @@ for n=1:numel(collision_rates)
     spin_system=basis(spin_system,bas);
 
     % Chemical-population-weighted excitation and unweighted detection
-    parameters.rho0=state(spin_system,'L+','19F','chem');
-    parameters.coil=state(spin_system,'L+','19F');
+    parameters.rho0=state(spin_system,'L+','19F');
+    parameters.coil=coil_state(spin_system,'L+','19F');
 
     % Laboratory-frame frequency-domain spectrum
     spectrum=liquid(spin_system,@slowpass,parameters,'labframe');

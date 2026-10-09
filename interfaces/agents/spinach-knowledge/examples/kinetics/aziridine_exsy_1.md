@@ -19,3 +19,5 @@ The concentration-aware initial state is 1H longitudinal magnetisation. The exam
 [Article DOI](https://doi.org/10.1002/ange.201410271)
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/aziridine_exsy_1.m)
+
+Initial states use concentration-weighted `state` without the retired `chem` method keyword.

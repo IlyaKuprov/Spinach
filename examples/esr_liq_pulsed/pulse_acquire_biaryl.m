@@ -62,7 +62,7 @@ spin_system=basis(spin_system,bas);
 % Experiment parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=3e8;

@@ -20,3 +20,5 @@ The upper panel plots the real FID against sample index times `timestep` in micr
 - [Imported phenyl DFT log](https://github.com/IlyaKuprov/Spinach/blob/main/examples/standard_systems/phenyl.log)
 - [ESEEM sequence helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
 - [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

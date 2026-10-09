@@ -19,3 +19,5 @@ The wise sequence uses 1H and 13C channels, offsets [2000, 10000] Hz, high-power
 singlerot returns cosine and sine FIDs. Each is apodised with a squared-cosine window; the first-dimension transforms are combined as real cosine plus i times real sine, then Fourier transformed in the second dimension. The plotted observable is the real part of the resulting two-dimensional spectrum.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

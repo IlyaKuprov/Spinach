@@ -40,8 +40,8 @@ spin_system=basis(spin_system,bas);
 
 % Initial and observable states
 rho=state(spin_system,'Lz','1H');
-coil_x=state(spin_system,'Lx','1H');
-coil_y=state(spin_system,'Ly','1H');
+coil_x=coil_state(spin_system,'Lx','1H');
+coil_y=coil_state(spin_system,'Ly','1H');
 
 % RF field operator
 Lx=operator(spin_system,'Lx','1H');

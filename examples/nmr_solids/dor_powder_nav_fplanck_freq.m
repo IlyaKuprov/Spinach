@@ -50,7 +50,7 @@ parameters.zerofill=1024;
 parameters.spins={'14N'};
 parameters.axis_units='kHz';
 parameters.rho0=state(spin_system,'L+','14N');
-parameters.coil=state(spin_system,'L+','14N');
+parameters.coil=coil_state(spin_system,'L+','14N');
 parameters.rframes={{'14N',3}};
 
 % Simulation

@@ -12,3 +12,5 @@ This hypothetical X-band pulse-acquire ESR calculation models the powder spectru
 For each orientation on `rep_2ang_6400pts_sph`, the initial triplet state is built by `zftrip` from the population weights `[0.56, 0.31, 0.13]`, the rotated ZFS tensor, and the field-dependent Zeeman tensor. The driver sets the detected state to `L+`, the hard-pulse operator to `Ly`, and the flip angle to `π/4`; `hp_acquire` applies the pulse and computes the free-induction signal. The carrier offset is zero, the sweep width is 4 GHz, and 128 points are acquired on a GHz lab-frame axis, inverted for plotting. The powder-averaged FID is apodised with `crisp`, zero-filled to 512 points, Fourier transformed, and the real spectrum is plotted.
 
 The script creates a figure; it does not save a spectrum file. The model assumes isotropic `g=2` and is explicitly hypothetical. The source header estimates a calculation time of seconds.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

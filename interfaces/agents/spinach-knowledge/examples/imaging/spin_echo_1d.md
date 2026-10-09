@@ -24,3 +24,5 @@ The example is a one-dimensional spin-echo acquisition with gradient, flow, and 
 ## Attribution
 
 Ahmed Allami; Ilya Kuprov.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

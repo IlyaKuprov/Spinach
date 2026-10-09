@@ -75,7 +75,7 @@ end
 
 % Set acquisition parameters
 parameters.spins={'13C'};
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=55000;

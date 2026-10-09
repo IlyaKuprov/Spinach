@@ -23,3 +23,5 @@ The detected operator is proton `Lz`. The XiX parameters are electron nutation f
 ## Dependencies and scope
 
 The entry point depends on Spinach system construction, basis, state, powder, and plotting helpers, plus `r1n_dnp` and the XiX sequence function `xixdnp_steady`. The file defines a single parameter set and offset profile; it does not compute distance- or B1-ensemble averages.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

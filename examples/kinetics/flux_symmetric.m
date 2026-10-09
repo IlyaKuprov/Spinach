@@ -30,7 +30,7 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'1H'};
 parameters.rho0=1.0*state(spin_system,{'L+'},{1})+...  % Initial concentrations
                 1.0*state(spin_system,{'L+'},{2});     % are specified here
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=900;
 parameters.sweep=5000;

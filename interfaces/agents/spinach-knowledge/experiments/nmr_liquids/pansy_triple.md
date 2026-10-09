@@ -20,3 +20,5 @@ Each FID field is a two-dimensional array with `npoints(1)` F1-state columns: `f
 - [PANSY chapter](https://doi.org/10.1007/128_2011_226)
 - [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/pansy_triple.m)
 - [Spinach Wiki: pansy_triple.m](https://spindynamics.org/wiki/index.php?title=pansy_triple.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -16,8 +16,10 @@ The signature takes `H`, `R`, and `K` and constructs `L=H+1i*R+1i*K`; unlike the
 - `parameters.max_delay`: maximum relaxation-evolution duration, in seconds.
 - `parameters.n_delays`: positive integer number of relaxation-evolution steps spanning `max_delay` (step interval `max_delay/n_delays`).
 
-The pulse/detection states are formed from `L+` of the selected first spin: `Ly` generates the 180° and 90° rotations, while `state(...,'L+',...)` provides the detection observable. There is no explicit coherence-order filter.
+The pulse/detection states are formed from `L+` of the selected first spin: `Ly` generates the 180° and 90° rotations, while `coil_state(...,'L+',...)` provides the detection observable. There is no explicit coherence-order filter.
 
 ## Detection and return
 
 `fids` contains the acquired FIDs as columns, with one column per relaxation-trajectory state; the row dimension is the FID time-point dimension (`npoints`). The trajectory starts at zero delay, and each propagation interval is `max_delay/n_delays`. The function returns the matrix only, not explicit time or delay-axis vectors. No DOI or numerical experimental data are supplied in the source page.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -114,7 +114,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters (19F)
 parameters_f.spins={'19F'};
 parameters_f.rho0=state(spin_system,'L+','19F');
-parameters_f.coil=state(spin_system,'L+','19F');
+parameters_f.coil=coil_state(spin_system,'L+','19F');
 parameters_f.decouple={};
 parameters_f.offset=-81655;
 parameters_f.sweep=300;
@@ -126,7 +126,7 @@ parameters_f.invert_axis=1;
 % Sequence parameters (1H A)
 parameters_ha.spins={'1H'};
 parameters_ha.rho0=state(spin_system,{'L+'},{4})+state(spin_system,{'L+'},{8});
-parameters_ha.coil=state(spin_system,{'L+'},{4})+state(spin_system,{'L+'},{8});
+parameters_ha.coil=coil_state(spin_system,{'L+'},{4})+coil_state(spin_system,{'L+'},{8});
 parameters_ha.decouple={};
 parameters_ha.offset=2426;
 parameters_ha.sweep=128;
@@ -138,7 +138,7 @@ parameters_ha.invert_axis=1;
 % Sequence parameters (1H B)
 parameters_hb.spins={'1H'};
 parameters_hb.rho0=state(spin_system,{'L+'},{6})+state(spin_system,{'L+'},{7});
-parameters_hb.coil=state(spin_system,{'L+'},{6})+state(spin_system,{'L+'},{7});
+parameters_hb.coil=coil_state(spin_system,{'L+'},{6})+coil_state(spin_system,{'L+'},{7});
 parameters_hb.decouple={};
 parameters_hb.offset=986;
 parameters_hb.sweep=350;

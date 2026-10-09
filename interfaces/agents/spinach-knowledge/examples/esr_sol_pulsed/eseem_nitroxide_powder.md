@@ -20,3 +20,5 @@ Before the FFT, the script passes `mean(fid)-fid` to exponential apodisation wit
 - [ESEEM sequence helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/eseem.m)
 - [ESEEM helper reference](https://spindynamics.org/wiki/index.php?title=eseem.m)
 - [Cited DOI](https://doi.org/10.1063/1.453532)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

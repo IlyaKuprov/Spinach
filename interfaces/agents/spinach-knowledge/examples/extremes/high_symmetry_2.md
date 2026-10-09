@@ -18,3 +18,5 @@ The selected spin is `31P`; the initial state and receiver are both `L+`, and `d
 ## Practical limit
 
 The source warns that the calculation needs 32+ CPU cores and 128+ GB RAM and takes hours on such a machine.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -115,7 +115,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=1400;
 parameters.sweep=2000;
@@ -155,7 +155,7 @@ kgrid; set(gca,'XDir','reverse'); kxlabel('chemical shift, ppm');
 % Sequence parameters
 parameters.spins={'19F'};
 parameters.rho0=state(spin_system,'L+','19F');
-parameters.coil=state(spin_system,'L+','19F');
+parameters.coil=coil_state(spin_system,'L+','19F');
 parameters.decouple={};
 parameters.offset=-81529;
 parameters.sweep=250;

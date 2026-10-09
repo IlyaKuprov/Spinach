@@ -27,3 +27,5 @@ The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters
 - `fid`: two-dimensional FID for P or N selection.
 - In P+N mode, `fid.pos` is the P-type component and `fid.neg` is the N-type component.
 - [Spinach Wiki: `gcosy.m`](https://spindynamics.org/wiki/index.php?title=gcosy.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

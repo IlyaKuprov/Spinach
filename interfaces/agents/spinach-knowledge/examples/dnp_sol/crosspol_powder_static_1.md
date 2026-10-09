@@ -15,3 +15,5 @@ The sequence has 100 intervals, each `1e-5` seconds, so the plotted time axis ru
 ## Calculation and output
 
 Spinach's `powder` driver calls `@cp_contact_hard` in NMR mode: `powder(spin_system,@cp_contact_hard,parameters,'nmr')`. The returned local variable `fid` is plotted as `real(fid)` against cumulative contact time in seconds; the vertical axis is labelled as the nitrogen `S_x` expectation value. The function itself declares no output argument, so its result is the generated figure rather than a returned FID. Running the example requires Spinach and the `cp_contact_hard` callback.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

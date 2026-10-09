@@ -19,3 +19,5 @@ The BRW comparison sets Redfield relaxation, zero equilibrium, secular relaxatio
 ## Plot
 
 The script places the real SLE and BRW signals in side-by-side panels labelled SLE and BRW, with amplitude in arbitrary units shown for the SLE panel. These are the outputs of the two models, not experimental data.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

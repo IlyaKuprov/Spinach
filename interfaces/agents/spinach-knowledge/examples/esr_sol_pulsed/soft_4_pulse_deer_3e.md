@@ -17,3 +17,5 @@ The script passes these settings to `deer_4p_soft_diag(spin_system,parameters)` 
 ## Source
 
 [examples/esr_sol_pulsed/soft_4_pulse_deer_3e.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/soft_4_pulse_deer_3e.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -17,3 +17,5 @@ The waveform is read from gaussian_1000.pk as amplitudes and phases, sampled at 
 The initial state is 1H Lz; Lx/Ly are the RF controls and Lz supplies the offset term. The pulse-prepared state is acquired with a 5000 Hz sweep, 2048 points, zero filling to 16384 points, and a Hz axis. Exponential apodisation uses parameter 6; the imaginary part of the Fourier-transformed FID is plotted. The script has no explicit spatial-gradient or homospoil stage and does not construct a relaxation superoperator.
 
 The shaped_pulse_xy implementation cites DOI [10.1016/j.jmr.2004.08.017](https://doi.org/10.1016/j.jmr.2004.08.017). See [shaped_pulse_gaussian.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/shaped_pulses/shaped_pulse_gaussian.m) and [shaped_pulse_xy.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/shaped_pulse_xy.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

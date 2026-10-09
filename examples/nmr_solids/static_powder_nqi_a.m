@@ -35,7 +35,7 @@ parameters.axis_units='MHz';
 parameters.invert_axis=1;
 parameters.grid='icos_2ang_163842pts';
 parameters.rho0=state(spin_system,'L+','14N');
-parameters.coil=state(spin_system,'L+','14N');
+parameters.coil=coil_state(spin_system,'L+','14N');
 parameters.verbose=0;
 
 % Simulation

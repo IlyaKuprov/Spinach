@@ -19,3 +19,5 @@ The source starts from isotropic thermal equilibrium and detects the first confi
 - `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function. The source requires the `sphten-liouv` formalism and same-sized matrices.
 
 [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/inept.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inept.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -42,7 +42,7 @@ spin_system=basis(spin_system,bas);
 
 % Start with Lz of 1H, detect in quadrature on 13C
 parameters.rho0=state(spin_system,'Lz','1H');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Experiment setup
 parameters.spins={'1H','13C'};

@@ -14,7 +14,7 @@ Relaxation is `t1_t2`, diagonal retention, and DiBari equilibrium. The orientati
 
 ## TOP contact-time and B1 ensembles
 
-The experiment uses `pulse_dur=10e-9` seconds, `delay_dur=14e-9`, `addshift=-13e6`, and powder grid `rep_2ang_800pts_sph`. Detection uses `state(spin_system,'Lz','1H')` and the experiment spins are `{'E','1H'}`. It scans `loop_counts=1:256`; contact time is calculated as `(pulse_dur+delay_dur)*loop_counts` and plotted in microseconds. For each loop count and B1 node, `powder` calls `topdnp_steady` in the `esr` context. Each ensemble has six Gauss–Legendre nodes: 10–20 MHz with `el_offs=95e6` (A), and 25–35 MHz with `el_offs=92e6` (B). The source legend names the curves “TOP, 15 MHz” and “TOP, 30 MHz”; those labels accompany the respective finite B1 ranges. Each B1 average uses quadrature weights normalised by their sum. See [topdnp_steady.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/topdnp_steady.m).
+The experiment uses `pulse_dur=10e-9` seconds, `delay_dur=14e-9`, `addshift=-13e6`, and powder grid `rep_2ang_800pts_sph`. Detection uses `coil_state(spin_system,'Lz','1H')` and the experiment spins are `{'E','1H'}`. It scans `loop_counts=1:256`; contact time is calculated as `(pulse_dur+delay_dur)*loop_counts` and plotted in microseconds. For each loop count and B1 node, `powder` calls `topdnp_steady` in the `esr` context. Each ensemble has six Gauss–Legendre nodes: 10–20 MHz with `el_offs=95e6` (A), and 25–35 MHz with `el_offs=92e6` (B). The source legend names the curves “TOP, 15 MHz” and “TOP, 30 MHz”; those labels accompany the respective finite B1 ranges. Each B1 average uses quadrature weights normalised by their sum. See [topdnp_steady.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/topdnp_steady.m).
 
 Shot spacing is set separately as `102e-6 - pulses_dur` for A and `153e-6 - pulses_dur` for B. These are the literal source expressions; units are not annotated in those assignments.
 
@@ -25,3 +25,5 @@ The source uses Spinach system construction and propagation functions `create`, 
 ## Output and scope
 
 The saved figure `top_q_con_time_ensemble_b1.fig` plots the real proton longitudinal expectation value against total contact time for the two B1 ensembles. It represents the specified pair, TOP helper, relaxation model, and six-node quadratures; the source provides no numerical result array as a function return.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -18,3 +18,5 @@ The source uses 1H `L+` for both initial state and receiver, with no decoupling.
 ## Source limits
 
 Magnetic parameters are cited to [the original report](https://doi.org/10.1016/j.saa.2010.11.015); the example comments estimate seconds of computation. No relaxation model or measured/computed peak values are supplied by this source file.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

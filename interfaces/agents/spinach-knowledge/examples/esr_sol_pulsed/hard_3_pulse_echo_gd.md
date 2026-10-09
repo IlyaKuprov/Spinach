@@ -19,3 +19,5 @@ The script plots the imaginary echo response against time in microseconds and cr
 ## Implementation
 
 See the [example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/hard_3_pulse_echo_gd.m) and the [three-pulse hard-echo helper](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_hard_echo.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

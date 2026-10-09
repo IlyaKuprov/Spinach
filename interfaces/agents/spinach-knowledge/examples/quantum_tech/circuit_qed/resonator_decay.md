@@ -20,3 +20,5 @@ The source header attributes its model and parameters to the matching example in
 ## Scope
 
 This is a five-level thermal open-system model. Its late-time state and accuracy are subject to that truncation; the script does not establish performance for an untruncated resonator or report an experimental decay measurement.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -30,3 +30,5 @@ The local function `xix_field_profile_b1_r(nu,srt)` constructs the distance-spec
 ## Clarification
 
 Despite “ensemble” in the name, the six nutation frequencies are a discrete outer profile scan, each paired with a different `srt`; the B1 quadrature is six nodes scaled separately by each `nu`, not a single fixed B1 interval.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

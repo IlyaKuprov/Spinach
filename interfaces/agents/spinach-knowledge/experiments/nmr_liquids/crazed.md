@@ -26,3 +26,5 @@ The source applies a 90-degree y pulse to the selected spin, evolves the F1 traj
 - `fid`: two-dimensional free induction decay with F1 and F2 evolution as above.
 
 This is a description of the parameterised sequence implementation, not a measured spectrum or a claim that a simulation was run and validated.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

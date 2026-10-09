@@ -11,8 +11,10 @@ The model specifies scalar Zeeman shifts and scalar couplings. For the basis it 
 
 ## Acquisition and processing
 
-This is an acquisition/FID calculation rather than an explicitly programmed RF-pulse sequence. It selects `19F` observation, sets both initial state and receiver coil to `state(...,'L+','19F')`, leaves decoupling empty, and passes `offset=-86700`, `sweep=300`, `npoints=512`, and `zerofill=2048` to `liquid(spin_system,@acquire,parameters,'nmr')`. The source sets `axis_units='ppm'` and `invert_axis=1`; it does not annotate units for offset or sweep. The resulting FID receives exponential apodisation with parameter 6, is Fourier transformed, and is displayed with `plot_1d`.
+This is an acquisition/FID calculation rather than an explicitly programmed RF-pulse sequence. It selects `19F` observation, sets the initial state to `state(...,'L+','19F')`, leaves decoupling empty, and passes `offset=-86700`, `sweep=300`, `npoints=512`, and `zerofill=2048` to `liquid(spin_system,@acquire,parameters,'nmr')`. The source sets `axis_units='ppm'` and `invert_axis=1`; it does not annotate units for offset or sweep. The resulting FID receives exponential apodisation with parameter 6, is Fourier transformed, and is displayed with `plot_1d`. The receiver uses the same operator description with `coil_state` instead.
 
 ## Resource note and scope
 
 The source warns that the run needs 32 CPU cores, 128 GB of RAM, and a Titan V or later, and estimates minutes on that setup. This is the source's hardware/runtime note, not a general performance guarantee. The page preserves the 16-active-spin description and the model's stated numerical field input without adding an unsupported tesla unit. No DOI or external literature source is supplied in the script.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

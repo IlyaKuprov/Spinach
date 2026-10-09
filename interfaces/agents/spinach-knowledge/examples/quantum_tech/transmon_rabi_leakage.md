@@ -13,3 +13,5 @@ The source sets the field to zero and declares one T4 mode, zero rotating-frame 
 ## State, propagation, and plot
 
 The initial state is BL1. Spinach propagates a single trajectory with 1 ns steps for 400 ns. At each point the code evaluates the BL1, BL2, BL3, and BL4 populations using the corresponding state operators and plots all four against time in ns. The figure visualises leakage during ideal coherent Rabi dynamics; the source includes no relaxation, decoherence, rotational diffusion, correlation spectrum, cross-correlations, or secular approximation, and reports no comparison with an experiment.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -21,3 +21,5 @@ The model has nine `1H` spins and one `19F` spin at `sys.magnet=11.7464`, with a
 Run `fluorobutane()` with both MAT files available to MATLAB. It has no declared return value: the script displays the final `fminsearch` parameter vector, and the objective displays trial parameters. Its figure compares experiment (red points) and simulation (blue line) in two proton windows (1.5–1.8 and 4.51–4.70 ppm) and a fluorine window (−173.4 to −172.95 ppm).
 
 The source specifies no parameter bounds, uncertainty estimates, or fit-success criterion; the displayed vector is an optimiser result, not a reported measured fit outcome.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

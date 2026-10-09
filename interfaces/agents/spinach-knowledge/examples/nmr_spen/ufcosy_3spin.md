@@ -10,3 +10,5 @@ The sample model is 15 mm long with 500 spatial points and period-3 spatial diff
 The sequence inputs match the two-spin demonstration: 1H acquisition at zero offset, 0.5 microsecond dwell, 512 points and 128 loops, with acquisition gradient `Ga=0.50 T/m`. Encoding uses 1000 pulse points, `nWURST=40`, `Te=15 ms`, 10 kHz bandwidth, and `Ge=0.01 T/m`; coherence selection uses `Gp=0.47 T/m` for `Tp=1 ms`. The wrapper provides these encoding and selection parameters to `spencosy`, but does not itself specify a full pulse/gradient waveform or detailed coherence-pathway schedule.
 
 The simulated FID is Fourier-transformed along its second dimension, shifted, and shown as a magnitude contour plot. The basis is sphten-liouv with no approximation; PT is disabled and the greedy algorithm enabled. There is no measured-data comparison or accuracy bound in the source. Its machine-time comment is not reported as a validated runtime.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

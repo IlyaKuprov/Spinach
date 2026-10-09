@@ -17,3 +17,5 @@ The acquisition uses proton `L+` for both the initial state and receiver, runs `
 The output is a four-panel set of spectra for the four offset settings. The source specifies no numerical roof-effect metric, acceptance threshold, or automated assertion; the page therefore does not claim that a particular spectral shape or intensity ratio was measured. The source contains no cited external reference for this example.
 
 [Source example](../../../../../examples/fundamentals/roof_effect.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

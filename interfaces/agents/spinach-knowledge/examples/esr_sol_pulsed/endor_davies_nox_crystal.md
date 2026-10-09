@@ -23,3 +23,5 @@ The output is a four-panel figure: ESR plus three ENDOR traces. ENDOR curves plo
 ## Requirements and scope
 
 Requires MATLAB and Spinach's <code>create</code>, <code>basis</code>, <code>state</code>, <code>crystal</code>, <code>acquire</code>, <code>endor_davies</code>, <code>apodisation</code>, <code>kfigure</code>, <code>scale_figure</code>, and plotting helpers. The result is for the one orientation explicitly set to <code>[0 0 0]</code>, not a powder average. The .m file supplies no DOI or bibliography entry; the stable source link above is provided instead.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

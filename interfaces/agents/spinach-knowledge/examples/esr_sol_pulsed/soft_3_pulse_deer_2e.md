@@ -19,3 +19,5 @@ The three pulses have ranks `[2,2,2]`, durations `[20,50,40]` ns, phases `[π/2,
 Execution and diagnostic plotting are delegated to `deer_3p_soft_diag(spin_system,parameters)`. The script itself does not store a returned trace or define figure axes; the result is therefore the diagnostic output of that routine for the configured DEER sequence, not a numerical result embedded in this example.
 
 Source code: [`examples/esr_sol_pulsed/soft_3_pulse_deer_2e.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/soft_3_pulse_deer_2e.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

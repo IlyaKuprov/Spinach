@@ -15,3 +15,5 @@ A six-point Gauss–Legendre quadrature uses the B1 interval 10e6–20e6 Hz. At 
 ## Output and dependencies
 
 The real part of the averaged DNP values is plotted as the proton `Lz` expectation value against microwave offset in MHz and saved to `xix_w_field_profile_ensemble_b1.fig`. In addition to Spinach's system, basis, detection, and powder routines, the driver calls `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. Its output is a figure; the source does not save a separate numeric result file.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -15,3 +15,5 @@ The initial state and receiver are the electron `L+` operator; decoupling is emp
 Requires the Spinach system/basis, ESR acquisition, processing, and plotting functions (`create`, `basis`, `state`, `liquid`, `acquire`, `apodisation`, `kfigure`, `plot_1d`). Reference: [Figure 3a, DOI: 10.1209/epl/i2004-10459-y](https://doi.org/10.1209/epl/i2004-10459-y).
 
 [Source: `relaxation_fremysalt.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/relaxation_fremysalt.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

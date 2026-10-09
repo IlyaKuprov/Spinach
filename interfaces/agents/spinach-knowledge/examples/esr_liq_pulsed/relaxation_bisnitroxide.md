@@ -17,3 +17,5 @@ Initial density and receiver are both electron `L+`; decoupling is empty and off
 Requires Spinach `create`, `basis`, `state`, `liquid`, `acquire`, `apodisation`, `kfigure`, and `plot_1d`. The parameter source cited by the example is [DOI: 10.1039/C8CP06819D](https://doi.org/10.1039/C8CP06819D).
 
 [Source: `relaxation_bisnitroxide.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/relaxation_bisnitroxide.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

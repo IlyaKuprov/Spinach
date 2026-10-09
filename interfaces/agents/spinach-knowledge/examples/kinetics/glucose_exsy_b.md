@@ -25,3 +25,5 @@ Cosine and sine signals receive squared-cosine apodisation in both dimensions. T
 ## Output and limits
 
 The figures show simulated and experimental spectra side by side and a pointwise difference histogram with displayed range [-300, 300]. `glucose_expt_b.mat` must be available on the MATLAB path/current working directory. This is not the fitting example mentioned in the source comment and it prints no fit score; this page therefore reports source inputs and code outputs, not a fitted result or an unrun simulation outcome.
+
+Initial states use concentration-weighted `state` without the retired `chem` method keyword.

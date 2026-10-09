@@ -15,3 +15,5 @@ For every distance/B1 pair, `powder(spin_system,@xixdnp_steady,parameters,'esr')
 ## Output and dependencies
 
 The final real DNP profile is plotted as the proton `Lz` expectation value versus microwave offset in MHz and saved to `xix_w_field_profile_ensemble_b1_r.fig`. The driver uses Spinach system/basis/detection and powder routines and the helpers `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. It saves a figure, not a separate numeric data file.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

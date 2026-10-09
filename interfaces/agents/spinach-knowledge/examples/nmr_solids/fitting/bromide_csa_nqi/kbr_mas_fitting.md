@@ -21,3 +21,5 @@ For each trial parameter vector the script simulates a single-rotation spectrum 
 The code models a one-dimensional MAS spectrum; it does not define a CP, HMQC, or Hartmann–Hahn transfer block. The wrapper call supplies the acquisition callback and spectral settings, not an experimental pulse sequence beyond what is explicit in the source. The file contains no saved best-fit parameter set or measured output. The source file gives no DOI.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -19,3 +19,5 @@ The function calls <code>liquid(spin_system,@acquire,parameters,'esr')</code>, a
 ## Requirements and scope
 
 Run with Spinach, MATLAB, and the relative <code>../standard_systems/parafluorotoluene.log</code> input path resolving from the example directory. The source uses <code>gparse</code>, <code>g2spinach</code>, <code>create</code>, <code>basis</code>, <code>state</code>, <code>liquid</code>, <code>acquire</code>, <code>apodisation</code>, <code>kfigure</code>, and <code>plot_1d</code>, as well as MATLAB FFT routines. The example supplies no DOI or bibliography record; the source and DFT-input links above are stable repository paths.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

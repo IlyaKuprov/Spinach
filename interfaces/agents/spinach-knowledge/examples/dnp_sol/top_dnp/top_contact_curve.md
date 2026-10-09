@@ -23,3 +23,5 @@ The electron nutation frequency (`irr_powers`) is `17.8e6` Hz, pulse duration is
 ## Output and scope
 
 The returned contact-curve values are plotted against a time axis from zero to `nloops*(pulse_dur+delay_dur)` seconds, with `nloops+1` points. The ordinate is the proton `I_z` expectation value. The script plots the curve and does not write a separate numeric data file. Its result is for this fixed TOP sequence configuration and powder grid.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

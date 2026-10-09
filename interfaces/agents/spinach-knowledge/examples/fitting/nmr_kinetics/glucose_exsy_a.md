@@ -34,3 +34,5 @@ The field is 9.4; the 16 fluorines are partitioned into those four chemical subs
 ## Entry-point output
 
 `glucose_exsy_a()` displays the optimiser's final vector but declares no MATLAB output argument. On non-worker evaluations it plots simulated and experimental spectra in adjacent panels using `plot_2d`; the experimental display is labelled positive, and the simulated display both. The script has no figure-save call. The capped search and displayed vector are not evidence of a converged fit.
+
+Initial states use concentration-weighted `state` without the retired `chem` method keyword.

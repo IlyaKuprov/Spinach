@@ -20,3 +20,5 @@ The detected channel is 1H. The acquisition settings are 0.100 s acquisition tim
 ## Signal processing and scope
 
 The returned signal is Fourier transformed with shifts along dimensions 1 and 2. The magnitude is displayed against a chemical-shift axis in ppm and a field-of-view axis in mm. The source describes the calculation as minutes on an NVIDIA Tesla A100 and much longer on CPU; this is a source estimate, not a reproduced timing. No external DOI, imported measurement, or experimental validation is specified by this example.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -16,8 +16,10 @@ The basis is `sphten-liouv` with no approximation; propagator chop tolerance is 
 
 ## Experiment and scan
 
-The proton detector is `state(spin_system,'Lz','1H')`. XiX settings are `parameters.spins={'E','1H'}`, fixed electron nutation frequency 18 MHz, grid `rep_2ang_800pts_sph`, pulse duration 48 ns, and second-pulse phase π. The source sets `addshift=-13e6`, `el_offs=61e6`, and scans `nloops=1:64`, with shot spacing set to 153 μs minus the total pulse duration. Total contact time is `2*nloops*48e-9` s (96 ns to 6.144 μs).
+The proton detector is `coil_state(spin_system,'Lz','1H')`. XiX settings are `parameters.spins={'E','1H'}`, fixed electron nutation frequency 18 MHz, grid `rep_2ang_800pts_sph`, pulse duration 48 ns, and second-pulse phase π. The source sets `addshift=-13e6`, `el_offs=61e6`, and scans `nloops=1:64`, with shot spacing set to 153 μs minus the total pulse duration. Total contact time is `2*nloops*48e-9` s (96 ns to 6.144 μs).
 
 ## Calculation and output
 
 For each distance node, each contact-time point is evaluated by `powder(spin_system,@xixdnp_steady,localpar,'esr')`. The code then performs a distance average with quadrature weights multiplied by the radial (r^2) Jacobian and normalises by the weighted (r^2) sum. It plots the real proton (L_z) expectation value against total contact time in μs and saves `xix_q_con_time_ensemble_r.fig`; the function has no explicit MATLAB output. The source comment estimates calculation time as minutes, not a measured runtime here.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

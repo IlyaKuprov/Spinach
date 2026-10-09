@@ -17,3 +17,5 @@ The model uses `sys.magnet=11.7464`, isotope labels including `G` ghost spins, t
 ## Entry point and objective
 
 Run `syn_difluoroheptane()` with the three MAT files available. The function displays the current and final parameter vectors and plots experiment against simulation in three reversed-ppm panels. Its objective is the sum of squared residual norms, weighting 19F by 10 and each 1H trace by 1; it has no declared return value. The source reports no fit result, uncertainty, or success threshold, and does not state units for the Gaussian apodisation arguments.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

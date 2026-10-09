@@ -14,3 +14,5 @@ The six-spin model contains only `1H` nuclei at `7.05` T. Under Spinach's nuclea
 ## Acquisition and observable
 
 The proton acquisition uses a `pi/4` y pulse, 500 Hz transmitter offset, 1000 Hz sweep, and 1024 points. The FID is zero-filled to 8192 points, Gaussian-apodised with parameter 10, Fourier transformed, and plotted as a real spectrum with the ppm axis inverted. No catalyst, chemical-exchange kinetics, explicit parahydrogen singlet, or relaxation superoperator appears in the script. This is a calculated product spectrum, not a measured trace or a prediction of conversion or polarisation yield.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

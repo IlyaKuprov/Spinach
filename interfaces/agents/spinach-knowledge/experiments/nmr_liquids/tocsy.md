@@ -22,3 +22,5 @@ This is not an explicit MLEV, DIPSI, WALTZ, or clean-TOCSY pulse-train simulatio
 - [TOCSY paper](https://doi.org/10.1016/0022-2364(85)90018-6)
 - [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/tocsy.m)
 - [Spinach Wiki: tocsy.m](https://spindynamics.org/wiki/index.php?title=tocsy.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

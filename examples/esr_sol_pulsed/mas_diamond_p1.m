@@ -55,7 +55,7 @@ parameters.max_rank=2700;
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E');
 parameters.pulse_dur=400e-9;
 parameters.pulse_frq=416e3;
 parameters.tau=300e-9;

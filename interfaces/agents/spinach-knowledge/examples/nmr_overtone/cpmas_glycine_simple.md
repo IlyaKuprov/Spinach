@@ -21,3 +21,5 @@ The basis is spherical-tensor Liouville space with no approximation. The wrapper
 The spectral sweep is 44-52 kHz with 256 points and 256-point zero filling. The axis is identified as kHz. The initial state is an oriented `1H` state, while the receiver and overtone channel operators are built for `14N`. The RF frequency input is `48e3` (48 kHz); the contact-duration input is `1e-4` s. The two-channel RF power input is `2*pi*[55.0e3,35.1e3]/sin(theta)`, where `theta=atan(sqrt(2))` is the magic angle.
 
 The program runs one `singlerot` calculation, plots the real part of the simulated spectrum, and does not report any measured signal or fitted parameter. “Hours” in the source header is a runtime estimate only.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

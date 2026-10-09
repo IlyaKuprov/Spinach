@@ -21,3 +21,5 @@ The example calls `imaging` with `fse`, then plots the recorded image beside the
 ## Source
 
 [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/fast_echo_2d.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

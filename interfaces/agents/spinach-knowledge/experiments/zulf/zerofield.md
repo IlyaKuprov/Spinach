@@ -29,3 +29,5 @@ The routine checks that `H`, `R`, and `K` are numeric matrices with matching dim
 
 - MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/zulf/zerofield.m
 - [Spinach Wiki: zerofield.m](https://spindynamics.org/wiki/index.php?title=zerofield.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

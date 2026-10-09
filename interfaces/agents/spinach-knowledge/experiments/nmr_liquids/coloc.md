@@ -26,3 +26,5 @@ The initial state is Lz on the first (F1) spin; the coil state is L+ on the seco
 For natural-abundance simulations, the source recommends isotope dilution via dilute.m.
 
 No MATLAB execution or experimental signal is claimed here.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

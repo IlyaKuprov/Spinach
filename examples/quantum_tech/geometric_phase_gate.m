@@ -119,9 +119,9 @@ L=H+1i*R+1i*K;
 
 % Global rotation generators, observables, and the unit state for normalisation
 Lx=operator(spin_system,'Lx','E'); Ly=operator(spin_system,'Ly','E');
-coil_x=[state(spin_system,{'Lx'},{1}) state(spin_system,{'Lx'},{2}) state(spin_system,{'Lx'},{3})];
-coil_n=state(spin_system,{'N'},{4});
-coil_p=state(spin_system,{'Lz','Lz'},{1,3}); unit=state(spin_system,{'E'},{1});
+coil_x=[coil_state(spin_system,{'Lx'},{1}) coil_state(spin_system,{'Lx'},{2}) coil_state(spin_system,{'Lx'},{3})];
+coil_n=coil_state(spin_system,{'N'},{4});
+coil_p=coil_state(spin_system,{'Lz','Lz'},{1,3}); unit=coil_state(spin_system,{'E'},{1});
 
 % First pi/2 pulse puts every ion along +x
 rho=step(spin_system,Ly,parameters.rho0,pi/2);

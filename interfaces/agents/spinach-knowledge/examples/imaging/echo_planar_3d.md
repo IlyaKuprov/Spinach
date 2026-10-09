@@ -19,3 +19,5 @@ The sequence call is `imaging(...,@epi_3d,...)`. The code halves `pe_grad_amp` f
 ## Source
 
 [MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/echo_planar_3d.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -52,7 +52,7 @@ spin_system=basis(spin_system,bas);
 
 % Initial and detection states
 parameters.rho0=state(spin_system,'Lz','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H');
 
 % Sequence parameters
 parameters.angle=pi/2;

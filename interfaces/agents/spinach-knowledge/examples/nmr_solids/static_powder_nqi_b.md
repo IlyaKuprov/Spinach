@@ -12,3 +12,5 @@ The three 79Br spins share the isotropic shift 60.0933 ppm at field parameter 9.
 ## Acquisition and processing
 
 The acquisition uses 79Br, sweep 1e5 Hz, receiver offset 6034.96 Hz, 1024 points, and 4096-point zero-fill; the axis is in Hz and inverted. The initial state combines site-specific `L+` states with weights 40, 32, and 28; the coil state is the total 79Br `L+`. After exponential apodisation with parameter 6, the real Fourier spectrum is plotted with vertical limits -10 to 1000.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

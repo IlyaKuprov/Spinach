@@ -14,3 +14,5 @@ The field is 14.1 T. The basis uses `sphten-liouv`, `IK-2`, proximity level 1, a
 Trajectory-mode `evolution` first propagates 50 points at 4e-5 s per point. Eight loop iterations then apply a `pi` rotation about proton `Lx`, each followed by 100 more trajectory points at the same time step. Thus the source specifies 850 sampled evolution points and nominally 0.034 s of free evolution, apart from the instantaneous pulse steps. `trajan(...,'correlation_order')` displays the resulting correlation-order trajectory.
 
 The source defines no numerical pass/fail threshold, convergence test, or reference trace; any visual axis scaling is not an acceptance criterion. The page therefore describes the sequence and diagnostic output without claiming that the trajectory was run or that a particular correlation order is sufficient.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

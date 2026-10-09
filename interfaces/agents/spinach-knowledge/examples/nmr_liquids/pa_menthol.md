@@ -18,3 +18,5 @@ The detected spin is 1H; both the initial state and receiver are `L+` on 1H, and
 ## Source limits
 
 The source attributes the example to Damien Jeannerat and estimates minutes of calculation, but provides no DOI, explicit shim units, numerical spectrum, measured shim values, or relaxation model in this MATLAB file. The loaded MAT file supplies the spin-system numbers.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

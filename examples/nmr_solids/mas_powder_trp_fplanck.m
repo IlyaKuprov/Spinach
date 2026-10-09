@@ -60,7 +60,7 @@ parameters.npoints=2048;
 parameters.zerofill=8192;
 parameters.spins={'13C'};
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C');
 parameters.verbose=1;
 
 % Simulation

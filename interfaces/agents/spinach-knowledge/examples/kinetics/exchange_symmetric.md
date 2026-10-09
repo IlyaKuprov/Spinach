@@ -15,3 +15,5 @@ The full `sphten-liouv` basis is used (`bas.approximation=none`). The initial st
 ## Scope
 
 The source header estimates a calculation time of seconds; this is not a measured runtime. The source defines a simulation and plotting procedure but supplies no numerical spectrum or fitted exchange result, so no line positions, intensities, or fit outcomes are asserted.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

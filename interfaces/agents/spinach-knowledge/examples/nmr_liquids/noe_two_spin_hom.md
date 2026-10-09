@@ -17,3 +17,5 @@ The code constructs the relaxation superoperator and thermal equilibrium state, 
 ## Source
 
 [examples/nmr_liquids/noe_two_spin_hom.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/noe_two_spin_hom.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

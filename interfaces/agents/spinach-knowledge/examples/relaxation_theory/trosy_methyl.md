@@ -13,3 +13,5 @@ The shielding tensors are source-provided DFT values converted to chemical-shift
 Frequency-domain `gridfree` detection with `slowpass` produces separate carbon and proton spectra. Each channel uses its own `L+` initial state and matching receiver, with no decoupling. The carbon spectrum uses a sweep from -300 to 300 Hz and 1024 points; the proton spectrum uses 200 to 1000 Hz and 2048 points. The plotted outputs are the real parts of the calculated spectra, not measured spectra.
 
 Source: [examples/relaxation_theory/trosy_methyl.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/trosy_methyl.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

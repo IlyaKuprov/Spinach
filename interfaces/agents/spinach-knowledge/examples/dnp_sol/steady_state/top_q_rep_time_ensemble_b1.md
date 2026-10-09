@@ -16,8 +16,10 @@ B1 nodes/weights are `[b1,wb1]=gaussleg(10e6,20e6,5)` (Hz per source comment); d
 
 ## Relaxation and calculation
 
-The source sets `inter.relaxation={'t1_t2'}`, callback `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`, `inter.r1_rates={1e3 r1n_rate}`, `inter.r2_rates={200e3 50e3}`, diagonal retention, and `dibari` equilibrium. Rate units are not annotated. Proton detection is `state(spin_system,'Lz','1H')`. Each point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`; B1 results are averaged with normalised `wb1` weights.
+The source sets `inter.relaxation={'t1_t2'}`, callback `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`, `inter.r1_rates={1e3 r1n_rate}`, `inter.r2_rates={200e3 50e3}`, diagonal retention, and `dibari` equilibrium. Rate units are not annotated. Proton detection is `coil_state(spin_system,'Lz','1H')`. Each point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`; B1 results are averaged with normalised `wb1` weights.
 
 ## Output and limits
 
 Plots the real part of proton `I_z` expectation against repetition time in ms and saves `top_q_rep_time_ensemble_b1.fig` in the MATLAB current folder; no separate numerical data file is saved. TOP steady-state dynamics are delegated to `topdnp_steady`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

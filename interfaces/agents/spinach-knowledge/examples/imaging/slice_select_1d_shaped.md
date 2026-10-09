@@ -23,3 +23,5 @@ The example calls imaging with slice_select_1d in the imaging context, applies s
 [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/slice_select_1d_shaped.m) · [Imaging callback](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/slice_select_1d.m)
 
 The source credits Ahmed Allami and Ilya Kuprov.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

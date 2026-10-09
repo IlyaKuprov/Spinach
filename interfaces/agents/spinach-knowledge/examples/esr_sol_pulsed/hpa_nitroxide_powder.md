@@ -17,3 +17,5 @@ Both the initial state and coil operator are `L+` on the electron. The code pass
 ## Observable and output
 
 The powder-averaged FID is apodised with the `crisp` window, Fourier transformed, and the real spectrum is plotted. The example does not save a data or figure file and estimates a run time of seconds. This is a simulated ideal-pulse acquisition with the specified damping model, not a measured spectrum.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

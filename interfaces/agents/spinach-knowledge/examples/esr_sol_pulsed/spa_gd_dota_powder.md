@@ -17,3 +17,5 @@ For each sample, `powder(spin_system,@sp_acquire,parameters,'labframe')` acquire
 ## Source
 
 [examples/esr_sol_pulsed/spa_gd_dota_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/spa_gd_dota_powder.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -15,3 +15,5 @@ The soft pulse is rank 2, phase `-pi/2`, frequency `-300e6`, duration `100e-9` s
 ## Source
 
 [examples/esr_sol_pulsed/spa_nitroxide_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/spa_nitroxide_powder.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

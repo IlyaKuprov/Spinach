@@ -22,3 +22,5 @@ The initial state and detection operator are `Lz` and `L+` on F2. After a +90° 
 
 - [HMBC sequence reference](https://doi.org/10.1021/ja00268a061)
 - [HMBC sequence reference](https://doi.org/10.1016/0022-2364(88)90172-2)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

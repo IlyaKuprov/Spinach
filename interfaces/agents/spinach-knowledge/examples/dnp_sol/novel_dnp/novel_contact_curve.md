@@ -15,3 +15,5 @@ Detection is proton `Lz`. The experiment selects `spins={'E','1H'}`, sets `offse
 ## Calculation and output
 
 The calculation is `powder(spin_system,@noveldnp,parameters,'esr')`. The local `contact_curve` is plotted as `real(contact_curve)` versus a 2,401-point time axis from zero to `timestep*nsteps` (2.4 microseconds); the axis is labelled contact time in seconds. The function declares no output argument, so the displayed curve is the user-facing result. Running it requires Spinach and the `noveldnp` callback. The proton shifts are guesses in the source, and the result is tied to the specified finite spherical grid and pulse/offset setup.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

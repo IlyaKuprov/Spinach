@@ -11,3 +11,5 @@ The basis is spherical-tensor Liouville space with no approximation, projection 
 ## Signal and display
 
 Both the initial state and receiver coil are the 13C `L+` state. The code requests 256 points, a sweep setting of 5e4, zero filling to 1024, offset 17000, and a ppm axis with inversion enabled. It applies exponential apodisation parameter 6 to the FID, Fourier transforms with `fftshift`, then plots the real spectrum using `plot_1d`. The result is a computed spectrum from the imported model and acquisition settings, not an experimentally measured spectrum.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

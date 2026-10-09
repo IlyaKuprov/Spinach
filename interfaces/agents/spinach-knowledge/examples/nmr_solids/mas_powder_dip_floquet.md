@@ -11,3 +11,5 @@ The calculation uses the spherical-tensor Liouville-space basis with no approxim
 ## Signal and display
 
 The initial state and receiver coil are both the proton `L+` state. `@acquire` produces the FID using 512 points, a sweep setting of 2e4, offset 0, and zero filling to 4096. The display axis is configured in ppm with inversion enabled. The code applies exponential apodisation parameter 6, computes `fftshift(fft(fid,parameters.zerofill))`, and plots its real part with `plot_1d`. This plotted spectrum is a computed result from the configured model, not an experimentally measured spectrum.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

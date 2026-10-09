@@ -22,3 +22,5 @@ The returned simulated signal is plotted as its real part against cumulative tim
 
 https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_contact_mas_nhh.m
 https://github.com/IlyaKuprov/Spinach/blob/main/experiments/cp_contact_hard.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

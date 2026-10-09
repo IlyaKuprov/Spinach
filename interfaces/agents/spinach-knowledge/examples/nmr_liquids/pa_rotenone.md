@@ -18,3 +18,5 @@ The observed spins, initial state, and receiver are all 1H, using `L+` for state
 ## Source limits
 
 The magnetic parameters are cited to [the reported rotenone study](https://doi.org/10.1002/jhet.5570250160), and the source estimates seconds of computation. This is a simulation recipe, not a supplied measured spectrum or a report of experimental relaxation-rate measurements.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

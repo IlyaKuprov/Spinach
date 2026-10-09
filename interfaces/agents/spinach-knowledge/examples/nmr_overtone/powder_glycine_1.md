@@ -17,3 +17,5 @@ The source uses grid `'rep_2ang_6400pts_sph'`, sweep `[0e3 15e3]`, 256 points an
 ## Output and limits
 
 The script plots the real part of the spectrum with `plot_1d`. It does not save the spectrum, provide numerical peak positions or intensities, specify a contact time, or define a fitting workflow. Its pulse warning is part of the source and should be retained when interpreting this as an example configuration.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -20,3 +20,5 @@ The source initialises longitudinal magnetisation on the configured nucleus and 
 - `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function. The source requires the `sphten-liouv` formalism and same-sized matrices.
 
 [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/inadequate_2d.m) · [Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inadequate_2d.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

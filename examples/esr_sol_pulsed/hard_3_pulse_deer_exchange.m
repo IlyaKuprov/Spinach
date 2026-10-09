@@ -60,7 +60,7 @@ for n=1:numel(weights)
     
     % Sequence parameters
     parameters.rho0=state(spin_system,'Lz','E');
-    parameters.coil_prob=state(spin_system,{'L-'},{1});
+    parameters.coil_prob=coil_state(spin_system,{'L-'},{1});
     parameters.stepsize=1e-8/4;
     parameters.nsteps=4*50;
     parameters.spins={'E'};

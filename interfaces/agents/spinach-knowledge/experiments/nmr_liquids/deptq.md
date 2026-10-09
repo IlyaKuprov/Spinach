@@ -24,3 +24,5 @@ The Liouvillian is `L=H+1i*R+1i*K`; the J-evolution interval is `abs(1/(2*parame
 - The source recommends using `dilute.m` to generate carbon isotopomers.
 - [DEPTQ paper, DOI 10.1006/jmre.1998.1595](https://doi.org/10.1006/jmre.1998.1595)
 - [Spinach Wiki: `deptq.m`](https://spindynamics.org/wiki/index.php?title=deptq.m)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

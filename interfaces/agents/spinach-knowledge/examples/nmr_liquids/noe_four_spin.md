@@ -14,3 +14,5 @@ The four chemical-shift entries are `[1.0, 2.0, 3.0, 4.0]`; nearest-neighbour sc
 The code builds the relaxation superoperator and thermal-equilibrium state, then constructs an inverted-spin initial state using `Lz` for spin 1. It evolves for 5.0 s under the relaxation superoperator and subtracts the unperturbed equilibrium state to isolate the NOE deviation. The subsequent pulse-acquire experiment detects proton `L+`, uses a `Ly` pulse of `pi/2`, and applies no decoupling. Acquisition parameters are offset 1400, sweep 4500, 8192 points, zero-filling to 65536, ppm axis units, and axis inversion; the source does not state offset or sweep units.
 
 The liquid simulation uses `@hp_acquire`; exponential apodisation with parameter 6 precedes a shifted FFT, and the real spectrum is plotted over 0.8–4.2 ppm. The source provides no experimental NOE rates, calibrated intensities, or DOI.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

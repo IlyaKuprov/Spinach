@@ -12,3 +12,5 @@ The script calls Spinach imaging with the PSYCOSY sequence. It sets a 1H, 720 Hz
 Each FID dimension receives square-sine apodisation; a two-dimensional FFT is shifted and plotted as a positive magnitude spectrum. The model is configured with the sphten-liouv formalism, IK-2 approximation, proximity level 1, scalar-coupling connectivity, greedy algorithm, proximity cutoff 4.0, and merge dimension 500. These settings describe this example only; the file contains no comparison with measured data or stated accuracy bound. The source comment's machine-time estimate is not repeated as a validated runtime.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

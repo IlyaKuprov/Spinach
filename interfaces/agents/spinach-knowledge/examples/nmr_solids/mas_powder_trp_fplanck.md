@@ -21,3 +21,5 @@ The basis is `sphten-liouv` with `IK-0`, longitudinal `15N`, projection +1, and 
 The summed FID is exponentially apodised with parameter 6, Fourier transformed, and plotted as its real spectrum. The simulation settings are not measured spectral output.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

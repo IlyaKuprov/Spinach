@@ -21,3 +21,5 @@ The initial F1 pulse is the source's sum of a +90° F1 x-pulse and an i-weighted
 ## Reference
 
 - [HETCOR sequence reference](https://doi.org/10.1016/0022-2364(81)90272-9)
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

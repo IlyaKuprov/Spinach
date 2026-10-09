@@ -13,3 +13,5 @@ The source sets sys.magnet to 9.394, places 1H and 15N at [0, 0, 0] and [0, 0, 1
 ## Powder signal
 
 The static powder calculation uses rep_2ang_6400pts_sph and 100 time steps of 1e-5 seconds (1 ms in total) with cp_contact_hard. The wrapper supplies those irradiation and time-grid parameters but does not state a Hartmann–Hahn matching criterion or define the helper's contact dynamics; neither should be inferred from the power values alone. The example plots the real 15N FID against cumulative time and labels it as the 15N S_X expectation value. No measured spectrum is reported.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

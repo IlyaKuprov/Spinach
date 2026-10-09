@@ -25,3 +25,5 @@ At each field, `liquid(...,'esr')` supplies one response per microwave offset. T
 ## Reference and caveat
 
 The source cites https://doi.org/10.1016/j.jmr.2021.106940. no numerical DNP values are reported here.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

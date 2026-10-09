@@ -13,3 +13,5 @@ This pulse-acquire NMR example illustrates the expected splitting of proton line
 The acquisition observes `1H`, starts from the `L+` state for `1H`, and uses the corresponding `L+` state as the coil. Decoupling is empty and the offset is 0. The sweep width is `3500` Hz, with `1024` acquired points and zero filling to `4096`; the displayed axis is in ppm and inverted. The code simulates an NMR FID with `liquid(spin_system,@acquire,parameters,'nmr')`, applies exponential apodisation with parameter 6, computes `fftshift(fft(fid,4096))`, and plots the real spectrum using `plot_1d`.
 
 The source comment states the expected qualitative outcome, namely splitting from the hypothetical uranium coupling; the script does not encode a numeric peak-position check or report a measured spectrum. Exact plotted output depends on the simulation and processing settings above. Source: [examples/fundamentals/high_spin_system_1.m](../../../../../examples/fundamentals/high_spin_system_1.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -22,3 +22,5 @@ For each of the 30 nutation-frequency values, the code runs 71 powder simulation
 ## Result and scope
 
 Calling the no-argument function produces the evolving contour figure; it does not return the surface as a MATLAB output. The axes and values describe this configured three-spin model, powder grid, 30-by-71 scan, and fixed reference shift. The calculation depends on Spinach, `noveldnp`, powder averaging, and MATLAB `parfor` support.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

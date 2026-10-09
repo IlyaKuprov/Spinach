@@ -16,3 +16,5 @@ The simulation sweeps five rotational-diffusion correlation times, `1e-7` to `1e
 This is a simulation, not a spectrum read from an experimental acquisition: the input is the CASTEP file and the programmed spin/acquisition model. The output is the calculated spectrum series. The source estimates minutes of calculation, or seconds with a GPU; GPU enablement is commented out in this file. It does not provide numerical peak positions or a measured-versus-simulated comparison.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

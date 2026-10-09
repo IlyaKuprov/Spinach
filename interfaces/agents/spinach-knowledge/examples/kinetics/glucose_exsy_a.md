@@ -25,3 +25,5 @@ Both cosine and sine signal components receive squared-cosine apodisation in bot
 ## Output and limits
 
 One figure places the simulated and experimental 2D spectra side by side. A second figure plots the pointwise difference histogram, with the displayed horizontal range fixed to [-300, 300]. This script needs `glucose_expt_a.mat` available on the MATLAB path/current working directory. It contains no fit procedure or printed fit score; no simulation outcome is quoted here.
+
+Initial states use concentration-weighted `state` without the retired `chem` method keyword.

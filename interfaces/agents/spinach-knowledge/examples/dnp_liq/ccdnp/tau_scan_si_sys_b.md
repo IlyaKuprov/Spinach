@@ -23,3 +23,5 @@ The microwave offset vector is `2*pi*linspace(-15,15,512)*1e6`, shown in MHz. Th
 **Source-specific clarification:** unlike parameter set A, this set has a strongly separated second-electron Zeeman tensor (`[2.0068 2.0038 2.0038]`), a different coordinate geometry and scalar-coupling input, and a symmetric `-15 to +15 MHz` scan.
 
 **Caveats:** the source provides a runtime estimate and resulting DNP surface, which are estimates rather than guarantees. Values whose units or angular conventions are not documented above are kept as source values rather than assigned inferred units.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

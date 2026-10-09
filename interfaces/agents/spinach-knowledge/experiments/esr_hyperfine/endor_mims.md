@@ -20,3 +20,5 @@ This is a simulated hyperfine-sensitive electron–nuclear sequence, not a measu
 The implementation uses pi/2 rotations and propagates npoints-1 further indirect-dimension points. The source gives no worked numeric sweep-width or tau example. Relaxation and kinetics enter through L = H + 1i*R + 1i*K; the output is the electron-coil-detected FID, not a spectrum already Fourier transformed.
 
 Source: https://spindynamics.org/wiki/index.php?title=endor_mims.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

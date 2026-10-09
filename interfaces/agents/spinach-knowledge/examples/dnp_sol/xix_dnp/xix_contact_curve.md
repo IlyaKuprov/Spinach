@@ -23,3 +23,5 @@ Dependencies are Spinach system, basis, and state construction; **powder** and t
 ## Reference
 
 [XiX DNP paper, DOI: 10.1021/jacs.1c09900](https://doi.org/10.1021/jacs.1c09900).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

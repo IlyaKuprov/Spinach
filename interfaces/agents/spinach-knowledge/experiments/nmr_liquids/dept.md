@@ -28,3 +28,5 @@ The source's explanatory note states that DEPT135 gives CH and CH3 signals oppos
 - `fid`: one-dimensional free induction decay detected on spin 1.
 
 The phase and multiplicity statements above are sequence notes in the source, not reported measurements or run-verified results for a particular system.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

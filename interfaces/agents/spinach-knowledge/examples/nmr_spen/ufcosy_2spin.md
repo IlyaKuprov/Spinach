@@ -10,3 +10,5 @@ The spatial model is a 15 mm sample on 500 points, with the period-3 derivative 
 The acquisition is 1H-selective, with zero offset, 0.5 microsecond dwell, 512 points per loop and 128 loops; the acquisition gradient `Ga` is 0.50 T/m. Encoding inputs are 1000 pulse points, `nWURST=40`, `Te=15 ms`, bandwidth 10 kHz, and encoding gradient `Ge=0.01 T/m`. Coherence selection uses `Gp=0.47 T/m` for `Tp=1 ms`. These are the values supplied to `spencosy`; the example does not define a complete time-resolved waveform schedule in this wrapper, so the internal chirp and gradient timing is not elaborated beyond those inputs.
 
 After imaging, the code Fourier-transforms the FID along dimension 2, shifts the spectrum, and plots its magnitude as contours. The basis uses the sphten-liouv formalism without an approximation; the example disables the PT option and enables the greedy algorithm. No measured spectrum, fit, or accuracy limit is supplied, and the source's A100/CPU timing comment is not a validated runtime result.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

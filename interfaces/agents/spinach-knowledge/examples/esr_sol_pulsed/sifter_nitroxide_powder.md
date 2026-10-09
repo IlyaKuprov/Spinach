@@ -21,3 +21,5 @@ The calculation is `imag(powder(spin_system,@sifter,parameters,'esr'))`, with 20
 The file specifies the spin-system entries and sequence inputs for this illustrative calculation. It provides no experimental comparison or numerical reference signal, and does not assign physical units to the field, coordinate, or coupling entries; the plotted time axis is explicitly displayed in ns.
 
 Source code: [`examples/esr_sol_pulsed/sifter_nitroxide_powder.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/sifter_nitroxide_powder.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

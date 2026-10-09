@@ -91,7 +91,7 @@ pulse=fmaxnewton(spin_system,@grape_xy,pulse);
 
 % Parameters
 parameters.rho0=rho_init;
-parameters.coil=state(spin_system,'L+','all');
+parameters.coil=coil_state(spin_system,'L+','all');
 parameters.pulse_op=operator(spin_system,'Ly','all');
 parameters.pulse_angle=pi/4;
 parameters.sweep=1000;

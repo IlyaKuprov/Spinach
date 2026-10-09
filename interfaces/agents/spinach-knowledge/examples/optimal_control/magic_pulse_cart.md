@@ -17,3 +17,5 @@ The three initial and target operators are normalised before optimisation. The b
 After optimisation, the waveform is simulated on an initial Lz state with the piecewise-constant exponential propagator. The resulting 13C signal is acquired with an L+ coil, a 70 kHz sweep, 2,048 points, and 16,384-point zero filling; a Gaussian apodisation parameter of 10 is applied before plotting the real spectrum on a ppm axis. A conventional hard-pulse spectrum is plotted for comparison; its configured power is `2*pi*60e3`, duration 4.2 microseconds, phase pi/2, and pulse rank 3.
 
 These are design and evaluation settings in the example source, not a reported optimisation outcome or a kernel-test result. The source comments estimate a calculation time of minutes. Source contacts: ilya.kuprov@weizmann.ac.il and david.goodwin@inano.au.dk.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

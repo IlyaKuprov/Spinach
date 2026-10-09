@@ -13,3 +13,5 @@ The code sets the field parameter to 9.394, gives coordinates for all nine spins
 ## Cross-polarisation observable
 
 Both irradiation-power rows contain 5e4 over 100 points; the source gives no unit for this value. The RF operators are Ly on 1H and Lx on 15N, with excitation operators Lx on 1H and Ly on 15N. Detection is the 15N Lx state. The powder grid is rep_2ang_100pts_sph, and 100 steps of 1e-5 seconds span 1 ms. The wrapper calls cp_contact_hard and plots the real 15N response versus cumulative time. It does not specify a Hartmann–Hahn matching condition or expose the helper's internal contact dynamics. No measured spectrum is reported.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

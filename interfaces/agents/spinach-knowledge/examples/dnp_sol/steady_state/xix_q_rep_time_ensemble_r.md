@@ -30,3 +30,5 @@ For each distance node, the code constructs the spin system and runs the 30-poin
 ## Clarification
 
 Unlike the B1-ensemble repetition-time variants, this file has no B1 quadrature: it uses one fixed 18 MHz electron nutation frequency and only quadratures the distance.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

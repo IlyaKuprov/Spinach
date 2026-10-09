@@ -24,3 +24,5 @@ The scan uses 128 correlation times from `50e-12` to `500e-12`, plotted in ps. F
 ## Output and limits
 
 The local answer is a complex 512-by-128 array (frequency by correlation time). At each correlation time it is divided by the isotropic-equilibrium expectation `localpar.coil'*rho_eq`, where `rho_eq=equilibrium(spin_system)`. The figure displays `real(answer)` as an image, with correlation time (ps) on x, microwave offset (MHz) on y, and a colorbar labelled steady-state `1H` DNP. The source does not save the map or return the array. It is one fixed field/system and a discrete grid; only the real normalised response is shown. Numerical map values have not been reproduced here.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

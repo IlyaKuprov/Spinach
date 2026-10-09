@@ -20,3 +20,5 @@ Simulates a time-domain rapid field-scan ESR experiment (Eaton-style). It constr
 The routine starts from isotropic thermal equilibrium. It forms the electron microwave operator from `L+`, builds the laboratory-frame Zeeman and coupling Hamiltonians and relaxation superoperator, symmetrises the drift Hamiltonian, and rotates it to the electron microwave frame using the carrier. The microwave term is `H_mw=-mw_pwr*(Ep-Ep')/(2i)`; the generator adds this drive and `1i*R` to the rotating-frame drift.
 
 The sweep offsets are `linspace(sweep(1),sweep(2),nsteps)`; adding `spin_system.inter.magnet` gives `b_axis` in Tesla. The Zeeman Hamiltonian is normalised by the centre field, then each point samples the current `L+` expectation and advances the state for one timestep under the offset-field generator using `step`. The outputs are a Tesla field-axis column and the corresponding complex `L+` amplitudes in `spectrum`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

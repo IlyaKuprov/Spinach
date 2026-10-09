@@ -17,3 +17,5 @@ The source sets the rotor axis to `[1 1 1]`, MAS rate to `2000 Hz` (2 kHz), powd
 The code calls `singlerot`, applies exponential apodisation with parameter `6`, computes `fftshift(fft(fid,parameters.zerofill))`, and plots `real(spectrum)` with `plot_1d`. The output is a simulation spectrum; this source does not supply experimentally measured output or report a numerical comparison.
 
 Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

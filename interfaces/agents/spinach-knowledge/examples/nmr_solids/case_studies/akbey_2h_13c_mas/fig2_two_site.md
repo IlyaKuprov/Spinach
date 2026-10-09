@@ -9,3 +9,5 @@ This example simulates two-site position exchange of a deuterium nucleus. The co
 This is a simulated one-dimensional rotor-synchronised ²H acquisition, not a measured spectrum supplied as input. The initial and detected operators are both ²H L+ coherence; acquisition is delegated to the single-rotor routine. The rotor parameter is 8500, the rotor axis is [1 1 1], and the powder grid is rep_2ang_800pts_sph with maximum rank 25. The spectral setup uses offset 0, a 0.4e6 sweep input, 1024 acquired and zero-filled points, and an axis labelled in kHz; the axis is inverted. No explicit RF pulse is set by this driver, and units for the sweep and rotor rate are not annotated.
 
 No apodisation is applied; the plotted signal is the real part of the Fourier-transformed simulated FID. The source cites Figure 2 of Umit Akbey et al., Journal of Magnetic Resonance (2021), DOI: https://doi.org/10.1016/j.jmr.2021.106974.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

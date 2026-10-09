@@ -18,3 +18,5 @@ The initial density operator and receiver are each the 1H raising state, with no
 ## Output and limits
 
 Only a plotted simulated spectrum is produced; the wrapper does not save data or compare the result against a measured spectrum. The listed spin parameters are model inputs, not reported measurements.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

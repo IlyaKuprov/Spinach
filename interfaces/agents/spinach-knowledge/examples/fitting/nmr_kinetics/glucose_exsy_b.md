@@ -33,3 +33,5 @@ The scalar objective is `1e-6*sum(sum((spectrum-expt_spec).^2))`, using the tran
 ## Entry-point output
 
 `glucose_exsy_b()` displays the optimiser's final vector and saves the current figure as `glucose_exsy_b.fig` in the MATLAB working directory. On non-worker evaluations, the two-panel comparison labels the simulated plot “both” and the denoised experimental display “positive”. The function declares no output argument, and the saved figure is not a saved fit-parameter file.
+
+Initial states use concentration-weighted `state` without the retired `chem` method keyword.

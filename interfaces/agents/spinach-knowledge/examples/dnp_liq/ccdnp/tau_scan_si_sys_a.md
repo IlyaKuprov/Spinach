@@ -23,3 +23,5 @@ The frequency-offset vector is `2*pi*linspace(-10,30,512)*1e6`; the figure expre
 **Source-specific clarification:** this is the A parameter set, not a generic DNP model: it pairs two near-1.978 electron tensors and uses the asymmetric `-10 to +30 MHz` offset window, unlike the companion B scan.
 
 **Caveats:** the example suppresses hygiene checks and uses hush output.  The listed Euler/coordinate/scalar-coupling conventions must be checked against the surrounding Spinach model if changing the parameter set.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

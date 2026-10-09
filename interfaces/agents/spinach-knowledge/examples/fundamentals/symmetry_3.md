@@ -15,8 +15,10 @@ The field is 11.7 T and all eight spins are protons. Zeeman scalar values in spi
 
 ## Acquisition and processing
 
-Both the initial state and coil are `state(spin_system,'L+','1H')`, and the decoupling list is empty. Liquid-state acquisition uses 8192 points, sweep 2500 Hz, and offset 1000 Hz. The FID receives exponential apodisation `{'exp',5}`, is zero-filled to 65536 points, then Fourier-transformed and plotted using the real spectrum in ppm with the axis inverted.
+The initial state uses `state(spin_system,'L+','1H')`, and the decoupling list is empty. Liquid-state acquisition uses 8192 points, sweep 2500 Hz, and offset 1000 Hz. The FID receives exponential apodisation `{'exp',5}`, is zero-filled to 65536 points, then Fourier-transformed and plotted using the real spectrum in ppm with the axis inverted. The receiver uses the same operator description with `coil_state` instead.
 
 ## Scope
 
 The page records the model and processing parameters present in the source. It does not claim observed peak positions, a measured spectrum, or a run result.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

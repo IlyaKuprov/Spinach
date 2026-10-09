@@ -43,8 +43,8 @@ parameters.sweep=[0e3 15e3];
 parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=state(spin_system,'Lz','14N');
-parameters.coil=cos(theta)*state(spin_system,'Lz','14N')+...
-                sin(theta)*state(spin_system,'Lx','14N');
+parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N')+...
+                sin(theta)*coil_state(spin_system,'Lx','14N');
 parameters.Lx=cos(theta)*operator(spin_system,'Lz','14N')+...
               sin(theta)*operator(spin_system,'Lx','14N');
 parameters.spins={'14N'};

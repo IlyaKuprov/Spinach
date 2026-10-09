@@ -12,3 +12,5 @@ This is a simulated powder NQR spectrum for one 127I nucleus at zero applied fie
 The powder calculation uses the `rep_2ang_200pts_sph` grid, the 127I channel, an L+ coil state, an Lx pulse operator, and a π/2 pulse angle. The source sets a sweep parameter of 5e8, 512 points, and `axis_units='MHz'`; the numeric sweep assignment is reported as written because the example does not annotate its unit at that line. The FID comes from `powder(...,@hp_acquire,...,'labframe')`, is exponentially apodised with parameter 6, and is Fourier transformed; the plotted spectrum is the imaginary part of the shifted transform. The source comment estimates calculation time as seconds; that is a source note, not a runtime measured here.
 
 The file defines a single-spin powder simulation. The file does not import measured data or specify a spatial model, gradient/chirp schedule, SPEN, ultrafast DOSY, or multiple-quantum selection.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

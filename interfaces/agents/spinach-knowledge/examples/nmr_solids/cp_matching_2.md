@@ -17,3 +17,5 @@ A parfor loop scans fifty ¹H irradiation settings from 0e3 to 30e3; ¹⁵N is h
 `cp_contact_hard` returns the coil expectation before contact and after each of ten 40 µs slices: eleven points per setting, with `fid(end)` at 400 µs. This is a simulated final-contact signal-versus-power sweep, not a full experimental sequence or a 2D acquired spectrum. The source header estimates calculation time as seconds; no timing measurement is reported here.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/cp_matching_2.m
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

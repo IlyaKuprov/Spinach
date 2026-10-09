@@ -17,3 +17,5 @@ For each B1 node, electron nutation frequency is `b1(k)`. TOP settings: E/1H; sp
 ## Relaxation, averaging, and output
 
 At each distance, source uses `inter.relaxation={'t1_t2'}` and `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r(n),bet)`, rates `inter.r1_rates={1e3 r1n_rate}` and `inter.r2_rates={200e3 50e3}`, diagonal retention, and `dibari` equilibrium (rate units not annotated). Proton `Lz` is detected. Each point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`. It normalises the B1-weighted average by `sum(wb1)`, then distance-averages using `r^2*wr` (explicitly identified as the Jacobian), normalised by `sum(r.^2.*wr)`. The real proton `I_z` expectation is plotted against repetition time in ms; saves `top_q_rep_time_ensemble_b1_r.fig` in the MATLAB current folder, not separate data. TOP steady-state dynamics are delegated to `topdnp_steady`.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

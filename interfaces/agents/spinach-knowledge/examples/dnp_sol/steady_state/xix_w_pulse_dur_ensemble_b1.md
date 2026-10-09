@@ -21,3 +21,5 @@ The pulse-duration vector contains 200 values from `2e-9` to `21e-9 s`. The offs
 ## Dependencies and scope
 
 The script depends on Spinach system/basis/state/powder and plotting functions, `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. The ensemble average is over B1 only; the distance remains fixed.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

@@ -10,7 +10,7 @@ This example simulates a one-dimensional liquid-state `1H` NMR spectrum for a mo
 ## Spin system and acquisition setup
 
 - The basis uses `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
-- The observed spins are `{'1H'}`; both the initial state and detection coil are set to `state(spin_system,'L+','1H')`. `parameters.decouple={}` specifies no decoupling entries.
+- The observed spins are `{'1H'}`; the initial state uses `state(spin_system,'L+','1H')`. `parameters.decouple={}` specifies no decoupling entries. The receiver uses the same operator description with `coil_state` instead.
 - The source sets offset `3500`, sweep `3000`, `4096` acquisition points, and `16536` zero-filled points. It labels the plotted axis `ppm` and sets `invert_axis=1`. The wrapper does not state units for offset, sweep, or the Gaussian parameter below; these numbers are the literal settings in the code, not inferred Hz or ppm values.
 - No relaxation parameters are assigned in this wrapper.
 
@@ -19,3 +19,5 @@ Acquisition is delegated through `liquid(spin_system,@acquire,parameters,'nmr')`
 ## Processing and output
 
 The returned FID is apodised with `{'gauss',10}`, Fourier-transformed as `fftshift(fft(fid,parameters.zerofill))`, and displayed as `real(spectrum)` with `plot_1d`. The zero-argument function does not declare a returned value or write an output spectrum file in this source. No experimental spectrum is loaded or compared in the wrapper.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

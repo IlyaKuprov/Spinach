@@ -14,3 +14,5 @@ Call `endor_davies_nox_powder()` with no arguments. This powder Davies ENDOR exa
 This example is specifically the soft-pulse Davies variant: its orientation-selection effects and long run time distinguish it from the hard-pulse Mims nitroxide example. Its source does not provide a DOI.
 
 Source: [examples/esr_sol_pulsed/endor_davies_nox_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/endor_davies_nox_powder.m).
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

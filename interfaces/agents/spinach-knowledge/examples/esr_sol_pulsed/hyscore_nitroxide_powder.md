@@ -12,3 +12,5 @@ The example is a powder-averaged, time-domain HYSCORE simulation for a `14N` nit
 ## HYSCORE timing and output
 
 The driver starts from electron `Lz`, detects electron `L+`, and requests a 20 MHz sweep, `tau = 136 ns`, 128 points per dimension, and the `rep_2ang_800pts_sph` powder grid. The `hyscore` sequence helper applies π/2–τ–π/2, selects zero-order electron coherence, evolves the indirect dimension, applies a π pulse, and forms the direct-dimension echo signal with the corresponding τ and detection-pulse operations. The 2D signal has its mean removed and cosine-apodisation is applied in both dimensions; it is zero-filled to 256×256 and transformed with a 2D FFT. The absolute spectrum is displayed as positive contours in MHz. The script plots but does not save the spectrum; its header estimates a calculation time of seconds.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

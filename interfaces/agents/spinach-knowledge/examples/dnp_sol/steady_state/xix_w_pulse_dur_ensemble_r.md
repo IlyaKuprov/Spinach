@@ -23,3 +23,5 @@ The final map is averaged over distance using the quadrature weights multiplied 
 ## Dependencies and scope
 
 The entry point uses Spinach system, basis, state, powder, and plotting routines, along with `gaussleg`, `r1n_dnp`, and `xixdnp_steady`. It averages distance only; B1 is held at the single stated value.
+
+Detection vectors use `coil_state`, independently of substance concentrations; initial density states retain concentration weighting through `state`.

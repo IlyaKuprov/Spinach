@@ -23,6 +23,8 @@ The returned `grad` differentiates the fidelity with respect to the waveform amp
 
 The fourth output `hess` is not available with the piecewise-linear `'trapezium'` integrator, stroboscopic steady states, nonempty keyhole schedules, average-fidelity mode, or trajectory penalties. In the supported state-vector formalisms, keyholes are also rejected for `'newton'` and `'goodwin'` methods; first-order `'lbfgs'` and `'rbfgs'` methods and empty keyhole schedules remain available. These are source guards, not a list of all optimiser methods.
 
+In stroboscopic `sphten-liouv` optimisation, every substance unit coordinate `bas.offsets(n)+1` must vanish in the target observable. Destination dressing solves the adjoint fixed-point system only on the remaining coordinates and reinserts zero unit components, removing all conserved trace directions rather than just the first.
+
 ## Additional control transformations
 
 A nonzero `dead_time` pulls the target backward through the last drift. A nonempty `prefix` transforms the initial state using the first drift, and a nonempty `suffix` transforms the target using the last drift. With the Bloch-Siegert option enabled, the per-control response operator contributes an amplitude-squared term to the slice generator, with its corresponding amplitude derivative.

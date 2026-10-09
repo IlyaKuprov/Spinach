@@ -616,3 +616,6 @@ returned descriptors do not imply populations in other substances.
 Segmented coherent states and Zeeman steady solves are explicitly deferred.
 Steady-state `solid_effect` and both DNP scans require a single substance;
 these experiments retain their supported single-substance algorithms.
+
+`create(sys)` without interaction input remains supported; it uses an empty
+interaction structure and the ordinary one-substance/unit-concentration defaults.

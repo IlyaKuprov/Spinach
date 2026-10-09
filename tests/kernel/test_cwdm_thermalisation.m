@@ -99,6 +99,29 @@ result=test_true(result,'T7 factor two',abs(ratio-2)<1e-5,...
 fprintf('CWDM_T7 H=%.16g nonunit=%.16g units=%.16g direct=%.16g merged=%.16g ratio=%.16g\n',...
         h_error,diss_error,source_error,direct_signal,merged_signal,ratio);
 
+% Enforce the same target trace contract in Zeeman-Liouville space
+sys=struct('magnet',14.1,'isotopes',{{'1H'}}); inter=struct();
+inter.chem.parts={1}; inter.chem.concs=0.3; inter.temperature=298;
+inter.relaxation={'damp'}; inter.damp_rate=2;
+inter.equilibrium='zero'; inter.rlx_keep='labframe';
+bas=struct('formalism','zeeman-liouv','approximation',{{'none'}});
+s=assume(test_spin_system(sys,inter,bas),'nmr');
+R0=relaxation(s); target=equilibrium(s); one=s; one.chem.concs=1;
+R=thermalize(s,R0,[],[],equilibrium(one),'IME');
+result=test_close(result,'Zeeman IME stationary target',R*target,zeros(4,1),...
+                  1e-14,0,'unit-trace targets thermalise concentration-weighted states');
+for concentration=[0 0.3 2]
+    one.chem.concs=concentration; rejected=false;
+    try
+        thermalize(s,R0,[],[],equilibrium(one),'IME');
+    catch err
+        rejected=strcmp(err.identifier,'Spinach:thermalize:targetConcentration');
+    end
+    result=test_true(result,'Zeeman weighted target rejected',rejected,...
+                     'zero and nonunit target traces are rejected without normalisation');
+end
+fprintf('CWDM_ZEEMAN_TARGET stationary=%.16g rejected=%d\n',norm(R*target),rejected);
+
 end
 
 

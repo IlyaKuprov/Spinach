@@ -8,7 +8,7 @@
 
 Returns projectors into independently evolving reduced subspaces, selected using the supplied Liouvillian `L` and state `rho`. This is state-space reduction; this function does not construct a relaxation generator or define relaxation-term units.
 
-The local projector cells in `bas.sym_fact(n)` are embedded at `bas.offsets(n)` before screening. Each projector therefore acts on one substance; no tensor products between substances are formed.
+The local projector cells in `bas.sym_fact(n)` are embedded at `bas.offsets(n)` before screening. Each projector therefore acts on one substance; no tensor products between substances are formed. These spin-only projectors are used only when the supplied generator has the compiled spin dimension. Enlarged spatial-spin generators instead proceed without spin symmetry factorisation; zero-track elimination and path tracing retain their usual enabled behavior.
 
 ## Reduction path
 

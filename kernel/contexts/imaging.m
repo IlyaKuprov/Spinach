@@ -102,7 +102,7 @@ H=frqoffset(spin_system,H,parameters);
 K=kinetics(spin_system);
 
 % Get problem dimensions
-spc_dim=prod(parameters.npts); spn_dim=size(H,1); problem_dim=spc_dim*spn_dim;
+spc_dim=prod(parameters.npts); spn_dim=spin_system.bas.offsets(end); problem_dim=spc_dim*spn_dim;
 report(spin_system,['lab space problem dimension     ' num2str(spc_dim)]);
 report(spin_system,['spin space problem dimension    ' num2str(spn_dim)]);
 report(spin_system,['Fokker-Planck problem dimension ' num2str(problem_dim)]);
@@ -262,7 +262,7 @@ if isfield(parameters,'image_size')&&(~all(mod(parameters.image_size,2)))
 end
 
 % Enforce no irrep mathematics
-if ~isempty(spin_system.comp.sym_group)
+if isfield(spin_system.bas,'sym_group')&&any(~cellfun(@isempty,spin_system.bas.sym_group))
     error('symmetry treatment is not supported in imaging simulations.');
 end
 

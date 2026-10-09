@@ -50,15 +50,17 @@ if ismember('trajlevel',spin_system.sys.disable)
     projectors{1}=1; return
 end
 
-% Embed each substance's local irreps in the direct sum
+% Embed spin irreps only for generators in the compiled spin space
 irr_projectors={}; irr_dimensions=[];
-for s=1:spin_system.bas.nsubst
-    for n=1:numel(spin_system.bas.sym_fact(s).irr_dimensions)
-        P=spin_system.bas.sym_fact(s).irr_projectors{n};
-        irr_projectors{end+1}=[sparse(spin_system.bas.offsets(s),size(P,2)); P;...
-            sparse(spin_system.bas.offsets(end)-spin_system.bas.offsets(s+1),size(P,2))]; %#ok<AGROW>
+if size(L,1)==spin_system.bas.offsets(end)
+    for s=1:spin_system.bas.nsubst
+        for n=1:numel(spin_system.bas.sym_fact(s).irr_dimensions)
+            P=spin_system.bas.sym_fact(s).irr_projectors{n};
+            irr_projectors{end+1}=[sparse(spin_system.bas.offsets(s),size(P,2)); P;...
+                sparse(spin_system.bas.offsets(end)-spin_system.bas.offsets(s+1),size(P,2))]; %#ok<AGROW>
+        end
+        irr_dimensions=[irr_dimensions; spin_system.bas.sym_fact(s).irr_dimensions(:)]; %#ok<AGROW>
     end
-    irr_dimensions=[irr_dimensions; spin_system.bas.sym_fact(s).irr_dimensions(:)]; %#ok<AGROW>
 end
 
 % Decide how to proceed

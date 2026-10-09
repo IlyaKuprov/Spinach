@@ -523,3 +523,11 @@ unit coordinate). `hilb2liouv` accepts explicit cells of Hilbert blocks;
 numeric matrices retain their single-block meaning. `sim2liouv` uses
 compiled block dimensions, migrates `sym_fact`, and refreshes the hash
 from the descriptor cells, new dimensions, and substance membership.
+
+Spatial phantom operators and states use the entire substance direct sum.
+`imaging` and `meshflow` obtain its dimension from `bas.offsets(end)`;
+`gridfree` checks extra isotropic terms against the same dimension.
+
+Spin-only symmetry projectors are not applied to enlarged spatial-spin
+generators in `reduce`; those use the usual trajectory-level reductions.
+`v2fplanck` tensors the spatial transport with the full direct-sum identity.

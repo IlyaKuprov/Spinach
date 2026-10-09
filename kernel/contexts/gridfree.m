@@ -321,7 +321,7 @@ if isfield(parameters,'add_terms')
     if ~iscell(parameters.add_terms)
         error('parameters.add_terms must be a cell array of two-element cell arrays.');
     end
-    spn_dim=size(spin_system.bas.basis,1);
+    spn_dim=spin_system.bas.offsets(end);
     for n=1:numel(parameters.add_terms)
         if (~iscell(parameters.add_terms{n}))||...
            (numel(parameters.add_terms{n})~=2)

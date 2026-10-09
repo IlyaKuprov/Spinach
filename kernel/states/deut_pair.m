@@ -86,7 +86,7 @@ for n=1:numel(IST)
 
         % Get the Spinach state
         rho=coil_state(spin_system,{descr_a,descr_b},...
-                              {spin_a, spin_b });
+                              {spin_a, spin_b },'exact');
 
         % Get and normalise the two-spin state
         tss=kron(IST{n},IST{k}); tss=tss/norm(tss,'fro');

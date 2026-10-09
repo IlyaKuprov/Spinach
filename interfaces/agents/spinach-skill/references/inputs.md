@@ -711,3 +711,5 @@ Retired global basis matrices and `bas.irrep` are rejected at the `basis`,
 `irr_dimensions`. `kinetics` also rejects retired chemistry fields inserted
 after `create`; use `chem.reactions`. These are consumer checks, not custom
 dot-read interception: the compiled objects remain ordinary MATLAB structs.
+
+Linear contexts (`liquid`, `imaging`, `crystal`, `powder`, `device`, `floquet`, `singlerot`, `doublerot`, and `gridfree`) reject state-dependent kinetics handles. Use a custom pulse sequence with `step`/`iserstep` for multi-reactant or callback-rate records; `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m` demonstrate that route.

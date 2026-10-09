@@ -27,3 +27,7 @@ Put `'rho_eq'` in `parameters.needs` to calculate the thermal equilibrium state 
 ## Source-supported example
 
 A spin-channel list may be `{'E'}`. For a system with multiple modes, provide one `mode_offset` value for each mode in its declaration order; use zero values for no mode detuning. These examples specify parameter structure, not a calculated device response.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:device:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

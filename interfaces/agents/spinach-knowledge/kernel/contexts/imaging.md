@@ -29,3 +29,7 @@ For example, choose `parameters.deriv={'fourier'}` or `parameters.deriv={'period
 The compiled terminal offset is the spin dimension across all substances; phantom spin operators and states must use that direct-sum ordering.
 
 Imaging rejects active compiled symmetry projectors. A declared symmetry group disabled through `sys.disable` leaves identity projectors and is accepted, just as an undeclared group is.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:imaging:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

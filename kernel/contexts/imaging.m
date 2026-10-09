@@ -76,6 +76,9 @@
 %       responds to a column-wise vectorization of a 3D array
 %       with dimensions ordered as [X Y Z].
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % a.j.allami@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -100,6 +103,15 @@ H=frqoffset(spin_system,H,parameters);
 
 % Call Spinach to build kinetics superoperator
 K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:imaging:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by imaging; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Get problem dimensions
 spc_dim=prod(parameters.npts); spn_dim=spin_system.bas.offsets(end); problem_dim=spc_dim*spn_dim;

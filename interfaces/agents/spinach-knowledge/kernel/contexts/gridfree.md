@@ -25,3 +25,7 @@ If the sequence requests `iso_eq`, the context constructs thermal equilibrium fr
 `parameters.spins={'1H','13C'}` shows the channel-list form. The source specifies rate, axis, offsets, rank truncation, and correlation times by the fields above; it does not provide a complete runnable parameter set.
 
 Additional isotropic terms are checked against `bas.offsets(end)`, the compiled spin dimension across all substances.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:gridfree:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

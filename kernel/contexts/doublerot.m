@@ -105,6 +105,9 @@
 %       and retains Hamiltonian, relaxation, and kinetics factors.
 %       The sequence must support implicit exponential actions.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=doublerot.m>
@@ -215,6 +218,15 @@ end
 
 % Get relaxation and kinetics 
 R=relaxation(spin_system); K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:doublerot:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by doublerot; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Get the averaging grid
 sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...

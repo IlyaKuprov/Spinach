@@ -7,8 +7,8 @@
 %     result  - regression test result with explanatory messages
 %
 % The test checks closed-form steady states, independent reaction blocks,
-% single-substance flux routing and conservation, and empty reaction maps
-% on a local descriptor. Multi-substance reactions are tested separately.
+% first-order exchange routing and conservation, and empty reaction maps
+% on a reordered local descriptor.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -45,21 +45,22 @@ result=test_close(result,'equilibrate independent blocks',equilibrate(K,c0),c_re
 result=test_close(result,'equilibrate zero concentration',equilibrate(K,zeros(4,1)),zeros(4,1),1e-15,1e-15,...
                   'a zero initial concentration vector remains zero for linear kinetics');
 
-% Build a single-substance spherical-tensor spin system for flux and reactions
+% Build a two-substance one-way exchange system
 sys.magnet=14.1;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,0};
-inter.chem.flux_rate=[0 3;0 0];
-inter.chem.flux_type='intramolecular';
+inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[1 2],'rate',3)};
 bas.formalism='sphten-liouv';
-bas.approximation={'none'};
+bas.approximation={'none','none'};
 spin_system=test_spin_system(sys,inter,bas);
 
-% Intramolecular flux must conserve every column sum of the kinetic generator
+% First-order exchange must conserve every column sum of the kinetic generator
 K=kinetics(spin_system);
 col_sums=sum(full(K),1);
-result=test_close(result,'kinetics intramolecular flux column sums',col_sums,zeros(size(col_sums)),1e-14,1e-14,...
-                  'intramolecular flux moves spin order without losing its column sum');
+result=test_close(result,'kinetics exchange column sums',col_sums,zeros(size(col_sums)),1e-14,1e-14,...
+                  'first-order exchange moves spin order without losing its column sum');
 
 % One-way flux drains source spin order and fills matched destination spin order
 rho_source=state(spin_system,'Lz',1);
@@ -70,12 +71,13 @@ result=test_close(result,'kinetics no action on destination source',K*rho_destin
                   'one-way flux does not drain spin order already on its destination');
 
 % Empty reactions traverse a single local descriptor with permuted spin columns
-inter.chem.parts={[2 1]};
+inter.chem.parts={[2 1]}; inter.chem.concs=1; inter.chem.reactions={};
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 reaction.reactants=[]; reaction.products=[]; reaction.matching=zeros(0,2);
 G=react_gen(spin_system,reaction);
 result=test_true(result,'react_gen reordered local columns',...
-                 iscell(G)&&isequal(size(G),[0 1]),...
+                 iscell(G)&&isempty(G),...
                  'an empty reaction is valid independently of the local spin-column order');
 
 end

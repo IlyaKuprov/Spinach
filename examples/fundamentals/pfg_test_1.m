@@ -38,7 +38,7 @@ rho=rand(size(L,1),1);
 rho(1)=1; rho=rho./norm(rho);
  
 % Determine projection quantum numbers of the basis
-[~,M]=lin2lm(spin_system.bas.basis);
+[~,M]=lin2lm(spin_system.bas.basis{1});
 
 % Determine the coherence order of each state
 coherence_orders=sum(M,2);

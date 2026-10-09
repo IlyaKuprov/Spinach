@@ -569,3 +569,10 @@ cells too; bypassing `basis` does not restore the retired global layout.
 
 Legacy two-substance chemistry test fixtures also require two approximation
 cells, even while their numerical chemistry assertions await WP3.
+
+Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
+only multi-substance Zeeman symmetry and analytical filters are rejected.
+Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
+use `bas.offsets(end)`. Identity states retain the selected substance: each
+selected spin contributes one local unit in a sum, a local product contributes
+once, and `chem` weights that unit by its hosting concentration.

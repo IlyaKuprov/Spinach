@@ -67,7 +67,7 @@ inter.zeeman.scalar={0.0,0.0,0.0};
 bas.formalism='sphten-liouv'; bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-dim=size(spin_system.bas.basis,1);
+dim=spin_system.bas.offsets(end);
 
 % Transverse magnetisation of the off-resonant nuclei
 rho_c=state(spin_system,{'L+'},{2});

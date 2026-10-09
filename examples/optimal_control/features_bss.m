@@ -47,7 +47,7 @@ rho_targ=state(spin_system,{'Lx'},{1});
 rho_targ=rho_targ/norm(full(rho_targ),2);
 
 % Drift Liouvillian is zero on resonance
-dim=size(spin_system.bas.basis,1);
+dim=spin_system.bas.offsets(end);
 
 % Control parameters
 control.drifts={{sparse(dim,dim)}};

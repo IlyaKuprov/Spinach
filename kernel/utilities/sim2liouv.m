@@ -99,11 +99,12 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     fields={'rho0','coil','screen'};
     for n=1:numel(fields)
         if isfield(parameters,fields{n})
-            states=reshape(parameters.(fields{n}),hdim,hdim,[]);
+            states=parameters.(fields{n});
             blocks=cell(spin_system.bas.nsubst,1);
             for k=1:spin_system.bas.nsubst
                 idx=spin_system.bas.offsets(k)+(1:dims(k));
-                blocks{k}=reshape(states(idx,idx,:),dims(k)^2,[]);
+                cols=reshape(idx(:)+hdim*(0:size(states,2)/hdim-1),1,[]);
+                blocks{k}=reshape(states(idx,cols),dims(k)^2,[]);
             end
             parameters.(fields{n})=vertcat(blocks{:});
         end

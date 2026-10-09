@@ -558,3 +558,6 @@ reaction-record implementation; absent chemistry gives the direct-sum zero.
 
 Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
 block must use `none`, as enforced by `basis`.
+
+`sim2liouv` accepts sparse horizontal density-matrix stacks and preserves their
+column order while extracting each substance block.

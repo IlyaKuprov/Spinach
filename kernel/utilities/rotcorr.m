@@ -42,6 +42,8 @@
 % rotation. D retains the anisotropy needed for that treatment.
 %
 % talos@spindynamics.org
+%
+% <https://spindynamics.org/wiki/index.php?title=rotcorr.m>
 
 function [tau,D,axes_len]=rotcorr(xyz,radii,layer,probe,temp,visc,npoints)
 

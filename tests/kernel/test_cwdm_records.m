@@ -30,20 +30,14 @@ result=test_true(result,'default closure',strcmp(s.chem.reactions{1}.closure,'ad
                  'the declared default closure is additive');
 summary_chemistry(s);
 
-% Reject column parts before their orientation reaches reporting consumers
-bad=inter; bad.chem.parts{1}=[1;2;3]; rejected=false;
-try
-    create(sys,bad);
-catch err
-    rejected=strcmp(err.identifier,'Spinach:create:chemicalParts')&&...
-             contains(err.message,'numeric row vectors or empty arrays');
-end
-result=test_true(result,'column part rejection',rejected,...
-                 'the producer requires row parts for chemistry reporting');
-bas.formalism='sphten-liouv'; bas.approximation={'none','none','none','none'};
-s=basis(s,bas); quiet=kinetics(s); printed=kinetics(s,'report');
-result=test_close(result,'row parts report',printed,quiet,0,0,...
-                  'unequal row parts and a spin-free part preserve the reported generator');
+% Preserve column-oriented spin membership while formatting its summary
+column_inter.chem.parts={(1:5)'};
+column_system=create(sys,column_inter); column_system.sys.output=1;
+text=evalc('summary_chemistry(column_system);');
+result=test_true(result,'column membership summary',...
+                 isequal(column_system.chem.parts{1},(1:5)')&&...
+                 contains(text,'chemical subsystem 1: spins [1  2  3  4  5]'),...
+                 'reporting formats a row without changing the accepted column-oriented input');
 
 % Assert every retired input even when its value is empty
 for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
@@ -115,6 +109,14 @@ valid{3}.reactants=[1 1]; valid{3}.products=[2 2]; valid{3}.closure='product';
 valid{4}.selector={'singlet',[1 2]}; valid{5}.selector={speye(64),speye(64)};
 inter.chem.reactions=valid; s=create(sys,inter);
 result=test_true(result,'valid records',numel(s.chem.reactions)==5,'valid record variants are retained');
+
+% Preserve the default single substance when chemistry groups are empty
+empty.chem=struct();
+[empty_sys,empty_inter]=merge_inp({sys,sys},{empty,empty});
+empty_system=create(empty_sys,empty_inter);
+result=test_true(result,'empty chemistry merge',isempty(fieldnames(empty_inter.chem))&&...
+                 isequal(empty_system.chem.parts,{1:10})&&isempty(empty_system.chem.reactions),...
+                 'merging absent partitions must not invent a reaction field requiring explicit parts');
 
 % Merge independent records with substance and spin offsets
 [merged_sys,merged]=merge_inp({sys,sys},{inter,inter});

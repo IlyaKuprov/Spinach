@@ -2756,9 +2756,8 @@ if isfield(inter,'chem')
 
         % Basic type checks
         if ~iscell(inter.chem.parts)||isempty(inter.chem.parts)||...
-           ~all(cellfun(@(x)isnumeric(x)&&isreal(x)&&(isrow(x)||isempty(x)),inter.chem.parts))
-            error('Spinach:create:chemicalParts',...
-                  'inter.chem.parts must be a non-empty cell array of numeric row vectors or empty arrays.');
+           ~all(cellfun(@(x)isnumeric(x)&&isreal(x)&&(isvector(x)||isempty(x)),inter.chem.parts))
+            error('inter.chem.parts must be a non-empty cell array of numeric vectors or empty arrays.');
         end
 
         % Chemiscal subsystem specification

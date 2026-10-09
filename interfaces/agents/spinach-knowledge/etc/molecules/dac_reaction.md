@@ -16,7 +16,7 @@ Acetonitrile is a concentration-only pool; solvent proton shifts, couplings, and
 
 - `sys`, `inter`: merged Spinach system and interaction structures.
 - `bas`: `formalism='sphten-liouv'`, `approximation='IK-2'`, `connectivity='scalar_couplings'`, `prox_level=1` on spin-bearing parts; the solvent uses `approximation='none'`.
-- `kin`: two reactant-to-product matching records, both using reactant parts [1 2]. The first targets part 3 (endo) with matches [1 12; 2 17; 3 18; 4 16; 5 10; 6 11; 7 14; 8 15; 9 13]. The second targets part 4 (exo) with [1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]. Each record has additive closure and an initial rate of zero; callers must set the two physical rates in `inter.chem.reactions` before `create`. The fourth output is the same pair of records.
+- `kin`: two reactant-to-product matching records, both using reactant parts [1 2]. The first targets part 3 (endo) with matches [1 12; 2 17; 3 18; 4 16; 5 10; 6 11; 7 14; 8 15; 9 13]. The second targets part 4 (exo) with [1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]. Each record has additive closure and an initial rate of zero; callers must set the two physical rates in `inter.chem.reactions` before `create`. The fourth output is an independent value copy of that pair: modifying `kin` does not update `inter`. Either set rates directly in `inter.chem.reactions`, or assign `inter.chem.reactions=kin` after modifying the returned records.
 
 The spin-bearing molecules use secular Redfield relaxation and zero equilibrium. Correlation times, in part order, are 5, 20, 50, 50, and 1 ps. The former T1/T2 term acted only on solvent protons; it is absent from the spin-free solvent model. Part 3 and the first reaction are endo; part 4 and the second are exo.
 

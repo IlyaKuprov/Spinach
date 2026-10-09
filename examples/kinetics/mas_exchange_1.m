@@ -25,8 +25,10 @@ inter.zeeman.scalar={0.0 3.0};
 
 % Chemical exchange
 inter.chem.parts={1,2};
-inter.chem.rates=[-2e4   2e4
-                   2e4  -2e4];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[1 2],'rate',2e4),...
+    struct('reactants',2,'products',1,...
+    'matching',[2 1],'rate',2e4)};
 inter.chem.concs=[1.0 1.0];
 
 % Basis set

@@ -103,7 +103,8 @@ if strcmp(mode,'report')
     summary_chemistry(spin_system);
     for n=1:numel(reactions)
         reaction=reactions{n};
-        source_spins=cell2mat(spin_system.chem.parts(reaction.reactants));
+        source_spins=cellfun(@(x)x(:)',spin_system.chem.parts(reaction.reactants),'UniformOutput',false);
+        source_spins=[source_spins{:}];
         report(spin_system,['reaction ' num2str(n) ': matched spins ' ...
                mat2str(reaction.matching(:,1)') ', traced spins ' ...
                mat2str(setdiff(source_spins,reaction.matching(:,1))) ...
@@ -111,8 +112,8 @@ if strcmp(mode,'report')
     end
 end
 
-% Constant first-order chemistry remains an ordinary sparse matrix
-if all(cellfun(@(r)isscalar(r.reactants)&&isnumeric(r.rate),reactions))
+% Numeric zero-rate records do not make first-order chemistry nonlinear
+if all(cellfun(@(r)isnumeric(r.rate)&&(isscalar(r.reactants)||r.rate==0),reactions))
     K=assemble(spin_system,reactions,0,unit_state(spin_system));
 else
     K=@(t,eta)assemble(spin_system,reactions,t,eta);
@@ -129,22 +130,23 @@ dim=spin_system.bas.offsets(end);
 eta=reshape(eta,dim,[]);
 blocks=cell(size(concs,1),1);
 
-% Evaluate each time-only rate once for all voxels at this stage
+% Evaluate each spatially uniform schedule once at the shared stage time
+rates=zeros(size(reactions));
 for n=1:numel(reactions)
     rate=reactions{n}.rate;
     if isa(rate,'function_handle'), rate=rate(t); end
     if ~isnumeric(rate)||~isscalar(rate)||~isreal(rate)||~isfinite(rate)||rate<0
         error('Spinach:kinetics:rateValue','time-dependent rates must return a finite non-negative scalar.');
     end
-    reactions{n}.rate=rate;
+    rates(n)=rate;
 end
 
-% Assemble the local chemistry independently in each voxel
+% Reuse the stage rates in every voxel
 for v=1:size(concs,1)
     K=sparse(dim,dim);
     for n=1:numel(reactions)
         reaction=reactions{n}; reactants=reaction.reactants;
-        rate=reaction.rate;
+        rate=rates(n);
 
         % Each occurrence loses its own state times the other concentrations
         for k=1:numel(reactants)

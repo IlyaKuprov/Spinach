@@ -40,3 +40,7 @@ Last-class fixtures remove all electrons or nuclei from IK-DNP, and all modes
 or spins from IK-SBS. Each surviving substance must match an explicit IK-0
 rebuild at its surviving class depth, including descriptors, offsets, and hash;
 a separate substance must retain its descriptor and settings.
+
+## Reaction-record fixtures
+
+Synthetic editing objects carry an explicit empty reaction list. Merge tests retain empty chemistry, spin offsets, column-oriented part lists, and all non-chemical assertions. An explicit selector-loss record tests simultaneous substance and selector-spin offsets; with declared parts, correlation times concatenate per substance rather than using the retired partless radical-pair fields.

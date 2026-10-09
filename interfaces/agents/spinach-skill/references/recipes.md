@@ -376,11 +376,14 @@ for normalisation and the real sweep is `parameters.fields` in tesla, alongside
 `parameters.needs={'zeeman_op'}`. The basis carries `bas.projections={0}` and
 permutation symmetry on equivalent protons via `bas.sym_spins`/`bas.sym_group`,
 and ZTE must remain off (do not add `'zte'` to `sys.enable`) because the singlet start state is not
-the thermal one. For Haberkorn or Jones–Hore kinetics use `@rydmr` with explicit
-`inter.chem.reactions` records: one first-order channel per singlet/triplet
-rate, a named `selector` and its electron pair, and explicit product matching
-or empty products for loss. The exponential `@rydmr_exp` parameter route and
-selective reaction-record route must not be mixed. Yield anisotropy uses `powder` with
+the thermal one. For Haberkorn or Jones-Hore kinetics use `@rydmr` with
+explicit `inter.chem.reactions` loss records with named singlet/triplet
+selectors (or their `jones-hore-` variants), electron indices, and numeric
+rates. Exactly one singlet-selector record defines the initial pair and
+yield prefactor in `rydmr`; all records must have empty products for this
+full-space resolvent (tracked products use time-domain propagation). The
+exponential and selector routes must not be
+mixed. See [relaxation](relaxation.md#chemical-kinetics) for record syntax. Yield anisotropy uses `powder` with
 `parameters.sum_up=0`, returning per-orientation yields plus the grid structure
 (`singlet_yield_anisotropy_1.m`). CIDNP is a different mechanism, handled
 phenomenologically with `magpump` in `cidnp_pumping_2.m`; the explicit geminate

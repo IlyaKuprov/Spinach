@@ -1,6 +1,13 @@
 % NMR spectrum of the reaction mixture in the absence of 
 % chemical kinetics and spatial dynamics.
 %
+% Direct-sum reduction separates the small acrylonitrile block, which
+% uses expm rather than the stock batched Taylor propagator. At the
+% default propagator rounding tolerance, this changes the full FID by
+% about 1.63e-6 relative; mapped spin operators agree to round-off.
+% A dense expm reference finds the direct-sum FID more accurate; both
+% trajectories retain rounding error from their larger propagators.
+%
 % a.acharya@soton.ac.uk
 % madhukar.said@ugent.be
 % bruno.linclau@ugent.be

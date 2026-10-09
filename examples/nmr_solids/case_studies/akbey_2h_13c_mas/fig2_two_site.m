@@ -24,8 +24,10 @@ inter.coupling.matrix{2,2}=Q2;
 
 % Kinetics
 inter.chem.parts={1,2};
-inter.chem.rates=1e4*[-1  1;
-                       1 -1];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',1e4),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',1e4)};
 inter.chem.concs=[1.0 1.0];
 
 % Basis set

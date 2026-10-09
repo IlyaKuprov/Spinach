@@ -18,7 +18,7 @@
 % Product-only spins must be at identity. Unmatched source spins are
 % traced out. Missing source descriptors are counted and reported;
 % no Cartesian product of the reactant bases is materialised. Repeated
-% spin-bearing reactants with matched spins require occurrence-resolved
+% spin-bearing reactants or products with matched spins require occurrence-resolved
 % matching and are rejected by this two-column matching interface.
 %
 % i.kuproprov@weizmann.ac.il
@@ -86,6 +86,13 @@ for n=unique(reaction.reactants)
        any(ismember(reaction.matching(:,1),spin_system.chem.parts{n}))
         error('Spinach:react_gen:repeatedMatching',...
               'matched repeated reactants require occurrence-resolved matching, not a two-column spin map.');
+    end
+end
+for n=unique(reaction.products)
+    if nnz(reaction.products==n)>1&&...
+       any(ismember(reaction.matching(:,2),spin_system.chem.parts{n}))
+        error('Spinach:react_gen:repeatedProductMatching',...
+              'matched repeated products require occurrence-resolved matching, not a two-column spin map.');
     end
 end
 end

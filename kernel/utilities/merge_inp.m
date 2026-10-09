@@ -151,9 +151,10 @@ end
 % Chemical process specifications
 if group_check(inter_parts,'chem')
     chem_parts=strip(inter_parts,'chem'); chem.stub=1;
-    spin_offset=0; subst_offset=0; chem.reactions={};
+    spin_offset=0; subst_offset=0;
     for n=1:numel(chem_parts)
         if isfield(chem_parts{n},'reactions')
+            if ~isfield(chem,'reactions'), chem.reactions={}; end
             for k=1:numel(chem_parts{n}.reactions)
                 reaction=chem_parts{n}.reactions{k};
                 reaction.reactants=reaction.reactants+subst_offset;
@@ -167,7 +168,9 @@ if group_check(inter_parts,'chem')
             chem_parts{n}=rmfield(chem_parts{n},'reactions');
         end
         spin_offset=spin_offset+part_sizes(n);
-        subst_offset=subst_offset+numel(chem_parts{n}.parts);
+        if isfield(chem_parts{n},'parts')
+            subst_offset=subst_offset+numel(chem_parts{n}.parts);
+        end
     end
     [chem,chem_parts]=merge_like_parts(chem,chem_parts,'parts',part_sizes);
     [chem,chem_parts]=merge_like_isotopes(chem,chem_parts,'concs');

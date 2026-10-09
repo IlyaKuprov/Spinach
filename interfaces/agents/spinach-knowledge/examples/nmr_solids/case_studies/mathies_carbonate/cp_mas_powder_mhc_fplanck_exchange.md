@@ -24,3 +24,5 @@ For each exchange rate, the code calls `singlerot` with `@cp_contact_soft`, usin
 The input is the CASTEP-derived structural/shielding data in `mhc.magres`; this source does not load an experimental FID or spectrum. The output is a simulated contact-curve plot. The GPU enable line is commented out, and the source notes that a GPU can accelerate the hours-long calculation.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+The rate matrix is represented by two explicit first-order reaction records. Atom matching pairs equal-position spin indices in the two declared parts in both directions; the permuted geometry/tensors represent the conformational exchange. Detection uses unweighted `coil_state`.

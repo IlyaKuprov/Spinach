@@ -6,4 +6,4 @@ The test also distinguishes the original reacting-flow frozen concentration gene
 
 The homogeneous two-channel case also compares frozen stock and kernel allocations with the exact bimolecular concentration solution on successively halved steps. Both allocations converge to the same mass-action trajectory; the test separately asserts the plan-prescribed equal unit-source sharing of the additive kernel. Finite frozen steps are not claimed to reproduce the exact ODE.
 
-Unweighted operator-vector calls explicitly supply the `exact` method required by the four-argument `coil_state` API.
+Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.

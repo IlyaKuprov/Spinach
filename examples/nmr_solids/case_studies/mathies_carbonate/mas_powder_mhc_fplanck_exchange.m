@@ -44,9 +44,11 @@ inter.coordinates{4}=props.std_geom(1,:);
 % Chemical kinetics endpoints
 inter.chem.parts={[1 2],[3 4]};
 
-% Reaction rate matrix, Hz
-inter.chem.rates=2e3*[-1  1; 
-                       1 -1];
+% Directed first-order exchange, Hz
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 3; 2 4],'rate',2e3),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[3 1; 4 2],'rate',2e3)};
 
 % Initial concentrations (arb. units)
 inter.chem.concs=[1 1];

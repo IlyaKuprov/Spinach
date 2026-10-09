@@ -21,8 +21,10 @@ inter.coordinates={[0 0 0]; [0 0 2];
                
 % Chemical exchange
 inter.chem.parts={[1 2],[3 4]};
-inter.chem.rates=[-5000 +5000;
-                  +5000 -5000];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 3; 2 4],'rate',5000),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[3 1; 4 2],'rate',5000)};
 inter.chem.concs=[1 1];
 
 % Basis set

@@ -4,4 +4,4 @@ Checks intermolecular spin replacement as an explicit additive `A+B -> A+B` reco
 
 The test verifies zero concentration derivatives at independently sampled populations, magnetisation conservation, and agreement between the nonlinear production stepper and an exponential of the generator frozen at its invariant concentrations. This freezing is valid for time-independent additive replacement with no concentration-changing reactions; it is not a general mass-action approximation.
 
-Unweighted operator-vector calls explicitly supply the `exact` method required by the four-argument `coil_state` API.
+Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.

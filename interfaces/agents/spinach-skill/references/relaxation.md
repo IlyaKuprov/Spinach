@@ -19,7 +19,14 @@ L=H+1i*R+1i*K;
 ```
 
 `R=relaxation(spin_system,euler_angles)` and `K=kinetics(spin_system)`;
-contexts assemble this for you. The Euler angles are optional and used only
+standard contexts supply these terms to their sequence when `K` is a matrix.
+A nonzero higher-order network or time-dependent rate produces `K(t,eta)`,
+which ordinary sequences such as COSY and NOESY cannot add to matrices.
+Use the `step`/`iserstep` generator-handle route, or a custom sequence that
+evaluates the handle at the required stage time and state; passing such a
+network to a standard linear sequence is not supported. For example, a
+chemistry-only step uses `{ @(t,eta)1i*K(t,eta), t, 'RKMK4' }`.
+The Euler angles are optional and used only
 by theories supporting relaxation anisotropy: `powder` recomputes `R` at
 every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic
@@ -278,7 +285,7 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
                             'matching',[6 1;7 2;8 3;9 4;10 5],'rate',20)};
 ```
 
-`inter.chem.parts` contains disjoint numeric row vectors of global spin indices;
+`inter.chem.parts` contains disjoint numeric vectors of global spin indices;
 empty entries are spin-free substances. Matching pairs must have identical
 isotopes, but different species need not have identical spin counts or basis
 topologies. Unmatched source spins are traced out; unmatched product spins
@@ -330,6 +337,11 @@ matrix. `test_cwdm_flux` supplies an analytic replacement check. Freezing an
 additive generator is justified only when its concentrations and rates remain
 constant, not for general mass-action or product-closure networks.
 
+For two one-spin substances, the additive event with `parts={1,2}`,
+`concs=[2000 500]`, `reactants=[1 2]`, `products=[1 2]`,
+`matching=[1 2;2 1]`, and rate 1 reproduces directed rates 500 and 2000
+inverse seconds. An order-m rate constant has units concentration^(1-m)/s.
+
 Radical-pair loss uses one first-order reaction record per channel. For a
 single species whose first two spins are electrons:
 
@@ -353,6 +365,10 @@ To track products, declare their parts and matching: selective arrival uses
 the projected source before tracing unmatched spins, as tested by
 `test_cwdm_selectors`. Use an explicit scalar `inter.nz_shift` when required;
 a general reaction network does not determine a unique scalar lifetime.
+
+For the legacy exponential scalar use the summed channel rates; the legacy
+Haberkorn/Jones-Hore scalar approximation uses half their sum. Retired chemistry
+fields are rejected rather than accepted alongside reaction records.
 
 ## Powder grids
 

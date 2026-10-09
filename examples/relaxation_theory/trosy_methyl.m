@@ -103,9 +103,18 @@ bas.approximation={'none', 'none', 'none'};
 
 % Methyl turning generator
 tau_m=1e-11; k_jump=1/(2*tau_m);
-inter.chem.rates=k_jump*[-2  1  1;
-                          1 -2  1;
-                          1  1 -2];
+inter.chem.reactions=cell(1,6); k=0;
+for n=1:3
+    for m=setdiff(1:3,n)
+
+        % Preserve atom identity between rotamer blocks
+        k=k+1;
+        inter.chem.reactions{k}=struct('reactants',n,'products',m,...
+            'matching',[inter.chem.parts{n}' inter.chem.parts{m}'],...
+            'rate',k_jump);
+
+    end
+end
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

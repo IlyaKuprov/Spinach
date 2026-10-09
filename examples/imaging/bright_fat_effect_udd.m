@@ -30,8 +30,8 @@ inter.coupling.scalar{5,6}=23;
 % Spins 1,2,3 are molecule A; spins 4,5,6 are molecule B
 inter.chem.parts={[1 2 3],[4 5 6]};
 
-% Kinetic rate matrix (Hz)
-inter.chem.rates=[0 0; 0 0];
+% Independent substances without chemical exchange
+inter.chem.reactions={};
 inter.chem.concs=[1 1];
 
 % Basis set

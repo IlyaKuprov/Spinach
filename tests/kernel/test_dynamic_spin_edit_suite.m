@@ -91,6 +91,41 @@ for field={'longitudinal','zero_quantum'}
     end
 end
 
+% Cap IK depths locally after spin removal and isotopic dilution
+sys.magnet=0; sys.isotopes={'1H','13C','13C','1H','1H','1H'};
+inter=struct(); inter.chem.parts={1:3,4:6}; inter.chem.concs=[1,1];
+inter.coordinates={[0 0 0],[1 0 0],[0 1 0],[10 0 0],[11 0 0],[10 1 0]};
+for approximation={'IK-0','IK-1','IK-2'}
+    for field={'prox_level','space_level'}
+        depths=struct(); depths.formalism='sphten-liouv';
+        depths.approximation=repmat(approximation,1,2);
+        depths.inter_level={3,2};
+        if ~strcmp(approximation{1},'IK-0')
+            depths.connectivity={'scalar_couplings','scalar_couplings'};
+            depths.(field{1})={3,2};
+        end
+        based=test_spin_system(sys,inter,depths);
+        subsystems=[{kill_spin(based,2)};dilute(based,'13C',1)];
+        result=test_true(result,['based dilute count ' approximation{1} ' ' field{1}],...
+                         numel(subsystems)==3,...
+                         'two dilute carbon sites generate two independently rebuilt subsystems');
+        expected=depths; expected.inter_level{1}=2;
+        if isfield(expected,field{1}), expected.(field{1}){1}=2; end
+        for n=1:numel(subsystems)
+            actual=subsystems{n}; rebuilt=basis(actual,expected);
+            result=test_true(result,['kill_spin depths ' approximation{1} ' ' field{1} ' ' num2str(n)],...
+                             isequal(actual.bas.inter_level,expected.inter_level)&&...
+                             (~isfield(expected,field{1})||...
+                              isequal(actual.bas.(field{1}),expected.(field{1})))&&...
+                             isequal(actual.chem.parts,{1:2,3:5})&&...
+                             isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                             isequal(actual.bas.offsets,rebuilt.bas.offsets)&&...
+                             strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                             'depths are capped locally, smaller depths survive, and the basis matches an explicit rebuild');
+        end
+    end
+end
+
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);
 result=test_true(result,'kill_spin logical mask',isequal(logical_trimmed.comp.isotopes,trimmed.comp.isotopes)&&...

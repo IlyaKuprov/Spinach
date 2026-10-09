@@ -20,6 +20,7 @@
 % Notes: an existing basis is rebuilt from its input settings, with
 %        local manual columns and global filter labels reindexed.
 %        Isotope filters with no surviving local spins are removed.
+%        Retained depths are capped by the surviving local spin count.
 %        Symmetry and assumption information is cleared; call assume
 %        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
@@ -77,9 +78,14 @@ if isfield(spin_system,'bas')
             for field={'inter_level','prox_level','space_level','connectivity'}
                 if isfield(bas,field{1}), bas.(field{1}){n}=[]; end
             end
-        elseif isfield(bas,'inter_level')&&...
-               ismember(bas.approximation{n},{'IK-0','IK-1'})
-            bas.inter_level{n}=min(bas.inter_level{n},nnz(local_keep));
+        else
+
+            % Cap retained depths by the surviving local spin count
+            for field={'inter_level','prox_level','space_level'}
+                if isfield(bas,field{1})
+                    bas.(field{1}){n}=min(bas.(field{1}){n},nnz(local_keep));
+                end
+            end
         end
     end
 end

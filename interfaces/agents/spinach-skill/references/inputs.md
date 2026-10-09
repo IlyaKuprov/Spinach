@@ -550,7 +550,9 @@ removes each unit independently and converts level populations per substance;
 `kill_spin` and `dilute` rebuild an existing basis after particle removal.
 Local manual columns and global numeric filter labels are reindexed. Isotope
 filters are removed when no matching spin survives in their own substance;
-empty substances keep their unit coordinate. Symmetry and Hamiltonian assumptions
+empty substances keep their unit coordinate. Retained `inter_level`, `prox_level`,
+and `space_level` depths are capped by each substance's surviving spin count
+before the rebuild. Symmetry and Hamiltonian assumptions
 are cleared, so reapply `assume` before constructing a Hamiltonian.
 
 Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;

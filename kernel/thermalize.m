@@ -122,10 +122,16 @@ if strcmp(method,'IME')
     if size(rho_eq,1)~=size(R,1)
         error('rho_eq and R must have matching dimensions.');
     end
-    if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
-       any(abs(rho_eq(spin_system.bas.offsets(1:end-1)+1)-1)>1e-10)
-        error('Spinach:thermalize:targetConcentration',...
-              'IME requires unit-concentration target blocks; request equilibrium with chem.concs set to ones.');
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        population=unit(idx)'*rho_eq(idx);
+        if strcmp(spin_system.bas.formalism,'zeeman-liouv')
+            population=sqrt(prod(spin_system.comp.mults(spin_system.chem.parts{n})))*population;
+        end
+        if abs(population-1)>1e-10
+            error('Spinach:thermalize:targetConcentration',...
+                  'IME requires unit-concentration target blocks; request equilibrium with chem.concs set to ones.');
+        end
     end
 end
 if strcmp(method,'dibari')

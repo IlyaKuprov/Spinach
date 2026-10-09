@@ -56,9 +56,10 @@
 %
 %    'chem'   - deprecated alias for 'exact', accepted for one release
 %
-% Every method weights each substance block by chem.concs. Use coil_state
-% for unweighted detection operators. The method is ignored in Zeeman
-% Hilbert and Liouville formalisms, but concentration weighting is not.
+% Every density-matrix and Liouville method weights each substance block
+% by chem.concs. Use coil_state for unweighted detection operators.
+% Storage-only wavefunctions remain unweighted. The method is ignored in
+% Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
 %
 % Outputs:
 %
@@ -89,6 +90,9 @@ end
 
 % Construct the unweighted operator representation
 rho=coil_state(spin_system,states,spins,method);
+
+% Keep storage-only wavefunctions normalised independently of concentration
+if strcmp(spin_system.bas.formalism,'zeeman-wavef'), return; end
 
 % Weight each substance without dividing by any concentration
 for n=1:spin_system.bas.nsubst

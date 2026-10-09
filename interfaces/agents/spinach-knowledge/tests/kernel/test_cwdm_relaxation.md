@@ -37,3 +37,5 @@ NGCE rejects the segmented two-substance system with both zero and nonzero
 regularisation using `Spinach:ngce:segmentedSubstances`. A supported
 single-substance zero stochastic trajectory retains zero uncertainty and
 regularises only the non-unit directions.
+
+Solid-effect coverage asserts the named segmented steady-state boundary with an electron and an independent nucleus. A supported single-substance zero-drive calculation is compared with thermal-equilibrium detection.

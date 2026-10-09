@@ -287,6 +287,32 @@ result=test_true(result,'pump later identity rejection',rejected,...
 fprintf('CWDM_MAGPUMP population_error=%.16g later_identity_rejected=%d\n',...
         norm(pumped*source-reference),rejected);
 
+% Reject the scalar solid-effect unit projection for independent substances
+sys=struct('magnet',1,'isotopes',{{'E','1H'}});
+inter=struct(); inter.chem.parts={1,2}; inter.chem.concs=[.7 .3];
+inter.relaxation={'t1_t2'}; inter.r1_rates={10,1}; inter.r2_rates={20,2};
+inter.rlx_keep='secular'; inter.equilibrium='zero'; inter.temperature=298;
+bas=struct('formalism','sphten-liouv','approximation',{{'none','none'}});
+s=test_spin_system(sys,inter,bas);
+parameters=struct('mw_pwr',0,'theory','exact','nuclear_frq',1,...
+                  'calc_type','steady_state'); rejected=false;
+try
+    solid_effect(s,parameters);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:solid_effect:segmentedSubstances');
+end
+result=test_true(result,'segmented solid effect',rejected,...
+                 'steady-state solid effect rejects multiple trace null directions');
+fprintf('CWDM_SOLID_EFFECT named_rejection=%d\n',rejected);
+
+% Retain the complete supported single-substance steady-state experiment
+inter.chem.parts={1:2}; inter.chem.concs=1; bas.approximation={'none'};
+s=test_spin_system(sys,inter,bas); actual=solid_effect(s,parameters);
+[I,Q]=hamiltonian(assume(s,'labframe'),'left'); rho=equilibrium(s,I,Q,[0 0 0]);
+coils=[state(s,'Lz',1) state(s,'Lz',2)];
+result=test_close(result,'single solid effect zero drive',actual,coils'*rho,...
+                  1e-12,1e-12,'without microwave drive the steady state is thermal');
+
 end
 
 

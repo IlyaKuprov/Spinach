@@ -172,4 +172,26 @@ for formalism={'zeeman-hilb','zeeman-liouv'}
                       'the state equals the trace-normalised Boltzmann exponential');
 end
 
+% Coherent states cannot use a tensor product in a segmented Zeeman space
+sys.isotopes={'1H','C3'}; inter=struct();
+inter.chem.parts={1,2}; inter.chem.concs=[1 1]; bas.approximation={'none','none'};
+for formalism={'zeeman-hilb','zeeman-liouv'}
+    bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas); rejected=false;
+    try
+        coherent(s,2,.5);
+    catch err
+        rejected=strcmp(err.identifier,'Spinach:coherent:segmentedZeeman');
+    end
+    result=test_true(result,['segmented coherent ' formalism{1}],rejected,...
+                     'the coherent tensor product is rejected before construction');
+    fprintf('CWDM_COHERENT %s named_rejection=%d\n',formalism{1},rejected);
+    local_bas=bas; local_bas.approximation={'none'};
+    local=test_spin_system(sys,struct(),local_bas);
+    amps=[1 .5 .5^2/sqrt(2)]; amps=amps/norm(amps);
+    expected=kron(eye(2),amps'*amps);
+    if strcmp(formalism{1},'zeeman-liouv'), expected=expected(:); end
+    result=test_close(result,['single coherent ' formalism{1}],coherent(local,2,.5),...
+                      expected,1e-14,1e-14,'the supported truncated coherent product is unchanged');
+end
+
 end

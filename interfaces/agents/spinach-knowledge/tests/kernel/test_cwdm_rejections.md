@@ -15,3 +15,5 @@ A two-substance wavefunction fixture with local dimensions two and four requires
 A disjoint but incomplete chemical partition must raise `Spinach:basis:incompletePartition` rather than silently omit the unassigned spin.
 
 Complete compiled column-vector partitions must yield the same descriptors as row-vector partitions.
+
+Coherent-state tests use local Hilbert dimensions two and three in both Zeeman formalisms, asserting the named segmented rejection and comparing the corresponding single-substance state with the explicit normalised truncated coherent product.

@@ -30,6 +30,15 @@ result=test_true(result,'default closure',strcmp(s.chem.reactions{1}.closure,'ad
                  'the declared default closure is additive');
 summary_chemistry(s);
 
+% Preserve column-oriented spin membership while formatting its summary
+column_inter.chem.parts={(1:5)'};
+column_system=create(sys,column_inter); column_system.sys.output=1;
+text=evalc('summary_chemistry(column_system);');
+result=test_true(result,'column membership summary',...
+                 isequal(column_system.chem.parts{1},(1:5)')&&...
+                 contains(text,'chemical subsystem 1: spins [1  2  3  4  5]'),...
+                 'reporting formats a row without changing the accepted column-oriented input');
+
 % Assert every retired input even when its value is empty
 for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
     bad=inter; bad.chem.(field{1})=[]; rejected=false;

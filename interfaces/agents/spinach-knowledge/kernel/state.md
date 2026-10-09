@@ -34,3 +34,5 @@ Source and credits: [Spinach Wiki: state.m](https://spindynamics.org/wiki/index.
 Segmented `zeeman-wavef` and `zeeman-liouv` calls raise `Spinach:state:segmentedZeeman` before construction or global identity allocation: the global tensor product is not a state in the substance direct sum. Single-substance wavefunctions retain their existing projection-number API.
 
 Mixed identity/non-identity expansions, including level projectors, retain the hosting substance for every term. Their identity coefficient populates only the local unit coordinate; Every method weights the complete expansion by the hosting concentration.
+
+The public wrapper validates its formalism, method, and state/spin descriptions locally before delegating unweighted construction to `coil_state`.

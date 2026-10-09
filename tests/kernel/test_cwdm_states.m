@@ -29,6 +29,21 @@ inter.temperature=298;
 bas.formalism='sphten-liouv'; bas.approximation={'none','none','none'};
 s=test_spin_system(sys,inter,bas); units=s.bas.offsets(1:end-1)+1;
 
+% Reject malformed caller descriptions at the public state boundary
+for args={{s,'Lz',[1 1],'exact'},{s,{'Lz','Lx'},{1},'exact'},...
+          {s,'Lz',1,'unknown'},{s,[0 0],[],'exact'}}
+    rejected=false;
+    try
+        state(args{1}{:});
+    catch err
+        fprintf('WRAPPER_REJECTION %s %s\n',err.stack(1).name,err.message);
+        rejected=strcmp(err.stack(1).name,'grumble')&&...
+                 strcmp(err.stack(1).file,which('state'));
+    end
+    result=test_true(result,'wrapper-local argument rejection',rejected,...
+                     'invalid descriptions are rejected by the public wrapper grumbler');
+end
+
 % Compare operator shapes with independent unit-concentration substances
 reference=cell(3,1);
 for n=1:2

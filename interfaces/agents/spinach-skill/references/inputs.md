@@ -619,3 +619,7 @@ these experiments retain their supported single-substance algorithms.
 
 `create(sys)` without interaction input remains supported; it uses an empty
 interaction structure and the ordinary one-substance/unit-concentration defaults.
+
+`reduce` rejects cross-substance entries in caller-supplied generators at the
+compiled spin dimension before building substance-local projectors. This
+boundary also covers the adjoint generator passed by destination screening.

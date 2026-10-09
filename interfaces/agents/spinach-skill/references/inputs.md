@@ -233,29 +233,29 @@ convention with `stev2sph(k,Bkq)`.
 ## Chemistry and kinetics
 
 ```matlab
-inter.chem.parts={1,2};                        % spin index sets per species
-inter.chem.rates=[-2e4   2e4
-                   2e4  -2e4];                 % Hz, columns sum to zero
+inter.chem.parts={1,2};
 inter.chem.concs=[1.0 1.0];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',2e4),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',2e4)};
 ```
 
-- `parts` — cell array of index vectors, one per chemical subsystem, disjoint
-  and within the spin count. The default is one subsystem containing everything.
-- `concs` — initial concentrations, one per subsystem, non-negative; mandatory
-  as soon as there is more than one subsystem.
-- `rates` — square first-order rate matrix in hertz, one row and column per
-  subsystem, column sums negligible (conservation of matter is checked). In
-  exchange mode all subsystems must have the same number of spins and identical
-  isotope sequences, so that spin *k* of species A maps onto spin *k* of B.
-- `flux_rate` and `flux_type` — magnetisation flux between individual spins;
-  an `nspins x nspins` real matrix and either `'intermolecular'` or
-  `'intramolecular'`. Both must be supplied together.
-- `rp_theory`, `rp_electrons`, `rp_rates` — radical pair recombination:
-  `'haberkorn'`, `'jones-hore'` or `'exponential'`; the two recombining
-  electron indices; and `[singlet_rate triplet_rate]` in hertz. All three
-  fields must appear together.
+- `parts` — disjoint spin-index vectors, one per substance; `[]` is a
+  spin-free pool. Reaction-bearing inputs require explicit parts.
+- `concs` — non-negative initial concentrations, one per substance;
+  thereafter concentrations are read from the propagated unit coordinates.
+- `reactions` — directed records with reactants, products, atom matching,
+  and rate. Matched spins must have identical isotopes; unmatched source
+  spins are traced out and new product spins arrive unpolarised. First-order
+  rates are in inverse seconds; order-m rates use concentration^(1-m)/s.
+- `closure` — additive by default, or product to retain cross-reactant
+  polarisation products. Selectors describe first-order spin-selective loss
+  and projected arrival; see the explicit-record section below.
 
-Any chemistry at all forces `bas.formalism='sphten-liouv'`.
+Legacy rates, flux, and radical-pair fields are rejected. The implemented
+reaction-record path requires `bas.formalism='sphten-liouv'`; chemistry-free
+systems remain available in the other formalisms.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
@@ -630,7 +630,7 @@ unweighted `coil_state` target, and `steady` pins the supplied concentrations.
 
 ### Reaction propagation
 
-`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
+`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Time-only rate callbacks are evaluated once per assembly and shared across voxels. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
 
 Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for a general reaction network. `kill_spin` rebuilds reaction matching and basis data, but refuses removal of selector electrons or changes to a substance carrying user-supplied selector matrices.
 

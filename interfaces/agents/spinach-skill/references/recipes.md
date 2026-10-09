@@ -377,8 +377,11 @@ for normalisation and the real sweep is `parameters.fields` in tesla, alongside
 permutation symmetry on equivalent protons via `bas.sym_spins`/`bas.sym_group`,
 and ZTE must remain off (do not add `'zte'` to `sys.enable`) because the singlet start state is not
 the thermal one. For Haberkorn or Jones-Hore kinetics use `@rydmr` with
-`inter.chem.rp_theory`, `rp_electrons` and `rp_rates` (Hz) supplied together;
-the two routes must not be mixed. Yield anisotropy uses `powder` with
+explicit `inter.chem.reactions` loss records with named singlet/triplet
+selectors (or their `jones-hore-` variants), electron indices, and numeric
+rates. Exactly one singlet-selector record defines the initial pair and
+yield prefactor in `rydmr`; the exponential and selector routes must not be
+mixed. See [relaxation](relaxation.md#chemical-kinetics) for record syntax. Yield anisotropy uses `powder` with
 `parameters.sum_up=0`, returning per-orientation yields plus the grid structure
 (`singlet_yield_anisotropy_1.m`). CIDNP is a different mechanism, handled
 phenomenologically with `magpump` in `cidnp_pumping_2.m`; the explicit geminate
@@ -407,22 +410,27 @@ functions from molecular dynamics are in `relaxation_theory/from_md`.
 ## Chemical kinetics and exchange
 
 `kinetics/exchange_symmetric.m` is the two-site template. Sites are chemical
-subsystems, the rate matrix has columns summing to zero, and the initial state
-is spread across subsystems with the `'chem'` qualifier.
+substances and reciprocal first-order records match their corresponding spins.
 
 ```matlab
-inter.chem.parts={<spin indices of site 1>,<spin indices of site 2>};
-inter.chem.rates=[-<k12> <k21>; <k12> -<k21>];   % Hz
+inter.chem.parts={1,2};
 inter.chem.concs=[<c1> <c2>];
-parameters.rho0=state(spin_system,'L+','<isotope>','chem');
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',<k12>),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',<k21>)};
+parameters.rho0=state(spin_system,'L+','<isotope>');
+parameters.coil=coil_state(spin_system,'L+','<isotope>','exact');
 ```
 
-Without `'chem'` the starting magnetisation would sit in one site only. Varying
-the rates to walk the spectrum through coalescence is the cheapest validation
-of an exchange model. `exchange_asymmetric.m` handles unequal populations,
-`flux_symmetric.m` irreversible flux, `glucose_exsy_a.m` two-dimensional EXSY,
-`relayed_hyperpol.m` polarisation relayed through a reaction, and
-`equilibrate(rates,concs)` the equilibrium composition of a rate matrix.
+Every `state` method weights each substance by its concentration; detection
+uses unweighted `coil_state`. The former `'chem'` method is deprecated.
+Varying rates through coalescence is a useful exchange-model check.
+`exchange_asymmetric.m` handles unequal populations, `flux_symmetric.m`
+symmetric intermolecular replacement, `glucose_exsy_a.m` two-dimensional
+EXSY, and `relayed_hyperpol.m` polarisation relayed through replacement.
+`equilibrate(rates,concs)` still accepts a standalone linear population-rate
+matrix; it is not a chemistry input to `create`.
 
 ## MRI, imaging, flow and diffusion
 

@@ -234,6 +234,8 @@ Any cross-substance entries in the Hamiltonian assembled from `I` and oriented
 Both `'IME'` and `'dibari'` require `inter.temperature`. IME needs the unit
 state population to be exactly 1; general propagation does not enforce initial
 normalisation, so a badly normalised state gives incorrect source amplitudes.
+IME requires block-diagonal relaxation: cross-substance entries of `R` raise
+`Spinach:thermalize:crossSubstanceRelaxation` even when they preserve unit states.
 
 In segmented `sphten-liouv`, `steady` initialises and pins the unit coordinate
 `bas.offsets(n)+1` of every substance to one; supplied guesses must obey the

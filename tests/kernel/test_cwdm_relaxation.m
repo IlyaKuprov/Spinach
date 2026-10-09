@@ -388,6 +388,33 @@ for method={'newton','squaring'}
     fprintf('CWDM_STEADY_POOL method=%s units=%s\n',method{1},mat2str(actual(units)'));
 end
 
+% IME requires independent relaxation blocks even when cross terms preserve trace
+sys=struct('magnet',1,'isotopes',{{'1H','1H'}});
+inter=struct(); inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+bas=struct('formalism','sphten-liouv','approximation',{{'none','none'}});
+s=test_spin_system(sys,inter,bas); unit=unit_state(s);
+rho_eq=unit+.1*state(s,'Lz',1)+.3*state(s,'Lz',2);
+R=-speye(s.bas.offsets(end)); units=s.bas.offsets(1:end-1)+1;
+R(units,units)=0; cross=R; cross(3,7)=.2; cross(7,3)=.2;
+result=test_true(result,'cross relaxation zero unit action',norm(cross*unit)==0,...
+                 'the fixture passes the existing already-thermalised check');
+rejected=false;
+try
+    thermalize(s,cross,[],[],rho_eq,'IME');
+catch err
+    rejected=strcmp(err.identifier,'Spinach:thermalize:crossSubstanceRelaxation');
+end
+result=test_true(result,'cross relaxation IME rejection',rejected,...
+                 'a trace-preserving cross-substance relaxation block is unsupported');
+fprintf('CWDM_IME_CROSS named_rejection=%d unit_action=%.16g\n',rejected,norm(cross*unit));
+
+% Supported IME direct sums annihilate the requested equilibrium at round-off
+actual=thermalize(s,R,[],[],rho_eq,'IME');
+result=test_close(result,'IME equilibrium stationary',actual*rho_eq,zeros(size(rho_eq)),...
+                  10*eps*norm(actual,'fro')*norm(rho_eq),0,...
+                  'independent IME blocks annihilate the unweighted target state');
+fprintf('CWDM_IME_STATIONARY residual=%.16g\n',norm(actual*rho_eq));
+
 end
 
 

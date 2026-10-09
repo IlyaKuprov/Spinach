@@ -43,3 +43,5 @@ Solid-effect coverage asserts the named segmented steady-state boundary with an 
 A two-substance Hilbert fixture converted by `sim2liouv` checks the named segmented Zeeman steady boundary for both methods, with empty and supplied initial guesses.
 
 Both DNP scan functions are called with complete two-substance inputs and must raise their named segmented-substance boundary rather than attempting a singular single-trace solve.
+
+A symmetric relaxation fixture with cross-substance active-state entries and exactly zero unit action must raise `Spinach:thermalize:crossSubstanceRelaxation` in IME. The corresponding supported block-diagonal operator must annihilate the supplied polarised unweighted target within `10*eps*norm(R_therm,'fro')*norm(rho_eq)` in the whole-vector two-norm.

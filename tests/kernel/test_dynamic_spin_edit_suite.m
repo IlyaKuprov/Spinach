@@ -234,26 +234,29 @@ result=test_true(result,'merge_inp rate arrays',isequal(inter.r1_rates,{0.1;0.2;
                  'merge_inp must merge per-spin rate cell arrays of either orientation into columns');
 result=test_true(result,'merge_inp index offsets',isequal(inter.srsk_sources,[1 3])&&...
                  isequal(inter.ignore,{[2 3]})&&isequal(inter.chem.parts,{1,[2 3]})&&...
-                 isequal(inter.chem.rates,zeros(2))&&isequal(inter.chem.concs,[1 1]),...
+                 isempty(inter.chem.reactions)&&isequal(inter.chem.concs,[1 1]),...
                  'merge_inp must offset spin and subsystem indices by preceding spin counts');
 result=test_true(result,'merge_inp suscept centres',isequal(inter.suscept.chi,{0.01*eye(3)})&&...
                  isequal(inter.suscept.xyz,{[5 5 5]}),...
                  'merge_inp must concatenate susceptibility centre lists across subsystems');
 
-% Check column-oriented subsystem lists and partless chemistry
+% Check column-oriented subsystem lists and reaction selector offsets
 [sys_parts,inter_parts]=local_merge_parts();
 inter_parts{2}.chem.parts={1;2};
 [~,inter]=merge_inp(sys_parts,inter_parts);
 result=test_true(result,'merge_inp column parts',isequal(inter.chem.parts,{1,2,3}),...
                  'column-oriented chemical part lists must merge into offset row lists');
 [sys_parts,inter_parts]=local_merge_parts();
-inter_parts{1}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
-inter_parts{2}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
+reaction=struct('reactants',1,'products',[],'matching',zeros(0,2),...
+                'rate',1e6,'selector',{{'singlet',[1 2]}},'loss','haberkorn');
+inter_parts{1}.chem.reactions={}; inter_parts{2}.chem.reactions={reaction};
 inter_parts{1}.tau_c={1e-9}; inter_parts{2}.tau_c={1e-9};
 [~,inter]=merge_inp(sys_parts,inter_parts);
-result=test_true(result,'merge_inp partless chem',isequal(inter.tau_c,{1e-9})&&...
-                 isequal(inter.chem.rp_electrons,[1 2]),...
-                 'chemistry without a species split must keep tau_c common and offset electron indices');
+result=test_true(result,'merge_inp reaction selector offsets',...
+                 isequal(inter.tau_c,{1e-9,1e-9})&&...
+                 isequal(inter.chem.reactions{1}.selector{2},[2 3])&&...
+                 isequal(inter.chem.reactions{1}.reactants,2),...
+                 'explicit reaction parts concatenate correlation times and offset selector spins and substances');
 
 % Check that non-extensive differences and malformed inputs are refused
 [sys_parts,inter_parts]=local_merge_parts();
@@ -327,9 +330,7 @@ spin_system.rlx.srsk_sources=[1 3];
 
 % Define chemistry arrays affected by spin removal
 spin_system.chem.parts={[1 2 3]};
-spin_system.chem.flux_rate=[];
-spin_system.chem.rp_electrons=[];
-spin_system.chem.rp_rates=[];
+spin_system.chem.reactions={};
 
 end
 
@@ -366,7 +367,7 @@ inter_parts{1}.ignore={};
 inter_parts{1}.suscept.chi={0.01*eye(3)};
 inter_parts{1}.suscept.xyz={[5 5 5]};
 inter_parts{1}.chem.parts={1};
-inter_parts{1}.chem.rates=0;
+inter_parts{1}.chem.reactions={};
 inter_parts{1}.chem.concs=1;
 
 % Build second subsystem input structures
@@ -388,7 +389,7 @@ inter_parts{2}.ignore={[1 2]};
 inter_parts{2}.suscept.chi={};
 inter_parts{2}.suscept.xyz={};
 inter_parts{2}.chem.parts={[1 2]};
-inter_parts{2}.chem.rates=0;
+inter_parts{2}.chem.reactions={};
 inter_parts{2}.chem.concs=1;
 
 end

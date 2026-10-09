@@ -110,8 +110,8 @@ result=test_close(result,'T11 additive order',coil'*(K(0,eta)*eta),0,1e-10,0,...
 % Partial tracing destroys unmatched source orders and creates only identity
 traced=struct('reactants',3,'products',1,'matching',[3 1],'rate',2);
 partial=s; partial.chem.reactions={traced}; partial.chem.reactions{1}.closure='additive';
-Ktrace=kinetics(partial); source=coil_state(s,{'Lz','Lz'},{3,4});
-result=test_close(result,'unmatched source trace',Ktrace*source,-2*source,1e-12,0,...
+trace_gen=kinetics(partial); source=coil_state(s,{'Lz','Lz'},{3,4});
+result=test_close(result,'unmatched source trace',trace_gen*source,-2*source,1e-12,0,...
                   'an order involving a traced spin has no product arrival');
 
 % Report missing source orders when a reactant basis is truncated
@@ -130,9 +130,9 @@ catch err
     rejected=strcmp(err.identifier,'Spinach:react_gen:repeatedMatching');
 end
 result=test_true(result,'repeated matching guard',rejected,'global spin labels cannot identify molecular occurrences');
-bad=s; bad.chem.reactions{1}.rate=@(t)-1; Kbad=kinetics(bad); rejected=false;
+bad=s; bad.chem.reactions{1}.rate=@(t)-1; bad_gen=kinetics(bad); rejected=false;
 try
-    Kbad(0,eta);
+    bad_gen(0,eta);
 catch err
     rejected=strcmp(err.identifier,'Spinach:kinetics:rateValue');
 end

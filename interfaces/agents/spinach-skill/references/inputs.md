@@ -636,3 +636,11 @@ unweighted `coil_state` target, and `steady` pins the supplied concentrations.
 `kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix; mass action and time-rate records give `K(t,eta)`. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
 
 Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for a general reaction network. `kill_spin` rebuilds reaction matching and basis data, but refuses removal of selector electrons or changes to a substance carrying user-supplied selector matrices.
+
+### Intermolecular spin replacement
+
+For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B` record with matching that swaps those spins and retains the others. Departing-spin intramolecular correlations are destroyed; unaffected internal orders are retained. The concentrations are invariant because both sides have identical stoichiometry. With time-independent rates and no other concentration-changing reactions, evaluate the returned handle once at `unit_state(spin_system)` to obtain the constant additive generator for ordinary linear propagation. Do not freeze general mass-action or product-closure chemistry this way.
+
+Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_network`, and `cidnp_transport`; their corresponding registered tests cover mass action, the two closures, selective loss, and integrated nuclear product arrival.
+
+Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.

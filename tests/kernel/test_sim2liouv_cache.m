@@ -80,6 +80,52 @@ for form_idx=1:numel(forms)
                       'non-Hilbert formalisms must be returned unchanged');
 end
 
+% Reject cross-substance entries in generators and standard parameter matrices
+sys.isotopes={'1H','1H','1H'}; sys.enable={};
+inter=struct(); inter.chem.parts={1,2:3}; inter.chem.concs=[1 0];
+bas.formalism='zeeman-hilb'; bas.approximation={'none','none'};
+segmented=test_spin_system(sys,inter,bas);
+for position={[1 3],[3 1]}
+    cross=sparse(position{1}(1),position{1}(2),1,6,6);
+    for n=1:3
+        generators={[],[],[]}; generators{n}=cross; rejected=false;
+        try
+            sim2liouv(segmented,struct(),generators{:});
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:sim2liouv:crossSubstance');
+        end
+        result=test_true(result,['cross generator ' num2str(n) ' ' mat2str(position{1})],...
+                         rejected,'conversion must not silently discard cross-substance terms');
+    end
+    for field={'pulse_op','mw_oper','ez_oper','homodec_oper','rho0','coil','screen'}
+        params=struct(); params.(field{1})=cross; rejected=false;
+        if ismember(field{1},{'rho0','coil','screen'})
+            params.(field{1})=[sparse(6,6) cross];
+        end
+        try
+            sim2liouv(segmented,params,[],[],[]);
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:sim2liouv:crossSubstance');
+        end
+        result=test_true(result,['cross parameter ' field{1} ' ' mat2str(position{1})],...
+                         rejected,'operator and horizontal state stacks cannot lose cross-substance terms');
+    end
+end
+
+% Preserve valid block-diagonal generators and sparse horizontal state stacks
+H=blkdiag(sparse([1 2;3 4]),speye(4));
+params=struct('rho0',[H 2*H],'pulse_op',H);
+[~,converted,h_out]=sim2liouv(segmented,params,H,[],[]);
+result=test_close(result,'segmented generator conversion',h_out,...
+                  blkdiag(hilb2liouv(H(1:2,1:2),'comm'),hilb2liouv(H(3:6,3:6),'comm')),...
+                  0,0,'valid substance blocks retain their independent commutators');
+result=test_close(result,'segmented pulse conversion',converted.pulse_op,h_out,0,0,...
+                  'operator-like parameters retain both independent blocks');
+unit=H(3:6,3:6); first=H(1:2,1:2); expected=[first(:);unit(:)];
+result=test_close(result,'segmented state stack',converted.rho0,[expected 2*expected],0,0,...
+                  'sparse horizontal stacks preserve their substance and state ordering');
+inter=struct(); bas.approximation={'none'};
+
 % Acquire a complex FID after a noncommuting phase-shifted soft pulse
 sys.magnet=1; sys.isotopes={'1H'}; sys.enable={'op_cache','ham_cache'};
 inter.zeeman.scalar={0}; bas.formalism='zeeman-hilb';

@@ -570,7 +570,9 @@ Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
 block must use `none`, as enforced by `basis`.
 
 `sim2liouv` accepts sparse horizontal density-matrix stacks and preserves their
-column order while extracting each substance block.
+column order while extracting each substance block. Segmented generators,
+operator-like parameters, and state stacks must be block diagonal in substance;
+nonzero cross-substance entries raise `Spinach:sim2liouv:crossSubstance`.
 
 Synthetic compiled-system fixtures must supply offsets and local descriptor
 cells too; bypassing `basis` does not restore the retired global layout.

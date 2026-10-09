@@ -47,3 +47,5 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 ## References
 
 - Spinach Wiki: [sim2liouv.m](https://spindynamics.org/wiki/index.php?title=sim2liouv.m)
+
+Segmented Hilbert inputs are validated for nonzero cross-substance entries before conversion. H, R, K, every converted operator-like parameter, and every horizontal matrix in rho0/coil/screen must be block diagonal; otherwise `Spinach:sim2liouv:crossSubstance` is raised. Sparse nonzero indices are inspected without allocating a dense block mask.

@@ -69,6 +69,10 @@
 %       ted R stays block-diagonal in the irrep table that reduce.m
 %       evolves independently.
 %
+% Note: segmented Hilbert inputs must be block diagonal in substance;
+%       cross-substance entries in generators and parameter matrices
+%       are rejected rather than discarded during conversion.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sim2liouv.m>
@@ -196,6 +200,23 @@ if ~isstruct(parameters)
 end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))
     error('H, R, and K must be numeric arrays.');
+end
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&spin_system.bas.nsubst>1
+    fields={'pulse_op','mw_oper','ez_oper','homodec_oper','rho0','coil','screen'};
+    fields=fields(isfield(parameters,fields));
+    matrices=[{H,R,K} cell(1,numel(fields))];
+    for n=1:numel(fields)
+        matrices{n+3}=parameters.(fields{n});
+    end
+    membership=repelem((1:spin_system.bas.nsubst)',spin_system.bas.nstates);
+    for n=1:numel(matrices)
+        [rows,cols]=find(matrices{n});
+        cols=mod(cols-1,spin_system.bas.offsets(end))+1;
+        if any(membership(rows)~=membership(cols))
+            error('Spinach:sim2liouv:crossSubstance',...
+                  'Hilbert inputs must not contain cross-substance matrix entries.');
+        end
+    end
 end
 end
 

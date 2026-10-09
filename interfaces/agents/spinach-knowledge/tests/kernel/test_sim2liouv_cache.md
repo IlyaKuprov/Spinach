@@ -31,3 +31,5 @@ result = test_sim2liouv_cache()
 
 - [sim2liouv](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sim2liouv.m) — Hilbert-to-Liouville conversion under test.
 - [Spinach GitHub repository](https://github.com/IlyaKuprov/Spinach)
+
+A segmented two-plus-four-dimensional fixture rejects nonzero entries in both off-diagonal substance blocks of H, R, K, all four operator-like fields, and the second member of each horizontal state stack. A valid sparse block-diagonal generator, pulse operator, and two-state stack are compared exactly with independent substance conversions.

@@ -650,6 +650,6 @@ Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: ch
 `create(sys)` without interaction input remains supported; it uses an empty
 interaction structure and the ordinary one-substance/unit-concentration defaults.
 
-`reduce` rejects cross-substance entries in caller-supplied generators at the
+In chemistry-free systems, `reduce` rejects cross-substance entries in caller-supplied generators at the
 compiled spin dimension before building substance-local projectors. This
 boundary also covers the adjoint generator passed by destination screening.

@@ -12,7 +12,7 @@ The local projector cells in `bas.sym_fact(n)` are embedded at `bas.offsets(n)` 
 
 ## Reduction path
 
-Input validation rejects nonzero cross-substance blocks with `Spinach:reduce:crossSubstanceGenerator` when `L` has the compiled spin dimension and there is more than one substance. This check precedes projector construction and applies also to adjoint generators supplied by destination screening. Enlarged spatial-spin inputs are not interpreted using spin-only offsets.
+Input validation rejects nonzero cross-substance blocks with `Spinach:reduce:crossSubstanceGenerator` when `L` has the compiled spin dimension, there is more than one substance, and no reaction records are declared. This check precedes projector construction and applies also to adjoint generators supplied by destination screening. Enlarged spatial-spin inputs are not interpreted using spin-only offsets.
 
 After validation, the source checks whether trajectory-level reduction is disabled by `spin_system.sys.disable` containing `'trajlevel'`; if so, it reports the setting and returns the unit projector `1`. Otherwise the available operations depend on `spin_system.bas.formalism` and the disable settings.
 
@@ -33,3 +33,4 @@ Use each projector `P` as documented by the source: `L_reduced=P'*L*P` for matri
 - http://dx.doi.org/10.1016/j.jmr.2008.08.008
 - http://dx.doi.org/10.1063/1.3398146
 - http://dx.doi.org/10.1016/j.jmr.2011.03.010
+

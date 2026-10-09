@@ -19,7 +19,14 @@ L=H+1i*R+1i*K;
 ```
 
 `R=relaxation(spin_system,euler_angles)` and `K=kinetics(spin_system)`;
-contexts assemble this for you. The Euler angles are optional and used only
+standard contexts supply these terms to their sequence when `K` is a matrix.
+A nonzero higher-order network or time-dependent rate produces `K(t,eta)`,
+which ordinary sequences such as COSY and NOESY cannot add to matrices.
+Use the `step`/`iserstep` generator-handle route, or a custom sequence that
+evaluates the handle at the required stage time and state; passing such a
+network to a standard linear sequence is not supported. For example, a
+chemistry-only step uses `{ @(t,eta)1i*K(t,eta), t, 'RKMK4' }`.
+The Euler angles are optional and used only
 by theories supporting relaxation anisotropy: `powder` recomputes `R` at
 every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic

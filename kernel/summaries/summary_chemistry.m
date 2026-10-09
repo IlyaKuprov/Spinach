@@ -1,4 +1,4 @@
-% Prints chemical subsystem and exchange summary for a Spinach system. Syntax:
+% Prints chemical subsystem and reaction summary for a Spinach system. Syntax:
 %
 %                 summary_chemistry(spin_system)
 %
@@ -20,43 +20,30 @@ function summary_chemistry(spin_system)
 % Check consistency
 grumble(spin_system);
 
-% Report multiple chemical subsystems
-if numel(spin_system.chem.parts)>1
-
-    % Report spin system partitioning
-    for n=1:numel(spin_system.chem.parts)
-        report(spin_system,['chemical subsystem ' num2str(n) ' contains spins: ' num2str(spin_system.chem.parts{n})]);
-    end
-
-    % Report first-order reaction rates
-    if isfield(spin_system.chem,'rates')
-        report(spin_system,'inter-subsystem reaction rates:');
-        report(spin_system,'===============================');
-        report(spin_system,' N(from)   N(to)    Rate(Hz)   ');
-        report(spin_system,'-------------------------------');
-        [rows,cols,vals]=find(spin_system.chem.rates-diag(diag(spin_system.chem.rates)));
-        for n=1:length(vals)
-            report(spin_system,[' ' strjust([num2str(cols(n)) blanks(3-length(num2str(cols(n))))],'left') '       '...
-                                    strjust([num2str(rows(n)) blanks(3-length(num2str(rows(n))))],'left') '      '...
-                                             num2str(vals(n),'%+0.3e')]);
-        end
-        report(spin_system,'===============================');
-    end
-
+% Report substance membership and initial concentration
+for n=1:numel(spin_system.chem.parts)
+    report(spin_system,['chemical subsystem ' num2str(n) ': spins ['...
+                       num2str(spin_system.chem.parts{n}(:)') '], concentration '...
+                       num2str(spin_system.chem.concs(n))]);
 end
 
-% Report flux rates if specified
-if isfield(spin_system.chem,'flux_rate')
-    [rows,cols,vals]=find(spin_system.chem.flux_rate);
-    if numel(vals)>0
-        report(spin_system,'point-to-point flux rates:');
-        report(spin_system,'===============================');
-        report(spin_system,' N(from)   N(to)    Rate(Hz)   ');
-        report(spin_system,'-------------------------------');
-        for n=1:length(vals)
-            report(spin_system,[' ' strjust([num2str(rows(n)) blanks(3-length(num2str(rows(n))))],'left') '       '...
-                                    strjust([num2str(cols(n)) blanks(3-length(num2str(cols(n))))],'left') '      '...
-                                             num2str(vals(n),'%+0.3e')]);
+% Report explicit reaction records and their closures
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
+    if isa(reaction.rate,'function_handle')
+        rate_text=func2str(reaction.rate);
+    else
+        rate_text=num2str(reaction.rate);
+    end
+    report(spin_system,['reaction ' num2str(n) ': [' num2str(reaction.reactants)...
+                       '] -> [' num2str(reaction.products) '], rate ' rate_text...
+                       ', closure ' reaction.closure]);
+    report(spin_system,['matched spin pairs: ' mat2str(reaction.matching)]);
+    if isfield(reaction,'selector')
+        if ischar(reaction.selector{1})
+            report(spin_system,['selector: ' reaction.selector{1}]);
+        else
+            report(spin_system,'selector: user product superoperator pair');
         end
     end
 end

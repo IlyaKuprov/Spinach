@@ -46,4 +46,14 @@ Zero track elimination is off by default. Add `'zte'` to `sys.enable` to opt in;
 
 Absent `inter.chem.parts` defaults to a single block containing all spins. A single substance defaults to concentration 1. Empty parts are accepted as spin-free substances; spin lists are sorted in the compiled object. Basis settings are supplied subsequently to `basis`, which validates their per-substance cell cardinality.
 
+## Explicit reaction records
+
+`inter.chem` accepts `parts`, `concs`, and `reactions`. Each reaction is a scalar structure with row-vector `reactants` and `products`, a two-column global-spin `matching` table, and a finite non-negative scalar `rate` or time function handle. Repeated substance indices encode stoichiometry; empty products encode untracked loss. Matched spins must belong to the declared sides, have identical isotopes, and appear at most once per matching column. Unmatched source spins are traced out and unmatched product spins arrive unpolarised when the generator is compiled.
+
+`closure` is `additive` by default or `product`. Optional selectors apply to a single first-order reactant: a named singlet/triplet (including Jones–Hore channel variants) with two distinct electron indices, or a pair of finite square product superoperators of equal size. Their basis dimensions are resolved by generator compilation, not by create. Legacy `rates`, `flux_rate`, `flux_type`, `rp_theory`, `rp_rates`, and `rp_electrons` inputs raise `Spinach:create:retiredChemistry` naming the replacement record format.
+
 Concentrations must be a finite, real, non-negative vector with one entry per substance, including spin-free substances. Zero concentrations are valid.
+
+## Explicit NZ evaluation point
+
+`inter.nz_shift` must be an explicit finite scalar with non-negative real part. The former `'chem'` request is rejected by `create`: a general reaction network does not specify a unique scalar lifetime. For a legacy exponential radical-pair model use the summed channel rates; for the legacy Haberkorn/Jones–Hore scalar approximation use half their sum, stating that approximation explicitly in the example. `relaxation` uses the supplied scalar without reading retired radical-pair fields.

@@ -8,7 +8,7 @@
 % Parameters:
 %
 %     L   -  Liouvillian matrix; in the compiled substance space,
-%            cross-substance blocks must be zero
+%            cross-substance blocks require declared reaction records
 %
 %     rho -  initial state (source state screening) or
 %            destination state (destination state screening)
@@ -32,7 +32,8 @@
 %        Briefly, the function tries symmetry factorisation, fol-
 %        lowed by zero track elimination when sys.enable contains
 %        'zte', then disconnected subspace identification by path
-%        tracing.
+%        tracing. Reaction records bypass spin-only symmetry blocks,
+%        because atom transport need not preserve those subspaces.
 %
 % ilya.kuprov@weizmann.ac.il
 % matthew.krzystyniak@oerc.ox.ac.uk
@@ -51,9 +52,9 @@ if ismember('trajlevel',spin_system.sys.disable)
     projectors{1}=1; return
 end
 
-% Embed spin irreps only for generators in the compiled spin space
+% Reaction maps need not preserve the spin-only substance irreps
 irr_projectors={}; irr_dimensions=[];
-if size(L,1)==spin_system.bas.offsets(end)
+if size(L,1)==spin_system.bas.offsets(end)&&isempty(spin_system.chem.reactions)
     for s=1:spin_system.bas.nsubst
         for n=1:numel(spin_system.bas.sym_fact(s).irr_dimensions)
             P=spin_system.bas.sym_fact(s).irr_projectors{n};
@@ -228,7 +229,7 @@ switch spin_system.bas.formalism
         elseif isempty(irr_projectors)
             
             % Inform the user
-            report(spin_system,'no permutation symmetry information has been supplied.');
+            report(spin_system,'no independent permutation symmetry blocks are available.');
             
             % Run zero track elimination
             report(spin_system,'attempting zero track elimination...');
@@ -334,7 +335,8 @@ end
 if size(L,1)~=size(L,2)
     error('L must be a square matrix.');
 end
-if spin_system.bas.nsubst>1&&size(L,1)==spin_system.bas.offsets(end)
+if spin_system.bas.nsubst>1&&size(L,1)==spin_system.bas.offsets(end)&&...
+   isempty(spin_system.chem.reactions)
     for n=1:spin_system.bas.nsubst
         idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
         if nnz(L(idx,:))~=nnz(L(idx,idx))

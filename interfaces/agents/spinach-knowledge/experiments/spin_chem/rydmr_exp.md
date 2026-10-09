@@ -6,7 +6,7 @@ Reference: [DOI 10.1080/00268979809483134](https://doi.org/10.1080/0026897980948
 
 Signature: `answer=rydmr_exp(spin_system,parameters,H,R,K)`
 
-This routine computes singlet-singlet radical-pair yields over field and singlet-recombination-rate inputs with the exponential-recombination treatment described by the cited paper. It expects a unit primary magnet specification (`sys.magnet=1`), and the supplied system magnet must equal one. Its source note says this function supplies exponential recombination itself, so do not combine it with a separate `inter.chem.rp_rates` setting.
+This routine computes singlet-singlet radical-pair yields over field and singlet-recombination-rate inputs with the exponential-recombination treatment described by the cited paper. It expects a unit primary magnet specification (`sys.magnet=1`), and the supplied system magnet must equal one. Its source note says this function supplies exponential recombination itself, so do not combine it with additional recombination loss records in `inter.chem.reactions`.
 
 The parameter row vector `fields` contains magnetic fields in tesla; `rates` contains singlet recombination rates in Hz. `electrons` gives the two electron indices in the isotope list, with `[1 2]` as the source example. The function checks that they are two positive integer indices within the system and that both selected spins are electrons. The caller should request `'zeeman_op'` in `parameters.needs` so the context supplies the field-sweep operator `parameters.hzeeman`. The routine also takes same-sized numeric matrix inputs `H`, `R`, and `K`.
 

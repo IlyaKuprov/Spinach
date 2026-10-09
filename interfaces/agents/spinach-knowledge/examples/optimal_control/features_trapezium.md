@@ -17,3 +17,4 @@ The six controls are `Lx` and `Ly` on each isotope, with channel map `[1;1;2;2;3
 For the follow-up simulation, each slice uses generators formed from the left, midpoint and right endpoint controls, then advances the state with `step`. The script computes and reports the real initial-to-target overlap. The iteration limit and requested report do not establish convergence or provide a measured fidelity in this source.
 
 Source: [examples/optimal_control/features_trapezium.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_trapezium.m).
+The initial and target operator vectors are constructed with unweighted `coil_state` before norm normalisation. This single-substance model has no chemical reactions.

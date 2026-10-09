@@ -10,7 +10,7 @@ Documented operator labels include `E`, `Lz`, `Lx`, `Ly`, `L+`, `L-`, `Tl,m`, an
 
 ## Basis and index construction
 
-The routine passes the request to `human2opspec`, then assembles each returned specification. In Zeeman formalisms it maps each per-spin linear specification through `lin2lm` to `L,M`, selects `irr_sph_ten(mults(k),L){L-M+1}` for that spin, and Kronecker-products the local matrices in specification order. In `zeeman-liouv` the resulting Hilbert operator is converted by `hilb2liouv`. In `sphten-liouv` it calls `superop` for each specification and confines any identity term to the selected substance. The code uses a sum of the resulting terms with their returned coefficients.
+The routine passes the request to `human2opspec`, then assembles each returned specification. In Zeeman formalisms it maps each per-spin linear specification through `lin2lm` to `L,M`, selects `irr_sph_ten(mults(k),L){L-M+1}` for that spin, and Kronecker-products the local matrices in specification order. In `zeeman-liouv` the resulting Hilbert operator is converted by `hilb2liouv`. In `sphten-liouv` it calls `superop` for each specification and confines any identity term to the selected substance. The code uses a sum of the resulting terms with their returned coefficients. The substance selector is defined before parallel assembly even for single-substance sum requests, where no block confinement is needed.
 
 For Liouville calculations the documented `operator_type` values are `left`, `right`, `comm` (default), and `acomm`. Hilbert formalisms ignore this option. A Liouville product request represents the superoperator of the full product operator, not a product of separately generated single-spin superoperators.
 

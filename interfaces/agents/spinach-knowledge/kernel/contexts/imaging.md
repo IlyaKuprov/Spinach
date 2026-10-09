@@ -27,3 +27,5 @@ The Hamiltonian and kinetics are shared across voxels. Relaxation is assembled f
 For example, choose `parameters.deriv={'fourier'}` or `parameters.deriv={'period',n}` according to the requested spatial derivative scheme; the source gives these selector forms but no complete numerical imaging setup.
 
 The compiled terminal offset is the spin dimension across all substances; phantom spin operators and states must use that direct-sum ordering.
+
+Imaging rejects active compiled symmetry projectors. A declared symmetry group disabled through `sys.disable` leaves identity projectors and is accepted, just as an undeclared group is.

@@ -262,7 +262,9 @@ if isfield(parameters,'image_size')&&(~all(mod(parameters.image_size,2)))
 end
 
 % Enforce no irrep mathematics
-if isfield(spin_system.bas,'sym_group')&&any(~cellfun(@isempty,spin_system.bas.sym_group))
+if any(arrayfun(@(x)numel(x.irr_projectors)~=1||...
+                   ~isequal(x.irr_projectors{1},speye(size(x.irr_projectors{1},1))),...
+                   spin_system.bas.sym_fact))
     error('symmetry treatment is not supported in imaging simulations.');
 end
 

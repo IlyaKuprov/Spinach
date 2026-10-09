@@ -588,3 +588,6 @@ Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
 use `bas.offsets(end)`. Identity states retain the selected substance: each
 selected spin contributes one local unit in a sum, a local product contributes
 once, and `chem` weights that unit by its hosting concentration.
+
+Imaging tests the compiled symmetry projectors, so a declared group disabled
+through `sys.disable` does not prevent an imaging calculation.

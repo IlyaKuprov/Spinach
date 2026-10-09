@@ -107,6 +107,7 @@ if ismember('op_cache',spin_system.sys.enable)
 end
 
 % Product specifications must belong to one substance
+subst=[];
 if iscell(spins), subst=which_subst(spin_system,cell2mat(spins)); end
 
 % Retain spin selection before identity descriptors lose their labels

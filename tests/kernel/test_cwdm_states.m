@@ -96,6 +96,18 @@ result=test_true(result,'spin-free equilibrium',isequal(equilibrium(empty),unit_
 fprintf('CWDM_T6 exact_weighting=1 zero_population=1 spin_free=1 thermal_error=%.16g\n',...
         norm(equilibrium(s)-vertcat(reference{:}),inf));
 
+% Keep storage-only wavefunction probabilities independent of concentration
+sys=struct('magnet',0,'isotopes',{{'1H'}}); inter=struct();
+inter.chem.parts={1};
+bas=struct('formalism','zeeman-wavef','approximation',{{'none'}});
+for concentration=[0 0.3 2]
+    inter.chem.concs=concentration;
+    s=test_spin_system(sys,inter,bas); psi=state(s,0.5);
+    result=test_true(result,'unweighted wavefunction',isequal(psi,[1;0]),...
+                     'storage-only kets retain unit probability at every concentration');
+end
+fprintf('CWDM_WAVEFUNCTION norm_squared=%.16g\n',norm(psi)^2);
+
 end
 
 

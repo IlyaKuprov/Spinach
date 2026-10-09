@@ -22,6 +22,8 @@
 %        Isotope filters with no surviving local spins are removed.
 %        Retained depths are capped by the surviving local populations;
 %        vector depths use the particle-type bounds enforced by basis.
+%        IK-DNP or IK-SBS losing a required particle class switches to
+%        IK-0 at the surviving class depth, without connectivity pruning.
 %        Symmetry and assumption information is cleared; call assume
 %        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
@@ -100,6 +102,14 @@ if isfield(spin_system,'bas')
                 bas.inter_level{n}(1)=min(bas.inter_level{n}(1),nnz(modes));
                 bas.inter_level{n}(2)=min(bas.inter_level{n}(2),nnz(modes)+nspins);
                 bas.inter_level{n}(3)=min(bas.inter_level{n}(3),nspins);
+            end
+
+            % Retain the surviving class depth without a two-class graph requirement
+            if ismember(bas.approximation{n},{'IK-DNP','IK-SBS'})&&...
+               any(bas.inter_level{n}([1 3])==0)
+                bas.approximation{n}='IK-0';
+                bas.inter_level{n}=max(1,max(bas.inter_level{n}([1 3])));
+                if isfield(bas,'connectivity'), bas.connectivity{n}=[]; end
             end
         end
     end

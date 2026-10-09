@@ -553,7 +553,9 @@ filters are removed when no matching spin survives in their own substance;
 empty substances keep their unit coordinate. Retained `inter_level`, `prox_level`,
 and `space_level` depths are capped by each substance's surviving particle count
 before the rebuild. IK-DNP vector components also respect electron and nucleus
-counts; IK-SBS components respect mode, total active-particle, and spin counts. Symmetry and Hamiltonian assumptions
+counts; IK-SBS components respect mode, total active-particle, and spin counts.
+Losing a required class in IK-DNP or IK-SBS selects IK-0 at the surviving
+class depth (at least one), without connectivity pruning. Symmetry and Hamiltonian assumptions
 are cleared, so reapply `assume` before constructing a Hamiltonian.
 
 Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;

@@ -35,3 +35,8 @@ Longitudinal and zero-quantum isotope filters are tested after partial isotope r
 IK-0, IK-1, and IK-2 basis-bearing fixtures test local depth clipping through both `kill_spin` and `dilute`. The affected three-spin substance shrinks to two spins, while an unaffected three-spin substance retains its smaller depth of two. Both `prox_level` and the `space_level` alias are exercised for IK-1/IK-2; retained depth cells, descriptors, offsets, and hashes must match explicitly capped basis settings.
 
 IK-DNP and IK-SBS vector-depth fixtures separately remove an electron/mode or a nucleus/spin while retaining both particle classes. The resulting depth vectors, descriptors, and hashes must match a rebuild with explicitly bounded settings.
+
+Last-class fixtures remove all electrons or nuclei from IK-DNP, and all modes
+or spins from IK-SBS. Each surviving substance must match an explicit IK-0
+rebuild at its surviving class depth, including descriptors, offsets, and hash;
+a separate substance must retain its descriptor and settings.

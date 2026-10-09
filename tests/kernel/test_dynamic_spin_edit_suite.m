@@ -156,6 +156,38 @@ for approximation={'IK-DNP','IK-SBS'}
     end
 end
 
+% Remove the last required particle class while another substance is untouched
+for approximation={'IK-DNP','IK-SBS'}
+    sys=struct('magnet',1);
+    if strcmp(approximation{1},'IK-DNP')
+        sys.isotopes={'E','E','1H','13C','19F'};
+    else
+        sys.isotopes={'C3','V3','1H','13C','19F'};
+    end
+    inter=struct(); inter.chem.parts={1:4,5}; inter.chem.concs=[1 1];
+    depths=struct('formalism','sphten-liouv');
+    depths.approximation={approximation{1},'IK-0'}; depths.inter_level={[2 3 1],1};
+    if strcmp(approximation{1},'IK-SBS'), depths.connectivity={'full_tensors',[]}; end
+    based=test_spin_system(sys,inter,depths);
+    for removed={1:2,3:4}
+        actual=kill_spin(based,removed{1}); expected=depths;
+        expected.approximation{1}='IK-0'; expected.inter_level{1}=1;
+        if isequal(removed{1},3:4), expected.inter_level{1}=2; end
+        if isfield(expected,'connectivity'), expected.connectivity{1}=[]; end
+        rebuilt=basis(actual,expected);
+        result=test_true(result,['last class ' approximation{1} ' ' mat2str(removed{1})],...
+                         isequal(actual.bas.approximation,expected.approximation)&&...
+                         isequal(actual.bas.inter_level,expected.inter_level)&&...
+                         isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                         isequal(actual.bas.basis{2},based.bas.basis{2})&&...
+                         isequal(actual.bas.offsets,rebuilt.bas.offsets)&&...
+                         strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                         'the surviving correlation bound becomes IK-0 and the other substance is unchanged');
+        fprintf('CWDM_KILL_LAST_CLASS %s removed=%s approximation=%s depth=%d\n',...
+                approximation{1},mat2str(removed{1}),actual.bas.approximation{1},actual.bas.inter_level{1});
+    end
+end
+
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);
 result=test_true(result,'kill_spin logical mask',isequal(logical_trimmed.comp.isotopes,trimmed.comp.isotopes)&&...

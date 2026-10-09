@@ -202,7 +202,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     end
     for n=1:numel(units)
         active=(units(n)+1):spin_system.bas.offsets(n+1);
-        if norm(P(active,units(n)),2)==0
+        if (~isempty(active))&&(norm(P(active,units(n)),2)==0)
             error('Spinach:steady:unthermalisedSubstance',...
                   'the relaxation superoperator must be thermalised in substance %d.',n);
         end

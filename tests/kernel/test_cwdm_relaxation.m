@@ -371,6 +371,23 @@ expected=repmat(parameters.coil'*parameters.rho0,3,1);
 result=test_close(result,'single field scan zero drive',actual,expected,...
                   1e-12,1e-12,'longitudinal equilibrium survives a zero-drive field scan');
 
+% A spin-free pool has no active rows and must not be mistaken for an
+% unthermalised substance: its steady state is its unit coordinate
+sys=struct('magnet',1,'isotopes',{{'1H'}});
+inter=struct(); inter.chem.parts={1,[]}; inter.chem.concs=[0.7 0.3];
+inter.relaxation={'t1_t2'}; inter.r1_rates={1}; inter.r2_rates={3};
+inter.equilibrium='IME'; inter.temperature=298; inter.rlx_keep='secular';
+bas=struct('formalism','sphten-liouv','approximation',{{'none','none'}});
+pool=assume(test_spin_system(sys,inter,bas),'nmr');
+P=expm(full(relaxation(pool))); units=pool.bas.offsets(1:end-1)+1;
+for method={'newton','squaring'}
+    actual=steady(pool,P,[],method{1});
+    result=test_true(result,['steady spin-free pool ' method{1}],...
+                     all(actual(units)==1)&&(numel(actual)==pool.bas.offsets(end)),...
+                     'a spin-free pool keeps its unit coordinate without a thermalisation source');
+    fprintf('CWDM_STEADY_POOL method=%s units=%s\n',method{1},mat2str(actual(units)'));
+end
+
 end
 
 

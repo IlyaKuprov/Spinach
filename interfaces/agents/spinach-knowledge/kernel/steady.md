@@ -10,7 +10,7 @@ Finds a state fixed by repeated application of the same propagator: the returned
 
 Only `sphten-liouv` and `zeeman-liouv` are accepted. `P` must be numeric and square, and `rho` a numeric column vector. If `rho` is omitted or empty, the default is a vector with entry 1 at every substance unit coordinate `bas.offsets(1:end-1)+1` in `sphten-liouv`, or the vectorised identity divided by the Hilbert-space dimension in `zeeman-liouv`.
 
-For a supplied initial state, `sphten-liouv` requires every substance unit coordinate to equal 1; `zeeman-liouv` requires unit trace within `1e-10`. The solver also checks the formalism-specific trace-conservation and thermalisation conditions on `P`. In `sphten-liouv`, each unit column must drive a non-unit coordinate inside its own offsets block; otherwise `Spinach:steady:unthermalisedSubstance` identifies the unthermalised substance. A thermalised partner does not satisfy this condition for another substance.
+For a supplied initial state, `sphten-liouv` requires every substance unit coordinate to equal 1; `zeeman-liouv` requires unit trace within `1e-10`. The solver also checks the formalism-specific trace-conservation and thermalisation conditions on `P`. In `sphten-liouv`, each unit column must drive a non-unit coordinate inside its own offsets block; otherwise `Spinach:steady:unthermalisedSubstance` identifies the unthermalised substance. A spin-free substance has no non-unit coordinates, so its block is exempt from this check and its steady state is its pinned unit population. A thermalised partner does not satisfy this condition for another substance.
 
 ## Methods
 

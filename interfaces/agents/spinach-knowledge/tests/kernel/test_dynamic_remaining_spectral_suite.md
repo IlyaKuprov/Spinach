@@ -36,3 +36,6 @@ The function takes no inputs.
 
 1. Spinach source: `tests/kernel/test_dynamic_remaining_spectral_suite.m` ([GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_remaining_spectral_suite.m))
 2. Functions exercised: `rspt_eig`, `eigenfields`, `g2fplanck`, `v2fplanck`, `rotor_stack`, `symmetry`, `orientation`, `spin`, `hamiltonian`, `assume`, `frqoffset`, `clean_up`, `fdmat`, `inflate`, `spdiags`, `kron`, `parpool`, `gcp`.
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.
+The local symmetry service returns projector cells and dimensions in `sym_fact`.

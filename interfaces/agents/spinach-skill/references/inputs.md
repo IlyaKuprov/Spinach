@@ -561,3 +561,6 @@ block must use `none`, as enforced by `basis`.
 
 `sim2liouv` accepts sparse horizontal density-matrix stacks and preserves their
 column order while extracting each substance block.
+
+Synthetic compiled-system fixtures must supply offsets and local descriptor
+cells too; bypassing `basis` does not restore the retired global layout.

@@ -59,3 +59,5 @@ The test uses `test_close` for numerical comparisons and `test_true` for logical
 - Tested functions: `no_dist`, `non_orth`, `firf`, `spf`, `szf`, `amp_tanh`, `amp_root`, `kernelest`, `bfgs_upd`, `bfgs`, `lbfgs`, `hess_reorder`, `hessreg`, `fapt2sfo`, `inst_freq`, `drifts`, `aux_mat`, `ctrl_trajan`, `ensemble`, `grape_xy`, `grape_curv`, `grape_phase`, `fmaxnewton`, `grape_liouv`, `tgrape`, `grape_coop`, `optimcon`, `pauli`.
 - Test infrastructure: `new_test_result`, `test_close`, `test_true`.
 - Source file: [tests/kernel/test_dynamic_optimcon_remaining.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_optimcon_remaining.m) in the Spinach repository.
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.

@@ -246,7 +246,7 @@ result=test_close(result,'inst_freq zero-magnitude finite tail',...
                   'inst_freq must preserve stencils without zero-magnitude points');
 
 % Check drift extraction through a minimal context callback
-spin_system.bas.basis=speye(2);
+spin_system.bas.basis={speye(2)}; spin_system.bas.offsets=[0;2];
 parameters.marker=true;
 [drift_cells,spc_dim]=drifts(spin_system,@local_context,parameters,'nmr');
 H=sparse(diag(1:4));
@@ -652,7 +652,9 @@ function spin_system=local_sphten_control_system()
 
 % Build a tiny spherical-tensor-like cooperative-control fixture
 spin_system=local_spin_system('sphten-liouv');
-spin_system.bas.basis=[0; 1];
+spin_system.bas.basis={[0; 1]}; spin_system.bas.offsets=[0;2];
+spin_system.bas.nsubst=1; spin_system.bas.nstates=2;
+spin_system.bas.tot_cord={[0;1]}; spin_system.chem.parts={1};
 control.isotopes={'E'};
 control.channels=[1;1];
 control.operators={[0 1; 1 0],[0 -1i; 1i 0]};

@@ -194,7 +194,7 @@ result=test_close(result,'magpump source column',R_pumped,[0 0 0;0.5 0 0;-0.25 0
 
 % Check Redfield-kite pruning keeps diagonals and longitudinal cross-relaxation
 spin_system=local_liouvillian_system(4);
-spin_system.bas.basis=[0;1;2;3];
+spin_system.bas.basis={[0;1;2;3]};
 R=sparse([1 2 2 4],[3 2 4 4],[2 7 5 9],4,4);
 R_kite=sec2kite(spin_system,R);
 R_ref=sparse([1 2 4],[3 2 4],[2 7 9],4,4);
@@ -243,7 +243,9 @@ spin_system.sys.output='hush';
 spin_system.sys.enable={};
 spin_system.sys.disable={};
 spin_system.bas.formalism='sphten-liouv';
-spin_system.bas.basis=zeros(dim,1);
+spin_system.bas.basis={zeros(dim,1)};
+spin_system.bas.offsets=[0;dim]; spin_system.bas.nsubst=1;
+spin_system.bas.nstates=dim; spin_system.chem.parts={1};
 spin_system.tols.liouv_zero=1e-12;
 spin_system.tols.prop_chop=1e-12;
 spin_system.tols.dense_matrix=0.5;

@@ -9,3 +9,7 @@ The calculation uses the complete spherical-tensor Liouville basis, full laborat
 The independent two-state exchange and rotational Redfield descriptions are phenomenological approximations. Collision trajectories, the other fluorines, and other relaxation mechanisms are omitted; the fastest rates are illustrative rather than calibrated liquid-state parameters. The example neither downloads inputs nor saves files automatically.
 
 The two first-order reaction records transport both nuclei with explicit forward and reverse atom matching. `state` supplies the stationary concentration weights; `coil_state` is unweighted.
+
+## Numerical conditioning
+
+The eight-rate raw spectra differ from the former representation by `4.54373e-8` in combined relative norm, above a `1e-10` comparison threshold. Matched relaxation, kinetics, excitation, and detection are exactly equal; Hamiltonian differences are at most `1.39e-16` relative. At the `1e11 s^-1` rate, where H is also exactly equal, the same operator solved in the two descriptor orderings gives a `2.96711e-8` difference, and imposing the stock ordering gives zero difference. Permuting only the stock matrix at the lowest and highest rates changes the spectra by `3.74004e-8` and `8.99500e-8`. This directly demonstrates floating-point ordering sensitivity of the extreme-exchange linear solves; it is not evidence of altered exchange physics. These controls do not establish a uniform `1e-10` all-rate parity result or an independent higher-precision accuracy ranking.

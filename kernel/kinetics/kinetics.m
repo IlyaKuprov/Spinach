@@ -24,6 +24,8 @@
 % is used. Spinless reactants are dynamic pools, not fixed reservoirs.
 % Named selectors implement Haberkorn or Jones-Hore loss and projected
 % product arrival. User selector pairs are local left/right projectors.
+% Each time-rate callback is evaluated once per generator evaluation;
+% the resulting rate is shared by all spatial voxels at that stage time.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -126,15 +128,23 @@ concs=chem_concs(spin_system,eta);
 dim=spin_system.bas.offsets(end);
 eta=reshape(eta,dim,[]);
 blocks=cell(size(concs,1),1);
+
+% Evaluate each time-only rate once for all voxels at this stage
+for n=1:numel(reactions)
+    rate=reactions{n}.rate;
+    if isa(rate,'function_handle'), rate=rate(t); end
+    if ~isnumeric(rate)||~isscalar(rate)||~isreal(rate)||~isfinite(rate)||rate<0
+        error('Spinach:kinetics:rateValue','time-dependent rates must return a finite non-negative scalar.');
+    end
+    reactions{n}.rate=rate;
+end
+
+% Assemble the local chemistry independently in each voxel
 for v=1:size(concs,1)
     K=sparse(dim,dim);
     for n=1:numel(reactions)
         reaction=reactions{n}; reactants=reaction.reactants;
         rate=reaction.rate;
-        if isa(rate,'function_handle'), rate=rate(t); end
-        if ~isnumeric(rate)||~isscalar(rate)||~isreal(rate)||~isfinite(rate)||rate<0
-            error('Spinach:kinetics:rateValue','time-dependent rates must return a finite non-negative scalar.');
-        end
 
         % Each occurrence loses its own state times the other concentrations
         for k=1:numel(reactants)

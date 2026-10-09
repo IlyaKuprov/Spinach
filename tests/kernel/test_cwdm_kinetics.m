@@ -95,6 +95,16 @@ s=basis(create(sys,inter),bas); K=kinetics(s); eta=unit_state(s);
 result=test_close(result,'time rate',chem_concs(s,K(0.5,eta)*eta),[-1.75 1.75 0 0],1e-12,0,...
                   'the first-order rate at t=0.5 is 2.5');
 
+% Resolve a time-only callback once for a multi-voxel generator evaluation
+rate_calls=0; timed=s; timed.chem.reactions{1}.rate=@counted_rate;
+timed_gen=kinetics(timed); stack=[eta;2*eta;3*eta];
+deriv=timed_gen(0.5,stack)*stack;
+result=test_true(result,'one callback per stage',rate_calls==1,...
+                 'a time-only rate is evaluated once regardless of voxel count');
+reference=[K(0.5,eta)*eta;K(0.5,2*eta)*(2*eta);K(0.5,3*eta)*(3*eta)];
+result=test_close(result,'shared voxel rate',deriv,reference,0,0,...
+                  'all voxels use the same resolved rate at the same stage time');
+
 % Product closure adds cross-reactant order without altering concentrations
 inter.chem.reactions={reaction}; inter.chem.reactions{1}.closure='product';
 s=basis(create(sys,inter),bas); K=kinetics(s);
@@ -161,6 +171,11 @@ fprintf('CWDM_T10_ERRORS %.12g %.12g %.12g RATIOS %.8g %.8g\n',...
 result=test_true(result,'T10 fourth order',all(errors(1:2)./errors(2:3)>15)&&...
                  all(errors(1:2)./errors(2:3)<17),'halving the step decreases error by approximately sixteen');
 result=test_true(result,'T10 absolute error',errors(3)<1e-10,'the finest-step error is below 1e-10');
+
+% Count production rate evaluations without changing their physical value
+function rate=counted_rate(t)
+    rate_calls=rate_calls+1; rate=2+t;
+end
 
 end
 

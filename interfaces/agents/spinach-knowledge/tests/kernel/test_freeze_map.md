@@ -16,6 +16,8 @@ For constrained curvilinear controls the same masking property covers every obje
 
 Finally, a long physically frozen interval must not require an unreachable propagation derivative. This remains true when a rank-reducing distortion and phase cycle together cancel the otherwise free input direction: the steady-state objective and gradient must stay finite, including with a non-Hermitian drift. The four-state spherical-tensor fixture supplies the compiled single-substance offsets `[0;4]` so that `steady` can locate its unit coordinate.
 
+A two-substance steady-state fixture compares the dressed gradient with the concatenated gradients of its single-substance blocks and the fidelity with their sum, at absolute and relative whole-array tolerances of `1e-12`. Both unit coordinates remain exactly one throughout propagation; a nonzero target unit component in either block is rejected.
+
 ## Inputs and outputs
 
 ```matlab

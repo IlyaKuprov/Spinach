@@ -17,3 +17,5 @@ A disjoint but incomplete chemical partition must raise `Spinach:basis:incomplet
 Complete compiled column-vector partitions must yield the same descriptors as row-vector partitions.
 
 Coherent-state tests use local Hilbert dimensions two and three in both Zeeman formalisms, asserting the named segmented rejection and comparing the corresponding single-substance state with the explicit normalised truncated coherent product.
+
+Mixed left-product/commutator equilibrium inputs are rejected in both block orderings with `Spinach:equilibrium:notLeftProduct` and the invalid substance number. Valid left-product blocks are compared against independently normalised Boltzmann exponentials at absolute and relative whole-vector tolerances of `1e-14`.

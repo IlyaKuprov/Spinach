@@ -20,7 +20,8 @@
 % Notes: an existing basis is rebuilt from its input settings, with
 %        local manual columns and global filter labels reindexed.
 %        Isotope filters with no surviving local spins are removed.
-%        Retained depths are capped by the surviving local spin count.
+%        Retained depths are capped by the surviving local populations;
+%        vector depths use the particle-type bounds enforced by basis.
 %        Symmetry and assumption information is cleared; call assume
 %        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
@@ -80,11 +81,25 @@ if isfield(spin_system,'bas')
             end
         else
 
-            % Cap retained depths by the surviving local spin count
+            % Cap scalar depths by the surviving local particle count
             for field={'inter_level','prox_level','space_level'}
                 if isfield(bas,field{1})
                     bas.(field{1}){n}=min(bas.(field{1}){n},nnz(local_keep));
                 end
+            end
+
+            % Bound vector depths by the same populations used in basis validation
+            spins=spin_system.chem.parts{n}(local_keep);
+            if strcmp(bas.approximation{n},'IK-DNP')
+                isotopes=spin_system.comp.isotopes(spins);
+                bas.inter_level{n}(1)=min(bas.inter_level{n}(1),nnz(cellfun(@iselectron,isotopes)));
+                bas.inter_level{n}(3)=min(bas.inter_level{n}(3),nnz(cellfun(@isnucleus,isotopes)));
+            elseif strcmp(bas.approximation{n},'IK-SBS')
+                modes=ismember(spin_system.comp.types(spins),{'C','V','T'});
+                nspins=nnz(~modes&(spin_system.comp.mults(spins)>1));
+                bas.inter_level{n}(1)=min(bas.inter_level{n}(1),nnz(modes));
+                bas.inter_level{n}(2)=min(bas.inter_level{n}(2),nnz(modes)+nspins);
+                bas.inter_level{n}(3)=min(bas.inter_level{n}(3),nspins);
             end
         end
     end

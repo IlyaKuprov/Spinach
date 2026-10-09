@@ -33,3 +33,5 @@ rebuild its 16-state two-spin basis while clearing stale symmetry and assumption
 Longitudinal and zero-quantum isotope filters are tested after partial isotope removal, loss of the last local match while another substance retains it, removal of all matching isotopes globally, and creation of a spin-free substance. Rebuilt descriptors, offsets, and hashes must equal an explicit rebuild with the surviving numeric and isotope filters.
 
 IK-0, IK-1, and IK-2 basis-bearing fixtures test local depth clipping through both `kill_spin` and `dilute`. The affected three-spin substance shrinks to two spins, while an unaffected three-spin substance retains its smaller depth of two. Both `prox_level` and the `space_level` alias are exercised for IK-1/IK-2; retained depth cells, descriptors, offsets, and hashes must match explicitly capped basis settings.
+
+IK-DNP and IK-SBS vector-depth fixtures separately remove an electron/mode or a nucleus/spin while retaining both particle classes. The resulting depth vectors, descriptors, and hashes must match a rebuild with explicitly bounded settings.

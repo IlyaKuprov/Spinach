@@ -126,6 +126,36 @@ for approximation={'IK-0','IK-1','IK-2'}
     end
 end
 
+% Cap each vector depth by its own surviving particle population
+for approximation={'IK-DNP','IK-SBS'}
+    for population=1:2
+        sys=struct('magnet',1);
+        if strcmp(approximation{1},'IK-DNP')
+            sys.isotopes={'E','E','1H','13C'};
+        else
+            sys.isotopes={'C3','V3','1H','13C'};
+        end
+        inter=struct(); inter.coupling.scalar=cell(4);
+        inter.coupling.scalar{3,4}=10;
+        depths=struct('formalism','sphten-liouv','approximation',{approximation});
+        depths.inter_level={[2 4 2]};
+        if strcmp(approximation{1},'IK-SBS')
+            depths.connectivity={'scalar_couplings'};
+        end
+        based=test_spin_system(sys,inter,depths);
+        removed=1; expected=depths; expected.inter_level={[1 3 2]};
+        if population==2
+            removed=4; expected.inter_level={[2 3 1]};
+        end
+        actual=kill_spin(based,removed); rebuilt=basis(actual,expected);
+        result=test_true(result,['vector depths ' approximation{1} ' ' num2str(population)],...
+                         isequal(actual.bas.inter_level,expected.inter_level)&&...
+                         isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                         strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                         'each depth uses the same particle-type bound as basis validation');
+    end
+end
+
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);
 result=test_true(result,'kill_spin logical mask',isequal(logical_trimmed.comp.isotopes,trimmed.comp.isotopes)&&...

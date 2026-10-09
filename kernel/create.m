@@ -73,7 +73,7 @@ end
 autoexec;
 
 % Rare, but it can happen
-if nargin==1, inter=[]; end
+if nargin==1, inter=struct(); end
 
 % Default to one substance at unit concentration
 if ~isfield(inter,'chem')||...

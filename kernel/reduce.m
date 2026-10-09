@@ -7,7 +7,8 @@
 %
 % Parameters:
 %
-%     L   -  Liouvillian matrix
+%     L   -  Liouvillian matrix; in the compiled substance space,
+%            cross-substance blocks require declared reaction records
 %
 %     rho -  initial state (source state screening) or
 %            destination state (destination state screening)
@@ -333,6 +334,16 @@ if ~isnumeric(L)
 end
 if size(L,1)~=size(L,2)
     error('L must be a square matrix.');
+end
+if spin_system.bas.nsubst>1&&size(L,1)==spin_system.bas.offsets(end)&&...
+   isempty(spin_system.chem.reactions)
+    for n=1:spin_system.bas.nsubst
+        idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+        if nnz(L(idx,:))~=nnz(L(idx,idx))
+            error('Spinach:reduce:crossSubstanceGenerator',...
+                  'L must not contain cross-substance blocks (substance %d).',n);
+        end
+    end
 end
 end
 

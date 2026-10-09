@@ -598,8 +598,8 @@ through `sys.disable` does not prevent an imaging calculation.
 Per-substance `space_level` aliases are derived independently; an empty entry
 does not inherit the preceding substance's proximity depth.
 
-Segmented wavefunction state construction is deferred and raises
-`Spinach:state:segmentedZeeman`; single-substance wavefunctions are unchanged.
+Segmented wavefunction and Zeeman-Liouville state construction is deferred and raises
+`Spinach:state:segmentedZeeman` before global tensor allocation; single-substance states are unchanged.
 
 Before basis compilation, `chem.parts` must cover every global spin; omitted
 spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.
@@ -644,3 +644,10 @@ Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: ch
 ### Spatial two-stage chemistry
 
 `reacting_flow_nmr` traces all spins with `kill_spin` for its concentration-only stage: the resulting five unit blocks include the spin-free solvent, and the same reaction records generate both concentration and spin transport. Its frozen-rate stepping workflow and `makima` history are retained, but equal sharing of product unit arrival changes finite frozen concentration steps relative to the old asymmetric generator; do not claim numerical history equivalence from the equal instantaneous mass-action derivative. In the NMR stage, history values are placed into voxel unit coordinates before evaluating `K(t,eta)`; additive closure then depends only on those coordinates, not the spin orders. The actual propagated state includes unit populations, while detection and reference longitudinal vectors use `coil_state`. The solvent is not excited or detected.
+
+`create(sys)` without interaction input remains supported; it uses an empty
+interaction structure and the ordinary one-substance/unit-concentration defaults.
+
+In chemistry-free systems, `reduce` rejects cross-substance entries in caller-supplied generators at the
+compiled spin dimension before building substance-local projectors. This
+boundary also covers the adjoint generator passed by destination screening.

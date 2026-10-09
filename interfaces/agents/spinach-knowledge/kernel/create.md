@@ -10,7 +10,7 @@ Wiki: [Spin Dynamics Wiki: create.m](https://spindynamics.org/wiki/index.php?tit
 The kernel entry point constructs the `spin_system` object used by the rest of Spinach. It validates and absorbs system and interaction specifications, then reports diagnostics.
 
 - `sys` — spin-system and instrument specification structure. The source requires isotope labels and a scalar magnet field; consult the Spin System Specification section of the manual for the complete input specification.
-- `inter` — interaction specification structure. It may be omitted; the executable code then sets it to `[]` before validation.
+- `inter` — interaction specification structure. It may be omitted; the executable code then uses an empty scalar structure before installing the single-substance defaults and validating input.
 - `spin_system` — assembled system object, including system, component, interaction, chemistry, and relaxation data. For `N=numel(sys.isotopes)`, particle metadata is held per particle and pairwise couplings in `N-by-N` cells, with populated spin-coupling entries represented by `3x3` tensors.
 
 ## Assembly in execution order

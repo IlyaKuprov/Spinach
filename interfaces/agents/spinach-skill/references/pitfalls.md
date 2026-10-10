@@ -231,6 +231,8 @@ spectrum (missing multiplet components, distorted powder lineshapes, phase
 errors). Convergence is established by refinement, never by appearance - see
 the validation procedure below.
 
+Disabling `clean-up` or setting `prop_chop=0` leaves Taylor terms unrounded; `propagator()` then checks numerical nonzeros so that explicitly stored sparse zeros do not prevent termination. This does not enable an approximation tolerance for the unrounded series.
+
 With `prop_cache`, `propagator()` separates cache entries by cleanup, storage-threshold, and GPU policy as well as generator, timestep, and chop tolerance; changing those settings within a pool cannot retrieve an entry built under a different policy.
 
 ## Scaling and memory

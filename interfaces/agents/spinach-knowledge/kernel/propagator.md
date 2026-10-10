@@ -10,7 +10,7 @@ Returns `P=exp(-1i*L*timestep)`. `L` is a numeric square Hamiltonian or Liouvill
 
 ## Numerical path
 
-For matrices with dimension below `spin_system.tols.small_matrix`, it calls MATLAB `expm`. Otherwise it evaluates a scaled Taylor series, cleans intermediate terms using `spin_system.tols.prop_chop`, and squares the result to undo scaling. The exact scaling is selected from the computed matrix norm. The source also contains a GPU branch when the `gpu` option is enabled and the dimension exceeds 500; this describes code routing, not a hardware-validation result.
+For matrices with dimension below `spin_system.tols.small_matrix`, it calls MATLAB `expm`. Otherwise it evaluates a scaled Taylor series, cleans intermediate terms using `spin_system.tols.prop_chop`, and squares the result to undo scaling. The exact scaling is selected from the computed matrix norm. When chopping is disabled or `prop_chop` is zero, termination checks numerical values rather than trusting the sparse stored-entry count; explicit stored zeros cannot keep an exhausted series running. The source also contains a GPU branch when the `gpu` option is enabled and the dimension exceeds 500; this describes code routing, not a hardware-validation result.
 
 ## Caching and side effects
 

@@ -181,7 +181,10 @@ The optional `destination` argument to `evolution` is a state for
 destination-state screening. `krylov` is for the case where `exp(L)` will not
 fit in memory but `L` will.
 
-`step` computes the action of the matrix exponential without forming it. Pass
+`step` normally computes the matrix-exponential action without forming it. Small
+Hilbert density matrices use an explicit exponential; sparse GPU generators are
+converted to full GPU storage locally for MATLAB's `expm` compatibility. CPU
+generators and the larger-matrix route retain their existing storage behaviour. Pass
 one matrix for the centre-point piecewise-constant rule, `{left,right}` for
 piecewise-linear, `{left,midpoint,right}` for piecewise-quadratic. Ideal hard
 pulses are `step` calls with a pulse operator and the flip angle in place of

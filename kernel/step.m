@@ -115,6 +115,9 @@ if ~expm_times_vec
     % Fast bypass for small density matrices
     if size(L,1)<spin_system.tols.small_matrix
 
+        % Matlab's GPU expm requires full storage for non-diagonal generators
+        if isa(L,'gpuArray')&&issparse(L), L=full(L); end
+
         % Use Matlab's expm
         P=expm(-1i*L*time_step);
 

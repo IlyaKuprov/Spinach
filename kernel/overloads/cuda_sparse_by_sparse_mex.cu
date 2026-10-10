@@ -1,153 +1,119 @@
 /* cuda_sparse_by_sparse_mex.cu
  *
- * Sparse GPU matrix product through cuSPARSE SpGEMM ALG3
+ * Sparse GPU matrix product through cuSPARSE SpGEMM, reading the operands
+ * from MATLAB's own sparse gpuArray storage
  *
  * Syntax:
  *
- *      [row_c,col_c,val_c]=cuda_sparse_by_sparse_mex(row_a,col_a,val_a,...
- *                                                    row_b,col_b,val_b,...
- *                                                    dims,chunk_fraction)
+ *      [row_c,col_c,val_c]=cuda_sparse_by_sparse_mex(A,B,alg)
  *
- * Internal helper for cuda_sparse_by_sparse.m. Inputs row_a and row_b
- * are zero-based int64 COO row-index gpuArrays. Inputs col_a and col_b
- * are zero-based int64 COO column-index gpuArrays. Inputs val_a and
- * val_b are real or complex double gpuArrays in MATLAB find() order. The
- * MEX gateway interprets the column-compressed MATLAB ordering as CSR
- * storage of the transposed matrices, computes B.'*A.' with cuSPARSE
- * SpGEMM ALG3, and returns one-based triplets for C=A*B. dims is
- * uint64([rows_a cols_a cols_b]). Output row_c and col_c are one-based
- * int64 gpuArray indices, and val_c is a real or complex double gpuArray.
+ * Internal helper for cuda_sparse_by_sparse.m. Inputs A and B are sparse
+ * double gpuArrays with size(A,2)==size(B,1); alg is 1, 2, or 3 and selects
+ * CUSPARSE_SPGEMM_ALG1, ALG2, or ALG3. Outputs row_c and col_c are one-based
+ * int32 index column gpuArrays and val_c is a double column gpuArray, all of
+ * length nnz(A*B) in row-major order; as in native mtimes, val_c is complex
+ * if either input is complex and neither has zero stored entries.
+ *
+ * MATLAB R2026b keeps a sparse gpuArray as zero-based CSR of the matrix
+ * itself with int32 indices. The storage block is two pointer hops from the
+ * mxGPUArray handle and holds the value, column index, and row offset device
+ * pointers at byte offsets 144, 152, and 160. The layout is undocumented, so
+ * before use the MEX checks that all three are device allocations on the
+ * current GPU large enough for the matrix, that the first row offset is zero,
+ * and that the last equals nzmax(), the stored entry count reported by
+ * MATLAB; it exceeds nnz() when GPU arithmetic leaves explicit zeros. Any
+ * mismatch raises Spinach:cuda_sparse_by_sparse_mex:layout. Input buffers
+ * are never written.
+ *
+ * ALG1 and ALG2 run on MATLAB's 32-bit indices in place. ALG3 corrupts
+ * device memory with 32-bit indices on large products, so its operands get
+ * 64-bit index copies; ALG3 chunk fraction is halved from one until its
+ * estimation and compute buffers fit into free device memory. When cuSPARSE
+ * or CUDA runs out of resources, the rows of A are bisected at half of their
+ * nonzeros and the halves are multiplied separately; a row block of A is
+ * passed as pointer offsets into MATLAB's index and value arrays with a
+ * rebased copy of its row offsets. A real operand of a mixed real-complex
+ * product is copied into complex values, because cuSPARSE needs a single
+ * value type.
+ *
+ * ilya.kuprov@weizmann.ac.il
  */
 
 #include "mex.h"
 #include "gpu/mxGPUArray.h"
+#include <cuda.h>
 #include <cuda_runtime.h>
-#include <cuComplex.h>
 #include <cusparse.h>
+#include <unistd.h>
 #include <algorithm>
-#include <cmath>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <utility>
+#include <vector>
+
+// Resource exhaustion, recoverable by multiplying fewer rows of A
+struct OutOfResources : std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
+
+// MATLAB sparse gpuArray storage does not have the expected layout
+struct LayoutMismatch : std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
+
+static void check_cuda(cudaError_t status,const char *call)
+{
+    if (status==cudaSuccess) return;
+    cudaGetLastError();
+    const std::string message=std::string(call)+" failed: "+cudaGetErrorString(status);
+    if (status==cudaErrorMemoryAllocation) throw OutOfResources(message);
+    throw std::runtime_error(message);
+}
+
+static void check_cusparse(cusparseStatus_t status,const char *call)
+{
+    if (status==CUSPARSE_STATUS_SUCCESS) return;
+    const std::string message=std::string(call)+" failed: "+cusparseGetErrorString(status);
+    if ((status==CUSPARSE_STATUS_INSUFFICIENT_RESOURCES)||
+        (status==CUSPARSE_STATUS_ALLOC_FAILED)) throw OutOfResources(message);
+    throw std::runtime_error(message);
+}
 
 class DeviceBuffer
 {
 public:
     DeviceBuffer()=default;
-    explicit DeviceBuffer(size_t n_bytes) { allocate(n_bytes); }
+    explicit DeviceBuffer(size_t n_bytes)
+    {
+        if (n_bytes>0) check_cuda(cudaMalloc(&ptr,n_bytes),"cudaMalloc");
+    }
+    DeviceBuffer(DeviceBuffer &&other) noexcept : ptr(other.ptr) { other.ptr=nullptr; }
+    DeviceBuffer& operator=(DeviceBuffer &&other) noexcept
+    {
+        std::swap(ptr,other.ptr); return *this;
+    }
     DeviceBuffer(const DeviceBuffer&)=delete;
     DeviceBuffer& operator=(const DeviceBuffer&)=delete;
-    ~DeviceBuffer() { release(); }
-
-    void allocate(size_t n_bytes)
-    {
-        release();
-        if (n_bytes>0)
-        {
-            cudaError_t status=cudaMalloc(&ptr,n_bytes);
-            if (status!=cudaSuccess)
-                throw std::runtime_error(std::string("cudaMalloc failed: ")+cudaGetErrorString(status));
-        }
-    }
-
-    void release()
-    {
-        if (ptr!=nullptr)
-        {
-            cudaFree(ptr);
-            ptr=nullptr;
-        }
-    }
-
-    void* data() { return ptr; }
-
-    template<typename T> T* as()
-    {
-        return static_cast<T*>(ptr);
-    }
-
+    ~DeviceBuffer() { if (ptr!=nullptr) cudaFree(ptr); }
+    template<typename T> T* as() const { return static_cast<T*>(ptr); }
 private:
     void *ptr=nullptr;
-};
-
-class GpuView
-{
-public:
-    explicit GpuView(const mxArray *array)
-    {
-        ptr=mxGPUCreateFromMxArray(array);
-        if (ptr==nullptr)
-            throw std::runtime_error("Failed to create an mxGPUArray view.");
-    }
-
-    GpuView(const GpuView&)=delete;
-    GpuView& operator=(const GpuView&)=delete;
-    ~GpuView()
-    {
-        if (ptr!=nullptr)
-            mxGPUDestroyGPUArray(ptr);
-    }
-
-    const mxGPUArray* get() const { return ptr; }
-
-private:
-    const mxGPUArray *ptr=nullptr;
-};
-
-class GpuOutput
-{
-public:
-    GpuOutput(mwSize n_elem,mxClassID class_id,mxComplexity complexity)
-    {
-        const mwSize dims[2]={n_elem,1};
-        ptr=mxGPUCreateGPUArray(2,dims,class_id,complexity,MX_GPU_DO_NOT_INITIALIZE);
-        if (ptr==nullptr)
-            throw std::runtime_error("Failed to create an output gpuArray.");
-    }
-
-    GpuOutput(const GpuOutput&)=delete;
-    GpuOutput& operator=(const GpuOutput&)=delete;
-    ~GpuOutput()
-    {
-        if (ptr!=nullptr)
-            mxGPUDestroyGPUArray(ptr);
-    }
-
-    template<typename T> T* data()
-    {
-        return static_cast<T*>(mxGPUGetData(ptr));
-    }
-
-    mxArray* to_mx() const
-    {
-        return mxGPUCreateMxArrayOnGPU(ptr);
-    }
-
-private:
-    mxGPUArray *ptr=nullptr;
 };
 
 class CusparseHandle
 {
 public:
-    CusparseHandle()
-    {
-        cusparseStatus_t status=cusparseCreate(&handle);
-        if (status!=CUSPARSE_STATUS_SUCCESS)
-            throw std::runtime_error(std::string("cusparseCreate failed: ")+cusparseGetErrorString(status));
-    }
-
+    CusparseHandle() { check_cusparse(cusparseCreate(&handle),"cusparseCreate"); }
     CusparseHandle(const CusparseHandle&)=delete;
     CusparseHandle& operator=(const CusparseHandle&)=delete;
-    ~CusparseHandle()
-    {
-        if (handle!=nullptr)
-            cusparseDestroy(handle);
-    }
-
-    cusparseHandle_t get() const { return handle; }
-
+    ~CusparseHandle() { cusparseDestroy(handle); }
+    operator cusparseHandle_t() const { return handle; }
 private:
     cusparseHandle_t handle=nullptr;
 };
@@ -155,15 +121,18 @@ private:
 class SpMat
 {
 public:
-    ~SpMat()
+    SpMat(int64_t rows,int64_t cols,int64_t nnz,const void *offsets,const void *indices,
+          const void *values,cusparseIndexType_t index_type,cudaDataType value_type)
     {
-        if (descr!=nullptr)
-            cusparseDestroySpMat(descr);
+        check_cusparse(cusparseCreateCsr(&descr,rows,cols,nnz,const_cast<void*>(offsets),
+                                         const_cast<void*>(indices),const_cast<void*>(values),
+                                         index_type,index_type,CUSPARSE_INDEX_BASE_ZERO,
+                                         value_type),"cusparseCreateCsr");
     }
-
-    cusparseSpMatDescr_t *ptr() { return &descr; }
+    SpMat(const SpMat&)=delete;
+    SpMat& operator=(const SpMat&)=delete;
+    ~SpMat() { cusparseDestroySpMat(descr); }
     operator cusparseSpMatDescr_t() const { return descr; }
-
 private:
     cusparseSpMatDescr_t descr=nullptr;
 };
@@ -171,465 +140,443 @@ private:
 class SpGemmDesc
 {
 public:
-    SpGemmDesc()
-    {
-        cusparseStatus_t status=cusparseSpGEMM_createDescr(&descr);
-        if (status!=CUSPARSE_STATUS_SUCCESS)
-            throw std::runtime_error(std::string("cusparseSpGEMM_createDescr failed: ")+cusparseGetErrorString(status));
-    }
-
+    SpGemmDesc() { check_cusparse(cusparseSpGEMM_createDescr(&descr),"cusparseSpGEMM_createDescr"); }
     SpGemmDesc(const SpGemmDesc&)=delete;
     SpGemmDesc& operator=(const SpGemmDesc&)=delete;
-    ~SpGemmDesc()
-    {
-        if (descr!=nullptr)
-            cusparseSpGEMM_destroyDescr(descr);
-    }
-
+    ~SpGemmDesc() { cusparseSpGEMM_destroyDescr(descr); }
     operator cusparseSpGEMMDescr_t() const { return descr; }
-
 private:
     cusparseSpGEMMDescr_t descr=nullptr;
 };
 
-struct InputCsrMatrix
+class GpuInput
 {
-    int64_t rows=0;
-    int64_t cols=0;
-    int64_t nnz=0;
-    const void *row_offsets=nullptr;
-    const void *col_indices=nullptr;
-    const void *values=nullptr;
-    DeviceBuffer row_store;
-    DeviceBuffer value_store;
+public:
+    explicit GpuInput(const mxArray *array) : ptr(mxGPUCreateFromMxArray(array)) {}
+    GpuInput(const GpuInput&)=delete;
+    GpuInput& operator=(const GpuInput&)=delete;
+    ~GpuInput() { mxGPUDestroyGPUArray(ptr); }
+    const mxGPUArray* get() const { return ptr; }
+private:
+    const mxGPUArray *ptr;
 };
 
-struct OutputCsrMatrix
+class GpuOutput
 {
-    int64_t rows=0;
-    int64_t cols=0;
-    int64_t nnz=0;
-    DeviceBuffer row_offsets;
-    DeviceBuffer col_indices;
-    DeviceBuffer values;
-};
-
-static void grumble(int nlhs,int nrhs,const mxArray *prhs[]);
-static void check_cuda(cudaError_t status,const char *call);
-static void check_cusparse(cusparseStatus_t status,const char *call);
-static void validate_gpu_view(const GpuView &view,const char *name,
-                              mxClassID class_id,bool allow_complex);
-static int64_t get_nnz(const GpuView &view);
-static void prepare_transpose_input(const GpuView &row_idx,
-                                    const GpuView &col_idx,
-                                    const GpuView &vals,int64_t n_rows,
-                                    int64_t n_cols,bool make_complex,
-                                    InputCsrMatrix &mat);
-static void run_spgemm(cusparseHandle_t handle,InputCsrMatrix &mat_a,
-                       InputCsrMatrix &mat_b,int64_t n_rows,int64_t n_cols,
-                       cudaDataType value_type,const void *alpha,
-                       const void *beta,float chunk_fraction,
-                       OutputCsrMatrix &mat_c);
-static void make_outputs(OutputCsrMatrix &mat_c,bool make_complex,
-                         mxArray *plhs[]);
-
-// Sorted COO row indices give each CSR offset by a lower-bound search
-__global__ void coo_to_csr_kernel(const int64_t *rows,int64_t *offsets,
-                                  int64_t nnz,int64_t n_rows)
-{
-    const int64_t row=static_cast<int64_t>(blockIdx.x)*blockDim.x+threadIdx.x;
-    for (int64_t current=row;current<=n_rows;current+=static_cast<int64_t>(gridDim.x)*blockDim.x)
+public:
+    GpuOutput(int64_t n,mxClassID class_id,mxComplexity complexity)
     {
-        int64_t first=0;
-        int64_t last=nnz;
-        while (first<last)
+        const mwSize dims[2]={static_cast<mwSize>(n),1};
+        ptr=mxGPUCreateGPUArray(2,dims,class_id,complexity,MX_GPU_DO_NOT_INITIALIZE);
+    }
+    GpuOutput(const GpuOutput&)=delete;
+    GpuOutput& operator=(const GpuOutput&)=delete;
+    ~GpuOutput() { mxGPUDestroyGPUArray(ptr); }
+    template<typename T> T* data() const { return static_cast<T*>(mxGPUGetData(ptr)); }
+    mxArray* to_matlab() const { return mxGPUCreateMxArrayOnGPU(ptr); }
+private:
+    mxGPUArray *ptr=nullptr;
+};
+
+// Sparse gpuArray storage as found in MATLAB memory; GPU arithmetic
+// can leave explicit zeros, so stored entries may outnumber nonzeros
+struct MatlabCsr
+{
+    int64_t rows,cols,nnz;
+    const int32_t *offsets,*indices;
+    const void *values;
+    bool is_complex;
+};
+
+// CSR operand in cuSPARSE index type I
+template<typename I> struct Operand
+{
+    int64_t rows,cols,nnz;
+    const I *offsets,*indices;
+    const char *values;
+};
+
+// CSR product of a row block of A with B
+template<typename I> struct Block
+{
+    int64_t first_row,rows,nnz;
+    DeviceBuffer offsets,indices,values;
+};
+
+static unsigned int grid_size(int64_t n)
+{
+    const int64_t blocks=(n+255)/256;
+    return static_cast<unsigned int>(std::max<int64_t>(1,std::min<int64_t>(blocks,std::numeric_limits<int>::max())));
+}
+
+// Shifted copy of an index array, optionally into a wider type
+template<typename In,typename Out>
+__global__ void rebase_kernel(const In *in,Out *out,int64_t n,int64_t origin)
+{
+    for (int64_t k=blockIdx.x*(int64_t)blockDim.x+threadIdx.x;k<n;k+=(int64_t)gridDim.x*blockDim.x)
+        out[k]=static_cast<Out>(in[k]-origin);
+}
+
+// Real values as complex values with zero imaginary parts
+__global__ void promote_kernel(const double *in,double2 *out,int64_t n)
+{
+    for (int64_t k=blockIdx.x*(int64_t)blockDim.x+threadIdx.x;k<n;k+=(int64_t)gridDim.x*blockDim.x)
+        out[k]=make_double2(in[k],0.0);
+}
+
+// One-based row and column indices of each CSR nonzero of a row block
+template<typename I>
+__global__ void triplet_kernel(const I *offsets,const I *indices,int64_t rows,int64_t nnz,
+                               int64_t first_row,int32_t *row_c,int32_t *col_c)
+{
+    for (int64_t k=blockIdx.x*(int64_t)blockDim.x+threadIdx.x;k<nnz;k+=(int64_t)gridDim.x*blockDim.x)
+    {
+        int64_t lo=0,hi=rows;
+        while (hi-lo>1)
         {
-            const int64_t middle=first+(last-first)/2;
-            if (rows[middle]<current)
-                first=middle+1;
-            else
-                last=middle;
+            const int64_t mid=(lo+hi)/2;
+            if (offsets[mid]<=k) lo=mid; else hi=mid;
         }
-        offsets[current]=first;
+        row_c[k]=static_cast<int32_t>(first_row+lo+1);
+        col_c[k]=static_cast<int32_t>(indices[k]+1);
     }
 }
 
-__global__ void real_to_complex_kernel(const double *vals_in,
-                                       cuDoubleComplex *vals_out,int64_t nnz)
+template<typename In,typename Out>
+static void rebase(const In *in,Out *out,int64_t n,int64_t origin)
 {
-    const int64_t idx=static_cast<int64_t>(blockIdx.x)*blockDim.x+threadIdx.x;
-    for (int64_t ptr=idx;ptr<nnz;ptr+=static_cast<int64_t>(gridDim.x)*blockDim.x)
-        vals_out[ptr]=make_cuDoubleComplex(vals_in[ptr],0.0);
+    rebase_kernel<In,Out><<<grid_size(n),256>>>(in,out,n,origin);
+    check_cuda(cudaGetLastError(),"rebase_kernel");
 }
 
-__global__ void expand_rows_kernel(const int64_t *row_offsets,int64_t *rows_out,
-                                   int64_t n_rows)
+static void promote(const void *in,DeviceBuffer &out,int64_t n)
 {
-    const int64_t row=static_cast<int64_t>(blockIdx.x)*blockDim.x+threadIdx.x;
-    for (int64_t current=row;current<n_rows;current+=static_cast<int64_t>(gridDim.x)*blockDim.x)
+    out=DeviceBuffer(n*sizeof(double2));
+    promote_kernel<<<grid_size(n),256>>>(static_cast<const double*>(in),out.as<double2>(),n);
+    check_cuda(cudaGetLastError(),"promote_kernel");
+}
+
+// Host memory test that cannot fault: the operating system copies the bytes into a pipe
+static bool host_readable(const void *ptr,size_t n_bytes)
+{
+    if ((ptr==nullptr)||(reinterpret_cast<uintptr_t>(ptr)%alignof(void*)!=0)) return false;
+    int fd[2];
+    if (pipe(fd)!=0) return false;
+    const bool readable=(write(fd[1],ptr,n_bytes)==static_cast<ssize_t>(n_bytes));
+    close(fd[0]); close(fd[1]);
+    return readable;
+}
+
+// Pointer must be a device allocation on this GPU spanning n_bytes
+static void check_extent(const void *ptr,size_t n_bytes,int device,const char *name)
+{
+    cudaPointerAttributes attributes;
+    if ((cudaPointerGetAttributes(&attributes,ptr)!=cudaSuccess)||
+        (attributes.type!=cudaMemoryTypeDevice)||(attributes.device!=device))
     {
-        const int64_t start=row_offsets[current];
-        const int64_t finish=row_offsets[current+1];
-
-        for (int64_t ptr=start;ptr<finish;ptr++)
-            rows_out[ptr]=current+1;
+        cudaGetLastError();
+        throw LayoutMismatch(std::string(name)+" pointer is not device memory on the current GPU.");
     }
+    CUdeviceptr base=0; size_t size=0;
+    const CUdeviceptr start=reinterpret_cast<CUdeviceptr>(ptr);
+    if ((cuMemGetAddressRange(&base,&size,start)!=CUDA_SUCCESS)||(start+n_bytes>base+size))
+        throw LayoutMismatch(std::string(name)+" allocation is smaller than the matrix requires.");
 }
 
-__global__ void one_based_cols_kernel(const int64_t *cols_in,int64_t *cols_out,int64_t nnz)
+// Stored entry count from nzmax() in MATLAB
+static int64_t matlab_nzmax(const mxArray *array)
 {
-    const int64_t idx=static_cast<int64_t>(blockIdx.x)*blockDim.x+threadIdx.x;
-    for (int64_t ptr=idx;ptr<nnz;ptr+=static_cast<int64_t>(gridDim.x)*blockDim.x)
-        cols_out[ptr]=cols_in[ptr]+1;
+    mxArray *input=const_cast<mxArray*>(array),*count=nullptr;
+    mexCallMATLAB(1,&count,1,&input,"nzmax");
+    if (mxIsGPUArray(count))
+    {
+        mxArray *host=nullptr;
+        mexCallMATLAB(1,&host,1,&count,"gather");
+        mxDestroyArray(count); count=host;
+    }
+    const int64_t n=static_cast<int64_t>(mxGetScalar(count));
+    mxDestroyArray(count);
+    return n;
 }
 
-void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
+static MatlabCsr read_storage(const mxArray *array,const GpuInput &gpu,int device,const char *name)
+{
+    const mwSize *dims=mxGPUGetDimensions(gpu.get());
+    MatlabCsr csr={static_cast<int64_t>(dims[0]),static_cast<int64_t>(dims[1]),matlab_nzmax(array),
+                   nullptr,nullptr,nullptr,mxGPUGetComplexity(gpu.get())==mxCOMPLEX};
+    mxFree(const_cast<mwSize*>(dims));
+    if (csr.nnz==0) return csr;
+
+    // Follow the two pointer hops to the storage block
+    const void *handle=gpu.get();
+    if (!host_readable(handle,sizeof(void*))) throw LayoutMismatch(std::string(name)+" handle is unreadable.");
+    const void *object=*static_cast<void* const*>(handle);
+    if (!host_readable(object,sizeof(void*))) throw LayoutMismatch(std::string(name)+" object is unreadable.");
+    const char *storage=*static_cast<char* const*>(object);
+    if (!host_readable(storage,168)) throw LayoutMismatch(std::string(name)+" storage block is unreadable.");
+    std::memcpy(&csr.values,storage+144,sizeof(void*));
+    std::memcpy(&csr.indices,storage+152,sizeof(void*));
+    std::memcpy(&csr.offsets,storage+160,sizeof(void*));
+
+    // Validate the buffers against the matrix MATLAB reports
+    const size_t value_size=csr.is_complex?sizeof(double2):sizeof(double);
+    check_extent(csr.values,csr.nnz*value_size,device,name);
+    check_extent(csr.indices,csr.nnz*sizeof(int32_t),device,name);
+    check_extent(csr.offsets,(csr.rows+1)*sizeof(int32_t),device,name);
+    int32_t first=-1,last=-1;
+    check_cuda(cudaMemcpy(&first,csr.offsets,sizeof(int32_t),cudaMemcpyDeviceToHost),"cudaMemcpy");
+    check_cuda(cudaMemcpy(&last,csr.offsets+csr.rows,sizeof(int32_t),cudaMemcpyDeviceToHost),"cudaMemcpy");
+    if ((first!=0)||(last!=csr.nnz))
+        throw LayoutMismatch(std::string(name)+" row offsets disagree with MATLAB nzmax.");
+    return csr;
+}
+
+// MATLAB storage in place for 32-bit indices, widened copies for 64-bit
+template<typename I>
+static Operand<I> make_operand(const MatlabCsr &csr,const void *values,
+                               DeviceBuffer &offsets,DeviceBuffer &indices)
+{
+    Operand<I> op={csr.rows,csr.cols,csr.nnz,nullptr,nullptr,static_cast<const char*>(values)};
+    if constexpr (sizeof(I)==sizeof(int32_t))
+    {
+        op.offsets=csr.offsets; op.indices=csr.indices;
+    }
+    else
+    {
+        offsets=DeviceBuffer((csr.rows+1)*sizeof(I)); indices=DeviceBuffer(csr.nnz*sizeof(I));
+        rebase(csr.offsets,offsets.as<I>(),csr.rows+1,0);
+        rebase(csr.indices,indices.as<I>(),csr.nnz,0);
+        op.offsets=offsets.as<I>(); op.indices=indices.as<I>();
+    }
+    return op;
+}
+
+template<typename I>
+static Block<I> spgemm_block(cusparseHandle_t handle,const Operand<I> &a,const std::vector<int64_t> &a_offsets,
+                             const Operand<I> &b,int64_t first_row,int64_t end_row,
+                             cusparseSpGEMMAlg_t alg,cudaDataType value_type,size_t value_size)
+{
+    const cusparseIndexType_t index_type=(sizeof(I)==sizeof(int32_t))?CUSPARSE_INDEX_32I:CUSPARSE_INDEX_64I;
+    const cusparseOperation_t op=CUSPARSE_OPERATION_NON_TRANSPOSE;
+    const double real_one=1.0,real_zero=0.0;
+    const double2 complex_one=make_double2(1.0,0.0),complex_zero=make_double2(0.0,0.0);
+    const void *alpha=(value_type==CUDA_R_64F)?static_cast<const void*>(&real_one):&complex_one;
+    const void *beta=(value_type==CUDA_R_64F)?static_cast<const void*>(&real_zero):&complex_zero;
+
+    // Row block of A: offsets into MATLAB arrays, rebased row offsets
+    const int64_t rows=end_row-first_row,origin=a_offsets[first_row];
+    DeviceBuffer block_offsets; const I *offsets=a.offsets;
+    if (rows<a.rows)
+    {
+        block_offsets=DeviceBuffer((rows+1)*sizeof(I));
+        rebase(a.offsets+first_row,block_offsets.as<I>(),rows+1,origin);
+        offsets=block_offsets.as<I>();
+    }
+    const SpMat mat_a(rows,a.cols,a_offsets[end_row]-origin,offsets,a.indices+origin,
+                      a.values+origin*value_size,index_type,value_type);
+    const SpMat mat_b(b.rows,b.cols,b.nnz,b.offsets,b.indices,b.values,index_type,value_type);
+    Block<I> c={first_row,rows,0,DeviceBuffer((rows+1)*sizeof(I)),DeviceBuffer(),DeviceBuffer()};
+    const SpMat mat_c(rows,b.cols,0,c.offsets.template as<I>(),nullptr,nullptr,index_type,value_type);
+    const SpGemmDesc desc;
+
+    // Work estimation
+    size_t size_1=0;
+    check_cusparse(cusparseSpGEMM_workEstimation(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,
+                                                 alg,desc,&size_1,nullptr),"cusparseSpGEMM_workEstimation");
+    const DeviceBuffer buffer_1(size_1);
+    check_cusparse(cusparseSpGEMM_workEstimation(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,
+                                                 alg,desc,&size_1,buffer_1.as<void>()),
+                   "cusparseSpGEMM_workEstimation");
+
+    // Compute buffer size; ALG3 chunk fraction is halved until both
+    // its estimation and its compute buffers fit into free memory
+    size_t size_2=0;
+    if (alg==CUSPARSE_SPGEMM_ALG1)
+    {
+        check_cusparse(cusparseSpGEMM_compute(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,
+                                              alg,desc,&size_2,nullptr),"cusparseSpGEMM_compute");
+    }
+    else
+    {
+        const bool chunked=(alg==CUSPARSE_SPGEMM_ALG3);
+        int64_t n_products=0;
+        if (chunked) check_cusparse(cusparseSpGEMM_getNumProducts(desc,&n_products),"cusparseSpGEMM_getNumProducts");
+        for (float chunk_fraction=1.0f;;chunk_fraction*=0.5f)
+        {
+            if (chunked&&(chunk_fraction<1)&&(chunk_fraction*n_products<1))
+                throw OutOfResources("ALG3 chunks do not fit into free device memory.");
+            size_t size_3=0,free_bytes=0,total_bytes=0;
+            check_cusparse(cusparseSpGEMM_estimateMemory(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,
+                                                         alg,desc,chunk_fraction,&size_3,nullptr,nullptr),
+                           "cusparseSpGEMM_estimateMemory");
+            check_cuda(cudaMemGetInfo(&free_bytes,&total_bytes),"cudaMemGetInfo");
+            if (chunked&&(size_3>free_bytes)) continue;
+            const DeviceBuffer buffer_3(size_3);
+            check_cusparse(cusparseSpGEMM_estimateMemory(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,
+                                                         alg,desc,chunk_fraction,&size_3,buffer_3.as<void>(),
+                                                         &size_2),"cusparseSpGEMM_estimateMemory");
+            if ((!chunked)||(size_2<=free_bytes)) break;
+        }
+    }
+    const DeviceBuffer buffer_2(size_2);
+    check_cusparse(cusparseSpGEMM_compute(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,
+                                          alg,desc,&size_2,buffer_2.as<void>()),"cusparseSpGEMM_compute");
+
+    // Copy the product into its own CSR arrays
+    int64_t c_rows=0,c_cols=0;
+    check_cusparse(cusparseSpMatGetSize(mat_c,&c_rows,&c_cols,&c.nnz),"cusparseSpMatGetSize");
+    c.indices=DeviceBuffer(c.nnz*sizeof(I)); c.values=DeviceBuffer(c.nnz*value_size);
+    check_cusparse(cusparseCsrSetPointers(mat_c,c.offsets.template as<void>(),c.indices.template as<void>(),
+                                          c.values.template as<void>()),"cusparseCsrSetPointers");
+    check_cusparse(cusparseSpGEMM_copy(handle,op,op,alpha,mat_a,mat_b,beta,mat_c,value_type,alg,desc),
+                   "cusparseSpGEMM_copy");
+    return c;
+}
+
+// Multiply rows [first_row,end_row) of A by B, bisecting on resource exhaustion
+template<typename I>
+static void multiply_rows(cusparseHandle_t handle,const Operand<I> &a,const std::vector<int64_t> &a_offsets,
+                          const Operand<I> &b,int64_t first_row,int64_t end_row,cusparseSpGEMMAlg_t alg,
+                          cudaDataType value_type,size_t value_size,std::vector<Block<I>> &blocks)
 {
     try
     {
-        if (mxInitGPU()!=MX_GPU_SUCCESS)
-            throw std::runtime_error("Failed to initialise the MATLAB GPU API.");
-
-        grumble(nlhs,nrhs,prhs);
-
-        const GpuView row_a(prhs[0]);
-        const GpuView col_a(prhs[1]);
-        const GpuView val_a(prhs[2]);
-        const GpuView row_b(prhs[3]);
-        const GpuView col_b(prhs[4]);
-        const GpuView val_b(prhs[5]);
-
-        validate_gpu_view(row_a,"row_a",mxINT64_CLASS,false);
-        validate_gpu_view(col_a,"col_a",mxINT64_CLASS,false);
-        validate_gpu_view(val_a,"val_a",mxDOUBLE_CLASS,true);
-        validate_gpu_view(row_b,"row_b",mxINT64_CLASS,false);
-        validate_gpu_view(col_b,"col_b",mxINT64_CLASS,false);
-        validate_gpu_view(val_b,"val_b",mxDOUBLE_CLASS,true);
-        check_cuda(cudaDeviceSynchronize(),"cudaDeviceSynchronize");
-
-        const uint64_T *dims=static_cast<const uint64_T*>(mxGetData(prhs[6]));
-        const uint64_T max_int=static_cast<uint64_T>(std::numeric_limits<size_t>::max()/sizeof(int64_t)-1);
-
-        if ((dims[0]>max_int)||(dims[1]>max_int)||(dims[2]>max_int))
-            throw std::runtime_error("Matrix row-offset allocation exceeds addressable memory.");
-
-        const int64_t n_rows=static_cast<int64_t>(dims[0]);
-        const int64_t n_inner=static_cast<int64_t>(dims[1]);
-        const int64_t n_cols=static_cast<int64_t>(dims[2]);
-        const float chunk_fraction=static_cast<float>(mxGetScalar(prhs[7]));
-        const bool make_complex=(mxGPUGetComplexity(val_a.get())==mxCOMPLEX)||
-                                (mxGPUGetComplexity(val_b.get())==mxCOMPLEX);
-
-        InputCsrMatrix mat_a;
-        InputCsrMatrix mat_b;
-        OutputCsrMatrix mat_c;
-        CusparseHandle handle;
-
-        prepare_transpose_input(row_a,col_a,val_a,
-                                n_rows,n_inner,make_complex,mat_a);
-        prepare_transpose_input(row_b,col_b,val_b,
-                                n_inner,n_cols,make_complex,mat_b);
-
-        if (make_complex)
-        {
-            const cuDoubleComplex alpha=make_cuDoubleComplex(1.0,0.0);
-            const cuDoubleComplex beta=make_cuDoubleComplex(0.0,0.0);
-
-            run_spgemm(handle.get(),mat_b,mat_a,n_cols,n_rows,CUDA_C_64F,
-                       &alpha,&beta,chunk_fraction,mat_c);
-        }
-        else
-        {
-            const double alpha=1.0;
-            const double beta=0.0;
-
-            run_spgemm(handle.get(),mat_b,mat_a,n_cols,n_rows,CUDA_R_64F,
-                       &alpha,&beta,chunk_fraction,mat_c);
-        }
-
-        make_outputs(mat_c,make_complex,plhs);
-        check_cuda(cudaDeviceSynchronize(),"cudaDeviceSynchronize");
+        blocks.push_back(spgemm_block(handle,a,a_offsets,b,first_row,end_row,alg,value_type,value_size));
+        return;
     }
-    catch (const std::exception &err)
+    catch (const OutOfResources&)
     {
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:runtime","%s",err.what());
+        if (end_row-first_row<2) throw;
     }
+
+    // Refuse to continue after an asynchronous fault
+    check_cuda(cudaDeviceSynchronize(),"cudaDeviceSynchronize");
+
+    // Split where the block has half of its nonzeros
+    const int64_t half=(a_offsets[first_row]+a_offsets[end_row])/2;
+    int64_t mid=std::upper_bound(a_offsets.begin()+first_row,a_offsets.begin()+end_row,half)-a_offsets.begin()-1;
+    mid=std::min(std::max(mid,first_row+1),end_row-1);
+    multiply_rows(handle,a,a_offsets,b,first_row,mid,alg,value_type,value_size,blocks);
+    multiply_rows(handle,a,a_offsets,b,mid,end_row,alg,value_type,value_size,blocks);
+}
+
+template<typename I>
+static void run(cusparseHandle_t handle,const MatlabCsr &csr_a,const void *values_a,
+                const MatlabCsr &csr_b,const void *values_b,cusparseSpGEMMAlg_t alg,
+                bool is_complex,mxArray *plhs[])
+{
+    const cudaDataType value_type=is_complex?CUDA_C_64F:CUDA_R_64F;
+    const size_t value_size=is_complex?sizeof(double2):sizeof(double);
+
+    // Operands, sharing index arrays when B is A
+    DeviceBuffer wide[4];
+    const Operand<I> a=make_operand<I>(csr_a,values_a,wide[0],wide[1]);
+    const Operand<I> b=((csr_b.offsets==csr_a.offsets)&&(values_b==values_a))?a:
+                       make_operand<I>(csr_b,values_b,wide[2],wide[3]);
+
+    // Host copy of the row offsets of A for block boundaries
+    std::vector<int32_t> offsets_32(csr_a.rows+1);
+    check_cuda(cudaMemcpy(offsets_32.data(),csr_a.offsets,offsets_32.size()*sizeof(int32_t),
+                          cudaMemcpyDeviceToHost),"cudaMemcpy");
+    const std::vector<int64_t> a_offsets(offsets_32.begin(),offsets_32.end());
+
+    // Row blocks of the product
+    std::vector<Block<I>> blocks;
+    multiply_rows(handle,a,a_offsets,b,0,a.rows,alg,value_type,value_size,blocks);
+    int64_t nnz=0;
+    for (const Block<I> &block : blocks) nnz+=block.nnz;
+    if (nnz>std::numeric_limits<int32_t>::max())
+        throw std::runtime_error("The product has more nonzeros than a MATLAB sparse gpuArray can hold.");
+
+    // One-based triplets in row-major order
+    const GpuOutput row_c(nnz,mxINT32_CLASS,mxREAL),col_c(nnz,mxINT32_CLASS,mxREAL);
+    const GpuOutput val_c(nnz,mxDOUBLE_CLASS,is_complex?mxCOMPLEX:mxREAL);
+    int64_t base=0;
+    for (const Block<I> &block : blocks)
+    {
+        if (block.nnz==0) continue;
+        triplet_kernel<I><<<grid_size(block.nnz),256>>>(block.offsets.template as<I>(),
+                                                         block.indices.template as<I>(),
+                                                         block.rows,block.nnz,block.first_row,
+                                                         row_c.data<int32_t>()+base,col_c.data<int32_t>()+base);
+        check_cuda(cudaGetLastError(),"triplet_kernel");
+        check_cuda(cudaMemcpy(val_c.data<char>()+base*value_size,block.values.template as<void>(),
+                              block.nnz*value_size,cudaMemcpyDeviceToDevice),"cudaMemcpy");
+        base+=block.nnz;
+    }
+    check_cuda(cudaDeviceSynchronize(),"cudaDeviceSynchronize");
+    plhs[0]=row_c.to_matlab(); plhs[1]=col_c.to_matlab(); plhs[2]=val_c.to_matlab();
 }
 
 static void grumble(int nlhs,int nrhs,const mxArray *prhs[])
 {
-    if (nrhs!=8)
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:nrhs","Eight inputs are required.");
-
-    if (nlhs!=3)
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:nlhs","Three outputs are required.");
-
-    if (prhs==nullptr)
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:prhsNull","Input argument array pointer is null.");
-
-    for (int arg=0;arg<6;arg++)
-        if (!mxIsGPUArray(prhs[arg]))
-            mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:notGpu","COO arrays must be gpuArrays.");
-
-    if ((mxGetClassID(prhs[6])!=mxUINT64_CLASS)||(mxGetNumberOfElements(prhs[6])!=3))
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:dims","dims must be a uint64 vector with three elements.");
-
-    if (!mxIsDouble(prhs[7])||mxIsComplex(prhs[7])||(mxGetNumberOfElements(prhs[7])!=1))
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:chunk","chunk_fraction must be a real double scalar.");
-
-    const double chunk_fraction=mxGetScalar(prhs[7]);
-
-    if ((!std::isfinite(chunk_fraction))||(chunk_fraction<std::numeric_limits<float>::min())||(chunk_fraction>1.0))
-        mexErrMsgIdAndTxt("Spinach:cuda_sparse_by_sparse_mex:chunkRange","chunk_fraction must be in the range [realmin(single),1].");
+    if (nrhs!=3) throw std::invalid_argument("Three inputs are required.");
+    if (nlhs!=3) throw std::invalid_argument("Three outputs are required.");
+    if ((!mxIsGPUArray(prhs[0]))||(!mxIsGPUArray(prhs[1])))
+        throw std::invalid_argument("A and B must be gpuArrays.");
+    if ((!mxIsDouble(prhs[2]))||mxIsComplex(prhs[2])||(mxGetNumberOfElements(prhs[2])!=1))
+        throw std::invalid_argument("alg must be a real double scalar.");
+    const double alg=mxGetScalar(prhs[2]);
+    if ((alg!=1)&&(alg!=2)&&(alg!=3)) throw std::invalid_argument("alg must be 1, 2, or 3.");
 }
 
-static void check_cuda(cudaError_t status,const char *call)
+void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
-    if (status!=cudaSuccess)
-        throw std::runtime_error(std::string(call)+" failed: "+cudaGetErrorString(status));
-}
-
-static void check_cusparse(cusparseStatus_t status,const char *call)
-{
-    if (status!=CUSPARSE_STATUS_SUCCESS)
-        throw std::runtime_error(std::string(call)+" failed: "+cusparseGetErrorString(status));
-}
-
-static void validate_gpu_view(const GpuView &view,const char *name,
-                              mxClassID class_id,bool allow_complex)
-{
-    if (mxGPUIsSparse(view.get()))
-        throw std::runtime_error(std::string(name)+" must be full.");
-
-    if (mxGPUGetClassID(view.get())!=class_id)
-        throw std::runtime_error(std::string(name)+" has an incompatible underlying type.");
-
-    if ((!allow_complex)&&(mxGPUGetComplexity(view.get())!=mxREAL))
-        throw std::runtime_error(std::string(name)+" must be real.");
-}
-
-static int64_t get_nnz(const GpuView &view)
-{
-    const mwSize n_elem=mxGPUGetNumberOfElements(view.get());
-    const mwSize max_int=static_cast<mwSize>(std::numeric_limits<size_t>::max()/sizeof(cuDoubleComplex));
-
-    if (n_elem>max_int)
-        throw std::runtime_error("COO array allocation exceeds addressable memory.");
-
-    return static_cast<int64_t>(n_elem);
-}
-
-static void prepare_transpose_input(const GpuView &row_idx,
-                                    const GpuView &col_idx,
-                                    const GpuView &vals,int64_t n_rows,
-                                    int64_t n_cols,bool make_complex,
-                                    InputCsrMatrix &mat)
-{
-    mat.rows=n_cols;
-    mat.cols=n_rows;
-    mat.nnz=get_nnz(vals);
-
-    if (get_nnz(row_idx)!=mat.nnz)
-        throw std::runtime_error("COO row-index and value arrays have inconsistent lengths.");
-
-    if (get_nnz(col_idx)!=mat.nnz)
-        throw std::runtime_error("COO column-index and value arrays have inconsistent lengths.");
-
-    mat.row_store.allocate((static_cast<size_t>(n_cols)+1)*sizeof(int64_t));
-
-    const int64_t block_size=256;
-    const int64_t grid_size=n_cols/block_size+1;
-
-    coo_to_csr_kernel<<<static_cast<unsigned int>(std::min<int64_t>(grid_size,std::numeric_limits<int>::max())),block_size>>>(
-        static_cast<const int64_t*>(mxGPUGetDataReadOnly(col_idx.get())),
-        mat.row_store.as<int64_t>(),mat.nnz,n_cols);
-    check_cuda(cudaGetLastError(),"coo_to_csr_kernel");
-
-    mat.row_offsets=mat.row_store.data();
-    mat.col_indices=mxGPUGetDataReadOnly(row_idx.get());
-
-    if (make_complex&&(mxGPUGetComplexity(vals.get())==mxREAL))
+    static char message[1024];
+    const char *identifier=nullptr;
+    try
     {
-        mat.value_store.allocate(static_cast<size_t>(mat.nnz)*sizeof(cuDoubleComplex));
+        if (mxInitGPU()!=MX_GPU_SUCCESS) throw std::runtime_error("Failed to initialise the MATLAB GPU API.");
+        grumble(nlhs,nrhs,prhs);
+        const GpuInput gpu_a(prhs[0]),gpu_b(prhs[1]);
+        if ((!mxGPUIsSparse(gpu_a.get()))||(!mxGPUIsSparse(gpu_b.get()))||
+            (mxGPUGetClassID(gpu_a.get())!=mxDOUBLE_CLASS)||(mxGPUGetClassID(gpu_b.get())!=mxDOUBLE_CLASS))
+            throw std::invalid_argument("A and B must be sparse double gpuArrays.");
+        int device=0;
+        check_cuda(cudaGetDevice(&device),"cudaGetDevice");
+        const MatlabCsr a=read_storage(prhs[0],gpu_a,device,"A");
+        const MatlabCsr b=read_storage(prhs[1],gpu_b,device,"B");
+        if (a.cols!=b.rows) throw std::invalid_argument("A and B dimensions are inconsistent.");
+        const bool is_complex=a.is_complex||b.is_complex;
 
-        if (mat.nnz>0)
+        // Operands without stored entries give a real empty product, as in native mtimes
+        if ((a.nnz==0)||(b.nnz==0))
         {
-            const int64_t block_size=256;
-            const int64_t grid_size=mat.nnz/block_size+(mat.nnz%block_size!=0);
-
-            real_to_complex_kernel<<<static_cast<unsigned int>(std::min<int64_t>(grid_size,std::numeric_limits<int>::max())),block_size>>>(
-                static_cast<const double*>(mxGPUGetDataReadOnly(vals.get())),
-                mat.value_store.as<cuDoubleComplex>(),mat.nnz);
-            check_cuda(cudaGetLastError(),"real_to_complex_kernel");
+            const GpuOutput row_c(0,mxINT32_CLASS,mxREAL),col_c(0,mxINT32_CLASS,mxREAL);
+            const GpuOutput val_c(0,mxDOUBLE_CLASS,mxREAL);
+            plhs[0]=row_c.to_matlab(); plhs[1]=col_c.to_matlab(); plhs[2]=val_c.to_matlab();
+            return;
         }
 
-        mat.values=mat.value_store.data();
+        // Complex copies of the values of a real operand in a mixed product
+        DeviceBuffer complex_a,complex_b;
+        const void *values_a=a.values,*values_b=b.values;
+        if (is_complex&&!a.is_complex) { promote(a.values,complex_a,a.nnz); values_a=complex_a.as<void>(); }
+        if (is_complex&&!b.is_complex) { promote(b.values,complex_b,b.nnz); values_b=complex_b.as<void>(); }
+
+        // ALG3 needs 64-bit indices, ALG1 and ALG2 use MATLAB's own
+        const CusparseHandle handle;
+        const int alg=static_cast<int>(mxGetScalar(prhs[2]));
+        if (alg==3)
+            run<int64_t>(handle,a,values_a,b,values_b,CUSPARSE_SPGEMM_ALG3,is_complex,plhs);
+        else
+            run<int32_t>(handle,a,values_a,b,values_b,(alg==1)?CUSPARSE_SPGEMM_ALG1:CUSPARSE_SPGEMM_ALG2,
+                         is_complex,plhs);
     }
-    else
+    catch (const LayoutMismatch &err)
     {
-        mat.values=mxGPUGetDataReadOnly(vals.get());
+        identifier="Spinach:cuda_sparse_by_sparse_mex:layout";
+        std::snprintf(message,sizeof(message),"%s",err.what());
     }
-    check_cuda(cudaDeviceSynchronize(),"cudaDeviceSynchronize");
-}
-
-static void run_spgemm(cusparseHandle_t handle,InputCsrMatrix &mat_a,
-                       InputCsrMatrix &mat_b,int64_t n_rows,int64_t n_cols,
-                       cudaDataType value_type,const void *alpha,
-                       const void *beta,float chunk_fraction,
-                       OutputCsrMatrix &mat_c)
-{
-    mat_c.rows=n_rows;
-    mat_c.cols=n_cols;
-    mat_c.row_offsets.allocate((static_cast<size_t>(n_rows)+1)*sizeof(int64_t));
-
-    SpMat descr_a;
-    SpMat descr_b;
-    SpMat descr_c;
-    SpGemmDesc spgemm_descr;
-
-    check_cusparse(cusparseCreateCsr(descr_a.ptr(),mat_a.rows,mat_a.cols,mat_a.nnz,
-                                     const_cast<void*>(mat_a.row_offsets),
-                                     const_cast<void*>(mat_a.col_indices),
-                                     const_cast<void*>(mat_a.values),
-                                     CUSPARSE_INDEX_64I,CUSPARSE_INDEX_64I,
-                                     CUSPARSE_INDEX_BASE_ZERO,value_type),
-                   "cusparseCreateCsr");
-    check_cusparse(cusparseCreateCsr(descr_b.ptr(),mat_b.rows,mat_b.cols,mat_b.nnz,
-                                     const_cast<void*>(mat_b.row_offsets),
-                                     const_cast<void*>(mat_b.col_indices),
-                                     const_cast<void*>(mat_b.values),
-                                     CUSPARSE_INDEX_64I,CUSPARSE_INDEX_64I,
-                                     CUSPARSE_INDEX_BASE_ZERO,value_type),
-                   "cusparseCreateCsr");
-    check_cusparse(cusparseCreateCsr(descr_c.ptr(),n_rows,n_cols,0,
-                                     mat_c.row_offsets.data(),nullptr,nullptr,
-                                     CUSPARSE_INDEX_64I,CUSPARSE_INDEX_64I,
-                                     CUSPARSE_INDEX_BASE_ZERO,value_type),
-                   "cusparseCreateCsr");
-
-    size_t buffer_size1=0;
-    size_t buffer_size2=0;
-    size_t buffer_size3=0;
-
-    check_cusparse(cusparseSpGEMM_workEstimation(handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 alpha,descr_a,descr_b,beta,descr_c,
-                                                 value_type,CUSPARSE_SPGEMM_ALG3,
-                                                 spgemm_descr,&buffer_size1,nullptr),
-                   "cusparseSpGEMM_workEstimation");
-
-    DeviceBuffer buffer1(buffer_size1);
-
-    check_cusparse(cusparseSpGEMM_workEstimation(handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 alpha,descr_a,descr_b,beta,descr_c,
-                                                 value_type,CUSPARSE_SPGEMM_ALG3,
-                                                 spgemm_descr,&buffer_size1,buffer1.data()),
-                   "cusparseSpGEMM_workEstimation");
-
-    int64_t num_products=0;
-    check_cusparse(cusparseSpGEMM_getNumProducts(spgemm_descr,&num_products),
-                   "cusparseSpGEMM_getNumProducts");
-
-    if (num_products<0)
-        throw std::runtime_error("cuSPARSE reported a negative intermediate product count.");
-
-    check_cusparse(cusparseSpGEMM_estimateMemory(handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 alpha,descr_a,descr_b,beta,descr_c,
-                                                 value_type,CUSPARSE_SPGEMM_ALG3,
-                                                 spgemm_descr,chunk_fraction,
-                                                 &buffer_size3,nullptr,nullptr),
-                   "cusparseSpGEMM_estimateMemory");
-
-    DeviceBuffer buffer3(buffer_size3);
-
-    check_cusparse(cusparseSpGEMM_estimateMemory(handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                                 alpha,descr_a,descr_b,beta,descr_c,
-                                                 value_type,CUSPARSE_SPGEMM_ALG3,
-                                                 spgemm_descr,chunk_fraction,
-                                                 &buffer_size3,buffer3.data(),&buffer_size2),
-                   "cusparseSpGEMM_estimateMemory");
-
-    DeviceBuffer buffer2(buffer_size2);
-
-    check_cusparse(cusparseSpGEMM_compute(handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                          CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                          alpha,descr_a,descr_b,beta,descr_c,
-                                          value_type,CUSPARSE_SPGEMM_ALG3,
-                                          spgemm_descr,&buffer_size2,buffer2.data()),
-                   "cusparseSpGEMM_compute");
-
-    int64_t c_rows=0;
-    int64_t c_cols=0;
-    int64_t c_nnz=0;
-
-    check_cusparse(cusparseSpMatGetSize(descr_c,&c_rows,&c_cols,&c_nnz),
-                   "cusparseSpMatGetSize");
-
-    if ((c_rows!=n_rows)||(c_cols!=n_cols))
-        throw std::runtime_error("cuSPARSE returned inconsistent output dimensions.");
-
-    if (c_nnz<0)
-        throw std::runtime_error("cuSPARSE reported a negative output nonzero count.");
-
-    if (static_cast<uint64_t>(c_nnz)>std::numeric_limits<size_t>::max()/sizeof(cuDoubleComplex))
-        throw std::runtime_error("Output allocation exceeds addressable memory.");
-
-    mat_c.nnz=c_nnz;
-
-    if (mat_c.nnz==0)
-        return;
-
-    const size_t value_size=(value_type==CUDA_R_64F)?sizeof(double):sizeof(cuDoubleComplex);
-
-    mat_c.col_indices.allocate(static_cast<size_t>(mat_c.nnz)*sizeof(int64_t));
-    mat_c.values.allocate(static_cast<size_t>(mat_c.nnz)*value_size);
-
-    check_cusparse(cusparseCsrSetPointers(descr_c,mat_c.row_offsets.data(),
-                                          mat_c.col_indices.data(),mat_c.values.data()),
-                   "cusparseCsrSetPointers");
-    check_cusparse(cusparseSpGEMM_copy(handle,CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                       CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                       alpha,descr_a,descr_b,beta,descr_c,
-                                       value_type,CUSPARSE_SPGEMM_ALG3,
-                                       spgemm_descr),
-                   "cusparseSpGEMM_copy");
-    check_cuda(cudaDeviceSynchronize(),"cudaDeviceSynchronize");
-
-    return;
-}
-
-static void make_outputs(OutputCsrMatrix &mat_c,bool make_complex,
-                         mxArray *plhs[])
-{
-    GpuOutput row_out(mat_c.nnz,mxINT64_CLASS,mxREAL);
-    GpuOutput col_out(mat_c.nnz,mxINT64_CLASS,mxREAL);
-    GpuOutput val_out(mat_c.nnz,mxDOUBLE_CLASS,make_complex?mxCOMPLEX:mxREAL);
-
-    if (mat_c.nnz>0)
+    catch (const std::invalid_argument &err)
     {
-        const int64_t block_size=256;
-        const int64_t row_grid=mat_c.rows/block_size+(mat_c.rows%block_size!=0);
-
-        const int64_t col_grid=mat_c.nnz/block_size+(mat_c.nnz%block_size!=0);
-
-        one_based_cols_kernel<<<static_cast<unsigned int>(std::min<int64_t>(col_grid,std::numeric_limits<int>::max())),block_size>>>(
-            mat_c.col_indices.as<int64_t>(),row_out.data<int64_t>(),mat_c.nnz);
-        check_cuda(cudaGetLastError(),"one_based_cols_kernel");
-
-        expand_rows_kernel<<<static_cast<unsigned int>(std::min<int64_t>(row_grid,std::numeric_limits<int>::max())),block_size>>>(
-            mat_c.row_offsets.as<int64_t>(),col_out.data<int64_t>(),mat_c.rows);
-        check_cuda(cudaGetLastError(),"expand_rows_kernel");
-
-        const size_t value_size=make_complex?sizeof(cuDoubleComplex):sizeof(double);
-        check_cuda(cudaMemcpy(val_out.data<void>(),mat_c.values.data(),
-                              static_cast<size_t>(mat_c.nnz)*value_size,
-                              cudaMemcpyDeviceToDevice),"cudaMemcpy");
+        identifier="Spinach:cuda_sparse_by_sparse_mex:input";
+        std::snprintf(message,sizeof(message),"%s",err.what());
     }
-
-    plhs[0]=row_out.to_mx();
-    plhs[1]=col_out.to_mx();
-    plhs[2]=val_out.to_mx();
+    catch (const std::exception &err)
+    {
+        identifier="Spinach:cuda_sparse_by_sparse_mex:runtime";
+        std::snprintf(message,sizeof(message),"%s",err.what());
+    }
+    if (identifier!=nullptr) mexErrMsgIdAndTxt(identifier,"%s",message);
 }

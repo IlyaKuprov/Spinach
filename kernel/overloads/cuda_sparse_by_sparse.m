@@ -1,86 +1,60 @@
-% Sparse matrix product on the GPU via cuSPARSE ALG3. Syntax:
+% Sparse matrix product on the GPU via cuSPARSE SpGEMM. Syntax:
 %
-%                 C=cuda_sparse_by_sparse(A,B,chunk_fraction)
+%                     C=cuda_sparse_by_sparse(A,B,alg)
 %
 % Parameters:
 %
-%    A              - real or complex sparse double gpuArray
+%    A    - real or complex sparse double gpuArray
 %
-%    B              - real or complex sparse double gpuArray
+%    B    - real or complex sparse double gpuArray
 %
-%    chunk_fraction - CPU double ALG3 chunk fraction in [realmin(single),1]
+%    alg  - cuSPARSE SpGEMM algorithm, 1, 2, or 3 for
+%           CUSPARSE_SPGEMM_ALG1, ALG2, or ALG3
 %
 % Outputs:
 %
-%    C              - sparse double gpuArray product A*B, complex if either
-%                     input is complex; inputs must have compatible sizes
+%    C    - sparse double gpuArray product A*B, complex if either
+%           input is complex and neither is all-zero, as in native
+%           mtimes; inputs must have compatible sizes
 %
-% The function uses MATLAB find() to expose GPU-resident sparse triplets,
-% calls cuda_sparse_by_sparse_mex() to interpret the column-major sparse
-% ordering as transposed CSR storage and run cuSPARSE SpGEMM with
-% CUSPARSE_SPGEMM_ALG3, and then reconstructs the sparse gpuArray from the
-% resulting triplets. If the platform MEX is absent or MATLAB cannot load
-% it, native GPU multiplication is used. Other failures are not intercepted.
+% The function passes A and B to cuda_sparse_by_sparse_mex(), which
+% reads MATLAB's internal CSR storage of the sparse gpuArrays in place,
+% runs cuSPARSE SpGEMM, and returns the product as row-major triplets
+% from which the sparse gpuArray is assembled. If the platform MEX is
+% absent or MATLAB cannot load it, or if the MEX does not recognise the
+% internal storage layout of this MATLAB version, native GPU multiplica-
+% tion is used. Other failures are not intercepted.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function C=cuda_sparse_by_sparse(A,B,chunk_fraction)
+function C=cuda_sparse_by_sparse(A,B,alg)
 
 % Check consistency
-grumble(A,B,chunk_fraction);
+grumble(A,B,alg);
 
 % Retain native multiplication when no platform MEX is available
 if exist('cuda_sparse_by_sparse_mex','file')~=3
     C=A*B; return
 end
 
-% Get matrix dimensions
-[n_rows,n_inner]=size(A);
-[~,n_cols]=size(B);
-
-% Return an empty GPU sparse matrix when multiplication is vacuous
-if (nnz(A)==0)||(nnz(B)==0)
-    if isreal(A)&&isreal(B)
-        C=sparse(gpuArray.zeros(0,1,'int64'),gpuArray.zeros(0,1,'int64'),...
-                 gpuArray.zeros(0,1),n_rows,n_cols);
-    else
-        C=sparse(gpuArray.zeros(0,1,'int64'),gpuArray.zeros(0,1,'int64'),...
-                 complex(gpuArray.zeros(0,1),gpuArray.zeros(0,1)),n_rows,n_cols);
-    end
-    return
-end
-
-% Get sparse triplets on the GPU
-[row_a,col_a,val_a]=find(A);
-[row_b,col_b,val_b]=find(B);
-
-% Convert one-based GPU indices into zero-based COO arrays
-row_a=int64(row_a)-1;
-col_a=int64(col_a)-1;
-row_b=int64(row_b)-1;
-col_b=int64(col_b)-1;
-
-% Pack dimensions for the MEX gateway
-dims=uint64([n_rows n_inner n_cols]);
-
-% Run cuSPARSE SpGEMM ALG3 on the GPU
+% Run cuSPARSE SpGEMM on the GPU
 try
-    [row_c,col_c,val_c]=cuda_sparse_by_sparse_mex(row_a,col_a,val_a,...
-        row_b,col_b,val_b,dims,chunk_fraction);
+    [row_c,col_c,val_c]=cuda_sparse_by_sparse_mex(A,B,alg);
 catch exception
-    if strcmp(exception.identifier,'MATLAB:mex:ErrInvalidMEXFile')
+    if ismember(exception.identifier,{'MATLAB:mex:ErrInvalidMEXFile',...
+                                      'Spinach:cuda_sparse_by_sparse_mex:layout'})
         C=A*B; return
     end
     rethrow(exception);
 end
 
-% Reconstruct the sparse GPU matrix
-C=sparse(row_c,col_c,val_c,n_rows,n_cols);
+% Assemble the sparse GPU matrix
+C=sparse(row_c,col_c,val_c,size(A,1),size(B,2));
 
 end
 
 % Validate the public sparse GPU multiplication interface
-function grumble(A,B,chunk_fraction)
+function grumble(A,B,alg)
 
 if ~isa(A,'gpuArray')
     error('A must be a gpuArray.');
@@ -110,13 +84,8 @@ if size(A,2)~=size(B,1)
     error('A and B dimensions are inconsistent.');
 end
 
-if ~isa(chunk_fraction,'double')||isa(chunk_fraction,'gpuArray')||~isreal(chunk_fraction)||...
-   ~isscalar(chunk_fraction)||~isfinite(chunk_fraction)
-    error('chunk_fraction must be a real finite CPU double scalar.');
-end
-
-if (chunk_fraction<double(realmin('single')))||(chunk_fraction>1)
-    error('chunk_fraction must be in the range [realmin(single),1].');
+if ~isa(alg,'double')||isa(alg,'gpuArray')||~isscalar(alg)||~ismember(alg,[1 2 3])
+    error('alg must be a CPU double scalar equal to 1, 2, or 3.');
 end
 
 end

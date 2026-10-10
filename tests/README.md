@@ -19,7 +19,7 @@ run_tests('verbose',true);
 ```
 
 
-GPU-dependent ALG3 compatibility regression (not part of the CPU manifest):
+GPU-dependent SpGEMM gateway compatibility regression (not part of the CPU manifest):
 
 ```matlab
 addpath('kernel/overloads','tests/kernel');

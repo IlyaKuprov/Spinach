@@ -14,6 +14,8 @@
 
 * **No uninformative output:** You must not produce usless or uninformative output. If you are unsure about something, you must read the existing *Spinach* code and find missing information to make sure that your output is useful and informative. Generic placeholder phrases must be removed from your output if they appear. Avoid cosmetic churn unless explicitly requested and clearly beneficial.
 
+* **Pull request merging requires permission:** When asked to submit a pull request, prepare it and address Codex bot review comments, but do not merge the pull request. Merging is something the user will do after reviewing the pull request.
+
 ### Preservation and Scientific Correctness
 
 * **Preserve content:** Before proposing a code or documentation rewrite or updating the agent skill or knowledge base, run an information-preservation gate: compare proposed content against existing content and flag content-drop risks. Block removal of substantial existing code or documentation, or useful existing skill or knowledge-base records, unless the user explicitly approves that removal.
@@ -48,7 +50,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 ### File Layout, Naming, and Formatting
 
-* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits.
+* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits. Every `end` keyword must be correctly indented. Maintain formatting symmetry between opening and closing keywords: when its opening statement is followed by a blank line, the closing `end` must be preceded by a blank line. If a Matlab command or an array is broken up into multiple lines using `...`, the lines must be logically and elegantly indented: decimal point alignment for numerical arrays, structural alignment for multiple arguments, etc.
 
 * **Naming Conventions:** Use descriptive, concise, all-lowercase, underscore-separated variable and function names of at most 20 characters. Read the current function documentation and consider each variable’s context, content, and role before naming it; avoid ambiguous or vague names. Use standard, commonly understood or documented abbreviations, such as `prop_idx` for a property index. Follow nearby naming patterns when in doubt. Uppercase textbook operator names (`H`, `R`, `K`, `P`, `Q`) and matrix names matching their mathematical notation are permitted. Loop counters should be single lowercase letters, such as `n` and `k`; do not use `i` or `l` as variables, and use `1i` for the imaginary unit. Use British spelling in function names, variable names, and comments, preferring `s` to `z` where both are allowed, and use the Oxford comma. Preserve required API field names, literal option strings, and existing API spellings rather than renaming them to satisfy these conventions.
 

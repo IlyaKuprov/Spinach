@@ -19,13 +19,17 @@ run_tests('verbose',true);
 ```
 
 
-GPU-dependent SpGEMM gateway compatibility regression (not part of the CPU manifest):
+GPU-dependent custom CUDA sparse-product regressions (not part of the CPU manifest):
 
 ```matlab
 addpath('kernel/overloads','tests/kernel');
 test_alg3_fallback();
+test_cuda_sparse();
 ```
 
-This requires a supported GPU and tests an isolated production-wrapper copy
-against missing and invalid MEX binaries and mocked non-loader failures.
-Shipped binaries are never renamed, modified, or rebuilt.
+These require a supported GPU. The fallback test uses an isolated wrapper copy
+against missing and invalid binaries and mocked non-loader failures; shipped
+binaries are never modified. The product test requires the compiled gateway
+and checks independent CPU references, real/complex combinations, empty and
+rectangular inputs, cancellation, bounded-memory row splitting, input
+immutability, and ordinary MATLAB operations on the returned sparse gpuArray.

@@ -16,12 +16,11 @@
 %
 %    P          -  propagator matrix
 %
-% Note: GPUs are supported, add 'gpu' to sys.enable array during 
-%       calculation setup. Sparse GPU products use cuSPARSE SpGEMM
-%       ALG2, the fastest of the three algorithms on the menthol
-%       propagator squarings. Native GPU multiplication is retained
-%       if the MEX is absent, unloadable, or does not recognise the
-%       sparse gpuArray storage layout.
+% Note: GPUs are supported, add 'gpu' to sys.enable during setup.
+%       Sparse GPU products use low-level CUDA CSR arithmetic with
+%       bounded shared-memory accumulation. Native GPU multiplication
+%       is retained only if the MEX is absent or unloadable. An
+%       unrecognised sparse storage layout raises an error.
 %
 % Note: propagator caching (https://doi.org/10.1063/1.4928978) is
 %       supported, add 'prop_cache' to sys.enable array to enable.
@@ -123,7 +122,7 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
         
         % Compute the next term
         if issparse(A)&&issparse(next_term)
-            next_term=cuda_sparse_by_sparse((1/n)*A,next_term,2);
+            next_term=cuda_sparse_by_sparse((1/n)*A,next_term);
         elseif issparse(A)
             next_term=(1/n)*A*next_term;
         else
@@ -196,7 +195,7 @@ if n_squarings>0
             
             % Square the propagator
             if issparse(P)
-                P=cuda_sparse_by_sparse(P,P,2);
+                P=cuda_sparse_by_sparse(P,P);
             else
                 P=P*P;
             end

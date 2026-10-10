@@ -1,39 +1,44 @@
 # kernel/utilities/zte.m
 
+- Signature: `projector=zte(spin_system,L,rho,nstates)`
+
 ## Purpose
 
-`zte.m` performs zero track elimination: it inspects the first few steps of the system trajectory and drops states that did not get populated beyond a user-specified tolerance, returning a projector matrix into the reduced state space.
+Zero track elimination inspects the first few trajectory steps and removes coordinates whose amplitudes remain below a user-specified tolerance.
 
-## Behaviour
+## Physical / mathematical content
 
-- Syntax: `projector=zte(spin_system,L,rho,nstates)`.
-- Input validation (`grumble`) requires the basis formalism to be `zeeman-liouv` or `sphten-liouv`, both `L` and `rho` to be numeric, `rho` to be a single vector (not a stack), `L` to be square, and `size(L,2)==size(rho,1)`.
-- If `nstates` is supplied, it must be a real positive integer scalar not exceeding `numel(rho)`; otherwise an error is raised.
-- Unless `'zte'` is listed in `spin_system.sys.enable`, the function reports that zero track elimination is not enabled, the basis is left unchanged, and `projector=1` is returned.
-- If `nnz(rho)/numel(rho) > spin_system.tols.zte_maxden`, the function skips elimination (too few zeros in the state vector) and returns `projector=1`.
-- If `norm(rho,1) < spin_system.tols.zte_tol`, the function skips elimination (state vector norm below drop tolerance, too small for the Krylov procedure) and returns `projector=1`.
-- Otherwise, the time step is set to `1/cheap_norm(L)`; if this is infinite (zero Liouvillian), a unit time step is used with a report.
-- The trajectory is preallocated as a complex matrix of size `numel(rho)`-by-`spin_system.tols.zte_nsteps`, with `trajectory(:,1)=rho`.
-- Steps 2 through `spin_system.tols.zte_nsteps` are computed with the Krylov `step` function. After each step, the active space dimension (number of states whose maximum absolute amplitude over the trajectory exceeds `spin_system.tols.zte_tol`) is compared with the previous value; the loop terminates early when the dimension stops changing.
-- Track selection: if `nstates` is given, states are ranked by their maximum absolute amplitude over the trajectory (descending) and the top `nstates` are kept; otherwise all states whose maximum absolute amplitude is below `spin_system.tols.zte_tol` are dropped.
-- In the compiled spherical-tensor space, every substance unit coordinate is retained regardless of its trajectory weight. This also applies to zero-population and spin-free substances; these mandatory coordinates may increase the retained dimension beyond `nstates`. For symmetry-reduced calls, `reduce` supplies the support of the projected unit directions instead of the original offsets.
-- The projector is built as `speye(size(L))` with the columns corresponding to zero tracks deleted. The intended usage is `L_reduced=P'*L*P` and `rho_reduced=P'*rho`.
-- The default tolerance may be altered by setting `sys.tols.zte_tol` before calling `create.m`.
-- If tiny interactions or nearly equivalent spins are present, it is best to leave zero track elimination off by omitting `'zte'` from the `sys.enable` cell array.
+Screening follows the actual initial state under the supplied Liouvillian. For a horizontal stack, the retained space contains the union of populated coordinates, without mixing the phases of different columns. This is trajectory-level pruning, not a change of spin basis or an orthogonalised Arnoldi/Lanczos construction.
 
-## Inputs and outputs
+## Numerical / algorithmic content
 
-Inputs:
-- `spin_system` — spin system object supplying tolerances (`zte_tol`, `zte_maxden`, `zte_nsteps`), formalism, and the `sys.enable` list.
-- `L` — the Liouvillian used for time propagation; must be square and dimensionally consistent with `rho`.
-- `rho` — the initial state vector for time propagation.
-- `nstates` (optional) — if specified, the `nstates` most populated states and all mandatory unit coordinates are kept, irrespective of the tolerance parameter.
+State columns are propagated together in bounded batches, one `step` call per batch and time point; a batch is discarded after its sampled trajectory has contributed to the row maxima. The batch width limits the complex-double dense input to approximately 16 MiB (except when a single column exceeds that bound). Each column is normalised before the shared Taylor propagation and restored afterward, so a weak column is not lost to the convergence tolerance set by a stronger one. Row-wise maxima of absolute amplitudes across the stack and sampled times determine the retained coordinates; exactly zero columns contribute no support.
 
-Output:
-- `projector` — projector matrix into the reduced space (a column-subset of the identity, or the scalar `1` when elimination is skipped).
+Sampling uses `1/cheap_norm(L)` (unit time for a zero generator), up to `zte_nsteps` samples including the initial state. Sampling stops only when none of the individual columns gains active support, rather than when their union temporarily plateaus. Without `nstates`, coordinates whose maxima are strictly below `zte_tol` are dropped. With `nstates`, the largest row maxima over columns and sampled times determine the retained coordinates.
 
-## References
+The existing not-enabled, occupied-row-density, and small-matrix-1-norm shortcuts take precedence over propagation and over `nstates`; they return scalar `1`, leaving the basis unchanged. The count is validated against the number of rows, not the number of input columns.
 
-- Source: [kernel/utilities/zte.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/zte.m)
-- Spinach Wiki: [zte.m](https://spindynamics.org/wiki/index.php?title=zte.m)
-- I. Kuprov, zero track elimination method: [http://dx.doi.org/10.1016/j.jmr.2008.08.008](http://dx.doi.org/10.1016/j.jmr.2008.08.008)
+In the compiled spherical-tensor space, every substance unit coordinate survives screening, including zero-population and spin-free blocks. These mandatory coordinates may increase the retained dimension beyond `nstates`. For symmetry-reduced calls, `reduce` supplies the projected unit support rather than original block offsets.
+
+## Syntax
+
+```matlab
+projector=zte(spin_system,L,rho,nstates)
+```
+
+## Parameters / inputs
+
+- `spin_system`: Spinach system in `zeeman-liouv` or `sphten-liouv` formalism, supplying tolerances and algorithm switches.
+- `L`: square Liouvillian used for time propagation.
+- `rho`: initial state column or horizontal stack of state columns, with the same number of rows as `L`.
+- `nstates`: existing optional positive integer, no larger than the state-space dimension. When screening runs, keeps this number of the most populated coordinates irrespective of the amplitude tolerance.
+
+## Outputs
+
+`projector` projects into the reduced space. Use `L_reduced=P'*L*P` and `rho_reduced=P'*rho`. A scalar `1` signals an unchanged basis.
+
+## Header notes
+
+Set `sys.tols.zte_tol` before `create` to change the default tolerance. ZTE is opt-in: add `'zte'` to `sys.enable`. With tiny interactions or nearly equivalent spins, leave it off.
+
+Method reference: [Kuprov, JMR (2008), doi:10.1016/j.jmr.2008.08.008](https://doi.org/10.1016/j.jmr.2008.08.008). See also [the function Wiki page](https://spindynamics.org/wiki/index.php?title=zte.m).

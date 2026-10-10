@@ -9,13 +9,15 @@
 %      L       - the Liouvillian to be used for time 
 %                propagation
 %
-%      rho     - the initial state to be used for 
-%                time propagation
+%      rho     - initial state column or horizontal stack of
+%                state columns to be used for time propagation
 %
 %      nstates - if this parameter is specified, only
 %                nstates most populated states are kept,
-%                irrespective of the tolerance parameter; unit
-%                coordinates are retained in addition
+%                irrespective of the tolerance parameter; stacks
+%                are ranked by maximum amplitude over columns
+%                and sampled times, with unit coordinates retained
+%                in addition
 %
 % Output:
 %
@@ -25,7 +27,9 @@
 %                            L_reduced=P'*L*P
 %                            rho_reduced=P'*rho;
 %
-% Note: in the compiled sphten-liouv space, unit coordinates of every
+% Note: stack columns are propagated together and screened by the
+%       maximum absolute amplitude reached in each state coordinate.
+%       In the compiled sphten-liouv space, unit coordinates of every
 %       substance survive elimination, including zero-population blocks.
 %       reduce.m supplies their support in projected irrep coordinates.
 %
@@ -48,12 +52,10 @@
 function projector=zte(spin_system,L,rho,nstates)
 
 % Validate the input
-grumble(spin_system,L,rho);
-
-% Validate the number of states if it is specified
-if exist('nstates','var')&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
-                            (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho)))
-    error('nstates must be a positive integer not exceeding the state space dimension.');
+if nargin==4
+    grumble(spin_system,L,rho,nstates);
+else
+    grumble(spin_system,L,rho);
 end
 
 % Run Zero Track Elimination
@@ -65,7 +67,7 @@ if ~ismember('zte',spin_system.sys.enable)
     % Return a unit matrix
     projector=1;
 
-elseif nnz(rho)/numel(rho)>spin_system.tols.zte_maxden
+elseif nnz(any(rho,2))/size(rho,1)>spin_system.tols.zte_maxden
     
     % Skip if the benefit is likely to be minor
     report(spin_system,'WARNING - too few zeros in the state vector, basis left unchanged.');
@@ -101,49 +103,56 @@ else
     report(spin_system,['a maximum of ' num2str(spin_system.tols.zte_nsteps) ...
                         ' steps shall be taken, ' num2str(timestep) ' seconds each.']);
     
-    % Preallocate the trajectory
-    trajectory=zeros(numel(rho),spin_system.tols.zte_nsteps,'like',1i);
-    
-    % Set the starting point
-    trajectory(:,1)=rho;
-    report(spin_system,['evolution step 0, active space dimension ' num2str(nnz(abs(trajectory(:,1))>spin_system.tols.zte_tol))]);
-    
-    % Compute trajectory steps with Krylov technique
-    for n=2:spin_system.tols.zte_nsteps
-        
-        % Take a step forward
-        trajectory(:,n)=step(spin_system,L,trajectory(:,n-1),timestep);
-        
-        % Analyze the trajectory
-        prev_space_dim=nnz(max(abs(trajectory(:,1:(n-1))),[],2)>spin_system.tols.zte_tol);
-        curr_space_dim=nnz(max(abs(trajectory),[],2)>spin_system.tols.zte_tol);
-        
-        % Inform the user
-        report(spin_system,['evolution step ' num2str(n-1) ...
-                            ', active space dimension ' num2str(curr_space_dim)]);
-        
-        % Terminate if done early
-        if curr_space_dim==prev_space_dim, break; end
-        
+    % Keep only row maxima globally; dense propagated batches are discarded
+    amplitudes=max(abs(rho),[],2);
+    report(spin_system,['evolution step 0, active space dimension ' ...
+                        num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
+
+    % Bound the dense workspace that step allocates for wide stacks
+    batch_width=max(1,floor(16*1024^2/(16*size(rho,1))));
+
+    % Propagate each multi-column batch until every column stops growing
+    for first=1:batch_width:size(rho,2)
+        columns=first:min(first+batch_width-1,size(rho,2));
+        block=rho(:,columns);
+        col_amplitudes=abs(block);
+        for n=2:spin_system.tols.zte_nsteps
+
+            % Record each column's active dimension independently
+            prev_space_dims=sum(col_amplitudes>spin_system.tols.zte_tol,1);
+
+            % Normalise columns to preserve weak states in a shared step
+            column_scales=max(abs(block),[],1);
+            column_scales(column_scales==0)=1;
+            block=step(spin_system,L,block./column_scales,timestep).*column_scales;
+            col_amplitudes=max(col_amplitudes,abs(block));
+
+            % A stagnant union can hide growth in an individual column
+            curr_space_dims=sum(col_amplitudes>spin_system.tols.zte_tol,1);
+            if all(curr_space_dims==prev_space_dims), break; end
+
+        end
+        amplitudes=max(amplitudes,max(col_amplitudes,[],2));
+        report(spin_system,['screened state columns ' num2str(first) ...
+                            ' to ' num2str(columns(end)) ...
+                            ', active space dimension ' ...
+                            num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
     end
-    
+
     % Determine which tracks to drop
     if exist('nstates','var')
-        
-        % Determine state amplitudes
-        amplitudes=max(abs(trajectory),[],2);
         
         % Sort the maximum amplitudes in descending order
         [~,index]=sort(amplitudes,'descend');
         
         % Drop all states beyond a given number
-        zero_track_mask=true(size(rho));
+        zero_track_mask=true(size(rho,1),1);
         zero_track_mask(index(1:nstates))=false();
         
     else
         
         % Drop all states with maximum amplitude below the threshold 
-        zero_track_mask=(max(abs(trajectory),[],2)<spin_system.tols.zte_tol);
+        zero_track_mask=(amplitudes<spin_system.tols.zte_tol);
         
     end
     
@@ -165,21 +174,25 @@ end
 end
 
 % Input validation function
-function grumble(spin_system,L,rho)
+function grumble(spin_system,L,rho,nstates)
 if ~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'})
     error('zero track elimination is only available for zeeman-liouv and sphten-liouv formalisms.');
 end
 if (~isnumeric(L))||(~isnumeric(rho))
     error('both inputs must be numeric.');
 end
-if ~isvector(rho)
-    error('single state vector expected, not a stack.');
+if (~ismatrix(rho))||(size(rho,2)==0)
+    error('state column or horizontal stack of state columns expected.');
 end
 if size(L,1)~=size(L,2)
     error('Liouvillian must be square.');
 end
 if size(L,2)~=size(rho,1)
     error('Liouvillian and state vector dimensions must be consistent.');
+end
+if nargin==4&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
+              (nstates<1)||(mod(nstates,1)~=0)||(nstates>size(rho,1)))
+    error('nstates must be a positive integer not exceeding the state space dimension.');
 end
 end
 
@@ -188,4 +201,5 @@ end
 % Lastly they say they always believed it. 
 %
 % Louis Agassiz
+
 

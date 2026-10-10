@@ -26,7 +26,13 @@ grumble(spin_system,R);
 nnz_before=nnz(R);      
 
 % Compile the index of all longitudinal product states in the basis
-[~,M]=lin2lm(spin_system.bas.basis); long_states=find(sum(abs(M),2)==0);
+long_mask=false(spin_system.bas.offsets(end),1);
+for n=1:spin_system.bas.nsubst
+    [~,M]=lin2lm(spin_system.bas.basis{n});
+    idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+    long_mask(idx)=sum(abs(M),2)==0;
+end
+long_states=find(long_mask);
 
 % Convert R to XYZ format
 [rows,cols,vals]=find(R);
@@ -51,7 +57,8 @@ end
 if (~isnumeric(R))||(size(R,1)~=size(R,2))
     error('R must be a square matrix.');
 end
-unit=unit_state(spin_system);
+unit=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
+            spin_system.bas.offsets(end),1);
 if norm(R*unit,2)>1e-10
     error('R appears to be thermalised, cannot proceed.');
 end

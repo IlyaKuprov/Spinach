@@ -24,7 +24,7 @@ inter.coupling.euler{1,2}=[0 0 0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -36,7 +36,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.screen=state(spin_system,'L-','E');
 parameters.pulse_op=operator(spin_system,'Ly','E');
 parameters.offset=0;

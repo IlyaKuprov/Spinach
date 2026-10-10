@@ -19,7 +19,7 @@ sys.magnet=0.33;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable path tracing (small system)
 sys.disable={'pt'};
@@ -32,6 +32,9 @@ parameters.tau=100e-9;
 parameters.zerofill=4096;
 parameters.spins={'E'};
 parameters.axis_units='MHz';
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

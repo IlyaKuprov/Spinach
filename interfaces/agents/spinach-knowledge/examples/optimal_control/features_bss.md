@@ -11,3 +11,5 @@ The ensemble varies an offset through the transverse `Lx` operator, using the 11
 ## Optimisation and reported observable
 
 `optimcon` prepares the control problem for LBFGS GRAPE (`fmaxnewton` with `@grape_xy`), real-valued fidelity and a 100-iteration limit. The script optimises once with `control.bsiegert=true` and again with it false, then evaluates each resulting pulse using `ensemble` in the corrected model. It reports two corrected-model ensemble fidelities without hard-coded values. The source header describes the corrected-versus-uncorrected gap as about six times the Lz-offset ensemble gap; the script does not compute that separate offset comparison. The calculation is a Spinach simulation, not a hardware measurement.
+
+The zero drift uses the compiled state-space dimension `bas.offsets(end)`, matching the state and control-operator dimensions.

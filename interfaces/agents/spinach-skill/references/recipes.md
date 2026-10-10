@@ -1,5 +1,33 @@
 # Starting points by physical problem
 
+## Contents
+
+- [Index of `examples/`](#index-of-examples)
+- [Optimal-control case studies](#optimal-control-case-studies)
+- [Liquid-state NMR, one dimension](#liquid-state-nmr-one-dimension)
+- [Liquid-state NMR, homonuclear 2D](#liquid-state-nmr-homonuclear-2d)
+- [Liquid-state NMR, heteronuclear 2D](#liquid-state-nmr-heteronuclear-2d)
+- [Proteins and nucleic acids](#proteins-and-nucleic-acids)
+- [Solid-state NMR, static powder and MAS](#solid-state-nmr-static-powder-and-mas)
+- [Quadrupolar nuclei and NQR](#quadrupolar-nuclei-and-nqr)
+- [EPR, field-swept and CW](#epr-field-swept-and-cw)
+- [EPR, pulsed: ESEEM, HYSCORE, ENDOR](#epr-pulsed-eseem-hyscore-endor)
+- [DEER](#deer)
+- [DNP](#dnp)
+- [PHIP and SABRE](#phip-and-sabre)
+- [Radical pairs, magnetic field effects, CIDNP](#radical-pairs-magnetic-field-effects-cidnp)
+- [Relaxation studies](#relaxation-studies)
+- [Chemical kinetics and exchange](#chemical-kinetics-and-exchange)
+- [MRI, imaging, flow and diffusion](#mri-imaging-flow-and-diffusion)
+- [Optimal control](#optimal-control)
+- [Fitting to experimental data](#fitting-to-experimental-data)
+- [Singlet states](#singlet-states)
+- [Zero-field and low-field NMR](#zero-field-and-low-field-nmr)
+- [Paramagnetic NMR and partial alignment](#paramagnetic-nmr-and-partial-alignment)
+- [Giant spin, lanthanides and molecular magnets](#giant-spin-lanthanides-and-molecular-magnets)
+- [Tensor visualisation, quantum technology, fundamentals](#tensor-visualisation-quantum-technology-fundamentals)
+- [Exporting NMR and EPR data](#exporting-nmr-and-epr-data)
+
 Paths are relative to the Spinach repository root. Every simulation follows the
 seven-part shape given in `SKILL.md`; what changes between problem classes is
 the context, the assumptions string, the basis, the pulse sequence, and the
@@ -347,10 +375,15 @@ for normalisation and the real sweep is `parameters.fields` in tesla, alongside
 `parameters.rates` in hertz, `parameters.electrons` and
 `parameters.needs={'zeeman_op'}`. The basis carries `bas.projections={0}` and
 permutation symmetry on equivalent protons via `bas.sym_spins`/`bas.sym_group`,
-and `sys.disable={'zte'}` is required because the singlet start state is not
+and ZTE must remain off (do not add `'zte'` to `sys.enable`) because the singlet start state is not
 the thermal one. For Haberkorn or Jones-Hore kinetics use `@rydmr` with
-`inter.chem.rp_theory`, `rp_electrons` and `rp_rates` (Hz) supplied together;
-the two routes must not be mixed. Yield anisotropy uses `powder` with
+explicit `inter.chem.reactions` loss records with named singlet/triplet
+selectors (or their `jones-hore-` variants), electron indices, and numeric
+rates. Exactly one singlet-selector record defines the initial pair and
+yield prefactor in `rydmr`; all records must have empty products for this
+full-space resolvent (tracked products use time-domain propagation). The
+exponential and selector routes must not be
+mixed. See [relaxation](relaxation.md#chemical-kinetics) for record syntax. Yield anisotropy uses `powder` with
 `parameters.sum_up=0`, returning per-orientation yields plus the grid structure
 (`singlet_yield_anisotropy_1.m`). CIDNP is a different mechanism, handled
 phenomenologically with `magpump` in `cidnp_pumping_2.m`; the explicit geminate
@@ -366,7 +399,8 @@ To extract one rate by hand:
 
 ```matlab
 R=relaxation(spin_system);
-Lz=state(spin_system,'Lz','<isotope>'); Lp=state(spin_system,'L+','<isotope>');
+Lz=coil_state(spin_system,'Lz','<isotope>','exact');
+Lp=coil_state(spin_system,'L+','<isotope>','exact');
 R1=-(Lz'*R*Lz)/(Lz'*Lz);  R2=-(Lp'*R*Lp)/(Lp'*Lp);
 ```
 
@@ -379,22 +413,34 @@ functions from molecular dynamics are in `relaxation_theory/from_md`.
 ## Chemical kinetics and exchange
 
 `kinetics/exchange_symmetric.m` is the two-site template. Sites are chemical
-subsystems, the rate matrix has columns summing to zero, and the initial state
-is spread across subsystems with the `'chem'` qualifier.
+substances, and each directed reaction declares its atom matching explicitly.
+For two copies of the same isotope:
 
 ```matlab
-inter.chem.parts={<spin indices of site 1>,<spin indices of site 2>};
-inter.chem.rates=[-<k12> <k21>; <k12> -<k21>];   % Hz
-inter.chem.concs=[<c1> <c2>];
-parameters.rho0=state(spin_system,'L+','<isotope>','chem');
+inter.chem.parts={1,2};
+inter.chem.concs=[1 1];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',2e3),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',2e3)};
 ```
 
-Without `'chem'` the starting magnetisation would sit in one site only. Varying
-the rates to walk the spectrum through coalescence is the cheapest validation
-of an exchange model. `exchange_asymmetric.m` handles unequal populations,
-`flux_symmetric.m` irreversible flux, `glucose_exsy_a.m` two-dimensional EXSY,
-`relayed_hyperpol.m` polarisation relayed through a reaction, and
-`equilibrate(rates,concs)` the equilibrium composition of a rate matrix.
+After `create` and `basis`, prepare with `state(spin_system,'L+','1H')` and
+detect with `coil_state(spin_system,'L+','1H','exact')`. All `state` methods
+are concentration-weighted; no chemistry qualifier is needed. Varying the
+rates through coalescence tests an exchange model. `exchange_asymmetric.m`
+handles unequal populations, `glucose_exsy_a.m` demonstrates two-dimensional
+EXSY, and `relayed_hyperpol.m` relays polarisation through reactions.
+`equilibrate(rates,concs)` still solves a separate classical linear network;
+its matrix is not an input field for `create`.
+
+For spin replacement rather than whole-species conversion, use an additive
+`A+B -> A+B` record matching the departing spin to the pool and the pool spin
+back to the molecule. `tests/kernel/test_cwdm_flux.m` checks transfer,
+departing-spin correlation loss, and invariant concentrations. Do not infer
+that a permutation record preserves the old phenomenological flux model's
+correlations. Nonlinear examples use `kinetics` and the state-dependent `step`
+route; `react_gen` returns product-row maps, not propagation matrices.
 
 ## MRI, imaging, flow and diffusion
 
@@ -433,7 +479,7 @@ normalise initial and target states, collect control and offset operators,
 assemble the drift, hand a separate `control` structure to `optimcon`, optimise
 with `fmaxnewton`.
 
-For cooperative phase control, `grape_coop` retains the requested primary fidelity and uses real-overlap auxiliary derivatives for its squared-impurity penalty, including with nonunit targets. Zero real auxiliary overlaps and zero impurity gradients are valid engine outputs. `fmaxnewton` checks only the initial assembled gradient on unfrozen coordinates for all four methods, but `grape_coop` provides no Hessian and supports only `lbfgs` and `rbfgs` optimisation; do not reject individual auxiliary contributions. The initial gradient norm must be at least `1e-6`, regardless of the objective value. Objective-only calls with `max_iter=0` do not apply the initial-gradient check.
+For cooperative phase control, the `control.freeze` mask matches the two stacked pulse phase profiles: each pulse freezes only its own rows, in both primary and impurity gradients; the objective is unchanged. An empty mask freezes nothing. `grape_coop` retains the requested primary fidelity and uses real-overlap auxiliary derivatives for its squared-impurity penalty, including with nonunit targets. Zero real auxiliary overlaps and zero impurity gradients are valid engine outputs. `fmaxnewton` checks only the initial assembled gradient on unfrozen coordinates for all four methods, but `grape_coop` provides no Hessian and supports only `lbfgs` and `rbfgs` optimisation; do not reject individual auxiliary contributions. The initial gradient norm must be at least `1e-6`, regardless of the objective value. Objective-only calls with `max_iter=0` do not apply the initial-gradient check.
 
 ```matlab
 rho_init=state(spin_system,{'Lz'},{<spin>}); rho_init=rho_init/norm(full(rho_init),2);
@@ -482,6 +528,14 @@ Four-output Hessian requests with nonempty state-vector keyholes are refused
 even when the configured optimisation method is `lbfgs` or `rbfgs`.
 Analytically designed rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
+Offset-independent adiabaticity inversion pulses (Tannus and Garwood, 1996)
+come from `oia_pulse(npts,dur,bwidth,am_fun)`: an envelope handle that maps a
+`1 x npts` row of times on `[-1,1]` to a finite floating-point row that is
+non-negative and strictly positive at interior samples (zeros allowed only
+at the two ends) in, Eq. 6 frequency sweep out, same output format and
+adiabaticity calibration as `chirp_pulse`; the Table 1 envelopes are one-line
+handles in its header and `shaped_pulses/shaped_pulse_oia.m` reproduces
+Figure 1 of the paper.
 In `zeeman-hilb`, the third output of `shaped_pulse_xy` is the one-sided
 ordered propagator for every method: reuse it as `P*rho*P'`, not `P*rho`;
 requesting it leaves the chosen two-sided state-propagation method unchanged.
@@ -641,7 +695,8 @@ giving a rotation per rank. Stevens parameters from a ligand-field calculation
 are converted with `icm2hz` then `stev2sph` and rotated with `wigner`
 (`dy_lft_single_1.m`). Drivers: `fieldscan_enlev` for Zeeman diagrams,
 `fieldscan_magn` for finite-speed sweep magnetisation and hysteresis, `eqmag`
-for equilibrium molar magnetisation (`create` and `basis` must be re-run inside
+for single-substance equilibrium molar magnetisation (mixture molar normalisation
+is not supported; `create` and `basis` must be re-run inside
 the loop when field or temperature changes), `fieldsweep` for powder EPR
 (`lanthanide_powder.m`), `geffect` for the effective g-tensor of a Kramers
 doublet. Relaxation work needs `sphten-liouv`: `lanthanide_redfield.m` for
@@ -673,3 +728,40 @@ hand instead of using a context, and the symmetry and state-space restriction
 files for basis-truncation behaviour. `extremes/high_symmetry_1.m` needs tens
 of cores and over a hundred gigabytes; `nmr_stochastic/snmr_strychnine.m`
 requires a GPU.
+
+## Exporting NMR and EPR data
+
+For native Spinach outputs, prefer `jcamp_nmr(spin_system,parameters,signal,domains,info)`
+for 1D/2D/3D NMR arrays and named quadrature structures, or
+`jcamp_epr(spin_system,parameters,signal,kind,info)` for electron acquisitions,
+processed spectra, returned field sweeps, and ENDOR RF scans. NMR domains are
+in physical F1/F2/F3 order; 2D arrays are [F2,F1], while 3D arrays are [F1,F2,F3].
+No phase cycling or quadrature recombination is performed. Frequency axes use
+`ft_axis` in Hz; NMR observation frequencies come from nuclei and the field.
+For non-uniform EMR times or custom maps, use `jcamp_signal` with explicit
+axis columns in MATLAB array order. See the [wrapper examples](../../../jcamp/README.md#export-directly-from-spinach-results)
+for required ownership and method metadata, units, and native row scan shapes.
+
+Use `text=jcamp_export(data)` in `interfaces/jcamp/` for JCAMP-DX export.
+Its [documented structure](../../../jcamp/README.md) supplies ownership, typed
+blocks, metadata, and either explicit traces, general NTUPLES pages, or peaks.
+Complex traces retain separate real/imaginary channels; multidimensional and
+hypercomplex data require explicit page coordinates and component names.
+Multiple datasets become a LINK file. Set `data.filename` to also write the
+returned text. No FFT, referencing, normalisation, unit conversion, or
+integer quantisation is performed. NMR observation frequency is in MHz; EMR
+microwave frequency is in Hz. The caller supplies the experiment-specific
+metadata, including pulse sequences and quadrature conventions. Tabulated
+abscissa units must match the declared NMR/EMR type; NMR delay text must
+contain the finite real numeric pair `(RD, ID)`. Multiplicity applies only to NMR
+peaks. Axis units and core EMR methods are validated; NMR 5.01 permits
+`MAGNITUDE` and `POWER` alongside `ARBITRARY UNITS`, without applying a
+transform. Add a PAGE variable when replicate identity must be explicit to
+coordinate-keyed readers.
+
+Supply `.SIMULATION SOURCE` and `.SIMULATION PARAMETERS` as non-empty ASCII
+text (row strings or cell vectors of lines), not numeric arrays.
+
+Complex NMR quadratures use `ARBITRARY UNITS`; magnitude/power data must
+be real and already transformed. NMR assignments may omit heights and method
+comments; widths require a method description.

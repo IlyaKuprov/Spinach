@@ -9,7 +9,7 @@ A simulated homonuclear 1H inversion-recovery experiment for strychnine. The sou
 
 ## Spin system and relaxation
 
-The model comes from `strychnine({'1H'})`; the magnetic-field parameter is 5.9. The calculation enables greedy parallelisation and uses Redfield relaxation, Di Bari equilibrium, `rlx_keep='kite'`, a correlation-time entry of `200e-12`, and a temperature parameter of 298 (the source does not annotate units for these parameter values). The basis is `sphten-liouv` with the IK-2 scalar-coupling approximation, scalar-coupling connectivity, proximity level 1, and a proximity cutoff of 5.0.
+The model comes from `strychnine({'1H'})`; the magnetic-field parameter is 5.9. The calculation enables greedy parallelisation and uses Redfield relaxation, Di Bari equilibrium, `rlx_keep='kite'`, a correlation-time entry of `200e-12`, and a temperature parameter of 298 (the source does not annotate units for these parameter values). The basis is `sphten-liouv` with the IK-2 scalar-coupling approximation, scalar-coupling connectivity, proximity level 1, and a proximity cutoff of 5.0. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Sequence and spectrum
 

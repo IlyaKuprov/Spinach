@@ -33,3 +33,11 @@ The scalar objective is `1e-6*sum(sum((spectrum-expt_spec).^2))`, using the tran
 ## Entry-point output
 
 `glucose_exsy_b()` displays the optimiser's final vector and saves the current figure as `glucose_exsy_b.fig` in the MATLAB working directory. On non-worker evaluations, the two-panel comparison labels the simulated plot “both” and the denoised experimental display “positive”. The function declares no output argument, and the saved figure is not a saved fit-parameter file.
+
+Every objective evaluation rebuilds four directed reaction records from the fitted rates, with corresponding fluorines matched between inside/outside pools. The local rate matrix is retained only for the concentration equilibrium calculation; it is not passed as a retired chemistry input. The initial state uses concentration-weighted `state` without the retired `chem` method.
+
+## Receiver weighting and objective equivalence
+
+The NOESY detection operator must use unweighted `coil_state`; the initial state already carries the equilibrium chemical concentrations. Weighting the receiver again changes the fitted objective. In an integration check with the unweighted production NOESY receiver and the original full acquisition grid, the initial parameter vector gives objective 96212.119538283994, matching the stock concentration convention. This validates the initial objective, not convergence or equivalence of the final optimiser vector; the ten-iteration cap remains unchanged.
+
+This objective requires the unweighted receiver: the reaction-record driver alone does not provide it. A checkout whose `noesy` still constructs detection with `state` weights the concentrations twice and will not reproduce the quoted value; receiver migration is a separate integration prerequisite.

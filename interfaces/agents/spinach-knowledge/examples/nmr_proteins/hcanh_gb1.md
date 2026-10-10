@@ -8,7 +8,7 @@ Simulates a three-dimensional H(CA)NH protein NMR spectrum for GB1, with the sou
 
 ## Protein system and basis
 
-The example imports `2N9K.pdb` and `2N9K.bmrb` using `pdb_mol=1`, `noshift='delete'`, and `select='backbone-minimal'`, sets the field to `14.1` T, and sets `inter_cutoff=2.0` and `prox_cutoff=4.0` (the source does not state units for these tolerance values). It builds a `sphten-liouv` basis with `IK-1` approximation, `scalar_couplings` connectivity, `inter_level=4`, and `prox_level=1`. `sys.enable={'greedy'}` is active; `gpu` appears only as a commented alternative.
+The example imports `2N9K.pdb` and `2N9K.bmrb` using `pdb_mol=1`, `noshift='delete'`, and `select='backbone-minimal'`, sets the field to `14.1` T, and sets `inter_cutoff=2.0` and `prox_cutoff=4.0` (the source does not state units for these tolerance values). It builds a `sphten-liouv` basis with `IK-1` approximation, `scalar_couplings` connectivity, `inter_level=4`, and `prox_level=1`. `sys.enable={'zte','greedy'}` is active; `gpu` appears only as a commented alternative.
 
 ## Sequence, acquisition and processing
 

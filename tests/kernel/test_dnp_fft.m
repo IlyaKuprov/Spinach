@@ -18,7 +18,7 @@ result=new_test_result('kernel/dnp_fft','FFT DNP steady states',...
 sys.magnet=0.0001; sys.isotopes={'E','1H'};
 inter.zeeman.scalar={2.0023,0};
 inter.coupling.scalar=cell(2); inter.coupling.scalar{1,2}=1e4;
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Exercise both Liouville bases, signed offsets, phase counts, and coils
 for formalism={'sphten-liouv','zeeman-liouv'}

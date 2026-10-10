@@ -26,7 +26,7 @@ inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
                        
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -34,6 +34,9 @@ inter.rlx_keep='diagonal';
 inter.equilibrium='zero';
 inter.r1_rates={20e6 0.5e6};
 inter.r2_rates={20e6 0.5e6};
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -44,7 +47,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=5e8;
@@ -75,7 +78,7 @@ ktitle('Single crystal ESR spectrum');
 clear('parameters');
 parameters.spins={'E','14N'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.orientation=[0 0 0];
 parameters.offset=[0 0];
 parameters.method='expm';

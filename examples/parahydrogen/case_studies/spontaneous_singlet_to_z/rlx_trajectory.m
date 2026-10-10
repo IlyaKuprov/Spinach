@@ -36,7 +36,10 @@ inter.tau_c={500e-12};
 
 % Formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

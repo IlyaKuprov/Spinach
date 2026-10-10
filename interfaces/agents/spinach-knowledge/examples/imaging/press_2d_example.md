@@ -25,3 +25,5 @@ The source comments list alternative RF frequencies for components B (`{-80e3, -
 [Example source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/press_2d_example.m) · [PRESS callback](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_2d.m) · [Voxel diagnostic](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/press_voxel_2d.m)
 
 The source credits Ahmed Allami and Ilya Kuprov.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

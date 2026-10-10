@@ -24,7 +24,7 @@ inter.zeeman.scalar{1}=32.4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -51,8 +51,8 @@ parameters.sweep=[44e3 52e3];
 parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=state(spin_system,'Lz','14N');
-parameters.coil=cos(theta)*state(spin_system,'Lz','14N')+...
-                sin(theta)*state(spin_system,'Lx','14N');
+parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N','exact')+...
+                sin(theta)*coil_state(spin_system,'Lx','14N','exact');
 parameters.Lx=cos(theta)*operator(spin_system,'Lz','14N')+...
               sin(theta)*operator(spin_system,'Lx','14N');
 parameters.spins={'14N'};

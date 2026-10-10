@@ -23,7 +23,7 @@ sys.enable={'ham_cache'}; sys.parallel={'processes',1}; sys.parprops={};
 inter.giant.coeff={{[0 0 0],[2e5 3e5 7e5 -3e5 2e5],...
                     zeros(1,7),[4e4 0 2e4 0 8e4 0 2e4 0 4e4]}};
 inter.giant.euler={{[0 0 0],[0.31 0.53 0.17],[0 0 0],[0.19 0.41 0.37]}};
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 angles=[0.29 0.47 0.61]; isotopes={'E5','E6'};
 
 % Exercise opposite cache insertion orders on distinct physical systems

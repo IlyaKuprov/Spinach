@@ -24,3 +24,7 @@ When supplied, `parameters.rho0` and `parameters.coil` are projected into the ce
 ## Source-supported example
 
 `examples/nmr_solids/mas_powder_gly_floquet.m` calculates a 13C MAS powder spectrum for glycine at 14.1 T. It uses a 2 kHz rate, `max_rank=23`, and the `leb_2ang_rank_23` grid, with 256 time points and a 50 kHz sweep. These are example settings, not universal convergence prescriptions.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:floquet:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

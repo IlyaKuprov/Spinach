@@ -45,3 +45,5 @@ result=test_dynamic_remaining_core_suite()
 
 - Source file: [tests/kernel/test_dynamic_remaining_core_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_remaining_core_suite.m) in the Spinach repository.
 - Functions exercised: `adelim`, `cg_fast`, `report`, `banner`, `polinfo`, `polyadic`, `summary_coordinates`, `impound`, `dipolar`, `isoswap`, `spin`, `intrep`, `fdhess`, `sinkhole`, `lorentzcon`, `gausscon`, `gaussfun`, `magpump`, `sec2kite`, `sorensen`, `stitch`, `rwalk`, `euler2dcm`, `new_test_result`, `test_close`, `test_true`.
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.

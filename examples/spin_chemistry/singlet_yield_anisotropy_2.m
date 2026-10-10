@@ -17,7 +17,7 @@ sys.isotopes={'E','E','14N','14N','1H'};
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Rotation matrices
 R1=[0.4380  0.8655 -0.2432;  0.8981 -0.4097  0.1595; -0.0384  0.2883  0.9568];

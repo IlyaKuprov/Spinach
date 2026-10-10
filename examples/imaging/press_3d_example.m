@@ -20,7 +20,7 @@ inter.coupling.scalar{1,2}=10;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable path tracing
 sys.disable={'pt'};
@@ -66,7 +66,7 @@ parameters.rlx_op={relaxation(spin_system)};
 parameters.rho0_ph={ones(parameters.npts)};   
 parameters.rho0_st={state(spin_system,'Lz','all')};
 parameters.coil_ph={ones(parameters.npts)};
-parameters.coil_st={state(spin_system,'L+','all')};
+parameters.coil_st={coil_state(spin_system,'L+','all','exact')};
 
 % Run voxel selection diagnostics
 phan=imaging(spin_system,@press_voxel_3d,parameters);

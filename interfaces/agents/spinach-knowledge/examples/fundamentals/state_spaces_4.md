@@ -19,3 +19,5 @@ singlerot is called with the traject callback and NMR mode to produce a trajecto
 ## Output and scope
 
 The function creates a correlation-order figure; it does not return or save a numerical result. The source defines the system, basis, grid name, propagation call, averaging call, and plot limits, but contains no plotted values or reported trajectory features. It therefore supports describing the calculation setup, not asserting a quantitative MAS response or a conclusion about which state-space contributions dominate. The orientation-grid identifier is retained as given; the source does not explain its quadrature construction or accuracy.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

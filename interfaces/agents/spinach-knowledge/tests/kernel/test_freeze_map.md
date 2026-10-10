@@ -14,7 +14,9 @@ The `control.freeze` mask applies to **input** waveform coordinates. Freezing an
 
 For constrained curvilinear controls the same masking property covers every objective channel, including the norm-squared penalty. With exact-Hessian methods, frozen rows and columns of the Hessian must vanish and the active block must agree with finite differences of production gradients (`1e-8` tolerance). The direct `grape_liouv` mask remains effective; the direct `grape_hilb` engine retains its existing unmasked derivatives.
 
-Finally, a long physically frozen interval must not require an unreachable propagation derivative. This remains true when a rank-reducing distortion and phase cycle together cancel the otherwise free input direction: the steady-state objective and gradient must stay finite, including with a non-Hermitian drift.
+Finally, a long physically frozen interval must not require an unreachable propagation derivative. This remains true when a rank-reducing distortion and phase cycle together cancel the otherwise free input direction: the steady-state objective and gradient must stay finite, including with a non-Hermitian drift. The four-state spherical-tensor fixture supplies the compiled single-substance offsets `[0;4]` so that `steady` can locate its unit coordinate.
+
+A two-substance steady-state fixture compares the dressed gradient with the concatenated gradients of its single-substance blocks and the fidelity with their sum, at absolute and relative whole-array tolerances of `1e-12`. Both unit coordinates remain exactly one throughout propagation; a nonzero target unit component in either block is rejected.
 
 ## Inputs and outputs
 
@@ -31,3 +33,5 @@ result=test_freeze_map()
 ## References
 
 - Spinach optimal control module functions used here: `optimcon`, `grape_xy`, `grape_curv`, `grape_phase`, `grape_liouv`, `grape_hilb`, `new_test_result`, `test_close`, `test_true`, `firf`, `spf`, `pauli`.
+
+The synthetic steady-state fixture supplies its unit concentration explicitly. Single-substance references sliced from the segmented fixture retain only the corresponding concentration and local spin membership, matching the compiled steady-state contract.

@@ -59,9 +59,9 @@ t2=zeros(spin_system.comp.nspins,1);
 
 % Fill the arrays
 parfor n=1:spin_system.comp.nspins
-    Lz=state(spin_system,{'Lz'},{n},'cheap');
+    Lz=coil_state(spin_system,{'Lz'},{n},'cheap');
     r1(n)=-real((Lz'*R*Lz)/(Lz'*Lz)); t1(n)=1/r1(n);
-    Lp=state(spin_system,{'L+'},{n},'cheap');
+    Lp=coil_state(spin_system,{'L+'},{n},'cheap');
     r2(n)=-real((Lp'*R*Lp)/(Lp'*Lp)); t2(n)=1/r2(n);
 end
 

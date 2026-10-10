@@ -32,7 +32,7 @@ inter.zeeman.scalar={0.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -47,7 +47,7 @@ rho_targ=state(spin_system,{'Lx'},{1});
 rho_targ=rho_targ/norm(full(rho_targ),2);
 
 % Drift Liouvillian is zero on resonance
-dim=size(spin_system.bas.basis,1);
+dim=spin_system.bas.offsets(end);
 
 % Control parameters
 control.drifts={{sparse(dim,dim)}};

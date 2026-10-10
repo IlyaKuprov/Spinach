@@ -39,7 +39,7 @@ inter.coupling.matrix{2,2}=[1e8  0   0
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -49,8 +49,8 @@ spin_system=basis(spin_system,bas);
 parameters.rho0=state(spin_system,'Lz','E8');
 parameters.ex_prob=operator(spin_system,'CTx',1);
 parameters.ex_pump=operator(spin_system,'CTx',2);
-parameters.coil_prob=state(spin_system,{'L+'},{1});
-parameters.coil_pump=state(spin_system,{'L+'},{2});
+parameters.coil_prob=coil_state(spin_system,{'L+'},{1},'exact');
+parameters.coil_pump=coil_state(spin_system,{'L+'},{2},'exact');
 parameters.spectrum_sweep=1e10;
 parameters.spectrum_nsteps=1024;
 parameters.ex_hard=operator(spin_system,'Lx','electrons');

@@ -1,5 +1,0 @@
-# Historical Tosner JMR 2009 Spinach variants
-
-These scripts illustrate related optimal-control targets but **are not numerical reproductions** of [Tošner et al., J. Magn. Reson. 197, 120–134 (2009)](https://doi.org/10.1016/j.jmr.2008.11.020): the coherence-transfer code adds an RF-power ensemble; inversion uses a soft spillout penalty in place of a hard cap; refocusing uses a 30 kHz RF scale and state-transfer rather than the paper's 15 kHz propagator target. They are retained so existing users do not lose examples.
-
-For source-deposited broadband pulse simulations and graphical offset/RF response maps, use [BEBOP/BIBOP](../Kobzar_JMR_2004/bebop_bibop_profiles.m) for excitation/inversion and [UR180](../Kobzar_JMR_2012/ur180_profiles.m) for refocusing. For a physically derived toroid RF distribution, use [toroid_oc_optim](../Skinner_JMR_2011/toroid_oc_optim.m) to design a new Spinach excitation pulse and compare it with the paper's 74% rectangular-pulse benchmark in [toroid_response_map](../Skinner_JMR_2011/toroid_response_map.m). The new design is not the article's deposited waveform.

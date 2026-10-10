@@ -63,7 +63,9 @@ states=cell(1,numel(spin_system.chem.parts));
 
 % Index basis states for different chemical species
 for s=1:numel(spin_system.chem.parts)
-    states{s}=(sum(spin_system.bas.basis(:,spin_system.chem.parts{s}),2)>0);
+    states{s}=false(spin_system.bas.offsets(end),1);
+    idx=(spin_system.bas.offsets(s)+1):spin_system.bas.offsets(s+1);
+    states{s}(idx)=spin_system.bas.tot_cord{s}>0;
 end
 
 % Loop over chemical species

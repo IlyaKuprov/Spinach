@@ -16,3 +16,5 @@ The basis uses `sphten-liouv` with `IK-0` approximation, interaction level 5, an
 ## Computation and output
 
 The function constructs the system and basis, calls `solid_effect` for time dependence, and plots real longitudinal expectation values on a logarithmic time axis from 0 to 10 s: the electron in one panel and the six proton channels in the other. It then requests a steady state and prints the real `Tr(Sz*rho)` values for all seven spins. It takes no arguments and returns no explicit output; the source does not save the arrays or figure. It depends on Spinach's model/basis, solid-effect, and plotting routines being available on the MATLAB path.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

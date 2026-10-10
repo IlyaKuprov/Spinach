@@ -20,7 +20,7 @@ inter.zeeman.euler={[-90 -90 -17]*(pi/180)};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};
@@ -44,7 +44,7 @@ parameters.sweep=[75e3 100e3];
 parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=state(spin_system,'Lz','14N');
-parameters.coil=state(spin_system,'Lz','14N');
+parameters.coil=coil_state(spin_system,'Lz','14N','exact');
 parameters.spins={'14N'};
 parameters.axis_units='kHz';
 parameters.verbose=0;

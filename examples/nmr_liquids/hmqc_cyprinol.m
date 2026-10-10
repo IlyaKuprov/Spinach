@@ -14,16 +14,16 @@ function hmqc_cyprinol()
 sys.magnet=11.7;
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 sys.tols.prox_cutoff=4.0;
 sys.tols.inter_cutoff=5.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.inter_level=3;
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-1'};
+bas.inter_level={3};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Sequence parameters
 parameters.J=150;

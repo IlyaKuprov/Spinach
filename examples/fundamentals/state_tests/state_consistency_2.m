@@ -16,7 +16,7 @@ inter.zeeman.scalar={0 0};
 
 % Hilbert space, Zeeman basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=create(sys, inter);
 spin_system=basis(spin_system, bas);
 
@@ -26,7 +26,7 @@ Op{1}=state(spin_system,{'Lz','Lx'},{1,2})+...
 
 % Liouville space, Zeeman basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=create(sys, inter);
 spin_system=basis(spin_system, bas);
 
@@ -39,7 +39,7 @@ Op{2}=reshape(Op{2},[24 24]);
 
 % Liouville space, IST basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=create(sys, inter);
 spin_system=basis(spin_system, bas);
 

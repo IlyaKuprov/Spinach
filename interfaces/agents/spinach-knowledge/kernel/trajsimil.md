@@ -13,7 +13,7 @@ Computes trajectory similarity scores. Returns one numeric similarity score per 
 - If `scorefcn` starts with `SG-` or `BSG`, state grouping is run before scoring:
   - `SG-`: all T(l,-m) states are renamed into T(l,m) states via `lin2lm` and `lm2lin` with `abs(M)`.
   - `BSG`: all non-identity states are renamed into Lz (entries of the state list not equal to 0 are set to 2).
-  - Unique grouped states are found with `unique(...,'rows')`, and for each group the trajectory rows are combined by root-sum-square: `sqrt(sum(abs(...).^2,1))` over the coefficients belonging to that group.
+  - Grouping is performed separately inside each substance block, so identical local descriptors (including units) of different substances are never combined. Unique grouped states are found with `unique(...,'rows')`, and for each group the trajectory rows are combined by root-sum-square: `sqrt(sum(abs(...).^2,1))` over the coefficients belonging to that group.
   - A progress message reports collapsing equivalent subspaces and, when finished, how many states were collected into how many groups.
   - State grouping (SG and BSG) is only available for the `sphten-liouv` formalism.
 - After any grouping, the score function is computed per time slice:
@@ -26,7 +26,7 @@ Computes trajectory similarity scores. Returns one numeric similarity score per 
 
 **Inputs**
 
-- `spin_system` — spin system object; its basis (`spin_system.bas.basis`) must match the trajectory row dimension, and its formalism must be a Liouville space formalism.
+- `spin_system` — spin system object; its compiled dimension (`spin_system.bas.offsets(end)`) must match the trajectory row dimension, and its formalism must be a Liouville space formalism.
 - `trajectory_1`, `trajectory_2` — spin system trajectories, supplied as `nstates x nsteps` matrices; both must be arrays of doubles with identical dimensions.
 - `scorefcn` — similarity scoring method:
   - `'RSP'` — running scalar product; computes scalar products between the corresponding vectors of the trajectories.

@@ -19,3 +19,5 @@ The illuminated trajectory uses 50 steps of 0.01 s, giving a 0.5 s pump interval
 ## Observables
 
 The plotted channels are the 19F longitudinal magnetisation, the 1H longitudinal magnetisation, and minus twice the longitudinal product state. These are simulated state projections plotted against time; the source-only description does not claim measured polarisation or a validated fit.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

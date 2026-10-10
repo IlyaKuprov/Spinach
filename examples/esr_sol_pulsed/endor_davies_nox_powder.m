@@ -28,7 +28,7 @@ inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
                        
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -47,7 +47,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E','14N'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.grid='rep_2ang_12800pts_sph';
 parameters.offset=[-2e8 0];
 parameters.method='expm';

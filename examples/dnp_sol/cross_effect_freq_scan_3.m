@@ -32,7 +32,7 @@ inter.coordinates={[ 0.00   0.00   0.00];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'nottingham'};
@@ -52,7 +52,7 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'E'};
 parameters.mw_pwr=2*pi*100e3;
 parameters.mw_frq=2*pi*linspace(-350,350,1e4)*1e6;
-parameters.coil=state(spin_system,'Lz','1H');
+parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 parameters.mw_oper=operator(spin_system,'Lx','E');
 parameters.ez_oper=operator(spin_system,'Lz','E');
 parameters.orientation=[0 0 0];

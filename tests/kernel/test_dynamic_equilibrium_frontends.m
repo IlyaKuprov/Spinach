@@ -37,7 +37,7 @@ function result=local_test_thermalize(result)
 
 % Build a one-spin spherical-tensor Liouville-space system
 spin_system=local_liouville_system();
-dim=size(spin_system.bas.basis,1);
+dim=spin_system.bas.offsets(end);
 unit=unit_state(spin_system);
 R=-diag([0;ones(dim-1,1)]);
 R=sparse(R);
@@ -64,7 +64,7 @@ function result=local_test_steady(result)
 
 % Build a one-spin spherical-tensor Liouville-space system
 spin_system=local_liouville_system();
-dim=size(spin_system.bas.basis,1);
+dim=spin_system.bas.offsets(end);
 
 % Construct a contractive affine propagator with a known fixed point
 rho_ss=zeros(dim,1);
@@ -108,7 +108,7 @@ inter.coupling.scalar{2,2}=0.0;
 inter.coordinates={[0.0 0.0 0.0];[0.6 0.7 0.8]};
 inter.order_matrix={diag([1e-3 2e-3 -3e-3])};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Store the original coupling tensor and apply residual ordering
@@ -134,7 +134,7 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0.0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 spin_system=assume(spin_system,'nmr');
 

@@ -28,7 +28,9 @@
 %       thrown for unhandled subfields. Coordinates and suscepti-
 %       bility centres from all subsystems are assumed to refer
 %       to one common frame of reference; spin index lists are
-%       returned as row vectors.
+%       returned as row vectors. Reaction records are concatenated
+%       with substance, matching, and named-selector spin offsets;
+%       user selector matrices remain substance-local.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -149,14 +151,29 @@ end
 % Chemical process specifications
 if group_check(inter_parts,'chem')
     chem_parts=strip(inter_parts,'chem'); chem.stub=1;
+    spin_offset=0; subst_offset=0;
+    for n=1:numel(chem_parts)
+        if isfield(chem_parts{n},'reactions')
+            if ~isfield(chem,'reactions'), chem.reactions={}; end
+            for k=1:numel(chem_parts{n}.reactions)
+                reaction=chem_parts{n}.reactions{k};
+                reaction.reactants=reaction.reactants+subst_offset;
+                reaction.products=reaction.products+subst_offset;
+                reaction.matching=reaction.matching+spin_offset;
+                if isfield(reaction,'selector')&&ischar(reaction.selector{1})
+                    reaction.selector{2}=reaction.selector{2}+spin_offset;
+                end
+                chem.reactions{end+1}=reaction;
+            end
+            chem_parts{n}=rmfield(chem_parts{n},'reactions');
+        end
+        spin_offset=spin_offset+part_sizes(n);
+        if isfield(chem_parts{n},'parts')
+            subst_offset=subst_offset+numel(chem_parts{n}.parts);
+        end
+    end
     [chem,chem_parts]=merge_like_parts(chem,chem_parts,'parts',part_sizes);
-    [chem,chem_parts]=merge_like_couplings(chem,chem_parts,'rates');
     [chem,chem_parts]=merge_like_isotopes(chem,chem_parts,'concs');
-    [chem,chem_parts]=merge_like_couplings(chem,chem_parts,'flux_rate');
-    [chem,chem_parts]=merge_like_magnet(chem,chem_parts,'flux_type');
-    [chem,chem_parts]=merge_like_magnet(chem,chem_parts,'rp_theory');
-    [chem,chem_parts]=merge_like_sources(chem,chem_parts,'rp_electrons',part_sizes);
-    [chem,chem_parts]=merge_like_magnet(chem,chem_parts,'rp_rates');
     group_gate(chem_parts,'chem');
     chem=rmfield(chem,'stub'); inter.chem=chem;
     inter_parts=cellfun(@(x)rmfield(x,'chem'),...

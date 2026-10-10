@@ -62,6 +62,9 @@
 %       luding infinite order. See the header of rotframe.m for further
 %       information.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=liquid.m>
@@ -99,6 +102,15 @@ else
     R=relaxation(spin_system);
     K=kinetics(spin_system);
 
+end
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:liquid:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by liquid; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
 end
 
 % Get the lab frame Zeeman operator if needed

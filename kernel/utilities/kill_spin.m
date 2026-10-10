@@ -15,13 +15,19 @@
 %
 %     spin_system   - the data structure with the indica-
 %                     ted particles and dependent infor-
-%                     mation (basis, assumptions) removed
+%                     mation updated; an existing basis is rebuilt
 %
-% Notes: basis, connectivity, symmetry, and assumption information
-%        is destroyed by this function; you would need to call the
-%        basis.m and assume.m functions again. Mode strengths are
+% Notes: an existing basis is rebuilt from its input settings, with
+%        local manual columns and global filter labels reindexed.
+%        Isotope filters with no surviving local spins are removed.
+%        Retained depths are capped by the surviving local populations;
+%        vector depths use the particle-type bounds enforced by basis.
+%        IK-DNP or IK-SBS losing a required particle class switches to
+%        IK-0 at the surviving class depth, without connectivity pruning.
+%        Symmetry and assumption information is cleared; call assume
+%        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
-%        particles remain.
+%        particles remain. Spin-free substances are retained.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -35,6 +41,79 @@ grumble(spin_system,hit_list)
 
 % Catch logical indexing
 if islogical(hit_list), hit_list=find(hit_list); end
+
+% Retain input settings rather than patching compiled basis data
+if isfield(spin_system,'bas')
+    fields={'formalism','approximation','inter_level','prox_level',...
+            'space_level','connectivity','manual','projections',...
+            'longitudinal','zero_quantum'};
+    fields=intersect(fields,fieldnames(spin_system.bas));
+    for n=1:numel(fields)
+        bas.(fields{n})=spin_system.bas.(fields{n});
+    end
+
+    % Reindex retained filter labels and remove empty isotope selections
+    keep=setdiff(1:spin_system.comp.nspins,hit_list);
+    for n=1:numel(spin_system.chem.parts)
+        local_keep=~ismember(spin_system.chem.parts{n},hit_list);
+        if isfield(bas,'manual')
+            bas.manual{n}=bas.manual{n}(:,local_keep);
+        end
+        for field={'longitudinal','zero_quantum'}
+            if isfield(bas,field{1})
+                for k=1:numel(bas.(field{1}){n})
+                    labels=bas.(field{1}){n}{k};
+                    if isnumeric(labels)
+                        [present,labels]=ismember(labels,keep);
+                        bas.(field{1}){n}{k}=labels(present);
+                    elseif ~ismember(labels,spin_system.comp.isotopes(...
+                                     spin_system.chem.parts{n}(local_keep)))
+                        bas.(field{1}){n}{k}=[];
+                    end
+                end
+                bas.(field{1}){n}=bas.(field{1}){n}(~cellfun(@isempty,bas.(field{1}){n}));
+            end
+        end
+
+        % A substance losing its last spin retains only its unit coordinate
+        if ~any(local_keep)
+            bas.approximation{n}='none';
+            for field={'inter_level','prox_level','space_level','connectivity'}
+                if isfield(bas,field{1}), bas.(field{1}){n}=[]; end
+            end
+        else
+
+            % Cap scalar depths by the surviving local particle count
+            for field={'inter_level','prox_level','space_level'}
+                if isfield(bas,field{1})
+                    bas.(field{1}){n}=min(bas.(field{1}){n},nnz(local_keep));
+                end
+            end
+
+            % Bound vector depths by the same populations used in basis validation
+            spins=spin_system.chem.parts{n}(local_keep);
+            if strcmp(bas.approximation{n},'IK-DNP')
+                isotopes=spin_system.comp.isotopes(spins);
+                bas.inter_level{n}(1)=min(bas.inter_level{n}(1),nnz(cellfun(@iselectron,isotopes)));
+                bas.inter_level{n}(3)=min(bas.inter_level{n}(3),nnz(cellfun(@isnucleus,isotopes)));
+            elseif strcmp(bas.approximation{n},'IK-SBS')
+                modes=ismember(spin_system.comp.types(spins),{'C','V','T'});
+                nspins=nnz(~modes&(spin_system.comp.mults(spins)>1));
+                bas.inter_level{n}(1)=min(bas.inter_level{n}(1),nnz(modes));
+                bas.inter_level{n}(2)=min(bas.inter_level{n}(2),nnz(modes)+nspins);
+                bas.inter_level{n}(3)=min(bas.inter_level{n}(3),nspins);
+            end
+
+            % Retain the surviving class depth without a two-class graph requirement
+            if ismember(bas.approximation{n},{'IK-DNP','IK-SBS'})&&...
+               any(bas.inter_level{n}([1 3])==0)
+                bas.approximation{n}='IK-0';
+                bas.inter_level{n}=max(1,max(bas.inter_level{n}([1 3])));
+                if isfield(bas,'connectivity'), bas.connectivity{n}=[]; end
+            end
+        end
+    end
+end
 
 % Inform the user
 report(spin_system,['removing ' num2str(numel(hit_list)) ...
@@ -163,23 +242,23 @@ for n=1:numel(spin_system.chem.parts)
     subsystem_idx(hit_list)=[];
     spin_system.chem.parts{n}=find(subsystem_idx);
 end
-if ~isempty(spin_system.chem.flux_rate)
-    spin_system.chem.flux_rate(hit_list,:)=[];
-    spin_system.chem.flux_rate(:,hit_list)=[];
-end
 
-% Update radical recombination parameters
-reacting_spins=zeros(1,spin_system.comp.nspins+numel(hit_list));
-reacting_spins(spin_system.chem.rp_electrons)=1; reacting_spins(hit_list)=[];
-spin_system.chem.rp_electrons=find(reacting_spins);
-if (~isempty(spin_system.chem.rp_rates))&&(numel(spin_system.chem.rp_electrons)<2)
-    error('cannot destroy an essential electron in a radical pair system.');
+% Rebuild the reaction atom maps in the surviving global spin index
+keep=setdiff(1:spin_system.comp.nspins+numel(hit_list),hit_list);
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
+    matching=reaction.matching;
+    matching(any(ismember(matching,hit_list),2),:)=[];
+    [~,reaction.matching]=ismember(matching,keep);
+    if isfield(reaction,'selector')&&ischar(reaction.selector{1})
+        [~,reaction.selector{2}]=ismember(reaction.selector{2},keep);
+    end
+    spin_system.chem.reactions{n}=reaction;
 end
 
 % If any basis set information is found, destroy it
 if isfield(spin_system,'bas')
     spin_system=rmfield(spin_system,'bas');
-    report(spin_system,'WARNING - basis set information must be re-created.');
 end
 
 % If any connectivity information is found, destroy it
@@ -210,6 +289,9 @@ if isfield(spin_system.inter.coupling,'strength')
     report(spin_system,'WARNING - assumption information must be re-created.');
 end
 
+% Rebuild descriptors, symmetry projectors, dimensions, offsets, and cache identity
+if exist('bas','var'), spin_system=basis(spin_system,bas); end
+
 end
 
 % Consistency enforcement
@@ -224,6 +306,19 @@ else
     end
     if any(hit_list>spin_system.comp.nspins)
         error('at least one number in hit_list exceeds the number of spins.');
+    end
+end
+if islogical(hit_list), hit_list=find(hit_list); end
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
+    if isfield(reaction,'selector')
+        if ischar(reaction.selector{1})
+            if any(ismember(reaction.selector{2},hit_list))
+                error('Spinach:kill_spin:selectorElectron','cannot remove an electron used by a reaction selector.');
+            end
+        elseif any(ismember(spin_system.chem.parts{reaction.reactants},hit_list))
+            error('Spinach:kill_spin:selectorMatrix','rebuild user selector matrices before removing spins from their substance.');
+        end
     end
 end
 end

@@ -20,7 +20,7 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -33,7 +33,7 @@ parameters.time_steps=2e-6*ones(1,500);
 parameters.irr_opers={operator(spin_system,'Ly','1H') ...
                       operator(spin_system,'Lx','15N')};
 parameters.exc_opers={operator(spin_system,'Lx','1H')};
-parameters.coil=state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.grid='rep_2ang_200pts_sph';
 parameters.needs={'aniso_eq'};
 parameters.spins={'15N'};

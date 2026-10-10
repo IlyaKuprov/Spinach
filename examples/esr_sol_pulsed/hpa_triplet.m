@@ -23,7 +23,7 @@ inter.coupling.matrix={zfs2mat(D,E,0,0,0)};
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory-level SSR algorithms
 sys.disable={'trajlevel'};
@@ -34,7 +34,7 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'E3'};
-parameters.coil=state(spin_system,'L+','E3');
+parameters.coil=coil_state(spin_system,'L+','E3','exact');
 parameters.pulse_op=operator(spin_system,'Ly','E3');
 parameters.pulse_angle=pi/4;
 parameters.offset=0;

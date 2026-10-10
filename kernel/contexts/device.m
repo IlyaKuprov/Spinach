@@ -65,6 +65,9 @@
 % Note: dissipative bosonic modes require a Liouville space formalism;
 %       coherent simulations may also use zeeman-hilb.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=device.m>
@@ -91,6 +94,15 @@ H=(H+H')/2;
 % Get relaxation and kinetics superoperators
 R=relaxation(spin_system,parameters.orientation);
 K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:device:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by device; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Get the thermal equilibrium if needed
 if ismember('rho_eq',parameters.needs)

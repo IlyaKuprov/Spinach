@@ -27,18 +27,18 @@ sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,0};
 inter.temperature=300;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Interpret the basis using the same documented state categories
-[L,M]=lin2lm(spin_system.bas.basis);
-sso_mask=(sum(logical(spin_system.bas.basis),2)==1);
-mso_mask=(sum(logical(spin_system.bas.basis),2)>1);
+[L,M]=lin2lm(spin_system.bas.basis{1});
+sso_mask=(sum(logical(spin_system.bas.basis{1}),2)==1);
+mso_mask=(sum(logical(spin_system.bas.basis{1}),2)>1);
 long_sso_mask=any((L>0)&(M==0),2)&sso_mask;
 tran_sso_mask=any((L>0)&(M~=0),2)&sso_mask;
 
 % Build a diagonal relaxation matrix with a zero unit-state element
-matrix_dim=size(spin_system.bas.basis,1);
+matrix_dim=spin_system.bas.offsets(end);
 diag_vals=(1:matrix_dim)';
 diag_vals(~(long_sso_mask|tran_sso_mask|mso_mask))=0;
 R=spdiags(diag_vals,0,matrix_dim,matrix_dim);

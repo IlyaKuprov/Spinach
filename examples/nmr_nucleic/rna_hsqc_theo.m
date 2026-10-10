@@ -22,13 +22,13 @@ sys.magnet=17.62;
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=5.0;
 sys.disable={'krylov','colorbar'};
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4; bas.prox_level=1;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4}; bas.prox_level={1};
 
 % Relaxation theory
 inter.relaxation={'damp'};

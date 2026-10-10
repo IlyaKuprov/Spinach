@@ -29,7 +29,7 @@ inter.lind_r1_rates=4; inter.lind_r2_rates=7;
 inter.equilibrium='zero'; inter.temperature=298;
 inter.rlx_keep='labframe'; inter.rlx_dfs='keep';
 sys.magnet=14.1;
-bas.approximation='none';
+bas.approximation={'none'};
 for n=1:numel(isotopes)
 
     % Build the full Zeeman generator and its normalised identity
@@ -47,7 +47,7 @@ for n=1:numel(isotopes)
                       'omitting retention must still select the full generator');
 
     % Propagate a complex pure state under noncommuting coherent dynamics
-    bas_hilb.formalism='zeeman-hilb'; bas_hilb.approximation='none';
+    bas_hilb.formalism='zeeman-hilb'; bas_hilb.approximation={'none'};
     spin_hilb=basis(spin_system,bas_hilb);
     H=0.3*operator(spin_hilb,'Lx',1)+0.2*operator(spin_hilb,'Ly',1);
     ket=zeros(size(H,1),1); ket(1)=1/sqrt(2); ket(2)=1i/sqrt(2);
@@ -107,7 +107,7 @@ result=test_close(result,'GISSMO linewidth rate',inter.damp_rate,pi,0,0,...
                   'the shipped one-hertz FWHM must give a pi-per-second damping rate');
 result=test_true(result,'GISSMO full retention',strcmp(inter.rlx_keep,'labframe'),...
                  'pure damping must not request unsupported Zeeman diagonal retention');
-bas.approximation='none'; formalisms={'sphten-liouv','zeeman-liouv'};
+bas.approximation={'none'}; formalisms={'sphten-liouv','zeeman-liouv'};
 for n=1:numel(formalisms)
 
     % Verify the entire imported generator in both full Liouville bases

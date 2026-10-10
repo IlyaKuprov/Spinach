@@ -17,15 +17,15 @@ function inad_cyprinol()
 sys.magnet=11.7;
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
-bas.inter_level=4;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
+bas.inter_level={4};
 
 % seq parameters
 parameters.spins={'13C'};

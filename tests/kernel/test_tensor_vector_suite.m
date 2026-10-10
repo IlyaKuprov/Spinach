@@ -117,7 +117,8 @@ end
 function spin_system=local_corr_system()
 
 spin_system.bas.formalism='sphten-liouv';
-spin_system.bas.basis=[1 0;0 1;1 1;0 0];
+spin_system.bas.basis={[1 0;0 1;1 1;0 0]};
+spin_system.bas.offsets=[0;4]; spin_system.bas.tot_cord={[1;1;2;0]};
 spin_system.chem.parts={1:2};
 spin_system.rlx.tau_c={2e-9};
 

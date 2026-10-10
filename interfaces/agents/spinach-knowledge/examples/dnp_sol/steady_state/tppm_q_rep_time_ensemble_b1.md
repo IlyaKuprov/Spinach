@@ -14,4 +14,4 @@ For the TPPM train, the source sets spins `{'E','1H'}`, orientation grid `rep_2a
 
 ## Calculation and output
 
-The proton detection operator is `state(spin_system,'Lz','1H')`. For each B1 node and repetition time, the source calls `powder(spin_system,@xixdnp_steady,localpar,'esr')`; it then averages the result with the B1 quadrature weights. The plot uses the real part of the proton `Lz` expectation against repetition time in ms, and is saved in the current working directory as `tppm_q_rep_time_ensemble_b1.fig`. The function has no declared output argument; the plotted data are local to the function.
+The proton detection operator is `coil_state(spin_system,'Lz','1H','exact')`. For each B1 node and repetition time, the source calls `powder(spin_system,@xixdnp_steady,localpar,'esr')`; it then averages the result with the B1 quadrature weights. The plot uses the real part of the proton `Lz` expectation against repetition time in ms, and is saved in the current working directory as `tppm_q_rep_time_ensemble_b1.fig`. The function has no declared output argument; the plotted data are local to the function.

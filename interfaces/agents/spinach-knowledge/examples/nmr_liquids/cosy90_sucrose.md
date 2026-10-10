@@ -10,7 +10,7 @@ A liquid-state proton COSY-90 simulation for sucrose using magnetic parameters i
 
 ## Spin system and basis
 
-The example parses the sucrose DFT log at ../standard_systems/sucrose.log and calls `g2spinach` to import hydrogen nuclei as `1H`. It passes `options.min_j=2.0` (the helper defines this as a scalar-coupling threshold in Hz) and `options.no_xyz=1`; it supplies 31.8 ppm as the reference-shielding argument to `g2spinach`. The imported system is then assigned a field of 5.9 T. The Liouville-space basis uses IK-2, scalar-coupling connectivity, proximity level 1, and the greedy system-building option; the source also sets a proximity cutoff of 4.0.
+The example parses the sucrose DFT log at ../standard_systems/sucrose.log and calls `g2spinach` to import hydrogen nuclei as `1H`. It passes `options.min_j=2.0` (the helper defines this as a scalar-coupling threshold in Hz) and `options.no_xyz=1`; it supplies 31.8 ppm as the reference-shielding argument to `g2spinach`. The imported system is then assigned a field of 5.9 T. The Liouville-space basis uses IK-2, scalar-coupling connectivity, proximity level 1, and the greedy system-building option; the source also sets a proximity cutoff of 4.0. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## COSY acquisition and processing
 

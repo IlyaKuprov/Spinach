@@ -7,7 +7,7 @@
 
 This pulse-acquire proton NMR example displays the density-operator content by spin-correlation order for anti-3,5-difluoroheptane. It concerns correlation-order state-space representation, not an angular or powder-quadrature test. The source comment calls the molecule a 16-spin example; the isotope array has 23 sites: seven spin-zero `12C`, fourteen `1H`, and two `19F`, so the listed spin-bearing nuclei number 16.
 
-The field is 11.7464 T. Chemical shifts and scalar couplings are specified explicitly in the source. The two `19F` shifts at sites 10 and 18 are set to zero, with source comments giving -184.1865 and explaining that zero is used because those values do not matter for this calculation and are faster. The basis uses `sphten-liouv`, `IK-0`, inter-level 1, manually populated projections at levels 1-3, two `S3` symmetry groups, longitudinal `19F` states, and projection `{1}`. Automatic `zte` state dropout is disabled. GPU enablement is commented out.
+The field is 11.7464 T. Chemical shifts and scalar couplings are specified explicitly in the source. The two `19F` shifts at sites 10 and 18 are set to zero, with source comments giving -184.1865 and explaining that zero is used because those values do not matter for this calculation and are faster. The basis uses `sphten-liouv`, `IK-0`, inter-level 1, manually populated projections at levels 1-3, two `S3` symmetry groups, longitudinal `19F` states, and projection `{1}`. Automatic `zte` state dropout is off by default. GPU enablement is commented out.
 
 ## Propagation and output
 

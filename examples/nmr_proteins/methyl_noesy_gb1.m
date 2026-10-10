@@ -14,6 +14,7 @@ options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
 options.deuterate='non-Me';
+options.csa_file='2N9K.csa';
 [sys,inter]=protein('2N9K.pdb','2N9K.bmrb',options);
 
 % Magnet field
@@ -31,12 +32,12 @@ inter.tau_c={5e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=2; bas.prox_level=2;         % Pairwise approximation
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={2}; bas.prox_level={2};         % Pairwise approximation
 
 % Algorithmic options
-sys.enable={'prop_cache','op_cache','greedy'};
+sys.enable={'zte','prop_cache','op_cache','greedy'};
 
 % Create the spin system structure
 spin_system=create(sys,inter);

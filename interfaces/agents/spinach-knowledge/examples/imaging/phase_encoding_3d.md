@@ -4,7 +4,7 @@ Three-dimensional slice selection followed by phase-encoded imaging of the selec
 
 ## Model and sequence
 
-The system is a single `1H` spin with `sys.magnet=5.9` and zero scalar chemical shift (the example does not annotate the field-value unit). It uses `t1_t2` relaxation with `R1=1.0`, `R2=1.0`, zero equilibrium, and diagonal retention. The `sphten-liouv` basis has no approximation. The source disables path tracing and Krylov propagation; it enables `greedy` while the adjacent `'gpu'` text is a comment, not the active setting. The source comment says a GPU is needed.
+The system is a single `1H` spin with `sys.magnet=5.9` and zero scalar chemical shift (the example does not annotate the field-value unit). It uses `t1_t2` relaxation with `R1=1.0`, `R2=1.0`, zero equilibrium, and diagonal retention. The `sphten-liouv` basis has no approximation. The source disables path tracing and Krylov propagation; it enables `zte` and `greedy` while the adjacent `'gpu'` text is a comment, not the active setting. The source comment says a GPU is needed.
 
 `phantoms('brain-medres')` supplies the `R1`, `R2` and proton-density maps plus sample dimensions and point counts. Relaxation operators come from `rlx_t1_t2`; the `R1`/`R2` maps are used as relaxation phantoms and proton density as the initial spatial phantom. The initial state is `Lz`, the uniform coil uses `L+`, and all three flow fields are zero with diffusion `0`. Grid differentiation is `{'period',3}`.
 

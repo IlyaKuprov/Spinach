@@ -24,7 +24,7 @@ inter.modes.anharms={-295.1e6};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

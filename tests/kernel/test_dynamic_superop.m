@@ -26,9 +26,9 @@ sys.magnet=0;
 sys.isotopes={'1H','13C'};
 inter.zeeman.scalar={0,0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
-matrix_dim=size(spin_system.bas.basis,1);
+matrix_dim=spin_system.bas.offsets(end);
 
 % Check the inactive-spin shortcut returns the full identity
 A_unit=local_xyz_to_sparse(superop(spin_system,[0 0],'left'),matrix_dim);
@@ -48,7 +48,7 @@ result=test_close(result,'superop acomm identity',A_acomm,A_left+A_right,1e-15,1
                   'an anticommutator superoperator must equal left multiplication plus right multiplication');
 
 % Check the Lz commutator eigenvalues on irreducible tensor projections
-[~,m_proj]=lin2lm(spin_system.bas.basis(:,1));
+[~,m_proj]=lin2lm(spin_system.bas.basis{1}(:,1));
 result=test_close(result,'superop Lz projection eigenvalues',diag(A_comm),m_proj,1e-15,1e-15,...
                   'the commutator [Lz,T(l,m)] must return m*T(l,m) on the active spin');
 

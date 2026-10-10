@@ -10,7 +10,7 @@ The model is one `1H` spin at 5.9 T with zero chemical shift, `t1_t2` relaxation
 
 ## Slice-select RF and gradients
 
-The slice-select pulse is a 50-step Gaussian pulse with phase `pi/2`, frequency entries `-5e3`, amplitude scaled by `2*pi*7500`, and total duration parameter `2.0e-4` divided equally among the steps. These RF-table values and durations have no unit comments in the source. The image-size array is `[201 201]`. Slice-select, readout, and phase-encode gradient amplitudes are `32.0e-3`, `5.3e-3`, and `4.8e-3` T/m, as labelled in the source. Readout and phase-encode duration fields are both `4e-3`; the echo-time field is `20e-3`. The gradient-angle array is `[pi/3 pi/4 pi/5]` and has no separate unit annotation. Spatial differentiation uses `{'period',3}`. The source actively sets `sys.enable={'greedy'}`; the nearby `gpu` text is a comment, not an enabled GPU option.
+The slice-select pulse is a 50-step Gaussian pulse with phase `pi/2`, frequency entries `-5e3`, amplitude scaled by `2*pi*7500`, and total duration parameter `2.0e-4` divided equally among the steps. These RF-table values and durations have no unit comments in the source. The image-size array is `[201 201]`. Slice-select, readout, and phase-encode gradient amplitudes are `32.0e-3`, `5.3e-3`, and `4.8e-3` T/m, as labelled in the source. Readout and phase-encode duration fields are both `4e-3`; the echo-time field is `20e-3`. The gradient-angle array is `[pi/3 pi/4 pi/5]` and has no separate unit annotation. Spatial differentiation uses `{'period',3}`. The source actively sets `sys.enable={'zte','greedy'}`; the nearby `gpu` text is a comment, not an enabled GPU option.
 
 ## Output and caveats
 

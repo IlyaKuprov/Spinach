@@ -7,8 +7,8 @@
 %     result  - regression test result with explanatory messages
 %
 % The test checks closed-form steady states, independent reaction blocks,
-% reaction-generator state routing, and conservation in a tiny exchange
-% kinetics superoperator.
+% first-order exchange routing and conservation, and empty reaction maps
+% on a reordered local descriptor.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -20,7 +20,7 @@ fprintf('TESTING: Chemical kinetics invariants\n');
 % State the kinetics target of the test
 result=new_test_result('kernel/kinetics_invariants_suite',...
                        'Chemical kinetics invariants',...
-                       'kinetic generators must conserve matter and route spin order between declared species.');
+                       'supported kinetic generators must conserve and route spin order.');
 
 % Check a two-site steady state from detailed balance
 kf=2;
@@ -45,34 +45,40 @@ result=test_close(result,'equilibrate independent blocks',equilibrate(K,c0),c_re
 result=test_close(result,'equilibrate zero concentration',equilibrate(K,zeros(4,1)),zeros(4,1),1e-15,1e-15,...
                   'a zero initial concentration vector remains zero for linear kinetics');
 
-% Build a two-site spherical-tensor spin system for exchange and reactions
+% Build a two-substance one-way exchange system
 sys.magnet=14.1;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,0};
-inter.chem.parts={1,2};
-inter.chem.rates=[-3 3;3 -3];
-inter.chem.concs=[1 1];
+inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[1 2],'rate',3)};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none','none'};
 spin_system=test_spin_system(sys,inter,bas);
 
-% Closed exchange must conserve every column sum of the kinetic generator
+% First-order exchange must conserve every column sum of the kinetic generator
 K=kinetics(spin_system);
 col_sums=sum(full(K),1);
-result=test_close(result,'kinetics closed-exchange column sums',col_sums,zeros(size(col_sums)),1e-14,1e-14,...
-                  'in a closed two-site exchange model all probability leaving a column re-enters elsewhere');
+result=test_close(result,'kinetics exchange column sums',col_sums,zeros(size(col_sums)),1e-14,1e-14,...
+                  'first-order exchange moves spin order without losing its column sum');
 
-% A one-way reaction generator must drain source spin order and fill matched product spin order
-reaction.reactants=1;
-reaction.products=2;
-reaction.matching=[1 2];
-G=react_gen(spin_system,reaction);
+% One-way flux drains source spin order and fills matched destination spin order
 rho_source=state(spin_system,'Lz',1);
 rho_destin=state(spin_system,'Lz',2);
-result=test_close(result,'react_gen source-to-product routing',G{1}*rho_source,rho_destin-rho_source,1e-14,1e-14,...
-                  'a matched reactant spin order is removed from the source species and inserted into the product species');
-result=test_close(result,'react_gen no action on product source',G{1}*rho_destin,zeros(size(rho_destin)),1e-14,1e-14,...
-                  'the reactant generator does not drain states already located on the product species');
+result=test_close(result,'kinetics source-to-destination routing',K*rho_source,3*(rho_destin-rho_source),1e-14,1e-14,...
+                  'flux transfers longitudinal spin order from spin one to spin two at the specified rate');
+result=test_close(result,'kinetics no action on destination source',K*rho_destin,zeros(size(rho_destin)),1e-14,1e-14,...
+                  'one-way flux does not drain spin order already on its destination');
+
+% Empty reactions traverse a single local descriptor with permuted spin columns
+inter.chem.parts={[2 1]}; inter.chem.concs=1; inter.chem.reactions={};
+bas.approximation={'none'};
+spin_system=test_spin_system(sys,inter,bas);
+reaction.reactants=[]; reaction.products=[]; reaction.matching=zeros(0,2);
+G=react_gen(spin_system,reaction);
+result=test_true(result,'react_gen reordered local columns',...
+                 iscell(G)&&isempty(G),...
+                 'an empty reaction is valid independently of the local spin-column order');
 
 end
 

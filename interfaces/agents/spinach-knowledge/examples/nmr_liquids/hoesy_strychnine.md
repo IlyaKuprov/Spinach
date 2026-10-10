@@ -10,7 +10,7 @@ Simulates the `13C{1H}` HOESY spectrum of strychnine at natural `13C` content. T
 
 ## Spin system and model
 
-The example obtains a strychnine spin system from `strychnine({'1H','13C'})`, so the explicit spin labels are proton and carbon-13. `dilute(spin_system,'13C')` generates carbon-13 isotopomer subsystems; the script simulates each and accumulates their spectra. The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-1`, scalar-coupling connectivity, proximity level 3 and interaction level 4. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `50e-12` s and temperature `298` K. Algorithm options are `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
+The example obtains a strychnine spin system from `strychnine({'1H','13C'})`, so the explicit spin labels are proton and carbon-13. `dilute(spin_system,'13C')` generates carbon-13 isotopomer subsystems; the script simulates each and accumulates their spectra. The field setting is `14.1` T. The basis is spherical-tensor Liouville space (`sphten-liouv`), `IK-1`, scalar-coupling connectivity, proximity level 3 and interaction level 4. Relaxation is Redfield with IME equilibrium, `rlx_keep='kite'`, correlation time `50e-12` s and temperature `298` K. Algorithm options are `zte` and `greedy`, proximity cutoff 5.0 and interaction cutoff 2.0.
 
 ## Acquisition and processing
 

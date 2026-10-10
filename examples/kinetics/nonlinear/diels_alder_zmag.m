@@ -1,5 +1,8 @@
 % Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition 
 % of acetylene to butadiene, demonstrating the non-linear kinetics module.
+% Concentrations occupy unit coordinates; additive product arrival shares
+% its unit source equally between reactants. The prescribed concentration
+% history and the two-point spin-propagation workflow are retained.
 %
 % Calculation time: minutes.
 %
@@ -57,29 +60,26 @@ inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 % Magnet field
 sys.magnet=14.1;
 
-% Chemical parts and unit concentrations
+% Chemical parts and initial concentrations, mol/L
 inter.chem.parts={1:2, 3:8, 9:16, 17:22};
-inter.chem.concs=[1 1 1 1];
+inter.chem.concs=[1e-2 2e-2 0 0.1];
+
+% Additive cycloaddition with rate constant in L/(mol*s)
+inter.chem.reactions={struct('reactants',[1 2],'products',3,...
+    'matching',[1 9;2 12;3 15;4 16;5 10;6 11;7 14;8 13],...
+    'rate',25.0,'closure','additive')};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Initial concentrations, mol/L
-A0=1e-2; B0=2e-2; C0=0; D0=0.1;
-
-% Reaction rate constant
-rrc=25.0;    % mol/(L*s)
-
-% 2nd order reaction generator
-K=@(t,x)(1i*[-rrc*x(2)   0       0        0; 
-              0       -rrc*x(1)  0        0;
-              0        rrc*x(1)  0        0;
-              0        0         0        0]);
+% Trace spins for the concentration-only stage of the same reaction network
+chem_system=kill_spin(spin_system,1:spin_system.comp.nspins);
+K_chem=kinetics(chem_system);
 
 % Time grid (ten seconds)
 nsteps=100; tmax=10.0; dt=tmax/nsteps;
@@ -89,11 +89,11 @@ time_axis=linspace(0,tmax,nsteps+1);
 x=zeros(4,nsteps+1);
 
 % Define initial concentrations
-x(:,1)=[A0 B0 C0 D0]'; 
+x(:,1)=unit_state(chem_system);
  
 % Run Lie group solver
 for n=1:nsteps 
-    x(:,n+1)=step(spin_system,{K,n*dt,'LG4'},x(:,n),dt); 
+    x(:,n+1)=step(chem_system,{@(t,y)1i*K_chem(t,y),n*dt,'LG4'},x(:,n),dt);
 end
 
 % Interpolate concentrations as functions of time
@@ -108,25 +108,16 @@ klegend({'acetylene','butadiene','cyclohexadiene'},...
         'Location','Best');
 scale_figure([1.00 0.75]); axis tight; drawnow;
 
-% Build kinetics generators 
-reaction.reactants=[1 2];  % which substances are reactants
-reaction.products=3;       % which substances are products
-reaction.matching=[1  9;  
-                   2 12;   % which spin on the left hand
-                   3 15;   % side of the reaction arrow
-                   4 16;   % goes into which spin on the
-                   5 10;   % right hand side
-                   6 11;
-                   7 14;
-                   8 13];
-G=react_gen(spin_system,reaction); 
+% Compile spin transport and embed prescribed history in unit coordinates
+K_spin=kinetics(spin_system);
+unit_idx=spin_system.bas.offsets(1:end-1)+1;
+unit_embed=sparse(unit_idx,1:4,ones(1,4),spin_system.bas.offsets(end),4);
+concs=@(t)[A(t);B(t);C(t);inter.chem.concs(4)];
 
-% Get concentration-weighted initial condition, no solvent
-eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
-    +B(0)*state(spin_system,'Lz',spin_system.chem.parts{2}) ...
-    +C(0)*state(spin_system,'Lz',spin_system.chem.parts{3});
+% Concentration-weighted longitudinal preparation without solvent excitation
+eta=state(spin_system,'Lz',1:16);
 [~,P]=levelpop('1H',sys.magnet,300);
-eta=(0.5*P(1)-0.5*P(2))*eta;
+eta=unit_state(spin_system)+(0.5*P(1)-0.5*P(2))*eta;
 
 % Preallocate the trajectory and get it started
 traj=zeros([numel(eta) nsteps+1]); traj(:,1)=eta;
@@ -138,13 +129,9 @@ for n=1:nsteps
     report(spin_system,['time step ' int2str(n) ...
                         '/' int2str(nsteps)]);
 
-    % Build the left interval edge composite evolution generator
-    F_L=1i*rrc*G{1}*B(time_axis(n))...   % Reaction from substance A
-       +1i*rrc*A(time_axis(n))*G{2};     % Reaction from substance B
-
-    % Build the right interval edge composite evolution generator
-    F_R=1i*rrc*G{1}*B(time_axis(n+1))... % Reaction from substance A
-       +1i*rrc*A(time_axis(n+1))*G{2};   % Reaction from substance B
+    % Evaluate additive chemistry at the prescribed interval-edge populations
+    F_L=1i*K_spin(time_axis(n),unit_embed*concs(time_axis(n)));
+    F_R=1i*K_spin(time_axis(n+1),unit_embed*concs(time_axis(n+1)));
 
     % Take the time step using the two-point Lie quadrature
     traj(:,n+1)=step(spin_system,{F_L,F_R},traj(:,n),dt);
@@ -152,11 +139,11 @@ for n=1:nsteps
 end
 
 % Look at spins in reactants and product
-coil=state(spin_system,{'Lz'},{1});
+coil=coil_state(spin_system,{'Lz'},{1},'exact');
 kfigure(); plot(time_axis,real(coil'*traj)); 
-coil=state(spin_system,{'Lz'},{3});
+coil=coil_state(spin_system,{'Lz'},{3},'exact');
 hold on;  plot(time_axis,real(coil'*traj)); 
-coil=state(spin_system,{'Lz'},{9});
+coil=coil_state(spin_system,{'Lz'},{9},'exact');
 hold on;  plot(time_axis,real(coil'*traj));
 xlim tight; kgrid; kxlabel('time, seconds'); 
 kylabel('conc.-weighted exp. value, 300K');

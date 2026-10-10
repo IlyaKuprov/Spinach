@@ -25,6 +25,9 @@ inter.coupling.scalar{2,3}=match_field*(spin('E')+spin('1H'))/(2*pi);
 % Increase viscosity
 inter.tau_c={2.2e-9};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Get thermal equilibrium at starting field
 sys.magnet=start_field;
 spin_system=create(sys,inter);

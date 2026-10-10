@@ -14,7 +14,7 @@ Common-linewidth damping uses **'damp'**, diagonal retention, zero equilibrium, 
 
 ## ESR acquisition
 
-The initial state and receiver are **state(spin_system,'L+','E')**; **E** is detected and decoupling is empty. Offset is **-2e7**, sweep **1e8**, point count 1024, zero-fill 4096, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The FID comes from **liquid(spin_system,@acquire,parameters,'esr')**; it receives **'none'** apodisation, is Fourier-transformed using the zero-fill length, and its real part is plotted.
+The initial state uses **state(spin_system,'L+','E')**; **E** is detected and decoupling is empty. Offset is **-2e7**, sweep **1e8**, point count 1024, zero-fill 4096, axis label **'GHz-labframe'**, derivative 1, and axis inversion 1. The FID comes from **liquid(spin_system,@acquire,parameters,'esr')**; it receives **'none'** apodisation, is Fourier-transformed using the zero-fill length, and its real part is plotted. The receiver uses the same operator description with `coil_state` instead.
 
 ## Dependencies and limits
 

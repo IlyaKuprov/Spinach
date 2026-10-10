@@ -32,7 +32,7 @@ inter.coordinates{2}=[20.00 0.00 0.00];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -44,7 +44,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.method='expm';
 parameters.verbose=0;

@@ -22,10 +22,10 @@ inter.coordinates={[-2.26  0.15  0.00],...
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
-sys.enable={'prop_cache'}; % 'gpu'
+sys.enable={'zte','prop_cache'}; % 'gpu'
 
 % Create the spin system structure
 spin_system=create(sys,inter);

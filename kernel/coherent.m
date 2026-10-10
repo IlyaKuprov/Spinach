@@ -18,7 +18,8 @@
 %
 % Note: the Fock space truncation of the mode chops the tail of
 %       the Poisson distribution; the state is renormalised after
-%       the truncation and the lost weight is reported.
+%       the truncation and the lost weight is reported. Segmented
+%       substance inputs are not yet supported.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -80,6 +81,10 @@ end
 function grumble(spin_system,mode,alpha)
 if ~isfield(spin_system,'bas')
     error('basis set information is missing, run basis() before calling this function.');
+end
+if spin_system.bas.nsubst>1
+    error('Spinach:coherent:segmentedZeeman',...
+          'multi-substance coherent states are not yet supported.');
 end
 if (~isnumeric(mode))||(~isscalar(mode))||(~isreal(mode))||...
    (mod(mode,1)~=0)||(mode<1)||(mode>spin_system.comp.nspins)

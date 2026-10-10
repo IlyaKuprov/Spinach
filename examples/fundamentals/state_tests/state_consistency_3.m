@@ -12,7 +12,7 @@ inter.zeeman.scalar={0 0};
 
 % Hilbert space
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -57,7 +57,7 @@ end
 
 % Move to Liouville space
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

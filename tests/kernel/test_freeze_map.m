@@ -250,7 +250,8 @@ for fixture=1:2
 end
 
 % Frozen long intervals must not request unreachable physical derivatives
-spin_system.bas.formalism='sphten-liouv';
+spin_system.bas.formalism='sphten-liouv'; spin_system.bas.offsets=[0;4];
+spin_system.chem.concs=1;
 spin_system.tols.stst_tol=1e-10; control=struct();
 control.isotopes={'1H'}; control.channels=[1;1];
 control.operators={0.2*diag([0 1 -1 0]),0.3*diag([0 0 1 -1])};
@@ -276,6 +277,56 @@ local_system=optimcon(spin_system,control);
 result=test_true(result,'phase-cancelled frozen delay',...
                  all(isfinite(fidelity),'all')&&all(isfinite(gradient),'all'),...
                  'composed Jacobians must identify cancelled physical derivatives');
+
+% Independent substances have independent steady dressing and control gradients
+sys.magnet=1; sys.isotopes={'1H','1H'};
+inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
+s=test_spin_system(sys,inter,bas); units=s.bas.offsets(1:end-1)+1;
+R=-speye(8); R(units,units)=0; R(3,1)=.2; R(7,5)=-.1;
+control=struct(); control.isotopes={'1H'}; control.channels=[1;1];
+control.operators={operator(s,'Lx',1),operator(s,'Ly',2)};
+control.drifts={{1i*R}}; control.rho_init={unit_state(s)};
+control.rho_targ={state(s,'Lz',1)+state(s,'Lz',2)};
+control.pwr_levels=1; control.pulse_dt=[.2 .3 .4]; control.method='lbfgs';
+control.max_iter=0; control.plotting={}; control.steady=true;
+s=optimcon(s,control); s.control.return_traj=true;
+waveform=[.3 -.2 .1;-.1 .4 .2];
+[traj,fidelity,gradient]=grape_liouv(s,control.drifts{1},control.operators,...
+                                  waveform,control.rho_init{1},control.rho_targ{1},'real');
+
+% Compare with separate single-substance calls without changing the pulse timing
+reference=zeros(size(gradient)); ref_fidelity=0;
+for n=1:2
+    idx=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    local=s; local.bas.offsets=[0;4]; local.bas.nsubst=1;
+    local.chem.concs=s.chem.concs(n); local.chem.parts={1};
+    [~,local_fid,reference(n,:)]=grape_liouv(local,{1i*R(idx,idx)},...
+        {control.operators{n}(idx,idx)},waveform(n,:),...
+        control.rho_init{1}(idx),control.rho_targ{1}(idx),'real');
+    ref_fidelity=ref_fidelity+local_fid;
+end
+result=test_close(result,'segmented steady gradient',gradient,reference,1e-12,1e-12,...
+                  'block-local controls have the concatenated single-substance gradients');
+result=test_close(result,'segmented steady fidelity',fidelity,ref_fidelity,1e-12,1e-12,...
+                  'the unweighted block objective is the sum of its local objectives');
+result=test_close(result,'segmented steady units',traj.forward(units,:),ones(2,4),0,0,...
+                  'every unit coordinate remains pinned throughout the pulse');
+fprintf('CWDM_GRAPE_STEADY gradient_error=%.16g fidelity_error=%.16g unit_error=%.16g\n',...
+        norm(gradient-reference,'fro'),abs(fidelity-ref_fidelity),norm(traj.forward(units,:)-1,'fro'));
+
+% Reject an identity observable in either substance before the adjoint solve
+for n=1:2
+    target=control.rho_targ{1}; target(units(n))=1; rejected=false;
+    try
+        grape_liouv(s,control.drifts{1},control.operators,waveform,control.rho_init{1},target,'real');
+    catch err
+        rejected=strcmp(err.message,'target state must have a zero trace.');
+    end
+    result=test_true(result,['steady target trace ' int2str(n)],rejected,...
+                     'a target must be traceless in every substance');
+    fprintf('CWDM_GRAPE_TRACE block=%d rejected=%d\n',n,rejected);
+end
 
 end
 

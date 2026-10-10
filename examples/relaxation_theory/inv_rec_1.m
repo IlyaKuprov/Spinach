@@ -16,7 +16,7 @@ inter.zeeman.scalar={1.5};
 
 % Complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
                
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -26,6 +26,9 @@ inter.equilibrium='dibari';
 inter.rlx_keep='secular';
 inter.temperature=298;
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -34,7 +37,7 @@ spin_system=basis(spin_system,bas);
 rho=equilibrium(spin_system);
 
 % Detection state
-coil=state(spin_system,'Lz','1H');
+coil=coil_state(spin_system,'Lz','1H','exact');
 
 % Static Liouvillian superoperator
 L=hamiltonian(assume(spin_system,'nmr'));

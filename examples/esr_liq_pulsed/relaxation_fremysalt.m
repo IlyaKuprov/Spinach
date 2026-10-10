@@ -21,7 +21,7 @@ sys.isotopes={'E','14N'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Interactions
 inter.zeeman.eigs=cell(2,1);
@@ -39,6 +39,9 @@ inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={8e-10};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -46,7 +49,7 @@ spin_system=basis(spin_system,bas);
 % Experiment parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.offset=-2e7;
 parameters.sweep=2e8;

@@ -21,7 +21,7 @@ spin_system=subsystems{4};
 
 % Generate the basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=basis(spin_system,bas);
 
 % Get isotropic Hamiltonian

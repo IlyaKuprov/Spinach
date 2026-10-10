@@ -24,7 +24,7 @@ result=new_test_result('kernel/echo_sweep_liouv',...
 p1.orientation='111'; p1.nitrogen='14N';
 [sys,inter]=diamond_p1(p1);
 sys.magnet=6.9156;
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 hilbert_system=basis(create(sys,inter),bas);
 bas.formalism='zeeman-liouv';
 liouville_system=basis(create(sys,inter),bas);

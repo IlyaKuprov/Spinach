@@ -16,7 +16,7 @@ The signature takes `H`, `R`, and `K` and constructs `L=H+1i*R+1i*K`; unlike the
 - `parameters.max_delay`: maximum relaxation-evolution duration, in seconds.
 - `parameters.n_delays`: positive integer number of relaxation-evolution steps spanning `max_delay` (step interval `max_delay/n_delays`).
 
-The pulse/detection states are formed from `L+` of the selected first spin: `Ly` generates the 180° and 90° rotations, while `state(...,'L+',...)` provides the detection observable. There is no explicit coherence-order filter.
+The pulse/detection states are formed from `L+` of the selected first spin: `Ly` generates the 180° and 90° rotations, while `coil_state(spin_system,'L+',parameters.spins{1},'exact')` provides the detection observable. There is no explicit coherence-order filter.
 
 ## Detection and return
 

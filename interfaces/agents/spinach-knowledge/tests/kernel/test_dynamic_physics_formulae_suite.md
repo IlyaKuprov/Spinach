@@ -39,3 +39,5 @@ result = test_dynamic_physics_formulae_suite()
 
 - Source file: [tests/kernel/test_dynamic_physics_formulae_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_physics_formulae_suite.m) in the Spinach repository.
 - Functions exercised: `add_spins`, `xyz2dd`, `xyz2hfc`, `expdrop`, `snormpdf`, `oscillator`, `hydrodynamics`, `sphten2zeeman`, with supporting utilities `new_test_result`, `test_true`, `test_close`, `spin`, `fdmat`, `inflate`.
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.

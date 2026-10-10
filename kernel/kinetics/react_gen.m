@@ -1,154 +1,99 @@
-% Chemical reaction generator builder. Syntax:
+% Compile product-row maps for an explicit chemical reaction. Syntax:
 %
-%              G=react_gen(spin_system,reaction)
+%                   maps=react_gen(spin_system,reaction)
 %
 % Parameters:
 %
-%    reaction.reactants - a vector of integers specifying
-%                         which parts declared in the in-
-%                         put (chem.parts) are reactants
+%    spin_system - Spinach object with a compiled sphten-liouv basis
 %
-%    reaction.products  - a vector of integers specifying
-%                         which parts declared in the in-
-%                         put (chem.parts) are products
-%
-%    reaction.matching  - a matrix with two columns, spe-
-%                         cifying which spin in the reac-
-%                         tants list (left column) becom-
-%                         es which spin in the product 
-%                         list (right column)
+%    reaction    - validated chem.reactions record from create()
 %
 % Outputs:
 %
-%    G - a cell array of matrices, one per reactant, map-
-%        ping each state of the reactant state space into
-%        its destination in the product state space
+%    maps        - cell array, one per product occurrence; each matrix
+%                  has global destination indices in its first column
+%                  and one global source index per reactant occurrence
+%                  in the remaining columns
+%
+% Product-only spins must be at identity. Unmatched source spins are
+% traced out. Missing source descriptors are counted and reported;
+% no Cartesian product of the reactant bases is materialised. Repeated
+% spin-bearing reactants or products with matched spins require occurrence-resolved
+% matching and are rejected by this two-column matching interface.
 %
 % i.kuproprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=react_gen.m>
 
-function G=react_gen(spin_system,reaction)
+function maps=react_gen(spin_system,reaction)
 
 % Check consistency
 grumble(spin_system,reaction);
 
-% Inform the user and get the timer going
-report(spin_system,'building reaction generators...');
-timer_react_gen=tic;
+% Enumerate each product block once per stoichiometric occurrence
+maps=cell(size(reaction.products));
+for n=1:numel(reaction.products)
 
-% Preallocate reaction generator arrays
-% to be [reactant destin source coeff] 
-nstates=size(spin_system.bas.basis,1);
-drain_gen_idx=zeros(nstates,4); 
-fill_gen_idx=zeros(nstates,4);
+    % Require unpolarised arrival on spins without a source
+    product=reaction.products(n);
+    spins=spin_system.chem.parts{product};
+    descr=spin_system.bas.basis{product};
+    present=~any(descr(:,~ismember(spins,reaction.matching(:,2))),2);
+    sources=zeros(size(descr,1),numel(reaction.reactants));
+    missing=false(size(present));
+    for k=1:numel(reaction.reactants)
 
-% Loop over the basis set
-parfor n=1:nstates %#ok<*PFBNS>
-    
-    % Extract the state
-    source_state=spin_system.bas.basis(n,:); 
+        % Pull the product descriptor back through the atom matching
+        reactant=reaction.reactants(k);
+        source_spins=spin_system.chem.parts{reactant};
+        [on_source,source_col]=ismember(reaction.matching(:,1),source_spins);
+        [on_product,product_col]=ismember(reaction.matching(:,2),spins);
+        matched=on_source&on_product;
+        [rows,cols,values]=find(descr(:,product_col(matched)));
+        source_col=source_col(matched);
+        source_descr=sparse(rows,source_col(cols),values,size(descr,1),numel(source_spins));
 
-    % Find participating spins
-    [~,spins_involved]=find(source_state);
-
-    % Build reaction generators
-    if ~isempty(spins_involved)
-
-        % Determine the host substance
-        host_subst=cellfun(@(x)all(ismember(spins_involved,x)),...
-                           spin_system.chem.parts);
-        [~,host_subst]=find(host_subst);
-
-        % Double-check basis state indexing
-        if numel(host_subst)~=1, error('basis set indexing problem.'); end
-
-        % Determine host substance type
-        this_is_reactants=ismember(host_subst,reaction.reactants);
-        this_is_products=ismember(host_subst,reaction.products);
-
-        % Double-check indexing
-        if this_is_reactants&&this_is_products
-            error('reactant/product indexing problem.');
+        % Locate source rows without constructing a reactant tensor basis
+        if isempty(source_spins)
+            found=true(size(present)); index=ones(size(present));
+        else
+            [found,index]=ismember(source_descr,spin_system.bas.basis{reactant},'rows');
         end
-
-        % Only reactants react
-        if this_is_reactants
-
-            % Add to reactant drain generator
-            idx=find(reaction.reactants==host_subst);
-            drain_gen_idx(n,:)=[idx n n -1];
-        
-            % Build the destination state
-            destin_state=zeros(1,numel(source_state));
-            destin_state(reaction.matching(:,2))=source_state(reaction.matching(:,1));
-            destin_state=sparse(destin_state);
-
-            % Look for the destination state in the basis set and double-check indexing
-            [destin_exists,destin_index]=ismember(destin_state,spin_system.bas.basis,'rows');
-            if numel(destin_index)>1, error('invalid basis set specification'); end
-
-            % Build product fill generator
-            if destin_exists
-
-                % Find participating spins
-                [~,spins_involved]=find(destin_state);
-
-                % Determine the host substance
-                host_subst=cellfun(@(x)all(ismember(spins_involved,x)),...
-                                   spin_system.chem.parts);
-                [~,host_subst]=find(host_subst);
-
-                % Double-check indexing
-                if numel(host_subst)~=1
-                    error('basis set indexing problem.');
-                end
-                
-                % Add to product fill generator
-                fill_gen_idx(n,:)=[idx destin_index n 1];
-
-            end
-
-        end
-
+        missing=missing|~found;
+        sources(:,k)=spin_system.bas.offsets(reactant)+index;
     end
 
+    % Report truncation separately from unmatched product-spin orders
+    report(spin_system,['reaction product ' num2str(product) ': ' ...
+           num2str(nnz(present&missing)) ' product rows without a source']);
+    present=present&~missing;
+    maps{n}=[spin_system.bas.offsets(product)+find(present) sources(present,:)];
 end
-
-% Merge and trim generator indices
-gen_idx=[drain_gen_idx; fill_gen_idx];
-gen_idx(gen_idx(:,4)==0,:)=[];
-
-% Convert to complex sparse matrices
-G=cell([numel(reaction.reactants) 1]);
-for n=1:numel(reaction.reactants)
-    G{n}=sparse(gen_idx(gen_idx(:,1)==n,2),...
-                gen_idx(gen_idx(:,1)==n,3),...
-                gen_idx(gen_idx(:,1)==n,4),nstates,nstates);
-    G{n}=complex(G{n});
-end
-
-% Report the time taken
-report(spin_system,['reaction generator build time: ' ...
-                     num2str(toc(timer_react_gen)) ' seconds']);
 
 end
 
 % Consistency enforcement
 function grumble(spin_system,reaction)
-if ~isempty(intersect(reaction.reactants,...
-                      reaction.products))
-    error('reactants and products must contain different substances.');
+if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
+    error('Spinach:react_gen:formalism','reaction maps currently require sphten-liouv formalism.');
 end
-if numel(cell2mat(spin_system.chem.parts(reaction.reactants)))~=...
-   numel(cell2mat(spin_system.chem.parts(reaction.products)))
-    error('number of spins not the same either side of the reaction arrow.');
+if ~isstruct(reaction)||~isscalar(reaction)||...
+   ~all(isfield(reaction,{'reactants','products','matching'}))
+    error('Spinach:react_gen:record','reaction must be a validated chem.reactions record.');
 end
-if (~isempty(setdiff(reaction.matching(:,1)',...
-                     cell2mat(spin_system.chem.parts(reaction.reactants)))))||...
-   (~isempty(setdiff(reaction.matching(:,2)',...
-                     cell2mat(spin_system.chem.parts(reaction.products)))))
-    error('matching map and part specification are not consistent.');
+for n=unique(reaction.reactants)
+    if nnz(reaction.reactants==n)>1&&...
+       any(ismember(reaction.matching(:,1),spin_system.chem.parts{n}))
+        error('Spinach:react_gen:repeatedMatching',...
+              'matched repeated reactants require occurrence-resolved matching, not a two-column spin map.');
+    end
+end
+for n=unique(reaction.products)
+    if nnz(reaction.products==n)>1&&...
+       any(ismember(reaction.matching(:,2),spin_system.chem.parts{n}))
+        error('Spinach:react_gen:repeatedProductMatching',...
+              'matched repeated products require occurrence-resolved matching, not a two-column spin map.');
+    end
 end
 end
 

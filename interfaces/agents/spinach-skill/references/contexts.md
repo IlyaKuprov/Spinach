@@ -1,5 +1,13 @@
 # Contexts, pulse sequences, and processing
 
+## Contents
+
+- [The context call](#the-context-call)
+- [Writing a pulse sequence](#writing-a-pulse-sequence)
+- [The `state` and `operator` grammar](#the-state-and-operator-grammar)
+- [The experiments library](#the-experiments-library)
+- [Acquisition and processing conventions](#acquisition-and-processing-conventions)
+
 The context sits between the spin system and the pulse sequence: it builds
 the Hamiltonian, the relaxation and kinetics superoperators, performs
 whatever orientational or spatial averaging the physical situation demands,
@@ -120,7 +128,7 @@ run under another.
 | `liquid`, `crystal`, `gridfree` | `pulse_sequence(spin_system,parameters,H,R,K)` |
 | `powder` | `pulse_sequence(spin_system,localpar,H,R,K)`, once per orientation |
 | `singlerot` | Liouville space: the third argument is the Fokker-Planck generator; Hilbert space: a stack of Hamiltonians, one per rotor phase |
-| `doublerot` | third argument is `L+1i*M`, the Fokker-Planck generator including the two rotor turning terms |
+| `doublerot` | Liouville space: third argument is `L+1i*M`, including both rotor turning terms; `zeeman-hilb`/`zeeman-wavef`: a cell stack of Hamiltonians over the two rotor phases |
 | `floquet` | third argument is the Floquet generator |
 | `imaging`, `meshflow` | `pulse_sequence(spin_system,parameters,H,R,K,G,F)` |
 
@@ -278,6 +286,16 @@ they build their own generators.
 (frequency-domain slow passage), `respiration`, `cp_acquire_soft`,
 `cp_contact_hard`, `cp_contact_soft`, `relaxan`, `eqmag`, `fieldsweep`,
 `fieldscan_enlev`, `fieldscan_magn`, `rapidscan`.
+
+`slowpass` takes a two-element `sweep` interval in Hz, `npoints>=2`,
+`rho0`, and `coil`, and returns the FFT-normalised frequency-domain response.
+Relaxation is required and must not be thermalised. Liouville identity
+components are excluded only when their sector is decoupled from spin order
+in both directions within `tols.liouv_zero`; that sector is shifted to lift
+stationary poles, while the spin-order block is unchanged. Spatial contexts
+supply `spc_dim` for identity embedding. Selective-reaction coupling retains
+the original resolvent; wavefunction inputs bypass identity removal. This
+does not regularise other undamped or coupled stationary modes.
 
 `acquire` takes `sweep` (Hz), `npoints`, `rho0`, `coil`, `decouple` (e.g.
 `{'15N','13C'}`), and optionally `homodec_oper` with `homodec_pwr` (Hz) and

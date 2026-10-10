@@ -44,7 +44,7 @@ inter.coupling.scalar{1,2}=2*(-73e6);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -63,7 +63,7 @@ parameters.mw_pwr=10e6;
 parameters.mw_frq=0;
 parameters.spins={'E'};
 parameters.fields=linspace(-0.08,0.04,256);
-parameters.coil=state(spin_system,'Lz','1H');
+parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 parameters.mw_oper=operator(spin_system,'Lx','E')/2;
 parameters.ez_oper=operator(spin_system,'Lz','E');
 parameters.grid='rep_2ang_1600pts_sph';

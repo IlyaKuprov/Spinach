@@ -14,3 +14,5 @@ The source labels the experiment 400 MHz NMR and sets `sys.magnet=9.4`. It uses 
 The simulation sweeps five rotational-diffusion correlation times, `1e-7` to `1e-3` s, with Wigner ranks `[2 3 5 7 13]`, respectively. For each value it calls `gridfree` with `@acquire` and the NMR mode, using 1024 points, a sweep value of 120000, zero fill to 4096, and offset 0. The source does not state units for those three acquisition values. It applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots the real spectrum with amplitude in arbitrary units and a displayed vertical range from -1 to 10. The legend identifies the five correlation times.
 
 This is a simulation, not a spectrum read from an experimental acquisition: the input is the CASTEP file and the programmed spin/acquisition model. The output is the calculated spectrum series. The source estimates minutes of calculation, or seconds with a GPU; GPU enablement is commented out in this file. It does not provide numerical peak positions or a measured-versus-simulated comparison.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

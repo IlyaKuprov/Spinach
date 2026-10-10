@@ -1,5 +1,5 @@
 % Returns the unit state vector or matrix in the current formalism
-% and basis. Syntax:
+% and basis, weighted by each substance concentration. Syntax:
 %
 %                     rho=unit_state(spin_system)
 %
@@ -12,6 +12,9 @@
 %
 %    rho          - vector or matrix representation of
 %                   the unit state 
+%
+% Note: Zeeman blocks retain the stock geometric identity normalisation.
+%       Use equilibrium for trace-one density matrices before weighting.
 %
 % ilya.kuprov@weizmann.ac.il
 % d.savostyanov@soton.ac.uk
@@ -28,19 +31,29 @@ switch spin_system.bas.formalism
     
     case 'sphten-liouv'
         
-        % Unit population of T(0,0) state
-        rho=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+        % Concentration at each T(0,0) coordinate
+        rho=sparse(spin_system.bas.offsets(1:end-1)+1,1,spin_system.chem.concs,...
+                   spin_system.bas.offsets(end),1);
         
     case 'zeeman-liouv'
         
-        % Normalized stretched unit matrix
-        rho=speye(prod(spin_system.comp.mults));
-        rho=rho(:); rho=rho/norm(rho,2);
+        % Stack locally normalised stretched identities
+        blocks=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+            block=block(:); blocks{n}=spin_system.chem.concs(n)*block/norm(block,2);
+        end
+        rho=vertcat(blocks{:});
         
     case 'zeeman-hilb'
         
-        % Sparse unit matrix
-        rho=speye(prod(spin_system.comp.mults));
+        % Place weighted geometric identities on the Hilbert diagonal
+        blocks=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            blocks{n}=spin_system.chem.concs(n)*...
+                      speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+        end
+        rho=blkdiag(blocks{:});
         
     otherwise
         
@@ -55,6 +68,10 @@ end
 function grumble(spin_system)
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('the spin_system object does not contain the required information.');
+end
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+    error('Spinach:unit_state:wavefunction',...
+          'concentration-weighted unit states are not supported in zeeman-wavef formalism.');
 end
 end
 

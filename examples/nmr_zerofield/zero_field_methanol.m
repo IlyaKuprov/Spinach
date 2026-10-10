@@ -20,9 +20,9 @@ inter.coupling.scalar{4,4}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_group={'S3'};
-bas.sym_spins={[1 2 3]};
+bas.approximation={'none'};
+bas.sym_group={{'S3'}};
+bas.sym_spins={{[1 2 3]}};
 
 % Sequence parameters
 parameters.sweep=700;
@@ -34,6 +34,9 @@ parameters.axis_units='Hz';
 parameters.invert_axis=0;
 parameters.flip_angle=pi/2;
 parameters.detection='uniaxial';
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

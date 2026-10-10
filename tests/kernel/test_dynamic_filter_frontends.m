@@ -47,7 +47,7 @@ inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=10.0;
 inter.coupling.scalar{2,2}=0.0;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Construct physical single- and two-spin state components
@@ -99,7 +99,7 @@ result=test_close(result,'decoupled state by name',rho_obs,rho_h,1e-14,1e-14,...
                   'decouple() must remove every state component involving the named spin');
 
 % Check that rows and columns touching carbon have been removed
-carbon_mask=(spin_system.bas.basis(:,2)~=0);
+carbon_mask=(spin_system.bas.basis{1}(:,2)~=0);
 zero_rows=norm(H_obs(carbon_mask,:),1);
 zero_cols=norm(H_obs(:,carbon_mask),1);
 result=test_close(result,'decoupled Liouvillian rows',zero_rows+zero_cols,0,1e-14,1e-14,...
@@ -123,7 +123,7 @@ inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=0.0;
 inter.coupling.scalar{2,2}=0.0;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Mix longitudinal, zero-quantum, and double-quantum components
@@ -153,7 +153,7 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0.0};
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 spin_system=assume(spin_system,'nmr');
 
@@ -188,7 +188,7 @@ inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=10.0;
 inter.coupling.scalar{2,2}=0.0;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 end

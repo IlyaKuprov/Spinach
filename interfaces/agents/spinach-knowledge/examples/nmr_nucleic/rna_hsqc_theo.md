@@ -7,7 +7,7 @@
 
 This example simulates a theoretical 1H-13C HSQC spectrum for the example RNA supplied by the Wagner group. It imports structural and assignment information from `example.pdb` and `example.txt` through `nuclacid`, with `options.noshift='delete'` and an empty deuteration list. These files define the modeled RNA system; the wrapper does not load an experimental spectrum.
 
-The field is 17.62 T. The basis is `sphten-liouv`, approximation `IK-1`, scalar-coupling connectivity, interaction level 4 and proximity level 1. Interaction and proximity cutoffs are both set to 5.0 (the wrapper does not state units). Krylov propagation and colorbar are disabled, and the greedy option is enabled. Relaxation is damped with diagonal retention and zero equilibrium; `damp_rate=5.0`, with no unit annotation in this file.
+The field is 17.62 T. The basis is `sphten-liouv`, approximation `IK-1`, scalar-coupling connectivity, interaction level 4 and proximity level 1. Interaction and proximity cutoffs are both set to 5.0 (the wrapper does not state units). Krylov propagation and colorbar are disabled, and the greedy option is enabled. Relaxation is damped with diagonal retention and zero equilibrium; `damp_rate=5.0`, with no unit annotation in this file. Zero track elimination is also explicitly enabled with `zte` in `sys.enable`.
 
 ## Sequence parameters and processing
 

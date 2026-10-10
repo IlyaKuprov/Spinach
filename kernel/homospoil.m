@@ -42,7 +42,7 @@
 function rho=homospoil(spin_system,rho,zqc_flag)
 
 % Check consistency
-grumble(rho,zqc_flag);
+grumble(spin_system,rho,zqc_flag);
 
 % In Hilbert space, only keep the diagonal
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
@@ -52,7 +52,7 @@ end
 
 % In Zeeman basis of Liouville space, keep the spin-space diagonal of every folded block
 if strcmp(spin_system.bas.formalism,'zeeman-liouv')
-    spn_dim=size(spin_system.bas.basis,1); spc_dim=numel(rho)/spn_dim;
+    spn_dim=spin_system.bas.offsets(end); spc_dim=numel(rho)/spn_dim;
     problem_dims=size(rho); rho=reshape(rho,[spn_dim spc_dim]);
     hdim=sqrt(spn_dim); offdiag_mask=true(spn_dim,1);
     offdiag_mask(1:(hdim+1):spn_dim)=false;
@@ -60,34 +60,24 @@ if strcmp(spin_system.bas.formalism,'zeeman-liouv')
 end
 
 % Store dimension statistics
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 spc_dim=numel(rho)/spn_dim;
 problem_dims=size(rho);
 
 % Fold indirect dimensions
 rho=reshape(rho,[spn_dim spc_dim]);
 
-% Pull the projection information from the basis
-[~,M]=lin2lm(spin_system.bas.basis);
-
-% Filter the state vector
-switch zqc_flag
-    
-    case 'keep'
-        
-        % Find the states that have zero carrier frequency and kill everything else
-        rho(abs(sum(repmat(spin_system.inter.basefrqs,size(spin_system.bas.basis,1),1).*M,2))>1e-6,:)=0;
-    
-    case 'destroy'
-        
-        % Find the longitudinal states and kill everything else
-        rho(sum(abs(M),2)>0,:)=0;
-    
-    otherwise
-        
-        % Complain and bomb out
-        error('unknown ZQC flag.');
-        
+% Filter each substance using its local projection quantum numbers
+for n=1:spin_system.bas.nsubst
+    [~,M]=lin2lm(spin_system.bas.basis{n});
+    switch zqc_flag
+        case 'keep'
+            frequencies=spin_system.inter.basefrqs(1,spin_system.chem.parts{n});
+            wipe=abs(sum(M.*frequencies,2))>1e-6;
+        case 'destroy'
+            wipe=sum(abs(M),2)>0;
+    end
+    rho(spin_system.bas.offsets(n)+find(wipe),:)=0;
 end
 
 % Unfold indirect dimensions
@@ -101,7 +91,11 @@ end
 end
 
 % Consistency enforcement
-function grumble(rho,zqc_flag)
+function grumble(spin_system,rho,zqc_flag)
+if (~strcmp(spin_system.bas.formalism,'sphten-liouv'))&&(spin_system.bas.nsubst>1)
+    error('Spinach:homospoil:segmentedZeeman',...
+          'multi-substance Zeeman homospoil filtering is not yet supported.');
+end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');
 end

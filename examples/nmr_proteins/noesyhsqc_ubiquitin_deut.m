@@ -15,6 +15,7 @@ function noesyhsqc_ubiquitin_deut()
 options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
+options.csa_file='1D3Z.csa';
 options.deuterate={'HA','HB','HB1','HB2','HB3','HG','HG1','HG2','HG3',...
                    'HD','HD1','HD2','HD3','HE','HE1','HE2','HE3','HZ',...
                    'HZ1','HZ2','HZ3','HH','HH1','HH2','HH3'};
@@ -37,12 +38,12 @@ inter.tau_c={1e-8};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4; bas.prox_level=3;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4}; bas.prox_level={3};
 
 % Algorithmic options
-sys.enable={'prop_cache','greedy'};
+sys.enable={'zte','prop_cache','greedy'};
 sys.disable={'asyredf'};
 
 % Create the spin system structure

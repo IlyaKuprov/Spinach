@@ -77,6 +77,9 @@
 % Note: perturbative corrections to the rotating frame transformation are 
 %       not supported - use singlerot.m if you need them.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=gridfree.m>
@@ -141,6 +144,15 @@ end
 % Get relaxation and kinetics
 R=relaxation(spin_system); 
 K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:gridfree:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by gridfree; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Get problem dimensions
 spc_dim=size(Lx,1); parameters.spc_dim=spc_dim;
@@ -321,7 +333,7 @@ if isfield(parameters,'add_terms')
     if ~iscell(parameters.add_terms)
         error('parameters.add_terms must be a cell array of two-element cell arrays.');
     end
-    spn_dim=size(spin_system.bas.basis,1);
+    spn_dim=spin_system.bas.offsets(end);
     for n=1:numel(parameters.add_terms)
         if (~iscell(parameters.add_terms{n}))||...
            (numel(parameters.add_terms{n})~=2)

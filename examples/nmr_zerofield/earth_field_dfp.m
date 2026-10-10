@@ -41,7 +41,7 @@ inter.coupling.scalar{idxof(sys,'H3'),idxof(sys,'H5')} =   0.55;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -60,8 +60,10 @@ parameters.invert_axis=0;
 parameters.detection='uniaxial';
 parameters.flip_angle=pi/2;
 
-% This needs a GPU
-% sys.enable={'gpu'}; 
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % 14N relaxation rates, Hz
 R_14N=[0 10 100 500 1e3 1e4 1e5 1e6];

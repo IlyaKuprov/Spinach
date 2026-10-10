@@ -23,3 +23,7 @@ The `parameters.rframes` cell array specifies rotating frames as {isotope, order
 ## Example from the source documentation
 
 This context function assembles sequence inputs; it does not itself specify a complete pulse sequence.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:liquid:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

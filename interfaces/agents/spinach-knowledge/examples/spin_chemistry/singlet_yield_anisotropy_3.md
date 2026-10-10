@@ -12,6 +12,10 @@ The system is two electrons, two 14N nuclei, and three 1H nuclei. The field is s
 
 ## Recombination and angular yield
 
-The reaction model is inter.chem.rp_theory='haberkorn' for electrons [1 2], with inter.chem.rp_rates=[1e6 1e6]. The powder calculation uses Lebedev grid leb_1ang_rank_63, tol=1e-2, verbose=0, and sum_up=0, and calls powder with @rydmr in the lab frame. The caller does not explicitly define the initial state; it delegates the singlet-yield computation to that routine.
+Two explicit first-order loss records have singlet and triplet selectors for electrons [1 2], each at 1e6 inverse seconds. Together they give the Haberkorn drain. The powder calculation uses Lebedev grid leb_1ang_rank_63, tol=1e-2, verbose=0, and sum_up=0, and calls powder with @rydmr in the lab frame. The caller does not explicitly define the initial state; it delegates the singlet-yield computation to that routine.
 
 The plotted output is cell2mat(yields) against grid.betas, labelled as the beta spherical angle in radians, with singlet yield on the vertical axis. The file identifies only a model reaction: it does not name the radicals or supply a measured yield.
+
+## Iterative-solver accuracy
+
+For the complete 32-orientation grid, stock and reaction-record calculations at the shipped `bicg` residual target of 1e-2 differ by 7.43314e-7 relative in singlet yields. Tightening only that target to 1e-10 in both full-grid runs reduces the relative difference to 1.41188e-14 (maximum absolute 8.99281e-15). The measured difference is therefore iterative-solver accuracy; the shipped example retains the original target and quadrature.

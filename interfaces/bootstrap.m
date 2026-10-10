@@ -42,7 +42,7 @@ sys.disable={'hygiene'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 if exist('volume','var')

@@ -27,7 +27,7 @@ inter.coupling.scalar{3,5}=0.2;
 
 % Hilbert space
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -42,7 +42,7 @@ options.dephasing=1;
 % Experiment parameters
 parameters.spins={'2H'};
 parameters.rho0=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5};
-parameters.coil=state(spin_system,'L+','2H');
+parameters.coil=coil_state(spin_system,'L+','2H','exact');
 parameters.pulse_op=operator(spin_system,'Ly','2H');
 parameters.pulse_angle=pi/4;
 parameters.decouple={};

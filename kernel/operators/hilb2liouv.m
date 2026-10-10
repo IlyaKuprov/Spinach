@@ -5,7 +5,9 @@
 %
 % Parameters:
 %
-%          H - a Hilbert space operator
+%          H - a Hilbert space operator, or a cell array of
+%              per-substance operators; cells are converted
+%              independently and assembled as a direct sum
 %
 %  conv_type - the type of Liouville space superoperator 
 %              to return:
@@ -36,6 +38,20 @@ function L=hilb2liouv(H,conv_type)
 
 % Check consistency
 grumble(H,conv_type);
+
+% Convert explicit substance blocks without inter-substance coherences
+if iscell(H)
+    blocks=cell(size(H));
+    for n=1:numel(H)
+        blocks{n}=hilb2liouv(H{n},conv_type);
+    end
+    if strcmp(conv_type,'statevec')
+        L=vertcat(blocks{:});
+    else
+        L=blkdiag(blocks{:});
+    end
+    return
+end
 
 % Prepare a unit matrix
 unit=speye(size(H));
@@ -79,8 +95,8 @@ end
 
 % Consistency enforcement
 function grumble(H,conv_type)
-if ~isnumeric(H)
-    error('H parameter must be numeric.');
+if (~isnumeric(H))&&(~iscell(H))
+    error('H parameter must be numeric or a cell array of numeric blocks.');
 end
 if ~ischar(conv_type)
     error('conv_type parameter must be a character string.');

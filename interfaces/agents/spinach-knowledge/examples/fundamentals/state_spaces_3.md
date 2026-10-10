@@ -7,7 +7,7 @@
 
 This example follows transverse magnetisation in the fatty-acid system returned by `fatty_acid(15)`, under strong scalar coupling and repeated refocusing pulses. Its analysis asks how the trajectory occupies successive spin-correlation orders; it does not test angular or powder quadrature. The source states that relaxation is absent and estimates a runtime of minutes.
 
-The field is 14.1 T. The basis uses `sphten-liouv`, `IK-2`, proximity level 1, and scalar-coupling connectivity; `greedy` and `prop_cache` are enabled. The initial state is proton `Lx`; the source also constructs a proton `L+` coil state, but does not pass that coil into the trajectory calculation. The Hamiltonian is built under the NMR assumption, without a relaxation term.
+The field is 14.1 T. The basis uses `sphten-liouv`, `IK-2`, proximity level 1, and scalar-coupling connectivity; `zte`, `greedy`, and `prop_cache` are enabled. The initial state is proton `Lx`; the source also constructs a proton `L+` coil state, but does not pass that coil into the trajectory calculation. The Hamiltonian is built under the NMR assumption, without a relaxation term.
 
 ## Sequence and output
 

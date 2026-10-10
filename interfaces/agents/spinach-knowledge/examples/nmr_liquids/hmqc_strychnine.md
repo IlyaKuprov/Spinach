@@ -8,7 +8,7 @@
 
 Calls `strychnine({'13C','1H'})`. The helper's requested-species filter leaves 22 `1H` spins and 21 `13C` sites from its strychnine model; the wrapper then generates natural-abundance 13C isotopomers with `dilute`. The helper attributes isotropic shifts and J-couplings to Berger and Braun except the one-bond C18-H18b coupling, which it cites to http://dx.doi.org/10.1016/j.jmr.2014.02.003; coordinates are attributed to the major conformer in http://dx.doi.org/10.1039/C0CC04114A.
 
-The wrapper sets `sys.magnet=5.9`, enables `greedy`, and sets `prox_cutoff=4.0`. Its basis is `sphten-liouv` / `IK-2` with scalar-coupling connectivity and proximity level 1.
+The wrapper sets `sys.magnet=5.9`, enables `zte` and `greedy`, and sets `prox_cutoff=4.0`. Its basis is `sphten-liouv` / `IK-2` with scalar-coupling connectivity and proximity level 1.
 
 ## Acquisition and processing
 

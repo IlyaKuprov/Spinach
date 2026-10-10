@@ -8,7 +8,7 @@
 
 `imaging` builds spin Hamiltonian and kinetic operators, voxel-dependent relaxation, spatial gradient operators, and the spatial diffusion/flow generator. It passes `H`, `R`, `K`, `G`, and `F` to `pulse_sequence(spin_system,parameters,H,R,K,G,F)`; the context output is whatever that sequence returns. The context applies the `nmr` assumption and channel-frequency offsets.
 
-The spin-space dimension is `spn_dim=size(H,1)`; the spatial dimension is `spc_dim=prod(parameters.npts)`; the combined state-space dimension is their product. Spatial arrays are ordered as [X Y Z], while the direct-product factor order is Z, then Y, then X, then Spin. The corresponding vector is the column-wise vectorisation of a 3D [X Y Z] array with a spin-state component at each voxel. `parameters.spc_dim` and `parameters.spn_dim` are passed to the sequence.
+The spin-space dimension is `spn_dim=spin_system.bas.offsets(end)`; the spatial dimension is `spc_dim=prod(parameters.npts)`; the combined state-space dimension is their product. Spatial arrays are ordered as [X Y Z], while the direct-product factor order is Z, then Y, then X, then Spin. The corresponding vector is the column-wise vectorisation of a 3D [X Y Z] array with a spin-state component at each voxel. `parameters.spc_dim` and `parameters.spn_dim` are passed to the sequence.
 
 ## Grid, transport, and units
 
@@ -25,3 +25,11 @@ The Hamiltonian and kinetics are shared across voxels. Relaxation is assembled f
 ## Example from the source documentation
 
 For example, choose `parameters.deriv={'fourier'}` or `parameters.deriv={'period',n}` according to the requested spatial derivative scheme; the source gives these selector forms but no complete numerical imaging setup.
+
+The compiled terminal offset is the spin dimension across all substances; phantom spin operators and states must use that direct-sum ordering.
+
+Imaging rejects active compiled symmetry projectors. A declared symmetry group disabled through `sys.disable` leaves identity projectors and is accepted, just as an undeclared group is.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:imaging:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

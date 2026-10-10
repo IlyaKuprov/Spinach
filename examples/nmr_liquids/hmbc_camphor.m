@@ -18,14 +18,14 @@ options.min_j=3.0; options.no_xyz=0;
 sys.magnet=14.1;
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Sequence parameters
 parameters.J=140;

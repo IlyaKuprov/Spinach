@@ -21,3 +21,5 @@ These are source inputs and plotted output, not a reported numerical validation 
 ## Callable context
 
 Run `pfg_test_1()` with the Spinach system, basis, Hamiltonian, gradient-pulse, coherence-analysis, and plotting functions used in the source; it accepts no arguments and produces a figure. No external experimental data are read.
+
+Coherence labels come from the single-substance descriptor `bas.basis{1}`, not the descriptor-cell container.

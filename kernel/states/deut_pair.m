@@ -35,6 +35,9 @@
 %             {Q- -> Q--, Q0 -> Q-, Q+ -> Q0, Q++ -> Q+, ...
 %              Q-- -> Q-, Q- -> Q0, Q0 -> Q+, Q+ -> Q++ }
 %
+% Outputs retain their unweighted projector normalisation; concentrations
+% do not enter the tensor expansion or its norms.
+%
 % WARNING: the states above are NOT irreducible spherical tensors - 
 %          Bargon just kroneckered up some Zeeman states and gave
 %          them what looked to him like reasonable labels.
@@ -82,8 +85,8 @@ for n=1:numel(IST)
         descr_b=['T' int2str(L2) ',' int2str(M2)];
 
         % Get the Spinach state
-        rho=state(spin_system,{descr_a,descr_b},...
-                              {spin_a, spin_b });
+        rho=coil_state(spin_system,{descr_a,descr_b},...
+                              {spin_a, spin_b },'exact');
 
         % Get and normalise the two-spin state
         tss=kron(IST{n},IST{k}); tss=tss/norm(tss,'fro');

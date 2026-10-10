@@ -34,14 +34,17 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,12,174.4);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
+bas.approximation={'IK-0'};
 bas.longitudinal={{'15N'}};
 bas.projections={+1};
-bas.inter_level=3;
+bas.inter_level={3};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -61,7 +64,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.verbose=1;
 
 % Simulation

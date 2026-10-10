@@ -95,7 +95,7 @@ else
 end
      
 % Project out Hx+1i*Hy in every voxel
-mri_slice=fpl2phan(rho,state(spin_system,'L+','1H'),parameters.npts);
+mri_slice=fpl2phan(rho,coil_state(spin_system,'L+','1H','exact'),parameters.npts);
 
 % Get sample dimension information
 dims=zeros(1,6); 

@@ -27,7 +27,7 @@ sys.magnet=0;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 inter.temperature=300;
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 spin_h=test_spin_system(sys,inter,bas);
 result=test_close(result,'unit_state zeeman-hilb',unit_state(spin_h),speye(2),1e-15,1e-15,...
                   'Hilbert-space unit state is the sparse unit density matrix');
@@ -41,7 +41,7 @@ result=test_close(result,'unit_state zeeman-liouv',unit_state(spin_l),unit_zeema
 bas.formalism='sphten-liouv';
 spin_s=test_spin_system(sys,inter,bas);
 unit_s=unit_state(spin_s);
-result=test_close(result,'unit_state sphten-liouv first component',unit_s,sparse(1,1,1,size(spin_s.bas.basis,1),1),1e-15,1e-15,...
+result=test_close(result,'unit_state sphten-liouv first component',unit_s,sparse(1,1,1,spin_s.bas.offsets(end),1),1e-15,1e-15,...
                   'spherical-tensor Liouville unit state is the T(0,0) population basis vector');
 stateinfo(spin_s,unit_s,1);
 result=test_true(result,'stateinfo sphten-liouv smoke',true,...
@@ -51,7 +51,7 @@ result=test_true(result,'stateinfo sphten-liouv smoke',true,...
 sys2.magnet=0;
 sys2.isotopes={'1H','1H'};
 inter2.zeeman.scalar={0,0};
-bas2.formalism='zeeman-hilb'; bas2.approximation='none';
+bas2.formalism='zeeman-hilb'; bas2.approximation={'none'};
 spin2=test_spin_system(sys2,inter2,bas2);
 S=singlet(spin2,1,2);
 [TU,T0,TD]=triplet(spin2,1,2);

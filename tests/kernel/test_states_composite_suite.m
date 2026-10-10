@@ -26,7 +26,7 @@ sys.magnet=0;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Check the Hilbert-space thermodynamic unit state
@@ -48,7 +48,7 @@ inter.zeeman.scalar={0,0};
 inter.coupling.scalar{1,2}=0;
 inter.coupling.scalar{2,2}=0;
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Textbook two-spin wavefunctions in the Zeeman product basis
@@ -82,7 +82,7 @@ inter.coupling.scalar{2,3}=0;
 inter.coupling.scalar{3,4}=0;
 inter.coupling.scalar{4,4}=0;
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Check the product of two singlet projectors
@@ -100,7 +100,7 @@ inter.coupling.scalar{1,2}=0;
 inter.coupling.scalar{2,3}=0;
 inter.coupling.scalar{3,3}=0;
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Enumerate two partner spins that may each be E or Lz while spin 2 is L+

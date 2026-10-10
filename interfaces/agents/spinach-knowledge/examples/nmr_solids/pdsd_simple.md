@@ -14,3 +14,5 @@ The model has two 13C and two 1H spins at the four coordinates listed in the sou
 ## Acquisition and processing
 
 The detected spins are 1H and 13C; the mixing-time parameter is `10e-3`. The two dimensions use 256 points each and zero-fill to 1024 each; sweep is 10000, and offsets are `[3150, 6750]`. The source does not annotate units for these acquisition values. `singlerot` returns cosine and sine signals; each receives squared-cosine apodisation in both dimensions. The code Fourier-transforms the indirect-dimension signals, forms the States combination `f1_cos - 1i*f1_sin`, transforms the direct dimension, and takes the real part for the plotted spectrum. The plotting parameters select 13C and positive contours.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

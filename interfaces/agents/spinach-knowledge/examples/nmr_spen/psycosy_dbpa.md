@@ -16,3 +16,5 @@ The `@psycosy` sequence runs through `imaging` on a 15 mm sample represented by 
 The sequence assignments are offset 2460, sweep 600, acquisition sizes [512, 512], zero-fill sizes [1024, 1024], and `axis_units='ppm'`. The mixing time is 25e-3 s and gradient amplitude 1e-2 T/m. The saltire chirp uses a 20-degree flip angle, 0.015 s duration, 0.05 s chirp-gradient duration, 10000 Hz sweep width, 250 pulse points, and smoothing factor 20. The source does not annotate units for the offset or the `sweep` assignment.
 
 The two-dimensional FID is apodised with square-sine windows in both dimensions, transformed with a zero-filled 2D FFT, and plotted as its magnitude. The source header estimates minutes on an NVIDIA Tesla A100 and says CPU execution takes much longer; this is the source's estimate, not a run result.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

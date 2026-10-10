@@ -35,6 +35,15 @@
 %       matrix inversion operation would fail to converge. The re-
 %       laxation matrix R must *not* be thermalized.
 %
+% Note: Liouville-space identity components are excluded only when
+%       the identity sector is decoupled from spin order in both
+%       directions, to within tols.liouv_zero. Its resolvent block
+%       is shifted by 1 inverse second to remove stationary poles;
+%       the spin-order block is unchanged. Spatial contexts supply
+%       parameters.spc_dim for the space-times-spin embedding.
+%       Coupled identity sectors, including selective reactions,
+%       and wavefunction inputs retain their original resolvent.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=slowpass.m>
@@ -61,6 +70,24 @@ L=H+1i*R+1i*K;
 % Compute subspace projectors
 projectors=reduce(spin_system,L,parameters.coil);
 
+% Get identity directions only in Liouville-space formalisms
+U=sparse(size(L,1),0);
+if ~strcmp(spin_system.bas.formalism,'zeeman-wavef')
+
+    % Get normalised unit states, one per substance
+    U=cell(1,spin_system.bas.nsubst);
+    for n=1:spin_system.bas.nsubst
+        unit_system=spin_system; unit_system.chem.concs(:)=0;
+        unit_system.chem.concs(n)=1; U{n}=unit_state(unit_system);
+    end
+    U=[U{:}];
+
+    % Embed the spin identities in every spatial basis coordinate
+    if isfield(parameters,'spc_dim')
+        U=kron(speye(parameters.spc_dim),U);
+    end
+end
+
 % Loop over subspaces
 for k=1:numel(projectors)
     
@@ -69,6 +96,19 @@ for k=1:numel(projectors)
     coil_subs=projectors{k}'*parameters.coil;
     L_subs=projectors{k}'*L*projectors{k};
     Id_subs=speye(size(L_subs));
+
+    % Normalise the projected identity directions
+    U_subs=projectors{k}'*U; U_subs=U_subs(:,any(U_subs,1));
+    U_subs=U_subs./sqrt(sum(abs(U_subs).^2,1));
+
+    % Remove identities only when they decouple from spin order in both directions
+    unit_block=U_subs'*L_subs*U_subs;
+    if norm(L_subs*U_subs-U_subs*unit_block,1)<=spin_system.tols.liouv_zero&&...
+       norm(U_subs'*L_subs-unit_block*U_subs',1)<=spin_system.tols.liouv_zero
+        rho0_subs=rho0_subs-U_subs*(U_subs'*rho0_subs);
+        coil_subs=coil_subs-U_subs*(U_subs'*coil_subs);
+        L_subs=L_subs-1i*(U_subs*U_subs');
+    end
     
     % Run backslash on the GPU if instructed
     if ismember('gpu',spin_system.sys.enable)

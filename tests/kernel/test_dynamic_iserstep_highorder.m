@@ -79,7 +79,7 @@ inter.zeeman.scalar={0};
 
 % Specify a full Hilbert basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Build the quiet regression-test system
 spin_system=test_spin_system(sys,inter,bas);

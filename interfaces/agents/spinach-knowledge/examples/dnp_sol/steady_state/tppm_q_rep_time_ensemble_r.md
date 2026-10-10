@@ -14,4 +14,4 @@ The TPPM parameters are spins `{'E','1H'}`, orientation grid `rep_2ang_800pts_sp
 
 ## Calculation and output
 
-The detection operator is proton `Lz`, created by `state(spin_system,'Lz','1H')`. For each distance and repetition time, the source calls `powder(spin_system,@xixdnp_steady,localpar,'esr')`. It combines distance points using the explicitly coded `r^2 * wr` radial weighting and normalises by `sum(r.^2.*wr)`. The real proton expectation is plotted against repetition time in ms and saved as `tppm_q_rep_time_ensemble_r.fig` in the current working directory. The function has no declared output argument.
+The detection operator is proton `Lz`, created by `coil_state(spin_system,'Lz','1H','exact')`. For each distance and repetition time, the source calls `powder(spin_system,@xixdnp_steady,localpar,'esr')`. It combines distance points using the explicitly coded `r^2 * wr` radial weighting and normalises by `sum(r.^2.*wr)`. The real proton expectation is plotted against repetition time in ms and saved as `tppm_q_rep_time_ensemble_r.fig` in the current working directory. The function has no declared output argument.

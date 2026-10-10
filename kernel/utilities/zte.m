@@ -14,7 +14,8 @@
 %
 %      nstates - if this parameter is specified, only
 %                nstates most populated states are kept,
-%                irrespective of the tolerance parameter
+%                irrespective of the tolerance parameter; unit
+%                coordinates are retained in addition
 %
 % Output:
 %
@@ -23,6 +24,10 @@
 %
 %                            L_reduced=P'*L*P
 %                            rho_reduced=P'*rho;
+%
+% Note: in the compiled sphten-liouv space, unit coordinates of every
+%       substance survive elimination, including zero-population blocks.
+%       reduce.m supplies their support in projected irrep coordinates.
 %
 % Note: default tolerance may be altered by setting sys.tols.zte_tol
 %       variable before calling create.m 
@@ -33,8 +38,8 @@
 %               http://dx.doi.org/10.1016/j.jmr.2008.08.008
 %
 % Note: if tiny interactions or nearly equivalent spins are present,
-%       it is best to disable zero track elimination by adding 'zte'
-%       to the sys.disable cell array. 
+%       it is best to leave zero track elimination disabled. Enable it
+%       explicitly by adding 'zte' to the sys.enable cell array.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -52,10 +57,10 @@ if exist('nstates','var')&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscala
 end
 
 % Run Zero Track Elimination
-if ismember('zte',spin_system.sys.disable)
+if ~ismember('zte',spin_system.sys.enable)
     
     % Skip if instructed to do so by the user
-    report(spin_system,'WARNING - zero track elimination disabled, basis left unchanged.');
+    report(spin_system,'zero track elimination not enabled, basis left unchanged.');
     
     % Return a unit matrix
     projector=1;
@@ -142,6 +147,12 @@ else
         
     end
     
+    % Preserve every substance unit coordinate in the compiled spin space
+    if strcmp(spin_system.bas.formalism,'sphten-liouv')&&...
+       (size(L,1)==spin_system.bas.offsets(end))
+        zero_track_mask(spin_system.bas.offsets(1:end-1)+1)=false;
+    end
+
     % Take a unit matrix and delete the columns corresponding to zero tracks
     projector=speye(size(L)); projector(:,zero_track_mask)=[];
      

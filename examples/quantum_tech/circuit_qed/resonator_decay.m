@@ -38,7 +38,7 @@ inter.modes.t2_times={1/(1/5e-6+(1+2*n_eq)/(2*inter.modes.lifetimes{1}))};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -54,9 +54,9 @@ rho_fock=state(spin_system,'BL5',1);
 rho_coh=coherent(spin_system,1,1.5);
 
 % Fock level population detection states
-coils=[state(spin_system,'BL1',1) state(spin_system,'BL2',1) ...
-       state(spin_system,'BL3',1) state(spin_system,'BL4',1) ...
-       state(spin_system,'BL5',1)];
+coils=[coil_state(spin_system,'BL1',1,'exact') coil_state(spin_system,'BL2',1,'exact') ...
+       coil_state(spin_system,'BL3',1,'exact') coil_state(spin_system,'BL4',1,'exact') ...
+       coil_state(spin_system,'BL5',1,'exact')];
 
 % Time grid of the source calculation
 nsteps=100; dt=1e-9; time_axis=dt*(0:nsteps);

@@ -18,3 +18,5 @@ Encoding uses 500 pulse points and 40 WURST cycles, with Te=0.015 s, bandwidth 1
 ## Signal display and limits
 
 The imaginary part of the simulated k-space echo array is plotted against t2-point and k-space-point indices. The conventional dimension is Fourier transformed with a shift along dimension 2, and the magnitude is plotted in ppm for the two 1H channels specified for display. The source describes the calculation as hours, much faster on GPU; it gives no numeric runtime or measured signal. No DOI, imported measurement, or experimental validation is specified in this example.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

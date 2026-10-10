@@ -1,5 +1,13 @@
 # Failure modes and diagnostics
 
+## Contents
+
+- [Crash catalogue](#crash-catalogue)
+- [Silent wrong-result traps](#silent-wrong-result-traps)
+- [Scaling and memory](#scaling-and-memory)
+- [The headless validation harness](#the-headless-validation-harness)
+- [What counts as evidence that a simulation is right](#what-counts-as-evidence-that-a-simulation-is-right)
+
 Almost every kernel function has a `grumble()` input checker that stops with a
 specific message, and the no-defaults policy means a missing physical input is
 an error, not a guess. Crashes are therefore usually self-explanatory once the
@@ -225,6 +233,8 @@ the validation procedure below.
 
 Disabling `clean-up` or setting `prop_chop=0` leaves Taylor terms unrounded; `propagator()` then checks numerical nonzeros so that explicitly stored sparse zeros do not prevent termination. This does not enable an approximation tolerance for the unrounded series.
 
+With `prop_cache`, `propagator()` separates cache entries by cleanup, storage-threshold, and GPU policy as well as generator, timestep, and chop tolerance; changing those settings within a pool cannot retrieve an entry built under a different policy.
+
 ## Scaling and memory
 
 The Liouville-space dimension grows as 4^N for N spin-1/2 particles (2^N in
@@ -242,13 +252,19 @@ spins; beyond that, the basis restriction is the tool, not a bigger machine:
   and observable cannot enter the discarded blocks, and validate against an
   unfiltered basis when practical.
 - `bas.sym_group`/`bas.sym_spins` exploit permutation symmetry - large
-  savings for methyl groups and symmetric aromatics.
+  savings for methyl groups and symmetric aromatics where the context supports
+  them. `imaging` rejects symmetry groups; do not carry this setting blindly
+  from a liquid-state example into spatially resolved simulations.
 
-At run time Spinach reduces dimension further on its own: zero-track
-elimination and path tracing routinely cut the active space by an order of
-magnitude, visible in the log as "state space dimension reduced from 64 to
-15". These reductions can be switched off through
-`sys.disable={'zte','pt','symmetry',...}` for debugging, at a large cost.
+At run time path tracing can reduce the active dimension further. Zero-track
+elimination is opt-in: add `'zte'` to `sys.enable` to activate it, and omit
+it to leave that reduction off. Enable it only for examples whose actual
+propagation path reaches Liouville-space trajectory reduction. Hilbert-space
+symmetry reduction, direct `step` or `krylov` propagation, polyadic generators,
+and `trajlevel`-disabled calculations do not use ZTE. A shaped-pulse call alone
+is insufficient: its selected method must reach `evolution`, or a subsequent
+acquisition must do so. Path tracing and symmetry can be disabled
+with `sys.disable={'pt','symmetry'}` for debugging, potentially at a large cost.
 
 Matrices switch to sparse algebra automatically, and above a state-space
 dimension of 10000 (a tunable tolerance) Spinach uses Krylov propagation

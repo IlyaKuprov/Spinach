@@ -11,7 +11,7 @@ This is a simulated liquid-state, two-dimensional `1H` TOCSY spectrum of sucrose
 
 - The conversion call supplies the numeric argument `31.8`; the source does not label its units or explain its meaning. The source sets `options.min_j=1.0` and `sys.magnet=5.9`; units are not stated in this wrapper.
 - The basis is `sphten-liouv`, with `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
-- It enables `greedy`, disables `krylov`, and sets `sys.tols.prox_cutoff=4.0`. The initial density operator is `state(spin_system,'Lz','1H')`.
+- It enables `zte` and `greedy`, disables `krylov`, and sets `sys.tols.prox_cutoff=4.0`. The initial density operator is `state(spin_system,'Lz','1H')`.
 - The wrapper assigns no relaxation parameters. Do not infer an additional relaxation model from this file.
 
 ## Sequence call and processing

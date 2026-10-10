@@ -21,7 +21,7 @@ inter.coupling.euler{1,1}=[0 0 0];
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

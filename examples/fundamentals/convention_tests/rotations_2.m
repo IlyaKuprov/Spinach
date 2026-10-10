@@ -19,7 +19,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % A pair of spins at a distance, A
 sys.isotopes={'1H','15N'};
@@ -30,6 +30,7 @@ inter.coordinates={[0.7 0.8 0.9];
 inter.coupling.matrix=cell(2,2);
 inter.coupling.matrix{1,2}=coupl_tensor_a;
                
+
 % Spinach housekeeping, A
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -45,7 +46,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % A pair of spins at a distance, B
 sys.isotopes={'1H','15N'};

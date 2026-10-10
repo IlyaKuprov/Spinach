@@ -17,7 +17,12 @@
 %
 %                   rho_zeeman=P*rho_sphten
 %
-% Note: the projector need not be square and may be huge.
+% Note: the projector need not be square and may be huge. Each
+%       substance is converted separately, with destination dimension
+%       D_n^2. The unit coordinate maps to vec(I_D_n), so the source
+%       unit coordinate equals the Hilbert trace divided by D_n.
+%       For trace-equals-concentration CWDM coordinates, divide each
+%       destination substance block of P by its local D_n explicitly.
 %
 % ilya.kuprov@weizmann.ac.il
 % enu.jamila@proton.me
@@ -29,37 +34,39 @@ function P=sphten2zeeman(spin_system)
 % Check consistency
 grumble(spin_system);
 
-% Preallocate the answer
-P=spalloc(prod(spin_system.comp.mults.^2),...
-          size(spin_system.bas.basis,1),0);
+% Build one conversion matrix per substance
+blocks=cell(spin_system.bas.nsubst,1);
+for s=1:spin_system.bas.nsubst
 
-% Destination basis is not normalised
-destin_norm=sqrt(prod(spin_system.comp.mults));
+    % Read the local descriptor and multiplicities
+    descriptor=spin_system.bas.basis{s};
+    mults=spin_system.comp.mults(spin_system.chem.parts{s});
+    destin_norm=sqrt(prod(mults));
+    block=spalloc(prod(mults.^2),spin_system.bas.nstates(s),0);
 
-% Loop over the basis set
-parfor n=1:size(spin_system.bas.basis,1) %#ok<*PFBNS>
+    % Convert the local spherical tensor basis
+    parfor n=1:size(descriptor,1)
 
-    % Get the state going
-    rho=sparse(1);
-    
-    % Loop over the elements
-    for k=1:size(spin_system.bas.basis,2) 
-        
-        % Get the spherical tensors for the current spin
-        ists=irr_sph_ten(spin_system.comp.mults(k));
-        
-        % Multiply into the state
-        rho=kron(rho,ists{spin_system.bas.basis(n,k)+1});
-        
+        % Form the tensor product for this state
+        rho=sparse(1);
+        for k=1:size(descriptor,2)
+            ists=irr_sph_ten(mults(k)); %#ok<PFBNS>
+            rho=kron(rho,ists{descriptor(n,k)+1});
+        end
+
+        % Preserve the source and destination normalisations
+        source_norm=norm(rho(:),2);
+        block(:,n)=destin_norm*rho(:)/source_norm; %#ok<SPRIX>
+
     end
-    
-    % Source basis is not normalised
-    source_norm=norm(rho(:),2);
 
-    % Write a column into the projector
-    P(:,n)=destin_norm*rho(:)/source_norm; %#ok<SPRIX>
-    
+    % Store the local conversion
+    blocks{s}=block;
+
 end
+
+% Never introduce inter-substance coherences
+P=blkdiag(blocks{:});
 
 end
 

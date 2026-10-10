@@ -24,7 +24,7 @@ sys.magnet=17.62;
 sys.tols.inter_cutoff=1.0;
 sys.tols.prox_cutoff=5.0;
 sys.disable={'krylov','colorbar'};
-sys.enable={'prop_cache','greedy'};
+sys.enable={'zte','prop_cache','greedy'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -34,9 +34,9 @@ inter.tau_c={3e-9};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=5; bas.prox_level=3;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={5}; bas.prox_level={3};
 
 % Create the spin system structure
 spin_system=create(sys,inter);

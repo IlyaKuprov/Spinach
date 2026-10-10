@@ -15,13 +15,16 @@ sys.magnet=0.339;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
 inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={5e-10};
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -30,7 +33,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.sweep=5e8;
 parameters.npoints=512;

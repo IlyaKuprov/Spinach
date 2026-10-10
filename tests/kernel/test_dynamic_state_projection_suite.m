@@ -27,7 +27,7 @@ sys.isotopes={'2H','2H'};
 inter.zeeman.scalar={0,0};
 inter.temperature=300;
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_d=test_spin_system(sys,inter,bas);
 
 % Request all deuteron-pair coherences
@@ -74,7 +74,7 @@ sys_s.isotopes={'1H'};
 inter_s.zeeman.scalar={0};
 inter_s.temperature=300;
 bas_s.formalism='sphten-liouv';
-bas_s.approximation='none';
+bas_s.approximation={'none'};
 spin_s=test_spin_system(sys_s,inter_s,bas_s);
 spin_s.sys.output=1;
 
@@ -93,7 +93,7 @@ sys_e.isotopes={'E3'};
 inter_e.zeeman.scalar={0};
 inter_e.temperature=300;
 bas_e.formalism='zeeman-hilb';
-bas_e.approximation='none';
+bas_e.approximation={'none'};
 spin_e=test_spin_system(sys_e,inter_e,bas_e);
 
 % Project an isotropic zero-field population through arbitrary high-field axes

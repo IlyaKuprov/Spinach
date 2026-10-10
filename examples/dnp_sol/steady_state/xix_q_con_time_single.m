@@ -40,7 +40,7 @@ inter.equilibrium='dibari';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
@@ -50,7 +50,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Detect the proton
-parameters.coil=state(spin_system,'Lz','1H');
+parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 
 % XiX loop count
 loop_counts=1:64;

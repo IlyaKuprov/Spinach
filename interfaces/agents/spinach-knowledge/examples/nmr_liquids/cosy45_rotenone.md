@@ -21,3 +21,5 @@ The proton offset is 1200 Hz and sweep width is 2000 Hz. The acquired grid is [5
 ## Scope
 
 This is a reduced proton-only spin model using the stated couplings, basis approximation and symmetry declarations. The script displays a simulated spectrum and cites a source paper, but contains no experimental spectrum overlay or numerical comparison; it does not itself establish agreement with measurement.
+
+Zero track elimination is explicitly enabled with `zte` in `sys.enable`.

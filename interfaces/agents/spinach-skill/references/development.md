@@ -29,6 +29,13 @@ the derivation. Without that evidence, report a question, not a defect.
 
 ## Tests, examples, and documentation
 
+For GPU `propagator` work, two-sparse-operand Taylor and squaring products
+use custom low-level CUDA CSR arithmetic when `cuda_sparse_by_sparse_mex`
+is available. Missing or unloadable platform binaries retain native GPU
+multiplication; storage-layout, computation, and validation failures propagate.
+Exercise both stages and `clean_up` on real and complex GPU arrays, preserving
+its round-to-grid, density, and disable policies.
+
 Select tests from `tests/README.md` and `tests/lib/test_manifest.m`; add a
 focused regression when behaviour changes. Run affected examples when they
 exercise a different regime from the unit tests. Capture assertions and

@@ -17,7 +17,9 @@
 %    P          -  propagator matrix
 %
 % Note: GPUs are supported, add 'gpu' to sys.enable array during 
-%       calculation setup.
+%       calculation setup. Sparse GPU products use cuSPARSE ALG3 with
+%       chunk_fraction=0.02, retaining the utility's tested setting
+%       (two percent of intermediate products per chunk).
 %
 % Note: propagator caching (https://doi.org/10.1063/1.4928978) is
 %       supported, add 'prop_cache' to sys.enable array to enable.
@@ -118,7 +120,9 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
     while nnz(next_term)>0
         
         % Compute the next term
-        if issparse(A)
+        if issparse(A)&&issparse(next_term)
+            next_term=cuda_sparse_by_sparse((1/n)*A,next_term,0.02);
+        elseif issparse(A)
             next_term=(1/n)*A*next_term;
         else
             next_term=(1/n)*next_term*A;
@@ -189,7 +193,12 @@ if n_squarings>0
             report(spin_system,['GPU squaring step ' num2str(n) '...']);
             
             % Square the propagator
-            P=clean_up(spin_system,P*P,spin_system.tols.prop_chop);
+            if issparse(P)
+                P=cuda_sparse_by_sparse(P,P,0.02);
+            else
+                P=P*P;
+            end
+            P=clean_up(spin_system,P,spin_system.tols.prop_chop);
             
         end
         

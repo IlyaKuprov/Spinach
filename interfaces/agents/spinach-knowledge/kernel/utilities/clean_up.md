@@ -15,7 +15,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/clean_
 - `polyadic` objects are processed recursively through their `prefix`, `suffix`, and `cores` fields.
 - Consistency is enforced by a local `grumble` subfunction: `A` must be numeric, `nonzero_tol` must be numeric, and `nonzero_tol` must be a positive real scalar; violations raise errors.
 - Cleaning is skipped entirely when the string `'clean-up'` is present in `spin_system.sys.disable`.
-- When enabled, the generic method applies `A=nonzero_tol*round((1/nonzero_tol)*A)`, which snaps values to the nearest multiple of the tolerance and thereby zeroes entries smaller than the tolerance.
+- When enabled, the generic method applies `A=nonzero_tol*round((1/nonzero_tol)*A)`, which snaps values to the nearest multiple of the tolerance. Real and imaginary components are rounded separately: components smaller in magnitude than half the tolerance become zero; exact half-grid ties round away from zero. This is grid rounding, not a magnitude filter at `nonzero_tol`. The same expression and storage rules apply to GPU arrays without gathering the array to the CPU.
 - Storage conversion rules:
   - A small sparse matrix with at least one non-zero and any dimension smaller than `spin_system.tols.small_matrix` is converted to full.
   - A big sparse matrix whose non-zero fraction `nnz(A)/numel(A)` exceeds `spin_system.tols.dense_matrix` is converted to full.

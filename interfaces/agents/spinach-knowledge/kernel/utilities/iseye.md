@@ -1,36 +1,28 @@
 # kernel/utilities/iseye.m
 
-- Signature: `verdict=iseye(M)`
-
 ## Purpose
 
-Returns true for unit matrices. The test is designed to be computationally affordable. Syntax: verdict=iseye(M)
+Returns `true` for unit (identity) matrices. The test is designed to be computationally affordable. Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iseye.m>
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `verdict=iseye(M)`.
+- Consistency is enforced first: if `M` is not numeric, the function errors with `'M must be numeric.'`.
+- If `M` is not square, `verdict` is `false`.
+- Otherwise, if `M` is not diagonal (`~isdiag(M)`), `verdict` is `false`.
+- Otherwise, a random test vector `a=randn(size(M,2),1)` is generated, and `M*a` is compared with `a` via `nnz(M*a-a)`. If `nnz(M*a-a)~=0`, `verdict` is `false`; otherwise `verdict` is `true`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- M -a matrix
+- `M` — a matrix (must be numeric).
 
-## Outputs
+**Outputs**
 
-- verdict -true or false
+- `verdict` — `true` or `false`.
 
-## Implementation structure
+## References
 
-- Returns true for unit matrices. The test is designed to be
-- computationally affordable. Syntax:
-- verdict=iseye(M)
-- M -a matrix
-- verdict -true or false
-- Check consistency
-- Run the checks
-- Not even square
-- Not even diagonal
-- Test vector
-- Compare with unit
-- Test failed
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=iseye.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/iseye.m>

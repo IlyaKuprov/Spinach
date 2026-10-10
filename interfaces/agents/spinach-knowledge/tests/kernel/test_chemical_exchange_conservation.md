@@ -1,30 +1,19 @@
 # tests/kernel/test_chemical_exchange_conservation.m
 
-- Signature: `result=test_chemical_exchange_conservation()`
+Source: [tests/kernel/test_chemical_exchange_conservation.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_chemical_exchange_conservation.m)
 
 ## Purpose
 
-Tests conservation in two-site chemical exchange. Syntax: result=test_chemical_exchange_conservation()
+Registered numerical regression for two-substance chemical exchange: total concentration, total longitudinal magnetisation, matched spin transfer, and the analytic population trajectory.
 
-## Physical / mathematical content
+## Physical fixture and assertions
 
-## Numerical / algorithmic content
+Two protons at 14.1 T have zero shifts, separate chemical parts `{1,2}`, concentrations `[1 1]`, and complete spherical-tensor bases. Two directed first-order records match the protons in opposite directions at 3 s⁻¹ each. The generator conserves total unit-coordinate population and total longitudinal magnetisation; its action on the first-site longitudinal state equals three times destination minus source. A population initially `[2;0]` at 0.2 s agrees with `expm([-3 3;3 -3]*0.2)*[2;0]`. Conservation and routing use absolute and relative whole-vector tolerances of 1e-14; the trajectory uses 1e-13.
 
-## Outputs
+## Inputs and outputs
 
-- result -regression test result with explanatory messages
-- The test builds a symmetric two-site exchange model and checks that the
-- kinetics generator conserves the total population over the two sites.
+```matlab
+result=test_chemical_exchange_conservation()
+```
 
-## Implementation structure
-
-- Tests conservation in two-site chemical exchange. Syntax:
-- result=test_chemical_exchange_conservation()
-- result -regression test result with explanatory messages
-- The test builds a symmetric two-site exchange model and checks that the
-- kinetics generator conserves the total population over the two sites.
-- Announce the test target
-- State the kinetics target of the test
-- Build a symmetric two-site exchange system
-- Build the kinetics generator
-- Closed Markov kinetics conserve total population by zero column sums
+No inputs. `result` is the regression result produced by `new_test_result` and updated by `test_close`.

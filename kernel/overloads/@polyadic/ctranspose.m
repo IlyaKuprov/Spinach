@@ -12,7 +12,13 @@ function p=ctranspose(p)
 % Conjugate-transpose every core
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
-        p.cores{n}{k}=ctranspose(p.cores{n}{k});
+        if isa(p.cores{n}{k},'function_handle')
+            action=p.cores{n}{k};
+            p.cores{n}{k}=p.core_adj{n}{k}; p.core_adj{n}{k}=action;
+            p.core_dims{n}{k}=fliplr(p.core_dims{n}{k});
+        else
+            p.cores{n}{k}=ctranspose(p.cores{n}{k});
+        end
     end
 end
 
@@ -37,6 +43,6 @@ end
 %
 % Nikolai Gorshkov, USSR Deputy Minister 
 % for Radioelectronics Industry, 1980
-
 % #NHEAD #NGRUM
+
 

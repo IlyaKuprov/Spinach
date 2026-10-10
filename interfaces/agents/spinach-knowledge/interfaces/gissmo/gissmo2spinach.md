@@ -1,42 +1,11 @@
 # interfaces/gissmo/gissmo2spinach.m
 
-- Signature: `[sys,inter]=gissmo2spinach(filename,subsystem)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/gissmo/gissmo2spinach.m) · [Wiki page](https://spindynamics.org/wiki/index.php?title=gissmo2spinach.m)
 
-## Purpose
+**Call:** `[sys,inter]=gissmo2spinach(filename,subsystem)`.
 
-Reads GISSMO files and forms Spinach data structures. Syntax: [sys,inter]=gissmo2spinach(file_name,subsystem)
+`filename` must be a non-empty character string naming an existing GISSMO XML file. `subsystem` selects a coupling matrix by its one-based order among the XML `coupling_matrix` elements; the importer does not separately validate that selector. It parses the XML with `parsexml`, reads the top-level `field_strength`, and processes the selected matrix's `lw`, `spin_names`, `chemical_shifts_ppm`, and `couplings_hz` elements.
 
-## Physical / mathematical content
+For the field, it evaluates `sys.magnet = 2*pi*1e6*field_strength/spin('1H')`, treating the XML numeric field-strength value as MHz before conversion. The spin list supplies each XML index and name; labels are stored as `sys.labels{index}='Atom name'`. Chemical-shift entries provide an index and a ppm value, copied to `inter.zeeman.scalar{index}`. Coupling entries provide `from_index`, `to_index`, and `value`; the numeric coupling value is copied into `inter.coupling.scalar{from_index,to_index}` in the XML's Hz convention. Imported isotopes are all set to `'1H'`.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- file_name -character string with the name of
-- the GISSMO XML file
-- subsystem -which of the coupling matrices to
-- to import
-
-## Outputs
-
-- sys, inter -Spinach data structures, ready for
-- calling create.m
-- Note: GISSMO only provides chemical shifts, J-couplings, the
-- non-selective line width, and the magnet field. You may
-- want to add further parameters by editing sys and inter
-- data structures manually.
-
-## Implementation structure
-
-- Reads GISSMO files and forms Spinach data structures. Syntax:
-- [sys,inter]=gissmo2spinach(file_name,subsystem)
-- file_name - character string with the name of
-- the GISSMO XML file
-- subsystem - which of the coupling matrices to
-- to import
-- sys, inter - Spinach data structures, ready for
-- calling create.m
-- Note: GISSMO only provides chemical shifts, J-couplings, the
-- non-selective line width, and the magnet field. You may
-- want to add further parameters by editing sys and inter
-- data structures manually.
+The selected matrix's linewidth text is passed to `fwhm2rlx`; that helper converts an FWHM value in Hz to `pi*FWHM` (its approximate R2-rate value). The importer sets `inter.relaxation={'damp'}`, `inter.rlx_keep='labframe'`, and `inter.equilibrium='zero'`. At least one field, linewidth, chemical-shift list, and coupling list must be encountered or the call errors. It returns the assembled `sys` and `inter` structures for `create`; additional parameters may need to be supplied by the caller. Dependencies called here are `parsexml`, `spin('1H')`, and `fwhm2rlx`.

@@ -1,39 +1,13 @@
 # kernel/overloads/@ttclass/numel.m
 
 - Signature: `n=numel(tt)`
+- Source: [`kernel/overloads/@ttclass/numel.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/numel.m)
+- Wiki: [`ttclass/numel.m`](https://spindynamics.org/wiki/index.php?title=ttclass/numel.m)
 
-## Purpose
+## Shape action
 
-Number of elements in the matrix represented by a tensor train. Syntax: n=numel(tt)
+Checks that `tt` is a `ttclass`, obtains `sizes(tt)`, converts its dimensions to `int64`, and multiplies all entries of that size array using native integer arithmetic. This counts logical matrix elements represented by the tensor train, not the number of stored core entries; it does not inspect or expand the cores and is independent of coefficient values and ranks.
 
-## Physical / mathematical content
+## Result and guards
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- tt -tensor train object
-
-## Outputs
-
-- n -an integer
-- Note: for large spin systems, the result may be too large
-- to be represented exactly as a double.
-
-## Implementation structure
-
-- Number of elements in the matrix represented by a tensor
-- train. Syntax:
-- n=numel(tt)
-- tt -tensor train object
-- n -an integer
-- Note: for large spin systems, the result may be too large
-- to be represented exactly as a double.
-- Check consistency
-- Compute the number of elements exactly
-- Check for overflow
-- Return a double
-- Consistency enforcement
-- If it had been possible to build the tower of Babel without
+If the computed count exceeds MATLAB's `flintmax`, the method errors because that count cannot be represented exactly as a double. Otherwise it converts the integer count to a double scalar. Non-`ttclass` inputs raise an error. No conjugation or core transformation is involved.

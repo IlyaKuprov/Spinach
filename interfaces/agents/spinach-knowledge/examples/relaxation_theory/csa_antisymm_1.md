@@ -1,30 +1,7 @@
 # examples/relaxation_theory/csa_antisymm_1.m
 
-- Signature: `csa_antisymm_1()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/csa_antisymm_1.m)
 
-## Purpose
+This example estimates longitudinal and transverse relaxation rates for one 13C nucleus from a Redfield relaxation matrix and compares those projections with the textbook CSA routine rlx_csa. It is a numerical model comparison, not an experimental benchmark. The field is 14.1 T; the chemical-shielding matrix (ppm) is [100 20 15; 20 0 30; 25 10 -30], which is nonsymmetric and therefore includes an antisymmetric component. The correlation time is 50 ps (50e-12 s).
 
-Longitudinal and transverse relaxation rates in a system with a significant antisymmetry in the shielding tensor. Calculation time: seconds
-
-## Physical / mathematical content
-
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Longitudinal and transverse relaxation rates in a system
-- with a significant antisymmetry in the shielding tensor.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Spinach relaxation rates
-- Textbook relaxation rates
-- Summary
+The source requests Redfield relaxation with zero equilibrium and lab-frame retention, using sphten-liouv without approximation. It computes R=relaxation(spin_system), forms longitudinal and transverse estimates by projecting R onto Lz and L+ respectively, and applies a minus sign to each normalised projection. The same field, isotope, shielding matrix and correlation time are passed to rlx_csa for the textbook comparison. It prints both sets of rates; the source does not supply a measured value or state a numerical agreement claim. No cross-correlation term is explicitly selected.

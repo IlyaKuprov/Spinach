@@ -1,54 +1,26 @@
 # kernel/pulses/wave_basis.m
 
+- MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/wave_basis.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=wave_basis.m
 - Signature: `basis_waves=wave_basis(basis_type,n_func,n_points)`
 
 ## Purpose
 
-Common basis sets for the expansion of pulse waveforms. Returns the wave- form basis functions as columns of a matrix. Syntax: basis_waves=wave_basis(basis_type,n_functions,n_steps)
+Returns sampled basis functions for pulse-waveform expansion. It constructs the requested functions as rows and returns their orthogonalised sampled vectors as columns of `basis_waves`.
 
-## Physical / mathematical content
+## Basis definitions and discretisation
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+- `sine_waves`: rows `sin(n*x)` for `n=1:n_func`, with `x` sampled by `linspace(-pi,pi,n_points)`.
+- `cosine_waves`: rows `cos((n-1)*x)` on that same interval, so the first row is the constant (zero-frequency) function and subsequent rows begin at frequency 1.
+- `legendre`: Legendre polynomials of orders `0:n_func-1` sampled on `linspace(-1,1,n_points)`; each sampled row is first normalised by its 2-norm.
 
-## Numerical / algorithmic content
+After construction the source applies MATLAB's `orth` to the transpose, making the sampled functions orthogonal as vectors under the discrete representation. The source notes that discretisation means the functions are not precisely orthogonal under the continuous standard scalar product, and that orthogonalisation can flip some functions upside-down. If the requested sampled rows are linearly dependent, the returned column count is smaller than `n_func` and the function errors, directing the caller to reduce `n_func`.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Inputs and output
 
-## Parameters / inputs
+- `basis_type` - character string: `sine_waves`, `cosine_waves`, or `legendre`
+- `n_func` - positive integer number of requested functions
+- `n_points` - positive integer number of discretisation points
+- `basis_waves` - matrix with the orthogonalised sampled basis functions in columns
 
-- basis_type -may be set to 'sine_waves', 'cosine_waves',
-- and 'legendre'. The sine and the cosine op-
-- tions return the corresponding functions in
-- the [-pi,pi] interval, legendre option re-
-- turns legendre polynomials in the [-1,1] in-
-- terval.
-- n_func -the number of functions to return (integer
-- frequencies starting from zero on the case
-- of cosines, integer frequencies starting
-- from 1 inthe case of sines, legendre poly-
-- nomial ranks in the case of legendre func-
-- tion basis set.
-- n_points -number of discretization points.
-
-## Outputs
-
-- basis_waves -a matrix with the basis waves in columns
-- Note: because the resulting waveforms are discretised, they are not pre-
-- cisely orthogonal under the standard scalar multiplication. An ex-
-- tra orthogonalisation step is therefore applied to make them ortho-
-- gonal as vectors. As a result, some functions may be upside-down.
-
-## Implementation structure
-
-- Common basis sets for the expansion of pulse waveforms. Returns the wave-
-- form basis functions as columns of a matrix. Syntax:
-- basis_waves=wave_basis(basis_type,n_functions,n_steps)
-- basis_type -may be set to 'sine_waves', 'cosine_waves',
-- and 'legendre'. The sine and the cosine op-
-- tions return the corresponding functions in
-- the [-pi,pi] interval, legendre option re-
-- turns legendre polynomials in the [-1,1] in-
-- terval.
-- n_func -the number of functions to return (integer
-- frequencies starting from zero on the case
-- of cosines, integer frequencies starting
+These are dimensionless sampled basis functions, not a pulse-file reader or a pulse amplitude/phase generator. The function exposes no filter parameter.

@@ -1,35 +1,26 @@
 # examples/quantum_tech/circuit_qed/cavity_fock_grape_b.m
 
 - Signature: `cavity_fock_grape_b()`
+- Source: [cavity_fock_grape_b.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/circuit_qed/cavity_fock_grape_b.m)
 
 ## Purpose
 
-GRAPE preparation of a cavity Fock state through a dispersively coupled qubit using smooth band-limited drives. The controls are expanded in an orthonormal basis of slow sine and cosine waves, and the optimisation runs over the expansion coefficients, so that the resulting pulses are hardware-friendly smooth envelopes rather than free piecewise-constant switches. Compare with the piecewise-constant treatment in cavit
+This example uses band-limited GRAPE to transfer a cavity from vacuum to its two-photon Fock level while leaving a dispersively coupled qubit in its upper level. It optimises smooth control waveforms rather than independent piecewise-constant control amplitudes.
 
-## Physical / mathematical content
+## Model and control objective
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The system is a four-level truncated cavity mode (`C4`) and a spin-1/2 electron (`E`) at zero magnet field. The cavity is on resonance with the control frame (`inter.modes.frqs={0 []}`), and the declared cavity–qubit dispersive coupling is 656.2 kHz. Spinach converts the mode-frequency and coupling inputs from Hz to angular-frequency units internally; pulse times are seconds, and the control scale is applied directly to the Hamiltonian in angular-frequency units.
 
-## Numerical / algorithmic content
+The cavity-QED assumption uses a common rotating frame and rotating-wave approximation, retaining the full dispersive term χ N Lz: cavity photon number couples to the qubit’s Lz component and shifts its transition frequency. The four controls are the two cavity quadratures and the two qubit rotations (`Lx`, `Ly`). The normalised initial state uses cavity level `BL1` (vacuum) and qubit level `ZL2`; the target changes the cavity to `BL3` (two photons) while retaining `ZL2`. No dissipative generator is added, so this is a closed-system coherent-state-transfer calculation, not a cavity-preparation measurement.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Numerical objective and reported output
 
-## Implementation structure
+Each of the 40 slices lasts 33 ns, giving a total pulse duration of 1.32 μs. The two sine and three cosine basis functions span the 40-point waveform; the four control channels are expanded in this common basis. The code sets the control scale to 1.76828×10^7 rad/s, uses the `NS` penalty with weight 0.001, and calls limited-memory BFGS through `fmaxnewton` for at most 300 iterations. The source header describes runtime on a minutes scale; this is not a timing result from this review.
 
-- GRAPE preparation of a cavity Fock state through a dispersively
-- coupled qubit using smooth band-limited drives. The controls are
-- expanded in an orthonormal basis of slow sine and cosine waves,
-- and the optimisation runs over the expansion coefficients, so
-- that the resulting pulses are hardware-friendly smooth envelopes
-- rather than free piecewise-constant switches. Compare with the
-- piecewise-constant treatment in cavity_fock_grape_a.m; model and
-- parameters follow the smooth pulse bosonic GRAPE example of the
-- paraqeet package.
-- Calculation time: minutes
-- Magnet field
-- Truncated cavity mode and a qubit
+After optimisation, the script reconstructs the waveform and propagates all slices directly. Its transfer score is `real(trace(rho_targ' * rho))`; the script errors if this score is below 0.80. The plot converts the control scale to MHz by dividing by 2π×10^6. The source file contains no recorded score or convergence history.
+
+The source header attributes its model and parameters to the matching example in the paraqeet package.
+
+## Scope
+
+The model is the example’s truncated, closed cavity–qubit system. It demonstrates a simulated Fock-state transfer under smooth controls; it is not evidence of experimental Fock-state preparation, device performance, or convergence beyond the source’s stated acceptance check.

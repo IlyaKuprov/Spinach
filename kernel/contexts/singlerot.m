@@ -94,7 +94,14 @@
 %       luding infinite order. See the header of rotframe.m for further
 %       information.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
+%
+% With sys.enable={'polyadic'}, the Liouville rotor derivative is applied
+% by FFT without forming its matrix. The callback must accept a polyadic
+% generator; use step or evolution exponential-action propagation.
 %
 % <https://spindynamics.org/wiki/index.php?title=singlerot.m>
 
@@ -126,8 +133,7 @@ if ismember('iso_eq',parameters.needs)
     parameters.rho0=equilibrium(spin_system,I_labframe);
 end
 
-% Get carrier operators for numerical
-% rotating frame transformations
+% Get carrier operators for numerical rotating frame transformations
 C=cell(size(parameters.rframes));
 for n=1:numel(parameters.rframes)
     C{n}=carrier(spin_system,parameters.rframes{n}{1});
@@ -135,6 +141,15 @@ end
 
 % Get relaxation and kinetics generators
 R=relaxation(spin_system); K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:singlerot:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by singlerot; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Load the spherical integration grid
 sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
@@ -170,8 +185,12 @@ switch spin_system.bas.formalism
         report(spin_system,['Fokker-Planck problem dimension:  ' num2str(spc_dim*spn_dim)]);
 
         % Make the rotor turning generator
-        [rotor_phases,d_dphi]=fourdif(spc_dim,1);
-        M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
+        [rotor_phases,d_dphi]=fourdif(spin_system,spc_dim,1);
+        if ismember('polyadic',spin_system.sys.enable)
+            M=(2*pi*parameters.rate)*polyadic({{d_dphi,opium(spn_dim,1)}});
+        else
+            M=2*pi*parameters.rate*kron(d_dphi,speye([spn_dim spn_dim]));
+        end
 
         % Project relaxation and kinetics superoperators into the FP space
         R=kron(speye([spc_dim spc_dim]),R); K=kron(speye([spc_dim spc_dim]),K);
@@ -203,7 +222,7 @@ switch spin_system.bas.formalism
     case {'zeeman-hilb','zeeman-wavef'}
 
         % Get rotor phases and avoid parfor bug
-        rotor_phases=fourdif(spc_dim,1); M=[];
+        rotor_phases=fourdif(spin_system,spc_dim,1); M=[];
 
     otherwise
 
@@ -314,6 +333,9 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
 
             % Assemble the Fokker-Planck evolution generator
             G=clean_up(spin_system,blkdiag(H{:})+1i*M,spin_system.tols.liouv_zero);
+
+            % Upload the polyadic once on this worker and reuse its GPU factors
+            if isa(G,'polyadic')&&ismember('gpu',spin_system.sys.enable), G=gpuArray(G); end
     
             % Run the pulse sequence
             ans_array{q}=pulse_sequence(spin_system,parameters,G,R,K);
@@ -519,4 +541,5 @@ end
 % told that this is not correct and asked to amend it.
 % 
 % IK's contract at Southampton University, 2014
+
 

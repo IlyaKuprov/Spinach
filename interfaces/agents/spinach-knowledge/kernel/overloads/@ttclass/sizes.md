@@ -2,36 +2,20 @@
 
 - Signature: `modesizes=sizes(tt)`
 
-## Purpose
+## Action
 
-Returns mode sizes (physical dimensions of each core) of a tensor train. Syntax: modesizes=sizes(tt)
+For each core in the first train, the method records the second and third core dimensions. It returns an `ncores`-by-2 array whose row `k` is `[size(tt.cores{k,1},2), size(tt.cores{k,1},3)]`, i.e. that core's physical row and column dimensions. It does not return bond ranks or aggregate dimensions across cores.
 
-## Physical / mathematical content
+This is a metadata query: it leaves the TT cores and ranks unchanged and does not materialise the represented matrix. It applies no conjugation or transpose and adds no explicit input guard.
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+## Input and output
 
-## Numerical / algorithmic content
+- `tt` — tensor-train object.
+- `modesizes` — `ncores`-by-2 array of per-core physical row and column dimensions for the first train.
 
-## Parameters / inputs
+## Source
 
-- tt -tensor train object
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/sizes.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/sizes.m)
 
-## Outputs
-
-- modesizes -ncores by 2 array of physical dimensions
-- of tensor train cores
-
-## Implementation structure
-
-- Returns mode sizes (physical dimensions of each core) of
-- a tensor train. Syntax:
-- modesizes=sizes(tt)
-- tt -tensor train object
-- modesizes -ncores by 2 array of physical dimensions
-- of tensor train cores
-- Determine the number of cores
-- Preallocate the answer
-- Fill in the answer
-- Computer models are no different from fashion models: seductive,
-- unreliable, easily corrupted, and they lead sensible people to
-- make fools of themselves.
+D. Savostyanov and I. Kuprov.

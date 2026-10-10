@@ -2,47 +2,12 @@
 
 - Signature: `grid_profile=grid_test(alphas,betas,gammas,weights,ranks,sfun)`
 
-## Purpose
+## Behaviour
 
-Plots grid integration quality as a function of spherical rank. The quality is defined as the norm of the residual of spherical harmon- ics or Wigner functions integrated using the grid provided. Syntax: grid_profile=grid_test(alphas,betas,gammas,weights,max_rank,sfun)
+For each requested spherical rank `l`, forms the weighted Wigner matrix `D=sum(weights(j)*wigner(l,alphas(j),betas(j),gammas(j)))`. Each matrix is `(2*l+1)` by `(2*l+1)`; the returned `grid_profile` has the same shape as `ranks`. Euler-angle inputs are finite real column vectors in radians, with one entry per grid point; `alphas` may be zero for single-angle grids. `weights` is a matching column vector of finite positive real values. The code uses weights as supplied and does not check that they sum to one or renormalise them.
 
-## Physical / mathematical content
+`ranks` is a vector of finite nonnegative integers. The selector `sfun` chooses the reported statistic: `'D_lmn'` subtracts `krondelta(0,l)` from the spectral 2-norm of the whole matrix; `'Y_lm'` subtracts it from the 2-norm of the central row `D(l+1,:)`; `'Y_l0'` subtracts it from the central element `D(l+1,l+1)`. These are the three-angle, two-angle, and single-angle diagnostics respectively. The returned values are the code's norm-minus-delta scores, not absolute-valued errors. Each score is also reported; if no output is requested, the function plots the profile against rank.
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
+Angles are in radians; the source assigns no physical unit to `weights`. No time, frequency-offset, eigenfield, or evolution input is part of this grid diagnostic.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- alphas -alpha Euler angles of the grid, in radians,
-- zeros for single-angle grids
-- betas -beta Euler angles of the grid, in radians
-- gammas -gamma Euler angles of the grid, in radians,
-- zeros for two-angle grids
-- weights -point weights of the grid
-- ranks -spherical ranks to consider
-- sfun -spherical function type: for three-angle
-- grids use 'D_lmn', for two-angle grids use
-- 'Y_lm', for single-angle grids use 'Y_l0'.
-
-## Outputs
-
-- grid_profile -a vector of residual norms in each spherical rank
-
-## Implementation structure
-
-- Plots grid integration quality as a function of spherical rank. The
-- quality is defined as the norm of the residual of spherical harmon-
-- ics or Wigner functions integrated using the grid provided. Syntax:
-- grid_profile=grid_test(alphas,betas,gammas,weights,max_rank,sfun)
-- alphas -alpha Euler angles of the grid, in radians,
-- zeros for single-angle grids
-- betas -beta Euler angles of the grid, in radians
-- gammas -gamma Euler angles of the grid, in radians,
-- zeros for two-angle grids
-- weights -point weights of the grid
-- ranks -spherical ranks to consider
-- sfun -spherical function type: for three-angle
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/grid_test.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grid_test.m)

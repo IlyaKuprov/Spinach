@@ -1,37 +1,20 @@
 # kernel/line_shapes/gaussfun.m
 
+- MATLAB source: [kernel/line_shapes/gaussfun.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/line_shapes/gaussfun.m)
+- Existing Wiki: [gaussfun.m](https://spindynamics.org/wiki/index.php?title=gaussfun.m)
 - Signature: `y=gaussfun(x,fwhm)`
 
-## Purpose
+## Meaning and equation
 
-Normalized Gaussian function in magnetic resonance notation. Syntax: y=gaussfun(x,fwhm)
+This evaluates a zero-centred Gaussian normalised to unit area. The source sets `sigma=fwhm/(2*sqrt(2*log(2)))` and evaluates `y=exp(-x^2/(2*sigma^2))/(sigma*sqrt(2*pi))` elementwise. Thus `fwhm` is the full width at half maximum, and the integral over the real line is one.
 
-## Physical / mathematical content
+## Inputs and units
 
-- Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
+- `x` - real numeric array of any dimension. The guard checks numeric and real input but does not explicitly require finite entries.
+- `fwhm` - positive real numeric scalar. The source checks the scalar count and positivity; it does not explicitly reject non-finite values.
 
-## Numerical / algorithmic content
+`x` and `fwhm` use the same coordinate units. The function performs no conversion or distinction between Hz and angular frequency; use one convention consistently. The line-shape values have reciprocal-coordinate units.
 
-## Parameters / inputs
+## Output
 
-- x -argument values, a real array of any dimension
-- fwhm -full width at half-maximum
-
-## Outputs
-
-- y -function values at the points specified in x
-
-## Implementation structure
-
-- Normalized Gaussian function in magnetic resonance
-- notation. Syntax:
-- y=gaussfun(x,fwhm)
-- x -argument values, a real array of any dimension
-- fwhm -full width at half-maximum
-- y -function values at the points specified in x
-- Check consistency
-- Compute standard deviation
-- Compute the Gaussian
-- Consistency enforcement
-- Fifty years ago the back streets of Leningrad
-- have taught me one lesson: when a fight is un-
+- `y` - Gaussian values with the same size as `x`.

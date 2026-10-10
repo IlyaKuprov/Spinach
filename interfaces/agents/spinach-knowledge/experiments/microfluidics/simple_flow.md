@@ -1,45 +1,23 @@
 # experiments/microfluidics/simple_flow.m
 
-- Signature: `traj=simple_flow(spin_system,parameters,H,R,K,~,F)`
+- MATLAB source: [experiments/microfluidics/simple_flow.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/microfluidics/simple_flow.m)
+- Spinach Wiki: [simple_flow.m](https://spindynamics.org/wiki/index.php?title=simple_flow.m)
 
 ## Purpose
 
-Simple forward evolution experiment for the microfluidics module; trajectory is returned. Syntax: traj=simple_flow(spin_system,parameters,H,R,K,~,F) This sequence must be called from the meshflow() context, which would provide H, R, K, G, and F. Because gradients are not being used, the G input is ignored.
+This microfluidics entry point advances an initial state through the supplied Fokker-Planck-space evolution and returns its trajectory. It is called in the meshflow() context; the source describes a parameterised calculation, not a measured flow result.
 
-## Physical / mathematical content
+## Inputs and parameters
 
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+Signature: traj=simple_flow(spin_system,parameters,H,R,K,~,F)
 
-## Numerical / algorithmic content
+- parameters.rho0: required initial state in Fokker-Planck space.
+- parameters.dt: required positive finite time step (seconds in Spinach's time convention; the source comment itself only says “time step”).
+- parameters.npoints: required positive integer number of trajectory points.
+- H, R, K, and F are supplied by the calling context. The routine forms L=H+1i*F+1i*R+1i*K. The placeholder ~ is the gradient argument G, which this source explicitly says is ignored.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Evolution and output
 
-## Parameters / inputs
+The routine calls evolution with parameters.rho0, time step parameters.dt, and parameters.npoints-1 evolution steps in trajectory mode. The returned traj is the Fokker-Planck-space state trajectory; it is not an acquired FID. The source points to fpl2phan and fpl2rho for converting such a trajectory to R3 or Liouville space.
 
-- parameters.npoints -number of points in
-- the trajectory
-- parameters.rho0 -initial state in Fokker-
-- Planck space
-- parameters.dt -trajectory time step
-
-## Outputs
-
-- traj -trajectory in the Fokker-Planck space
-- Notes: to convert Fokker-Planck space trajectory into R3
-- or Liouville space, use fpl2phan and fpl2rho func-
-- tions.
-
-## Implementation structure
-
-- Simple forward evolution experiment for the microfluidics
-- module; trajectory is returned. Syntax:
-- traj=simple_flow(spin_system,parameters,H,R,K,~,F)
-- This sequence must be called from the meshflow() context,
-- which would provide H, R, K, G, and F. Because gradients
-- are not being used, the G input is ignored.
-- parameters.npoints -number of points in
-- the trajectory
-- parameters.rho0 -initial state in Fokker-
-- Planck space
-- parameters.dt -trajectory time step
-- traj -trajectory in the Fokker-Planck space
+This describes the implemented call path; no MATLAB run or measured flow outcome is asserted.

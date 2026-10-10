@@ -1,38 +1,15 @@
 # interfaces/comsol/mesh_inact.m
 
-- Signature: `mesh=mesh_inact(mesh,vertex_list)`
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/comsol/mesh_inact.m) · [Spinach Wiki: mesh_inact.m](https://spindynamics.org/wiki/index.php?title=mesh_inact.m)
 
-## Purpose
+## Purpose and return value
 
-Marks 2D microfluidic mesh vertices as inactive in hydrodyna- mic and diffusive transport processes. Syntax: mesh=mesh_inact(mesh,vertex_list)
+`mesh=mesh_inact(mesh,vertex_list)` removes the selected mesh vertices from the active set and returns the updated mesh structure. This is an in-memory mesh operation; it does not call COMSOL.
 
-## Physical / mathematical content
+## Accepted data
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+`mesh` must carry vertex coordinates in `mesh.x`, indexing data in `mesh.idx.active`, and, when present, vertex fields `mesh.u`, `mesh.v`, and `mesh.c`. `vertex_list` is a real numeric row vector of positive integers no greater than `numel(mesh.x)`. The implementation checks that `mesh.idx` exists, but assumes its `active` member and the coordinates exist.
 
-## Numerical / algorithmic content
+## Transformation and guardrails
 
-## Parameters / inputs
-
-- mesh -Spinach mesh object
-- vertex_list -row vector of integers specifying
-- the vertices to be inactivated
-
-## Outputs
-
-- mesh -updated mesh object
-
-## Implementation structure
-
-- Marks 2D microfluidic mesh vertices as inactive in hydrodyna-
-- mic and diffusive transport processes. Syntax:
-- mesh=mesh_inact(mesh,vertex_list)
-- mesh -Spinach mesh object
-- vertex_list -row vector of integers specifying
-- the vertices to be inactivated
-- mesh -updated mesh object
-- Check consistency
-- Update the active vertex list
-- Zero out velocities and concentrations, if present
-- Consistency enforcement
-- The basic principle of the new education is to be that dunces and
+The function removes the listed indices from `mesh.idx.active` using MATLAB `setdiff`. It then identifies every vertex not in the resulting active list and sets the corresponding entries of `u` and `v` to zero, if those fields exist; rows of `c` are likewise zeroed when present. The coordinate and velocity units are not changed. The function does not return a separate status value; success is represented by the returned, modified `mesh`. Invalid list type, shape, sign, integrality, or bounds cause an error.

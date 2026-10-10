@@ -1,37 +1,30 @@
 # kernel/utilities/get_coupling.m
 
-- Signature: `A=get_coupling(spin_system,n,k)`
-
 ## Purpose
 
-Extracts the 3x3 coupling tensor between a pair of spins back from the spin_system data structure. Syntax: A=get_coupling(spin_system,n,k)
+Extracts the 3x3 coupling tensor between a pair of spins from the `spin_system` data structure.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/get_coupling.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `A=get_coupling(spin_system,n,k)`.
+- Runs a consistency check (`grumble`) that errors if `spin_system` lacks the `inter` or `inter.coupling` fields, or if `n` or `k` is not a positive real integer.
+- Retrieves the forward coupling `spin_system.inter.coupling.matrix{n,k}` and the backward coupling `spin_system.inter.coupling.matrix{k,n}`.
+- Replaces empty entries with 3x3 zero matrices.
+- Returns the sum of the forward and backward coupling tensors.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- n,k -indices of the two spins as they appear
-- in spin_system.comp.isotopes
+Inputs:
 
-## Outputs
+- `spin_system` — spin system data structure containing coupling information.
+- `n`, `k` — indices of the two spins as they appear in `spin_system.comp.isotopes`; must be positive real integers.
 
-- A -3x3 coupling tensor in rad/s
+Outputs:
 
-## Implementation structure
+- `A` — 3x3 coupling tensor in rad/s.
 
-- Extracts the 3x3 coupling tensor between a pair of spins back
-- from the spin_system data structure. Syntax:
-- A=get_coupling(spin_system,n,k)
-- n,k -indices of the two spins as they appear
-- in spin_system.comp.isotopes
-- A -3x3 coupling tensor in rad/s
-- Check consistency
-- Pull forward and backward coupling
-- Fill in empties
-- Add up
-- Consistency enforcement
-- Единственное, что я понимаю в арбузах -это если я по
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=get_coupling.m>

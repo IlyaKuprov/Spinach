@@ -39,10 +39,14 @@
 %        vectors in Liouville space) with the active spin in the
 %        specified state and the partner spins in all combinati-
 %        ons specified by the user. All spins not explicitly
-%        mentioned in the input will be in their 'E' states.
+%        mentioned within the hosting substance are in 'E' states.
 %
 %    descr - a cell array of product structure descriptors for 
-%            each element of A
+%            each element of A; descriptors retain all global spin
+%            positions even when state construction uses one substance
+%
+% Note: fixed and partner spins must belong to one substance. The
+%       remaining substances are not populated by identity padding.
 %
 % Example: in a five-spin system, the following call
 %
@@ -112,13 +116,19 @@ for n=1:numel(active_partners)
 
 end
 
-% Get the full spin list    
-full_spin_list=num2cell(1:spin_system.comp.nspins);
+% Restrict construction to the substance hosting the requested spins
+spin_list=1:spin_system.comp.nspins;
+if spin_system.bas.nsubst>1
+    set_spins=cellfun(@(spec)spec{2},set_spin);
+    subst=which_subst(spin_system,[set_spins active_partners]);
+    spin_list=spin_system.chem.parts{subst};
+end
+full_spin_list=num2cell(spin_list);
 
 % Generate the states
 A=cell(1,numel(descr));
 parfor n=1:numel(descr)
-    A{n}=state(spin_system,descr{n},full_spin_list);
+    A{n}=state(spin_system,descr{n}(spin_list),full_spin_list);
 end
 
 end

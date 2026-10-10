@@ -15,13 +15,16 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'15N'}};
 bas.projections={+1};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -41,7 +44,7 @@ parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.grid='rep_2ang_100pts_sph';
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.verbose=0;
 
 % Simulation

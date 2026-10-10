@@ -1,82 +1,25 @@
 # kernel/krylov.m
 
 - Signature: `answer=krylov(spin_system,L,coil,rho,timestep,nsteps,output)`
+- Direct MATLAB source: [`kernel/krylov.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/krylov.m)
+- Existing Wiki: [`krylov.m`](https://spindynamics.org/wiki/index.php?title=krylov.m)
 
-## Purpose
+## Purpose and propagation
 
-Krylov propagation function. Avoids matrix exponentiation, but can be slow. Should be used when the Liouvillian exponential does not fit in- to the system memory, but the Liouvillian itself does. Syntax: answer=krylov(spin_system,L,coil,rho,time_step,nsteps,output)
+Propagates state vectors without constructing the full propagator; the source recommends it when the propagator does not fit in memory but `L` does, while warning that it may be slow. A propagation step applies the matrix-exponential action to the state (Spinach convention: `rho_next=exp(-1i*L*timestep)*rho`); this implementation advances states through calls to `step(spin_system,L,rho,timestep)` ([helper source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/step.m)). The source comment identifies the implemented approach as a reordered Taylor process rather than a Krylov-subspace/Arnoldi iteration. In `zeeman-wavef`, the source header identifies `L` as the Hamiltonian and `rho` as a wavefunction; `zeeman-hilb` is unsupported.
 
-## Physical / mathematical content
+The routine has no frequency-unit conversion. `timestep` must be consistent with the units/convention of `L`; the source does not declare a standalone Hz-versus-angular-frequency conversion or normalisation of the input/output state.
 
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
+## Inputs and guards
 
-## Numerical / algorithmic content
+The formalism guard accepts `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`. The source checks that `L`, `coil`, `timestep`, and `nsteps` are numeric, that `rho` is numeric or a cell array, and that `output` is a character value in a whitelist. These are type/formalism checks; this function does not add explicit dimensional, finiteness, sign, or integer checks in the visible guards. GPU-enabled systems move `L`, `rho`, and `coil` to the GPU; otherwise `rho` is made full on the CPU.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Output modes and shapes
 
-## Parameters / inputs
+- `final`: advances once by `timestep*nsteps`; returns the gathered final state, with the state dimensions of `rho`.
+- `trajectory`: returns state vectors at the initial point and after each step, allocated as `size(rho,1)×(nsteps+1)`.
+- `refocus`: sets the step count to `size(rho,2)`; successively advances columns 2:end, 3:end, and so on, then returns the resulting `rho` matrix. This schedules the initial vector at zero steps, the next at one step, etc., as used for the second indirect-dimension evolution after a refocusing pulse.
+- `observable`: records `coil'*rho` initially and after every step, returning `(nsteps+1)×size(rho,2)` for a single detection vector.
+- `multichannel`: records all coil overlaps, returning `size(coil,2)×(nsteps+1)×size(rho,2)`; the source header notes that destination-state screening can be less efficient with multiple destinations.
 
-- L -the Liouvillian to be used during evolution
-- rho -the initial state vector or a horizontal stack thereof
-- output -a string giving the type of evolution that is required
-- 'final' -returns the final state vector or a horizontal
-- stack thereof.
-- 'trajectory' -returns the stack of state vectors giving
-- the trajectory of the system starting from
-- rho with the user-specified number of steps
-- and step length.
-- 'total' -returns the integral of the observable trace
-- from the simulation start to infinity. This
-- option requires the presence of relaxation.
-- 'refocus' -evolves the first vector for zero steps,
-- second vector for one step, third vector for
-- two steps, etc., consistent with the second
-- stage of evolution in the indirect dimension
-- after a refocusing pulse.
-- 'observable' -returns the time dynamics of an observable
-- as a vector (if starting from a single ini-
-- tial state) or a matrix (if starting from a
-- stack of initial states).
-- 'multichannel' -returns the time dynamics of several
-- observables as rows of a matrix (if
-- starting from a single initial state)
-- or as a channels-by-time-by-states
-- array (if starting from a stack of
-- initial states). Note that destination
-- state screening may be less efficient
-- when there are multiple destinations
-- to screen against.
-- coil -the detection state, used when 'observable' is specified as
-- the output option. If 'multichannel' is selected, the coil
-- should contain multiple columns corresponding to individual
-- observable vectors.
-
-## Outputs
-
-- answer -a vector, a matrix, or a channels-by-time-by-states
-- array, depending on the options set during the call.
-- Note: this function does not support the zeeman-hilb formalism; in
-- zeeman-wavef, L is the Hamiltonian matrix, rho is a wavefunc-
-- tion or a horizontal stack thereof, coil is a reference wave-
-- function, and observables are overlap trajectories.
-- Note: we initially had a faithful implementation of the Krylov process
-- here -subspace, orthogonalisation, projection, etc., but in all
-- our testing it was much inferior to the reordered Taylor process
-- that is currently implemented below.
-
-## Implementation structure
-
-- Krylov propagation function. Avoids matrix exponentiation, but can be
-- slow. Should be used when the Liouvillian exponential does not fit in-
-- to the system memory, but the Liouvillian itself does. Syntax:
-- answer=krylov(spin_system,L,coil,rho,time_step,nsteps,output)
-- L -the Liouvillian to be used during evolution
-- rho -the initial state vector or a horizontal stack thereof
-- output -a string giving the type of evolution that is required
-- 'final' -returns the final state vector or a horizontal
-- stack thereof.
-- 'trajectory' -returns the stack of state vectors giving
-- the trajectory of the system starting from
-- rho with the user-specified number of steps
+The input whitelist also contains `total`, but the dispatch switch has no `total` case; any unmatched dispatch reaches the source's `unknown output option` error. This distinction is based on the source's guard and dispatch, not a runtime test.

@@ -4,40 +4,22 @@
 
 ## Purpose
 
-Returns the components of the two-spin triplet state; both particles must be spin-1/2. Syntax: [Tp,T0,Tm]=triplet(spin_system,spin_a,spin_b)
+Constructs the three triplet projectors for two distinct spin-1/2 particles. The spin indices must be distinct positive integers within the spin system, and both selected spins must have multiplicity 2. Pair operators are built in the caller's `spin_a,spin_b` order.
 
-## Physical / mathematical content
+## Construction and normalisation
 
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
+The function obtains identity, single-spin z, and pairwise Cartesian operators from `state`, then forms
 
-## Numerical / algorithmic content
+- `TU=EE/4+(ZE+EZ)/2+ZZ` (up projection)
+- `T0=EE/4+XX+YY-ZZ` (middle projection)
+- `TD=EE/4-(ZE+EZ)/2+ZZ` (down projection)
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Parameters / inputs
-
-- spin_a -the number of the first spin in the
-- triplet state
-- spin_b -the number of the second spin in the
-- triplet state
+In Hilbert space each selected two-spin factor is a unit-trace triplet projector; the function applies no further rescaling. Any other spins retain their identity factors. In Liouville space each output is a state vector representing the corresponding operator in the configured basis, not a wavefunction.
 
 ## Outputs
 
-- TU,T0,TD -density matrices (Hilbert space) or
-- state vectors (Liouville space) of
-- TU, T0, and TD projections
+- `TU`, `T0`, and `TD` are returned in that order: up, middle, and down. Each is a density matrix in Hilbert-space formalism or a state vector in Liouville-space formalism.
 
-## Implementation structure
-
-- Returns the components of the two-spin triplet state; both particles
-- must be spin-1/2. Syntax:
-- [Tp,T0,Tm]=triplet(spin_system,spin_a,spin_b)
-- spin_a -the number of the first spin in the
-- triplet state
-- spin_b -the number of the second spin in the
-- TU,T0,TD -density matrices (Hilbert space) or
-- state vectors (Liouville space) of
-- TU, T0, and TD projections
-- Check consistency
-- Build the component operators
-- Build the triplet states
+- Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/triplet.m
+- Wiki: https://spindynamics.org/wiki/index.php?title=triplet.m
+- Related: [state](../state.md)

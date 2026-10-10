@@ -2,47 +2,14 @@
 
 - Signature: `[alps,bets,gams,whts,vorn]=grid_trian(type,n)`
 
-## Purpose
+## Behaviour
 
-Triangular spherical quadrature grids, as per Appendix A.6 of (http://dx.doi.org/10.1016/j.jmr.2014.05.009). Syntax: [alps,bets,gams,whts,vorn]=grid_trian(type,n)
+Generates a spherical triangular quadrature grid. `type` is a character string selecting `'asg'`, `'sophe'`, or `'stoll'`; `n` is a positive real integer subdivision parameter, not a returned point count. All three outputs `alps`, `bets`, and `gams` are matching column vectors with one entry per grid point, in radians; `alps` is zero throughout because these are two-angle grids.
 
-## Physical / mathematical content
+The `'asg'` branch maps an integer triangular lattice onto the sphere and extends it by coordinate reflections. `'sophe'` samples a triangular beta-gamma lattice in an octant, reflects it over the sphere, and explicitly adds the two poles. `'stoll'` combines three SOPHE-derived octant constructions, reflects the result, and adds the poles and four equatorial points. The number and arrangement of points depend on the selected construction and `n`.
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+When more than three outputs are requested, the function computes spherical Voronoi polygons and solid-angle cell areas; `whts` is the area vector divided by `4*pi`, so its entries are normalised solid-angle weights. `vorn` contains one spherical Voronoi polygon per grid point. This calculation is skipped for calls requesting only the three angle vectors. With no output arguments the function also computes the tessellation and plots the grid.
 
-## Numerical / algorithmic content
+The source identifies Appendix A.6 of the cited paper as the grid reference: [DOI](http://dx.doi.org/10.1016/j.jmr.2014.05.009).
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Parameters / inputs
-
-- type -'asg', 'sophe', or 'stoll'
-- n -point count parameter
-
-## Outputs
-
-- alps -alpha Euler angles of the grid (radians),
-- zeros because these are two-angle grids
-- bets -beta Euler angles of the grid (radians)
-- gams -gamma Euler angles of the grid (radians)
-- whts -Voronoi tessellation body angle weights
-- vorn -a cell array of matrices containing the
-- coordinates of the vertices of the Voro-
-- noi polyhedra
-- If no outputs are requested, a schematic is drawn.
-
-## Implementation structure
-
-- Triangular spherical quadrature grids, as per Appendix A.6 of
-- (http://dx.doi.org/10.1016/j.jmr.2014.05.009). Syntax:
-- [alps,bets,gams,whts,vorn]=grid_trian(type,n)
-- type -'asg', 'sophe', or 'stoll'
-- n -point count parameter
-- alps -alpha Euler angles of the grid (radians),
-- zeros because these are two-angle grids
-- bets -beta Euler angles of the grid (radians)
-- gams -gamma Euler angles of the grid (radians)
-- whts -Voronoi tessellation body angle weights
-- vorn -a cell array of matrices containing the
-- coordinates of the vertices of the Voro-
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/grid_trian.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grid_trian.m)

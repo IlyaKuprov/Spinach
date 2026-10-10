@@ -1,45 +1,21 @@
 # kernel/optimcon/hessreg.m
 
 - Signature: `[H,data]=hessreg(spin_system,H,g,data)`
+- Source: [kernel/optimcon/hessreg.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/hessreg.m)
 
 ## Purpose
 
-RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,data]=hessreg(spin_system,H,g,data)
+Applies rational-function-optimisation (RFO) regularisation to a Newton-Raphson Hessian and gradient pair. It returns a regularised Hessian and the updated diagnostic counter; it does not return or modify the gradient. This helper does not perform a line search.
 
-## Physical / mathematical content
+## Inputs and settings
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+- `H` must be a real, square, symmetric numeric matrix. `g` must be a real column vector with one element per Hessian dimension.
+- The four RFO settings are read from `spin_system.control.reg_alpha`, `reg_phi`, `reg_max_iter`, and `reg_max_cond`. This function does not assign their defaults. The diagnostic structure must already provide `data.count.rfo`.
 
-## Numerical / algorithmic content
+## Regularisation
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
+If `H` is positive definite and its 2-norm condition number is already below `reg_max_cond`, the function returns it unchanged and takes no RFO iterations. Otherwise, for up to `reg_max_iter` iterations it forms the augmented matrix with blocks `alpha^2*H`, `alpha*g`, `alpha*g'`, and zero. It computes the smallest eigenvalue shift needed to make the augmented matrix nonnegative, subtracts that shift times the identity, removes the final row and column, and divides the remaining Hessian by `alpha^2`. It then multiplies `alpha` by `reg_phi`, increments `data.count.rfo`, and stops early if the condition number is below the target.
 
-## Parameters / inputs
+Finally, the result is replaced by its real symmetric part. If its condition number still meets or exceeds `reg_max_cond`, the routine emits a warning that the target was not reached. The source validates `H` and `g`, but does not validate or initialise the settings or counter structure.
 
-- H -Hessian matrix to be regularised
-- g -gradient computed at the same point as H
-- data -diagnostic data structure
-
-## Outputs
-
-- H -regularised Hessian
-- data -updated diagnostic data structure with
-- data.count.rfo incremented by the number
-- of RFO iterations taken
-
-## Implementation structure
-
-- RFO regularisation for Newton-Raphson Hessian and gradient
-- pairs. Syntax:
-- [H,data]=hessreg(spin_system,H,g,data)
-- H -Hessian matrix to be regularised
-- g -gradient computed at the same point as H
-- data -diagnostic data structure
-- H -regularised Hessian
-- data -updated diagnostic data structure with
-- data.count.rfo incremented by the number
-- of RFO iterations taken
-- Check consistency
-- Set shorthands
+[Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=hessreg.m)

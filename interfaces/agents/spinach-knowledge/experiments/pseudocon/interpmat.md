@@ -1,46 +1,25 @@
 # experiments/pseudocon/interpmat.m
 
 - Signature: `P=interpmat(cube_dims,ranges,xyz)`
+- MATLAB source: [`experiments/pseudocon/interpmat.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/pseudocon/interpmat.m)
 
 ## Purpose
 
-Returns a matrix that acts on a stretched pseudocontact shift density cube and projects out the values of the PCS at the Cartesian coordinates given. Tricubic interpolation is used. Syntax: P=interpmat(cube_dims,ranges,xyz)
+Builds a sparse linear operator that interpolates a stretched PCS density cube at specified Cartesian coordinates. The code describes it as tricubic interpolation and identifies it as an internal part of the PCS inverse-problem solver, not normally called directly.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
+- `cube_dims` — three integer grid sizes in [X Y Z] order; each must be at least 4.
+- `ranges` — real six-element vector [xmin xmax ymin ymax zmin zmax] in ångströms (Å), with each minimum less than its corresponding maximum.
+- `xyz` — N-by-3 array of real Cartesian coordinates in Å where PCS values are requested; every point must lie inside the supplied ranges.
+- `P` — sparse N-by-product(cube_dims) interpolation matrix. Acting on the vectorised cube, it returns one interpolated PCS value per row of `xyz`.
 
-## Numerical / algorithmic content
+## Interpolation construction
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The function creates uniformly spaced x, y, and z grids with `linspace`, using the supplied extents and dimensions. For each query point, it chooses a four-point stencil along each axis, shifting the stencil at grid boundaries so all four indices remain within the cube. It evaluates the one-dimensional interpolation weights with `fdweights` at the requested physical coordinate on each subgrid. The tensor product of the three one-dimensional weight vectors supplies that point's coefficients across the cube; the coefficients are assembled into a sparse matrix row. The point-wise work is in a `parfor` loop.
 
-## Parameters / inputs
+Queries outside any extent are rejected; extrapolation is not supported. The input checks require three integer dimensions of at least four, real six-element ranges with increasing bounds, and real N-by-3 query coordinates.
 
-- cube_dims -pseudocontact shift cube grid sizes, a vector of
-- three integers ordered as [X Y Z]
-- ranges -cartesian axis extents for the pseudocontact shift
-- cube as [xmin xmax ymin ymax zmin zmax] in Angstroms.
-- xyz -nuclear coordinates as [x y z] with multiple rows) at
-- which PCS is to be evaluated, in Angstroms.
-- Output:
-- P -matrix projecting out PCS values at the specified
-- nuclear positions from the stretched PCS cube.
-- Note: this function is a part of the PCS inverse problem solver module; it
-- should not normally be called directly by the user.
+## References
 
-## Implementation structure
-
-- Returns a matrix that acts on a stretched pseudocontact shift density cube
-- and projects out the values of the PCS at the Cartesian coordinates given.
-- Tricubic interpolation is used. Syntax:
-- P=interpmat(cube_dims,ranges,xyz)
-- cube_dims -pseudocontact shift cube grid sizes, a vector of
-- three integers ordered as [X Y Z]
-- ranges -cartesian axis extents for the pseudocontact shift
-- cube as [xmin xmax ymin ymax zmin zmax] in Angstroms.
-- xyz -nuclear coordinates as [x y z] with multiple rows) at
-- which PCS is to be evaluated, in Angstroms.
-- Output:
-- P -matrix projecting out PCS values at the specified
+- [Spin Dynamics Wiki: interpmat.m](https://spindynamics.org/wiki/index.php?title=interpmat.m)

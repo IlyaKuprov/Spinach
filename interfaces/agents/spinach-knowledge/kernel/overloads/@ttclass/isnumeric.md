@@ -1,32 +1,18 @@
 # kernel/overloads/@ttclass/isnumeric.m
 
-- Signature: `answer=isnumeric(tt)`
+[Mapped MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/isnumeric.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/isnumeric.m)
 
-## Purpose
+## Signature
 
-Returns TRUE for non-empty tensor train objects. Syntax: answer=isnumeric(tt)
+`answer=isnumeric(tt)`
 
-## Physical / mathematical content
+## Behaviour
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Returns logical true exactly when `tt` is a `ttclass` object and its `cores` field is non-empty. Otherwise it returns logical false. The test is on the core container itself; it does not inspect core values, the coefficient, or whether the represented tensor is nonzero.
 
-## Numerical / algorithmic content
+## Input and output
 
-## Parameters / inputs
+- `tt` — tensor-train object.
+- `answer` — logical predicate result.
 
-- tt -tensor train object
-
-## Outputs
-
-- answer -logical true for non-empty tensor train objects
-
-## Implementation structure
-
-- Returns TRUE for non-empty tensor train objects. Syntax:
-- answer=isnumeric(tt)
-- tt -tensor train object
-- answer -logical true for non-empty tensor train objects
-- Non-empty tensor trains should return true()
-- People who think honestly and deeply have a hostile
-- attitude towards the public.
-- Johann Wolfgang von Goethe
+This method does not change the train, its shape, ranks, or coefficient and does not materialise the represented tensor.

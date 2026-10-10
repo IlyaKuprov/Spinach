@@ -1,32 +1,17 @@
 # examples/quantum_tech/transmon_cavity_swap.m
 
+Source: [examples/quantum_tech/transmon_cavity_swap.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/transmon_cavity_swap.m)
+
 - Signature: `transmon_cavity_swap()`
 
-## Purpose
+## Model
 
-Vacuum Rabi swap between a transmon and a microwave cavity mode, both represented by truncated bosonic Weyl algebras. This is the circuit-QED Jaynes-Cummings limit of Blais et al., Rev. Mod. Phys. 93, 025005 (2021). Calculation time: seconds
+This is a coherent Jaynes–Cummings-limit vacuum-Rabi exchange between a truncated transmon oscillator and a truncated cavity mode, not an electron-spin or defect calculation. The isotope labels `T3` and `C3` give three-level representations for the transmon and cavity. At zero magnetic field both rotating-frame mode frequencies are set to zero, so the modes are resonant; the transmon anharmonicity is `-250e6` (−250 MHz) and the exchange coupling is `20e6` (20 MHz). The source configures no external drive or dissipative terms.
 
-## Physical / mathematical content
+The Zeeman-Hilbert basis is used without approximation. The initial state is transmon `BL2` with cavity `BL1`, i.e. one transmon excitation and the cavity in its lowest state. A cavity-context device trajectory evolves this initial condition. The trajectory settings include `sweep=2e9` and `npoints=301`; the plotted time coordinates are explicitly 0–150 ns at 301 points.
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
-- The physics is Jaynes-Cummings-like cavity QED: a two-level or few-level matter degree of freedom exchanges excitations with a quantised harmonic mode through rotating terms such as a†σ_- + aσ_+.
+## Observable and plot
 
-## Numerical / algorithmic content
+The code evaluates transmon and cavity excitation populations from separate coil operators and plots both against time. It also checks that cavity population reaches at least 0.95, transmon population falls to at most 0.05, and the two populations sum to one within `1e-6`. The curves represent ideal coherent excitation exchange in this finite model; these source-level checks do not establish measured device performance or fidelity.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Vacuum Rabi swap between a transmon and a microwave cavity
-- mode, both represented by truncated bosonic Weyl algebras.
-- This is the circuit-QED Jaynes-Cummings limit of Blais et
-- al., Rev. Mod. Phys. 93, 025005 (2021).
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Resonant transmon-cavity pair in the rotating frame
-- Formalism and basis
-- Spinach housekeeping
-- Sequence parameters
-- Trajectory through the device context
+The source relates the example to the circuit-QED Jaynes–Cummings model and cites Blais et al., *Reviews of Modern Physics* **93**, 025005 (2021) ([DOI](https://doi.org/10.1103/RevModPhys.93.025005)).

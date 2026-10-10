@@ -1,38 +1,21 @@
 # kernel/optimcon/distortions/no_dist.m
 
-- Signature: `[w,J]=no_dist(w)`
+- Signature: [w,J]=no_dist(w)
+- MATLAB source: [no_dist.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/no_dist.m)
 
 ## Purpose
 
-A distortion function that applies no distortion and therefore has a unit Jacobian. Syntax: [w,J]=no_dist(w)
+Selects the identity transformation for an optimal-control distortion stage: it returns the input waveform unchanged.
 
-## Physical / mathematical content
+## Input and output
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
+- w must be a real numeric array. The function imposes no vector or matrix shape restriction and does not explicitly require finite values.
+- The returned w is the same array, unchanged; its units and dimensions are therefore unchanged.
 
-## Numerical / algorithmic content
+## Derivative
 
-## Parameters / inputs
+The optional J is sparse identity matrix speye(numel(w)), the Jacobian of the unchanged waveform with respect to its MATLAB vectorisation. No adjoint is returned.
 
-- w -waveform, a numerical array
+## Reference
 
-## Outputs
-
-- w -the same waveform as the input
-- J -a sparse unit matrix with the dimension mat-
-- ching the vectorisation of the input
-
-## Implementation structure
-
-- A distortion function that applies no distortion and therefore
-- has a unit Jacobian. Syntax:
-- [w,J]=no_dist(w)
-- w -waveform, a numerical array
-- w -the same waveform as the input
-- J -a sparse unit matrix with the dimension mat-
-- ching the vectorisation of the input
-- Check consistency
-- Return a unit Jacobian if asked
-- Consistency enforcement
-- If I only knew how I could get mathematicians interested in
-- transformation groups and the treatment of differential equ-
+- Spinach documentation: https://spindynamics.org/wiki/index.php?title=no_dist.m

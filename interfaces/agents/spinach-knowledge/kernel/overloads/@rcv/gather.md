@@ -1,35 +1,23 @@
 # kernel/overloads/@rcv/gather.m
 
+[GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/gather.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/gather.m)
+
 - Signature: `A=gather(A)`
 
 ## Purpose
 
-Gathers an RCV sparse matrix from GPU. Syntax: A=gather(A)
+Moves a GPU-resident RCV sparse matrix's stored arrays to CPU memory.
 
-## Physical / mathematical content
+## Storage and behaviour
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+RCV stores row indices, column indices, and corresponding values in parallel arrays; `numRows` and `numCols` retain the matrix shape. The overload checks that `A` is an `rcv` object. If `A.isGPU` is true, it eagerly applies `gather` to `A.row`, `A.col`, and `A.val`, then sets `A.isGPU` to false. If the flag is already false, it leaves the object unchanged. The row and column counts are not reassigned, so the represented dimensions remain unchanged. This transfers the stored arrays; it does not build a MATLAB sparse or dense matrix.
 
-## Numerical / algorithmic content
+The values are transferred without conjugation or scalar expansion/broadcasting.
 
-## Parameters / inputs
+## Input
 
-- A -an RCV sparse matrix
+- `A` - an RCV sparse matrix. The explicit check is object type only.
 
-## Outputs
+## Output
 
-- A -the same matrix with data stored on the CPU
-
-## Implementation structure
-
-- Gathers an RCV sparse matrix from GPU. Syntax:
-- A=gather(A)
-- A -an RCV sparse matrix
-- A -the same matrix with data stored on the CPU
-- Check consistency
-- Gather to CPU
-- Consistency enforcement
-- Aerie, I've noticed the unfortunate fact that you live
-- by one of the great lessons of history that nothing is
-- often a good thing to do and a clever thing to say.
-- Edwin Odesseiron, in Baldur's Gate 2
+- `A` - the same RCV matrix with its stored arrays on the CPU when it was GPU-resident.

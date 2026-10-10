@@ -11,7 +11,7 @@
 % with unit and nonunit targets, a complex detection operator, and a
 % power ensemble, zero impurity, purely imaginary auxiliary overlaps,
 % and cancellation of primary transfer by the impurity penalty, including
-% an anonymous forwarding adapter.
+% an anonymous forwarding adapter, and distinct freeze masks for the two pulses.
 % Independent matrix propagation checks the objective;
 % centred differences at three increments check its phase gradient.
 % All four optimiser methods must reject unusable assembled initial
@@ -140,6 +140,31 @@ for fixture=1:4
                 result=test_close(result,sprintf('%s h=%.1e',label,step_size),...
                                   gradient,fd_grad,2e-9,2*step_size^2,...
                                   'The derivative must match centred differences to second order.');
+            end
+
+            % Check distinct pulse masks against the independent phase differences
+            if fixture<=2
+                for mask_case=1:3
+                    freeze=false(size(phase_pair));
+                    if mask_case>1
+                        freeze(1,1)=true; freeze(2,end)=true;
+                        if mask_case==3, freeze=~freeze; end
+                    end
+                    masked_system=local_system;
+                    masked_system.control.freeze=freeze;
+                    [~,masked_fid,masked_grad]=grape_coop(phase_pair,masked_system);
+                    masked_grad=masked_grad(:,:,1);
+                    mask_label=sprintf('%s mask %d',label,mask_case);
+                    result=test_close(result,[mask_label ' objective'],...
+                                      masked_fid,fidelity,0,0,...
+                                      'Freezing derivatives must not change the propagated objective.');
+                    result=test_close(result,[mask_label ' frozen zeros'],...
+                                      masked_grad(freeze),zeros(nnz(freeze),1),0,0,...
+                                      'Each pulse must zero only its own frozen phase coordinates.');
+                    result=test_close(result,[mask_label ' free derivatives'],...
+                                      masked_grad(~freeze),fd_grad(~freeze),2e-9,2*steps(end)^2,...
+                                      'Unfrozen cooperative derivatives must retain both impurity contributions.');
+                end
             end
         end
 
@@ -353,6 +378,21 @@ if isempty(zero_caught)
     result=test_true(result,'zero primary cooperative improves',...
                      zero_after(1)>zero_before(1)&&zero_data.count.iter==1,...
                      'The impurity gradient must improve the cooperative objective.');
+end
+
+% Optimise distinct partial masks with both supported cooperative methods
+coop_system.control.freeze=logical([1 0;0 1]);
+for method_idx=1:2
+    coop_system.control.method=methods{method_idx};
+    [frozen_point,frozen_data]=fmaxnewton(coop_system,@grape_coop,coop_guess);
+    freeze=coop_system.control.freeze;
+    result=test_close(result,[methods{method_idx} ' frozen cooperative phases'],...
+                      frozen_point(freeze),coop_guess(freeze),0,0,...
+                      'Optimisation must leave each pulse''s frozen phase coordinates unchanged.');
+    [~,frozen_after]=grape_coop(frozen_point,coop_system);
+    result=test_true(result,[methods{method_idx} ' partial cooperative improvement'],...
+                     frozen_after(1)>coop_before(1)&&frozen_data.count.iter==1,...
+                     'A nonstationary unfrozen direction must still improve the cooperative score.');
 end
 
 % Keep the assembled-gradient guard when every cooperative phase is frozen

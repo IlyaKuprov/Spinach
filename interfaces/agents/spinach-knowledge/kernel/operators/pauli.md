@@ -1,52 +1,23 @@
 # kernel/operators/pauli.m
 
+- Source: [kernel/operators/pauli.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/pauli.m)
+- Wiki: [pauli.m on the Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=pauli.m)
 - Signature: `S=pauli(mult)`
 
 ## Purpose
 
-Pauli spin operators (sparse, see below for normalisa- tion conventions) for a spin of a user-specified ener- gy level multiplicity. Syntax: S=pauli(mult)
+Constructs the sparse spin-operator matrices for one finite spin with Hilbert-space multiplicity `mult`. This is a spin representation, not a bosonic-mode operator constructor.
 
-## Physical / mathematical content
+## Basis and operator definitions
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+Let `s=(mult-1)/2`. The matrix basis is ordered by magnetic projection `m=s,s-1,...,-s`; all matrices are `mult`-by-`mult`. `S.u` is the identity and `S.z` is diagonal with those projections. `S.p` is the raising operator on the first off-diagonal and `S.m` is its lowering counterpart on the opposite off-diagonal; their ladder entries use the square-root factors `sqrt(s*(s+1)-m*(m+1))` and `sqrt(s*(s+1)-m*(m-1))`, respectively.
 
-## Numerical / algorithmic content
+The transverse operators are defined as `S.x=(S.p+S.m)/2` and `S.y=(S.p-S.m)/(2i)`; equivalently, the source comments define `S.p=S.x+1i*S.y` and `S.m=S.x-1i*S.y`. The resulting spin matrices satisfy the cyclic commutation relations `[S.x,S.y]=1i*S.z`, `[S.y,S.z]=1i*S.x`, and `[S.z,S.x]=1i*S.y`.
 
-## Parameters / inputs
+## Construction and inputs
 
-- mult -an integer specifying the
-- multiplicity of the spin
+The multiplicity must be a positive real integer. Multiplicities 2 and 3 use explicit spin-half and spin-one matrices; other multiplicities use the general ladder construction above. The returned matrices are sparse and are made complex at construction.
 
-## Outputs
+## Output
 
-- S.u -unit operator
-- S.p -raising operator
-- S.m -lowering operator
-- S.x -Sx observable operator
-- S.y -Sy observable operator
-- S.z -Sz observable operator
-- Note: the matrices are normalised to obey the following
-- commutation relations for all multiplicities:
-- [S.x,S.y]=1i*S.z
-- [S.y,S.z]=1i*S.x
-- [S.z,S.x]=1i*S.y
-- Note: raising and lowering operators are defined as:
-- S.p=S.x+1i*S.y
-- S.m=S.x-1i*S.y
-- Note: arrays are declared complex at creation to avoid
-- expensive reallocation operations later on.
-
-## Implementation structure
-
-- Pauli spin operators (sparse, see below for normalisa-
-- tion conventions) for a spin of a user-specified ener-
-- gy level multiplicity. Syntax:
-- S=pauli(mult)
-- mult -an integer specifying the
-- multiplicity of the spin
-- S.u -unit operator
-- S.p -raising operator
-- S.m -lowering operator
-- S.x -Sx observable operator
-- S.y -Sy observable operator
-- S.z -Sz observable operator
+`S` is a structure containing `u`, `p`, `m`, `x`, `y`, and `z`, each a `mult`-by-`mult` spin operator. This function returns generators/operators, not a time propagator.

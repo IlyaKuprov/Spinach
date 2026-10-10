@@ -22,7 +22,10 @@ inter.temperature=100;
                               
 % Use the complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach code
 spin_system=create(sys,inter);

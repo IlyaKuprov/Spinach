@@ -1,42 +1,28 @@
 # kernel/line_shapes/lorentzcon.m
 
+- MATLAB source: [kernel/line_shapes/lorentzcon.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/line_shapes/lorentzcon.m)
+- Existing Wiki: [lorentzcon.m](https://spindynamics.org/wiki/index.php?title=lorentzcon.m)
 - Signature: `y=lorentzcon(offs,ampl,fwhm,x)`
 
-## Purpose
+## Meaning and equation
 
-Normalised Lorentzian function in magnetic resonance notation and its convolution with a triangular function. Syntax: y=lorentzcon(offs,ampl,fwhm,x)
+The routine returns a Lorentzian, or its convolution with a normalised boxcar or triangular distribution. Let `gamma=fwhm/2`; the unit-area kernel centred at zero is `L(u)=gamma/(pi*(u^2+gamma^2))`.
 
-## Physical / mathematical content
+- One offset `q`: `y(x)=ampl*L(x-q)`.
+- Two sorted offsets `a<b`: they define a uniform density `B(t)=1/(b-a)` on `[a,b]`; `y(x)=ampl*integral(B(t)*L(x-t),t=a..b)`. This is the source's Lorentzian-boxcar convolution.
+- Three distinct sorted offsets `a<b<c`: they define the unit-area triangular density `T(t)=2*(t-a)/((b-a)*(c-a))` on `[a,b]`, `T(t)=2*(c-t)/((c-b)*(c-a))` on `(b,c]`, and zero elsewhere; `y(x)=ampl*integral(T(t)*L(x-t),t=a..c)`.
 
-- Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
+For three offsets, repeated or numerically coalescent vertices select the limiting Lorentzian or right-angle-triangle convolution. The implementation compares spacings with a tolerance based on machine precision and the offset norm. Since each kernel is unit area, the line-shape area is `ampl`.
 
-## Numerical / algorithmic content
+## Inputs and units
 
-## Parameters / inputs
+- `offs` - one, two, or three finite real numeric values.
+- `ampl` - finite real numeric scalar multiplier.
+- `fwhm` - finite positive real numeric scalar full width at half maximum.
+- `x` - finite real numeric array of any dimension.
 
-- offs -peak offset from zero -when this is a scalar,
-- a Lorentzian is returned; when this is a vector
-- with three elements, a convolution with a tri-
-- angular function is returned.
-- ampl -amplitude multiplier, scalar
-- fwhm -full width at half-maximum, scalar
-- x -argument, array of any dimension
+The offsets, `x`, and `fwhm` must share the same coordinate units. The function does not convert between Hz and angular frequency; choose and use one convention consistently. For dimensionless `ampl`, `y` has reciprocal-coordinate units. The source converts the offsets, amplitude, and width to double precision and converts integer `x` to double before evaluation.
 
-## Outputs
+## Output
 
-- y -an array of values, same size as x
-
-## Implementation structure
-
-- Normalised Lorentzian function in magnetic resonance notation and
-- its convolution with a triangular function. Syntax:
-- y=lorentzcon(offs,ampl,fwhm,x)
-- offs -peak offset from zero -when this is a scalar,
-- a Lorentzian is returned; when this is a vector
-- with three elements, a convolution with a tri-
-- angular function is returned.
-- ampl -amplitude multiplier, scalar
-- fwhm -full width at half-maximum, scalar
-- x -argument, array of any dimension
-- y -an array of values, same size as x
-- Check consistency
+- `y` - values with the same size as `x` (integer `x` is promoted to double by the source).

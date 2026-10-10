@@ -88,7 +88,7 @@ H=frqoffset(spin_system,H,parameters);
 rotor_theta=pi/2-rotor_theta;
 
 % Compute rotor angles
-rotor_phases=fourdif(2*parameters.max_rank+1,1);
+rotor_phases=fourdif(spin_system,2*parameters.max_rank+1,1);
 
 % Get carrier operators
 C=cell(size(parameters.rframes));
@@ -253,4 +253,5 @@ end
 % Never complain and never explain. 
 %
 % Benjamin Disraeli
+
 

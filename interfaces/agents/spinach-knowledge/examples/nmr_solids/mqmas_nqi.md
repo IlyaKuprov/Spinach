@@ -1,31 +1,17 @@
 # examples/nmr_solids/mqmas_nqi.m
 
+- MATLAB implementation: [examples/nmr_solids/mqmas_nqi.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mqmas_nqi.m)
+
+Source: [examples/nmr_solids/mqmas_nqi.m](../../../../../examples/nmr_solids/mqmas_nqi.m)
+
 - Signature: `mqmas_nqi()`
 
-## Purpose
+## Model
 
-Rotor-synchronous MQMAS spectrum of a 87Rb compound, transmitter set to the isotropic chemical shift. Calculation time: minutes
+The spin system contains `87Rb` at 9.4 T, with the source specifying just a nuclear quadrupole interaction. It constructs the NQI with `eeqq2nqi(5e6,0.50,3/2,[0 0 0])`: a 5 MHz coupling input, asymmetry parameter 0.50, spin 3/2, and zero Euler-angle values. These are settings for the simulated example, not a reported measurement of a particular compound.
 
-## Physical / mathematical content
+## Rotor-synchronous MQMAS sequence
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The script sets a 62.5 kHz rotor rate about axis vector `[1 1 1]`, rank 7, and powder grid `rep_2ang_1600pts_sph`. It uses MQ order 3, zero offset from the transmitter position described as the isotropic chemical shift, and puts `87Rb` in rotor frame 2. Two RF amplitudes are specified as `2*pi*250e3` rad/s each (250 kHz in cycles per second), with pulse durations 2 microseconds and 1 microsecond. The initial state is `Lz` and the receiver is `L+`.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Rotor-synchronous MQMAS spectrum of a 87Rb compound,
-- transmitter set to the isotropic chemical shift.
-- Calculation time: minutes
-- System specification: just the NQI
-- Formalism and basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The experiment is run with `singlerot` and `mqmas` in the lab frame. The two acquisition dimensions use 128 points each and are zero-filled to 256 each. Both dimensions receive squared-cosine apodisation before a two-dimensional Fourier transform; the magnitude spectrum is plotted. These settings define a calculation, not an experimentally measured spectrum.

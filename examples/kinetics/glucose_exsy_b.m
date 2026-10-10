@@ -52,17 +52,27 @@ inter.chem.parts={[1  2],...  % Alpha, inside
                   [7  8]};    % Beta,  outside
 
 % Reaction rate matrix
-inter.chem.rates=[-0.3438  0.1550  0       0;          
+rates=[-0.3438  0.1550  0       0;
                    0.3438 -0.1550  0       0;         
                    0       0      -0.7995  0.4350; 
                    0       0       0.7995 -0.4350];
 
+% Directed translocation records preserve corresponding fluorine spins
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[(1:2)' (3:4)'],'rate',rates(2,1)),...
+    struct('reactants',2,'products',1,...
+    'matching',[(3:4)' (1:2)'],'rate',rates(1,2)),...
+    struct('reactants',3,'products',4,...
+    'matching',[(5:6)' (7:8)'],'rate',rates(4,3)),...
+    struct('reactants',4,'products',3,...
+    'matching',[(7:8)' (5:6)'],'rate',rates(3,4))};
+
 % Equilibrium concentrations with alpha-beta imbalance
-inter.chem.concs=equilibrate(inter.chem.rates,[3.8034; 0; 14.2442; 0]);
+inter.chem.concs=equilibrate(rates,[3.8034; 0; 14.2442; 0]);
               
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none', 'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
@@ -78,6 +88,9 @@ inter.r2_rates=num2cell(34.0359*ones(1,8));
 % Do not draw colorbars
 sys.disable={'colorbar'};
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -90,7 +103,7 @@ parameters.npoints=[512 1024];
 parameters.zerofill=[1024 1024];
 parameters.spins={'19F'};
 parameters.axis_units='ppm';
-parameters.rho0=state(spin_system,'Lz','19F','chem');
+parameters.rho0=state(spin_system,'Lz','19F');
 
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');

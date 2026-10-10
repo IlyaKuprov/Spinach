@@ -28,7 +28,7 @@ inter.relaxation={'damp'};
 inter.equilibrium='zero';        % Thermalised later
 inter.temperature=40;
 inter.damp_rate=5.0;
-inter.rlx_keep='diagonal';
+inter.rlx_keep='labframe';
 
 % Formalisms to test
 formalisms={'sphten-liouv','zeeman-liouv'};
@@ -38,7 +38,7 @@ for n=1:numel(formalisms)
 
     % Basis set
     bas.formalism=formalisms{n};
-    bas.approximation='none';
+    bas.approximation={'none'};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);

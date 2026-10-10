@@ -1,52 +1,32 @@
 # experiments/nmr_protein/hnca.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_protein/hnca.m)
+
 - Signature: `fid=hnca(spin_system,parameters,H,R,K)`
 
 ## Purpose
 
-Protein-specific HNCA experiment (Figure 7.31a of "Protein NMR Spectroscopy", 2nd edition) using pre-set values of J-couplings used in the magnetisation transfer stages. The simulation uses the bidirectional propagation method described in The sequence is hard-wired to work on 1H,13C,15N proteins and uses PDB labels to select spins that will be affected by otherwise ideal pulses. F1 is 15N, F2 is 13C, F3 is 1H. Synta
+Protein-specific HNCA, Figure 7.31a of the second edition of *Protein NMR Spectroscopy*. The implementation uses the bidirectional-propagation method described in [the cited paper](http://dx.doi.org/10.1016/j.jmr.2014.04.002). It is hard-wired for 1H, 13C, and 15N; F1, F2, and F3 are 15N, 13C, and 1H.
 
-## Physical / mathematical content
+## Inputs and spin labels
 
-- Protein triple-resonance sequence implementations. They orchestrate heteronuclear coherence transfers across biomolecular spin networks while preserving phase and acquisition conventions.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- `spin_system` must use the `sphten-liouv` formalism. Set PDB atom labels such as `H`, `CA`, and `C` so the sequence can identify the proton, alpha-carbon, and carbonyl sites.
+- `parameters.npoints` is a three-integer vector `[n1 n2 n3]` for `[t1 t2 t3]`; `parameters.sweep` is a three-positive-real vector `[f1 f2 f3]`.
+- `H`, `R`, and `K` are same-size matrices supplied by the context function (Hamiltonian, relaxation, and kinetics matrices). The source header exposes no `parameters.spins` isotope-cell-array option; the isotope channels are fixed by the sequence.
+- `parameters.rho0` and `parameters.coil` may be supplied. If absent, the code builds the initial longitudinal state and proton detection state from sites labelled `H`.
 
-## Numerical / algorithmic content
+## Coherence selection and transfer
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The default initial state is on the labelled amide protons. A 1H pulse and the first transfer block create proton coherence; the sequence then selects positive and negative 15N coherence for F1. It refocuses the first evolution interval with H, CA, and CO pulses, applies the CA-transfer delay, and uses the CA/H pulse block before the reverse half. The code selects positive and negative coherence on the labelled CA carbons for F2 and uses 1H single-quantum detection for F3. This is the HNCA transfer implemented by the source, with CA and CO sites selected by their PDB labels.
 
-## Parameters / inputs
+## Timing and output
 
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+The couplings are fixed in the source: `J_nh=92` and `J_nca=11.5` (Hz). The corresponding delays are `tau=abs(1/(4*J_nh))` (about 2.72 ms) and `delta=abs(1/(4*J_nca))` (about 21.74 ms). Couplings are in Hz and delays in seconds.
 
-## Outputs
+The returned structure has `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the four States sign combinations across F1 and F2. Each FID is permuted to `[n3 n2 n1]`, or `[t3 t2 t1]` in acquisition order.
 
-- fid -a structure with four fields: fid.pos_pos, fid.pos_neg,
-- fid.neg_pos, fid.neg_neg that are used in the subsequ-
-- ent States quadrature processing
-- Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
-- sys.labels for this sequence to work properly.
+## References
 
-## Implementation structure
-
-- Protein-specific HNCA experiment (Figure 7.31a of "Protein NMR
-- Spectroscopy", 2nd edition) using pre-set values of J-couplings
-- used in the magnetisation transfer stages. The simulation uses
-- the bidirectional propagation method described in
-- The sequence is hard-wired to work on 1H,13C,15N proteins and uses
-- PDB labels to select spins that will be affected by otherwise ideal
-- pulses. F1 is 15N, F2 is 13C, F3 is 1H. Syntax:
-- fid=hnca(spin_system,parameters,H,R,K)
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
+- *Protein NMR Spectroscopy*, 2nd edition, Figure 7.31a.
+- [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002).
+- [Spin Dynamics Wiki: hnca.m](https://spindynamics.org/wiki/index.php?title=hnca.m).

@@ -1,31 +1,15 @@
 # examples/esr_sol_pulsed/endor_mims_nox_powder.m
 
-- Signature: `endor_mims_nox_powder()`
+Call `endor_mims_nox_powder()` with no arguments. It simulates Mims ENDOR for a nitroxide radical powder with ideal hard pulses; the source estimates a runtime of seconds.
 
-## Purpose
+## Spin system and processing
 
-Mims ENDOR simulation for a nitroxide radical powder. Ideal hard pulses are assumed. Calculation time: seconds.
+- The system is electron plus 14N at 3.5 T. Its diagonal electron g values are 2.01045, 2.00641 and 2.00211. The electron–14N coupling matrix is `[1.2356 0 0.6322; 0 1.1266 0; 0.6322 0 8.2230] × 10^7`; units are not annotated in the source. The basis is `sphten-liouv` without approximation, and trajectory-level SSR is disabled.
+- `powder` calls `@endor_mims` in the `esr` context using `rep_2ang_12800pts_sph`. The FID uses 128 points, sweep 3×10^8, τ = 100 ns and zero-filling to 512 points; `axis_units` is set to MHz.
+- Before Fourier transformation, the mean is removed and the FID is apodised with the source setting `{'exp',6}`. The source then computes `fftshift(fft(fid,zerofill))` and plots the real spectrum against nuclear frequency in MHz with `plot_1d`. The function displays a figure and does not save the FID or spectrum.
 
-## Physical / mathematical content
+## Requirements and scope
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Run with MATLAB and Spinach, including `powder`, spin-system/basis construction, `endor_mims` and `apodisation`; plotting uses `plot_1d` and `kxlabel`. This is the ideal-hard-pulse Mims nitroxide workflow, not the long soft-pulse Davies calculation. The source provides no DOI.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Mims ENDOR simulation for a nitroxide radical powder. Ideal
-- hard pulses are assumed.
-- Calculation time: seconds.
-- Isotopes
-- Magnet field
-- Interactions
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Crude apodisation
+Source: [examples/esr_sol_pulsed/endor_mims_nox_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/endor_mims_nox_powder.m).

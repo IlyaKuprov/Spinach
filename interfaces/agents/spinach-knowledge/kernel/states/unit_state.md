@@ -4,35 +4,28 @@
 
 ## Purpose
 
-Returns the unit state vector or matrix in the current formalism and basis. Syntax: rho=unit_state(spin_system)
+Constructs the unit-state representation for the basis already stored in `spin_system`. Call `basis` first; the function uses its formalism and basis data.
 
-## Physical / mathematical content
+## Representations
 
-- State-construction utilities. These routines build equilibrium states, singlets, triplets, partner-state expansions, and physically meaningful density operators in the active basis.
+- In `sphten-liouv`, returns a sparse direct-sum column vector with every substance unit coordinate `bas.offsets(n)+1` set to `chem.concs(n)`, including zero concentrations. These coordinates represent `T(0,0)`.
+- In `zeeman-liouv`, vectorises the identity on the spin Hilbert space using MATLAB column-major `(:)` ordering and divides by its Euclidean 2-norm, then weights it by the local concentration and stacks the independent blocks.
+- In `zeeman-hilb`, returns a block diagonal matrix of local sparse identities multiplied by their concentrations.
+- Other formalism values raise an error.
 
-## Numerical / algorithmic content
+Thus, “unit” does not mean a trace-one identity in every representation: the two Zeeman cases differ in both shape and normalisation.
 
-## Parameters / inputs
+## Inputs and output
 
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
+- `spin_system`: Spinach data object with basis information.
+- `rho`: the vector or matrix representation selected above.
 
-## Outputs
+## Links
 
-- rho -vector or matrix representation of
-- the unit state
+- Basis setup: [`basis.m` page](../basis.md).
+- Source: [`kernel/states/unit_state.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/unit_state.m).
+- Wiki: [`unit_state.m`](https://spindynamics.org/wiki/index.php?title=unit_state.m).
 
-## Implementation structure
+Wavefunction concentration-weighted units are explicitly rejected by `Spinach:unit_state:wavefunction`.
 
-- Returns the unit state vector or matrix in the current formalism
-- and basis. Syntax:
-- rho=unit_state(spin_system)
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
-- rho -vector or matrix representation of
-- the unit state
-- Check consistency
-- Decide how to proceed
-- Unit population of T(0,0) state
-- Normalized stretched unit matrix
-- Sparse unit matrix
+Absent basis metadata or a missing formalism field is rejected by the existing explicit input-validation error before any formalism-specific capability check.

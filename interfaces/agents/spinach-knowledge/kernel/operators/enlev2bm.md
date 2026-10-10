@@ -1,44 +1,19 @@
 # kernel/operators/enlev2bm.m
 
 - Signature: `[states,coeffs]=enlev2bm(nlevels,lvl_num)`
+- DIRECT source: [kernel/operators/enlev2bm.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/enlev2bm.m)
+- Wiki: [enlev2bm.m](https://spindynamics.org/wiki/index.php?title=enlev2bm.m)
 
-## Purpose
+## Definition
 
-Bosonic monomial expansion of specific bosonic energy level projectors. Syntax: [states,coeffs]=enlev2bm(nlevels,lvl_num)
+The function represents one energy-level projector of a truncated bosonic mode in Spinach's bosonic-monomial basis. It creates an `nlevels`-by-`nlevels` diagonal matrix `P`, sets only `P(lvl_num,lvl_num)=1`, and passes `P` to [oper2bm](oper2bm.md). The level number is one-based: level 1 is the empty-mode state, and increasing indices count upward from it.
 
-## Physical / mathematical content
+This is a basis expansion of a projector, not a propagator. The function does not exponentiate an operator or apply time evolution.
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+## Basis and outputs
 
-## Numerical / algorithmic content
+`states` contains the Spinach BM-basis indices returned by `oper2bm(P)`; use [lin2kq](../indexing/lin2kq.md) for the K,Q bosonic-monomial indexing. `coeffs` is returned directly from the same conversion call. `enlev2bm` adds no scale factor or other coefficient normalisation of its own; the values are those calculated by `oper2bm` for this diagonal projector.
 
-## Parameters / inputs
+## Inputs and checks
 
-- nlevels -number of energy levels in the mode,
-- a positive integer
-- lvl_num -energy level number, counting from the
-- empty mode state upwards
-
-## Outputs
-
-- states -states, in the Spinach BM basis index-
-- ing, that contribute to the operator in
-- question; use lin2kq to convert to K,Q
-- bosonic monomial indices
-- coeffs -coefficients with which the BMs enter
-- the linear combination
-
-## Implementation structure
-
-- Bosonic monomial expansion of specific bosonic energy
-- level projectors. Syntax:
-- [states,coeffs]=enlev2bm(nlevels,lvl_num)
-- nlevels -number of energy levels in the mode,
-- a positive integer
-- lvl_num -energy level number, counting from the
-- empty mode state upwards
-- states -states, in the Spinach BM basis index-
-- ing, that contribute to the operator in
-- question; use lin2kq to convert to K,Q
-- bosonic monomial indices
-- coeffs -coefficients with which the BMs enter
+`nlevels` is the mode's number of levels, intended as a positive integer. The source checks that it is numeric, scalar, real, and at least 1; it does not explicitly test integrality or finiteness. `lvl_num` must be numeric, scalar, real, and between 1 and `nlevels`; the source uses it directly as a MATLAB matrix index, so it must also be a valid integer index.

@@ -33,7 +33,7 @@ inter.coordinates={[0.0 0.0 0.0]
                
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -76,7 +76,7 @@ parfor n=1:numel(field_grid)
     spin_system=basis(spin_system,bas);
     
     % Relevant operators and states
-    locpar.coil=state(spin_system,'Lz','1H');
+    locpar.coil=coil_state(spin_system,'Lz','1H','exact');
     locpar.mw_oper=operator(spin_system,'Lx','E');
     locpar.ez_oper=operator(spin_system,'Lz','E');
 

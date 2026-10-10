@@ -1,42 +1,30 @@
 # etc/textbook/rlx_dip.m
 
-- Signature: `[r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)`
+- MATLAB implementation: [etc/textbook/rlx_dip.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/rlx_dip.m)
+
+**Signature:** `[r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)`
 
 ## Purpose
 
-Redfield theory expressions for dipolar relaxation and cross- relaxation rates, isotropic tumbling in liquid phase. Syntax: [r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)
+Calculates Redfield dipolar relaxation and longitudinal cross-relaxation rates for two spins in an isotropically tumbling liquid.
 
-## Physical / mathematical content
+## Inputs
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- `B0` — real scalar magnetic field in tesla.
+- `spins` — two-element cell array of character-array isotope labels, e.g. `{'1H','15N'}`.
+- `dist` — positive real scalar inter-spin distance in ångströms.
+- `tau_c` — positive real scalar rotational correlation time in seconds.
 
-## Numerical / algorithmic content
+## Calculation and outputs
 
-## Parameters / inputs
+The function places the spins at `[0 0 0]` and `[0 0 dist]` to build the DD tensor with `xyz2dd`, obtains its second-rank invariant with `blinv`, and sets `r_dif_c=1/(6*tau_c)`. It calculates each spin's `s(s+1)` factor from the isotope multiplicity and forms the Zeeman frequencies as `spin(spins{i})*B0`. The Redfield expressions use the rank-2 spectral-density values `spden(2,r_dif_c,omega)` at zero, individual Zeeman, sum, and difference frequencies.
 
-- B0 -magnet field, Tesla
-- spins -the spins involved, e.g. {'1H','15N'}
-- dist -inter-spin distance, Angstrom
-- tau_c -rotational correlation time, seconds
+- `r1` — two longitudinal rates in Hz, ordered as the input spins.
+- `r2` — two transverse rates in Hz, ordered as the input spins.
+- `rx` — longitudinal cross-relaxation rate in Hz.
 
-## Outputs
+Unlike `rlx_dd_csa`, the validation here does not restrict the isotopes to spin-1/2; the expressions include the computed spin-square factors.
 
-- r1 -two longitudinal relaxation rates, Hz
-- r2 -two transverse relaxation rates, Hz
-- rx -longitudinal cross-relaxation rate, Hz
+## Reference
 
-## Implementation structure
-
-- Redfield theory expressions for dipolar relaxation and cross-
-- relaxation rates, isotropic tumbling in liquid phase. Syntax:
-- [r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)
-- B0 -magnet field, Tesla
-- spins -the spins involved, e.g. {'1H','15N'}
-- dist -inter-spin distance, Angstrom
-- tau_c -rotational correlation time, seconds
-- r1 -two longitudinal relaxation rates, Hz
-- r2 -two transverse relaxation rates, Hz
-- rx -longitudinal cross-relaxation rate, Hz
-- Check consistency
-- Blicharsky invariant and rotational diffusion coefficient
+[Spinach Wiki: rlx_dip.m](https://spindynamics.org/wiki/index.php?title=rlx_dip.m)

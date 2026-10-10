@@ -1,51 +1,31 @@
 # kernel/kinetics/kinetics.m
 
-- Signature: `K=kinetics(spin_system)`
+## Direct-sum chemistry
 
-## Purpose
+`K=kinetics(spin_system)` compiles `chem.reactions` into sparse drains and product-row maps. Numeric first-order records return a constant sparse matrix. Numeric zero-rate higher-order records also permit the static route; an entirely zero-rate network yields a sparse zero matrix usable by ordinary linear contexts. Rate callbacks remain dynamic even if a sampled value is zero. Higher-order reactions or time-dependent rate handles return `K(t,eta)`, evaluated on the instantaneous concentration-weighted state. Chemistry-free systems retain their zero generator in every formalism. Both Liouville formalisms support first-order and mass-action reactions; Hilbert reactions expose a first-order matrix derivative.
 
-Chemical kinetics superoperator. Syntax: K=kinetics(spin_system)
+The dissipative convention is `L=H+1i*R+1i*K`. A state-dependent generator uses the existing `step` handle route, for example `{ @(t,eta)1i*K(t,eta), t, 'RKMK4' }`. No block is normalised or divided by concentration. Every reactant occurrence contributes a drain multiplied by the concentrations of the other occurrences. Repeated products contribute repeated fills. Spin-free reactants are dynamic pools, not fixed-concentration reservoirs.
 
-## Physical / mathematical content
+## Arrival closures and selectors
 
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The additive closure carries each reactant's internal spin orders and distributes the unit arrival equally over the reactant occurrences, so the reaction event is counted once. Cross-reactant orders are omitted. The product closure gathers source coordinates from all but the last occurrence into the sparse matrix acting on the last; it retains their polarisation products without constructing a tensor-product basis.
 
-## Numerical / algorithmic content
+Named singlet/triplet selectors use the left/right electronic projectors: Haberkorn loss is half their sum, and arrival is their product followed by the matching map. Jones–Hore variants use identity minus the complementary projector product for the drain. User selector pairs are substance-local left/right product superoperators with the reactant Liouville block dimensions, including in `zeeman-hilb`.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+`kinetics(spin_system,'report')` prints the network, closure, matched and traced spins. Compilation reports product rows missing a source descriptor. Maps and selector products are compiled once per call, not inside time stepping. For a space-times-spin state, the handle assembles an independent sparse chemistry block per voxel; transport is added separately. Each time-dependent rate is evaluated and validated once at the shared stage time, then reused across voxels.
 
-## Parameters / inputs
+## Zeeman representation and matrix actions
 
-- spin_system -Spinach spin system description object
-- produced as described in the spin system
-- and basis specification sections, of the
-- of the online manual. All adjustable pa-
-- rameters are described in the chemical
-- kinetics parameters section.
+For Zeeman input, the same reaction compiler runs on a complete spherical-tensor basis for each substance. Its local maps are transformed with the physical `sphten2zeeman/D_n` matrix and its inverse. Numeric first-order maps are transformed once. A state-dependent map pulls back the instantaneous vector, evaluates the shared polynomial generator, and transforms its result independently per voxel. This small-system reference implementation pays for complete local bases and dense basis transformations; it does not duplicate the closure, matching, or selector physics.
 
-## Outputs
+With nonempty `zeeman-hilb` reactions, `K(t,rho)` returns the matrix derivative through `hilb_action`. It is not a Hamiltonian and must not be supplied as a conjugation generator to `step`. Numeric and time-dependent first-order rates are supported. More than one reactant occurrence raises `Spinach:kinetics:hilbertMassAction` with the complete message “mass-action chemistry is not supported in zeeman-hilb formalism.” A ket formalism remains storage-only and rejects reaction records.
 
-- K -kinetics superoperator. If a Liouvillian is
-- assembled manually, this dissipative super-
-- operator must enter as 1i*K, for example
-- L=H+1i*R+1i*K
-- Note: a large variety of chemical reaction models is supported,
-- see the chemical kinetics parameters section of the onli-
-- ne manual.
-- Note: Spinach context functions include relaxation and kinetics
-- superoperators into the total Liovillian automatically.
+## Retired mechanisms
 
-## Implementation structure
+Legacy rate, flux, and radical-pair fields are rejected by `create`; this routine only reads explicit reaction records. First-order exchange is a directed record with matching, untracked exponential loss has empty products, and radical-pair channels use selectors. A permutation reaction changes all mapped orders; it must not be assumed identical to a legacy phenomenological flux model that left some correlations stationary.
 
-- Chemical kinetics superoperator. Syntax:
-- K=kinetics(spin_system)
-- spin_system - Spinach spin system description object
-- produced as described in the spin system
-- and basis specification sections, of the
-- of the online manual. All adjustable pa-
-- rameters are described in the chemical
-- kinetics parameters section.
-- K - kinetics superoperator. If a Liouvillian is
-- assembled manually, this dissipative super-
-- operator must enter as 1i*K, for example
-- L=H+1i*R+1i*K
+Nonempty wavefunction reaction records raise `Spinach:kinetics:wavefunction`, naming zeeman-wavef explicitly; this covers first-order and mass-action chemistry.
+
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
+The kinetics consumer also rejects all six retired chemistry fields, even when empty, with `Spinach:kinetics:retiredChemistry` pointing to `chem.reactions`; this covers manually modified or saved legacy structures that bypass `create`.
+Reporting accepts mixed row/column substance memberships by formatting local spin lists as rows; the stored memberships and generator are unchanged.

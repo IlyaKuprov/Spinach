@@ -1,37 +1,9 @@
 # kernel/overloads/@ttclass/rdivide.m
 
-- Signature: `a=rdivide(a,b)`
+Signature: `a=rdivide(a,b)`
 
-## Purpose
+Source: [kernel/overloads/@ttclass/rdivide.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/rdivide.m) · Wiki: [ttclass/rdivide.m](https://spindynamics.org/wiki/index.php?title=ttclass/rdivide.m)
 
-Divides a tensor train object by a scalar. Syntax: c=rdivide(a,b)
+The method proceeds only when `a` is a `ttclass` and `b` is scalar. Although the source comment describes a numeric scalar, the guard itself checks only `isscalar(b)`; it does not separately require numeric, real, finite, or nonzero `b`. If either check fails, the method raises its stated error; a scalar of another class passes the guard and is subjected to the divisions.
 
-## Physical / mathematical content
-
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- a -a ttclass object
-- b -a numeric scalar
-
-## Outputs
-
-- c -a ttclass object
-
-## Implementation structure
-
-- Divides a tensor train object by a scalar. Syntax:
-- c=rdivide(a,b)
-- a -a ttclass object
-- b -a numeric scalar
-- c -a ttclass object
-- Division of tensor train by a scalar
-- Divide the coefficients and update the tolerances
-- Complain and bomb out
-- Documentation is like sex: when it is good, it is
-- very, very good, and when it is bad it's still bet-
-- ter than nothing.
-- Jim Hargrove
+It divides the coefficient vector by `b` and the tolerance vector by `abs(b)`; the core arrays are left unchanged. The tensor train stays in its stored representation rather than being expanded to a full array. For complex `b`, coefficients use `b` itself, not its conjugate; only the tolerance scaling uses its magnitude. There is no zero-divisor check, and no full tensor materialisation occurs in this method.

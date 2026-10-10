@@ -1,62 +1,24 @@
 # kernel/pulses/cartesian2polar.m
 
+[Source: `kernel/pulses/cartesian2polar.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/cartesian2polar.m)
+
 - Signature: `[r,p,Dr,Dp,Drr,Drp,Dpr,Dpp]=cartesian2polar(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy)`
 
 ## Purpose
 
-Converts the [RF_x, RF_y] representation of a pulse waveform and the derivatives of any function with respect to those RF values into the [RF_amplitude, RF_phase] representation and the derivatives of the function with respect to amplitudes and phases. Syntax: [r,p,Dr,Dp,Drr,Drp,Dpr,Dpp]=... cartesian2polar(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy)
+Converts paired Cartesian components into polar waveform coordinates, and optionally transforms first and second derivatives of a scalar objective with respect to those components. It is an algebraic coordinate conversion: it does not create a time grid, resample the waveform, or change units supplied by the caller.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+- `x`, `y` — real numeric vectors of equal size, the X and Y components.
+- With four inputs, `Dx` and `Dy` are the matching first derivatives. When requested as outputs, `Dr` and `Dp` are the derivatives in amplitude and phase coordinates.
+- With eight inputs, `Dxx`, `Dxy`, `Dyx`, and `Dyy` supply the second-derivative matrices; the corresponding outputs are `Drr`, `Drp`, `Dpr`, and `Dpp`.
+- `r = sqrt(x.^2 + y.^2)` is the non-negative radius in the same numerical scale as x and y; `p = atan2(y,x)` is in radians.
 
-## Numerical / algorithmic content
+The supported input forms are two, four, or eight arguments. Inputs must be real numeric arrays of compatible dimensions; the second-derivative form requires row-vector inputs and same-sized square derivative matrices. Supplying derivative inputs does not require returning their transformed outputs, but those outputs are calculated only when requested. No unit conversion or file/system-state side effect occurs.
 
-## Parameters / inputs
+This conversion is also used by `bruker_write.m`, which subsequently wraps phase and converts it to degrees for Bruker export.
 
-- x -vector of waveform amplitudes along X
-- y -vector of waveform amplitudes along Y
-- Dx -optional vector of derivatives of a scalar function
-- with respect to the waveform amplitudes along X
-- Dy -optional vector of derivatives of a scalar function
-- with respect to the waveform amplitudes along Y
-- Dxx -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along X
-- Dxy -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along X and Y
-- Dyx -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along Y and X
-- Dyy -optional matrix of second derivatives of a scalar function
-- with respect to the waveform amplitudes along Y
+## Reference
 
-## Outputs
-
-- r -vector of waveform amplitudes
-- p -vector of waveform phases
-- Dr -vector of derivatives of the function with respect
-- to the waveform amplitudes.
-- Dp -vector of derivatives of the function with respect
-- to the waveform phases.
-- Drr -matrix of second derivatives of the function with respect
-- to the waveform amplitudes.
-- Drp -matrix of second derivatives of the function with respect
-- to the waveform amplitudes and phases.
-- Dpr -matrix of second derivatives of the function with respect
-- to the waveform phases and amplitudes.
-- Dpp -matrix of second derivatives of the function with respect
-- to the waveform phases.
-
-## Implementation structure
-
-- Converts the [RF_x, RF_y] representation of a pulse waveform and the
-- derivatives of any function with respect to those RF values into the
-- [RF_amplitude, RF_phase] representation and the derivatives of the
-- function with respect to amplitudes and phases. Syntax:
-- [r,p,Dr,Dp,Drr,Drp,Dpr,Dpp]=...
-- cartesian2polar(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy)
-- x -vector of waveform amplitudes along X
-- y -vector of waveform amplitudes along Y
-- Dx -optional vector of derivatives of a scalar function
-- with respect to the waveform amplitudes along X
-- Dy -optional vector of derivatives of a scalar function
-- with respect to the waveform amplitudes along Y
+[Spin Dynamics Wiki: `cartesian2polar.m`](https://spindynamics.org/wiki/index.php?title=cartesian2polar.m)

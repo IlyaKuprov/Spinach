@@ -1,35 +1,17 @@
 # examples/relaxation_theory/inv_rec_2.m
 
-- Signature: `inv_rec_2()`
+- MATLAB implementation: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/inv_rec_2.m)
 
-## Purpose
+Source: [examples/relaxation_theory/inv_rec_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/inv_rec_2.m)
 
-An example of inversion recovery experiment simulation for a strychnine spin system. Calculation time: minutes.
+## Purpose and molecular model
 
-## Physical / mathematical content
+Simulates proton inversion-recovery spectra for the strychnine spin system at six recovery delays; the source estimates calculation time in minutes. It obtains the proton system from strychnine({'1H'}) and sets the field to 14.1 T. It is a simulation workflow, not an experimental result or a claimed fit.
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Relaxation and basis
 
-## Numerical / algorithmic content
+The relaxation mechanism is Redfield with tau_c={200e-12} s (200 ps), dibari equilibrium, kite retention (rlx_keep='kite'), and temperature value 298 (the source does not state a temperature unit). The basis uses sphten-liouv, IK-2, scalar-coupling connectivity, and proximity level 3. The script sets the proximity cutoff to 4.0 without stating its unit and disables Krylov propagation.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Pulse sequence and acquisition
 
-## Implementation structure
-
-- An example of inversion recovery experiment simulation
-- for a strychnine spin system.
-- Calculation time: minutes.
-- Read the spin system properties
-- Magnet field
-- Disable Krylov propagation
-- Basis set
-- Relaxation theory parameters
-- Proximity cut-off
-- Spinach housekeeping
-- Aquisition parameters
-- Set up different recovery delays
+The recovery delays are 0.01, 0.1, 0.5, 1, 5, and 10 s. For each delay, the script starts from isotropic thermal equilibrium, applies a pi rotation about Ly, evolves under the rotating-frame Hamiltonian plus Redfield relaxation for that delay, then applies a pi/2 Ly read pulse. It acquires the proton signal with an L+ detection state. Acquisition settings are sweep 6500, 8192 points, zero-fill to 65536, proton channel, ppm axis, and an explicitly labelled offset of 2800 Hz. Each FID receives exponential apodisation with parameter 5, is Fourier transformed, and is plotted in its own panel of a 2-by-3 figure labelled by recovery delay. The plot therefore compares six simulated spectra across the specified delays; the source does not report a measured spectrum or rate benchmark.

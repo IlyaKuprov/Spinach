@@ -1,38 +1,17 @@
 # kernel/operators/mprealloc.m
 
 - Signature: `A=mprealloc(spin_system,nnzpc)`
+- Direct source: [kernel/operators/mprealloc.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/mprealloc.m)
+- Wiki: [mprealloc.m](https://spindynamics.org/wiki/index.php?title=mprealloc.m)
 
 ## Purpose
 
-Preallocates an operator in the current basis. Syntax: A=mprealloc(spin_system,nnzpc)
+Allocates an all-zero sparse square matrix sized for the active Spinach formalism, reserving an estimated number of nonzeros per column. This routine allocates storage only: it does not construct matrix elements, define an operator's action, or propagate a state.
 
-## Physical / mathematical content
+## Dimension and formalism
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The dimension is `spin_system.bas.offsets(end)`, compiled by `basis` as the sum of the substance dimensions in the selected formalism. No basis is constructed or reordered.
 
-## Numerical / algorithmic content
+## Allocation and input checks
 
-## Parameters / inputs
-
-- nnzpc -expected number of non-zeros per column
-
-## Outputs
-
-- A -all-zero sparse matrix of the appropriate
-- dimension with room for the specified num-
-- ber of non-zeroes
-
-## Implementation structure
-
-- Preallocates an operator in the current basis. Syntax:
-- A=mprealloc(spin_system,nnzpc)
-- nnzpc - expected number of non-zeros per column
-- A - all-zero sparse matrix of the appropriate
-- dimension with room for the specified num-
-- ber of non-zeroes
-- Check consistency
-- Do the math
-- Create a zero Liouville space matrix operator
-- Create a zero Hilbert space matrix operator
-- Complain and bomb out
-- Consistency enforcement
+For the selected dimension `d`, the implementation calls `spalloc(d,d,nnzpc*d)`; the third argument is reserved sparse storage, not a count of nonzeros already present. The function checks that `spin_system.bas.formalism` exists and that `nnzpc` is numeric, real, scalar, and integer-valued before allocation. The documentation describes `nnzpc` as the expected nonzero count per column.

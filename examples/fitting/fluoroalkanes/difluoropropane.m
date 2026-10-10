@@ -87,9 +87,9 @@ inter.coupling.scalar{5,6}=params(6);
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
-bas.sym_group={'S2','S2'};
-bas.sym_spins={[1 2],[7 8]};
+bas.approximation={'none'};
+bas.sym_group={{'S2','S2'}};
+bas.sym_spins={{[1 2],[7 8]}};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 
@@ -98,7 +98,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters (19F)
 parameters_f.spins={'19F'};
 parameters_f.rho0=state(spin_system,'L+',[3 6]);
-parameters_f.coil=state(spin_system,'L+',[3 6]);
+parameters_f.coil=coil_state(spin_system,'L+',[3 6],'exact');
 parameters_f.decouple={};
 parameters_f.offset=-105059;
 parameters_f.sweep=600;
@@ -110,7 +110,7 @@ parameters_f.invert_axis=1;
 % Sequence parameters (1H A)
 parameters_ha.spins={'1H'};
 parameters_ha.rho0=state(spin_system,'L+',[1 2 7 8]);
-parameters_ha.coil=state(spin_system,'L+',[1 2 7 8]);
+parameters_ha.coil=coil_state(spin_system,'L+',[1 2 7 8],'exact');
 parameters_ha.decouple={};
 parameters_ha.offset=2300;
 parameters_ha.sweep=128;
@@ -122,7 +122,7 @@ parameters_ha.invert_axis=1;
 % Sequence parameters (1H B)
 parameters_hb.spins={'1H'};
 parameters_hb.rho0=state(spin_system,'L+',[4 5]);
-parameters_hb.coil=state(spin_system,'L+',[4 5]);
+parameters_hb.coil=coil_state(spin_system,'L+',[4 5],'exact');
 parameters_hb.decouple={};
 parameters_hb.offset=1050;
 parameters_hb.sweep=300;

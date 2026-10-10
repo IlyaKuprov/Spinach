@@ -1,36 +1,16 @@
 # kernel/overloads/@ttclass/trace.m
 
-- Signature: `tttrace=trace(tt)`
+## Signature
 
-## Purpose
+`tttrace=trace(tt)`
 
-Computes the trace of a tensor train operator. Syntax: tttrace=trace(tt)
+## Behaviour
 
-## Physical / mathematical content
+For every core and every pair of left/right bond indices, the method reshapes that core's physical row/column slice to a matrix of the corresponding local mode sizes and applies MATLAB's `trace` to that matrix. The resulting local traces are stored as cores with both physical modes set to one. The core sequence and bond ranks are retained, as are the input train coefficients; the auxiliary representation's tolerance is set to zero for each train.
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+Finally, `full` materialises the singleton-mode auxiliary tensor train, yielding the trace as a scalar. The implementation performs these local diagonal contractions and the final train summation directly; it does not invoke rank truncation, rounding, or a tolerance-controlled approximation.
 
-## Numerical / algorithmic content
+## References
 
-## Parameters / inputs
-
-- tt -tensor train operator
-
-## Outputs
-
-- tttrace -trace of the tensor train operator
-
-## Implementation structure
-
-- Computes the trace of a tensor train operator. Syntax:
-- tttrace=trace(tt)
-- tt -tensor train operator
-- tttrace -trace of the tensor train operator
-- Read sizes and ranks
-- Make an auxiliary tensor train
-- Run through all tensor trains
-- Preallocate a core
-- Fill in the core
-- Reshape the core
-- Sum up the auxiliary tensor train
-- Pronouncement of experts to the effect that something
+- [Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/trace.m)
+- [Spin Dynamics Wiki: `ttclass/trace.m`](https://spindynamics.org/wiki/index.php?title=ttclass/trace.m)

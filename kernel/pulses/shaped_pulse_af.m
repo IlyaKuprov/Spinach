@@ -61,6 +61,12 @@
 %       from your intended location. This is the principal source
 %       of bugs when using this function.
 %
+% With polyadics enabled, expv and evolution use an implicit FFT
+% phase derivative. The expm method retains an explicit phase
+% derivative and requires materialisable L0, Lx, and Ly. Action-only
+% Fourier-flow backgrounds are rejected; disable polyadics before
+% constructing the background when an explicit propagator is needed.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=shaped_pulse_af.m>
@@ -83,8 +89,13 @@ report(spin_system,['spin space problem dimension    ' num2str(spn_dim)]);
 report(spin_system,['state vector stack size         ' num2str(stk_dim)]);
 report(spin_system,['Fokker-Planck problem dimension ' num2str(spc_dim*spn_dim)]);
 
-% Compute RF phases and Fourier derivative operator
-[phases,d_dphi]=fourdif(spc_dim,1);
+% Select the phase derivative without changing explicit propagation
+use_poly=ismember('polyadic',spin_system.sys.enable)&&~strcmp(method,'expm');
+deriv_system=spin_system;
+if strcmp(method,'expm')
+    deriv_system.sys.enable=setdiff(spin_system.sys.enable,{'polyadic'});
+end
+[phases,d_dphi]=fourdif(deriv_system,spc_dim,1);
 
 % Add the overall phase
 phases=phases+rf_phi;
@@ -100,7 +111,7 @@ F1=polyadic({{spdiags(cos(phases),0,spc_dim,spc_dim),Lx},...
 M=polyadic({{d_dphi,opium(spn_dim,1)}});
 
 % Inflate polyadic representations
-if ~ismember('polyadic',spin_system.sys.enable)
+if ~use_poly
     F0=complex(inflate(F0)); 
     F1=complex(inflate(F1)); 
      M=complex(inflate(M));
@@ -200,8 +211,7 @@ switch method
             P_tot=mat2cell(P_tot,spn_dim*ones(1,spc_dim),...
                                  spn_dim*ones(1,spc_dim));
 
-            % The effective propagator starts at first location and
-            % collects the dynamics from all locations in the end
+            % Collect first-location dynamics from all final locations
             P=P_tot{1,1};
             for n=2:spc_dim
                 P=P+P_tot{n,1};
@@ -299,4 +309,5 @@ end
 % of the puddles in the road.
 %
 % Alexander Smith
+
 

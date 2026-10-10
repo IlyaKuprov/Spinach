@@ -1,5 +1,13 @@
 # Failure modes and diagnostics
 
+## Contents
+
+- [Crash catalogue](#crash-catalogue)
+- [Silent wrong-result traps](#silent-wrong-result-traps)
+- [Scaling and memory](#scaling-and-memory)
+- [The headless validation harness](#the-headless-validation-harness)
+- [What counts as evidence that a simulation is right](#what-counts-as-evidence-that-a-simulation-is-right)
+
 Almost every kernel function has a `grumble()` input checker that stops with a
 specific message, and the no-defaults policy means a missing physical input is
 an error, not a guess. Crashes are therefore usually self-explanatory once the
@@ -223,6 +231,8 @@ spectrum (missing multiplet components, distorted powder lineshapes, phase
 errors). Convergence is established by refinement, never by appearance - see
 the validation procedure below.
 
+With `prop_cache`, `propagator()` separates cache entries by cleanup, storage-threshold, and GPU policy as well as generator, timestep, and chop tolerance; changing those settings within a pool cannot retrieve an entry built under a different policy.
+
 ## Scaling and memory
 
 The Liouville-space dimension grows as 4^N for N spin-1/2 particles (2^N in
@@ -240,18 +250,24 @@ spins; beyond that, the basis restriction is the tool, not a bigger machine:
   and observable cannot enter the discarded blocks, and validate against an
   unfiltered basis when practical.
 - `bas.sym_group`/`bas.sym_spins` exploit permutation symmetry - large
-  savings for methyl groups and symmetric aromatics.
+  savings for methyl groups and symmetric aromatics where the context supports
+  them. `imaging` rejects symmetry groups; do not carry this setting blindly
+  from a liquid-state example into spatially resolved simulations.
 
-At run time Spinach reduces dimension further on its own: zero-track
-elimination and path tracing routinely cut the active space by an order of
-magnitude, visible in the log as "state space dimension reduced from 64 to
-15". Horizontal wavefunction and Liouville-state stacks are screened using
-their actual columns; ZTE retains the union of their populated coordinates.
-ZTE streams nonzero columns independently, bounding additional screening
-storage by the row dimension and scaling each column separately. Weak
-columns above `zte_tol` must not be judged against another column's scale.
-These reductions can be switched off through
-`sys.disable={'zte','pt','symmetry',...}` for debugging, at a large cost.
+At run time path tracing can reduce the active dimension further. Zero-track
+elimination is opt-in: add `'zte'` to `sys.enable` to activate it, and omit
+it to leave that reduction off. Enable it only for examples whose actual
+propagation path reaches Liouville-space trajectory reduction. Hilbert-space
+symmetry reduction, direct `step` or `krylov` propagation, polyadic generators,
+and `trajlevel`-disabled calculations do not use ZTE. A shaped-pulse call alone
+is insufficient: its selected method must reach `evolution`, or a subsequent
+acquisition must do so. Path tracing and symmetry can be disabled
+with `sys.disable={'pt','symmetry'}` for debugging, potentially at a large cost.
+
+Horizontal wavefunction and Liouville-state stacks are screened using their
+actual columns; enabled ZTE retains the union of their populated coordinates.
+ZTE propagates columns in bounded batches and scales each separately, so weak
+columns above `zte_tol` are not judged against another column's scale.
 
 Matrices switch to sparse algebra automatically, and above a state-space
 dimension of 10000 (a tunable tolerance) Spinach uses Krylov propagation

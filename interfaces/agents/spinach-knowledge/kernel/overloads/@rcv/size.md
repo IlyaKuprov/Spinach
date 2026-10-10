@@ -1,42 +1,17 @@
 # kernel/overloads/@rcv/size.m
 
-- Signature: `[s,ncols]=size(A,dim)`
+- Signature: `s=size(A,dim)` or `[s,ncols]=size(A)`
+- Source: [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/size.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=rcv/size.m)
 
 ## Purpose
 
-Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) [s,ncols]=size(A)
+Returns the stored matrix dimensions of an RCV sparse-matrix object.
 
-## Physical / mathematical content
+## Behaviour
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+- With one output and no dimension index, returns `[A.numRows A.numCols]`.
+- With one output and `dim=1` or `dim=2`, returns the row or column count, respectively. Any other positive integer dimension returns `1`.
+- With two outputs and no dimension index, returns the row count in `s` and the column count in `ncols`.
+- A dimension index must be a finite, real, positive integer scalar. Requesting two outputs together with a dimension index raises an error.
 
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- A -RCV sparse matrix
-- dim -optional dimension index
-
-## Outputs
-
-- s -size vector, dimension length, or number
-- of rows in the two-output form
-- ncols -number of columns in the two-output form
-
-## Implementation structure
-
-- Returns the size of an RCV sparse matrix. Syntax:
-- s=size(A,dim)
-- [s,ncols]=size(A)
-- A -RCV sparse matrix
-- dim -optional dimension index
-- s -size vector, dimension length, or number
-- of rows in the two-output form
-- ncols -number of columns in the two-output form
-- Check consistency
-- Refuse two outputs with a dimension query
-- Mimic Matlab
-- Consistency enforcement
-- I did not succeed in life by intelligence. I succeeded
-- because I have a long attention span.
-- Charlie Munger
+Dimensions are carried in the RCV object as `int64` values. The returned dimension answers depend on `numRows` and `numCols`, not the number of stored coordinate entries.

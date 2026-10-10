@@ -28,6 +28,9 @@ dnp=zeros([numel(field_grid) numel(exch_grid)]);
 % Create and scale the figure
 current_fig=kfigure(); scale_figure([1.0 0.65]);
 
+% Enable zero track elimination
+sys.enable={'zte'};
+
 % Loop over the fields
 for n=1:numel(field_grid)
 

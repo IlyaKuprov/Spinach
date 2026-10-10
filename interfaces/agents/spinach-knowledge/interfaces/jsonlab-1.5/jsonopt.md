@@ -1,28 +1,9 @@
 # interfaces/jsonlab-1.5/jsonopt.m
 
-- Signature: `val=jsonopt(key,default,varargin)`
+[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/jsonopt.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
-## Purpose
+**Call:** `val=jsonopt(key,default,varargin)`.
 
-No descriptive header was found. The best immediate identifier is `val=jsonopt(key,default,varargin)`, and the implementation details below should be used to infer its role.
+The function starts with `val=default`; if no optional argument is supplied, it returns that default. Otherwise it examines only the first value in `varargin`. If that value is a struct, it first checks for a field named exactly `key`; if absent, it checks for a field named `lower(key)`. It returns the matching field value unchanged, or `default` when the optional value is not a struct or neither field exists. Further optional arguments are ignored.
 
-## Physical / mathematical content
-
-- JSONLab vendored utilities. The main content is data serialisation, structure walking, option parsing, and text/binary JSON handling rather than spin physics.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- val=jsonopt(key,default,optstruct)
-- setting options based on a struct. The struct can be produced
-- by varargin2struct from a list of 'param','value' pairs
-- authors:Qianqian Fang (q.fang <at> neu.edu)
-- $Id: loadjson.m 371 2012-06-20 12:43:06Z fangq $
-- input:
-- key: a string with which one look up a value from a struct
-- default: if the key does not exist, return default
-- optstruct: a struct where each sub-field is a key
-- output:
-- val: if key exists, val=optstruct.key; otherwise val=default
-- license:
+The JSONLab source notes that an options struct can be built with `varargin2struct` from parameter/value pairs. This helper does not merge options, coerce field values, or validate the requested key; field-name lookup follows MATLAB `isfield` semantics.

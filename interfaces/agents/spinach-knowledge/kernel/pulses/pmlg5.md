@@ -1,43 +1,23 @@
 # kernel/pulses/pmlg5.m
 
-- Signature: `phi=pmlg5(n)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/pmlg5.m
+Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=pmlg5.m
 
 ## Purpose
 
-PMLG5 phase sequence as described in the paper by Vinogradova, Madhu and Vega (https://doi.org/10.1016/S0009-2614(99)01174-4).
-
-## Physical / mathematical content
-
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+Return the phase of a pulse in the PMLG5 phase cycle. This function returns one phase value, not a sampled RF waveform.
 
 ## Syntax
 
-```matlab
-phi=spinal(n)
-```
+~~~matlab
+phi=pmlg5(n)
+~~~
 
-## Parameters / inputs
+## Input and output
 
-- n -a positive integer number
+- n: positive integer pulse index.
+- phi: phase in radians.
 
-## Outputs
+## Implementation
 
-- phi -the phase of the n-th pulse in
-- PMLG sequence, radians
-
-## Implementation structure
-
-- PMLG5 phase sequence as described in the paper by Vinogradova,
-- Madhu and Vega (https://doi.org/10.1016/S0009-2614(99)01174-4).
-- phi=spinal(n)
-- n -a positive integer number
-- phi -the phase of the n-th pulse in
-- PMLG sequence, radians
-- Check consistency
-- PMLG5 phase sequence
-- Loop correctly over
-- Consistency enforcement
-- One man's crappy software is another
-- man's full time job.
+The source stores a 20-value phase cycle in degrees, selects entry mod(n-1,20)+1, then multiplies it by pi/180. Thus indices beyond 20 repeat the cycle; the first entry is 339.22 degrees (converted to radians). The cited phase sequence is from Vinogradova, Madhu and Vega: https://doi.org/10.1016/S0009-2614(99)01174-4.

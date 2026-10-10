@@ -1,59 +1,28 @@
 # interfaces/pdb_bmrb/nuclacid.m
 
-- Signature: `[sys,inter]=nuclacid(pdb_file,shift_file,options)`
+Source: [interfaces/pdb_bmrb/nuclacid.m](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/pdb_bmrb/nuclacid.m)
+Wiki: [Nuclacid.m](https://spindynamics.org/wiki/index.php?title=Nuclacid.m)
 
-## Purpose
+## Interface and inputs
 
-Nucleic acid data import function. Parses PDB and chemical shift data, runs a J-coupling guess using guess_j_nuc.m function and outputs sys and inter data structures that are required by the create.m gateway function in Spinach. Syntax: [sys,inter]=nuclacid(pdb_file,shift_file,options)
+`[sys, inter] = nuclacid(pdb_file, shift_file, options)` imports a nucleic-acid structure and chemical shifts for Spinach. Both file names must be MATLAB character arrays. The required `options.noshift` character value is `'keep'` or `'delete'`; `options.deut_list` must be a cell array. The shift input is ASCII with tab-delimited residue number, atom ID, and shift fields (the parser reads each line as numeric, text, numeric). See `example.txt` in `examples/nmr_nucleic`.
 
-## Physical / mathematical content
+The PDB reader supplies residue numbers/types, atom IDs, and coordinates. Before matching, the importer removes the named atom IDs `O5'`, `O4'`, `O4`, `O6`, `O2`, `O2'`, `O3'`, `O1P`, `O2P`, `P`, `H2'`, `H5T`, and `HO'2`; these atoms do not appear in the returned simulation. Shift rows are selected by residue number and matched on exact atom ID; the match does not additionally compare residue type. When duplicate rows match a residue number and atom ID, the first selected shift is used. PDB atom-name primes are changed to `p` before J-coupling estimation (for example, an apostrophe in an atom ID becomes `p`).
 
-- PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+Only retained atom IDs beginning with `H`, `C`, `N`, or `P` are mapped, respectively, to `1H`, `13C`, `15N`, or `31P`; another initial atom character raises an error. Couplings are estimated by `guess_j_nuc` from the retained residue numbers, residue types, normalised atom IDs, and coordinates. The importer does not estimate CSA here.
 
-## Numerical / algorithmic content
+## Missing shifts and deuteration
 
-## Parameters / inputs
-
-- pdb_file -a character string containing the name
-- of the PDB file
-- shift_file -a character string containing the name
-- of the chemical shift file, ASCII for-
-- matted as [residue_number atom_id shift],
-- see example.txt in examples/nmr_nucleic
-- options.deut_list -a cell array of strings, specifying which
-- atoms should be assumed to be deuterated,
-- for example {'ADE:H2pp'}. When an atom is
-- deuterated, J-couplings are reduced appro-
-- priately.
-- options.noshift -'keep' places unassigned atoms between -1
-- and 0 ppm, 'delete' removes them from the
-- system
+For an unassigned retained atom, `options.noshift = 'keep'` assigns values from `linspace(-1,0,nmissing)` ppm to the missing shifts; `'delete'` removes those atoms from both the spin list and both dimensions of the coupling array. The example deuteration key is `'ADE:H2pp'`. Keys are matched as residue type, colon, and normalised atom ID (not the numeric residue index). A requested deuteration must identify a proton mapped as `1H`; otherwise the function errors. For accepted entries, the isotope becomes `2H` and the corresponding coupling row and column are scaled by `spin('2H')/spin('1H')`.
 
 ## Outputs
 
-- sys.isotopes -Nspins x 1 cell array of strings
-- sys.labels -Nspins x 1 cell array of strings
-- containing standard IUPAC DNA/RNA
-- atom labels
-- inter.coordinates -Nspins x 3 matrix, Angstrom.
-- inter.zeeman.scalar -Nspins x 1 cell array of numbers,
-- ppm. Isotropic chemical shifts go
-- here.
-- inter.coupling.scalar -Nspins x Nspins cell array of sca-
-- lar couplings, all in Hz.
+The output order follows the retained PDB atom order after exclusions and, for `'delete'`, after removal of unassigned atoms.
 
-## Implementation structure
+- `sys.isotopes`: row cell array of isotope labels, one per spin.
+- `sys.labels`: row cell array of labels in the form `RESNAME(residue_number):atom_id`.
+- `inter.coordinates`: Nspins x 3 numeric coordinates in Angstrom.
+- `inter.zeeman.scalar`: row cell array of isotropic chemical shifts in ppm.
+- `inter.coupling.scalar`: Nspins x Nspins cell array of scalar couplings in Hz.
 
-- Nucleic acid data import function. Parses PDB and chemical shift
-- data, runs a J-coupling guess using guess_j_nuc.m function and
-- outputs sys and inter data structures that are required by the
-- create.m gateway function in Spinach. Syntax:
-- [sys,inter]=nuclacid(pdb_file,shift_file,options)
-- pdb_file -a character string containing the name
-- of the PDB file
-- shift_file -a character string containing the name
-- of the chemical shift file, ASCII for-
-- matted as [residue_number atom_id shift],
-- see example.txt in examples/nmr_nucleic
-- options.deut_list -a cell array of strings, specifying which
+The returned cell orientations above follow the implementation's row-vector construction, including `inter.zeeman.scalar`; coordinates remain a numeric matrix.

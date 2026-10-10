@@ -2,35 +2,13 @@
 
 - Signature: `summary_pbc(spin_system,header)`
 
-## Purpose
+## Behaviour
 
-Prints periodic boundary condition vector summary for a Spinach system. Syntax: summary_pbc(spin_system,header)
+Prints each periodic-boundary vector from `spin_system.inter.pbc` as X, Y and Z columns. Each component is signed and formatted to three decimal places; the source assigns no coordinate units. The supplied `header` precedes the table.
 
-## Physical / mathematical content
+The function returns nothing; every line is routed through `report(spin_system,...)`. The local guard requires a structure `spin_system` and character-array `header`; it does not validate individual vector lengths.
 
-## Numerical / algorithmic content
+## References
 
-## Parameters / inputs
-
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-
-## Outputs
-
-- this function prints to the console or to the user-specified
-- output via report.m function
-
-## Implementation structure
-
-- Prints periodic boundary condition vector summary for a Spinach system. Syntax:
-- summary_pbc(spin_system,header)
-- spin_system -Spinach spin system description object
-- header -a string of text to precede the summary
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Print the vector table
-- Consistency enforcement
-- To anger a conservative, lie to him. To
-- anger a liberal, tell him the truth.
-- Theodore Roosevelt
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/summaries/summary_pbc.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=summary_pbc.m)

@@ -75,7 +75,7 @@ DELTA=tau_cc-parameters.delta;
 rho0=state(spin_system,'Lz','1H','cheap');
 
 % Detection state
-coil=state(spin_system,'L+','1H','cheap');
+coil=coil_state(spin_system,'L+','1H','cheap');
 
 % Pulse operators all protons
 Hp=operator(spin_system,'L+','1H'); Hx=(Hp+Hp')/2; 

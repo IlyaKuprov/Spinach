@@ -1,40 +1,33 @@
 # kernel/utilities/cheb_coeff.m
 
-- Signature: `c=cheb_coeff(f,a,b,n)`
-
 ## Purpose
 
-Discrete cosine transform algorithm for Chebyshev expansion coefficients of the user-specified scalar function. Syntax: c=cheb_coeff(f,a,b,n)
+Computes the Chebyshev expansion coefficients of a user-specified scalar function using a discrete cosine transform (DCT) algorithm.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/cheb_coeff.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `c=cheb_coeff(f,a,b,n)`.
+- Validates inputs via an internal `grumble` subfunction, which errors if `f` is not a function handle, if `a` and `b` are not real scalars with `a < b`, or if `n` is not a positive real integer.
+- Generates `n` Chebyshev–Gauss query points on `[-1,+1]` as `x=cos(((1:n)*2-1)*pi/(2*n))`.
+- Scales the query points to the interval `[a,b]` via `x=0.5*(a+x*(b-a)+b)`.
+- Evaluates the function at the scaled points and applies `dct`, dividing by `sqrt(n)`; coefficients `c(2:n)` are then multiplied by `sqrt(2)`.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- f -function handle, must be vectorised
-- a -left edge of the expansion interval
-- b -right edge of the expansion interval
-- n -number of Chebyshev polynomials in
-- the expansion
+Inputs:
 
-## Outputs
+- `f` — function handle, must be vectorised.
+- `a` — left edge of the expansion interval.
+- `b` — right edge of the expansion interval.
+- `n` — number of Chebyshev polynomials in the expansion.
 
-- c -a vector of expansion coefficients
+Output:
 
-## Implementation structure
+- `c` — a vector of expansion coefficients.
 
-- Discrete cosine transform algorithm for Chebyshev expansion
-- coefficients of the user-specified scalar function. Syntax:
-- c=cheb_coeff(f,a,b,n)
-- f -function handle, must be vectorised
-- a -left edge of the expansion interval
-- b -right edge of the expansion interval
-- n -number of Chebyshev polynomials in
-- the expansion
-- c -a vector of expansion coefficients
-- Check consistency
-- [-1,+1] query points
-- Scaled query points
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=cheb_coeff.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/cheb_coeff.m>

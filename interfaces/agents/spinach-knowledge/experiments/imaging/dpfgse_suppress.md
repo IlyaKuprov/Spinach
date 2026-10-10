@@ -1,50 +1,24 @@
 # experiments/imaging/dpfgse_suppress.m
 
 - Signature: `fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)`
+- Canonical MATLAB source: [`experiments/imaging/dpfgse_suppress.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/dpfgse_suppress.m)
 
-## Purpose
+## Contract and physical sequence
 
-DPFGSE signal suppression, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Syntax: fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)
+This is a simulated one-dimensional DPFGSE signal-suppression / pulse-acquire experiment, not an MRI image or a DNP calculation. The source cites Equation 3 of Stott et al. It forms `L=H+F+1i*R+1i*K`, uses `G{1}` for spatial encoding, and constructs proton `Lx` and `Ly` pulse operators across `prod(parameters.npts)` spatial points.
 
-## Physical / mathematical content
+The source sequence is: hard proton pi/2 about `Ly`; one `g_amp(1)` gradient; a soft shaped pi pulse at the listed frequencies shifted by `offset`; a hard pi rotation about `Ly` (the code passes angle `-pi`); gradients `g_amp(1)` then `g_amp(2)`; a second identical shaped soft pi pulse; another hard `-pi` about `Ly`; and a final `g_amp(2)` gradient. Every gradient lasts `g_dur`. It then observes the state through `parameters.coil`. This describes the suppression variant's implemented ordering; no measured suppression factor is claimed.
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
+## Parameters and units
 
-## Numerical / algorithmic content
+- `parameters.g_amp`: two gradient amplitudes in T/m; `parameters.g_dur` is a positive duration in seconds.
+- `parameters.rf_frq_list`, `parameters.rf_amp_list`, `parameters.rf_dur_list`, `parameters.rf_phi`, and `parameters.max_rank`: shaped-pulse inputs passed to `shaped_pulse_af`; the source checks matching frequency/amplitude/duration list lengths and positive pulse durations.
+- `parameters.rho0` and numeric `parameters.coil`: initial state and detected spin state.
+- `parameters.npts`: positive-integer spatial-grid vector. The source recommends at least 100 points in the spatial dimension and increasing until the answer stops changing; this is a resolution guideline, not a result from a run.
+- `parameters.offset` and `parameters.sweep` are in Hz; `parameters.npoints` is the FID point count. Acquisition passes `1/sweep` seconds and `npoints-1` evolution steps to `evolution` with the observable coil state.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## References
 
-## Parameters / inputs
-
-- parameters.g_amp -amplitudes of the two gradients, T/m
-- parameters.g_dur -gradient duration, seconds
-- parameters.rf_frq_list -soft pulse parameters that will
-- parameters.rf_amp_list be passed to shaped_pulse_af
-- parameters.rf_dur_list function
-- parameters.rf_phi
-- parameters.max_rank
-- parameters.sweep -detection sweep width, Hz
-- parameters.npoints -number of points in the fid
-- parameters.offset -transmitter and receiver offset, Hz
-
-## Outputs
-
-- fid -free induction decay of what is effectively a
-- 1D pulse-acquire NMR experiment
-- Notes: at least a hundred points are required in the spatial
-- dimension; increase until the answer stops changing.
-
-## Implementation structure
-
-- DPFGSE signal suppression, based on Equation 3 from the paper by
-- Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Syntax:
-- fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)
-- parameters.g_amp -amplitudes of the two gradients, T/m
-- parameters.g_dur -gradient duration, seconds
-- parameters.rf_frq_list -soft pulse parameters that will
-- parameters.rf_amp_list be passed to shaped_pulse_af
-- parameters.rf_dur_list function
-- parameters.rf_phi
-- parameters.max_rank
-- parameters.sweep -detection sweep width, Hz
-- parameters.npoints -number of points in the fid
+- Stott et al., DPFGSE method, cited by the source: <https://doi.org/10.1006/jmre.1997.1110>
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=dpfgse_suppress.m>
+- Source: [`experiments/imaging/dpfgse_suppress.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/imaging/dpfgse_suppress.m)

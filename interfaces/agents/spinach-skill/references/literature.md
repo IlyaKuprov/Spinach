@@ -1,5 +1,26 @@
 # Literature
 
+## Contents
+
+- [Citing the library](#citing-the-library)
+- [State space restriction and basis construction](#state-space-restriction-and-basis-construction)
+- [Large matrix representations](#large-matrix-representations)
+- [Fokker-Planck formalism and spatial dynamics](#fokker-planck-formalism-and-spatial-dynamics)
+- [Propagation](#propagation)
+- [Relaxation theory](#relaxation-theory)
+- [Optimal control](#optimal-control)
+- [Fitting and inverse problems](#fitting-and-inverse-problems)
+- [Applications: hyperpolarisation, PHIP and SABRE](#applications-hyperpolarisation-phip-and-sabre)
+- [Applications: dynamic nuclear polarisation](#applications-dynamic-nuclear-polarisation)
+- [Applications: solid-state NMR and magic angle spinning](#applications-solid-state-nmr-and-magic-angle-spinning)
+- [Applications: EPR, DEER and spin labels](#applications-epr-deer-and-spin-labels)
+- [Applications: paramagnetic NMR](#applications-paramagnetic-nmr)
+- [Applications: radical pairs and spin chemistry](#applications-radical-pairs-and-spin-chemistry)
+- [Applications: singlet order and long-lived states](#applications-singlet-order-and-long-lived-states)
+- [Applications: zero, ultralow and Earth field NMR](#applications-zero-ultralow-and-earth-field-nmr)
+- [Applications: imaging, flow and diffusion](#applications-imaging-flow-and-diffusion)
+- [Applications: pulse design and quantum simulation](#applications-pulse-design-and-quantum-simulation)
+
 Theory implemented in Spinach, and representative published work that used it.
 Format is `Authors, "Title", Journal Volume, Pages/Article (Year), DOI`; an
 absent field was not available from a checkable record and must not be filled
@@ -28,6 +49,9 @@ The reduced Liouville-space basis is what makes large spin systems tractable.
 ## Large matrix representations
 
 Tensor-structured and unopened-Kronecker forms for matrices too large to store.
+For `ttclass` compression, use `shrink`: its absolute Frobenius tolerance is
+independent of coefficient sign or phase, and zero coefficients are handled
+before the SVD truncation sweep.
 
 - D.V. Savostyanov, S.V. Dolgov, J.M. Werner, I. Kuprov, "Exact NMR simulation of protein-size spin systems using tensor train formalism", Physical Review B 90(8), 085139 (2014), DOI: 10.1103/PhysRevB.90.085139 - the `@ttclass` overload.
 - L.J. Edwards, D.V. Savostyanov, Z.T. Welderufael, D. Lee, I. Kuprov, "Quantum mechanical NMR simulation algorithm for protein-size spin systems", Journal of Magnetic Resonance 243, 107-113 (2014), DOI: 10.1016/j.jmr.2014.04.002 - restricted basis plus tensor trains at protein scale.

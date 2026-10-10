@@ -1,31 +1,22 @@
 # examples/extremes/perfluoropyrene.m
 
-- Signature: `perfluoropyrene()`
+- MATLAB implementation: [examples/extremes/perfluoropyrene.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/extremes/perfluoropyrene.m)
 
-## Purpose
+- Entry point: `perfluoropyrene()`.
+- Source: [`examples/extremes/perfluoropyrene.m`](../../../../../examples/extremes/perfluoropyrene.m); input log: [`examples/standard_systems/perfluoropyrene_cation.log`](../../../../../examples/standard_systems/perfluoropyrene_cation.log).
 
-X-band pulsed ESR spectrum of perfluoropyrene cation radical, computed using brute force operator algebra in the full 4,194,304 -dimensional Liouville space. This is deliberate -a much faster calculation is, of course, possible with a restricted basis set. This calculation requires at least 64GB of RAM and illustrates the per- formance of trajectory-level state space restriction in Spinach. Calculation time: minutes
+## Intent and spin-system construction
 
-## Physical / mathematical content
+The source describes this as an X-band pulsed ESR spectrum of the perfluoropyrene cation radical. It reads the molecular data from the linked log using `gparse` and `g2spinach`, with the supplied electron/`19F` isotope mapping; `options.no_xyz=1` tells the conversion to ignore coordinate information. The explicit input and conversion settings, rather than a hand-written isotope list, define the spin system. The magnetic-induction parameter is `0.33` (unit not written in the script).
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Relaxation is configured as `{'damp'}`, with diagonal relaxation operators, zero equilibrium state and `damp_rate=2e6`. The basis is `sphten-liouv` with `approximation='none'`. The source comment calls this brute-force operator algebra in the full 4,194,304-dimensional Liouville space and notes that a restricted basis would be faster; it also identifies trajectory-level state-space restriction as the performance technique of interest.
 
-## Numerical / algorithmic content
+## ESR acquisition and output
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The observed spin is `E` (electron), with `L+` initial state and receiver, no decoupled spins, and offset `0`. The sweep is `3e8`, with `2048` points and zero-fill to `4096`; the axis is `GHz-labframe`, the derivative parameter is `1`, and the axis is inverted. The script does not give units for offset, sweep or damping rate beyond the axis label.
 
-## Implementation structure
+It runs `liquid(spin_system,@acquire,parameters,'esr')`, applies no apodisation (`{'none'}`), Fourier-transforms the FID and plots the real spectrum. It defines no explicit pulse-duration or pulse-amplitude table; the sequence is the acquisition callback invoked by the ESR-mode engine.
 
-- X-band pulsed ESR spectrum of perfluoropyrene cation radical, computed
-- using brute force operator algebra in the full 4,194,304 -dimensional
-- Liouville space. This is deliberate -a much faster calculation is, of
-- course, possible with a restricted basis set.
-- This calculation requires at least 64GB of RAM and illustrates the per-
-- formance of trajectory-level state space restriction in Spinach.
-- Calculation time: minutes
-- Ignore coordinate information (HFCs provided)
-- Read the spin system properties (vacuum DFT calculation)
-- Magnet induction
-- Relaxation theory
-- Basis set
+## Practical limit
+
+The source comments state a minimum of 64 GB RAM and a calculation time of minutes.

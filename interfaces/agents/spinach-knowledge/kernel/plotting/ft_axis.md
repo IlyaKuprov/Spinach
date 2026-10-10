@@ -4,35 +4,21 @@
 
 ## Purpose
 
-Fourier transform axis ticks generator that accounts for the periodicity and correctly folds the edge frequency. Syntax: ax=ft_axis(offset,sweep,npoints)
+Returns a row vector of Fourier-frequency coordinates with spacing `sweep/npoints`. It is an axis-construction helper, not a Fourier transform.
 
-## Physical / mathematical content
+## Axis construction
 
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The code first forms `linspace(-sweep/2,sweep/2,npoints+1)`. For odd `npoints` it drops the first value, shifts the remaining values left by half a bin, and adds `offset`; for even `npoints` it drops the last value and adds `offset`. Thus odd point counts give bins symmetric about the offset; even counts include the lower edge `offset-sweep/2` and stop one bin below the upper periodic edge `offset+sweep/2`. The coordinate units are those supplied for `offset` and `sweep`.
 
-## Numerical / algorithmic content
+## Inputs and guards
 
-## Parameters / inputs
+- `offset` - real numeric scalar centre frequency.
+- `sweep` - positive real numeric scalar frequency span.
+- `npoints` - real numeric integer greater than 2.
 
-- offset -centre frequency
-- sweep -frequency range
-- npoints -number of points
+Invalid inputs raise an error. The output `ax` is a 1-by-`npoints` row vector.
 
-## Outputs
+## Links
 
-- ax -row vector of axis ticks
-
-## Implementation structure
-
-- Fourier transform axis ticks generator that accounts for the
-- periodicity and correctly folds the edge frequency. Syntax:
-- ax=ft_axis(offset,sweep,npoints)
-- offset -centre frequency
-- sweep -frequency range
-- npoints -number of points
-- ax -row vector of axis ticks
-- Check consistency
-- Axis with an extra point
-- Odd and even point counts
-- If odd, drop and shift
-- If even, just drop
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/ft_axis.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ft_axis.m)

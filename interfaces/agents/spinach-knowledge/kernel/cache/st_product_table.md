@@ -1,45 +1,22 @@
 # kernel/cache/st_product_table.m
 
-- Signature: `[pt_left,pt_right]=st_product_table(nlevels)`
+- Signature: `[pt_left,pt_right] = st_product_table(nlevels)`
+- Implementation: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cache/st_product_table.m>
 
-## Purpose
+## Contract
 
-Structure coefficient tables for single transition operators. Syntax: [pt_left,pt_right]=st_product_table(nlevels)
+For `nlevels` energy levels, the function returns the coefficients of products of the single-transition operator basis `B = sin_tran(nlevels)`. With every index in `1:nlevels^2`, the coefficients are defined by the source conventions `S{n}*S{m} = ... + pt_left(n,m,k)*S{k} + ...` and `S{m}*S{n} = ... + pt_right(n,m,k)*S{k} + ...`. Thus each output is an `nlevels^2-by-nlevels^2-by-nlevels^2` array; the first two indices name the multiplied operators and the third names the projected basis operator.
 
-## Physical / mathematical content
+The implementation evaluates the two ordered products separately: `hdot(B{k}, B{n}*B{m})` for the left table and `hdot(B{k}, B{m}*B{n})` for the right table. The source identifies this convention with Eq. 7.18 of the first edition of IK's book and notes that its normalisation is missing there; it also points to `kq2lin` and `lin2kq` for translating between single and double indices.
 
-- Cache-management utilities. These files maintain Spinach temporary or persistent cache state used to avoid repeated expensive construction of large operators or metadata.
+## Input
 
-## Numerical / algorithmic content
+- `nlevels` must be a numeric, real, positive integer scalar.
 
-## Parameters / inputs
+## Cache behaviour
 
-- nlevels -the number of energy levels in the system
+The function first looks beside its implementation for `st_product_table_<nlevels>.mat`. If present, it loads `pt_left` and `pt_right`; otherwise it constructs the tables and attempts to save those variables there. A save failure is caught: the computed outputs are still returned, with a warning that the installation may be write-protected. This function's disk-cache filename is keyed by `nlevels`.
 
-## Outputs
+## Reference
 
-- pt_left, pt_right -structure coefficients in
-- the following conventions:
-- S{n}*S{m}=...+pt_left(n,m,k)*S{k}+...
-- S{m}*S{n}=...+pt_right(n,m,k)*S{k}+...
-- corresponding to the expansion of the left and the right multiplica-
-- tive action by S{n} on S{m} as given in Eq 7.18 of the first edition
-- of IK's book (normalisation is missing in the book, that's a typo).
-- Numbering translation between single and double index is given by
-- kq2lin and lin2kq functions.
-- Note: these are expensive tables, disk cache is used automatically.
-
-## Implementation structure
-
-- Structure coefficient tables for single transition operators. Syntax:
-- [pt_left,pt_right]=st_product_table(nlevels)
-- nlevels -the number of energy levels in the system
-- pt_left, pt_right -structure coefficients in
-- the following conventions:
-- S{n}*S{m}=...+pt_left(n,m,k)*S{k}+...
-- S{m}*S{n}=...+pt_right(n,m,k)*S{k}+...
-- corresponding to the expansion of the left and the right multiplica-
-- tive action by S{n} on S{m} as given in Eq 7.18 of the first edition
-- of IK's book (normalisation is missing in the book, that's a typo).
-- Numbering translation between single and double index is given by
-- kq2lin and lin2kq functions.
+- [Spinach Wiki: `st_product_table.m`](https://spindynamics.org/wiki/index.php?title=st_product_table.m)

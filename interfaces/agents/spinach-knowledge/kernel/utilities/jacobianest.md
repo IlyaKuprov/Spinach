@@ -1,48 +1,31 @@
 # kernel/utilities/jacobianest.m
 
+- MATLAB implementation: [kernel/utilities/jacobianest.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/jacobianest.m)
+
 - Signature: `[jac,err] = jacobianest(fun,x0)`
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=jacobianest.m>
 
 ## Purpose
 
-Estimate of the Jacobian matrix of a vector valued function of n variables. Syntax: [jac,err] = jacobianest(fun,x0)
+Estimate the Jacobian of a vector-valued function at a numeric vector or array `x0`, and return an entry-wise estimated error alongside each partial derivative. This is a general numerical-differentiation utility, not a spin-system model.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- `fun` is a function handle that accepts `x0` and returns a vector-valued result. The implementation checks that it is a function handle.
+- `x0` is numeric and may be a vector or array. Its elements are treated as independent scalar coordinates, addressed by linear index; the function receives the original array shape.
+- `jac` has one row per element of `fun(x0)` and one column per element of `x0` (the function output is vectorised internally).
+- `err` has the same shape as `jac` and contains the estimated error associated with each selected derivative.
 
-## Numerical / algorithmic content
+## Numerical method
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+The function evaluates `fun(x0)` once to establish the number of output components. For each input coordinate it forms a geometrically spaced set of 26 perturbations. For a nonzero coordinate, the signed perturbations are `x0(i)*100*(2.0000001).^(0:-1:-25)`; for a zero coordinate, the same relative scale is used without multiplying by zero. Each perturbation gives a centred finite-difference derivative, `(f(x0+h)-f(x0-h))/(2*h)`.
 
-## Parameters / inputs
+For each output component, `rombextrap` combines successive finite-difference values using the error powers `[2 4]`, cancelling the leading second- and fourth-order error terms, extrapolates towards zero step, and estimates uncertainty from the residual of that extrapolation. The selection step is important: it sorts the *extrapolated derivative values* in ascending numerical order, removes the three smallest and three largest values, and keeps the uncertainty estimates associated with the remaining candidates. It then selects the retained derivative whose estimated error is smallest. It does **not** trim the endpoints of the step-size sequence: the trim acts only after extrapolated derivative candidates and their uncertainties have been formed.
 
-- fun -(vector valued) analytical function to differentiate.
-- fun must be a function of the vector or array x0.
-- x0 -vector location at which to differentiate fun
-- If x0 is an nxm array, then fun is assumed to be
-- a function of n*m variables.
+## Shape and edge cases
 
-## Outputs
+An input array with `p=numel(x0)` coordinates produces an `n-by-p` Jacobian when `fun(x0)` contains `n` values. If the function result is empty, the routine returns empty `0-by-p` arrays for both outputs. The reported errors are estimates produced by the extrapolation procedure, not an assertion of a rigorous bound.
 
-- jac -array of first partial derivatives of fun.
-- Assuming that x0 is a vector of length p
-- and fun returns a vector of length n, then
-- jac will be an array of size (n,p)
-- err -vector of error estimates corresponding to
-- each partial derivative in jac.
-- John D'Errico
+## Finite differences and error pairing
 
-## Implementation structure
-
-- Estimate of the Jacobian matrix of a vector valued
-- function of n variables. Syntax:
-- [jac,err] = jacobianest(fun,x0)
-- fun -(vector valued) analytical function to differentiate.
-- fun must be a function of the vector or array x0.
-- x0 -vector location at which to differentiate fun
-- If x0 is an nxm array, then fun is assumed to be
-- a function of n*m variables.
-- jac -array of first partial derivatives of fun.
-- Assuming that x0 is a vector of length p
-- and fun returns a vector of length n, then
-- jac will be an array of size (n,p)
+The code perturbs one input coordinate at a time, evaluates both sides of each centred difference, and then processes each output component independently. `sort` returns indices that are also used to reorder the corresponding error estimates, preserving the derivative/error pairing after the extreme derivative values are discarded.

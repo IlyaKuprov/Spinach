@@ -17,9 +17,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -29,7 +29,7 @@ inter.tau_c={10e-9};            % large protein
 inter.temperature=298;
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 sys.tols.prox_cutoff=5.0;
 sys.tols.inter_cutoff=2.0;
 

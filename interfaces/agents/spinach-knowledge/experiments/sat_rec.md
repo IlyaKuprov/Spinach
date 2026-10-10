@@ -1,47 +1,28 @@
 # experiments/sat_rec.m
 
-- Signature: `fids=sat_rec(spin_system,parameters,H,R,K)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/sat_rec.m
+Spinach Wiki: https://spindynamics.org/wiki/index.php?title=sat_rec.m
 
-## Purpose
+## Purpose and initial condition
 
-Saturation-recovery pulse sequence with analytical saturation (just the unit state as the initial condition). Syntax: fids=sat_rec(spin_system,parameters,H,R,K)
+`sat_rec` computes a saturation-recovery sequence with analytical saturation: it sets the initial state to `unit_state(spin_system)` rather than applying an explicit saturation pulse. The source notes that the relaxation superoperator must be thermalised. It does not accept a user-supplied starting state.
 
-## Physical / mathematical content
+## Propagation and acquisition
 
-## Numerical / algorithmic content
+The routine forms `L=H+1i*R+1i*K`. It generates a relaxation trajectory from the unit state using a step of `max_delay/n_delays` for `n_delays` trajectory steps. At every trajectory state it applies a `pi/2` pulse about the Y component of `L+` for the selected isotope, `parameters.spins{1}`. It then acquires using the corresponding `L+` detection state and the same propagation generator, with dwell `1/sweep` and `npoints-1` evolution steps.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The `sweep` parameter is documented in Hz, so the FID dwell is `1/sweep`. `max_delay` is documented as the longest relaxation delay; the source does not state a unit in its parameter description. The relaxation trajectory includes its initial zero-delay state, so observable evolution returns `fids` with `npoints` time-sample rows and `n_delays+1` columns, one FID per delay including zero.
 
-## Parameters / inputs
+## Required parameters and outputs
 
-- parameters.sweep spectrum sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.max_delay longest relaxation delay
-- parameters.n_delays number of relaxation delays to run
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `sweep`: positive real scalar, Hz; `npoints`: positive integer.
+- `spins`: one-element cell array containing an isotope present in the system, e.g. `{'1H'}` (or `{'13C'}`).
+- `max_delay`: positive real scalar, the longest recovery delay; `n_delays`: positive integer.
+- `H`, `R` and `K`: numeric matrices with matching dimensions. The source requires the relaxation superoperator to be thermalised and rejects a system whose `spin_system.rlx.equilibrium` is `'zero'`.
+- `fids`: `npoints × (n_delays+1)` matrix, each column a FID for one relaxation delay including zero.
 
-## Outputs
+This describes the implemented sequence, not simulated or measured recovery curves.
 
-- fids -free induction decays for each delay starting from zero,
-- a matrix with individual FIDs in columns
-- Note: the relaxation superoperator must be thermalised.
-- Zak El-Machachi
+## Source reference
 
-## Implementation structure
-
-- Saturation-recovery pulse sequence with analytical saturation (just
-- the unit state as the initial condition). Syntax:
-- fids=sat_rec(spin_system,parameters,H,R,K)
-- parameters.sweep spectrum sweep width, Hz
-- parameters.npoints number of points in the FID
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.max_delay longest relaxation delay
-- parameters.n_delays number of relaxation delays to run
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=sat_rec.m)

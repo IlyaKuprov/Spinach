@@ -14,7 +14,7 @@ inter.zeeman.euler={[0 0 0],[0 0 0]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -34,7 +34,7 @@ spin_system=basis(spin_system,bas);
 parameters.grid='rep_2ang_200pts_sph';
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.pulse_op=operator(spin_system,'Lx','1H');
 parameters.nloops=10;
 parameters.timestep=1e-5;

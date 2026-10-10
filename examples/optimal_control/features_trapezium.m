@@ -32,18 +32,18 @@ inter.coupling.scalar{2,3}=-160;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Set up and normalise the initial state
-rho_init=state(spin_system,{'Lz'},{1});
+rho_init=coil_state(spin_system,{'Lz'},{1},'exact');
 rho_init=rho_init/norm(full(rho_init),2);
 
 % Set up and normalise the target state
-rho_targ=state(spin_system,{'Lz'},{3});
+rho_targ=coil_state(spin_system,{'Lz'},{3},'exact');
 rho_targ=rho_targ/norm(full(rho_targ),2);
 
 % Control operators

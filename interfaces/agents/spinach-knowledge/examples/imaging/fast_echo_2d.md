@@ -1,30 +1,23 @@
 # examples/imaging/fast_echo_2d.m
 
-- Signature: `fast_echo_2d()`
-
 ## Purpose
 
-Fast (in the experiment duration sense) spin echo 2D brain imaging example. Simulation time: hours, faster with a Tesla V100 GPU.
+Runs the 2D fast spin-echo brain-imaging example using a single slice of the `brain-medres` phantom. “Fast” describes the experiment-duration intent in the source comment; the same header estimates simulation time in hours.
 
-## Physical / mathematical content
+## Spin and image model
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
+The model is one `1H` spin at 5.9 T with zero chemical shift. It uses `t1_t2` relaxation, diagonal retention, zero equilibrium, and rate settings of 1 for both `R1` and `R2`; the basis is `sphten-liouv` with no approximation. The code selects slice 50 from the `R1`, `R2`, and proton-density maps, uses the first two geometry and point-count entries, and sets image size to `[101 105]`.
 
-## Numerical / algorithmic content
+The proton-density map weights the initial `Lz` state, and a uniform receive-coil phantom detects `L+`. The relaxation maps are paired with the `rlx_t1_t2` operators. The source does not configure flow or diffusion parameters in this example.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Gradient and acquisition settings
 
-## Implementation structure
+Readout and phase-encode amplitudes are `5.3e-3` and `4.8e-3` T/m, explicitly labelled in the source. Their duration fields are `2e-3` and `1e-3`, respectively; the source does not annotate duration units. The offset is zero, decoupling is empty, and spatial differentiation uses `{'period',3}`.
 
-- Fast (in the experiment duration sense) spin echo 2D brain
-- imaging example.
-- Simulation time: hours, faster with a Tesla V100 GPU.
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Relaxation model
-- Disable path tracing
-- This needs a GPU
-- sys.enable={'gpu'};
-- Basis set
-- Spinach housekeeping
+## Output and caveats
+
+The example calls `imaging` with `fse`, then plots the recorded image beside the selected `R1` and `R2` phantom maps. The source estimates hours of runtime and says a Tesla V100 is faster; its GPU-enable line is commented out, so this file does not enable GPU execution. The timing is an estimate in the source, not a benchmark.
+
+## Source
+
+[MATLAB example](https://github.com/IlyaKuprov/Spinach/blob/main/examples/imaging/fast_echo_2d.m)

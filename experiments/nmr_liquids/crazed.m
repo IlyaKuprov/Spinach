@@ -51,7 +51,7 @@ L=H+1i*R+1i*K;
 timestep=1/parameters.sweep;
 
 % Detection state
-coil=state(spin_system,'L+',parameters.spins{1});
+coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
 
 % Get the pulse operator
 Ly=operator(spin_system,'Ly',parameters.spins{1});

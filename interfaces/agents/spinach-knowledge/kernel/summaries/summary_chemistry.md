@@ -1,35 +1,3 @@
 # kernel/summaries/summary_chemistry.m
 
-- Signature: `summary_chemistry(spin_system)`
-
-## Purpose
-
-Prints chemical subsystem and exchange summary for a Spinach system. Syntax: summary_chemistry(spin_system)
-
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- spin_system -Spinach spin system description object
-
-## Outputs
-
-- this function prints to the console or to the user-specified
-- output via report.m function
-
-## Implementation structure
-
-- Prints chemical subsystem and exchange summary for a Spinach system. Syntax:
-- summary_chemistry(spin_system)
-- spin_system -Spinach spin system description object
-- this function prints to the console or to the user-specified
-- output via report.m function
-- Check consistency
-- Report multiple chemical subsystems
-- Report spin system partitioning
-- Report first-order reaction rates
-- Report flux rates if specified
-- Consistency enforcement
-- Always code as if the guy who ends up maintaining
+`summary_chemistry(spin_system)` reports each substance's global spin membership and initial concentration, including spin-free substances. Every explicit reaction is printed with reactant and product substance indices, scalar rate or time-handle expression, closure, matching pairs, and optional selector name (or user product-superoperator pair). Column-oriented spin memberships are formatted as rows without mutating their stored shape. Output is routed through `report`; the system is not modified. Empty products denote loss without a tracked product.

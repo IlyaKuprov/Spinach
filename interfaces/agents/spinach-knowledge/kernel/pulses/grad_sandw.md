@@ -1,55 +1,29 @@
 # kernel/pulses/grad_sandw.m
 
-- Signature: `rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)`
+[Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/grad_sandw.m) · [Spin Dynamics Wiki: grad_sandw.m](https://spindynamics.org/wiki/index.php?title=grad_sandw.m)
 
-## Purpose
+Signature: `rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)`
 
-Emulates the effect of a gradient sandwich on the sample average density matrix using Edwards formalism. It is assumed that the effect of diffusi- on is negligible, that the gradients are linear, and that they are anti- symmetric about the middle of the sample. Syntax: rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)
+## Purpose and assumptions
 
-## Physical / mathematical content
+Computes the sample-averaged effect of a two-gradient sandwich using Edwards' formalism. It assumes negligible diffusion, linear gradients, and gradients antisymmetric about the sample midpoint. Because the spatial coordinate is integrated out, the returned state is not a spatially resolved state for a later gradient to refocus; this routine is for standalone gradient pairs. Use the imaging context for more sophisticated gradient evolution.
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
+## Inputs and units
 
-## Numerical / algorithmic content
+- `spin_system`, `L`, and `rho`: a Liouville-space spin system, its Liouvillian, and the state vector. The source accepts the `sphten-liouv` and `zeeman-liouv` formalisms.
+- `P`: the source describes this as the total propagator for all events between the two gradients.
+- `g_amps`: two real gradient amplitudes in gauss/cm; the source header calls these a row vector, while validation checks for two elements.
+- `s_len`: positive sample length in cm.
+- `g_durs`: two real, non-negative gradient durations in seconds.
+- `s_facs`: two real, non-negative shape factors. Keep the documented `[1 1]` for square gradient pulses.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## What the implementation does
 
-## Parameters / inputs
+The effective gradient operators use `1e-4 * shape_factor * gradient_amplitude * sample_length * duration * (carrier / magnet)`; the source warns that shifts are ignored. Before propagating, it checks that `L*G_i - G_i*L` has `cheap_norm` no greater than `1e-6` for each effective gradient operator; otherwise it errors. The state is evolved under `L` for each gradient duration, while a block evolution combines the gradient operators with `P` and maps the result back to the state-vector space. The half-gradient evolution factors account for the normalised sample integral.
 
-- rho -spin system state vector
-- L -system Liouvillian
-- P -total propagator for all events happening
-- between the two gradients
-- g_amps -row vector containing the amplitudes of
-- the two gradients, Gauss/cm
-- s_len -sample length, cm
-- g_durs -row vector containing the durations of
-- the two gradients, seconds
-- s_facs -shape factors of the two gradients, use
-- [1 1] for square gradient pulses
+The routine calls `report` with a progress message. It contains no explicit plotting or file-writing operation.
 
-## Outputs
+## References
 
-- rho -spin system state vector, integrated over
-- the spatial coordinate
-- Note: the function integrates over sample coordinates -subsequent gra-
-- dient pulses would not refocus the magnetization that it has left
-- defocused. More information on the subject is available in Luke's
-- paper (http://dx.doi.org/10.1016/j.jmr.2014.01.011).
-- Note: this function is OK for standalone gradient pairs; for more
-- sophisticated gradient work, use the imaging context.
-
-## Implementation structure
-
-- Emulates the effect of a gradient sandwich on the sample average density
-- matrix using Edwards formalism. It is assumed that the effect of diffusi-
-- on is negligible, that the gradients are linear, and that they are anti-
-- symmetric about the middle of the sample. Syntax:
-- rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)
-- rho -spin system state vector
-- L -system Liouvillian
-- P -total propagator for all events happening
-- between the two gradients
-- g_amps -row vector containing the amplitudes of
-- the two gradients, Gauss/cm
-- s_len -sample length, cm
+- [Luke et al., Journal of Magnetic Resonance (2014)](http://dx.doi.org/10.1016/j.jmr.2014.01.011)
+- [Spin Dynamics Wiki: `grad_sandw.m`](https://spindynamics.org/wiki/index.php?title=grad_sandw.m)

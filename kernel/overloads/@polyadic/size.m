@@ -21,6 +21,12 @@ function varargout=size(p,dim)
 % Check consistency
 if nargin==2, grumble(dim); end
 
+% Combine stored implicit dimensions with matrix dimensions
+core_dims=p.core_dims{1};
+for k=1:numel(core_dims)
+    if isempty(core_dims{k}), core_dims{k}=size(p.cores{1}{k}); end
+end
+
 % Get row dimension
 if ~isempty(p.prefix)
     
@@ -30,7 +36,7 @@ if ~isempty(p.prefix)
 else
     
     % The cores of the polyadic
-    nrows=prod(cellfun(@(x)size(x,1),p.cores{1}));
+    nrows=prod(cellfun(@(dims)dims(1),core_dims));
     
 end
 
@@ -43,7 +49,7 @@ if ~isempty(p.suffix)
 else
     
     % The cores of the polyadic
-    ncols=prod(cellfun(@(x)size(x,2),p.cores{1}));
+    ncols=prod(cellfun(@(dims)dims(2),core_dims));
     
 end
 
@@ -78,4 +84,5 @@ end
 % will lead to the perversion of truth, justice, and beauty.
 %
 % Hans-Hermann Hoppe
+
 

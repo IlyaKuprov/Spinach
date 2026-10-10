@@ -1,40 +1,33 @@
 # kernel/utilities/snormpdf.m
 
-- Signature: `p=snormpdf(x,mu,sigma,alpha)`
-
 ## Purpose
 
-Azzalini's skew normal distribution. Syntax: p=snormpdf(x,mu,sigma,alpha)
+Evaluates the probability density of Azzalini's skew normal distribution, given a location, a scale, and a skew factor.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `p=snormpdf(x,mu,sigma,alpha)`.
+- The function first calls an internal consistency checker (`grumble`) on all four inputs.
+- The density is computed as `p=2*normpdf(x,mu,sigma).*normcdf(alpha*x,alpha*mu,sigma)`, which the source identifies as Equation 2 in the JSTOR reference.
+- `p` has the same shape as `x`.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+Inputs:
 
-- x -an array of real numbers
-- mu -expectation value of the normal distribution
-- sigma -standard deviation of the normal distribution
-- alpha -skew factor, a real number
+- `x` — an array of real numbers; must be a real numeric array.
+- `mu` — expectation value of the normal distribution; must be a real scalar.
+- `sigma` — standard deviation of the normal distribution; must be a real positive scalar.
+- `alpha` — skew factor, a real number; must be a real scalar.
 
-## Outputs
+Output:
 
-- p -an array of probability densities,
-- same shape as x
+- `p` — an array of probability densities, same shape as `x`.
 
-## Implementation structure
+Errors are raised with the messages `x must be a real numeric array.`, `mu must be a real scalar.`, `sigma must be a real positive scalar.`, and `alpha must be a real scalar.` when the corresponding checks fail.
 
-- Azzalini's skew normal distribution. Syntax:
-- p=snormpdf(x,mu,sigma,alpha)
-- x -an array of real numbers
-- mu -expectation value of the normal distribution
-- sigma -standard deviation of the normal distribution
-- alpha -skew factor, a real number
-- p -an array of probability densities,
-- same shape as x
-- Check consistency
-- Equation 2 in http://www.jstor.org/stable/4615982
-- Consistency enforcement
-- The smallest minority on earth is the individual. Those who deny
+## References
+
+- Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/snormpdf.m>
+- Wiki: <https://spindynamics.org/wiki/index.php?title=snormpdf.m>
+- Azzalini skew normal density, Equation 2: <http://www.jstor.org/stable/4615982>

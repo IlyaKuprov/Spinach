@@ -8,7 +8,7 @@
 %
 %    R    - relaxation superoperator, from relaxation()
 %
-%    rho  - the state to be pumped, from state()
+%    rho  - unweighted polarisation shape to pump, from coil_state()
 %
 %    rate - pumping rate, Hz
 %
@@ -16,9 +16,10 @@
 %
 %    R    - modified relaxation superoperator
 %
-% Note: for the pumping to work correctly, the unit state population 
-%       (first element) in the state vector that R will be acting on 
-%        must be set to 1.
+% Note: each substance is pumped through its own unit coordinate at
+%       bas.offsets(n)+1. That population in the state vector on which
+%       R acts supplies the instantaneous concentration, so pumping
+%       scales with population without division by concentrations.
 %
 % Note: this function is only available in sphten-liouv formalism, and
 %       may be called repeatedly if multiple states are pumped.
@@ -29,11 +30,15 @@
 
 function R=magpump(spin_system,R,rho,rate)
 
-% Check consisttency
+% Check consistency
 grumble(spin_system,R,rho,rate);
 
-% Add pumping as a coupling to unit state
-R(:,1)=R(:,1)+rate*rho;
+% Couple each local target to the unit coordinate of its own substance
+for n=1:spin_system.bas.nsubst
+    rows=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+    unit=spin_system.bas.offsets(n)+1;
+    R(rows,unit)=R(rows,unit)+rate*rho(rows);
+end
 
 end
 
@@ -51,7 +56,9 @@ end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available in sphten-liouv formalism.');
 end
-if rho(1)~=0, error('unit state cannot be pumped.'); end
+if any(rho(spin_system.bas.offsets(1:end-1)+1)~=0)
+    error('unit state cannot be pumped.');
+end
 end
 
 % I know of scarcely anything so apt to impress the imagination as the

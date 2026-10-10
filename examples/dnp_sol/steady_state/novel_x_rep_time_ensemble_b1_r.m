@@ -25,7 +25,7 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
@@ -66,7 +66,7 @@ for n=1:numel(r)
     spin_system=basis(spin_system,bas);
     
     % Detect the proton
-    parameters.coil=state(spin_system,'Lz','1H');
+    parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 
     % Experiment parameters
     parameters.spins={'E','1H'};

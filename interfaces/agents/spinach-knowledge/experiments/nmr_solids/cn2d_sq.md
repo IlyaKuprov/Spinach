@@ -1,58 +1,31 @@
 # experiments/nmr_solids/cn2d_sq.m
 
-- Signature: `fid=cn2d_sq(spin_system,parameters,H,R,K)`
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_solids/cn2d_sq.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=cn2d_sq.m)
 
-## Purpose
+## Experiment and coherence pathway
 
-Single-quantum version of the 13C-detected 14N-13C MAS 2D correlation experiment described by Jarvis, Haies, Williamson and Carravetta in
+This function implements the single-quantum version of the 13C-detected 14N-13C MAS two-dimensional correlation experiment described by Jarvis, Haies, Williamson, and Carravetta ([DOI: 10.1039/c3cp50787d](https://doi.org/10.1039/c3cp50787d)). It takes `parameters.rho0` as the initial state and `parameters.coil` as the detection state.
 
-## Physical / mathematical content
+`parameters.spins` is a two-entry cell array with 14N first and 13C second. The code obtains `L+` operators for these nuclei, forms their x/y components, and embeds the operators in the Fokker-Planck spatial dimension with `kron(speye(parameters.spc_dim),...)`. It evolves the initial state under 14N RF at `rf_pwr` for `rf_dur`: the cosine component uses the 14N x operator and the sine component uses the y operator. It then selects 13C single-quantum coherence (`-1` or `+1`) and 14N single-quantum coherence (`-1` or `+1`). The indirect dimension is propagated as a trajectory, followed by a 13C x-pi pulse; the second dimension is observed against the supplied coil. The output separates the sine and cosine States-quadrature components.
 
-- Solid-state pulse sequence implementations. The core ingredients are anisotropic Hamiltonians, rotor synchronisation, cross-polarisation, recoupling/decoupling, and powder or rotor-stack propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The source labels this a MAS experiment, while its explicit spatial field is `spc_dim`; it does not accept a rotor rate or field orientation as a sequence parameter. The supplied `H`, `R`, `K`, and `spin_system` carry the modeled dynamics. The function body defines finite-duration 14N RF evolution, coherence selection, 13C refocusing, and detection.
 
-## Numerical / algorithmic content
+## Inputs and units
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Call signature: `fid=cn2d_sq(spin_system,parameters,H,R,K)`.
 
-## Syntax
+- `parameters.spins`: `{'14N','13C'}` order, with exactly two entries.
+- `parameters.spc_dim`: Fokker-Planck spatial dimension used to lift spin operators.
+- `parameters.sweep`: two sweep widths in Hz.
+- `parameters.npoints`: numbers of points in the two dimensions.
+- `parameters.rho0`: initial state.
+- `parameters.coil`: detection state.
+- `parameters.rf_pwr`: 14N RF power in Hz.
+- `parameters.rf_dur`: 14N RF pulse duration in seconds.
+- `H`, `R`, `K`: Hamiltonian, relaxation, and kinetics matrices supplied by the context function.
 
-```matlab
-fid=cn2d_sq(spin_system,parameters,H,R,K)
-```
+The consistency checks require `sphten-liouv` formalism and matrix-valued `H`, `R`, and `K` of the same dimension. Sweep and point-count vectors have two entries, with the spin list in the documented 14N-then-13C order; RF power and pulse duration are positive real scalars.
 
-## Parameters / inputs
+## Output
 
-- parameters.spins -isotopes to which the sequence is
-- applied, specified as a cell array
-- with 14N first, and 13C second
-- parameters.spc_dim -Fokker-Planck spatial dimension
-- parameters.sweep -sweep widths in the two dimensions, Hz
-- parameters.npoints -numbers of points in the two dimensions
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.rf_pwr -RF power on 14N, Hz
-- parameters.rf_dur -RF pulse duration on 14N, seconds
-
-## Outputs
-
-- fid.sin
-- fid.cos -sine and cosine components
-- of the States quadrature
-
-## Implementation structure
-
-- Single-quantum version of the 13C-detected 14N-13C MAS 2D correlation
-- experiment described by Jarvis, Haies, Williamson and Carravetta in
-- fid=cn2d_sq(spin_system,parameters,H,R,K)
-- parameters.spins -isotopes to which the sequence is
-- applied, specified as a cell array
-- with 14N first, and 13C second
-- parameters.spc_dim -Fokker-Planck spatial dimension
-- parameters.sweep -sweep widths in the two dimensions, Hz
-- parameters.npoints -numbers of points in the two dimensions
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.rf_pwr -RF power on 14N, Hz
+`fid.sin` and `fid.cos` are the two States-quadrature components. Each is generated over the two configured dimensions: the first sweep/point-count entry is the indirect coherence evolution and the second is 13C detection. The source propagates `npoints(i)-1` steps after the starting state in each dimension.

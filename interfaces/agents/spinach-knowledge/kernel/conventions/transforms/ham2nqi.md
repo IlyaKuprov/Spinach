@@ -1,47 +1,30 @@
 # kernel/conventions/transforms/ham2nqi.m
 
-- Signature: `[omega,Q]=ham2nqi(H)`
-
 ## Purpose
 
-Converts a single-spin Hamiltonian back into the Zeeman and quadrupolar interaction parameters that had been used to generate it. Syntax: [omega,Q]=ham2nqi(H)
+Decomposes a single-spin Hamiltonian in the Zeeman basis into its Zeeman vector and quadrupolar coupling tensor.
 
-## Physical / mathematical content
+## Signature
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+`[omega,Q]=ham2nqi(H)`
 
-## Numerical / algorithmic content
+## Decomposition convention
 
-## Parameters / inputs
+The returned quantities reconstruct the Hamiltonian as:
 
-- H -single-spin Hamiltonian written in
-- the Zeeman basis for a spin of any
-- multiplicity
+`H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz + [Sx Sy Sz]*Q*[Sx Sy Sz].'`
 
-## Outputs
+Here `Sx`, `Sy`, and `Sz` are the Cartesian operators from `pauli(mult)`; the tensor components are expressed in that same Cartesian operator basis. The function does not rotate the basis. Both `omega` and `Q` are in rad/s.
 
-- omega -Larmor frequencies, rad/s
-- Q -symmetric traceless quadrupolar
-- coupling tensor, rad/s
-- The outputs are returned such that:
-- H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz +
-- + [Sx Sy Sz]*Q*[Sx Sy Sz].';
-- An error is produced if the Hamilonian contains
-- any terms (for example, cubic) beyond those, or
-- if it is not Hermitian and traceless.
+The code extracts each Zeeman component as `trace(Si'*H)/norm(Si,'fro')^2` for `Si = S.x, S.y, S.z`, then takes the real part. For multiplicity greater than two it obtains the rank-2 coefficients from `T{5}` through `T{9}` and converts them with `sphten2mat([],[],rank2)`; for a 2x2 spin-1/2 Hamiltonian it returns `Q=zeros(3,3)`.
 
-## Implementation structure
+## Input and outputs
 
-- Converts a single-spin Hamiltonian back into the
-- Zeeman and quadrupolar interaction parameters that
-- had been used to generate it. Syntax:
-- [omega,Q]=ham2nqi(H)
-- H -single-spin Hamiltonian written in
-- the Zeeman basis for a spin of any
-- multiplicity
-- omega -Larmor frequencies, rad/s
-- Q -symmetric traceless quadrupolar
-- coupling tensor, rad/s
-- The outputs are returned such that:
-- H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz +
+- `H`: numeric square matrix in the Zeeman basis. It must be Hermitian, have `abs(trace(H)) <= eps()*norm(H,2)`, and contain at least four elements (at least 2x2). The implementation also reconstructs the Hamiltonian and errors if `norm(H-HR,2) > 1e-6*norm(H,2)`, identifying terms beyond the supported linear and quadratic form.
+- `omega`: 1x3 real vector of Larmor-frequency components in rad/s.
+- `Q`: 3x3 real symmetric traceless quadrupolar coupling tensor in rad/s.
+
+## References
+
+- MATLAB source: [kernel/conventions/transforms/ham2nqi.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/ham2nqi.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ham2nqi.m)

@@ -1,31 +1,11 @@
 # examples/nmr_liquids/pansy_triple_ch.m
 
-- Signature: `pansy_triple_ch()`
+[Spinach source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/pansy_triple_ch.m)
 
-## Purpose
+This wrapper models a three-channel PANSY experiment on glycine: proton-proton, proton-carbon-13, and proton-nitrogen-15 2D blocks. Its header describes glycine coordinates, shieldings, and J couplings as DFT-computed and says the molecule has natural-abundance carbon-13. The wrapper reads `../standard_systems/glycine.log` through `gparse` and `g2spinach`; it does not load an experimental NMR spectrum. It builds isotopomers by diluting for `13C` and then `15N`, simulates each, and adds their signals. Thus the plotted result is a Spinach simulation based on the DFT log and isotope enumeration, not an observed measurement. The header's “Calculation time: seconds” is a source comment, not a runtime measured in this task.
 
-Triple-channel PANSY experiment on glycine with natural content of 13C isotope. Coordinates, shieldings, and J- couplings computed with DFT. Calculation time: seconds
+The mapped spins are `H`/`1H`, `C`/`13C`, and `N`/`15N`; the mapping call also receives the vector `[31.5 189.2 400.3]` without naming its units in this wrapper. The conversion options are `min_j=3.0` and `no_xyz=1`, and `sys.magnet=5.9` (magnetic field, 5.9 T by Spinach convention). The basis uses `sphten-liouv`, `IK-2`, scalar-coupling connectivity, and proximity level 1. No relaxation model is set in this wrapper.
 
-## Physical / mathematical content
+For the three channels, the wrapper sets sweeps `[1700 4500 8000]`, offsets `[900 3200 4000]`, acquisition points `[128 128 128]`, and zero-fill sizes `[512 512 512]`; it labels plotted axes in ppm. The code does not annotate the units of the numeric sweep and offset literals. It calls `liquid(subsystem,@pansy_triple,parameters,'nmr')`, apodises `fid.aa`, `fid.ab`, and `fid.ac` with squared-cosine windows in both dimensions, then applies 2D FFTs and sums the transformed FIDs over isotopomers. The wrapper delegates pulse-sequence details to `@pansy_triple`; it does not itself specify pulse timings/phases, gradients, or receiver settings, so none are inferred here.
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Triple-channel PANSY experiment on glycine with natural
-- content of 13C isotope. Coordinates, shieldings, and J-
-- couplings computed with DFT.
-- Calculation time: seconds
-- Read the spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Preallocate the answer
-- Generate isotopomers
-- Loop over isotopomers
+The source plots the real-valued `aa`, `ab`, and `ac` spectra as, respectively, 1H-1H, 1H-13C, and 1H-15N 2D blocks. It generates figures rather than saving a data file. The source's plot calls also pass rendering controls `20`, `[0.05 0.25 0.05 0.25]`, `2`, `256`, `6`, and `'both'`; the wrapper does not explain those controls further.

@@ -25,25 +25,16 @@ function p=prefix(a,p)
 % Check consistency
 grumble(p);
 
-% Absorb the prefix
-if isscalar(a)
-    
-    % Multiply the first core
-    for n=1:numel(p.cores)
-        p.cores{n}{1}=a*p.cores{n}{1};
-    end
-    
-else
-    
-    % Check the dimensions
-    if size(a,2)~=size(p,1)
-        error('matrix dimension mismatch.');
-    end
+% Represent scalar prefix as a dimensioned scaled identity
+if ~isa(a,'polyadic')&&isscalar(a), a=opium(size(p,1),a); end
 
-    % Update prefix array
-    p.prefix=[{a} p.prefix];
-    
+% Check the dimensions
+if size(a,2)~=size(p,1)
+    error('matrix dimension mismatch.');
 end
+
+% Update prefix array
+p.prefix=[{a} p.prefix];
 
 end
 
@@ -59,4 +50,5 @@ end
 % understanding it.
 %
 % Upton Sinclair
+
 

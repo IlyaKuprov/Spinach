@@ -19,7 +19,7 @@ inter.coordinates={[-1.11551509    1.65289357   -1.19927242]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
@@ -47,7 +47,7 @@ parameters.spins={'1H','15N'};
 parameters.irr_opers={Hx Nx};
 parameters.exc_opers={0*Hy 0*Ny};
 parameters.rho0=state(spin_system,'Lx','1H');
-parameters.coil=state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.time_steps=4e-5*ones(1,10);
 parameters.grid='rep_2ang_200pts_oct';
 

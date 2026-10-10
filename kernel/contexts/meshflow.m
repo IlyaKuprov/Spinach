@@ -65,7 +65,7 @@ F=flow_gen(spin_system,parameters);
 
 % Get problem dimensions
 spc_dim=spin_system.mesh.vor.ncells;  
-spn_dim=size(spin_system.bas.basis,1); problem_dim=spc_dim*spn_dim;
+spn_dim=spin_system.bas.offsets(end); problem_dim=spc_dim*spn_dim;
 report(spin_system,['lab space problem dimension     ' num2str(spc_dim)]);
 report(spin_system,['spin space problem dimension    ' num2str(spn_dim)]);
 report(spin_system,['Fokker-Planck problem dimension ' num2str(problem_dim)]);

@@ -21,33 +21,9 @@ function A=mprealloc(spin_system,nnzpc)
 % Check consistency
 grumble(spin_system,nnzpc);
 
-% Do the math
-switch spin_system.bas.formalism
-    
-    case 'sphten-liouv'
-        
-        % Create a zero Liouville space matrix operator
-        problem_dim=size(spin_system.bas.basis,1);
-        A=spalloc(problem_dim,problem_dim,nnzpc*problem_dim);
-        
-    case {'zeeman-wavef','zeeman-hilb'}
-        
-        % Create a zero Hilbert space matrix operator
-        problem_dim=prod(spin_system.comp.mults);
-        A=spalloc(problem_dim,problem_dim,nnzpc*problem_dim);
-        
-    case 'zeeman-liouv'
-        
-        % Create a zero Liouville space matrix operator
-        problem_dim=prod(spin_system.comp.mults.^2);
-        A=spalloc(problem_dim,problem_dim,nnzpc*problem_dim);
-        
-    otherwise
-        
-        % Complain and bomb out
-        error('unknown formalism specification.');
-        
-end
+% Preallocate the direct-sum operator
+problem_dim=spin_system.bas.offsets(end);
+A=spalloc(problem_dim,problem_dim,nnzpc*problem_dim);
 
 end
 

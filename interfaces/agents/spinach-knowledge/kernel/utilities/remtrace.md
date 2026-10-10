@@ -1,35 +1,27 @@
 # kernel/utilities/remtrace.m
 
-- Signature: `A=remtrace(A)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/remtrace.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/remtrace.m)
 
 ## Purpose
 
-Subtracts an appropriate multiple of the unit matrix to make the input matrix traceless. Syntax: A=remtrace(A)
+Subtracts an appropriate multiple of the unit matrix from a square matrix to make it traceless.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `A=remtrace(A)`.
+- The function calls an internal consistency check (`grumble`) that errors with `'A must be a square matrix.'` if the input is not numeric or if it is not square (`size(A,1)~=size(A,2)`).
+- The trace is removed by computing `dim=size(A,1)` and updating `A=A-speye(dim)*trace(A)/dim`, i.e. subtracting `trace(A)/dim` times the identity matrix of the same dimension.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Input:**
 
-- A -a square matrix
+- `A` — a square matrix.
 
-## Outputs
+**Output:**
 
-- A -a square matrix with a zero trace
+- `A` — a square matrix with a zero trace.
 
-## Implementation structure
+## References
 
-- Subtracts an appropriate multiple of the unit matrix to make
-- the input matrix traceless. Syntax:
-- A=remtrace(A)
-- A -a square matrix
-- A -a square matrix with a zero trace
-- Check consistency
-- Kill the trace
-- Consistency enforcement
-- Cacophobia, n.
-- The fear of ugliness and of things
-- that are ugly.
+- Spinach Dynamics Wiki: [remtrace.m](https://spindynamics.org/wiki/index.php?title=remtrace.m)

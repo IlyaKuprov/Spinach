@@ -2,45 +2,19 @@
 
 - Signature: `[states,coeffs]=bos2ist(prod_spec,nlevels)`
 
-## Purpose
+## Meaning
 
-Irreducible spherical tensor expansion of a user-specified bosonic operator product. Syntax: [states,coeffs]=bos2ist(prod_spec,lvl_num)
+Expands an ordered product of truncated-mode bosonic operators into Spinach irreducible spherical-tensor (IST) basis states and their coefficients. The accepted symbols in `prod_spec` are `C` (creation), `A` (annihilation), and `N` (number operator); `CCAA` is the source's example. Starting with the sparse identity, the routine scans the string from left to right and right-multiplies by the corresponding `weyl(nlevels)` matrix at each character. An empty character string leaves the identity matrix to be expanded.
 
-## Physical / mathematical content
+## Index mapping and output
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The routine passes the completed matrix to `oper2ist`. Its `states` are Spinach IST linear basis indices, not oscillator population labels; `lin2lm` converts an index to spherical-tensor `L,M` labels. The parallel `coeffs` values give the expansion coefficients for those states. In the called `oper2ist` implementation, linear labels start at zero and terms with coefficient magnitude no greater than `10*eps('double')` are omitted.
 
-## Numerical / algorithmic content
+## Inputs and guards
 
-## Parameters / inputs
+`prod_spec` must be a character value whose characters are all in `C`, `A`, or `N`. The local check requires `nlevels` to be numeric, real, scalar, and at least one; the subsequent `weyl` call additionally enforces a positive integer. The truncation sets the matrix size used for the Weyl operators and IST expansion.
 
-- prod_spec -bosonic operator product specification
-- in which 'C' stands for creation opera-
-- tor and 'A' for annihilation operator,
-- for example 'CCAA'
-- nlevels -number of energy levels in the trunca-
-- ted bosonic mode
+## References
 
-## Outputs
-
-- states -states, in the Spinach IST basis index-
-- ing, that contribute to the operator in
-- question; use lin2lm to convert to L,M
-- spherical tensor indices
-- coeffs -coefficients with which the ISTs enter
-- the linear combination
-
-## Implementation structure
-
-- Irreducible spherical tensor expansion of a user-specified
-- bosonic operator product. Syntax:
-- [states,coeffs]=bos2ist(prod_spec,lvl_num)
-- prod_spec -bosonic operator product specification
-- in which 'C' stands for creation opera-
-- tor and 'A' for annihilation operator,
-- for example 'CCAA'
-- nlevels -number of energy levels in the trunca-
-- ted bosonic mode
-- states -states, in the Spinach IST basis index-
-- ing, that contribute to the operator in
-- question; use lin2lm to convert to L,M
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/bos2ist.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=bos2ist.m)

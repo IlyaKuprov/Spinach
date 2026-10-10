@@ -1,37 +1,18 @@
 # kernel/overloads/@ttclass/isreal.m
 
-- Signature: `answer=isreal(tt)`
+[Mapped MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/isreal.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/isreal.m)
 
-## Purpose
+## Signature
 
-Returns TRUE for real-valued tensor train objects. Syntax: answer=isreal(tt)
+`answer=isreal(tt)`
 
-## Physical / mathematical content
+## Behaviour
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+For a `ttclass` input, the method first evaluates `all(isreal(tt.coeff))`. Only if that is true does it visit every stored core `tt.cores{k,n}` for `n=1:tt.ntrains` and `k=1:tt.ncores`; it returns early when a core is not real. Thus the predicate covers the stored coefficients and core entries, rather than forming or inspecting a materialised tensor. It applies no conjugation and changes no train data.
 
-## Numerical / algorithmic content
+A non-`ttclass` input raises the error `input is not a ttclass.`.
 
-## Parameters / inputs
+## Input and output
 
-- tt -tensor train object
-
-## Outputs
-
-- answer -logical true when all coefficients and core
-- elements of the tensor train are real
-
-## Implementation structure
-
-- Returns TRUE for real-valued tensor train objects. Syntax:
-- answer=isreal(tt)
-- tt -tensor train object
-- answer -logical true when all coefficients and core
-- elements of the tensor train are real
-- Non-empty tensor trains should return true()
-- Check coefficient first
-- If the coefficients are real, check the cores
-- Complain and bomb out
-- Democracy is a pathetic belief in the collective wisdom
-- of individual ignorance.
-- H.L. Mencken
+- `tt` — tensor-train object.
+- `answer` — logical result of the coefficient and core checks.

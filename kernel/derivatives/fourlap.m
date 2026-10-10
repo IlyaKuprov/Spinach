@@ -30,13 +30,16 @@ function L=fourlap(npoints,extents)
 % Check consistency
 grumble(npoints,extents);
 
+% Request explicit Fourier differentiation
+spin_system.sys.enable={};
+
 % Decide the dimensionality
 switch numel(npoints)
     
     case 1
         
         % Get differentiation matrices
-        [~,Dxx]=fourdif(npoints(1),2);
+        [~,Dxx]=fourdif(spin_system,npoints(1),2);
         
         % Normalize differentiation matrices
         Dxx=(2*pi/extents(1))^2*Dxx;
@@ -47,8 +50,8 @@ switch numel(npoints)
     case 2
         
         % Get differentiation matrices
-        [~,Dxx]=fourdif(npoints(1),2);
-        [~,Dyy]=fourdif(npoints(2),2);
+        [~,Dxx]=fourdif(spin_system,npoints(1),2);
+        [~,Dyy]=fourdif(spin_system,npoints(2),2);
         
         % Normalize differentiation matrices
         Dxx=(2*pi/extents(1))^2*Dxx;
@@ -61,9 +64,9 @@ switch numel(npoints)
     case 3
 
         % Get differentiation matrices
-        [~,Dxx]=fourdif(npoints(1),2);
-        [~,Dyy]=fourdif(npoints(2),2);
-        [~,Dzz]=fourdif(npoints(3),2);
+        [~,Dxx]=fourdif(spin_system,npoints(1),2);
+        [~,Dyy]=fourdif(spin_system,npoints(2),2);
+        [~,Dzz]=fourdif(spin_system,npoints(3),2);
         
         % Normalize differentiation matrices
         Dxx=(2*pi/extents(1))^2*Dxx;
@@ -98,4 +101,5 @@ end
 % is the same old story.
 %
 % Margaret Thatcher
+
 

@@ -1,40 +1,30 @@
 # kernel/utilities/unihash.m
 
-- Signature: `A=unihash(A)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/unihash.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/unihash.m)
 
 ## Purpose
 
-Hash table based stable duplicate row eliminator, for use with large sparse matrices where Matlab's unique(...,'rows') is too slow. Syntax: A=unihash(A)
+`unihash` is a hash-table-based stable duplicate row eliminator, intended for large sparse matrices where MATLAB's `unique(...,'rows')` is too slow. It removes duplicate rows from a matrix while keeping the first occurrence of each row.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `A=unihash(A)`.
+- The function first validates its input via an internal consistency check (`grumble`), which errors with `'A must be a numeric matrix.'` if the input is not numeric or not a matrix.
+- An MD5 hash table is built as a character array of blanks, `repmat(' ',[size(A,1) 32])`, i.e. one 32-character row per row of `A`.
+- A `parfor` loop over `k=1:size(A,1)` fills each row of the hash table with `md5_hash(A(k,:))`, so row hashing is parallelised.
+- Redundant row indices are found with `[~,idx]=unique(hash_table,'rows','stable')`, which preserves the order of first occurrences.
+- The elimination step returns `A=A(idx,:)`, deleting duplicate rows while keeping the first occurrence of each.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+**Input:**
 
-## Parameters / inputs
+- `A` — a large and sparse matrix; must be numeric and a matrix.
 
-- A -a large and sparse matrix
+**Output:**
 
-## Outputs
+- `A` — the same matrix with duplicate rows deleted, keeping the first occurrence of each.
 
-- A -same matrix with duplicate
-- rows deleted, keeping the
-- first occurrence of each
+## References
 
-## Implementation structure
-
-- Hash table based stable duplicate row eliminator,
-- for use with large sparse matrices where Matlab's
-- unique(...,'rows') is too slow. Syntax:
-- A=unihash(A)
-- A -a large and sparse matrix
-- A -same matrix with duplicate
-- rows deleted, keeping the
-- first occurrence of each
-- Check consistency
-- Build an MD5 hash table
-- Redundant row index using a hash table
-- Elimination
+- Spinach Dynamics Wiki: [unihash.m](https://spindynamics.org/wiki/index.php?title=unihash.m)

@@ -1,28 +1,13 @@
 # kernel/integrity/rearm.m
 
-- Signature: `rearm()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/rearm.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=rearm.m)
 
-## Purpose
+`rearm()` rebuilds the baseline used by [`sniff`](sniff.md) to flag edits to Spinach MATLAB files. It is an integrity utility, not a physical model.
 
-Rearms the sniffer database. The sniffer checks Spinach distribution .m files for any modifications that the user did since downloading Spinach. The function prints the list of files that have changed in any way since the in- ternal database has been rearmed. The purpose is to catch local modifications that the user may have made and forgotten about, that are causing some un- intended consequences elsewhere in Spinac
+It recursively scans .m files below `kernel`, `interfaces`, `experiments`, and `etc`. For each included file, it appends a fingerprint formed from the file's basename and a hash of its line contents: `md5_hash([filename md5_hash(content)])`. The current exception list is empty. The fingerprints are stored as the `smells` cell array in `kernel/integrity/smells.mat`; this is a list, not a path-to-hash index. The directory path is not part of a fingerprint.
 
-## Physical / mathematical content
+Call it after establishing the source version that should count as the baseline. A later `sniff` reports fingerprints absent from that list. Because fingerprints omit directory paths and the comparison is membership-only, this scheme does not identify moved files by path, nor does it detect files that have been deleted from the scan tree.
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
+## Inputs and outputs
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Rearms the sniffer database. The sniffer checks Spinach
-- distribution .m files for any modifications that the user
-- did since downloading Spinach. The function prints the
-- list of files that have changed in any way since the in-
-- ternal database has been rearmed.
-- The purpose is to catch local modifications that the user
-- may have made and forgotten about, that are causing some un-
-- intended consequences elsewhere in Spinach.
-- List top level directories
-- List exceptions
-- Get the directory trees
-- Get the table going
+No inputs or return value. It deletes the existing `smells.mat`, saves the newly collected `smells`, and displays `rearm: sniffer rearmed.`. The source contains no input-validation guard.

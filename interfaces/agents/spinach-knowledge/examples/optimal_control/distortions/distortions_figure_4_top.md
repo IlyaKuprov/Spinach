@@ -1,34 +1,25 @@
 # examples/optimal_control/distortions/distortions_figure_4_top.m
 
-- Signature: `distortions_figure_4_top()`
+- MATLAB implementation: [examples/optimal_control/distortions/distortions_figure_4_top.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/distortions/distortions_figure_4_top.m)
+
+- Signature: distortions_figure_4_top()
+- Source: [examples/optimal_control/distortions/distortions_figure_4_top.m](../../../../../../examples/optimal_control/distortions/distortions_figure_4_top.m)
+- Paper: [Rasulov and Kuprov, arXiv:2502.02198](https://arxiv.org/abs/2502.02198)
 
 ## Purpose
 
-Figure 4 (top) from the paper by Rasulov and Kuprov:
+Reconstructs the RLC-distortion robustness calculation for the top panel of Figure 4. The script first optimises a broadband carbon XY pulse under an ensemble of two-stage RLC-like slice filters, then independently simulates the pulse over a wider Q-factor and RF-amplitude grid and plots the resulting state-transfer infidelity.
 
-## Physical / mathematical content
+## Model and pulse design
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The spin system contains 100 uncoupled 13C spins with evenly spaced offsets from −100 to +100 ppm at a 28.18 T field. Spinach uses the sphten-liouv formalism with the IK-2 approximation and projection level 1. Normalised Cartesian operators Sx, Sy and Sz are prepared as the three initial states; the desired outputs are −Sz, Sy and Sx. The same drift Hamiltonian is used for each state, while Lx and Ly drive the two quadratures of one 13C channel.
 
-## Numerical / algorithmic content
+The control has 125 piecewise-constant intervals of 1 μs (125 μs total); the final five are frozen as dead time. Nominal channel amplitude levels span 50–70 kHz in nutation-frequency units, converted to angular frequency by multiplying by 2π. The starting waveform is loaded from guess.mat (xy_profile), with the final five samples set to zero. optimcon configures an LBFGS-GRAPE calculation via fmaxnewton and grape_xy; the run permits 25 iterations and applies the NS and SNS penalties with weights 0.01 and 0.10.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## RLC distortion and reported observable
 
-## Implementation structure
+For the optimisation ensemble, five Q values span 560–640. The source forms the per-slice attenuation parameter as exp(-abs(omega)*dt/(2*Q)), with omega=-sys.magnet*spin('13C') and dt=1 μs, and applies spf twice in succession to each quadrature. Thus the modeled response is a paired slice-filter operation parameterised by Q; it is not a measured probe response or a full hardware calibration.
 
-- Figure 4 (top) from the paper by Rasulov and Kuprov:
-- Set the magnetic field
-- Put 100 non-interacting spins at equal intervals
-- within the [-100,+100] ppm chemical shift range
-- Select a basis set -IK-2 keeps complete basis on each
-- spin in this case, but ignores multi-spin orders
-- Run Spinach housekeeping
-- Set up spin states
-- Get the control operators
-- Get the drift Hamiltonian
-- Define control parameters
-- Last 5 slices are dead time
+After optimisation, the benchmark varies Q over 200–1000 and nominal RF nutation frequency over 40–80 kHz (41 points on each axis). For each grid point, the pulse is rescaled, passed through the two Q-dependent spf stages, and propagated with shaped_pulse_xy using expv-pwc. The plotted quantity is log10 of one minus the mean of the three real target-state overlaps. The heat map has RF nutation frequency in kHz and Q factor on its axes, with reference lines at 50/70 kHz and Q=550/650; the script also requests control, robustness and spectrogram plots during optimisation.
+
+These are simulated responses of the stated spin model and filter, not experimental observations. The waveform initial guess and Spinach helper implementations are dependencies; their contents are not defined by this example.

@@ -1,35 +1,11 @@
 # kernel/plotting/kcolourbar.m
 
+Source: [kernel/plotting/kcolourbar.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/kcolourbar.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=kcolourbar.m)
+
 - Signature: `kcolourbar(x)`
 
-## Purpose
+## Behaviour and rendering
 
-House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kcolourbar(x)
+The optional `x` defaults to the empty character array. The function calls MATLAB's `colorbar` for the current axes, setting tick-label interpretation to `latex` and tick-label font size to 12. It sets the bar label to `x`, with `latex` interpretation and font size 13. MATLAB's colorbar object supplies the colour scale and rendering; this function does not set a colormap, colour limits, tick values, or transform plotted data. MATLAB manages the colorbar's association and layout with the current axes.
 
-## Physical / mathematical content
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- x -a character string
-
-## Outputs
-
-- creates or updates the colour bar
-- in the current axis system
-
-## Implementation structure
-
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- kcolourbar(x)
-- x -a character string
-- creates or updates the colour bar
-- in the current axis system
-- Default is empty string
-- Check consistency
-- Ticks to LaTeX
-- Label to LaTex
-- Consistency enforcement
-- I've often remarked that identity politics is the product of
+`x` must be a character array; a non-character input raises an error. The function returns no value or colorbar handle. It has no numerical axis formula or coordinate array input.

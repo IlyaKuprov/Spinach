@@ -1,36 +1,16 @@
 # kernel/plotting/sweep2ticks.m
 
-- Signature: `axis_hz=sweep2ticks(offs,sweep,npoints)`
+- Source: [kernel/plotting/sweep2ticks.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/sweep2ticks.m)
+- Wiki: [sweep2ticks.m](https://spindynamics.org/wiki/index.php?title=sweep2ticks.m)
 
 ## Purpose
 
-Converts offset-sweep-npoints specification into axis ticks in Hz. The function returns the frequency axis of the spectrum, suitable for use in Matlab functions like plot(). Syntax: axis_hz=sweep2ticks(offs,sweep,npoints)
+Convert an offset, sweep width, and point count into a column vector of frequency ticks in Hz, for example as an axis supplied to a plotting function.
 
-## Physical / mathematical content
+## Inputs and discretisation
 
-## Numerical / algorithmic content
+- `offs` is a real scalar offset from the carrier frequency in Hz.
+- `sweep` is a real scalar sweep width in Hz.
+- `npoints` is a real integer scalar of at least 1.
 
-## Parameters / inputs
-
-- offs -offset from carrier frequency, Hz
-- sweep -sweep width, Hz
-- npoints -number of points in the spectrum
-
-## Outputs
-
-- axis_hz -a column vector of axis ticks, Hz
-
-## Implementation structure
-
-- Converts offset-sweep-npoints specification into axis ticks in Hz.
-- The function returns the frequency axis of the spectrum, suitable
-- for use in Matlab functions like plot(). Syntax:
-- axis_hz=sweep2ticks(offs,sweep,npoints)
-- offs -offset from carrier frequency, Hz
-- sweep -sweep width, Hz
-- npoints -number of points in the spectrum
-- axis_hz -a column vector of axis ticks, Hz
-- Check consistency
-- Build the axis
-- Consistency enforcement
-- Spinach code is clear, useful and elegant because the program is the
+The implementation is `-linspace(-sweep/2,sweep/2,npoints)' + offs`. For a positive sweep and more than one point, this yields evenly spaced samples from `offs+sweep/2` down to `offs-sweep/2`, including both endpoints. It returns the axis only: it does not plot, change axes, or write a file. The input checks require real scalar offset and sweep values and an integer point count; they do not impose a positivity check on `sweep`.

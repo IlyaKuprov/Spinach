@@ -25,25 +25,16 @@ function p=suffix(p,a)
 % Check consistency
 grumble(p);
 
-% Absorb the suffix
-if isscalar(a)
-    
-    % Multiply the last core
-    for n=1:numel(p.cores)
-        p.cores{n}{end}=a*p.cores{n}{end};
-    end
-    
-else
-    
-    % Check the dimensions
-    if size(p,2)~=size(a,1)
-        error('matrix dimension mismatch.');
-    end
+% Represent scalar suffix as a dimensioned scaled identity
+if ~isa(a,'polyadic')&&isscalar(a), a=opium(size(p,2),a); end
 
-    % Update suffix array
-    p.suffix=[p.suffix {a}];
-    
+% Check the dimensions
+if size(p,2)~=size(a,1)
+    error('matrix dimension mismatch.');
 end
+
+% Update suffix array
+p.suffix=[p.suffix {a}];
 
 end
 
@@ -58,4 +49,5 @@ end
 % will over time become left-wing.
 %
 % O'Sullivan's First Law
+
 

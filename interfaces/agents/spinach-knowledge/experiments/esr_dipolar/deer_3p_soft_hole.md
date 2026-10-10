@@ -1,73 +1,13 @@
 # experiments/esr_dipolar/deer_3p_soft_hole.m
 
-- Signature: `fids=deer_3p_soft_hole(spin_system,parameters,H,R,K)`
+This is a pulse diagnostic for the three-pulse DEER/PELDOR experiment, not the DEER echo-stack calculation. The source describes a hypothetical test in which a selected soft pulse is followed by an ideal hard `pi/2` pulse and time-domain acquisition.
 
-## Purpose
+## Preparation and acquisition
 
-Pulse diagnostics for the three-pulse DEER/PELDOR pulse sequen- ce. This function shows how soft pulses affect the magnetisati- on of the sample. It is a hypothetical experiment where a soft pulse specified by the user is performed, immediately followed by an ideal pi/2 pulse on all spins followed by infinite-band- width time-domain detection. Syntax: fids=deer_3p_soft_hole(spin_system,parameters,H,R,K)
+Each of the three shaped pulses is applied independently to `parameters.rho0`; the three pulse responses are not composed sequentially. The unpulsed state is retained as a reference. The code assembles these four states, applies a hard `pi/2` rotation about the constructed `Ey` operator, and calls `acquire`. That operator is built for the first entry of `parameters.spins`; the header describes the hard pulse as acting on all spins. The acquisition uses the receiver offset, sweep, and point count supplied in `parameters`.
 
-## Physical / mathematical content
+Required fields are `parameters.pulse_frq`, `parameters.pulse_pwr`, `parameters.pulse_dur`, `parameters.pulse_phi`, and `parameters.pulse_rnk` (three pulse values each), plus `parameters.offset`, `parameters.sweep`, `parameters.npoints`, `parameters.spins`, `parameters.rho0`, `parameters.coil`, and `parameters.method`. Pulse frequencies are Hz, powers rad/s, durations seconds, phases radians, and ranks integer Fokker-Planck ranks. Offset and sweep are Hz. The method is `expm`, `expv`, or `evolution`; context matrices `H`, `R`, and `K` must be same-sized. The spin list normally identifies electron spins.
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The function returns `fids` from `acquire`. Its implementation passes four prepared states (reference plus three pulse-specific states), and the diagnostic wrapper consumes four FID columns. The header output note instead says three FIDs. The returned `fids` matrix has `parameters.npoints` time-sample rows and four state columns (the reference and three pulse responses); the source does not state numeric signal units. It describes the acquisition as infinite-bandwidth while also requiring a sweep value; the implementation passes that value to `acquire`, so the source does not resolve the wording further.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Parameters / inputs
-
-- parameters.pulse_frq -frequencies for the three
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the three
-- pulses, rad/s
-- parameters.pulse_dur -durations for the three
-- pulses, seconds
-- parameters.pulse_phi -initial phases for the three
-- pulses, radians
-- parameters.pulse_rnk -Fokker-Planck ranks for the
-- three pulses
-- parameters.offset -receiver offset for the time
-- domain detection, Hz
-- parameters.sweep -sweep width for time domain
-- detection, Hz
-- parameters.npoints -number of points in the free
-- induction decay
-- parameters.spins -irradiated spins, normally {'E'}
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.method -soft puse propagation method,
-- 'expv' for Krylov propagation,
-- 'expm' for exponential propa-
-- gation, 'evolution' for Spin-
-- ach evolution function
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fids -three free induction decays that should be apo-
-- dised and Fourier transformed
-- Note: for the method, start with 'expm', change to 'expv' if the
-- calculation runs out of memory, and use 'evolution' as the
-- last resort.
-
-## Implementation structure
-
-- Pulse diagnostics for the three-pulse DEER/PELDOR pulse sequen-
-- ce. This function shows how soft pulses affect the magnetisati-
-- on of the sample. It is a hypothetical experiment where a soft
-- pulse specified by the user is performed, immediately followed
-- by an ideal pi/2 pulse on all spins followed by infinite-band-
-- width time-domain detection. Syntax:
-- fids=deer_3p_soft_hole(spin_system,parameters,H,R,K)
-- parameters.pulse_frq -frequencies for the three
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the three
-- pulses, rad/s
-- parameters.pulse_dur -durations for the three
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/esr_dipolar/deer_3p_soft_hole.m

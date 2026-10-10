@@ -1,45 +1,32 @@
 # kernel/derivatives/fdweights.m
 
-- Signature: `w=fdweights(target_point,grid_points,max_order)`
+Direct source: [kernel/derivatives/fdweights.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/derivatives/fdweights.m)
+Spin Dynamics Wiki: [fdweights.m](https://spindynamics.org/wiki/index.php?title=fdweights.m)
 
-## Purpose
+## Purpose and interface
 
-Calculates finite difference weights for numerical derivatives, including order 0, which amounts to interpolation. Syntax: w=fdweights(target_point,grid_points,max_order)
+w=fdweights(target_point,grid_points,max_order) computes finite-difference coefficient rows at a target coordinate from supplied grid coordinates. It uses Fornberg's recursive coefficient construction. Derivative order zero is included, so the first row gives interpolation weights.
 
-## Physical / mathematical content
+- target_point is one real numeric scalar inside the interval from the smallest to largest grid coordinate, including the end points.
+- grid_points is a real numeric vector sorted in ascending order.
+- max_order is the highest derivative order requested and is less than the number of grid points.
+- w has max_order+1 rows and one column per grid point. Row 1 corresponds to order 0; row r+1 supplies order r.
 
-- Derivative utilities. These routines compute finite-difference, analytical, or optimisation-oriented derivatives needed for sensitivity analysis, fitting, and optimal control.
+## Recurrence and units
 
-## Numerical / algorithmic content
+The recurrence begins with the order-zero coefficient for the first grid point and adds grid points one at a time. For each new point it updates the coefficients for the derivative orders available at that stage, through max_order. The resulting row, dotted with function values at grid_points, approximates the requested derivative at target_point.
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The grid coordinates determine the scale: for coordinates expressed in units of length, the row for derivative order r has units of inverse length to the r power when applied to function values. No separate spacing parameter or post-scaling is introduced.
 
-## Parameters / inputs
+## Guards and example
 
-- target_point -the point at which the derivative
-- is required
-- grid_points -the points at which the function
-- is given
-- max_order -maximum derivative order
+The source requires real numeric input arguments, a scalar target, a vector of grid points, a target lying within their minimum-to-maximum interval, sorted ascending grid points, integer max_order, and max_order < numel(grid_points). The implementation's explicit sortedness test does not separately require strictly distinct grid coordinates. The guard block does not contain separate scalar or nonnegative tests for max_order; it checks integrality and the upper bound only.
 
-## Outputs
+    w=fdweights(0,[-1 0 1],1);
 
-- w -finite difference coefficient array
-- with the coefficients for the succes-
-- sive derivatives in rows
+Here w has two rows: interpolation weights [0 1 0] and first-derivative weights [-1/2 0 1/2] for these unit-spaced coordinates.
 
-## Implementation structure
+## Related routines
 
-- Calculates finite difference weights for numerical derivatives,
-- including order 0, which amounts to interpolation. Syntax:
-- w=fdweights(target_point,grid_points,max_order)
-- target_point -the point at which the derivative
-- is required
-- grid_points -the points at which the function
-- is given
-- max_order -maximum derivative order
-- w -finite difference coefficient array
-- with the coefficients for the succes-
-- sive derivatives in rows
-- Check consistency
+- [fdmat.m](fdmat.md) uses these coefficients to assemble a sparse differentiation matrix.
+- [fdvec.m](fdvec.md) uses them to differentiate an input vector.

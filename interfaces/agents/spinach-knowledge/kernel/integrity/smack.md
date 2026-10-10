@@ -1,28 +1,11 @@
 # kernel/integrity/smack.m
 
-- Signature: `smack()`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/integrity/smack.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=smack.m)
 
-## Purpose
+`smack()` is a MATLAB environment-recovery utility for problems involving MATLAB Distributed Computing Server (MDCS), not a spin-dynamics calculation. Its source comment says to use it from the command line; the function does not enforce that restriction.
 
-Gives Matlab a good smack every time MDCS gets its kni- ckers in a twist. Syntax: smack() This function shuts down the parallel pool, clears the workspace, clears the GPUs, and makes sure there are no crashed MDCS jobs left over. This function should only be used from the command line.
+The function deletes the current parallel pool, deletes jobs belonging to the `Processes` cluster, closes all open MATLAB file handles, clears the workspace, and resets each device counted by `gpuDeviceCount`. These are broad session side effects, not a selective cleanup of a particular job or GPU.
 
-## Physical / mathematical content
+## Inputs and outputs
 
-- Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Gives Matlab a good smack every time MDCS gets its kni-
-- ckers in a twist. Syntax:
-- smack()
-- This function shuts down the parallel pool, clears the
-- workspace, clears the GPUs, and makes sure there are no
-- crashed MDCS jobs left over. This function should only
-- be used from the command line.
-- Kill the parallel pool
-- Clear out crashed jobs
-- Close all handles
-- Clear the workspace
-- Reset all GPUs
+No inputs or return value. There is no source-level validation or recovery guard around the cleanup operations. Use only when those whole-session effects are intended.

@@ -26,7 +26,7 @@ inter.coupling.scalar{5,5}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.J_ch=140;
@@ -39,6 +39,9 @@ parameters.npoints=[64 64 64];
 parameters.zerofill=[256 256 256];
 parameters.decouple_f3={'13C'};
 parameters.axis_units='ppm';
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

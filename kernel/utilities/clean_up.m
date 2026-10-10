@@ -21,7 +21,7 @@
 
 function A=clean_up(spin_system,A,nonzero_tol)
 
-% Skip opium objects
+% Skip implicit identities
 if isa(A,'opium'), return; end
 
 % Skip if disabled
@@ -45,7 +45,9 @@ if isa(A,'polyadic')
     end
     for n=1:numel(A.cores)
         for k=1:numel(A.cores{n})
-            A.cores{n}{k}=clean_up(spin_system,A.cores{n}{k},nonzero_tol);
+            if ~isa(A.cores{n}{k},'function_handle')
+                A.cores{n}{k}=clean_up(spin_system,A.cores{n}{k},nonzero_tol);
+            end
         end
     end
     return
@@ -95,4 +97,5 @@ end
 % and taboos.
 %
 % H.L. Mencken
+
 

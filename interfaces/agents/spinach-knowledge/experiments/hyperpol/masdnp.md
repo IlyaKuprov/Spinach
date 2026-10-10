@@ -1,58 +1,35 @@
 # experiments/hyperpol/masdnp.m
 
+- MATLAB implementation: [experiments/hyperpol/masdnp.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/masdnp.m)
+
 - Signature: `dnp=masdnp(spin_system,parameters)`
 
-## Purpose
+## Purpose and physical scope
 
-Magic angle spinning DNP simulation, returning the rotor period averaged steady state magnetization. This function takes a lot of inspiration from the code donated by Fred Mentink, please ci- te Fred's papers if you are using it. Syntax: dnp=masdnp(spin_system,parameters)
+This routine simulates magic-angle-spinning DNP and returns a powder-orientation-weighted enhancement ratio. For each orientation it constructs an ESR rotor stack, applies microwave excitation and relaxation through a rotor period, forms an effective period generator, evolves the thermal-equilibrium state for the specified microwave duration, then averages the detected magnetisation over a rotor period and divides by the corresponding equilibrium `coil` signal. The spin-system model supplies the couplings; the routine does not construct hyperfine tensors or run ESEEM/ENDOR or image reconstruction.
 
-## Physical / mathematical content
+## Inputs
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
+- `parameters.spins`: spin labels for microwave irradiation; the implementation uses the first label, `parameters.spins{1}`, for the microwave frequency and operator.
+- `parameters.rate`: MAS rate in Hz; `parameters.axis`: spinning-axis direction vector; `parameters.max_rank`: integer rotor-discretisation rank.
+- `parameters.mw_pwr`: microwave power in radians per second; `parameters.mw_frq`: microwave frequency in Hz; `parameters.mw_time`: irradiation/equilibration duration in seconds.
+- `parameters.grid`: name of a spherical averaging grid available in the Spinach grids folder; `parameters.coil`: detection state; `parameters.verbose`: diagnostic-output flag (0 or 1).
+- `spin_system` must use `sphten-liouv` or `zeeman-liouv` formalism. Call `masdnp` directly, not through a context wrapper.
 
-## Numerical / algorithmic content
+## Calculation and output
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The routine builds the microwave operator from the first selected spin's `L+` and `L-` operators, constructs relaxation and a lab-frame thermal-equilibrium state, and iterates over the weighted spherical grid. The rotor propagator is assembled from step propagators over one rotor period; its logarithm supplies an effective generator for `evolution` over `parameters.mw_time`. The function then averages the detection-state projection over one rotor period and accumulates the orientation-weighted ratio `Hz_dnp/Hz_eq`. The output dnp is a scalar enhancement ratio, not an absolute polarisation or a time/frequency spectrum.
 
-## Parameters / inputs
+## Model limits
 
-- parameters.spins -the spins to microwave
-- parameters.rate -spinning rate, Hz
-- parameters.axis -spinning axis direction vector.
-- parameters.max_rank -rotor discretization grid rank
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.mw_frq -microwave frequency, Hz
-- parameters.mw_time -microwave irradiation duration
-- before the average magnetistion
-- is computed, seconds
-- parameters.grid -the name of the spherical avera-
-- ging grid
-- parameters.coil -detection state
-- parameters.verbose -set this to 1 to enable diag-
-- nostic output
+The source recommends increasing rotor rank and spherical-grid size until the answer stops changing, noting that both may need to be very large. No convergence is implied by the example values below. The routine requires the named spherical-grid file to be installed under the Spinach root directory.
 
-## Outputs
+## Source-coded numerical example and DOI
 
-- dnp -enhancement of the user-specified state relative to
-- the thermal equilibrium
-- Note: increase the rotor rank and the spherical grid size until
-- the answer stops changing. You will likely need huge values
-- for both parameters.
-- Note: this function must be called directly, without a context
-- wrapper.
+examples/dnp_mas/solid_effect_mas_powder.m sets parameters.rate=12.5e3 Hz, parameters.max_rank=800, parameters.mw_pwr=2*pi*0.85e6 radians per second, parameters.mw_frq=-263.366e9 Hz and parameters.mw_time=1.0 seconds, using grid 'rep_2ang_100pts_sph'. The example comments identify the simulation as based on Fred Mentink-Vigier's paper and explicitly note that Spinach rotation conventions differ. The cited DOI is <https://doi.org/10.1016/j.jmr.2015.07.001>. These are example inputs, not experimental measurements or a claimed reproduced result.
 
-## Implementation structure
+## Source and attribution
 
-- Magic angle spinning DNP simulation, returning the rotor period
-- averaged steady state magnetization. This function takes a lot
-- of inspiration from the code donated by Fred Mentink, please ci-
-- te Fred's papers if you are using it. Syntax:
-- dnp=masdnp(spin_system,parameters)
-- parameters.spins - the spins to microwave
-- parameters.rate - spinning rate, Hz
-- parameters.axis - spinning axis direction vector.
-- parameters.max_rank - rotor discretization grid rank
-- parameters.mw_pwr - microwave power, rad/s
-- parameters.mw_frq - microwave frequency, Hz
-- parameters.mw_time - microwave irradiation duration
+- Source: `experiments/hyperpol/masdnp.m`
+- <https://spindynamics.org/wiki/index.php?title=masdnp.m>
+- Source attributions: ilya.kuprov@weizmann.ac.il; fmentink@magnet.fsu.edu

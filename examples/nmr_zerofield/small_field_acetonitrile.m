@@ -26,7 +26,7 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Sequence parameters
 parameters.sweep=700;

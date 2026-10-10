@@ -23,6 +23,9 @@ function answer=full(p)
 % Process nested polyadics
 for n=1:numel(p.cores)
     for k=1:numel(p.cores{n})
+        if isa(p.cores{n}{k},'function_handle')
+            error('function handle cores cannot be materialised.');
+        end
         if isa(p.cores{n}{k},'polyadic')
             p.cores{n}{k}=full(p.cores{n}{k});
         end
@@ -76,4 +79,5 @@ end
 % Weak men are more likely to be socialists.
 %
 % http://dx.doi.org/10.1016/j.evolhumbehav.2017.04.001
+
 

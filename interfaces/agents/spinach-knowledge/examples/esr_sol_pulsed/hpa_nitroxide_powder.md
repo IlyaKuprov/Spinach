@@ -1,31 +1,19 @@
 # examples/esr_sol_pulsed/hpa_nitroxide_powder.m
 
+- MATLAB implementation: [examples/esr_sol_pulsed/hpa_nitroxide_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/hpa_nitroxide_powder.m)
+
+[MATLAB example](../../../../../examples/esr_sol_pulsed/hpa_nitroxide_powder.m) · [acquire sequence helper](../../../../../experiments/acquire.m)
+
 - Signature: `hpa_nitroxide_powder()`
 
-## Purpose
+## Aim and spin system
 
-Powder averaged pulse-acquire W-band Fourier ESR spectrum of nitroxide radical. An ideal pulse is assumed. Calculation time: seconds
+The source describes a powder-averaged pulse-acquire W-band Fourier ESR spectrum for a nitroxide radical and assumes an ideal pulse. The model has an electron (`E`) and `14N` at 3.5 T. The electron g tensor is `diag(2.01045, 2.00641, 2.00211)`; the electron–nitrogen coupling tensor is supplied as `1e7 * [1.2356 0 0.6322; 0 1.1266 0; 0.6322 0 8.2230]` (the source does not annotate the matrix unit). The source also specifies damping relaxation (`inter.relaxation={'damp'}`), retains diagonal relaxation terms, sets equilibrium to zero, and sets `damp_rate=5e7` (the source does not annotate this field's unit). It uses an exact spherical-tensor Liouville basis and disables trajectory-level SSR algorithms.
 
-## Physical / mathematical content
+## Acquisition protocol
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Both the initial state and coil operator are `L+` on the electron. The code passes these to `acquire`, so the ideal pulse is represented by the chosen transverse initial coherence; no explicit pulse waveform, duration, or pulse-power scan is simulated. No spins are decoupled. Fixed acquisition settings are offset `-2e8`, sweep width `1e9` Hz, 128 points, zero-fill to 512, and the `rep_2ang_6400pts_sph` powder grid. The derivative is disabled, the axis is inverted, and the display is labelled `GHz-labframe`. The `acquire` helper documents sweep width in Hz.
 
-## Numerical / algorithmic content
+## Observable and output
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder averaged pulse-acquire W-band Fourier ESR spectrum of
-- nitroxide radical. An ideal pulse is assumed.
-- Calculation time: seconds
-- Isotopes
-- Magnet field
-- Interactions
-- Relaxation theory
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+The powder-averaged FID is apodised with the `crisp` window, Fourier transformed, and the real spectrum is plotted. The example does not save a data or figure file and estimates a run time of seconds. This is a simulated ideal-pulse acquisition with the specified damping model, not a measured spectrum.

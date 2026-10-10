@@ -1,46 +1,22 @@
 # experiments/rapidscan.m
 
+Source: [experiments/rapidscan.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/rapidscan.m)
+Spinach Wiki: [rapidscan.m](https://spindynamics.org/wiki/index.php?title=rapidscan.m)
+
 - Signature: `[b_axis,spectrum]=rapidscan(spin_system,parameters)`
 
 ## Purpose
 
-Time-domain rapid field scan ESR experiment, Eatons style. Syntax: [b_axis,spectrum]=rapidscan(spin_system,parameters)
+Simulates a time-domain rapid field-scan ESR experiment (Eaton-style). It constructs the microwave-frame generator and propagates the equilibrium density matrix while stepping through a prescribed magnetic-field sweep; it does not define or compile a pulse sequence. Call it directly, without a context function.
 
-## Physical / mathematical content
+## Inputs
 
-## Numerical / algorithmic content
+- `parameters.mw_pwr` is a non-negative scalar in rad/s used as the microwave-drive coefficient.
+- `parameters.sweep` is a two-element vector of field offsets in Tesla, swept linearly around the centre field `spin_system.inter.magnet`.
+- `parameters.nsteps` is a positive integer number of field points; `parameters.timestep` is a positive duration in seconds.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Calculation and output
 
-## Parameters / inputs
+The routine starts from isotropic thermal equilibrium. It forms the electron microwave operator from `L+`, builds the laboratory-frame Zeeman and coupling Hamiltonians and relaxation superoperator, symmetrises the drift Hamiltonian, and rotates it to the electron microwave frame using the carrier. The microwave term is `H_mw=-mw_pwr*(Ep-Ep')/(2i)`; the generator adds this drive and `1i*R` to the rotating-frame drift.
 
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.sweep -magnetic field sweep extents,
-- arouind the centre field specified
-- in sys.magnet, a two-element vector
-- in Tesla
-- parameters.nsteps -number of steps in the magnetic
-- field sweep
-- parameters.timestep -duration of each time step, seconds
-
-## Outputs
-
-- b_axis -magnetic field axis, Tesla
-- spectrum -L+ observable amplitude at each
-- magnetic field
-- Note: this experiment should be called directly without a context.
-
-## Implementation structure
-
-- Time-domain rapid field scan ESR experiment, Eatons style. Syntax:
-- [b_axis,spectrum]=rapidscan(spin_system,parameters)
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.sweep -magnetic field sweep extents,
-- arouind the centre field specified
-- in sys.magnet, a two-element vector
-- in Tesla
-- parameters.nsteps -number of steps in the magnetic
-- field sweep
-- parameters.timestep -duration of each time step, seconds
-- b_axis -magnetic field axis, Tesla
-- spectrum -L+ observable amplitude at each
+The sweep offsets are `linspace(sweep(1),sweep(2),nsteps)`; adding `spin_system.inter.magnet` gives `b_axis` in Tesla. The Zeeman Hamiltonian is normalised by the centre field, then each point samples the current `L+` expectation and advances the state for one timestep under the offset-field generator using `step`. The outputs are a Tesla field-axis column and the corresponding complex `L+` amplitudes in `spectrum`.

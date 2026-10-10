@@ -1,38 +1,27 @@
 # kernel/eigenfields/cubic_roots.m
 
-- Signature: `root_list=cubic_roots(poly_coeffs,root_tol)`
+- Direct source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/eigenfields/cubic_roots.m
+- Spinach Wiki: https://spindynamics.org/wiki/index.php?title=cubic_roots.m
+
+## Signature
+
+`root_list=cubic_roots(poly_coeffs,root_tol)`
 
 ## Purpose
 
-Real roots of a cubic polynomial in the unit interval. Syntax: root_list=cubic_roots(poly_coeffs,root_tol)
+Find the real roots of a polynomial of degree at most three in the unit interval. This helper is used by eigenfield calculations to solve cubic interpolants on a normalised field-interval coordinate.
 
-## Physical / mathematical content
+## Inputs
 
-- Eigenfield utilities. These files analyse field-dependent eigenstructure and resonance conditions, linking Hamiltonian spectra to magnetic-field sweeps and transition behaviour.
+- `poly_coeffs`: numeric real array with four finite elements, interpreted as `[a b c d]` for `a*x^3+b*x^2+c*x+d`. The input is reshaped to a row.
+- `root_tol`: finite positive real numeric scalar used both to discard small leading coefficients and to filter roots.
 
-## Numerical / algorithmic content
+## Output
 
-## Parameters / inputs
+- `root_list`: sorted row vector of accepted real roots in `[0,1]`; empty when no root is accepted.
 
-- poly_coeffs -four real coefficients [a b c d] of
-- a*x^3+b*x^2+c*x+d
-- root_tol -positive real root filtering tolerance
+## Algorithm and edge cases
 
-## Outputs
+The coefficients are divided by their maximum absolute value, making the computation insensitive to a common nonzero coefficient scale. All-zero coefficients return an empty result. Leading coefficients with absolute value at most `root_tol` are dropped, so a lower-degree polynomial is handled; if no coefficient remains, the result is empty. MATLAB's polynomial root calculation is then filtered by `abs(imag(root)) < root_tol`. Real parts within `[-root_tol,1+root_tol]` are clamped to `[0,1]`, sorted, and adjacent roots separated by at most `root_tol` are merged.
 
-- root_list -sorted row vector of real roots in [0,1]
-
-## Implementation structure
-
-- Real roots of a cubic polynomial in the unit interval. Syntax:
-- root_list=cubic_roots(poly_coeffs,root_tol)
-- poly_coeffs -four real coefficients [a b c d] of
-- a*x^3+b*x^2+c*x+d
-- root_tol -positive real root filtering tolerance
-- root_list -sorted row vector of real roots in [0,1]
-- Check consistency
-- Normalise polynomial coefficients
-- Drop leading numerical zeros
-- Find real roots inside the unit interval
-- Merge numerically coincident roots
-- Consistency enforcement
+The polynomial coordinate is dimensionless and the output is in the unit interval. The source contains no worked numeric example.

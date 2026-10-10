@@ -4,34 +4,15 @@
 
 ## Purpose
 
-Converts a tensor train representation of a matrix into a matrix. Syntax: answer=full(ttrain)
+Materialises a tensor-train matrix as a dense numeric matrix. A TT stores each sum term as a column of core cells, with a coefficient for that term; each core carries left/right bond ranks and one row-mode and one column-mode dimension. This is a tensor-train representation, not a polyadic-object storage interface.
 
-## Physical / mathematical content
+## Contraction and result shape
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+The result is initialised with `zeros(size(ttrain))`, so its matrix shape is the product of the row-mode sizes by the product of the column-mode sizes. For each train term, the function starts from the last core, contracts toward the first using the adjacent bond ranks, and reshapes/permutes the accumulated row and column mode axes into matrix order. It multiplies that dense term by its stored coefficient and adds it to the result.
 
-## Numerical / algorithmic content
+The allocation is dense and can be very large. The function contains no explicit class, rank-consistency, or mode-size validation; it relies on the object's core, rank, size, and `size` methods to describe a valid TT.
 
-## Parameters / inputs
+## Sources
 
-- ttrain -tensor train object
-
-## Outputs
-
-- answer -a full matrix
-- Note: the result can be huge, careless use would crash the system.
-
-## Implementation structure
-
-- Converts a tensor train representation of a matrix
-- into a matrix. Syntax:
-- answer=full(ttrain)
-- ttrain -tensor train object
-- answer -a full matrix
-- Note: the result can be huge, careless use would crash the system.
-- Preallocate the result
-- Get object dimensions
-- Get tensor ranks
-- Get mode sizes
-- Loop over the buffer
-- Multiply up the tensor train
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/full.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ttclass/full.m)

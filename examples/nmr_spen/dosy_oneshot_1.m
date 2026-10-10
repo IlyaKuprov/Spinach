@@ -20,7 +20,7 @@ inter.coupling.scalar{3,3}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory parameters 
 inter.relaxation={'t1_t2'}; 
@@ -31,7 +31,7 @@ inter.r2_rates=num2cell(1./[0.1602 0.1802 0.1902]);
 
 % Algorithmic options
 sys.disable={'pt'};
-sys.enable={'greedy'}; % 'gpu'
+sys.enable={'zte','greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -58,7 +58,7 @@ parameters.rlx_op={relaxation(spin_system)};
 parameters.rho0_ph={ones(parameters.npts,1)};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts,1)};
-parameters.coil_st={state(spin_system,'L-','1H')};
+parameters.coil_st={coil_state(spin_system,'L-','1H','exact')};
 
 % Diffusion
 parameters.diff=18.55e-10;       % m^2/s

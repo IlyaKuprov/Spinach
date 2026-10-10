@@ -5,7 +5,11 @@
 %
 % Parameters:
 %
-%    props      - the output of gparse() function
+%    props      - the output of gparse() or oparse(); EPR import
+%                 requires props.isotopes for each nonempty HFC:
+%                 Gaussian mass numbers or ORCA isotope strings.
+%                 HFCs are scaled by target/source gyromagnetic
+%                 ratio before thresholding and purging.
 %
 %    particles  - a cell array of the following form:
 %
@@ -95,7 +99,7 @@ function [sys,inter]=g2spinach(props,particles,references,options)
 if ~exist('options','var'), options=[]; end
 
 % Check consistency
-grumble(props,particles,references,options);
+source_gammas=grumble(props,particles,references,options);
 
 % Fundamental constants
 nuclear_magneton=7.6225932291E6;
@@ -152,8 +156,16 @@ switch ismember('E',[particles{:}])
         % All couplings are zero except for the hyperfine couplings to the electron
         inter.coupling.matrix=mat2cell(zeros(3*nspins,3*nspins),3*ones(nspins,1),3*ones(nspins,1));
         for n=1:(nspins-1)
-            inter.coupling.matrix{n,end}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
-            inter.coupling.matrix{end,n}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
+
+            % Scale the entire tensor before thresholding or purging
+            hfc=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
+            if ~isempty(hfc)
+                hfc=hfc*(spin(sys.isotopes{n})/source_gammas(index(n)));
+            end
+
+            % Preserve the symmetric-pair storage convention
+            inter.coupling.matrix{n,end}=hfc;
+            inter.coupling.matrix{end,n}=hfc;
         end
         
         % Remove small hyperfine couplings
@@ -266,7 +278,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(props,nuclei,references,options) %#ok<INUSD>
+function source_gammas=grumble(props,nuclei,references,options) %#ok<INUSD>
 if ~isstruct(props)
     error('the first argument must be a structure returned by gparse().');
 end
@@ -275,6 +287,53 @@ if ~iscell(nuclei)
 end
 if (~isnumeric(references))||(numel(nuclei)~=numel(references))
     error('references must be a numerical array with the same number of entries as nuclei.');
+end
+source_gammas=[];
+if ismember('E',[nuclei{:}])
+    elements=cellfun(@(entry)entry{1},nuclei,'UniformOutput',false);
+    source_gammas=zeros(size(props.symbols));
+    for n=1:numel(props.symbols)
+        if ~ismember(props.symbols{n},elements)||isempty(props.hfc.full.matrix{n})
+            continue
+        end
+        if isfield(props,'isotopes')&&...
+           (numel(props.isotopes)~=numel(props.symbols))
+            error(['EPR import requires an explicit HFC source isotope '...
+                   'for each atom: props.isotopes and props.symbols must '...
+                   'have the same length; subset both with the same indices.']);
+        end
+        source_iso='';
+        if isfield(props,'isotopes')&&(numel(props.isotopes)>=n)
+            if isnumeric(props.isotopes)
+                mass_number=props.isotopes(n);
+                if isreal(mass_number)&&isfinite(mass_number)&&...
+                   (mass_number>0)&&(mod(mass_number,1)==0)
+                    source_iso=[num2str(mass_number) props.symbols{n}];
+                end
+            elseif iscell(props.isotopes)
+                source_iso=props.isotopes{n};
+            end
+        end
+        if ~ischar(source_iso)||isempty(source_iso)||~isrow(source_iso)||...
+           isempty(regexp(source_iso,['^[1-9][0-9]*' props.symbols{n} '$'],'once'))
+            error('EPR import without an explicit HFC source isotope is not implemented.');
+        end
+        try
+            source_gammas(n)=spin(source_iso);
+        catch exception
+            if strcmp(exception.identifier,'spin:unknown_isotope')
+                error(['invalid HFC source isotope ' source_iso ' at atom '...
+                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
+            elseif strcmp(exception.identifier,'spin:data_unavailable')
+                error(['no spin data for HFC source isotope ' source_iso ' at atom '...
+                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
+            end
+            rethrow(exception)
+        end
+        if source_gammas(n)==0
+            error('EPR import with a zero-gamma HFC source isotope is not implemented.');
+        end
+    end
 end
 end
 
@@ -287,4 +346,5 @@ end
 %
 % A sign, first reported in 1955
 % at an IBM computing facility
+
 

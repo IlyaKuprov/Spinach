@@ -68,7 +68,7 @@ end
 report(spin_system,[num2str(nnz(dec_mask)) ' spins to be frozen and depopulated.']);
 
 % Get the spin space dimension
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 
 % Build the wipeout machinery
 switch spin_system.bas.formalism
@@ -76,7 +76,12 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
 
         % Get the list of states to be wiped
-        zero_mask=(sum(spin_system.bas.basis(:,dec_mask),2)~=0);
+        zero_mask=false(spn_dim,1);
+        for n=1:spin_system.bas.nsubst
+            local_mask=dec_mask(spin_system.chem.parts{n});
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            zero_mask(idx)=any(spin_system.bas.basis{n}(:,local_mask),2);
+        end
 
     case {'zeeman-liouv','zeeman-hilb'}
 
@@ -123,8 +128,13 @@ if (nargout>0)&&(~isempty(L))
             report(spin_system,['zeroing ' num2str(nnz(fp_zero_mask))...
                                 ' rows and columns in the Liouvillian.']);
 
-            % Apply the zero mask
-            L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
+            % Apply the zero mask without opening implicit operators
+            if isa(L,'polyadic')
+                P=spdiags(double(~fp_zero_mask),0,size(L,1),size(L,2));
+                L=P*L*P;
+            else
+                L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
+            end
 
         case 'zeeman-liouv'
 
@@ -192,6 +202,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,L,rho,spins)
+if (~strcmp(spin_system.bas.formalism,'sphten-liouv'))&&(spin_system.bas.nsubst>1)
+    error('Spinach:decouple:segmentedZeeman',...
+          'multi-substance Zeeman decouple filtering is not yet supported.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
     error('analytical decoupling is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end
@@ -221,5 +235,6 @@ end
 % It's not worth doing something unless you were doing something that
 % someone, somewere, would much rather you weren't doing.
 %
-% Terry Pratchett 
+% Terry Pratchett
+
 

@@ -1,60 +1,11 @@
 # kernel/cache/sle_operators.m
 
-- Signature: `[Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)`
+`[Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)` builds a truncated Wigner-function basis and the operators needed for lab-space rotational diffusion and interaction multiplication. `max_rank` is a positive integer. For `R = max_rank`, `space_basis` has one row `[L M N]` for every `L = 0,...,R` and every pair `M,N = L,L-1,...,-L`; its dimensions are `basis_dim`-by-3, where `basis_dim = (R+1)*(2*R+1)*(2*R+3)/3`.
 
-## Purpose
+`Lx`, `Ly`, and `Lz` are sparse `basis_dim`-by-`basis_dim` matrices. The raising matrix `L+` raises `M` by one at fixed `L,N`, with matrix element `sqrt(L*(L+1)-M*(M+1))`; it then sets `Lx=(L+ + L+')/2`, `Ly=(L+ - L+')/(2i)`, and `Lz=diag(M)`.
 
-Wigner D function basis set and rotation generators required by the SLE module. Syntax: [Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)
+`int_ranks` is an optional row vector of distinct positive integer interaction ranks; it may be empty when only the rotation generators are needed. The validator does not impose an upper bound relating an interaction rank to `max_rank`. `D` is indexed by rank, and each requested `D{r}` is a `(2r+1)`-by-`(2r+1)` cell array. Entry `D{r}{m,n}` is a sparse `basis_dim`-by-`basis_dim` matrix for multiplication by the Wigner function with projections `M=r+1-m` and `N=r+1-n`. Its retained couplings use the product of the two Clebsch–Gordan coefficients and the normalisation factor `sqrt((2*L2+1)/(2*L+1))`. Rank 2 uses the built-in bypass formula; other ranks call `clebsch_gordan.m` through the Java virtual machine. A cached result can be loaded without that calculation.
 
-## Physical / mathematical content
+The cache key includes `max_rank` and the requested interaction ranks in `sle_operators_rank_<max_rank>_int_<ranks>.mat`, beside the function. A cache hit loads `space_basis`, the three generators, and `D`; otherwise the results are built and a v7.3 save is attempted. A failed save warns but does not discard the returned operators. `max_rank` must be a positive integer, and `int_ranks` must be empty or a row of distinct positive integers.
 
-- Cache-management utilities. These files maintain Spinach temporary or persistent cache state used to avoid repeated expensive construction of large operators or metadata.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Parameters / inputs
-
-- max_rank -maximum L rank for Wigner D functions
-- int_ranks -row vector of interaction ranks for which
-- product superoperators are required; may
-- be empty if only rotation generators are
-- needed
-
-## Outputs
-
-- space_basis -lab space basis set descriptor, in
-- [L M N] format, giving indices of
-- each Wigner function in the basis.
-- Lx,Ly,Lz -representations of lab space rotation
-- generators in the Wigner function basis,
-- to be used in the building of the lab
-- space diffusion operator.
-- D -a cell array with one element per interac-
-- tion rank r in int_ranks, each a cell array
-- of Wigner function product superoperators,
-- corresponding to multiplication by D[r,M,N]
-- of the basis Wigner functions, to be used
-- in the building of the spin Hamiltonian
-- operator; D{r} has dimensions (2r+1)x(2r+1)
-- Automatic caching is implemented -the function would not re-
-- compute operator sets that it can find on disk.
-- Note: building product superoperators for interaction ranks other
-- than 2 calls clebsch_gordan.m, which requires the Java virtual
-- machine; cached operator sets load without it.
-
-## Implementation structure
-
-- Wigner D function basis set and rotation generators required by
-- the SLE module. Syntax:
-- [Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)
-- max_rank -maximum L rank for Wigner D functions
-- int_ranks -row vector of interaction ranks for which
-- product superoperators are required; may
-- be empty if only rotation generators are
-- needed
-- space_basis - lab space basis set descriptor, in
-- [L M N] format, giving indices of
-- each Wigner function in the basis.
-- Lx,Ly,Lz -representations of lab space rotation
+[MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cache/sle_operators.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=sle_operators.m)

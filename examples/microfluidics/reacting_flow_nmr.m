@@ -1,6 +1,12 @@
 % Complete microfluidic simulation: diffusion, flow, two second-
 % order chemical reactions, and NMR detection in a narrow strip
-% of the chip where the coil is assumed to be located.
+% of the chip where the coil is assumed to be located. Solvent is a
+% spin-bearing pool. The concentration history and spin evolution both
+% use the kernel reaction records; the two-stage history workflow is
+% retained, with the original frozen-rate concentration time steps.
+% Product unit arrival is now shared equally between reactants; this
+% preserves the mass-action derivative but changes finite frozen steps.
+% It is not numerically identical to the old concentration history.
 %
 % Calculation time: days, much faster on GPU.
 %
@@ -14,7 +20,11 @@
 function reacting_flow_nmr()
 
 % Import Diels-Alder cycloaddition
-[sys,inter,bas,kin]=dac_reaction();
+[sys,inter,bas]=dac_reaction();
+
+% Bimolecular rates in L/(mol*s), endo then exo
+inter.chem.reactions{1}.rate=2.0;
+inter.chem.reactions{2}.rate=1.0;
 
 % Import hydrodynamics information
 comsol.mesh_file='chip_mesh.txt';
@@ -41,16 +51,9 @@ spin_system.mesh=mesh;
 
 %% Concentration dynamics stage
 
-% Rate constants, mol/(L*s)
-k1=2.0;  % towards exo  
-k2=1.0;  % towards endo
-
-% Cycloaddition reaction generator, including solvent
-K=@(x)([-k1*x(2)-k2*x(2)  0                0      0     0;      
-         0               -k1*x(1)-k2*x(1)  0      0     0;           
-         0                k1*x(1)          0      0     0;
-         0                k2*x(1)          0      0     0; 
-         0                0                0      0     0]);  
+% Trace all spins for the concentration-only stage, retaining five pools
+chem_system=kill_spin(spin_system,1:spin_system.comp.nspins);
+K_chem=kinetics(chem_system);
 
 % Strong diffusion
 parameters.diff=1e-7;
@@ -72,19 +75,13 @@ for n=1:chem_nsteps
     report(spin_system,['chemistry + hydrodynamics time step ' int2str(n) ...
                         '/' int2str(chem_nsteps)]);
 
-    % Build a kinetics generator in each cell
-    GK=zeros([5 5 spin_system.mesh.vor.ncells],'like',1i);
-    parfor k=1:spin_system.mesh.vor.ncells
-        GK(:,:,k)=K(chem_traj(:,k,n));
-    end
-
-    % Assemble the evolution generator
-    G=1i*sp_block_diag(GK)+1i*kron(GF,speye(5));
-
-    % Take the time step
+    % Assemble local chemistry and spatial transport at the current state
     c_curr=chem_traj(:,:,n); c_curr=c_curr(:);
-    c_next=step(spin_system,G,c_curr,chem_dt);
-    chem_traj(:,:,n+1)=reshape(c_next,[5 spin_system.mesh.vor.ncells]);
+    G=1i*K_chem((n-1)*chem_dt,c_curr)+1i*kron(GF,speye(5));
+
+    % Retain the frozen-rate concentration step of the original workflow
+    c_next=step(chem_system,G,c_curr,chem_dt);
+    chem_traj(:,:,n+1)=chem_concs(chem_system,c_next).';
 
 end
 
@@ -103,9 +100,11 @@ end
 
 %% Full chemistry + hydrodynamics + spin dynamics stage
 
-% Build chemical reaction generators
-G1=react_gen(spin_system,kin{1});
-G2=react_gen(spin_system,kin{2});
+% Compile the full spin-transport reaction maps once
+K_spin=kinetics(spin_system);
+unit_idx=spin_system.bas.offsets(1:end-1)+1;
+spin_dim=spin_system.bas.offsets(end);
+unit_embed=sparse(unit_idx(1:4),1:4,ones(1,4),spin_dim,4);
 
 % Build RF coil phantom
 coil_ph=(spin_system.mesh.x(spin_system.mesh.idx.active)>287.0)&...
@@ -119,7 +118,7 @@ Ly=operator(spin_system,'Ly','1H'); dim=numel(coil_ph);
 Ly=polyadic({{spdiags(coil_ph,0,dim,dim),Ly}});
 
 % Build detection states
-coil=state(spin_system,'L+','1H');
+coil=coil_state(spin_system,'L+','1H','exact');
 coil=kron(coil_ph,coil);
 
 % NMR simulation parameters
@@ -145,10 +144,10 @@ if ismember('gpu',sys.enable)
 end
 
 % Build state operators
-LzA=state(spin_system,'Lz',spin_system.chem.parts{1});
-LzB=state(spin_system,'Lz',spin_system.chem.parts{2});
-LzC=state(spin_system,'Lz',spin_system.chem.parts{3});
-LzD=state(spin_system,'Lz',spin_system.chem.parts{4});
+LzA=coil_state(spin_system,'Lz',spin_system.chem.parts{1},'exact');
+LzB=coil_state(spin_system,'Lz',spin_system.chem.parts{2},'exact');
+LzC=coil_state(spin_system,'Lz',spin_system.chem.parts{3},'exact');
+LzD=coil_state(spin_system,'Lz',spin_system.chem.parts{4},'exact');
 
 % Preallocate fids array
 fids=cell(chem_nsteps,1);
@@ -162,12 +161,13 @@ parfor j=1:numel(n_vals)
     % dereference
     n=n_vals(j);
 
-    % Build the initial condition
+    % Prepare only reacting-species magnetisation, leaving solvent spins unexcited
     eta=cell(spin_system.mesh.vor.ncells,1);
     start_time=chem_time_grid(n);
     for k=1:spin_system.mesh.vor.ncells
         eta{k}=A{k}(start_time)*LzA+B{k}(start_time)*LzB+...
-               C{k}(start_time)*LzC+D{k}(start_time)*LzD;    
+               C{k}(start_time)*LzC+D{k}(start_time)*LzD;
+        eta{k}(unit_idx)=chem_traj(:,k,n);
     end
     eta=cell2mat(eta);
 
@@ -190,26 +190,19 @@ parfor j=1:numel(n_vals)
         report(spin_system,['NMR time step ' int2str(k) ...
                             '/' int2str(parameters.nsteps)]);
 
-        % Build the kinetics generator
-        K_L=cell(spin_system.mesh.vor.ncells,1);
-        K_R=cell(spin_system.mesh.vor.ncells,1);
+        % Supply the prescribed history through voxel unit coordinates
+        concs_left=zeros(4,spin_system.mesh.vor.ncells);
+        concs_right=zeros(4,spin_system.mesh.vor.ncells);
         for m=1:spin_system.mesh.vor.ncells %#ok<*PFBNS>
-
-            % Build the left interval edge kinetics generator
-            K_L{m}=k1*G1{1}*B{m}(timing_grid(k))+ ...   % Reaction 1 from substance A
-                   k1*A{m}(timing_grid(k))*G1{2}+ ...   % Reaction 1 from substance B
-                   k2*G2{1}*B{m}(timing_grid(k))+ ...   % Reaction 2 from substance A
-                   k2*A{m}(timing_grid(k))*G2{2};       % Reaction 2 from substance B
-
-            % Build the right interval edge composite evolution generator
-            K_R{m}=k1*G1{1}*B{m}(timing_grid(k+1))+ ... % Reaction 1 from substance A
-                   k1*A{m}(timing_grid(k+1))*G1{2}+ ... % Reaction 1 from substance B
-                   k2*G2{1}*B{m}(timing_grid(k+1))+...  % Reaction 2 from substance A
-                   k2*A{m}(timing_grid(k+1))*G2{2};     % Reaction 2 from substance B
-
+            concs_left(:,m)=[A{m}(timing_grid(k));B{m}(timing_grid(k));...
+                             C{m}(timing_grid(k));D{m}(timing_grid(k))];
+            concs_right(:,m)=[A{m}(timing_grid(k+1));B{m}(timing_grid(k+1));...
+                              C{m}(timing_grid(k+1));D{m}(timing_grid(k+1))];
         end
-        K_L=matlab.internal.math.blkdiag(K_L{:});
-        K_R=matlab.internal.math.blkdiag(K_R{:});
+        eta_left=unit_embed*sparse(concs_left);
+        eta_right=unit_embed*sparse(concs_right);
+        K_L=K_spin(timing_grid(k),eta_left(:));
+        K_R=K_spin(timing_grid(k+1),eta_right(:));
 
         % Assemble left and right evolution generators
         F_L=H+1i*F+1i*R+1i*K_L; F_R=H+1i*F+1i*R+1i*K_R;

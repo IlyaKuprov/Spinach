@@ -1,34 +1,9 @@
 # examples/singlet_states/decoherence_diacetylene.m
 
-- Signature: `decoherence_diacetylene()`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/singlet_states/decoherence_diacetylene.m)
 
-## Purpose
+This calculation models diacetylene with two protons and four carbons (4,096-dimensional Liouville space). The spin data are imported from vacuum-DFT coordinates, shifts, couplings and CSAs; the source selects 1H and 13C and passes `[31.8 182.4]` to `g2spinach` as conversion arguments, without assigning units to those values. All dipolar couplings and CSA tensors enter the Redfield relaxation superoperator.
 
-Long-lived spin states in the diacetylene molecule (2 protons, 4 carbons, 4096-dimensional Liouville space). The relaxation superoperator accounts for every dipolar coupling and every CSA tensor in the system. Calculation time: seconds
+The executable field assignment is 14.1 T, although its immediately preceding comment says 1.0 Tesla; this description follows the assignment. The model sets zero equilibrium, keeps relaxation in the lab frame, uses a 100 ps correlation time and sets both relaxation tolerances to 1e-5. It uses the complete, unapproximated `sphten-liouv` basis.
 
-## Physical / mathematical content
-
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-
-## Implementation structure
-
-- Long-lived spin states in the diacetylene molecule (2 protons,
-- 4 carbons, 4096-dimensional Liouville space). The relaxation
-- superoperator accounts for every dipolar coupling and every CSA
-- tensor in the system.
-- Calculation time: seconds
-- Read the spin system (coordinates, chemical shifts,
-- J-couplings and CSAs) from a vacuum DFT calculation
-- Set magnet field to 1.0 Tesla
-- Tighten up the tolerances
-- Set relaxation theory parameters
-- Relaxation superoperator accuracy
-- Use complete basis set
+The function displays 20 small-magnitude relaxation eigenvalues, then constructs the normalised singlet operator for the two centre carbons (spin indices 1 and 2) and evaluates `S'*R*S` as its self-relaxation rate. It also finds two low-magnitude eigenvectors and prints their spherical-tensor composition with `stateinfo`. These are model diagnostics; the source contains no reported numerical result, preparation pulse, gradient, storage-time trace or image reconstruction.

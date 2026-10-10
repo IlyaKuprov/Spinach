@@ -1,26 +1,19 @@
 # examples/fundamentals/convention_tests/nqi_test.m
 
+- MATLAB implementation: [examples/fundamentals/convention_tests/nqi_test.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/fundamentals/convention_tests/nqi_test.m)
+
 - Signature: `nqi_test()`
 
 ## Purpose
 
-Test of the reverse decomposition of spin-1 Hamiltonians.
+Exercises the reverse decomposition of a spin-1 Hamiltonian: `ham2nqi` extracts `omega` and `Q` from a randomly generated traceless Hermitian 3×3 matrix, then a Spinach ¹⁴N model is used to reconstruct that matrix. The coupling scaling and operator components are specified in the source; no additional unit interpretation is assumed here.
 
-## Physical / mathematical content
+## Setup and reconstruction
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+Run `nqi_test()`. It creates `H_T` from a complex random 3×3 matrix, adds its conjugate transpose, and removes the trace with `remtrace`. It calls `[omega,Q]=ham2nqi(H_T)`, then builds a system with zero magnet field, isotope `14N`, and coupling matrix `Q/(2*pi)`. The basis uses `zeeman-hilb` formalism with `approximation='none'`; after `create` and `basis`, the code sets the lab frame, obtains `[H_iso,H_aniso]=hamiltonian(spin_system)`, and forms `H_S` from `H_iso + orientation(H_aniso,[0 0 0])` plus the coefficients `omega(1)`, `omega(2)`, and `omega(3)` multiplying the `Lx`, `Ly`, and `Lz` operators for `14N`.
 
-## Numerical / algorithmic content
+The reconstruction passes when `norm(H_T-H_S,2)` is no greater than `1e-6*norm(H_T+H_S,2)`. This source-defined relative comparison is the acceptance criterion; it is not a reported fit outcome.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Observable result and scope
 
-## Implementation structure
-
-- Test of the reverse decomposition of
-- spin-1 Hamiltonians.
-- Get random test Hamiltonian
-- Translate back
-- Set up Spinach
-- Re-build using Spinach functionality
-- Compare the matrices
+The function prints `Quadrupolar reconstruction test PASSED.` when the comparison passes, or raises `Quadrupolar reconstruction test FAILED.` otherwise. It produces no plot and declares no output arguments. Each run uses a newly sampled random matrix; the source sets no seed and tests a single 3×3 case per invocation.

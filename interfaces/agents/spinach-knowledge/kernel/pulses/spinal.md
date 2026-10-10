@@ -1,37 +1,26 @@
 # kernel/pulses/spinal.m
 
+MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/pulses/spinal.m
+Source Wiki page: https://spindynamics.org/wiki/index.php?title=spinal.m
+
 - Signature: `phi=spinal(n)`
 
 ## Purpose
 
-SPINAL phase sequences as described in the paper by Fung, Khitrin and Ermolaev (https://doi.org/10.1006/jmre.1999.1896). Syntax: phi=spinal(n)
+Returns the phase, in radians, of pulse `n` in the SPINAL sequence described by Fung, Khitrin, and Ermolaev.
 
-## Physical / mathematical content
+## Sequence and indexing
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-
-## Numerical / algorithmic content
+The implementation stores 64 phase entries in degrees, selects entry `mod(n-1,64)+1`, then converts that entry to radians. Indexing starts at 1, and the stored phase pattern repeats every 64 pulses; for example, the first entry is 10 degrees. The function returns only a phase value, not an RF amplitude or pulse duration.
 
 ## Parameters / inputs
 
-- n -a positive integer number
+- `n` - positive integer scalar identifying the pulse in the sequence
 
-## Outputs
+## Output
 
-- phi -the phase of the n-th pulse in
-- SPINAL sequence, radians
+- `phi` - phase of the `n`th pulse in the SPINAL sequence, radians
 
-## Implementation structure
+## Reference
 
-- SPINAL phase sequences as described in the paper by Fung, Khitrin
-- and Ermolaev (https://doi.org/10.1006/jmre.1999.1896). Syntax:
-- phi=spinal(n)
-- n -a positive integer number
-- phi -the phase of the n-th pulse in
-- SPINAL sequence, radians
-- Check consistency
-- Spinal phase sequence
-- Loop correctly over
-- Consistency enforcement
-- The key to performance is elegance, not
-- battalions of special cases.
+Fung, Khitrin, and Ermolaev, https://doi.org/10.1006/jmre.1999.1896

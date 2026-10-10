@@ -1,43 +1,29 @@
 # kernel/utilities/sphten2zeeman.m
 
-- Signature: `P=sphten2zeeman(spin_system)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sphten2zeeman.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/sphten2zeeman.m)
 
 ## Purpose
 
-Returns a matrix that converts state vectors written in the spherical tensor basis set used by Spinach into state vectors written in the Zeeman basis set in Liouville space. Syntax: P=sphten2zeeman(spin_system)
+Returns a projector matrix `P` that converts state vectors written in the spherical tensor basis set used by Spinach into state vectors written in the Zeeman basis set in Liouville space, via `rho_zeeman = P * rho_sphten`.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- The function first calls an internal consistency check (`grumble`) that errors with `'this function is only available for sphten-liouv formalism.'` unless `spin_system.bas.formalism` is `'sphten-liouv'`.
+- Each substance is converted independently from `bas.basis{n}`, using the multiplicities of `chem.parts{n}`. The resulting sparse matrices are assembled as a direct sum: no inter-substance coherences are introduced.
+- Each local tensor product is divided by its Frobenius norm and multiplied by `sqrt(D_n)`, where `D_n` is the local Hilbert dimension. Consequently the unit coordinate maps to `vec(I_D_n)`, and its value equals the Hilbert trace divided by `D_n`.
+- To convert concentration-weighted spherical-tensor states into physical trace-equals-concentration Zeeman vectors, divide each destination block of P by its local Hilbert dimension D_n. The returned P retains the stock operator-normalisation convention.
+- The projector need not be square and may be huge.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+**Inputs**
 
-## Parameters / inputs
+- `spin_system` — main Spinach data structure using the `sphten-liouv` formalism and including basis set information.
 
-- spin_system -main Spinach data structure using
-- sphten-liouv formalism and inclu-
-- ding basis set information
+**Outputs**
 
-## Outputs
+- `P` — projector matrix used as `rho_zeeman = P * rho_sphten`.
 
-- P -projector matrix that is to be used in the fol-
-- lowing way:
-- rho_zeeman=P*rho_sphten
-- Note: the projector need not be square and may be huge.
+## References
 
-## Implementation structure
-
-- Returns a matrix that converts state vectors written in the
-- spherical tensor basis set used by Spinach into state vectors
-- written in the Zeeman basis set in Liouville space. Syntax:
-- P=sphten2zeeman(spin_system)
-- spin_system -main Spinach data structure using
-- sphten-liouv formalism and inclu-
-- ding basis set information
-- P -projector matrix that is to be used in the fol-
-- lowing way:
-- rho_zeeman=P*rho_sphten
-- Note: the projector need not be square and may be huge.
-- Check consistency
+- Spinach Wiki: [sphten2zeeman.m](https://spindynamics.org/wiki/index.php?title=sphten2zeeman.m)

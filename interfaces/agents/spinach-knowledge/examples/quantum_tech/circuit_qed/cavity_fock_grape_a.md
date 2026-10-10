@@ -1,35 +1,15 @@
 # examples/quantum_tech/circuit_qed/cavity_fock_grape_a.m
 
-- Signature: `cavity_fock_grape_a()`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/quantum_tech/circuit_qed/cavity_fock_grape_a.m
 
-## Purpose
+## Objective and physical model
 
-GRAPE preparation of a cavity Fock state through a dispersively coupled qubit, using piecewise-constant drives on both the cavity and the qubit. A linear drive alone cannot make a Fock state out of the vacuum of a harmonic mode; the qubit conditions the cavity phase through the dispersive shift and thereby provides the requi- red nonlinearity. The optimisation is run at two Fock space trun- cations; the pulse optimis
+This GRAPE example prepares cavity Fock state `|2>` from vacuum using a dispersively coupled qubit. A linear drive on a harmonic cavity alone produces displaced-vacuum states, not an isolated number state; the qubit's state-dependent dispersive shift supplies the nonlinearity used by the joint cavity–qubit controls. The model and parameters are attributed in the source to the bosonic GRAPE example in the para-qeet package.
 
-## Physical / mathematical content
+The cavity is simulated in two separate truncations, with three and four Fock levels (`C3` and `C4`), each coupled to a two-level qubit (`E`). In the selected rotating frame the cavity is on resonance with its drive; the effective Hamiltonian includes the dispersive number-dependent cavity–qubit shift, set to `656.2e3` Hz (656.2 kHz). The two cavity controls are its in-phase and quadrature displacement operators, accompanied by qubit `Lx` and `Ly` controls. The initial state is cavity vacuum with the qubit in its upper state; the target is cavity `|2>` with the qubit still upper. The calculation is a closed-system coherent model: the source specifies no relaxation, dephasing, or measurement process.
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+## Controls and truncation comparison
 
-## Numerical / algorithmic content
+Four piecewise-constant controls act on the cavity's two quadratures and the qubit's x and y operators. Each pulse has 40 slices of 33 ns, for a total duration of 1.32 μs. The optimisation uses L-BFGS, at most 300 iterations, the source's `NS` penalty with weight 0.001, and control scaling `1.76828e7` (the source does not annotate a physical unit for this scale). The initial guess has a Gaussian envelope centred at 0.66 μs, with 1.32 μs divided by 8 as its width parameter; its in-phase cavity and qubit channels start at amplitude 0.7 and the quadrature channels at zero.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Implementation structure
-
-- GRAPE preparation of a cavity Fock state through a dispersively
-- coupled qubit, using piecewise-constant drives on both the cavity
-- and the qubit. A linear drive alone cannot make a Fock state out
-- of the vacuum of a harmonic mode; the qubit conditions the cavity
-- phase through the dispersive shift and thereby provides the requi-
-- red nonlinearity. The optimisation is run at two Fock space trun-
-- cations; the pulse optimised in the smaller space underperforms
-- when it is re-evaluated in the larger one -optimal control solu-
-- tions must be converged with respect to the Fock space truncation.
-- Model and parameters from the bosonic GRAPE example of the para-
-- qeet package.
-- Calculation time: minutes
+The script optimises separately in `C3` and `C4`, directly propagates each resulting pulse to calculate transfer fidelity, and evaluates the `C3`-optimised pulse again in `C4`. It requires each in-space optimisation fidelity to reach 0.95, then reports the difference between the `C4`-optimised fidelity and the transplanted `C3` pulse's fidelity. This cross-test probes sensitivity to the chosen Fock truncation; two finite truncations alone do not prove convergence. The source comments describe the expected underperformance of the transplanted pulse, but no MATLAB result is included here and no numerical fidelity or convergence claim is made.

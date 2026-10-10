@@ -68,7 +68,7 @@ end
 timestep=1./parameters.sweep;
 
 % Detection state
-coil=state(spin_system,'L+',parameters.spins{1},'cheap');
+coil=coil_state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
 Lx=operator(spin_system,'Lx',parameters.spins{1});

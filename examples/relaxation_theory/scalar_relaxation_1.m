@@ -21,7 +21,7 @@ inter.zeeman.scalar={0.0 2.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation superoperator
 inter.relaxation={'SRFK'};

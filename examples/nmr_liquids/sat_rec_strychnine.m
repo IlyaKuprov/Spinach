@@ -17,7 +17,7 @@ sys.magnet=5.9;
 sys.tols.prox_cutoff=5.0;
 
 % Greedy parallelisation
-sys.enable={'greedy'};
+sys.enable={'zte','greedy'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -28,9 +28,9 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -1,36 +1,22 @@
 # kernel/operators/boson_ortho.m
 
+Direct source: [kernel/operators/boson_ortho.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/boson_ortho.m)
+
 - Signature: `B=boson_ortho(nlevels)`
 
 ## Purpose
 
-Orthogonal bosonic monomials calculated from the bosonic mono- mial basis produced by boson_mono(nlevels). Gram-Schmidt or- thogonalisation is used without normalisation. Syntax: B=boson_ortho(nlevels)
+Return the `boson_mono(nlevels)` monomials after sequential Gram–Schmidt subtraction with respect to the Frobenius inner product implemented by `hdot`. The source processes cells in their inherited `boson_mono` order. For each current operator `B{n}` and each preceding `B{k}`, it subtracts `B{k}*hdot(B{k},B{n})/hdot(B{k},B{k})`. Here `hdot(X,Y)=sum(conj(X).*Y,'all')`.
 
-## Physical / mathematical content
+## Ordering, dimensions, and normalisation
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
+The result retains the input cell ordering and shape: an `nlevels^2-by-1` cell array of `nlevels-by-nlevels` matrices. The subtractions make each operator orthogonal to the preceding processed operators under `hdot`. There is no unit-norm rescaling: the routine does not divide each resulting matrix by its own norm, and the first item is unchanged.
 
-## Numerical / algorithmic content
+## Operator action
 
-## Parameters / inputs
+Each item remains an operator matrix. The function performs no left/right action, Liouville-space lifting, commutator construction, or propagation.
 
-- nlevels -number of bosonic ladder population levels
+## Reference
 
-## Outputs
-
-- B -a cell array of orthogonal bosonic monomials
-
-## Implementation structure
-
-- Orthogonal bosonic monomials calculated from the bosonic mono-
-- mial basis produced by boson_mono(nlevels). Gram-Schmidt or-
-- thogonalisation is used without normalisation. Syntax:
-- B=boson_ortho(nlevels)
-- nlevels -number of bosonic ladder population levels
-- B -a cell array of orthogonal bosonic monomials
-- Check consistency
-- Bosonic monomials
-- Gram-Schmidt
-- Consistency enforcement
-- "We're all our own prisons. We are each our own wardens.
-- We do our own time. Prison Is In Your Mind."
+- [Spin Dynamics documentation for `boson_ortho.m`](https://spindynamics.org/wiki/index.php?title=boson_ortho.m)
+- Related entry: [`boson_mono.m`](boson_mono.md)

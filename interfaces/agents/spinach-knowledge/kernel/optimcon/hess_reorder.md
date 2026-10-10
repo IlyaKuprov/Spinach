@@ -1,39 +1,18 @@
 # kernel/optimcon/hess_reorder.m
 
 - Signature: `hess=hess_reorder(hess,K,N)`
+- Source: [kernel/optimcon/hess_reorder.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/hess_reorder.m)
 
 ## Purpose
 
-The waveforms on different channels are assumed to be stored in the rows of the input array. The Hessian elements correspond to the ele- ments of the waveform array ordered as: [X1 Y1 Z1 X2 Y2 Z2 ... Xn Yn Zn] where X,Y,Z are different control channels and the index enumerates the time discretization points. Gradient dimensions and element or- der are the same as the input waveform dimensions and element order. Eleme
+Reorders both variable axes of a Hessian to match the alternate flattening of a control waveform. If a waveform has K control rows and N time points, the input ordering is channel-fast within each time point, for example `[X1 Y1 Z1 X2 Y2 Z2 ... Xn Yn Zn]`. The output ordering is time-fast within each channel, for example `[X1 X2 ... Xn Y1 Y2 ... Yn Z1 Z2 ... Zn]`. Here the letter identifies a channel and the index identifies a time point. The same permutation converts in the reverse direction when supplied dimensions are correspondingly swapped; the routine does not infer the ordering.
 
-## Physical / mathematical content
+## Inputs and output
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
+- `hess` must be a numeric square matrix of size `(K*N) × (K*N)`.
+- `K` and `N` must each be a positive integer scalar: respectively the number of waveform control rows and time points.
+- The output `hess` is the permuted matrix. The gradient is not changed by this function; the source notes that its dimensions and element order follow the waveform.
 
-## Numerical / algorithmic content
+The implementation reshapes `hess` to `[K N K N]`, permutes the axes as `[2 1 4 3]`, and reshapes to `[N*K N*K]`. The checks do not require `hess` to be real or symmetric.
 
-## Parameters / inputs
-
-- hess -the old Hessian matrix to be reordered, curre-
-- ntly ordered K first then N.
-- K -the first ordered variable of the old Hessian,
-- number of control channels in the example above.
-- N -the second ordered variable of the old Hessian,
-- number of time points in the example above.
-- Output:
-- hess -reordered Hessian with N first then K.
-
-## Implementation structure
-
-- The waveforms on different channels are assumed to be stored in the
-- rows of the input array. The Hessian elements correspond to the ele-
-- ments of the waveform array ordered as:
-- [X1 Y1 Z1 X2 Y2 Z2 ... Xn Yn Zn]
-- where X,Y,Z are different control channels and the index enumerates
-- the time discretization points. Gradient dimensions and element or-
-- der are the same as the input waveform dimensions and element order.
-- Elements of the Hessian are reordered as to correspond to the wavef-
-- orm array:
-- [X1 X2 ... Xn Y1 Y2 ... Yn Z1 Z2 ... Zn]
-- interchanging the order from controls then time point to time point
-- then controls, or vice versa. Syntax:
+[Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=hess_reorder.m)

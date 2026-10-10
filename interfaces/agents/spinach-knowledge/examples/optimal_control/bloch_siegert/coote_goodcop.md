@@ -1,34 +1,25 @@
 # examples/optimal_control/bloch_siegert/coote_goodcop.m
 
-- Signature: `coote_goodcop()`
-
 ## Purpose
 
-Reproduction of the GOODCOP pulse design logic from Coote et al. with Bloch-Siegert corrections enabled in the optimiser and simulator The pulse enforces contracted-time C-alpha evolution while inverting CO
+This example sets up a 13C optimal-control pulse design based on the GOODCOP logic cited by [Coote et al.](https://doi.org/10.1038/s41467-018-05400-4). The design applies a 150 us pulse that gives C-alpha spins their offset-dependent free evolution for 90% of the pulse duration while inverting longitudinal magnetisation across the CO band. The example links the duration, RF ceiling, contraction factor, and ensemble bands to Table 1 and the paper text, and the 53.2 ppm carrier to Supplementary Figure 5.
 
-## Physical / mathematical content
+## Model and target
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The model is one 13C spin at 18.8 T, corresponding to an 800 MHz 1H field, in the sphten-liouv basis with no basis approximation. The carrier is 53.2 ppm. The model uses normalised Ix, Iy, and Iz state vectors and the NMR drift Hamiltonian.
 
-## Numerical / algorithmic content
+The C-alpha ensemble contains 100 uniformly spaced offsets from 35 to 75 ppm. Its initial transverse states alternate between Ix and Iy; each target is the state propagated by the offset Hamiltonian 2*pi*ca_hz*Lz for 0.90*150 us, or 135 us. The CO ensemble contains 30 uniformly spaced offsets from 165 to 185 ppm, with Iz as each initial state and -Iz as its target. Chemical-shift offsets are converted to Hz relative to the carrier at the specified field.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Controls and optimisation
 
-## Implementation structure
+The pulse has two 13C controls, along x and y, sampled in 75 equal intervals of 2 us. The RF ceiling is 15 kHz; the control amplitude scale is 2*pi*15 kHz in angular-frequency units. The offset ensemble is associated with Lz, and the ensemble correlation is rho_ens. The control setup specifies the lbfgs method and a maximum of 200 iterations; fmaxnewton is called with the grape_xy objective.
 
-- Reproduction of the GOODCOP pulse design logic from Coote et al.
-- with Bloch-Siegert corrections enabled in the optimiser and simulator
-- The pulse enforces contracted-time C-alpha evolution while inverting CO
-- Magnetic field corresponding to 800 MHz 1H
-- Single-spin carbon model
-- Basis set
-- Spinach housekeeping
-- Relevant operators and states
-- Drift Hamiltonian
-- Paper parameters for GOODCOP
-- Offset grids from the paper
-- Convert to offset frequencies
+Two waveforms are optimised from the same randomly drawn initial guess: one with Bloch-Siegert corrections enabled in optimcon, and one with those corrections disabled. The returned control arrays are multiplied by the RF amplitude scale. The Bloch-Siegert-enabled simulation augments the x/y controls with virtual controls using bloch_siegert; the uncorrected waveform is simulated without that augmentation.
+
+## Evaluation
+
+The evaluation grid contains 251 uniformly spaced chemical shifts from 0 to 200 ppm. At each point, the drift includes the corresponding Lz offset; Iz is propagated through each pulse, and the real final Iz overlap is recorded as Mz. The plotted observable is final Mz versus 13C chemical shift, with separate profiles for Bloch-Siegert corrections on and off.
+
+## Source
+
+[coote_goodcop.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/bloch_siegert/coote_goodcop.m)

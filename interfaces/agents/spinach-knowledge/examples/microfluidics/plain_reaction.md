@@ -1,30 +1,15 @@
 # examples/microfluidics/plain_reaction.m
 
-- Signature: `plain_reaction()`
+## Model
 
-## Purpose
+A homogeneous cycloaddition concentration model with two reactants, two competing product channels, and an inert fifth solvent component; there is no spin dynamics, flow, or diffusion. Explicit reaction records assign rates 0.5 and 0.1 L/(mol*s) to products 3 (endo) and 4 (exo), respectively, retaining the original numerical channels and plot labels. For concentrations A and B, the implemented rates are `dA/dt=dB/dt=-(k1+k2)*A*B`, `dP3/dt=k1*A*B`, `dP4/dt=k2*A*B`, and `dS/dt=0`. Initial concentrations are `[0.6; 0.5; 0; 0; 18.1] mol/L`.
 
-Non-linear reaction kinetics in a situation when there is no hydrodynamics, diffusion, or spin dynamics. This is in- tended as a stepping stone to the more complicated cases in the same directory of the Spinach example set. Calculation time: seconds.
+## Integration and output
 
-## Physical / mathematical content
+The concentration trajectory is advanced for 20 seconds in 200 steps with `step` and the `LG4` integrator. A concentration-versus-time plot shows components 1–4 in mol/L and omits solvent. The file header describes runtime as seconds; that is a source estimate, not a timing measurement here.
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
+The five species are spin-free unit-coordinate blocks. A ghost seed is created and traced out with `kill_spin` because `create` requires a non-empty isotope input; no spin physics is introduced. This concentration-only construction does not change the three solvent protons in the shared `dac_reaction` molecular definition. `kinetics` compiles the records, `unit_state` supplies initial populations, and the existing LG4 stepping uses the concentration-dependent generator. Additive product unit arrival is shared equally between reactants instead of being assigned solely to B, so finite-step concentration histories need not equal the old asymmetric allocation.
 
-## Numerical / algorithmic content
+## Source
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Non-linear reaction kinetics in a situation when there is
-- no hydrodynamics, diffusion, or spin dynamics. This is in-
-- tended as a stepping stone to the more complicated cases
-- in the same directory of the Spinach example set.
-- Calculation time: seconds.
-- No spin system here
-- Rate constants, mol/(L*s)
-- Cycloaddition reaction generator, including solvent
-- Kinetic time grid, 20 seconds
-- Preallocate concentration trajectory
-- Initial concentrations, mol/L
-- Concentration dynamics
+https://github.com/IlyaKuprov/Spinach/blob/main/examples/microfluidics/plain_reaction.m

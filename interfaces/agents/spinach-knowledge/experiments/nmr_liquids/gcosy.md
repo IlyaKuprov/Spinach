@@ -1,65 +1,29 @@
 # experiments/nmr_liquids/gcosy.m
 
 - Signature: `fid=gcosy(spin_system,parameters,H,R,K)`
+- Source: [`experiments/nmr_liquids/gcosy.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/gcosy.m)
 
-## Purpose
+## Purpose and sequence
 
-Horne-Morris gradient-selected COSY pulse sequence. Syntax: fid=gcosy(spin_system,parameters,H,R,K)
+This Horne-Morris gradient-selected COSY sequence starts from `Lz` magnetisation on the selected isotope, applies an `Lx` 90-degree pulse, and records the F1 trajectory. Its second pulse has angle `parameters.angle`. A two-gradient sandwich selects the pathway: P uses opposite gradient signs, while N uses equal signs. A positive `parameters.g_stab_del` inserts a stabilisation delay after the first gradient as part of the sandwich propagator and after the second gradient before F2 acquisition. F2 evolution is detected with the selected isotope's `L+` coil state. The source notes P-type selection is less sensitive to mixing-pulse phase errors; P+N returns both pathway components for echo/anti-echo recombination. This is a parameterised simulation sequence, not a measured spectrum or run-verified result.
 
-## Physical / mathematical content
+The Liouvillian is `L=H+1i*R+1i*K`; both dimensions use dwell time `1/parameters.sweep` seconds. Defaults are `g_amp=3` Gauss/cm, `g_dur=2e-3` seconds, `g_stab_del=2e-4` seconds, `s_len=1.5` cm, and `pathway='P'`. They apply when the corresponding field is absent.
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+## Parameters and inputs
 
-## Numerical / algorithmic content
+- `parameters.sweep`: positive real scalar sweep width in Hz.
+- `parameters.npoints`: two positive integer point counts, ordered F1 then F2.
+- `parameters.spins`: one-element cell array naming an isotope present in the system (for example, `{'1H'}` or `{'13C'}`).
+- `parameters.angle`: finite real second-pulse angle in radians. The source notes pi/2 is usual and also allows angles such as those for COSY45 and COSY60.
+- `parameters.g_amp`: positive real gradient amplitude in Gauss/cm; default 3.
+- `parameters.g_dur`: positive real gradient duration in seconds; default 2e-3.
+- `parameters.g_stab_del`: non-negative real post-gradient stabilisation delay in seconds; default 2e-4.
+- `parameters.s_len`: positive real active sample length in cm; default 1.5.
+- `parameters.pathway`: `'P'`, `'N'`, or `'P+N'`; default `'P'`. P uses gradient signs [1,-1], N [1,1].
+- `H`, `R`, and `K`: same-sized numeric Hamiltonian, relaxation, and kinetics matrices supplied by the context function. The function requires the `sphten-liouv` formalism.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Outputs and reference
 
-## Parameters / inputs
-
-- parameters.sweep sweep width in Hz
-- parameters.npoints number of points for both dimensions
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.angle second pulse angle in radians, usu-
-- ally pi/2, but also allows COSY45,
-- COSY60, etc.
-- parameters.g_amp gradient amplitude in Gauss/cm,
-- defaults to 3
-- parameters.g_dur gradient duration in seconds,
-- defaults to 2e-3
-- parameters.g_stab_del post-gradient stabilisation delay in
-- seconds, defaults to 2e-4
-- parameters.s_len active sample length in cm,
-- defaults to 1.5
-- parameters.pathway optional coherence pathway selection,
-- either 'P', 'N', or 'P+N', defaults
-- to 'P'
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid -two-dimensional free induction decay, or a structure
-- with P-type fid.pos and N-type fid.neg fields in
-- 'P+N' mode
-- Note: the default P-type pathway uses opposite gradient signs
-- and is less sensitive to mixing pulse phase errors. The
-- N-type pathway uses equal gradient signs.
-- Note: 'P+N' mode returns P-type and N-type components for
-- echo/anti-echo recombination in phase-sensitive processing.
-
-## Implementation structure
-
-- Horne-Morris gradient-selected COSY pulse sequence. Syntax:
-- fid=gcosy(spin_system,parameters,H,R,K)
-- parameters.sweep sweep width in Hz
-- parameters.npoints number of points for both dimensions
-- parameters.spins nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.angle second pulse angle in radians, usu-
-- ally pi/2, but also allows COSY45,
-- COSY60, etc.
-- parameters.g_amp gradient amplitude in Gauss/cm,
-- defaults to 3
-- parameters.g_dur gradient duration in seconds,
+- `fid`: two-dimensional FID for P or N selection.
+- In P+N mode, `fid.pos` is the P-type component and `fid.neg` is the N-type component.
+- [Spinach Wiki: `gcosy.m`](https://spindynamics.org/wiki/index.php?title=gcosy.m)

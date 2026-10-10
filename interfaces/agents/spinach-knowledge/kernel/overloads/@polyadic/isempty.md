@@ -1,33 +1,12 @@
 # kernel/overloads/@polyadic/isempty.m
 
-- Signature: `answer=isempty(p)`
+MATLAB source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@polyadic/isempty.m>
+Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=polyadic/isempty.m>
 
-## Purpose
+## Meaning
 
-Returns true for polyadics that represent a matrix with a zero dimension. Syntax: answer=isempty(p)
+This overload asks whether the dimensions reported for a polyadic value contain a zero. It evaluates `size(p)` and returns `true` if any returned dimension equals zero; otherwise it returns `false`. Thus the decision is about the object's reported shape, not whether its stored factors contain nonzero numerical values.
 
-## Physical / mathematical content
+The method does not inflate the representation, inspect core or affix values, or perform matrix multiplication. Its shape semantics are delegated to the applicable `size` method. This file defines no broadcasting rule or additional validation of the polyadic object's internal dimensions.
 
-- Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- p -a polyadic object
-
-## Outputs
-
-- answer -a logical value
-
-## Implementation structure
-
-- Returns true for polyadics that represent a matrix with a
-- zero dimension. Syntax:
-- answer=isempty(p)
-- p -a polyadic object
-- answer -a logical value
-- Check the size
-- Q: Why do sumo wrestlers shave their legs and armpits?
-- A: To make sure people can tell them apart from feminists.
-- A "festive season" cracker
+No orientation-specific data or action is handled here.

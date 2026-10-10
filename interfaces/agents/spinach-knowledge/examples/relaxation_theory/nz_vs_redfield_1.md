@@ -1,33 +1,13 @@
 # examples/relaxation_theory/nz_vs_redfield_1.m
 
-- Signature: `nz_vs_redfield_1()`
+[Source file](https://github.com/IlyaKuprov/Spinach/blob/main/examples/relaxation_theory/nz_vs_redfield_1.m) · Signature: `nz_vs_redfield_1()`
 
-## Purpose
+## Purpose and model
 
-Nakajima-Zwanzig relaxation theory against Redfield theory for a two-spin system with dipolar and CSA cross-correlations. The three superoperators compared are the off-shell NZ kernel (resolvent form), the on-shell NZ kernel (back-rotated form), and Redfield theory. The on-shell kernel at zero shift reproduces Redfield theory exactly; the off-shell kernel agrees with Redfield theory on the zero-frequency subspace of 
+This example compares Redfield relaxation with two Nakajima–Zwanzig (NZ) kernels for a two-spin system with dipolar and chemical-shift-anisotropy cross-correlations. The source distinguishes the off-shell resolvent kernel from the on-shell back-rotated kernel. Its header states the expected relationships: at zero shift the on-shell kernel reproduces Redfield theory; the off-shell kernel agrees with Redfield on the zero-frequency subspace and differs to first order in omega times correlation time on coherences; a lifetime shift suppresses rates by moving the kernel off the real axis. These are source-described theoretical comparisons, not experimental observations.
 
-## Physical / mathematical content
+The model uses `1H` and `13C` with magnet setting 14.1. The shielding principal-value inputs are [7, 15, -22] and [11, 18, -29], with Euler-angle inputs [pi/3, pi/4, pi/5] and [pi/6, pi/7, pi/8]. Coordinates are (0,0,0) and (0,0,1.02); the source does not annotate a unit for these entries. Common relaxation settings are zero equilibrium, lab-frame retention, and keeping the density-fluctuation settings. The Redfield and NZ base correlation-time inputs are 200e-12. The source explicitly labels seconds on the correlation-time plot axis; it does not otherwise attach a unit to the base input in the parameter assignment.
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+## Comparisons and displayed output
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Nakajima-Zwanzig relaxation theory against Redfield theory for a
-- two-spin system with dipolar and CSA cross-correlations. The three
-- superoperators compared are the off-shell NZ kernel (resolvent form),
-- the on-shell NZ kernel (back-rotated form), and Redfield theory. The
-- on-shell kernel at zero shift reproduces Redfield theory exactly; the
-- off-shell kernel agrees with Redfield theory on the zero-frequency
-- subspace of the coherent Liouvillian and differs in first order in
-- omega*tau_c on coherences; a lifetime shift suppresses all rates by
-- pushing the kernel off the real axis.
-- Calculation time: minutes
-- Magnet and isotopes
-- Chemical shielding tensors
+The script constructs full relaxation superoperators for Redfield, on-shell NZ with `nz_onshell=true` and zero shift, and off-shell NZ. It prints relative 1-norm differences for on-shell versus Redfield, off-shell versus Redfield on the zero-frequency (kite) subspace, and off-shell versus Redfield over the full superoperator. It then scans correlation times 2.5e-12, 5e-12, 10e-12, and 20e-12, comparing off-shell NZ and Redfield at each value. A second scan applies lifetime shifts 0, 1e9, 1e10, and 1e11 Hz and records the largest absolute diagonal relaxation rate. Two panels plot the calculated relative difference versus correlation time and largest rate versus lifetime shift. The source gives no measured data and the example page reports no run-specific numerical output; the plotted curves and printed values are calculations produced when the script runs.

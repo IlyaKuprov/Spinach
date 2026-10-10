@@ -1,53 +1,18 @@
 # kernel/optimcon/distortions/amp_root.m
 
-- Signature: `[w,J]=amp_root(w,sat_lvls,s)`
+Source: [kernel/optimcon/distortions/amp_root.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/distortions/amp_root.m)
+Wiki: [Spinach reference](https://spindynamics.org/wiki/index.php?title=amp_root.m)
 
 ## Purpose
 
-Amplifier compression distortion model. Applies a saturating root-sigmoidal distortion to the waveform amplitude: y=x/(1+(x/a)^s)^(1/s) Treats odd channels of multi-channel waveform as X and even ones as Y components; the autodiff Jacobian is returned for the vectorisation of the input array. Syntax: [w,J]=amp_root(w,sat_lvls,s)
+Applies a smooth radial amplitude compression independently to every X/Y control pair in every time slice. For a pair <code>(X,Y)</code>, let <code>r = sqrt(X^2+Y^2)</code>, saturation level <code>a</code>, and sharpness <code>s</code>. Both components are multiplied by <code>[1+(r/a)^s]^(-1/s)</code>, so the output radial amplitude is <code>r/[1+(r/a)^s]^(1/s)</code>. The pair's direction is unchanged. A starting choice of <code>s=4</code> is documented.
 
-## Physical / mathematical content
+The waveform uses rad/s nutation-frequency units. The saturation level has the same amplitude units and sets the limiting radial output amplitude. The routine is a distortion map, not an objective or constraint function.
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+## Call and data
 
-## Numerical / algorithmic content
+<code>[w,J] = amp_root(w,sat_lvls,s)</code>
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Rows of <code>w</code> are successive X and Y components, and each column is one time slice. <code>sat_lvls</code> and <code>s</code> each provide one value per X/Y pair. There are no default input values. <code>w</code> must be real numeric with an even row count; each saturation level must be finite, real and positive; each sharpness value must be a real positive integer. The implementation checks element counts against the number of pairs but does not explicitly require finite entries in <code>w</code> or finite <code>s</code> values.
 
-## Parameters / inputs
-
-- w -waveform in rad/s nutation frequency units,
-- one time slice per column, and rows arran-
-- ged as XYXY... with respect to in-phase and
-- quadrature parts on each control channel
-- sat_lvls -saturation levels beyond which the amplifi-
-- er cannot go, one value per X,Y pair in w,
-- giving the maximum output sqrt(X^2+Y^2)
-- s -a vector of positive integers (one value per
-- X,Y pair in w) regulating the sharpness of
-- the transition from linear to saturating be-
-- haviour, a good starting choice is 4
-
-## Outputs
-
-- w -distorted waveform in the same units and
-- layout as the input
-- J -distortion Jacobian matrix with respect to
-- the vectorisation of the input, sparse
-
-## Implementation structure
-
-- Amplifier compression distortion model. Applies a saturating
-- root-sigmoidal distortion to the waveform amplitude:
-- y=x/(1+(x/a)^s)^(1/s)
-- Treats odd channels of multi-channel waveform as X and even
-- ones as Y components; the autodiff Jacobian is returned for
-- the vectorisation of the input array. Syntax:
-- [w,J]=amp_root(w,sat_lvls,s)
-- w -waveform in rad/s nutation frequency units,
-- one time slice per column, and rows arran-
-- ged as XYXY... with respect to in-phase and
-- quadrature parts on each control channel
-- sat_lvls -saturation levels beyond which the amplifi-
+The second output <code>J</code> is optional. When requested, it is a sparse <code>numel(w)</code>-by-<code>numel(w)</code> Jacobian with respect to MATLAB column-major vectorisation of <code>w</code>. Each pair contributes a 2-by-2 block of the form <code>scale*I + curvature*[X;Y]*[X Y]</code>, where <code>scale = [1+(r/a)^s]^(-1/s)</code> and <code>curvature = -r^(s-2)/a^s * [1+(r/a)^s]^(-1/s-1)</code>. At <code>r=0</code>, the implementation explicitly sets <code>scale=1</code> and <code>curvature=0</code>. If needed, Jacobian block values are gathered to host memory before sparse assembly.

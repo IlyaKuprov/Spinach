@@ -1,56 +1,23 @@
 # experiments/hyperpol/noveldnp_steady.m
 
 - Signature: `dnp=noveldnp_steady(spin_system,parameters,H,R,K)`
+- Canonical MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/hyperpol/noveldnp_steady.m
 
-## Purpose
+## Purpose and sequence
 
-Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed solid effect (SE), steady-state version. For futher information see: Syntax (call from powder context): dnp=noveldnp_steady(spin_system,parameters,H,R,K)
+Computes a steady-state detected observable over microwave resonance offsets for the pulsed solid-effect or NOVEL DNP sequence. The input relaxation superoperator `R` is documented as thermalised to finite temperature. The function forms `L=H+1i*R+1i*K`; for each offset it adds the electron (L_z) offset term, applies the selected irradiation/contact block, then the unirradiated shot-spacing block, and solves the repeated-cycle steady state with a Newton solver. The output is the coil-state overlap with that steady state, not a measured polarisation.
 
-## Physical / mathematical content
+For `flippulse=1`, the source applies an electron (X)-axis 90-degree pulse followed by a (-Y) microwave contact period. When `flipback=1`, it then applies a (-X) microwave flipback pulse of duration `pulse_dur`. For `flippulse=0`, it uses the contact period without the preparation pulse. `irr_powers`, `el_offs`, and `addshift` enter the generator multiplied by `2*pi`; use Hz-valued frequencies consistent with the source's stated Hz convention for microwave amplitude. Durations are in seconds.
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
+## Inputs and output
 
-## Numerical / algorithmic content
+`H`, `R`, and `K` are context-supplied matrices; `R` must represent finite-temperature relaxation. Required fields are `irr_powers` (non-negative microwave amplitude, Hz), `coil` (detection-state column vector), `contact_dur` (seconds), `shot_spacing` (seconds), `flippulse` (0 or 1), `flipback` (0 or 1), `addshift` (real scalar frequency shift), and `el_offs` (real offset array). If `flippulse=1`, a positive `pulse_dur` in seconds is required. `dnp` has the same shape as `parameters.el_offs`, with one complex-capable detected value per offset.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 
-## Parameters / inputs
 
-- H -Hamiltonian matrix, received from
-- context function
-- R -relaxation superoperator, received
-- from context function, must be ther-
-- malised to some finite temperature
-- K -kinetics superoperator, received
-- from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.coil -detection state(s)
-- parameters.contact_dur -contact time, seconds
-- parameters.shot_spacing -delay between microwave irradiation periods
-- parameters.flippulse -0: Solid Effect (no flip pulse)
-- 1: NOVEL (90-degree flip pulse)
-- parameters.flipback -0: NOVEL without flipback pulse
-- 1: NOVEL with flipback pulse
-- parameters.addshift -shift to center the field profile
-- parameters.el_offs -microwave resonance offsets
-- Output:
-- dnp -steady state observable on the de-
-- tection state vector as a function
-- of microwave resonance offset
+No gradients, spatial encoding, k-space, or FID are produced. The code-level 0/1 switch and 0/90/270-degree pulse axes are the available numerical examples; no parameter set or computed experimental result is provided in the source or baseline page.
 
-## Implementation structure
+## References
 
-- Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed
-- solid effect (SE), steady-state version. For futher information see:
-- Syntax (call from powder context):
-- dnp=noveldnp_steady(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from
-- context function
-- R -relaxation superoperator, received
-- from context function, must be ther-
-- malised to some finite temperature
-- K -kinetics superoperator, received
-- from context function
-- parameters.irr_powers -microwave amplitude (aka electron
+- NOVEL/solid-effect references retained from the source: https://doi.org/10.1016/0022-2364(88)90190-4 and https://doi.org/10.1063/1.5000528
+- Spin Dynamics Wiki: https://spindynamics.org/wiki/index.php?title=noveldnp_steady.m

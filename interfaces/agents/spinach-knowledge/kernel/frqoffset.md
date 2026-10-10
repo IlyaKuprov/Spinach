@@ -4,44 +4,26 @@
 
 ## Purpose
 
-Adds omega*Lz Larmor frequency offsets to the Hamiltonian; this is useful in liquid state NMR experiments. Syntax: H=frqoffset(spin_system,H,parameters)
+Adds frequency-offset terms for selected spins to a Hamiltonian operator or commutation superoperator.
 
-## Physical / mathematical content
+## Frequency-offset rule
 
-## Numerical / algorithmic content
+For each nonzero offset, the function adds `2*pi*offset*Lz(spin)` to `H`. An offset is specified in Hz; multiplying by `2*pi` converts its coefficient to angular frequency in radians per second. The function constructs an offset Hamiltonian term; it does not itself propagate a state or evolve a signal. Matrix addition leaves the returned `H` at the input dimensions and retains its operator or superoperator representation.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+If multiple entries in `parameters.spins` name the same spin, their offset values must agree; the routine applies that spin offset once, rather than combining different channel values. Zero offsets contribute no term.
 
 ## Parameters / inputs
 
-- H -Hamiltonian operator or commutati-
-- on superoperator
-- parameters.spins -a cell array giving the spins that
-- the offsets should be applied to,
-- e.g. {'1H','13C'}
-- parameters.offset -a vector of offsets (in Hz) on
-- each of the spins listed in the
-- parameters.spins array
+- `spin_system` — Spinach spin-system structure used to resolve the spin operators.
+- `H` — Hamiltonian operator or commutation superoperator to which the offset terms are added.
+- `parameters.spins` — non-empty cell array of character spin labels present in `spin_system.comp.isotopes`, for example `{'1H','13C'}`.
+- `parameters.offset` — non-empty real numeric vector in Hz, with one value per spin label. The implementation checks the vector length and real-numeric form; it does not explicitly require finite values.
 
-## Outputs
+## Output
 
-- H -Hamiltonian operator or commutati-
-- on superoperator
-- Note: offset transformation of this kind is an approximati-
-- on, use rotframe.m or intrep.m if a rigorous treat-
-- ment of second order effects is required.
+- `H` — the input operator or superoperator with the selected offset terms added.
 
-## Implementation structure
+This is the documented approximate offset transformation; the source recommends `rotframe.m` or `intrep.m` when a rigorous treatment of second-order effects is required.
 
-- Adds omega*Lz Larmor frequency offsets to the Hamiltonian;
-- this is useful in liquid state NMR experiments. Syntax:
-- H=frqoffset(spin_system,H,parameters)
-- H -Hamiltonian operator or commutati-
-- on superoperator
-- parameters.spins -a cell array giving the spins that
-- the offsets should be applied to,
-- e.g. {'1H','13C'}
-- parameters.offset -a vector of offsets (in Hz) on
-- each of the spins listed in the
-- parameters.spins array
-- Note: offset transformation of this kind is an approximati-
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/frqoffset.m)
+<https://spindynamics.org/wiki/index.php?title=frqoffset.m>

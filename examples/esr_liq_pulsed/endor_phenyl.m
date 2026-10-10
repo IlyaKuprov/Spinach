@@ -34,11 +34,11 @@ inter.coupling.scalar{6,1}=mt2hz(0.19,g_phenyl);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Symmetry: equivalent ortho pair and equivalent meta pair
-bas.sym_group={'S2','S2'};
-bas.sym_spins={[2 3],[4 5]};
+bas.sym_group={{'S2','S2'}};
+bas.sym_spins={{[2 3],[4 5]}};
 
 % Sequence parameters
 parameters.offset=0;
@@ -48,6 +48,9 @@ parameters.tau=100e-9;
 parameters.zerofill=4096;
 parameters.spins={'E'};
 parameters.axis_units='MHz';
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

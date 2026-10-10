@@ -1,34 +1,16 @@
 # examples/optimal_control/distortions/rlc_response_2.m
 
+Source: [examples/optimal_control/distortions/rlc_response_2.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/distortions/rlc_response_2.m)
+
 - Signature: `rlc_response_2()`
+- Calculation time: the source header estimates minutes.
 
-## Purpose
+## Purpose and model
 
-Probe circuit response effect on the accuracy of the deu- terium pre-phasing pulse designed to set deuterium magne- tisation in a -CD3 group of alanine up for rephasing 100 microseconds after the pulse is finished. The system is assumed to be a powder (100 orientations) with a B1 distribution (from 40 to 60 kHz per channel). Piecewise-constant GRAPE pulse is used. Calculation time: minutes
+This example asks how a probe-circuit response model changes a simulated deuterium pre-phasing pulse for the CD3 group of alanine. The source describes the goal as placing the deuterium magnetisation for rephasing 100 microseconds after the pulse. Its spin model contains 2H, with the alanine-CD3 NQI input `anas2mat(0,40e3,0,0,0,0)`; the script labels the magnet as 600 MHz and sets `sys.magnet=14.1` T. It uses the full sphten-liouv basis (`bas.approximation='none'`) and a 100-orientation powder grid named `rep_2ang_100pts_sph`. The powder drift ensemble is built with `drifts(...,@powder,...,'labframe')`.
 
-## Physical / mathematical content
+## Pulse design and response
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The normalised initial and target states are the 2H `Lz` and `Lx` states. The two controls are the 2H `Lx`/`Ly` operators on one channel. The amplitude-robust design spans five RF levels, 40, 45, 50, 55, and 60 kHz per channel (stored as `2*pi*[40 45 50 55 60]*1e3`). It uses 75 slices of 2 microseconds each, a 100-microsecond optimiser dead time, a maximum of 50 iterations, an NS penalty of weight 1, and freezes the first and last four slices. The source sets the final optimiser method to `goodwin`, with the rectangle integrator, and calls `grape_xy` from `randn(2,75)/10` after setting the first and last four samples to zero. Optimiser plots are requested for XY controls, robustness, and the spectrogram.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Probe circuit response effect on the accuracy of the deu-
-- terium pre-phasing pulse designed to set deuterium magne-
-- tisation in a -CD3 group of alanine up for rephasing 100
-- microseconds after the pulse is finished.
-- The system is assumed to be a powder (100 orientations)
-- with a B1 distribution (from 40 to 60 kHz per channel).
-- Piecewise-constant GRAPE pulse is used.
-- Calculation time: minutes
-- 600 MHz magnet
-- Isotopes
-- Alanine CD3 NQI parameters
-- Basis set
+The resulting Cartesian control arrays are scaled by the mean power level and passed to `restrans` with the 2H Larmor frequency at 14.1 T, Q = 200, and the `pwc` response option (the call also supplies a final argument of 100). This produces the circuit-response figure; the page describes a model calculation, not a measured probe trace. The script contains no reported response values or comparison metric, so it does not establish hardware performance or a numerical loss of pulse accuracy.

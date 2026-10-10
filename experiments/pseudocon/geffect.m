@@ -88,7 +88,7 @@ if (~isnumeric(states))||(~isreal(states))||...
    (numel(states)~=2)||any(mod(states,1)~=0)||any(states<1)
     error('the two elements of states argument must be positive integers.');
 end
-if any(states>size(spin_system.bas.basis,1))
+if any(states>spin_system.bas.offsets(end))
     error('the requested state number exceeds the number of states in the system.');
 end
 if states(1)==states(2)

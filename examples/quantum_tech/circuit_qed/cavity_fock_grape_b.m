@@ -29,7 +29,7 @@ inter.modes.dispersive{1,2}=656.2e3;
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

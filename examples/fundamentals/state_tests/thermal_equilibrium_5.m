@@ -27,7 +27,7 @@ inter.coupling.scalar{2,4}=  -40.7675;
 inter.relaxation={'damp'};
 inter.temperature=40;
 inter.damp_rate=5.0;
-inter.rlx_keep='diagonal';
+inter.rlx_keep='labframe';
 
 % Formalisms and methods to test
 formalisms={'sphten-liouv','zeeman-liouv'};
@@ -44,7 +44,10 @@ for n=1:numel(formalisms)
 
         % Basis set
         bas.formalism=formalisms{n};
-        bas.approximation='none';
+        bas.approximation={'none'};
+
+        % Enable zero track elimination
+        sys.enable={'zte'};
 
         % Spinach housekeeping
         spin_system=create(sys,inter);
@@ -62,7 +65,7 @@ for n=1:numel(formalisms)
         L=hamiltonian(spin_system)+1i*relaxation(spin_system);
 
         % Get recovery trajectories
-        coil=state(spin_system,'Lz','19F');
+        coil=coil_state(spin_system,'Lz','19F','exact');
         traj{n,k}=evolution(spin_system,L,coil,rho,1e-3,1000,'observable');
 
     end

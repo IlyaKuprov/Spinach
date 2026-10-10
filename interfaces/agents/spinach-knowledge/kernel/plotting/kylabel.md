@@ -1,35 +1,21 @@
 # kernel/plotting/kylabel.m
 
-- Signature: `kylabel(varargin)`
+- MATLAB implementation: [kernel/plotting/kylabel.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/kylabel.m)
 
-## Purpose
+Set an axes' y-axis label with LaTeX rendering and apply the Spinach tick-label style.
 
-House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kylabel(varargin)
+## Call
 
-## Physical / mathematical content
+`kylabel(varargin)`
 
-## Numerical / algorithmic content
+Supply the same arguments accepted by MATLAB's `ylabel` function (for example, label text and its property-value options). The wrapper forwards those arguments to `ylabel` and appends `'Interpreter','latex'`; the label is therefore requested in LaTeX, rather than the default interpreter. There is no separate unit convention imposed by this plotting helper.
 
-## Parameters / inputs
+## Effect and scope
 
-- varargin -same arguments as those accepted by
-- Matlab's ylabel function
+After setting the y label, the function sets `TickLabelInterpreter` to `'latex'` and `FontSize` to `12` on `gca` (the current axes). These values concern the axes' tick labels, not a numerical result or data transformation. No output is returned.
 
-## Outputs
+The label call receives the caller's arguments, but the follow-up style call explicitly uses `gca`; if an axes target is supplied to `ylabel`, the tick styling still targets the current axes. There is no physical or numerical calculation here.
 
-- creates or updates the current axis system
+## Source link
 
-## Implementation structure
-
-- House style settings for Matlab figures; a product of much
-- experience with academic publication aesthetics. Syntax:
-- kylabel(varargin)
-- varargin -same arguments as those accepted by
-- Matlab's ylabel function
-- creates or updates the current axis system
-- Display the label using LaTeX
-- Switch tick labels to LaTeX
-- Political activism is a way for useless people to
-- feel important.
-- Thomas Sowell
-- #NGRUM
+[`kylabel.m` on the Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=kylabel.m)

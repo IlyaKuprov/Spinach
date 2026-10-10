@@ -1,39 +1,23 @@
 # kernel/overloads/@rcv/horzcat.m
 
-- Signature: `A=horzcat(A,B)`
+[GitHub source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@rcv/horzcat.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=rcv/horzcat.m)
+
+- Signature: `A=horzcat(varargin)` (the arguments are used in their supplied order)
 
 ## Purpose
 
-Horizontal concatenation for RCV sparse matrices. Syntax: A=horzcat(A,B)
+Horizontally concatenates one or more RCV matrices as consecutive column blocks.
 
-## Physical / mathematical content
+## Storage and behaviour
 
-- RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
+RCV stores row indices, column indices, and values in parallel arrays, with `numRows` and `numCols` recording the represented shape. The overload requires every argument to be an `rcv` object and all row counts to match; the implementation assumes at least one argument. If any operand has `isGPU=true`, it applies `gpuArray` to every operand, leaving already-GPU operands as they are. In the supplied left-to-right order, each operand's row indices and values are retained, while its column indices are increased by the cumulative widths of all preceding operands. The adjusted row, column, and value arrays are then eagerly concatenated, and `numCols` is set to the sum of the operand widths. The output is an RCV matrix with `numRows` rows and that total number of columns; its data remain in coordinate-array form rather than being materialised as a sparse or dense MATLAB matrix.
 
-## Numerical / algorithmic content
+Values are concatenated unchanged: this overload does not conjugate them or provide scalar expansion/broadcasting. Non-RCV scalar operands fail the object-type check.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Input
 
-## Parameters / inputs
+- One or more RCV sparse matrices, in the order to appear from left to right. Every input must have the same row count.
 
-- A -left RCV sparse matrix
-- B -right RCV sparse matrix
+## Output
 
-## Outputs
-
-- A -RCV sparse matrix
-
-## Implementation structure
-
-- Horizontal concatenation for RCV sparse matrices. Syntax:
-- A=horzcat(A,B)
-- A -left RCV sparse matrix
-- B -right RCV sparse matrix
-- A -RCV sparse matrix
-- Check consistency
-- Align locations
-- Shift column indices
-- Concatenate RCV arrays
-- Update column count
-- Consistency enforcement
-- The back half of your forties is a cursed age. It's not
+- `A` - the RCV matrix formed by the consecutive horizontal blocks.

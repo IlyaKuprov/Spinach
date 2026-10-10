@@ -1,47 +1,22 @@
 # interfaces/gaussian/brokensymm.m
 
+[Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/gaussian/brokensymm.m) · [Spinach Wiki: brokensymm.m](https://spindynamics.org/wiki/index.php?title=brokensymm.m)
+
 - Signature: `J=brokensymm(props_sing,props_trip)`
 
-## Purpose
+## Inputs and calculation
 
-Exchange coupling estimation from a pair of DFT logs using Yamaguchi equation. The notation is: H=-2J*(Sa.Sb)
+Pass two Gaussian property structures, ordinarily the outputs of `gparse` for the singlet and triplet calculations of the same biradical. Each must contain `energy` (SCF energy in Hartree) and `s_sq` (the computed expectation value of total spin squared). The function checks for these four fields; it does not parse Gaussian log files itself.
 
-## Physical / mathematical content
+It applies Eq. 6 of the Yamaguchi treatment cited below:
 
-- Gaussian interfaces. These parse quantum-chemistry output into spin Hamiltonian ingredients such as hyperfine, shielding, or exchange parameters.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+`J=(props_trip.energy-props_sing.energy)/(props_sing.s_sq-props_trip.s_sq)`
 
-## Numerical / algorithmic content
+The result is then multiplied by `6.57968974479e15` to convert Hartree to Hz. The output is a scalar estimate under the Hamiltonian convention `H=-2J*(Sa.Sb)`; sign interpretation depends on retaining that convention. The source describes the estimate as order-of-magnitude and really rough, so it should not be treated as a precision exchange coupling.
 
-## Syntax
+The implementation depends on the input structures' numeric fields and does not perform the Gaussian calculations or additional unit conversions beyond Hartree-to-Hz.
 
-```matlab
-J=brokensymm(props_sing,props_trip)
-```
+## References
 
-## Parameters / inputs
-
-- props_sing -the output of gparse for the singlet
-- state of the biradical
-- props_trip -the output of gparse for the triplet
-- state of the biradical
-
-## Outputs
-
-- J -an order-of-magnitude (really rough)
-- estimate of exchange coupling, Hz
-
-## Implementation structure
-
-- Exchange coupling estimation from a pair of DFT logs using
-- Yamaguchi equation. The notation is:
-- H=-2J*(Sa.Sb)
-- J=brokensymm(props_sing,props_trip)
-- props_sing -the output of gparse for the singlet
-- state of the biradical
-- props_trip -the output of gparse for the triplet
-- J -an order-of-magnitude (really rough)
-- estimate of exchange coupling, Hz
-- Check consistency
-- Eq 6 in https://doi.org/10.1063/1.5144696
-- Convert from Hartree to Hz
+- Yamaguchi equation, Eq. 6: [doi:10.1063/1.5144696](https://doi.org/10.1063/1.5144696).
+- [Spinach Wiki: brokensymm.m](https://spindynamics.org/wiki/index.php?title=brokensymm.m)

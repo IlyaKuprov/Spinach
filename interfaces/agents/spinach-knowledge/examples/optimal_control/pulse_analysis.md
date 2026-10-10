@@ -1,21 +1,12 @@
 # examples/optimal_control/pulse_analysis.m
 
 - Signature: `pulse_analysis()`
+- Source: [`examples/optimal_control/pulse_analysis.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/pulse_analysis.m)
 
 ## Purpose
 
-An example of spectrogram analysis for a quadratic chirp pulse; adapted from Matlab example set. Calculation time: seconds.
+A short signal-processing illustration of a quadratic-chirp superposition and its spectrogram; the source says it was adapted from the MATLAB example set and gives a calculation time of seconds. It does not define a spin system or perform a GRAPE pulse optimisation.
 
-## Physical / mathematical content
+## Signal and analysis settings
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- An example of spectrogram analysis for a quadratic chirp
-- pulse; adapted from Matlab example set.
-- Calculation time: seconds.
-- Quadratic chirp superposition
-- Do the plotting
+At a sampling frequency of 1000 Hz, the script samples two seconds from 0 through 1.999 s. It adds two quadratic chirps: one starts at 100 Hz and reaches 200 Hz at 1 s, while the other starts at 200 Hz and reaches 100 Hz at 1 s. The first subplot shows signal amplitude in arbitrary units versus time. The second displays a spectrogram using a 100-sample window, 80-sample overlap, 100 frequency points, and a minimum threshold of −50 dB; its axes are time in seconds and frequency in Hz.

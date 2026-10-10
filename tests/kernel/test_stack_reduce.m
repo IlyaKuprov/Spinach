@@ -23,10 +23,10 @@ result=new_test_result('kernel/stack_reduce','Stacked-state reduction',...
 % Build a physical pair of magnetically equivalent protons
 sys.magnet=9.4; sys.isotopes={'1H','1H'};
 sys.parallel={'processes',1}; sys.output='hush';
-sys.disable={'hygiene'}; sys.parprops={};
+sys.disable={'hygiene'}; sys.enable={'zte'}; sys.parprops={};
 inter.zeeman.scalar={0,0}; inter.coupling.scalar={0,10;10,0};
-bas.approximation='none'; bas.sym_group={'S2'};
-bas.sym_spins={[1 2]}; bas.sym_a1g_only=false;
+bas.approximation={'none'}; bas.sym_group={{'S2'}};
+bas.sym_spins={{[1 2]}}; bas.sym_a1g_only={false};
 forms={'sphten-liouv','zeeman-liouv','zeeman-wavef'};
 for k=1:numel(forms)
 
@@ -68,9 +68,9 @@ bas.formalism='zeeman-hilb';
 hilb_system=basis(create(sys,inter),bas);
 hilb_system=assume(hilb_system,'nmr');
 hilb_system.tols.irrep_drop=1e-3;
-hilb_irreps=hilb_system.bas.irrep;
-P_first=hilb_irreps(1).projector;
-P_second=hilb_irreps(2).projector;
+hilb_irreps=hilb_system.bas.sym_fact(1).irr_projectors;
+P_first=hilb_irreps{1};
+P_second=hilb_irreps{2};
 hilb_states=cell(1,8);
 hilb_states(:)={sparse(size(P_first,1),size(P_first,1))};
 hilb_states{1}=P_first*P_first';
@@ -81,7 +81,7 @@ result=test_true(result,'Hilbert weak state survives stack dilution',...
                  'each occupied symmetry sector must survive independently');
 
 % Build Liouville-space controls without permutation factorisation
-bas=struct('formalism','sphten-liouv','approximation','none');
+bas=struct('formalism','sphten-liouv','approximation',{{'none'}});
 spin_system=basis(create(sys,inter),bas);
 spin_system=assume(spin_system,'nmr'); H=hamiltonian(spin_system);
 rho=state(spin_system,'L+',1)-state(spin_system,'L+',2);
@@ -105,16 +105,16 @@ inputs=sparse(size(H,1),size(H,1)+1);
 inputs(2,1)=3; inputs(4,end)=2i; inputs(7,2)=-1;
 H=sparse(size(H,1),size(H,1));
 P=zte(spin_system,H,inputs);
-Q=speye(size(H)); Q=Q(:,[2 4 7]);
+Q=speye(size(H)); Q=Q(:,[1 2 4 7]);
 result=test_close(result,'zero-generator support',P*P',Q*Q',0,0,...
-                  'a wide stack must produce one coordinate mask, not a mask per column');
+                  'a wide stack has one coordinate mask including the mandatory unit');
 P=zte(spin_system,H,inputs,2);
-Q=speye(size(H)); Q=Q(:,[2 4]);
+Q=speye(size(H)); Q=Q(:,[1 2 4]);
 result=test_close(result,'explicit state ranking',P*P',Q*Q',0,0,...
-                  'nstates ranks maximum amplitude over columns and time');
+                  'nstates ranks maximum amplitude over columns and time, retaining the unit too');
 P=zte(spin_system,H,inputs,1);
-result=test_true(result,'one retained coordinate',size(P,2)==1,...
-                 'the lower nstates boundary must retain exactly one coordinate');
+result=test_true(result,'one ranked coordinate plus unit',size(P,2)==2,...
+                 'the lower nstates boundary retains one ranked coordinate and the unit');
 P=zte(spin_system,H,inputs,size(H,1));
 result=test_close(result,'full retained dimension',P*P',speye(size(H)),0,0,...
                   'the upper nstates boundary is the row dimension');
@@ -139,14 +139,14 @@ end
 result=test_true(result,'nstates dimension guard',caught,...
                  'the number of columns must not enlarge the state space dimension');
 
-% Preserve the explicit disable override
-spin_system.sys.disable={'zte'};
+% Preserve the opt-in gate
+spin_system.sys.enable={};
 P=zte(spin_system,H,inputs,2);
-result=test_true(result,'ZTE disable',isequal(P,1),...
-                 'an explicit disable must still leave the space unchanged');
+result=test_true(result,'ZTE not enabled',isequal(P,1),...
+                 'omitting the enable flag leaves the space unchanged');
 
 % Force disconnected-subspace screening of complex columns
-spin_system.sys.disable={'merge'};
+spin_system.sys.disable={'merge'}; spin_system.sys.enable={'zte'};
 spin_system.tols.merge_dim=1;
 projectors=path_trace(spin_system,H,inputs);
 P=[projectors{:}]; Q=speye(size(H)); Q=Q(:,[2 4 7]);

@@ -1,33 +1,15 @@
 # examples/nmr_solids/mas_powder_nqi_floquet.m
 
-- Signature: `mas_powder_nqi_floquet()`
+- MATLAB implementation: [examples/nmr_solids/mas_powder_nqi_floquet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_nqi_floquet.m)
 
-## Purpose
+[MATLAB source](../../../../../examples/nmr_solids/mas_powder_nqi_floquet.m)
 
-Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus using Floquet theory. Perturbative correcti- ons to the rotationg frame transformation are not applied. Calculation time: seconds
+## Purpose and spin system
 
-## Physical / mathematical content
+This example computes a powder MAS spectrum for one quadrupolar `2H` nucleus. It sets the field to `9.4 T`, the quadrupolar tensor eigenvalues to `[-1e3 -2e3 3e3] Hz`, and its Euler angles to `[0 0 0]`. The values are model inputs, not experimental measurements; the tensor eigenvalues sum to zero. Spinach documents quadrupolar interaction tensors in Hz in its [g2spinach knowledge page](../../interfaces/g2spinach.md).
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## MAS algorithm and acquisition
 
-## Numerical / algorithmic content
+The source uses the Floquet route directly: `floquet(spin_system,@acquire,parameters,'nmr')`. Its header says perturbative corrections to the rotating-frame transformation are not applied and estimates a seconds-scale calculation time; the timing is not a measured runtime. The rotor axis is `[1 1 1]` and rate `1000 Hz`; the powder grid is `leb_2ang_rank_17` with `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, and offset 0. It selects `2H`, leaves `decouple={}`, sets ppm axis units, and inverts the axis. Both initial state and receiver are `L+` on `2H`.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder magic angle spinning spectrum of a single quadrupolar
-- deuterium nucleus using Floquet theory. Perturbative correcti-
-- ons to the rotationg frame transformation are not applied.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The returned FID is exponentially apodised with parameter `6`, Fourier transformed using `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted with `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.

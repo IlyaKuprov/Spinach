@@ -1,34 +1,20 @@
 # examples/optimal_control/state_transfer_m2s.m
 
 - Signature: `state_transfer_m2s()`
+- Source: [`examples/optimal_control/state_transfer_m2s.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/state_transfer_m2s.m)
 
 ## Purpose
 
-A transfer of coherence from longitudinal magnetization into a two-spin singlet state in allyl pyruvate with a distribution of B1 powers and transmitter offsets. XX and YY components of the singlet dephase rapidly in this system, and are therefore drop- ped from the target state specification. Calculation time: many hours.
+Design a transfer from longitudinal magnetisation to a two-spin singlet-related target in allyl pyruvate under transmitter-offset and pulse-power distributions. The source says the `XX` and `YY` components are omitted from the target because they dephase rapidly in this system, and estimates the calculation time as many hours. These are the example's design assumptions and estimate, not results of a run here.
 
-## Physical / mathematical content
+## Spin model and target
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The script loads the allyl-pyruvate proton system, removes the methyl group by retaining the first five spins, and sets `sys.magnet=11.7464` (the source labels the field as 500.13 MHz). It uses the full spherical-tensor Liouville-space basis. The initial state is longitudinal magnetisation on all spins; the target operator is the negative product of the `Lz` operators for spins labelled `Hb` and `Hc`. The source constructs an NMR drift, applies a 2670 transmitter offset, and uses proton `Lx` and `Ly` controls.
 
-## Numerical / algorithmic content
+## Robust pulse design
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The design samples five offsets from −10 to 10 and five configured power levels, `2*pi*[480 490 500 510 520]`; the source does not attach units to those ensemble values. It uses 300 slices of 1 ms each (0.3 s total), penalties `NS` and `SNS` with weights 1 and 10, L-BFGS, and a 3000-iteration termination limit. The initial 2-by-300 Cartesian pulse is built from a 300 Hz cosine and a constant second component, scaled by 0.05. Optimisation is requested through `fmaxnewton(spin_system,@grape_xy,pulse)`; the plotting configuration includes correlation/coherence order, control components, per-spin controls, amplitude, and spectrogram views.
 
-## Implementation structure
+## Scripted pulse and spectrum comparison
 
-- A transfer of coherence from longitudinal magnetization into a
-- two-spin singlet state in allyl pyruvate with a distribution of
-- B1 powers and transmitter offsets. XX and YY components of the
-- singlet dephase rapidly in this system, and are therefore drop-
-- ped from the target state specification.
-- Calculation time: many hours.
-- Get the spin system
-- Kill the methyl group
-- Magnetic field (500.13 MHz)
-- Formalism and basis set
-- Run Spinach housekeeping
-- Set up and normalise the initial state
+The example first simulates and plots a pulse-acquire spectrum from the initial state, using `parameters.sweep=1000`, 2048 points, 4096-point zero filling, and Hz axis units. It then scales the optimised pulse by the mean configured power level, propagates it with `shaped_pulse_xy`, applies homospoil, and computes `real(rho_targ'*rho)` as a fidelity diagnostic. A second pulse-acquire spectrum is generated from that propagated state for comparison. These are operations encoded in the source; no numerical fidelity or successful run is asserted here.

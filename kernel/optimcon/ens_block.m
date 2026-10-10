@@ -63,6 +63,9 @@ for k=1:numel(missing)
     spin_system.control.(missing{k})=frozen.(missing{k});
 end
 
+% Defer input-coordinate freezing until after the waveform-map pullback
+freeze=spin_system.control.freeze; spin_system.control.freeze=[];
+
 % GRAPE function for the formalism
 switch spin_system.bas.formalism
     case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
@@ -125,6 +128,16 @@ for m=1:n_mine
         end
     end
 
+    % Skip physical derivatives only where no unfrozen input can reach
+    if (n_outputs>2)&&any(freeze(:))
+        free_map=kron(speye(nsteps),sparse(R));
+        free_map=free_map(:,~freeze(:));
+        influence=J*free_map; terms=sum(J~=0,2);
+        roundoff=(2*eps*terms)./(1-2*eps*terms);
+        spin_system.control.freeze=reshape(~any(abs(influence)>...
+                roundoff.*(abs(J)*abs(free_map)),2),ncont,nsteps);
+    end
+
     % Fidelity, trajectory, and derivatives
     outputs=cell(1,n_outputs);
     [outputs{:}]=grape(spin_system,L,spin_system.control.operators,local_waveform,rho_init,rho_targ,control.fidelity);
@@ -142,6 +155,13 @@ for m=1:n_mine
         hess=hess+power_lvl^2*hess_n(:);
     end
 
+end
+
+% Freeze input derivatives after all physical-coordinate transformations
+if n_outputs>2, grad(freeze(:))=0; end
+if n_outputs>3
+    hess=reshape(hess,ncont*nsteps,ncont*nsteps);
+    hess(freeze(:),:)=0; hess(:,freeze(:))=0; hess=hess(:);
 end
 
 % Collapse a non-empty block into one trajectory sum when only the average is needed

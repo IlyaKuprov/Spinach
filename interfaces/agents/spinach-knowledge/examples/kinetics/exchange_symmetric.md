@@ -1,29 +1,21 @@
 # examples/kinetics/exchange_symmetric.m
 
-- Signature: `exchange_symmetric()`
+- MATLAB implementation: [examples/kinetics/exchange_symmetric.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/exchange_symmetric.m)
 
-## Purpose
+- Callable as the no-argument MATLAB function `exchange_symmetric()`; it creates the Spinach system and basis before running the acquisition.
 
-Two-spin symmetric chemical exchange pattern. Calculation time: seconds.
+## Purpose and model
 
-## Physical / mathematical content
+This example simulates a two-site symmetric chemical-exchange NMR pattern for two `1H` environments. The source sets `sys.magnet=14.1`, scalar Zeeman values `{0.0, 3.0}`, exchange sites `{1,2}`, and reciprocal first-order rates of `2e3`, with `inter.chem.concs=[1.0 1.0]`. The field, scalar-value, and rate units are not annotated in this source; the page therefore preserves the configured values without assigning units.
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+## Acquisition and observable
 
-## Numerical / algorithmic content
+The full `sphten-liouv` basis is used (`bas.approximation=none`). The initial state is the concentration-weighted `1H` `L+` operator and the coil is `1H` `L+`. `liquid(spin_system,@acquire,parameters,'nmr')` generates the FID with an empty decoupling list, `offset=900`, `sweep=5000`, 512 points, and zero filling to 1024. The plotted frequency-axis unit is explicitly set to ppm and the axis is inverted. The FID receives exponential apodisation with parameter 6; a shifted FFT is applied and `plot_1d` displays its real part.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Scope
 
-## Implementation structure
+The source header estimates a calculation time of seconds; this is not a measured runtime. The source defines a simulation and plotting procedure but supplies no numerical spectrum or fitted exchange result, so no line positions, intensities, or fit outcomes are asserted.
 
-- Two-spin symmetric chemical exchange pattern.
-- Calculation time: seconds.
-- System specification
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Exchange is declared as two first-order reaction records with explicit reciprocal spin matching. Preparation is concentration weighted; detection uses unweighted `coil_state`. Rates and equilibrium concentration ratios are unchanged.
+
+Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.

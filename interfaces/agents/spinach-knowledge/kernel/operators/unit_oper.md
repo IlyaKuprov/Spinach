@@ -1,38 +1,12 @@
 # kernel/operators/unit_oper.m
 
-- Signature: `A=unit_oper(spin_system)`
+Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/operators/unit_oper.m
+Wiki: https://spindynamics.org/wiki/index.php?title=unit_oper.m
 
-## Purpose
+## Purpose and output
 
-Returns a unit operator in the current formalism and basis. The operator has dimension equal to the basis size in sphten-liouv formalism, the dimension equal to the product of all spin multi- plicities in zeeman-hilb and zeeman-wavef formalisms, and the dimension of square of the product of all spin multiplicities in zeeman-liouv formalism. Syntax: A=unit_oper(spin_system)
+`unit_oper(spin_system)` returns a sparse identity matrix for the selected formalism. It is diagonal in, and preserves, the current basis ordering; it does not construct a generator or time propagator.
 
-## Physical / mathematical content
+## Dimensions
 
-- Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
-
-## Outputs
-
-- A -a sparse unit matrix of appropriate
-- dimension
-
-## Implementation structure
-
-- Returns a unit operator in the current formalism and basis. The
-- operator has dimension equal to the basis size in sphten-liouv
-- formalism, the dimension equal to the product of all spin multi-
-- plicities in zeeman-hilb and zeeman-wavef formalisms, and the
-- dimension of square of the product of all spin multiplicities in
-- zeeman-liouv formalism. Syntax:
-- A=unit_oper(spin_system)
-- spin_system -Spinach data object containing basis
-- information (call basis.m first)
-- A -a sparse unit matrix of appropriate
-- dimension
-- Check consistency
+The dimension is `spin_system.bas.offsets(end)`, the sum of the compiled substance dimensions. The result is `speye` of that dimension in every formalism, including a one-dimensional block for each spin-free substance.

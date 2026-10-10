@@ -23,15 +23,15 @@ inter.coupling.scalar{5,2}=0;
 inter.coupling.scalar{5,5}=0;
 
 % Algorithmic options
-sys.enable={'greedy'}; % 'gpu'
+sys.enable={'zte','greedy'}; % 'gpu'
 sys.tols.prox_cutoff=4.0;
 sys.tols.merge_dim=500;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -54,7 +54,7 @@ parameters.rlx_op={relaxation(spin_system)};
 parameters.rho0_ph={ones(parameters.npts,1)};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts,1)};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % Sequence parameters
 parameters.offset=4620;

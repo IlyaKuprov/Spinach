@@ -1,34 +1,15 @@
 # examples/optimal_control/features_curv.m
 
-- Signature: `features_curv()`
+[Stable source link](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/features_curv.m)
 
-## Purpose
+## Calculation
 
-A transfer of coherence from longitudinal magnetization into a two-spin singlet state with a distribution of B1 powers. An ensemble of ten spin systems with different power levels is simultaneously driven to optimal fidelity, which in this case is 1/sqrt(2) = 0.7071 Curvilinear GRAPE interface is used -the user specifies the definition of the curvilinear coordinates and the Jacobian. In this case, the coor- dinates a
+The example transfers longitudinal magnetisation of two coupled 13C spins into their two-spin singlet state. At 14.1 T the chemical shifts are 0.00 and 0.25 ppm, and the scalar coupling is 60 Hz. The full `sphten-liouv` basis is used without approximation. The normalised initial state is `state(...,'Lz','all')`; the target is `singlet(spin_system,1,2)`. The drift is the NMR Hamiltonian, and the two RF controls are the 13C `Lx` and `Ly` operators on one channel.
 
-## Physical / mathematical content
+The 50-slice waveform has 1 ms per slice. The power ensemble is the 11-point vector `2π×100×linspace(0.6,1.4,11)` as supplied in the source. A `SNS` penalty with weight 100 is enabled; the configured diagnostics are correlation order, coherence order, XY controls, robustness, and spectrogram. This is a simulated RF-power-robust control calculation; no experimental data are imported.
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+## Curvilinear GRAPE and output
 
-## Numerical / algorithmic content
+The optimisation variables are amplitude and phase: the source maps `u=[r,φ]` to Cartesian controls `[r cos(φ), r sin(φ)]` and passes `dx_du` to `grape_curv`. The coded Jacobian matrix has rows `[cos(φ), sin(φ)]` and `[−r sin(φ), r cos(φ)]`. The initial guess uses unit amplitude and random phases scaled by π/2. `fmaxnewton` runs the curvilinear GRAPE objective; the optimised coordinates are converted to Cartesian controls and propagated by `shaped_pulse_xy` with `expv-pwc`. The final density operator is filtered to zero-quantum 13C coherence and two-spin correlation, then summarised by `stateinfo` (order 5).
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- A transfer of coherence from longitudinal magnetization into a two-spin
-- singlet state with a distribution of B1 powers. An ensemble of ten spin
-- systems with different power levels is simultaneously driven to optimal
-- fidelity, which in this case is 1/sqrt(2) = 0.7071
-- Curvilinear GRAPE interface is used -the user specifies the definition
-- of the curvilinear coordinates and the Jacobian. In this case, the coor-
-- dinates are phase-amplitude.
-- Calculation time: minutes.
-- Magnetic field
-- Isotopes
-- Interactions
-- Basis set
+The source header gives 1/√2 ≈ 0.7071 as the intended optimal fidelity, not as a value printed by this script. It describes ten power levels, while the executable `linspace(...,11)` setting supplies eleven. The results are simulations, not hardware measurements.

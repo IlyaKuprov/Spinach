@@ -1,35 +1,16 @@
 # examples/nmr_solids/rframe_nqi_fplanck.m
 
 - Signature: `rframe_nqi_fplanck()`
+- Source: [examples/nmr_solids/rframe_nqi_fplanck.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/rframe_nqi_fplanck.m)
 
 ## Purpose
 
-Powder magic angle spinning spectrum (rotor-synchronized detection) of a single quadrupolar 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The calculation accounts for the second-order quadrupolar shift and lineshape by applying numerical second order corrections to the rotating frame transformation. Calculation time: hours
+Calculates a powder MAS spectrum with rotor-synchronised detection for a single quadrupolar 14N nucleus. The one-dimensional Fokker–Planck treatment uses a spherical grid and applies numerical second-order corrections to the rotating-frame transformation to account for the second-order quadrupolar shift and lineshape. The source estimates hours of calculation time.
 
-## Physical / mathematical content
+## Spin system and rotor sampling
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The field parameter is 14.1. The quadrupolar interaction is `eeqq2nqi(3.06e6, 0.40, 1, [0 0 0])`; its arguments have no units stated in the source. The full spherical-tensor Liouville basis is used. `singlerot` propagates the acquisition callback in the lab frame, with rate 50000, rotor axis `[1,1,1]`, maximum rank 85, and the `rep_2ang_6400pts_sph` grid. The example disables trajectory-level propagation and Krylov methods, and selects rotating-frame order 2. No gradient is configured.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- Powder magic angle spinning spectrum (rotor-synchronized detection)
-- of a single quadrupolar 14N nucleus using 1D Fokker-Planck equation
-- and a spherical grid. The calculation accounts for the second-order
-- quadrupolar shift and lineshape by applying numerical second order
-- corrections to the rotating frame transformation.
-- Calculation time: hours
-- System specification
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
+Both the initial state and receiver are the 14N `L+` state. Acquisition uses sweep 50000, 256 points, zero-fill to 1024, and offset 18000; the frequency-axis units are explicitly set to Hz. The FID receives exponential apodisation with parameter 6, is Fourier transformed, and the real part is plotted.

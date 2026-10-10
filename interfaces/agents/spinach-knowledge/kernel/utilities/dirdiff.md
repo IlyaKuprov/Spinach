@@ -1,45 +1,42 @@
 # kernel/utilities/dirdiff.m
 
-- Signature: `D=dirdiff(spin_system,A,B,T,N)`
-
 ## Purpose
 
-Directional derivatives of the matrix exponential. Implements Equation 11 of Najfeld and Havel (https://doi.org/10.1006/aama.1995.1017) and Equati- on 16 of Goodwin and Kuprov (https://doi.org/10.1063/1.4928978). Syntax: D=dirdiff(spin_system,A,B,T,N)
+Computes directional derivatives of the matrix exponential, implementing Equation 11 of Najfeld and Havel and Equation 16 of Goodwin and Kuprov. The function returns the propagator and its derivatives with respect to perturbations of the Hamiltonian along one or more specified directions.
 
-## Physical / mathematical content
+Source: [kernel/utilities/dirdiff.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dirdiff.m)
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+The function builds an auxiliary block matrix of dimension `N` by `N` blocks, each block having the size of `A`. All diagonal blocks are set to `A`. The superdiagonal blocks are set to the differentiation direction or directions: if `B` is a cell array, block `{n,n+1}` receives `B{n}` for `n=1..N-1`; if `B` is a single matrix, every superdiagonal block receives `B`. All other blocks are initialised as sparse zero matrices of the same size as `A`.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Before exponentiation, the propagator tolerance is tightened by setting `spin_system.tols.prop_chop` to `1e-14`. The auxiliary matrix is converted with `cell2mat` and exponentiated over time `T` using the `propagator` function, yielding `exp(-1i*A*T)` in the top-left block together with the derivative blocks.
 
-## Parameters / inputs
+Directional derivatives are extracted from the first block row: output element `n` is `factorial(n-1)` times the block `auxmat(1:size(A,1), (1:size(A,2))+size(A,2)*(n-1))`. The result is the cell array `{D0,D1,D2,...}` of Equation 18 in Goodwin and Kuprov, where `D0` is the propagator itself and subsequent entries are its directional derivatives. Using `N=2` yields the propagator and its first derivative.
 
-- A -Hamiltonian at the reference point, corresponding
-- to exp(-1i*A*T) propagator
-- B -differentiation direction (if a matrix) or direc-
-- tions (if a cell array of matrices)
-- T -the time to use in exp(-1i*A*T)
-- N -block dimension of the auxiliary matrix, use N=2
-- to get the propagator and its first derivative
+Input consistency is enforced by an internal `grumble` subroutine, which raises errors when:
 
-## Outputs
+- `N` is not a real scalar integer greater than 1;
+- `B` is a cell array whose number of elements does not equal `N-1`;
+- `A` or any `B` matrix is not a numeric square matrix;
+- `T` is not a real numeric scalar.
 
-- D -a cell array of matrices {D0,D1,D2,...} of Eq 18
-- in Goodwin and Kuprov
+## Inputs and outputs
 
-## Implementation structure
+**Inputs**
 
-- Directional derivatives of the matrix exponential. Implements Equation 11
-- of Najfeld and Havel (https://doi.org/10.1006/aama.1995.1017) and Equati-
-- on 16 of Goodwin and Kuprov (https://doi.org/10.1063/1.4928978). Syntax:
-- D=dirdiff(spin_system,A,B,T,N)
-- A -Hamiltonian at the reference point, corresponding
-- to exp(-1i*A*T) propagator
-- B -differentiation direction (if a matrix) or direc-
-- tions (if a cell array of matrices)
-- T -the time to use in exp(-1i*A*T)
-- N -block dimension of the auxiliary matrix, use N=2
-- to get the propagator and its first derivative
-- D -a cell array of matrices {D0,D1,D2,...} of Eq 18
+- `spin_system` — spin system object supplying tolerances used by the propagator call.
+- `A` — Hamiltonian at the reference point, corresponding to the `exp(-1i*A*T)` propagator; must be a numeric square matrix.
+- `B` — differentiation direction (a single square matrix) or directions (a cell array of square matrices); when a cell array, the number of matrices must equal `N-1`.
+- `T` — time used in `exp(-1i*A*T)`; must be a real scalar.
+- `N` — block dimension of the auxiliary matrix; must be a real integer greater than 1. Use `N=2` to obtain the propagator and its first derivative.
+
+**Outputs**
+
+- `D` — cell array of matrices `{D0,D1,D2,...}` corresponding to Equation 18 in Goodwin and Kuprov.
+
+## References
+
+- Najfeld, I.; Havel, T. F. Derivatives of the matrix exponential and their computation. *Advances in Applied Mathematics*. [https://doi.org/10.1006/aama.1995.1017](https://doi.org/10.1006/aama.1995.1017)
+- Goodwin, D. L.; Kuprov, I. Auxiliary matrix formalism for interaction picture transformations of pulsed and continuous wave calculations. *The Journal of Chemical Physics*. [https://doi.org/10.1063/1.4928978](https://doi.org/10.1063/1.4928978)
+- Spinach documentation: [dirdiff.m](https://spindynamics.org/wiki/index.php?title=dirdiff.m)

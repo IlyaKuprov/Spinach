@@ -1,28 +1,25 @@
 # examples/esr_liq_pulsed/rapidscan_nitroxide.m
 
-- Signature: `rapidscan_nitroxide()`
+## Purpose and interface
 
-## Purpose
+A rapid-scan ESR calculation for a nitroxide radical. Call `rapidscan_nitroxide()` with no arguments in MATLAB. The function has no declared outputs; it plots the calculated real spectrum rather than saving or returning the axis or data.
 
-Rapid scan ESR spectrum of a nitroxide radical. Calculation time: seconds
+## Spin system and relaxation
 
-## Physical / mathematical content
+The two-spin system is `{'14N','E'}`, with centre-field setting `sys.magnet=3.5`. Nitrogen's Zeeman matrix is zero; the electron g matrix is
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+```
+[2.0104 0      0.0001
+ 0      2.0064 0
+ 0.0001 0      2.0021].
+```
 
-## Numerical / algorithmic content
+The symmetric nitrogen-electron coupling matrix is `[0.6178 0 0.3161; 0 0.5633 0; 0.3161 0 4.1115]*1e7`. The source does not label the units of these tensor entries. The basis is full `sphten-liouv`; relaxation is Redfield with secular terms, `equilibrium='dibari'`, `inter.temperature=100`, and `inter.tau_c={2e-11}` (the source does not attach units to the last two values).
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+## Rapid-scan settings and output
 
-## Implementation structure
+Unlike the other pages in this group, this one calls `rapidscan(spin_system,parameters)`, not the pulse-acquire `liquid/@acquire` pathway. It sets `mw_pwr=2*pi*1e3`, sweep endpoints `[-0.011 -0.003]`, 500 steps, and timestep `1e-8`. The output is plotted against the returned magnetic-induction axis (labelled T), with signal intensity labelled in arbitrary units; the source does not save the arrays. The power, sweep, and timestep assignments have no unit comments, so they are given here as coded.
 
-- Rapid scan ESR spectrum of a nitroxide radical.
-- Calculation time: seconds
-- Centre field
-- Spin system properties
-- Simulation parameters
-- Spinach housekeeping
-- Experiment parameters
-- Run the experiment
-- Plot the result
+Requires Spinach `create`, `basis`, `rapidscan`, and plotting support (`kfigure`, `plot`). No external spin-system file is read.
+
+[Source: `rapidscan_nitroxide.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_liq_pulsed/rapidscan_nitroxide.m).

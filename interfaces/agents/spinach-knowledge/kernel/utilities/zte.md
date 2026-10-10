@@ -16,7 +16,9 @@ State columns are propagated together in bounded batches, one `step` call per ba
 
 Sampling uses `1/cheap_norm(L)` (unit time for a zero generator), up to `zte_nsteps` samples including the initial state. Sampling stops only when none of the individual columns gains active support, rather than when their union temporarily plateaus. Without `nstates`, coordinates whose maxima are strictly below `zte_tol` are dropped. With `nstates`, the largest row maxima over columns and sampled times determine the retained coordinates.
 
-The existing explicit-disable, occupied-row-density, and small-matrix-1-norm shortcuts take precedence over propagation and over `nstates`; they return scalar `1`, leaving the basis unchanged. The count is validated against the number of rows, not the number of input columns.
+The existing not-enabled, occupied-row-density, and small-matrix-1-norm shortcuts take precedence over propagation and over `nstates`; they return scalar `1`, leaving the basis unchanged. The count is validated against the number of rows, not the number of input columns.
+
+In the compiled spherical-tensor space, every substance unit coordinate survives screening, including zero-population and spin-free blocks. These mandatory coordinates may increase the retained dimension beyond `nstates`. For symmetry-reduced calls, `reduce` supplies the projected unit support rather than original block offsets.
 
 ## Syntax
 
@@ -37,6 +39,6 @@ projector=zte(spin_system,L,rho,nstates)
 
 ## Header notes
 
-Set `sys.tols.zte_tol` before `create` to change the default tolerance. With tiny interactions or nearly equivalent spins, disable ZTE by adding `'zte'` to `sys.disable`.
+Set `sys.tols.zte_tol` before `create` to change the default tolerance. ZTE is opt-in: add `'zte'` to `sys.enable`. With tiny interactions or nearly equivalent spins, leave it off.
 
 Method reference: [Kuprov, JMR (2008), doi:10.1016/j.jmr.2008.08.008](https://doi.org/10.1016/j.jmr.2008.08.008). See also [the function Wiki page](https://spindynamics.org/wiki/index.php?title=zte.m).

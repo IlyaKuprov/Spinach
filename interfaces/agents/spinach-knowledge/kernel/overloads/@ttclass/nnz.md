@@ -1,35 +1,13 @@
 # kernel/overloads/@ttclass/nnz.m
 
 - Signature: `answer=nnz(ttrain)`
+- Source: [`kernel/overloads/@ttclass/nnz.m`](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/nnz.m)
+- Wiki: [`ttclass/nnz.m`](https://spindynamics.org/wiki/index.php?title=ttclass/nnz.m)
 
-## Purpose
+## Core action
 
-Counts non-zero elements in all cores of a tensor train. Syntax: answer=nnz(ttrain)
+Applies MATLAB `nnz` to each entry of `ttrain.cores` and sums those counts. The scalar therefore counts stored nonzero core entries across the train buffer; it is not the number of nonzero entries in the represented matrix or tensor. It does not expand the train and does not use `ttrain.coeff`.
 
-## Physical / mathematical content
+## Result and guards
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- ttrain -tensor train object
-
-## Outputs
-
-- answer -number of non-zero elements in all tensor train cores
-
-## Implementation structure
-
-- Counts non-zero elements in all cores of a tensor train. Syntax:
-- answer=nnz(ttrain)
-- ttrain -tensor train object
-- answer -number of non-zero elements in all tensor train cores
-- Count the non-zeros
-- Men have always been and forever would remain silly victims of lies and
-- self-deceit in politics, until they learn to see, behind any moral, re-
-- ligious, political or social statements, proclamations and promises the
-- interests of specific social classes.
-- Vladimir Lenin
-- #NGRUM
+Returns the summed count as a scalar. The method has no explicit type, shape, or rank guard, and performs no core or rank transformation. Its count follows the stored core shapes, not the logical dimensions represented by them.

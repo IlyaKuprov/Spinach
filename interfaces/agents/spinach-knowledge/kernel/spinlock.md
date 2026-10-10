@@ -1,46 +1,28 @@
 # kernel/spinlock.m
 
-- Signature: `rho=spinlock(spin_system,Lx,Ly,rho,direction)`
+- Signature: rho = spinlock(spin_system,Lx,Ly,rho,direction)
+- Source: [kernel/spinlock.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/spinlock.m)
+- Wiki: [spinlock.m](https://spindynamics.org/wiki/index.php?title=spinlock.m)
 
 ## Purpose
 
-Analytical approximation to a spin locking process. This function oblite- rates all spin-spin correlations and all magnetization components other than those along the indicated direction. Syntax: rho=spinlock(spin_system,Lx,Ly,rho,direction)
+Applies the source-described analytical approximation to spin locking: it removes spin-spin correlations and magnetisation components other than those along the selected X or Y direction. It returns the transformed state rho; it is not a time-dependent pulse simulation.
 
-## Physical / mathematical content
+## Operation
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+For direction 'X', the source applies step with Ly at pi/2, homospoil with the 'destroy' option, then step with Ly at -pi/2. For direction 'Y', it uses Lx for the same three operations. direction must be 'X' or 'Y'.
 
 ## Parameters / inputs
 
-- Lx -X magnetization operator on the spins that
-- should be locked
-- Ly -Y magnetization operator on the spins that
-- should be locked
-- rho -state vector or a bookshelf stack thereof
-- direction -direction in which the spins should be lo-
-- cked, 'X' or 'Y'.
+- spin_system — Spinach system description used by step and homospoil.
+- Lx, Ly — X- and Y-magnetisation operators for the spins to be locked; they must be numeric matrices of equal dimensions.
+- rho — numeric state vector or bookshelf stack with the row dimension matching Lx and Ly.
+- direction — 'X' or 'Y'.
 
-## Outputs
+## Output
 
-- rho -state vector or a bookshelf stack thereof
-- Note: this is an approximation to what happens during a real spin locking
-- process. If you need a very accurate simulation, you would need to
-- model the spin locking explicitly by adding RF terms to the system
-- Hamiltonian.
+- rho — the state after the selected approximation, in the representation supplied to the helper.
 
-## Implementation structure
+## Side effects
 
-- Analytical approximation to a spin locking process. This function oblite-
-- rates all spin-spin correlations and all magnetization components other
-- than those along the indicated direction. Syntax:
-- rho=spinlock(spin_system,Lx,Ly,rho,direction)
-- Lx -X magnetization operator on the spins that
-- should be locked
-- Ly -Y magnetization operator on the spins that
-- rho -state vector or a bookshelf stack thereof
-- direction -direction in which the spins should be lo-
-- cked, 'X' or 'Y'.
-- Note: this is an approximation to what happens during a real spin locking
-- process. If you need a very accurate simulation, you would need to
+This source contains no display or file-write calls. Its stated result is the returned rho, formed through step and homospoil. No frequency or field unit is specified by this function.

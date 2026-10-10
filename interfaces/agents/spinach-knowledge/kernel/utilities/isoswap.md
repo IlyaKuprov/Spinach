@@ -1,40 +1,34 @@
 # kernel/utilities/isoswap.m
 
-- Signature: `[sys,inter]=isoswap(sys,inter,spins,new_iso)`
-
 ## Purpose
 
-Makes isotope replacements in the input structures. All interactions are automatically scaled as necessary. Syntax: [sys,inter]=isoswap(sys,inter,spins,new_iso)
+Makes isotope replacements in the input structures. All interactions are automatically scaled as necessary.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isoswap.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `[sys,inter]=isoswap(sys,inter,spins,new_iso)`.
+- Enforces input consistency via an internal `grumble` subfunction, which errors if isotope information is missing from `sys`, if `inter` is not a structure, if `spins` is not a real numeric vector of integer indices not exceeding the number of isotopes, or if `new_iso` is not a character string.
+- Wipes quadratic couplings before replacement, in both eigensystem representation (`inter.coupling.eigs`, together with `inter.coupling.euler`) and matrix representation (`inter.coupling.matrix`), printing a warning per affected spin that the coupling is not transferable.
+- Wipes high-rank couplings stored in `inter.giant.coeff` and `inter.giant.euler`, printing a warning per affected spin.
+- For each specified spin, computes `gamma_ratio = spin(new_iso)/spin(sys.isotopes{n})` and scales all couplings to every other spin `k` (both `{n,k}` and `{k,n}` entries) in the eigensystem and matrix representations by this ratio.
+- Replaces the isotope string `sys.isotopes{n}` with `new_iso` for each specified spin.
+- Quadratic and higher order couplings are wiped with a warning because they are not transferable.
 
-## Parameters / inputs
+## Inputs and outputs
 
-- sys, inter -Spinach input data structures
-- spins -a vector of integers specifying
-- spin numbers
-- new_iso -character string specifying
-- the new isotope
-- Output:
-- sys, inter -Spinach input data structures
-- Note: quadratic and higher order couplings are wiped and a warning
-- is printed -those are not transferable.
+Inputs:
 
-## Implementation structure
+- `sys`, `inter` — Spinach input data structures.
+- `spins` — a vector of integers specifying spin numbers.
+- `new_iso` — character string specifying the new isotope.
 
-- Makes isotope replacements in the input structures. All interactions
-- are automatically scaled as necessary. Syntax:
-- [sys,inter]=isoswap(sys,inter,spins,new_iso)
-- sys, inter -Spinach input data structures
-- spins -a vector of integers specifying
-- spin numbers
-- new_iso -character string specifying
-- the new isotope
-- Output:
-- Note: quadratic and higher order couplings are wiped and a warning
-- is printed -those are not transferable.
-- Grumbler missing
+Outputs:
+
+- `sys`, `inter` — Spinach input data structures with the isotope replacement applied and interactions scaled.
+
+## References
+
+- Spinach Wiki: <https://spindynamics.org/wiki/index.php?title=isoswap.m>
+- Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isoswap.m>

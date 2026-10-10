@@ -16,14 +16,16 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'15N','13C'}};
 
 % Force Krylov propagation
 sys.tols.krylov_tol=1000;
 
-% This needs a GPU
-% sys.enable={'gpu'};
+% Enable zero track elimination, with optional GPU arithmetic
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -39,7 +41,7 @@ parameters.offset=15000;
 parameters.spins={'13C'};
 parameters.grid='rep_2ang_200pts_sph';
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.verbose=1;
 
 % Get the trajectory

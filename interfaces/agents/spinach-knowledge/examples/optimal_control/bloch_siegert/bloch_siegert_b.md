@@ -1,34 +1,16 @@
 # examples/optimal_control/bloch_siegert/bloch_siegert_b.m
 
 - Signature: `bloch_siegert_b()`
+- Source: [examples/optimal_control/bloch_siegert/bloch_siegert_b.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/bloch_siegert/bloch_siegert_b.m)
 
-## Purpose
+## Objective and spin model
 
-Bloch-Siegert shift compensation functionality demo. The script optimises a universal rotation pulse for a range of resonance offsets. As the control power is increased, Bloch-Siegert shift starts to reduce the fidelity unless it is correctly accounted for. Calculation time: minutes.
+Estimated calculation time: minutes. This example designs a universal rotation pulse over an ensemble of 100 non-interacting `13C` spins whose scalar chemical shifts are equally spaced from -100 to +100 ppm at `sys.magnet=28.18`. The selected basis is `sphten-liouv` with `IK-2`, proximity level 1, and scalar-coupling connectivity; the source comment says this retains each spin's complete basis while omitting multi-spin orders.
 
-## Physical / mathematical content
+The target action is defined on three normalised states: `Sx -> -Sz`, `Sy -> Sy`, and `Sz -> Sx`. The control operators are `Lx` and `Ly` on `13C`, with the NMR-assumption Hamiltonian as drift. The three initial and target states are passed together to the ensemble optimiser.
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+## Waveform parameterisation and comparison
 
-## Numerical / algorithmic content
+The 20 power levels span 0.001 to 1.0 times the absolute `13C` Larmor angular frequency and are specified in rad/s. Each waveform has 50 equal-duration slices, with `pulse_dt=(pi/100)/pwr_level`. A shared 2-by-50 Gaussian initial guess is scaled by 1/10. L-BFGS via `fmaxnewton` is limited to 500 iterations with `tol_x=1e-4`.
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Bloch-Siegert shift compensation functionality demo. The
-- script optimises a universal rotation pulse for a range
-- of resonance offsets. As the control power is increased,
-- Bloch-Siegert shift starts to reduce the fidelity unless
-- it is correctly accounted for.
-- Calculation time: minutes.
-- Magnet field
-- 100 non-interacting spins at equal intervals
-- within [-100,+100] ppm chemical shift range
-- Select a basis set -IK-2 keeps complete basis on each
-- spin in this case, but ignores multi-spin orders
-- Run Spinach housekeeping
+For every power, the code constructs optimiser settings with BSS off and on and optimises a `grape_xy` waveform under each. Both are then evaluated with the BSS-enabled settings using `ensemble`. The figure plots `1-fidelity` against relative power on a logarithmic scale.

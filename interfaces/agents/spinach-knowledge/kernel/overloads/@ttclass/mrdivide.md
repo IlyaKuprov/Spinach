@@ -1,36 +1,11 @@
 # kernel/overloads/@ttclass/mrdivide.m
 
-- Signature: `a=mrdivide(a,b)`
+Direct mapped source: [kernel/overloads/@ttclass/mrdivide.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/mrdivide.m) · [existing Spinach Wiki entry](https://spindynamics.org/wiki/index.php?title=ttclass/mrdivide.m)
 
-## Purpose
+## Behaviour
 
-Divides a tensor train object by a scalar. Syntax: c=mrdivide(a,b)
+For `a/b`, the guard requires `a` to be `ttclass` and `b` to satisfy `isscalar`; it does not additionally constrain `b` to `double`. The operation divides every train coefficient by `b` and every stored tolerance by `abs(b)`. It leaves cores, mode sizes, and ranks unchanged, and neither compresses nor materialises a dense result.
 
-## Physical / mathematical content
+The scalar is not conjugated; `abs(b)` is used only in the tolerance update. There is no explicit zero-divisor guard, so zero follows MATLAB's division behaviour. Other operand combinations raise the method's error.
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- a -tensor train object
-- b -a scalar
-
-## Outputs
-
-- c -tensor train object
-
-## Implementation structure
-
-- Divides a tensor train object by a scalar. Syntax:
-- c=mrdivide(a,b)
-- a -tensor train object
-- b -a scalar
-- c -tensor train object
-- Division of tensor train by a scalar
-- Divide the coefficients and update the tolerances
-- Complain and bomb out
-- It is dangerous to be right in matters on which the established
-- authorities are wrong.
-- Voltaire
+No numeric example or DOI is present in the source or either existing page.

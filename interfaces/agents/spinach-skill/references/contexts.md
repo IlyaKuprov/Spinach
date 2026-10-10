@@ -1,5 +1,13 @@
 # Contexts, pulse sequences, and processing
 
+## Contents
+
+- [The context call](#the-context-call)
+- [Writing a pulse sequence](#writing-a-pulse-sequence)
+- [The `state` and `operator` grammar](#the-state-and-operator-grammar)
+- [The experiments library](#the-experiments-library)
+- [Acquisition and processing conventions](#acquisition-and-processing-conventions)
+
 The context sits between the spin system and the pulse sequence: it builds
 the Hamiltonian, the relaxation and kinetics superoperators, performs
 whatever orientational or spatial averaging the physical situation demands,
@@ -65,6 +73,8 @@ In `powder`, `parameters.rho0` may be a function handle of the three ZYZ
 active Euler angles. In `singlerot`, two-angle grids belong in Liouville
 space and three-angle grids in Hilbert space; `singlerot` supports
 arbitrary-order rotating-frame corrections and `floquet` does not.
+`doublerot` supports the same opt-in FFT differentiation in both Liouville formalisms. It uses independent outer and inner phase axes, keeps their specified ranks, and passes polyadic Hamiltonian/rotor, relaxation, and kinetics generators to the callback. Use implicit exponential actions; the Hilbert Hamiltonian-stack route is unchanged.
+
 For traditional MAS stacks, `rotor_stack` applies its explicit assumptions
 to both Hamiltonian construction and numerical `parameters.rframes`,
 regardless of prior assumptions on the input object. Numerical frames reject
@@ -105,6 +115,8 @@ context on an imported mesh, needs five phantom pairs on the same pattern:
 `H_ph`/`H_op`, `R_ph`/`R_op`, `K_ph`/`K_op`, `rho0_ph`/`rho0_st`,
 `coil_ph`/`coil_st`.
 
+For imaging flow/diffusion with `parameters.deriv={'fourier'}` and polyadics enabled, `hydrodynamics` retains FFT derivative cores rather than dense matrices. These outputs and the inherited `v2fplanck` flow/diffusion generators are action-only: neither `inflate` nor `full` can materialise them. Disable polyadics when a sparse numeric operator is required. Tensor ordering, physical lengths, and products of first derivatives in `v2fplanck` are unchanged, including even-grid Nyquist treatment. The periodic finite-difference option is unchanged.
+
 ### What the context hands to the sequence
 
 The three or five positional arguments after `parameters` are not always what
@@ -116,7 +128,7 @@ run under another.
 | `liquid`, `crystal`, `gridfree` | `pulse_sequence(spin_system,parameters,H,R,K)` |
 | `powder` | `pulse_sequence(spin_system,localpar,H,R,K)`, once per orientation |
 | `singlerot` | Liouville space: the third argument is the Fokker-Planck generator; Hilbert space: a stack of Hamiltonians, one per rotor phase |
-| `doublerot` | third argument is `L+1i*M`, the Fokker-Planck generator including the two rotor turning terms |
+| `doublerot` | Liouville space: third argument is `L+1i*M`, including both rotor turning terms; `zeeman-hilb`/`zeeman-wavef`: a cell stack of Hamiltonians over the two rotor phases |
 | `floquet` | third argument is the Floquet generator |
 | `imaging`, `meshflow` | `pulse_sequence(spin_system,parameters,H,R,K,G,F)` |
 
@@ -124,6 +136,8 @@ run under another.
 generator. All contexts that build a spatial subspace also set
 `parameters.spc_dim` and `parameters.spn_dim`, the spatial and spin subspace
 dimensions, before calling the sequence; `crystal` sets `spc_dim` to 1.
+
+For a standalone periodic Fourier Laplacian, call `fourlap_poly(spin_system,npoints,extents)` to honour the polyadic enable switch. The original two-argument `fourlap` remains explicit. The implicit second derivative retains the even-grid Nyquist mode; it is not a substitute for squaring a first derivative whose Nyquist action is zero.
 
 ## Writing a pulse sequence
 
@@ -205,6 +219,8 @@ dimension instead of factoring the spatial part out, which throws for
 most spatial dimensions and masks the wrong elements when the combined
 row count happens to be a perfect square.
 
+`dnp_freq_scan` honours the polyadic enable switch for `fp-gmres`, using FFT phase differentiation and a spin-sized Fourier-block preconditioner. Nonconverged implicit solves fail explicitly. `fp-backs` retains direct matrix solves, and LvN methods are unchanged. This is a CPU steady-state route, not GPU GMRES.
+
 ## The `state` and `operator` grammar
 
 ```matlab
@@ -271,6 +287,16 @@ they build their own generators.
 `cp_contact_hard`, `cp_contact_soft`, `relaxan`, `eqmag`, `fieldsweep`,
 `fieldscan_enlev`, `fieldscan_magn`, `rapidscan`.
 
+`slowpass` takes a two-element `sweep` interval in Hz, `npoints>=2`,
+`rho0`, and `coil`, and returns the FFT-normalised frequency-domain response.
+Relaxation is required and must not be thermalised. Liouville identity
+components are excluded only when their sector is decoupled from spin order
+in both directions within `tols.liouv_zero`; that sector is shifted to lift
+stationary poles, while the spin-order block is unchanged. Spatial contexts
+supply `spc_dim` for identity embedding. Selective-reaction coupling retains
+the original resolvent; wavefunction inputs bypass identity removal. This
+does not regularise other undamped or coupled stationary modes.
+
 `acquire` takes `sweep` (Hz), `npoints`, `rho0`, `coil`, `decouple` (e.g.
 `{'15N','13C'}`), and optionally `homodec_oper` with `homodec_pwr` (Hz) and
 `dead_time` (seconds). `hp_acquire` adds `pulse_op` and `pulse_angle`
@@ -278,7 +304,9 @@ they build their own generators.
 `sp_acquire` adds `pulse_frq` (Hz, relative to the current rotating frame),
 `pulse_phi` (rad), `pulse_pwr` (rad/s), `pulse_dur` (s), `pulse_rnk`
 (Fokker-Planck cut-off rank - start at 2 and increase until the answer stops
-moving), and `method` (`'expv'`, `'expm'`, `'evolution'`).
+moving), and `method` (`'expv'`, `'expm'`, `'evolution'`). When `sim2liouv`
+admits a Hilbert-space sequence, it converts `homodec_oper` into a
+commutation superoperator alongside the other operator-like fields.
 
 **Liquid-state 2D** (`experiments/nmr_liquids/`) - `cosy`, `gcosy`,
 `ct_cosy`, `dqf_cosy`, `ecosy`, `tocsy`, `noesy`, `roesy`, `hoesy`,
@@ -300,7 +328,7 @@ cm, default 1.5), and `parameters.pathway`, one of `'P'` (default), `'N'`, or
 
 Natural-abundance simulations should use isotope dilution -
 `subsystems=dilute(spin_system,isotope,tuples)` returns a cell array of
-spin systems, one per isotopomer, to be looped over.
+spin systems, one per isotopomer, to be looped over. `kill_spin` (also used by `dilute`) reindexes retained bosonic-mode parameters, pair couplings, and nested spin-modulation blocks. It clears mode assumption strengths and removes the mode container when no C, V, or T particles remain; rebuild the basis and assumptions afterwards. After removing the final mode, ordinary spin-only assumption sets and retention options apply.
 
 **Bruker ports** (`experiments/bruker/`) - literal translations of the
 echo/antiecho gradient-selected pulse programs: `hmqcetgp`, `hmqcetgpsi`,
@@ -475,3 +503,13 @@ box, with its left edge and its cap line 10 points from the left and the top
 edge of the box; the offsets are computed when it is called, so call it after the
 figure has its final size and a tiled layout all of its tiles; `fig2tiles` re-applies the tagged letters on the
 retiled axes of a merged figure.
+
+### Matrix-free single-rotor propagation
+
+For a Liouville `singlerot` calculation, `sys.enable={'polyadic'}` applies the rotor derivative through FFTs at the same `2*max_rank+1` phase points. This changes storage and multiplication, not the rotor truncation or powder-phase averaging. The callback receives a polyadic generator: use `step` or `evolution` exponential actions, not explicit matrix exponentiation, indexing, or materialisation. `echo_sweep` supports this route, and analytical `sphten-liouv` decoupling uses buffered diagonal projections for implicit generators. The default explicit derivative and the Hilbert Hamiltonian-stack route are unchanged.
+
+The derivative is composed through ordinary multiplication of three polyadics: inverse FFT times multiplier times FFT. The multiplier is a sparse diagonal numeric core built once on the CPU. For GPU execution, the assembled polyadic generator is uploaded on the executing orientation worker before the callback, and its GPU factors are reused. Only the transforms use handles; their adjoints include MATLAB's FFT normalisation. At core creation, pass `struct('action',fwd,'adjoint',adj,'dims',[nrows ncols])` in the core list of `polyadic`. The object owns those dimensions and adjoints internally; the handles accept only numeric blocks, with no command protocol. `full` and `inflate` reject implicit cores. Compatible one-element right-hand states, dense or sparse, use ordinary numeric multiplication rather than deferred operator scaling. Numeric scalar affixes retain their dimensions and inflate to explicit matrices; `isreal` classifies their stored identity coefficients, while opaque handle cores remain conservatively non-real. Converge rotor rank independently of this storage choice.
+
+`shaped_pulse_af` also uses the shared `fourdif(spin_system,N,m)` phase derivative when polyadics are enabled and its method is `expv` or `evolution`. The `expm` method retains an explicit phase derivative, but requires materialisable background and RF operators. A Fourier-flow background constructed with polyadics enabled is action-only and is rejected by `expm`; disable polyadics before constructing that background when an explicit effective pulse propagator is required. Changing the switch at the pulse call does not materialise an existing implicit background.
+
+`fourdif(spin_system,N,m)` returns the same canonical `[0,2*pi)` grid in both modes. Its second output is explicit unless `spin_system.sys.enable` contains `polyadic`; then it is an implicit FFT derivative. For period `extent`, multiply it by `(2*pi/extent)^m`. Matrix-only callers must use a local system copy without the polyadic option.

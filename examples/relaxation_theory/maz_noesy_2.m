@@ -89,9 +89,9 @@ sys.disable={'krylov'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=4;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={4};
+bas.connectivity={'scalar_couplings'};
 
 % Relaxation superoperator
 inter.relaxation={'redfield','SRFK','SRSK'};
@@ -104,6 +104,9 @@ inter.srfk_mdepth=cell(8);
 inter.srfk_mdepth{1,5}=15.0;
 inter.srfk_mdepth{2,5}=15.0;
 inter.srfk_mdepth{3,5}=15.0;
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -18,9 +18,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.inter_level=7; bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-1'};
+bas.inter_level={7}; bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 bas.projections={1};
 
 % Proximity cut-off

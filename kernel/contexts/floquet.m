@@ -75,6 +75,9 @@
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different labs.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
 %
@@ -139,6 +142,15 @@ parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
 
 % Get relaxation and kinetics
 R=relaxation(spin_system); K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:floquet:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by floquet; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Get the averaging grid as a structure
 sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...

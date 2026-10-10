@@ -1,32 +1,23 @@
 # examples/nmr_overtone/cpmas_glycine_simple.m
 
+- MATLAB implementation: [examples/nmr_overtone/cpmas_glycine_simple.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/cpmas_glycine_simple.m)
+
 - Signature: `cpmas_glycine_simple()`
 
-## Purpose
+## What it models
 
-Cross-polarization experiment between protons and 14N overtone transition in glycine under MAS. Glycine quadrupolar tensor da- ta comes from the paper by O'Dell and Ratcliffe: Calculation time: hours
+This is a single-condition Spinach calculation of proton-to-`14N` overtone cross-polarisation in glycine under MAS, according to the source header. It constructs a spin system from parameters in the script and calls `singlerot(spin_system,@overtone_cp,parameters,'qnmr')`; it does not load or fit a measured spectrum. The sequence implementation is delegated to `@overtone_cp`, which is not defined in this wrapper, so pulse shapes, phase cycling, and other sequence internals are not specified here. No gradient list or laboratory pulse-acquire schedule is defined in this wrapper.
 
-## Physical / mathematical content
+The header says the glycine quadrupolar tensor data come from O'Dell and Ratcliffe, [DOI 10.1016/j.cplett.2011.08.030](https://doi.org/10.1016/j.cplett.2011.08.030). The input is `C_q=1.18e6` Hz (1.18 MHz), `eta_q=0.53`, and `I=1`, converted with `eeqq2nqi`. This paper is the named source for a model tensor; the example contains no experimental data file.
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## Spin system and relaxation
 
-## Numerical / algorithmic content
+The isotopes are `14N` and `1H`; the field input is `sys.magnet=14.1`. The wrapper sets `inter.zeeman.scalar={32.4,0}`, places the nuclei at `[0,0,0]` and `[0,0,1.00]`, and leaves the homonuclear `inter.coupling.matrix{2,2}` empty. No additional N–H tensor is assigned by hand: `create` uses these 1 Å coordinates to generate the point-dipolar N–H coupling automatically. Adding a second dipolar tensor would double-count it. Relaxation uses the damping option, diagonal retained terms, zero equilibrium, and `damp_rate=300` (no unit is given inline).
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The basis is spherical-tensor Liouville space with no approximation. The wrapper disables `krylov` and `trajlevel`, sets `max_rank=7`, and uses the rough powder grid `rep_2ang_6400pts_sph`. Its rotor-rate input is `-19840`; the wrapper does not attach a unit to that literal.
 
-## Implementation structure
+## Fixed RF condition and simulated spectrum
 
-- Cross-polarization experiment between protons and 14N overtone
-- transition in glycine under MAS. Glycine quadrupolar tensor da-
-- ta comes from the paper by O'Dell and Ratcliffe:
-- Calculation time: hours
-- System specification
-- Relaxation theory
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Magic angle
-- Spectrum setup
-- Simulation
+The spectral sweep is 44-52 kHz with 256 points and 256-point zero filling. The axis is identified as kHz. The initial state is an oriented `1H` state, while the receiver and overtone channel operators are built for `14N`. The RF frequency input is `48e3` (48 kHz); the contact-duration input is `1e-4` s. The two-channel RF power input is `2*pi*[55.0e3,35.1e3]/sin(theta)`, where `theta=atan(sqrt(2))` is the magic angle.
+
+The program runs one `singlerot` calculation, plots the real part of the simulated spectrum, and does not report any measured signal or fitted parameter. “Hours” in the source header is a runtime estimate only.

@@ -24,7 +24,7 @@ inter.coordinates={[0.0 0.0 0.0]
                
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -32,6 +32,9 @@ inter.equilibrium='dibari';
 inter.rlx_keep='secular';
 inter.temperature=298;
 inter.tau_c={10e-12};
+
+% Enable zero track elimination
+sys.enable={'zte'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -49,9 +52,9 @@ rho0=step(spin_system,Lx,rho_eq,pi);
 % Experiment paramaters
 parameters.spins={'E'};
 parameters.rho0=rho0;
-parameters.coil=[state(spin_system,{'Lz'},{1})...
-                 state(spin_system,{'Lz'},{2})...
-                 state(spin_system,{'Lz'},{3})];
+parameters.coil=[coil_state(spin_system,{'Lz'},{1},'exact')...
+                 coil_state(spin_system,{'Lz'},{2},'exact')...
+                 coil_state(spin_system,{'Lz'},{3},'exact')];
 parameters.mw_pwr=0;
 parameters.mw_off=0;
 parameters.mw_oper=operator(spin_system,'Lx','E');

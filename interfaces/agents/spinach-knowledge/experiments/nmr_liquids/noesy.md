@@ -1,65 +1,25 @@
 # experiments/nmr_liquids/noesy.m
 
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_liquids/noesy.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=noesy.m)
+
 - Signature: `fid=noesy(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and sequence
 
-Phase-sensitive homonuclear NOESY pulse sequence from:
+A phase-sensitive homonuclear NOESY experiment. The source cites [the early NOESY paper](https://doi.org/10.1063/1.438208), [this report](https://doi.org/10.1016/0006-291X(80)90695-6), and [the later paper](https://doi.org/10.1016/0022-2364(82)90279-7). The code uses a four-step pulse phase cycle: after the first 90° x pulse, the second pulse alternates x/y with signs +π/2,+π/2,−π/2,−π/2; the third pulse is y with +π/2 in each step. It evolves t1, performs the mixing period, then acquires t2 with an L+ detection state. The returned quadrature channels subtract the third and fourth cycle members from the first and second to eliminate axial peaks. No explicit coherence-order projection is performed in this function.
 
-## Physical / mathematical content
+By default, a homospoil step destroys all but longitudinal magnetisation before mixing, and the mixing evolution uses relaxation and kinetics, `iR+iK`. Setting `parameters.oldschool` to 1 disables homospoil and instead evolves the mixing period under the full `H+iR+iK` generator. The source describes this implementation as laid out for low memory use in extreme protein and nucleic-acid simulations rather than CPU speed; it notes that analytical decoupling is meaningful only in `sphten-liouv` formalism.
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+## Inputs
 
-## Numerical / algorithmic content
+- `parameters.sweep`: two positive sweep widths in Hz; `parameters.npoints`: two positive integer point counts, both ordered by dimension.
+- `parameters.spins`: nuclei label cell array; header examples include `{'1H'}` and `{'13C'}`.
+- `parameters.tmix`: mixing time in seconds.
+- Optional `parameters.decouple`: labels such as `{'13C','1H'}` or spin indices such as `[1 2]`.
+- Supply `parameters.rho0` as the initial state, or omit it and set `parameters.needs={'rho_eq'}` to start from exact thermal equilibrium.
+- Optional `parameters.oldschool`: set to 1 to disable the default homospoil gradient.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics from the context function.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Output
 
-## Syntax
-
-```matlab
-fid=noesy(spin_system,parameters,H,R,K)
-```
-
-## Parameters / inputs
-
-- parameters.sweep -sweep widths, Hz
-- parameters.npoints -number of points for both dimensions
-- parameters.spins -nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.tmix -mixing time, seconds
-- parameters.decouple -spins to be decoupled, specified either
-- by name, e.g. {'13C','1H'}, or by a list
-- of numbers, e.g. [1 2]
-- parameters.rho0 -initial state; skip this and specify
-- parameters.needs={'rho_eq'} to start
-- from exact thermal equilibrium
-- parameters.oldschool -set to 1 to disable homospoil gradient
-- before the mixing time
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.cos,fid.sin -two components of the FID for F1 hyper-
-- complex processing
-- Note: this function is used for extreme simulations (proteins
-- and nucleic acids) -its layout is optimised for minimum
-- memory footprint rather than CPU time.
-- Note: non-empty analytical decoupling is meaningful only in
-- sphten-liouv formalism.
-
-## Implementation structure
-
-- Phase-sensitive homonuclear NOESY pulse sequence from:
-- fid=noesy(spin_system,parameters,H,R,K)
-- parameters.sweep -sweep widths, Hz
-- parameters.npoints -number of points for both dimensions
-- parameters.spins -nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.tmix -mixing time, seconds
-- parameters.decouple -spins to be decoupled, specified either
-- by name, e.g. {'13C','1H'}, or by a list
-- of numbers, e.g. [1 2]
-- parameters.rho0 -initial state; skip this and specify
-- parameters.needs={'rho_eq'} to start
+`fid.cos` and `fid.sin` are the two F1 hypercomplex components. Each is a two-dimensional FID with array shape `[npoints(2), npoints(1)]`: the direct t2 samples are rows and the t1 trajectory samples are columns.

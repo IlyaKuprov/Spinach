@@ -25,7 +25,7 @@ inter.coupling.scalar{3,4}=50;
 
 % Basis set
 bas.formalism='zeeman-wavef';
-bas.approximation='none'; 
+bas.approximation={'none'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);

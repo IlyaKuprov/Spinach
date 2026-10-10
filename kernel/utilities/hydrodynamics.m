@@ -2,7 +2,7 @@
 % derivative operators with respect to the three sample coordi-
 % nates. Syntax:
 %
-%              [Fx,Fy,Fz]=hydrodynamics(parameters)
+%              [Fx,Fy,Fz]=hydrodynamics(spin_system,parameters)
 %
 % Parameters:
 %
@@ -28,8 +28,9 @@
 %       responds to a column-wise vectorization of a 3D array
 %       with dimensions ordered as [X Y Z].
 %
-% Note: polyadic objects are returned, use inflate() to get the
-%       corresponding sparse matrix.
+% Note: polyadic objects are returned. Fourier derivatives with
+%       polyadics enabled are action-only and cannot be inflated;
+%       disable polyadics to retain materialisable numeric cores.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
@@ -43,9 +44,9 @@ grumble(parameters);
 
 % Build derivative operators
 switch parameters.deriv{1}
-    
+
     case 'period'
-        
+
         % Finite-difference derivatives
         if isscalar(parameters.npts)
             Dx=fdmat(parameters.npts(1),parameters.deriv{2},1)/(parameters.dims(1)/parameters.npts(1));
@@ -59,28 +60,28 @@ switch parameters.deriv{1}
             Dy=fdmat(parameters.npts(2),parameters.deriv{2},1)/(parameters.dims(2)/parameters.npts(2));
             Dz=fdmat(parameters.npts(3),parameters.deriv{2},1)/(parameters.dims(3)/parameters.npts(3));
         end
-        
+
    case 'fourier'
-        
+
         % Fourier derivatives
         if isscalar(parameters.npts)
-            [~,Dx]=fourdif(parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
+            [~,Dx]=fourdif(spin_system,parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
         end
         if numel(parameters.npts)==2
-            [~,Dx]=fourdif(parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
-            [~,Dy]=fourdif(parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
+            [~,Dx]=fourdif(spin_system,parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
+            [~,Dy]=fourdif(spin_system,parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
         end
         if numel(parameters.npts)==3
-            [~,Dx]=fourdif(parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
-            [~,Dy]=fourdif(parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
-            [~,Dz]=fourdif(parameters.npts(3),1); Dz=(2*pi/parameters.dims(3))*Dz;
+            [~,Dx]=fourdif(spin_system,parameters.npts(1),1); Dx=(2*pi/parameters.dims(1))*Dx;
+            [~,Dy]=fourdif(spin_system,parameters.npts(2),1); Dy=(2*pi/parameters.dims(2))*Dy;
+            [~,Dz]=fourdif(spin_system,parameters.npts(3),1); Dz=(2*pi/parameters.dims(3))*Dz;
         end
-        
+
     otherwise
-        
+
         % Complain and bomb out
         error('unrecognized derivative operator type.');
-        
+
 end
 
 % Kron up derivative operators
@@ -162,4 +163,5 @@ end
 % blowing forlornly in the direction indicated.
 %
 % Viktor Shenderovich
+
 

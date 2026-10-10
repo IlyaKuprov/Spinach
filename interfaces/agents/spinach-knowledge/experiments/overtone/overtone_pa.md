@@ -1,67 +1,17 @@
 # experiments/overtone/overtone_pa.m
 
-- Signature: `spectrum=overtone_pa(spin_system,parameters,H,R,K)`
+Source: [canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/overtone/overtone_pa.m) · [Spinach wiki](https://spindynamics.org/wiki/index.php?title=overtone_pa.m)
 
-## Purpose
+Signature: `spectrum=overtone_pa(spin_system,parameters,H,R,K)`.
 
-Overtone soft pulse-acquire experiment. Syntax: spectrum=overtone_pa(spin_system,parameters,H,R,K)
+## Behaviour
 
-## Physical / mathematical content
+This is an overtone soft-pulse/acquire wrapper. It obtains the source-defined reference frequency, lifts the supplied quadrupolar-channel `Lx` operator across `spc_dim`, applies one pulse to `rho0`, then calls `overtone_a` with the original `H`, `R`, and `K`. The pulse evolution combines the supplied Hamiltonian, relaxation, and kinetics as `H+1i*R+1i*K`.
 
-- Overtone experiment implementations. These routines excite or detect high-order quadrupolar transitions and therefore combine non-secular quadrupolar terms, MAS or field effects, and specialised detection pathways.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The `average` branch forms an average pulse operator at `2*pi*(ovt_frq-rf_frq)` and applies its propagator for `rf_dur`. The `fplanck` branch calls `shaped_pulse_af` with the same combined evolution generator, `Lx`, the starting state, the offset in Hz, pulse power, and duration. The file has no separate MAS-rate or sample-orientation field; `spc_dim` is the documented Fokker–Planck spatial dimension.
 
-## Numerical / algorithmic content
+## Inputs and limits
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+Required fields: `sweep` (two-element real frequency extent in Hz around the overtone frequency), `npoints` (positive integer), `spins` (one-element cell array), `spc_dim` (positive integer), `rho0`, `coil`, `Lx` (quadrupolar-nucleus X Zeeman operator), `rf_frq` (offset in Hz), `rf_pwr` (rad/s), `rf_dur` (positive scalar in seconds), and `method` (`'average'` or `'fplanck'`). The consistency check requires `H`, `R`, and `K` to be numeric matrices of matching dimensions.
 
-## Parameters / inputs
-
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz around the overtone frequency
-- parameters.npoints number of points in the spectrum
-- parameters.spins overtone-active nucleus, specified as a
-- single-element cell array
-- parameters.spc_dim Fokker-Planck spatial dimension
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.Lx X Zeeman operator on the
-- quadrupolar nucleus
-- parameters.rf_frq pulse frequency offset from
-- the overtone frequency on the
-- quadrupolar nucleus, Hz
-- parameters.rf_pwr pulse power on the quadrupolar
-- nucleus, rad/s
-- parameters.rf_dur pulse duration, seconds
-- parameters.method 'average' uses the average Hamil-
-- tonian theory, 'fplanck' uses
-- Fokker-Planck formalism
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- spectrum -the spectrum of the system with the specified
-- starting state detected on the specified coil
-- state within the frequency interval requested
-- Note: relaxation must be present in the system dynamics, or the matrix
-- inversion operation in the overtone_a call would fail. The rela-
-- xation superoperator R must *not* be thermalised.
-
-## Implementation structure
-
-- Overtone soft pulse-acquire experiment. Syntax:
-- spectrum=overtone_pa(spin_system,parameters,H,R,K)
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz around the overtone frequency
-- parameters.npoints number of points in the spectrum
-- parameters.spins overtone-active nucleus, specified as a
-- single-element cell array
-- parameters.spc_dim Fokker-Planck spatial dimension
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.Lx X Zeeman operator on the
+The source comment states that relaxation must be present for the matrix inversion in `overtone_a` to converge and that `R` must not be thermalised. This is a documented requirement, not evidence of a successful run. The wrapper returns the helper's `spectrum` without reshaping it; the helper interprets `sweep` and `npoints` for acquisition.

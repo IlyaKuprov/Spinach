@@ -1,48 +1,11 @@
 # kernel/kinetics/react_gen.m
 
-- Signature: `G=react_gen(spin_system,reaction)`
+## Product-row reaction compilation
 
-## Purpose
+`maps=react_gen(spin_system,reaction)` accepts a validated reaction record and the compiled spherical-tensor direct sum. It returns one index matrix per product occurrence: the first column is a global destination row, and the remaining columns are global source rows, one per reactant occurrence.
 
-Chemical reaction generator builder. Syntax: G=react_gen(spin_system,reaction)
+Compilation enumerates product rows, pulls their descriptors back through the atom matching, and looks each source descriptor up in its local substance basis. Unmatched source spins are traced out; unmatched product spins can only arrive at identity. The unit row is retained, making concentrations part of the same reaction map as spin orders. A spin-free reactant contributes its sole unit coordinate. Repeated product indices produce repeated maps with the required stoichiometry.
 
-## Physical / mathematical content
+The compiler never forms a Cartesian product of reactant bases. Product rows excluded because a source descriptor was truncated are counted and reported separately from orders on unmatched product spins. `kinetics` applies rates, drains, selectors, and the additive or product closure to these index lists.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Parameters / inputs
-
-- reaction.reactants -a vector of integers specifying
-- which parts declared in the in-
-- put (chem.parts) are reactants
-- reaction.products -a vector of integers specifying
-- which parts declared in the in-
-- put (chem.parts) are products
-- reaction.matching -a matrix with two columns, spe-
-- cifying which spin in the reac-
-- tants list (left column) becom-
-- es which spin in the product
-- list (right column)
-
-## Outputs
-
-- G -a cell array of matrices, one per reactant, map-
-- ping each state of the reactant state space into
-- its destination in the product state space
-
-## Implementation structure
-
-- Chemical reaction generator builder. Syntax:
-- G=react_gen(spin_system,reaction)
-- reaction.reactants -a vector of integers specifying
-- which parts declared in the in-
-- put (chem.parts) are reactants
-- reaction.products -a vector of integers specifying
-- put (chem.parts) are products
-- reaction.matching -a matrix with two columns, spe-
-- cifying which spin in the reac-
-- tants list (left column) becom-
-- es which spin in the product
-- list (right column)
+The two-column global matching cannot identify different molecular occurrences of a repeated reactant. A repeated reactant whose spins appear in matching therefore raises `Spinach:react_gen:repeatedMatching`; repeated spin-free or wholly traced reactants remain supported. Matched repeated spin-bearing products likewise raise `Spinach:react_gen:repeatedProductMatching`, because global destination labels do not identify molecular occurrences; repeated unlabelled products retain their stoichiometric multiplicity. Occurrence-resolved matching is not guessed.

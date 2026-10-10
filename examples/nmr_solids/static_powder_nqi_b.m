@@ -27,8 +27,8 @@ inter.coupling.matrix{3,3}=1e3*diag([1.5885  0.9449 -( 1.5885 + 0.9449)]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=1; bas.projections={+1};
+bas.approximation={'IK-0'};
+bas.inter_level={1}; bas.projections={+1};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -50,7 +50,7 @@ parameters.zerofill=4096;   % zerofill to
 parameters.rho0=40*state(spin_system,{'L+'},{1})+...
                 32*state(spin_system,{'L+'},{2})+...
                 28*state(spin_system,{'L+'},{3});
-parameters.coil=state(spin_system,'L+','79Br');
+parameters.coil=coil_state(spin_system,'L+','79Br','exact');
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');

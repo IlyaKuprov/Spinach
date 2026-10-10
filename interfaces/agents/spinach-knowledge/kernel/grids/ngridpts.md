@@ -2,47 +2,10 @@
 
 - Signature: `n=ngridpts(grad_amps,grad_durs,isotope,max_coh_order,sample_size)`
 
-## Purpose
+## Behaviour and units
 
-Estimates the minimum number of spatial grid points necessary to have a valid treatment of gradient driven experiments with expli- cit digitization of spatial dimensions. Syntax: n=ngridpts(grad_amps,grad_durs,isotope,... max_coh_order,sample_size);
+Estimates a minimum spatial discretisation count for a gradient-driven experiment. `grad_amps` and `grad_durs` are matching row vectors of gradient amplitudes in T/m and durations in seconds; `isotope` is a character isotope label (for example, `'1H'`); `max_coh_order` is a signed real integer; and `sample_size` is a positive real scalar in metres.
 
-## Physical / mathematical content
+The source sums segment magnitudes rather than allowing gradient-area cancellation: `G_eff=sum(abs(grad_amps.*grad_durs))`. It then uses `spin(isotope)` and computes `k_max=abs(max_coh_order*spin(isotope)*G_eff)`, followed by `n=ceil(k_max*sample_size/pi)`. `spin` returns the magnetogyric ratio in rad/(s*T), so `k_max` has units rad/m and the result is a dimensionless integer count. This is a worst-case spatial angular wavenumber rule, not a frequency-offset or time-evolution calculation. The function returns `n` as a scalar nonnegative integer minimum recommendation; its header cautions that several times this count may be needed for a chosen accuracy.
 
-- Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
-
-## Numerical / algorithmic content
-
-## Parameters / inputs
-
-- grad_amps -a row vector of all gradient amplitudes
-- in the sequence, T/m
-- grad_durs -a row vector of all gradient durations
-- in the sequence, s
-- isotope -the highest magnetogyric ratio isotope in
-- the spin system, e.g. '1H'
-- max_coh_order -maximum order of coherence (either positive
-- or negative) expected during the experiment
-- being simulated
-- sample_size -spatial extent of the sample, m
-
-## Outputs
-
-- n -the minimum recommended number of discretisation points
-- Note: the function returns the minimum number of points, it may
-- in practice be necessary to have several times the number,
-- depending on your accuracy requirements.
-
-## Implementation structure
-
-- Estimates the minimum number of spatial grid points necessary to
-- have a valid treatment of gradient driven experiments with expli-
-- cit digitization of spatial dimensions. Syntax:
-- n=ngridpts(grad_amps,grad_durs,isotope,...
-- max_coh_order,sample_size);
-- grad_amps -a row vector of all gradient amplitudes
-- in the sequence, T/m
-- grad_durs -a row vector of all gradient durations
-- in the sequence, s
-- isotope -the highest magnetogyric ratio isotope in
-- the spin system, e.g. '1H'
-- max_coh_order -maximum order of coherence (either positive
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/grids/ngridpts.m) · [spin.m units](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/spin.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=ngridpts.m)

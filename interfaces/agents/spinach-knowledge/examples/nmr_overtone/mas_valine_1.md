@@ -1,33 +1,21 @@
 # examples/nmr_overtone/mas_valine_1.m
 
+- MATLAB implementation: [examples/nmr_overtone/mas_valine_1.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_overtone/mas_valine_1.m)
+
 - Signature: `mas_valine_1()`
 
-## Purpose
+## What the example models
 
-Overtone detection 14N magic angle spinning NMR spectrum of N-acetylvaline, computed using Fokker-Planck formalism. Va- line quadrupolar tensor data comes from our paper: Calculation time: hours
+This source models a 14N overtone MAS spectrum of N-acetylvaline with the Fokker-Planck formalism. It sets `sys.magnet=14.102` and `sys.isotopes={'14N'}`; the quadrupolar call is `eeqq2nqi(3.21e6,0.27,1,[0 0 0])`. It also supplies `inter.zeeman.eigs={[57.5 81.0 227.0]}` and `inter.zeeman.euler={[-90 -90 -17]*(pi/180)}`. These entries preserve the values and orientation expression supplied by the source; no tensor units are stated alongside them. The basis is `sphten-liouv` with no approximation. Relaxation uses diagonal damping, zero equilibrium, and `damp_rate=2000`.
 
-## Physical / mathematical content
+The source attributes the valine quadrupolar tensor data to the authors' paper ([DOI 10.1039/C4CP03994G](https://doi.org/10.1039/C4CP03994G)) and estimates calculation time as hours. This attribution and estimate describe the example setup; they do not establish a fit or reproduction of an experimental spectrum.
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+## MAS settings and pulse-detected sequence
 
-## Numerical / algorithmic content
+The source sets `theta=atan(sqrt(2))`, `max_rank=8`, axis `[sqrt(2/3) 0 sqrt(1/3)]`, rate `-19840`, and grid `'rep_2ang_6400pts_sph'`. It assigns sweep `[75e3 100e3]`, 256 points, 256-point zero filling, and `axis_units='kHz'`.
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The initial state is 14N `Lz`; both the coil and the `Lx` operator are the angle-weighted `Lz/Lx` combinations using `cos(theta)` and `sin(theta)`. The RF settings are exactly `rf_pwr=2*pi*55e3/sin(theta)`, `rf_dur=70e-6`, and `rf_frq=86e3`; the method is `'average'`. The calculation calls `singlerot(...,@overtone_pa,...,'qnmr')`. The source gives no contact-time or fitting step.
 
-## Implementation structure
+## Output and distinction from the Z-detected variant
 
-- Overtone detection 14N magic angle spinning NMR spectrum of
-- N-acetylvaline, computed using Fokker-Planck formalism. Va-
-- line quadrupolar tensor data comes from our paper:
-- Calculation time: hours
-- System specification
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
-- Magic angle
-- Spectrum setup
-- Simulation
+The result is multiplied by `exp(1i*1.75)` and `real(spectrum)` is plotted using `plot_1d`. The source does not save a spectrum file or report numerical output. This is the pulse-driven, angle-weighted preparation/detection path. In `mas_valine_2.m`, the stated initial state and coil are both 14N `Lz`, no RF pulse or phase multiplication is assigned, and the propagator is `@overtone_a`; those are distinct source-defined sequences, not interchangeable descriptions of one calculation.

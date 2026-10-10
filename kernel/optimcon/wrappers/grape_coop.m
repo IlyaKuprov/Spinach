@@ -8,7 +8,7 @@
 % Parameters:
 %
 %      phi_profile  -  phase profiles of the two pulses,
-%                      concatenated horizontally
+%                      stacked in two row blocks
 %
 % Outputs:
 %
@@ -19,6 +19,8 @@
 %      gradient     -  cooperative fidelity gradient
 %
 % Note: only phase-modulated point-to-point transformations are supported.
+% The control.freeze mask uses the same two row blocks as phi_profile;
+% each pulse freezes its own phase coordinates. An empty mask freezes none.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -34,6 +36,13 @@ n_channels=spin_system.control.ncontrols/2;
 profile_a=phi_profile(1:n_channels,:);
 profile_b=phi_profile((n_channels+1):end,:);
 
+% Split the input-coordinate freeze mask between the two pulses
+freeze_a=spin_system.control.freeze; freeze_b=freeze_a;
+if ~isempty(freeze_a)
+    freeze_a=freeze_a(1:n_channels,:);
+    freeze_b=freeze_b((n_channels+1):end,:);
+end
+
 % Get target and impurity projectors
 rho_targ=spin_system.control.rho_targ{1};
 switch spin_system.bas.formalism
@@ -48,7 +57,9 @@ end
 spin_system.control.return_traj=true();
 
 % Run both experiments
+spin_system.control.freeze=freeze_a;
 [traj_data_a,fidelity_a,gradient_a]=grape_phase(profile_a,spin_system);
+spin_system.control.freeze=freeze_b;
 [traj_data_b,fidelity_b,gradient_b]=grape_phase(profile_b,spin_system);
 
 % Project out the impurities
@@ -90,7 +101,9 @@ spin_system.control.fidelity='real';
 spin_system.control.ens_corrs={'rho_ens'};
 [spin_system.control.catalog,...
  spin_system.control.ens_sizes]=ens_catalog(spin_system.control);
+spin_system.control.freeze=freeze_a;
 [~,~,gradient_c]=grape_phase(profile_a,spin_system);
+spin_system.control.freeze=freeze_b;
 [~,~,gradient_d]=grape_phase(profile_b,spin_system);
 
 % Average fidelity of the two pulses
@@ -134,4 +147,5 @@ end
 % ugly, miserable, talentless people.
 %
 % Milo Yiannopoulos
+
 

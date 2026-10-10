@@ -47,8 +47,10 @@ multipart=kill_spin(multipart,3);
 result=test_true(result,'kill_spin multi-part update',isequal(multipart.chem.parts,{[1 2],zeros(1,0)}),...
                  'killing the last spin must renumber every chemical subsystem without an error');
 
-% Check destruction of stale basis, connectivity, symmetry, and assumption data
-stale=spin_system; stale.bas.formalism='sphten-liouv';
+% Check basis rebuilding and destruction of stale symmetry and assumptions
+sys.magnet=0; sys.isotopes=spin_system.comp.isotopes;
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
+stale=test_spin_system(sys,struct(),bas);
 stale.inter.conmatrix=logical(speye(3));
 stale.comp.sym_group={'S2'}; stale.comp.sym_spins={[2 3]}; stale.comp.sym_a1g_only=true();
 stale.inter.assumptions='nmr';
@@ -56,11 +58,135 @@ stale.inter.zeeman.strength={'secular','secular','secular'};
 stale.inter.giant.strength={[],[],[]};
 stale.inter.coupling.strength=cell(3,3);
 stale=kill_spin(stale,2);
-result=test_true(result,'kill_spin stale metadata',~isfield(stale,'bas')&&...
-                 ~isfield(stale.inter,'conmatrix')&&~isfield(stale.comp,'sym_group')&&...
+result=test_true(result,'kill_spin stale metadata',isequal(stale.bas.nstates,16)&&...
+                 isequal(stale.bas.offsets,[0;16])&&~isfield(stale.comp,'sym_group')&&...
                  ~isfield(stale.inter,'assumptions')&&~isfield(stale.inter.zeeman,'strength')&&...
                  ~isfield(stale.inter.giant,'strength')&&~isfield(stale.inter.coupling,'strength'),...
-                 'basis, connectivity, symmetry, and assumption data must be destroyed on spin removal');
+                 'the basis must be rebuilt, and stale symmetry and assumptions cleared on spin removal');
+
+% Remove isotope filters only when their substance loses the last match
+sys.magnet=0; sys.isotopes={'1H','13C','13C','1H','13C'};
+inter.chem.parts={1:3,4:5}; inter.chem.concs=[1,1];
+bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
+for field={'longitudinal','zero_quantum'}
+    filtered=bas; filtered.(field{1})={{'13C',1},{'13C'}};
+    based=test_spin_system(sys,inter,filtered);
+    retained=kill_spin(based,2);
+    result=test_true(result,['kill_spin retained ' field{1}],...
+                     isequal(retained.bas.(field{1}),filtered.(field{1})),...
+                     'the isotope filter survives while a matching local spin remains');
+    for removed={[2 3],1:3,[2 3 5]}
+        actual=kill_spin(based,removed{1});
+        expected=filtered; expected.(field{1}){1}={1};
+        if ismember(1,removed{1}), expected.(field{1}){1}={}; end
+        if ismember(5,removed{1}), expected.(field{1}){2}={}; end
+        rebuilt=basis(actual,expected);
+        result=test_true(result,['kill_spin stale ' field{1} ' ' mat2str(removed{1})],...
+                         all(cellfun(@(x,y)isequal(x,y)||(isempty(x)&&isempty(y)),...
+                                     actual.bas.(field{1}),expected.(field{1})))&&...
+                         isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                         isequal(actual.bas.offsets,rebuilt.bas.offsets)&&...
+                         strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                         'stale isotope filters are dropped locally and the rebuilt basis matches fresh settings');
+    end
+end
+
+% Cap IK depths locally after spin removal and isotopic dilution
+sys.magnet=0; sys.isotopes={'1H','13C','13C','1H','1H','1H'};
+inter=struct(); inter.chem.parts={1:3,4:6}; inter.chem.concs=[1,1];
+inter.coordinates={[0 0 0],[1 0 0],[0 1 0],[10 0 0],[11 0 0],[10 1 0]};
+for approximation={'IK-0','IK-1','IK-2'}
+    for field={'prox_level','space_level'}
+        depths=struct(); depths.formalism='sphten-liouv';
+        depths.approximation=repmat(approximation,1,2);
+        depths.inter_level={3,2};
+        if ~strcmp(approximation{1},'IK-0')
+            depths.connectivity={'scalar_couplings','scalar_couplings'};
+            depths.(field{1})={3,2};
+        end
+        based=test_spin_system(sys,inter,depths);
+        subsystems=[{kill_spin(based,2)};dilute(based,'13C',1)];
+        result=test_true(result,['based dilute count ' approximation{1} ' ' field{1}],...
+                         numel(subsystems)==3,...
+                         'two dilute carbon sites generate two independently rebuilt subsystems');
+        expected=depths; expected.inter_level{1}=2;
+        if isfield(expected,field{1}), expected.(field{1}){1}=2; end
+        for n=1:numel(subsystems)
+            actual=subsystems{n}; rebuilt=basis(actual,expected);
+            result=test_true(result,['kill_spin depths ' approximation{1} ' ' field{1} ' ' num2str(n)],...
+                             isequal(actual.bas.inter_level,expected.inter_level)&&...
+                             (~isfield(expected,field{1})||...
+                              isequal(actual.bas.(field{1}),expected.(field{1})))&&...
+                             isequal(actual.chem.parts,{1:2,3:5})&&...
+                             isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                             isequal(actual.bas.offsets,rebuilt.bas.offsets)&&...
+                             strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                             'depths are capped locally, smaller depths survive, and the basis matches an explicit rebuild');
+        end
+    end
+end
+
+% Cap each vector depth by its own surviving particle population
+for approximation={'IK-DNP','IK-SBS'}
+    for population=1:2
+        sys=struct('magnet',1);
+        if strcmp(approximation{1},'IK-DNP')
+            sys.isotopes={'E','E','1H','13C'};
+        else
+            sys.isotopes={'C3','V3','1H','13C'};
+        end
+        inter=struct(); inter.coupling.scalar=cell(4);
+        inter.coupling.scalar{3,4}=10;
+        depths=struct('formalism','sphten-liouv','approximation',{approximation});
+        depths.inter_level={[2 4 2]};
+        if strcmp(approximation{1},'IK-SBS')
+            depths.connectivity={'scalar_couplings'};
+        end
+        based=test_spin_system(sys,inter,depths);
+        removed=1; expected=depths; expected.inter_level={[1 3 2]};
+        if population==2
+            removed=4; expected.inter_level={[2 3 1]};
+        end
+        actual=kill_spin(based,removed); rebuilt=basis(actual,expected);
+        result=test_true(result,['vector depths ' approximation{1} ' ' num2str(population)],...
+                         isequal(actual.bas.inter_level,expected.inter_level)&&...
+                         isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                         strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                         'each depth uses the same particle-type bound as basis validation');
+    end
+end
+
+% Remove the last required particle class while another substance is untouched
+for approximation={'IK-DNP','IK-SBS'}
+    sys=struct('magnet',1);
+    if strcmp(approximation{1},'IK-DNP')
+        sys.isotopes={'E','E','1H','13C','19F'};
+    else
+        sys.isotopes={'C3','V3','1H','13C','19F'};
+    end
+    inter=struct(); inter.chem.parts={1:4,5}; inter.chem.concs=[1 1];
+    depths=struct('formalism','sphten-liouv');
+    depths.approximation={approximation{1},'IK-0'}; depths.inter_level={[2 3 1],1};
+    if strcmp(approximation{1},'IK-SBS'), depths.connectivity={'full_tensors',[]}; end
+    based=test_spin_system(sys,inter,depths);
+    for removed={1:2,3:4}
+        actual=kill_spin(based,removed{1}); expected=depths;
+        expected.approximation{1}='IK-0'; expected.inter_level{1}=1;
+        if isequal(removed{1},3:4), expected.inter_level{1}=2; end
+        if isfield(expected,'connectivity'), expected.connectivity{1}=[]; end
+        rebuilt=basis(actual,expected);
+        result=test_true(result,['last class ' approximation{1} ' ' mat2str(removed{1})],...
+                         isequal(actual.bas.approximation,expected.approximation)&&...
+                         isequal(actual.bas.inter_level,expected.inter_level)&&...
+                         isequal(actual.bas.basis,rebuilt.bas.basis)&&...
+                         isequal(actual.bas.basis{2},based.bas.basis{2})&&...
+                         isequal(actual.bas.offsets,rebuilt.bas.offsets)&&...
+                         strcmp(actual.bas.basis_hash,rebuilt.bas.basis_hash),...
+                         'the surviving correlation bound becomes IK-0 and the other substance is unchanged');
+        fprintf('CWDM_KILL_LAST_CLASS %s removed=%s approximation=%s depth=%d\n',...
+                approximation{1},mat2str(removed{1}),actual.bas.approximation{1},actual.bas.inter_level{1});
+    end
+end
 
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);
@@ -108,26 +234,29 @@ result=test_true(result,'merge_inp rate arrays',isequal(inter.r1_rates,{0.1;0.2;
                  'merge_inp must merge per-spin rate cell arrays of either orientation into columns');
 result=test_true(result,'merge_inp index offsets',isequal(inter.srsk_sources,[1 3])&&...
                  isequal(inter.ignore,{[2 3]})&&isequal(inter.chem.parts,{1,[2 3]})&&...
-                 isequal(inter.chem.rates,zeros(2))&&isequal(inter.chem.concs,[1 1]),...
+                 isempty(inter.chem.reactions)&&isequal(inter.chem.concs,[1 1]),...
                  'merge_inp must offset spin and subsystem indices by preceding spin counts');
 result=test_true(result,'merge_inp suscept centres',isequal(inter.suscept.chi,{0.01*eye(3)})&&...
                  isequal(inter.suscept.xyz,{[5 5 5]}),...
                  'merge_inp must concatenate susceptibility centre lists across subsystems');
 
-% Check column-oriented subsystem lists and partless chemistry
+% Check column-oriented subsystem lists and reaction selector offsets
 [sys_parts,inter_parts]=local_merge_parts();
 inter_parts{2}.chem.parts={1;2};
 [~,inter]=merge_inp(sys_parts,inter_parts);
 result=test_true(result,'merge_inp column parts',isequal(inter.chem.parts,{1,2,3}),...
                  'column-oriented chemical part lists must merge into offset row lists');
 [sys_parts,inter_parts]=local_merge_parts();
-inter_parts{1}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
-inter_parts{2}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
+reaction=struct('reactants',1,'products',[],'matching',zeros(0,2),...
+                'rate',1e6,'selector',{{'singlet',[1 2]}},'loss','haberkorn');
+inter_parts{1}.chem.reactions={}; inter_parts{2}.chem.reactions={reaction};
 inter_parts{1}.tau_c={1e-9}; inter_parts{2}.tau_c={1e-9};
 [~,inter]=merge_inp(sys_parts,inter_parts);
-result=test_true(result,'merge_inp partless chem',isequal(inter.tau_c,{1e-9})&&...
-                 isequal(inter.chem.rp_electrons,[1 2]),...
-                 'chemistry without a species split must keep tau_c common and offset electron indices');
+result=test_true(result,'merge_inp reaction selector offsets',...
+                 isequal(inter.tau_c,{1e-9,1e-9})&&...
+                 isequal(inter.chem.reactions{1}.selector{2},[2 3])&&...
+                 isequal(inter.chem.reactions{1}.reactants,2),...
+                 'explicit reaction parts concatenate correlation times and offset selector spins and substances');
 
 % Check that non-extensive differences and malformed inputs are refused
 [sys_parts,inter_parts]=local_merge_parts();
@@ -201,9 +330,7 @@ spin_system.rlx.srsk_sources=[1 3];
 
 % Define chemistry arrays affected by spin removal
 spin_system.chem.parts={[1 2 3]};
-spin_system.chem.flux_rate=[];
-spin_system.chem.rp_electrons=[];
-spin_system.chem.rp_rates=[];
+spin_system.chem.reactions={};
 
 end
 
@@ -240,7 +367,7 @@ inter_parts{1}.ignore={};
 inter_parts{1}.suscept.chi={0.01*eye(3)};
 inter_parts{1}.suscept.xyz={[5 5 5]};
 inter_parts{1}.chem.parts={1};
-inter_parts{1}.chem.rates=0;
+inter_parts{1}.chem.reactions={};
 inter_parts{1}.chem.concs=1;
 
 % Build second subsystem input structures
@@ -262,7 +389,7 @@ inter_parts{2}.ignore={[1 2]};
 inter_parts{2}.suscept.chi={};
 inter_parts{2}.suscept.xyz={};
 inter_parts{2}.chem.parts={[1 2]};
-inter_parts{2}.chem.rates=0;
+inter_parts{2}.chem.reactions={};
 inter_parts{2}.chem.concs=1;
 
 end

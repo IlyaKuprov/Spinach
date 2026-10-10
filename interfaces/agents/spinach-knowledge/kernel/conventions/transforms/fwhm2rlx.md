@@ -1,40 +1,27 @@
 # kernel/conventions/transforms/fwhm2rlx.m
 
-- Signature: `r2rate=fwhm2rlx(fwhm)`
-
 ## Purpose
 
-Converts full width at half-maximum (FWHM) of an NMR signal into an approximation of the R2 rate. Syntax: r2rate=fwhm2rlx(fwhm)
+Approximates the transverse relaxation rate from an NMR signal's full width at half-maximum (FWHM), assuming a Lorentzian line shape.
 
-## Physical / mathematical content
+## Signature
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+`r2rate=fwhm2rlx(fwhm)`
 
-## Numerical / algorithmic content
+## Conversion
 
-## Parameters / inputs
+`r2rate = pi * fwhm`
 
-- fwhm -full width at half-maximum, Hz
+Both the input FWHM and output approximate R2 rate are in Hz.
 
-## Outputs
+## Input and output
 
-- r2rate -approximate R2 relaxation rate, Hz
-- Note: FWHM is not a reliable measure of the transverse
-- relaxation rate. The value obtained from this
-- function should be treated as an upper bound.
-- Note: Lorentzian line shape is assumed.
+- `fwhm`: real numeric array. The function errors if any element is less than or equal to zero. The validation does not explicitly test finiteness.
+- `r2rate`: numeric array with the same dimensions as `fwhm`, scaled elementwise by pi.
 
-## Implementation structure
+FWHM alone is not a reliable measure of transverse relaxation; the source says to treat the result as an upper bound. The Lorentzian line shape is assumed.
 
-- Converts full width at half-maximum (FWHM) of an NMR
-- signal into an approximation of the R2 rate. Syntax:
-- r2rate=fwhm2rlx(fwhm)
-- fwhm -full width at half-maximum, Hz
-- r2rate -approximate R2 relaxation rate, Hz
-- Note: FWHM is not a reliable measure of the transverse
-- relaxation rate. The value obtained from this
-- function should be treated as an upper bound.
-- Note: Lorentzian line shape is assumed.
-- Check consistency
-- Run the conversion
-- Consistency enforcement
+## References
+
+- MATLAB source: [kernel/conventions/transforms/fwhm2rlx.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/fwhm2rlx.m)
+- [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=fwhm2rlx.m)

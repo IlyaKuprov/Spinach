@@ -1,34 +1,16 @@
 # kernel/overloads/@ttclass/transpose.m
 
-- Signature: `ttrain=transpose(ttrain)`
+## Signature
 
-## Purpose
+`ttrain=transpose(ttrain)`
 
-Transposes a tensor without complex conjugation. Syntax: ttrain=transpose(ttrain)
+## Behaviour
 
-## Physical / mathematical content
+For every train and core, the method permutes the four core dimensions in the order `[1 3 2 4]`. This leaves the left and right bond dimensions and the core sequence unchanged while swapping the two physical dimensions (row and column modes). The resulting tensor train represents the non-conjugating matrix transpose: complex entries are not conjugated, and the represented matrix dimensions are exchanged.
 
-- Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
+The core ranks, train coefficients, and tolerance metadata are unchanged. This is a dimension permutation only; no rank reduction, truncation, or rounding is performed.
 
-## Numerical / algorithmic content
+## References
 
-## Parameters / inputs
-
-- ttrain -tensor train representation of a matrix
-
-## Outputs
-
-- ttrain -transpose of the input tensor train
-
-## Implementation structure
-
-- Transposes a tensor without complex conjugation. Syntax:
-- ttrain=transpose(ttrain)
-- ttrain -tensor train representation of a matrix
-- ttrain -transpose of the input tensor train
-- Read tensor sizes and ranks
-- Swap the middle dimensions of all cores
-- "Public welfare" is the welfare of those who do not earn
-- it; those who do, are entitled to no welfare.
-- Ayn Rand, "Atlas Shrugged"
-- #NGRUM
+- [Source on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/overloads/@ttclass/transpose.m)
+- [Spin Dynamics Wiki: `ttclass/transpose.m`](https://spindynamics.org/wiki/index.php?title=ttclass/transpose.m)

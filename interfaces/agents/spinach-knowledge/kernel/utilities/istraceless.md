@@ -1,37 +1,23 @@
 # kernel/utilities/istraceless.m
 
-- Signature: `A=istraceless(M)`
-
 ## Purpose
 
-A floating-point precision consistent check for whether a particular matrix is traceless. Syntax: A=istraceless(M)
+Checks whether a matrix is traceless within floating-point precision, returning a logical true or false. Source: [kernel/utilities/istraceless.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/istraceless.m).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+The function calls `grumble(M)` to enforce that the input is numeric, raising the error `'M must be numeric.'` if `~isnumeric(M)` is true. It then computes the working precision as `eps(class(M))`, obtains the cheapest norm of `M` via `cheap_norm(M)`, and returns `A=(abs(trace(M))<=precision*norm_m)`. Thus `A` is true when the absolute value of the trace does not exceed the precision-scaled norm of the matrix.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs:**
 
-- M -a matrix of any dimension
+- `M` — a matrix of any dimension.
 
-## Outputs
+**Outputs:**
 
-- A -true if the matrix is traceless to ap-
-- propriate precision, false otherwise
+- `A` — true if the matrix is traceless to appropriate precision, false otherwise.
 
-## Implementation structure
+## References
 
-- A floating-point precision consistent check for whether
-- a particular matrix is traceless. Syntax:
-- A=istraceless(M)
-- M -a matrix of any dimension
-- A -true if the matrix is traceless to ap-
-- propriate precision, false otherwise
-- Check consistency
-- Working precision
-- Cheapest norm of M
-- Decide if M is traceless
-- Consistency enforcement
-- The College asked me to chair the Size and Shape
+- Spinach Dynamics Wiki: [istraceless.m](https://spindynamics.org/wiki/index.php?title=istraceless.m)

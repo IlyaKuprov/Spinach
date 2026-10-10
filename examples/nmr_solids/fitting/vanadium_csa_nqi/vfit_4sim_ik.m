@@ -58,7 +58,9 @@ disp(params);
 % Silence Spinach
 sys.output='hush';
 sys.disable={'hygiene'};
-% sys.enable={'gpu'};
+sys.enable={'zte'};
+
+% sys.enable={'zte','gpu'};
 
 % Data dimensions
 sfO1 = 157.7815; nrpointsb = 4096;
@@ -94,7 +96,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(Qcc,Qeta,3.5,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Spinach housekeeping
@@ -114,7 +116,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','51V');
-parameters.coil=state(spin_system,'L+','51V');
+parameters.coil=coil_state(spin_system,'L+','51V','exact');
 
 % Simulation A
 parameters.rate=41000;

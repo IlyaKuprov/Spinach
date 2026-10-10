@@ -1,49 +1,34 @@
 # kernel/utilities/herm_spline.m
 
-- Signature: `y=herm_spline(f0,df0,f1,df1,x)`
-
 ## Purpose
 
-Cubic Hermite spline on [0,1] interval from values and deriva- tives at the interval edges. Syntax: y=herm_spline(f0,df0,f1,df1,x)
+Evaluates a cubic Hermite spline on the [0,1] interval, defined by function values and derivatives at the two interval edges, at one or more query points.
 
-## Physical / mathematical content
+Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/herm_spline.m>
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+## Behaviour
 
-## Numerical / algorithmic content
+- Syntax: `y=herm_spline(f0,df0,f1,df1,x)`.
+- The spline coefficients (ordered from x^3 down to x^0) are obtained as a fixed 4x4 matrix multiplying the vector `[df0; f0; df1; f1]`, with the matrix rows `[1 2 1 -2; -2 -3 -1 3; 1 0 0 0; 0 1 0 0]`.
+- Each query point is evaluated as `c(1)*x^3+c(2)*x^2+c(3)*x+c(4)` in a loop over all entries of `x`.
+- If all four edge values/derivatives are scalars and `x` is not a scalar, the scalars are expanded to arrays of the same size as `x`, so the same spline is evaluated at all query points; otherwise, multiple splines are evaluated at their corresponding query points.
+- Input consistency is enforced by an internal `grumble` subfunction:
+ all inputs must be numeric, real, and finite (error otherwise), and `f0`, `df0`, `f1`, `df1` must each be either a scalar or the same size as `x` (error otherwise).
 
-## Parameters / inputs
+## Inputs and outputs
 
-- f0 -function value(s) at the left edge, a real
-- scalar or array
-- df0 -function derivative(s) at the left edge,
-- a real scalar or array
-- f1 -function value(s) at the right edge, a real
-- scalar or array
-- df1 -function derivative(s) at the right edge,
-- a real scalar or array
-- x -query point(s) inside [0,1] interval,
-- a real scalar or array
-- Function values and derivatives can be scalars (in which case
-- the same spline is evaluated at all query points) or arrays of
-- the same size as x, in which case multiple splines are evalua-
-- ted at their corresponding query points.
+Inputs:
 
-## Outputs
+- `f0` - function value(s) at the left edge; real scalar or array.
+- `df0` - function derivative(s) at the left edge; real scalar or array.
+- `f1` - function value(s) at the right edge; real scalar or array.
+- `df1` - function derivative(s) at the right edge; real scalar or array.
+- `x` - query point(s) inside the [0,1] interval; real scalar or array.
 
-- y -the value of the spline(s) at the query point(s)
+Output:
 
-## Implementation structure
+- `y` - value of the spline(s) at the query point(s), same size as `x`.
 
-- Cubic Hermite spline on [0,1] interval from values and deriva-
-- tives at the interval edges. Syntax:
-- y=herm_spline(f0,df0,f1,df1,x)
-- f0 -function value(s) at the left edge, a real
-- scalar or array
-- df0 -function derivative(s) at the left edge,
-- a real scalar or array
-- f1 -function value(s) at the right edge, a real
-- df1 -function derivative(s) at the right edge,
-- x -query point(s) inside [0,1] interval,
-- Function values and derivatives can be scalars (in which case
-- the same spline is evaluated at all query points) or arrays of
+## References
+
+- Spinach Dynamics Wiki: <https://spindynamics.org/wiki/index.php?title=herm_spline.m>

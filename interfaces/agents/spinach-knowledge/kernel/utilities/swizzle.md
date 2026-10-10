@@ -1,37 +1,29 @@
 # kernel/utilities/swizzle.m
 
-- Signature: `tuples=swizzle(index_arrays)`
-
 ## Purpose
 
-Flattens out nested index lists and outputs them as an array of tuples in random order. This is useful for flattening nes- ted loops for parallel processing. Syntax: tuples=swizzle(index_arrays)
+Flattens nested index lists into an array of tuples in random order, which is useful for flattening nested loops for parallel processing.
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Syntax: `tuples=swizzle(index_arrays)`.
+- The function first validates its input via an internal consistency check (`grumble`):
+  - Errors with `index_arrays must be a cell array of row vectors.` if the input is not a cell array.
+  - Errors with `elements of index_arrays must be row vectors of positive integers.` if any element is not real, not a row vector, contains non-integer values, or contains values less than 1.
+- The tuples are built by Kronecker-style expansion: the first index vector initialises the column, and each subsequent vector appends a new column formed by `kron` of ones and the vector against the accumulated tuples.
+- After construction, the rows of the tuple matrix are randomly permuted with `randperm`, so the tuples are returned in random order with tuples listed as rows.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Parameters / inputs
+**Inputs**
 
-- index_arrays -a cell array of row vectors
+- `index_arrays` — a cell array of row vectors (each element must be a row vector of positive integers).
 
-## Outputs
+**Outputs**
 
-- tuples -a matrix of tuples in random or-
-- der, with tuples listed as rows
+- `tuples` — a matrix of tuples in random order, with tuples listed as rows.
 
-## Implementation structure
+## References
 
-- Flattens out nested index lists and outputs them as an array
-- of tuples in random order. This is useful for flattening nes-
-- ted loops for parallel processing. Syntax:
-- tuples=swizzle(index_arrays)
-- index_arrays -a cell array of row vectors
-- tuples -a matrix of tuples in random or-
-- der, with tuples listed as rows
-- Check consistency
-- Kronecker up the arrays
-- Randomise the tuple list
-- Consistency enforcement
-- Acording to a conference rumour, before appointing IK to a tenured
+- Source: [kernel/utilities/swizzle.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/swizzle.m)
+- Wiki: <https://spindynamics.org/wiki/index.php?title=swizzle.m>

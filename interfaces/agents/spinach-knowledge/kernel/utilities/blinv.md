@@ -1,33 +1,32 @@
 # kernel/utilities/blinv.m
 
-- Signature: `[Lsq,Dsq]=blinv(A)`
+**Source:** [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/blinv.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/blinv.m)
 
 ## Purpose
 
-Blicharski's relaxation theory invariants, as given by Equations 20-21 in http://doi.org/10.1515/zna-1972-1012, with an error and a typo corrected in Equation 21. Syntax: [Lsq,Dsq]=blinv(A) where A is the interaction matrix. This function is not sensitive to the trace of the matrix. Parameters: A -a real 3x3 matrix
+Computes Blicharski's relaxation theory invariants for a real 3x3 interaction matrix, as given by Equations 20-21 in [http://doi.org/10.1515/zna-1972-1012](http://doi.org/10.1515/zna-1972-1012).
 
-## Physical / mathematical content
+## Behaviour
 
-- General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
+- Validates the input via an internal consistency check (`grumble`), which errors with `'A must be a real 3x3 matrix.'` if the argument is not numeric, not real, not a matrix, or not of size 3x3.
+- Computes the first rank invariant `Lsq` as the sum of squared antisymmetric parts:
+  - `(A(1,2)-A(2,1))^2 + (A(1,3)-A(3,1))^2 + (A(2,3)-A(3,2))^2`
+- Computes the second rank invariant `Dsq` as:
+  - `A(1,1)^2 + A(2,2)^2 + A(3,3)^2 - A(1,1)*A(2,2) - A(1,1)*A(3,3) - A(2,2)*A(3,3) + (3/4)*((A(1,2)+A(2,1))^2 + (A(1,3)+A(3,1))^2 + (A(2,3)+A(3,2))^2)`
+- The function is not sensitive to the trace of the matrix.
 
-## Numerical / algorithmic content
+## Inputs and outputs
 
-## Outputs
+**Inputs:**
 
-- Lsq -first rank invariant
-- Dsq -second rank invariant
+- `A` — a real 3x3 matrix (the interaction matrix).
 
-## Implementation structure
+**Outputs:**
 
-- Blicharski's relaxation theory invariants, as given by Equations
-- 20-21 in http://doi.org/10.1515/zna-1972-1012, with an error and
-- a typo corrected in Equation 21. Syntax:
-- [Lsq,Dsq]=blinv(A)
-- where A is the interaction matrix. This function is not sensitive
-- to the trace of the matrix. Parameters:
-- A - a real 3x3 matrix
-- Lsq - first rank invariant
-- Dsq - second rank invariant
-- Check consistency
-- First rank invariant
-- Second rank invariant
+- `Lsq` — first rank invariant.
+- `Dsq` — second rank invariant.
+
+## References
+
+- Blicharski, J. S. — Equations 20-21, [http://doi.org/10.1515/zna-1972-1012](http://doi.org/10.1515/zna-1972-1012).
+- Spinach Wiki: [https://spindynamics.org/wiki/index.php?title=blinv.m](https://spindynamics.org/wiki/index.php?title=blinv.m)

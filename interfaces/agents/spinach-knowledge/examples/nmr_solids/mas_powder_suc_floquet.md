@@ -1,32 +1,17 @@
 # examples/nmr_solids/mas_powder_suc_floquet.m
 
-- Signature: `mas_powder_suc_floquet()`
+Source: [examples/nmr_solids/mas_powder_suc_floquet.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/mas_powder_suc_floquet.m)
 
 ## Purpose
 
-13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the Floquet MAS formalism. Chemical shielding tensors, J-couplings and coordinates are estimated with DFT. Calculation time: days (hours with a Tesla card)
+Calculates a 13C MAS NMR spectrum for the sucrose system imported from the PCM-DFT output file. The source labels the method Floquet MAS and estimates “days” of calculation time, or “hours with a Tesla card”; those are source comments, not measured timings.
 
-## Physical / mathematical content
+## Model and acquisition
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+`gparse('../standard_systems/sucrose.log')` and `g2spinach` import the carbon isotope set `13C`, using `182.1` as the absolute shielding reference (ppm; `g2spinach` defines reference values as those placed at zero ppm). The source describes the shielding tensors, J-couplings, and coordinates as DFT-derived. The field is `14.1` T. The basis uses `sphten-liouv`, `IK-0`, projection `+1`, and inter-level 3; interaction and proximity cutoffs are set to 5.0 and 4.0.
 
-## Numerical / algorithmic content
+The rotor-axis vector is `1 1 1`, MAS rate is `6000` Hz, maximum rank is 23, sweep is `50000` Hz, and offset is `15000` Hz. The acquisition has 256 points and zero-fills to 1024. It selects `13C`, specifies an empty `decouple` list, and labels the axis in Hz. The header assumes 1H decoupling, but the script selects only 13C, sets no explicit RF field or pulse program, and does not request a decoupling channel. It assigns no dipolar tensor value directly; the parsed model also carries molecular coordinates.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Calculation and display
 
-## Implementation structure
-
-- 13C MAS spectrum of sucrose powder (assuming decoupling of 1H),
-- computed using the Floquet MAS formalism. Chemical shielding
-- tensors, J-couplings and coordinates are estimated with DFT.
-- Calculation time: days (hours with a Tesla card)
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- % Simulation
-- Apodisation
+The source calls `floquet(spin_system,@acquire,parameters,'nmr')` with grid `leb_2ang_rank_23`. The initial state and receiver are both `L+` on `13C`. It exponentially apodises the calculated FID with parameter 6, Fourier transforms to 1024 points, and plots the real spectrum with `plot_1d`. These are simulated settings and output, not experimental measurements.

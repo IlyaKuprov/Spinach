@@ -1,38 +1,17 @@
 # kernel/conventions/transforms/axis_tsymm.m
 
-- Signature: `A=axis_tsymm(T,a)`
+[Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/conventions/transforms/axis_tsymm.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=axis_tsymm.m)
 
-## Purpose
+## Contract
 
-Roughly averages an interaction tensor with respect to the rotation around a user-specified axis. Syntax: T=axis_tsymm(T,a)
+axis_tsymm forms an approximate rotational average of a real 3-by-3 interaction tensor about a specified Cartesian axis. It returns a 3-by-3 tensor in the same matrix representation; the routine does not take a spin system, orientation grid, or spatial-coordinate array.
 
-## Physical / mathematical content
+The input axis is a nonzero real 3-by-1 vector, and the tensor is a real 3-by-3 matrix. The source does not specify a physical unit for the tensor entries or require the input matrix to be symmetric. The vector and tensor are interpreted in the common Cartesian frame used by the rotation operation.
 
-- Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
+## Transformation and sampling
 
-## Numerical / algorithmic content
+For n=1:360, the routine constructs R=anax2dcm(a,pi*n/180) and accumulates R*T*R'; it divides the sum by 360. Thus the source samples 360 equally spaced rotations over a full turn, at pi*n/180 radians, and returns their discrete mean. “Approximate” describes this finite angular sampling.
 
-## Parameters / inputs
+## Source-supported use
 
-- T -3x3 real interaction tensor
-- a -3x1 real vector specifying the rotation axis
-
-## Outputs
-
-- A -3x3 real interaction tensor averaged over
-- the rotation around the specified axis
-
-## Implementation structure
-
-- Roughly averages an interaction tensor with respect to the
-- rotation around a user-specified axis. Syntax:
-- T=axis_tsymm(T,a)
-- T -3x3 real interaction tensor
-- a -3x1 real vector specifying the rotation axis
-- A -3x3 real interaction tensor averaged over
-- the rotation around the specified axis
-- Check consistency
-- Preallocate average
-- Loop over the full rotation
-- Compute the average
-- Consistency enforcement
+The documented call is A=axis_tsymm(T,a), with T a 3-by-3 real interaction tensor and a the 3-by-1 real rotation-axis vector.

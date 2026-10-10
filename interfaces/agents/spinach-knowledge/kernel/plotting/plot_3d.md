@@ -4,53 +4,27 @@
 
 ## Purpose
 
-Volume isosurface plotting utility with non-linear adaptive surface spacing. The function plots the 3D volume and the three projections onto the coordinate planes. Syntax: plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)
+Render an input real 3D spectrum as isosurfaces, with its three coordinate-plane projections. This is a plotting routine; it does not propagate a spin system or calculate a spectrum.
 
-## Physical / mathematical content
+## Inputs and axes
 
-## Numerical / algorithmic content
+- `spectrum` is a real numeric cube with dimensions `N1 × N2 × N3`. The three sweep widths and offsets are in Hz; `parameters.spins` has three entries.
+- Each frequency vector is built by `ft_axis(offset(i),sweep(i),size(spectrum,i))`. That helper starts with `N+1` evenly spaced samples from `-sweep/2` to `sweep/2`; for odd `N` it drops the first and shifts the remaining values by half a bin, while for even `N` it drops the last, then adds the offset. [See `ft_axis`](ft_axis.md).
+- `axis_units='Hz'` leaves those vectors unchanged. For `ppm`, each is converted as `1e6*(2*pi*frequency)/(spin(spins{i})*spin_system.inter.magnet)`. For frequency-swept Gauss, each becomes `1e4*(B0-2*pi*frequency/spin('E'))`, where `B0=spin_system.inter.magnet`. These conversions change tick coordinates, not the spectrum values.
 
-## Parameters / inputs
+## Surface levels and projections
 
-- spectrum -a real cube containing the 3D NMR spectrum
-- parameters.sweep -three sweep widths, Hz
-- parameters.spins -cell array with three character
-- strings specifying the working
-- spins.
-- parameters.offset -three transmitter offsets, Hz
-- parameters.axis_units -axis units ('ppm','Hz','Gauss')
-- nsurf -the number of surfaces, a reasonable value is 20
-- delta -minimum and maximum elevation (as a fraction of the
-- total intensity) of the surfaces above the baseline.
-- A good starting value is [0.02 0.2 0.02 0.2]. The
-- first pair of numbers refers to the positive surfa-
-- ces and the second pair to the negative ones.
-- k -a coefficient that controls the curvature of the surface
-- spacing function: k=1 corresponds to linear spacing and
-- k>1 bends the spacing curve to increase the sampling den-
-- sity near the baseline. A reasonable value is 2.
-- signs -can be set to 'positive', 'negative' or 'both' -this
-- will cause the corresponding surfaces to be plotted.
+The routine obtains `xmax` and `xmin` from the cube and passes them with `delta`, `k`, `signs`, and `nsurf` to `contspacing` to make the isosurface levels. The source documents `nsurf=20` as a reasonable value. `delta` contains four fractions: the first pair sets positive-surface minimum/maximum elevations and the second pair sets the negative ones; its example is `[0.02 0.2 0.02 0.2]`. `k=1` gives linear spacing; `k>1` concentrates levels nearer the baseline, with `k=2` suggested. `signs` selects `'positive'`, `'negative'`, or `'both'`.
 
-## Outputs
+The 3D panel uses `meshgrid(axis_f2,axis_f1,axis_f3)`, so its X, Y, and Z coordinates are F2, F1, and F3 and align with the three spectrum dimensions. Isosurfaces are red with no edges; explicit axis limits are the minimum and maximum of each converted axis vector. The other panels call `plot_2d` on `squeeze(sum(spectrum,1))` (F3–F2), `squeeze(sum(spectrum,3))` (F2–F1), and `squeeze(sum(spectrum,2))` (F3–F1), each with 20 contours, `delta`, `k=2`, 256 colormap entries, `m=6`, and `signs`.
 
-- this function creates a figure
-- Note: the following functions are used to compute surface levels:
-- cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-- cont_levs_neg=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
-- where smin and smax are computed from the spectrum cube.
+## Rendering and checks
 
-## Implementation structure
+The function uses a 2-by-2 subplot layout; the first panel is created with `'replace'`. It makes the 3D axes square, boxed, gridded, reverses X/Y/Z directions, sets a camera position from the axis extents, and labels the axes. The projection panels are square and gridded with reversed X/Y directions. Finally, it sets the current figure position to `[100 100 2*default_width 2*default_height]`. It returns no value.
 
-- Volume isosurface plotting utility with non-linear adaptive surface
-- spacing. The function plots the 3D volume and the three projections
-- onto the coordinate planes. Syntax:
-- plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)
-- spectrum -a real cube containing the 3D NMR spectrum
-- parameters.sweep - three sweep widths, Hz
-- parameters.spins - cell array with three character
-- strings specifying the working
-- spins.
-- parameters.offset - three transmitter offsets, Hz
-- parameters.axis_units - axis units ('ppm','Hz','Gauss')
-- nsurf -the number of surfaces, a reasonable value is 20
+The local guards require a real numeric 3D cube; three-element offsets, sweeps, point counts, zero-fill sizes, and spin entries; finite positive integer point-count and zero-fill vectors; and a spectrum shape matching `parameters.zerofill`. Units must be a character string recognised as `'ppm'`, `'Hz'`, or `'Gauss'`; `nsurf` and `k` must be positive integers and `delta` must contain four real values from 0 to 1.
+
+## References
+
+- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/plot_3d.m)
+- [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=plot_3d.m)

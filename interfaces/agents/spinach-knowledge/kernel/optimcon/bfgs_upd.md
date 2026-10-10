@@ -1,56 +1,27 @@
 # kernel/optimcon/bfgs_upd.m
 
-- Signature: `H=bfgs_upd(H,dx,dg)`
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/bfgs_upd.m) · [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=bfgs_upd.m)
 
 ## Purpose
 
-Performs a one-step BFGS Hessian update for maximisation using the argument and gradient increments from the previous step.
-
-## Physical / mathematical content
-
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- This routine performs a single dense BFGS Hessian update for a maximisation problem. The sign conventions matter: the stored matrix approximates the negative Hessian so that solving H\g yields an ascent direction.
-- The curvature test rejects bad secant pairs when dg^T dx does not have the sign and magnitude expected for locally concave behaviour. That protects the update from producing indefinite or numerically meaningless curvature models.
-
-## Numerical / algorithmic content
-
-- If no valid curvature information exists yet, the code scales an identity matrix using y^T y / y^T dx, a standard quasi-Newton initialisation that roughly matches curvature along the first accepted step.
+Apply one dense BFGS update for maximisation. `H` approximates the negative objective Hessian; `dx` and `dg` are argument and gradient increments. The update uses the sign-adjusted gradient increment `y=-dg`. It updates curvature information only; it does not evaluate the objective or impose constraints.
 
 ## Syntax
 
-```matlab
-H=bfgs_upd(H,dx,dg)
-```
+`H=bfgs_upd(H,dx,dg)`
 
-## Parameters / inputs
+## Inputs
 
-- H -current BFGS approximation to the Hessian
-- matrix corresponding to the *negative*
-- Hessian of the objective; use [] on the
-- first call
-- dx -increment in arguments between the current
-- and the previous step
-- dg -increment in gradients between the current
-- and the previous step
+- `H` — existing real square approximation, or `[]` for initialisation.
+- `dx` — nonempty real numeric vector of argument increments.
+- `dg` — nonempty real numeric vector of gradient increments, with the same number of elements as `dx`.
 
-## Outputs
+The implementation accepts row or column vectors and reshapes both increments into columns. It checks that a supplied `H` is real, square, and dimensionally compatible. It does not require the increments or `H` to be finite at input validation; non-finite increment curvature fails the pair test.
 
-- H -updated BFGS approximation to the Hessian
-- matrix corresponding to the *negative*
-- Hessian of the objective
+## Update and output
 
-## Implementation structure
+- `H` — updated real symmetric approximation to the negative objective Hessian.
 
-- Performs a one-step BFGS Hessian update for maximisation using
-- the argument and gradient increments from the previous step.
-- H=bfgs_upd(H,dx,dg)
-- H -current BFGS approximation to the Hessian
-- matrix corresponding to the *negative*
-- Hessian of the objective; use [] on the
-- first call
-- dx -increment in arguments between the current
-- and the previous step
-- dg -increment in gradients between the current
-- H -updated BFGS approximation to the Hessian
-- Hessian of the objective
+A curvature pair is used only when the finite inner products are positive in norm and `dg' * dx < -0.01*norm(dg)*norm(dx)`. With an empty `H`, a rejected pair returns an identity matrix sized to `dx`; a usable pair initialises a scaled identity and is then applied in the same call. With an existing matrix, a rejected pair leaves its symmetrised value unchanged. The BFGS update also returns that symmetrised value without updating if its denominators are non-finite or no larger than machine `eps`.
+
+The routine assigns no physical units; increments and gradients retain the caller's optimisation-coordinate and objective units.

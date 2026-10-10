@@ -27,12 +27,13 @@ inter.r2_rates={1};
 % Disable path tracing
 sys.disable={'pt'};
 
-% This needs a GPU
+% Optional GPU arithmetic
+
 % sys.enable={'gpu'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -68,7 +69,7 @@ parameters.rlx_op={R1Op,R2Op};
 parameters.rho0_ph={PDPh};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts)};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % Run the simulation
 mri=imaging(spin_system,@fse,parameters);

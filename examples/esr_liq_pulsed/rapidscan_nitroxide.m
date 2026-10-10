@@ -26,7 +26,7 @@ inter.coupling.matrix{2,1}=[0.6178         0    0.3161
 
 % Simulation parameters
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 inter.relaxation={'redfield'};
 inter.rlx_keep='secular';
 inter.equilibrium='dibari';

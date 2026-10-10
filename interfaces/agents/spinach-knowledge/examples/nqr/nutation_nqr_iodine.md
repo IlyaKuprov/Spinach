@@ -1,30 +1,14 @@
 # examples/nqr/nutation_nqr_iodine.m
 
 - Signature: `nutation_nqr_iodine()`
+- Source: [`examples/nqr/nutation_nqr_iodine.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nqr/nutation_nqr_iodine.m)
 
-## Purpose
+## Purpose and model
 
-Powder NQR nutation curve for a system with a single 127I nucleus. Calculation time: seconds
+This example calculates a powder nutation response for a single 127I nucleus in zero applied magnetic field. The quadrupolar interaction is constructed by `eeqq2nqi(560e6,0.01,5/2,[0 0 0])`; these are the source's arguments, with the first argument supplied as 560e6 and no unit annotation for that argument in this file. It uses the spherical-tensor Liouville formalism without approximation. Relaxation is set to damping at 1e5, with zero equilibrium and a temperature setting of 298 (the source does not state a unit for the latter).
 
-## Physical / mathematical content
+## Nutation schedule and acquisition
 
-- NQR examples. The Hamiltonian is dominated by quadrupolar interaction with little or no Zeeman field, so transition frequencies reflect electric field gradients and asymmetry parameters.
+The calculation uses the spherical powder grid `rep_2ang_200pts_sph`, a 127I channel, an L+ coil state, and Lx and Ly operators. The frequency sweep is 83.5–84.5 MHz as shown by the code's MHz plotting conversion; the transmitter is set to 84.0 MHz, and the RF-power setting is `2*pi*1e5` (the source does not annotate its unit). Ten powder simulations with `@nqr_pa` use pulse durations `5e-7*n` seconds for n=1…10, i.e. 0.5–5 μs.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Powder NQR nutation curve for a system with a
-- single 127I nucleus.
-- Calculation time: seconds
-- System specification
-- Formalism and basis
-- Relaxation theory
-- Spinach housekeeping
-- Experiment parameters
-- Get a figure started
-- Loop over the pulse durations
-- Set pulse duration
-- Run the simulation
+For each duration, the code demodulates by multiplying by the transmitter-offset phase, constructs a 512-point frequency axis, and plots the imaginary spectrum in MHz. The panels are labelled in 0.5 μs increments and use vertical limits of −3.0059e−5 to 3.0059e−5. The source comment estimates calculation time as seconds; that is a source note, not a runtime measured here. This is a simulated single-spin powder NQR nutation series; no imported measurement, spatial gradient, chirp, or SPEN/DOSY encoding is specified.

@@ -1,52 +1,17 @@
 # examples/esr_sol_pulsed/mas_diamond_p1.m
 
 - Signature: `mas_diamond_p1()`
+- Source: [`examples/esr_sol_pulsed/mas_diamond_p1.m`](https://github.com/IlyaKuprov/Spinach/blob/main/examples/esr_sol_pulsed/mas_diamond_p1.m)
+- Spin-system builder: [`etc/diamond_defects/diamond_p1.m`](https://github.com/IlyaKuprov/Spinach/blob/main/etc/diamond_defects/diamond_p1.m)
+- Sequence: [`experiments/echo_sweep.m`](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/echo_sweep.m)
+- Figure comparison: Khamrui et al., *J. Phys. Chem. Lett.* (2026), [doi:10.1021/acs.jpclett.6c02108](https://doi.org/10.1021/acs.jpclett.6c02108). The spin-system builder cites magnetic parameters from [Nir-Arad et al. (2024)](https://doi.org/10.1039/d4cp03055a) and [Smith et al. (1959)](https://doi.org/10.1103/PhysRev.115.1546).
 
-## Purpose
+## Physical aim and spin model
 
-Two-pulse echo-detected frequency-swept EPR spectra of the P1 substitutional nitrogen defect in diamond, static and under magic angle spinning, after Figure 1a of Khamrui et al., J. Phys. Chem. Lett. 2026, <https://doi.org/10.1021/acs.jpclett.6c02108>: 400 ns long pulses with 416 kHz nutation frequency, 300 ns interpulse delay, at 6.9 T, static and at 10, 25, and 37 kHz MAS. The carrier is stepped across the spectrum and the integrated echo is recorded at each frequency, with the spectra normalised to the static one. Calculation time: hours on a 256-core node.
+The calculation compares two-pulse, echo-detected frequency-swept EPR of a diamond P1 substitutional-nitrogen centre at rest and under magic-angle spinning. The `diamond_p1` builder supplies an electron and `14N`, with the P1 orientation set to `111`. Its electron g principal values are [2.00220, 2.00220, 2.00218]; the nitrogen hyperfine tensor principal values are [81.3, 81.3, 114.0] MHz and the nitrogen quadrupole term is built from `D = −3.97 MHz`, `E = 0`. The tensors are axial/coaxial in the builder's crystal frame. The source describes the dipolar part of the nitrogen hyperfine coupling as 10.9 MHz. The full Zeeman Hilbert-space basis is used without approximation.
 
-## Physical / mathematical content
+## Echo sweep and plotted result
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The 14N hyperfine coupling of the P1 centre (dipolar part 10.9 MHz) makes the two outer lines dephase under spinning as their resonance frequencies move during the sequence, whereas the central line survives.
-- All P1 centre tensors are axial and coaxial, so a two-angle powder grid is sufficient; relaxation is omitted: with T2 long against the echo window it scales the four spectra by nearly the same factor, which the normalisation removes.
+The field is 6.9156 T (the source identifies the central line at 193.797 GHz). Two 400 ns pulses, with 416 kHz nutation frequency, are separated by 300 ns; the echo is integrated for 1.0 μs after the second pulse in 5 ns time steps. The rotor axis is [1,1,1], rotor-stack maximum rank is 2700, and 100 initial rotor phases are averaged. The carrier is swept over 300 MHz in 601 points, with zero offset and the `rep_2ang_400pts_sph` grid. The `singlerot`/`echo_sweep` path computes the integrated echo at each carrier position; the electron coherence pathway (−1 then +1) replaces phase cycling. The rates are 0, 10, 25, and 37 kHz. Absolute spectra are normalised to the maximum of the static spectrum, then plotted together with a legend and echo-intensity axis in arbitrary units.
 
-## Known limitations against Figure 1a
-
-- Line positions and the collapse of the outer lines under spinning match the paper, but the intensities do not reproduce the paper's own simulation: normalised to the static central peak, the static outer perpendicular edges come out at 0.20 and 0.18 (paper about 0.4), and the central line keeps 0.98, 0.90, and 0.82 of its echo at 10, 25, and 37 kHz (paper about 0.87, 0.52, and 0.33). The paper's simulated outer lines are broad humps where this example gives the perpendicular-edge singularity convolved with the roughly 1 MHz pulse response.
-- Zeroing the 14N quadrupole leaves the 37 kHz central survival unchanged, so it is not the source. Untested candidates: the paper's model keeps only the secular hyperfine term with no nuclear Zeeman interaction, its echo integration window is not stated (this example integrates the complex echo over 1.0 us after the second pulse), and its carrier step is not stated. Relaxation (T1=100 us, T2=4 us in the paper) is omitted here; with T2 four times the 1.0 us echo window it scales the four spectra by nearly the same factor, an approximation rather than an identity.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit in Hilbert space (`zeeman-hilb`): the pulse sequence `experiments/echo_sweep.m` steps through the Hamiltonian rotor stack that `singlerot()` supplies, applying a propagator per 5 ns time step to the density matrix.
-- The rotor stack index at each time step follows from `parameters.rate`, so `rate=0` is the static case; the rotor rank (2700) is set so that the rotor phase resolution of the stack matches the 5 ns time step at 37 kHz, the fastest rate used; at slower rates consecutive steps reuse a stack element.
-- The electron coherence pathway (-1 after the first pulse, +1 after the second) is selected with `coherence()` in place of the phase cycle; the sequence averages over 100 rotor phases at the start of the sequence and sweeps the carrier offset inside the sequence, reusing the free-evolution propagators because the rotor stack commutes with the electron `Lz`.
-
-## Implementation structure
-
-- Two-pulse echo-detected frequency-swept EPR spectra of the P1 sub-
-- stitutional nitrogen defect in diamond, static and under magic ang-
-- le spinning, after Figure 1a of Khamrui et al., J. Phys. Chem. Lett.
-- 2026, <https://doi.org/10.1021/acs.jpclett.6c02108>: 400 ns long
-- pulses with 416 kHz nutation frequency, 300 ns interpulse delay, at
-- 6.9 T, static and at 10, 25, and 37 kHz MAS. The carrier is stepped
-- across the spectrum and the integrated echo is recorded at each fre-
-- quency, with the spectra normalised to the static one.
-- The 14N hyperfine coupling (dipolar part 10.9 MHz) makes the two outer
-- lines dephase under spinning as their resonance frequencies move during
-- the sequence, whereas the central line survives. Compared to the paper's
-- own simulation, the static outer edges here are weaker (0.2 of the cent-
-- ral peak against 0.4) and the central line dephases less (0.8 at 37 kHz).
-- Calculation time: hours on a 256-core node.
-- P1 centre parameters
-- Build the spin system
-- Magnet field, central line at 193.797 GHz
-- Basis set
-- Spinach housekeeping
-- Rotor parameters
-- Sequence parameters
-- Spinning rates
-- Simulation
-- Normalisation to the static spectrum
-- Plotting
+Relaxation is omitted, and the plot is the only output (no spectrum file is saved). The source header's comparison describes static outer edges at 0.2 of the central peak versus about 0.4 in the paper, and about 0.8 of the central-line echo remaining at 37 kHz; it notes that the paper's simulated result differs. The header estimates hours on a 256-core node.

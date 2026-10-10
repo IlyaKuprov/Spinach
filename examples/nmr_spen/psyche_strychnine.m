@@ -18,14 +18,14 @@ sys.magnet=11.7;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.connectivity='scalar_couplings';
-bas.approximation='IK-2';
-bas.prox_level=1;
+bas.connectivity={'scalar_couplings'};
+bas.approximation={'IK-2'};
+bas.prox_level={1};
 
 % Algorithmic options
 sys.tols.inter_cutoff=2.0;
 sys.disable={'pt','colorbar'};
-sys.enable={'greedy'}; % 'gpu'
+sys.enable={'zte','greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -66,7 +66,7 @@ parameters.u=zeros(parameters.npts,1);
 parameters.rho0_ph={ones(parameters.npts,1)};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts,1)};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % Relaxation phantom
 parameters.rlx_ph={};

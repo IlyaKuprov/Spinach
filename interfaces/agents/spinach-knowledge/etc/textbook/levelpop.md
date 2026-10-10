@@ -1,44 +1,35 @@
 # etc/textbook/levelpop.m
 
-- Signature: `[E,P,dP]=levelpop(isotope,field,temperature)`
+- MATLAB implementation: [etc/textbook/levelpop.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/textbook/levelpop.m)
 
 ## Purpose
 
-Equilibrium populations of the energy levels of a user-specified spin at the user-specified temperature. Energies are reported as fractions of kT at the temperature specified. Syntax: [E,P,dP]=levelpop(isotope,field,temperature)
+Computes the energy levels and equilibrium populations for one isotope in a static field at a specified spin temperature. This is a single-spin Zeeman calculation; it does not assemble couplings or a multi-spin Hamiltonian.
 
-## Physical / mathematical content
+## Use
 
-## Numerical / algorithmic content
+```matlab
+[E,P,dP]=levelpop(isotope,field,temperature)
+```
 
-## Parameters / inputs
+All arguments are required; no defaults are defined.
 
-- isotope -character string specifying the isotope.
-- e.g. '1H', '13C', 'E', etc.
-- field -primary magnet field in Tesla
-- temperature -spin temperature, Kelvin
+- `isotope` — character array naming a Spinach isotope; source examples include `'1H'`, `'13C'`, and `'E'`.
+- `field` — real numeric scalar for the primary magnetic field, in tesla.
+- `temperature` — non-zero real numeric scalar spin temperature, in kelvin. The input check does not require positivity.
 
-## Outputs
+## Calculation and outputs
 
-- E -vector of level energies, frac-
-- tions of kT at the temperature
-- specified
-- P -vector of level populations
-- dP -vector of population differences
-- for adjacent levels
-- Notes: the function is sensitive to the sign of the magnetogyric
-- ratio -negative for electrons, positive for protons, etc.
+The function obtains the magnetogyric ratio and multiplicity from `spin(isotope)`, creates the spin matrices with `pauli(multiplicity)`, and forms the Zeeman Hamiltonian `H=-mg_ratio*field*S.z`. Energies are returned as `E=ħ diag(H)/(k_B temperature)`, i.e. fractions of `k_B T`. The source uses exact SI constants `ħ=6.62607015e-34/(2π) J·s` and `k_B=1.380649e-23 J/K`.
 
-## Implementation structure
+To avoid overflow in the Boltzmann factors, it computes `exp(-E+min(E))` and normalises the result to obtain `P`. It returns `dP=-diff(P)`; these are signed differences for adjacent entries in the returned vector order, not absolute differences.
 
-- Equilibrium populations of the energy levels of a user-specified spin at
-- the user-specified temperature. Energies are reported as fractions of kT
-- at the temperature specified. Syntax:
-- [E,P,dP]=levelpop(isotope,field,temperature)
-- isotope -character string specifying the isotope.
-- e.g. '1H', '13C', 'E', etc.
-- field -primary magnet field in Tesla
-- temperature -spin temperature, Kelvin
-- E -vector of level energies, frac-
-- tions of kT at the temperature
-- specified
-- P -vector of level populations
+- `E` — vector of energy levels in units of `k_B T`.
+- `P` — normalised vector of level populations.
+- `dP` — signed adjacent-level population differences.
+
+The sign of the magnetogyric ratio matters: the source notes it is negative for electrons and positive for protons. Field and temperature are checked as real scalars, with temperature additionally checked to be non-zero; the source does not check either for finiteness.
+
+## Source link
+
+[Spinach Wiki: levelpop.m](https://spindynamics.org/wiki/index.php?title=levelpop.m)

@@ -1,20 +1,11 @@
 # etc/forum.m
 
-- Signature: `forum()`
+- MATLAB implementation: [etc/forum.m](https://github.com/IlyaKuprov/Spinach/blob/main/etc/forum.m)
 
-## Purpose
+`forum()`
 
-Opens Spinach support forum page.
+Opens the Spinach support forum in MATLAB's default browser by calling:
 
-## Physical / mathematical content
+`web('https://spindynamics.org/spin_forum/index.php','-browser')`
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Opens Spinach support forum page.
-- Call the default browser
-- A paratrooper keeps going for as long as he can,
-- and then for as long as necessary.
-- A Russian saying
-- #NHEAD #NGRUM #NWIKI
+The function has no inputs or outputs. It launches/navigates to the forum page; it does not retrieve, parse, or summarise forum content. Its only external destination is the [Spinach support forum](https://spindynamics.org/spin_forum/index.php).

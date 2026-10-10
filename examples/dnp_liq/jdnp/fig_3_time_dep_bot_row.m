@@ -44,6 +44,9 @@ for n=1:numel(field_grid)
     proton_zeeman_iso=sys.magnet*spin('1H')/(2*pi);
     inter.coupling.scalar{2,3}=electron_zeeman_iso+proton_zeeman_iso;
         
+    % Enable zero track elimination
+    sys.enable={'zte'};
+
     % Spinach housekeeping
     spin_system=create(sys,inter);  
     spin_system=basis(spin_system,bas);
@@ -63,7 +66,7 @@ for n=1:numel(field_grid)
     H=H+parameters.mw_pwr*Ex+parameters.mw_off*Ez;
              
     % Detection state: Lz on the proton
-    coil=state(spin_system,'Lz','1H');
+    coil=coil_state(spin_system,'Lz','1H','exact');
              
     % Run the time evolution and normalise to thermal equilibrium
     answer=evolution(spin_system,H+1i*R,coil,rho_eq,parameters.t_step,...

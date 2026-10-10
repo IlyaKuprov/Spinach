@@ -1,30 +1,17 @@
 # examples/dnp_liq/jdnp/fig_2_tau_and_field_traject.m
 
-- Signature: `fig_2_tau_and_field_traject()`
+- MATLAB implementation: [examples/dnp_liq/jdnp/fig_2_tau_and_field_traject.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/dnp_liq/jdnp/fig_2_tau_and_field_traject.m)
 
-## Purpose
+## What it calculates
 
-Time evolution plot for JDNP: proton polarisation as a function of time for specific external fields and rotational correlation times. The inter-electron exchange coupling is set to the match- ing condition at each field. Further details in: Calculation time: seconds, line-by-line plotting
+This zero-argument example constructs a liquid-state JDNP time trace for six static-field settings, with four rotational correlation times at each field. The inter-electron scalar coupling is reset at each field to the sum of the isotropic electron Zeeman frequency and the proton Zeeman frequency; the resulting figure compares time-dependent proton polarisation across fields and correlation times. The source points to [DOI: 10.1039/d1cp04186j](https://doi.org/10.1039/d1cp04186j).
 
-## Physical / mathematical content
+## Running assumptions and settings
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
+Run with MATLAB and Spinach available on the path, and with the JDNP example helper system_specification() and Spinach plotting helpers accessible. The function takes no arguments; it obtains sys, inter, bas, and parameters from that helper. Its indexing assumes the proton is site 1 and the two electrons are sites 2 and 3, including inter.zeeman.matrix{2} and scalar coupling {2,3}.
 
-## Numerical / algorithmic content
+The source sets parameters.mw_pwr=2*pi*250e3, t_step=1e-3, and nsteps=200. The six fields are [0.5 3.4 7.0 11.7 14.1 23.5] T. tau_c is [300 400 500 600] ps (stored in seconds as [300e-12 400e-12 500e-12 600e-12]). At each field, the microwave offset is formed from g_ref and g_trityl; the code then loops over tau_c, builds the Spinach system/basis, and propagates with the ESR Hamiltonian plus relaxation and microwave terms. The proton Lz expectation is made real and divided by its thermal-equilibrium value.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Output and limits
 
-## Implementation structure
-
-- Time evolution plot for JDNP: proton polarisation as a function
-- of time for specific external fields and rotational correlation
-- times. The inter-electron exchange coupling is set to the match-
-- ing condition at each field. Further details in:
-- Calculation time: seconds, line-by-line plotting
-- Load the spin system
-- Experiment parameters
-- Magnetic field grid, Tesla
-- Correlation time grid, seconds
-- Get a figure going
-- Loop over the field grid
-- Set magnet field
+The routine opens a 2-by-3 figure, one panel per field, with four correlation-time traces in each. It constructs 201 times from zero through t_step*nsteps, displays them as milliseconds (1e3*t_axis), and fixes the plotted vertical range to [-250, 50]. It creates a figure only; it does not save the trace or export the plot. The numeric setting mw_pwr is recorded as written because the source does not state its unit. No simulation or numerical result is claimed to have been reproduced here.

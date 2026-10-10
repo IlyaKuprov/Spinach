@@ -1,59 +1,28 @@
 # experiments/spen/dosy_oneshot.m
 
+- MATLAB source: [experiments/spen/dosy_oneshot.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/spen/dosy_oneshot.m)
 - Signature: `fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)`
 
-## Purpose
+## Sequence model
 
-One-shot DOSY pulse sequence. Syntax: fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)
+The source describes a one-shot DOSY pulse sequence. It forms `L=H+F+1i*R+1i*K`, builds a Y pulse operator for the single specified spin over the spatial Fokker–Planck grid, and starts from the supplied `parameters.rho0`. The implemented pathway is explicit: a 90-degree Y rotation, selection of coherence order -1, a first gradient interval, a 180-degree Y rotation, selection of +1, a second gradient interval, two successive 90-degree Y rotations, and selection of coherence order 0. It then applies the central diffusion interval and refocusing gradient intervals, followed by a 90-degree Y rotation, two more gradient intervals separated by a 180-degree Y rotation, and F2 signal acquisition. No particular prepared state is assumed beyond the caller-supplied `rho0`.
 
-## Physical / mathematical content
+Gradient intervals use `G{1}` and last `g_dur/2` each. The first pair uses the signed terms `+(1+kappa)*g_amp*G{1}` and `-(1-kappa)*g_amp*G{1}`; the central intervals use `-(2*kappa)*g_amp*G{1}`. Each gradient interval is followed by a `g_stab_del` evolution under `L`. The central diffusion evolution lasts `del-4*(g_dur/2)-4*g_stab_del`, with the same central gradient term on its two sides. These are the source's specified intervals; this function does not define a chirped RF pulse.
 
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+## Inputs, units, and grids
 
-## Numerical / algorithmic content
+- `rho0`: caller-prepared initial state; `coil`: detection state; `spins`: a one-element cell array naming the working spin.
+- `g_amp`: gradient amplitude, T/m; `g_dur`: gradient pulse width, s; `kappa`: dimensionless bipolar-gradient imbalance, with amplitude ratio `(1+kappa):(1-kappa)`.
+- `g_stab_del` and `del`: stabilisation delay and diffusion interval, respectively, in seconds. The code rejects `del < 2*g_dur+4*g_stab_del`.
+- `dims`: sample size in m; `npts`: number of spatial discretisation points. `diff` supplies spatially uniform diffusion coefficient/tensor data in m^2/s, or `dxx` supplies voxel-wise diffusion along the sample axis in m^2/s; provide exactly one of these alternatives.
+- `npoints`: number of acquired signal points; `sweep`: acquisition sweep width, Hz.
+- `H`, `R`, and `K`: Fokker–Planck Hamiltonian, relaxation, and kinetics superoperators; `G`: gradient superoperators; `F`: diffusion and flow superoperator. The function requires the `sphten-liouv` formalism.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Output axis
 
-## Parameters / inputs
+The final call uses timestep `1/sweep` and `npoints-1` evolution steps in observable mode. For a single supplied initial state, `fid` is a vector of `npoints` time-domain samples; the spatial Fokker–Planck grid is internal to the calculation, not an extra returned signal axis.
 
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.spins nuclei on which the sequence runs
-- parameters.g_amp gradient amplitude for diffusion
-- encoding (T/m)
-- parameters.g_dur pulse width of the gradient for diffusion
-- encoding (s)
-- parameters.kappa unbalancing factor to unbalance the bipolar
-- gradients in the ratio (1+kappa):(1-kappa)
-- parameters.g_stab_del gradient stabilization delay (s)
-- parameters.del diffusion delay, seconds
-- parameters.dims size of the sample (m)
-- parameters.npts number of discretization points in the grid
-- parameters.npoints number of points in the acquired signal
-- parameters.sweep acquisition sweep width, Hz
-- H Fokker-Planck Hamiltonian
-- R Fokker-Planck relaxation superoperator
-- K Fokker-Planck kinetics superoperator
-- G Fokker-Planck gradient superoperators
-- F Fokker-Planck diffusion and flow
-- superoperator
+## References
 
-## Outputs
-
-- fid -free induction decay
-
-## Implementation structure
-
-- One-shot DOSY pulse sequence. Syntax:
-- fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.spins nuclei on which the sequence runs
-- parameters.g_amp gradient amplitude for diffusion
-- encoding (T/m)
-- parameters.g_dur pulse width of the gradient for diffusion
-- encoding (s)
-- parameters.kappa unbalancing factor to unbalance the bipolar
-- gradients in the ratio (1+kappa):(1-kappa)
-- parameters.g_stab_del gradient stabilization delay (s)
+- [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/spen/dosy_oneshot.m)
+- [Spinach Wiki: dosy_oneshot.m](https://spindynamics.org/wiki/index.php?title=dosy_oneshot.m)

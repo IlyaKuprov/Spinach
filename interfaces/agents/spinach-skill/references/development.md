@@ -29,10 +29,12 @@ the derivation. Without that evidence, report a question, not a defect.
 
 ## Tests, examples, and documentation
 
-For GPU `propagator` work, make the compiled `cuda_sparse_by_sparse_mex`
-available: two-sparse-operand Taylor and squaring products explicitly use
-cuSPARSE ALG3. Exercise both stages and `clean_up` on real and complex GPU
-arrays, preserving its round-to-grid, density, and disable policies.
+For GPU `propagator` work, two-sparse-operand Taylor and squaring products
+use cuSPARSE ALG3 when `cuda_sparse_by_sparse_mex` is available. Missing or
+unloadable platform binaries retain native GPU multiplication; computation
+and validation failures are not caught. Exercise both stages and `clean_up`
+on real and complex GPU arrays, preserving its round-to-grid, density, and
+disable policies.
 
 Select tests from `tests/README.md` and `tests/lib/test_manifest.m`; add a
 focused regression when behaviour changes. Run affected examples when they

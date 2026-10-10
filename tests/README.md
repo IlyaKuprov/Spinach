@@ -19,3 +19,13 @@ run_tests('verbose',true);
 ```
 
 
+GPU-dependent ALG3 compatibility regression (not part of the CPU manifest):
+
+```matlab
+addpath('kernel/overloads','tests/kernel');
+test_alg3_fallback();
+```
+
+This requires a supported GPU and tests an isolated production-wrapper copy
+against missing and invalid MEX binaries and mocked non-loader failures.
+Shipped binaries are never renamed, modified, or rebuilt.

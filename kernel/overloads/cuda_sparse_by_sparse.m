@@ -19,7 +19,8 @@
 % calls cuda_sparse_by_sparse_mex() to interpret the column-major sparse
 % ordering as transposed CSR storage and run cuSPARSE SpGEMM with
 % CUSPARSE_SPGEMM_ALG3, and then reconstructs the sparse gpuArray from the
-% resulting triplets.
+% resulting triplets. If the platform MEX is absent or MATLAB cannot load
+% it, native GPU multiplication is used. Other failures are not intercepted.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -27,6 +28,11 @@ function C=cuda_sparse_by_sparse(A,B,chunk_fraction)
 
 % Check consistency
 grumble(A,B,chunk_fraction);
+
+% Retain native multiplication when no platform MEX is available
+if exist('cuda_sparse_by_sparse_mex','file')~=3
+    C=A*B; return
+end
 
 % Get matrix dimensions
 [n_rows,n_inner]=size(A);
@@ -58,8 +64,15 @@ col_b=int32(col_b)-1;
 dims=uint64([n_rows n_inner n_cols]);
 
 % Run cuSPARSE SpGEMM ALG3 on the GPU
-[row_c,col_c,val_c]=cuda_sparse_by_sparse_mex(row_a,col_a,val_a,...
-    row_b,col_b,val_b,dims,chunk_fraction);
+try
+    [row_c,col_c,val_c]=cuda_sparse_by_sparse_mex(row_a,col_a,val_a,...
+        row_b,col_b,val_b,dims,chunk_fraction);
+catch exception
+    if strcmp(exception.identifier,'MATLAB:mex:ErrInvalidMEXFile')
+        C=A*B; return
+    end
+    rethrow(exception);
+end
 
 % Reconstruct the sparse GPU matrix
 C=sparse(row_c,col_c,val_c,n_rows,n_cols);
@@ -110,10 +123,6 @@ max_int=double(intmax('int32'));
 
 if max([size(A,1) size(A,2) size(B,2) nnz(A) nnz(B)])>max_int
     error('Matrix dimensions and nonzero counts must fit into int32.');
-end
-
-if exist('cuda_sparse_by_sparse_mex','file')~=3
-    error('cuda_sparse_by_sparse_mex is not compiled.');
 end
 
 end

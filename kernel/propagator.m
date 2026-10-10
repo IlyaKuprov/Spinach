@@ -19,7 +19,8 @@
 % Note: GPUs are supported, add 'gpu' to sys.enable array during 
 %       calculation setup. Sparse GPU products use cuSPARSE ALG3 with
 %       chunk_fraction=0.02, retaining the utility's tested setting
-%       (two percent of intermediate products per chunk).
+%       (two percent of intermediate products per chunk). Native GPU
+%       multiplication is retained if the MEX is absent or unloadable.
 %
 % Note: propagator caching (https://doi.org/10.1063/1.4928978) is
 %       supported, add 'prop_cache' to sys.enable array to enable.

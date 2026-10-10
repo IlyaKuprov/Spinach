@@ -41,10 +41,10 @@ end
 % Return an empty GPU sparse matrix when multiplication is vacuous
 if (nnz(A)==0)||(nnz(B)==0)
     if isreal(A)&&isreal(B)
-        C=sparse(gpuArray.zeros(0,1,'int32'),gpuArray.zeros(0,1,'int32'),...
+        C=sparse(gpuArray.zeros(0,1,'int64'),gpuArray.zeros(0,1,'int64'),...
                  gpuArray.zeros(0,1),n_rows,n_cols);
     else
-        C=sparse(gpuArray.zeros(0,1,'int32'),gpuArray.zeros(0,1,'int32'),...
+        C=sparse(gpuArray.zeros(0,1,'int64'),gpuArray.zeros(0,1,'int64'),...
                  complex(gpuArray.zeros(0,1),gpuArray.zeros(0,1)),n_rows,n_cols);
     end
     return
@@ -55,10 +55,10 @@ end
 [row_b,col_b,val_b]=find(B);
 
 % Convert one-based GPU indices into zero-based COO arrays
-row_a=int32(row_a)-1;
-col_a=int32(col_a)-1;
-row_b=int32(row_b)-1;
-col_b=int32(col_b)-1;
+row_a=int64(row_a)-1;
+col_a=int64(col_a)-1;
+row_b=int64(row_b)-1;
+col_b=int64(col_b)-1;
 
 % Pack dimensions for the MEX gateway
 dims=uint64([n_rows n_inner n_cols]);
@@ -117,12 +117,6 @@ end
 
 if (chunk_fraction<double(realmin('single')))||(chunk_fraction>1)
     error('chunk_fraction must be in the range [realmin(single),1].');
-end
-
-max_int=double(intmax('int32'));
-
-if max([size(A,1) size(A,2) size(B,2) nnz(A) nnz(B)])>max_int
-    error('Matrix dimensions and nonzero counts must fit into int32.');
 end
 
 end

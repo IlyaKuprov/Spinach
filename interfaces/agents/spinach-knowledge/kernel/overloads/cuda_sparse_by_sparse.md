@@ -4,7 +4,7 @@ Source: [kernel/overloads/cuda_sparse_by_sparse.m](https://github.com/IlyaKuprov
 
 ## Purpose and interface
 
-`C=cuda_sparse_by_sparse(A,B,chunk_fraction)` computes a sparse GPU matrix product using cuSPARSE `CUSPARSE_SPGEMM_ALG3`. Both operands must be sparse double gpuArrays with compatible dimensions. Real and complex operands may be mixed; the result is a sparse double gpuArray, complex whenever either input is complex. Matrix dimensions and input nonzero counts must fit into int32, and the gateway rejects an output nonzero count exceeding int32.
+`C=cuda_sparse_by_sparse(A,B,chunk_fraction)` computes a sparse GPU matrix product using cuSPARSE `CUSPARSE_SPGEMM_ALG3`. Both operands must be sparse double gpuArrays with compatible dimensions. Real and complex operands may be mixed; the result is a sparse double gpuArray, complex whenever either input is complex. CSR offsets and column indices use signed 64-bit integers throughout the CUDA helper.
 
 `chunk_fraction` is a required finite real CPU double scalar in `[realmin('single'),1]`. It controls ALG3 intermediate-product chunking, not a strict bound on total device memory. `propagator` uses `0.02` at its sparse GPU Taylor and squaring call sites.
 

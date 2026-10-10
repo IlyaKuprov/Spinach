@@ -103,6 +103,10 @@ are retained. Alternative environmental lifetimes do not override this cutoff.
 spins,new_iso)` performs isotope replacement and rescales all interactions
 accordingly, wiping quadratic and higher-order couplings with a warning.
 
+`isot2elem({'1H','13C','35Cl'})` returns `{'H','C','Cl'}`, retaining the input
+cell-array shape and order. It strips digits only, without an isotope lookup;
+isomer suffixes and other non-digit characters are not removed.
+
 ## Zeeman interactions
 
 Three mutually compatible specifications exist; whatever is supplied is summed

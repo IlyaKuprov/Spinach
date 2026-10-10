@@ -16,7 +16,7 @@ TOP settings: E/1H; spherical grid `rep_2ang_800pts_sph`; 10 ns pulse; 14 ns del
 
 ## Relaxation and calculation
 
-Uses `inter.relaxation={'t1_t2'}`; `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`; `inter.r1_rates={1e3 r1n_rate}`; `inter.r2_rates={200e3 50e3}`; diagonal retention; `dibari` equilibrium. Rate units are not annotated. Proton detection is `state(spin_system,'Lz','1H')`; each scan point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`.
+Uses `inter.relaxation={'t1_t2'}`; `r1n_dnp(sys.magnet,inter.temperature,2.00230,1e-3,52,r_en,bet)`; `inter.r1_rates={1e3 r1n_rate}`; `inter.r2_rates={200e3 50e3}`; diagonal retention; `dibari` equilibrium. Rate units are not annotated. Proton detection is `coil_state(spin_system,'Lz','1H','exact')`; each scan point calls `powder(spin_system,@topdnp_steady,localpar,'esr')`.
 
 ## Output and limits
 

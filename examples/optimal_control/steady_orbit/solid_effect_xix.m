@@ -42,7 +42,7 @@ inter.equilibrium='dibari';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Parallelisation settings
 sys.parallel={'processes',240};

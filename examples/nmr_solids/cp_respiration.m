@@ -19,7 +19,7 @@ inter.coordinates={[0.00 0.00 0.00]
 
 % Formalism and basis
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -34,7 +34,7 @@ parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=8;
 parameters.spins={'1H','13C'};
 parameters.rho0=state(spin_system,'Lx','1H'); 
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.grid='rep_2ang_100pts_sph';
 parameters.npoints=512;
 parameters.zerofill=16384;

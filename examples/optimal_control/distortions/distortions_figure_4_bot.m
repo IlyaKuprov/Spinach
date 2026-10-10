@@ -21,9 +21,9 @@ inter.zeeman.scalar=num2cell(linspace(-100,100,n_spins));
 % Select a basis set - IK-2 keeps complete basis on each 
 % spin in this case, but ignores multi-spin orders
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Run Spinach housekeeping
 spin_system=create(sys,inter);

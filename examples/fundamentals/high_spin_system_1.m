@@ -11,7 +11,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spin system
 sys.isotopes={'1H','235U','1H','1H'};
@@ -30,7 +30,7 @@ spin_system=basis(spin_system,bas);
 % Pulse sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=3500;

@@ -10,7 +10,7 @@ Expands fixed states on selected spins across every combination of partner-spin 
 
 - `set_spin` is a cell array of pairs `{state_label,spin_index}`; for example, `{{'L+',2}}` places `L+` on spin 2.
 - `partners` is a cell array of pairs `{state_labels,spin_indices}`. Each `state_labels` entry is a cell array of labels, and each `spin_indices` entry is a vector of spin indices. For example, `{{{'E','Lz'},[1 3]}}` allows spins 1 and 3 to take either listed state.
-- Spin indices refer to positions in the spin system, not isotope-list entries. Spins not specified in either input retain the `E` state.
+- Spin indices refer to positions in the spin system, not isotope-list entries. Unspecified spins in the hosting substance retain the `E` state; descriptor padding outside that substance does not populate another block.
 
 ## Outputs
 
@@ -33,3 +33,5 @@ Each corresponding element of `A` is constructed from that descriptor over spin 
 - Source: https://github.com/IlyaKuprov/Spinach/blob/main/kernel/states/partner_state.m
 - Wiki: https://spindynamics.org/wiki/index.php?title=partner_state.m
 - Related: [state](../state.md)
+
+In segmented systems, all explicitly fixed and partner spins must belong to one substance; genuine cross-substance requests raise `Spinach:which_subst:crossSubstance`. State construction passes only that substance’s descriptor entries and their global spin indices to `state`. Returned `descr` entries still span every global spin and retain `E` elsewhere; those padding identities do not populate unrelated substance blocks.

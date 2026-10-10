@@ -17,7 +17,7 @@ inter.zeeman.scalar{1}=32.4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'damp'};

@@ -21,7 +21,7 @@ inter.temperature=298;           % Work at room tempearture
 inter.tau_c={9.6e-12};           % Correlation time
 
 bas.formalism='sphten-liouv';    % Liouville space formalism
-bas.approximation='none';        % Complete basis set
+bas.approximation={'none'};        % Complete basis set
 
 % Proximity cut-off
 sys.tols.prox_cutoff=4.0;
@@ -57,7 +57,7 @@ Lx=operator(spin_system,'Lx','19F');
 Ly=operator(spin_system,'Ly','19F');
 
 % Set detection state to L+
-coil=state(spin_system,'L+','19F');
+coil=coil_state(spin_system,'L+','19F','exact');
 
 % Calculate the time step of the simulation
 timestep=1/parameters.sweep;

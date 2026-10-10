@@ -25,3 +25,7 @@ Both cosine and sine signal components receive squared-cosine apodisation in bot
 ## Output and limits
 
 One figure places the simulated and experimental 2D spectra side by side. A second figure plots the pointwise difference histogram, with the displayed horizontal range fixed to [-300, 300]. This script needs `glucose_expt_a.mat` available on the MATLAB path/current working directory. It contains no fit procedure or printed fit score; no simulation outcome is quoted here.
+
+## Reaction-record interface
+
+Four directed first-order records describe alpha and beta translocation separately, matching corresponding fluorine spins in each inside/outside pair. The local four-by-four rate matrix is retained only for `equilibrate` and supplies the record rates; it is not a retired `inter.chem.rates` input. Initial longitudinal magnetisation uses concentration-weighted `state` directly. The NOESY detection vector must be unweighted (`coil_state`) so that concentrations enter the signal only once.

@@ -19,7 +19,7 @@ inter.coupling.matrix{1,1}=eeqq2nqi(1.18e6,0.50,1,[0 0 0]);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -42,7 +42,7 @@ parameters.spins={'14N'};
 parameters.rframes={{'14N',2}};
 parameters.axis_units='Hz';
 parameters.rho0=state(spin_system,'Lz','14N');
-parameters.coil=state(spin_system,'L+','14N');
+parameters.coil=coil_state(spin_system,'L+','14N','exact');
 parameters.verbose=0;
 parameters.pulse_dur=1.2e-6;
 parameters.pulse_amp=88e3;

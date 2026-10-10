@@ -10,16 +10,16 @@ Extended T1/T2 relaxation model that returns the relaxation superoperators separ
 
 - Syntax: `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)`.
 - Calls `grumble` to enforce that `spin_system.bas.formalism` is `'sphten-liouv'`; otherwise it errors with `'this function is only available in sphten-liouv formalism.'`.
-- Computes spherical tensor ranks (`L`) and projections (`M`) via `lin2lm(spin_system.bas.basis)`.
-- Preallocates per-isotope `r1_rates` and `r2_rates` vectors sized to `spin_system.comp.isotopes`.
-- For each isotope, the R1 and R2 rate specifications are read from the cell arrays `spin_system.rlx.r1_rates{n}` and `spin_system.rlx.r2_rates{n}`. Each entry may be:
+- Computes spherical tensor ranks (`L`) and projections (`M`) from each local descriptor `spin_system.bas.basis{n}`.
+- Preallocates per-spin `r1_rates` and `r2_rates` column vectors.
+- For each spin, the R1 and R2 rate specifications are read from the cell arrays `spin_system.rlx.r1_rates{n}` and `spin_system.rlx.r2_rates{n}`. Each entry may be:
   - A numeric scalar: the rate is assigned directly.
   - A numeric 3x3 tensor: Euler angles must be supplied, otherwise the function errors with `'Euler angles must be specified with anisotropic T1/T2 relaxation theory.'`. The orientation vector is computed as `ort=[0 0 1]*euler2dcm(euler_angles(1),euler_angles(2),euler_angles(3))` (noted in the source as matching `alphas=0` of two-angle grids), and the rate is `ort*current_r*_rate*ort'`.
   - A function handle: Euler angles must be supplied (same error otherwise); the rate is obtained by calling the handle as `current_r*_rate(euler_angles(1),euler_angles(2),euler_angles(3))`.
   - Any other specification triggers an error (`'unknown R1 rate specification.'`).
 - Euler angles use the ZYZ active convention in radians and specify the system orientation relative to the input orientation; they have no effect when R1 and R2 rates are scalars.
 - After filling the rates, the function verifies that all R1 and R2 rates are real, erroring with `'all R1 and R2 relaxation rates must be real numbers.'` if not.
-- Builds diagonal superoperators over the Liouville space of dimension `size(spin_system.bas.basis,1)` using a `parfor` loop over all states:
+- Builds diagonal superoperators over the direct-sum Liouville space of dimension `bas.offsets(end)`, mapping local descriptor columns through `chem.parts{n}` and placing rates at the block offsets:
   - Spins in the unit state (`L(n,:)==0`) do not contribute.
   - Spins in longitudinal states (`M(n,:)==0` among contributing spins) contribute their R1 rate.
   - Spins in transverse states (`M(n,:)~=0` among contributing spins) contribute their R2 rate.

@@ -74,12 +74,12 @@ result=test_true(result,'zte default projector',isequal(projector,1),...
                  'zero-track elimination must be opt-in and return a unit projector placeholder by default');
 
 % Check explicit zero-track elimination on an invariant coordinate subspace
-spin_system.sys.enable={'zte'};
+spin_system.sys.enable={'zte'}; spin_system.bas.offsets=[0;4];
 [spin_system,~]=tolerances(spin_system,struct());
 projector=zte(spin_system,spdiags((1:4)',0,4,4),sparse([0;1;0;0]));
-result=test_true(result,'zte enabled reduction',isequal(size(projector),[4 1])&&...
+result=test_true(result,'zte enabled reduction',isequal(size(projector),[4 2])&&...
                  isequal(projector*projector'*[0;1;0;0],[0;1;0;0]),...
-                 'enabled zero-track elimination must retain the populated coordinate and remove three empty tracks');
+                 'enabled zero-track elimination must retain the populated coordinate and the unit, removing two empty tracks');
 
 % Check that paranoia overrides an explicit zero-track elimination request
 spin_system.sys.enable={'zte','paranoia'};

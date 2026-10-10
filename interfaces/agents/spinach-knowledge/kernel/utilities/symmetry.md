@@ -9,7 +9,7 @@ Permutation symmetry treatment. Compiles character tables of composite symmetry 
 ## Behaviour
 
 - Syntax: `spin_system=symmetry(spin_system,bas)`.
-- This is a service function of the Spinach kernel that should not be called directly; it is called by `basis.m`.
+- This is a service function of the Spinach kernel that should not be called directly; `basis.m` calls it on a one-substance object, using local spin indices and `bas.basis{1}`. The returned local factorisation is placed in the corresponding `sym_fact(n)` block.
 - Non-Abelian groups and multi-dimensional irreps are supported; edit `perm_group.m` to add your own groups.
 - Consistency is enforced by an internal `grumble` subfunction which validates the symmetry parameters in `bas` (see Inputs and outputs).
 - If `'symmetry'` is listed in `spin_system.sys.disable`, the function issues a warning that symmetry factorisation is disabled and writes empty cells to `spin_system.comp.sym_group`, `spin_system.comp.sym_spins`, and sets `spin_system.comp.sym_a1g_only` to true.
@@ -36,8 +36,8 @@ Permutation symmetry treatment. Compiles character tables of composite symmetry 
 
 **Outputs**
 
-- `spin_system.bas.irrep(n).projector` — projector matrices into each irreducible representation.
-- `spin_system.bas.irrep(n).dimension` — dimension of each irreducible representation.
+- `spin_system.bas.sym_fact.irr_projectors{n}` — projector matrices into each irreducible representation.
+- `spin_system.bas.sym_fact.irr_dimensions(n)` — dimension of each irreducible representation.
 - The function also populates `spin_system.comp.sym_group`, `spin_system.comp.sym_spins` and `spin_system.comp.sym_a1g_only`.
 
 ## References

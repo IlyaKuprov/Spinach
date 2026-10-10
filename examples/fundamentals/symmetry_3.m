@@ -21,9 +21,9 @@ inter.coupling.scalar{8,8}=0.00;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_spins={[3 4 5],[6 7 8]};
-bas.sym_group={'S3','S3'};
+bas.approximation={'none'};
+bas.sym_spins={{[3 4 5],[6 7 8]}};
+bas.sym_group={{'S3','S3'}};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -35,7 +35,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=1000;
 parameters.sweep=2500;

@@ -55,7 +55,7 @@ inter.coupling.scalar{2,22}=15.63;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -64,7 +64,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'31P'};
 parameters.rho0=state(spin_system,'L+','31P');
-parameters.coil=state(spin_system,'L+','31P');
+parameters.coil=coil_state(spin_system,'L+','31P','exact');
 parameters.decouple={};
 parameters.offset=-7100;
 parameters.sweep=1000;

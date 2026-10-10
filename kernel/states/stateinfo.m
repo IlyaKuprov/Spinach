@@ -19,7 +19,8 @@
 %   This corresponds to the direct product of single-spin irreducible
 %   spherical tensors with the specified indices, its coefficient in 
 %   the linear combination, and the number of the corresponding state
-%   in the basis set.
+%   in the direct-sum basis set. Each row names its substance and
+%   global spin indices; only that substance's tensor labels are shown.
 %
 % Note: this function requires a spherical tensor basis set.
 %
@@ -39,21 +40,26 @@ report(spin_system,['state vector 2-norm: ' num2str(norm(rho,2))]);
 % Locate npops most populated states and sort by amplitude
 [~,sorting_index]=sort(abs(rho),1,'descend');
 largest_elemts=rho(sorting_index(1:npops));
-largest_states=spin_system.bas.basis(sorting_index(1:npops),:);
 
 % Print the states and their populations
 report(spin_system,[num2str(npops) ' most populated basis states (state, coeff, number)']);
 for n=1:npops
-    state_string=cell(1,spin_system.comp.nspins);
-    for k=1:spin_system.comp.nspins
-        [l,m]=lin2lm(largest_states(n,k));
-        if l==0
+
+    % Locate the hosting substance and its local descriptor row
+    subst=find(sorting_index(n)<=spin_system.bas.offsets(2:end),1);
+    row=sorting_index(n)-spin_system.bas.offsets(subst);
+    spins=spin_system.chem.parts{subst};
+    state_string=cell(1,numel(spins));
+    for k=1:numel(spins)
+        [L,M]=lin2lm(spin_system.bas.basis{subst}(row,k));
+        if L==0
             state_string{k}='  ....  ';
         else
-            state_string{k}=[' (' num2str(l,'%d') ',' num2str(m,'%+d') ') '];
+            state_string{k}=[' (' num2str(L,'%d') ',' num2str(M,'%+d') ') '];
         end
     end
-    report(spin_system,[cell2mat(state_string)              '    ' ...
+    report(spin_system,['substance ' num2str(subst) ' spins [' num2str(spins) '] ' ...
+                        cell2mat(state_string)              '    ' ...
                         num2str(largest_elemts(n),'%+5.3e') '    ' ...
                         num2str(sorting_index(n))]);
 end

@@ -8,7 +8,7 @@
 
 `gridfree` builds a Fokker–Planck Liouvillian for magic-angle spinning and stochastic Liouville equation (SLE) simulations, then calls the pulse-sequence handle with `(spin_system,parameters,H,R,K)`. The sequence's return value is the context output; the context itself does not prescribe its shape.
 
-The spin subspace has dimension `spn_dim=size(H,1)`. The SLE orientation subspace has dimension `spc_dim`, obtained from the spatial operators, and the combined Fokker–Planck dimension is `spn_dim*spc_dim`. The spatial basis is the Wigner-D-function basis used by the SLE operators, not a sampled spherical `parameters.grid` (that field is rejected here). The context reports the powder average of the pulse-sequence result. It is restricted to the Liouville formalisms `zeeman-liouv` and `sphten-liouv`. Any `parameters.rframes` field is rejected: numerical rotating-frame transformations are not supported in this SLE context. Use `singlerot()` when those corrections are required.
+The spin subspace has dimension `spn_dim=size(H,1)`, equal to the compiled terminal offset. The SLE orientation subspace has dimension `spc_dim`, obtained from the spatial operators, and the combined Fokker–Planck dimension is `spn_dim*spc_dim`. The spatial basis is the Wigner-D-function basis used by the SLE operators, not a sampled spherical `parameters.grid` (that field is rejected here). The context reports the powder average of the pulse-sequence result. It is restricted to the Liouville formalisms `zeeman-liouv` and `sphten-liouv`. Any `parameters.rframes` field is rejected: numerical rotating-frame transformations are not supported in this SLE context. Use `singlerot()` when those corrections are required.
 
 ## Spin and orientation inputs
 
@@ -23,3 +23,9 @@ If the sequence requests `iso_eq`, the context constructs thermal equilibrium fr
 ## Example from the source documentation
 
 `parameters.spins={'1H','13C'}` shows the channel-list form. The source specifies rate, axis, offsets, rank truncation, and correlation times by the fields above; it does not provide a complete runnable parameter set.
+
+Additional isotropic terms are checked against `bas.offsets(end)`, the compiled spin dimension across all substances.
+
+## State-dependent chemistry boundary
+
+This context rejects a function handle returned by `kinetics` with `Spinach:gridfree:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.

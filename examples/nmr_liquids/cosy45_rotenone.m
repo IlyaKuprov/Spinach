@@ -45,11 +45,11 @@ sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
-bas.sym_group={'S3','S3','S3'};
-bas.sym_spins={[14 15 16],[17 18 19],[20 21 22]};
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
+bas.sym_group={{'S3','S3','S3'}};
+bas.sym_spins={{[14 15 16],[17 18 19],[20 21 22]}};
 
 % Sequence parameters
 parameters.angle=pi/4;

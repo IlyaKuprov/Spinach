@@ -6,9 +6,9 @@
 %
 %     result  - regression test result with explanatory messages
 %
-% The test checks linear equilibrium, chemical reaction generators, full
-% chemical kinetics generators, and a minimal hydrodynamic diffusion
-% generator against conservation and detailed-balance invariants.
+% The test checks linear equilibrium, single-substance reaction and flux
+% generators, matched multi-substance chemical transport, and a minimal
+% hydrodynamic diffusion generator against conservation invariants.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -31,30 +31,46 @@ result=test_close(result,'equilibrate two-state detailed balance',ceq,[1;2],1e-1
 result=test_close(result,'equilibrate zero shortcut',equilibrate(K,[0;0]),[0;0],0,0,...
                   'zero initial concentration remains zero');
 
-% Build a two-site exchange Spinach system used by react_gen and kinetics
+% Build a single-substance flux system with a local descriptor
 sys.magnet=0;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0 0};
-inter.chem.parts={1,2};
-inter.chem.rates=[-1 1;1 -1];
-inter.chem.concs=[1 1];
-bas.formalism='sphten-liouv'; bas.approximation='none';
+inter.chem.parts={[1 2]}; inter.chem.concs=1;
+inter.chem.reactions={struct('reactants',1,'products',1,...
+    'matching',[1 2;2 1],'rate',1)};
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
-% react_gen must build a conservative drain/fill mapping for a specified reaction
-reaction.reactants=1;
-reaction.products=2;
-reaction.matching=[1 2];
+% A nonempty local basis with no reaction has no reactant generators
+reaction.reactants=[];
+reaction.products=[];
+reaction.matching=zeros(0,2);
 G=react_gen(spin_system,reaction);
-result=test_close(result,'react_gen one reaction count',numel(G),1,0,0,...
-                  'one reactant channel produces one reaction-generator matrix');
-result=test_close(result,'react_gen conservation',sum(full(G{1}),1),zeros(1,size(G{1},2)),1e-14,1e-14,...
-                  'reaction drain and fill terms conserve total population column by column');
+result=test_true(result,'react_gen single-substance empty reaction',...
+                 iscell(G)&&isempty(G),...
+                 'the cell-valued local descriptor is accepted for an empty reaction');
 
-% Full kinetics generator for symmetric exchange must conserve population
+% Intramolecular flux conserves spin order column by column
 Kspin=kinetics(spin_system);
-result=test_close(result,'kinetics column sums',sum(full(Kspin),1),zeros(1,size(Kspin,2)),1e-14,1e-14,...
-                  'closed chemical kinetics generator has zero column sums');
+result=test_close(result,'kinetics flux column sums',sum(full(Kspin),1),zeros(1,size(Kspin,2)),1e-14,1e-14,...
+                  'single-substance intramolecular flux has zero column sums');
+
+% Check matched multi-substance reaction maps and generators
+inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[1 2],'rate',1),...
+    struct('reactants',2,'products',1,...
+    'matching',[2 1],'rate',1)};
+bas.approximation={'none','none'};
+spin_system=test_spin_system(sys,inter,bas);
+G=react_gen(spin_system,spin_system.chem.reactions{1});
+result=test_true(result,'react_gen matched product rows',...
+                 isequal(G{1},[(5:8)' (1:4)']),...
+                 'all four product descriptors map to the corresponding source descriptors');
+Kspin=kinetics(spin_system);
+result=test_close(result,'kinetics matched exchange',Kspin,...
+                  [-eye(4) eye(4);eye(4) -eye(4)],1e-14,1e-14,...
+                  'two matched first-order records give the independent block exchange generator');
 
 % A minimal two-cell diffusion mesh must produce a conservative symmetric generator
 mesh.vor.ncells=2;

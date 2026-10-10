@@ -21,3 +21,5 @@ In `zeeman-hilb`, the function returns the density matrix. In `zeeman-liouv`, it
 - `mode`: particle index, checked against the system's particle count and bosonic type.
 - `alpha`: finite numeric scalar, with real or complex value; it is the dimensionless coherent-state amplitude.
 - The mode cutoff is read from `spin_system.comp.mults(mode)`; it is not an extra function argument.
+
+This tensor-product constructor requires a single substance. Segmented inputs raise `Spinach:coherent:segmentedZeeman` before constructing the mode projector, rather than returning tensor-product dimensions in a direct-sum basis.

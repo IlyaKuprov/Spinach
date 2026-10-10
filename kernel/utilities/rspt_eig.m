@@ -61,17 +61,25 @@ function [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)
 grumble(parameters,Hz,Hc,Hmw,B);
 
 % Recursive call for symmetry
-if isfield(spin_system.bas,'irrep')
+if isfield(spin_system.bas,'sym_fact')
 
     % Preallocate irrep output blocks
-    n_irreps=numel(spin_system.bas.irrep);
+    irr_projectors={};
+    for s=1:spin_system.bas.nsubst
+        for n=1:numel(spin_system.bas.sym_fact(s).irr_dimensions)
+            P=spin_system.bas.sym_fact(s).irr_projectors{n};
+            irr_projectors{end+1}=[sparse(spin_system.bas.offsets(s),size(P,2)); P;...
+                sparse(spin_system.bas.offsets(end)-spin_system.bas.offsets(s+1),size(P,2))]; %#ok<AGROW>
+        end
+    end
+    n_irreps=numel(irr_projectors);
     E=cell(n_irreps,1); V=cell(1,n_irreps);
 
     % Loop over irreps
     for n=1:n_irreps
 
         % Extract irrep projector
-        P=spin_system.bas.irrep(n).projector;
+        P=irr_projectors{n};
 
         % Project Hamiltonian components
         HzIrr=P'*Hz*P; HzIrr=(HzIrr+HzIrr')/2; 
@@ -82,7 +90,7 @@ if isfield(spin_system.bas,'irrep')
 
         % Issue a recursive call
         spin_system_nosym=spin_system;
-        spin_system_nosym.bas=rmfield(spin_system.bas,'irrep');
+        spin_system_nosym.bas=rmfield(spin_system.bas,'sym_fact');
         [E{n},V{n}]=rspt_eig(spin_system_nosym,parameters,...
                              HzIrr,HcIrr,HmwIrr,B);
 

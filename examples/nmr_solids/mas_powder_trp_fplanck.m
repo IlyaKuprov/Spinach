@@ -34,10 +34,10 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,12,174.4);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
+bas.approximation={'IK-0'};
 bas.longitudinal={{'15N'}};
 bas.projections={+1};
-bas.inter_level=3;
+bas.inter_level={3};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
@@ -60,7 +60,7 @@ parameters.npoints=2048;
 parameters.zerofill=8192;
 parameters.spins={'13C'};
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.verbose=1;
 
 % Simulation

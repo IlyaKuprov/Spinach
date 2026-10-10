@@ -19,7 +19,7 @@ for n=1:numel(Fs)
 
     % Basis set
     bas.formalism=Fs{n};
-    bas.approximation='none';
+    bas.approximation={'none'};
 
     % Hush the logs
     sys.output='hush';

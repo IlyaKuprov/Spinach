@@ -41,9 +41,9 @@ inter.coupling.scalar{22,22}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=1;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={1};
 
 % Algorithmic options
 sys.disable={'pt','colorbar'};
@@ -88,7 +88,7 @@ parameters.u=zeros(parameters.npts,1);
 parameters.rho0_ph={ones(parameters.npts,1)};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts,1)};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % Relaxation phantom
 parameters.rlx_ph={};

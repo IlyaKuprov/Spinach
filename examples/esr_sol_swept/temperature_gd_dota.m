@@ -21,7 +21,7 @@ inter.coupling.euler{1,1}=[0 0 0];
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Get figure going
 kfigure(); scale_figure([2.0 1.5]);

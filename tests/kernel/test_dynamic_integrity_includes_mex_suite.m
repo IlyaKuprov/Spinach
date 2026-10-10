@@ -538,7 +538,8 @@ spin_system.tols.prop_chop=1e-14;
 spin_system.tols.small_matrix=10;
 spin_system.tols.dense_matrix=0.5;
 spin_system.bas.formalism='sphten-liouv';
-spin_system.bas.basis=1;
+spin_system.bas.basis={1}; spin_system.bas.offsets=[0;1];
+spin_system.bas.tot_cord={1};
 spin_system.chem.parts={1};
 spin_system.rlx.tau_c={1/3};
 

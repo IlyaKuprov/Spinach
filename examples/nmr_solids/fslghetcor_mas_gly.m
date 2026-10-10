@@ -25,8 +25,8 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,7,8.0);   % H_N
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=4;
+bas.approximation={'IK-0'};
+bas.inter_level={4};
 
 % Ignore interactions below 200 Hz
 sys.tols.inter_cutoff=2*pi*200;
@@ -42,7 +42,7 @@ spin_system=basis(spin_system,bas);
 
 % Start with Lz of 1H, detect in quadrature on 13C
 parameters.rho0=state(spin_system,'Lz','1H');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 
 % Experiment setup
 parameters.spins={'1H','13C'};

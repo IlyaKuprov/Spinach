@@ -45,8 +45,8 @@ inter.coordinates=mat2cell(props.std_geom,ones(18,1));
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3; 
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 bas.projections={+1};
 
 % Interaction cut-off, Hz
@@ -71,7 +71,7 @@ parameters.npoints=512;
 parameters.zerofill=1024;
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.verbose=1;
 
 % Simulation

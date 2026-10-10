@@ -22,7 +22,7 @@ inter.coordinates={[0.00 0.00 0.00]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination, with optional GPU arithmetic
 sys.enable={'zte'};
@@ -46,7 +46,7 @@ parameters.rframes={{'14N',3}};
 parameters.axis_units='ppm';
 parameters.rho0=state(spin_system,'L+',parameters.spins{2})+...
                 state(spin_system,'L-',parameters.spins{2});
-parameters.coil=state(spin_system,'L+',parameters.spins{2});
+parameters.coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
 parameters.rf_pwr=40e3;
 parameters.rf_dur=2e-3;
 

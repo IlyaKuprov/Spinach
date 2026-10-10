@@ -40,7 +40,7 @@ L=H+1i*R+1i*K;
 rho=state(spin_system,'Lz','electrons');
 
 % Detection state
-coil=state(spin_system,'L+','electrons');
+coil=coil_state(spin_system,'L+','electrons','exact');
 
 % Pulse operators
 Ep=operator(spin_system,'L+','electrons'); Ey=(Ep-Ep')/2i;

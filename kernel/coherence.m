@@ -44,7 +44,7 @@ function rho=coherence(spin_system,rho,spec)
 grumble(spin_system,rho,spec);
 
 % Store dimension statistics
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     spn_dim=spn_dim^2;
 end
@@ -60,28 +60,22 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
 
         % Projection quantum numbers of basis states
-        [~,M]=lin2lm(spin_system.bas.basis);
+        M=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            [~,M{n}]=lin2lm(spin_system.bas.basis{n});
+        end
 
-    case 'zeeman-liouv'
+    case {'zeeman-liouv','zeeman-hilb'}
 
-        % Projection quantum numbers of ket and bra indices
-        nspins=spin_system.comp.nspins;
-        spns=(spin_system.comp.mults-1)/2;
-        M_ket=spns-spin_system.bas.basis(:,1:nspins)+1;
-        M_bra=spns-spin_system.bas.basis(:,(nspins+1):end)+1;
-
-        % Coherence orders of stretched density matrix elements
-        M=M_ket-M_bra;
-
-    case 'zeeman-hilb'
-
-        % Projection quantum numbers of the Zeeman basis
-        hdim=size(spin_system.bas.basis,1);
-        spns=(spin_system.comp.mults-1)/2;
-        M_lvl=spns-spin_system.bas.basis+1;
-
-        % Coherence orders of stretched density matrix elements
-        M=repmat(M_lvl,[hdim 1])-kron(M_lvl,ones(hdim,1));
+        % Construct exact ket-minus-bra projection labels
+        mults=spin_system.comp.mults; hdim=prod(mults);
+        M=zeros(spn_dim,spin_system.comp.nspins);
+        for n=1:spin_system.comp.nspins
+            levels=((mults(n)-1)/2:-1:-(mults(n)-1)/2)';
+            levels=kron(ones(prod(mults(1:(n-1))),1),...
+                        kron(levels,ones(prod(mults((n+1):end)),1)));
+            M(:,n)=repmat(levels,hdim,1)-kron(levels,ones(hdim,1));
+        end
 
 end
 
@@ -113,7 +107,17 @@ for n=1:numel(spec)
     end
     
     % Determine coherence order of each basis state
-    coherence_orders_present=sum(M(:,spins),2);
+    if strcmp(spin_system.bas.formalism,'sphten-liouv')
+        if islogical(spins), spins=find(spins); end
+        coherence_orders_present=zeros(spn_dim,1);
+        for k=1:spin_system.bas.nsubst
+            local_spins=ismember(spin_system.chem.parts{k},spins);
+            idx=(spin_system.bas.offsets(k)+1):spin_system.bas.offsets(k+1);
+            coherence_orders_present(idx)=sum(M{k}(:,local_spins),2);
+        end
+    else
+        coherence_orders_present=sum(M(:,spins),2);
+    end
   
     % Wipe all coherence orders except those specified by the user
     state_mask(:,n)=ismember(coherence_orders_present,spec{n}{2});
@@ -138,13 +142,24 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,spec)
+if isfield(spin_system.bas,'basis')&&~iscell(spin_system.bas.basis)
+    error('Spinach:basis:retiredGlobalBasis',...
+          'the global bas.basis matrix is retired; use bas.basis{n} and bas.offsets from basis().');
+end
+if isfield(spin_system.bas,'irrep')
+    error('Spinach:basis:retiredIrrep',...
+          'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
     error('analytical coherence order selection is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');
 end
-if mod(numel(rho),size(spin_system.bas.basis,1))~=0
+if (~strcmp(spin_system.bas.formalism,'sphten-liouv'))&&(spin_system.bas.nsubst>1)
+    error('multi-substance Zeeman coherence selection is not yet supported.');
+end
+if mod(numel(rho),spin_system.bas.offsets(end))~=0
     error('the number of elements in rho must be a multiple of the dimension of the spin state space.');
 end
 if ~iscell(spec)

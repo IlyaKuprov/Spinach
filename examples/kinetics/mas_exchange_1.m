@@ -25,13 +25,15 @@ inter.zeeman.scalar={0.0 3.0};
 
 % Chemical exchange
 inter.chem.parts={1,2};
-inter.chem.rates=[-2e4   2e4
-                   2e4  -2e4];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+    'matching',[1 2],'rate',2e4),...
+    struct('reactants',2,'products',1,...
+    'matching',[2 1],'rate',2e4)};
 inter.chem.concs=[1.0 1.0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -42,8 +44,8 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'2H'};
-parameters.rho0=state(spin_system,'L+','2H','chem');
-parameters.coil=state(spin_system,'L+','2H');
+parameters.rho0=state(spin_system,'L+','2H');
+parameters.coil=coil_state(spin_system,'L+','2H','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=0.4e6;

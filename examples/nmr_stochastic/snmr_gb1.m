@@ -22,9 +22,9 @@ sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4; bas.prox_level=3;
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4}; bas.prox_level={3};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -59,9 +59,9 @@ Nx=operator(spin_system,'Lx','15N');
 Ny=operator(spin_system,'Ly','15N');
 
 % Observables
-coils=[state(spin_system,'Lx','1H')  state(spin_system,'Ly','1H')  ...
-       state(spin_system,'Lx','13C') state(spin_system,'Ly','13C') ...
-       state(spin_system,'Lx','15N') state(spin_system,'Ly','15N')];
+coils=[coil_state(spin_system,'Lx','1H','exact')  coil_state(spin_system,'Ly','1H','exact')  ...
+       coil_state(spin_system,'Lx','13C','exact') coil_state(spin_system,'Ly','13C','exact') ...
+       coil_state(spin_system,'Lx','15N','exact') coil_state(spin_system,'Ly','15N','exact')];
 
 % Isotropic thermal equilibrium
 rho=equilibrium(spin_system);

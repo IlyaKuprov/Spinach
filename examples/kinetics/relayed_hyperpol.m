@@ -3,6 +3,10 @@
 %
 %          https://doi.org/10.1016/j.jmr.2024.107727
 % 
+% Additive replacement records retain internal peptide orders and discard
+% cross-molecule orders, as in the intermolecular exchange model. Every
+% pool has invariant unit concentration, permitting a constant generator.
+%
 % Christopher Pötzl
 
 function relayed_hyperpol()
@@ -28,8 +32,7 @@ inter.coordinates={[6.67  4.45  4.03];  % labile
                    [5.33  8.70  4.21];  % aliphatic
                    [4.44  8.22  2.75]}; % aliphatic
 
-% 20 water protons exist, but have no coordinates to
-% prevent direct cross-relaxation from happening
+% Coordinate-free water has no direct cross-relaxation
 inter.coordinates=[inter.coordinates; repelem({[]},20)'];
 
 % Chemical shifts, all water at 4.5 ppm
@@ -41,26 +44,35 @@ inter.zeeman.scalar=[inter.zeeman.scalar repelem({4.5},20)];
 inter.relaxation={'redfield','t1_t2'};
 inter.equilibrium='dibari';
 inter.rlx_keep='secular';
-inter.tau_c={1.2e-10};
+inter.tau_c=repmat({1.2e-10},1,21);
 inter.temperature=298;
 
 % Empirical relaxation at 0.1 Hz for water
 inter.r1_rates=num2cell([zeros(1,10) 0.1*ones(1,20)]);
 inter.r2_rates=num2cell([zeros(1,10) 0.1*ones(1,20)]);
 
-% Basis set, single-spin for water, up to 
-% three-spin orders for the molecule
-bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='full_tensors';
-bas.prox_level=3;
-bas.inter_level=1;
+% Peptide and twenty independent unit-concentration water pools
+inter.chem.parts=[{1:10} num2cell(11:30)];
+inter.chem.concs=ones(1,21);
 
-% Exchange flux matrix
-inter.chem.flux_rate=zeros(30,30);
-inter.chem.flux_rate(1:4,11:20)=20;
-inter.chem.flux_rate(11:20,1:4)=20;
-inter.chem.flux_type='intermolecular';
+% Intermolecular replacements preserve populations and trace departing spins
+inter.chem.reactions=cell(1,40);
+for n=1:4
+    for k=11:20
+        matching=[(1:10)' (1:10)';k k];
+        matching([n 11],2)=[k;n];
+        inter.chem.reactions{10*(n-1)+k-10}=...
+            struct('reactants',[1 k-9],'products',[1 k-9],...
+                   'matching',matching,'rate',20,'closure','additive');
+    end
+end
+
+% Three-spin peptide orders and complete one-spin water bases
+bas.formalism='sphten-liouv';
+bas.approximation=repmat({'IK-1'},1,21);
+bas.connectivity=repmat({'full_tensors'},1,21);
+bas.prox_level=[{3} repmat({1},1,20)];
+bas.inter_level=repmat({1},1,21);
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -70,23 +82,24 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 spin_system=assume(spin_system,'nmr');
         
-% Build the Liouvillian
+% Freeze additive chemistry at its invariant unit concentrations
 H=hamiltonian(spin_system);
 R=relaxation(spin_system);
 K=kinetics(spin_system);
+K=K(0,unit_state(spin_system));
 L=H+1i*R+1i*K;
        
 % Isotropic thermal equilibrium
 rho=equilibrium(spin_system);
 
 % Polarise the water 100%
-Wz=state(spin_system,'Lz',11:20);
+Wz=coil_state(spin_system,'Lz',11:20,'exact');
 rho=rho-Wz*(Wz'*rho)/norm(Wz,2)^2+Wz;
 
 % Get detection states
 H_aliph=[6 7 8]; H_alpha=5;
-HZ_aliph=state(spin_system,'Lz',H_aliph); 
-HZ_alpha=state(spin_system,'Lz',H_alpha);
+HZ_aliph=coil_state(spin_system,'Lz',H_aliph,'exact');
+HZ_alpha=coil_state(spin_system,'Lz',H_alpha,'exact');
             
 % Time evolution simulation
 result=evolution(spin_system,L,[HZ_aliph HZ_alpha],...

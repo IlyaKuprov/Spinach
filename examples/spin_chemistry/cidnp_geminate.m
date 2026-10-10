@@ -14,13 +14,14 @@ sys.isotopes ={'E','E','1H'};
 inter.zeeman.scalar={2.0023 2.0024 1.0};
 inter.coupling.scalar=cell(3,3);
 inter.coupling.scalar{2,3}=1e7;
-inter.chem.rp_theory='haberkorn';
-inter.chem.rp_electrons=[1 2];
-inter.chem.rp_rates=[1e7 0];
+inter.chem.parts={1:3};
+inter.chem.reactions={struct('reactants',1,'products',[],...
+                            'matching',zeros(0,2),'rate',1e7,...
+                            'selector',{{'singlet',[1 2]}})};
                      
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -52,7 +53,7 @@ L=H+1i*K;
 rho=evolution(spin_system,L,[],rho,1e-6,1,'final');
 
 % Check the nuclear magnetisation
-Nz=state(spin_system,'Lz','1H');
+Nz=coil_state(spin_system,'Lz','1H','exact');
 rho_reac=rho(1:(numel(rho)/2));
 rho_prod=rho((numel(rho)/2+1):end);
 disp(['Nuclear magnetisation in reactants: ' num2str(real(Nz'*rho_reac))]);

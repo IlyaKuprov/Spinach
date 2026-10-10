@@ -68,9 +68,10 @@ inter.coupling.eigs{2,3}=mt2hz([0.6 0.6 3.6]);
 inter.coupling.euler{2,3}=[0 0 0];
 
 % Haberkorn recombination, singlet channel only
-inter.chem.rp_theory='haberkorn';
-inter.chem.rp_electrons=[1 2];
-inter.chem.rp_rates=[k_rec 0];
+inter.chem.parts={1:3};
+inter.chem.reactions={struct('reactants',1,'products',[],...
+                            'matching',zeros(0,2),'rate',k_rec,...
+                            'selector',{{'singlet',[1 2]}})};
 
 % Relaxation theory settings
 inter.relaxation={theory};
@@ -79,15 +80,15 @@ inter.rlx_keep='labframe';
 inter.rlx_dfs='keep';
 inter.tau_c={tau_c};
 
-% Scalar lifetime shift from the declared kinetics
+% Explicit Haberkorn scalar approximation (half the summed rates)
 if strcmp(theory,'naka-zwan')
-    inter.nz_shift='chem';
+    inter.nz_shift=k_rec/2;
     inter.nz_onshell=false;
 end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -119,7 +120,7 @@ L=H+1i*R+1i*K;
 rho=evolution(spin_system,L,[],rho,200e-9,1,'final');
 
 % Nuclear magnetisation in the product block
-Nz=state(spin_system,'Lz','1H');
+Nz=coil_state(spin_system,'Lz','1H','exact');
 rho_prod=rho((numel(rho)/2+1):end);
 pol=real(Nz'*rho_prod);
 

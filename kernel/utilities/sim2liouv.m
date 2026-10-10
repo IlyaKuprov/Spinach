@@ -2,7 +2,7 @@
 % the formalism specified in the spin system object is 'zeeman-hilb',
 % this function projects the evolution generators into Liouville
 % space, converts the standard state-like and operator-like fields
-% of the parameters structure, rebuilds the basis index table, mig-
+% of the parameters structure, rebuilds the block dimensions, mig-
 % rates the symmetry irrep projectors into the adjoint representa-
 % tion, and sets the formalism to 'zeeman-liouv'; for all other
 % formalisms, every argument is returned unchanged. This makes
@@ -69,6 +69,10 @@
 %       ted R stays block-diagonal in the irrep table that reduce.m
 %       evolves independently.
 %
+% Note: segmented Hilbert inputs must be block diagonal in substance;
+%       cross-substance entries in generators and parameter matrices
+%       are rejected rather than discarded during conversion.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sim2liouv.m>
@@ -84,53 +88,56 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     % Inform the user
     report(spin_system,'projecting zeeman-hilb simulation into Liouville space...');
 
-    % Project the evolution generators into Liouville space
-    H=hilb2liouv(H,'comm'); R=hilb2liouv(R,'acomm'); K=hilb2liouv(K,'acomm');
+    % Convert generators using explicit Hilbert space substance blocks
+    dims=spin_system.bas.nstates; hdim=sum(dims);
+    generators={H,R,K}; types={'comm','acomm','acomm'};
+    for n=1:numel(generators)
+        if ~isempty(generators{n})
+            blocks=mat2cell(generators{n},dims,dims);
+            generators{n}=hilb2liouv(blocks(1:spin_system.bas.nsubst+1:end),types{n});
+        end
+    end
+    [H,R,K]=generators{:};
 
-    % Get the Hilbert space basis table and dimension
-    zbas=spin_system.bas.basis; hdim=size(zbas,1);
-
-    % Stretch the state-like parameters
-    if isfield(parameters,'rho0')
-        parameters.rho0=reshape(parameters.rho0,hdim^2,[]);
-    end
-    if isfield(parameters,'coil')
-        parameters.coil=reshape(parameters.coil,hdim^2,[]);
-    end
-    if isfield(parameters,'screen')
-        parameters.screen=reshape(parameters.screen,hdim^2,[]);
-    end
-
-    % Project the operator-like parameters
-    if isfield(parameters,'pulse_op')
-        parameters.pulse_op=hilb2liouv(parameters.pulse_op,'comm');
-    end
-    if isfield(parameters,'mw_oper')
-        parameters.mw_oper=hilb2liouv(parameters.mw_oper,'comm');
-    end
-    if isfield(parameters,'ez_oper')
-        parameters.ez_oper=hilb2liouv(parameters.ez_oper,'comm');
-    end
-    if isfield(parameters,'homodec_oper')
-        parameters.homodec_oper=hilb2liouv(parameters.homodec_oper,'comm');
+    % Stretch each state-like parameter within each substance
+    fields={'rho0','coil','screen'};
+    for n=1:numel(fields)
+        if isfield(parameters,fields{n})
+            states=parameters.(fields{n});
+            blocks=cell(spin_system.bas.nsubst,1);
+            for k=1:spin_system.bas.nsubst
+                idx=spin_system.bas.offsets(k)+(1:dims(k));
+                cols=reshape(idx(:)+hdim*(0:size(states,2)/hdim-1),1,[]);
+                blocks{k}=reshape(states(idx,cols),dims(k)^2,[]);
+            end
+            parameters.(fields{n})=vertcat(blocks{:});
+        end
     end
 
-    % Rebuild the basis index table for the Liouville space
-    spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
-
-    % Refresh existing cache identity using the canonical basis hash
-    if isfield(spin_system.bas,'basis_hash')
-        spin_system.bas.basis_hash=md5_hash(spin_system.bas.basis);
+    % Convert operator-like parameters within each substance
+    fields={'pulse_op','mw_oper','ez_oper','homodec_oper'};
+    for n=1:numel(fields)
+        if isfield(parameters,fields{n})
+            blocks=mat2cell(parameters.(fields{n}),dims,dims);
+            parameters.(fields{n})=hilb2liouv(blocks(1:spin_system.bas.nsubst+1:end),'comm');
+        end
     end
+
+    % Compile the Liouville dimensions and refresh the cache identity
+    spin_system.bas.nstates=dims.^2;
+    spin_system.bas.offsets=[0;cumsum(spin_system.bas.nstates)];
+    spin_system.bas.basis_hash=md5_hash({spin_system.bas.basis,...
+                                       spin_system.bas.nstates,spin_system.chem.parts});
 
     % Migrate the irreps into the adjoint representation
-    if isfield(spin_system.bas,'irrep')
+    for s=1:spin_system.bas.nsubst
 
         % Grab the Hilbert space irreps
-        hs_irreps=spin_system.bas.irrep; n_irreps=numel(hs_irreps);
+        hs_irreps=spin_system.bas.sym_fact(s);
+        n_irreps=numel(hs_irreps.irr_dimensions);
 
         % Preallocate the Liouville space irrep array
-        ls_irreps(n_irreps^2-n_irreps+1)=struct('projector',[],'dimension',[]);
+        ls_irreps=repmat(struct('projector',[],'dimension',[]),n_irreps^2-n_irreps+1,1);
 
         % Diagonal irrep pairs share the unit state and are merged into the first subspace
         ls_irreps(1).projector=[]; ls_irreps(1).dimension=0; pair_idx=1;
@@ -140,8 +147,8 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
             for k=1:n_irreps
 
                 % Build the irrep pair projector and dimension
-                pair_proj=kron(conj(hs_irreps(n).projector),hs_irreps(k).projector);
-                pair_dim=hs_irreps(n).dimension*hs_irreps(k).dimension;
+                pair_proj=kron(conj(hs_irreps.irr_projectors{n}),hs_irreps.irr_projectors{k});
+                pair_dim=hs_irreps.irr_dimensions(n)*hs_irreps.irr_dimensions(k);
 
                 % Merge diagonal pairs, store off-diagonal pairs separately
                 if n==k
@@ -157,7 +164,8 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
         end
 
         % Write the Liouville space irreps
-        spin_system.bas.irrep=ls_irreps;
+        spin_system.bas.sym_fact(s).irr_dimensions=[ls_irreps.dimension]';
+        spin_system.bas.sym_fact(s).irr_projectors={ls_irreps.projector};
         report(spin_system,['Hilbert space irreps migrated into Liouville space, '...
                             num2str(numel(ls_irreps)) ' irrep pair subspaces.']);
 
@@ -168,7 +176,11 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
 
     % Project the unit state out of the relaxation superoperator
     if ~isempty(R)
-        U=unit_state(spin_system);
+        units=cell(spin_system.bas.nsubst,1);
+        for n=1:spin_system.bas.nsubst
+            unit=speye(dims(n)); units{n}=unit(:)/sqrt(dims(n));
+        end
+        U=blkdiag(units{:});
         R=R-U*(U'*R)-(R*U)*U'+U*(U'*R*U)*U';
         report(spin_system,'unit state exempted from the projected relaxation superoperator.');
     end
@@ -188,6 +200,23 @@ if ~isstruct(parameters)
 end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))
     error('H, R, and K must be numeric arrays.');
+end
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&spin_system.bas.nsubst>1
+    fields={'pulse_op','mw_oper','ez_oper','homodec_oper','rho0','coil','screen'};
+    fields=fields(isfield(parameters,fields));
+    matrices=[{H,R,K} cell(1,numel(fields))];
+    for n=1:numel(fields)
+        matrices{n+3}=parameters.(fields{n});
+    end
+    membership=repelem((1:spin_system.bas.nsubst)',spin_system.bas.nstates);
+    for n=1:numel(matrices)
+        [rows,cols]=find(matrices{n});
+        cols=mod(cols-1,spin_system.bas.offsets(end))+1;
+        if any(membership(rows)~=membership(cols))
+            error('Spinach:sim2liouv:crossSubstance',...
+                  'Hilbert inputs must not contain cross-substance matrix entries.');
+        end
+    end
 end
 end
 

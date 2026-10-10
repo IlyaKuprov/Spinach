@@ -41,7 +41,7 @@ sys.magnet=9.4;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -58,7 +58,7 @@ parameters.offset=0;
 parameters.spins={'14N'};
 parameters.grid='rep_2ang_12800pts_sph';
 parameters.rho0=state(spin_system,'L+','14N');
-parameters.coil=state(spin_system,'L+','14N');
+parameters.coil=coil_state(spin_system,'L+','14N','exact');
 parameters.axis_units='MHz';
 parameters.verbose=0;
 

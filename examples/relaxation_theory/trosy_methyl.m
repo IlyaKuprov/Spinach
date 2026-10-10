@@ -99,13 +99,22 @@ inter.coupling.scalar(9:12,9:12)=j_coupling;
 
 % Formalism and basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none', 'none'};
 
 % Methyl turning generator
 tau_m=1e-11; k_jump=1/(2*tau_m);
-inter.chem.rates=k_jump*[-2  1  1;
-                          1 -2  1;
-                          1  1 -2];
+inter.chem.reactions=cell(1,6); k=0;
+for n=1:3
+    for m=setdiff(1:3,n)
+
+        % Preserve atom identity between rotamer blocks
+        k=k+1;
+        inter.chem.reactions{k}=struct('reactants',n,'products',m,...
+            'matching',[inter.chem.parts{n}' inter.chem.parts{m}'],...
+            'rate',k_jump);
+
+    end
+end
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -118,7 +127,7 @@ kfigure(); scale_figure([1.5 0.8]);
 parameters.tau_c=50e-9;
 parameters.max_rank=3;
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.decouple={};
 parameters.spins={'13C'};
 parameters.sweep=[-300 300];
@@ -135,7 +144,7 @@ subplot(1,2,1); plot_1d(spin_system,real(spectrum),parameters);
 parameters.tau_c=50e-9;
 parameters.max_rank=3;
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.spins={'1H'};
 parameters.sweep=[200 1000];

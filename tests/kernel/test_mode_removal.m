@@ -42,7 +42,7 @@ for n=1:numel(hit_lists)
 
     % Rebuild the basis and assumptions required by kill_spin
     for k=1:numel(formalisms)
-        bas.formalism=formalisms{k}; bas.approximation='none';
+        bas.formalism=formalisms{k}; bas.approximation={'none'};
         observed=assume(basis(trimmed,bas),'labframe');
         expected=assume(basis(reference,bas),'labframe');
         [H_obs,Q_obs]=hamiltonian(observed);
@@ -102,7 +102,7 @@ for n=1:numel(mode_types)
                          ~isfield(trimmed.inter.modes,'strength'),...
                          'particle removal must destroy derived mode assumptions');
         for p=1:numel(formalisms)
-            bas.formalism=formalisms{p}; bas.approximation='none';
+            bas.formalism=formalisms{p}; bas.approximation={'none'};
             observed=assume(basis(trimmed,bas),assumptions{k});
             expected=assume(basis(mode_reference,bas),assumptions{k});
             result=test_close(result,[label ' rebuild ' formalisms{p}],...
@@ -122,7 +122,7 @@ for n=1:numel(mode_types)
                                  'no mode metadata may remain in a spin-only system');
         if ~passed, continue; end
         for p=1:numel(formalisms)
-            bas.formalism=formalisms{p}; bas.approximation='none';
+            bas.formalism=formalisms{p}; bas.approximation={'none'};
             observed=basis(trimmed,bas); expected=basis(spin_reference,bas);
             for assumption={'nmr','esr'}
                 for retention={'','zeeman','couplings'}

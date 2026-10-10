@@ -67,6 +67,9 @@
 %       luding infinite order. See the header of rotframe.m for further
 %       information.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=crystal.m>
@@ -133,6 +136,15 @@ R=relaxation(spin_system,parameters.orientation);
 
 % Build kinetics
 K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:crystal:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by crystal; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Get problem dimensions
 parameters.spc_dim=1; parameters.spn_dim=size(H,1);

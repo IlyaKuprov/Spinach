@@ -33,7 +33,7 @@ sys.enable={'zte','greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -62,7 +62,7 @@ tube=zeros(parameters.npts); tube(:,6:10)=1;
 parameters.rho0_ph={tube};
 parameters.rho0_st={state(spin_system,'Lz','13C')};
 parameters.coil_ph={tube};
-parameters.coil_st={state(spin_system,'L+','13C')};
+parameters.coil_st={coil_state(spin_system,'L+','13C','exact')};
 
 % Diffusion and flow
 parameters.u=-6e-2*ones(parameters.npts);
@@ -142,7 +142,7 @@ traj=imaging(spin_system,@tube_flow,parameters);
 
 % Get detection states
 coil_sing=singlet(spin_system,1,2);
-coil_magn=state(spin_system,'L+','all');
+coil_magn=coil_state(spin_system,'L+','all','exact');
                 
 % Show the movie
 kfigure();

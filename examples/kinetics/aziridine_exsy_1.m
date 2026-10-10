@@ -127,8 +127,10 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,1:20,[2.237 1.576 2.970 0.0 1.
 kplus=4; kminus=20;
 inter.chem.parts={[1  2  3  4  5  6  7  8  9  10]...
                   [11 12 13 14 15 16 17 18 19 20]};
-inter.chem.rates=[-kplus  kminus
-                   kplus -kminus];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[(1:10)' (11:20)'],'rate',kplus),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[(11:20)' (1:10)'],'rate',kminus)};
 inter.chem.concs=[kminus kplus];
                
 % Relaxation theory 
@@ -140,10 +142,10 @@ inter.tau_c={50e-12 50e-12};
               
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.inter_level=4;
-bas.prox_level=3;
+bas.approximation={'IK-1', 'IK-1'};
+bas.connectivity={'scalar_couplings', 'scalar_couplings'};
+bas.inter_level={4, 4};
+bas.prox_level={3, 3};
 
 % Algorithmic options
 sys.disable={'krylov'};
@@ -166,7 +168,7 @@ parameters.axis_units='ppm';
 parameters.tmix=0.800;
 
 % Concentration-aware initial state
-parameters.rho0=state(spin_system,'Lz','1H','chem');
+parameters.rho0=state(spin_system,'Lz','1H');
 
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');

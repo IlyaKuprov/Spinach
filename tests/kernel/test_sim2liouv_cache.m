@@ -18,7 +18,7 @@ result=new_test_result('kernel/sim2liouv_cache','Converted basis cache identity'
 % Build small systems with a real one-worker cache store
 sys.magnet=1; sys.isotopes={'1H'}; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.parprops={};
-inter.zeeman.scalar={1}; bas.formalism='zeeman-hilb'; bas.approximation='none';
+inter.zeeman.scalar={1}; bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 flags={{'op_cache'},{'ham_cache'},{'op_cache','ham_cache'}};
 nuclei={'1H','13C'};
 for flag_idx=1:numel(flags)
@@ -32,7 +32,7 @@ for flag_idx=1:numel(flags)
         [spin_l,~,K]=sim2liouv(spin_h,struct(),H,[],[]);
         ref_l=spin_l; ref_l.sys.enable={};
         result=test_close(result,'canonical converted hash',...
-                          strcmp(spin_l.bas.basis_hash,md5_hash(spin_l.bas.basis)),true,0,0,...
+                          strcmp(spin_l.bas.basis_hash,md5_hash({spin_l.bas.basis,spin_l.bas.nstates,spin_l.chem.parts})),true,0,0,...
                           'the converted basis must have its canonical identity');
 
         % Warm both representations in the requested order
@@ -56,14 +56,15 @@ end
 spin_h.sys.enable={};
 [spin_l,~,~,~,~]=sim2liouv(spin_h,struct(),[],[],[]);
 result=test_close(result,'disabled cache hash',...
-                  strcmp(spin_l.bas.basis_hash,md5_hash(spin_l.bas.basis)),true,0,0,...
+                  strcmp(spin_l.bas.basis_hash,md5_hash({spin_l.bas.basis,spin_l.bas.nstates,spin_l.chem.parts})),true,0,0,...
                   'existing metadata must remain valid if caching is enabled again');
 
-% Preserve objects that never requested a cache
+% Retain canonical identity independently of cache settings
 sys.enable={}; spin_h=basis(create(sys,inter),bas);
 [spin_l,~,~,~,~]=sim2liouv(spin_h,struct(),[],[],[]);
-result=test_close(result,'absent cache metadata',isfield(spin_l.bas,'basis_hash'),false,0,0,...
-                  'conversion without caching must not introduce cache metadata');
+result=test_close(result,'uncached canonical hash',...
+                  strcmp(spin_l.bas.basis_hash,md5_hash({spin_l.bas.basis,spin_l.bas.nstates,spin_l.chem.parts})),true,0,0,...
+                  'conversion without caching must retain the canonical compiled identity');
 
 % Return every input unchanged for the three no-op formalisms
 forms={'zeeman-liouv','sphten-liouv','zeeman-wavef'};
@@ -78,6 +79,52 @@ for form_idx=1:numel(forms)
                       isequal(h_out,H)&&isequal(r_out,R)&&isequal(k_out,K),true,0,0,...
                       'non-Hilbert formalisms must be returned unchanged');
 end
+
+% Reject cross-substance entries in generators and standard parameter matrices
+sys.isotopes={'1H','1H','1H'}; sys.enable={};
+inter=struct(); inter.chem.parts={1,2:3}; inter.chem.concs=[1 0];
+bas.formalism='zeeman-hilb'; bas.approximation={'none','none'};
+segmented=test_spin_system(sys,inter,bas);
+for position={[1 3],[3 1]}
+    cross=sparse(position{1}(1),position{1}(2),1,6,6);
+    for n=1:3
+        generators={[],[],[]}; generators{n}=cross; rejected=false;
+        try
+            sim2liouv(segmented,struct(),generators{:});
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:sim2liouv:crossSubstance');
+        end
+        result=test_true(result,['cross generator ' num2str(n) ' ' mat2str(position{1})],...
+                         rejected,'conversion must not silently discard cross-substance terms');
+    end
+    for field={'pulse_op','mw_oper','ez_oper','homodec_oper','rho0','coil','screen'}
+        params=struct(); params.(field{1})=cross; rejected=false;
+        if ismember(field{1},{'rho0','coil','screen'})
+            params.(field{1})=[sparse(6,6) cross];
+        end
+        try
+            sim2liouv(segmented,params,[],[],[]);
+        catch err
+            rejected=strcmp(err.identifier,'Spinach:sim2liouv:crossSubstance');
+        end
+        result=test_true(result,['cross parameter ' field{1} ' ' mat2str(position{1})],...
+                         rejected,'operator and horizontal state stacks cannot lose cross-substance terms');
+    end
+end
+
+% Preserve valid block-diagonal generators and sparse horizontal state stacks
+H=blkdiag(sparse([1 2;3 4]),speye(4));
+params=struct('rho0',[H 2*H],'pulse_op',H);
+[~,converted,h_out]=sim2liouv(segmented,params,H,[],[]);
+result=test_close(result,'segmented generator conversion',h_out,...
+                  blkdiag(hilb2liouv(H(1:2,1:2),'comm'),hilb2liouv(H(3:6,3:6),'comm')),...
+                  0,0,'valid substance blocks retain their independent commutators');
+result=test_close(result,'segmented pulse conversion',converted.pulse_op,h_out,0,0,...
+                  'operator-like parameters retain both independent blocks');
+unit=H(3:6,3:6); first=H(1:2,1:2); expected=[first(:);unit(:)];
+result=test_close(result,'segmented state stack',converted.rho0,[expected 2*expected],0,0,...
+                  'sparse horizontal stacks preserve their substance and state ordering');
+inter=struct(); bas.approximation={'none'};
 
 % Acquire a complex FID after a noncommuting phase-shifted soft pulse
 sys.magnet=1; sys.isotopes={'1H'}; sys.enable={'op_cache','ham_cache'};

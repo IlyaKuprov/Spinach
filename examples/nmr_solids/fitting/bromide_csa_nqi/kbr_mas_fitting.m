@@ -64,8 +64,8 @@ errfun(best_fit);
 
         % Basis set
         bas.formalism='sphten-liouv';
-        bas.approximation='IK-0';
-        bas.inter_level=1; bas.projections={+1};
+        bas.approximation={'IK-0'};
+        bas.inter_level={1}; bas.projections={+1};
 
         % Relaxation theory
         inter.relaxation={'t1_t2'};
@@ -89,7 +89,7 @@ errfun(best_fit);
         parameters.rho0=params(9) *state(spin_system,{'L+'},{1})+...
                         params(10)*state(spin_system,{'L+'},{2})+...
                         params(11)*state(spin_system,{'L+'},{3});
-        parameters.coil=state(spin_system,'L+','79Br');
+        parameters.coil=coil_state(spin_system,'L+','79Br','exact');
 
         % Simulation
         fid=singlerot(spin_system,@acquire,parameters,'nmr');

@@ -91,6 +91,9 @@
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different labs.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
 %
@@ -156,6 +159,15 @@ spin_system=assume(spin_system,assumptions);
 
 % Get kinetics superoperator
 K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:powder:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by powder; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Add offsets to the isotropic part
 I=frqoffset(spin_system,I,parameters);

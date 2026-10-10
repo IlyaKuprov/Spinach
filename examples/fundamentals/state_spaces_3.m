@@ -17,9 +17,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Algorithmic options
 sys.enable={'zte','greedy','prop_cache'};
@@ -31,7 +31,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'Lx','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Assumptions
 spin_system=assume(spin_system,'nmr');

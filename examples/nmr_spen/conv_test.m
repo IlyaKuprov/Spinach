@@ -23,7 +23,7 @@ inter.zeeman.scalar={4.6};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'pt','krylov'};
@@ -86,7 +86,7 @@ for k=1:numel(grid_sizes)
     
     % Detection state - uniform across sample
     parameters.coil_ph={ones(parameters.npts,1)};
-    parameters.coil_st={state(spin_system,'L+','1H')};
+    parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
     
     % Hush the reporting
     report(spin_system,'Spinach output hushed.');

@@ -1,0 +1,3 @@
+# tests/kernel/test_cwdm_retired.m
+
+Tests named legacy-layout rejection at `basis`, `coherence`, `correlation`, `summary_basis`, and `kinetics`. Each boundary receives an old global `bas.basis` matrix and a `bas.irrep` field; assertions require the error identifier and every named replacement. The kinetics consumer is also tested with each of the six retired chemistry fields inserted after `create`, including empty values. Valid basis compilation, filters, summary, and a zero chemistry generator remain exercised. These checks do not claim that ordinary MATLAB struct dot reads can be intercepted.

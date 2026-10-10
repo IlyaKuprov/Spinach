@@ -61,7 +61,7 @@ timestep=1./parameters.sweep;
 rho=state(spin_system,'Lz',parameters.spins{1});
 
 % Quadrature detection state
-coil=state(spin_system,'L+',parameters.spins{1});
+coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
 
 % Pulse operators
 Lx=operator(spin_system,'Lx',parameters.spins{1});

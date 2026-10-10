@@ -10,14 +10,14 @@ function flux_symmetric()
 sys.magnet=14.1;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0.0 3.0};
-inter.chem.flux_rate=zeros(2);
-inter.chem.flux_rate(1,2)=2e3; % from 1 to 2
-inter.chem.flux_rate(2,1)=2e3; % from 2 to 1
-inter.chem.flux_type='intermolecular';
+inter.chem.parts={1,2};
+inter.chem.concs=[1 1];
+inter.chem.reactions={struct('reactants',[1 2],'products',[1 2],...
+                            'matching',[1 2;2 1],'rate',2e3)};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none','none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -28,9 +28,8 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'1H'};
-parameters.rho0=1.0*state(spin_system,{'L+'},{1})+...  % Initial concentrations
-                1.0*state(spin_system,{'L+'},{2});     % are specified here
-parameters.coil=state(spin_system,'L+','1H');
+parameters.rho0=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=900;
 parameters.sweep=5000;
@@ -40,7 +39,7 @@ parameters.axis_units='ppm';
 parameters.invert_axis=1;
 
 % Simulation
-fid=liquid(spin_system,@acquire,parameters,'nmr');
+fid=liquid(spin_system,@flux_acquire,parameters,'nmr');
 
 % Apodisation
 fid=apodisation(spin_system,fid,{{'exp',6}});
@@ -50,6 +49,15 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
 kfigure(); plot_1d(spin_system,real(spectrum),parameters);
+
+end
+
+% Freeze additive replacement at its invariant species concentrations
+function fid=flux_acquire(spin_system,parameters,H,R,K)
+
+% No concentration-changing reaction is present in this network
+K=K(0,unit_state(spin_system));
+fid=acquire(spin_system,parameters,H,R,K);
 
 end
 

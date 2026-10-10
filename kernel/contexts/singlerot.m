@@ -94,6 +94,9 @@
 %       luding infinite order. See the header of rotframe.m for further
 %       information.
 %
+% State-dependent reaction records require a custom pulse sequence using
+% step/iserstep; this context accepts only static kinetics matrices.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % With sys.enable={'polyadic'}, the Liouville rotor derivative is applied
@@ -138,6 +141,15 @@ end
 
 % Get relaxation and kinetics generators
 R=relaxation(spin_system); K=kinetics(spin_system);
+
+% Reject state-dependent chemistry before static generator assembly
+if isa(K,'function_handle')
+    error('Spinach:singlerot:stateDependentKinetics',...
+          ['state-dependent reaction records are not supported by singlerot; ' ...
+           'use a custom pulse sequence with step/iserstep, as in ' ...
+           'examples/kinetics/nonlinear/bimolecular_closures.m or ' ...
+           'examples/microfluidics/reacting_flow_nmr.m.']);
+end
 
 % Load the spherical integration grid
 sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...

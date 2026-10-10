@@ -79,13 +79,13 @@ inter.coupling.scalar{20,23}=    7.45;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=1; bas.manual=false(3,23);
-bas.manual(1,[14 15 16 12 13 10 11 8 9])=1;
-bas.manual(2,[12 13 10 11 8 9 17 18 19 20])=1;
-bas.manual(3,[8 9 17 18 19 20 21 22 23])=1;
-bas.sym_group={'S3','S3'};
-bas.sym_spins={[14 15 16],[21 22 23]};
+bas.approximation={'IK-0'};
+bas.inter_level={1}; bas.manual={false(3,23)};
+bas.manual{1}(1,[14 15 16 12 13 10 11 8 9])=1;
+bas.manual{1}(2,[12 13 10 11 8 9 17 18 19 20])=1;
+bas.manual{1}(3,[8 9 17 18 19 20 21 22 23])=1;
+bas.sym_group={{'S3','S3'}};
+bas.sym_spins={{[14 15 16],[21 22 23]}};
 bas.longitudinal={{'19F'}};
 bas.projections={1};
 
@@ -99,7 +99,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.decouple={};
 parameters.offset=1400;
 parameters.sweep=2500;

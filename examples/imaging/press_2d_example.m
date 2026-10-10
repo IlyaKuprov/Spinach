@@ -29,9 +29,9 @@ inter.coupling.scalar{5,6}=30;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.prox_level=1;
-bas.connectivity='scalar_couplings';
+bas.approximation={'IK-2'};
+bas.prox_level={1};
+bas.connectivity={'scalar_couplings'};
 
 % Disable path tracing
 sys.disable={'pt'};
@@ -83,7 +83,7 @@ parameters.rho0_st={state(spin_system,'Lz',[1 2]);
                     state(spin_system,'Lz',[3 4]);
                     state(spin_system,'Lz',[5 6])};
 parameters.coil_ph={ones(parameters.npts)};
-parameters.coil_st={state(spin_system,'L+','all')};
+parameters.coil_st={coil_state(spin_system,'L+','all','exact')};
 
 % Show the phantom
 kfigure(); scale_figure([2.0 1.0]); 

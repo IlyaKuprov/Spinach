@@ -31,14 +31,14 @@ inter.temperature=80;
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Detection state
-parameters.coil=state(spin_system,'Lz','1H');
+parameters.coil=coil_state(spin_system,'Lz','1H','exact');
 
 % Experiment parameters
 parameters.spins={'E','1H'};

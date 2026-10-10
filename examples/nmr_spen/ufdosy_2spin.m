@@ -25,7 +25,7 @@ inter.coordinates={[0 0 0]; [0 0 2.5]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -57,7 +57,7 @@ parameters.rlx_op={relaxation(spin_system)};
 parameters.rho0_ph={ones(parameters.npts,1)};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts,1)};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % Diffusion and flow
 parameters.u=1e-4*ones(parameters.npts,1);

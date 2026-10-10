@@ -35,7 +35,7 @@ end
 
 % Build a physical one-spin Liouville system for RF pulse comparisons
 sys.magnet=1; sys.isotopes={'1H'}; inter.zeeman.scalar={0};
-bas.formalism='zeeman-liouv'; bas.approximation='none';
+bas.formalism='zeeman-liouv'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 Lx=operator(spin_system,'Lx',1); Ly=operator(spin_system,'Ly',1);
 L0=2*pi*37*operator(spin_system,'Lz',1);

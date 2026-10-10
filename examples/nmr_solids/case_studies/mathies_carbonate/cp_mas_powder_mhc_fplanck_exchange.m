@@ -53,7 +53,7 @@ inter.chem.concs=[1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none', 'none'};
 
 % Disable start-up checks
 sys.disable={'hygiene'};
@@ -88,15 +88,17 @@ contact_curves=zeros(numel(exch_rates),...
 for n=1:numel(exch_rates)
 
     % Set the exchange rates
-    inter.chem.rates=exch_rates(n)*[-1  1;
-                                     1 -1];
+    inter.chem.reactions={struct('reactants',1,'products',2,...
+                                'matching',[1 4; 2 5; 3 6],'rate',exch_rates(n)),...
+                          struct('reactants',2,'products',1,...
+                                'matching',[4 1; 5 2; 6 3],'rate',exch_rates(n))};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
     
     % Detection state
-    parameters.coil=state(spin_system,'L+','13C');
+    parameters.coil=coil_state(spin_system,'L+','13C','exact');
 
     % Simulation
     contact_curves(n,:)=singlerot(spin_system,@cp_contact_soft,parameters,'nmr');

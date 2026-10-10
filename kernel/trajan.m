@@ -71,8 +71,7 @@ grumble(spin_system,traj,property,time_axis);
 
 % Project out unit state
 if ~strcmp(property,'level_populations')
-    unit=unit_state(spin_system);
-    traj=traj-(unit*unit')*traj;
+    traj(spin_system.bas.offsets(1:end-1)+1,:)=0;
 end
 
 % Determine how to proceed
@@ -81,7 +80,7 @@ switch property
     case 'correlation_order'
         
         % Determine the correlation order of each state
-        correlation_orders=sum(logical(spin_system.bas.basis),2);
+        correlation_orders=vertcat(spin_system.bas.tot_cord{:});
         
         % Find out which correlation orders are present
         unique_correlation_orders=unique(correlation_orders);
@@ -122,11 +121,8 @@ switch property
         
     case 'coherence_order'
         
-        % Determine projection quantum numbers of the basis
-        [~,M]=lin2lm(spin_system.bas.basis);
-        
         % Determine the coherence order of each state
-        coherence_orders=sum(M,2);
+        coherence_orders=vertcat(spin_system.bas.tot_proj{:});
         
         % Find out which coherence orders are present
         unique_coherence_orders=unique(coherence_orders);
@@ -171,7 +167,10 @@ switch property
         for n=1:spin_system.comp.nspins
             
             % Find the subspace of states that involve the current spin
-            subspace_mask=(spin_system.bas.basis(:,n)~=0);
+            s=which_subst(spin_system,n);
+            k=(spin_system.chem.parts{s}==n);
+            subspace_mask=spin_system.bas.offsets(s)+...
+                          find(spin_system.bas.basis{s}(:,k)~=0);
             
             % Get the part of the trajectory belonging to the subspace
             subspace_trajectory=traj(subspace_mask,:);
@@ -214,8 +213,11 @@ switch property
         for n=1:spin_system.comp.nspins
             
             % Find the subspace of states that are local to current spin
-            subspace_mask=(spin_system.bas.basis(:,n)~=0)&...
-                          (sum(spin_system.bas.basis,2)==spin_system.bas.basis(:,n));
+            s=which_subst(spin_system,n);
+            k=(spin_system.chem.parts{s}==n);
+            subspace_mask=spin_system.bas.offsets(s)+...
+                          find((spin_system.bas.basis{s}(:,k)~=0)&...
+                               (spin_system.bas.tot_cord{s}==1));
             
             % Get the part of the trajectory belonging to the subspace
             subspace_trajectory=traj(subspace_mask,:);
@@ -253,17 +255,19 @@ switch property
         
         % Move trajectory into the Zeeman basis set
         traj=sphten2zeeman(spin_system)*traj;
-        traj=traj/prod(spin_system.comp.mults);
-        
-        % Find out the number of energy levels
-        nlevels=sqrt(size(traj,1));
+
+        % Find the Hilbert dimensions and offsets of each substance
+        nlevels=cellfun(@(spins)prod(spin_system.comp.mults(spins)),spin_system.chem.parts);
+        hilb_offsets=[0 cumsum(nlevels)];
+        liouv_offsets=[0 cumsum(nlevels.^2)];
         
         % Preallocate population dynamics array
-        result=zeros(nlevels,size(traj,2));
+        result=zeros(sum(nlevels),size(traj,2));
         
         % Extract the populations
-        for n=1:size(traj,2)
-            result(:,n)=real(diag(reshape(traj(:,n),[nlevels nlevels])));
+        for s=1:spin_system.bas.nsubst
+            rows=liouv_offsets(s)+(1:nlevels(s)+1:nlevels(s)^2);
+            result(hilb_offsets(s)+(1:nlevels(s)),:)=real(traj(rows,:))/nlevels(s);
         end
         
         % Create labels
@@ -331,7 +335,7 @@ end
 if ~isnumeric(trajectory)
     error('trajectory should be an array of doubles.');
 end
-if size(trajectory,1)~=size(spin_system.bas.basis,1)
+if size(trajectory,1)~=spin_system.bas.offsets(end)
     error('trajectory dimension should match basis dimension.');
 end
 if (~isempty(property))&&((~ischar(property))||...

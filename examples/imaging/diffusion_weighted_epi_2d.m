@@ -35,7 +35,7 @@ sys.enable={'zte'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -73,7 +73,7 @@ parameters.rlx_op={R1Op,R2Op};
 parameters.rho0_ph={PDPh};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(parameters.npts)};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % 2D diffusion tensor field
 parameters.dxx=1e-4*ones(parameters.npts);

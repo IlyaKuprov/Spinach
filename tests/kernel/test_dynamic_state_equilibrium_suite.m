@@ -27,7 +27,7 @@ sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 inter.temperature=300;
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_h=test_spin_system(sys,inter,bas);
 
 % Set an explicit non-degenerate Hamiltonian in angular frequency units

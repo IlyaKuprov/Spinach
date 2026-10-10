@@ -26,7 +26,7 @@ sys.magnet=14.1;
 sys.isotopes={'1H'};
 inter.zeeman.scalar={1};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Build Spinach and reference Hamiltonians

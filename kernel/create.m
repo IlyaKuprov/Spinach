@@ -73,7 +73,16 @@ end
 autoexec;
 
 % Rare, but it can happen
-if nargin==1, inter=[]; end
+if nargin==1, inter=struct(); end
+
+% Default to one substance at unit concentration
+if ~isfield(inter,'chem')||...
+   (~isfield(inter.chem,'parts')&&~isfield(inter.chem,'reactions'))
+    inter.chem.parts={1:numel(sys.isotopes)};
+end
+if isfield(inter.chem,'parts')&&isscalar(inter.chem.parts)&&~isfield(inter.chem,'concs')
+    inter.chem.concs=1;
+end
 
 % Validate input
 grumble(sys,inter);
@@ -872,7 +881,7 @@ if isfield(inter,'chem')&&isfield(inter.chem,'parts')
     
     % Sort spin indices within part specifications
     for n=1:numel(inter.chem.parts)
-        inter.chem.parts{n}=sort(inter.chem.parts{n},'ascend');
+        spin_system.chem.parts{n}=sort(inter.chem.parts{n},'ascend');
     end
     
 else
@@ -899,34 +908,15 @@ else
     
 end
 
-% Absorb exchange reaction rates (linear kinetics)
-if isfield(inter,'chem')&&isfield(inter.chem,'rates')
-    
-    % Assign the data structure
-    spin_system.chem.rates=inter.chem.rates;
-    
-else
-    
-    % No exchange reactions
-    spin_system.chem.rates=[];
-    
-end
-
-% Absorb magnetization flux rates
-if isfield(inter,'chem')&&...
-   isfield(inter.chem,'flux_rate')&&...
-   isfield(inter.chem,'flux_type')
-    
-    % Assign the data structure
-    spin_system.chem.flux_rate=inter.chem.flux_rate;
-    spin_system.chem.flux_type=inter.chem.flux_type;
-    
-else
-    
-    % No magnetization fluxes
-    spin_system.chem.flux_rate=[];
-    spin_system.chem.flux_type='';
-    
+% Absorb explicit reaction records
+spin_system.chem.reactions={};
+if isfield(inter,'chem')&&isfield(inter.chem,'reactions')
+    spin_system.chem.reactions=inter.chem.reactions;
+    for n=1:numel(spin_system.chem.reactions)
+        if ~isfield(spin_system.chem.reactions{n},'closure')
+            spin_system.chem.reactions{n}.closure='additive';
+        end
+    end
 end
 
 % Report back to the user
@@ -1104,7 +1094,8 @@ for n=1:numel(spin_system.chem.parts)
         if (n~=k)
             coupling_block=spin_system.inter.coupling.matrix(spin_system.chem.parts{n},spin_system.chem.parts{k});
             if ~all(cellfun(@isempty,coupling_block(:)))
-                error('couplings detected between spins in different chemical species.');
+                error('Spinach:create:crossSubstanceCoupling',...
+                      'couplings detected between spins in different chemical species.');
             end
         end
     end
@@ -1470,30 +1461,6 @@ if isfield(inter,'weiz_r1e')&&isfield(inter,'weiz_r2e')&&...
    isfield(inter,'weiz_r1n')&&isfield(inter,'weiz_r2n')&&...
    isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')
     summary_rlx_weiz(spin_system);
-end
-
-% Absorb radical recombination parameters
-if isfield(inter,'chem')&&isfield(inter.chem,'rp_theory')
-
-    % Absorb theory
-    spin_system.chem.rp_theory=inter.chem.rp_theory;
-    report(spin_system,['radical recombination theory set to ' spin_system.chem.rp_theory]);
-
-    % Absorb spins
-    spin_system.chem.rp_electrons=inter.chem.rp_electrons;
-    report(spin_system,['recombining electrons at positions ' num2str(spin_system.chem.rp_electrons)]);
-
-    % Absorb rates
-    spin_system.chem.rp_rates=inter.chem.rp_rates;
-    report(spin_system,['singlet recombination rate ' num2str(spin_system.chem.rp_rates(1)) ' Hz.']);
-    report(spin_system,['triplet recombination rate ' num2str(spin_system.chem.rp_rates(2)) ' Hz.']);
-
-else
-    
-    spin_system.chem.rp_theory='';
-    spin_system.chem.rp_electrons=[];
-    spin_system.chem.rp_rates=[];
-    
 end
 
 % Apply interaction drops
@@ -2071,15 +2038,11 @@ if isfield(inter,'relaxation')
             error('inter.nz_shift requires naka-zwan relaxation theory.');
         end
         if ischar(inter.nz_shift)
-            if ~strcmp(inter.nz_shift,'chem')
-                error('the only character value allowed in inter.nz_shift is ''chem''.');
-            end
-            if (~isfield(inter,'chem'))||(~isfield(inter.chem,'rp_rates'))
-                error('inter.nz_shift=''chem'' requires radical pair kinetics in inter.chem.');
-            end
+            error('Spinach:create:explicitNZShift',...
+                  'inter.nz_shift must be an explicit scalar; reaction records do not define a unique scalar lifetime.');
         elseif (~isnumeric(inter.nz_shift))||(~isscalar(inter.nz_shift))||...
                (~isfinite(inter.nz_shift))||(real(inter.nz_shift)<0)
-            error('inter.nz_shift must be ''chem'' or a finite scalar with a non-negative real part.');
+            error('inter.nz_shift must be a finite scalar with a non-negative real part.');
         end
     end
 
@@ -2771,19 +2734,30 @@ end
 % Check chemical kinetics
 if isfield(inter,'chem')
     
-    % If rates are provided, insist on parts and concentrations
-    if isfield(inter.chem,'rates')&&(~isfield(inter.chem,'parts'))
-        error('subsystem identifiers (inter.chem.parts) must be provided.');
-    elseif isfield(inter.chem,'rates')&&(~isfield(inter.chem,'concs'))
-        error('initial concentrations (inter.chem.concs) must be provided.');
+    retired={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'};
+    for n=1:numel(retired)
+        if isfield(inter.chem,retired{n})
+            error('Spinach:create:retiredChemistry',...
+                  ['inter.chem.' retired{n} ' is retired; use inter.chem.reactions records '...
+                   'with reactants, products, matching, and rate fields.']);
+        end
     end
-    
+    if ~isempty(setdiff(fieldnames(inter.chem),{'parts','concs','reactions'}))
+        error('Spinach:create:chemistryField',...
+              'inter.chem accepts only parts, concs, and reactions.');
+    end
+    if isfield(inter.chem,'reactions')&&~isfield(inter.chem,'parts')
+        error('Spinach:create:reactionParts',...
+              'inter.chem.reactions requires explicit inter.chem.parts.');
+    end
+
     % Check chemical species specification
     if isfield(inter.chem,'parts')
 
         % Basic type checks
-        if ~iscell(inter.chem.parts)||(~all(cellfun(@isvector,inter.chem.parts)))
-            error('inter.chem.parts must be a cell array of vectors.');
+        if ~iscell(inter.chem.parts)||isempty(inter.chem.parts)||...
+           ~all(cellfun(@(x)isnumeric(x)&&isreal(x)&&(isvector(x)||isempty(x)),inter.chem.parts))
+            error('inter.chem.parts must be a non-empty cell array of numeric vectors or empty arrays.');
         end
 
         % Chemiscal subsystem specification
@@ -2802,108 +2776,103 @@ if isfield(inter,'chem')
                 error('elements of inter.chem.parts must be vectors of unique positive integers not exceeding the total number of spins.');
             end
 
-            % If rates are given, insist on first order exchange
-            if isfield(inter.chem,'rates')
-                for k=1:numel(inter.chem.parts)
-                    if numel(inter.chem.parts{n})~=numel(inter.chem.parts{k})
-                        error('exchange mode: all chemical subsystems must have the same number of spins.');
-                    end
-                end
-                for k=1:numel(inter.chem.parts)
-                    for m=1:numel(inter.chem.parts{n})
-                        if ~strcmp(sys.isotopes{inter.chem.parts{n}(m)},sys.isotopes{inter.chem.parts{k}(m)})
-                            error('exchange mode: isotope sequences in all chemical subsystems must be the same.');
-                        end
-                    end
-                end
-            end
-
         end
 
-    end
-    
-    % Check reaction rate matrix
-    if isfield(inter.chem,'rates')
-        if (~isnumeric(inter.chem.rates))||(~isreal(inter.chem.rates))||...
-           (size(inter.chem.rates,1)~=size(inter.chem.rates,2))
-            error('inter.chem.rates must be a real square matrix.');
-        end
-        if any(size(inter.chem.rates)~=numel(inter.chem.parts))
-            error('both dimensions of inter.chem.rates matrix must be equal to the number of chemical subsystems.');
-        end
-        if ~all(abs(sum(inter.chem.rates,1))<=10*eps('double')*norm(inter.chem.rates,1))
-            error('inter.chem.rates violates conservation of matter: column sums must be negligible.');
-        end
     end
     
     % Check initial concentrations
     if isfield(inter.chem,'concs')
-        if (~isnumeric(inter.chem.concs))||(~isreal(inter.chem.concs))||any(inter.chem.concs(:)<0)
-            error('inter.chem.concs must be a vector of non-negative real numbers.');
+        if (~isnumeric(inter.chem.concs))||(~isreal(inter.chem.concs))||...
+           (~isvector(inter.chem.concs))||any(~isfinite(inter.chem.concs(:)))||...
+           any(inter.chem.concs(:)<0)
+            error('inter.chem.concs must be a vector of finite non-negative real numbers.');
         end
         if numel(inter.chem.concs)~=numel(inter.chem.parts)
             error('the number of initial concentrations must be equal to the number of chemical species.');
         end
     end
     
-    % Check flux specifications
-    if isfield(inter.chem,'flux_rate')&&(~isfield(inter.chem,'flux_type'))
-        error('flux type (inter.chem.flux_type) must be provided.');
-    elseif isfield(inter.chem,'flux_type')&&(~isfield(inter.chem,'flux_rate'))
-        error('flux rates (inter.chem.flux_rate) must be provided.');
-    end
-    
-    % Check flux rate matrix
-    if isfield(inter.chem,'flux_rate')
-        if (~isnumeric(inter.chem.flux_rate))||(~isreal(inter.chem.flux_rate))||...
-           (size(inter.chem.flux_rate,1)~=size(inter.chem.flux_rate,2))
-            error('inter.chem.flux_rate must be a real square matrix.');
+    if isfield(inter.chem,'reactions')
+        if ~iscell(inter.chem.reactions)||...
+           (~isvector(inter.chem.reactions)&&~isempty(inter.chem.reactions))
+            error('Spinach:create:reactionRecords',...
+                  'inter.chem.reactions must be a cell vector of scalar structures.');
         end
-        if any(size(inter.chem.flux_rate)~=numel(sys.isotopes))
-            error('both dimensions of inter.chem.flux_rate matrix must be equal to the number of spins.');
-        end
-    end
-    
-    % Check flux type
-    if isfield(inter.chem,'flux_type')
-        if ~ischar(inter.chem.flux_type)
-            error('inter.chem.flux_type must be a character string.');
-        end
-        if ~ismember(inter.chem.flux_type,{'intermolecular','intramolecular'})
-            error('incorrect flux type specification.');
-        end
-    end
-    
-    % Check radical pair kinetics
-    if isfield(inter.chem,'rp_theory')
-        if ~ischar(inter.chem.rp_theory)
-            error('inter.chem.rp_theory must be a string.');
-        end
-        if ~ismember(inter.chem.rp_theory,{'haberkorn','jones-hore','exponential'})
-            error('allowed values for inter.chem.rp_theory are ''exponential'', ''haberkorn'' and ''jones-hore''.');
-        end
-        if (~isfield(inter.chem,'rp_electrons'))||(~isfield(inter.chem,'rp_rates'))
-            error('inter.chem.rp_electrons and inter.chem.rp_rates must be specified alongside inter.chem.rp_theory parameter.');
-        end
-    end
-    if isfield(inter.chem,'rp_electrons')
-        if (~isfield(inter.chem,'rp_theory'))||(~isfield(inter.chem,'rp_rates'))
-            error('inter.chem.rp_theory and inter.chem.rp_rates must be specified alongside inter.chem.rp_electrons parameter.');
-        end
-        if (~isnumeric(inter.chem.rp_electrons))||(numel(inter.chem.rp_electrons)~=2)||...
-           any(mod(inter.chem.rp_electrons,1)~=0)||any(inter.chem.rp_electrons<1)
-            error('inter.chem.rp_electrons must be a vector of two positive integers.');
-        end
-        if any(inter.chem.rp_electrons>numel(sys.isotopes))||any(~cellfun(@(x)strcmp(x(1),'E'),sys.isotopes(inter.chem.rp_electrons)))
-            error('at least one of the elements of inter.chem.rp_electrons does not refer to an electron.');
-        end
-    end
-    if isfield(inter.chem,'rp_rates')
-        if (~isfield(inter.chem,'rp_theory'))||(~isfield(inter.chem,'rp_electrons'))
-            error('inter.chem.rp_theory and inter.chem.rp_electrons must be specified alongside inter.chem.rp_rates parameter.');
-        end
-        if (~isnumeric(inter.chem.rp_rates))||(numel(inter.chem.rp_rates)~=2)||(~isreal(inter.chem.rp_rates))||any(inter.chem.rp_rates<0)
-            error('inter.chem.rp_rates must be a vector of two non-negative real numbers.');
+        for n=1:numel(inter.chem.reactions)
+            reaction=inter.chem.reactions{n};
+            if ~isstruct(reaction)||~isscalar(reaction)||...
+               ~all(isfield(reaction,{'reactants','products','matching','rate'}))
+                error('Spinach:create:reactionRecord',...
+                      'each reaction must be a scalar structure with reactants, products, matching, and rate fields.');
+            end
+            if ~isempty(setdiff(fieldnames(reaction),...
+                               {'reactants','products','matching','rate','closure','selector'}))
+                error('Spinach:create:reactionField','unrecognised reaction record field.');
+            end
+            for field={'reactants','products'}
+                indices=reaction.(field{1});
+                if ~isnumeric(indices)||~isreal(indices)||...
+                   (~isrow(indices)&&~isempty(indices))||...
+                   any(~isfinite(indices)|indices<1|indices>numel(inter.chem.parts)|mod(indices,1)~=0)
+                    error('Spinach:create:reactionSubstances',...
+                          'reaction reactants and products must be row vectors of valid substance indices.');
+                end
+            end
+            if isempty(reaction.reactants)
+                error('Spinach:create:reactionReactants','a reaction must have at least one reactant.');
+            end
+            matching=reaction.matching;
+            if ~isnumeric(matching)||~isreal(matching)||~ismatrix(matching)||size(matching,2)~=2||...
+               any(~isfinite(matching)|matching<1|mod(matching,1)~=0,'all')
+                error('Spinach:create:reactionMatching',...
+                      'reaction matching must be a two-column matrix of positive integer spin indices.');
+            end
+            sources=cell2mat(cellfun(@(x)x(:)',inter.chem.parts(reaction.reactants),'UniformOutput',false));
+            destins=cell2mat(cellfun(@(x)x(:)',inter.chem.parts(reaction.products),'UniformOutput',false));
+            if ~all(ismember(matching(:,1),sources))||~all(ismember(matching(:,2),destins))
+                error('Spinach:create:reactionMembership',...
+                      'matching columns must belong to the declared reactants and products.');
+            end
+            if numel(unique(matching(:,1)))~=size(matching,1)||...
+               numel(unique(matching(:,2)))~=size(matching,1)
+                error('Spinach:create:reactionDuplicate','a spin must not be matched twice.');
+            end
+            if ~isequal(sys.isotopes(matching(:,1)),sys.isotopes(matching(:,2)))
+                error('Spinach:create:reactionIsotopes','matched spins must have identical isotopes.');
+            end
+            if ~(isa(reaction.rate,'function_handle')||...
+                 (isnumeric(reaction.rate)&&isreal(reaction.rate)&&isscalar(reaction.rate)&&...
+                  isfinite(reaction.rate)&&reaction.rate>=0))
+                error('Spinach:create:reactionRate',...
+                      'reaction rate must be a finite non-negative scalar or a function handle of time.');
+            end
+            if isfield(reaction,'closure')&&...
+               (~ischar(reaction.closure)||~isrow(reaction.closure)||...
+                ~ismember(reaction.closure,{'additive','product'}))
+                error('Spinach:create:reactionClosure','reaction closure must be additive or product.');
+            end
+            if isfield(reaction,'selector')
+                selector=reaction.selector;
+                if numel(reaction.reactants)~=1||~iscell(selector)||numel(selector)~=2
+                    error('Spinach:create:reactionSelector',...
+                          'a selector must be a two-element cell on a single first-order reactant.');
+                end
+                if ischar(selector{1})
+                    electrons=selector{2};
+                    if ~ismember(selector{1},{'singlet','triplet','jones-hore-singlet','jones-hore-triplet'})||...
+                       ~isnumeric(electrons)||~isreal(electrons)||~isequal(size(electrons),[1 2])||...
+                       any(~ismember(electrons,sources))||numel(unique(electrons))~=2||...
+                       ~all(cellfun(@(x)strncmp(x,'E',1),sys.isotopes(electrons)))
+                        error('Spinach:create:reactionElectrons',...
+                              'named selectors require two distinct electrons within the reactant substance.');
+                    end
+                elseif ~all(cellfun(@(x)isnumeric(x)&&ismatrix(x)&&...
+                                    size(x,1)==size(x,2)&&~isempty(x)&&all(isfinite(x),'all'),selector))||...
+                       ~isequal(size(selector{1}),size(selector{2}))
+                    error('Spinach:create:reactionSelectorPair',...
+                          'user selectors must be two finite square product superoperators of equal size.');
+                end
+            end
         end
     end
     

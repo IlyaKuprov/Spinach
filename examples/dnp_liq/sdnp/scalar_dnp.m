@@ -33,7 +33,7 @@ inter.coupling.scalar{1,2}=2e6;  % Hz
 
 % Formalism and approximation
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theories
 inter.relaxation={'SRFK','redfield','t1_t2'};

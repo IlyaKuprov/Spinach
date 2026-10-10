@@ -71,9 +71,10 @@ inter.coupling.euler{2,3}=[0 0 0];
 inter.coupling.euler{2,4}=[pi/5 pi/3 pi/7];
 
 % Haberkorn recombination, singlet channel only
-inter.chem.rp_theory='haberkorn';
-inter.chem.rp_electrons=[1 2];
-inter.chem.rp_rates=[k_rec 0];
+inter.chem.parts={1:4};
+inter.chem.reactions={struct('reactants',1,'products',[],...
+                            'matching',zeros(0,2),'rate',k_rec,...
+                            'selector',{{'singlet',[1 2]}})};
 
 % Relaxation theory settings
 inter.relaxation={theory};
@@ -82,15 +83,15 @@ inter.rlx_keep='labframe';
 inter.rlx_dfs='keep';
 inter.tau_c={tau_c};
 
-% Scalar lifetime shift from the declared kinetics
+% Explicit Haberkorn scalar approximation (half the summed rates)
 if strcmp(theory,'naka-zwan')
-    inter.nz_shift='chem';
+    inter.nz_shift=k_rec/2;
     inter.nz_onshell=false;
 end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

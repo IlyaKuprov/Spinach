@@ -37,7 +37,7 @@ inter.coordinates{2}=props.std_geom(4,:);
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination, with optional GPU arithmetic
 sys.enable={'zte'};
@@ -52,7 +52,7 @@ spin_system=basis(spin_system,bas);
 parameters.rate=10000;
 parameters.axis=[1 1 1];
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.spins={'1H'};
 parameters.decouple={};
 parameters.sweep=120000;

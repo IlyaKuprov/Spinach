@@ -21,7 +21,7 @@ sys.parallel={'processes',2};
 inter.zeeman.scalar={1 2}; inter.zeeman.eigs={[0 10 20],[0 0 0]};
 inter.zeeman.euler={[0 0 0],[0 0 0]};
 inter.coupling.scalar={0 100;100 0};
-bas.approximation='none';
+bas.approximation={'none'};
 parameters.axis=[1 1 1]; parameters.grid='leb_2ang_rank_5';
 parameters.spins={'1H'}; parameters.offset=0;
 parameters.pulse_dur=1e-4; parameters.pulse_frq=2500;

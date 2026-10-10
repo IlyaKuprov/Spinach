@@ -17,6 +17,10 @@ Builds a relaxation superoperator by accumulating the terms selected in `spin_sy
 
 The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no spin theory is selected and no dissipative mode term is present, the result is set to zero.
 
+Retention by longitudinal order or base frequency uses each substance’s local descriptor. Diagonal retention and uniform damping exempt the unit coordinate of every block separately.
+
+Nottingham's four-level electron manifold is implemented for a single substance with exactly two electrons. `relaxation` rejects every segmented Nottingham descriptor with `Spinach:relaxation:nottinghamSubstance`, including separate two-electron substances; nucleus-only, spin-free, and split-electron partners are not assigned partial models. The existing `create` restriction of two electrons overall is unchanged.
+
 ## Parameters / inputs
 
 - `spin_system` — Spinach system containing the selected relaxation theories and their parameters.
@@ -32,3 +36,11 @@ The function header does not state units for the relaxation-rate or correlation-
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/relaxation.m)
 - [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=relaxation.m)
+
+SRSK normalised source vectors use unweighted `coil_state`, so zero concentration never makes their norm vanish. Diagonal retention and uniform damping use geometric units independent of concentration. IME requests unit-concentration equilibrium shapes before adding unit-column sources; propagated populations provide the concentration weighting.
+
+Normalised SRSK vectors explicitly request the `exact` method of the four-argument unweighted `coil_state` primitive.
+
+## Explicit NZ evaluation point
+
+`inter.nz_shift` must be an explicit finite scalar with non-negative real part. The former `'chem'` request is rejected by `create`: a general reaction network does not specify a unique scalar lifetime. For a legacy exponential radical-pair model use the summed channel rates; for the legacy Haberkorn/Jones–Hore scalar approximation use half their sum, stating that approximation explicitly in the example. `relaxation` uses the supplied scalar without reading retired radical-pair fields.

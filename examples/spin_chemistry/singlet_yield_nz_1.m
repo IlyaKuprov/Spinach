@@ -84,9 +84,9 @@ inter.coupling.euler{1,3}=[0 0 0];
 inter.coupling.euler{1,4}=[pi/7 pi/5 pi/3];
 
 % Exponential cage recombination kinetics
-inter.chem.rp_theory='exponential';
-inter.chem.rp_electrons=[1 2];
-inter.chem.rp_rates=[k_cage/2 k_cage/2];
+inter.chem.parts={1:4};
+inter.chem.reactions={struct('reactants',1,'products',[],...
+                            'matching',zeros(0,2),'rate',k_cage)};
 
 % Relaxation theory settings
 inter.relaxation={theory};
@@ -95,15 +95,15 @@ inter.rlx_keep='labframe';
 inter.rlx_dfs='keep';
 inter.tau_c={tau_c};
 
-% Lifetime shift from the declared kinetics
+% Explicit exponential lifetime shift (sum of the channel rates)
 if strcmp(theory,'naka-zwan')
-    inter.nz_shift='chem';
+    inter.nz_shift=k_cage;
     inter.nz_onshell=false;
 end
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

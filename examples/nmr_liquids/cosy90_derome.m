@@ -21,7 +21,7 @@ inter.coupling.scalar{3,3}=0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};

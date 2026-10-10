@@ -54,3 +54,5 @@ result = test_dynamic_integrity_includes_mex_suite()
 ## References
 
 - [Spinach GitHub repository — test_dynamic_integrity_includes_mex_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_integrity_includes_mex_suite.m)
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.

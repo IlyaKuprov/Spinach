@@ -25,7 +25,7 @@ inter.coordinates={[ 0.00 0.00 0.00]
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
                
 
 % Spinach housekeeping
@@ -34,7 +34,7 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil_prob=state(spin_system,{'L-'},{1});
+parameters.coil_prob=coil_state(spin_system,{'L-'},{1},'exact');
 parameters.stepsize=1e-8;
 parameters.nsteps=100;
 parameters.spins={'E'};

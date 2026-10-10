@@ -15,7 +15,7 @@ inter.zeeman.euler={[0 0 0],[0 0 0]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 
 % Enable zero track elimination
@@ -35,7 +35,7 @@ parameters.npoints=512;
 parameters.zerofill=4096;
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 parameters.verbose=0;
 
 % Simulation

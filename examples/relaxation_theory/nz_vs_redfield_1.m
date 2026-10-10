@@ -36,7 +36,7 @@ inter.rlx_dfs='keep';
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Redfield superoperator
 inter_rf=inter; inter_rf.relaxation={'redfield'}; inter_rf.tau_c={200e-12};

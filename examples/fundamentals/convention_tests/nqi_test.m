@@ -17,7 +17,7 @@ sys.magnet=0;
 sys.isotopes={'14N'};
 inter.coupling.matrix={Q/(2*pi)};
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 

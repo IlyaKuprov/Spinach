@@ -15,7 +15,7 @@ inter.zeeman.scalar={1.5};
 
 % Complete basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
                
 % Relaxation theory
 inter.relaxation={'t1_t2'};
@@ -36,7 +36,7 @@ spin_system=basis(spin_system,bas);
 rho=state(spin_system,'E','1H');
 
 % Detection state
-coil=state(spin_system,'Lz','1H');
+coil=coil_state(spin_system,'Lz','1H','exact');
 
 % Static Hamiltonian superoperator
 H=hamiltonian(assume(spin_system,'nmr'));

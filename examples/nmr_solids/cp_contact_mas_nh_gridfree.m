@@ -23,7 +23,7 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Optional GPU arithmetic
 
@@ -49,7 +49,7 @@ parameters.irr_powers=[5e4*ones(1,100);
 parameters.irr_opers={Hy Nx};
 parameters.exc_opers={Hx Ny};
 parameters.needs={'iso_eq'};
-parameters.coil=state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.time_steps=1e-5*ones(1,100);
 
 % Simulation

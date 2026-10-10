@@ -18,7 +18,7 @@ inter.coordinates={[0.00 0.00 0.00]
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.disable={'trajlevel'};
@@ -36,7 +36,7 @@ parameters.max_rank=9;
 parameters.grid='leb_2ang_rank_23';
 parameters.ncycles=0:48;
 parameters.rho0=state(spin_system,'Lx','13C');
-parameters.coil=state(spin_system,'Lx','13C');
+parameters.coil=coil_state(spin_system,'Lx','13C','exact');
 parameters.verbose=0;
 
 % Simulation

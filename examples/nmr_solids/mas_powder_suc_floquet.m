@@ -16,9 +16,9 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
+bas.approximation={'IK-0'};
 bas.projections={+1};
-bas.inter_level=3;
+bas.inter_level={3};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
@@ -45,7 +45,7 @@ parameters.axis_units='Hz';
 parameters.invert_axis=1;
 parameters.grid='leb_2ang_rank_23';
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.verbose=1;
 
 %% Simulation

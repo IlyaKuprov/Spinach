@@ -9,11 +9,20 @@
 
 The routine moves the inputs to the adjoint representation when needed, forms `L=H+1i*R+1i*K`, and obtains subspaces selected for the coil. In each subspace it projects the initial state, coil, and Liouvillian, then evaluates and sums the coil response at each frequency `omega` by solving the shifted Liouvillian system with right-hand side `rho0_subs` and pairing the result with `coil_subs`.
 
+## Identity directions and reaction coupling
+
+In Liouville space, concentration-independent unit vectors identify each substance's identity sector. Spatial contexts supply `parameters.spc_dim`; identities are then embedded in every coordinate of the space-times-spin basis. After subspace projection and normalisation, both directions of coupling between identity and spin order are checked against `spin_system.tols.liouv_zero`.
+
+Only a decoupled identity sector is removed from the initial and detection states and shifted by `-1i*U*U'` in the Liouvillian (one inverse second). This lifts stationary identity poles without changing the spin-order resolvent. If either coupling is nonzero beyond the tolerance, as can occur for selective reactions, the original states and Liouvillian are retained. This is not a general treatment of singular spin-order modes: the relaxation requirement still applies, and coupled stationary modes are not regularised.
+
+Wavefunction inputs do not have a Liouville identity sector and bypass unit-state construction. Hilbert-space density-matrix inputs are converted by `sim2liouv` before this treatment.
+
 ## Frequency and output axes
 
 - `parameters.sweep` is a two-element frequency interval in Hz.
 - `parameters.npoints` sets the number of points. The code forms `2*pi*linspace(sweep(1),sweep(2),npoints)'`, so the interval is converted to angular frequency for the resolvent.
 - The returned `spectrum` is a complex column vector with `npoints` entries, one per equally spaced requested frequency. No time axis or FID is returned.
+- At least two frequency points are required. Multiplication by `abs(diff(sweep))*npoints/(npoints-1)` matches the unnormalised FFT amplitude convention.
 
 ## Inputs and relaxation condition
 

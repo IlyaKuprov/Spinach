@@ -43,7 +43,7 @@ if ~exist('spins','var'), spins='all'; end
 grumble(spin_system,rho,orders,spins)
 
 % Store dimension statistics
-spn_dim=size(spin_system.bas.basis,1);
+spn_dim=spin_system.bas.offsets(end);
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     spn_dim=spn_dim^2;
 end
@@ -68,10 +68,15 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
 
         % Compute the order of correlation for each basis state
-        orders_present=sum(logical(spin_system.bas.basis(:,spins)),2);
+        orders_present=zeros(spn_dim,1);
+        for n=1:spin_system.bas.nsubst
+            local_spins=ismember(spin_system.chem.parts{n},spins);
+            idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
+            orders_present(idx)=sum(logical(spin_system.bas.basis{n}(:,local_spins)),2);
+        end
 
         % Wipe all correlation orders except those specified by the user
-        state_mask=false(size(spin_system.bas.basis,1),1);
+        state_mask=false(spin_system.bas.offsets(end),1);
         for n=orders
             state_mask=state_mask|(orders_present==n);
         end
@@ -135,6 +140,18 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,correlation_orders,spins)
+if isfield(spin_system.bas,'basis')&&~iscell(spin_system.bas.basis)
+    error('Spinach:basis:retiredGlobalBasis',...
+          'the global bas.basis matrix is retired; use bas.basis{n} and bas.offsets from basis().');
+end
+if isfield(spin_system.bas,'irrep')
+    error('Spinach:basis:retiredIrrep',...
+          'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
+end
+if (~strcmp(spin_system.bas.formalism,'sphten-liouv'))&&(spin_system.bas.nsubst>1)
+    error('Spinach:correlation:segmentedZeeman',...
+          'multi-substance Zeeman correlation filtering is not yet supported.');
+end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
     error('analytical correlation order selection is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end

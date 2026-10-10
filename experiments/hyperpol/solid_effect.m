@@ -47,7 +47,8 @@
 %                 ted using the coil states specified.
 %
 % Note: this function generates its own Liouvillian and should be 
-%       called directly, without a context wrapper.
+%       called directly, without a context wrapper. Steady-state
+%       calculations require a single substance.
 %
 % ilya.kuprov@weizmann.ac.il
 % alexander.karabanov@nottingham.ac.uk
@@ -102,7 +103,7 @@ else
     % Set detection states to Lz on every spin
     coils=cell(1,spin_system.comp.nspins);
     for n=1:spin_system.comp.nspins              
-        coils{n}=state(spin_system,{'Lz'},{n});        
+        coils{n}=coil_state(spin_system,{'Lz'},{n},'exact');        
     end
     coils=cell2mat(coils);
     
@@ -182,6 +183,10 @@ if ~ischar(parameters.calc_type)
 end
 if ~ismember(parameters.calc_type,{'time_dependence','steady_state','trajectory'})
     error('incorrect parameters.calc_type specification, see the function header.');
+end
+if strcmp(parameters.calc_type,'steady_state')&&spin_system.bas.nsubst>1
+    error('Spinach:solid_effect:segmentedSubstances',...
+          'steady-state solid-effect calculations require a single substance.');
 end
 if ~isfield(parameters,'nuclear_frq')
     error('nuclear frequency should be specified in parameters.nuclear_frq variable.');

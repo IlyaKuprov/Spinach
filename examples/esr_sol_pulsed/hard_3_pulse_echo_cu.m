@@ -19,7 +19,7 @@ inter.coordinates={[0 0 0]; [20 0 0]};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Disable trajectory level SSR algorithms
 sys.disable={'trajlevel'};
@@ -31,7 +31,7 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.ex_prob=(operator(spin_system,{'L+'},{1})+...
                     operator(spin_system,{'L-'},{1}))/2;
 parameters.ex_pump=(operator(spin_system,{'L+'},{2})+...

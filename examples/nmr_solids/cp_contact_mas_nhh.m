@@ -31,8 +31,8 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=3;
+bas.approximation={'IK-0'};
+bas.inter_level={3};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
@@ -60,7 +60,7 @@ parameters.spins={'1H','15N'};
 parameters.irr_opers={Hy Nx};
 parameters.exc_opers={Hx Ny};
 parameters.needs={'iso_eq'};
-parameters.coil=state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.time_steps=1e-5*ones(1,100);
 parameters.grid='rep_2ang_100pts_sph';
 

@@ -32,7 +32,7 @@ inter.zeeman.scalar={0.0};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic switches
 sys.disable={'trajlevel'};
@@ -49,7 +49,7 @@ parameters.rho0_st{1}=state(spin_system,'Lz','1H');
 
 % Detection state: Lz in all cells
 parameters.coil_ph{1}=ones(spin_system.mesh.vor.ncells,1);
-parameters.coil_st{1}=state(spin_system,'Lz','1H');
+parameters.coil_st{1}=coil_state(spin_system,'Lz','1H','exact');
 
 % Sequence and timing parameters
 parameters.spins={'1H'};
@@ -83,7 +83,7 @@ parameters.K_ph={drainage};
 traj=meshflow(spin_system,@simple_flow,parameters);
 
 % Extract the observable quantity
-coil=state(spin_system,'Lz','1H');
+coil=coil_state(spin_system,'Lz','1H','exact');
 traj=fpl2phan(traj(:),coil,[2659 parameters.npoints]);
 
 % Make a figure

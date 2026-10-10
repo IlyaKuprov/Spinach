@@ -31,8 +31,8 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=4;
+bas.approximation={'IK-0'};
+bas.inter_level={4};
 
 % This needs a GPU
 sys.enable={'greedy'}; % 'gpu'
@@ -48,7 +48,7 @@ parameters.irr_opers={operator(spin_system,'Ly','1H') ...
                       operator(spin_system,'Lx','15N')};
 parameters.exc_opers={operator(spin_system,'Lx','1H') ...
                       operator(spin_system,'Ly','15N')};
-parameters.coil=state(spin_system,'Lx','15N');
+parameters.coil=coil_state(spin_system,'Lx','15N','exact');
 parameters.grid='rep_2ang_100pts_sph';
 parameters.time_steps=1e-5*ones(1,100);
 parameters.needs={'aniso_eq'};

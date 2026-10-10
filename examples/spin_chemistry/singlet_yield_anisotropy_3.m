@@ -17,8 +17,8 @@ sys.isotopes={'E','E','14N','14N','1H','1H','1H'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.inter_level=5;
+bas.approximation={'IK-0'};
+bas.inter_level={5};
 
 % Hyperfine coupling tensors
 inter.coupling.matrix=cell(7);
@@ -42,9 +42,12 @@ inter.coupling.matrix{2,7}=mt2hz([-0.9920 -0.2091 -0.2003;
 inter.zeeman.scalar={2.0023 2.0025 0 0 0 0 0};
 
 % Kinetics parameters
-inter.chem.rp_theory='haberkorn';
-inter.chem.rp_electrons=[1 2];
-inter.chem.rp_rates=[1e6 1e6];
+inter.chem.parts={1:7};
+inter.chem.reactions={...
+    struct('reactants',1,'products',[],'matching',zeros(0,2),'rate',1e6,...
+           'selector',{{'singlet',[1 2]}}),...
+    struct('reactants',1,'products',[],'matching',zeros(0,2),'rate',1e6,...
+           'selector',{{'triplet',[1 2]}})};
 
 % Sequence parameters
 parameters.grid='leb_1ang_rank_63';

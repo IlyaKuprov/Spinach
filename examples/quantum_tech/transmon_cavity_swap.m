@@ -23,7 +23,7 @@ inter.modes.exchange{1,2}=20e6;
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -38,8 +38,8 @@ parameters.npoints=301;
 traj=device(spin_system,@traject,parameters,'cavity');
 
 % Project out the transmon and cavity excitation populations
-coil_t=state(spin_system,{'BL2','E'},{1,2});
-coil_c=state(spin_system,{'E','BL2'},{1,2});
+coil_t=coil_state(spin_system,{'BL2','E'},{1,2},'exact');
+coil_c=coil_state(spin_system,{'E','BL2'},{1,2},'exact');
 pop_t=cellfun(@(rho)full(hdot(coil_t,rho)),traj);
 pop_c=cellfun(@(rho)full(hdot(coil_c,rho)),traj);
 

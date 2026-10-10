@@ -37,9 +37,9 @@ inter.temperature=298;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
-bas.sym_group={'S3'};
-bas.sym_spins={[1 2 3]};
+bas.approximation={'none'};
+bas.sym_group={{'S3'}};
+bas.sym_spins={{[1 2 3]}};
 
 % Sequence parameters
 parameters.sweep=700;

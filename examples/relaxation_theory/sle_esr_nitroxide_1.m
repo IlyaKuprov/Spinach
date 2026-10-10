@@ -19,7 +19,7 @@ sys.tols.prox_cutoff=4.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -32,7 +32,7 @@ spin_system=basis(spin_system,bas);
 parameters.max_rank=10;
 parameters.tau_c=5e-11;
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.spins={'E'};
 parameters.sweep=[-3e8 -1e8];
@@ -63,7 +63,7 @@ spin_system=basis(spin_system,bas);
 % BRW parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.sweep=[-3e8 -1e8];
 parameters.npoints=1024;
 parameters.zerofill=1024;

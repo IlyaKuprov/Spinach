@@ -32,7 +32,7 @@ inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.temperature=298;
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Build relaxation superoperator and transverse state

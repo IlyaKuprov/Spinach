@@ -62,41 +62,38 @@ grumble(spin_system,trajectory_1,trajectory_2,scorefcn);
 % Run state grouping
 if strncmp(scorefcn,'SG-',3)||strncmp(scorefcn,'BSG',3)
     
-    % Grab the description of the current basis
-    state_list=spin_system.bas.basis;
-    
-    % Tell the user we're started
+    % Report the grouping operation
     report(spin_system,'collapsing equivalent subspaces...');
-    
-    % Decide how to proceed
-    if strncmp(scorefcn,'SG-',3)
+
+    % Group local descriptors without identifying different substances
+    index_backward=zeros(spin_system.bas.offsets(end),1); group_count=0;
+    for s=1:spin_system.bas.nsubst
         
-        % Rename all T(l,-m) states into T(l,m) states
-        [L,M]=lin2lm(state_list); state_list=lm2lin(L,abs(M));
-        
-        % Update the method variable
-        scorefcn=scorefcn(4:end);
-        
-    elseif strncmp(scorefcn,'BSG',3)
-        
-        % Rename all non-identity states into Lz
-        state_list(state_list~=0)=2;
-        
-        % Update the method variable
-        scorefcn=scorefcn(5:end);
-        
+        % Apply the requested equivalence within this substance
+        state_list=spin_system.bas.basis{s};
+        if strncmp(scorefcn,'SG-',3)
+            [L,M]=lin2lm(state_list); state_list=lm2lin(L,abs(M));
+        else
+            state_list(state_list~=0)=2;
+        end
+
+        % Offset the local groups into the direct sum
+        [~,index_forward,local_groups]=unique(state_list,'rows');
+        rows=spin_system.bas.offsets(s)+(1:spin_system.bas.nstates(s));
+        index_backward(rows)=group_count+local_groups;
+        group_count=group_count+numel(index_forward);
     end
-    
-    % Index all unique and repeated states on the modified state list
-    [grouped_state_list,index_forward,index_backward]=unique(state_list,'rows');
-    
+
+    % Remove the state-grouping prefix
+    if strncmp(scorefcn,'SG-',3), scorefcn=scorefcn(4:end);
+    else, scorefcn=scorefcn(5:end); end
+
     % Preallocate state-grouped trajectories
-    grouped_trajectory_1=zeros(length(index_forward),size(trajectory_1,2));
-    grouped_trajectory_2=zeros(length(index_forward),size(trajectory_2,2));
+    grouped_trajectory_1=zeros(group_count,size(trajectory_1,2));
+    grouped_trajectory_2=zeros(group_count,size(trajectory_2,2));
     
-    % Group trajectory tracks corresponding to the states that are
-    % flagged as identical in the indices (root-sum-square)
-    for n=1:length(index_forward)
+    % Combine equivalent tracks by their root-sum-square
+    for n=1:group_count
         grouped_trajectory_1(n,:)=sqrt(sum(abs(trajectory_1(index_backward==n,:)).^2,1));
         grouped_trajectory_2(n,:)=sqrt(sum(abs(trajectory_2(index_backward==n,:)).^2,1));
     end
@@ -106,7 +103,7 @@ if strncmp(scorefcn,'SG-',3)||strncmp(scorefcn,'BSG',3)
     trajectory_2=grouped_trajectory_2;
     
     % Tell the user we're done
-    report(spin_system,[num2str(size(state_list,1)) ' states collected into ' num2str(size(grouped_state_list,1)) ' groups.']);
+    report(spin_system,[num2str(spin_system.bas.offsets(end)) ' states collected into ' num2str(group_count) ' groups.']);
     
 end
 
@@ -155,8 +152,8 @@ end
 if any(size(trajectory_1)~=size(trajectory_2))
     error('matrix dimensions of the two trajectories should match.');
 end
-if (size(trajectory_1,1)~=size(spin_system.bas.basis,1))||...
-   (size(trajectory_2,1)~=size(spin_system.bas.basis,1))
+if (size(trajectory_1,1)~=spin_system.bas.offsets(end))||...
+   (size(trajectory_2,1)~=spin_system.bas.offsets(end))
     error('trajectory dimension should be equal to the basis set dimension.');
 end
 if (~isnumeric(trajectory_1))||(~isnumeric(trajectory_2))

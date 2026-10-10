@@ -21,7 +21,7 @@ sys.magnet=0.33;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.projections={+1};
 bas.longitudinal={{'1H'}};
 
@@ -41,7 +41,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'L+','E');
-parameters.coil=state(spin_system,'L+','E');
+parameters.coil=coil_state(spin_system,'L+','E','exact');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=5e8;

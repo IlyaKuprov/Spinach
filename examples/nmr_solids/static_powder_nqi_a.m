@@ -18,7 +18,7 @@ inter.coupling.matrix{2,2}=eeqq2nqi(3.06e6,0.40,1,[0 0 0]);
 
 % Basis set
 bas.formalism='zeeman-hilb';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -35,7 +35,7 @@ parameters.axis_units='MHz';
 parameters.invert_axis=1;
 parameters.grid='icos_2ang_163842pts';
 parameters.rho0=state(spin_system,'L+','14N');
-parameters.coil=state(spin_system,'L+','14N');
+parameters.coil=coil_state(spin_system,'L+','14N','exact');
 parameters.verbose=0;
 
 % Simulation

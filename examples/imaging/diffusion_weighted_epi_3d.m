@@ -32,7 +32,7 @@ sys.enable={'zte','greedy'}; % 'gpu'
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -87,7 +87,7 @@ parameters.rlx_ph={R1_Ph,R2_Ph};
 parameters.rho0_ph={PD_Ph};
 parameters.rho0_st={state(spin_system,'Lz','1H')};
 parameters.coil_ph={ones(prod(parameters.npts,1))};
-parameters.coil_st={state(spin_system,'L+','1H')};
+parameters.coil_st={coil_state(spin_system,'L+','1H','exact')};
 
 % 3D diffusion tensor field
 parameters.dxx=2e-5*ones(parameters.npts);

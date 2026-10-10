@@ -18,9 +18,9 @@ sys.disable={'krylov'};
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -54,7 +54,7 @@ mixing_time=[0.01; 0.1; 0.5; 1; 5; 10]; % s
 parameters.rho_eq=equilibrium(spin_system);
 
 % Detection state
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Rotating frame Liouvillian
 L=hamiltonian(assume(spin_system,'nmr'))+...

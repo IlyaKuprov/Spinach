@@ -44,7 +44,7 @@ parameters.mqorder=[+6 -1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Algorithmic options
 sys.enable={'zte','greedy'};
@@ -55,7 +55,7 @@ spin_system=basis(spin_system,bas);
 
 % Initial and detection states
 parameters.rho0=state(spin_system,'Lz','1H');
-parameters.coil=state(spin_system,'L+','1H');
+parameters.coil=coil_state(spin_system,'L+','1H','exact');
 
 % Sequence parameters
 parameters.angle=pi/2;

@@ -19,9 +19,9 @@ Keeps the requested spin-correlation orders and zeros the other components in th
 
 ## How the selection is applied
 
-The code takes the basis-row count as the spin-space dimension, squares it for `zeeman-hilb`, and treats the remaining flattened columns as the space dimension. It reshapes `rho` for filtering and restores its original dimensions afterward.
+The code takes `bas.offsets(end)` as the spin-space dimension, squares it for `zeeman-hilb`, and treats the remaining flattened columns as the space dimension. It reshapes `rho` for filtering and restores its original dimensions afterward.
 
-For `sphten-liouv`, the routine counts nonzero entries in the basis columns belonging to the selected spins. It retains basis rows whose selected-spin correlation order is requested and zeros all other rows across the input columns.
+For `sphten-liouv`, the routine counts nonzero entries in each local descriptor’s columns belonging to the selected global spins, mapped through `chem.parts{n}`. The resulting masks are placed at `bas.offsets(n)`. It retains basis rows whose selected-spin correlation order is requested and zeros all other rows across the input columns.
 
 For `zeeman-liouv` and `zeeman-hilb`, it builds sparse identity-component channels for the selected spins, samples the generating operation at roots of unity, and combines the samples with discrete Fourier weights for the requested orders from zero through the number of selected spins. In Hilbert formalism the density matrix is processed through the corresponding squared spin-space dimension; the code restores the original input shape. The header notes that correlation order is not diagonal in the Zeeman basis and describes the Hilbert-space density-matrix handling as a Liouville-space stretch/filter/fold operation; the executable path performs the reshape and projection directly.
 
@@ -34,3 +34,7 @@ Correlation orders and numeric spin selectors are integer indices; no physical u
 ## Signature clarification
 
 The header names the third argument `correlation_orders`; the executable declaration calls it `orders`. This is a parameter-name clarification only.
+
+Multi-substance Zeeman filtering is unsupported and raises `Spinach:correlation:segmentedZeeman` before constructing a tensor-product channel or applying a diagonal mask. Single-substance Zeeman and segmented spherical-tensor paths remain available.
+
+Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.

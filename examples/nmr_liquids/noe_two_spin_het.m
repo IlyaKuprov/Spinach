@@ -18,7 +18,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -45,8 +45,8 @@ Lz1=state(spin_system,{'Lz'},{1});
 rho=rho_eq-2*Lz1*(Lz1'*rho_eq)/norm(Lz1)^2;
 
 % Compute the evolution trajectory
-coil=[state(spin_system,{'Lz'},{1})...
-      state(spin_system,{'Lz'},{2})];
+coil=[coil_state(spin_system,{'Lz'},{1},'exact')...
+      coil_state(spin_system,{'Lz'},{2},'exact')];
 answer=evolution(spin_system,1i*R,coil,rho,1e-2,400,'multichannel');
 
 % Plot the longitudinal magnetization

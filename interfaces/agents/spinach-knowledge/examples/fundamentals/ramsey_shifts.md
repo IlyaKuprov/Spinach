@@ -18,3 +18,5 @@ where w_n is the signed Zeeman frequency, w_c the signed carrier frequency, and 
 The script forms the transverse states of 13C and 15N in a 1H/13C/15N system and propagates their normalised sum for 20 ms under a constant proton drive. The off-resonant nuclei are not driven directly. A Ramsey/Bloch–Siegert correction is enabled for the proton-channel control, and the final accumulated phases are compared with the analytic shifts using the signed base frequencies and magnetogyric ratios.
 
 At 14.1 T and a drive amplitude of 2π·25 kHz, the example checks each numerical phase against its analytic value with relative tolerance 10^-6 and checks that the 15N and 13C phases have opposite signs. It then doubles the amplitude and requires the 13C phase ratio to be 4 (quadratic drive-amplitude scaling), and halves the field and requires a ratio of 2 (inverse-field scaling), each within 10^-5.
+
+The zero drift uses the compiled state-space dimension `bas.offsets(end)`, matching the state and control-operator dimensions.

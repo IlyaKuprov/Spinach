@@ -287,6 +287,16 @@ they build their own generators.
 `cp_contact_hard`, `cp_contact_soft`, `relaxan`, `eqmag`, `fieldsweep`,
 `fieldscan_enlev`, `fieldscan_magn`, `rapidscan`.
 
+`slowpass` takes a two-element `sweep` interval in Hz, `npoints>=2`,
+`rho0`, and `coil`, and returns the FFT-normalised frequency-domain response.
+Relaxation is required and must not be thermalised. Liouville identity
+components are excluded only when their sector is decoupled from spin order
+in both directions within `tols.liouv_zero`; that sector is shifted to lift
+stationary poles, while the spin-order block is unchanged. Spatial contexts
+supply `spc_dim` for identity embedding. Selective-reaction coupling retains
+the original resolvent; wavefunction inputs bypass identity removal. This
+does not regularise other undamped or coupled stationary modes.
+
 `acquire` takes `sweep` (Hz), `npoints`, `rho0`, `coil`, `decouple` (e.g.
 `{'15N','13C'}`), and optionally `homodec_oper` with `homodec_pwr` (Hz) and
 `dead_time` (seconds). `hp_acquire` adds `pulse_op` and `pulse_angle`

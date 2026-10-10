@@ -28,3 +28,5 @@ The function takes no inputs.
 ## References
 
 - Source: [tests/kernel/test_tensor_vector_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_tensor_vector_suite.m)
+
+The synthetic compiled fixtures use per-substance descriptor cells and offsets.

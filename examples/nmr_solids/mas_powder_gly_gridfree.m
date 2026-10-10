@@ -17,7 +17,7 @@ sys.magnet=14.1;
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='none';
+bas.approximation={'none'};
 bas.longitudinal={{'15N'}};
 bas.projections={+1};
 
@@ -45,7 +45,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=state(spin_system,'L+','13C');
+parameters.coil=coil_state(spin_system,'L+','13C','exact');
 parameters.verbose=0;
 
 % Simulation

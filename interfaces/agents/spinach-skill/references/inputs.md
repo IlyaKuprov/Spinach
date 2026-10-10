@@ -233,29 +233,37 @@ convention with `stev2sph(k,Bkq)`.
 ## Chemistry and kinetics
 
 ```matlab
-inter.chem.parts={1,2};                        % spin index sets per species
-inter.chem.rates=[-2e4   2e4
-                   2e4  -2e4];                 % Hz, columns sum to zero
+inter.chem.parts={1,2};                        % one spin per species
 inter.chem.concs=[1.0 1.0];
+inter.chem.reactions={struct('reactants',1,'products',2,...
+                            'matching',[1 2],'rate',2e4),...
+                      struct('reactants',2,'products',1,...
+                            'matching',[2 1],'rate',2e4)};
 ```
 
-- `parts` — cell array of index vectors, one per chemical subsystem, disjoint
-  and within the spin count. The default is one subsystem containing everything.
-- `concs` — initial concentrations, one per subsystem, non-negative; mandatory
-  as soon as there is more than one subsystem.
-- `rates` — square first-order rate matrix in hertz, one row and column per
-  subsystem, column sums negligible (conservation of matter is checked). In
-  exchange mode all subsystems must have the same number of spins and identical
-  isotope sequences, so that spin *k* of species A maps onto spin *k* of B.
-- `flux_rate` and `flux_type` — magnetisation flux between individual spins;
-  an `nspins x nspins` real matrix and either `'intermolecular'` or
-  `'intramolecular'`. Both must be supplied together.
-- `rp_theory`, `rp_electrons`, `rp_rates` — radical pair recombination:
-  `'haberkorn'`, `'jones-hore'` or `'exponential'`; the two recombining
-  electron indices; and `[singlet_rate triplet_rate]` in hertz. All three
-  fields must appear together.
+- `parts` — cell array of numeric index vectors, one per chemical subsystem,
+  disjoint and within the spin count; an empty entry denotes a spin-free substance.
+  Reaction-bearing inputs require explicit parts; otherwise the default is one
+  subsystem containing everything.
+- `concs` — non-negative initial concentrations, one per subsystem; required
+  for multiple substances. Propagated unit coordinates carry subsequent
+  concentrations. `state` weights each block by its initial concentration;
+  `coil_state(...,'exact')` constructs unweighted detection vectors.
+- `reactions` — cell array of scalar records with row-vector `reactants` and
+  `products`, two-column global-spin `matching`, and non-negative scalar or
+  time-dependent `rate`. First-order rates are in inverse seconds; order-m rates
+  use concentration^(1-m)/s. Matched spins must have identical isotopes. Empty
+  products denote untracked loss; repeated substance indices give stoichiometry.
+  Unmatched source spins are traced out and new product spins arrive unpolarised.
+- `closure` — per-record `additive` default, or `product` to retain cross-reactant
+  polarisation products. Higher-order rates multiply the other reactant
+  concentrations in the instantaneous state; their units depend on reaction order.
+- `selector` — optional named singlet/triplet channel (including Jones–Hore
+  variants) and two electron indices on a single reactant, or a pair of local
+  left/right projector matrices. See the selective-loss recipe in relaxation.md.
 
-Any chemistry at all forces `bas.formalism='sphten-liouv'`.
+Spin replacement uses explicit matching records, not a flux matrix.
+Legacy rates, flux, and radical-pair fields are rejected. Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
@@ -278,10 +286,22 @@ Relaxation enters through `inter.relaxation`, `inter.rlx_keep`,
 
 ```matlab
 bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.connectivity='scalar_couplings';
-bas.prox_level=3;
+bas.approximation={'IK-2'};
+bas.connectivity={'scalar_couplings'};
+bas.prox_level={3};
 ```
+
+Every field except `formalism` is a cell with exactly one entry per chemical
+substance, even when there is only one. The table gives the contents of each
+entry (the filter rows already describe the outer cell). There is no scalar
+broadcast. `manual{n}` has local spin columns; `sym_spins{n}` is a cell of local
+spin-index vectors. Numeric longitudinal and zero-quantum filter labels remain
+global. Empty depth/connectivity entries are used where the local approximation
+does not need that setting. The compiled descriptors are `bas.basis{n}`, with
+unit rows first and `bas.offsets` delimiting the direct-sum blocks.
+Coherence, correlation, homospoil, and decoupling selections retain global
+spin labels at their interface; they map those labels into each substance’s
+local descriptor and apply the resulting masks at its offset.
 
 | Field | Legal values | Notes |
 |---|---|---|
@@ -293,7 +313,7 @@ bas.prox_level=3;
 | `projections` | cell array with one row vector of integers per chemical substance | Keeps only the listed total projection quantum numbers in that substance; an empty element means no filter. `sphten-liouv` only. Single substance: `bas.projections={+1}`. |
 | `longitudinal` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only longitudinal states on those spins of that substance. `sphten-liouv` only. Single substance: `bas.longitudinal={{'15N'}}`. |
 | `zero_quantum` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only states that are zero-quantum over the union of the listed spins of that substance. `sphten-liouv` only. Single substance: `bas.zero_quantum={{'1H'}}`. |
-| `manual` | logical matrix with `nspins` columns | Explicit subgraph list, one subgraph per row; a row may not span two chemical substances. |
+| `manual` | logical matrix with `numel(chem.parts{n})` columns | Explicit local subgraph list, one subgraph per row. |
 | `sym_group` | cell array from `S2`, `S3`, `S4`, `S4A`, `S5`, `S6`, `S6A`, `S8A` | Permutation symmetry groups. |
 | `sym_spins` | cell array of index vectors | One vector per group, at least two spins each, no spin in two groups, no group spanning two chemical substances. Mandatory alongside `sym_group`. |
 | `sym_a1g_only` | logical | Keep only the fully symmetric irreducible representation. |
@@ -491,3 +511,205 @@ Complete ready-made systems live in `etc/molecules/` (`strychnine(spins)`,
 `guess_j_pro`, `guess_j_nuc` and `guess_csa_pro` are the estimators `protein`
 and `nuclacid` call internally; everything they return is an estimate and must
 be reported as one.
+
+## Direct-sum operator addressing
+
+In `sphten-liouv`, a product operator acts only in the substance hosting its
+spins; cross-substance product specifications raise
+`Spinach:which_subst:crossSubstance`. Isotope selections sum single-spin
+operators across the hosting blocks. Operator and identity dimensions come
+from `bas.offsets(end)`, not from the number of descriptor cells.
+Explicit identity requests act only on the selected substance; numeric and
+isotope sums contribute once per matching spin. Left/right identity actions
+give the local identity, anticommutators twice it, and commutators zero.
+Multi-substance Zeeman operators are local tensor products placed into their hosting direct-sum blocks. Isotope sums cover all matching substances.
+
+Symmetry factorisations live in `bas.sym_fact(n)`. `reduce` and `rspt_eig`
+embed their local projector columns using `bas.offsets`; do not read the
+retired global `bas.irrep` field.
+
+Converters preserve the substance direct sum. `sphten2zeeman` maps each
+unit coordinate to `vec(I_D)` (Hilbert trace divided by `D` is the source
+unit coordinate). `hilb2liouv` accepts explicit cells of Hilbert blocks;
+numeric matrices retain their single-block meaning. `sim2liouv` uses
+compiled block dimensions, migrates `sym_fact`, and refreshes the hash
+from the descriptor cells, new dimensions, and substance membership.
+
+Spatial phantom operators and states use the entire substance direct sum.
+`imaging` and `meshflow` obtain its dimension from `bas.offsets(end)`;
+`gridfree` checks extra isotropic terms against the same dimension.
+
+Spin-only symmetry projectors are not applied to enlarged spatial-spin
+generators in `reduce`; those use the usual trajectory-level reductions.
+`v2fplanck` tensors the spatial transport with the full direct-sum identity.
+
+`summary_basis` reports substances separately; `stateinfo` identifies the
+hosting substance and global spin labels of every reported coefficient.
+State numbers retain the global direct-sum offsets.
+
+`zte` preserves all compiled spherical-tensor unit coordinates, even for
+zero-population substances. `reduce` transports their support through the
+symmetry projection and keeps it during subsequent population screening.
+
+Trajectory analysis uses local descriptors and global spin labels. `trajan`
+removes each unit independently and converts level populations per substance;
+`trajsimil` groups equivalent tracks only within the same substance.
+
+`kill_spin` and `dilute` rebuild an existing basis after particle removal.
+Local manual columns and global numeric filter labels are reindexed. Isotope
+filters are removed when no matching spin survives in their own substance;
+empty substances keep their unit coordinate. Retained `inter_level`, `prox_level`,
+and `space_level` depths are capped by each substance's surviving particle count
+before the rebuild. IK-DNP vector components also respect electron and nucleus
+counts; IK-SBS components respect mode, total active-particle, and spin counts.
+Losing a required class in IK-DNP or IK-SBS selects IK-0 at the surviving
+class depth (at least one), without connectivity pruning. Symmetry and Hamiltonian assumptions
+are cleared, so reapply `assume` before constructing a Hamiltonian.
+
+Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
+product operators and states raise `Spinach:which_subst:crossSubstance`.
+
+Chemistry uses explicit `chem.reactions` records through `kinetics` and
+`react_gen`; retired rates, flux, and radical-pair fields are rejected.
+
+Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
+block must use `none`, as enforced by `basis`.
+
+`sim2liouv` accepts sparse horizontal density-matrix stacks and preserves their
+column order while extracting each substance block. Segmented generators,
+operator-like parameters, and state stacks must be block diagonal in substance;
+nonzero cross-substance entries raise `Spinach:sim2liouv:crossSubstance`.
+
+Synthetic compiled-system fixtures must supply offsets and local descriptor
+cells too; bypassing `basis` does not restore the retired global layout.
+
+`bootstrap` follows the same one-cell approximation contract as physical systems.
+
+Two-substance chemistry fixtures require two approximation cells. The
+generator and invariant suites cover positive matched multi-substance
+reaction maps, explicit first-order exchange, routing, and conservation,
+alongside single-substance spin permutations and empty reaction maps.
+
+Single-substance Zeeman symmetry remains available through `bas.sym_fact(1)`;
+multi-substance Zeeman symmetry and analytical filters remain explicitly rejected.
+Zeeman units and equilibrium states are assembled independently per substance;
+geometric units retain stock normalisations, while thermal blocks have trace c_n.
+Single-substance descriptor consumers use `bas.basis{1}` and dimension consumers
+use `bas.offsets(end)`. Identity states retain the selected substance: each
+selected spin contributes one local unit in a sum, a local product contributes
+once, and every `state` method weights that unit by its hosting concentration.
+Use `coil_state` with the same description for unweighted detection vectors;
+`state(...,'chem')` is a deprecated alias of the weighted exact method.
+
+Imaging tests the compiled symmetry projectors, so a declared group disabled
+through `sys.disable` does not prevent an imaging calculation.
+
+Per-substance `space_level` aliases are derived independently; an empty entry
+does not inherit the preceding substance's proximity depth.
+
+Segmented Zeeman-Liouville states use local identities. The weighted `state`
+wrapper rejects segmented wavefunctions with `Spinach:state:segmentedZeeman`;
+`coil_state` can store the unweighted direct sum of local product kets.
+Single-substance state numerics are unchanged.
+
+Before basis compilation, `chem.parts` must cover every global spin; omitted
+spins raise `Spinach:basis:incompletePartition`. Empty substances are permitted.
+
+Level projectors retain their substance through mixed identity and non-identity
+tensor expansions, including chemical concentration weighting.
+
+`partner_state` keeps global descriptor positions but constructs states only in
+the substance hosting the fixed and partner spins. Padding identities in its
+returned descriptors do not imply populations in other substances.
+
+Segmented coherent states and Zeeman steady solves are explicitly deferred.
+Steady-state `solid_effect` and both DNP scans require a single substance;
+these experiments retain their supported single-substance algorithms.
+
+### Explicit chemistry records
+
+Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
+
+`unit_state`, `state`, and `equilibrium` return concentration-weighted density
+matrices and Liouville states; storage-only wavefunctions remain unweighted.
+Geometric detection and normalised operator vectors use `coil_state`, including
+pulse-sequence receivers, voxel projection operators, normalised ENDOR sums,
+relaxation-analysis probes, and microwave transition operators. Prepared densities
+retain `state`; do not apply concentration factors to receivers. IME
+`thermalize` instead takes unit-concentration target shapes: request equilibrium
+on a copy with all `chem.concs` entries one, as `relaxation` does internally.
+The propagated unit coordinates supply the instantaneous concentrations; neither
+thermalisation nor pumping divides by a concentration. `magpump` takes an
+unweighted `coil_state` target, and `steady` pins the supplied concentrations.
+
+### Reaction propagation
+
+`kinetics` compiles reaction records once. Numeric first-order records give a sparse matrix (zero numeric higher-order records do not change that classification); mass action and time-rate records give `K(t,eta)`. Time-only rate callbacks are evaluated once per assembly and shared across voxels. Use `1i*K` in a Liouvillian, or the existing `step` handle route for nonlinear propagation. `chem_concs` reads per-voxel concentrations from spherical-tensor unit coordinates or Zeeman trace functionals without division or normalisation. Spin-free pools participate dynamically. `react_gen` returns product-row/source-index lists, not the retired per-reactant generator matrices. Matched repeated spin-bearing reactants or products require occurrence-resolved matching and are rejected rather than assigned arbitrary molecular copies.
+
+Use an explicit scalar `nz_shift`; the old `'chem'` shorthand is not defined for a general reaction network. `kill_spin` rebuilds reaction matching and basis data, but refuses removal of selector electrons or changes to a substance carrying user-supplied selector matrices.
+
+### Intermolecular spin replacement
+
+For a molecule A exchanging one spin with a pool B, use an additive `A+B -> A+B` record with matching that swaps those spins and retains the others. Departing-spin intramolecular correlations are destroyed; unaffected internal orders are retained. The concentrations are invariant because both sides have identical stoichiometry. With time-independent rates and no other concentration-changing reactions, evaluate the returned handle once at `unit_state(spin_system)` to obtain the constant additive generator for ordinary linear propagation. Do not freeze general mass-action or product-closure chemistry this way. `relayed_hyperpol` applies this construction to one ten-proton peptide block and twenty independent water pools; only water spins 11–20 participate in its forty replacement records.
+
+`uf6_collisions` uses two first-order records with both nuclei matched in each direction; stationary concentrations weight excitation once, and `coil_state` detects both species without another population factor.
+
+Worked replacements are `flux_asymmetric`/`flux_symmetric` and `frydman_pump_a`/`frydman_pump_b`: store each independent pool as its own substance, use one symmetric replacement per distinct pair, and use unweighted detection vectors. A one-spin pool has a complete level-one basis. Changes in thermal preparation must be checked separately from reaction-map equivalence.
+
+`plain_reaction` demonstrates an entirely spin-free network: construct a ghost seed with explicit substance records, then trace it with `kill_spin` before calling `kinetics`. All five remaining coordinates are concentrations.
+
+Small kernel-path demonstrations are `bimolecular_closures`, `spinless_sink_network`, and `cidnp_transport`; their corresponding registered tests cover mass action, the two closures, selective loss, and integrated nuclear product arrival.
+
+Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: chemical maps can connect substance irreps. Full-generator ZTE and path tracing remain available and retain chemical arrival into initially empty products.
+
+### Two-stage chemistry histories
+
+`diels_alder_zmag`, `diels_alder_spec`, and `reacting_nmr` put true initial concentrations in `chem.concs`, trace spins for their LG4 concentration histories, and compile the full additive maps once for the two-point spin steps. Embed the prescribed history into unit coordinates when evaluating `K(t,eta)`; initialise spin magnetisation with weighted `state`, add `unit_state`, and detect with unweighted `coil_state`. Do not multiply the initial state by the concentrations a second time.
+
+### Spatial two-stage chemistry
+
+`reacting_flow_nmr` traces all spins with `kill_spin` for its concentration-only stage: the resulting five unit blocks include the traced solvent, and the same reaction records generate both concentration and spin transport. Its frozen-rate stepping workflow and `makima` history are retained, but equal sharing of product unit arrival changes finite frozen concentration steps relative to the old asymmetric generator. Equal sharing is the specified additive closure, not a claim of improved frozen-step accuracy: both allocations converge to the same mass-action ODE. Do not claim numerical history equivalence from the equal instantaneous derivative. In the NMR stage, history values are placed into voxel unit coordinates before evaluating `K(t,eta)`; additive closure then depends only on those coordinates, not the spin orders. The actual propagated state includes unit populations, while detection and reference longitudinal vectors use `coil_state`. The shared `dac_reaction` definition retains all three acetonitrile protons and their T1/T2 relaxation. The flow example prepares only the four reacting species; solvent remains unexcited and contributes no signal.
+
+`create(sys)` without interaction input remains supported; it uses an empty
+interaction structure and the ordinary one-substance/unit-concentration defaults.
+
+In chemistry-free systems, `reduce` rejects cross-substance entries in caller-supplied generators at the
+compiled spin dimension before building substance-local projectors. This
+boundary also covers the adjoint generator passed by destination screening.
+
+The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
+with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
+spin lists. Only the legacy `state` wrapper retains optional arguments.
+
+Zeeman-wavefunction direct sums provide storage only. Nonempty reaction records
+are rejected by `basis` and `kinetics`; `equilibrium`, `unit_state`, and
+`thermalize` reject mixed-state or concentration-weighted requests explicitly
+with messages naming `zeeman-wavef`. Legacy unweighted singleton kets remain available.
+
+### Zeeman chemistry and matrix IME
+
+Zeeman Liouville chemistry uses complete local bases and dense transformations
+of the shared reaction compiler, so it is intended as a small-system reference
+backend. Both closures, atom matching, spin-free products, selectors, and spatial
+state-dependent maps retain the same physical contract. User selector pairs
+remain local Liouville product superoperators even for Hilbert input.
+
+With Hilbert reaction records, `K=kinetics(s)` returns `K(t,rho)` as a matrix
+derivative, not a conjugation Hamiltonian. Only first-order records are accepted;
+mass action raises `Spinach:kinetics:hilbertMassAction`. `thermalize` supports
+Hilbert IME from an explicit direct-sum Liouville relaxation matrix and a
+block-diagonal unit-trace target, returning the same matrix-RHS interface. These
+handles are not `step` generators, and the stock Hilbert relaxation constructor
+is unchanged. `chem_concs` extracts each Hilbert block trace and rejects
+inter-substance coherences.
+
+`unit_state` requires a compiled basis; absent basis metadata is rejected before formalism capability checks.
+
+Retired global basis matrices and `bas.irrep` are rejected at the `basis`,
+`coherence`, `correlation`, `summary_basis`, and `kinetics` boundaries. Use
+`bas.basis{n}` with `bas.offsets`, and `bas.sym_fact(n).irr_projectors`/
+`irr_dimensions`. `kinetics` also rejects retired chemistry fields inserted
+after `create`; use `chem.reactions`. These are consumer checks, not custom
+dot-read interception: the compiled objects remain ordinary MATLAB structs.
+
+Linear contexts (`liquid`, `imaging`, `crystal`, `powder`, `device`, `floquet`, `singlerot`, `doublerot`, and `gridfree`) reject state-dependent kinetics handles. Use a custom pulse sequence with `step`/`iserstep` for multi-reactant or callback-rate records; `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m` demonstrate that route.

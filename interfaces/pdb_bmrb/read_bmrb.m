@@ -20,7 +20,7 @@
 %
 % Supports tagged NMR-STAR 2.1 and 3.x shift loops, arbitrary column
 % order, quoted and multiline values, comments, and wrapped rows.
-% Numeric author residue numbers take precedence over Seq_ID and
+% Integer-valued author residue numbers take precedence over Seq_ID and
 % Comp_index_ID, matching PDB numbering where available. Missing
 % author numbers fall back row by row; non-numeric author identifiers
 % cannot be represented by this numeric interface. Null assignments
@@ -50,10 +50,17 @@ pattern=['(?m)^;[\s\S]*?^;(?=\s|$)|'...
          '''(?:[^''\n]|''(?!\s|$))*''(?=\s|$)|'...
          '"(?:[^"\n]|"(?!\s|$))*"(?=\s|$)|'...
          '#[^\n]*|[^\s]+'];
-tokens=regexp(text,pattern,'match');
-tokens(startsWith(tokens,'#'))=[];
+[tokens,positions]=regexp(text,pattern,'match','start');
+comment_mask=startsWith(tokens,'#');
+tokens(comment_mask)=[]; positions(comment_mask)=[];
 quoted=startsWith(tokens,{'''','"'})|...
-       (startsWith(tokens,';')&contains(tokens,newline));
+       (startsWith(tokens,';')&...
+        ((positions==1)|(text(max(1,positions-1))==newline)));
+
+% Reject unterminated delimiters before removing quotation characters
+if any(~cellfun(@(token)numel(token)>=2&&token(end)==token(1),tokens(quoted)))
+    error('BMRB file contains an unterminated quoted or multiline value.');
+end
 
 % Retain the established headerless eight-column import
 if ~any(~quoted&(startsWith(lower(tokens),'data_')|...
@@ -161,7 +168,8 @@ for n=find(~quoted&strcmpi(lower_tokens,'loop_'))
         col=find(strcmp(tags,num_tags{k}),1);
         if ~isempty(col)
             values=str2double(table(:,col));
-            mask=~isfinite(residue)&isfinite(values);
+            mask=~isfinite(residue)&isfinite(values)&...
+                 (imag(values)==0)&(values==fix(values));
             residue(mask)=values(mask);
         end
     end
@@ -172,7 +180,7 @@ for n=find(~quoted&strcmpi(lower_tokens,'loop_'))
     missing=all(ismember(table(:,num_cols),nulls),2)|...
             ismember(table(:,shift_col),nulls)|...
             ismember(table(:,type_col),nulls)|ismember(table(:,atom_col),nulls);
-    if any(~missing&(~isfinite(shifts)|~isfinite(residue)|residue~=fix(residue)))
+    if any(~missing&(~isfinite(shifts)|imag(shifts)~=0|~isfinite(residue)))
         error('Chemical shift assignment has an invalid shift or residue number.');
     end
     keep=~missing;

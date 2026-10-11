@@ -136,6 +136,7 @@ numerical validation. All other CUDA errors and wrong results remain failures.
 ## Detection states
 
 `coil_state(spin_system,states,spins,'exact')` constructs correctly normalised,
-unweighted detection states. In Liouville space it applies the left-product
-operator to the local unit coordinate. Use `state` for concentration-weighted
+unweighted detection states. In spherical-tensor Liouville space, single-spin
+left-product table coefficients normalise tensor descriptors; direct projection
+into the hosting basis avoids full superoperator allocation. Use `state` for concentration-weighted
 initial states; detection vectors must not include concentration weighting.

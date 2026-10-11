@@ -142,6 +142,23 @@ result=test_true(result,'explicit wavefunction coil',...
                  isequal(coil_state(s,0.5,[],'exact'),[1;0]),...
                  'the explicit four-argument wavefunction API remains supported');
 
+% Compare direct tensor construction with full operator action for mixed spins
+sys=struct('magnet',0,'isotopes',{{'1H','2H','23Na'}}); inter=struct();
+cases={{'Lz','all'},{'L+','all'},{'Ly',[1 3]},...
+       {{'Lx','Ly'},{1,2}},{{'T2,-1','T3,2'},{2,3}},...
+       {{'ZL1','ZL3'},{1,3}},{'CTy',3},{'E','all'}};
+for approximation={'none','IK-0'}
+    bas=struct('formalism','sphten-liouv','approximation',{approximation});
+    if strcmp(approximation{1},'IK-0'), bas.inter_level={1}; end
+    s=test_spin_system(sys,inter,bas); unit=sparse(1,1,1,s.bas.offsets(end),1);
+    for args=cases
+        expected=operator(s,args{1}{:},'left')*unit;
+        actual=coil_state(s,args{1}{:},'exact');
+        result=test_close(result,'direct exact state',actual,expected,1e-13,1e-13,...
+                          'direct coefficients match operator action for mixed spins and truncated bases');
+    end
+end
+
 end
 
 

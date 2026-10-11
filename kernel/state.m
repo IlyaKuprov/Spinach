@@ -54,7 +54,9 @@
 %
 % Every density-matrix and Liouville method weights each substance block
 % by chem.concs. Use coil_state for unweighted detection operators.
-% Storage-only wavefunctions remain unweighted in every substance block.
+% Single-substance wavefunctions remain unweighted; segmented wavefunction
+% requests are rejected (use coil_state for unweighted ket storage). The method is ignored in
+% Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
 %
 % Outputs:
 %

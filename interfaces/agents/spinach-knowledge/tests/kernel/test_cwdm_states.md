@@ -11,3 +11,5 @@ Single-substance wavefunction construction must return the same unit ket at conc
 The fixed four-argument `coil_state` API is tested: an omitted method is rejected, and an explicit wavefunction call returns the unit ket.
 
 Both constructors reject the removed shortcut in all four supported formalisms.
+
+Direct exact tensor construction is compared with full operator action on a mixed proton/deuteron/sodium system, in full and single-spin-correlation bases. Products, complex Cartesian operators, higher-rank tensors, central transitions, level projectors, and identities are covered, including descriptors projected out of the truncated basis.

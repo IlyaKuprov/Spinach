@@ -146,7 +146,7 @@ switch spin_system.bas.formalism
                 rho=sparse(spin_system.bas.offsets(end),1);
 
                 % Locate each operator in its hosting descriptor
-                for n=1:numel(opspecs)
+                parfor n=1:numel(opspecs)
                     active_spins=find(opspecs{n});
                     if isempty(active_spins)
                         rho=rho+coeffs(n)*unit;
@@ -159,7 +159,7 @@ switch spin_system.bas.formalism
                         error('the requested state is not present in the basis.');
                     end
                     index=index+spin_system.bas.offsets(subst);
-                    rho(index)=rho(index)+coeffs(n);
+                    rho=rho+sparse(index,1,coeffs(n),spin_system.bas.offsets(end),1);
                 end
 
             % Careful normalisation

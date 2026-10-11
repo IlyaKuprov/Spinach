@@ -132,3 +132,9 @@ gateway directly with CPU products across random real and complex matrices.
 Read its messages: missing GPU/gateway coverage and the specific
 `MATLAB:mex:ErrInvalidMEXFile` loader error are reported as skipped, not as
 numerical validation. All other CUDA errors and wrong results remain failures.
+
+## Cheap detection states
+
+`coil_state(spin_system,states,spins,'cheap')` locates spherical-tensor state
+descriptors in a `parfor` loop and sums sparse contributions. The result remains
+unweighted and does not acquire exact normalisation; use `'exact'` when required.

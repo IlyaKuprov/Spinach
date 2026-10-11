@@ -142,25 +142,28 @@ switch spin_system.bas.formalism
                 % Parse the specification
                 [opspecs,coeffs]=human2opspec(spin_system,states,spins);
                 
-                % Allocate the unweighted direct-sum state
-                rho=sparse(spin_system.bas.offsets(end),1);
+                % Keep only descriptors and their hosting basis on the workers
+                if spin_system.bas.nsubst==1, subst=1; end
+                parts=spin_system.chem.parts{subst};
+                local_basis=spin_system.bas.basis{subst};
+                active=cellfun(@any,opspecs);
+                descriptors=vertcat(opspecs{:});
+                descriptors=descriptors(active,parts);
+                nterms=size(descriptors,1); indices=zeros(nterms,1);
 
-                % Locate each operator in its hosting descriptor
-                for n=1:numel(opspecs)
-                    active_spins=find(opspecs{n});
-                    if isempty(active_spins)
-                        rho=rho+coeffs(n)*unit;
-                        continue;
-                    end
-                    subst=which_subst(spin_system,active_spins);
-                    descriptor=opspecs{n}(spin_system.chem.parts{subst});
-                    [present,index]=ismember(descriptor,spin_system.bas.basis{subst},'rows');
+                % Look up single terms locally and return only indices otherwise
+                parfor (n=1:nterms,nterms*(nterms>1))
+                    [present,index]=ismember(descriptors(n,:),local_basis,'rows');
                     if ~present
                         error('the requested state is not present in the basis.');
                     end
-                    index=index+spin_system.bas.offsets(subst);
-                    rho(index)=rho(index)+coeffs(n);
+                    indices(n)=index;
                 end
+
+                % Assemble identity and indexed contributions on the client
+                rho=sum(coeffs(~active))*unit+sparse(...
+                    indices+spin_system.bas.offsets(subst),ones(size(indices)),...
+                    coeffs(active),spin_system.bas.offsets(end),1);
 
             % Careful normalisation
             case 'exact'

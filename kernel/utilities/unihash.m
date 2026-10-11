@@ -26,7 +26,7 @@ grumble(A);
 % Build an MD5 hash table
 hash_table=repmat(' ',[size(A,1) 32]);
 parfor k=1:size(A,1)
-    hash_table(k,:)=md5_hash(A(k,:));
+    hash_table(k,:)=md5_hash(full(A(k,:)));
 end
 
 % Redundant row index using a hash table

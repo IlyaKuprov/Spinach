@@ -28,9 +28,13 @@ cleanup and continuous patrol are deliberately inspected rather than run.
 
 The compiler helper must confine outputs to their source directories, retain
 the interleaved-complex API and CUDA driver link, and avoid OpenMP dependence.
-Linux on R2026b or later includes the CUDA gateway; Windows, macOS, and older
-MATLAB releases retain only the five C++ targets. Compiler invocations are
-intercepted in an isolated fixture, so these checks never rebuild production
+Windows, Linux, and macOS on R2026b or later include the CUDA gateway; older
+MATLAB releases retain only the five C++ targets. Windows driver-library
+lookup is checked both with an external CUDA path and with compiler defaults;
+the search-path option must precede the driver-library option.
+The specific macOS CUDA-unavailable error must be reported without aborting
+the C++ builds; other macOS errors and all Windows errors must propagate.
+Compiler invocations are intercepted in an isolated fixture, so these checks never rebuild production
 binaries. This validates routing and compiler arguments, not kernel arithmetic;
 `kernel/cuda_product` supplies the independent CPU-reference numerical checks.
 

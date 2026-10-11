@@ -111,8 +111,13 @@ end
 lower_tokens=lower(tokens);
 control=~quoted&(startsWith(lower_tokens,{'_','save_','data_'})|...
                   ismember(lower_tokens,{'loop_','stop_','global_'}));
+
+% Decode value delimiters and the opening text-field newline
 for n=find(quoted)
     tokens{n}=tokens{n}(2:end-1);
+    if text(positions(n))==';'&&startsWith(tokens{n},newline)
+        tokens{n}=tokens{n}(2:end);
+    end
 end
 
 % Collect the four documented assignment columns from every shift loop

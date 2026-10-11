@@ -45,6 +45,11 @@ writelines(lines,file_name);
 result=check_import(result,file_name,[1;1],{'GLY';'GLY'},...
                     {'HA2';'CA'},[4.2;55.1],'metadata and lists');
 
+% Exclude the opening text-field newline while retaining its data newlines
+lines=[header;"4.2";";";"HA2";";";"GLY 1";"stop_";"save_"];
+writelines(lines,file_name);
+result=check_import(result,file_name,1,{'GLY'},{sprintf('HA2\n')},4.2,'text field value');
+
 % Allow null optional fields and omit null assignments without synthesising values
 lines=[header;". HA2 GLY 1";"? CA GLY 1";"4.2 HA2 GLY 1";"stop_";"save_"];
 writelines(lines,file_name);

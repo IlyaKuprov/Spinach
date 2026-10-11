@@ -19,6 +19,19 @@ run_tests('verbose',true);
 ```
 
 
+The CUDA sparse-product comparison is registered in the main manifest:
+
+```matlab
+run_test('kernel/cuda_product');
+```
+
+It compares the gateway directly with independent CPU products for random
+square and rectangular sparse matrices in all real/complex combinations.
+GPU checks report explicit `SKIP` messages when a usable GPU or the compiled
+gateway is unavailable, following the existing GPU coverage convention.
+With both prerequisites present, loader errors and numerical failures fail
+the test. Build the gateway with `compile_mex()` before running GPU coverage.
+
 GPU-dependent custom CUDA sparse-product regressions (not part of the CPU manifest):
 
 ```matlab

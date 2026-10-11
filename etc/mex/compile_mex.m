@@ -1,6 +1,8 @@
-% MEX compilation utility. Rebuilds all C++ MEX binaries of
+% MEX compilation utility. Rebuilds all C++ and CUDA MEX binaries of
 % the Spinach installation that contains this file, placing
-% each binary next to its source. Syntax:
+% each binary next to its source. CUDA compilation requires
+% mexcuda and a supported CUDA toolkit; on Windows, CUDA_PATH
+% must point to that toolkit. Syntax:
 %
 %                       compile_mex()
 %
@@ -33,6 +35,18 @@ mex('-R2018a','-O','-DNDEBUG',...
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
+% CUDA sparse matrix product
+if ispc
+    mexcuda('-R2018a','-O','-lcuda',...
+            ['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')],...
+            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
+            '-outdir',[P '/kernel/overloads']);
+else
+    mexcuda('-R2018a','-O','-lcuda',...
+            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
+            '-outdir',[P '/kernel/overloads']);
+end
+
 end
 
 % Audiophiles don't use their equip-
@@ -41,4 +55,5 @@ end
 % their equipment.
 %
 % Alan Parsons
+
 

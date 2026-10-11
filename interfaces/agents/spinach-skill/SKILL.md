@@ -107,3 +107,15 @@ account of the physical assumptions, checkout/version, exact checks run, and
 measured outcome. Distinguish executed results from static review or prediction.
 If MATLAB, data, or resources are unavailable, name the blocker and mark the
 corresponding results unvalidated; never manufacture a success marker.
+
+## CUDA sparse-product regression
+
+`compile_mex()` also builds the CUDA sparse-product gateway using `mexcuda`
+and the CUDA driver library. A supported CUDA toolkit is required; on Windows,
+`CUDA_PATH` must point to it. The current gateway source contains a POSIX
+host-memory probe and is not yet Windows-portable.
+
+Run `run_test('kernel/cuda_product')` from the regression suite to compare the
+gateway directly with CPU products across random real and complex matrices.
+Read its messages: unavailable GPU or compiled-gateway coverage is explicitly
+reported as skipped, not as numerical validation.

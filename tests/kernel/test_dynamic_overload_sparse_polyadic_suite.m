@@ -13,6 +13,9 @@
 
 function result=test_dynamic_overload_sparse_polyadic_suite()
 
+% Keep test graphics invisible and preserve the caller's figures
+cleaner=test_graphics(); %#ok<NASGU>
+
 % Announce the test target
 fprintf('TESTING: Sparse, polyadic, and OPIUM overload dispatch\n');
 
@@ -92,14 +95,9 @@ result=test_close(result,'rcv gather cpu no-op',full(gather(ra)),full(A),1e-15,1
                   'gather on a CPU RCV object must be a no-op');
 
 % Exercise RCV sparsity plotting dispatch offscreen
-old_visibility=get(groot,'defaultFigureVisible');
-set(0,'DefaultFigureVisible','off');
-plot_cleaner=onCleanup(@()set(groot,'defaultFigureVisible',old_visibility));
 figures_before=numel(findall(0,'Type','figure'));
 spy(ra);
 figures_after=numel(findall(0,'Type','figure'));
-close all;
-clear('plot_cleaner');
 result=test_true(result,'rcv direct spy',figures_after>=figures_before+1,...
                  'direct spy() must dispatch to the RCV overload and create a figure');
 
@@ -250,4 +248,5 @@ catch
 end
 
 end
+
 

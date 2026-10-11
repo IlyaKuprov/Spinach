@@ -14,6 +14,9 @@
 
 function result=test_dynamic_remaining_regularisation_suite()
 
+% Keep test graphics invisible and preserve the caller's figures
+cleaner=test_graphics(); %#ok<NASGU>
+
 % Announce the test target
 fprintf('TESTING: Remaining regularisation utilities\n');
 
@@ -27,7 +30,6 @@ lam=logspace(-3,3,9);
 err=sqrt(1+lam.^2);
 reg=sqrt(1+lam.^-2);
 lam_opt=lcurve(lam,err,reg,'log');
-close all;
 result=test_true(result,'lcurve synthetic corner',lam_opt>0.1&&lam_opt<10,...
                  'the maximum-curvature point of the symmetric synthetic L-curve should lie near lambda=1');
 

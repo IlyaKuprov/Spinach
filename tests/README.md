@@ -19,6 +19,17 @@ run_tests('verbose',true);
 ```
 
 
+The runner prints one aligned progress/result line per selected test, then a
+pass/fail summary. `verbose=true` adds recorded check explanations. Spinach
+systems built by `test_spin_system` use `sys.output='hush'`; remaining console
+output is captured and printed only for failed tests, including text emitted
+before an exception. Recorded failures and thrown errors still fail the suite.
+Test-created figures are invisible and deleted on success or error. Existing
+figures, the current figure, and root graphics defaults are preserved; tests
+must not explicitly close caller-owned figures. MATLAB's capture does not
+intercept native process stderr, including JVM startup diagnostics on some
+MATLAB/Java installations; those messages are outside the test reporter.
+
 The CUDA sparse-product comparison is registered in the main manifest:
 
 ```matlab

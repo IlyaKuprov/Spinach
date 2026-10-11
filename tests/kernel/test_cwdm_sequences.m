@@ -14,6 +14,9 @@
 
 function result=test_cwdm_sequences()
 
+% Keep test graphics invisible and preserve the caller's figures
+cleaner=test_graphics(); %#ok<NASGU>
+
 % Announce the sequence contract
 fprintf('TESTING: CWDM sequence probes\n');
 result=new_test_result('kernel/cwdm_sequences','CWDM sequence probes',...
@@ -72,7 +75,6 @@ for sequence={@epi_3d,@phase_enc_3d}
     result=test_close(result,[func2str(sequence{1}) ' empty geometry'],actual,reference,...
                       1e-12,1e-12,'caller-supplied density and receiver do not change with stored concentration');
 end
-close all;
 
 % Build a hyperfine-coupled electron and proton for normalised CW ENDOR
 sys.isotopes={'E','1H'}; inter=struct();

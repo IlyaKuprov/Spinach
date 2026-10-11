@@ -23,10 +23,9 @@ result=new_test_result('kernel/plotting_remaining_suite',...
                        'remaining plotting helpers must return deterministic arrays, graphics objects, or guarded validation errors.');
 
 % Force invisible figures during the test
-old_visibility=get(groot,'defaultFigureVisible');
 warning_state=warning('query','MATLAB:griddedInterpolant:MeshgridEval2DWarnId');
-set(groot,'defaultFigureVisible','off');
-cleaner=onCleanup(@()local_cleanup(old_visibility,warning_state));
+cleaner=test_graphics(); %#ok<NASGU>
+warning_cleaner=onCleanup(@()warning(warning_state));
 
 % Build a minimal spin-system structure used by plotting routines
 spin_system=local_plot_system();
@@ -445,16 +444,6 @@ function local_delete_file(file_name)
 if exist(file_name,'file')
     delete(file_name);
 end
-
-end
-
-
-function local_cleanup(old_visibility,warning_state)
-
-% Restore figure and warning state after success or failure
-close all force;
-set(groot,'defaultFigureVisible',old_visibility);
-warning(warning_state.state,warning_state.identifier);
 
 end
 

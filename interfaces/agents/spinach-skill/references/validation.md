@@ -83,6 +83,10 @@ interface. Select relevant registered tests using `list_tests` or inspect
 entry. Broader selection uses `run_tests`, for example
 `run_tests('pattern','relaxation')`. The runner throws on failed tests and
 returns `PASS` statuses on success; retain the selected test IDs and results.
+The runner prints uniform per-test progress and a summary; `verbose=true`
+adds recorded check explanations. Stray console output is captured and shown
+on failure, including output before exceptions. Test figures are invisible
+and cleaned up without closing existing figures or changing root defaults.
 
 Examples demonstrate intended usage and may be expensive or produce only
 figures. Tests provide explicit assertions but do not necessarily cover the

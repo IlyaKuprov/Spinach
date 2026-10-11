@@ -12,10 +12,6 @@ Required fields are `spins`, `hi_pwr`, `cp_pwr`, `cp_dur`, `rho0`, `coil`, `swee
 
 The source applies high-power 90-degree pulses along X and Y on the first channel, using `1/(4*hi_pwr)` seconds. It evolves both quadratures for `npoints(1)-1` F1 steps. The contact generator adds `-2*pi*cp_pwr(1)*Hy` on channel 1 and `+2*pi*cp_pwr(2)*Cx` on channel 2; contact evolution is for `cp_dur`. It then analytically decouples the first channel during acquisition and detects the F2 evolution on `coil` for `npoints(2)-1` steps.
 
-## GPU allocation caching
-
-With GPU arithmetic enabled, WISE releases unused allocation-cache blocks when the sequence exits by briefly setting the current device's `CachePolicy` to `minimum`. This avoids retaining orientation-specific allocation sizes across a powder calculation. The previous policy is restored immediately, both on normal return and on errors; allocation reuse within the sequence is unchanged. No device reset is performed, so existing GPU arrays remain valid. The sequence and returned States quadratures are unchanged.
-
 ## Output and limits
 
 The return value is a structure with `fid.cos` and `fid.sin`, the cosine and sine States-quadrature components. Each contains F2 observable samples for the F1 trajectory states: `npoints(2)` by `npoints(1)`, including the initial sample on each dimension. The source does not construct a MAS rotor or powder-orientation sweep; those dynamics are represented by the context-supplied matrices and spatial dimension. The implementation describes the transfer/control sequence, not a processed spectrum.

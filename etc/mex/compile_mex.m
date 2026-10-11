@@ -4,6 +4,8 @@
 % MATLAB R2026b or later, mexcuda, a supported host C++ compiler,
 % and the CUDA driver library. Windows uses CUDA_PATH/lib/x64 when
 % CUDA_PATH is set; otherwise mexcuda's library search is used.
+% macOS CUDA-unavailable errors are reported after the C++ builds;
+% all other compilation errors propagate.
 % Syntax:
 %
 %                       compile_mex()
@@ -37,18 +39,29 @@ mex('-R2018a','-O','-DNDEBUG',...
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
-% CUDA sparse matrix product
+% Enforce the CUDA sparse-storage release contract
 if isMATLABReleaseOlderThan('R2026b')
     disp('CUDA sparse-product MEX compilation skipped: requires R2026b or later.');
-elseif ispc&&~isempty(getenv('CUDA_PATH'))
-    mexcuda('-R2018a','-O','-lcuda',...
-            ['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')],...
+    return;
+end
+
+% CUDA driver library search
+lib_args={};
+if ispc&&~isempty(getenv('CUDA_PATH'))
+    lib_args={['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')]};
+end
+
+% CUDA sparse matrix product
+try
+    mexcuda('-R2018a','-O','-lcuda',lib_args{:},...
             [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
             '-outdir',[P '/kernel/overloads']);
-else
-    mexcuda('-R2018a','-O','-lcuda',...
-            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
-            '-outdir',[P '/kernel/overloads']);
+catch exception
+    if ismac&&strcmp(exception.identifier,'parallel:gpu:device:MacOSGPUNotSupported')
+        disp(['CUDA sparse-product MEX unavailable: ' exception.message]);
+    else
+        rethrow(exception);
+    end
 end
 
 end

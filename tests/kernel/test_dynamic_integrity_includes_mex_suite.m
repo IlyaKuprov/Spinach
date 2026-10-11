@@ -440,6 +440,13 @@ for n=1:numel(compilers)
     fprintf(fid,'end\n');
     fprintf(fid,'mex_calls{end+1}=varargin;\n');
     fprintf(fid,'save(record_file,''mex_calls'');\n');
+    if n==2
+        fprintf(fid,'error_file=fullfile(fileparts(record_file),''cuda_error.mat'');\n');
+        fprintf(fid,'if exist(error_file,''file'')\n');
+        fprintf(fid,'    loaded=load(error_file,''identifier'');\n');
+        fprintf(fid,'    error(loaded.identifier,''Compiler fixture failure'');\n');
+        fprintf(fid,'end\n');
+    end
     fprintf(fid,'end\n\n');
     fclose(fid);
 end
@@ -543,6 +550,34 @@ for n=1:numel(routes)
     end
 end
 clear('env_cleaner');
+
+% Report unavailable macOS CUDA without hiding unrelated compilation failures
+error_ids={'parallel:gpu:device:MacOSGPUNotSupported',...
+           'Spinach:test:cudaCompileFailure',...
+           'parallel:gpu:device:MacOSGPUNotSupported'};
+for n=1:numel(error_ids)
+    for k=1:numel(platforms)
+        fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
+        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},(k==1)==(n==3));
+        fclose(fid);
+    end
+    identifier=error_ids{n};
+    save(fullfile(scratch,'etc','mex','cuda_error.mat'),'identifier');
+    delete(fullfile(scratch,'etc','mex','mex_calls.mat'));
+    clear('compile_mex','ispc','ismac'); rehash;
+    caught_id='';
+    try
+        output=evalc('compile_mex();');
+    catch exception
+        caught_id=exception.identifier;
+    end
+    loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
+    result=test_true(result,sprintf('compile_mex CUDA error %d',n),...
+                     (numel(loaded.mex_calls)==6)&&...
+                     (((n==1)&&isempty(caught_id)&&contains(output,'CUDA'))||...
+                      ((n~=1)&&strcmp(caught_id,identifier))),...
+                     'only the macOS CUDA-unavailable error is reported; other compiler failures propagate');
+end
 clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement

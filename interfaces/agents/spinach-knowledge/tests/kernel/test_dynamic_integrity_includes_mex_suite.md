@@ -31,6 +31,8 @@ the interleaved-complex API and CUDA driver link, and avoid OpenMP dependence.
 Windows, Linux, and macOS on R2026b or later include the CUDA gateway; older
 MATLAB releases retain only the five C++ targets. Windows driver-library
 lookup is checked both with an external CUDA path and with compiler defaults.
+The specific macOS CUDA-unavailable error must be reported without aborting
+the C++ builds; other macOS errors and all Windows errors must propagate.
 Compiler invocations are intercepted in an isolated fixture, so these checks never rebuild production
 binaries. This validates routing and compiler arguments, not kernel arithmetic;
 `kernel/cuda_product` supplies the independent CPU-reference numerical checks.

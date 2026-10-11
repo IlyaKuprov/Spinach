@@ -57,12 +57,12 @@ Hx=operator(spin_system,'Lx','1H');
 Hx=kron(speye(parameters.spc_dim),Hx);
 
 % Quadrature detection state
-coil=coil_state(spin_system,'L+','13C','cheap');
+coil=coil_state(spin_system,'L+','13C','exact');
 coil=kron(ones(parameters.spc_dim,1),coil);
 coil=coil/parameters.spc_dim;
 
 % Skip CP and start with Ly on carbons
-rho=state(spin_system,'Ly','13C','cheap');
+rho=state(spin_system,'Ly','13C');
 rho=kron(ones(parameters.spc_dim,1),rho);
 
 % Phase cycle specification

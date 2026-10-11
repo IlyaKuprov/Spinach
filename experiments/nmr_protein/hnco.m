@@ -70,10 +70,10 @@ CAs=strcmp('CA',spin_system.comp.labels);
 Ns=strcmp('N',spin_system.comp.labels);
 
 % Initial condition - NH protons
-rho=state(spin_system,'Lz',find(HNs),'cheap');
+rho=state(spin_system,'Lz',find(HNs));
 
 % Detection state - NH protons
-coil=coil_state(spin_system,'L+',find(HNs),'cheap');
+coil=coil_state(spin_system,'L+',find(HNs),'exact');
 
 % Pulse operators on 13CO carbons
 COp=operator(spin_system,'L+',find(COs));

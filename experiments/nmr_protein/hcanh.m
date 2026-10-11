@@ -70,13 +70,13 @@ delta4=23.0e-3;           % Sequence description
 % Initial condition - CA protons
 if ~isfield(parameters,'rho0')
     HAs=ismember(spin_system.comp.labels,{'HA','HA1','HA2','HA3'});
-    parameters.rho0=state(spin_system,'Lz',find(HAs),'cheap');
+    parameters.rho0=state(spin_system,'Lz',find(HAs));
 end
 
 % Detection state - NH protons
 if ~isfield(parameters,'coil')
     HNs=ismember(spin_system.comp.labels,{'H'});
-    parameters.coil=coil_state(spin_system,'L+',find(HNs),'cheap');
+    parameters.coil=coil_state(spin_system,'L+',find(HNs),'exact');
 end
 
 % Pulse operators all protons

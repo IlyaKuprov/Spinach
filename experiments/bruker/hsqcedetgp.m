@@ -68,10 +68,10 @@ timestep=1./parameters.sweep;
 delta=abs(1/(2*parameters.J));
 
 % Initial condition
-rho=state(spin_system,'Lz',parameters.spins{2},'cheap');
+rho=state(spin_system,'Lz',parameters.spins{2});
 
 % Detection state
-coil=coil_state(spin_system,'L+',parameters.spins{2},'cheap');
+coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
 
 % Pulse operators
 Cx=operator(spin_system,'Lx',parameters.spins{1});

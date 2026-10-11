@@ -44,11 +44,7 @@
 %
 %                   psi=state(spin_system,[-1/2 1/2 0])
 %
-% Method argument has the following effect in sphten-liouv formalism:
-%
-%    'cheap'  - the state vector is generated without
-%               normalisation. For very large spin sys-
-%               tems this is much faster
+% The method argument accepts:
 %
 %    'exact'  - exact state vector with correct normalisation,
 %               this is the default when the last argument is
@@ -124,7 +120,7 @@ end
 
 if ~ischar(method)
     error('method must be a character string.')
-elseif ~ismember(method, {'cheap', 'exact', 'chem'})
+elseif ~ismember(method, {'exact', 'chem'})
     error('unknown method specification.');
 end
 

@@ -72,8 +72,8 @@ t3.nsteps=parameters.npoints(3); t3.timestep=1/parameters.sweep(3);
 delta=abs(1/(4*parameters.J));
 
 % Initial and detection states
-rho=state(spin_system,'Lz','1H','cheap');
-coil=coil_state(spin_system,'L+','1H','cheap');
+rho=state(spin_system,'Lz','1H');
+coil=coil_state(spin_system,'L+','1H','exact');
 
 % Pulse operators
 Hx=operator(spin_system,'Lx','1H'); 

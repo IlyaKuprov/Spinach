@@ -55,12 +55,12 @@ L=H+1i*R+1i*K;
 
 % Initial condition
 if ~isfield(parameters,'rho0')
-    parameters.rho0=state(spin_system,'Lz',parameters.spins{1},'cheap');
+    parameters.rho0=state(spin_system,'Lz',parameters.spins{1});
 end
 
 % Detection state
 if ~isfield(parameters,'coil')
-    parameters.coil=coil_state(spin_system,'L+',parameters.spins{1},'cheap');
+    parameters.coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
 end
 
 % Get the time grid for the CT period

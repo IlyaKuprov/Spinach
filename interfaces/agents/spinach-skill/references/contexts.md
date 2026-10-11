@@ -246,11 +246,11 @@ Valid labels are `'E'` (identity), `'Lz'`, `'Lx'`, `'Ly'`, `'L+'`, `'L-'`,
 `'CTy'`, `'CTz'`, `'CT+'`, `'CT-'`. Valid spin specifications are standard
 isotope names plus `'electrons'`, `'nuclei'`, and `'all'`.
 
-`method` in `state` applies in `sphten-liouv` and is ignored in the Zeeman
-formalisms: `'exact'` is the default and correctly normalised, `'cheap'`
-skips normalisation and is much faster for very large spin systems, and
-`'chem'` weights the exact vector by the concentrations in
-`inter.chem.concs`. `operator_type` applies in Liouville space and is ignored
+`method` in `state` is `'exact'` by default; `'chem'` is a deprecated alias.
+Density matrices and Liouville vectors are weighted by `inter.chem.concs` in
+both cases; wavefunctions remain unweighted. Detection uses `coil_state` with
+all four arguments and method `'exact'`. `operator_type` applies in Liouville
+space and is ignored
 in Hilbert space: `'comm'` (commutation, the default), `'left'`, `'right'`,
 `'acomm'`. `format` is `'csc'` for a MATLAB sparse matrix (default) or
 `'xyz'` for a `[rows, cols, vals]` array; adding `'op_cache'` to `sys.enable`
@@ -265,8 +265,8 @@ Typical usage inside a sequence, and the pattern used throughout
 `experiments/`:
 
 ```matlab
-parameters.rho0=state(spin_system,'Lz',parameters.spins{2},'cheap');
-parameters.coil=state(spin_system,'L+',parameters.spins{2},'cheap');
+parameters.rho0=state(spin_system,'Lz',parameters.spins{2});
+parameters.coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
 Lx_F1=operator(spin_system,'Lx',parameters.spins{1});
 Ly_F2=operator(spin_system,'Ly',parameters.spins{2});
 ```

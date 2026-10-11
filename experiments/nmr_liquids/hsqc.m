@@ -59,12 +59,12 @@ delta=abs(1/(2*parameters.J));
 
 % Initial condition
 if ~isfield(parameters,'rho0')
-    parameters.rho0=state(spin_system,'Lz',parameters.spins{2},'cheap');
+    parameters.rho0=state(spin_system,'Lz',parameters.spins{2});
 end
 
 % Detection state
 if ~isfield(parameters,'coil')
-    parameters.coil=coil_state(spin_system,'L+',parameters.spins{2},'cheap');
+    parameters.coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
 end
 
 % Pulse operators

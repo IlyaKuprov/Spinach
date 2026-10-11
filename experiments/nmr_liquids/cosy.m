@@ -51,10 +51,10 @@ grumble(spin_system,parameters,H,R,K);
 L=H+1i*R+1i*K;
 
 % Initial state up to an overall multiplier
-rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
+rho=state(spin_system,'Lz',parameters.spins{1});
 
 % Detection state up to an overall multiplier
-coil=coil_state(spin_system,'L+',parameters.spins{1},'cheap');
+coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
 
 % Get the pulse operator
 Lx=operator(spin_system,'Lx',parameters.spins{1});

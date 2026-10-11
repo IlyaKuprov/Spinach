@@ -824,7 +824,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
     % Eliminate redundant states using a hash table
     report(spin_system,'eliminating redundant states...');
-    basis_spec=unihash(basis_spec);
+    basis_spec=hash_unique(basis_spec);
 
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');

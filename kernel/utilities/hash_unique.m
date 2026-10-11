@@ -2,7 +2,7 @@
 % for use with large sparse matrices where Matlab's
 % unique(...,'rows') is too slow. Syntax:
 %
-%                   A=unihash(A)
+%                   A=hash_unique(A)
 %
 % Parameters:
 %
@@ -16,9 +16,9 @@
 %
 % ilya.kuprov@weizmann.ac.il
 % 
-% <https://spindynamics.org/wiki/index.php?title=unihash.m>
+% <https://spindynamics.org/wiki/index.php?title=hash_unique.m>
 
-function A=unihash(A)
+function A=hash_unique(A)
 
 % Check consistency
 grumble(A);

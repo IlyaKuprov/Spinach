@@ -34,7 +34,10 @@ use custom low-level CUDA CSR arithmetic when `cuda_sparse_by_sparse_mex`
 is available. Missing or unloadable platform binaries retain native GPU
 multiplication; storage-layout, computation, and validation failures propagate.
 Exercise both stages and `clean_up` on real and complex GPU arrays, preserving
-its round-to-grid, density, and disable policies.
+its round-to-grid, density, and disable policies. Gateways rebuilt from the current source and the updated Linux binary use
+scalar placeholder expansion for nonempty output construction; the shipped
+Windows binary requires rebuilding to obtain this optimisation. Memory tests
+must include constructor temporaries, not just numerical-kernel workspace.
 
 Select tests from `tests/README.md` and `tests/lib/test_manifest.m`; add a
 focused regression when behaviour changes. Run affected examples when they

@@ -9,10 +9,13 @@
 function ct_hsqc_gb1()
 
 % Protein data import
+protein_dir=fullfile(fileparts(mfilename('fullpath')),...
+                     '..','standard_systems','proteins');
 options.pdb_mol=1;
 options.noshift='delete';
 options.select='backbone';
-[sys,inter]=protein('2N9K.pdb','2N9K.bmrb',options);
+[sys,inter]=protein(fullfile(protein_dir,'2N9K.pdb'),...
+                    fullfile(protein_dir,'2N9K.bmrb'),options);
 
 % Magnet field
 sys.magnet=14.1;

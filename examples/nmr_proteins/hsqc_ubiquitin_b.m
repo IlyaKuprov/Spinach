@@ -11,10 +11,13 @@
 function hsqc_ubiquitin_b()
 
 % Protein data import
+protein_dir=fullfile(fileparts(mfilename('fullpath')),...
+                     '..','standard_systems','proteins');
 options.pdb_mol=1;
 options.noshift='delete';
 options.select='backbone-hsqc';
-[sys,inter]=protein('1D3Z.pdb','1D3Z.bmrb',options);
+[sys,inter]=protein(fullfile(protein_dir,'1D3Z.pdb'),...
+                    fullfile(protein_dir,'1D3Z.bmrb'),options);
 
 % Magnet field
 sys.magnet=14.1;

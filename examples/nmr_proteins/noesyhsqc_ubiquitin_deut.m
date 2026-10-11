@@ -12,14 +12,17 @@
 function noesyhsqc_ubiquitin_deut()
 
 % Protein data import
+protein_dir=fullfile(fileparts(mfilename('fullpath')),...
+                     '..','standard_systems','proteins');
 options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
-options.csa_file='1D3Z.csa';
+options.csa_file=fullfile(protein_dir,'1D3Z.csa');
 options.deuterate={'HA','HB','HB1','HB2','HB3','HG','HG1','HG2','HG3',...
                    'HD','HD1','HD2','HD3','HE','HE1','HE2','HE3','HZ',...
                    'HZ1','HZ2','HZ3','HH','HH1','HH2','HH3'};
-[sys,inter]=protein('1D3Z.pdb','1D3Z.bmrb',options);
+[sys,inter]=protein(fullfile(protein_dir,'1D3Z.pdb'),...
+                    fullfile(protein_dir,'1D3Z.bmrb'),options);
 
 % Magnet field
 sys.magnet=21.1356;

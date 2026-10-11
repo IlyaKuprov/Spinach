@@ -17,3 +17,6 @@ The script refines at grid sizes 64, 128, 256, and 384, calling `ipcs(parameters
 ## Scope
 
 The file specifies a reconstruction procedure and saved tensor update; it does not report a numerical fit score or establish agreement with the experimental PCS. The units and sign convention for the loaded tensor, coordinates, and PCS are not documented in this script and are therefore left unstated here.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

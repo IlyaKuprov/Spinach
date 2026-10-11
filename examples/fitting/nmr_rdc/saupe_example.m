@@ -7,7 +7,9 @@
 function saupe_example()
 
 % Read the PDB file
-[pdb_aa,~,pdb_id,coords]=read_pdb_pro('protein.pdb',1);
+protein_dir=fullfile(fileparts(mfilename('fullpath')),...
+                     '..','..','standard_systems','proteins');
+[pdb_aa,~,pdb_id,coords]=read_pdb_pro(fullfile(protein_dir,'protein.pdb'),1);
 
 % Read RDC data
 load('rdc_data.mat','aa_num','rdc_hz',...

@@ -17,3 +17,6 @@ The 3D sequence simulation calls `liquid(...,@hncoca,...,'nmr')` with declared s
 ## Processing and output
 
 Each of the four phase-cycle components receives squared-cosine apodisation. The code Fourier-transforms the four components in F3, combines conjugate components into positive and negative signals, transforms those in F2 and combines them again, then Fourier-transforms F1. The plotted 3D output is `-real(spectrum)`.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

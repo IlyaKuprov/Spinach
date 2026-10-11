@@ -13,3 +13,6 @@ The simulation calls liquid with the hsqc sequence and spins 15N and 1H, J=90, s
 ## Simulation and output
 
 The generated simulated FIDs are squared-cosine apodised. The code Fourier-transforms F2, combines the two components as f1_pos+conj(f1_neg) for the States signal, then transforms F1 and plots the magnitude spectrum. The PDB/BMRB files initialise the simulated protein model; the example does not load an experimental spectrum or report measured coherence data. No DOI citation appears in the source.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

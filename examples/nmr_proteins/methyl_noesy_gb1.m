@@ -10,12 +10,15 @@
 function methyl_noesy_gb1()
 
 % Protein data import
+protein_dir=fullfile(fileparts(mfilename('fullpath')),...
+                     '..','standard_systems','proteins');
 options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
 options.deuterate='non-Me';
-options.csa_file='2N9K.csa';
-[sys,inter]=protein('2N9K.pdb','2N9K.bmrb',options);
+options.csa_file=fullfile(protein_dir,'2N9K.csa');
+[sys,inter]=protein(fullfile(protein_dir,'2N9K.pdb'),...
+                    fullfile(protein_dir,'2N9K.bmrb'),options);
 
 % Magnet field
 sys.magnet=21.1356;

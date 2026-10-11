@@ -132,7 +132,7 @@ switch spin_system.bas.formalism
 
         % Project directly into the hosting basis without building superoperators
         parts=spin_system.chem.parts{subst};
-        [present,indices]=hash_ismember(descriptors(:,parts),spin_system.bas.basis{subst});
+        [present,indices]=hash_ismember(descriptors(:,parts),spin_system.bas.row_hash{subst});
         rho=sparse(indices(present)+spin_system.bas.offsets(subst),...
                    ones(nnz(present),1),coeffs(present),spin_system.bas.offsets(end),1);
 

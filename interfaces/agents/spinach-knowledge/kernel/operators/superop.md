@@ -25,3 +25,5 @@ The two commutator-specific branches discard local transitions when the sum of t
 - `A`: three-column XYZ sparse triplets: row index, column index, and value. This is not MATLAB's CSC storage format; if the selected transitions are empty, the source returns the zero triplet `[1 1 0]`.
 
 Direct calls to this general function are not usually required; the source recommends the friendlier `operator()` function.
+
+For unequal source and destination subspaces, active labels in the full source rows are replaced by the target transition labels, then `hash_ismember` matches these rows against the selected cached `bas.row_hash{n}` destination rows. This retains the spectator-row equality condition without hashing references again. Equal subspaces still use the direct-index shortcut.

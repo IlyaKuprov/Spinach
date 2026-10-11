@@ -146,3 +146,10 @@ unweighted detection states. In spherical-tensor Liouville space, single-spin
 left-product table coefficients normalise tensor descriptors; direct projection
 into the hosting basis avoids full superoperator allocation. Use `state` for concentration-weighted
 initial states; detection vectors must not include concentration weighting.
+
+Basis row membership uses `bas.row_hash{n}`, a 32-character MD5 per full local
+descriptor row, compiled by `basis`. Keep this array in the same row order as
+`bas.basis{n}` when explicitly slicing descriptors; rebuild through `basis`
+after changing basis settings. `hash_ismember(A,hash_b)` takes numeric query
+rows and prehashed references, not two numeric matrices. Do not use full-row
+hashes to compare descriptors with columns removed.

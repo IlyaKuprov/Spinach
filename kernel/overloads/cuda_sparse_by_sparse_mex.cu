@@ -382,9 +382,10 @@ template<class T> __global__ void fill_ones(T *values,int64_t n)
 static mxArray *allocate_pattern(const GpuOutput &rows,const GpuOutput &cols,int64_t nnz,
                                 int64_t m,int64_t n,bool complex)
 {
-    const GpuOutput ones(nnz,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL);
-    if (complex) fill_ones<<<256,256>>>(ones.data<double2>(),nnz);
-    else fill_ones<<<256,256>>>(ones.data<double>(),nnz);
+    const int64_t n_values=nnz?1:0;
+    const GpuOutput ones(n_values,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL);
+    if (complex) fill_ones<<<256,256>>>(ones.data<double2>(),n_values);
+    else fill_ones<<<256,256>>>(ones.data<double>(),n_values);
     check_cuda(cudaDeviceSynchronize(),"fill_ones");
     mxArray *args[5]={rows.to_matlab(),cols.to_matlab(),ones.to_matlab(),
                      mxCreateDoubleScalar(static_cast<double>(m)),mxCreateDoubleScalar(static_cast<double>(n))};

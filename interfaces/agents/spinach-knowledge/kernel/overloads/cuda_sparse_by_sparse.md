@@ -16,6 +16,6 @@ A fresh sparse gpuArray is allocated from the symbolic GPU pattern using MATLAB'
 
 ## Availability and errors
 
-The shipped Linux binary targets R2026b and H200 (sm_90), with CUDA runtime and driver dependencies but no direct cuSPARSE dependency. Missing or unloadable platform binaries retain native GPU multiplication. An unrecognised internal layout raises `Spinach:cuda_sparse_by_sparse_mex:layout`; this does not fall back to native multiplication. CUDA computation and allocation errors propagate.
+The scalar-placeholder optimisation applies to the updated Linux binary and gateways rebuilt from the current source; the unchanged shipped Windows binary retains vector placeholders until rebuilt. The shipped Linux binary targets R2026b and H200 (sm_90), with CUDA runtime and driver dependencies but no direct cuSPARSE dependency. Missing or unloadable platform binaries retain native GPU multiplication. An unrecognised internal layout raises `Spinach:cuda_sparse_by_sparse_mex:layout`; this does not fall back to native multiplication. CUDA computation and allocation errors propagate.
 
 Algorithm references: Gustavson (1978), DOI [10.1145/355791.355796](https://doi.org/10.1145/355791.355796); Davis et al., [Sparse Direct Methods, Algorithm 2.2](https://people.engr.tamu.edu/davis/publications_files/survey_tech_report.pdf); [GraphBLAS saxpy3](https://github.com/DrTimothyAldenDavis/GraphBLAS/blob/stable/Source/mxm/GB_AxB_saxpy3.c); [spECK](https://github.com/GPUPeople/spECK).

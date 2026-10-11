@@ -44,15 +44,8 @@
 %
 %                   psi=coil_state(spin_system,[-1/2 1/2 0],[],'exact')
 %
-% Method argument has the following effect in sphten-liouv formalism:
-%
-%    'cheap'  - the state vector is generated without
-%               normalisation. For very large spin sys-
-%               tems this is much faster
-%
-%    'exact'  - exact state vector with correct normalisation
-%
-% All four arguments are required; method is ignored in Zeeman formalisms.
+% All four arguments are required; method must be 'exact'. State vectors
+% have correct normalisation in every Liouville-space formalism.
 %
 % The result is unweighted in every formalism. Use state for initial
 % populations weighted by substance concentrations. Wavefunction output is
@@ -131,58 +124,11 @@ end
 % Decide how to proceed
 switch spin_system.bas.formalism
     
-    case 'sphten-liouv'
-        
-        % Choose the state vector generation method
-        switch method
-            
-            % Careless normalisation
-            case 'cheap'
-                
-                % Parse the specification
-                [opspecs,coeffs]=human2opspec(spin_system,states,spins);
-                
-                % Keep only descriptors and their hosting basis on the workers
-                if spin_system.bas.nsubst==1, subst=1; end
-                parts=spin_system.chem.parts{subst};
-                local_basis=spin_system.bas.basis{subst};
-                active=cellfun(@any,opspecs);
-                descriptors=vertcat(opspecs{:});
-                descriptors=descriptors(active,parts);
-                nterms=size(descriptors,1); indices=zeros(nterms,1);
-
-                % Look up single terms locally and return only indices otherwise
-                parfor (n=1:nterms,nterms*(nterms>1))
-                    [present,index]=ismember(descriptors(n,:),local_basis,'rows');
-                    if ~present
-                        error('the requested state is not present in the basis.');
-                    end
-                    indices(n)=index;
-                end
-
-                % Assemble identity and indexed contributions on the client
-                rho=sum(coeffs(~active))*unit+sparse(...
-                    indices+spin_system.bas.offsets(subst),ones(size(indices)),...
-                    coeffs(active),spin_system.bas.offsets(end),1);
-
-            % Careful normalisation
-            case 'exact'
-                
-                % Apply a left side product superoperator to the unit state
-                rho=operator(spin_system,states,spins,'left')*unit;
-            
-            otherwise
-                
-                % Complain and bomb out
-                error('unknown state generation method.');
-                
-        end
-        
-    case 'zeeman-liouv'
+    case {'sphten-liouv','zeeman-liouv'}
 
         % Apply a left side product superoperator to the unit state
-        rho=operator(spin_system,states,spins,'left')*unit; 
-                
+        rho=operator(spin_system,states,spins,'left')*unit;
+
     case 'zeeman-hilb'
         
         % Generate a Hilbert space operator
@@ -233,7 +179,7 @@ end
 
 if ~ischar(method)
     error('method must be a character string.')
-elseif ~ismember(method, {'cheap', 'exact'})
+elseif ~strcmp(method,'exact')
     error('unknown method specification.');
 end
 

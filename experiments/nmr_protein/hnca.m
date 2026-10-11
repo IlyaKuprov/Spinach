@@ -61,13 +61,13 @@ J_nca=11.5; delta=abs(1/(4*J_nca));
 % Initial condition - NH protons
 if ~isfield(parameters,'rho0')
     HNs=ismember(spin_system.comp.labels,{'H'}); 
-    parameters.rho0=state(spin_system,'Lz',find(HNs),'cheap');
+    parameters.rho0=state(spin_system,'Lz',find(HNs));
 end
 
 % Detection state - NH protons
 if ~isfield(parameters,'coil')
     HNs=ismember(spin_system.comp.labels,{'H'}); 
-    parameters.coil=coil_state(spin_system,'L+',find(HNs),'cheap');
+    parameters.coil=coil_state(spin_system,'L+',find(HNs),'exact');
 end
 
 % Pulse operators all protons

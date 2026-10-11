@@ -685,7 +685,7 @@ compiled spin dimension before building substance-local projectors. This
 boundary also covers the adjoint generator passed by destination screening.
 
 The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
-with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
+with all four arguments; use `exact`, and pass `[]` for wavefunction
 spin lists. Only the legacy `state` wrapper retains optional arguments.
 
 Zeeman-wavefunction direct sums provide storage only. Nonempty reaction records

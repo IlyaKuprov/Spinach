@@ -133,10 +133,9 @@ Read its messages: missing GPU/gateway coverage and the specific
 `MATLAB:mex:ErrInvalidMEXFile` loader error are reported as skipped, not as
 numerical validation. All other CUDA errors and wrong results remain failures.
 
-## Cheap detection states
+## Detection states
 
-`coil_state(spin_system,states,spins,'cheap')` locates spherical-tensor state
-descriptors in a `parfor` loop. Only descriptor rows and the hosting basis block
-are sent to workers, which return scalar row indices; the client assembles the
-sparse state; singleton lookups stay on the client without basis transfer. The
-result remains unweighted and lacks exact normalisation; use `'exact'` when required.
+`coil_state(spin_system,states,spins,'exact')` constructs correctly normalised,
+unweighted detection states. In Liouville space it applies the left-product
+operator to the local unit coordinate. Use `state` for concentration-weighted
+initial states; detection vectors must not include concentration weighting.

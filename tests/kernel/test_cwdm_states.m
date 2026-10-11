@@ -8,7 +8,7 @@
 %     result - exact state-weighting and thermal-equilibrium checks
 %
 % Independent single-substance constructions supply the reference shapes.
-% Exact and cheap states, identities, level projectors, zero populations,
+% Exact states, identities, level projectors, zero populations,
 % and spin-free substances are covered. Thermal vectors use a 1e-12 bound.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -55,7 +55,7 @@ for n=1:2
     local_bas=bas; local_bas.approximation={'none'};
     local=test_spin_system(local_sys,local_inter,local_bas);
     reference{n}=s.chem.concs(n)*equilibrium(local);
-    for method={'exact','cheap'}
+    for method={'exact'}
         for label={'Lz','L+','E','ZL1'}
             expected=zeros(s.bas.offsets(end),1);
             expected(rows)=coil_state(local,label{1},1,method{1});
@@ -107,6 +107,27 @@ for concentration=[0 0.3 2]
                      'storage-only kets retain unit probability at every concentration');
 end
 fprintf('CWDM_WAVEFUNCTION norm_squared=%.16g\n',norm(psi)^2);
+
+% Reject the removed shortcut in every supported formalism
+for formalism={'sphten-liouv','zeeman-liouv','zeeman-hilb','zeeman-wavef'}
+    bas.formalism=formalism{1};
+    s=test_spin_system(sys,inter,bas);
+    if strcmp(formalism{1},'zeeman-wavef')
+        description=0.5; spins=[];
+    else
+        description='Lz'; spins=1;
+    end
+    for constructor={@state,@coil_state}
+        rejected=false;
+        try
+            constructor{1}(s,description,spins,'cheap');
+        catch err
+            rejected=strcmp(err.message,'unknown method specification.');
+        end
+        result=test_true(result,'removed state method',rejected,...
+                         'both constructors reject the removed shortcut in every formalism');
+    end
+end
 
 % Require all four arguments on the new unweighted primitive
 rejected=false;

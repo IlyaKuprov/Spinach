@@ -51,7 +51,7 @@ end
 rho=rho/norm(rho,2);
 
 % Detect the nuclei
-coil=coil_state(spin_system,'L+','nuclei','cheap');
+coil=coil_state(spin_system,'L+','nuclei','exact');
         
 % Evolution time step
 timestep=1/parameters.sweep;

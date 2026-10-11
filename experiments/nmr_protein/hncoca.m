@@ -63,13 +63,13 @@ t3.nsteps=parameters.npoints(3); t3.timestep=1/parameters.sweep(3);
 % Initial condition - NH protons
 if ~isfield(parameters,'rho0')
     HNs=ismember(spin_system.comp.labels,{'H'});
-    parameters.rho0=state(spin_system,'Lz',find(HNs),'cheap');
+    parameters.rho0=state(spin_system,'Lz',find(HNs));
 end
 
 % Detection state - NH protons
 if ~isfield(parameters,'coil')
     HNs=ismember(spin_system.comp.labels,{'H'});
-    parameters.coil=coil_state(spin_system,'L+',find(HNs),'cheap');
+    parameters.coil=coil_state(spin_system,'L+',find(HNs),'exact');
 end
 
 % Spin indices

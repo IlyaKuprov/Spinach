@@ -44,11 +44,7 @@
 %
 %                   psi=state(spin_system,[-1/2 1/2 0])
 %
-% Method argument has the following effect in sphten-liouv formalism:
-%
-%    'cheap'  - the state vector is generated without
-%               normalisation. For very large spin sys-
-%               tems this is much faster
+% The method argument accepts:
 %
 %    'exact'  - exact state vector with correct normalisation,
 %               this is the default when the last argument is
@@ -58,9 +54,7 @@
 %
 % Every density-matrix and Liouville method weights each substance block
 % by chem.concs. Use coil_state for unweighted detection operators.
-% Single-substance wavefunctions remain unweighted; segmented wavefunction
-% requests are rejected (use coil_state for unweighted ket storage). The method is ignored in
-% Zeeman Hilbert and Liouville formalisms, but concentration weighting is not.
+% Storage-only wavefunctions remain unweighted in every substance block.
 %
 % Outputs:
 %
@@ -124,7 +118,7 @@ end
 
 if ~ischar(method)
     error('method must be a character string.')
-elseif ~ismember(method, {'cheap', 'exact', 'chem'})
+elseif ~ismember(method, {'exact', 'chem'})
     error('unknown method specification.');
 end
 

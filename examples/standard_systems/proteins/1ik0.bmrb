@@ -1,0 +1,2552 @@
+data_5004
+
+#######################
+#  Entry information  #
+#######################
+
+save_entry_information
+   _Entry.Sf_category                    entry_information
+   _Entry.Sf_framecode                   entry_information
+   _Entry.ID                             5004
+   _Entry.Title                         
+;
+1H, 13C, 13CO, and 15N Chemical Shift Assignments for human IL-13
+;
+   _Entry.Type                           .
+   _Entry.Version_type                   original
+   _Entry.Submission_date                2001-05-01
+   _Entry.Accession_date                 2001-05-01
+   _Entry.Last_release_date              .
+   _Entry.Original_release_date          .
+   _Entry.Origination                    author
+   _Entry.NMR_STAR_version               3.1.1.61
+   _Entry.Original_NMR_STAR_version      2.1
+   _Entry.Experimental_method            NMR
+   _Entry.Experimental_method_subtype    .
+   _Entry.Details                        .
+   _Entry.BMRB_internal_directory_name   .
+
+   loop_
+      _Entry_author.Ordinal
+      _Entry_author.Given_name
+      _Entry_author.Family_name
+      _Entry_author.First_initial
+      _Entry_author.Middle_initials
+      _Entry_author.Family_title
+      _Entry_author.Entry_ID
+
+      1 Franklin  Moy      . J. . 5004 
+      2 Elizabeth Diblasio . .  . 5004 
+      3 James     Wilhelm  . .  . 5004 
+      4 Robert    Powers   . .  . 5004 
+
+   stop_
+
+   loop_
+      _Data_set.Type
+      _Data_set.Count
+      _Data_set.Entry_ID
+
+      assigned_chemical_shifts 1 5004 
+
+   stop_
+
+   loop_
+      _Datum.Type
+      _Datum.Count
+      _Datum.Entry_ID
+
+      '1H chemical shifts'  793 5004 
+      '13C chemical shifts' 504 5004 
+      '15N chemical shifts' 108 5004 
+
+   stop_
+
+   loop_
+      _Release.Release_number
+      _Release.Format_type
+      _Release.Format_version
+      _Release.Date
+      _Release.Submission_date
+      _Release.Type
+      _Release.Author
+      _Release.Detail
+      _Release.Entry_ID
+
+      1 . . 2004-07-07 . update   author 'correction of chemical shifts' 5004 
+      2 . . 2002-05-09 . original author 'original release'              5004 
+
+   stop_
+
+   loop_
+      _Related_entries.Database_name
+      _Related_entries.Database_accession_code
+      _Related_entries.Relationship
+      _Related_entries.Entry_ID
+
+      BMRB 4843 'Chemical shift data for the same molecule reported by Byrd, et. al.' 5004 
+
+   stop_
+
+save_
+
+
+###############
+#  Citations  #
+###############
+
+save_entry_citation
+   _Citation.Sf_category                  citations
+   _Citation.Sf_framecode                 entry_citation
+   _Citation.Entry_ID                     5004
+   _Citation.ID                           1
+   _Citation.Class                       'entry citation'
+   _Citation.CAS_abstract_code            .
+   _Citation.MEDLINE_UI_code              21313626
+   _Citation.DOI                          .
+   _Citation.PubMed_ID                    11419948
+   _Citation.Full_citation                .
+   _Citation.Title                       'Solution Structure of Human IL-13 and Implication for Receptor Binding'
+   _Citation.Status                       published
+   _Citation.Type                         journal
+   _Citation.Journal_abbrev              'J. Mol. Biol.'
+   _Citation.Journal_name_full            .
+   _Citation.Journal_volume               310
+   _Citation.Journal_issue                1
+   _Citation.Journal_ASTM                 .
+   _Citation.Journal_ISSN                 .
+   _Citation.Journal_CSD                  .
+   _Citation.Book_title                   .
+   _Citation.Book_chapter_title           .
+   _Citation.Book_volume                  .
+   _Citation.Book_series                  .
+   _Citation.Book_publisher               .
+   _Citation.Book_publisher_city          .
+   _Citation.Book_ISBN                    .
+   _Citation.Conference_title             .
+   _Citation.Conference_site              .
+   _Citation.Conference_state_province    .
+   _Citation.Conference_country           .
+   _Citation.Conference_start_date        .
+   _Citation.Conference_end_date          .
+   _Citation.Conference_abstract_number   .
+   _Citation.Thesis_institution           .
+   _Citation.Thesis_institution_city      .
+   _Citation.Thesis_institution_country   .
+   _Citation.WWW_URL                      .
+   _Citation.Page_first                   219
+   _Citation.Page_last                    230
+   _Citation.Year                         2001
+   _Citation.Details                      .
+
+   loop_
+      _Citation_author.Ordinal
+      _Citation_author.Given_name
+      _Citation_author.Family_name
+      _Citation_author.First_initial
+      _Citation_author.Middle_initials
+      _Citation_author.Family_title
+      _Citation_author.Entry_ID
+      _Citation_author.Citation_ID
+
+      1 Franklin  Moy      . J. . 5004 1 
+      2 Elizabeth Diblasio . .  . 5004 1 
+      3 James     Wilhelm  . .  . 5004 1 
+      4 Robert    Powers   . .  . 5004 1 
+
+   stop_
+
+   loop_
+      _Citation_keyword.Keyword
+      _Citation_keyword.Entry_ID
+      _Citation_keyword.Citation_ID
+
+       NMR                 5004 1 
+      'solution structure' 5004 1 
+       interleukin-13      5004 1 
+       interleukin-14      5004 1 
+
+   stop_
+
+save_
+
+
+#############################################
+#  Molecular system (assembly) description  #
+#############################################
+
+save_system_IL-13
+   _Assembly.Sf_category                       assembly
+   _Assembly.Sf_framecode                      system_IL-13
+   _Assembly.Entry_ID                          5004
+   _Assembly.ID                                1
+   _Assembly.Name                             'human interleukin-13'
+   _Assembly.BMRB_code                         .
+   _Assembly.Number_of_components              .
+   _Assembly.Organic_ligands                   .
+   _Assembly.Metal_ions                        .
+   _Assembly.Non_standard_bonds                .
+   _Assembly.Ambiguous_conformational_states   .
+   _Assembly.Ambiguous_chem_comp_sites         .
+   _Assembly.Molecules_in_chemical_exchange    .
+   _Assembly.Paramagnetic                      no
+   _Assembly.Thiol_state                      'all disulfide bound'
+   _Assembly.Molecular_mass                    .
+   _Assembly.Enzyme_commission_number          .
+   _Assembly.Details                           .
+   _Assembly.DB_query_date                     .
+   _Assembly.DB_query_revised_last_date        .
+
+   loop_
+      _Assembly_type.Type
+      _Assembly_type.Entry_ID
+      _Assembly_type.Assembly_ID
+
+      monomer 5004 1 
+
+   stop_
+
+   loop_
+      _Entity_assembly.ID
+      _Entity_assembly.Entity_assembly_name
+      _Entity_assembly.Entity_ID
+      _Entity_assembly.Entity_label
+      _Entity_assembly.Asym_ID
+      _Entity_assembly.PDB_chain_ID
+      _Entity_assembly.Experimental_data_reported
+      _Entity_assembly.Physical_state
+      _Entity_assembly.Conformational_isomer
+      _Entity_assembly.Chemical_exchange_state
+      _Entity_assembly.Magnetic_equivalence_group_code
+      _Entity_assembly.Role
+      _Entity_assembly.Details
+      _Entity_assembly.Entry_ID
+      _Entity_assembly.Assembly_ID
+
+      1 interleukin-13 1 $IL-13 . . . native . . . . . 5004 1 
+
+   stop_
+
+   loop_
+      _Bond.ID
+      _Bond.Type
+      _Bond.Value_order
+      _Bond.Assembly_atom_ID_1
+      _Bond.Entity_assembly_ID_1
+      _Bond.Entity_assembly_name_1
+      _Bond.Entity_ID_1
+      _Bond.Comp_ID_1
+      _Bond.Comp_index_ID_1
+      _Bond.Seq_ID_1
+      _Bond.Atom_ID_1
+      _Bond.Assembly_atom_ID_2
+      _Bond.Entity_assembly_ID_2
+      _Bond.Entity_assembly_name_2
+      _Bond.Entity_ID_2
+      _Bond.Comp_ID_2
+      _Bond.Comp_index_ID_2
+      _Bond.Seq_ID_2
+      _Bond.Atom_ID_2
+      _Bond.Auth_entity_assembly_ID_1
+      _Bond.Auth_entity_assembly_name_1
+      _Bond.Auth_seq_ID_1
+      _Bond.Auth_comp_ID_1
+      _Bond.Auth_atom_ID_1
+      _Bond.Auth_entity_assembly_ID_2
+      _Bond.Auth_entity_assembly_name_2
+      _Bond.Auth_seq_ID_2
+      _Bond.Auth_comp_ID_2
+      _Bond.Auth_atom_ID_2
+      _Bond.Entry_ID
+      _Bond.Assembly_ID
+
+      1 disulfide single . 1 . . CYS 29 29 SG . 1 . 1 CYS 57 57 SG . . . . . . . . . . 5004 1 
+      2 disulfide single . 1 . . CYS 45 45 SG . 1 . 1 CYS 71 71 SG . . . . . . . . . . 5004 1 
+
+   stop_
+
+   loop_
+      _Assembly_common_name.Name
+      _Assembly_common_name.Type
+      _Assembly_common_name.Entry_ID
+      _Assembly_common_name.Assembly_ID
+
+      'human interleukin-13' system       5004 1 
+       IL-13                 abbreviation 5004 1 
+
+   stop_
+
+save_
+
+
+    ####################################
+    #  Biological polymers and ligands #
+    ####################################
+
+save_IL-13
+   _Entity.Sf_category                       entity
+   _Entity.Sf_framecode                      IL-13
+   _Entity.Entry_ID                          5004
+   _Entity.ID                                1
+   _Entity.BMRB_code                         .
+   _Entity.Name                              interleukin-13
+   _Entity.Type                              polymer
+   _Entity.Polymer_common_type               .
+   _Entity.Polymer_type                      polypeptide(L)
+   _Entity.Polymer_type_details              .
+   _Entity.Polymer_strand_ID                 .
+   _Entity.Polymer_seq_one_letter_code_can   .
+   _Entity.Polymer_seq_one_letter_code      
+;
+MGPVPPSTALRELIEELVNI
+TQNQKAPLCNGSMVWSINLT
+AGMYCAALESLINVSGCSAI
+EKTQRMLSGFCPHKVSAGQF
+SSLHVRDTKIEVAQFVKDLL
+LHLKKLFREGRFN
+;
+   _Entity.Target_identifier                 .
+   _Entity.Polymer_author_defined_seq        .
+   _Entity.Polymer_author_seq_details        .
+   _Entity.Ambiguous_conformational_states   .
+   _Entity.Ambiguous_chem_comp_sites         .
+   _Entity.Nstd_monomer                      .
+   _Entity.Nstd_chirality                    .
+   _Entity.Nstd_linkage                      .
+   _Entity.Nonpolymer_comp_ID                .
+   _Entity.Nonpolymer_comp_label             .
+   _Entity.Number_of_monomers                113
+   _Entity.Number_of_nonpolymer_components   .
+   _Entity.Paramagnetic                      .
+   _Entity.Thiol_state                      'all disulfide bound'
+   _Entity.Src_method                        .
+   _Entity.Parent_entity_ID                  .
+   _Entity.Fragment                          .
+   _Entity.Mutation                          .
+   _Entity.EC_number                         .
+   _Entity.Calc_isoelectric_point            .
+   _Entity.Formula_weight                    .
+   _Entity.Formula_weight_exptl              .
+   _Entity.Formula_weight_exptl_meth         .
+   _Entity.Details                           .
+   _Entity.DB_query_date                     .
+   _Entity.DB_query_revised_last_date        2015-01-28
+
+   loop_
+      _Entity_db_link.Ordinal
+      _Entity_db_link.Author_supplied
+      _Entity_db_link.Database_code
+      _Entity_db_link.Accession_code
+      _Entity_db_link.Entry_mol_code
+      _Entity_db_link.Entry_mol_name
+      _Entity_db_link.Entry_experimental_method
+      _Entity_db_link.Entry_structure_resolution
+      _Entity_db_link.Entry_relation_type
+      _Entity_db_link.Entry_details
+      _Entity_db_link.Chimera_segment_ID
+      _Entity_db_link.Seq_query_to_submitted_percent
+      _Entity_db_link.Seq_subject_length
+      _Entity_db_link.Seq_identity
+      _Entity_db_link.Seq_positive
+      _Entity_db_link.Seq_homology_expectation_val
+      _Entity_db_link.Seq_align_begin
+      _Entity_db_link.Seq_align_end
+      _Entity_db_link.Seq_difference_details
+      _Entity_db_link.Seq_alignment_details
+      _Entity_db_link.Entry_ID
+      _Entity_db_link.Entity_ID
+
+       1 no BMRB         4843 .  IL-13                                                                          . . . . .  99.12 113 100.00 100.00 3.14e-76 . . . . 5004 1 
+       2 no PDB  1GA3          . "Nmr Structure Of Interleukin-13"                                               . . . . .  99.12 113 100.00 100.00 3.14e-76 . . . . 5004 1 
+       3 no PDB  1IJZ          . "Solution Structure Of Human Il-13"                                             . . . . . 100.00 113 100.00 100.00 3.28e-77 . . . . 5004 1 
+       4 no PDB  1IK0          . "Solution Structure Of Human Il-13"                                             . . . . . 100.00 113 100.00 100.00 3.28e-77 . . . . 5004 1 
+       5 no PDB  3BPO          . "Crystal Structure Of The Il13-Il4r-Il13ra Ternary Complex"                     . . . . . 100.00 127  98.23  99.12 1.46e-73 . . . . 5004 1 
+       6 no PDB  3G6D          . "Crystal Structure Of The Complex Between Cnto607 Fab And Il-13"                . . . . . 100.00 113 100.00 100.00 3.28e-77 . . . . 5004 1 
+       7 no PDB  3L5W          . "Crystal Structure Of The Complex Between Il-13 And C836 Fab"                   . . . . . 100.00 113 100.00 100.00 3.28e-77 . . . . 5004 1 
+       8 no PDB  3L5X          . "Crystal Structure Of The Complex Between Il-13 And H2l6 Fab"                   . . . . . 100.00 113 100.00 100.00 3.28e-77 . . . . 5004 1 
+       9 no PDB  3LB6          . "The Structure Of Il-13 In Complex With Il-13ralpha2"                           . . . . .  99.12 132 100.00 100.00 2.18e-76 . . . . 5004 1 
+      10 no PDB  4I77          . "Lebrikizumab Fab Bound To Il-13"                                               . . . . .  99.12 112 100.00 100.00 2.05e-76 . . . . 5004 1 
+      11 no PDB  4PS4          . "Crystal Structure Of The Complex Between Il-13 And M1295 Fab"                  . . . . . 100.00 113 100.00 100.00 3.28e-77 . . . . 5004 1 
+      12 no DBJ  BAG73312      . "interleukin 13 [synthetic construct]"                                          . . . . .  99.12 146  99.11 100.00 2.36e-75 . . . . 5004 1 
+      13 no EMBL CAA48823      . "NC30 [Homo sapiens]"                                                           . . . . .  99.12 146 100.00 100.00 4.26e-76 . . . . 5004 1 
+      14 no EMBL CAA48824      . "NC30 [Homo sapiens]"                                                           . . . . .  99.12 132 100.00 100.00 2.18e-76 . . . . 5004 1 
+      15 no GB   AAA36107      . "interleukin 13 [Homo sapiens]"                                                 . . . . .  99.12 132 100.00 100.00 2.18e-76 . . . . 5004 1 
+      16 no GB   AAA83738      . "interleukin 13 [Homo sapiens]"                                                 . . . . .  99.12 131  98.21  98.21 8.99e-73 . . . . 5004 1 
+      17 no GB   AAB01681      . "interleukin-13 precursor [Homo sapiens]"                                       . . . . .  99.12 132 100.00 100.00 2.18e-76 . . . . 5004 1 
+      18 no GB   AAC03535      . "interleukin 13 precursor [Homo sapiens]"                                       . . . . .  99.12 132  99.11  99.11 1.32e-75 . . . . 5004 1 
+      19 no GB   AAH96138      . "IL13 protein [Homo sapiens]"                                                   . . . . .  71.68  81  98.77 100.00 2.49e-51 . . . . 5004 1 
+      20 no PRF  1909326A      . "interleukin 13"                                                                . . . . .  99.12 146 100.00 100.00 4.26e-76 . . . . 5004 1 
+      21 no REF  NP_001008992  . "interleukin-13 precursor [Pan troglodytes]"                                    . . . . .  99.12 132  99.11 100.00 1.28e-75 . . . . 5004 1 
+      22 no REF  NP_002179     . "interleukin-13 precursor [Homo sapiens]"                                       . . . . .  99.12 146  99.11 100.00 2.36e-75 . . . . 5004 1 
+      23 no REF  XP_002815912  . "PREDICTED: interleukin-13 isoform X1 [Pongo abelii]"                           . . . . .  99.12 146  98.21 100.00 3.39e-75 . . . . 5004 1 
+      24 no REF  XP_003829348  . "PREDICTED: interleukin-13 isoform X1 [Pan paniscus]"                           . . . . .  99.12 146  99.11 100.00 2.19e-75 . . . . 5004 1 
+      25 no REF  XP_003829349  . "PREDICTED: interleukin-13 isoform X2 [Pan paniscus]"                           . . . . .  99.12 121  99.11 100.00 9.80e-76 . . . . 5004 1 
+      26 no SP   P35225        . "RecName: Full=Interleukin-13; Short=IL-13; Flags: Precursor [Homo sapiens]"    . . . . .  99.12 146 100.00 100.00 4.26e-76 . . . . 5004 1 
+      27 no SP   P61126        . "RecName: Full=Interleukin-13; Short=IL-13; Flags: Precursor [Pan troglodytes]" . . . . .  99.12 132  99.11 100.00 1.28e-75 . . . . 5004 1 
+
+   stop_
+
+   loop_
+      _Entity_common_name.Name
+      _Entity_common_name.Type
+      _Entity_common_name.Entry_ID
+      _Entity_common_name.Entity_ID
+
+      interleukin-13 common       5004 1 
+      IL-13          abbreviation 5004 1 
+
+   stop_
+
+   loop_
+      _Entity_comp_index.ID
+      _Entity_comp_index.Auth_seq_ID
+      _Entity_comp_index.Comp_ID
+      _Entity_comp_index.Comp_label
+      _Entity_comp_index.Entry_ID
+      _Entity_comp_index.Entity_ID
+
+        1 . MET . 5004 1 
+        2 . GLY . 5004 1 
+        3 . PRO . 5004 1 
+        4 . VAL . 5004 1 
+        5 . PRO . 5004 1 
+        6 . PRO . 5004 1 
+        7 . SER . 5004 1 
+        8 . THR . 5004 1 
+        9 . ALA . 5004 1 
+       10 . LEU . 5004 1 
+       11 . ARG . 5004 1 
+       12 . GLU . 5004 1 
+       13 . LEU . 5004 1 
+       14 . ILE . 5004 1 
+       15 . GLU . 5004 1 
+       16 . GLU . 5004 1 
+       17 . LEU . 5004 1 
+       18 . VAL . 5004 1 
+       19 . ASN . 5004 1 
+       20 . ILE . 5004 1 
+       21 . THR . 5004 1 
+       22 . GLN . 5004 1 
+       23 . ASN . 5004 1 
+       24 . GLN . 5004 1 
+       25 . LYS . 5004 1 
+       26 . ALA . 5004 1 
+       27 . PRO . 5004 1 
+       28 . LEU . 5004 1 
+       29 . CYS . 5004 1 
+       30 . ASN . 5004 1 
+       31 . GLY . 5004 1 
+       32 . SER . 5004 1 
+       33 . MET . 5004 1 
+       34 . VAL . 5004 1 
+       35 . TRP . 5004 1 
+       36 . SER . 5004 1 
+       37 . ILE . 5004 1 
+       38 . ASN . 5004 1 
+       39 . LEU . 5004 1 
+       40 . THR . 5004 1 
+       41 . ALA . 5004 1 
+       42 . GLY . 5004 1 
+       43 . MET . 5004 1 
+       44 . TYR . 5004 1 
+       45 . CYS . 5004 1 
+       46 . ALA . 5004 1 
+       47 . ALA . 5004 1 
+       48 . LEU . 5004 1 
+       49 . GLU . 5004 1 
+       50 . SER . 5004 1 
+       51 . LEU . 5004 1 
+       52 . ILE . 5004 1 
+       53 . ASN . 5004 1 
+       54 . VAL . 5004 1 
+       55 . SER . 5004 1 
+       56 . GLY . 5004 1 
+       57 . CYS . 5004 1 
+       58 . SER . 5004 1 
+       59 . ALA . 5004 1 
+       60 . ILE . 5004 1 
+       61 . GLU . 5004 1 
+       62 . LYS . 5004 1 
+       63 . THR . 5004 1 
+       64 . GLN . 5004 1 
+       65 . ARG . 5004 1 
+       66 . MET . 5004 1 
+       67 . LEU . 5004 1 
+       68 . SER . 5004 1 
+       69 . GLY . 5004 1 
+       70 . PHE . 5004 1 
+       71 . CYS . 5004 1 
+       72 . PRO . 5004 1 
+       73 . HIS . 5004 1 
+       74 . LYS . 5004 1 
+       75 . VAL . 5004 1 
+       76 . SER . 5004 1 
+       77 . ALA . 5004 1 
+       78 . GLY . 5004 1 
+       79 . GLN . 5004 1 
+       80 . PHE . 5004 1 
+       81 . SER . 5004 1 
+       82 . SER . 5004 1 
+       83 . LEU . 5004 1 
+       84 . HIS . 5004 1 
+       85 . VAL . 5004 1 
+       86 . ARG . 5004 1 
+       87 . ASP . 5004 1 
+       88 . THR . 5004 1 
+       89 . LYS . 5004 1 
+       90 . ILE . 5004 1 
+       91 . GLU . 5004 1 
+       92 . VAL . 5004 1 
+       93 . ALA . 5004 1 
+       94 . GLN . 5004 1 
+       95 . PHE . 5004 1 
+       96 . VAL . 5004 1 
+       97 . LYS . 5004 1 
+       98 . ASP . 5004 1 
+       99 . LEU . 5004 1 
+      100 . LEU . 5004 1 
+      101 . LEU . 5004 1 
+      102 . HIS . 5004 1 
+      103 . LEU . 5004 1 
+      104 . LYS . 5004 1 
+      105 . LYS . 5004 1 
+      106 . LEU . 5004 1 
+      107 . PHE . 5004 1 
+      108 . ARG . 5004 1 
+      109 . GLU . 5004 1 
+      110 . GLY . 5004 1 
+      111 . ARG . 5004 1 
+      112 . PHE . 5004 1 
+      113 . ASN . 5004 1 
+
+   stop_
+
+   loop_
+      _Entity_poly_seq.Hetero
+      _Entity_poly_seq.Mon_ID
+      _Entity_poly_seq.Num
+      _Entity_poly_seq.Comp_index_ID
+      _Entity_poly_seq.Entry_ID
+      _Entity_poly_seq.Entity_ID
+
+      . MET   1   1 5004 1 
+      . GLY   2   2 5004 1 
+      . PRO   3   3 5004 1 
+      . VAL   4   4 5004 1 
+      . PRO   5   5 5004 1 
+      . PRO   6   6 5004 1 
+      . SER   7   7 5004 1 
+      . THR   8   8 5004 1 
+      . ALA   9   9 5004 1 
+      . LEU  10  10 5004 1 
+      . ARG  11  11 5004 1 
+      . GLU  12  12 5004 1 
+      . LEU  13  13 5004 1 
+      . ILE  14  14 5004 1 
+      . GLU  15  15 5004 1 
+      . GLU  16  16 5004 1 
+      . LEU  17  17 5004 1 
+      . VAL  18  18 5004 1 
+      . ASN  19  19 5004 1 
+      . ILE  20  20 5004 1 
+      . THR  21  21 5004 1 
+      . GLN  22  22 5004 1 
+      . ASN  23  23 5004 1 
+      . GLN  24  24 5004 1 
+      . LYS  25  25 5004 1 
+      . ALA  26  26 5004 1 
+      . PRO  27  27 5004 1 
+      . LEU  28  28 5004 1 
+      . CYS  29  29 5004 1 
+      . ASN  30  30 5004 1 
+      . GLY  31  31 5004 1 
+      . SER  32  32 5004 1 
+      . MET  33  33 5004 1 
+      . VAL  34  34 5004 1 
+      . TRP  35  35 5004 1 
+      . SER  36  36 5004 1 
+      . ILE  37  37 5004 1 
+      . ASN  38  38 5004 1 
+      . LEU  39  39 5004 1 
+      . THR  40  40 5004 1 
+      . ALA  41  41 5004 1 
+      . GLY  42  42 5004 1 
+      . MET  43  43 5004 1 
+      . TYR  44  44 5004 1 
+      . CYS  45  45 5004 1 
+      . ALA  46  46 5004 1 
+      . ALA  47  47 5004 1 
+      . LEU  48  48 5004 1 
+      . GLU  49  49 5004 1 
+      . SER  50  50 5004 1 
+      . LEU  51  51 5004 1 
+      . ILE  52  52 5004 1 
+      . ASN  53  53 5004 1 
+      . VAL  54  54 5004 1 
+      . SER  55  55 5004 1 
+      . GLY  56  56 5004 1 
+      . CYS  57  57 5004 1 
+      . SER  58  58 5004 1 
+      . ALA  59  59 5004 1 
+      . ILE  60  60 5004 1 
+      . GLU  61  61 5004 1 
+      . LYS  62  62 5004 1 
+      . THR  63  63 5004 1 
+      . GLN  64  64 5004 1 
+      . ARG  65  65 5004 1 
+      . MET  66  66 5004 1 
+      . LEU  67  67 5004 1 
+      . SER  68  68 5004 1 
+      . GLY  69  69 5004 1 
+      . PHE  70  70 5004 1 
+      . CYS  71  71 5004 1 
+      . PRO  72  72 5004 1 
+      . HIS  73  73 5004 1 
+      . LYS  74  74 5004 1 
+      . VAL  75  75 5004 1 
+      . SER  76  76 5004 1 
+      . ALA  77  77 5004 1 
+      . GLY  78  78 5004 1 
+      . GLN  79  79 5004 1 
+      . PHE  80  80 5004 1 
+      . SER  81  81 5004 1 
+      . SER  82  82 5004 1 
+      . LEU  83  83 5004 1 
+      . HIS  84  84 5004 1 
+      . VAL  85  85 5004 1 
+      . ARG  86  86 5004 1 
+      . ASP  87  87 5004 1 
+      . THR  88  88 5004 1 
+      . LYS  89  89 5004 1 
+      . ILE  90  90 5004 1 
+      . GLU  91  91 5004 1 
+      . VAL  92  92 5004 1 
+      . ALA  93  93 5004 1 
+      . GLN  94  94 5004 1 
+      . PHE  95  95 5004 1 
+      . VAL  96  96 5004 1 
+      . LYS  97  97 5004 1 
+      . ASP  98  98 5004 1 
+      . LEU  99  99 5004 1 
+      . LEU 100 100 5004 1 
+      . LEU 101 101 5004 1 
+      . HIS 102 102 5004 1 
+      . LEU 103 103 5004 1 
+      . LYS 104 104 5004 1 
+      . LYS 105 105 5004 1 
+      . LEU 106 106 5004 1 
+      . PHE 107 107 5004 1 
+      . ARG 108 108 5004 1 
+      . GLU 109 109 5004 1 
+      . GLY 110 110 5004 1 
+      . ARG 111 111 5004 1 
+      . PHE 112 112 5004 1 
+      . ASN 113 113 5004 1 
+
+   stop_
+
+save_
+
+
+    ####################
+    #  Natural source  #
+    ####################
+
+save_natural_source
+   _Entity_natural_src_list.Sf_category    natural_source
+   _Entity_natural_src_list.Sf_framecode   natural_source
+   _Entity_natural_src_list.Entry_ID       5004
+   _Entity_natural_src_list.ID             1
+
+   loop_
+      _Entity_natural_src.ID
+      _Entity_natural_src.Entity_ID
+      _Entity_natural_src.Entity_label
+      _Entity_natural_src.Entity_chimera_segment_ID
+      _Entity_natural_src.NCBI_taxonomy_ID
+      _Entity_natural_src.Type
+      _Entity_natural_src.Common
+      _Entity_natural_src.Organism_name_scientific
+      _Entity_natural_src.Organism_name_common
+      _Entity_natural_src.Organism_acronym
+      _Entity_natural_src.ICTVdb_decimal_code
+      _Entity_natural_src.Superkingdom
+      _Entity_natural_src.Kingdom
+      _Entity_natural_src.Genus
+      _Entity_natural_src.Species
+      _Entity_natural_src.Strain
+      _Entity_natural_src.Variant
+      _Entity_natural_src.Subvariant
+      _Entity_natural_src.Organ
+      _Entity_natural_src.Tissue
+      _Entity_natural_src.Tissue_fraction
+      _Entity_natural_src.Cell_line
+      _Entity_natural_src.Cell_type
+      _Entity_natural_src.ATCC_number
+      _Entity_natural_src.Organelle
+      _Entity_natural_src.Cellular_location
+      _Entity_natural_src.Fragment
+      _Entity_natural_src.Fraction
+      _Entity_natural_src.Secretion
+      _Entity_natural_src.Plasmid
+      _Entity_natural_src.Plasmid_details
+      _Entity_natural_src.Gene_mnemonic
+      _Entity_natural_src.Dev_stage
+      _Entity_natural_src.Details
+      _Entity_natural_src.Citation_ID
+      _Entity_natural_src.Citation_label
+      _Entity_natural_src.Entry_ID
+      _Entity_natural_src.Entity_natural_src_list_ID
+
+      1 1 $IL-13 . 9606 . . 'Homo sapiens' Human . . Eukaryota Metazoa Homo sapiens . . . . . . . . . . . . . . . . . . . . . 5004 1 
+
+   stop_
+
+save_
+
+
+    #########################
+    #  Experimental source  #
+    #########################
+
+save_experimental_source
+   _Entity_experimental_src_list.Sf_category    experimental_source
+   _Entity_experimental_src_list.Sf_framecode   experimental_source
+   _Entity_experimental_src_list.Entry_ID       5004
+   _Entity_experimental_src_list.ID             1
+
+   loop_
+      _Entity_experimental_src.ID
+      _Entity_experimental_src.Entity_ID
+      _Entity_experimental_src.Entity_label
+      _Entity_experimental_src.Entity_chimera_segment_ID
+      _Entity_experimental_src.Production_method
+      _Entity_experimental_src.Host_org_scientific_name
+      _Entity_experimental_src.Host_org_name_common
+      _Entity_experimental_src.Host_org_details
+      _Entity_experimental_src.Host_org_NCBI_taxonomy_ID
+      _Entity_experimental_src.Host_org_genus
+      _Entity_experimental_src.Host_org_species
+      _Entity_experimental_src.Host_org_strain
+      _Entity_experimental_src.Host_org_variant
+      _Entity_experimental_src.Host_org_subvariant
+      _Entity_experimental_src.Host_org_organ
+      _Entity_experimental_src.Host_org_tissue
+      _Entity_experimental_src.Host_org_tissue_fraction
+      _Entity_experimental_src.Host_org_cell_line
+      _Entity_experimental_src.Host_org_cell_type
+      _Entity_experimental_src.Host_org_cellular_location
+      _Entity_experimental_src.Host_org_organelle
+      _Entity_experimental_src.Host_org_gene
+      _Entity_experimental_src.Host_org_culture_collection
+      _Entity_experimental_src.Host_org_ATCC_number
+      _Entity_experimental_src.Vector_type
+      _Entity_experimental_src.PDBview_host_org_vector_name
+      _Entity_experimental_src.PDBview_plasmid_name
+      _Entity_experimental_src.Vector_name
+      _Entity_experimental_src.Vector_details
+      _Entity_experimental_src.Vendor_name
+      _Entity_experimental_src.Host_org_dev_stage
+      _Entity_experimental_src.Details
+      _Entity_experimental_src.Citation_ID
+      _Entity_experimental_src.Citation_label
+      _Entity_experimental_src.Entry_ID
+      _Entity_experimental_src.Entity_experimental_src_list_ID
+
+      1 1 $IL-13 . 'recombinant technology' . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5004 1 
+
+   stop_
+
+save_
+
+
+#####################################
+#  Sample contents and methodology  #
+#####################################
+	 
+    ########################
+    #  Sample description  #
+    ########################
+
+save_sample_1
+   _Sample.Sf_category                      sample
+   _Sample.Sf_framecode                     sample_1
+   _Sample.Entry_ID                         5004
+   _Sample.ID                               1
+   _Sample.Type                             solution
+   _Sample.Sub_type                         .
+   _Sample.Details                          .
+   _Sample.Aggregate_sample_number          .
+   _Sample.Solvent_system                   .
+   _Sample.Preparation_date                 .
+   _Sample.Preparation_expiration_date      .
+   _Sample.Polycrystallization_protocol     .
+   _Sample.Single_crystal_protocol          .
+   _Sample.Crystal_grow_apparatus           .
+   _Sample.Crystal_grow_atmosphere          .
+   _Sample.Crystal_grow_details             .
+   _Sample.Crystal_grow_method              .
+   _Sample.Crystal_grow_method_cit_ID       .
+   _Sample.Crystal_grow_pH                  .
+   _Sample.Crystal_grow_pH_range            .
+   _Sample.Crystal_grow_pressure            .
+   _Sample.Crystal_grow_pressure_esd        .
+   _Sample.Crystal_grow_seeding             .
+   _Sample.Crystal_grow_seeding_cit_ID      .
+   _Sample.Crystal_grow_temp                .
+   _Sample.Crystal_grow_temp_details        .
+   _Sample.Crystal_grow_temp_esd            .
+   _Sample.Crystal_grow_time                .
+   _Sample.Oriented_sample_prep_protocol    .
+   _Sample.Lyophilization_cryo_protectant   .
+   _Sample.Storage_protocol                 .
+
+   loop_
+      _Sample_component.ID
+      _Sample_component.Mol_common_name
+      _Sample_component.Isotopic_labeling
+      _Sample_component.Assembly_ID
+      _Sample_component.Assembly_label
+      _Sample_component.Entity_ID
+      _Sample_component.Entity_label
+      _Sample_component.Product_ID
+      _Sample_component.Type
+      _Sample_component.Concentration_val
+      _Sample_component.Concentration_val_min
+      _Sample_component.Concentration_val_max
+      _Sample_component.Concentration_val_units
+      _Sample_component.Concentration_val_err
+      _Sample_component.Vendor
+      _Sample_component.Vendor_product_name
+      _Sample_component.Vendor_product_code
+      _Sample_component.Entry_ID
+      _Sample_component.Sample_ID
+
+      1  interleukin-13    '[U-95% 13C; U-95% 15N]' . . 1 $IL-13 . .  1.0 . . mM . . . . 5004 1 
+      2 'phosphate buffer'  .                       . .  .  .     . . 40   . . mM . . . . 5004 1 
+      3  NaN3               .                       . .  .  .     . .  2   . . mM . . . . 5004 1 
+      4  NaCl               .                       . .  .  .     . . 40   . . mM . . . . 5004 1 
+      5  H2O                .                       . .  .  .     . . 90   . . %  . . . . 5004 1 
+      6  D2O                .                       . .  .  .     . . 10   . . %  . . . . 5004 1 
+
+   stop_
+
+save_
+
+
+save_sample_2
+   _Sample.Sf_category                      sample
+   _Sample.Sf_framecode                     sample_2
+   _Sample.Entry_ID                         5004
+   _Sample.ID                               2
+   _Sample.Type                             solution
+   _Sample.Sub_type                         .
+   _Sample.Details                          .
+   _Sample.Aggregate_sample_number          .
+   _Sample.Solvent_system                   .
+   _Sample.Preparation_date                 .
+   _Sample.Preparation_expiration_date      .
+   _Sample.Polycrystallization_protocol     .
+   _Sample.Single_crystal_protocol          .
+   _Sample.Crystal_grow_apparatus           .
+   _Sample.Crystal_grow_atmosphere          .
+   _Sample.Crystal_grow_details             .
+   _Sample.Crystal_grow_method              .
+   _Sample.Crystal_grow_method_cit_ID       .
+   _Sample.Crystal_grow_pH                  .
+   _Sample.Crystal_grow_pH_range            .
+   _Sample.Crystal_grow_pressure            .
+   _Sample.Crystal_grow_pressure_esd        .
+   _Sample.Crystal_grow_seeding             .
+   _Sample.Crystal_grow_seeding_cit_ID      .
+   _Sample.Crystal_grow_temp                .
+   _Sample.Crystal_grow_temp_details        .
+   _Sample.Crystal_grow_temp_esd            .
+   _Sample.Crystal_grow_time                .
+   _Sample.Oriented_sample_prep_protocol    .
+   _Sample.Lyophilization_cryo_protectant   .
+   _Sample.Storage_protocol                 .
+
+   loop_
+      _Sample_component.ID
+      _Sample_component.Mol_common_name
+      _Sample_component.Isotopic_labeling
+      _Sample_component.Assembly_ID
+      _Sample_component.Assembly_label
+      _Sample_component.Entity_ID
+      _Sample_component.Entity_label
+      _Sample_component.Product_ID
+      _Sample_component.Type
+      _Sample_component.Concentration_val
+      _Sample_component.Concentration_val_min
+      _Sample_component.Concentration_val_max
+      _Sample_component.Concentration_val_units
+      _Sample_component.Concentration_val_err
+      _Sample_component.Vendor
+      _Sample_component.Vendor_product_name
+      _Sample_component.Vendor_product_code
+      _Sample_component.Entry_ID
+      _Sample_component.Sample_ID
+
+      1  interleukin-13    '[U-95% 15N]' . . 1 $IL-13 . .  1.0 . . mM . . . . 5004 2 
+      2 'phosphate buffer'  .            . .  .  .     . . 40   . . mM . . . . 5004 2 
+      3  NaN3               .            . .  .  .     . .  2   . . mM . . . . 5004 2 
+      4  NaCl               .            . .  .  .     . . 40   . . mM . . . . 5004 2 
+      5  H2O                .            . .  .  .     . . 90   . . %  . . . . 5004 2 
+      6  D2O                .            . .  .  .     . . 10   . . %  . . . . 5004 2 
+
+   stop_
+
+save_
+
+
+#######################
+#  Sample conditions  #
+#######################
+
+save_Ex-cond_1
+   _Sample_condition_list.Sf_category    sample_conditions
+   _Sample_condition_list.Sf_framecode   Ex-cond_1
+   _Sample_condition_list.Entry_ID       5004
+   _Sample_condition_list.ID             1
+   _Sample_condition_list.Details        .
+
+   loop_
+      _Sample_condition_variable.Type
+      _Sample_condition_variable.Val
+      _Sample_condition_variable.Val_err
+      _Sample_condition_variable.Val_units
+      _Sample_condition_variable.Entry_ID
+      _Sample_condition_variable.Sample_condition_list_ID
+
+      pH            6.0 0.0 n/a 5004 1 
+      temperature 298   0   K   5004 1 
+
+   stop_
+
+save_
+
+
+#########################
+#  Experimental detail  #
+#########################
+
+    ##################################
+    #  NMR Spectrometer definitions  #
+    ##################################
+
+save_NMR_spectrometer
+   _NMR_spectrometer.Sf_category      NMR_spectrometer
+   _NMR_spectrometer.Sf_framecode     NMR_spectrometer
+   _NMR_spectrometer.Entry_ID         5004
+   _NMR_spectrometer.ID               1
+   _NMR_spectrometer.Details          .
+   _NMR_spectrometer.Manufacturer     Bruker
+   _NMR_spectrometer.Model            AVANCE
+   _NMR_spectrometer.Serial_number    .
+   _NMR_spectrometer.Field_strength   600
+
+save_
+
+
+save_spectrometer_list
+   _NMR_spectrometer_list.Sf_category    NMR_spectrometer_list
+   _NMR_spectrometer_list.Sf_framecode   spectrometer_list
+   _NMR_spectrometer_list.Entry_ID       5004
+   _NMR_spectrometer_list.ID             1
+
+   loop_
+      _NMR_spectrometer_view.ID
+      _NMR_spectrometer_view.Name
+      _NMR_spectrometer_view.Manufacturer
+      _NMR_spectrometer_view.Model
+      _NMR_spectrometer_view.Serial_number
+      _NMR_spectrometer_view.Field_strength
+      _NMR_spectrometer_view.Details
+      _NMR_spectrometer_view.Citation_ID
+      _NMR_spectrometer_view.Citation_label
+      _NMR_spectrometer_view.Entry_ID
+      _NMR_spectrometer_view.NMR_spectrometer_list_ID
+
+      1 NMR_spectrometer Bruker AVANCE . 600 . . . 5004 1 
+
+   stop_
+
+save_
+
+
+    #############################
+    #  NMR applied experiments  #
+    #############################
+
+save_experiment_list
+   _Experiment_list.Sf_category    experiment_list
+   _Experiment_list.Sf_framecode   experiment_list
+   _Experiment_list.Entry_ID       5004
+   _Experiment_list.ID             1
+   _Experiment_list.Details        .
+
+save_
+
+
+####################
+#  NMR parameters  #
+####################
+
+    ##############################
+    #  Assigned chemical shifts  #
+    ##############################
+
+	################################
+	#  Chemical shift referencing  #
+	################################
+
+save_chemical_shift_reference
+   _Chem_shift_reference.Sf_category    chem_shift_reference
+   _Chem_shift_reference.Sf_framecode   chemical_shift_reference
+   _Chem_shift_reference.Entry_ID       5004
+   _Chem_shift_reference.ID             1
+   _Chem_shift_reference.Details        .
+
+   loop_
+      _Chem_shift_ref.Atom_type
+      _Chem_shift_ref.Atom_isotope_number
+      _Chem_shift_ref.Mol_common_name
+      _Chem_shift_ref.Atom_group
+      _Chem_shift_ref.Concentration_val
+      _Chem_shift_ref.Concentration_units
+      _Chem_shift_ref.Solvent
+      _Chem_shift_ref.Rank
+      _Chem_shift_ref.Chem_shift_units
+      _Chem_shift_ref.Chem_shift_val
+      _Chem_shift_ref.Ref_method
+      _Chem_shift_ref.Ref_type
+      _Chem_shift_ref.Indirect_shift_ratio
+      _Chem_shift_ref.External_ref_loc
+      _Chem_shift_ref.External_ref_sample_geometry
+      _Chem_shift_ref.External_ref_axis
+      _Chem_shift_ref.Indirect_shift_ratio_cit_ID
+      _Chem_shift_ref.Indirect_shift_ratio_cit_label
+      _Chem_shift_ref.Ref_correction_type
+      _Chem_shift_ref.Correction_val
+      _Chem_shift_ref.Correction_val_cit_ID
+      _Chem_shift_ref.Correction_val_cit_label
+      _Chem_shift_ref.Entry_ID
+      _Chem_shift_ref.Chem_shift_reference_ID
+
+      H  1 DSS 'methyl protons' . . . . ppm 0.0 internal direct   1.0         . . . . . . . . . 5004 1 
+      N 15 DSS 'methyl protons' . . . . ppm 0.0 .        indirect 0.101329118 . . . . . . . . . 5004 1 
+      C 13 DSS 'methyl protons' . . . . ppm 0.0 .        indirect 0.251449530 . . . . . . . . . 5004 1 
+
+   stop_
+
+save_
+
+
+     ###################################
+     #  Assigned chemical shift lists  #
+     ###################################
+
+###################################################################
+#       Chemical Shift Ambiguity Index Value Definitions          #
+#                                                                 #
+# The values other than 1 are used for those atoms with different #
+# chemical shifts that cannot be assigned to stereospecific atoms #
+# or to specific residues or chains.                              #
+#                                                                 #
+#   Index Value            Definition                             #
+#                                                                 #
+#      1             Unique (including isolated methyl protons,   #
+#                         geminal atoms, and geminal methyl       #
+#                         groups with identical chemical shifts)  #
+#                         (e.g. ILE HD11, HD12, HD13 protons)     #
+#      2             Ambiguity of geminal atoms or geminal methyl #
+#                         proton groups (e.g. ASP HB2 and HB3     #
+#                         protons, LEU CD1 and CD2 carbons, or    #
+#                         LEU HD11, HD12, HD13 and HD21, HD22,    #
+#                         HD23 methyl protons)                    #
+#      3             Aromatic atoms on opposite sides of          #
+#                         symmetrical rings (e.g. TYR HE1 and HE2 #
+#                         protons)                                #
+#      4             Intraresidue ambiguities (e.g. LYS HG and    #
+#                         HD protons or TRP HZ2 and HZ3 protons)  #
+#      5             Interresidue ambiguities (LYS 12 vs. LYS 27) #
+#      6             Intermolecular ambiguities (e.g. ASP 31 CA   #
+#                         in monomer 1 and ASP 31 CA in monomer 2 #
+#                         of an asymmetrical homodimer, duplex    #
+#                         DNA assignments, or other assignments   #
+#                         that may apply to atoms in one or more  #
+#                         molecule in the molecular assembly)     #
+#      9             Ambiguous, specific ambiguity not defined    #
+#                                                                 #
+###################################################################
+save_shift_set_1
+   _Assigned_chem_shift_list.Sf_category                   assigned_chemical_shifts
+   _Assigned_chem_shift_list.Sf_framecode                  shift_set_1
+   _Assigned_chem_shift_list.Entry_ID                      5004
+   _Assigned_chem_shift_list.ID                            1
+   _Assigned_chem_shift_list.Sample_condition_list_ID      1
+   _Assigned_chem_shift_list.Sample_condition_list_label  $Ex-cond_1
+   _Assigned_chem_shift_list.Chem_shift_reference_ID       1
+   _Assigned_chem_shift_list.Chem_shift_reference_label   $chemical_shift_reference
+   _Assigned_chem_shift_list.Chem_shift_1H_err             .
+   _Assigned_chem_shift_list.Chem_shift_13C_err            .
+   _Assigned_chem_shift_list.Chem_shift_15N_err            .
+   _Assigned_chem_shift_list.Chem_shift_31P_err            .
+   _Assigned_chem_shift_list.Chem_shift_2H_err             .
+   _Assigned_chem_shift_list.Chem_shift_19F_err            .
+   _Assigned_chem_shift_list.Error_derivation_method       .
+   _Assigned_chem_shift_list.Details                       .
+   _Assigned_chem_shift_list.Text_data_format              .
+   _Assigned_chem_shift_list.Text_data                     .
+
+   loop_
+      _Chem_shift_experiment.Experiment_ID
+      _Chem_shift_experiment.Experiment_name
+      _Chem_shift_experiment.Sample_ID
+      _Chem_shift_experiment.Sample_label
+      _Chem_shift_experiment.Sample_state
+      _Chem_shift_experiment.Entry_ID
+      _Chem_shift_experiment.Assigned_chem_shift_list_ID
+
+      . . 1 $sample_1 . 5004 1 
+      . . 2 $sample_2 . 5004 1 
+
+   stop_
+
+   loop_
+      _Atom_chem_shift.ID
+      _Atom_chem_shift.Assembly_atom_ID
+      _Atom_chem_shift.Entity_assembly_ID
+      _Atom_chem_shift.Entity_ID
+      _Atom_chem_shift.Comp_index_ID
+      _Atom_chem_shift.Seq_ID
+      _Atom_chem_shift.Comp_ID
+      _Atom_chem_shift.Atom_ID
+      _Atom_chem_shift.Atom_type
+      _Atom_chem_shift.Atom_isotope_number
+      _Atom_chem_shift.Val
+      _Atom_chem_shift.Val_err
+      _Atom_chem_shift.Assign_fig_of_merit
+      _Atom_chem_shift.Ambiguity_code
+      _Atom_chem_shift.Occupancy
+      _Atom_chem_shift.Resonance_ID
+      _Atom_chem_shift.Auth_entity_assembly_ID
+      _Atom_chem_shift.Auth_asym_ID
+      _Atom_chem_shift.Auth_seq_ID
+      _Atom_chem_shift.Auth_comp_ID
+      _Atom_chem_shift.Auth_atom_ID
+      _Atom_chem_shift.Details
+      _Atom_chem_shift.Entry_ID
+      _Atom_chem_shift.Assigned_chem_shift_list_ID
+
+         1 . 1 1   1   1 MET CA   C 13  55.3  . . 1 . . . . . . . . 5004 1 
+         2 . 1 1   1   1 MET CB   C 13  33.0  . . 1 . . . . . . . . 5004 1 
+         3 . 1 1   1   1 MET CG   C 13  30.9  . . 1 . . . . . . . . 5004 1 
+         4 . 1 1   2   2 GLY H    H  1   8.61 . . 1 . . . . . . . . 5004 1 
+         5 . 1 1   2   2 GLY N    N 15 112.3  . . 1 . . . . . . . . 5004 1 
+         6 . 1 1   2   2 GLY HA2  H  1   4.13 . . 2 . . . . . . . . 5004 1 
+         7 . 1 1   2   2 GLY HA3  H  1   4.18 . . 2 . . . . . . . . 5004 1 
+         8 . 1 1   2   2 GLY CA   C 13  44.5  . . 1 . . . . . . . . 5004 1 
+         9 . 1 1   3   3 PRO HA   H  1   4.46 . . 1 . . . . . . . . 5004 1 
+        10 . 1 1   3   3 PRO CA   C 13  63.0  . . 1 . . . . . . . . 5004 1 
+        11 . 1 1   3   3 PRO HB2  H  1   1.89 . . 2 . . . . . . . . 5004 1 
+        12 . 1 1   3   3 PRO HB3  H  1   2.24 . . 2 . . . . . . . . 5004 1 
+        13 . 1 1   3   3 PRO CB   C 13  32.1  . . 1 . . . . . . . . 5004 1 
+        14 . 1 1   3   3 PRO CG   C 13  27.2  . . 1 . . . . . . . . 5004 1 
+        15 . 1 1   3   3 PRO HG2  H  1   2.00 . . 1 . . . . . . . . 5004 1 
+        16 . 1 1   3   3 PRO HG3  H  1   2.00 . . 1 . . . . . . . . 5004 1 
+        17 . 1 1   3   3 PRO CD   C 13  49.7  . . 1 . . . . . . . . 5004 1 
+        18 . 1 1   3   3 PRO HD2  H  1   3.63 . . 1 . . . . . . . . 5004 1 
+        19 . 1 1   3   3 PRO HD3  H  1   3.63 . . 1 . . . . . . . . 5004 1 
+        20 . 1 1   3   3 PRO C    C 13 176.9  . . 1 . . . . . . . . 5004 1 
+        21 . 1 1   4   4 VAL H    H  1   8.20 . . 1 . . . . . . . . 5004 1 
+        22 . 1 1   4   4 VAL N    N 15 121.7  . . 1 . . . . . . . . 5004 1 
+        23 . 1 1   4   4 VAL HA   H  1   4.42 . . 1 . . . . . . . . 5004 1 
+        24 . 1 1   4   4 VAL CA   C 13  59.7  . . 1 . . . . . . . . 5004 1 
+        25 . 1 1   4   4 VAL HB   H  1   2.04 . . 1 . . . . . . . . 5004 1 
+        26 . 1 1   4   4 VAL CB   C 13  32.5  . . 1 . . . . . . . . 5004 1 
+        27 . 1 1   4   4 VAL CG1  C 13  20.9  . . 2 . . . . . . . . 5004 1 
+        28 . 1 1   4   4 VAL CG2  C 13  20.1  . . 2 . . . . . . . . 5004 1 
+        29 . 1 1   4   4 VAL HG11 H  1   0.98 . . 2 . . . . . . . . 5004 1 
+        30 . 1 1   4   4 VAL HG12 H  1   0.98 . . 2 . . . . . . . . 5004 1 
+        31 . 1 1   4   4 VAL HG13 H  1   0.98 . . 2 . . . . . . . . 5004 1 
+        32 . 1 1   4   4 VAL HG21 H  1   0.93 . . 2 . . . . . . . . 5004 1 
+        33 . 1 1   4   4 VAL HG22 H  1   0.93 . . 2 . . . . . . . . 5004 1 
+        34 . 1 1   4   4 VAL HG23 H  1   0.93 . . 2 . . . . . . . . 5004 1 
+        35 . 1 1   5   5 PRO HA   H  1   4.66 . . 1 . . . . . . . . 5004 1 
+        36 . 1 1   5   5 PRO CA   C 13  61.6  . . 1 . . . . . . . . 5004 1 
+        37 . 1 1   5   5 PRO HB2  H  1   1.80 . . 2 . . . . . . . . 5004 1 
+        38 . 1 1   5   5 PRO HB3  H  1   2.29 . . 2 . . . . . . . . 5004 1 
+        39 . 1 1   5   5 PRO CB   C 13  31.1  . . 1 . . . . . . . . 5004 1 
+        40 . 1 1   5   5 PRO CG   C 13  27.5  . . 1 . . . . . . . . 5004 1 
+        41 . 1 1   5   5 PRO HG2  H  1   1.92 . . 2 . . . . . . . . 5004 1 
+        42 . 1 1   5   5 PRO HG3  H  1   2.02 . . 2 . . . . . . . . 5004 1 
+        43 . 1 1   5   5 PRO CD   C 13  51.1  . . 1 . . . . . . . . 5004 1 
+        44 . 1 1   5   5 PRO HD2  H  1   3.91 . . 2 . . . . . . . . 5004 1 
+        45 . 1 1   5   5 PRO HD3  H  1   3.62 . . 2 . . . . . . . . 5004 1 
+        46 . 1 1   6   6 PRO HA   H  1   4.40 . . 1 . . . . . . . . 5004 1 
+        47 . 1 1   6   6 PRO CA   C 13  64.0  . . 1 . . . . . . . . 5004 1 
+        48 . 1 1   6   6 PRO HB2  H  1   1.90 . . 2 . . . . . . . . 5004 1 
+        49 . 1 1   6   6 PRO HB3  H  1   2.31 . . 2 . . . . . . . . 5004 1 
+        50 . 1 1   6   6 PRO CB   C 13  32.1  . . 1 . . . . . . . . 5004 1 
+        51 . 1 1   6   6 PRO CG   C 13  27.5  . . 1 . . . . . . . . 5004 1 
+        52 . 1 1   6   6 PRO HG2  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+        53 . 1 1   6   6 PRO HG3  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+        54 . 1 1   6   6 PRO CD   C 13  50.5  . . 1 . . . . . . . . 5004 1 
+        55 . 1 1   6   6 PRO HD2  H  1   3.69 . . 2 . . . . . . . . 5004 1 
+        56 . 1 1   6   6 PRO HD3  H  1   3.83 . . 2 . . . . . . . . 5004 1 
+        57 . 1 1   6   6 PRO C    C 13 177.5  . . 1 . . . . . . . . 5004 1 
+        58 . 1 1   7   7 SER H    H  1   8.13 . . 1 . . . . . . . . 5004 1 
+        59 . 1 1   7   7 SER N    N 15 113.4  . . 1 . . . . . . . . 5004 1 
+        60 . 1 1   7   7 SER HA   H  1   3.93 . . 1 . . . . . . . . 5004 1 
+        61 . 1 1   7   7 SER CA   C 13  59.9  . . 1 . . . . . . . . 5004 1 
+        62 . 1 1   7   7 SER HB2  H  1   3.77 . . 1 . . . . . . . . 5004 1 
+        63 . 1 1   7   7 SER HB3  H  1   3.30 . . 1 . . . . . . . . 5004 1 
+        64 . 1 1   7   7 SER CB   C 13  62.7  . . 1 . . . . . . . . 5004 1 
+        65 . 1 1   7   7 SER C    C 13 175.9  . . 1 . . . . . . . . 5004 1 
+        66 . 1 1   8   8 THR H    H  1   7.71 . . 1 . . . . . . . . 5004 1 
+        67 . 1 1   8   8 THR N    N 15 117.9  . . 1 . . . . . . . . 5004 1 
+        68 . 1 1   8   8 THR HA   H  1   3.97 . . 1 . . . . . . . . 5004 1 
+        69 . 1 1   8   8 THR CA   C 13  65.8  . . 1 . . . . . . . . 5004 1 
+        70 . 1 1   8   8 THR HB   H  1   4.19 . . 1 . . . . . . . . 5004 1 
+        71 . 1 1   8   8 THR CB   C 13  68.8  . . 1 . . . . . . . . 5004 1 
+        72 . 1 1   8   8 THR CG2  C 13  21.8  . . 1 . . . . . . . . 5004 1 
+        73 . 1 1   8   8 THR HG21 H  1   1.20 . . 1 . . . . . . . . 5004 1 
+        74 . 1 1   8   8 THR HG22 H  1   1.20 . . 1 . . . . . . . . 5004 1 
+        75 . 1 1   8   8 THR HG23 H  1   1.20 . . 1 . . . . . . . . 5004 1 
+        76 . 1 1   8   8 THR C    C 13 175.2  . . 1 . . . . . . . . 5004 1 
+        77 . 1 1   9   9 ALA H    H  1   7.98 . . 1 . . . . . . . . 5004 1 
+        78 . 1 1   9   9 ALA N    N 15 123.9  . . 1 . . . . . . . . 5004 1 
+        79 . 1 1   9   9 ALA HA   H  1   4.18 . . 1 . . . . . . . . 5004 1 
+        80 . 1 1   9   9 ALA CA   C 13  55.2  . . 1 . . . . . . . . 5004 1 
+        81 . 1 1   9   9 ALA HB1  H  1   1.34 . . 1 . . . . . . . . 5004 1 
+        82 . 1 1   9   9 ALA HB2  H  1   1.34 . . 1 . . . . . . . . 5004 1 
+        83 . 1 1   9   9 ALA HB3  H  1   1.34 . . 1 . . . . . . . . 5004 1 
+        84 . 1 1   9   9 ALA CB   C 13  18.1  . . 1 . . . . . . . . 5004 1 
+        85 . 1 1   9   9 ALA C    C 13 180.8  . . 1 . . . . . . . . 5004 1 
+        86 . 1 1  10  10 LEU H    H  1   8.56 . . 1 . . . . . . . . 5004 1 
+        87 . 1 1  10  10 LEU N    N 15 120.3  . . 1 . . . . . . . . 5004 1 
+        88 . 1 1  10  10 LEU HA   H  1   4.39 . . 1 . . . . . . . . 5004 1 
+        89 . 1 1  10  10 LEU CA   C 13  57.9  . . 1 . . . . . . . . 5004 1 
+        90 . 1 1  10  10 LEU HB2  H  1   1.84 . . 1 . . . . . . . . 5004 1 
+        91 . 1 1  10  10 LEU HB3  H  1   2.01 . . 1 . . . . . . . . 5004 1 
+        92 . 1 1  10  10 LEU CB   C 13  41.6  . . 1 . . . . . . . . 5004 1 
+        93 . 1 1  10  10 LEU CG   C 13  27.7  . . 1 . . . . . . . . 5004 1 
+        94 . 1 1  10  10 LEU HG   H  1   1.74 . . 1 . . . . . . . . 5004 1 
+        95 . 1 1  10  10 LEU CD1  C 13  26.0  . . 2 . . . . . . . . 5004 1 
+        96 . 1 1  10  10 LEU CD2  C 13  24.2  . . 2 . . . . . . . . 5004 1 
+        97 . 1 1  10  10 LEU HD11 H  1   1.12 . . 1 . . . . . . . . 5004 1 
+        98 . 1 1  10  10 LEU HD12 H  1   1.12 . . 1 . . . . . . . . 5004 1 
+        99 . 1 1  10  10 LEU HD13 H  1   1.12 . . 1 . . . . . . . . 5004 1 
+       100 . 1 1  10  10 LEU HD21 H  1   1.12 . . 1 . . . . . . . . 5004 1 
+       101 . 1 1  10  10 LEU HD22 H  1   1.12 . . 1 . . . . . . . . 5004 1 
+       102 . 1 1  10  10 LEU HD23 H  1   1.12 . . 1 . . . . . . . . 5004 1 
+       103 . 1 1  10  10 LEU C    C 13 177.8  . . 1 . . . . . . . . 5004 1 
+       104 . 1 1  11  11 ARG H    H  1   8.19 . . 1 . . . . . . . . 5004 1 
+       105 . 1 1  11  11 ARG N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+       106 . 1 1  11  11 ARG HA   H  1   3.53 . . 1 . . . . . . . . 5004 1 
+       107 . 1 1  11  11 ARG CA   C 13  60.0  . . 1 . . . . . . . . 5004 1 
+       108 . 1 1  11  11 ARG HB2  H  1   2.00 . . 1 . . . . . . . . 5004 1 
+       109 . 1 1  11  11 ARG HB3  H  1   1.93 . . 1 . . . . . . . . 5004 1 
+       110 . 1 1  11  11 ARG CB   C 13  29.6  . . 1 . . . . . . . . 5004 1 
+       111 . 1 1  11  11 ARG CG   C 13  27.1  . . 1 . . . . . . . . 5004 1 
+       112 . 1 1  11  11 ARG HG2  H  1   1.47 . . 1 . . . . . . . . 5004 1 
+       113 . 1 1  11  11 ARG HG3  H  1   1.47 . . 1 . . . . . . . . 5004 1 
+       114 . 1 1  11  11 ARG CD   C 13  43.2  . . 1 . . . . . . . . 5004 1 
+       115 . 1 1  11  11 ARG HD2  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+       116 . 1 1  11  11 ARG HD3  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+       117 . 1 1  11  11 ARG C    C 13 178.5  . . 1 . . . . . . . . 5004 1 
+       118 . 1 1  12  12 GLU H    H  1   8.30 . . 1 . . . . . . . . 5004 1 
+       119 . 1 1  12  12 GLU N    N 15 117.2  . . 1 . . . . . . . . 5004 1 
+       120 . 1 1  12  12 GLU HA   H  1   3.94 . . 1 . . . . . . . . 5004 1 
+       121 . 1 1  12  12 GLU CA   C 13  59.7  . . 1 . . . . . . . . 5004 1 
+       122 . 1 1  12  12 GLU HB2  H  1   1.98 . . 1 . . . . . . . . 5004 1 
+       123 . 1 1  12  12 GLU HB3  H  1   2.12 . . 1 . . . . . . . . 5004 1 
+       124 . 1 1  12  12 GLU CB   C 13  29.4  . . 1 . . . . . . . . 5004 1 
+       125 . 1 1  12  12 GLU CG   C 13  37.1  . . 1 . . . . . . . . 5004 1 
+       126 . 1 1  12  12 GLU HG2  H  1   2.22 . . 2 . . . . . . . . 5004 1 
+       127 . 1 1  12  12 GLU HG3  H  1   2.55 . . 2 . . . . . . . . 5004 1 
+       128 . 1 1  12  12 GLU C    C 13 179.2  . . 1 . . . . . . . . 5004 1 
+       129 . 1 1  13  13 LEU H    H  1   7.85 . . 1 . . . . . . . . 5004 1 
+       130 . 1 1  13  13 LEU N    N 15 123.2  . . 1 . . . . . . . . 5004 1 
+       131 . 1 1  13  13 LEU HA   H  1   4.53 . . 1 . . . . . . . . 5004 1 
+       132 . 1 1  13  13 LEU CA   C 13  58.1  . . 1 . . . . . . . . 5004 1 
+       133 . 1 1  13  13 LEU HB2  H  1   1.73 . . 1 . . . . . . . . 5004 1 
+       134 . 1 1  13  13 LEU HB3  H  1   2.22 . . 1 . . . . . . . . 5004 1 
+       135 . 1 1  13  13 LEU CB   C 13  41.3  . . 1 . . . . . . . . 5004 1 
+       136 . 1 1  13  13 LEU CG   C 13  27.3  . . 1 . . . . . . . . 5004 1 
+       137 . 1 1  13  13 LEU HG   H  1   1.51 . . 1 . . . . . . . . 5004 1 
+       138 . 1 1  13  13 LEU CD1  C 13  27.8  . . 1 . . . . . . . . 5004 1 
+       139 . 1 1  13  13 LEU CD2  C 13  23.5  . . 1 . . . . . . . . 5004 1 
+       140 . 1 1  13  13 LEU HD11 H  1   0.78 . . 1 . . . . . . . . 5004 1 
+       141 . 1 1  13  13 LEU HD12 H  1   0.78 . . 1 . . . . . . . . 5004 1 
+       142 . 1 1  13  13 LEU HD13 H  1   0.78 . . 1 . . . . . . . . 5004 1 
+       143 . 1 1  13  13 LEU HD21 H  1   1.04 . . 1 . . . . . . . . 5004 1 
+       144 . 1 1  13  13 LEU HD22 H  1   1.04 . . 1 . . . . . . . . 5004 1 
+       145 . 1 1  13  13 LEU HD23 H  1   1.04 . . 1 . . . . . . . . 5004 1 
+       146 . 1 1  13  13 LEU C    C 13 177.7  . . 1 . . . . . . . . 5004 1 
+       147 . 1 1  14  14 ILE H    H  1   8.38 . . 1 . . . . . . . . 5004 1 
+       148 . 1 1  14  14 ILE N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+       149 . 1 1  14  14 ILE HA   H  1   3.34 . . 1 . . . . . . . . 5004 1 
+       150 . 1 1  14  14 ILE CA   C 13  66.8  . . 1 . . . . . . . . 5004 1 
+       151 . 1 1  14  14 ILE HB   H  1   1.81 . . 1 . . . . . . . . 5004 1 
+       152 . 1 1  14  14 ILE CB   C 13  37.9  . . 1 . . . . . . . . 5004 1 
+       153 . 1 1  14  14 ILE CG1  C 13  31.5  . . 1 . . . . . . . . 5004 1 
+       154 . 1 1  14  14 ILE HG12 H  1   0.69 . . 2 . . . . . . . . 5004 1 
+       155 . 1 1  14  14 ILE HG13 H  1   1.78 . . 2 . . . . . . . . 5004 1 
+       156 . 1 1  14  14 ILE CG2  C 13  16.5  . . 1 . . . . . . . . 5004 1 
+       157 . 1 1  14  14 ILE HG21 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+       158 . 1 1  14  14 ILE HG22 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+       159 . 1 1  14  14 ILE HG23 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+       160 . 1 1  14  14 ILE CD1  C 13  13.9  . . 1 . . . . . . . . 5004 1 
+       161 . 1 1  14  14 ILE HD11 H  1   0.58 . . 1 . . . . . . . . 5004 1 
+       162 . 1 1  14  14 ILE HD12 H  1   0.58 . . 1 . . . . . . . . 5004 1 
+       163 . 1 1  14  14 ILE HD13 H  1   0.58 . . 1 . . . . . . . . 5004 1 
+       164 . 1 1  14  14 ILE C    C 13 177.2  . . 1 . . . . . . . . 5004 1 
+       165 . 1 1  15  15 GLU H    H  1   8.21 . . 1 . . . . . . . . 5004 1 
+       166 . 1 1  15  15 GLU N    N 15 116.7  . . 1 . . . . . . . . 5004 1 
+       167 . 1 1  15  15 GLU HA   H  1   3.81 . . 1 . . . . . . . . 5004 1 
+       168 . 1 1  15  15 GLU CA   C 13  59.5  . . 1 . . . . . . . . 5004 1 
+       169 . 1 1  15  15 GLU HB2  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+       170 . 1 1  15  15 GLU HB3  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+       171 . 1 1  15  15 GLU CB   C 13  29.2  . . 1 . . . . . . . . 5004 1 
+       172 . 1 1  15  15 GLU CG   C 13  36.7  . . 1 . . . . . . . . 5004 1 
+       173 . 1 1  15  15 GLU HG2  H  1   2.24 . . 2 . . . . . . . . 5004 1 
+       174 . 1 1  15  15 GLU HG3  H  1   2.45 . . 2 . . . . . . . . 5004 1 
+       175 . 1 1  15  15 GLU C    C 13 179.0  . . 1 . . . . . . . . 5004 1 
+       176 . 1 1  16  16 GLU H    H  1   7.78 . . 1 . . . . . . . . 5004 1 
+       177 . 1 1  16  16 GLU N    N 15 121.9  . . 1 . . . . . . . . 5004 1 
+       178 . 1 1  16  16 GLU HA   H  1   4.61 . . 1 . . . . . . . . 5004 1 
+       179 . 1 1  16  16 GLU CA   C 13  58.2  . . 1 . . . . . . . . 5004 1 
+       180 . 1 1  16  16 GLU HB2  H  1   1.95 . . 1 . . . . . . . . 5004 1 
+       181 . 1 1  16  16 GLU HB3  H  1   2.07 . . 1 . . . . . . . . 5004 1 
+       182 . 1 1  16  16 GLU CB   C 13  28.9  . . 1 . . . . . . . . 5004 1 
+       183 . 1 1  16  16 GLU CG   C 13  34.3  . . 1 . . . . . . . . 5004 1 
+       184 . 1 1  16  16 GLU HG2  H  1   2.27 . . 2 . . . . . . . . 5004 1 
+       185 . 1 1  16  16 GLU HG3  H  1   2.44 . . 2 . . . . . . . . 5004 1 
+       186 . 1 1  16  16 GLU C    C 13 177.8  . . 1 . . . . . . . . 5004 1 
+       187 . 1 1  17  17 LEU H    H  1   8.25 . . 1 . . . . . . . . 5004 1 
+       188 . 1 1  17  17 LEU N    N 15 118.9  . . 1 . . . . . . . . 5004 1 
+       189 . 1 1  17  17 LEU HA   H  1   4.08 . . 1 . . . . . . . . 5004 1 
+       190 . 1 1  17  17 LEU CA   C 13  57.7  . . 1 . . . . . . . . 5004 1 
+       191 . 1 1  17  17 LEU HB2  H  1   2.21 . . 1 . . . . . . . . 5004 1 
+       192 . 1 1  17  17 LEU HB3  H  1   1.25 . . 1 . . . . . . . . 5004 1 
+       193 . 1 1  17  17 LEU CB   C 13  41.9  . . 1 . . . . . . . . 5004 1 
+       194 . 1 1  17  17 LEU CG   C 13  26.2  . . 1 . . . . . . . . 5004 1 
+       195 . 1 1  17  17 LEU HG   H  1   2.13 . . 1 . . . . . . . . 5004 1 
+       196 . 1 1  17  17 LEU CD1  C 13  27.2  . . 1 . . . . . . . . 5004 1 
+       197 . 1 1  17  17 LEU CD2  C 13  22.9  . . 1 . . . . . . . . 5004 1 
+       198 . 1 1  17  17 LEU HD11 H  1   0.78 . . 1 . . . . . . . . 5004 1 
+       199 . 1 1  17  17 LEU HD12 H  1   0.78 . . 1 . . . . . . . . 5004 1 
+       200 . 1 1  17  17 LEU HD13 H  1   0.78 . . 1 . . . . . . . . 5004 1 
+       201 . 1 1  17  17 LEU HD21 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       202 . 1 1  17  17 LEU HD22 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       203 . 1 1  17  17 LEU HD23 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       204 . 1 1  17  17 LEU C    C 13 180.5  . . 1 . . . . . . . . 5004 1 
+       205 . 1 1  18  18 VAL H    H  1   8.72 . . 1 . . . . . . . . 5004 1 
+       206 . 1 1  18  18 VAL N    N 15 121.7  . . 1 . . . . . . . . 5004 1 
+       207 . 1 1  18  18 VAL HA   H  1   3.33 . . 1 . . . . . . . . 5004 1 
+       208 . 1 1  18  18 VAL CA   C 13  67.0  . . 1 . . . . . . . . 5004 1 
+       209 . 1 1  18  18 VAL HB   H  1   2.18 . . 1 . . . . . . . . 5004 1 
+       210 . 1 1  18  18 VAL CB   C 13  31.7  . . 1 . . . . . . . . 5004 1 
+       211 . 1 1  18  18 VAL CG1  C 13  21.0  . . 1 . . . . . . . . 5004 1 
+       212 . 1 1  18  18 VAL CG2  C 13  23.7  . . 1 . . . . . . . . 5004 1 
+       213 . 1 1  18  18 VAL HG11 H  1   0.84 . . 1 . . . . . . . . 5004 1 
+       214 . 1 1  18  18 VAL HG12 H  1   0.84 . . 1 . . . . . . . . 5004 1 
+       215 . 1 1  18  18 VAL HG13 H  1   0.84 . . 1 . . . . . . . . 5004 1 
+       216 . 1 1  18  18 VAL HG21 H  1   1.03 . . 1 . . . . . . . . 5004 1 
+       217 . 1 1  18  18 VAL HG22 H  1   1.03 . . 1 . . . . . . . . 5004 1 
+       218 . 1 1  18  18 VAL HG23 H  1   1.03 . . 1 . . . . . . . . 5004 1 
+       219 . 1 1  18  18 VAL C    C 13 178.0  . . 1 . . . . . . . . 5004 1 
+       220 . 1 1  19  19 ASN H    H  1   8.00 . . 1 . . . . . . . . 5004 1 
+       221 . 1 1  19  19 ASN N    N 15 118.6  . . 1 . . . . . . . . 5004 1 
+       222 . 1 1  19  19 ASN HA   H  1   4.43 . . 1 . . . . . . . . 5004 1 
+       223 . 1 1  19  19 ASN CA   C 13  56.7  . . 1 . . . . . . . . 5004 1 
+       224 . 1 1  19  19 ASN HB2  H  1   3.08 . . 2 . . . . . . . . 5004 1 
+       225 . 1 1  19  19 ASN HB3  H  1   3.21 . . 2 . . . . . . . . 5004 1 
+       226 . 1 1  19  19 ASN CB   C 13  38.6  . . 1 . . . . . . . . 5004 1 
+       227 . 1 1  19  19 ASN C    C 13 178.8  . . 1 . . . . . . . . 5004 1 
+       228 . 1 1  20  20 ILE H    H  1   8.14 . . 1 . . . . . . . . 5004 1 
+       229 . 1 1  20  20 ILE N    N 15 111.3  . . 1 . . . . . . . . 5004 1 
+       230 . 1 1  20  20 ILE HA   H  1   4.32 . . 1 . . . . . . . . 5004 1 
+       231 . 1 1  20  20 ILE CA   C 13  64.2  . . 1 . . . . . . . . 5004 1 
+       232 . 1 1  20  20 ILE HB   H  1   2.16 . . 1 . . . . . . . . 5004 1 
+       233 . 1 1  20  20 ILE CB   C 13  37.9  . . 1 . . . . . . . . 5004 1 
+       234 . 1 1  20  20 ILE CG1  C 13  26.1  . . 1 . . . . . . . . 5004 1 
+       235 . 1 1  20  20 ILE HG12 H  1   1.45 . . 2 . . . . . . . . 5004 1 
+       236 . 1 1  20  20 ILE HG13 H  1   1.74 . . 2 . . . . . . . . 5004 1 
+       237 . 1 1  20  20 ILE CG2  C 13  17.9  . . 1 . . . . . . . . 5004 1 
+       238 . 1 1  20  20 ILE HG21 H  1   1.13 . . 1 . . . . . . . . 5004 1 
+       239 . 1 1  20  20 ILE HG22 H  1   1.13 . . 1 . . . . . . . . 5004 1 
+       240 . 1 1  20  20 ILE HG23 H  1   1.13 . . 1 . . . . . . . . 5004 1 
+       241 . 1 1  20  20 ILE CD1  C 13  14.7  . . 1 . . . . . . . . 5004 1 
+       242 . 1 1  20  20 ILE HD11 H  1   0.96 . . 1 . . . . . . . . 5004 1 
+       243 . 1 1  20  20 ILE HD12 H  1   0.96 . . 1 . . . . . . . . 5004 1 
+       244 . 1 1  20  20 ILE HD13 H  1   0.96 . . 1 . . . . . . . . 5004 1 
+       245 . 1 1  20  20 ILE C    C 13 176.9  . . 1 . . . . . . . . 5004 1 
+       246 . 1 1  21  21 THR H    H  1   7.52 . . 1 . . . . . . . . 5004 1 
+       247 . 1 1  21  21 THR N    N 15 109.0  . . 1 . . . . . . . . 5004 1 
+       248 . 1 1  21  21 THR HA   H  1   4.45 . . 1 . . . . . . . . 5004 1 
+       249 . 1 1  21  21 THR CA   C 13  62.5  . . 1 . . . . . . . . 5004 1 
+       250 . 1 1  21  21 THR HB   H  1   4.27 . . 1 . . . . . . . . 5004 1 
+       251 . 1 1  21  21 THR CB   C 13  70.2  . . 1 . . . . . . . . 5004 1 
+       252 . 1 1  21  21 THR CG2  C 13  22.8  . . 1 . . . . . . . . 5004 1 
+       253 . 1 1  21  21 THR HG21 H  1   1.26 . . 1 . . . . . . . . 5004 1 
+       254 . 1 1  21  21 THR HG22 H  1   1.26 . . 1 . . . . . . . . 5004 1 
+       255 . 1 1  21  21 THR HG23 H  1   1.26 . . 1 . . . . . . . . 5004 1 
+       256 . 1 1  21  21 THR C    C 13 175.9  . . 1 . . . . . . . . 5004 1 
+       257 . 1 1  22  22 GLN H    H  1   7.89 . . 1 . . . . . . . . 5004 1 
+       258 . 1 1  22  22 GLN N    N 15 120.7  . . 1 . . . . . . . . 5004 1 
+       259 . 1 1  22  22 GLN HA   H  1   4.34 . . 1 . . . . . . . . 5004 1 
+       260 . 1 1  22  22 GLN CA   C 13  57.1  . . 1 . . . . . . . . 5004 1 
+       261 . 1 1  22  22 GLN HB2  H  1   2.10 . . 1 . . . . . . . . 5004 1 
+       262 . 1 1  22  22 GLN HB3  H  1   2.10 . . 1 . . . . . . . . 5004 1 
+       263 . 1 1  22  22 GLN CB   C 13  29.5  . . 1 . . . . . . . . 5004 1 
+       264 . 1 1  22  22 GLN CG   C 13  33.9  . . 1 . . . . . . . . 5004 1 
+       265 . 1 1  22  22 GLN HG2  H  1   2.47 . . 1 . . . . . . . . 5004 1 
+       266 . 1 1  22  22 GLN HG3  H  1   2.47 . . 1 . . . . . . . . 5004 1 
+       267 . 1 1  22  22 GLN C    C 13 176.4  . . 1 . . . . . . . . 5004 1 
+       268 . 1 1  23  23 ASN H    H  1   8.23 . . 1 . . . . . . . . 5004 1 
+       269 . 1 1  23  23 ASN N    N 15 117.2  . . 1 . . . . . . . . 5004 1 
+       270 . 1 1  23  23 ASN HA   H  1   4.71 . . 1 . . . . . . . . 5004 1 
+       271 . 1 1  23  23 ASN CA   C 13  53.5  . . 1 . . . . . . . . 5004 1 
+       272 . 1 1  23  23 ASN HB2  H  1   2.84 . . 2 . . . . . . . . 5004 1 
+       273 . 1 1  23  23 ASN HB3  H  1   2.97 . . 2 . . . . . . . . 5004 1 
+       274 . 1 1  23  23 ASN CB   C 13  38.4  . . 1 . . . . . . . . 5004 1 
+       275 . 1 1  23  23 ASN C    C 13 175.1  . . 1 . . . . . . . . 5004 1 
+       276 . 1 1  24  24 GLN H    H  1   8.10 . . 1 . . . . . . . . 5004 1 
+       277 . 1 1  24  24 GLN N    N 15 119.9  . . 1 . . . . . . . . 5004 1 
+       278 . 1 1  24  24 GLN HA   H  1   4.35 . . 1 . . . . . . . . 5004 1 
+       279 . 1 1  24  24 GLN CA   C 13  55.6  . . 1 . . . . . . . . 5004 1 
+       280 . 1 1  24  24 GLN HB2  H  1   2.21 . . 1 . . . . . . . . 5004 1 
+       281 . 1 1  24  24 GLN HB3  H  1   1.99 . . 1 . . . . . . . . 5004 1 
+       282 . 1 1  24  24 GLN CB   C 13  29.4  . . 1 . . . . . . . . 5004 1 
+       283 . 1 1  24  24 GLN CG   C 13  33.8  . . 1 . . . . . . . . 5004 1 
+       284 . 1 1  24  24 GLN HG2  H  1   2.36 . . 1 . . . . . . . . 5004 1 
+       285 . 1 1  24  24 GLN HG3  H  1   2.36 . . 1 . . . . . . . . 5004 1 
+       286 . 1 1  24  24 GLN C    C 13 176.3  . . 1 . . . . . . . . 5004 1 
+       287 . 1 1  25  25 LYS H    H  1   8.45 . . 1 . . . . . . . . 5004 1 
+       288 . 1 1  25  25 LYS N    N 15 122.2  . . 1 . . . . . . . . 5004 1 
+       289 . 1 1  25  25 LYS HA   H  1   4.25 . . 1 . . . . . . . . 5004 1 
+       290 . 1 1  25  25 LYS CA   C 13  56.9  . . 1 . . . . . . . . 5004 1 
+       291 . 1 1  25  25 LYS HB2  H  1   1.92 . . 1 . . . . . . . . 5004 1 
+       292 . 1 1  25  25 LYS HB3  H  1   1.79 . . 1 . . . . . . . . 5004 1 
+       293 . 1 1  25  25 LYS CB   C 13  32.7  . . 1 . . . . . . . . 5004 1 
+       294 . 1 1  25  25 LYS CG   C 13  25.0  . . 1 . . . . . . . . 5004 1 
+       295 . 1 1  25  25 LYS HG2  H  1   1.41 . . 2 . . . . . . . . 5004 1 
+       296 . 1 1  25  25 LYS HG3  H  1   1.48 . . 2 . . . . . . . . 5004 1 
+       297 . 1 1  25  25 LYS CD   C 13  28.7  . . 1 . . . . . . . . 5004 1 
+       298 . 1 1  25  25 LYS HD2  H  1   1.68 . . 1 . . . . . . . . 5004 1 
+       299 . 1 1  25  25 LYS HD3  H  1   1.68 . . 1 . . . . . . . . 5004 1 
+       300 . 1 1  25  25 LYS CE   C 13  42.1  . . 1 . . . . . . . . 5004 1 
+       301 . 1 1  25  25 LYS HE2  H  1   2.97 . . 1 . . . . . . . . 5004 1 
+       302 . 1 1  25  25 LYS HE3  H  1   2.97 . . 1 . . . . . . . . 5004 1 
+       303 . 1 1  25  25 LYS C    C 13 175.9  . . 1 . . . . . . . . 5004 1 
+       304 . 1 1  26  26 ALA H    H  1   7.69 . . 1 . . . . . . . . 5004 1 
+       305 . 1 1  26  26 ALA N    N 15 122.5  . . 1 . . . . . . . . 5004 1 
+       306 . 1 1  26  26 ALA HA   H  1   4.68 . . 1 . . . . . . . . 5004 1 
+       307 . 1 1  26  26 ALA CA   C 13  49.9  . . 1 . . . . . . . . 5004 1 
+       308 . 1 1  26  26 ALA HB1  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+       309 . 1 1  26  26 ALA HB2  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+       310 . 1 1  26  26 ALA HB3  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+       311 . 1 1  26  26 ALA CB   C 13  18.8  . . 1 . . . . . . . . 5004 1 
+       312 . 1 1  27  27 PRO HA   H  1   4.32 . . 1 . . . . . . . . 5004 1 
+       313 . 1 1  27  27 PRO CA   C 13  63.0  . . 1 . . . . . . . . 5004 1 
+       314 . 1 1  27  27 PRO HB2  H  1   1.66 . . 2 . . . . . . . . 5004 1 
+       315 . 1 1  27  27 PRO HB3  H  1   2.30 . . 2 . . . . . . . . 5004 1 
+       316 . 1 1  27  27 PRO CB   C 13  32.3  . . 1 . . . . . . . . 5004 1 
+       317 . 1 1  27  27 PRO CG   C 13  27.8  . . 1 . . . . . . . . 5004 1 
+       318 . 1 1  27  27 PRO HG2  H  1   1.98 . . 2 . . . . . . . . 5004 1 
+       319 . 1 1  27  27 PRO HG3  H  1   2.06 . . 2 . . . . . . . . 5004 1 
+       320 . 1 1  27  27 PRO CD   C 13  50.4  . . 1 . . . . . . . . 5004 1 
+       321 . 1 1  27  27 PRO HD2  H  1   3.58 . . 2 . . . . . . . . 5004 1 
+       322 . 1 1  27  27 PRO HD3  H  1   3.79 . . 2 . . . . . . . . 5004 1 
+       323 . 1 1  27  27 PRO C    C 13 176.5  . . 1 . . . . . . . . 5004 1 
+       324 . 1 1  28  28 LEU H    H  1   8.34 . . 1 . . . . . . . . 5004 1 
+       325 . 1 1  28  28 LEU N    N 15 125.9  . . 1 . . . . . . . . 5004 1 
+       326 . 1 1  28  28 LEU HA   H  1   4.22 . . 1 . . . . . . . . 5004 1 
+       327 . 1 1  28  28 LEU CA   C 13  55.7  . . 1 . . . . . . . . 5004 1 
+       328 . 1 1  28  28 LEU HB2  H  1   1.61 . . 1 . . . . . . . . 5004 1 
+       329 . 1 1  28  28 LEU HB3  H  1   1.61 . . 1 . . . . . . . . 5004 1 
+       330 . 1 1  28  28 LEU CB   C 13  42.8  . . 1 . . . . . . . . 5004 1 
+       331 . 1 1  28  28 LEU CG   C 13  27.0  . . 1 . . . . . . . . 5004 1 
+       332 . 1 1  28  28 LEU HG   H  1   1.65 . . 1 . . . . . . . . 5004 1 
+       333 . 1 1  28  28 LEU CD1  C 13  25.5  . . 1 . . . . . . . . 5004 1 
+       334 . 1 1  28  28 LEU CD2  C 13  24.2  . . 1 . . . . . . . . 5004 1 
+       335 . 1 1  28  28 LEU HD11 H  1   0.72 . . 1 . . . . . . . . 5004 1 
+       336 . 1 1  28  28 LEU HD12 H  1   0.72 . . 1 . . . . . . . . 5004 1 
+       337 . 1 1  28  28 LEU HD13 H  1   0.72 . . 1 . . . . . . . . 5004 1 
+       338 . 1 1  28  28 LEU HD21 H  1   0.83 . . 1 . . . . . . . . 5004 1 
+       339 . 1 1  28  28 LEU HD22 H  1   0.83 . . 1 . . . . . . . . 5004 1 
+       340 . 1 1  28  28 LEU HD23 H  1   0.83 . . 1 . . . . . . . . 5004 1 
+       341 . 1 1  28  28 LEU C    C 13 178.1  . . 1 . . . . . . . . 5004 1 
+       342 . 1 1  29  29 CYS H    H  1   9.67 . . 1 . . . . . . . . 5004 1 
+       343 . 1 1  29  29 CYS N    N 15 120.8  . . 1 . . . . . . . . 5004 1 
+       344 . 1 1  29  29 CYS HA   H  1   4.55 . . 1 . . . . . . . . 5004 1 
+       345 . 1 1  29  29 CYS CA   C 13  53.2  . . 1 . . . . . . . . 5004 1 
+       346 . 1 1  29  29 CYS HB2  H  1   2.88 . . 1 . . . . . . . . 5004 1 
+       347 . 1 1  29  29 CYS HB3  H  1   3.49 . . 1 . . . . . . . . 5004 1 
+       348 . 1 1  29  29 CYS CB   C 13  34.0  . . 1 . . . . . . . . 5004 1 
+       349 . 1 1  29  29 CYS C    C 13 175.4  . . 1 . . . . . . . . 5004 1 
+       350 . 1 1  30  30 ASN H    H  1   8.33 . . 1 . . . . . . . . 5004 1 
+       351 . 1 1  30  30 ASN N    N 15 115.1  . . 1 . . . . . . . . 5004 1 
+       352 . 1 1  30  30 ASN HA   H  1   4.30 . . 1 . . . . . . . . 5004 1 
+       353 . 1 1  30  30 ASN CA   C 13  55.0  . . 1 . . . . . . . . 5004 1 
+       354 . 1 1  30  30 ASN HB2  H  1   2.78 . . 2 . . . . . . . . 5004 1 
+       355 . 1 1  30  30 ASN HB3  H  1   3.03 . . 2 . . . . . . . . 5004 1 
+       356 . 1 1  30  30 ASN CB   C 13  38.2  . . 1 . . . . . . . . 5004 1 
+       357 . 1 1  30  30 ASN C    C 13 175.8  . . 1 . . . . . . . . 5004 1 
+       358 . 1 1  31  31 GLY H    H  1   8.14 . . 1 . . . . . . . . 5004 1 
+       359 . 1 1  31  31 GLY N    N 15 108.8  . . 1 . . . . . . . . 5004 1 
+       360 . 1 1  31  31 GLY HA2  H  1   3.87 . . 2 . . . . . . . . 5004 1 
+       361 . 1 1  31  31 GLY HA3  H  1   4.14 . . 2 . . . . . . . . 5004 1 
+       362 . 1 1  31  31 GLY CA   C 13  45.8  . . 1 . . . . . . . . 5004 1 
+       363 . 1 1  31  31 GLY C    C 13 174.7  . . 1 . . . . . . . . 5004 1 
+       364 . 1 1  32  32 SER H    H  1   7.63 . . 1 . . . . . . . . 5004 1 
+       365 . 1 1  32  32 SER N    N 15 115.6  . . 1 . . . . . . . . 5004 1 
+       366 . 1 1  32  32 SER HA   H  1   4.34 . . 1 . . . . . . . . 5004 1 
+       367 . 1 1  32  32 SER CA   C 13  60.4  . . 1 . . . . . . . . 5004 1 
+       368 . 1 1  32  32 SER HB2  H  1   3.79 . . 1 . . . . . . . . 5004 1 
+       369 . 1 1  32  32 SER HB3  H  1   3.79 . . 1 . . . . . . . . 5004 1 
+       370 . 1 1  32  32 SER CB   C 13  64.2  . . 1 . . . . . . . . 5004 1 
+       371 . 1 1  32  32 SER C    C 13 172.4  . . 1 . . . . . . . . 5004 1 
+       372 . 1 1  33  33 MET H    H  1   8.37 . . 1 . . . . . . . . 5004 1 
+       373 . 1 1  33  33 MET N    N 15 121.6  . . 1 . . . . . . . . 5004 1 
+       374 . 1 1  33  33 MET HA   H  1   5.06 . . 1 . . . . . . . . 5004 1 
+       375 . 1 1  33  33 MET CA   C 13  53.5  . . 1 . . . . . . . . 5004 1 
+       376 . 1 1  33  33 MET HB2  H  1   1.76 . . 1 . . . . . . . . 5004 1 
+       377 . 1 1  33  33 MET HB3  H  1   1.51 . . 1 . . . . . . . . 5004 1 
+       378 . 1 1  33  33 MET CB   C 13  34.5  . . 1 . . . . . . . . 5004 1 
+       379 . 1 1  33  33 MET CG   C 13  32.1  . . 1 . . . . . . . . 5004 1 
+       380 . 1 1  33  33 MET HG2  H  1   2.36 . . 2 . . . . . . . . 5004 1 
+       381 . 1 1  33  33 MET HG3  H  1   2.58 . . 2 . . . . . . . . 5004 1 
+       382 . 1 1  33  33 MET CE   C 13  17.2  . . 1 . . . . . . . . 5004 1 
+       383 . 1 1  33  33 MET HE1  H  1   1.87 . . 1 . . . . . . . . 5004 1 
+       384 . 1 1  33  33 MET HE2  H  1   1.87 . . 1 . . . . . . . . 5004 1 
+       385 . 1 1  33  33 MET HE3  H  1   1.87 . . 1 . . . . . . . . 5004 1 
+       386 . 1 1  33  33 MET C    C 13 176.1  . . 1 . . . . . . . . 5004 1 
+       387 . 1 1  34  34 VAL H    H  1   9.19 . . 1 . . . . . . . . 5004 1 
+       388 . 1 1  34  34 VAL N    N 15 114.7  . . 1 . . . . . . . . 5004 1 
+       389 . 1 1  34  34 VAL HA   H  1   4.41 . . 1 . . . . . . . . 5004 1 
+       390 . 1 1  34  34 VAL CA   C 13  58.1  . . 1 . . . . . . . . 5004 1 
+       391 . 1 1  34  34 VAL HB   H  1   2.03 . . 1 . . . . . . . . 5004 1 
+       392 . 1 1  34  34 VAL CB   C 13  34.8  . . 1 . . . . . . . . 5004 1 
+       393 . 1 1  34  34 VAL CG1  C 13  23.8  . . 1 . . . . . . . . 5004 1 
+       394 . 1 1  34  34 VAL CG2  C 13  18.4  . . 1 . . . . . . . . 5004 1 
+       395 . 1 1  34  34 VAL HG11 H  1   0.45 . . 1 . . . . . . . . 5004 1 
+       396 . 1 1  34  34 VAL HG12 H  1   0.45 . . 1 . . . . . . . . 5004 1 
+       397 . 1 1  34  34 VAL HG13 H  1   0.45 . . 1 . . . . . . . . 5004 1 
+       398 . 1 1  34  34 VAL HG21 H  1   0.22 . . 1 . . . . . . . . 5004 1 
+       399 . 1 1  34  34 VAL HG22 H  1   0.22 . . 1 . . . . . . . . 5004 1 
+       400 . 1 1  34  34 VAL HG23 H  1   0.22 . . 1 . . . . . . . . 5004 1 
+       401 . 1 1  34  34 VAL C    C 13 174.6  . . 1 . . . . . . . . 5004 1 
+       402 . 1 1  35  35 TRP H    H  1   7.83 . . 1 . . . . . . . . 5004 1 
+       403 . 1 1  35  35 TRP N    N 15 119.9  . . 1 . . . . . . . . 5004 1 
+       404 . 1 1  35  35 TRP HA   H  1   4.80 . . 1 . . . . . . . . 5004 1 
+       405 . 1 1  35  35 TRP CA   C 13  57.7  . . 1 . . . . . . . . 5004 1 
+       406 . 1 1  35  35 TRP HB2  H  1   2.95 . . 1 . . . . . . . . 5004 1 
+       407 . 1 1  35  35 TRP HB3  H  1   3.25 . . 1 . . . . . . . . 5004 1 
+       408 . 1 1  35  35 TRP CB   C 13  29.7  . . 1 . . . . . . . . 5004 1 
+       409 . 1 1  35  35 TRP CD1  C 13 127.5  . . 1 . . . . . . . . 5004 1 
+       410 . 1 1  35  35 TRP HD1  H  1   7.18 . . 1 . . . . . . . . 5004 1 
+       411 . 1 1  35  35 TRP NE1  N 15 128.7  . . 1 . . . . . . . . 5004 1 
+       412 . 1 1  35  35 TRP HE1  H  1  10.02 . . 1 . . . . . . . . 5004 1 
+       413 . 1 1  35  35 TRP CE3  C 13 120.8  . . 1 . . . . . . . . 5004 1 
+       414 . 1 1  35  35 TRP HE3  H  1   7.42 . . 1 . . . . . . . . 5004 1 
+       415 . 1 1  35  35 TRP CZ3  C 13 122.2  . . 1 . . . . . . . . 5004 1 
+       416 . 1 1  35  35 TRP HZ3  H  1   6.81 . . 1 . . . . . . . . 5004 1 
+       417 . 1 1  35  35 TRP CZ2  C 13 114.4  . . 1 . . . . . . . . 5004 1 
+       418 . 1 1  35  35 TRP HZ2  H  1   7.33 . . 1 . . . . . . . . 5004 1 
+       419 . 1 1  35  35 TRP CH2  C 13 124.7  . . 1 . . . . . . . . 5004 1 
+       420 . 1 1  35  35 TRP HH2  H  1   7.09 . . 1 . . . . . . . . 5004 1 
+       421 . 1 1  35  35 TRP C    C 13 177.2  . . 1 . . . . . . . . 5004 1 
+       422 . 1 1  36  36 SER H    H  1   8.74 . . 1 . . . . . . . . 5004 1 
+       423 . 1 1  36  36 SER N    N 15 117.0  . . 1 . . . . . . . . 5004 1 
+       424 . 1 1  36  36 SER HA   H  1   4.52 . . 1 . . . . . . . . 5004 1 
+       425 . 1 1  36  36 SER CA   C 13  58.6  . . 1 . . . . . . . . 5004 1 
+       426 . 1 1  36  36 SER HB2  H  1   3.93 . . 2 . . . . . . . . 5004 1 
+       427 . 1 1  36  36 SER HB3  H  1   4.02 . . 2 . . . . . . . . 5004 1 
+       428 . 1 1  36  36 SER CB   C 13  64.1  . . 1 . . . . . . . . 5004 1 
+       429 . 1 1  36  36 SER C    C 13 173.8  . . 1 . . . . . . . . 5004 1 
+       430 . 1 1  37  37 ILE H    H  1   8.31 . . 1 . . . . . . . . 5004 1 
+       431 . 1 1  37  37 ILE N    N 15 114.8  . . 1 . . . . . . . . 5004 1 
+       432 . 1 1  37  37 ILE HA   H  1   4.71 . . 1 . . . . . . . . 5004 1 
+       433 . 1 1  37  37 ILE CA   C 13  59.5  . . 1 . . . . . . . . 5004 1 
+       434 . 1 1  37  37 ILE HB   H  1   1.80 . . 1 . . . . . . . . 5004 1 
+       435 . 1 1  37  37 ILE CB   C 13  41.5  . . 1 . . . . . . . . 5004 1 
+       436 . 1 1  37  37 ILE CG1  C 13  25.7  . . 1 . . . . . . . . 5004 1 
+       437 . 1 1  37  37 ILE HG12 H  1   0.98 . . 2 . . . . . . . . 5004 1 
+       438 . 1 1  37  37 ILE HG13 H  1   1.17 . . 2 . . . . . . . . 5004 1 
+       439 . 1 1  37  37 ILE CG2  C 13  18.0  . . 1 . . . . . . . . 5004 1 
+       440 . 1 1  37  37 ILE HG21 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       441 . 1 1  37  37 ILE HG22 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       442 . 1 1  37  37 ILE HG23 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       443 . 1 1  37  37 ILE CD1  C 13  14.4  . . 1 . . . . . . . . 5004 1 
+       444 . 1 1  37  37 ILE HD11 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+       445 . 1 1  37  37 ILE HD12 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+       446 . 1 1  37  37 ILE HD13 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+       447 . 1 1  37  37 ILE C    C 13 174.9  . . 1 . . . . . . . . 5004 1 
+       448 . 1 1  38  38 ASN H    H  1   8.41 . . 1 . . . . . . . . 5004 1 
+       449 . 1 1  38  38 ASN N    N 15 120.9  . . 1 . . . . . . . . 5004 1 
+       450 . 1 1  38  38 ASN HA   H  1   4.67 . . 1 . . . . . . . . 5004 1 
+       451 . 1 1  38  38 ASN CA   C 13  52.3  . . 1 . . . . . . . . 5004 1 
+       452 . 1 1  38  38 ASN HB2  H  1   2.66 . . 2 . . . . . . . . 5004 1 
+       453 . 1 1  38  38 ASN HB3  H  1   2.74 . . 2 . . . . . . . . 5004 1 
+       454 . 1 1  38  38 ASN CB   C 13  38.8  . . 1 . . . . . . . . 5004 1 
+       455 . 1 1  38  38 ASN C    C 13 175.2  . . 1 . . . . . . . . 5004 1 
+       456 . 1 1  39  39 LEU H    H  1   8.42 . . 1 . . . . . . . . 5004 1 
+       457 . 1 1  39  39 LEU N    N 15 125.8  . . 1 . . . . . . . . 5004 1 
+       458 . 1 1  39  39 LEU HA   H  1   3.94 . . 1 . . . . . . . . 5004 1 
+       459 . 1 1  39  39 LEU CA   C 13  55.1  . . 1 . . . . . . . . 5004 1 
+       460 . 1 1  39  39 LEU HB2  H  1   1.29 . . 1 . . . . . . . . 5004 1 
+       461 . 1 1  39  39 LEU HB3  H  1   0.60 . . 1 . . . . . . . . 5004 1 
+       462 . 1 1  39  39 LEU CB   C 13  40.0  . . 1 . . . . . . . . 5004 1 
+       463 . 1 1  39  39 LEU CG   C 13  26.2  . . 1 . . . . . . . . 5004 1 
+       464 . 1 1  39  39 LEU HG   H  1   1.41 . . 1 . . . . . . . . 5004 1 
+       465 . 1 1  39  39 LEU CD1  C 13  23.4  . . 1 . . . . . . . . 5004 1 
+       466 . 1 1  39  39 LEU CD2  C 13  25.4  . . 1 . . . . . . . . 5004 1 
+       467 . 1 1  39  39 LEU HD11 H  1   0.48 . . 1 . . . . . . . . 5004 1 
+       468 . 1 1  39  39 LEU HD12 H  1   0.48 . . 1 . . . . . . . . 5004 1 
+       469 . 1 1  39  39 LEU HD13 H  1   0.48 . . 1 . . . . . . . . 5004 1 
+       470 . 1 1  39  39 LEU HD21 H  1   0.63 . . 1 . . . . . . . . 5004 1 
+       471 . 1 1  39  39 LEU HD22 H  1   0.63 . . 1 . . . . . . . . 5004 1 
+       472 . 1 1  39  39 LEU HD23 H  1   0.63 . . 1 . . . . . . . . 5004 1 
+       473 . 1 1  39  39 LEU C    C 13 175.9  . . 1 . . . . . . . . 5004 1 
+       474 . 1 1  40  40 THR H    H  1   7.42 . . 1 . . . . . . . . 5004 1 
+       475 . 1 1  40  40 THR N    N 15 113.6  . . 1 . . . . . . . . 5004 1 
+       476 . 1 1  40  40 THR HA   H  1   4.30 . . 1 . . . . . . . . 5004 1 
+       477 . 1 1  40  40 THR CA   C 13  61.2  . . 1 . . . . . . . . 5004 1 
+       478 . 1 1  40  40 THR HB   H  1   4.29 . . 1 . . . . . . . . 5004 1 
+       479 . 1 1  40  40 THR CB   C 13  70.1  . . 1 . . . . . . . . 5004 1 
+       480 . 1 1  40  40 THR CG2  C 13  21.1  . . 1 . . . . . . . . 5004 1 
+       481 . 1 1  40  40 THR HG21 H  1   1.09 . . 1 . . . . . . . . 5004 1 
+       482 . 1 1  40  40 THR HG22 H  1   1.09 . . 1 . . . . . . . . 5004 1 
+       483 . 1 1  40  40 THR HG23 H  1   1.09 . . 1 . . . . . . . . 5004 1 
+       484 . 1 1  40  40 THR C    C 13 174.4  . . 1 . . . . . . . . 5004 1 
+       485 . 1 1  41  41 ALA H    H  1   8.07 . . 1 . . . . . . . . 5004 1 
+       486 . 1 1  41  41 ALA N    N 15 123.8  . . 1 . . . . . . . . 5004 1 
+       487 . 1 1  41  41 ALA HA   H  1   4.32 . . 1 . . . . . . . . 5004 1 
+       488 . 1 1  41  41 ALA CA   C 13  53.2  . . 1 . . . . . . . . 5004 1 
+       489 . 1 1  41  41 ALA HB1  H  1   1.39 . . 1 . . . . . . . . 5004 1 
+       490 . 1 1  41  41 ALA HB2  H  1   1.39 . . 1 . . . . . . . . 5004 1 
+       491 . 1 1  41  41 ALA HB3  H  1   1.39 . . 1 . . . . . . . . 5004 1 
+       492 . 1 1  41  41 ALA CB   C 13  18.7  . . 1 . . . . . . . . 5004 1 
+       493 . 1 1  41  41 ALA C    C 13 178.1  . . 1 . . . . . . . . 5004 1 
+       494 . 1 1  42  42 GLY H    H  1   8.54 . . 1 . . . . . . . . 5004 1 
+       495 . 1 1  42  42 GLY N    N 15 109.0  . . 1 . . . . . . . . 5004 1 
+       496 . 1 1  42  42 GLY HA2  H  1   3.95 . . 2 . . . . . . . . 5004 1 
+       497 . 1 1  42  42 GLY HA3  H  1   4.12 . . 2 . . . . . . . . 5004 1 
+       498 . 1 1  42  42 GLY CA   C 13  46.4  . . 1 . . . . . . . . 5004 1 
+       499 . 1 1  42  42 GLY C    C 13 175.8  . . 1 . . . . . . . . 5004 1 
+       500 . 1 1  43  43 MET H    H  1   7.82 . . 1 . . . . . . . . 5004 1 
+       501 . 1 1  43  43 MET N    N 15 119.1  . . 1 . . . . . . . . 5004 1 
+       502 . 1 1  43  43 MET HA   H  1   4.25 . . 1 . . . . . . . . 5004 1 
+       503 . 1 1  43  43 MET CA   C 13  57.9  . . 1 . . . . . . . . 5004 1 
+       504 . 1 1  43  43 MET HB2  H  1   1.96 . . 1 . . . . . . . . 5004 1 
+       505 . 1 1  43  43 MET HB3  H  1   2.11 . . 1 . . . . . . . . 5004 1 
+       506 . 1 1  43  43 MET CB   C 13  32.0  . . 1 . . . . . . . . 5004 1 
+       507 . 1 1  43  43 MET CG   C 13  31.8  . . 1 . . . . . . . . 5004 1 
+       508 . 1 1  43  43 MET HG2  H  1   2.25 . . 1 . . . . . . . . 5004 1 
+       509 . 1 1  43  43 MET HG3  H  1   2.25 . . 1 . . . . . . . . 5004 1 
+       510 . 1 1  43  43 MET CE   C 13  17.6  . . 1 . . . . . . . . 5004 1 
+       511 . 1 1  43  43 MET HE1  H  1   1.43 . . 1 . . . . . . . . 5004 1 
+       512 . 1 1  43  43 MET HE2  H  1   1.43 . . 1 . . . . . . . . 5004 1 
+       513 . 1 1  43  43 MET HE3  H  1   1.43 . . 1 . . . . . . . . 5004 1 
+       514 . 1 1  43  43 MET C    C 13 176.2  . . 1 . . . . . . . . 5004 1 
+       515 . 1 1  44  44 TYR H    H  1   7.51 . . 1 . . . . . . . . 5004 1 
+       516 . 1 1  44  44 TYR N    N 15 118.3  . . 1 . . . . . . . . 5004 1 
+       517 . 1 1  44  44 TYR HA   H  1   3.98 . . 1 . . . . . . . . 5004 1 
+       518 . 1 1  44  44 TYR CA   C 13  62.7  . . 1 . . . . . . . . 5004 1 
+       519 . 1 1  44  44 TYR HB2  H  1   2.91 . . 1 . . . . . . . . 5004 1 
+       520 . 1 1  44  44 TYR HB3  H  1   2.91 . . 1 . . . . . . . . 5004 1 
+       521 . 1 1  44  44 TYR CB   C 13  38.5  . . 1 . . . . . . . . 5004 1 
+       522 . 1 1  44  44 TYR CD1  C 13 132.0  . . 1 . . . . . . . . 5004 1 
+       523 . 1 1  44  44 TYR CD2  C 13 132.0  . . 1 . . . . . . . . 5004 1 
+       524 . 1 1  44  44 TYR HD1  H  1   6.92 . . 1 . . . . . . . . 5004 1 
+       525 . 1 1  44  44 TYR HD2  H  1   6.92 . . 1 . . . . . . . . 5004 1 
+       526 . 1 1  44  44 TYR CE1  C 13 118.6  . . 1 . . . . . . . . 5004 1 
+       527 . 1 1  44  44 TYR CE2  C 13 118.6  . . 1 . . . . . . . . 5004 1 
+       528 . 1 1  44  44 TYR HE1  H  1   6.42 . . 1 . . . . . . . . 5004 1 
+       529 . 1 1  44  44 TYR HE2  H  1   6.42 . . 1 . . . . . . . . 5004 1 
+       530 . 1 1  44  44 TYR C    C 13 178.3  . . 1 . . . . . . . . 5004 1 
+       531 . 1 1  45  45 CYS H    H  1   8.66 . . 1 . . . . . . . . 5004 1 
+       532 . 1 1  45  45 CYS N    N 15 115.1  . . 1 . . . . . . . . 5004 1 
+       533 . 1 1  45  45 CYS HA   H  1   4.43 . . 1 . . . . . . . . 5004 1 
+       534 . 1 1  45  45 CYS CA   C 13  57.4  . . 1 . . . . . . . . 5004 1 
+       535 . 1 1  45  45 CYS HB2  H  1   3.15 . . 1 . . . . . . . . 5004 1 
+       536 . 1 1  45  45 CYS HB3  H  1   3.15 . . 1 . . . . . . . . 5004 1 
+       537 . 1 1  45  45 CYS CB   C 13  40.5  . . 1 . . . . . . . . 5004 1 
+       538 . 1 1  45  45 CYS C    C 13 176.5  . . 1 . . . . . . . . 5004 1 
+       539 . 1 1  46  46 ALA H    H  1   8.25 . . 1 . . . . . . . . 5004 1 
+       540 . 1 1  46  46 ALA N    N 15 123.2  . . 1 . . . . . . . . 5004 1 
+       541 . 1 1  46  46 ALA HA   H  1   4.16 . . 1 . . . . . . . . 5004 1 
+       542 . 1 1  46  46 ALA CA   C 13  55.2  . . 1 . . . . . . . . 5004 1 
+       543 . 1 1  46  46 ALA HB1  H  1   1.45 . . 1 . . . . . . . . 5004 1 
+       544 . 1 1  46  46 ALA HB2  H  1   1.45 . . 1 . . . . . . . . 5004 1 
+       545 . 1 1  46  46 ALA HB3  H  1   1.45 . . 1 . . . . . . . . 5004 1 
+       546 . 1 1  46  46 ALA CB   C 13  18.3  . . 1 . . . . . . . . 5004 1 
+       547 . 1 1  46  46 ALA C    C 13 179.7  . . 1 . . . . . . . . 5004 1 
+       548 . 1 1  47  47 ALA H    H  1   8.63 . . 1 . . . . . . . . 5004 1 
+       549 . 1 1  47  47 ALA N    N 15 119.7  . . 1 . . . . . . . . 5004 1 
+       550 . 1 1  47  47 ALA HA   H  1   4.34 . . 1 . . . . . . . . 5004 1 
+       551 . 1 1  47  47 ALA CA   C 13  55.3  . . 1 . . . . . . . . 5004 1 
+       552 . 1 1  47  47 ALA HB1  H  1   1.60 . . 1 . . . . . . . . 5004 1 
+       553 . 1 1  47  47 ALA HB2  H  1   1.60 . . 1 . . . . . . . . 5004 1 
+       554 . 1 1  47  47 ALA HB3  H  1   1.60 . . 1 . . . . . . . . 5004 1 
+       555 . 1 1  47  47 ALA CB   C 13  18.2  . . 1 . . . . . . . . 5004 1 
+       556 . 1 1  47  47 ALA C    C 13 178.8  . . 1 . . . . . . . . 5004 1 
+       557 . 1 1  48  48 LEU H    H  1   8.07 . . 1 . . . . . . . . 5004 1 
+       558 . 1 1  48  48 LEU N    N 15 118.6  . . 1 . . . . . . . . 5004 1 
+       559 . 1 1  48  48 LEU HA   H  1   4.06 . . 1 . . . . . . . . 5004 1 
+       560 . 1 1  48  48 LEU CA   C 13  57.9  . . 1 . . . . . . . . 5004 1 
+       561 . 1 1  48  48 LEU HB2  H  1   1.60 . . 1 . . . . . . . . 5004 1 
+       562 . 1 1  48  48 LEU HB3  H  1   2.21 . . 1 . . . . . . . . 5004 1 
+       563 . 1 1  48  48 LEU CB   C 13  41.9  . . 1 . . . . . . . . 5004 1 
+       564 . 1 1  48  48 LEU CG   C 13  26.9  . . 1 . . . . . . . . 5004 1 
+       565 . 1 1  48  48 LEU HG   H  1   1.60 . . 1 . . . . . . . . 5004 1 
+       566 . 1 1  48  48 LEU CD1  C 13  23.1  . . 1 . . . . . . . . 5004 1 
+       567 . 1 1  48  48 LEU CD2  C 13  26.7  . . 1 . . . . . . . . 5004 1 
+       568 . 1 1  48  48 LEU HD11 H  1   1.05 . . 1 . . . . . . . . 5004 1 
+       569 . 1 1  48  48 LEU HD12 H  1   1.05 . . 1 . . . . . . . . 5004 1 
+       570 . 1 1  48  48 LEU HD13 H  1   1.05 . . 1 . . . . . . . . 5004 1 
+       571 . 1 1  48  48 LEU HD21 H  1   1.01 . . 1 . . . . . . . . 5004 1 
+       572 . 1 1  48  48 LEU HD22 H  1   1.01 . . 1 . . . . . . . . 5004 1 
+       573 . 1 1  48  48 LEU HD23 H  1   1.01 . . 1 . . . . . . . . 5004 1 
+       574 . 1 1  48  48 LEU C    C 13 177.4  . . 1 . . . . . . . . 5004 1 
+       575 . 1 1  49  49 GLU H    H  1   8.46 . . 1 . . . . . . . . 5004 1 
+       576 . 1 1  49  49 GLU N    N 15 118.3  . . 1 . . . . . . . . 5004 1 
+       577 . 1 1  49  49 GLU HA   H  1   3.81 . . 1 . . . . . . . . 5004 1 
+       578 . 1 1  49  49 GLU CA   C 13  59.6  . . 1 . . . . . . . . 5004 1 
+       579 . 1 1  49  49 GLU HB2  H  1   2.18 . . 1 . . . . . . . . 5004 1 
+       580 . 1 1  49  49 GLU HB3  H  1   2.31 . . 1 . . . . . . . . 5004 1 
+       581 . 1 1  49  49 GLU CB   C 13  29.5  . . 1 . . . . . . . . 5004 1 
+       582 . 1 1  49  49 GLU CG   C 13  37.3  . . 1 . . . . . . . . 5004 1 
+       583 . 1 1  49  49 GLU HG2  H  1   2.23 . . 2 . . . . . . . . 5004 1 
+       584 . 1 1  49  49 GLU HG3  H  1   2.54 . . 2 . . . . . . . . 5004 1 
+       585 . 1 1  49  49 GLU C    C 13 178.1  . . 1 . . . . . . . . 5004 1 
+       586 . 1 1  50  50 SER H    H  1   7.82 . . 1 . . . . . . . . 5004 1 
+       587 . 1 1  50  50 SER N    N 15 111.1  . . 1 . . . . . . . . 5004 1 
+       588 . 1 1  50  50 SER HA   H  1   4.29 . . 1 . . . . . . . . 5004 1 
+       589 . 1 1  50  50 SER CA   C 13  61.7  . . 1 . . . . . . . . 5004 1 
+       590 . 1 1  50  50 SER HB2  H  1   3.67 . . 2 . . . . . . . . 5004 1 
+       591 . 1 1  50  50 SER HB3  H  1   3.88 . . 2 . . . . . . . . 5004 1 
+       592 . 1 1  50  50 SER CB   C 13  63.5  . . 1 . . . . . . . . 5004 1 
+       593 . 1 1  50  50 SER C    C 13 177.8  . . 1 . . . . . . . . 5004 1 
+       594 . 1 1  51  51 LEU H    H  1   7.99 . . 1 . . . . . . . . 5004 1 
+       595 . 1 1  51  51 LEU N    N 15 116.7  . . 1 . . . . . . . . 5004 1 
+       596 . 1 1  51  51 LEU HA   H  1   3.96 . . 1 . . . . . . . . 5004 1 
+       597 . 1 1  51  51 LEU CA   C 13  56.6  . . 1 . . . . . . . . 5004 1 
+       598 . 1 1  51  51 LEU HB2  H  1   1.76 . . 1 . . . . . . . . 5004 1 
+       599 . 1 1  51  51 LEU HB3  H  1   1.39 . . 1 . . . . . . . . 5004 1 
+       600 . 1 1  51  51 LEU CB   C 13  42.8  . . 1 . . . . . . . . 5004 1 
+       601 . 1 1  51  51 LEU CG   C 13  26.2  . . 1 . . . . . . . . 5004 1 
+       602 . 1 1  51  51 LEU HG   H  1   1.74 . . 1 . . . . . . . . 5004 1 
+       603 . 1 1  51  51 LEU CD1  C 13  25.0  . . 1 . . . . . . . . 5004 1 
+       604 . 1 1  51  51 LEU CD2  C 13  23.0  . . 1 . . . . . . . . 5004 1 
+       605 . 1 1  51  51 LEU HD11 H  1   0.74 . . 1 . . . . . . . . 5004 1 
+       606 . 1 1  51  51 LEU HD12 H  1   0.74 . . 1 . . . . . . . . 5004 1 
+       607 . 1 1  51  51 LEU HD13 H  1   0.74 . . 1 . . . . . . . . 5004 1 
+       608 . 1 1  51  51 LEU HD21 H  1   0.57 . . 1 . . . . . . . . 5004 1 
+       609 . 1 1  51  51 LEU HD22 H  1   0.57 . . 1 . . . . . . . . 5004 1 
+       610 . 1 1  51  51 LEU HD23 H  1   0.57 . . 1 . . . . . . . . 5004 1 
+       611 . 1 1  51  51 LEU C    C 13 180.5  . . 1 . . . . . . . . 5004 1 
+       612 . 1 1  52  52 ILE H    H  1   8.80 . . 1 . . . . . . . . 5004 1 
+       613 . 1 1  52  52 ILE N    N 15 119.5  . . 1 . . . . . . . . 5004 1 
+       614 . 1 1  52  52 ILE HA   H  1   4.15 . . 1 . . . . . . . . 5004 1 
+       615 . 1 1  52  52 ILE CA   C 13  61.9  . . 1 . . . . . . . . 5004 1 
+       616 . 1 1  52  52 ILE HB   H  1   1.98 . . 1 . . . . . . . . 5004 1 
+       617 . 1 1  52  52 ILE CB   C 13  37.8  . . 1 . . . . . . . . 5004 1 
+       618 . 1 1  52  52 ILE CG1  C 13  29.3  . . 1 . . . . . . . . 5004 1 
+       619 . 1 1  52  52 ILE HG12 H  1   1.32 . . 2 . . . . . . . . 5004 1 
+       620 . 1 1  52  52 ILE HG13 H  1   1.48 . . 2 . . . . . . . . 5004 1 
+       621 . 1 1  52  52 ILE CG2  C 13  18.2  . . 1 . . . . . . . . 5004 1 
+       622 . 1 1  52  52 ILE HG21 H  1   0.87 . . 1 . . . . . . . . 5004 1 
+       623 . 1 1  52  52 ILE HG22 H  1   0.87 . . 1 . . . . . . . . 5004 1 
+       624 . 1 1  52  52 ILE HG23 H  1   0.87 . . 1 . . . . . . . . 5004 1 
+       625 . 1 1  52  52 ILE CD1  C 13  14.2  . . 1 . . . . . . . . 5004 1 
+       626 . 1 1  52  52 ILE HD11 H  1   0.82 . . 1 . . . . . . . . 5004 1 
+       627 . 1 1  52  52 ILE HD12 H  1   0.82 . . 1 . . . . . . . . 5004 1 
+       628 . 1 1  52  52 ILE HD13 H  1   0.82 . . 1 . . . . . . . . 5004 1 
+       629 . 1 1  52  52 ILE C    C 13 175.0  . . 1 . . . . . . . . 5004 1 
+       630 . 1 1  53  53 ASN H    H  1   7.01 . . 1 . . . . . . . . 5004 1 
+       631 . 1 1  53  53 ASN N    N 15 116.0  . . 1 . . . . . . . . 5004 1 
+       632 . 1 1  53  53 ASN HA   H  1   4.63 . . 1 . . . . . . . . 5004 1 
+       633 . 1 1  53  53 ASN CA   C 13  54.4  . . 1 . . . . . . . . 5004 1 
+       634 . 1 1  53  53 ASN HB2  H  1   2.62 . . 1 . . . . . . . . 5004 1 
+       635 . 1 1  53  53 ASN HB3  H  1   2.97 . . 1 . . . . . . . . 5004 1 
+       636 . 1 1  53  53 ASN CB   C 13  39.9  . . 1 . . . . . . . . 5004 1 
+       637 . 1 1  53  53 ASN C    C 13 174.6  . . 1 . . . . . . . . 5004 1 
+       638 . 1 1  54  54 VAL H    H  1   7.42 . . 1 . . . . . . . . 5004 1 
+       639 . 1 1  54  54 VAL N    N 15 121.0  . . 1 . . . . . . . . 5004 1 
+       640 . 1 1  54  54 VAL HA   H  1   4.01 . . 1 . . . . . . . . 5004 1 
+       641 . 1 1  54  54 VAL CA   C 13  62.7  . . 1 . . . . . . . . 5004 1 
+       642 . 1 1  54  54 VAL HB   H  1   2.12 . . 1 . . . . . . . . 5004 1 
+       643 . 1 1  54  54 VAL CB   C 13  31.5  . . 1 . . . . . . . . 5004 1 
+       644 . 1 1  54  54 VAL CG1  C 13  22.9  . . 1 . . . . . . . . 5004 1 
+       645 . 1 1  54  54 VAL CG2  C 13  22.5  . . 1 . . . . . . . . 5004 1 
+       646 . 1 1  54  54 VAL HG11 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       647 . 1 1  54  54 VAL HG12 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       648 . 1 1  54  54 VAL HG13 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+       649 . 1 1  54  54 VAL HG21 H  1   0.77 . . 1 . . . . . . . . 5004 1 
+       650 . 1 1  54  54 VAL HG22 H  1   0.77 . . 1 . . . . . . . . 5004 1 
+       651 . 1 1  54  54 VAL HG23 H  1   0.77 . . 1 . . . . . . . . 5004 1 
+       652 . 1 1  54  54 VAL C    C 13 174.8  . . 1 . . . . . . . . 5004 1 
+       653 . 1 1  55  55 SER H    H  1   8.42 . . 1 . . . . . . . . 5004 1 
+       654 . 1 1  55  55 SER N    N 15 122.6  . . 1 . . . . . . . . 5004 1 
+       655 . 1 1  55  55 SER HA   H  1   4.70 . . 1 . . . . . . . . 5004 1 
+       656 . 1 1  55  55 SER CA   C 13  57.1  . . 1 . . . . . . . . 5004 1 
+       657 . 1 1  55  55 SER HB2  H  1   3.78 . . 1 . . . . . . . . 5004 1 
+       658 . 1 1  55  55 SER HB3  H  1   3.78 . . 1 . . . . . . . . 5004 1 
+       659 . 1 1  55  55 SER CB   C 13  64.8  . . 1 . . . . . . . . 5004 1 
+       660 . 1 1  55  55 SER C    C 13 175.1  . . 1 . . . . . . . . 5004 1 
+       661 . 1 1  56  56 GLY H    H  1   8.84 . . 1 . . . . . . . . 5004 1 
+       662 . 1 1  56  56 GLY N    N 15 111.5  . . 1 . . . . . . . . 5004 1 
+       663 . 1 1  56  56 GLY HA2  H  1   3.83 . . 2 . . . . . . . . 5004 1 
+       664 . 1 1  56  56 GLY HA3  H  1   3.91 . . 2 . . . . . . . . 5004 1 
+       665 . 1 1  56  56 GLY CA   C 13  46.5  . . 1 . . . . . . . . 5004 1 
+       666 . 1 1  56  56 GLY C    C 13 173.7  . . 1 . . . . . . . . 5004 1 
+       667 . 1 1  57  57 CYS H    H  1   8.59 . . 1 . . . . . . . . 5004 1 
+       668 . 1 1  57  57 CYS N    N 15 120.3  . . 1 . . . . . . . . 5004 1 
+       669 . 1 1  57  57 CYS HA   H  1   4.81 . . 1 . . . . . . . . 5004 1 
+       670 . 1 1  57  57 CYS CA   C 13  52.2  . . 1 . . . . . . . . 5004 1 
+       671 . 1 1  57  57 CYS HB2  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+       672 . 1 1  57  57 CYS HB3  H  1   3.03 . . 1 . . . . . . . . 5004 1 
+       673 . 1 1  57  57 CYS CB   C 13  39.2  . . 1 . . . . . . . . 5004 1 
+       674 . 1 1  58  58 SER H    H  1   8.95 . . 1 . . . . . . . . 5004 1 
+       675 . 1 1  58  58 SER N    N 15 125.5  . . 1 . . . . . . . . 5004 1 
+       676 . 1 1  58  58 SER HA   H  1   4.19 . . 1 . . . . . . . . 5004 1 
+       677 . 1 1  58  58 SER CA   C 13  61.8  . . 1 . . . . . . . . 5004 1 
+       678 . 1 1  58  58 SER HB2  H  1   3.91 . . 1 . . . . . . . . 5004 1 
+       679 . 1 1  58  58 SER HB3  H  1   3.91 . . 1 . . . . . . . . 5004 1 
+       680 . 1 1  58  58 SER CB   C 13  62.7  . . 1 . . . . . . . . 5004 1 
+       681 . 1 1  58  58 SER C    C 13 177.1  . . 1 . . . . . . . . 5004 1 
+       682 . 1 1  59  59 ALA H    H  1   8.65 . . 1 . . . . . . . . 5004 1 
+       683 . 1 1  59  59 ALA N    N 15 121.8  . . 1 . . . . . . . . 5004 1 
+       684 . 1 1  59  59 ALA HA   H  1   4.23 . . 1 . . . . . . . . 5004 1 
+       685 . 1 1  59  59 ALA CA   C 13  54.9  . . 1 . . . . . . . . 5004 1 
+       686 . 1 1  59  59 ALA HB1  H  1   1.46 . . 1 . . . . . . . . 5004 1 
+       687 . 1 1  59  59 ALA HB2  H  1   1.46 . . 1 . . . . . . . . 5004 1 
+       688 . 1 1  59  59 ALA HB3  H  1   1.46 . . 1 . . . . . . . . 5004 1 
+       689 . 1 1  59  59 ALA CB   C 13  19.4  . . 1 . . . . . . . . 5004 1 
+       690 . 1 1  59  59 ALA C    C 13 178.3  . . 1 . . . . . . . . 5004 1 
+       691 . 1 1  60  60 ILE H    H  1   7.01 . . 1 . . . . . . . . 5004 1 
+       692 . 1 1  60  60 ILE N    N 15 107.5  . . 1 . . . . . . . . 5004 1 
+       693 . 1 1  60  60 ILE HA   H  1   4.55 . . 1 . . . . . . . . 5004 1 
+       694 . 1 1  60  60 ILE CA   C 13  59.3  . . 1 . . . . . . . . 5004 1 
+       695 . 1 1  60  60 ILE HB   H  1   1.98 . . 1 . . . . . . . . 5004 1 
+       696 . 1 1  60  60 ILE CB   C 13  40.9  . . 1 . . . . . . . . 5004 1 
+       697 . 1 1  60  60 ILE CG1  C 13  28.2  . . 1 . . . . . . . . 5004 1 
+       698 . 1 1  60  60 ILE HG12 H  1   1.34 . . 2 . . . . . . . . 5004 1 
+       699 . 1 1  60  60 ILE HG13 H  1   1.48 . . 2 . . . . . . . . 5004 1 
+       700 . 1 1  60  60 ILE CG2  C 13  17.6  . . 1 . . . . . . . . 5004 1 
+       701 . 1 1  60  60 ILE HG21 H  1   0.95 . . 1 . . . . . . . . 5004 1 
+       702 . 1 1  60  60 ILE HG22 H  1   0.95 . . 1 . . . . . . . . 5004 1 
+       703 . 1 1  60  60 ILE HG23 H  1   0.95 . . 1 . . . . . . . . 5004 1 
+       704 . 1 1  60  60 ILE CD1  C 13  15.4  . . 1 . . . . . . . . 5004 1 
+       705 . 1 1  60  60 ILE HD11 H  1   0.93 . . 1 . . . . . . . . 5004 1 
+       706 . 1 1  60  60 ILE HD12 H  1   0.93 . . 1 . . . . . . . . 5004 1 
+       707 . 1 1  60  60 ILE HD13 H  1   0.93 . . 1 . . . . . . . . 5004 1 
+       708 . 1 1  60  60 ILE C    C 13 175.2  . . 1 . . . . . . . . 5004 1 
+       709 . 1 1  61  61 GLU H    H  1   7.53 . . 1 . . . . . . . . 5004 1 
+       710 . 1 1  61  61 GLU N    N 15 124.1  . . 1 . . . . . . . . 5004 1 
+       711 . 1 1  61  61 GLU HA   H  1   4.14 . . 1 . . . . . . . . 5004 1 
+       712 . 1 1  61  61 GLU CA   C 13  60.2  . . 1 . . . . . . . . 5004 1 
+       713 . 1 1  61  61 GLU HB2  H  1   2.07 . . 2 . . . . . . . . 5004 1 
+       714 . 1 1  61  61 GLU HB3  H  1   2.21 . . 2 . . . . . . . . 5004 1 
+       715 . 1 1  61  61 GLU CB   C 13  29.5  . . 1 . . . . . . . . 5004 1 
+       716 . 1 1  61  61 GLU CG   C 13  37.1  . . 1 . . . . . . . . 5004 1 
+       717 . 1 1  61  61 GLU HG2  H  1   2.22 . . 2 . . . . . . . . 5004 1 
+       718 . 1 1  61  61 GLU HG3  H  1   2.54 . . 2 . . . . . . . . 5004 1 
+       719 . 1 1  61  61 GLU C    C 13 178.8  . . 1 . . . . . . . . 5004 1 
+       720 . 1 1  62  62 LYS H    H  1   8.77 . . 1 . . . . . . . . 5004 1 
+       721 . 1 1  62  62 LYS N    N 15 121.5  . . 1 . . . . . . . . 5004 1 
+       722 . 1 1  62  62 LYS HA   H  1   3.97 . . 1 . . . . . . . . 5004 1 
+       723 . 1 1  62  62 LYS CA   C 13  60.7  . . 1 . . . . . . . . 5004 1 
+       724 . 1 1  62  62 LYS HB2  H  1   1.94 . . 1 . . . . . . . . 5004 1 
+       725 . 1 1  62  62 LYS HB3  H  1   1.84 . . 1 . . . . . . . . 5004 1 
+       726 . 1 1  62  62 LYS CB   C 13  31.3  . . 1 . . . . . . . . 5004 1 
+       727 . 1 1  62  62 LYS CG   C 13  25.6  . . 1 . . . . . . . . 5004 1 
+       728 . 1 1  62  62 LYS HG2  H  1   1.42 . . 2 . . . . . . . . 5004 1 
+       729 . 1 1  62  62 LYS HG3  H  1   1.50 . . 2 . . . . . . . . 5004 1 
+       730 . 1 1  62  62 LYS CD   C 13  29.5  . . 1 . . . . . . . . 5004 1 
+       731 . 1 1  62  62 LYS HD2  H  1   1.65 . . 1 . . . . . . . . 5004 1 
+       732 . 1 1  62  62 LYS HD3  H  1   1.65 . . 1 . . . . . . . . 5004 1 
+       733 . 1 1  62  62 LYS CE   C 13  42.2  . . 1 . . . . . . . . 5004 1 
+       734 . 1 1  62  62 LYS HE2  H  1   2.82 . . 1 . . . . . . . . 5004 1 
+       735 . 1 1  62  62 LYS HE3  H  1   2.82 . . 1 . . . . . . . . 5004 1 
+       736 . 1 1  62  62 LYS C    C 13 179.3  . . 1 . . . . . . . . 5004 1 
+       737 . 1 1  63  63 THR H    H  1   8.65 . . 1 . . . . . . . . 5004 1 
+       738 . 1 1  63  63 THR N    N 15 119.2  . . 1 . . . . . . . . 5004 1 
+       739 . 1 1  63  63 THR HA   H  1   3.59 . . 1 . . . . . . . . 5004 1 
+       740 . 1 1  63  63 THR CA   C 13  69.3  . . 1 . . . . . . . . 5004 1 
+       741 . 1 1  63  63 THR HB   H  1   4.17 . . 1 . . . . . . . . 5004 1 
+       742 . 1 1  63  63 THR CB   C 13  67.6  . . 1 . . . . . . . . 5004 1 
+       743 . 1 1  63  63 THR CG2  C 13  21.1  . . 1 . . . . . . . . 5004 1 
+       744 . 1 1  63  63 THR HG21 H  1   0.96 . . 1 . . . . . . . . 5004 1 
+       745 . 1 1  63  63 THR HG22 H  1   0.96 . . 1 . . . . . . . . 5004 1 
+       746 . 1 1  63  63 THR HG23 H  1   0.96 . . 1 . . . . . . . . 5004 1 
+       747 . 1 1  63  63 THR C    C 13 176.6  . . 1 . . . . . . . . 5004 1 
+       748 . 1 1  64  64 GLN H    H  1   8.11 . . 1 . . . . . . . . 5004 1 
+       749 . 1 1  64  64 GLN N    N 15 118.7  . . 1 . . . . . . . . 5004 1 
+       750 . 1 1  64  64 GLN HA   H  1   3.70 . . 1 . . . . . . . . 5004 1 
+       751 . 1 1  64  64 GLN CA   C 13  60.2  . . 1 . . . . . . . . 5004 1 
+       752 . 1 1  64  64 GLN HB2  H  1   2.64 . . 1 . . . . . . . . 5004 1 
+       753 . 1 1  64  64 GLN HB3  H  1   1.88 . . 1 . . . . . . . . 5004 1 
+       754 . 1 1  64  64 GLN CB   C 13  28.3  . . 1 . . . . . . . . 5004 1 
+       755 . 1 1  64  64 GLN CG   C 13  34.8  . . 1 . . . . . . . . 5004 1 
+       756 . 1 1  64  64 GLN HG2  H  1   1.81 . . 2 . . . . . . . . 5004 1 
+       757 . 1 1  64  64 GLN HG3  H  1   2.56 . . 2 . . . . . . . . 5004 1 
+       758 . 1 1  64  64 GLN C    C 13 178.4  . . 1 . . . . . . . . 5004 1 
+       759 . 1 1  65  65 ARG H    H  1   8.07 . . 1 . . . . . . . . 5004 1 
+       760 . 1 1  65  65 ARG N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+       761 . 1 1  65  65 ARG HA   H  1   4.01 . . 1 . . . . . . . . 5004 1 
+       762 . 1 1  65  65 ARG CA   C 13  59.7  . . 1 . . . . . . . . 5004 1 
+       763 . 1 1  65  65 ARG HB2  H  1   1.87 . . 2 . . . . . . . . 5004 1 
+       764 . 1 1  65  65 ARG HB3  H  1   2.01 . . 2 . . . . . . . . 5004 1 
+       765 . 1 1  65  65 ARG CB   C 13  29.9  . . 1 . . . . . . . . 5004 1 
+       766 . 1 1  65  65 ARG CG   C 13  27.4  . . 1 . . . . . . . . 5004 1 
+       767 . 1 1  65  65 ARG HG2  H  1   1.63 . . 1 . . . . . . . . 5004 1 
+       768 . 1 1  65  65 ARG HG3  H  1   1.63 . . 1 . . . . . . . . 5004 1 
+       769 . 1 1  65  65 ARG CD   C 13  43.5  . . 1 . . . . . . . . 5004 1 
+       770 . 1 1  65  65 ARG HD2  H  1   3.25 . . 2 . . . . . . . . 5004 1 
+       771 . 1 1  65  65 ARG HD3  H  1   3.18 . . 2 . . . . . . . . 5004 1 
+       772 . 1 1  65  65 ARG C    C 13 180.6  . . 1 . . . . . . . . 5004 1 
+       773 . 1 1  66  66 MET H    H  1   9.04 . . 1 . . . . . . . . 5004 1 
+       774 . 1 1  66  66 MET N    N 15 121.4  . . 1 . . . . . . . . 5004 1 
+       775 . 1 1  66  66 MET HA   H  1   4.07 . . 1 . . . . . . . . 5004 1 
+       776 . 1 1  66  66 MET CA   C 13  59.7  . . 1 . . . . . . . . 5004 1 
+       777 . 1 1  66  66 MET HB2  H  1   2.18 . . 1 . . . . . . . . 5004 1 
+       778 . 1 1  66  66 MET HB3  H  1   2.18 . . 1 . . . . . . . . 5004 1 
+       779 . 1 1  66  66 MET CB   C 13  34.3  . . 1 . . . . . . . . 5004 1 
+       780 . 1 1  66  66 MET CG   C 13  33.8  . . 1 . . . . . . . . 5004 1 
+       781 . 1 1  66  66 MET HG2  H  1   2.44 . . 2 . . . . . . . . 5004 1 
+       782 . 1 1  66  66 MET HG3  H  1   2.95 . . 2 . . . . . . . . 5004 1 
+       783 . 1 1  66  66 MET CE   C 13  18.6  . . 1 . . . . . . . . 5004 1 
+       784 . 1 1  66  66 MET HE1  H  1   2.07 . . 1 . . . . . . . . 5004 1 
+       785 . 1 1  66  66 MET HE2  H  1   2.07 . . 1 . . . . . . . . 5004 1 
+       786 . 1 1  66  66 MET HE3  H  1   2.07 . . 1 . . . . . . . . 5004 1 
+       787 . 1 1  66  66 MET C    C 13 180.5  . . 1 . . . . . . . . 5004 1 
+       788 . 1 1  67  67 LEU H    H  1   8.83 . . 1 . . . . . . . . 5004 1 
+       789 . 1 1  67  67 LEU N    N 15 119.7  . . 1 . . . . . . . . 5004 1 
+       790 . 1 1  67  67 LEU HA   H  1   4.20 . . 1 . . . . . . . . 5004 1 
+       791 . 1 1  67  67 LEU CA   C 13  58.2  . . 1 . . . . . . . . 5004 1 
+       792 . 1 1  67  67 LEU HB2  H  1   2.18 . . 1 . . . . . . . . 5004 1 
+       793 . 1 1  67  67 LEU HB3  H  1   1.54 . . 1 . . . . . . . . 5004 1 
+       794 . 1 1  67  67 LEU CB   C 13  43.3  . . 1 . . . . . . . . 5004 1 
+       795 . 1 1  67  67 LEU CG   C 13  27.2  . . 1 . . . . . . . . 5004 1 
+       796 . 1 1  67  67 LEU HG   H  1   1.98 . . 1 . . . . . . . . 5004 1 
+       797 . 1 1  67  67 LEU CD1  C 13  26.5  . . 1 . . . . . . . . 5004 1 
+       798 . 1 1  67  67 LEU CD2  C 13  23.8  . . 1 . . . . . . . . 5004 1 
+       799 . 1 1  67  67 LEU HD11 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+       800 . 1 1  67  67 LEU HD12 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+       801 . 1 1  67  67 LEU HD13 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+       802 . 1 1  67  67 LEU HD21 H  1   1.06 . . 1 . . . . . . . . 5004 1 
+       803 . 1 1  67  67 LEU HD22 H  1   1.06 . . 1 . . . . . . . . 5004 1 
+       804 . 1 1  67  67 LEU HD23 H  1   1.06 . . 1 . . . . . . . . 5004 1 
+       805 . 1 1  67  67 LEU C    C 13 179.1  . . 1 . . . . . . . . 5004 1 
+       806 . 1 1  68  68 SER H    H  1   7.95 . . 1 . . . . . . . . 5004 1 
+       807 . 1 1  68  68 SER N    N 15 114.5  . . 1 . . . . . . . . 5004 1 
+       808 . 1 1  68  68 SER HA   H  1   4.22 . . 1 . . . . . . . . 5004 1 
+       809 . 1 1  68  68 SER CA   C 13  61.6  . . 1 . . . . . . . . 5004 1 
+       810 . 1 1  68  68 SER HB2  H  1   4.09 . . 1 . . . . . . . . 5004 1 
+       811 . 1 1  68  68 SER HB3  H  1   4.01 . . 1 . . . . . . . . 5004 1 
+       812 . 1 1  68  68 SER CB   C 13  62.7  . . 1 . . . . . . . . 5004 1 
+       813 . 1 1  68  68 SER C    C 13 176.1  . . 1 . . . . . . . . 5004 1 
+       814 . 1 1  69  69 GLY H    H  1   7.45 . . 1 . . . . . . . . 5004 1 
+       815 . 1 1  69  69 GLY N    N 15 106.6  . . 1 . . . . . . . . 5004 1 
+       816 . 1 1  69  69 GLY HA2  H  1   3.63 . . 2 . . . . . . . . 5004 1 
+       817 . 1 1  69  69 GLY HA3  H  1   3.97 . . 2 . . . . . . . . 5004 1 
+       818 . 1 1  69  69 GLY CA   C 13  46.0  . . 1 . . . . . . . . 5004 1 
+       819 . 1 1  69  69 GLY C    C 13 174.6  . . 1 . . . . . . . . 5004 1 
+       820 . 1 1  70  70 PHE H    H  1   7.44 . . 1 . . . . . . . . 5004 1 
+       821 . 1 1  70  70 PHE N    N 15 117.0  . . 1 . . . . . . . . 5004 1 
+       822 . 1 1  70  70 PHE HA   H  1   4.28 . . 1 . . . . . . . . 5004 1 
+       823 . 1 1  70  70 PHE CA   C 13  58.5  . . 1 . . . . . . . . 5004 1 
+       824 . 1 1  70  70 PHE HB2  H  1   2.58 . . 1 . . . . . . . . 5004 1 
+       825 . 1 1  70  70 PHE HB3  H  1   2.58 . . 1 . . . . . . . . 5004 1 
+       826 . 1 1  70  70 PHE CB   C 13  40.8  . . 1 . . . . . . . . 5004 1 
+       827 . 1 1  70  70 PHE CD1  C 13 131.6  . . 1 . . . . . . . . 5004 1 
+       828 . 1 1  70  70 PHE CD2  C 13 131.6  . . 1 . . . . . . . . 5004 1 
+       829 . 1 1  70  70 PHE HD1  H  1   6.89 . . 1 . . . . . . . . 5004 1 
+       830 . 1 1  70  70 PHE HD2  H  1   6.89 . . 1 . . . . . . . . 5004 1 
+       831 . 1 1  70  70 PHE CE1  C 13 130.7  . . 1 . . . . . . . . 5004 1 
+       832 . 1 1  70  70 PHE CE2  C 13 130.7  . . 1 . . . . . . . . 5004 1 
+       833 . 1 1  70  70 PHE HE1  H  1   7.09 . . 1 . . . . . . . . 5004 1 
+       834 . 1 1  70  70 PHE HE2  H  1   7.09 . . 1 . . . . . . . . 5004 1 
+       835 . 1 1  70  70 PHE CZ   C 13 128.8  . . 1 . . . . . . . . 5004 1 
+       836 . 1 1  70  70 PHE HZ   H  1   6.85 . . 1 . . . . . . . . 5004 1 
+       837 . 1 1  70  70 PHE C    C 13 175.2  . . 1 . . . . . . . . 5004 1 
+       838 . 1 1  71  71 CYS H    H  1   7.45 . . 1 . . . . . . . . 5004 1 
+       839 . 1 1  71  71 CYS N    N 15 119.2  . . 1 . . . . . . . . 5004 1 
+       840 . 1 1  71  71 CYS HA   H  1   5.19 . . 1 . . . . . . . . 5004 1 
+       841 . 1 1  71  71 CYS CA   C 13  53.0  . . 1 . . . . . . . . 5004 1 
+       842 . 1 1  71  71 CYS HB2  H  1   2.43 . . 2 . . . . . . . . 5004 1 
+       843 . 1 1  71  71 CYS HB3  H  1   3.30 . . 2 . . . . . . . . 5004 1 
+       844 . 1 1  71  71 CYS CB   C 13  43.6  . . 1 . . . . . . . . 5004 1 
+       845 . 1 1  72  72 PRO HA   H  1   4.52 . . 1 . . . . . . . . 5004 1 
+       846 . 1 1  72  72 PRO CA   C 13  64.0  . . 1 . . . . . . . . 5004 1 
+       847 . 1 1  72  72 PRO HB2  H  1   2.05 . . 2 . . . . . . . . 5004 1 
+       848 . 1 1  72  72 PRO HB3  H  1   2.20 . . 2 . . . . . . . . 5004 1 
+       849 . 1 1  72  72 PRO CB   C 13  31.6  . . 1 . . . . . . . . 5004 1 
+       850 . 1 1  72  72 PRO CG   C 13  26.9  . . 1 . . . . . . . . 5004 1 
+       851 . 1 1  72  72 PRO HG2  H  1   1.82 . . 2 . . . . . . . . 5004 1 
+       852 . 1 1  72  72 PRO HG3  H  1   2.05 . . 2 . . . . . . . . 5004 1 
+       853 . 1 1  72  72 PRO CD   C 13  51.4  . . 1 . . . . . . . . 5004 1 
+       854 . 1 1  72  72 PRO HD2  H  1   3.75 . . 2 . . . . . . . . 5004 1 
+       855 . 1 1  72  72 PRO HD3  H  1   3.86 . . 2 . . . . . . . . 5004 1 
+       856 . 1 1  72  72 PRO C    C 13 175.8  . . 1 . . . . . . . . 5004 1 
+       857 . 1 1  73  73 HIS H    H  1   7.41 . . 1 . . . . . . . . 5004 1 
+       858 . 1 1  73  73 HIS N    N 15 116.3  . . 1 . . . . . . . . 5004 1 
+       859 . 1 1  73  73 HIS HA   H  1   4.93 . . 1 . . . . . . . . 5004 1 
+       860 . 1 1  73  73 HIS CA   C 13  54.0  . . 1 . . . . . . . . 5004 1 
+       861 . 1 1  73  73 HIS HB2  H  1   3.18 . . 1 . . . . . . . . 5004 1 
+       862 . 1 1  73  73 HIS HB3  H  1   3.18 . . 1 . . . . . . . . 5004 1 
+       863 . 1 1  73  73 HIS CB   C 13  31.3  . . 1 . . . . . . . . 5004 1 
+       864 . 1 1  73  73 HIS CD2  C 13 120.7  . . 1 . . . . . . . . 5004 1 
+       865 . 1 1  73  73 HIS HD2  H  1   7.17 . . 1 . . . . . . . . 5004 1 
+       866 . 1 1  73  73 HIS CE1  C 13 137.3  . . 1 . . . . . . . . 5004 1 
+       867 . 1 1  73  73 HIS HE1  H  1   8.44 . . 1 . . . . . . . . 5004 1 
+       868 . 1 1  73  73 HIS C    C 13 173.4  . . 1 . . . . . . . . 5004 1 
+       869 . 1 1  74  74 LYS H    H  1   8.55 . . 1 . . . . . . . . 5004 1 
+       870 . 1 1  74  74 LYS N    N 15 121.8  . . 1 . . . . . . . . 5004 1 
+       871 . 1 1  74  74 LYS HA   H  1   4.31 . . 1 . . . . . . . . 5004 1 
+       872 . 1 1  74  74 LYS CA   C 13  56.6  . . 1 . . . . . . . . 5004 1 
+       873 . 1 1  74  74 LYS HB2  H  1   1.79 . . 1 . . . . . . . . 5004 1 
+       874 . 1 1  74  74 LYS HB3  H  1   1.79 . . 1 . . . . . . . . 5004 1 
+       875 . 1 1  74  74 LYS CB   C 13  32.6  . . 1 . . . . . . . . 5004 1 
+       876 . 1 1  74  74 LYS CG   C 13  24.8  . . 1 . . . . . . . . 5004 1 
+       877 . 1 1  74  74 LYS HG2  H  1   1.43 . . 1 . . . . . . . . 5004 1 
+       878 . 1 1  74  74 LYS HG3  H  1   1.43 . . 1 . . . . . . . . 5004 1 
+       879 . 1 1  74  74 LYS CD   C 13  28.9  . . 1 . . . . . . . . 5004 1 
+       880 . 1 1  74  74 LYS HD2  H  1   1.68 . . 1 . . . . . . . . 5004 1 
+       881 . 1 1  74  74 LYS HD3  H  1   1.68 . . 1 . . . . . . . . 5004 1 
+       882 . 1 1  74  74 LYS CE   C 13  42.1  . . 1 . . . . . . . . 5004 1 
+       883 . 1 1  74  74 LYS HE2  H  1   2.95 . . 1 . . . . . . . . 5004 1 
+       884 . 1 1  74  74 LYS HE3  H  1   2.95 . . 1 . . . . . . . . 5004 1 
+       885 . 1 1  74  74 LYS C    C 13 176.9  . . 1 . . . . . . . . 5004 1 
+       886 . 1 1  75  75 VAL H    H  1   8.57 . . 1 . . . . . . . . 5004 1 
+       887 . 1 1  75  75 VAL N    N 15 125.3  . . 1 . . . . . . . . 5004 1 
+       888 . 1 1  75  75 VAL HA   H  1   4.41 . . 1 . . . . . . . . 5004 1 
+       889 . 1 1  75  75 VAL CA   C 13  61.8  . . 1 . . . . . . . . 5004 1 
+       890 . 1 1  75  75 VAL HB   H  1   1.98 . . 1 . . . . . . . . 5004 1 
+       891 . 1 1  75  75 VAL CB   C 13  33.8  . . 1 . . . . . . . . 5004 1 
+       892 . 1 1  75  75 VAL CG1  C 13  21.6  . . 2 . . . . . . . . 5004 1 
+       893 . 1 1  75  75 VAL CG2  C 13  22.1  . . 2 . . . . . . . . 5004 1 
+       894 . 1 1  75  75 VAL HG11 H  1   1.00 . . 2 . . . . . . . . 5004 1 
+       895 . 1 1  75  75 VAL HG12 H  1   1.00 . . 2 . . . . . . . . 5004 1 
+       896 . 1 1  75  75 VAL HG13 H  1   1.00 . . 2 . . . . . . . . 5004 1 
+       897 . 1 1  75  75 VAL HG21 H  1   0.93 . . 2 . . . . . . . . 5004 1 
+       898 . 1 1  75  75 VAL HG22 H  1   0.93 . . 2 . . . . . . . . 5004 1 
+       899 . 1 1  75  75 VAL HG23 H  1   0.93 . . 2 . . . . . . . . 5004 1 
+       900 . 1 1  75  75 VAL C    C 13 175.2  . . 1 . . . . . . . . 5004 1 
+       901 . 1 1  76  76 SER H    H  1   8.39 . . 1 . . . . . . . . 5004 1 
+       902 . 1 1  76  76 SER N    N 15 120.2  . . 1 . . . . . . . . 5004 1 
+       903 . 1 1  76  76 SER HA   H  1   4.62 . . 1 . . . . . . . . 5004 1 
+       904 . 1 1  76  76 SER CA   C 13  57.1  . . 1 . . . . . . . . 5004 1 
+       905 . 1 1  76  76 SER HB2  H  1   3.64 . . 2 . . . . . . . . 5004 1 
+       906 . 1 1  76  76 SER HB3  H  1   3.78 . . 2 . . . . . . . . 5004 1 
+       907 . 1 1  76  76 SER CB   C 13  65.0  . . 1 . . . . . . . . 5004 1 
+       908 . 1 1  76  76 SER C    C 13 173.4  . . 1 . . . . . . . . 5004 1 
+       909 . 1 1  77  77 ALA H    H  1   8.64 . . 1 . . . . . . . . 5004 1 
+       910 . 1 1  77  77 ALA N    N 15 126.0  . . 1 . . . . . . . . 5004 1 
+       911 . 1 1  77  77 ALA HA   H  1   4.06 . . 1 . . . . . . . . 5004 1 
+       912 . 1 1  77  77 ALA CA   C 13  53.4  . . 1 . . . . . . . . 5004 1 
+       913 . 1 1  77  77 ALA HB1  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+       914 . 1 1  77  77 ALA HB2  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+       915 . 1 1  77  77 ALA HB3  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+       916 . 1 1  77  77 ALA CB   C 13  18.3  . . 1 . . . . . . . . 5004 1 
+       917 . 1 1  77  77 ALA C    C 13 178.5  . . 1 . . . . . . . . 5004 1 
+       918 . 1 1  78  78 GLY H    H  1   8.67 . . 1 . . . . . . . . 5004 1 
+       919 . 1 1  78  78 GLY N    N 15 110.1  . . 1 . . . . . . . . 5004 1 
+       920 . 1 1  78  78 GLY HA2  H  1   3.72 . . 2 . . . . . . . . 5004 1 
+       921 . 1 1  78  78 GLY HA3  H  1   4.09 . . 2 . . . . . . . . 5004 1 
+       922 . 1 1  78  78 GLY CA   C 13  45.5  . . 1 . . . . . . . . 5004 1 
+       923 . 1 1  78  78 GLY C    C 13 173.9  . . 1 . . . . . . . . 5004 1 
+       924 . 1 1  79  79 GLN H    H  1   7.76 . . 1 . . . . . . . . 5004 1 
+       925 . 1 1  79  79 GLN N    N 15 119.9  . . 1 . . . . . . . . 5004 1 
+       926 . 1 1  79  79 GLN HA   H  1   4.27 . . 1 . . . . . . . . 5004 1 
+       927 . 1 1  79  79 GLN CA   C 13  55.7  . . 1 . . . . . . . . 5004 1 
+       928 . 1 1  79  79 GLN HB2  H  1   1.92 . . 1 . . . . . . . . 5004 1 
+       929 . 1 1  79  79 GLN HB3  H  1   1.92 . . 1 . . . . . . . . 5004 1 
+       930 . 1 1  79  79 GLN CB   C 13  29.6  . . 1 . . . . . . . . 5004 1 
+       931 . 1 1  79  79 GLN CG   C 13  33.5  . . 1 . . . . . . . . 5004 1 
+       932 . 1 1  79  79 GLN HG2  H  1   2.05 . . 2 . . . . . . . . 5004 1 
+       933 . 1 1  79  79 GLN HG3  H  1   2.17 . . 2 . . . . . . . . 5004 1 
+       934 . 1 1  79  79 GLN C    C 13 175.4  . . 1 . . . . . . . . 5004 1 
+       935 . 1 1  80  80 PHE H    H  1   8.41 . . 1 . . . . . . . . 5004 1 
+       936 . 1 1  80  80 PHE N    N 15 120.5  . . 1 . . . . . . . . 5004 1 
+       937 . 1 1  80  80 PHE HA   H  1   4.74 . . 1 . . . . . . . . 5004 1 
+       938 . 1 1  80  80 PHE CA   C 13  57.3  . . 1 . . . . . . . . 5004 1 
+       939 . 1 1  80  80 PHE HB2  H  1   2.84 . . 1 . . . . . . . . 5004 1 
+       940 . 1 1  80  80 PHE HB3  H  1   3.17 . . 1 . . . . . . . . 5004 1 
+       941 . 1 1  80  80 PHE CB   C 13  40.0  . . 1 . . . . . . . . 5004 1 
+       942 . 1 1  80  80 PHE CD1  C 13 132.0  . . 1 . . . . . . . . 5004 1 
+       943 . 1 1  80  80 PHE CD2  C 13 132.0  . . 1 . . . . . . . . 5004 1 
+       944 . 1 1  80  80 PHE HD1  H  1   7.20 . . 1 . . . . . . . . 5004 1 
+       945 . 1 1  80  80 PHE HD2  H  1   7.20 . . 1 . . . . . . . . 5004 1 
+       946 . 1 1  80  80 PHE CE1  C 13 131.3  . . 1 . . . . . . . . 5004 1 
+       947 . 1 1  80  80 PHE CE2  C 13 131.3  . . 1 . . . . . . . . 5004 1 
+       948 . 1 1  80  80 PHE HE1  H  1   7.27 . . 1 . . . . . . . . 5004 1 
+       949 . 1 1  80  80 PHE HE2  H  1   7.27 . . 1 . . . . . . . . 5004 1 
+       950 . 1 1  80  80 PHE C    C 13 176.0  . . 1 . . . . . . . . 5004 1 
+       951 . 1 1  81  81 SER H    H  1   8.98 . . 1 . . . . . . . . 5004 1 
+       952 . 1 1  81  81 SER N    N 15 118.2  . . 1 . . . . . . . . 5004 1 
+       953 . 1 1  81  81 SER HA   H  1   4.38 . . 1 . . . . . . . . 5004 1 
+       954 . 1 1  81  81 SER CA   C 13  59.4  . . 1 . . . . . . . . 5004 1 
+       955 . 1 1  81  81 SER HB2  H  1   3.86 . . 1 . . . . . . . . 5004 1 
+       956 . 1 1  81  81 SER HB3  H  1   3.80 . . 1 . . . . . . . . 5004 1 
+       957 . 1 1  81  81 SER CB   C 13  63.7  . . 1 . . . . . . . . 5004 1 
+       958 . 1 1  81  81 SER C    C 13 175.2  . . 1 . . . . . . . . 5004 1 
+       959 . 1 1  82  82 SER H    H  1   8.75 . . 1 . . . . . . . . 5004 1 
+       960 . 1 1  82  82 SER N    N 15 118.3  . . 1 . . . . . . . . 5004 1 
+       961 . 1 1  82  82 SER HA   H  1   4.34 . . 1 . . . . . . . . 5004 1 
+       962 . 1 1  82  82 SER CA   C 13  59.4  . . 1 . . . . . . . . 5004 1 
+       963 . 1 1  82  82 SER HB2  H  1   3.73 . . 1 . . . . . . . . 5004 1 
+       964 . 1 1  82  82 SER HB3  H  1   3.73 . . 1 . . . . . . . . 5004 1 
+       965 . 1 1  82  82 SER CB   C 13  63.3  . . 1 . . . . . . . . 5004 1 
+       966 . 1 1  82  82 SER C    C 13 174.4  . . 1 . . . . . . . . 5004 1 
+       967 . 1 1  83  83 LEU H    H  1   8.02 . . 1 . . . . . . . . 5004 1 
+       968 . 1 1  83  83 LEU N    N 15 122.5  . . 1 . . . . . . . . 5004 1 
+       969 . 1 1  83  83 LEU HA   H  1   4.19 . . 1 . . . . . . . . 5004 1 
+       970 . 1 1  83  83 LEU CA   C 13  55.2  . . 1 . . . . . . . . 5004 1 
+       971 . 1 1  83  83 LEU HB2  H  1   1.46 . . 2 . . . . . . . . 5004 1 
+       972 . 1 1  83  83 LEU HB3  H  1   1.52 . . 2 . . . . . . . . 5004 1 
+       973 . 1 1  83  83 LEU CB   C 13  41.9  . . 1 . . . . . . . . 5004 1 
+       974 . 1 1  83  83 LEU CG   C 13  27.2  . . 1 . . . . . . . . 5004 1 
+       975 . 1 1  83  83 LEU HG   H  1   1.46 . . 1 . . . . . . . . 5004 1 
+       976 . 1 1  83  83 LEU CD1  C 13  24.9  . . 2 . . . . . . . . 5004 1 
+       977 . 1 1  83  83 LEU CD2  C 13  23.6  . . 2 . . . . . . . . 5004 1 
+       978 . 1 1  83  83 LEU HD11 H  1   0.85 . . 2 . . . . . . . . 5004 1 
+       979 . 1 1  83  83 LEU HD12 H  1   0.85 . . 2 . . . . . . . . 5004 1 
+       980 . 1 1  83  83 LEU HD13 H  1   0.85 . . 2 . . . . . . . . 5004 1 
+       981 . 1 1  83  83 LEU HD21 H  1   0.76 . . 2 . . . . . . . . 5004 1 
+       982 . 1 1  83  83 LEU HD22 H  1   0.76 . . 2 . . . . . . . . 5004 1 
+       983 . 1 1  83  83 LEU HD23 H  1   0.76 . . 2 . . . . . . . . 5004 1 
+       984 . 1 1  83  83 LEU C    C 13 176.7  . . 1 . . . . . . . . 5004 1 
+       985 . 1 1  84  84 HIS H    H  1   7.88 . . 1 . . . . . . . . 5004 1 
+       986 . 1 1  84  84 HIS N    N 15 118.1  . . 1 . . . . . . . . 5004 1 
+       987 . 1 1  84  84 HIS HA   H  1   4.49 . . 1 . . . . . . . . 5004 1 
+       988 . 1 1  84  84 HIS CA   C 13  55.4  . . 1 . . . . . . . . 5004 1 
+       989 . 1 1  84  84 HIS HB2  H  1   2.55 . . 2 . . . . . . . . 5004 1 
+       990 . 1 1  84  84 HIS HB3  H  1   2.72 . . 2 . . . . . . . . 5004 1 
+       991 . 1 1  84  84 HIS CB   C 13  28.8  . . 1 . . . . . . . . 5004 1 
+       992 . 1 1  84  84 HIS CD2  C 13 119.5  . . 1 . . . . . . . . 5004 1 
+       993 . 1 1  84  84 HIS HD2  H  1   6.81 . . 1 . . . . . . . . 5004 1 
+       994 . 1 1  84  84 HIS CE1  C 13 136.3  . . 1 . . . . . . . . 5004 1 
+       995 . 1 1  84  84 HIS HE1  H  1   8.08 . . 1 . . . . . . . . 5004 1 
+       996 . 1 1  84  84 HIS C    C 13 174.9  . . 1 . . . . . . . . 5004 1 
+       997 . 1 1  85  85 VAL H    H  1   7.61 . . 1 . . . . . . . . 5004 1 
+       998 . 1 1  85  85 VAL N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+       999 . 1 1  85  85 VAL HA   H  1   3.89 . . 1 . . . . . . . . 5004 1 
+      1000 . 1 1  85  85 VAL CA   C 13  63.6  . . 1 . . . . . . . . 5004 1 
+      1001 . 1 1  85  85 VAL HB   H  1   1.98 . . 1 . . . . . . . . 5004 1 
+      1002 . 1 1  85  85 VAL CB   C 13  32.2  . . 1 . . . . . . . . 5004 1 
+      1003 . 1 1  85  85 VAL CG1  C 13  20.9  . . 2 . . . . . . . . 5004 1 
+      1004 . 1 1  85  85 VAL CG2  C 13  26.2  . . 2 . . . . . . . . 5004 1 
+      1005 . 1 1  85  85 VAL HG11 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1006 . 1 1  85  85 VAL HG12 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1007 . 1 1  85  85 VAL HG13 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1008 . 1 1  85  85 VAL HG21 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1009 . 1 1  85  85 VAL HG22 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1010 . 1 1  85  85 VAL HG23 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1011 . 1 1  85  85 VAL C    C 13 176.0  . . 1 . . . . . . . . 5004 1 
+      1012 . 1 1  86  86 ARG H    H  1   8.29 . . 1 . . . . . . . . 5004 1 
+      1013 . 1 1  86  86 ARG N    N 15 122.4  . . 1 . . . . . . . . 5004 1 
+      1014 . 1 1  86  86 ARG HA   H  1   4.22 . . 1 . . . . . . . . 5004 1 
+      1015 . 1 1  86  86 ARG CA   C 13  55.4  . . 1 . . . . . . . . 5004 1 
+      1016 . 1 1  86  86 ARG HB2  H  1   1.20 . . 1 . . . . . . . . 5004 1 
+      1017 . 1 1  86  86 ARG HB3  H  1   1.38 . . 1 . . . . . . . . 5004 1 
+      1018 . 1 1  86  86 ARG CB   C 13  29.8  . . 1 . . . . . . . . 5004 1 
+      1019 . 1 1  86  86 ARG CG   C 13  26.9  . . 1 . . . . . . . . 5004 1 
+      1020 . 1 1  86  86 ARG HG2  H  1   1.47 . . 1 . . . . . . . . 5004 1 
+      1021 . 1 1  86  86 ARG HG3  H  1   1.47 . . 1 . . . . . . . . 5004 1 
+      1022 . 1 1  86  86 ARG CD   C 13  43.4  . . 1 . . . . . . . . 5004 1 
+      1023 . 1 1  86  86 ARG HD2  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+      1024 . 1 1  86  86 ARG HD3  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+      1025 . 1 1  86  86 ARG C    C 13 175.1  . . 1 . . . . . . . . 5004 1 
+      1026 . 1 1  87  87 ASP H    H  1   7.92 . . 1 . . . . . . . . 5004 1 
+      1027 . 1 1  87  87 ASP N    N 15 119.9  . . 1 . . . . . . . . 5004 1 
+      1028 . 1 1  87  87 ASP HA   H  1   4.75 . . 1 . . . . . . . . 5004 1 
+      1029 . 1 1  87  87 ASP CA   C 13  54.4  . . 1 . . . . . . . . 5004 1 
+      1030 . 1 1  87  87 ASP HB2  H  1   2.64 . . 1 . . . . . . . . 5004 1 
+      1031 . 1 1  87  87 ASP HB3  H  1   2.83 . . 1 . . . . . . . . 5004 1 
+      1032 . 1 1  87  87 ASP CB   C 13  42.2  . . 1 . . . . . . . . 5004 1 
+      1033 . 1 1  87  87 ASP C    C 13 175.9  . . 1 . . . . . . . . 5004 1 
+      1034 . 1 1  88  88 THR H    H  1   8.38 . . 1 . . . . . . . . 5004 1 
+      1035 . 1 1  88  88 THR N    N 15 114.7  . . 1 . . . . . . . . 5004 1 
+      1036 . 1 1  88  88 THR HA   H  1   4.58 . . 1 . . . . . . . . 5004 1 
+      1037 . 1 1  88  88 THR CA   C 13  61.7  . . 1 . . . . . . . . 5004 1 
+      1038 . 1 1  88  88 THR HB   H  1   4.12 . . 1 . . . . . . . . 5004 1 
+      1039 . 1 1  88  88 THR CB   C 13  71.1  . . 1 . . . . . . . . 5004 1 
+      1040 . 1 1  88  88 THR CG2  C 13  21.4  . . 1 . . . . . . . . 5004 1 
+      1041 . 1 1  88  88 THR HG21 H  1   1.22 . . 1 . . . . . . . . 5004 1 
+      1042 . 1 1  88  88 THR HG22 H  1   1.22 . . 1 . . . . . . . . 5004 1 
+      1043 . 1 1  88  88 THR HG23 H  1   1.22 . . 1 . . . . . . . . 5004 1 
+      1044 . 1 1  88  88 THR C    C 13 173.5  . . 1 . . . . . . . . 5004 1 
+      1045 . 1 1  89  89 LYS H    H  1   8.46 . . 1 . . . . . . . . 5004 1 
+      1046 . 1 1  89  89 LYS N    N 15 124.8  . . 1 . . . . . . . . 5004 1 
+      1047 . 1 1  89  89 LYS HA   H  1   4.85 . . 1 . . . . . . . . 5004 1 
+      1048 . 1 1  89  89 LYS CA   C 13  55.4  . . 1 . . . . . . . . 5004 1 
+      1049 . 1 1  89  89 LYS HB2  H  1   1.45 . . 1 . . . . . . . . 5004 1 
+      1050 . 1 1  89  89 LYS HB3  H  1   1.23 . . 1 . . . . . . . . 5004 1 
+      1051 . 1 1  89  89 LYS CB   C 13  34.8  . . 1 . . . . . . . . 5004 1 
+      1052 . 1 1  89  89 LYS CG   C 13  25.2  . . 1 . . . . . . . . 5004 1 
+      1053 . 1 1  89  89 LYS HG2  H  1   0.81 . . 2 . . . . . . . . 5004 1 
+      1054 . 1 1  89  89 LYS HG3  H  1   0.21 . . 2 . . . . . . . . 5004 1 
+      1055 . 1 1  89  89 LYS CD   C 13  29.1  . . 1 . . . . . . . . 5004 1 
+      1056 . 1 1  89  89 LYS HD2  H  1   0.81 . . 2 . . . . . . . . 5004 1 
+      1057 . 1 1  89  89 LYS HD3  H  1   0.99 . . 2 . . . . . . . . 5004 1 
+      1058 . 1 1  89  89 LYS CE   C 13  41.2  . . 1 . . . . . . . . 5004 1 
+      1059 . 1 1  89  89 LYS HE2  H  1   1.88 . . 1 . . . . . . . . 5004 1 
+      1060 . 1 1  89  89 LYS HE3  H  1   1.88 . . 1 . . . . . . . . 5004 1 
+      1061 . 1 1  89  89 LYS C    C 13 175.6  . . 1 . . . . . . . . 5004 1 
+      1062 . 1 1  90  90 ILE H    H  1   9.20 . . 1 . . . . . . . . 5004 1 
+      1063 . 1 1  90  90 ILE N    N 15 116.8  . . 1 . . . . . . . . 5004 1 
+      1064 . 1 1  90  90 ILE HA   H  1   4.63 . . 1 . . . . . . . . 5004 1 
+      1065 . 1 1  90  90 ILE CA   C 13  59.2  . . 1 . . . . . . . . 5004 1 
+      1066 . 1 1  90  90 ILE HB   H  1   1.89 . . 1 . . . . . . . . 5004 1 
+      1067 . 1 1  90  90 ILE CB   C 13  43.0  . . 1 . . . . . . . . 5004 1 
+      1068 . 1 1  90  90 ILE CG1  C 13  25.3  . . 1 . . . . . . . . 5004 1 
+      1069 . 1 1  90  90 ILE HG12 H  1   1.44 . . 1 . . . . . . . . 5004 1 
+      1070 . 1 1  90  90 ILE HG13 H  1   1.44 . . 1 . . . . . . . . 5004 1 
+      1071 . 1 1  90  90 ILE CG2  C 13  18.0  . . 1 . . . . . . . . 5004 1 
+      1072 . 1 1  90  90 ILE HG21 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+      1073 . 1 1  90  90 ILE HG22 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+      1074 . 1 1  90  90 ILE HG23 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+      1075 . 1 1  90  90 ILE CD1  C 13  13.9  . . 1 . . . . . . . . 5004 1 
+      1076 . 1 1  90  90 ILE HD11 H  1   0.93 . . 1 . . . . . . . . 5004 1 
+      1077 . 1 1  90  90 ILE HD12 H  1   0.93 . . 1 . . . . . . . . 5004 1 
+      1078 . 1 1  90  90 ILE HD13 H  1   0.93 . . 1 . . . . . . . . 5004 1 
+      1079 . 1 1  90  90 ILE C    C 13 174.4  . . 1 . . . . . . . . 5004 1 
+      1080 . 1 1  91  91 GLU H    H  1   8.82 . . 1 . . . . . . . . 5004 1 
+      1081 . 1 1  91  91 GLU N    N 15 121.8  . . 1 . . . . . . . . 5004 1 
+      1082 . 1 1  91  91 GLU HA   H  1   4.51 . . 1 . . . . . . . . 5004 1 
+      1083 . 1 1  91  91 GLU CA   C 13  57.2  . . 1 . . . . . . . . 5004 1 
+      1084 . 1 1  91  91 GLU HB2  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+      1085 . 1 1  91  91 GLU HB3  H  1   2.29 . . 1 . . . . . . . . 5004 1 
+      1086 . 1 1  91  91 GLU CB   C 13  30.0  . . 1 . . . . . . . . 5004 1 
+      1087 . 1 1  91  91 GLU CG   C 13  37.2  . . 1 . . . . . . . . 5004 1 
+      1088 . 1 1  91  91 GLU HG2  H  1   2.41 . . 1 . . . . . . . . 5004 1 
+      1089 . 1 1  91  91 GLU HG3  H  1   2.41 . . 1 . . . . . . . . 5004 1 
+      1090 . 1 1  91  91 GLU C    C 13 179.0  . . 1 . . . . . . . . 5004 1 
+      1091 . 1 1  92  92 VAL H    H  1   8.56 . . 1 . . . . . . . . 5004 1 
+      1092 . 1 1  92  92 VAL N    N 15 123.1  . . 1 . . . . . . . . 5004 1 
+      1093 . 1 1  92  92 VAL HA   H  1   3.61 . . 1 . . . . . . . . 5004 1 
+      1094 . 1 1  92  92 VAL CA   C 13  66.6  . . 1 . . . . . . . . 5004 1 
+      1095 . 1 1  92  92 VAL HB   H  1   1.91 . . 1 . . . . . . . . 5004 1 
+      1096 . 1 1  92  92 VAL CB   C 13  31.2  . . 1 . . . . . . . . 5004 1 
+      1097 . 1 1  92  92 VAL CG1  C 13  24.4  . . 2 . . . . . . . . 5004 1 
+      1098 . 1 1  92  92 VAL CG2  C 13  21.9  . . 2 . . . . . . . . 5004 1 
+      1099 . 1 1  92  92 VAL HG11 H  1   0.86 . . 2 . . . . . . . . 5004 1 
+      1100 . 1 1  92  92 VAL HG12 H  1   0.86 . . 2 . . . . . . . . 5004 1 
+      1101 . 1 1  92  92 VAL HG13 H  1   0.86 . . 2 . . . . . . . . 5004 1 
+      1102 . 1 1  92  92 VAL HG21 H  1   0.84 . . 2 . . . . . . . . 5004 1 
+      1103 . 1 1  92  92 VAL HG22 H  1   0.84 . . 2 . . . . . . . . 5004 1 
+      1104 . 1 1  92  92 VAL HG23 H  1   0.84 . . 2 . . . . . . . . 5004 1 
+      1105 . 1 1  92  92 VAL C    C 13 177.0  . . 1 . . . . . . . . 5004 1 
+      1106 . 1 1  93  93 ALA H    H  1   9.38 . . 1 . . . . . . . . 5004 1 
+      1107 . 1 1  93  93 ALA N    N 15 120.9  . . 1 . . . . . . . . 5004 1 
+      1108 . 1 1  93  93 ALA HA   H  1   3.96 . . 1 . . . . . . . . 5004 1 
+      1109 . 1 1  93  93 ALA CA   C 13  56.1  . . 1 . . . . . . . . 5004 1 
+      1110 . 1 1  93  93 ALA HB1  H  1   1.56 . . 1 . . . . . . . . 5004 1 
+      1111 . 1 1  93  93 ALA HB2  H  1   1.56 . . 1 . . . . . . . . 5004 1 
+      1112 . 1 1  93  93 ALA HB3  H  1   1.56 . . 1 . . . . . . . . 5004 1 
+      1113 . 1 1  93  93 ALA CB   C 13  18.8  . . 1 . . . . . . . . 5004 1 
+      1114 . 1 1  93  93 ALA C    C 13 179.6  . . 1 . . . . . . . . 5004 1 
+      1115 . 1 1  94  94 GLN H    H  1   6.94 . . 1 . . . . . . . . 5004 1 
+      1116 . 1 1  94  94 GLN N    N 15 116.8  . . 1 . . . . . . . . 5004 1 
+      1117 . 1 1  94  94 GLN HA   H  1   3.99 . . 1 . . . . . . . . 5004 1 
+      1118 . 1 1  94  94 GLN CA   C 13  58.0  . . 1 . . . . . . . . 5004 1 
+      1119 . 1 1  94  94 GLN HB2  H  1   2.19 . . 2 . . . . . . . . 5004 1 
+      1120 . 1 1  94  94 GLN HB3  H  1   2.31 . . 2 . . . . . . . . 5004 1 
+      1121 . 1 1  94  94 GLN CB   C 13  28.3  . . 1 . . . . . . . . 5004 1 
+      1122 . 1 1  94  94 GLN CG   C 13  33.4  . . 1 . . . . . . . . 5004 1 
+      1123 . 1 1  94  94 GLN HG2  H  1   2.46 . . 1 . . . . . . . . 5004 1 
+      1124 . 1 1  94  94 GLN HG3  H  1   2.46 . . 1 . . . . . . . . 5004 1 
+      1125 . 1 1  94  94 GLN C    C 13 176.8  . . 1 . . . . . . . . 5004 1 
+      1126 . 1 1  95  95 PHE H    H  1   8.19 . . 1 . . . . . . . . 5004 1 
+      1127 . 1 1  95  95 PHE N    N 15 120.3  . . 1 . . . . . . . . 5004 1 
+      1128 . 1 1  95  95 PHE HA   H  1   4.00 . . 1 . . . . . . . . 5004 1 
+      1129 . 1 1  95  95 PHE CA   C 13  61.7  . . 1 . . . . . . . . 5004 1 
+      1130 . 1 1  95  95 PHE HB2  H  1   2.78 . . 1 . . . . . . . . 5004 1 
+      1131 . 1 1  95  95 PHE HB3  H  1   3.41 . . 1 . . . . . . . . 5004 1 
+      1132 . 1 1  95  95 PHE CB   C 13  39.6  . . 1 . . . . . . . . 5004 1 
+      1133 . 1 1  95  95 PHE CD1  C 13 132.4  . . 1 . . . . . . . . 5004 1 
+      1134 . 1 1  95  95 PHE CD2  C 13 132.4  . . 1 . . . . . . . . 5004 1 
+      1135 . 1 1  95  95 PHE HD1  H  1   7.08 . . 1 . . . . . . . . 5004 1 
+      1136 . 1 1  95  95 PHE HD2  H  1   7.08 . . 1 . . . . . . . . 5004 1 
+      1137 . 1 1  95  95 PHE CE1  C 13 131.2  . . 1 . . . . . . . . 5004 1 
+      1138 . 1 1  95  95 PHE CE2  C 13 131.2  . . 1 . . . . . . . . 5004 1 
+      1139 . 1 1  95  95 PHE HE1  H  1   7.38 . . 1 . . . . . . . . 5004 1 
+      1140 . 1 1  95  95 PHE HE2  H  1   7.38 . . 1 . . . . . . . . 5004 1 
+      1141 . 1 1  95  95 PHE CZ   C 13 128.9  . . 1 . . . . . . . . 5004 1 
+      1142 . 1 1  95  95 PHE HZ   H  1   7.37 . . 1 . . . . . . . . 5004 1 
+      1143 . 1 1  95  95 PHE C    C 13 178.3  . . 1 . . . . . . . . 5004 1 
+      1144 . 1 1  96  96 VAL H    H  1   8.86 . . 1 . . . . . . . . 5004 1 
+      1145 . 1 1  96  96 VAL N    N 15 116.2  . . 1 . . . . . . . . 5004 1 
+      1146 . 1 1  96  96 VAL HA   H  1   3.62 . . 1 . . . . . . . . 5004 1 
+      1147 . 1 1  96  96 VAL CA   C 13  66.8  . . 1 . . . . . . . . 5004 1 
+      1148 . 1 1  96  96 VAL HB   H  1   2.16 . . 1 . . . . . . . . 5004 1 
+      1149 . 1 1  96  96 VAL CB   C 13  31.3  . . 1 . . . . . . . . 5004 1 
+      1150 . 1 1  96  96 VAL CG1  C 13  22.9  . . 1 . . . . . . . . 5004 1 
+      1151 . 1 1  96  96 VAL CG2  C 13  22.4  . . 1 . . . . . . . . 5004 1 
+      1152 . 1 1  96  96 VAL HG11 H  1   1.02 . . 1 . . . . . . . . 5004 1 
+      1153 . 1 1  96  96 VAL HG12 H  1   1.02 . . 1 . . . . . . . . 5004 1 
+      1154 . 1 1  96  96 VAL HG13 H  1   1.02 . . 1 . . . . . . . . 5004 1 
+      1155 . 1 1  96  96 VAL HG21 H  1   1.10 . . 1 . . . . . . . . 5004 1 
+      1156 . 1 1  96  96 VAL HG22 H  1   1.10 . . 1 . . . . . . . . 5004 1 
+      1157 . 1 1  96  96 VAL HG23 H  1   1.10 . . 1 . . . . . . . . 5004 1 
+      1158 . 1 1  96  96 VAL C    C 13 176.7  . . 1 . . . . . . . . 5004 1 
+      1159 . 1 1  97  97 LYS H    H  1   7.67 . . 1 . . . . . . . . 5004 1 
+      1160 . 1 1  97  97 LYS N    N 15 121.6  . . 1 . . . . . . . . 5004 1 
+      1161 . 1 1  97  97 LYS HA   H  1   3.91 . . 1 . . . . . . . . 5004 1 
+      1162 . 1 1  97  97 LYS CA   C 13  60.5  . . 1 . . . . . . . . 5004 1 
+      1163 . 1 1  97  97 LYS HB2  H  1   1.96 . . 1 . . . . . . . . 5004 1 
+      1164 . 1 1  97  97 LYS HB3  H  1   1.96 . . 1 . . . . . . . . 5004 1 
+      1165 . 1 1  97  97 LYS CB   C 13  32.2  . . 1 . . . . . . . . 5004 1 
+      1166 . 1 1  97  97 LYS CG   C 13  25.7  . . 1 . . . . . . . . 5004 1 
+      1167 . 1 1  97  97 LYS HG2  H  1   1.45 . . 1 . . . . . . . . 5004 1 
+      1168 . 1 1  97  97 LYS HG3  H  1   1.45 . . 1 . . . . . . . . 5004 1 
+      1169 . 1 1  97  97 LYS CD   C 13  29.6  . . 1 . . . . . . . . 5004 1 
+      1170 . 1 1  97  97 LYS HD2  H  1   1.67 . . 1 . . . . . . . . 5004 1 
+      1171 . 1 1  97  97 LYS HD3  H  1   1.67 . . 1 . . . . . . . . 5004 1 
+      1172 . 1 1  97  97 LYS CE   C 13  42.1  . . 1 . . . . . . . . 5004 1 
+      1173 . 1 1  97  97 LYS HE2  H  1   2.93 . . 1 . . . . . . . . 5004 1 
+      1174 . 1 1  97  97 LYS HE3  H  1   2.93 . . 1 . . . . . . . . 5004 1 
+      1175 . 1 1  97  97 LYS C    C 13 176.9  . . 1 . . . . . . . . 5004 1 
+      1176 . 1 1  98  98 ASP H    H  1   8.33 . . 1 . . . . . . . . 5004 1 
+      1177 . 1 1  98  98 ASP N    N 15 120.4  . . 1 . . . . . . . . 5004 1 
+      1178 . 1 1  98  98 ASP HA   H  1   4.36 . . 1 . . . . . . . . 5004 1 
+      1179 . 1 1  98  98 ASP CA   C 13  57.4  . . 1 . . . . . . . . 5004 1 
+      1180 . 1 1  98  98 ASP HB2  H  1   2.59 . . 1 . . . . . . . . 5004 1 
+      1181 . 1 1  98  98 ASP HB3  H  1   2.42 . . 1 . . . . . . . . 5004 1 
+      1182 . 1 1  98  98 ASP CB   C 13  39.9  . . 1 . . . . . . . . 5004 1 
+      1183 . 1 1  98  98 ASP C    C 13 179.0  . . 1 . . . . . . . . 5004 1 
+      1184 . 1 1  99  99 LEU H    H  1   8.12 . . 1 . . . . . . . . 5004 1 
+      1185 . 1 1  99  99 LEU N    N 15 121.8  . . 1 . . . . . . . . 5004 1 
+      1186 . 1 1  99  99 LEU HA   H  1   3.88 . . 1 . . . . . . . . 5004 1 
+      1187 . 1 1  99  99 LEU CA   C 13  57.8  . . 1 . . . . . . . . 5004 1 
+      1188 . 1 1  99  99 LEU HB2  H  1   1.16 . . 1 . . . . . . . . 5004 1 
+      1189 . 1 1  99  99 LEU HB3  H  1   1.87 . . 1 . . . . . . . . 5004 1 
+      1190 . 1 1  99  99 LEU CB   C 13  41.8  . . 1 . . . . . . . . 5004 1 
+      1191 . 1 1  99  99 LEU CG   C 13  26.7  . . 1 . . . . . . . . 5004 1 
+      1192 . 1 1  99  99 LEU HG   H  1   1.46 . . 1 . . . . . . . . 5004 1 
+      1193 . 1 1  99  99 LEU CD1  C 13  26.0  . . 2 . . . . . . . . 5004 1 
+      1194 . 1 1  99  99 LEU CD2  C 13  22.9  . . 2 . . . . . . . . 5004 1 
+      1195 . 1 1  99  99 LEU HD11 H  1   0.84 . . 2 . . . . . . . . 5004 1 
+      1196 . 1 1  99  99 LEU HD12 H  1   0.84 . . 2 . . . . . . . . 5004 1 
+      1197 . 1 1  99  99 LEU HD13 H  1   0.84 . . 2 . . . . . . . . 5004 1 
+      1198 . 1 1  99  99 LEU HD21 H  1   0.71 . . 2 . . . . . . . . 5004 1 
+      1199 . 1 1  99  99 LEU HD22 H  1   0.71 . . 2 . . . . . . . . 5004 1 
+      1200 . 1 1  99  99 LEU HD23 H  1   0.71 . . 2 . . . . . . . . 5004 1 
+      1201 . 1 1  99  99 LEU C    C 13 177.7  . . 1 . . . . . . . . 5004 1 
+      1202 . 1 1 100 100 LEU H    H  1   8.54 . . 1 . . . . . . . . 5004 1 
+      1203 . 1 1 100 100 LEU N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+      1204 . 1 1 100 100 LEU HA   H  1   3.88 . . 1 . . . . . . . . 5004 1 
+      1205 . 1 1 100 100 LEU CA   C 13  58.5  . . 1 . . . . . . . . 5004 1 
+      1206 . 1 1 100 100 LEU HB2  H  1   1.61 . . 1 . . . . . . . . 5004 1 
+      1207 . 1 1 100 100 LEU HB3  H  1   2.11 . . 1 . . . . . . . . 5004 1 
+      1208 . 1 1 100 100 LEU CB   C 13  41.6  . . 1 . . . . . . . . 5004 1 
+      1209 . 1 1 100 100 LEU CG   C 13  27.2  . . 1 . . . . . . . . 5004 1 
+      1210 . 1 1 100 100 LEU HG   H  1   1.53 . . 1 . . . . . . . . 5004 1 
+      1211 . 1 1 100 100 LEU CD1  C 13  24.4  . . 1 . . . . . . . . 5004 1 
+      1212 . 1 1 100 100 LEU CD2  C 13  26.2  . . 1 . . . . . . . . 5004 1 
+      1213 . 1 1 100 100 LEU HD11 H  1   1.00 . . 1 . . . . . . . . 5004 1 
+      1214 . 1 1 100 100 LEU HD12 H  1   1.00 . . 1 . . . . . . . . 5004 1 
+      1215 . 1 1 100 100 LEU HD13 H  1   1.00 . . 1 . . . . . . . . 5004 1 
+      1216 . 1 1 100 100 LEU HD21 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1217 . 1 1 100 100 LEU HD22 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1218 . 1 1 100 100 LEU HD23 H  1   0.85 . . 1 . . . . . . . . 5004 1 
+      1219 . 1 1 100 100 LEU C    C 13 177.6  . . 1 . . . . . . . . 5004 1 
+      1220 . 1 1 101 101 LEU H    H  1   7.79 . . 1 . . . . . . . . 5004 1 
+      1221 . 1 1 101 101 LEU N    N 15 117.9  . . 1 . . . . . . . . 5004 1 
+      1222 . 1 1 101 101 LEU HA   H  1   3.93 . . 1 . . . . . . . . 5004 1 
+      1223 . 1 1 101 101 LEU CA   C 13  58.5  . . 1 . . . . . . . . 5004 1 
+      1224 . 1 1 101 101 LEU HB2  H  1   1.86 . . 1 . . . . . . . . 5004 1 
+      1225 . 1 1 101 101 LEU HB3  H  1   1.64 . . 1 . . . . . . . . 5004 1 
+      1226 . 1 1 101 101 LEU CB   C 13  41.5  . . 1 . . . . . . . . 5004 1 
+      1227 . 1 1 101 101 LEU CG   C 13  26.9  . . 1 . . . . . . . . 5004 1 
+      1228 . 1 1 101 101 LEU HG   H  1   1.78 . . 1 . . . . . . . . 5004 1 
+      1229 . 1 1 101 101 LEU CD1  C 13  25.1  . . 1 . . . . . . . . 5004 1 
+      1230 . 1 1 101 101 LEU CD2  C 13  23.6  . . 1 . . . . . . . . 5004 1 
+      1231 . 1 1 101 101 LEU HD11 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+      1232 . 1 1 101 101 LEU HD12 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+      1233 . 1 1 101 101 LEU HD13 H  1   0.94 . . 1 . . . . . . . . 5004 1 
+      1234 . 1 1 101 101 LEU HD21 H  1   0.87 . . 1 . . . . . . . . 5004 1 
+      1235 . 1 1 101 101 LEU HD22 H  1   0.87 . . 1 . . . . . . . . 5004 1 
+      1236 . 1 1 101 101 LEU HD23 H  1   0.87 . . 1 . . . . . . . . 5004 1 
+      1237 . 1 1 101 101 LEU C    C 13 180.0  . . 1 . . . . . . . . 5004 1 
+      1238 . 1 1 102 102 HIS H    H  1   7.63 . . 1 . . . . . . . . 5004 1 
+      1239 . 1 1 102 102 HIS N    N 15 118.6  . . 1 . . . . . . . . 5004 1 
+      1240 . 1 1 102 102 HIS HA   H  1   4.35 . . 1 . . . . . . . . 5004 1 
+      1241 . 1 1 102 102 HIS CA   C 13  59.7  . . 1 . . . . . . . . 5004 1 
+      1242 . 1 1 102 102 HIS HB2  H  1   3.16 . . 1 . . . . . . . . 5004 1 
+      1243 . 1 1 102 102 HIS HB3  H  1   3.07 . . 1 . . . . . . . . 5004 1 
+      1244 . 1 1 102 102 HIS CB   C 13  31.2  . . 1 . . . . . . . . 5004 1 
+      1245 . 1 1 102 102 HIS CD2  C 13 118.6  . . 1 . . . . . . . . 5004 1 
+      1246 . 1 1 102 102 HIS HD2  H  1   6.64 . . 1 . . . . . . . . 5004 1 
+      1247 . 1 1 102 102 HIS CE1  C 13 138.6  . . 1 . . . . . . . . 5004 1 
+      1248 . 1 1 102 102 HIS HE1  H  1   7.74 . . 1 . . . . . . . . 5004 1 
+      1249 . 1 1 102 102 HIS C    C 13 177.6  . . 1 . . . . . . . . 5004 1 
+      1250 . 1 1 103 103 LEU H    H  1   8.87 . . 1 . . . . . . . . 5004 1 
+      1251 . 1 1 103 103 LEU N    N 15 118.5  . . 1 . . . . . . . . 5004 1 
+      1252 . 1 1 103 103 LEU HA   H  1   3.92 . . 1 . . . . . . . . 5004 1 
+      1253 . 1 1 103 103 LEU CA   C 13  57.9  . . 1 . . . . . . . . 5004 1 
+      1254 . 1 1 103 103 LEU HB2  H  1   1.90 . . 1 . . . . . . . . 5004 1 
+      1255 . 1 1 103 103 LEU HB3  H  1   1.35 . . 1 . . . . . . . . 5004 1 
+      1256 . 1 1 103 103 LEU CB   C 13  41.3  . . 1 . . . . . . . . 5004 1 
+      1257 . 1 1 103 103 LEU CG   C 13  26.1  . . 1 . . . . . . . . 5004 1 
+      1258 . 1 1 103 103 LEU HG   H  1   2.00 . . 1 . . . . . . . . 5004 1 
+      1259 . 1 1 103 103 LEU CD1  C 13  27.0  . . 1 . . . . . . . . 5004 1 
+      1260 . 1 1 103 103 LEU CD2  C 13  22.5  . . 1 . . . . . . . . 5004 1 
+      1261 . 1 1 103 103 LEU HD11 H  1   0.73 . . 1 . . . . . . . . 5004 1 
+      1262 . 1 1 103 103 LEU HD12 H  1   0.73 . . 1 . . . . . . . . 5004 1 
+      1263 . 1 1 103 103 LEU HD13 H  1   0.73 . . 1 . . . . . . . . 5004 1 
+      1264 . 1 1 103 103 LEU HD21 H  1   0.79 . . 1 . . . . . . . . 5004 1 
+      1265 . 1 1 103 103 LEU HD22 H  1   0.79 . . 1 . . . . . . . . 5004 1 
+      1266 . 1 1 103 103 LEU HD23 H  1   0.79 . . 1 . . . . . . . . 5004 1 
+      1267 . 1 1 103 103 LEU C    C 13 179.4  . . 1 . . . . . . . . 5004 1 
+      1268 . 1 1 104 104 LYS H    H  1   8.57 . . 1 . . . . . . . . 5004 1 
+      1269 . 1 1 104 104 LYS N    N 15 117.7  . . 1 . . . . . . . . 5004 1 
+      1270 . 1 1 104 104 LYS HA   H  1   3.93 . . 1 . . . . . . . . 5004 1 
+      1271 . 1 1 104 104 LYS CA   C 13  60.8  . . 1 . . . . . . . . 5004 1 
+      1272 . 1 1 104 104 LYS HB2  H  1   1.83 . . 1 . . . . . . . . 5004 1 
+      1273 . 1 1 104 104 LYS HB3  H  1   1.89 . . 1 . . . . . . . . 5004 1 
+      1274 . 1 1 104 104 LYS CB   C 13  32.5  . . 1 . . . . . . . . 5004 1 
+      1275 . 1 1 104 104 LYS CG   C 13  26.8  . . 1 . . . . . . . . 5004 1 
+      1276 . 1 1 104 104 LYS HG2  H  1   1.38 . . 2 . . . . . . . . 5004 1 
+      1277 . 1 1 104 104 LYS HG3  H  1   1.78 . . 2 . . . . . . . . 5004 1 
+      1278 . 1 1 104 104 LYS CD   C 13  29.8  . . 1 . . . . . . . . 5004 1 
+      1279 . 1 1 104 104 LYS HD2  H  1   1.58 . . 2 . . . . . . . . 5004 1 
+      1280 . 1 1 104 104 LYS HD3  H  1   1.65 . . 2 . . . . . . . . 5004 1 
+      1281 . 1 1 104 104 LYS CE   C 13  41.5  . . 1 . . . . . . . . 5004 1 
+      1282 . 1 1 104 104 LYS HE2  H  1   2.82 . . 1 . . . . . . . . 5004 1 
+      1283 . 1 1 104 104 LYS HE3  H  1   2.82 . . 1 . . . . . . . . 5004 1 
+      1284 . 1 1 104 104 LYS C    C 13 179.4  . . 1 . . . . . . . . 5004 1 
+      1285 . 1 1 105 105 LYS H    H  1   7.33 . . 1 . . . . . . . . 5004 1 
+      1286 . 1 1 105 105 LYS N    N 15 121.0  . . 1 . . . . . . . . 5004 1 
+      1287 . 1 1 105 105 LYS HA   H  1   4.01 . . 1 . . . . . . . . 5004 1 
+      1288 . 1 1 105 105 LYS CA   C 13  59.8  . . 1 . . . . . . . . 5004 1 
+      1289 . 1 1 105 105 LYS HB2  H  1   1.88 . . 2 . . . . . . . . 5004 1 
+      1290 . 1 1 105 105 LYS HB3  H  1   2.05 . . 2 . . . . . . . . 5004 1 
+      1291 . 1 1 105 105 LYS CB   C 13  32.1  . . 1 . . . . . . . . 5004 1 
+      1292 . 1 1 105 105 LYS CG   C 13  25.0  . . 1 . . . . . . . . 5004 1 
+      1293 . 1 1 105 105 LYS HG2  H  1   1.25 . . 2 . . . . . . . . 5004 1 
+      1294 . 1 1 105 105 LYS HG3  H  1   1.52 . . 2 . . . . . . . . 5004 1 
+      1295 . 1 1 105 105 LYS CD   C 13  29.7  . . 1 . . . . . . . . 5004 1 
+      1296 . 1 1 105 105 LYS HD2  H  1   1.65 . . 1 . . . . . . . . 5004 1 
+      1297 . 1 1 105 105 LYS HD3  H  1   1.65 . . 1 . . . . . . . . 5004 1 
+      1298 . 1 1 105 105 LYS CE   C 13  42.1  . . 1 . . . . . . . . 5004 1 
+      1299 . 1 1 105 105 LYS HE2  H  1   2.91 . . 1 . . . . . . . . 5004 1 
+      1300 . 1 1 105 105 LYS HE3  H  1   2.91 . . 1 . . . . . . . . 5004 1 
+      1301 . 1 1 105 105 LYS C    C 13 178.1  . . 1 . . . . . . . . 5004 1 
+      1302 . 1 1 106 106 LEU H    H  1   7.81 . . 1 . . . . . . . . 5004 1 
+      1303 . 1 1 106 106 LEU N    N 15 119.4  . . 1 . . . . . . . . 5004 1 
+      1304 . 1 1 106 106 LEU HA   H  1   3.88 . . 1 . . . . . . . . 5004 1 
+      1305 . 1 1 106 106 LEU CA   C 13  58.0  . . 1 . . . . . . . . 5004 1 
+      1306 . 1 1 106 106 LEU HB2  H  1   1.81 . . 1 . . . . . . . . 5004 1 
+      1307 . 1 1 106 106 LEU HB3  H  1   1.61 . . 1 . . . . . . . . 5004 1 
+      1308 . 1 1 106 106 LEU CB   C 13  41.0  . . 1 . . . . . . . . 5004 1 
+      1309 . 1 1 106 106 LEU CG   C 13  26.5  . . 1 . . . . . . . . 5004 1 
+      1310 . 1 1 106 106 LEU HG   H  1   1.45 . . 1 . . . . . . . . 5004 1 
+      1311 . 1 1 106 106 LEU CD1  C 13  25.3  . . 2 . . . . . . . . 5004 1 
+      1312 . 1 1 106 106 LEU CD2  C 13  23.0  . . 2 . . . . . . . . 5004 1 
+      1313 . 1 1 106 106 LEU HD11 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+      1314 . 1 1 106 106 LEU HD12 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+      1315 . 1 1 106 106 LEU HD13 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+      1316 . 1 1 106 106 LEU HD21 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+      1317 . 1 1 106 106 LEU HD22 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+      1318 . 1 1 106 106 LEU HD23 H  1   0.71 . . 1 . . . . . . . . 5004 1 
+      1319 . 1 1 106 106 LEU C    C 13 179.3  . . 1 . . . . . . . . 5004 1 
+      1320 . 1 1 107 107 PHE H    H  1   8.63 . . 1 . . . . . . . . 5004 1 
+      1321 . 1 1 107 107 PHE N    N 15 118.9  . . 1 . . . . . . . . 5004 1 
+      1322 . 1 1 107 107 PHE HA   H  1   4.10 . . 1 . . . . . . . . 5004 1 
+      1323 . 1 1 107 107 PHE CA   C 13  61.0  . . 1 . . . . . . . . 5004 1 
+      1324 . 1 1 107 107 PHE HB2  H  1   3.16 . . 1 . . . . . . . . 5004 1 
+      1325 . 1 1 107 107 PHE HB3  H  1   3.11 . . 1 . . . . . . . . 5004 1 
+      1326 . 1 1 107 107 PHE CB   C 13  39.8  . . 1 . . . . . . . . 5004 1 
+      1327 . 1 1 107 107 PHE CD1  C 13 131.8  . . 1 . . . . . . . . 5004 1 
+      1328 . 1 1 107 107 PHE CD2  C 13 131.8  . . 1 . . . . . . . . 5004 1 
+      1329 . 1 1 107 107 PHE CE1  C 13 129.7  . . 1 . . . . . . . . 5004 1 
+      1330 . 1 1 107 107 PHE CE2  C 13 129.7  . . 1 . . . . . . . . 5004 1 
+      1331 . 1 1 107 107 PHE HE1  H  1   7.11 . . 1 . . . . . . . . 5004 1 
+      1332 . 1 1 107 107 PHE HE2  H  1   7.11 . . 1 . . . . . . . . 5004 1 
+      1333 . 1 1 107 107 PHE CZ   C 13 129.9  . . 1 . . . . . . . . 5004 1 
+      1334 . 1 1 107 107 PHE HZ   H  1   7.31 . . 1 . . . . . . . . 5004 1 
+      1335 . 1 1 107 107 PHE C    C 13 178.4  . . 1 . . . . . . . . 5004 1 
+      1336 . 1 1 108 108 ARG H    H  1   8.05 . . 1 . . . . . . . . 5004 1 
+      1337 . 1 1 108 108 ARG N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+      1338 . 1 1 108 108 ARG HA   H  1   4.09 . . 1 . . . . . . . . 5004 1 
+      1339 . 1 1 108 108 ARG CA   C 13  58.5  . . 1 . . . . . . . . 5004 1 
+      1340 . 1 1 108 108 ARG HB2  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+      1341 . 1 1 108 108 ARG HB3  H  1   2.03 . . 1 . . . . . . . . 5004 1 
+      1342 . 1 1 108 108 ARG CB   C 13  30.2  . . 1 . . . . . . . . 5004 1 
+      1343 . 1 1 108 108 ARG CG   C 13  27.4  . . 1 . . . . . . . . 5004 1 
+      1344 . 1 1 108 108 ARG HG2  H  1   1.80 . . 1 . . . . . . . . 5004 1 
+      1345 . 1 1 108 108 ARG HG3  H  1   1.80 . . 1 . . . . . . . . 5004 1 
+      1346 . 1 1 108 108 ARG CD   C 13  43.5  . . 1 . . . . . . . . 5004 1 
+      1347 . 1 1 108 108 ARG HD2  H  1   3.26 . . 1 . . . . . . . . 5004 1 
+      1348 . 1 1 108 108 ARG HD3  H  1   3.26 . . 1 . . . . . . . . 5004 1 
+      1349 . 1 1 108 108 ARG C    C 13 177.9  . . 1 . . . . . . . . 5004 1 
+      1350 . 1 1 109 109 GLU H    H  1   7.91 . . 1 . . . . . . . . 5004 1 
+      1351 . 1 1 109 109 GLU N    N 15 117.4  . . 1 . . . . . . . . 5004 1 
+      1352 . 1 1 109 109 GLU HA   H  1   4.17 . . 1 . . . . . . . . 5004 1 
+      1353 . 1 1 109 109 GLU CA   C 13  56.7  . . 1 . . . . . . . . 5004 1 
+      1354 . 1 1 109 109 GLU HB2  H  1   1.99 . . 1 . . . . . . . . 5004 1 
+      1355 . 1 1 109 109 GLU HB3  H  1   2.10 . . 1 . . . . . . . . 5004 1 
+      1356 . 1 1 109 109 GLU CB   C 13  30.0  . . 1 . . . . . . . . 5004 1 
+      1357 . 1 1 109 109 GLU CG   C 13  36.6  . . 1 . . . . . . . . 5004 1 
+      1358 . 1 1 109 109 GLU HG2  H  1   2.24 . . 2 . . . . . . . . 5004 1 
+      1359 . 1 1 109 109 GLU HG3  H  1   2.45 . . 2 . . . . . . . . 5004 1 
+      1360 . 1 1 109 109 GLU C    C 13 176.9  . . 1 . . . . . . . . 5004 1 
+      1361 . 1 1 110 110 GLY H    H  1   7.72 . . 1 . . . . . . . . 5004 1 
+      1362 . 1 1 110 110 GLY N    N 15 108.3  . . 1 . . . . . . . . 5004 1 
+      1363 . 1 1 110 110 GLY HA2  H  1   3.38 . . 2 . . . . . . . . 5004 1 
+      1364 . 1 1 110 110 GLY HA3  H  1   3.70 . . 2 . . . . . . . . 5004 1 
+      1365 . 1 1 110 110 GLY CA   C 13  45.7  . . 1 . . . . . . . . 5004 1 
+      1366 . 1 1 110 110 GLY C    C 13 173.8  . . 1 . . . . . . . . 5004 1 
+      1367 . 1 1 111 111 ARG H    H  1   7.71 . . 1 . . . . . . . . 5004 1 
+      1368 . 1 1 111 111 ARG N    N 15 119.8  . . 1 . . . . . . . . 5004 1 
+      1369 . 1 1 111 111 ARG HA   H  1   4.28 . . 1 . . . . . . . . 5004 1 
+      1370 . 1 1 111 111 ARG CA   C 13  54.9  . . 1 . . . . . . . . 5004 1 
+      1371 . 1 1 111 111 ARG HB2  H  1   1.60 . . 1 . . . . . . . . 5004 1 
+      1372 . 1 1 111 111 ARG HB3  H  1   1.80 . . 1 . . . . . . . . 5004 1 
+      1373 . 1 1 111 111 ARG CB   C 13  30.2  . . 1 . . . . . . . . 5004 1 
+      1374 . 1 1 111 111 ARG CG   C 13  26.9  . . 1 . . . . . . . . 5004 1 
+      1375 . 1 1 111 111 ARG HG2  H  1   1.48 . . 1 . . . . . . . . 5004 1 
+      1376 . 1 1 111 111 ARG HG3  H  1   1.48 . . 1 . . . . . . . . 5004 1 
+      1377 . 1 1 111 111 ARG CD   C 13  43.4  . . 1 . . . . . . . . 5004 1 
+      1378 . 1 1 111 111 ARG HD2  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+      1379 . 1 1 111 111 ARG HD3  H  1   3.14 . . 1 . . . . . . . . 5004 1 
+      1380 . 1 1 111 111 ARG C    C 13 175.1  . . 1 . . . . . . . . 5004 1 
+      1381 . 1 1 112 112 PHE H    H  1   7.93 . . 1 . . . . . . . . 5004 1 
+      1382 . 1 1 112 112 PHE N    N 15 119.5  . . 1 . . . . . . . . 5004 1 
+      1383 . 1 1 112 112 PHE HA   H  1   4.75 . . 1 . . . . . . . . 5004 1 
+      1384 . 1 1 112 112 PHE CA   C 13  57.0  . . 1 . . . . . . . . 5004 1 
+      1385 . 1 1 112 112 PHE HB2  H  1   2.84 . . 1 . . . . . . . . 5004 1 
+      1386 . 1 1 112 112 PHE HB3  H  1   3.29 . . 1 . . . . . . . . 5004 1 
+      1387 . 1 1 112 112 PHE CB   C 13  39.8  . . 1 . . . . . . . . 5004 1 
+      1388 . 1 1 112 112 PHE CD1  C 13 131.4  . . 1 . . . . . . . . 5004 1 
+      1389 . 1 1 112 112 PHE CD2  C 13 131.4  . . 1 . . . . . . . . 5004 1 
+      1390 . 1 1 112 112 PHE HD1  H  1   7.14 . . 1 . . . . . . . . 5004 1 
+      1391 . 1 1 112 112 PHE HD2  H  1   7.14 . . 1 . . . . . . . . 5004 1 
+      1392 . 1 1 112 112 PHE CE1  C 13 131.2  . . 1 . . . . . . . . 5004 1 
+      1393 . 1 1 112 112 PHE CE2  C 13 131.2  . . 1 . . . . . . . . 5004 1 
+      1394 . 1 1 112 112 PHE HE1  H  1   7.20 . . 1 . . . . . . . . 5004 1 
+      1395 . 1 1 112 112 PHE HE2  H  1   7.20 . . 1 . . . . . . . . 5004 1 
+      1396 . 1 1 112 112 PHE CZ   C 13 132.0  . . 1 . . . . . . . . 5004 1 
+      1397 . 1 1 112 112 PHE HZ   H  1   7.43 . . 1 . . . . . . . . 5004 1 
+      1398 . 1 1 112 112 PHE C    C 13 174.4  . . 1 . . . . . . . . 5004 1 
+      1399 . 1 1 113 113 ASN H    H  1   7.86 . . 1 . . . . . . . . 5004 1 
+      1400 . 1 1 113 113 ASN N    N 15 122.9  . . 1 . . . . . . . . 5004 1 
+      1401 . 1 1 113 113 ASN HA   H  1   4.55 . . 1 . . . . . . . . 5004 1 
+      1402 . 1 1 113 113 ASN CA   C 13  54.5  . . 1 . . . . . . . . 5004 1 
+      1403 . 1 1 113 113 ASN HB2  H  1   2.80 . . 2 . . . . . . . . 5004 1 
+      1404 . 1 1 113 113 ASN HB3  H  1   2.84 . . 2 . . . . . . . . 5004 1 
+      1405 . 1 1 113 113 ASN CB   C 13  40.6  . . 1 . . . . . . . . 5004 1 
+
+   stop_
+
+save_
+

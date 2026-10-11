@@ -98,7 +98,10 @@ Use [execution and validation](references/validation.md) before running.
 Start with a small representative case; estimate cost before production grids
 or ensemble searches. Inspect the log and result, not only the process status.
 Check the relevant physical limit and converge the approximations that affect
-the requested observable. For a library edit, also follow
+the requested observable. For GPU propagation changes, include sparse
+non-Hermitian derivative generators and repeated actions after norm evaluation;
+compare against independent dense exponentials, not just the norm value.
+For a library edit, also follow
 [development](references/development.md); a smoke test does not validate a
 scientific algorithm change.
 

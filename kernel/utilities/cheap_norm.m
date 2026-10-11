@@ -40,9 +40,14 @@ if nargin<3, itmax=5; end
 % Check consistency
 grumble(A,t,itmax);
 
-% Inf-norm is best on GPU
+% Preserve the GPU infinity-norm contract
 if isa(A,'gpuArray')
-    n=norm(A,inf); return
+    if issparse(A)&&(~isvector(A))
+        n=norm(transpose(A),1);
+    else
+        n=norm(A,inf);
+    end
+    return
 end
 
 % 1-norm is best on CPU

@@ -21,6 +21,10 @@ Syntax: `n=cheap_norm(A,t,itmax)`
 - `itmax` — optional; integer maximum number of estimator iterations (at least 2); defaults to 5.
 - `n` — infinity-norm for GPU arrays, 1-norm for CPU arrays, and a lower-bound 1-norm estimate for polyadics.
 
+## GPU matrix representation
+
+Sparse GPU matrices use the 1-norm of a non-conjugate transpose, which equals the original matrix infinity-norm. GPU vectors retain the vector infinity-norm. The CPU and polyadic norm contracts are unchanged.
+
 ## References
 
 - Higham and Tisseur, algorithm referenced in the source: <https://doi.org/10.1137/S0895479899356080>

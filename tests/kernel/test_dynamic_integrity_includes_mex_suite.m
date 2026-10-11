@@ -451,6 +451,9 @@ for n=1:numel(platforms)
     fprintf(fid,'function flag=%s()\nflag=false;\nend\n',platforms{n});
     fclose(fid);
 end
+fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
+fprintf(fid,'function flag=isMATLABReleaseOlderThan(release)\nflag=false;\nend\n');
+fclose(fid);
 old_path=path;
 old_dir=pwd;
 cleanup_obj=onCleanup(@()local_restore_remove(old_path,old_dir,scratch));
@@ -458,7 +461,7 @@ warning_state=warning('query','MATLAB:dispatcher:nameConflict');
 warning('off','MATLAB:dispatcher:nameConflict');
 warning_cleaner=onCleanup(@()warning(warning_state));
 addpath(fullfile(scratch,'etc','mex'),'-begin');
-clear('compile_mex','mex','mexcuda','ispc','ismac');
+clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan');
 
 % Exercise the rewritten compiler helper through the stub
 compile_mex();
@@ -506,22 +509,26 @@ result=test_true(result,'compile_mex compiler calls',...
                  strcmp(cuda_out,fullfile(scratch,'kernel','overloads')),...
                  'compile_mex must compile all six MEX sources into their source directories with the interleaved-complex API');
 
-% Check that unsupported platforms retain only the five C++ builds
-for n=1:numel(platforms)
+% Check that unsupported platforms and releases retain five C++ builds
+skipped={'Windows','macOS','older MATLAB'};
+for n=1:numel(skipped)
     for k=1:numel(platforms)
         fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
         fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},n==k);
         fclose(fid);
     end
+    fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
+    fprintf(fid,'function flag=isMATLABReleaseOlderThan(release)\nflag=%d;\nend\n',n==3);
+    fclose(fid);
     delete(fullfile(scratch,'etc','mex','mex_calls.mat'));
-    clear('compile_mex','ispc','ismac'); rehash;
+    clear('compile_mex','ispc','ismac','isMATLABReleaseOlderThan'); rehash;
     evalc('compile_mex();');
     loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
-    result=test_true(result,['compile_mex skip ' platforms{n}],...
+    result=test_true(result,['compile_mex skip ' skipped{n}],...
                      numel(loaded.mex_calls)==5,...
-                     'unsupported platforms must keep C++ builds without invoking mexcuda');
+                     'unsupported platforms and releases retain C++ builds without invoking mexcuda');
 end
-clear('compile_mex','mex','mexcuda','ispc','ismac','warning_cleaner');
+clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement
 compile_src=fileread(compile_file);

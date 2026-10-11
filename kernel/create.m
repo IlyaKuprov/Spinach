@@ -411,6 +411,17 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
     parallel.gpu.enableCUDAForwardCompatibility(true);
 end
 
+% Minimise GPU allocation caching on the client and every worker
+if ismember('gpu',spin_system.sys.enable)
+    if isworkernode
+        device=gpuDevice; device.CachePolicy='minimum';
+    else
+        pctRunOnAll(['spinach_gpu_device=gpuDevice; '...
+                     'spinach_gpu_device.CachePolicy=''minimum''; '...
+                     'clear spinach_gpu_device;']);
+    end
+end
+
 % Spin system banner
 banner(spin_system,'spin_system_banner');
 

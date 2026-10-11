@@ -18,6 +18,8 @@ The function normally returns the propagated state without a numeric progress su
 
 When GPU support is enabled in `spin_system.sys.enable`, the function converts numeric generators and states to GPU arrays as needed. This direct implementation does not write files or assign into `spin_system`; it may use GPU arrays and a parallel pool for computation. The state-dependent branch delegates to `iserstep.m`.
 
+The small-Hilbert explicit-exponential route converts a sparse GPU generator to full GPU storage before `expm`, including when the caller already supplied a GPU array without enabling GPU promotion. This local conversion preserves the generator values and accommodates MATLAB's restriction on non-diagonal sparse GPU exponentials; CPU generators, zero-time returns, and the larger-matrix route are unchanged.
+
 ## Links
 
 - Related solvers: [`iserstep.m`](pulses/iserstep.md) and [`evolution.m`](evolution.md).

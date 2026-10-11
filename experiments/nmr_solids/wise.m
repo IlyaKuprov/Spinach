@@ -36,6 +36,9 @@
 %
 %    K  - kinetics superoperator, received from context function
 %
+% GPU calls release unused allocation-cache blocks on completion or error,
+% preserving the cache policy and live arrays; no device reset is performed.
+%
 % Outputs:
 %
 %    fid.sin, fid.cos        - sine and cosine components
@@ -49,6 +52,13 @@ function fid=wise(spin_system,parameters,H,R,K)
  
 % Consistency enforcement
 grumble(spin_system,parameters,H,R,K);
+
+% Release unused GPU cache blocks on exit without resetting live arrays
+if ismember('gpu',spin_system.sys.enable)
+    device=gpuDevice; cache_policy=device.CachePolicy;
+    cache_cleanup=onCleanup(@()setfield(setfield(device,...
+                               'CachePolicy','minimum'),'CachePolicy',cache_policy));
+end
 
 % Wipe the state of the low-gamma spin (pre-saturation)
 [~,parameters.rho0]=decouple(spin_system,[],parameters.rho0,parameters.spins(2));
@@ -173,4 +183,5 @@ end
 % who tell us it's for our own good.
 %
 % Peter Wood
+
 

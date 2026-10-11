@@ -31,6 +31,8 @@ The optional `bas.projections`, `bas.longitudinal`, and `bas.zero_quantum` setti
 
 For `sphten-liouv`, the routine prepares `spin_system.bas.lpst` and `spin_system.bas.rpst` cells indexed by spin multiplicity, loading or computing product tables through `ist_product_table` for each present multiplicity other than 1. It stores an MD5 hash of all descriptor blocks, `nstates`, and `chem.parts` in `spin_system.bas.basis_hash` for later cache use. This function does not itself describe persistent cache storage or cache invalidation.
 
+`bas.row_hash{n}` is a character array with one 32-character MD5 digest per local spherical-tensor descriptor row, computed as `md5_hash(full(bas.basis{n}(k,:)))`. It is distinct from the aggregate `basis_hash`. Hashes are compiled after basis filtering and ordering, and accompany temporary local descriptors used for symmetry. Compiled Zeeman bases have empty 0-by-32 row-hash arrays; `sim2liouv` changes their dimensions but not their empty descriptors. Rebuild with `basis` after changing basis settings; any explicit descriptor slicing must slice its row hashes identically. Hash matches do not perform collision detection.
+
 ## Parameters / output
 
 - `spin_system` - primary structure produced by [create.m](create.md), including component multiplicities, types, isotope identities, interactions, and chemical-substance mapping.

@@ -7,3 +7,5 @@ In spherical-tensor Liouville space, exact construction multiplies tensor-descri
 Concentrations never enter this constructor: coils for a zero-population substance remain nonzero. Use `state` for concentration-weighted initial states, so coil detection weights a signal once, not twice. Zeeman Liouville construction uses a direct sum of vectorised local identities; Hilbert construction returns the block-local operator.
 
 In wavefunction formalism, this unweighted primitive stacks one product ket per substance, including the scalar ket for a spin-free block. This is storage only: no concentration weighting or incoherent mixing is represented. The concentration-weighted `state` wrapper rejects segmented wavefunction requests.
+
+Direct spherical-tensor projection hashes full query descriptor rows and matches them to cached `bas.row_hash{n}` using `hash_ismember`; reference basis rows are not rehashed.

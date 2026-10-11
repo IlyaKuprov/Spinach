@@ -139,7 +139,7 @@ for n=1:size(from,1)
     end
     source_subsp=spin_system.bas.basis{subst}(source_subsp_idx,:);
     source_subsp_idx=find(source_subsp_idx);
-    source_subsp(:,local_spins)=[];
+    source_subsp(:,local_spins)=repmat(to(n,:),size(source_subsp,1),1);
     
     % Get source subspace dimension
     subsp_dim=size(source_subsp,1);
@@ -154,7 +154,6 @@ for n=1:size(from,1)
         end
         destin_subsp=spin_system.bas.basis{subst}(destin_subsp_idx,:);
         destin_subsp_idx=find(destin_subsp_idx);
-        destin_subsp(:,local_spins)=[];
         
         % Fill the operator
         if isequal(source_subsp,destin_subsp)
@@ -164,8 +163,9 @@ for n=1:size(from,1)
             
         else
         
-            % Otherwise, use brute-force state-by-state matching
-            [does_it_go_anywhere,where_it_goes_if_it_does]=ismember(source_subsp,destin_subsp,'rows');
+            % Match full transition targets against cached destination row hashes
+            [does_it_go_anywhere,where_it_goes_if_it_does]=hash_ismember(source_subsp,...
+                spin_system.bas.row_hash{subst}(destin_subsp_idx,:));
             A{n}=[source_subsp_idx(does_it_go_anywhere)                           ...
                   destin_subsp_idx(where_it_goes_if_it_does(does_it_go_anywhere)) ...
                   coeff(n)*ones(nnz(does_it_go_anywhere),1)];
@@ -214,4 +214,5 @@ end
 % absolute.
 %
 % Ayn Rand
+
 

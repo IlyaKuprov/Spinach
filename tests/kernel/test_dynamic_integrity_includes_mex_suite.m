@@ -420,21 +420,39 @@ mkdir(fullfile(scratch,'etc','mex','private'));
 mkdir(fullfile(scratch,'kernel','line_shapes'));
 mkdir(fullfile(scratch,'kernel','eigenfields'));
 mkdir(fullfile(scratch,'kernel','indexing'));
+mkdir(fullfile(scratch,'kernel','overloads'));
+repo_root=fileparts(fileparts(fileparts(compile_file)));
+copyfile(fullfile(repo_root,'kernel','overloads','cuda_sparse_by_sparse_mex.cu'),...
+         fullfile(scratch,'kernel','overloads','cuda_sparse_by_sparse_mex.cu'));
 copyfile(compile_file,fullfile(scratch,'etc','mex','compile_mex.m'));
 
-% Install a path-local mex stub that records compiler calls
-fid=fopen(fullfile(scratch,'etc','mex','private','mex.m'),'w');
-fprintf(fid,'function mex(varargin)\n');
-fprintf(fid,'record_file=fullfile(fileparts(fileparts(mfilename(''fullpath''))),''mex_calls.mat'');\n');
-fprintf(fid,'if exist(record_file,''file'')\n');
-fprintf(fid,'    loaded=load(record_file,''mex_calls'');\n');
-fprintf(fid,'    mex_calls=loaded.mex_calls;\n');
-fprintf(fid,'else\n');
-fprintf(fid,'    mex_calls={};\n');
-fprintf(fid,'end\n');
-fprintf(fid,'mex_calls{end+1}=varargin;\n');
-fprintf(fid,'save(record_file,''mex_calls'');\n');
-fprintf(fid,'end\n\n');
+% Install path-local compiler stubs that record all build calls
+compilers={'mex','mexcuda'};
+for n=1:numel(compilers)
+    fid=fopen(fullfile(scratch,'etc','mex','private',[compilers{n} '.m']),'w');
+    fprintf(fid,'function %s(varargin)\n',compilers{n});
+    fprintf(fid,'record_file=fullfile(fileparts(fileparts(mfilename(''fullpath''))),''mex_calls.mat'');\n');
+    fprintf(fid,'if exist(record_file,''file'')\n');
+    fprintf(fid,'    loaded=load(record_file,''mex_calls'');\n');
+    fprintf(fid,'    mex_calls=loaded.mex_calls;\n');
+    fprintf(fid,'else\n');
+    fprintf(fid,'    mex_calls={};\n');
+    fprintf(fid,'end\n');
+    fprintf(fid,'mex_calls{end+1}=varargin;\n');
+    fprintf(fid,'save(record_file,''mex_calls'');\n');
+    fprintf(fid,'end\n\n');
+    fclose(fid);
+end
+
+% Drive the Linux compiler route independently of the fixture host
+platforms={'ispc','ismac'};
+for n=1:numel(platforms)
+    fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{n} '.m']),'w');
+    fprintf(fid,'function flag=%s()\nflag=false;\nend\n',platforms{n});
+    fclose(fid);
+end
+fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
+fprintf(fid,'function flag=isMATLABReleaseOlderThan(release)\nflag=false;\nend\n');
 fclose(fid);
 old_path=path;
 old_dir=pwd;
@@ -443,7 +461,7 @@ warning_state=warning('query','MATLAB:dispatcher:nameConflict');
 warning('off','MATLAB:dispatcher:nameConflict');
 warning_cleaner=onCleanup(@()warning(warning_state));
 addpath(fullfile(scratch,'etc','mex'),'-begin');
-clear('compile_mex','mex');
+clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan');
 
 % Exercise the rewritten compiler helper through the stub
 compile_mex();
@@ -453,6 +471,7 @@ gauss_args=loaded.mex_calls{2};
 cubic_args=loaded.mex_calls{3};
 spsort_args=loaded.mex_calls{4};
 spunicols_args=loaded.mex_calls{5};
+cuda_args=loaded.mex_calls{6};
 
 % Normalise recorded paths before comparing with platform-native fullfile output
 line_args_cmp=strrep(strrep(line_args,'/',filesep),'\',filesep);
@@ -460,30 +479,56 @@ gauss_args_cmp=strrep(strrep(gauss_args,'/',filesep),'\',filesep);
 cubic_args_cmp=strrep(strrep(cubic_args,'/',filesep),'\',filesep);
 spsort_args_cmp=strrep(strrep(spsort_args,'/',filesep),'\',filesep);
 spunicols_args_cmp=strrep(strrep(spunicols_args,'/',filesep),'\',filesep);
+cuda_args_cmp=strrep(strrep(cuda_args,'/',filesep),'\',filesep);
 line_out=line_args_cmp{find(strcmp(line_args,'-outdir'),1)+1};
 gauss_out=gauss_args_cmp{find(strcmp(gauss_args,'-outdir'),1)+1};
 cubic_out=cubic_args_cmp{find(strcmp(cubic_args,'-outdir'),1)+1};
 spsort_out=spsort_args_cmp{find(strcmp(spsort_args,'-outdir'),1)+1};
 spunicols_out=spunicols_args_cmp{find(strcmp(spunicols_args,'-outdir'),1)+1};
+cuda_out=cuda_args_cmp{find(strcmp(cuda_args,'-outdir'),1)+1};
 result=test_true(result,'compile_mex compiler calls',...
-                 numel(loaded.mex_calls)==5&&...
+                 numel(loaded.mex_calls)==6&&...
                  any(strcmp(line_args,'-R2018a'))&&...
                  any(strcmp(gauss_args,'-R2018a'))&&...
                  any(strcmp(cubic_args,'-R2018a'))&&...
                  any(strcmp(spsort_args,'-R2018a'))&&...
                  any(strcmp(spunicols_args,'-R2018a'))&&...
+                 any(strcmp(cuda_args,'-R2018a'))&&...
+                 any(strcmp(cuda_args,'-O'))&&any(strcmp(cuda_args,'-lcuda'))&&...
                  any(strcmp(line_args_cmp,fullfile(scratch,'kernel','line_shapes','lorentzcon.cpp')))&&...
                  any(strcmp(gauss_args_cmp,fullfile(scratch,'kernel','line_shapes','gausscon.cpp')))&&...
                  any(strcmp(cubic_args_cmp,fullfile(scratch,'kernel','eigenfields','cubic_roots.cpp')))&&...
                  any(strcmp(spsort_args_cmp,fullfile(scratch,'kernel','indexing','spsortrows.cpp')))&&...
                  any(strcmp(spunicols_args_cmp,fullfile(scratch,'kernel','indexing','spunicols.cpp')))&&...
+                 any(strcmp(cuda_args_cmp,fullfile(scratch,'kernel','overloads','cuda_sparse_by_sparse_mex.cu')))&&...
                  strcmp(line_out,fullfile(scratch,'kernel','line_shapes'))&&...
                  strcmp(gauss_out,fullfile(scratch,'kernel','line_shapes'))&&...
                  strcmp(cubic_out,fullfile(scratch,'kernel','eigenfields'))&&...
                  strcmp(spsort_out,fullfile(scratch,'kernel','indexing'))&&...
-                 strcmp(spunicols_out,fullfile(scratch,'kernel','indexing')),...
-                 'compile_mex must compile the five listed MEX sources into their source directories with the interleaved-complex API');
-clear('compile_mex','mex','warning_cleaner');
+                 strcmp(spunicols_out,fullfile(scratch,'kernel','indexing'))&&...
+                 strcmp(cuda_out,fullfile(scratch,'kernel','overloads')),...
+                 'compile_mex must compile all six MEX sources into their source directories with the interleaved-complex API');
+
+% Check that unsupported platforms and releases retain five C++ builds
+skipped={'Windows','macOS','older MATLAB'};
+for n=1:numel(skipped)
+    for k=1:numel(platforms)
+        fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
+        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},n==k);
+        fclose(fid);
+    end
+    fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
+    fprintf(fid,'function flag=isMATLABReleaseOlderThan(release)\nflag=%d;\nend\n',n==3);
+    fclose(fid);
+    delete(fullfile(scratch,'etc','mex','mex_calls.mat'));
+    clear('compile_mex','ispc','ismac','isMATLABReleaseOlderThan'); rehash;
+    evalc('compile_mex();');
+    loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
+    result=test_true(result,['compile_mex skip ' skipped{n}],...
+                     numel(loaded.mex_calls)==5,...
+                     'unsupported platforms and releases retain C++ builds without invoking mexcuda');
+end
+clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement
 compile_src=fileread(compile_file);
@@ -493,14 +538,15 @@ result=test_true(result,'compile_mex source confinement',...
                  contains(compile_src,'kernel/eigenfields/cubic_roots.cpp')&&...
                  contains(compile_src,'kernel/indexing/spsortrows.cpp')&&...
                  contains(compile_src,'kernel/indexing/spunicols.cpp')&&...
+                 contains(compile_src,'kernel/overloads/cuda_sparse_by_sparse_mex.cu')&&...
                  contains(compile_src,'''-outdir'',[P ''/kernel/line_shapes'']')&&...
                  contains(compile_src,'''-outdir'',[P ''/kernel/eigenfields'']')&&...
                  contains(compile_src,'''-outdir'',[P ''/kernel/indexing'']')&&...
+                 contains(compile_src,'''-outdir'',[P ''/kernel/overloads'']')&&...
                  contains(compile_src,'''-R2018a'''),...
                  'compile_mex must compile the listed MEX sources, write outputs into their source directories, and request the interleaved-complex API');
 
 % Inspect sparse indexing MEX sources for platform-specific OpenMP rigging
-repo_root=fileparts(fileparts(fileparts(compile_file)));
 spsort_src=fileread(fullfile(repo_root,'kernel','indexing','spsortrows.cpp'));
 spunicols_src=fileread(fullfile(repo_root,'kernel','indexing','spunicols.cpp'));
 openmp_markers={'_OPENMP','omp_set','omp_get','omp.h','#pragma omp',...
@@ -632,3 +678,5 @@ catch err
 end
 
 end
+
+

@@ -4,7 +4,7 @@
 
 ## Call and effect
 
-Run `compile_mex()` in MATLAB from the Spinach installation that contains this function; it takes no arguments and returns no MATLAB output. It locates its installation root from `mfilename('fullpath')`, then calls `mex` sequentially to rebuild five C++ MEX targets, placing each binary beside its source:
+Run `compile_mex()` in MATLAB from the Spinach installation that contains this function; it takes no arguments and returns no MATLAB output. It locates its installation root from `mfilename('fullpath')`, then calls `mex` and `mexcuda` sequentially to rebuild five C++ MEX targets and the CUDA sparse-product MEX, placing each binary beside its source:
 
 | Source | Destination directory | Kernel |
 |---|---|---|
@@ -13,9 +13,10 @@ Run `compile_mex()` in MATLAB from the Spinach installation that contains this f
 | `kernel/eigenfields/cubic_roots.cpp` | `kernel/eigenfields` | Cubic polynomial roots |
 | `kernel/indexing/spsortrows.cpp` | `kernel/indexing` | Sparse-double row sorting |
 | `kernel/indexing/spunicols.cpp` | `kernel/indexing` | Sparse-double unique columns |
+| `kernel/overloads/cuda_sparse_by_sparse_mex.cu` | `kernel/overloads` | GPU sparse matrix product |
 
-The build calls select the `-R2018a` MEX API, optimisation (`-O`), and `-DNDEBUG`. The first three also pass the current `COMPFLAGS` and `LINKFLAGS` through to MATLAB's compiler invocation. The target list and output paths are fixed in the function; this is an in-place rebuild, not a configurable target selector or installer.
+The C++ build calls select the `-R2018a` MEX API, optimisation (`-O`), and `-DNDEBUG`. The first three also pass the current `COMPFLAGS` and `LINKFLAGS` through to MATLAB's compiler invocation. Windows, macOS, and MATLAB releases before R2026b retain the five C++ builds and skip the unsupported CUDA target. The target list and output paths are fixed in the function; this is an in-place rebuild, not a configurable target selector or installer.
 
-A working MATLAB `mex` compiler configuration and the source tree are prerequisites. The function contains no separate post-build test or result report, so successful return alone is not evidence that these kernels pass runtime tests.
+The CUDA build uses `-R2018a`, `-O`, and `-lcuda` to link the CUDA driver API. The CUDA target requires Linux, MATLAB R2026b or later, `mexcuda`, a supported host C++ compiler, and the CUDA driver library. `mexcuda` can use the NVIDIA compiler bundled with MATLAB; a standalone CUDA toolkit is not required ([MathWorks documentation](https://www.mathworks.com/help/parallel-computing/mexcuda.html)). The source tree is required for every build. Platform support also depends on the CUDA source: the POSIX-only source is skipped on Windows and macOS. The function contains no separate post-build test or result report, so successful return alone is not evidence that these kernels pass runtime tests.
 
 Source: [compile_mex.m in Spinach](https://spindynamics.org/wiki/index.php?title=compile_mex.m).

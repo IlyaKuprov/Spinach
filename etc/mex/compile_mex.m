@@ -1,6 +1,9 @@
-% MEX compilation utility. Rebuilds all C++ MEX binaries of
+% MEX compilation utility. Rebuilds all C++ and CUDA MEX binaries of
 % the Spinach installation that contains this file, placing
-% each binary next to its source. Syntax:
+% each binary next to its source. CUDA compilation requires
+% MATLAB R2026b or later on Linux, mexcuda, a supported host C++
+% compiler, and the CUDA driver library. Other targets are skipped.
+% Syntax:
 %
 %                       compile_mex()
 %
@@ -33,6 +36,15 @@ mex('-R2018a','-O','-DNDEBUG',...
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
+% CUDA sparse matrix product
+if ispc||ismac||isMATLABReleaseOlderThan('R2026b')
+    disp('CUDA sparse-product MEX compilation skipped: requires Linux and R2026b or later.');
+else
+    mexcuda('-R2018a','-O','-lcuda',...
+            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
+            '-outdir',[P '/kernel/overloads']);
+end
+
 end
 
 % Audiophiles don't use their equip-
@@ -41,4 +53,5 @@ end
 % their equipment.
 %
 % Alan Parsons
+
 

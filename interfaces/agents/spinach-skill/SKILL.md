@@ -138,4 +138,5 @@ numerical validation. All other CUDA errors and wrong results remain failures.
 `coil_state(spin_system,states,spins,'cheap')` locates spherical-tensor state
 descriptors in a `parfor` loop. Only descriptor rows and the hosting basis block
 are sent to workers, which return scalar row indices; the client assembles the
-sparse state. The result remains unweighted and lacks exact normalisation; use `'exact'` when required.
+sparse state; singleton lookups stay on the client without basis transfer. The
+result remains unweighted and lacks exact normalisation; use `'exact'` when required.

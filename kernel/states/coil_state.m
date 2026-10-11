@@ -149,10 +149,10 @@ switch spin_system.bas.formalism
                 active=cellfun(@any,opspecs);
                 descriptors=vertcat(opspecs{:});
                 descriptors=descriptors(active,parts);
-                indices=zeros(size(descriptors,1),1);
+                nterms=size(descriptors,1); indices=zeros(nterms,1);
 
-                % Return one local basis index per non-identity descriptor
-                parfor n=1:size(descriptors,1)
+                % Look up single terms locally and return only indices otherwise
+                parfor (n=1:nterms,nterms*(nterms>1))
                     [present,index]=ismember(descriptors(n,:),local_basis,'rows');
                     if ~present
                         error('the requested state is not present in the basis.');

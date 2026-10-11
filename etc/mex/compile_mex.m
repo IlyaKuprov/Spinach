@@ -1,8 +1,9 @@
 % MEX compilation utility. Rebuilds all C++ and CUDA MEX binaries of
 % the Spinach installation that contains this file, placing
 % each binary next to its source. CUDA compilation requires
-% MATLAB R2026b or later on Linux, mexcuda, a supported host C++
-% compiler, and the CUDA driver library. Other targets are skipped.
+% MATLAB R2026b or later, mexcuda, a supported host C++ compiler,
+% and the CUDA driver library. Windows uses CUDA_PATH/lib/x64 when
+% CUDA_PATH is set; otherwise mexcuda's library search is used.
 % Syntax:
 %
 %                       compile_mex()
@@ -37,8 +38,13 @@ mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
 % CUDA sparse matrix product
-if ispc||ismac||isMATLABReleaseOlderThan('R2026b')
-    disp('CUDA sparse-product MEX compilation skipped: requires Linux and R2026b or later.');
+if isMATLABReleaseOlderThan('R2026b')
+    disp('CUDA sparse-product MEX compilation skipped: requires R2026b or later.');
+elseif ispc&&~isempty(getenv('CUDA_PATH'))
+    mexcuda('-R2018a','-O','-lcuda',...
+            ['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')],...
+            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
+            '-outdir',[P '/kernel/overloads']);
 else
     mexcuda('-R2018a','-O','-lcuda',...
             [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...

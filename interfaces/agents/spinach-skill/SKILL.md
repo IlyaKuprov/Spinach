@@ -111,10 +111,12 @@ corresponding results unvalidated; never manufacture a success marker.
 ## CUDA sparse-product regression
 
 `compile_mex()` also builds the CUDA sparse-product gateway using `mexcuda`
-and the CUDA driver library on Linux with MATLAB R2026b or later and a
-supported host C++ compiler. `mexcuda` can use MATLAB's bundled NVIDIA compiler;
-a standalone CUDA toolkit is not required. Windows, macOS, and older releases
-retain the five C++ builds and skip the unsupported CUDA target.
+and the CUDA driver library with MATLAB R2026b or later and a supported
+host C++ compiler. `mexcuda` can use MATLAB's bundled NVIDIA compiler;
+a standalone CUDA toolkit is not required. Windows adds `CUDA_PATH/lib/x64`
+when configured. Windows, Linux, and macOS routes are retained; the host must
+still provide a working CUDA toolchain. Older releases retain five C++ builds
+and skip the R2026b-layout CUDA target.
 
 Run `run_test('kernel/cuda_product')` from the regression suite to compare the
 gateway directly with CPU products across random real and complex matrices.

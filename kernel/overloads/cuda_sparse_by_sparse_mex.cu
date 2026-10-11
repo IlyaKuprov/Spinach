@@ -12,11 +12,18 @@
  * Sources: Gustavson (1978), DOI 10.1145/355791.355796; Davis et al., Sparse
  * Direct Methods, Algorithm 2.2; GraphBLAS GB_AxB_saxpy3.c; spECK HashSpGEMM.
  */
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 #include "mex.h"
 #include "gpu/mxGPUArray.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <unistd.h>
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
@@ -81,11 +88,18 @@ struct MatlabCsr
 static bool host_readable(const void *ptr,size_t n_bytes)
 {
     if ((ptr==nullptr)||(reinterpret_cast<uintptr_t>(ptr)%alignof(void*)!=0)) return false;
+#ifdef _WIN32
+    std::vector<char> buffer(n_bytes);
+    SIZE_T bytes_read=0;
+    return ReadProcessMemory(GetCurrentProcess(),ptr,buffer.data(),n_bytes,&bytes_read)&&
+           (bytes_read==n_bytes);
+#else
     int fd[2];
     if (pipe(fd)!=0) return false;
     const bool readable=(write(fd[1],ptr,n_bytes)==static_cast<ssize_t>(n_bytes));
     close(fd[0]); close(fd[1]);
     return readable;
+#endif
 }
 
 // Pointer must be a device allocation on this GPU spanning n_bytes

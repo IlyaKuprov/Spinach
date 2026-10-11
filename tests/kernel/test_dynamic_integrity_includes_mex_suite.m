@@ -509,12 +509,18 @@ result=test_true(result,'compile_mex compiler calls',...
                  strcmp(cuda_out,fullfile(scratch,'kernel','overloads')),...
                  'compile_mex must compile all six MEX sources into their source directories with the interleaved-complex API');
 
-% Check that unsupported platforms and releases retain five C++ builds
-skipped={'Windows','macOS','older MATLAB'};
-for n=1:numel(skipped)
+% Check platform routes with and without an external CUDA library path
+cuda_path=getenv('CUDA_PATH');
+env_cleaner=onCleanup(@()setenv('CUDA_PATH',cuda_path));
+routes={'Windows','macOS','older MATLAB','Windows bundled toolchain'};
+for n=1:numel(routes)
+    setenv('CUDA_PATH',fullfile(scratch,'CUDA Toolkit'));
+    if n==4
+        setenv('CUDA_PATH','');
+    end
     for k=1:numel(platforms)
         fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
-        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},n==k);
+        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},n==k||((n==4)&&(k==1)));
         fclose(fid);
     end
     fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
@@ -524,10 +530,19 @@ for n=1:numel(skipped)
     clear('compile_mex','ispc','ismac','isMATLABReleaseOlderThan'); rehash;
     evalc('compile_mex();');
     loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
-    result=test_true(result,['compile_mex skip ' skipped{n}],...
-                     numel(loaded.mex_calls)==5,...
-                     'unsupported platforms and releases retain C++ builds without invoking mexcuda');
+    result=test_true(result,['compile_mex route ' routes{n}],...
+                     numel(loaded.mex_calls)==6-(n==3),...
+                     'all platforms invoke mexcuda on R2026b or later; older releases retain five C++ builds');
+    if n~=3
+        cuda_args=loaded.mex_calls{6};
+        library_arg=['-L' fullfile(scratch,'CUDA Toolkit','lib','x64')];
+        result=test_true(result,['compile_mex driver ' routes{n}],...
+                         any(strcmp(cuda_args,'-lcuda'))&&...
+                         (any(strcmp(cuda_args,library_arg))==(n==1)),...
+                         'Windows uses CUDA_PATH/lib/x64 when set; other routes retain compiler library search');
+    end
 end
+clear('env_cleaner');
 clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement

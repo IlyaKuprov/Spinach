@@ -13,11 +13,9 @@ Runs the Spinach regression test suite ([source](https://github.com/IlyaKuprov/S
 - Parses options via `test_options`, obtains the test manifest via `test_manifest`.
 - If a `pattern` option is non-empty, filters the manifest to tests whose `id` or `name` contains the pattern as a substring.
 - Preallocates an empty result structure array with fields `id`, `name`, `purpose`, `status`, `elapsed`, `messages`, `failures`, `error`.
-- For each manifest entry: resets a clock and the record accumulator via `test_record(new_test_result(id,name,''))`, then runs the test function with `feval`.
-- On normal return, sets `elapsed` from `toc`, sets `error` to `strjoin(result.failures,'; ')`, and sets `status` to `'PASS'` if `failures` is empty, otherwise `'FAIL'`.
-- On a MATLAB error, recovers the recorded result via `test_record([])`, sets `status` to `'FAIL'`, sets `elapsed` from `toc`, appends `err.message` to `failures`, and sets `error` to `strjoin(result.failures,'; ')`.
-- A test is reported as a failure when it records at least one failed check in the `failures` field of its result structure, in which case the `error` field carries the recorded failures; messages accumulated before the failure are preserved. A test that throws a MATLAB error is also reported as a failure, and the suite continues with the next test; checks recorded before the error are recovered from `test_record` and reported alongside the error message.
-- If `verbose` is set, prints per-test status, id, and elapsed time in the format `%s\t%s\t%.3f s`, followed by indented messages, and, for failures, an `ERROR:` line with the joined error string.
+- Each test runs through `test_execute`, which captures console output while preserving recorded failures, partial check messages, and thrown-error text. Elapsed time uses a dedicated timer so a test's own `tic` calls cannot reset it.
+- Progress includes the current index, selected count, test identifier, status, and elapsed time. `verbose=true` additionally prints recorded check explanations. Captured chatter is printed only for failures, including output preceding exceptions.
+- Test graphics are invisible. Cleanup deletes newly created figures (including hidden handles), restores root graphics defaults and the previously current figure, and retains existing figures. Tests must not explicitly delete caller-owned figures.
 - If `stop_on_fail` is set and a test fails, the loop breaks and no further tests run.
 - After the loop, counts `'PASS'` and `'FAIL'` statuses and prints `Spinach regression tests: %d passed, %d failed.`.
 - If any test failed, prints a `FAIL\t%s\t%s` line per failed test with its id and error string, then raises the error `'Spinach regression tests failed.'`.

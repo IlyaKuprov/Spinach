@@ -27,9 +27,7 @@ result=new_test_result('examples/dynamic_examples_smoke',...
                        'compact example-stage calculations must run, process, and plot deterministic spectra.');
 
 % Force invisible figures during the test
-old_visibility=get(groot,'defaultFigureVisible');
-set(groot,'defaultFigureVisible','off');
-cleaner=onCleanup(@()local_cleanup(old_visibility));
+cleaner=test_graphics(); %#ok<NASGU>
 
 % Run and plot a compact one-dimensional acquisition path
 result=local_test_acquire_1d(result);
@@ -139,15 +137,6 @@ result=test_true(result,'CT-COSY plot axes',numel(axis_f1)==parameters.zerofill(
 result=test_true(result,'CT-COSY contour object',isscalar(contour_obj),...
                  'plot_2d creates one contour object for the compact CT-COSY spectrum');
 close(fig);
-
-end
-
-
-function local_cleanup(old_visibility)
-
-% Restore figure state after success or failure
-close all force;
-set(groot,'defaultFigureVisible',old_visibility);
 
 end
 

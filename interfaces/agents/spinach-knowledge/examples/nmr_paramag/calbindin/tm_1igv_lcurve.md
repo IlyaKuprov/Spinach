@@ -17,3 +17,6 @@ Fifteen smoothing values are defined by `10.^linspace(-1.5,1.0,15)`. In a `parfo
 ## Scope
 
 This is a parameter-selection workflow, not a reported numerical conclusion: the source contains no selected value or claim of fit agreement. It does not update the saved susceptibility tensor. The script gives no units or sign convention for the PCS, coordinates, or `chi`, so none are inferred here.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

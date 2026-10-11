@@ -457,6 +457,9 @@ Karplus curve to a Gaussian dihedral scan.
 `[sys,inter,aux]=protein(pdb_file,bmrb_file,options)` builds a protein spin
 system from PDB coordinates and BMRB chemical shifts, guessing J-couplings from
 Karplus curves and literature values and CSAs from local geometry.
+Shipped protein PDB, BMRB, and CSA inputs reside in
+`examples/standard_systems/proteins`; examples resolve that directory relative
+to their own file location.
 `options.select` is `'backbone'`, `'backbone-minimal'`, `'backbone-hsqc'`,
 `'all'`, or a list of PDB atom numbers; `options.pdb_mol` selects a molecule
 from a multi-molecule PDB; `options.noshift` is `'keep'` (unassigned atoms

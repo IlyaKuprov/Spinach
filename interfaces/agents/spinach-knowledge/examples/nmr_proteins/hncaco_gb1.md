@@ -17,3 +17,6 @@ Sequence parameters are J_NH = 92 Hz, T = 25 ms for the indirect 15N evolution d
 The script invokes `liquid(spin_system,@hncaco,parameters,'nmr')`, applies square-cosine apodisation to each of the four FID branches in all dimensions, and Fourier transforms F3, F2, then F1. Conjugate branches are combined with subtraction to construct absorptive components; it plots `imag(spectrum)` with `plot_3d`, threshold 10, bounds [0.2, 0.9, 0.2, 0.9], dimension 2, and positive contours.
 
 The sequence source cites the bidirectional-propagation method at http://dx.doi.org/10.1016/j.jmr.2014.04.002.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

@@ -43,6 +43,13 @@ independent copies or paraphrases in this skill or its references.
    the sibling `spinach-knowledge` tree for function-level explanations, then
    confirm signatures, units, and restrictions in the actual `.m` files.
 
+For protein file import, use `protein` with the PDB, BMRB, and requested CSA
+inputs. `read_bmrb` accepts tagged NMR-STAR 2.1/3.x files as well as legacy
+tables; do not strip metadata or assume fixed column positions. Check residue
+numbering and the choice of chemical shift list or entity separately: the
+four-output reader returns all lists and cannot choose a chain. See the
+corresponding `spinach-knowledge/interfaces/pdb_bmrb/` entries.
+
 ## Choose a route
 
 | Task or uncertainty | Read |

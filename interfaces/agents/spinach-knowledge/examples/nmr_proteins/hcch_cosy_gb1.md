@@ -5,7 +5,7 @@
 
 ## Task and input
 
-A three-dimensional HCCH COSY forward simulation using GB1 protein input. The code calls `protein('2N9K.pdb','2N9K.bmrb',options)` with `pdb_mol=1`, `noshift='delete'`, and `select='all'`; it then removes all imported `15N` spins with `kill_spin`. These are structure/chemical-shift inputs to construct the spin system, not imported measured FIDs or a measured spectrum. The source does not encode a paramagnetic centre or electron-spin interaction.
+A three-dimensional HCCH COSY forward simulation using GB1 protein input. The code calls `protein` with `pdb_mol=1`, `noshift='delete'`, and `select='all'`; it then removes all imported `15N` spins with `kill_spin`. These are structure/chemical-shift inputs to construct the spin system, not imported measured FIDs or a measured spectrum. The source does not encode a paramagnetic centre or electron-spin interaction.
 
 ## Spin model and basis
 
@@ -20,3 +20,6 @@ The call `liquid(spin_system,@hcch_cosy,parameters,'nmr')` produces simulated FI
 ## Output and scope
 
 The script displays `imag(spectrum)` with `plot_3d`, threshold `10`, bounds `[0.05 0.25 0.05 0.25]`, dimension `2`, and selection `'positive'`; no spectrum-file export is coded. The source estimates calculation time in hours. This is an H-C-H three-dimensional experiment, not an H-N-C triple-resonance sequence; no experimental spectrum comparison is coded.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

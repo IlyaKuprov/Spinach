@@ -10,8 +10,9 @@ stream that is restored on exit.
 
 The absolute tolerance is a complex dot-product roundoff bound scaled by
 `norm(abs(A)*abs(B),'fro')`, accounting for both CPU and GPU accumulation.
-Checks also require native sparse GPU output. A missing usable GPU or compiled
-gateway produces an explicit skip message; with both present, loader errors
+Checks also require native sparse GPU output. A missing usable GPU or gateway
+produces an explicit skip message; the specific
+`MATLAB:mex:ErrInvalidMEXFile` loader error is also skipped. Other CUDA errors
 and incorrect products remain failures.
 
 Run `run_test('kernel/cuda_product')` after `compile_mex()` to exercise it.

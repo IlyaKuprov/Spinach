@@ -29,7 +29,7 @@ It compares the gateway directly with independent CPU products for random
 square and rectangular sparse matrices in all real/complex combinations.
 GPU checks report explicit `SKIP` messages when a usable GPU or the compiled
 gateway is unavailable, following the existing GPU coverage convention.
-With both prerequisites present, loader errors and numerical failures fail
+With both prerequisites present, numerical and non-loader CUDA errors fail
 the test. Build the gateway with `compile_mex()` before running GPU coverage.
 
 GPU-dependent custom CUDA sparse-product regressions (not part of the CPU manifest):

@@ -111,11 +111,12 @@ corresponding results unvalidated; never manufacture a success marker.
 ## CUDA sparse-product regression
 
 `compile_mex()` also builds the CUDA sparse-product gateway using `mexcuda`
-and the CUDA driver library. A supported CUDA toolkit is required; on Windows,
-`CUDA_PATH` must point to it. The current gateway source contains a POSIX
-host-memory probe and is not yet Windows-portable.
+and the CUDA driver library on Linux, with a supported CUDA toolkit. The
+current gateway has a POSIX host-memory probe; Windows and macOS retain the
+five C++ builds and skip this unsupported CUDA target.
 
 Run `run_test('kernel/cuda_product')` from the regression suite to compare the
 gateway directly with CPU products across random real and complex matrices.
-Read its messages: unavailable GPU or compiled-gateway coverage is explicitly
-reported as skipped, not as numerical validation.
+Read its messages: missing GPU/gateway coverage and the specific
+`MATLAB:mex:ErrInvalidMEXFile` loader error are reported as skipped, not as
+numerical validation. All other CUDA errors and wrong results remain failures.

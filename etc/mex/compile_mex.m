@@ -1,8 +1,8 @@
 % MEX compilation utility. Rebuilds all C++ and CUDA MEX binaries of
 % the Spinach installation that contains this file, placing
 % each binary next to its source. CUDA compilation requires
-% mexcuda and a supported CUDA toolkit; on Windows, CUDA_PATH
-% must point to that toolkit. Syntax:
+% mexcuda and a supported CUDA toolkit on Linux; the POSIX-only
+% CUDA source is skipped on Windows and macOS. Syntax:
 %
 %                       compile_mex()
 %
@@ -36,11 +36,8 @@ mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
 % CUDA sparse matrix product
-if ispc
-    mexcuda('-R2018a','-O','-lcuda',...
-            ['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')],...
-            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
-            '-outdir',[P '/kernel/overloads']);
+if ispc||ismac
+    disp('CUDA sparse-product MEX compilation skipped: source requires Linux.');
 else
     mexcuda('-R2018a','-O','-lcuda',...
             [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...

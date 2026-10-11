@@ -1,7 +1,7 @@
 % Compares the CUDA sparse-product MEX with independent CPU products.
 % Tests three shapes and all four real/complex operand combinations.
 % The tolerance bounds roundoff in both CPU and GPU complex dot products.
-% GPU coverage is skipped explicitly if a usable GPU or gateway is absent.
+% GPU coverage is skipped if the GPU or a loadable gateway is unavailable.
 % Syntax:
 %
 %                  result=test_cuda_product()
@@ -47,7 +47,15 @@ for n=1:size(shapes,1)
 
         % Call the gateway directly and form the independent CPU reference
         gpu_a=gpuArray(host_a); gpu_b=gpuArray(host_b);
-        gpu_c=cuda_sparse_by_sparse_mex(gpu_a,gpu_b);
+        try
+            gpu_c=cuda_sparse_by_sparse_mex(gpu_a,gpu_b);
+        catch exception
+            if strcmp(exception.identifier,'MATLAB:mex:ErrInvalidMEXFile')
+                result.messages{end+1}='SKIP: CUDA sparse-product gateway cannot be loaded.';
+                return;
+            end
+            rethrow(exception);
+        end
         reference=gather(gpu_a)*gather(gpu_b);
         observed=gather(gpu_c);
 

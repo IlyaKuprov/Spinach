@@ -56,3 +56,7 @@ result = test_dynamic_integrity_includes_mex_suite()
 - [Spinach GitHub repository — test_dynamic_integrity_includes_mex_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_integrity_includes_mex_suite.m)
 
 The synthetic compiled fixtures use per-substance descriptor cells and offsets.
+
+The compiler fixture drives the Linux route explicitly and also checks that
+simulated Windows and macOS routes retain the five C++ builds without invoking
+`mexcuda` for the unsupported POSIX-only CUDA source.

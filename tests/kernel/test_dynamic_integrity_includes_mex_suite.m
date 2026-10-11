@@ -443,6 +443,14 @@ for n=1:numel(compilers)
     fprintf(fid,'end\n\n');
     fclose(fid);
 end
+
+% Drive the Linux compiler route independently of the fixture host
+platforms={'ispc','ismac'};
+for n=1:numel(platforms)
+    fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{n} '.m']),'w');
+    fprintf(fid,'function flag=%s()\nflag=false;\nend\n',platforms{n});
+    fclose(fid);
+end
 old_path=path;
 old_dir=pwd;
 cleanup_obj=onCleanup(@()local_restore_remove(old_path,old_dir,scratch));
@@ -450,7 +458,7 @@ warning_state=warning('query','MATLAB:dispatcher:nameConflict');
 warning('off','MATLAB:dispatcher:nameConflict');
 warning_cleaner=onCleanup(@()warning(warning_state));
 addpath(fullfile(scratch,'etc','mex'),'-begin');
-clear('compile_mex','mex','mexcuda');
+clear('compile_mex','mex','mexcuda','ispc','ismac');
 
 % Exercise the rewritten compiler helper through the stub
 compile_mex();
@@ -497,7 +505,23 @@ result=test_true(result,'compile_mex compiler calls',...
                  strcmp(spunicols_out,fullfile(scratch,'kernel','indexing'))&&...
                  strcmp(cuda_out,fullfile(scratch,'kernel','overloads')),...
                  'compile_mex must compile all six MEX sources into their source directories with the interleaved-complex API');
-clear('compile_mex','mex','mexcuda','warning_cleaner');
+
+% Check that unsupported platforms retain only the five C++ builds
+for n=1:numel(platforms)
+    for k=1:numel(platforms)
+        fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
+        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},n==k);
+        fclose(fid);
+    end
+    delete(fullfile(scratch,'etc','mex','mex_calls.mat'));
+    clear('compile_mex','ispc','ismac'); rehash;
+    evalc('compile_mex();');
+    loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
+    result=test_true(result,['compile_mex skip ' platforms{n}],...
+                     numel(loaded.mex_calls)==5,...
+                     'unsupported platforms must keep C++ builds without invoking mexcuda');
+end
+clear('compile_mex','mex','mexcuda','ispc','ismac','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement
 compile_src=fileread(compile_file);

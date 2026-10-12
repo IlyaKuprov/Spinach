@@ -13,8 +13,8 @@ protein_dir=fullfile(fileparts(mfilename('fullpath')),...
 options.pdb_mol=1;
 options.noshift='delete';
 options.select='all';
-[sys,inter]=protein(fullfile(protein_dir,'2N9K.pdb'),...
-                    fullfile(protein_dir,'2N9K.bmrb'),options);
+[sys,inter]=protein(fullfile(protein_dir,'2n9k.pdb'),...
+                    fullfile(protein_dir,'2n9k.bmrb'),options);
 
 % Magnet field
 sys.magnet=18.79;

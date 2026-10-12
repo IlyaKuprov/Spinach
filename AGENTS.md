@@ -66,7 +66,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 ## Spinach Kernel Coding Elegance
 
-Keep the scientific model, algorithm, and numerical costs directly readable. Apply these rules alongside the programming style above; retain established API behaviour. Read this section before writing or refactoring a Spinach function, and apply the final review before delivery.
+Keep the scientific model, algorithm, and numerical costs directly readable. Apply these rules alongside the programming style above; retain established API behaviour. Read this section before writing or refactoring a Spinach function, and apply the final review before delivery. If the functionality being requested already exists in Spinach in some form, draw the user's attento to that before proceeding.
 
 ### Write the calculation, not a framework
 

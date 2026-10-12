@@ -8,9 +8,7 @@
 function tm_1igv_lcurve()
 
 % Load the pdb file
-protein_dir=fullfile(fileparts(mfilename('fullpath')),...
-                     '..','..','standard_systems','proteins');
-pdb=pdbread(fullfile(protein_dir,'1igv_processed.pdb'));
+pdb=pdbread('1igv_processed.pdb');
 
 % Load experimental data
 load('tm_1igv_pcs.mat','x','y','z','expt_pcs'); %#ok<*NODEF>

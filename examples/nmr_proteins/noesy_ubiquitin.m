@@ -14,9 +14,9 @@ protein_dir=fullfile(fileparts(mfilename('fullpath')),...
 options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
-options.csa_file=fullfile(protein_dir,'1D3Z.csa');
-[sys,inter]=protein(fullfile(protein_dir,'1D3Z.pdb'),...
-                    fullfile(protein_dir,'1D3Z.bmrb'),options);
+options.csa_file=fullfile(protein_dir,'id3z.csa');
+[sys,inter]=protein(fullfile(protein_dir,'id3z.pdb'),...
+                    fullfile(protein_dir,'id3z.bmrb'),options);
 
 % Magnet field
 sys.magnet=21.1356;

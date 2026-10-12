@@ -15,8 +15,8 @@ protein_dir=fullfile(fileparts(mfilename('fullpath')),...
 options.pdb_mol=1;
 options.noshift='delete';
 options.select='backbone-hsqc';
-[sys,inter]=protein(fullfile(protein_dir,'1D3Z.pdb'),...
-                    fullfile(protein_dir,'1D3Z.bmrb'),options);
+[sys,inter]=protein(fullfile(protein_dir,'id3z.pdb'),...
+                    fullfile(protein_dir,'id3z.bmrb'),options);
 
 % Magnet field
 sys.magnet=11.7395;

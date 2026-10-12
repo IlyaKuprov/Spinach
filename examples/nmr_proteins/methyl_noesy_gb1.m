@@ -16,9 +16,9 @@ options.pdb_mol=1;
 options.select='all';
 options.noshift='delete';
 options.deuterate='non-Me';
-options.csa_file=fullfile(protein_dir,'2N9K.csa');
-[sys,inter]=protein(fullfile(protein_dir,'2N9K.pdb'),...
-                    fullfile(protein_dir,'2N9K.bmrb'),options);
+options.csa_file=fullfile(protein_dir,'2n9k.csa');
+[sys,inter]=protein(fullfile(protein_dir,'2n9k.pdb'),...
+                    fullfile(protein_dir,'2n9k.bmrb'),options);
 
 % Magnet field
 sys.magnet=21.1356;

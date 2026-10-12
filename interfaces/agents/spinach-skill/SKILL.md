@@ -89,6 +89,11 @@ This limits retained allocation-cache blocks throughout the Spinach run.
 Selecting or resetting a device later resets its policy to MATLAB's default;
 call `create` again to reapply the Spinach policy.
 
+Use `save_vstore(file_name)` to save the current pool's ValueStore keys and
+values to a MAT file, and `load_vstore(file_name)` to add them to a current
+pool. Loading preserves current-only keys and overwrites matching keys with
+saved values; neither function creates a pool. Callbacks are not transferred.
+
 ## Build the smallest physically adequate calculation
 
 - Adapt a close example; preserve its conventions until you have checked why

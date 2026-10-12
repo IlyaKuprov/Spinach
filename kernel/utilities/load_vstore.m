@@ -1,7 +1,7 @@
-% Loads the current parallel pool ValueStore from a Matlab file.
-% The current store is cleared before the saved keys and values
-% are inserted. Callback functions are session-local and are not
-% loaded. Syntax:
+% Adds a saved ValueStore snapshot to the current parallel pool.
+% Existing keys absent from the file are retained; saved values
+% replace current values for matching keys. Callback functions
+% are session-local and are not loaded. Syntax:
 %
 %                  load_vstore(file_name)
 %
@@ -37,12 +37,6 @@ end
 % Get the current ValueStore
 store=current_pool.ValueStore;
 
-% Remove current keys
-old_keys=keys(store);
-if ~isempty(old_keys)
-    remove(store,old_keys);
-end
-
 % Insert saved keys and values
 if ~isempty(snapshot.key_set)
     put(store,snapshot.key_set,snapshot.val_set);
@@ -66,4 +60,5 @@ end
 % tion: instead of abolishing evil, it would encourage and reward it.
 %
 % Ayn Rand, "The Virtue of Selfishness"
+
 

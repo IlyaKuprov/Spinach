@@ -177,6 +177,8 @@ implemented by `evolution`.
 | `'observable'` | time dynamics of one observable against `coil` |
 | `'multichannel'` | several observables as rows, `coil` carrying one column each; a channels-by-time-by-states array for a stack of initial states |
 
+For explicit-propagator Liouville-space GPU `refocus`, the state stack is held in full GPU storage and propagated in batches. Column n still receives n-1 steps. Allow GPU memory for the dense stack and multiplication temporaries, rather than only one state vector.
+
 The optional `destination` argument to `evolution` is a state for
 destination-state screening. `krylov` is for the case where `exp(L)` will not
 fit in memory but `L` will.

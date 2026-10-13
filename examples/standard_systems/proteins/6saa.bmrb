@@ -1,0 +1,1237 @@
+data_34417
+
+
+#######################
+#  Entry information  #
+#######################
+save_entry_information
+   _Entry.Sf_category                    entry_information
+   _Entry.Sf_framecode                   entry_information
+   _Entry.ID                             34417
+   _Entry.Title
+;
+M-TRTX-Preg1a (Poecilotheria regalis)
+;
+   _Entry.Type                           macromolecule
+   _Entry.Version_type                   original
+   _Entry.Submission_date                2019-07-16
+   _Entry.Accession_date                 2019-07-16
+   _Entry.Last_release_date              2020-07-13
+   _Entry.Original_release_date          2020-07-13
+   _Entry.Origination                    author
+   _Entry.Format_name                    .
+   _Entry.NMR_STAR_version               3.2.14.0
+   _Entry.NMR_STAR_dict_location         .
+   _Entry.Original_NMR_STAR_version      3.1
+   _Entry.Experimental_method            NMR
+   _Entry.Experimental_method_subtype    'SOLUTION NMR'
+   _Entry.Source_data_format             .
+   _Entry.Source_data_format_version     .
+   _Entry.Generated_software_name        .
+   _Entry.Generated_software_version     .
+   _Entry.Generated_software_ID          .
+   _Entry.Generated_software_label       .
+   _Entry.Generated_date                 .
+   _Entry.DOI                            .
+   _Entry.UUID                           .
+   _Entry.Related_coordinate_file_name   .
+   _Entry.Details                        .
+   _Entry.BMRB_internal_directory_name   .
+
+   loop_
+      _Entry_author.Ordinal
+      _Entry_author.Given_name
+      _Entry_author.Family_name
+      _Entry_author.First_initial
+      _Entry_author.Middle_initials
+      _Entry_author.Family_title
+      _Entry_author.ORCID
+      _Entry_author.Entry_ID
+
+      1   H.   Meudal   H.   .    .   .   34417
+      2   C.   Landon   C.   .    .   .   34417
+      3   A.   Delmas   A.   F.   .   .   34417
+   stop_
+
+   loop_
+      _Struct_keywords.Keywords
+      _Struct_keywords.Text
+      _Struct_keywords.Entry_ID
+
+      GPCR                      .   34417
+      TOXIN                     .   34417
+      'animal toxin'            .   34417
+      'melanocortin receptor'   .   34417
+      screening                 .   34417
+   stop_
+
+   loop_
+      _Data_set.Type
+      _Data_set.Count
+      _Data_set.Entry_ID
+
+      assigned_chemical_shifts   1   34417
+   stop_
+
+   loop_
+      _Datum.Type
+      _Datum.Count
+      _Datum.Entry_ID
+
+      '13C chemical shifts'   76    34417
+      '15N chemical shifts'   25    34417
+      '1H chemical shifts'    174   34417
+   stop_
+
+   loop_
+      _Release.Release_number
+      _Release.Format_type
+      _Release.Format_version
+      _Release.Date
+      _Release.Submission_date
+      _Release.Type
+      _Release.Author
+      _Release.Detail
+      _Release.Entry_ID
+
+      2   .   .   2021-09-13   2019-07-16   update     BMRB     'update entry citation'   34417
+      1   .   .   2020-07-20   2019-07-16   original   author   'original release'        34417
+   stop_
+
+   loop_
+      _Related_entries.Database_name
+      _Related_entries.Database_accession_code
+      _Related_entries.Relationship
+      _Related_entries.Entry_ID
+
+      PDB   6SAA   'BMRB Entry Tracking System'   34417
+   stop_
+save_
+
+
+###############
+#  Citations  #
+###############
+save_citation_1
+   _Citation.Sf_category                  citations
+   _Citation.Sf_framecode                 citation_1
+   _Citation.Entry_ID                     34417
+   _Citation.ID                           1
+   _Citation.Name                         .
+   _Citation.Class                        'entry citation'
+   _Citation.CAS_abstract_code            .
+   _Citation.MEDLINE_UI_code              .
+   _Citation.PubMed_ID                    32602722
+   _Citation.DOI                          10.1021/acs.jmedchem.0c00485
+   _Citation.Full_citation                .
+   _Citation.Title
+;
+A Venomics approach coupled to high-throughput toxin production strategies identifies the first venom-derived melanocortin receptor agonists.
+;
+   _Citation.Status                       published
+   _Citation.Type                         journal
+   _Citation.Journal_abbrev               'J. Med. Chem.'
+   _Citation.Journal_name_full            .
+   _Citation.Journal_volume               63
+   _Citation.Journal_issue                15
+   _Citation.Journal_ASTM                 JMCMAR
+   _Citation.Journal_ISSN                 0022-2623
+   _Citation.Journal_CSD                  0151
+   _Citation.Book_title                   .
+   _Citation.Book_chapter_title           .
+   _Citation.Book_volume                  .
+   _Citation.Book_series                  .
+   _Citation.Book_publisher               .
+   _Citation.Book_publisher_city          .
+   _Citation.Book_ISBN                    .
+   _Citation.Conference_title             .
+   _Citation.Conference_site              .
+   _Citation.Conference_state_province    .
+   _Citation.Conference_country           .
+   _Citation.Conference_start_date        .
+   _Citation.Conference_end_date          .
+   _Citation.Conference_abstract_number   .
+   _Citation.Thesis_institution           .
+   _Citation.Thesis_institution_city      .
+   _Citation.Thesis_institution_country   .
+   _Citation.WWW_URL                      .
+   _Citation.Page_first                   8250
+   _Citation.Page_last                    8264
+   _Citation.Year                         2020
+   _Citation.Details                      .
+
+   loop_
+      _Citation_author.Ordinal
+      _Citation_author.Given_name
+      _Citation_author.Family_name
+      _Citation_author.First_initial
+      _Citation_author.Middle_initials
+      _Citation_author.Family_title
+      _Citation_author.ORCID
+      _Citation_author.Entry_ID
+      _Citation_author.Citation_ID
+
+      1    S.   Reynaud                  S.   .        .   .   34417   1
+      2    J.   Ciolek                   J.   .        .   .   34417   1
+      3    M.   Degueldre                M.   .        .   .   34417   1
+      4    N.   Saez                     N.   J.       .   .   34417   1
+      5    A.   Sequeira                 A.   F.       .   .   34417   1
+      6    Y.   Duhoo                    Y.   .        .   .   34417   1
+      7    J.   Bras                     J.   L.A.     .   .   34417   1
+      8    H.   Meudal                   H.   .        .   .   34417   1
+      9    M.   'Cabo Diez'              M.   .        .   .   34417   1
+      10   V.   'Fernandez Pedrosa'      V.   .        .   .   34417   1
+      11   M.   Verdenaud                M.   .        .   .   34417   1
+      12   J.   Boeri                    J.   .        .   .   34417   1
+      13   O.   'Pereira Ramos'          O.   .        .   .   34417   1
+      14   F.   Ducancel                 F.   .        .   .   34417   1
+      15   M.   'Vanden Driessche'       M.   .        .   .   34417   1
+      16   R.   Fourmy                   R.   .        .   .   34417   1
+      17   A.   Violette                 A.   .        .   .   34417   1
+      18   G.   Upert                    G.   .        .   .   34417   1
+      19   G.   Mourier                  G.   .        .   .   34417   1
+      20   A.   Beck-Sickinger           A.   G.       .   .   34417   1
+      21   K.   Morl                     K.   .        .   .   34417   1
+      22   C.   Landon                   C.   .        .   .   34417   1
+      23   C.   Fontes                   C.   M.G.A.   .   .   34417   1
+      24   R.   'Minambres Herraiz'      R.   .        .   .   34417   1
+      25   R.   'Rodriguez de la Vega'   R.   C.       .   .   34417   1
+      26   S.   Peigneur                 S.   .        .   .   34417   1
+      27   J.   Tytgat                   J.   .        .   .   34417   1
+      28   L.   Quinton                  L.   .        .   .   34417   1
+      29   E.   'De Pauw'                E.   .        .   .   34417   1
+      30   R.   Vincentelli              R.   .        .   .   34417   1
+      31   D.   Servent                  D.   .        .   .   34417   1
+      32   N.   Gilles                   N.   .        .   .   34417   1
+   stop_
+save_
+
+
+#############################################
+#  Molecular system (assembly) description  #
+#############################################
+save_assembly
+   _Assembly.Sf_category                       assembly
+   _Assembly.Sf_framecode                      assembly
+   _Assembly.Entry_ID                          34417
+   _Assembly.ID                                1
+   _Assembly.Name                              U1-theraphotoxin-Pf3
+   _Assembly.BMRB_code                         .
+   _Assembly.Number_of_components              .
+   _Assembly.Organic_ligands                   .
+   _Assembly.Metal_ions                        .
+   _Assembly.Non_standard_bonds                .
+   _Assembly.Ambiguous_conformational_states   .
+   _Assembly.Ambiguous_chem_comp_sites         .
+   _Assembly.Molecules_in_chemical_exchange    .
+   _Assembly.Paramagnetic                      no
+   _Assembly.Thiol_state                       .
+   _Assembly.Molecular_mass                    .
+   _Assembly.Enzyme_commission_number          .
+   _Assembly.Details                           .
+   _Assembly.DB_query_date                     .
+   _Assembly.DB_query_revised_last_date        .
+
+   loop_
+      _Entity_assembly.ID
+      _Entity_assembly.Entity_assembly_name
+      _Entity_assembly.Entity_ID
+      _Entity_assembly.Entity_label
+      _Entity_assembly.Asym_ID
+      _Entity_assembly.PDB_chain_ID
+      _Entity_assembly.Experimental_data_reported
+      _Entity_assembly.Physical_state
+      _Entity_assembly.Conformational_isomer
+      _Entity_assembly.Chemical_exchange_state
+      _Entity_assembly.Magnetic_equivalence_group_code
+      _Entity_assembly.Role
+      _Entity_assembly.Details
+      _Entity_assembly.Entry_ID
+      _Entity_assembly.Assembly_ID
+
+      1   unit_1   1   $entity_1   A   A   yes   .   .   .   .   .   .   34417   1
+   stop_
+
+   loop_
+      _Bond.ID
+      _Bond.Type
+      _Bond.Value_order
+      _Bond.Assembly_atom_ID_1
+      _Bond.Entity_assembly_ID_1
+      _Bond.Entity_assembly_name_1
+      _Bond.Entity_ID_1
+      _Bond.Comp_ID_1
+      _Bond.Comp_index_ID_1
+      _Bond.Seq_ID_1
+      _Bond.Atom_ID_1
+      _Bond.Assembly_atom_ID_2
+      _Bond.Entity_assembly_ID_2
+      _Bond.Entity_assembly_name_2
+      _Bond.Entity_ID_2
+      _Bond.Comp_ID_2
+      _Bond.Comp_index_ID_2
+      _Bond.Seq_ID_2
+      _Bond.Atom_ID_2
+      _Bond.Auth_entity_assembly_ID_1
+      _Bond.Auth_entity_assembly_name_1
+      _Bond.Auth_asym_ID_1
+      _Bond.Auth_seq_ID_1
+      _Bond.Auth_comp_ID_1
+      _Bond.Auth_atom_ID_1
+      _Bond.Auth_entity_assembly_ID_2
+      _Bond.Auth_entity_assembly_name_2
+      _Bond.Auth_asym_ID_2
+      _Bond.Auth_seq_ID_2
+      _Bond.Auth_comp_ID_2
+      _Bond.Auth_atom_ID_2
+      _Bond.Entry_ID
+      _Bond.Assembly_ID
+
+      1   disulfide   single   .   1   .   1   CYS   2    2    SG   .   1   .   1   CYS   19   19   SG   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+      2   disulfide   single   .   1   .   1   CYS   9    9    SG   .   1   .   1   CYS   22   22   SG   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+      3   disulfide   single   .   1   .   1   CYS   18   18   SG   .   1   .   1   CYS   27   27   SG   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+   stop_
+save_
+
+
+    ####################################
+    #  Biological polymers and ligands #
+    ####################################
+save_entity_1
+   _Entity.Sf_category                       entity
+   _Entity.Sf_framecode                      entity_1
+   _Entity.Entry_ID                          34417
+   _Entity.ID                                1
+   _Entity.BMRB_code                         .
+   _Entity.Name                              entity_1
+   _Entity.Type                              polymer
+   _Entity.Polymer_common_type               .
+   _Entity.Polymer_type                      polypeptide(L)
+   _Entity.Polymer_type_details              .
+   _Entity.Polymer_strand_ID                 A
+   _Entity.Polymer_seq_one_letter_code_can   .
+   _Entity.Polymer_seq_one_letter_code
+;
+RCLHAGAACSGPIQKIPCCG
+TCSRRKCT
+;
+   _Entity.Target_identifier                 .
+   _Entity.Polymer_author_defined_seq        .
+   _Entity.Polymer_author_seq_details        .
+   _Entity.Ambiguous_conformational_states   .
+   _Entity.Ambiguous_chem_comp_sites         .
+   _Entity.Nstd_monomer                      no
+   _Entity.Nstd_chirality                    .
+   _Entity.Nstd_linkage                      no
+   _Entity.Nonpolymer_comp_ID                .
+   _Entity.Nonpolymer_comp_label             .
+   _Entity.Number_of_monomers                28
+   _Entity.Number_of_nonpolymer_components   .
+   _Entity.Paramagnetic                      no
+   _Entity.Thiol_state                       'all disulfide bound'
+   _Entity.Src_method                        syn
+   _Entity.Parent_entity_ID                  1
+   _Entity.Fragment                          .
+   _Entity.Mutation                          .
+   _Entity.EC_number                         .
+   _Entity.Calc_isoelectric_point            .
+   _Entity.Formula_weight                    2927.543
+   _Entity.Formula_weight_exptl              .
+   _Entity.Formula_weight_exptl_meth         .
+   _Entity.Details                           .
+   _Entity.DB_query_date                     .
+   _Entity.DB_query_revised_last_date        .
+
+   loop_
+      _Entity_comp_index.ID
+      _Entity_comp_index.Auth_seq_ID
+      _Entity_comp_index.Comp_ID
+      _Entity_comp_index.Comp_label
+      _Entity_comp_index.Entry_ID
+      _Entity_comp_index.Entity_ID
+
+      1    .   ARG   .   34417   1
+      2    .   CYS   .   34417   1
+      3    .   LEU   .   34417   1
+      4    .   HIS   .   34417   1
+      5    .   ALA   .   34417   1
+      6    .   GLY   .   34417   1
+      7    .   ALA   .   34417   1
+      8    .   ALA   .   34417   1
+      9    .   CYS   .   34417   1
+      10   .   SER   .   34417   1
+      11   .   GLY   .   34417   1
+      12   .   PRO   .   34417   1
+      13   .   ILE   .   34417   1
+      14   .   GLN   .   34417   1
+      15   .   LYS   .   34417   1
+      16   .   ILE   .   34417   1
+      17   .   PRO   .   34417   1
+      18   .   CYS   .   34417   1
+      19   .   CYS   .   34417   1
+      20   .   GLY   .   34417   1
+      21   .   THR   .   34417   1
+      22   .   CYS   .   34417   1
+      23   .   SER   .   34417   1
+      24   .   ARG   .   34417   1
+      25   .   ARG   .   34417   1
+      26   .   LYS   .   34417   1
+      27   .   CYS   .   34417   1
+      28   .   THR   .   34417   1
+   stop_
+
+   loop_
+      _Entity_poly_seq.Hetero
+      _Entity_poly_seq.Mon_ID
+      _Entity_poly_seq.Num
+      _Entity_poly_seq.Comp_index_ID
+      _Entity_poly_seq.Entry_ID
+      _Entity_poly_seq.Entity_ID
+
+      .   ARG   1    1    34417   1
+      .   CYS   2    2    34417   1
+      .   LEU   3    3    34417   1
+      .   HIS   4    4    34417   1
+      .   ALA   5    5    34417   1
+      .   GLY   6    6    34417   1
+      .   ALA   7    7    34417   1
+      .   ALA   8    8    34417   1
+      .   CYS   9    9    34417   1
+      .   SER   10   10   34417   1
+      .   GLY   11   11   34417   1
+      .   PRO   12   12   34417   1
+      .   ILE   13   13   34417   1
+      .   GLN   14   14   34417   1
+      .   LYS   15   15   34417   1
+      .   ILE   16   16   34417   1
+      .   PRO   17   17   34417   1
+      .   CYS   18   18   34417   1
+      .   CYS   19   19   34417   1
+      .   GLY   20   20   34417   1
+      .   THR   21   21   34417   1
+      .   CYS   22   22   34417   1
+      .   SER   23   23   34417   1
+      .   ARG   24   24   34417   1
+      .   ARG   25   25   34417   1
+      .   LYS   26   26   34417   1
+      .   CYS   27   27   34417   1
+      .   THR   28   28   34417   1
+   stop_
+save_
+
+
+    ####################
+    #  Natural source  #
+    ####################
+save_natural_source
+   _Entity_natural_src_list.Sf_category    natural_source
+   _Entity_natural_src_list.Sf_framecode   natural_source
+   _Entity_natural_src_list.Entry_ID       34417
+   _Entity_natural_src_list.ID             1
+
+   loop_
+      _Entity_natural_src.ID
+      _Entity_natural_src.Entity_ID
+      _Entity_natural_src.Entity_label
+      _Entity_natural_src.Entity_chimera_segment_ID
+      _Entity_natural_src.NCBI_taxonomy_ID
+      _Entity_natural_src.Type
+      _Entity_natural_src.Common
+      _Entity_natural_src.Organism_name_scientific
+      _Entity_natural_src.Organism_name_common
+      _Entity_natural_src.Organism_acronym
+      _Entity_natural_src.ICTVdb_decimal_code
+      _Entity_natural_src.Superkingdom
+      _Entity_natural_src.Kingdom
+      _Entity_natural_src.Genus
+      _Entity_natural_src.Species
+      _Entity_natural_src.Strain
+      _Entity_natural_src.Variant
+      _Entity_natural_src.Organ
+      _Entity_natural_src.Tissue
+      _Entity_natural_src.Tissue_fraction
+      _Entity_natural_src.Cell_line
+      _Entity_natural_src.Cell_type
+      _Entity_natural_src.ATCC_number
+      _Entity_natural_src.Organelle
+      _Entity_natural_src.Secretion
+      _Entity_natural_src.Plasmid
+      _Entity_natural_src.Gene_mnemonic
+      _Entity_natural_src.Details
+      _Entity_natural_src.Entry_ID
+      _Entity_natural_src.Entity_natural_src_list_ID
+
+      1   1   $entity_1   .   1971608   organism   .   'Poecilotheria formosa'   'Poecilotheria formosa'   .   .   Eukaryota   Metazoa   Poecilotheria   formosa   .   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+   stop_
+save_
+
+
+    #########################
+    #  Experimental source  #
+    #########################
+save_experimental_source
+   _Entity_experimental_src_list.Sf_category    experimental_source
+   _Entity_experimental_src_list.Sf_framecode   experimental_source
+   _Entity_experimental_src_list.Entry_ID       34417
+   _Entity_experimental_src_list.ID             1
+
+   loop_
+      _Entity_experimental_src.ID
+      _Entity_experimental_src.Entity_ID
+      _Entity_experimental_src.Entity_label
+      _Entity_experimental_src.Entity_chimera_segment_ID
+      _Entity_experimental_src.Production_method
+      _Entity_experimental_src.Host_org_scientific_name
+      _Entity_experimental_src.Host_org_name_common
+      _Entity_experimental_src.Host_org_details
+      _Entity_experimental_src.Host_org_NCBI_taxonomy_ID
+      _Entity_experimental_src.Host_org_genus
+      _Entity_experimental_src.Host_org_species
+      _Entity_experimental_src.Host_org_strain
+      _Entity_experimental_src.Host_org_variant
+      _Entity_experimental_src.Host_org_ATCC_number
+      _Entity_experimental_src.Vector_type
+      _Entity_experimental_src.PDBview_host_org_vector_name
+      _Entity_experimental_src.PDBview_plasmid_name
+      _Entity_experimental_src.Vector_name
+      _Entity_experimental_src.Vector_details
+      _Entity_experimental_src.Vendor_name
+      _Entity_experimental_src.Details
+      _Entity_experimental_src.Entry_ID
+      _Entity_experimental_src.Entity_experimental_src_list_ID
+
+      1   1   $entity_1   .   'chemical synthesis'   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+   stop_
+save_
+
+
+#####################################
+#  Sample contents and methodology  #
+#####################################
+	 
+    ########################
+    #  Sample description  #
+    ########################
+save_sample_1
+   _Sample.Sf_category                      sample
+   _Sample.Sf_framecode                     sample_1
+   _Sample.Entry_ID                         34417
+   _Sample.ID                               1
+   _Sample.Name                             .
+   _Sample.Type                             solution
+   _Sample.Sub_type                         .
+   _Sample.Details                          '0.5 mM [1-28]M-TRTX-Preg1a, 90% H2O/10% D2O'
+   _Sample.Aggregate_sample_number          .
+   _Sample.Solvent_system                   '90% H2O/10% D2O'
+   _Sample.Preparation_date                 .
+   _Sample.Preparation_expiration_date      .
+   _Sample.Polycrystallization_protocol     .
+   _Sample.Single_crystal_protocol          .
+   _Sample.Crystal_grow_apparatus           .
+   _Sample.Crystal_grow_atmosphere          .
+   _Sample.Crystal_grow_details             .
+   _Sample.Crystal_grow_method              .
+   _Sample.Crystal_grow_method_cit_ID       .
+   _Sample.Crystal_grow_pH                  .
+   _Sample.Crystal_grow_pH_range            .
+   _Sample.Crystal_grow_pressure            .
+   _Sample.Crystal_grow_pressure_esd        .
+   _Sample.Crystal_grow_seeding             .
+   _Sample.Crystal_grow_seeding_cit_ID      .
+   _Sample.Crystal_grow_temp                .
+   _Sample.Crystal_grow_temp_details        .
+   _Sample.Crystal_grow_temp_esd            .
+   _Sample.Crystal_grow_time                .
+   _Sample.Oriented_sample_prep_protocol    .
+   _Sample.Lyophilization_cryo_protectant   .
+   _Sample.Storage_protocol                 .
+
+   loop_
+      _Sample_component.ID
+      _Sample_component.Mol_common_name
+      _Sample_component.Isotopic_labeling
+      _Sample_component.Assembly_ID
+      _Sample_component.Assembly_label
+      _Sample_component.Entity_ID
+      _Sample_component.Entity_label
+      _Sample_component.Product_ID
+      _Sample_component.Type
+      _Sample_component.Concentration_val
+      _Sample_component.Concentration_val_min
+      _Sample_component.Concentration_val_max
+      _Sample_component.Concentration_val_units
+      _Sample_component.Concentration_val_err
+      _Sample_component.Vendor
+      _Sample_component.Vendor_product_name
+      _Sample_component.Vendor_product_code
+      _Sample_component.Entry_ID
+      _Sample_component.Sample_ID
+
+      1   [1-28]M-TRTX-Preg1a   'natural abundance'   .   .   1   $entity_1   .   .   0.5   .   .   mM   .   .   .   .   34417   1
+   stop_
+save_
+
+
+#######################
+#  Sample conditions  #
+#######################
+save_sample_conditions_1
+   _Sample_condition_list.Sf_category    sample_conditions
+   _Sample_condition_list.Sf_framecode   sample_conditions_1
+   _Sample_condition_list.Entry_ID       34417
+   _Sample_condition_list.ID             1
+   _Sample_condition_list.Name           .
+   _Sample_condition_list.Details        .
+
+   loop_
+      _Sample_condition_variable.Type
+      _Sample_condition_variable.Val
+      _Sample_condition_variable.Val_err
+      _Sample_condition_variable.Val_units
+      _Sample_condition_variable.Entry_ID
+      _Sample_condition_variable.Sample_condition_list_ID
+
+      'ionic strength'   0     .   mM    34417   1
+      pH                 4.5   .   pH    34417   1
+      pressure           1     .   atm   34417   1
+      temperature        298   .   K     34417   1
+   stop_
+save_
+
+
+############################
+#  Computer software used  #
+############################
+save_software_1
+   _Software.Sf_category    software
+   _Software.Sf_framecode   software_1
+   _Software.Entry_ID       34417
+   _Software.ID             1
+   _Software.Type           .
+   _Software.Name           CNS
+   _Software.Version        .
+   _Software.DOI            .
+   _Software.Details        .
+
+   loop_
+      _Vendor.Name
+      _Vendor.Address
+      _Vendor.Electronic_address
+      _Vendor.Entry_ID
+      _Vendor.Software_ID
+
+      'Brunger et al.'   .   .   34417   1
+   stop_
+
+   loop_
+      _Task.Task
+      _Task.Software_module
+      _Task.Entry_ID
+      _Task.Software_ID
+
+      refinement   .   34417   1
+   stop_
+save_
+
+save_software_2
+   _Software.Sf_category    software
+   _Software.Sf_framecode   software_2
+   _Software.Entry_ID       34417
+   _Software.ID             2
+   _Software.Type           .
+   _Software.Name           ARIA
+   _Software.Version        .
+   _Software.DOI            .
+   _Software.Details        .
+
+   loop_
+      _Vendor.Name
+      _Vendor.Address
+      _Vendor.Electronic_address
+      _Vendor.Entry_ID
+      _Vendor.Software_ID
+
+      "Linge, O'Donoghue and Nilges"   .   .   34417   2
+   stop_
+
+   loop_
+      _Task.Task
+      _Task.Software_module
+      _Task.Entry_ID
+      _Task.Software_ID
+
+      'structure calculation'   .   34417   2
+   stop_
+save_
+
+save_software_3
+   _Software.Sf_category    software
+   _Software.Sf_framecode   software_3
+   _Software.Entry_ID       34417
+   _Software.ID             3
+   _Software.Type           .
+   _Software.Name           'CcpNmr Analysis'
+   _Software.Version        .
+   _Software.DOI            .
+   _Software.Details        .
+
+   loop_
+      _Vendor.Name
+      _Vendor.Address
+      _Vendor.Electronic_address
+      _Vendor.Entry_ID
+      _Vendor.Software_ID
+
+      'Vranken et al.'   .   .   34417   3
+   stop_
+
+   loop_
+      _Task.Task
+      _Task.Software_module
+      _Task.Entry_ID
+      _Task.Software_ID
+
+      'chemical shift assignment'   .   34417   3
+      'peak picking'                .   34417   3
+   stop_
+save_
+
+
+#########################
+#  Experimental detail  #
+#########################
+
+    ##################################
+    #  NMR Spectrometer definitions  #
+    ##################################
+save_NMR_spectrometer_1
+   _NMR_spectrometer.Sf_category      NMR_spectrometer
+   _NMR_spectrometer.Sf_framecode     NMR_spectrometer_1
+   _NMR_spectrometer.Entry_ID         34417
+   _NMR_spectrometer.ID               1
+   _NMR_spectrometer.Name             .
+   _NMR_spectrometer.Details          cryoprobe
+   _NMR_spectrometer.Manufacturer     Bruker
+   _NMR_spectrometer.Model            'AVANCE III HD'
+   _NMR_spectrometer.Serial_number    .
+   _NMR_spectrometer.Field_strength   700
+save_
+
+save_NMR_spectrometer_list
+   _NMR_spectrometer_list.Sf_category    NMR_spectrometer_list
+   _NMR_spectrometer_list.Sf_framecode   NMR_spectrometer_list
+   _NMR_spectrometer_list.Entry_ID       34417
+   _NMR_spectrometer_list.ID             1
+   _NMR_spectrometer_list.Name           .
+
+   loop_
+      _NMR_spectrometer_view.ID
+      _NMR_spectrometer_view.Name
+      _NMR_spectrometer_view.Manufacturer
+      _NMR_spectrometer_view.Model
+      _NMR_spectrometer_view.Serial_number
+      _NMR_spectrometer_view.Field_strength
+      _NMR_spectrometer_view.Details
+      _NMR_spectrometer_view.Citation_ID
+      _NMR_spectrometer_view.Citation_label
+      _NMR_spectrometer_view.Entry_ID
+      _NMR_spectrometer_view.NMR_spectrometer_list_ID
+
+      1   NMR_spectrometer_1   Bruker   'AVANCE III HD'   .   700   .   .   .   34417   1
+   stop_
+save_
+
+
+    #############################
+    #  NMR applied experiments  #
+    #############################
+save_experiment_list
+   _Experiment_list.Sf_category    experiment_list
+   _Experiment_list.Sf_framecode   experiment_list
+   _Experiment_list.Entry_ID       34417
+   _Experiment_list.ID             1
+   _Experiment_list.Details        .
+
+   loop_
+      _Experiment.ID
+      _Experiment.Name
+      _Experiment.Raw_data_flag
+      _Experiment.NUS_flag
+      _Experiment.Interleaved_flag
+      _Experiment.NMR_spec_expt_ID
+      _Experiment.NMR_spec_expt_label
+      _Experiment.MS_expt_ID
+      _Experiment.MS_expt_label
+      _Experiment.SAXS_expt_ID
+      _Experiment.SAXS_expt_label
+      _Experiment.FRET_expt_ID
+      _Experiment.FRET_expt_label
+      _Experiment.EMR_expt_ID
+      _Experiment.EMR_expt_label
+      _Experiment.Sample_ID
+      _Experiment.Sample_label
+      _Experiment.Sample_state
+      _Experiment.Sample_volume
+      _Experiment.Sample_volume_units
+      _Experiment.Sample_condition_list_ID
+      _Experiment.Sample_condition_list_label
+      _Experiment.Sample_spinning_rate
+      _Experiment.Sample_angle
+      _Experiment.NMR_tube_type
+      _Experiment.NMR_spectrometer_ID
+      _Experiment.NMR_spectrometer_label
+      _Experiment.NMR_spectrometer_probe_ID
+      _Experiment.NMR_spectrometer_probe_label
+      _Experiment.NMR_spectral_processing_ID
+      _Experiment.NMR_spectral_processing_label
+      _Experiment.Mass_spectrometer_ID
+      _Experiment.Mass_spectrometer_label
+      _Experiment.Xray_instrument_ID
+      _Experiment.Xray_instrument_label
+      _Experiment.Fluorescence_instrument_ID
+      _Experiment.Fluorescence_instrument_label
+      _Experiment.EMR_instrument_ID
+      _Experiment.EMR_instrument_label
+      _Experiment.Chromatographic_system_ID
+      _Experiment.Chromatographic_system_label
+      _Experiment.Chromatographic_column_ID
+      _Experiment.Chromatographic_column_label
+      _Experiment.Details
+      _Experiment.Entry_ID
+      _Experiment.Experiment_list_ID
+
+      1   '2D 1H-1H TOCSY'   no   .   .   .   .   .   .   .   .   .   .   .   .   1   $sample_1   isotropic   .   .   1   $sample_conditions_1   .   .   .   1   $NMR_spectrometer_1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+      2   '2D 1H-1H NOESY'   no   .   .   .   .   .   .   .   .   .   .   .   .   1   $sample_1   isotropic   .   .   1   $sample_conditions_1   .   .   .   1   $NMR_spectrometer_1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+      3   '2D 1H-15N HSQC'   no   .   .   .   .   .   .   .   .   .   .   .   .   1   $sample_1   isotropic   .   .   1   $sample_conditions_1   .   .   .   1   $NMR_spectrometer_1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+      4   '2D 1H-13C HSQC'   no   .   .   .   .   .   .   .   .   .   .   .   .   1   $sample_1   isotropic   .   .   1   $sample_conditions_1   .   .   .   1   $NMR_spectrometer_1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   34417   1
+   stop_
+save_
+
+
+####################
+#  NMR parameters  #
+####################
+
+    ##############################
+    #  Assigned chemical shifts  #
+    ##############################
+
+	################################
+	#  Chemical shift referencing  #
+	################################
+save_chem_shift_reference_1
+   _Chem_shift_reference.Sf_category    chem_shift_reference
+   _Chem_shift_reference.Sf_framecode   chem_shift_reference_1
+   _Chem_shift_reference.Entry_ID       34417
+   _Chem_shift_reference.ID             1
+   _Chem_shift_reference.Name           .
+   _Chem_shift_reference.Details        .
+
+   loop_
+      _Chem_shift_ref.Atom_type
+      _Chem_shift_ref.Atom_isotope_number
+      _Chem_shift_ref.Mol_common_name
+      _Chem_shift_ref.Atom_group
+      _Chem_shift_ref.Concentration_val
+      _Chem_shift_ref.Concentration_units
+      _Chem_shift_ref.Solvent
+      _Chem_shift_ref.Rank
+      _Chem_shift_ref.Chem_shift_units
+      _Chem_shift_ref.Chem_shift_val
+      _Chem_shift_ref.Ref_method
+      _Chem_shift_ref.Ref_type
+      _Chem_shift_ref.Indirect_shift_ratio
+      _Chem_shift_ref.External_ref_loc
+      _Chem_shift_ref.External_ref_sample_geometry
+      _Chem_shift_ref.External_ref_axis
+      _Chem_shift_ref.Ref_correction_type
+      _Chem_shift_ref.Correction_val
+      _Chem_shift_ref.Entry_ID
+      _Chem_shift_ref.Chem_shift_reference_ID
+
+      C   13   DSS   'methyl protons'   .   .   .   .   ppm   0.000   internal   direct   0.10132912   .   .   .   .   .   34417   1
+      H   1    DSS   'methyl protons'   .   .   .   .   ppm   0.000   internal   direct   1.0          .   .   .   .   .   34417   1
+      N   15   DSS   'methyl protons'   .   .   .   .   ppm   0.000   internal   direct   0.25144953   .   .   .   .   .   34417   1
+   stop_
+save_
+
+
+     ###################################
+     #  Assigned chemical shift lists  #
+     ###################################
+
+###################################################################
+#       Chemical Shift Ambiguity Index Value Definitions          #
+#                                                                 #
+# The values other than 1 are used for those atoms with different #
+# chemical shifts that cannot be assigned to stereospecific atoms #
+# or to specific residues or chains.                              #
+#                                                                 #
+#   Index Value            Definition                             #
+#                                                                 #
+#      1             Unique (including isolated methyl protons,   #
+#                         geminal atoms, and geminal methyl       #
+#                         groups with identical chemical shifts)  #
+#                         (e.g. ILE HD11, HD12, HD13 protons)     #
+#      2             Ambiguity of geminal atoms or geminal methyl #
+#                         proton groups (e.g. ASP HB2 and HB3     #
+#                         protons, LEU CD1 and CD2 carbons, or    #
+#                         LEU HD11, HD12, HD13 and HD21, HD22,    #
+#                         HD23 methyl protons)                    #
+#      3             Aromatic atoms on opposite sides of          #
+#                         symmetrical rings (e.g. TYR HE1 and HE2 #
+#                         protons)                                #
+#      4             Intraresidue ambiguities (e.g. LYS HG and    #
+#                         HD protons or TRP HZ2 and HZ3 protons)  #
+#      5             Interresidue ambiguities (LYS 12 vs. LYS 27) #
+#      6             Intermolecular ambiguities (e.g. ASP 31 CA   #
+#                         in monomer 1 and ASP 31 CA in monomer 2 #
+#                         of an asymmetrical homodimer, duplex    #
+#                         DNA assignments, or other assignments   #
+#                         that may apply to atoms in one or more  #
+#                         molecule in the molecular assembly)     #
+#      9             Ambiguous, specific ambiguity not defined    #
+#                                                                 #
+###################################################################
+save_assigned_chemical_shifts_1
+   _Assigned_chem_shift_list.Sf_category                   assigned_chemical_shifts
+   _Assigned_chem_shift_list.Sf_framecode                  assigned_chemical_shifts_1
+   _Assigned_chem_shift_list.Entry_ID                      34417
+   _Assigned_chem_shift_list.ID                            1
+   _Assigned_chem_shift_list.Name                          .
+   _Assigned_chem_shift_list.Sample_condition_list_ID      1
+   _Assigned_chem_shift_list.Sample_condition_list_label   $sample_conditions_1
+   _Assigned_chem_shift_list.Chem_shift_reference_ID       1
+   _Assigned_chem_shift_list.Chem_shift_reference_label    $chem_shift_reference_1
+   _Assigned_chem_shift_list.Chem_shift_1H_err             .
+   _Assigned_chem_shift_list.Chem_shift_13C_err            .
+   _Assigned_chem_shift_list.Chem_shift_15N_err            .
+   _Assigned_chem_shift_list.Chem_shift_31P_err            .
+   _Assigned_chem_shift_list.Chem_shift_2H_err             .
+   _Assigned_chem_shift_list.Chem_shift_19F_err            .
+   _Assigned_chem_shift_list.Error_derivation_method       .
+   _Assigned_chem_shift_list.Details                       .
+   _Assigned_chem_shift_list.Text_data_format              .
+   _Assigned_chem_shift_list.Text_data                     .
+
+   loop_
+      _Chem_shift_experiment.Experiment_ID
+      _Chem_shift_experiment.Experiment_name
+      _Chem_shift_experiment.Sample_ID
+      _Chem_shift_experiment.Sample_label
+      _Chem_shift_experiment.Sample_state
+      _Chem_shift_experiment.Entry_ID
+      _Chem_shift_experiment.Assigned_chem_shift_list_ID
+
+      1   '2D 1H-1H TOCSY'   .   .   .   34417   1
+      2   '2D 1H-1H NOESY'   .   .   .   34417   1
+      3   '2D 1H-15N HSQC'   .   .   .   34417   1
+      4   '2D 1H-13C HSQC'   .   .   .   34417   1
+   stop_
+
+   loop_
+      _Atom_chem_shift.ID
+      _Atom_chem_shift.Assembly_atom_ID
+      _Atom_chem_shift.Entity_assembly_ID
+      _Atom_chem_shift.Entity_assembly_asym_ID
+      _Atom_chem_shift.Entity_ID
+      _Atom_chem_shift.Comp_index_ID
+      _Atom_chem_shift.Seq_ID
+      _Atom_chem_shift.Comp_ID
+      _Atom_chem_shift.Atom_ID
+      _Atom_chem_shift.Atom_type
+      _Atom_chem_shift.Atom_isotope_number
+      _Atom_chem_shift.Val
+      _Atom_chem_shift.Val_err
+      _Atom_chem_shift.Assign_fig_of_merit
+      _Atom_chem_shift.Ambiguity_code
+      _Atom_chem_shift.Ambiguity_set_ID
+      _Atom_chem_shift.Occupancy
+      _Atom_chem_shift.Resonance_ID
+      _Atom_chem_shift.Auth_entity_assembly_ID
+      _Atom_chem_shift.Auth_asym_ID
+      _Atom_chem_shift.Auth_seq_ID
+      _Atom_chem_shift.Auth_comp_ID
+      _Atom_chem_shift.Auth_atom_ID
+      _Atom_chem_shift.Details
+      _Atom_chem_shift.Entry_ID
+      _Atom_chem_shift.Assigned_chem_shift_list_ID
+
+      1     .   1   .   1   1    1    ARG   HA     H   1    4.119     0.000   .   1   .   .   .   .   A   1    ARG   HA     .   34417   1
+      2     .   1   .   1   1    1    ARG   HB2    H   1    1.927     0.000   .   1   .   .   .   .   A   1    ARG   HB2    .   34417   1
+      3     .   1   .   1   1    1    ARG   HB3    H   1    1.877     0.000   .   1   .   .   .   .   A   1    ARG   HB3    .   34417   1
+      4     .   1   .   1   1    1    ARG   HG2    H   1    1.594     0.000   .   1   .   .   .   .   A   1    ARG   HG2    .   34417   1
+      5     .   1   .   1   1    1    ARG   HG3    H   1    1.594     0.000   .   1   .   .   .   .   A   1    ARG   HG3    .   34417   1
+      6     .   1   .   1   1    1    ARG   HD2    H   1    3.188     0.000   .   1   .   .   .   .   A   1    ARG   HD2    .   34417   1
+      7     .   1   .   1   1    1    ARG   HD3    H   1    3.188     0.000   .   1   .   .   .   .   A   1    ARG   HD3    .   34417   1
+      8     .   1   .   1   1    1    ARG   HE     H   1    7.273     0.000   .   1   .   .   .   .   A   1    ARG   HE     .   34417   1
+      9     .   1   .   1   1    1    ARG   CA     C   13   54.995    0.000   .   1   .   .   .   .   A   1    ARG   CA     .   34417   1
+      10    .   1   .   1   1    1    ARG   CB     C   13   30.423    0.000   .   1   .   .   .   .   A   1    ARG   CB     .   34417   1
+      11    .   1   .   1   1    1    ARG   CG     C   13   26.021    0.000   .   1   .   .   .   .   A   1    ARG   CG     .   34417   1
+      12    .   1   .   1   2    2    CYS   H      H   1    8.555     0.000   .   1   .   .   .   .   A   2    CYS   H      .   34417   1
+      13    .   1   .   1   2    2    CYS   HA     H   1    5.041     0.000   .   1   .   .   .   .   A   2    CYS   HA     .   34417   1
+      14    .   1   .   1   2    2    CYS   HB2    H   1    2.923     0.000   .   1   .   .   .   .   A   2    CYS   HB2    .   34417   1
+      15    .   1   .   1   2    2    CYS   HB3    H   1    2.995     0.000   .   1   .   .   .   .   A   2    CYS   HB3    .   34417   1
+      16    .   1   .   1   2    2    CYS   CA     C   13   53.401    0.000   .   1   .   .   .   .   A   2    CYS   CA     .   34417   1
+      17    .   1   .   1   2    2    CYS   CB     C   13   42.273    0.000   .   1   .   .   .   .   A   2    CYS   CB     .   34417   1
+      18    .   1   .   1   2    2    CYS   N      N   15   119.487   0.000   .   1   .   .   .   .   A   2    CYS   N      .   34417   1
+      19    .   1   .   1   3    3    LEU   H      H   1    9.225     0.000   .   1   .   .   .   .   A   3    LEU   H      .   34417   1
+      20    .   1   .   1   3    3    LEU   HA     H   1    4.426     0.000   .   1   .   .   .   .   A   3    LEU   HA     .   34417   1
+      21    .   1   .   1   3    3    LEU   HB2    H   1    2.148     0.000   .   1   .   .   .   .   A   3    LEU   HB2    .   34417   1
+      22    .   1   .   1   3    3    LEU   HB3    H   1    1.291     0.000   .   1   .   .   .   .   A   3    LEU   HB3    .   34417   1
+      23    .   1   .   1   3    3    LEU   HG     H   1    1.405     0.000   .   1   .   .   .   .   A   3    LEU   HG     .   34417   1
+      24    .   1   .   1   3    3    LEU   HD11   H   1    0.725     0.000   .   1   .   .   .   .   A   3    LEU   HD11   .   34417   1
+      25    .   1   .   1   3    3    LEU   HD12   H   1    0.725     0.000   .   1   .   .   .   .   A   3    LEU   HD12   .   34417   1
+      26    .   1   .   1   3    3    LEU   HD13   H   1    0.725     0.000   .   1   .   .   .   .   A   3    LEU   HD13   .   34417   1
+      27    .   1   .   1   3    3    LEU   HD21   H   1    0.827     0.000   .   1   .   .   .   .   A   3    LEU   HD21   .   34417   1
+      28    .   1   .   1   3    3    LEU   HD22   H   1    0.827     0.000   .   1   .   .   .   .   A   3    LEU   HD22   .   34417   1
+      29    .   1   .   1   3    3    LEU   HD23   H   1    0.827     0.000   .   1   .   .   .   .   A   3    LEU   HD23   .   34417   1
+      30    .   1   .   1   3    3    LEU   CA     C   13   53.780    0.000   .   1   .   .   .   .   A   3    LEU   CA     .   34417   1
+      31    .   1   .   1   3    3    LEU   CB     C   13   42.807    0.000   .   1   .   .   .   .   A   3    LEU   CB     .   34417   1
+      32    .   1   .   1   3    3    LEU   CG     C   13   25.487    0.000   .   1   .   .   .   .   A   3    LEU   CG     .   34417   1
+      33    .   1   .   1   3    3    LEU   CD1    C   13   21.669    0.000   .   1   .   .   .   .   A   3    LEU   CD1    .   34417   1
+      34    .   1   .   1   3    3    LEU   CD2    C   13   25.463    0.000   .   1   .   .   .   .   A   3    LEU   CD2    .   34417   1
+      35    .   1   .   1   3    3    LEU   N      N   15   121.985   0.000   .   1   .   .   .   .   A   3    LEU   N      .   34417   1
+      36    .   1   .   1   4    4    HIS   H      H   1    8.847     0.000   .   1   .   .   .   .   A   4    HIS   H      .   34417   1
+      37    .   1   .   1   4    4    HIS   HA     H   1    4.372     0.000   .   1   .   .   .   .   A   4    HIS   HA     .   34417   1
+      38    .   1   .   1   4    4    HIS   HB2    H   1    3.317     0.000   .   1   .   .   .   .   A   4    HIS   HB2    .   34417   1
+      39    .   1   .   1   4    4    HIS   HB3    H   1    3.237     0.000   .   1   .   .   .   .   A   4    HIS   HB3    .   34417   1
+      40    .   1   .   1   4    4    HIS   HD2    H   1    7.352     0.000   .   1   .   .   .   .   A   4    HIS   HD2    .   34417   1
+      41    .   1   .   1   4    4    HIS   HE1    H   1    8.579     0.000   .   1   .   .   .   .   A   4    HIS   HE1    .   34417   1
+      42    .   1   .   1   4    4    HIS   CA     C   13   54.338    0.000   .   1   .   .   .   .   A   4    HIS   CA     .   34417   1
+      43    .   1   .   1   4    4    HIS   CB     C   13   29.167    0.000   .   1   .   .   .   .   A   4    HIS   CB     .   34417   1
+      44    .   1   .   1   4    4    HIS   N      N   15   124.354   0.000   .   1   .   .   .   .   A   4    HIS   N      .   34417   1
+      45    .   1   .   1   5    5    ALA   H      H   1    8.362     0.000   .   1   .   .   .   .   A   5    ALA   H      .   34417   1
+      46    .   1   .   1   5    5    ALA   HA     H   1    3.726     0.000   .   1   .   .   .   .   A   5    ALA   HA     .   34417   1
+      47    .   1   .   1   5    5    ALA   HB1    H   1    1.291     0.000   .   1   .   .   .   .   A   5    ALA   HB1    .   34417   1
+      48    .   1   .   1   5    5    ALA   HB2    H   1    1.291     0.000   .   1   .   .   .   .   A   5    ALA   HB2    .   34417   1
+      49    .   1   .   1   5    5    ALA   HB3    H   1    1.291     0.000   .   1   .   .   .   .   A   5    ALA   HB3    .   34417   1
+      50    .   1   .   1   5    5    ALA   CA     C   13   53.241    0.000   .   1   .   .   .   .   A   5    ALA   CA     .   34417   1
+      51    .   1   .   1   5    5    ALA   CB     C   13   17.946    0.000   .   1   .   .   .   .   A   5    ALA   CB     .   34417   1
+      52    .   1   .   1   5    5    ALA   N      N   15   124.066   0.000   .   1   .   .   .   .   A   5    ALA   N      .   34417   1
+      53    .   1   .   1   6    6    GLY   H      H   1    9.181     0.000   .   1   .   .   .   .   A   6    GLY   H      .   34417   1
+      54    .   1   .   1   6    6    GLY   HA2    H   1    3.520     0.000   .   1   .   .   .   .   A   6    GLY   HA2    .   34417   1
+      55    .   1   .   1   6    6    GLY   HA3    H   1    4.505     0.000   .   1   .   .   .   .   A   6    GLY   HA3    .   34417   1
+      56    .   1   .   1   6    6    GLY   CA     C   13   44.333    0.000   .   1   .   .   .   .   A   6    GLY   CA     .   34417   1
+      57    .   1   .   1   6    6    GLY   N      N   15   113.963   0.000   .   1   .   .   .   .   A   6    GLY   N      .   34417   1
+      58    .   1   .   1   7    7    ALA   H      H   1    7.597     0.000   .   1   .   .   .   .   A   7    ALA   H      .   34417   1
+      59    .   1   .   1   7    7    ALA   HA     H   1    4.264     0.000   .   1   .   .   .   .   A   7    ALA   HA     .   34417   1
+      60    .   1   .   1   7    7    ALA   HB1    H   1    1.400     0.000   .   1   .   .   .   .   A   7    ALA   HB1    .   34417   1
+      61    .   1   .   1   7    7    ALA   HB2    H   1    1.400     0.000   .   1   .   .   .   .   A   7    ALA   HB2    .   34417   1
+      62    .   1   .   1   7    7    ALA   HB3    H   1    1.400     0.000   .   1   .   .   .   .   A   7    ALA   HB3    .   34417   1
+      63    .   1   .   1   7    7    ALA   CA     C   13   51.577    0.000   .   1   .   .   .   .   A   7    ALA   CA     .   34417   1
+      64    .   1   .   1   7    7    ALA   CB     C   13   20.424    0.000   .   1   .   .   .   .   A   7    ALA   CB     .   34417   1
+      65    .   1   .   1   7    7    ALA   N      N   15   125.047   0.000   .   1   .   .   .   .   A   7    ALA   N      .   34417   1
+      66    .   1   .   1   8    8    ALA   H      H   1    8.384     0.000   .   1   .   .   .   .   A   8    ALA   H      .   34417   1
+      67    .   1   .   1   8    8    ALA   HA     H   1    4.560     0.000   .   1   .   .   .   .   A   8    ALA   HA     .   34417   1
+      68    .   1   .   1   8    8    ALA   HB1    H   1    1.405     0.000   .   1   .   .   .   .   A   8    ALA   HB1    .   34417   1
+      69    .   1   .   1   8    8    ALA   HB2    H   1    1.405     0.000   .   1   .   .   .   .   A   8    ALA   HB2    .   34417   1
+      70    .   1   .   1   8    8    ALA   HB3    H   1    1.405     0.000   .   1   .   .   .   .   A   8    ALA   HB3    .   34417   1
+      71    .   1   .   1   8    8    ALA   CA     C   13   51.991    0.000   .   1   .   .   .   .   A   8    ALA   CA     .   34417   1
+      72    .   1   .   1   8    8    ALA   CB     C   13   18.637    0.000   .   1   .   .   .   .   A   8    ALA   CB     .   34417   1
+      73    .   1   .   1   8    8    ALA   N      N   15   124.843   0.000   .   1   .   .   .   .   A   8    ALA   N      .   34417   1
+      74    .   1   .   1   9    9    CYS   H      H   1    7.977     0.000   .   1   .   .   .   .   A   9    CYS   H      .   34417   1
+      75    .   1   .   1   9    9    CYS   HA     H   1    4.841     0.000   .   1   .   .   .   .   A   9    CYS   HA     .   34417   1
+      76    .   1   .   1   9    9    CYS   HB2    H   1    3.188     0.000   .   1   .   .   .   .   A   9    CYS   HB2    .   34417   1
+      77    .   1   .   1   9    9    CYS   HB3    H   1    3.190     0.000   .   1   .   .   .   .   A   9    CYS   HB3    .   34417   1
+      78    .   1   .   1   9    9    CYS   CA     C   13   53.980    0.000   .   1   .   .   .   .   A   9    CYS   CA     .   34417   1
+      79    .   1   .   1   9    9    CYS   CB     C   13   46.069    0.000   .   1   .   .   .   .   A   9    CYS   CB     .   34417   1
+      80    .   1   .   1   9    9    CYS   N      N   15   117.071   0.000   .   1   .   .   .   .   A   9    CYS   N      .   34417   1
+      81    .   1   .   1   10   10   SER   H      H   1    8.665     0.000   .   1   .   .   .   .   A   10   SER   H      .   34417   1
+      82    .   1   .   1   10   10   SER   HA     H   1    4.434     0.000   .   1   .   .   .   .   A   10   SER   HA     .   34417   1
+      83    .   1   .   1   10   10   SER   HB2    H   1    3.905     0.000   .   1   .   .   .   .   A   10   SER   HB2    .   34417   1
+      84    .   1   .   1   10   10   SER   HB3    H   1    3.905     0.000   .   1   .   .   .   .   A   10   SER   HB3    .   34417   1
+      85    .   1   .   1   10   10   SER   CA     C   13   58.543    0.000   .   1   .   .   .   .   A   10   SER   CA     .   34417   1
+      86    .   1   .   1   10   10   SER   CB     C   13   63.862    0.000   .   1   .   .   .   .   A   10   SER   CB     .   34417   1
+      87    .   1   .   1   10   10   SER   N      N   15   116.645   0.000   .   1   .   .   .   .   A   10   SER   N      .   34417   1
+      88    .   1   .   1   11   11   GLY   H      H   1    8.191     0.000   .   1   .   .   .   .   A   11   GLY   H      .   34417   1
+      89    .   1   .   1   11   11   GLY   HA2    H   1    4.347     0.000   .   1   .   .   .   .   A   11   GLY   HA2    .   34417   1
+      90    .   1   .   1   11   11   GLY   HA3    H   1    3.941     0.000   .   1   .   .   .   .   A   11   GLY   HA3    .   34417   1
+      91    .   1   .   1   11   11   GLY   CA     C   13   44.568    0.000   .   1   .   .   .   .   A   11   GLY   CA     .   34417   1
+      92    .   1   .   1   11   11   GLY   N      N   15   112.927   0.000   .   1   .   .   .   .   A   11   GLY   N      .   34417   1
+      93    .   1   .   1   12   12   PRO   HA     H   1    4.373     0.000   .   1   .   .   .   .   A   12   PRO   HA     .   34417   1
+      94    .   1   .   1   12   12   PRO   HB2    H   1    2.332     0.000   .   1   .   .   .   .   A   12   PRO   HB2    .   34417   1
+      95    .   1   .   1   12   12   PRO   HB3    H   1    1.976     0.000   .   1   .   .   .   .   A   12   PRO   HB3    .   34417   1
+      96    .   1   .   1   12   12   PRO   HG2    H   1    2.049     0.000   .   1   .   .   .   .   A   12   PRO   HG2    .   34417   1
+      97    .   1   .   1   12   12   PRO   HG3    H   1    2.049     0.000   .   1   .   .   .   .   A   12   PRO   HG3    .   34417   1
+      98    .   1   .   1   12   12   PRO   HD2    H   1    3.588     0.000   .   1   .   .   .   .   A   12   PRO   HD2    .   34417   1
+      99    .   1   .   1   12   12   PRO   HD3    H   1    3.770     0.000   .   1   .   .   .   .   A   12   PRO   HD3    .   34417   1
+      100   .   1   .   1   12   12   PRO   CA     C   13   63.867    0.000   .   1   .   .   .   .   A   12   PRO   CA     .   34417   1
+      101   .   1   .   1   12   12   PRO   CB     C   13   31.810    0.000   .   1   .   .   .   .   A   12   PRO   CB     .   34417   1
+      102   .   1   .   1   12   12   PRO   CG     C   13   26.510    0.000   .   1   .   .   .   .   A   12   PRO   CG     .   34417   1
+      103   .   1   .   1   12   12   PRO   CD     C   13   49.283    0.000   .   1   .   .   .   .   A   12   PRO   CD     .   34417   1
+      104   .   1   .   1   13   13   ILE   H      H   1    7.784     0.000   .   1   .   .   .   .   A   13   ILE   H      .   34417   1
+      105   .   1   .   1   13   13   ILE   HA     H   1    4.239     0.000   .   1   .   .   .   .   A   13   ILE   HA     .   34417   1
+      106   .   1   .   1   13   13   ILE   HB     H   1    1.883     0.000   .   1   .   .   .   .   A   13   ILE   HB     .   34417   1
+      107   .   1   .   1   13   13   ILE   HG12   H   1    1.358     0.000   .   1   .   .   .   .   A   13   ILE   HG12   .   34417   1
+      108   .   1   .   1   13   13   ILE   HG13   H   1    1.093     0.000   .   1   .   .   .   .   A   13   ILE   HG13   .   34417   1
+      109   .   1   .   1   13   13   ILE   HG21   H   1    0.818     0.000   .   1   .   .   .   .   A   13   ILE   HG21   .   34417   1
+      110   .   1   .   1   13   13   ILE   HG22   H   1    0.818     0.000   .   1   .   .   .   .   A   13   ILE   HG22   .   34417   1
+      111   .   1   .   1   13   13   ILE   HG23   H   1    0.818     0.000   .   1   .   .   .   .   A   13   ILE   HG23   .   34417   1
+      112   .   1   .   1   13   13   ILE   HD11   H   1    0.818     0.000   .   1   .   .   .   .   A   13   ILE   HD11   .   34417   1
+      113   .   1   .   1   13   13   ILE   HD12   H   1    0.818     0.000   .   1   .   .   .   .   A   13   ILE   HD12   .   34417   1
+      114   .   1   .   1   13   13   ILE   HD13   H   1    0.818     0.000   .   1   .   .   .   .   A   13   ILE   HD13   .   34417   1
+      115   .   1   .   1   13   13   ILE   CA     C   13   59.983    0.000   .   1   .   .   .   .   A   13   ILE   CA     .   34417   1
+      116   .   1   .   1   13   13   ILE   CB     C   13   37.757    0.000   .   1   .   .   .   .   A   13   ILE   CB     .   34417   1
+      117   .   1   .   1   13   13   ILE   CG1    C   13   26.669    0.000   .   1   .   .   .   .   A   13   ILE   CG1    .   34417   1
+      118   .   1   .   1   13   13   ILE   CG2    C   13   16.982    0.000   .   1   .   .   .   .   A   13   ILE   CG2    .   34417   1
+      119   .   1   .   1   13   13   ILE   CD1    C   13   12.243    0.000   .   1   .   .   .   .   A   13   ILE   CD1    .   34417   1
+      120   .   1   .   1   13   13   ILE   N      N   15   118.436   0.000   .   1   .   .   .   .   A   13   ILE   N      .   34417   1
+      121   .   1   .   1   14   14   GLN   H      H   1    7.873     0.000   .   1   .   .   .   .   A   14   GLN   H      .   34417   1
+      122   .   1   .   1   14   14   GLN   HA     H   1    4.337     0.000   .   1   .   .   .   .   A   14   GLN   HA     .   34417   1
+      123   .   1   .   1   14   14   GLN   HB2    H   1    2.101     0.000   .   1   .   .   .   .   A   14   GLN   HB2    .   34417   1
+      124   .   1   .   1   14   14   GLN   HB3    H   1    1.915     0.000   .   1   .   .   .   .   A   14   GLN   HB3    .   34417   1
+      125   .   1   .   1   14   14   GLN   HG2    H   1    2.188     0.000   .   1   .   .   .   .   A   14   GLN   HG2    .   34417   1
+      126   .   1   .   1   14   14   GLN   HG3    H   1    2.304     0.000   .   1   .   .   .   .   A   14   GLN   HG3    .   34417   1
+      127   .   1   .   1   14   14   GLN   HE21   H   1    8.115     0.000   .   1   .   .   .   .   A   14   GLN   HE21   .   34417   1
+      128   .   1   .   1   14   14   GLN   HE22   H   1    6.292     0.000   .   1   .   .   .   .   A   14   GLN   HE22   .   34417   1
+      129   .   1   .   1   14   14   GLN   CA     C   13   54.798    0.000   .   1   .   .   .   .   A   14   GLN   CA     .   34417   1
+      130   .   1   .   1   14   14   GLN   CB     C   13   28.940    0.000   .   1   .   .   .   .   A   14   GLN   CB     .   34417   1
+      131   .   1   .   1   14   14   GLN   CG     C   13   32.536    0.000   .   1   .   .   .   .   A   14   GLN   CG     .   34417   1
+      132   .   1   .   1   14   14   GLN   N      N   15   125.435   0.000   .   1   .   .   .   .   A   14   GLN   N      .   34417   1
+      133   .   1   .   1   15   15   LYS   H      H   1    8.603     0.000   .   1   .   .   .   .   A   15   LYS   H      .   34417   1
+      134   .   1   .   1   15   15   LYS   HA     H   1    4.060     0.000   .   1   .   .   .   .   A   15   LYS   HA     .   34417   1
+      135   .   1   .   1   15   15   LYS   HB2    H   1    1.787     0.000   .   1   .   .   .   .   A   15   LYS   HB2    .   34417   1
+      136   .   1   .   1   15   15   LYS   HB3    H   1    1.787     0.000   .   1   .   .   .   .   A   15   LYS   HB3    .   34417   1
+      137   .   1   .   1   15   15   LYS   HG2    H   1    1.474     0.000   .   1   .   .   .   .   A   15   LYS   HG2    .   34417   1
+      138   .   1   .   1   15   15   LYS   HG3    H   1    1.390     0.000   .   1   .   .   .   .   A   15   LYS   HG3    .   34417   1
+      139   .   1   .   1   15   15   LYS   HD2    H   1    1.652     0.000   .   1   .   .   .   .   A   15   LYS   HD2    .   34417   1
+      140   .   1   .   1   15   15   LYS   HD3    H   1    1.652     0.000   .   1   .   .   .   .   A   15   LYS   HD3    .   34417   1
+      141   .   1   .   1   15   15   LYS   HE2    H   1    2.953     0.000   .   1   .   .   .   .   A   15   LYS   HE2    .   34417   1
+      142   .   1   .   1   15   15   LYS   HE3    H   1    2.953     0.000   .   1   .   .   .   .   A   15   LYS   HE3    .   34417   1
+      143   .   1   .   1   15   15   LYS   CA     C   13   58.080    0.000   .   1   .   .   .   .   A   15   LYS   CA     .   34417   1
+      144   .   1   .   1   15   15   LYS   CB     C   13   32.239    0.000   .   1   .   .   .   .   A   15   LYS   CB     .   34417   1
+      145   .   1   .   1   15   15   LYS   CG     C   13   24.488    0.000   .   1   .   .   .   .   A   15   LYS   CG     .   34417   1
+      146   .   1   .   1   15   15   LYS   CD     C   13   28.311    0.000   .   1   .   .   .   .   A   15   LYS   CD     .   34417   1
+      147   .   1   .   1   15   15   LYS   CE     C   13   41.550    0.000   .   1   .   .   .   .   A   15   LYS   CE     .   34417   1
+      148   .   1   .   1   15   15   LYS   N      N   15   125.588   0.000   .   1   .   .   .   .   A   15   LYS   N      .   34417   1
+      149   .   1   .   1   16   16   ILE   H      H   1    7.853     0.000   .   1   .   .   .   .   A   16   ILE   H      .   34417   1
+      150   .   1   .   1   16   16   ILE   HA     H   1    4.563     0.000   .   1   .   .   .   .   A   16   ILE   HA     .   34417   1
+      151   .   1   .   1   16   16   ILE   HB     H   1    1.780     0.000   .   1   .   .   .   .   A   16   ILE   HB     .   34417   1
+      152   .   1   .   1   16   16   ILE   HG12   H   1    1.052     0.000   .   1   .   .   .   .   A   16   ILE   HG12   .   34417   1
+      153   .   1   .   1   16   16   ILE   HG13   H   1    1.405     0.000   .   1   .   .   .   .   A   16   ILE   HG13   .   34417   1
+      154   .   1   .   1   16   16   ILE   HG21   H   1    0.795     0.000   .   1   .   .   .   .   A   16   ILE   HG21   .   34417   1
+      155   .   1   .   1   16   16   ILE   HG22   H   1    0.795     0.000   .   1   .   .   .   .   A   16   ILE   HG22   .   34417   1
+      156   .   1   .   1   16   16   ILE   HG23   H   1    0.795     0.000   .   1   .   .   .   .   A   16   ILE   HG23   .   34417   1
+      157   .   1   .   1   16   16   ILE   HD11   H   1    0.755     0.000   .   1   .   .   .   .   A   16   ILE   HD11   .   34417   1
+      158   .   1   .   1   16   16   ILE   HD12   H   1    0.755     0.000   .   1   .   .   .   .   A   16   ILE   HD12   .   34417   1
+      159   .   1   .   1   16   16   ILE   HD13   H   1    0.755     0.000   .   1   .   .   .   .   A   16   ILE   HD13   .   34417   1
+      160   .   1   .   1   16   16   ILE   CA     C   13   56.914    0.000   .   1   .   .   .   .   A   16   ILE   CA     .   34417   1
+      161   .   1   .   1   16   16   ILE   CB     C   13   38.188    0.000   .   1   .   .   .   .   A   16   ILE   CB     .   34417   1
+      162   .   1   .   1   16   16   ILE   CG1    C   13   26.211    0.000   .   1   .   .   .   .   A   16   ILE   CG1    .   34417   1
+      163   .   1   .   1   16   16   ILE   CG2    C   13   16.674    0.000   .   1   .   .   .   .   A   16   ILE   CG2    .   34417   1
+      164   .   1   .   1   16   16   ILE   CD1    C   13   11.913    0.000   .   1   .   .   .   .   A   16   ILE   CD1    .   34417   1
+      165   .   1   .   1   16   16   ILE   N      N   15   121.171   0.000   .   1   .   .   .   .   A   16   ILE   N      .   34417   1
+      166   .   1   .   1   17   17   PRO   HA     H   1    4.494     0.000   .   1   .   .   .   .   A   17   PRO   HA     .   34417   1
+      167   .   1   .   1   17   17   PRO   HB2    H   1    2.247     0.000   .   1   .   .   .   .   A   17   PRO   HB2    .   34417   1
+      168   .   1   .   1   17   17   PRO   HB3    H   1    2.247     0.000   .   1   .   .   .   .   A   17   PRO   HB3    .   34417   1
+      169   .   1   .   1   17   17   PRO   HG2    H   1    2.032     0.000   .   1   .   .   .   .   A   17   PRO   HG2    .   34417   1
+      170   .   1   .   1   17   17   PRO   HG3    H   1    1.885     0.000   .   1   .   .   .   .   A   17   PRO   HG3    .   34417   1
+      171   .   1   .   1   17   17   PRO   HD2    H   1    3.865     0.000   .   1   .   .   .   .   A   17   PRO   HD2    .   34417   1
+      172   .   1   .   1   17   17   PRO   HD3    H   1    3.725     0.000   .   1   .   .   .   .   A   17   PRO   HD3    .   34417   1
+      173   .   1   .   1   17   17   PRO   CA     C   13   61.851    0.000   .   1   .   .   .   .   A   17   PRO   CA     .   34417   1
+      174   .   1   .   1   17   17   PRO   CB     C   13   31.949    0.000   .   1   .   .   .   .   A   17   PRO   CB     .   34417   1
+      175   .   1   .   1   17   17   PRO   CD     C   13   50.394    0.000   .   1   .   .   .   .   A   17   PRO   CD     .   34417   1
+      176   .   1   .   1   18   18   CYS   H      H   1    8.908     0.000   .   1   .   .   .   .   A   18   CYS   H      .   34417   1
+      177   .   1   .   1   18   18   CYS   HA     H   1    4.658     0.000   .   1   .   .   .   .   A   18   CYS   HA     .   34417   1
+      178   .   1   .   1   18   18   CYS   HB2    H   1    2.134     0.000   .   1   .   .   .   .   A   18   CYS   HB2    .   34417   1
+      179   .   1   .   1   18   18   CYS   HB3    H   1    3.237     0.000   .   1   .   .   .   .   A   18   CYS   HB3    .   34417   1
+      180   .   1   .   1   18   18   CYS   CA     C   13   54.868    0.000   .   1   .   .   .   .   A   18   CYS   CA     .   34417   1
+      181   .   1   .   1   18   18   CYS   CB     C   13   34.572    0.000   .   1   .   .   .   .   A   18   CYS   CB     .   34417   1
+      182   .   1   .   1   18   18   CYS   N      N   15   119.717   0.000   .   1   .   .   .   .   A   18   CYS   N      .   34417   1
+      183   .   1   .   1   19   19   CYS   H      H   1    9.680     0.000   .   1   .   .   .   .   A   19   CYS   H      .   34417   1
+      184   .   1   .   1   19   19   CYS   HA     H   1    4.395     0.000   .   1   .   .   .   .   A   19   CYS   HA     .   34417   1
+      185   .   1   .   1   19   19   CYS   HB2    H   1    3.135     0.000   .   1   .   .   .   .   A   19   CYS   HB2    .   34417   1
+      186   .   1   .   1   19   19   CYS   HB3    H   1    2.673     0.000   .   1   .   .   .   .   A   19   CYS   HB3    .   34417   1
+      187   .   1   .   1   19   19   CYS   CA     C   13   56.661    0.000   .   1   .   .   .   .   A   19   CYS   CA     .   34417   1
+      188   .   1   .   1   19   19   CYS   CB     C   13   38.550    0.000   .   1   .   .   .   .   A   19   CYS   CB     .   34417   1
+      189   .   1   .   1   19   19   CYS   N      N   15   126.213   0.000   .   1   .   .   .   .   A   19   CYS   N      .   34417   1
+      190   .   1   .   1   20   20   GLY   H      H   1    9.248     0.000   .   1   .   .   .   .   A   20   GLY   H      .   34417   1
+      191   .   1   .   1   20   20   GLY   HA2    H   1    3.455     0.000   .   1   .   .   .   .   A   20   GLY   HA2    .   34417   1
+      192   .   1   .   1   20   20   GLY   HA3    H   1    4.259     0.000   .   1   .   .   .   .   A   20   GLY   HA3    .   34417   1
+      193   .   1   .   1   20   20   GLY   CA     C   13   44.365    0.000   .   1   .   .   .   .   A   20   GLY   CA     .   34417   1
+      194   .   1   .   1   20   20   GLY   N      N   15   111.739   0.000   .   1   .   .   .   .   A   20   GLY   N      .   34417   1
+      195   .   1   .   1   21   21   THR   H      H   1    8.263     0.000   .   1   .   .   .   .   A   21   THR   H      .   34417   1
+      196   .   1   .   1   21   21   THR   HA     H   1    4.484     0.000   .   1   .   .   .   .   A   21   THR   HA     .   34417   1
+      197   .   1   .   1   21   21   THR   HB     H   1    3.964     0.000   .   1   .   .   .   .   A   21   THR   HB     .   34417   1
+      198   .   1   .   1   21   21   THR   HG21   H   1    1.058     0.000   .   1   .   .   .   .   A   21   THR   HG21   .   34417   1
+      199   .   1   .   1   21   21   THR   HG22   H   1    1.058     0.000   .   1   .   .   .   .   A   21   THR   HG22   .   34417   1
+      200   .   1   .   1   21   21   THR   HG23   H   1    1.058     0.000   .   1   .   .   .   .   A   21   THR   HG23   .   34417   1
+      201   .   1   .   1   21   21   THR   CA     C   13   59.543    0.000   .   1   .   .   .   .   A   21   THR   CA     .   34417   1
+      202   .   1   .   1   21   21   THR   CB     C   13   71.035    0.000   .   1   .   .   .   .   A   21   THR   CB     .   34417   1
+      203   .   1   .   1   21   21   THR   N      N   15   120.845   0.000   .   1   .   .   .   .   A   21   THR   N      .   34417   1
+      204   .   1   .   1   22   22   CYS   H      H   1    8.834     0.000   .   1   .   .   .   .   A   22   CYS   H      .   34417   1
+      205   .   1   .   1   22   22   CYS   HA     H   1    4.973     0.000   .   1   .   .   .   .   A   22   CYS   HA     .   34417   1
+      206   .   1   .   1   22   22   CYS   HB2    H   1    2.848     0.000   .   1   .   .   .   .   A   22   CYS   HB2    .   34417   1
+      207   .   1   .   1   22   22   CYS   HB3    H   1    3.027     0.000   .   1   .   .   .   .   A   22   CYS   HB3    .   34417   1
+      208   .   1   .   1   22   22   CYS   CA     C   13   54.909    0.000   .   1   .   .   .   .   A   22   CYS   CA     .   34417   1
+      209   .   1   .   1   22   22   CYS   CB     C   13   39.556    0.000   .   1   .   .   .   .   A   22   CYS   CB     .   34417   1
+      210   .   1   .   1   22   22   CYS   N      N   15   124.461   0.000   .   1   .   .   .   .   A   22   CYS   N      .   34417   1
+      211   .   1   .   1   23   23   SER   H      H   1    8.934     0.000   .   1   .   .   .   .   A   23   SER   H      .   34417   1
+      212   .   1   .   1   23   23   SER   HA     H   1    4.713     0.000   .   1   .   .   .   .   A   23   SER   HA     .   34417   1
+      213   .   1   .   1   23   23   SER   HB2    H   1    3.651     0.000   .   1   .   .   .   .   A   23   SER   HB2    .   34417   1
+      214   .   1   .   1   23   23   SER   HB3    H   1    3.506     0.000   .   1   .   .   .   .   A   23   SER   HB3    .   34417   1
+      215   .   1   .   1   23   23   SER   CA     C   13   56.058    0.000   .   1   .   .   .   .   A   23   SER   CA     .   34417   1
+      216   .   1   .   1   23   23   SER   CB     C   13   63.436    0.000   .   1   .   .   .   .   A   23   SER   CB     .   34417   1
+      217   .   1   .   1   23   23   SER   N      N   15   127.690   0.000   .   1   .   .   .   .   A   23   SER   N      .   34417   1
+      218   .   1   .   1   24   24   ARG   H      H   1    9.459     0.000   .   1   .   .   .   .   A   24   ARG   H      .   34417   1
+      219   .   1   .   1   24   24   ARG   HA     H   1    3.819     0.000   .   1   .   .   .   .   A   24   ARG   HA     .   34417   1
+      220   .   1   .   1   24   24   ARG   HB2    H   1    1.868     0.000   .   1   .   .   .   .   A   24   ARG   HB2    .   34417   1
+      221   .   1   .   1   24   24   ARG   HB3    H   1    1.868     0.000   .   1   .   .   .   .   A   24   ARG   HB3    .   34417   1
+      222   .   1   .   1   24   24   ARG   HG2    H   1    1.584     0.000   .   1   .   .   .   .   A   24   ARG   HG2    .   34417   1
+      223   .   1   .   1   24   24   ARG   HG3    H   1    1.583     0.000   .   1   .   .   .   .   A   24   ARG   HG3    .   34417   1
+      224   .   1   .   1   24   24   ARG   HD2    H   1    3.184     0.000   .   1   .   .   .   .   A   24   ARG   HD2    .   34417   1
+      225   .   1   .   1   24   24   ARG   HD3    H   1    3.185     0.000   .   1   .   .   .   .   A   24   ARG   HD3    .   34417   1
+      226   .   1   .   1   24   24   ARG   HE     H   1    7.154     0.000   .   1   .   .   .   .   A   24   ARG   HE     .   34417   1
+      227   .   1   .   1   24   24   ARG   CA     C   13   57.046    0.000   .   1   .   .   .   .   A   24   ARG   CA     .   34417   1
+      228   .   1   .   1   24   24   ARG   CD     C   13   42.973    0.000   .   1   .   .   .   .   A   24   ARG   CD     .   34417   1
+      229   .   1   .   1   24   24   ARG   N      N   15   129.822   0.000   .   1   .   .   .   .   A   24   ARG   N      .   34417   1
+      230   .   1   .   1   25   25   ARG   H      H   1    8.467     0.000   .   1   .   .   .   .   A   25   ARG   H      .   34417   1
+      231   .   1   .   1   25   25   ARG   HA     H   1    3.745     0.000   .   1   .   .   .   .   A   25   ARG   HA     .   34417   1
+      232   .   1   .   1   25   25   ARG   HB2    H   1    2.192     0.000   .   1   .   .   .   .   A   25   ARG   HB2    .   34417   1
+      233   .   1   .   1   25   25   ARG   HB3    H   1    2.192     0.000   .   1   .   .   .   .   A   25   ARG   HB3    .   34417   1
+      234   .   1   .   1   25   25   ARG   HG2    H   1    1.526     0.000   .   1   .   .   .   .   A   25   ARG   HG2    .   34417   1
+      235   .   1   .   1   25   25   ARG   HG3    H   1    1.526     0.000   .   1   .   .   .   .   A   25   ARG   HG3    .   34417   1
+      236   .   1   .   1   25   25   ARG   HD2    H   1    3.212     0.000   .   1   .   .   .   .   A   25   ARG   HD2    .   34417   1
+      237   .   1   .   1   25   25   ARG   HD3    H   1    3.212     0.000   .   1   .   .   .   .   A   25   ARG   HD3    .   34417   1
+      238   .   1   .   1   25   25   ARG   HE     H   1    7.177     0.000   .   1   .   .   .   .   A   25   ARG   HE     .   34417   1
+      239   .   1   .   1   25   25   ARG   CA     C   13   57.991    0.000   .   1   .   .   .   .   A   25   ARG   CA     .   34417   1
+      240   .   1   .   1   25   25   ARG   CB     C   13   26.661    0.000   .   1   .   .   .   .   A   25   ARG   CB     .   34417   1
+      241   .   1   .   1   25   25   ARG   CG     C   13   27.388    0.000   .   1   .   .   .   .   A   25   ARG   CG     .   34417   1
+      242   .   1   .   1   25   25   ARG   CD     C   13   42.942    0.000   .   1   .   .   .   .   A   25   ARG   CD     .   34417   1
+      243   .   1   .   1   25   25   ARG   N      N   15   109.412   0.000   .   1   .   .   .   .   A   25   ARG   N      .   34417   1
+      244   .   1   .   1   26   26   LYS   H      H   1    7.860     0.000   .   1   .   .   .   .   A   26   LYS   H      .   34417   1
+      245   .   1   .   1   26   26   LYS   HA     H   1    5.169     0.000   .   1   .   .   .   .   A   26   LYS   HA     .   34417   1
+      246   .   1   .   1   26   26   LYS   HB2    H   1    1.660     0.000   .   1   .   .   .   .   A   26   LYS   HB2    .   34417   1
+      247   .   1   .   1   26   26   LYS   HB3    H   1    1.537     0.000   .   1   .   .   .   .   A   26   LYS   HB3    .   34417   1
+      248   .   1   .   1   26   26   LYS   HG3    H   1    1.315     0.000   .   1   .   .   .   .   A   26   LYS   HG3    .   34417   1
+      249   .   1   .   1   26   26   LYS   HD2    H   1    1.703     0.000   .   1   .   .   .   .   A   26   LYS   HD2    .   34417   1
+      250   .   1   .   1   26   26   LYS   HD3    H   1    1.623     0.000   .   1   .   .   .   .   A   26   LYS   HD3    .   34417   1
+      251   .   1   .   1   26   26   LYS   HE2    H   1    3.004     0.000   .   1   .   .   .   .   A   26   LYS   HE2    .   34417   1
+      252   .   1   .   1   26   26   LYS   HE3    H   1    3.007     0.000   .   1   .   .   .   .   A   26   LYS   HE3    .   34417   1
+      253   .   1   .   1   26   26   LYS   CA     C   13   54.562    0.000   .   1   .   .   .   .   A   26   LYS   CA     .   34417   1
+      254   .   1   .   1   26   26   LYS   CB     C   13   36.667    0.000   .   1   .   .   .   .   A   26   LYS   CB     .   34417   1
+      255   .   1   .   1   26   26   LYS   CG     C   13   24.654    0.000   .   1   .   .   .   .   A   26   LYS   CG     .   34417   1
+      256   .   1   .   1   26   26   LYS   CD     C   13   29.021    0.000   .   1   .   .   .   .   A   26   LYS   CD     .   34417   1
+      257   .   1   .   1   26   26   LYS   CE     C   13   41.672    0.000   .   1   .   .   .   .   A   26   LYS   CE     .   34417   1
+      258   .   1   .   1   26   26   LYS   N      N   15   123.399   0.000   .   1   .   .   .   .   A   26   LYS   N      .   34417   1
+      259   .   1   .   1   27   27   CYS   H      H   1    9.333     0.000   .   1   .   .   .   .   A   27   CYS   H      .   34417   1
+      260   .   1   .   1   27   27   CYS   HA     H   1    5.426     0.000   .   1   .   .   .   .   A   27   CYS   HA     .   34417   1
+      261   .   1   .   1   27   27   CYS   HB2    H   1    3.969     0.000   .   1   .   .   .   .   A   27   CYS   HB2    .   34417   1
+      262   .   1   .   1   27   27   CYS   HB3    H   1    2.645     0.000   .   1   .   .   .   .   A   27   CYS   HB3    .   34417   1
+      263   .   1   .   1   27   27   CYS   CA     C   13   52.400    0.000   .   1   .   .   .   .   A   27   CYS   CA     .   34417   1
+      264   .   1   .   1   27   27   CYS   CB     C   13   34.555    0.000   .   1   .   .   .   .   A   27   CYS   CB     .   34417   1
+      265   .   1   .   1   27   27   CYS   N      N   15   124.359   0.000   .   1   .   .   .   .   A   27   CYS   N      .   34417   1
+      266   .   1   .   1   28   28   THR   H      H   1    9.275     0.000   .   1   .   .   .   .   A   28   THR   H      .   34417   1
+      267   .   1   .   1   28   28   THR   HA     H   1    4.258     0.000   .   1   .   .   .   .   A   28   THR   HA     .   34417   1
+      268   .   1   .   1   28   28   THR   HB     H   1    4.466     0.000   .   1   .   .   .   .   A   28   THR   HB     .   34417   1
+      269   .   1   .   1   28   28   THR   HG21   H   1    1.237     0.000   .   1   .   .   .   .   A   28   THR   HG21   .   34417   1
+      270   .   1   .   1   28   28   THR   HG22   H   1    1.237     0.000   .   1   .   .   .   .   A   28   THR   HG22   .   34417   1
+      271   .   1   .   1   28   28   THR   HG23   H   1    1.237     0.000   .   1   .   .   .   .   A   28   THR   HG23   .   34417   1
+      272   .   1   .   1   28   28   THR   CA     C   13   62.974    0.000   .   1   .   .   .   .   A   28   THR   CA     .   34417   1
+      273   .   1   .   1   28   28   THR   CB     C   13   70.848    0.000   .   1   .   .   .   .   A   28   THR   CB     .   34417   1
+      274   .   1   .   1   28   28   THR   CG2    C   13   21.745    0.000   .   1   .   .   .   .   A   28   THR   CG2    .   34417   1
+      275   .   1   .   1   28   28   THR   N      N   15   125.877   0.000   .   1   .   .   .   .   A   28   THR   N      .   34417   1
+   stop_
+save_
+

@@ -4,11 +4,9 @@
 result. Its tests exercise infrastructure without rebuilding shipped binaries,
 rewriting the production integrity database, or running destructive cleanup.
 
-The checked host defaults are 32 process workers on ALAUNDO and 12 on TALOS
-when GPU arithmetic is requested. Host-specific parallelisation must preserve
-user overrides; unknown hosts and
-CPU-only routes must not acquire unsolicited GPU worker settings. GPU guard
-includes must remove and restore only the requested GPU flag, preserve other
+The autoexec include must preserve explicitly supplied parallel settings.
+Machine-specific GPU counts and worker defaults are deliberately not asserted.
+GPU guard includes must remove and restore only the requested GPU flag, preserve other
 flags, and reject an unmatched end guard. Environment, graphics defaults, and
 any temporary pool created by the test are restored on exit.
 

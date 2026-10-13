@@ -10,7 +10,7 @@ Reports the final basis-set summary for a Spinach system. For each listed basis 
 
 ## Numerical content
 
-Each substance is reported separately using `bas.nstates(n)` and its local descriptor `bas.basis{n}`. Column headings identify global spins in `chem.parts{n}`, while state numbers include the compiled offset. The percentage uses the full local Hilbert dimension for Hilbert/wavefunction formalisms and its square for Liouville formalisms. Non-sphten formalisms print dimensions without tensor labels. If `nstates` is greater than `spin_system.tols.basis_hush`, the detailed state table is suppressed; the final dimension and percentage are still reported. The labels and counts have no physical units.
+Each substance is reported separately using `bas.nstates(n)` and its local descriptor `bas.basis{n}`. Column headings identify global spins in `chem.parts{n}`, while state numbers include the compiled offset. The percentage uses the full local Hilbert dimension for Hilbert/wavefunction formalisms and its square for Liouville formalisms. Non-sphten formalisms print dimensions without tensor labels. If `nstates` is greater than `spin_system.tols.basis_hush`, the detailed state table is suppressed; the final dimension and percentage are still reported. The labels and counts have no physical units. Tensor columns widen to accommodate the local ranks, signed projections, and global spin labels; the state-index column also widens when required by the global offsets. The ordinary eight-character tensor spacing is retained.
 
 ## Parameters / inputs
 

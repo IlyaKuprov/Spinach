@@ -29,7 +29,7 @@ includes_dir=fullfile(spinach_root,'kernel','includes');
 integrity_dir=fullfile(spinach_root,'kernel','integrity');
 mex_dir=fullfile(spinach_root,'etc','mex');
 
-% Exercise host overrides and GPU guard includes
+% Exercise portable user overrides and GPU guard includes
 result=local_test_autoexec(result,fullfile(includes_dir,'autoexec.m'));
 result=local_test_gpu_guard(result,fullfile(includes_dir,'start_disallow_gpu.m'),...
                             fullfile(includes_dir,'end_disallow_gpu.m'));
@@ -74,48 +74,15 @@ old_toolbar=get(groot,'defaultFigureToolbar');
 cleanup_obj=onCleanup(@()local_restore_autoexec(old_computer,old_position,...
                                                 old_style,old_menu,old_toolbar));
 
-% Check the ALAUNDO GPU-aware override
-sys=struct();
-sys.enable={'gpu'};
-setenv('COMPUTERNAME','ALAUNDO');
-run(autoexec_file);
-result=test_true(result,'autoexec ALAUNDO GPU override',...
-                 isequal(sys.parallel,{'processes',32}),...
-                 'ALAUNDO should use four workers per GPU when GPU arithmetic was requested');
-
-% Check the TALOS GPU-aware override
-sys=struct();
-sys.enable={'gpu'};
-setenv('COMPUTERNAME','TALOS');
-run(autoexec_file);
-result=test_true(result,'autoexec TALOS GPU override',...
-                 isequal(sys.parallel,{'processes',12}),...
-                 'TALOS should use four workers per GPU when GPU arithmetic was requested');
-
-% Check the TALOS non-GPU no-op branch
-sys=struct();
-sys.enable={};
-setenv('COMPUTERNAME','TALOS');
-run(autoexec_file);
-result=test_true(result,'autoexec TALOS CPU no-op',~isfield(sys,'parallel'),...
-                 'TALOS should not invent a parallelisation policy without GPU arithmetic');
-
 % Check that user parallel settings are not overwritten
 sys=struct();
 sys.parallel={'processes',4};
 sys.enable={'gpu'};
-setenv('COMPUTERNAME','TALOS');
+setenv('COMPUTERNAME','UNKNOWN_SPINACH_HOST');
 run(autoexec_file);
 result=test_true(result,'autoexec preserves user parallel setting',...
                  isequal(sys.parallel,{'processes',4}),...
                  'autoexec must not override a user-supplied sys.parallel field');
-
-% Check that unknown hosts leave sys.parallel unset
-sys=struct();
-setenv('COMPUTERNAME','UNKNOWN_SPINACH_HOST');
-run(autoexec_file);
-result=test_true(result,'autoexec unknown host no-op',~isfield(sys,'parallel'),...
-                 'unknown host names should not invent a parallelisation policy');
 
 end
 

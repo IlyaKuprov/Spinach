@@ -18,8 +18,8 @@
 %
 %     fid - complex 1-by-(nsteps+1) trace, including the initial observable
 %
-% The assembled L is in rad/s: L=H+1i*R+1i*K. This function uses MATLAB
-% expm(-1i*L*timestep), then repeats the fixed propagator. Training and
+% Supplied terms use L=H+1i*R+1i*K in rad/s. This function assembles
+% timestep*L before MATLAB expm, then repeats the fixed propagator. Training and
 % projection are separate costs. No physical spin_system is modified, and
 % no tolerance-based screening, processing, or reference is inferred.
 % Accuracy is limited by the supplied reduction and generator, not by a
@@ -29,11 +29,14 @@
 % generator. A zero initial state or detector also needs no propagation.
 % Zero coefficients are omitted from assembly; sparse active terms retain a
 % sparse generator until a dense exponential is needed. An exactly zero
-% assembled generator returns the constant initial signal without an exponential.
+% time-scaled generator returns the constant initial signal without an exponential.
 % Zero generator columns on the state support, or zero rows on the detector
 % support, also give constant traces. Computed zero actions are not inferred.
 % Sparse model terms and states are validated without expanding implicit zeros.
-% Nonfinite computed initial overlaps are rejected, including constant queries.
+% Coefficient/time products are formed first when normal and finite; otherwise
+% terms are multiplied by their coefficient before the time step. Nonzero term
+% entries lost to time-scaling underflow are rejected, not inferred as exact zeros.
+% Nonfinite computed states and overlaps are rejected, including constant queries.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -56,22 +59,38 @@ if (nsteps==0)||(timestep==0)||~any(coefficients)||~any(rho)||~any(model.coil)
     fid(:)=fid(1); return;
 end
 
-% Assemble the projected affine Liouvillian
-L=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
+% Assemble the time-scaled projected affine Liouvillian
+scaled_L=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
 for n=find(coefficients).'
-    L=L+coefficients(n)*model.terms{n};
+    scale=coefficients(n)*timestep;
+    if ~isfinite(scale)||abs(scale)<realmin
+        term=(coefficients(n)*model.terms{n})*timestep;
+    else
+        term=scale*model.terms{n};
+    end
+    if any(isnan(term),'all')||any(isinf(term),'all')
+        error('time-scaled Liouvillian terms must be finite.');
+    end
+    if nnz(term)<nnz(model.terms{n})
+        error('nonzero time-scaled term entries must remain representable.');
+    end
+    scaled_L=scaled_L+term;
+    clear term
 end
-if any(isnan(L),'all')||any(isinf(L),'all')
-    error('assembled Liouvillian must be finite.');
+if any(isnan(scaled_L),'all')||any(isinf(scaled_L),'all')
+    error('time-scaled Liouvillian must be finite.');
 end
 
 % Return the constant observable for a structurally stationary state or detector
-if ~any(any(L,1)&(rho.'~=0))||~any(any(L,2)&(model.coil~=0)), fid(:)=fid(1); return; end
+if ~any(any(scaled_L,1)&(rho.'~=0))||~any(any(scaled_L,2)&(model.coil~=0)), fid(:)=fid(1); return; end
 
 % Propagate the reduced observable with the Spinach sign convention
-P=expm(-1i*full(L)*timestep);
+P=expm(-1i*full(scaled_L)); clear scaled_L
 for n=1:nsteps
     rho=P*rho; fid(n+1)=model.coil'*rho;
+    if any(isnan(rho),'all')||any(isinf(rho),'all')||~isfinite(fid(n+1))
+        error('propagated states and observables must be finite.');
+    end
 end
 
 end

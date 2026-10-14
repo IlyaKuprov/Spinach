@@ -436,6 +436,67 @@ small_fid=pod_evolve(small_phase,1,0.03,3);
 result=test_true(result,'nonzero small generator',imag(small_fid(end))~=0,...
                  'stationary returns use exact nullspace actions rather than a magnitude tolerance');
 
+% Preserve representable time-scaled phases across scalar factor ranges
+for storage={'dense','sparse'}
+    terms={1e-200;2^1000;-1i*2^-1000;-1i*2^800;2^-700;1i*700;1i*log(2)};
+    if strcmp(storage{1},'sparse'), terms=cellfun(@sparse,terms,'UniformOutput',false); end
+    prepared=pod_project(1,terms(1),1,1);
+    observed=pod_evolve(prepared,1e-200,1e200,1);
+    result=test_close(result,['affine tiny phase ' storage{1}],imag(observed(2))/1e-200,...
+                      -1,1e-12,0,'the time step rescues a phase lost by coefficient-term multiplication');
+    prepared.terms=terms(2); observed=pod_evolve(prepared,2^-700,2^-700,1);
+    result=test_close(result,['scalar scale underflow ' storage{1}],imag(observed(2))/2^-400,...
+                      -1,1e-12,0,'term-first ordering avoids an underflowing coefficient-time product');
+    prepared.terms=terms(3);
+    result=test_close(result,['scalar scale overflow ' storage{1}],pod_evolve(prepared,2^700,2^700,1),...
+                      [1 0],0,0,'term-first ordering retains a finite strongly damped exponent');
+    prepared.terms=terms(4);
+    result=test_close(result,['generator scale overflow ' storage{1}],pod_evolve(prepared,2^400,2^-1000,1),...
+                      [1 0],0,0,'time-first ordering avoids an overflowing unscaled generator');
+    prepared.terms=terms(5); rejected=false;
+    try
+        pod_evolve(prepared,2^-700,2^-700,1);
+    catch err
+        rejected=contains(err.message,'must remain representable');
+    end
+    result=test_true(result,['unrepresentable scaled term ' storage{1}],rejected,...
+                     'lost nonzero entries are rejected rather than certified as structural zeros');
+
+    % Reject later range overflow while retaining finite amplified controls
+    prepared.terms=terms(6); prepared.coil=1e-300; rejected=false;
+    try
+        pod_evolve(prepared,1,1,2);
+    catch err
+        rejected=contains(err.message,'propagated states and observables must be finite');
+    end
+    result=test_true(result,['later state overflow ' storage{1}],rejected,...
+                     'state overflow cannot silently corrupt a representable detector-scaled observable');
+    observed=pod_evolve(prepared,1,1,1);
+    result=test_close(result,['finite amplified state ' storage{1}],observed(2)/exp(700+log(1e-300)),...
+                      1,1e-12,0,'the preceding representable state and observable remain supported');
+    prepared.terms=terms(7);
+    for phase=[1 1+1i]
+        prepared.coil=phase*(realmax/2); rejected=false;
+        try
+            pod_evolve(prepared,1,1,2);
+        catch err
+            rejected=contains(err.message,'propagated states and observables must be finite');
+        end
+        result=test_true(result,['later detector overflow ' storage{1} ' ' num2str(phase)],rejected,...
+                         'finite propagated states whose detection overflows are rejected');
+        prepared.coil=phase*(realmax/4);
+        result=test_close(result,['finite amplified detector ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,1,1,2)/realmax,conj(phase)*[1/4 1/2 1],1e-12,0,...
+                          'finite real and complex amplified observables remain supported');
+    end
+end
+
+% Retain a detector-visible tiny phase of a sparse mixing generator
+scaled_mixing=pod_project(eye(2),{1e-200*sparse([0 1;1 0])},[1;0],[0;1]);
+observed=pod_evolve(scaled_mixing,1e-200,1e200,1);
+result=test_close(result,'affine tiny mixing phase',imag(observed(2))/1e-200,-1,1e-12,0,...
+                  'a zero initial overlap does not hide a representable off-diagonal phase');
+
 % Preserve finite phases when a state action underflows rather than vanishes
 scaled_state=struct('terms',{{sparse(1e-200)}},'rho',1e-200,'coil',1e200);
 result=test_close(result,'underflowing state action',pod_evolve(scaled_state,1,1e200,3),...

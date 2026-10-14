@@ -25,14 +25,14 @@
 % the reduced rank, never forming a full propagator or full state trajectory.
 % Scalar models use the identical closed-form scalar exponential.
 % Coefficients, terms and time are assembled in one binary-exponent frame,
-% restoring only the summed time-scaled generator. No fallback order is used.
+% restoring only its structurally observable part. No fallback order is used.
 % A state-conditioned real scalar shift and working-state amplitude are carried
 % separately; only the detected observable is restored to physical units.
 % Equivalent forward/adjoint actions choose the smaller initial norm-growth
 % rate; this changes neither the generator nor the Hermitian observable.
 % The diagonal is stored separately; callbacks apply its scalar shift without
 % constructing a shifted dense operator. The Hermitian bound and induced norms
-% use sparse reductions or bounded dense scans, never a dense Hermitian part.
+% use row/column sums or bounded dense scans, never a stored Hermitian part.
 % Real actions and states retain real working storage. The native callback prevents an
 % additional automatic trace shift.
 % Block widths use a Hermitian-part growth bound and the double range;
@@ -50,7 +50,7 @@
 % Matrix products require nonzero operand-component pairs to remain nonzero
 % at the working scale; this can conservatively reject a finite physical result.
 % Exponent-aware component products preserve finite scaled observables.
-% Structurally unreachable or unobservable coordinates are removed exactly.
+% Structural paths are reduced before assembly and after affine cancellation.
 % Implicit support traversal uses bounded dense row/column slices; sparse
 % reverse traversal stores transposed sparse terms. Fixed off-diagonal component
 % bounds, Hermitian radii, and induced norms preserve the operator storage;
@@ -121,8 +121,18 @@ for n=active(order)
     A=A+scaled;
 end
 
-% Release affine term workspaces before restoring the physical generator
+% Release term workspaces and remove paths disconnected by affine cancellation
 clear term scaled terms
+coordinates=intersect(reachable_support({A},1,find(rho),false),...
+                      reachable_support({A},1,find(coil),true));
+if isempty(coordinates), fid(:)=0; return; end
+if numel(coordinates)<size(rho,1)
+    A=A(coordinates,coordinates);
+    [rho,rebase]=binary_normalise(rho(coordinates)); state_exp=state_exp+rebase;
+    [coil,rebase]=binary_normalise(coil(coordinates)); coil_exp=coil_exp+rebase;
+end
+
+% Restore only the observable part of the time-scaled generator
 scaled=binary_scale(A,common_exp);
 A=-1i*scaled; clear scaled
 if ~any(any(A,1)&(rho.'~=0))||~any(any(A,2)&(coil~=0)), fid(:)=fid(1); return; end
@@ -201,8 +211,8 @@ function [radii,norms,minimum,exponent]=action_bounds(A,diagonal)
 % Measure the Hermitian row radii and both induced column norms once
 largest=max(max(abs(real(diagonal)),[],'all'),max(abs(imag(diagonal)),[],'all'));
 if issparse(A)
-    radii=full(sum(abs(A/2+A'/2),2));
     norms=full([sum(abs(A),1).' sum(abs(A),2)]); minimum=component_min(A);
+    radii=norms(:,1)/2+norms(:,2)/2;
     largest=full(max(largest,max(max(abs(real(A)),[],'all'),max(abs(imag(A)),[],'all'))));
 else
     radii=zeros(size(A,1),1); norms=zeros(size(A,1),2); minimum=Inf;
@@ -222,15 +232,19 @@ function growth=real_growth(A,diagonal,exponent,rho)
 
 % The real Rayleigh rate is identical for a generator and its Hermitian adjoint
 if issparse(A)
-    action=binary_scale(A,-exponent)*rho;
+    left=rho'; overlap=0;
+    for k=1:size(A,2)
+        overlap=overlap+(left*binary_scale(A(:,k),-exponent))*rho(k);
+    end
+    overlap=overlap+left*(binary_scale(diagonal,-exponent).*rho);
 else
     action=zeros(size(rho));
     for k=1:size(A,2)
         action=action+binary_scale(A(:,k),-exponent)*rho(k);
     end
+    action=action+binary_scale(diagonal,-exponent).*rho; overlap=rho'*action;
 end
-action=action+binary_scale(diagonal,-exponent).*rho;
-growth=pow2(real(rho'*action)/(rho'*rho),exponent);
+growth=pow2(real(overlap)/(rho'*rho),exponent);
 
 end
 

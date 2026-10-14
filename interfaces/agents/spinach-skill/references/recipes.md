@@ -812,6 +812,9 @@ accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
 
 The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Implicit term-support traversal avoids constructing dense support graphs. Per-term assembly workspaces are released before physical rescaling. The diagonal is separated once; scalar shifts are applied in the callback without a second dense generator. Hermitian radii and forward/adjoint norms use sparse reductions or bounded dense column/row scans. Real states/actions retain real storage. Fixed off-diagonal bounds are measured once; shifted diagonal bounds are cached per block. Dense range scans use bounded columns. Fixed basis adjoints and component ranges are prepared once outside projection slices. All-real projection data retain real working slices and prepared coordinates. Extreme normalised operand ranges are explicit errors, not silent product underflow.
 
-Sparse POD action bounds use sparse reductions and native sparse Rayleigh
-products; dense generators use bounded column and row workspace. Binary
+Repeat directed reachability on the assembled affine sum before restoring
+physical units, because affine cancellation can disconnect previously linked modes.
+Sparse POD action bounds use absolute row/column sums, with their half-sum
+bounding Hermitian radii without constructing a Hermitian part. Rayleigh
+estimates stream normalised columns and sparse scalar overlaps. Binary
 scaling checks stored component counts, avoiding implicit-zero masks.

@@ -53,3 +53,5 @@ Independent rank-one relaxation exponentials and two-mode triangular formulas ex
 Scalar complex-phase controls preserve the selected adjoint conjugation in the closed-form action, including exchanged state and detector roles.
 
 Connected tridiagonal relaxation fixtures compare dense and rank-8192 sparse models with an independent alternating-eigenmode exponential, complex coefficients, and exchanged source/detector roles.
+
+Affine connecting-path cancellations exclude an unobserved growing mode before restoring its physical scale, including a sum whose irrelevant diagonal would overflow. Dense/sparse and real/imaginary detectors use an independent scalar phase; residual connecting paths remain explicit range errors.

@@ -939,6 +939,31 @@ for storage={'dense','sparse'}
     end
 end
 
+% Remove disconnected affine cancellations before restoring irrelevant growth
+for storage={'dense','sparse'}
+    for residual=[0 1]
+        for phase=[1 1i]
+            first=[1 1;1 1i*2^1023]; second=[0 -1;-1 residual*1i*2^1023];
+            if strcmp(storage{1},'sparse'), first=sparse(first); second=sparse(second); end
+            prepared=struct('terms',{{first;second}},'rho',[1;0],'coil',[phase;0]);
+            reference=conj(phase)*exp(-1i*(0:3));
+            result=test_close(result,['affine disconnected ' storage{1} ' ' num2str(residual) ' ' num2str(phase)],...
+                              pod_evolve(prepared,[1;1],1,3),reference,1e-12,0,...
+                              'cancelled connecting paths exclude finite or unrepresentable irrelevant growth');
+        end
+    end
+    second=[0 -0.5;-0.5 0];
+    if strcmp(storage{1},'sparse'), second=sparse(second); end
+    prepared.terms={first;second}; rejected=false;
+    try
+        pod_evolve(prepared,[1;1],1,3);
+    catch
+        rejected=true;
+    end
+    result=test_true(result,['affine connected range ' storage{1}],rejected,...
+                     'a genuine path to extreme growth remains outside the supported working range');
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

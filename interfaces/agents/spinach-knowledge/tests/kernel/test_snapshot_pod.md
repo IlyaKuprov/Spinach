@@ -37,3 +37,5 @@ Compensating block amplitudes and weights have independently known singular valu
 Streamed dense-term projection is checked against independently selected coordinates of a1000-by1000 complex operator; projected state and detector selections are exact. Sparse prepared storage remains a maintained acceptance condition. Non-double time and integer-count inputs are rejected explicitly.
 
 Additional references cover scaled-product rejection, exponent-aware real and complex overlap, disconnected unstable modes, and directed source-to-detector paths against independent triangular formulas.
+
+Additional real/imaginary tiny-basis fixtures reject product loss in both Galerkin stages. Constant-query detector fixtures now require the finite exponent-aware overlap instead of rejecting it. Exact complex-component, projection and detection cancellations remain independent controls.

@@ -501,6 +501,62 @@ small_fid=pod_evolve(small_phase,1,0.03,3);
 result=test_true(result,'nonzero small generator',imag(small_fid(end))~=0,...
                  'stationary returns use structural support rather than a magnitude tolerance');
 
+% Reject vanished normalised products without confusing exact cancellation with loss
+for storage={'dense','sparse'}
+    for phase=[1 1i]
+        tiny_basis=[1;phase*2^-1074]; huge_state=[0;2^1023]; huge_term=[0 2^1023;0 0];
+        if strcmp(storage{1},'sparse')
+            tiny_basis=sparse(tiny_basis); huge_state=sparse(huge_state); huge_term=sparse(huge_term);
+        end
+        for query={@()pod_project(tiny_basis,{zeros(2)},huge_state,[1;0]),...
+                   @()pod_project(tiny_basis,{zeros(2)},[1;0],huge_state),...
+                   @()pod_project(tiny_basis,{huge_term},[1;0],[1;0])}
+            rejected=false;
+            try
+                query{1}();
+            catch err
+                rejected=contains(err.message,'product dynamic range');
+            end
+            result=test_true(result,['projection product loss ' storage{1} ' ' num2str(phase)],...
+                             rejected,'tiny basis factors lost inside either matrix product are rejected');
+        end
+        prepared=struct('terms',{{zeros(2)}},'rho',[2^1023;phase*2^-50],'coil',[0;2^1023]);
+        if strcmp(storage{1},'sparse')
+            prepared.rho=sparse(prepared.rho); prepared.coil=sparse(prepared.coil);
+        end
+        for query={[0 0 0],[1 0 2],[0 0.03 2],[1 0.03 2]}
+            evaluation=query{1};
+            result=test_close(result,['detection product preservation ' storage{1} ' ' num2str(phase)],...
+                              pod_evolve(prepared,evaluation(1),evaluation(2),evaluation(3))/2^973,...
+                              phase*ones(1,evaluation(3)+1),0,0,...
+                              'exponent-aware detection retains the finite overlap in every constant query');
+        end
+    end
+    prepared=struct('terms',{{0.5+1i*2^-1074}},'rho',1,'coil',1);
+    if strcmp(storage{1},'sparse'), prepared.terms={sparse(prepared.terms{1})}; end
+    rejected=false;
+    try
+        pod_evolve(prepared,1i,1,1);
+    catch err
+        rejected=contains(err.message,'product dynamic range');
+    end
+    result=test_true(result,['affine component product loss ' storage{1}],rejected,...
+                     'a surviving complex component cannot mask a vanished constituent product');
+    prepared=struct('terms',{{0.5+0.5i}},'rho',1,'coil',1);
+    result=test_close(result,['complex component cancellation ' storage{1}],...
+                      pod_evolve(prepared,1+1i,1,2),exp(0:2),1e-12,0,...
+                      'representable real products may cancel exactly during complex multiplication');
+    prepared=struct('terms',{{zeros(2)}},'rho',[1;1],'coil',[1;-1]);
+    result=test_close(result,['detection exact cancellation ' storage{1}],...
+                      pod_evolve(prepared,0,0,0),0,0,0,...
+                      'a zero overlap from finite cancelling products remains supported');
+    exact_basis=[1;1]/sqrt(2);
+    if strcmp(storage{1},'sparse'), exact_basis=sparse(exact_basis); end
+    prepared=pod_project(exact_basis,{zeros(2)},2^1000*[1;-1],[1;0]);
+    result=test_close(result,['projection exact cancellation ' storage{1}],prepared.rho,0,0,0,...
+                      'a zero projected coordinate from finite cancelling products remains supported');
+end
+
 % Preserve representable time-scaled phases across scalar factor ranges
 for storage={'dense','sparse'}
     terms={1e-200;2^1000;-1i*2^-1000;-1i*2^800;2^-700;1i*700;1i*log(2)};

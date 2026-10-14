@@ -120,8 +120,11 @@ for n=active(order)
     scaled=binary_scale(term,exponents(n)-common_exp);
     A=A+scaled;
 end
+
+% Release affine term workspaces before restoring the physical generator
+clear term scaled terms
 scaled=binary_scale(A,common_exp);
-A=-1i*scaled; clear term scaled
+A=-1i*scaled; clear scaled
 if ~any(any(A,1)&(rho.'~=0))||~any(any(A,2)&(coil~=0)), fid(:)=fid(1); return; end
 
 % Certify scalar physical underflow from the largest finite complex signal

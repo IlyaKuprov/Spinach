@@ -784,5 +784,7 @@ projection, and repeated evaluation have separate costs. The maintained
 propagator truncation, methyl model, pulse fit, slow-mode selection, or offset
 interpolation is supplied by these utilities. Randomised basis construction
 uses blockwise range products and sketch-width residual slices rather than
-dense snapshot concatenation; sparse
-Liouvillian validation inspects only stored entries.
+dense snapshot concatenation. Sketch and compressed arrays still depend on
+the total snapshot-column count; sparse Liouvillian validation inspects only
+stored entries. The regression checks sparse snapshot finiteness and zero-data
+rejection for both methods, including preservation of the caller's RNG.

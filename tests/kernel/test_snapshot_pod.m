@@ -96,11 +96,36 @@ for power_iters=[0 2]
                      'genuinely truncated sketches preserve the caller random state');
 end
 
+% Check sparse snapshots against dense data and reject nonfinite or zero data
+for sparse_opts={exact_opts,rand_opts}
+    sparse_result=pod_basis({sparse(raw);sparse(3,2)},[1;0],2,sparse_opts{1});
+    dense_result=pod_basis({raw;zeros(3,2)},[1;0],2,sparse_opts{1});
+    result=test_close(result,['sparse snapshots ' sparse_opts{1}.method],...
+                      sparse_result.basis*sparse_result.basis',...
+                      dense_result.basis*dense_result.basis',1e-12,0,...
+                      'finite sparse snapshots and zero-weight blocks preserve the weighted subspace');
+    for bad_value=[NaN Inf 0]
+        before=rng; rejected=false;
+        try
+            pod_basis({sparse(1,1,bad_value,3,3)},1,1,sparse_opts{1});
+        catch
+            rejected=true;
+        end
+        result=test_true(result,['sparse data ' sparse_opts{1}.method ' ' num2str(bad_value)],...
+                         rejected&&isequal(before,rng),...
+                         'stored NaN/Inf and all-zero sparse data fail without changing caller RNG');
+    end
+end
+
 % Retain sparse Liouvillian terms and reject nonfinite stored entries
 sparse_basis=[speye(2);sparse(2046,2)]; sparse_state=sparse_basis(:,1);
 sparse_model=pod_project(full(sparse_basis),{speye(2048)},full(sparse_state),full(sparse_state));
 result=test_close(result,'sparse term projection',sparse_model.terms{1},eye(2),...
                   1e-12,0,'sparse implicit zeros do not alter the Galerkin projection');
+zero_model=pod_project(full(sparse_basis),{sparse(2048,2048)},...
+                       full(sparse_state),full(sparse_state));
+result=test_close(result,'zero sparse term',zero_model.terms{1},zeros(2),...
+                  0,0,'a finite zero Liouvillian is a valid affine term');
 for bad_value=[NaN Inf]
     rejected=false;
     try

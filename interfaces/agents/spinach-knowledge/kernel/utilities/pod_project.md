@@ -11,3 +11,5 @@ Projection rejects operand ranges whose normalised real component products would
 The matrix-product range contract conservatively requires every nonzero operand-component pair to remain nonzero at the working scale; it can reject a physically finite result rather than silently lose a contribution.
 
 The fixed Hermitian basis and its component minimum are prepared once for all projection slices, terms, and states. Range scans use bounded dense columns or stored sparse components; no full-basis range scan occurs inside the slice loop.
+
+All-real projection operands retain real slice and prepared-array storage. Complex operands promote the result naturally; no imaginary component is discarded.

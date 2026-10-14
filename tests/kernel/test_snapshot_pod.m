@@ -851,6 +851,29 @@ for storage={'dense','sparse'}
     end
 end
 
+% Preserve real projection storage without discarding genuinely complex coordinates
+for basis_kind={'dense','sparse'}
+    for term_kind={'dense','sparse'}
+        subspace=eye(3,2); term=diag(1:3); rho=[1;2;3]; coil=[3;2;1];
+        if strcmp(basis_kind{1},'sparse'), subspace=sparse(subspace); end
+        if strcmp(term_kind{1},'sparse'), term=sparse(term); end
+        label=[basis_kind{1} ' ' term_kind{1}];
+        prepared=pod_project(subspace,{term},rho,coil);
+        result=test_true(result,['real projected storage ' label],...
+                         isreal(prepared.terms{1})&&isreal(prepared.rho)&&isreal(prepared.coil),...
+                         'all-real Galerkin data retain real prepared arrays');
+        result=test_close(result,['real projected values ' label],...
+                          [prepared.terms{1},prepared.rho,prepared.coil],...
+                          [1 0 1 3;0 2 2 2],0,0,...
+                          'coordinate selection agrees with independent real entries');
+        term(1,2)=1i; prepared=pod_project(subspace,{term},1i*rho,coil);
+        result=test_close(result,['complex storage control ' label],...
+                          [prepared.terms{1},prepared.rho,prepared.coil],...
+                          [1 1i 1i 3;0 2 2i 2],0,0,...
+                          'complex term and state contributions survive real initial allocation');
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

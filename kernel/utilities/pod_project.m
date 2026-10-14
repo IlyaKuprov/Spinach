@@ -34,7 +34,8 @@
 % matrix products and restores physical units
 % afterwards. The fixed Hermitian basis and its component range are prepared
 % once, outside the projection slices. Dense range scans use bounded columns.
-% Unsupported component loss is rejected, not silently removed.
+% Real operands retain real slice and output storage; complex products promote
+% storage only when required. Unsupported component loss is rejected, not removed.
 % Nonzero operand-component pairs must remain nonzero at the working scale;
 % this conservative product-range contract can reject a finite physical result.
 % The Gram tolerance uses a dimension-dependent complex-arithmetic budget
@@ -80,17 +81,18 @@ end
 
 % Allocate only the required projected coordinates while preserving sparse storage
 if issparse(left_basis)&&issparse(data)
-    projected=complex(sparse(size(left_basis,1),size(right,2)));
+    projected=sparse(size(left_basis,1),size(right,2));
 else
-    projected=complex(zeros(size(left_basis,1),size(right,2)));
+    projected=zeros(size(left_basis,1),size(right,2));
 end
 
 % Accumulate the Galerkin product from bounded normalised column slices
 for n=1:width:size(data,2)
     columns=n:min(n+width-1,size(data,2)); part=data(:,columns);
-    scaled=complex(pow2(real(part),-exponent),pow2(imag(part),-exponent));
+    scaled=pow2(real(part),-exponent);
+    if ~isreal(part), scaled=complex(scaled,pow2(imag(part),-exponent)); end
     if any((real(part)~=0)&(real(scaled)==0),'all')||...
-       any((imag(part)~=0)&(imag(scaled)==0),'all')
+       (~isreal(part)&&any((imag(part)~=0)&(imag(scaled)==0),'all'))
         error('projection data dynamic range exceeds the normalised double representation.');
     end
     if basis_min*component_min(scaled)==0
@@ -100,7 +102,11 @@ for n=1:width:size(data,2)
 end
 
 % Restore physical units and reject unsupported projected coordinates
-projected=complex(pow2(real(projected),exponent),pow2(imag(projected),exponent));
+if isreal(projected)
+    projected=pow2(projected,exponent);
+else
+    projected=complex(pow2(real(projected),exponent),pow2(imag(projected),exponent));
+end
 if any(isnan(projected),'all')||any(isinf(projected),'all')
     error('projected terms and states must be finite.');
 end

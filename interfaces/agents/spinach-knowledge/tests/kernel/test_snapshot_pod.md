@@ -45,3 +45,5 @@ Dense real/complex invariant-mode references cover short and composed small-step
 Complete-support dense/sparse normal dynamics use an independent rank-one exponential formula, with real/complex detection and one/two affine terms. These references validate graph bypass and callback range caching without inferring accuracy from their implementation.
 
 Dense-basis diagonal projection uses independent parity-sum formulas for real/complex coordinates with sparse/dense terms. Incomplete dense supports and disconnected controls compare implicit directed traversal against independent full exponentials, with real/complex detection and both storage types.
+
+Real-storage controls compare dense/sparse coordinate projections with exact selected entries, and retain genuinely complex terms and states.

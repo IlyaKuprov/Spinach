@@ -806,3 +806,5 @@ active term; mixed state/detector sides do not establish stationarity. Computed
 zero actions can underflow and are not certificates. Sparse storage is preserved
 until a dense small reduced propagator is actually required. No componentwise
 accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
+
+The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Extreme normalized operand ranges are explicit errors, not silent product underflow.

@@ -655,6 +655,56 @@ result=test_close(result,'amplified non-normal composition',observed(2:3)./refer
                   ones(1,2),1e-12,0,...
                   'binary amplitude propagation preserves a detector-scaled triangular semigroup');
 
+% Guard scaled matrix products and retain exponent-aware observable products
+for storage={'dense','sparse'}
+    subspace=[1;2^-1074]; initial=[0;2^1023]; detector=[1;0]; terms={zeros(2)};
+    if strcmp(storage{1},'sparse')
+        subspace=sparse(subspace); initial=sparse(initial); detector=sparse(detector); terms={sparse(2,2)};
+    end
+    rejected=false;
+    try
+        pod_project(subspace,terms,initial,detector);
+    catch err
+        rejected=contains(err.message,'product dynamic range');
+    end
+    result=test_true(result,['projection product range ' storage{1}],rejected,...
+                     'a tiny basis component must not be silently lost in a scaled product');
+    prepared=struct('terms',{{0.5+1i*2^-1074}},'rho',1,'coil',1);
+    if strcmp(storage{1},'sparse'), prepared.terms={sparse(prepared.terms{1})}; end
+    rejected=false;
+    try
+        pod_evolve(prepared,1i,1,1);
+    catch err
+        rejected=contains(err.message,'product dynamic range');
+    end
+    result=test_true(result,['affine component product range ' storage{1}],rejected,...
+                     'nonzero complex components must not disappear before a range check');
+    for phase=[1 1i 1+1i]
+        prepared=struct('terms',{terms},'rho',[2^1023;2^-50],'coil',phase*[0;2^1023]);
+        if strcmp(storage{1},'sparse')
+            prepared.rho=sparse(prepared.rho); prepared.coil=sparse(prepared.coil);
+        end
+        result=test_close(result,['exponent-aware overlap ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,0,0,0)/2^973,conj(phase),0,0,...
+                          'component exponents preserve a finite dot product across vector scales');
+    end
+end
+
+% Remove inaccessible growth while retaining directed paths to the observable
+for storage={'dense','sparse'}
+    terms={1i*diag([2000 -1])}; subspace=eye(2);
+    if strcmp(storage{1},'sparse'), terms={sparse(terms{1})}; subspace=sparse(subspace); end
+    prepared=pod_project(subspace,terms,[0;1],[0;1]);
+    result=test_close(result,['disconnected growth ' storage{1}],pod_evolve(prepared,1,1,3),...
+                      exp(-(0:3)),1e-14,0,'an unreachable unstable block cannot spoil a finite observable');
+    A=diag([-1 -2 -3 2000]); A(1,2)=1; A(2,3)=1;
+    if strcmp(storage{1},'sparse'), A=sparse(A); end
+    prepared=struct('terms',{{1i*A}},'rho',[0;0;1;0],'coil',[1;0;0;0]);
+    times=0:3; reference=exp(-times).*(-expm1(-times)).^2/2;
+    result=test_close(result,['directed observable paths ' storage{1}],pod_evolve(prepared,1,1,3),...
+                      reference,1e-13,0,'all intermediate coordinates on a source-to-detector path remain');
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

@@ -33,6 +33,8 @@
 % power-of-two scale in column slices bounded by reduced rank before
 % matrix products and restores physical units
 % afterwards. Unsupported component loss is rejected, not silently removed.
+% Nonzero operand-component pairs must remain nonzero at the working scale;
+% this conservative product-range contract can reject a finite physical result.
 % The Gram tolerance uses a dimension-dependent complex-arithmetic budget
 % gamma(8*n)*r, with gamma(k)=k*eps/(1-k*eps).
 % Galerkin projection: Benner et al., DOI:10.1137/130932715, section 2.2.
@@ -85,7 +87,7 @@ for n=1:width:size(data,2)
        any((imag(part)~=0)&(imag(scaled)==0),'all')
         error('projection data dynamic range exceeds the normalised double representation.');
     end
-    projected=projected+(basis'*scaled)*right(columns,:);
+    projected=projected+checked_product(checked_product(basis',scaled),right(columns,:));
 end
 
 % Restore physical units and reject unsupported projected coordinates
@@ -93,6 +95,19 @@ projected=complex(pow2(real(projected),exponent),pow2(imag(projected),exponent))
 if any(isnan(projected),'all')||any(isinf(projected),'all')
     error('projected terms and states must be finite.');
 end
+
+end
+
+% Reject unsupported operand ranges before a bounded matrix product
+function product=checked_product(left,right)
+
+% Bound every nonzero real component product without forming a product array
+left_parts=[nonzeros(real(left));nonzeros(imag(left))];
+right_parts=[nonzeros(real(right));nonzeros(imag(right))];
+if ~isempty(left_parts)&&~isempty(right_parts)&&min(abs(left_parts))*min(abs(right_parts))==0
+    error('projection product dynamic range exceeds the normalised double representation.');
+end
+product=left*right;
 
 end
 

@@ -32,6 +32,10 @@
 % Nonfinite projected data, unrepresentable generator/component ranges,
 % and nonfinite output signals are explicit errors. No arbitrary-precision or
 % componentwise accuracy guarantee is implied for ill-conditioned dynamics.
+% Matrix products require nonzero operand-component pairs to remain nonzero
+% at the working scale; this can conservatively reject a finite physical result.
+% Exponent-aware component products preserve finite scaled observables.
+% Structurally unreachable or unobservable coordinates are removed exactly.
 % Constant requests and common structural stationary supports avoid expm;
 % computed zero actions are never used to infer stationarity. Sparse terms
 % remain sparse until the reduced dense exponential is actually needed.
@@ -65,12 +69,22 @@ for n=active
 end
 if state_fixed||coil_fixed, fid(:)=fid(1); return; end
 
+% Retain only coordinates on structural paths from the state to the detector
+terms=model.terms; nranks=size(rho,1); adjacency=sparse(nranks,nranks);
+for n=active, adjacency=adjacency+spones(sparse(terms{n})); end
+coordinates=intersect(reachable_support(adjacency.',find(rho)),...
+                      reachable_support(adjacency,find(coil)));
+if isempty(coordinates), fid(:)=0; return; end
+for n=active, terms{n}=terms{n}(coordinates,coordinates); end
+[rho,rebase]=binary_normalise(rho(coordinates)); state_exp=state_exp+rebase;
+[coil,rebase]=binary_normalise(coil(coordinates)); coil_exp=coil_exp+rebase;
+
 % Determine a common binary frame for the complete time-scaled affine sum
 [time_frac,time_exp]=log2(timestep); term_exp=zeros(size(coefficients));
 coef_frac=complex(zeros(size(coefficients))); coef_exp=zeros(size(coefficients));
 for n=active
     [coef_frac(n),coef_exp(n)]=binary_normalise(coefficients(n));
-    largest=max(max(abs(real(model.terms{n})),[],'all'),max(abs(imag(model.terms{n})),[],'all'));
+    largest=max(max(abs(real(terms{n})),[],'all'),max(abs(imag(terms{n})),[],'all'));
     if largest==0, term_exp(n)=-Inf; else, [~,term_exp(n)]=log2(largest); end
 end
 exponents=term_exp+coef_exp+time_exp; common_exp=max(exponents(active));
@@ -78,13 +92,11 @@ if ~isfinite(common_exp), fid(:)=fid(1); return; end
 
 % Sum normalised terms before restoring their physical time-scaled magnitude
 [~,order]=sort(exponents(active),'descend');
-A=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
+A=complex(sparse(numel(coordinates),numel(coordinates)));
 for n=active(order)
     if ~isfinite(term_exp(n)), continue; end
-    [term,~]=binary_normalise(model.terms{n}); term=term*(coef_frac(n)*time_frac);
-    if nnz(term)<nnz(model.terms{n})
-        error('affine term dynamic range exceeds the normalised double representation.');
-    end
+    [term,~]=binary_normalise(terms{n});
+    term=checked_product(term,checked_product(coef_frac(n),time_frac));
     scaled=complex(pow2(real(term),exponents(n)-common_exp),...
                    pow2(imag(term),exponents(n)-common_exp));
     if any((real(term)~=0)&(real(scaled)==0),'all')||...
@@ -117,7 +129,7 @@ P=P*exp(growth-growth_exp*log(2)); prop_exp=prop_exp+growth_exp;
 
 % Propagate normalised coordinates and restore only the observable amplitude
 for n=1:nsteps
-    [rho,step_exp]=binary_normalise(P*rho); state_exp=state_exp+prop_exp+step_exp;
+    [rho,step_exp]=binary_normalise(checked_product(P,rho)); state_exp=state_exp+prop_exp+step_exp;
     if abs(state_exp)>=flintmax, error('state exponent exceeds the exact integer range.'); end
     fid(n+1)=detect_scaled(coil,rho,state_exp+coil_exp);
 end
@@ -137,11 +149,62 @@ end
 data=scaled;
 end
 
-% Restore the physical observable after a bounded Hermitian inner product
+% Restore an observable using exponent-aware real component products
 function signal=detect_scaled(coil,rho,exponent)
-signal=coil'*rho;
-signal=complex(pow2(real(signal),exponent),pow2(imag(signal),exponent));
+
+% Accumulate the real and imaginary Hermitian products in independent frames
+components=cell(2,2);
+components(1,:)={real(coil),real(rho)};
+components(2,:)={imag(coil),imag(rho)};
+signal=complex(0);
+for n=1:2
+    fractions=[]; powers=[];
+    for k=1:2
+        left=components{k,1}; right=components{k,2}; indices=find((left~=0)&(right~=0));
+        [left_frac,left_exp]=log2(abs(full(left(indices))));
+        [right_frac,right_exp]=log2(abs(full(right(indices))));
+        fractions=[fractions;sign(left(indices)).*sign(right(indices)).*left_frac.*right_frac]; %#ok<AGROW>
+        powers=[powers;left_exp+right_exp]; %#ok<AGROW>
+    end
+    if ~isempty(powers)
+        [powers,~,groups]=unique(powers); fractions=accumarray(groups,full(fractions));
+        powers=powers(fractions~=0); fractions=fractions(fractions~=0);
+        if ~isempty(powers)
+            common=max(powers); scaled=pow2(fractions,powers-common);
+            if any((fractions~=0)&(scaled==0))
+                error('observable product dynamic range exceeds the normalised double representation.');
+            end
+            signal=signal+(1i^(n-1))*pow2(sum(scaled),common+exponent);
+        end
+    end
+    components(1,:)={real(coil),imag(rho)};
+    components(2,:)={-imag(coil),real(rho)};
+end
 if ~isfinite(signal), error('detected observable must be finite.'); end
+
+end
+
+% Find all directed paths from a support using one auxiliary graph vertex
+function coordinates=reachable_support(adjacency,support)
+
+% Traverse the structural graph without numerical actions or dense expansion
+nranks=size(adjacency,1); connectivity=digraph(adjacency);
+connectivity=addedge(connectivity,repmat(nranks+1,numel(support),1),support,ones(numel(support),1));
+coordinates=bfsearch(connectivity,nranks+1); coordinates(coordinates==nranks+1)=[];
+
+end
+
+% Reject unsupported operand ranges before a bounded matrix product
+function product=checked_product(left,right)
+
+% Bound every nonzero real component product without forming a product array
+left_parts=[nonzeros(real(left));nonzeros(imag(left))];
+right_parts=[nonzeros(real(right));nonzeros(imag(right))];
+if ~isempty(left_parts)&&~isempty(right_parts)&&min(abs(left_parts))*min(abs(right_parts))==0
+    error('working product dynamic range exceeds the normalised double representation.');
+end
+product=left*right;
+
 end
 
 % Consistency enforcement

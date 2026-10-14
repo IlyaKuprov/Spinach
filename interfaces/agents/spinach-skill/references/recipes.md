@@ -768,6 +768,11 @@ comments; widths require a method description.
 
 ## Snapshot POD for repeated parameter families
 
+For tiny snapshot scales, `total_energy` may round to zero even when the
+unsquared data norm is nonzero. `residual_rel` uses that unsquared norm;
+zero data and overflowing energy remain errors. This is not a guarantee for
+arbitrary subnormal inputs.
+
 For a defined system and parameter family, train explicitly with `pod_basis`,
 project fixed affine Liouvillian terms and initial/detection vectors once with
 `pod_project`, and evaluate their coefficients with `pod_evolve`. Supplied

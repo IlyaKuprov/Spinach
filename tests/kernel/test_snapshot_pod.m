@@ -23,6 +23,43 @@ saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng));
 exact_opts=struct('method','svd','oversampling',0,'power_iters',0,'seed',7);
 rand_opts=struct('method','randomised','oversampling',1,'power_iters',2,'seed',7);
 
+% Check tiny nonzero norms without using underflowed energy as a zero test
+tiny_opts={exact_opts,...
+           struct('method','randomised','oversampling',0,'power_iters',0,'seed',7),...
+           struct('method','randomised','oversampling',0,'power_iters',2,'seed',7)};
+for n=1:numel(tiny_opts)
+    opts=tiny_opts{n}; before=rng; label=num2str(n); scale=1e-200;
+    tiny=pod_basis({scale},1,1,opts);
+    result=test_close(result,['tiny scalar value ' label],tiny.singular_vals/scale,...
+                      1,1e-12,0,'the nonzero rank-one singular value survives energy underflow');
+    result=test_close(result,['tiny scalar residual ' label],tiny.residual_rel,...
+                      0,1e-12,0,'relative residual uses the unsquared norm');
+    result=test_true(result,['tiny energy and RNG ' label],...
+                     tiny.total_energy==0&&isequal(before,rng),...
+                     'rounded-zero energy is a diagnostic and the caller RNG is preserved');
+    if strcmp(opts.method,'randomised'), opts.oversampling=1; end
+    tiny=pod_basis({scale*diag([3 1 0.5])},1,2,opts);
+    result=test_close(result,['tiny truncated projector ' label],...
+                      tiny.basis*tiny.basis',diag([1 1 0]),1e-12,0,...
+                      'tiny rank-two truncation retains the independently known subspace');
+    result=test_close(result,['tiny truncated residual ' label],tiny.residual_abs/scale,...
+                      0.5,1e-12,0,'scaled absolute residual retains the omitted mode');
+    result=test_close(result,['tiny relative residual ' label],tiny.residual_rel,...
+                      0.5/sqrt(10.25),1e-12,0,'relative diagnostics remain meaningful at tiny scale');
+    invalid_tiny={zeros(3),scale*diag([1 0 0]),1e200*eye(3)};
+    for k=1:numel(invalid_tiny)
+        rejected=false; before=rng;
+        try
+            pod_basis(invalid_tiny(k),1,2,opts);
+        catch
+            rejected=true;
+        end
+        result=test_true(result,['tiny invalid ' label ' ' num2str(k)],...
+                         rejected&&isequal(before,rng),...
+                         'zero data, unsupported rank, and energy overflow still fail with RNG preserved');
+    end
+end
+
 % Test a weighted complex diagonal snapshot matrix with known singular values
 blocks={diag([3 1i 0.5]);diag([1 2i 1])}; weights=[1;4];
 observed=pod_basis(blocks,weights,2,exact_opts);

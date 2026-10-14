@@ -4,6 +4,8 @@ The regression uses independently known weighted singular values and projection 
 
 The test separates algebraic projection correctness from truncation accuracy, checks complex detection conjugation and Spinach's propagation sign, and rejects unsupported ranks and input shapes. Compact scaled numerical references target 1e-12 maximum absolute error; they do not certify arbitrary large or ill-conditioned reductions.
 
+At scale 1e-200, exact SVD and randomised sketches with zero/two power iterations check scalar singular values and rank-two truncated subspaces using scaled or relative errors. Rounded-zero energy is accepted while zero data, unsupported rank, and energy overflow remain errors; caller RNG is checked on acceptance and rejection.
+
 Mixed sparse/dense weighted blocks with a zero-weight block exercise genuinely truncated sketches with zero and two power iterations against an explicit concatenated reference. Both exact and randomised methods compare sparse snapshots with dense equivalents and reject stored NaN/Inf and all-zero data without changing caller RNG. Sparse projection accepts a zero Liouvillian term and rejects stored NaN/Inf entries.
 
 A zero-step trajectory is checked against the independent initial complex overlap. Zero-duration traces are independent of generator assembly, including a case whose affine assembly would overflow. Zero-weight column exclusion is checked with active data narrower than the requested sketch, padded singular values, rank rejection, and unchanged caller RNG. Invalid zero-weight blocks are still rejected.

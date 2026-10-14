@@ -27,9 +27,10 @@
 %     result.basis         - n-by-target_rank orthonormal complex basis
 %     result.singular_vals - singular values of supplied weighted data for
 %                            'svd', or of its range sketch for 'randomised'
-%     result.total_energy  - squared Frobenius norm of weighted supplied data
+%     result.total_energy  - squared Frobenius norm of weighted supplied data;
+%                            may round to zero for nonzero tiny data
 %     result.residual_abs  - ||data-basis*(basis'*data)||_F, on supplied data
-%     result.residual_rel  - residual_abs/sqrt(total_energy)
+%     result.residual_rel  - residual_abs divided by the unsquared data norm
 %     result.orth_error    - ||basis'*basis-eye(target_rank)||_F
 %
 % Exact SVD minimises the supplied weighted snapshot Frobenius projection
@@ -74,7 +75,7 @@ for n=1:numel(blocks)
     end
 end
 total_energy=data_norm^2;
-if ~isfinite(total_energy)||total_energy==0
+if ~isfinite(total_energy)||data_norm==0
     error('weighted data must have finite nonzero energy.');
 end
 

@@ -93,7 +93,7 @@ result=test_close(result,'initial and zero-time trace',pod_evolve(model,coeffici
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};
 inter.r1_rates={0.7}; inter.r2_rates={1.1}; inter.equilibrium='zero'; inter.rlx_keep='labframe';
-bas.formalism='sphten-liouv'; bas.approximation='none';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 spin_system.tols.prop_chop=eps; spin_system.tols.liouv_zero=eps;
 spin_system.tols.zte_tol=eps;
@@ -133,5 +133,4 @@ end
 clear restore_rng
 
 end
-
 

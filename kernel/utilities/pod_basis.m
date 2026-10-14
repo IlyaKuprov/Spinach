@@ -40,6 +40,8 @@
 % caller's random state is preserved, including on an error.
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=pod_basis.m>
 
 function result=pod_basis(blocks,weights,target_rank,options)
 
@@ -138,5 +140,4 @@ if strcmp(options.method,'randomised')&&target_rank+options.oversampling>ndims_d
 end
 
 end
-
 

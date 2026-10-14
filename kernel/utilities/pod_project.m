@@ -29,6 +29,8 @@
 % Orthogonality alone does not preserve positivity or trace.
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=pod_project.m>
 
 function model=pod_project(basis,terms,rho,coil)
 
@@ -75,5 +77,4 @@ if ~isa(coil,'double')||~isequal(size(coil),[size(basis,1) 1])||~all(isfinite(co
 end
 
 end
-
 

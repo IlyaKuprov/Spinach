@@ -16,7 +16,7 @@ inter.zeeman.scalar={0 0.25}; inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=35;
 inter.relaxation={'t1_t2'}; inter.r1_rates={0.7 0.8};
 inter.r2_rates={2 2.5}; inter.equilibrium='zero'; inter.rlx_keep='labframe';
-bas.formalism='sphten-liouv'; bas.approximation='none';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
 
 % Build the complete Liouville system and an explicit affine offset term
 spin_system=create(sys,inter); spin_system=basis(spin_system,bas);
@@ -63,5 +63,4 @@ kxlabel('frequency, Hz'); kylabel('real spectral amplitude'); kgrid;
 klegend({'Full Spinach','Snapshot POD'},'Location','Best');
 
 end
-
 

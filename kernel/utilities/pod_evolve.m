@@ -26,6 +26,8 @@
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=pod_evolve.m>
 
 function fid=pod_evolve(model,coefficients,timestep,nsteps)
 
@@ -83,5 +85,4 @@ if ~isnumeric(nsteps)||~isreal(nsteps)||~isscalar(nsteps)||...
 end
 
 end
-
 

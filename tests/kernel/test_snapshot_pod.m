@@ -874,6 +874,19 @@ for basis_kind={'dense','sparse'}
     end
 end
 
+% Preserve scalar phase when rounded Rayleigh rates select the adjoint action
+for frequency=[0.3 0.7 -0.3 -0.7]
+    for swapped=[false true]
+        rho=0.3+0.4i; coil=-0.4+0.7i;
+        if swapped, [rho,coil]=deal(coil,rho); end
+        prepared=pod_project(1,{frequency},rho,coil);
+        reference=(coil'*rho)*exp(-1i*frequency*(0:256)*0.01);
+        result=test_close(result,['scalar phase adjoint ' num2str(frequency) ' ' num2str(swapped)],...
+                          pod_evolve(prepared,1,0.01,256),reference,1e-12,0,...
+                          'the closed-form scalar action obeys the selected conjugation and Hermitian detection');
+    end
+end
+
 % Compare real relaxation actions with the independent rank-one exponential
 for storage={'dense','sparse'}
     ranks=4; generator=-eye(ranks)+ones(ranks)/(2*ranks); subspace=eye(ranks);

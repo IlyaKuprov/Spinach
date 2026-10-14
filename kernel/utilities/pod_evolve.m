@@ -52,8 +52,9 @@
 % Exponent-aware component products preserve finite scaled observables.
 % Structurally unreachable or unobservable coordinates are removed exactly.
 % Implicit support traversal uses bounded dense row/column slices; sparse
-% reverse traversal stores transposed sparse terms. Fixed generator component
-% ranges are scanned once per action block, with column-bounded workspace.
+% reverse traversal stores transposed sparse terms. Fixed off-diagonal component
+% bounds, Hermitian radii, and induced norms use bounded column/row scans;
+% shifted diagonal components are checked once per action block.
 % Constant requests and common structural stationary supports avoid action evaluation;
 % computed zero actions are never used to infer stationarity. Sparse terms
 % remain sparse through the maintained exponential actions.
@@ -158,6 +159,7 @@ while completed<nsteps
 
     % Evaluate only the requested actions with no implicit trace shift
     if size(A,1)==1
+        if use_adjoint, shifted_diag=conj(shifted_diag); end
         actions=exp(shifted_diag)*rho;
     else
         action_norm=max(norms(:,1+use_adjoint)+abs(shifted_diag));

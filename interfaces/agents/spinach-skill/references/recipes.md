@@ -815,8 +815,10 @@ assembled generator) avoid an exponential after input validation. Zero initial
 overlap alone does not trigger this return. Zero coefficients are skipped
 during assembly; sparse active terms remain sparse until dense propagation.
 
-Randomised POD releases sketch coefficients before compression and forms only
-the retained modes after rank validation. Structurally zero generator columns
+POD requests singular values as a vector, without a diagonal matrix. Projected
+terms and states must remain finite after preparation. Randomised POD releases
+sketch coefficients before compression and forms only the retained modes after
+rank validation. Structurally zero generator columns
 on the state support or rows on the detector support avoid dense propagation.
 Computed zero actions do not establish stationarity: they may underflow.
 Cancellation-based nullspaces use the general exponential path.

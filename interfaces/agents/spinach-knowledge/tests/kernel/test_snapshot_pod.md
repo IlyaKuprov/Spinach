@@ -19,3 +19,5 @@ Constant-signal cases cover full and sparse zero coefficient columns, zero spars
 Large oversampling retains the prescribed leading subspace and all compressed singular values. Exact sparse right/left nullspace fixtures include non-normal dynamics and a nonstationary state observed by a stationary detector. A tiny nonzero phase is not discarded as stationary.
 
 Underflowing state and detector actions retain their finite independent phase reference. A cancellation-based nullspace remains supported without the structural shortcut.
+
+Dense/sparse real and complex state projection overflow is rejected during preparation; large finite projected initial and detector coordinates remain supported.

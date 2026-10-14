@@ -88,7 +88,7 @@ if strcmp(options.method,'svd')
         data(:,columns)=sqrt(weights(n))*blocks{n};
         first_column=first_column+size(blocks{n},2);
     end
-    [modes,values]=svd(data,'econ');
+    [modes,singular_vals]=svd(data,'econ','vector');
 else
     output_size=target_rank+options.oversampling;
     saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng));
@@ -130,13 +130,13 @@ else
         data(:,columns)=(sqrt(weights(n))*range')*blocks{n};
         first_column=first_column+size(blocks{n},2);
     end
-    [left_modes,values]=svd(data,'econ');
+    [left_modes,singular_vals]=svd(data,'econ','vector');
     clear restore_rng
 end
 clear data
 
 % Reject unsupported rank rather than returning arbitrary null-space modes
-singular_vals=[diag(values);zeros(output_size-size(values,1),1)];
+singular_vals=[singular_vals;zeros(output_size-numel(singular_vals),1)];
 rank_tol=max(row_count,data_columns)*eps(singular_vals(1));
 if singular_vals(target_rank)<=rank_tol
     error('target_rank exceeds the numerical rank of the supplied data sketch.');

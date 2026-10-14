@@ -28,7 +28,8 @@
 % Non-Euclidean metrics require explicit caller-supplied whitening first.
 % Orthogonality alone does not preserve positivity or trace. Finiteness
 % checks preserve sparse zeros without extracting dense entries. Sparse
-% bases retain a sparse identity in the orthogonality check.
+% bases retain a sparse identity in the orthogonality check. Computed
+% projected terms and state vectors must remain finite.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -48,7 +49,12 @@ for n=1:numel(terms)
         error('projected Liouvillian terms must be finite.');
     end
 end
-model=struct('terms',{reduced},'rho',basis'*rho,'coil',basis'*coil);
+rho=basis'*rho; coil=basis'*coil;
+if any(isnan(rho),'all')||any(isinf(rho),'all')||...
+   any(isnan(coil),'all')||any(isinf(coil),'all')
+    error('projected states must be finite.');
+end
+model=struct('terms',{reduced},'rho',rho,'coil',coil);
 
 end
 

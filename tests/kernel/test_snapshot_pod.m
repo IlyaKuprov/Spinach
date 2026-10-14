@@ -266,6 +266,34 @@ for bad_value=[NaN Inf]
                      'dense validation rejects NaN and Inf while preserving sparse support');
 end
 
+% Reject computed state overflow while admitting large finite projections
+for storage={'dense','sparse'}
+    subspace=[1;1]/sqrt(2); finite=[1;0];
+    if strcmp(storage{1},'sparse'), subspace=sparse(subspace); finite=sparse(finite); end
+    for phase=[1 1i]
+        huge=phase*realmax*[1;1];
+        if strcmp(storage{1},'sparse'), huge=sparse(huge); end
+        for component={'rho','coil'}
+            rho=finite; coil=finite; rejected=false;
+            if strcmp(component{1},'rho'), rho=huge; else, coil=huge; end
+            try
+                pod_project(subspace,{eye(2)},rho,coil);
+            catch err
+                rejected=contains(err.message,'projected states must be finite');
+            end
+            result=test_true(result,['projected overflow ' storage{1} ' ' component{1} ' ' num2str(phase)],...
+                             rejected,'finite caller vectors whose reduced coordinates overflow fail during preparation');
+        end
+    end
+    large=(realmax/2)*[1;1];
+    if strcmp(storage{1},'sparse'), large=sparse(large); end
+    prepared=pod_project(subspace,{eye(2)},large,1i*large);
+    result=test_close(result,['finite large rho ' storage{1}],prepared.rho/realmax,...
+                      1/sqrt(2),1e-15,0,'large finite reduced initial coordinates remain supported');
+    result=test_close(result,['finite large coil ' storage{1}],prepared.coil/realmax,...
+                      1i/sqrt(2),1e-15,0,'large finite complex detector coordinates remain supported');
+end
+
 % Solve a non-Hermitian triangular dissipative model in an invariant subspace
 H=diag([2 -3 7]); R=[-0.4 0.2 0;0 -0.8 0;0 0 -1.2];
 rho=[1+1i;-0.3+0.2i;0]; coil=[0.4-0.2i;1+1i;2];

@@ -6,4 +6,4 @@ For Spinach, terms use L=H+1i*R+1i*K in rad/s; detection retains the Hermitian i
 
 Liouvillian finiteness validation preserves sparse implicit zeros and scans dense terms without extracting a same-size double nonzero-entry vector.
 
-Sparse bases and state vectors are screened without expanding their implicit zeros; sparse basis Gram matrices retain a sparse identity for orthogonality checking. Sparse coordinate-selection bases and sparse terms/states can therefore yield a sparse prepared model. Projected terms remain subject to computed-domain finiteness checks.
+Sparse bases and state vectors are screened without expanding their implicit zeros; sparse basis Gram matrices retain a sparse identity for orthogonality checking. Sparse coordinate-selection bases and sparse terms/states can therefore yield a sparse prepared model. Projected terms and state vectors remain subject to computed-domain finiteness checks: finite full-space inputs can still overflow during projection.

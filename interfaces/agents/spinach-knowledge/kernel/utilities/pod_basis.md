@@ -6,7 +6,7 @@ Weights multiply block energy, without automatic case normalisation. Diagnostics
 
 Zero data is detected from the unsquared weighted norm. Squared `total_energy` can round to zero for tiny nonzero snapshots; `residual_rel` divides by the unsquared norm. Energy overflow remains an error, and this handling does not change numerical rank tolerances or certify arbitrary subnormal inputs.
 
-Randomised construction applies weighted sparse or dense blocks directly, without forming a dense concatenated snapshot matrix. For n state coordinates, M positively weighted columns, and working sketch rank s, it retains n-by-s range arrays and M-by-s or s-by-M sketch/compressed arrays; total workspace therefore also depends on M. Energy and residual measurement use column slices no wider than the sketch rank. Both methods omit unused right singular vectors.
+Randomised construction applies weighted sparse or dense blocks directly, without forming a dense concatenated snapshot matrix. For n state coordinates, M positively weighted columns, and working sketch rank s, it retains n-by-s range arrays and M-by-s or s-by-M sketch/compressed arrays; total workspace therefore also depends on M. Energy and residual measurement use column slices no wider than the sketch rank. Both methods omit unused right singular vectors and request singular values directly as a vector, without allocating a diagonal singular-value matrix.
 
 Zero-weight blocks remain subject to the input contract but do not enter construction or residual arithmetic. Internal sketches cannot exceed the positively weighted column count. Returned singular-value vectors retain their original supplied-data lengths with zero padding; numerical rank tolerance retains the original supplied-data dimensions.
 

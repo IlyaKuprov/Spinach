@@ -804,3 +804,8 @@ Sparse coordinate-selection preparation preserves sparse reduced terms and
 states, including in orthogonality and finiteness checks. `pod_evolve` checks
 sparse model terms without expanding implicit zeros before initial-only
 returns; nonzero-duration propagation still uses a dense reduced exponential.
+
+Exact constant-signal queries (zero coefficients, initial state, detector or
+assembled generator) avoid an exponential after input validation. Zero initial
+overlap alone does not trigger this return. Zero coefficients are skipped
+during assembly; sparse active terms remain sparse until dense propagation.

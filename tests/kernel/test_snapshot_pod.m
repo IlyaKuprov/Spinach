@@ -269,7 +269,39 @@ for bad_value=[NaN Inf]
     end
     result=test_true(result,['sparse model nonfinite ' num2str(bad_value)],rejected,...
                      'stored NaN and Inf are rejected before an initial-only return');
+    rejected=false;
+    try
+        pod_evolve(invalid_prepared,[0;0],0.03,3);
+    catch err
+        rejected=contains(err.message,'model terms must be conformable finite');
+    end
+    result=test_true(result,['invalid zero coefficients ' num2str(bad_value)],rejected,...
+                     'zero coefficients do not bypass the prepared-model finite-value contract');
 end
+
+% Return exact constant signals without assembling unnecessary dense propagators
+constant_model=struct('terms',{{speye(4);speye(4)}},...
+                     'rho',[1+1i;2;0;0],'coil',[-1i;3;0;0]);
+constant_trace=(5+1i)*ones(1,4);
+result=test_close(result,'zero coefficients',pod_evolve(constant_model,[0;0],0.03,3),...
+                  constant_trace,0,0,'all-zero coefficients give the initial observable at every time');
+result=test_close(result,'sparse zero coefficients',pod_evolve(constant_model,sparse(2,1),0.03,3),...
+                  constant_trace,0,0,'a sparse zero coefficient column has the same affine meaning');
+zero_terms=constant_model; zero_terms.terms={sparse(4,4);sparse(4,4)};
+result=test_close(result,'zero generator terms',pod_evolve(zero_terms,[2;-3],0.03,3),...
+                  constant_trace,0,0,'zero sparse terms give a zero generator despite nonzero coefficients');
+result=test_close(result,'cancelled generator',pod_evolve(constant_model,[1;-1],0.03,3),...
+                  constant_trace,0,0,'exact affine cancellation gives a constant signal');
+zero_state=constant_model; zero_state.rho=zeros(4,1);
+result=test_close(result,'zero initial state',pod_evolve(zero_state,[1;1],0.03,3),...
+                  zeros(1,4),0,0,'linear propagation preserves an exactly zero initial state');
+zero_detector=constant_model; zero_detector.coil=sparse(4,1);
+result=test_close(result,'zero detector',pod_evolve(zero_detector,[1;1],0.03,3),...
+                  zeros(1,4),0,0,'an exactly zero detector gives no signal for any finite generator');
+mixing_model=struct('terms',{{[0 1;1 0]}},'rho',[1;0],'coil',[0;1]);
+result=test_close(result,'initial zero is not constant',pod_evolve(mixing_model,1,0.1,3),...
+                  -1i*sin(0.1*(0:3)),1e-12,0,...
+                  'zero initial overlap alone does not imply a zero trajectory under state mixing');
 
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};

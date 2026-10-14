@@ -24,8 +24,12 @@
 % no tolerance-based screening, processing, or reference is inferred.
 % Accuracy is limited by the supplied reduction and generator, not by a
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
-% Zero-step or zero-duration requests validate inputs and return the initial
-% signal, repeated as needed, without assembling or exponentiating a generator.
+% Zero-step, zero-duration and all-zero-coefficient requests validate inputs
+% and return the initial signal, repeated as needed, without assembling a
+% generator. A zero initial state or detector also needs no propagation.
+% Zero coefficients are omitted from assembly; sparse active terms retain a
+% sparse generator until a dense exponential is needed. An exactly zero
+% assembled generator returns the constant initial signal without an exponential.
 % Sparse model terms and states are validated without expanding implicit zeros.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -38,19 +42,26 @@ function fid=pod_evolve(model,coefficients,timestep,nsteps)
 % Check the prepared model and evaluation contract
 grumble(model,coefficients,timestep,nsteps);
 
-% Return the initial observable directly when no evolution is requested
+% Return known constant signals without constructing a propagator
 rho=model.rho; fid=complex(zeros(1,nsteps+1)); fid(1)=model.coil'*rho;
-if (nsteps==0)||(timestep==0), fid(:)=fid(1); return; end
+if (nsteps==0)||(timestep==0)||~any(coefficients)||~any(rho)||~any(model.coil)
+    fid(:)=fid(1); return;
+end
 
 % Assemble the projected affine Liouvillian
-L=zeros(size(model.terms{1}),'like',1i);
-for n=1:numel(model.terms)
+L=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
+for n=find(coefficients).'
     L=L+coefficients(n)*model.terms{n};
 end
-if ~all(isfinite(L),'all'), error('assembled Liouvillian must be finite.'); end
+if any(isnan(L),'all')||any(isinf(L),'all')
+    error('assembled Liouvillian must be finite.');
+end
+
+% Return the constant observable for an exactly zero assembled generator
+if nnz(L)==0, fid(:)=fid(1); return; end
 
 % Propagate the reduced observable with the Spinach sign convention
-P=expm(-1i*L*timestep);
+P=expm(-1i*full(L)*timestep);
 for n=1:nsteps
     rho=P*rho; fid(n+1)=model.coil'*rho;
 end

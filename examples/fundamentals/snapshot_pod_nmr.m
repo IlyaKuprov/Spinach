@@ -6,6 +6,7 @@
 % Training and projection costs must be amortised separately from evaluation.
 %
 % ilya.kuprov@weizmann.ac.il
+% arnab.acharya@weizmann.ac.il
 
 function snapshot_pod_nmr()
 

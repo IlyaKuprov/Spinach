@@ -26,6 +26,7 @@
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
 %
 % ilya.kuprov@weizmann.ac.il
+% arnab.acharya@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=pod_evolve.m>
 
@@ -52,7 +53,6 @@ end
 
 % Consistency enforcement
 function grumble(model,coefficients,timestep,nsteps)
-
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'terms','rho','coil'}))
     error('model must contain terms, rho, and coil.');
 end
@@ -83,6 +83,6 @@ if ~isnumeric(nsteps)||~isreal(nsteps)||~isscalar(nsteps)||...
    ~isfinite(nsteps)||nsteps<0||mod(nsteps,1)~=0
     error('nsteps must be a nonnegative integer.');
 end
-
 end
+
 

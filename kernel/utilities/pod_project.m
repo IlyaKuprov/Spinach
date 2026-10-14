@@ -29,6 +29,7 @@
 % Orthogonality alone does not preserve positivity or trace.
 %
 % ilya.kuprov@weizmann.ac.il
+% arnab.acharya@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=pod_project.m>
 
@@ -51,7 +52,6 @@ end
 
 % Consistency enforcement
 function grumble(basis,terms,rho,coil)
-
 if ~isa(basis,'double')||~ismatrix(basis)||isempty(basis)||...
    ~all(isfinite(basis),'all')||size(basis,2)>size(basis,1)
     error('basis must be a finite nonempty double n-by-r matrix with r<=n.');
@@ -65,7 +65,7 @@ if ~iscell(terms)||~iscolumn(terms)||isempty(terms)
 end
 for n=1:numel(terms)
     if ~isa(terms{n},'double')||~isequal(size(terms{n}),[size(basis,1) size(basis,1)])||...
-       ~all(isfinite(terms{n}),'all')
+       ~all(isfinite(nonzeros(terms{n})))
         error('each term must be a finite double n-by-n matrix.');
     end
 end
@@ -75,6 +75,6 @@ end
 if ~isa(coil,'double')||~isequal(size(coil),[size(basis,1) 1])||~all(isfinite(coil))
     error('coil must be a finite double n-by-1 column.');
 end
-
 end
+
 

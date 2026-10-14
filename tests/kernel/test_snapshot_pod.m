@@ -12,6 +12,7 @@
 % residuals diagnose the supplied data, not the observable approximation.
 %
 % ilya.kuprov@weizmann.ac.il
+% arnab.acharya@weizmann.ac.il
 
 function result=test_snapshot_pod()
 
@@ -64,6 +65,53 @@ catch
 end
 result=test_true(result,'rank failure restores RNG',failed&&isequal(before,rng),...
                  'rank-deficient requests fail without supplying null-space directions or changing RNG');
+
+% Compare genuinely truncated blockwise sketches with a concatenated reference
+rng(632,'twister'); snapshots=complex(randn(18,27),randn(18,27));
+split_blocks={sparse(snapshots(:,1:7));snapshots(:,8:19);sparse(snapshots(:,20:end))};
+split_weights=[0.5;2;0];
+weighted=[sqrt(0.5)*snapshots(:,1:7) sqrt(2)*snapshots(:,8:19) zeros(18,8)];
+for power_iters=[0 2]
+    sketch_opts=struct('method','randomised','oversampling',2,...
+                       'power_iters',power_iters,'seed',17);
+    rng(17,'twister'); omega=complex(randn(27,6),randn(27,6));
+    [range,~]=qr(weighted*omega,0);
+    for k=1:power_iters
+        [dual_range,~]=qr(weighted'*range,0);
+        [range,~]=qr(weighted*dual_range,0);
+    end
+    [left_modes,values]=svd(range'*weighted,'econ');
+    reference=range*left_modes(:,1:4); before=rng;
+    observed=pod_basis(split_blocks,split_weights,4,sketch_opts);
+    result=test_close(result,['blockwise projector ' num2str(power_iters)],...
+                      observed.basis*observed.basis',reference*reference',1e-12,0,...
+                      'mixed sparse and dense weighted blocks recover the explicit truncated sketch');
+    result=test_close(result,['blockwise values ' num2str(power_iters)],...
+                      observed.singular_vals,diag(values),1e-12,0,...
+                      'compressed singular values match the independently concatenated reference');
+    result=test_close(result,['blockwise residual ' num2str(power_iters)],...
+                      observed.residual_abs,norm(weighted-observed.basis*(observed.basis'*weighted),'fro'),...
+                      1e-12,0,'the blockwise residual retains all supplied weights');
+    result=test_true(result,['blockwise RNG ' num2str(power_iters)],isequal(before,rng),...
+                     'genuinely truncated sketches preserve the caller random state');
+end
+
+% Retain sparse Liouvillian terms and reject nonfinite stored entries
+sparse_basis=[speye(2);sparse(2046,2)]; sparse_state=sparse_basis(:,1);
+sparse_model=pod_project(full(sparse_basis),{speye(2048)},full(sparse_state),full(sparse_state));
+result=test_close(result,'sparse term projection',sparse_model.terms{1},eye(2),...
+                  1e-12,0,'sparse implicit zeros do not alter the Galerkin projection');
+for bad_value=[NaN Inf]
+    rejected=false;
+    try
+        pod_project(full(sparse_basis),{sparse(3,3,bad_value,2048,2048)},...
+                    full(sparse_state),full(sparse_state));
+    catch
+        rejected=true;
+    end
+    result=test_true(result,['sparse nonfinite ' num2str(bad_value)],rejected,...
+                     'sparse validation still rejects nonfinite stored values');
+end
 
 % Solve a non-Hermitian triangular dissipative model in an invariant subspace
 H=diag([2 -3 7]); R=[-0.4 0.2 0;0 -0.8 0;0 0 -1.2];

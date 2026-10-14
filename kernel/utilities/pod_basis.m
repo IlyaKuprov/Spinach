@@ -37,9 +37,13 @@
 % Residuals are measured data diagnostics, not observable error bounds.
 % Rank-deficient inputs are rejected if the requested rank exceeds the
 % numerical rank; no arbitrary null-space directions are supplied. The
-% caller's random state is preserved, including on an error.
+% caller's random state is preserved, including on an error. Randomised
+% construction applies weighted blocks without a full snapshot concatenation;
+% workspace includes n-by-sketch_rank and total_columns-by-sketch_rank arrays
+% for range products, compressed data, and residual measurement.
 %
 % ilya.kuprov@weizmann.ac.il
+% arnab.acharya@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=pod_basis.m>
 
@@ -48,60 +52,102 @@ function result=pod_basis(blocks,weights,target_rank,options)
 % Check the supplied data contract
 grumble(blocks,weights,target_rank,options);
 
-% Assemble explicitly weighted snapshot blocks
+% Measure the weighted data norm without concatenating or copying the blocks
+row_count=size(blocks{1},1); column_count=sum(cellfun(@(x)size(x,2),blocks));
+data_norm=0; block_width=target_rank+options.oversampling;
 for n=1:numel(blocks)
-    blocks{n}=sqrt(weights(n))*blocks{n};
+    for k=1:block_width:size(blocks{n},2)
+        columns=k:min(k+block_width-1,size(blocks{n},2));
+        data_norm=hypot(data_norm,norm(sqrt(weights(n))*blocks{n}(:,columns),'fro'));
+    end
 end
-data=full([blocks{:}]); total_energy=norm(data,'fro')^2;
-if ~all(isfinite(data),'all')||~isfinite(total_energy)||total_energy==0
+total_energy=data_norm^2;
+if ~isfinite(total_energy)||total_energy==0
     error('weighted data must have finite nonzero energy.');
 end
 
-% Compute the exact basis or a seeded randomised range sketch
+% Compute the exact basis or a seeded blockwise randomised range sketch
 if strcmp(options.method,'svd')
-    [modes,values,~]=svd(data,'econ');
+    data=zeros(row_count,column_count); first_column=1;
+    for n=1:numel(blocks)
+        columns=first_column:first_column+size(blocks{n},2)-1;
+        data(:,columns)=sqrt(weights(n))*blocks{n};
+        first_column=first_column+size(blocks{n},2);
+    end
+    [modes,values]=svd(data,'econ');
 else
     saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng));
     rng(options.seed,'twister'); sketch_rank=target_rank+options.oversampling;
-    omega=complex(randn(size(data,2),sketch_rank),randn(size(data,2),sketch_rank));
-    [range,~]=qr(data*omega,0);
-    for n=1:options.power_iters
-        [dual_range,~]=qr(data'*range,0);
-        [range,~]=qr(data*dual_range,0);
+    omega=complex(randn(column_count,sketch_rank),randn(column_count,sketch_rank));
+    for k=0:options.power_iters
+
+        % Apply the weighted snapshot matrix using only the supplied blocks
+        range=zeros(row_count,sketch_rank); first_column=1;
+        for n=1:numel(blocks)
+            columns=first_column:first_column+size(blocks{n},2)-1;
+            range=range+blocks{n}*(sqrt(weights(n))*omega(columns,:));
+            first_column=first_column+size(blocks{n},2);
+        end
+        [range,~]=qr(range,0);
+        if k<options.power_iters
+
+            % Reorthogonalise the adjoint range before the next power iteration
+            omega=zeros(column_count,sketch_rank); first_column=1;
+            for n=1:numel(blocks)
+                columns=first_column:first_column+size(blocks{n},2)-1;
+                omega(columns,:)=blocks{n}'*(sqrt(weights(n))*range);
+                first_column=first_column+size(blocks{n},2);
+            end
+            [omega,~]=qr(omega,0);
+
+        end
+
     end
-    [left_modes,values,~]=svd(range'*data,'econ'); modes=range*left_modes;
+
+    % Factor only the compressed snapshots, without right singular vectors
+    data=zeros(sketch_rank,column_count); first_column=1;
+    for n=1:numel(blocks)
+        columns=first_column:first_column+size(blocks{n},2)-1;
+        data(:,columns)=(sqrt(weights(n))*range')*blocks{n};
+        first_column=first_column+size(blocks{n},2);
+    end
+    [left_modes,values]=svd(data,'econ'); modes=range*left_modes;
     clear restore_rng
 end
 
 % Reject unsupported rank rather than returning arbitrary null-space modes
 singular_vals=diag(values);
-rank_tol=max(size(data))*eps(singular_vals(1));
+rank_tol=max(row_count,column_count)*eps(singular_vals(1));
 if singular_vals(target_rank)<=rank_tol
     error('target_rank exceeds the numerical rank of the supplied data sketch.');
 end
 basis=modes(:,1:target_rank);
 
-% Measure the projection residual block by block without a second data copy
-residual_sq=0;
+% Measure the projection residual in column slices bounded by the sketch rank
+residual_abs=0;
 for n=1:numel(blocks)
-    residual_sq=residual_sq+norm(blocks{n}-basis*(basis'*blocks{n}),'fro')^2;
+    for k=1:block_width:size(blocks{n},2)
+        columns=k:min(k+block_width-1,size(blocks{n},2));
+        data=sqrt(weights(n))*blocks{n}(:,columns);
+        residual_abs=hypot(residual_abs,norm(data-basis*(basis'*data),'fro'));
+    end
 end
 result=struct('basis',basis,'singular_vals',singular_vals,...
-              'total_energy',total_energy,'residual_abs',sqrt(residual_sq),...
-              'residual_rel',sqrt(residual_sq/total_energy),...
+              'total_energy',total_energy,'residual_abs',residual_abs,...
+              'residual_rel',residual_abs/data_norm,...
               'orth_error',norm(basis'*basis-eye(target_rank),'fro'));
 
 end
 
 % Consistency enforcement
 function grumble(blocks,weights,target_rank,options)
-
 if ~iscell(blocks)||~iscolumn(blocks)||isempty(blocks)
     error('blocks must be a nonempty cell column.');
 end
 for n=1:numel(blocks)
     if ~isa(blocks{n},'double')||~ismatrix(blocks{n})||isempty(blocks{n})||...
-       ~all(isfinite(blocks{n}),'all')||size(blocks{n},1)~=size(blocks{1},1)
+       any(isnan(blocks{n}),'all')||any(isinf(blocks{n}),'all')||...
+       size(blocks{n},1)~=size(blocks{1},1)
         error('blocks must contain finite nonempty double matrices with common row count.');
     end
 end
@@ -138,6 +184,6 @@ end
 if strcmp(options.method,'randomised')&&target_rank+options.oversampling>ndims_data
     error('target_rank plus oversampling exceeds the data dimensions.');
 end
-
 end
+
 

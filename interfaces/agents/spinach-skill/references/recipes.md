@@ -782,4 +782,7 @@ identically processed spectra within the intended grid. Use
 projection, and repeated evaluation have separate costs. The maintained
 `snapshot_pod_nmr` example makes the sampling and ranks explicit; no automatic
 propagator truncation, methyl model, pulse fit, slow-mode selection, or offset
-interpolation is supplied by these utilities.
+interpolation is supplied by these utilities. Randomised basis construction
+uses blockwise range products and sketch-width residual slices rather than
+dense snapshot concatenation; sparse
+Liouvillian validation inspects only stored entries.

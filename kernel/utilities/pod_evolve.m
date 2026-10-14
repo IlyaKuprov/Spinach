@@ -24,7 +24,7 @@
 % no tolerance-based screening, processing, or reference is inferred.
 % Accuracy is limited by the supplied reduction and generator, not by a
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
-% Zero-step or zero-duration requests validate inputs and return the initial
+% Zero-step, zero-duration, or all-zero coefficient requests return the initial
 % signal, repeated as needed, without assembling or exponentiating a generator.
 % Sparse model terms and states are validated without expanding implicit zeros.
 %
@@ -38,9 +38,9 @@ function fid=pod_evolve(model,coefficients,timestep,nsteps)
 % Check the prepared model and evaluation contract
 grumble(model,coefficients,timestep,nsteps);
 
-% Return the initial observable directly when no evolution is requested
+% Return the initial observable directly when evolution is exactly stationary
 rho=model.rho; fid=complex(zeros(1,nsteps+1)); fid(1)=model.coil'*rho;
-if (nsteps==0)||(timestep==0), fid(:)=fid(1); return; end
+if (nsteps==0)||(timestep==0)||all(coefficients==0), fid(:)=fid(1); return; end
 
 % Assemble the projected affine Liouvillian
 L=zeros(size(model.terms{1}),'like',1i);

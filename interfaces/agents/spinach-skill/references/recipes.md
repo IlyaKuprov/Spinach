@@ -789,7 +789,7 @@ the total snapshot-column count; sparse Liouvillian validation inspects only
 stored entries. The regression checks sparse snapshot finiteness and zero-data
 rejection for both methods, including preservation of the caller's RNG.
 
-Zero-step or zero-duration `pod_evolve` requests return the initial observable,
+Zero-step, zero-duration, or exactly all-zero coefficient `pod_evolve` requests return the initial observable,
 repeated as needed, without assembling or exponentiating the reduced generator.
 Zero-weight blocks are validated but excluded from basis construction;
 sketch sizes are bounded by positively weighted columns, while returned

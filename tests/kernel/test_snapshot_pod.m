@@ -335,7 +335,7 @@ for storage={'dense','sparse'}
         coil=phase*realmax*[1;1];
         if strcmp(storage{1},'sparse'), coil=sparse(coil); end
         prepared=pod_project(subspace,terms,rho,coil);
-        for query={[0 0 0],[1 0 3],[0 0.03 3]}
+        for query={[0 0 0],[1 0 3],[0 0.03 3],[1 0.03 3]}
             evaluation=query{1}; rejected=false;
             try
                 pod_evolve(prepared,evaluation(1),evaluation(2),evaluation(3));
@@ -345,6 +345,14 @@ for storage={'dense','sparse'}
             result=test_true(result,['overlap overflow ' storage{1} ' ' num2str(phase) ' ' num2str(evaluation)],...
                              rejected,'finite coordinates with a nonfinite computed overlap fail before initial-only returns');
         end
+        prepared.rho=abs(rho); rejected=false;
+        try
+            pod_evolve(prepared,1,0.03,3);
+        catch err
+            rejected=contains(err.message,'initial observable must be finite');
+        end
+        result=test_true(result,['noncancelling overflow ' storage{1} ' ' num2str(phase)],...
+                         rejected,'finite coordinates with overflowing products fail before ordinary propagation');
         prepared.rho=rho/4; prepared.coil=coil/2;
         result=test_close(result,['finite large overlap ' storage{1} ' ' num2str(phase)],...
                           pod_evolve(prepared,0,0.03,3)/realmax,zeros(1,4),0,0,...

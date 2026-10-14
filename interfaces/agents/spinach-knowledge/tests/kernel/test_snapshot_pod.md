@@ -22,4 +22,4 @@ Underflowing state and detector actions retain their finite independent phase re
 
 Dense/sparse real and complex state projection overflow is rejected during preparation; large finite projected initial and detector coordinates remain supported.
 
-Dense/sparse real and complex initial-overlap overflow is rejected before zero-step, zero-duration and zero-coefficient returns. Large cancelling overlaps with finite intermediate products remain supported.
+Dense/sparse real and complex initial-overlap overflow is rejected before zero-step, zero-duration and zero-coefficient returns, and ordinary positive-time requests. Non-cancelling product overflow is also rejected. Large cancelling overlaps with finite intermediate products remain supported.

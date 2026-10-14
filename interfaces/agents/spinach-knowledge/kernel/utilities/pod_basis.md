@@ -9,3 +9,5 @@ Randomised construction applies weighted sparse or dense blocks directly, withou
 Zero-weight blocks remain subject to the input contract but do not enter construction or residual arithmetic. Internal sketches cannot exceed the positively weighted column count. Returned singular-value vectors retain their original supplied-data lengths with zero padding; numerical rank tolerance retains the original supplied-data dimensions.
 
 Randomised sketches and returned bases remain real when every positively weighted block is real; a zero-weight complex block does not force imaginary storage. Active complex data retain complex Gaussian sketches. Both cases preserve caller RNG and fixed-seed repeatability.
+
+Sketch coefficients are released before compressed snapshots are allocated. After numerical rank validation, randomised mode construction multiplies only the retained compressed left singular vectors; compressed data and unused range/mode arrays are released before residual measurement. Returned singular-value diagnostics are unchanged.

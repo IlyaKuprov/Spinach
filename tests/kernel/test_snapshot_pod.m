@@ -96,6 +96,16 @@ for power_iters=[0 2]
                      'genuinely truncated sketches preserve the caller random state');
 end
 
+% Check large oversampling without changing the retained subspace or spectrum
+wide_data=[diag(32:-1:1) zeros(32)];
+wide_opts=struct('method','randomised','oversampling',30,'power_iters',0,'seed',17);
+wide_basis=pod_basis({sparse(wide_data)},1,2,wide_opts);
+result=test_close(result,'oversampled retained projector',wide_basis.basis*wide_basis.basis',...
+                  diag([1 1 zeros(1,30)]),1e-12,0,...
+                  'a full-row sketch retains only the two leading diagonal snapshot directions');
+result=test_close(result,'oversampled singular values',wide_basis.singular_vals,(32:-1:1)',...
+                  1e-12,0,'retained mode construction does not discard compressed singular values');
+
 % Compare real-only sketches with a real Gaussian reference and retain real storage
 rng(632,'twister'); real_snapshots=randn(18,27);
 real_blocks={sparse(real_snapshots(:,1:7));real_snapshots(:,8:19);1i*ones(18,8)};
@@ -311,6 +321,20 @@ mixing_model=struct('terms',{{[0 1;1 0]}},'rho',[1;0],'coil',[0;1]);
 result=test_close(result,'initial zero is not constant',pod_evolve(mixing_model,1,0.1,3),...
                   -1i*sin(0.1*(0:3)),1e-12,0,...
                   'zero initial overlap alone does not imply a zero trajectory under state mixing');
+
+% Check exact sparse right and left nullspaces without requiring a zero generator
+right_null=struct('terms',{{sparse([0 4 0;0 0 3;0 0 2])}},...
+                  'rho',[1;0;0],'coil',[1+1i;2;0]);
+left_null=struct('terms',{{sparse([0 0 0;4 0 3;0 0 2])}},...
+                 'rho',[1+1i;1;1],'coil',[1;0;0]);
+result=test_close(result,'exact stationary state',pod_evolve(right_null,1,0.03,3),...
+                  (1-1i)*ones(1,4),0,0,'a nonzero generator leaves its exact right-nullspace state unchanged');
+result=test_close(result,'exact stationary detector',pod_evolve(left_null,1,0.03,3),...
+                  (1+1i)*ones(1,4),0,0,'a left-nullspace detector is constant despite nonstationary state evolution');
+small_phase=struct('terms',{{sparse(1e-100)}},'rho',1,'coil',1);
+small_fid=pod_evolve(small_phase,1,0.03,3);
+result=test_true(result,'nonzero small generator',imag(small_fid(end))~=0,...
+                 'stationary returns use exact nullspace actions rather than a magnitude tolerance');
 
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};

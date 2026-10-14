@@ -809,3 +809,8 @@ Exact constant-signal queries (zero coefficients, initial state, detector or
 assembled generator) avoid an exponential after input validation. Zero initial
 overlap alone does not trigger this return. Zero coefficients are skipped
 during assembly; sparse active terms remain sparse until dense propagation.
+
+Randomised POD releases sketch coefficients before compression and forms only
+the retained modes after rank validation. Exact right-state and left-detector
+nullspace actions avoid dense propagation even for a nonzero sparse generator;
+these returns do not use tolerance screening.

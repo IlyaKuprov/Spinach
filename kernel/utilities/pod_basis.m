@@ -46,6 +46,8 @@
 % retain target_rank+oversampling entries, padding excluded directions with
 % zeros. Internal sketches are limited by the positively weighted columns.
 % Numerical rank tolerance still uses the original supplied-data dimensions.
+% Sketch coefficients are released before compressed snapshots are allocated.
+% Only retained randomised modes are formed, after numerical rank validation.
 % Randomised sketches remain real when all positively weighted blocks are real.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -120,15 +122,17 @@ else
     end
 
     % Factor only the compressed snapshots, without right singular vectors
+    clear omega
     data=zeros(sketch_rank,column_count); first_column=1;
     for n=1:numel(blocks)
         columns=first_column:first_column+size(blocks{n},2)-1;
         data(:,columns)=(sqrt(weights(n))*range')*blocks{n};
         first_column=first_column+size(blocks{n},2);
     end
-    [left_modes,values]=svd(data,'econ'); modes=range*left_modes;
+    [left_modes,values]=svd(data,'econ');
     clear restore_rng
 end
+clear data
 
 % Reject unsupported rank rather than returning arbitrary null-space modes
 singular_vals=[diag(values);zeros(output_size-size(values,1),1)];
@@ -136,7 +140,14 @@ rank_tol=max(row_count,data_columns)*eps(singular_vals(1));
 if singular_vals(target_rank)<=rank_tol
     error('target_rank exceeds the numerical rank of the supplied data sketch.');
 end
-basis=modes(:,1:target_rank);
+
+% Form only retained basis modes after the numerical rank check
+if strcmp(options.method,'svd')
+    basis=modes(:,1:target_rank);
+else
+    basis=range*left_modes(:,1:target_rank);
+end
+clear modes left_modes range
 
 % Measure the projection residual in column slices bounded by the sketch rank
 residual_abs=0;

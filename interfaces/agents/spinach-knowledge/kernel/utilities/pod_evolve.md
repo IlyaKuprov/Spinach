@@ -13,3 +13,5 @@ MATLAB expmv implements the Al-Mohy–Higham exponential-action method, DOI:10.1
 Hermitian detection accumulates real component products by their binary exponents before restoring signal units. Structural directed reachability retains exactly the coordinates on paths from the state to the detector, excluding unrelated unstable blocks. Normalized matrix products explicitly reject unsupported component underflow.
 
 The matrix-product range contract conservatively requires every nonzero operand-component pair to remain nonzero at the working scale; it can reject a physically finite result rather than silently lose a contribution.
+
+Complete term support skips graph construction because every nonempty source and detector support is mutually reachable. Fixed-generator component ranges are measured once per action block, outside the callback. Dense range scans use bounded column storage; sparse range scans traverse stored components. Callback checks scan only changing action operands.

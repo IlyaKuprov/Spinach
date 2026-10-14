@@ -801,6 +801,24 @@ for storage={'dense','sparse'}
                      'an arbitrarily small representable growing contribution is not dropped as invariant');
 end
 
+% Compare complete-support normal dynamics with an independent rank-one formula
+for storage={'dense','sparse'}
+    L=-ones(3)-1i*eye(3); subspace=eye(3); rho=[1;0;0]; times=(0:8)*0.03;
+    if strcmp(storage{1},'sparse'), L=sparse(L); subspace=sparse(subspace); end
+    for phase=[1 1i]
+        coil=phase*[1;2;-1];
+        reference=conj(phase)*exp(-times).*(1+2*(exp(3*1i*times)-1)/3);
+        for n=1:2
+            if n==1, terms={L}; coefficients=1;
+            else, terms={eye(3);L-eye(3)}; coefficients=[1;1]; end
+            prepared=pod_project(subspace,terms,rho,coil);
+            result=test_close(result,['complete support action ' storage{1} ' ' num2str(phase) ' ' num2str(n)],...
+                              pod_evolve(prepared,coefficients,0.03,8),reference,1e-12,0,...
+                              'complete term support and cached component bounds preserve the normal semigroup');
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

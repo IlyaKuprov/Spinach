@@ -810,4 +810,4 @@ forward/adjoint choice preserves the Hermitian signal and native norm estimates
 preserve caller RNG. No componentwise
 accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
 
-The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Extreme normalised operand ranges are explicit errors, not silent product underflow.
+The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Complete term support avoids a graph that cannot remove coordinates. Fixed generator range checks are cached per action block; dense range scans use bounded columns. Extreme normalised operand ranges are explicit errors, not silent product underflow.

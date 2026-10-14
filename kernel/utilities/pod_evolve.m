@@ -47,6 +47,8 @@
 % at the working scale; this can conservatively reject a finite physical result.
 % Exponent-aware component products preserve finite scaled observables.
 % Structurally unreachable or unobservable coordinates are removed exactly.
+% Complete support skips graph construction. Fixed generator component ranges
+% are scanned once per action block, with column-bounded dense workspace.
 % Constant requests and common structural stationary supports avoid action evaluation;
 % computed zero actions are never used to infer stationarity. Sparse terms
 % remain sparse through the maintained exponential actions.
@@ -80,15 +82,24 @@ for n=active
 end
 if state_fixed||coil_fixed, fid(:)=fid(1); return; end
 
-% Retain only coordinates on structural paths from the state to the detector
-terms=model.terms; nranks=size(rho,1); adjacency=sparse(nranks,nranks);
-for n=active, adjacency=adjacency+spones(sparse(terms{n})); end
-coordinates=intersect(reachable_support(adjacency.',find(rho)),...
-                      reachable_support(adjacency,find(coil)));
-if isempty(coordinates), fid(:)=0; return; end
-for n=active, terms{n}=terms{n}(coordinates,coordinates); end
-[rho,rebase]=binary_normalise(rho(coordinates)); state_exp=state_exp+rebase;
-[coil,rebase]=binary_normalise(coil(coordinates)); coil_exp=coil_exp+rebase;
+% Avoid a complete support graph that cannot eliminate any coordinates
+terms=model.terms; nranks=size(rho,1); coordinates=(1:nranks).'; complete_support=false;
+for n=active
+    if nnz(terms{n})==numel(terms{n}), complete_support=true; break; end
+end
+if ~complete_support
+
+    % Retain only coordinates on structural paths from the state to the detector
+    adjacency=sparse(nranks,nranks);
+    for n=active, adjacency=adjacency+spones(sparse(terms{n})); end
+    coordinates=intersect(reachable_support(adjacency.',find(rho)),...
+                          reachable_support(adjacency,find(coil)));
+    if isempty(coordinates), fid(:)=0; return; end
+    for n=active, terms{n}=terms{n}(coordinates,coordinates); end
+    [rho,rebase]=binary_normalise(rho(coordinates)); state_exp=state_exp+rebase;
+    [coil,rebase]=binary_normalise(coil(coordinates)); coil_exp=coil_exp+rebase;
+
+end
 
 % Determine a common binary frame for the complete time-scaled affine sum
 [time_frac,time_exp]=log2(timestep); term_exp=zeros(size(coefficients));
@@ -163,7 +174,8 @@ while completed<nsteps
         if ~isfinite(norm(shifted,1))||norm(shifted,1)>=flintmax
             error('working action norm exceeds the exact double step range.');
         end
-        actions=expmv(@(flag,data)exponential_action(shifted,flag,data),rho,0:width);
+        minimum=component_min(shifted);
+        actions=expmv(@(flag,data)exponential_action(shifted,minimum,flag,data),rho,0:width);
         actions=actions(:,2:end);
     end
 
@@ -201,13 +213,16 @@ end
 end
 
 % Supply native exponential actions and adjoints without a second scalar shift
-function result=exponential_action(A,flag,data)
+function result=exponential_action(A,minimum,flag,data)
 
-% Follow the documented operator-action protocol used by expmv
+% Check only the changing operand after the fixed generator has been scanned
+if strcmp(flag,'real'), result=isreal(A); return; end
+if minimum*component_min(data)==0
+    error('working product dynamic range exceeds the normalised double representation.');
+end
 switch flag
-    case 'real', result=isreal(A);
-    case 'notransp', result=checked_product(A,data);
-    case 'transp', result=checked_product(A',data);
+    case 'notransp', result=A*data;
+    case 'transp', result=A'*data;
 end
 
 end
@@ -274,12 +289,31 @@ end
 function product=checked_product(left,right)
 
 % Bound every nonzero real component product without forming a product array
-left_parts=[nonzeros(real(left));nonzeros(imag(left))];
-right_parts=[nonzeros(real(right));nonzeros(imag(right))];
-if ~isempty(left_parts)&&~isempty(right_parts)&&min(abs(left_parts))*min(abs(right_parts))==0
+if component_min(left)*component_min(right)==0
     error('working product dynamic range exceeds the normalised double representation.');
 end
 product=left*right;
+
+end
+
+% Find the smallest nonzero component with bounded dense column storage
+function minimum=component_min(data)
+
+% Preserve stored sparse traversal without copying dense matrix components
+minimum=Inf;
+if issparse(data)
+    parts=nonzeros(real(data));
+    if ~isempty(parts), minimum=min(abs(parts)); end
+    parts=nonzeros(imag(data));
+    if ~isempty(parts), minimum=min(minimum,min(abs(parts))); end
+else
+    for k=1:size(data,2)
+        parts=real(data(:,k)); parts=parts(parts~=0);
+        if ~isempty(parts), minimum=min(minimum,min(abs(parts))); end
+        parts=imag(data(:,k)); parts=parts(parts~=0);
+        if ~isempty(parts), minimum=min(minimum,min(abs(parts))); end
+    end
+end
 
 end
 

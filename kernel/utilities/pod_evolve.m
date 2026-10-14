@@ -30,7 +30,11 @@
 % separately; only the detected observable is restored to physical units.
 % Equivalent forward/adjoint actions choose the smaller initial norm-growth
 % rate; this changes neither the generator nor the Hermitian observable.
-% The action callback prevents an additional automatic trace shift.
+% The diagonal is stored separately; callbacks apply its scalar shift without
+% constructing a shifted dense operator. The Hermitian bound and induced norms
+% use bounded column/row scans, never a full Hermitian-part matrix. Real actions
+% and states retain real working storage. The native callback prevents an
+% additional automatic trace shift.
 % Block widths use a Hermitian-part growth bound and the double range;
 % unscalarised action norms above flintmax are unsupported. Working actions
 % that round entirely to zero are rejected, not declared stationary.
@@ -96,7 +100,7 @@ end
 
 % Determine a common binary frame for the complete time-scaled affine sum
 [time_frac,time_exp]=log2(timestep); term_exp=zeros(size(coefficients));
-coef_frac=complex(zeros(size(coefficients))); coef_exp=zeros(size(coefficients));
+coef_frac=zeros(size(coefficients)); coef_exp=zeros(size(coefficients));
 for n=active
     [coef_frac(n),coef_exp(n)]=binary_normalise(coefficients(n));
     largest=max(max(abs(real(terms{n})),[],'all'),max(abs(imag(terms{n})),[],'all'));
@@ -107,25 +111,15 @@ if ~isfinite(common_exp), fid(:)=fid(1); return; end
 
 % Sum normalised terms before restoring their physical time-scaled magnitude
 [~,order]=sort(exponents(active),'descend');
-A=complex(sparse(numel(coordinates),numel(coordinates)));
+A=sparse(numel(coordinates),numel(coordinates));
 for n=active(order)
     if ~isfinite(term_exp(n)), continue; end
     [term,~]=binary_normalise(terms{n});
     term=checked_product(term,checked_product(coef_frac(n),time_frac));
-    scaled=complex(pow2(real(term),exponents(n)-common_exp),...
-                   pow2(imag(term),exponents(n)-common_exp));
-    if any((real(term)~=0)&(real(scaled)==0),'all')||...
-       any((imag(term)~=0)&(imag(scaled)==0),'all')
-        error('affine term dynamic range exceeds the normalised double representation.');
-    end
+    scaled=binary_scale(term,exponents(n)-common_exp);
     A=A+scaled;
 end
-scaled=complex(pow2(real(A),common_exp),pow2(imag(A),common_exp));
-if any((real(A)~=0)&(real(scaled)==0),'all')||...
-   any((imag(A)~=0)&(imag(scaled)==0),'all')||...
-   any(isnan(scaled),'all')||any(isinf(scaled),'all')
-    error('time-scaled generator must be representable in double precision.');
-end
+scaled=binary_scale(A,common_exp);
 A=-1i*scaled; clear term scaled
 if ~any(any(A,1)&(rho.'~=0))||~any(any(A,2)&(coil~=0)), fid(:)=fid(1); return; end
 
@@ -134,10 +128,14 @@ if size(A,1)==1&&real(A)<log(realmin)+log(eps)-log(realmax)-2*log(2)
     fid(2:end)=0; return;
 end
 
-% Choose an equivalent action with the smaller initial coordinate growth rate
-use_adjoint=real_growth(A',coil)<real_growth(A,rho);
+% Separate the diagonal once and cache bounded off-diagonal action estimates
+diagonal=diag(A); A(1:size(A,1)+1:end)=0;
+[radii,norms,minimum,scale_exp]=action_bounds(A,diagonal);
+
+% Choose an equivalent action without transposing the stored generator
+use_adjoint=real_growth(A,diagonal,scale_exp,coil)<real_growth(A,diagonal,scale_exp,rho);
 if use_adjoint
-    A=A'; [rho,coil]=deal(coil,rho); [state_exp,coil_exp]=deal(coil_exp,state_exp);
+    [rho,coil]=deal(coil,rho); [state_exp,coil_exp]=deal(coil_exp,state_exp);
     fid(1)=conj(fid(1));
 end
 
@@ -146,29 +144,29 @@ saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng)); completed=0;
 while completed<nsteps
 
     % Separate the current state amplitude from a controlled real scalar shift
-    growth=real_growth(A,rho); growth_exp=floor(growth/log(2));
+    growth=real_growth(A,diagonal,scale_exp,rho); growth_exp=floor(growth/log(2));
     if ~isfinite(growth_exp)||abs(growth_exp)>=flintmax
         growth=0; growth_exp=0;
     end
-    shifted=A-growth*speye(size(A,1)); width=min(size(A,1),nsteps-completed);
+    shifted_diag=diagonal-growth; width=min(size(A,1),nsteps-completed);
 
     % Bound action storage and growth without altering the physical generator
-    hermitian=shifted/2+shifted'/2; diagonal=real(diag(hermitian));
-    hermitian=hermitian-spdiags(diag(hermitian),0,size(A,1),size(A,1));
-    growth_bound=max(diagonal+sum(abs(hermitian),2));
+    growth_bound=max(real(shifted_diag)+radii);
     if growth_bound>0
         width=min(width,max(1,floor((log(realmax)-log(norm(rho)))/growth_bound)));
     end
 
     % Evaluate only the requested actions with no implicit trace shift
     if size(A,1)==1
-        actions=exp(shifted)*rho;
+        actions=exp(shifted_diag)*rho;
     else
-        if ~isfinite(norm(shifted,1))||norm(shifted,1)>=flintmax
+        action_norm=max(norms(:,1+use_adjoint)+abs(shifted_diag));
+        if ~isfinite(action_norm)||action_norm>=flintmax
             error('working action norm exceeds the exact double step range.');
         end
-        minimum=component_min(shifted);
-        actions=expmv(@(flag,data)exponential_action(shifted,minimum,flag,data),rho,0:width);
+        component_bound=min(minimum,component_min(shifted_diag));
+        actions=expmv(@(flag,data)exponential_action(A,shifted_diag,component_bound,...
+                                                  use_adjoint,flag,data),rho,0:width);
         actions=actions(:,2:end);
     end
 
@@ -192,30 +190,47 @@ clear restore_rng
 
 end
 
-% Estimate an amplitude shift without requiring a full physical-scale action
-function growth=real_growth(A,rho)
+% Cache fixed action bounds with bounded dense column and row workspace
+function [radii,norms,minimum,exponent]=action_bounds(A,diagonal)
 
-% Any finite real scalar shift is valid; its estimate is not an invariance test
-if size(A,1)==1
-    growth=real(A);
-else
-    [scaled,exponent]=binary_normalise(A);
-    growth=pow2(real(rho'*(scaled*rho))/(rho'*rho),exponent);
+% Measure the Hermitian row radii and both induced column norms once
+radii=zeros(size(A,1),1); norms=zeros(size(A,1),2); minimum=Inf;
+largest=max(max(abs(real(diagonal)),[],'all'),max(abs(imag(diagonal)),[],'all'));
+for k=1:size(A,1)
+    column=A(:,k); row=A(k,:)';
+    radii(k)=sum(abs(column/2+row/2)); norms(k,:)=[sum(abs(column)) sum(abs(row))];
+    minimum=min(minimum,component_min(column));
+    largest=max(largest,max(max(abs(real(column)),[],'all'),max(abs(imag(column)),[],'all')));
+end
+[~,exponent]=log2(largest);
+
 end
 
+% Estimate the real Rayleigh rate without a full normalised generator copy
+function growth=real_growth(A,diagonal,exponent,rho)
+
+% The real Rayleigh rate is identical for a generator and its Hermitian adjoint
+action=zeros(size(rho));
+for k=1:size(A,2)
+    action=action+binary_scale(A(:,k),-exponent)*rho(k);
+end
+action=action+binary_scale(diagonal,-exponent).*rho;
+growth=pow2(real(rho'*action)/(rho'*rho),exponent);
+
 end
 
-% Supply native exponential actions and adjoints without a second scalar shift
-function result=exponential_action(A,minimum,flag,data)
+% Apply shifted diagonal actions without copying or transposing the generator
+function result=exponential_action(A,diagonal,minimum,adjoint,flag,data)
 
-% Check only the changing operand after the fixed generator has been scanned
-if strcmp(flag,'real'), result=isreal(A); return; end
+% Check changing operands and select the equivalent action or its adjoint
+if strcmp(flag,'real'), result=isreal(A)&&isreal(diagonal); return; end
 if minimum*component_min(data)==0
     error('working product dynamic range exceeds the normalised double representation.');
 end
-switch flag
-    case 'notransp', result=A*data;
-    case 'transp', result=A'*data;
+if xor(strcmp(flag,'transp'),adjoint)
+    result=A'*data+conj(diagonal).*data;
+else
+    result=A*data+diagonal.*data;
 end
 
 end
@@ -224,13 +239,18 @@ end
 function [data,exponent]=binary_normalise(data)
 largest=max(max(abs(real(data)),[],'all'),max(abs(imag(data)),[],'all'));
 [~,exponent]=log2(largest);
-scaled=complex(pow2(real(data),-exponent),pow2(imag(data),-exponent));
+data=binary_scale(data,-exponent);
+end
+
+% Scale real or complex components without forcing complex working storage
+function scaled=binary_scale(data,exponent)
+scaled=pow2(real(data),exponent);
+if ~isreal(data), scaled=complex(scaled,pow2(imag(data),exponent)); end
 if any((real(data)~=0)&(real(scaled)==0),'all')||...
-   any((imag(data)~=0)&(imag(scaled)==0),'all')||...
+   (~isreal(data)&&any((imag(data)~=0)&(imag(scaled)==0),'all'))||...
    any(isnan(scaled),'all')||any(isinf(scaled),'all')
     error('working-array dynamic range exceeds the normalised double representation.');
 end
-data=scaled;
 end
 
 % Restore an observable using exponent-aware real component products

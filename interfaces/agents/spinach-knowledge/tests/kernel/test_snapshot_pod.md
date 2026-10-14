@@ -47,3 +47,5 @@ Complete-support dense/sparse normal dynamics use an independent rank-one expone
 Dense-basis diagonal projection uses independent parity-sum formulas for real/complex coordinates with sparse/dense terms. Incomplete dense supports and disconnected controls compare implicit directed traversal against independent full exponentials, with real/complex detection and both storage types.
 
 Real-storage controls compare dense/sparse coordinate projections with exact selected entries, and retain genuinely complex terms and states.
+
+Independent rank-one relaxation exponentials and two-mode triangular formulas exercise separated diagonals, real and complex coefficients, Hermitian detection, and exchanged source/detector roles in dense and sparse storage.

@@ -874,6 +874,38 @@ for basis_kind={'dense','sparse'}
     end
 end
 
+% Compare real relaxation actions with the independent rank-one exponential
+for storage={'dense','sparse'}
+    ranks=4; generator=-eye(ranks)+ones(ranks)/(2*ranks); subspace=eye(ranks);
+    if strcmp(storage{1},'sparse'), generator=sparse(generator); subspace=sparse(subspace); end
+    for coefficient=[1 1+1i]
+        for phase=[1 1i]
+            prepared=pod_project(subspace,{1i*generator},ones(ranks,1),phase*ones(ranks,1));
+            reference=conj(phase)*ranks*exp(-coefficient*(0:8)*0.1/2);
+            result=test_close(result,['real relaxation action ' storage{1} ' ' num2str(coefficient) ' ' num2str(phase)],...
+                              pod_evolve(prepared,coefficient,0.1,8),reference,1e-12,0,...
+                              'real and genuinely complex actions preserve the rank-one relaxation semigroup');
+        end
+    end
+end
+
+% Compare separated complex diagonals and adjoints with a triangular closed form
+for storage={'dense','sparse'}
+    generator=[-2+0.3i 3+2i;0 -1+0.5i]; subspace=eye(2); times=(0:8)*0.03;
+    first=exp(generator(1,1)*times); last=exp(generator(2,2)*times);
+    transfer=generator(1,2)*(first-last)/(generator(1,1)-generator(2,2));
+    if strcmp(storage{1},'sparse'), generator=sparse(generator); subspace=sparse(subspace); end
+    for swapped=[false true]
+        rho=[0.5;1]; coil=[1;0.3i];
+        if swapped, [rho,coil]=deal(coil,rho); end
+        reference=conj(coil(1))*(first*rho(1)+transfer*rho(2))+conj(coil(2))*last*rho(2);
+        prepared=pod_project(subspace,{1i*generator},rho,coil);
+        result=test_close(result,['separated diagonal action ' storage{1} ' ' num2str(swapped)],...
+                          pod_evolve(prepared,1,0.03,8),reference,1e-12,0,...
+                          'complex diagonal and off-diagonal contributions retain Hermitian detection');
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

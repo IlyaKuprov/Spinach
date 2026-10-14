@@ -761,6 +761,46 @@ for storage={'dense','sparse'}
                       reference,1e-13,0,'all intermediate coordinates on a source-to-detector path remain');
 end
 
+% Compare dense invariant actions with exact modes and preserve weak growing controls
+for storage={'dense','sparse'}
+    A=[999.5 1000.5;1000.5 999.5]; subspace=eye(2); before=rng;
+    if strcmp(storage{1},'sparse'), A=sparse(A); subspace=sparse(subspace); end
+    for phase=[1 1i]
+        prepared=pod_project(subspace,{1i*A},phase*[1;-1],[1;-1]);
+        for query={[1 3],[2^-10 1024]}
+            evaluation=query{1}; times=(0:evaluation(2))*evaluation(1);
+            result=test_close(result,['dense invariant action ' storage{1} ' ' num2str(phase)],...
+                              pod_evolve(prepared,1,evaluation(1),evaluation(2)),...
+                              2*phase*exp(-times),1e-11,0,...
+                              'a dense unobserved growth mode is never exponentiated as a full propagator');
+        end
+        prepared=pod_project(subspace,{1i*(A+1i*[1.5 -0.5;-0.5 1.5])},[1;0],phase*[1;-1]);
+        result=test_close(result,['complex adjoint action ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,1,1,3),conj(phase)*exp((-1+2i)*(0:3)),1e-11,0,...
+                          'adjoint detection retains the propagation sign and Hermitian conjugation');
+    end
+    result=test_true(result,['native action RNG ' storage{1}],isequal(before,rng),...
+                     'native norm estimation must not consume the caller random stream');
+    prepared=pod_project(subspace,{1i*A},[1;1],[1;1]); rejected=false; before=rng;
+    try
+        pod_evolve(prepared,1,1,1);
+    catch err
+        rejected=contains(err.message,'detected observable must be finite');
+    end
+    result=test_true(result,['observed growing mode ' storage{1}],rejected,...
+                     'a genuinely unrepresentable growing observable remains an error');
+    result=test_true(result,['failed action RNG ' storage{1}],isequal(before,rng),...
+                     'native norm-estimation errors also preserve the caller random stream');
+    prepared.rho=[1+eps;-1+eps]; prepared.coil=prepared.rho; rejected=false;
+    try
+        pod_evolve(prepared,1,1,1);
+    catch
+        rejected=true;
+    end
+    result=test_true(result,['weak growing mode control ' storage{1}],rejected,...
+                     'an arbitrarily small representable growing contribution is not dropped as invariant');
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

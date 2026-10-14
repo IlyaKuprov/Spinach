@@ -804,7 +804,10 @@ Initial-only and exact constant signals avoid an unnecessary exponential after
 validation. Common structural stationarity must use the same side across every
 active term; mixed state/detector sides do not establish stationarity. Computed
 zero actions can underflow and are not certificates. Sparse storage is preserved
-until a dense small reduced propagator is actually required. No componentwise
+through native exponential actions. Blocks are bounded by reduced rank and a
+Hermitian-part growth estimate; scalar models use scalar exponentials. The
+forward/adjoint choice preserves the Hermitian signal and native norm estimates
+preserve caller RNG. No componentwise
 accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
 
 The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Extreme normalised operand ranges are explicit errors, not silent product underflow.

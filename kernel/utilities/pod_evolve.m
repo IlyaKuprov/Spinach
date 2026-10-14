@@ -20,14 +20,25 @@
 %
 % Supplied terms use L=H+1i*R+1i*K in rad/s. Fixed-basis affine
 % Galerkin evaluation follows Benner et al., DOI:10.1137/130932715.
-% MATLAB expm supplies the maintained scaling/squaring exponential;
-% see Al-Mohy and Higham, DOI:10.1137/09074721X. One propagator is
-% amortised across the requested steps of the small reduced model.
+% MATLAB exponential actions follow Al-Mohy and Higham,
+% DOI:10.1137/100788860. Actions are streamed in blocks no wider than
+% the reduced rank, never forming a full propagator or full state trajectory.
+% Scalar models use the identical closed-form scalar exponential.
 % Coefficients, terms and time are assembled in one binary-exponent frame,
 % restoring only the summed time-scaled generator. No fallback order is used.
-% The propagator's real scalar growth and working-state amplitude are carried
+% A state-conditioned real scalar shift and working-state amplitude are carried
 % separately; only the detected observable is restored to physical units.
-% This avoids amplitude overflow when a small detector gives a finite signal.
+% Equivalent forward/adjoint actions choose the smaller initial norm-growth
+% rate; this changes neither the generator nor the Hermitian observable.
+% The action callback prevents an additional automatic trace shift.
+% Block widths use a Hermitian-part growth bound and the double range;
+% unscalarised action norms above flintmax are unsupported. Working actions
+% that round entirely to zero are rejected, not declared stationary.
+% Caller RNG is restored after native norm estimates, including on errors.
+% A scalar damping bound certifies zero when every future signal component
+% is below half the smallest subnormal, without testing a computed action.
+% Physical signals below the subnormal range round to zero; nonfinite
+% physical signals are errors.
 % Inputs and integer counts are double; nsteps must be below flintmax.
 % Nonfinite projected data, unrepresentable generator/component ranges,
 % and nonfinite output signals are explicit errors. No arbitrary-precision or
@@ -36,9 +47,9 @@
 % at the working scale; this can conservatively reject a finite physical result.
 % Exponent-aware component products preserve finite scaled observables.
 % Structurally unreachable or unobservable coordinates are removed exactly.
-% Constant requests and common structural stationary supports avoid expm;
+% Constant requests and common structural stationary supports avoid action evaluation;
 % computed zero actions are never used to infer stationarity. Sparse terms
-% remain sparse until the reduced dense exponential is actually needed.
+% remain sparse through the maintained exponential actions.
 % Training, projection and evaluation remain separate. No physical system,
 % metric, reference, processing policy or positivity constraint is inferred.
 % Snapshot reconstruction energy does not certify observable accuracy.
@@ -114,24 +125,89 @@ end
 A=-1i*scaled; clear term scaled
 if ~any(any(A,1)&(rho.'~=0))||~any(any(A,2)&(coil~=0)), fid(:)=fid(1); return; end
 
-% Choose a representable scalar growth factor before the maintained exponential
-nranks=size(A,1); growth=sum(real(diag(A))/nranks);
-growth_exp=floor(growth/log(2));
-if ~isfinite(growth_exp)||abs(growth_exp)>=flintmax
-    growth=0; growth_exp=0;
+% Certify scalar physical underflow from the largest finite complex signal
+if size(A,1)==1&&real(A)<log(realmin)+log(eps)-log(realmax)-2*log(2)
+    fid(2:end)=0; return;
 end
-P=expm(full(A-growth*speye(nranks))); clear A
-if any(isnan(P),'all')||any(isinf(P),'all')
-    error('shifted reduced propagator must be finite.');
-end
-[P,prop_exp]=binary_normalise(P);
-P=P*exp(growth-growth_exp*log(2)); prop_exp=prop_exp+growth_exp;
 
-% Propagate normalised coordinates and restore only the observable amplitude
-for n=1:nsteps
-    [rho,step_exp]=binary_normalise(checked_product(P,rho)); state_exp=state_exp+prop_exp+step_exp;
-    if abs(state_exp)>=flintmax, error('state exponent exceeds the exact integer range.'); end
-    fid(n+1)=detect_scaled(coil,rho,state_exp+coil_exp);
+% Choose an equivalent action with the smaller initial coordinate growth rate
+use_adjoint=real_growth(A',coil)<real_growth(A,rho);
+if use_adjoint
+    A=A'; [rho,coil]=deal(coil,rho); [state_exp,coil_exp]=deal(coil_exp,state_exp);
+    fid(1)=conj(fid(1));
+end
+
+% Preserve the caller stream used by native action norm estimates
+saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng)); completed=0;
+while completed<nsteps
+
+    % Separate the current state amplitude from a controlled real scalar shift
+    growth=real_growth(A,rho); growth_exp=floor(growth/log(2));
+    if ~isfinite(growth_exp)||abs(growth_exp)>=flintmax
+        growth=0; growth_exp=0;
+    end
+    shifted=A-growth*speye(size(A,1)); width=min(size(A,1),nsteps-completed);
+
+    % Bound action storage and growth without altering the physical generator
+    hermitian=shifted/2+shifted'/2; diagonal=real(diag(hermitian));
+    hermitian=hermitian-spdiags(diag(hermitian),0,size(A,1),size(A,1));
+    growth_bound=max(diagonal+sum(abs(hermitian),2));
+    if growth_bound>0
+        width=min(width,max(1,floor((log(realmax)-log(norm(rho)))/growth_bound)));
+    end
+
+    % Evaluate only the requested actions with no implicit trace shift
+    if size(A,1)==1
+        actions=exp(shifted)*rho;
+    else
+        if ~isfinite(norm(shifted,1))||norm(shifted,1)>=flintmax
+            error('working action norm exceeds the exact double step range.');
+        end
+        actions=expmv(@(flag,data)exponential_action(shifted,flag,data),rho,0:width);
+        actions=actions(:,2:end);
+    end
+
+    % Restore each observable while carrying the last normalised state forward
+    base_exp=state_exp;
+    for k=1:width
+        [column,column_exp]=binary_normalise(actions(:,k));
+        if ~any(column), error('working exponential action underflowed to zero.'); end
+        fractional=k*(growth-growth_exp*log(2)); fractional_exp=floor(fractional/log(2));
+        column=column*exp(fractional-fractional_exp*log(2));
+        [column,rebase]=binary_normalise(column);
+        state_exp=base_exp+column_exp+k*growth_exp+fractional_exp+rebase;
+        if abs(state_exp)>=flintmax, error('state exponent exceeds the exact integer range.'); end
+        fid(completed+k+1)=detect_scaled(coil,column,state_exp+coil_exp);
+    end
+    rho=column; completed=completed+width;
+
+end
+if use_adjoint, fid=conj(fid); end
+clear restore_rng
+
+end
+
+% Estimate an amplitude shift without requiring a full physical-scale action
+function growth=real_growth(A,rho)
+
+% Any finite real scalar shift is valid; its estimate is not an invariance test
+if size(A,1)==1
+    growth=real(A);
+else
+    [scaled,exponent]=binary_normalise(A);
+    growth=pow2(real(rho'*(scaled*rho))/(rho'*rho),exponent);
+end
+
+end
+
+% Supply native exponential actions and adjoints without a second scalar shift
+function result=exponential_action(A,flag,data)
+
+% Follow the documented operator-action protocol used by expmv
+switch flag
+    case 'real', result=isreal(A);
+    case 'notransp', result=checked_product(A,data);
+    case 'transp', result=checked_product(A',data);
 end
 
 end

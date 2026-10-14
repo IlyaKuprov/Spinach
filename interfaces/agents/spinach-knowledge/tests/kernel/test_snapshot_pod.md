@@ -39,3 +39,5 @@ Streamed dense-term projection is checked against independently selected coordin
 Additional references cover scaled-product rejection, exponent-aware real and complex overlap, disconnected unstable modes, and directed source-to-detector paths against independent triangular formulas.
 
 Additional real/imaginary tiny-basis fixtures reject product loss in both Galerkin stages. Constant-query detector fixtures now require the finite exponent-aware overlap instead of rejecting it. Exact complex-component, projection and detection cancellations remain independent controls.
+
+Dense real/complex invariant-mode references cover short and composed small-step actions despite an unobserved unstable mode. Adjoint references verify the propagation sign and complex Hermitian detection. Genuine and eps-sized observed growing modes are adversarial controls; neither is truncated as invariant. Native action RNG is checked on acceptance and error.

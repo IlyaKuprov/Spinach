@@ -799,3 +799,8 @@ Randomised construction keeps its sketch and basis real for real positively
 weighted blocks; excluded complex blocks do not force complex storage.
 Liouvillian finiteness checks preserve sparse zeros without extracting dense
 nonzero entries into a double vector.
+
+Sparse coordinate-selection preparation preserves sparse reduced terms and
+states, including in orthogonality and finiteness checks. `pod_evolve` checks
+sparse model terms without expanding implicit zeros before initial-only
+returns; nonzero-duration propagation still uses a dense reduced exponential.

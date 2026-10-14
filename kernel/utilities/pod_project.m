@@ -26,8 +26,9 @@
 % guarantee accurate reduced trajectories. Terms, states, and basis must
 % share ordering and projectors; no coordinate conversion is inferred.
 % Non-Euclidean metrics require explicit caller-supplied whitening first.
-% Orthogonality alone does not preserve positivity or trace. Term finiteness
-% checks neither expand sparse implicit zeros nor extract dense entries.
+% Orthogonality alone does not preserve positivity or trace. Finiteness
+% checks preserve sparse zeros without extracting dense entries. Sparse
+% bases retain a sparse identity in the orthogonality check.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -43,7 +44,7 @@ grumble(basis,terms,rho,coil);
 reduced=cell(size(terms));
 for n=1:numel(terms)
     reduced{n}=basis'*terms{n}*basis;
-    if ~all(isfinite(reduced{n}),'all')
+    if any(isnan(reduced{n}),'all')||any(isinf(reduced{n}),'all')
         error('projected Liouvillian terms must be finite.');
     end
 end
@@ -54,11 +55,11 @@ end
 % Consistency enforcement
 function grumble(basis,terms,rho,coil)
 if ~isa(basis,'double')||~ismatrix(basis)||isempty(basis)||...
-   ~all(isfinite(basis),'all')||size(basis,2)>size(basis,1)
+   any(isnan(basis),'all')||any(isinf(basis),'all')||size(basis,2)>size(basis,1)
     error('basis must be a finite nonempty double n-by-r matrix with r<=n.');
 end
 orth_tol=size(basis,1)*size(basis,2)*eps;
-if norm(basis'*basis-eye(size(basis,2)),'fro')>orth_tol
+if norm(basis'*basis-speye(size(basis,2)),'fro')>orth_tol
     error('basis must be orthonormal in Euclidean state coordinates.');
 end
 if ~iscell(terms)||~iscolumn(terms)||isempty(terms)
@@ -70,10 +71,10 @@ for n=1:numel(terms)
         error('each term must be a finite double n-by-n matrix.');
     end
 end
-if ~isa(rho,'double')||~isequal(size(rho),[size(basis,1) 1])||~all(isfinite(rho))
+if ~isa(rho,'double')||~isequal(size(rho),[size(basis,1) 1])||any(isnan(rho),'all')||any(isinf(rho),'all')
     error('rho must be a finite double n-by-1 column.');
 end
-if ~isa(coil,'double')||~isequal(size(coil),[size(basis,1) 1])||~all(isfinite(coil))
+if ~isa(coil,'double')||~isequal(size(coil),[size(basis,1) 1])||any(isnan(coil),'all')||any(isinf(coil),'all')
     error('coil must be a finite double n-by-1 column.');
 end
 end

@@ -194,6 +194,19 @@ for bad_value=[NaN Inf]
                      'sparse validation still rejects nonfinite stored values');
 end
 
+% Prepare a sparse coordinate-selection model without expanding basis or state zeros
+selected=pod_project(sparse_basis,{speye(2048)},sparse_state,1i*sparse_state);
+result=test_true(result,'sparse prepared storage',issparse(selected.terms{1})&&...
+                 issparse(selected.rho)&&issparse(selected.coil),...
+                 'sparse coordinate selection preserves reduced term and state representations');
+result=test_close(result,'sparse prepared term',selected.terms{1},eye(2),1e-12,0,...
+                  'sparse preparation reproduces the independent identity projection');
+result=test_close(result,'sparse prepared observable',pod_evolve(selected,1,0.03,0),...
+                  -1i,0,0,'sparse complex detection retains the Hermitian initial overlap');
+result=test_close(result,'sparse prepared evolution',pod_evolve(selected,1,0.03,3),...
+                  -1i*exp(-1i*0.03*(0:3)),1e-12,0,...
+                  'nonzero-duration sparse models recover the independent scalar phase trajectory');
+
 % Reject nonfinite dense terms without extracting their double entries
 for bad_value=[NaN Inf]
     bad_term=eye(3); bad_term(1,2)=bad_value; rejected=false;
@@ -238,6 +251,25 @@ result=test_close(result,'zero-step initial observable',pod_evolve(model,coeffic
 large_model=struct('terms',{{realmax*eye(2)}},'rho',[1;2],'coil',[1i;3]);
 result=test_close(result,'zero-duration large generator',pod_evolve(large_model,2,0,3),...
                   repmat(6-1i,1,4),0,0,'a zero-duration trace is well defined even when affine assembly would overflow');
+
+% Validate sparse reduced terms even when no generator is needed
+sparse_prepared=struct('terms',{{speye(2048);sparse(2048,2048)}},...
+                       'rho',ones(2048,1),'coil',1i*ones(2048,1));
+result=test_close(result,'sparse zero-step observable',pod_evolve(sparse_prepared,[1;0],0.03,0),...
+                  -2048i,0,0,'sparse reduced terms permit initial-only requests without expansion');
+result=test_close(result,'sparse zero-duration trace',pod_evolve(sparse_prepared,[1;0],0,3),...
+                  -2048i*ones(1,4),0,0,'sparse reduced terms and a zero term preserve repeated initial overlaps');
+for bad_value=[NaN Inf]
+    invalid_prepared=sparse_prepared;
+    invalid_prepared.terms{1}=sparse(1,1,bad_value,2048,2048); rejected=false;
+    try
+        pod_evolve(invalid_prepared,[1;0],0,0);
+    catch err
+        rejected=contains(err.message,'model terms must be conformable finite');
+    end
+    result=test_true(result,['sparse model nonfinite ' num2str(bad_value)],rejected,...
+                     'stored NaN and Inf are rejected before an initial-only return');
+end
 
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};

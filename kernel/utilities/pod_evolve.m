@@ -26,6 +26,7 @@
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
 % Zero-step or zero-duration requests validate inputs and return the initial
 % signal, repeated as needed, without assembling or exponentiating a generator.
+% Sparse model terms and states are validated without expanding implicit zeros.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -67,13 +68,14 @@ end
 nranks=size(model.terms{1},1);
 for n=1:numel(model.terms)
     if ~isa(model.terms{n},'double')||nranks<1||...
-       ~isequal(size(model.terms{n}),[nranks nranks])||~all(isfinite(model.terms{n}),'all')
+       ~isequal(size(model.terms{n}),[nranks nranks])||...
+       any(isnan(model.terms{n}),'all')||any(isinf(model.terms{n}),'all')
         error('model terms must be conformable finite square double matrices.');
     end
 end
 if ~isa(model.rho,'double')||~isequal(size(model.rho),[nranks 1])||...
-   ~all(isfinite(model.rho))||~isa(model.coil,'double')||...
-   ~isequal(size(model.coil),[nranks 1])||~all(isfinite(model.coil))
+   any(isnan(model.rho),'all')||any(isinf(model.rho),'all')||~isa(model.coil,'double')||...
+   ~isequal(size(model.coil),[nranks 1])||any(isnan(model.coil),'all')||any(isinf(model.coil),'all')
     error('model rho and coil must be conformable finite double columns.');
 end
 if ~isa(coefficients,'double')||~isequal(size(coefficients),size(model.terms))||...

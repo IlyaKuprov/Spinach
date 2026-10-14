@@ -80,9 +80,14 @@ sketch_rank=min(target_rank+options.oversampling,column_count);
 % Represent weighted block scales without forming their potentially large product
 [weight_frac,weight_exp]=log2(sqrt(weights)); block_exp=zeros(size(weights));
 for n=1:numel(blocks)
-    largest=max(max(abs(real(blocks{n})),[],'all'),max(abs(imag(blocks{n})),[],'all'));
+    largest=0;
+    for k=1:sketch_rank:size(blocks{n},2)
+        columns=k:min(k+sketch_rank-1,size(blocks{n},2)); data=blocks{n}(:,columns);
+        largest=max(largest,max(max(abs(real(data)),[],'all'),max(abs(imag(data)),[],'all')));
+    end
     if largest==0, block_exp(n)=-Inf; else, [~,block_exp(n)]=log2(largest); end
 end
+clear data
 scale_exponent=max(block_exp+weight_exp);
 if ~isfinite(scale_exponent), error('weighted data must be nonzero.'); end
 

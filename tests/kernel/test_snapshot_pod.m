@@ -354,6 +354,18 @@ for storage={'dense','sparse'}
                       1i/sqrt(2),1e-15,0,'large finite complex detector coordinates remain supported');
 end
 
+% Compare streamed dense projection with independently selected coordinates
+selection=[1;333;1000]; subspace=sparse(selection,(1:3).',1,1000,3);
+dense_term=randn(1000)+1i*randn(1000); rho_dense=randn(1000,1); coil_dense=1i*randn(1000,1);
+prepared=pod_project(subspace,{dense_term},rho_dense,coil_dense);
+result=test_close(result,'streamed dense term',prepared.terms{1},dense_term(selection,selection),...
+                  0,0,'coordinate selection gives an independent dense-operator projection reference');
+result=test_close(result,'streamed dense state',prepared.rho,rho_dense(selection),...
+                  0,0,'state projection uses the same bounded normalisation arithmetic');
+result=test_close(result,'streamed dense detector',prepared.coil,coil_dense(selection),...
+                  0,0,'Hermitian detector projection preserves the selected complex coordinates');
+clear dense_term rho_dense coil_dense
+
 % Solve a non-Hermitian triangular dissipative model in an invariant subspace
 H=diag([2 -3 7]); R=[-0.4 0.2 0;0 -0.8 0;0 0 -1.2];
 rho=[1+1i;-0.3+0.2i;0]; coil=[0.4-0.2i;1+1i;2];
@@ -487,7 +499,7 @@ result=test_close(result,'exact stationary detector',pod_evolve(left_null,1,0.03
 small_phase=struct('terms',{{sparse(1e-100)}},'rho',1,'coil',1);
 small_fid=pod_evolve(small_phase,1,0.03,3);
 result=test_true(result,'nonzero small generator',imag(small_fid(end))~=0,...
-                 'stationary returns use exact nullspace actions rather than a magnitude tolerance');
+                 'stationary returns use structural support rather than a magnitude tolerance');
 
 % Preserve representable time-scaled phases across scalar factor ranges
 for storage={'dense','sparse'}
@@ -499,13 +511,13 @@ for storage={'dense','sparse'}
                       -1,1e-12,0,'the time step rescues a phase lost by coefficient-term multiplication');
     prepared.terms=terms(2); observed=pod_evolve(prepared,2^-700,2^-700,1);
     result=test_close(result,['scalar scale underflow ' storage{1}],imag(observed(2))/2^-400,...
-                      -1,1e-12,0,'term-first ordering avoids an underflowing coefficient-time product');
+                      -1,1e-12,0,'the binary frame avoids an underflowing coefficient-time product');
     prepared.terms=terms(3);
     result=test_close(result,['scalar scale overflow ' storage{1}],pod_evolve(prepared,2^700,2^700,1),...
-                      [1 0],0,0,'term-first ordering retains a finite strongly damped exponent');
+                      [1 0],0,0,'the binary frame retains a finite strongly damped exponent');
     prepared.terms=terms(4);
     result=test_close(result,['generator scale overflow ' storage{1}],pod_evolve(prepared,2^400,2^-1000,1),...
-                      [1 0],0,0,'time-first ordering avoids an overflowing unscaled generator');
+                      [1 0],0,0,'the common binary frame avoids an overflowing unscaled generator');
     prepared.terms=terms(5); rejected=false;
     try
         pod_evolve(prepared,2^-700,2^-700,1);
@@ -548,13 +560,13 @@ for storage={'dense','sparse'}
     prepared=pod_project(1,terms(1),1,1);
     result=test_close(result,['subnormal scale ordering ' storage{1}],...
                       pod_evolve(prepared,2^51,2^-1074,1),[1 exp(-1i)],1e-12,0,...
-                      'time-term multiplication retains a finite exponent despite coefficient-term overflow');
+                      'the common binary frame retains a finite exponent despite coefficient-term overflow');
     observed=pod_evolve(prepared,2.1,2^-1074,1);
     result=test_close(result,['subnormal scale precision ' storage{1}],imag(observed(2))/(2.1*2^-51),...
                       -1,1e-12,0,'subnormal scalar products do not quantise a representable phase');
     result=test_close(result,['subnormal coefficient ordering ' storage{1}],...
                       pod_evolve(prepared,2^-1074,2^40,1),[1 exp(-1i*2^-11)],1e-12,0,...
-                      'a finite unscaled affine term rescues overflowing time-term multiplication');
+                      'separate exponents retain the phase without overflowing time-term multiplication');
     prepared.terms=terms([2;2]);
     result=test_close(result,['overflowing scaled cancellation ' storage{1}],...
                       pod_evolve(prepared,[1;-1],2,3),ones(1,4),0,0,...
@@ -581,7 +593,7 @@ observed=pod_evolve(scaled_mixing,1e-200,1e200,1);
 result=test_close(result,'affine tiny mixing phase',imag(observed(2))/1e-200,-1,1e-12,0,...
                   'a zero initial overlap does not hide a representable off-diagonal phase');
 
-% Check bounded scaling fallbacks and common structural stationarity
+% Check binary-frame scaling and common structural stationarity
 for storage={'dense','sparse'}
     for phase=[1 1i]
         huge=phase*2^1023; stationary=phase*[0 realmax;0 realmax];
@@ -589,7 +601,7 @@ for storage={'dense','sparse'}
         prepared=struct('terms',{{huge}},'rho',1,'coil',1);
         result=test_close(result,['subnormal fallback ' storage{1} ' ' num2str(phase)],...
                           pod_evolve(prepared,2^51,2^-1074,2),exp(-1i*phase*(0:2)),1e-12,0,...
-                          'a finite subnormal scale rescues overflowing term-first multiplication');
+                          'a common binary frame avoids overflowing term-first multiplication');
         prepared.terms={phase*realmax;-phase*realmax;phase*0.5};
         if strcmp(storage{1},'sparse'), prepared.terms=cellfun(@sparse,prepared.terms,'UniformOutput',false); end
         result=test_close(result,['affine scaling fallback ' storage{1} ' ' num2str(phase)],...

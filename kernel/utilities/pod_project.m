@@ -30,7 +30,8 @@
 % checks preserve sparse zeros without extracting dense entries. Sparse
 % bases retain a sparse identity in the orthogonality check. Computed
 % projected terms and state vectors must remain finite. Projection uses a
-% power-of-two scale before matrix products and restores physical units
+% power-of-two scale in column slices bounded by reduced rank before
+% matrix products and restores physical units
 % afterwards. Unsupported component loss is rejected, not silently removed.
 % The Gram tolerance uses a dimension-dependent complex-arithmetic budget
 % gamma(8*n)*r, with gamma(k)=k*eps/(1-k*eps).
@@ -60,18 +61,39 @@ end
 
 % Evaluate a Galerkin product in a binary-scaled representation
 function projected=scaled_projection(basis,data,right)
-largest=max(max(abs(real(data)),[],'all'),max(abs(imag(data)),[],'all'));
-[~,exponent]=log2(largest);
-scaled=complex(pow2(real(data),-exponent),pow2(imag(data),-exponent));
-if any((real(data)~=0)&(real(scaled)==0),'all')||...
-   any((imag(data)~=0)&(imag(scaled)==0),'all')
-    error('projection data dynamic range exceeds the normalised double representation.');
+
+% Measure the binary input scale without a second full operator
+width=size(basis,2); largest=0;
+for n=1:width:size(data,2)
+    columns=n:min(n+width-1,size(data,2)); part=data(:,columns);
+    largest=max(largest,max(max(abs(real(part)),[],'all'),max(abs(imag(part)),[],'all')));
 end
-projected=basis'*scaled*right;
+[~,exponent]=log2(largest);
+
+% Allocate only the required projected coordinates while preserving sparse storage
+if issparse(basis)&&issparse(data)
+    projected=complex(sparse(size(basis,2),size(right,2)));
+else
+    projected=complex(zeros(size(basis,2),size(right,2)));
+end
+
+% Accumulate the Galerkin product from bounded normalised column slices
+for n=1:width:size(data,2)
+    columns=n:min(n+width-1,size(data,2)); part=data(:,columns);
+    scaled=complex(pow2(real(part),-exponent),pow2(imag(part),-exponent));
+    if any((real(part)~=0)&(real(scaled)==0),'all')||...
+       any((imag(part)~=0)&(imag(scaled)==0),'all')
+        error('projection data dynamic range exceeds the normalised double representation.');
+    end
+    projected=projected+(basis'*scaled)*right(columns,:);
+end
+
+% Restore physical units and reject unsupported projected coordinates
 projected=complex(pow2(real(projected),exponent),pow2(imag(projected),exponent));
 if any(isnan(projected),'all')||any(isinf(projected),'all')
     error('projected terms and states must be finite.');
 end
+
 end
 
 % Consistency enforcement

@@ -33,3 +33,5 @@ Dense/sparse real and imaginary fixtures check subnormal product-order fallback,
 Power-of-two-normalised exact and randomised training checks scale covariance at1e-200,1 and1e200, with independent singular values and residual ratios. Physical squared energy is a diagnostic, not a rank decision. Caller RNG remains preserved.
 
 Compensating block amplitudes and weights have independently known singular values and reconstruction residuals. Physical diagnostic overflow retains a finite scaled frame; unsupported component loss is rejected without RNG changes. Native complex scalar SVD bases are accepted by the dimension-derived Gram budget. A positively amplified non-normal triangular family matches an independently scaled analytic semigroup beyond physical state range.
+
+Streamed dense-term projection is checked against independently selected coordinates of a1000-by1000 complex operator; projected state and detector selections are exact. Sparse prepared storage remains a maintained acceptance condition. Non-double time and integer-count inputs are rejected explicitly.

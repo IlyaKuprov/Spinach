@@ -325,6 +325,33 @@ result=test_close(result,'dense zero coefficients',pod_evolve(model,zeros(2,1),0
 result=test_close(result,'zero-step initial observable',pod_evolve(model,coefficients,0.03,0),...
                   reference(1),1e-12,0,'zero steps return exactly one initial complex observable');
 
+% Reject nonfinite computed overlaps before constant-signal shortcuts
+for storage={'dense','sparse'}
+    subspace=eye(2); terms={zeros(2)}; rho=[2;-2];
+    if strcmp(storage{1},'sparse')
+        subspace=sparse(subspace); terms={sparse(2,2)}; rho=sparse(rho);
+    end
+    for phase=[1 1+1i]
+        coil=phase*realmax*[1;1];
+        if strcmp(storage{1},'sparse'), coil=sparse(coil); end
+        prepared=pod_project(subspace,terms,rho,coil);
+        for query={[0 0 0],[1 0 3],[0 0.03 3]}
+            evaluation=query{1}; rejected=false;
+            try
+                pod_evolve(prepared,evaluation(1),evaluation(2),evaluation(3));
+            catch err
+                rejected=contains(err.message,'initial observable must be finite');
+            end
+            result=test_true(result,['overlap overflow ' storage{1} ' ' num2str(phase) ' ' num2str(evaluation)],...
+                             rejected,'finite coordinates with a nonfinite computed overlap fail before initial-only returns');
+        end
+        prepared.rho=rho/4; prepared.coil=coil/2;
+        result=test_close(result,['finite large overlap ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,0,0.03,3)/realmax,zeros(1,4),0,0,...
+                          'large cancelling products remain supported when each product is finite');
+    end
+end
+
 % Zero-duration traces depend only on the initial overlap, not generator assembly
 large_model=struct('terms',{{realmax*eye(2)}},'rho',[1;2],'coil',[1i;3]);
 result=test_close(result,'zero-duration large generator',pod_evolve(large_model,2,0,3),...

@@ -33,6 +33,7 @@
 % Zero generator columns on the state support, or zero rows on the detector
 % support, also give constant traces. Computed zero actions are not inferred.
 % Sparse model terms and states are validated without expanding implicit zeros.
+% Nonfinite computed initial overlaps are rejected, including constant queries.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -44,8 +45,13 @@ function fid=pod_evolve(model,coefficients,timestep,nsteps)
 % Check the prepared model and evaluation contract
 grumble(model,coefficients,timestep,nsteps);
 
-% Return known constant signals without constructing a propagator
+% Compute and check the initial observable
 rho=model.rho; fid=complex(zeros(1,nsteps+1)); fid(1)=model.coil'*rho;
+if ~isfinite(fid(1))
+    error('initial observable must be finite.');
+end
+
+% Return known constant signals without constructing a propagator
 if (nsteps==0)||(timestep==0)||~any(coefficients)||~any(rho)||~any(model.coil)
     fid(:)=fid(1); return;
 end

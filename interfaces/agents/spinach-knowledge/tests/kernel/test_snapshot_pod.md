@@ -21,3 +21,5 @@ Large oversampling retains the prescribed leading subspace and all compressed si
 Underflowing state and detector actions retain their finite independent phase reference. A cancellation-based nullspace remains supported without the structural shortcut.
 
 Dense/sparse real and complex state projection overflow is rejected during preparation; large finite projected initial and detector coordinates remain supported.
+
+Dense/sparse real and complex initial-overlap overflow is rejected before zero-step, zero-duration and zero-coefficient returns. Large cancelling overlaps with finite intermediate products remain supported.

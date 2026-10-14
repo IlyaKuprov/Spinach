@@ -34,7 +34,9 @@
 % support, also give constant traces. Computed zero actions are not inferred.
 % Sparse model terms and states are validated without expanding implicit zeros.
 % Coefficient/time products are formed first when normal and finite; otherwise
-% terms are multiplied by their coefficient before the time step. Nonzero term
+% terms are multiplied by the time step before their coefficient. A finite
+% unscaled affine sum is tried when individual scaled terms are out of range.
+% Common structural stationarity is checked before any scaling. Nonzero term
 % entries lost to time-scaling underflow are rejected, not inferred as exact zeros.
 % Nonfinite computed states and overlaps are rejected, including constant queries.
 %
@@ -59,23 +61,53 @@ if (nsteps==0)||(timestep==0)||~any(coefficients)||~any(rho)||~any(model.coil)
     fid(:)=fid(1); return;
 end
 
+% Check common structural stationarity before scaling irrelevant entries
+active=find(coefficients).'; fixed_state=true; fixed_coil=true;
+for n=active
+    fixed_state=fixed_state&&~any(any(model.terms{n},1)&(rho.'~=0));
+    fixed_coil=fixed_coil&&~any(any(model.terms{n},2)&(model.coil~=0));
+end
+if fixed_state||fixed_coil, fid(:)=fid(1); return; end
+
 % Assemble the time-scaled projected affine Liouvillian
+scaled_valid=true;
 scaled_L=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
-for n=find(coefficients).'
+for n=active
     scale=coefficients(n)*timestep;
     if ~isfinite(scale)||abs(scale)<realmin
-        term=(coefficients(n)*model.terms{n})*timestep;
+        term=(model.terms{n}*timestep)*coefficients(n);
     else
         term=scale*model.terms{n};
     end
-    if any(isnan(term),'all')||any(isinf(term),'all')
-        error('time-scaled Liouvillian terms must be finite.');
-    end
-    if nnz(term)<nnz(model.terms{n})
-        error('nonzero time-scaled term entries must remain representable.');
+    if any(isnan(term),'all')||any(isinf(term),'all')||nnz(term)<nnz(model.terms{n})
+        scaled_valid=false; clear term; break;
     end
     scaled_L=scaled_L+term;
     clear term
+end
+
+% Preserve affine cancellation when separate time-scaled terms overflow
+if ~scaled_valid||any(isnan(scaled_L),'all')||any(isinf(scaled_L),'all')
+    clear scaled_L
+    L=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
+    for n=active
+        term=coefficients(n)*model.terms{n};
+        if any(isnan(term),'all')||any(isinf(term),'all')
+            error('affine Liouvillian terms must be finite.');
+        end
+        if nnz(term)<nnz(model.terms{n})
+            error('nonzero affine term entries must remain representable.');
+        end
+        L=L+term; clear term
+    end
+    if any(isnan(L),'all')||any(isinf(L),'all')
+        error('affine Liouvillian must be finite.');
+    end
+    scaled_L=L*timestep;
+    if nnz(scaled_L)<nnz(L)
+        error('nonzero time-scaled generator entries must remain representable.');
+    end
+    clear L
 end
 if any(isnan(scaled_L),'all')||any(isinf(scaled_L),'all')
     error('time-scaled Liouvillian must be finite.');

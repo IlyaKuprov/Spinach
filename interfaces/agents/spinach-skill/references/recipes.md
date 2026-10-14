@@ -826,6 +826,9 @@ Cancellation-based nullspaces use the general exponential path.
 
 POD evolution assembles the time-scaled affine generator, ordering scalar
 products to avoid an underflowing or overflowing coefficient/time intermediate.
+A finite unscaled affine sum is tried when individual scaled terms are out of
+range, preserving cancellation before time scaling. Common same-side structural
+stationarity is checked before scaling unreachable entries.
 Lost nonzero scaled term entries are rejected rather than treated as exact
 zeros. Computed initial/later observables and propagated states must remain
 finite; this is explicit rejection, not scaled-state propagation.

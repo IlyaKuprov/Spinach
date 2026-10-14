@@ -806,3 +806,5 @@ active term; mixed state/detector sides do not establish stationarity. Computed
 zero actions can underflow and are not certificates. Sparse storage is preserved
 until a dense small reduced propagator is actually required. No componentwise
 accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
+
+POD normalised products explicitly reject nonzero real constituent factors that multiply to zero in projection, affine scaling and detection. Checks preserve column-sliced sparse projection and accept exact cancellation of representable products. They do not provide arbitrary exponent-aware dot accumulation; unobserved unstable blocks still require a finite complete shifted propagator.

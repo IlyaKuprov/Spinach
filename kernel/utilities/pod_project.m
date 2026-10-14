@@ -85,7 +85,7 @@ for n=1:width:size(data,2)
        any((imag(part)~=0)&(imag(scaled)==0),'all')
         error('projection data dynamic range exceeds the normalised double representation.');
     end
-    projected=projected+(basis'*scaled)*right(columns,:);
+    projected=projected+checked_product(checked_product(basis',scaled),right(columns,:));
 end
 
 % Restore physical units and reject unsupported projected coordinates
@@ -94,6 +94,22 @@ if any(isnan(projected),'all')||any(isinf(projected),'all')
     error('projected terms and states must be finite.');
 end
 
+end
+
+% Reject lost real constituent products before a complex matrix multiplication
+function product=checked_product(left,right)
+for n=1:size(left,1)
+    for k=1:size(right,2)
+        for a={real(left(n,:)).',imag(left(n,:)).'}
+            for b={real(right(:,k)),imag(right(:,k))}
+                if any((a{1}~=0)&(b{1}~=0)&(a{1}.*b{1}==0),'all')
+                    error('projection product underflow exceeds the normalised double representation.');
+                end
+            end
+        end
+    end
+end
+product=left*right;
 end
 
 % Consistency enforcement

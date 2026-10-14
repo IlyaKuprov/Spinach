@@ -81,7 +81,9 @@ if ~isfinite(common_exp), fid(:)=fid(1); return; end
 A=complex(sparse(size(model.terms{1},1),size(model.terms{1},2)));
 for n=active(order)
     if ~isfinite(term_exp(n)), continue; end
-    [term,~]=binary_normalise(model.terms{n}); term=term*(coef_frac(n)*time_frac);
+    [term,~]=binary_normalise(model.terms{n});
+    check_factors(coef_frac(n),time_frac); fraction=coef_frac(n)*time_frac;
+    check_factors(term,fraction); term=term*fraction;
     if nnz(term)<nnz(model.terms{n})
         error('affine term dynamic range exceeds the normalised double representation.');
     end
@@ -139,9 +141,20 @@ end
 
 % Restore the physical observable after a bounded Hermitian inner product
 function signal=detect_scaled(coil,rho,exponent)
-signal=coil'*rho;
+check_factors(coil,rho); signal=coil'*rho;
 signal=complex(pow2(real(signal),exponent),pow2(imag(signal),exponent));
 if ~isfinite(signal), error('detected observable must be finite.'); end
+end
+
+% Reject vanished nonzero factors independently of complex summation or cancellation
+function check_factors(left,right)
+for a={real(left),imag(left)}
+    for b={real(right),imag(right)}
+        if any((a{1}~=0)&(b{1}~=0)&(a{1}.*b{1}==0),'all')
+            error('working product underflow exceeds the normalised double representation.');
+        end
+    end
+end
 end
 
 % Consistency enforcement

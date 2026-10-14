@@ -30,7 +30,8 @@
 % Zero coefficients are omitted from assembly; sparse active terms retain a
 % sparse generator until a dense exponential is needed. An exactly zero
 % assembled generator returns the constant initial signal without an exponential.
-% Exact right-state or left-detector nullspaces also give constant traces.
+% Zero generator columns on the state support, or zero rows on the detector
+% support, also give constant traces. Computed zero actions are not inferred.
 % Sparse model terms and states are validated without expanding implicit zeros.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -58,8 +59,8 @@ if any(isnan(L),'all')||any(isinf(L),'all')
     error('assembled Liouvillian must be finite.');
 end
 
-% Return the constant observable for an exact stationary state or detector
-if (nnz(L)==0)||(nnz(L*rho)==0)||(nnz(model.coil'*L)==0), fid(:)=fid(1); return; end
+% Return the constant observable for a structurally stationary state or detector
+if ~any(any(L,1)&(rho.'~=0))||~any(any(L,2)&(model.coil~=0)), fid(:)=fid(1); return; end
 
 % Propagate the reduced observable with the Spinach sign convention
 P=expm(-1i*full(L)*timestep);

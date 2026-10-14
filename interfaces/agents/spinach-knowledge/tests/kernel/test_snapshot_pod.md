@@ -15,3 +15,5 @@ Sparse coordinate-selection preparation checks reduced storage, the identity pro
 Constant-signal cases cover full and sparse zero coefficient columns, zero sparse terms, exact affine cancellation, and zero states/detectors. A two-coordinate mixing reference ensures a zero initial overlap can evolve into a nonzero signal. Stored NaN/Inf remain invalid with zero coefficients.
 
 Large oversampling retains the prescribed leading subspace and all compressed singular values. Exact sparse right/left nullspace fixtures include non-normal dynamics and a nonstationary state observed by a stationary detector. A tiny nonzero phase is not discarded as stationary.
+
+Underflowing state and detector actions retain their finite independent phase reference. A cancellation-based nullspace remains supported without the structural shortcut.

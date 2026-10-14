@@ -51,3 +51,5 @@ Real-storage controls compare dense/sparse coordinate projections with exact sel
 Independent rank-one relaxation exponentials and two-mode triangular formulas exercise separated diagonals, real and complex coefficients, Hermitian detection, and exchanged source/detector roles in dense and sparse storage.
 
 Scalar complex-phase controls preserve the selected adjoint conjugation in the closed-form action, including exchanged state and detector roles.
+
+Connected tridiagonal relaxation fixtures compare dense and rank-8192 sparse models with an independent alternating-eigenmode exponential, complex coefficients, and exchanged source/detector roles.

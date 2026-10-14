@@ -32,8 +32,8 @@
 % rate; this changes neither the generator nor the Hermitian observable.
 % The diagonal is stored separately; callbacks apply its scalar shift without
 % constructing a shifted dense operator. The Hermitian bound and induced norms
-% use bounded column/row scans, never a full Hermitian-part matrix. Real actions
-% and states retain real working storage. The native callback prevents an
+% use sparse reductions or bounded dense scans, never a dense Hermitian part.
+% Real actions and states retain real working storage. The native callback prevents an
 % additional automatic trace shift.
 % Block widths use a Hermitian-part growth bound and the double range;
 % unscalarised action norms above flintmax are unsupported. Working actions
@@ -53,7 +53,7 @@
 % Structurally unreachable or unobservable coordinates are removed exactly.
 % Implicit support traversal uses bounded dense row/column slices; sparse
 % reverse traversal stores transposed sparse terms. Fixed off-diagonal component
-% bounds, Hermitian radii, and induced norms use bounded column/row scans;
+% bounds, Hermitian radii, and induced norms preserve the operator storage;
 % shifted diagonal components are checked once per action block.
 % Constant requests and common structural stationary supports avoid action evaluation;
 % computed zero actions are never used to infer stationarity. Sparse terms
@@ -195,29 +195,39 @@ clear restore_rng
 
 end
 
-% Cache fixed action bounds with bounded dense column and row workspace
+% Cache action bounds with sparse reductions or bounded dense workspace
 function [radii,norms,minimum,exponent]=action_bounds(A,diagonal)
 
 % Measure the Hermitian row radii and both induced column norms once
-radii=zeros(size(A,1),1); norms=zeros(size(A,1),2); minimum=Inf;
 largest=max(max(abs(real(diagonal)),[],'all'),max(abs(imag(diagonal)),[],'all'));
-for k=1:size(A,1)
-    column=A(:,k); row=A(k,:)';
-    radii(k)=sum(abs(column/2+row/2)); norms(k,:)=[sum(abs(column)) sum(abs(row))];
-    minimum=min(minimum,component_min(column));
-    largest=max(largest,max(max(abs(real(column)),[],'all'),max(abs(imag(column)),[],'all')));
+if issparse(A)
+    radii=full(sum(abs(A/2+A'/2),2));
+    norms=full([sum(abs(A),1).' sum(abs(A),2)]); minimum=component_min(A);
+    largest=full(max(largest,max(max(abs(real(A)),[],'all'),max(abs(imag(A)),[],'all'))));
+else
+    radii=zeros(size(A,1),1); norms=zeros(size(A,1),2); minimum=Inf;
+    for k=1:size(A,1)
+        column=A(:,k); row=A(k,:)';
+        radii(k)=sum(abs(column/2+row/2)); norms(k,:)=[sum(abs(column)) sum(abs(row))];
+        minimum=min(minimum,component_min(column));
+        largest=max(largest,max(max(abs(real(column)),[],'all'),max(abs(imag(column)),[],'all')));
+    end
 end
 [~,exponent]=log2(largest);
 
 end
 
-% Estimate the real Rayleigh rate without a full normalised generator copy
+% Estimate the real Rayleigh rate without a full dense normalised generator
 function growth=real_growth(A,diagonal,exponent,rho)
 
 % The real Rayleigh rate is identical for a generator and its Hermitian adjoint
-action=zeros(size(rho));
-for k=1:size(A,2)
-    action=action+binary_scale(A(:,k),-exponent)*rho(k);
+if issparse(A)
+    action=binary_scale(A,-exponent)*rho;
+else
+    action=zeros(size(rho));
+    for k=1:size(A,2)
+        action=action+binary_scale(A(:,k),-exponent)*rho(k);
+    end
 end
 action=action+binary_scale(diagonal,-exponent).*rho;
 growth=pow2(real(rho'*action)/(rho'*rho),exponent);
@@ -251,8 +261,8 @@ end
 function scaled=binary_scale(data,exponent)
 scaled=pow2(real(data),exponent);
 if ~isreal(data), scaled=complex(scaled,pow2(imag(data),exponent)); end
-if any((real(data)~=0)&(real(scaled)==0),'all')||...
-   (~isreal(data)&&any((imag(data)~=0)&(imag(scaled)==0),'all'))||...
+if nnz(real(data))~=nnz(real(scaled))||...
+   (~isreal(data)&&nnz(imag(data))~=nnz(imag(scaled)))||...
    any(isnan(scaled),'all')||any(isinf(scaled),'all')
     error('working-array dynamic range exceeds the normalised double representation.');
 end

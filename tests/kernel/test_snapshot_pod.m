@@ -919,6 +919,26 @@ for storage={'dense','sparse'}
     end
 end
 
+% Compare connected tridiagonal actions with an independent alternating eigenmode
+for storage={'dense','sparse'}
+    ranks=128;
+    if strcmp(storage{1},'sparse'), ranks=8192; end
+    values=ones(ranks,1); diagonal=-2*values; diagonal([1 end])=-3;
+    generator=spdiags([values diagonal values],-1:1,ranks,ranks);
+    if strcmp(storage{1},'dense'), generator=full(generator); end
+    for coefficient=[1 1+0.2i]
+        for swapped=[false true]
+            rho=(-1).^(1:ranks).'; coil=(1+0.3i)*rho;
+            if swapped, [rho,coil]=deal(coil,rho); end
+            prepared=struct('terms',{{1i*generator}},'rho',rho,'coil',coil);
+            reference=(coil'*rho)*exp(-4*coefficient*(0:4)*0.01);
+            result=test_close(result,['tridiagonal action ' storage{1} ' ' num2str(coefficient) ' ' num2str(swapped)],...
+                              pod_evolve(prepared,coefficient,0.01,4),reference,0,1e-12,...
+                              'connected sparse and dense actions preserve the exact relaxation eigenmode');
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

@@ -26,7 +26,8 @@
 % guarantee accurate reduced trajectories. Terms, states, and basis must
 % share ordering and projectors; no coordinate conversion is inferred.
 % Non-Euclidean metrics require explicit caller-supplied whitening first.
-% Orthogonality alone does not preserve positivity or trace.
+% Orthogonality alone does not preserve positivity or trace. Term finiteness
+% checks neither expand sparse implicit zeros nor extract dense entries.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -65,7 +66,7 @@ if ~iscell(terms)||~iscolumn(terms)||isempty(terms)
 end
 for n=1:numel(terms)
     if ~isa(terms{n},'double')||~isequal(size(terms{n}),[size(basis,1) size(basis,1)])||...
-       ~all(isfinite(nonzeros(terms{n})))
+       any(isnan(terms{n}),'all')||any(isinf(terms{n}),'all')
         error('each term must be a finite double n-by-n matrix.');
     end
 end

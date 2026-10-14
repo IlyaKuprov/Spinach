@@ -96,6 +96,38 @@ for power_iters=[0 2]
                      'genuinely truncated sketches preserve the caller random state');
 end
 
+% Compare real-only sketches with a real Gaussian reference and retain real storage
+rng(632,'twister'); real_snapshots=randn(18,27);
+real_blocks={sparse(real_snapshots(:,1:7));real_snapshots(:,8:19);1i*ones(18,8)};
+real_weights=[0.5;2;0]; weighted=[sqrt(0.5)*real_snapshots(:,1:7) sqrt(2)*real_snapshots(:,8:19)];
+for power_iters=[0 2]
+    sketch_opts=struct('method','randomised','oversampling',2,...
+                       'power_iters',power_iters,'seed',17);
+    rng(17,'twister'); omega=randn(19,6); [range,~]=qr(weighted*omega,0);
+    for k=1:power_iters
+        [dual_range,~]=qr(weighted'*range,0);
+        [range,~]=qr(weighted*dual_range,0);
+    end
+    [left_modes,values]=svd(range'*weighted,'econ');
+    reference=range*left_modes(:,1:4); before=rng;
+    observed=pod_basis(real_blocks,real_weights,4,sketch_opts);
+    repeated=pod_basis(real_blocks,real_weights,4,sketch_opts);
+    result=test_close(result,['real projector ' num2str(power_iters)],...
+                      observed.basis*observed.basis',reference*reference',1e-12,0,...
+                      'real weighted blocks recover the independent real truncated sketch');
+    result=test_close(result,['real values ' num2str(power_iters)],observed.singular_vals,...
+                      diag(values),1e-12,0,'real compressed singular values match the concatenated reference');
+    result=test_close(result,['real residual ' num2str(power_iters)],observed.residual_abs,...
+                      norm(weighted-observed.basis*(observed.basis'*weighted),'fro'),1e-12,0,...
+                      'a zero-weight complex block does not contribute to the real projection residual');
+    result=test_true(result,['real storage ' num2str(power_iters)],isreal(observed.basis),...
+                     'complex storage is unnecessary when every positively weighted block is real');
+    result=test_true(result,['real RNG ' num2str(power_iters)],isequal(before,rng),...
+                     'real truncated sketches preserve the caller random state');
+    result=test_close(result,['real repeatability ' num2str(power_iters)],...
+                      observed.basis,repeated.basis,0,0,'real sketches are reproducible for a fixed seed');
+end
+
 % Check sparse snapshots against dense data and reject nonfinite or zero data
 for sparse_opts={exact_opts,rand_opts}
     sparse_result=pod_basis({sparse(raw);sparse(3,2)},[1;0],2,sparse_opts{1});
@@ -160,6 +192,18 @@ for bad_value=[NaN Inf]
     end
     result=test_true(result,['sparse nonfinite ' num2str(bad_value)],rejected,...
                      'sparse validation still rejects nonfinite stored values');
+end
+
+% Reject nonfinite dense terms without extracting their double entries
+for bad_value=[NaN Inf]
+    bad_term=eye(3); bad_term(1,2)=bad_value; rejected=false;
+    try
+        pod_project(eye(3),{bad_term},ones(3,1),ones(3,1));
+    catch err
+        rejected=contains(err.message,'each term must be a finite');
+    end
+    result=test_true(result,['dense nonfinite ' num2str(bad_value)],rejected,...
+                     'dense validation rejects NaN and Inf while preserving sparse support');
 end
 
 % Solve a non-Hermitian triangular dissipative model in an invariant subspace

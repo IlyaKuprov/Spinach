@@ -7,3 +7,5 @@ Weights multiply block energy, without automatic case normalisation. Diagnostics
 Randomised construction applies weighted sparse or dense blocks directly, without forming a dense concatenated snapshot matrix. For n state coordinates, M positively weighted columns, and working sketch rank s, it retains n-by-s range arrays and M-by-s or s-by-M sketch/compressed arrays; total workspace therefore also depends on M. Energy and residual measurement use column slices no wider than the sketch rank. Both methods omit unused right singular vectors.
 
 Zero-weight blocks remain subject to the input contract but do not enter construction or residual arithmetic. Internal sketches cannot exceed the positively weighted column count. Returned singular-value vectors retain their original supplied-data lengths with zero padding; numerical rank tolerance retains the original supplied-data dimensions.
+
+Randomised sketches and returned bases remain real when every positively weighted block is real; a zero-weight complex block does not force imaginary storage. Active complex data retain complex Gaussian sketches. Both cases preserve caller RNG and fixed-seed repeatability.

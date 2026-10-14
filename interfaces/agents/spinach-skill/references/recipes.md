@@ -794,3 +794,8 @@ repeated as needed, without assembling or exponentiating the reduced generator.
 Zero-weight blocks are validated but excluded from basis construction;
 sketch sizes are bounded by positively weighted columns, while returned
 singular-value vectors retain zero padding for the supplied-data dimensions.
+
+Randomised construction keeps its sketch and basis real for real positively
+weighted blocks; excluded complex blocks do not force complex storage.
+Liouvillian finiteness checks preserve sparse zeros without extracting dense
+nonzero entries into a double vector.

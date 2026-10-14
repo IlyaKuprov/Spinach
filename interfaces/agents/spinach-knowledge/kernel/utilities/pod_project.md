@@ -4,4 +4,4 @@
 
 For Spinach, terms use L=H+1i*R+1i*K in rad/s; detection retains the Hermitian inner product. Non-Euclidean metrics require explicit whitening by the caller. No automatic basis choice, physical coordinate conversion, trace preservation, or positivity guarantee is implied. Preparation is distinct from repeated coefficient evaluation.
 
-Sparse Liouvillian validation inspects stored entries only, without constructing a dense finiteness mask for implicit zeros.
+Liouvillian finiteness validation preserves sparse implicit zeros and scans dense terms without extracting a same-size double nonzero-entry vector.

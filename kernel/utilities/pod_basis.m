@@ -46,6 +46,7 @@
 % retain target_rank+oversampling entries, padding excluded directions with
 % zeros. Internal sketches are limited by the positively weighted columns.
 % Numerical rank tolerance still uses the original supplied-data dimensions.
+% Randomised sketches remain real when all positively weighted blocks are real.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -89,7 +90,10 @@ else
     output_size=target_rank+options.oversampling;
     saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng));
     rng(options.seed,'twister'); sketch_rank=block_width;
-    omega=complex(randn(column_count,sketch_rank),randn(column_count,sketch_rank));
+    omega=randn(column_count,sketch_rank);
+    if ~all(cellfun(@isreal,blocks))
+        omega=complex(omega,randn(column_count,sketch_rank));
+    end
     for k=0:options.power_iters
 
         % Apply the weighted snapshot matrix using only the supplied blocks

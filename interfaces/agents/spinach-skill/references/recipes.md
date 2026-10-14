@@ -785,4 +785,6 @@ propagator truncation, methyl model, pulse fit, slow-mode selection, or offset
 interpolation is supplied by these utilities. Randomised basis construction
 uses blockwise range products and sketch-width residual slices rather than
 dense snapshot concatenation; sparse
-Liouvillian validation inspects only stored entries.
+Liouvillian validation inspects only stored entries. A zero-step `pod_evolve`
+request returns the initial observable without assembling or exponentiating
+the reduced generator.

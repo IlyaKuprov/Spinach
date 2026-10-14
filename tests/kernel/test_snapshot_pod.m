@@ -137,6 +137,10 @@ result=test_close(result,'full-rank dissipative trace',...
 result=test_close(result,'initial and zero-time trace',pod_evolve(model,coefficients,0,2),...
                   repmat(coil'*rho,1,3),1e-12,0,'the initial sample and zero-time repetitions retain the complex observable');
 
+% Check a zero-step request against the independently known initial overlap
+result=test_close(result,'zero-step initial observable',pod_evolve(model,coefficients,0.03,0),...
+                  reference(1),1e-12,0,'zero steps return exactly one initial complex observable');
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

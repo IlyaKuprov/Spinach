@@ -24,6 +24,8 @@
 % no tolerance-based screening, processing, or reference is inferred.
 % Accuracy is limited by the supplied reduction and generator, not by a
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
+% A zero-step request validates inputs and returns only the initial signal,
+% without assembling the generator or constructing its exponential.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -35,6 +37,10 @@ function fid=pod_evolve(model,coefficients,timestep,nsteps)
 % Check the prepared model and evaluation contract
 grumble(model,coefficients,timestep,nsteps);
 
+% Return the initial observable directly when no propagation is requested
+rho=model.rho; fid=complex(zeros(1,nsteps+1)); fid(1)=model.coil'*rho;
+if nsteps==0, return; end
+
 % Assemble the projected affine Liouvillian
 L=zeros(size(model.terms{1}),'like',1i);
 for n=1:numel(model.terms)
@@ -43,8 +49,7 @@ end
 if ~all(isfinite(L),'all'), error('assembled Liouvillian must be finite.'); end
 
 % Propagate the reduced observable with the Spinach sign convention
-P=expm(-1i*L*timestep); rho=model.rho;
-fid=complex(zeros(1,nsteps+1)); fid(1)=model.coil'*rho;
+P=expm(-1i*L*timestep);
 for n=1:nsteps
     rho=P*rho; fid(n+1)=model.coil'*rho;
 end

@@ -819,6 +819,38 @@ for storage={'dense','sparse'}
     end
 end
 
+% Compare dense-basis diagonal projection with independent weighted parity sums
+for storage={'dense','sparse'}
+    nranks=128; diagonal=(1:nranks)'/nranks; term=diag(diagonal);
+    if strcmp(storage{1},'sparse'), term=sparse(term); end
+    for phase=[1 1i]
+        subspace=[ones(nranks,1),phase*((-1).^(1:nranks)')]/sqrt(nranks);
+        prepared=pod_project(subspace,{term},eye(nranks,1),1i*eye(nranks,1));
+        average=(nranks+1)/(2*nranks); coordinates=[1;-conj(phase)]/sqrt(nranks);
+        reference=[average phase/(2*nranks);conj(phase)/(2*nranks) average];
+        result=test_close(result,['fixed basis range ' storage{1} ' ' num2str(phase)],...
+                          [prepared.terms{1},prepared.rho,prepared.coil],...
+                          [reference,coordinates,1i*coordinates],1e-12,0,...
+                          'dense fixed coordinates preserve independent diagonal and parity projections');
+    end
+end
+
+% Compare incomplete dense support and disconnected controls with full exponentials
+for storage={'dense','sparse'}
+    for removed=[1 4]
+        L=reshape((1:25)/25,5,5)+1i*eye(5); L(2:removed+1,1)=0; subspace=eye(5);
+        if strcmp(storage{1},'sparse'), L=sparse(L); subspace=sparse(subspace); end
+        for phase=[1 1i]
+            rho=eye(5,1); coil=phase*[0;1;0;0;0]; reference=complex(zeros(1,5));
+            for n=0:4, reference(n+1)=coil'*expm(-1i*full(L)*(0.03*n))*rho; end
+            prepared=pod_project(subspace,{L},rho,coil);
+            result=test_close(result,['implicit incomplete support ' storage{1} ' ' num2str(removed) ' ' num2str(phase)],...
+                              pod_evolve(prepared,1,0.03,4),reference,1e-12,0,...
+                              'implicit directed traversal retains paths without assuming dense connectivity');
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

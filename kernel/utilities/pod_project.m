@@ -32,7 +32,9 @@
 % projected terms and state vectors must remain finite. Projection uses a
 % power-of-two scale in column slices bounded by reduced rank before
 % matrix products and restores physical units
-% afterwards. Unsupported component loss is rejected, not silently removed.
+% afterwards. The fixed Hermitian basis and its component range are prepared
+% once, outside the projection slices. Dense range scans use bounded columns.
+% Unsupported component loss is rejected, not silently removed.
 % Nonzero operand-component pairs must remain nonzero at the working scale;
 % this conservative product-range contract can reject a finite physical result.
 % The Gram tolerance uses a dimension-dependent complex-arithmetic budget
@@ -49,23 +51,27 @@ function model=pod_project(basis,terms,rho,coil)
 % Check Euclidean coordinates and the affine projection contract
 grumble(basis,terms,rho,coil);
 
+% Prepare the fixed Hermitian basis and its component range once
+basis_min=component_min(basis); left_basis=basis';
+
 % Project normalised affine terms and restore their physical units
 reduced=cell(size(terms));
 for n=1:numel(terms)
-    reduced{n}=scaled_projection(basis,terms{n},basis);
+    reduced{n}=scaled_projection(left_basis,basis_min,terms{n},basis);
 end
 
 % Project both state-space vectors with the same range-aware arithmetic
-rho=scaled_projection(basis,rho,1); coil=scaled_projection(basis,coil,1);
+rho=scaled_projection(left_basis,basis_min,rho,1);
+coil=scaled_projection(left_basis,basis_min,coil,1);
 model=struct('terms',{reduced},'rho',rho,'coil',coil);
 
 end
 
 % Evaluate a Galerkin product in a binary-scaled representation
-function projected=scaled_projection(basis,data,right)
+function projected=scaled_projection(left_basis,basis_min,data,right)
 
 % Measure the binary input scale without a second full operator
-width=size(basis,2); largest=0;
+width=size(left_basis,1); largest=0;
 for n=1:width:size(data,2)
     columns=n:min(n+width-1,size(data,2)); part=data(:,columns);
     largest=max(largest,max(max(abs(real(part)),[],'all'),max(abs(imag(part)),[],'all')));
@@ -73,10 +79,10 @@ end
 [~,exponent]=log2(largest);
 
 % Allocate only the required projected coordinates while preserving sparse storage
-if issparse(basis)&&issparse(data)
-    projected=complex(sparse(size(basis,2),size(right,2)));
+if issparse(left_basis)&&issparse(data)
+    projected=complex(sparse(size(left_basis,1),size(right,2)));
 else
-    projected=complex(zeros(size(basis,2),size(right,2)));
+    projected=complex(zeros(size(left_basis,1),size(right,2)));
 end
 
 % Accumulate the Galerkin product from bounded normalised column slices
@@ -87,7 +93,10 @@ for n=1:width:size(data,2)
        any((imag(part)~=0)&(imag(scaled)==0),'all')
         error('projection data dynamic range exceeds the normalised double representation.');
     end
-    projected=projected+checked_product(checked_product(basis',scaled),right(columns,:));
+    if basis_min*component_min(scaled)==0
+        error('projection product dynamic range exceeds the normalised double representation.');
+    end
+    projected=projected+checked_product(left_basis*scaled,right(columns,:));
 end
 
 % Restore physical units and reject unsupported projected coordinates
@@ -102,12 +111,31 @@ end
 function product=checked_product(left,right)
 
 % Bound every nonzero real component product without forming a product array
-left_parts=[nonzeros(real(left));nonzeros(imag(left))];
-right_parts=[nonzeros(real(right));nonzeros(imag(right))];
-if ~isempty(left_parts)&&~isempty(right_parts)&&min(abs(left_parts))*min(abs(right_parts))==0
+if component_min(left)*component_min(right)==0
     error('projection product dynamic range exceeds the normalised double representation.');
 end
 product=left*right;
+
+end
+
+% Find the smallest nonzero component with bounded dense column storage
+function minimum=component_min(data)
+
+% Preserve stored sparse traversal without copying dense matrix components
+minimum=Inf;
+if issparse(data)
+    parts=nonzeros(real(data));
+    if ~isempty(parts), minimum=min(abs(parts)); end
+    parts=nonzeros(imag(data));
+    if ~isempty(parts), minimum=min(minimum,min(abs(parts))); end
+else
+    for k=1:size(data,2)
+        parts=real(data(:,k)); parts=parts(parts~=0);
+        if ~isempty(parts), minimum=min(minimum,min(abs(parts))); end
+        parts=imag(data(:,k)); parts=parts(parts~=0);
+        if ~isempty(parts), minimum=min(minimum,min(abs(parts))); end
+    end
+end
 
 end
 

@@ -9,3 +9,5 @@ Projection commutes algebraically with affine assembly, but does not certify acc
 Projection rejects operand ranges whose normalised real component products would underflow; it never silently substitutes a zero coordinate. This conservative range check does not certify componentwise conditioning.
 
 The matrix-product range contract conservatively requires every nonzero operand-component pair to remain nonzero at the working scale; it can reject a physically finite result rather than silently lose a contribution.
+
+The fixed Hermitian basis and its component minimum are prepared once for all projection slices, terms, and states. Range scans use bounded dense columns or stored sparse components; no full-basis range scan occurs inside the slice loop.

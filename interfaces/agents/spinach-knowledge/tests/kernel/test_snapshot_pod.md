@@ -43,3 +43,5 @@ Additional real/imaginary tiny-basis fixtures reject product loss in both Galerk
 Dense real/complex invariant-mode references cover short and composed small-step actions despite an unobserved unstable mode. Adjoint references verify the propagation sign and complex Hermitian detection. Genuine and eps-sized observed growing modes are adversarial controls; neither is truncated as invariant. Native action RNG is checked on acceptance and error.
 
 Complete-support dense/sparse normal dynamics use an independent rank-one exponential formula, with real/complex detection and one/two affine terms. These references validate graph bypass and callback range caching without inferring accuracy from their implementation.
+
+Dense-basis diagonal projection uses independent parity-sum formulas for real/complex coordinates with sparse/dense terms. Incomplete dense supports and disconnected controls compare implicit directed traversal against independent full exponentials, with real/complex detection and both storage types.

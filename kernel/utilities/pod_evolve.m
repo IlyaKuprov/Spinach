@@ -47,8 +47,9 @@
 % at the working scale; this can conservatively reject a finite physical result.
 % Exponent-aware component products preserve finite scaled observables.
 % Structurally unreachable or unobservable coordinates are removed exactly.
-% Complete support skips graph construction. Fixed generator component ranges
-% are scanned once per action block, with column-bounded dense workspace.
+% Implicit support traversal uses bounded dense row/column slices; sparse
+% reverse traversal stores transposed sparse terms. Fixed generator component
+% ranges are scanned once per action block, with column-bounded workspace.
 % Constant requests and common structural stationary supports avoid action evaluation;
 % computed zero actions are never used to infer stationarity. Sparse terms
 % remain sparse through the maintained exponential actions.
@@ -82,23 +83,15 @@ for n=active
 end
 if state_fixed||coil_fixed, fid(:)=fid(1); return; end
 
-% Avoid a complete support graph that cannot eliminate any coordinates
-terms=model.terms; nranks=size(rho,1); coordinates=(1:nranks).'; complete_support=false;
-for n=active
-    if nnz(terms{n})==numel(terms{n}), complete_support=true; break; end
-end
-if ~complete_support
-
-    % Retain only coordinates on structural paths from the state to the detector
-    adjacency=sparse(nranks,nranks);
-    for n=active, adjacency=adjacency+spones(sparse(terms{n})); end
-    coordinates=intersect(reachable_support(adjacency.',find(rho)),...
-                          reachable_support(adjacency,find(coil)));
-    if isempty(coordinates), fid(:)=0; return; end
+% Retain structural paths without materialising a dense support graph
+terms=model.terms;
+coordinates=intersect(reachable_support(terms,active,find(rho),false),...
+                      reachable_support(terms,active,find(coil),true));
+if isempty(coordinates), fid(:)=0; return; end
+if numel(coordinates)<size(rho,1)
     for n=active, terms{n}=terms{n}(coordinates,coordinates); end
     [rho,rebase]=binary_normalise(rho(coordinates)); state_exp=state_exp+rebase;
     [coil,rebase]=binary_normalise(coil(coordinates)); coil_exp=coil_exp+rebase;
-
 end
 
 % Determine a common binary frame for the complete time-scaled affine sum
@@ -275,13 +268,36 @@ if ~isfinite(signal), error('detected observable must be finite.'); end
 
 end
 
-% Find all directed paths from a support using one auxiliary graph vertex
-function coordinates=reachable_support(adjacency,support)
+% Traverse implicit term supports with bounded dense neighbour storage
+function coordinates=reachable_support(terms,active,support,backward)
 
-% Traverse the structural graph without numerical actions or dense expansion
-nranks=size(adjacency,1); connectivity=digraph(adjacency);
-connectivity=addedge(connectivity,repmat(nranks+1,numel(support),1),support,ones(numel(support),1));
-coordinates=bfsearch(connectivity,nranks+1); coordinates(coordinates==nranks+1)=[];
+% Track each coordinate once without constructing an aggregate edge set
+nranks=size(terms{active(1)},1); visited=false(nranks,1); queue=zeros(nranks,1);
+tail=numel(support); queue(1:tail)=support; visited(support)=true; head=1;
+if tail==nranks, coordinates=(1:nranks).'; return; end
+
+% Retain column traversal for sparse adjoints without transposing dense terms
+if backward
+    for n=active
+        if issparse(terms{n}), terms{n}=terms{n}.'; end
+    end
+end
+
+% Discover neighbours from bounded dense slices or stored sparse columns
+while head<=tail
+    coordinate=queue(head); head=head+1;
+    for n=active
+        if backward&&~issparse(terms{n})
+            neighbours=find(terms{n}(coordinate,:).');
+        else
+            neighbours=find(terms{n}(:,coordinate));
+        end
+        neighbours=neighbours(~visited(neighbours)); visited(neighbours)=true;
+        queue(tail+(1:numel(neighbours)))=neighbours; tail=tail+numel(neighbours);
+        if tail==nranks, coordinates=(1:nranks).'; return; end
+    end
+end
+coordinates=find(visited);
 
 end
 

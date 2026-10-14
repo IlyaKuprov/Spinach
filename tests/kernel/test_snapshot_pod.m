@@ -70,11 +70,11 @@ result=test_true(result,'rank failure restores RNG',failed&&isequal(before,rng),
 rng(632,'twister'); snapshots=complex(randn(18,27),randn(18,27));
 split_blocks={sparse(snapshots(:,1:7));snapshots(:,8:19);sparse(snapshots(:,20:end))};
 split_weights=[0.5;2;0];
-weighted=[sqrt(0.5)*snapshots(:,1:7) sqrt(2)*snapshots(:,8:19) zeros(18,8)];
+weighted=[sqrt(0.5)*snapshots(:,1:7) sqrt(2)*snapshots(:,8:19)];
 for power_iters=[0 2]
     sketch_opts=struct('method','randomised','oversampling',2,...
                        'power_iters',power_iters,'seed',17);
-    rng(17,'twister'); omega=complex(randn(27,6),randn(27,6));
+    rng(17,'twister'); omega=complex(randn(19,6),randn(19,6));
     [range,~]=qr(weighted*omega,0);
     for k=1:power_iters
         [dual_range,~]=qr(weighted'*range,0);
@@ -115,6 +115,30 @@ for sparse_opts={exact_opts,rand_opts}
                          rejected&&isequal(before,rng),...
                          'stored NaN/Inf and all-zero sparse data fail without changing caller RNG');
     end
+end
+
+% Preserve spectral padding when zero-weight columns exceed the active dimensions
+thin_data=[3 0;0 1;0 0;0 0]; excluded=sparse(4,10000);
+for method={'svd','randomised'}
+    if strcmp(method{1},'svd')
+        thin_opts=exact_opts;
+    else
+        thin_opts=struct('method','randomised','oversampling',2,'power_iters',2,'seed',7);
+    end
+    observed=pod_basis({thin_data;excluded},[1;0],2,thin_opts);
+    result=test_close(result,['excluded spectrum ' method{1}],observed.singular_vals,...
+                      [3;1;0;0],1e-12,0,'omitted zero-weight directions remain explicit zero singular values');
+    result=test_close(result,['excluded subspace ' method{1}],observed.basis*observed.basis',...
+                      diag([1 1 0 0]),1e-12,0,'oversampling beyond the active columns cannot add data directions');
+    if strcmp(method{1},'randomised'), thin_opts.oversampling=1; end
+    before=rng; rejected=false;
+    try
+        pod_basis({thin_data;excluded},[1;0],3,thin_opts);
+    catch err
+        rejected=contains(err.message,'target_rank exceeds the numerical rank');
+    end
+    result=test_true(result,['excluded rank ' method{1}],rejected&&isequal(before,rng),...
+                     'unsupported retained rank fails without inventing modes or changing caller RNG');
 end
 
 % Retain sparse Liouvillian terms and reject nonfinite stored entries
@@ -166,6 +190,11 @@ result=test_close(result,'initial and zero-time trace',pod_evolve(model,coeffici
 result=test_close(result,'zero-step initial observable',pod_evolve(model,coefficients,0.03,0),...
                   reference(1),1e-12,0,'zero steps return exactly one initial complex observable');
 
+% Zero-duration traces depend only on the initial overlap, not generator assembly
+large_model=struct('terms',{{realmax*eye(2)}},'rho',[1;2],'coil',[1i;3]);
+result=test_close(result,'zero-duration large generator',pod_evolve(large_model,2,0,3),...
+                  repmat(6-1i,1,4),0,0,'a zero-duration trace is well defined even when affine assembly would overflow');
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};
@@ -190,6 +219,7 @@ invalid={@()pod_basis(blocks,[0;0],1,exact_opts),...
          @()pod_basis({zeros(3)},1,1,exact_opts),...
          @()pod_basis({eye(3);eye(2)},[1;1],1,exact_opts),...
          @()pod_basis({raw},-1,1,exact_opts),...
+         @()pod_basis({raw;NaN(3,2)},[1;0],2,exact_opts),...
          @()pod_basis({raw},1,4,exact_opts),...
          @()pod_project(2*subspace,terms,rho,coil),...
          @()pod_project(subspace,{eye(2)},[1;0;0],[1;0;0]),...

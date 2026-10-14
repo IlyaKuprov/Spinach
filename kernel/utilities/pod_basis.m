@@ -39,8 +39,13 @@
 % numerical rank; no arbitrary null-space directions are supplied. The
 % caller's random state is preserved, including on an error. Randomised
 % construction applies weighted blocks without a full snapshot concatenation;
-% workspace includes n-by-sketch_rank and total_columns-by-sketch_rank arrays
-% for range products, compressed data, and residual measurement.
+% workspace includes n-by-sketch_rank and active_columns-by-sketch_rank arrays
+% for range products, compressed data, and residual measurement. Zero-weight
+% blocks are validated, but excluded from construction. Exact singular-value
+% vectors retain min(n,total supplied columns) entries; randomised vectors
+% retain target_rank+oversampling entries, padding excluded directions with
+% zeros. Internal sketches are limited by the positively weighted columns.
+% Numerical rank tolerance still uses the original supplied-data dimensions.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -52,9 +57,13 @@ function result=pod_basis(blocks,weights,target_rank,options)
 % Check the supplied data contract
 grumble(blocks,weights,target_rank,options);
 
+% Exclude zero-weight blocks while retaining the supplied-data dimensions
+row_count=size(blocks{1},1); data_columns=sum(cellfun(@(x)size(x,2),blocks));
+keep_blocks=weights>0; blocks=blocks(keep_blocks); weights=weights(keep_blocks);
+column_count=sum(cellfun(@(x)size(x,2),blocks));
+
 % Measure the weighted data norm without concatenating or copying the blocks
-row_count=size(blocks{1},1); column_count=sum(cellfun(@(x)size(x,2),blocks));
-data_norm=0; block_width=target_rank+options.oversampling;
+data_norm=0; block_width=min(target_rank+options.oversampling,column_count);
 for n=1:numel(blocks)
     for k=1:block_width:size(blocks{n},2)
         columns=k:min(k+block_width-1,size(blocks{n},2));
@@ -68,6 +77,7 @@ end
 
 % Compute the exact basis or a seeded blockwise randomised range sketch
 if strcmp(options.method,'svd')
+    output_size=min(row_count,data_columns);
     data=zeros(row_count,column_count); first_column=1;
     for n=1:numel(blocks)
         columns=first_column:first_column+size(blocks{n},2)-1;
@@ -76,8 +86,9 @@ if strcmp(options.method,'svd')
     end
     [modes,values]=svd(data,'econ');
 else
+    output_size=target_rank+options.oversampling;
     saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng));
-    rng(options.seed,'twister'); sketch_rank=target_rank+options.oversampling;
+    rng(options.seed,'twister'); sketch_rank=block_width;
     omega=complex(randn(column_count,sketch_rank),randn(column_count,sketch_rank));
     for k=0:options.power_iters
 
@@ -116,8 +127,8 @@ else
 end
 
 % Reject unsupported rank rather than returning arbitrary null-space modes
-singular_vals=diag(values);
-rank_tol=max(row_count,column_count)*eps(singular_vals(1));
+singular_vals=[diag(values);zeros(output_size-size(values,1),1)];
+rank_tol=max(row_count,data_columns)*eps(singular_vals(1));
 if singular_vals(target_rank)<=rank_tol
     error('target_rank exceeds the numerical rank of the supplied data sketch.');
 end

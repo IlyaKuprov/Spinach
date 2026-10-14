@@ -4,4 +4,4 @@
 
 This evaluator does not train, retune rank, subtract a reference, or process a spectrum. Its intended use is an explicitly validated fixed family for which projection costs can be amortised. Generator assembly and reduction errors remain the caller's responsibility; no observable error bound follows from orthogonality.
 
-A zero-step request returns only the initial observable after validation, without assembling a generator or computing a matrix exponential.
+Zero-step and zero-duration requests return the initial observable, repeated as needed, after validation, without assembling a generator or computing a matrix exponential.

@@ -829,3 +829,5 @@ products to avoid an underflowing or overflowing coefficient/time intermediate.
 Lost nonzero scaled term entries are rejected rather than treated as exact
 zeros. Computed initial/later observables and propagated states must remain
 finite; this is explicit rejection, not scaled-state propagation.
+
+Common zero state-support columns or detector-support rows across every active term certify stationarity before scaling unreachable entries; conditions from opposite sides cannot be mixed across terms. Nonfinite term-first products retry a finite nonzero coefficient/time scale. Nonfinite separately scaled assembly retries the unscaled affine sum before time scaling, with finite products and nonzero-entry representability still required. These bounded fallbacks do not guarantee support for every mathematically finite exponent.

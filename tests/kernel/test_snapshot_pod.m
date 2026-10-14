@@ -497,6 +497,46 @@ observed=pod_evolve(scaled_mixing,1e-200,1e200,1);
 result=test_close(result,'affine tiny mixing phase',imag(observed(2))/1e-200,-1,1e-12,0,...
                   'a zero initial overlap does not hide a representable off-diagonal phase');
 
+% Check bounded scaling fallbacks and common structural stationarity
+for storage={'dense','sparse'}
+    for phase=[1 1i]
+        huge=phase*2^1023; stationary=phase*[0 realmax;0 realmax];
+        if strcmp(storage{1},'sparse'), huge=sparse(huge); stationary=sparse(stationary); end
+        prepared=struct('terms',{{huge}},'rho',1,'coil',1);
+        result=test_close(result,['subnormal fallback ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,2^51,2^-1074,2),exp(-1i*phase*(0:2)),1e-12,0,...
+                          'a finite subnormal scale rescues overflowing term-first multiplication');
+        prepared.terms={phase*realmax;-phase*realmax;phase*0.5};
+        if strcmp(storage{1},'sparse'), prepared.terms=cellfun(@sparse,prepared.terms,'UniformOutput',false); end
+        result=test_close(result,['affine scaling fallback ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,[1;1;1],2,2),exp(-1i*phase*(0:2)),1e-12,0,...
+                          'unscaled cancellation retains a finite nonzero exponent when separate scaling overflows');
+        prepared=struct('terms',{{stationary;stationary}},'rho',[1;0],'coil',[1;1]);
+        result=test_close(result,['unreachable state entries ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,[2;3],1,2),ones(1,3),0,0,...
+                          'common zero state-support columns avoid irrelevant range overflow');
+        prepared.terms={stationary.';stationary.'}; prepared.rho=[1;1]; prepared.coil=[1;0];
+        result=test_close(result,['unreachable detector entries ' storage{1} ' ' num2str(phase)],...
+                          pod_evolve(prepared,[2;3],1,2),ones(1,3),0,0,...
+                          'common zero detector-support rows avoid irrelevant range overflow');
+    end
+    prepared=struct('terms',{{[0 1;0 0];[0 0;1 0]}},'rho',[1;0],'coil',[1;0]);
+    if strcmp(storage{1},'sparse'), prepared.terms=cellfun(@sparse,prepared.terms,'UniformOutput',false); end
+    result=test_close(result,['mixed stationarity sides ' storage{1}],...
+                      pod_evolve(prepared,[1;1],0.2,2),cos(0.2*(0:2)),1e-12,0,...
+                      'state stationarity in one term and detector stationarity in another do not combine');
+    prepared.terms={realmax;-realmax;2^-1000}; prepared.rho=1; prepared.coil=1;
+    if strcmp(storage{1},'sparse'), prepared.terms=cellfun(@sparse,prepared.terms,'UniformOutput',false); end
+    rejected=false;
+    try
+        pod_evolve(prepared,[1;1;1],2^-1000,1);
+    catch err
+        rejected=contains(err.message,'must remain representable');
+    end
+    result=test_true(result,['fallback underflow rejected ' storage{1}],rejected,...
+                     'lost nonzero term entries remain errors rather than stationary signals');
+end
+
 % Preserve finite phases when a state action underflows rather than vanishes
 scaled_state=struct('terms',{{sparse(1e-200)}},'rho',1e-200,'coil',1e200);
 result=test_close(result,'underflowing state action',pod_evolve(scaled_state,1,1e200,3),...

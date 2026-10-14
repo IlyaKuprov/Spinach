@@ -25,3 +25,5 @@ Dense/sparse real and complex state projection overflow is rejected during prepa
 Dense/sparse real and complex initial-overlap overflow is rejected before zero-step, zero-duration and zero-coefficient returns, and ordinary positive-time requests. Non-cancelling product overflow is also rejected. Large cancelling overlaps with finite intermediate products remain supported.
 
 Time-scaled affine assembly is checked with a detector-visible tiny mixing phase, coefficient/time underflow and overflow, an overflowing unscaled generator with a finite damped exponent, and explicit rejection of lost nonzero scaled entries. Later state and real/complex detector overflow are rejected, with independently normalised finite amplified controls. Dense and sparse terms exercise the same regimes.
+
+Dense/sparse real and imaginary fixtures check subnormal product-order fallback, affine cancellation before time scaling with a nonzero residual, and common state/detector structural stationarity despite unreachable overflow. Mixed-side stationarity and lost tiny entries remain adversarial controls.

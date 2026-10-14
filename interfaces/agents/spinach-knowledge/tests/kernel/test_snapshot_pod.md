@@ -27,3 +27,5 @@ Dense/sparse real and complex initial-overlap overflow is rejected before zero-s
 Time-scaled affine assembly is checked with a detector-visible tiny mixing phase, coefficient/time underflow and overflow, an overflowing unscaled generator with a finite damped exponent, and explicit rejection of lost nonzero scaled entries. Later state and real/complex detector overflow are rejected, with independently normalised finite amplified controls. Dense and sparse terms exercise the same regimes.
 
 Exponent-range boundaries include subnormal coefficient/time products, both finite factor orderings, and exact affine cancellation before an otherwise overflowing time scale. Unreachable state/detector entries do not require representable scaling. Two terms stationary on different sides compose a detector-visible nilpotent chain, preventing a per-term mixed-side shortcut.
+
+Dense/sparse real and imaginary fixtures check subnormal product-order fallback, affine cancellation before time scaling with a nonzero residual, and common state/detector structural stationarity despite unreachable overflow. Mixed-side stationarity and lost tiny entries remain adversarial controls.

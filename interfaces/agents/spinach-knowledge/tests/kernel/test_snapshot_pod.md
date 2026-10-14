@@ -4,7 +4,7 @@ The regression uses independently known weighted singular values and projection 
 
 The test separates algebraic projection correctness from truncation accuracy, checks complex detection conjugation and Spinach's propagation sign, and rejects unsupported ranks and input shapes. Compact scaled numerical references target 1e-12 maximum absolute error; they do not certify arbitrary large or ill-conditioned reductions.
 
-At scale 1e-200, exact SVD and randomised sketches with zero/two power iterations check scalar singular values and rank-two truncated subspaces using scaled or relative errors. Rounded-zero energy is accepted while zero data, unsupported rank, and energy overflow remain errors; caller RNG is checked on acceptance and rejection.
+At scale 1e-200, exact SVD and randomised sketches with zero/two power iterations check scalar singular values and rank-two truncated subspaces using scaled or relative errors. Rounded-zero energy is accepted while zero data, unsupported rank, remain errors; caller RNG is checked on acceptance and rejection.
 
 Mixed sparse/dense weighted blocks with a zero-weight block exercise genuinely truncated sketches with zero and two power iterations against an explicit concatenated reference. Both exact and randomised methods compare sparse snapshots with dense equivalents and reject stored NaN/Inf and all-zero data without changing caller RNG. Sparse projection accepts a zero Liouvillian term and rejects stored NaN/Inf entries.
 
@@ -22,10 +22,14 @@ Underflowing state and detector actions retain their finite independent phase re
 
 Dense/sparse real and complex state projection overflow is rejected during preparation; large finite projected initial and detector coordinates remain supported.
 
-Dense/sparse real and complex initial-overlap overflow is rejected before zero-step, zero-duration and zero-coefficient returns, and ordinary positive-time requests. Non-cancelling product overflow is also rejected. Large cancelling overlaps with finite intermediate products remain supported.
+Dense/sparse real and complex initial overlaps use bounded detection before physical rescaling: opposing large products can cancel to finite signals in constant and ordinary queries. Non-cancelling unrepresentable physical signals remain errors.
 
-Time-scaled affine assembly is checked with a detector-visible tiny mixing phase, coefficient/time underflow and overflow, an overflowing unscaled generator with a finite damped exponent, and explicit rejection of lost nonzero scaled entries. Later state and real/complex detector overflow are rejected, with independently normalised finite amplified controls. Dense and sparse terms exercise the same regimes.
+Time-scaled affine assembly is checked with a detector-visible tiny mixing phase, coefficient/time underflow and overflow, an overflowing unscaled generator with a finite damped exponent, and explicit rejection of lost nonzero scaled entries. Finite detector-scaled amplification beyond physical state range is supported; unrepresentable real/complex detector signals remain errors, with independently normalised finite controls. Dense and sparse terms exercise the same regimes.
 
 Exponent-range boundaries include subnormal coefficient/time products, both finite factor orderings, and exact affine cancellation before an otherwise overflowing time scale. Unreachable state/detector entries do not require representable scaling. Two terms stationary on different sides compose a detector-visible nilpotent chain, preventing a per-term mixed-side shortcut.
 
 Dense/sparse real and imaginary fixtures check subnormal product-order fallback, affine cancellation before time scaling with a nonzero residual, and common state/detector structural stationarity despite unreachable overflow. Mixed-side stationarity and lost tiny entries remain adversarial controls.
+
+Power-of-two-normalised exact and randomised training checks scale covariance at1e-200,1 and1e200, with independent singular values and residual ratios. Physical squared energy is a diagnostic, not a rank decision. Caller RNG remains preserved.
+
+Compensating block amplitudes and weights have independently known singular values and reconstruction residuals. Physical diagnostic overflow retains a finite scaled frame; unsupported component loss is rejected without RNG changes. Native complex scalar SVD bases are accepted by the dimension-derived Gram budget. A positively amplified non-normal triangular family matches an independently scaled analytic semigroup beyond physical state range.

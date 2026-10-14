@@ -46,7 +46,7 @@ for n=1:numel(tiny_opts)
                       0.5,1e-12,0,'scaled absolute residual retains the omitted mode');
     result=test_close(result,['tiny relative residual ' label],tiny.residual_rel,...
                       0.5/sqrt(10.25),1e-12,0,'relative diagnostics remain meaningful at tiny scale');
-    invalid_tiny={zeros(3),scale*diag([1 0 0]),1e200*eye(3)};
+    invalid_tiny={zeros(3),scale*diag([1 0 0])};
     for k=1:numel(invalid_tiny)
         rejected=false; before=rng;
         try
@@ -56,9 +56,69 @@ for n=1:numel(tiny_opts)
         end
         result=test_true(result,['tiny invalid ' label ' ' num2str(k)],...
                          rejected&&isequal(before,rng),...
-                         'zero data, unsupported rank, and energy overflow still fail with RNG preserved');
+                         'zero data and unsupported rank fail with RNG preserved');
     end
 end
+
+% Check scale covariance without using physical squared energy for rank
+for method={'svd','randomised'}
+    opts=exact_opts; opts.method=method{1};
+    if strcmp(opts.method,'randomised'), opts.oversampling=1; end
+    for magnitude=[1e-200 1 1e200]
+        data=magnitude*diag([3 1 0.5]); before=rng;
+        observed=pod_basis({data},1,2,opts);
+        result=test_close(result,['scale singular values ' method{1} ' ' num2str(magnitude)],...
+                          observed.singular_vals/magnitude,[3;1;0.5],1e-12,0,...
+                          'binary-normalised factorisation retains physical singular values');
+        result=test_close(result,['scale residual ' method{1} ' ' num2str(magnitude)],...
+                          observed.residual_rel,0.5/sqrt(10.25),1e-12,0,...
+                          'relative reconstruction error is independent of physical amplitude');
+        result=test_true(result,['scale RNG ' method{1} ' ' num2str(magnitude)],isequal(before,rng),...
+                         'scale-normalised exact and seeded randomised paths preserve caller RNG');
+    end
+end
+
+% Combine compensating weights and block amplitudes without large intermediates
+for method={'svd','randomised'}
+    opts=exact_opts; opts.method=method{1};
+    if strcmp(opts.method,'randomised'), opts.oversampling=1; end
+    data={2^-511*diag([3 1]);2^511*diag([1 2])};
+    observed=pod_basis(data,[2^1022;2^-1022],1,opts);
+    result=test_close(result,['compensated weights ' method{1}],observed.singular_vals,...
+                      sqrt([10;5]),1e-12,0,'opposing block and weight scales define the same weighted operator');
+    result=test_close(result,['compensated residual ' method{1}],observed.residual_rel,...
+                      sqrt(1/3),1e-12,0,'the independent weighted Frobenius residual is retained');
+    opts.oversampling=0; observed=pod_basis({realmax},realmax,1,opts);
+    [fraction,~]=log2(sqrt(realmax)); [block_fraction,~]=log2(realmax);
+    result=test_close(result,['scaled diagnostic frame ' method{1}],observed.singular_vals_scaled,...
+                      fraction*block_fraction,1e-12,0,'the finite binary diagnostic frame survives physical overflow');
+    result=test_true(result,['physical diagnostic overflow ' method{1}],...
+                     isinf(observed.singular_vals)&&isinf(observed.total_energy)&&observed.residual_rel<1e-12,...
+                     'physical diagnostic overflow does not invalidate a well-defined POD subspace');
+end
+
+% Reject unsupported training dynamic range without changing the caller RNG
+before=rng; rejected=false;
+try
+    pod_basis({diag([realmax 2^-1074])},1,1,exact_opts);
+catch err
+    rejected=contains(err.message,'dynamic range');
+end
+result=test_true(result,'training range rejection',rejected&&isequal(before,rng),...
+                 'normalisation never silently deletes a nonzero supplied component');
+
+% Check that the Gram budget accepts native complex producer outputs
+accepted=true;
+for n=1:100
+    sample=randn+1i*randn; produced=pod_basis({sample},1,1,exact_opts);
+    try
+        pod_project(produced.basis,{1},1,1);
+    catch
+        accepted=false;
+    end
+end
+result=test_true(result,'native complex producer Gram budget',accepted,...
+                 'dimension-dependent complex roundoff admits the native scalar SVD basis');
 
 % Test a weighted complex diagonal snapshot matrix with known singular values
 blocks={diag([3 1i 0.5]);diag([1 2i 1])}; weights=[1;4];
@@ -279,7 +339,7 @@ for storage={'dense','sparse'}
             try
                 pod_project(subspace,{eye(2)},rho,coil);
             catch err
-                rejected=contains(err.message,'projected states must be finite');
+                rejected=contains(err.message,'projected terms and states must be finite');
             end
             result=test_true(result,['projected overflow ' storage{1} ' ' component{1} ' ' num2str(phase)],...
                              rejected,'finite caller vectors whose reduced coordinates overflow fail during preparation');
@@ -325,7 +385,7 @@ result=test_close(result,'dense zero coefficients',pod_evolve(model,zeros(2,1),0
 result=test_close(result,'zero-step initial observable',pod_evolve(model,coefficients,0.03,0),...
                   reference(1),1e-12,0,'zero steps return exactly one initial complex observable');
 
-% Reject nonfinite computed overlaps before constant-signal shortcuts
+% Detect in normalised coordinates before restoring the physical observable
 for storage={'dense','sparse'}
     subspace=eye(2); terms={zeros(2)}; rho=[2;-2];
     if strcmp(storage{1},'sparse')
@@ -336,27 +396,20 @@ for storage={'dense','sparse'}
         if strcmp(storage{1},'sparse'), coil=sparse(coil); end
         prepared=pod_project(subspace,terms,rho,coil);
         for query={[0 0 0],[1 0 3],[0 0.03 3],[1 0.03 3]}
-            evaluation=query{1}; rejected=false;
-            try
-                pod_evolve(prepared,evaluation(1),evaluation(2),evaluation(3));
-            catch err
-                rejected=contains(err.message,'initial observable must be finite');
-            end
-            result=test_true(result,['overlap overflow ' storage{1} ' ' num2str(phase) ' ' num2str(evaluation)],...
-                             rejected,'finite coordinates with a nonfinite computed overlap fail before initial-only returns');
+            evaluation=query{1};
+            result=test_close(result,['scaled cancelling overlap ' storage{1} ' ' num2str(phase) ' ' num2str(evaluation)],...
+                              pod_evolve(prepared,evaluation(1),evaluation(2),evaluation(3)),...
+                              zeros(1,evaluation(3)+1),0,0,...
+                              'bounded detection cancels large opposing products before physical rescaling');
         end
         prepared.rho=abs(rho); rejected=false;
         try
             pod_evolve(prepared,1,0.03,3);
         catch err
-            rejected=contains(err.message,'initial observable must be finite');
+            rejected=contains(err.message,'detected observable must be finite');
         end
         result=test_true(result,['noncancelling overflow ' storage{1} ' ' num2str(phase)],...
-                         rejected,'finite coordinates with overflowing products fail before ordinary propagation');
-        prepared.rho=rho/4; prepared.coil=coil/2;
-        result=test_close(result,['finite large overlap ' storage{1} ' ' num2str(phase)],...
-                          pod_evolve(prepared,0,0.03,3)/realmax,zeros(1,4),0,0,...
-                          'large cancelling products remain supported when each product is finite');
+                         rejected,'an unrepresentable physical observable remains an explicit error');
     end
 end
 
@@ -457,20 +510,17 @@ for storage={'dense','sparse'}
     try
         pod_evolve(prepared,2^-700,2^-700,1);
     catch err
-        rejected=contains(err.message,'must remain representable');
+        rejected=contains(err.message,'represent');
     end
     result=test_true(result,['unrepresentable scaled term ' storage{1}],rejected,...
                      'lost nonzero entries are rejected rather than certified as structural zeros');
 
-    % Reject later range overflow while retaining finite amplified controls
-    prepared.terms=terms(6); prepared.coil=1e-300; rejected=false;
-    try
-        pod_evolve(prepared,1,1,2);
-    catch err
-        rejected=contains(err.message,'propagated states and observables must be finite');
-    end
-    result=test_true(result,['later state overflow ' storage{1}],rejected,...
-                     'state overflow cannot silently corrupt a representable detector-scaled observable');
+    % Preserve detector-scaled amplification and reject unrepresentable signals
+    prepared.terms=terms(6); prepared.coil=1e-300;
+    observed=pod_evolve(prepared,1,1,2);
+    result=test_close(result,['scaled amplified state ' storage{1}],...
+                      observed(3)/exp(1400+log(1e-300)),1,1e-12,0,...
+                      'binary state amplitude retains a finite observable beyond physical state range');
     observed=pod_evolve(prepared,1,1,1);
     result=test_close(result,['finite amplified state ' storage{1}],observed(2)/exp(700+log(1e-300)),...
                       1,1e-12,0,'the preceding representable state and observable remain supported');
@@ -480,7 +530,7 @@ for storage={'dense','sparse'}
         try
             pod_evolve(prepared,1,1,2);
         catch err
-            rejected=contains(err.message,'propagated states and observables must be finite');
+            rejected=contains(err.message,'detected observable must be finite');
         end
         result=test_true(result,['later detector overflow ' storage{1} ' ' num2str(phase)],rejected,...
                          'finite propagated states whose detection overflows are rejected');
@@ -565,7 +615,7 @@ for storage={'dense','sparse'}
     try
         pod_evolve(prepared,[1;1;1],2^-1000,1);
     catch err
-        rejected=contains(err.message,'must remain representable');
+        rejected=contains(err.message,'represent');
     end
     result=test_true(result,['fallback underflow rejected ' storage{1}],rejected,...
                      'lost nonzero term entries remain errors rather than stationary signals');
@@ -584,6 +634,14 @@ cancel_state=struct('terms',{{sparse([1 -1;2 -2])}},'rho',[1;1],'coil',[1;0]);
 result=test_close(result,'cancellation stationary state',pod_evolve(cancel_state,1,0.03,3),...
                   ones(1,4),1e-12,0,...
                   'a nullspace from cancellation remains supported through dense propagation');
+
+% Compare amplified non-normal composition with a scaled analytic reference
+amplified=pod_project(eye(2),{1i*[700 1;0 699]},[0;1],[1e-300;0]);
+observed=pod_evolve(amplified,1,1,2); times=0:2;
+reference=exp(700*times+log(1e-300)).*(-expm1(-times));
+result=test_close(result,'amplified non-normal composition',observed(2:3)./reference(2:3),...
+                  ones(1,2),1e-12,0,...
+                  'binary amplitude propagation preserves a detector-scaled triangular semigroup');
 
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
@@ -616,7 +674,9 @@ invalid={@()pod_basis(blocks,[0;0],1,exact_opts),...
          @()pod_evolve(model,[1 1],0.1,2),...
          @()pod_evolve(bad_model,coefficients,0.1,2),...
          @()pod_evolve(model,coefficients,-0.1,2),...
-         @()pod_evolve(model,coefficients,0.1,1.5)};
+         @()pod_evolve(model,coefficients,0.1,1.5),...
+         @()pod_evolve(model,coefficients,0.1,uint8(255)),...
+         @()pod_evolve(model,coefficients,single(0.1),2)};
 for n=1:numel(invalid)
     rejected=false;
     try

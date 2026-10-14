@@ -29,7 +29,12 @@
 % Orthogonality alone does not preserve positivity or trace. Finiteness
 % checks preserve sparse zeros without extracting dense entries. Sparse
 % bases retain a sparse identity in the orthogonality check. Computed
-% projected terms and state vectors must remain finite.
+% projected terms and state vectors must remain finite. Projection uses a
+% power-of-two scale before matrix products and restores physical units
+% afterwards. Unsupported component loss is rejected, not silently removed.
+% The Gram tolerance uses a dimension-dependent complex-arithmetic budget
+% gamma(8*n)*r, with gamma(k)=k*eps/(1-k*eps).
+% Galerkin projection: Benner et al., DOI:10.1137/130932715, section 2.2.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -38,24 +43,35 @@
 
 function model=pod_project(basis,terms,rho,coil)
 
-% Check the projection contract
+% Check Euclidean coordinates and the affine projection contract
 grumble(basis,terms,rho,coil);
 
-% Project the fixed affine terms and both state-space vectors
+% Project normalised affine terms and restore their physical units
 reduced=cell(size(terms));
 for n=1:numel(terms)
-    reduced{n}=basis'*terms{n}*basis;
-    if any(isnan(reduced{n}),'all')||any(isinf(reduced{n}),'all')
-        error('projected Liouvillian terms must be finite.');
-    end
+    reduced{n}=scaled_projection(basis,terms{n},basis);
 end
-rho=basis'*rho; coil=basis'*coil;
-if any(isnan(rho),'all')||any(isinf(rho),'all')||...
-   any(isnan(coil),'all')||any(isinf(coil),'all')
-    error('projected states must be finite.');
-end
+
+% Project both state-space vectors with the same range-aware arithmetic
+rho=scaled_projection(basis,rho,1); coil=scaled_projection(basis,coil,1);
 model=struct('terms',{reduced},'rho',rho,'coil',coil);
 
+end
+
+% Evaluate a Galerkin product in a binary-scaled representation
+function projected=scaled_projection(basis,data,right)
+largest=max(max(abs(real(data)),[],'all'),max(abs(imag(data)),[],'all'));
+[~,exponent]=log2(largest);
+scaled=complex(pow2(real(data),-exponent),pow2(imag(data),-exponent));
+if any((real(data)~=0)&(real(scaled)==0),'all')||...
+   any((imag(data)~=0)&(imag(scaled)==0),'all')
+    error('projection data dynamic range exceeds the normalised double representation.');
+end
+projected=basis'*scaled*right;
+projected=complex(pow2(real(projected),exponent),pow2(imag(projected),exponent));
+if any(isnan(projected),'all')||any(isinf(projected),'all')
+    error('projected terms and states must be finite.');
+end
 end
 
 % Consistency enforcement
@@ -64,7 +80,8 @@ if ~isa(basis,'double')||~ismatrix(basis)||isempty(basis)||...
    any(isnan(basis),'all')||any(isinf(basis),'all')||size(basis,2)>size(basis,1)
     error('basis must be a finite nonempty double n-by-r matrix with r<=n.');
 end
-orth_tol=size(basis,1)*size(basis,2)*eps;
+roundoff=8*size(basis,1)*eps;
+orth_tol=size(basis,2)*roundoff/(1-roundoff);
 if norm(basis'*basis-speye(size(basis,2)),'fro')>orth_tol
     error('basis must be orthonormal in Euclidean state coordinates.');
 end

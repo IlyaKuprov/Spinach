@@ -28,17 +28,24 @@
 %     result.singular_vals - singular values of supplied weighted data for
 %                            'svd', or of its range sketch for 'randomised'
 %     result.total_energy  - squared Frobenius norm of weighted supplied data;
-%                            may round to zero for nonzero tiny data
+%                            may round to zero or infinity
 %     result.residual_abs  - ||data-basis*(basis'*data)||_F, on supplied data
 %     result.residual_rel  - residual_abs divided by the unsquared data norm
 %     result.orth_error    - ||basis'*basis-eye(target_rank)||_F
+%     result.scale_exponent - common binary exponent of weighted data
+%     result.singular_vals_scaled - singular values before binary rescaling
+%     result.data_norm_scaled - Frobenius norm before binary rescaling
 %
 % Exact SVD minimises the supplied weighted snapshot Frobenius projection
 % error. Randomised sketches and pre-truncated factors qualify that claim.
 % Residuals are measured data diagnostics, not observable error bounds.
 % Rank-deficient inputs are rejected if the requested rank exceeds the
 % numerical rank; no arbitrary null-space directions are supplied. The
-% caller's random state is preserved, including on an error. Randomised
+% caller's random state is preserved, including on an error. Factorisation,
+% rank and relative residuals use a power-of-two-normalised weighted matrix.
+% Squared physical energy never decides rank. Physical diagnostics may exceed
+% double range; the scaled diagnostics remain available. Loss of a nonzero
+% component during normalisation is rejected explicitly. Randomised
 % construction applies weighted blocks without a full snapshot concatenation;
 % workspace includes n-by-sketch_rank and active_columns-by-sketch_rank arrays
 % for range products, compressed data, and residual measurement. Zero-weight
@@ -51,6 +58,9 @@
 % Only retained randomised modes are formed, after numerical rank validation.
 % Randomised sketches remain real when all positively weighted blocks are real.
 %
+% Algorithms: Benner et al., DOI:10.1137/130932715; Halko et al.,
+% DOI:10.1137/090771806, Algorithms 4.4 and 5.1. All integer inputs are double.
+%
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
 %
@@ -61,109 +71,130 @@ function result=pod_basis(blocks,weights,target_rank,options)
 % Check the supplied data contract
 grumble(blocks,weights,target_rank,options);
 
-% Exclude zero-weight blocks while retaining the supplied-data dimensions
+% Retain original dimensions but exclude zero-weight blocks from the operator
 row_count=size(blocks{1},1); data_columns=sum(cellfun(@(x)size(x,2),blocks));
-keep_blocks=weights>0; blocks=blocks(keep_blocks); weights=weights(keep_blocks);
+keep=weights>0; blocks=blocks(keep); weights=weights(keep);
 column_count=sum(cellfun(@(x)size(x,2),blocks));
+sketch_rank=min(target_rank+options.oversampling,column_count);
 
-% Measure the weighted data norm without concatenating or copying the blocks
-data_norm=0; block_width=min(target_rank+options.oversampling,column_count);
+% Represent weighted block scales without forming their potentially large product
+[weight_frac,weight_exp]=log2(sqrt(weights)); block_exp=zeros(size(weights));
 for n=1:numel(blocks)
-    for k=1:block_width:size(blocks{n},2)
-        columns=k:min(k+block_width-1,size(blocks{n},2));
-        data_norm=hypot(data_norm,norm(sqrt(weights(n))*blocks{n}(:,columns),'fro'));
+    largest=max(max(abs(real(blocks{n})),[],'all'),max(abs(imag(blocks{n})),[],'all'));
+    if largest==0, block_exp(n)=-Inf; else, [~,block_exp(n)]=log2(largest); end
+end
+scale_exponent=max(block_exp+weight_exp);
+if ~isfinite(scale_exponent), error('weighted data must be nonzero.'); end
+
+% Measure the normalised operator norm in bounded column slices
+data_norm=0;
+for n=1:numel(blocks)
+    for k=1:sketch_rank:size(blocks{n},2)
+        columns=k:min(k+sketch_rank-1,size(blocks{n},2));
+        data=weighted_slice(blocks{n}(:,columns),weight_frac(n),weight_exp(n)-scale_exponent);
+        data_norm=hypot(data_norm,norm(data,'fro'));
     end
 end
-total_energy=data_norm^2;
-if ~isfinite(total_energy)||data_norm==0
-    error('weighted data must have finite nonzero energy.');
-end
 
-% Compute the exact basis or a seeded blockwise randomised range sketch
+% Factor the complete normalised data or construct its stabilised range sketch
 if strcmp(options.method,'svd')
-    output_size=min(row_count,data_columns);
-    data=zeros(row_count,column_count); first_column=1;
+    output_size=min(row_count,data_columns); data=zeros(row_count,column_count);
+    first_column=1;
     for n=1:numel(blocks)
-        columns=first_column:first_column+size(blocks{n},2)-1;
-        data(:,columns)=sqrt(weights(n))*blocks{n};
+        for k=1:sketch_rank:size(blocks{n},2)
+            columns=k:min(k+sketch_rank-1,size(blocks{n},2));
+            data(:,first_column+columns-1)=weighted_slice(blocks{n}(:,columns),...
+                                                         weight_frac(n),weight_exp(n)-scale_exponent);
+        end
         first_column=first_column+size(blocks{n},2);
     end
-    [modes,singular_vals]=svd(data,'econ','vector');
+    [modes,singular_vals]=svd(data,'econ','vector'); clear data
 else
     output_size=target_rank+options.oversampling;
-    saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng));
-    rng(options.seed,'twister'); sketch_rank=block_width;
+    saved_rng=rng; restore_rng=onCleanup(@()rng(saved_rng)); rng(options.seed,'twister');
     omega=randn(column_count,sketch_rank);
-    if ~all(cellfun(@isreal,blocks))
-        omega=complex(omega,randn(column_count,sketch_rank));
-    end
-    for k=0:options.power_iters
+    if ~all(cellfun(@isreal,blocks)), omega=complex(omega,randn(column_count,sketch_rank)); end
+    for j=0:options.power_iters
 
-        % Apply the weighted snapshot matrix using only the supplied blocks
-        range=zeros(row_count,sketch_rank); first_column=1;
+        % Apply the normalised weighted data and reorthogonalise its range
+        Q=zeros(row_count,sketch_rank); first_column=1;
         for n=1:numel(blocks)
-            columns=first_column:first_column+size(blocks{n},2)-1;
-            range=range+blocks{n}*(sqrt(weights(n))*omega(columns,:));
+            for k=1:sketch_rank:size(blocks{n},2)
+                columns=k:min(k+sketch_rank-1,size(blocks{n},2));
+                data=weighted_slice(blocks{n}(:,columns),weight_frac(n),weight_exp(n)-scale_exponent);
+                Q=Q+data*omega(first_column+columns-1,:);
+            end
             first_column=first_column+size(blocks{n},2);
         end
-        [range,~]=qr(range,0);
-        if k<options.power_iters
+        [Q,~]=qr(Q,0); clear data
+        if j<options.power_iters
 
-            % Reorthogonalise the adjoint range before the next power iteration
-            omega=zeros(column_count,sketch_rank); first_column=1;
+            % Apply the adjoint and reorthogonalise before another data pass
+            first_column=1;
             for n=1:numel(blocks)
-                columns=first_column:first_column+size(blocks{n},2)-1;
-                omega(columns,:)=blocks{n}'*(sqrt(weights(n))*range);
+                for k=1:sketch_rank:size(blocks{n},2)
+                    columns=k:min(k+sketch_rank-1,size(blocks{n},2));
+                    data=weighted_slice(blocks{n}(:,columns),weight_frac(n),weight_exp(n)-scale_exponent);
+                    omega(first_column+columns-1,:)=data'*Q;
+                end
                 first_column=first_column+size(blocks{n},2);
             end
-            [omega,~]=qr(omega,0);
+            [omega,~]=qr(omega,0); clear data
 
         end
 
     end
 
-    % Factor only the compressed snapshots, without right singular vectors
+    % Compress the normalised data after releasing Gaussian coefficients
     clear omega
     data=zeros(sketch_rank,column_count); first_column=1;
     for n=1:numel(blocks)
-        columns=first_column:first_column+size(blocks{n},2)-1;
-        data(:,columns)=(sqrt(weights(n))*range')*blocks{n};
+        for k=1:sketch_rank:size(blocks{n},2)
+            columns=k:min(k+sketch_rank-1,size(blocks{n},2));
+            data(:,first_column+columns-1)=Q'*weighted_slice(blocks{n}(:,columns),...
+                                                           weight_frac(n),weight_exp(n)-scale_exponent);
+        end
         first_column=first_column+size(blocks{n},2);
     end
-    [left_modes,singular_vals]=svd(data,'econ','vector');
-    clear restore_rng
+    [modes,singular_vals]=svd(data,'econ','vector'); clear data restore_rng
 end
-clear data
 
-% Reject unsupported rank rather than returning arbitrary null-space modes
+% Apply the original-dimension rank threshold in normalised coordinates
 singular_vals=[singular_vals;zeros(output_size-numel(singular_vals),1)];
 rank_tol=max(row_count,data_columns)*eps(singular_vals(1));
-if singular_vals(target_rank)<=rank_tol
+if target_rank>numel(singular_vals)||singular_vals(target_rank)<=rank_tol
     error('target_rank exceeds the numerical rank of the supplied data sketch.');
 end
+basis=modes(:,1:target_rank);
+if strcmp(options.method,'randomised'), basis=Q*basis; end
+clear modes Q
 
-% Form only retained basis modes after the numerical rank check
-if strcmp(options.method,'svd')
-    basis=modes(:,1:target_rank);
-else
-    basis=range*left_modes(:,1:target_rank);
-end
-clear modes left_modes range
-
-% Measure the projection residual in column slices bounded by the sketch rank
-residual_abs=0;
+% Measure the actual supplied-data residual rather than a spectral tail estimate
+residual=0;
 for n=1:numel(blocks)
-    for k=1:block_width:size(blocks{n},2)
-        columns=k:min(k+block_width-1,size(blocks{n},2));
-        data=sqrt(weights(n))*blocks{n}(:,columns);
-        residual_abs=hypot(residual_abs,norm(data-basis*(basis'*data),'fro'));
+    for k=1:sketch_rank:size(blocks{n},2)
+        columns=k:min(k+sketch_rank-1,size(blocks{n},2));
+        data=weighted_slice(blocks{n}(:,columns),weight_frac(n),weight_exp(n)-scale_exponent);
+        residual=hypot(residual,norm(data-basis*(basis'*data),'fro'));
     end
 end
-result=struct('basis',basis,'singular_vals',singular_vals,...
-              'total_energy',total_energy,'residual_abs',residual_abs,...
-              'residual_rel',residual_abs/data_norm,...
-              'orth_error',norm(basis'*basis-eye(target_rank),'fro'));
+result=struct('basis',basis,'singular_vals',pow2(singular_vals,scale_exponent),...
+              'total_energy',pow2(data_norm^2,2*scale_exponent),...
+              'residual_abs',pow2(residual,scale_exponent),'residual_rel',residual/data_norm,...
+              'orth_error',norm(basis'*basis-speye(target_rank),'fro'),...
+              'scale_exponent',scale_exponent,'singular_vals_scaled',singular_vals,...
+              'data_norm_scaled',data_norm);
 
+end
+
+% Apply one common binary scale to a weighted data slice without losing components
+function data=weighted_slice(data,fraction,exponent)
+real_data=pow2(real(data),exponent)*fraction;
+imag_data=pow2(imag(data),exponent)*fraction;
+if any((real(data)~=0)&(real_data==0),'all')||any((imag(data)~=0)&(imag_data==0),'all')
+    error('weighted data dynamic range exceeds the normalised double representation.');
+end
+if isreal(data), data=real_data; else, data=complex(real_data,imag_data); end
 end
 
 % Consistency enforcement
@@ -183,7 +214,7 @@ if ~isa(weights,'double')||~isreal(weights)||~isequal(size(weights),size(blocks)
     error('weights must be a matching finite nonnegative double column with a positive entry.');
 end
 ndims_data=min(size(blocks{1},1),sum(cellfun(@(x)size(x,2),blocks)));
-if ~isnumeric(target_rank)||~isreal(target_rank)||~isscalar(target_rank)||...
+if ~isa(target_rank,'double')||~isreal(target_rank)||~isscalar(target_rank)||...
    ~isfinite(target_rank)||target_rank<1||mod(target_rank,1)~=0||target_rank>ndims_data
     error('target_rank must be a positive integer within the data dimensions.');
 end
@@ -197,7 +228,7 @@ if ~ischar(options.method)||~isrow(options.method)||...
 end
 for n=2:4
     value=options.(fields{n});
-    if ~isnumeric(value)||~isreal(value)||~isscalar(value)||~isfinite(value)||...
+    if ~isa(value,'double')||~isreal(value)||~isscalar(value)||~isfinite(value)||...
        value<0||mod(value,1)~=0
         error('oversampling, power_iters, and seed must be nonnegative integers.');
     end

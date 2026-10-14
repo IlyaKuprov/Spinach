@@ -1,9 +1,7 @@
-# Fixed-basis affine Liouvillian projection
+# Fixed-basis affine Galerkin projection
 
-`pod_project` prepares fixed affine Liouvillian terms, one initial state, and one detection vector in an explicitly supplied orthonormal Euclidean basis. All inputs must share state ordering and projectors. Its affine assembly identity is algebraic, not a statement of reduced-trajectory accuracy.
+`pod_project(basis,terms,rho,coil)` prepares a fixed family in one state ordering: reduced terms are basis'*terms{k}*basis, initial coordinates are basis'*rho and detection coordinates are basis'*coil. Hermitian detection preserves coil'*rho. Liouvillians follow L=H+1i*R+1i*K in rad/s and propagation exp(-1i*L*t), with time in seconds.
 
-For Spinach, terms use L=H+1i*R+1i*K in rad/s; detection retains the Hermitian inner product. Non-Euclidean metrics require explicit whitening by the caller. No automatic basis choice, physical coordinate conversion, trace preservation, or positivity guarantee is implied. Preparation is distinct from repeated coefficient evaluation.
+Input data are power-of-two normalised before each matrix product, then restored to physical units. This avoids oversized intermediates when projected coordinates are finite. Nonzero components lost to normalisation and nonfinite final projected terms/states are unsupported and rejected. Finiteness checks preserve sparse implicit zeros; sparse bases use a sparse Gram identity. The dimension-dependent orthogonality budget is gamma(8*n)*r, where gamma(k)=k*eps/(1-k*eps), allowing the real/complex dot-product roundoff scale without repairing the supplied basis.
 
-Liouvillian finiteness validation preserves sparse implicit zeros and scans dense terms without extracting a same-size double nonzero-entry vector.
-
-Sparse bases and state vectors are screened without expanding their implicit zeros; sparse basis Gram matrices retain a sparse identity for orthogonality checking. Sparse coordinate-selection bases and sparse terms/states can therefore yield a sparse prepared model. Projected terms and state vectors remain subject to computed-domain finiteness checks: finite full-space inputs can still overflow during projection.
+Projection commutes algebraically with affine assembly, but does not certify accurate reduced trajectories, positivity, trace preservation or stability. The caller supplies an orthonormal Euclidean basis, conformable finite double terms and state columns, common ordering and consistent projectors. No coordinate conversion or non-Euclidean metric is inferred. Training and evaluation remain separate. Fixed-basis offline/online projection follows Benner, Gugercin and Willcox, DOI:10.1137/130932715, section2.2.

@@ -3,7 +3,10 @@
 % interleaved held-out offsets compare full Spinach and projected dynamics.
 % A rank-three truncation and the full four-dimensional coherence subspace
 % are both reported: snapshot energy is not an observable error bound.
-% Training and projection costs must be amortised separately from evaluation.
+% Weighted training uses one binary scale; amplitude-aware evaluation restores
+% only detected signals. Training and projection costs are reported separately
+% from repeated query costs. The retained physical model is unchanged.
+% POD/Galerkin reference: DOI:10.1137/130932715.
 %
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
@@ -41,12 +44,14 @@ end
 % Train explicit ranks and measure held-out FIDs and identically processed spectra
 window=cos(linspace(0,pi/2,nsteps+1)).^2;
 for target_rank=[3 4]
-    prepared=pod_basis(blocks,ones(size(blocks)),target_rank,options);
-    model=pod_project(prepared.basis,terms,full(rho),full(coil));
+    offline=tic; prepared=pod_basis(blocks,ones(size(blocks)),target_rank,options);
+    model=pod_project(prepared.basis,terms,full(rho),full(coil)); preparation=toc(offline);
+    evaluation=0;
     for n=1:numel(test_offsets)
         L=terms{1}+test_offsets(n)*terms{2};
         full_fid=evolution(spin_system,L,coil,rho,timestep,nsteps,'observable').';
-        reduced_fid=pod_evolve(model,[1;test_offsets(n)],timestep,nsteps);
+        online=tic; reduced_fid=pod_evolve(model,[1;test_offsets(n)],timestep,nsteps);
+        evaluation=evaluation+toc(online);
         full_spec=fftshift(fft(full_fid.*window,1024));
         reduced_spec=fftshift(fft(reduced_fid.*window,1024));
         peak=max(abs(full_spec)); delta=reduced_spec-full_spec;
@@ -54,7 +59,10 @@ for target_rank=[3 4]
                 target_rank,test_offsets(n),max(abs(reduced_fid-full_fid)),...
                 max(abs(delta))/peak,sqrt(mean(abs(delta).^2))/peak);
     end
-    fprintf('rank=%d supplied_snapshot_residual=%.3e\n',target_rank,prepared.residual_rel);
+    fprintf('rank=%d supplied_snapshot_residual=%.3e data_binary_scale=%d\n',...
+            target_rank,prepared.residual_rel,prepared.scale_exponent);
+    fprintf('rank=%d preparation=%.3e s mean_query=%.3e s\n',...
+            target_rank,preparation,evaluation/numel(test_offsets));
 end
 
 % Display the last independently processed full and reduced spectra on one scale

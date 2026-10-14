@@ -768,69 +768,41 @@ comments; widths require a method description.
 
 ## Snapshot POD for repeated parameter families
 
-For tiny snapshot scales, `total_energy` may round to zero even when the
-unsquared data norm is nonzero. `residual_rel` uses that unsquared norm;
-zero data and overflowing energy remain errors. This is not a guarantee for
-arbitrary subnormal inputs.
+For an explicitly covered system and parameter family, train with `pod_basis`,
+project fixed affine terms and state/detection columns using `pod_project`, then
+supply coefficients and a uniform grid to `pod_evolve`. Keep Euclidean ordering
+and Liouvillian convention L=H+1i*R+1i*K, rad/s; time is seconds. Integer inputs
+and counts are double. No metric, processing, reference subtraction, stability
+repair or positivity constraint is inferred.
 
-For a defined system and parameter family, train explicitly with `pod_basis`,
-project fixed affine Liouvillian terms and initial/detection vectors once with
-`pod_project`, and evaluate their coefficients with `pod_evolve`. Supplied
-snapshot blocks or U*S factors share one Euclidean state ordering; weights
-are block-energy weights, not silently normalised case probabilities. Exact
-SVD and seeded randomised sketches have different optimality claims, and a
-pre-truncated factor cannot recover omitted snapshot information. Neither
-snapshot residual nor orthogonality establishes observable accuracy,
-positivity, or trace preservation. Compare independent full Spinach FIDs and
-identically processed spectra within the intended grid. Use
-`L=H+1i*R+1i*K` in rad/s, time in seconds, and conjugated detection. Training,
-projection, and repeated evaluation have separate costs. The maintained
-`snapshot_pod_nmr` example makes the sampling and ranks explicit; no automatic
-propagator truncation, methyl model, pulse fit, slow-mode selection, or offset
-interpolation is supplied by these utilities. Randomised basis construction
-uses blockwise range products and sketch-width residual slices rather than
-dense snapshot concatenation. Sketch and compressed arrays still depend on
-the total snapshot-column count; sparse Liouvillian validation inspects only
-stored entries. The regression checks sparse snapshot finiteness and zero-data
-rejection for both methods, including preservation of the caller's RNG.
+Weighted snapshot matrices or covariance-equivalent factors are normalised in
+one binary frame before SVD, QR, rank decisions and residual measurement.
+Exact SVD is the full-data reference. Randomised SVD applies weighted blocks in
+bounded slices, reorthogonalises after every data/adjoint pass and factors only
+compressed snapshots, following Halko et al., DOI:10.1137/090771806. Preserve
+caller RNG; exclude validated zero-weight blocks from workspace but retain
+original-dimension rank thresholds and diagnostic padding. Form retained modes
+only and release Gaussian coefficients before compressed data.
 
-Zero-step, zero-duration, or exactly all-zero coefficient `pod_evolve` requests return the initial observable,
-repeated as needed, without assembling or exponentiating the reduced generator.
-Zero-weight blocks are validated but excluded from basis construction;
-sketch sizes are bounded by positively weighted columns, while returned
-singular-value vectors retain zero padding for the supplied-data dimensions.
+Physical diagnostic energy may round to zero or infinity. Use relative residuals
+and the returned scaled diagnostics, not squared energy, for numerical decisions.
+Normalisation that loses nonzero components is unsupported. Factor truncation
+qualifies reconstruction of supplied factors, not omitted original trajectories.
+POD snapshot optimality is not a reduced-output error guarantee; see Benner et al.,
+DOI:10.1137/130932715. Validate held-out complex FIDs and identically processed
+spectra against full Spinach; report offline costs separately from repeated queries.
 
-Randomised construction keeps its sketch and basis real for real positively
-weighted blocks; excluded complex blocks do not force complex storage.
-Liouvillian finiteness checks preserve sparse zeros without extracting dense
-nonzero entries into a double vector.
+Projection normalises data before matrix products and restores physical units.
+Evaluation assembles the time-scaled affine sum in one binary-exponent frame,
+then restores only the summed generator. Normalised propagation carries real
+scalar growth and state amplitude separately, restoring only the Hermitian
+observable. Use MATLAB's maintained reduced exponential; do not introduce a
+heuristic size dispatcher. Unsupported component ranges, unrepresentable
+projected coordinates/generators and nonfinite final signals remain explicit errors.
 
-Sparse coordinate-selection preparation preserves sparse reduced terms and
-states, including in orthogonality and finiteness checks. `pod_evolve` checks
-sparse model terms without expanding implicit zeros before initial-only
-returns; nonzero-duration propagation still uses a dense reduced exponential.
-
-Exact constant-signal queries (zero coefficients, initial state, detector or
-assembled generator) avoid an exponential after input validation. Zero initial
-overlap alone does not trigger this return. Zero coefficients are skipped
-during assembly; sparse active terms remain sparse until dense propagation.
-
-POD requests singular values as a vector, without a diagonal matrix. Projected
-terms and states must remain finite after preparation; a nonfinite computed
-initial overlap is rejected before any constant-signal return. Randomised POD
-releases sketch coefficients before compression and forms only the retained modes
-after rank validation. Structurally zero generator columns on the state support
-or rows on the detector support avoid dense propagation.
-Computed zero actions do not establish stationarity: they may underflow.
-Cancellation-based nullspaces use the general exponential path.
-
-POD evolution assembles the time-scaled affine generator, ordering scalar
-products to avoid an underflowing or overflowing coefficient/time intermediate.
-A finite unscaled affine sum is tried when individual scaled terms are out of
-range, preserving cancellation before time scaling. Common same-side structural
-stationarity is checked before scaling unreachable entries.
-Lost nonzero scaled term entries are rejected rather than treated as exact
-zeros. Computed initial/later observables and propagated states must remain
-finite; this is explicit rejection, not scaled-state propagation.
-
-Common zero state-support columns or detector-support rows across every active term certify stationarity before scaling unreachable entries; conditions from opposite sides cannot be mixed across terms. Nonfinite term-first products retry a finite nonzero coefficient/time scale. Nonfinite separately scaled assembly retries the unscaled affine sum before time scaling, with finite products and nonzero-entry representability still required. These bounded fallbacks do not guarantee support for every mathematically finite exponent.
+Initial-only and exact constant signals avoid an unnecessary exponential after
+validation. Common structural stationarity must use the same side across every
+active term; mixed state/detector sides do not establish stationarity. Computed
+zero actions can underflow and are not certificates. Sparse storage is preserved
+until a dense small reduced propagator is actually required. No componentwise
+accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.

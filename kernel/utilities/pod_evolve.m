@@ -24,7 +24,7 @@
 % no tolerance-based screening, processing, or reference is inferred.
 % Accuracy is limited by the supplied reduction and generator, not by a
 % snapshot-energy guarantee. No positivity or trace preservation is implied.
-% Zero-step, zero-duration and all-zero-coefficient requests validate inputs
+% Zero-step, zero-duration, and all-zero-coefficient requests validate inputs
 % and return the initial signal, repeated as needed, without assembling a
 % generator. A zero initial state or detector also needs no propagation.
 % Zero coefficients are omitted from assembly; sparse active terms retain a

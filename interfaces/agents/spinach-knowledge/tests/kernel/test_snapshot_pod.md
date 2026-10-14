@@ -10,6 +10,6 @@ A zero-step trajectory is checked against the independent initial complex overla
 
 Real truncated sketches with zero and two power iterations match an independent real Gaussian reference, retain real basis storage despite a zero-weight complex block, and preserve RNG and seed repeatability. Dense NaN/Inf terms are rejected alongside the sparse validation cases.
 
-Sparse coordinate-selection preparation checks reduced storage, the identity projection, complex Hermitian detection, and a nonzero-duration analytic phase trajectory. Sparse reduced models cover zero-step and zero-duration queries, a zero term, and rejection of stored NaN/Inf before initial-only returns.
+Sparse coordinate-selection preparation checks reduced storage, the identity projection, complex Hermitian detection, and a nonzero-duration analytic phase trajectory. Sparse reduced models cover zero-step and zero-duration queries, a zero term, and rejection of stored NaN/Inf before initial-only returns. Exact all-zero coefficients are tested for dense and large sparse models with complex initial overlaps; stored NaN/Inf terms remain invalid for that shortcut.
 
 Constant-signal cases cover full and sparse zero coefficient columns, zero sparse terms, exact affine cancellation, and zero states/detectors. A two-coordinate mixing reference ensures a zero initial overlap can evolve into a nonzero signal. Stored NaN/Inf remain invalid with zero coefficients.

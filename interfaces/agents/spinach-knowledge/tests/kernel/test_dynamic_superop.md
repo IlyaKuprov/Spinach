@@ -40,3 +40,5 @@ The function takes no inputs.
 - `new_test_result()`, `test_close()`, `test_true()` — test harness utilities.
 - `test_spin_system()` — builds the two-spin spherical-tensor Liouville-space test system.
 - `lin2lm()` — extracts the `m` projection quantum numbers from the spherical-tensor basis.
+
+All 16 two-spin tensor descriptors, including the all-unit descriptor, are checked for both commutator and anticommutator identities against independently assembled left and right products. This exercises odd and even total rank parity, rather than a product of local commutators.

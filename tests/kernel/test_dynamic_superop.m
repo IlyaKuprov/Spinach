@@ -61,6 +61,20 @@ result=test_close(result,'superop product comm identity',A_comm,A_left-A_right,1
 result=test_true(result,'superop product sparsity',nnz(A_comm)>0&&nnz(A_comm)<matrix_dim^2,...
                  'the two-spin product superoperator must be non-zero and sparse in the tensor basis');
 
+% Exercise every two-spin tensor product including the unit descriptor
+for n=0:3
+    for k=0:3
+        A_left=local_xyz_to_sparse(superop(spin_system,[n k],'left'),matrix_dim);
+        A_right=local_xyz_to_sparse(superop(spin_system,[n k],'right'),matrix_dim);
+        A_comm=local_xyz_to_sparse(superop(spin_system,[n k],'comm'),matrix_dim);
+        A_acomm=local_xyz_to_sparse(superop(spin_system,[n k],'acomm'),matrix_dim);
+        result=test_close(result,'exhaustive product commutator',A_comm,A_left-A_right,1e-15,1e-15,...
+                          'total odd rank parity must reproduce the full product commutator');
+        result=test_close(result,'exhaustive product anticommutator',A_acomm,A_left+A_right,1e-15,1e-15,...
+                          'total even rank parity must reproduce the full product anticommutator');
+    end
+end
+
 end
 
 

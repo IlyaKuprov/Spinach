@@ -10,4 +10,4 @@ In wavefunction formalism, this unweighted primitive stacks one product ket per 
 
 Direct spherical-tensor projection hashes full query descriptor rows and matches them to cached `bas.row_hash{n}` using `hash_ismember`; reference basis rows are not rehashed.
 
-The single-spin left-product tables store nonzero `[n m k value]` records. Detection-state normalisation selects `[index 1 index value]` directly, without constructing a dense product page.
+The single-spin left-product tables store nonzero `[n m k value]` records. `basis` extracts `[index 1 index value]` into `bas.unit_norm{mult}` once; detection-state normalisation uses a direct vector lookup without scanning product records.

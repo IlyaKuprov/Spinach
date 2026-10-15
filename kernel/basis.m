@@ -215,6 +215,9 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     % Preallocate the structure table arrays
     spin_system.bas.lpst=cell(max(unique_mults),1);
     spin_system.bas.rpst=cell(max(unique_mults),1);
+    spin_system.bas.lp_offsets=cell(max(unique_mults),1);
+    spin_system.bas.rp_offsets=cell(max(unique_mults),1);
+    spin_system.bas.unit_norm=cell(max(unique_mults),1);
 
     % Fill the arrays
     for n=setdiff(unique_mults,1)
@@ -222,11 +225,18 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         % Load from disk or compute
         [lpst,rpst]=ist_product_table(n);
 
-        % Left product structure table
+        % Group product records by operator descriptor
+        lpst=sortrows(lpst,[1 3 2]); rpst=sortrows(rpst,[1 3 2]);
         spin_system.bas.lpst{n}=lpst;
-
-        % Right product structure table
         spin_system.bas.rpst{n}=rpst;
+
+        % Index contiguous descriptor slices without scanning product tables
+        spin_system.bas.lp_offsets{n}=[0;cumsum(accumarray(lpst(:,1),1,[n^2 1]))];
+        spin_system.bas.rp_offsets{n}=[0;cumsum(accumarray(rpst(:,1),1,[n^2 1]))];
+
+        % Extract the detection-state normalisation once per multiplicity
+        unit_rows=lpst(:,2)==1&lpst(:,1)==lpst(:,3);
+        spin_system.bas.unit_norm{n}=accumarray(lpst(unit_rows,1),lpst(unit_rows,4),[n^2 1]);
 
     end
 

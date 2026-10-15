@@ -25,8 +25,10 @@
 %       usually required - please use the (much friendlier) operator()
 %       function.
 %
-% Note: the superoperator is returned in XYZ sparse format, which is 
-%       different from Matlab's CSC format.
+% Note: the superoperator is returned in XYZ sparse format, which is
+%       different from Matlab's CSC format. Commutators retain odd total
+%       operator/source/destination rank parity; anticommutators retain
+%       even parity. Cancellation precedes many-spin basis matching.
 %
 % ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
@@ -34,16 +36,6 @@
 % <https://spindynamics.org/wiki/index.php?title=superop.m>
 
 function A=superop(spin_system,opspec,side)
-
-% Issue a recursive call if appropriate
-if strcmp(side,'comm')
-    A=superop(spin_system,opspec,'leftofcomm');
-    B=superop(spin_system,opspec,'rightofcomm');
-    B(:,3)=-B(:,3); A=[A; B]; return;
-elseif strcmp(side,'acomm')
-    A=[superop(spin_system,opspec,'left');
-       superop(spin_system,opspec,'right')]; return;
-end
 
 % Validate the input
 grumble(spin_system,opspec);
@@ -56,6 +48,8 @@ if isempty(active_spins)
     A=unit_oper(spin_system); 
     [rows,cols,vals]=find(A);
     A=[rows cols vals];
+    if strcmp(side,'comm'), A=[1 1 0]; end
+    if strcmp(side,'acomm'), A(:,3)=2*A(:,3); end
     return;
 end
 
@@ -82,15 +76,17 @@ for n=1:length(active_spins)
     % Select the sided product table
     switch side
 
-        case {'left','leftofcomm'}
+        case {'left','leftofcomm','comm','acomm'}
 
             % Read left product coordinate records
             pt=spin_system.bas.lpst{mult};
+            offsets=spin_system.bas.lp_offsets{mult};
 
         case {'right','rightofcomm'}
 
             % Read right product coordinate records
             pt=spin_system.bas.rpst{mult};
+            offsets=spin_system.bas.rp_offsets{mult};
 
         otherwise
 
@@ -100,7 +96,7 @@ for n=1:length(active_spins)
     end
 
     % Select the current tensor and read its coordinate records
-    pt=pt(pt(:,1)==table_idx,:);
+    pt=pt((offsets(table_idx)+1):offsets(table_idx+1),:);
     destin{n}=pt(:,2); source{n}=pt(:,3); struct{n}=pt(:,4);
 
     % Spinach uses 0 index for the unit matrix
@@ -116,6 +112,15 @@ for n=2:numel(active_spins)
     to=[kron(to,ones(size(destin{n},1),1)) ...
         kron(ones(size(to,1),1),destin{n})];
     coeff=kron(coeff,struct{n});
+end
+
+% Remove cancelling product paths before matching the many-spin basis
+if ismember(side,{'comm','acomm'})
+    ranks_from=floor(sqrt(from)); ranks_to=floor(sqrt(to));
+    rank_oper=sum(floor(sqrt(opspec(active_spins))));
+    odd_paths=mod(rank_oper+sum(ranks_from,2)+sum(ranks_to,2),2)==1;
+    if strcmp(side,'comm'), keep=odd_paths; else, keep=~odd_paths; end
+    from=from(keep,:); to=to(keep,:); coeff=2*coeff(keep);
 end
 
 % Lift the basis columns corresponding to the relevant spins

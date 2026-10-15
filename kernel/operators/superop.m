@@ -204,7 +204,7 @@ end
 if numel(opspec)~=spin_system.comp.nspins
     error('the number of elements in the opspec array must be equal to the number of spins.');
 end
-if any((opspec+1)>spin_system.comp.mults.^2)
+if any(opspec<0)||any((opspec+1)>spin_system.comp.mults.^2)
     error('physically impossible state requested in opspec.');
 end
 end

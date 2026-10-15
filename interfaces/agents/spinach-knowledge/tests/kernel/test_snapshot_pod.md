@@ -55,3 +55,5 @@ Scalar complex-phase controls preserve the selected adjoint conjugation in the c
 Connected tridiagonal relaxation fixtures compare dense and rank-8192 sparse models with an independent alternating-eigenmode exponential, complex coefficients, and exchanged source/detector roles.
 
 Affine connecting-path cancellations exclude an unobserved growing mode before restoring its physical scale, including a sum whose irrelevant diagonal would overflow. Dense/sparse and real/imaginary detectors use an independent scalar phase; residual connecting paths remain explicit range errors.
+
+All six orders of a three-term affine family preserve a weak nilpotent coupling between cancelling large entries, with dense/sparse terms and real/imaginary source phases. A five-term deeper cancellation must explicitly reject an uncertified zero; an exactly accumulated reordering recovers its independent nilpotent signal.

@@ -25,7 +25,12 @@
 % the reduced rank, never forming a full propagator or full state trajectory.
 % Scalar models use the identical closed-form scalar exponential.
 % Coefficients, terms and time are assembled in one binary-exponent frame,
-% restoring only its structurally observable part. No fallback order is used.
+% restoring only its structurally observable part. Compensated entrywise sums
+% use TwoSum (Ogita et al., DOI:10.1137/030601818, Algorithms 3.1 and 4.1).
+% Compensation is column-sized; sparse columns are assembled once. A zero entry whose
+% correction lost information is rejected before structural inference. These
+% transforms apply to computed scaled terms, not exact coefficient products.
+% No arbitrary-precision or fallback multiplication order is used.
 % A state-conditioned real scalar shift and working-state amplitude are carried
 % separately; only the detected observable is restored to physical units.
 % Equivalent forward/adjoint actions choose the smaller initial norm-growth
@@ -110,19 +115,40 @@ end
 exponents=term_exp+coef_exp+time_exp; common_exp=max(exponents(active));
 if ~isfinite(common_exp), fid(:)=fid(1); return; end
 
-% Sum normalised terms before restoring their physical time-scaled magnitude
-[~,order]=sort(exponents(active),'descend');
-A=sparse(numel(coordinates),numel(coordinates));
-for n=active(order)
-    if ~isfinite(term_exp(n)), continue; end
-    [term,~]=binary_normalise(terms{n});
-    term=checked_product(term,checked_product(coef_frac(n),time_frac));
-    scaled=binary_scale(term,exponents(n)-common_exp);
-    A=A+scaled;
-end
+% Prepare common-frame factors and preserve sparse column construction
+[~,order]=sort(exponents(active),'descend'); active=active(order);
+active=active(isfinite(term_exp(active))); factors=zeros(size(coefficients));
+for n=active, factors(n)=checked_product(coef_frac(n),time_frac); end
+sparse_terms=all(cellfun(@issparse,terms(active))); nranks=numel(coordinates);
+if sparse_terms, columns=cell(1,nranks); else, A=zeros(nranks); end
 
-% Release term workspaces and remove paths disconnected by affine cancellation
-clear term scaled terms
+% Accumulate entrywise residuals in column-sized compensated workspace
+for k=1:nranks
+
+    % Transform each component addition into its value and exact rounding residual
+    column=sparse(nranks,1); correction=column; uncertain=(column~=0);
+    for n=active
+        term=binary_scale(terms{n}(:,k),-term_exp(n));
+        scaled=binary_scale(checked_product(term,factors(n)),exponents(n)-common_exp);
+        [column,residual]=two_sum(column,scaled);
+        [correction,roundoff]=two_sum(correction,residual);
+        uncertain=uncertain|(roundoff~=0);
+    end
+
+    % Reject zero entries whose accumulated correction lost information
+    column=column+correction;
+    if any(column(uncertain)==0)
+        error('affine cancellation cannot certify a zero generator entry.');
+    end
+
+    % Assemble stored sparse columns once rather than growing sparse pointers
+    if sparse_terms, columns{k}=column; else, A(:,k)=column; end
+
+end
+if sparse_terms, A=[columns{:}]; end
+
+% Release column workspaces before reducing paths disconnected by cancellation
+clear columns column correction uncertain residual roundoff term scaled terms
 coordinates=intersect(reachable_support({A},1,find(rho),false),...
                       reachable_support({A},1,find(coil),true));
 if isempty(coordinates), fid(:)=0; return; end
@@ -203,6 +229,12 @@ end
 if use_adjoint, fid=conj(fid); end
 clear restore_rng
 
+end
+
+% Recover the exact addition residual of bounded real or complex components
+function [total,residual]=two_sum(left,right)
+total=left+right; virtual=total-left;
+residual=(left-(total-virtual))+(right-virtual);
 end
 
 % Cache action bounds with sparse reductions or bounded dense workspace

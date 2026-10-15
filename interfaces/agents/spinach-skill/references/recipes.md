@@ -818,3 +818,11 @@ Sparse POD action bounds use absolute row/column sums, with their half-sum
 bounding Hermitian radii without constructing a Hermitian part. Rayleigh
 estimates stream normalised columns and sparse scalar overlaps. Binary
 scaling checks stored component counts, avoiding implicit-zero masks.
+
+Accumulate affine entries with TwoSum-based compensated additions
+(Ogita et al., DOI:10.1137/030601818, Algorithms3.1/4.1). Compensation
+workspace is column-sized. Dense outputs are preallocated; sparse output
+columns are staged and concatenated once to avoid quadratic sparse-pointer
+insertion. Reject a final zero whose correction accumulation lost information
+before using it as structural evidence. These transforms apply to computed
+scaled terms, not exact coefficient products or arbitrary-precision sums.

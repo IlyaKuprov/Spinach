@@ -964,6 +964,39 @@ for storage={'dense','sparse'}
                      'a genuine path to extreme growth remains outside the supported working range');
 end
 
+% Preserve weak affine couplings between cancelling order-one contributions
+for storage={'dense','sparse'}
+    terms={[1 0;2^-54 0];[0 0;1 0];[-1 0;-1 0]}; orders=perms(1:3);
+    if strcmp(storage{1},'sparse'), terms=cellfun(@sparse,terms,'UniformOutput',false); end
+    for k=1:size(orders,1)
+        for phase=[1 1i]
+            prepared=struct('terms',{terms(orders(k,:))},'rho',[phase;0],'coil',[0;1+0.3i]);
+            reference=(1-0.3i)*phase*(-1i)*(0:3);
+            result=test_close(result,['affine residual ' storage{1} ' ' num2str(k) ' ' num2str(phase)],...
+                              pod_evolve(prepared,ones(3,1),2^54,3),reference,1e-12,0,...
+                              'all term permutations preserve the independently known nilpotent coupling');
+        end
+    end
+end
+
+% Reject uncertified zeros after a second-level compensated residual is lost
+for storage={'dense','sparse'}
+    terms={[1 0;1 0];[1 0;2^-54 0];[-1 0;2^-108 1];[-1 0;-1 0];[0 0;-2^-54 -1]};
+    if strcmp(storage{1},'sparse'), terms=cellfun(@sparse,terms,'UniformOutput',false); end
+    prepared=struct('terms',{terms},'rho',[1;0],'coil',[0;1]); rejected=false;
+    try
+        pod_evolve(prepared,ones(5,1),2^108,3);
+    catch caught
+        rejected=contains(caught.message,'affine cancellation cannot certify');
+    end
+    result=test_true(result,['uncertified affine zero ' storage{1}],rejected,...
+                     'a rounded zero with a lost correction is an explicit unsupported sum');
+    prepared.terms=terms([1 4 2 5 3]);
+    result=test_close(result,['certified affine control ' storage{1}],...
+                      pod_evolve(prepared,ones(5,1),2^108,3),-1i*(0:3),1e-12,0,...
+                      'the independently known nilpotent signal survives an exactly accumulated control');
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

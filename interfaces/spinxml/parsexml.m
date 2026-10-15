@@ -23,7 +23,7 @@ function xml=parsexml(filename)
 % Check consistency
 grumble(filename);
 
-% Use Matlab's native XML engine, avoiding Java
+% Use Matlab's native XML engine
 
 % Read the file
 try

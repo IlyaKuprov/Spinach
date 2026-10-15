@@ -24,8 +24,7 @@ endpoint phase is combined with the Condon–Shortley CG conversion.
 
 Coefficients, ratios, and recurrence amplitudes retain roundoff corrections in a
 second native double; this is fixed compensated arithmetic, not an arbitrary-
-precision runtime. The final coefficient is an ordinary double. There is no Java
-or Symbolic Math Toolbox dependency. No factorial or alternating factorial sum
+precision runtime. The final coefficient is an ordinary double. There is no Symbolic Math Toolbox dependency. No factorial or alternating factorial sum
 is evaluated. Small nonzero tails are reconstructed before the final conversion,
 without squaring the target coefficient. FP64 output range and subnormal rounding
 still apply; no universal correctly-rounded guarantee is made.

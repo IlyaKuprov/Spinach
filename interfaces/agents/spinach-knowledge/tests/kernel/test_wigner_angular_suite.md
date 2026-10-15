@@ -51,6 +51,7 @@ The function takes no inputs. It returns `result`, a regression test result with
 ## Clebsch–Gordan recurrence coverage
 
 The CG checks include exact-input 100-digit Mathematica reference values across
-integer and half-integer magnetic recurrence regimes, representable tails near
+integer and half-integer magnetic recurrence regimes compared relatively,
+incompatible rank/projection parity rejection in CG and 3j calls, representable tails near
 `1e-300` compared relatively, a rank-10000 singlet, and an exact antisymmetry zero.
 The two full 10000-row fundamentals comparison examples remain separate checks.

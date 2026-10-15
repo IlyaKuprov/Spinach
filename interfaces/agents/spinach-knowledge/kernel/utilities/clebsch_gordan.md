@@ -10,7 +10,9 @@ Computes the Clebsch-Gordan coefficient: the coefficient in front of the `Y(L,M)
 
 The three preliminary zero-test stages are retained: projection bounds and
 `M=M1+M2`, triangle inequalities, and the legacy nonempty summation-range test.
-A failed stage returns zero. The notation follows Varshalovich, Section 8.2.1.
+A failed stage returns zero. After these retained stages, incompatible total-rank
+or rank/projection integer–half-integer parities also return zero before the
+recurrence is constructed. The notation follows Varshalovich, Section 8.2.1.
 
 Admissible coefficients are evaluated using the Schulten–Gordon magnetic-index
 three-term recurrence with Luscombe–Luban ratio propagation in the monotone tails.

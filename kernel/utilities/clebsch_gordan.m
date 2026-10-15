@@ -68,6 +68,9 @@ if prefactor_is_nonzero
         % Proceed if appropriate
         if sum_is_nonzero
             
+            % Reject incompatible angular-momentum and projection parities
+            if any(mod([a+b+c a+alp b+bet c+gam],1)), return; end
+
             % Select the shortest 3j family using phase-free cyclic permutations
             spins=[double(a) double(b) double(c)];
             mags=[double(alp) double(bet) -double(gam)];

@@ -1096,6 +1096,38 @@ for storage={'dense','sparse'}
     end
 end
 
+% Certify physical damping tails without dropping representable collective tails
+for storage={'dense','sparse'}
+    for rate=[-750 -1000]
+        term=1i*diag([rate 0]);
+        if strcmp(storage{1},'sparse'), term=sparse(term); end
+        for phase=[1 1+1i]
+            prepared=pod_project(eye(2),{term},[1;1],[conj(phase);1]);
+            result=test_close(result,['physical diagonal tail ' storage{1} ' ' num2str(rate) ' ' num2str(phase)],...
+                              pod_evolve(prepared,1,1,3),1+phase*exp(rate*(0:3)),1e-12,0,...
+                              'a certified physically unrepresentable damping tail does not hide the surviving signal');
+        end
+    end
+    for count=[2 256]
+        rate=-700; if count==256, rate=-750; end
+        term=1i*diag([0;rate*ones(count,1)]); detector=[realmax/4;ones(count,1)];
+        if strcmp(storage{1},'sparse'), term=sparse(term); end
+        prepared=pod_project(eye(count+1),{term},ones(count+1,1),detector);
+        rejected=false;
+        try
+            pod_evolve(prepared,1,1,1);
+        catch caught
+            rejected=contains(caught.message,'observable product dynamic range');
+        end
+        result=test_true(result,['representable damping tail ' storage{1} ' ' num2str(count)],rejected,...
+                         'a physically representable discarded tail remains an explicit range error');
+        if count==256
+            result=test_true(result,['collective tail reference ' storage{1}],exp(log(count)+rate)>0,...
+                             'individually underflowed exponentials can have a representable collective signal');
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

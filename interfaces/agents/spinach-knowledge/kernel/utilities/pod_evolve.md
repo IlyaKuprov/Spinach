@@ -23,3 +23,5 @@ Per-term affine workspaces are released before the assembled generator is restor
 Exactly diagonal summed generators use componentwise scalar exponentials, one state column per acquisition step; no dense zero off-diagonal matrix is retained. These actions do not use the generic exponential-action norm cutoff. Non-diagonal actions retain their existing range contract.
 
 Each exactly diagonal mode carries its own binary state amplitude. Only bounded exponential residuals and phases are formed before per-mode renormalisation; Hermitian detection combines component products with their coordinate exponents. This supports finite detected products even when a separate exponential factor or physical state component would overflow or underflow.
+
+Observable alignment may discard underflowed working components only when an exponent bound for the complete computed tail is strictly below half the smallest physical subnormal. The bound uses the largest absolute discarded group and its count, not separate per-mode underflow tests; physically representable collective tails remain explicit range errors.

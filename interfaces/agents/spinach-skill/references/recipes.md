@@ -834,3 +834,5 @@ states; representable subnormal coordinates remain supported.
 POD evaluation recognises an exactly diagonal assembled generator and applies its componentwise closed-form exponential one state column at a time. This avoids retaining a dense zero off-diagonal matrix and bypasses the generic non-diagonal action-norm restriction; existing numeric range and finite-observable contracts still apply.
 
 Exactly diagonal POD modes carry individual binary state amplitudes. Evaluation forms bounded exponential residuals and phases rather than a potentially overflowing/underflowing standalone exponential; observable accumulation combines each coordinate exponent with its Hermitian detector product. Exact-integer exponent limits and finite-output requirements remain explicit.
+
+POD observable accumulation accepts discarded working products only if an absolute power-of-two bound on their complete computed physical tail lies below half the smallest subnormal. This supports fully damped modes alongside surviving signals without discarding a potentially representable collective tail.

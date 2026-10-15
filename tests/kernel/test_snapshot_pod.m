@@ -1128,6 +1128,37 @@ for storage={'dense','sparse'}
     end
 end
 
+% Reject subnormal diagonal products while retaining the normal working boundary
+for storage={'dense','sparse'}
+    for amplitude=[0.5 0.75 1]
+        for swapped=[false true]
+            initial=amplitude*2^1023*[1;1]; detector=[1;-1];
+            if swapped, [initial,detector]=deal(detector,initial); end
+            for frequency=[-2^-1074 2^-1074 -2^-1073 2^-1073]
+                term=diag([frequency 0]);
+                if strcmp(storage{1},'sparse'), term=sparse(term); end
+                prepared=pod_project(eye(2),{term},initial,detector); rejected=false;
+                try
+                    pod_evolve(prepared,1,1,1);
+                catch caught
+                    rejected=contains(caught.message,'normal double working range');
+                end
+                result=test_true(result,['diagonal product range ' storage{1} ' ' num2str(amplitude) ' ' num2str(swapped) ' ' num2str(frequency)],rejected,...
+                                 'a zero or quantised subnormal phase product is rejected before amplification');
+            end
+            for frequency=[-2^-1021 2^-1021]
+                term=diag([frequency 0]);
+                if strcmp(storage{1},'sparse'), term=sparse(term); end
+                prepared=pod_project(eye(2),{term},initial,detector);
+                observed=pod_evolve(prepared,1,1,1); expected=-amplitude*pow2(frequency,1023);
+                result=test_close(result,['diagonal normal boundary ' storage{1} ' ' num2str(amplitude) ' ' num2str(swapped) ' ' num2str(frequency)],...
+                                  imag(observed(2))/expected,1,1e-12,0,...
+                                  'a normal component product retains the independently amplified phase');
+            end
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

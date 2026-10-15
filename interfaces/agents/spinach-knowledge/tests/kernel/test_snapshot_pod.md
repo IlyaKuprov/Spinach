@@ -65,3 +65,5 @@ Independent diagonal exponential controls include dense/sparse storage, ordinary
 Per-mode diagonal amplitude controls cover a finite product with an overflowing exponential factor, growing/decaying modes, tiny states and large detectors, exchanged source/detector roles, large phases, multiple samples and exact stationary-background cancellation. Each nonzero expected sample is compared after division by its independent closed-form value, avoiding masking by a large initial sample.
 
 Damped-mode controls retain a constant surviving background after certified physical underflow. Negative controls require explicit rejection of representable discarded tails, including a collective signal from 256 individually underflowed exponentials.
+
+Subnormal diagonal-product controls cover zeroed and quantised amplified phases, three state scales, both phase signs, dense/sparse storage and exchanged source/detector roles. Independent amplified-phase controls retain products at the normal working boundary.

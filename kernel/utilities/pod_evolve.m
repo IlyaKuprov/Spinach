@@ -25,7 +25,9 @@
 % the reduced rank, never forming a full propagator or full state trajectory.
 % Exactly diagonal actions use componentwise closed-form exponentials, one
 % state column at a time, with a binary amplitude for each mode and no stored
-% zero off-diagonal matrix or overflowing exponential factor.
+% zero off-diagonal matrix or overflowing exponential factor. Diagonal
+% component products must remain in the normal double working range;
+% unsupported subnormal products are rejected before phase quantisation.
 % Coefficients, terms and time are assembled in one binary-exponent frame,
 % restoring only its structurally observable part. Compensated entrywise sums
 % use TwoSum (Ogita et al., DOI:10.1137/030601818, Algorithms 3.1 and 4.1).
@@ -184,13 +186,22 @@ if ~any(A,'all')
         error('state exponent exceeds the exact integer range.');
     end
     factor=exp(complex(real(diagonal)-growth_exp*log(2),imag(diagonal)));
+    minimum=component_min(factor);
     for k=1:nsteps
+
+        % Reject subnormal component products before phase quantisation
+        if minimum*component_min(rho)<realmin
+            error('diagonal products must remain in the normal double working range.');
+        end
+
+        % Advance and renormalise the independently scaled coordinates
         rho=rho.*factor; [~,rebase]=log2(abs(rho));
         rho=binary_scale(rho,-rebase); mode_exp=mode_exp+growth_exp+rebase;
         if any(abs(mode_exp+state_exp+coil_exp)>=flintmax)
             error('state exponent exceeds the exact integer range.');
         end
         fid(k+1)=detect_scaled(coil,rho,mode_exp+state_exp+coil_exp);
+
     end
     return;
 

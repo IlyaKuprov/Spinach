@@ -23,15 +23,17 @@ for n=1:numel(T)
 
         % Left side product action
         LSPA_table=zeros(spin_mult,spin_mult);
-        for k=1:numel(T)
-            LSPA_table=LSPA_table+ist_PTL(n,m,k)*T{k}/norm(T{k},'fro');
+        pt=ist_PTL((ist_PTL(:,1)==n)&(ist_PTL(:,2)==m),:);
+        for k=1:size(pt,1)
+            LSPA_table=LSPA_table+pt(k,4)*T{pt(k,3)}/norm(T{pt(k,3)},'fro');
         end
         LSPA_known=T{n}*T{m}/norm(T{m},'fro');
 
         % Right side product action
         RSPA_table=zeros(spin_mult,spin_mult);
-        for k=1:numel(T)
-            RSPA_table=RSPA_table+ist_PTR(n,m,k)*T{k}/norm(T{k},'fro');
+        pt=ist_PTR((ist_PTR(:,1)==n)&(ist_PTR(:,2)==m),:);
+        for k=1:size(pt,1)
+            RSPA_table=RSPA_table+pt(k,4)*T{pt(k,3)}/norm(T{pt(k,3)},'fro');
         end
         RSPA_known=T{m}*T{n}/norm(T{m},'fro');
 
@@ -80,4 +82,5 @@ end
 disp('BM product action table test PASSED.');
 
 end
+
 

@@ -143,7 +143,9 @@ numerical validation. All other CUDA errors and wrong results remain failures.
 
 `coil_state(spin_system,states,spins)` constructs correctly normalised,
 unweighted detection states. In spherical-tensor Liouville space, single-spin
-left-product table coefficients normalise tensor descriptors; direct projection
+left-product table coefficients normalise tensor descriptors. `bas.lpst{mult}`
+and `bas.rpst{mult}` contain nonzero `[n m k value]` rows with one-based
+tensor indices, not dense three-dimensional arrays; direct projection
 into the hosting basis avoids full superoperator allocation. Use `state` for concentration-weighted
 initial states; detection vectors must not include concentration weighting.
 

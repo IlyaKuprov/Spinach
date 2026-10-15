@@ -206,13 +206,10 @@ for k=1:numel(mfiles)
         
         % Check that the documentation page exists on the Wiki
         if strcmp(mode,'online')&&(~wiki_ex)
-            connection=java.net.URL(wiki_address).openConnection();
-            connection.setDoInput(true); connection.setDoOutput(true);
-            connection.setRequestProperty('User-Agent','spinach_exorcism_module');
+            wiki_options=weboptions('ContentType','text','Timeout',Inf,...
+                                    'UserAgent','spinach_exorcism_module');
             try
-                input=java.io.BufferedReader(...
-                      java.io.InputStreamReader(connection.getInputStream()));
-                input.close();
+                webread(wiki_address,wiki_options);
             catch
                 edit(file_name); web(wiki_address,'-browser');
                 error('documentation page missing from the wiki');

@@ -61,3 +61,7 @@ Concentrations must be a finite, real, non-negative vector with one entry per su
 ## GPU allocation caching
 
 With GPU arithmetic enabled, `create` sets the selected GPU's `CachePolicy` to `minimum` on the client and every pool worker. This applies even when `hygiene` is disabled and limits retained allocation-cache blocks across experiments and powder orientations. The cache-policy assignment does not reset live GPU arrays; the existing optional hygiene reset remains separate. Selecting or resetting a device afterwards restores MATLAB's default policy, so call `create` again to reapply it.
+
+## ValueStore cache preservation
+
+When reusing a parallel pool, `create` clears its ValueStore only if none of `op_cache`, `ham_cache`, or `prop_cache` is enabled in `sys.enable`. Enabling any of these options preserves the entire existing store across spin-system construction.

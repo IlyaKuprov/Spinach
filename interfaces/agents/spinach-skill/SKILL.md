@@ -157,3 +157,9 @@ descriptor row, compiled by `basis`. Keep this array in the same row order as
 after changing basis settings. `hash_ismember(A,hash_b)` takes numeric query
 rows and prehashed references, not two numeric matrices. Do not use full-row
 hashes to compare descriptors with columns removed.
+
+## Reusing ValueStore caches
+
+Set `op_cache`, `ham_cache`, or `prop_cache` in `sys.enable` to preserve the
+existing parallel pool's ValueStore across `create` calls. With none of these
+options enabled, `create` clears the ValueStore when reusing the pool.

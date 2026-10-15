@@ -297,9 +297,11 @@ if ~isworkernode
         report(spin_system,'WARNING - this pool will be re-used');
         sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');
 
-        % Empty ValueStore of the current pool
-        store=current_pool.ValueStore; store.remove(store.keys);
-        report(spin_system,'parallel pool ValueStore cleared.');
+        % Clear ValueStore only when no ValueStore-backed cache is enabled
+        if ~any(ismember({'op_cache','ham_cache','prop_cache'},spin_system.sys.enable))
+            store=current_pool.ValueStore; store.remove(store.keys);
+            report(spin_system,'parallel pool ValueStore cleared.');
+        end
 
         % Disable pool timeout
         current_pool.IdleTimeout=Inf;

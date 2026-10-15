@@ -26,8 +26,8 @@
 %
 % Note: only nonzero coefficients are stored. Projection conservation,
 %       the rank triangle, and odd rank sums at zero projections eliminate
-%       analytically forbidden products before contraction. Coordinate
-%       caches are separate from legacy dense caches; spin-1/2 is hard-coded.
+%       analytically forbidden products before contraction. Cached tables
+%       use the same coordinate format; spin-1/2 is hard-coded.
 %
 % hannah.hogben@chem.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -84,7 +84,7 @@ end
 % Generate cache record name
 own_path=mfilename('fullpath');
 own_path=own_path(1:(end-17));
-table_file=[own_path 'ist_product_table_coords_' ...
+table_file=[own_path 'ist_product_table_' ...
             num2str(mult) '.mat'];
 
 % Check the cache

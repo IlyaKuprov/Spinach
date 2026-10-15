@@ -9,8 +9,8 @@ The coefficient ordering is:
 
 The implementation computes norms with `hdot` and projects the normalised operator products back onto `T{k}`. This is the left/right multiplicative-action convention associated with Eq. 7.18 in the first edition of IK's book; the source notes that the book omits its normalisation. `lm2lin` and `lin2lm` translate between single and double indices.
 
-For `mult == 2`, the 16-row coordinate tables are hard-coded and returned without a disk-cache lookup. Other multiplicities use `ist_product_table_coords_<mult>.mat` beside the function: an existing cache is loaded, or tables are built and saved as v7.3 when possible. A failed save raises a warning but leaves the computed outputs available.
+For `mult == 2`, the 16-row coordinate tables are hard-coded and returned without a disk-cache lookup. Other multiplicities use `ist_product_table_<mult>.mat` beside the function: an existing cache is loaded, or tables are built and saved as v7.3 when possible. A failed save raises a warning but leaves the computed outputs available.
 
 [MATLAB implementation](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cache/ist_product_table.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ist_product_table.m)
 
-Projection conservation, the angular-momentum triangle, and the zero-projection odd-rank-sum rule skip analytically forbidden contractions. Remaining exactly zero floating-point results are omitted without an amplitude threshold. Legacy dense cache files are not read or overwritten.
+Projection conservation, the angular-momentum triangle, and the zero-projection odd-rank-sum rule skip analytically forbidden contractions. Remaining exactly zero floating-point results are omitted without an amplitude threshold. The shipped MAT-files contain coordinate records under the original cache filenames.

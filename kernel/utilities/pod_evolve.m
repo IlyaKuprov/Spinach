@@ -24,7 +24,8 @@
 % DOI:10.1137/100788860. Actions are streamed in blocks no wider than
 % the reduced rank, never forming a full propagator or full state trajectory.
 % Exactly diagonal actions use componentwise closed-form exponentials, one
-% state column at a time, without a stored zero off-diagonal matrix.
+% state column at a time, with a binary amplitude for each mode and no stored
+% zero off-diagonal matrix or overflowing exponential factor.
 % Coefficients, terms and time are assembled in one binary-exponent frame,
 % restoring only its structurally observable part. Compensated entrywise sums
 % use TwoSum (Ogita et al., DOI:10.1137/030601818, Algorithms 3.1 and 4.1).
@@ -32,9 +33,9 @@
 % correction lost information is rejected before structural inference. These
 % transforms apply to computed scaled terms, not exact coefficient products.
 % No arbitrary-precision or fallback multiplication order is used.
-% A state-conditioned real scalar shift and working-state amplitude are carried
+% Non-diagonal actions carry a state-conditioned real scalar shift and amplitude
 % separately; only the detected observable is restored to physical units.
-% Equivalent forward/adjoint actions choose the smaller initial norm-growth
+% Equivalent non-diagonal forward/adjoint actions choose the smaller norm-growth
 % rate; this changes neither the generator nor the Hermitian observable.
 % The diagonal is stored separately; callbacks apply its scalar shift without
 % constructing a shifted dense operator. The Hermitian bound and induced norms
@@ -81,7 +82,7 @@ grumble(model,coefficients,timestep,nsteps);
 % Separate coordinate amplitude from the working vectors before detection
 [rho,state_exp]=binary_normalise(model.rho);
 [coil,coil_exp]=binary_normalise(model.coil);
-fid=complex(zeros(1,nsteps+1)); fid(1)=detect_scaled(coil,rho,state_exp+coil_exp);
+fid=complex(zeros(1,nsteps+1)); fid(1)=detect_scaled(coil,rho,repmat(state_exp+coil_exp,size(rho)));
 if nsteps==0||timestep==0||~any(coefficients)||~any(rho)||~any(coil)
     fid(:)=fid(1); return;
 end
@@ -171,8 +172,27 @@ end
 
 % Separate the diagonal once and cache bounded off-diagonal action estimates
 diagonal=diag(A); A(1:size(A,1)+1:end)=0;
-diagonal_action=~any(A,'all');
-if diagonal_action, A=[]; end
+if ~any(A,'all')
+
+    % Evolve each diagonal coordinate with its own binary amplitude
+    clear A
+    [~,mode_exp]=log2(abs(rho)); rho=binary_scale(rho,-mode_exp);
+    growth_exp=floor(real(diagonal)/log(2));
+    if any(~isfinite(growth_exp)|abs(growth_exp)>=flintmax)
+        error('state exponent exceeds the exact integer range.');
+    end
+    factor=exp(complex(real(diagonal)-growth_exp*log(2),imag(diagonal)));
+    for k=1:nsteps
+        rho=rho.*factor; [~,rebase]=log2(abs(rho));
+        rho=binary_scale(rho,-rebase); mode_exp=mode_exp+growth_exp+rebase;
+        if any(abs(mode_exp+state_exp+coil_exp)>=flintmax)
+            error('state exponent exceeds the exact integer range.');
+        end
+        fid(k+1)=detect_scaled(coil,rho,mode_exp+state_exp+coil_exp);
+    end
+    return;
+
+end
 [radii,norms,minimum,scale_exp]=action_bounds(A,diagonal);
 
 % Choose an equivalent action without transposing the stored generator
@@ -191,8 +211,7 @@ while completed<nsteps
     if ~isfinite(growth_exp)||abs(growth_exp)>=flintmax
         growth=0; growth_exp=0;
     end
-    shifted_diag=diagonal-growth; width=min(numel(diagonal),nsteps-completed);
-    if diagonal_action, width=1; end
+    shifted_diag=diagonal-growth; width=min(size(A,1),nsteps-completed);
 
     % Bound action storage and growth without altering the physical generator
     growth_bound=max(real(shifted_diag)+radii);
@@ -201,19 +220,14 @@ while completed<nsteps
     end
 
     % Evaluate only the requested actions with no implicit trace shift
-    if diagonal_action
-        if use_adjoint, shifted_diag=conj(shifted_diag); end
-        actions=exp(shifted_diag).*rho;
-    else
-        action_norm=max(norms(:,1+use_adjoint)+abs(shifted_diag));
-        if ~isfinite(action_norm)||action_norm>=flintmax
-            error('working action norm exceeds the exact double step range.');
-        end
-        component_bound=min(minimum,component_min(shifted_diag));
-        actions=expmv(@(flag,data)exponential_action(A,shifted_diag,component_bound,...
-                                                  use_adjoint,flag,data),rho,0:width);
-        actions=actions(:,2:end);
+    action_norm=max(norms(:,1+use_adjoint)+abs(shifted_diag));
+    if ~isfinite(action_norm)||action_norm>=flintmax
+        error('working action norm exceeds the exact double step range.');
     end
+    component_bound=min(minimum,component_min(shifted_diag));
+    actions=expmv(@(flag,data)exponential_action(A,shifted_diag,component_bound,...
+                                              use_adjoint,flag,data),rho,0:width);
+    actions=actions(:,2:end);
 
     % Restore each observable while carrying the last normalised state forward
     base_exp=state_exp;
@@ -225,7 +239,7 @@ while completed<nsteps
         [column,rebase]=binary_normalise(column);
         state_exp=base_exp+column_exp+k*growth_exp+fractional_exp+rebase;
         if abs(state_exp)>=flintmax, error('state exponent exceeds the exact integer range.'); end
-        fid(completed+k+1)=detect_scaled(coil,column,state_exp+coil_exp);
+        fid(completed+k+1)=detect_scaled(coil,column,repmat(state_exp+coil_exp,size(column)));
     end
     rho=column; completed=completed+width;
 
@@ -251,7 +265,7 @@ if issparse(A)
     radii=norms(:,1)/2+norms(:,2)/2;
     largest=full(max(largest,max(max(abs(real(A)),[],'all'),max(abs(imag(A)),[],'all'))));
 else
-    radii=zeros(numel(diagonal),1); norms=zeros(numel(diagonal),2); minimum=Inf;
+    radii=zeros(size(A,1),1); norms=zeros(size(A,1),2); minimum=Inf;
     for k=1:size(A,1)
         column=A(:,k); row=A(k,:)';
         radii(k)=sum(abs(column/2+row/2)); norms(k,:)=[sum(abs(column)) sum(abs(row))];
@@ -318,7 +332,7 @@ if nnz(real(data))~=nnz(real(scaled))||...
 end
 end
 
-% Restore an observable using exponent-aware real component products
+% Restore an observable with one binary exponent per state coordinate
 function signal=detect_scaled(coil,rho,exponent)
 
 % Accumulate the real and imaginary Hermitian products in independent frames
@@ -333,7 +347,7 @@ for n=1:2
         [left_frac,left_exp]=log2(abs(full(left(indices))));
         [right_frac,right_exp]=log2(abs(full(right(indices))));
         fractions=[fractions;sign(left(indices)).*sign(right(indices)).*left_frac.*right_frac]; %#ok<AGROW>
-        powers=[powers;left_exp+right_exp]; %#ok<AGROW>
+        powers=[powers;left_exp+right_exp+exponent(indices)]; %#ok<AGROW>
     end
     if ~isempty(powers)
         [powers,~,groups]=unique(powers); fractions=accumarray(groups,full(fractions));
@@ -343,7 +357,7 @@ for n=1:2
             if any((fractions~=0)&(scaled==0))
                 error('observable product dynamic range exceeds the normalised double representation.');
             end
-            signal=signal+(1i^(n-1))*pow2(sum(scaled),common+exponent);
+            signal=signal+(1i^(n-1))*pow2(sum(scaled),common);
         end
     end
     components(1,:)={real(coil),imag(rho)};

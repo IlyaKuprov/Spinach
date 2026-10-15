@@ -874,16 +874,16 @@ for basis_kind={'dense','sparse'}
     end
 end
 
-% Preserve scalar phase when rounded Rayleigh rates select the adjoint action
+% Preserve scalar phase independently of rounded Rayleigh-rate selection
 for frequency=[0.3 0.7 -0.3 -0.7]
     for swapped=[false true]
         rho=0.3+0.4i; coil=-0.4+0.7i;
         if swapped, [rho,coil]=deal(coil,rho); end
         prepared=pod_project(1,{frequency},rho,coil);
         reference=(coil'*rho)*exp(-1i*frequency*(0:256)*0.01);
-        result=test_close(result,['scalar phase adjoint ' num2str(frequency) ' ' num2str(swapped)],...
+        result=test_close(result,['scalar phase convention ' num2str(frequency) ' ' num2str(swapped)],...
                           pod_evolve(prepared,1,0.01,256),reference,1e-12,0,...
-                          'the closed-form scalar action obeys the selected conjugation and Hermitian detection');
+                          'the closed-form scalar action preserves phase and Hermitian detection');
     end
 end
 
@@ -1060,6 +1060,37 @@ for storage={'dense','sparse'}
                                   'diagonal modes use independent scalar exponentials without a generic action-norm limit');
                 result=test_true(result,['diagonal RNG ' storage{1} ' ' num2str(frequency) ' ' num2str(swapped) ' ' num2str(coefficient)],...
                                  isequal(rng,saved_rng),'closed-form diagonal actions preserve the caller stream');
+            end
+        end
+    end
+end
+
+% Scale each diagonal exponential jointly with its state and detector amplitudes
+for storage={'dense','sparse'}
+    term=1i*diag([1000 0]);
+    if strcmp(storage{1},'sparse'), term=sparse(term); end
+    prepared=pod_project(eye(2),{term},[1e-300;1],[1;1]);
+    observed=pod_evolve(prepared,1,1,1); expected=1+exp(1000+log(1e-300));
+    result=test_close(result,['diagonal finite product ' storage{1}],observed(2)/expected,1,1e-12,0,...
+                      'a finite state-exponential product is not rejected because the exponential factor overflows');
+    for rate=[-1000 -400 400 1000]
+        amplitude=1; sensitivity=1;
+        if rate>0, amplitude=1e-300; else, sensitivity=1e300; end
+        nsteps=3; if rate==1000, nsteps=1; end
+        for frequency=[0 1e16]
+            for swapped=[false true]
+                term=diag([frequency+1i*rate 0 0]);
+                initial=[amplitude*(1+1i);1;1]; detector=[sensitivity;1;-1]; phase=1+1i;
+                if swapped, [initial,detector]=deal(detector,initial); phase=conj(phase); end
+                if strcmp(storage{1},'sparse'), term=sparse(term); end
+                prepared=pod_project(eye(3),{term},initial,detector);
+                expected=phase*exp(log(amplitude)+log(sensitivity)+rate*(0:nsteps)).*...
+                         exp(-1i*frequency*(0:nsteps));
+                observed=pod_evolve(prepared,1,1,nsteps); nonzero=(expected~=0);
+                observed(nonzero)=observed(nonzero)./expected(nonzero);
+                result=test_close(result,['diagonal scaled modes ' storage{1} ' ' num2str(rate) ' ' num2str(frequency) ' ' num2str(swapped)],...
+                                  observed,double(nonzero),1e-12,0,...
+                                  'independent mode amplitudes retain tiny and large observables after exact background cancellation');
             end
         end
     end

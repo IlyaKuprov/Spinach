@@ -832,3 +832,5 @@ Reject real or imaginary components rounded to zero before storing terms or
 states; representable subnormal coordinates remain supported.
 
 POD evaluation recognises an exactly diagonal assembled generator and applies its componentwise closed-form exponential one state column at a time. This avoids retaining a dense zero off-diagonal matrix and bypasses the generic non-diagonal action-norm restriction; existing numeric range and finite-observable contracts still apply.
+
+Exactly diagonal POD modes carry individual binary state amplitudes. Evaluation forms bounded exponential residuals and phases rather than a potentially overflowing/underflowing standalone exponential; observable accumulation combines each coordinate exponent with its Hermitian detector product. Exact-integer exponent limits and finite-output requirements remain explicit.

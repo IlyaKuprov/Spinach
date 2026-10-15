@@ -1191,6 +1191,26 @@ for storage={'dense','sparse'}
     end
 end
 
+% Retain independent residuals before filtering equal-exponent product groups
+orders=[1 2 3 4;1 3 2 4];
+for storage={'dense','sparse'}
+    for swapped=[false true]
+        for phase=[1 -1 1i -1i]
+            for k=1:size(orders,1)
+                initial=phase*2^27*[.5;-.5;.875;-.875];
+                detector=2^27*[.75;.75-eps(.75);.875;.875]; expected=phase;
+                initial=initial(orders(k,:)); detector=detector(orders(k,:));
+                if swapped, [initial,detector]=deal(detector,initial); expected=conj(expected); end
+                term=zeros(4); if strcmp(storage{1},'sparse'), term=sparse(term); end
+                prepared=pod_project(eye(4),{term},initial,detector);
+                result=test_close(result,['equal-exponent cancellation ' storage{1} ' ' num2str(swapped) ' ' num2str(phase) ' ' num2str(k)],...
+                                  pod_evolve(prepared,1,0.3,2),expected*ones(1,3),1e-12,0,...
+                                  'computed dyadic products have an independently exact residual of one before phase rotation');
+            end
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

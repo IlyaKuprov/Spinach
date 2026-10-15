@@ -53,7 +53,8 @@
 % Observable alignment checks exact binary scale restoration, including
 % nonzero subnormal quantisation. Inexact products are discarded only when a bound
 % on the complete computed tail is below half the smallest subnormal.
-% Compensated addition retains the aligned groups through cancellation; a zero
+% Compensation acts on computed component products, within exponent groups
+% and after alignment, not on exact products. A zero
 % whose correction lost information is rejected, not used as a signal component.
 % Physical signals below the subnormal range round to zero; nonfinite
 % physical signals are errors.
@@ -366,7 +367,20 @@ for n=1:2
         powers=[powers;left_exp+right_exp+exponent(indices)]; %#ok<AGROW>
     end
     if ~isempty(powers)
-        [powers,~,groups]=unique(powers); fractions=accumarray(groups,full(fractions));
+
+        % Compensate component products within each binary-exponent group
+        [powers,~,groups]=unique(powers); totals=zeros(size(powers));
+        corrections=totals; uncertain=false(size(powers));
+        for k=1:numel(fractions)
+            group=groups(k);
+            [totals(group),residual]=two_sum(totals(group),fractions(k));
+            [corrections(group),roundoff]=two_sum(corrections(group),residual);
+            uncertain(group)=uncertain(group)||(roundoff~=0);
+        end
+        fractions=totals+corrections;
+        if any(uncertain&(fractions==0))
+            error('observable cancellation cannot certify a zero exponent group.');
+        end
         powers=powers(fractions~=0); fractions=fractions(fractions~=0);
         if ~isempty(powers)
             common=max(powers); scaled=pow2(fractions,powers-common);
@@ -395,6 +409,7 @@ for n=1:2
             end
             signal=signal+(1i^(n-1))*pow2(total,common);
         end
+
     end
     components(1,:)={real(coil),imag(rho)};
     components(2,:)={-imag(coil),real(rho)};

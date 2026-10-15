@@ -35,8 +35,7 @@
 % compute operator sets that it can find on disk.
 %
 % Note: building product superoperators for interaction ranks other
-%       than 2 calls clebsch_gordan.m, which requires the Java virtual
-%       machine; cached operator sets load without it.
+%       than 2 calls the native MATLAB clebsch_gordan.m routine.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de

@@ -11,7 +11,7 @@ Regression test for the remaining deterministic utility helpers in the Spinach k
 The function announces its target with `fprintf`, registers a test result under the name `kernel/dynamic_remaining_core_suite` via `new_test_result`, and then runs a sequence of checks:
 
 - **Adiabatic elimination** (`adelim`): builds a 3-spin Liouville-space descriptor with `local_liouvillian_system(3)` and applies `adelim` to the matrix `[1 2 3;4 5 6;7 8 10]` with state 3 eliminated and states `[1 2]` retained. The slow block must equal `[1 2;4 5]`, and the induced relaxation term must equal `1i*[3;6]*(1/10)*[7 8]`, i.e. `i*L01*(L11\L10)`, both at tolerances `1e-14`.
-- **Clebsch-Gordan coefficient** (`cg_fast`): `cg_fast(1,0,1/2,1/2,1/2,-1/2)` must equal `1/sqrt(2)` at tolerance `1e-12` (two spin-half states coupling to the triplet M=0 state).
+- **Clebsch-Gordan coefficient** (`clebsch_gordan`): `clebsch_gordan(1,0,1/2,1/2,1/2,-1/2)` must equal `1/sqrt(2)` at tolerance `1e-12` (two spin-half states coupling to the triplet M=0 state).
 - **Console and banner reporting** (`report`, `banner`): writes to a temporary file handle stored in `spin_system.sys.output`, then verifies via `fileread` that the log contains both the direct report message and the text `BASIS SET`; `banner()` must delegate to `report()`. The output is then reset to `'hush'`.
 - **Polyadic diagnostics** (`polinfo`): called directly on `polyadic({{speye(2),sparse(1)}})` with an explicit label; a PASS message is appended manually.
 - **Coordinate summary** (`summary_coordinates`): called on a one-spin system with coordinates `[0 0 0]`, isotope `'1H'`, label `'proton'`, and multiplicity 2, traversing coordinate metadata through the silent report path.
@@ -44,6 +44,6 @@ result=test_dynamic_remaining_core_suite()
 ## References
 
 - Source file: [tests/kernel/test_dynamic_remaining_core_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_remaining_core_suite.m) in the Spinach repository.
-- Functions exercised: `adelim`, `cg_fast`, `report`, `banner`, `polinfo`, `polyadic`, `summary_coordinates`, `impound`, `dipolar`, `isoswap`, `spin`, `intrep`, `fdhess`, `sinkhole`, `lorentzcon`, `gausscon`, `gaussfun`, `magpump`, `sec2kite`, `sorensen`, `stitch`, `rwalk`, `euler2dcm`, `new_test_result`, `test_close`, `test_true`.
+- Functions exercised: `adelim`, `clebsch_gordan`, `report`, `banner`, `polinfo`, `polyadic`, `summary_coordinates`, `impound`, `dipolar`, `isoswap`, `spin`, `intrep`, `fdhess`, `sinkhole`, `lorentzcon`, `gausscon`, `gaussfun`, `magpump`, `sec2kite`, `sorensen`, `stitch`, `rwalk`, `euler2dcm`, `new_test_result`, `test_close`, `test_true`.
 
 The synthetic compiled fixtures use per-substance descriptor cells and offsets.

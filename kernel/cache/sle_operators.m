@@ -34,8 +34,8 @@
 % Automatic caching is implemented - the function would not re-
 % compute operator sets that it can find on disk.
 %
-% Note: building product superoperators for interaction ranks other
-%       than 2 calls the native MATLAB clebsch_gordan.m routine.
+% Product superoperators at every interaction rank use the native
+% MATLAB clebsch_gordan.m routine.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -170,14 +170,11 @@ else
                 normalization_factor=sqrt((2*L2+1)./(2*L+1));
 
                 % Compute the structure coefficients of the Wigner D functions
-                if int_rank==2
-                    matrix_elements=clebsch_gordan_bypass(L,M,L1,M1,L2,M2).*...
-                                    clebsch_gordan_bypass(L,N,L1,N1,L2,N2).*...
-                                    normalization_factor;
-                else
-                    matrix_elements=clebsch_gordan_general(L,M,L1,M1,L2,M2).*...
-                                    clebsch_gordan_general(L,N,L1,N1,L2,N2).*...
-                                    normalization_factor;
+                matrix_elements=zeros(size(L));
+                parfor k=1:numel(L)
+                    matrix_elements(k)=clebsch_gordan(L(k),M(k),L1(k),M1(k),L2(k),M2(k))*...
+                                       clebsch_gordan(L(k),N(k),L1(k),N1(k),L2(k),N2(k))*...
+                                       normalization_factor(k);
                 end
 
                 % Assign matrix elements
@@ -203,129 +200,6 @@ end
     
 end
 
-% Hard-coded Clebsch-Gordan formulae for the L1=2 case
-function cg=clebsch_gordan_bypass(L_array,~,~,M1_array,L2_array,M2_array)
-
-% Preallocate the answer
-cg=zeros(size(L_array));
-
-parfor n=1:numel(L_array)
-    
-    % Get local variables
-    L=L_array(n); M1=M1_array(n); L2=L2_array(n); M2=M2_array(n);
-
-    % Enumerate all cases explicitly
-    switch M1
-        case -2
-            switch L
-                case L2-2
-                    cg(n)=sqrt(((-3+L2+M2)*(-2+L2+M2)*(-1+L2+M2)*(L2+M2))/...
-                        (L2*(1-L2-4*power(L2,2)+4*power(L2,3))))/2;
-                case L2-1
-                    cg(n)=-(sqrt(((1+L2-M2)*(-2+L2+M2)*(-1+L2+M2)*(L2+M2))/....
-                        (L2*(-1-2*L2+power(L2,2)+2*power(L2,3))))/sqrt(2));
-                case L2
-                    cg(n)=sqrt(1.5)*sqrt(((1+L2-M2)*(2+L2-M2)*(-1+L2+M2)*(L2+M2))/...
-                        (L2*(-3+L2*(1+4*L2*(2+L2)))));
-                case L2+1
-                    cg(n)=-(sqrt(((1+L2-M2)*(2+L2-M2)*(3+L2-M2)*(L2+M2))/...
-                        (L2*(2+7*L2+7*power(L2,2)+2*power(L2,3))))/sqrt(2));
-                case L2+2
-                    cg(n)=(power(-1,-2*L2+2*M2)*sqrt(((1+L2-M2)*(2+L2-M2)*(3+L2-M2)*(4+L2-M2))/...
-                        (6+25*L2+35*power(L2,2)+20*power(L2,3)+4*power(L2,4))))/2;
-            end
-        case -1
-            switch L
-                case L2-2
-                    cg(n)=-sqrt(((L2-M2)*(-2+L2+M2)*(-1+L2+M2)*(L2+M2))/...
-                        (L2*(1-L2-4*power(L2,2)+4*power(L2,3))));
-                case L2-1
-                    cg(n)=((1+L2-2*M2)*sqrt(((-1+L2+M2)*(L2+M2))/...
-                        (L2*(-1-2*L2+power(L2,2)+2*power(L2,3)))))/sqrt(2);
-                case L2
-                    cg(n)=sqrt(1.5)*sqrt(((1+L2-M2)*(L2+M2))/...
-                        (L2*(-3+L2*(1+4*L2*(2+L2)))))*(-1+2*M2);
-                case L2+1
-                    cg(n)=-((power(-1,-2*L2+2*M2)*sqrt(((1+L2-M2)*(2+L2-M2))/...
-                        (L2*(1+L2)*(2+L2)*(1+2*L2)))*(L2+2*M2))/sqrt(2));
-                case L2+2
-                    cg(n)=power(-1,-2*L2+2*M2)*sqrt(((1+L2-M2)*(2+L2-M2)*(3+L2-M2)*(1+L2+M2))/...
-                        (6+25*L2+35*power(L2,2)+20*power(L2,3)+4*power(L2,4)));
-            end
-        case 0
-            switch L
-                case L2-2
-                    cg(n)=sqrt(1.5)*sqrt(((-1+L2-M2)*(L2-M2)*(-1+L2+M2)*(L2+M2))/...
-                        (L2*(1-L2-4*power(L2,2)+4*power(L2,3))));
-                case L2-1
-                    cg(n)=sqrt(3)*M2*sqrt((power(L2,2)-power(M2,2))/...
-                        (L2*(-1-2*L2+power(L2,2)+2*power(L2,3))));
-                case L2
-                    cg(n)=(-(L2*(1+L2))+3*power(M2,2))/...
-                        sqrt(L2*(-3+L2*(1+4*L2*(2+L2))));
-                case L2+1
-                    cg(n)=-(power(-1,-2*L2+2*M2)*sqrt(3)*M2*sqrt(((1+L2-M2)*(1+L2+M2))/...
-                        (L2*(1+L2)*(2+L2)*(1+2*L2))));
-                case L2+2
-                    cg(n)=power(-1,-2*L2+2*M2)*sqrt(3)*sqrt(((1+L2-M2)*(2+L2-M2)*(1+L2+M2)*(2+L2+M2))/...
-                        (12+50*L2+70*power(L2,2)+40*power(L2,3)+8*power(L2,4)));
-            end
-        case 1
-            switch L
-                case L2-2
-                    cg(n)=-sqrt(((-2+L2-M2)*(-1+L2-M2)*(L2-M2)*(L2+M2))/...
-                        (L2*(1-L2-4*power(L2,2)+4*power(L2,3))));
-                case L2-1
-                    cg(n)=-((sqrt(((-1+L2-M2)*(L2-M2))/...
-                        ((-1+L2)*L2*(1+L2)*(1+2*L2)))*(1+L2+2*M2))/sqrt(2));
-                case L2
-                    cg(n)=-(power(-1,-2*L2+2*M2)*sqrt(1.5)*sqrt(((L2-M2)*(1+L2+M2))/...
-                        (L2*(-3+L2*(1+4*L2*(2+L2)))))*(1+2*M2));
-                case L2+1
-                    cg(n)=(power(-1,-2*L2+2*M2)*(L2-2*M2)*sqrt(((1+L2+M2)*(2+L2+M2))/...
-                        (L2*(2+7*L2+7*power(L2,2)+2*power(L2,3)))))/sqrt(2);
-                case L2+2
-                    cg(n)=power(-1,-2*L2+2*M2)*sqrt(((1+L2-M2)*(1+L2+M2)*(2+L2+M2)*(3+L2+M2))/...
-                        (6+25*L2+35*power(L2,2)+20*power(L2,3)+4*power(L2,4)));
-            end
-        case 2
-            switch L
-                case L2-2
-                    cg(n)=sqrt(((-3+L2-M2)*(-2+L2-M2)*(-1+L2-M2)*(L2-M2))/...
-                        (L2*(1-L2-4*power(L2,2)+4*power(L2,3))))/2;
-                case L2-1
-                    cg(n)=(power(-1,-2*L2+2*M2)*sqrt(((-2+L2-M2)*(-1+L2-M2)*(L2-M2)*(1+L2+M2))/...
-                        (L2*(-1-2*L2+power(L2,2)+2*power(L2,3)))))/sqrt(2);
-                case L2
-                    cg(n)=power(-1,-2*L2+2*M2)*sqrt(1.5)*sqrt(((-1+L2-M2)*(L2-M2)*(1+L2+M2)*(2+L2+M2))/...
-                        (L2*(-3+L2*(1+4*L2*(2+L2)))));
-                case L2+1
-                    cg(n)=(power(-1,-2*L2+2*M2)*sqrt(((L2-M2)*(1+L2+M2)*(2+L2+M2)*(3+L2+M2))/...
-                        (L2*(2+7*L2+7*power(L2,2)+2*power(L2,3)))))/sqrt(2);
-                case L2+2
-                    cg(n)=(power(-1,-2*L2+2*M2)*sqrt(((1+L2+M2)*(2+L2+M2)*(3+L2+M2)*(4+L2+M2))/...
-                        (6+25*L2+35*power(L2,2)+20*power(L2,3)+4*power(L2,4))))/2;
-            end
-    end
-    
-end
-
-end
-
-% General Clebsch-Gordan coefficients for arbitrary acting rank
-function cg=clebsch_gordan_general(L_array,M_array,L1,M1_array,L2_array,M2_array)
-
-% Preallocate the answer
-cg=zeros(size(L_array));
-
-% Compute the coefficients
-parfor n=1:numel(L_array)
-    cg(n)=clebsch_gordan(L_array(n),M_array(n),L1(n),...
-                         M1_array(n),L2_array(n),M2_array(n));
-end
-
-end
-
 % Consistency enforcement
 function grumble(max_rank,int_ranks)
 if (numel(max_rank)~=1)||(~isnumeric(max_rank))||(~isreal(max_rank))||...
@@ -343,4 +217,5 @@ end
 % To invent, you need a good imagination and a pile of junk.
 % 
 % Thomas Edison
+
 

@@ -108,3 +108,11 @@ comparison isolates the unit-column source difference algebraically; an actual
 old-kernel comparison additionally requires a separately captured stock result
 and an explicit descriptor embedding. Do not treat the algebraic test as a
 stock execution.
+
+## Angular-momentum coefficients
+
+Use `clebsch_gordan(L,M,L1,M1,L2,M2)` for all CG calculations, including
+low ranks. The coupled state comes first; the two uncoupled states follow
+in their physical order. The former `cg_fast` function and rank-two SLE
+formula bypass have been removed. SLE product operators use the acting
+rank before the source rank and retain separate left and right projections.

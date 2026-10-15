@@ -16,7 +16,7 @@ For rank `L`, the supplied coefficients are spherical-harmonic moments: integrat
 
 ## Calculation and output
 
-The routine combines each supplied multipole rank with the rank-2 anisotropic susceptibility components and spherical harmonics. A rank-`L` term has radial dependence `r^(-L-3)` and harmonic degree `L+2`; the summed real value is scaled by `1e6` to return `theo_pcs` in ppm at each nuclear coordinate.
+CG coefficients are evaluated by `clebsch_gordan(L,M,L1,M1,L2,M2)`, with total rank and projection first, the density multipole second, and susceptibility rank two third. The routine combines each supplied multipole rank with the rank-2 anisotropic susceptibility components and spherical harmonics. A rank-`L` term has radial dependence `r^(-L-3)` and harmonic degree `L+2`; the summed real value is scaled by `1e6` to return `theo_pcs` in ppm at each nuclear coordinate.
 
 ## References
 

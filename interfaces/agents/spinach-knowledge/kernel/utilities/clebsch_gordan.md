@@ -30,7 +30,7 @@ is evaluated. Small nonzero tails are reconstructed before the final conversion,
 without squaring the target coefficient. FP64 output range and subnormal rounding
 still apply; no universal correctly-rounded guarantee is made.
 
-`cg_fast.m` remains available for low ranks. The two shipped Mathematica comparison
+This is the shared coefficient implementation for all ranks. The two shipped Mathematica comparison
 tables and `tests/kernel/test_wigner_angular_suite.m` cover numerical regressions;
 tiny nonzero coefficients require relative as well as absolute comparisons.
 

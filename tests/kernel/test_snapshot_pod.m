@@ -1043,6 +1043,28 @@ for storage={'dense','sparse'}
     end
 end
 
+% Compare componentwise diagonal phases with independent scalar exponentials
+for storage={'dense','sparse'}
+    for frequency=[1 1e16]
+        for swapped=[false true]
+            for coefficient=[1 1+1i*2^-54]
+                term=diag([frequency -frequency 0]); initial=[1;2;1i]; detector=[2;1i;1];
+                if swapped, [initial,detector]=deal(detector,initial); end
+                if strcmp(storage{1},'sparse'), term=sparse(term); end
+                prepared=pod_project(eye(3),{term},initial,detector);
+                expected=complex(zeros(1,5));
+                for k=0:4, expected(k+1)=detector'*(exp(-1i*coefficient*diag(term)*k).*initial); end
+                saved_rng=rng; observed=pod_evolve(prepared,coefficient,1,4);
+                result=test_close(result,['diagonal phases ' storage{1} ' ' num2str(frequency) ' ' num2str(swapped) ' ' num2str(coefficient)],...
+                                  observed,expected,1e-12,0,...
+                                  'diagonal modes use independent scalar exponentials without a generic action-norm limit');
+                result=test_true(result,['diagonal RNG ' storage{1} ' ' num2str(frequency) ' ' num2str(swapped) ' ' num2str(coefficient)],...
+                                 isequal(rng,saved_rng),'closed-form diagonal actions preserve the caller stream');
+            end
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

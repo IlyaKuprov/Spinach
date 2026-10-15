@@ -805,7 +805,7 @@ validation. Common structural stationarity must use the same side across every
 active term; mixed state/detector sides do not establish stationarity. Computed
 zero actions can underflow and are not certificates. Sparse storage is preserved
 through native exponential actions. Blocks are bounded by reduced rank and a
-Hermitian-part growth estimate; scalar models use scalar exponentials. The
+Hermitian-part growth estimate; exactly diagonal models use componentwise exponentials. The
 forward/adjoint choice preserves the Hermitian signal and native norm estimates
 preserve caller RNG. No componentwise
 accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
@@ -830,3 +830,5 @@ scaled terms, not exact coefficient products or arbitrary-precision sums.
 Physical projection restoration must retain every nonzero working component.
 Reject real or imaginary components rounded to zero before storing terms or
 states; representable subnormal coordinates remain supported.
+
+POD evaluation recognises an exactly diagonal assembled generator and applies its componentwise closed-form exponential one state column at a time. This avoids retaining a dense zero off-diagonal matrix and bypasses the generic non-diagonal action-norm restriction; existing numeric range and finite-observable contracts still apply.

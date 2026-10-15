@@ -23,7 +23,8 @@
 % MATLAB exponential actions follow Al-Mohy and Higham,
 % DOI:10.1137/100788860. Actions are streamed in blocks no wider than
 % the reduced rank, never forming a full propagator or full state trajectory.
-% Scalar models use the identical closed-form scalar exponential.
+% Exactly diagonal actions use componentwise closed-form exponentials, one
+% state column at a time, without a stored zero off-diagonal matrix.
 % Coefficients, terms and time are assembled in one binary-exponent frame,
 % restoring only its structurally observable part. Compensated entrywise sums
 % use TwoSum (Ogita et al., DOI:10.1137/030601818, Algorithms 3.1 and 4.1).
@@ -41,7 +42,7 @@
 % Real actions and states retain real working storage. The native callback prevents an
 % additional automatic trace shift.
 % Block widths use a Hermitian-part growth bound and the double range;
-% unscalarised action norms above flintmax are unsupported. Working actions
+% non-diagonal action norms above flintmax are unsupported. Working actions
 % that round entirely to zero are rejected, not declared stationary.
 % Caller RNG is restored after native norm estimates, including on errors.
 % A scalar damping bound certifies zero when every future signal component
@@ -170,6 +171,8 @@ end
 
 % Separate the diagonal once and cache bounded off-diagonal action estimates
 diagonal=diag(A); A(1:size(A,1)+1:end)=0;
+diagonal_action=~any(A,'all');
+if diagonal_action, A=[]; end
 [radii,norms,minimum,scale_exp]=action_bounds(A,diagonal);
 
 % Choose an equivalent action without transposing the stored generator
@@ -188,7 +191,8 @@ while completed<nsteps
     if ~isfinite(growth_exp)||abs(growth_exp)>=flintmax
         growth=0; growth_exp=0;
     end
-    shifted_diag=diagonal-growth; width=min(size(A,1),nsteps-completed);
+    shifted_diag=diagonal-growth; width=min(numel(diagonal),nsteps-completed);
+    if diagonal_action, width=1; end
 
     % Bound action storage and growth without altering the physical generator
     growth_bound=max(real(shifted_diag)+radii);
@@ -197,9 +201,9 @@ while completed<nsteps
     end
 
     % Evaluate only the requested actions with no implicit trace shift
-    if size(A,1)==1
+    if diagonal_action
         if use_adjoint, shifted_diag=conj(shifted_diag); end
-        actions=exp(shifted_diag)*rho;
+        actions=exp(shifted_diag).*rho;
     else
         action_norm=max(norms(:,1+use_adjoint)+abs(shifted_diag));
         if ~isfinite(action_norm)||action_norm>=flintmax
@@ -247,7 +251,7 @@ if issparse(A)
     radii=norms(:,1)/2+norms(:,2)/2;
     largest=full(max(largest,max(max(abs(real(A)),[],'all'),max(abs(imag(A)),[],'all'))));
 else
-    radii=zeros(size(A,1),1); norms=zeros(size(A,1),2); minimum=Inf;
+    radii=zeros(numel(diagonal),1); norms=zeros(numel(diagonal),2); minimum=Inf;
     for k=1:size(A,1)
         column=A(:,k); row=A(k,:)';
         radii(k)=sum(abs(column/2+row/2)); norms(k,:)=[sum(abs(column)) sum(abs(row))];

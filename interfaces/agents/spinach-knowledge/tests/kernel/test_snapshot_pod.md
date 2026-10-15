@@ -59,3 +59,5 @@ Affine connecting-path cancellations exclude an unobserved growing mode before r
 All six orders of a three-term affine family preserve a weak nilpotent coupling between cancelling large entries, with dense/sparse terms and real/imaginary source phases. A five-term deeper cancellation must explicitly reject an uncertified zero; an exactly accumulated reordering recovers its independent nilpotent signal.
 
 Dense/sparse projection restoration cases reject real/imaginary underflow in terms, initial states, detectors, and single components of a nonzero complex coordinate. Exact smallest-subnormal Galerkin controls and phase-resolved long-time acquisition distinguish preservation from a zero-generator shortcut.
+
+Independent diagonal exponential controls include dense/sparse storage, ordinary and large finite phases, complex coefficients, exchanged source/detector roles, a stationary mode, multiple samples, and caller RNG preservation.

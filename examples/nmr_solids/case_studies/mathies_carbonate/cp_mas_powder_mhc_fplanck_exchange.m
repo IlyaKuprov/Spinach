@@ -55,13 +55,8 @@ inter.chem.concs=[1 1];
 bas.formalism='sphten-liouv';
 bas.approximation={'none', 'none'};
 
-% Disable start-up checks
-sys.disable={'hygiene'};
-
-% Enable zero track elimination, with optional GPU arithmetic
+% Enable zero track elimination
 sys.enable={'zte'};
-
-% sys.enable={'zte','gpu'};
 
 % Exchange rate constant array
 exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz
@@ -89,9 +84,11 @@ for n=1:numel(exch_rates)
 
     % Set the exchange rates
     inter.chem.reactions={struct('reactants',1,'products',2,...
-                                'matching',[1 4; 2 5; 3 6],'rate',exch_rates(n)),...
+                                 'matching',[1 4; 2 5; 3 6],...
+                                 'rate',exch_rates(n)),...
                           struct('reactants',2,'products',1,...
-                                'matching',[4 1; 5 2; 6 3],'rate',exch_rates(n))};
+                                 'matching',[4 1; 5 2; 6 3],...
+                                 'rate',exch_rates(n))};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);

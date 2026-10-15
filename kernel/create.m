@@ -313,20 +313,6 @@ if ~isworkernode
         report(spin_system,['         > parallel profile:  ' spin_system.sys.parallel{1}]);
         report(spin_system,['         > workers requested: ' num2str(spin_system.sys.parallel{2})]);
 
-        % Default port range is insufficient
-        pool_port_range=[20001 44999];
-        port_rng_str=[num2str(pool_port_range(1)) ' ' ...
-                      num2str(pool_port_range(2))];
-        pctconfig('portrange',pool_port_range);
-
-        % Report the network port range override
-        report(spin_system,['         > worker port range: ' num2str(pool_port_range(1)) '-' ...
-                                                             num2str(pool_port_range(2))]);
-
-        % Pass worker-side port override into worker environment
-        setenv('PARALLEL_SERVER_OVERRIDE_PORT_RANGE',port_rng_str);
-        pool_env_vars={'PARALLEL_SERVER_OVERRIDE_PORT_RANGE'};
-
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
 
@@ -369,8 +355,7 @@ if ~isworkernode
         maxNumCompThreads(feature('numcores'));
         
         % Start the parallel pool
-        current_pool=parpool(c,spin_system.sys.parallel{2},...
-                             'EnvironmentVariables',pool_env_vars);
+        current_pool=parpool(c,spin_system.sys.parallel{2});
 
         % Disable pool timeout
         current_pool.IdleTimeout=Inf;

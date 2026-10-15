@@ -39,9 +39,9 @@ cache_root=fileparts(which('sle_operators'));
 cache_file=fullfile(cache_root,'sle_operators_rank_4_int_3_1_2.mat');
 cache_exists=exist(cache_file,'file')==2;
 if cache_exists
-    saved_cache=load(cache_file); %#ok<NASGU>
-    cleanup=onCleanup(@()save(cache_file,'-struct','saved_cache'));
-    delete(cache_file);
+    backup_file=tempname;
+    movefile(cache_file,backup_file);
+    cleanup=onCleanup(@()movefile(backup_file,cache_file,'f'));
 else
     cleanup=onCleanup(@()delete(cache_file));
 end

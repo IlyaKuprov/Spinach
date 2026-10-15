@@ -55,7 +55,7 @@ parameters.invert_axis=1;
 parameters.verbose=0;
 
 % Detection state
-parameters.coil=coil_state(spin_system,'L+','13C','exact');
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Simulation
 fid=singlerot(spin_system,@wise,parameters,'nmr');

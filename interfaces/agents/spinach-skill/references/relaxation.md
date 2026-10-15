@@ -310,7 +310,7 @@ parameters such as `inter.tau_c` remain per substance.
 
 The example is at exchange equilibrium because forward and reverse event
 fluxes are equal. `state(spin_system,'Lz','1H')` applies initial concentrations
-without a chemistry qualifier; `coil_state(spin_system,'Lz','1H','exact')`
+without a chemistry qualifier; `coil_state(spin_system,'Lz','1H')`
 is unweighted detection. `equilibrate(K,c0)` may still calculate stationary
 concentrations of the separate classical network `dc/dt=K*c`; the classical
 matrix is not a chemistry input field. First-order reaction rates have units

@@ -39,4 +39,4 @@ The returned population and coherence entries are Spinach states in the selected
 
 The tensor expansion uses unweighted `coil_state` before normalising each basis tensor. Outputs retain the existing projector normalisation independently of concentration, including a zero-population substance.
 
-Operator-shape expansions explicitly request `coil_state` with the `exact` method.
+Operator-shape expansions use the three-argument unweighted `coil_state` primitive.

@@ -82,11 +82,10 @@ grumble(spin_system,states,spins,method);
 if strcmp(method,'chem')
     warning('Spinach:state:deprecatedChem',...
             '''chem'' is deprecated: use state for weighted states and coil_state for unweighted coils.');
-    method='exact';
 end
 
 % Construct the unweighted operator representation
-rho=coil_state(spin_system,states,spins,method);
+rho=coil_state(spin_system,states,spins);
 
 % Keep storage-only wavefunctions normalised independently of concentration
 if strcmp(spin_system.bas.formalism,'zeeman-wavef'), return; end

@@ -57,7 +57,7 @@ Hx=operator(spin_system,'Lx','1H');
 Hx=kron(speye(parameters.spc_dim),Hx);
 
 % Quadrature detection state
-coil=coil_state(spin_system,'L+','13C','exact');
+coil=coil_state(spin_system,'L+','13C');
 coil=kron(ones(parameters.spc_dim,1),coil);
 coil=coil/parameters.spc_dim;
 

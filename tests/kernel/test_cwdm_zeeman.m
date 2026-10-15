@@ -69,7 +69,7 @@ fprintf('CWDM_T16 eq=%.16g H=%.16g R=%.16g generator=%.16g\n',...
 pulse_s=operator(s,'Ly','1H'); pulse_z=operator(z,'Ly','1H');
 rho_s=expm(full(-1i*pulse_s*pi/2))*rho_s;
 rho_z=expm(full(-1i*pulse_z*pi/2))*rho_z;
-coil_s=coil_state(s,'L+','1H','exact'); coil_z=coil_state(z,'L+','1H','exact');
+coil_s=coil_state(s,'L+','1H'); coil_z=coil_state(z,'L+','1H');
 prop_s=expm(full(-1i*H+R+ks)*0.0002); prop_z=expm(full(generator)*0.0002);
 fid_s=zeros(256,1); fid_z=zeros(256,1);
 for n=1:256
@@ -118,7 +118,7 @@ inter.zeeman.scalar={1,2,3}; inter.chem.parts={1,2:3,[]}; inter.chem.concs=[0.4 
 bas.approximation={'none','none','none'};
 for formalism={'zeeman-liouv','zeeman-hilb'}
     bas.formalism=formalism{1}; z=test_spin_system(sys,inter,bas);
-    rho=equilibrium(z); coil=coil_state(z,'Lz',2,'exact');
+    rho=equilibrium(z); coil=coil_state(z,'Lz',2);
 
     % Check product placement, identity support, and both sparse formats
     product=kron(diag([0.5 -0.5]),[0 0.5;0.5 0]);

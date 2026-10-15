@@ -1,7 +1,7 @@
 % Generates Hilbert space density matrices and Liouville space state 
 % vectors from their human-readable descriptions. Syntax:
 %
-%              rho=coil_state(spin_system,states,spins,method)
+%              rho=coil_state(spin_system,states,spins)
 %
 % Parameters:
 %
@@ -42,10 +42,10 @@
 %    of projection quantum numbers on all spins; pass an empty spin list,
 %    for example, in a {'1H','1H','14N'} system:
 %
-%                   psi=coil_state(spin_system,[-1/2 1/2 0],[],'exact')
+%                   psi=coil_state(spin_system,[-1/2 1/2 0],[])
 %
-% All four arguments are required; method must be 'exact'. State vectors
-% have correct normalisation in every Liouville-space formalism.
+% All three arguments are required. State vectors have correct
+% normalisation in every Liouville-space formalism.
 %
 % The result is unweighted in every formalism. Use state for initial
 % populations weighted by substance concentrations. Wavefunction output is
@@ -63,10 +63,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=coil_state.m>
 
-function rho=coil_state(spin_system,states,spins,method)
+function rho=coil_state(spin_system,states,spins)
 
 % Check consistency
-grumble(spin_system,states,spins,method);
+grumble(spin_system,states,spins);
 
 % Reject product states spanning substances
 if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
@@ -89,7 +89,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
     if isnumeric(spins)
         rho=sparse(spin_system.bas.offsets(end),1);
         for n=1:numel(spins)
-            rho=rho+coil_state(spin_system,{states},{spins(n)},method);
+            rho=rho+coil_state(spin_system,{states},{spins(n)});
         end
         return;
     end
@@ -176,7 +176,7 @@ end
 end
 
 % Input validation function
-function grumble(spin_system,states,spins,method)
+function grumble(spin_system,states,spins)
 
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('basis set information is missing, run basis() before calling this function.');
@@ -187,12 +187,6 @@ end
 if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
                                         'sphten-liouv','zeeman-wavef'})
     error('unknown formalism specification.');
-end
-
-if ~ischar(method)
-    error('method must be a character string.')
-elseif ~strcmp(method,'exact')
-    error('unknown method specification.');
 end
 
 if (~(ischar(states)&&ischar(spins)))&&...

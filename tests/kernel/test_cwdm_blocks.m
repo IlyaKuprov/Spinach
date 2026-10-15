@@ -52,7 +52,7 @@ for method={'exact'}
         rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
         outside=setdiff(1:s.bas.offsets(end),rows);
         for k=s.chem.parts{n}
-            coil=coil_state(s,'L+',k,method{1});
+            coil=coil_state(s,'L+',k);
             result=test_true(result,['coil ' method{1} ' ' int2str(k)],...
                              nnz(coil(outside))==0&&nnz(coil(rows))>0,...
                              'a detection state occupies only its hosting substance');

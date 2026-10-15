@@ -98,7 +98,7 @@ for n=1:numel(exch_rates)
     spin_system=basis(spin_system,bas);
     
     % Detection state
-    parameters.coil=coil_state(spin_system,'L+','13C','exact');
+    parameters.coil=coil_state(spin_system,'L+','13C');
 
     % Simulation
     contact_curves(n,:)=singlerot(spin_system,@cp_contact_soft,parameters,'nmr');

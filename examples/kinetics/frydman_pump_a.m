@@ -87,10 +87,10 @@ parameters.cp_npt=100;
 traj=liquid(spin_system,@frydman_pump,parameters,'nmr');
 
 % Observables: peptide bond N-H
-Hz=coil_state(spin_system,{'Lz'},{1},'exact');
-Hx=coil_state(spin_system,{'Lx'},{1},'exact');
-Nz=coil_state(spin_system,{'Lz'},{2},'exact');
-Nx=coil_state(spin_system,{'Lx'},{2},'exact');
+Hz=coil_state(spin_system,{'Lz'},{1});
+Hx=coil_state(spin_system,{'Lx'},{1});
+Nz=coil_state(spin_system,{'Lz'},{2});
+Nx=coil_state(spin_system,{'Lx'},{2});
 
 % Project out the observables
 Hz=real(Hz'*traj); Hx=real(Hx'*traj);  

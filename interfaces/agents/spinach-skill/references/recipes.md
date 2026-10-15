@@ -399,8 +399,8 @@ To extract one rate by hand:
 
 ```matlab
 R=relaxation(spin_system);
-Lz=coil_state(spin_system,'Lz','<isotope>','exact');
-Lp=coil_state(spin_system,'L+','<isotope>','exact');
+Lz=coil_state(spin_system,'Lz','<isotope>');
+Lp=coil_state(spin_system,'L+','<isotope>');
 R1=-(Lz'*R*Lz)/(Lz'*Lz);  R2=-(Lp'*R*Lp)/(Lp'*Lp);
 ```
 
@@ -426,7 +426,7 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
 ```
 
 After `create` and `basis`, prepare with `state(spin_system,'L+','1H')` and
-detect with `coil_state(spin_system,'L+','1H','exact')`. All `state` methods
+detect with `coil_state(spin_system,'L+','1H')`. All `state` methods
 are concentration-weighted; no chemistry qualifier is needed. Varying the
 rates through coalescence tests an exchange model. `exchange_asymmetric.m`
 handles unequal populations, `glucose_exsy_a.m` demonstrates two-dimensional

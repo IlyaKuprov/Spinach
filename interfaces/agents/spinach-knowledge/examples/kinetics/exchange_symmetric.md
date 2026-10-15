@@ -18,4 +18,4 @@ The source header estimates a calculation time of seconds; this is not a measure
 
 Exchange is declared as two first-order reaction records with explicit reciprocal spin matching. Preparation is concentration weighted; detection uses unweighted `coil_state`. Rates and equilibrium concentration ratios are unchanged.
 
-Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.
+Detection and reference operator vectors use the three-argument unweighted `coil_state` primitive.

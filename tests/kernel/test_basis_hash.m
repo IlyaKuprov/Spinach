@@ -72,8 +72,8 @@ for side={'left','right','comm','acomm'}
 end
 
 % Compare exact coils with projected full-basis detection states
-observed=coil_state(s,{'L+','Lz'},{1,2},'exact');
-expected=coil_state(reference,{'L+','Lz'},{1,2},'exact');
+observed=coil_state(s,{'L+','Lz'},{1,2});
+expected=coil_state(reference,{'L+','Lz'},{1,2});
 result=test_close(result,'truncated coil',observed,expected(selection),1e-13,1e-13,...
                   'a descriptor absent from the truncated basis contributes zero');
 

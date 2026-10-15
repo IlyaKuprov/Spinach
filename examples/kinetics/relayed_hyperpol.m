@@ -93,13 +93,13 @@ L=H+1i*R+1i*K;
 rho=equilibrium(spin_system);
 
 % Polarise the water 100%
-Wz=coil_state(spin_system,'Lz',11:20,'exact');
+Wz=coil_state(spin_system,'Lz',11:20);
 rho=rho-Wz*(Wz'*rho)/norm(Wz,2)^2+Wz;
 
 % Get detection states
 H_aliph=[6 7 8]; H_alpha=5;
-HZ_aliph=coil_state(spin_system,'Lz',H_aliph,'exact');
-HZ_alpha=coil_state(spin_system,'Lz',H_alpha,'exact');
+HZ_aliph=coil_state(spin_system,'Lz',H_aliph);
+HZ_alpha=coil_state(spin_system,'Lz',H_alpha);
             
 % Time evolution simulation
 result=evolution(spin_system,L,[HZ_aliph HZ_alpha],...

@@ -52,7 +52,7 @@ bas.approximation={'IK-0','IK-0','IK-0','IK-0','IK-0'};
 bas.inter_level={1,1,1,1,1};
 s=assume(test_spin_system(sys,inter,bas),'nmr'); R=relaxation(s);
 for axis={'Lz','L+'}
-    rho=coil_state(s,axis{1},28:30,'exact');
+    rho=coil_state(s,axis{1},28:30);
     result=test_close(result,['solvent ' axis{1} ' decay'],R*rho,-0.5*rho,...
                       1e-12,0,'the solvent mode retains its specified relaxation rate');
 end

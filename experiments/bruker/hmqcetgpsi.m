@@ -65,7 +65,7 @@ delta=abs(1/(2*parameters.J));
 rho=state(spin_system,'Lz',parameters.spins{2});
 
 % Detection state
-coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
+coil=coil_state(spin_system,'L+',parameters.spins{2});
 
 % Pulse operators
 Cx=operator(spin_system,'Lx',parameters.spins{1});

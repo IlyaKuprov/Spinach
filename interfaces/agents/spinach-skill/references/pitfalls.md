@@ -310,7 +310,8 @@ Run every unattended simulation through this pattern:
 If the script must plot, headless rendering needs
 `set(0,'DefaultFigureVisible','off')`, `opengl('save','software')`, and
 `QT_QPA_PLATFORM=offscreen`; a crash inside figure creation under `-batch` is
-an environment problem, not a Spinach one.
+an environment problem, not a Spinach one. For non-plotting runs, `-nojvm`
+is faster.
 
 ## What counts as evidence that a simulation is right
 

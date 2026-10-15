@@ -27,8 +27,8 @@ before an exception. Recorded failures and thrown errors still fail the suite.
 Test-created figures are invisible and deleted on success or error. Existing
 figures, the current figure, and root graphics defaults are preserved; tests
 must not explicitly close caller-owned figures. MATLAB's capture does not
-intercept native process stderr, including MATLAB startup diagnostics; those
-messages are outside the test reporter.
+intercept native process stderr, including JVM startup diagnostics on some
+MATLAB/Java installations; those messages are outside the test reporter.
 
 The CUDA sparse-product comparison is registered in the main manifest:
 

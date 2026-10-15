@@ -838,3 +838,7 @@ Exactly diagonal POD modes carry individual binary state amplitudes. Evaluation 
 POD observable accumulation accepts discarded working products only if an absolute power-of-two bound on their complete computed physical tail lies below half the smallest subnormal. This supports fully damped modes alongside surviving signals without discarding a potentially representable collective tail.
 
 Diagonal POD updates require the cached factor and changing state component bounds to give a normal nonzero double product. Subnormal working products are rejected explicitly before phase loss or quantisation; the conservative restriction can reject a finite physical observable, while the normal-product boundary remains supported.
+
+POD observable exponent alignment checks exact binary scale restoration, including nonzero subnormal quantisation. Inexact aligned groups require the existing complete physical-tail bound before they may be discarded; representable tails are explicit errors. Exactly aligned subnormal groups remain supported through cancellation. Regression controls use independently known residuals with real/imaginary signs, exchanged state/detector roles and dense/sparse terms.
+
+Observable group addition reuses the TwoSum transform and cascaded correction to retain aligned cancellation residuals; a computed zero with lost correction information is rejected. This is compensation for computed products, not arbitrary-precision or exact-product summation.

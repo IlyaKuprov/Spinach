@@ -27,3 +27,7 @@ Each exactly diagonal mode carries its own binary state amplitude. Only bounded 
 Observable alignment may discard underflowed working components only when an exponent bound for the complete computed tail is strictly below half the smallest physical subnormal. The bound uses the largest absolute discarded group and its count, not separate per-mode underflow tests; physically representable collective tails remain explicit range errors.
 
 Diagonal update factors have a cached nonzero component bound. Before each pointwise update, the factor/state component bound must remain in the normal double range; unsupported subnormal products are rejected before zeroing or quantising a small phase. This conservative computed-range restriction may reject a finite physical observable. Normal-boundary phase controls remain supported.
+
+POD observable exponent alignment checks exact binary scale restoration, including nonzero subnormal quantisation. Inexact aligned groups require the existing complete physical-tail bound before they may be discarded; representable tails are explicit errors. Exactly aligned subnormal groups remain supported through cancellation. Regression controls use independently known residuals with real/imaginary signs, exchanged state/detector roles and dense/sparse terms.
+
+Observable group addition reuses the TwoSum transform and cascaded correction to retain aligned cancellation residuals; a computed zero with lost correction information is rejected. This is compensation for computed products, not arbitrary-precision or exact-product summation.

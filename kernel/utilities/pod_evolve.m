@@ -50,8 +50,11 @@
 % Caller RNG is restored after native norm estimates, including on errors.
 % A scalar damping bound certifies zero when every future signal component
 % is below half the smallest subnormal, without testing a computed action.
-% Discarded observable products are accepted only when a power-of-two bound
+% Observable alignment checks exact binary scale restoration, including
+% nonzero subnormal quantisation. Inexact products are discarded only when a bound
 % on the complete computed tail is below half the smallest subnormal.
+% Compensated addition retains the aligned groups through cancellation; a zero
+% whose correction lost information is rejected, not used as a signal component.
 % Physical signals below the subnormal range round to zero; nonfinite
 % physical signals are errors.
 % Inputs and integer counts are double; nsteps must be below flintmax.
@@ -366,7 +369,8 @@ for n=1:2
         [powers,~,groups]=unique(powers); fractions=accumarray(groups,full(fractions));
         powers=powers(fractions~=0); fractions=fractions(fractions~=0);
         if ~isempty(powers)
-            common=max(powers); scaled=pow2(fractions,powers-common); lost=(fractions~=0)&(scaled==0);
+            common=max(powers); scaled=pow2(fractions,powers-common);
+            lost=pow2(scaled,common-powers)~=fractions;
             if any(lost)
 
                 % Certify the complete computed tail is below half a subnormal
@@ -374,9 +378,22 @@ for n=1:2
                 if max(powers(lost))+tail_exp+count_exp>log2(realmin)+log2(eps)-1
                     error('observable product dynamic range exceeds the normalised double representation.');
                 end
+                scaled(lost)=0;
 
             end
-            signal=signal+(1i^(n-1))*pow2(sum(scaled),common);
+
+            % Retain computed alignment groups through cancelling additions
+            total=0; correction=0; uncertain=false;
+            for k=1:numel(scaled)
+                [total,residual]=two_sum(total,scaled(k));
+                [correction,roundoff]=two_sum(correction,residual);
+                uncertain=uncertain||(roundoff~=0);
+            end
+            total=total+correction;
+            if uncertain&&(total==0)
+                error('observable cancellation cannot certify a zero signal component.');
+            end
+            signal=signal+(1i^(n-1))*pow2(total,common);
         end
     end
     components(1,:)={real(coil),imag(rho)};

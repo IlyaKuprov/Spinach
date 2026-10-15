@@ -67,3 +67,7 @@ Per-mode diagonal amplitude controls cover a finite product with an overflowing 
 Damped-mode controls retain a constant surviving background after certified physical underflow. Negative controls require explicit rejection of representable discarded tails, including a collective signal from 256 individually underflowed exponentials.
 
 Subnormal diagonal-product controls cover zeroed and quantised amplified phases, three state scales, both phase signs, dense/sparse storage and exchanged source/detector roles. Independent amplified-phase controls retain products at the normal working boundary.
+
+POD observable exponent alignment checks exact binary scale restoration, including nonzero subnormal quantisation. Inexact aligned groups require the existing complete physical-tail bound before they may be discarded; representable tails are explicit errors. Exactly aligned subnormal groups remain supported through cancellation. Regression controls use independently known residuals with real/imaginary signs, exchanged state/detector roles and dense/sparse terms.
+
+Observable group addition reuses the TwoSum transform and cascaded correction to retain aligned cancellation residuals; a computed zero with lost correction information is rejected. This is compensation for computed products, not arbitrary-precision or exact-product summation.

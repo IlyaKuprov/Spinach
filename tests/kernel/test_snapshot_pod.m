@@ -1159,6 +1159,38 @@ for storage={'dense','sparse'}
     end
 end
 
+% Check exponent alignment through cancellation, including exact subnormal controls
+weak_exp=[-25 -24 -24 -23 -23]; amplitudes=[0.75 0.75 0.5 0.5 0.75];
+for storage={'dense','sparse'}
+    for swapped=[false true]
+        for phase=[1 -1 1i -1i]
+            for k=1:5
+                initial=phase*[pow2(.5625,512);-pow2(.75,511);pow2(amplitudes(k),weak_exp(k))];
+                detector=[pow2(.5,512);pow2(.75,512);pow2(amplitudes(k),weak_exp(k))];
+                expected=phase*pow2(amplitudes(k)^2,2*weak_exp(k));
+                if swapped, [initial,detector]=deal(detector,initial); expected=conj(expected); end
+                term=zeros(3); if strcmp(storage{1},'sparse'), term=sparse(term); end
+                prepared=pod_project(eye(3),{term},initial,detector);
+                if k<=2
+                    rejected=false;
+                    try
+                        pod_evolve(prepared,1,0,0);
+                    catch caught
+                        rejected=contains(caught.message,'observable product dynamic range');
+                    end
+                    result=test_true(result,['quantised overlap ' storage{1} ' ' num2str(swapped) ' ' num2str(phase) ' ' num2str(k)],rejected,...
+                                     'a nonzero but inexact subnormal alignment cannot certify a finite overlap');
+                else
+                    observed=pod_evolve(prepared,1,0.3,2);
+                    result=test_close(result,['exact subnormal overlap ' storage{1} ' ' num2str(swapped) ' ' num2str(phase) ' ' num2str(k)],...
+                                      observed/expected,ones(1,3),1e-12,0,...
+                                      'exactly aligned subnormal groups retain the independently known cancellation residual');
+                end
+            end
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

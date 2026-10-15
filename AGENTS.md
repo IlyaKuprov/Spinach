@@ -50,7 +50,17 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 ### File Layout, Naming, and Formatting
 
-* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits. Every `end` keyword must be correctly indented. If a Matlab command or an array is broken up into multiple lines using `...`, the lines must be logically and elegantly indented: decimal point alignment for numerical arrays, structural alignment for multiple arguments, etc. For non-grumbler code, maintain formatting symmetry between opening and closing keywords: when its opening statement is followed by a blank line, the closing `end` must be preceded by a blank line. Grumbler code needs no blank lines anywhere.
+* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits. Every `end` keyword must be correctly indented. Continuation layout follows the alignment rule below. For non-grumbler code, maintain formatting symmetry between opening and closing keywords: when its opening statement is followed by a blank line, the closing `end` must be preceded by a blank line. Grumbler code needs no blank lines anywhere.
+
+* **Continuation Alignment (not block indentation):** Four-space indentation applies to control-flow blocks; it is not a blanket rule for lines continued with `...`. Align continued arguments with the corresponding arguments or opening-delimiter contents above, align continued expression terms structurally, and align numerical array columns by their decimal points. Preserve meaningful existing continuation columns when restyling; never flatten them to a uniform four-space indent or accept an automatic formatter's output without inspection. If an earlier edit changes the width of the text providing the alignment anchor, adjust the continuation columns accordingly. Review every affected multi-line statement in monospaced text: syntax checks, unchanged syntax trees, and generic style checks do not establish visual alignment. For example:
+
+  ```matlab
+  rho=step(spin_system,L,rho,...
+           time_step);
+
+  coords=[0.0 0.0  0.0;...
+          0.0 0.0 12.5];
+  ```
 
 * **Naming Conventions:** Use descriptive, concise, all-lowercase, underscore-separated variable and function names of at most 20 characters. Read the current function documentation and consider each variable’s context, content, and role before naming it; avoid ambiguous or vague names. Use standard, commonly understood or documented abbreviations, such as `prop_idx` for a property index. Follow nearby naming patterns when in doubt. Uppercase textbook operator names (`H`, `R`, `K`, `P`, `Q`) and matrix names matching their mathematical notation are permitted. Loop counters should be single lowercase letters, such as `n` and `k`; do not use `i` or `l` as variables, and use `1i` for the imaginary unit. Use British spelling in function names, variable names, and comments, preferring `s` to `z` where both are allowed, and use the Oxford comma. Preserve required API field names, literal option strings, and existing API spellings rather than renaming them to satisfy these conventions.
 

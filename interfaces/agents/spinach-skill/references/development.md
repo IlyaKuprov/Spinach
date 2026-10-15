@@ -8,7 +8,7 @@ Consult that file directly for repository policy; this reference does not
 maintain an independent version of its instructions. Preserve unrelated
 changes and compiled MEX files. For source-style auditing, `exorcise('offline')`
 skips network checks; `exorcise('online')` also checks documentation URLs
-through native MATLAB HTTP requests and can run without the JVM.
+through native MATLAB HTTP requests.
 Use a separate branch/worktree when the current checkout belongs to another
 task. Do not submit scientific or personal data that were not authorised for
 publication.
@@ -57,8 +57,8 @@ coverage for unchanged algorithms merely because the documentation checker
 passes. Use [skill evaluation](skill-evaluation.md) for skill changes.
 
 For `clebsch_gordan`, preserve the preliminary zero filters and the input ceiling.
-Its compensated magnetic recurrence uses native doubles only and does not require
-a JVM. Run both unchanged `examples/fundamentals/clebsch_gordan/cg_test_*` examples
+Its compensated magnetic recurrence uses native doubles only. Run both unchanged
+`examples/fundamentals/clebsch_gordan/cg_test_*` examples
 at their shipped strict absolute tolerance; also check nonzero tails relatively
 against independent high-precision references, since absolute tolerance alone
 can accept a vanished tiny coefficient. The angular-momentum regression suite

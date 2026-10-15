@@ -95,12 +95,7 @@ end
 % I sing. Come Muse! Inspire my dreary tale
 % That all may learn a lesson, none may fail.
 %
-% When Sol of morning brightness shone the ray
-% Which pierced my curtains, heralding new day,
-% I rose up and, stumbling from the bed,
-% Perceived a battle raging in my head
-% Between some Scottish malt and Spanish cava:
-% I knew at once the only cure was Java.
+% [...]
 %
 % The kitchen soon I gained on falt'ring feet,
 % Gazed on the jars of storage - shining, neat -

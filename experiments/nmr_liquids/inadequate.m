@@ -55,7 +55,7 @@ tau=abs(1/(4*parameters.J));
 
 % Initial and detection states
 rho=state(spin_system,'Lz',parameters.spins{1});
-coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
+coil=coil_state(spin_system,'L+',parameters.spins{1});
 
 % Pulse operators
 Cx=operator(spin_system,'Lx',parameters.spins{1});

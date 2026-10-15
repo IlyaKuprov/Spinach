@@ -252,7 +252,7 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
 - `concs` — non-negative initial concentrations, one per subsystem; required
   for multiple substances. Propagated unit coordinates carry subsequent
   concentrations. `state` weights each block by its initial concentration;
-  `coil_state(...,'exact')` constructs unweighted detection vectors.
+  `coil_state(...)` constructs unweighted detection vectors.
 - `reactions` — cell array of scalar records with row-vector `reactants` and
   `products`, two-column global-spin `matching`, and non-negative scalar or
   time-dependent `rate`. First-order rates are in inverse seconds; order-m rates
@@ -684,9 +684,8 @@ In chemistry-free systems, `reduce` rejects cross-substance entries in caller-su
 compiled spin dimension before building substance-local projectors. This
 boundary also covers the adjoint generator passed by destination screening.
 
-The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
-with all four arguments; use `exact`, and pass `[]` for wavefunction
-spin lists. Only the legacy `state` wrapper retains optional arguments.
+The unweighted primitive requires `coil_state(spin_system,states,spins)`
+with all three arguments; pass `[]` for wavefunction spin lists. Only the legacy `state` wrapper retains optional arguments.
 
 Zeeman-wavefunction direct sums provide storage only. Nonempty reaction records
 are rejected by `basis` and `kinetics`; `equilibrium`, `unit_state`, and

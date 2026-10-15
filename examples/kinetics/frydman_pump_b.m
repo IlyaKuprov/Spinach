@@ -88,12 +88,12 @@ parameters.nloops=10;
 traj=liquid(spin_system,@frydman_pump,parameters,'nmr');
 
 % Observables: peptide bond spins
-Hz=coil_state(spin_system,{'Lz'},{1},'exact');
-Hx=coil_state(spin_system,{'Lx'},{1},'exact');
-Nz=coil_state(spin_system,{'Lz'},{2},'exact');
-Nx=coil_state(spin_system,{'Lx'},{2},'exact');
-COz=coil_state(spin_system,{'Lz'},{4},'exact');
-COx=coil_state(spin_system,{'Lx'},{4},'exact');
+Hz=coil_state(spin_system,{'Lz'},{1});
+Hx=coil_state(spin_system,{'Lx'},{1});
+Nz=coil_state(spin_system,{'Lz'},{2});
+Nx=coil_state(spin_system,{'Lx'},{2});
+COz=coil_state(spin_system,{'Lz'},{4});
+COx=coil_state(spin_system,{'Lx'},{4});
 
 % Project out the observables
 Hz=real(Hz'*traj); Hx=real(Hx'*traj);  

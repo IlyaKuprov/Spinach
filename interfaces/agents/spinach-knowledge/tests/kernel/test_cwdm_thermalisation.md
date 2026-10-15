@@ -8,4 +8,4 @@ T7 explicitly collapses the independent identity coordinates into a common ident
 
 The single-substance Zeeman-Liouville test also rejects target traces zero, 0.3, and two, while a unit-trace target makes the concentration-weighted equilibrium stationary under isotropic damping.
 
-Detection uses the explicit `exact` method of `coil_state`.
+Detection uses the three-argument unweighted `coil_state` primitive.

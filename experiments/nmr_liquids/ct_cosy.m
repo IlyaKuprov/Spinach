@@ -60,7 +60,7 @@ end
 
 % Detection state
 if ~isfield(parameters,'coil')
-    parameters.coil=coil_state(spin_system,'L+',parameters.spins{1},'exact');
+    parameters.coil=coil_state(spin_system,'L+',parameters.spins{1});
 end
 
 % Get the time grid for the CT period

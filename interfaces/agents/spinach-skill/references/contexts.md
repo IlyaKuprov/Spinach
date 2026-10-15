@@ -251,7 +251,7 @@ isotope names plus `'electrons'`, `'nuclei'`, and `'all'`.
 `method` in `state` is `'exact'` by default; `'chem'` is a deprecated alias.
 Density matrices and Liouville vectors are weighted by `inter.chem.concs` in
 both cases; wavefunctions remain unweighted. Detection uses `coil_state` with
-all four arguments and method `'exact'`. `operator_type` applies in Liouville
+all three arguments and no method selector. `operator_type` applies in Liouville
 space and is ignored
 in Hilbert space: `'comm'` (commutation, the default), `'left'`, `'right'`,
 `'acomm'`. `format` is `'csc'` for a MATLAB sparse matrix (default) or
@@ -268,7 +268,7 @@ Typical usage inside a sequence, and the pattern used throughout
 
 ```matlab
 parameters.rho0=state(spin_system,'Lz',parameters.spins{2});
-parameters.coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
+parameters.coil=coil_state(spin_system,'L+',parameters.spins{2});
 Lx_F1=operator(spin_system,'Lx',parameters.spins{1});
 Ly_F2=operator(spin_system,'Ly',parameters.spins{2});
 ```

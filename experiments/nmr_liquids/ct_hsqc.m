@@ -65,7 +65,7 @@ end
 
 % Detection state
 if ~isfield(parameters,'coil')
-    parameters.coil=coil_state(spin_system,'L+',parameters.spins{2},'exact');
+    parameters.coil=coil_state(spin_system,'L+',parameters.spins{2});
 end
 
 % Pulse operators

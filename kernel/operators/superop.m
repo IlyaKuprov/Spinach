@@ -79,18 +79,18 @@ for n=1:length(active_spins)
     mult=spin_system.comp.mults(active_spins(n));
     table_idx=opspec(active_spins(n))+1;
 
-    % Extract pages corresponding to the current state
+    % Select the sided product table
     switch side
 
         case {'left','leftofcomm'}
 
-            % Extract left product pages from Lie structure tables
-            pt=squeeze(spin_system.bas.lpst{mult}(table_idx,:,:));
+            % Read left product coordinate records
+            pt=spin_system.bas.lpst{mult};
 
         case {'right','rightofcomm'}
 
-            % Extract right product pages from Lie structure tables
-            pt=squeeze(spin_system.bas.rpst{mult}(table_idx,:,:));
+            % Read right product coordinate records
+            pt=spin_system.bas.rpst{mult};
 
         otherwise
 
@@ -99,8 +99,9 @@ for n=1:length(active_spins)
 
     end
 
-    % Convert product action table to indices
-    [destin{n},source{n},struct{n}]=find(pt);
+    % Select the current tensor and read its coordinate records
+    pt=pt(pt(:,1)==table_idx,:);
+    destin{n}=pt(:,2); source{n}=pt(:,3); struct{n}=pt(:,4);
 
     % Spinach uses 0 index for the unit matrix
     source{n}=source{n}-1; destin{n}=destin{n}-1;
@@ -203,7 +204,7 @@ end
 if numel(opspec)~=spin_system.comp.nspins
     error('the number of elements in the opspec array must be equal to the number of spins.');
 end
-if any((opspec+1)>spin_system.comp.mults.^2)
+if any(opspec<0)||any((opspec+1)>spin_system.comp.mults.^2)
     error('physically impossible state requested in opspec.');
 end
 end

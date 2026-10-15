@@ -9,3 +9,5 @@ Concentrations never enter this constructor: coils for a zero-population substan
 In wavefunction formalism, this unweighted primitive stacks one product ket per substance, including the scalar ket for a spin-free block. This is storage only: no concentration weighting or incoherent mixing is represented. The concentration-weighted `state` wrapper rejects segmented wavefunction requests.
 
 Direct spherical-tensor projection hashes full query descriptor rows and matches them to cached `bas.row_hash{n}` using `hash_ismember`; reference basis rows are not rehashed.
+
+The single-spin left-product tables store nonzero `[n m k value]` records. Detection-state normalisation selects `[index 1 index value]` directly, without constructing a dense product page.

@@ -4,11 +4,12 @@
 
 ## Purpose
 
-Regression test suite for Spinach angular-momentum coefficient and spherical-function helpers. The suite checks Clebsch-Gordan coefficients, Wigner symbols, Wigner D matrices, and spherical harmonics against elementary exact values, verifying that the angular-momentum helpers reproduce elementary exact quantum-mechanical coefficients.
+Regression test suite for Spinach angular-momentum coefficient and spherical-function helpers. The suite checks Clebsch-Gordan coefficients, Wigner symbols, Wigner D matrices, and spherical harmonics against elementary exact and high-precision values, verifying that the angular-momentum helpers reproduce elementary exact quantum-mechanical coefficients.
 
 ## Behaviour
 
-The function announces the test target with `fprintf('TESTING: Angular-momentum coefficient functions\n')` and initialises a test result object via `new_test_result` with suite name `'kernel/wigner_angular_suite'`, description `'Angular-momentum coefficient functions'`, and the specification that angular-momentum helpers must reproduce elementary exact quantum-mechanical coefficients. Each individual check is performed with `test_close`, which compares a computed value against a reference value with absolute and relative tolerances and appends an explanatory message to the result.
+Each check compares a production calculation with an independent value or a
+physical identity, recording explanatory failures without losing later checks.
 
 Clebsch-Gordan checks:
 
@@ -46,3 +47,10 @@ The function takes no inputs. It returns `result`, a regression test result with
 ## References
 
 1. Spinach source file: [tests/kernel/test_wigner_angular_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_wigner_angular_suite.m)
+
+## Clebsch–Gordan recurrence coverage
+
+The CG checks include exact-input 100-digit Mathematica reference values across
+integer and half-integer magnetic recurrence regimes, representable tails near
+`1e-300` compared relatively, a rank-10000 singlet, and an exact antisymmetry zero.
+The two full 10000-row fundamentals comparison examples remain separate checks.

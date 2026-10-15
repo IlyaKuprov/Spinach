@@ -6,23 +6,31 @@
 
 Computes the Clebsch-Gordan coefficient: the coefficient in front of the `Y(L,M)` spherical harmonic in the expansion of the product of `Y(L1,M1)` and `Y(L2,M2)` spherical harmonics. In the more general sense, the coefficient refers to the expansion coefficient of the `|L,M>` angular momentum or spin state in the product basis of `|L1,M1>|L2,M2>` states.
 
-## Behaviour
+## Behaviour and numerical method
 
-- Syntax: `cg=clebsch_gordan(L,M,L1,M1,L2,M2)`.
-- The notation is matched to Varshalovich, Section 8.2.1, with the mapping `c=L`, `gam=M`, `a=L1`, `alp=M1`, `b=L2`, `bet=M2`.
-- The function runs three stages of zero tests before computing anything:
-  - Stage I checks that `a+alp>=0`, `a-alp>=0`, `b+bet>=0`, `b-bet>=0`, `c+gam>=0`, `c-gam>=0`, and `gam==alp+bet`.
-  - Stage II checks the triangle conditions `a+b-c>=0`, `a-b+c>=0`, `-a+b+c>=0`, and `a+b+c+1>=0`.
-  - Stage III checks that the summation range is non-empty, with lower limit `max([alp-a, b+gam-a, 0])` and upper limit `min([c+b+alp, c+b-a, c+gam])`.
-- If any test fails, the function returns zero for inadmissible index combinations.
-- If all tests pass, the coefficient is computed using arbitrary-precision Java arithmetic:
-  - A look-up table of factorials is built with `java.math.BigInteger`, with `gamma(k)` holding `(k-1)!` for `k` from 3 to `a+b+c+2`.
-  - The prefactor numerator is `(2c+1) * gamma(a-b+c+1) * gamma(-a+b+c+1) * gamma(c+gam+1) * gamma(c-gam+1) * gamma(a+b-c+1)`.
-  - The prefactor denominator is `gamma(a+b+c+2) * gamma(a+alp+1) * gamma(a-alp+1) * gamma(b+bet+1) * gamma(b-bet+1)`.
-  - The summation runs over `z` from the lower to the upper limit, with each term being `(-1)^(b+bet+z) * gamma(c+b+alp-z+1) * gamma(a-alp+z+1)` divided by `gamma(z+1) * gamma(c-a+b-z+1) * gamma(c+gam-z+1) * gamma(a-b-gam+z+1)`.
-  - Divisions use `java.math.BigDecimal` with `java.math.RoundingMode.HALF_UP`, at a precision of `length(denom.toString)-length(numer.toString)+64` digits.
-  - The final result is returned as `sign(z_sum) * sqrt(z_sum^2 * prefactor)` converted to double precision.
-- Per the source header, the calculation in double-precision arithmetic is not trivial for high ranks; this function produces machine-precision answers up to about `L=1e4`. A faster implementation for low ranks is available in `cg_fast.m`.
+The three preliminary zero-test stages are retained: projection bounds and
+`M=M1+M2`, triangle inequalities, and the legacy nonempty summation-range test.
+A failed stage returns zero. The notation follows Varshalovich, Section 8.2.1.
+
+Admissible coefficients are evaluated using the Schulten–Gordon magnetic-index
+three-term recurrence with Luscombe–Luban ratio propagation in the monotone tails.
+Cyclic column permutations select the shortest family without an additional
+permutation sign. Magnetic recurrence avoids the singular zero-angular-momentum
+endpoint of the alternative angular-momentum recurrence. Neighbouring interior
+values are fitted, the full family is normalised by 3j orthogonality, and its
+endpoint phase is combined with the Condon–Shortley CG conversion.
+
+Coefficients, ratios, and recurrence amplitudes retain roundoff corrections in a
+second native double; this is fixed compensated arithmetic, not an arbitrary-
+precision runtime. The final coefficient is an ordinary double. There is no Java
+or Symbolic Math Toolbox dependency. No factorial or alternating factorial sum
+is evaluated. Small nonzero tails are reconstructed before the final conversion,
+without squaring the target coefficient. FP64 output range and subnormal rounding
+still apply; no universal correctly-rounded guarantee is made.
+
+`cg_fast.m` remains available for low ranks. The two shipped Mathematica comparison
+tables and `tests/kernel/test_wigner_angular_suite.m` cover numerical regressions;
+tiny nonzero coefficients require relative as well as absolute comparisons.
 
 ## Inputs and outputs
 
@@ -45,4 +53,6 @@ Computes the Clebsch-Gordan coefficient: the coefficient in front of the `Y(L,M)
 ## References
 
 - Varshalovich, D. A., Section 8.2.1 (notation reference cited in the source).
+- Schulten and Gordon, J. Math. Phys. 16, 1961 (1975), https://doi.org/10.1063/1.522426.
+- Luscombe and Luban, Phys. Rev. E 57, 7274 (1998), https://doi.org/10.1103/PhysRevE.57.7274.
 - Spinach Wiki: [clebsch_gordan.m](https://spindynamics.org/wiki/index.php?title=clebsch_gordan.m)

@@ -56,6 +56,14 @@ examples, and claims against the current source. Do not claim numerical
 coverage for unchanged algorithms merely because the documentation checker
 passes. Use [skill evaluation](skill-evaluation.md) for skill changes.
 
+For `clebsch_gordan`, preserve the preliminary zero filters and the input ceiling.
+Its compensated magnetic recurrence uses native doubles only and does not require
+a JVM. Run both unchanged `examples/fundamentals/clebsch_gordan/cg_test_*` examples
+at their shipped strict absolute tolerance; also check nonzero tails relatively
+against independent high-precision references, since absolute tolerance alone
+can accept a vanished tiny coefficient. The angular-momentum regression suite
+contains representative reference, tail, exact-zero, and ceiling cases.
+
 ## Review and delivery
 
 Before committing, re-read the checkout `AGENTS.md`, inspect the full diff,

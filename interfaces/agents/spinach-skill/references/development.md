@@ -6,7 +6,9 @@ Read and follow the distribution-root `AGENTS.md` as mandatory instructions
 for every task, as required by [the skill entrypoint](../SKILL.md#mandatory-repository-instructions).
 Consult that file directly for repository policy; this reference does not
 maintain an independent version of its instructions. Preserve unrelated
-changes and compiled MEX files.
+changes and compiled MEX files. For source-style auditing, `exorcise('offline')`
+skips network checks; `exorcise('online')` also checks documentation URLs
+through native MATLAB HTTP requests and can run without the JVM.
 Use a separate branch/worktree when the current checkout belongs to another
 task. Do not submit scientific or personal data that were not authorised for
 publication.

@@ -826,3 +826,7 @@ columns are staged and concatenated once to avoid quadratic sparse-pointer
 insertion. Reject a final zero whose correction accumulation lost information
 before using it as structural evidence. These transforms apply to computed
 scaled terms, not exact coefficient products or arbitrary-precision sums.
+
+Physical projection restoration must retain every nonzero working component.
+Reject real or imaginary components rounded to zero before storing terms or
+states; representable subnormal coordinates remain supported.

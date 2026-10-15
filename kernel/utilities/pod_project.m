@@ -42,6 +42,10 @@
 % gamma(8*n)*r, with gamma(k)=k*eps/(1-k*eps).
 % Galerkin projection: Benner et al., DOI:10.1137/130932715, section 2.2.
 %
+% Physical restoration rejects a nonzero working component rounded to zero,
+% including loss of just one component of a complex projected coordinate.
+% Representable subnormal coordinates remain supported.
+%
 % ilya.kuprov@weizmann.ac.il
 % arnab.acharya@weizmann.ac.il
 %
@@ -101,14 +105,20 @@ for n=1:width:size(data,2)
     projected=projected+checked_product(left_basis*scaled,right(columns,:));
 end
 
-% Restore physical units and reject unsupported projected coordinates
+% Restore physical units while tracking every nonzero real and imaginary component
+real_count=nnz(real(projected));
 if isreal(projected)
-    projected=pow2(projected,exponent);
+    imag_count=0; projected=pow2(projected,exponent);
 else
+    imag_count=nnz(imag(projected));
     projected=complex(pow2(real(projected),exponent),pow2(imag(projected),exponent));
 end
 if any(isnan(projected),'all')||any(isinf(projected),'all')
     error('projected terms and states must be finite.');
+end
+if nnz(real(projected))~=real_count||...
+   (imag_count~=0&&nnz(imag(projected))~=imag_count)
+    error('projected coordinate dynamic range exceeds the physical double representation.');
 end
 
 end

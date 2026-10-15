@@ -997,6 +997,52 @@ for storage={'dense','sparse'}
                       'the independently known nilpotent signal survives an exactly accumulated control');
 end
 
+% Reject physical restoration loss without discarding representable subnormals
+for storage={'dense','sparse'}
+    for phase=[1 1i]
+        subspace=[1;2^-1073]; initial=[1;0];
+        term=[0 0;phase*realmin 0]; zero=zeros(2); tiny_state=[0;phase*realmin];
+        if strcmp(storage{1},'sparse')
+            subspace=sparse(subspace); term=sparse(term); zero=sparse(zero); tiny_state=sparse(tiny_state);
+        end
+        requests={@()pod_project(subspace,{term},initial,initial),...
+                  @()pod_project(subspace,{zero},tiny_state,initial),...
+                  @()pod_project(subspace,{zero},initial,tiny_state)};
+        for n=1:numel(requests)
+            rejected=false;
+            try
+                requests{n}();
+            catch caught
+                rejected=contains(caught.message,'physical double representation');
+            end
+            result=test_true(result,['restoration loss ' storage{1} ' ' num2str(phase) ' ' num2str(n)],rejected,...
+                             'terms, initial coordinates, and detector coordinates cannot silently round to zero');
+        end
+        term=[phase*realmin 0;1i*phase*realmin 0];
+        if strcmp(storage{1},'sparse'), term=sparse(term); end
+        rejected=false;
+        try
+            pod_project(subspace,{term},initial,initial);
+        catch caught
+            rejected=contains(caught.message,'physical double representation');
+        end
+        result=test_true(result,['restoration component loss ' storage{1} ' ' num2str(phase)],rejected,...
+                         'losing one complex component is rejected even when the coordinate remains nonzero');
+        subspace=[1;2^-52]; term=[0 0;phase*realmin 0];
+        if strcmp(storage{1},'sparse'), subspace=sparse(subspace); term=sparse(term); end
+        prepared=pod_project(subspace,{term},initial,initial);
+        result=test_true(result,['representable projected subnormal ' storage{1} ' ' num2str(phase)],...
+                         isequal(full(prepared.terms{1}),phase*2^-1074),...
+                         'the independent Galerkin coordinate at the smallest subnormal is preserved');
+        if phase==1
+            observed=pod_evolve(prepared,1,realmax,1); expected=imag(exp(-1i*(2^-1074*realmax)));
+            result=test_close(result,['subnormal projected phase ' storage{1}],...
+                              imag(observed(2))/expected,1,1e-12,0,...
+                              'a long acquisition preserves the independently representable phase, not just its real background');
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

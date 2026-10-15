@@ -13,3 +13,5 @@ The matrix-product range contract conservatively requires every nonzero operand-
 The fixed Hermitian basis and its component minimum are prepared once for all projection slices, terms, and states. Range scans use bounded dense columns or stored sparse components; no full-basis range scan occurs inside the slice loop.
 
 All-real projection operands retain real slice and prepared-array storage. Complex operands promote the result naturally; no imaginary component is discarded.
+
+Physical restoration rejects loss of a nonzero real or imaginary working component, including partial loss in a still-nonzero complex coordinate. Counts before and after elementwise binary scaling identify that loss without retaining another projected array. Representable subnormal terms and states remain supported.

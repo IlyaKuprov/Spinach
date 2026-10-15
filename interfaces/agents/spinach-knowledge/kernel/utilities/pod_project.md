@@ -15,3 +15,5 @@ The fixed Hermitian basis and its component minimum are prepared once for all pr
 All-real projection operands retain real slice and prepared-array storage. Complex operands promote the result naturally; no imaginary component is discarded.
 
 Physical restoration rejects loss of a nonzero real or imaginary working component, including partial loss in a still-nonzero complex coordinate. Counts before and after elementwise binary scaling identify that loss without retaining another projected array. Representable subnormal terms and states remain supported.
+
+Normalised Galerkin column-slice sums retain TwoSum/cascaded corrections in projected-output-shaped workspace before physical restoration. A zero coordinate with lost correction information is rejected, rather than certifying a stationary generator. Compensation applies to computed slice products, not exact matrix multiplication. Independent dense/sparse and real/imaginary dyadic controls retain a projected 2^-56 term and its finite long-time phase.

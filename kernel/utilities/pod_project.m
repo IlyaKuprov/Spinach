@@ -34,6 +34,10 @@
 % matrix products and restores physical units
 % afterwards. The fixed Hermitian basis and its component range are prepared
 % once, outside the projection slices. Dense range scans use bounded columns.
+% Slice sums retain TwoSum/cascaded corrections before interpreting zero
+% coordinates (Ogita et al., DOI:10.1137/030601818). A zero whose correction
+% lost information is rejected. Compensation applies to computed products,
+% not exact matrix products; its workspace has the projected output shape.
 % Real operands retain real slice and output storage; complex products promote
 % storage only when required. Unsupported component loss is rejected, not removed.
 % Nonzero operand-component pairs must remain nonzero at the working scale;
@@ -91,6 +95,7 @@ else
 end
 
 % Accumulate the Galerkin product from bounded normalised column slices
+correction=projected; uncertain=(projected~=0);
 for n=1:width:size(data,2)
     columns=n:min(n+width-1,size(data,2)); part=data(:,columns);
     scaled=pow2(real(part),-exponent);
@@ -102,8 +107,17 @@ for n=1:width:size(data,2)
     if basis_min*component_min(scaled)==0
         error('projection product dynamic range exceeds the normalised double representation.');
     end
-    projected=projected+checked_product(left_basis*scaled,right(columns,:));
+    [projected,residual]=two_sum(projected,checked_product(left_basis*scaled,right(columns,:)));
+    [correction,roundoff]=two_sum(correction,residual);
+    uncertain=uncertain|(roundoff~=0);
 end
+
+% Restore compensated sums before interpreting zero projected coordinates
+projected=projected+correction;
+if any(projected(uncertain)==0)
+    error('projection cancellation cannot certify a zero coordinate.');
+end
+clear correction uncertain residual roundoff
 
 % Restore physical units while tracking every nonzero real and imaginary component
 real_count=nnz(real(projected));
@@ -121,6 +135,12 @@ if nnz(real(projected))~=real_count||...
     error('projected coordinate dynamic range exceeds the physical double representation.');
 end
 
+end
+
+% Recover the exact addition residual of bounded real or complex components
+function [total,residual]=two_sum(left,right)
+total=left+right; virtual=total-left;
+residual=(left-(total-virtual))+(right-virtual);
 end
 
 % Reject unsupported operand ranges before a bounded matrix product

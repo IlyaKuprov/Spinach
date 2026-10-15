@@ -1211,6 +1211,25 @@ for storage={'dense','sparse'}
     end
 end
 
+% Preserve projection-slice residuals before long-time phase amplification
+orders=[1 2 3 4;1 3 2 4];
+for storage={'dense','sparse'}
+    for phase=[1 -1 1i -1i]
+        for k=1:size(orders,1)
+            subspace=.5*ones(4,1); values=[.375,-(.375-eps(.375)),.765625,-.765625];
+            term=phase*diag(values(orders(k,:)));
+            if strcmp(storage{1},'sparse'), subspace=sparse(subspace); term=sparse(term); end
+            prepared=pod_project(subspace,{term},subspace,subspace);
+            result=test_close(result,['projection slice residual ' storage{1} ' ' num2str(phase) ' ' num2str(k)],...
+                              full(prepared.terms{1})/2^-56,phase,1e-12,0,...
+                              'independent dyadic slice contributions retain the projected 2^-56 residual');
+            result=test_close(result,['projected long phase ' storage{1} ' ' num2str(phase) ' ' num2str(k)],...
+                              pod_evolve(prepared,1,2^56,1),[1 exp(-1i*phase)],1e-12,0,...
+                              'a finite long acquisition resolves the independently known nonzero generator');
+        end
+    end
+end
+
 % Compare a damped proton coherence and longitudinal component with Spinach
 sys.magnet=14.1; sys.isotopes={'1H'};
 inter.zeeman.scalar={0}; inter.relaxation={'t1_t2'};

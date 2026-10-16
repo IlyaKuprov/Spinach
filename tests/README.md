@@ -38,7 +38,7 @@ run_test('kernel/cuda_product');
 
 It compares the gateway directly with independent CPU products for random
 square and rectangular sparse matrices in all real/complex combinations.
-This gateway requires MATLAB R2026a or later; older releases skip its test.
+This gateway requires MATLAB R2026b or later; older releases skip its test.
 GPU checks report explicit `SKIP` messages when a usable GPU or the compiled
 gateway is unavailable, following the existing GPU coverage convention.
 With both prerequisites present, numerical and non-loader CUDA errors fail

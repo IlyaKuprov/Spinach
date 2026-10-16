@@ -1,4 +1,4 @@
-/* Low-level CUDA CSR-by-CSR product for MATLAB R2026a.
+/* Low-level CUDA CSR-by-CSR product for MATLAB R2026b.
  * C=cuda_sparse_by_sparse_mex(A,B), sparse double gpuArrays, real or complex.
  * Gustavson row-wise symbolic/numeric phases; no cuSPARSE or BLAS calls.
  * Shared-memory dense accumulators for narrow column ranges, bounded hash

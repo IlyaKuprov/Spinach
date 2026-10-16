@@ -19,11 +19,11 @@
 % accumulators, with column splitting for overflowing sparse hashes. No
 % cuSPARSE multiplication is used. A fresh MATLAB-owned sparse GPU pattern
 % is allocated once, and numerical values are written directly into it.
-% The undocumented R2026a CSR layout is validated before use. A layout
+% The undocumented R2026b CSR layout is validated before use. A layout
 % mismatch is an error, not a fallback to a potentially unsafe GPU product.
-% Missing or unloadable platform binaries and pre-Volta GPUs retain native
-% multiplication. Rebuild with the running MATLAB release for acceleration
-% after a CUDA major-version change; the shipped Linux binary uses CUDA 12.
+% Missing or unloadable platform binaries and GPUs below compute capability
+% 7.5 retain native multiplication. Rebuild with the running MATLAB release
+% after a CUDA major-version change; the Linux binary uses CUDA 13.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -34,7 +34,7 @@ grumble(A,B);
 
 % Retain native multiplication without a compatible platform binary or GPU
 if (exist('cuda_sparse_by_sparse_mex','file')~=3)||...
-   (str2double(gpuDevice().ComputeCapability)<7)
+   (str2double(gpuDevice().ComputeCapability)<7.5)
     C=A*B; return
 end
 

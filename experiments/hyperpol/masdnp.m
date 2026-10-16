@@ -29,7 +29,7 @@
 %     parameters.coil      -  detection state
 %
 %     parameters.verbose   -  set this to 1 to enable diag-
-%                             nostic output
+%                             nostic output (default: 0)
 %
 % Outputs:
 %
@@ -49,6 +49,9 @@
 % <https://spindynamics.org/wiki/index.php?title=masdnp.m>
 
 function dnp=masdnp(spin_system,parameters)
+
+% Default diagnostic output
+if ~isfield(parameters,'verbose'), parameters.verbose=0; end
 
 % Check consistency
 grumble(spin_system,parameters);
@@ -187,9 +190,6 @@ end
 if (~isnumeric(parameters.mw_time))||(~isreal(parameters.mw_time))||...
    (numel(parameters.mw_time)~=1)||(parameters.mw_time<0)
     error('parameters.mw_time must be a non-negative real scalar.');
-end
-if ~isfield(parameters,'verbose')
-    error('diagnostic output flag must be specified in parameters.verbose variable.');
 end
 if (~isnumeric(parameters.verbose))||(~isreal(parameters.verbose))||...
    (numel(parameters.verbose)~=1)

@@ -133,7 +133,7 @@ error is reported without aborting the C++ builds; other build errors propagate.
 Modern MATLAB does not provide macOS CUDA support. Older releases retain five C++ builds
 and skip the R2026a-layout CUDA target.
 
-The shipped Linux gateway targets compute capability 7.0 or later and CUDA 12.
+The shipped Linux and Windows gateways target compute capability 7.0 or later and CUDA 12.
 The wrapper uses native GPU multiplication on older GPUs or if the binary cannot
 load. Standard R2026b installations need a local rebuild for custom-kernel
 acceleration with CUDA 13; installing an old CUDA runtime is not required.

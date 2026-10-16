@@ -10,7 +10,7 @@ stream that is restored on exit.
 
 The absolute tolerance is a complex dot-product roundoff bound scaled by
 `norm(abs(A)*abs(B),'fro')`, accounting for both CPU and GPU accumulation.
-Checks also require native sparse GPU output. A MATLAB release before R2026b, missing usable GPU, or missing gateway
+Checks also require native sparse GPU output. A MATLAB release before R2026a, missing usable GPU, or missing gateway
 produces an explicit skip message; the specific
 `MATLAB:mex:ErrInvalidMEXFile` loader error is also skipped. Other CUDA errors
 and incorrect products remain failures.

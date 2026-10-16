@@ -506,7 +506,7 @@ for n=1:numel(routes)
     loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
     result=test_true(result,['compile_mex route ' routes{n}],...
                      numel(loaded.mex_calls)==6-(n==3),...
-                     'all platforms invoke mexcuda on R2026b or later; older releases retain five C++ builds');
+                     'all platforms invoke mexcuda on R2026a or later; older releases retain five C++ builds');
     if n~=3
         cuda_args=loaded.mex_calls{6};
         library_arg=['-L' fullfile(scratch,'CUDA Toolkit','lib','x64')];

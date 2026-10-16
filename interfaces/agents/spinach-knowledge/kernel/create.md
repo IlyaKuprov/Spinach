@@ -68,4 +68,4 @@ When reusing a parallel pool, `create` clears its ValueStore only if none of `op
 
 ## MATLAB release maintenance
 
-Use current patched R2026a or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.
+Use current patched R2026b or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.

@@ -26,7 +26,7 @@ cleanup and continuous patrol are deliberately inspected rather than run.
 
 The compiler helper must confine outputs to their source directories, retain
 the interleaved-complex API and CUDA driver link, and avoid OpenMP dependence.
-Windows, Linux, and macOS on R2026a or later include the CUDA gateway; older
+Windows, Linux, and macOS on R2026b or later include the CUDA gateway; older
 MATLAB releases retain only the five C++ targets. Windows driver-library
 lookup is checked both with an external CUDA path and with compiler defaults;
 the search-path option must precede the driver-library option.

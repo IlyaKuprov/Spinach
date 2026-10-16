@@ -166,7 +166,7 @@ a named grid.
 inter.zeeman.eigs={[<xx> <yy> <zz>]};    % ppm
 inter.zeeman.euler={[<a> <b> <g>]};      % radians
 sys.disable={'trajlevel'}; bas.projections={+1};
-parameters.grid='rep_2ang_6400pts_sph'; parameters.verbose=0;
+parameters.grid='rep_2ang_6400pts_sph';
 fid=powder(spin_system,@acquire,parameters,'nmr');
 ```
 

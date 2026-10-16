@@ -141,7 +141,7 @@ Windows R2026a pool startup retains the expanded worker port-range workaround.
 
 Run `run_test('kernel/cuda_product')` from the regression suite to compare the
 gateway directly with CPU products across random real and complex matrices.
-Read its messages: missing GPU/gateway coverage and the specific
+Read its messages: pre-Volta GPUs, missing GPU/gateway coverage, and the specific
 `MATLAB:mex:ErrInvalidMEXFile` loader error are reported as skipped, not as
 numerical validation. All other CUDA errors and wrong results remain failures.
 

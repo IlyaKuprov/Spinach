@@ -25,6 +25,10 @@ if (exist('canUseGPU','file')==0)||(~canUseGPU())
     result.messages{end+1}='SKIP: CUDA sparse products require a usable GPU.';
     return;
 end
+if str2double(gpuDevice().ComputeCapability)<7
+    result.messages{end+1}='SKIP: shipped CUDA gateway requires compute capability 7.0 or later.';
+    return;
+end
 if exist('cuda_sparse_by_sparse_mex','file')~=3
     result.messages{end+1}='SKIP: CUDA sparse products require the compiled gateway.';
     return;

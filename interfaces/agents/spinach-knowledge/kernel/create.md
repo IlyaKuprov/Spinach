@@ -66,6 +66,6 @@ With GPU arithmetic enabled, `create` sets the selected GPU's `CachePolicy` to `
 
 When reusing a parallel pool, `create` clears its ValueStore only if none of `op_cache`, `ham_cache`, or `prop_cache` is enabled in `sys.enable`. Enabling any of these options preserves the entire existing store across spin-system construction.
 
-## Windows R2026a parallel pools
+## MATLAB release maintenance
 
-Before starting a new pool on Windows R2026a, `create` expands the client port range to 20001–44999 and passes `PARALLEL_SERVER_OVERRIDE_PORT_RANGE` into the workers. R2026b and non-Windows hosts retain the default pool-startup path. Existing pools are reused without changing their port settings.
+Use current patched R2026a or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.

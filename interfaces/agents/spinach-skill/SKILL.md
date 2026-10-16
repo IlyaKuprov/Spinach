@@ -137,7 +137,7 @@ The shipped Linux and Windows gateways target compute capability 7.0 or later an
 The wrapper uses native GPU multiplication on older GPUs or if the binary cannot
 load. Standard R2026b installations need a local rebuild for custom-kernel
 acceleration with CUDA 13; installing an old CUDA runtime is not required.
-Windows R2026a pool startup retains the expanded worker port-range workaround.
+Use current patched R2026a; pool startup retains MATLAB’s default port settings.
 
 Run `run_test('kernel/cuda_product')` from the regression suite to compare the
 gateway directly with CPU products across random real and complex matrices.

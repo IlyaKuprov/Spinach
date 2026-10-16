@@ -766,3 +766,84 @@ text (row strings or cell vectors of lines), not numeric arrays.
 Complex NMR quadratures use `ARBITRARY UNITS`; magnitude/power data must
 be real and already transformed. NMR assignments may omit heights and method
 comments; widths require a method description.
+
+## Snapshot POD for repeated parameter families
+
+For an explicitly covered system and parameter family, train with `pod_basis`,
+project fixed affine terms and state/detection columns using `pod_project`, then
+supply coefficients and a uniform grid to `pod_evolve`. Keep Euclidean ordering
+and Liouvillian convention L=H+1i*R+1i*K, rad/s; time is seconds. Integer inputs
+and counts are double. No metric, processing, reference subtraction, stability
+repair or positivity constraint is inferred.
+
+Weighted snapshot matrices or covariance-equivalent factors are normalised in
+one binary frame before SVD, QR, rank decisions and residual measurement.
+Exact SVD is the full-data reference. Randomised SVD applies weighted blocks in
+bounded slices, reorthogonalises after every data/adjoint pass and factors only
+compressed snapshots, following Halko et al., DOI:10.1137/090771806. Preserve
+caller RNG; exclude validated zero-weight blocks from workspace but retain
+original-dimension rank thresholds and diagnostic padding. Form retained modes
+only and release Gaussian coefficients before compressed data.
+
+Physical diagnostic energy may round to zero or infinity. Use relative residuals
+and the returned scaled diagnostics, not squared energy, for numerical decisions.
+Normalisation that loses nonzero components is unsupported. Factor truncation
+qualifies reconstruction of supplied factors, not omitted original trajectories.
+POD snapshot optimality is not a reduced-output error guarantee; see Benner et al.,
+DOI:10.1137/130932715. Validate held-out complex FIDs and identically processed
+spectra against full Spinach; report offline costs separately from repeated queries.
+
+Projection normalises data before matrix products and restores physical units.
+Evaluation assembles the time-scaled affine sum in one binary-exponent frame,
+then restores only the summed generator. Normalised propagation carries real
+scalar growth and state amplitude separately, restoring only the Hermitian
+observable. Use MATLAB's maintained reduced exponential; do not introduce a
+heuristic size dispatcher. Unsupported component ranges, unrepresentable
+projected coordinates/generators and nonfinite final signals remain explicit errors.
+
+Initial-only and exact constant signals avoid an unnecessary exponential after
+validation. Common structural stationarity must use the same side across every
+active term; mixed state/detector sides do not establish stationarity. Computed
+zero actions can underflow and are not certificates. Sparse storage is preserved
+through native exponential actions. Blocks are bounded by reduced rank and a
+Hermitian-part growth estimate; exactly diagonal models use componentwise exponentials. The
+forward/adjoint choice preserves the Hermitian signal and native norm estimates
+preserve caller RNG. No componentwise
+accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
+
+The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Implicit term-support traversal avoids constructing dense support graphs. Per-term assembly workspaces are released before physical rescaling. The diagonal is separated once; scalar shifts are applied in the callback without a second dense generator. Hermitian radii and forward/adjoint norms use sparse reductions or bounded dense column/row scans. Real states/actions retain real storage. Fixed off-diagonal bounds are measured once; shifted diagonal bounds are cached per block. Dense range scans use bounded columns. Fixed basis adjoints and component ranges are prepared once outside projection slices. All-real projection data retain real working slices and prepared coordinates. Extreme normalised operand ranges are explicit errors, not silent product underflow.
+
+Repeat directed reachability on the assembled affine sum before restoring
+physical units, because affine cancellation can disconnect previously linked modes.
+Sparse POD action bounds use absolute row/column sums, with their half-sum
+bounding Hermitian radii without constructing a Hermitian part. Rayleigh
+estimates stream normalised columns and sparse scalar overlaps. Binary
+scaling checks stored component counts, avoiding implicit-zero masks.
+
+Accumulate affine entries with TwoSum-based compensated additions
+(Ogita et al., DOI:10.1137/030601818, Algorithms3.1/4.1). Compensation
+workspace is column-sized. Dense outputs are preallocated; sparse output
+columns are staged and concatenated once to avoid quadratic sparse-pointer
+insertion. Reject a final zero whose correction accumulation lost information
+before using it as structural evidence. These transforms apply to computed
+scaled terms, not exact coefficient products or arbitrary-precision sums.
+
+Physical projection restoration must retain every nonzero working component.
+Reject real or imaginary components rounded to zero before storing terms or
+states; representable subnormal coordinates remain supported.
+
+POD evaluation recognises an exactly diagonal assembled generator and applies its componentwise closed-form exponential one state column at a time. This avoids retaining a dense zero off-diagonal matrix and bypasses the generic non-diagonal action-norm restriction; existing numeric range and finite-observable contracts still apply.
+
+Exactly diagonal POD modes carry individual binary state amplitudes. Evaluation forms bounded exponential residuals and phases rather than a potentially overflowing/underflowing standalone exponential; observable accumulation combines each coordinate exponent with its Hermitian detector product. Exact-integer exponent limits and finite-output requirements remain explicit.
+
+POD observable accumulation accepts discarded working products only if an absolute power-of-two bound on their complete computed physical tail lies below half the smallest subnormal. This supports fully damped modes alongside surviving signals without discarding a potentially representable collective tail.
+
+Diagonal POD updates require the cached factor and changing state component bounds to give a normal nonzero double product. Subnormal working products are rejected explicitly before phase loss or quantisation; the conservative restriction can reject a finite physical observable, while the normal-product boundary remains supported.
+
+POD observable exponent alignment checks exact binary scale restoration, including nonzero subnormal quantisation. Inexact aligned groups require the existing complete physical-tail bound before they may be discarded; representable tails are explicit errors. Exactly aligned subnormal groups remain supported through cancellation. Regression controls use independently known residuals with real/imaginary signs, exchanged state/detector roles and dense/sparse terms.
+
+Observable group addition reuses the TwoSum transform and cascaded correction to retain aligned cancellation residuals; a computed zero with lost correction information is rejected. This is compensation for computed products, not arbitrary-precision or exact-product summation.
+
+Computed component products sharing an exponent are accumulated with TwoSum and cascaded correction before zero groups are filtered. A zero group with lost correction information is rejected. The aligned-group stage retains its own compensation; neither stage certifies exact real-number products. Signed real/imaginary, exchanged state/detector, reordered and dense/sparse controls retain a dyadic residual of one.
+
+Normalised Galerkin column-slice sums retain TwoSum/cascaded corrections in projected-output-shaped workspace before physical restoration. A zero coordinate with lost correction information is rejected, rather than certifying a stationary generator. Compensation applies to computed slice products, not exact matrix multiplication. Independent dense/sparse and real/imaginary dyadic controls retain a projected 2^-56 term and its finite long-time phase.

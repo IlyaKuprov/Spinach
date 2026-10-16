@@ -40,7 +40,6 @@ parameters.rho0=state(spin_system,'L+','1H');
 parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.rate=500;
 parameters.max_rank=17;
-parameters.verbose=0;
 
 % Simulation
 fid=gridfree(spin_system,@acquire,parameters,'nmr');

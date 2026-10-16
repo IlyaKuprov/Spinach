@@ -64,7 +64,6 @@ parameters.method='average';
 parameters.axis_units='kHz';
 parameters.rf_pwr=2*pi*[55.0e3 35.1e3]/sin(theta);
 parameters.rf_frq=48e3;
-parameters.verbose=0;
 
 % Start a new figure
 kfigure(); scale_figure([2.5 1.0]);

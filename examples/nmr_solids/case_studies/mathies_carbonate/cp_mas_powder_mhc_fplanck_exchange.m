@@ -73,7 +73,6 @@ parameters.cp_pwr=[60e3 50e3];    % Hz
 parameters.nsteps=1000; 
 parameters.timestep=1e-5;         % sec
 parameters.needs={'iso_eq'};
-parameters.verbose=1;
 
 % Preallocate contact curve array
 contact_curves=zeros(numel(exch_rates),...

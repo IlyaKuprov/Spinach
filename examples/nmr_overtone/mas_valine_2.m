@@ -47,7 +47,6 @@ parameters.rho0=state(spin_system,'Lz','14N');
 parameters.coil=coil_state(spin_system,'Lz','14N');
 parameters.spins={'14N'};
 parameters.axis_units='kHz';
-parameters.verbose=0;
 
 % Simulation
 spectrum=singlerot(spin_system,@overtone_a,parameters,'qnmr');

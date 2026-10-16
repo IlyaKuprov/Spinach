@@ -60,7 +60,6 @@ parameters.grid='rep_2ang_12800pts_sph';
 parameters.rho0=state(spin_system,'L+','14N');
 parameters.coil=coil_state(spin_system,'L+','14N');
 parameters.axis_units='MHz';
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');

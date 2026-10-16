@@ -42,7 +42,6 @@ parameters.spins={'13C'};
 parameters.grid='rep_2ang_200pts_sph';
 parameters.rho0=state(spin_system,'L+','1H');
 parameters.coil=coil_state(spin_system,'L+','1H');
-parameters.verbose=1;
 
 % Get the trajectory
 traj=singlerot(spin_system,@traject,parameters,'nmr');

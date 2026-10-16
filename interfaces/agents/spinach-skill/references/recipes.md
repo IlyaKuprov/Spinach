@@ -166,7 +166,7 @@ a named grid.
 inter.zeeman.eigs={[<xx> <yy> <zz>]};    % ppm
 inter.zeeman.euler={[<a> <b> <g>]};      % radians
 sys.disable={'trajlevel'}; bas.projections={+1};
-parameters.grid='rep_2ang_6400pts_sph'; parameters.verbose=0;
+parameters.grid='rep_2ang_6400pts_sph';
 fid=powder(spin_system,@acquire,parameters,'nmr');
 ```
 
@@ -347,7 +347,8 @@ MAS-DNP has a dedicated non-context driver, `masdnp`, returning the
 steady-state enhancement directly (`dnp_mas/solid_effect_mas_powder.m`), with
 `*_enlev.m`, `*_dynam.m` and `*_steady.m` companions decomposing the same
 physics; these use `inter.equilibrium='dibari'`, the correct treatment for a
-strongly polarised electron. Liquid-phase Overhauser DNP is
+strongly polarised electron. MAS-DNP diagnostics are quiet by default;
+set `parameters.verbose=1` only when debugging. Liquid-phase Overhauser DNP is
 `dnp_liq/odnp_liquid_1.m`, running `liquid` with `@dnp_time_dep` and `'esr'`
 assumptions; transfer comes from Redfield dipolar cross-relaxation, so geometry
 and `inter.tau_c` are the physics, and detection is a row of `Lz` states so

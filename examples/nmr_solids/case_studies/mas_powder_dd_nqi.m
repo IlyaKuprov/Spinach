@@ -51,7 +51,6 @@ parameters.axis_units='MHz';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','17O');
 parameters.coil=coil_state(spin_system,'L+','17O');
-parameters.verbose=0;
 
 % Simulation
 fid=singlerot(spin_system,@acquire,parameters,'nmr');

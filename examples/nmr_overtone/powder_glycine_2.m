@@ -48,7 +48,6 @@ parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N')+...
                 sin(theta)*coil_state(spin_system,'Lx','14N');
 parameters.spins={'14N'};
 parameters.axis_units='kHz';
-parameters.verbose=0;
 
 % Simulation
 spectrum=powder(spin_system,@overtone_a,parameters,'qnmr');

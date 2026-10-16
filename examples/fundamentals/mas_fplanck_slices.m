@@ -43,7 +43,6 @@ parameters.rf_op=operator(spin_system,'Lx','13C');
 parameters.rf_amp=2*pi*3500;
 parameters.duration=1/parameters.rate;
 parameters.serial=true;
-parameters.verbose=0;
 
 % Compare independent rotor-rank and slice-count refinements
 [fp_csa,sl_csa]=compare_routes(spin_system,parameters,...

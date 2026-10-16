@@ -42,7 +42,6 @@ parameters.sweep=20e6;
 parameters.tau=136e-9;
 parameters.grid='rep_2ang_800pts_sph';
 parameters.axis_units='MHz';
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@hyscore,parameters,'esr');

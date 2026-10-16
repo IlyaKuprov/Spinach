@@ -63,7 +63,6 @@ parameters.axis_units='kHz';
 parameters.rf_pwr=2*pi*[55.0e3 35.1e3]/sin(theta);
 parameters.rf_frq=86.30e3;
 parameters.rf_dur=1e-4;
-parameters.verbose=0;
 
 % Simulation
 spectrum=singlerot(spin_system,@overtone_cp,parameters,'qnmr');

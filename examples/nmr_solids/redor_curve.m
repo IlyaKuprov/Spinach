@@ -37,7 +37,6 @@ parameters.grid='leb_2ang_rank_23';
 parameters.ncycles=0:48;
 parameters.rho0=state(spin_system,'Lx','13C');
 parameters.coil=coil_state(spin_system,'Lx','13C');
-parameters.verbose=0;
 
 % Simulation
 curve=singlerot(spin_system,@redor,parameters,'nmr');

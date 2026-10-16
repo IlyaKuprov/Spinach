@@ -39,7 +39,6 @@ parameters.pulse_op=operator(spin_system,'Lx','1H');
 parameters.nloops=10;
 parameters.timestep=1e-5;
 parameters.npoints=100;
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@cpmg,parameters,'nmr');

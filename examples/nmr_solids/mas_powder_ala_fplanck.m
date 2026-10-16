@@ -43,7 +43,6 @@ parameters.spins={'13C'};
 parameters.grid='rep_2ang_100pts_sph';
 parameters.rho0=state(spin_system,'L+','13C');
 parameters.coil=coil_state(spin_system,'L+','13C');
-parameters.verbose=0;
 
 % Simulation
 fid=singlerot(spin_system,@acquire,parameters,'nmr');

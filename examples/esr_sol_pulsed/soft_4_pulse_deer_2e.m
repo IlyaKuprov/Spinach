@@ -47,7 +47,6 @@ parameters.rho0=state(spin_system,'Lz','E');
 parameters.coil=coil_state(spin_system,'L+','E');
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.method='expm';
-parameters.verbose=0;
 
 % EPR parameters
 parameters.offset=-4e8;

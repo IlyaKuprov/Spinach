@@ -51,7 +51,6 @@ parameters.coil=coil_state(spin_system,'L+','E');
 parameters.grid='rep_2ang_12800pts_sph';
 parameters.offset=[-2e8 0];
 parameters.method='expm';
-parameters.verbose=0;
 
 % Electron pulse parameters
 parameters.e_rnk=2;

@@ -55,7 +55,6 @@ parameters.invert_axis=1;
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.rho0=state(spin_system,'L+','13C');
 parameters.coil=coil_state(spin_system,'L+','13C');
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');

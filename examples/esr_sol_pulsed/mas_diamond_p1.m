@@ -68,7 +68,6 @@ parameters.npoints=601;
 parameters.zerofill=601;
 parameters.grid='rep_2ang_400pts_sph';
 parameters.axis_units='GHz-labframe';
-parameters.verbose=0;
 
 % Spinning rates
 rates=[0 10e3 25e3 37e3];

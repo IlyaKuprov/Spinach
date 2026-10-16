@@ -39,7 +39,6 @@ parameters.invert_axis=1;
 parameters.rate=1000;
 parameters.rho0=state(spin_system,'L+','1H');
 parameters.coil=coil_state(spin_system,'L+','1H');
-parameters.verbose=0;
 
 % Simulation
 fid=gridfree(spin_system,@acquire,parameters,'nmr');

@@ -58,7 +58,6 @@ for n=1:numel(W)
     parameters.derivative=0;
     parameters.invert_axis=0;
     parameters.rframes={{'E8',2}};
-    parameters.verbose=0;
     
     % Soft pulse parameters
     parameters.pulse_rnk=2;

@@ -43,7 +43,6 @@ parameters.rframes={{'14N',2}};
 parameters.axis_units='Hz';
 parameters.rho0=state(spin_system,'Lz','14N');
 parameters.coil=coil_state(spin_system,'L+','14N');
-parameters.verbose=0;
 parameters.pulse_dur=1.2e-6;
 parameters.pulse_amp=88e3;
 parameters.pulse_num=2;

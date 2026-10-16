@@ -36,7 +36,6 @@ parameters.npoints=256;
 parameters.zerofill=512;
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');

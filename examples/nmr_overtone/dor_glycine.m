@@ -63,7 +63,6 @@ parameters.rf_pwr=2*pi*3.0e6;
 parameters.rf_dur=1.0e-6;
 parameters.rf_frq=-10e3;
 parameters.axis_units='kHz';
-parameters.verbose=0;
 
 % Run the simulation
 spectrum=doublerot(spin_system,@overtone_pa,parameters,'qnmr');

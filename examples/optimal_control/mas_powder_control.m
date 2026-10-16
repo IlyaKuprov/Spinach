@@ -31,7 +31,6 @@ parameters.grid='rep_2ang_100pts_sph';      % powder grid
 parameters.max_rank=8;                      % spinner rank
 parameters.spins={'87Rb'};                  % spins involved
 parameters.rframes={{'87Rb',3}};            % rotating frame order
-parameters.verbose=0;                       % diagnostic output
 
 % Drift Liouvillians and classical subspace dimension for the ensemble
 [control.drifts,spc_dim]=drifts(spin_system,@singlerot,parameters,'qnmr');

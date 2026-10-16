@@ -72,7 +72,6 @@ parameters.zerofill=1024;
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
 parameters.coil=coil_state(spin_system,'L+','1H');
-parameters.verbose=1;
 
 % Simulation
 fid=singlerot(spin_system,@acquire,parameters,'nmr');

@@ -39,7 +39,6 @@ parameters.rframes={{'14N',2}};
 parameters.axis_units='Hz';
 parameters.rho0=state(spin_system,'L+','14N');
 parameters.coil=coil_state(spin_system,'L+','14N');
-parameters.verbose=0;
 
 % Simulation
 fid=singlerot(spin_system,@acquire,parameters,'labframe');

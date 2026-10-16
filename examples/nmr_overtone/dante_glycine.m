@@ -58,7 +58,6 @@ parameters.rf_frq=48e3;
 parameters.method='average';
 parameters.n_periods=4;
 parameters.pulse_num=2;
-parameters.verbose=0;
 
 % Simulation
 spectrum=singlerot(spin_system,@overtone_dante,parameters,'qnmr');

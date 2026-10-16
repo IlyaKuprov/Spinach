@@ -42,7 +42,6 @@ parameters.decouple={};
 parameters.offset=0;
 parameters.grid='rep_2ang_100pts_sph';
 parameters.rframes={{'2H',2}};
-parameters.verbose=0;
 
 % Drift Liouvillians for the ensemble
 control.drifts=drifts(spin_system,@powder,parameters,'labframe');

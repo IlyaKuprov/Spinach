@@ -61,7 +61,6 @@ parameters.rf_pwr=2*pi*55e3/sin(theta);
 parameters.rf_dur=260e-6;
 parameters.rf_frq=48e3;
 parameters.method='average';
-parameters.verbose=0;
 
 % Simulation
 spectrum=singlerot(spin_system,@overtone_pa,parameters,'qnmr');

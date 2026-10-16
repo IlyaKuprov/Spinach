@@ -58,7 +58,6 @@ parameters.sweep=[NaN 1/(33e-6)]; % f1 f2
 parameters.npoints=[128 512];     % f1 f2
 parameters.zerofill=[512 2048];   % f1 f2
 parameters.nblocks=4;             % Number of FSLG blocks
-parameters.verbose=1;
 parameters.invert_axis=1;
 
 % Simulation

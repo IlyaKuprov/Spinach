@@ -65,7 +65,6 @@ parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','13C');
 parameters.coil=coil_state(spin_system,'L+','13C');
-parameters.verbose=1;
 
 % Simulation
 fid=floquet(spin_system,@acquire,parameters,'nmr');

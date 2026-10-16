@@ -51,7 +51,6 @@ parameters.npoints=128;
 parameters.zerofill=1024;
 parameters.spins={'13C'};
 parameters.grid='rep_2ang_200pts_sph';
-parameters.verbose=0;
 
 % Numerical rotating frame transforms
 parameters.rframes={{'13C',1},{'14N',2}};

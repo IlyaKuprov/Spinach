@@ -1,7 +1,7 @@
 % Compares the CUDA sparse-product MEX with independent CPU products.
 % Tests three shapes and all four real/complex operand combinations.
 % The tolerance bounds roundoff in both CPU and GPU complex dot products.
-% GPU coverage requires MATLAB R2026b or later and a loadable gateway.
+% GPU coverage requires MATLAB R2026a or later and a loadable gateway.
 % Syntax:
 %
 %                  result=test_cuda_product()
@@ -17,12 +17,16 @@ function result=test_cuda_product() % #NGRUM
 % State the independent reference and report missing GPU prerequisites
 result=new_test_result('kernel/cuda_product','CUDA sparse matrix product',...
                        'CUDA sparse products must agree with independent CPU products.');
-if isMATLABReleaseOlderThan('R2026b')
-    result.messages{end+1}='SKIP: CUDA sparse products require MATLAB R2026b or later.';
+if isMATLABReleaseOlderThan('R2026a')
+    result.messages{end+1}='SKIP: CUDA sparse products require MATLAB R2026a or later.';
     return;
 end
 if (exist('canUseGPU','file')==0)||(~canUseGPU())
     result.messages{end+1}='SKIP: CUDA sparse products require a usable GPU.';
+    return;
+end
+if str2double(gpuDevice().ComputeCapability)<7
+    result.messages{end+1}='SKIP: shipped CUDA gateway requires compute capability 7.0 or later.';
     return;
 end
 if exist('cuda_sparse_by_sparse_mex','file')~=3

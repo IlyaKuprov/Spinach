@@ -1,7 +1,7 @@
 % MEX compilation utility. Rebuilds all C++ and CUDA MEX binaries of
 % the Spinach installation that contains this file, placing
 % each binary next to its source. CUDA compilation requires
-% MATLAB R2026b or later, mexcuda, a supported host C++ compiler,
+% MATLAB R2026a or later, mexcuda, a supported host C++ compiler,
 % and the CUDA driver library. Windows uses CUDA_PATH/lib/x64 when
 % CUDA_PATH is set; otherwise mexcuda's library search is used.
 % macOS CUDA-unavailable errors are reported after the C++ builds;
@@ -40,8 +40,8 @@ mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
 % Enforce the CUDA sparse-storage release contract
-if isMATLABReleaseOlderThan('R2026b')
-    disp('CUDA sparse-product MEX compilation skipped: requires R2026b or later.');
+if isMATLABReleaseOlderThan('R2026a')
+    disp('CUDA sparse-product MEX compilation skipped: requires R2026a or later.');
     return;
 end
 

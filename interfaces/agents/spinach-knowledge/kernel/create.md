@@ -65,3 +65,7 @@ With GPU arithmetic enabled, `create` sets the selected GPU's `CachePolicy` to `
 ## ValueStore cache preservation
 
 When reusing a parallel pool, `create` clears its ValueStore only if none of `op_cache`, `ham_cache`, or `prop_cache` is enabled in `sys.enable`. Enabling any of these options preserves the entire existing store across spin-system construction.
+
+## MATLAB release maintenance
+
+Use current patched R2026a or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.

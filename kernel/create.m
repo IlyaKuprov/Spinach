@@ -315,6 +315,19 @@ if ~isworkernode
         report(spin_system,['         > parallel profile:  ' spin_system.sys.parallel{1}]);
         report(spin_system,['         > workers requested: ' num2str(spin_system.sys.parallel{2})]);
 
+        % Expand the Windows R2026a pool port range before starting workers
+        if ispc&&isMATLABReleaseOlderThan('R2026b')
+            pool_port_range=[20001 44999];
+            port_rng_str=[num2str(pool_port_range(1)) ' ' ...
+                          num2str(pool_port_range(2))];
+            pctconfig('portrange',pool_port_range);
+            setenv('PARALLEL_SERVER_OVERRIDE_PORT_RANGE',port_rng_str);
+            pool_env_vars={'PARALLEL_SERVER_OVERRIDE_PORT_RANGE'};
+            report(spin_system,['         > worker port range: ' ...
+                                num2str(pool_port_range(1)) '-' ...
+                                num2str(pool_port_range(2))]);
+        end
+
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
 
@@ -357,7 +370,12 @@ if ~isworkernode
         maxNumCompThreads(feature('numcores'));
         
         % Start the parallel pool
-        current_pool=parpool(c,spin_system.sys.parallel{2});
+        if ispc&&isMATLABReleaseOlderThan('R2026b')
+            current_pool=parpool(c,spin_system.sys.parallel{2},...
+                                 'EnvironmentVariables',pool_env_vars);
+        else
+            current_pool=parpool(c,spin_system.sys.parallel{2});
+        end
 
         % Disable pool timeout
         current_pool.IdleTimeout=Inf;

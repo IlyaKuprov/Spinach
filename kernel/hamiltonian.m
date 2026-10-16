@@ -610,6 +610,11 @@ if ismember('ham_cache',spin_system.sys.enable)
                            spin_system.bas.basis_hash,spin_system.inter.giant});
     end
 
+    % Include rounding and storage policy in the cache identity
+    ham_hash=md5_hash({ham_hash,spin_system.tols.liouv_zero,...
+                      spin_system.tols.small_matrix,spin_system.tols.dense_matrix,...
+                      ismember('clean-up',spin_system.sys.disable)});
+
     % Get ValueStore, unless the client has no parallel pool
     if ~isworkernode
         pool=gcp('nocreate');

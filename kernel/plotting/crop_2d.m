@@ -34,6 +34,8 @@
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=crop_2d.m>
+%
+% parameters.offset is optional; its default is [0 0].
 
 function [spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)
 

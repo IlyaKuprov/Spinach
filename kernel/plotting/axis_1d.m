@@ -39,6 +39,9 @@
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=axis_1d.m>
+%
+% parameters.offset is optional for scalar sweep widths (default: 0).
+% For two-endpoint sweeps, parameters.offset must remain absent.
 
 function [ax,ax_label]=axis_1d(spin_system,parameters)
 

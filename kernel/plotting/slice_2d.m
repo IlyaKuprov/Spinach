@@ -55,6 +55,8 @@
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=slice_2d.m>
+%
+% parameters.offset is optional; its default is [0 0].
 
 function slice_2d(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)
 

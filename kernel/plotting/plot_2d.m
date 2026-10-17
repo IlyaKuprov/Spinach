@@ -67,6 +67,8 @@
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_2d.m>
+%
+% parameters.offset is optional; its default is [0 0].
 
 function [axis_f1,axis_f2,spectrum]=plot_2d(spin_system,spectrum,...
                                             parameters,ncont,delta,...

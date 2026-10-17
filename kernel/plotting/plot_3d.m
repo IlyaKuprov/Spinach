@@ -52,6 +52,8 @@
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_3d.m>
+%
+% parameters.offset is optional; its default is [0 0 0].
 
 function plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)
 

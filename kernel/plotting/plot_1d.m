@@ -36,6 +36,9 @@
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_1d.m>
+%
+% parameters.offset is optional for scalar sweep widths (default: 0).
+% For two-endpoint sweeps, parameters.offset must remain absent.
 
 function plot_1d(spin_system,spectrum,parameters,varargin)
 

@@ -29,6 +29,8 @@
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=stack_2d.m>
+%
+% parameters.offset is optional; its default is [0 0].
 
 function stack_2d(spin_system,spectrum,parameters,stack_dim,alpha_fun)
 

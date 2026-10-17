@@ -19,7 +19,3 @@ Both systems use the `sphten-liouv` formalism with the `IK-0` approximation, lon
 ## Spectrum processing
 
 The summed FID receives exponential apodisation with parameter 6, then a Fourier transform. The plotted trace is the real part of the calculated spectrum.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

@@ -11,7 +11,3 @@ The calculation uses the spherical-tensor Liouville-space basis with no approxim
 ## Signal and display
 
 The initial state and receiver coil are both the proton `L+` state. `@acquire` produces the FID using 512 points, a sweep setting of 2e4, offset 0, and zero filling to 4096. The display axis is configured in ppm with inversion enabled. The code applies exponential apodisation parameter 6, computes `fftshift(fft(fid,parameters.zerofill))`, and plots its real part with `plot_1d`. This plotted spectrum is a computed result from the configured model, not an experimentally measured spectrum.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

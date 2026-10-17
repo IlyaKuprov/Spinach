@@ -15,7 +15,3 @@ The source header identifies Fokker–Planck theory and says perturbative correc
 The rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]` and rate `1000 Hz`; powder settings are `leb_2ang_rank_17` and `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, offset 0, and ppm axis units; it selects `2H`, leaves `decouple={}`, and sets `invert_axis=1`. Both initial state and receiver are `L+` on `2H`.
 
 The returned FID is exponentially apodised with parameter `6`, Fourier transformed with `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted using `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

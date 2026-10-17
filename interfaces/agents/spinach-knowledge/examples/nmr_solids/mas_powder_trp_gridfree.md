@@ -19,7 +19,3 @@ The basis uses `sphten-liouv`, `IK-0`, longitudinal `15N`, projection +1, and in
 ## Spectrum processing
 
 The summed FID is exponentially apodised with parameter 6 and Fourier transformed. The plotted trace is the real part of the calculated spectrum.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

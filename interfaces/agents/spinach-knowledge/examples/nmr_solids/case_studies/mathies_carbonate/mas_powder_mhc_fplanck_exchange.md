@@ -20,7 +20,3 @@ The source sets the MAS rate parameter to 10,000 (no unit is written beside this
 The simulation applies exponential apodisation with parameter 6 to the computed FID, Fourier transforms it, and plots the real spectrum with `plot_1d`. Its input is the CASTEP-derived structural/shielding data in `mhc.magres`; it does not load an experimental FID or measured spectrum. The output is a simulated MAS spectrum.
 
 The rate matrix is represented by two explicit first-order reaction records. Atom matching pairs equal-position spin indices in the two declared parts in both directions; the permuted geometry/tensors represent the conformational exchange. Detection uses unweighted `coil_state`.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

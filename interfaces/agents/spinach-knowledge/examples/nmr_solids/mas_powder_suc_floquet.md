@@ -15,7 +15,3 @@ The rotor-axis vector is `1 1 1`, MAS rate is `6000` Hz, maximum rank is 23, swe
 ## Calculation and display
 
 The source calls `floquet(spin_system,@acquire,parameters,'nmr')` with grid `leb_2ang_rank_23`. The initial state and receiver are both `L+` on `13C`. It exponentially apodises the calculated FID with parameter 6, Fourier transforms to 1024 points, and plots the real spectrum with `plot_1d`. These are simulated settings and output, not experimental measurements.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

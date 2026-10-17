@@ -17,7 +17,3 @@ The source sets the rotor axis to `[sqrt(2/3) 0 sqrt(1/3)]`, MAS rate to `2000 H
 The code calls `singlerot`, applies exponential apodisation with parameter `6`, computes `fftshift(fft(fid,parameters.zerofill))`, and plots `real(spectrum)` with `plot_1d`. The output is a simulation spectrum; this source does not supply experimentally measured output or report a numerical comparison.
 
 Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

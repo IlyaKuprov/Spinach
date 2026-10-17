@@ -21,7 +21,3 @@ This is a four-spectrum fitting wrapper around singlerot and acquire, not a CP o
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

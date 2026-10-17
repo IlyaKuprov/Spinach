@@ -14,7 +14,3 @@ The field parameter is 14.1. The quadrupolar interaction is `eeqq2nqi(3.06e6, 0.
 ## Acquisition and processing
 
 Both the initial state and receiver are the 14N `L+` state. Acquisition uses sweep 50000, 256 points, zero-fill to 1024, and offset 18000; the frequency-axis units are explicitly set to Hz. The FID receives exponential apodisation with parameter 6, is Fourier transformed, and the real part is plotted.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

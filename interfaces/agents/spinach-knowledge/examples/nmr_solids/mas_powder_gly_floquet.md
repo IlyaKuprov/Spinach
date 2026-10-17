@@ -11,7 +11,3 @@ The basis is spherical-tensor Liouville space with no approximation, projection 
 ## Signal and display
 
 Both the initial state and receiver coil are the 13C `L+` state. The code requests 256 points, a sweep setting of 5e4, zero filling to 1024, offset 17000, and a ppm axis with inversion enabled. It applies exponential apodisation parameter 6 to the FID, Fourier transforms with `fftshift`, then plots the real spectrum using `plot_1d`. The result is a computed spectrum from the imported model and acquisition settings, not an experimentally measured spectrum.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

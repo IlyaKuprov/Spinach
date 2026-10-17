@@ -11,7 +11,3 @@ This is a simulated one-dimensional rotor-synchronised ²H acquisition, not a me
 No apodisation is applied; the plotted signal is the real part of the Fourier-transformed simulated FID. The source cites Figure 2 of Umit Akbey et al., Journal of Magnetic Resonance (2021), DOI: https://doi.org/10.1016/j.jmr.2021.106974.
 
 The exchange network is declared as directed first-order reaction records, one for each ordered pair of distinct sites, with rate `1e4` and a one-spin atom match. Initial coherence uses concentration-weighted `state`; detection uses unweighted `coil_state`.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

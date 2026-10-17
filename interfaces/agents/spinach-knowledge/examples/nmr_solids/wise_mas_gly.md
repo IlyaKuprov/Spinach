@@ -19,7 +19,3 @@ The wise sequence uses 1H and 13C channels, offsets [2000, 10000] Hz, high-power
 singlerot returns cosine and sine FIDs. Each is apodised with a squared-cosine window; the first-dimension transforms are combined as real cosine plus i times real sine, then Fourier transformed in the second dimension. The plotted observable is the real part of the resulting two-dimensional spectrum.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

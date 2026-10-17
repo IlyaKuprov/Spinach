@@ -26,7 +26,3 @@ The input is the CASTEP-derived structural/shielding data in `mhc.magres`; this 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
 
 The rate matrix is represented by two explicit first-order reaction records. Atom matching pairs equal-position spin indices in the two declared parts in both directions; the permuted geometry/tensors represent the conformational exchange. Detection uses unweighted `coil_state`.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

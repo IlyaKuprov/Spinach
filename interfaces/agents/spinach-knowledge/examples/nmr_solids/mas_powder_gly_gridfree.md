@@ -17,7 +17,3 @@ The MAS rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]` and rate is `2000 Hz` (2 kHz); p
 After `gridfree` returns the FID, the script applies exponential apodisation parameter `6`, Fourier transforms with `fftshift(fft(fid,parameters.zerofill))`, and plots the real spectrum via `plot_1d`. These are model and processing settings for a computed spectrum; this file does not provide experimental measured output or a numerical comparison.
 
 Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

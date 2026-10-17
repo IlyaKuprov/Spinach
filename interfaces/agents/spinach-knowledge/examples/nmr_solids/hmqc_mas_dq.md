@@ -15,7 +15,3 @@ The wrapper calls singlerot with @cn2d_dq and the qnmr mode. That selects the DQ
 The source comment estimates hours on CPU or minutes on a Tesla V100 GPU. This is a code comment, not a measured result reported by this page; the example does not supply a measured spectrum, benchmark record, or validation claim.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

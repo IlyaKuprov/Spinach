@@ -17,7 +17,3 @@ The basis is `sphten-liouv` with no approximation. The no-argument function sets
 `singlerot(spin_system,@acquire,parameters,'nmr')` generates the signal using the single-rotation MAS acquisition pathway. The code applies exponential apodisation with parameter 6, Fourier-transforms and shifts the spectrum, then plots its real part with `plot_1d`.
 
 The page describes the simulated spectrum only; it does not claim a measured line shape, fitted exchange rate, or quantitative match to data. See the [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/kinetics/mas_exchange_1.m) for the complete interaction and sequence setup.
-
-## Rotor convention
-
-The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

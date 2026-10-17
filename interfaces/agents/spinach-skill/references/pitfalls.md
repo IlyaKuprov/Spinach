@@ -264,6 +264,11 @@ is insufficient: its selected method must reach `evolution`, or a subsequent
 acquisition must do so. Path tracing and symmetry can be disabled
 with `sys.disable={'pt','symmetry'}` for debugging, potentially at a large cost.
 
+Horizontal wavefunction and Liouville-state stacks are screened using their
+actual columns; enabled ZTE retains the union of their populated coordinates.
+ZTE propagates columns in bounded batches and scales each separately, so weak
+columns above `zte_tol` are not judged against another column's scale.
+
 Matrices switch to sparse algebra automatically, and above a state-space
 dimension of 10000 (a tunable tolerance) Spinach uses Krylov propagation
 rather than forming the propagator. When writing custom sequences for large

@@ -116,7 +116,7 @@ cR=-1.5;
 H_dir_L=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hc*Hd{2}-Hd{2}*Hc);
 H_dir_R=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hd{1}*Hc-Hc*Hd{1});
 H=(Hd{1}+Hd{2})/2+cL*H_dir_L+cR*H_dir_R;
-dc=1e-6;
+dc=eps('double')^(1/3);
 DL_ref=(expm(-1i*dt*(H+dc*H_dir_L))-expm(-1i*dt*(H-dc*H_dir_L)))/(2*dc);
 DR_ref=(expm(-1i*dt*(H+dc*H_dir_R))-expm(-1i*dt*(H-dc*H_dir_R)))/(2*dc);
 result=test_close(result,'trapdiff left derivative',DL,DL_ref,1e-10,1e-10,...
@@ -243,7 +243,7 @@ end
 function grad=local_finite_grad(fun,x)
 
 % Compute a centred finite-difference gradient
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 grad=zeros(size(x));
 for n=1:numel(x)
     x_plus=x;
@@ -259,7 +259,7 @@ end
 function hess=local_finite_hess(fun,x)
 
 % Compute a centred finite-difference Hessian
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 grad=fun(x);
 hess=zeros(numel(grad),numel(x));
 for n=1:numel(x)

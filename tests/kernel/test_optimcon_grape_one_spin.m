@@ -105,7 +105,7 @@ result=test_close(result,'grape_hilb fidelity',fidelity,fid_ref,1e-13,1e-13,...
                   'GRAPE fidelity must match direct Hilbert-space propagation');
 
 % Compute a centred finite-difference gradient of the GRAPE fidelity
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 grad_ref=zeros(size(waveform));
 for n=1:numel(waveform)
     wf_plus=waveform;

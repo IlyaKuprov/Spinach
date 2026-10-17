@@ -32,7 +32,7 @@ for n=1:numel(formalisms)
     spin_system=optimcon(spin_system,control);
 
     % Random guess and finite diff increment
-    guess=randn(2,5)/3; h=sqrt(eps('double'));
+    guess=randn(2,5)/3; h=eps('double')^(1/3);
 
     % Call GRAPE and request analytical Hessian
     [~,~,~,hess_anl]=grape_xy(guess,spin_system);

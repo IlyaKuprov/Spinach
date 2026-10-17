@@ -18,8 +18,8 @@ dL_da=@(a,b,c)(A+(c^4)*C+b*c*B*C);
 dL_db=@(a,b,c)(-c*sin(b)*B+a*c*B*C);
 dL_dc=@(a,b,c)(cos(b)*B+(4*a*c^3)*C+a*b*B*C);
 
-% Real coefficients and fin. diff. increment
-x=randn(1); y=randn(1); z=randn(1); h=sqrt(eps);
+% Real coefficients and fourth-order central difference increment
+x=randn(1); y=randn(1); z=randn(1); h=eps('double')^(1/5);
 
 % First parameter
 P=f([  L(x,y,z)   dL_da(x,y,z);

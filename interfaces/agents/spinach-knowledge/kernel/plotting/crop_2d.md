@@ -25,3 +25,7 @@ The cropped matrix is `spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`. The n
 
 - `spec` — cropped 2-D matrix, with retained F1 rows and F2 columns.
 - `parameters` — updated `zerofill`, `sweep`, and `offset`; other fields are carried through.
+
+## Omitted offsets
+
+When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

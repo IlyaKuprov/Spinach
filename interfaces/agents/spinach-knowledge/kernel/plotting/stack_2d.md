@@ -21,3 +21,7 @@ Draw a 2D NMR spectrum as stacked line traces in the current axes. Spectrum valu
 
 Frequency coordinates are made with `ft_axis` using offsets, sweep widths, and the matching spectrum dimension. `ppm` and `Gauss` axes use the spin and field data; `Hz`, `kHz`, and `MHz` rescale the frequency axis, while `points` uses sample indices. If any imaginary data are nonzero, the function recursively plots the real part and then the imaginary part on the same axes.
 Each slice opacity is evaluated by `alpha_fun`, normalised by the largest opacity, and floored at `0.01`. The function draws patch-line traces, tightens the horizontal limits, enables the grid and perspective projection, orbits the camera, reverses both horizontal axis directions, and labels F1/F2. It updates the current figure and returns no data or file.
+
+## Omitted offsets
+
+When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

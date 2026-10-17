@@ -22,3 +22,7 @@ The matrix is transposed before `contour(axis_f2,axis_f1,...)`. The function use
 Input and contour controls have source guards, including matrix input, one-or-two-element axis parameters, valid unit names, positive integer counts for `ncont`, `ncol`, and `m`, and a character `signs` option. Neither `nfft` nor `dwell` is read by this plotting routine.
 
 [Wiki reference](https://spindynamics.org/wiki/index.php?title=plot_2d.m)
+
+## Omitted offsets
+
+When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

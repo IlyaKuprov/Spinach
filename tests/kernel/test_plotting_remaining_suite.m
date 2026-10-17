@@ -92,6 +92,7 @@ parameters.axis_units='Hz';
 [axis_hz,axis_label]=axis_1d(spin_system,parameters);
 result=test_close(result,'axis_1d Hz values',axis_hz,[-300 -200 -100 0 100 200 300 400],1e-12,1e-12,...
                   'axis_1d delegates scalar sweep specifications to ft_axis');
+
 % Compare omitted and explicit zero, retaining nonzero carriers
 zero_params=rmfield(parameters,'offset');
 [axis_zero,~]=axis_1d(spin_system,zero_params);
@@ -122,6 +123,7 @@ range_params.axis_units='Hz';
 [range_axis,range_label]=axis_1d(spin_system,range_params);
 result=test_close(result,'axis_1d range values',range_axis,linspace(-200,300,6),1e-12,1e-12,...
                   'axis_1d preserves explicit two-bound sweep specifications');
+
 % Endpoint sweeps must not accept even an explicitly zero carrier
 bad_range=range_params;
 bad_range.offset=0;

@@ -518,3 +518,9 @@ The derivative is composed through ordinary multiplication of three polyadics: i
 `shaped_pulse_af` also uses the shared `fourdif(spin_system,N,m)` phase derivative when polyadics are enabled and its method is `expv` or `evolution`. The `expm` method retains an explicit phase derivative, but requires materialisable background and RF operators. A Fourier-flow background constructed with polyadics enabled is action-only and is rejected by `expm`; disable polyadics before constructing that background when an explicit effective pulse propagator is required. Changing the switch at the pulse call does not materialise an existing implicit background.
 
 `fourdif(spin_system,N,m)` returns the same canonical `[0,2*pi)` grid in both modes. Its second output is explicit unless `spin_system.sys.enable` contains `polyadic`; then it is an implicit FFT derivative. For period `extent`, multiply it by `(2*pi/extent)^m`. Matrix-only callers must use a local system copy without the polyadic option.
+
+## Carrier defaults and rotor convention
+
+Existing simulation contexts default omitted carrier offsets to zero per channel. Plotting and axis consumers also accept omitted offsets: `axis_1d` and `plot_1d` use scalar zero for scalar sweep widths, 2D plotting/cropping uses `[0 0]`, and `plot_3d` uses `[0 0 0]`. Explicit endpoint sweeps in 1D must still omit offsets. Preserve explicit nonzero values; these local defaults do not mutate the caller parameter structure.
+
+Use `[sqrt(2/3) 0 sqrt(1/3)]` for fixed single-rotor example axes. Keep deliberate magic-angle calibration perturbations around that nominal axis and do not replace double-rotor axes.

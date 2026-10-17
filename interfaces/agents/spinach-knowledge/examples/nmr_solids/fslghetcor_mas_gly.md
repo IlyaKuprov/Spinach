@@ -21,3 +21,7 @@ The simulation returns cosine and sine channels, each apodised with squared-cosi
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_solids/fslghetcor_mas_gly.m
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+## Rotor convention
+
+The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

@@ -12,8 +12,12 @@ This example constructs a computed 13C MAS spectrum for glycine powder with the 
 
 ## MAS acquisition and spectrum
 
-The MAS rotor axis is `[1 1 1]` and rate is `2000 Hz` (2 kHz); powder settings are `leb_2ang_rank_23` and `max_rank=23`. The acquisition sweep is `5e4 Hz` with 256 points, zero-fill 1024, and `offset=17000`. It selects `13C`, assigns `axis_units='ppm'`, sets `invert_axis=1`, and explicitly leaves `decouple={}`. Both initial state and receiver are `L+` on `13C`.
+The MAS rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]` and rate is `2000 Hz` (2 kHz); powder settings are `leb_2ang_rank_23` and `max_rank=23`. The acquisition sweep is `5e4 Hz` with 256 points, zero-fill 1024, and `offset=17000`. It selects `13C`, assigns `axis_units='ppm'`, sets `invert_axis=1`, and explicitly leaves `decouple={}`. Both initial state and receiver are `L+` on `13C`.
 
 After `gridfree` returns the FID, the script applies exponential apodisation parameter `6`, Fourier transforms with `fftshift(fft(fid,parameters.zerofill))`, and plots the real spectrum via `plot_1d`. These are model and processing settings for a computed spectrum; this file does not provide experimental measured output or a numerical comparison.
 
 Related source documentation: [g2spinach.m](../../../../../interfaces/g2spinach.m).
+
+## Rotor convention
+
+The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

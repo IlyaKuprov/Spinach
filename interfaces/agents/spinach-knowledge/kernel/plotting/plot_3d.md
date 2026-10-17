@@ -28,3 +28,7 @@ The local guards require a real numeric 3D cube; three-element offsets, sweeps, 
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/plot_3d.m)
 - [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=plot_3d.m)
+
+## Omitted offsets
+
+When `parameters.offset` is absent, the function assumes `[0 0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

@@ -14,8 +14,12 @@ The code separately builds the two unit-cell molecules. Its 11 indexed isotropic
 
 ## Floquet calculation and acquisition
 
-Both systems use the `sphten-liouv` formalism with the `IK-0` approximation, longitudinal `15N`, projection +1, and interaction level 3. The setup uses a 14 kHz rotor rate with axis vector `[1 1 1]`, rank 11, and the `leb_2ang_rank_11` orientation grid. For each molecule, the script calls `floquet` in NMR mode and adds its FID to the other. Acquisition is on `13C` with `L+` initial and receiver states, a 100 kHz sweep, 2048 points, 8192-point zero filling, and zero offset. The source sets the display axis to ppm and inverts it.
+Both systems use the `sphten-liouv` formalism with the `IK-0` approximation, longitudinal `15N`, projection +1, and interaction level 3. The setup uses a 14 kHz rotor rate with axis vector `[sqrt(2/3) 0 sqrt(1/3)]`, rank 11, and the `leb_2ang_rank_11` orientation grid. For each molecule, the script calls `floquet` in NMR mode and adds its FID to the other. Acquisition is on `13C` with `L+` initial and receiver states, a 100 kHz sweep, 2048 points, 8192-point zero filling, and zero offset. The source sets the display axis to ppm and inverts it.
 
 ## Spectrum processing
 
 The summed FID receives exponential apodisation with parameter 6, then a Fourier transform. The plotted trace is the real part of the calculated spectrum.
+
+## Rotor convention
+
+The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

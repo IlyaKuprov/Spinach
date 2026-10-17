@@ -10,7 +10,7 @@ Build the coordinate vector and text label for a one-dimensional spectrum axis. 
 
 ## Axis construction
 
-`parameters.sweep` is either one real numeric value or two. For a scalar sweep, `parameters.offset` must be present and scalar; the function delegates construction to `ft_axis(parameters.offset,parameters.sweep,parameters.zerofill)`. The offset is relative to the magnet frequency in Hz. For a two-element sweep, the first endpoint must be less than the second, `offset` must be absent, and the Hz coordinates are `linspace(sweep(1),sweep(2),zerofill)`. Both paths produce the requested number of points and report the endpoint range through `report`.
+`parameters.sweep` is either one real numeric value or two. For a scalar sweep, `parameters.offset` defaults to zero when omitted and must be scalar when supplied; the function delegates construction to `ft_axis(parameters.offset,parameters.sweep,parameters.zerofill)`. The offset is relative to the magnet frequency in Hz. For a two-element sweep, the first endpoint must be less than the second, `offset` must be absent, and the Hz coordinates are `linspace(sweep(1),sweep(2),zerofill)`. Both paths produce the requested number of points and report the endpoint range through `report`.
 
 The spin's reference frequency is calculated as `basefrq=-spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`. Any characters before the first letter in the spin label are formatted as an isotope superscript in the returned label when present; for example, the existing input example `{'1H'}` is accepted as the one-element `parameters.spins` cell.
 
@@ -37,7 +37,7 @@ For magnetic-field conversion the source uses the electron spin frequency throug
 ## Inputs and outputs
 
 - `parameters.sweep`: sweep width (scalar) or ascending Hz endpoints (two values).
-- `parameters.offset`: required scalar only with a scalar sweep.
+- `parameters.offset`: optional scalar with a scalar sweep, default zero; must be absent with endpoint sweeps.
 - `parameters.zerofill`: positive integer axis length.
 - `parameters.axis_units`: one of the unit names in the table.
 - `parameters.spins`: one-element cell naming the spin, such as `{'1H'}`.

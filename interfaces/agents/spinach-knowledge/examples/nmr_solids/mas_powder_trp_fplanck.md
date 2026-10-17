@@ -14,10 +14,14 @@ For the two unit-cell molecules, the first eight indexed shift values are 124.2,
 
 ## Fokker-Planck calculation and acquisition
 
-The basis is `sphten-liouv` with `IK-0`, longitudinal `15N`, projection +1, and interaction level 3. The rotor rate is 14 kHz about axis vector `[1 1 1]`; the calculation uses rank 11 and the named `leb_2ang_rank_11` grid. Each system is propagated by `singlerot` with `acquire` in NMR mode, and the two FIDs are added. Acquisition uses a 100 kHz sweep, 2048 points, 8192-point zero filling, and `13C` `L+` initial and receiver states. The source enables the GPU for the second molecule; the GPU-enable line for the first is commented out.
+The basis is `sphten-liouv` with `IK-0`, longitudinal `15N`, projection +1, and interaction level 3. The rotor rate is 14 kHz about axis vector `[sqrt(2/3) 0 sqrt(1/3)]`; the calculation uses rank 11 and the named `leb_2ang_rank_11` grid. Each system is propagated by `singlerot` with `acquire` in NMR mode, and the two FIDs are added. Acquisition uses a 100 kHz sweep, 2048 points, 8192-point zero filling, and `13C` `L+` initial and receiver states. The source enables the GPU for the second molecule; the GPU-enable line for the first is commented out.
 
 ## Spectrum processing
 
 The summed FID is exponentially apodised with parameter 6, Fourier transformed, and plotted as its real spectrum. The simulation settings are not measured spectral output.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+## Rotor convention
+
+The fixed single-rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]`, a unit vector at the magic angle to the laboratory z axis.

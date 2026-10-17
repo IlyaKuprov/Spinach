@@ -28,4 +28,4 @@ The cropped matrix is `spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`. The n
 
 ## Omitted offsets
 
-When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.
+When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets specify the input spectral axes. Cropping returns updated parameters, including offsets recentered on the retained grid; assigning the second output back to the caller parameter structure retains those updates.

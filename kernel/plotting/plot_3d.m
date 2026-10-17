@@ -45,6 +45,9 @@
 %
 % where smin and smax are computed from the spectrum cube. 
 %
+% Omitted parameters.offset defaults to zero on each plotted axis.
+% Explicit offsets are retained for construction of the input axes.
+%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %

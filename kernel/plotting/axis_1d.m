@@ -33,6 +33,9 @@
 %
 % Note: magnetic field units use the free electron g-tensor for conversion.
 %
+% For a scalar sweep, omitted parameters.offset defaults to zero.
+% For a two-endpoint sweep, parameters.offset must remain absent.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=axis_1d.m>

@@ -10,7 +10,7 @@
 %   crop_ranges - cropping bounds, supplied in the following
 %                 format: {[f1_min f1_max],[f2_min f2_max]}
 %
-% The following subfields are used in the parameters structure:
+% The following subfields are required in the parameters structure:
 %
 %    parameters.sweep   -    one or two sweep widths, Hz
 %
@@ -27,22 +27,11 @@
 %                 offset, sweep, and zerofill reproduce the
 %                 retained axis points on the ft_axis grid
 %
-% Omitted parameters.offset defaults to zero on each plotted axis.
-% Explicit offsets are retained for construction of the input axes.
-% Cropping returns offsets recentered on the retained spectral grid.
-%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=crop_2d.m>
-%
-% parameters.offset is optional; its default is [0 0].
 
 function [spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)
-
-% Default transmitter offsets
-if ~isfield(parameters,'offset')
-    parameters.offset=zeros(1,2);
-end
 
 % Check consistency
 grumble(spin_system,spec,parameters,crop_ranges);

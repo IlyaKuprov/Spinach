@@ -22,7 +22,3 @@ The input must be a real numeric matrix. The parameter structure must supply spi
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/plot_uf.m)
 - [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=plot_uf.m)
-
-## Omitted offsets
-
-When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

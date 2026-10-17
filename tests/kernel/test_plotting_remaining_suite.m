@@ -92,18 +92,6 @@ parameters.axis_units='Hz';
 [axis_hz,axis_label]=axis_1d(spin_system,parameters);
 result=test_close(result,'axis_1d Hz values',axis_hz,[-300 -200 -100 0 100 200 300 400],1e-12,1e-12,...
                   'axis_1d delegates scalar sweep specifications to ft_axis');
-
-% Compare omitted and explicit zero, retaining nonzero carriers
-zero_params=rmfield(parameters,'offset');
-[axis_zero,~]=axis_1d(spin_system,zero_params);
-zero_params.offset=0;
-[axis_explicit,~]=axis_1d(spin_system,zero_params);
-result=test_close(result,'axis_1d omitted zero',axis_zero,axis_explicit,1e-12,1e-12,...
-                  'missing offset means zero for a scalar sweep width');
-result=test_close(result,'axis_1d nonzero offset',axis_hz-axis_zero,...
-                  100*ones(size(axis_hz)),1e-12,1e-12,...
-                  'explicit nonzero carrier shifts the whole axis');
-
 result=test_true(result,'axis_1d Hz label',contains(axis_label,'offset frequency / Hz'),...
                  'axis_1d labels raw rotating-frame frequency axes');
 
@@ -123,19 +111,6 @@ range_params.axis_units='Hz';
 [range_axis,range_label]=axis_1d(spin_system,range_params);
 result=test_close(result,'axis_1d range values',range_axis,linspace(-200,300,6),1e-12,1e-12,...
                   'axis_1d preserves explicit two-bound sweep specifications');
-
-% Endpoint sweeps must not accept even an explicitly zero carrier
-bad_range=range_params;
-bad_range.offset=0;
-rejected=false;
-try
-    axis_1d(spin_system,bad_range);
-catch
-    rejected=true;
-end
-result=test_true(result,'axis_1d endpoint offset rejected',rejected,...
-                 'two-element endpoint sweeps cannot also specify offsets');
-
 result=test_true(result,'axis_1d range label',contains(range_label,'offset frequency / Hz'),...
                  'axis_1d still labels explicit Hz ranges as offset frequencies');
 

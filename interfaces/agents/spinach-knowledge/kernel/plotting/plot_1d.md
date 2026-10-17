@@ -20,7 +20,3 @@ If the spectrum is complex, it recursively plots the real and imaginary parts, h
 The source checks that the spectrum is numeric and the sweep is real with one or two elements; a two-element sweep must increase and cannot be combined with `offset`. Axis construction also requires a valid `zerofill` count. The documented numeric illustration `{'1H'}` is a spin-label example, not a hard-coded spin selection.
 
 [Wiki reference](https://spindynamics.org/wiki/index.php?title=plot_1d.m)
-
-## Omitted offsets
-
-When `parameters.offset` is absent, the function assumes a scalar zero for a scalar sweep; endpoint sweeps retain their no-offset convention. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

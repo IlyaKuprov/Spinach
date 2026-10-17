@@ -36,15 +36,8 @@
 % mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_uf.m>
-%
-% parameters.offset is optional; its default is [0 0].
 
 function plot_uf(spin_system,spectrum_uf,parameters)
-
-% Default transmitter offsets
-if ~isfield(parameters,'offset')
-    parameters.offset=zeros(1,2);
-end
 
 % Check consistency
 grumble(spectrum_uf,parameters)

@@ -45,22 +45,12 @@
 %
 % where smin and smax are computed from the spectrum cube. 
 %
-% Omitted parameters.offset defaults to zero on each plotted axis.
-% Explicit offsets are retained for construction of the input axes.
-%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_3d.m>
-%
-% parameters.offset is optional; its default is [0 0 0].
 
 function plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)
-
-% Default transmitter offsets
-if ~isfield(parameters,'offset')
-    parameters.offset=zeros(1,3);
-end
 
 % Check consistency
 grumble(spectrum,parameters,nsurf,delta,k,signs);

@@ -22,7 +22,3 @@ The local guards require a numeric matrix; one or two spin entries; one or two o
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/plotting/slice_2d.m)
 - [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=slice_2d.m)
-
-## Omitted offsets
-
-When `parameters.offset` is absent, the function assumes `[0 0]`. Explicit offsets are preserved. Defaults are local to the function and do not populate the caller parameter structure.

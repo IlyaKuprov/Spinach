@@ -33,23 +33,11 @@
 %
 % Note: magnetic field units use the free electron g-tensor for conversion.
 %
-% For a scalar sweep, omitted parameters.offset defaults to zero.
-% For a two-endpoint sweep, parameters.offset must remain absent.
-%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=axis_1d.m>
-%
-% parameters.offset is optional for scalar sweep widths (default: 0).
-% For two-endpoint sweeps, parameters.offset must remain absent.
 
 function [ax,ax_label]=axis_1d(spin_system,parameters)
-
-% Default offset only for sweep-width specification
-if isfield(parameters,'sweep')&&isscalar(parameters.sweep)&&...
-   ~isfield(parameters,'offset')
-    parameters.offset=0;
-end
 
 % Check consistency
 grumble(spin_system,parameters);

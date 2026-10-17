@@ -57,5 +57,3 @@ result = test_plotting_remaining_suite()
 - Tested functions: `ft_axis`, `sweep2ticks`, `fft_freq_axis`, `ifft_time_axis`, `axis_1d`, `bwr_cmap`, `contspacing`, `crop_2d`, `zoom_3d`, `molplot`, `cylgrid`, `plot_uf`, `cst_display`, `efg_display`, `hfc_display`, `int_2d`, `slice_2d`, `write_movie`.
 - Test infrastructure: `new_test_result`, `test_close`, `test_true`, `spin`.
 - [Spinach GitHub repository](https://github.com/IlyaKuprov/Spinach)
-
-The axis tests also compare omitted and explicit zero offsets, preserve nonzero carriers, and reject offsets combined with explicit sweep endpoints.

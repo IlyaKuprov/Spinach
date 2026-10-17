@@ -47,7 +47,7 @@ parameters.coil=coil_state(spin_system,'L+','13C');
 % Experiment setup
 parameters.spins={'1H','13C'};
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=7;
 parameters.grid='rep_2ang_100pts_sph';
 parameters.offset=[2e3 1e4];      % Hz

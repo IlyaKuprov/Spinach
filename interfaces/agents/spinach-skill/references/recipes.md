@@ -180,7 +180,7 @@ CSA, dipolar, quadrupolar, alanine, glycine, sucrose and tryptophan; compare
 `mas_powder_csa_fplanck.m` against `mas_powder_csa_gridfree.m` for two
 formalisms on identical physics. `singlerot` (Fokker-Planck) is the default and
 adds `parameters.rate` (Hz, sign sets the rotation sense),
-`parameters.axis=[1 1 1]` for the magic angle, `parameters.max_rank` and a
+`parameters.axis=[sqrt(2/3) 0 sqrt(1/3)]` for the magic angle, `parameters.max_rank` and a
 Lebedev grid; rank and grid are both convergence parameters and must be raised
 together. `gridfree` takes the same three but no grid, `doublerot` handles DOR.
 Cross polarisation is `cp_powder_static_nh.m` and

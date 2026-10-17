@@ -64,7 +64,7 @@ exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz
 % Experiment setup
 parameters.spins={'1H','13C'};
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=7;
 parameters.grid='rep_2ang_800pts_sph';
 parameters.offset=[2e3 1e4];      % 5 ppm 1H, 100 ppm 13C

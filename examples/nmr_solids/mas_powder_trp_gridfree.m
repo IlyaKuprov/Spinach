@@ -54,7 +54,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment setup
 parameters.rate=14000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.assumptions='nmr';
 parameters.max_rank=11;
 parameters.sweep=1e5;

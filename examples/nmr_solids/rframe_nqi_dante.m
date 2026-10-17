@@ -31,7 +31,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment setup
 parameters.rate=62.5e3;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=35;
 parameters.grid='rep_2ang_200pts_sph';
 parameters.sweep=2000000;

@@ -10,7 +10,7 @@ Simulates a two-dimensional WISE spectrum of alpha-glycine powder under magic-an
 
 ## Spin system and rotor sampling
 
-The seven-spin system is generated from the PCM-DFT glycine structure: two 13C and five 1H sites. The file labels the setting as a 400 MHz spectrometer and sets sys.magnet to 9.4. Isotropic shifts are set to 176.4 and 43.6 for the carbonyl and Cα carbons, 2.6 and 3.8 for the two Hα sites, and 8.0 for each of three HN sites. It uses an sphten-liouv basis with IK-0 approximation and inter-level 3, discarding interactions below 200 Hz. The rotor-axis vector is [1, 1, 1], the rate parameter is 5000, and the orientation grid is rep_2ang_200pts_sph; maximum rank is 9.
+The seven-spin system is generated from the PCM-DFT glycine structure: two 13C and five 1H sites. The file labels the setting as a 400 MHz spectrometer and sets sys.magnet to 9.4. Isotropic shifts are set to 176.4 and 43.6 for the carbonyl and Cα carbons, 2.6 and 3.8 for the two Hα sites, and 8.0 for each of three HN sites. It uses an sphten-liouv basis with IK-0 approximation and inter-level 3, discarding interactions below 200 Hz. The rotor-axis vector is [sqrt(2/3) 0 sqrt(1/3)], the rate parameter is 5000, and the orientation grid is rep_2ang_200pts_sph; maximum rank is 9.
 
 ## WISE acquisition and processing
 

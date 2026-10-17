@@ -518,3 +518,7 @@ The derivative is composed through ordinary multiplication of three polyadics: i
 `shaped_pulse_af` also uses the shared `fourdif(spin_system,N,m)` phase derivative when polyadics are enabled and its method is `expv` or `evolution`. The `expm` method retains an explicit phase derivative, but requires materialisable background and RF operators. A Fourier-flow background constructed with polyadics enabled is action-only and is rejected by `expm`; disable polyadics before constructing that background when an explicit effective pulse propagator is required. Changing the switch at the pulse call does not materialise an existing implicit background.
 
 `fourdif(spin_system,N,m)` returns the same canonical `[0,2*pi)` grid in both modes. Its second output is explicit unless `spin_system.sys.enable` contains `polyadic`; then it is an implicit FFT derivative. For period `extent`, multiply it by `(2*pi/extent)^m`. Matrix-only callers must use a local system copy without the polyadic option.
+
+## Single-rotor convention
+
+Use `[sqrt(2/3) 0 sqrt(1/3)]` for fixed single-rotor example axes. Keep deliberate magic-angle calibration perturbations around that nominal axis and do not replace double-rotor axes.

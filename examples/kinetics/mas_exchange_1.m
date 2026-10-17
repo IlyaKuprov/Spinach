@@ -55,7 +55,7 @@ parameters.axis_units='Hz';
 parameters.invert_axis=1;
 parameters.grid='rep_2ang_200pts_sph';
 parameters.rate=25000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=12;
 
 % Acquisition

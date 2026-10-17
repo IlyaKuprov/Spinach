@@ -428,7 +428,7 @@ function result=local_check_jacobian(result,label,fun,waveform,J,tol)
 x=waveform(:);
 probe=sin((1:numel(x))');
 probe=probe/norm(probe,2);
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 y_plus=fun(x+step_size*probe);
 y_minus=fun(x-step_size*probe);
 jv_ref=(y_plus(:)-y_minus(:))/(2*step_size);
@@ -695,7 +695,7 @@ end
 function grad=local_phase_grad(phi_profile,spin_system)
 
 % Compute a centred finite-difference phase gradient
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 grad=zeros(size(phi_profile));
 for n=1:numel(phi_profile)
     phi_plus=phi_profile;
@@ -740,7 +740,7 @@ end
 function grad=local_grape_liouv_grad(spin_system,drift,controls,waveform,rho_init,rho_targ)
 
 % Compute a centred finite-difference Liouville-GRAPE gradient
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 grad=zeros(size(waveform));
 for n=1:numel(waveform)
     wave_plus=waveform;
@@ -765,7 +765,7 @@ end
 function grad=local_tgrape_grad(spin_system,drift,controls,waveform,dt_grid,rho_init,rho_targ)
 
 % Compute a centred finite-difference TGRAPE duration gradient
-step_size=1e-6;
+step_size=eps('double')^(1/3);
 grad=zeros(size(dt_grid));
 for n=1:numel(dt_grid)
     dt_plus=dt_grid;

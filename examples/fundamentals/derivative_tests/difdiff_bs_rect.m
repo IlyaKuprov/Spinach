@@ -73,7 +73,7 @@ spin_system=optimcon(spin_system,control);
 
 % Build random guess and finite difference increment
 guess=randn(numel(control.operators),numel(control.pulse_dt))/10;
-h=1e-5;
+h=eps('double')^(1/3);
 fail_count=0;
 
 % Request analytical gradient

@@ -22,8 +22,9 @@ for n=1:numel(formalisms)
     B=randn(5)+1i*randn(5); B=(B+B')/20;
 
     % First derivative, numerical
-    D_num=(propagator(spin_system,H+1e-3*A,1)-...
-           propagator(spin_system,H-1e-3*A,1))/2e-3;
+    h=eps('double')^(1/3);
+    D_num=(propagator(spin_system,H+h*A,1)-...
+           propagator(spin_system,H-h*A,1))/(2*h);
 
     % First derivative, analytical
     D_anl=dirdiff(spin_system,H,A,1,2);

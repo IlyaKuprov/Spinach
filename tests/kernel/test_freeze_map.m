@@ -83,7 +83,7 @@ for fixture=1:2
                               'masking must follow the complete waveform-map pullback');
 
             % Differentiate the public objective on free input coordinates
-            for increment=[1e-3 1e-4]
+            for increment=[1e-3 1e-4 eps('double')^(1/3)]
                 numerical=zeros(size(wave));
                 for n=find(~mask(:))'
                     plus=wave; minus=wave;
@@ -150,7 +150,7 @@ for fixture=1:2
                               'free curvilinear coordinates must retain all Cartesian contributions');
 
             % Differentiate the full public objective at two finite-difference increments
-            for increment=[1e-4 1e-5]
+            for increment=[1e-4 1e-5 eps('double')^(1/3)]
                 numerical=zeros(size(gradient));
                 for n=find(~mask(:))'
                     plus=wave; minus=wave;
@@ -210,7 +210,7 @@ for fixture=1:2
                               'Hessian masking must not change the objective');
 
             % Compare active curvature with finite differences of production gradients
-            for increment=[1e-3 1e-4]
+            for increment=[1e-3 1e-4 eps('double')^(1/3)]
                 numerical=zeros(numel(waveform),numel(waveform));
                 for n=find(~mask(:))'
                     plus=waveform; minus=waveform;

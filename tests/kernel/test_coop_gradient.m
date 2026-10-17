@@ -37,7 +37,7 @@ spin_ops=pauli(2);
 formalisms={'zeeman-liouv','zeeman-hilb'};
 measures={'real','square'};
 methods={'lbfgs','rbfgs','newton','goodwin'};
-steps=[1e-3 1e-4 1e-5];
+steps=[1e-3 1e-4 1e-5 eps('double')^(1/3)];
 
 % Exercise a unit target and a nonunit complex detection operator
 for fixture=1:4

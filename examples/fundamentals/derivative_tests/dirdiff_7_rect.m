@@ -41,7 +41,7 @@ for n=1:numel(formalisms)
     spin_system=optimcon(spin_system,control);
 
     % Random phases and finite diff increment
-    guess=randn(1,5)/3; h=sqrt(eps('double'));
+    guess=randn(1,5)/3; h=eps('double')^(1/3);
 
     % Call GRAPE and request analytical gradient
     [~,~,grad_anl]=grape_phase(guess,spin_system);

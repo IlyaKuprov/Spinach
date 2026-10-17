@@ -36,7 +36,7 @@ for n=1:numel(formalisms)
     spin_system=optimcon(spin_system,control);
 
     % Random phases and finite diff increment
-    guess=randn(2,5)/3; h=1e-5;
+    guess=randn(2,5)/3; h=eps('double')^(1/3);
 
     % Call GRAPE and request analytical Hessian
     [~,~,~,hess_anl]=grape_phase(guess,spin_system);

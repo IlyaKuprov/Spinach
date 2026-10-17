@@ -13,7 +13,7 @@
 % and cancellation of primary transfer by the impurity penalty, including
 % an anonymous forwarding adapter, and distinct freeze masks for the two pulses.
 % Independent matrix propagation checks the objective;
-% centred differences at three increments check its phase gradient.
+% centred differences at four increments check its phase gradient.
 % All four optimiser methods must reject unusable assembled initial
 % guesses while permitting objective-only calls and valid optimisation.
 %
@@ -123,7 +123,7 @@ for fixture=1:4
                              numel(traj_data)==2&&iscell(traj_data{1})&&iscell(traj_data{2}),...
                              'The cooperative objective must return both pulse trajectories.');
 
-            % Compare every phase derivative at three finite-difference increments
+            % Compare every phase derivative at four finite-difference increments
             for step_size=steps
                 fd_grad=zeros(size(phase_pair));
                 for n=1:numel(phase_pair)

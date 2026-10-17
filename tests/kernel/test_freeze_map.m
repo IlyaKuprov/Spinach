@@ -149,7 +149,7 @@ for fixture=1:2
             result=test_close(result,[label ' pullback'],gradient(~full_mask),free_grad(~full_mask),1e-12,1e-12,...
                               'free curvilinear coordinates must retain all Cartesian contributions');
 
-            % Differentiate the full public objective at two finite-difference increments
+            % Differentiate the full public objective at three finite-difference increments
             for increment=[1e-4 1e-5 eps('double')^(1/3)]
                 numerical=zeros(size(gradient));
                 for n=find(~mask(:))'

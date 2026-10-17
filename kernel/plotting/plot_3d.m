@@ -52,6 +52,11 @@
 
 function plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)
 
+% Default transmitter offsets
+if ~isfield(parameters,'offset')
+    parameters.offset=zeros(1,3);
+end
+
 % Check consistency
 grumble(spectrum,parameters,nsurf,delta,k,signs);
 

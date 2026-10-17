@@ -39,6 +39,12 @@
 
 function [ax,ax_label]=axis_1d(spin_system,parameters)
 
+% Default offset only for sweep-width specification
+if isfield(parameters,'sweep')&&isscalar(parameters.sweep)&&...
+   ~isfield(parameters,'offset')
+    parameters.offset=0;
+end
+
 % Check consistency
 grumble(spin_system,parameters);
 

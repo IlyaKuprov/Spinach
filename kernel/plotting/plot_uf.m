@@ -39,6 +39,11 @@
 
 function plot_uf(spin_system,spectrum_uf,parameters)
 
+% Default transmitter offsets
+if ~isfield(parameters,'offset')
+    parameters.offset=zeros(1,2);
+end
+
 % Check consistency
 grumble(spectrum_uf,parameters)
 

@@ -33,6 +33,11 @@
 
 function [spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)
 
+% Default transmitter offsets
+if ~isfield(parameters,'offset')
+    parameters.offset=zeros(1,2);
+end
+
 % Check consistency
 grumble(spin_system,spec,parameters,crop_ranges);
 

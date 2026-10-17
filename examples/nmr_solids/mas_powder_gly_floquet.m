@@ -33,7 +33,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment setup
 parameters.rate=2000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=23;
 parameters.sweep=5e4;
 parameters.npoints=256;

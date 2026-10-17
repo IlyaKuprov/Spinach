@@ -45,7 +45,7 @@ inter.coupling.matrix{2,2}=remtrace(nqi);
 
 % Experiment setup
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=5;
 parameters.npoints=128;
 parameters.zerofill=1024;

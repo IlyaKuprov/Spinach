@@ -27,7 +27,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment setup
 parameters.rate=500;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=17;
 parameters.grid='leb_2ang_rank_17';
 parameters.sweep=2e4;

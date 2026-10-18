@@ -329,6 +329,16 @@ result=test_true(result,'inactive flux preserves cross-substance guard',rejected
 
 % Reject non-finite rates before they can enter a physical generator
 sys.output='hush'; sys.parallel={'local',1};
+invalid=inter; invalid.chem.flux_rate=ones(2,2,2); rejected=false;
+try
+    create(sys,invalid);
+catch err
+    rejected=contains(err.message,'square matrix');
+end
+result=test_true(result,'multidimensional flux rejected',rejected,...
+                 'point-to-point rates must form a two-dimensional matrix');
+
+% Reject non-finite rates
 for rate=[NaN Inf -Inf]
     invalid=inter; invalid.chem.flux_rate(1,2)=rate; rejected=false;
     try

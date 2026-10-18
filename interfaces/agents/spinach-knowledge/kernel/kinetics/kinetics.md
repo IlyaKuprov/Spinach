@@ -1,6 +1,6 @@
 # kernel/kinetics/kinetics.m
 
-Reporting is delegated to `kernel/summaries/summary_kinetics.m`: the one-argument form reports flux before basis construction, and the compiled-reaction form reports the network and atom transport.
+Reporting is delegated to two fixed-signature functions in `kernel/summaries`: `summary_rlx_flux(spin_system)` reports flux before basis construction, and `summary_kinetics(spin_system,reactions)` reports the compiled network and atom transport.
 
 ## Direct-sum chemistry
 

@@ -47,7 +47,7 @@ if nargin==1, mode=''; end
 
 % Report restored point-to-point fluxes without compiling their relaxation generator
 if strcmp(mode,'report')
-    summary_kinetics(spin_system);
+    summary_rlx_flux(spin_system);
 
     % create() reports validated flux inputs before basis construction
     if ~isfield(spin_system,'bas')

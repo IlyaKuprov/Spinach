@@ -109,6 +109,15 @@ for n=1:2
     expected=expected+kron(spdiags(p.rlx_ph{1},0,p.npts,p.npts),p.rlx_op{1});
 end
 
+% An all-zero matrix must not activate the spherical-tensor-only flux consumer
+inter.chem.flux_rate=zeros(2); bas.formalism='zeeman-liouv';
+p.rlx_ph={}; p.rlx_op={};
+s=test_spin_system(sys,inter,bas);
+answer=imaging(s,@(s,p,H,R,K,G,F)struct('R',R,'K',K),p);
+dim=p.npts*s.bas.offsets(end);
+result=test_close(result,'inactive imaging flux',answer.R,sparse(dim,dim),0,0,...
+                  'zero rates require neither a flux term nor flux-specific formalism');
+
 end
 
 % Return the static spin or rotor generator for the acceptance control

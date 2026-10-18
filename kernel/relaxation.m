@@ -835,11 +835,21 @@ function F=magnetization_flux(spin_system)
 
 % Allocate the generator and retain the no-flux default
 F=mprealloc(spin_system,0);
-if isempty(spin_system.chem.flux_rate), return; end
+if nnz(spin_system.chem.flux_rate)==0, return; end
 
 % The original flux model uses spherical tensor basis labels
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('magnetization flux treatment is only available for sphten-liouv formalism.');
+end
+
+% Select the physical fate of correlations, as in the original flux model
+switch spin_system.chem.flux_type
+    case 'intramolecular'
+        transfer_correlations=true;
+    case 'intermolecular'
+        transfer_correlations=false;
+    otherwise
+        error('unrecognized type of magnetization flux.');
 end
 
 % Process every matrix entry, including diagonal bath rates
@@ -868,7 +878,7 @@ for n=1:numel(rates)
 
     % Single-spin orders transfer in both models; correlations only within molecules
     for order=1:2
-        if (order==1)||strcmp(spin_system.chem.flux_type,'intramolecular')
+        if (order==1)||transfer_correlations
 
             % Orders containing both spins were stationary in the original model
             [~,from_static,to_static]=intersect(rows{1,order},rows{2,order});

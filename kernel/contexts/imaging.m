@@ -134,7 +134,7 @@ for n=1:numel(parameters.rlx_ph)
 end
 
 % Point-to-point flux is uniform and is not scaled by relaxation phantoms
-if ~isempty(spin_system.chem.flux_rate)
+if nnz(spin_system.chem.flux_rate)>0
     flux_system=spin_system; flux_system.rlx.theories={};
     if isfield(flux_system.inter,'modes')
         flux_system.inter=rmfield(flux_system.inter,'modes');

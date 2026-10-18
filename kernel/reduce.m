@@ -55,7 +55,7 @@ end
 % Reaction maps and flux need not preserve the spin-only substance irreps
 irr_projectors={}; irr_dimensions=[];
 if size(L,1)==spin_system.bas.offsets(end)&&...
-   isempty(spin_system.chem.reactions)&&isempty(spin_system.chem.flux_rate)
+   isempty(spin_system.chem.reactions)&&(nnz(spin_system.chem.flux_rate)==0)
     for s=1:spin_system.bas.nsubst
         for n=1:numel(spin_system.bas.sym_fact(s).irr_dimensions)
             P=spin_system.bas.sym_fact(s).irr_projectors{n};
@@ -337,7 +337,7 @@ if size(L,1)~=size(L,2)
     error('L must be a square matrix.');
 end
 if spin_system.bas.nsubst>1&&size(L,1)==spin_system.bas.offsets(end)&&...
-   isempty(spin_system.chem.reactions)&&isempty(spin_system.chem.flux_rate)
+   isempty(spin_system.chem.reactions)&&(nnz(spin_system.chem.flux_rate)==0)
     for n=1:spin_system.bas.nsubst
         idx=(spin_system.bas.offsets(n)+1):spin_system.bas.offsets(n+1);
         if nnz(L(idx,:))~=nnz(L(idx,idx))

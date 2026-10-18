@@ -65,6 +65,7 @@ result=test_close(result,'total exchanged magnetisation',...
 % Original point-to-point flux syntax remains a distinct additive R contribution
 result=magnetization_flux_checks(result);
 result=flux_consumer_checks(result);
+result=inactive_flux_checks(result);
 
 end
 
@@ -273,6 +274,58 @@ catch err
 end
 result=test_true(result,'uncoupled substance guard retained',rejected,...
                  'only declared reactions or flux permit cross-substance generator blocks');
+
+end
+
+
+
+% Only actual transfer entries activate the flux consumer and reduction coupling
+function result=inactive_flux_checks(result)
+
+% No-op flux is allowed in either Zeeman formalism, as in the historical consumer
+sys.magnet=14.1; sys.isotopes={'1H','1H'};
+inter.zeeman.scalar={0,3};
+inter.chem.flux_rate=zeros(2); inter.chem.flux_type='intermolecular';
+bas.approximation={'none'};
+for formalism={'zeeman-liouv','zeeman-hilb'}
+    bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas);
+    result=test_close(result,['zero flux in ' formalism{1}],...
+                      relaxation(s),sparse(s.bas.offsets(end),s.bas.offsets(end)),0,0,...
+                      'all-zero paired rates require no flux-specific formalism or basis');
+end
+
+% Caller-selected physical models must dispatch explicitly, not silently fall back
+bas.formalism='sphten-liouv'; inter.chem.flux_rate=[0 3;7 0];
+s=test_spin_system(sys,inter,bas);
+for mode={'intermoleculr',''}
+    s.chem.flux_type=mode{1}; rejected=false;
+    try
+        relaxation(s);
+    catch err
+        rejected=contains(err.message,'unrecognized type of magnetization flux');
+    end
+    result=test_true(result,['invalid caller-selected flux model ' mode{1}],rejected,...
+                     'the original physical dispatch rejects unsupported active-flux models');
+end
+
+% Zero rate matrices retain the same symmetry projectors as absent flux
+inter.chem.parts={1,2}; inter.chem.concs=[1 1]; inter.chem.flux_rate=zeros(2);
+bas.approximation={'none','none'}; sys.disable={'pt'};
+s=test_spin_system(sys,inter,bas); bare=s;
+bare.chem.flux_rate=[]; bare.chem.flux_type='';
+rho=state(s,'Lz','1H'); dim=s.bas.offsets(end);
+L=1i*spdiags((1:dim)',0,dim,dim);
+result=test_true(result,'inactive flux preserves symmetry projectors',...
+                 isequal(reduce(s,L,rho),reduce(bare,L,rho)),...
+                 'an all-zero matrix does not couple independent substances');
+L(7,3)=1; rejected=false;
+try
+    reduce(s,L,rho);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:reduce:crossSubstanceGenerator');
+end
+result=test_true(result,'inactive flux preserves cross-substance guard',rejected,...
+                 'all-zero rates do not authorize an undeclared cross-substance generator');
 
 end
 

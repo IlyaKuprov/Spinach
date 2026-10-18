@@ -13,10 +13,10 @@ function frydman_pump_b()
 % Number of water protons
 n_water_protons=100;
 
-% Magnet field 
+% Magnet field
 sys.magnet=11.7;
 
-% Core spin system 
+% Core spin system
 sys.isotopes={'1H','15N','13C','13C'};
 
 % Add water protons
@@ -28,8 +28,8 @@ inter.zeeman.scalar(5:(5+n_water_protons-1))={0.0};
 
 % Scalar couplings
 inter.coupling.scalar=cell(n_water_protons+4);
-inter.coupling.scalar{1,2}=-45;  
-inter.coupling.scalar{2,4}=8; 
+inter.coupling.scalar{1,2}=-45;
+inter.coupling.scalar{2,4}=8;
 
 % Estimated relaxation times, seconds
 T1H=0.2722; T1N=0.8; T1Ca=2; T1CO=2; T1W=0.2994;
@@ -43,33 +43,24 @@ inter.rlx_keep='diagonal';
 inter.equilibrium='IME';
 inter.temperature=298;
 
-% Peptide and independent water-pool substances
-inter.chem.parts=[{1:4} num2cell(5:(n_water_protons+4))];
-inter.chem.concs=ones(1,n_water_protons+1);
-
-% Per-substance basis settings retain each internal spin space
+% Basis set
 bas.formalism='sphten-liouv';
-bas.approximation=repmat({'IK-1'},1,n_water_protons+1);
-bas.connectivity=repmat({'scalar_couplings'},1,n_water_protons+1);
-bas.inter_level=[{4} repmat({1},1,n_water_protons)];
-bas.prox_level=repmat({1},1,n_water_protons+1);
+bas.approximation={'IK-1'};
+bas.connectivity={'scalar_couplings'};
+bas.inter_level={4};
+bas.prox_level={1};
 
-% Exchange rates between NH and nearest water, and among water protons
-nh_wt_exch_rate=1000; wt_wt_exch_rate=1e4;
+% Exchange rates
+nh_wt_exch_rate=1000; % between NH and nearest water
+wt_wt_exch_rate=1e4;  % between all water protons
 
-% Replacement swaps the amide proton while retaining the peptide core
-inter.chem.reactions={struct('reactants',[1 2],'products',[1 2],...
-                            'matching',[1 5;2 2;3 3;4 4;5 1],...
-                            'rate',nh_wt_exch_rate)};
-
-% Every water pair exchanges once as a symmetric replacement event
-for n=1:n_water_protons
-    for k=(n+1):n_water_protons
-        inter.chem.reactions{end+1}=struct('reactants',[n+1 k+1],...
-            'products',[n+1 k+1],'matching',[n+4 k+4;k+4 n+4],...
-            'rate',wt_wt_exch_rate);
-    end
-end
+% Exchange rate matrix
+inter.chem.flux_rate=zeros(n_water_protons+4);
+inter.chem.flux_rate(1,5)=nh_wt_exch_rate;
+inter.chem.flux_rate(5,1)=nh_wt_exch_rate;
+inter.chem.flux_rate(5:(5+n_water_protons-1),...
+                     5:(5+n_water_protons-1))=wt_wt_exch_rate;
+inter.chem.flux_type='intermolecular';
 
 % Enable zero track elimination
 sys.enable={'zte'};
@@ -96,24 +87,24 @@ COz=coil_state(spin_system,{'Lz'},{4});
 COx=coil_state(spin_system,{'Lx'},{4});
 
 % Project out the observables
-Hz=real(Hz'*traj); Hx=real(Hx'*traj);  
-Nz=real(Nz'*traj); Nx=real(Nx'*traj); 
+Hz=real(Hz'*traj); Hx=real(Hx'*traj);
+Nz=real(Nz'*traj); Nx=real(Nx'*traj);
 COz=real(COz'*traj); COx=real(COx'*traj);
 
 % Plotting
 kfigure(); scale_figure([1.0 2.0]);
-subplot(3,1,1); plot([Hz' Hx']); 
+subplot(3,1,1); plot([Hz' Hx']);
 klegend({'H$_{\rm{Z}}$','H$_{\rm{X}}$'},...
         'Location','Best'); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');
-subplot(3,1,2); plot([Nz' Nx']); 
+subplot(3,1,2); plot([Nz' Nx']);
 klegend({'N$_{\rm{Z}}$','N$_{\rm{X}}$'},...
         'Location','Best'); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');
-subplot(3,1,3); plot([COz' COx']); 
+subplot(3,1,3); plot([COz' COx']);
 klegend({'C$^{(\rm{O})}_{\rm{Z}}$','C$^{(\rm{O})}_{\rm{X}}$'},...
         'Location','Best'); xlim tight; kgrid;
-kxlabel('time, ms'); kylabel('expectation value'); 
+kxlabel('time, ms'); kylabel('expectation value');
 
 end
 
@@ -127,9 +118,6 @@ Cy=operator(spin_system,'Ly',parameters.spins{3});
 
 % Isotropic thermal equilibrium
 rho=equilibrium(spin_system);
-
-% Freeze additive replacement because all concentrations are invariant
-K=K(0,unit_state(spin_system));
 
 % Effective DIPSI Hamiltonian, CP stage 1
 spin_system=dictum(spin_system,{'1H'},'ignore');         % Kill Zeeman on H
@@ -150,39 +138,40 @@ H_CP2=hamiltonian(spin_system); L_CP2=H_CP2+1i*R+1i*K;
 time_step=parameters.cp_dur./parameters.cp_npt; traj=[];
 
 % N,C flip and crush
-rho=step(spin_system,Ny,rho,+pi/2); 
-rho=step(spin_system,Cy,rho,+pi/2);  
+rho=step(spin_system,Ny,rho,+pi/2);
+rho=step(spin_system,Cy,rho,+pi/2);
 rho=homospoil(spin_system,rho,'destroy');
 
 % Sequence loop
 for n=1:parameters.nloops
-    
+
     % Forward flips
-    rho=step(spin_system,Hy,rho,+pi/2);   
-    rho=step(spin_system,Cy,rho,+pi/2);   
+    rho=step(spin_system,Hy,rho,+pi/2);
+    rho=step(spin_system,Cy,rho,+pi/2);
     rho=step(spin_system,Ny,rho,+pi/2);
-    
+
     % First CP period
     rho_stack=evolution(spin_system,L_CP1,[],rho,time_step(1),...
                         parameters.cp_npt(1)-1,'trajectory');
     traj=[traj rho_stack]; rho=rho_stack(:,end); %#ok<AGROW>
-    
+
     % Proton back-flip
     rho=step(spin_system,Hy,rho,-pi/2);
-    
+
     % Second CP period
     rho_stack=evolution(spin_system,L_CP2,[],rho,time_step(2),...
                         parameters.cp_npt(2)-1,'trajectory');
     traj=[traj rho_stack]; rho=rho_stack(:,end); %#ok<AGROW>
-     
-    % Carbon and nitrogen back-flips    
-    rho=step(spin_system,Cy,rho,-pi/2);     
+
+    % Carbon and nitrogen back-flips
+    rho=step(spin_system,Cy,rho,-pi/2);
     rho=step(spin_system,Ny,rho,-pi/2);
-    
-    % Crusher gradient     
+
+    % Crusher gradient
     rho=homospoil(spin_system,rho,'destroy');
-    
+
 end
 
 end
+
 

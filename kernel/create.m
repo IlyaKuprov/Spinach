@@ -917,6 +917,23 @@ if isfield(inter,'chem')&&isfield(inter.chem,'reactions')
     end
 end
 
+% Absorb magnetization flux rates
+if isfield(inter,'chem')&&...
+   isfield(inter.chem,'flux_rate')&&...
+   isfield(inter.chem,'flux_type')
+
+    % Assign the data structure
+    spin_system.chem.flux_rate=inter.chem.flux_rate;
+    spin_system.chem.flux_type=inter.chem.flux_type;
+
+else
+
+    % No magnetization fluxes
+    spin_system.chem.flux_rate=[];
+    spin_system.chem.flux_type='';
+
+end
+
 % Report back to the user
 summary_chemistry(spin_system);
 
@@ -2732,7 +2749,32 @@ end
 % Check chemical kinetics
 if isfield(inter,'chem')
     
-    retired={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'};
+    if isfield(inter.chem,'flux_rate')&&(~isfield(inter.chem,'flux_type'))
+        error('flux type (inter.chem.flux_type) must be provided.');
+    elseif isfield(inter.chem,'flux_type')&&(~isfield(inter.chem,'flux_rate'))
+        error('flux rates (inter.chem.flux_rate) must be provided.');
+    end
+
+    if isfield(inter.chem,'flux_rate')
+        if (~isnumeric(inter.chem.flux_rate))||(~isreal(inter.chem.flux_rate))||...
+           (size(inter.chem.flux_rate,1)~=size(inter.chem.flux_rate,2))
+            error('inter.chem.flux_rate must be a real square matrix.');
+        end
+        if any(size(inter.chem.flux_rate)~=numel(sys.isotopes))
+            error('both dimensions of inter.chem.flux_rate matrix must be equal to the number of spins.');
+        end
+    end
+
+    if isfield(inter.chem,'flux_type')
+        if ~ischar(inter.chem.flux_type)
+            error('inter.chem.flux_type must be a character string.');
+        end
+        if ~ismember(inter.chem.flux_type,{'intermolecular','intramolecular'})
+            error('incorrect flux type specification.');
+        end
+    end
+
+    retired={'rates','rp_theory','rp_rates','rp_electrons'};
     for n=1:numel(retired)
         if isfield(inter.chem,retired{n})
             error('Spinach:create:retiredChemistry',...
@@ -2740,9 +2782,9 @@ if isfield(inter,'chem')
                    'with reactants, products, matching, and rate fields.']);
         end
     end
-    if ~isempty(setdiff(fieldnames(inter.chem),{'parts','concs','reactions'}))
+    if ~isempty(setdiff(fieldnames(inter.chem),{'parts','concs','reactions','flux_rate','flux_type'}))
         error('Spinach:create:chemistryField',...
-              'inter.chem accepts only parts, concs, and reactions.');
+              'inter.chem accepts only parts, concs, reactions, flux_rate, and flux_type.');
     end
     if isfield(inter.chem,'reactions')&&~isfield(inter.chem,'parts')
         error('Spinach:create:reactionParts',...
@@ -3155,4 +3197,5 @@ end
 % the soil for those who did not.
 %
 % Benjamin Franklin
+
 

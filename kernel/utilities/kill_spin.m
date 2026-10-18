@@ -243,6 +243,12 @@ for n=1:numel(spin_system.chem.parts)
     spin_system.chem.parts{n}=find(subsystem_idx);
 end
 
+% Update magnetization flux indices
+if ~isempty(spin_system.chem.flux_rate)
+    spin_system.chem.flux_rate(hit_list,:)=[];
+    spin_system.chem.flux_rate(:,hit_list)=[];
+end
+
 % Rebuild the reaction atom maps in the surviving global spin index
 keep=setdiff(1:spin_system.comp.nspins+numel(hit_list),hit_list);
 for n=1:numel(spin_system.chem.reactions)
@@ -328,4 +334,5 @@ end
 % a bath house.
 %
 % David Hilbert, about Emmy Noether, in 1915.
+
 

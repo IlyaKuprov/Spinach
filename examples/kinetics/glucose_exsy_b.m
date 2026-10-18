@@ -108,6 +108,10 @@ parameters.rho0=state(spin_system,'Lz','19F');
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');
 
+% Restore the original spin-1/2 'cheap' detector normalisation
+fid.cos=2*fid.cos;
+fid.sin=2*fid.sin;
+
 % Apodisation
 fid.cos=apodisation(spin_system,fid.cos,{{'sqcos'},{'sqcos'}});
 fid.sin=apodisation(spin_system,fid.sin,{{'sqcos'},{'sqcos'}}); 
@@ -147,4 +151,5 @@ ktitle('difference histogram');
 kgrid; xlim([-300 300]);
 
 end
+
 

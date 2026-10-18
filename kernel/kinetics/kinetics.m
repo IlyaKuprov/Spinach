@@ -255,7 +255,7 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,mode)
-for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
+for field={'rates','rp_theory','rp_rates','rp_electrons'}
     if isfield(spin_system.chem,field{1})
         error('Spinach:kinetics:retiredChemistry',...
               ['chem.' field{1} ' is retired; use chem.reactions records.']);
@@ -300,4 +300,5 @@ end
 % Ayn Rand, "The Fountainhead"
 
 % #NGRUM
+
 

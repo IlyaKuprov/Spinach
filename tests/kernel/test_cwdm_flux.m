@@ -64,6 +64,7 @@ result=test_close(result,'total exchanged magnetisation',...
 
 % Original point-to-point flux syntax remains a distinct additive R contribution
 result=magnetization_flux_checks(result);
+result=flux_consumer_checks(result);
 
 end
 
@@ -191,6 +192,87 @@ for n=1:numel(rates)
         F=F-rates(n)*spdiags(double(source),0,size(F,1),size(F,2));
     end
 end
+
+end
+
+
+
+% Flux must remain compatible with recursive relaxation, assembly, and propagation
+function result=flux_consumer_checks(result)
+
+% Use a non-zero, valid SRSK coupling and flux between two proton sites
+sys.magnet=14.1; sys.isotopes={'1H','1H','1H'};
+inter.zeeman.scalar={0,3,5}; inter.coupling.scalar=cell(3);
+inter.coupling.scalar{1,3}=3;
+inter.relaxation={'t1_t2','SRSK'}; inter.srsk_sources=3;
+inter.r1_rates={1,2,1e5}; inter.r2_rates={3,4,1e5};
+inter.rlx_keep='labframe'; inter.equilibrium='zero'; inter.temperature=298;
+inter.chem.flux_rate=[11 5 0;7 13 0;0 0 0];
+inter.chem.flux_type='intermolecular';
+bas.formalism='sphten-liouv'; bas.approximation={'none'};
+s=test_spin_system(sys,inter,bas);
+flux=s; flux.rlx.theories={}; F=relaxation(flux);
+for destination={'zero','IME','dibari'}
+    work=s; work.rlx.equilibrium=destination{1};
+    if strcmp(destination{1},'dibari')
+        work.sys.disable=[work.sys.disable {'high_temp'}];
+    end
+    bare=work; bare.chem.flux_rate=[]; bare.chem.flux_type='';
+    bath=relaxation(bare);
+    result=test_close(result,['SRSK once-only flux ' destination{1}],...
+                      relaxation(work)-bath,F,100*eps(norm(bath,'fro')),0,...
+                      'recursive SRSK rates exclude flux until after outer thermalisation');
+end
+
+% Reuse the historical block-diagonal and common-value merge contracts
+part.isotopes={'1H','1H'};
+a.chem.flux_rate=[3 -5;7 0]; a.chem.flux_type='intermolecular';
+b.chem.flux_rate=[0 11;13 17]; b.chem.flux_type='intermolecular';
+[merged_sys,merged]=merge_inp({part,part},{a,b});
+result=test_close(result,'merged flux rate matrices',merged.chem.flux_rate,...
+                  blkdiag(a.chem.flux_rate,b.chem.flux_rate),0,0,...
+                  'original signed real rates and diagonal entries remain unchanged');
+result=test_true(result,'merged common flux type',...
+                 strcmp(merged.chem.flux_type,'intermolecular')&&numel(merged_sys.isotopes)==4,...
+                 'matching flux types are accepted without converting to reactions');
+for kind=1:3
+    bad=b; field='flux_type';
+    if kind==1, bad.chem.flux_type='intramolecular'; end
+    if kind==2, bad.chem=rmfield(bad.chem,'flux_type'); end
+    if kind==3
+        bad.chem=rmfield(bad.chem,'flux_rate'); field='flux_rate';
+    end
+    rejected=false;
+    try
+        merge_inp({part,part},{a,bad});
+    catch err
+        rejected=contains(err.message,field);
+    end
+    result=test_true(result,['incompatible flux merge ' num2str(kind)],rejected,...
+                     'mismatched or missing flux fields retain their specific native merge rejection');
+end
+
+% Cross-substance transfer invalidates independent-substance symmetry projectors
+sys.isotopes={'1H','1H'}; inter=struct(); inter.zeeman.scalar={0,3};
+inter.chem.parts={1,2}; inter.chem.concs=[1 1];
+inter.chem.flux_rate=[0 5;7 0]; inter.chem.flux_type='intermolecular';
+bas.approximation={'none','none'};
+s=test_spin_system(sys,inter,bas);
+F=relaxation(s); rho=state(s,'Lz',1); time=0.02;
+current=evolution(s,1i*F,[],rho,time,1,'final');
+result=test_close(result,'reduced cross-substance flux propagation',current,...
+                  expm(full(F)*time)*rho,1e-12,0,...
+                  'trajectory reduction retains source and destination in one coupled space');
+
+% The unrelated cross-substance prohibition remains when no coupling is specified
+bare=s; bare.chem.flux_rate=[]; bare.chem.flux_type=''; rejected=false;
+try
+    reduce(bare,1i*F,rho);
+catch err
+    rejected=strcmp(err.identifier,'Spinach:reduce:crossSubstanceGenerator');
+end
+result=test_true(result,'uncoupled substance guard retained',rejected,...
+                 'only declared reactions or flux permit cross-substance generator blocks');
 
 end
 

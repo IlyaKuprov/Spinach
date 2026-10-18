@@ -174,6 +174,8 @@ if group_check(inter_parts,'chem')
     end
     [chem,chem_parts]=merge_like_parts(chem,chem_parts,'parts',part_sizes);
     [chem,chem_parts]=merge_like_isotopes(chem,chem_parts,'concs');
+    [chem,chem_parts]=merge_like_couplings(chem,chem_parts,'flux_rate');
+    [chem,chem_parts]=merge_like_magnet(chem,chem_parts,'flux_type');
     group_gate(chem_parts,'chem');
     chem=rmfield(chem,'stub'); inter.chem=chem;
     inter_parts=cellfun(@(x)rmfield(x,'chem'),...
@@ -459,4 +461,5 @@ end
 % Respondit Pilatus: "Quod scripsi, scripsi."
 %
 % Ioannes 19:21-22
+
 

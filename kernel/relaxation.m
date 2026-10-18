@@ -518,6 +518,10 @@ if ismember('SRSK',spin_system.rlx.theories)
     % Leave thermalisation of the sum to the outer call
     spin_system_local.rlx.equilibrium='zero';
 
+    % Leave magnetization flux to the outer call
+    spin_system_local.chem.flux_rate=[];
+    spin_system_local.chem.flux_type='';
+
     % Leave mode dissipation to the outer call
     if boson_terms
         spin_system_local.inter.modes.damp(:)=0;

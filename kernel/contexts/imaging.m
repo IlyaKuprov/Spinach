@@ -48,6 +48,10 @@
 %                 parameters.rlx_ph={Ph1,Ph2,...,PhN}
 %                 parameters.rlx_op={R1,R2,...,RN}
 %
+% Point-to-point magnetization flux is added uniformly to R. Relaxation
+% phantom operators must exclude that flux: when using relaxation() to
+% construct them, clear chem.flux_rate in the spin system passed to it.
+%
 % where PhN have the same dimension as the sample voxel grid and RN are re-
 % laxation superoperators. The initial condition phantom reflects the fact 
 % that different voxels might start off in a different spin state. It must
@@ -127,6 +131,15 @@ for n=1:numel(parameters.rlx_ph)
     polyadic_cores{n}=cell(1,2);
     polyadic_cores{n}{1}=spdiags(parameters.rlx_ph{n}(:),0,spc_dim,spc_dim);
     polyadic_cores{n}{2}=parameters.rlx_op{n};
+end
+
+% Point-to-point flux is uniform and is not scaled by relaxation phantoms
+if ~isempty(spin_system.chem.flux_rate)
+    flux_system=spin_system; flux_system.rlx.theories={};
+    if isfield(flux_system.inter,'modes')
+        flux_system.inter=rmfield(flux_system.inter,'modes');
+    end
+    polyadic_cores{end+1}={opium(spc_dim,1),relaxation(flux_system)};
 end
 R=polyadic(polyadic_cores);
 
@@ -292,4 +305,5 @@ end
 % asked me what they were discussing. I said, "religion".
 %
 % IK's email to Fred Mentink-Vigier, 2014
+
 

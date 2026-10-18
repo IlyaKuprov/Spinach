@@ -7,7 +7,8 @@
 %
 %    spin_system - Spinach object with chem.reactions and a compiled basis
 %
-%    mode        - optional 'report' prints the reaction maps and closures
+%    mode        - optional 'report' prints flux rates, reaction maps,
+%                  and closures; flux reporting also works before basis()
 %
 % Outputs:
 %
@@ -43,6 +44,32 @@ function K=kinetics(spin_system,mode)
 
 % Preserve the ordinary call and the explicitly requested reporting form
 if nargin==1, mode=''; end
+
+% Report restored point-to-point fluxes without compiling their relaxation generator
+if strcmp(mode,'report')
+    if isfield(spin_system.chem,'flux_rate')&&nnz(spin_system.chem.flux_rate)>0
+        switch spin_system.chem.flux_type
+            case 'intramolecular'
+                report(spin_system,'intramolecular magnetization flux, correlations will be kept.');
+            case 'intermolecular'
+                report(spin_system,'intermolecular magnetization flux, correlations will be damped.');
+        end
+        [rows,cols,vals]=find(spin_system.chem.flux_rate);
+        report(spin_system,'point-to-point flux rates:');
+        report(spin_system,'===============================');
+        report(spin_system,' N(from)   N(to)    Rate(Hz)   ');
+        report(spin_system,'-------------------------------');
+        for n=1:numel(vals)
+            report(spin_system,sprintf(' %-3d      %-3d      %+0.3e',rows(n),cols(n),vals(n)));
+        end
+    end
+
+    % create() reports validated flux inputs before basis construction
+    if ~isfield(spin_system,'bas')
+        K=[]; return
+    end
+end
+
 grumble(spin_system,mode);
 
 % Leave chemistry-free systems available in every formalism

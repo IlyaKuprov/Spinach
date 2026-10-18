@@ -83,6 +83,32 @@ for n=1:numel(contexts)
     end
 end
 
+% Keep point-to-point flux uniform with and without relaxation phantoms
+sys.magnet=1; sys.isotopes={'1H','1H'};
+inter=struct(); inter.zeeman.scalar={0,0};
+inter.chem.flux_rate=[0 0.3;0.7 0];
+inter.chem.flux_type='intermolecular';
+bas=struct(); bas.formalism='sphten-liouv'; bas.approximation={'none'};
+s=test_spin_system(sys,inter,bas); flux=relaxation(s);
+p=struct(); p.spins={'1H'}; p.offset=0;
+p.dims=1; p.npts=10; p.deriv={'period',3};
+p.rlx_ph={}; p.rlx_op={};
+p.rho0=kron(ones(p.npts,1),state(s,'Lz',1)); p.coil=p.rho0;
+p.u=zeros(p.npts,1); p.diff=0;
+expected=kron(speye(p.npts),flux);
+for n=1:2
+    answer=imaging(s,@(s,p,H,R,K,G,F)struct('R',R,'K',K),p);
+    result=test_close(result,['uniform imaging flux ' num2str(n)],...
+                      answer.R,expected,0,0,...
+                      'flux belongs to R and is independent of relaxation phantom weights');
+    result=test_close(result,['imaging flux absent from K ' num2str(n)],...
+                      answer.K,zeros(size(answer.K)),0,0,...
+                      'point-to-point flux must not be duplicated in K');
+    p.rlx_ph={(1:p.npts)'/p.npts};
+    p.rlx_op={-0.2*operator(s,'Lz',1)^2};
+    expected=expected+kron(spdiags(p.rlx_ph{1},0,p.npts,p.npts),p.rlx_op{1});
+end
+
 end
 
 % Return the static spin or rotor generator for the acceptance control

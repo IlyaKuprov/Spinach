@@ -71,7 +71,11 @@ if (~boson_terms)&&all(strcmp(spin_system.rlx.theories,'flux'),'all')
 
     % Return the selected flux contribution, including the no-theory zero
     R=rlx_flux(spin_system);
-    report(spin_system,'ordinary relaxation disabled; returning flux contribution.');
+    if isempty(spin_system.rlx.theories)
+        report(spin_system,'relaxation superoperator set to zero.');
+    else
+        report(spin_system,'ordinary relaxation disabled; returning flux contribution.');
+    end
 
     % Exit the function
     return;

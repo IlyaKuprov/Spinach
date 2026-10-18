@@ -6,4 +6,4 @@ The combined-mechanism cases check additivity with T1/T2 relaxation and with a n
 
 `test_cwdm_flux` separately covers both correlation-transfer models against an independently assembled full generator, retention and thermalisation, SRSK recursion, cross-substance reduction, and zero-rate behaviour. `test_cwdm_contexts` checks that imaging only uses caller-supplied relaxation operators.
 
-A column theory array with repeated flux entries also verifies scalar gating and once-only addition. The zero-flux-only Hilbert-space case explicitly requests IME: it must return zero without invoking the Liouville-only thermalisation routine.
+The empty-theory diagnostic is checked separately from creation-time summary gating. A column theory array with repeated flux entries also verifies scalar gating and once-only addition. The zero-flux-only Hilbert-space case explicitly requests IME: it must return zero without invoking the Liouville-only thermalisation routine.

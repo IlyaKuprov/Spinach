@@ -8,7 +8,7 @@
 
 The source identifies this as Lucio Frydman's water-exchange spin-lock pump, Figure 2, and cites https://doi.org/10.1016/j.jmr.2021.107083. The model has a `1H`, `15N`, `13C`, `13C` peptide core plus 20 added `1H` water spins (24 spins total). `sys.magnet` is set to 11.7; the source labels this a magnet field but gives no unit. All listed chemical shifts are zero. The explicitly assigned H-N scalar coupling is -45 Hz.
 
-The `t1_t2` relaxation model uses diagonal retention. Source-estimated T1 and T2 values are given in seconds: H 0.2722, N 0.8, C-alpha 2, carbonyl C 2, and water 0.2994. The source sets `inter.temperature=298` without stating a unit and uses an isotropic equilibrium model (`IME`). The basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, `inter_level=4`, and `prox_level=1`. Intermolecular exchange entries are source-labelled in Hz: 10 between the amide H and the first water proton, and 1e4 in the water-proton block.
+The example selects `inter.relaxation={'t1_t2','flux'}`. The T1/T2 contribution uses diagonal retention; flux is added separately without that projection. Source-estimated T1 and T2 values are given in seconds: H 0.2722, N 0.8, C-alpha 2, carbonyl C 2, and water 0.2994. The source sets `inter.temperature=298` without stating a unit and uses an isotropic equilibrium model (`IME`). The basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, `inter_level=4`, and `prox_level=1`. Intermolecular exchange entries are source-labelled in Hz: 10 between the amide H and the first water proton, and 1e4 in the water-proton block.
 
 ## Sequence and observables
 

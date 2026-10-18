@@ -15,13 +15,15 @@ result=new_test_result('kernel/cwdm_flux_report','Flux reporting',...
 % Use asymmetric rates so the original from/to convention is observable
 sys.magnet=9.4; sys.isotopes={'1H','1H'};
 sys.parallel={'local',1};
-inter.chem.flux_rate=[0 3;7 0];
+inter.flux_rate=[0 3;7 0];
 flux_types={'intramolecular','intermolecular'};
 bas.formalism='sphten-liouv'; bas.approximation={'none'};
 for n=1:numel(flux_types)
 
     % Creation prints the original rate table; kinetics remains quiet
-    inter.chem.flux_type=flux_types{n};
+    inter.relaxation={'flux'};
+    inter.rlx_keep='labframe'; inter.equilibrium='zero';
+    inter.flux_type=flux_types{n};
     creation=evalc('spin_system=create(sys,inter);');
     spin_system=basis(spin_system,bas);
     ordinary=kinetics(spin_system);
@@ -46,8 +48,8 @@ for n=1:2
     if n==1
         no_flux=struct();
     else
-        no_flux.chem.flux_rate=zeros(2);
-        no_flux.chem.flux_type='intramolecular';
+        no_flux.rlx.flux_rate=zeros(2);
+        no_flux.rlx.flux_type='intramolecular';
     end
     creation=evalc('spin_system=create(sys,no_flux);');
     assert(~contains(creation,'point-to-point flux rates:'));

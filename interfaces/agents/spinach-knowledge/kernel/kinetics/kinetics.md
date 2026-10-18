@@ -33,3 +33,5 @@ The kinetics consumer rejects the four retired chemistry fields `rates`, `rp_the
 The original `flux_rate`/`flux_type` pair remains supported independently through the relaxation generator in `sphten-liouv`, not added to the chemical generator returned here. `create` reports nonzero directed spin rates and flux type through `summary_rlx_flux` before basis construction.
 
 Reporting accepts mixed row/column substance memberships by formatting local spin lists as rows; the stored memberships and generator are unchanged.
+
+Flux is an explicit relaxation theory, not a chemistry reaction: select 'flux' in inter.relaxation and set inter.flux_rate and inter.flux_type. kinetics(spin_system) handles declared chemistry independently of the point-to-point flux operator.

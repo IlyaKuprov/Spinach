@@ -48,6 +48,10 @@ part_sizes=cellfun(@(x)numel(x.isotopes),sys_parts);
 % Create structure stubs
 sys.stub=1; inter.stub=1;
 
+% Magnetisation flux is a relaxation mechanism
+[inter,inter_parts]=merge_like_couplings(inter,inter_parts,'flux_rate');
+[inter,inter_parts]=merge_like_magnet(inter,inter_parts,'flux_type');
+
 % Fields containing common values that must be equal
 sys_common={'magnet','output','scratch','enable',...
             'disable','tols','parallel','parprops'};
@@ -174,8 +178,7 @@ if group_check(inter_parts,'chem')
     end
     [chem,chem_parts]=merge_like_parts(chem,chem_parts,'parts',part_sizes);
     [chem,chem_parts]=merge_like_isotopes(chem,chem_parts,'concs');
-    [chem,chem_parts]=merge_like_couplings(chem,chem_parts,'flux_rate');
-    [chem,chem_parts]=merge_like_magnet(chem,chem_parts,'flux_type');
+
     group_gate(chem_parts,'chem');
     chem=rmfield(chem,'stub'); inter.chem=chem;
     inter_parts=cellfun(@(x)rmfield(x,'chem'),...
@@ -455,8 +458,8 @@ if any(cellfun(@(x)(~isfield(x,'isotopes')),sys_parts))
     error('every sys structure must contain an isotopes subfield.');
 end
 for n=1:numel(inter_parts)
-    if isfield(inter_parts{n},'chem')&&isfield(inter_parts{n}.chem,'flux_rate')
-        rates=inter_parts{n}.chem.flux_rate;
+    if isfield(inter_parts{n},'flux_rate')
+        rates=inter_parts{n}.flux_rate;
         nspins=numel(sys_parts{n}.isotopes);
         if ~isnumeric(rates)||~isreal(rates)||~isequal(size(rates),[nspins nspins])||...
            ~all(isfinite(rates(:)))

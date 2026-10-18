@@ -37,7 +37,7 @@ inter.zeeman.scalar={8.45 8.45 8.45 8.11 3.73 ...
 inter.zeeman.scalar=[inter.zeeman.scalar repelem({4.5},20)];
 
 % Relaxation theories
-inter.relaxation={'redfield','t1_t2'};
+inter.relaxation={'redfield','t1_t2','flux'};
 inter.equilibrium='dibari';
 inter.rlx_keep='secular';
 inter.tau_c={1.2e-10};
@@ -55,10 +55,10 @@ bas.prox_level={3};
 bas.inter_level={1};
 
 % Exchange flux matrix
-inter.chem.flux_rate=zeros(30,30);
-inter.chem.flux_rate(1:4,11:20)=20;
-inter.chem.flux_rate(11:20,1:4)=20;
-inter.chem.flux_type='intermolecular';
+inter.flux_rate=zeros(30,30);
+inter.flux_rate(1:4,11:20)=20;
+inter.flux_rate(11:20,1:4)=20;
+inter.flux_type='intermolecular';
 
 % Enable zero track elimination
 sys.enable={'zte'};

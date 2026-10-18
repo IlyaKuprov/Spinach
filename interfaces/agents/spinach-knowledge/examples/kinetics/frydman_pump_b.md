@@ -27,3 +27,5 @@ This is a forward sequence simulation with source-specified relaxation and excha
 ## Reaction-record representation
 
 The peptide is one substance and every water proton has its own unit-concentration substance. An additive replacement swaps the amide proton with the nearest water proton while retaining the other peptide spins; each distinct water pair has one symmetric replacement record. Internal peptide correlations involving the departing proton decay, while no cross-molecular correlations are stored. Concentrations are invariant, permitting the sequence to freeze the additive generator once at `unit_state`. Observable vectors use unweighted `coil_state`; thermal equilibrium and IME remain concentration-aware.
+
+Current executable example selects 'flux' explicitly in inter.relaxation and supplies top-level inter.flux_rate and inter.flux_type. Flux is appended through relaxation once; rates alone would not enable it. Preserve the example's ordinary inter.rlx_keep and inter.equilibrium configuration.

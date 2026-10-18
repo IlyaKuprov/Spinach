@@ -917,26 +917,8 @@ if isfield(inter,'chem')&&isfield(inter.chem,'reactions')
     end
 end
 
-% Absorb magnetization flux rates
-if isfield(inter,'chem')&&...
-   isfield(inter.chem,'flux_rate')&&...
-   isfield(inter.chem,'flux_type')
-
-    % Assign the data structure
-    spin_system.chem.flux_rate=inter.chem.flux_rate;
-    spin_system.chem.flux_type=inter.chem.flux_type;
-
-else
-
-    % No magnetization fluxes
-    spin_system.chem.flux_rate=[];
-    spin_system.chem.flux_type='';
-
-end
-
 % Report back to the user
 summary_kinetics(spin_system);
-summary_rlx_flux(spin_system);
 
 % Order matrices
 if isfield(inter,'order_matrix')
@@ -1139,6 +1121,21 @@ else
     
 end
 
+% Absorb magnetisation flux rates
+if isfield(inter,'flux_rate')&&isfield(inter,'flux_type')
+
+    % Assign the data structure
+    spin_system.rlx.flux_rate=inter.flux_rate;
+    spin_system.rlx.flux_type=inter.flux_type;
+
+else
+
+    % No magnetisation fluxes
+    spin_system.rlx.flux_rate=[];
+    spin_system.rlx.flux_type='';
+
+end
+
 % Relaxation superoperator
 if isfield(inter,'relaxation')
     spin_system.rlx.theories=inter.relaxation;
@@ -1149,6 +1146,9 @@ else
     spin_system.rlx.theories={};
     report(spin_system,'WARNING - no relaxation theory specified');
 end
+
+% Report enabled magnetisation flux
+summary_rlx_flux(spin_system);
 
 % Rotational correlation times
 if isfield(inter,'tau_c')
@@ -2007,7 +2007,7 @@ if isfield(inter,'relaxation')
     end
     
     % Check relaxation theories
-    if ~all(ismember(inter.relaxation,{'damp','t1_t2','redfield','lindblad',...
+    if ~all(ismember(inter.relaxation,{'damp','t1_t2','redfield','lindblad','flux',...
                                        'nottingham','weizmann','SRFK','SRSK',...
                                        'naka-zwan'}))
         error('unrecognised relaxation theory specification.');
@@ -2747,35 +2747,42 @@ if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')&&...
     error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
 end
 
+% Check magnetisation flux parameters
+if isfield(inter,'flux_rate')&&(~isfield(inter,'flux_type'))
+    error('flux type (inter.flux_type) must be provided.');
+elseif isfield(inter,'flux_type')&&(~isfield(inter,'flux_rate'))
+    error('flux rates (inter.flux_rate) must be provided.');
+end
+
+if isfield(inter,'flux_rate')
+    if (~isnumeric(inter.flux_rate))||(~isreal(inter.flux_rate))||...
+       (~ismatrix(inter.flux_rate))||...
+       (~all(isfinite(inter.flux_rate(:))))||...
+       (size(inter.flux_rate,1)~=size(inter.flux_rate,2))
+        error('inter.flux_rate must be a finite real square matrix.');
+    end
+    if any(size(inter.flux_rate)~=numel(sys.isotopes))
+        error('both dimensions of inter.flux_rate matrix must be equal to the number of spins.');
+    end
+end
+
+if isfield(inter,'flux_type')
+    if ~ischar(inter.flux_type)
+        error('inter.flux_type must be a character string.');
+    end
+    if ~ismember(inter.flux_type,{'intermolecular','intramolecular'})
+        error('incorrect flux type specification.');
+    end
+end
+
+% Require flux parameters when the theory is enabled
+if isfield(inter,'relaxation')&&ismember('flux',inter.relaxation)&&...
+   (~isfield(inter,'flux_rate')||~isfield(inter,'flux_type'))
+    error('flux relaxation requires inter.flux_rate and inter.flux_type.');
+end
+
 % Check chemical kinetics
 if isfield(inter,'chem')
-    
-    if isfield(inter.chem,'flux_rate')&&(~isfield(inter.chem,'flux_type'))
-        error('flux type (inter.chem.flux_type) must be provided.');
-    elseif isfield(inter.chem,'flux_type')&&(~isfield(inter.chem,'flux_rate'))
-        error('flux rates (inter.chem.flux_rate) must be provided.');
-    end
-
-    if isfield(inter.chem,'flux_rate')
-        if (~isnumeric(inter.chem.flux_rate))||(~isreal(inter.chem.flux_rate))||...
-           (~ismatrix(inter.chem.flux_rate))||...
-           (~all(isfinite(inter.chem.flux_rate(:))))||...
-           (size(inter.chem.flux_rate,1)~=size(inter.chem.flux_rate,2))
-            error('inter.chem.flux_rate must be a finite real square matrix.');
-        end
-        if any(size(inter.chem.flux_rate)~=numel(sys.isotopes))
-            error('both dimensions of inter.chem.flux_rate matrix must be equal to the number of spins.');
-        end
-    end
-
-    if isfield(inter.chem,'flux_type')
-        if ~ischar(inter.chem.flux_type)
-            error('inter.chem.flux_type must be a character string.');
-        end
-        if ~ismember(inter.chem.flux_type,{'intermolecular','intramolecular'})
-            error('incorrect flux type specification.');
-        end
-    end
 
     retired={'rates','rp_theory','rp_rates','rp_electrons'};
     for n=1:numel(retired)
@@ -2785,9 +2792,9 @@ if isfield(inter,'chem')
                    'with reactants, products, matching, and rate fields.']);
         end
     end
-    if ~isempty(setdiff(fieldnames(inter.chem),{'parts','concs','reactions','flux_rate','flux_type'}))
+    if ~isempty(setdiff(fieldnames(inter.chem),{'parts','concs','reactions'}))
         error('Spinach:create:chemistryField',...
-              'inter.chem accepts only parts, concs, reactions, flux_rate, and flux_type.');
+              'inter.chem accepts only parts, concs, and reactions; use inter.flux_rate and inter.flux_type for flux relaxation.');
     end
     if isfield(inter.chem,'reactions')&&~isfield(inter.chem,'parts')
         error('Spinach:create:reactionParts',...

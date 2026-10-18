@@ -17,7 +17,7 @@ Builds a relaxation superoperator by accumulating the terms selected in `spin_sy
 
 ## Numerical / algorithmic content
 
-The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no spin theory is selected and no dissipative mode term is present, the result is the point-to-point contribution from `rlx_flux(spin_system)`, which is zero only when the flux rates are zero.
+The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no relaxation theory is selected and no dissipative mode term is present, the result is zero even if nonzero flux rates are stored. Selecting only `'flux'` returns the point-to-point contribution; selecting it with other theories adds that contribution exactly once.
 
 Retention by longitudinal order or base frequency uses each substance’s local descriptor. Diagonal retention and uniform damping exempt the unit coordinate of every block separately.
 
@@ -46,3 +46,9 @@ Normalised SRSK vectors use the three-argument unweighted `coil_state` primitive
 ## Explicit NZ evaluation point
 
 `inter.nz_shift` must be an explicit finite scalar with non-negative real part. The former `'chem'` request is rejected by `create`: a general reaction network does not specify a unique scalar lifetime. For a legacy exponential radical-pair model use the summed channel rates; for the legacy Haberkorn/Jones–Hore scalar approximation use half their sum, stating that approximation explicitly in the example. `relaxation` uses the supplied scalar without reading retired radical-pair fields.
+
+## Explicit point-to-point flux relaxation
+
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
+
+Selecting flux does not waive the usual relaxation settings: supply valid inter.rlx_keep and inter.equilibrium as required by the relaxation path (for example 'labframe' and 'zero').

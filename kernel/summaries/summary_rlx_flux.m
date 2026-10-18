@@ -18,14 +18,14 @@ function summary_rlx_flux(spin_system)
 grumble(spin_system);
 
 % Report flux inputs before basis construction
-if isfield(spin_system.chem,'flux_rate')&&nnz(spin_system.chem.flux_rate)>0
-    switch spin_system.chem.flux_type
+if ismember('flux',spin_system.rlx.theories)&&nnz(spin_system.rlx.flux_rate)>0
+    switch spin_system.rlx.flux_type
         case 'intramolecular'
             report(spin_system,'intramolecular magnetisation flux, correlations will be kept.');
         case 'intermolecular'
             report(spin_system,'intermolecular magnetisation flux, correlations will be damped.');
     end
-    [rows,cols,vals]=find(spin_system.chem.flux_rate);
+    [rows,cols,vals]=find(spin_system.rlx.flux_rate);
     report(spin_system,'point-to-point flux rates:');
     report(spin_system,'===============================');
     report(spin_system,' N(from)   N(to)    Rate(Hz)   ');

@@ -1,7 +1,5 @@
-# examples/dnp_sol/cavity_dnp/validate_cavity_dnp.m
+# validate_cavity_dnp
 
-Runs the native Spinach donor-cavity example with three, four, and five Fock states, confirming the declared Cn subsystem and full Hilbert dimensions 60/80/100. Checks cutoff convergence and density trace, Hermiticity, and positivity at absolute 1e-8 accuracy.
+`validation=validate_cavity_dnp()` executes the native `sphten-liouv` example at cavity cutoffs 3, 4, and 5, repeats propagation on a half-step grid, and checks trace, pulse swaps, population bounds, and unoccupied Fock edge. It also tests a zero-exchange control, lossless excitation conservation and resonant Rabi oscillations, and the exact resolved damped Jaynes–Cummings photon transient.
 
-Independent native `evolution` controls compare a genuine half-step trajectory at every original sample time, zero coupling, lossless Rabi oscillations and excitation conservation, and exact damped Jaynes-Cummings survival and photon transients. The existing native generators are reused, rather than reconstructing a parallel dissipator.
-
-Call `validation=validate_cavity_dnp()` from the example directory after configuring the Spinach path. The returned structure contains numerical errors and physical observables; failed tolerances raise assertions. A success marker is printed after the checks. No files are written, and the checks validate the stated single-donor idealisation rather than omitted ensemble physics.
+All simulated controls retain the same formalism and use native Hamiltonian, state/operator, and evolution APIs. Analytical expressions are independent reference curves only. Success prints `CAVITY_DNP_VALIDATION_SUCCESS`; the function writes no files. These tests validate the documented four-level analogue, not the omitted low-field Bi donor or ensemble physics.

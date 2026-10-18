@@ -1,9 +1,7 @@
-# examples/dnp_sol/cavity_dnp/cavity_dnp_minimal.m
+# cavity_dnp_minimal
 
-Illustrates one ideal cavity-assisted DNP cycle for Bi:Si using the native Spinach particle specification `E`, `209Bi`, and `Cn`. The full donor-cavity Hilbert space has dimension `20*nlevels`; all donor spectator levels and retained cavity occupations remain represented.
+`result=cavity_dnp_minimal(nlevels)` models an ideal shelving, conditional nuclear swap, and cavity-mediated reset cycle using an electron, a spin-1/2 nucleus, and a Cn bosonic mode. It is a four-level high-field analogue of Fig. 1 in Lorriaux et al., arXiv:2610.19180v1, not a low-field Bi:Si donor simulation or an ensemble fit.
 
-Call `result=cavity_dnp_minimal(nlevels)` with an integer cavity dimension of at least three. The result contains time in seconds, active-state populations, photon occupation, target-state population enhancement, physical nuclear magnetisation change, diagnostics, and the native system and generators. No files or figures are produced.
+The formalism is exclusively `sphten-liouv`. Native interaction specifications generate the Hamiltonian and cavity relaxation; native state/operator syntax generates vacuum, spin populations, conditional pulse generators, and observables. `step` applies ideal pulses; `evolution` propagates explicit spin-cavity exchange and photon loss. Physical expectation values use native left-product operators contracted with the identity trace functional. Returned fields include populations, Iz, photons, trace, Fock-edge occupation, enhancement, and native generators for controls.
 
-`create`, `basis`, and `hamiltonian` identify the physical donor energy eigenstates. Native `operator` and `state` calls provide composite observables and vacuum state. Spectral projectors specify ideal selective microwave/RF transitions; `hilb2liouv`, native mode `relaxation`, and `evolution` provide commutators, photon loss, and propagation. No external reduced density solver or custom tensor dissipator is used.
-
-The cavity remains explicit during emission, but donor-cavity coupling is switched off during ideal pulses. Coupling and pulse strengths are illustrative rather than fitted; collective effects, disorder, repeated pumping, spin diffusion, and non-cavity relaxation are excluded. See the example README and Lorriaux et al., arXiv:2610.19180v1.
+The initial nuclear mixture is unpolarized, the cavity bath is at zero temperature, and ideal pulses omit drift and decay. Illustrative rates are not the paper's experimental parameters. See the adjacent README for approximations and `validate_cavity_dnp` for numerical controls.

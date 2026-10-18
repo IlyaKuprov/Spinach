@@ -454,6 +454,16 @@ end
 if any(cellfun(@(x)(~isfield(x,'isotopes')),sys_parts))
     error('every sys structure must contain an isotopes subfield.');
 end
+for n=1:numel(inter_parts)
+    if isfield(inter_parts{n},'chem')&&isfield(inter_parts{n}.chem,'flux_rate')
+        rates=inter_parts{n}.chem.flux_rate;
+        nspins=numel(sys_parts{n}.isotopes);
+        if ~isnumeric(rates)||~isreal(rates)||~isequal(size(rates),[nspins nspins])||...
+           ~all(isfinite(rates(:)))
+            error('each flux_rate must be a finite real matrix matching its subsystem spin count.');
+        end
+    end
+end
 end
 
 % Dicebant ergo Pilato pontifices Judaeorum: "Noli scribere

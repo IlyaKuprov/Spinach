@@ -1,5 +1,7 @@
 # kernel/utilities/merge_inp.m
 
+Each supplied flux-rate block is validated before concatenation: it must be finite, real, numeric, and square with dimensions equal to that subsystem’s spin count. Compensating incorrect block sizes cannot silently reassign rates between subsystems.
+
 `[sys,inter]=merge_inp(sys_parts,inter_parts)` combines molecular input structures, for example from separate DFT calculations, without confusing their local spin labels. Both arguments must be nonempty row cell arrays of structures of equal length; every `sys` entry must supply `isotopes`. The outputs are merged `sys` and `inter` inputs, not a compiled Spinach system.
 
 ## Independent molecules in a common experimental setting

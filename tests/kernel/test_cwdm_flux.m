@@ -225,6 +225,18 @@ for destination={'zero','IME','dibari'}
                       'recursive SRSK rates exclude flux until after outer thermalisation');
 end
 
+% Reject constituent sizes even when the merged dimensions would match
+one.isotopes={'1H'}; two.isotopes={'1H','1H'};
+a.chem.flux_rate=[0 1;2 0]; a.chem.flux_type='intermolecular';
+b.chem.flux_rate=0; b.chem.flux_type='intermolecular'; rejected=false;
+try
+    merge_inp({one,two},{a,b});
+catch err
+    rejected=contains(err.message,'subsystem spin count');
+end
+result=test_true(result,'compensating flux block sizes rejected',rejected,...
+                 'each block must match its own subsystem before concatenation');
+
 % Reuse the historical block-diagonal and common-value merge contracts
 part.isotopes={'1H','1H'};
 a.chem.flux_rate=[3 -5;7 0]; a.chem.flux_type='intermolecular';

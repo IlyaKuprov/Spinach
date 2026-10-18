@@ -437,4 +437,4 @@ rather than `inter.tau_c`, the latter being read only by Redfield theory.
 
 ### Imaging relaxation phantoms
 
-`imaging` adds point-to-point magnetization flux uniformly to `R`, independently of relaxation phantoms. Phantom relaxation operators must exclude this flux; when constructing them with `relaxation`, clear `chem.flux_rate` in the clone used for phantom construction.
+`imaging` assembles `R` only from the user-supplied `parameters.rlx_ph` and `parameters.rlx_op`. These relaxation superoperators must already contain all required contributions, including magnetisation flux; the context does not add a separate flux term.

@@ -1,7 +1,9 @@
 # examples/dnp_sol/cavity_dnp/cavity_dnp_minimal.m
 
-Demonstrates one ideal cavity-assisted DNP cycle for a single Bi:Si donor using three active energy eigenstates and an explicit truncated bosonic cavity. The full donor Hamiltonian identifies the active states; seven inert ground populations are included analytically in normalisation.
+Illustrates one ideal cavity-assisted DNP cycle for Bi:Si using the native Spinach particle specification `E`, `209Bi`, and `Cn`. The full donor-cavity Hilbert space has dimension `20*nlevels`; all donor spectator levels and retained cavity occupations remain represented.
 
-Call `result=cavity_dnp_minimal(nlevels)` with an integer Fock dimension of at least two. The returned structure contains time in seconds, active populations, photon occupation, the target-state population enhancement, the change in physical nuclear magnetisation, and density-matrix consistency diagnostics. Frequencies used internally are angular frequencies. No files or figures are produced.
+Call `result=cavity_dnp_minimal(nlevels)` with an integer cavity dimension of at least three. The result contains time in seconds, active-state populations, photon occupation, target-state population enhancement, physical nuclear magnetisation change, diagnostics, and the native system and generators. No files or figures are produced.
 
-The pulses are ideal selective pi rotations with donor-cavity coupling switched off. The waiting stage retains Jaynes-Cummings coupling and photon loss. The illustrative coupling is not fitted to an ensemble; collective effects and repeated pumping are outside the model. See the adjacent example README for parameters and the reference to Lorriaux et al., arXiv:2610.19180v1.
+`create`, `basis`, and `hamiltonian` identify the physical donor energy eigenstates. Native `operator` and `state` calls provide composite observables and vacuum state. Spectral projectors specify ideal selective microwave/RF transitions; `hilb2liouv`, native mode `relaxation`, and `evolution` provide commutators, photon loss, and propagation. No external reduced density solver or custom tensor dissipator is used.
+
+The cavity remains explicit during emission, but donor-cavity coupling is switched off during ideal pulses. Coupling and pulse strengths are illustrative rather than fitted; collective effects, disorder, repeated pumping, spin diffusion, and non-cavity relaxation are excluded. See the example README and Lorriaux et al., arXiv:2610.19180v1.

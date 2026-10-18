@@ -331,6 +331,14 @@ relaxation-induced and single-frequency alternatives.
 
 ## DNP
 
+For cavity-assisted DNP, use `dnp_sol/cavity_dnp/cavity_dnp_minimal.m`:
+`result=cavity_dnp_minimal(3,2,300)` retains the full E/209Bi donor and
+bosonic cavity in `sphten-liouv`, with RF saturation, selective pulses,
+and a photon-loss reset. `validate_cavity_dnp(result)` checks numerical
+convergence and the RF/exchange controls. The README states the pulse
+and cavity approximations; nuclear Iz transfer is not an eigenstate
+population-enhancement measurement.
+
 `dnp_sol/solid_effect_freq_scan_1.m` scans the microwave frequency at one
 crystal orientation using the `crystal` context with `@dnp_freq_scan`, an
 `IK-0` basis, `parameters.method='lvn-backs'` and

@@ -1,5 +1,7 @@
 # validate_cavity_dnp
 
-`validation=validate_cavity_dnp(reference)` validates the actual E/209Bi/Cn example, with an optional previously computed default reference. It compares Fock cutoffs 3, 4, and 5, increases the pulse Fokker–Planck rank, doubles the RF saturation length, and checks half-size and non-dyadic laboratory-frame reset timesteps.
+`validation=validate_cavity_dnp(reference)` checks a result from `cavity_dnp_minimal(3,2,300)`. A no-argument call first runs that reference calculation.
 
-Independent native controls omit the RF pulse or the spin–cavity exchange, test lossless conservation of total spin projection plus photon number, resolve the donor-generated photon transient, and compare native one-photon loss with the exact exponential. Trace, observable bounds, saturation residual, and Fock-edge occupation are checked. Every simulated trajectory stays in `sphten-liouv`; no density-matrix conversions, custom generators, or effective three-level dynamics are used. Success prints `CAVITY_DNP_VALIDATION_SUCCESS`.
+Checks cover cavity dimensions 3, 4, and 5; pulse phase-grid rank; saturation-sweep count; and reset time-step refinements by factors of 2 and 5/4. Physical controls omit the selective RF pulse or spin-cavity exchange, test lossless conservation of donor projection plus photon number, resolve the photon transient, and compare one-photon loss with the exact exponential. Trace, observable bounds, saturation residual, and Fock-edge occupation are also checked.
+
+All trajectories remain in `sphten-liouv`. The function returns the measured errors and diagnostics and prints `CAVITY_DNP_VALIDATION_SUCCESS` after all assertions pass. It writes no files or figures.

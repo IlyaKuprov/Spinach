@@ -33,6 +33,10 @@
 %       space formalisms; the euler_angles parameter refers to the
 %       spin subsystem only and has no effect on the mode terms.
 %
+% Point-to-point fluxes specified by inter.chem.flux_rate and
+% inter.chem.flux_type are added after relaxation retention and
+% thermalisation, preserving their original kinetic-generator action.
+%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk
@@ -64,8 +68,11 @@ end
 % Do nothing if none specified
 if isempty(spin_system.rlx.theories)&&(~boson_terms)
 
-    % Update the user
-    report(spin_system,'relaxation superoperator set to zero.');
+    % Flux is independent of the relaxation theory and its thermalisation
+    R=rlx_flux(spin_system);
+    if nnz(R)==0
+        report(spin_system,'relaxation superoperator set to zero.');
+    end
 
     % Exit the function
     return;
@@ -511,6 +518,10 @@ if ismember('SRSK',spin_system.rlx.theories)
     % Leave thermalisation of the sum to the outer call
     spin_system_local.rlx.equilibrium='zero';
 
+    % Leave magnetisation flux to the outer call
+    spin_system_local.chem.flux_rate=[];
+    spin_system_local.chem.flux_type='';
+
     % Leave mode dissipation to the outer call
     if boson_terms
         spin_system_local.inter.modes.damp(:)=0;
@@ -808,6 +819,9 @@ end
 % Perform final clean-up and make array complex for later
 R=complex(clean_up(spin_system,R,spin_system.tols.rlx_zero));
 
+% Add magnetisation flux after retention, thermalisation, and relaxation clean-up
+R=R+rlx_flux(spin_system);
+
 % Print matrix diagnostics
 report(spin_system,['final relaxation superoperator density ' num2str(100*nnz(R)/numel(R))...
                     '%, nnz(R)=' num2str(nnz(R)) ', sparsity ' num2str(issparse(R))]);
@@ -922,4 +936,5 @@ end
 % it at all.
 %
 % Friedrich Nietzsche
+
 

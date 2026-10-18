@@ -1,13 +1,10 @@
 % Direct-sum chemical kinetics from explicit reaction records. Syntax:
 %
 %                  K=kinetics(spin_system)
-%                  K=kinetics(spin_system,'report')
 %
 % Parameters:
 %
 %    spin_system - Spinach object with chem.reactions and a compiled basis
-%
-%    mode        - optional 'report' prints the reaction maps and closures
 %
 % Outputs:
 %
@@ -39,11 +36,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kinetics.m>
 
-function K=kinetics(spin_system,mode)
+function K=kinetics(spin_system)
 
-% Preserve the ordinary call and the explicitly requested reporting form
-if nargin==1, mode=''; end
-grumble(spin_system,mode);
+% Check consistency
+grumble(spin_system);
 
 % Leave chemistry-free systems available in every formalism
 if isempty(spin_system.chem.reactions)
@@ -79,7 +75,7 @@ if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})
     end
 
     % Transform fixed maps once and state-dependent maps at each stage state
-    K=kinetics(source,mode);
+    K=kinetics(source);
     if isnumeric(K)
         K=P*K*Q;
     else
@@ -145,20 +141,6 @@ for n=1:numel(reactions)
         end
     end
     reactions{n}=reaction;
-end
-
-% Print the declared network and its atom transport
-if strcmp(mode,'report')
-    summary_chemistry(spin_system);
-    for n=1:numel(reactions)
-        reaction=reactions{n};
-        source_spins=cellfun(@(x)x(:)',spin_system.chem.parts(reaction.reactants),'UniformOutput',false);
-        source_spins=[source_spins{:}];
-        report(spin_system,['reaction ' num2str(n) ': matched spins ' ...
-               mat2str(reaction.matching(:,1)') ', traced spins ' ...
-               mat2str(setdiff(source_spins,reaction.matching(:,1))) ...
-               ', closure ' reaction.closure]);
-    end
 end
 
 % Numeric zero-rate records do not make first-order chemistry nonlinear
@@ -254,8 +236,8 @@ K=blkdiag(blocks{:});
 end
 
 % Consistency enforcement
-function grumble(spin_system,mode)
-for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
+function grumble(spin_system)
+for field={'rates','rp_theory','rp_rates','rp_electrons'}
     if isfield(spin_system.chem,field{1})
         error('Spinach:kinetics:retiredChemistry',...
               ['chem.' field{1} ' is retired; use chem.reactions records.']);
@@ -268,9 +250,6 @@ end
 if isfield(spin_system.bas,'irrep')
     error('Spinach:basis:retiredIrrep',...
           'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
-end
-if ~ischar(mode)||(~isempty(mode)&&~strcmp(mode,'report'))
-    error('Spinach:kinetics:mode','the optional kinetics mode must be ''report''.');
 end
 if ~isempty(spin_system.chem.reactions)&&strcmp(spin_system.bas.formalism,'zeeman-wavef')
     error('Spinach:kinetics:wavefunction',...
@@ -300,4 +279,5 @@ end
 % Ayn Rand, "The Fountainhead"
 
 % #NGRUM
+
 

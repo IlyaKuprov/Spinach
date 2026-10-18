@@ -40,7 +40,7 @@ result=test_true(result,'column membership summary',...
                  'reporting formats a row without changing the accepted column-oriented input');
 
 % Assert every retired input even when its value is empty
-for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
+for field={'rates','rp_theory','rp_rates','rp_electrons'}
     bad=inter; bad.chem.(field{1})=[]; rejected=false;
     try
         create(sys,bad);
@@ -87,7 +87,7 @@ for n=1:5
         case 3
             bad.chem=rmfield(bad.chem,'parts'); id='reactionParts'; text='explicit inter.chem.parts';
         case 4
-            bad.chem.extra=1; id='chemistryField'; text='only parts, concs, and reactions';
+            bad.chem.extra=1; id='chemistryField'; text='only parts, concs, reactions, flux_rate, and flux_type';
         case 5
             bad.chem.reactions{1}.products=3; bad.chem.reactions{1}.matching=[3 5];
             id='reactionIsotopes'; text='identical isotopes';

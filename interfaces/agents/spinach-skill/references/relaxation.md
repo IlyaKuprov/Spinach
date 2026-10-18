@@ -332,7 +332,7 @@ frequency, distorted-state lifetime, and rotational correlation time
 separate when adapting this model; scaling both exchange rates preserves
 populations but is a different physical scan.
 
-Spin replacement between molecules uses matching rather than a flux matrix.
+Explicit spin-replacement reaction records use atom matching. The original point-to-point `flux_rate`/`flux_type` model remains supported separately through the relaxation generator in `sphten-liouv`; it is not interchangeable with every matching-based reaction.
 For a two-proton molecule exchanging its first proton with a one-proton pool:
 
 ```matlab
@@ -347,7 +347,7 @@ coincide. The additive arrival keeps each reactant's internal orders but not
 cross-reactant polarisation products: the retained molecular spin survives,
 while correlations involving the departing spin are lost. Intramolecular
 permutation records instead transport the mapped multi-spin orders. These are
-physical matching models, not an automatic translation of every retired flux
+physical matching models, not an automatic translation of every point-to-point flux
 matrix. `test_cwdm_flux` supplies an analytic replacement check. Freezing an
 additive generator is justified only when its concentrations and rates remain
 constant, not for general mass-action or product-closure networks.
@@ -434,3 +434,7 @@ Spinning contexts add a second convergence axis, `parameters.max_rank`,
 which must be converged independently of the grid. `gridfree` needs no grid
 at all, and takes its rotational correlation times in `parameters.tau_c`
 rather than `inter.tau_c`, the latter being read only by Redfield theory.
+
+### Imaging relaxation phantoms
+
+`imaging` assembles `R` only from the user-supplied `parameters.rlx_ph` and `parameters.rlx_op`. These relaxation superoperators must already contain all required contributions, including magnetisation flux; the context does not add a separate flux term.

@@ -28,7 +28,7 @@ closures={'additive','product'}; signal=zeros(2,numel(time_grid));
 % Compare the two nonlinear closures with independently stepped references
 for n=1:2
     spin_system.chem.reactions{1}.closure=closures{n};
-    K=kinetics(spin_system,'report'); rho=rho0;
+    K=kinetics(spin_system); rho=rho0;
     signal(n,1)=real(coil'*rho);
     for k=2:numel(time_grid)
         rho=step(spin_system,{@(t,y)1i*K(t,y),time_grid(k-1),'RKMK4'},rho,dt);

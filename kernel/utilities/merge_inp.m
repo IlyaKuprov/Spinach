@@ -174,6 +174,8 @@ if group_check(inter_parts,'chem')
     end
     [chem,chem_parts]=merge_like_parts(chem,chem_parts,'parts',part_sizes);
     [chem,chem_parts]=merge_like_isotopes(chem,chem_parts,'concs');
+    [chem,chem_parts]=merge_like_couplings(chem,chem_parts,'flux_rate');
+    [chem,chem_parts]=merge_like_magnet(chem,chem_parts,'flux_type');
     group_gate(chem_parts,'chem');
     chem=rmfield(chem,'stub'); inter.chem=chem;
     inter_parts=cellfun(@(x)rmfield(x,'chem'),...
@@ -452,6 +454,16 @@ end
 if any(cellfun(@(x)(~isfield(x,'isotopes')),sys_parts))
     error('every sys structure must contain an isotopes subfield.');
 end
+for n=1:numel(inter_parts)
+    if isfield(inter_parts{n},'chem')&&isfield(inter_parts{n}.chem,'flux_rate')
+        rates=inter_parts{n}.chem.flux_rate;
+        nspins=numel(sys_parts{n}.isotopes);
+        if ~isnumeric(rates)||~isreal(rates)||~isequal(size(rates),[nspins nspins])||...
+           ~all(isfinite(rates(:)))
+            error('each flux_rate must be a finite real matrix matching its subsystem spin count.');
+        end
+    end
+end
 end
 
 % Dicebant ergo Pilato pontifices Judaeorum: "Noli scribere
@@ -459,4 +471,5 @@ end
 % Respondit Pilatus: "Quod scripsi, scripsi."
 %
 % Ioannes 19:21-22
+
 

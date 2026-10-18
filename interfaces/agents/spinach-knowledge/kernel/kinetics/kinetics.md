@@ -1,5 +1,7 @@
 # kernel/kinetics/kinetics.m
 
+`kinetics(spin_system)` has one argument and performs no summary reporting. `create` calls `summary_rlx_flux(spin_system)` and `summary_kinetics(spin_system)` directly before basis construction.
+
 ## Direct-sum chemistry
 
 `K=kinetics(spin_system)` compiles `chem.reactions` into sparse drains and product-row maps. Numeric first-order records return a constant sparse matrix. Numeric zero-rate higher-order records also permit the static route; an entirely zero-rate network yields a sparse zero matrix usable by ordinary linear contexts. Rate callbacks remain dynamic even if a sampled value is zero. Higher-order reactions or time-dependent rate handles return `K(t,eta)`, evaluated on the instantaneous concentration-weighted state. Chemistry-free systems retain their zero generator in every formalism. Both Liouville formalisms support first-order and mass-action reactions; Hilbert reactions expose a first-order matrix derivative.
@@ -12,7 +14,7 @@ The additive closure carries each reactant's internal spin orders and distribute
 
 Named singlet/triplet selectors use the left/right electronic projectors: Haberkorn loss is half their sum, and arrival is their product followed by the matching map. Jones–Hore variants use identity minus the complementary projector product for the drain. User selector pairs are substance-local left/right product superoperators with the reactant Liouville block dimensions, including in `zeeman-hilb`.
 
-`kinetics(spin_system,'report')` prints the network, closure, matched and traced spins. Compilation reports product rows missing a source descriptor. Maps and selector products are compiled once per call, not inside time stepping. For a space-times-spin state, the handle assembles an independent sparse chemistry block per voxel; transport is added separately. Each time-dependent rate is evaluated and validated once at the shared stage time, then reused across voxels.
+`create` reports the network, closure, matched and traced spins through `summary_kinetics(spin_system)`. Compilation reports product rows missing a source descriptor. Maps and selector products are compiled once per call, not inside time stepping. For a space-times-spin state, the handle assembles an independent sparse chemistry block per voxel; transport is added separately. Each time-dependent rate is evaluated and validated once at the shared stage time, then reused across voxels.
 
 ## Zeeman representation and matrix actions
 
@@ -27,5 +29,7 @@ Legacy rate, flux, and radical-pair fields are rejected by `create`; this routin
 Nonempty wavefunction reaction records raise `Spinach:kinetics:wavefunction`, naming zeeman-wavef explicitly; this covers first-order and mass-action chemistry.
 
 Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
-The kinetics consumer also rejects all six retired chemistry fields, even when empty, with `Spinach:kinetics:retiredChemistry` pointing to `chem.reactions`; this covers manually modified or saved legacy structures that bypass `create`.
+The kinetics consumer rejects the four retired chemistry fields `rates`, `rp_theory`, `rp_rates`, and `rp_electrons`, even when empty, with `Spinach:kinetics:retiredChemistry` pointing to `chem.reactions`; this covers manually modified or saved legacy structures that bypass `create`.
+The original `flux_rate`/`flux_type` pair remains supported independently through the relaxation generator in `sphten-liouv`, not added to the chemical generator returned here. `create` reports nonzero directed spin rates and flux type through `summary_rlx_flux` before basis construction.
+
 Reporting accepts mixed row/column substance memberships by formatting local spin lists as rows; the stored memberships and generator are unchanged.

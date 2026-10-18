@@ -267,7 +267,7 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
   left/right projector matrices. See the selective-loss recipe in relaxation.md.
 
 Spin replacement uses explicit matching records, not a flux matrix.
-Legacy rates, flux, and radical-pair fields are rejected. Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
+Legacy rate-matrix and radical-pair fields are rejected. The original point-to-point `flux_rate`/`flux_type` inputs remain supported separately through relaxation in `sphten-liouv`. Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
@@ -577,7 +577,7 @@ Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
 product operators and states raise `Spinach:which_subst:crossSubstance`.
 
 Chemistry uses explicit `chem.reactions` records through `kinetics` and
-`react_gen`; retired rates, flux, and radical-pair fields are rejected.
+`react_gen`; retired rate-matrix and radical-pair fields are rejected. Point-to-point flux inputs remain supported through relaxation.
 
 Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
 block must use `none`, as enforced by `basis`.
@@ -635,7 +635,7 @@ these experiments retain their supported single-substance algorithms.
 
 ### Explicit chemistry records
 
-Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
+Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rate-matrix and radical-pair input fields are retired. The original paired `inter.chem.flux_rate`/`flux_type` inputs remain supported independently of reaction records: matrix entry `(from,to)` is a directed spin flux in Hz, with `intramolecular` correlation transfer or `intermolecular` correlation damping. They contribute through relaxation in `sphten-liouv`. `create` reports their nonzero rates and type through `summary_rlx_flux`. `kinetics(spin_system)` has one argument and does not print summaries. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
 
 `unit_state`, `state`, and `equilibrium` return concentration-weighted density
 matrices and Liouville states; storage-only wavefunctions remain unweighted.

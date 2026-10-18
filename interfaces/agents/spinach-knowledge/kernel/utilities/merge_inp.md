@@ -1,5 +1,7 @@
 # kernel/utilities/merge_inp.m
 
+Each supplied flux-rate block is validated before concatenation: it must be finite, real, numeric, and square with dimensions equal to that subsystem’s spin count. Compensating incorrect block sizes cannot silently reassign rates between subsystems.
+
 `[sys,inter]=merge_inp(sys_parts,inter_parts)` combines molecular input structures, for example from separate DFT calculations, without confusing their local spin labels. Both arguments must be nonempty row cell arrays of structures of equal length; every `sys` entry must supply `isotopes`. The outputs are merged `sys` and `inter` inputs, not a compiled Spinach system.
 
 ## Independent molecules in a common experimental setting
@@ -14,6 +16,6 @@ The merger is deliberately strict about missing and unsupported data. Nested Zee
 
 Chemical parts carry shifted global spin membership, and initial concentrations are concatenated. Reaction records retain their physical rates and closures while reactant/product substance indices, atom-matching spin indices, and named selector electrons receive the appropriate offsets. User selector matrices remain local to their own substance and are not expanded into the merged direct sum. The caller then uses `create` and `basis` to validate and compile the merged model.
 
-Entirely empty chemistry groups remain empty. This preserves `create`'s default single-substance construction instead of inventing a reaction field that would require explicit parts. Retired rate-matrix, flux, and radical-pair chemistry fields are not merged; use explicit reaction records. Local per-spin relaxation/source data and the supported nested interaction groups are retained, while unknown fields fail visibly so that unsupported physical information is never silently lost.
+Entirely empty chemistry groups remain empty. This preserves `create`'s default single-substance construction instead of inventing a reaction field that would require explicit parts. Retired rate-matrix and radical-pair chemistry fields are not merged; use explicit reaction records for those models. The supported point-to-point `flux_rate` matrices are assembled in block-diagonal spin order, and the paired `flux_type` values must agree. Local per-spin relaxation/source data and the supported nested interaction groups are retained, while unknown fields fail visibly so that unsupported physical information is never silently lost.
 
 Source: [kernel/utilities/merge_inp.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/merge_inp.m). [Wiki](https://spindynamics.org/wiki/index.php?title=merge_inp.m).

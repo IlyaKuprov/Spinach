@@ -53,4 +53,4 @@ Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply int
 
 Selecting flux does not waive the usual relaxation settings: supply valid inter.rlx_keep and inter.equilibrium as required by the relaxation path (for example 'labframe' and 'zero').
 
-A selected all-zero flux with no other mechanism returns zero before retention or thermalisation, including in Hilbert space with IME selected.
+When flux is the only selected mechanism and there is no dissipative mode contribution, `relaxation` returns `rlx_flux` directly without constructing ordinary relaxation or applying its retention and thermalisation. An all-zero flux therefore returns zero, including in Hilbert space with IME selected. The flux-only check reduces across all dimensions of the internal theory array.

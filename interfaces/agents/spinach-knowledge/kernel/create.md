@@ -52,7 +52,7 @@ Absent `inter.chem.parts` defaults to a single block containing all spins. A sin
 
 `closure` is `additive` by default or `product`. Optional selectors apply to a single first-order reactant: a named singlet/triplet (including Jones–Hore channel variants) with two distinct electron indices, or a pair of finite square product superoperators of equal size. Their basis dimensions are resolved by generator compilation, not by create. Legacy `rates`, `rp_theory`, `rp_rates`, and `rp_electrons` inputs raise `Spinach:create:retiredChemistry` naming the replacement record format.
 
-The original paired `inter.flux_rate`/`flux_type` inputs remain supported. Matrix entry `(from,to)` gives a directed spin flux in Hz and must be a finite real two-dimensional square matrix; type is `intramolecular` or `intermolecular`. These inputs contribute through relaxation in `sphten-liouv`, independently of reaction records. Creation reports their nonzero rates and type.
+The original paired `inter.flux_rate`/`flux_type` inputs remain supported. Matrix entry `(from,to)` gives a directed spin flux in Hz and must be a finite real two-dimensional square matrix; type is `intramolecular` or `intermolecular`. These inputs contribute through relaxation in `sphten-liouv`, independently of reaction records. Creation reports their nonzero rates and type only when `'flux'` is explicitly selected in `inter.relaxation`; inactive inputs produce no flux summary.
 
 Concentrations must be a finite, real, non-negative vector with one entry per substance, including spin-free substances. Zero concentrations are valid.
 

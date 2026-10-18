@@ -40,6 +40,11 @@ result=test_true(result,'internal ownership',...
 result=test_true(result,'enabled summary',contains(lower(summary),'flux'),...
                  'Enabled flux must be reported.');
 
+% Accepted column theory arrays still select flux only once
+shaped=s; shaped.rlx.theories=repmat({'flux'},2,1);
+result=test_close(result,'flux theory array shape',relaxation(shaped),F,0,0,...
+                  'Repeated flux entries add the mechanism only once.');
+
 % Stored rates do not enable the mechanism
 without=rmfield(inter,'relaxation');
 quiet=evalc('off=create(loud,without);'); off=basis(off,bas);

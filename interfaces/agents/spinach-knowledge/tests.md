@@ -1,5 +1,7 @@
 # Test knowledge index
 
+[test_manifest](tests/lib/test_manifest.md) registers these functions for the normal `run_tests` and `run_test` entry points.
+
 ## Flux relaxation
 
 - [test_flux_relaxation](tests/kernel/test_flux_relaxation.md): switch activation, independent transfer equation, T1/T2 and Redfield additivity, input validation and utility dependencies.

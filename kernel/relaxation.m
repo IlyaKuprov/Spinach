@@ -66,13 +66,12 @@ if boson_terms&&(~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-lio
     boson_terms=false;
 end
 
-% Return before thermalisation when no relaxation mechanism contributes
-if (~boson_terms)&&(isempty(spin_system.rlx.theories)||...
-   (all(strcmp(spin_system.rlx.theories,'flux'))&&...
-    nnz(spin_system.rlx.flux_rate)==0))
+% Flux bypasses ordinary relaxation retention and thermalisation
+if (~boson_terms)&&all(strcmp(spin_system.rlx.theories,'flux'),'all')
 
-    % No relaxation mechanisms are active
-    report(spin_system,'relaxation superoperator set to zero.');
+    % Return the selected flux contribution, including the no-theory zero
+    R=rlx_flux(spin_system);
+    report(spin_system,'ordinary relaxation disabled; returning flux contribution.');
 
     % Exit the function
     return;
@@ -920,7 +919,8 @@ if ( ismember('SRSK',spin_system.rlx.theories))&&...
 end
 if ( strcmp(spin_system.rlx.equilibrium,'IME'))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))&&...
-   ~(isequal(spin_system.rlx.theories,{'flux'})&&...
+   ~(ismember('flux',spin_system.rlx.theories)&&...
+     all(strcmp(spin_system.rlx.theories,'flux'),'all')&&...
      nnz(spin_system.rlx.flux_rate)==0)
     error('IME thermalisation is only available in Liouville space.');
 end

@@ -1,11 +1,37 @@
 # cavity_dnp_minimal
 
-`result=cavity_dnp_minimal(nlevels,max_rank,ncycles)` uses a cavity Fock dimension, pulse Fokker–Planck rank, and RF sweep count. The usual call is `cavity_dnp_minimal(3,2,300)`; abbreviated calls retain rank 2 and 300 sweeps.
+This example illustrates the preparation, selective pulses, and cavity reset in Fig. 1 and Appendix D of Lorriaux et al., arXiv:2610.19180v1. It is not an ensemble fit.
 
-The calculation retains all twenty Bi:Si donor levels and the cavity in `sphten-liouv`. It illustrates Fig. 1 and Appendix D of Lorriaux et al., arXiv:2610.19180v1, rather than fitting an ensemble measurement.
+After adding Spinach and this directory to the MATLAB path, run:
 
-Thermal preparation at 25 mK is followed by RF saturation of the eight lower-manifold lines, a selective microwave pulse, a selective RF pulse, and a 20 s cavity reset. `reduce` removes only the disconnected cavity spectator during the pulses. `shaped_pulse_af` retains the donor drift, and `coherence` averages donor phase without removing electron–nuclear zero-quantum coherences. Vacuum attachment, spin-cavity exchange, photon loss, and propagation use Spinach's bosonic state, interaction, relaxation, and evolution APIs.
+```matlab
+result=cavity_dnp_minimal();
+```
 
-RF sweeps replace experimental band-limited noise; rectangular pulses replace WURST shapes. Other approximations are a disconnected cavity during pulses, a zero-temperature photon bath, illustrative 100 Hz single-donor coupling, and omission of intrinsic spin relaxation and direct nuclear magnetic drive.
+The calculation requests 64 workers, subject to the parallel profile limit. The example writes no files and opens no figures.
 
-The result contains nuclear Iz, photon number, trace, and Fock-edge trajectories, plus preparation diagnostics and objects used by `validate_cavity_dnp`. Observable duals use left-product operators; the trace uses `state(spin_system,'E',1)`, not a product of identities. The nuclear polarisation change is not a claim about twofold |6> population enhancement.
+## Model
+
+The system contains an electron, 209Bi (I=9/2), and a truncated bosonic cavity. All twenty donor levels are retained in `sphten-liouv`. The magnetic field is 65.37 mT, the isotropic hyperfine coupling is 1.475 GHz, and the electron g factor is 2.00032; the nuclear Zeeman term uses Spinach's isotope table.
+
+The cavity is resonant with the |6> to |15> transition. Its illustrative single-donor coupling is 100 Hz and its photon linewidth is 210 kHz. The Jaynes–Cummings interaction is selected with `inter.modes.strength.exchange='rwa'`; donor Zeeman frequencies remain in the laboratory-frame Hamiltonian. The photon bath is at zero temperature. Intrinsic spin relaxation, inhomogeneous broadening, collective enhancement, and resonator-frequency modulation are omitted.
+
+## Preparation and pulse sequence
+
+The donor starts at 25 mK. During preparation the cavity is disconnected, and `reduce` removes its spectator coordinate from the pulse calculation without discarding donor levels or changing formalism.
+
+Repeated rectangular RF sweeps saturate all eight adjacent transitions in the lower donor manifold. After each pulse, `coherence` averages the donor RF phase. This sequence replaces the experimental band-limited-noise scrambling; the sweep residual and raw preparation trace are returned.
+
+A selective microwave pulse shelves |6> population in |15>, then a selective RF pulse transfers |7> population to |6>. Both use `shaped_pulse_af` with the full donor drift and a linearly polarised electronic magnetic drive. The smaller direct nuclear drive is neglected. Donor phase averaging removes phase-dependent transients but retains electron–nuclear zero-quantum coherences. The calibrated rectangular pulses approximate, rather than reproduce, the experimental WURST waveforms; they are not ideal eigenstate swaps.
+
+The cavity vacuum is attached using `BL1`, and the connected system is rebuilt. `evolution` follows spin-cavity exchange and photon loss for 20 s. Disconnecting the cavity during the pulses approximates experimental resonator detuning.
+
+## Results and numerical settings
+
+The returned trajectories are nuclear Iz, photon number, trace, and highest-retained-Fock-level population. `delta_iz` measures nuclear polarisation transfer from the saturated preparation, not a twofold enhancement of |6> population. The example does not use a coupled-eigenstate population label.
+
+Traces use the native unit state, `state(spin_system,'E',1)`, and observables use left-product operators. The raw preparation trace is recorded before normalisation. Precision is set by `paranoia`; `spin_system.tols.small_matrix=size(H,1)+1` selects the matrix-exponential branch of Spinach's propagator for the bounded reset matrices.
+
+The example uses three cavity levels, pulse Fokker–Planck rank 2, and 300 saturation sweeps. These settings were checked against cavity dimensions 4 and 5, rank 3, and 600 sweeps. The maximum nuclear Iz differences were below 3e-5, 1.4e-6, and 4.6e-7, respectively. The reset time grid is 0 to 20 s in 1 ms steps. These constants are visible near the top of the example rather than exposed as function arguments.
+
+The same calculation was also checked with reset time-step refinements by factors of 2 and 5/4. Physical controls omitted the selective RF pulse or spin-cavity exchange, tested lossless conservation of donor projection plus photon number, resolved the photon transient, and compared one-photon decay with the exact exponential. Trace, observable bounds, saturation residual, and Fock-edge occupation were checked. No validation driver is shipped with this example.

@@ -11,31 +11,23 @@
 % smaller nuclear magnetic moment is neglected. The complete
 % isotropic hyperfine interaction is retained.
 %
-%          result=cavity_dnp_minimal(nlevels,max_rank,ncycles)
-%
-% nlevels  - cavity Fock dimension, integer at least three
-% max_rank - pulse Fokker-Planck rank, normally 2
-% ncycles  - number of RF saturation sweeps, normally 300
+%                 result=cavity_dnp_minimal()
 %
 % result contains time in seconds, nuclear Iz, photon number,
 % trace, and Fock-edge population as row vectors. It also holds
 % preparation diagnostics, pulse frequencies (Hz) and durations
-% (s), and the spin system, states, and operators for validation.
-% One- and two-argument calls retain rank 2 and 300 sweeps.
+% (s), and the spin system, states, and operators.
 %
 % Calculation time: minutes; requests a 64-worker parallel pool
 %
 % ilya.kuprov@weizmann.ac.il
 
-function result=cavity_dnp_minimal(nlevels,max_rank,ncycles)
+function result=cavity_dnp_minimal()
 
-% Preserve the original abbreviated calls
-if nargin<2
-    max_rank=2;
-end
-if nargin<3
-    ncycles=300;
-end
+% Converged cavity cutoff, pulse rank, and saturation sweep count
+nlevels=3;
+max_rank=2;
+ncycles=300;
 
 % Magnet field and particles
 sys.magnet=0.06537;
@@ -191,7 +183,7 @@ result.transition_hz=[mw_frq rf_frq];
 result.saturation_hz=rf_frqs;
 result.pulse_durations=[mw_time rf_time];
 
-% Objects used by the companion numerical validation
+% Spin system and states underlying the trajectories
 result.spin_system=spin_system;
 result.H=H;
 result.R=R;

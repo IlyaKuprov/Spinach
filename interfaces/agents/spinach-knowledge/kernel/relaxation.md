@@ -17,7 +17,7 @@ Builds a relaxation superoperator by accumulating the terms selected in `spin_sy
 
 ## Numerical / algorithmic content
 
-The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no spin theory is selected and no dissipative mode term is present, the result is set to zero.
+The function starts with a zero superoperator and adds the enabled spin-relaxation contributions. For Redfield, it checks that rotational correlation times are nonzero and checks the stated `T1,2 >> tau_c` condition against the constructed relaxation rates. Positive bosonic-mode damping or dephasing adds thermalised GKSL terms in Liouville space; outside the supported Liouville formalisms the source reports that those mode terms are not added. When no spin theory is selected and no dissipative mode term is present, the result is the point-to-point contribution from `rlx_flux(spin_system)`, which is zero only when the flux rates are zero.
 
 Retention by longitudinal order or base frequency uses each substance’s local descriptor. Diagonal retention and uniform damping exempt the unit coordinate of every block separately.
 

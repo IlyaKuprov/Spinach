@@ -69,7 +69,7 @@ end
 if isempty(spin_system.rlx.theories)&&(~boson_terms)
 
     % Flux is independent of the relaxation theory and its thermalisation
-    R=magnetization_flux(spin_system);
+    R=rlx_flux(spin_system);
     if nnz(R)==0
         report(spin_system,'relaxation superoperator set to zero.');
     end
@@ -518,7 +518,7 @@ if ismember('SRSK',spin_system.rlx.theories)
     % Leave thermalisation of the sum to the outer call
     spin_system_local.rlx.equilibrium='zero';
 
-    % Leave magnetization flux to the outer call
+    % Leave magnetisation flux to the outer call
     spin_system_local.chem.flux_rate=[];
     spin_system_local.chem.flux_type='';
 
@@ -819,87 +819,14 @@ end
 % Perform final clean-up and make array complex for later
 R=complex(clean_up(spin_system,R,spin_system.tols.rlx_zero));
 
-% Add magnetization flux after retention, thermalisation, and relaxation clean-up
-R=R+magnetization_flux(spin_system);
+% Add magnetisation flux after retention, thermalisation, and relaxation clean-up
+R=R+rlx_flux(spin_system);
 
 % Print matrix diagnostics
 report(spin_system,['final relaxation superoperator density ' num2str(100*nnz(R)/numel(R))...
                     '%, nnz(R)=' num2str(nnz(R)) ', sparsity ' num2str(issparse(R))]);
 R_whos=whos('R'); report(spin_system,['memory footprint of the relaxation superoperator: '...
                                       num2str(R_whos.bytes/1024^3) ' GB']);
-
-end
-
-% Magnetization transfer in the compiled local basis descriptors
-function F=magnetization_flux(spin_system)
-
-% Allocate the generator and retain the no-flux default
-F=mprealloc(spin_system,0);
-if nnz(spin_system.chem.flux_rate)==0, return; end
-
-% The original flux model uses spherical tensor basis labels
-if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('magnetization flux treatment is only available for sphten-liouv formalism.');
-end
-
-% Select the physical fate of correlations, as in the original flux model
-switch spin_system.chem.flux_type
-    case 'intramolecular'
-        transfer_correlations=true;
-    case 'intermolecular'
-        transfer_correlations=false;
-    otherwise
-        error('unrecognized type of magnetization flux.');
-end
-
-% Process every matrix entry, including diagonal bath rates
-[sources,destins,rates]=find(spin_system.chem.flux_rate);
-orders=cellfun(@(b)sum(logical(b),2),spin_system.bas.basis,'UniformOutput',false);
-for n=1:numel(rates)
-
-    % Locate single- and multi-spin orders on either side
-    spins=[sources(n) destins(n)];
-    rows=cell(2,2); labels=cell(2,2);
-    for side=1:2
-        subst=which_subst(spin_system,spins(side));
-        local=find(spin_system.chem.parts{subst}==spins(side));
-        descriptor=spin_system.bas.basis{subst};
-        counts=orders{subst};
-        for order=1:2
-            if order==1
-                mask=(counts==1)&(descriptor(:,local)~=0);
-            else
-                mask=(counts>1)&(descriptor(:,local)~=0);
-            end
-            rows{side,order}=spin_system.bas.offsets(subst)+find(mask);
-            labels{side,order}=descriptor(mask,local);
-        end
-    end
-
-    % Single-spin orders transfer in both models; correlations only within molecules
-    for order=1:2
-        if (order==1)||transfer_correlations
-
-            % Orders containing both spins were stationary in the original model
-            [~,from_static,to_static]=intersect(rows{1,order},rows{2,order});
-            rows{1,order}(from_static)=[]; labels{1,order}(from_static)=[];
-            rows{2,order}(to_static)=[]; labels{2,order}(to_static)=[];
-
-            % Retain the original tensor-label compatibility check
-            if ~isequal(labels{1,order},labels{2,order})
-                error('spin systems on either side of the reaction arrow have different topology or basis sets.');
-            end
-
-            % Gain terms retain their original ordered basis-state matching
-            F=F+rates(n)*sparse(rows{2,order},rows{1,order},...
-                               ones(size(rows{1,order})),size(F,1),size(F,2));
-        end
-
-        % Intermolecular flux destroys every source correlation, even on the diagonal
-        F=F-rates(n)*sparse(rows{1,order},rows{1,order},...
-                           ones(size(rows{1,order})),size(F,1),size(F,2));
-    end
-end
 
 end
 

@@ -47,22 +47,7 @@ if nargin==1, mode=''; end
 
 % Report restored point-to-point fluxes without compiling their relaxation generator
 if strcmp(mode,'report')
-    if isfield(spin_system.chem,'flux_rate')&&nnz(spin_system.chem.flux_rate)>0
-        switch spin_system.chem.flux_type
-            case 'intramolecular'
-                report(spin_system,'intramolecular magnetization flux, correlations will be kept.');
-            case 'intermolecular'
-                report(spin_system,'intermolecular magnetization flux, correlations will be damped.');
-        end
-        [rows,cols,vals]=find(spin_system.chem.flux_rate);
-        report(spin_system,'point-to-point flux rates:');
-        report(spin_system,'===============================');
-        report(spin_system,' N(from)   N(to)    Rate(Hz)   ');
-        report(spin_system,'-------------------------------');
-        for n=1:numel(vals)
-            report(spin_system,sprintf(' %-3d      %-3d      %+0.3e',rows(n),cols(n),vals(n)));
-        end
-    end
+    summary_kinetics(spin_system);
 
     % create() reports validated flux inputs before basis construction
     if ~isfield(spin_system,'bas')
@@ -176,16 +161,7 @@ end
 
 % Print the declared network and its atom transport
 if strcmp(mode,'report')
-    summary_chemistry(spin_system);
-    for n=1:numel(reactions)
-        reaction=reactions{n};
-        source_spins=cellfun(@(x)x(:)',spin_system.chem.parts(reaction.reactants),'UniformOutput',false);
-        source_spins=[source_spins{:}];
-        report(spin_system,['reaction ' num2str(n) ': matched spins ' ...
-               mat2str(reaction.matching(:,1)') ', traced spins ' ...
-               mat2str(setdiff(source_spins,reaction.matching(:,1))) ...
-               ', closure ' reaction.closure]);
-    end
+    summary_kinetics(spin_system,reactions);
 end
 
 % Numeric zero-rate records do not make first-order chemistry nonlinear

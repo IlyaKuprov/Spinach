@@ -1,5 +1,7 @@
 # kernel/relaxation.m
 
+Point-to-point magnetisation flux is constructed by `kernel/utilities/rlx_flux.m`, independently of ordinary spin-relaxation thermalisation.
+
 - Signature: `R=relaxation(spin_system,euler_angles)`
 
 ## Purpose

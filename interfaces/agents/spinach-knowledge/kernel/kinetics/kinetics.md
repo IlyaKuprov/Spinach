@@ -1,5 +1,7 @@
 # kernel/kinetics/kinetics.m
 
+Reporting is delegated to `kernel/summaries/summary_kinetics.m`: the one-argument form reports flux before basis construction, and the compiled-reaction form reports the network and atom transport.
+
 ## Direct-sum chemistry
 
 `K=kinetics(spin_system)` compiles `chem.reactions` into sparse drains and product-row maps. Numeric first-order records return a constant sparse matrix. Numeric zero-rate higher-order records also permit the static route; an entirely zero-rate network yields a sparse zero matrix usable by ordinary linear contexts. Rate callbacks remain dynamic even if a sampled value is zero. Higher-order reactions or time-dependent rate handles return `K(t,eta)`, evaluated on the instantaneous concentration-weighted state. Chemistry-free systems retain their zero generator in every formalism. Both Liouville formalisms support first-order and mass-action reactions; Hilbert reactions expose a first-order matrix derivative.

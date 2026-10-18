@@ -173,10 +173,6 @@ parameters.rho0=state(spin_system,'Lz','1H');
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');
 
-% Restore the original spin-1/2 'cheap' detector normalisation
-fid.cos=2*fid.cos;
-fid.sin=2*fid.sin;
-
 % Apodisation
 fid.cos=apodisation(spin_system,fid.cos,{{'sqcos'},{'sqcos'}});
 fid.sin=apodisation(spin_system,fid.sin,{{'sqcos'},{'sqcos'}});
@@ -197,5 +193,4 @@ plot_2d(spin_system,-real(spectrum),parameters,...
         20,[0.01 0.1 0.05 0.5],2,256,6,'both');
 
 end
-
 

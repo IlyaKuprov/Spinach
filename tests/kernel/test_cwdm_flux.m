@@ -63,14 +63,14 @@ result=test_close(result,'total exchanged magnetisation',...
                   'replacement moves, but does not destroy, the exchanged single-spin magnetisation');
 
 % Original point-to-point flux syntax remains a distinct additive R contribution
-result=magnetization_flux_checks(result);
+result=magnetisation_flux_checks(result);
 result=flux_consumer_checks(result);
 result=inactive_flux_checks(result);
 
 end
 
 % Check the historical point-to-point model independently of reaction records
-function result=magnetization_flux_checks(result)
+function result=magnetisation_flux_checks(result)
 
 % Retain the original one-substance spin space and non-zero diagonal bath rates
 sys.magnet=14.1; sys.isotopes={'1H','1H','1H'};
@@ -302,7 +302,7 @@ for mode={'intermoleculr',''}
     try
         relaxation(s);
     catch err
-        rejected=contains(err.message,'unrecognized type of magnetization flux');
+        rejected=contains(err.message,'unrecognized type of magnetisation flux');
     end
     result=test_true(result,['invalid caller-selected flux model ' mode{1}],rejected,...
                      'the original physical dispatch rejects unsupported active-flux models');

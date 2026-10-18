@@ -14,7 +14,7 @@ The additive closure carries each reactant's internal spin orders and distribute
 
 Named singlet/triplet selectors use the left/right electronic projectors: Haberkorn loss is half their sum, and arrival is their product followed by the matching map. Jones–Hore variants use identity minus the complementary projector product for the drain. User selector pairs are substance-local left/right product superoperators with the reactant Liouville block dimensions, including in `zeeman-hilb`.
 
-`kinetics(spin_system,'report')` prints the network, closure, matched and traced spins. Compilation reports product rows missing a source descriptor. Maps and selector products are compiled once per call, not inside time stepping. For a space-times-spin state, the handle assembles an independent sparse chemistry block per voxel; transport is added separately. Each time-dependent rate is evaluated and validated once at the shared stage time, then reused across voxels.
+`create` reports the network, closure, matched and traced spins through `summary_kinetics(spin_system)`. Compilation reports product rows missing a source descriptor. Maps and selector products are compiled once per call, not inside time stepping. For a space-times-spin state, the handle assembles an independent sparse chemistry block per voxel; transport is added separately. Each time-dependent rate is evaluated and validated once at the shared stage time, then reused across voxels.
 
 ## Zeeman representation and matrix actions
 

@@ -48,8 +48,11 @@ for n=1:2
     if n==1
         no_flux=struct();
     else
-        no_flux.rlx.flux_rate=zeros(2);
-        no_flux.rlx.flux_type='intramolecular';
+        no_flux.flux_rate=zeros(2);
+        no_flux.flux_type='intramolecular';
+        no_flux.relaxation={'flux'};
+        no_flux.rlx_keep='labframe';
+        no_flux.equilibrium='zero';
     end
     creation=evalc('spin_system=create(sys,no_flux);');
     assert(~contains(creation,'point-to-point flux rates:'));

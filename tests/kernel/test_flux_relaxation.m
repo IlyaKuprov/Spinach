@@ -87,6 +87,14 @@ z=create(sys,zero); z=basis(z,bas);
 result=test_close(result,'zero flux with T1 T2',relaxation(z),T,...
                   100*eps(norm(T,1)),0,'Zero flux preserves other models.');
 
+% Enabled zero flux is a no-op before Hilbert-space IME thermalisation
+hilbert=bas; hilbert.formalism='zeeman-hilb';
+no_op=inter; no_op.flux_rate=zeros(2);
+no_op.equilibrium='IME'; no_op.temperature=300;
+h=test_spin_system(sys,no_op,hilbert);
+result=test_true(result,'zero Hilbert flux with IME',nnz(relaxation(h))==0,...
+                 'A zero mechanism must not enter Liouville-only thermalisation.');
+
 % Reject incomplete new inputs and the retired chemistry-owned syntax
 invalid={rmfield(inter,'flux_rate'),rmfield(inter,'flux_type')};
 legacy=rmfield(inter,{'flux_rate','flux_type'});

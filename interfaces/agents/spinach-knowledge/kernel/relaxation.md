@@ -52,3 +52,5 @@ Normalised SRSK vectors use the three-argument unweighted `coil_state` primitive
 Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
 
 Selecting flux does not waive the usual relaxation settings: supply valid inter.rlx_keep and inter.equilibrium as required by the relaxation path (for example 'labframe' and 'zero').
+
+A selected all-zero flux with no other mechanism returns zero before retention or thermalisation, including in Hilbert space with IME selected.

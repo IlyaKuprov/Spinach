@@ -48,9 +48,8 @@
 %                 parameters.rlx_ph={Ph1,Ph2,...,PhN}
 %                 parameters.rlx_op={R1,R2,...,RN}
 %
-% Point-to-point magnetization flux is added uniformly to R. Relaxation
-% phantom operators must exclude that flux: when using relaxation() to
-% construct them, clear chem.flux_rate in the spin system passed to it.
+% Relaxation superoperators must include all required contributions,
+% including magnetisation flux, as supplied by the user.
 %
 % where PhN have the same dimension as the sample voxel grid and RN are re-
 % laxation superoperators. The initial condition phantom reflects the fact 
@@ -133,14 +132,6 @@ for n=1:numel(parameters.rlx_ph)
     polyadic_cores{n}{2}=parameters.rlx_op{n};
 end
 
-% Point-to-point flux is uniform and is not scaled by relaxation phantoms
-if nnz(spin_system.chem.flux_rate)>0
-    flux_system=spin_system; flux_system.rlx.theories={};
-    if isfield(flux_system.inter,'modes')
-        flux_system.inter=rmfield(flux_system.inter,'modes');
-    end
-    polyadic_cores{end+1}={opium(spc_dim,1),relaxation(flux_system)};
-end
 R=polyadic(polyadic_cores);
 
 % Decide the initial state

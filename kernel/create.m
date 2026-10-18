@@ -2760,8 +2760,9 @@ if isfield(inter,'chem')
 
     if isfield(inter.chem,'flux_rate')
         if (~isnumeric(inter.chem.flux_rate))||(~isreal(inter.chem.flux_rate))||...
+           (~all(isfinite(inter.chem.flux_rate(:))))||...
            (size(inter.chem.flux_rate,1)~=size(inter.chem.flux_rate,2))
-            error('inter.chem.flux_rate must be a real square matrix.');
+            error('inter.chem.flux_rate must be a finite real square matrix.');
         end
         if any(size(inter.chem.flux_rate)~=numel(sys.isotopes))
             error('both dimensions of inter.chem.flux_rate matrix must be equal to the number of spins.');

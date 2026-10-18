@@ -327,6 +327,19 @@ end
 result=test_true(result,'inactive flux preserves cross-substance guard',rejected,...
                  'all-zero rates do not authorize an undeclared cross-substance generator');
 
+% Reject non-finite rates before they can enter a physical generator
+sys.output='hush'; sys.parallel={'local',1};
+for rate=[NaN Inf -Inf]
+    invalid=inter; invalid.chem.flux_rate(1,2)=rate; rejected=false;
+    try
+        create(sys,invalid);
+    catch err
+        rejected=contains(err.message,'finite');
+    end
+    result=test_true(result,['non-finite flux rate ' num2str(rate)],rejected,...
+                     'every supplied point-to-point rate must be finite');
+end
+
 end
 
 

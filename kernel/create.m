@@ -935,10 +935,8 @@ else
 end
 
 % Report back to the user
-summary_chemistry(spin_system);
-if nnz(spin_system.chem.flux_rate)>0
-    kinetics(spin_system,'report');
-end
+summary_kinetics(spin_system);
+summary_rlx_flux(spin_system);
 
 % Order matrices
 if isfield(inter,'order_matrix')

@@ -1,6 +1,6 @@
 # kernel/kinetics/kinetics.m
 
-Reporting is delegated to two fixed-signature functions in `kernel/summaries`: `summary_rlx_flux(spin_system)` reports flux before basis construction, and `summary_kinetics(spin_system,reactions)` reports the compiled network and atom transport.
+`kinetics(spin_system)` has one argument and performs no summary reporting. `create` calls `summary_rlx_flux(spin_system)` and `summary_kinetics(spin_system)` directly before basis construction.
 
 ## Direct-sum chemistry
 
@@ -30,6 +30,6 @@ Nonempty wavefunction reaction records raise `Spinach:kinetics:wavefunction`, na
 
 Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
 The kinetics consumer rejects the four retired chemistry fields `rates`, `rp_theory`, `rp_rates`, and `rp_electrons`, even when empty, with `Spinach:kinetics:retiredChemistry` pointing to `chem.reactions`; this covers manually modified or saved legacy structures that bypass `create`.
-The original `flux_rate`/`flux_type` pair remains supported independently through the relaxation generator in `sphten-liouv`, not added to the chemical generator returned here. Report mode prints its nonzero directed spin rates and flux type, including on a validated object from `create` before basis construction.
+The original `flux_rate`/`flux_type` pair remains supported independently through the relaxation generator in `sphten-liouv`, not added to the chemical generator returned here. `create` reports nonzero directed spin rates and flux type through `summary_rlx_flux` before basis construction.
 
 Reporting accepts mixed row/column substance memberships by formatting local spin lists as rows; the stored memberships and generator are unchanged.

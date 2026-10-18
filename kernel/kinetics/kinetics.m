@@ -1,14 +1,10 @@
 % Direct-sum chemical kinetics from explicit reaction records. Syntax:
 %
 %                  K=kinetics(spin_system)
-%                  K=kinetics(spin_system,'report')
 %
 % Parameters:
 %
 %    spin_system - Spinach object with chem.reactions and a compiled basis
-%
-%    mode        - optional 'report' prints flux rates, reaction maps,
-%                  and closures; flux reporting also works before basis()
 %
 % Outputs:
 %
@@ -40,22 +36,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kinetics.m>
 
-function K=kinetics(spin_system,mode)
+function K=kinetics(spin_system)
 
-% Preserve the ordinary call and the explicitly requested reporting form
-if nargin==1, mode=''; end
-
-% Report restored point-to-point fluxes without compiling their relaxation generator
-if strcmp(mode,'report')
-    summary_rlx_flux(spin_system);
-
-    % create() reports validated flux inputs before basis construction
-    if ~isfield(spin_system,'bas')
-        K=[]; return
-    end
-end
-
-grumble(spin_system,mode);
+% Check consistency
+grumble(spin_system);
 
 % Leave chemistry-free systems available in every formalism
 if isempty(spin_system.chem.reactions)
@@ -91,7 +75,7 @@ if ismember(spin_system.bas.formalism,{'zeeman-liouv','zeeman-hilb'})
     end
 
     % Transform fixed maps once and state-dependent maps at each stage state
-    K=kinetics(source,mode);
+    K=kinetics(source);
     if isnumeric(K)
         K=P*K*Q;
     else
@@ -157,11 +141,6 @@ for n=1:numel(reactions)
         end
     end
     reactions{n}=reaction;
-end
-
-% Print the declared network and its atom transport
-if strcmp(mode,'report')
-    summary_kinetics(spin_system,reactions);
 end
 
 % Numeric zero-rate records do not make first-order chemistry nonlinear
@@ -257,7 +236,7 @@ K=blkdiag(blocks{:});
 end
 
 % Consistency enforcement
-function grumble(spin_system,mode)
+function grumble(spin_system)
 for field={'rates','rp_theory','rp_rates','rp_electrons'}
     if isfield(spin_system.chem,field{1})
         error('Spinach:kinetics:retiredChemistry',...
@@ -271,9 +250,6 @@ end
 if isfield(spin_system.bas,'irrep')
     error('Spinach:basis:retiredIrrep',...
           'bas.irrep is retired; use bas.sym_fact(n).irr_projectors and irr_dimensions.');
-end
-if ~ischar(mode)||(~isempty(mode)&&~strcmp(mode,'report'))
-    error('Spinach:kinetics:mode','the optional kinetics mode must be ''report''.');
 end
 if ~isempty(spin_system.chem.reactions)&&strcmp(spin_system.bas.formalism,'zeeman-wavef')
     error('Spinach:kinetics:wavefunction',...

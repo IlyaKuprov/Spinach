@@ -25,7 +25,13 @@ inter.chem.parts={1,2,3:4,[]}; inter.chem.concs=[0.7 0.3 0 0];
 reaction=struct('reactants',[1 2],'products',3,'matching',[1 3;2 4],'rate',50);
 inter.chem.reactions={reaction};
 bas.formalism='sphten-liouv'; bas.approximation={'none','none','none','none'};
-s=basis(create(sys,inter),bas); K=kinetics(s,'report');
+sys.output='console'; text=evalc('s=create(sys,inter);'); s.sys.output='hush';
+result=test_true(result,'creation reports reaction transport',...
+                 contains(text,'reaction 1: matched spins')&&contains(text,'closure additive'),...
+                 'create reports reaction maps before basis construction');
+result=test_true(result,'single-argument kinetics',nargin('kinetics')==1,...
+                 'kinetics has no reporting mode argument');
+s=basis(s,bas); K=kinetics(s);
 eta=unit_state(s)+0.1*state(s,'Lz',1)+0.2*state(s,'Lz',2);
 product=coil_state(s,'Lz',3)+2*coil_state(s,'Lz',4);
 reference=-50*0.3*(0.7*coil_state(s,'E',1)+0.1*state(s,'Lz',1))...
@@ -55,7 +61,7 @@ mixed=s; mixed.chem.parts={1,2,[3;4],[]};
 mixed.chem.reactions={struct('reactants',[3 1],'products',[],...
                             'matching',zeros(0,2),'rate',2,'closure','additive')};
 ordinary=kinetics(mixed); mixed.sys.output=1;
-[text,reported]=evalc('kinetics(mixed,''report'');');
+text=evalc('summary_kinetics(mixed);'); reported=kinetics(mixed);
 result=test_true(result,'mixed membership reporting',contains(text,'traced spins [1 3 4]'),...
                  'reporting accepts row and column spin memberships in the same reaction');
 result=test_close(result,'report generator invariance',reported(0,eta),ordinary(0,eta),0,0,...

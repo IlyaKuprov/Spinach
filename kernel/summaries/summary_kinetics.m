@@ -1,12 +1,10 @@
-% Compiled chemical reaction network reporting. Syntax:
+% Chemical reaction network reporting. Syntax:
 %
-%                  summary_kinetics(spin_system,reactions)
+%                  summary_kinetics(spin_system)
 %
 % Parameters:
 %
 %    spin_system - Spinach data structure
-%
-%    reactions   - cell array of compiled reaction records
 %
 % Outputs:
 %
@@ -14,15 +12,15 @@
 %
 % i.kuprov@soton.ac.uk
 
-function summary_kinetics(spin_system,reactions)
+function summary_kinetics(spin_system)
 
 % Check consistency
-grumble(spin_system,reactions);
+grumble(spin_system);
 
-% Report the compiled reaction network and atom transport
+% Report the reaction network and atom transport
 summary_chemistry(spin_system);
-for n=1:numel(reactions)
-    reaction=reactions{n};
+for n=1:numel(spin_system.chem.reactions)
+    reaction=spin_system.chem.reactions{n};
     source_spins=cellfun(@(x)x(:)',spin_system.chem.parts(reaction.reactants),'UniformOutput',false);
     source_spins=[source_spins{:}];
     report(spin_system,['reaction ' num2str(n) ': matched spins ' ...
@@ -34,12 +32,9 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,reactions)
+function grumble(spin_system)
 if ~isstruct(spin_system)
     error('spin_system must be a structure.');
-end
-if ~iscell(reactions)||~all(cellfun(@isstruct,reactions))
-    error('reactions must be a cell array of structures.');
 end
 end
 

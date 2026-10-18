@@ -443,6 +443,12 @@ that a permutation record preserves the old phenomenological flux model's
 correlations. Nonlinear examples use `kinetics` and the state-dependent `step`
 route; `react_gen` returns product-row maps, not propagation matrices.
 
+Point-to-point magnetisation flux is instead selected with
+`inter.relaxation={'flux'}` (or alongside other relaxation theories), using
+`inter.flux_rate` and `inter.flux_type`. Supply the usual `inter.rlx_keep`
+and `inter.equilibrium` settings. These inputs do not create chemistry
+records, and they are inactive unless `'flux'` is selected.
+
 ## MRI, imaging, flow and diffusion
 
 `imaging/phase_encoding_2d.m` is the reference; the `imaging` context takes no

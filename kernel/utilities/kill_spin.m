@@ -243,10 +243,10 @@ for n=1:numel(spin_system.chem.parts)
     spin_system.chem.parts{n}=find(subsystem_idx);
 end
 
-% Update magnetization flux indices
-if ~isempty(spin_system.chem.flux_rate)
-    spin_system.chem.flux_rate(hit_list,:)=[];
-    spin_system.chem.flux_rate(:,hit_list)=[];
+% Update magnetisation flux indices
+if ~isempty(spin_system.rlx.flux_rate)
+    spin_system.rlx.flux_rate(hit_list,:)=[];
+    spin_system.rlx.flux_rate(:,hit_list)=[];
 end
 
 % Rebuild the reaction atom maps in the surviving global spin index

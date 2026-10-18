@@ -6,7 +6,7 @@
 
 ## Contract
 
-Relaxation is assembled only from caller-supplied phantom operators and weights. The caller must include any required magnetisation flux in those operators; imaging does not add or construct it.
+Relaxation is assembled only from caller-supplied phantom operators and weights. The caller must include any required magnetisation flux in those operators; imaging does not add or construct it. When constructing them with `relaxation`, select `'flux'` in `inter.relaxation` and supply `inter.flux_rate` and `inter.flux_type`.
 
 `imaging` builds spin Hamiltonian and kinetic operators, voxel-dependent relaxation, spatial gradient operators, and the spatial diffusion/flow generator. It passes `H`, `R`, `K`, `G`, and `F` to `pulse_sequence(spin_system,parameters,H,R,K,G,F)`; the context output is whatever that sequence returns. The context applies the `nmr` assumption and channel-frequency offsets.
 

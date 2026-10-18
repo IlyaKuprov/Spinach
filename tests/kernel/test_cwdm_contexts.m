@@ -86,8 +86,10 @@ end
 % Use only caller-supplied relaxation superoperators, including flux
 sys.magnet=1; sys.isotopes={'1H','1H'};
 inter=struct(); inter.zeeman.scalar={0,0};
-inter.chem.flux_rate=[0 0.3;0.7 0];
-inter.chem.flux_type='intermolecular';
+inter.flux_rate=[0 0.3;0.7 0];
+inter.relaxation={'flux'};
+inter.rlx_keep='labframe'; inter.equilibrium='zero';
+inter.flux_type='intermolecular';
 bas=struct(); bas.formalism='sphten-liouv'; bas.approximation={'none'};
 s=test_spin_system(sys,inter,bas); flux=relaxation(s);
 p=struct(); p.spins={'1H'}; p.offset=0;
@@ -110,7 +112,7 @@ for n=1:2
 end
 
 % The context does not invoke a flux consumer in other formalisms
-inter.chem.flux_rate=zeros(2); bas.formalism='zeeman-liouv';
+inter.flux_rate=zeros(2); bas.formalism='zeeman-liouv';
 p.rlx_ph={}; p.rlx_op={};
 s=test_spin_system(sys,inter,bas);
 answer=imaging(s,@(s,p,H,R,K,G,F)struct('R',R,'K',K),p);

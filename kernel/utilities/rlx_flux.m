@@ -5,7 +5,7 @@
 % Parameters:
 %
 %    spin_system - Spinach data structure with a compiled basis and
-%                  validated chem.flux_rate and chem.flux_type fields
+%                  validated rlx.flux_rate and rlx.flux_type fields
 %
 % Outputs:
 %
@@ -20,7 +20,8 @@ grumble(spin_system);
 
 % Allocate the generator and retain the no-flux default
 F=mprealloc(spin_system,0);
-if nnz(spin_system.chem.flux_rate)==0, return; end
+if ~ismember('flux',spin_system.rlx.theories)||...
+   nnz(spin_system.rlx.flux_rate)==0, return; end
 
 % The original flux model uses spherical tensor basis labels
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
@@ -28,7 +29,7 @@ if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
 end
 
 % Select the physical fate of correlations, as in the original flux model
-switch spin_system.chem.flux_type
+switch spin_system.rlx.flux_type
     case 'intramolecular'
         transfer_correlations=true;
     case 'intermolecular'
@@ -38,7 +39,7 @@ switch spin_system.chem.flux_type
 end
 
 % Process every matrix entry, including diagonal bath rates
-[sources,destins,rates]=find(spin_system.chem.flux_rate);
+[sources,destins,rates]=find(spin_system.rlx.flux_rate);
 orders=cellfun(@(b)sum(logical(b),2),spin_system.bas.basis,'UniformOutput',false);
 for n=1:numel(rates)
 

@@ -1,4 +1,4 @@
-% Two-spin asymmetric magnetization flux problem.
+% Two-spin asymmetric magnetisation flux problem.
 %
 % Calculation time: seconds.
 %
@@ -10,10 +10,12 @@ function flux_asymmetric()
 sys.magnet=14.1;
 sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,3};
-inter.chem.flux_rate=zeros(2);
-inter.chem.flux_rate(1,2)=5e2; % from 1 to 2
-inter.chem.flux_rate(2,1)=2e3; % from 2 to 1
-inter.chem.flux_type='intermolecular';
+inter.relaxation={'flux'};
+inter.rlx_keep='labframe'; inter.equilibrium='zero';
+inter.flux_rate=zeros(2);
+inter.flux_rate(1,2)=5e2; % from 1 to 2
+inter.flux_rate(2,1)=2e3; % from 2 to 1
+inter.flux_type='intermolecular';
 
 % Basis specification
 bas.formalism='sphten-liouv';

@@ -36,7 +36,7 @@ T1H=0.2722; T1N=0.8; T1Ca=2; T1CO=2; T1W=0.2994;
 T2H=0.2722; T2N=0.8; T2Ca=2; T2CO=2; T2W=0.2994;
 
 % Relaxation theory
-inter.relaxation={'t1_t2'};
+inter.relaxation={'t1_t2','flux'};
 inter.r1_rates=num2cell(1./[T1H T1N T1Ca T1CO T1W*ones(1,n_water_protons)]);
 inter.r2_rates=num2cell(1./[T2H T2N T2Ca T2CO T2W*ones(1,n_water_protons)]);
 inter.rlx_keep='diagonal';
@@ -55,12 +55,12 @@ nh_wt_exch_rate=1000; % between NH and nearest water
 wt_wt_exch_rate=1e4;  % between all water protons
 
 % Exchange rate matrix
-inter.chem.flux_rate=zeros(n_water_protons+4);
-inter.chem.flux_rate(1,5)=nh_wt_exch_rate;
-inter.chem.flux_rate(5,1)=nh_wt_exch_rate;
-inter.chem.flux_rate(5:(5+n_water_protons-1),...
+inter.flux_rate=zeros(n_water_protons+4);
+inter.flux_rate(1,5)=nh_wt_exch_rate;
+inter.flux_rate(5,1)=nh_wt_exch_rate;
+inter.flux_rate(5:(5+n_water_protons-1),...
                      5:(5+n_water_protons-1))=wt_wt_exch_rate;
-inter.chem.flux_type='intermolecular';
+inter.flux_type='intermolecular';
 
 % Enable zero track elimination
 sys.enable={'zte'};

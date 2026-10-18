@@ -438,3 +438,7 @@ rather than `inter.tau_c`, the latter being read only by Redfield theory.
 ### Imaging relaxation phantoms
 
 `imaging` assembles `R` only from the user-supplied `parameters.rlx_ph` and `parameters.rlx_op`. These relaxation superoperators must already contain all required contributions, including magnetisation flux; the context does not add a separate flux term.
+
+## Explicit point-to-point flux relaxation
+
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.

@@ -75,23 +75,25 @@ function result=magnetisation_flux_checks(result)
 % Retain the original one-substance spin space and non-zero diagonal bath rates
 sys.magnet=14.1; sys.isotopes={'1H','1H','1H'};
 inter.zeeman.scalar={0,3,5};
-inter.chem.flux_rate=[11 500 0;2000 13 70;0 30 17];
-inter.chem.flux_type='intermolecular';
+inter.flux_rate=[11 500 0;2000 13 70;0 30 17];
+inter.relaxation={'flux'};
+inter.rlx_keep='labframe'; inter.equilibrium='zero';
+inter.flux_type='intermolecular';
 bas.formalism='sphten-liouv'; bas.approximation={'none'};
 s=test_spin_system(sys,inter,bas);
 
 % Spin removal retains the original flux matrix indexing contract
 reduced=kill_spin(s,3);
 result=test_close(result,'flux indices after spin removal',...
-                  reduced.chem.flux_rate,inter.chem.flux_rate(1:2,1:2),0,0,...
+                  reduced.rlx.flux_rate,inter.flux_rate(1:2,1:2),0,0,...
                   'removed spins lose their incoming and outgoing flux entries');
 
 result=test_true(result,'original flux inputs retained',...
-                 isequal(s.chem.flux_rate,inter.chem.flux_rate)&&...
-                 strcmp(s.chem.flux_type,inter.chem.flux_type),...
+                 isequal(s.rlx.flux_rate,inter.flux_rate)&&...
+                 strcmp(s.rlx.flux_type,inter.flux_type),...
                  'point-to-point rates retain their original matrix orientation');
 for type={'intermolecular','intramolecular'}
-    s.chem.flux_type=type{1};
+    s.rlx.flux_type=type{1};
     result=test_close(result,[type{1} ' full flux generator'],...
                       relaxation(s),original_flux(s),0,0,...
                       'single-spin gains, losses, correlations, and diagonal rates match the original generator');
@@ -109,17 +111,17 @@ result=test_close(result,'flux across local descriptor blocks',...
                   'global spin labels are translated to local descriptor columns and offsets');
 
 % Relaxation retention and thermalisation must not act on the flux generator
-s.chem.flux_type='intermolecular';
+s.rlx.flux_type='intermolecular';
 for keep={'diagonal','secular','labframe'}
     for destination={'zero','IME','dibari'}
-        work=s; work.rlx.theories={'t1_t2'};
+        work=s; work.rlx.theories={'t1_t2','flux'};
         work.rlx.r1_rates={1,2,3}; work.rlx.r2_rates={4,5,6};
         work.rlx.keep=keep{1}; work.rlx.equilibrium=destination{1};
         work.rlx.temperature=298;
         if strcmp(destination{1},'dibari')
             work.sys.disable=[work.sys.disable {'high_temp'}];
         end
-        bare=work; bare.chem.flux_rate=[]; bare.chem.flux_type='';
+        bare=work; bare.rlx.flux_rate=[]; bare.rlx.flux_type='';
         result=test_close(result,['flux after ' keep{1} ' ' destination{1}],...
                           relaxation(work)-relaxation(bare),original_flux(work),1e-12,1e-12,...
                           'flux is added after relaxation processing, as the old separate K was');
@@ -131,17 +133,19 @@ result=test_close(result,'flux bypasses relaxation zero threshold',...
                   'relaxation-specific numerical thresholds must not erase historical flux');
 
 % Original no-flux defaults and paired-field validation remain unchanged
-bare=inter; bare=rmfield(bare,'chem');
+bare=rmfield(inter,{'flux_rate','flux_type'}); bare.relaxation={};
 bare=test_spin_system(sys,bare,bas);
 result=test_true(result,'original no-flux defaults',...
-                 isempty(bare.chem.flux_rate)&&isempty(bare.chem.flux_type),...
+                 isempty(bare.rlx.flux_rate)&&isempty(bare.rlx.flux_type),...
                  'absent flux inputs produce the original empty defaults');
 invalid={struct('flux_rate',zeros(3)),struct('flux_type','intermolecular'),...
          struct('flux_rate',zeros(2),'flux_type','intermolecular'),...
          struct('flux_rate',1i*eye(3),'flux_type','intermolecular'),...
          struct('flux_rate',zeros(3),'flux_type','unknown')};
 for n=1:numel(invalid)
-    bad=inter; bad.chem=invalid{n}; rejected=false;
+    bad=rmfield(inter,{'flux_rate','flux_type'}); rejected=false;
+    fields=fieldnames(invalid{n});
+    for k=1:numel(fields), bad.(fields{k})=invalid{n}.(fields{k}); end
     try
         create(sys,bad);
     catch
@@ -153,7 +157,7 @@ end
 
 % Unlike tensor ranks cannot be transferred by the original basis matching
 sys.isotopes={'1H','2H'}; inter.zeeman.scalar={0,3};
-inter.chem.flux_rate=[0 3;0 0];
+inter.flux_rate=[0 3;0 0];
 s=test_spin_system(sys,inter,bas); rejected=false;
 try
     relaxation(s);
@@ -175,14 +179,14 @@ for n=1:numel(s.chem.parts)
     b(rows,s.chem.parts{n})=s.bas.basis{n};
 end
 orders=sum(logical(b),2); F=sparse(size(b,1),size(b,1));
-[from,to,rates]=find(s.chem.flux_rate);
+[from,to,rates]=find(s.rlx.flux_rate);
 for n=1:numel(rates)
     for order=1:2
         mask=(orders==1);
         if order==2, mask=(orders>1); end
         source=mask&(b(:,from(n))~=0);
         destin=mask&(b(:,to(n))~=0);
-        if (order==1)||strcmp(s.chem.flux_type,'intramolecular')
+        if (order==1)||strcmp(s.rlx.flux_type,'intramolecular')
             stationary=source&destin;
             source=xor(source,stationary); destin=xor(destin,stationary);
             if ~isequal(b(source,from(n)),b(destin,to(n)))
@@ -205,20 +209,21 @@ function result=flux_consumer_checks(result)
 sys.magnet=14.1; sys.isotopes={'1H','1H','1H'};
 inter.zeeman.scalar={0,3,5}; inter.coupling.scalar=cell(3);
 inter.coupling.scalar{1,3}=3;
-inter.relaxation={'t1_t2','SRSK'}; inter.srsk_sources=3;
+inter.relaxation={'t1_t2','SRSK','flux'}; inter.srsk_sources=3;
 inter.r1_rates={1,2,1e5}; inter.r2_rates={3,4,1e5};
 inter.rlx_keep='labframe'; inter.equilibrium='zero'; inter.temperature=298;
-inter.chem.flux_rate=[11 5 0;7 13 0;0 0 0];
-inter.chem.flux_type='intermolecular';
+inter.flux_rate=[11 5 0;7 13 0;0 0 0];
+
+inter.flux_type='intermolecular';
 bas.formalism='sphten-liouv'; bas.approximation={'none'};
 s=test_spin_system(sys,inter,bas);
-flux=s; flux.rlx.theories={}; F=relaxation(flux);
+flux=s; flux.rlx.theories={'flux'}; F=relaxation(flux);
 for destination={'zero','IME','dibari'}
     work=s; work.rlx.equilibrium=destination{1};
     if strcmp(destination{1},'dibari')
         work.sys.disable=[work.sys.disable {'high_temp'}];
     end
-    bare=work; bare.chem.flux_rate=[]; bare.chem.flux_type='';
+    bare=work; bare.rlx.flux_rate=[]; bare.rlx.flux_type='';
     bath=relaxation(bare);
     result=test_close(result,['SRSK once-only flux ' destination{1}],...
                       relaxation(work)-bath,F,100*eps(norm(bath,'fro')),0,...
@@ -227,8 +232,8 @@ end
 
 % Reject constituent sizes even when the merged dimensions would match
 one.isotopes={'1H'}; two.isotopes={'1H','1H'};
-a.chem.flux_rate=[0 1;2 0]; a.chem.flux_type='intermolecular';
-b.chem.flux_rate=0; b.chem.flux_type='intermolecular'; rejected=false;
+a.flux_rate=[0 1;2 0]; a.flux_type='intermolecular';
+b.flux_rate=0; b.flux_type='intermolecular'; rejected=false;
 try
     merge_inp({one,two},{a,b});
 catch err
@@ -239,21 +244,21 @@ result=test_true(result,'compensating flux block sizes rejected',rejected,...
 
 % Reuse the historical block-diagonal and common-value merge contracts
 part.isotopes={'1H','1H'};
-a.chem.flux_rate=[3 -5;7 0]; a.chem.flux_type='intermolecular';
-b.chem.flux_rate=[0 11;13 17]; b.chem.flux_type='intermolecular';
+a.flux_rate=[3 -5;7 0]; a.flux_type='intermolecular';
+b.flux_rate=[0 11;13 17]; b.flux_type='intermolecular';
 [merged_sys,merged]=merge_inp({part,part},{a,b});
-result=test_close(result,'merged flux rate matrices',merged.chem.flux_rate,...
-                  blkdiag(a.chem.flux_rate,b.chem.flux_rate),0,0,...
+result=test_close(result,'merged flux rate matrices',merged.flux_rate,...
+                  blkdiag(a.flux_rate,b.flux_rate),0,0,...
                   'original signed real rates and diagonal entries remain unchanged');
 result=test_true(result,'merged common flux type',...
-                 strcmp(merged.chem.flux_type,'intermolecular')&&numel(merged_sys.isotopes)==4,...
+                 strcmp(merged.flux_type,'intermolecular')&&numel(merged_sys.isotopes)==4,...
                  'matching flux types are accepted without converting to reactions');
 for kind=1:3
     bad=b; field='flux_type';
-    if kind==1, bad.chem.flux_type='intramolecular'; end
-    if kind==2, bad.chem=rmfield(bad.chem,'flux_type'); end
+    if kind==1, bad.flux_type='intramolecular'; end
+    if kind==2, bad=rmfield(bad,'flux_type'); end
     if kind==3
-        bad.chem=rmfield(bad.chem,'flux_rate'); field='flux_rate';
+        bad=rmfield(bad,'flux_rate'); field='flux_rate';
     end
     rejected=false;
     try
@@ -268,7 +273,9 @@ end
 % Cross-substance transfer invalidates independent-substance symmetry projectors
 sys.isotopes={'1H','1H'}; inter=struct(); inter.zeeman.scalar={0,3};
 inter.chem.parts={1,2}; inter.chem.concs=[1 1];
-inter.chem.flux_rate=[0 5;7 0]; inter.chem.flux_type='intermolecular';
+inter.flux_rate=[0 5;7 0]; inter.relaxation={'flux'};
+inter.rlx_keep='labframe'; inter.equilibrium='zero';
+inter.flux_type='intermolecular';
 bas.approximation={'none','none'};
 s=test_spin_system(sys,inter,bas);
 F=relaxation(s); rho=state(s,'Lz',1); time=0.02;
@@ -278,7 +285,7 @@ result=test_close(result,'reduced cross-substance flux propagation',current,...
                   'trajectory reduction retains source and destination in one coupled space');
 
 % The unrelated cross-substance prohibition remains when no coupling is specified
-bare=s; bare.chem.flux_rate=[]; bare.chem.flux_type=''; rejected=false;
+bare=s; bare.rlx.flux_rate=[]; bare.rlx.flux_type=''; rejected=false;
 try
     reduce(bare,1i*F,rho);
 catch err
@@ -297,7 +304,9 @@ function result=inactive_flux_checks(result)
 % No-op flux is allowed in either Zeeman formalism, as in the historical consumer
 sys.magnet=14.1; sys.isotopes={'1H','1H'};
 inter.zeeman.scalar={0,3};
-inter.chem.flux_rate=zeros(2); inter.chem.flux_type='intermolecular';
+inter.flux_rate=zeros(2); inter.relaxation={'flux'};
+inter.rlx_keep='labframe'; inter.equilibrium='zero';
+inter.flux_type='intermolecular';
 bas.approximation={'none'};
 for formalism={'zeeman-liouv','zeeman-hilb'}
     bas.formalism=formalism{1}; s=test_spin_system(sys,inter,bas);
@@ -307,10 +316,10 @@ for formalism={'zeeman-liouv','zeeman-hilb'}
 end
 
 % Caller-selected physical models must dispatch explicitly, not silently fall back
-bas.formalism='sphten-liouv'; inter.chem.flux_rate=[0 3;7 0];
+bas.formalism='sphten-liouv'; inter.flux_rate=[0 3;7 0];
 s=test_spin_system(sys,inter,bas);
 for mode={'intermoleculr',''}
-    s.chem.flux_type=mode{1}; rejected=false;
+    s.rlx.flux_type=mode{1}; rejected=false;
     try
         relaxation(s);
     catch err
@@ -321,10 +330,10 @@ for mode={'intermoleculr',''}
 end
 
 % Zero rate matrices retain the same symmetry projectors as absent flux
-inter.chem.parts={1,2}; inter.chem.concs=[1 1]; inter.chem.flux_rate=zeros(2);
+inter.chem.parts={1,2}; inter.chem.concs=[1 1]; inter.flux_rate=zeros(2);
 bas.approximation={'none','none'}; sys.disable={'pt'};
 s=test_spin_system(sys,inter,bas); bare=s;
-bare.chem.flux_rate=[]; bare.chem.flux_type='';
+bare.rlx.flux_rate=[]; bare.rlx.flux_type='';
 rho=state(s,'Lz','1H'); dim=s.bas.offsets(end);
 L=1i*spdiags((1:dim)',0,dim,dim);
 result=test_true(result,'inactive flux preserves symmetry projectors',...
@@ -341,7 +350,7 @@ result=test_true(result,'inactive flux preserves cross-substance guard',rejected
 
 % Reject non-finite rates before they can enter a physical generator
 sys.output='hush'; sys.parallel={'local',1};
-invalid=inter; invalid.chem.flux_rate=ones(2,2,2); rejected=false;
+invalid=inter; invalid.flux_rate=ones(2,2,2); rejected=false;
 try
     create(sys,invalid);
 catch err
@@ -352,7 +361,7 @@ result=test_true(result,'multidimensional flux rejected',rejected,...
 
 % Reject non-finite rates
 for rate=[NaN Inf -Inf]
-    invalid=inter; invalid.chem.flux_rate(1,2)=rate; rejected=false;
+    invalid=inter; invalid.flux_rate(1,2)=rate; rejected=false;
     try
         create(sys,invalid);
     catch err

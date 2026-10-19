@@ -124,7 +124,7 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
         if issparse(A)
             next_term=multiclean(spin_system,(1/n)*A,next_term,spin_system.tols.prop_chop);
         else
-            next_term=multiclean(spin_system,(1/n)*next_term,A,spin_system.tols.prop_chop);
+            next_term=multiclean(spin_system,next_term,(1/n)*A,spin_system.tols.prop_chop);
         end
         
         % Eliminate small elements
@@ -147,7 +147,7 @@ else
         if issparse(A)
             next_term=multiclean(spin_system,(1/n)*A,next_term,spin_system.tols.prop_chop);
         else
-            next_term=multiclean(spin_system,(1/n)*next_term,A,spin_system.tols.prop_chop);
+            next_term=multiclean(spin_system,next_term,(1/n)*A,spin_system.tols.prop_chop);
         end
         
         % Eliminate small elements

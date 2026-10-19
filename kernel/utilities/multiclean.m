@@ -1,206 +1,66 @@
-% Memory-prioritised matrix multiplication with immediate clean_up of
-% each output panel. No inner-product partial sum is rounded. Syntax:
+% Memory-prioritised matrix multiplication with panel-wise cleanup. Syntax:
 %
-%                         C=multiclean(spin_system,A,B,tol)
+%                 C=multiclean(spin_system,A,B,tol)
 %
-% Parameters:
-%
-%     spin_system - Spinach data structure with clean-up and storage policy
-%
-%     A,B  - two-dimensional single or double matrices, full or sparse,
-%            on CPU or GPU; dimensions must conform for A*B, including
-%            MATLAB scalar multiplication
-%
-%     tol  - real, non-negative numeric CPU scalar, or NaN;
-%            zero or NaN returns native A*B without panel multiplication
-%
-% Outputs:
-%
-%     C    - cleaned product, with the precision of clean_up(A*B) and
-%            the device of A*B (single tol can lower double precision)
-%
-% The result follows clean_up with the supplied global storage policy.
-% Disabled clean-up returns native A*B without conversion or rounding.
-% Rounding is the existing tol*round((1/tol)*panel) operation, not
-% magnitude thresholding. With tol=0 or NaN, A*B is returned directly.
-% Dense and sparse inputs use one multiply path; partial inner products
-% are never rounded.
-%
-% Panels have at most one input-storage footprint, counting three product
-% buffers and the sliced right operand conservatively as dense. On GPUs,
-% this budget is also limited by current AvailableMemory. This bounds the
-% explicit uncleaned intermediates, not undocumented BLAS/CUDA workspace
-% or the cleaned output. Sparse assembly temporarily holds triplets as
-% well as the result. A dense result must itself fit in available memory.
-% Custom objects retain their native multiplication and clean_up dispatch.
-% Sparse double GPU panels use cuda_sparse_by_sparse internally.
-% GPU sparse inputs require MATLAB R2026b contiguous-submatrix indexing.
-% Blocked BLAS reductions can differ in their last bits from A*B, hence
-% values on a rounding boundary need not give bitwise-identical results.
+% A,B are conforming matrices on CPU or GPU; tol is a finite, real,
+% non-negative floating-point scalar. Zero leaves entries unrounded.
+% Storage and rounding decisions belong to clean_up. Sparse GPU products
+% use cuda_sparse_by_sparse internally. Panel assembly may change floating-
+% point roundoff relative to a single native multiplication.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function C=multiclean(spin_system,A,B,tol)
 
-% Preserve custom multiplication and cleanup without materialising operands
-if (isobject(A)&&~isa(A,'gpuArray'))||(isobject(B)&&~isa(B,'gpuArray'))
-    C=clean_up(spin_system,A*B,tol); return
-end
-
 % Check consistency
 grumble(A,B,tol);
 
-% Disabled clean-up must also preserve native multiplication arithmetic
-if (tol==0)||isnan(tol)||ismember('clean-up',spin_system.sys.disable)
-    C=A*B; return
-end
-
-% Retain native cleanup arithmetic for exceptional tolerance types
-if (~isfloat(tol))||isinf(tol)
+% Scalars, empty products and symbolic objects do not need panel storage
+if isscalar(A)||isscalar(B)||isempty(A)||isempty(B)||...
+   (isobject(A)&&~isa(A,'gpuArray'))||(isobject(B)&&~isa(B,'gpuArray'))
     C=clean_up(spin_system,A*B,tol); return
 end
 
-% Obtain product metadata without computing an uncleaned product
-if isscalar(A)
-    proto=A*zeros(0,0,'like',B); nrows=size(B,1); ncols=size(B,2);
-elseif isscalar(B)
-    proto=zeros(0,0,'like',A)*B; nrows=size(A,1); ncols=size(A,2);
-else
-    proto=zeros(0,0,'like',A)*zeros(0,0,'like',B);
-    nrows=size(A,1); ncols=size(B,2);
+% Put both operands on the execution device
+if isa(A,'gpuArray')||isa(B,'gpuArray')
+    A=gpuArray(A); B=gpuArray(B);
 end
 
-% Specify only the local policy needed by clean_up
-panel_system=spin_system;
-if issparse(proto)
-    panel_system.tols.dense_matrix=Inf;
-else
-    panel_system.tols.dense_matrix=0;
-end
-panel_system.tols.small_matrix=0;
+% Budget three dense panel arrays against the input nonzero count
+width=max(1,floor((nnz(A)+nnz(B))/(3*size(A,1))));
+width=min(width,size(B,2));
+rows=cell(1,ceil(size(B,2)/width)); cols=rows; vals=rows;
 
-% Include clean_up scalar arithmetic in the output precision metadata
-clean_proto=clean_up(panel_system,proto,tol);
-
-% Empty products follow the global clean-up policy
-if (nrows==0)||(ncols==0)
-    C=clean_up(spin_system,A*B,tol); return
-end
-
-% Preserve matrix arithmetic by placing a scalar on the left
-if isscalar(B)&&~isscalar(A)
-    C=multiclean(spin_system,B,A,tol); return
-end
-
-% Reserve dense output before measuring the remaining GPU memory
-dense_output=~issparse(proto);
-if dense_output
-    output_proto=zeros(1,'like',clean_proto);
-    if (~isreal(A))||(~isreal(B)), output_proto=complex(output_proto); end
-    C=zeros(nrows,ncols,'like',output_proto);
-end
-
-% Measure input storage, not the size of the hypothetical dense product
-if isa(proto,'gpuArray')
-    A=gpuArray(A); input_bytes=0;
-    for input={A,B}
-        data=input{1};
-        if isa(data,'gpuArray'), precision=classUnderlying(data);
-        else, precision=class(data); end
-        data_bytes=8-4*strcmp(precision,'single');
-        data_bytes=data_bytes*(1+~isreal(data));
-        if issparse(data)
-            input_bytes=input_bytes+(data_bytes+8)*double(gather(nnz(data)))+...
-                        8*(size(data,2)+1);
-        else
-            input_bytes=input_bytes+data_bytes*numel(data);
-        end
-    end
-    device=gpuDevice; input_bytes=min(input_bytes,device.AvailableMemory);
-    precision=classUnderlying(proto);
-else
-    info=whos('A','B'); input_bytes=sum([info.bytes]);
-    precision=class(proto);
-end
-
-% Bound live panel storage independently of output sparsity
-value_bytes=(8-4*strcmp(precision,'single'))*(1+(~isreal(A)||~isreal(B)));
-entry_bytes=value_bytes+8;
-slice_bytes=8*size(B,1)*(1+~isreal(B)+issparse(B))+8*issparse(B);
-col_bytes=3*(nrows*entry_bytes+8)+slice_bytes;
-panel_width=max(1,min(ncols,floor(input_bytes/max(1,col_bytes))));
-if ncols>1, panel_width=min(panel_width,ceil(ncols/2)); end
-
-% Use the CUDA backend only within its sparse double GPU contract
-use_cuda=isa(A,'gpuArray')&&issparse(A)&&issparse(B)&&(size(A,2)==size(B,1))&&...
-         strcmp(classUnderlying(A),'double')&&...
-         (isa(B,'double')||(isa(B,'gpuArray')&&strcmp(classUnderlying(B),'double')));
-
-% Retain only cleaned entries
-panel_count=ceil(ncols/panel_width);
-if ~dense_output
-    row_parts=cell(1,panel_count); col_parts=cell(1,panel_count);
-    val_parts=cell(1,panel_count);
-end
-
-% Multiply complete inner products and immediately clean each panel
-for panel_index=1:panel_count
-    first_col=1+(panel_index-1)*panel_width;
-    last_col=min(ncols,first_col+panel_width-1);
-    panel=B(:,first_col:last_col);
-    if use_cuda, panel=cuda_sparse_by_sparse(A,gpuArray(panel));
-    else, panel=A*panel; end
-    panel=clean_up(spin_system,panel,tol);
-
-    % Sparse GPU arrays cannot be assigned by subscript
-    if dense_output
-        C(:,first_col:last_col)=full(panel);
+% Multiply complete columns, clean them and retain their sparse storage
+for n=1:numel(rows)
+    columns=(1+(n-1)*width):min(n*width,size(B,2));
+    if isa(A,'gpuArray')&&issparse(A)&&issparse(B)&&...
+       strcmp(classUnderlying(A),'double')&&strcmp(classUnderlying(B),'double')
+        panel=cuda_sparse_by_sparse(A,B(:,columns));
     else
-        [row_index,col_index,values]=find(panel);
-        row_parts{panel_index}=row_index(:);
-        col_parts{panel_index}=col_index(:);
-        val_parts{panel_index}=values(:);
-        col_parts{panel_index}=col_parts{panel_index}+first_col-1;
+        panel=A*B(:,columns);
     end
-    clear panel
+    [rows{n},cols{n},vals{n}]=find(clean_up(spin_system,panel,tol));
+    rows{n}=rows{n}(:); cols{n}=cols{n}(:)+columns(1)-1; vals{n}=vals{n}(:);
 end
 
-% Sparse GPU arrays cannot be concatenated; assemble retained triplets
-if ~dense_output
-    row_index=vertcat(row_parts{:}); clear row_parts
-    col_index=vertcat(col_parts{:}); clear col_parts
-    values=vertcat(val_parts{:}); clear val_parts
-    C=sparse(row_index,col_index,values,nrows,ncols);
-end
-
-% Apply the global storage policy without rounding a second time
-if issparse(C)&&(nnz(C)>0)&&any(size(C)<spin_system.tols.small_matrix)
-    C=full(C);
-end
-if issparse(C)&&(nnz(C)/numel(C)>spin_system.tols.dense_matrix)
-    C=full(C);
-end
-if (~issparse(C))&&(nnz(C)/numel(C)<spin_system.tols.dense_matrix)&&...
-                  all(size(C)>spin_system.tols.small_matrix)
-    C=sparse(C);
-end
+% Let clean_up choose storage for the assembled matrix
+C=sparse(vertcat(rows{:}),vertcat(cols{:}),vertcat(vals{:}),size(A,1),size(B,2));
+C=clean_up(spin_system,C,tol);
 
 end
 
 % Consistency enforcement
 function grumble(A,B,tol)
-if (~isnumeric(A))||(~isfloat(A))||(~ismatrix(A))
-    error('A must be a two-dimensional single or double array.');
-end
-if (~isnumeric(B))||(~isfloat(B))||(~ismatrix(B))
-    error('B must be a two-dimensional single or double array.');
+if (~ismatrix(A))||(~ismatrix(B))
+    error('A and B must be matrices.');
 end
 if (~isscalar(A))&&(~isscalar(B))&&(size(A,2)~=size(B,1))
     error('matrix dimensions must conform for A*B.');
 end
-if isa(tol,'gpuArray')||(~isnumeric(tol))||(~isreal(tol))||...
-   (~isscalar(tol))||(tol<0)
-    error('tol must be a non-negative real numeric CPU scalar, or NaN.');
+if (~isfloat(tol))||(~isreal(tol))||(~isscalar(tol))||...
+   (~isfinite(tol))||(tol<0)
+    error('tol must be a finite non-negative real floating-point scalar.');
 end
 end
 

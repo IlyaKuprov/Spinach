@@ -1,24 +1,13 @@
-# multiclean.m
+# kernel/utilities/multiclean.m
 
-`multiclean(spin_system,A,B,tol)` computes a matrix product in output-column panels and applies the existing `clean_up` rounding to each complete panel before retaining it. This limits temporary unpruned fill-in; it does not round partial inner-product sums. It is useful where an ordinary `A*B` followed by cleanup would briefly retain far more entries than the cleaned result.
+## Purpose
 
-## Syntax
+`C=multiclean(spin_system,A,B,tol)` multiplies matrices in output-column panels and cleans each panel before assembly, reducing transient fill-in. Complete inner products are retained. CPU and GPU, full and sparse inputs are supported; eligible sparse GPU products use the CUDA backend internally.
 
-```matlab
-C=multiclean(spin_system,A,B,tol);
-```
+## Numerical contract
 
-`A` and `B` are conformable two-dimensional single or double arrays, sparse or full, on the CPU or GPU, subject to MATLAB’s native multiplication restrictions. `tol` is a non-negative real numeric CPU scalar, or NaN. Integer and infinite tolerances retain native-product `clean_up` arithmetic. Zero or NaN tolerance, or the `clean-up` disable switch in `spin_system.sys.disable`, uses native multiplication without cleanup. Positive tolerances use the same rounding operation as `clean_up`, not a simple magnitude cutoff.
+`tol` must be a finite, real, non-negative floating-point scalar. NaN, infinity and integer tolerances are errors. Zero tolerance and the cleanup-disable switch are handled by `clean_up`, without separate bypass logic in the helper. The supplied spin system is neither copied nor modified.
 
-The helper preserves the native product’s device; precision follows `clean_up`, so a single-precision tolerance can lower a double-precision result. `spin_system` supplies the disable switch and global sparse/full storage thresholds. The final whole-matrix representation follows those thresholds, without a second numerical rounding pass. Callers pass their original tolerance directly and do not need a cleanup-bypass block or an outer `clean_up` call.
+Panel nonzero entries are assembled into a sparse matrix and passed through ordinary `clean_up` for the final storage choice. Repeated rounding and blocked multiplication can differ from one native product by numerical roundoff; bitwise preservation is not promised. Scalars, empty products and symbolic operator objects use native multiplication followed by cleanup.
 
-Panel sizing depends on input storage and, on the GPU, available device memory after the fixed left operand and any dense output have been allocated with the required precision and complexity. It bounds explicit raw panels, not undocumented multiplication workspace, final result storage, or all assembly temporaries. Runtime can increase. Blocked dense reductions can differ in their last bits from a single native multiplication; values at rounding boundaries need not be bitwise identical.
-
-Do not introduce cleanup between factors, inside sums, or before normalization merely to use this helper: moving a rounding boundary changes the numerical algorithm. Custom objects retain their native multiplication and `clean_up` dispatch inside `multiclean`; callers do not need operand-type branches or to materialise those objects.
-
-Sparse double GPU panel products use `cuda_sparse_by_sparse` internally; other supported operand combinations use native multiplication. Backend selection is not a caller responsibility. The CUDA wrapper retains its own platform-binary and device-compatibility behaviour.
-
-## Related functions
-
-- `clean_up`: rounding and spin-system-dependent storage policy.
-- `propagator`, `expmint`: scaling-and-squaring and auxiliary-matrix integrals with potentially large temporary fill-in.
+Panel width is based on input nonzero counts and the storage for three dense output panels. This favours sparse-workload memory over speed; it is not a bound on backend workspace, final output or concatenation storage.

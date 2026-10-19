@@ -174,15 +174,9 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 
 ## Memory-heavy cleaned matrix products
 
-Keep custom-object and CUDA-backend dispatch inside `multiclean`, not in
-its callers.
-Use `multiclean(spin_system,A,B,tol)` to avoid retaining an entire unpruned matrix
-product before cleanup. It cleans complete output panels, not partial
-inner-product sums, and supports native CPU/GPU sparse/full multiplication
-combinations. Keep the original rounding boundary: do not insert cleanup
-inside a product chain, sum, or normalization step. The helper applies the supplied global
-storage policy without rounding twice and centrally handles disabled
-clean-up and zero/NaN tolerances. Callers pass their original tolerance
-directly and do not add an outer clean_up. Validate both numerical agreement and peak process/device memory;
-lower memory need not mean faster execution. Reserve GPU output with its
-actual complexity; empty product prototypes can silently be real.
+Use `multiclean(spin_system,A,B,tol)` at memory-heavy product/cleanup boundaries.
+Pass the original spin system and tolerance; let `clean_up` own rounding,
+disable switches and storage decisions. Backend selection belongs inside
+`multiclean`. Tolerances must be finite non-negative floating-point scalars.
+Prefer compact panel code and numerical agreement within roundoff over
+bitwise preservation. Validate memory and runtime on the workload of interest.

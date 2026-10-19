@@ -54,7 +54,7 @@ Legal `sys.disable` entries, anything else being an error: `'pt'` (non-interacti
 `sys.enable` entries: `'zte'` (zero track elimination, off by default), `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
 `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
-couplings), `'dafuq'`. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
+couplings),. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
 
 `sim2liouv` refreshes existing basis cache identities after Hilbert-to-Liouville
 conversion; cached operators and Hamiltonians remain representation-specific.
@@ -71,14 +71,14 @@ ratio in rad/(s·tesla) and the multiplicity.
 
 | Specification | Particle |
 |---|---|
-| `'1H'`, `'13C'`, `'15N'`, `'195Pt'`, ... | Nucleus: mass number followed by element symbol. |
+| `'1H'`, `'13C'`, `'15N'`, `'195Pt'`,... | Nucleus: mass number followed by element symbol. |
 | `'E'`, `'E+'` | Electron and positron, multiplicity 2. |
 | `'E4'`, `'E16'` | High-spin electron; the integer is the **multiplicity**, so `'E4'` is S=3/2 and `'E16'` is S=15/2. |
 | `'G'` | Ghost spin, gamma=0 and multiplicity 1; a placeholder that carries coordinates but no magnetism. |
 | `'N'`, `'antiN'`, `'M'`, `'M+'` | Neutron, antineutron, negative and positive muons. |
 | `'anti1H'` | Antiproton; `'1H'` remains the proton row. |
 | `'Lambda'`, `'Sigma+'`, `'Sigma-'`, `'Xi0'`, `'Xi-'`, `'Omega-'` | Static-moment hyperons; `anti`-prefixed keys name their CPT-qualified counterparts. |
-| `'99Tc_m'`, `'180Ta_m'`, ... | Distinct evaluated nuclear states, not unqualified ground-state aliases. |
+| `'99Tc_m'`, `'180Ta_m'`,... | Distinct evaluated nuclear states, not unqualified ground-state aliases. |
 | `'C#'`, `'V#'`, `'T#'` | Cavity mode, phonon mode, transmon; the integer is the number of levels, and gamma is zero for all three. |
 
 The fixed signature is `[gamma,multiplicity,data]=spin(name)`. Existing one-/two-output

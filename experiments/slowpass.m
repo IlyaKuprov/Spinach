@@ -141,9 +141,6 @@ for k=1:numel(projectors)
                                 ', nnz(M1)=' num2str(nnz(M1))     ...
                                 ', nnz(M2)=' num2str(nnz(M2))]);
 
-            % MDCS diagnostics     
-            parallel_profiler_start;                  
-                          
             % Run the calculation in parallel
             parfor n=1:numel(freq_grid)
             
@@ -153,17 +150,11 @@ for k=1:numel(projectors)
                 
             end
             
-            % Get MDCS diagnostics       
-            parallel_profiler_report;  
-            
         else   
             
             % Inform the user
             report(spin_system,'using CPU backslash path...');
             
-            % MDCS diagnostics     
-            parallel_profiler_start; 
-        
             % Run the calculation in parallel
             parfor n=1:numel(freq_grid)
                 
@@ -171,9 +162,6 @@ for k=1:numel(projectors)
                 spectrum(n)=spectrum(n)+dot(coil_subs,((1i*L_subs+1i*freq_grid(n)*Id_subs)\rho0_subs));
                 
             end
-            
-            % Get MDCS diagnostics       
-            parallel_profiler_report;
             
         end
     

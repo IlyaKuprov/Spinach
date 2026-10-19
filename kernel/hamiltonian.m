@@ -667,7 +667,7 @@ if ~isworkernode
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     terms_done=0; last_toc=0;
-    tic; ticBytes(gcp); do_diag=true;
+    tic; do_diag=true;
 else
     do_diag=false; D=[]; tic;
 end
@@ -700,13 +700,6 @@ parfor n=1:nterms
     % Report progress
     if do_diag, send(D,n); end
 
-end
-
-% Parfor communication stats
-if ~isworkernode
-    nbytes=mean(tocBytes(gcp),1)/2^20;
-    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
-                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
 end
 
 % Inform the user

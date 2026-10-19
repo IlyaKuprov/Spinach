@@ -3,8 +3,9 @@
 % (sle2rlx.m), compared with Redfield theory (relaxation.m) for the same
 % spin systems and the same rotational correlation times: the nitroxide
 % radical of sle_esr_nitroxide_1.m and the 15N-1H pair with dipolar and
-% CSA interactions of sle_nmr_dd_csa.m. Both calculations are done in the
-% laboratory frame with the dynamic frequency shifts retained. Pertinent
+% CSA interactions of sle_nmr_dd_csa.m. The SLE generators are built with-
+% out any relaxation theory, both calculations are done in the laboratory
+% frame, and the dynamic frequency shifts are retained. Pertinent
 % matrix elements of the two superoperators are printed to the console;
 % the residual differences are the higher-order corrections to Redfield
 % theory that the full SLE memory kernel contains.
@@ -22,30 +23,28 @@ options.no_xyz=1;
 sys.magnet=3.5;
 sys.tols.prox_cutoff=4.0;
 
+% Basis set
+bas.formalism='sphten-liouv';
+bas.approximation={'none'};
+
+% SLE generator in the lab frame, no relaxation theory
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+parameters.spins={'E'};
+parameters.max_rank=4;
+parameters.tau_c=5e-11;
+capture=@(spin_system,parameters,H,R,K)H+1i*R+1i*K;
+L=gridfree(spin_system,capture,parameters,'labframe');
+
 % Redfield theory, lab frame, dynamic frequency shifts kept
 inter.relaxation={'redfield'};
 inter.equilibrium='zero';
 inter.rlx_keep='labframe';
 inter.rlx_dfs='keep';
 inter.tau_c={5e-11};
-
-% Basis set
-bas.formalism='sphten-liouv';
-bas.approximation={'none'};
-
-% Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-
-% Redfield superoperator
 R_rf=relaxation(spin_system);
-
-% SLE generator in the lab frame
-parameters.spins={'E'};
-parameters.max_rank=4;
-parameters.tau_c=5e-11;
-capture=@(spin_system,parameters,H,R,K)H+1i*R+1i*K;
-L=gridfree(spin_system,capture,parameters,'labframe');
 
 % Lattice equilibrium is the rank zero Wigner function
 P=sparse(1,1,1,size(L,1)/size(R_rf,1),1);
@@ -78,25 +77,23 @@ inter.coordinates={[-0.451455   -0.678015    0.000000]
                    [-1.475290   -0.641823    0.000000]};
 sys.tols.prox_cutoff=4.0;
 
+% SLE generator in the lab frame, no relaxation theory
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+parameters.spins={'15N'};
+parameters.max_rank=4;
+parameters.tau_c=5e-9;
+L=gridfree(spin_system,capture,parameters,'labframe');
+
 % Redfield theory, lab frame, dynamic frequency shifts kept
 inter.relaxation={'redfield'};
 inter.equilibrium='zero';
 inter.rlx_keep='labframe';
 inter.rlx_dfs='keep';
 inter.tau_c={5e-9};
-
-% Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-
-% Redfield superoperator
 R_rf=relaxation(spin_system);
-
-% SLE generator in the lab frame
-parameters.spins={'15N'};
-parameters.max_rank=4;
-parameters.tau_c=5e-9;
-L=gridfree(spin_system,capture,parameters,'labframe');
 
 % Lattice equilibrium is the rank zero Wigner function
 P=sparse(1,1,1,size(L,1)/size(R_rf,1),1);

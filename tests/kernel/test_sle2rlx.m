@@ -41,12 +41,12 @@ result=test_close(result,'exchange averaged frequency',L0,...
                   p_a*omega_a+p_b*omega_b,0,1e-12,...
                   'the lattice-averaged Liouvillian must be the population-weighted frequency');
 
-% Check the fast-exchange linewidth against the exact eigenvalue
+% Check the exchange correction to the line against the exact eigenvalue
 spin_line=eig(full(L)); [~,idx]=min(abs(spin_line-L0)); spin_line=spin_line(idx);
 delta_omega=omega_b-omega_a; k_ex=k_ab+k_ba;
-result=test_close(result,'exchange linewidth',L0+1i*R,spin_line,...
+result=test_close(result,'exchange line correction',1i*R,spin_line-L0,...
                   0,(delta_omega/k_ex)^2,...
-                  'the Markov generator must match the exact spin line to the second order in the exchange parameter');
+                  'the exchange broadening and shift must match the exact spin line to the second order in the exchange parameter');
 
 % Check the Swift-Connick limit of the exchange broadening
 result=test_close(result,'exchange Swift-Connick rate',real(R),...
@@ -57,18 +57,18 @@ result=test_close(result,'exchange Swift-Connick rate',real(R),...
 clear('sys','inter');
 sys.magnet=14.1; sys.isotopes={'13C'}; sys.output='hush';
 inter.zeeman.matrix={[200 0 0; 0 50 0; 0 0 -70]};
+spin_system=create(sys,inter); spin_system=basis(spin_system,bas);
+
+% SLE generator in the lab frame, no relaxation theory
+parameters.spins={'13C'}; parameters.max_rank=4; parameters.tau_c=1e-11;
+capture=@(spin_system,parameters,H,R,K)H+1i*R+1i*K;
+L=gridfree(spin_system,capture,parameters,'labframe');
+
+% Redfield superoperator, lab frame, dynamic frequency shifts kept
 inter.relaxation={'redfield'}; inter.equilibrium='zero';
 inter.rlx_keep='labframe'; inter.rlx_dfs='keep'; inter.tau_c={1e-11};
 spin_system=create(sys,inter); spin_system=basis(spin_system,bas);
-
-% Redfield superoperator
 R_rf=relaxation(spin_system);
-
-% SLE generator in the lab frame
-parameters.spins={'13C'}; parameters.max_rank=4; parameters.tau_c=1e-11;
-parameters.verbose=0;
-capture=@(spin_system,parameters,H,R,K)H+1i*R+1i*K;
-L=gridfree(spin_system,capture,parameters,'labframe');
 
 % Back-projection onto the rank zero Wigner function
 P=sparse(1,1,1,size(L,1)/size(R_rf,1),1);

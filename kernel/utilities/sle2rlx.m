@@ -24,9 +24,10 @@
 % Outputs:
 %
 %    R        - relaxation superoperator in the spin Liouville space,
-%               lab frame, in the convention of relaxation.m (it en-
-%               ters the Liouvillian as 1i*R, dynamic frequency shi-
-%               fts are its imaginary part)
+%               in the same frame and representation as L, in the
+%               convention of relaxation.m (it enters the Liouvil-
+%               lian as 1i*R, dynamic frequency shifts are its ima-
+%               ginary part)
 %
 %    L0       - lattice-averaged Liouvillian <one|L|pi>
 %
@@ -42,6 +43,12 @@
 %       relaxes faster than the spins it modulates (Redfield condition);
 %       the eigenvalues of L0+1i*R should then approximate the spin-like
 %       branch of the SLE spectrum. The function does not check this.
+%
+% Note: no frame transformation is performed: a generator built under
+%       rotating frame assumptions yields a rotating frame R, and com-
+%       parisons with relaxation.m require a lab frame generator. Any
+%       relaxation superoperator already present in L is averaged into
+%       L0 and is not a part of R.
 %
 % talos@spindynamics.org
 %

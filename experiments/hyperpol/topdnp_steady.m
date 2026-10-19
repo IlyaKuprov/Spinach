@@ -76,7 +76,8 @@ for n=1:numel(parameters.el_offs)
 
     % Precompute and clean up TOP DNP propagator
     P=multiclean(spin_system,propagator(spin_system,L_curr,parameters.delay_dur),...
-                 propagator(spin_system,L1,parameters.pulse_dur),spin_system.tols.prop_chop);
+                             propagator(spin_system,L1,parameters.pulse_dur),...
+                             spin_system.tols.prop_chop);
 
     % Send the problem to GPU if necessary
     if ismember('gpu',spin_system.sys.enable), P=gpuArray(P); end
@@ -88,7 +89,8 @@ for n=1:numel(parameters.el_offs)
     if isa(P,'gpuArray'), P=gather(P); end
 
     % Shot spacing delay
-    P=multiclean(spin_system,propagator(spin_system,L_curr,parameters.shot_spacing),P,spin_system.tols.prop_chop);
+    P=multiclean(spin_system,propagator(spin_system,L_curr,parameters.shot_spacing),...
+                             P,spin_system.tols.prop_chop);
 
     % Compute the steady state
     rho=steady(spin_system,P,[],'newton');

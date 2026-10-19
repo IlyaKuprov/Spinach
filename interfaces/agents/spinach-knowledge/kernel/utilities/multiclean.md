@@ -8,9 +8,9 @@
 C=multiclean(spin_system,A,B,tol);
 ```
 
-`A` and `B` are conformable two-dimensional single or double arrays, sparse or full, on the CPU or GPU, subject to MATLAB’s native multiplication restrictions. `tol` is a finite non-negative real CPU scalar, or NaN. A zero tolerance uses native multiplication without cleanup. Positive tolerances use the same rounding operation as `clean_up`, not a simple magnitude cutoff.
+`A` and `B` are conformable two-dimensional single or double arrays, sparse or full, on the CPU or GPU, subject to MATLAB’s native multiplication restrictions. `tol` is a finite non-negative real CPU scalar, or NaN. Zero or NaN tolerance, or the `clean-up` disable switch in `spin_system.sys.disable`, uses native multiplication without cleanup. Positive tolerances use the same rounding operation as `clean_up`, not a simple magnitude cutoff.
 
-The helper preserves the native product’s device and sparse/full representation; precision follows `clean_up`, so a single-precision tolerance can lower a double-precision result. It has no spin-system argument and therefore cannot apply custom density thresholds or a cleanup-disable flag. Spinach callers select zero tolerance when cleanup is disabled and retain their final `clean_up(spin_system,C,tol,true)` to apply the whole-matrix storage policy.
+The helper preserves the native product’s device; precision follows `clean_up`, so a single-precision tolerance can lower a double-precision result. `spin_system` supplies the disable switch and global sparse/full storage thresholds. The final whole-matrix representation follows those thresholds, without a second numerical rounding pass. Callers pass their original tolerance directly and do not need a cleanup-bypass block or an outer `clean_up` call.
 
 Panel sizing depends on input storage and, on the GPU, available device memory. It bounds explicit raw panels, not undocumented multiplication workspace, final result storage, or all assembly temporaries. Runtime can increase. Blocked dense reductions can differ in their last bits from a single native multiplication; values at rounding boundaries need not be bitwise identical.
 

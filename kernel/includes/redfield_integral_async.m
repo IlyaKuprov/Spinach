@@ -172,8 +172,8 @@ ABCD=get(store,store_keys); remove(store,store_keys);
 [A,B,C,D]=deal(ABCD{:}); clear('ABCD');
 
 % Compute the integral and do an intermediate clean-up
-R_int=-weight*A*expmint(spin_system,B,C,D,upper_limit);
-clear('A','B','C','D'); R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero);
+R_int=-weight*A*expmint(spin_system,B,C,D,upper_limit); clear('A','B','C','D');
+R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero);
 
 % Convert CSR sparse format into XYZ format
 [row,col,val]=find(R_int); clear('spin_system','R_int');

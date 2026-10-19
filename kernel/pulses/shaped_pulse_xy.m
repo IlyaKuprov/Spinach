@@ -76,8 +76,7 @@ if nargout>1
     % Preallocate as a cell array
     traj=cell(1,numel(slice_durs)+1);
 
-    % First element is
-    % initial condition
+    % Store the initial condition as the first element
     traj{1}=rho;
 
 end
@@ -124,11 +123,12 @@ switch method(1:4)
                     % Update the propagator
                     if nargout>2
                         if strcmp(spin_system.bas.formalism,'zeeman-hilb')
-                            P=propagator(spin_system,slice_oper,slice_durs(n))*P;
+                            P=multiclean(spin_system,propagator(spin_system,slice_oper,slice_durs(n)),P,spin_system.tols.prop_chop);
                         else
                             P=step(spin_system,slice_oper,P,slice_durs(n));
+                            P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                         end
-                        P=clean_up(spin_system,P,spin_system.tols.prop_chop);
+
                     end
 
                 % 2nd order Lie
@@ -150,11 +150,12 @@ switch method(1:4)
                     if nargout>2
                         if strcmp(spin_system.bas.formalism,'zeeman-hilb')
                             slice_oper=isergen(slice_oper_l,[],slice_oper_r,slice_durs(n));
-                            P=propagator(spin_system,slice_oper,slice_durs(n))*P;
+                            P=multiclean(spin_system,propagator(spin_system,slice_oper,slice_durs(n)),P,spin_system.tols.prop_chop);
                         else
                             P=step(spin_system,{slice_oper_l,slice_oper_r},P,slice_durs(n));
+                            P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                         end
-                        P=clean_up(spin_system,P,spin_system.tols.prop_chop);
+
                     end
 
                 otherwise
@@ -250,7 +251,7 @@ switch method(1:4)
 
             % Update pulse propagator
             if nargout>2
-                P=clean_up(spin_system,PS*P,spin_system.tols.prop_chop);
+                P=multiclean(spin_system,PS,P,spin_system.tols.prop_chop);
             end
 
             % Inform the user
@@ -317,11 +318,11 @@ switch method(1:4)
             % Update pulse propagator
             if nargout>2
                 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
-                    P=propagator(spin_system,slice_oper,slice_durs(n))*P;
+                    P=multiclean(spin_system,propagator(spin_system,slice_oper,slice_durs(n)),P,spin_system.tols.prop_chop);
                 else
                     P=evolution(spin_system,slice_oper,[],P,slice_durs(n),1,'final');
+                    P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                 end
-                P=clean_up(spin_system,P,spin_system.tols.prop_chop);
             end
 
             % Inform the user
@@ -419,4 +420,5 @@ end
 % PTCL Teaching Lab, but the photographs of the resulting fibre tip
 % were left on Peter's table on Monday. The paper was accepted by 
 % JMR without review.
+
 

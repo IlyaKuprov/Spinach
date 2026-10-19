@@ -88,7 +88,7 @@ PP=propagator(spin_system,pulseop,parameters.pulse_dur);
 PE=propagator(spin_system,L,cycle_length-parameters.pulse_dur);
 
 % Combine the propagators
-P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop);
+P=multiclean(spin_system,PE,PP,spin_system.tols.prop_chop);
 
 % Apply the DANTE pulse train
 parameters.rho0=multiprop(spin_system,P,parameters.rho0,...
@@ -189,4 +189,5 @@ end
 % ly because they didn't get invited to those sorts of parties.
 %
 % Douglas Adams, "The Hitchhiker's Guide to the Galaxy"
+
 

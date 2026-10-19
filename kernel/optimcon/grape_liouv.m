@@ -263,8 +263,8 @@ switch spin_system.control.integrator
                 P{n}=propagator(spin_system,L_forw{n},dt(n));
 
                 % Merge into the total (physical: no keyholes)
-                P_tot=clean_up(spin_system,P{n}*P_tot,...
-                               spin_system.tols.prop_chop);
+                P_tot=multiclean(spin_system,P{n},P_tot,spin_system.tols.prop_chop);
+
 
             end
 
@@ -342,9 +342,8 @@ for n=1:nsteps
     if strcmp(spin_system.control.method,'goodwin')&&(n_outputs>3)
         P_cum{n}=propagator(spin_system,L_forw{n},dt(n));
         if n>1
-            P_cum{n}=P_cum{n}*P_cum{n-1};
-            P_cum{n}=clean_up(spin_system,P_cum{n},...
-                              spin_system.tols.prop_chop);
+            P_cum{n}=multiclean(spin_system,P_cum{n},P_cum{n-1},spin_system.tols.prop_chop);
+
         end
     end
 

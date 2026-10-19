@@ -199,7 +199,7 @@ switch method
 
             % Update pulse propagator in Fokker-Planck space
             if nargout>2
-                P_tot=clean_up(spin_system,P*P_tot,spin_system.tols.prop_chop);
+                P_tot=multiclean(spin_system,P,P_tot,spin_system.tols.prop_chop);
             end
 
         end

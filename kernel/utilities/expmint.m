@@ -60,7 +60,7 @@ P=(BE1'*auxmat*BE1)'; Q=(BE1'*auxmat*BE2);
 clear('auxmat','BE1','BE2');
 
 % Multiply up the blocks
-R=clean_up(spin_system,P*Q,spin_system.tols.prop_chop);
+R=multiclean(spin_system,P,Q,spin_system.tols.prop_chop);
 
 % Reclaim memory
 clear('P','Q');
@@ -88,4 +88,5 @@ end
 %                    put poison in your tea."
 % WINSTON CHURCHILL: "If I were your husband, Nancy, I'd 
 %                     drink it."
+
 

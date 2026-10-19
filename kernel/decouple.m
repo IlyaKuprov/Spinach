@@ -135,6 +135,7 @@ if (nargout>0)&&(~isempty(L))
             else
                 L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
             end
+            L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
 
         case 'zeeman-liouv'
 
@@ -142,17 +143,15 @@ if (nargout>0)&&(~isempty(L))
             fp_proj=kron(speye(spc_dim),P);
 
             % Apply the projector from both sides
-            L=fp_proj*L*fp_proj;
+            L=multiclean(spin_system,fp_proj*L,fp_proj,spin_system.tols.liouv_zero);
 
         case 'zeeman-hilb'
 
             % Stretch, project, and fold the Hamiltonian
             L=reshape(P*L(:),size(L));
+            L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
 
     end
-
-    % Re-evaluate sparsity
-    L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
 
 end
 

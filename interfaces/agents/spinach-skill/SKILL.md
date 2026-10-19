@@ -171,3 +171,12 @@ hashes to compare descriptors with columns removed.
 Set `op_cache`, `ham_cache`, or `prop_cache` in `sys.enable` to preserve the
 existing parallel pool's ValueStore across `create` calls. With none of these
 options enabled, `create` clears the ValueStore when reusing the pool.
+
+## Memory-heavy cleaned matrix products
+
+Use `multiclean(spin_system,A,B,tol)` at memory-heavy product/cleanup boundaries.
+Pass the original spin system and tolerance; let `clean_up` own rounding,
+disable switches and storage decisions. Backend selection belongs inside
+`multiclean`. Tolerances must be finite non-negative floating-point scalars.
+Prefer compact panel code and numerical agreement within roundoff over
+bitwise preservation. Validate memory and runtime on the workload of interest.

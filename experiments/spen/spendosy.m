@@ -79,7 +79,7 @@ Ly=kron(speye(prod(parameters.npts)),(Lp-Lp')/2i);
 
 % Get the chirp pulse
 [Cx,Cy]=chirp_pulse(parameters.pulsenpoints,parameters.Te,parameters.BW,...
-                       parameters.smfactor,parameters.chirptype);
+                    parameters.smfactor,parameters.chirptype);
 
 % Get the gradient amplitude list
 gradient_amplitudes=parameters.Ge*ones(parameters.pulsenpoints,1);
@@ -133,7 +133,7 @@ rho=step(spin_system,L-parameters.Ga*G{1},rho,Taq/2);
 % Build whole-loop propagators
 P1L=propagator(spin_system,L+parameters.Ga*G{1},parameters.npoints*parameters.deltat);
 P2L=propagator(spin_system,L-parameters.Ga*G{1},parameters.npoints*parameters.deltat);
-PL=clean_up(spin_system,P2L*P1L,spin_system.tols.prop_chop); clear('P1L','P2L');
+PL=multiclean(spin_system,P2L,P1L,spin_system.tols.prop_chop); clear('P1L','P2L');
 
 % Build the intra-loop propagator
 P=propagator(spin_system,L+parameters.Ga*G{1},parameters.deltat);
@@ -282,4 +282,5 @@ end
 % history. But he has none of that, and so he's a critic.
 %
 % Sergei Shnurov
+
 

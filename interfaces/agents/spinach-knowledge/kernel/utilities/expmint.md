@@ -12,27 +12,25 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/expmin
 
 ## Behaviour
 
-- Syntax: `R=expmint(spin_system,A,B,C,T)`.
-- Consistency is enforced first: `A`, `B` and `C` must be numeric matrices of the same dimension, `A` must be Hermitian, and `T` must be a real scalar; violations raise errors.
-- Zero-argument shortcut: if `T==0` or `B` has no nonzero entries, the function returns an empty sparse matrix of the size of `B` via `spalloc`.
-- Otherwise the auxiliary matrix `[-A, 1i*B; 0*A, -C]` is built, block extraction multipliers `BE1` and `BE2` are formed with `spdiags`, and `A`, `B`, `C` are cleared from memory.
-- The auxiliary matrix is exponentiated over time `T` by calling `propagator(spin_system,auxmat,T)`.
-- The user is informed via `report(spin_system,'processing auxiliary matrix blocks...')`.
-- Blocks are extracted as `P=(BE1'*auxmat*BE1)'` and `Q=(BE1'*auxmat*BE2)`, after which the auxiliary matrix and extraction multipliers are cleared.
-- The result is `R=clean_up(spin_system,P*Q,spin_system.tols.prop_chop)`, after which `P` and `Q` are cleared.
-- The header notes that the auxiliary matrix method is massively faster than either commutator series or diagonalisation, and that this is the most memory-intensive stage in many calculations, with aggressive memory recycling.
+Use `R=expmint(spin_system,A,B,C,T)` for the integral above. The matrices must be numeric and have identical dimensions, `A` must be Hermitian, and `T` must be a real scalar; invalid arguments raise errors. Zero integration time or a zero `B` gives a zero sparse result with the dimensions of `B`.
+
+The auxiliary-matrix method provides an alternative to commutator expansions or diagonalisation. It doubles the matrix dimension and can be the most memory-intensive part of a calculation, so the propagation tolerances and sparse/full storage policy in `spin_system` matter. Intermediate storage is recycled aggressively; retain sparse inputs when appropriate rather than assuming that a sparse input guarantees a small temporary product.
 
 ## Inputs and outputs
 
 Inputs:
 
-- `spin_system` — Spinach system object passed through to `propagator`, `report` and `clean_up`.
+- `spin_system` — Spinach configuration controlling propagation tolerances, cleanup and reporting.
 - `A`, `B`, `C` — the three matrices involved in the integral; they must be numeric matrices of identical dimension, and `A` must be Hermitian.
 - `T` — integration time; a real scalar.
 
 Output:
 
 - `R` — the resulting integral.
+
+## Temporary memory
+
+Scaling-and-squaring and the final back-rotation use `multiclean` to discard insignificant product entries panel by panel rather than retaining the complete unpruned product. The existing cleanup tolerance and whole-matrix storage policy remain in effect. This reduces temporary fill-in at a possible runtime cost; it does not reduce the auxiliary dimension or change the integral formula.
 
 ## References
 

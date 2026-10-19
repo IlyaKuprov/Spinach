@@ -4,7 +4,7 @@
 
 ## Meaning
 
-Applies a square propagator `P` exactly `N` times by processing the binary digits of `N`. It multiplies the state by the current power only for set bits, shifts to the next bit, and squares `P` only when more bits remain. It therefore does not form `P^N` as a separate matrix. After each required square, the code calls `clean_up(...,spin_system.tols.prop_chop)`. A validated `N=0` returns the original `rho` unchanged.
+Applies a square propagator `P` exactly `N` times without forming `P^N` as a separate matrix. Binary exponentiation reduces the number of matrix products; a validated `N=0` returns the original `rho` unchanged. Squaring uses panel multiplication with `spin_system.tols.prop_chop`; ordinary cleanup controls storage, and numerical agreement within roundoff—not bitwise identity—is the contract.
 
 For `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, each active power acts as `rho=P*rho`. In `zeeman-hilb`, `rho=P*rho*P'`, where MATLAB `P'` is the conjugate transpose. The output retains `rho`'s dimensions.
 

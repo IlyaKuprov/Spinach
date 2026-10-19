@@ -94,7 +94,7 @@ report(spin_system,'computing H0 exponentials...');
 P=cell(n_tau_int_steps,1); P{1}=speye(size(H0));
 P_dt=propagator(spin_system,H0,dt); 
 for n=2:n_tau_int_steps % Keep cleaning up insignificant non-zeroes
-    P{n}=clean_up(spin_system,P_dt*P{n-1},spin_system.tols.prop_chop);
+    P{n}=multiclean(spin_system,P_dt,P{n-1},spin_system.tols.prop_chop);
 end
 
 % Determine the number of stripes
@@ -123,11 +123,9 @@ parfor s=1:nstripes % Inefficient, investigate
     H1s=H1(:,s); Ps=P; F=sparse(0);
     
     % Trapezium rule for tau integral
-    f_curr=clean_up(spin_system,-dt*H1s{1}*Ps{1}*H1s{1}*Ps{1}',...
-                    spin_system.tols.liouv_zero);
+    f_curr=multiclean(spin_system,-dt*H1s{1}*Ps{1}*H1s{1},Ps{1}',spin_system.tols.liouv_zero);
     for tau=2:n_tau_int_steps
-        f_next=clean_up(spin_system,-dt*H1s{1}*Ps{tau}*H1s{tau}*Ps{tau}',...
-                        spin_system.tols.liouv_zero);
+        f_next=multiclean(spin_system,-dt*H1s{1}*Ps{tau}*H1s{tau},Ps{tau}',spin_system.tols.liouv_zero);
         F=F+(f_curr+f_next)/2; f_curr=f_next;
     end
 
@@ -198,4 +196,5 @@ end
 % with a similar dumbass."
 %
 % A Russian hand-to-hand combat instructor
+
 

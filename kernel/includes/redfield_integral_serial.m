@@ -84,8 +84,9 @@ for n=1:numel(Q)
                                         C(~states{s},~states{s})=0; D(~states{s},~states{s})=0;
                                             
                                         % Compute the integral and clean up to the tolerance
-                                        R_int=-weights{s}(j)*A*expmint(spin_system,B,C,D,upper_limit);
-                                        R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero);
+                                        R_int=multiclean(spin_system,-weights{s}(j)*A,...
+                                                        expmint(spin_system,B,C,D,upper_limit),...
+                                                        1e-2*spin_system.tols.rlx_zero);
 
                                         % Add to the total
                                         R=R+R_int;

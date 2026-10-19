@@ -57,14 +57,14 @@ while N>0
 
     % Multiply the current binary power into the result if present
     if bitand(N,uint64(1))>0
-        Q=clean_up(spin_system,Q*P,spin_system.tols.prop_chop);
+        Q=multiclean(spin_system,Q,P,spin_system.tols.prop_chop);
     end
 
     % Shift to the next binary digit
     N=bitshift(N,-1);
 
     % Square the propagator only if higher powers remain
-    if N>0, P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); end
+    if N>0, P=multiclean(spin_system,P,P,spin_system.tols.prop_chop); end
 
 end
 
@@ -110,4 +110,5 @@ end
 %
 % Melanie McDonagh,
 % in The Spectator
+
 

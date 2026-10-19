@@ -78,7 +78,7 @@ switch method
         while cheap_diff>spin_system.tols.stst_tol
 
             % Compute the square
-            Psq=clean_up(spin_system,P*P,spin_system.tols.prop_chop);
+            Psq=multiclean(spin_system,P,P,spin_system.tols.prop_chop);
 
             % Pin the trace conservation row exactly
             if strcmp(spin_system.bas.formalism,'zeeman-liouv')
@@ -237,4 +237,5 @@ end
 %
 % News section 
 % of The Spectator
+
 

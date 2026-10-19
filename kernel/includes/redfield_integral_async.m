@@ -171,8 +171,10 @@ store_keys={['brw_integrator_batch_' num2str(job_id) '_A'],...
 ABCD=get(store,store_keys); remove(store,store_keys);
 
 % Compute the integral and do an intermediate clean-up
-R=-w*ABCD{1}*expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim); 
-clear('ABCD'); R=clean_up(spin_system,R,1e-2*spin_system.tols.rlx_zero);
+R=multiclean(spin_system,-w*ABCD{1},...
+             expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim),...
+             1e-2*spin_system.tols.rlx_zero);
+clear('ABCD');
 
 % Convert CSR sparse format into XYZ format
 [row,col,val]=find(R); clear('spin_system','R');

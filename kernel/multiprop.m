@@ -59,7 +59,7 @@ while N>0
     N=bitshift(N,-1);
 
     % Square the propagator only if higher powers remain
-    if N>0, P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); end
+    if N>0, P=multiclean(spin_system,P,P,spin_system.tols.prop_chop); end
 
 end
 
@@ -124,4 +124,5 @@ end
 %
 % Frank Herbert, in
 % the Dune series
+
 

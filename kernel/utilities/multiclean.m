@@ -44,8 +44,7 @@ if isobject(A)||isobject(B)
 end
 
 % Memory share of this worker, assuming all workers do the same job
-os=java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-budget=double(os.getFreeMemorySize())/max(1,spin_system.sys.parallel{2});
+budget=free_memory()/max(1,spin_system.sys.parallel{2});
 
 % Bytes per full product element, with two clean_up temporaries
 elem=full(ones(1,'like',A)*ones(1,'like',B)); elem=whos('elem');
@@ -65,6 +64,19 @@ for n=1:numel(C)
 end
 C=clean_up(spin_system,[C{:}],tol);
 
+end
+
+% Available host memory in bytes
+function bytes=free_memory()
+if ispc
+    stats=memory(); bytes=stats.MemAvailableAllArrays;
+elseif ismac
+    [~,txt]=system('vm_stat'); pages=regexp(txt,'Pages (free|inactive):\s+(\d+)','tokens');
+    bytes=4096*sum(cellfun(@(c)str2double(c{2}),pages));
+else
+    txt=fileread('/proc/meminfo');
+    bytes=1024*str2double(regexp(txt,'MemAvailable:\s+(\d+)','tokens','once'));
+end
 end
 
 % Consistency enforcement

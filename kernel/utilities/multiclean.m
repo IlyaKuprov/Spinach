@@ -27,13 +27,15 @@ function C=multiclean(spin_system,A,B,tol)
 % Check consistency
 grumble(A,B,tol);
 
-% Scalars, empty products and symbolic objects do not need panel storage
-if isscalar(A)||isscalar(B)||isempty(A)||isempty(B)||...
-   (isobject(A)&&~isa(A,'gpuArray'))||(isobject(B)&&~isa(B,'gpuArray'))
+% Exceptional special cases
+if isscalar(A)||isempty(A)||...
+   isscalar(B)||isempty(B)||...
+   (isobject(A)&&~isa(A,'gpuArray'))||...
+   (isobject(B)&&~isa(B,'gpuArray'))
     C=clean_up(spin_system,A*B,tol); return
 end
 
-% Put both operands on the execution device
+% Make sure both terms are on GPU
 if isa(A,'gpuArray')||isa(B,'gpuArray')
     A=gpuArray(A); B=gpuArray(B);
 end

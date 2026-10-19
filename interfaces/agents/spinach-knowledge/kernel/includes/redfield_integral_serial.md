@@ -18,8 +18,6 @@ The coupling matrices are `A=Q{n}{k,m}` and `C=Q{n}{p,q}'`. Before masking, `B` 
 
 This version evaluates terms directly in the current execution context and accumulates them serially; it does not queue futures or use the pool `ValueStore`. After the loops it clears intermediate variables and reports completion of the relaxation-integral evaluation.
 
-Both integral paths use `A`, `B`, `C`, and `D` for the auxiliary-matrix operands, `weight` for the selected correlation-function coefficient, `upper_limit` for the integration endpoint, and `R_int` for one cleaned integral contribution.
-
 ## References
 
 - [Kuprov et al., Journal of Magnetic Resonance (2011), DOI: 10.1016/j.jmr.2010.12.004](http://dx.doi.org/10.1016/j.jmr.2010.12.004)

@@ -19,7 +19,7 @@ result=new_test_result('kernel/multiclean','Fused multiplication and clean-up',.
                        'Panel products agree with clean_up within numerical roundoff.');
 
 % Exercise the supplied global storage policy
-spin_system.sys.disable={};
+spin_system.sys.disable={}; spin_system.sys.parallel={'processes',1};
 spin_system.tols.small_matrix=200;
 spin_system.tols.dense_matrix=0.15;
 
@@ -98,6 +98,16 @@ for sparse_a=[false true]
                            reference_clean(spin_system,A*B,tol));
         end
     end
+end
+
+% Force the panel path by declaring an enormous worker count
+rng(11); A=sprandn(200,120,0.05); B=sprandn(120,170,0.05);
+many_workers=spin_system; many_workers.sys.parallel={'processes',1e12};
+for tol=[0 1e-3]
+    result=compare(result,'forced panels',multiclean(many_workers,A,B,tol),...
+                   reference_clean(spin_system,A*B,tol));
+    result=compare(result,'forced panels full',multiclean(many_workers,full(A),B,tol),...
+                   reference_clean(spin_system,full(A)*B,tol));
 end
 
 % Exercise scalar multiplication, vectors, and zero inner dimensions

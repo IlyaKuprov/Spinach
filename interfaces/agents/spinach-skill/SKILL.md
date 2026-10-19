@@ -176,7 +176,8 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 
 Use `multiclean(spin_system,A,B,tol)` at memory-heavy product/cleanup boundaries.
 Pass the original spin system and tolerance; let `clean_up` own rounding,
-disable switches and storage decisions. Backend selection belongs inside
-`multiclean`. Tolerances must be finite non-negative floating-point scalars.
+disable switches and storage decisions. Backend selection and the
+panel-or-ordinary decision belong inside `multiclean`; hand-built
+`spin_system` structures must carry `sys.parallel`. Tolerances must be finite non-negative floating-point scalars.
 Prefer compact panel code and numerical agreement within roundoff over
 bitwise preservation. Validate memory and runtime on the workload of interest.

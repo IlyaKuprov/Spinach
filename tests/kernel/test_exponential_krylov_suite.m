@@ -94,7 +94,7 @@ end
 function spin_system=local_spin_system()
 
 spin_system.sys.enable={};
-spin_system.sys.disable={};
+spin_system.sys.disable={}; spin_system.sys.parallel={'processes',1};
 spin_system.sys.output='hush';
 spin_system.tols.small_matrix=1000;
 spin_system.tols.prop_chop=1e-14;

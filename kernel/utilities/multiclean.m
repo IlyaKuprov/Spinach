@@ -1,10 +1,11 @@
-% Memory-prioritised matrix multiplication with panel-wise cleanup. Syntax:
+% Matrix multiplication with clean-up. Syntax:
 %
 %                 C=multiclean(spin_system,A,B,tol)
 %
 % Parameters:
 %
-%     spin_system - Spinach system structure supplying cleanup policy
+%     spin_system - Spinach system structure supplying cleanup
+%                   policy and the parallel worker count
 %
 %     A,B         - conforming matrices on CPU or GPU; scalar and
 %                   symbolic-operator products are also accepted
@@ -16,9 +17,13 @@
 %
 %     C           - cleaned product with the dimensions of A*B
 %
-% clean_up controls rounding and storage. Sparse double GPU products use
-% cuda_sparse_by_sparse internally. Panel multiplication and repeated
-% cleanup may differ from one native product by numerical roundoff.
+% When the full product does not fit into the memory share of the
+% current worker (host free memory divided by the worker count), it
+% is computed in column panels that are cleaned up as they are made,
+% which limits the fill-in of sparse products. GPU products always
+% use ordinary multiplication; sparse double GPU products use the
+% cuda_sparse_by_sparse backend. Panel multiplication may differ
+% from one native product by numerical roundoff.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -27,50 +32,38 @@ function C=multiclean(spin_system,A,B,tol)
 % Check consistency
 grumble(A,B,tol);
 
-% Exceptional special cases
-if isscalar(A)||isempty(A)||...
-   isscalar(B)||isempty(B)||...
-   (isobject(A)&&~isa(A,'gpuArray'))||...
-   (isobject(B)&&~isa(B,'gpuArray'))
+% GPU arrays and symbolic objects: ordinary cleaned-up multiplication
+if isobject(A)||isobject(B)
+    if isa(A,'gpuArray')&&isa(B,'gpuArray')&&issparse(A)&&issparse(B)&&...
+       strcmp(classUnderlying(A),'double')&&strcmp(classUnderlying(B),'double')
+        C=cuda_sparse_by_sparse(A,B);
+    else
+        C=A*B;
+    end
+    C=clean_up(spin_system,C,tol); return
+end
+
+% Memory share of this worker, assuming all workers do the same job
+os=java.lang.management.ManagementFactory.getOperatingSystemMXBean();
+budget=double(os.getFreeMemorySize())/max(1,spin_system.sys.parallel{2});
+
+% Bytes per full product element, with two clean_up temporaries
+elem=full(ones(1,'like',A)*ones(1,'like',B)); elem=whos('elem');
+elem_bytes=3*elem.bytes*(1+(~isreal(A)||~isreal(B)));
+
+% Full product fits into the memory share: ordinary multiplication
+if size(A,1)*size(B,2)*elem_bytes<=budget
     C=clean_up(spin_system,A*B,tol); return
 end
 
-% Make sure both terms are on GPU
-if isa(A,'gpuArray')||isa(B,'gpuArray')
-    A=gpuArray(A); B=gpuArray(B);
-end
-
-% Budget three dense panel arrays against the input nonzero count
-width=max(1,floor((nnz(A)+nnz(B))/(3*size(A,1))));
-width=min(width,size(B,2));
-nblocks=ceil(size(B,2)/width); sparse_product=issparse(A)&&issparse(B);
-if sparse_product, rows=cell(1,nblocks); cols=rows; vals=rows; end
-
-% Multiply complete columns and clean each panel
-for n=1:nblocks
+% Column panels of the product that fit into the memory share
+width=max(1,floor(budget/(size(A,1)*elem_bytes)));
+C=cell(1,ceil(size(B,2)/width));
+for n=1:numel(C)
     columns=(1+(n-1)*width):min(n*width,size(B,2));
-    if isa(A,'gpuArray')&&issparse(A)&&issparse(B)&&...
-       strcmp(classUnderlying(A),'double')&&strcmp(classUnderlying(B),'double')
-        panel=cuda_sparse_by_sparse(A,B(:,columns));
-    else
-        panel=A*B(:,columns);
-    end
-    panel=clean_up(spin_system,panel,tol);
-    if sparse_product
-        [rows{n},cols{n},vals{n}]=find(panel);
-        rows{n}=rows{n}(:); cols{n}=cols{n}(:)+columns(1)-1; vals{n}=vals{n}(:);
-    else
-        if n==1, C=zeros(size(A,1),size(B,2),'like',full(panel)); end
-        C(:,columns)=full(panel);
-    end
+    C{n}=sparse(clean_up(spin_system,A*B(:,columns),tol));
 end
-
-% Let clean_up choose storage for the assembled matrix
-if sparse_product
-    C=sparse(vertcat(rows{:}),vertcat(cols{:}),vertcat(vals{:}),size(A,1),size(B,2));
-    clear rows cols vals
-end
-C=clean_up(spin_system,C,tol);
+C=clean_up(spin_system,[C{:}],tol);
 
 end
 

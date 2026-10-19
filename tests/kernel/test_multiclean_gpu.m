@@ -19,7 +19,7 @@ result=new_test_result('kernel/multiclean_gpu','GPU fused multiplication',...
                        'GPU panel arithmetic agrees within roundoff on the execution device.');
 
 % Exercise the supplied global storage policy
-spin_system.sys.disable={};
+spin_system.sys.disable={}; spin_system.sys.parallel={'processes',1};
 spin_system.tols.small_matrix=200;
 spin_system.tols.dense_matrix=0.15;
 

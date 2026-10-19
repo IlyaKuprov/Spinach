@@ -135,7 +135,7 @@ function spin_system=local_spin_system()
 % Build a minimal quiet Spinach object for Hilbert-space helpers
 spin_system.sys.output='hush';
 spin_system.sys.enable={};
-spin_system.sys.disable={};
+spin_system.sys.disable={}; spin_system.sys.parallel={'processes',1};
 spin_system.tols.liouv_zero=1e-14;
 spin_system.tols.small_matrix=64;
 spin_system.tols.dense_matrix=0.5;

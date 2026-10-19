@@ -24,7 +24,7 @@ result=new_test_result('kernel/multiprop_adaptive',...
 
 % Build the minimum Spinach system fields required by clean_up()
 spin_system.sys.enable={};
-spin_system.sys.disable={};
+spin_system.sys.disable={}; spin_system.sys.parallel={'processes',1};
 spin_system.bas.formalism='zeeman-liouv';
 spin_system.tols.prop_chop=0;
 spin_system.tols.dense_matrix=0.15;

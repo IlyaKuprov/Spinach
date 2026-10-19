@@ -13,7 +13,7 @@ function result=test_cleanup_storage()
 % State the test target and ordinary cleanup policy
 result=new_test_result('kernel/cleanup_storage','Product cleanup policy',...
                        'Cleanup controls final storage; roundoff is permitted.');
-s.sys.disable={}; s.tols.small_matrix=10; s.tols.dense_matrix=0.5;
+s.sys.disable={}; s.sys.parallel={'processes',1}; s.tols.small_matrix=10; s.tols.dense_matrix=0.5;
 
 % Check sparse and dense outcomes without changing the supplied tolerances
 for density=[0.1 0.9]

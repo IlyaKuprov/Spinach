@@ -2,12 +2,10 @@
 
 ## Purpose
 
-`C=multiclean(spin_system,A,B,tol)` multiplies matrices in output-column panels and cleans each panel before assembly, reducing transient fill-in. Complete inner products are retained. CPU and GPU, full and sparse inputs are supported; eligible sparse GPU products use the CUDA backend internally.
+`C=multiclean(spin_system,A,B,tol)` computes a cleaned-up matrix product. When the full product fits into the memory share of the current worker, it is ordinary `clean_up(A*B,tol)`. Otherwise the product is formed in column panels that are cleaned as they are made, which limits transient fill-in of sparse products at the cost of runtime.
 
 ## Numerical contract
 
-`tol` must be a finite, real, non-negative floating-point scalar. NaN, infinity and integer tolerances are errors. Zero tolerance and the cleanup-disable switch are handled by `clean_up`, without separate bypass logic in the helper. The supplied spin system is neither copied nor modified.
+`tol` must be a finite, real, non-negative floating-point scalar; NaN, infinity and integer tolerances are errors. Zero tolerance and the cleanup-disable switch are handled by `clean_up`. The supplied spin system is neither copied nor modified.
 
-Sparse-by-sparse panels are assembled from their nonzero entries; products involving a full operand fill a full output directly. Ordinary `clean_up` makes the final storage choice. Repeated rounding and blocked multiplication can differ from one native product by numerical roundoff; bitwise preservation is not promised. Scalars, empty products and symbolic operator objects use native multiplication followed by cleanup.
-
-Panel width is based on input nonzero counts and the storage for three dense output panels. This favours sparse-workload memory over speed; it is not a bound on backend workspace, final output or concatenation storage.
+The memory share is host free memory divided by `spin_system.sys.parallel{2}`, on the assumption that all workers perform the same operation. The full product is deemed to fit when `rows*cols` elements, with two `clean_up` temporaries, are within that share. Panel width follows the same bound. GPU arrays and symbolic operator objects always use ordinary multiplication; sparse double GPU products use `cuda_sparse_by_sparse`. Panel results may differ from one native product by numerical roundoff.

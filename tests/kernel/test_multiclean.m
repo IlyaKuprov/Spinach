@@ -141,12 +141,12 @@ end
 
 % Disabled clean-up returns native BLAS arithmetic, not panel arithmetic
 rng(17); A=randn(31,47); B=randn(47,53);
-result=compare(result,'zero tolerance native arithmetic',multiclean(spin_system,A,B,0),A*B);
+result=compare(result,'zero tolerance numerical agreement',multiclean(spin_system,A,B,0),A*B);
 
-% Bypasses retain native arithmetic and representation
+% Compare unrounded products within floating-point roundoff
 rng(17); A=randn(31,47); B=randn(47,53);
 spin_system.sys.disable={'clean-up'};
-result=compare(result,'disabled native arithmetic',multiclean(spin_system,A,B,1),A*B);
+result=compare(result,'disabled cleanup numerical agreement',multiclean(spin_system,A,B,1),A*B);
 spin_system.sys.disable={};
 
 % Global density differs from each panel's local density

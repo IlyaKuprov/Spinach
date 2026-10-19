@@ -2,11 +2,23 @@
 %
 %                 C=multiclean(spin_system,A,B,tol)
 %
-% A,B are conforming matrices on CPU or GPU; tol is a finite, real,
-% non-negative floating-point scalar. Zero leaves entries unrounded.
-% Storage and rounding decisions belong to clean_up. Sparse GPU products
-% use cuda_sparse_by_sparse internally. Panel assembly may change floating-
-% point roundoff relative to a single native multiplication.
+% Parameters:
+%
+%     spin_system - Spinach system structure supplying cleanup policy
+%
+%     A,B         - conforming matrices on CPU or GPU; scalar and
+%                   symbolic-operator products are also accepted
+%
+%     tol         - finite, real, non-negative floating-point scalar;
+%                   zero leaves entries unrounded
+%
+% Outputs:
+%
+%     C           - cleaned product with the dimensions of A*B
+%
+% clean_up controls rounding and storage. Sparse double GPU products use
+% cuda_sparse_by_sparse internally. Panel multiplication and repeated
+% cleanup may differ from one native product by numerical roundoff.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -32,7 +44,7 @@ width=min(width,size(B,2));
 nblocks=ceil(size(B,2)/width); sparse_product=issparse(A)&&issparse(B);
 if sparse_product, rows=cell(1,nblocks); cols=rows; vals=rows; end
 
-% Multiply complete columns, clean them and retain their sparse storage
+% Multiply complete columns and clean each panel
 for n=1:nblocks
     columns=(1+(n-1)*width):min(n*width,size(B,2));
     if isa(A,'gpuArray')&&issparse(A)&&issparse(B)&&...

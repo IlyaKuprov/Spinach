@@ -127,8 +127,6 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
             next_term=multiclean(spin_system,next_term,(1/n)*A,spin_system.tols.prop_chop);
         end
         
-        % Eliminate small elements
-        
         % Add to the total and increment the counter
         P=P+gather(next_term); n=n+1;
         
@@ -149,8 +147,6 @@ else
         else
             next_term=multiclean(spin_system,next_term,(1/n)*A,spin_system.tols.prop_chop);
         end
-        
-        % Eliminate small elements
         
         % Add to the total and increment the counter
         P=P+next_term; n=n+1;

@@ -26,7 +26,7 @@ In `sphten-liouv`, the zero mask flags rows with nonzero selected-spin entries i
 
 In the Zeeman formalisms, spin involvement is not diagonal in the Zeeman basis. The code instead constructs a projector onto the selected spins' identity components, using the spin multiplicities and matrix-unit factors. For `zeeman-liouv`, the projector is extended over any Fokker–Planck coordinates; it is applied to both sides of `L` and to `rho`. For `zeeman-hilb`, the Hamiltonian and density-matrix stack are reshaped into Liouville-space columns, projected, and reshaped back. Thus each selected-spin Hamiltonian/state factor is reduced to its identity-component average, as described in the source comments.
 
-After a requested nonempty `L` is projected, the routine calls `clean_up` with `spin_system.tols.liouv_zero`.
+Projected nonempty `L` uses `spin_system.tols.liouv_zero` cleanup. The Zeeman–Liouville projection uses panel multiplication with cleanup inside `multiclean`; numerical roundoff is permitted and ordinary cleanup determines storage.
 
 ## Guards
 

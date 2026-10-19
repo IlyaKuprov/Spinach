@@ -53,6 +53,10 @@
 
 function spectrum=overtone_dante(spin_system,parameters,H,R,K)
 
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=spin_system.tols.prop_chop;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
+
 % Check consistency
 grumble(parameters,H,R,K);
 
@@ -88,7 +92,7 @@ PP=propagator(spin_system,pulseop,parameters.pulse_dur);
 PE=propagator(spin_system,L,cycle_length-parameters.pulse_dur);
 
 % Combine the propagators
-P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop);
+P=clean_up(spin_system,multiclean(PE,PP,product_tol),spin_system.tols.prop_chop,true);
 
 % Apply the DANTE pulse train
 parameters.rho0=multiprop(spin_system,P,parameters.rho0,...

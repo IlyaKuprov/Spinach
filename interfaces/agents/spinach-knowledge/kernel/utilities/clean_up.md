@@ -37,3 +37,7 @@ Output:
 
 - Spinach Wiki page: <https://spindynamics.org/wiki/index.php?title=clean_up.m>
 - Source file: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/clean_up.m>
+
+## Already-rounded products
+
+The optional fourth logical argument `already_cleaned` defaults to false. Set it to true only when numerical rounding has already been applied, such as by `multiclean`; cleanup then applies the spin-system storage policy without rounding again. This matters because floating-point scale/round operations need not be idempotent for large values. Existing three-argument calls are unchanged, and zero/NaN tolerances and the cleanup-disable switch retain their bypass semantics.

@@ -34,6 +34,10 @@ Output:
 
 - `R` — the resulting integral.
 
+## Temporary memory
+
+Scaling-and-squaring and the final back-rotation use `multiclean` to discard insignificant product entries panel by panel rather than retaining the complete unpruned product. The existing cleanup tolerance and whole-matrix storage policy remain in effect. This reduces temporary fill-in at a possible runtime cost; it does not reduce the auxiliary dimension or change the integral formula.
+
 ## References
 
 - C. van Loan, paper on computing integrals involving matrix exponentials: <http://dx.doi.org/10.1109/TAC.1978.1101743>

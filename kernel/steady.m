@@ -61,6 +61,10 @@ if isempty(rho)
     end
 end
 
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=spin_system.tols.prop_chop;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
+
 % Pick the method
 switch method
 
@@ -78,7 +82,7 @@ switch method
         while cheap_diff>spin_system.tols.stst_tol
 
             % Compute the square
-            Psq=clean_up(spin_system,P*P,spin_system.tols.prop_chop);
+            Psq=clean_up(spin_system,multiclean(P,P,product_tol),spin_system.tols.prop_chop,true);
 
             % Pin the trace conservation row exactly
             if strcmp(spin_system.bas.formalism,'zeeman-liouv')

@@ -61,6 +61,10 @@
 
 function fid=spencosy(spin_system,parameters,H,R,K,G,F)
 
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=spin_system.tols.prop_chop;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
+
 % Check consistency
 grumble(spin_system,parameters,H,R,K,G,F);
 
@@ -102,7 +106,7 @@ rho=step(spin_system,L-parameters.Ga*G{1},rho,Taq/2);
 % Build whole-loop propagators
 P1L=propagator(spin_system,L+parameters.Ga*G{1},parameters.npoints*parameters.deltat);
 P2L=propagator(spin_system,L-parameters.Ga*G{1},parameters.npoints*parameters.deltat);
-PL=clean_up(spin_system,P2L*P1L,spin_system.tols.prop_chop); clear('P1L','P2L');
+PL=clean_up(spin_system,multiclean(P2L,P1L,product_tol),spin_system.tols.prop_chop,true); clear('P1L','P2L');
 
 % Build the intra-loop propagator
 P=propagator(spin_system,L+parameters.Ga*G{1},parameters.deltat);

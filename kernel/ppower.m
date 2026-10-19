@@ -29,6 +29,10 @@ function P=ppower(spin_system,P,N)
 % Check consistency
 grumble(spin_system,P,N);
 
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=spin_system.tols.prop_chop;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
+
 % Convert the step count into a bit-addressable integer
 if ~isa(N,'uint64'), N=uint64(N); end
 
@@ -57,14 +61,14 @@ while N>0
 
     % Multiply the current binary power into the result if present
     if bitand(N,uint64(1))>0
-        Q=clean_up(spin_system,Q*P,spin_system.tols.prop_chop);
+        Q=clean_up(spin_system,multiclean(Q,P,product_tol),spin_system.tols.prop_chop,true);
     end
 
     % Shift to the next binary digit
     N=bitshift(N,-1);
 
     % Square the propagator only if higher powers remain
-    if N>0, P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); end
+    if N>0, P=clean_up(spin_system,multiclean(P,P,product_tol),spin_system.tols.prop_chop,true); end
 
 end
 

@@ -91,6 +91,10 @@ function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,
                                                     waveform,rho_init,rho_targ,...
                                                     fidelity_type)
 
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=spin_system.tols.prop_chop;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
+
 % Check consistency
 n_outputs=nargout();
 grumble(spin_system,drifts,controls,waveform,...
@@ -263,8 +267,9 @@ switch spin_system.control.integrator
                 P{n}=propagator(spin_system,L_forw{n},dt(n));
 
                 % Merge into the total (physical: no keyholes)
-                P_tot=clean_up(spin_system,P{n}*P_tot,...
-                               spin_system.tols.prop_chop);
+                P_tot=multiclean(P{n},P_tot,product_tol);
+                P_tot=clean_up(spin_system,P_tot,...
+                               spin_system.tols.prop_chop,true);
 
             end
 
@@ -342,9 +347,9 @@ for n=1:nsteps
     if strcmp(spin_system.control.method,'goodwin')&&(n_outputs>3)
         P_cum{n}=propagator(spin_system,L_forw{n},dt(n));
         if n>1
-            P_cum{n}=P_cum{n}*P_cum{n-1};
+            P_cum{n}=multiclean(P_cum{n},P_cum{n-1},product_tol);
             P_cum{n}=clean_up(spin_system,P_cum{n},...
-                              spin_system.tols.prop_chop);
+                              spin_system.tols.prop_chop,true);
         end
     end
 

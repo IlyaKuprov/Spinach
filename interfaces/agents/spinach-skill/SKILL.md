@@ -171,3 +171,16 @@ hashes to compare descriptors with columns removed.
 Set `op_cache`, `ham_cache`, or `prop_cache` in `sys.enable` to preserve the
 existing parallel pool's ValueStore across `create` calls. With none of these
 options enabled, `create` clears the ValueStore when reusing the pool.
+
+## Memory-heavy cleaned matrix products
+
+Use `multiclean(A,B,tol)` to avoid retaining an entire unpruned matrix
+product before cleanup. It cleans complete output panels, not partial
+inner-product sums, and supports native CPU/GPU sparse/full multiplication
+combinations. Keep the original rounding boundary: do not insert cleanup
+inside a product chain, sum, or normalization step. The three-argument
+helper preserves native product storage; callers retain `clean_up` for
+their whole-matrix density policy using the `already_cleaned=true` option
+to avoid rounding twice, and pass zero tolerance when cleanup is
+disabled. Validate both numerical agreement and peak process/device memory;
+lower memory need not mean faster execution.

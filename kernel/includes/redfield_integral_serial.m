@@ -26,6 +26,10 @@
 % <https://spindynamics.org/wiki/index.php?title=redfield_integral_serial.m>
 
 % Sum over spherical ranks
+
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=1e-2*spin_system.tols.rlx_zero;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
 for n=1:numel(Q)
     
     % Sum over first projection index
@@ -84,8 +88,18 @@ for n=1:numel(Q)
                                         C(~states{s},~states{s})=0; D(~states{s},~states{s})=0;
                                             
                                         % Compute the integral and clean up to the tolerance
-                                        R_int=-weights{s}(j)*A*expmint(spin_system,B,C,D,upper_limit);
-                                        R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero);
+                                        already_cleaned=false;
+                                        A_weighted=-weights{s}(j)*A;
+                                        R_int=expmint(spin_system,B,C,D,upper_limit);
+                                        if (isa(A_weighted,'double')||isa(A_weighted,'single')||isa(A_weighted,'gpuArray'))&&...
+                                           (isa(R_int,'double')||isa(R_int,'single')||isa(R_int,'gpuArray'))
+                                            R_int=multiclean(A_weighted,R_int,product_tol);
+                                            already_cleaned=true;
+                                        else
+                                            R_int=A_weighted*R_int;
+                                        end
+                                        clear('A_weighted');
+                                        R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero,already_cleaned);
 
                                         % Add to the total
                                         R=R+R_int;

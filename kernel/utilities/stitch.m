@@ -46,6 +46,10 @@
 function fid=stitch(spin_system,L,rho_stack,coil_stack,...
                     mec_oper,mec_time,t1,t2,t3,tdir)
 
+% Preserve the explicit clean-up bypass during blocked products
+product_tol=spin_system.tols.prop_chop;
+if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
+
 % Set default time directions
 if ~exist('tdir','var'), tdir='+-'; end
 
@@ -61,9 +65,13 @@ P=propagator(spin_system,L,t2.timestep/2); Pct=P';
 % Compute midpoint event propagator
 Pm=speye(size(L));
 for n=1:numel(mec_oper)
-    Pm=propagator(spin_system,mec_oper{n},mec_time{n})*Pm;
+    if n==numel(mec_oper)
+        Pm=multiclean(propagator(spin_system,mec_oper{n},mec_time{n}),Pm,product_tol);
+    else
+        Pm=propagator(spin_system,mec_oper{n},mec_time{n})*Pm;
+    end
 end
-Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop);
+Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop,~isempty(mec_oper));
 
 % Decide the device and style
 if ismember('gpu',spin_system.sys.enable)

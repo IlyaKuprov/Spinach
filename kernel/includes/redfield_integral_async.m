@@ -162,7 +162,6 @@ end
 % Asynchronous BRW integral kernel, careful memory management
 function job_id=brw_compute_kernel(spin_system,w,job_id,upper_lim)
 
-
 % Get data from pool ValueStore
 store=getCurrentValueStore();
 store_keys={['brw_integrator_batch_' num2str(job_id) '_A'],...
@@ -172,16 +171,9 @@ store_keys={['brw_integrator_batch_' num2str(job_id) '_A'],...
 ABCD=get(store,store_keys); remove(store,store_keys);
 
 % Compute the integral and do an intermediate clean-up
-A_weighted=-w*ABCD{1};
-R=expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim);
-if (isa(A_weighted,'double')||isa(A_weighted,'single')||isa(A_weighted,'gpuArray'))&&...
-   (isa(R,'double')||isa(R,'single')||isa(R,'gpuArray'))
-    R=multiclean(spin_system,A_weighted,R,1e-2*spin_system.tols.rlx_zero);
-else
-    R=A_weighted*R;
-    R=clean_up(spin_system,R,1e-2*spin_system.tols.rlx_zero);
-end
-clear('A_weighted');
+R=multiclean(spin_system,-w*ABCD{1},...
+             expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim),...
+             1e-2*spin_system.tols.rlx_zero);
 clear('ABCD');
 
 % Convert CSR sparse format into XYZ format
@@ -200,5 +192,4 @@ end
 % Ramona Arnett
 
 % #NHEAD
-
 

@@ -173,11 +173,39 @@ for formalism={'sphten-liouv','zeeman-liouv','zeeman-hilb'}
     end
 end
 
+% Preserve custom multiplication and cleanup for either operand
+custom=polyadic({{sparse(diag([1 2 3 4])/8)}});
+operands={{custom,eye(4)},{eye(4),custom},{custom,custom}};
+for pair=1:numel(operands)
+    for disabled=[false true]
+        custom_system=spin_system; custom_system.sys.disable={};
+        if disabled, custom_system.sys.disable={'clean-up'}; end
+        for tol=[0 NaN 1/8]
+            left=operands{pair}{1}; right=operands{pair}{2};
+            expected=clean_up(custom_system,left*right,tol);
+            actual=multiclean(custom_system,left,right,tol);
+            result=test_true(result,'custom operand values',...
+                             isequaln(full(actual),full(expected)),...
+                             'Custom objects must retain native multiplication and cleanup.');
+            result=test_true(result,'custom operand representation',...
+                             strcmp(class(actual),class(expected)),...
+                             'Custom representation must not be materialised by multiclean.');
+        end
+    end
+end
+
+% Preserve numeric tolerance types accepted by the existing cleanup contract
+for tol={int32(0),int32(1),uint64(1),Inf}
+    left=2.25; right=0.5;
+    result=compare(result,'native tolerance compatibility',...
+                   multiclean(spin_system,left,right,tol{1}),...
+                   clean_up(spin_system,left*right,tol{1}));
+end
+
 % Reject malformed inputs without accepting ambiguous tolerance policies
 bad_cases={{ones(2),ones(3),1},{ones(2),ones(2),-1},...
-           {ones(2),ones(2),Inf},...
            {ones(2),ones(2),1i},{ones(2),ones(2),[1 2]},...
-           {int32(1),1,1},{ones(2,2,2),1,1},{1,1,int32(1)}};
+           {int32(1),1,1},{ones(2,2,2),1,1}};
 for case_index=1:numel(bad_cases)
     rejected=false;
     try

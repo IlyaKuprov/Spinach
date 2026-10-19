@@ -61,13 +61,9 @@ P=propagator(spin_system,L,t2.timestep/2); Pct=P';
 % Compute midpoint event propagator
 Pm=speye(size(L));
 for n=1:numel(mec_oper)
-    if n==numel(mec_oper)
-        Pm=multiclean(spin_system,propagator(spin_system,mec_oper{n},mec_time{n}),Pm,spin_system.tols.prop_chop);
-    else
-        Pm=propagator(spin_system,mec_oper{n},mec_time{n})*Pm;
-    end
+    Pm=propagator(spin_system,mec_oper{n},mec_time{n})*Pm;
 end
-if isempty(mec_oper), Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop); end
+Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop);
 
 % Decide the device and style
 if ismember('gpu',spin_system.sys.enable)
@@ -201,5 +197,4 @@ end
 % A wolf hates both men and dogs, but dogs he hates more.
 %
 % Sergey Dovlatov
-
 

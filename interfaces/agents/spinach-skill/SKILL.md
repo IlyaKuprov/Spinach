@@ -174,6 +174,7 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 
 ## Memory-heavy cleaned matrix products
 
+Keep custom-object dispatch inside `multiclean`, not in its callers.
 Use `multiclean(spin_system,A,B,tol)` to avoid retaining an entire unpruned matrix
 product before cleanup. It cleans complete output panels, not partial
 inner-product sums, and supports native CPU/GPU sparse/full multiplication

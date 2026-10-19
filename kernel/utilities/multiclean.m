@@ -11,7 +11,7 @@
 %            on CPU or GPU; dimensions must conform for A*B, including
 %            MATLAB scalar multiplication
 %
-%     tol  - real, non-negative single or double CPU scalar, or NaN;
+%     tol  - real, non-negative numeric CPU scalar, or NaN;
 %            zero or NaN returns native A*B without panel multiplication
 %
 % Outputs:
@@ -32,6 +32,7 @@
 % explicit uncleaned intermediates, not undocumented BLAS/CUDA workspace
 % or the cleaned output. Sparse assembly temporarily holds triplets as
 % well as the result. A dense result must itself fit in available memory.
+% Custom objects retain their native multiplication and clean_up dispatch.
 % GPU sparse inputs require MATLAB R2026b contiguous-submatrix indexing.
 % Blocked BLAS reductions can differ in their last bits from A*B, hence
 % values on a rounding boundary need not give bitwise-identical results.
@@ -40,12 +41,22 @@
 
 function C=multiclean(spin_system,A,B,tol)
 
+% Preserve custom multiplication and cleanup without materialising operands
+if (isobject(A)&&~isa(A,'gpuArray'))||(isobject(B)&&~isa(B,'gpuArray'))
+    C=clean_up(spin_system,A*B,tol); return
+end
+
 % Check consistency
 grumble(A,B,tol);
 
 % Disabled clean-up must also preserve native multiplication arithmetic
 if (tol==0)||isnan(tol)||ismember('clean-up',spin_system.sys.disable)
     C=A*B; return
+end
+
+% Retain native cleanup arithmetic for exceptional tolerance types
+if (~isfloat(tol))||isinf(tol)
+    C=clean_up(spin_system,A*B,tol); return
 end
 
 % Obtain product metadata without computing an uncleaned product
@@ -86,7 +97,7 @@ if dense_output, C=zeros(nrows,ncols,'like',clean_proto); end
 
 % Measure input storage, not the size of the hypothetical dense product
 if isa(proto,'gpuArray')
-    input_bytes=0;
+    A=gpuArray(A); input_bytes=0;
     for input={A,B}
         data=input{1};
         if isa(data,'gpuArray'), precision=classUnderlying(data);
@@ -175,9 +186,9 @@ end
 if (~isscalar(A))&&(~isscalar(B))&&(size(A,2)~=size(B,1))
     error('matrix dimensions must conform for A*B.');
 end
-if isa(tol,'gpuArray')||(~isnumeric(tol))||(~isfloat(tol))||(~isreal(tol))||...
-   (~isscalar(tol))||isinf(tol)||(tol<0)
-    error('tol must be a non-negative real single or double CPU scalar, or NaN.');
+if isa(tol,'gpuArray')||(~isnumeric(tol))||(~isreal(tol))||...
+   (~isscalar(tol))||(tol<0)
+    error('tol must be a non-negative real numeric CPU scalar, or NaN.');
 end
 end
 

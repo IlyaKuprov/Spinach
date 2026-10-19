@@ -143,13 +143,7 @@ if (nargout>0)&&(~isempty(L))
             fp_proj=kron(speye(spc_dim),P);
 
             % Apply the projector from both sides
-            L=fp_proj*L;
-            if isa(L,'double')||isa(L,'single')||isa(L,'gpuArray')
-                L=multiclean(spin_system,L,fp_proj,spin_system.tols.liouv_zero);
-            else
-                L=L*fp_proj;
-                L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
-            end
+            L=multiclean(spin_system,fp_proj*L,fp_proj,spin_system.tols.liouv_zero);
 
         case 'zeeman-hilb'
 

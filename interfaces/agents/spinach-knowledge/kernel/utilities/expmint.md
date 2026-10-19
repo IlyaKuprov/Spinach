@@ -19,7 +19,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/expmin
 - The auxiliary matrix is exponentiated over time `T` by calling `propagator(spin_system,auxmat,T)`.
 - The user is informed via `report(spin_system,'processing auxiliary matrix blocks...')`.
 - Blocks are extracted as `P=(BE1'*auxmat*BE1)'` and `Q=(BE1'*auxmat*BE2)`, after which the auxiliary matrix and extraction multipliers are cleared.
-- The result is `R=clean_up(spin_system,P*Q,spin_system.tols.prop_chop)`, after which `P` and `Q` are cleared.
+- The result is `R=multiclean(spin_system,P,Q,spin_system.tols.prop_chop)`, after which `P` and `Q` are cleared.
 - The header notes that the auxiliary matrix method is massively faster than either commutator series or diagonalisation, and that this is the most memory-intensive stage in many calculations, with aggressive memory recycling.
 
 ## Inputs and outputs

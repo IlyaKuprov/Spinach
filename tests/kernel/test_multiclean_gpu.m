@@ -8,7 +8,7 @@
 %               device checks; requires an available MATLAB GPU
 %
 % Sparse GPU panel indexing requires MATLAB R2026b. This test deliberately
-% does not select, reset, or silently skip an unavailable GPU.
+% does not select or reset a GPU; unavailable hardware reports SKIP.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -89,15 +89,29 @@ spin_system.sys.disable={'clean-up'};
 result=compare(result,'disabled native arithmetic',multiclean(spin_system,A,B,1),A*B);
 spin_system.sys.disable={};
 
+% Keep a mixed-device left operand resident before sizing panels
+for precision={'double','single'}
+    A=cast(reshape(1:12,3,4)/8,precision{1});
+    B=cast(reshape(1:20,4,5)/8,precision{1});
+    result=compare(result,'CPU left with GPU right',...
+                   multiclean(spin_system,A,gpuArray(B),1/8),...
+                   clean_up(spin_system,A*gpuArray(B),1/8));
+    result=compare(result,'GPU left with CPU right',...
+                   multiclean(spin_system,gpuArray(A),B,1/8),...
+                   clean_up(spin_system,gpuArray(A)*B,1/8));
+end
+
 % Global density differs from each panel's local density
-A=gpuArray(speye(240)); B=gpuArray(sparse(240,40)); B(:,1:4)=1;
+A=gpuArray(speye(240)); B=sparse(240,40);
+B(:,1:4)=1; B=gpuArray(B);
 for density=[0.05 0.15 0.9]
     for small_matrix=[0 200]
         spin_system.tols.dense_matrix=density;
         spin_system.tols.small_matrix=small_matrix;
         A=sparse(A); B=sparse(B);
         for dense_input=0:1
-            if dense_input, A=full(A); B=full(B); end
+            if dense_input, A=full(A); B=full(B);
+            else, A=sparse(A); B=sparse(B); end
             label=sprintf('global density=%g size=%d full=%d',density,small_matrix,dense_input);
             result=compare(result,label,multiclean(spin_system,A,B,0.125),...
                            clean_up(spin_system,A*B,0.125));

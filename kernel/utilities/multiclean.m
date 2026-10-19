@@ -29,10 +29,11 @@ end
 % Budget three dense panel arrays against the input nonzero count
 width=max(1,floor((nnz(A)+nnz(B))/(3*size(A,1))));
 width=min(width,size(B,2));
-rows=cell(1,ceil(size(B,2)/width)); cols=rows; vals=rows;
+nblocks=ceil(size(B,2)/width); sparse_product=issparse(A)&&issparse(B);
+if sparse_product, rows=cell(1,nblocks); cols=rows; vals=rows; end
 
 % Multiply complete columns, clean them and retain their sparse storage
-for n=1:numel(rows)
+for n=1:nblocks
     columns=(1+(n-1)*width):min(n*width,size(B,2));
     if isa(A,'gpuArray')&&issparse(A)&&issparse(B)&&...
        strcmp(classUnderlying(A),'double')&&strcmp(classUnderlying(B),'double')
@@ -40,12 +41,21 @@ for n=1:numel(rows)
     else
         panel=A*B(:,columns);
     end
-    [rows{n},cols{n},vals{n}]=find(clean_up(spin_system,panel,tol));
-    rows{n}=rows{n}(:); cols{n}=cols{n}(:)+columns(1)-1; vals{n}=vals{n}(:);
+    panel=clean_up(spin_system,panel,tol);
+    if sparse_product
+        [rows{n},cols{n},vals{n}]=find(panel);
+        rows{n}=rows{n}(:); cols{n}=cols{n}(:)+columns(1)-1; vals{n}=vals{n}(:);
+    else
+        if n==1, C=zeros(size(A,1),size(B,2),'like',full(panel)); end
+        C(:,columns)=full(panel);
+    end
 end
 
 % Let clean_up choose storage for the assembled matrix
-C=sparse(vertcat(rows{:}),vertcat(cols{:}),vertcat(vals{:}),size(A,1),size(B,2));
+if sparse_product
+    C=sparse(vertcat(rows{:}),vertcat(cols{:}),vertcat(vals{:}),size(A,1),size(B,2));
+    clear rows cols vals
+end
 C=clean_up(spin_system,C,tol);
 
 end

@@ -38,9 +38,7 @@ result=local_test_gpu_guard(result,fullfile(includes_dir,'start_disallow_gpu.m')
 pool_created=local_start_pool_if_needed();
 pool_cleanup=onCleanup(@()local_delete_pool(pool_created));
 
-% Exercise parallel profiler and Redfield include paths
-result=local_test_parallel_profiler(result,fullfile(includes_dir,'parallel_profiler_start.m'),...
-                                    fullfile(includes_dir,'parallel_profiler_report.m'));
+% Exercise Redfield include paths
 result=local_test_redfield_serial(result,fullfile(includes_dir,'redfield_integral_serial.m'));
 result=local_test_redfield_async(result,fullfile(includes_dir,'redfield_integral_async.m'));
 result=local_test_direct_include_dispatch(result);
@@ -122,37 +120,6 @@ result=test_true(result,'end_disallow_gpu requires start',...
 end
 
 
-function result=local_test_parallel_profiler(result,start_file,report_file)
-
-% Build a quiet spin system without the detailed dafuq profiler
-spin_system=local_quiet_spin_system();
-spin_system.sys.enable={};
-spin_system.sys.scratch=tempdir;
-
-% Exercise brief profiler start and report includes
-run(start_file);
-pause(0.01);
-run(report_file);
-result=test_true(result,'parallel profiler byte counters',...
-                 exist('nbytes','var')&&isnumeric(nbytes)&&numel(nbytes)==2&&...
-                 all(isfinite(nbytes)),...
-                 'parallel profiler report must compute a finite two-element worker byte counter');
-result=test_true(result,'parallel profiler wall time',...
-                 exist('walltime','var')&&isnumeric(walltime)&&isscalar(walltime)&&...
-                 isfinite(walltime)&&(walltime>=0),...
-                 'parallel profiler report must compute a finite non-negative wall time');
-
-% Inspect the detailed internal-profiler branch without executing it
-start_src=fileread(start_file);
-report_src=fileread(report_file);
-result=test_true(result,'parallel profiler dafuq source guard',...
-                 contains(start_src,'parallel.internal.profiling.PoolProfiler')&&...
-                 contains(report_src,'parProfiler.drainLog()'),...
-                 'the detailed dafuq profiler path is internal MATLAB API code and is source-guarded here');
-
-end
-
-
 function result=local_test_redfield_serial(result,serial_file)
 
 % Build a one-dimensional Redfield fixture, on-shell kernel at zero shift
@@ -210,17 +177,6 @@ end_disallow_gpu;
 result=test_true(result,'gpu guard direct script dispatch',...
                  gpu_removed&&ismember('gpu',spin_system.sys.enable),...
                  'direct GPU guard script dispatch must remove, and then restore, the gpu flag');
-
-% Execute the parallel profiler pair by script name
-spin_system=local_quiet_spin_system();
-spin_system.sys.enable={};
-spin_system.sys.scratch=tempdir;
-parallel_profiler_start;
-pause(0.01);
-parallel_profiler_report;
-result=test_true(result,'parallel profiler direct script dispatch',...
-                 exist('nbytes','var')&&exist('walltime','var')&&all(isfinite(nbytes)),...
-                 'direct profiler script dispatch must report finite byte counters and wall time');
 
 % Execute the serial Redfield include by script name
 [spin_system,Q,L0,R,expected]=local_redfield_fixture(); %#ok<ASGLU>

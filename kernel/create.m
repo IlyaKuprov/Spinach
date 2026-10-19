@@ -214,7 +214,6 @@ if ~isempty(spin_system.sys.enable)
     if ismember('paranoia',spin_system.sys.enable),   report(spin_system,'         > paranoid numerical accuracy settings'); end
     if ismember('cowboy',spin_system.sys.enable),     report(spin_system,'         > loose numerical accuracy settings'); end
     if ismember('polyadic',spin_system.sys.enable),   report(spin_system,'         > polyadic arithmetic with spatial degrees of freedom'); end
-    if ismember('dafuq',spin_system.sys.enable),      report(spin_system,'         > detailed parallel profiling'); end
     if ismember('sodd',spin_system.sys.enable),       report(spin_system,'         > spin-orbit corrections to dipolar couplings'); end
 end
 
@@ -232,20 +231,6 @@ if ~isworkernode
     
     % Shuffle the random number generator
     rng('shuffle'); report(spin_system,'random number generator shuffled');
-    
-    % Detailed parallel profiling
-    if ismember('dafuq',spin_system.sys.enable)
-        
-        % Dump MDCS messages to console
-        setSchedulerMessageHandler(@disp);
-        
-        % Turn on MDCS debugging
-        setenv('MDCE_DEBUG','true');
-        
-        % Preserve job information
-        pctconfig('preservejobs',true);
-        
-    end
     
     % Set default parallel profile
     if ~isfield(sys,'parallel')
@@ -1540,7 +1525,7 @@ if isfield(sys,'enable')
         error('sys.enable must be a cell array of strings.');
     end
     if any(~ismember(sys.enable,{'zte','gpu','op_cache','greedy','paranoia','sodd',...
-                                 'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
+                                 'cowboy','polyadic','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end
 end

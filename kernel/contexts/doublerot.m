@@ -305,9 +305,6 @@ if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     spin_system.sys.output='hush';
 end
 
-% MDCS diagnostics
-parallel_profiler_start;
-
 % Powder averaged spectrum
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
 
@@ -410,9 +407,6 @@ end
 
 % Unsilence the output
 spin_system.sys.output=prev_setting;
-
-% Get MDCS diagnostics
-parallel_profiler_report;
 
 % Decide the return array
 if parameters.sum_up

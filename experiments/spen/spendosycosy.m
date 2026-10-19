@@ -22,7 +22,7 @@
 %
 % parameters.pulsenpoints   number of points in the pulse shape
 %
-% parameters.smfactor         smoothing factor for the pulse
+% parameters.smfactor       smoothing factor for the pulse
 %
 % parameters.Te             duration of the pulse
 %
@@ -145,8 +145,7 @@ cosy_stack=step(spin_system,L-parameters.Ga*G{1},cosy_stack,Taq/2);
 % Build whole-loop propagators
 P1L=propagator(spin_system,L+parameters.Ga*G{1},parameters.npoints1*parameters.deltat);
 P2L=propagator(spin_system,L-parameters.Ga*G{1},parameters.npoints1*parameters.deltat);
-PL=multiclean(spin_system,P2L,P1L,spin_system.tols.prop_chop);
-clear('P1L','P2L');
+PL=multiclean(spin_system,P2L,P1L,spin_system.tols.prop_chop); clear('P1L','P2L');
 
 % Build the intra-loop propagator
 P=propagator(spin_system,L+parameters.Ga*G{1},parameters.deltat);

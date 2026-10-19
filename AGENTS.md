@@ -80,29 +80,33 @@ Keep the scientific model, algorithm, and numerical costs directly readable. App
 
 ### Write the calculation, not a framework
 
-1. **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change; apply the existing-capability and minimalism rules above.
+- **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change; apply the existing-capability and minimalism rules above.
 
-2. **Keep the mathematics visible.** Use expressions that a domain scientist can match to the defining equation. Keep small fixed transforms explicit when that is clearer than a generic implementation. Introduce an intermediate when it names a physical quantity, exposes a numerical stage, or avoids meaningful repeated work—not merely to rename an expression.
+- **Keep the mathematics visible.** Use expressions that a domain scientist can match to the defining equation. Keep small fixed transforms explicit when that is clearer than a generic implementation. Introduce an intermediate when it names a physical quantity, exposes a numerical stage, or avoids meaningful repeated work—not merely to rename an expression.
 
-3. **Use direct data flow.** Arrange the body in dependency order, with one conceptually distinct operation per captioned block. Prefer ordinary matrices, arrays, cells, and existing Spinach structures. Do not introduce a class, dispatcher framework, configuration parser, or mutable cache for a routine calculation.
+- **Use direct data flow.** Arrange the body in dependency order, with one conceptually distinct operation per captioned block. Prefer ordinary matrices, arrays, cells, and existing Spinach structures. Do not introduce a class, dispatcher framework, configuration parser, or mutable cache for a routine calculation.
 
-4. **Abstract scientific reuse, not typing effort.** Apply the helper and reuse rules above. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
+- **Abstract scientific reuse, not typing effort.** Apply the helper and reuse rules above. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
+
+- **Do not make ugly penny-pinching edits.** It is acceptable to incur small additional computational costs if that produces more elegant and compact code.
+
+- **No pointless past behaviour preservation.** For code re-factors, good numerical agreement is sufficient, bit-wise identity is unnecessary: do not introduce ugly clauses to preserve exact previous behaviour. Do not maintain backwards compatibility of calls with previous versions of Spinach. Only the current head must be internally consistent.
 
 ### Make the numerical representation earn its cost
 
-5. **Compute only what the caller needs.** If an operator action suffices, do not materialise the full operator or exponential. Do not allocate a trajectory, Hessian, or accumulated propagator unless requested. Preserve sparse, factorised, or matrix-free structure until an operation genuinely requires expansion.
+- **Compute only what the caller needs.** If an operator action suffices, do not materialise the full operator or exponential. Do not allocate a trajectory, Hessian, or accumulated propagator unless requested. Preserve sparse, factorised, or matrix-free structure until an operation genuinely requires expansion.
 
-6. **Use MATLAB operations where they express the mathematics clearly.** Prefer direct array algebra and established sparse constructors to hand-built book-keeping. Keep loops when they naturally traverse spins, tensor ranks, pulse slices, or independent cases. Do not replace a readable loop with dense broadcasting, elaborate indexing, or a large temporary merely to call the result vectorised. Preallocate growing results and avoid repeating expensive conversions inside loops.
+- **Use MATLAB operations where they express the mathematics clearly.** Prefer direct array algebra and established sparse constructors to hand-built book-keeping. Keep loops when they naturally traverse spins, tensor ranks, pulse slices, or independent cases. Do not replace a readable loop with dense broadcasting, elaborate indexing, or a large temporary merely to call the result vectorised. Preallocate growing results and avoid repeating expensive conversions inside loops.
 
-7. **Give numerical decisions a reason.** Derive scales, convergence decisions, and bounds from the algorithm and data where possible; reuse the relevant Spinach tolerance policy. Distinguish exact mathematical constants from numerical tolerances and performance cutoffs. Do not introduce an unexplained epsilon, iteration cap, size threshold, or regulariser. Do not silently change established thresholds during restyling, and do not claim a performance improvement without measurement.
+- **Give numerical decisions a reason.** Derive scales, convergence decisions, and bounds from the algorithm and data where possible; reuse the relevant Spinach tolerance policy. Distinguish exact mathematical constants from numerical tolerances and performance cutoffs. Do not introduce an unexplained epsilon, iteration cap, size threshold, or regulariser. Do not silently change established thresholds during restyling, and do not claim a performance improvement without measurement.
 
-8. **Preserve the scientific contract.** Keep units, signs, normalisation, basis order, shapes, and operator conventions explicit. For propagation, retain the convention `exp(-1i*L*t)`. Do not silently symmetrise, renormalise, clip, transpose, or regularise an input to make the calculation work; such operations need a documented mathematical role and compatibility with the requested behaviour.
+- **Preserve the scientific contract.** Keep units, signs, normalisation, basis order, shapes, and operator conventions explicit. For propagation, retain the convention `exp(-1i*L*t)`. Do not silently symmetrise, renormalise, clip, transpose, or regularise an input to make the calculation work; such operations need a documented mathematical role and compatibility with the requested behaviour.
 
 ### Review before delivery
 
-9. **Review for subtraction before delivery.** Apply the minimalism rules above while keeping the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For every changed MATLAB file, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
+- **Review for subtraction before delivery.** Apply the minimalism rules above while keeping the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For every changed MATLAB file, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
 
-**Final review question:** Can a Spinach scientist see the model, the algorithm, and the numerical costs directly, without mentally dismantling software scaffolding? If not, simplify the design before polishing its formatting.
+- **Final review question:** Can a Spinach scientist see the model, the algorithm, and the numerical costs directly, without mentally dismantling software scaffolding? If not, simplify the design before polishing its formatting.
 
 ## Spinach example coding style
 

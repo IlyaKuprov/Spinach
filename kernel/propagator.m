@@ -121,10 +121,7 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
     while nnz(next_term)>0
         
         % Compute the next term
-        if issparse(A)&&issparse(next_term)
-            next_term=cuda_sparse_by_sparse((1/n)*A,next_term);
-            next_term=clean_up(spin_system,next_term,spin_system.tols.prop_chop);
-        elseif issparse(A)
+        if issparse(A)
             next_term=multiclean(spin_system,(1/n)*A,next_term,spin_system.tols.prop_chop);
         else
             next_term=multiclean(spin_system,(1/n)*next_term,A,spin_system.tols.prop_chop);
@@ -193,12 +190,7 @@ if n_squarings>0
             report(spin_system,['GPU squaring step ' num2str(n) '...']);
             
             % Square the propagator
-            if issparse(P)
-                P=cuda_sparse_by_sparse(P,P);
-                P=clean_up(spin_system,P,spin_system.tols.prop_chop);
-            else
-                P=multiclean(spin_system,P,P,spin_system.tols.prop_chop);
-            end
+            P=multiclean(spin_system,P,P,spin_system.tols.prop_chop);
             
         end
         

@@ -16,6 +16,8 @@ Panel sizing depends on input storage and, on the GPU, available device memory a
 
 Do not introduce cleanup between factors, inside sums, or before normalization merely to use this helper: moving a rounding boundary changes the numerical algorithm. Custom objects retain their native multiplication and `clean_up` dispatch inside `multiclean`; callers do not need operand-type branches or to materialise those objects.
 
+Sparse double GPU panel products use `cuda_sparse_by_sparse` internally; other supported operand combinations use native multiplication. Backend selection is not a caller responsibility. The CUDA wrapper retains its own platform-binary and device-compatibility behaviour.
+
 ## Related functions
 
 - `clean_up`: rounding and spin-system-dependent storage policy.

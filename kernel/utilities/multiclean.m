@@ -33,6 +33,7 @@
 % or the cleaned output. Sparse assembly temporarily holds triplets as
 % well as the result. A dense result must itself fit in available memory.
 % Custom objects retain their native multiplication and clean_up dispatch.
+% Sparse double GPU panels use cuda_sparse_by_sparse internally.
 % GPU sparse inputs require MATLAB R2026b contiguous-submatrix indexing.
 % Blocked BLAS reductions can differ in their last bits from A*B, hence
 % values on a rounding boundary need not give bitwise-identical results.
@@ -126,6 +127,11 @@ col_bytes=3*(nrows*entry_bytes+8)+slice_bytes;
 panel_width=max(1,min(ncols,floor(input_bytes/max(1,col_bytes))));
 if ncols>1, panel_width=min(panel_width,ceil(ncols/2)); end
 
+% Use the CUDA backend only within its sparse double GPU contract
+use_cuda=isa(A,'gpuArray')&&issparse(A)&&issparse(B)&&(size(A,2)==size(B,1))&&...
+         strcmp(classUnderlying(A),'double')&&...
+         (isa(B,'double')||(isa(B,'gpuArray')&&strcmp(classUnderlying(B),'double')));
+
 % Retain only cleaned entries
 panel_count=ceil(ncols/panel_width);
 if ~dense_output
@@ -137,7 +143,9 @@ end
 for panel_index=1:panel_count
     first_col=1+(panel_index-1)*panel_width;
     last_col=min(ncols,first_col+panel_width-1);
-    panel=A*B(:,first_col:last_col);
+    panel=B(:,first_col:last_col);
+    if use_cuda, panel=cuda_sparse_by_sparse(A,gpuArray(panel));
+    else, panel=A*panel; end
     panel=clean_up(spin_system,panel,tol);
 
     % Sparse GPU arrays cannot be assigned by subscript

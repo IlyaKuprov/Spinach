@@ -45,10 +45,6 @@
 
 function [L,rho]=decouple(spin_system,L,rho,spins)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.liouv_zero;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Return if the spin list is empty
 if isempty(spins), return; end
 
@@ -120,9 +116,6 @@ if (nargout>0)&&(~isempty(L))
     report(spin_system,['space sub-problem dimension: ' num2str(spc_dim)]);
     report(spin_system,['spin sub-problem dimension:  ' num2str(spn_dim)]);
 
-    % Track rounding only for explicit fused products
-    already_cleaned=false;
-
     % Apply the wipeout machinery
     switch spin_system.bas.formalism
 
@@ -142,6 +135,7 @@ if (nargout>0)&&(~isempty(L))
             else
                 L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
             end
+            L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
 
         case 'zeeman-liouv'
 
@@ -151,26 +145,19 @@ if (nargout>0)&&(~isempty(L))
             % Apply the projector from both sides
             L=fp_proj*L;
             if isa(L,'double')||isa(L,'single')||isa(L,'gpuArray')
-                L=multiclean(L,fp_proj,product_tol);
-                already_cleaned=true;
+                L=multiclean(spin_system,L,fp_proj,spin_system.tols.liouv_zero);
             else
                 L=L*fp_proj;
+                L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
             end
 
         case 'zeeman-hilb'
 
             % Stretch, project, and fold the Hamiltonian
-            if isa(L,'double')||isa(L,'single')||isa(L,'gpuArray')
-                L=reshape(multiclean(P,L(:),product_tol),size(L));
-                already_cleaned=true;
-            else
-                L=reshape(P*L(:),size(L));
-            end
+            L=reshape(P*L(:),size(L));
+            L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
 
     end
-
-    % Re-evaluate sparsity
-    L=clean_up(spin_system,L,spin_system.tols.liouv_zero,already_cleaned);
 
 end
 

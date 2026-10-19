@@ -104,11 +104,6 @@ elseif mat_norm>16
     
 end
 
-
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Determine scaling and squaring parameters
 n_squarings=max([0 ceil(log2(mat_norm))]); scaling_factor=2^n_squarings;
 report(spin_system,['scaling -i*L*dt down by ' num2str(scaling_factor) ...
@@ -127,13 +122,12 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
         
         % Compute the next term
         if issparse(A)
-            next_term=multiclean((1/n)*A,next_term,product_tol);
+            next_term=multiclean(spin_system,(1/n)*A,next_term,spin_system.tols.prop_chop);
         else
-            next_term=multiclean((1/n)*next_term,A,product_tol);
+            next_term=multiclean(spin_system,(1/n)*next_term,A,spin_system.tols.prop_chop);
         end
         
         % Eliminate small elements
-        next_term=clean_up(spin_system,next_term,spin_system.tols.prop_chop,true);
         
         % Add to the total and increment the counter
         P=P+gather(next_term); n=n+1;
@@ -151,13 +145,12 @@ else
         
         % Compute the next term
         if issparse(A)
-            next_term=multiclean((1/n)*A,next_term,product_tol);
+            next_term=multiclean(spin_system,(1/n)*A,next_term,spin_system.tols.prop_chop);
         else
-            next_term=multiclean((1/n)*next_term,A,product_tol);
+            next_term=multiclean(spin_system,(1/n)*next_term,A,spin_system.tols.prop_chop);
         end
         
         % Eliminate small elements
-        next_term=clean_up(spin_system,next_term,spin_system.tols.prop_chop,true);
         
         % Add to the total and increment the counter
         P=P+next_term; n=n+1;
@@ -197,8 +190,7 @@ if n_squarings>0
             report(spin_system,['GPU squaring step ' num2str(n) '...']);
             
             % Square the propagator
-            P=multiclean(P,P,product_tol);
-            P=clean_up(spin_system,P,spin_system.tols.prop_chop,true);
+            P=multiclean(spin_system,P,P,spin_system.tols.prop_chop);
             
         end
         
@@ -214,7 +206,7 @@ if n_squarings>0
             report(spin_system,['CPU squaring step ' num2str(n) '...']);
             
             % Square the propagator
-            P=clean_up(spin_system,multiclean(P,P,product_tol),spin_system.tols.prop_chop,true);
+            P=multiclean(spin_system,P,P,spin_system.tols.prop_chop);
             
         end
       
@@ -259,4 +251,5 @@ end
 % kes are the highest possible to man: the survival of reason.
 %
 % Ayn Rand
+
 

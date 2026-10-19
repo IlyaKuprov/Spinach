@@ -32,10 +32,6 @@ function rho=multiprop(spin_system,P,rho,N)
 % Check consistency
 grumble(spin_system,P,rho,N);
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Zero-step shortcut
 if N==0, return; end
 
@@ -63,7 +59,7 @@ while N>0
     N=bitshift(N,-1);
 
     % Square the propagator only if higher powers remain
-    if N>0, P=clean_up(spin_system,multiclean(P,P,product_tol),spin_system.tols.prop_chop,true); end
+    if N>0, P=multiclean(spin_system,P,P,spin_system.tols.prop_chop); end
 
 end
 
@@ -128,4 +124,5 @@ end
 %
 % Frank Herbert, in
 % the Dune series
+
 

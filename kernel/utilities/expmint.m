@@ -31,10 +31,6 @@
 
 function R=expmint(spin_system,A,B,C,T)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Check consistency
 grumble(A,B,C,T);
 
@@ -64,7 +60,7 @@ P=(BE1'*auxmat*BE1)'; Q=(BE1'*auxmat*BE2);
 clear('auxmat','BE1','BE2');
 
 % Multiply up the blocks
-R=clean_up(spin_system,multiclean(P,Q,product_tol),spin_system.tols.prop_chop,true);
+R=multiclean(spin_system,P,Q,spin_system.tols.prop_chop);
 
 % Reclaim memory
 clear('P','Q');
@@ -92,4 +88,5 @@ end
 %                    put poison in your tea."
 % WINSTON CHURCHILL: "If I were your husband, Nancy, I'd 
 %                     drink it."
+
 

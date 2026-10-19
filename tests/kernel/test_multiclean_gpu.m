@@ -18,6 +18,19 @@ function result=test_multiclean_gpu()
 result=new_test_result('kernel/multiclean_gpu','GPU fused multiplication',...
                        'GPU panel arithmetic preserves values, storage, and device.');
 
+% Exercise the supplied global storage policy
+spin_system.sys.disable={};
+spin_system.tols.small_matrix=200;
+spin_system.tols.dense_matrix=0.15;
+
+
+% Skip unavailable hardware in the default registered test suite
+if ~canUseGPU
+    result.status='SKIP';
+    result.messages{end+1}='No usable GPU is available.';
+    return
+end
+
 % Cover all storage pairs, both precisions, and real and complex data
 for precision={'double','single'}
     for complex_case=0:1
@@ -36,8 +49,8 @@ for precision={'double','single'}
                         label=sprintf('%s complex=%d sparse=%d%d gpu=%d tol=%g',...
                                       precision{1},complex_case,left_sparse,...
                                       right_sparse,device_case,tol);
-                        reference=reference_clean(left*right,tol);
-                        result=compare(result,label,multiclean(left,right,tol),reference);
+                        reference=reference_clean(spin_system,left*right,tol);
+                        result=compare(result,label,multiclean(spin_system,left,right,tol),reference);
                     end
                 end
             end
@@ -50,7 +63,7 @@ A=gpuArray(speye(220));
 for column_count=[0 1 33 34 220]
     B=gpuArray(sparse([zeros(220,220-column_count) ones(220,column_count)]));
     result=compare(result,['global density ' num2str(column_count)],...
-                   multiclean(A,B,1/8),reference_clean(A*B,1/8));
+                   multiclean(spin_system,A,B,1/8),reference_clean(spin_system,A*B,1/8));
 end
 
 % Exercise scalar scaling, complex sparse output, and empty shapes
@@ -62,12 +75,38 @@ cases={{2,gpuArray(sparse(eye(220)))},...
 for case_index=1:numel(cases)
     A=cases{case_index}{1}; B=cases{case_index}{2};
     result=compare(result,['GPU shape case ' num2str(case_index)],...
-                   multiclean(A,B,1/8),reference_clean(A*B,1/8));
+                   multiclean(spin_system,A,B,1/8),reference_clean(spin_system,A*B,1/8));
 end
 
 % Disabled clean-up preserves the native GPU reduction
 A=gpuArray(randn(31,47)); B=gpuArray(randn(47,53));
-result=compare(result,'GPU zero tolerance native arithmetic',multiclean(A,B,0),A*B);
+result=compare(result,'GPU zero tolerance native arithmetic',multiclean(spin_system,A,B,0),A*B);
+
+% Bypasses retain native arithmetic and representation
+rng(17); A=gpuArray(randn(31,47)); B=gpuArray(randn(47,53));
+result=compare(result,'NaN native arithmetic',multiclean(spin_system,A,B,NaN),A*B);
+spin_system.sys.disable={'clean-up'};
+result=compare(result,'disabled native arithmetic',multiclean(spin_system,A,B,1),A*B);
+spin_system.sys.disable={};
+
+% Global density differs from each panel's local density
+A=gpuArray(speye(240)); B=gpuArray(sparse(240,40)); B(:,1:4)=1;
+for density=[0.05 0.15 0.9]
+    for small_matrix=[0 200]
+        spin_system.tols.dense_matrix=density;
+        spin_system.tols.small_matrix=small_matrix;
+        A=sparse(A); B=sparse(B);
+        for dense_input=0:1
+            if dense_input, A=full(A); B=full(B); end
+            label=sprintf('global density=%g size=%d full=%d',density,small_matrix,dense_input);
+            result=compare(result,label,multiclean(spin_system,A,B,0.125),...
+                           clean_up(spin_system,A*B,0.125));
+        end
+    end
+end
+spin_system.tols.dense_matrix=0.15;
+spin_system.tols.small_matrix=200;
+
 
 end
 
@@ -102,17 +141,9 @@ end
 end
 
 
-% Reference rounding without an application-specific representation policy
-function C=reference_clean(C,tol)
+% Reference rounding and global storage policy
+function C=reference_clean(spin_system,C,tol)
 
-% Preserve the storage selected by the native product
-spin_system.sys.disable={};
-spin_system.tols.small_matrix=0;
-if issparse(C)
-    spin_system.tols.dense_matrix=Inf;
-else
-    spin_system.tols.dense_matrix=0;
-end
 C=clean_up(spin_system,C,tol);
 
 end

@@ -46,10 +46,6 @@
 function fid=stitch(spin_system,L,rho_stack,coil_stack,...
                     mec_oper,mec_time,t1,t2,t3,tdir)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Set default time directions
 if ~exist('tdir','var'), tdir='+-'; end
 
@@ -66,12 +62,12 @@ P=propagator(spin_system,L,t2.timestep/2); Pct=P';
 Pm=speye(size(L));
 for n=1:numel(mec_oper)
     if n==numel(mec_oper)
-        Pm=multiclean(propagator(spin_system,mec_oper{n},mec_time{n}),Pm,product_tol);
+        Pm=multiclean(spin_system,propagator(spin_system,mec_oper{n},mec_time{n}),Pm,spin_system.tols.prop_chop);
     else
         Pm=propagator(spin_system,mec_oper{n},mec_time{n})*Pm;
     end
 end
-Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop,~isempty(mec_oper));
+if isempty(mec_oper), Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop); end
 
 % Decide the device and style
 if ismember('gpu',spin_system.sys.enable)
@@ -205,4 +201,5 @@ end
 % A wolf hates both men and dogs, but dogs he hates more.
 %
 % Sergey Dovlatov
+
 

@@ -53,10 +53,6 @@
 
 function dnp=noveldnp_steady(spin_system,parameters,H,R,K)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Check consistency
 grumble(parameters,H,R,K);
 
@@ -84,9 +80,8 @@ for n=1:numel(parameters.el_offs)
         L_contact=L_curr+2*pi*parameters.irr_powers*(Ex*cosd(270)+Ey*sind(270));
     
         % Compute and clean up NOVEL propagator
-        P=multiclean(propagator(spin_system,L_contact,parameters.contact_dur),...
-                     propagator(spin_system,L_pulse,parameters.pulse_dur),product_tol);
-        P=clean_up(spin_system,P,spin_system.tols.prop_chop,true);
+        P=multiclean(spin_system,propagator(spin_system,L_contact,parameters.contact_dur),...
+                     propagator(spin_system,L_pulse,parameters.pulse_dur),spin_system.tols.prop_chop);
     
         if parameters.flipback
 
@@ -94,8 +89,7 @@ for n=1:numel(parameters.el_offs)
             L_flipback=L_curr+2*pi*parameters.irr_powers*(Ex*cosd(180)+Ey*sind(180));
 
             % Compute and clean up NOVEL w flipback propagator
-            P=multiclean(propagator(spin_system,L_flipback,parameters.pulse_dur),P,product_tol);
-            P=clean_up(spin_system,P,spin_system.tols.prop_chop,true);
+            P=multiclean(spin_system,propagator(spin_system,L_flipback,parameters.pulse_dur),P,spin_system.tols.prop_chop);
 
          end
 
@@ -111,8 +105,7 @@ for n=1:numel(parameters.el_offs)
     end
 
     % Shot spacing delay
-    P=multiclean(propagator(spin_system,L_curr,parameters.shot_spacing),P,product_tol);
-    P=clean_up(spin_system,P,spin_system.tols.prop_chop,true);
+    P=multiclean(spin_system,propagator(spin_system,L_curr,parameters.shot_spacing),P,spin_system.tols.prop_chop);
 
     % Compute the steady state
     rho=steady(spin_system,P,[],'newton');
@@ -197,4 +190,5 @@ end
 % cubic centimetres inside your skull.
 %
 % George Orwell, "1984"
+
 

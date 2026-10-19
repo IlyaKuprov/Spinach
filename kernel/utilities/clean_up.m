@@ -2,16 +2,13 @@
 % user-specified tolerance and converts between sparse and full storage de-
 % pending on the density of non-zeroes in the array. Syntax:
 %
-%           A=clean_up(spin_system,A,nonzero_tol,already_cleaned)
+%                 A=clean_up(spin_system,A,nonzero_tol)
 %
 % Parameters:
 %
 %            A  - a numerical array or a cell array thereof
 %
 %   nonzero_tol - nonzero tolerance
-%
-% already_cleaned - optional logical scalar, default false; true skips
-%                   rounding and applies only the storage policy
 %
 % Outputs:
 %
@@ -22,13 +19,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=clean_up.m>
 
-function A=clean_up(spin_system,A,nonzero_tol,already_cleaned)
-
-% Round by default; fused products have already been rounded once
-if nargin<4, already_cleaned=false; end
-if (~islogical(already_cleaned))||(~isscalar(already_cleaned))
-    error('already_cleaned must be a logical scalar.');
-end
+function A=clean_up(spin_system,A,nonzero_tol)
 
 % Skip implicit identities
 if isa(A,'opium'), return; end
@@ -39,7 +30,7 @@ if (nonzero_tol==0)||isnan(nonzero_tol), return; end
 % Process cells recursively
 if iscell(A)
     for n=1:numel(A)
-        A{n}=clean_up(spin_system,A{n},nonzero_tol,already_cleaned);
+        A{n}=clean_up(spin_system,A{n},nonzero_tol);
     end
     return
 end
@@ -47,15 +38,15 @@ end
 % Process polyadics recursively
 if isa(A,'polyadic')
     for n=1:numel(A.prefix)
-        A.prefix{n}=clean_up(spin_system,A.prefix{n},nonzero_tol,already_cleaned);
+        A.prefix{n}=clean_up(spin_system,A.prefix{n},nonzero_tol);
     end
     for n=1:numel(A.suffix)
-        A.suffix{n}=clean_up(spin_system,A.suffix{n},nonzero_tol,already_cleaned);
+        A.suffix{n}=clean_up(spin_system,A.suffix{n},nonzero_tol);
     end
     for n=1:numel(A.cores)
         for k=1:numel(A.cores{n})
             if ~isa(A.cores{n}{k},'function_handle')
-                A.cores{n}{k}=clean_up(spin_system,A.cores{n}{k},nonzero_tol,already_cleaned);
+                A.cores{n}{k}=clean_up(spin_system,A.cores{n}{k},nonzero_tol);
             end
         end
     end
@@ -69,7 +60,7 @@ grumble(A,nonzero_tol);
 if ~ismember('clean-up',spin_system.sys.disable)
 
     % Use memory-hungry generic method
-    if ~already_cleaned, A=nonzero_tol*round((1/nonzero_tol)*A); end
+    A=nonzero_tol*round((1/nonzero_tol)*A);
 
     % A small non-zero matrix should always be full
     if issparse(A)&&(nnz(A)>0)&&...

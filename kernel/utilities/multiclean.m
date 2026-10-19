@@ -1,26 +1,28 @@
 % Memory-prioritised matrix multiplication with immediate clean_up of
 % each output panel. No inner-product partial sum is rounded. Syntax:
 %
-%                         C=multiclean(A,B,tol)
+%                         C=multiclean(spin_system,A,B,tol)
 %
 % Parameters:
+%
+%     spin_system - Spinach data structure with clean-up and storage policy
 %
 %     A,B  - two-dimensional single or double matrices, full or sparse,
 %            on CPU or GPU; dimensions must conform for A*B, including
 %            MATLAB scalar multiplication
 %
-%     tol  - real, finite, non-negative single or double CPU scalar;
-%            zero returns native A*B without panel multiplication
+%     tol  - real, non-negative single or double CPU scalar, or NaN;
+%            zero or NaN returns native A*B without panel multiplication
 %
 % Outputs:
 %
 %     C    - cleaned product, with the precision of clean_up(A*B) and
 %            the device of A*B (single tol can lower double precision)
 %
-% The three-argument interface preserves the native A*B sparse/full
-% representation; the caller retains its spin-system storage policy.
+% The result follows clean_up with the supplied global storage policy.
+% Disabled clean-up returns native A*B without conversion or rounding.
 % Rounding is the existing tol*round((1/tol)*panel) operation, not
-% magnitude thresholding. With tol=0, A*B is returned directly.
+% magnitude thresholding. With tol=0 or NaN, A*B is returned directly.
 % Dense and sparse inputs use one multiply path; partial inner products
 % are never rounded.
 %
@@ -36,13 +38,15 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function C=multiclean(A,B,tol)
+function C=multiclean(spin_system,A,B,tol)
 
 % Check consistency
 grumble(A,B,tol);
 
 % Disabled clean-up must also preserve native multiplication arithmetic
-if tol==0, C=A*B; return; end
+if (tol==0)||isnan(tol)||ismember('clean-up',spin_system.sys.disable)
+    C=A*B; return
+end
 
 % Obtain product metadata without computing an uncleaned product
 if isscalar(A)
@@ -55,26 +59,30 @@ else
 end
 
 % Specify only the local policy needed by clean_up
-spin_system.sys.disable={};
+panel_system=spin_system;
 if issparse(proto)
-    spin_system.tols.dense_matrix=Inf;
+    panel_system.tols.dense_matrix=Inf;
 else
-    spin_system.tols.dense_matrix=0;
+    panel_system.tols.dense_matrix=0;
 end
-spin_system.tols.small_matrix=0;
+panel_system.tols.small_matrix=0;
 
 % Include clean_up scalar arithmetic in the output precision metadata
-clean_proto=clean_up(spin_system,proto,tol);
+clean_proto=clean_up(panel_system,proto,tol);
 
-% Empty products require no arithmetic or storage conversion
+% Empty products follow the global clean-up policy
 if (nrows==0)||(ncols==0)
-    C=zeros(nrows,ncols,'like',clean_proto); return
+    C=clean_up(spin_system,A*B,tol); return
 end
 
 % Preserve matrix arithmetic by placing a scalar on the left
 if isscalar(B)&&~isscalar(A)
-    C=multiclean(B,A,tol); return
+    C=multiclean(spin_system,B,A,tol); return
 end
+
+% Reserve dense output before measuring the remaining GPU memory
+dense_output=~issparse(proto);
+if dense_output, C=zeros(nrows,ncols,'like',clean_proto); end
 
 % Measure input storage, not the size of the hypothetical dense product
 if isa(proto,'gpuArray')
@@ -107,12 +115,9 @@ col_bytes=3*(nrows*entry_bytes+8)+slice_bytes;
 panel_width=max(1,min(ncols,floor(input_bytes/max(1,col_bytes))));
 if ncols>1, panel_width=min(panel_width,ceil(ncols/2)); end
 
-% Retain only cleaned entries, without any caller-specific density policy
+% Retain only cleaned entries
 panel_count=ceil(ncols/panel_width);
-dense_output=~issparse(proto);
-if dense_output
-    C=zeros(nrows,ncols,'like',clean_proto);
-else
+if ~dense_output
     row_parts=cell(1,panel_count); col_parts=cell(1,panel_count);
     val_parts=cell(1,panel_count);
 end
@@ -145,6 +150,18 @@ if ~dense_output
     C=sparse(row_index,col_index,values,nrows,ncols);
 end
 
+% Apply the global storage policy without rounding a second time
+if issparse(C)&&(nnz(C)>0)&&any(size(C)<spin_system.tols.small_matrix)
+    C=full(C);
+end
+if issparse(C)&&(nnz(C)/numel(C)>spin_system.tols.dense_matrix)
+    C=full(C);
+end
+if (~issparse(C))&&(nnz(C)/numel(C)<spin_system.tols.dense_matrix)&&...
+                  all(size(C)>spin_system.tols.small_matrix)
+    C=sparse(C);
+end
+
 end
 
 % Consistency enforcement
@@ -159,8 +176,8 @@ if (~isscalar(A))&&(~isscalar(B))&&(size(A,2)~=size(B,1))
     error('matrix dimensions must conform for A*B.');
 end
 if isa(tol,'gpuArray')||(~isnumeric(tol))||(~isfloat(tol))||(~isreal(tol))||...
-   (~isscalar(tol))||(~isfinite(tol))||(tol<0)
-    error('tol must be a finite non-negative real single or double CPU scalar.');
+   (~isscalar(tol))||isinf(tol)||(tol<0)
+    error('tol must be a non-negative real single or double CPU scalar, or NaN.');
 end
 end
 

@@ -52,10 +52,6 @@
 
 function dnp=xixdnp_steady(spin_system,parameters,H,R,K)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Check consistency
 grumble(parameters,H,R,K);
 
@@ -82,9 +78,8 @@ for n=1:numel(parameters.el_offs)
                                           Ey*sin(parameters.phase));
 
     % Compute the contact time block propagator
-    P=multiclean(propagator(spin_system,L2,parameters.pulse_dur),...
-                 propagator(spin_system,L1,parameters.pulse_dur),product_tol);
-    P=clean_up(spin_system,P,spin_system.tols.prop_chop,true);
+    P=multiclean(spin_system,propagator(spin_system,L2,parameters.pulse_dur),...
+                 propagator(spin_system,L1,parameters.pulse_dur),spin_system.tols.prop_chop);
 
     % Send the problem to GPU if necessary
     if ismember('gpu',spin_system.sys.enable), P=gpuArray(P); end
@@ -96,8 +91,7 @@ for n=1:numel(parameters.el_offs)
     if isa(P,'gpuArray'), P=gather(P); end
 
     % Add the delay after the contact time
-    P=multiclean(propagator(spin_system,L_curr,parameters.shot_spacing),P,product_tol);
-    P=clean_up(spin_system,P,spin_system.tols.prop_chop,true);
+    P=multiclean(spin_system,propagator(spin_system,L_curr,parameters.shot_spacing),P,spin_system.tols.prop_chop);
 
     % Compute the stroboscopic steady state
     rho=steady(spin_system,P,[],'newton');
@@ -174,4 +168,5 @@ end
 % I damn well please.
 %
 % Ernest Bevin, UK Foreign Secretary 1945-1951
+
 

@@ -64,10 +64,6 @@
 function [rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...
                                       amplitudes,slice_durs,rho,method)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Check consistency
 grumble(drift,controls,amplitudes,slice_durs,rho,method);
 
@@ -127,12 +123,12 @@ switch method(1:4)
                     % Update the propagator
                     if nargout>2
                         if strcmp(spin_system.bas.formalism,'zeeman-hilb')
-                            P=multiclean(propagator(spin_system,slice_oper,slice_durs(n)),P,product_tol);
+                            P=multiclean(spin_system,propagator(spin_system,slice_oper,slice_durs(n)),P,spin_system.tols.prop_chop);
                         else
                             P=step(spin_system,slice_oper,P,slice_durs(n));
+                            P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                         end
-                        P=clean_up(spin_system,P,spin_system.tols.prop_chop,...
-                               strcmp(spin_system.bas.formalism,'zeeman-hilb'));
+
                     end
 
                 % 2nd order Lie
@@ -154,12 +150,12 @@ switch method(1:4)
                     if nargout>2
                         if strcmp(spin_system.bas.formalism,'zeeman-hilb')
                             slice_oper=isergen(slice_oper_l,[],slice_oper_r,slice_durs(n));
-                            P=multiclean(propagator(spin_system,slice_oper,slice_durs(n)),P,product_tol);
+                            P=multiclean(spin_system,propagator(spin_system,slice_oper,slice_durs(n)),P,spin_system.tols.prop_chop);
                         else
                             P=step(spin_system,{slice_oper_l,slice_oper_r},P,slice_durs(n));
+                            P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                         end
-                        P=clean_up(spin_system,P,spin_system.tols.prop_chop,...
-                               strcmp(spin_system.bas.formalism,'zeeman-hilb'));
+
                     end
 
                 otherwise
@@ -255,7 +251,7 @@ switch method(1:4)
 
             % Update pulse propagator
             if nargout>2
-                P=clean_up(spin_system,multiclean(PS,P,product_tol),spin_system.tols.prop_chop,true);
+                P=multiclean(spin_system,PS,P,spin_system.tols.prop_chop);
             end
 
             % Inform the user
@@ -322,12 +318,11 @@ switch method(1:4)
             % Update pulse propagator
             if nargout>2
                 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
-                    P=multiclean(propagator(spin_system,slice_oper,slice_durs(n)),P,product_tol);
+                    P=multiclean(spin_system,propagator(spin_system,slice_oper,slice_durs(n)),P,spin_system.tols.prop_chop);
                 else
                     P=evolution(spin_system,slice_oper,[],P,slice_durs(n),1,'final');
+                    P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                 end
-                P=clean_up(spin_system,P,spin_system.tols.prop_chop,...
-                               strcmp(spin_system.bas.formalism,'zeeman-hilb'));
             end
 
             % Inform the user
@@ -425,4 +420,5 @@ end
 % PTCL Teaching Lab, but the photographs of the resulting fibre tip
 % were left on Peter's table on Monday. The paper was accepted by 
 % JMR without review.
+
 

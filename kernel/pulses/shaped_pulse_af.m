@@ -75,10 +75,6 @@ function [rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,...
                                       rf_amp_list,rf_dur_list,rf_phi,...
                                       max_rank,method)
 
-% Preserve the explicit clean-up bypass during blocked products
-product_tol=spin_system.tols.prop_chop;
-if ismember('clean-up',spin_system.sys.disable), product_tol=0; end
-
 % Set the defaults
 if ~exist('method','var'), method='expv'; end
 
@@ -203,7 +199,7 @@ switch method
 
             % Update pulse propagator in Fokker-Planck space
             if nargout>2
-                P_tot=clean_up(spin_system,multiclean(P,P_tot,product_tol),spin_system.tols.prop_chop,true);
+                P_tot=multiclean(spin_system,P,P_tot,spin_system.tols.prop_chop);
             end
 
         end

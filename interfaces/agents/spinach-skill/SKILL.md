@@ -174,13 +174,12 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 
 ## Memory-heavy cleaned matrix products
 
-Use `multiclean(A,B,tol)` to avoid retaining an entire unpruned matrix
+Use `multiclean(spin_system,A,B,tol)` to avoid retaining an entire unpruned matrix
 product before cleanup. It cleans complete output panels, not partial
 inner-product sums, and supports native CPU/GPU sparse/full multiplication
 combinations. Keep the original rounding boundary: do not insert cleanup
-inside a product chain, sum, or normalization step. The three-argument
-helper preserves native product storage; callers retain `clean_up` for
-their whole-matrix density policy using the `already_cleaned=true` option
-to avoid rounding twice, and pass zero tolerance when cleanup is
-disabled. Validate both numerical agreement and peak process/device memory;
+inside a product chain, sum, or normalization step. The helper applies the supplied global
+storage policy without rounding twice and centrally handles disabled
+clean-up and zero/NaN tolerances. Callers pass their original tolerance
+directly and do not add an outer clean_up. Validate both numerical agreement and peak process/device memory;
 lower memory need not mean faster execution.

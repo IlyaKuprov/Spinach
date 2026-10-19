@@ -27,6 +27,10 @@ Spinach programming style, kernel coding elegance, example coding, Wiki
 documentation, and task-execution policy. Consult it directly; do not keep
 independent copies or paraphrases in this skill or its references.
 
+For Redfield integral maintenance, the serial and asynchronous includes share the
+`A`, `B`, `C`, `D`, `weight`, `upper_limit`, and `R_int` notation; see their
+knowledge entries under `kernel/includes/`.
+
 ## Establish the task and the checkout
 
 1. Identify the requested observable, physical system, experimental conditions,

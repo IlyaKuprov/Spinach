@@ -84,7 +84,8 @@ for n=1:numel(Q)
                                         C(~states{s},~states{s})=0; D(~states{s},~states{s})=0;
                                             
                                         % Compute the integral and clean up to the tolerance
-                                        R_int=-weights{s}(j)*A*expmint(spin_system,B,C,D,upper_limit);
+                                        weight=weights{s}(j);
+                                        R_int=-weight*A*expmint(spin_system,B,C,D,upper_limit);
                                         R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero);
 
                                         % Add to the total
@@ -102,7 +103,7 @@ for n=1:numel(Q)
 end
     
 % Deallocate variables
-clear('Q','L0','R_int','weights','rates','states');
+clear('Q','L0','R_int','weight','weights','rates','states');
 
 % Report to the user
 report(spin_system,'relaxation integral evaluation done.');

@@ -1,6 +1,6 @@
 # kernel/includes/redfield_integral_async.m
 
-- Signature: script include; its nested worker has signature `brw_compute_kernel(spin_system,w,job_id,upper_lim)`.
+- Signature: script include; its nested worker has signature `brw_compute_kernel(spin_system,weight,job_id,upper_limit)`.
 
 ## Purpose and scope
 
@@ -19,6 +19,8 @@ The kernel matrix is `D=B-1i*(rate-rlx_shift)*speye(size(B))` on shell, and `D=-
 ## Parallel execution and accumulation
 
 Each retained term gets a monotonically increasing job number. The include places `A`, `B`, `C`, and `D` in the pool `ValueStore` under per-job keys, then queues `brw_compute_kernel` with `parfeval`. A worker retrieves and removes those matrices, evaluates and cleans the integral, converts its sparse result to row/column/value triples, and stores the triples under that job's result key. The client retrieves completed futures with `fetchNext`, rethrows a worker error if present, removes each retrieved result from the store, reconstructs the sparse matrix, and adds it to `R`. If no future array was created, it reports that `Q` contained no significant elements.
+
+Both integral paths use `A`, `B`, `C`, and `D` for the auxiliary-matrix operands, `weight` for the selected correlation-function coefficient, `upper_limit` for the integration endpoint, and `R_int` for one cleaned integral contribution.
 
 ## References
 

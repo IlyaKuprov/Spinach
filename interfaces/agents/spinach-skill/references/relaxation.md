@@ -8,6 +8,7 @@
 - [Scalar relaxation](#scalar-relaxation)
 - [Which terms of R survive](#which-terms-of-r-survive)
 - [Thermal equilibrium and temperature](#thermal-equilibrium-and-temperature)
+- [Relaxation superoperators from SLE generators](#relaxation-superoperators-from-sle-generators)
 - [Chemical kinetics](#chemical-kinetics)
 - [Powder grids](#powder-grids)
 
@@ -285,6 +286,46 @@ which places the result in `parameters.rho0`: `'rho_eq'` in `liquid`,
 Run `[r1,r2,t1,t2,R]=relaxan(spin_system)` before trusting any of this: it
 prints longitudinal and transverse rates and times for every spin, dynamic
 frequency shifts dropped. Compare against measurement first.
+
+## Relaxation superoperators from SLE generators
+
+`sle2rlx` projects a stochastic Liouville equation generator back onto the
+spin Liouville space and returns the Redfield-type relaxation superoperator
+that the lattice dynamics induces there:
+
+```matlab
+capture=@(spin_system,parameters,H,R,K)struct('L',H+1i*R+1i*K,...
+                                              'spc_dim',parameters.spc_dim);
+sle=gridfree(spin_system,capture,parameters,'labframe');
+P=sparse(1,1,1,sle.spc_dim,1);
+[R,L0]=sle2rlx(spin_system,sle.L,P,P);
+```
+
+- `L` is the generator in the `kron(lattice,spin)` order of `gridfree`;
+  `pi_vec` and `one_vec` are the lattice equilibrium distribution and the
+  lattice integration functional (unit vector of the rank-zero Wigner
+  function, which is lattice index 1, for `gridfree`; equilibrium populations
+  and a vector of ones for an explicitly built `kron(species,spin)` exchange
+  generator with the same spin space in every species). The direct sum of
+  substance blocks that `kinetics.m` builds for `inter.chem` is not of this
+  form and is not supported.
+- `R` comes back in the same frame as `L`: build the generator with
+  `'labframe'` assumptions when comparing with `relaxation.m`, and set
+  `inter.rlx_keep='labframe'` and `inter.rlx_dfs='keep'` on the Redfield
+  side for an element-by-element comparison.
+- Build the generator from a spin system without `inter.relaxation`: any
+  relaxation superoperator present in `L` is averaged into `L0`, not into
+  `R`.
+- The result is the Markov limit of the exact Nakajima-Zwanzig memory kernel
+  and is valid when the lattice relaxes faster than the spins (Redfield
+  condition); the function does not check this. Rank two is the minimum
+  lattice rank for rank-two interactions; even there the Q-to-Q blocks of
+  the anisotropic interaction are retained in `A`, so the result resums
+  higher-order anisotropy terms and reduces to Redfield theory only when
+  those blocks are negligible. Higher ranks add further coupling paths.
+- Example: `examples/relaxation_theory/sle2rlx_vs_redfield.m`; test:
+  `tests/kernel/test_sle2rlx.m`.
+
 
 ## Chemical kinetics
 

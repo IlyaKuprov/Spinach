@@ -74,10 +74,10 @@ R_rf=relaxation(spin_system);
 P=sparse(1,1,1,size(L,1)/size(R_rf,1),1);
 [R_sle,L0]=sle2rlx(spin_system,L,P,P);
 
-% Check the lattice-averaged Liouvillian
+% Check the lattice-averaged Liouvillian, an index selection that must hold to roundoff
 H0=hamiltonian(assume(spin_system,'labframe'));
 result=test_close(result,'SLE averaged Liouvillian',full(L0),full(H0),...
-                  1e-6*norm(H0,1),0,...
+                  0,1e-12,...
                   'the lattice-averaged Liouvillian must be the isotropic lab frame Hamiltonian');
 
 % Check the relaxation superoperator against Redfield theory

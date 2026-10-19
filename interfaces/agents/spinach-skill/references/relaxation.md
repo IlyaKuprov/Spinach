@@ -294,17 +294,21 @@ spin Liouville space and returns the Redfield-type relaxation superoperator
 that the lattice dynamics induces there:
 
 ```matlab
-capture=@(spin_system,parameters,H,R,K)H+1i*R+1i*K;
-L=gridfree(spin_system,capture,parameters,'labframe');
-P=sparse(1,1,1,size(L,1)/size(spin_system.bas.basis,1),1);
-[R,L0]=sle2rlx(spin_system,L,P,P);
+capture=@(spin_system,parameters,H,R,K)struct('L',H+1i*R+1i*K,...
+                                              'spc_dim',parameters.spc_dim);
+sle=gridfree(spin_system,capture,parameters,'labframe');
+P=sparse(1,1,1,sle.spc_dim,1);
+[R,L0]=sle2rlx(spin_system,sle.L,P,P);
 ```
 
 - `L` is the generator in the `kron(lattice,spin)` order of `gridfree`;
   `pi_vec` and `one_vec` are the lattice equilibrium distribution and the
   lattice integration functional (unit vector of the rank-zero Wigner
   function, which is lattice index 1, for `gridfree`; equilibrium populations
-  and a vector of ones for chemical exchange).
+  and a vector of ones for an explicitly built `kron(species,spin)` exchange
+  generator with the same spin space in every species). The direct sum of
+  substance blocks that `kinetics.m` builds for `inter.chem` is not of this
+  form and is not supported.
 - `R` comes back in the same frame as `L`: build the generator with
   `'labframe'` assumptions when comparing with `relaxation.m`, and set
   `inter.rlx_keep='labframe'` and `inter.rlx_dfs='keep'` on the Redfield
@@ -314,9 +318,11 @@ P=sparse(1,1,1,size(L,1)/size(spin_system.bas.basis,1),1);
   `R`.
 - The result is the Markov limit of the exact Nakajima-Zwanzig memory kernel
   and is valid when the lattice relaxes faster than the spins (Redfield
-  condition); the function does not check this. `max_rank=2` already gives
-  Redfield theory with the lattice spectral densities, higher ranks add the
-  higher-order corrections.
+  condition); the function does not check this. Rank two is the minimum
+  lattice rank for rank-two interactions; even there the Q-to-Q blocks of
+  the anisotropic interaction are retained in `A`, so the result resums
+  higher-order anisotropy terms and reduces to Redfield theory only when
+  those blocks are negligible. Higher ranks add further coupling paths.
 - Example: `examples/relaxation_theory/sle2rlx_vs_redfield.m`; test:
   `tests/kernel/test_sle2rlx.m`.
 

@@ -1,17 +1,20 @@
 % Relaxation superoperator extracted from a stochastic Liouville equation
 % generator by Markovian back-projection onto the spin Liouville space.
 % The SLE generator acts on the direct product of a lattice space (Wigner
-% functions of molecular orientation in gridfree.m, or chemical species)
-% and the spin Liouville space; the lattice dynamics is projected out and
-% appears in the spin space as a Redfield-type relaxation superoperator.
-% Syntax:
+% functions of molecular orientation in gridfree.m, or chemical species in
+% an explicitly constructed kron(species,spin) exchange generator with the
+% same spin space in every species) and the spin Liouville space; the lat-
+% tice dynamics is projected out and appears in the spin space as a Red-
+% field-type relaxation superoperator. Syntax:
 %
 %                 [R,L0]=sle2rlx(spin_system,L,pi_vec,one_vec)
 %
 % Parameters:
 %
 %    L        - SLE generator, L=H+1i*R+1i*K, in the kron(lattice,spin)
-%               index order used by gridfree.m, sparse or polyadic
+%               index order used by gridfree.m, sparse or polyadic; the
+%               direct sum of substance blocks built by kinetics.m does
+%               not have this structure and is not supported
 %
 %    pi_vec   - lattice equilibrium distribution (right null vector of
 %               the lattice generator), column vector

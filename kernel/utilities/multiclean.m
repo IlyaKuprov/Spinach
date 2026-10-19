@@ -94,7 +94,11 @@ end
 
 % Reserve dense output before measuring the remaining GPU memory
 dense_output=~issparse(proto);
-if dense_output, C=zeros(nrows,ncols,'like',clean_proto); end
+if dense_output
+    output_proto=zeros(1,'like',clean_proto);
+    if (~isreal(A))||(~isreal(B)), output_proto=complex(output_proto); end
+    C=zeros(nrows,ncols,'like',output_proto);
+end
 
 % Measure input storage, not the size of the hypothetical dense product
 if isa(proto,'gpuArray')

@@ -184,4 +184,5 @@ inside a product chain, sum, or normalization step. The helper applies the suppl
 storage policy without rounding twice and centrally handles disabled
 clean-up and zero/NaN tolerances. Callers pass their original tolerance
 directly and do not add an outer clean_up. Validate both numerical agreement and peak process/device memory;
-lower memory need not mean faster execution.
+lower memory need not mean faster execution. Reserve GPU output with its
+actual complexity; empty product prototypes can silently be real.

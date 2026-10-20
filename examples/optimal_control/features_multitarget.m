@@ -76,12 +76,12 @@ control.drifts=D;                       % Drift array
 control.operators={LxH,LyH,LxC,LyC};	% Control operators
 control.rho_init=sources;               % Initial states
 control.rho_targ=targets;               % Destination states
-control.pwr_levels=2*pi*500;            % Power levals
+control.pwr_levels=2*pi*[450 500 550];  % Power levals
 control.pulse_dt=5e-4*ones(1,275);      % Interval grid
-control.penalties={'SNS'};              % Penalty
-control.p_weights=100;                  % Penalty weight
+control.penalties={'NS','SNS'};         % Penalty
+control.p_weights=[1 100];              % Penalty weight
 control.method='lbfgs';                 % Optimisation method
-control.max_iter=150;                   % Termination condition
+control.max_iter=200;                   % Termination condition
 
 % Control trajectory analysis plots
 control.plotting={'correlation_order','local_each_spin',...
@@ -91,7 +91,7 @@ control.plotting={'correlation_order','local_each_spin',...
 spin_system=optimcon(spin_system,control);
 
 % Run the optimisation from a random guess
-pulse=fmaxnewton(spin_system,@grape_xy,randn(4,275)/3);
+pulse=fmaxnewton(spin_system,@grape_xy,randn(4,275)/10);
 
 % Denormalise and format the waveform
 pulse=pulse*control.pwr_levels;

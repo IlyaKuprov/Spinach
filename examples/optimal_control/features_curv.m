@@ -56,14 +56,14 @@ control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pulse_dt=1e-3*ones(1,50);                 % Pulse duration
 control.pwr_levels=2*pi*100*linspace(0.6,1.4,11); % Power levels
-control.penalties={'SNS'};                        % Penalty
-control.p_weights=100;                            % Penalty weight
+control.penalties={'NS','SNS'};                   % Penalty
+control.p_weights=[0.1 100];                      % Penalty weight
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=100;                             % Termination condition
 
 % Diagnostic output
 control.plotting={'correlation_order','coherence_order',...
-                  'xy_controls','robustness','spectrogram'};
+                  'xy_controls','spectrogram'};
 
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);

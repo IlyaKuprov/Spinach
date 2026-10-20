@@ -66,11 +66,11 @@ control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.8e3,1.2e3,5);  % Pulse powers, rad/s
 control.pulse_dt=2e-4*ones(1,50);                 % Slice durations
-control.penalties={'SNS'};                        % Penalty
-control.p_weights=100;                            % Penalty weight
+control.penalties={'NS','SNS'};                   % Penalty
+control.p_weights=[0.1 100];                      % Penalty weight
 control.integrator='trapezium';                   % Piecewise-linear
 control.method='lbfgs';                           % Optimisation method
-control.max_iter=100;                             % Termination condition
+control.max_iter=200;                             % Termination condition
 
 % Plots during optimisation
 control.plotting={'correlation_order','local_each_spin',...

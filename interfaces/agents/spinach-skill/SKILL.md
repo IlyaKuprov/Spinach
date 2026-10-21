@@ -133,10 +133,11 @@ error is reported without aborting the C++ builds; other build errors propagate.
 Modern MATLAB does not provide macOS CUDA support. Older releases retain five C++ builds
 and skip the R2026b-layout CUDA target.
 
-The sparse output uses a build-pinned R2026b native factory with MATLAB-owned
+The sparse output uses a fixed-offset R2026b native factory with MATLAB-owned
 CSR buffers and native reference-counted cleanup, without COO construction.
-Unknown GPU-library builds fail before private calls. The Linux gateway uses
-CUDA 13.1; the direct factory path is validated on Linux H200, including
+Factory and storage layouts are assumed backward-compatible, without build-ID
+pinning; MATLAB's measured 32-bit sparse storage limit still applies.
+The Linux gateway uses CUDA 13.1; the direct factory path is validated on Linux H200, including
 real and complex memcheck. Windows uses bundled CUDA 13.1 and is validated
 on A800. Both platforms pass the shipped sparse-product regressions.
 The wrapper retains its compute-capability 7.5 minimum.

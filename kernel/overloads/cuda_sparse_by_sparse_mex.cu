@@ -6,7 +6,7 @@
  *Inputs are read-only MATLAB CSR buffers. A fresh MATLAB-owned CSR structure
  *is allocated once from the symbolic pattern; numeric values are written
  *directly to it,and the ready object is returned without a numeric copy.
- *A version-pinned native factory allocates CSR buffers with MATLAB ownership.
+ *A native factory allocates CSR buffers with MATLAB ownership.
  *Layout offsets are undocumented and checked before use. Input/output storage
  *uses MATLAB's int32 ABI; all offsets,task sizes,and host sums use int64.
  *Sources:Gustavson (1978),DOI 10.1145/355791.355796; Davis et al.,Sparse
@@ -26,7 +26,6 @@
 #define __USE_GNU
 #include <dlfcn.h>
 #undef __USE_GNU
-#include <link.h>
 #endif
 #include "mex.h"
 #include "gpu/mxGPUArray.h"
@@ -509,40 +508,12 @@ static mxArray *allocate_csr(int64_t m,int64_t n,int64_t nnz,bool complex,Matlab
     const auto base=reinterpret_cast<char*>(GetModuleHandleA("gpu.dll"));
     if (!base)
         throw LayoutMismatch("MATLAB GPU library is not loaded.");
-    const auto dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
-    const auto pe=reinterpret_cast<const IMAGE_NT_HEADERS*>(base+dos->e_lfanew);
-    if ((pe->FileHeader.TimeDateStamp!=0x221ff86b)||(pe->OptionalHeader.SizeOfImage!=0xdfe000))
-        throw LayoutMismatch("Private sparse allocation requires the verified R2026b GPU library.");
     const size_t env_offset=0x6a1aa0,ctor_offset=0x666780;
 #else
     Dl_info info;
     if (!dladdr(reinterpret_cast<void*>(mxGPUCreateGPUArray),&info))
         throw LayoutMismatch("MATLAB GPU library could not be located.");
     const auto base=static_cast<char*>(info.dli_fbase);
-    const unsigned char expected[20]={0xa0,0x4d,0x7f,0x46,0x9d,0x8e,0x27,0x40,0xf7,0xb9,
-                                     0x57,0x7f,0x45,0x76,0xcf,0x37,0x5d,0x29,0xc3,0x77};
-    const auto elf=reinterpret_cast<const Elf64_Ehdr*>(base);
-    const auto headers=reinterpret_cast<const Elf64_Phdr*>(base+elf->e_phoff);
-    bool matched=false;
-    for (int k=0; k<elf->e_phnum; k++)
-        if (headers[k].p_type==PT_NOTE)
-        {
-            const char *note=base+headers[k].p_vaddr,*end=note+headers[k].p_memsz;
-            while (note+sizeof(Elf64_Nhdr)<=end)
-            {
-                const auto h=reinterpret_cast<const Elf64_Nhdr*>(note);
-                const char *name=note+sizeof(*h),*data=name+((h->n_namesz+3)&~3u);
-                const char *next=data+((h->n_descsz+3)&~3u);
-                if ((next>end)||(next<=note))
-                    break;
-                if ((h->n_type==NT_GNU_BUILD_ID)&&(h->n_namesz==4)&&(h->n_descsz==20)&&
-                    !std::memcmp(name,"GNU",4)&&!std::memcmp(data,expected,20))
-                    matched=true;
-                note=next;
-            }
-        }
-    if (!matched)
-        throw LayoutMismatch("Private sparse allocation requires the verified R2026b GPU library.");
     const size_t env_offset=0xbe68b0,ctor_offset=0xba32a0;
 #endif
     const auto env=reinterpret_cast<Owner (*)()>(base+env_offset)();
@@ -617,7 +588,7 @@ static void product(const mxArray *array_a,const mxArray *array_b,mxArray **resu
     if (a.cols!=b.rows)
         throw std::invalid_argument("Inner matrix dimensions must agree.");
     if ((a.rows>INT_MAX)||(b.cols>INT_MAX))
-        throw std::invalid_argument("Dimensions exceed MATLAB's sparse GPU index ABI.");
+        throw std::invalid_argument("MATLAB gpuArray sparse storage uses 32-bit indices; dimensions exceed 2147483647.");
     const bool complex=a.is_complex||b.is_complex;
     MatlabCsr c;
     if ((!a.nnz)||(!b.nnz)||(!a.rows)||(!b.cols))
@@ -696,7 +667,8 @@ static void product(const mxArray *array_a,const mxArray *array_b,mxArray **resu
     }
     const size_t shared_bytes=std::max<size_t>(max_dense_cols*value_size,max_hash_slots*(value_size+sizeof(int)));
     if (nnz>INT_MAX)
-        throw std::runtime_error("Output exceeds MATLAB's sparse GPU index ABI.");
+        throw std::runtime_error("MATLAB gpuArray sparse storage uses 32-bit indices; the product has "+
+                                 std::to_string(nnz)+" structural nonzeros (limit 2147483647).");
     *result=allocate_csr(a.rows,b.cols,nnz,complex,c);
     if (!nnz)
         return;

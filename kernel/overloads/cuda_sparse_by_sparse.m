@@ -18,7 +18,7 @@
 % Gustavson row-wise symbolic and numeric phases use bounded shared-memory
 % accumulators, with column splitting for overflowing sparse hashes. No
 % cuSPARSE multiplication is used. A fresh MATLAB-owned sparse GPU pattern
-% is allocated by a build-pinned native factory, with columns and numerical
+% is allocated by a native factory, with columns and numerical
 % values written directly into its owned CSR buffers without COO staging.
 % The undocumented R2026b CSR layout is validated before use. A layout
 % mismatch is an error, not a fallback to a potentially unsafe GPU product.

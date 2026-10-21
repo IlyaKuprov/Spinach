@@ -6,7 +6,7 @@
  * Inputs are read-only MATLAB CSR buffers. A fresh MATLAB-owned CSR structure
  * is allocated once from the symbolic pattern; numeric values are written
  * directly to it, and the ready object is returned without a numeric copy.
- * The allocation currently uses MATLAB sparse() with placeholder values.
+ * A version-pinned native factory allocates CSR buffers with MATLAB ownership.
  * Layout offsets are undocumented and checked before use. Input/output storage
  * uses MATLAB's int32 ABI; all offsets, task sizes, and host sums use int64.
  * Sources: Gustavson (1978), DOI 10.1145/355791.355796; Davis et al., Sparse
@@ -19,6 +19,10 @@
 #include <windows.h>
 #else
 #include <unistd.h>
+#define __USE_GNU
+#include <dlfcn.h>
+#undef __USE_GNU
+#include <link.h>
 #endif
 #include "mex.h"
 #include "gpu/mxGPUArray.h"
@@ -32,6 +36,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <memory>
 
 struct LayoutMismatch:std::runtime_error { using std::runtime_error::runtime_error; };
 static void check_cuda(cudaError_t code,const char *stage)
@@ -58,24 +63,6 @@ public:
 private:
     const mxGPUArray *ptr;
 };
-
-class GpuOutput
-{
-public:
-    GpuOutput(int64_t n,mxClassID class_id,mxComplexity complexity)
-    {
-        const mwSize dims[2]={static_cast<mwSize>(n),1};
-        ptr=mxGPUCreateGPUArray(2,dims,class_id,complexity,MX_GPU_DO_NOT_INITIALIZE);
-    }
-    GpuOutput(const GpuOutput&)=delete;
-    GpuOutput& operator=(const GpuOutput&)=delete;
-    ~GpuOutput() { mxGPUDestroyGPUArray(ptr); }
-    template<typename T> T* data() const { return static_cast<T*>(mxGPUGetData(ptr)); }
-    mxArray* to_matlab() const { return mxGPUCreateMxArrayOnGPU(ptr); }
-private:
-    mxGPUArray *ptr=nullptr;
-};
-
 
 struct MatlabCsr
 {
@@ -228,7 +215,7 @@ __global__ void validate_csr(MatlabCsr a,int *invalid)
 }
 // Count or emit each task's structural columns using a bitset or a hash table
 __global__ void symbolic(MatlabCsr a,MatlabCsr b,Task *tasks,int n_tasks,int dense_width,int capacity,
-                         int32_t *rows_c,int32_t *cols_c,bool emit)
+                         int32_t *cols_c,bool emit)
 {
     extern __shared__ int keys[];
     __shared__ int count,overflow,local_capacity,prefix[256];
@@ -283,8 +270,7 @@ __global__ void symbolic(MatlabCsr a,MatlabCsr b,Task *tasks,int n_tasks,int den
                 }
                 if (present) {
                     const int64_t pos=task.base+output+prefix[tid]-1;
-                    rows_c[pos]=static_cast<int32_t>(task.row+1);
-                    cols_c[pos]=static_cast<int32_t>(task.lo+k+1);
+                    cols_c[pos]=static_cast<int32_t>(task.lo+k);
                 }
                 output+=prefix[blockDim.x-1];
                 __syncthreads();
@@ -292,8 +278,7 @@ __global__ void symbolic(MatlabCsr a,MatlabCsr b,Task *tasks,int n_tasks,int den
         } else {
             sort_keys(keys,local_capacity);
             for (int k=tid;k<task.count;k+=blockDim.x) {
-                rows_c[task.base+k]=static_cast<int32_t>(task.row+1);
-                cols_c[task.base+k]=keys[k]+1;
+                cols_c[task.base+k]=keys[k];
             }
         }
         __syncthreads();
@@ -372,28 +357,80 @@ __global__ void numeric(MatlabCsr a,MatlabCsr b,const Task *tasks,int n_tasks,in
         __syncthreads();
     }
 }
-template<class T> __global__ void fill_ones(T *values,int64_t n)
+// Native factories retain MATLAB's allocator, shared ownership, and device registry
+static mxArray *allocate_csr(int64_t m,int64_t n,int64_t nnz,bool complex)
 {
-    for (int64_t k=blockIdx.x*(int64_t)blockDim.x+threadIdx.x;k<n;k+=(int64_t)gridDim.x*blockDim.x) {
-        if constexpr (sizeof(T)==sizeof(double)) values[k]=1.0;
-        else values[k]=make_double2(1.0,1.0);
+    using Owner=std::shared_ptr<void>;
+    struct Impl { Owner storage; uint64_t sparse=1,readonly=0; };
+    static_assert(sizeof(Impl)==32,"Unexpected sparse implementation ABI.");
+#ifdef _WIN32
+    const auto base=reinterpret_cast<char*>(GetModuleHandleA("gpu.dll"));
+    if (!base) throw LayoutMismatch("MATLAB GPU library is not loaded.");
+    const auto dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
+    const auto pe=reinterpret_cast<const IMAGE_NT_HEADERS*>(base+dos->e_lfanew);
+    if ((pe->FileHeader.TimeDateStamp!=0x221ff86b)||(pe->OptionalHeader.SizeOfImage!=0xdfe000))
+        throw LayoutMismatch("Private sparse allocation requires the verified R2026b GPU library.");
+    const size_t env_offset=0x6a1aa0,ctor_offset=0x666780;
+#else
+    Dl_info info;
+    if (!dladdr(reinterpret_cast<void*>(mxGPUCreateGPUArray),&info))
+        throw LayoutMismatch("MATLAB GPU library could not be located.");
+    const auto base=static_cast<char*>(info.dli_fbase);
+    const unsigned char expected[20]={0xa0,0x4d,0x7f,0x46,0x9d,0x8e,0x27,0x40,0xf7,0xb9,
+                                      0x57,0x7f,0x45,0x76,0xcf,0x37,0x5d,0x29,0xc3,0x77};
+    const auto elf=reinterpret_cast<const Elf64_Ehdr*>(base);
+    const auto headers=reinterpret_cast<const Elf64_Phdr*>(base+elf->e_phoff);
+    bool matched=false;
+    for (int k=0;k<elf->e_phnum;k++) if (headers[k].p_type==PT_NOTE) {
+        const char *note=base+headers[k].p_vaddr,*end=note+headers[k].p_memsz;
+        while (note+sizeof(Elf64_Nhdr)<=end) {
+            const auto h=reinterpret_cast<const Elf64_Nhdr*>(note);
+            const char *name=note+sizeof(*h),*data=name+((h->n_namesz+3)&~3u);
+            const char *next=data+((h->n_descsz+3)&~3u);
+            if ((next>end)||(next<=note)) break;
+            if ((h->n_type==NT_GNU_BUILD_ID)&&(h->n_namesz==4)&&(h->n_descsz==20)&&
+                !std::memcmp(name,"GNU",4)&&!std::memcmp(data,expected,20)) matched=true;
+            note=next;
+        }
     }
-}
-static mxArray *allocate_pattern(const GpuOutput &rows,const GpuOutput &cols,int64_t nnz,
-                                int64_t m,int64_t n,bool complex)
-{
-    const int64_t n_values=nnz?1:0;
-    const GpuOutput ones(n_values,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL);
-    if (complex) fill_ones<<<256,256>>>(ones.data<double2>(),n_values);
-    else fill_ones<<<256,256>>>(ones.data<double>(),n_values);
-    check_cuda(cudaDeviceSynchronize(),"fill_ones");
-    mxArray *args[5]={rows.to_matlab(),cols.to_matlab(),ones.to_matlab(),
-                     mxCreateDoubleScalar(static_cast<double>(m)),mxCreateDoubleScalar(static_cast<double>(n))};
-    mxArray *result=nullptr;
-    mxArray *error=mexCallMATLABWithTrap(1,&result,5,args,"sparse");
-    for (auto *arg:args) mxDestroyArray(arg);
-    if (error) { mxDestroyArray(error); throw std::runtime_error("MATLAB sparse pattern allocation failed."); }
-    return result;
+    if (!matched) throw LayoutMismatch("Private sparse allocation requires the verified R2026b GPU library.");
+    const size_t env_offset=0xbe68b0,ctor_offset=0xba32a0;
+#endif
+    const auto env=reinterpret_cast<Owner(*)()>(base+env_offset)();
+#ifdef _WIN32
+    struct Dims { size_t *data; size_t size,capacity,inline_data[5]; };
+    size_t shape[2]={static_cast<size_t>(m),static_cast<size_t>(n)};
+    const Dims dims={shape,2,2,{0}};
+    using Factory=Owner(*)(const Dims&,size_t,mxClassID,mxComplexity,const Owner&);
+    auto storage=reinterpret_cast<Factory>(base+0x698a10)(dims,nnz,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL,env);
+#else
+    using Factory=Owner(*)(size_t,size_t,size_t,mxClassID,mxComplexity,const Owner&);
+    auto storage=reinterpret_cast<Factory>(base+0xbd6f80)(m,n,nnz,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL,env);
+#endif
+    const char *data=static_cast<const char*>(storage.get());
+    int32_t meta[4]; int class_id,complexity;
+    if (!host_readable(data,376)) throw LayoutMismatch("Allocated sparse storage is unreadable.");
+    std::memcpy(meta,data+128,sizeof(meta));
+    std::memcpy(&class_id,data+72,sizeof(int)); std::memcpy(&complexity,data+76,sizeof(int));
+    if ((meta[0]!=nnz)||(meta[1]!=nnz)||(meta[2]!=m)||(meta[3]!=n)||
+        (class_id!=mxDOUBLE_CLASS)||(complexity!=(complex?mxCOMPLEX:mxREAL)))
+        throw LayoutMismatch("Allocated sparse metadata does not match the requested output.");
+    int device; check_cuda(cudaGetDevice(&device),"cudaGetDevice");
+    void *values,*indices,*offsets;
+    std::memcpy(&values,data+144,sizeof(void*)); std::memcpy(&indices,data+152,sizeof(void*));
+    std::memcpy(&offsets,data+160,sizeof(void*));
+    if (nnz) {
+        check_extent(values,nnz*(complex?sizeof(double2):sizeof(double)),device,"C");
+        check_extent(indices,nnz*sizeof(int32_t),device,"C");
+    }
+    check_extent(offsets,(m+1)*sizeof(int32_t),device,"C");
+    auto impl=std::make_unique<Impl>(); impl->storage=std::move(storage);
+    auto wrapper=static_cast<mxGPUArray*>(::operator new(32));
+    try { reinterpret_cast<void(*)(mxGPUArray*,Impl*)>(base+ctor_offset)(wrapper,impl.get()); }
+    catch (...) { ::operator delete(wrapper); throw; }
+    impl.release();
+    std::unique_ptr<mxGPUArray,decltype(&mxGPUDestroyGPUArray)> owner(wrapper,mxGPUDestroyGPUArray);
+    return mxGPUCreateMxArrayOnGPU(wrapper);
 }
 static void product(const mxArray *array_a,const mxArray *array_b,mxArray **result)
 {
@@ -407,8 +444,7 @@ static void product(const mxArray *array_a,const mxArray *array_b,mxArray **resu
     if ((a.rows>INT_MAX)||(b.cols>INT_MAX)) throw std::invalid_argument("Dimensions exceed MATLAB's sparse GPU index ABI.");
     const bool complex=a.is_complex||b.is_complex;
     if ((!a.nnz)||(!b.nnz)||(!a.rows)||(!b.cols)) {
-        const GpuOutput rows(0,mxINT32_CLASS,mxREAL),cols(0,mxINT32_CLASS,mxREAL);
-        *result=allocate_pattern(rows,cols,0,a.rows,b.cols,false); return;
+        *result=allocate_csr(a.rows,b.cols,0,false); return;
     }
     const Buffer invalid(sizeof(int));
     check_cuda(cudaMemset(invalid.ptr,0,sizeof(int)),"cudaMemset");
@@ -432,7 +468,7 @@ static void product(const mxArray *array_a,const mxArray *array_b,mxArray **resu
         const Buffer device_tasks(tasks.size()*sizeof(Task));
         check_cuda(cudaMemcpy(device_tasks.ptr,tasks.data(),tasks.size()*sizeof(Task),cudaMemcpyHostToDevice),"tasks upload");
         symbolic<<<std::min<size_t>(tasks.size(),prop.multiProcessorCount*8),256,sym_shared>>>
-            (a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,nullptr,nullptr,false);
+            (a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,nullptr,false);
         check_cuda(cudaMemcpy(tasks.data(),device_tasks.ptr,tasks.size()*sizeof(Task),cudaMemcpyDeviceToHost),"symbolic counts");
         std::vector<Task> next;
         bool split=false;
@@ -456,17 +492,33 @@ static void product(const mxArray *array_a,const mxArray *array_b,mxArray **resu
     acc_stride=std::max(acc_stride,max_hash);
     const size_t shared_bytes=acc_stride*value_size+max_hash*sizeof(int);
     if (nnz>INT_MAX) throw std::runtime_error("Output exceeds MATLAB's sparse GPU index ABI.");
-    const GpuOutput rows(nnz,mxINT32_CLASS,mxREAL),cols(nnz,mxINT32_CLASS,mxREAL);
-    if (!nnz) { *result=allocate_pattern(rows,cols,0,a.rows,b.cols,complex); return; }
+    *result=allocate_csr(a.rows,b.cols,nnz,complex);
+    if (!nnz) return;
     const Buffer device_tasks(tasks.size()*sizeof(Task));
     check_cuda(cudaMemcpy(device_tasks.ptr,tasks.data(),tasks.size()*sizeof(Task),cudaMemcpyHostToDevice),"tasks upload");
     const int grid=std::min<size_t>(tasks.size(),prop.multiProcessorCount*8);
-    symbolic<<<grid,256,sym_shared>>>(a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,rows.data<int32_t>(),cols.data<int32_t>(),true);
-    check_cuda(cudaDeviceSynchronize(),"symbolic pattern");
-    *result=allocate_pattern(rows,cols,nnz,a.rows,b.cols,complex);
     const GpuInput gpu_c(*result);
+    const char *storage=**reinterpret_cast<char* const* const*>(gpu_c.get());
+    int32_t *offsets,*indices;
+    std::memcpy(&offsets,storage+160,sizeof(void*)); std::memcpy(&indices,storage+152,sizeof(void*));
+    check_extent(offsets,(a.rows+1)*sizeof(int32_t),device,"C");
+    check_extent(indices,nnz*sizeof(int32_t),device,"C");
+    std::vector<int64_t> row_counts(a.rows+1,0);
+    for (const Task &task:tasks) row_counts[task.row+1]+=task.count;
+    std::vector<int32_t> row_offsets(a.rows+1,0);
+    for (int64_t row=1;row<=a.rows;row++) {
+        row_counts[row]+=row_counts[row-1];
+        row_offsets[row]=static_cast<int32_t>(row_counts[row]);
+    }
+    check_cuda(cudaMemcpy(offsets,row_offsets.data(),row_offsets.size()*sizeof(int32_t),cudaMemcpyHostToDevice),"output offsets");
+    symbolic<<<grid,256,sym_shared>>>(a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,indices,true);
+    check_cuda(cudaDeviceSynchronize(),"symbolic pattern");
     const MatlabCsr c=read_storage(*result,gpu_c,device,"C");
-    if (c.nnz!=nnz) throw LayoutMismatch("Allocated output structure has an unexpected entry count.");
+    if ((c.rows!=a.rows)||(c.cols!=b.cols)||(c.nnz!=nnz)||(c.is_complex!=complex))
+        throw LayoutMismatch("Allocated output structure has unexpected metadata.");
+    validate_csr<<<256,256>>>(c,invalid.as<int>());
+    check_cuda(cudaMemcpy(&bad,invalid.ptr,sizeof(int),cudaMemcpyDeviceToHost),"validate output");
+    if (bad) throw LayoutMismatch("Constructed output CSR indices are invalid.");
     #define RUN_NUMERIC(AV,BV,CV) \
         check_cuda(cudaFuncSetAttribute(numeric<AV,BV,CV>,cudaFuncAttributeMaxDynamicSharedMemorySize,shared_bytes),"shared memory opt-in"); \
         numeric<AV,BV,CV><<<grid,512,shared_bytes>>>(a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,acc_stride,c.indices,const_cast<CV*>(static_cast<const CV*>(c.values)))

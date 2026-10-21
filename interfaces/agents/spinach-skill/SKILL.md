@@ -133,9 +133,12 @@ error is reported without aborting the C++ builds; other build errors propagate.
 Modern MATLAB does not provide macOS CUDA support. Older releases retain five C++ builds
 and skip the R2026b-layout CUDA target.
 
-The shipped Linux and Windows gateways are built with R2026b and CUDA 13
-for compute capability 7.5 or later. Direct gateway and wrapper arithmetic
-are validated on Linux H200 and Windows A800 without an external CUDA runtime.
+The sparse output uses a build-pinned R2026b native factory with MATLAB-owned
+CSR buffers and native reference-counted cleanup, without COO construction.
+Unknown GPU-library builds fail before private calls. The Linux gateway uses
+CUDA 12.8; Windows uses bundled CUDA 13.1 and is validated on A800. Linux
+runtime validation additionally requires a driver compatible with R2026b.
+The wrapper retains its compute-capability 7.5 minimum.
 Missing or unloadable binaries retain native GPU multiplication; computation
 and storage-layout errors remain errors. When MATLAB cannot use any GPU,
 `create()` reports the condition and removes optional GPU acceleration, leaving

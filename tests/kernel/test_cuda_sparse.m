@@ -19,7 +19,7 @@ for s=1:size(shapes,1)
         if bitget(k,1), A=A+1i*A; end
         if bitget(k,2), B=B-2i*B; end
         Ag=gpuArray(A); Bg=gpuArray(B);
-        C=cuda_sparse_by_sparse(Ag,Bg);
+        C=cuda_sparse_by_sparse(Ag,Bg,0);
         assert(isequal(full(gather(C)),full(A*B)));
         assert(issparse(C)&&isa(C,'gpuArray'));
         assert(isequal(gather(Ag),A)&&isequal(gather(Bg),B));
@@ -29,26 +29,26 @@ end
 % Check numerical cancellation and explicit GPU storage zeros
 A=sparse([1 1 2 2],[1 2 1 2],[1 -1 2 -2],2,2);
 B=sparse(ones(2));
-C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B));
+C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B),0);
 assert(nnz(C)==0&&isequal(full(gather(C)),zeros(2)));
 Ag=real(gpuArray(complex(A,A)).*gpuArray(sparse([1 0;1 1])));
-C=cuda_sparse_by_sparse(Ag,gpuArray(B));
+C=cuda_sparse_by_sparse(Ag,gpuArray(B),0);
 assert(isequal(full(gather(C)),full(gather(Ag))*full(B)));
 
 % Exercise a million-column hash and an overflowing dense row
 A=sparse([1 1 2],[1 2 3],[2 3 4],4,3);
 B=sparse([1 2 3],[1 500000 1000000],[5 6 7],3,1000000);
-C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B));
+C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B),0);
 assert(isequal(gather(C),A*B));
 A=sparse(randi(3,10,30)); B=sparse(randi(3,30,20000));
-C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B));
+C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B),0);
 assert(isequal(gather(C),A*B));
 
 % Check floating-point accuracy and ordinary MATLAB consumers
 for k=0:3
     A=sprandn(80,100,0.05)*(1+1i*bitget(k,1));
     B=sprandn(100,80,0.05)*(1+1i*bitget(k,2));
-    C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B));
+    C=cuda_sparse_by_sparse(gpuArray(A),gpuArray(B),0);
     R=A*B; tol=1e-13*norm(R,'fro');
     assert(norm(gather(C)-R,'fro')<tol);
     assert(isreal(C)==(k==0));
@@ -57,7 +57,7 @@ for k=0:3
     assert(norm(gather(C*gpuArray.ones(80,1))-R*ones(80,1))<80*tol);
     [row_idx,col_idx,values]=find(C);
     assert(norm(gather(sparse(row_idx,col_idx,values,80,80))-R,'fro')<tol);
-    Q=cuda_sparse_by_sparse(C,C);
+    Q=cuda_sparse_by_sparse(C,C,0);
     assert(norm(gather(Q)-R^2,'fro')<2*norm(R,'fro')*tol);
 end
 
@@ -74,17 +74,17 @@ A=sprandn(300,300,0.02);
 Ag=clean_up(spin_system,gpuArray(A),1);
 R=clean_up(spin_system,A,1);
 Bg=gpuArray(speye(300));
-Q=cuda_sparse_by_sparse(Ag,Bg);
+Q=cuda_sparse_by_sparse(Ag,Bg,0);
 assert(isequal(gather(Q),R));
-Q=cuda_sparse_by_sparse(Bg,Ag);
+Q=cuda_sparse_by_sparse(Bg,Ag,0);
 assert(isequal(gather(Q),R));
 assert(isequal(gather(Ag),R));
 
 % Reuse an all-zero custom result after native structural compaction
 A=sparse([1 1 2 2],[1 2 1 2],[1 -1 2 -2],2,2);
-Q=cuda_sparse_by_sparse(gpuArray(A),gpuArray(sparse(ones(2))));
+Q=cuda_sparse_by_sparse(gpuArray(A),gpuArray(sparse(ones(2))),0);
 Q=clean_up(spin_system,Q,1e-8);
-Q=cuda_sparse_by_sparse(Q,gpuArray(speye(2)));
+Q=cuda_sparse_by_sparse(Q,gpuArray(speye(2)),0);
 assert(nnz(Q)==0);
 fprintf('CUSTOM_SPARSE_TEST_COMPLETE\n');
 

@@ -4,7 +4,7 @@ Source: [kernel/overloads/cuda_sparse_by_sparse.m](https://github.com/IlyaKuprov
 
 ## Purpose and interface
 
-`C=cuda_sparse_by_sparse(A,B)` multiplies compatible sparse double gpuArrays using custom CUDA CSR arithmetic, without cuSPARSE SpGEMM. All four real/complex combinations are supported without promoting or copying real input values. The result is a MATLAB-owned sparse double gpuArray, ready for ordinary MATLAB operations; neither input is modified. The obsolete cuSPARSE algorithm-selector argument has been removed.
+`C=cuda_sparse_by_sparse(A,B,0)` multiplies compatible sparse double gpuArrays using custom CUDA CSR arithmetic, without cuSPARSE SpGEMM. All four real/complex combinations are supported without promoting or copying real input values. The result is a MATLAB-owned sparse double gpuArray, ready for ordinary MATLAB operations; neither input is modified. The obsolete cuSPARSE algorithm-selector argument has been removed.
 
 ## Algorithm and storage
 

@@ -56,7 +56,7 @@ for n=1:size(shapes,1)
         % Call the gateway directly and form the independent CPU reference
         gpu_a=gpuArray(host_a); gpu_b=gpuArray(host_b);
         try
-            gpu_c=cuda_sparse_by_sparse_mex(gpu_a,gpu_b);
+            gpu_c=cuda_sparse_by_sparse_mex(gpu_a,gpu_b,0);
         catch exception
             if strcmp(exception.identifier,'MATLAB:mex:ErrInvalidMEXFile')
                 result.messages{end+1}='SKIP: CUDA sparse-product gateway cannot be loaded.';
@@ -79,6 +79,26 @@ for n=1:size(shapes,1)
                          'the gateway returns a sparse gpuArray without a CPU fallback');
 
     end
+end
+
+% Strict dropping preserves the threshold boundary and removes cancellations
+for kind=1:2
+    A=sparse([1 1 1;1 -1 0]);
+    B=sparse([0.25 0.5 1;0.25 -0.5 0;0 0 0]);
+    if kind==2
+        A=1i*A;
+    end
+    tol=0.5; C_ref=A*B;
+    C_ref(abs(C_ref)<tol)=0; %#ok<SPRIX> small CPU reference
+    [rows,cols,values]=find(C_ref);
+    C_ref=sparse(rows,cols,values,size(A,1),size(B,2));
+    C=gather(cuda_sparse_by_sparse(gpuArray(A),gpuArray(B),tol));
+    label=sprintf('strict dropping, complex=%d',kind==2);
+    result=test_true(result,[label ' pattern'],...
+                     nnz(C)==nnz(C_ref)&&isequal(spones(C),spones(C_ref)),...
+                     'only entries strictly below the threshold are removed');
+    result=test_true(result,[label ' values'],norm(C-C_ref,1)<1e-14,...
+                     'surviving values agree with the independent CPU product');
 end
 
 end

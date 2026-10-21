@@ -122,7 +122,7 @@ if ismember('gpu',spin_system.sys.enable)&&(size(A,1)>500)
         
         % Compute the next term
         if issparse(A)&&issparse(next_term)
-            next_term=cuda_sparse_by_sparse((1/n)*A,next_term);
+            next_term=cuda_sparse_by_sparse((1/n)*A,next_term,0);
         elseif issparse(A)
             next_term=(1/n)*A*next_term;
         else
@@ -195,7 +195,7 @@ if n_squarings>0
             
             % Square the propagator
             if issparse(P)
-                P=cuda_sparse_by_sparse(P,P);
+                P=cuda_sparse_by_sparse(P,P,0);
             else
                 P=P*P;
             end

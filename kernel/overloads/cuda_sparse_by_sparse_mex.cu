@@ -1,17 +1,21 @@
-/* Low-level CUDA CSR-by-CSR product for MATLAB R2026b.
- * C=cuda_sparse_by_sparse_mex(A,B), sparse double gpuArrays, real or complex.
- * Gustavson row-wise symbolic/numeric phases; no cuSPARSE or BLAS calls.
- * Shared-memory dense accumulators for narrow column ranges, bounded hash
- * accumulators otherwise. Overflowed symbolic tasks split their column range.
- * Inputs are read-only MATLAB CSR buffers. A fresh MATLAB-owned CSR structure
- * is allocated once from the symbolic pattern; numeric values are written
- * directly to it, and the ready object is returned without a numeric copy.
- * A version-pinned native factory allocates CSR buffers with MATLAB ownership.
- * Layout offsets are undocumented and checked before use. Input/output storage
- * uses MATLAB's int32 ABI; all offsets, task sizes, and host sums use int64.
- * Sources: Gustavson (1978), DOI 10.1145/355791.355796; Davis et al., Sparse
- * Direct Methods, Algorithm 2.2; GraphBLAS GB_AxB_saxpy3.c; spECK HashSpGEMM.
+/*Low-level CUDA CSR-by-CSR product for MATLAB R2026b.
+ *C=cuda_sparse_by_sparse_mex(A,B),sparse double gpuArrays,real or complex.
+ *Gustavson row-wise symbolic/numeric phases; no cuSPARSE or BLAS calls.
+ *Shared-memory dense accumulators for narrow column ranges,bounded hash
+ *accumulators otherwise. Overflowed symbolic tasks split their column range.
+ *Inputs are read-only MATLAB CSR buffers. A fresh MATLAB-owned CSR structure
+ *is allocated once from the symbolic pattern; numeric values are written
+ *directly to it,and the ready object is returned without a numeric copy.
+ *A version-pinned native factory allocates CSR buffers with MATLAB ownership.
+ *Layout offsets are undocumented and checked before use. Input/output storage
+ *uses MATLAB's int32 ABI; all offsets,task sizes,and host sums use int64.
+ *Sources:Gustavson (1978),DOI 10.1145/355791.355796; Davis et al.,Sparse
+ *Direct Methods,Algorithm 2.2; GraphBLAS GB_AxB_saxpy3.c; spECK HashSpGEMM.
+ *
+ *ilya.kuprov@weizmann.ac.il
  */
+
+// Includes and platform interfaces
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -28,6 +32,8 @@
 #include "gpu/mxGPUArray.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <cub/block/block_scan.cuh>
+#include <cub/block/block_reduce.cuh>
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
@@ -38,32 +44,61 @@
 #include <vector>
 #include <memory>
 
-struct LayoutMismatch:std::runtime_error { using std::runtime_error::runtime_error; };
+// RAII helpers and CUDA error translation
+struct LayoutMismatch:std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
+
 static void check_cuda(cudaError_t code,const char *stage)
 {
-    if (code!=cudaSuccess) throw std::runtime_error(std::string(stage)+": "+cudaGetErrorString(code));
+    if (code!=cudaSuccess)
+        throw std::runtime_error(std::string(stage)+": "+cudaGetErrorString(code));
 }
+
 struct Buffer
 {
     void *ptr=nullptr;
-    explicit Buffer(size_t bytes) { if (bytes) check_cuda(cudaMalloc(&ptr,bytes),"cudaMalloc"); }
-    ~Buffer() { if (ptr) cudaFree(ptr); }
+    explicit Buffer(size_t bytes)
+    {
+        if (bytes)
+            check_cuda(cudaMalloc(&ptr,bytes),"cudaMalloc");
+    }
+    ~Buffer()
+    {
+        if (ptr)
+            cudaFree(ptr);
+    }
     Buffer(const Buffer&)=delete;
-    Buffer& operator=(const Buffer&)=delete;
-    template<class T> T* as() const { return static_cast<T*>(ptr); }
+    Buffer &operator=(const Buffer&)=delete;
+    template<class T> T* as() const
+    {
+        return static_cast<T*>(ptr);
+    }
 };
+
 class GpuInput
 {
 public:
-    explicit GpuInput(const mxArray *array) : ptr(mxGPUCreateFromMxArray(array)) {}
+    explicit GpuInput(const mxArray *array):ptr(mxGPUCreateFromMxArray(array))
+    {
+    }
     GpuInput(const GpuInput&)=delete;
-    GpuInput& operator=(const GpuInput&)=delete;
-    ~GpuInput() { mxGPUDestroyGPUArray(ptr); }
-    const mxGPUArray* get() const { return ptr; }
+    GpuInput &operator=(const GpuInput&)=delete;
+    ~GpuInput()
+    {
+        mxGPUDestroyGPUArray(ptr);
+    }
+    const mxGPUArray *get() const
+    {
+        return ptr;
+    }
+
 private:
     const mxGPUArray *ptr;
 };
 
+// MATLAB private CSR readers
 struct MatlabCsr
 {
     int64_t rows,cols,nnz;
@@ -74,17 +109,19 @@ struct MatlabCsr
 
 static bool host_readable(const void *ptr,size_t n_bytes)
 {
-    if ((ptr==nullptr)||(reinterpret_cast<uintptr_t>(ptr)%alignof(void*)!=0)) return false;
+    if ((ptr==nullptr)||(reinterpret_cast<uintptr_t>(ptr)%alignof(void*)!=0))
+        return false;
 #ifdef _WIN32
     std::vector<char> buffer(n_bytes);
     SIZE_T bytes_read=0;
-    return ReadProcessMemory(GetCurrentProcess(),ptr,buffer.data(),n_bytes,&bytes_read)&&
-           (bytes_read==n_bytes);
+    return ReadProcessMemory(GetCurrentProcess(),ptr,buffer.data(),n_bytes,&bytes_read)&&(bytes_read==n_bytes);
 #else
     int fd[2];
-    if (pipe(fd)!=0) return false;
+    if (pipe(fd)!=0)
+        return false;
     const bool readable=(write(fd[1],ptr,n_bytes)==static_cast<ssize_t>(n_bytes));
-    close(fd[0]); close(fd[1]);
+    close(fd[0]);
+    close(fd[1]);
     return readable;
 #endif
 }
@@ -93,13 +130,14 @@ static bool host_readable(const void *ptr,size_t n_bytes)
 static void check_extent(const void *ptr,size_t n_bytes,int device,const char *name)
 {
     cudaPointerAttributes attributes;
-    if ((cudaPointerGetAttributes(&attributes,ptr)!=cudaSuccess)||
-        (attributes.type!=cudaMemoryTypeDevice)||(attributes.device!=device))
+    if ((cudaPointerGetAttributes(&attributes,ptr)!=cudaSuccess)||(attributes.type!=cudaMemoryTypeDevice)||
+        (attributes.device!=device))
     {
         cudaGetLastError();
         throw LayoutMismatch(std::string(name)+" pointer is not device memory on the current GPU.");
     }
-    CUdeviceptr base=0; size_t size=0;
+    CUdeviceptr base=0;
+    size_t size=0;
     const CUdeviceptr start=reinterpret_cast<CUdeviceptr>(ptr);
     if ((cuMemGetAddressRange(&base,&size,start)!=CUDA_SUCCESS)||(start+n_bytes>base+size))
         throw LayoutMismatch(std::string(name)+" allocation is smaller than the matrix requires.");
@@ -114,7 +152,8 @@ static int64_t matlab_nzmax(const mxArray *array)
     {
         mxArray *host=nullptr;
         mexCallMATLAB(1,&host,1,&count,"gather");
-        mxDestroyArray(count); count=host;
+        mxDestroyArray(count);
+        count=host;
     }
     const int64_t n=static_cast<int64_t>(mxGetScalar(count));
     mxDestroyArray(count);
@@ -127,15 +166,19 @@ static MatlabCsr read_storage(const mxArray *array,const GpuInput &gpu,int devic
     MatlabCsr csr={static_cast<int64_t>(dims[0]),static_cast<int64_t>(dims[1]),matlab_nzmax(array),
                    nullptr,nullptr,nullptr,mxGPUGetComplexity(gpu.get())==mxCOMPLEX};
     mxFree(const_cast<mwSize*>(dims));
-    if (csr.nnz==0) return csr;
+    if (csr.nnz==0)
+        return csr;
 
     // Follow the two pointer hops to the storage block
     const void *handle=gpu.get();
-    if (!host_readable(handle,sizeof(void*))) throw LayoutMismatch(std::string(name)+" handle is unreadable.");
-    const void *object=*static_cast<void* const*>(handle);
-    if (!host_readable(object,sizeof(void*))) throw LayoutMismatch(std::string(name)+" object is unreadable.");
-    const char *storage=*static_cast<char* const*>(object);
-    if (!host_readable(storage,168)) throw LayoutMismatch(std::string(name)+" storage block is unreadable.");
+    if (!host_readable(handle,sizeof(void*)))
+        throw LayoutMismatch(std::string(name)+" handle is unreadable.");
+    const void *object=*static_cast<void *const*>(handle);
+    if (!host_readable(object,sizeof(void*)))
+        throw LayoutMismatch(std::string(name)+" object is unreadable.");
+    const char *storage=*static_cast<char *const*>(object);
+    if (!host_readable(storage,168))
+        throw LayoutMismatch(std::string(name)+" storage block is unreadable.");
     std::memcpy(&csr.values,storage+144,sizeof(void*));
     std::memcpy(&csr.indices,storage+152,sizeof(void*));
     std::memcpy(&csr.offsets,storage+160,sizeof(void*));
@@ -154,218 +197,318 @@ static MatlabCsr read_storage(const mxArray *array,const GpuInput &gpu,int devic
     return csr;
 }
 
+// Device helpers for disjoint row and column-range tasks
+struct Task
+{
+    int64_t row,lo,hi,base;
+    int32_t count,overflow;
+};
 
-// Symbolic tasks partition output rows into disjoint column ranges
-struct Task { int64_t row,lo,hi,base; int32_t count,overflow; };
 __host__ __device__ int table_capacity(int64_t bound,int limit)
 {
     int slots=1;
-    while ((slots<limit)&&(slots<2*bound)) slots*=2;
+    while ((slots<limit)&&(slots<2*bound))
+        slots*=2;
     return slots;
 }
+
 __device__ int64_t lower_bound_col(const int32_t *cols,int64_t first,int64_t last,int64_t key)
 {
-    while (first<last) {
+    while (first<last)
+    {
         const int64_t mid=first+(last-first)/2;
-        if (cols[mid]<key) first=mid+1; else last=mid;
+        if (cols[mid]<key)
+            first=mid+1;
+        else
+            last=mid;
     }
     return first;
 }
+
 __device__ int hash_slot(int col,int capacity)
 {
     return (static_cast<uint32_t>(col)*2654435761u)&(capacity-1);
 }
+
 __device__ int insert_key(int *keys,int capacity,int col)
 {
     int slot=hash_slot(col,capacity);
-    for (int k=0;k<capacity;k++) {
+    for (int k=0; k<capacity; k++)
+    {
         const int old=atomicCAS(keys+slot,-1,col);
-        if ((old==-1)||(old==col)) return slot;
+        if ((old==-1)||(old==col))
+            return slot;
         slot=(slot+1)&(capacity-1);
     }
     return -1;
 }
+
 __device__ void sort_keys(int *keys,int capacity)
 {
-    for (int k=threadIdx.x;k<capacity;k+=blockDim.x)
-        if (keys[k]<0) keys[k]=INT_MAX;
+    for (int k=threadIdx.x; k<capacity; k+=blockDim.x)
+        if (keys[k]<0)
+            keys[k]=INT_MAX;
     __syncthreads();
-    for (int width=2;width<=capacity;width*=2)
-        for (int gap=width/2;gap;gap/=2) {
-            for (int k=threadIdx.x;k<capacity;k+=blockDim.x) {
+    for (int width=2; width<=capacity; width*=2)
+        for (int gap=width/2; gap; gap/=2)
+        {
+            for (int k=threadIdx.x; k<capacity; k+=blockDim.x)
+            {
                 const int other=k^gap;
-                if (other>k) {
+                if (other>k)
+                {
                     const int a=keys[k],b=keys[other];
-                    if (((k&width)==0)?(a>b):(a<b)) { keys[k]=b; keys[other]=a; }
+                    if (((k&width)==0)?(a>b):(a<b))
+                    {
+                        keys[k]=b;
+                        keys[other]=a;
+                    }
                 }
             }
             __syncthreads();
         }
 }
+
 // Validate every CSR index and row boundary before launching arithmetic
 __global__ void validate_csr(MatlabCsr a,int *invalid)
 {
-    for (int64_t row=blockIdx.x*(int64_t)blockDim.x+threadIdx.x;row<a.rows;row+=(int64_t)blockDim.x*gridDim.x) {
+    if ((blockIdx.x==0)&&(threadIdx.x==0)&&((a.offsets[0]!=0)||(a.offsets[a.rows]!=a.nnz)))
+        atomicExch(invalid,1);
+    for (int64_t row=blockIdx.x*(int64_t)blockDim.x+threadIdx.x; row<a.rows; row+=(int64_t)blockDim.x*gridDim.x)
+    {
         const int64_t first=a.offsets[row],last=a.offsets[row+1];
-        if ((first<0)||(last<first)||(last>a.nnz)) { atomicExch(invalid,1); continue; }
-        for (int64_t p=first;p<last;p++)
+        if ((first<0)||(last<first)||(last>a.nnz))
+        {
+            atomicExch(invalid,1);
+            continue;
+        }
+        for (int64_t p=first; p<last; p++)
             if ((a.indices[p]<0)||(a.indices[p]>=a.cols)||((p>first)&&(a.indices[p]<=a.indices[p-1])))
                 atomicExch(invalid,1);
     }
 }
-// Count or emit each task's structural columns using a bitset or a hash table
-__global__ void symbolic(MatlabCsr a,MatlabCsr b,Task *tasks,int n_tasks,int dense_width,int capacity,
-                         int32_t *cols_c,bool emit)
+
+// Symbolic kernel: exact pattern counts and sorted column emission
+__global__ void symbolic(MatlabCsr a,MatlabCsr b,Task *tasks,int n_tasks,int dense_width,int capacity,int32_t *cols_c,
+                         bool emit)
 {
     extern __shared__ int keys[];
-    __shared__ int count,overflow,local_capacity,prefix[256];
-    const int tid=threadIdx.x,lane=tid&31,warp=tid/32;
-    for (int task_id=blockIdx.x;task_id<n_tasks;task_id+=gridDim.x) {
+    __shared__ int overflow,local_capacity;
+    __shared__ cub::BlockScan<int,256>::TempStorage scan;
+    __shared__ cub::BlockReduce<int,256>::TempStorage reduce;
+    const int thread_id=threadIdx.x,lane=thread_id&31,warp=thread_id/32;
+    for (int task_id=blockIdx.x; task_id<n_tasks; task_id+=gridDim.x)
+    {
         Task &task=tasks[task_id];
+        if (!emit&&!task.overflow)
+            continue;
         const bool dense=task.hi-task.lo<=dense_width;
         const int width=static_cast<int>(task.hi-task.lo);
-        if (tid==0) {
+        if (thread_id==0)
+        {
             int64_t bound=emit?task.count:0;
             if (!emit&&!dense)
-                for (int64_t p=a.offsets[task.row];(p<a.offsets[task.row+1])&&(bound<capacity/2);p++)
+                for (int64_t p=a.offsets[task.row]; (p<a.offsets[task.row+1])&&(bound<capacity/2); p++)
                     bound+=static_cast<int64_t>(b.offsets[a.indices[p]+1])-b.offsets[a.indices[p]];
             local_capacity=table_capacity(bound,capacity);
         }
         __syncthreads();
         const int slots=dense?(width+31)/32:local_capacity;
-        for (int k=tid;k<slots;k+=blockDim.x) keys[k]=dense?0:-1;
-        if (tid==0) { count=0; overflow=0; }
+        for (int k=thread_id; k<slots; k+=blockDim.x)
+            keys[k]=dense?0:-1;
+        if (thread_id==0)
+            overflow=0;
         __syncthreads();
+
         const int64_t first_a=a.offsets[task.row],last_a=a.offsets[task.row+1];
-        for (int64_t p=first_a+warp;p<last_a;p+=blockDim.x/32) {
+        for (int64_t p=first_a+warp; p<last_a; p+=blockDim.x/32)
+        {
             const int64_t row_b=a.indices[p];
             const int64_t first_b=b.offsets[row_b],last_b=b.offsets[row_b+1];
             const int64_t begin=(task.lo==0)?first_b:lower_bound_col(b.indices,first_b,last_b,task.lo);
             const int64_t end=(task.hi==b.cols)?last_b:lower_bound_col(b.indices,begin,last_b,task.hi);
-            for (int64_t q=begin+lane;q<end;q+=32) {
+            for (int64_t q=begin+lane; q<end; q+=32)
+            {
                 const int col=b.indices[q];
-                if (dense) atomicOr(reinterpret_cast<unsigned int*>(keys)+(col-task.lo)/32,1u<<((col-task.lo)%32));
-                else if ((atomicAdd(&overflow,0)==0)&&(insert_key(keys,local_capacity,col)<0)) atomicExch(&overflow,1);
+                if (dense)
+                    atomicOr(reinterpret_cast<unsigned int*>(keys)+(col-task.lo)/32,1u<<((col-task.lo)%32));
+                else if ((atomicAdd(&overflow,0)==0)&&(insert_key(keys,local_capacity,col)<0))
+                    atomicExch(&overflow,1);
             }
         }
         __syncthreads();
-        int local=0;
-        for (int k=tid;k<slots;k+=blockDim.x) local+=dense?__popc(keys[k]):(keys[k]!=-1);
-        atomicAdd(&count,local);
-        __syncthreads();
-        if (!emit) {
-            if (tid==0) { task.count=count; task.overflow=overflow||(!dense&&(count>local_capacity/2)); }
-        } else if (dense) {
+
+        if (!emit)
+        {
+            int local_count=0;
+            for (int k=thread_id; k<slots; k+=blockDim.x)
+                local_count+=dense?__popc(keys[k]):(keys[k]!=-1);
+            const int count=cub::BlockReduce<int,256>(reduce).Sum(local_count);
+            if (thread_id==0)
+            {
+                task.count=count;
+                task.overflow=overflow||(!dense&&(count>local_capacity/2));
+            }
+        }
+        else if (dense)
+        {
             int output=0;
-            for (int start=0;start<width;start+=blockDim.x) {
-                const int k=start+tid;
+            for (int start=0; start<width; start+=blockDim.x)
+            {
+                const int k=start+thread_id;
                 const int present=(k<width)?((static_cast<uint32_t>(keys[k/32])>>(k%32))&1u):0;
-                prefix[tid]=present;
-                __syncthreads();
-                for (int gap=1;gap<blockDim.x;gap*=2) {
-                    const int prev=(tid>=gap)?prefix[tid-gap]:0;
-                    __syncthreads();
-                    prefix[tid]+=prev;
-                    __syncthreads();
+                int prefix,total;
+                cub::BlockScan<int,256>(scan).InclusiveSum(present,prefix,total);
+                if (present)
+                {
+                    const int64_t output_pos=task.base+output+prefix-1;
+                    cols_c[output_pos]=static_cast<int32_t>(task.lo+k);
                 }
-                if (present) {
-                    const int64_t pos=task.base+output+prefix[tid]-1;
-                    cols_c[pos]=static_cast<int32_t>(task.lo+k);
-                }
-                output+=prefix[blockDim.x-1];
+                output+=total;
                 __syncthreads();
             }
-        } else {
+        }
+        else
+        {
             sort_keys(keys,local_capacity);
-            for (int k=tid;k<task.count;k+=blockDim.x) {
+            for (int k=thread_id; k<task.count; k+=blockDim.x)
+            {
                 cols_c[task.base+k]=keys[k];
             }
         }
         __syncthreads();
     }
 }
-__device__ double load_value(const double *values,int64_t k) { return values[k]; }
-__device__ double2 load_value(const double2 *values,int64_t k) { return values[k]; }
-__device__ double multiply(double a,double b) { return a*b; }
-__device__ double2 multiply(double a,double2 b) { return make_double2(a*b.x,a*b.y); }
-__device__ double2 multiply(double2 a,double b) { return make_double2(a.x*b,a.y*b); }
+
+// Real and interleaved-complex scalar arithmetic
+__device__ double multiply(double a,double b)
+{
+    return a*b;
+}
+
+__device__ double2 multiply(double a,double2 b)
+{
+    return make_double2(a*b.x,a*b.y);
+}
+
+__device__ double2 multiply(double2 a,double b)
+{
+    return make_double2(a.x*b,a.y*b);
+}
+
 __device__ double2 multiply(double2 a,double2 b)
 {
     return make_double2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);
 }
-__device__ double zero_value(double) { return 0.0; }
-__device__ double2 zero_value(double2) { return make_double2(0.0,0.0); }
-__device__ double sum_value(double a,double b) { return a+b; }
-__device__ double2 sum_value(double2 a,double2 b) { return make_double2(a.x+b.x,a.y+b.y); }
-__device__ void add_value(double *dest,double x) { atomicAdd(dest,x); }
-__device__ void add_value(double2 *dest,double2 x) { atomicAdd(&dest->x,x.x); atomicAdd(&dest->y,x.y); }
-// Each block accumulates one row/range; all matrix values stay on the GPU
-// Dense ranges index shared accumulators directly; wider ranges use bounded hashing
-// Shared-memory storage is reused across the task fleet, never per scalar product
-// Template arguments avoid promoting real inputs to complex buffers
-// Row-major sorted symbolic offsets address the newly allocated MATLAB object
-// No input storage is written
-// (These explanatory details are part of the algorithm, not runtime options.)
+
+__device__ double sum_value(double a,double b)
+{
+    return a+b;
+}
+
+__device__ double2 sum_value(double2 a,double2 b)
+{
+    return make_double2(a.x+b.x,a.y+b.y);
+}
+
+__device__ void add_value(double *dest,double x)
+{
+    atomicAdd(dest,x);
+}
+
+__device__ void add_value(double2 *dest,double2 x)
+{
+    atomicAdd(&dest->x,x.x);
+    atomicAdd(&dest->y,x.y);
+}
+
+// Numeric kernel: direct accumulation into MATLAB values
 template<class AValue,class BValue,class CValue>
-__global__ void numeric(MatlabCsr a,MatlabCsr b,const Task *tasks,int n_tasks,int dense_width,int max_capacity,int acc_stride,
+__global__ void numeric(MatlabCsr a,MatlabCsr b,const Task *tasks,int n_tasks,int dense_width,int max_capacity,
                         const int32_t *cols_c,CValue *values_c)
 {
     extern __shared__ double2 shared[];
-    CValue *acc=reinterpret_cast<CValue*>(shared);
-    int *keys=reinterpret_cast<int*>(acc+acc_stride);
-    const int tid=threadIdx.x,lane=tid&31,warp=tid/32;
-    for (int task_id=blockIdx.x;task_id<n_tasks;task_id+=gridDim.x) {
+    CValue *accumulator=reinterpret_cast<CValue*>(shared);
+    const int thread_id=threadIdx.x,lane=thread_id&31,warp=thread_id/32;
+    for (int task_id=blockIdx.x; task_id<n_tasks; task_id+=gridDim.x)
+    {
         const Task task=tasks[task_id];
         const bool dense=task.hi-task.lo<=dense_width;
         const int capacity=table_capacity(task.count,max_capacity);
+        int *keys=reinterpret_cast<int*>(accumulator+capacity);
         const int width=dense?static_cast<int>(task.hi-task.lo):capacity;
-        for (int k=tid;k<width;k+=blockDim.x) { acc[k]=zero_value(CValue{}); if (!dense) keys[k]=-1; }
+        for (int k=thread_id; k<width; k+=blockDim.x)
+        {
+            accumulator[k]=CValue{};
+            if (!dense)
+                keys[k]=-1;
+        }
         __syncthreads();
         if (!dense)
-            for (int k=tid;k<task.count;k+=blockDim.x) insert_key(keys,capacity,cols_c[task.base+k]);
+            for (int k=thread_id; k<task.count; k+=blockDim.x)
+                insert_key(keys,capacity,cols_c[task.base+k]);
         __syncthreads();
+
         const int64_t first_a=a.offsets[task.row],last_a=a.offsets[task.row+1];
         const int n_warps=blockDim.x/32;
         const int64_t col_lo=dense?task.lo+(task.hi-task.lo)*warp/n_warps:task.lo;
         const int64_t col_hi=dense?task.lo+(task.hi-task.lo)*(warp+1)/n_warps:task.hi;
-        for (int64_t p=first_a+(dense?0:warp);p<last_a;p+=dense?1:n_warps) {
-            const AValue av=load_value(static_cast<const AValue*>(a.values),p);
+        for (int64_t p=first_a+(dense?0:warp); p<last_a; p+=dense?1:n_warps)
+        {
+            const AValue value_a=static_cast<const AValue*>(a.values)[p];
             const int64_t row_b=a.indices[p];
             const int64_t first_b=b.offsets[row_b],last_b=b.offsets[row_b+1];
             const int64_t begin=(col_lo==0)?first_b:lower_bound_col(b.indices,first_b,last_b,col_lo);
             const int64_t end=(col_hi==b.cols)?last_b:lower_bound_col(b.indices,begin,last_b,col_hi);
-            for (int64_t q=begin+lane;q<end;q+=32) {
+            for (int64_t q=begin+lane; q<end; q+=32)
+            {
                 const int col=b.indices[q];
                 int slot=static_cast<int>(col-task.lo);
-                const CValue value=multiply(av,load_value(static_cast<const BValue*>(b.values),q));
-                if (dense) acc[slot]=sum_value(acc[slot],value);
-                else {
+                const CValue value=multiply(value_a,static_cast<const BValue*>(b.values)[q]);
+                if (dense)
+                    accumulator[slot]=sum_value(accumulator[slot],value);
+                else
+                {
                     slot=hash_slot(col,capacity);
-                    while (keys[slot]!=col) slot=(slot+1)&(capacity-1);
-                    add_value(acc+slot,value);
+                    while (keys[slot]!=col)
+                        slot=(slot+1)&(capacity-1);
+                    add_value(accumulator+slot,value);
                 }
             }
             __syncwarp();
         }
         __syncthreads();
-        for (int k=tid;k<task.count;k+=blockDim.x) {
+
+        for (int k=thread_id; k<task.count; k+=blockDim.x)
+        {
             const int col=cols_c[task.base+k];
             int slot=static_cast<int>(col-task.lo);
-            if (!dense) { slot=hash_slot(col,capacity); while (keys[slot]!=col) slot=(slot+1)&(capacity-1); }
-            values_c[task.base+k]=acc[slot];
+            if (!dense)
+            {
+                slot=hash_slot(col,capacity);
+                while (keys[slot]!=col)
+                    slot=(slot+1)&(capacity-1);
+            }
+            values_c[task.base+k]=accumulator[slot];
         }
         __syncthreads();
     }
 }
-// Native factories retain MATLAB's allocator, shared ownership, and device registry
-static mxArray *allocate_csr(int64_t m,int64_t n,int64_t nnz,bool complex)
+
+// Native factory allocation with MATLAB ownership and device registration
+static mxArray *allocate_csr(int64_t m,int64_t n,int64_t nnz,bool complex,MatlabCsr &c)
 {
     using Owner=std::shared_ptr<void>;
-    struct Impl { Owner storage; uint64_t sparse=1,readonly=0; };
+    struct Impl
+    {
+        Owner storage;
+        uint64_t sparse=1,readonly=0;
+    };
     static_assert(sizeof(Impl)==32,"Unexpected sparse implementation ABI.");
 #ifdef _WIN32
     const auto base=reinterpret_cast<char*>(GetModuleHandleA("gpu.dll"));
-    if (!base) throw LayoutMismatch("MATLAB GPU library is not loaded.");
+    if (!base)
+        throw LayoutMismatch("MATLAB GPU library is not loaded.");
     const auto dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     const auto pe=reinterpret_cast<const IMAGE_NT_HEADERS*>(base+dos->e_lfanew);
     if ((pe->FileHeader.TimeDateStamp!=0x221ff86b)||(pe->OptionalHeader.SizeOfImage!=0xdfe000))
@@ -377,170 +520,277 @@ static mxArray *allocate_csr(int64_t m,int64_t n,int64_t nnz,bool complex)
         throw LayoutMismatch("MATLAB GPU library could not be located.");
     const auto base=static_cast<char*>(info.dli_fbase);
     const unsigned char expected[20]={0xa0,0x4d,0x7f,0x46,0x9d,0x8e,0x27,0x40,0xf7,0xb9,
-                                      0x57,0x7f,0x45,0x76,0xcf,0x37,0x5d,0x29,0xc3,0x77};
+                                     0x57,0x7f,0x45,0x76,0xcf,0x37,0x5d,0x29,0xc3,0x77};
     const auto elf=reinterpret_cast<const Elf64_Ehdr*>(base);
     const auto headers=reinterpret_cast<const Elf64_Phdr*>(base+elf->e_phoff);
     bool matched=false;
-    for (int k=0;k<elf->e_phnum;k++) if (headers[k].p_type==PT_NOTE) {
-        const char *note=base+headers[k].p_vaddr,*end=note+headers[k].p_memsz;
-        while (note+sizeof(Elf64_Nhdr)<=end) {
-            const auto h=reinterpret_cast<const Elf64_Nhdr*>(note);
-            const char *name=note+sizeof(*h),*data=name+((h->n_namesz+3)&~3u);
-            const char *next=data+((h->n_descsz+3)&~3u);
-            if ((next>end)||(next<=note)) break;
-            if ((h->n_type==NT_GNU_BUILD_ID)&&(h->n_namesz==4)&&(h->n_descsz==20)&&
-                !std::memcmp(name,"GNU",4)&&!std::memcmp(data,expected,20)) matched=true;
-            note=next;
+    for (int k=0; k<elf->e_phnum; k++)
+        if (headers[k].p_type==PT_NOTE)
+        {
+            const char *note=base+headers[k].p_vaddr,*end=note+headers[k].p_memsz;
+            while (note+sizeof(Elf64_Nhdr)<=end)
+            {
+                const auto h=reinterpret_cast<const Elf64_Nhdr*>(note);
+                const char *name=note+sizeof(*h),*data=name+((h->n_namesz+3)&~3u);
+                const char *next=data+((h->n_descsz+3)&~3u);
+                if ((next>end)||(next<=note))
+                    break;
+                if ((h->n_type==NT_GNU_BUILD_ID)&&(h->n_namesz==4)&&(h->n_descsz==20)&&
+                    !std::memcmp(name,"GNU",4)&&!std::memcmp(data,expected,20))
+                    matched=true;
+                note=next;
+            }
         }
-    }
-    if (!matched) throw LayoutMismatch("Private sparse allocation requires the verified R2026b GPU library.");
+    if (!matched)
+        throw LayoutMismatch("Private sparse allocation requires the verified R2026b GPU library.");
     const size_t env_offset=0xbe68b0,ctor_offset=0xba32a0;
 #endif
-    const auto env=reinterpret_cast<Owner(*)()>(base+env_offset)();
+    const auto env=reinterpret_cast<Owner (*)()>(base+env_offset)();
 #ifdef _WIN32
-    struct Dims { size_t *data; size_t size,capacity,inline_data[5]; };
+    struct Dims
+    {
+        size_t *data;
+        size_t size,capacity,inline_data[5];
+    };
     size_t shape[2]={static_cast<size_t>(m),static_cast<size_t>(n)};
     const Dims dims={shape,2,2,{0}};
-    using Factory=Owner(*)(const Dims&,size_t,mxClassID,mxComplexity,const Owner&);
+    using Factory=Owner (*)(const Dims&,size_t,mxClassID,mxComplexity,const Owner&);
     auto storage=reinterpret_cast<Factory>(base+0x698a10)(dims,nnz,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL,env);
 #else
-    using Factory=Owner(*)(size_t,size_t,size_t,mxClassID,mxComplexity,const Owner&);
+    using Factory=Owner (*)(size_t,size_t,size_t,mxClassID,mxComplexity,const Owner&);
     auto storage=reinterpret_cast<Factory>(base+0xbd6f80)(m,n,nnz,mxDOUBLE_CLASS,complex?mxCOMPLEX:mxREAL,env);
 #endif
+
+    // Check native metadata and borrow the allocated CSR buffers
     const char *data=static_cast<const char*>(storage.get());
-    int32_t meta[4]; int class_id,complexity;
-    if (!host_readable(data,376)) throw LayoutMismatch("Allocated sparse storage is unreadable.");
+    int32_t meta[4];
+    int class_id,complexity;
+    if (!host_readable(data,376))
+        throw LayoutMismatch("Allocated sparse storage is unreadable.");
     std::memcpy(meta,data+128,sizeof(meta));
-    std::memcpy(&class_id,data+72,sizeof(int)); std::memcpy(&complexity,data+76,sizeof(int));
-    if ((meta[0]!=nnz)||(meta[1]!=nnz)||(meta[2]!=m)||(meta[3]!=n)||
-        (class_id!=mxDOUBLE_CLASS)||(complexity!=(complex?mxCOMPLEX:mxREAL)))
+    std::memcpy(&class_id,data+72,sizeof(int));
+    std::memcpy(&complexity,data+76,sizeof(int));
+    if ((meta[0]!=nnz)||(meta[1]!=nnz)||(meta[2]!=m)||(meta[3]!=n)||(class_id!=mxDOUBLE_CLASS)||
+        (complexity!=(complex?mxCOMPLEX:mxREAL)))
         throw LayoutMismatch("Allocated sparse metadata does not match the requested output.");
-    int device; check_cuda(cudaGetDevice(&device),"cudaGetDevice");
-    void *values,*indices,*offsets;
-    std::memcpy(&values,data+144,sizeof(void*)); std::memcpy(&indices,data+152,sizeof(void*));
-    std::memcpy(&offsets,data+160,sizeof(void*));
-    if (nnz) {
-        check_extent(values,nnz*(complex?sizeof(double2):sizeof(double)),device,"C");
-        check_extent(indices,nnz*sizeof(int32_t),device,"C");
+    int device;
+    check_cuda(cudaGetDevice(&device),"cudaGetDevice");
+    c={m,n,nnz,nullptr,nullptr,nullptr,complex};
+    std::memcpy(&c.values,data+144,sizeof(void*));
+    std::memcpy(&c.indices,data+152,sizeof(void*));
+    std::memcpy(&c.offsets,data+160,sizeof(void*));
+    if (nnz)
+    {
+        check_extent(c.values,nnz*(complex?sizeof(double2):sizeof(double)),device,"C");
+        check_extent(c.indices,nnz*sizeof(int32_t),device,"C");
     }
-    check_extent(offsets,(m+1)*sizeof(int32_t),device,"C");
-    auto impl=std::make_unique<Impl>(); impl->storage=std::move(storage);
+    check_extent(c.offsets,(m+1)*sizeof(int32_t),device,"C");
+
+    // Transfer storage ownership into the MATLAB GPU wrapper
+    auto impl=std::make_unique<Impl>();
+    impl->storage=std::move(storage);
     auto wrapper=static_cast<mxGPUArray*>(::operator new(32));
-    try { reinterpret_cast<void(*)(mxGPUArray*,Impl*)>(base+ctor_offset)(wrapper,impl.get()); }
-    catch (...) { ::operator delete(wrapper); throw; }
+    try
+    {
+        reinterpret_cast<void (*)(mxGPUArray*,Impl*)>(base+ctor_offset)(wrapper,impl.get());
+    }
+    catch (...)
+    {
+        ::operator delete(wrapper);
+        throw;
+    }
     impl.release();
     std::unique_ptr<mxGPUArray,decltype(&mxGPUDestroyGPUArray)> owner(wrapper,mxGPUDestroyGPUArray);
     return mxGPUCreateMxArrayOnGPU(wrapper);
 }
+
+// Host driver: validate, count, allocate, and fill one native output
 static void product(const mxArray *array_a,const mxArray *array_b,mxArray **result)
 {
     const GpuInput gpu_a(array_a),gpu_b(array_b);
-    if ((!mxGPUIsSparse(gpu_a.get()))||(!mxGPUIsSparse(gpu_b.get()))||
-        (mxGPUGetClassID(gpu_a.get())!=mxDOUBLE_CLASS)||(mxGPUGetClassID(gpu_b.get())!=mxDOUBLE_CLASS))
+    if ((!mxGPUIsSparse(gpu_a.get()))||(!mxGPUIsSparse(gpu_b.get()))||(mxGPUGetClassID(gpu_a.get())!=mxDOUBLE_CLASS)||
+        (mxGPUGetClassID(gpu_b.get())!=mxDOUBLE_CLASS))
         throw std::invalid_argument("Inputs must be sparse double gpuArrays.");
-    int device; check_cuda(cudaGetDevice(&device),"cudaGetDevice");
+    int device;
+    check_cuda(cudaGetDevice(&device),"cudaGetDevice");
     const MatlabCsr a=read_storage(array_a,gpu_a,device,"A"),b=read_storage(array_b,gpu_b,device,"B");
-    if (a.cols!=b.rows) throw std::invalid_argument("Inner matrix dimensions must agree.");
-    if ((a.rows>INT_MAX)||(b.cols>INT_MAX)) throw std::invalid_argument("Dimensions exceed MATLAB's sparse GPU index ABI.");
+    if (a.cols!=b.rows)
+        throw std::invalid_argument("Inner matrix dimensions must agree.");
+    if ((a.rows>INT_MAX)||(b.cols>INT_MAX))
+        throw std::invalid_argument("Dimensions exceed MATLAB's sparse GPU index ABI.");
     const bool complex=a.is_complex||b.is_complex;
-    if ((!a.nnz)||(!b.nnz)||(!a.rows)||(!b.cols)) {
-        *result=allocate_csr(a.rows,b.cols,0,false); return;
+    MatlabCsr c;
+    if ((!a.nnz)||(!b.nnz)||(!a.rows)||(!b.cols))
+    {
+        *result=allocate_csr(a.rows,b.cols,0,false,c);
+        return;
     }
+
+    // Validate input row boundaries and sorted columns before arithmetic
     const Buffer invalid(sizeof(int));
     check_cuda(cudaMemset(invalid.ptr,0,sizeof(int)),"cudaMemset");
     validate_csr<<<256,256>>>(a,invalid.as<int>());
     validate_csr<<<256,256>>>(b,invalid.as<int>());
-    int bad=0; check_cuda(cudaMemcpy(&bad,invalid.ptr,sizeof(int),cudaMemcpyDeviceToHost),"validate_csr");
-    if (bad) throw LayoutMismatch("CSR row offsets or sorted column indices are invalid.");
-    cudaDeviceProp prop; check_cuda(cudaGetDeviceProperties(&prop,device),"cudaGetDeviceProperties");
+    int invalid_csr=0;
+    check_cuda(cudaMemcpy(&invalid_csr,invalid.ptr,sizeof(int),cudaMemcpyDeviceToHost),"validate_csr");
+    if (invalid_csr)
+        throw LayoutMismatch("CSR row offsets or sorted column indices are invalid.");
+
+    // Size shared accumulators within the existing device resource budget
+    cudaDeviceProp device_props;
+    check_cuda(cudaGetDeviceProperties(&device_props,device),"cudaGetDeviceProperties");
     const int value_size=complex?sizeof(double2):sizeof(double);
-    const int budget=std::min(prop.sharedMemPerBlockOptin,prop.sharedMemPerMultiprocessor/2)-2048;
+    const int budget=std::min(device_props.sharedMemPerBlockOptin,device_props.sharedMemPerMultiprocessor/2)-2048;
     int capacity=1;
-    while (2*capacity*(value_size+sizeof(int))<=budget) capacity*=2;
-    // Reserve room for the hash keys when deriving the actual dense width
+    while (2*capacity*(value_size+sizeof(int))<=budget)
+        capacity*=2;
     const int dense_cols=((budget-capacity*sizeof(int))/value_size/256)*256;
     std::vector<Task> tasks;
     tasks.reserve(a.rows);
-    for (int64_t row=0;row<a.rows;row++) tasks.push_back({row,0,b.cols,0,0,0});
-    const size_t sym_shared=std::max(capacity,(dense_cols+31)/32)*sizeof(int);
+    for (int64_t row=0; row<a.rows; row++)
+        tasks.push_back({row,0,b.cols,0,0,1});
+    const size_t symbolic_bytes=std::max(capacity,(dense_cols+31)/32)*sizeof(int);
+
     // Symbolic failures split only column ranges, without materialising products
-    for (;;) {
+    for (;;)
+    {
         const Buffer device_tasks(tasks.size()*sizeof(Task));
-        check_cuda(cudaMemcpy(device_tasks.ptr,tasks.data(),tasks.size()*sizeof(Task),cudaMemcpyHostToDevice),"tasks upload");
-        symbolic<<<std::min<size_t>(tasks.size(),prop.multiProcessorCount*8),256,sym_shared>>>
-            (a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,nullptr,false);
-        check_cuda(cudaMemcpy(tasks.data(),device_tasks.ptr,tasks.size()*sizeof(Task),cudaMemcpyDeviceToHost),"symbolic counts");
+        check_cuda(cudaMemcpy(device_tasks.ptr,tasks.data(),tasks.size()*sizeof(Task),cudaMemcpyHostToDevice),
+                   "tasks upload");
+        symbolic<<<std::min<size_t>(tasks.size(),device_props.multiProcessorCount*8),256,symbolic_bytes>>>(
+            a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,nullptr,false);
+        check_cuda(cudaMemcpy(tasks.data(),device_tasks.ptr,tasks.size()*sizeof(Task),cudaMemcpyDeviceToHost),
+                   "symbolic counts");
         std::vector<Task> next;
         bool split=false;
-        for (const Task &task:tasks) {
-            if (task.overflow) {
+        for (const Task &task:tasks)
+        {
+            if (task.overflow)
+            {
                 const int64_t mid=task.lo+(task.hi-task.lo)/2;
-                if ((mid==task.lo)||(mid==task.hi)) throw std::runtime_error("Symbolic task cannot be split.");
-                next.push_back({task.row,task.lo,mid,0,0,0}); next.push_back({task.row,mid,task.hi,0,0,0}); split=true;
-            } else if (task.count) next.push_back(task);
+                if ((mid==task.lo)||(mid==task.hi))
+                    throw std::runtime_error("Symbolic task cannot be split.");
+                next.push_back({task.row,task.lo,mid,0,0,1});
+                next.push_back({task.row,mid,task.hi,0,0,1});
+                split=true;
+            }
+            else if (task.count)
+                next.push_back(task);
         }
         tasks.swap(next);
-        if (!split) break;
+        if (!split)
+            break;
     }
+
+    // Prefix exact task counts and allocate the final MATLAB buffers once
     int64_t nnz=0;
-    int max_hash=0,acc_stride=0;
-    for (Task &task:tasks) {
-        task.base=nnz; nnz+=task.count;
-        if (task.hi-task.lo<=dense_cols) acc_stride=std::max(acc_stride,static_cast<int>(task.hi-task.lo));
-        else max_hash=std::max(max_hash,table_capacity(task.count,capacity));
+    int max_hash_slots=0,max_dense_cols=0;
+    for (Task &task:tasks)
+    {
+        task.base=nnz;
+        nnz+=task.count;
+        if (task.hi-task.lo<=dense_cols)
+            max_dense_cols=std::max(max_dense_cols,static_cast<int>(task.hi-task.lo));
+        else
+            max_hash_slots=std::max(max_hash_slots,table_capacity(task.count,capacity));
     }
-    acc_stride=std::max(acc_stride,max_hash);
-    const size_t shared_bytes=acc_stride*value_size+max_hash*sizeof(int);
-    if (nnz>INT_MAX) throw std::runtime_error("Output exceeds MATLAB's sparse GPU index ABI.");
-    *result=allocate_csr(a.rows,b.cols,nnz,complex);
-    if (!nnz) return;
+    const size_t shared_bytes=std::max<size_t>(max_dense_cols*value_size,max_hash_slots*(value_size+sizeof(int)));
+    if (nnz>INT_MAX)
+        throw std::runtime_error("Output exceeds MATLAB's sparse GPU index ABI.");
+    *result=allocate_csr(a.rows,b.cols,nnz,complex,c);
+    if (!nnz)
+        return;
+
+    // Upload final tasks and derive row offsets from their ordered endpoints
     const Buffer device_tasks(tasks.size()*sizeof(Task));
-    check_cuda(cudaMemcpy(device_tasks.ptr,tasks.data(),tasks.size()*sizeof(Task),cudaMemcpyHostToDevice),"tasks upload");
-    const int grid=std::min<size_t>(tasks.size(),prop.multiProcessorCount*8);
-    const GpuInput gpu_c(*result);
-    const char *storage=**reinterpret_cast<char* const* const*>(gpu_c.get());
-    int32_t *offsets,*indices;
-    std::memcpy(&offsets,storage+160,sizeof(void*)); std::memcpy(&indices,storage+152,sizeof(void*));
-    check_extent(offsets,(a.rows+1)*sizeof(int32_t),device,"C");
-    check_extent(indices,nnz*sizeof(int32_t),device,"C");
-    std::vector<int64_t> row_counts(a.rows+1,0);
-    for (const Task &task:tasks) row_counts[task.row+1]+=task.count;
+    check_cuda(cudaMemcpy(device_tasks.ptr,tasks.data(),tasks.size()*sizeof(Task),cudaMemcpyHostToDevice),
+               "tasks upload");
+    const int grid=std::min<size_t>(tasks.size(),device_props.multiProcessorCount*8);
     std::vector<int32_t> row_offsets(a.rows+1,0);
-    for (int64_t row=1;row<=a.rows;row++) {
-        row_counts[row]+=row_counts[row-1];
-        row_offsets[row]=static_cast<int32_t>(row_counts[row]);
+    size_t task_id=0;
+    int64_t end=0;
+    for (int64_t row=0; row<a.rows; row++)
+    {
+        while ((task_id<tasks.size())&&(tasks[task_id].row==row))
+        {
+            end=tasks[task_id].base+tasks[task_id].count;
+            task_id++;
+        }
+        row_offsets[row+1]=static_cast<int32_t>(end);
     }
-    check_cuda(cudaMemcpy(offsets,row_offsets.data(),row_offsets.size()*sizeof(int32_t),cudaMemcpyHostToDevice),"output offsets");
-    symbolic<<<grid,256,sym_shared>>>(a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,indices,true);
-    check_cuda(cudaDeviceSynchronize(),"symbolic pattern");
-    const MatlabCsr c=read_storage(*result,gpu_c,device,"C");
-    if ((c.rows!=a.rows)||(c.cols!=b.cols)||(c.nnz!=nnz)||(c.is_complex!=complex))
-        throw LayoutMismatch("Allocated output structure has unexpected metadata.");
+    check_cuda(cudaMemcpy(const_cast<int32_t*>(c.offsets),row_offsets.data(),row_offsets.size()*sizeof(int32_t),
+                          cudaMemcpyHostToDevice),
+               "output offsets");
+
+    // Emit and validate the exact output pattern before numerical accumulation
+    symbolic<<<grid,256,symbolic_bytes>>>(a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,
+                                        const_cast<int32_t*>(c.indices),true);
+    check_cuda(cudaGetLastError(),"symbolic pattern");
     validate_csr<<<256,256>>>(c,invalid.as<int>());
-    check_cuda(cudaMemcpy(&bad,invalid.ptr,sizeof(int),cudaMemcpyDeviceToHost),"validate output");
-    if (bad) throw LayoutMismatch("Constructed output CSR indices are invalid.");
+    check_cuda(cudaMemcpy(&invalid_csr,invalid.ptr,sizeof(int),cudaMemcpyDeviceToHost),"validate output");
+    if (invalid_csr)
+        throw LayoutMismatch("Constructed output CSR indices are invalid.");
+
+    // Write values in place with the matching real or complex specialisation
     #define RUN_NUMERIC(AV,BV,CV) \
-        check_cuda(cudaFuncSetAttribute(numeric<AV,BV,CV>,cudaFuncAttributeMaxDynamicSharedMemorySize,shared_bytes),"shared memory opt-in"); \
-        numeric<AV,BV,CV><<<grid,512,shared_bytes>>>(a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,acc_stride,c.indices,const_cast<CV*>(static_cast<const CV*>(c.values)))
-    if (a.is_complex&&b.is_complex) { RUN_NUMERIC(double2,double2,double2); }
-    else if (a.is_complex) { RUN_NUMERIC(double2,double,double2); }
-    else if (b.is_complex) { RUN_NUMERIC(double,double2,double2); }
-    else { RUN_NUMERIC(double,double,double); }
+        check_cuda(cudaFuncSetAttribute(numeric<AV,BV,CV>, \
+                                       cudaFuncAttributeMaxDynamicSharedMemorySize,shared_bytes), \
+                   "shared memory opt-in"); \
+        numeric<AV,BV,CV><<<grid,512,shared_bytes>>> \
+            (a,b,device_tasks.as<Task>(),tasks.size(),dense_cols,capacity,c.indices, \
+             const_cast<CV*>(static_cast<const CV*>(c.values)))
+    if (a.is_complex&&b.is_complex)
+    {
+        RUN_NUMERIC(double2,double2,double2);
+    }
+    else if (a.is_complex)
+    {
+        RUN_NUMERIC(double2,double,double2);
+    }
+    else if (b.is_complex)
+    {
+        RUN_NUMERIC(double,double2,double2);
+    }
+    else
+    {
+        RUN_NUMERIC(double,double,double);
+    }
     #undef RUN_NUMERIC
     check_cuda(cudaDeviceSynchronize(),"numeric product");
 }
+
+// mexFunction: translate exceptions after native and temporary owners unwind
 void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
-    static char message[1024]; const char *identifier=nullptr;
-    try {
-        if (nrhs!=2||nlhs!=1) throw std::invalid_argument("Two inputs and one output are required.");
-        if (!mxIsGPUArray(prhs[0])||!mxIsGPUArray(prhs[1])) throw std::invalid_argument("Inputs must be gpuArrays.");
-        if (mxInitGPU()!=MX_GPU_SUCCESS) throw std::runtime_error("GPU API initialisation failed.");
+    static char message[1024];
+    const char *identifier=nullptr;
+    try
+    {
+        if (nrhs!=2||nlhs!=1)
+            throw std::invalid_argument("Two inputs and one output are required.");
+        if (!mxIsGPUArray(prhs[0])||!mxIsGPUArray(prhs[1]))
+            throw std::invalid_argument("Inputs must be gpuArrays.");
+        if (mxInitGPU()!=MX_GPU_SUCCESS)
+            throw std::runtime_error("GPU API initialisation failed.");
         product(prhs[0],prhs[1],plhs);
-    } catch (const LayoutMismatch &err) {
-        identifier="Spinach:cuda_sparse_by_sparse_mex:layout"; std::snprintf(message,sizeof(message),"%s",err.what());
-    } catch (const std::exception &err) {
-        identifier="Spinach:cuda_sparse_by_sparse_mex:runtime"; std::snprintf(message,sizeof(message),"%s",err.what());
     }
-    if (identifier) { if ((nlhs>0)&&plhs[0]) { mxDestroyArray(plhs[0]); plhs[0]=nullptr; } mexErrMsgIdAndTxt(identifier,"%s",message); }
+    catch (const LayoutMismatch &err)
+    {
+        identifier="Spinach:cuda_sparse_by_sparse_mex:layout";
+        std::snprintf(message,sizeof(message),"%s",err.what());
+    }
+    catch (const std::exception &err)
+    {
+        identifier="Spinach:cuda_sparse_by_sparse_mex:runtime";
+        std::snprintf(message,sizeof(message),"%s",err.what());
+    }
+    if (identifier)
+    {
+        if ((nlhs>0)&&plhs[0])
+        {
+            mxDestroyArray(plhs[0]);
+            plhs[0]=nullptr;
+        }
+        mexErrMsgIdAndTxt(identifier,"%s",message);
+    }
 }

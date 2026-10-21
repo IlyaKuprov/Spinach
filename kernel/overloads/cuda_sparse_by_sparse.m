@@ -24,7 +24,7 @@
 % mismatch is an error, not a fallback to a potentially unsafe GPU product.
 % Missing or unloadable platform binaries and GPUs below compute capability
 % 7.5 retain native multiplication. Rebuild with the running MATLAB release
-% after a CUDA major-version change; the Linux binary uses CUDA 12.8.
+% after a CUDA major-version change; the Linux binary uses CUDA 13.
 %
 % ilya.kuprov@weizmann.ac.il
 

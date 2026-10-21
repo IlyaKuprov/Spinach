@@ -136,7 +136,7 @@ and skip the R2026b-layout CUDA target.
 The sparse output uses a build-pinned R2026b native factory with MATLAB-owned
 CSR buffers and native reference-counted cleanup, without COO construction.
 Unknown GPU-library builds fail before private calls. The Linux gateway uses
-CUDA 12.8; Windows uses bundled CUDA 13.1 and is validated on A800. Linux
+CUDA 13.1; Windows uses bundled CUDA 13.1 and is validated on A800. Linux
 runtime validation additionally requires a driver compatible with R2026b.
 The wrapper retains its compute-capability 7.5 minimum.
 Missing or unloadable binaries retain native GPU multiplication; computation

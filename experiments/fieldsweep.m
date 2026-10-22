@@ -50,9 +50,6 @@
 %       in sys.magnet should be set to 1 Tesla.
 %
 % Note: this experiment should be called directly without a context.
-%       Adaptive refinement is scheduled on the client. Shared edges
-%       are reserved while in flight, then cached for neighbouring
-%       triangles; each midpoint eigenset is computed only once.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -85,122 +82,54 @@ parameters.b_axis=linspace(parameters.window(1),...
                            parameters.window(2),...
                            parameters.npoints);
 
-% Transfer the heavy operators once and reuse them in every task
-operators=parallel.pool.Constant({Ic,Iz,Qc,Qz,Hmw});
+% Preallocate asynchronous work outputs
+eigensets(1:grid_size)=parallel.Future;
 
-% Schedule the initial vertex eigensets with worker-local operators
-futures(1:grid_size)=parallel.Future;
+% Schedule work
 for n=1:grid_size
+
+    % Create a local copy and specify system orientation 
     localpar=parameters; localpar.orientation=[0 betas(n) gammas(n)];
-    futures(n)=parfeval(@vertex_task,1,spin_system,localpar,operators);
+
+    % Assemble Zeeman and coupling Hamiltonians
+    Hz=Iz+orientation(Qz,localpar.orientation); 
+    Hc=Ic+orientation(Qc,localpar.orientation); 
+    
+    % Submit asynchronous eigenfields calculation job for this vertex
+    eigensets(n)=parfeval(@eigenfields,1,spin_system,localpar,Hz,Hc,Hmw);
+
 end
 
-% Retrieve vertices and attach their spherical coordinates
-eigensets=fetchOutputs(futures);
+% Retrieve vertex eigensets
+eigensets=fetchOutputs(eigensets);
+
+% Add coordinates
 for n=1:grid_size
-    eigensets(n).xyz=[sin(betas(n))*cos(gammas(n));...
-                      sin(betas(n))*sin(gammas(n));...
+    eigensets(n).xyz=[sin(betas(n))*cos(gammas(n)); 
+                      sin(betas(n))*sin(gammas(n)); 
                       cos(betas(n))];
 end
 
-% Index cached nodes by sorted edge endpoints; empty nodes are in flight
-nodes=num2cell(eigensets); triangles=hull;
-edges=containers.Map('KeyType','char','ValueType','double');
-midpoint_ids=zeros(size(triangles));
-futures=parallel.FevalFuture.empty(1,0); active=zeros(1,0);
-pending=(1:size(triangles,1))';
-spec=zeros(size(parameters.b_axis),'like',1i);
+% Preallocate asynchronous work outputs
+spec(1:size(hull,1))=parallel.Future;
 
-% Refine on the client, allowing branches to use the whole pool
-while (~isempty(pending))||(~isempty(futures))
+% Schedule work 
+for n=1:size(hull,1)
+    
+    % Extract triangle vertex indices
+    a=hull(n,1); b=hull(n,2); c=hull(n,3);
 
-    % Submit triangles whose shared edges are not already in flight
-    waiting=false(size(pending));
-    for p=1:numel(pending)
-        n=pending(p);
-
-        % Look up the three edges in the midpoint cache
-        vertices=triangles(n,:); pairs=vertices([1 2; 2 3; 3 1]);
-        keys=cell(1,3); ids=zeros(1,3); blocked=false;
-        for k=1:3
-            keys{k}=sprintf('%d,%d',sort(pairs(k,:)));
-            if isKey(edges,keys{k})
-                ids(k)=edges(keys{k});
-                blocked=blocked||isempty(nodes{ids(k)});
-            end
-        end
-
-        % A reserved edge must finish before another task can use it
-        if blocked
-            waiting(p)=true; continue
-        end
-
-        % Reserve missing midpoints before another triangle is submitted
-        midpoints=cell(1,3);
-        for k=1:3
-            if ids(k)==0
-                nodes{end+1}=[]; ids(k)=numel(nodes);
-                edges(keys{k})=ids(k);
-            else
-                midpoints{k}=nodes{ids(k)};
-            end
-        end
-        midpoint_ids(n,:)=ids;
-
-        % Evaluate one refinement level using cached midpoint eigensets
-        triangle=[nodes{vertices}];
-        futures(end+1)=parfeval(@triangle_task,3,spin_system,...
-                               parameters,triangle,operators,midpoints);
-        active(end+1)=n;
-
-    end
-    pending=pending(waiting);
-
-    % Drain the next completed triangle and release its reserved edges
-    [idx,local_spec,err,midpoints]=fetchNext(futures);
-    n=active(idx); ids=midpoint_ids(n,:);
-    nodes(ids)=midpoints;
-    futures(idx)=[]; active(idx)=[];
-
-    % Accumulate converged triangles or expose four independent children
-    if err>parameters.int_tol
-        vertices=triangles(n,:); first=size(triangles,1)+1;
-        children=[vertices(1) ids(1) ids(3);...
-                  ids(1) vertices(2) ids(2);...
-                  ids(3) ids(2) vertices(3);...
-                  ids(1) ids(2) ids(3)];
-        triangles=[triangles; children];
-        midpoint_ids=[midpoint_ids; zeros(4,3)];
-        pending=[(first:first+3)'; pending];
-    else
-        spec=spec+local_spec;
-    end
+    % Extract vertex eigensets
+    triangle=eigensets([a b c]); 
+    
+    % Call recursive Voitlander integrator
+    spec(n)=parfeval(@voitlander,1,spin_system,parameters,...
+                                   triangle,Ic,Iz,Qc,Qz,Hmw);
 
 end
 
-end
-
-% Assemble an initial vertex eigenset from worker-local operators
-function eigenset=vertex_task(spin_system,parameters,operators)
-
-% Orient the operators at the requested vertex
-operators=operators.Value;
-Hz=operators{2}+orientation(operators{4},parameters.orientation);
-Hc=operators{1}+orientation(operators{3},parameters.orientation);
-
-% Solve the field-swept eigenproblem
-eigenset=eigenfields(spin_system,parameters,Hz,Hc,operators{5});
-
-end
-
-% Evaluate a triangle using the operators resident on this worker
-function [spec,err,midpoints]=triangle_task(spin_system,parameters,...
-                                           triangle,operators,midpoints)
-
-% Unwrap the constant without capturing the operators in a closure
-operators=operators.Value;
-[spec,err,midpoints]=voitlander(spin_system,parameters,triangle,...
-                              operators{:},midpoints);
+% Retrieve and sum up cell integrals
+spec=sum(fetchOutputs(spec),1);
 
 end
 
@@ -286,5 +215,4 @@ end
 %
 % From the Prussian secret police
 % report on Karl Marx
-
 

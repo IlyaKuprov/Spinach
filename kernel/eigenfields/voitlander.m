@@ -1,16 +1,12 @@
-% Single-level Voitlander integrator. Computes an approximation
+% Adaptively recursed Voitlander integrator. Computes an approximation
 % of an integral of field-swept EPR transition over a spherical triang-
 % le. Unmatched transitions use vertex quadrature rather than being
 % omitted; matched transitions retain triangular interpolation. Syntax:
 %
-%     [spec,err,midpoints]=voitlander(spin_system,parameters,...
-%                                   triangle,Ic,Iz,Qc,Qz,Hmw,midpoints)
+%             spec=voitlander(spin_system,parameters,...
+%                             triangle,Ic,Iz,Qc,Qz,Hmw)
 %
 % Parameters:
-%
-%     midpoints   - three-element cell array of eigensets
-%                   on edges 12, 23, and 31; empty cells are computed,
-%                   use cell(1,3) when all three are unknown
 %
 %     triangle(1:3).xyz - Cartesian coordinates of the corners of the
 %                         spherical triangle, unit column vectors
@@ -59,66 +55,91 @@
 %
 %     parameters.b_axis  - a vector of magnetic field values, Tesla
 %
+%     parameters.int_tol - integration accuracy tolerance
+%
 % Outputs:
 %
-%     spec        - Simpson-Richardson spectrum, same dimensions
-%                   as parameters.b_axis
-%
-%     err         - two-norm of direct minus subdivided spectrum
-%
-%     midpoints   - completed eigensets on edges 12, 23, and 31
-%
-% Note: refinement and convergence decisions belong to the caller.
-%
+%     spec        - ESR spectrum integral over the triangle, array
+%                   of the same dimension as parameters.b_axis
+%               
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=voitlander.m>
 
-function [spec,err,midpoints]=voitlander(spin_system,parameters,...
-                                       triangle,Ic,Iz,Qc,Qz,Hmw,midpoints)
+function spec=voitlander(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw)
 
 % Check consistency
-grumble(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw,midpoints);
+grumble(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw);
 
-% Get triangle subdivision midpoints
+% Get traingle subdivision midpoints
 [r12,r23,r31]=sphtrsubd(triangle(1).xyz,...
                         triangle(2).xyz,...
                         triangle(3).xyz);
-coords=[r12(:) r23(:) r31(:)];
 
-% Compute only midpoint eigensets absent from the client cache
-for n=1:3
-    if isempty(midpoints{n})
+% First subdivision midpoint eigenset
+[phi,elev]=cart2sph(r12(1),r12(2),r12(3));
+parameters12=parameters; 
+parameters12.orientation=[0, pi/2-elev, phi];
+Hz=Iz+orientation(Qz,parameters12.orientation); 
+Hc=Ic+orientation(Qc,parameters12.orientation); 
+eigenset12=eigenfields(spin_system,parameters12,Hz,Hc,Hmw);
+eigenset12.xyz=[r12(1); r12(2); r12(3)];
 
-        % Assemble the Hamiltonian at this edge midpoint
-        [phi,elev]=cart2sph(coords(1,n),coords(2,n),coords(3,n));
-        localpar=parameters; localpar.orientation=[0, pi/2-elev, phi];
-        Hz=Iz+orientation(Qz,localpar.orientation);
-        Hc=Ic+orientation(Qc,localpar.orientation);
+% Second subdivision midpoint eigenset
+[phi,elev]=cart2sph(r23(1),r23(2),r23(3));
+parameters23=parameters; 
+parameters23.orientation=[0, pi/2-elev, phi];
+Hz=Iz+orientation(Qz,parameters23.orientation); 
+Hc=Ic+orientation(Qc,parameters23.orientation); 
+eigenset23=eigenfields(spin_system,parameters23,Hz,Hc,Hmw);
+eigenset23.xyz=[r23(1); r23(2); r23(3)];
 
-        % Return the eigenset and its coordinates for client caching
-        midpoints{n}=eigenfields(spin_system,localpar,Hz,Hc,Hmw);
-        midpoints{n}.xyz=coords(:,n);
+% Third subdivision midpoint eigenset
+[phi,elev]=cart2sph(r31(1),r31(2),r31(3));
+parameters31=parameters; 
+parameters31.orientation=[0, pi/2-elev, phi];
+Hz=Iz+orientation(Qz,parameters31.orientation); 
+Hc=Ic+orientation(Qc,parameters31.orientation); 
+eigenset31=eigenfields(spin_system,parameters31,Hz,Hc,Hmw);
+eigenset31.xyz=[r31(1); r31(2); r31(3)];
 
-    end
-end
+% Eigensets for the vertices (three each) of the four subdivision traingles
+triangle_a(1)=triangle(1); triangle_a(2)=eigenset12;  triangle_a(3)=eigenset31;
+triangle_b(1)=eigenset12;  triangle_b(2)=triangle(2); triangle_b(3)=eigenset23;
+triangle_c(1)=eigenset31;  triangle_c(2)=eigenset23;  triangle_c(3)=triangle(3);
+triangle_d(1)=eigenset12;  triangle_d(2)=eigenset23;  triangle_d(3)=eigenset31;
 
-% Assemble the four children in the original subdivision order
-triangle_a=[triangle(1) midpoints{1} midpoints{3}];
-triangle_b=[midpoints{1} triangle(2) midpoints{2}];
-triangle_c=[midpoints{3} midpoints{2} triangle(3)];
-triangle_d=[midpoints{1} midpoints{2} midpoints{3}];
-
-% Compute direct and subdivided integrals without changing quadrature
+% Compute the subdivided integral
 spec_sub=trint(parameters,triangle_a)+...
          trint(parameters,triangle_b)+...
          trint(parameters,triangle_c)+...
          trint(parameters,triangle_d);
+     
+% Compute the direct integral
 spec_dir=trint(parameters,triangle);
 
-% Return Simpson-Richardson spectrum and the refinement error
-spec=(4*spec_sub-spec_dir)/3;
-err=norm(spec_dir-spec_sub,2);
+% Simpson-Richardson correction
+spec_sim=(4*spec_sub-spec_dir)/3;
+
+% If the accuracy is insufficient, recurse
+if norm(spec_dir-spec_sub,2)>parameters.int_tol
+
+    % Compute the four triangles of the subdivision via asynchronous recursion
+    spec_a=parfeval(@voitlander,1,spin_system,parameters,triangle_a,Ic,Iz,Qc,Qz,Hmw);
+    spec_b=parfeval(@voitlander,1,spin_system,parameters,triangle_b,Ic,Iz,Qc,Qz,Hmw);
+    spec_c=parfeval(@voitlander,1,spin_system,parameters,triangle_c,Ic,Iz,Qc,Qz,Hmw);
+    spec_d=parfeval(@voitlander,1,spin_system,parameters,triangle_d,Ic,Iz,Qc,Qz,Hmw);
+
+    % Retrieve the work
+    spec=fetchOutputs(spec_a)+fetchOutputs(spec_b)+...
+         fetchOutputs(spec_c)+fetchOutputs(spec_d);
+
+else
+    
+    % Good enough
+    spec=spec_sim;
+
+end
 
 end
 
@@ -273,16 +294,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw,midpoints)
-if (~iscell(midpoints))||(~isequal(size(midpoints),[1 3]))
-    error('midpoints must be a 1-by-3 cell array.');
-end
-for n=1:3
-    if (~isempty(midpoints{n}))&&...
-       ((~isstruct(midpoints{n}))||(~isscalar(midpoints{n})))
-        error('each midpoint must be empty or a scalar eigenset.');
-    end
-end
+function grumble(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw)
 if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
    (~isfield(spin_system.bas,'formalism'))
     error('spin_system must be a Spinach data structure with basis information.');
@@ -296,6 +308,13 @@ end
 if (~isnumeric(parameters.b_axis))||(~isreal(parameters.b_axis))||...
    (~isvector(parameters.b_axis))||any(~isfinite(parameters.b_axis(:)))
     error('parameters.b_axis must be a finite real vector.');
+end
+if ~isfield(parameters,'int_tol')
+    error('integration tolerance must be supplied in parameters.int_tol field.');
+end
+if (~isnumeric(parameters.int_tol))||(~isreal(parameters.int_tol))||...
+   (~isscalar(parameters.int_tol))||(parameters.int_tol<=0)
+    error('parameters.int_tol must be a positive real scalar.');
 end
 if ~isfield(parameters,'mw_freq')
     error('resonance frequency must be supplied in parameters.mw_freq field.');
@@ -414,5 +433,4 @@ end
 %
 % Joseph Stalin, when told that
 % Vatican was a powerful entity
-
 

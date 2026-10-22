@@ -39,7 +39,7 @@ result = test_dynamic_voitlander()
 
 ## References
 
-- `voitlander` — single-level Voitlander spherical-triangle integration kernel under test, called with an empty 1x3 `midpoints` cell or with precomputed midpoint eigensets.
+- `voitlander` — adaptive Voitlander spherical-triangle integration kernel under test.
 - `eigenfields` — resonance root and transition property extraction.
 - `sphtrsubd`, `sphtarea` — spherical triangle subdivision and area computation.
 - `hamiltonian`, `assume`, `state`, `orientation`, `test_spin_system`, `new_test_result`, `test_true`, `test_close` — Spinach kernel utilities used by the test.

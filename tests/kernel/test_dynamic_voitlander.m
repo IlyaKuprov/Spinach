@@ -6,9 +6,8 @@
 %
 %     result  - regression test result with explanatory messages
 %
-% The test uses one-level quadrature and midpoint reuse, including an
-% isotropic spin-half electron, for which all triangle vertices and
-% subdivision midpoints have the same transition field.
+% The test uses an isotropic spin-half electron, for which all triangle
+% vertices and subdivision midpoints have the same transition field.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -19,7 +18,7 @@ fprintf('TESTING: Voitlander spherical-triangle integration\n');
 
 % State the Voitlander target of the test
 result=new_test_result('kernel/dynamic_voitlander',...
-                       'Single-level Voitlander triangle integral',...
+                       'Adaptive Voitlander triangle integral',...
                        'voitlander() must integrate a constant isotropic transition as triangle area times a Lorentzian line.');
 
 % Build an isotropic one-electron Hilbert-space system
@@ -30,7 +29,7 @@ bas.formalism='zeeman-hilb';
 bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
-% Set field-swept EPR parameters for one-level quadrature
+% Set field-swept EPR parameters with a deliberately loose recursion gate
 parameters.spins={'E'};
 parameters.mw_freq=9.5e9;
 parameters.fwhm=2e-3;
@@ -38,6 +37,7 @@ parameters.window=[0.33 0.35];
 parameters.npoints=9;
 parameters.tm_tol=0;
 parameters.rspt_order=Inf;
+parameters.int_tol=1e9;
 parameters.pp_tol=(parameters.window(2)-parameters.window(1))/(2*(parameters.npoints-1));
 parameters.orientation=[0 0 0];
 parameters.rho0=-state(spin_system,'Lz','E');
@@ -81,32 +81,8 @@ triangle=struct('xyz',{r1,r2,r3},'tf',{tf,tf,tf},...
                 'pd',{pd,pd,pd},'ti',{ti,ti,ti},...
                 'tj',{tj,tj,tj});
 
-% Integrate one level and retain midpoint eigensets
-[spec,err,midpoints]=voitlander(spin_system,parameters,triangle,...
-                              Ic,Iz,Qc,Qz,Hmw,cell(1,3));
-
-% Reuse all or some midpoint eigensets without changing quadrature
-[spec_cached,err_cached,cached_midpoints]=...
-    voitlander(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw,midpoints);
-partial=midpoints; partial{2}=[];
-[spec_partial,err_partial,partial_midpoints]=...
-    voitlander(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw,partial);
-result=test_true(result,'voitlander midpoint reuse',...
-                 isequal(midpoints,cached_midpoints)&&...
-                 isequal(midpoints,partial_midpoints),...
-                 'cached and recomputed eigensets agree');
-result=test_true(result,'voitlander cached spectrum',...
-                 isequal(spec,spec_cached)&&isequal(spec,spec_partial)&&...
-                 isequal(err,err_cached)&&isequal(err,err_partial),...
-                 'cached midpoint quadrature is unchanged');
-
-% Fully cached midpoints must not invoke the eigenfield solver
-cached_par=parameters; cached_par.rho0=@(~,~) error('cache was not used');
-spec_cached=voitlander(spin_system,cached_par,triangle,...
-                       Ic,Iz,Qc,Qz,Hmw,midpoints);
-result=test_true(result,'voitlander cache skips eigensolver',...
-                 isequal(spec,spec_cached),...
-                 'fully cached triangles do not evaluate populations');
+% Integrate the triangle using the production routine
+spec=voitlander(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw);
 
 % Build the analytic Lorentzian reference for a constant transition
 line_width=tw/2;
@@ -128,8 +104,7 @@ tri_corr(2).tm=2*tm;
 tri_corr(2).tj=2*tj;
 tri_corr(3).tm=4*tm;
 tri_corr(3).tj=tj;
-spec_corr=voitlander(spin_system,parameters,tri_corr,...
-                     Ic,Iz,Qc,Qz,Hmw,cell(1,3));
+spec_corr=voitlander(spin_system,parameters,tri_corr,Ic,Iz,Qc,Qz,Hmw);
 prod_area=(4*(2*area_a+2*area_b+2*area_c+area_d)-...
            4*sphtarea(r1,r2,r3))/3;
 line_shape=(tm*tj/(pi*line_width))./(1+((parameters.b_axis-tf)/line_width).^2);
@@ -142,8 +117,7 @@ tri_unmatched=triangle;
 for n=1:3
     tri_unmatched(n).ti=[100+n 200+n 1];
 end
-spec_unmatched=voitlander(spin_system,parameters,tri_unmatched,...
-                          Ic,Iz,Qc,Qz,Hmw,cell(1,3));
+spec_unmatched=voitlander(spin_system,parameters,tri_unmatched,Ic,Iz,Qc,Qz,Hmw);
 result=test_close(result,'voitlander unmatched vertex conservation',...
                   spec_unmatched,spec,1e-10,1e-12,...
                   'relabelled constant lines must retain the same total area');
@@ -154,8 +128,7 @@ fields={'tf','tm','tw','pd','tj','ti'};
 for n=1:numel(fields)
     tri_empty(1).(fields{n})=tri_empty(1).(fields{n})([],:);
 end
-spec_empty=voitlander(spin_system,parameters,tri_empty,...
-                      Ic,Iz,Qc,Qz,Hmw,cell(1,3));
+spec_empty=voitlander(spin_system,parameters,tri_empty,Ic,Iz,Qc,Qz,Hmw);
 empty_area=(4*((2/3)*area_a+area_b+area_c+area_d)-...
             (2/3)*sphtarea(r1,r2,r3))/3;
 reference=empty_area*tm*tj*pd*(line_width/pi)./...
@@ -169,8 +142,7 @@ tri_sing=triangle;
 tri_sing(1).tj=Inf;
 tri_sing(2).tj=tj;
 tri_sing(3).tj=2*tj;
-spec_sing=voitlander(spin_system,parameters,tri_sing,...
-                     Ic,Iz,Qc,Qz,Hmw,cell(1,3));
+spec_sing=voitlander(spin_system,parameters,tri_sing,Ic,Iz,Qc,Qz,Hmw);
 sing_area=(4*(area_a+area_b+(4/3)*area_c+area_d)-...
            (3/2)*sphtarea(r1,r2,r3))/3;
 line_shape=(tm*tj/(pi*line_width))./(1+((parameters.b_axis-tf)/line_width).^2);
@@ -233,15 +205,12 @@ tri_local=struct('xyz',{r1,r2,r3},...
                  'pd',{pd(high_root),pd,pd(high_root)},...
                  'ti',{ti_local,ti,ti_local},...
                  'tj',{tj(high_root),tj,tj(high_root)});
-spec_ref=voitlander(spin_system,parameters,tri_ref,...
-                    Ic,Iz,Qc,Qz,Hmw,cell(1,3));
-spec_local=voitlander(spin_system,parameters,tri_local,...
-                      Ic,Iz,Qc,Qz,Hmw,cell(1,3));
+spec_ref=voitlander(spin_system,parameters,tri_ref,Ic,Iz,Qc,Qz,Hmw);
+spec_local=voitlander(spin_system,parameters,tri_local,Ic,Iz,Qc,Qz,Hmw);
 
 % Check that local branch renumbering does not drop the continuous sheet
 result=test_close(result,'voitlander branch relabelling',spec_local,spec_ref,1e-12,1e-12,...
                   'field-continuation matching must ignore local branch ordinal changes at window edges');
 
 end
-
 

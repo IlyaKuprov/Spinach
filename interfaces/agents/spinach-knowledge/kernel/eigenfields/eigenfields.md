@@ -11,6 +11,8 @@
 
 For `Hc+B*Hz`, find fields `B` in the requested window where an energy-level gap matches the microwave angular frequency and the transition moment through `Hmw` is significant. The formalism selects either a Hilbert-space field sweep or a Liouville-space generalised eigenproblem.
 
+In the Hilbert-space calculation, Hermite midpoint predictions retain the eigensolver's symmetry-block ordering; without symmetry, the predictions are sorted globally. Keeping independent blocks in projector order preserves their transition identities. Field-knot overlap tracking and orientation-dependent transition-pair selection are unchanged.
+
 ## Inputs
 
 - `spin_system`: Spinach spin-system structure; `spin_system.bas.formalism` selects the pathway.

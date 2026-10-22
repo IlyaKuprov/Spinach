@@ -46,6 +46,31 @@ result=test_close(result,'rspt_eig transition moments',T_obs,T_ref,1e-14,1e-14,.
 result=test_close(result,'rspt_eig level populations',LP_obs,LP_ref,1e-14,1e-14,...
                   'level populations are equilibrium density-matrix expectations');
 
+% Keep symmetry blocks contiguous when their energy ranges overlap
+spin_system=local_minimal_system('zeeman-hilb',4);
+projector=speye(4);
+spin_system.bas.sym_fact.irr_dimensions=[2 2];
+spin_system.bas.sym_fact.irr_projectors={projector(:,1:2),projector(:,3:4)};
+parameters=struct('rspt_order',Inf);
+Hz=diag([1 -1 2 -2]); Hc=diag([0 4 1 5]); Hmw=zeros(4);
+for field=[0 3]
+
+    % Sort independently within the two invariant subspaces
+    energies=diag(Hc+field*Hz);
+    [~,idx1]=sort(energies(1:2));
+    [~,idx2]=sort(energies(3:4));
+    idx=[idx1;idx2+2];
+    [E_obs,V_obs,dE_obs]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,field);
+    result=test_close(result,'rspt_eig block-local energies',E_obs,energies(idx),1e-14,1e-14,...
+                      'energy ordering must preserve the symmetry direct sum');
+    result=test_close(result,'rspt_eig block-local eigenvectors',abs(V_obs),full(projector(:,idx)),1e-14,1e-14,...
+                      'eigenvectors must follow the block-local energy ordering');
+    slopes=diag(Hz);
+    result=test_close(result,'rspt_eig block-local derivatives',dE_obs,slopes(idx),1e-14,1e-14,...
+                      'energy derivatives must follow the block-local energy ordering');
+
+end
+
 % Check Liouville-space resonance-field extraction for a diagonal pencil
 spin_system=local_minimal_system('sphten-liouv',2);
 parameters=struct();

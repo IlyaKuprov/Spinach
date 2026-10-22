@@ -15,7 +15,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
   - Orders 1–4: the Hamiltonian is split into diagonal and off-diagonal parts, and `rspert` is called with the specified order.
   - `Inf`: full diagonalisation via `eig(H,'vector')`.
   - Any other value: an error `'unsupported perturbation theory order.'` is raised.
-- Energies are sorted in ascending order and eigenvectors reordered to match.
+- Energies are ascending within each symmetry block; the blocks retain projector order rather than being globally interleaved. Eigenvectors and derived quantities use this same ordering. Without a decomposition, energies remain globally ascending.
 - If more than two output arguments are requested, `dE` is computed via the Hellmann–Feynman theorem as `real(diag(V'*Hz*V))`.
 - If more than three output arguments are requested, transition moments are computed as `T = abs(V'*Hmw*V).^2`.
 - If more than four output arguments are requested, level populations `LP = real(diag(V'*rho0*V))` are computed from the thermal equilibrium state:
@@ -38,7 +38,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
 
 **Outputs:**
 
-- `E` — column vector of energies, sorted in ascending order (rad/s).
+- `E` — column vector of energies (rad/s), ascending within each symmetry block in projector order.
 - `V` — matrix with eigenvectors in columns, sorted left to right in the same order as the energies.
 - `dE` — column vector of dE/dB derivatives, sorted in the same order as the energies.
 - `T` — matrix of transition moments under `Hmw`.

@@ -1,6 +1,7 @@
 % Adaptively recursed Voitlander integrator. Computes an approximation
 % of an integral of field-swept EPR transition over a spherical triang-
-% le. Syntax:
+% le. Unmatched transitions use vertex quadrature rather than being
+% omitted; matched transitions retain triangular interpolation. Syntax:
 %
 %             spec=voitlander(spin_system,parameters,...
 %                             triangle,Ic,Iz,Qc,Qz,Hmw)
@@ -148,9 +149,9 @@ function spec=trint(parameters,triangle)
 % Preallocate the spectrum
 spec=zeros(size(parameters.b_axis),'like',1i);
 
-% Skip missing corners
-if isempty(triangle(1).ti)||...
-   isempty(triangle(2).ti)||...
+% Skip triangles without transitions
+if isempty(triangle(1).ti)&&...
+   isempty(triangle(2).ti)&&...
    isempty(triangle(3).ti)
     return;
 end
@@ -243,6 +244,20 @@ ntrans=numel(idx1);
 S=sphtarea(triangle(1).xyz,...
            triangle(2).xyz,...
            triangle(3).xyz);
+
+% Preserve unmatched lines using vertex quadrature over their third of the area
+matched={idx1,idx2,idx3};
+for k=1:3
+    unmatched=setdiff(1:numel(triangle(k).tf),matched{k});
+    for n=unmatched
+        weight=triangle(k).tm(n)*triangle(k).tj(n)*triangle(k).pd(n);
+        if isfinite(weight)
+            field=triangle(k).tf(n);
+            spec=spec+(S/3)*lorentzcon([field field field],weight,...
+                                       triangle(k).tw(n),parameters.b_axis);
+        end
+    end
+end
 
 % Build spectrum
 for n=1:ntrans

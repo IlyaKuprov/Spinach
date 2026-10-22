@@ -37,8 +37,9 @@
 %
 % Outputs:
 %
-%     E    - a column vector of energies, sorted in ascen-
-%            ding order (rad/s)
+%     E    - a column vector of energies (rad/s), ascending
+%            within each symmetry block; blocks retain the
+%            order of the symmetry projectors
 %
 %     V    - a matrix with eigenvectors in columns, sorted 
 %            left to right in the same order as the energies
@@ -132,8 +133,10 @@ else
 
 end
 
-% Sort the energies in ascending order
-[E,idx]=sort(E,'ascend'); V=V(:,idx);
+% Sort within each symmetry block, preserving its position in the direct sum
+if ~isfield(spin_system.bas,'sym_fact')
+    [E,idx]=sort(E,'ascend'); V=V(:,idx);
+end
 
 % Hellmann-Feynman dE/dB, if required
 if nargout>2, dE=real(diag(V'*Hz*V)); end

@@ -32,6 +32,12 @@
 %                        this option is used, the assumptions
 %                        on the respective spins should be
 %                        laboratory frame.
+%                         Alternatively, a scalar structure with
+%                         alphas, betas, gammas (radians), and
+%                         weights: non-empty real finite numeric
+%                         vectors of equal length. Weights
+%                         are used without normalisation; row and
+%                         column vectors are both accepted.
 %
 %   parameters.needs   - a cell array of strings specifying ad-
 %                        ditional information required by the
@@ -182,8 +188,12 @@ end
 parameters.spc_dim=1; parameters.spn_dim=size(I,1);
 
 % Get the averaging grid as a Matlab structure
-sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 
-               filesep parameters.grid],'alphas','betas','gammas','weights');
+if ischar(parameters.grid)
+    sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
+                   filesep parameters.grid],'alphas','betas','gammas','weights');
+else
+    sph_grid=parameters.grid;
+end
            
 % Assign local variables
 alphas=sph_grid.alphas; betas=sph_grid.betas; 
@@ -354,8 +364,10 @@ if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');
 elseif isempty(parameters.grid)
     error('parameters.grid variable cannot be empty.');
+elseif isstruct(parameters.grid)
+    grid_check(parameters.grid);
 elseif ~ischar(parameters.grid)
-    error('parameters.grid variable must be a character string.');
+    error('parameters.grid variable must be a character string or a spherical grid structure.');
 end
 
 % Pulse sequence
@@ -448,4 +460,5 @@ end
 % No. Altruism says: Yes.
 %
 % Ayn Rand
+
 

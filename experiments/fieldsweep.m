@@ -11,6 +11,14 @@
 %                             transition degeneracies, a good
 %                             start is
 %                             'rep_2ang_100pts_sph'
+%                             Alternatively, a scalar structure with
+%                             alphas, betas, gammas (radians), and
+%                             weights: non-empty real finite numeric
+%                             vectors of equal length. This
+%                             uses direct weighted orientation sums,
+%                             not adaptive spherical triangles.
+%                             Weights are used as supplied; use a
+%                             sum of 4*pi for a full-sphere integral.
 %
 %     parameters.spins     -  a one-element cell array speci-
 %                             fying the spin that is coupled
@@ -71,6 +79,30 @@ Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2;
 
 % Get the microwave operator (state in Liouville space)
 Hmw=coil_state(spin_system,'Lx',parameters.spins{1});
+
+% Integrate an explicitly supplied weighted orientation grid
+if isstruct(parameters.grid)
+    sph_grid=parameters.grid;
+    parameters.b_axis=linspace(parameters.window(1),...
+                               parameters.window(2),...
+                               parameters.npoints);
+    spec=zeros(size(parameters.b_axis));
+    for n=1:numel(sph_grid.weights)
+        parameters.orientation=[sph_grid.alphas(n) ...
+                                sph_grid.betas(n) ...
+                                sph_grid.gammas(n)];
+        Hz=Iz+orientation(Qz,parameters.orientation);
+        Hc=Ic+orientation(Qc,parameters.orientation);
+        eigenset=eigenfields(spin_system,parameters,Hz,Hc,Hmw);
+        for k=1:numel(eigenset.tf)
+            weight=sph_grid.weights(n)*eigenset.tm(k)*...
+                   eigenset.tj(k)*eigenset.pd(k);
+            spec=spec+lorentzcon(repmat(eigenset.tf(k),1,3),...
+                                weight,parameters.fwhm,parameters.b_axis);
+        end
+    end
+    return
+end
 
 % Get the initial grid and compute its convex hull
 load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 
@@ -141,8 +173,10 @@ end
 if ~isfield(parameters,'grid')
     error('grid must be specified in parameters.grid variable.');
 end
-if ~ischar(parameters.grid)
-    error('parameters.grid must be character string.');
+if isstruct(parameters.grid)
+    grid_check(parameters.grid);
+elseif ~ischar(parameters.grid)
+    error('parameters.grid must be a character string or a spherical grid structure.');
 end
 if ~isfield(parameters,'spins')
     error('spin to couple to the microwave field must be specified in parameters.spins variable.');
@@ -215,4 +249,5 @@ end
 %
 % From the Prussian secret police
 % report on Karl Marx
+
 

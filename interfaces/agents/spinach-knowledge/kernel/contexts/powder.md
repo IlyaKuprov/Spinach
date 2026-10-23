@@ -24,3 +24,9 @@ There is no spatial-motion axis in this context: `parameters.spc_dim=1`, and `pa
 ## State-dependent chemistry boundary
 
 This context rejects a function handle returned by `kinetics` with `Spinach:powder:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.
+
+## Explicit spherical grids
+
+`parameters.grid` also accepts a scalar structure containing `alphas`, `betas`, `gammas`, and `weights`. These must be non-empty, finite, real numeric vectors with equal element counts; angles are in radians. Row and column vectors are accepted. Weights are used exactly as supplied, without normalisation or a positivity restriction. This permits orientation selection and non-isotropic quadrature. The character-grid path retains its existing behaviour.
+
+The supplied grid is returned as `sph_grid`.

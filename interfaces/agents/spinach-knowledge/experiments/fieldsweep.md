@@ -30,3 +30,11 @@ The first output spec is the field-sampled spectrum, with its field coordinates 
 This is a computational powder integration over a finite spherical grid, with a potentially expensive eigenfields calculation. The source's example settings are starting points, not validated accuracy guarantees; increase grid density or adjust tolerances as required by convergence. Use rspt_order=Inf when exact diagonalisation is desired instead of the suggested perturbative order 2. The function must be called directly, without an experiment context.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/fieldsweep.m
+
+## Explicit spherical grids
+
+`parameters.grid` also accepts a scalar structure containing `alphas`, `betas`, `gammas`, and `weights`. These must be non-empty, finite, real numeric vectors with equal element counts; angles are in radians. Row and column vectors are accepted. Weights are used exactly as supplied, without normalisation or a positivity restriction. This permits orientation selection and non-isotropic quadrature. The character-grid path retains its existing behaviour.
+
+A structure selects direct weighted sums of the orientation-resolved eigenfield lines, with the same Lorentzian broadening and transition weights as the existing integrator. It does not use convex-hull triangulation, adaptive refinement, or `rs_tol`. For the full-sphere integral convention of the character-grid route, quadrature weights should sum to `4*pi`; weights summing to one give an orientational average instead. A discrete quadrature and the adaptive triangle integral need not coincide for a finite grid.
+
+`test_fieldsweep_custom_grid` checks a principal-axis spin-1/2 electron line against its analytic Lorentzian, including field centre and absolute intensity, row-vector spectrum/axis dimensions, signed sums over three anisotropic orientations, and negative weight scaling with column-vector grids. The collapsed-triangle `lorentzcon` line has area equal to its supplied amplitude: `amplitude/(pi*gamma)/(1+((B-B0)/gamma)^2)`, where `gamma=fwhm/2`. No factor of one half or implicit quadrature normalisation is introduced.

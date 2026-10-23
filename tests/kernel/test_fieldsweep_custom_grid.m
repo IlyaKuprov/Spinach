@@ -5,7 +5,7 @@
 % Outputs:
 %
 %     result - regression checks for anisotropic spectra, field axes,
-%              and adaptive spherical-triangle subdivision
+%              column orientation vectors, and adaptive subdivision
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -27,6 +27,27 @@ parameters.npoints=31; parameters.tm_tol=1e-10;
 parameters.rspt_order=Inf; parameters.int_tol=Inf;
 grid_name='icos_2ang_12pts';
 sph_grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',grid_name));
+
+% Reject row and mixed orientation layouts at the experiment boundary
+labels={'row grid rejection','row beta rejection','row gamma rejection'};
+for n=1:3
+    parameters.grid=sph_grid;
+    if n~=3, parameters.grid.betas=sph_grid.betas.'; end
+    if n~=2, parameters.grid.gammas=sph_grid.gammas.'; end
+    if n==1
+        parameters.grid.alphas=sph_grid.alphas.';
+        parameters.grid.weights=sph_grid.weights.';
+    end
+    grid_check(parameters.grid); rejected=false;
+    try
+        fieldsweep(spin_system,parameters);
+    catch err
+        rejected=strcmp(err.message,...
+                        'parameters.grid.betas and gammas must be column vectors.');
+    end
+    result=test_true(result,labels{n},rejected,...
+                     'fieldsweep requires column beta and gamma vectors without reshaping them');
+end
 
 % Compare identical initial grids without recursive refinement
 parameters.grid=grid_name;

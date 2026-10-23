@@ -14,9 +14,10 @@
 %                             Alternatively, a scalar structure with
 %                             alphas, betas, gammas (radians), and
 %                             weights: non-empty real finite numeric
-%                             vectors of equal length. Only betas and
-%                             gammas initialise the same adaptive
-%                             spherical-triangle integration.
+%                             vectors of equal length. The betas and
+%                             gammas must be column vectors; they
+%                             initialise the same adaptive spherical-
+%                             triangle integration.
 %
 %     parameters.spins     -  a one-element cell array speci-
 %                             fying the spin that is coupled
@@ -153,6 +154,9 @@ if ~isfield(parameters,'grid')
 end
 if isstruct(parameters.grid)
     grid_check(parameters.grid);
+    if (~iscolumn(parameters.grid.betas))||(~iscolumn(parameters.grid.gammas))
+        error('parameters.grid.betas and gammas must be column vectors.');
+    end
 elseif ~ischar(parameters.grid)
     error('parameters.grid must be a character string or a spherical grid structure.');
 end

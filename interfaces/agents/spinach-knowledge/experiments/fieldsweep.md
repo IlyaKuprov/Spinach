@@ -33,6 +33,6 @@ Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/fieldsweep.m
 
 ## Explicit spherical grids
 
-`parameters.grid` may be a grid name or a scalar structure with `alphas`, `betas`, `gammas`, and `weights`: non-empty, finite, real numeric vectors of equal length, with angles in radians. For a structure, `betas` and `gammas` replace only the disk-loaded arrays. Both input forms then use the same convex hull, eigenfield calculations, adaptive subdivision, and triangle integration. As in the named-grid path, this algorithm does not use the supplied alpha angles or node weights.
+`parameters.grid` may be a grid name or a scalar structure with `alphas`, `betas`, `gammas`, and `weights`: non-empty, finite, real numeric vectors of equal length, with angles in radians. The `betas` and `gammas` fields must be column vectors; `alphas` and `weights` may be row or column vectors. Row-oriented beta or gamma vectors, including mixed layouts, are rejected by `fieldsweep` input validation. For a structure, `betas` and `gammas` replace only the disk-loaded arrays. Both input forms then use the same convex hull, eigenfield calculations, adaptive subdivision, and triangle integration. As in the named-grid path, this algorithm does not use the supplied alpha angles or node weights.
 
 The regression compares an anisotropic named grid with its identical explicit structure, including modified unused alpha/weight fields. Spectra and field axes agree exactly. Profiling confirms recursive Voitlander subdivision beyond the initial convex-hull cells.

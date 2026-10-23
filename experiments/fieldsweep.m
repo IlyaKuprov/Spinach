@@ -14,11 +14,9 @@
 %                             Alternatively, a scalar structure with
 %                             alphas, betas, gammas (radians), and
 %                             weights: non-empty real finite numeric
-%                             vectors of equal length. This
-%                             uses direct weighted orientation sums,
-%                             not adaptive spherical triangles.
-%                             Weights are used as supplied; use a
-%                             sum of 4*pi for a full-sphere integral.
+%                             vectors of equal length. Only betas and
+%                             gammas initialise the same adaptive
+%                             spherical-triangle integration.
 %
 %     parameters.spins     -  a one-element cell array speci-
 %                             fying the spin that is coupled
@@ -80,33 +78,13 @@ Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2;
 % Get the microwave operator (state in Liouville space)
 Hmw=coil_state(spin_system,'Lx',parameters.spins{1});
 
-% Integrate an explicitly supplied weighted orientation grid
-if isstruct(parameters.grid)
-    sph_grid=parameters.grid;
-    parameters.b_axis=linspace(parameters.window(1),...
-                               parameters.window(2),...
-                               parameters.npoints);
-    spec=zeros(size(parameters.b_axis));
-    for n=1:numel(sph_grid.weights)
-        parameters.orientation=[sph_grid.alphas(n) ...
-                                sph_grid.betas(n) ...
-                                sph_grid.gammas(n)];
-        Hz=Iz+orientation(Qz,parameters.orientation);
-        Hc=Ic+orientation(Qc,parameters.orientation);
-        eigenset=eigenfields(spin_system,parameters,Hz,Hc,Hmw);
-        for k=1:numel(eigenset.tf)
-            weight=sph_grid.weights(n)*eigenset.tm(k)*...
-                   eigenset.tj(k)*eigenset.pd(k);
-            spec=spec+lorentzcon(repmat(eigenset.tf(k),1,3),...
-                                weight,parameters.fwhm,parameters.b_axis);
-        end
-    end
-    return
-end
-
 % Get the initial grid and compute its convex hull
-load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 
-      filesep parameters.grid],'betas','gammas');
+if isstruct(parameters.grid)
+    betas=parameters.grid.betas; gammas=parameters.grid.gammas;
+else
+    load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
+          filesep parameters.grid],'betas','gammas');
+end
 hull=get_hull(betas,gammas); grid_size=numel(betas);
 
 % Make the magnetic field axis

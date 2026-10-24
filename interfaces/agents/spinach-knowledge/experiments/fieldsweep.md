@@ -21,7 +21,7 @@ Computes a simulated field-swept powder EPR spectrum by locating spin transition
 
 ## Calculation and returned axes
 
-The function obtains coupling and Zeeman Hamiltonian terms, constructs the unweighted microwave Lx operator vector with `coil_state` for the selected spin, loads the named spherical grid, and forms its convex hull. It builds parameters.b_axis as linspace(window(1),window(2),npoints). At each grid vertex it calls eigenfields for the specified microwave frequency and orientation; it then integrates contributions triangle by triangle with the recursive Voitlander integrator and sums the triangle spectra. The source describes the line shape as Lorentzian.
+The function obtains coupling and Zeeman Hamiltonian terms, constructs the unweighted microwave Lx operator vector with `coil_state` for the selected spin, obtains the named or explicit spherical grid, and forms its convex hull. It builds parameters.b_axis as linspace(window(1),window(2),npoints). At each grid vertex it calls eigenfields for the specified microwave frequency and orientation; it then integrates contributions triangle by triangle with the recursive Voitlander integrator and sums the triangle spectra. The source describes the line shape as Lorentzian.
 
 The first output spec is the field-sampled spectrum, with its field coordinates in the returned parameters.b_axis (tesla). The second output is the updated parameter structure, including that axis; the source signature does not return b_axis as a separate first or second output.
 
@@ -30,3 +30,9 @@ The first output spec is the field-sampled spectrum, with its field coordinates 
 This is a computational powder integration over a finite spherical grid, with a potentially expensive eigenfields calculation. The source's example settings are starting points, not validated accuracy guarantees; increase grid density or adjust tolerances as required by convergence. Use rspt_order=Inf when exact diagonalisation is desired instead of the suggested perturbative order 2. The function must be called directly, without an experiment context.
 
 Source: https://github.com/IlyaKuprov/Spinach/blob/main/experiments/fieldsweep.m
+
+## Explicit spherical grids
+
+`parameters.grid` may be a grid name or a scalar structure with `alphas`, `betas`, `gammas`, and `weights`: non-empty, finite, real numeric vectors of equal length, with angles in radians. The `betas` and `gammas` fields must be column vectors; `alphas` and `weights` may be row or column vectors. Row-oriented beta or gamma vectors, including mixed layouts, are rejected by `fieldsweep` input validation. For a structure, `betas` and `gammas` replace only the disk-loaded arrays. Both input forms then use the same convex hull, eigenfield calculations, adaptive subdivision, and triangle integration. As in the named-grid path, this algorithm does not use the supplied alpha angles or node weights.
+
+The regression compares an anisotropic named grid with its identical explicit structure, including modified unused alpha/weight fields. Spectra and field axes agree exactly. Profiling confirms recursive Voitlander subdivision beyond the initial convex-hull cells.

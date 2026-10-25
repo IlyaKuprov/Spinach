@@ -57,7 +57,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 % Plot the time domain signal
 kfigure(); subplot(2,1,1);
 plot((0:(parameters.npoints-1))*parameters.timestep*1e6,real(fid));
-kxlabel('time, $\mu$s'); axis tight; kgrid;
+kxlabel('time, $\mu$s'); xlim tight; ylim padded; kgrid;
 
 % Frequency axis, interpulse delay increment is timestep/2
 freq_axis=fft_freq_axis(parameters.npoints,parameters.timestep/2,...
@@ -65,7 +65,7 @@ freq_axis=fft_freq_axis(parameters.npoints,parameters.timestep/2,...
 
 % Plot the spectrum
 subplot(2,1,2); plot(freq_axis,real(spectrum));
-kxlabel('frequency, MHz'); axis tight; kgrid;
+kxlabel('frequency, MHz'); xlim tight; ylim padded; kgrid;
 
 end
 

@@ -102,8 +102,7 @@ response.mag_x=mag_x;
 response.detected=trapz(radii_m,mag_x,1)/(radii_m(end)-radii_m(1));
 
 % Start the response figure
-fig=kfigure();
-tiledlayout(1,2);
+fig=kfigure(); tiledlayout(1,2);
 
 % Plot the spatial-offset surface
 nexttile;

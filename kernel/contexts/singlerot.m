@@ -52,6 +52,12 @@
 %                         grids should be used in Liouville
 %                         space and three-angle grids in Hil-
 %                         bert space.
+%                         Alternatively, a scalar structure with
+%                         alphas, betas, gammas (radians), and
+%                         weights: non-empty real finite numeric
+%                         vectors of equal length. Weights
+%                         are used without normalisation; row and
+%                         column vectors are both accepted.
 %
 %   parameters.needs    - a cell array of character strings spe-
 %                         cifying additional requirements that
@@ -152,8 +158,12 @@ if isa(K,'function_handle')
 end
 
 % Load the spherical integration grid
-sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
-               filesep parameters.grid],'alphas','betas','gammas','weights');
+if ischar(parameters.grid)
+    sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
+                   filesep parameters.grid],'alphas','betas','gammas','weights');
+else
+    sph_grid=parameters.grid;
+end
 alphas=sph_grid.alphas; betas=sph_grid.betas; 
 gammas=sph_grid.gammas; weights=sph_grid.weights;
 
@@ -196,7 +206,7 @@ switch spin_system.bas.formalism
         R=kron(speye([spc_dim spc_dim]),R); K=kron(speye([spc_dim spc_dim]),K);
 
         % Project the initial state into the FP space
-        if isfield(parameters,'rho0')&&strcmp(parameters.grid,'single_crystal')
+        if isfield(parameters,'rho0')&&ischar(parameters.grid)&&strcmp(parameters.grid,'single_crystal')
     
             % Single crystal simulations start at 12 o'clock
             space_part=zeros(parameters.spc_dim,1); space_part(1)=1;
@@ -465,8 +475,10 @@ if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');
 elseif isempty(parameters.grid)
     error('parameters.grid variable cannot be empty.');
+elseif isstruct(parameters.grid)
+    grid_check(parameters.grid);
 elseif ~ischar(parameters.grid)
-    error('parameters.grid variable must be a character string.');
+    error('parameters.grid variable must be a character string or a spherical grid structure.');
 end
 
 % Pulse sequence

@@ -65,6 +65,9 @@ function tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw)
 % Check consistency
 grumble(spin_system,parameters,Hz,Hc);
 
+% The supplied Zeeman pencil is normalised to one Tesla
+spin_system.inter.magnet=1;
+
 % Get frequency gap tolerance in rad/s
 frq_gap_tol=abs(spin('E')*parameters.pp_tol);
 

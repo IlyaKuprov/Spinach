@@ -31,7 +31,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
 - `parameters` — Parameter struct:
   - `parameters.rspt_order` — perturbation theory order used to account for the off-diagonal part of the Hamiltonian; `Inf` for exact diagonalisation.
   - `parameters.rho0` — optional; a matrix specifying a user-defined thermal equilibrium state, or a function handle `f(B,alp,bet,gam)` returning the thermal equilibrium at each orientation and magnetic field; if absent, the thermal equilibrium is computed at the current temperature, orientation, and magnetic field.
-- `Hz` — laboratory frame Hamiltonian containing only Zeeman terms at 1 Tesla.
+- `Hz` — laboratory-frame Hamiltonian containing only Zeeman terms at the reference field `spin_system.inter.magnet` (Tesla).
 - `Hc` — laboratory frame Hamiltonian containing all spin-spin couplings but no Zeeman terms.
 - `Hmw` — observable operator without the amplitude prefactor (2-norm should be around 1).
 - `B` — magnetic field, Tesla.
@@ -48,3 +48,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
 
 - Spinach Wiki: [rspt_eig.m](https://spindynamics.org/wiki/index.php?title=rspt_eig.m)
 - Source code: [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspt_eig.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspt_eig.m)
+
+## Reference field
+
+`Hz` is the Zeeman Hamiltonian evaluated at the finite, non-zero reference field `spin_system.inter.magnet` (Tesla). At target field `B`, the Hamiltonian is `(B/spin_system.inter.magnet)*Hz+Hc`; energy derivatives and thermal populations use the same normalisation. A reference field of one Tesla retains the original behaviour. `eigenfields` accepts a per-Tesla Zeeman pencil and sets its local reference field to one Tesla; `fieldsweep` retains its existing one-Tesla input requirement.

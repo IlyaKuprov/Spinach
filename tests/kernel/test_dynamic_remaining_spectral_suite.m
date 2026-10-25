@@ -229,6 +229,7 @@ spin_system.bas.basis={zeros(dim,1)};
 spin_system.bas.offsets=[0;dim]; spin_system.bas.nsubst=1;
 spin_system.bas.nstates=dim; spin_system.chem.parts={1};
 spin_system.comp.mults=2;
+spin_system.inter.magnet=1;
 spin_system.tols.inter_cutoff=1e-10;
 spin_system.tols.liouv_zero=1e-12;
 spin_system.tols.prop_chop=1e-12;

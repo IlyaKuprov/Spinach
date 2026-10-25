@@ -11,6 +11,13 @@
 %                             transition degeneracies, a good
 %                             start is
 %                             'rep_2ang_100pts_sph'
+%                             Alternatively, a scalar structure with
+%                             alphas, betas, gammas (radians), and
+%                             weights: non-empty real finite numeric
+%                             vectors of equal length. The betas and
+%                             gammas must be column vectors; they
+%                             initialise the same adaptive spherical-
+%                             triangle integration.
 %
 %     parameters.spins     -  a one-element cell array speci-
 %                             fying the spin that is coupled
@@ -73,8 +80,12 @@ Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2;
 Hmw=coil_state(spin_system,'Lx',parameters.spins{1});
 
 % Get the initial grid and compute its convex hull
-load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 
-      filesep parameters.grid],'betas','gammas');
+if isstruct(parameters.grid)
+    betas=parameters.grid.betas; gammas=parameters.grid.gammas;
+else
+    load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
+          filesep parameters.grid],'betas','gammas');
+end
 hull=get_hull(betas,gammas); grid_size=numel(betas);
 
 % Make the magnetic field axis
@@ -141,8 +152,13 @@ end
 if ~isfield(parameters,'grid')
     error('grid must be specified in parameters.grid variable.');
 end
-if ~ischar(parameters.grid)
-    error('parameters.grid must be character string.');
+if isstruct(parameters.grid)
+    grid_check(parameters.grid);
+    if (~iscolumn(parameters.grid.betas))||(~iscolumn(parameters.grid.gammas))
+        error('parameters.grid.betas and gammas must be column vectors.');
+    end
+elseif ~ischar(parameters.grid)
+    error('parameters.grid must be a character string or a spherical grid structure.');
 end
 if ~isfield(parameters,'spins')
     error('spin to couple to the microwave field must be specified in parameters.spins variable.');
@@ -215,4 +231,5 @@ end
 %
 % From the Prussian secret police
 % report on Karl Marx
+
 

@@ -172,7 +172,8 @@ if tphi_times(2)<5*tphi_times(1)
 end
 
 % Plot the noise spectrum and the coherence decays
-kfigure(); subplot(1,2,1); loglog(freqs,psd,'.',freqs,noise_amp^2./freqs,'r-');
+kfigure(); scale_figure([2.00 0.75]); subplot(1,2,1); 
+loglog(freqs,psd,'.',freqs,noise_amp^2./freqs,'r-');
 kgrid; kxlabel('frequency, Hz'); kylabel('$S(f)$, $\Phi_0^2$/Hz'); ktitle('flux noise spectrum');
 subplot(1,2,2); plot(1e6*time_axis,signals'); kgrid; ylim([0 1.05]);
 kxlabel('time, $\mu$s'); kylabel('cavity coherence'); ktitle('SAFE Ramsey decay');

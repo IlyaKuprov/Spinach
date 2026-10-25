@@ -79,9 +79,9 @@ if max(n_cav)<1.5
 end
 
 % Plot the mode occupation dynamics
-kfigure(); plot(time_axis,[n_cav n_mech],'LineWidth',1.5);
-axis tight; kgrid; kxlabel('time, dimensionless');
-kylabel('mode occupation numbers');
+kfigure(); plot(time_axis,[n_cav n_mech]);
+xlim tight; ylim padded; kxlabel('time, dimensionless');
+kylabel('mode occupation numbers'); kgrid;
 ktitle('optomechanical sideband transfer');
 klegend({'cavity','mechanical mode'},'Location','Best');
 

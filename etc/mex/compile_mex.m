@@ -45,15 +45,18 @@ if isMATLABReleaseOlderThan('R2026b')
     return;
 end
 
-% CUDA driver library search
-lib_args={};
+% CUDA driver library search on Windows; non-executable stack on
+% Linux, where glibc 2.41+ refuses to load executable-stack MEX
+link_args={};
 if ispc&&~isempty(getenv('CUDA_PATH'))
-    lib_args={['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')]};
+    link_args={['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')]};
+elseif isunix&&~ismac
+    link_args={'LDFLAGS=$LDFLAGS -Wl,-z,noexecstack'};
 end
 
 % CUDA sparse matrix product
 try
-    mexcuda('-R2018a','-O',lib_args{:},'-lcuda',...
+    mexcuda('-R2018a','-O',link_args{:},'-lcuda',...
             [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
             '-outdir',[P '/kernel/overloads']);
 catch exception

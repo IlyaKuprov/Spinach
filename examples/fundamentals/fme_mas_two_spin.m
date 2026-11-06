@@ -6,9 +6,8 @@
 % is third order in the paper. Both gauges include endpoint kicks
 % so their intra-rotor evolution is compared on the same footing.
 %
-% Local mas_rhs callback: t is seconds; u is a dim^2-by-1 column-stacked
-% propagator; H is a 1-by-5 signed-harmonic cell in rad/s; omega is
-% rad/s; dim is the Hilbert dimension; du is dim^2-by-1 in 1/s.
+% States, propagation, and observables use native Spinach interfaces.
+% The direct reference is checked by three-point step quadrature refinement.
 %
 % talos@spindynamics.org
 
@@ -16,7 +15,7 @@ function fme_mas_two_spin()
 
 % Homonuclear spins, chemical shifts in ppm, coordinates in Angstrom
 sys.isotopes={'1H','1H'}; sys.magnet=9.4;
-sys.parallel={'processes',1}; sys.scratch=tempdir;
+sys.parallel={'processes',1}; sys.scratch=tempdir; sys.output='hush';
 inter.zeeman.scalar={0,2};
 inter.coordinates={[0 0 0],[0 0 2.5]};
 bas.formalism='zeeman-hilb'; bas.approximation={'none'};
@@ -28,43 +27,64 @@ parameters.axis=[sqrt(2/3) 0 1/sqrt(3)];
 parameters.offset=0; parameters.spins={'1H'};
 parameters.max_rank=2; parameters.rframes={};
 parameters.orientation=[0.3 0.7 0.2]; parameters.masframe='magnet';
-[stack,phases]=rotor_stack(spin_system,parameters,'nmr');
+stack=rotor_stack(spin_system,parameters,'nmr');
+stack=cellfun(@full,stack,'UniformOutput',false);
+fourier_h=fftshift(fft(cat(3,stack{:}),[],3),3)/numel(stack);
 H=cell(1,5);
-for n=-2:2
-    H{n+3}=zeros(size(stack{1}));
-    for k=1:numel(phases)
-        H{n+3}=H{n+3}+full(stack{k})*exp(-1i*n*phases(k))/numel(phases);
-    end
+for n=1:5
+    H{n}=fourier_h(:,:,n);
 end
 
 % Use the native rotor sign and expand spin blocks, not the enlarged FP matrix
 rate=25000; omega=-2*pi*rate; period=1/rate;
 [Fa,Ka]=floquet_magnus(H,omega,2,0,'aht');
 [Fv,Kv]=floquet_magnus(H,omega,2,0,'van_vleck');
-rho0=full(operator(spin_system,'Lx','all')); coil=rho0;
-dim=size(rho0,1); normalisation=trace(coil*rho0);
+rho0=state(spin_system,'Lx','all');
+coil=coil_state(spin_system,'Lx','all'); normalisation=hdot(coil,rho0);
+times=linspace(0,20*period,801); timestep=times(2)-times(1);
+nsteps=numel(times)-1; input_harmonics=-2:2;
 
-% Direct time ordering of the rank-two Hamiltonian, independent of F and K
-times=linspace(0,20*period,801);
-options=odeset('RelTol',1e-10,'AbsTol',1e-12);
-[~,trajectory]=ode113(@(t,u)mas_rhs(t,u,H,omega,dim),...
-                      times,reshape(eye(dim),[],1),options);
+% Assemble the physical Fourier series for native product quadrature
+ham_data=cat(3,H{:});
+ham_at=@(t)sum(ham_data.*reshape(exp(1i*input_harmonics*omega*t),1,1,[]),3);
+reference=zeros(numel(times),2);
+for pass=1:2
 
-% Both intra-rotor points and rotor-synchronised points are retained
-signal=zeros(numel(times),3);
+    % Refine the native fourth-order time ordering
+    substeps=8*2^(pass-1); dt=timestep/substeps; rho=rho0;
+    for n=1:numel(times)
+        reference(n,pass)=real(hdot(coil,rho))/normalisation;
+        if n==numel(times), break; end
+        for k=1:substeps
+            t=times(n)+(k-1)*dt;
+            generators={ham_at(t),ham_at(t+dt/2),ham_at(t+dt)};
+            rho=step(spin_system,generators,rho,dt);
+        end
+    end
+
+end
+ref_error=max(abs(reference(:,1)-reference(:,2)));
+assert(ref_error<1e-8,'Native reference needs a finer time grid.');
+fprintf('Native reference refinement difference: %.3g.\n',ref_error);
+
+% Native effective trajectories retain the initial kicks in both gauges
 Ka=cellfun(@full,Ka,'UniformOutput',false); kicks_a=cat(3,Ka{:});
 Kv=cellfun(@full,Kv,'UniformOutput',false); kicks_v=cat(3,Kv{:});
 harmonics=-(numel(Kv)-1)/2:(numel(Kv)-1)/2;
-start_a=sum(kicks_a,3); start_v=sum(kicks_v,3);
+initial_a=step(spin_system,sum(kicks_a,3),rho0,-1);
+initial_v=step(spin_system,sum(kicks_v,3),rho0,-1);
+trajectory_a=evolution(spin_system,Fa,[],initial_a,timestep,nsteps,'trajectory');
+trajectory_v=evolution(spin_system,Fv,[],initial_v,timestep,nsteps,'trajectory');
+signal=zeros(numel(times),3); signal(:,1)=reference(:,2);
+
+% Native endpoint transformations and Frobenius observable readout
 for n=1:numel(times)
-    Uref=reshape(trajectory(n,:),dim,dim);
     phase=reshape(exp(1i*harmonics*omega*times(n)),1,1,[]);
     kick_a=sum(kicks_a.*phase,3); kick_v=sum(kicks_v.*phase,3);
-    Ua=expm(-1i*kick_a)*expm(-1i*Fa*times(n))*expm(1i*start_a);
-    Uv=expm(-1i*kick_v)*expm(-1i*Fv*times(n))*expm(1i*start_v);
-    signal(n,1)=real(trace(coil*Uref*rho0*Uref'))/normalisation;
-    signal(n,2)=real(trace(coil*Ua*rho0*Ua'))/normalisation;
-    signal(n,3)=real(trace(coil*Uv*rho0*Uv'))/normalisation;
+    rho_a=step(spin_system,kick_a,trajectory_a{n},1);
+    rho_v=step(spin_system,kick_v,trajectory_v{n},1);
+    signal(n,2)=real(hdot(coil,rho_a))/normalisation;
+    signal(n,3)=real(hdot(coil,rho_v))/normalisation;
 end
 fprintf('2-spin maximum signal error: AHT %.3g; complete FVV %.3g.\n',...
         max(abs(signal(:,2)-signal(:,1))),...
@@ -82,18 +102,6 @@ plot(times(1:40:end)/period,signal(1:40:end,2:3)-signal(1:40:end,1),'o');
 kgrid; kxlabel('Rotor periods'); kylabel('Signal error');
 legend('AHT','FVV','AHT at nT','FVV at nT','Location','northeast',...
        'Interpreter','none','FontSize',9);
-
-end
-
-% ODE callback: t [s], u [dim^2x1], H {1x5} [rad/s], omega [rad/s]; du [1/s]
-function du=mas_rhs(t,u,H,omega,dim)
-
-% Sum the rank-two Fourier Hamiltonian and apply Schrodinger evolution
-Ht=zeros(dim);
-for n=-2:2
-    Ht=Ht+H{n+3}*exp(1i*n*omega*t);
-end
-du=reshape(-1i*Ht*reshape(u,dim,dim),[],1);
 
 end
 

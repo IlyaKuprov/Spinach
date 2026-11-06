@@ -5,9 +5,8 @@
 % Angular frequencies are rad/s. The Fourier frequency is twice the
 % resonant carrier frequency; order 2 means third order in the paper.
 %
-% Local driven_rhs callback: t is seconds; u is a 4-by-1 column-stacked
-% propagator; H is a 1-by-3 signed-harmonic cell in rad/s; omega is
-% rad/s; du is its 4-by-1 time derivative in inverse seconds.
+% Time evolution uses evolution and step; hdot provides observables.
+% The direct reference is checked by native three-point quadrature refinement.
 %
 % talos@spindynamics.org
 
@@ -15,13 +14,12 @@ function fme_bloch_siegert()
 
 % One spin in Hilbert space
 sys.isotopes={'1H'}; sys.magnet=0;
-sys.parallel={'processes',1}; sys.scratch=tempdir;
+sys.parallel={'processes',1}; sys.scratch=tempdir; sys.output='hush';
 inter.zeeman.scalar={0};
 bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 Lx=full(operator(spin_system,'Lx',1));
-Lz=full(operator(spin_system,'Lz',1));
 Lp=full(operator(spin_system,'L+',1));
 
 % Resonant rotating frame, including the counterrotating field
@@ -31,25 +29,49 @@ H={omega1*Lp'/2,omega1*Lx,omega1*Lp/2};
 fprintf('Leading Bloch-Siegert coefficient: %.6g Hz along Lz.\n',...
         omega1^2/(4*omega0)/(2*pi));
 
-% Direct time ordering: integrate the two-by-two propagator
+% Native states and detection operators keep the observable convention explicit
+rho0=state(spin_system,'Lz',1); coil=coil_state(spin_system,'Lz',1);
+normalisation=hdot(coil,rho0);
 period=2*pi/omega; times=linspace(0,40*period,1601);
-options=odeset('RelTol',1e-10,'AbsTol',1e-12);
-[~,trajectory]=ode113(@(t,u)driven_rhs(t,u,H,omega),...
-                      times,reshape(eye(2),[],1),options);
+timestep=times(2)-times(1); nsteps=numel(times)-1; input_harmonics=-1:1;
 
-% Compare complete evolution with omission of both endpoint kicks
-rho0=Lz; signal=zeros(numel(times),3);
+% Assemble the physical Fourier series for native product quadrature
+ham_data=cat(3,H{:});
+ham_at=@(t)sum(ham_data.*reshape(exp(1i*input_harmonics*omega*t),1,1,[]),3);
+reference=zeros(numel(times),2);
+for pass=1:2
+
+    % Refine the native fourth-order time ordering
+    substeps=8*2^(pass-1); dt=timestep/substeps; rho=rho0;
+    for n=1:numel(times)
+        reference(n,pass)=real(hdot(coil,rho))/normalisation;
+        if n==numel(times), break; end
+        for k=1:substeps
+            t=times(n)+(k-1)*dt;
+            generators={ham_at(t),ham_at(t+dt/2),ham_at(t+dt)};
+            rho=step(spin_system,generators,rho,dt);
+        end
+    end
+
+end
+ref_error=max(abs(reference(:,1)-reference(:,2)));
+assert(ref_error<1e-8,'Native reference needs a finer time grid.');
+fprintf('Native reference refinement difference: %.3g.\n',ref_error);
+
+% Propagate the effective generator using the existing trajectory interface
 K=cellfun(@full,K,'UniformOutput',false); kicks=cat(3,K{:});
-harmonics=-(numel(K)-1)/2:(numel(K)-1)/2;
-K0=sum(kicks,3);
+harmonics=-(numel(K)-1)/2:(numel(K)-1)/2; K0=sum(kicks,3);
+initial=step(spin_system,K0,rho0,-1);
+trajectory=evolution(spin_system,F,[],initial,timestep,nsteps,'trajectory');
+signal=zeros(numel(times),3); signal(:,1)=reference(:,2);
+signal(:,3)=real(evolution(spin_system,F,coil,rho0,timestep,nsteps,...
+                          'observable'))/normalisation;
+
+% Apply endpoint kicks through step and read observables through hdot
 for n=1:numel(times)
     Kt=sum(kicks.*reshape(exp(1i*harmonics*omega*times(n)),1,1,[]),3);
-    Uref=reshape(trajectory(n,:),2,2);
-    Ubare=expm(-1i*F*times(n));
-    Ufull=expm(-1i*Kt)*Ubare*expm(1i*K0);
-    signal(n,1)=real(trace(Lz*Uref*rho0*Uref'))/trace(Lz^2);
-    signal(n,2)=real(trace(Lz*Ufull*rho0*Ufull'))/trace(Lz^2);
-    signal(n,3)=real(trace(Lz*Ubare*rho0*Ubare'))/trace(Lz^2);
+    rho=step(spin_system,Kt,trajectory{n},1);
+    signal(n,2)=real(hdot(coil,rho))/normalisation;
 end
 fprintf('Maximum signal error: complete %.3g; missing kicks %.3g.\n',...
         max(abs(signal(:,2)-signal(:,1))),...
@@ -67,15 +89,6 @@ plot(times(1:40:end)/period,signal(1:40:end,2)-signal(1:40:end,1),'ko');
 kgrid; kxlabel('Counterrotating-field periods'); kylabel('Signal error');
 legend('Full FVV','No kicks','Period boundaries','Location','southoutside',...
        'Orientation','horizontal');
-
-end
-
-% ODE callback: t [s], u [4x1], H {1x3} [rad/s], omega [rad/s]; du [4x1/s]
-function du=driven_rhs(t,u,H,omega)
-
-% Evaluate the Hamiltonian and Schrodinger equation
-Ht=H{1}*exp(-1i*omega*t)+H{2}+H{3}*exp(1i*omega*t);
-du=reshape(-1i*Ht*reshape(u,2,2),[],1);
 
 end
 

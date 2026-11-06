@@ -15,8 +15,8 @@ function fme_symbolic_check()
 % Dimensionless phase x=omega*t and exactly represented spin matrices
 syms x y a b c real
 p=sym(pi);
-Sx=sym([0 1;1 0])/2; Sy=sym([0 -1i;1i 0])/2;
-Sz=sym([1 0;0 -1])/2;
+S=pauli(2);
+Sx=sym(full(S.x)); Sy=sym(full(S.y)); Sz=sym(full(S.z));
 H0=a*Sz; Hp=(b*Sx-1i*c*Sy)/2; Hm=Hp';
 Hx=H0+Hp*exp(1i*x)+Hm*exp(-1i*x);
 Hy=subs(Hx,x,y);

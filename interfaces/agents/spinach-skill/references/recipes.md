@@ -747,9 +747,16 @@ kick; the latter fixes a kick that vanishes at the specified initial time.
 The order number counts inverse-frequency powers: the paper's fourth-order
 effective Hamiltonian is `order=3` here.
 
-Evaluate the returned kick Fourier series at both endpoints and propagate
-as `expm(-1i*K(t))*expm(-1i*F*(t-t0))*expm(1i*K(t0))`. The returned
-kick includes one extra inverse-frequency power for intra-cycle sampling.
+The mathematical factorisation is
+$U(t,t_0)=e^{-iK(t)}e^{-iF(t-t_0)}e^{iK(t_0)}$, but examples should delegate
+its execution to Spinach: prepare states with `state`, detectors with
+`coil_state`, apply dimensionless kicks with `step`, propagate the effective
+generator with `evolution`, and read observables with `hdot` or native
+observable evolution. Use `operator` or `pauli` rather than literal spin
+matrices. A time-dependent reference can use the existing three-point
+`step` quadrature; check its time-grid refinement rather than writing a
+separate Schrodinger ODE or matrix-exponential density propagation. The
+returned kick includes one extra inverse-frequency power for intra-cycle sampling.
 Do not judge accuracy from quasienergies alone: omitted kicks can preserve
 eigenvalues while corrupting complex signals. Check direct time propagation,
 Fourier resolution, expansion order, and the intended observation interval.

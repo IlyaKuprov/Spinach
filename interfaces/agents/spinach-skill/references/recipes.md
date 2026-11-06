@@ -736,6 +736,42 @@ files for basis-truncation behaviour. `extremes/high_symmetry_1.m` needs tens
 of cores and over a hundred gigabytes; `nmr_stochastic/snmr_strychnine.m`
 requires a GPU.
 
+## Periodic high-frequency effective generators
+
+For a finite Fourier series `H(t)=sum H_n*exp(1i*n*omega*t)`, use
+`[F,K]=floquet_magnus(H,omega,order,t0,theory)`. Supply an odd-length
+row cell array ordered from negative to positive harmonic, angular frequency
+in rad/s, effective inverse-frequency power zero to three, an initial time
+in seconds, and either `'van_vleck'` or `'aht'`. The former fixes a zero-mean
+kick; the latter fixes a kick that vanishes at the specified initial time.
+The order number counts inverse-frequency powers: the paper's fourth-order
+effective Hamiltonian is `order=3` here.
+
+The mathematical factorisation is
+$U(t,t_0)=e^{-iK(t)}e^{-iF(t-t_0)}e^{iK(t_0)}$, but examples should delegate
+its execution to Spinach: prepare states with `state`, detectors with
+`coil_state`, apply dimensionless kicks with `step`, propagate the effective
+generator with `evolution`, and read observables with `hdot` or native
+observable evolution. Use `operator` or `pauli` rather than literal spin
+matrices. A time-dependent reference can use the existing three-point
+`step` quadrature; check its time-grid refinement rather than writing a
+separate Schrodinger ODE or matrix-exponential density propagation. The
+returned kick includes one extra inverse-frequency power for intra-cycle sampling.
+Do not judge accuracy from quasienergies alone: omitted kicks can preserve
+eigenvalues while corrupting complex signals. Check direct time propagation,
+Fourier resolution, expansion order, and the intended observation interval.
+
+Keep native `floquet` and `singlerot` contexts for full-space MAS dynamics.
+`drifts(spin_system,@singlerot,parameters,assumptions)` extracts their
+Fokker-Planck generators for reference propagation, but those generators
+include the spatial derivative and are not the temporal Fourier input to
+`floquet_magnus`. Obtain physical phase Hamiltonians using `rotor_stack`
+and Fourier transform that stack instead. The integration test
+`test_fme_context` checks this input against native FP phase blocks and
+propagation; its signed phase convention uses
+`omega=-2*pi*parameters.rate`. This is not a harmonic extractor for
+nonuniform grids, diffusion, or arbitrary flow.
+
 ## Exporting NMR and EPR data
 
 For native Spinach outputs, prefer `jcamp_nmr(spin_system,parameters,signal,domains,info)`

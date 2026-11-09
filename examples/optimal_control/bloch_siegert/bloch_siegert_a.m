@@ -4,9 +4,10 @@
 % Bloch-Siegert shift starts to reduce the fidelity unless
 % it is correctly accounted for.
 %
-% Calculation time: minutes.
+% Calculation time: hours (spaghetti plots)
 %
 % aditya.dev@weizmann.ac.il
+% ilya.kuprov@weizmann.ac.il
 
 function bloch_siegert_a()
 
@@ -49,58 +50,74 @@ control.drifts={{D}};
 control.operators={Lx,Ly};
 control.rho_init={rho_init};
 control.rho_targ={rho_targ};
-control.method='lbfgs';
+control.method='rbfgs';
 control.max_iter=500;
 control.tol_x=1e-4;
 control.plotting={};
 
 % Power levels to sweep (rad/s)
 zeeman_frq=abs(spin('1H')*sys.magnet);
-pwr_list=zeeman_frq*linspace(1e-3,1.0,20);
-
-% Preallocate results
-fid_a=zeros(size(pwr_list));
-fid_b=zeros(size(pwr_list));
-
-% Common initial guess
-guess=randn(2,50)/10;
-
-% Loop over control power 
-for n=1:numel(pwr_list)
-
-    % Set current power
-    control.pwr_levels=pwr_list(n);
-
-    % Set pulse slice duration
-    dt=(pi/100)/control.pwr_levels;
-    control.pulse_dt=dt*ones(1,50);
-
-    % BSS settings: off, on
-    control.bsiegert=false();
-    setting_a=optimcon(spin_system,control);
-    control.bsiegert=true();  
-    setting_b=optimcon(spin_system,control);
-
-    % Optimisation with and without BSS 
-    pulse_a=fmaxnewton(setting_a,@grape_xy,guess);
-    pulse_b=fmaxnewton(setting_b,@grape_xy,guess);
-
-    % Evaluation for a system with BSS
-    [~,fid_a(n)]=ensemble(pulse_a,setting_b);
-    [~,fid_b(n)]=ensemble(pulse_b,setting_b);
-   
-end
+pwr_list=zeeman_frq*linspace(1e-3,1.0,50);
 
 % Compute relative control powers
 relative_power=pwr_list./zeeman_frq;
 
-% Plotting
-kfigure(); scale_figure([1.0 0.75]); 
-plot(relative_power,1-fid_a); hold on; kgrid;
-plot(relative_power,1-fid_b); set(gca,'Yscale','log');
+% Get a figure going
+kfigure(); hold on;
+scale_figure([1.0 0.75]);
+
+% Spaghetti plot loop
+for k=1:20
+
+    % Preallocate results
+    fid_a=zeros(size(pwr_list));
+    fid_b=zeros(size(pwr_list));
+
+    % Common initial guess
+    guess=randn(2,50)/10;
+
+    % Loop over control power
+    for n=1:numel(pwr_list)
+
+        % Set current power
+        control.pwr_levels=pwr_list(n);
+
+        % Set pulse slice duration
+        dt=(pi/100)/control.pwr_levels;
+        control.pulse_dt=dt*ones(1,50);
+
+        % BSS settings: off, on
+        control.bsiegert=false();
+        setting_a=optimcon(spin_system,control);
+        control.bsiegert=true();
+        setting_b=optimcon(spin_system,control);
+
+        % Optimisation with and without BSS
+        pulse_a=fmaxnewton(setting_a,@grape_xy,guess);
+        pulse_b=fmaxnewton(setting_b,@grape_xy,guess);
+
+        % Evaluation for a system with BSS
+        [~,fid_a(n)]=ensemble(pulse_a,setting_b);
+        [~,fid_b(n)]=ensemble(pulse_b,setting_b);
+
+    end
+
+    % Do the plotting
+    plot(relative_power,1-fid_a,'Color',[0.000 0.447 0.741]);
+    plot(relative_power,1-fid_b,'Color',[0.850 0.325 0.098]);
+    drawnow;
+
+end
+
+% Embellishments
+set(gca,'Yscale','log'); xlim tight; ylim padded; 
 kxlabel('relative control power $|\omega_1 / \omega_0|$');
-kylabel('terminal infidelity'); ylim padded;
 klegend({'GRAPE','GRAPE + BSS'},'Location','East');
+kylabel('infidelity'); kbox; kletter('A'); kgrid;
+
+% Save the figure
+savefig(gcf,'bloch_siegert_a.fig');
+pdf_and_png('bloch_siegert_a');
 
 end
 

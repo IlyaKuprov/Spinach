@@ -30,18 +30,6 @@
 %                  ent is returned as an array separating penalty Hes-
 %                  sians from the fidelity Hessian.
 %
-% Note: the ensemble cases enumerated in spin_system.control.catalog
-%       are processed in the contiguous per-worker blocks assigned by
-%       optimcon.m in spin_system.control.worker_cases. Each worker
-%       holds the common frozen problem and the drift generators of its
-%       own block, published by optimcon.m as pool constants; the per-
-%       case physics runs in ens_block.m on each worker, so only the
-%       waveform and the live control fields travel at each objective
-%       evaluation, and the gradient, the Hessian, and averaged trajec-
-%       tories are summed on the workers. This function must be called
-%       from the client, on the pool that was open when optimcon.m ran:
-%       a worker holds only its own block.
-%
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk

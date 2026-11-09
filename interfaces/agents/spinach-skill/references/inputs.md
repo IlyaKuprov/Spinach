@@ -271,7 +271,8 @@ Legacy rate-matrix and radical-pair fields are rejected. The original point-to-p
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
-across parts.
+across parts. Bosonic mode inputs are merged as well, and inputs that
+cannot be merged unambiguously raise an informative error.
 
 ## Partial ordering, temperature and relaxation inputs
 

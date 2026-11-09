@@ -1,6 +1,6 @@
 # kernel/utilities/kill_spin.m
 
-`spin_system=kill_spin(spin_system,hit_list)` removes spins or bosonic modes from the unified particle list. `hit_list` is a vector of valid positive particle indices or a logical mask with one element per particle. The returned system retains the surviving physical model, reindexes particle-dependent interactions and relaxation data, and rebuilds an existing basis rather than attempting to patch compiled descriptors.
+`spin_system=kill_spin(spin_system,hit_list)` removes spins or bosonic modes from the unified particle list. `hit_list` is a vector of distinct valid positive particle indices (repeated indices are rejected) or a logical mask with one element per particle. The returned system retains the surviving physical model, reindexes particle-dependent interactions and relaxation data, and rebuilds an existing basis rather than attempting to patch compiled descriptors.
 
 ## Physical model and chemistry
 

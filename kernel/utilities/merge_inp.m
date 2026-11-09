@@ -23,12 +23,19 @@
 %       fields (magnet, temperature, relaxation settings, etc.)
 %       must be identical in all subsystems that supply them, and
 %       any difference is treated as an error. Nested groups
-%       (zeeman, coupling, giant, suscept, chem) and every field
+%       (zeeman, coupling, giant, suscept, chem) and their fields
 %       must be present in all subsystems or in none. An error is
-%       thrown for unhandled subfields. Coordinates and suscepti-
-%       bility centres from all subsystems are assumed to refer
+%       thrown for unhandled subfields. Within an explicit single-
+%       substance partition, an absent concentration defaults to
+%       one, as in create(). Non-empty chemical specifications use
+%       the default local partition when it is absent; empty ones
+%       do not introduce a chemical split.
+%       Bosonic mode arrays are concatenated or block-diagonally
+%       combined; absent optional entries retain create() defaults.
+%       Coordinates and susceptibility centres are assumed to refer
 %       to one common frame of reference; spin index lists are
-%       returned as row vectors. Reaction records are concatenated
+%       returned as row vectors, as are concentrations and per-
+%       substance cell arrays. Reaction records are concatenated
 %       with substance, matching, and named-selector spin offsets;
 %       user selector matrices remain substance-local.
 %
@@ -44,6 +51,19 @@ grumble(sys_parts,inter_parts);
 
 % Count the spins in each subsystem
 part_sizes=cellfun(@(x)numel(x.isotopes),sys_parts);
+
+% Preserve create() defaults within non-empty chemical specifications
+if group_check(inter_parts,'chem')&&...
+   any(cellfun(@(x)~isempty(fieldnames(x.chem)),inter_parts))
+    for n=1:numel(inter_parts)
+        if ~isfield(inter_parts{n}.chem,'parts')
+            inter_parts{n}.chem.parts={1:part_sizes(n)};
+        end
+        if ~isfield(inter_parts{n}.chem,'concs')
+            inter_parts{n}.chem.concs=1;
+        end
+    end
+end
 
 % Create structure stubs
 sys.stub=1; inter.stub=1;
@@ -103,6 +123,73 @@ end
 
 % Fields containing cell arrays of spin index vectors
 [inter,inter_parts]=merge_like_parts(inter,inter_parts,'ignore',part_sizes);
+
+% Bosonic mode arrays share the unified particle indexing
+if any(cellfun(@(x)isfield(x,'modes'),inter_parts))
+    modes_parts=cell(size(inter_parts));
+    for n=1:numel(inter_parts)
+        if isfield(inter_parts{n},'modes')
+            modes_parts{n}=inter_parts{n}.modes;
+            inter_parts{n}=rmfield(inter_parts{n},'modes');
+        else
+            modes_parts{n}=struct();
+        end
+    end
+    mode_vectors={'frqs','carriers','anharms','lifetimes',...
+                  'linewidths','qfactors','t2_times'};
+    mode_pairs={'exchange','kerr','longitudinal','dispersive',...
+                'coupling_mod','zeeman_mod'};
+    modes.stub=1;
+    for field=[mode_vectors mode_pairs]
+        if any(cellfun(@(x)isfield(x,field{1}),modes_parts))
+            for n=1:numel(modes_parts)
+                if ~isfield(modes_parts{n},field{1})
+                    nparticles=part_sizes(n);
+                    if ismember(field,mode_vectors)
+                        modes_parts{n}.(field{1})=cell(1,nparticles);
+                    else
+                        modes_parts{n}.(field{1})=cell(nparticles);
+                    end
+                end
+            end
+            if ismember(field,mode_vectors)
+                [modes,modes_parts]=merge_like_isotopes(modes,modes_parts,field{1});
+            else
+                [modes,modes_parts]=merge_like_couplings(modes,modes_parts,field{1});
+            end
+        end
+    end
+    group_gate(modes_parts,'modes');
+
+    % Embed the spin indices inside mode-derivative tensor blocks
+    for field={'coupling_mod','zeeman_mod'}
+        if isfield(modes,field{1})
+            offset=0;
+            for n=1:numel(part_sizes)
+                indices=offset+(1:part_sizes(n));
+                for row=indices
+                    for col=indices
+                        orders=modes.(field{1}){row,col};
+                        for k=1:numel(orders)
+                            if ~isempty(orders{k})
+                                if strcmp(field{1},'zeeman_mod')
+                                    block=cell(1,sum(part_sizes));
+                                    block(indices)=orders{k};
+                                else
+                                    block=cell(sum(part_sizes));
+                                    block(indices,indices)=orders{k};
+                                end
+                                modes.(field{1}){row,col}{k}=block;
+                            end
+                        end
+                    end
+                end
+                offset=offset+part_sizes(n);
+            end
+        end
+    end
+    inter.modes=rmfield(modes,'stub');
+end
 
 % Zeeman interaction specifications
 if group_check(inter_parts,'zeeman')
@@ -188,12 +275,14 @@ end
 % Catch unhandled subfields
 for n=1:numel(sys_parts)
     if ~isempty(fieldnames(sys_parts{n}))
-        error('unhandled subfield in sys.');
+        fields=fieldnames(sys_parts{n});
+        error(['cannot merge sys.' fields{1} ': no merging rule is defined.']);
     end
 end
 for n=1:numel(inter_parts)
     if ~isempty(fieldnames(inter_parts{n}))
-        error('unhandled subfield in inter.');
+        fields=fieldnames(inter_parts{n});
+        error(['cannot merge inter.' fields{1} ': no merging rule is defined.']);
     end
 end
 
@@ -215,7 +304,9 @@ end
 function group_gate(group_parts,group_name)
 for n=1:numel(group_parts)
     if ~isempty(fieldnames(group_parts{n}))
-        error(['unhandled subfield in inter.' group_name '.']);
+        fields=fieldnames(group_parts{n});
+        error(['cannot merge inter.' group_name '.' fields{1} ...
+               ': no merging rule is defined.']);
     end
 end
 end
@@ -253,17 +344,17 @@ else
 end
 end
 
-% Merge subsystem fields assuming optional row cell arrays
+% Merge subsystem fields holding optional row or column vectors
 function [spec,spec_parts]=merge_like_isotopes(spec,spec_parts,field_name)
 if isfield(spec_parts{1},field_name)
-    spec.(field_name)=spec_parts{1}.(field_name);
+    spec.(field_name)=reshape(spec_parts{1}.(field_name),1,[]);
     spec_parts{1}=rmfield(spec_parts{1},field_name);
     for n=2:numel(spec_parts)
         if isfield(spec_parts{n},field_name)
             if ~isfield(spec,field_name)
                 error([field_name ' is not present in all subsystems.']);
             else
-                spec.(field_name)=[spec.(field_name) spec_parts{n}.(field_name)];
+                spec.(field_name)=[spec.(field_name) reshape(spec_parts{n}.(field_name),1,[])];
                 spec_parts{n}=rmfield(spec_parts{n},field_name);
             end
         else
@@ -458,6 +549,10 @@ if any(cellfun(@(x)(~isfield(x,'isotopes')),sys_parts))
     error('every sys structure must contain an isotopes subfield.');
 end
 for n=1:numel(inter_parts)
+    if isfield(inter_parts{n},'chem')&&isfield(inter_parts{n}.chem,'parts')&&...
+       ~isscalar(inter_parts{n}.chem.parts)&&~isfield(inter_parts{n}.chem,'concs')
+        error('inter.chem.concs is required for a part with multiple substances.');
+    end
     if isfield(inter_parts{n},'flux_rate')
         rates=inter_parts{n}.flux_rate;
         nspins=numel(sys_parts{n}.isotopes);

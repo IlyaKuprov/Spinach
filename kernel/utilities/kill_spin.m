@@ -310,6 +310,9 @@ else
     if (~isnumeric(hit_list))||any(hit_list<1)||any(mod(hit_list,1)~=0)
         error('hit_list must be a logical mask or an array of positive integers.');
     end
+    if numel(unique(hit_list))~=numel(hit_list)
+        error('hit_list must not contain repeated particle indices.');
+    end
     if any(hit_list>spin_system.comp.nspins)
         error('at least one number in hit_list exceeds the number of spins.');
     end

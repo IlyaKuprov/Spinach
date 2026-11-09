@@ -56,7 +56,7 @@ spectrum=zeros(parameters.zerofill(2),...
                parameters.zerofill(1),'like',1i);
 
 % Loop over isotopomers
-parfor n=1:numel(subsystems)
+for n=1:numel(subsystems)
     
     % Build the basis
     subsystem=basis(subsystems{n},bas);

@@ -13,10 +13,18 @@
 
 function rd_inhomogeneous()
 
-% Spin system and basis set
-sys.magnet=14.1; sys.isotopes={'1H'};
+% Magnet field
+sys.magnet=14.1;
+
+% Isotopes
+sys.isotopes={'1H'};
+
+% Chemical shifts
 inter.zeeman.scalar={0};
-bas.formalism='sphten-liouv'; bas.approximation={'none'};
+
+% Basis set
+bas.formalism='sphten-liouv';
+bas.approximation={'none'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -80,8 +88,4 @@ xlabel('time, seconds'); ylabel('m_{perp} / equilibrium');
 legend('0 Hz','10 Hz','30 Hz','80 Hz','Location','best'); kgrid;
 
 end
-
-% The purpose of computing is insight, not numbers.
-% Richard Hamming
-
 

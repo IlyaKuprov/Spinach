@@ -13,10 +13,20 @@
 
 function rd_coupled_spectrum()
 
-% Spin system and basis set
-sys.magnet=14.1; sys.isotopes={'1H','1H'};
+% Magnet field
+sys.magnet=14.1;
+
+% Isotopes
+sys.isotopes={'1H','1H'};
+
+% Chemical shifts
 inter.zeeman.scalar={0 0};
-bas.formalism='sphten-liouv'; bas.approximation={'none'};
+
+% Basis set
+bas.formalism='sphten-liouv';
+bas.approximation={'none'};
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
@@ -69,8 +79,4 @@ xlabel('time, seconds'); ylabel('magnetisation / equilibrium');
 legend('m_x','m_y','m_z','m_z, no feedback','Location','best'); kgrid;
 
 end
-
-% The purpose of computing is insight, not numbers.
-% Richard Hamming
-
 

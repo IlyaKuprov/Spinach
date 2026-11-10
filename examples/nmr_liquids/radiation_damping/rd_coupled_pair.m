@@ -16,20 +16,29 @@ function rd_coupled_pair()
 % Interaction and acquisition parameters
 J=10; dnu=12; rate=40; theta=170*pi/180;
 dt=5e-4; nsteps=600; time=(0:nsteps)*dt;
-bas.formalism='sphten-liouv'; bas.approximation={'none'};
 magn=zeros(3,nsteps+1,2,2);
+
+% Basis set
+bas.formalism='sphten-liouv';
+bas.approximation={'none'};
 
 % Compare a weak AX doublet and a strongly coupled AB pair
 for k=1:2
 
-    % Spin system and basis set
+    % Magnet field
     sys.magnet=14.1;
+
+    % Isotopes
     if k==1
         sys.isotopes={'1H','13C'};
     else
         sys.isotopes={'1H','1H'};
     end
+
+    % Chemical shifts
     inter.zeeman.scalar={0 0};
+
+    % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
@@ -66,7 +75,9 @@ for k=1:2
         offsets=[-(D+J) -(D-J) D-J D+J]/2;
         weights=[1-J/D 1+J/D 1+J/D 1-J/D]/4;
     end
-    sys.isotopes={'1H'}; inter.zeeman.scalar={0};
+    % Single-spin system for the classical lines
+    sys.isotopes={'1H'};
+    inter.zeeman.scalar={0};
     line_system=create(sys,inter);
     line_system=basis(line_system,bas);
     Lx=operator(line_system,'Lx','1H');
@@ -108,8 +119,4 @@ for k=1:2
 end
 
 end
-
-% The purpose of computing is insight, not numbers.
-% Richard Hamming
-
 

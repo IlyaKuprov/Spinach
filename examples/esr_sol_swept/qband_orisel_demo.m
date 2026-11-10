@@ -33,7 +33,7 @@ bas.formalism='zeeman-hilb';
 bas.approximation={'none'};
 
 % Microwave excitation and powder quadrature
-parameters.grid='rep_2ang_800pts_sph';
+parameters.grid='leb_2ang_rank_95';
 parameters.selection_spin='E';
 parameters.exclude_from_EPR=[];
 parameters.selection_transition='all';

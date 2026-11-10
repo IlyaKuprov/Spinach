@@ -28,16 +28,46 @@ p.exclude_from_EPR=[]; p.magnetic=1.21; p.mw_frq=34e9;
 p.bandwidth_EPR=100e6; p.rspt_order=inf; p.intensity_cutoff=0;
 [g,t]=epr_orisel_transitions(s,p);
 
+% Check an absolute S=1/2 intensity using a pure ground state
+h=hamiltonian(assume(s,'labframe'));
+[v,e]=eig(full(h),'vector'); [~,ground]=min(e);
+pure=p; pure.rho0=v(:,ground)*v(:,ground)';
+[~,pure_trans]=epr_orisel_transitions(s,pure);
+strengths=cellfun(@(x)x(1),pure_trans.intensities);
+fprintf('ABSOLUTE INTENSITY actual %.12g, expected 0.25\n',strengths(1));
+assert(max(abs(strengths-0.25))<1e-12);
+
+% Check unequal orientation-dependent strengths by direct diagonalisation
+inter_a=inter; inter_a.zeeman.eigs={[2.15 1.91 2.03]};
+inter_a.zeeman.euler={[0.2 0.4 0.7]};
+sa=create(sys,inter_a); sa=basis(sa,bas);
+[ga,ta]=epr_orisel_transitions(sa,pure);
+[iz,qz]=hamiltonian(assume(sa,'labframe','zeeman'));
+sx=operator(sa,'Lx',1); reference=zeros(size(ga.weights));
+for n=1:numel(ga.weights)
+    hz=iz+orientation(qz,[ga.alphas(n) ga.betas(n) ga.gammas(n)]);
+    [va,ea]=eig(full(hz*p.magnetic/sys.magnet),'vector');
+    [~,order]=sort(ea); va=va(:,order);
+    populations=real(diag(va'*pure.rho0*va));
+    reference(n)=abs(va(:,1)'*sx*va(:,2))^2*(populations(1)-populations(2));
+    assert(abs(ta.intensities{n}(1)-reference(n))<1e-12);
+end
+assert(max(reference)>min(reference));
+fprintf('ANISOTROPIC INTENSITY range %.12g to %.12g\n',...
+        min(reference),max(reference));
+
 % Verify the Zeeman frequency and its field derivative independently
 expected=abs(spin('E'))*(2/s.tols.freeg)*p.magnetic/(2*pi);
 assert(max(abs(cellfun(@(x)x(1),t.frequencies)-expected))<1e-4);
 assert(max(abs(cellfun(@(x)x(1),t.dfdb_hz_per_t)-expected/p.magnetic))<1e-4);
 fprintf('PASS reference-field scaling: %.9f GHz at %.4f T\n',expected/1e9,p.magnetic);
 
-% Verify unit-peak weighting and the two half-height points through production
+% Verify area normalisation and half-height points through production
 p.mw_frq=t.frequencies{1}(1);
 [~,peak]=epr_orisel_transitions(s,p);
-assert(max(abs(peak.selection_weights-cellfun(@(x)x(1),peak.intensities)))<1e-14);
+peak_height=sqrt(4*log(2)/pi)/p.bandwidth_EPR;
+expected=peak_height*cellfun(@(x)x(1),peak.intensities);
+assert(max(abs(peak.selection_weights./expected-1))<1e-12);
 for sign=[-1 1]
     half=p; half.mw_frq=p.mw_frq+sign*p.bandwidth_EPR/2;
     [~,t]=epr_orisel_transitions(s,half);
@@ -113,6 +143,8 @@ assert_fails(@()epr_orisel_transitions(sn,ex));
 ex=p; ex.rspt_order=1.5;
 assert_fails(@()epr_orisel_transitions(sn,ex));
 ex=p; ex.selection_spin='14N';
+assert_fails(@()epr_orisel_transitions(sn,ex));
+ex=p; ex.selection_spin=2;
 assert_fails(@()epr_orisel_transitions(sn,ex));
 
 % Check nonfinite scalar controls and the preserved selector entry point

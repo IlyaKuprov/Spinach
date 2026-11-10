@@ -13,7 +13,7 @@
 %   magnetic           - positive static field in tesla
 %   mw_frq             - microwave frequency in Hz
 %   bandwidth_EPR      - Gaussian FWHM in Hz of the INTENSITY response;
-%                        the response has unit peak, not unit area, and
+%                        the response has unit area (units Hz^-1) and
 %                        is applied once to transition intensities
 %   rspt_order         - 1, 2, 3, 4, or Inf (default: exact diagonalisation)
 %   intensity_cutoff   - discard intensities at or below this value
@@ -116,7 +116,7 @@ parfor(n=1:n_orients,nworkers)
     sz_diag=real(diag(v'*sz*v));
     for k=1:ne-1
         for m=k+1:ne
-            iij=abs(t(k,m))^2*(lp(k)-lp(m));
+            iij=t(k,m)*(lp(k)-lp(m));
             if iij>parameters.intensity_cutoff
                 idx=round(min(sz_diag([k m]))+n_rows/2+1);
                 if (idx>=1)&&(idx<=n_rows)
@@ -130,11 +130,10 @@ parfor(n=1:n_orients,nworkers)
         end
     end
 
-    % Apply a unit-peak Gaussian intensity response
+    % Apply an area-normalised Gaussian intensity profile
     freq_hz=freq_hz(1:ntran); intensity=intensity(1:ntran);
     row_idx=row_idx(1:ntran); dfdb_hz=dfdb_hz(1:ntran);
-    response=gaussfun(freq_hz-parameters.mw_frq,parameters.bandwidth_EPR)/...
-             gaussfun(0,parameters.bandwidth_EPR);
+    response=gaussfun(freq_hz-parameters.mw_frq,parameters.bandwidth_EPR);
     for k=1:ntran
         selection_row(row_idx(k))=selection_row(row_idx(k))+intensity(k)*response(k);
     end

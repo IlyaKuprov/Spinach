@@ -230,8 +230,8 @@ nitrogen-14 overtone detection is `nmr_overtone/mas_glycine_1.m`.
 For fixed-field orientation selection, use `epr_orisel_grid` and inspect
 `examples/esr_sol_swept/qband_orisel_demo.m`. Its microwave frequency is
 34 GHz and its three fields are 1.2097, 1.2112, and 1.2162 T.
-`bandwidth_EPR` is the Gaussian intensity-response FWHM in Hz, with unit
-peak; it is not a pulse-amplitude bandwidth. `epr_orisel_transitions`
+`bandwidth_EPR` is the Gaussian intensity-profile FWHM in Hz, with unit
+area (profile units Hz^-1); it is not a pulse-amplitude bandwidth. `epr_orisel_transitions`
 returns unnormalised transition-weighted responses; `epr_orisel_grid`
 applies quadrature weights once and returns a unit-sum selected grid
 for `powder`. `plot_orisel` displays distinct full-sphere directions

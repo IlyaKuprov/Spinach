@@ -2,14 +2,13 @@
 % tanh recovery and sech transverse envelope without relaxation.
 % https://doi.org/10.1103/PhysRev.95.8
 %
-% Ported from Spynach (A. Jerschow, MIT licence).
-% https://github.com/ajerschow/spynach
+% Ported from Spynach, copyright (c) 2026 Alexej Jerschow, MIT licence:
+% https://github.com/ajerschow/spynach/blob/main/LICENSE
 %
 % Calculation time: seconds
 %
 % Alexej Jerschow (original demonstrations)
-% Talos (MATLAB port)
-% Copyright (c) 2026 Alexej Jerschow; MIT licence, see LICENSE.md.
+% talos@spindynamics.org
 
 function rd_closed_form()
 

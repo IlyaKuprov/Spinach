@@ -2,14 +2,14 @@
 % traces, compared with the same spin system without feedback.
 % Exponential apodisation is applied only to the plotted spectra.
 %
-% Ported from Spynach (A. Jerschow, MIT licence), try.html#ex-rd.
-% https://github.com/ajerschow/spynach
+% Ported from the Spynach browser example try.html#ex-rd, copyright
+% (c) 2026 Alexej Jerschow, MIT licence:
+% https://github.com/ajerschow/spynach/blob/main/LICENSE
 %
 % Calculation time: seconds
 %
 % Alexej Jerschow (original demonstration)
-% Talos (MATLAB port)
-% Copyright (c) 2026 Alexej Jerschow; MIT licence, see LICENSE.md.
+% talos@spindynamics.org
 
 function rd_coupled_spectrum()
 

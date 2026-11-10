@@ -4,7 +4,7 @@
 % Bloch-Siegert shift starts to reduce the fidelity unless
 % it is correctly accounted for.
 %
-% Calculation time: hours (spaghetti plots)
+% Calculation time: many hours (spaghetti plots)
 %
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il

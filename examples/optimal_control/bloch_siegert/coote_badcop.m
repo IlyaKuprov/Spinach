@@ -12,6 +12,7 @@
 % Calculation time: minutes
 %
 % aditya.dev@weizmann.ac.il
+% ilya.kuprov@weizmann.ac.il
 
 function coote_badcop()
 
@@ -117,10 +118,12 @@ for k=1:numel(variants)
     control.pulse_dt=(pulse_dur/200)*ones(1,200);
     control.offsets={all_hz};
     control.off_ops={Lz};
-    control.method='lbfgs';
-    control.max_iter=200;
+    control.method='rbfgs';
+    control.max_iter=500;
+    control.penalties={'NS'};
+    control.p_weights=0.01;
     control.ens_corrs={'rho_ens'};
-    control.plotting={};
+    control.plotting={'xy_controls'};
 
     % Enable Bloch-Siegert corrections
     control.bsiegert=true();

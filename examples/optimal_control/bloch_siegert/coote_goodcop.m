@@ -85,9 +85,12 @@ control.pwr_levels=2*pi*max_rf_hz;
 control.pulse_dt=(pulse_dur/75)*ones(1,75);
 control.offsets={all_hz};
 control.off_ops={Lz};
-control.method='lbfgs';
-control.max_iter=200;
+control.method='rbfgs';
+control.max_iter=500;
+control.penalties={'NS'};
+control.p_weights=0.01;
 control.ens_corrs={'rho_ens'};
+control.plotting={'xy_controls'};
 
 % Enable BSS corrections
 control.bsiegert=true();

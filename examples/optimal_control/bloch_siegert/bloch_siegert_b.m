@@ -4,7 +4,7 @@
 % Bloch-Siegert shift starts to reduce the fidelity unless
 % it is correctly accounted for.
 %
-% Calculation time: hours (spaghetti plots)
+% Calculation time: many hours (spaghetti plots)
 %
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
@@ -66,7 +66,7 @@ relative_power=pwr_list./zeeman_frq;
 
 % Get a figure going
 kfigure(); hold on;
-scale_figure([1.0 0.75]);
+scale_figure([1.0 0.65]);
 
 % Spaghetti plot loop
 for k=1:20

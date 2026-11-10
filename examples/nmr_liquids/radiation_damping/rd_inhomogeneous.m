@@ -1,6 +1,7 @@
 % Radiation damping of a Gaussian inhomogeneous proton line.
 % All isochromats share one coil; their weighted transverse
 % magnetisation generates the feedback field on every spin.
+% The offset grid resolves the acquisition and Gaussian tails.
 %
 % Ported from Spynach, copyright (c) 2026 Alexej Jerschow, MIT licence:
 % https://github.com/ajerschow/spynach/blob/main/LICENSE
@@ -30,10 +31,21 @@ coil=[state(spin_system,'Lx','1H') ...
       state(spin_system,'Lz','1H')];
 rho_eq=coil(:,3); mz_eq=real(rho_eq'*rho_eq);
 
-% Offset grid, linewidths, and acquisition parameters
-offsets=linspace(-120,120,81); widths=[0 10 30 80];
+% Linewidths and acquisition parameters
+widths=[0 10 30 80];
 rate=40; theta=170*pi/180; dt=5e-4; nsteps=600;
-time=(0:nsteps)*dt; niso=numel(offsets);
+time=(0:nsteps)*dt;
+
+% Retain the Gaussian down to 1e-6 of its peak
+tail_tol=1e-6;
+half_span=max(widths)*sqrt(-log(tail_tol)/(4*log(2)));
+
+% Place recurrence at least four acquisition durations away
+nhalf=ceil(4*half_span*time(end));
+
+% Include the zero-width line exactly on a symmetric odd grid
+offsets=linspace(-half_span,half_span,2*nhalf+1);
+niso=numel(offsets);
 rho0=step(spin_system,Ly,rho_eq,theta);
 Cx=kron(speye(niso),Lx); Cy=kron(speye(niso),Ly);
 H=kron(2*pi*spdiags(offsets',0,niso,niso),Lz);

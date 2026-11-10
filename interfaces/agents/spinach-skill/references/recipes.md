@@ -20,6 +20,7 @@
 - [Chemical kinetics and exchange](#chemical-kinetics-and-exchange)
 - [MRI, imaging, flow and diffusion](#mri-imaging-flow-and-diffusion)
 - [Optimal control](#optimal-control)
+- [Radiation damping and shared-coil feedback](#radiation-damping-and-shared-coil-feedback)
 - [Fitting to experimental data](#fitting-to-experimental-data)
 - [Singlet states](#singlet-states)
 - [Zero-field and low-field NMR](#zero-field-and-low-field-nmr)
@@ -889,3 +890,24 @@ Observable group addition reuses the TwoSum transform and cascaded correction to
 Computed component products sharing an exponent are accumulated with TwoSum and cascaded correction before zero groups are filtered. A zero group with lost correction information is rejected. The aligned-group stage retains its own compensation; neither stage certifies exact real-number products. Signed real/imaginary, exchanged state/detector, reordered and dense/sparse controls retain a dyadic residual of one.
 
 Normalised Galerkin column-slice sums retain TwoSum/cascaded corrections in projected-output-shaped workspace before physical restoration. A zero coordinate with lost correction information is rejected, rather than certifying a stationary generator. Compensation applies to computed slice products, not exact matrix multiplication. Independent dense/sparse and real/imaginary dyadic controls retain a projected 2^-56 term and its finite long-time phase.
+
+## Radiation damping and shared-coil feedback
+
+Use `examples/nmr_liquids/radiation_damping/` for nonlinear probe feedback:
+
+- `rd_closed_form` checks single-spin recovery against the tanh/sech solution.
+- `rd_detuned_probe` demonstrates probe-phase-dependent damping and pulling.
+- `rd_inhomogeneous` treats a Gaussian isochromat ensemble in one shared coil.
+- `rd_coupled_pair` compares quantum AX/AB dynamics with spectral-line models.
+- `rd_coupled_spectrum` compares coupled-proton spectra with and without feedback.
+
+The examples use a state-dependent generator with `iserstep` and `LG4`.
+For isochromats, sum the weighted transverse magnetisation before constructing
+the feedback field, then apply that same field to every isochromat. Do not
+propagate separate feedback fields and average the results. Choose the grid
+range from the line-shape tails and its spacing from the acquisition duration:
+the recurrence time is the inverse spacing in Hz and must lie well beyond the
+acquisition. Check convergence under refinement, not just agreement with a port
+using the same grid. For integrator comparisons, retain
+`examples/fundamentals/quadratures/product_quadratures_2.m` as the companion
+example; it compares numerical methods rather than providing an analytic truth.

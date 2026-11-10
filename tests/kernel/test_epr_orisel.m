@@ -37,6 +37,18 @@ strengths=cellfun(@(x)x(1),pure_trans.intensities);
 fprintf('ABSOLUTE INTENSITY actual %.12g, expected 0.25\n',strengths(1));
 assert(max(abs(strengths-0.25))<1e-12);
 
+% Supply current angles to population callbacks, overriding stale inputs
+for stale=[false true]
+    dynamic=p;
+    dynamic.rho0=@(B,a,b,g)(0.7+0.1*cos(b))*pure.rho0+...
+                          (0.3-0.1*cos(b))*(eye(2)-pure.rho0);
+    if stale, dynamic.orientation=[0 0 0]; end
+    [gc,tc]=epr_orisel_transitions(s,dynamic);
+    actual=cellfun(@(x)x(1),tc.intensities);
+    expected=.25*(.4+.2*cos(gc.betas(:)));
+    assert(max(abs(actual(:)-expected))<1e-12);
+end
+
 % Check unequal orientation-dependent strengths by direct diagonalisation
 inter_a=inter; inter_a.zeeman.eigs={[2.15 1.91 2.03]};
 inter_a.zeeman.euler={[0.2 0.4 0.7]};
@@ -55,6 +67,20 @@ end
 assert(max(reference)>min(reference));
 fprintf('ANISOTROPIC INTENSITY range %.12g to %.12g\n',...
         min(reference),max(reference));
+
+% Support all substance entries, including entries emptied by exclusions
+sm_sys=sys; sm_sys.isotopes={'E','1H'};
+im=inter; im.zeeman.eigs={[2 2 2],[0 0 0]};
+im.zeeman.euler={[0 0 0],[0 0 0]};
+im.chem.parts={1,2}; im.chem.reactions={}; im.chem.concs=[1 1];
+bm=bas; bm.approximation={'none','none'};
+sm=create(sm_sys,im); sm=basis(sm,bm);
+for excluded=[0 2]
+    pm=p; if excluded~=0, pm.exclude_from_EPR=excluded; end
+    [~,tm]=epr_orisel_transitions(sm,pm);
+    assert(all(cellfun(@(x)~isempty(x),tm.frequencies)));
+    assert(max(abs(cellfun(@(x)x(1),tm.frequencies)-t.frequencies{1}(1)))<1e-4);
+end
 
 % Verify the Zeeman frequency and its field derivative independently
 expected=abs(spin('E'))*(2/s.tols.freeg)*p.magnetic/(2*pi);
@@ -91,6 +117,15 @@ old.export_grid=export_file; sg=epr_orisel_grid(s,old);
 assert(isequal(load(export_file),sg));
 clear cleanup
 fprintf('PASS removed options have no effect\n');
+
+% Keep positive support when cumulative roundoff exceeds a tiny cutoff
+uniform.alphas=zeros(900,1); uniform.betas=zeros(900,1);
+uniform.gammas=zeros(900,1);
+uniform.weights=[ones(800,1)/800; zeros(100,1)];
+tiny.selection_weights=ones(1,900); tiny.grid_cutoff=1e-16;
+selected=epr_orisel_grid(uniform,tiny);
+assert(numel(selected.weights)==800);
+assert(abs(sum(selected.weights)-1)<1e-12);
 
 % Check weighted pruning at an exact cutoff boundary
 q.selection_weights=zeros(1,numel(g.weights));

@@ -19,6 +19,10 @@
 %   intensity_cutoff   - discard intensities at or below this value
 %                        (default: zero)
 %
+% Optional parameters.rho0 follows rspt_eig: a density matrix in the
+% retained Hilbert basis, or a function rho0(B,alpha,beta,gamma).
+% Population callbacks receive the current powder orientation.
+%
 % Outputs:
 %
 %   sph_grid           - original grid; angle and weight column vectors
@@ -73,7 +77,7 @@ loc_spin=spin_system;
 if ~isempty(parameters.exclude_from_EPR)
     loc_spin=kill_spin(loc_spin,parameters.exclude_from_EPR);
 end
-bas.formalism='zeeman-hilb'; bas.approximation={'none'};
+bas.formalism='zeeman-hilb'; bas.approximation=repmat({'none'},1,numel(loc_spin.chem.parts));
 loc_spin=basis(loc_spin,bas);
 selection_idx=spin_selection_indices(loc_spin,parameters.selection_spin);
 if (numel(selection_idx)~=1)||~strncmp(loc_spin.comp.isotopes{selection_idx},'E',1)
@@ -106,7 +110,8 @@ parfor(n=1:n_orients,nworkers)
     angles=[alphas(n) betas(n) gammas(n)];
     h_z=i_z+orientation(q_z,angles); h_z=(h_z+h_z')/2;
     h_c=i_c+orientation(q_c,angles); h_c=(h_c+h_c')/2;
-    [e,v,de,t,lp]=rspt_eig(loc_spin,parameters,h_z,h_c,h_mw,parameters.magnetic);
+    local_par=parameters; local_par.orientation=angles;
+    [e,v,de,t,lp]=rspt_eig(loc_spin,local_par,h_z,h_c,h_mw,parameters.magnetic);
 
     % Enumerate positive-intensity transitions
     ne=numel(e); ntran=0;

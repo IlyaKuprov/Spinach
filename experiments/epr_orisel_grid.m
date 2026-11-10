@@ -79,10 +79,11 @@ weights=weights/sum(weights);
 
 % Retain the smallest prefix meeting the integral cutoff
 [weights,idx]=sort(weights,'descend');
-if parameters.grid_cutoff==0
-    n=nnz(weights);
-else
-    n=find(cumsum(weights)>=1-parameters.grid_cutoff,1);
+n=nnz(weights);
+if parameters.grid_cutoff>0
+    % Enforce the exact unit endpoint despite cumulative roundoff
+    cumulative=cumsum(weights(1:n)); cumulative(end)=1;
+    n=find(cumulative>=1-parameters.grid_cutoff,1);
 end
 idx=idx(1:n); weights=weights(1:n);
 selection_grid.alphas=orisel_grid.alphas(idx);

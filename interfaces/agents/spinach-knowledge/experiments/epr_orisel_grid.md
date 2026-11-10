@@ -1,0 +1,5 @@
+# experiments/epr_orisel_grid.m
+
+Builds a conditional orientation-selected powder quadrature from epr_orisel_transitions. selection_transition selects unique approximate electron-mS rows, or 'all'. The summed raw response is multiplied by the original quadrature exactly once, sorted in descending weight, truncated to the smallest prefix carrying at least 1-grid_cutoff, and normalized. A zero cutoff retains all positive support. The four output grid columns can be supplied to powder as parameters.grid.
+
+The pruning-only call accepts an existing grid and parameters.selection_weights, a row of raw excitation values. They must not already contain the quadrature weights. grid_cutoff defaults to zero and must lie in [0,1). Zero excitation and negative/nonfinite combined weights are rejected; signed quadratures are unsupported. Diagnostic raw weights are unnormalized; selected-grid weights sum to one. The original transition fields, grid, selection_weights, weights alias, selected_weights, transition_indices, and selection_grid remain available. Optional plot_orisel and export_grid behavior is preserved for the full calculation call.

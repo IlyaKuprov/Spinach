@@ -1,0 +1,3 @@
+# tests/kernel/test_epr_orisel.m
+
+Focused regression registered as kernel/epr_orisel. Checks isotropic-electron frequency and field derivative with unequal reference and target fields; Gaussian unit-peak and half-height responses through production; inert removed options; modern exclusion selectors; exact quadrature cutoff equality; invalid/zero weights; and true-color visible-axis plotting including zero weights and hold-state restoration. Also checks both spin-one electron rows, default and selector-only compatibility, original diagnostic field names, and MAT-grid export. Uses small CPU Hilbert-space systems and a Lebedev grid. Errors fail the standard test runner.

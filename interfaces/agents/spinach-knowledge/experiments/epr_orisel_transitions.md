@@ -1,0 +1,7 @@
+# experiments/epr_orisel_transitions.m
+
+Returns orientation-resolved EPR transition frequencies (Hz), intensities, field derivatives (Hz/T), approximate electron-mS row labels, and raw excitation weights. The input reference field is left in the Zeeman Hamiltonian; rspt_eig scales it once to parameters.magnetic. Exact diagonalisation is the default; orders 1–4 remain available.
+
+parameters.bandwidth_EPR is the Gaussian **intensity-response FWHM in Hz**. The implementation uses gaussfun(offset,FWHM)/gaussfun(0,FWHM): unit peak, applied once to |Sx|² times the thermal population difference. It is neither pulse amplitude nor a unit-area spectral density. Parameters mw_frq and magnetic are Hz and tesla. Quadrature weights are not included here.
+
+exclude_from_EPR accepts indices, masks, isotopes, labels, or mixed cell selectors. selection_spin must name exactly one retained electron. The selector-only spin_selector entry point is retained. Approximate rows follow rounded laboratory-Z expectation values and are not exact quantum numbers under strong mixing. Fixed laboratory-x polarization, no pulse saturation, no strain, and no relaxation are modeled. Full Hilbert-space scaling limits system size. Strongly mixed transitions can be omitted even when all rows are requested. Output names remain frequencies, intensities, transition_rows, dfdb_hz_per_t, orientation_weights, selection_weights, and parameters. Supplied grid fields are column vectors.

@@ -90,7 +90,7 @@ control.max_iter=500;
 control.penalties={'NS'};
 control.p_weights=0.01;
 control.ens_corrs={'rho_ens'};
-control.plotting={'xy_controls'};
+control.plotting={};
 
 % Enable BSS corrections
 control.bsiegert=true();
@@ -148,7 +148,7 @@ parfor n=1:numel(eval_hz) %#ok<*PFBNS>
 end
 
 % Plot the inversion profile
-kfigure; scale_figure([1.00 0.65]);
+kfigure; scale_figure([1.00 0.666]);
 plot(eval_ppm,mz_bs,'--'); hold on; 
 plot(eval_ppm,mz_nobs); kletter('A');
 kxlabel('$^{13}$C chemical shift, ppm');

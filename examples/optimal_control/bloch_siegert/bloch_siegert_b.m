@@ -59,7 +59,7 @@ control.plotting={};
 
 % Power levels to sweep (rad/s)
 zeeman_frq=abs(spin('13C')*sys.magnet);
-pwr_list=zeeman_frq*linspace(1e-3,1.0,50);
+pwr_list=zeeman_frq*linspace(1e-3,0.3,50);
 
 % Compute relative control powers
 relative_power=pwr_list./zeeman_frq;

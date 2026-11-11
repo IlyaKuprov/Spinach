@@ -127,7 +127,7 @@ for k=1:numel(variants)
     control.penalties={'NS'};
     control.p_weights=0.01;
     control.ens_corrs={'rho_ens'};
-    control.plotting={'xy_controls'};
+    control.plotting={};
 
     % Enable Bloch-Siegert corrections
     control.bsiegert=true();
@@ -157,7 +157,7 @@ for k=1:numel(variants)
     eval_hz=ppm2hz(eval_ppm-carrier_ppm,sys.magnet,'13C');
     mz_bs=zeros(size(eval_hz));
     mz_nobs=zeros(size(eval_hz));
-    for n=1:numel(eval_hz)
+    parfor n=1:numel(eval_hz) %#ok<*PFBNS>
 
         % Add the offset term
         Hn=D+2*pi*eval_hz(n)*Lz;
@@ -167,7 +167,7 @@ for k=1:numel(variants)
         
         % Run with the Bloch-Siegert physics present
         rho=shaped_pulse_xy(ss_bs,Hn,controls_aug,pulse_aug,...
-                            control.pulse_dt,Iz,'expv-pwc');
+                            control.pulse_dt,Iz,'expv-pwc'); 
 
         % Get the fidelity
         mz_bs(n)=real(Iz'*rho);
@@ -186,7 +186,7 @@ for k=1:numel(variants)
 
     % Plot the inversion profile
     subplot(numel(variants),1,k);
-    plot(eval_ppm,mz_bs); hold on;
+    plot(eval_ppm,mz_bs,'--'); hold on;
     plot(eval_ppm,mz_nobs); kgrid;
 
     % Shade chemical shifts without destination states

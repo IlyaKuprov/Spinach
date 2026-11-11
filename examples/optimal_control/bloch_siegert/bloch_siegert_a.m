@@ -1,6 +1,6 @@
 % Bloch-Siegert shift compensation functionality demo. The
-% script optimises a 90-degree pulse (Lz -> Lx) for a sing-
-% le spin on resonance. As the control power is increased,
+% script optimises a universal rotation pulse for a single
+% spin on resonance. As the control power is increased, the
 % Bloch-Siegert shift starts to reduce the fidelity unless
 % it is correctly accounted for.
 %
@@ -28,13 +28,10 @@ bas.approximation={'none'};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Build and normalise the initial state (Lz)
-rho_init=state(spin_system,{'Lz'},{1});
-rho_init=rho_init/norm(full(rho_init),2);
-
-% Build and normalise the target state (Lx)
-rho_targ=state(spin_system,{'Lx'},{1});
-rho_targ=rho_targ/norm(full(rho_targ),2);
+% Set up spin states
+Sx=state(spin_system,'Lx','1H'); Sx=Sx/norm(full(Sx),2);
+Sy=state(spin_system,'Ly','1H'); Sy=Sy/norm(full(Sy),2);
+Sz=state(spin_system,'Lz','1H'); Sz=Sz/norm(full(Sz),2);
 
 % Get the control operators
 Lx=operator(spin_system,'Lx','1H');
@@ -48,16 +45,19 @@ control.isotopes={'1H'};
 control.channels=[1; 1];
 control.drifts={{D}};
 control.operators={Lx,Ly};
-control.rho_init={rho_init};
-control.rho_targ={rho_targ};
+control.rho_init={ Sx Sy Sz};
+control.rho_targ={-Sz Sy Sx};
 control.method='rbfgs';
 control.max_iter=500;
 control.tol_x=1e-4;
+control.tol_g=2e-4;
+control.penalties={'NS'};
+control.p_weights=0.001;
 control.plotting={};
 
 % Power levels to sweep (rad/s)
 zeeman_frq=abs(spin('1H')*sys.magnet);
-pwr_list=zeeman_frq*linspace(1e-3,1.0,50);
+pwr_list=zeeman_frq*linspace(1e-3,0.3,50);
 
 % Compute relative control powers
 relative_power=pwr_list./zeeman_frq;
@@ -74,17 +74,17 @@ for k=1:20
     fid_b=zeros(size(pwr_list));
 
     % Common initial guess
-    guess=randn(2,50)/10;
+    guess=randn(2,25)/3;
 
     % Loop over control power
     for n=1:numel(pwr_list)
 
-        % Set current power
-        control.pwr_levels=pwr_list(n);
+        % 20% distribution either side of current power
+        control.pwr_levels=pwr_list(n)*linspace(0.8,1.2,11);
 
         % Set pulse slice duration
-        dt=(pi/100)/control.pwr_levels;
-        control.pulse_dt=dt*ones(1,50);
+        dt=(pi/20)/mean(control.pwr_levels);
+        control.pulse_dt=dt*ones(1,25);
 
         % BSS settings: off, on
         control.bsiegert=false();

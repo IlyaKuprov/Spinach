@@ -130,8 +130,8 @@ if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','drift_s
 end
 current_pool=gcp('nocreate'); pool_id=0;
 if ~isempty(current_pool), pool_id=current_pool.ID; end
-if (~isempty(getCurrentWorker()))||(pool_id~=spin_system.control.pool_id)
-    error('ensemble() must run on the client, on the pool that was open when optimcon() ran; re-run optimcon() after changing the pool.');
+if pool_id~=spin_system.control.pool_id
+    error('ensemble() must run with the parallel pool that was open when optimcon() ran; re-run optimcon() after changing the pool, and inside the parfor body when running on a worker.');
 end
 if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');

@@ -188,6 +188,19 @@ for k=1:numel(variants)
     subplot(numel(variants),1,k);
     plot(eval_ppm,mz_bs); hold on;
     plot(eval_ppm,mz_nobs); kgrid;
+
+    % Shade chemical shifts without destination states
+    if variants{k}.cb_prs
+        xregion(eval_ppm(1),cb_prs_ppm(1));
+        xregion(cb_prs_ppm(end),co_ppm(1));
+    else
+        xregion(eval_ppm(1),cb_inv_ppm(1));
+        xregion(cb_inv_ppm(end),ca_ppm(1));
+        xregion(ca_ppm(end),co_ppm(1));
+    end
+    xregion(co_ppm(end),eval_ppm(end));
+
+    % Label the panel
     kxlabel('$^{13}$C chemical shift / ppm'); 
     kylabel('Final $M_\textnormal{Z}$');  
     klegend({'BSS applied',...

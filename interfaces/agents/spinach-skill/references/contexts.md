@@ -502,7 +502,11 @@ and `mri_2d_plot(mri,parameters,method)` with `method` in
 `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)` with
 `crop_ranges={[f1_min f1_max],[f2_min f2_max]}` in ppm only. Figures use the
 house wrappers `kfigure`, `ktitle`, `kgrid`, `kxlabel`, `kylabel`, `kzlabel`,
-`klegend`, `kletter`, `kcolourbar`, and `scale_figure`. `kletter(letter_label)`
+`klegend`, `kletter`, `kcolourbar`, `kvertshade`, `khorzshade`, and
+`scale_figure`. `kvertshade(a,b)` and `khorzshade(a,b)` shade the band between
+x-axis (respectively y-axis) values `a` and `b` in 10% grey (black at 10%
+opacity), spanning the whole axes underneath the data; they are shaded-strip
+analogues of `xline` and `yline`. `kletter(letter_label)`
 takes a one-element character string and draws a bold panel letter inside the plot
 box, with its left edge and its cap line 10 points from the left and the top
 edge of the box; the offsets are computed when it is called, so call it after the

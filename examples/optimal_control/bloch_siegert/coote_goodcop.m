@@ -98,7 +98,7 @@ control.bsiegert=true();
 % Spinach housekeeping 
 spin_system_bs=optimcon(spin_system,control);
 
-% Optimise the waveform
+% Optimise the waveform with BSS
 guess=randn(2,numel(control.pulse_dt))/8;
 pulse_bs=fmaxnewton(spin_system_bs,@grape_xy,guess);
 pulse_bs=control.pwr_levels*pulse_bs;
@@ -110,7 +110,7 @@ control.bsiegert=false();
 % Spinach housekeeping 
 spin_system_nobs=optimcon(spin_system,control);
 
-% Optimise the waveform
+% Optimise the waveform without BSS
 pulse_nobs=fmaxnewton(spin_system_nobs,@grape_xy,guess);
 pulse_nobs=control.pwr_levels*pulse_nobs;
 pulse_nobs=mat2cell(pulse_nobs,[1 1]);
@@ -120,7 +120,7 @@ eval_ppm=linspace(0,200,251);
 eval_hz=ppm2hz(eval_ppm-carrier_ppm,sys.magnet,'13C');
 mz_bs=zeros(size(eval_hz));
 mz_nobs=zeros(size(eval_hz));
-for n=1:numel(eval_hz)
+parfor n=1:numel(eval_hz) %#ok<*PFBNS>
 
     % Add the offset term
     Hn=D+2*pi*eval_hz(n)*Lz;
@@ -130,7 +130,7 @@ for n=1:numel(eval_hz)
 
     % Run with the Bloch-Siegert physics present
     rho=shaped_pulse_xy(spin_system_bs,Hn,controls_aug,pulse_aug,...
-                        control.pulse_dt,Iz,'expv-pwc');
+                        control.pulse_dt,Iz,'expv-pwc'); 
 
     % Get the fidelity
     mz_bs(n)=real(Iz'*rho);
@@ -148,13 +148,14 @@ for n=1:numel(eval_hz)
 end
 
 % Plot the inversion profile
-kfigure;
-plot(eval_ppm,mz_bs,'LineWidth',1.5); hold on;
-plot(eval_ppm,mz_nobs,'LineWidth',1.5); kgrid;
-kxlabel('$^{13}$C chemical shift / ppm');
-kylabel('Final M$_Z$'); ktitle('GOODCOP profile ');
-legend({'BSS on','BSS off'},'Location','Best');
-set(gca,'XDir','Reverse');
+kfigure; scale_figure([1.00 0.65]);
+plot(eval_ppm,mz_bs,'--'); hold on; 
+plot(eval_ppm,mz_nobs); kletter('A');
+kxlabel('$^{13}$C chemical shift, ppm');
+kylabel('Final $M_\textnormal{Z}$'); 
+set(gca,'XDir','Reverse'); ylim padded; kgrid;
+xregion(0,35); xregion(75,165); xregion(185,200);
+klegend({'BSS applied','BSS ignored'},'Location','Best');
 
 end
 

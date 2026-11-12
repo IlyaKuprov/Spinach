@@ -55,6 +55,7 @@ control.rho_targ={-Sz Sy Sx};
 control.method='rbfgs';
 control.max_iter=500;
 control.tol_x=1e-4;
+control.tol_g=1e-4;
 control.plotting={};
 
 % Power levels to sweep (rad/s)
@@ -66,7 +67,7 @@ relative_power=pwr_list./zeeman_frq;
 
 % Get a figure going
 kfigure(); hold on;
-scale_figure([1.0 0.65]);
+scale_figure([1.000 0.666]);
 
 % Spaghetti plot loop
 for k=1:20

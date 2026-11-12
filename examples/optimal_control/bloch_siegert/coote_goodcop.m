@@ -86,9 +86,10 @@ control.pulse_dt=(pulse_dur/75)*ones(1,75);
 control.offsets={all_hz};
 control.off_ops={Lz};
 control.method='rbfgs';
-control.max_iter=500;
+control.max_iter=300;
 control.penalties={'NS'};
 control.p_weights=0.01;
+control.tol_g=1e-4;
 control.ens_corrs={'rho_ens'};
 control.plotting={};
 
@@ -148,7 +149,7 @@ parfor n=1:numel(eval_hz) %#ok<*PFBNS>
 end
 
 % Plot the inversion profile
-kfigure; scale_figure([1.00 0.666]);
+kfigure; scale_figure([1.0 0.5]);
 plot(eval_ppm,mz_bs,'--'); hold on; 
 plot(eval_ppm,mz_nobs); kletter('A');
 kxlabel('$^{13}$C chemical shift, ppm');

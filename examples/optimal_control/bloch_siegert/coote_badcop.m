@@ -60,18 +60,18 @@ variants={...
 
 
 % Get the figure going
-kfigure; scale_figure([1.0 2.0]);
+kfigure; scale_figure([1.0 1.5]);
 letters={'B','C','D'};
 
 % Design and evaluate each variant
 for k=1:numel(variants)
 
-    % Build the C-beta inversion grid
+    % Build the CB inversion grid
     cb_inv_ppm=linspace(variants{k}.cb_inv_ppm(1),...
                         variants{k}.cb_inv_ppm(2),60);
     cb_inv_hz=ppm2hz(cb_inv_ppm-carrier_ppm,sys.magnet,'13C');
 
-    % Only BADCOP2 and BADCOP3 preserve C-beta outside that band
+    % BADCOP2 and BADCOP3 preserve CB outside that band
     if variants{k}.cb_prs
         cb_prs_ppm=linspace(5,80,80);
         mask=(cb_prs_ppm<variants{k}.cb_inv_ppm(1))|...
@@ -123,9 +123,10 @@ for k=1:numel(variants)
     control.offsets={all_hz};
     control.off_ops={Lz};
     control.method='rbfgs';
-    control.max_iter=500;
+    control.max_iter=300;
     control.penalties={'NS'};
     control.p_weights=0.01;
+    control.tol_g=1e-4;
     control.ens_corrs={'rho_ens'};
     control.plotting={};
 

@@ -511,10 +511,11 @@ norm. `optimcon` distributes the drift generators over the workers of the pool
 that is open when it runs and records that pool's identity; each worker then
 evaluates its own block of ensemble cases in `ens_block`. The pool must have
 `SpmdEnabled` true (the default), and `ensemble` refuses any other pool, even
-one with the same number of workers, and refuses a call from inside a worker:
-keep the same pool object from `optimcon` through `fmaxnewton` and any later
-`ensemble` evaluation, and re-run `optimcon` after deleting or restarting the
-pool. `control.freeze` masks input-waveform coordinates after the full distortion,
+one with the same number of workers: keep the same pool object from `optimcon`
+through `fmaxnewton` and any later `ensemble` evaluation, and re-run `optimcon`
+after deleting or restarting the pool. Inside a `parfor` body on a process-pool
+worker there is no pool; call `optimcon` in the loop body, and the ensemble is
+then evaluated serially on that worker. `control.freeze` masks input-waveform coordinates after the full distortion,
 phase, and power derivative pullback; frozen fidelity-gradient entries and
 supported Hessian rows and columns are zero (distortion Hessians remain
 unavailable). For `grape_curv`, the mask has exactly the shape of the input

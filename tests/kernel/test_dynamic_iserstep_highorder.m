@@ -115,7 +115,7 @@ result=test_close(result,'LG4A rotating field order',rotating_orders,4*ones(1,2)
 
 % Build independent references for a genuinely state-dependent Hamiltonian
 nonlinear_fun=@(t,state)0.7*X+0.2*cos(0.9*t)*Y+...
-                      (0.3+0.6*real(trace(Z*state)))*Z;
+                        (0.3+0.6*real(trace(Z*state)))*Z;
 loose_opts=odeset('RelTol',1e-11,'AbsTol',1e-12);
 tight_opts=odeset('RelTol',2.5e-14,'AbsTol',2.5e-15);
 [~,ref_loose]=ode113(@nonlin_density_rhs,[0 1.5],rho(:),loose_opts);

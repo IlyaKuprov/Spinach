@@ -137,8 +137,9 @@ switch method
         k6=h*a_fun(t_n+h,rho_u6);
         Q6=k6-2*k2+k1;
 
-        % Final exponent v
-        v=Q1+Q2+(2/3)*Q5+(1/6)*Q6-(1/6)*(Q1*Q2-(Q2-Q3+Q5+0.5*Q6)*Q1);
+        % Final exponent with the complete Appendix A.1 commutator
+        v=Q1+Q2+(2/3)*Q5+(1/6)*Q6-...
+          (1/6)*(Q1*(Q2-Q3+Q5+0.5*Q6)-(Q2-Q3+Q5+0.5*Q6)*Q1);
 
         % Step update
         rho_b=step(spin_system,prop_scale*v,rho_a,dt);
@@ -514,4 +515,5 @@ end
 % they didn't look capable of doing either.
 %
 % Ronald Reagan
+
 

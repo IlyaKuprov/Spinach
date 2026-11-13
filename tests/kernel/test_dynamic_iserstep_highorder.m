@@ -8,7 +8,10 @@
 %
 % The test checks zero-step handling, nonlinear generator execution, and
 % agreement of high-order Lie and RKMK branches against a refined DP8
-% reference on a compact Hilbert-space problem.
+% reference on a compact Hilbert-space problem. Additional LG4A checks
+% cover constant and commuting fields, fourth-order convergence in a
+% rotating field, and a genuinely nonlinear density-matrix flow against
+% independently refined ODE references.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -66,6 +69,101 @@ for n=1:numel(methods)
     result=test_close(result,['iserstep Hermiticity ' methods{n}],rho_obs,rho_obs',1e-12,1e-12,...
                       'unitary Hamiltonian propagation preserves Hermiticity');
 end
+
+% Check the constant-generator limit against exact density conjugation
+constant_fun=@(t,state)H0;
+rho_const=iserstep(spin_system,{constant_fun,0,'LG4A'},rho,0.2);
+P=expm(-1i*0.2*H0);
+result=test_close(result,'LG4A constant generator',rho_const,P*rho*P',1e-13,1e-13,...
+                  'a constant Hamiltonian must give exact density conjugation');
+
+% Check exact Simpson phase and trace for a commuting quadratic field
+quadratic_fun=@(t,state)(1+t^2)*Sz;
+rho_obs=rho;
+for n=1:8
+    rho_obs=iserstep(spin_system,{quadratic_fun,(n-1)/8,'LG4A'},rho_obs,1/8);
+end
+P=expm(-1i*(4/3)*Sz);
+result=test_close(result,'LG4A commuting quadratic',rho_obs,P*rho*P',1e-12,1e-12,...
+                  'the commuting quadratic field has an exact Simpson phase and no artificial damping');
+
+% Specify a rotating noncommuting field with an exact frame solution
+X=[0 1;1 0];
+Y=[0 -1i;1i 0];
+Z=diag([1 -1]);
+rotating_fun=@(t,state)0.8*(cos(2.3*t)*X+sin(2.3*t)*Y)+0.4*Z;
+P=expm(-1i*2.3*Z)*expm(-1i*2*(0.8*X+(0.4-2.3/2)*Z));
+rho_exact=P*rho*P';
+grid_sizes=[16 32 64];
+rotating_errors=zeros(size(grid_sizes));
+
+% Refine the same physical interval without projecting the density matrix
+for n=1:numel(grid_sizes)
+
+    % Integrate the rotating field over two seconds
+    time_step=2/grid_sizes(n);
+    rho_obs=rho;
+    for k=1:grid_sizes(n)
+        rho_obs=iserstep(spin_system,{rotating_fun,(k-1)*time_step,'LG4A'},rho_obs,time_step);
+    end
+    rotating_errors(n)=norm(rho_obs-rho_exact,'fro');
+
+end
+rotating_orders=log2(rotating_errors(1:end-1)./rotating_errors(2:end));
+result=test_close(result,'LG4A rotating field order',rotating_orders,4*ones(1,2),0.05,0,...
+                  'a noncommuting prescribed field must exhibit fourth-order global convergence');
+
+% Build independent references for a genuinely state-dependent Hamiltonian
+nonlinear_fun=@(t,state)0.7*X+0.2*cos(0.9*t)*Y+...
+                      (0.3+0.6*real(trace(Z*state)))*Z;
+loose_opts=odeset('RelTol',1e-11,'AbsTol',1e-12);
+tight_opts=odeset('RelTol',2.5e-14,'AbsTol',2.5e-15);
+[~,ref_loose]=ode113(@nonlin_density_rhs,[0 1.5],rho(:),loose_opts);
+[~,ref_tight]=ode113(@nonlin_density_rhs,[0 1.5],rho(:),tight_opts);
+[~,ref_other]=ode89(@nonlin_density_rhs,[0 1.5],rho(:),tight_opts);
+rho_ref=reshape(ref_tight(end,:).',2,2);
+result=test_close(result,'LG4A nonlinear reference refinement',ref_loose(end,:),ref_tight(end,:),2e-10,0,...
+                  'tightening the independent ODE reference must leave the final density matrix unchanged');
+result=test_close(result,'LG4A independent nonlinear reference',ref_other(end,:),ref_tight(end,:),2e-12,0,...
+                  'independent ODE methods must agree well below the measured LG4A errors');
+nonlinear_errors=zeros(size(grid_sizes));
+
+% Check full-interval nonlinear order and physical density invariants
+for n=1:numel(grid_sizes)
+
+    % Evaluate state feedback at every native LG4A stage
+    time_step=1.5/grid_sizes(n);
+    rho_obs=rho;
+    for k=1:grid_sizes(n)
+        rho_obs=iserstep(spin_system,{nonlinear_fun,(k-1)*time_step,'LG4A'},rho_obs,time_step);
+    end
+    nonlinear_errors(n)=norm(rho_obs-rho_ref,'fro');
+    result=test_close(result,['LG4A nonlinear trace ' num2str(grid_sizes(n))],...
+                      trace(rho_obs),trace(rho),1e-12,1e-12,...
+                      'the nonlinear flow must preserve density-matrix trace');
+    result=test_close(result,['LG4A nonlinear spectrum ' num2str(grid_sizes(n))],...
+                      sort(eig(rho_obs)),sort(eig(rho)),1e-12,1e-12,...
+                      'unitary conjugation must preserve the density-matrix eigenvalues');
+
+end
+nonlinear_orders=log2(nonlinear_errors(1:end-1)./nonlinear_errors(2:end));
+result=test_close(result,'LG4A nonlinear field order',nonlinear_orders,4*ones(1,2),0.08,0,...
+                  'a genuinely state-dependent Hamiltonian must exhibit fourth-order global convergence');
+
+end
+
+% Independent density-matrix reference equation
+function derivative=nonlin_density_rhs(time,rho_vector)
+
+% Reconstruct the Hermitian mean-field Hamiltonian
+rho=reshape(rho_vector,2,2);
+X=[0 1;1 0];
+Y=[0 -1i;1i 0];
+Z=diag([1 -1]);
+H=0.7*X+0.2*cos(0.9*time)*Y+(0.3+0.6*real(trace(Z*rho)))*Z;
+
+% Integrate the commutator directly without exponentiating
+derivative=reshape(-1i*(H*rho-rho*H),4,1);
 
 end
 

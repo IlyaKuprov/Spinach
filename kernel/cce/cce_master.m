@@ -186,6 +186,8 @@ end
 function pulse=pulse_matrix(event,meta,model)
 d=meta.dimension; generator=zeros(d);
 if isfield(event,'operator')&&~isempty(event.operator)
+    % Scale the generator by the optional rotation angle
+    if isfield(event,'angle')&&~isempty(event.angle), event.operator=event.angle*event.operator; end
     if isequal(event.target,model.central_ids)
         generator=kron(event.operator,eye(meta.bath_dimension));
     elseif isscalar(event.target)

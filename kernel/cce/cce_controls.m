@@ -159,7 +159,8 @@ for t=1:numel(schedule.times)
                         error('cce_controls:exterior_entangled','Exterior operator pulses require explicit dynamical sites.');
                     end
                     P=embed_operator(event.operator,event.target,ids,model.multiplicities);
-                    pulse=expm(-1i*event.angle*P)*pulse;
+                    scale=1; if isfield(event,'angle')&&~isempty(event.angle), scale=event.angle; end
+                    pulse=expm(-1i*scale*P)*pulse;
                 else
                     axis=axis_vector(event.axis); generator=zeros(dimension);
                     for id=reshape(intersect(event.target,ids,'stable'),1,[])

@@ -94,6 +94,27 @@ result=test_true(result,'Physical and selective pulses differ',...
     norm(physical.raw.density(:,:,end)-selective.raw.density(:,:,end),'fro')>1,...
     'A spin-one Cartesian rotation must not silently become a two-level pulse');
 
+% Apply the declared angle to explicit generators on the static path
+sys=struct(); sys.magnet=0; sys.isotopes={'E'}; sys.output='hush';
+sys.disable={'hygiene'}; sys.parallel={'processes',1};
+inter=struct(); inter.zeeman.matrix={zeros(3)}; spin_system=create(sys,inter);
+stat.central_spins=1; stat.bath_spins=[]; stat.method='gcce'; stat.expansion='standard';
+stat.quantity='density'; stat.order=0; stat.central.rho=diag([1 0]); stat.assumptions='labframe';
+stat.orientation=[0 0 0]; stat.interaction_cutoff=Inf; stat.graph=struct('mode','complete');
+stat.meanfield='none'; stat.times=[0 1]; stat.bath_state=struct('mode','mixed_product');
+stat.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
+stat.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
+                     'operator',[0 1;1 0]/2,'angle',pi);
+rotated=cce(spin_system,stat); stat.sequence.angle=0; unrotated=cce(spin_system,stat);
+stat.sequence=rmfield(stat.sequence,'angle'); stat.sequence.operator=pi*[0 1;1 0]/2;
+folded=cce(spin_system,stat);
+result=test_close(result,'Static explicit generator with angle pi',rotated.density(:,:,end),diag([0 1]),...
+                  1e-12,0,'An explicit Sx generator with angle pi inverts the central population');
+result=test_close(result,'Static explicit generator with zero angle',unrotated.density(:,:,end),diag([1 0]),...
+                  1e-12,0,'A zero angle must leave the central state unchanged');
+result=test_close(result,'Static angle-folded generator',folded.density(:,:,end),rotated.density(:,:,end),...
+                  1e-12,0,'A missing angle defaults to one, so pi*Sx equals Sx with angle pi');
+
 % Print numerical evidence without adding nonstandard harness fields
 fprintf('controls dense error %.3g; ideal-limit errors %s; waveform errors %s\n',error,mat2str(errors,6),mat2str(waveform_errors,6));
 

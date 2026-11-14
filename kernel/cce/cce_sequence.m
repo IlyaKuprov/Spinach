@@ -5,7 +5,8 @@
 % times is a strictly increasing nonnegative seconds row starting at zero.
 % sequence is an event structure array (empty means FID). An ideal event
 % has type='ideal', target (physical IDs), placement='fraction'/'absolute',
-% at, and either a Hermitian operator or axis plus angle. axis is x/y/z
+% at, and either a Hermitian generator operator, applied as the rotation
+% exp(-i*angle*operator) with angle defaulting to 1, or axis plus angle. axis is x/y/z
 % or a real normalized three-vector. Simultaneous events retain input order.
 % A selective central-register operator acts in central_ids product order;
 % axis rotations are full physical-spin rotations, not qubit rotations.
@@ -137,6 +138,10 @@ for j=1:numel(events)
         if ~isnumeric(op)||~isequal(size(op),[d d])||any(~isfinite(op),'all')||...
            norm(op-op','fro')>d^2*eps*max(1,norm(op,'fro'))
             error('Pulse operator must be finite Hermitian in target product order.');
+        end
+        if isfield(event,'angle')&&~isempty(event.angle)&&(~isnumeric(event.angle)||...
+           ~isscalar(event.angle)||~isreal(event.angle)||~isfinite(event.angle))
+            error('Pulse operator angle must be a finite real scalar.');
         end
     else
         if ~isfield(event,'angle')||~isnumeric(event.angle)||~isscalar(event.angle)||...

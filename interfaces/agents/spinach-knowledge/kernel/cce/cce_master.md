@@ -14,6 +14,8 @@ Propagate open-system conditional or generalized cluster dynamics.
 - Conditional blocks produce branch coherence; generalized density propagation supplies the same raw contract as the unitary evaluator.
 - Checks local trace, Hermiticity and positivity diagnostics where defined; product-truncated populations are not a universal relaxation-time method.
 
+- Generalized coherence is raw by default, matching `gcce`; only an explicit `normalized=true` divides by the initial central coherence.
+
 ## Inputs and outputs
 
 ```matlab

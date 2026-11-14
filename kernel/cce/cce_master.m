@@ -119,11 +119,9 @@ end
 % Do not expose an uncomputed central density for conditional propagation
 if meta.conditional, densities=[]; end
 
-% Observe the full central density or normalized conditional coherence
+% Observe the central density without changing the requested normalization
 if ~meta.conditional
-    observe=parameters;
-    if ~isfield(observe,'normalized'), observe.normalized=strcmp(parameters.quantity,'coherence'); end
-    values=cce_observe(densities,observe);
+    values=cce_observe(densities,parameters);
 end
 
 % Bound arithmetic error explicitly without claiming a physical CCE bound
@@ -133,8 +131,9 @@ if strcmp(parameters.quantity,'observable')
     if ~iscell(operators), operators={operators}; end
     scale=cellfun(@(op) norm(op,2),operators);
 end
-if ~meta.conditional&&isfield(observe,'normalized')&&observe.normalized
-    observe.normalized=false; initial=cce_observe(parameters.central.rho,observe);
+if ~meta.conditional&&isfield(parameters,'normalized')&&parameters.normalized
+    observe=parameters; observe.normalized=false;
+    initial=cce_observe(parameters.central.rho,observe);
     scale=scale./abs(initial);
 end
 argument=norm(G,1)*schedule.times(:);

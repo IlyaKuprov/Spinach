@@ -50,6 +50,21 @@ p.method='gcce'; p.quantity='density'; closed=cce(s,p);
 p.method='megcce'; opened=cce(s,p);
 result=test_close(result,'C7 numerical check',opened.density,closed.density,2e-11,2e-11,'Generalized zero jumps.');
 
+% Preserve raw coherence unless normalization was explicitly requested
+q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
+q.method='gcce'; closed_coherence=cce(s,q); q.method='megcce'; raw_coherence=cce(s,q);
+result=test_close(result,'ME raw coherence default',raw_coherence.value,closed_coherence.value,...
+                  2e-11,2e-11,'An empty jump array must not normalize raw generalized coherence.');
+q.normalized=false; explicit_raw=cce(s,q);
+result=test_close(result,'ME explicit raw coherence',explicit_raw.value,closed_coherence.value,...
+                  2e-11,2e-11,'Explicit false and the omitted normalization option must agree.');
+q.normalized=true; normalized_coherence=cce(s,q);
+result=test_close(result,'ME explicit normalized coherence',normalized_coherence.value,...
+                  2*closed_coherence.value,2e-11,2e-11,...
+                  'Explicit normalization divides by the balanced initial coherence of one half.');
+fprintf('R1230 closed %.16g; ME default %.16g.\n',...
+        real(closed_coherence.value(1)),real(raw_coherence.value(1)));
+
 % Validate whole-sequence Hahn timing and a zero-duration initial state
 p.sequence=struct('type','ideal','placement','fraction','at',0.5,...
                   'target',1,'axis','x','angle',pi);
@@ -202,7 +217,7 @@ conditional_error=max(abs(r.value-reference));
 % Match PyCCE run/gcce.py:116-131 pulse-rotated final readout states
 s.inter.zeeman.matrix{1}(3,3)=5282579115.0000000;
 p.method='megcce'; p.central.alpha=[0;1]; p.central.beta=[1;0];
-r=cce(s,p);
+p.normalized=true; r=cce(s,p);
 reference=[1.0000000000000020;0.99999696702632823;0.99996577952531562;0.99988384475122793;0.99978528981565296;0.99974208884696936;0.99976927314393593;0.99975844441771289;0.99954179272729826;0.99906118745487882;0.99848426483783148]+...
           1i*[-1.5501238790078434e-17;-0.0000045301957227707227;-0.000022166638316224802;-0.000022200000381094418;0.000036116963262306526;0.00012774472614107248;0.00014770063943958262;0.0000075750698896664989;-0.00023796879104827002;-0.00038050310796545583;-0.00022067377857413301];
 result=test_close(result,'PyCCE reconstructed ME-gCCE2',r.value,reference,5e-8,0,...

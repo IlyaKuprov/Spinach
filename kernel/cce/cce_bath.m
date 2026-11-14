@@ -297,7 +297,9 @@ if isfield(s,'selection')
 end
 if isfield(s,'remove_ids')&&(~isnumeric(s.remove_ids)||~isreal(s.remove_ids)||...
    any(~isfinite(s.remove_ids))||any(s.remove_ids<1|s.remove_ids>site_count|...
-   s.remove_ids~=fix(s.remove_ids))), error('Invalid deleted site IDs.'); end
+   s.remove_ids~=fix(s.remove_ids)))
+    error('Invalid deleted site IDs.');
+end
 if isfield(s,'tensors_Hz')&&(~isnumeric(s.tensors_Hz)||~isreal(s.tensors_Hz)||...
    size(s.tensors_Hz,1)~=3||size(s.tensors_Hz,2)~=3||any(~isfinite(s.tensors_Hz),'all'))
     error('Local tensors must be finite real 3-by-3-by-site arrays in Hz.');

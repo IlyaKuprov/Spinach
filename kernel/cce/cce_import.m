@@ -183,7 +183,9 @@ if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
    ~isstruct(units)||~isscalar(units), error('Invalid CCE import arguments.'); end
 if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    any(~isfinite(units.rotation),'all')||norm(units.rotation.'*units.rotation-eye(3),'fro')>100*eps||...
-   abs(det(units.rotation)-1)>100*eps), error('Invalid frame rotation.'); end
+   abs(det(units.rotation)-1)>100*eps)
+    error('Invalid frame rotation.');
+end
 
 end
 

@@ -41,7 +41,11 @@ u.tensor='G'; u.gyro_rad_s_T=2*pi*1e6; put(file,sprintf('1,2,2\n'));
 data=cce_import(file,'tensor',u);
 result=test_close(result,'Field units require an explicit gyro',data.pairs_Hz.tensor,200*eye(3),1e-12,1e-14,'Field units require an explicit gyro');
 u=rmfield(u,'gyro_rad_s_T'); rejected=false;
-try, cce_import(file,'tensor',u); catch, rejected=true; end
+try
+    cce_import(file,'tensor',u);
+catch
+    rejected=true;
+end
 result=test_true(result,'Unspecified field gyromagnetic units are refused',rejected,'Unspecified field gyromagnetic units are refused');
 
 % Check cube geometry and z-fastest voxel ordering against an explicit array
@@ -70,9 +74,19 @@ result=test_true(result,'CSV physical isotope labels',isequal(a.ids,17)&&...
                  isequal(a.isotopes,{'13C'}),'Physical site IDs are not renumbered on import.');
 
 % Refuse omitted frame and invalid explicit export extension
-rejected=false; try, cce_import(file,'csv',struct('length','m')); catch, rejected=true; end
+rejected=false;
+try
+    cce_import(file,'csv',struct('length','m'));
+catch
+    rejected=true;
+end
 result=test_true(result,'Missing frame refused',rejected,'No silent frame inference.');
-rejected=false; try, cce_export(fullfile(folder,'data.txt'),model,original); catch, rejected=true; end
+rejected=false;
+try
+    cce_export(fullfile(folder,'data.txt'),model,original);
+catch
+    rejected=true;
+end
 result=test_true(result,'Unsupported export refused',rejected,'Fixed signature infers only documented extensions.');
 
 disp('CCE IO: MAT/JSON/CSV round trips exact; tensor and voxel conversions passed.');

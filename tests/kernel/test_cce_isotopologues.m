@@ -74,7 +74,12 @@ result=test_true(result,'Vacancies remove spins entirely',isempty(empty_sys.isot
 % Refuse exponential enumeration above the explicit resource ceiling
 v.occupancy=[0.2 0.3;0.2 0.3];
 v.isotopologues=struct('mode','enumerate','max_configurations',8);
-rejected=false; try, cce_bath(v); catch e, rejected=strcmp(e.identifier,'cce_bath:configurations'); end
+rejected=false;
+try
+    cce_bath(v);
+catch e
+    rejected=strcmp(e.identifier,'cce_bath:configurations');
+end
 result=test_true(result,'Enumeration ceiling exposed',rejected,...
                  'Nine configurations cannot silently truncate to eight.');
 

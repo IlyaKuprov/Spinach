@@ -36,7 +36,7 @@ result=test_close(result,'Tensor covariance',inter.coupling.matrix{1,2},q.rotati
 r=struct('mode','random','isotopes',{{'E'}},'magnetic',0,...
          'bounds_A',[0 0 0;100 200 0],'dimension',2,'density',1e17,...
          'seed',19,'max_attempts',10000,'exclusion_A',1);
-[~,~,bath]=cce_bath(r);
+[~,~,bath]=cce_bath(r); surface_density=r.density;
 result=test_true(result,'Surface density gives twenty unique sites',numel(bath.ids)==20&&size(unique(bath.coordinates_A,'rows'),1)==20,'Surface density gives twenty unique sites');
 result=test_close(result,'SI density and area conversion',bath.realized_density,r.density,1,1e-14,'SI density and area conversion');
 
@@ -45,7 +45,11 @@ q=rmfield(q,{'rotation','translation_A','pairs_Hz'}); q.coordinates_A=[0 0 0;1 0
 q.groups={[1 2]}; q.remove_ids=2; [~,~,bath]=cce_bath(q);
 result=test_true(result,'Defect removal preserves physical group IDs',isequal(bath.ids,1)&&isequal(bath.groups,{1}),'Defect removal preserves physical group IDs');
 q=rmfield(q,'remove_ids'); q.coordinates_A=zeros(2,3); rejected=false;
-try, cce_bath(q); catch, rejected=true; end
+try
+    cce_bath(q);
+catch
+    rejected=true;
+end
 result=test_true(result,'Duplicate physical sites are refused',rejected,'Duplicate physical sites are refused');
 
 % Check explicit physical grouping and isotope row normalization
@@ -74,10 +78,20 @@ result=test_close(result,'Native dipolar transform covariance',Tr,R*T*R.',...
 
 % Reject invalid original site labels rather than silently dropping them
 q=rmfield(q,{'rotation','translation_A'}); q.groups={[1 3]};
-rejected=false; try, cce_bath(q); catch, rejected=true; end
+rejected=false;
+try
+    cce_bath(q);
+catch
+    rejected=true;
+end
 result=test_true(result,'Unknown group site refused',rejected,'Original candidate IDs are checked.');
 q.groups={1,2}; q.pairs_Hz=struct('ids',[1 3],'tensor',eye(3));
-rejected=false; try, cce_bath(q); catch, rejected=true; end
+rejected=false;
+try
+    cce_bath(q);
+catch
+    rejected=true;
+end
 result=test_true(result,'Unknown pair site refused',rejected,'A misspelled interaction cannot disappear.');
 
 % Check the linear density boundary independently of the areal case
@@ -90,10 +104,15 @@ result=test_true(result,'Linear density and frozen coordinates',numel(line.ids)=
 
 % Expose unattainable random packing at the caller ceiling
 r.count=2; r=rmfield(r,'density'); r.exclusion_A=20; r.max_attempts=2;
-rejected=false; try, cce_bath(r); catch e, rejected=strcmp(e.identifier,'cce_bath:packing'); end
+rejected=false;
+try
+    cce_bath(r);
+catch e
+    rejected=strcmp(e.identifier,'cce_bath:packing');
+end
 result=test_true(result,'Packing ceiling exposed',rejected,'No hidden relaxation of exclusion radius.');
 
-fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),2e18);
+fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),surface_density);
 
 end
 

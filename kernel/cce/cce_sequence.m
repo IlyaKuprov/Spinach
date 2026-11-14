@@ -45,7 +45,9 @@ if advanced
     segments=cce_controls(model,[],[],[],parameters); schedule=segments.schedule;
     schedule.controls=strcmp(parameters.method,'gcce');
     if ~schedule.controls
+        % Drop validated empty DEER selections before ordinary event validation
         copy=parameters; copy.sequence=schedule.events;
+        copy.sequence=copy.sequence(~arrayfun(@(event)isempty(event.target),copy.sequence));
         if any(strcmp({schedule.events.type},'finite'))
             error('cce_sequence:conditional_drive','Finite controls require gCCE.');
         end

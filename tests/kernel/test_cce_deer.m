@@ -57,6 +57,30 @@ result=test_close(result,'Public DEER species and site filters agree',...
                   filtered.value,by_site.value,0,0,...
                   'The public driver must accept documented species filters without synthetic metadata.');
 
+% Preserve explicitly allowed empty selections through every driver compiler
+q.central.alpha=[1;0]; q.central.beta=[0;1];
+q.deer.detuning_center=100; q.deer.halfwidth=1; q.deer.allow_empty=true;
+for method={'cce','gcce','mecce','megcce','noise'}
+    q.method=method{1}; q.quantity='coherence'; q.jumps=struct([]);
+    if strcmp(q.method,'noise')
+        q.quantity='autocorrelation';
+        q.noise=struct('connected',false,'ordering','ordered',...
+                       'terms',struct('support',2,'operator',diag([1 -1])/2));
+    end
+    reference=q; reference.deer.enabled=false; reference.sequence=[]; expected=cce(ss,reference);
+    passed=false; difference=Inf;
+    try
+        empty=cce(ss,q); difference=max(abs(empty.value-expected.value),[],'all');
+        passed=isequal(empty.valid,expected.valid);
+    catch
+        passed=false;
+    end
+    result=test_true(result,['Empty DEER permitted: ' q.method],passed,...
+                     'An explicitly allowed empty selection is a no-op in every method.');
+    result=test_close(result,['Empty DEER no-pulse value: ' q.method],difference,0,...
+                      1e-12,1e-12,'Removing an empty pulse must preserve the no-pulse result.');
+end
+
 fprintf('DEER exact-boundary cases passed: selected sites [3 4], [3 6], and empty.\n');
 
 end

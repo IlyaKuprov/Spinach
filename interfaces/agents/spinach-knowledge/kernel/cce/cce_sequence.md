@@ -14,6 +14,8 @@ Compile whole-sequence sample times and ideal conditional pulse events.
 - Ideal events use `type=ideal`, physical `target` IDs, axis, angle in rad, and `placement=fraction|absolute`; `at` is a fraction of each total sequence time or seconds, respectively.
 - Conditional CCE accepts only complete-register ideal pi swaps. Named sequences, finite pulses and DEER requests are routed through `cce_controls`.
 
+- Explicitly permitted empty DEER selections are no-op events. After selector validation, empty-target pulses are removed before conditional/ME/noise schedule recursion; generalized control compilation already treats them as no-ops.
+
 ## Inputs and outputs
 
 ```matlab

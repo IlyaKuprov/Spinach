@@ -29,6 +29,33 @@ ensemble=cce_states(model,p); exact=cce_cluster(model,struct('id',1,'sites',[2 3
 mixture_error=norm(sampled(:)-exact.density(:));
 result=test_close(result,'Exhaustive weighted samples equal exact product mixture',sampled,exact.density,1e-12,0,'Exhaustive weighted samples equal exact product mixture');
 
+% Estimate the sampled full-bath mean uncertainty under internal averaging
+sampled=p; sampled.method='gcce'; sampled.quantity='density';
+sampled.bath_state=struct('mode','sampled','samples',16,'seed',17,'basis','uniform','probabilities','uniform');
+sampled.averaging='internal_then_expansion'; averaged=cce(spin_system,sampled);
+values=cellfun(@(raw)raw(end).value,averaged.raw,'UniformOutput',false);
+values=cat(3,values{:});
+expected_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(16*15));
+result=test_close(result,'Internal full-bath sampling uncertainty',...
+                  averaged.sampling_standard_error,expected_error,1e-12,1e-12,...
+                  'Internal full-bath averaging is a sample mean with directly measurable dispersion.');
+result=test_true(result,'Internal full-bath nonzero dispersion',any(expected_error>1e-5,'all'),...
+                 'The regression must sample physically different bath eigenstates.');
+
+% Mark unavailable nonlinear truncated and single-draw estimates explicitly
+sampled.order=1; truncated=cce(spin_system,sampled);
+result=test_true(result,'Internal truncated uncertainty unavailable',...
+                 all(isnan(truncated.sampling_standard_error),'all'),...
+                 'A nonlinear product-of-means estimate must not claim zero Monte Carlo uncertainty.');
+sampled.order=2; sampled.bath_state.samples=1; single=cce(spin_system,sampled);
+result=test_true(result,'Single sample uncertainty unavailable',...
+                 all(isnan(single.sampling_standard_error),'all'),...
+                 'One random draw cannot estimate its own sampling variance.');
+sampled.averaging='after_expansion'; single=cce(spin_system,sampled);
+result=test_true(result,'Single external sample uncertainty unavailable',...
+                 all(isnan(single.sampling_standard_error),'all'),...
+                 'Unavailable uncertainty must have the same meaning in both averaging branches.');
+
 % Show that reducing samples and then averaging is not the reversed estimator
 sample_products=[2 1/2].*[3 1/3]; average_products=mean(sample_products);
 product_averages=mean([2 1/2])*mean([3 1/3]);

@@ -227,12 +227,19 @@ end
 
 % Expose estimator uncertainty separately from propagation error bounds
 result.sampling_standard_error=zeros(size(result.value));
-if ns>1&&strcmp(averaging,'after_expansion')
-    for s=1:ns
-        result.sampling_standard_error=result.sampling_standard_error+...
-            abs(reductions{s}.value-result.value).^2/(ns*(ns-1));
+if strcmp(ensemble.mode,'sampled')
+    result.sampling_standard_error(:)=NaN; values=[];
+    if ns>1&&strcmp(averaging,'after_expansion')
+        values=cellfun(@(item)item.value,reductions,'UniformOutput',false);
+        values=cat(3,values{:});
+    elseif ns>1&&~isempty(full_index)&&...
+           ~(strcmp(parameters.method,'noise')&&parameters.noise.connected)
+        values=cellfun(@(records)records(full_index+1).value,all_raw,'UniformOutput',false);
+        values=cat(3,values{:});
     end
-    result.sampling_standard_error=sqrt(result.sampling_standard_error);
+    if ~isempty(values)
+        result.sampling_standard_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(ns*(ns-1)));
+    end
 end
 result.raw=all_raw;
 end

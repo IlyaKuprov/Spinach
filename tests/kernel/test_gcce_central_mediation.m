@@ -45,6 +45,36 @@ result=test_true(result,'nonfactorization measured',difference>1e-2,...
 metrics.first_order_error=difference;
 metrics.full_order_error=max(abs(second.value-reference));
 
+% Resolve two independently coupled central spins with a joint readout
+sys.isotopes={'1H','1H','13C','13C'};
+inter.zeeman.matrix=repmat({zeros(3)},1,4); inter.coupling.matrix=cell(4);
+spin_system=create(sys,inter);
+spin_system.inter.coupling.matrix{1,3}=diag([0 0 2]);
+spin_system.inter.coupling.matrix{2,4}=diag([0 0 2]);
+p.central_spins=[1 2]; p.bath_spins=[3 4]; p.central=struct('rho',ones(4)/4);
+p.quantity='observable'; p.operators=kron(x,eye(2))+kron(eye(2),x);
+p.times=[0 1]; p.order=2; reference=cos(p.times(:));
+p.averaging='internal_then_expansion';
+
+% Check unitary and master-equation paths against the exact signal
+for method={'gcce','megcce'}
+    p.method=method{1};
+    if strcmp(p.method,'megcce'), p.jumps=struct([]); end
+    for mode={'mixed_product','sampled'}
+        p.bath_state=struct('mode',mode{1});
+        if strcmp(mode{1},'sampled')
+            p.bath_state.samples=4; p.bath_state.seed=11; p.bath_state.basis='uniform';
+            p.bath_state.probabilities={ones(2,1)/2,ones(2,1)/2};
+        end
+        actual=cce(spin_system,p);
+        name=['joint readout ' method{1} ' ' mode{1}];
+        result=test_close(result,name,actual.value,reference,1e-8,1e-8,...
+                          'Disconnected Hamiltonian components need not factorize a sum readout.');
+        metrics.([method{1} '_' mode{1} '_joint_error'])=max(abs(actual.value-reference));
+    end
+    if isfield(p,'jumps'), p=rmfield(p,'jumps'); end
+end
+
 % Report the measured metrics
 disp(metrics);
 

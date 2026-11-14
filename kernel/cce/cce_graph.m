@@ -50,7 +50,7 @@ grumble(model,parameters);
 ids=model.bath_ids; n=numel(ids); nc=numel(central_pos);
 
 % Obtain physical two-spin operator norms before graph pruning
-pair_norm=zeros(n); attachments=false(n,nc); central_graph=eye(nc)>0;
+pair_norm=zeros(n); attachments=false(n,nc);
 for k=1:numel(model.pairs)
 
     % Resolve this unordered physical pair
@@ -86,17 +86,12 @@ for k=1:numel(model.pairs)
         attachments(ia,cb)=strength>0;
     elseif ~isempty(ib)&&~isempty(ca)
         attachments(ib,ca)=strength>0;
-    elseif ~isempty(ca)&&~isempty(cb)&&strength>0
-        central_graph(ca,cb)=true; central_graph(cb,ca)=true;
     end
 
 end
 
-% Connect bath sites mediated by any connected central component
-for k=1:nc
-    central_graph=central_graph|(central_graph(:,k)&central_graph(k,:));
-end
-mediated=(double(attachments)*double(central_graph)*double(attachments.'))>0;
+% Keep the central register joint unless state/readout factorization is proven
+attached=any(attachments,2); mediated=attached&attached.';
 mediated(1:n+1:end)=false;
 
 % Construct scores without modifying the Hamiltonian or edge norms

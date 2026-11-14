@@ -72,6 +72,8 @@ if ~strcmp(parameters.expansion,'standard')
     if strcmp(parameters.expansion,'disjoint_inter'), parameters.order=2; end
 end
 clusters=cce_clusters(model,graph,parameters);
+full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
+if isempty(model.bath_ids), full_index=0; end
 
 % Apply W12 conditional averages before irreducible subset reduction
 if strcmp(parameters.bath_state.mode,'interlaced')
@@ -84,6 +86,17 @@ if strcmp(parameters.bath_state.mode,'interlaced')
     valid=true(size(estimates)); bounds=zeros(size(estimates)); records=cell(numel(ensemble.contexts),numel(clusters));
     for s=1:numel(ensemble.contexts)
         conditioned=parameters; conditioned.interlaced.reference_state=s;
+        if ~isempty(full_index)
+
+            % Exact full-bath averages need no lower-cluster ratios
+            conditioned.interlaced.raw_only=true; target=empty;
+            if full_index>0, target=clusters(full_index); end
+            exact=cce_interlace(model,target,ensemble,schedule,conditioned);
+            estimates(:,s)=exact.value; bounds(:,s)=exact.abs_error_bound; valid(:,s)=exact.valid;
+            by_order(:,:,s)=repmat(exact.value,1,parameters.order);
+            if full_index>0, records{s,full_index}=exact; end
+            continue
+        end
         baseline=cce_interlace(model,empty,ensemble,schedule,conditioned);
         product=baseline.value; uncertainty=baseline.abs_error_bound;
         for order=1:parameters.order
@@ -118,8 +131,6 @@ end
 % Propagate each globally assigned bath state before ensemble reduction
 ns=numel(ensemble.contexts); reductions=cell(1,ns);
 all_raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
-full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
-if isempty(model.bath_ids), full_index=0; end
 
 % Preserve the covariance of the sampled mixture rather than conditional covariances
 if strcmp(parameters.method,'noise')&&parameters.noise.connected&&ns>1

@@ -12,6 +12,8 @@ Evaluate conditional product-state averages for interlaced CCE.
 - Enumerates the declared product-state space within max_states and computes conditional raw averages. Denominator subsets must reuse the numerator condition_sites.
 - Refuses closure beyond the enumeration budget rather than making an undeclared approximate random draw.
 
+- When a full-bath cluster is available, the public driver takes its raw conditional average directly (`raw_only=true`), including the empty-bath case. Singular auxiliary baselines do not mask an exact full-bath result; full-bath output is repeated in the order ledger because intermediate ratios were bypassed.
+
 ## Inputs and outputs
 
 ```matlab

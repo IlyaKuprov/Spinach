@@ -61,6 +61,38 @@ mixture.meanfield='none'; exact=cce(model.spin_system,mixture);
 result=test_close(result,'Full-order W12 equals exact mixed bath',integrated.value,exact.value,...
                   1e-11,0,'Shared-K recursion telescopes at full bath order');
 
+% Full-bath interlacing bypasses singular lower-cluster ratios
+sys.isotopes={'13C','13C','13C'}; sys.magnet=0; sys.output='hush';
+sys.disable={'hygiene'}; sys.parallel={'local',1};
+inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)}; inter.coupling.matrix=cell(3);
+inter.coupling.matrix{1,2}=diag([0 0 2]);
+inter.coupling.matrix{1,3}=zeros(3);
+inter.coupling.matrix{2,3}=diag([8 0 0]); spin_system=create(sys,inter);
+spin_system.inter.coupling.matrix{1,2}=diag([0 0 2]);
+spin_system.inter.coupling.matrix{1,3}=zeros(3);
+spin_system.inter.coupling.matrix{2,3}=diag([8 0 0]);
+q=p; q.method='cce'; q.bath_spins=[2 3]; q.order=2; q.times=[0 pi/2];
+q.bath_state.probabilities='uniform';
+reference=q; reference.bath_state=struct('mode','mixed_product'); reference.meanfield='none';
+exact=cce(spin_system,reference); full_bath=cce(spin_system,q);
+
+% Verify the raw full-bath value against independent conditional exponentials
+x=[0 1;1 0]/2; z=diag([1 -1])/2;
+ha=kron(z,eye(2))+8*kron(x,x); hb=-kron(z,eye(2))+8*kron(x,x);
+dense=trace(expm(1i*hb*pi/2)*expm(-1i*ha*pi/2))/4;
+result=test_close(result,'Interlaced independent dense reference',full_bath.value(end),dense,...
+                  1e-12,1e-12,'The full-bath bypass must reproduce a separately constructed four-dimensional trace.');
+result=test_close(result,'Interlaced full-bath zero baseline',full_bath.value,exact.value,...
+                  1e-12,1e-12,'The exact conditional full-bath average survives a zero empty-cluster baseline.');
+result=test_true(result,'Interlaced full-bath validity',all(full_bath.valid),...
+                 'A singular auxiliary ratio must not invalidate an exact full-bath value.');
+% Preserve the same bypass for raw generalized central coherence
+q.method='gcce'; generalized=cce(spin_system,q);
+result=test_close(result,'Generalized interlaced full-bath zero baseline',generalized.value,...
+                  full_bath.value/2,1e-12,1e-12,...
+                  'Raw generalized coherence differs only by its initial amplitude of one half.');
+fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath.value(end)),real(exact.value(end)));
+
 fprintf('interlacing configurations %d; raw enumeration error %.3g; duplicate-weight difference %.6g; mass %.6g\n',...
         size(raw.assignments,1),norm(raw.value-value),difference,mass);
 

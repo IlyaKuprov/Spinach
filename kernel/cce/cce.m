@@ -31,7 +31,7 @@
 %   times, raw, clusters, graph, schedule, partition, ensemble, model_hash,
 %   input_parameters, averaging, method, exact_reference, elapsed_seconds,
 %   convergence, budget_satisfied, sampling_standard_error and diagnostics;
-%   density is added for density requests. value is time-by-observable;
+%   density is empty except for density requests. value is time-by-observable;
 %   density elements use column-major order.
 %
 % Multiplicative convention: F(empty)=1; F(C)=L(C)/L(empty),
@@ -80,53 +80,62 @@ if strcmp(parameters.bath_state.mode,'interlaced')
     if ~strcmp(parameters.quantity,'coherence')
         error('cce:interlaced','Interlaced multiplication requires scalar coherence.');
     end
-    empty=struct('id',uint64(0),'sites',[]);
-    estimates=zeros(numel(parameters.times),numel(ensemble.contexts));
-    by_order=zeros(numel(parameters.times),parameters.order,numel(ensemble.contexts));
-    valid=true(size(estimates)); bounds=zeros(size(estimates)); records=cell(numel(ensemble.contexts),numel(clusters));
-    for s=1:numel(ensemble.contexts)
+    empty=struct('id',uint64(0),'sites',[]); ns=numel(ensemble.contexts);
+    nt=numel(parameters.times); no=parameters.order+1;
+    estimates=zeros(nt,ns); by_order=zeros(nt,1,no,ns);
+    order_error=zeros(size(by_order)); order_valid=true(size(by_order));
+    valid=true(size(estimates)); bounds=zeros(size(estimates));
+    records=cell(ns,numel(clusters)+1);
+    for s=1:ns
         conditioned=parameters; conditioned.interlaced.reference_state=s;
         if ~isempty(full_index)
-
-            % Exact full-bath averages need no lower-cluster ratios
-            conditioned.interlaced.raw_only=true; target=empty;
-            if full_index>0, target=clusters(full_index); end
-            exact=cce_interlace(model,target,ensemble,schedule,conditioned);
-            estimates(:,s)=exact.value; bounds(:,s)=exact.abs_error_bound; valid(:,s)=exact.valid;
-            by_order(:,:,s)=repmat(exact.value,1,parameters.order);
-            if full_index>0, records{s,full_index}=exact; end
-            continue
+            % Full-bath conditioning is an exact raw average without denominators
+            conditioned.interlaced.raw_only=true;
+            if full_index==0, cluster=empty; else, cluster=clusters(full_index); end
+            item=cce_interlace(model,cluster,ensemble,schedule,conditioned);
+            estimates(:,s)=item.value; bounds(:,s)=item.abs_error_bound;
+            valid(:,s)=item.valid; records{s,full_index+1}=item;
+            by_order(:,:,1:end-1,s)=NaN; order_error(:,:,1:end-1,s)=Inf;
+            order_valid(:,:,1:end-1,s)=false;
+            by_order(:,:,end,s)=item.value; order_error(:,:,end,s)=item.abs_error_bound;
+            order_valid(:,:,end,s)=item.valid; continue;
         end
-        baseline=cce_interlace(model,empty,ensemble,schedule,conditioned);
-        product=baseline.value; uncertainty=baseline.abs_error_bound;
+        base=cce_interlace(model,empty,ensemble,schedule,conditioned);
+        product=base.value; uncertainty=base.abs_error_bound; valid(:,s)=base.valid;
+        records{s,1}=base; by_order(:,:,1,s)=product;
+        order_error(:,:,1,s)=uncertainty; order_valid(:,:,1,s)=valid(:,s);
         for order=1:parameters.order
             for j=find([clusters.order]==order)
                 item=cce_interlace(model,clusters(j),ensemble,schedule,conditioned);
                 uncertainty=abs(product).*item.factor_abs_error_bound+...
                     abs(item.factor).*uncertainty+uncertainty.*item.factor_abs_error_bound;
                 product=product.*item.factor; valid(:,s)=valid(:,s)&item.factor_valid;
-                records{s,j}=item;
+                records{s,j+1}=item;
             end
-            by_order(:,order,s)=product;
+            by_order(:,:,order+1,s)=product; order_error(:,:,order+1,s)=uncertainty;
+            order_valid(:,:,order+1,s)=valid(:,s);
         end
         estimates(:,s)=product; bounds(:,s)=uncertainty;
     end
+
+    % Aggregate every computed prefix and preserve unavailable lower exact orders
+    weights=reshape(ensemble.weights,1,1,1,[]);
     value=estimates*ensemble.weights(:); uncertainty=bounds*ensemble.weights(:);
-    mask=all(valid,2)&uncertainty<=parameters.numerics.atol+parameters.numerics.rtol*abs(value);
-    result=struct('value',value,'coherence',value,'valid',mask,'times',parameters.times,...
-                  'abs_error_bound',uncertainty,...
-                  'by_order',sum(by_order.*reshape(ensemble.weights,1,1,[]),3),...
-                  'raw',{records},'clusters',clusters,'graph',graph,'schedule',schedule,...
-                  'ensemble',ensemble,'model_metadata',rmfield(model,'spin_system'),...
-                  'status','complete','diagnostics',struct('conditioning','W12_shared_K'));
-    result.reason=repmat({''},size(value)); result.reason(~mask)={'unresolved_interlaced_factor'};
-    result.elapsed=toc(started); result.sampling_standard_error=NaN(size(value));
-    if numel(ensemble.contexts)>1
-        result.sampling_standard_error=std(estimates,0,2)/sqrt(numel(ensemble.contexts));
-    end
-    if any(~mask), result.status='incomplete'; end
-    return;
-end
+    prefixes=sum(by_order.*weights,4); prefix_error=sum(order_error.*weights,4);
+    prefix_valid=all(order_valid,4); reasons=repmat({'ok'},size(prefixes));
+    reasons(~prefix_valid)={'unresolved_interlaced_factor'};
+    if ~isempty(full_index), reasons(:,:,1:end-1)={'not_evaluated'}; end
+    mask=all(valid,2)&isfinite(value)&isfinite(uncertainty);
+    result=struct('value',value,'valid',mask,'abs_error_bound',uncertainty,...
+                  'reason',{reasons(:,:,end)},'by_order',prefixes,...
+                  'by_order_error',prefix_error,'by_order_valid',prefix_valid,...
+                  'by_order_reason',{reasons},'orders',0:parameters.order,'reducer','interlaced');
+    result.raw=records(~cellfun(@isempty,records));
+    result.sampling_standard_error=NaN(size(value));
+    if ns>1, result.sampling_standard_error=std(estimates,0,2)/sqrt(ns); end
+    if ~isempty(full_index), result.sampling_standard_error(:)=0; end
+    averaging='conditional_interlaced';
+else
 
 % Propagate each globally assigned bath state before ensemble reduction
 ns=numel(ensemble.contexts); reductions=cell(1,ns);
@@ -225,7 +234,11 @@ if ns>1&&strcmp(averaging,'after_expansion')
     end
     result.sampling_standard_error=sqrt(result.sampling_standard_error);
 end
-result.coherence=result.value; result.raw=all_raw; result.times=parameters.times;
+result.raw=all_raw;
+end
+
+% Finalize every estimator through the same public result and diagnostic contract
+result.coherence=result.value; result.times=parameters.times;
 result.clusters=clusters; result.graph=graph; result.schedule=schedule;
 result.partition=partition;
 result.ensemble=ensemble; result.model_hash=model.source_hash;
@@ -237,11 +250,12 @@ result.budget_satisfied=result.valid&...
     result.abs_error_bound<=parameters.numerics.atol+parameters.numerics.rtol*abs(result.value);
 
 % Diagnose a reconstructed central density without symmetrization or clipping
+result.density=[];
 if strcmp(parameters.quantity,'density')
     d=ensemble.central_dimension; nt=numel(parameters.times);
     result.density=reshape(result.value.',d,d,nt);
 end
-result.diagnostics=cce_diagnostics(model,all_raw,result,parameters);
+result.diagnostics=cce_diagnostics(model,result.raw,result,parameters);
 
 end
 

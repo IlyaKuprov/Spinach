@@ -14,6 +14,8 @@ Evaluate conditional, generalized, open-system or bath-noise cluster expansions 
 - Keeps complex phase, validity masks and numerical error estimates. Density elements are reduced independently; the truncated result is not projected onto a positive density matrix.
 - Attaches cce_diagnostics. Envelope fitting and spectra are separate calls to cce_analyse and cce_spectrum, not automatic driver outputs.
 
+- Every estimator, including interlaced and partitioned calculations, uses the same result schema and `cce_diagnostics`. Density is an empty array unless requested. Interlaced prefixes use time-by-output-by-order arrays including order zero; lower prefixes skipped by an exact full-bath bypass are NaN with false masks and `not_evaluated` reasons, not invented repeated full-order values.
+
 ## Inputs and outputs
 
 ```matlab

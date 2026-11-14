@@ -37,6 +37,44 @@ result=test_true(result,'physical density accepted',physical.diagnostics.accepta
                  physical.diagnostics.physicality_checked,...
                  'Complete exact density is normalized, Hermitian and positive.');
 
+% Audit common result fields across standard, partition, ME and noise branches
+for method={'cce','gcce','mecce','megcce','noise'}
+    q=p; q.method=method{1}; q.quantity='coherence'; q.jumps=struct([]);
+    if strcmp(q.method,'noise')
+        q.quantity='autocorrelation';
+        q.noise=struct('connected',false,'ordering','ordered',...
+                       'terms',struct('support',2,'operator',diag([1 -1])/2));
+    end
+    for expansion={'standard','partition'}
+        q.expansion=expansion{1}; q.groups={2,3};
+        q.partition=struct('mode','user','max_dimension',4);
+        checked=cce(spin_system,q);
+        result=test_true(result,['Common schema: ' q.method ' ' q.expansion],...
+                         isequal(sort(fieldnames(checked)),sort(fieldnames(physical))),...
+                         'Every public driver branch must carry the same result fields.');
+        result=test_close(result,['Final prefix: ' q.method ' ' q.expansion],...
+                          checked.by_order(:,:,end),checked.value,0,0,...
+                          'The final by-order estimate must equal the returned estimate.');
+        result=test_true(result,['Final reasons: ' q.method ' ' q.expansion],...
+                         isequal(checked.by_order_reason(:,:,end),checked.reason),...
+                         'A full-bath bypass must update the final prefix reason codes too.');
+    end
+end
+
+% Retain all sampled prefix means rather than the first sampled trajectory
+q=p; q.bath_state=struct('mode','sampled','basis','uniform',...
+                        'probabilities','uniform','samples',4,'seed',193);
+sampled=cce(spin_system,q); prefixes=zeros(size(sampled.by_order));
+for k=1:numel(sampled.raw)
+    reduced=cce_reduce(sampled.raw{k},sampled.clusters,q);
+    reduced.by_order(:,:,end)=sampled.raw{k}(end).value;
+    prefixes=prefixes+sampled.ensemble.weights(k)*reduced.by_order;
+end
+result=test_close(result,'Sampled by-order means',sampled.by_order,prefixes,1e-12,1e-12,...
+                  'Each displayed prefix must use the same sample averaging as the final result.');
+result=test_close(result,'Sampled final prefix',sampled.by_order(:,:,end),sampled.value,...
+                  1e-12,1e-12,'The result must not expose the first realization as an averaged prefix.');
+
 % Insert a negative eigenvalue without allowing automatic matrix repair
 modified=physical; modified.density(:,:,2)=diag([1.2 -0.2]);
 before=modified.density; diagnosed=cce_diagnostics(model,physical.raw,modified,p);

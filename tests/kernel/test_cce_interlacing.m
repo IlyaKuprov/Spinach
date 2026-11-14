@@ -93,6 +93,26 @@ result=test_close(result,'Generalized interlaced full-bath zero baseline',genera
                   'Raw generalized coherence differs only by its initial amplitude of one half.');
 fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath.value(end)),real(exact.value(end)));
 
+% Require the common result schema and diagnostics on the interlaced path
+reference=q; reference.bath_state=struct('mode','mixed_product'); standard=cce(spin_system,reference);
+result=test_true(result,'Interlaced common result fields',...
+                 isequal(sort(fieldnames(generalized)),sort(fieldnames(standard))),...
+                 'All public driver branches must expose the same documented result fields.');
+result=test_true(result,'Interlaced common diagnostic fields',...
+                 isequal(sort(fieldnames(generalized.diagnostics)),sort(fieldnames(standard.diagnostics))),...
+                 'Interlaced results must carry numerical coverage and budget diagnostics.');
+q.convergence=struct('ladders',struct('field','order','values',{{1,1}}),...
+                     'max_work',10,'atol',1e-8,'rtol',1e-8,'checks',{{}});
+converged=false;
+try
+    checked=cce_converge(spin_system,q); converged=checked.diagnostics.acceptable;
+catch
+    converged=false;
+end
+result=test_true(result,'Interlaced convergence diagnostics',converged,...
+                 'A complete exact interlaced calculation must be usable by cce_converge.');
+q=rmfield(q,'convergence');
+
 % Match ordinary master evaluation for recursive and full-bath interlacing
 sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.output='hush';
 inter.zeeman.scalar={0,0,0}; inter.coupling=struct('scalar',{cell(3)});

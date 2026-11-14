@@ -12,8 +12,9 @@
 % Inputs:
 %   model - output of cce_prepare.
 %   sites - physical bath IDs; [] selects the central baseline.
-%   context - bath IDs, single-site states/expectations and mean-field
-%   choice; optional backend override.
+%   context - scalar structure with optional backend override, exterior_ids
+%   and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
+%   Exterior fields use retained model pair interactions.
 %
 % Outputs:
 %   H - Hermitian cluster Hamiltonian in rad/s.

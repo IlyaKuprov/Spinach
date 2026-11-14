@@ -15,7 +15,8 @@
 % Inputs:
 %   model, cluster, context, schedule, parameters - cluster inputs;
 %   noise.ordering=ordered|symmetrized, logical connected, and terms with
-%   ordered bath support and operator matrices.
+%   ordered bath support and operator matrices; optional noise.branch selects
+%   alpha or beta.
 %
 % Outputs:
 %   raw - time-dependent autocorrelation with the standard cluster IDs,

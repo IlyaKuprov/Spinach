@@ -21,6 +21,16 @@ a bath or justify a universal product approximation for population T1.
 subtraction rather than multiplying coherences. Declare operator ordering and
 connected subtraction before computing a spectrum.
 
+## Reduction convention
+
+Write `L(C)` for a raw cluster observable and `L(empty)` for the shared
+central baseline. The multiplicative expansion uses `F(C)=L(C)/L(empty)`,
+`K(C)=F(C)/product(K(S))` over nonempty proper subsets, and
+`L_approx=L(empty)*product(K(C))` over the retained family. Noise instead uses
+`K(C)=L(C)-L(empty)-sum(K(S))` and adds the connected contributions.
+Subset closure and consistent state/conditioning contexts are essential.
+Unresolved denominators produce explicit invalid masks, not epsilon repairs.
+
 ## Minimal conditional calculation
 
 This deliberately small example checks the API and exact full-bath limit; it
@@ -163,7 +173,8 @@ evidence that bath size, graph pruning or sampling is converged.
 frequency grid in rad/s, one/two-sidedness, full/positive time domain,
 rectangle/trapezoid weights and none/Hann window. Positive-time extension
 requires `stationary=true`. There is no window-power renormalization.
-`cce_analyse` only fits the explicitly declared real/magnitude envelope,
+Call spectrum and analysis helpers separately; `cce` does not attach their
+outputs automatically. `cce_analyse` only fits the explicitly declared real/magnitude envelope,
 interval, model, weights and confidence choice; it does not label an arbitrary
 fit as T1.
 
@@ -181,6 +192,11 @@ sidecar that is the round-trip authority; retain it.
 - [Numerical conditioning](../../spinach-knowledge/tests/kernel/test_cce_conditioning.md)
 - [Convergence tests](../../spinach-knowledge/tests/kernel/test_cce_convergence.md)
 - [Import/export tests](../../spinach-knowledge/tests/kernel/test_cce_io.md)
+
+Method references: [conditional CCE](https://doi.org/10.1103/PhysRevB.78.085315),
+[generalized CCE](https://doi.org/10.1103/PRXQuantum.2.010311),
+[pCCE](https://doi.org/10.1103/PhysRevB.110.L220302), and
+[ME-CCE](https://doi.org/10.1103/PhysRevLett.132.250401).
 
 Read the local `kernel/cce/*.m` headers and `grumble` checks before extending
 these structures; the implementation is the authority for supported fields.

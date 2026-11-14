@@ -26,7 +26,7 @@ segments=cce_controls(model,sites,context,schedule,parameters)
 
 **Outputs**
 
-- `segments` — compiled schedule and/or time-segment Hamiltonians, pulses and exterior-field metadata.
+- `segments` — schedule, selected_sites, durations, hamiltonians, pulses and exterior_expectations indexed by time then segment; generalized propagation also returns raw with central densities and reducer fields.
 
 ## References
 

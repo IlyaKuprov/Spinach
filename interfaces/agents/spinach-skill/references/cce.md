@@ -96,7 +96,7 @@ default is named below, supply the field explicitly and obey its source
 | `checkpoint.file`, `.resume` | MAT checkpoint path and explicit resume flag | No checkpoint when file absent/empty; resume false |
 | `analysis.fit` | Enable explicit-window envelope fit | false; fit model/window/weights/confidence must be supplied when enabled |
 
-For second-order conditional projection, enable `central.second_order.enabled`
+For second-order conditional projection, enable `second_order.enabled`
 and supply `gap_tolerance` in rad/s and `overlap_tolerance`; disabled otherwise.
 For pCCE supply `partition.mode=user|coupling|spatial|adaptive`,
 `max_group_size`, `max_group_dimension`, and mode-specific fields.
@@ -180,7 +180,7 @@ sidecar that is the round-trip authority; retain it.
 - [Open-system reference](../../spinach-knowledge/tests/kernel/test_mecce_exact.md)
 - [Numerical conditioning](../../spinach-knowledge/tests/kernel/test_cce_conditioning.md)
 - [Convergence tests](../../spinach-knowledge/tests/kernel/test_cce_convergence.md)
-- [Import/export tests](../../spinach-knowledge/tests/kernel/test_cce_import_export.md)
+- [Import/export tests](../../spinach-knowledge/tests/kernel/test_cce_io.md)
 
 Read the local `kernel/cce/*.m` headers and `grumble` checks before extending
 these structures; the implementation is the authority for supported fields.

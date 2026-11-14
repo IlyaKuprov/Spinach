@@ -10,7 +10,7 @@ Construct explicit, lattice or random spin baths with explicit isotope assignmen
 
 - Builds Spinach sys/inter inputs and a physical bath record; cell vectors and coordinates use Angstrom, magnetic field uses tesla.
 - Supports seeded random coordinates/occupancies and exact or sampled occupancy configurations. Missing occupancy probability denotes vacancy.
-- Point dipoles are included only when explicitly requested; declared hyperfine/contact/quadrupole tensors carry explicit conventions rather than inferred units.
+- Does not add point dipoles. Optional tensors_Hz and pairs_Hz carry Cartesian tensor data; rotation, translation_A, remove_ids, selection and groups retain stable site IDs.
 
 ## Inputs and outputs
 

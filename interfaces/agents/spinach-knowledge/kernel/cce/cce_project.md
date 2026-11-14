@@ -21,7 +21,7 @@ branches=cce_project(model,parameters)
 **Inputs**
 
 - `model` — prepared central-register model.
-- `parameters.central.alpha`, `.beta` — normalized orthogonal state vectors. Optional `.second_order.enabled`; when true, `.gap_tolerance` in rad/s and `.overlap_tolerance` are mandatory.
+- `parameters.central.alpha`, `.beta` — normalized orthogonal state vectors. Optional `parameters.second_order.enabled`; when true, `parameters.second_order.gap_tolerance` in rad/s and `overlap_tolerance` are mandatory.
 
 **Outputs**
 

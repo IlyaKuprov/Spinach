@@ -2,8 +2,10 @@
 %
 %                 imported=cce_import(filename,format,units)
 %
-% format: mat/json (cce_export envelopes), csv (export sidecar or table
-% id,isotope,x,y,z), xyz, tensor (CSV id1,id2,xx,xy,...,zz), or cube.
+% format: mat/json (cce_export envelopes returning model/result),
+% csv (export sidecar or table
+% id,isotope,x,y,z), xyz, tensor (CSV id1,id2,value or id1,id2,xx,...,zz),
+% or cube. Scalars denote isotropic tensors.
 % External coordinates require units.length='angstrom','nm','m','bohr'.
 % Tensors require units.tensor='Hz','kHz','MHz','rad/s','T','mT','G'; field
 % units also require units.gyro_rad_s_T. units.frame is mandatory ('lab'
@@ -29,10 +31,11 @@ if ismember(format,{'json','mat'})||...
         envelope=unpack(jsondecode(fileread(filename)));
     end
     if ~isstruct(envelope)||~all(isfield(envelope,{'schema','version','payload'}))||...
-       ~strcmp(envelope.schema,'spinach-cce')||envelope.version~=1
+       ~strcmp(envelope.schema,'spinach-cce')||envelope.version~=1||...
+       ~isfield(envelope,'model')||~isfield(envelope,'payload')
         error('cce_import:version','Unsupported CCE file schema.');
     end
-    imported=envelope.payload; return;
+    imported=struct('model',envelope.model,'result',envelope.payload); return;
 end
 
 % Require a frame for all non-self-describing physical input
@@ -175,12 +178,14 @@ end
 
 function grumble(filename,format,units)
 
-% Check parse arguments and any supplied frame transformation
 if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
    ~ismember(format,{'mat','json','csv','xyz','tensor','cube'})||...
    ~isstruct(units)||~isscalar(units), error('Invalid CCE import arguments.'); end
 if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    any(~isfinite(units.rotation),'all')||norm(units.rotation.'*units.rotation-eye(3),'fro')>100*eps||...
-   abs(det(units.rotation)-1)>100*eps), error('Invalid frame rotation.'); end
+   abs(det(units.rotation)-1)>100*eps)
+    error('Invalid frame rotation.');
+end
 
 end
+

@@ -62,6 +62,28 @@ sampled=arrayfun(@(c)prod(c.multiplicities),sample.configurations);
 reference=real(exact); variance=sum([configs.weight].*(real(values)-reference).^2);
 error=abs(mean(sampled)-reference); bound=5*sqrt(variance/numel(sampled));
 result=test_true(result,'Sampling agrees within a declared five-sigma bound',error<bound&&isequal(state,rng),'Sampling agrees within a declared five-sigma bound');
+
+% Check pure vacancies without constructing a fictitious spin-zero species
+v=struct('mode','explicit','isotopes',{{'1H','1H'}},'magnetic',0,...
+         'coordinates_A',[0 0 0;1 0 0],'species',{{'1H','2H'}},...
+         'occupancy',[0 0;0 0],'seed',8);
+[empty_sys,~,empty_bath]=cce_bath(v);
+result=test_true(result,'Vacancies remove spins entirely',isempty(empty_sys.isotopes)&&...
+                 isempty(empty_bath.ids),'No placeholder multiplicity is introduced.');
+
+% Refuse exponential enumeration above the explicit resource ceiling
+v.occupancy=[0.2 0.3;0.2 0.3];
+v.isotopologues=struct('mode','enumerate','max_configurations',8);
+rejected=false;
+try
+    cce_bath(v);
+catch e
+    rejected=strcmp(e.identifier,'cce_bath:configurations');
+end
+result=test_true(result,'Enumeration ceiling exposed',rejected,...
+                 'Nine configurations cannot silently truncate to eight.');
+
 fprintf('CCE isotopologues: mean error %.6g; five-sigma bound %.6g; 6000 draws.\n',error,bound);
 
 end
+

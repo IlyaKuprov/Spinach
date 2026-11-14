@@ -21,7 +21,10 @@
 function [sys,inter,bath]=cce_bath(specification)
 
 % Validate the explicit physical boundary
-s=specification; grumble(s);
+grumble(specification); s=specification;
+
+% Normalize isotope tables to the public row-vector convention
+s.isotopes=s.isotopes(:).';
 if isfield(s,'configurations')&&strcmp(s.mode,'lattice')&&prod(s.repeats)>1
     error('Joint isotopologues require explicit sites, not implicit lattice replication.');
 end
@@ -40,7 +43,7 @@ switch s.mode
             origin=[origin 1:size(s.fractional,1)]; %#ok<AGROW>
         end
     case 'random'
-        span=diff(s.bounds_A,1,1); active=find(span>0);
+        span=diff(s.bounds_A,1,1); active=span>0;
         measure=prod(span(active)*1e-10);
         if isfield(s,'count'), count=s.count;
         else, count=round(s.density*measure); end
@@ -60,7 +63,7 @@ end
 
 % Expand site properties and preserve pre-deletion identities
 ids=1:size(xyz,1); species=s.isotopes;
-if numel(species)==1, species=repmat(species,1,numel(ids));
+if isscalar(species), species=repmat(species,1,numel(ids));
 elseif numel(species)~=numel(ids), species=species(origin); end
 prob=[];
 if isfield(s,'occupancy')
@@ -144,7 +147,7 @@ if isfield(s,'tensors_Hz')
     inter.zeeman.units='Hz';
 end
 if isfield(s,'pairs_Hz')
-    inter.coupling.matrix=cell(numel(ids));
+    inter.coupling.matrix=cell(numel(ids),numel(ids));
     for n=1:numel(s.pairs_Hz)
         [present,index]=ismember(s.pairs_Hz(n).ids,ids);
         if all(present)
@@ -164,7 +167,7 @@ bath.configuration_selection=1;
 if isempty(configs), bath.configuration_selection=[]; end
 bath.groups=num2cell(ids); bath.units=struct('coordinates','angstrom','couplings','Hz');
 if isfield(s,'groups')
-    bath.groups=cellfun(@(g)intersect(g,ids,'stable'),s.groups,'UniformOutput',false);
+    bath.groups=cellfun(@(g)intersect(g,ids,'stable'),s.groups(:).','UniformOutput',false);
     bath.groups=bath.groups(~cellfun(@isempty,bath.groups));
     if ~isequal(sort([bath.groups{:}]),ids), error('Groups must partition retained IDs.'); end
 end
@@ -198,15 +201,15 @@ end
 
 function grumble(s)
 
-% Require an explicit and finite input schema
 if ~isstruct(s)||~isscalar(s)||~all(isfield(s,{'mode','isotopes','magnetic'}))||...
    ~ismember(s.mode,{'explicit','lattice','random'})||~iscellstr(s.isotopes)||...
    isempty(s.isotopes)||~isnumeric(s.magnetic)||~isscalar(s.magnetic)||...
-   ~isfinite(s.magnetic)||s.magnetic<0
+   ~isreal(s.magnetic)||~isfinite(s.magnetic)||s.magnetic<0
     error('Invalid bath specification.');
 end
 for k=1:numel(s.isotopes), spin(s.isotopes{k}); end
-if isfield(s,'seed')&&(~isscalar(s.seed)||s.seed<0||s.seed~=fix(s.seed))
+if isfield(s,'seed')&&(~isnumeric(s.seed)||~isreal(s.seed)||~isscalar(s.seed)||...
+   ~isfinite(s.seed)||s.seed<0||s.seed>2^32-1||s.seed~=fix(s.seed))
     error('Seed must be a nonnegative integer.');
 end
 switch s.mode
@@ -239,33 +242,73 @@ switch s.mode
         n=1;
 end
 if numel(s.isotopes)~=1&&numel(s.isotopes)~=n, error('Species count mismatch.'); end
+site_count=n;
+if strcmp(s.mode,'lattice'), site_count=n*prod(s.repeats); end
+if strcmp(s.mode,'random')
+    if isfield(s,'count')
+        site_count=s.count;
+    else
+        widths=diff(s.bounds_A);
+        site_count=round(s.density*prod(widths(widths>0)*1e-10));
+    end
+end
+if isfield(s,'groups')
+    if ~iscell(s.groups)||~isrow(s.groups), error('Groups must be a cell row.'); end
+    for k=1:numel(s.groups)
+        g=s.groups{k};
+        if ~isnumeric(g)||~isreal(g)||~isrow(g)||isempty(g)||...
+           any(~isfinite(g))||any(g<1)||any(g>site_count)||any(g~=fix(g))
+            error('Groups must contain valid candidate site IDs.');
+        end
+    end
+    if numel(unique([s.groups{:}]))~=numel([s.groups{:}])
+        error('Physical groups overlap.');
+    end
+end
+if isfield(s,'pairs_Hz')
+    if ~isstruct(s.pairs_Hz)||~all(isfield(s.pairs_Hz,{'ids','tensor'}))
+        error('Pair tensors require ids and tensor fields.');
+    end
+    pair_ids=zeros(numel(s.pairs_Hz),2);
+    for k=1:numel(s.pairs_Hz)
+        ids=s.pairs_Hz(k).ids; tensor=s.pairs_Hz(k).tensor;
+        if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||numel(ids)~=2||...
+           any(~isfinite(ids))||any(ids<1)||any(ids>site_count)||any(ids~=fix(ids))
+            error('Pair tensors require valid candidate site IDs.');
+        end
+        if ~isnumeric(tensor)||~isreal(tensor)||any(~isfinite(tensor),'all')||...
+           ~(isscalar(tensor)||isequal(size(tensor),[3 3]))
+            error('Pair tensors must be finite real scalars or 3-by-3 matrices.');
+        end
+        pair_ids(k,:)=sort(ids);
+    end
+    if size(unique(pair_ids,'rows'),1)~=size(pair_ids,1)
+        error('Duplicate pair tensors are ambiguous.');
+    end
+end
 if isfield(s,'selection')
     q=s.selection;
     if ~isstruct(q)||~all(isfield(q,{'centres_A','inner_A','outer_A'}))||...
        isempty(q.centres_A)||size(q.centres_A,2)~=3||any(~isfinite(q.centres_A),'all')||...
        ~isscalar(q.inner_A)||~isscalar(q.outer_A)||q.inner_A<0||q.outer_A<q.inner_A||...
-       isnan(q.inner_A)||isnan(q.outer_A), error('Invalid shell selection.'); end
+       isnan(q.inner_A)||isnan(q.outer_A)
+        error('Invalid shell selection.');
+    end
 end
-if isfield(s,'remove_ids')&&(~isnumeric(s.remove_ids)||any(~isfinite(s.remove_ids))||...
-   any(s.remove_ids<1|s.remove_ids~=fix(s.remove_ids))), error('Invalid deleted site IDs.'); end
+if isfield(s,'remove_ids')&&(~isnumeric(s.remove_ids)||~isreal(s.remove_ids)||...
+   any(~isfinite(s.remove_ids))||any(s.remove_ids<1|s.remove_ids>site_count|...
+   s.remove_ids~=fix(s.remove_ids)))
+    error('Invalid deleted site IDs.');
+end
 if isfield(s,'tensors_Hz')&&(~isnumeric(s.tensors_Hz)||~isreal(s.tensors_Hz)||...
    size(s.tensors_Hz,1)~=3||size(s.tensors_Hz,2)~=3||any(~isfinite(s.tensors_Hz),'all'))
     error('Local tensors must be finite real 3-by-3-by-site arrays in Hz.');
 end
-if isfield(s,'pairs_Hz')
-    for k=1:numel(s.pairs_Hz)
-        pair=s.pairs_Hz(k);
-        if ~all(isfield(pair,{'ids','tensor'}))||numel(pair.ids)~=2||...
-           any(~isfinite(pair.ids)|pair.ids<1|pair.ids~=fix(pair.ids))||...
-           ~isnumeric(pair.tensor)||~isreal(pair.tensor)||any(~isfinite(pair.tensor),'all')||...
-           (~isscalar(pair.tensor)&&~isequal(size(pair.tensor),[3 3]))
-            error('Invalid Hz pair tensor record.');
-        end
-    end
-end
-if isfield(s,'rotation')&&(~isequal(size(s.rotation),[3 3])||...
+if isfield(s,'rotation')&&(~isnumeric(s.rotation)||~isreal(s.rotation)||~isequal(size(s.rotation),[3 3])||...
    any(~isfinite(s.rotation),'all')||norm(s.rotation.'*s.rotation-eye(3),'fro')>100*eps||...
-   abs(det(s.rotation)-1)>100*eps), error('Rotation must be proper orthogonal.'); end
+   abs(det(s.rotation)-1)>100*eps)
+    error('Rotation must be proper orthogonal.');
+end
 if isfield(s,'translation_A')&&(~isequal(size(s.translation_A),[1 3])||any(~isfinite(s.translation_A))), error('Invalid translation.'); end
 if isfield(s,'occupancy')
     if ~isfield(s,'species')||~iscellstr(s.species)||size(s.occupancy,2)~=numel(s.species)||...
@@ -296,3 +339,4 @@ if isfield(s,'isotopologues')
 end
 
 end
+

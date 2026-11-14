@@ -3,7 +3,8 @@
 %                    result=test_cce_lunghi_fixtures()
 %
 % Set SPINACH_CCE_LUNGHI_FIXTURES to inputs and CSVs, and
-% SPINACH_CCE_LUNGHI_STATES to phase-preserving *_states.json files. Source
+% SPINACH_CCE_LUNGHI_STATES to phase-preserving *_states.json files and
+% *_diagnostic.mat source matrices exported by PyCCE. Source
 % structures are not redistributed: the pinned source has no licence.
 % These reduced source-input cases are not published-figure validation.
 %
@@ -67,6 +68,12 @@ for case_id=1:2
     model=cce_prepare(ss,p); [hamiltonian,~]=cce_hamiltonian(model,[],struct());
     states=jsondecode(fileread(fullfile(states_folder,[name '_states.json'])));
     a=states.alpha_real+1i*states.alpha_imag; b=states.beta_real+1i*states.beta_imag;
+    source=load(fullfile(states_folder,[name '_diagnostic.mat']),'H','Hc');
+    central_error=norm(hamiltonian/(2*pi*1000)-source.Hc,'fro');
+    matrix_scale=norm(source.Hc,'fro');
+    result=test_close(result,[name ' central source Hamiltonian'],...
+                      full(hamiltonian)/(2*pi*1000)/matrix_scale,source.Hc/matrix_scale,1e-10,0,...
+                      'Explicit kHz to rad/s boundary and central Hilbert ordering.');
     residual=max(norm(hamiltonian*a-a*(a'*hamiltonian*a)),...
                  norm(hamiltonian*b-b*(b'*hamiltonian*b)))/norm(hamiltonian,'fro');
     result=test_true(result,[name ' exported eigenstates'],residual<100*eps,...
@@ -75,8 +82,23 @@ for case_id=1:2
     p.sequence=struct('type','ideal','target',[1 2],'placement','fraction','at',0.5,...
                       'operator',pi*(a*b'+b*a')/2);
     p.normalized=true; actual=cce(ss,p);
+
     % Separate the stored source pulse from the unitary Spinach logical pulse
     [full_hamiltonian,~]=cce_hamiltonian(model,[3 4],struct());
+
+    % Permute bath-first PyCCE ordering into the central-first native basis
+    permutation=reshape(1:4*central_dimension,central_dimension,4).';
+    permutation=permutation(:); reference_h=source.H(permutation,permutation);
+    matrix_error=norm(full(full_hamiltonian)/(2*pi*1000)-reference_h,'fro');
+    matrix_scale=norm(reference_h,'fro');
+    result=test_close(result,[name ' complete source Hamiltonian'],...
+                      full(full_hamiltonian)/(2*pi*1000)/matrix_scale,reference_h/matrix_scale,1e-10,0,...
+                      'Independent PyCCE tensor compilation and explicit basis permutation.');
+    fprintf('%s source matrices: absolute %.6g/%.6g kHz; relative %.6g/%.6g.\n',...
+            name,central_error,matrix_error,central_error/norm(source.Hc,'fro'),...
+            matrix_error/norm(reference_h,'fro'));
+
+    % Propagate source and unitary pulses with dense matrix exponentials
     initial=kron((a+b)*(a+b)'/2,eye(4)/4);
     source_pulse=-1i*kron(a*b'+b*a',eye(4));
     unitary_pulse=expm(-1i*pi*kron(a*b'+b*a',eye(4))/2);
@@ -91,9 +113,9 @@ for case_id=1:2
         independent(k)=2*a'*reduced*b;
     end
     reference=expected(:,2)+1i*expected(:,3); errors(case_id)=max(abs(source-reference));
-    result=test_close(result,[name ' stored source pulse'],source,reference,2e-8,2e-8,...
+    result=test_close(result,[name ' stored source pulse'],source,reference,1e-10,0,...
                       'Stored source uses -i sigma_x with zero spectator block.');
-    result=test_close(result,[name ' unitary CCE pulse'],actual.value,independent,2e-8,2e-8,...
+    result=test_close(result,[name ' unitary CCE pulse'],actual.value,independent,1e-10,0,...
                       'Spinach uses exp(-i pi sigma_x/2), retaining spectator levels.');
     result=test_true(result,[name ' distinct pulse semantics'],norm(source_pulse'*source_pulse-eye(4*central_dimension),'fro')>1,...
                      'Do not equate the source fixture pulse with a full unitary.');
@@ -109,3 +131,4 @@ reduced=zeros(dimension);
 for k=1:4, reduced=reduced+density(k:4:end,k:4:end); end
 
 end
+

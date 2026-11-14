@@ -1,8 +1,9 @@
 % Export a complete CCE result without discarding complex phase. Syntax:
 %
-%                      cce_export(result,filename,format)
+%                      cce_export(filename,model,result)
 %
-% format is 'mat','json', or 'csv'. MAT/JSON store a versioned envelope;
+% filename must end in .mat, .json, or .csv; model and result are scalar
+% structures. MAT/JSON store a versioned envelope with both structures;
 % JSON preserves numeric type, shape, complex components and nonfinite
 % values. CSV stores numeric vectors/matrices as long-form real/imag rows.
 % A JSON sidecar, filename.json, retains the full result and diagnostics.
@@ -10,11 +11,14 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function cce_export(result,filename,format)
+function cce_export(filename,model,result)
 
 % Validate serialization choices before opening a destination
- grumble(result,filename,format);
- envelope=struct('schema','spinach-cce','version',1,'payload',result);
+grumble(filename,model,result);
+
+% Infer the representation without extending the fixed public signature
+[~,~,extension]=fileparts(filename); format=lower(extension(2:end));
+envelope=struct('schema','spinach-cce','version',1,'model',model,'payload',result);
 
 % Preserve native MATLAB arrays or explicitly typed JSON values
 switch format
@@ -39,7 +43,7 @@ switch format
                 end
             end
         end
-        cce_export(result,[filename '.json'],'json');
+        cce_export([filename '.json'],model,result);
 end
 
 end
@@ -72,12 +76,17 @@ end
 
 end
 
-function grumble(result,filename,format)
+function grumble(filename,model,result)
 
-% Require a scalar result structure and a supported file representation
-if ~isstruct(result)||~isscalar(result)||~ischar(filename)||isempty(filename)||...
-   ~ischar(format)||~ismember(format,{'mat','json','csv'})
+if ~ischar(filename)||~isrow(filename)||isempty(filename)||...
+   ~isstruct(model)||~isscalar(model)||~isstruct(result)||~isscalar(result)
     error('Invalid CCE export arguments.');
 end
 
+[~,~,extension]=fileparts(filename);
+if ~ismember(lower(extension),{'.mat','.json','.csv'})
+    error('CCE export requires a .mat, .json or .csv filename.');
 end
+
+end
+

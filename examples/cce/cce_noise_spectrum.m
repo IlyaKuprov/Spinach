@@ -33,10 +33,10 @@ result=cce(spin_system,parameters); reference=cos(omega*result.times(:))/4;
 result.reference_error=max(abs(result.value-reference));
 fprintf('Noise analytic cosine maximum error: %.3g.\n',result.reference_error);
 
-% Transform the stated finite observation window, without a Markov assumption
+% Extend the stationary mixed-state correlation without a Markov assumption
 parameters.spectrum=struct('frequency_grid',linspace(-2*abs(omega),2*abs(omega),401),...
     'convention','exp(+i*omega*t)','sidedness','two-sided','window','hann',...
-    'time_domain','positive','weights','trapezoid');
+    'time_domain','positive','weights','trapezoid','stationary',true);
 spectrum=cce_spectrum(result.times,result.value,parameters); result.spectrum=spectrum;
 
 % Plot the physical correlation and its finite-window transform

@@ -2,8 +2,8 @@
 %
 %                       result=cce(spin_system,parameters)
 %
-% Required fields: central_spins, bath_spins, method (cce/gcce), expansion
-% (standard), quantity (coherence/density/observable), times (whole-sequence
+% Required fields: central_spins, bath_spins, method (cce/gcce/mecce/megcce/noise), expansion
+% (standard), quantity (coherence/density/observable/autocorrelation), times (whole-sequence
 % seconds), order, central, assumptions, orientation, interaction_cutoff,
 % graph, bath_state, meanfield, sequence, numerics.atol/rtol/max_memory_bytes.
 % cce_prepare, cce_graph, cce_states and cce_sequence document their schemas.
@@ -17,6 +17,9 @@
 % metadata. Density outputs additionally report physicality without repair.
 % Extensions fail with cce:capability until their implementations are present;
 % no optional control, checkpoint or dissipative physics is silently ignored.
+% ME jumps use ordered physical support, dimensionless operator and s^-1 rate
+% fields (cce_liouvillian). Noise requires explicit ordering, connected flag
+% and Hermitian support/operator terms (cce_noise); its reducer is additive.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,7 +28,14 @@ function result=cce(spin_system,parameters)
 % Validate orchestration choices before canonicalizing the physical model
 grumble(spin_system,parameters);
 started=tic; model=cce_prepare(spin_system,parameters);
-ensemble=cce_states(model,parameters); schedule=cce_sequence(model,parameters);
+
+% Dispatch open-system and additive-noise cluster evaluators
+evaluator=@cce_cluster;
+if ismember(parameters.method,{'mecce','megcce'}), evaluator=@cce_master; end
+if strcmp(parameters.method,'noise'), evaluator=@cce_noise; end
+state_parameters=parameters;
+if ismember(parameters.method,{'mecce','noise'}), state_parameters.method='cce'; end
+ensemble=cce_states(model,state_parameters); schedule=cce_sequence(model,parameters);
 graph=cce_graph(model,parameters); clusters=cce_clusters(model,graph,parameters);
 
 % Propagate each globally assigned bath state before ensemble reduction
@@ -34,9 +44,9 @@ empty=struct('id',uint64(0),'sites',[]);
 full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
 if isempty(model.bath_ids), full_index=0; end
 for s=1:ns
-    records=cce_cluster(model,empty,ensemble.contexts(s),schedule,parameters);
+    records=evaluator(model,empty,ensemble.contexts(s),schedule,parameters);
     for k=1:numel(clusters)
-        records(k+1)=cce_cluster(model,clusters(k),ensemble.contexts(s),schedule,parameters);
+        records(k+1)=evaluator(model,clusters(k),ensemble.contexts(s),schedule,parameters);
     end
     all_raw{s}=records;
 end
@@ -150,15 +160,18 @@ end
 required={'method','expansion','quantity','times','order','central',...
           'bath_state','meanfield','sequence','numerics'};
 if ~all(isfield(parameters,required)), error('Required CCE parameter fields are missing.'); end
-if ~ismember(parameters.method,{'cce','gcce'})
+if ~ismember(parameters.method,{'cce','gcce','mecce','megcce','noise'})
     error('cce:capability','Method requires the cce_liouvillian or cce_noise extension.');
 end
 if ~strcmp(parameters.expansion,'standard')
     error('cce:capability','Nonstandard grouping requires the cce_partition extension.');
 end
-if ~ismember(parameters.quantity,{'coherence','density','observable'})||...
-   (strcmp(parameters.method,'cce')&&~strcmp(parameters.quantity,'coherence'))
+if ~ismember(parameters.quantity,{'coherence','density','observable','autocorrelation'})||...
+   (ismember(parameters.method,{'cce','mecce'})&&~strcmp(parameters.quantity,'coherence'))
     error('Conditional CCE returns branch coherence; gcce also returns density and observables.');
+end
+if strcmp(parameters.method,'noise')&&~strcmp(parameters.quantity,'autocorrelation')
+    error('noise requires quantity=autocorrelation.');
 end
 if ~strcmp(parameters.meanfield,'none')&&~strcmp(parameters.meanfield,'static')
     error('meanfield must be explicitly none or static.');

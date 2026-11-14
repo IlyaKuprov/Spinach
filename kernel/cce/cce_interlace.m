@@ -139,7 +139,12 @@ for k=1:numel(weights)
     % Preserve worst constituent residuals rather than only the first assignment
     if isfield(item,'eigen_residual')
         raw.eigen_residual=max(raw.eigen_residual,item.eigen_residual);
+    end
+    if isfield(item,'orthogonality_residual')
         raw.orthogonality_residual=max(raw.orthogonality_residual,item.orthogonality_residual);
+    end
+    if isfield(item,'unitarity_residual')
+        raw.unitarity_residual=max(raw.unitarity_residual,item.unitarity_residual);
     end
 end
 

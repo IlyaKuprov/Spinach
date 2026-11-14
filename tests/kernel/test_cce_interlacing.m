@@ -202,6 +202,37 @@ end
 fprintf('interlacing configurations %d; raw enumeration error %.3g; duplicate-weight difference %.6g; mass %.6g\n',...
         size(raw.assignments,1),norm(raw.value-value),difference,mass);
 
+% Preserve driven raw schemas through both truncated and full-bath interlacing
+sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.output='hush';
+sys.disable={'hygiene'}; sys.parallel={'processes',1};
+inter.coupling.matrix=cell(3); inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
+inter.coupling.matrix{1,3}=diag([1 3 4])/(2*pi); spin_system=create(sys,inter);
+q=p; q.method='gcce'; q.bath_spins=[2 3]; q.meanfield='none';
+q.bath_state.probabilities='uniform'; q.times=[0 0.2 0.5];
+q.interlaced=struct('max_states',4); driven_ok=true; driven_error=0;
+finite=struct('type','finite','target',1,'placement','absolute','at',0.05,...
+              'duration',0.05,'axis','x','amplitude',2,'detuning',0);
+for sequence={struct('name','hahn','count',1,'axis','x','target',1),finite}
+    q.sequence=sequence{1};
+    for order=1:2
+        q.order=order; reference=q; reference.bath_state=struct('mode','mixed_product');
+        expected=cce(spin_system,reference);
+        try
+            actual=cce(spin_system,q);
+            driven_error=max(driven_error,norm(actual.value-expected.value,'fro'));
+            driven_ok=driven_ok&&all(isfinite(actual.value),'all')&&...
+                      all(isfinite(actual.abs_error_bound),'all');
+        catch exception
+            driven_ok=false; fprintf('Driven interlacing exception %s\n',exception.identifier);
+        end
+    end
+end
+result=test_true(result,'Driven interlaced raw schemas',driven_ok,...
+                 'Named and finite controls must not require a static-only residual field.');
+result=test_close(result,'Driven interlaced mixed-state equivalence',driven_error,0,2e-12,0,...
+                  'Explicit uniform assignments and mixed local states give identical cluster averages.');
+fprintf('R6 driven interlacing accepted %d; maximum error %.3g\n',driven_ok,driven_error);
+
 end
 
 % Build a nontrivial static-exterior model with two included pair superclusters

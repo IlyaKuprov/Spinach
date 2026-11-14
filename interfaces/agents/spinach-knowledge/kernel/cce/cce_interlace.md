@@ -16,7 +16,7 @@ Evaluate conditional product-state averages for interlaced CCE.
 
 - When a full-bath cluster is available, the public driver takes its raw conditional average directly (`raw_only=true`), including the empty-bath case. Singular auxiliary baselines do not mask an exact full-bath result; skipped lower-order prefixes are explicitly unavailable, and the final-order ledger retains the exact value with its validity/error metadata.
 
-- Conditional raw diagnostics retain the largest eigenproblem and orthogonality residual over all constituent assignments, not only the first assignment.
+- Conditional raw diagnostics retain the largest available eigenproblem, orthogonality and unitarity residual over all constituent assignments, not only the first assignment. Each field is optional independently; driven records need not provide static-eigensystem diagnostics.
 
 ## Inputs and outputs
 

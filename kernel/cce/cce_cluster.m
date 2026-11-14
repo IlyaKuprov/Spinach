@@ -14,6 +14,15 @@
 
 function raw=cce_cluster(model,cluster,context,schedule,parameters)
 
+% Route driven generalized clusters through the local segment compiler
+if isstruct(schedule)&&isfield(schedule,'controls')&&schedule.controls
+    if ~strcmp(parameters.method,'gcce')
+        error('cce_cluster:controls','Driven or exterior-pulse sequences require gCCE.');
+    end
+    segments=cce_controls(model,sort(cluster.sites),context,schedule,parameters);
+    raw=segments.raw; raw.cluster_id=uint64(cluster.id); return;
+end
+
 % Validate the fixed interfaces and supported dynamics family
 grumble(model,cluster,context,schedule,parameters);
 

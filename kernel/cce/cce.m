@@ -28,6 +28,48 @@ started=tic; model=cce_prepare(spin_system,parameters);
 ensemble=cce_states(model,parameters); schedule=cce_sequence(model,parameters);
 graph=cce_graph(model,parameters); clusters=cce_clusters(model,graph,parameters);
 
+% Apply W12 conditional averages before irreducible subset reduction
+if strcmp(parameters.bath_state.mode,'interlaced')
+    if ~strcmp(parameters.quantity,'coherence')
+        error('cce:interlaced','Interlaced multiplication requires scalar coherence.');
+    end
+    empty=struct('id',uint64(0),'sites',[]);
+    estimates=zeros(numel(parameters.times),numel(ensemble.contexts));
+    by_order=zeros(numel(parameters.times),parameters.order,numel(ensemble.contexts));
+    valid=true(size(estimates)); bounds=zeros(size(estimates)); records=cell(numel(ensemble.contexts),numel(clusters));
+    for s=1:numel(ensemble.contexts)
+        conditioned=parameters; conditioned.interlaced.reference_state=s;
+        baseline=cce_interlace(model,empty,ensemble,schedule,conditioned);
+        product=baseline.value; uncertainty=baseline.abs_error_bound;
+        for order=1:parameters.order
+            for j=find([clusters.order]==order)
+                item=cce_interlace(model,clusters(j),ensemble,schedule,conditioned);
+                uncertainty=abs(product).*item.factor_abs_error_bound+...
+                    abs(item.factor).*uncertainty+uncertainty.*item.factor_abs_error_bound;
+                product=product.*item.factor; valid(:,s)=valid(:,s)&item.factor_valid;
+                records{s,j}=item;
+            end
+            by_order(:,order,s)=product;
+        end
+        estimates(:,s)=product; bounds(:,s)=uncertainty;
+    end
+    value=estimates*ensemble.weights(:); uncertainty=bounds*ensemble.weights(:);
+    mask=all(valid,2)&uncertainty<=parameters.numerics.atol+parameters.numerics.rtol*abs(value);
+    result=struct('value',value,'coherence',value,'valid',mask,'times',parameters.times,...
+                  'abs_error_bound',uncertainty,...
+                  'by_order',sum(by_order.*reshape(ensemble.weights,1,1,[]),3),...
+                  'raw',{records},'clusters',clusters,'graph',graph,'schedule',schedule,...
+                  'ensemble',ensemble,'model_metadata',rmfield(model,'spin_system'),...
+                  'status','complete','diagnostics',struct('conditioning','W12_shared_K'));
+    result.reason=repmat({''},size(value)); result.reason(~mask)={'unresolved_interlaced_factor'};
+    result.elapsed=toc(started); result.sampling_standard_error=NaN(size(value));
+    if numel(ensemble.contexts)>1
+        result.sampling_standard_error=std(estimates,0,2)/sqrt(numel(ensemble.contexts));
+    end
+    if any(~mask), result.status='incomplete'; end
+    return;
+end
+
 % Propagate each globally assigned bath state before ensemble reduction
 ns=numel(ensemble.contexts); all_raw=cell(1,ns); reductions=cell(1,ns);
 empty=struct('id',uint64(0),'sites',[]);
@@ -167,12 +209,9 @@ if isfield(parameters,'averaging')&&...
    ~ismember(parameters.averaging,{'after_expansion','internal_then_expansion'})
     error('cce:capability','Interlaced averaging requires cce_interlace.');
 end
-if ismember(parameters.bath_state.mode,{'sampled','interlaced'})&&...
+if strcmp(parameters.bath_state.mode,'sampled')&&...
    ~isfield(parameters,'averaging')
     error('Sampled states require an explicit averaging estimator.');
-end
-if strcmp(parameters.bath_state.mode,'interlaced')
-    error('cce:capability','Interlaced states require cce_interlace.');
 end
 for name={'drive','relaxation','convergence','checkpoint','control','pulse_family','time_axes'}
     if isfield(parameters,name{1})&&~isempty(parameters.(name{1}))
@@ -187,9 +226,6 @@ if isfield(parameters,'parallel')&&~isempty(parameters.parallel)
 end
 if isfield(parameters.numerics,'precision')&&~strcmp(parameters.numerics.precision,'double')
     error('cce:capability','Baseline propagation requires double precision.');
-end
-if isfield(parameters,'deer')&&isfield(parameters.deer,'enabled')&&parameters.deer.enabled
-    error('cce:capability','DEER selection requires cce_controls.');
 end
 end
 

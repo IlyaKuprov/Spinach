@@ -41,6 +41,14 @@ value=value/mass; duplicated=duplicated/occurrence_mass; difference=norm(value-d
 result=test_close(result,'Conditional raw average agrees with independent full-state enumeration',raw.value,value,1e-12,0,'Conditional raw average agrees with independent full-state enumeration');
 result=test_true(result,'Duplicate-occurrence weighting gives a detectably different answer',difference>1e-4,'Duplicate-occurrence weighting gives a detectably different answer');
 
+% Preserve the largest numerical residual across every conditional assignment
+probe=p; probe.interlaced.evaluator=@residual_fixture;
+measured=cce_interlace(model,cluster,ensemble,schedule,probe);
+result=test_close(result,'Interlaced worst residual retained',max(measured.eigen_residual),2,...
+                  0,0,'Ensemble diagnostics must not report only the first assignment residual.');
+result=test_close(result,'Interlaced worst orthogonality retained',max(measured.orthogonality_residual),4,...
+                  0,0,'Residual metadata follows the worst constituent solve, not its weight.');
+
 % Denominator subclusters are conditioned on exactly the numerator distribution
 empty=struct('id',uint64(0),'sites',[]); baseline=cce_interlace(model,empty,ensemble,schedule,p);
 result=test_true(result,...
@@ -103,7 +111,6 @@ result=test_true(result,'Interlaced common diagnostic fields',...
                  'Interlaced results must carry numerical coverage and budget diagnostics.');
 q.convergence=struct('ladders',struct('field','order','values',{{2,2}}),...
                      'max_work',10,'atol',1e-8,'rtol',1e-8,'checks',{{}});
-converged=false;
 try
     checked=cce_converge(spin_system,q); converged=checked.diagnostics.acceptable;
 catch
@@ -111,7 +118,6 @@ catch
 end
 result=test_true(result,'Interlaced convergence diagnostics',converged,...
                  'A complete exact interlaced calculation must be usable by cce_converge.');
-q=rmfield(q,'convergence');
 result=test_true(result,'Exact interlaced lower orders unavailable',...
                  all(isnan(generalized.by_order(:,:,1:end-1)),'all')&&...
                  all(~generalized.by_order_valid(:,:,1:end-1),'all'),...
@@ -150,6 +156,15 @@ end
 fprintf('interlacing configurations %d; raw enumeration error %.3g; duplicate-weight difference %.6g; mass %.6g\n',...
         size(raw.assignments,1),norm(raw.value-value),difference,mass);
 
+end
+
+% Supply controlled constituent residuals to test conditional metadata reduction
+function raw=residual_fixture(model,cluster,context,schedule,parameters)
+
+% Evaluate the unchanged physics and tag the sampled exterior assignment
+raw=cce_cluster(model,cluster,context,schedule,parameters);
+raw.eigen_residual=1.5-context.expectations(3,3);
+raw.orthogonality_residual=2*raw.eigen_residual;
 end
 
 % Build a nontrivial static-exterior model with two included pair superclusters

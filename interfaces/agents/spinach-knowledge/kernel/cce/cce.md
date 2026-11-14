@@ -14,7 +14,7 @@ Evaluate conditional, generalized, open-system or bath-noise cluster expansions 
 - Keeps complex phase, validity masks and numerical error estimates. Density elements are reduced independently; the truncated result is not projected onto a positive density matrix.
 - Attaches cce_diagnostics. Envelope fitting and spectra are separate calls to cce_analyse and cce_spectrum, not automatic driver outputs.
 
-- Every estimator, including interlaced and partitioned calculations, uses the same result schema and `cce_diagnostics`. Density is an empty array unless requested. Interlaced prefixes use time-by-output-by-order arrays including order zero; lower prefixes skipped by an exact full-bath bypass are NaN with false masks and `not_evaluated` reasons, not invented repeated full-order values.
+- Every estimator, including interlaced and partitioned calculations, uses the same result schema and `cce_diagnostics`. Density is an empty array unless requested; density-specific diagnostics are present but empty until physicality_checked is true. Interlaced prefixes use time-by-output-by-order arrays including order zero; lower prefixes skipped by an exact full-bath bypass are NaN with false masks and `not_evaluated` reasons, not invented repeated full-order values.
 
 - Sampling uncertainty is the standard error of independent sample means where available, including internal full-bath averaging. A single random draw, truncated nonlinear internal averaging, and internal connected-noise covariance report NaN rather than false zero certainty. Deterministic mixed states report zero. Full-bath interlacing is an exact enumerated conditional distribution, so has zero sampling error.
 

@@ -34,7 +34,7 @@ for n=1:numel(names)
         result=test_close(result,[names{n} ' reference'],actual.reference_error,...
                           0,1e-7,0,'Analytic, dense expm, or pinned Python reference.');
     end
-    if isfield(actual,'density')
+    if ~isempty(actual.density)
 
         % Full-order finite baths must preserve central density physicality
         result=test_true(result,[names{n} ' trace'],...

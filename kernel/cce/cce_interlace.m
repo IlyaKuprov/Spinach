@@ -131,6 +131,11 @@ for k=1:numel(weights)
     raw.abs_error_bound=raw.abs_error_bound+weights(k)*item.abs_error_bound;
     raw.density=raw.density+weights(k)*item.density;
     raw.valid=raw.valid&item.valid;
+    % Preserve worst constituent residuals rather than only the first assignment
+    if isfield(item,'eigen_residual')
+        raw.eigen_residual=max(raw.eigen_residual,item.eigen_residual);
+        raw.orthogonality_residual=max(raw.orthogonality_residual,item.orthogonality_residual);
+    end
 end
 
 % Form the irreducible W12 factor using precisely the same conditioning event

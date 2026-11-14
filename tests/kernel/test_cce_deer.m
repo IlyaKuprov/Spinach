@@ -68,7 +68,7 @@ for method={'cce','gcce','mecce','megcce','noise'}
                        'terms',struct('support',2,'operator',diag([1 -1])/2));
     end
     reference=q; reference.deer.enabled=false; reference.sequence=[]; expected=cce(ss,reference);
-    passed=false; difference=Inf;
+    difference=Inf;
     try
         empty=cce(ss,q); difference=max(abs(empty.value-expected.value),[],'all');
         passed=isequal(empty.valid,expected.valid);

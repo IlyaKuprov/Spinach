@@ -73,6 +73,8 @@ diagnostics.truncation_error=[]; diagnostics.structural_error=[];
 diagnostics.sampling_error=[]; diagnostics.time_mesh_error=[];
 diagnostics.complete_coverage=all(valid,'all');
 diagnostics.physicality_checked=false; diagnostics.physicality_pass=true;
+diagnostics.trace_error=[]; diagnostics.hermiticity_error=[];
+diagnostics.minimum_eigenvalue=[]; diagnostics.physicality_valid=[];
 
 % Inspect density matrices as returned, including all invalid time points
 if isfield(result,'density')&&~isempty(result.density)

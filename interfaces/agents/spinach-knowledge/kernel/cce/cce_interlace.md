@@ -29,6 +29,8 @@ raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
 
 - `raw` — conditional raw cluster observable with condition_sites and conditional-average diagnostics for consistent denominator reduction.
 
+Conditional averages dispatch `cce`/`gcce` to the closed-system evaluator and `mecce`/`megcce` to the master-equation evaluator, including empty baselines, recursive subsets and the full-bath shortcut. Interlaced multiplicative reduction requires scalar coherence, not additive noise correlations.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_interlace.m)

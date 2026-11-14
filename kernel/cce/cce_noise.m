@@ -97,6 +97,10 @@ if ~isstruct(model)||~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||
    ~isstruct(parameters)||~isfield(parameters,'noise')
     error('Prepared model, cluster, context, schedule and noise parameters are required.');
 end
+if ~isfield(parameters,'method')||~strcmp(parameters.method,'noise')||...
+   ~isfield(parameters,'quantity')||~strcmp(parameters.quantity,'autocorrelation')
+    error('cce_noise:capability','Noise evaluation requires method=noise and quantity=autocorrelation.');
+end
 noise=parameters.noise;
 if ~isstruct(noise)||~all(isfield(noise,{'ordering','connected','terms'}))||...
    ~ismember(noise.ordering,{'ordered','symmetrized'})||...

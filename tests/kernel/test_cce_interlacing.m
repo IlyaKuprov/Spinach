@@ -93,6 +93,34 @@ result=test_close(result,'Generalized interlaced full-bath zero baseline',genera
                   'Raw generalized coherence differs only by its initial amplitude of one half.');
 fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath.value(end)),real(exact.value(end)));
 
+% Match ordinary master evaluation for recursive and full-bath interlacing
+sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.output='hush';
+inter.zeeman.scalar={0,0,0}; inter.coupling=struct('scalar',{cell(3)});
+spin_system=create(sys,inter);
+q=p; q.bath_spins=[2 3]; q.times=[0 0.3 0.8]; q.meanfield='none';
+q.bath_state.probabilities='uniform'; q.interlaced=struct('max_states',4);
+q.jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
+for method={'mecce','megcce'}
+    q.method=method{1};
+    for order=1:2
+        q.order=order; reference=q; reference.bath_state=struct('mode','mixed_product');
+        expected=cce(spin_system,reference); matched=false; difference_me=Inf;
+        try
+            actual=cce(spin_system,q); difference_me=max(abs(actual.value-expected.value));
+            matched=all(actual.valid)&&difference_me<2e-11;
+        catch exception
+            fprintf('Interlaced %s order %d: %s\n',method{1},order,exception.message);
+        end
+        result=test_true(result,sprintf('Interlaced %s order %d dispatch',method{1},order),matched,...
+                         'Both recursive subset averages and full-bath shortcuts must retain Lindblad jumps.');
+        scale=1; if strcmp(method{1},'megcce'), scale=0.5; end
+        result=test_close(result,sprintf('Analytic %s dephasing reference',method{1}),expected.value,...
+                          scale*exp(-1.4*q.times(:)),2e-11,2e-11,...
+                          'A central Pauli-z jump damps coherence at twice its supplied rate.');
+        fprintf('R5575 %s order %d error %.3g.\n',method{1},order,difference_me);
+    end
+end
+
 fprintf('interlacing configurations %d; raw enumeration error %.3g; duplicate-weight difference %.6g; mass %.6g\n',...
         size(raw.assignments,1),norm(raw.value-value),difference,mass);
 

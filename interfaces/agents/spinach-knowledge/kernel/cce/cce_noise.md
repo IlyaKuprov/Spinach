@@ -26,6 +26,8 @@ raw=cce_noise(model,cluster,context,schedule,parameters)
 
 - `raw` — time-dependent autocorrelation with the standard cluster IDs, validity and error fields; additive reduction is selected by method noise.
 
+Direct calls require `method='noise'` and `quantity='autocorrelation'`; other physical evaluators are not silently substituted.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_noise.m)

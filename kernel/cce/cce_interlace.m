@@ -115,7 +115,13 @@ for k=1:numel(weights)
             context.expectations(j,a)=real(trace(context.bath_rho{j}*operators{a}));
         end
     end
-    item=cce_cluster(model,cluster,context,schedule,parameters);
+
+    % Preserve the physical evaluator in every recursive conditional average
+    if ismember(parameters.method,{'mecce','megcce'})
+        item=cce_master(model,cluster,context,schedule,parameters);
+    else
+        item=cce_cluster(model,cluster,context,schedule,parameters);
+    end
     if isempty(raw)
         raw=item; raw.value=zeros(size(item.value));
         raw.abs_error_bound=zeros(size(item.abs_error_bound));

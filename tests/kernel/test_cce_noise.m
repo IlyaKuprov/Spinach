@@ -81,6 +81,19 @@ fprintf('R1236 sampled covariance %.16g; empirical variance %.16g.\n',...
 fprintf('Noise full-order error %.3g; quantum ordering error %.3g\n',...
         exact_error,max(abs(ordered.value-reference)));
 
+% Refuse routing a master-equation request through the noise evaluator
+q=p; q.method='megcce'; q.central.rho=ones(2)/2;
+model=cce_prepare(s,q); ensemble=cce_states(model,q);
+schedule=cce_sequence(model,q); cluster=struct('id',uint64(1),'sites',[2 3]);
+rejected=false;
+try
+    cce_noise(model,cluster,ensemble.contexts(1),schedule,q);
+catch exception
+    rejected=strcmp(exception.identifier,'cce_noise:capability');
+end
+result=test_true(result,'Noise evaluator rejects foreign method',rejected,...
+                 'Direct evaluator calls must not silently use Hamiltonian noise dynamics for a master-equation method.');
+
 end
 
 

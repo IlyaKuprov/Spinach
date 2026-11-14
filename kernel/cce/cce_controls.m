@@ -359,8 +359,14 @@ for event=reshape(events,1,[])
            ~isscalar(event.detuning)||~isreal(event.detuning)||~isfinite(event.detuning)
             error('cce_controls:finite','Finite pulses require duration,axis,amplitude,detuning.');
         end
-    elseif ~isfield(event,'angle')||~isscalar(event.angle)||~isreal(event.angle)||~isfinite(event.angle)
-        error('cce_controls:angle','Ideal pulse angle must be finite and real.');
+    else
+        % Operator events default to angle one; axis events require an angle
+        has_operator=isfield(event,'operator')&&~isempty(event.operator);
+        has_angle=isfield(event,'angle')&&~isempty(event.angle);
+        if (~has_operator&&~has_angle)||(has_angle&&(~isnumeric(event.angle)||...
+           ~isscalar(event.angle)||~isreal(event.angle)||~isfinite(event.angle)))
+            error('cce_controls:angle','Ideal pulse angle must be finite and real.');
+        end
     end
     if strcmp(event.type,'ideal')&&isfield(event,'operator')&&~isempty(event.operator)
         d=prod(model.multiplicities(event.target)); op=event.operator;

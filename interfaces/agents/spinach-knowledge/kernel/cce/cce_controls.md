@@ -8,6 +8,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
+- Ideal operator events use angle one when `angle` is omitted or empty, including alongside finite controls; axis events still require an explicit finite angle.
+
 - Coherence is raw by default on every dispatch path; explicit `normalized=true` divides by the initial coherence.
 - Observable readout and error bounds both use `parameters.operators`.
 - DEER species filters use the prepared model’s canonical isotope metadata.

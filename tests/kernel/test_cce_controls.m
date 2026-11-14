@@ -17,6 +17,41 @@ initial=kron(context.central_rho,context.bath_rho{1}); rho=U*initial*U'; expecte
 error=norm(s.raw.density(:,:,end)-expected,'fro');
 result=test_close(result,'Finite detuned drive matches independent dense expm',s.raw.density(:,:,end),expected,1e-12,0,'Finite detuned drive matches independent dense expm');
 
+% Preserve optional operator angles when finite controls select this compiler
+finite=p.sequence; ideal=finite; ideal.type='ideal'; ideal.at=0.15;
+ideal.axis=[]; ideal.operator=0.3*z; finite.operator=[];
+q=p; q.sequence=[finite ideal]; accepted=true; optional_error=Inf;
+try
+    implicit=cce_controls(model,2,context,[],q);
+    q.sequence(1).angle=[]; q.sequence(2).angle=[];
+    empty_angle=cce_controls(model,2,context,[],q);
+    q.sequence(2).angle=1; explicit=cce_controls(model,2,context,[],q);
+    optional_error=max(norm(implicit.raw.value-explicit.raw.value),norm(empty_angle.raw.value-explicit.raw.value));
+catch exception
+    accepted=false; fprintf('operator optional-angle exception %s\n',exception.identifier);
+end
+result=test_true(result,'Finite ideal operator optional angle',accepted,...
+                 'Omitted and empty ideal operator angles both mean one beside finite controls.');
+result=test_close(result,'Finite ideal operator angle parity',optional_error,0,1e-12,1e-12,...
+                  'Both optional forms must match an explicit unit angle.');
+fprintf('operator optional-angle error %.3g\n',optional_error);
+
+% Match ideal-only optional angles in Hamiltonian and master-equation paths
+for method={'gcce','megcce'}
+    q=p; q.method=method{1}; q.sequence=rmfield(ideal,{'amplitude','detuning','duration'});
+    q.jumps=struct([]); values=cell(1,3);
+    for variant=1:3
+        if variant==2, q.sequence.angle=[]; elseif variant==3, q.sequence.angle=1; end
+        values{variant}=cce(model.spin_system,q);
+    end
+    result=test_close(result,[method{1} ' omitted ideal operator angle'],...
+                      values{1}.value,values{3}.value,1e-12,1e-12,...
+                      'The ideal evaluator must default an absent operator angle to one.');
+    result=test_close(result,[method{1} ' empty ideal operator angle'],...
+                      values{2}.value,values{3}.value,1e-12,1e-12,...
+                      'The ideal evaluator must default an empty operator angle to one.');
+end
+
 % Require no-op control dispatch to preserve explicit and default normalization
 q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
 q.central.rho=ones(2)/2; q.sequence=[]; ss=model.spin_system;

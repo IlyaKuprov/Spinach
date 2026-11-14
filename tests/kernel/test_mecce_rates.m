@@ -70,6 +70,36 @@ result=test_true(result,'C7 contract check',max(abs(first.*second-combined))>0.0
 fprintf('ME dephasing maximum error %.3g; T1 product counterexample %.3g\n',...
         max(abs(conditional.value-2*expected(:))),max(abs(first.*second-combined)));
 
+% Refuse a nonnormal jump whose loss operator leaves a selected branch
+sys.isotopes={'14N'}; inter.zeeman.scalar={0}; s=create(sys,inter);
+a=[1;0;0]; b=[0;1;0]; psi=(a+b)/sqrt(2);
+p.method='mecce'; p.quantity='coherence'; p.times=[0 1]; p.bath_spins=[];
+p.central=struct('alpha',a,'beta',b,'rho',psi*psi');
+op=[1 0 1;0 0 0;0 0 0];
+p.jumps=struct('support',1,'operator',op,'rate',1);
+rejected=false;
+try
+    cce(s,p);
+catch exception
+    rejected=strcmp(exception.identifier,'cce:jumpBranches');
+end
+result=test_true(result,'Conditional loss-operator leakage refused',rejected,...
+                 'Jump invariance alone does not close a nonnormal Lindblad coherence block.');
+
+% Retain the excluded level in an independent dense master-equation reference
+p.method='megcce'; full=cce(s,p); loss=op'*op;
+generator=kron(conj(op),op)-(kron(eye(3),loss)+kron(loss.',eye(3)))/2;
+rho=reshape(expm(generator)*p.central.rho(:),3,3);
+result=test_close(result,'Nonnormal jump full-space reference',full.value(end),rho(1,2),...
+                  2e-12,2e-12,'ME-gCCE retains the third-level loss-operator coupling.');
+fprintf('R5567 normalized full %.16g; conditional truncation %.16g.\n',...
+        2*real(rho(1,2)),exp(-0.5));
+
+% Continue accepting reducing conditional subspaces with an excluded level
+p.method='mecce'; p.jumps.operator=diag([1 0 2]); closed=cce(s,p);
+result=test_close(result,'Reducing three-level conditional jump',closed.value(end),exp(-0.5),...
+                  2e-12,2e-12,'An excluded level alone is not grounds for refusing a closed block.');
+
 end
 
 

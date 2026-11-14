@@ -85,8 +85,14 @@ for k=1:numel(parameters.jumps)
         vb=kron(parameters.central.beta,eye(db));
         left=va'*op*va; right=vb'*op*vb;
         leakage=norm(op*va-va*left,'fro')+norm(op*vb-vb*right,'fro');
-        if leakage>100*eps*d*max(1,norm(op,'fro'))
-            error('cce:jumpBranches','A central-changing jump requires megcce.');
+
+        % Check closure under the anticommutator loss operator as well
+        loss=op'*op;
+        loss_leakage=norm(loss*va-va*(va'*loss*va),'fro')+...
+                     norm(loss*vb-vb*(vb'*loss*vb),'fro');
+        if leakage>100*eps*d*max(1,norm(op,'fro'))||...
+           loss_leakage>100*eps*d*max(1,norm(loss,'fro'))
+            error('cce:jumpBranches','A branch-changing jump or loss operator requires megcce.');
         end
     else
         left=op; right=op;

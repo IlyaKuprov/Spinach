@@ -27,6 +27,8 @@ Build a local GKSL generator for full density or conditional coherence blocks.
 - `G` — dense GKSL generator acting on column-vectorized density/coherence blocks.
 - `meta` — tensor order, dimensions, Hamiltonians and included jump records.
 
+Conditional jumps must preserve both selected branches under the jump operator and its loss operator `J' * J`; otherwise use `megcce`, including for central registers larger than two levels.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_liouvillian.m)

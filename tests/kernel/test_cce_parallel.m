@@ -68,6 +68,46 @@ try
     cce(spin_system,p); catch exception, refused=strcmp(exception.identifier,'cce_schedule:memory'); end
 result=test_true(result,'memory cap',refused,'Raw storage and dense working matrices are bounded together.');
 
+% Bound all concurrently active cluster workspaces in the selected batch
+p.numerics.max_memory_bytes=2^26;
+model=cce_prepare(spin_system,p); graph=cce_graph(model,p);
+clusters=cce_clusters(model,graph,p); ensemble=cce_states(model,p);
+schedule=cce_sequence(model,p); p.parallel.mode='clusters';
+p.parallel.batch_size=2; count=numel(ensemble.contexts)*(numel(clusters)+1);
+nt=numel(schedule.times); dc=prod(model.multiplicities(model.central_ids));
+metadata=whos('model','clusters','ensemble','schedule','p');
+resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
+dimension=max([clusters.dimension])/dc; workspace=16*(24+numel(schedule.events))*dimension^2;
+p.numerics.max_memory_bytes=resident+1.5*workspace; refused=false;
+try
+    cce_schedule(model,clusters,ensemble,schedule,p,@cce_cluster);
+catch exception
+    if ~strcmp(exception.identifier,'cce_schedule:memory'), rethrow(exception); end
+    refused=true;
+end
+result=test_true(result,'Concurrent worker memory preflight',refused,...
+                 'A cap fitting one workspace but not two must reject a two-worker batch before evaluation.');
+p.parallel.mode='serial'; accepted=cce_schedule(model,clusters,ensemble,schedule,p,@cce_cluster);
+result=test_true(result,'Single-worker memory preflight',numel(accepted)==numel(ensemble.contexts),...
+                 'The same cap must still admit one serial workspace.');
+fprintf('Memory cap %.0f bytes; one workspace %.0f; two-worker refusal %d.\n',...
+        p.numerics.max_memory_bytes,workspace,refused);
+
+% Include concurrent Liouville workspaces in the master-equation bound
+p.method='mecce'; p.parallel.mode='clusters';
+model=cce_prepare(spin_system,p); metadata=whos('model','clusters','ensemble','schedule','p');
+resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
+workspace=16*(24+numel(schedule.events))*dimension^4;
+p.numerics.max_memory_bytes=resident+1.5*workspace; refused=false;
+try
+    cce_schedule(model,clusters,ensemble,schedule,p,@cce_cluster);
+catch exception
+    if ~strcmp(exception.identifier,'cce_schedule:memory'), rethrow(exception); end
+    refused=true;
+end
+result=test_true(result,'Concurrent ME worker memory preflight',refused,...
+                 'Each active ME task needs its own squared-Hilbert-space dense workspace.');
+
 % Print the pilot timings without imposing an unjustified speedup target
 fprintf('CCE pilot serial %.6g s; one worker %.6g s; two workers %.6g s; discrepancy %.3g.\n',...
         serial_time,one_time,two_time,max(abs(serial.value-two.value),[],'all'));

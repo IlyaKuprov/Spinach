@@ -8,6 +8,8 @@ Evaluate cluster/state tasks in deterministic indexed batches.
 
 ## Behaviour
 
+- The memory preflight includes one dense workspace for every simultaneously active worker, limited by pool size, batch size and task count; serial execution retains a one-workspace bound.
+
 - Sorts task IDs by configuration, state and cluster, but returns records in the input context/cluster order; workers do not perform reduction.
 - Runs serially by default; parallel.mode=clusters or states uses an existing pool started by create with explicit sys.parallel. The pool size and aggregate memory bounds are checked.
 - Can resume versioned checkpoints with matching physical identity. `parallel.max_tasks` provides an intentional incomplete-run checkpoint boundary.

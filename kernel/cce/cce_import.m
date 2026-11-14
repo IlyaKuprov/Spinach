@@ -29,10 +29,11 @@ if ismember(format,{'json','mat'})||...
         envelope=unpack(jsondecode(fileread(filename)));
     end
     if ~isstruct(envelope)||~all(isfield(envelope,{'schema','version','payload'}))||...
-       ~strcmp(envelope.schema,'spinach-cce')||envelope.version~=1
+       ~strcmp(envelope.schema,'spinach-cce')||envelope.version~=1||...
+       ~isfield(envelope,'model')||~isfield(envelope,'payload')
         error('cce_import:version','Unsupported CCE file schema.');
     end
-    imported=envelope.payload; return;
+    imported=struct('model',envelope.model,'result',envelope.payload); return;
 end
 
 % Require a frame for all non-self-describing physical input

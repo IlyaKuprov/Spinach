@@ -21,7 +21,7 @@
 function [sys,inter,bath]=cce_bath(specification)
 
 % Validate the explicit physical boundary
-s=specification; grumble(s);
+grumble(specification); s=specification;
 if isfield(s,'configurations')&&strcmp(s.mode,'lattice')&&prod(s.repeats)>1
     error('Joint isotopologues require explicit sites, not implicit lattice replication.');
 end

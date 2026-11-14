@@ -17,9 +17,10 @@ original=struct('value',[1+2i NaN;3-4i Inf],'validity',logical([1 0;1 0]),...
 
 % Test each versioned representation, including its complete diagnostics
 for format={'mat','json','csv'}
-    file=fullfile(folder,['result.' format{1}]); cce_export(original,file,format{1});
+    file=fullfile(folder,['result.' format{1}]); model=struct('coordinates_A',[1 2 3]);
+    cce_export(file,model,original);
     restored=cce_import(file,format{1},struct());
-    result=test_true(result,['Exact complex round trip: ' format{1}],isequaln(original,restored),['Exact complex round trip: ' format{1}]);
+    result=test_true(result,['Exact complex round trip: ' format{1}],isequaln(original,restored.result)&&isequaln(model,restored.model),['Exact complex round trip: ' format{1}]);
 end
 
 % Verify declared coordinate units and active Cartesian rotations

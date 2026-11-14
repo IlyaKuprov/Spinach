@@ -54,7 +54,9 @@ if advanced
         if ~isempty(schedule.events)&&any(strcmp({schedule.events.type},'finite'))
             error('cce_sequence:conditional_drive','Finite controls require gCCE.');
         end
+        % Remove both static-field options before recursive event-only compilation
         copy.meanfield='none';
+        if isfield(copy,'meanfield_radius'), copy=rmfield(copy,'meanfield_radius'); end
         if isfield(copy,'deer'), copy.deer.enabled=false; end
         schedule=cce_sequence(model,copy);
     end

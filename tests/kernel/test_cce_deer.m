@@ -163,6 +163,45 @@ else, difference=Inf; end
 result=test_close(result,'Driver spectrum helper parity',difference,0,...
                   0,0,'The driver must invoke the same explicit Fourier contract as cce_spectrum.');
 
+% Retain physical mean fields while stripping their options during event recompilation
+r=base; r=rmfield(r,intersect(fieldnames(r),{'noise','spectrum','deer','normalized'}));
+r.quantity='coherence'; r.central=struct('alpha',[1;0],'beta',[0;1],'rho',ones(2)/2);
+r.bath_state=struct('mode','mixed_product'); r.meanfield='static'; r.meanfield_radius=Inf;
+r.times=[0 0.01]; r.order=2;
+for method={'cce','mecce','megcce'}
+    r.method=method{1};
+    if ~strcmp(r.method,'cce'), r.jumps=struct([]); end
+    for control=1:3
+
+        % Cover named central pulses, DEER selection and explicit bath pulses
+        r.sequence=struct('name','hahn','count',1,'axis','x','target',1);
+        if control==2
+            r.sequence=struct('type','ideal','target','deer','placement','fraction',...
+                              'at',0.5,'axis','x','angle',pi);
+            r.deer=struct('enabled',true,'detuning_center',0,'halfwidth',1,'sites',2);
+        elseif control==3
+            r.sequence=struct('type','ideal','target',2,'placement','fraction',...
+                              'at',0.5,'axis','x','angle',pi);
+        end
+        if control~=2&&isfield(r,'deer'), r=rmfield(r,'deer'); end
+
+        % Compare the explicit unbounded radius against the default unbounded field
+        unlimited=rmfield(r,'meanfield_radius'); reference=cce_sequence(prepared,unlimited);
+        passed=true; difference=Inf;
+        try
+            with_radius=cce_sequence(prepared,r); difference=double(~isequaln(with_radius,reference));
+        catch exception
+            if ~strcmp(exception.identifier,'cce:capability'), rethrow(exception); end
+            passed=false;
+        end
+        name=sprintf('Static radius recursive controls %s %d',r.method,control);
+        result=test_true(result,[name ' accepted'],passed,...
+                         'Internal compilation must remove the radius when disabling mean fields.');
+        result=test_close(result,[name ' parity'],difference,0,1e-12,1e-12,...
+                          'An explicit infinite radius must equal the unbounded static-field default.');
+    end
+end
+
 fprintf('DEER exact-boundary cases passed: selected sites [3 4], [3 6], and empty.\n');
 
 end

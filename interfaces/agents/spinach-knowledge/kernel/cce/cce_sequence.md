@@ -42,3 +42,5 @@ schedule=cce_sequence(model,parameters)
 - [cce_cluster.m](cce_cluster.md)
 
 An empty event list remains valid when an enabled DEER selector has no pulse to select; the conditional finite-event check does not dereference an empty numeric array. Zero-valued unused padding fields in mixed event arrays are harmless; nonzero unused control components are rejected.
+
+- Static mean-field radii remain active in physical evaluation but are removed with the mean-field mode during recursive event-only compilation; named, DEER-selected and bath-targeted ideal sequences accept explicit radii.

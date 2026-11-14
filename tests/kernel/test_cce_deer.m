@@ -256,26 +256,28 @@ for method={'cce','gcce','mecce','megcce'}
                      accepted,'The radius does not inspect sites already included in the cluster.');
 
     % Driver and direct helper calls must report the same prerequisite
-    calls={@()cce(spin_system,parameters),...
-           @()cce_cluster(model,cluster,context,schedule,parameters),...
-           @()cce_controls(model,cluster.sites,context,schedule,parameters)};
-    names={'driver','cluster','controls'};
-    if ismember(parameters.method,{'mecce','megcce'})
-        calls{end+1}=@()cce_master(model,cluster,context,schedule,parameters);
-        names{end+1}='master';
+    master=ismember(parameters.method,{'mecce','megcce'});
+    calls=cell(1,5+master); names=cell(size(calls));
+    calls(1:3)={@()cce(spin_system,parameters),...
+                @()cce_cluster(model,cluster,context,schedule,parameters),...
+                @()cce_controls(model,cluster.sites,context,schedule,parameters)};
+    names(1:3)={'driver','cluster','controls'};
+    if master
+        calls{6}=@()cce_master(model,cluster,context,schedule,parameters);
+        names{6}='master';
     end
     % A controlled schedule must not bypass the pre-dispatch prerequisite
     driven=schedule; driven.controls=true;
-    calls{end+1}=@()cce_cluster(model,cluster,context,driven,parameters);
-    names{end+1}='controlled dispatch';
+    calls{4}=@()cce_cluster(model,cluster,context,driven,parameters);
+    names{4}='controlled dispatch';
 
     % Conditional enumeration must use the same checked evaluators
     ip=parameters; ip.bath_state=struct('mode','interlaced','basis','uniform',...
                                       'probabilities','uniform','samples',1,'seed',7);
     ip.interlaced=struct('condition_sites',{{[2 3]}},'reference_state',1,'max_states',4);
     sampled=cce_states(model,ip);
-    calls{end+1}=@()cce_interlace(model,cluster,sampled,schedule,ip);
-    names{end+1}='interlace';
+    calls{5}=@()cce_interlace(model,cluster,sampled,schedule,ip);
+    names{5}='interlace';
     for k=1:numel(calls)
         rejected=false;
         try

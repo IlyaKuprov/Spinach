@@ -8,6 +8,12 @@ Reduced VOTPP and Cu(mnt)2 source-input gCCE reconstruction.
 
 ## Behaviour
 
+Requires `SPINACH_CCE_LUNGHI_FIXTURES` (external inputs/CSVs) and
+`SPINACH_CCE_LUNGHI_STATES` (phase-preserving states JSON and diagnostic MAT
+files). Without both, the test returns with an explanatory message and does
+not run the external comparison. These unlicensed source structures are not
+redistributed; reduced source-input validation is not published-figure validation.
+
 Runs the assertions and tolerance checks declared in the source.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.

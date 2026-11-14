@@ -1,0 +1,35 @@
+# kernel/cce/cce_converge.m
+
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_converge.m)
+
+## Purpose
+
+Run independent, explicit convergence ladders and report acceptance gates.
+
+## Behaviour
+
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
+- Varies one supported field at a time from the baseline; order, bath size, graph cutoff, sample count and time-grid refinement are separate tests. Every refinement is compared with the returned baseline, and all comparisons must pass; agreement of later ladder steps cannot certify an inaccurate baseline.
+- Applies user-declared observable tolerances and work cap. Time-grid comparisons require nested points; sample-count ladders require an independent-seed check.
+- Runs explicit held-out complete parameter checks when supplied; does not equate an order plateau with convergence in omitted physical dimensions.
+
+## Inputs and outputs
+
+```matlab
+result=cce_converge(spin_system,parameters)
+```
+
+**Inputs**
+
+- `spin_system`, `parameters` — physical model and ordinary CCE settings plus `convergence.ladders` (field and cell-row values), atol, rtol, max_work, and optional checks (cell of complete parameter structures).
+
+**Outputs**
+
+- `result` — baseline CCE result with convergence status, original input_parameters and convergence_report containing comparisons, work usage and acceptance metadata.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_converge.m)
+- [cce.m](cce.md)
+- [cce_diagnostics.m](cce_diagnostics.md)

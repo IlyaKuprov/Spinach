@@ -1,0 +1,41 @@
+# kernel/cce/cce_noise.m
+
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_noise.m)
+
+## Purpose
+
+Evaluate bath-noise autocorrelation for additive connected-cluster expansion.
+
+## Behaviour
+
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
+- Builds the sum of noise terms completely supported inside the cluster; refuses a split multi-site term.
+- Uses a central-state-independent bath Hamiltonian, or the explicitly requested noise.branch alpha/beta projection, and applies the requested ordered or symmetrized correlation convention. Virtual-state noise corrections are refused.
+- Optional connected subtraction removes the mean-product contribution; the result retains units squared of the supplied observable operators. For sampled baths the driver averages the raw moments and means before connected subtraction under either averaging mode, preserving classical ensemble variance. Direct cluster calls return the covariance of their supplied context and retain raw moment/mean fields for ensemble combination.
+
+- Local noise-operator Hermiticity is checked relative to the operator norm, with no absolute unit floor.
+
+## Inputs and outputs
+
+```matlab
+raw=cce_noise(model,cluster,context,schedule,parameters)
+```
+
+**Inputs**
+
+- `model`, `cluster`, `context`, `schedule`, `parameters` — cluster inputs; `noise.ordering=ordered|symmetrized`, logical connected, and terms with ordered bath support and operator matrices; optional noise.branch selects alpha or beta.
+
+**Outputs**
+
+- `raw` — time-dependent autocorrelation with the standard cluster IDs, validity and error fields; additive reduction is selected by method noise.
+
+Direct calls require `method='noise'` and `quantity='autocorrelation'`; other physical evaluators are not silently substituted.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_noise.m)
+- [cce_reduce.m](cce_reduce.md)
+- [cce_spectrum.m](cce_spectrum.md)
+
+For unconnected noise, the cluster graph joins observable-support sites even without a bare Hamiltonian edge, retaining disconnected moment products. Sampled connected noise retains the same support edges to preserve cross-site covariance of the actual finite sampled mixture; deterministic product-state connected noise keeps the ordinary coupling graph. Both ordered and symmetrized reductions use this common graph.

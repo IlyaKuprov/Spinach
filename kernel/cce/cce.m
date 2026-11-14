@@ -1,0 +1,349 @@
+% Cluster correlation expansion for a prepared Spinach spin system. Syntax:
+%
+%                       result=cce(spin_system,parameters)
+%
+% Required fields: central_spins, bath_spins, method (cce/gcce/mecce/megcce/noise), expansion
+% (standard), quantity (coherence/density/observable/autocorrelation), times (whole-sequence
+% seconds), order, central, assumptions, orientation, interaction_cutoff,
+% graph, bath_state, meanfield, sequence, numerics.atol/rtol/max_memory_bytes.
+% cce_prepare, cce_graph, cce_states and cce_sequence document their schemas.
+% normalized=true divides gcce observables by the supplied initial state;
+% conditional branch coherence is intrinsically normalized. Density is not.
+% reducer is powers (default) or direct. Sampled estimators explicitly set
+% averaging='after_expansion' or 'internal_then_expansion'.
+%
+% Outputs include complex value/coherence, per-order estimates, validity,
+% reasons, propagated error bounds, raw clusters and exact-full-bath bypass
+% metadata. Density outputs additionally report physicality without repair.
+% Extensions fail with cce:capability until their implementations are present;
+% no optional control, checkpoint or dissipative physics is silently ignored.
+% ME jumps use ordered physical support, dimensionless operator and s^-1 rate
+% fields (cce_liouvillian). Noise requires explicit ordering, connected flag
+% and Hermitian support/operator terms (cce_noise); its reducer is additive.
+%
+% Inputs:
+%   spin_system - canonical structure returned by create.
+%   parameters - explicit physical, state, graph, sequence and numerical
+%   choices; see the CCE recipe.
+%
+% Outputs:
+%   result - reduction values/masks/error/by-order fields plus coherence,
+%   times, raw, clusters, graph, schedule, partition, ensemble, model_hash,
+%   input_parameters, averaging, method, exact_reference, elapsed_seconds,
+%   convergence, budget_satisfied, sampling_standard_error and diagnostics;
+%   density is empty except for density requests. value is time-by-observable;
+%   density elements use column-major order.
+%
+% Multiplicative convention: F(empty)=1; F(C)=L(C)/L(empty),
+% K(C)=F(C)/product(K(S), nonempty proper S subset C), and
+% L_approx=L(empty)*product(K(C), retained nonempty C).
+% For noise, K(C)=L(C)-L(empty)-sum(K(S), proper nonempty S),
+% and L_approx=L(empty)+sum(K(C)). Masks remain explicit;
+% unresolved denominators are never replaced by epsilon.
+%
+% See also cce_prepare, cce_cluster, cce_reduce, cce_diagnostics.
+% Reference: https://doi.org/10.1103/PhysRevB.78.085315
+% Reference: https://doi.org/10.1103/PRXQuantum.2.010311
+%
+% ilya.kuprov@weizmann.ac.il
+
+function result=cce(spin_system,parameters)
+
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
+% Reject the helper-only initial density override at the public driver
+if isfield(parameters,'initial_rho')
+    error('cce:capability','parameters.initial_rho is helper-only; specify central.rho.');
+end
+
+% Reject conditioning controls when the driver is not performing interlacing
+if isfield(parameters,'interlaced')&&isfield(parameters,'bath_state')&&...
+   ~strcmp(parameters.bath_state.mode,'interlaced')
+    error('cce:capability','parameters.interlaced requires bath_state.mode=interlaced.');
+end
+
+% Convergence scans are explicit helper operations, not driver flags
+if isfield(parameters,'convergence')
+    error('cce:capability','parameters.convergence requires explicit cce_converge execution.');
+end
+
+% Validate the core driver contract before allocating retained results
+grumble(spin_system,parameters);
+started=tic; model=cce_prepare(spin_system,parameters);
+
+% Dispatch open-system and additive-noise cluster evaluators
+evaluator=@cce_cluster;
+if ismember(parameters.method,{'mecce','megcce'}), evaluator=@cce_master; end
+if strcmp(parameters.method,'noise'), evaluator=@cce_noise; end
+state_parameters=parameters;
+if ismember(parameters.method,{'mecce','noise'})
+    state_parameters.method='cce';
+    if isfield(state_parameters,'jumps'), state_parameters=rmfield(state_parameters,'jumps'); end
+    if isfield(state_parameters.numerics,'propagator')
+        state_parameters.numerics=rmfield(state_parameters.numerics,'propagator');
+    end
+end
+if strcmp(parameters.method,'noise')
+    state_parameters=rmfield(state_parameters,'noise');
+    if isfield(state_parameters,'spectrum'), state_parameters=rmfield(state_parameters,'spectrum'); end
+end
+ensemble=cce_states(model,state_parameters); schedule=cce_sequence(model,parameters);
+graph=cce_graph(model,parameters);
+
+% Freeze physical group partitions before evaluating any production sample
+partition=[];
+if ~strcmp(parameters.expansion,'standard')
+    partition=cce_partition(model,graph,parameters);
+    if ~partition.complete, error('cce:partition_incomplete','Partition validation did not converge.'); end
+    parameters.groups=partition.groups;
+    if strcmp(parameters.expansion,'disjoint'), parameters.order=1; end
+    if strcmp(parameters.expansion,'disjoint_inter'), parameters.order=2; end
+end
+clusters=cce_clusters(model,graph,parameters);
+full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
+if isempty(model.bath_ids), full_index=0; end
+
+% Apply W12 conditional averages before irreducible subset reduction
+if strcmp(parameters.bath_state.mode,'interlaced')
+    if ~strcmp(parameters.quantity,'coherence')
+        error('cce:interlaced','Interlaced multiplication requires scalar coherence.');
+    end
+    empty=struct('id',uint64(0),'sites',[]); ns=numel(ensemble.contexts);
+    nt=numel(parameters.times); no=parameters.order+1;
+    estimates=zeros(nt,ns); by_order=zeros(nt,1,no,ns);
+    order_error=zeros(size(by_order)); order_valid=true(size(by_order));
+    valid=true(size(estimates)); bounds=zeros(size(estimates));
+    records=cell(ns,numel(clusters)+1);
+    for s=1:ns
+        conditioned=parameters; conditioned.interlaced.reference_state=s;
+        if ~isempty(full_index)
+            % Full-bath conditioning is an exact raw average without denominators
+            conditioned.interlaced.raw_only=true;
+            if full_index==0, cluster=empty; else, cluster=clusters(full_index); end
+            item=cce_interlace(model,cluster,ensemble,schedule,conditioned);
+            estimates(:,s)=item.value; bounds(:,s)=item.abs_error_bound;
+            valid(:,s)=item.valid; records{s,full_index+1}=item;
+            by_order(:,:,1:end-1,s)=NaN; order_error(:,:,1:end-1,s)=Inf;
+            order_valid(:,:,1:end-1,s)=false;
+            by_order(:,:,end,s)=item.value; order_error(:,:,end,s)=item.abs_error_bound;
+            order_valid(:,:,end,s)=item.valid; continue;
+        end
+        base=cce_interlace(model,empty,ensemble,schedule,conditioned);
+        product=base.value; uncertainty=base.abs_error_bound; valid(:,s)=base.valid;
+        records{s,1}=base; by_order(:,:,1,s)=product;
+        order_error(:,:,1,s)=uncertainty; order_valid(:,:,1,s)=valid(:,s);
+        for order=1:parameters.order
+            for j=find([clusters.order]==order)
+                item=cce_interlace(model,clusters(j),ensemble,schedule,conditioned);
+                uncertainty=abs(product).*item.factor_abs_error_bound+...
+                    abs(item.factor).*uncertainty+uncertainty.*item.factor_abs_error_bound;
+                product=product.*item.factor; valid(:,s)=valid(:,s)&item.factor_valid;
+                records{s,j+1}=item;
+            end
+            by_order(:,:,order+1,s)=product; order_error(:,:,order+1,s)=uncertainty;
+            order_valid(:,:,order+1,s)=valid(:,s);
+        end
+        estimates(:,s)=product; bounds(:,s)=uncertainty;
+    end
+
+    % Aggregate every computed prefix and preserve unavailable lower exact orders
+    weights=reshape(ensemble.weights,1,1,1,[]);
+    value=estimates*ensemble.weights(:); uncertainty=bounds*ensemble.weights(:);
+    prefixes=sum(by_order.*weights,4); prefix_error=sum(order_error.*weights,4);
+    prefix_valid=all(order_valid,4); reasons=repmat({'ok'},size(prefixes));
+    reasons(~prefix_valid)={'unresolved_interlaced_factor'};
+    if ~isempty(full_index), reasons(:,:,1:end-1)={'not_evaluated'}; end
+    mask=all(valid,2)&isfinite(value)&isfinite(uncertainty);
+    result=struct('value',value,'valid',mask,'abs_error_bound',uncertainty,...
+                  'reason',{reasons(:,:,end)},'by_order',prefixes,...
+                  'by_order_error',prefix_error,'by_order_valid',prefix_valid,...
+                  'by_order_reason',{reasons},'orders',0:parameters.order,'reducer','interlaced');
+    result.raw=records(~cellfun(@isempty,records));
+    result.sampling_standard_error=NaN(size(value));
+    if ns>1, result.sampling_standard_error=std(estimates,0,2)/sqrt(ns); end
+    if ~isempty(full_index), result.sampling_standard_error(:)=0; end
+    averaging='conditional_interlaced';
+else
+
+% Propagate each globally assigned bath state before ensemble reduction
+ns=numel(ensemble.contexts); reductions=cell(1,ns);
+all_raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
+
+% Preserve the covariance of the sampled mixture rather than conditional covariances
+if strcmp(parameters.method,'noise')&&parameters.noise.connected&&ns>1
+
+    % Average cluster moments before taking the connected covariance
+    for k=1:numel(all_raw{1})
+        mean_time=zeros(size(all_raw{1}(k).value)); mean_zero=0;
+        for s=1:ns
+            item=all_raw{s}(k); weight=ensemble.weights(s);
+            mean_time=mean_time+weight*item.noise_mean;
+            mean_zero=mean_zero+weight*item.noise_mean_zero;
+        end
+
+        % Retain linear sample contributions for either additive estimator
+        for s=1:ns
+            all_raw{s}(k).value=all_raw{s}(k).noise_moment-...
+                                all_raw{s}(k).noise_mean*mean_zero-...
+                                mean_time*(all_raw{s}(k).noise_mean_zero-mean_zero);
+        end
+    end
+end
+
+% Distinguish average-of-expansions from an explicitly requested internal average
+averaging='after_expansion';
+if isfield(parameters,'averaging'), averaging=parameters.averaging; end
+if strcmp(averaging,'internal_then_expansion')&&ns>1
+    records=all_raw{1};
+    for k=1:numel(records)
+        records(k).value(:)=0; records(k).abs_error_bound(:)=0;
+        for s=1:ns
+            records(k).value=records(k).value+ensemble.weights(s)*all_raw{s}(k).value;
+            records(k).abs_error_bound=records(k).abs_error_bound+...
+                                      ensemble.weights(s)*all_raw{s}(k).abs_error_bound;
+            records(k).valid=records(k).valid&all_raw{s}(k).valid;
+        end
+    end
+    reduction_inputs={records}; weights=1;
+else
+    reduction_inputs=all_raw; weights=ensemble.weights;
+end
+
+% Use exact full-bath raw values even when intermediate baselines vanish
+for s=1:numel(reduction_inputs)
+    records=reduction_inputs{s};
+    reduction_parameters=parameters;
+    if ~isempty(full_index), reduction_parameters.numerics.zero_policy='mask'; end
+    reduced=cce_reduce(records,clusters,reduction_parameters);
+    if ~isempty(full_index)
+        exact=records(full_index+1);
+        reduced.value=exact.value; reduced.valid=exact.valid;
+        reduced.abs_error_bound=exact.abs_error_bound;
+        reduced.reason=repmat({'ok'},size(exact.value));
+        reduced.by_order(:,:,end)=exact.value;
+        reduced.by_order_valid(:,:,end)=exact.valid;
+        reduced.by_order_error(:,:,end)=exact.abs_error_bound;
+        reduced.by_order_reason(:,:,end)=repmat({'ok'},size(exact.value));
+    end
+    reductions{s}=reduced;
+end
+
+% Combine completed samples deterministically without masking failed samples
+result=reductions{1}; result.value(:)=0; result.abs_error_bound(:)=0;
+result.by_order(:)=0; result.by_order_error(:)=0;
+for s=1:numel(reduction_inputs)
+    result.value=result.value+weights(s)*reductions{s}.value;
+    result.abs_error_bound=result.abs_error_bound+weights(s)*reductions{s}.abs_error_bound;
+    result.by_order=result.by_order+weights(s)*reductions{s}.by_order;
+    result.by_order_error=result.by_order_error+weights(s)*reductions{s}.by_order_error;
+    result.by_order_valid=result.by_order_valid&reductions{s}.by_order_valid;
+    failed_order=~reductions{s}.by_order_valid;
+    result.by_order_reason(failed_order)=reductions{s}.by_order_reason(failed_order);
+    result.valid=result.valid&reductions{s}.valid;
+    failed=~reductions{s}.valid; result.reason(failed)=reductions{s}.reason(failed);
+end
+
+% Account for deterministic weighted summation without hiding sample uncertainty
+if numel(reduction_inputs)>1
+    operations=4*numel(reduction_inputs);
+    rounding=operations*eps/(1-operations*eps); magnitude=zeros(size(result.value));
+    for s=1:numel(reduction_inputs)
+        magnitude=magnitude+weights(s)*abs(reductions{s}.value);
+    end
+    result.abs_error_bound=result.abs_error_bound+rounding*magnitude;
+end
+
+% Expose estimator uncertainty separately from propagation error bounds
+result.sampling_standard_error=zeros(size(result.value));
+if strcmp(ensemble.mode,'sampled')
+    result.sampling_standard_error(:)=NaN; values=[];
+    if ns>1&&strcmp(averaging,'after_expansion')
+        values=cellfun(@(item)item.value,reductions,'UniformOutput',false);
+        values=cat(3,values{:});
+    elseif ns>1&&~isempty(full_index)&&...
+           ~(strcmp(parameters.method,'noise')&&parameters.noise.connected)
+        values=cellfun(@(records)records(full_index+1).value,all_raw,'UniformOutput',false);
+        values=cat(3,values{:});
+    end
+    if ~isempty(values)
+        result.sampling_standard_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(ns*(ns-1)));
+    end
+end
+result.raw=all_raw;
+end
+
+% Finalize every estimator through the same public result and diagnostic contract
+result.coherence=result.value; result.times=parameters.times;
+result.clusters=clusters; result.graph=graph; result.schedule=schedule;
+result.partition=partition;
+result.ensemble=ensemble; result.model_hash=model.source_hash;
+result.input_parameters=parameters; result.averaging=averaging;
+result.method=parameters.method; result.exact_reference=~isempty(full_index);
+if result.exact_reference, result.method='exact-reference'; end
+result.elapsed_seconds=toc(started); result.convergence='not_requested';
+result.budget_satisfied=result.valid&...
+    result.abs_error_bound<=parameters.numerics.atol+parameters.numerics.rtol*abs(result.value);
+
+% Diagnose a reconstructed central density without symmetrization or clipping
+result.density=[];
+if strcmp(parameters.quantity,'density')
+    d=ensemble.central_dimension; nt=numel(parameters.times);
+    result.density=reshape(result.value.',d,d,nt);
+end
+result.diagnostics=cce_diagnostics(model,result.raw,result,parameters);
+
+% Apply explicitly requested postprocessing to the computed result
+if isfield(parameters,'spectrum')
+    result.spectrum=cce_spectrum(result.times,result.value,parameters);
+end
+if isfield(parameters,'analysis'), result.analysis=cce_analyse(result,parameters); end
+
+% Honor explicit raw suppression after diagnostics and analysis consume it
+if isfield(parameters,'retain_raw')&&~parameters.retain_raw, result.raw={}; end
+
+end
+
+% Validate explicit choices and refuse unavailable extensions
+function grumble(spin_system,parameters)
+if ~isstruct(spin_system)||~isstruct(parameters)||~isscalar(parameters)
+    error('spin_system and parameters must be scalar structures.');
+end
+required={'method','expansion','quantity','times','order','central',...
+          'bath_state','meanfield','sequence','numerics'};
+if ~all(isfield(parameters,required)), error('Required CCE parameter fields are missing.'); end
+if ~ismember(parameters.method,{'cce','gcce','mecce','megcce','noise'})
+    error('cce:capability','Method requires the cce_liouvillian or cce_noise extension.');
+end
+if ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter'})
+    error('cce:capability','Unsupported CCE expansion.');
+end
+if ~ismember(parameters.quantity,{'coherence','density','observable','autocorrelation'})||...
+   (ismember(parameters.method,{'cce','mecce'})&&~strcmp(parameters.quantity,'coherence'))
+    error('Conditional CCE returns branch coherence; gcce also returns density and observables.');
+end
+if strcmp(parameters.method,'noise')&&~strcmp(parameters.quantity,'autocorrelation')
+    error('noise requires quantity=autocorrelation.');
+end
+if ~strcmp(parameters.meanfield,'none')&&~strcmp(parameters.meanfield,'static')
+    error('meanfield must be explicitly none or static.');
+end
+if isfield(parameters,'averaging')&&...
+   ~ismember(parameters.averaging,{'after_expansion','internal_then_expansion'})
+    error('cce:capability','Interlaced averaging requires cce_interlace.');
+end
+if strcmp(parameters.bath_state.mode,'sampled')&&...
+   ~isfield(parameters,'averaging')
+    error('Sampled states require an explicit averaging estimator.');
+end
+for name={'drive','relaxation','convergence','control','pulse_family','time_axes'}
+    if isfield(parameters,name{1})&&~isempty(parameters.(name{1}))
+        error('cce:capability','Requested %s extension is not available in this baseline.',name{1});
+    end
+end
+if isfield(parameters.numerics,'precision')&&~strcmp(parameters.numerics.precision,'double')
+    error('cce:capability','Baseline propagation requires double precision.');
+end
+end
+
+

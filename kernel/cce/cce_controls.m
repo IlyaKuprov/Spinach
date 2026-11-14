@@ -207,7 +207,7 @@ if strcmp(parameters.method,'gcce')
         bounds(t)=16*dimension^3*eps*scale;
     end
     observe=parameters; observe.initial_rho=context.central_rho;
-    if ~isfield(observe,'normalized'), observe.normalized=strcmp(parameters.quantity,'coherence'); end
+    if ~isfield(observe,'normalized'), observe.normalized=false; end
     value=cce_observe(density,observe);
     scale=ones(1,size(value,2));
     if strcmp(parameters.quantity,'observable')

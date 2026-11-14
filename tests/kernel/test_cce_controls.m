@@ -17,6 +17,38 @@ initial=kron(context.central_rho,context.bath_rho{1}); rho=U*initial*U'; expecte
 error=norm(s.raw.density(:,:,end)-expected,'fro');
 result=test_close(result,'Finite detuned drive matches independent dense expm',s.raw.density(:,:,end),expected,1e-12,0,'Finite detuned drive matches independent dense expm');
 
+% Require no-op control dispatch to preserve explicit and default normalization
+q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
+q.central.rho=ones(2)/2; q.sequence=[]; ss=model.spin_system;
+for normalized=[false true]
+    q.normalized=normalized; plain=cce(ss,q);
+    q.sequence=struct('type','finite','target',1,'placement','absolute','at',0,...
+                      'duration',0.01,'axis','x','amplitude',0,'detuning',0);
+    driven=cce(ss,q);
+    result=test_close(result,'Control dispatch preserves coherence normalization',...
+                      driven.value,plain.value,1e-12,1e-12,...
+                      'A zero-amplitude control must not change the requested coherence scale.');
+    q.sequence=[];
+end
+q=rmfield(q,'normalized'); plain=cce(ss,q);
+q.sequence=struct('type','finite','target',1,'placement','absolute','at',0,...
+                  'duration',0.01,'axis','x','amplitude',0,'detuning',0);
+driven=cce(ss,q);
+result=test_close(result,'Control dispatch preserves default raw coherence',...
+                  driven.value,plain.value,1e-12,1e-12,...
+                  'Omitting normalized must retain the same raw coherence on both dispatch paths.');
+fprintf('Control normalization dispatch discrepancy %.3g.\n',max(abs(driven.value-plain.value)));
+
+% Compare named and explicit Hahn dispatch with the same physical events
+q.sequence=struct('type','ideal','target',1,'placement','fraction',...
+                  'at',0.5,'axis','x','angle',pi);
+explicit_echo=cce(ss,q);
+q.sequence=struct('name','hahn','count',1,'axis','x','target',1);
+named_echo=cce(ss,q);
+result=test_close(result,'Named and explicit Hahn normalization',...
+                  named_echo.value,explicit_echo.value,1e-12,1e-12,...
+                  'Naming the same pulse sequence must not change the default coherence scale.');
+
 % Exercise the public driver through the named/finite dispatch hooks
 integrated=cce(model.spin_system,p);
 result=test_close(result,'Public finite-control driver',reshape(integrated.value(end,:),2,2),expected,...

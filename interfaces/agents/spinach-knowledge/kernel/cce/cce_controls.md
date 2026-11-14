@@ -8,6 +8,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
+- Coherence is raw by default on every dispatch path; explicit `normalized=true` divides by the initial coherence.
+
 - Expands named hahn/cpmg/xy4/xy8/udd ideal sequences and explicit piecewise-constant finite drives; amplitude and detuning are angular frequencies.
 - Finite drives and ideal bath/selective rotations require generalized CCE. Simultaneous finite drives are refused rather than implicitly combined.
 - Supplies piecewise segments with embedded cluster operators; exterior rotations update mean fields according to `meanfield=none|static`; static exterior ideal one-site rotations update the sampled field exactly.

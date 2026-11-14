@@ -42,6 +42,25 @@ loaded=load(filename,'state'); state=loaded.state;
 result=test_true(result,'completed bitmap',all(state.completed),...
                  'All sixteen tasks are marked complete after resume.');
 
+% Refuse cached records when any Spinach Hamiltonian tolerance changes
+changed_system=spin_system; changed_system.tols.inter_cutoff=1e6; refused=false;
+try
+    cce(changed_system,p);
+catch exception
+    refused=strcmp(exception.identifier,'cce_checkpoint:identity');
+end
+result=test_true(result,'Spinach tolerance checkpoint identity',refused,...
+                 'A changed interaction cutoff must invalidate the physical checkpoint identity.');
+q=rmfield(p,'checkpoint'); fresh=cce(changed_system,q);
+tolerance_difference=max(abs(uninterrupted.value(:)-fresh.value(:)));
+original_model=cce_prepare(spin_system,q); changed_model=cce_prepare(changed_system,q);
+result=test_true(result,'Spinach tolerance result fingerprint',...
+                 ~strcmp(original_model.source_hash,changed_model.source_hash),...
+                 'The public model fingerprint must distinguish tolerance-dependent Hamiltonians.');
+result=test_true(result,'Interaction cutoff changes propagation',tolerance_difference>1e-4,...
+                 'The fixture must independently demonstrate that the changed tolerance affects results.');
+fprintf('checkpoint tolerance observable difference %.12g\n',tolerance_difference);
+
 % Refuse changed times, physical tensors, seed and cluster identity
 changed=p; changed.times=[0 0.002 0.004]; refused=false;
 try

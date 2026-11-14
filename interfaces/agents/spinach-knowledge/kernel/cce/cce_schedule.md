@@ -8,6 +8,8 @@ Evaluate cluster/state tasks in deterministic indexed batches.
 
 ## Behaviour
 
+- The physical fingerprint includes `spin_system.tols`, including Hamiltonian interaction cutoffs and stock propagation tolerances.
+
 - The memory preflight includes one dense workspace for every simultaneously active worker, limited by pool size, batch size and task count; serial execution retains a one-workspace bound.
 
 - Sorts task IDs by configuration, state and cluster, but returns records in the input context/cluster order; workers do not perform reduction.

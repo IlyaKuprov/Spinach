@@ -145,7 +145,7 @@ for n=1:nspins
           abs(spin_system.inter.basefrqs(n));
     model.canonical_roundoff=model.canonical_roundoff+27*eps*scale;
 end
-model.source_hash=md5_hash({spin_system.comp,spin_system.inter,parameters});
+model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,parameters});
 
 % Declare the validated direct domain rather than guessing new physics
 model.direct_supported=ismember(assumptions{1},{'labframe','nmr','esr','deer','deer-zz'});

@@ -8,6 +8,8 @@ Compile canonical Spinach metadata for local cluster Hamiltonians.
 
 ## Behaviour
 
+- The physical fingerprint includes `spin_system.tols`, including Hamiltonian interaction cutoffs and stock propagation tolerances.
+
 - Applies the requested stock `assume` approximation without building a basis, and retains the source spin system for the reference backend.
 - Builds stable physical-ID maps, multiplicities, coordinates in Angstrom, local linear/quadratic terms and ordered pair tensors in rad/s from metadata already converted by `create`.
 - Uses `hamiltonian_backend=auto` unless explicitly set. The direct domain includes labframe, nmr, esr, deer and deer-zz subject to the source checks; unsupported direct requests are rejected by the Hamiltonian builder.

@@ -202,7 +202,104 @@ for method={'cce','mecce','megcce'}
     end
 end
 
+% Require actual geometry for every finite static-field radius path
+result=radius_checks(result,ss,base);
+
 fprintf('DEER exact-boundary cases passed: selected sites [3 4], [3 6], and empty.\n');
+
+end
+
+% Exercise all driver, direct-evaluator and event-recompilation paths
+function result=radius_checks(result,spin_system,parameters)
+
+% Use a polarized exterior bath so dropping its fields is not innocuous
+parameters=rmfield(parameters,intersect(fieldnames(parameters),{'deer','noise'}));
+parameters.central=struct('alpha',[1;0],'beta',[0;1],'rho',ones(2)/2);
+parameters.bath_state=struct('mode','explicit_product',...
+                             'rho',{{diag([1 0]),diag([1 0])}});
+parameters.meanfield='static'; parameters.meanfield_radius=2;
+parameters.order=1; parameters.sequence=[];
+cluster=struct('id',1,'sites',2);
+for method={'cce','gcce','mecce','megcce'}
+
+    % Choose each implemented evaluator without changing the missing geometry
+    parameters.method=method{1}; parameters.quantity='coherence';
+    parameters.jumps=struct([]);
+    model=cce_prepare(spin_system,parameters); ensemble=cce_states(model,parameters);
+    context=ensemble.contexts(1); schedule=cce_sequence(model,parameters);
+
+    % Distinguish missing central and exterior sites from irrelevant included sites
+    for missing=[model.central_ids 3]
+        partial=model; partial.coordinates_A=[0 0 0;1 0 0;3 0 0];
+        partial.coordinates_A(missing,:)=NaN; rejected=false;
+        try
+            cce_cluster(partial,cluster,context,schedule,parameters);
+        catch err
+            rejected=strcmp(err.identifier,'cce:coordinates')&&...
+                     contains(err.message,'meanfield_radius');
+        end
+        result=test_true(result,sprintf('Finite radius missing site %d %s',missing,parameters.method),...
+                         rejected,'Each central and exterior site needs finite coordinates.');
+    end
+    spatial=model; spatial.coordinates_A=[0 0 0;NaN NaN NaN;3 0 0];
+    accepted=true;
+    try
+        if ismember(parameters.method,{'mecce','megcce'})
+            cce_master(spatial,cluster,context,schedule,parameters);
+        else
+            cce_cluster(spatial,cluster,context,schedule,parameters);
+        end
+    catch
+        accepted=false;
+    end
+    result=test_true(result,['Finite radius ignores included-site geometry ' parameters.method],...
+                     accepted,'The radius does not inspect sites already included in the cluster.');
+
+    % Driver and direct helper calls must report the same prerequisite
+    calls={@()cce(spin_system,parameters),...
+           @()cce_cluster(model,cluster,context,schedule,parameters),...
+           @()cce_controls(model,cluster.sites,context,schedule,parameters)};
+    names={'driver','cluster','controls'};
+    if ismember(parameters.method,{'mecce','megcce'})
+        calls{end+1}=@()cce_master(model,cluster,context,schedule,parameters);
+        names{end+1}='master';
+    end
+    % A controlled schedule must not bypass the pre-dispatch prerequisite
+    driven=schedule; driven.controls=true;
+    calls{end+1}=@()cce_cluster(model,cluster,context,driven,parameters);
+    names{end+1}='controlled dispatch';
+
+    % Conditional enumeration must use the same checked evaluators
+    ip=parameters; ip.bath_state=struct('mode','interlaced','basis','uniform',...
+                                      'probabilities','uniform','samples',1,'seed',7);
+    ip.interlaced=struct('condition_sites',{{[2 3]}},'reference_state',1,'max_states',4);
+    sampled=cce_states(model,ip);
+    calls{end+1}=@()cce_interlace(model,cluster,sampled,schedule,ip);
+    names{end+1}='interlace';
+    for k=1:numel(calls)
+        rejected=false;
+        try
+            calls{k}();
+        catch err
+            rejected=strcmp(err.identifier,'cce:coordinates')&&...
+                     contains(err.message,'meanfield_radius');
+        end
+        result=test_true(result,['Finite radius geometry ' parameters.method ' ' names{k}],...
+                         rejected,'A finite mean-field radius requires central and exterior coordinates.');
+    end
+end
+
+% Keep invalid scalar radii from silently disabling or emptying the field
+for radius={NaN,-1,-Inf,[1 2],1i,'2'}
+    parameters.meanfield_radius=radius{1}; rejected=false;
+    try
+        cce_validate(parameters);
+    catch err
+        rejected=strcmp(err.identifier,'cce:parameters')&&contains(err.message,'meanfield_radius');
+    end
+    result=test_true(result,'Invalid finite-radius declaration',rejected,...
+                     'meanfield_radius must be a nonnegative real scalar or positive Inf.');
+end
 
 end
 

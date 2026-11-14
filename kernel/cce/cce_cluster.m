@@ -28,7 +28,7 @@
 function raw=cce_cluster(model,cluster,context,schedule,parameters)
 
 % Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
+cce_validate(parameters,model,cluster.sites,context);
 
 % Route driven generalized clusters through the local segment compiler
 if isstruct(schedule)&&isfield(schedule,'controls')&&schedule.controls

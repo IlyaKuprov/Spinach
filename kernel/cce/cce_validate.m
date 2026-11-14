@@ -1,12 +1,14 @@
 % Reject unsupported CCE parameter fields before any evaluator dispatch.
-% Syntax: cce_validate(parameters)
+% Syntax: cce_validate(parameters[,model,sites,context])
 %
 % This shared contract checks optional field names and method applicability;
 % individual helpers validate the dimensions and values they consume.
+% Optional model, included bath sites and state context also validate the
+% finite mean-field radius against central and exterior coordinates.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function cce_validate(parameters)
+function cce_validate(parameters,model,sites,context)
 
 % Validate the public container before inspecting optional fields
 grumble(parameters);
@@ -163,6 +165,25 @@ end
 if isfield(parameters,'retain_raw')&&...
    (~islogical(parameters.retain_raw)||~isscalar(parameters.retain_raw))
     error('cce:parameters','parameters.retain_raw must be a logical scalar.');
+end
+
+% Validate a distance cutoff before evaluating geometry in any propagation path
+if isfield(parameters,'meanfield_radius')
+    radius=parameters.meanfield_radius;
+    if ~isnumeric(radius)||~isreal(radius)||~isscalar(radius)||isnan(radius)||radius<0
+        error('cce:parameters','parameters.meanfield_radius must be a nonnegative real scalar.');
+    end
+    if nargin>1&&isfinite(radius)
+        exterior=setdiff(context.bath_ids,sites);
+        if ~isempty(exterior)&&(~isfield(model,'coordinates_A')||...
+           ~isnumeric(model.coordinates_A)||~isreal(model.coordinates_A)||...
+           size(model.coordinates_A,2)~=3||...
+           size(model.coordinates_A,1)<max([model.central_ids exterior])||...
+           any(~isfinite(model.coordinates_A([model.central_ids exterior],:)),'all'))
+            error('cce:coordinates',...
+                  'parameters.meanfield_radius requires finite central and exterior coordinates.');
+        end
+    end
 end
 
 % Reject inactive top-level selectors instead of giving them no effect

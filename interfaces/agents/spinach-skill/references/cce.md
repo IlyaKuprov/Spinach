@@ -106,14 +106,19 @@ default is named below, supply the field explicitly and obey its source
 | `checkpoint.file`, `.resume` | MAT checkpoint path and explicit resume flag | No checkpoint when file absent/empty; resume false |
 | `analysis.fit` | Enable explicit-window envelope fit | false; fit model/window/weights/confidence must be supplied when enabled |
 
+A finite `meanfield_radius` requires finite real central and exterior coordinates;
+missing geometry raises `cce:coordinates`. Use a nonnegative scalar in Angstrom,
+or `Inf` for no spatial cutoff (no coordinates required).
+
 For second-order conditional projection, enable `second_order.enabled`
 and supply `gap_tolerance` in rad/s and `overlap_tolerance`; disabled otherwise.
-For pCCE supply `partition.mode=user|coupling|spatial|adaptive`,
-`max_group_size`, `max_group_dimension`, and mode-specific fields.
-`partition.order_semantics` defaults to `max_groups`; `disjoint` and
-`disjoint_inter` have restricted order meanings described in `cce_partition`.
-Adaptive grouping requires pilot records/scores and production holdout ranges;
-it is not an online regrouping of production samples.
+For pCCE supply `partition.mode=user|coupling|spatial|adaptive` and
+`partition.max_dimension` (the group Hilbert-dimension ceiling). Explicit
+groups belong in top-level `groups`; expansion semantics belong in top-level
+`expansion` and `order`. Spatial grouping requires `group_count` and `max_rounds`.
+Adaptive grouping uses `mode=adaptive` or `partition.adaptive=true` and requires `patches`,
+`patch_atol`, `patch_rtol`, `pilot_contexts`, `heldout_contexts`, `max_rounds`,
+and `max_probes`; it is not an online regrouping of production samples.
 
 Interlacing uses `interlaced.max_states`, `reference_state`, and optional
 `condition_sites`. Numerator and denominator subsets must share the same
@@ -135,7 +140,7 @@ events for a piecewise envelope. Simultaneous finite drives, and finite or
 entangling exterior pulses, are refused. Static exterior one-site ideal
 rotations update the sampled field exactly.
 
-For ME-CCE, `dissipation.jumps` records contain ordered physical `support`, an
+For ME-CCE, `parameters.jumps` records contain ordered physical `support`, an
 `operator` in that tensor order and a nonnegative `rate` in s^-1. A correlated
 jump cut across a cluster boundary is refused. Dynamics uses column-major
 vectorization; the module does not silently reinterpret a Hamiltonian matrix

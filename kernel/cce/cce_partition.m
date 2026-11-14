@@ -5,10 +5,12 @@
 %
 % Inputs:
 %   model, graph - canonical model and bath connectivity.
-%   parameters.partition - mode, max_group_size, max_group_dimension, and
-%   mode-specific groups or pilot fields. order_semantics is max_groups
-%   (default), disjoint, or disjoint_inter; see the source header for pilot
-%   score and holdout fields.
+%   parameters.partition - mode=user|coupling|spatial|adaptive and max_dimension
+%   (maximum group Hilbert dimension). Spatial mode also requires
+%   group_count and max_rounds. Adaptive mode or optional adaptive=true requires patches,
+%   patch_atol, patch_rtol, pilot_contexts, heldout_contexts, max_rounds,
+%   and max_probes. Explicit groups live in parameters.groups; expansion
+%   and order are top-level fields, not partition options.
 %
 % Outputs:
 %   partition - frozen groups and IDs, group-level graph/order metadata, and

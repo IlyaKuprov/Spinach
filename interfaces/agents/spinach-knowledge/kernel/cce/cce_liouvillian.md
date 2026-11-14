@@ -26,7 +26,7 @@ Build a local GKSL generator for full density or conditional coherence blocks.
 
 **Inputs**
 
-- `model`, `sites`, `context`, `parameters` — prepared cluster inputs and `dissipation.jumps` records with ordered support IDs, operator matrix and rate in s^-1.
+- `model`, `sites`, `context`, `parameters` — prepared cluster inputs and `parameters.jumps` records with ordered support IDs, operator matrix and rate in s^-1.
 
 **Outputs**
 

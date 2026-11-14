@@ -47,6 +47,53 @@ result=test_true(result,'Defect removal preserves physical group IDs',isequal(ba
 q=rmfield(q,'remove_ids'); q.coordinates_A=zeros(2,3); rejected=false;
 try, cce_bath(q); catch, rejected=true; end
 result=test_true(result,'Duplicate physical sites are refused',rejected,'Duplicate physical sites are refused');
-fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),r.density);
+
+% Check explicit physical grouping and isotope row normalization
+q=struct('mode','explicit','isotopes',{{'1H';'13C'}},'magnetic',1,...
+         'coordinates_A',[0 0 0;1 0 0],'groups',{{1,2}});
+[sys,inter,b]=cce_bath(q);
+result=test_true(result,'Complete groups and isotope row convention',...
+                 isequal(b.groups,{1,2})&&isrow(sys.isotopes),...
+                 'User groups explicitly partition every retained site.');
+
+% Check scalar isotropic interactions match explicitly supplied tensors
+q.pairs_Hz=struct('ids',[1 2],'tensor',37); [~,scalar]=cce_bath(q);
+q.pairs_Hz.tensor=37*eye(3); [~,tensor]=cce_bath(q);
+result=test_close(result,'Scalar isotropic tensor',scalar.coupling.matrix{1,2},...
+                  tensor.coupling.matrix{1,2},0,0,'Both inputs are in Hz.');
+
+% Check bath-to-Spinach point-dipole covariance without a Hamiltonian shortcut
+q=rmfield(q,'pairs_Hz'); R=[0 -1 0;1 0 0;0 0 1];
+q.rotation=R; q.translation_A=[3 4 5];
+[rsys,rinter]=cce_bath(q); sys.output='hush'; rsys.output='hush';
+sys.parallel={'local',1}; rsys.parallel={'local',1};
+plain=create(sys,inter); rotated=create(rsys,rinter);
+T=plain.inter.coupling.matrix{1,2}; Tr=rotated.inter.coupling.matrix{1,2};
+result=test_close(result,'Native dipolar transform covariance',Tr,R*T*R.',...
+                  100*eps*norm(T,'fro'),100*eps,'Rigid translations leave dipoles invariant.');
+
+% Reject invalid original site labels rather than silently dropping them
+q=rmfield(q,{'rotation','translation_A'}); q.groups={[1 3]};
+rejected=false; try, cce_bath(q); catch, rejected=true; end
+result=test_true(result,'Unknown group site refused',rejected,'Original candidate IDs are checked.');
+q.groups={1,2}; q.pairs_Hz=struct('ids',[1 3],'tensor',eye(3));
+rejected=false; try, cce_bath(q); catch, rejected=true; end
+result=test_true(result,'Unknown pair site refused',rejected,'A misspelled interaction cannot disappear.');
+
+% Check the linear density boundary independently of the areal case
+r=struct('mode','random','isotopes',{{'1H'}},'magnetic',0,'seed',12,...
+         'dimension',1,'bounds_A',[0 2 3;10 2 3],'density',3e9,'max_attempts',20);
+[~,~,line]=cce_bath(r);
+result=test_true(result,'Linear density and frozen coordinates',numel(line.ids)==3&&...
+                 all(line.coordinates_A(:,2)==2)&&all(line.coordinates_A(:,3)==3),...
+                 'Three spins in 10 Angstrom at 3e9 per metre.');
+
+% Expose unattainable random packing at the caller ceiling
+r.count=2; r=rmfield(r,'density'); r.exclusion_A=20; r.max_attempts=2;
+rejected=false; try, cce_bath(r); catch e, rejected=strcmp(e.identifier,'cce_bath:packing'); end
+result=test_true(result,'Packing ceiling exposed',rejected,'No hidden relaxation of exclusion radius.');
+
+fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),2e18);
 
 end
+

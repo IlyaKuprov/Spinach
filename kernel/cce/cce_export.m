@@ -78,16 +78,15 @@ end
 
 function grumble(filename,model,result)
 
-% Require a scalar result structure and a supported file representation
 if ~ischar(filename)||~isrow(filename)||isempty(filename)||...
    ~isstruct(model)||~isscalar(model)||~isstruct(result)||~isscalar(result)
     error('Invalid CCE export arguments.');
 end
 
-% Restrict the filename extension to supported representations
 [~,~,extension]=fileparts(filename);
 if ~ismember(lower(extension),{'.mat','.json','.csv'})
     error('CCE export requires a .mat, .json or .csv filename.');
 end
 
 end
+

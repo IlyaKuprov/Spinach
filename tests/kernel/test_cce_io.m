@@ -16,6 +16,7 @@ original=struct('value',[1+2i NaN;3-4i Inf],'validity',logical([1 0;1 0]),...
                 'id',intmax('uint64'),'powers',[intmin('int64') intmax('int64')]);
 
 % Test each versioned representation, including its complete diagnostics
+original.integer_extremes={intmin('int64'),intmax('int64'),intmax('uint64')};
 for format={'mat','json','csv'}
     file=fullfile(folder,['result.' format{1}]); model=struct('coordinates_A',[1 2 3]);
     cce_export(file,model,original);
@@ -50,6 +51,30 @@ u=struct('length','bohr','frame','lab','density','electron/bohr^3');
 data=cce_import(file,'cube',u);
 result=test_close(result,'Cube z-fastest order',squeeze(data.density),[1 2;3 4],0,0,'Cube z-fastest order');
 result=test_close(result,'Cube explicit bohr conversion',data.voxel_vectors_A,0.529177210544*eye(3),0,0,'Cube explicit bohr conversion');
+
+% Compare independently declared scalar and Cartesian tensor units
+file=fullfile(folder,'scalar.csv'); put(file,sprintf('id1,id2,value\n1,2,2.5\n'));
+a=cce_import(file,'tensor',struct('tensor','kHz','frame','lab'));
+result=test_close(result,'Scalar kHz tensor',a.pairs_Hz.tensor,2500*eye(3),0,0,...
+                  'A scalar frequency is an isotropic Cartesian tensor.');
+a=cce_import(file,'tensor',struct('tensor','rad/s','frame','lab'));
+result=test_close(result,'Angular to cyclic frequency',a.pairs_Hz.tensor,...
+                  2.5*eye(3)/(2*pi),eps,eps,'Angular frequencies cross the native Hz boundary.');
+
+% Preserve explicit labels and SI coordinates through tabular import
+file=fullfile(folder,'sites.csv'); put(file,sprintf('id,isotope,x,y,z\n17,13C,1e-10,2e-10,3e-10\n'));
+a=cce_import(file,'csv',struct('length','m','frame','lab'));
+result=test_close(result,'CSV SI coordinate boundary',a.coordinates_A,[1 2 3],4*eps,4*eps,...
+                  'Metres convert once into Angstrom.');
+result=test_true(result,'CSV physical isotope labels',isequal(a.ids,17)&&...
+                 isequal(a.isotopes,{'13C'}),'Physical site IDs are not renumbered on import.');
+
+% Refuse omitted frame and invalid explicit export extension
+rejected=false; try, cce_import(file,'csv',struct('length','m')); catch, rejected=true; end
+result=test_true(result,'Missing frame refused',rejected,'No silent frame inference.');
+rejected=false; try, cce_export(fullfile(folder,'data.txt'),model,original); catch, rejected=true; end
+result=test_true(result,'Unsupported export refused',rejected,'Fixed signature infers only documented extensions.');
+
 disp('CCE IO: MAT/JSON/CSV round trips exact; tensor and voxel conversions passed.');
 
 end
@@ -60,3 +85,4 @@ function put(file,content)
 fid=fopen(file,'w'); cleanup=onCleanup(@()fclose(fid)); fwrite(fid,content,'char');
 
 end
+

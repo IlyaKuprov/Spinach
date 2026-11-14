@@ -2,8 +2,10 @@
 %
 %                 imported=cce_import(filename,format,units)
 %
-% format: mat/json (cce_export envelopes), csv (export sidecar or table
-% id,isotope,x,y,z), xyz, tensor (CSV id1,id2,xx,xy,...,zz), or cube.
+% format: mat/json (cce_export envelopes returning model/result),
+% csv (export sidecar or table
+% id,isotope,x,y,z), xyz, tensor (CSV id1,id2,value or id1,id2,xx,...,zz),
+% or cube. Scalars denote isotropic tensors.
 % External coordinates require units.length='angstrom','nm','m','bohr'.
 % Tensors require units.tensor='Hz','kHz','MHz','rad/s','T','mT','G'; field
 % units also require units.gyro_rad_s_T. units.frame is mandatory ('lab'
@@ -176,7 +178,6 @@ end
 
 function grumble(filename,format,units)
 
-% Check parse arguments and any supplied frame transformation
 if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
    ~ismember(format,{'mat','json','csv','xyz','tensor','cube'})||...
    ~isstruct(units)||~isscalar(units), error('Invalid CCE import arguments.'); end
@@ -185,3 +186,4 @@ if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    abs(det(units.rotation)-1)>100*eps), error('Invalid frame rotation.'); end
 
 end
+

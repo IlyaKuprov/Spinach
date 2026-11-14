@@ -163,7 +163,7 @@ else
     if strcmp(parameters.quantity,'observable')
         operators=parameters.operators;
         if ~iscell(operators), operators={operators}; end
-        scale=cellfun(@(op) norm(op,2),operators);
+        scale=cellfun(@(op) norm(op,2),operators(:).');
     else
         scale=ones(1,size(values,2));
     end

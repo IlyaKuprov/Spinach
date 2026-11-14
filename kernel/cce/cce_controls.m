@@ -231,7 +231,7 @@ if strcmp(parameters.method,'gcce')
     if strcmp(parameters.quantity,'observable')
         operators=parameters.operators;
         if ~iscell(operators), operators={operators}; end
-        scale=cellfun(@(operator) norm(operator,2),operators);
+        scale=cellfun(@(operator) norm(operator,2),operators(:).');
     end
     if observe.normalized
         plain=observe; plain.normalized=false;

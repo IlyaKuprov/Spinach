@@ -132,7 +132,7 @@ scale=ones(1,size(values,2));
 if strcmp(parameters.quantity,'observable')
     operators=parameters.operators;
     if ~iscell(operators), operators={operators}; end
-    scale=cellfun(@(op) norm(op,2),operators);
+    scale=cellfun(@(op) norm(op,2),operators(:).');
 end
 if ~meta.conditional&&isfield(parameters,'normalized')&&parameters.normalized
     observe=parameters; observe.normalized=false;

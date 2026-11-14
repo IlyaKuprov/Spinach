@@ -13,6 +13,8 @@ Extract central density elements, coherence or linear observables without discar
 - Flattens density matrices in MATLAB column-major order, or projects alpha/beta coherence, or evaluates the supplied operators.
 - For scalar observables, explicit `normalized` divides by the expectation in `central.rho`, not the first requested time. Unresolved normalization is not silently repaired.
 
+- Operator cells are enumerated in MATLAB linear-index order regardless of their shape. Normalization tolerances and static, driven, and master-equation error bounds use that same output-column order.
+
 ## Inputs and outputs
 
 ```matlab

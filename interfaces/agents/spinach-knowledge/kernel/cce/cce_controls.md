@@ -8,9 +8,9 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
-- Observable readout and error bounds both use `parameters.operators`.
-
 - Coherence is raw by default on every dispatch path; explicit `normalized=true` divides by the initial coherence.
+- Observable readout and error bounds both use `parameters.operators`.
+- DEER species filters use the prepared model’s canonical isotope metadata.
 
 - Expands named hahn/cpmg/xy4/xy8/udd ideal sequences and explicit piecewise-constant finite drives; amplitude and detuning are angular frequencies.
 - Finite drives and ideal bath/selective rotations require generalized CCE. Simultaneous finite drives are refused rather than implicitly combined.

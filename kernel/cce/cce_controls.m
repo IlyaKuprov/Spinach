@@ -277,7 +277,7 @@ if isfield(spec,'sites')
     candidates=intersect(candidates,spec.sites,'stable');
 end
 if isfield(spec,'species')
-    candidates=candidates(ismember(model.isotopes(candidates),cellstr(spec.species)));
+    candidates=candidates(ismember(model.spin_system.comp.isotopes(candidates),cellstr(spec.species)));
 end
 frequencies=zeros(size(candidates));
 for k=1:numel(candidates)

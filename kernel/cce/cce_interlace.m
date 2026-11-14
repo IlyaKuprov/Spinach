@@ -50,7 +50,12 @@ if isfield(spec,'condition_sites')
     cylinders=spec.condition_sites;
 else
     family=cce_clusters(model,cce_graph(model,parameters),parameters);
-    cylinders={family(arrayfun(@(c) all(ismember(cluster.sites,c.sites)),family)).sites};
+    % Retain the reference-assignment baseline when no clusters were kept
+    if isempty(family)&&isempty(cluster.sites)
+        cylinders={[]};
+    else
+        cylinders={family(arrayfun(@(c) all(ismember(cluster.sites,c.sites)),family)).sites};
+    end
 end
 if isempty(cylinders), error('cce_interlace:empty','No conditioning supercluster.'); end
 

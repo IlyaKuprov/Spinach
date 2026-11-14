@@ -8,6 +8,8 @@ Evaluate conditional product-state averages for interlaced CCE.
 
 ## Behaviour
 
+- An empty cluster family retains the empty-cluster baseline: its conditioning cylinder fixes the entire bath to the reference assignment.
+
 - Constructs the union of product-state cylinders associated with retained superclusters, or uses explicitly supplied condition_sites.
 - Enumerates the declared product-state space within max_states and computes conditional raw averages. Denominator subsets must reuse the numerator condition_sites.
 - Refuses closure beyond the enumeration budget rather than making an undeclared approximate random draw.

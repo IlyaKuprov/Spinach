@@ -12,6 +12,37 @@ result=new_test_result('kernel/cce_interlacing','CCE conditional interlacing',..
 ensemble.assignments(1,:)=[1 1 1]; schedule=cce_sequence(model,p);
 p.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3],[2 4]}});
 cluster=struct('id',uint64(1),'sites',2); raw=cce_interlace(model,cluster,ensemble,schedule,p);
+% Keep the empty-cluster conditional baseline valid for an empty family
+q=p; q.interlaced=rmfield(q.interlaced,'condition_sites'); q.order=0;
+empty_cluster=struct('id',uint64(0),'sites',[]); baseline_ok=true; baseline_error=Inf;
+try
+    baseline=cce_interlace(model,empty_cluster,ensemble,schedule,q);
+    reference=ensemble.contexts(1); reference.assignment=ensemble.assignments(1,:);
+    reference.bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
+    reference.expectations=repmat([0 0 0.5],3,1);
+    direct=cce_cluster(model,empty_cluster,reference,schedule,q);
+    baseline_error=norm(baseline.value-direct.value);
+catch exception
+    baseline_ok=false; fprintf('empty interlaced baseline exception %s\n',exception.identifier);
+end
+result=test_true(result,'Empty-family interlaced baseline',baseline_ok,...
+                 'An empty family still has a well-defined baseline at the reference assignment.');
+result=test_close(result,'Empty-family baseline parity',baseline_error,0,1e-12,1e-12,...
+                  'No conditioning sites means exactly the unconditioned reference baseline.');
+for method={'cce','gcce','mecce','megcce'}
+    q.order=0; q.method=method{1}; q.jumps=struct([]);
+    q.central.rho=[1 1;1 1]/2;
+    try
+        driver=cce(model.spin_system,q); driver_ok=all(isfinite(driver.value(:)));
+    catch exception
+        driver_ok=false; fprintf('order-zero %s driver exception %s\n',method{1},exception.identifier);
+    end
+    result=test_true(result,['Order-zero interlaced ' method{1} ' driver'],driver_ok,...
+                     'Every interlaced evaluator must retain its baseline with no clusters.');
+end
+fprintf('empty interlaced baseline error %.3g\n',baseline_error);
+
+% Restore the overlapping-supercluster reference assignments
 expected=[1 1 1;1 1 2;1 2 1;2 1 1;2 1 2;2 2 1];
 weights=[0.7*0.2*0.6;0.7*0.2*0.4;0.7*0.8*0.6;...
          0.3*0.2*0.6;0.3*0.2*0.4;0.3*0.8*0.6]; weights=weights/sum(weights);

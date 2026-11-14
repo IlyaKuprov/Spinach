@@ -2,8 +2,8 @@
 %
 %                       result=cce(spin_system,parameters)
 %
-% Required fields: central_spins, bath_spins, method (cce/gcce), expansion
-% (standard), quantity (coherence/density/observable), times (whole-sequence
+% Required fields: central_spins, bath_spins, method (cce/gcce/mecce/megcce/noise), expansion
+% (standard), quantity (coherence/density/observable/autocorrelation), times (whole-sequence
 % seconds), order, central, assumptions, orientation, interaction_cutoff,
 % graph, bath_state, meanfield, sequence, numerics.atol/rtol/max_memory_bytes.
 % cce_prepare, cce_graph, cce_states and cce_sequence document their schemas.
@@ -17,6 +17,9 @@
 % metadata. Density outputs additionally report physicality without repair.
 % Extensions fail with cce:capability until their implementations are present;
 % no optional control, checkpoint or dissipative physics is silently ignored.
+% ME jumps use ordered physical support, dimensionless operator and s^-1 rate
+% fields (cce_liouvillian). Noise requires explicit ordering, connected flag
+% and Hermitian support/operator terms (cce_noise); its reducer is additive.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,7 +28,14 @@ function result=cce(spin_system,parameters)
 % Validate orchestration choices before canonicalizing the physical model
 grumble(spin_system,parameters);
 started=tic; model=cce_prepare(spin_system,parameters);
-ensemble=cce_states(model,parameters); schedule=cce_sequence(model,parameters);
+
+% Dispatch open-system and additive-noise cluster evaluators
+evaluator=@cce_cluster;
+if ismember(parameters.method,{'mecce','megcce'}), evaluator=@cce_master; end
+if strcmp(parameters.method,'noise'), evaluator=@cce_noise; end
+state_parameters=parameters;
+if ismember(parameters.method,{'mecce','noise'}), state_parameters.method='cce'; end
+ensemble=cce_states(model,state_parameters); schedule=cce_sequence(model,parameters);
 graph=cce_graph(model,parameters);
 
 % Freeze physical group partitions before evaluating any production sample
@@ -39,18 +49,53 @@ if ~strcmp(parameters.expansion,'standard')
 end
 clusters=cce_clusters(model,graph,parameters);
 
+% Apply W12 conditional averages before irreducible subset reduction
+if strcmp(parameters.bath_state.mode,'interlaced')
+    if ~strcmp(parameters.quantity,'coherence')
+        error('cce:interlaced','Interlaced multiplication requires scalar coherence.');
+    end
+    empty=struct('id',uint64(0),'sites',[]);
+    estimates=zeros(numel(parameters.times),numel(ensemble.contexts));
+    by_order=zeros(numel(parameters.times),parameters.order,numel(ensemble.contexts));
+    valid=true(size(estimates)); bounds=zeros(size(estimates)); records=cell(numel(ensemble.contexts),numel(clusters));
+    for s=1:numel(ensemble.contexts)
+        conditioned=parameters; conditioned.interlaced.reference_state=s;
+        baseline=cce_interlace(model,empty,ensemble,schedule,conditioned);
+        product=baseline.value; uncertainty=baseline.abs_error_bound;
+        for order=1:parameters.order
+            for j=find([clusters.order]==order)
+                item=cce_interlace(model,clusters(j),ensemble,schedule,conditioned);
+                uncertainty=abs(product).*item.factor_abs_error_bound+...
+                    abs(item.factor).*uncertainty+uncertainty.*item.factor_abs_error_bound;
+                product=product.*item.factor; valid(:,s)=valid(:,s)&item.factor_valid;
+                records{s,j}=item;
+            end
+            by_order(:,order,s)=product;
+        end
+        estimates(:,s)=product; bounds(:,s)=uncertainty;
+    end
+    value=estimates*ensemble.weights(:); uncertainty=bounds*ensemble.weights(:);
+    mask=all(valid,2)&uncertainty<=parameters.numerics.atol+parameters.numerics.rtol*abs(value);
+    result=struct('value',value,'coherence',value,'valid',mask,'times',parameters.times,...
+                  'abs_error_bound',uncertainty,...
+                  'by_order',sum(by_order.*reshape(ensemble.weights,1,1,[]),3),...
+                  'raw',{records},'clusters',clusters,'graph',graph,'schedule',schedule,...
+                  'ensemble',ensemble,'model_metadata',rmfield(model,'spin_system'),...
+                  'status','complete','diagnostics',struct('conditioning','W12_shared_K'));
+    result.reason=repmat({''},size(value)); result.reason(~mask)={'unresolved_interlaced_factor'};
+    result.elapsed=toc(started); result.sampling_standard_error=NaN(size(value));
+    if numel(ensemble.contexts)>1
+        result.sampling_standard_error=std(estimates,0,2)/sqrt(numel(ensemble.contexts));
+    end
+    if any(~mask), result.status='incomplete'; end
+    return;
+end
+
 % Propagate each globally assigned bath state before ensemble reduction
-ns=numel(ensemble.contexts); all_raw=cell(1,ns); reductions=cell(1,ns);
-empty=struct('id',uint64(0),'sites',[]);
+ns=numel(ensemble.contexts); reductions=cell(1,ns);
+all_raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
 full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
 if isempty(model.bath_ids), full_index=0; end
-for s=1:ns
-    records=cce_cluster(model,empty,ensemble.contexts(s),schedule,parameters);
-    for k=1:numel(clusters)
-        records(k+1)=cce_cluster(model,clusters(k),ensemble.contexts(s),schedule,parameters);
-    end
-    all_raw{s}=records;
-end
 
 % Distinguish average-of-expansions from an explicitly requested internal average
 averaging='after_expansion';
@@ -139,18 +184,8 @@ result.budget_satisfied=result.valid&...
 if strcmp(parameters.quantity,'density')
     d=ensemble.central_dimension; nt=numel(parameters.times);
     result.density=reshape(result.value.',d,d,nt);
-    result.diagnostics.trace_error=nan(nt,1);
-    result.diagnostics.hermiticity_error=nan(nt,1);
-    result.diagnostics.minimum_eigenvalue=nan(nt,1);
-    for k=1:nt
-        rho=result.density(:,:,k);
-        if all(isfinite(rho),'all')
-            result.diagnostics.trace_error(k)=abs(trace(rho)-1);
-            result.diagnostics.hermiticity_error(k)=norm(rho-rho','fro');
-            result.diagnostics.minimum_eigenvalue(k)=min(eig((rho+rho')/2));
-        end
-    end
 end
+result.diagnostics=cce_diagnostics(model,all_raw,result,parameters);
 
 end
 
@@ -162,15 +197,18 @@ end
 required={'method','expansion','quantity','times','order','central',...
           'bath_state','meanfield','sequence','numerics'};
 if ~all(isfield(parameters,required)), error('Required CCE parameter fields are missing.'); end
-if ~ismember(parameters.method,{'cce','gcce'})
+if ~ismember(parameters.method,{'cce','gcce','mecce','megcce','noise'})
     error('cce:capability','Method requires the cce_liouvillian or cce_noise extension.');
 end
 if ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter'})
     error('cce:capability','Unsupported CCE expansion.');
 end
-if ~ismember(parameters.quantity,{'coherence','density','observable'})||...
-   (strcmp(parameters.method,'cce')&&~strcmp(parameters.quantity,'coherence'))
+if ~ismember(parameters.quantity,{'coherence','density','observable','autocorrelation'})||...
+   (ismember(parameters.method,{'cce','mecce'})&&~strcmp(parameters.quantity,'coherence'))
     error('Conditional CCE returns branch coherence; gcce also returns density and observables.');
+end
+if strcmp(parameters.method,'noise')&&~strcmp(parameters.quantity,'autocorrelation')
+    error('noise requires quantity=autocorrelation.');
 end
 if ~strcmp(parameters.meanfield,'none')&&~strcmp(parameters.meanfield,'static')
     error('meanfield must be explicitly none or static.');
@@ -179,29 +217,17 @@ if isfield(parameters,'averaging')&&...
    ~ismember(parameters.averaging,{'after_expansion','internal_then_expansion'})
     error('cce:capability','Interlaced averaging requires cce_interlace.');
 end
-if ismember(parameters.bath_state.mode,{'sampled','interlaced'})&&...
+if strcmp(parameters.bath_state.mode,'sampled')&&...
    ~isfield(parameters,'averaging')
     error('Sampled states require an explicit averaging estimator.');
 end
-if strcmp(parameters.bath_state.mode,'interlaced')
-    error('cce:capability','Interlaced states require cce_interlace.');
-end
-for name={'drive','relaxation','convergence','checkpoint','control','pulse_family','time_axes'}
+for name={'drive','relaxation','convergence','control','pulse_family','time_axes'}
     if isfield(parameters,name{1})&&~isempty(parameters.(name{1}))
         error('cce:capability','Requested %s extension is not available in this baseline.',name{1});
     end
 end
-if isfield(parameters,'parallel')&&~isempty(parameters.parallel)
-    if ~isstruct(parameters.parallel)||~isfield(parameters.parallel,'mode')||...
-       ~strcmp(parameters.parallel.mode,'serial')
-        error('cce:capability','Nonserial execution requires cce_schedule.');
-    end
-end
 if isfield(parameters.numerics,'precision')&&~strcmp(parameters.numerics.precision,'double')
     error('cce:capability','Baseline propagation requires double precision.');
-end
-if isfield(parameters,'deer')&&isfield(parameters.deer,'enabled')&&parameters.deer.enabled
-    error('cce:capability','DEER selection requires cce_controls.');
 end
 end
 

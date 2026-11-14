@@ -43,6 +43,25 @@ reference=1-2*modulation*sin(norm(a)*p.times(:)/4).^2.*sin(norm(b)*p.times(:)/4)
 result=test_close(result,'one-spin Hahn formula',echo.value,reference,1e-11,1e-11,'Independent analytic or dense reference.');
 result=test_true(result,'zero time is unity',echo.value(1)==1,'Independent analytic or dense reference.');
 
+% Include absolute-time pulses only in samples that reach their timestamp
+q=p; q.times=[0 0.0005 0.001 0.0015]; q.sequence=struct('type','ideal',...
+    'target',1,'placement','absolute','at',0.001,'axis','x','angle',pi);
+model=cce_prepare(spin_system,q); schedule=cce_sequence(model,q);
+result=test_true(result,'Absolute event inclusion per sample',...
+                 isempty(schedule.order{1})&&isempty(schedule.order{2})&&...
+                 isequal(schedule.order{3},1)&&isequal(schedule.order{4},1),...
+                 'Zero and shorter samples omit the pulse; equality and later samples include it.');
+absolute=cce(spin_system,q); values=zeros(numel(q.times),1);
+for k=1:numel(q.times)
+    t=q.times(k); a=min(t,0.001); b=max(0,t-0.001);
+    ua=expm(-1i*hb*b)*expm(-1i*ha*a);
+    ub=expm(-1i*ha*b)*expm(-1i*hb*a);
+    values(k)=exp(-1i*phase*(a-b))*trace(ua*ub')/2;
+end
+result=test_close(result,'Absolute pulse dense branch reference',absolute.value,values,...
+                  2e-12,2e-12,'Each requested duration uses only pulses at or before its endpoint.');
+fprintf('Absolute pulse dense discrepancy %.3g.\n',max(abs(absolute.value-values)));
+
 % Verify isolated-centre phase appears once in an empty bath
 p.bath_spins=[]; p.order=0; p.sequence=[];
 empty=cce(spin_system,p);

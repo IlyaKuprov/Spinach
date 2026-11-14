@@ -8,6 +8,8 @@ Compile whole-sequence sample times and ideal conditional pulse events.
 
 ## Behaviour
 
+- Positive absolute timestamps are accepted: each sample includes only events at or before its duration, while the zero sample always has no pulses.
+
 - Checks finite, nonnegative, sorted row-vector sample times in seconds and explicit event ordering.
 - Ideal events use `type=ideal`, physical `target` IDs, axis, angle in rad, and `placement=fraction|absolute`; `at` is a fraction of each total sequence time or seconds, respectively.
 - Conditional CCE accepts only complete-register ideal pi swaps. Named sequences, finite pulses and DEER requests are routed through `cce_controls`.

@@ -74,7 +74,9 @@ end
 % Store stable ordering including the well-defined zero-duration sequence
 order=cell(1,nt);
 for k=1:nt
-    [~,order{k}]=sort(positions(:,k),'ascend');
+    included=find(positions(:,k)<=parameters.times(k)&parameters.times(k)>0);
+    [~,permutation]=sort(positions(included,k),'ascend');
+    order{k}=included(permutation);
 end
 schedule=struct('times',parameters.times,'events',events,...
                 'positions',positions,'order',{order},...
@@ -124,9 +126,6 @@ for j=1:numel(events)
     end
     if strcmp(event.placement,'fraction')&&event.at>1
         error('Fractional event time must lie in [0,1].');
-    end
-    if strcmp(event.placement,'absolute')&&any(event.at>t)
-        error('Absolute event lies beyond a requested total time.');
     end
     has_operator=isfield(event,'operator')&&~isempty(event.operator);
     has_axis=isfield(event,'axis')&&~isempty(event.axis);

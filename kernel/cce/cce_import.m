@@ -159,6 +159,9 @@ function value=unpack(encoded)
 % Reconstitute each numeric component and the original MATLAB array shape
 switch encoded.kind
     case 'integer'
+        if prod(encoded.shape)==0
+            value=zeros(encoded.shape.',encoded.class); return;
+        end
         value=reshape(typecast(uint8(encoded.bytes),encoded.class),encoded.shape.');
     case 'array'
         if prod(encoded.shape)==0
@@ -169,14 +172,18 @@ switch encoded.kind
         value=reshape(cast(data,encoded.class),encoded.shape.');
     case 'char'
         value=encoded.value;
+        if isfield(encoded,'shape'), value=reshape(value,encoded.shape.'); end
     case 'string'
         value=reshape(string(encoded.items),encoded.shape.');
     case 'cell'
         items=encoded.items;
+        if isempty(items), items=cell(0,1); end
         if isstruct(items), items=num2cell(items); end
         value=reshape(cellfun(@unpack,items,'UniformOutput',false),encoded.shape.');
     case 'struct'
         names=encoded.fields; items=encoded.items;
+        if isempty(names), names=cell(0,1); end
+        if isempty(items), items=cell(0,1); end
         if isstruct(items), items=num2cell(items); end
         value=repmat(cell2struct(cell(size(names)),names),encoded.shape.');
         for j=1:numel(names)
@@ -195,6 +202,19 @@ if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
    ~isstruct(units)||~isscalar(units)
     error('Invalid CCE import arguments.');
 end
+% Require unit fields to belong to the requested physical file format
+allowed={};
+if ismember(format,{'xyz','csv','cube'}), allowed={'length','rotation','frame'}; end
+if strcmp(format,'tensor'), allowed={'tensor','rotation','gyro_rad_s_T','frame'}; end
+if strcmp(format,'cube'), allowed=[allowed {'density'}]; end
+if strcmp(format,'csv')&&isfile([filename '.json']), allowed={}; end
+unknown=setdiff(fieldnames(units),allowed);
+if ~isempty(unknown), error('Unsupported units.%s for format %s.',unknown{1},format); end
+if isfield(units,'gyro_rad_s_T')&&isfield(units,'tensor')&&...
+   ~ismember(units.tensor,{'T','mT','G'})
+    error('units.gyro_rad_s_T is only used for field-valued tensors.');
+end
+
 if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    any(~isfinite(units.rotation),'all')||norm(units.rotation.'*units.rotation-eye(3),'fro')>100*eps||...
    abs(det(units.rotation)-1)>100*eps)

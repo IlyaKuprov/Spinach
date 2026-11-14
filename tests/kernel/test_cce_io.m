@@ -24,6 +24,37 @@ for format={'mat','json','csv'}
     result=test_true(result,['Exact complex round trip: ' format{1}],isequaln(original,restored.result)&&isequaln(model,restored.model),['Exact complex round trip: ' format{1}]);
 end
 
+% Preserve all empty container and numeric shapes in the tagged JSON envelope
+empty_model=struct('central',{{}},'empty_struct',struct([]));
+empty_model.branches=cell(0,2); empty_model.no_fields=repmat(struct(),2,1);
+empty_model.values=zeros(2,0,3); empty_model.flags=false(0,2);
+empty_model.integers=zeros(0,2,'uint64'); empty_model.strings=strings(0,2);
+empty_model.characters=repmat('a',0,2);
+empty_model.text=''; empty_model.nested={cell(0,1),[],struct('value',{{}})};
+for extension={'mat','json','csv'}
+    filename=fullfile(folder,['empty.' extension{1}]); cce_export(filename,empty_model,struct());
+    recovered=false;
+    try
+        payload=cce_import(filename,extension{1},struct());
+        recovered=isequaln(payload.model,empty_model);
+    catch
+    end
+    result=test_true(result,['Empty containers round trip: ' extension{1}],recovered,...
+                     'An exporter must import its own empty cells, arrays and fieldless structures.');
+end
+
+% Compare each decoded field to identify any empty-shape loss
+filename=fullfile(folder,'empty.json'); payload=struct('model',struct());
+try
+    payload=cce_import(filename,'json',struct());
+catch
+end
+for name=fieldnames(empty_model).'
+    result=test_true(result,['Empty JSON field: ' name{1}],...
+                     isfield(payload.model,name{1})&&isequaln(payload.model.(name{1}),empty_model.(name{1})),...
+                     'Empty container type and complete dimensions must survive JSON.');
+end
+
 % Verify declared coordinate units and active Cartesian rotations
 file=fullfile(folder,'sites.xyz'); put(file,sprintf('2\nexplicit isotope labels\n1H 0.1 0.2 0.3\n13C 0.4 0.5 0.6\n'));
 u=struct('length','nm','frame','molecular','rotation',[0 -1 0;1 0 0;0 0 1]);

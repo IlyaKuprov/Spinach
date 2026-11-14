@@ -44,3 +44,6 @@ result=test_cce_io()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_io.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+MAT/JSON/CSV-sidecar empty-container checks include empty cells and structs, fieldless struct arrays, integer/logical/string/character arrays, and nontrivial zero-sized dimensions.

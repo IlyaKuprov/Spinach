@@ -31,3 +31,5 @@ cce_export(filename,model,result)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_export.m)
 - [cce_import.m](cce_import.md)
+
+Character tags retain MATLAB array shape, including nonstandard empty character dimensions. The importer remains compatible with earlier character tags without a shape field.

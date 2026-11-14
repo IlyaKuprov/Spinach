@@ -31,3 +31,5 @@ imported=cce_import(filename,format,units)
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_import.m)
 - [cce_export.m](cce_export.md)
 - [cce_bath.m](cce_bath.md)
+
+Tagged JSON reconstructs empty cells and field-name lists before cell operations, including empty structures, integer arrays, multidimensional zero-sized arrays, and character shapes. MAT, JSON, and CSV-sidecar exports share exact type/shape round-trip tests. Unit fields must belong to the requested physical format; frame and cube density labels remain metadata.

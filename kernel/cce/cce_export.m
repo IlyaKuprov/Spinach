@@ -68,7 +68,7 @@ elseif isnumeric(value)||islogical(value)
                    'real',{arrayfun(@(v)sprintf('%.17g',v),real(value(:)),'UniformOutput',false)},...
                    'imag',{arrayfun(@(v)sprintf('%.17g',v),imag(value(:)),'UniformOutput',false)});
 elseif ischar(value)
-    encoded=struct('kind','char','value',value);
+    encoded=struct('kind','char','value',value,'shape',size(value));
 elseif isstring(value)
     encoded=struct('kind','string','shape',size(value),'items',{cellstr(value(:))});
 elseif iscell(value)

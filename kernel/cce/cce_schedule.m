@@ -60,6 +60,9 @@ if count>max_tasks, error('cce_schedule:tasks','Task count exceeds parallel.max_
 nt=numel(schedule.times); dc=prod(model.multiplicities(model.central_ids));
 components=1;
 if strcmp(parameters.quantity,'density'), components=dc^2; end
+if strcmp(parameters.quantity,'observable')&&iscell(parameters.operators)
+    components=numel(parameters.operators);
+end
 metadata=whos('model','clusters','ensemble','schedule','parameters');
 resident=3*count*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
 

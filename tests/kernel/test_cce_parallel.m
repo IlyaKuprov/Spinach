@@ -108,6 +108,24 @@ end
 result=test_true(result,'Concurrent ME worker memory preflight',refused,...
                  'Each active ME task needs its own squared-Hilbert-space dense workspace.');
 
+% Count every observable column in closed and open-system resident records
+q=p; q.bath_state=struct('mode','mixed_product'); q.central.rho=eye(2)/2;
+q.quantity='observable'; q.operators=repmat({eye(2)},1,200);
+q.times=linspace(0,1,301); q.parallel.mode='serial';
+q.numerics.max_memory_bytes=5000000; q.lindblad=struct([]);
+for method={'gcce','megcce'}
+    q.method=method{1}; refused=false;
+    try
+        cce(spin_system,q);
+    catch exception
+        refused=strcmp(exception.identifier,'cce_schedule:memory');
+    end
+    result=test_true(result,['observable column memory ' method{1}],refused,...
+                     'The four time-by-operator records alone exceed five million bytes.');
+    fprintf('R7 observable memory %s rejection %d raw minimum %d budget %d\n',...
+            method{1},refused,4*25*numel(q.times)*numel(q.operators),q.numerics.max_memory_bytes);
+end
+
 % Print the pilot timings without imposing an unjustified speedup target
 fprintf('CCE pilot serial %.6g s; one worker %.6g s; two workers %.6g s; discrepancy %.3g.\n',...
         serial_time,one_time,two_time,max(abs(serial.value-two.value),[],'all'));

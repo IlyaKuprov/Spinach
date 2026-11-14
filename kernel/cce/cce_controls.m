@@ -33,6 +33,8 @@
 %   exterior_expectations indexed by time then segment; generalized
 %   propagation also returns raw with central densities and reducer fields.
 %
+% See also cce_sequence, cce_cluster.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function segments=cce_controls(model,sites,context,schedule,parameters)

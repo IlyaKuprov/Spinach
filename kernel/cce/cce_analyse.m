@@ -23,6 +23,8 @@
 %   analysis - retained data/masks, status, warnings and fit
 %   parameters/diagnostics.
 %
+% See also cce_diagnostics.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function analysis=cce_analyse(result,parameters)

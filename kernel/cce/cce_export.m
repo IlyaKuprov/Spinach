@@ -16,6 +16,8 @@
 % Outputs:
 %   No return value; writes the requested file (and JSON sidecar for CSV).
 %
+% See also cce_import.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function cce_export(filename,model,result)

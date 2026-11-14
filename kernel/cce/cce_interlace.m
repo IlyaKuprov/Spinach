@@ -23,6 +23,9 @@
 %   raw - conditional raw cluster observable with condition_sites and
 %   conditional-average diagnostics for consistent denominator reduction.
 %
+% See also cce_states, cce_reduce.
+% Reference: https://doi.org/10.1103/PhysRevB.86.035452
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_interlace(model,cluster,ensemble,schedule,parameters)

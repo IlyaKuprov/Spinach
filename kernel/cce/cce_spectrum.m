@@ -26,6 +26,8 @@
 %   spectrum - angular-frequency grid, transformed values and declared
 %   convention/quadrature metadata.
 %
+% See also cce_noise.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function spectrum=cce_spectrum(times,correlation,parameters)

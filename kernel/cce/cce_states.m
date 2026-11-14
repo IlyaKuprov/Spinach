@@ -25,6 +25,9 @@
 %   mode, configuration ID and state IDs. Each context carries the same
 %   exterior assignment for all its clusters.
 %
+% See also cce_interlace, cce_cluster.
+% Reference: https://doi.org/10.1103/PhysRevB.79.115320
+%
 % ilya.kuprov@weizmann.ac.il
 
 function ensemble=cce_states(model,parameters)

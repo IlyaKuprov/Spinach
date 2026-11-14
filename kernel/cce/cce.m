@@ -34,6 +34,17 @@
 %   density is added for density requests. value is time-by-observable;
 %   density elements use column-major order.
 %
+% Multiplicative convention: F(empty)=1; F(C)=L(C)/L(empty),
+% K(C)=F(C)/product(K(S), nonempty proper S subset C), and
+% L_approx=L(empty)*product(K(C), retained nonempty C).
+% For noise, K(C)=L(C)-L(empty)-sum(K(S), proper nonempty S),
+% and L_approx=L(empty)+sum(K(C)). Masks remain explicit;
+% unresolved denominators are never replaced by epsilon.
+%
+% See also cce_prepare, cce_cluster, cce_reduce, cce_diagnostics.
+% Reference: https://doi.org/10.1103/PhysRevB.78.085315
+% Reference: https://doi.org/10.1103/PRXQuantum.2.010311
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=cce(spin_system,parameters)

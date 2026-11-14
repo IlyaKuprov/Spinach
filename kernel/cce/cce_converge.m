@@ -27,6 +27,8 @@
 %   input_parameters and convergence_report containing comparisons, work
 %   usage and acceptance metadata.
 %
+% See also cce, cce_diagnostics.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=cce_converge(spin_system,parameters)

@@ -20,6 +20,8 @@
 %   schedule - sample times, compiled events and conditional/generalized
 %   control metadata.
 %
+% See also cce_controls, cce_cluster.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function schedule=cce_sequence(model,parameters)

@@ -29,6 +29,8 @@
 %   groups, hilbert_dim, proper-subcluster references, per-order reduction
 %   powers, score, tuple_id and closure_only.
 %
+% See also cce_graph, cce_partition, cce_reduce.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function clusters=cce_clusters(model,graph,parameters)

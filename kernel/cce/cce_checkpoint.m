@@ -19,6 +19,8 @@
 % Outputs:
 %   state - validated/read/written checkpoint state.
 %
+% See also cce_schedule.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function state=cce_checkpoint(filename,action,state)

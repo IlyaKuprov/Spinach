@@ -17,6 +17,9 @@
 %   raw - cluster observable/density, validity and numerical error metadata
 %   for cce_reduce.
 %
+% See also cce_liouvillian, cce_observe.
+% Reference: https://doi.org/10.1103/PhysRevLett.132.250401
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_master(model,cluster,context,schedule,parameters)

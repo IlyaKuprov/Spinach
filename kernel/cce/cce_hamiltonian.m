@@ -21,6 +21,8 @@
 %   meta - physical tensor order, dimensions, local operators and backend
 %   metadata.
 %
+% See also cce_prepare, cce_states.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [H,meta]=cce_hamiltonian(model,sites,context)

@@ -23,6 +23,8 @@
 %   validity and error fields; additive reduction is selected by method
 %   noise.
 %
+% See also cce_reduce, cce_spectrum.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_noise(model,cluster,context,schedule,parameters)

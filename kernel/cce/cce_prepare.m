@@ -20,6 +20,8 @@
 %   interactions, central projectors when supplied, backend capability and
 %   content hash.
 %
+% See also cce_hamiltonian, cce_project.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function model=cce_prepare(spin_system,parameters)

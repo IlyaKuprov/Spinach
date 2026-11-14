@@ -19,6 +19,10 @@
 %   raw - cluster/state/configuration IDs, value, valid, abs_error_bound,
 %   central density where applicable, and propagation diagnostics.
 %
+% See also cce_hamiltonian, cce_observe, cce_reduce.
+% Reference: https://doi.org/10.1103/PhysRevB.78.085315
+% Reference: https://doi.org/10.1103/PRXQuantum.2.010311
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_cluster(model,cluster,context,schedule,parameters)

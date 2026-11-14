@@ -25,6 +25,8 @@
 %   branches - alpha/beta state, projector, energy, expectations and
 %   susceptibility records, with register operators and projection metadata.
 %
+% See also cce_prepare, cce_cluster.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function branches=cce_project(model,parameters)

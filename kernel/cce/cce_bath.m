@@ -26,6 +26,8 @@
 %   bath - coordinates, physical identity, occupancy/configuration and
 %   construction metadata.
 %
+% See also cce_import, cce_prepare.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [sys,inter,bath]=cce_bath(specification)

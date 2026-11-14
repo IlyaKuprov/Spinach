@@ -22,6 +22,9 @@
 %   blocks.
 %   meta - tensor order, dimensions, Hamiltonians and included jump records.
 %
+% See also cce_master, cce_hamiltonian.
+% Reference: https://doi.org/10.1103/PhysRevLett.132.250401
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [G,meta]=cce_liouvillian(model,sites,context,parameters)

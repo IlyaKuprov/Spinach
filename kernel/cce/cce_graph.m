@@ -32,6 +32,8 @@
 %   central_mediated, approximate, omitted_bath_ids, selection_mode and
 %   requires_convergence.
 %
+% See also cce_clusters, cce_partition.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function graph=cce_graph(model,parameters)

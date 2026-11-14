@@ -19,6 +19,8 @@
 %   diagnostics - numerical/conditioning, cluster, sample and density
 %   diagnostic fields.
 %
+% See also cce, cce_reduce.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function diagnostics=cce_diagnostics(model,raw,result,parameters)

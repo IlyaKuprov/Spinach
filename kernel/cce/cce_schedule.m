@@ -23,6 +23,8 @@
 %   raw - cell per input context, each containing the baseline record then
 %   cluster records in input order.
 %
+% See also cce_checkpoint, cce_cluster.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)

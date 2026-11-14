@@ -24,6 +24,8 @@
 %   imported - recovered model/result or canonical spin/tensor/cube data with
 %   explicit metadata.
 %
+% See also cce_export, cce_bath.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function imported=cce_import(filename,format,units)

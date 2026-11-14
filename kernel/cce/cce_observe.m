@@ -18,6 +18,8 @@
 %   observed - numeric time-by-observable complex array; unresolved scalar
 %   normalization raises cce_observe:initial_zero.
 %
+% See also cce_cluster, cce_master.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function observed=cce_observe(rho,parameters)

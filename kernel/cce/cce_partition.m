@@ -14,6 +14,9 @@
 %   partition - frozen groups and IDs, group-level graph/order metadata, and
 %   pilot/validation diagnostics.
 %
+% See also cce_clusters, cce_graph.
+% Reference: https://doi.org/10.1103/PhysRevB.110.L220302
+%
 % ilya.kuprov@weizmann.ac.il
 
 function partition=cce_partition(model,graph,parameters)

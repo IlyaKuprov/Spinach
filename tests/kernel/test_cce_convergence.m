@@ -40,6 +40,18 @@ result=test_true(result,'unchanged physics',isequal(converged.times,p.times)&&..
                  converged.input_parameters.order==1,...
                  'The reported baseline is not silently replaced by another physical calculation.');
 
+% Do not certify an inaccurate baseline when later ladder steps agree
+inter.coupling.matrix{2,3}=diag([9 9 0]); coupled=create(sys,inter);
+q=p; q.order=1; q.times=[0 0.01 0.04]; q.bath_state=struct('mode','mixed_product');
+q.convergence.ladders=struct('field','order','values',{{1,2,3}});
+q.convergence.max_work=3; ladder=cce_converge(coupled,q);
+reference=rmfield(q,'convergence'); reference.order=2; exact=cce(coupled,reference);
+baseline_error=max(abs(ladder.value-exact.value));
+result=test_true(result,'Returned baseline must converge',...
+                 strcmp(ladder.convergence,'not_converged')&&baseline_error>1e-3,...
+                 'Agreement of orders two and three cannot certify the returned order-one baseline.');
+fprintf('R1227 baseline error %.16g; ladder status %s.\n',baseline_error,ladder.convergence);
+
 % Exhaust the resource budget before every requested independent check
 p.convergence.max_work=2; capped=cce_converge(spin_system,p);
 result=test_true(result,'resource cap',strcmp(capped.convergence,'limit_reached'),...

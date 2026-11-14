@@ -44,8 +44,7 @@ report=repmat(struct('field','','step',0,'difference',Inf,'scaled_difference',In
                      'passed',false),1,capacity); recorded=0;
 all_pass=result.diagnostics.acceptable; limited=false;
 for k=1:numel(control.ladders)
-    ladder=control.ladders(k); previous=result;
-    passed=false;
+    ladder=control.ladders(k); passed=true;
     for j=2:numel(ladder.values)
         if work>=control.max_work, limited=true; break; end
 
@@ -54,8 +53,8 @@ for k=1:numel(control.ladders)
         if isscalar(pieces), trial.(pieces{1})=ladder.values{j};
         else, trial.(pieces{1}).(pieces{2})=ladder.values{j}; end
         current=cce(spin_system,trial); work=work+1;
-        entry=compare(previous,current,control,ladder.field,j);
-        recorded=recorded+1; report(recorded)=entry; passed=entry.passed; previous=current;
+        entry=compare(result,current,control,ladder.field,j);
+        recorded=recorded+1; report(recorded)=entry; passed=passed&&entry.passed;
     end
     all_pass=all_pass&&passed;
     if limited, break; end

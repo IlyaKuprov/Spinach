@@ -26,7 +26,18 @@ function result=cce(spin_system,parameters)
 grumble(spin_system,parameters);
 started=tic; model=cce_prepare(spin_system,parameters);
 ensemble=cce_states(model,parameters); schedule=cce_sequence(model,parameters);
-graph=cce_graph(model,parameters); clusters=cce_clusters(model,graph,parameters);
+graph=cce_graph(model,parameters);
+
+% Freeze physical group partitions before evaluating any production sample
+partition=[];
+if ~strcmp(parameters.expansion,'standard')
+    partition=cce_partition(model,graph,parameters);
+    if ~partition.complete, error('cce:partition_incomplete','Partition validation did not converge.'); end
+    parameters.groups=partition.groups;
+    if strcmp(parameters.expansion,'disjoint'), parameters.order=1; end
+    if strcmp(parameters.expansion,'disjoint_inter'), parameters.order=2; end
+end
+clusters=cce_clusters(model,graph,parameters);
 
 % Propagate each globally assigned bath state before ensemble reduction
 ns=numel(ensemble.contexts); all_raw=cell(1,ns); reductions=cell(1,ns);
@@ -115,6 +126,7 @@ if ns>1&&strcmp(averaging,'after_expansion')
 end
 result.coherence=result.value; result.raw=all_raw; result.times=parameters.times;
 result.clusters=clusters; result.graph=graph; result.schedule=schedule;
+result.partition=partition;
 result.ensemble=ensemble; result.model_hash=model.source_hash;
 result.input_parameters=parameters; result.averaging=averaging;
 result.method=parameters.method; result.exact_reference=~isempty(full_index);
@@ -153,8 +165,8 @@ if ~all(isfield(parameters,required)), error('Required CCE parameter fields are 
 if ~ismember(parameters.method,{'cce','gcce'})
     error('cce:capability','Method requires the cce_liouvillian or cce_noise extension.');
 end
-if ~strcmp(parameters.expansion,'standard')
-    error('cce:capability','Nonstandard grouping requires the cce_partition extension.');
+if ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter'})
+    error('cce:capability','Unsupported CCE expansion.');
 end
 if ~ismember(parameters.quantity,{'coherence','density','observable'})||...
    (strcmp(parameters.method,'cce')&&~strcmp(parameters.quantity,'coherence'))

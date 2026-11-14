@@ -27,6 +27,9 @@
 
 function raw=cce_cluster(model,cluster,context,schedule,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Route driven generalized clusters through the local segment compiler
 if isstruct(schedule)&&isfield(schedule,'controls')&&schedule.controls
     if ~strcmp(parameters.method,'gcce')
@@ -294,10 +297,6 @@ if ~isfield(parameters,'meanfield')||~ismember(parameters.meanfield,{'none','sta
 end
 if isfield(parameters.numerics,'propagator')&&~strcmp(parameters.numerics.propagator,'eig')
     error('cce_cluster:capability','Only the residual-checked eig propagator is implemented.');
-end
-if strcmp(parameters.method,'gcce')&&isfield(parameters,'second_order')&&...
-   parameters.second_order.enabled
-    error('Generalized CCE cannot add a conditional second-order correction.');
 end
 if strcmp(parameters.meanfield,'static')
     for event=schedule.events

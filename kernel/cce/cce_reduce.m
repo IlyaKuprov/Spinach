@@ -48,6 +48,9 @@
 
 function reduced=cce_reduce(raw,clusters,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate indexed raw records and the closed cluster family
 grumble(raw,clusters,parameters);
 

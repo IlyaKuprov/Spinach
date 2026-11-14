@@ -240,6 +240,32 @@ if isfield(s,'seed')&&(~isnumeric(s.seed)||~isreal(s.seed)||~isscalar(s.seed)||.
    ~isfinite(s.seed)||s.seed<0||s.seed>2^32-1||s.seed~=fix(s.seed))
     error('Seed must be a nonnegative integer.');
 end
+% Reject unsupported bath properties rather than dropping their physical effect
+allowed={'mode','isotopes','magnetic','coordinates_A','fractional','cell_A','repeats',...
+         'bounds_A','count','density','dimension','seed','exclusion_A','max_attempts','occupancy',...
+         'rotation','translation_A','species','configurations','remove_ids',...
+         'selection','isotopologues','tensors_Hz','pairs_Hz','groups'};
+unknown=setdiff(fieldnames(s),allowed);
+if ~isempty(unknown), error('Unsupported bath specification.%s.',unknown{1}); end
+mode_fields={'coordinates_A','explicit';'fractional','lattice';'cell_A','lattice';...
+             'repeats','lattice';'bounds_A','random';'count','random';...
+             'density','random';'dimension','random';'exclusion_A','random';'max_attempts','random'};
+for k=1:size(mode_fields,1)
+    if isfield(s,mode_fields{k,1})&&~strcmp(s.mode,mode_fields{k,2})
+        error('Bath specification.%s requires mode=%s.',mode_fields{k,1},mode_fields{k,2});
+    end
+end
+if isfield(s,'count')&&isfield(s,'density')
+    error('Specify random bath count or density, not both.');
+end
+if isfield(s,'configurations')&&...
+   (isfield(s,'species')||isfield(s,'occupancy')||isfield(s,'isotopologues'))
+    error('Explicit configurations cannot be combined with independent isotope controls.');
+end
+if isfield(s,'isotopologues')&&~isfield(s,'occupancy')
+    error('isotopologues requires occupancy.');
+end
+
 switch s.mode
     case 'explicit'
         if ~isfield(s,'coordinates_A')||~isnumeric(s.coordinates_A)||...
@@ -272,6 +298,10 @@ end
 site_count=n;
 if strcmp(s.mode,'lattice'), site_count=n*prod(s.repeats); end
 if strcmp(s.mode,'random')
+    if isfield(s,'dimension')&&(~isnumeric(s.dimension)||~isscalar(s.dimension)||...
+       s.dimension~=nnz(diff(s.bounds_A)))
+        error('Random bath dimension must match the number of nonzero bounds.');
+    end
     if isfield(s,'count')
         site_count=s.count;
     else
@@ -317,6 +347,8 @@ if isfield(s,'pairs_Hz')
 end
 if isfield(s,'selection')
     q=s.selection;
+    unknown=setdiff(fieldnames(q),{'center_A','inner_A','outer_A'});
+    if ~isempty(unknown), error('Unsupported selection.%s.',unknown{1}); end
     if ~isstruct(q)||~all(isfield(q,{'centres_A','inner_A','outer_A'}))||...
        isempty(q.centres_A)||size(q.centres_A,2)~=3||any(~isfinite(q.centres_A),'all')||...
        ~isscalar(q.inner_A)||~isscalar(q.outer_A)||q.inner_A<0||q.outer_A<q.inner_A||...
@@ -328,6 +360,11 @@ if isfield(s,'remove_ids')&&(~isnumeric(s.remove_ids)||~isreal(s.remove_ids)||..
    any(~isfinite(s.remove_ids))||any(s.remove_ids<1|s.remove_ids>site_count|...
    s.remove_ids~=fix(s.remove_ids)))
     error('Invalid deleted site IDs.');
+end
+% Reject unused explicit pair annotations before building interaction tensors
+if isfield(s,'pairs_Hz')
+    unknown=setdiff(fieldnames(s.pairs_Hz),{'ids','tensor'});
+    if ~isempty(unknown), error('Unsupported pairs_Hz.%s.',unknown{1}); end
 end
 if isfield(s,'tensors_Hz')&&(~isnumeric(s.tensors_Hz)||~isreal(s.tensors_Hz)||...
    size(s.tensors_Hz,1)~=3||size(s.tensors_Hz,2)~=3||any(~isfinite(s.tensors_Hz),'all'))
@@ -348,6 +385,21 @@ if isfield(s,'occupancy')
     for k=1:numel(s.species), spin(s.species{k}); end
     if ~isfield(s,'isotopologues')&&~isfield(s,'seed'), error('Occupancy sampling requires a seed.'); end
 end
+if isfield(s,'configurations')
+    unknown=setdiff(fieldnames(s.configurations),{'isotopes','weight'});
+    if ~isempty(unknown), error('Unsupported configurations.%s.',unknown{1}); end
+end
+if isfield(s,'isotopologues')
+    unknown=setdiff(fieldnames(s.isotopologues),{'mode','max_configurations','count'});
+    if ~isempty(unknown), error('Unsupported isotopologues.%s.',unknown{1}); end
+    if strcmp(s.isotopologues.mode,'enumerate')&&isfield(s.isotopologues,'count')
+        error('isotopologues.count requires sample mode.');
+    end
+    if strcmp(s.isotopologues.mode,'sample')&&isfield(s.isotopologues,'max_configurations')
+        error('isotopologues.max_configurations requires enumerate mode.');
+    end
+end
+
 if isfield(s,'configurations')
     weights=[s.configurations.weight];
     if isempty(weights)||any(~isfinite(weights)|weights<0)||abs(sum(weights)-1)>numel(weights)*eps

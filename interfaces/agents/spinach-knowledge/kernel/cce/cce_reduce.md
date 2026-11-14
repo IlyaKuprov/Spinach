@@ -8,6 +8,8 @@ Reduce raw cluster observables with conditioned multiplicative or additive recur
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Accepts the empty-cluster baseline followed by one raw record per retained cluster; the integer-power and direct recursive forms use the same subset-closed family.
 - The multiplicative reducer accumulates log magnitudes and phases without replacing zero denominators by epsilon. Near-unresolved factors are masked or raise an error according to `zero_policy`.
 - Noise uses additive connected-cluster subtraction. A known complete-bath exact value is substituted by `cce`, not by this algebraic helper.

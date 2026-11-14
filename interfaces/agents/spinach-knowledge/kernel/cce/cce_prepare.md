@@ -8,6 +8,8 @@ Compile canonical Spinach metadata for local cluster Hamiltonians.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - The physical fingerprint includes `spin_system.tols`, including Hamiltonian interaction cutoffs and stock propagation tolerances.
 
 - Applies the requested stock `assume` approximation without building a basis, and retains the source spin system for the reference backend.
@@ -34,3 +36,5 @@ model=cce_prepare(spin_system,parameters)
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_prepare.m)
 - [cce_hamiltonian.m](cce_hamiltonian.md)
 - [cce_project.m](cce_project.md)
+
+The shared vocabulary replaces the earlier permissive reserved-field list. Legacy `pulses`, `lindblad`, `output`, `execution`, `workers`, `observable`, and `controls` are not alternate APIs.

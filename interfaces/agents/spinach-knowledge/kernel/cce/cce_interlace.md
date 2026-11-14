@@ -8,6 +8,8 @@ Evaluate conditional product-state averages for interlaced CCE.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - An empty cluster family retains the empty-cluster baseline: its conditioning cylinder fixes the entire bath to the reference assignment.
 
 - Constructs the union of product-state cylinders associated with retained superclusters, or uses explicitly supplied condition_sites.

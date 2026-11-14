@@ -20,6 +20,7 @@ result=test_close(result,'Finite detuned drive matches independent dense expm',s
 % Preserve optional operator angles when finite controls select this compiler
 finite=p.sequence; ideal=finite; ideal.type='ideal'; ideal.at=0.15;
 ideal.axis=[]; ideal.operator=0.3*z; finite.operator=[];
+ideal.duration=[]; ideal.amplitude=[]; ideal.detuning=[];
 q=p; q.sequence=[finite ideal]; accepted=true; optional_error=Inf;
 try
     implicit=cce_controls(model,2,context,[],q);
@@ -100,7 +101,7 @@ result=test_close(result,'Named and explicit Hahn normalization',...
 
 % Exercise the documented observable field for scalar and multiple readouts
 q.quantity='observable'; q.operators=full(z); observed=cce(ss,q);
-q.quantity='density'; density_result=cce(ss,q); exact=zeros(numel(q.times),2);
+q.quantity='density'; q=rmfield(q,'operators'); density_result=cce(ss,q); exact=zeros(numel(q.times),2);
 for k=1:numel(q.times)
     exact(k,:)=[trace(z*density_result.density(:,:,k)) trace(x*density_result.density(:,:,k))];
 end
@@ -199,7 +200,7 @@ q.central.rho=diag([1 0 0]); q.order=0; q.bath_state=struct('mode','mixed_produc
 q.sequence=struct('type','ideal','target',1,'placement','absolute','at',0,'axis','x','angle',pi);
 spin_one=cce_prepare(spin_system,q); states=cce_states(spin_one,q);
 physical=cce_controls(spin_one,[],states.contexts(1),[],q);
-q.sequence.operator=[0 1 0;1 0 0;0 0 0]/2;
+q.sequence.operator=[0 1 0;1 0 0;0 0 0]/2; q.sequence.axis=[];
 selective=cce_controls(spin_one,[],states.contexts(1),[],q);
 result=test_close(result,'Physical spin-one pi pulse',physical.raw.density(:,:,end),diag([0 0 1]),...
                   1e-12,0,'A full spin-one rotation maps m=+1 to m=-1');

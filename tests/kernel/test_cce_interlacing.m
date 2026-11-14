@@ -111,7 +111,8 @@ result=test_true(result,'Included-supercluster family generates the same K autom
 p.order=3; p.interlaced.max_states=32; integrated=cce(model.spin_system,p);
 mixture=p; mixture.bath_state=struct('mode','explicit_product',...
     'rho',{{diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])}});
-mixture.meanfield='none'; exact=cce(model.spin_system,mixture);
+mixture.meanfield='none'; mixture=rmfield(mixture,'interlaced');
+exact=cce(model.spin_system,mixture);
 result=test_close(result,'Full-order W12 equals exact mixed bath',integrated.value,exact.value,...
                   1e-11,0,'Shared-K recursion telescopes at full bath order');
 
@@ -127,7 +128,7 @@ spin_system.inter.coupling.matrix{1,3}=zeros(3);
 spin_system.inter.coupling.matrix{2,3}=diag([8 0 0]);
 q=p; q.method='cce'; q.bath_spins=[2 3]; q.order=2; q.times=[0 pi/2];
 q.bath_state.probabilities='uniform';
-reference=q; reference.bath_state=struct('mode','mixed_product'); reference.meanfield='none';
+reference=q; reference.bath_state=struct('mode','mixed_product'); reference=rmfield(reference,'interlaced'); reference.meanfield='none';
 exact=cce(spin_system,reference); full_bath=cce(spin_system,q);
 
 % Verify the raw full-bath value against independent conditional exponentials
@@ -148,7 +149,7 @@ result=test_close(result,'Generalized interlaced full-bath zero baseline',genera
 fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath.value(end)),real(exact.value(end)));
 
 % Require the common result schema and diagnostics on the interlaced path
-reference=q; reference.bath_state=struct('mode','mixed_product'); standard=cce(spin_system,reference);
+reference=q; reference.bath_state=struct('mode','mixed_product'); reference=rmfield(reference,'interlaced'); standard=cce(spin_system,reference);
 result=test_true(result,'Interlaced common result fields',...
                  isequal(sort(fieldnames(generalized)),sort(fieldnames(standard))),...
                  'All public driver branches must expose the same documented result fields.');
@@ -181,7 +182,7 @@ q.jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
 for method={'mecce','megcce'}
     q.method=method{1};
     for order=1:2
-        q.order=order; reference=q; reference.bath_state=struct('mode','mixed_product');
+        q.order=order; reference=q; reference.bath_state=struct('mode','mixed_product'); reference=rmfield(reference,'interlaced');
         expected=cce(spin_system,reference); matched=false; difference_me=Inf;
         try
             actual=cce(spin_system,q); difference_me=max(abs(actual.value-expected.value));
@@ -215,7 +216,7 @@ finite=struct('type','finite','target',1,'placement','absolute','at',0.05,...
 for sequence={struct('name','hahn','count',1,'axis','x','target',1),finite}
     q.sequence=sequence{1};
     for order=1:2
-        q.order=order; reference=q; reference.bath_state=struct('mode','mixed_product');
+        q.order=order; reference=q; reference.bath_state=struct('mode','mixed_product'); reference=rmfield(reference,'interlaced');
         expected=cce(spin_system,reference);
         try
             actual=cce(spin_system,q);

@@ -8,6 +8,8 @@ Propagate open-system conditional or generalized cluster dynamics.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Selective explicit-generator pulses use `cce_hamiltonian` metadata dimensions to embed the target in the retained central-first tensor order.
 
 - Uses the local GKSL generator and the compiled ideal-pulse schedule for `mecce` or `megcce`.

@@ -8,6 +8,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Ideal operator events use angle one when `angle` is omitted or empty, including alongside finite controls; axis events still require an explicit finite angle.
 
 - Coherence is raw by default on every dispatch path; explicit `normalized=true` divides by the initial coherence.

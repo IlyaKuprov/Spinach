@@ -8,6 +8,8 @@ Compile central and product-bath states with stable physical IDs.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Supports maximally mixed product states, explicit single-site density matrices, sampled product states, and interlaced sampled contexts.
 - Uses local Threefry streams with global state IDs as substreams; it does not change the global random stream.
 - Checks state normalization, Hermiticity and positivity. With no explicit central density, conditional methods use the alpha/beta superposition while generalized methods require `central.rho`.

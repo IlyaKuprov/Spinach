@@ -33,6 +33,9 @@
 
 function result=cce_converge(spin_system,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate all ladder fields and budgets before running the baseline
 grumble(spin_system,parameters);
 control=parameters.convergence; baseline=rmfield(parameters,'convergence');

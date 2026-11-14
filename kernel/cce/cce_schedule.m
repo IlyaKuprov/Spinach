@@ -29,6 +29,9 @@
 
 function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate immutable inputs and choose one outer parallel layer
 grumble(model,clusters,ensemble,schedule,parameters);
 

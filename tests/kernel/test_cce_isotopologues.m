@@ -32,7 +32,7 @@ p.quantity='coherence'; p.order=2; p.central.alpha=[1;0]; p.central.beta=[0;1];
 p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
 p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
 p.times=[0 0.001 0.003]; p.sequence=[]; p.bath_state.mode='mixed_product';
-p.numerics=struct('atol',1e-10,'rtol',1e-10,'max_memory_bytes',2^24,'reduction','direct');
+p.numerics=struct('atol',1e-10,'rtol',1e-10,'max_memory_bytes',2^24);
 weighted=zeros(3,1); analytic=zeros(3,1);
 for k=1:numel(configs)
     ss.comp.isotopes=[{'E'} configs(k).isotopes]; ss.comp.mults=[2 configs(k).multiplicities];

@@ -8,6 +8,8 @@ Integrate a declared bath correlation into a finite-window spectrum.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Uses the explicit angular-frequency grid and rectangle or trapezoid weights with convention exp(+i*omega*t).
 - A positive-time domain is extended only under an explicitly stationary correlation assumption; two-sided data are used as declared.
 - Applies none or Hann window without window-power renormalization. Optional real modulation on the original time mesh supplies a squared filter integral in seconds squared.

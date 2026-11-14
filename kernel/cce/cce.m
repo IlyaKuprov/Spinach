@@ -49,7 +49,26 @@
 
 function result=cce(spin_system,parameters)
 
-% Validate orchestration choices before canonicalizing the physical model
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
+% Reject the helper-only initial density override at the public driver
+if isfield(parameters,'initial_rho')
+    error('cce:capability','parameters.initial_rho is helper-only; specify central.rho.');
+end
+
+% Reject conditioning controls when the driver is not performing interlacing
+if isfield(parameters,'interlaced')&&isfield(parameters,'bath_state')&&...
+   ~strcmp(parameters.bath_state.mode,'interlaced')
+    error('cce:capability','parameters.interlaced requires bath_state.mode=interlaced.');
+end
+
+% Convergence scans are explicit helper operations, not driver flags
+if isfield(parameters,'convergence')
+    error('cce:capability','parameters.convergence requires explicit cce_converge execution.');
+end
+
+% Validate the core driver contract before allocating retained results
 grumble(spin_system,parameters);
 started=tic; model=cce_prepare(spin_system,parameters);
 
@@ -58,7 +77,17 @@ evaluator=@cce_cluster;
 if ismember(parameters.method,{'mecce','megcce'}), evaluator=@cce_master; end
 if strcmp(parameters.method,'noise'), evaluator=@cce_noise; end
 state_parameters=parameters;
-if ismember(parameters.method,{'mecce','noise'}), state_parameters.method='cce'; end
+if ismember(parameters.method,{'mecce','noise'})
+    state_parameters.method='cce';
+    if isfield(state_parameters,'jumps'), state_parameters=rmfield(state_parameters,'jumps'); end
+    if isfield(state_parameters.numerics,'propagator')
+        state_parameters.numerics=rmfield(state_parameters.numerics,'propagator');
+    end
+end
+if strcmp(parameters.method,'noise')
+    state_parameters=rmfield(state_parameters,'noise');
+    if isfield(state_parameters,'spectrum'), state_parameters=rmfield(state_parameters,'spectrum'); end
+end
 ensemble=cce_states(model,state_parameters); schedule=cce_sequence(model,parameters);
 graph=cce_graph(model,parameters);
 
@@ -263,6 +292,15 @@ if strcmp(parameters.quantity,'density')
     result.density=reshape(result.value.',d,d,nt);
 end
 result.diagnostics=cce_diagnostics(model,result.raw,result,parameters);
+
+% Apply explicitly requested postprocessing to the computed result
+if isfield(parameters,'spectrum')
+    result.spectrum=cce_spectrum(result.times,result.value,parameters);
+end
+if isfield(parameters,'analysis'), result.analysis=cce_analyse(result,parameters); end
+
+% Honor explicit raw suppression after diagnostics and analysis consume it
+if isfield(parameters,'retain_raw')&&~parameters.retain_raw, result.raw={}; end
 
 end
 

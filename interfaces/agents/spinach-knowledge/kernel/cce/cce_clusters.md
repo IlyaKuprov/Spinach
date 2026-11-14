@@ -8,6 +8,8 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Enumerates connected candidate clusters through the requested order; disconnected subsets required by retained clusters are restored for recursive reduction.
 - Applies optional per-order cluster caps and explicit group-cluster selection deterministically, preserving physical-ID and subset bookkeeping.
 - Partition mode expands group clusters into physical sites, so the reported order counts groups, not physical spins.

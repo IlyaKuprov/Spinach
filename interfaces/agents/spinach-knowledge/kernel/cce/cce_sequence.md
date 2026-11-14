@@ -8,6 +8,8 @@ Compile whole-sequence sample times and ideal conditional pulse events.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Positive absolute timestamps are accepted: each sample includes only events at or before its duration, while the zero sample always has no pulses.
 
 - Checks finite, nonnegative, sorted row-vector sample times in seconds and explicit event ordering.
@@ -38,3 +40,5 @@ schedule=cce_sequence(model,parameters)
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_sequence.m)
 - [cce_controls.m](cce_controls.md)
 - [cce_cluster.m](cce_cluster.md)
+
+An empty event list remains valid when an enabled DEER selector has no pulse to select; the conditional finite-event check does not dereference an empty numeric array. Zero-valued unused padding fields in mixed event arrays are harmless; nonzero unused control components are rejected.

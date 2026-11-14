@@ -31,6 +31,9 @@
 
 function branches=cce_project(model,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate explicit central vectors and perturbation controls
 grumble(model,parameters);
 

@@ -38,6 +38,9 @@
 
 function graph=cce_graph(model,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate inputs
 grumble(model,parameters);
 

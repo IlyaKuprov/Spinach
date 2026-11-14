@@ -27,6 +27,9 @@
 
 function schedule=cce_sequence(model,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Compile named, finite and DEER controls through the shared segment schema
 advanced=isstruct(parameters.sequence)&&isfield(parameters.sequence,'name');
 if isstruct(parameters.sequence)&&isfield(parameters.sequence,'type')
@@ -48,7 +51,7 @@ if advanced
         % Drop validated empty DEER selections before ordinary event validation
         copy=parameters; copy.sequence=schedule.events;
         copy.sequence=copy.sequence(~arrayfun(@(event)isempty(event.target),copy.sequence));
-        if any(strcmp({schedule.events.type},'finite'))
+        if ~isempty(schedule.events)&&any(strcmp({schedule.events.type},'finite'))
             error('cce_sequence:conditional_drive','Finite controls require gCCE.');
         end
         copy.meanfield='none';

@@ -39,6 +39,9 @@
 
 function segments=cce_controls(model,sites,context,schedule,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate the canonical metadata and requested controls
 grumble(model,sites,context,parameters);
 

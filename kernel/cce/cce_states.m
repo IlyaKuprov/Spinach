@@ -32,6 +32,9 @@
 
 function ensemble=cce_states(model,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate explicit physical states and sampling controls
 grumble(model,parameters);
 

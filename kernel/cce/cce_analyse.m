@@ -29,6 +29,9 @@
 
 function analysis=cce_analyse(result,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate retained raw data and the explicit fitting contract
 grumble(result,parameters);
 analysis=struct('times',result.times,'value',result.value,'valid',result.valid,...

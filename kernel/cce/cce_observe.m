@@ -24,6 +24,9 @@
 
 function observed=cce_observe(rho,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate the density stack and requested observable
 grumble(rho,parameters);
 

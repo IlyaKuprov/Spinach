@@ -8,6 +8,8 @@ Extract central density elements, coherence or linear observables without discar
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Normalization uncertainty scales with each observable operator norm, so changing physical units preserves a resolved normalized value; genuinely zero references remain errors.
 
 - Flattens density matrices in MATLAB column-major order, or projects alpha/beta coherence, or evaluates the supplied operators.

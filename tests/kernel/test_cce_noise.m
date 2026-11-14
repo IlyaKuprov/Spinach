@@ -53,7 +53,7 @@ result=test_close(result,'C7 numerical check',classical.value,repmat(0.16,numel(
 % Retain classical ensemble variance in a sampled connected correlation
 q=p; q.bath_state=struct('mode','sampled','samples',64,'seed',31,...
                         'basis','uniform','probabilities','uniform');
-q.central.rho=eye(2)/2; model=cce_prepare(s,q); ensemble=cce_states(model,q);
+q.central.rho=eye(2)/2; clean=rmfield(q,'noise'); model=cce_prepare(s,clean); ensemble=cce_states(model,clean);
 means=1.5-ensemble.assignments(:,1); expected=0.25-(ensemble.weights(:).'*means)^2;
 for mode={'after_expansion','internal_then_expansion'}
     q.averaging=mode{1}; sampled=cce(s,q);
@@ -88,13 +88,13 @@ fprintf('Noise full-order error %.3g; quantum ordering error %.3g\n',...
 
 % Refuse routing a master-equation request through the noise evaluator
 q=p; q.method='megcce'; q.central.rho=ones(2)/2;
-model=cce_prepare(s,q); ensemble=cce_states(model,q);
-schedule=cce_sequence(model,q); cluster=struct('id',uint64(1),'sites',[2 3]);
+clean=rmfield(q,'noise'); model=cce_prepare(s,clean); ensemble=cce_states(model,clean);
+schedule=cce_sequence(model,clean); cluster=struct('id',uint64(1),'sites',[2 3]);
 rejected=false;
 try
     cce_noise(model,cluster,ensemble.contexts(1),schedule,q);
 catch exception
-    rejected=strcmp(exception.identifier,'cce_noise:capability');
+    rejected=ismember(exception.identifier,{'cce_noise:capability','cce:capability'});
 end
 result=test_true(result,'Noise evaluator rejects foreign method',rejected,...
                  'Direct evaluator calls must not silently use Hamiltonian noise dynamics for a master-equation method.');

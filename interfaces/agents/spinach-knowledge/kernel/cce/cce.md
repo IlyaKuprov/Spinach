@@ -8,6 +8,8 @@ Evaluate conditional, generalized, open-system or bath-noise cluster expansions 
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Compiles the physical model, graph, cluster family, states and pulse schedule; evaluates raw cluster tasks, then reduces each state realization before weighted averaging.
 - Uses `cce_cluster` for `cce`/`gcce`, `cce_master` for `mecce`/`megcce`, and the additive `cce_noise` evaluator for `noise`. Partition and interlaced modes are selected through the parameter structure.
 - When a selected cluster contains the entire physical bath, returns that raw exact-cluster value instead of a product whose intermediate denominators may vanish.
@@ -42,3 +44,7 @@ result=cce(spin_system,parameters)
 - [cce_diagnostics.m](cce_diagnostics.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.78.085315)
 - [Method reference](https://doi.org/10.1103/PRXQuantum.2.010311)
+
+`retain_raw=false` explicitly suppresses raw cluster arrays after diagnostics and analysis; the existing default remains retained. Nonempty jumps require ME methods; bath-noise evolution is closed-system and does not accept Lindblad jumps. State-only parameter copies remove propagation-only fields before conditional-state preparation.
+
+Explicit `analysis` and `spectrum` requests now run `cce_analyse` and `cce_spectrum` on the result. `convergence` remains an explicit `cce_converge` operation and is rejected by the single-run driver. Unsupported noise term weights are rejected; scale the operator itself.

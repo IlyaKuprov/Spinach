@@ -29,6 +29,9 @@
 
 function raw=cce_noise(model,cluster,context,schedule,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate explicit quantum ordering and the additive observable contract
 grumble(model,cluster,context,schedule,parameters);
 [H,~]=cce_hamiltonian(model,cluster.sites,struct('backend','auto'));

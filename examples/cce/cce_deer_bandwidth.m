@@ -43,15 +43,14 @@ parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 % Select the first bath resonance with a rectangular pump window
 parameters.sequence(2)=struct('type','ideal','target',2,'axis','x',...
                               'angle',pi,'placement','fraction','at',0.25);
-parameters.controls.frequencies=struct('sites',[2 3],'values',[0 1e6],'units','Hz');
-parameters.controls.pulses=struct('event',2,'scope',[2 3],'centre',0,...
-    'bandwidth',2e5,'offset',0,'units','Hz','shape','rectangular');
+parameters.deer=struct('enabled',true,'detuning_center',0,...
+                       'halfwidth',2*pi*1e5,'sites',2,'allow_empty',true);
 
-% Run the cluster expansion and report its physical input boundary
+% Run the generalized cluster expansion
 result=cce(spin_system,parameters);
 fprintf('cce_deer_bandwidth: %d/%d valid values; finite-cluster demonstration.\n',...
         nnz(result.valid),numel(result.valid));
-fprintf('Pump centre 0 Hz, bandwidth 200 kHz; offsets [0,1 MHz].\n');
+fprintf('Pump centre 0 Hz, bandwidth 200 kHz; physical site 2.\n');
 
 % Plot the conditional complex coherence
 kfigure(); plot(1e6*result.times,real(result.value),'b-',...

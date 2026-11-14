@@ -29,6 +29,9 @@
 
 function [G,meta]=cce_liouvillian(model,sites,context,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate dimensions, units and the explicit method
 grumble(model,sites,context,parameters);
 

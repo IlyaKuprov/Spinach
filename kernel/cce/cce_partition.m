@@ -21,6 +21,9 @@
 
 function partition=cce_partition(model,graph,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate declared bounds and canonicalise physical group membership
 grumble(model,graph,parameters);
 p=parameters.partition; ids=graph.bath_ids;

@@ -130,11 +130,14 @@ finite=struct('type','finite','target',1,'placement','absolute','at',0.05,...
               'duration',0.05,'axis','x','amplitude',2,'detuning',0);
 for method={'gcce','megcce'}
     q.method=method{1};
+    if strcmp(q.method,'gcce'), q.jumps=struct([]);
+    else, q.jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7); end
     for sequence={[],struct('name','hahn','count',1,'axis','x','target',1),finite}
         q.sequence=sequence{1};
         if strcmp(q.method,'megcce')&&~isempty(q.sequence), continue; end
         for mode={'mixed_product','interlaced'}
             q.bath_state=struct('mode',mode{1});
+            if isfield(q,'interlaced'), q=rmfield(q,'interlaced'); end
             if strcmp(mode{1},'interlaced')
                 q.bath_state.samples=1; q.bath_state.seed=31;
                 q.bath_state.probabilities='uniform'; q.bath_state.basis='uniform';

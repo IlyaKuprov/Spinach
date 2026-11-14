@@ -8,6 +8,8 @@ Fit an explicitly declared decay envelope without an automatic T1 claim.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Preserves input values/masks and returns status not_requested when fitting is not enabled.
 - Fits A*exp(-(t/T)^beta) in a user-declared interval; exponential fixes beta=1, stretched_exponential fits it. No offset is inferred.
 - Uses the selected real or magnitude envelope and explicit inverse-variance weights; optional confidence is none or linearized at the requested level. Invalid data are diagnosed rather than silently fitted.

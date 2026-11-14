@@ -36,3 +36,7 @@ Joint isotope configurations contain one entry per pre-exclusion candidate, incl
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_bath.m)
 - [cce_import.m](cce_import.md)
 - [cce_prepare.m](cce_prepare.md)
+
+Bath constructors reject unknown fields, mutually exclusive random count/density, mode-inapplicable geometry, and incompatible explicit versus independent isotopologue specifications.
+
+For random baths an explicit dimension, when supplied, must equal the number of nonzero Cartesian box extents. Selection subfields are center_A, inner_A and outer_A.

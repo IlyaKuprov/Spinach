@@ -8,6 +8,8 @@ Run independent, explicit convergence ladders and report acceptance gates.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Varies one supported field at a time from the baseline; order, bath size, graph cutoff, sample count and time-grid refinement are separate tests. Every refinement is compared with the returned baseline, and all comparisons must pass; agreement of later ladder steps cannot certify an inaccurate baseline.
 - Applies user-declared observable tolerances and work cap. Time-grid comparisons require nested points; sample-count ladders require an independent-seed check.
 - Runs explicit held-out complete parameter checks when supplied; does not equate an order plateau with convergence in omitted physical dimensions.

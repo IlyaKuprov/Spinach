@@ -35,6 +35,9 @@
 
 function clusters=cce_clusters(model,graph,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate the physical group and graph contracts
 grumble(model,graph,parameters);
 

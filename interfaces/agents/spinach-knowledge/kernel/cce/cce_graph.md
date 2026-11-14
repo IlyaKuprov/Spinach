@@ -8,6 +8,8 @@ Construct physical bath connectivity and deterministic cluster-selection scores.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Builds complete, distance, coupling-threshold or explicit adjacency graphs in stable bath-ID order.
 - Uses the spectral norm of the spin-operator pair interaction for coupling connectivity; generalized central-mediated connections are included when required by the method.
 - Checks explicit adjacency symmetry and a zero diagonal, and keeps disconnected vertices available to singleton clusters.

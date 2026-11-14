@@ -62,7 +62,7 @@ for case_id=1:2
     p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
     p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
     p.bath_state.mode='mixed_product'; p.times=input.compute.times_ms(:).'*1e-3;
-    p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28,'reduction','direct');
+    p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
     p.sequence=[]; p.central.alpha=eye(central_dimension,1);
     p.central.beta=circshift(p.central.alpha,1);
     model=cce_prepare(ss,p); [hamiltonian,~]=cce_hamiltonian(model,[],struct());

@@ -39,8 +39,12 @@ result=test_true(result,'one-worker raw identity',isequaln(serial.raw,one.raw),.
 result=test_close(result,'one-worker reduction',one.value,serial.value,0,0,...
                   'The final reduction runs only on the client.');
 
-% Request two workers through create rather than a hidden scheduler pool
+% Close this test's pool before create because create reuses an existing pool
+delete(gcp('nocreate'));
 sys.parallel={'local',2}; spin_system=create(sys,inter);
+pool=gcp('nocreate');
+result=test_true(result,'Requested two-worker pool',pool.NumWorkers==2,...
+                 'The concurrency and memory checks require two actually running workers.');
 started=tic; two=cce(spin_system,p); two_time=toc(started);
 result=test_true(result,'two-worker sample identity',isequal(serial.ensemble.assignments,two.ensemble.assignments),...
                  'State substreams depend on seed and state ID, never worker rank.');
@@ -94,13 +98,13 @@ fprintf('Memory cap %.0f bytes; one workspace %.0f; two-worker refusal %d.\n',..
         p.numerics.max_memory_bytes,workspace,refused);
 
 % Include concurrent Liouville workspaces in the master-equation bound
-p.method='mecce'; p.parallel.mode='clusters';
+p.method='mecce'; p.jumps=struct([]); p.parallel.mode='clusters';
 model=cce_prepare(spin_system,p); metadata=whos('model','clusters','ensemble','schedule','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
 workspace=16*(24+numel(schedule.events))*dimension^4;
 p.numerics.max_memory_bytes=resident+1.5*workspace; refused=false;
 try
-    cce_schedule(model,clusters,ensemble,schedule,p,@cce_cluster);
+    cce_schedule(model,clusters,ensemble,schedule,p,@cce_master);
 catch exception
     if ~strcmp(exception.identifier,'cce_schedule:memory'), rethrow(exception); end
     refused=true;
@@ -112,7 +116,7 @@ result=test_true(result,'Concurrent ME worker memory preflight',refused,...
 q=p; q.bath_state=struct('mode','mixed_product'); q.central.rho=eye(2)/2;
 q.quantity='observable'; q.operators=repmat({eye(2)},1,200);
 q.times=linspace(0,1,301); q.parallel.mode='serial';
-q.numerics.max_memory_bytes=5000000; q.lindblad=struct([]);
+q.numerics.max_memory_bytes=5000000; q.jumps=struct([]);
 for method={'gcce','megcce'}
     q.method=method{1}; refused=false;
     try

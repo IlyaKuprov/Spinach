@@ -263,7 +263,7 @@ parameters.meanfield='none';
 parameters.sequence=struct('type','ideal','target',1,'placement','fraction',...
                            'at',0.5,'axis','x','angle',pi);
 parameters.numerics=struct('max_memory_bytes',2^28,'atol',1e-10,'rtol',1e-10,...
-                           'reduction','direct','zero_policy','mask','propagator','eig');
+                           'zero_policy','mask','propagator','eig');
 parameters.averaging='after_expansion';
 
 end

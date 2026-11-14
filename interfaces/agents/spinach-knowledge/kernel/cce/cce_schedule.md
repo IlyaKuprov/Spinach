@@ -8,6 +8,8 @@ Evaluate cluster/state tasks in deterministic indexed batches.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Resident output accounting includes every requested observable column (one for a numeric operator matrix, the cell count for multiple operators), all density components, and the additional noise moments. This common preflight applies to closed-system and master-equation evaluators before allocating their task ledger.
 
 - The physical fingerprint includes `spin_system.tols`, including Hamiltonian interaction cutoffs and stock propagation tolerances.

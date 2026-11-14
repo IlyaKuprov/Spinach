@@ -30,6 +30,9 @@
 
 function raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate the explicit conditioning and local product distribution
 grumble(model,cluster,ensemble,parameters);
 

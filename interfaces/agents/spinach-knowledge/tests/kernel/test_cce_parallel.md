@@ -42,3 +42,7 @@ result=test_cce_parallel()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Checks resident-memory refusal for 200 observable columns on both gCCE and generalized master-equation paths; the four raw output records alone require 6,020,000 bytes against a 5,000,000-byte cap.
+
+Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+The concurrency fixture closes its own one-worker pool before create requests two workers, and asserts the resulting live worker count. create deliberately reuses an existing pool. ME memory checks use cce_master with explicit empty jumps; the observable-memory test uses jumps rather than the ignored lindblad alias.

@@ -8,6 +8,8 @@ Propagate one unitary conditional or generalized cluster.
 
 ## Behaviour
 
+- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
+
 - Conditional CCE evaluates branch traces `Tr(Ua*rhoB*Ub^dagger)`; generalized CCE propagates the complete central-register-plus-cluster density.
 - Uses the same exterior context for every cluster and returns complex values with numerical validity/error information.
 - Generalized central densities are passed through `cce_observe`; static Hermitian eigensystems supply exact local exponentials and measured backward residuals.

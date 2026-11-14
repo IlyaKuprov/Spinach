@@ -32,6 +32,9 @@
 
 function spectrum=cce_spectrum(times,correlation,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate the transform convention, dimensional axes and quadrature
 grumble(times,correlation,parameters);
 s=parameters.spectrum; times=times(:); omega=s.frequency_grid(:);

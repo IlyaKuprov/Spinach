@@ -25,6 +25,9 @@
 
 function diagnostics=cce_diagnostics(model,raw,result,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Check shapes before combining numerical validity and time coverage
 grumble(model,raw,result,parameters);
 value=result.value; valid=result.valid&isfinite(value)&...

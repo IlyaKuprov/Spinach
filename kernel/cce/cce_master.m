@@ -24,6 +24,9 @@
 
 function raw=cce_master(model,cluster,context,schedule,parameters)
 
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
 % Validate the propagation contract before allocating cluster matrices
 grumble(model,cluster,context,schedule,parameters);
 sites=cluster.sites; hc=struct('backend','auto');

@@ -60,7 +60,7 @@ for f=1:numel(fixtures)
     p.central=struct('alpha',a,'beta',b,'rho',(a+b)*(a+b)'/2);
     p.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
                       'operator',pi*(a*b'+b*a')/2);
-    p.normalized=true; actual=cce(spin_system,p);
+    p.normalized=strcmp(p.method,'gcce'); actual=cce(spin_system,p);
 
     % Compare the raw traces, not only the final absolute echo envelope
     for j=1:numel(fixture.raw)

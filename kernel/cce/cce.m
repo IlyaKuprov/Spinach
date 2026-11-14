@@ -27,10 +27,12 @@
 %   choices; see the CCE recipe.
 %
 % Outputs:
-%   result - times, value, valid, abs_error_bound, density, raw, clusters,
-%   graph, states, schedule, state_reductions, exact_reference, parameters,
-%   model_hash, wall_time, statistics, diagnostics, analysis, and spectrum.
-%   value is time-by-observable; density elements use column-major order.
+%   result - reduction values/masks/error/by-order fields plus coherence,
+%   times, raw, clusters, graph, schedule, partition, ensemble, model_hash,
+%   input_parameters, averaging, method, exact_reference, elapsed_seconds,
+%   convergence, budget_satisfied, sampling_standard_error and diagnostics;
+%   density is added for density requests. value is time-by-observable;
+%   density elements use column-major order.
 %
 % ilya.kuprov@weizmann.ac.il
 

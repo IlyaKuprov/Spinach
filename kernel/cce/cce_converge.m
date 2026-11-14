@@ -23,8 +23,9 @@
 %   and optional checks (cell of complete parameter structures).
 %
 % Outputs:
-%   result - baseline/run results, ladder comparisons, independent checks,
-%   work usage and convergence decision.
+%   result - baseline CCE result with convergence status, original
+%   input_parameters and convergence_report containing comparisons, work
+%   usage and acceptance metadata.
 %
 % ilya.kuprov@weizmann.ac.il
 

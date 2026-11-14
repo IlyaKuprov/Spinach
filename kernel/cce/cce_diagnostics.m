@@ -10,7 +10,9 @@
 % no normalization, positivity projection or sample censoring is done.
 %
 % Inputs:
-%   result - CCE value, valid mask, abs_error_bound and retained metadata.
+%   model - prepared physical model; raw - cell of cluster-record arrays.
+%   result - CCE value, valid mask, abs_error_bound, and optional
+%   density/sampling_standard_error.
 %   parameters - numerical tolerances and observable declarations.
 %
 % Outputs:

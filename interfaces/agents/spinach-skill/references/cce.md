@@ -92,7 +92,7 @@ default is named below, supply the field explicitly and obey its source
 | `hamiltonian_backend` | auto/direct/stock | auto; unsupported direct models are rejected |
 | `graph.mode` | complete/distance/coupling/explicit | Required; radius in Angstrom, threshold in rad/s, or adjacency as appropriate |
 | `graph.score` | coupling_norm/resonance/supplied | coupling_norm; resonance additionally requires mismatch matrix and positive mismatch_scale in rad/s |
-| `graph.bath_radius` | Bath selection radius in Angstrom | Inf; omitted sites require convergence checks |
+| `bath_radius` | Bath selection radius in Angstrom | Inf; omitted sites require convergence checks |
 | `groups`, `clusters`, `cluster_cap` | Physical group partition; explicit group-ID clusters; per-order caps | Singleton groups; generated connected family; Inf cap |
 | `bath_state.mode` | mixed_product/explicit_product/sampled/interlaced | Required; explicit `rho` cells follow bath IDs |
 | `bath_state.basis`, `.probabilities`, `.samples`, `.seed` | Product-state sampling declarations | Sampled/interlaced modes require basis/probabilities (cells or `uniform`), sample count and seed |

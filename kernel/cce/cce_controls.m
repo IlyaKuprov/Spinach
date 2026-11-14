@@ -302,7 +302,12 @@ if isfield(spec,'species')
 end
 frequencies=zeros(size(candidates));
 for k=1:numel(candidates)
+    % Reject transverse canonical fields rather than silently secularizing them
     id=candidates(k); tensor=model.zeeman{id};
+    if norm(tensor(3,1:2))>3*eps*norm(tensor(3,:))
+        error('cce_controls:deer_axial',...
+              'DEER frequency selection requires an axial Zeeman field at site %d.',id);
+    end
     frequencies(k)=tensor(3,3);
 end
 selected=candidates(abs(frequencies-spec.detuning_center)<spec.halfwidth);

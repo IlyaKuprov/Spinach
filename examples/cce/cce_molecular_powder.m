@@ -29,10 +29,13 @@ inter=rmfield(inter,'coordinates');
 % Compile physical metadata without a full-bath basis
 spin_system=create(sys,inter);
 
-% Conditional central-spin Hahn coherence and a complete small-bath graph
+% Generalized central-spin Hahn coherence and a complete small-bath graph
 parameters.central_spins=1; parameters.bath_spins=2:3;
-parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='coherence'; parameters.order=2;
+parameters.expansion='standard'; parameters.method='gcce'; parameters.quantity='coherence'; parameters.order=2;
 parameters.central.alpha=[1;0]; parameters.central.beta=[0;1];
+
+% Rotated tensors mix central states, so retain their full generalized dynamics
+parameters.central.rho=ones(2)/2; parameters.normalized=true;
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');

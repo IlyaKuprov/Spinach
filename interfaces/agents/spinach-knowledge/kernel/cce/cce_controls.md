@@ -8,6 +8,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
+DEER frequency windows require axial canonical lab-frame Zeeman rows at every candidate site after species/site filtering. A transverse row raises `cce_controls:deer_axial` with the physical site ID; it is never silently replaced by its longitudinal coefficient. Existing signed axial frequencies, strict boundaries, and explicit empty-selection behavior are unchanged.
+
 A finite `meanfield_radius` requires finite real central and exterior coordinates; missing geometry raises `cce:coordinates` before distance filtering. The radius is nonnegative, and `Inf` retains the unbounded default without requiring coordinates. Included cluster sites need no coordinates for this cutoff, and an empty exterior requires no distance calculation.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.

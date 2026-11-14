@@ -8,6 +8,8 @@ Propagate one unitary conditional or generalized cluster.
 
 ## Behaviour
 
+Conditional propagation requires the supplied central branch subspaces to be invariant under the actual cluster Hamiltonian (including retained interactions and exterior fields). Nonzero leakage above dimension-scaled roundoff raises `cce:pure_dephasing`; use generalized dynamics or supply an explicitly projected physical model. Explicit `second_order.enabled` remains the separate central-gap perturbation model with its existing gap/overlap checks.
+
 A finite `meanfield_radius` requires finite real central and exterior coordinates; missing geometry raises `cce:coordinates` before distance filtering. The radius is nonnegative, and `Inf` retains the unbounded default without requiring coordinates. Included cluster sites need no coordinates for this cutoff, and an empty exterior requires no distance calculation.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.

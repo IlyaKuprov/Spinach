@@ -38,6 +38,11 @@ for f=1:numel(fixtures)
         gyros(j)=type.gyro;
         spin_system.inter.zeeman.matrix{j+1}(3,:)=-type.gyro*field*1000;
         spin_system.inter.coupling.matrix{1,j+1}=2*pi*1000*squeeze(fixture.bath.A(j,:,:)).';
+
+        % Conventional reference CCE explicitly retains only central Sz coupling
+        if strcmp(fixture.compute.method,'cce')
+            spin_system.inter.coupling.matrix{1,j+1}(:,1:2)=0;
+        end
         spin_system.inter.coupling.matrix{j+1,j+1}=2*pi*1000*squeeze(fixture.bath.Q(j,:,:)).';
     end
     for j=1:nb

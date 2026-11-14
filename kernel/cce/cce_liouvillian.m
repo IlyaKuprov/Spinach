@@ -56,6 +56,13 @@ if conditional
     end
     va=kron(branch.alpha.state,eye(db)); vb=kron(branch.beta.state,eye(db));
     ha=va'*H*va; hb=vb'*H*vb;
+
+    % Reject central transitions omitted by conditional master evolution
+    leakage=max(norm(H*va-va*ha,'fro'),norm(H*vb-vb*hb,'fro'));
+    if leakage>size(H,1)*eps*norm(H,'fro')
+        error('cce:pure_dephasing',...
+              'Conditional states are not invariant under the cluster Hamiltonian; use megcce.');
+    end
     G=-1i*(kron(eye(db),ha)-kron(hb.',eye(db)));
 else
     ha=H; hb=H; G=-1i*(kron(eye(d),H)-kron(H.',eye(d)));

@@ -37,6 +37,9 @@ for f=1:numel(data)
         spin_system.inter.zeeman.matrix{j+1}(3,3)=-gamma_n*500*1000;
         r=xyz(j,:)-center;
         spin_system.inter.coupling.matrix{1,j+1}=dipolar(r,gamma_e,gamma_n);
+
+        % Match the external reference's explicit conditional central Sz model
+        spin_system.inter.coupling.matrix{1,j+1}(:,1:2)=0;
         for k=j+1:nb
             r=xyz(j,:)-xyz(k,:);
             spin_system.inter.coupling.matrix{j+1,k+1}=dipolar(r,gamma_n,gamma_n);

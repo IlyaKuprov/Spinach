@@ -44,6 +44,12 @@ if isfield(parameters.noise,'branch')
         error('cce:capability','Noise virtual-state corrections are not implemented.');
     end
     vector=kron(branch.(parameters.noise.branch).state,eye(db)); hb=vector'*H*vector;
+
+    % Require the fixed central branch to be invariant under the actual Hamiltonian
+    if norm(H*vector-vector*hb,'fro')>size(H,1)*eps*norm(H,'fro')
+        error('cce:pure_dephasing',...
+              'The noise branch is not invariant under the cluster Hamiltonian.');
+    end
 else
     hb=zeros(db);
     for k=1:d0, hb=hb+H((k-1)*db+(1:db),(k-1)*db+(1:db))/d0; end

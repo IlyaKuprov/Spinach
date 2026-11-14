@@ -23,7 +23,9 @@ for n=2:3
     % Hydrogenic envelope and six-valley interference, illustrative scale
     r=inter.coordinates{n};
     contact=2e5*exp(-2*norm(r)/a)*(sum(cos(k0*r))/3)^2;
-    inter.coupling.matrix{1,n}=contact*eye(3);
+
+    % Retain central Sz only for the explicitly conditional donor model
+    inter.coupling.matrix{1,n}=diag([0 0 contact]);
 end
 inter.coupling.matrix{2,3}=diag([200 200 -400]);
 

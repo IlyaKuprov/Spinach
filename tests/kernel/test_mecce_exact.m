@@ -44,7 +44,8 @@ end
 fprintf('Selective ME pulse dense discrepancy %.3g.\n',pulse_error);
 
 % Require zero-jump trajectories to retain complex closed-system phases
-p.method='cce'; closed=cce(s,p); p.method='mecce'; opened=cce(s,p);
+conditional_system=s; conditional_system.inter.coupling.matrix{1,2}=diag([0 0 1.1]);
+p.method='cce'; closed=cce(conditional_system,p); p.method='mecce'; opened=cce(conditional_system,p);
 result=test_close(result,'C7 numerical check',opened.value,closed.value,2e-11,2e-11,'Conditional zero jumps.');
 p.method='gcce'; p.quantity='density'; closed=cce(s,p);
 p.method='megcce'; opened=cce(s,p);
@@ -84,8 +85,8 @@ p.sequence=struct('type','ideal','placement','fraction','at',0.5,...
 p.method='gcce'; closed_echo=cce(s,p); p.method='megcce'; opened_echo=cce(s,p);
 result=test_close(result,'ME-gCCE Hahn zero jumps',opened_echo.density,closed_echo.density,...
                   2e-11,2e-11,'Physical pulse, whole-sequence clock and zero-time identity.');
-p.method='cce'; p.quantity='coherence'; closed_echo=cce(s,p);
-p.method='mecce'; opened_echo=cce(s,p);
+p.method='cce'; p.quantity='coherence'; closed_echo=cce(conditional_system,p);
+p.method='mecce'; opened_echo=cce(conditional_system,p);
 result=test_close(result,'ME-CCE Hahn zero jumps',opened_echo.value,closed_echo.value,...
                   2e-11,2e-11,'Conditional branch swapping retains the complex trajectory.');
 p.method='megcce'; p.quantity='density'; p.sequence=struct([]);
@@ -114,7 +115,7 @@ result=test_close(result,'C7 numerical check',opened.density,reference,2e-11,2e-
 ha=H(1:4,1:4); hb=H(5:8,5:8); lb=kron(j,eye(2));
 generator=-1i*(kron(eye(4),ha)-kron(hb.',eye(4)))+...
           rate*(kron(conj(lb),lb)-(kron(eye(4),lb'*lb)+kron((lb'*lb).',eye(4)))/2);
-p.method='mecce'; p.quantity='coherence'; conditional=cce(s,p); rb=eye(4)/4;
+p.method='mecce'; p.quantity='coherence'; conditional=cce(conditional_system,p); rb=eye(4)/4;
 conditional_reference=zeros(numel(p.times),1);
 for k=1:numel(p.times)
     conditional_reference(k)=trace(reshape(expm(generator*p.times(k))*rb(:),4,4));
@@ -220,7 +221,10 @@ for k=2:7
     p.jumps(end+1)=struct('support',k,'operator',[0 1;0 0],'rate',500);
     p.jumps(end+1)=struct('support',k,'operator',[0 0;1 0],'rate',500);
 end
-r=cce(s,p);
+% Declare the pinned conventional ME reference's central-Sz projection
+conditional_system=s;
+for k=2:7, conditional_system.inter.coupling.matrix{1,k}(:,1:2)=0; end
+r=cce(conditional_system,p);
 reference=[1.0000000000000004;0.99999923394307144;0.99999409440779452;0.99998078627671738;0.99995608154472349;0.99991725565690237;0.99986203036107879;0.99978852242935690;0.99969519766699644;0.99958082968503426;0.99944446296394518]+...
           1i*[8.0506813103672611e-17;-1.4845050358724403e-11;-3.0705481891667437e-11;-4.7507112746376136e-11;-6.5180890168568098e-11;-8.3662944693980344e-11;-1.0289507687643922e-10;-1.2282225090608725e-10;-1.4339388638076503e-10;-1.6456348260287508e-10;-1.8628754486596782e-10];
 result=test_close(result,'PyCCE reconstructed ME-CCE2',r.value,reference,5e-8,0,...

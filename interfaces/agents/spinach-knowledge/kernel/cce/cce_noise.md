@@ -8,6 +8,8 @@ Evaluate bath-noise autocorrelation for additive connected-cluster expansion.
 
 ## Behaviour
 
+A requested fixed `noise.branch` must be invariant under the actual cluster Hamiltonian; otherwise `cce:pure_dephasing` rejects the unsupported fixed-branch dynamics. The explicitly defined no-branch bath-only partial-trace model remains unchanged and does not claim full central-bath dynamics.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Builds the sum of noise terms completely supported inside the cluster; refuses a split multi-site term.

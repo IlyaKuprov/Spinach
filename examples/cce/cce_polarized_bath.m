@@ -12,8 +12,8 @@ sys.magnet=0.01; sys.isotopes={'E','1H','1H'};
 sys.output='hush'; sys.parallel={'local',1};
 inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
-inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000];
-inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 12000];
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 12000].';
 inter.coupling.matrix{2,3}=diag([400 400 -800]);
 spin_system=create(sys,inter);
 

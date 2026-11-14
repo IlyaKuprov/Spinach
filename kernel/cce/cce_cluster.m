@@ -84,6 +84,13 @@ if strcmp(parameters.method,'cce')
     branches=cce_project(model,parameters);
     pa=kron(branches.alpha.state,eye(db)); pb=kron(branches.beta.state,eye(db));
     ha=pa'*H*pa; hb=pb'*H*pb;
+
+    % Require invariant conditional subspaces unless virtual transitions are explicit
+    leakage=max(norm(H*pa-pa*ha,'fro'),norm(H*pb-pb*hb,'fro'));
+    if ~branches.second_order_enabled&&leakage>size(H,1)*eps*norm(H,'fro')
+        error('cce:pure_dephasing',...
+              'Conditional states are not invariant under the cluster Hamiltonian; use gcce.');
+    end
     if branches.second_order_enabled
         ha=ha+virtual_correction(branches.alpha,model,sites,hcontext,db);
         hb=hb+virtual_correction(branches.beta,model,sites,hcontext,db);

@@ -57,6 +57,75 @@ result=test_close(result,'Public DEER species and site filters agree',...
                   filtered.value,by_site.value,0,0,...
                   'The public driver must accept documented species filters without synthetic metadata.');
 
+% Reject a non-axial canonical Zeeman field before frequency-window selection
+rotated=cce_prepare(ss,q); rotated.zeeman{2}(3,:)=[3 0 4];
+axial=q; axial.deer.detuning_center=4; axial.deer.halfwidth=0.1;
+rejected=false;
+try
+    cce_controls(rotated,[],[],[],axial);
+catch exception
+    rejected=strcmp(exception.identifier,'cce_controls:deer_axial');
+end
+result=test_true(result,'DEER rejects non-axial Zeeman selection',rejected,...
+                 'The full 3*Sx+4*Sz gap is 5 rad/s, not the longitudinal 4 rad/s.');
+
+% Validate actual public lab-frame inputs before any evaluator dispatch
+rotated_system=ss; rotated_system.inter.zeeman.matrix{2}(3,:)=[3 0 4];
+rejected=false;
+try
+    cce(rotated_system,axial);
+catch exception
+    rejected=strcmp(exception.identifier,'cce_controls:deer_axial');
+end
+result=test_true(result,'Public DEER rejects non-axial Zeeman selection',rejected,...
+                 'Driver preparation must preserve the transverse field and reach the selector guard.');
+
+% Do not apply the axial requirement to unselected physical sites
+axial.deer.sites=3; axial.deer.detuning_center=0; axial.deer.halfwidth=1;
+selected=cce_controls(rotated,[],[],[],axial);
+result=test_true(result,'DEER axial check respects site filters',...
+                 isequal(selected.selected_sites{1},3),...
+                 'An unrelated non-axial site must not invalidate an axial selection.');
+
+% Reject conditional dynamics that discard actual central spin transitions
+transverse=ss; transverse.inter.coupling.matrix{1,2}=diag([2 0 0]);
+conditional=q; conditional=rmfield(conditional,'deer');
+conditional.quantity='coherence'; conditional.sequence=[]; conditional.central.alpha=[1;0]; conditional.central.beta=[0;1];
+conditional.central.rho=[1 -1i;1i 1]/2;
+for method={'cce','mecce','noise'}
+    conditional.method=method{1};
+    if strcmp(method{1},'mecce'), conditional.jumps=struct([]); end
+    if strcmp(method{1},'noise')
+        conditional.quantity='autocorrelation';
+        conditional.noise=struct('terms',struct('support',2,'operator',diag([1 -1])/2),...
+                                 'connected',true,'ordering','ordered','branch','alpha');
+    end
+    rejected=false;
+    try
+        cce(transverse,conditional);
+    catch exception
+        rejected=strcmp(exception.identifier,'cce:pure_dephasing');
+    end
+    result=test_true(result,['Conditional transition rejection: ' method{1}],rejected,...
+                     'Discarding a nonzero central transition requires generalized dynamics.');
+
+    % Exercise the same invariant-subspace guard through interlaced recursion
+    if ~strcmp(method{1},'noise')
+        ip=conditional; ip.bath_state=struct('mode','interlaced','basis','uniform',...
+                                            'probabilities','uniform','samples',1,'seed',19);
+        ip.interlaced=struct('condition_sites',{{[2 3]}},'reference_state',1,'max_states',4);
+        ip.averaging='after_expansion'; rejected=false;
+        try
+            cce(transverse,ip);
+        catch exception
+            rejected=strcmp(exception.identifier,'cce:pure_dephasing');
+        end
+        result=test_true(result,['Interlaced transition rejection: ' method{1}],rejected,...
+                         'Conditioning must not bypass the actual-Hamiltonian invariance check.');
+    end
+    if isfield(conditional,'jumps'), conditional=rmfield(conditional,'jumps'); end
+end
+
 % Preserve explicitly allowed empty selections through every driver compiler
 q.central.alpha=[1;0]; q.central.beta=[0;1];
 q.deer.detuning_center=100; q.deer.halfwidth=1; q.deer.allow_empty=true;

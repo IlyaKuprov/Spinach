@@ -21,6 +21,11 @@ inter.coupling.matrix{1,2}=diag([2000 2000 -4000]);
 inter.coupling.matrix{2,3}=diag([81 81 114])*1e6;
 inter.coupling.matrix{1,3}=[0 0 0;0 0 0;400 0 200].';
 
+% Declare central-Sz projection for this conditional electron-bath model
+for n=2:numel(sys.isotopes)
+    if ~isempty(inter.coupling.matrix{1,n}), inter.coupling.matrix{1,n}(:,1:2)=0; end
+end
+
 % Coordinates define the toy geometry; all couplings above are explicit
 inter=rmfield(inter,'coordinates');
 

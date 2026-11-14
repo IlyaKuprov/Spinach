@@ -65,6 +65,19 @@ result=test_close(result,'ME explicit normalized coherence',normalized_coherence
 fprintf('R1230 closed %.16g; ME default %.16g.\n',...
         real(closed_coherence.value(1)),real(raw_coherence.value(1)));
 
+% Refuse a multi-site operator instead of silently applying identity
+q=p; q.method='megcce'; q.quantity='density'; q.central.rho=diag([1 0]);
+q.sequence=struct('type','ideal','placement','fraction','at',0.5,'target',[1 2],...
+                  'operator',kron([0 1;1 0]/2,eye(2)),'angle',pi);
+rejected=false;
+try
+    cce(s,q);
+catch err
+    rejected=strcmp(err.identifier,'cce_master:operator_target');
+end
+result=test_true(result,'ME multi-site operator rejection',rejected,...
+                 'Unsupported joint central-bath generators must fail explicitly, never act as identity.');
+
 % Validate whole-sequence Hahn timing and a zero-duration initial state
 p.sequence=struct('type','ideal','placement','fraction','at',0.5,...
                   'target',1,'axis','x','angle',pi);

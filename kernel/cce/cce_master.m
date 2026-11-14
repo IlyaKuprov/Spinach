@@ -197,6 +197,8 @@ if isfield(event,'operator')&&~isempty(event.operator)
             right=prod(meta.dimensions(position+1:end));
             generator=kron(eye(left),kron(event.operator,eye(right)));
         end
+    else
+        error('cce_master:operator_target','Operator events target the whole central register or one physical site.');
     end
 else
     axis=event.axis;

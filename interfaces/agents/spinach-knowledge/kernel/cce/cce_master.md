@@ -16,6 +16,8 @@ Propagate open-system conditional or generalized cluster dynamics.
 
 - Generalized coherence is raw by default, matching `gcce`; only an explicit `normalized=true` divides by the initial central coherence.
 
+- Explicit operator pulses target the complete ordered central register or one physical site; unsupported multi-site targets are rejected instead of ignored.
+
 ## Inputs and outputs
 
 ```matlab

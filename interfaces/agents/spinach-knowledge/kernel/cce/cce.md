@@ -31,7 +31,7 @@ result=cce(spin_system,parameters)
 
 **Outputs**
 
-- `result` — reduction values/masks/error/by-order fields plus `coherence`, `times`, `raw`, `clusters`, `graph`, `schedule`, `partition`, `ensemble`, `model_hash`, `input_parameters`, `averaging`, `method`, `exact_reference`, `elapsed_seconds`, `convergence`, `budget_satisfied`, `sampling_standard_error` and `diagnostics`; `density` is added for density requests. `value` is time-by-observable; density elements use column-major order.
+- `result` — reduction values/masks/error/by-order fields plus `coherence`, `times`, `raw`, `clusters`, `graph`, `schedule`, `partition`, `ensemble`, `model_hash`, `input_parameters`, `averaging`, `method`, `exact_reference`, `elapsed_seconds`, `convergence`, `budget_satisfied`, `sampling_standard_error` and `diagnostics`; `density` is empty unless a density was requested. `value` is time-by-observable; density elements use column-major order.
 
 ## References
 

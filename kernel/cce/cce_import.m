@@ -14,6 +14,16 @@
 % and Hz. Cube output retains density samples and explicit voxel geometry;
 % negative atom counts/orbital cubes are rejected rather than guessed.
 %
+% Inputs:
+%   filename, format, units - input path; mat/json/csv/xyz/tensor/cube;
+%   external length unit angstrom/nm/m/bohr, tensor unit
+%   Hz/kHz/MHz/rad/s/T/mT/G. Field units also require gamma_rad_per_s_T;
+%   optional frame is a proper rotation matrix.
+%
+% Outputs:
+%   imported - recovered model/result or canonical spin/tensor/cube data with
+%   explicit metadata.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function imported=cce_import(filename,format,units)

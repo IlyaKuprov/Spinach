@@ -11,6 +11,15 @@
 % axis rotations are full physical-spin rotations, not qubit rotations.
 % Finite controls are deliberately delegated to the cce_controls extension.
 %
+% Inputs:
+%   model - prepared register and bath IDs.
+%   parameters - times, sequence ([] for FID), method and central-state
+%   declarations.
+%
+% Outputs:
+%   schedule - sample times, compiled events and conditional/generalized
+%   control metadata.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function schedule=cce_sequence(model,parameters)

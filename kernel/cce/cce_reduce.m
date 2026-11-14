@@ -23,6 +23,17 @@
 % uncertainty is zero and every denominator is resolved. Complete bath
 % exact-reference bypass belongs to cce.m, not this algebraic reducer.
 %
+% Inputs:
+%   raw - records with cluster_id, time-by-observable value, logical valid,
+%   and nonnegative abs_error_bound.
+%   clusters - ordered subset-closed records from cce_clusters.
+%   parameters - method, numerical tolerances; optional reducer=powers|direct
+%   (default powers), numerics.zero_policy=mask|error (default mask).
+%
+% Outputs:
+%   reduced - values, validity/error/reason arrays, by-order results,
+%   cluster/cumulant and conditioning diagnostics.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function reduced=cce_reduce(raw,clusters,parameters)

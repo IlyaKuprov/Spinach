@@ -9,6 +9,17 @@
 % Exterior fields use exactly the model's retained pair interactions.
 % meta reports IDs, dimensions, operators, backend and roundoff residuals.
 %
+% Inputs:
+%   model - output of cce_prepare.
+%   sites - physical bath IDs; [] selects the central baseline.
+%   context - bath IDs, single-site states/expectations and mean-field
+%   choice; optional backend override.
+%
+% Outputs:
+%   H - Hermitian cluster Hamiltonian in rad/s.
+%   meta - physical tensor order, dimensions, local operators and backend
+%   metadata.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [H,meta]=cce_hamiltonian(model,sites,context)

@@ -12,6 +12,17 @@
 % bounds resident raw data plus simultaneous per-worker dense storage.
 % checkpoint.file/resume enable per-batch atomic restart. No GPU path.
 %
+% Inputs:
+%   model, clusters, ensemble, schedule, parameters, evaluator - prepared
+%   objects and evaluator function handle. Optional parallel.mode,
+%   parallel.batch_size, parallel.max_tasks, and checkpoint.file/resume;
+%   serial batch_size defaults to one and parallel batch_size to the pool
+%   size.
+%
+% Outputs:
+%   raw - cell per input context, each containing the baseline record then
+%   cluster records in input order.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)

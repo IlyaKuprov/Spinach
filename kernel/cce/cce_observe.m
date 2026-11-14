@@ -8,6 +8,16 @@
 % observables; its reference is central.rho, never the first output time.
 % Density elements are flattened in MATLAB column-major order.
 %
+% Inputs:
+%   rho - central density array, d-by-d-by-ntime.
+%   parameters - quantity=density|coherence|observable; central alpha/beta
+%   vectors or observable operators (matrix/cell); explicit normalized for
+%   scalar quantities.
+%
+% Outputs:
+%   observed - numeric time-by-observable complex array; unresolved scalar
+%   normalization raises cce_observe:initial_zero.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function observed=cce_observe(rho,parameters)

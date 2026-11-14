@@ -16,6 +16,16 @@
 % isotopologues.mode='enumerate' or 'sample' produces weighted configurations;
 % enumerate requires max_configurations; sample requires count and seed.
 %
+% Inputs:
+%   specification - mode, isotope cell row, magnetic field and mode-specific
+%   coordinates, cell/fractional/repeats, or bounds_A/count-or-
+%   density/dimension/seed; optional occupancy and interaction declarations.
+%
+% Outputs:
+%   sys, inter - inputs for Spinach create.
+%   bath - coordinates, physical identity, occupancy/configuration and
+%   construction metadata.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [sys,inter,bath]=cce_bath(specification)

@@ -9,6 +9,13 @@
 % A JSON sidecar, filename.json, retains the full result and diagnostics.
 % CSV is a human-readable view; its sidecar is the round-trip authority.
 %
+% Inputs:
+%   filename - .mat, .json or .csv destination.
+%   model, result - scalar structures to serialize.
+%
+% Outputs:
+%   No return value; writes the requested file (and JSON sidecar for CSV).
+%
 % ilya.kuprov@weizmann.ac.il
 
 function cce_export(filename,model,result)

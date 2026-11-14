@@ -9,6 +9,14 @@
 % reasons, time coverage and density tests are reported independently;
 % no normalization, positivity projection or sample censoring is done.
 %
+% Inputs:
+%   result - CCE value, valid mask, abs_error_bound and retained metadata.
+%   parameters - numerical tolerances and observable declarations.
+%
+% Outputs:
+%   diagnostics - numerical/conditioning, cluster, sample and density
+%   diagnostic fields.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function diagnostics=cce_diagnostics(model,raw,result,parameters)

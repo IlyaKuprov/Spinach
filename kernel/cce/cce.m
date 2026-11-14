@@ -21,6 +21,17 @@
 % fields (cce_liouvillian). Noise requires explicit ordering, connected flag
 % and Hermitian support/operator terms (cce_noise); its reducer is additive.
 %
+% Inputs:
+%   spin_system - canonical structure returned by create.
+%   parameters - explicit physical, state, graph, sequence and numerical
+%   choices; see the CCE recipe.
+%
+% Outputs:
+%   result - times, value, valid, abs_error_bound, density, raw, clusters,
+%   graph, states, schedule, state_reductions, exact_reference, parameters,
+%   model_hash, wall_time, statistics, diagnostics, analysis, and spectrum.
+%   value is time-by-observable; density elements use column-major order.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=cce(spin_system,parameters)

@@ -56,6 +56,10 @@ if isfield(parameters,'normalized')&&parameters.normalized
     reference_parameters=parameters; reference_parameters.normalized=false;
     reference=cce_observe(parameters.central.rho,reference_parameters);
     bound=size(rho,1)^2*eps*max(1,norm(parameters.central.rho,'fro'));
+    % Propagate density uncertainty in the units of each observable
+    if strcmp(parameters.quantity,'observable')
+        bound=bound*cellfun(@(op) norm(op,'fro'),operators);
+    end
     if any(abs(reference)<=bound)
         error('cce_observe:initial_zero','Initial observable is unresolved or zero.');
     end

@@ -52,6 +52,20 @@ for method={'gcce','megcce'}
                       'The ideal evaluator must default an empty operator angle to one.');
 end
 
+% Preserve normalized observable units through each generalized driver
+for method={'gcce','megcce'}
+    for driven=[false true]
+        if driven&&strcmp(method{1},'megcce'), continue; end
+        q=p; q.method=method{1}; q.jumps=struct([]); q.quantity='observable'; q.normalized=true;
+        q.operators={1e-20*eye(2),eye(2),1e20*eye(2)};
+        if ~driven, q.sequence=[]; end
+        scaled=cce(model.spin_system,q);
+        result=test_close(result,[method{1} ' scaled observable driver ' num2str(driven)],...
+                          scaled.value,ones(numel(q.times),3),1e-11,1e-11,...
+                          'Operator units must not change normalized readout through any propagation path.');
+    end
+end
+
 % Require no-op control dispatch to preserve explicit and default normalization
 q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
 q.central.rho=ones(2)/2; q.sequence=[]; ss=model.spin_system;

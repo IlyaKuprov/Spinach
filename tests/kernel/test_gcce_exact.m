@@ -10,6 +10,29 @@ function result=test_gcce_exact()
 result=new_test_result('kernel/gcce_exact','gCCE exact validation',...
                        'Four bath spins, complex pure/mixed states and physical Hahn pulses.');
 
+% Normalize independently scaled observables with scale-aware uncertainty
+rho0=diag([1 0]); q=struct('quantity','observable','central',struct('rho',rho0),...
+                         'normalized',true,'operators',{{diag([1 0]),1e-20*diag([1 0]),1e20*diag([1 0])}});
+scaled=NaN(1,3); accepted=true;
+try
+    scaled=cce_observe(rho0,q);
+catch exception
+    accepted=false; fprintf('scaled observable exception %s\n',exception.identifier);
+end
+result=test_true(result,'Scaled observable normalization accepted',accepted,...
+                 'Changing physical units cannot turn a well-resolved nonzero reference into zero.');
+result=test_close(result,'Scaled observable normalization parity',scaled,ones(1,3),1e-13,1e-13,...
+                  'All independently scaled projectors must have normalized initial value one.');
+q.operators={1e20*diag([1 -1])}; q.central.rho=diag([0.5 0.5]); refused=false;
+try
+    cce_observe(q.central.rho,q);
+catch exception
+    refused=strcmp(exception.identifier,'cce_observe:initial_zero');
+end
+result=test_true(result,'Scaled zero reference rejection',refused,...
+                 'Scaling an operator must not hide a genuinely zero normalization reference.');
+fprintf('scaled observable normalized values %s\n',mat2str(scaled,12));
+
 % Construct deterministic central-exchange and bath-bath interactions
 nb=4; sys.isotopes=repmat({'13C'},1,nb+1); sys.magnet=0; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'local',1};

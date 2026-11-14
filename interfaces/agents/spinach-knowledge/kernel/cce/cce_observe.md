@@ -8,6 +8,8 @@ Extract central density elements, coherence or linear observables without discar
 
 ## Behaviour
 
+- Normalization uncertainty scales with each observable operator norm, so changing physical units preserves a resolved normalized value; genuinely zero references remain errors.
+
 - Flattens density matrices in MATLAB column-major order, or projects alpha/beta coherence, or evaluates the supplied operators.
 - For scalar observables, explicit `normalized` divides by the expectation in `central.rho`, not the first requested time. Unresolved normalization is not silently repaired.
 

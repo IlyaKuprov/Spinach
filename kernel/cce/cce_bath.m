@@ -347,7 +347,7 @@ if isfield(s,'pairs_Hz')
 end
 if isfield(s,'selection')
     q=s.selection;
-    unknown=setdiff(fieldnames(q),{'center_A','inner_A','outer_A'});
+    unknown=setdiff(fieldnames(q),{'centres_A','inner_A','outer_A'});
     if ~isempty(unknown), error('Unsupported selection.%s.',unknown{1}); end
     if ~isstruct(q)||~all(isfield(q,{'centres_A','inner_A','outer_A'}))||...
        isempty(q.centres_A)||size(q.centres_A,2)~=3||any(~isfinite(q.centres_A),'all')||...

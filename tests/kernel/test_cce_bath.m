@@ -67,6 +67,22 @@ result=test_true(result,'Zero local Hz tensors at zero field accepted',...
 
 fprintf('Local Hz roundtrip max rad/s error %.3g.\n',tensor_error); q=saved_q;
 
+% Select a shell through the documented centre-coordinate field
+shell=struct('mode','explicit','isotopes',{{'1H','1H','1H'}},...
+             'magnetic',0,'coordinates_A',[0 0 0;1 0 0;2 0 0]);
+shell.selection=struct('centres_A',[0 0 0],'inner_A',0.5,'outer_A',1.5);
+selected=[]; accepted=false;
+try
+    [~,~,selected_bath]=cce_bath(shell);
+    selected=selected_bath.ids; accepted=true;
+catch
+    % Convert a validator rejection into a named regression failure
+end
+result=test_true(result,'Documented shell centres accepted',accepted,...
+                 'selection.centres_A must be accepted by the shell validator.');
+result=test_true(result,'Documented shell selects physical IDs',isequal(selected,2),...
+                 'The shell [0.5,1.5] around the origin must retain only site 2.');
+
 % Test a two-dimensional number density and finite packing exclusion
 r=struct('mode','random','isotopes',{{'E'}},'magnetic',0,...
          'bounds_A',[0 0 0;100 200 0],'dimension',2,'density',1e17,...

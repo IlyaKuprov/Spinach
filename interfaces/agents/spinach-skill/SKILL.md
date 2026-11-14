@@ -116,6 +116,13 @@ the requested observable. For a library edit, also follow
 [development](references/development.md); a smoke test does not validate a
 scientific algorithm change.
 
+For `iserstep` LG4A, keep the complete final commutator from Appendix A.1
+of the Casas--Iserles paper. Check commuting exact-phase limits as well as
+noncommuting and genuinely state-dependent order refinement; norm or density
+trace preservation alone does not establish fourth-order accuracy. The
+`kernel/dynamic_iserstep_highorder` regression covers density conjugation,
+independent nonlinear references, and these structural and order checks.
+
 Deliver the runnable script or patch, requested data/figures, and a concise
 account of the physical assumptions, checkout/version, exact checks run, and
 measured outcome. Distinguish executed results from static review or prediction.

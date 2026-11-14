@@ -24,7 +24,8 @@ end
 
 % Resolve the exponential correlation's analytic Lorentzian
 rate=2; t=(0:0.0005:10)'; omega=linspace(-8,8,101)';
-p.spectrum.frequency_grid=omega; p.spectrum.time_domain='positive'; p.spectrum.weights='trapezoid';
+p.spectrum.frequency_grid=omega; p.spectrum.time_domain='positive';
+p.spectrum.weights='trapezoid'; p.spectrum.stationary=true;
 s=cce_spectrum(t,exp(-rate*t),p); reference=2*rate./(rate^2+omega.^2);
 result=test_close(result,'C7 numerical check',s.value,reference,1.5e-6,1e-6,'Exponential Lorentzian quadrature.');
 lorentz_error=max(abs(s.value-reference));
@@ -43,6 +44,34 @@ catch
     refused=true;
 end
 result=test_true(result,'C7 contract check',refused,'Complex ordered noise cannot be folded to a one-sided PSD.');
+
+% Demand a scalar logical stationarity assertion before positive-time extension
+q.spectrum=struct('convention','exp(+i*omega*t)','sidedness','two-sided',...
+                  'window','none','frequency_grid',0,'time_domain','positive','weights','trapezoid');
+invalid={[],false,1,[true true]}; labels={'missing','false','numeric','nonscalar'};
+for k=1:numel(invalid)
+    trial=q; if k>1, trial.spectrum.stationary=invalid{k}; end
+    rejected=false;
+    try
+        cce_spectrum([0;1],[1;exp(-1)],trial);
+    catch exception
+        rejected=contains(exception.message,'stationary');
+    end
+    result=test_true(result,['Positive-time stationarity ' labels{k}],rejected,...
+                     'Negative-time reconstruction requires an explicit scalar logical stationary=true.');
+end
+
+% Keep measured full-time data independent of stationarity assumptions
+q.spectrum.time_domain='full'; q.spectrum.stationary=false;
+measured=cce_spectrum([-1;0;1],[0.2;1;0.8],q);
+result=test_close(result,'Nonstationary full-time data retained',measured.value,1.5,1e-14,1e-14,...
+                  'Full-time quadrature uses the supplied asymmetric correlation without extension.');
+q.spectrum.time_domain='positive'; q.spectrum.stationary=true;
+extended=cce_spectrum([0;1],[1;exp(-1)],q);
+result=test_close(result,'Declared stationary extension',extended.value,1+exp(-1),1e-14,1e-14,...
+                  'Declared stationary positive-time data reproduce the explicit mirrored trapezoid.');
+fprintf('R5579 declared extension %.16g; full nonstationary %.16g.\n',extended.value,measured.value);
+
 fprintf('Spectrum Parseval error %.3g; Lorentzian max error %.3g\n',maximum,lorentz_error);
 
 end

@@ -22,7 +22,7 @@ spectrum=cce_spectrum(times,correlation,parameters)
 
 - `times` — time samples in seconds.
 - `correlation` — time-by-observable complex correlations.
-- `parameters.spectrum` — frequency_grid (rad/s), convention=exp(+i*omega*t), sidedness=two-sided|one-sided, window=none|hann, time_domain=full|positive, weights=trapezoid|rectangle; positive-time extension additionally requires stationary=true.
+- `parameters.spectrum` — frequency_grid (rad/s), convention=exp(+i*omega*t), sidedness=two-sided|one-sided, window=none|hann, time_domain=full|positive, weights=trapezoid|rectangle; positive-time extension additionally requires an explicit scalar logical `stationary=true`; missing, false, numeric and nonscalar assertions are refused. Full-time data need no stationarity assertion.
 
 **Outputs**
 

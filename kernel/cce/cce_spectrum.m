@@ -113,8 +113,12 @@ if ~isnumeric(w)||~isreal(w)||~isvector(w)||isempty(w)||...
    any(~isfinite(w))||any(diff(w)<=0)
     error('frequency_grid must be strictly increasing finite angular frequencies.');
 end
-if strcmp(s.time_domain,'positive')&&times(1)~=0
-    error('Positive-time stationary input must start at zero.');
+if strcmp(s.time_domain,'positive')
+    if ~isfield(s,'stationary')||~islogical(s.stationary)||...
+       ~isscalar(s.stationary)||~s.stationary
+        error('Positive-time extension requires scalar logical stationary=true.');
+    end
+    if times(1)~=0, error('Positive-time stationary input must start at zero.'); end
 end
 if strcmp(s.weights,'rectangle')&&...
    max(abs(diff(times)-mean(diff(times))))>100*eps*max(abs(times))

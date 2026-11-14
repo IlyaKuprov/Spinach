@@ -104,6 +104,31 @@ result=test_true(result,'Adaptive pilot and held-out gates',...
                  ~isempty(a.diagnostics.heldout_error),...
                  'Freeze a pilot-selected exact group before held-out testing.');
 
+% Restrict every bath-indexed graph matrix to an ordered proper patch
+for scoring={'explicit','supplied','resonance'}
+    q=parameters; q.groups={2:4}; q.partition.patches={[4 2]};
+    q.partition.max_rounds=1; q.graph=struct('mode','complete','score','coupling_norm');
+    switch scoring{1}
+        case 'explicit'
+            q.graph.mode='explicit'; q.graph.adjacency=sparse(~eye(3));
+        case 'supplied'
+            q.graph.score='supplied'; q.graph.scores=[0 1 2;1 0 3;2 3 0];
+        case 'resonance'
+            q.graph.score='resonance'; q.graph.mismatch=[0 1 2;1 0 3;2 3 0];
+            q.graph.mismatch_scale=1;
+    end
+    passed=false; patch_error=Inf;
+    try
+        probe=cce_partition(model,cce_graph(model,q),q);
+        passed=probe.complete; patch_error=max(probe.diagnostics.heldout_error);
+    catch exception
+        fprintf('PATCH_GRAPH %s error=%s\n',scoring{1},exception.identifier);
+    end
+    result=test_true(result,['Adaptive proper-patch graph ' scoring{1}],passed,...
+                     'Full-bath graph matrices follow the declared physical patch ordering.');
+    fprintf('PATCH_GRAPH %s passed=%d error=%.3e\n',scoring{1},passed,patch_error);
+end
+
 % Expose each exhausted adaptation budget rather than declaring success
 parameters.partition.max_probes=1; limited=cce_partition(model,graph,parameters);
 result=test_true(result,'Probe ceiling is incomplete',...

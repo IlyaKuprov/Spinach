@@ -171,6 +171,14 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
         local=q; local.bath_spins=sites;
         local.groups=cellfun(@(g)intersect(g,sites),candidate,'UniformOutput',false);
         local.groups=local.groups(~cellfun(@isempty,local.groups));
+        % Restrict bath-indexed graph data in the declared physical patch order
+        [~,indices]=ismember(sites,model.bath_ids);
+        for field={'adjacency','scores','mismatch'}
+            if isfield(local.graph,field{1})
+                matrix=local.graph.(field{1});
+                local.graph.(field{1})=matrix(indices,indices);
+            end
+        end
         local_model=model; local_model.bath_ids=sites;
         local_graph=cce_graph(local_model,local); family=cce_clusters(local_model,local_graph,local);
         empty=struct('id',0,'sites',[]); whole=struct('id',1,'sites',sort(sites));

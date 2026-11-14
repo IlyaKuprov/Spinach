@@ -30,6 +30,8 @@ partition=cce_partition(model,graph,parameters)
 
 - `partition` — frozen groups and IDs, group-level graph/order metadata, and pilot/validation diagnostics.
 
+Adaptive proper-bath patches restrict explicit adjacency, supplied scores, and resonance mismatch matrices to the patch physical-ID order before building the local graph.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_partition.m)

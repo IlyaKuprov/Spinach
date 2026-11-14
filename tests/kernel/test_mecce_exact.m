@@ -16,6 +16,33 @@ p=parameters(); p.times=linspace(0,0.8,15);
 p.central=struct('alpha',[1;0],'beta',[0;1],'rho',[1 1;1 1]/2);
 p.jumps=struct('support',{},'operator',{},'rate',{});
 
+% Compare selective explicit-generator ME pulses with closed and dense evolution
+q=p; spin=pauli(2); q.method='gcce'; q.quantity='density'; q.times=[0 0.07 0.2];
+q.sequence=struct('type','ideal','target',2,'placement','fraction',...
+                  'at',0.4,'operator',spin.x,'angle',pi);
+closed_pulse=cce(s,q); q.method='megcce'; opened_pulse=cce(s,q);
+result=test_close(result,'Selective operator ME pulse matches closed evolution',...
+                  opened_pulse.density,closed_pulse.density,2e-11,2e-11,...
+                  'Zero-jump master evolution must use the same retained-site dimensions as the Hamiltonian.');
+q.method='gcce'; model=cce_prepare(s,q); H=cce_hamiltonian(model,[2 3],struct());
+spin=pauli(2); pulse=kron(eye(2),kron(expm(-1i*pi*spin.x),eye(2)));
+initial=kron(q.central.rho,eye(4)/4); pulse_error=0;
+for k=1:numel(q.times)
+    t=q.times(k); U=expm(-1i*H*0.6*t)*pulse*expm(-1i*H*0.4*t);
+    if t==0, U=eye(8); end
+    full_density=U*initial*U'; reduced=zeros(2);
+    for a=1:2
+        for b=1:2
+            reduced(a,b)=trace(full_density((a-1)*4+(1:4),(b-1)*4+(1:4)));
+        end
+    end
+    result=test_close(result,'Selective operator ME pulse dense reference',...
+                      opened_pulse.density(:,:,k),reduced,2e-11,2e-11,...
+                      'An independent Kronecker pulse embeds the bath generator at physical site two.');
+    pulse_error=max(pulse_error,norm(opened_pulse.density(:,:,k)-reduced,'fro'));
+end
+fprintf('Selective ME pulse dense discrepancy %.3g.\n',pulse_error);
+
 % Require zero-jump trajectories to retain complex closed-system phases
 p.method='cce'; closed=cce(s,p); p.method='mecce'; opened=cce(s,p);
 result=test_close(result,'C7 numerical check',opened.value,closed.value,2e-11,2e-11,'Conditional zero jumps.');

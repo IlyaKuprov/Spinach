@@ -8,6 +8,8 @@ Propagate open-system conditional or generalized cluster dynamics.
 
 ## Behaviour
 
+- Selective explicit-generator pulses use `cce_hamiltonian` metadata dimensions to embed the target in the retained central-first tensor order.
+
 - Uses the local GKSL generator and the compiled ideal-pulse schedule for `mecce` or `megcce`.
 - Conditional blocks produce branch coherence; generalized density propagation supplies the same raw contract as the unitary evaluator.
 - Checks local trace, Hermiticity and positivity diagnostics where defined; product-truncated populations are not a universal relaxation-time method.

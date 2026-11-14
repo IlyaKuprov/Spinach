@@ -8,6 +8,8 @@ Construct explicit, lattice or random spin baths with explicit isotope assignmen
 
 ## Behaviour
 
+- `tensors_Hz` specifies total local Zeeman frequency tensors, not offsets: after rotation, nuclear tensors are converted to ppm and electron tensors to g units so `create` recovers `2*pi*tensors_Hz` in rad/s. A nonzero tensor at zero field is refused because native Zeeman inputs cannot represent it; zero tensors are accepted.
+
 - Builds Spinach sys/inter inputs and a physical bath record; cell vectors and coordinates use Angstrom, magnetic field uses tesla.
 - Supports seeded random coordinates/occupancies and exact or sampled occupancy configurations. Missing occupancy probability denotes vacancy.
 - Does not add point dipoles. Optional tensors_Hz and pairs_Hz carry Cartesian tensor data; rotation, translation_A, remove_ids, selection and groups retain stable site IDs.

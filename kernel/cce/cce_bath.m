@@ -12,7 +12,9 @@
 % struct array configurations(isotopes,weight). All sampling uses local RNG.
 % Optional rotation (proper Cartesian matrix), translation_A, remove_ids,
 % selection (centres_A,inner_A,outer_A), groups, tensors_Hz and pairs_Hz
-% (records ids,tensor) retain stable site IDs. No dipoles are added here.
+% (records ids,tensor) retain stable site IDs. Local tensors are total
+% Zeeman frequencies, converted to native ppm/g units before create. Nonzero
+% local tensors at zero field are refused. No dipoles are added here.
 % isotopologues.mode='enumerate' or 'sample' produces weighted configurations;
 % enumerate requires max_configurations; sample requires count and seed.
 %
@@ -154,7 +156,21 @@ if isfield(s,'tensors_Hz')
     inter.zeeman.matrix=cell(1,numel(ids));
     for n=1:numel(ids)
         tensor=s.tensors_Hz(:,:,ids(n));
-        inter.zeeman.matrix{n}=rotation*tensor*rotation.';
+        tensor=rotation*tensor*rotation.';
+
+        % Invert create's native Zeeman convention for the total Hz tensor
+        frequency=-spin(species{n})*s.magnetic;
+        if frequency==0
+            if any(tensor,'all')
+                error('cce_bath:zero_field','Nonzero local Hz tensors require a nonzero magnetic field.');
+            end
+            inter.zeeman.matrix{n}=zeros(3);
+        elseif species{n}(1)=='E'
+            constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
+            inter.zeeman.matrix{n}=2*pi*tensor*constants.tols.freeg/frequency;
+        else
+            inter.zeeman.matrix{n}=1e6*(2*pi*tensor/frequency-eye(3));
+        end
     end
     inter.zeeman.units='Hz';
 end

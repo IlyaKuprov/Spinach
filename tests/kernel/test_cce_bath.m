@@ -32,6 +32,41 @@ q.pairs_Hz=struct('ids',[1 2],'tensor',[1 2 3;4 5 6;7 8 10]);
 result=test_close(result,'Coordinate covariance',bath.coordinates_A,q.coordinates_A*q.rotation.'+q.translation_A,0,0,'Coordinate covariance');
 result=test_close(result,'Tensor covariance',inter.coupling.matrix{1,2},q.rotation*q.pairs_Hz.tensor*q.rotation.',0,0,'Tensor covariance');
 
+% Preserve the preceding geometry fixture while checking tensor conversion
+saved_q=q;
+
+% Round-trip local total-frequency tensors through native Zeeman conventions
+q=struct('mode','explicit','isotopes',{{'1H','E','15N'}},'magnetic',1,...
+         'coordinates_A',[0 0 0;1 0 0;2 0 0]);
+q.rotation=[0 -1 0;1 0 0;0 0 1];
+q.tensors_Hz=cat(3,[100 2 3;2 200 4;3 4 300],diag([400 500 600]),diag([-70 90 110]));
+[sys,inter]=cce_bath(q); sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
+ss=create(sys,inter); tensor_error=0;
+for k=1:3
+    reference=2*pi*q.rotation*q.tensors_Hz(:,:,k)*q.rotation.';
+    result=test_close(result,'Local Hz tensor native Zeeman roundtrip',...
+                      ss.inter.zeeman.matrix{k},reference,1e-7,1e-10,...
+                      'Nuclear ppm and electron g input must reproduce the rotated total angular-frequency tensor.');
+    tensor_error=max(tensor_error,norm(ss.inter.zeeman.matrix{k}-reference,'fro'));
+end
+q.magnetic=0; rejected=false;
+try
+    cce_bath(q);
+catch exception
+    rejected=strcmp(exception.identifier,'cce_bath:zero_field');
+end
+result=test_true(result,'Nonzero local Hz tensor at zero field refused',rejected,...
+                 'Native Zeeman inputs cannot represent a field-independent nonzero tensor at zero field.');
+
+% Preserve representable zero tensors at zero magnetic field
+q.tensors_Hz=zeros(3,3,3); [sys,inter]=cce_bath(q);
+sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1}; ss=create(sys,inter);
+result=test_true(result,'Zero local Hz tensors at zero field accepted',...
+                 all(cellfun(@(tensor) norm(tensor,'fro')==0,ss.inter.zeeman.matrix)),...
+                 'The zero-field refusal is limited to nonzero tensors.');
+
+fprintf('Local Hz roundtrip max rad/s error %.3g.\n',tensor_error); q=saved_q;
+
 % Test a two-dimensional number density and finite packing exclusion
 r=struct('mode','random','isotopes',{{'E'}},'magnetic',0,...
          'bounds_A',[0 0 0;100 200 0],'dimension',2,'density',1e17,...

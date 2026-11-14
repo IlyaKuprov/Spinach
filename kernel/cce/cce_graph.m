@@ -255,3 +255,5 @@ if (strcmp(g.mode,'distance')||(isfield(parameters,'bath_radius')&&...
     error('cce_graph:coordinates','distance selection requires finite physical coordinates.');
 end
 end
+
+

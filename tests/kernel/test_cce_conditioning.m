@@ -105,3 +105,5 @@ result=test_true(result,'Direct singularity is reported honestly',~direct.valid&
                  'direct ratios cannot divide exact zero irreducibles even when powers cancel them');
 
 end
+
+

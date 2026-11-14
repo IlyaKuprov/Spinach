@@ -132,3 +132,4 @@ for k=1:4, reduced=reduced+density(k:4:end,k:4:end); end
 
 end
 
+

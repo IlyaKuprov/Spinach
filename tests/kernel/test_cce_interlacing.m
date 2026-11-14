@@ -85,3 +85,4 @@ p.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 model=cce_prepare(spin_system,p);
 end
 
+

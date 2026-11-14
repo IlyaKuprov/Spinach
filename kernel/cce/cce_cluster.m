@@ -308,3 +308,4 @@ if strcmp(parameters.meanfield,'static')
 end
 end
 
+

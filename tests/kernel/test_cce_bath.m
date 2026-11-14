@@ -116,3 +116,4 @@ fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks 
 
 end
 
+

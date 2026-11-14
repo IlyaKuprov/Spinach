@@ -86,3 +86,4 @@ distance=norm(r);
 tensor=1000*1.054571729*g1*g2*(eye(3)-3*(r.'*r)/distance^2)/distance^3;
 end
 
+

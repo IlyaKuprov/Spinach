@@ -80,3 +80,4 @@ fprintf('CCE density error %.3g; trace %.3g; Hermiticity %.3g; minimum eigenvalu
 
 end
 
+

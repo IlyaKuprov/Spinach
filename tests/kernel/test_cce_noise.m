@@ -112,6 +112,61 @@ result=test_true(result,'Scaled non-Hermitian noise rejected',rejected,...
                  'A noise operator must remain Hermitian when its units are rescaled.');
 fprintf('R6 scaled noise rejection %d\n',rejected);
 
+% Retain disconnected observable cross terms in sparse graph families
+s=create(sys,inter); p.method='noise'; p.order=2; p.times=[0 0.3 0.8];
+p.graph=struct('mode','coupling','threshold',0);
+p.bath_state=struct('mode','explicit_product','rho',{{diag([1 0]),diag([1 0])}});
+p.noise=struct('ordering','ordered','connected',false,...
+               'terms',struct('support',{2,3},'operator',{z,z}));
+uncoupled=cce(s,p);
+result=test_close(result,'disconnected unconnected noise',uncoupled.value,...
+                  ones(numel(p.times),1),1e-12,0,...
+                  'The two polarized singleton moments require their disconnected cross terms.');
+fprintf('R7 disconnected noise zero-time %.17g\n',real(uncoupled.value(1)));
+
+% Check evolving disconnected means against an independent dense reference
+s.inter.zeeman.matrix{2}(3,1)=1.3; s.inter.zeeman.matrix{3}(3,1)=0.7;
+H=1.3*kron(x,eye(2))+0.7*kron(eye(2),x);
+B=kron(z,eye(2))+kron(eye(2),z); rho=kron(diag([1 0]),diag([1 0]));
+reference=zeros(numel(p.times),1); connected=reference;
+for k=1:numel(p.times)
+    U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
+    reference(k)=trace(Bt*B*rho);
+    connected(k)=reference(k)-trace(Bt*rho)*trace(B*rho);
+end
+for ordering={'ordered','symmetrized'}
+    p.noise.ordering=ordering{1}; p.noise.connected=false;
+    actual=cce(s,p); p.noise.connected=true; covariance=cce(s,p);
+    fprintf('R7 noise %s unconnected %.17g connected %.17g reference %.17g covariance %.17g\n',...
+            ordering{1},actual.value(end),covariance.value(end),reference(end),connected(end));
+    result=test_close(result,['sparse unconnected ' ordering{1}],actual.value,...
+                      reference,1e-12,0,'Disconnected time-dependent means survive additive reduction.');
+    result=test_close(result,['sparse connected ' ordering{1}],covariance.value,...
+                      connected,1e-12,0,'Connected reduction still removes the disconnected moments.');
+end
+
+% Preserve cross-site covariance of the actual finite sampled mixture
+p.bath_state=struct('mode','sampled','samples',16,'seed',31,...
+                    'basis','uniform','probabilities','uniform');
+p.noise.connected=true; p.central.rho=eye(2)/2;
+model=cce_prepare(s,p); ensemble=cce_states(model,p);
+rho=zeros(4);
+for k=1:size(ensemble.assignments,1)
+    index=2*(ensemble.assignments(k,1)-1)+ensemble.assignments(k,2);
+    rho(index,index)=rho(index,index)+ensemble.weights(k);
+end
+for k=1:numel(p.times)
+    U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
+    reference(k)=trace(Bt*B*rho)-trace(Bt*rho)*trace(B*rho);
+end
+for averaging={'after_expansion','internal_then_expansion'}
+    p.averaging=averaging{1}; actual=cce(s,p);
+    result=test_close(result,['sampled sparse covariance ' averaging{1}],...
+                      actual.value,reference,1e-12,0,...
+                      'The finite sampled mixture retains disconnected cross-site covariance.');
+    fprintf('R7 sampled covariance discrepancy %.17g\n',max(abs(actual.value-reference)));
+end
+
 end
 
 

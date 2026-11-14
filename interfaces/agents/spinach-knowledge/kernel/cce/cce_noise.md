@@ -35,3 +35,5 @@ Direct calls require `method='noise'` and `quantity='autocorrelation'`; other ph
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_noise.m)
 - [cce_reduce.m](cce_reduce.md)
 - [cce_spectrum.m](cce_spectrum.md)
+
+For unconnected noise, the cluster graph joins observable-support sites even without a bare Hamiltonian edge, retaining disconnected moment products. Sampled connected noise retains the same support edges to preserve cross-site covariance of the actual finite sampled mixture; deterministic product-state connected noise keeps the ordinary coupling graph. Both ordered and symmetrized reductions use this common graph.

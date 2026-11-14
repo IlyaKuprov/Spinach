@@ -134,6 +134,16 @@ if (ismember(parameters.method,{'gcce','megcce'})||second_order)&&~approximate
     adjacency=adjacency|mediated;
 end
 
+% Retain disconnected moments and finite-sample cross-site covariance
+if strcmp(parameters.method,'noise')&&isfield(parameters,'noise')
+    sampled=isfield(parameters,'bath_state')&&...
+            ismember(parameters.bath_state.mode,{'sampled','interlaced'});
+    if ~parameters.noise.connected||sampled
+        observed=ismember(model.bath_ids,[parameters.noise.terms.support]);
+        adjacency(observed,observed)=true; adjacency(1:n+1:end)=false;
+    end
+end
+
 % Restrict candidate bath by distance from the union of central sites
 keep=true(1,n);
 if isfield(parameters,'bath_radius')&&isfinite(parameters.bath_radius)

@@ -48,6 +48,18 @@ catch err
     refused=strcmp(err.identifier,'cce:jumpBranches');
 end
 result=test_true(result,'C7 contract check',refused,'Central-changing jump requires ME-gCCE.');
+% Reject branch leakage independently of reciprocal operator-rate scaling
+scaled=p; scaled.jumps.operator=1e-16*scaled.jumps.operator;
+scaled.jumps.rate=1e32*scaled.jumps.rate; refused=false;
+try
+    cce_liouvillian(m,[],struct(),scaled);
+catch err
+    refused=strcmp(err.identifier,'cce:jumpBranches');
+end
+result=test_true(result,'Scaled branch-changing central refusal',refused,...
+                 'Reciprocal operator-rate scaling preserves the dissipator and its branch leakage.');
+
+% Continue the invalid-rate validation on the original operator
 p.jumps.rate=-1; refused=false;
 try
     cce_liouvillian(m,[],struct(),p);

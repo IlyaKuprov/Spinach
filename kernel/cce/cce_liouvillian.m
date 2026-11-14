@@ -90,8 +90,8 @@ for k=1:numel(parameters.jumps)
         loss=op'*op;
         loss_leakage=norm(loss*va-va*(va'*loss*va),'fro')+...
                      norm(loss*vb-vb*(vb'*loss*vb),'fro');
-        if leakage>100*eps*d*max(1,norm(op,'fro'))||...
-           loss_leakage>100*eps*d*max(1,norm(loss,'fro'))
+        if leakage>100*eps*d*norm(op,'fro')||...
+           loss_leakage>100*eps*d*norm(loss,'fro')
             error('cce:jumpBranches','A branch-changing jump or loss operator requires megcce.');
         end
     else

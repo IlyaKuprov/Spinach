@@ -8,6 +8,8 @@ Build a local GKSL generator for full density or conditional coherence blocks.
 
 ## Behaviour
 
+- Conditional branch-leakage checks scale with the jump and loss-operator norms; reciprocal jump/rate rescaling cannot conceal branch-changing dynamics.
+
 - Embeds explicitly supported jump operators in physical tensor order and uses column-major vectorization.
 - Includes nonnegative rates in inverse seconds and local cluster Hamiltonians in rad/s; incomplete correlated jump support is refused.
 - Disjoint exterior jumps are omitted only when they do not supply a frozen exterior field; evolving exterior mean fields are not replaced by a dissipator.

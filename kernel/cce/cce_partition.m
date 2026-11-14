@@ -181,8 +181,8 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
             baseline=evaluator(model,empty,state,schedule,q);
             exact=evaluator(model,whole,state,schedule,q);
             records=repmat(baseline,1,numel(family));
-            for k=1:numel(family)
-                records(k)=evaluator(model,family(k),state,schedule,q);
+            for cluster_index=1:numel(family)
+                records(cluster_index)=evaluator(model,family(cluster_index),state,schedule,q);
             end
 
             % Score all requested times without hiding masks or exact-zero tolerances
@@ -230,6 +230,13 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids','multi
     error('Canonical model, graph, and scalar partition parameters are required.');
 end
 p=parameters.partition; ids=graph.bath_ids;
+if ~isnumeric(model.physical_ids)||~isreal(model.physical_ids)||...
+   ~isrow(model.physical_ids)||any(~isfinite(model.physical_ids))||...
+   ~isnumeric(model.multiplicities)||~isreal(model.multiplicities)||...
+   numel(model.multiplicities)~=numel(model.physical_ids)||...
+   any(~isfinite(model.multiplicities)|model.multiplicities<1|mod(model.multiplicities,1)~=0)
+    error('Physical multiplicities must be finite positive integers.');
+end
 if ~all(isfield(p,{'mode','max_dimension'}))||~ischar(p.mode)||...
    ~ismember(p.mode,{'user','coupling','spatial','adaptive'})||~integer(p.max_dimension,1)
     error('A recognised partition mode and finite positive integer dimension are required.');
@@ -265,7 +272,9 @@ if strcmp(p.mode,'spatial')
     if ~all(isfield(p,{'group_count','max_rounds'}))||~integer(p.group_count,0)||...
        p.group_count>numel(ids)||(~isempty(ids)&&p.group_count<1)||...
        ~integer(p.max_rounds,1)||~isfield(model,'coordinates_A')||...
-       size(model.coordinates_A,2)~=3||any(~isfinite(model.coordinates_A(index,:)),'all')
+       ~isnumeric(model.coordinates_A)||~isreal(model.coordinates_A)||...
+       ~isequal(size(model.coordinates_A),[numel(model.physical_ids) 3])||...
+       any(~isfinite(model.coordinates_A(index,:)),'all')
         error('Spatial grouping requires finite coordinates, group count, and round ceiling.');
     end
 end

@@ -8,6 +8,8 @@ Evaluate cluster/state tasks in deterministic indexed batches.
 
 ## Behaviour
 
+- Each concurrent task reserves full central-register-times-bath Hamiltonian construction and physical pulse storage separately from projected bath Hilbert/Liouville propagation. Stock spherical-component storage is included; conditional CCE, ME-CCE and noise do not replace the construction dimension with the bath dimension.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Resident output accounting includes every requested observable column (one for a numeric operator matrix, the cell count for multiple operators), all density components, and the additional noise moments. This common preflight applies to closed-system and master-equation evaluators before allocating their task ledger.

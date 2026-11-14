@@ -75,10 +75,22 @@ peak=0;
 for k=0:numel(clusters)
     sites=[];
     if k>0, sites=clusters(k).sites; end
+    % Reserve unprojected Hamiltonians, spin operators and physical pulse matrices
     db=prod(model.multiplicities(sites)); dimension=dc*db;
-    if ismember(parameters.method,{'cce','mecce','noise'}), dimension=db; end
-    if ismember(parameters.method,{'mecce','megcce'}), dimension=dimension^2; end
-    workspace=16*(24+numel(schedule.events))*dimension^2;
+    copies=12+3*(numel(model.central_ids)+numel(sites))+2*numel(schedule.events);
+    if ~model.direct_supported||strcmp(model.backend,'stock')
+
+        % Include the spherical components retained by the stock construction route
+        ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
+        copies=copies+sum((2*(1:ranks)+1).^2);
+    end
+    workspace=16*copies*dimension^2;
+
+    % Add the projected Hilbert or Liouville propagation workspace separately
+    propagated=dimension;
+    if ismember(parameters.method,{'cce','mecce','noise'}), propagated=db; end
+    if ismember(parameters.method,{'mecce','megcce'}), propagated=propagated^2; end
+    workspace=workspace+16*(24+numel(schedule.events))*propagated^2;
     if isfield(schedule,'controls')&&schedule.controls
 
         % Reserve every retained segment on each simultaneously active worker

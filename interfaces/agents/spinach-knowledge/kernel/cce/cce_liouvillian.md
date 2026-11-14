@@ -8,6 +8,8 @@ Build a local GKSL generator for full density or conditional coherence blocks.
 
 ## Behaviour
 
+- The per-call memory ceiling includes full central-register physical operators as well as the projected Liouvillian, and is checked before constructing either.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Conditional branch-leakage checks scale with the jump and loss-operator norms; reciprocal jump/rate rescaling cannot conceal branch-changing dynamics.

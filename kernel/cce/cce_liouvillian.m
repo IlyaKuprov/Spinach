@@ -35,17 +35,18 @@ cce_validate(parameters);
 % Validate dimensions, units and the explicit method
 grumble(model,sites,context,parameters);
 
-% Build the Hamiltonian in central-first tensor order
-[H,hmeta]=cce_hamiltonian(model,sites,context);
-ids=hmeta.physical_ids; dims=model.multiplicities(ids); d=size(H,1);
+% Bound full physical operators separately from the projected Liouvillian
+ids=[model.central_ids sites]; dims=model.multiplicities(ids); d=prod(dims);
 d0=prod(model.multiplicities(model.central_ids)); db=d/d0;
 conditional=strcmp(parameters.method,'mecce');
-
-% Guard the dense generator allocation before forming Kronecker products
 if conditional, n=db^2; else, n=d^2; end
-if 8*16*n^2>parameters.numerics.max_memory_bytes
+full_workspace=(12+3*numel(ids))*d^2;
+if 16*(full_workspace+8*n^2)>parameters.numerics.max_memory_bytes
     error('cce:memory','Liouvillian construction exceeds max_memory_bytes.');
 end
+
+% Build the Hamiltonian in central-first tensor order after the allocation guard
+[H,hmeta]=cce_hamiltonian(model,sites,context);
 
 % Assemble the coherent full-density or conditional-block generator
 if conditional

@@ -81,7 +81,10 @@ p.parallel.batch_size=2; count=numel(ensemble.contexts)*(numel(clusters)+1);
 nt=numel(schedule.times); dc=prod(model.multiplicities(model.central_ids));
 metadata=whos('model','clusters','ensemble','schedule','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
-dimension=max([clusters.dimension])/dc; workspace=16*(24+numel(schedule.events))*dimension^2;
+dimension=max([clusters.dimension])/dc;
+construction=16*(12+3*numel(model.physical_ids)+...
+                 2*numel(schedule.events))*(dc*dimension)^2;
+workspace=construction+16*(24+numel(schedule.events))*dimension^2;
 p.numerics.max_memory_bytes=resident+1.5*workspace; refused=false;
 try
     cce_schedule(model,clusters,ensemble,schedule,p,@cce_cluster);
@@ -101,7 +104,7 @@ fprintf('Memory cap %.0f bytes; one workspace %.0f; two-worker refusal %d.\n',..
 p.method='mecce'; p.jumps=struct([]); p.parallel.mode='clusters';
 model=cce_prepare(spin_system,p); metadata=whos('model','clusters','ensemble','schedule','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
-workspace=16*(24+numel(schedule.events))*dimension^4;
+workspace=construction+16*(24+numel(schedule.events))*dimension^4;
 p.numerics.max_memory_bytes=resident+1.5*workspace; refused=false;
 try
     cce_schedule(model,clusters,ensemble,schedule,p,@cce_master);
@@ -111,6 +114,72 @@ catch exception
 end
 result=test_true(result,'Concurrent ME worker memory preflight',refused,...
                  'Each active ME task needs its own squared-Hilbert-space dense workspace.');
+
+% Bound full central-register construction separately from projected propagation
+large_sys=struct('isotopes',{repmat({'1H'},1,7)},'magnet',0,'output','hush',...
+                 'disable',{{'hygiene'}},'parallel',{{'processes',2}});
+large_spin=create(large_sys,struct()); large=p; large.central_spins=1:6;
+large.bath_spins=7; large.order=1; large.times=[0 0.01]; large.method='cce';
+large=rmfield(large,'jumps'); large.central=struct('alpha',[1;zeros(63,1)],...
+                                               'beta',[zeros(63,1);1]);
+large.bath_state=struct('mode','mixed_product'); large.parallel.batch_size=2;
+large.numerics.max_memory_bytes=2^28; large_model=cce_prepare(large_spin,large);
+large_graph=cce_graph(large_model,large); large_clusters=cce_clusters(large_model,large_graph,large);
+large_ensemble=cce_states(large_model,large); large_schedule=cce_sequence(large_model,large);
+for method={'cce','mecce','noise'}
+
+    % Keep an independent high-budget reference for each physical evaluator
+    large.method=method{1}; evaluator=@cce_cluster;
+    if strcmp(large.method,'mecce'), large.jumps=struct([]); evaluator=@cce_master; end
+    if strcmp(large.method,'noise')
+        large=rmfield(large,'jumps'); large.quantity='autocorrelation'; evaluator=@cce_noise;
+        large.noise=struct('terms',struct('support',7,'operator',diag([1 -1])/2),...
+                          'ordering','ordered','connected',false);
+    end
+    large.numerics.max_memory_bytes=2^28;
+    high=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
+    metadata=whos('large_model','large_clusters','large_ensemble','large_schedule','large');
+    resident=3*2*(2*(25+16*64^2)+1024)+sum([metadata.bytes]);
+    if strcmp(large.method,'noise'), resident=resident+3*2*(32*2+16); end
+    full_workspace=16*(64*2)^2*(12+3*7);
+    large.numerics.max_memory_bytes=resident+1.5*full_workspace; refused=false;
+    try
+        cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
+    catch exception
+        if ~strcmp(exception.identifier,'cce_schedule:memory'), rethrow(exception); end
+        refused=true;
+    end
+    result=test_true(result,['Full-register concurrent workspace ' large.method],refused,...
+                     'Two workers must reserve unprojected central-register storage as well as bath propagation.');
+
+    % The same ceiling must still permit one worker and preserve its numerical result
+    large.parallel.mode='serial';
+    low=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
+    result=test_close(result,['Full-register serial parity ' large.method],...
+                      low{1}(end).value,high{1}(end).value,0,0,...
+                      'The memory guard must reject concurrency, not an individually fitting task.');
+    large.parallel.mode='clusters';
+    fprintf('CCE full-register %s budget %.0f one workspace %.0f refused %d.\n',...
+            large.method,large.numerics.max_memory_bytes,full_workspace,refused);
+end
+
+% Apply the caller's ceiling to full-register conditional jump construction too
+liouville=large; liouville.method='mecce'; liouville.quantity='coherence';
+liouville=rmfield(liouville,'noise');
+liouville.jumps=struct('support',1,'operator',diag([1 -1])/2,'rate',1);
+liouville.numerics.max_memory_bytes=2^28;
+reference=cce_liouvillian(large_model,7,struct(),liouville);
+liouville.numerics.max_memory_bytes=10000; refused=false;
+try
+    cce_liouvillian(large_model,7,struct(),liouville);
+catch exception
+    if ~strcmp(exception.identifier,'cce:memory'), rethrow(exception); end
+    refused=true;
+end
+result=test_true(result,'Conditional full-register Liouvillian guard',refused,...
+                 'A projected 4-by-4 generator cannot hide its 128-by-128 physical jump matrices.');
+result=test_close(result,'Conditional jump independent dephasing',reference,-eye(4)/2,1e-14,1e-14,...
+                  'Opposite central Iz eigenvalues give a bath-independent coherence decay rate of one half.');
 
 % Count every observable column in closed and open-system resident records
 q=p; q.bath_state=struct('mode','mixed_product'); q.central.rho=eye(2)/2;

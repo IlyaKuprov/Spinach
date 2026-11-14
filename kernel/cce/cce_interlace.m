@@ -16,8 +16,8 @@
 %   cluster, complete sampled ensemble, compiled sequence and interlaced
 %   settings.
 %   parameters.interlaced - max_states, reference_state (ensemble context
-%   index), optional condition_sites cell array; an optional evaluator
-%   function handle supports open-system/noise dispatch.
+%   index), optional condition_sites cell array and raw_only flag. The
+%   declared method selects closed-system or master-equation propagation.
 %
 % Outputs:
 %   raw - conditional raw cluster observable with condition_sites and

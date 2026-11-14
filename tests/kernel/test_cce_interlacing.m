@@ -42,12 +42,27 @@ result=test_close(result,'Conditional raw average agrees with independent full-s
 result=test_true(result,'Duplicate-occurrence weighting gives a detectably different answer',difference>1e-4,'Duplicate-occurrence weighting gives a detectably different answer');
 
 % Preserve the largest numerical residual across every conditional assignment
-probe=p; probe.interlaced.evaluator=@residual_fixture;
-measured=cce_interlace(model,cluster,ensemble,schedule,probe);
-result=test_close(result,'Interlaced worst residual retained',max(measured.eigen_residual),2,...
+probe=p; probe.interlaced.raw_only=true; probe.interlaced.condition_sites={[2 3 4]};
+probe.bath_state.basis={eye(2),[0 1;1 0],eye(2)};
+probe_model=model; probe_model.zeeman{2}(3,:)=[0.731 0.473 0.122];
+probe_ensemble=cce_states(probe_model,probe);
+measured=cce_interlace(probe_model,cluster,probe_ensemble,schedule,probe);
+residual=0; orthogonality=0;
+for k=1:size(measured.assignments,1)
+    context=probe_ensemble.contexts(1);
+    for j=1:3
+        vector=probe.bath_state.basis{j}(:,measured.assignments(k,j));
+        context.bath_rho{j}=vector*vector';
+        context.expectations(j,:)=[0 0 trace(context.bath_rho{j}*diag([0.5 -0.5]))];
+    end
+    item=cce_cluster(probe_model,cluster,context,schedule,probe);
+    residual=max(residual,max(item.eigen_residual));
+    orthogonality=max(orthogonality,max(item.orthogonality_residual));
+end
+result=test_close(result,'Interlaced worst residual retained',max(measured.eigen_residual),residual,...
                   0,0,'Ensemble diagnostics must not report only the first assignment residual.');
-result=test_close(result,'Interlaced worst orthogonality retained',max(measured.orthogonality_residual),4,...
-                  0,0,'Residual metadata follows the worst constituent solve, not its weight.');
+result=test_close(result,'Interlaced worst orthogonality retained',max(measured.orthogonality_residual),...
+                  orthogonality,0,0,'Residual metadata follows the worst constituent solve, not its weight.');
 
 % Denominator subclusters are conditioned on exactly the numerator distribution
 empty=struct('id',uint64(0),'sites',[]); baseline=cce_interlace(model,empty,ensemble,schedule,p);
@@ -156,15 +171,6 @@ end
 fprintf('interlacing configurations %d; raw enumeration error %.3g; duplicate-weight difference %.6g; mass %.6g\n',...
         size(raw.assignments,1),norm(raw.value-value),difference,mass);
 
-end
-
-% Supply controlled constituent residuals to test conditional metadata reduction
-function raw=residual_fixture(model,cluster,context,schedule,parameters)
-
-% Evaluate the unchanged physics and tag the sampled exterior assignment
-raw=cce_cluster(model,cluster,context,schedule,parameters);
-raw.eigen_residual=1.5-context.expectations(3,3);
-raw.orthogonality_residual=2*raw.eigen_residual;
 end
 
 % Build a nontrivial static-exterior model with two included pair superclusters

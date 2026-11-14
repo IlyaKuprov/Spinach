@@ -8,6 +8,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
+- Observable readout and error bounds both use `parameters.operators`.
+
 - Coherence is raw by default on every dispatch path; explicit `normalized=true` divides by the initial coherence.
 
 - Expands named hahn/cpmg/xy4/xy8/udd ideal sequences and explicit piecewise-constant finite drives; amplitude and detuning are angular frequencies.

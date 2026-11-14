@@ -211,7 +211,7 @@ if strcmp(parameters.method,'gcce')
     value=cce_observe(density,observe);
     scale=ones(1,size(value,2));
     if strcmp(parameters.quantity,'observable')
-        operators=parameters.observable;
+        operators=parameters.operators;
         if ~iscell(operators), operators={operators}; end
         scale=cellfun(@(operator) norm(operator,2),operators);
     end

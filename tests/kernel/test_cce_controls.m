@@ -49,6 +49,19 @@ result=test_close(result,'Named and explicit Hahn normalization',...
                   named_echo.value,explicit_echo.value,1e-12,1e-12,...
                   'Naming the same pulse sequence must not change the default coherence scale.');
 
+% Exercise the documented observable field for scalar and multiple readouts
+q.quantity='observable'; q.operators=full(z); observed=cce(ss,q);
+q.quantity='density'; density_result=cce(ss,q); exact=zeros(numel(q.times),2);
+for k=1:numel(q.times)
+    exact(k,:)=[trace(z*density_result.density(:,:,k)) trace(x*density_result.density(:,:,k))];
+end
+result=test_close(result,'Driven scalar operators readout',observed.value,exact(:,1),...
+                  1e-12,1e-12,'The documented operators field supplies the driven observable.');
+q.quantity='observable'; q.operators={full(z),full(x)}; observed=cce(ss,q);
+result=test_close(result,'Driven cell operators readout',observed.value,exact,...
+                  1e-12,1e-12,'Each observable has its own operator-norm error scale.');
+fprintf('Driven operators discrepancy %.3g.\n',max(abs(observed.value-exact),[],'all'));
+
 % Exercise the public driver through the named/finite dispatch hooks
 integrated=cce(model.spin_system,p);
 result=test_close(result,'Public finite-control driver',reshape(integrated.value(end,:),2,2),expected,...

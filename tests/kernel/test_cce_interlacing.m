@@ -1,0 +1,87 @@
+% Exact W12 conditioning-set and probability regression tests.
+% Syntax: result=test_cce_interlacing()
+%
+% ilya.kuprov@weizmann.ac.il
+
+function result=test_cce_interlacing()
+
+% Construct overlapping superclusters around a single bath spin
+result=new_test_result('kernel/cce_interlacing','CCE conditional interlacing',...
+                       'Check unique configurations, conditional weights and shared denominator K.');
+[model,p]=fixture(); ensemble=cce_states(model,p);
+ensemble.assignments(1,:)=[1 1 1]; schedule=cce_sequence(model,p);
+p.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3],[2 4]}});
+cluster=struct('id',uint64(1),'sites',2); raw=cce_interlace(model,cluster,ensemble,schedule,p);
+expected=[1 1 1;1 1 2;1 2 1;2 1 1;2 1 2;2 2 1];
+weights=[0.7*0.2*0.6;0.7*0.2*0.4;0.7*0.8*0.6;...
+         0.3*0.2*0.6;0.3*0.2*0.4;0.3*0.8*0.6]; weights=weights/sum(weights);
+result=test_true(result,'Overlapping cylinders yield six unique configurations, not eight occurrences',isequal(raw.assignments,expected),'Overlapping cylinders yield six unique configurations, not eight occurrences');
+result=test_close(result,'Conditional probabilities are physical product weights',raw.weights,weights,1e-15,0,'Conditional probabilities are physical product weights');
+
+% Independently enumerate the full bath and accept the union predicate
+value=zeros(size(raw.value)); mass=0; duplicated=zeros(size(raw.value)); occurrence_mass=0;
+for a=1:2
+    for b=1:2
+        for c=1:2
+            multiplicity=(c==1)+(b==1);
+            if multiplicity==0, continue; end
+            context=ensemble.contexts(1); assignment=[a b c]; weight=1;
+            for j=1:3
+                rho=zeros(2); rho(assignment(j),assignment(j))=1; context.bath_rho{j}=rho;
+                context.expectations(j,:)=[0 0 1.5-assignment(j)];
+                weight=weight*p.bath_state.probabilities{j}(assignment(j));
+            end
+            item=cce_cluster(model,cluster,context,schedule,p);
+            value=value+weight*item.value; mass=mass+weight;
+            duplicated=duplicated+multiplicity*weight*item.value; occurrence_mass=occurrence_mass+multiplicity*weight;
+        end
+    end
+end
+value=value/mass; duplicated=duplicated/occurrence_mass; difference=norm(value-duplicated);
+result=test_close(result,'Conditional raw average agrees with independent full-state enumeration',raw.value,value,1e-12,0,'Conditional raw average agrees with independent full-state enumeration');
+result=test_true(result,'Duplicate-occurrence weighting gives a detectably different answer',difference>1e-4,'Duplicate-occurrence weighting gives a detectably different answer');
+
+% Denominator subclusters are conditioned on exactly the numerator distribution
+empty=struct('id',uint64(0),'sites',[]); baseline=cce_interlace(model,empty,ensemble,schedule,p);
+result=test_true(result,...
+                 'Explicit shared K is identical in numerator and empty denominator',isequal(raw.assignments,baseline.assignments)&&isequal(raw.weights,baseline.weights),...
+                 'Explicit shared K is identical in numerator and empty denominator');
+p.interlaced.max_states=7; refused=false;
+try
+    cce_interlace(model,cluster,ensemble,schedule,p); catch exception, refused=strcmp(exception.identifier,'cce_interlace:budget'); end
+result=test_true(result,'Enumeration work exceeding the declared budget is refused',refused,'Enumeration work exceeding the declared budget is refused');
+p.interlaced.max_states=16; p.interlaced=rmfield(p.interlaced,'condition_sites');
+automatic=cce_interlace(model,cluster,ensemble,schedule,p);
+result=test_true(result,'Included-supercluster family generates the same K automatically',isequal(automatic.assignments,expected),'Included-supercluster family generates the same K automatically');
+% At full order every conditioning cylinder is the full bath and W12 is exact
+p.order=3; p.interlaced.max_states=32; integrated=cce(model.spin_system,p);
+mixture=p; mixture.bath_state=struct('mode','explicit_product',...
+    'rho',{{diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])}});
+mixture.meanfield='none'; exact=cce(model.spin_system,mixture);
+result=test_close(result,'Full-order W12 equals exact mixed bath',integrated.value,exact.value,...
+                  1e-11,0,'Shared-K recursion telescopes at full bath order');
+
+fprintf('interlacing configurations %d; raw enumeration error %.3g; duplicate-weight difference %.6g; mass %.6g\n',...
+        size(raw.assignments,1),norm(raw.value-value),difference,mass);
+
+end
+
+% Build a nontrivial static-exterior model with two included pair superclusters
+function [model,p]=fixture()
+sys.isotopes={'1H','1H','1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
+inter.coupling.matrix=cell(4);
+inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
+inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
+inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
+spin_system=create(sys,inter); p.central_spins=1; p.bath_spins=2:4;
+p.method='gcce'; p.expansion='standard'; p.quantity='coherence'; p.times=[0 0.2 0.4]; p.order=2;
+p.central.rho=[1 1;1 1]/2; p.central.alpha=[1;0]; p.central.beta=[0;1];
+p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
+p.graph=struct('mode','complete','score','coupling_norm');
+p.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
+                    'probabilities',{{[0.7;0.3],[0.2;0.8],[0.6;0.4]}});
+p.meanfield='static'; p.sequence=[];
+p.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
+model=cce_prepare(spin_system,p);
+end
+

@@ -15,6 +15,35 @@
 
 function schedule=cce_sequence(model,parameters)
 
+% Compile named, finite and DEER controls through the shared segment schema
+advanced=isstruct(parameters.sequence)&&isfield(parameters.sequence,'name');
+if isstruct(parameters.sequence)&&isfield(parameters.sequence,'type')
+    advanced=advanced||any(strcmp({parameters.sequence.type},'finite'));
+end
+if isfield(parameters,'deer')&&isfield(parameters.deer,'enabled')
+    advanced=advanced||parameters.deer.enabled;
+end
+if isfield(parameters,'meanfield')&&strcmp(parameters.meanfield,'static')&&...
+   isstruct(parameters.sequence)&&isfield(parameters.sequence,'target')
+    for event=reshape(parameters.sequence,1,[])
+        if isnumeric(event.target), advanced=advanced||any(ismember(event.target,model.bath_ids)); end
+    end
+end
+if advanced
+    segments=cce_controls(model,[],[],[],parameters); schedule=segments.schedule;
+    schedule.controls=strcmp(parameters.method,'gcce');
+    if ~schedule.controls
+        copy=parameters; copy.sequence=schedule.events;
+        if any(strcmp({schedule.events.type},'finite'))
+            error('cce_sequence:conditional_drive','Finite controls require gCCE.');
+        end
+        copy.meanfield='none';
+        if isfield(copy,'deer'), copy.deer.enabled=false; end
+        schedule=cce_sequence(model,copy);
+    end
+    return;
+end
+
 % Validate times and event syntax before producing any propagator schedule
 grumble(model,parameters);
 

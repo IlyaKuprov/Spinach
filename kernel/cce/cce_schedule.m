@@ -135,7 +135,7 @@ for first=1:batch_size:numel(missing)
         end
     else
         parfor (j=1:numel(indices),workers)
-            records{j}=evaluator(model,task_clusters{j},task_contexts{j},schedule,parameters);
+            records{j}=evaluator(model,task_clusters{j},task_contexts{j},schedule,parameters); %#ok<PFBNS>
         end
     end
     state.records(indices)=records; state.completed(indices)=true;

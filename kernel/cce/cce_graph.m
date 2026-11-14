@@ -128,7 +128,9 @@ adjacency(1:n+1:end)=false;
 
 % Preserve mediated correlations unless graph approximation is explicit
 approximate=isfield(parameters.graph,'approximate')&&parameters.graph.approximate;
-if ismember(parameters.method,{'gcce','megcce'})&&~approximate
+second_order=strcmp(parameters.method,'cce')&&isfield(parameters,'second_order')&&...
+             isfield(parameters.second_order,'enabled')&&parameters.second_order.enabled;
+if (ismember(parameters.method,{'gcce','megcce'})||second_order)&&~approximate
     adjacency=adjacency|mediated;
 end
 

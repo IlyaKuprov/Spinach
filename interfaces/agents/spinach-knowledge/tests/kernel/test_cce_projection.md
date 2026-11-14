@@ -40,3 +40,5 @@ result=test_cce_projection()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_projection.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+Checks second-order mediated coupling-graph dynamics against independently constructed dense conditional Hamiltonians, and verifies that omitting induced edges requires the explicit graph approximation flag.

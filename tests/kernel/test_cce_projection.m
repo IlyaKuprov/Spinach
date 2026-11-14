@@ -92,6 +92,34 @@ branches=cce_project(cce_prepare(system,parameters),parameters);
 result=test_close(result,'multiple central register',...
                   branches.alpha.expectations,[0 0 1/2;0 1/2 0],8*eps,0,'Complex state expectations preserve declared central order.');
 
+% Compare mediated pair dynamics against independently projected dense matrices
+sys.isotopes={'1H','1H','1H'}; system=create(sys,struct());
+system.inter.zeeman.matrix{1}=1000*eye(3);
+system.inter.coupling.matrix{1,2}=diag([100 0 0]);
+system.inter.coupling.matrix{1,3}=diag([80 0 0]);
+p=struct('central_spins',1,'bath_spins',[2 3],'method','cce',...
+         'quantity','coherence','expansion','standard','order',2,...
+         'times',[0 0.1 0.3 0.5],'assumptions','labframe',...
+         'orientation',[0 0 0],'interaction_cutoff',Inf,'meanfield','none');
+p.central=struct('alpha',[1;0],'beta',[0;1]); p.sequence=struct([]);
+p.graph=struct('mode','coupling','threshold',0);
+p.bath_state=struct('mode','mixed_product');
+p.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',1e8);
+p.second_order=struct('enabled',true,'gap_tolerance',1,'overlap_tolerance',1e-10);
+actual=cce(system,p); x=[0 1;1 0]/2;
+field=100*kron(x,eye(2))+80*kron(eye(2),x);
+ha=500*eye(4)+field^2/4000; hb=-ha;
+reference=arrayfun(@(t) trace(expm(-1i*ha*t)*expm(1i*hb*t))/4,p.times).';
+result=test_close(result,'second-order mediated graph',actual.value,reference,...
+                  1e-10,0,'The coupling graph must retain susceptibility-induced bath pairs.');
+fprintf('R7 projection sparse dense discrepancy %.17g\n',max(abs(actual.value-reference)));
+
+% Preserve the explicit opt-out without altering the projected Hamiltonian
+p.graph.approximate=true; approximate=cce(system,p);
+result=test_true(result,'second-order graph approximation explicit',...
+                 max(abs(approximate.value-reference))>0.4,...
+                 'Only an explicitly approximate graph may omit the induced pair.');
+
 end
 
 

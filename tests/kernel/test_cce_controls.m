@@ -233,6 +233,24 @@ result=test_close(result,'Static angle-folded generator',folded.density(:,:,end)
 % Print numerical evidence without adding nonstandard harness fields
 fprintf('controls dense error %.3g; ideal-limit errors %s; waveform errors %s\n',error,mat2str(errors,6),mat2str(waveform_errors,6));
 
+% Pulse-generator validation is unchanged by reciprocal operator-angle scaling
+[model,q,ensemble]=fixture(); context=ensemble.contexts(1); rejected=false(1,2);
+q.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
+                  'operator',1e-20*[0 1;0 0],'angle',1e20);
+try
+    cce_sequence(model,q);
+catch
+    rejected(1)=true;
+end
+try
+    cce_controls(model,2,context,[],q);
+catch
+    rejected(2)=true;
+end
+result=test_true(result,'Scaled non-Hermitian pulse rejected',all(rejected),...
+                 'A small operator norm cannot hide non-Hermiticity compensated by a large angle.');
+fprintf('R6 scaled pulse rejections %d/2\n',sum(rejected));
+
 end
 
 % Trace the independent bath index in the dense Kronecker reference

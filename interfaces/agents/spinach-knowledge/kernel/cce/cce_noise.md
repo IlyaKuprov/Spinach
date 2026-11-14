@@ -12,6 +12,8 @@ Evaluate bath-noise autocorrelation for additive connected-cluster expansion.
 - Uses a central-state-independent bath Hamiltonian, or the explicitly requested noise.branch alpha/beta projection, and applies the requested ordered or symmetrized correlation convention. Virtual-state noise corrections are refused.
 - Optional connected subtraction removes the mean-product contribution; the result retains units squared of the supplied observable operators. For sampled baths the driver averages the raw moments and means before connected subtraction under either averaging mode, preserving classical ensemble variance. Direct cluster calls return the covariance of their supplied context and retain raw moment/mean fields for ensemble combination.
 
+- Local noise-operator Hermiticity is checked relative to the operator norm, with no absolute unit floor.
+
 ## Inputs and outputs
 
 ```matlab

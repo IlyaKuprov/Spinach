@@ -137,7 +137,7 @@ for j=1:numel(events)
     if has_operator
         d=prod(model.multiplicities(event.target)); op=event.operator;
         if ~isnumeric(op)||~isequal(size(op),[d d])||any(~isfinite(op),'all')||...
-           norm(op-op','fro')>d^2*eps*max(1,norm(op,'fro'))
+           norm(op-op','fro')>d^2*eps*norm(op,'fro')
             error('Pulse operator must be finite Hermitian in target product order.');
         end
         if isfield(event,'angle')&&~isempty(event.angle)&&(~isnumeric(event.angle)||...

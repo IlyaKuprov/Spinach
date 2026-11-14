@@ -371,7 +371,7 @@ for event=reshape(events,1,[])
     if strcmp(event.type,'ideal')&&isfield(event,'operator')&&~isempty(event.operator)
         d=prod(model.multiplicities(event.target)); op=event.operator;
         if ~isnumeric(op)||~isequal(size(op),[d d])||any(~isfinite(op),'all')||...
-           norm(op-op','fro')>d^2*eps*max(1,norm(op,'fro'))
+           norm(op-op','fro')>d^2*eps*norm(op,'fro')
             error('cce_controls:operator','Pulse operator must be finite and Hermitian.');
         end
     elseif ~isfield(event,'axis')||...

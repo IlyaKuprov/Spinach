@@ -127,7 +127,7 @@ for k=1:numel(noise.terms)
     n=prod(model.multiplicities(term.support));
     if ~isnumeric(term.operator)||~isequal(size(term.operator),[n n])||...
        any(~isfinite(term.operator),'all')||...
-       norm(term.operator-term.operator','fro')>100*eps*max(1,norm(term.operator,'fro'))
+       norm(term.operator-term.operator','fro')>100*eps*norm(term.operator,'fro')
         error('Noise operators must be finite Hermitian matrices of the support dimension.');
     end
 end

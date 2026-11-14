@@ -74,6 +74,41 @@ fprintf('R5579 declared extension %.16g; full nonstationary %.16g.\n',extended.v
 
 fprintf('Spectrum Parseval error %.3g; Lorentzian max error %.3g\n',maximum,lorentz_error);
 
+% Validate each one-sided correlation independently of its units and companions
+q=p; q.spectrum=rmfield(q.spectrum,'modulation');
+q.spectrum.sidedness='one-sided'; q.spectrum.stationary=true;
+q.spectrum.time_domain='positive'; t=(0:0.1:1).'; rejected=false(1,8);
+inputs={1e-20*exp(-1i*t),[cos(t) 1e-20*exp(-1i*t)],...
+        [1e20*cos(t) exp(-1i*t)],1e-200*exp(-1i*t)};
+for k=1:4
+    try
+        cce_spectrum(t,inputs{k},q);
+    catch
+        rejected(k)=true;
+    end
+end
+q.spectrum.time_domain='full'; t=(-1:0.1:1).';
+inputs={1e-20*(1+t),[cos(t) 1e-20*(1+t)],[1e20*cos(t) 1+t],1e-200*(1+t)};
+for k=1:4
+    try
+        cce_spectrum(t,inputs{k},q);
+    catch
+        rejected(k+4)=true;
+    end
+end
+result=test_true(result,'One-sided per-column scale checks',all(rejected),...
+                 'Small units or a larger companion must not conceal a complex or non-even correlation.');
+
+% Real even correlations retain linear scaling, including an identically zero column
+scales=[0 1e-200 1e-20 1 1e20 1e200]; correlations=cos(t)*scales;
+reference=cce_spectrum(t,cos(t),q); actual=cce_spectrum(t,correlations,q);
+relative=actual.value(:,2:end)./scales(2:end)-reference.value;
+result=test_close(result,'One-sided scaled real-even spectra',relative,zeros(size(relative)),1e-13,0,...
+                  'The validity test must not change spectra under independent unit rescaling.');
+result=test_true(result,'One-sided zero correlation',all(actual.value(:,1)==0),...
+                 'An identically zero correlation is both real and even.');
+fprintf('R6 one-sided rejections %d/8; scaled transform error %.3g\n',sum(rejected),norm(relative,'fro'));
+
 end
 
 

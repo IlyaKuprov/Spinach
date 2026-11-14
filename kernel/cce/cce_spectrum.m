@@ -125,12 +125,15 @@ if strcmp(s.weights,'rectangle')&&...
     error('Rectangle quadrature requires a uniform time grid.');
 end
 if strcmp(s.sidedness,'one-sided')
-    if any(w<0)||norm(imag(correlation),'fro')>100*eps*max(1,norm(correlation,'fro'))
+    % Compare dimensionless residuals separately for each correlation column
+    scale=max(abs(correlation),[],1); scale(scale==0)=1;
+    scaled=correlation./scale;
+    if any(w<0)||any(max(abs(imag(scaled)),[],1)>100*eps)
         error('One-sided folding requires nonnegative frequencies and a real even correlation.');
     end
     if strcmp(s.time_domain,'full')&&...
        (norm(times(:)+flipud(times(:)))>100*eps*max(abs(times))||...
-        norm(correlation-flipud(correlation),'fro')>100*eps*max(1,norm(correlation,'fro')))
+        any(max(abs(scaled-flipud(scaled)),[],1)>100*eps))
         error('Full-time one-sided input must have symmetric times and an even correlation.');
     end
 end

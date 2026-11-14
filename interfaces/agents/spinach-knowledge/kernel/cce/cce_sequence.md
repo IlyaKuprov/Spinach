@@ -16,6 +16,8 @@ Compile whole-sequence sample times and ideal conditional pulse events.
 
 - Explicitly permitted empty DEER selections are no-op events. After selector validation, empty-target pulses are removed before conditional/ME/noise schedule recursion; generalized control compilation already treats them as no-ops.
 
+- Explicit pulse-generator Hermiticity is checked relative to its norm, with no absolute unit floor; reciprocal operator/angle rescaling cannot conceal a non-Hermitian generator.
+
 ## Inputs and outputs
 
 ```matlab

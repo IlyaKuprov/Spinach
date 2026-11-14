@@ -20,6 +20,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 - The memory budget includes retained Hamiltonians, pulses and exterior expectations for every requested time and segment, before operator allocation; scheduler accounting includes each simultaneously active worker.
 
+- Explicit pulse-generator Hermiticity is checked relative to its norm, with no absolute unit floor; reciprocal operator/angle rescaling cannot conceal a non-Hermitian generator.
+
 ## Inputs and outputs
 
 ```matlab

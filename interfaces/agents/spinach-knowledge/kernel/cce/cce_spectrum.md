@@ -12,6 +12,8 @@ Integrate a declared bath correlation into a finite-window spectrum.
 - A positive-time domain is extended only under an explicitly stationary correlation assumption; two-sided data are used as declared.
 - Applies none or Hann window without window-power renormalization. Optional real modulation on the original time mesh supplies a squared filter integral in seconds squared.
 
+- One-sided reality and full-time evenness are checked independently for each correlation column, relative to that column's maximum magnitude. Independent unit rescaling and large companion columns cannot conceal invalid input; zero columns remain valid.
+
 ## Inputs and outputs
 
 ```matlab

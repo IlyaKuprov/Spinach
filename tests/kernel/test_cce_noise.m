@@ -99,6 +99,19 @@ end
 result=test_true(result,'Noise evaluator rejects foreign method',rejected,...
                  'Direct evaluator calls must not silently use Hamiltonian noise dynamics for a master-equation method.');
 
+% Reject non-Hermitian bath operators independently of their physical units
+q=p; q.graph=struct('mode','complete');
+q.noise.terms(1).operator=1e-20*[0 1;0 0]; rejected=false;
+try
+    cce(s,q);
+catch exception
+    rejected=contains(lower(exception.message),'hermitian');
+    fprintf('Scaled noise validation: %s\n',exception.message);
+end
+result=test_true(result,'Scaled non-Hermitian noise rejected',rejected,...
+                 'A noise operator must remain Hermitian when its units are rescaled.');
+fprintf('R6 scaled noise rejection %d\n',rejected);
+
 end
 
 

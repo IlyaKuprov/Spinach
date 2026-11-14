@@ -147,6 +147,61 @@ catch e
 end
 result=test_true(result,'Packing ceiling exposed',rejected,'No hidden relaxation of exclusion radius.');
 
+% Validate joint assignments against count and density-derived random candidates
+q=struct('mode','random','isotopes',{{'1H'}},'magnetic',1,'bounds_A',[0 0 0;1 1 1],...
+         'count',3,'dimension',3,'seed',17,'max_attempts',100);
+q.configurations=struct('isotopes',{{'1H','','13C'},{'','1H','1H'}},'weight',{0.3,0.7});
+for density_mode=[false true]
+    trial=q;
+    if density_mode, trial=rmfield(trial,'count'); trial.density=3e30; end
+    accepted=false;
+    try
+        [~,~,joint]=cce_bath(trial);
+        accepted=size(joint.candidate_coordinates_A,1)==3&&...
+                 isequal(joint.configurations(1).ids,[1 3])&&...
+                 isequal(joint.configurations(2).ids,[2 3])&&...
+                 isequal([joint.configurations.weight],[0.3 0.7]);
+    catch exception
+        fprintf('Random joint density=%d: %s\n',density_mode,exception.message);
+    end
+    result=test_true(result,sprintf('Random joint candidate count density=%d',density_mode),accepted,...
+                     'Each joint isotope row covers every candidate before vacancies or exclusions are applied.');
+
+    % Refuse singleton joint rows before any candidate-mask indexing
+    trial.configurations=struct('isotopes',{{'1H'}},'weight',1); rejected=false;
+    try
+        cce_bath(trial);
+    catch exception
+        rejected=contains(exception.message,'Joint configuration size mismatch');
+    end
+    result=test_true(result,sprintf('Random joint singleton refused density=%d',density_mode),rejected,...
+                     'Malformed joint assignments must fail validation rather than logical-mask indexing.');
+end
+
+% Preserve original candidate IDs when random sites are geometrically excluded
+q.isotopes={'1H','1H','1H'}; q.remove_ids=2; accepted=false;
+try
+    [~,~,joint]=cce_bath(q);
+    accepted=isequal(joint.configurations(1).ids,[1 3])&&...
+             isequal(joint.configurations(2).ids,3)&&sum([joint.configurations.weight])==1;
+catch exception
+    fprintf('Excluded random joint: %s\n',exception.message);
+end
+result=test_true(result,'Random joint exclusion keeps candidate IDs',accepted,...
+                 'Joint rows use the pre-exclusion candidate count even when explicit isotope labels are supplied.');
+
+% Use the same candidate count for site-resolved independent probabilities
+q=rmfield(q,{'configurations','remove_ids'}); q.isotopes={'1H'};
+q.species={'1H','13C'}; q.occupancy=[1 0;0 1;1 0]; accepted=false;
+try
+    [sampled,~,~]=cce_bath(q); accepted=isequal(sampled.isotopes,{'1H','13C','1H'});
+catch exception
+    fprintf('Random site probabilities: %s\n',exception.message);
+end
+result=test_true(result,'Random site-resolved occupancy count',accepted,...
+                 'Random per-site independent probabilities have one row per candidate, just like joint configurations.');
+fprintf('R5587 count and density each produce three candidates; retained joint IDs [1 3] and [3].\n');
+
 fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),surface_density);
 
 end

@@ -269,7 +269,6 @@ switch s.mode
         if isfield(s,'exclusion_A')&&(~isscalar(s.exclusion_A)||~isfinite(s.exclusion_A)||s.exclusion_A<0), error('Invalid exclusion.'); end
         n=1;
 end
-if numel(s.isotopes)~=1&&numel(s.isotopes)~=n, error('Species count mismatch.'); end
 site_count=n;
 if strcmp(s.mode,'lattice'), site_count=n*prod(s.repeats); end
 if strcmp(s.mode,'random')
@@ -280,6 +279,8 @@ if strcmp(s.mode,'random')
         site_count=round(s.density*prod(widths(widths>0)*1e-10));
     end
 end
+if strcmp(s.mode,'random'), n=site_count; end
+if numel(s.isotopes)~=1&&numel(s.isotopes)~=n, error('Species count mismatch.'); end
 if isfield(s,'groups')
     if ~iscell(s.groups)||~isrow(s.groups), error('Groups must be a cell row.'); end
     for k=1:numel(s.groups)
@@ -353,7 +354,7 @@ if isfield(s,'configurations')
         error('Joint configuration weights must sum to one.');
     end
     for k=1:numel(weights)
-        if numel(s.configurations(k).isotopes)~=n, error('Joint configuration size mismatch.'); end
+        if numel(s.configurations(k).isotopes)~=site_count, error('Joint configuration size mismatch.'); end
     end
 end
 if isfield(s,'isotopologues')

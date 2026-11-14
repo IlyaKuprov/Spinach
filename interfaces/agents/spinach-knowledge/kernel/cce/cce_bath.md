@@ -29,6 +29,8 @@ Construct explicit, lattice or random spin baths with explicit isotope assignmen
 - `sys`, `inter` — inputs for Spinach create.
 - `bath` — coordinates, physical identity, occupancy/configuration and construction metadata.
 
+Joint isotope configurations contain one entry per pre-exclusion candidate, including vacancies. For random baths this length is the explicit count or the density-derived count, independently of whether the base isotope table contains a single label or one label per candidate. Site-resolved independent occupancy probabilities likewise use one row per random candidate.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_bath.m)

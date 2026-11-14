@@ -50,6 +50,34 @@ result=test_close(result,'C7 numerical check',symmetric.value,real(reference),1e
 p.noise.terms=struct('support',2,'operator',z); classical=cce(s,p);
 result=test_close(result,'C7 numerical check',classical.value,repmat(0.16,numel(p.times),1),1e-12,1e-12,...
                   'Commuting classical connected variance.');
+% Retain classical ensemble variance in a sampled connected correlation
+q=p; q.bath_state=struct('mode','sampled','samples',64,'seed',31,...
+                        'basis','uniform','probabilities','uniform');
+q.central.rho=eye(2)/2; model=cce_prepare(s,q); ensemble=cce_states(model,q);
+means=1.5-ensemble.assignments(:,1); expected=0.25-(ensemble.weights(:).'*means)^2;
+for mode={'after_expansion','internal_then_expansion'}
+    q.averaging=mode{1}; sampled=cce(s,q);
+    result=test_close(result,['Sampled connected noise ' mode{1}],sampled.value,...
+                      repmat(expected,numel(q.times),1),1e-12,1e-12,...
+                      'The mixed-state covariance includes the variance of sampled conditional means.');
+end
+% Compare time-dependent ordered and symmetrized covariances with a dense mixture
+s.inter.zeeman.matrix{2}=zeros(3); s.inter.zeeman.matrix{2}(3,1)=1.3;
+rho=diag([mean(ensemble.assignments(:,1)==1) mean(ensemble.assignments(:,1)==2)]);
+for ordering={'ordered','symmetrized'}
+    q.noise.ordering=ordering{1}; sampled_dynamic=cce(s,q); reference=zeros(size(sampled_dynamic.value));
+    for k=1:numel(q.times)
+        U=expm(-1i*1.3*x*q.times(k)); bt=U'*z*U; moment=trace(bt*z*rho);
+        if strcmp(ordering{1},'symmetrized'), moment=trace((bt*z+z*bt)*rho)/2; end
+        reference(k)=moment-trace(bt*rho)*trace(z*rho);
+    end
+    result=test_close(result,['Sampled dynamic covariance ' ordering{1}],sampled_dynamic.value,...
+                      reference,1e-12,1e-12,'Time-dependent means must be averaged before connected subtraction.');
+    fprintf('Dynamic %s covariance discrepancy %.3g.\n',ordering{1},max(abs(sampled_dynamic.value-reference)));
+end
+fprintf('R1236 sampled covariance %.16g; empirical variance %.16g.\n',...
+        real(sampled.value(1)),expected);
+
 fprintf('Noise full-order error %.3g; quantum ordering error %.3g\n',...
         exact_error,max(abs(ordered.value-reference)));
 

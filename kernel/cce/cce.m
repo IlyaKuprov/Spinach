@@ -121,6 +121,27 @@ all_raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
 full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
 if isempty(model.bath_ids), full_index=0; end
 
+% Preserve the covariance of the sampled mixture rather than conditional covariances
+if strcmp(parameters.method,'noise')&&parameters.noise.connected&&ns>1
+
+    % Average cluster moments before taking the connected covariance
+    for k=1:numel(all_raw{1})
+        mean_time=zeros(size(all_raw{1}(k).value)); mean_zero=0;
+        for s=1:ns
+            item=all_raw{s}(k); weight=ensemble.weights(s);
+            mean_time=mean_time+weight*item.noise_mean;
+            mean_zero=mean_zero+weight*item.noise_mean_zero;
+        end
+
+        % Retain linear sample contributions for either additive estimator
+        for s=1:ns
+            all_raw{s}(k).value=all_raw{s}(k).noise_moment-...
+                                all_raw{s}(k).noise_mean*mean_zero-...
+                                mean_time*(all_raw{s}(k).noise_mean_zero-mean_zero);
+        end
+    end
+end
+
 % Distinguish average-of-expansions from an explicitly requested internal average
 averaging='after_expansion';
 if isfield(parameters,'averaging'), averaging=parameters.averaging; end

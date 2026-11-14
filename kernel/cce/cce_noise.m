@@ -66,6 +66,7 @@ for id=ids
     where=find(context.bath_ids==id,1); rho=kron(rho,context.bath_rho{where});
 end
 mean_zero=trace(B*rho); nt=numel(schedule.times); values=complex(zeros(nt,1));
+mean_time=complex(zeros(nt,1)); moments=complex(zeros(nt,1));
 [V,D]=eig((hb+hb')/2,'vector');
 
 % Evaluate the explicitly ordered or symmetrized quantum correlation
@@ -75,14 +76,16 @@ for k=1:nt
     if strcmp(parameters.noise.ordering,'symmetrized')
         values(k)=(values(k)+trace(B*bt*rho))/2;
     end
-    if parameters.noise.connected, values(k)=values(k)-trace(bt*rho)*mean_zero; end
+    mean_time(k)=trace(bt*rho); moments(k)=values(k);
+    if parameters.noise.connected, values(k)=values(k)-mean_time(k)*mean_zero; end
 end
 
 % Return an additive cumulant input with a scale-sensitive roundoff estimate
 bound=64*eps*db*(1+norm(hb,2)*schedule.times(:))*norm(B,2)^2;
 raw=struct('cluster_id',cluster.id,'value',values,'valid',isfinite(values),...
            'abs_error_bound',bound,'ordering',parameters.noise.ordering,...
-           'connected',parameters.noise.connected,'reducer','additive');
+           'connected',parameters.noise.connected,'reducer','additive',...
+           'noise_moment',moments,'noise_mean',mean_time,'noise_mean_zero',mean_zero);
 
 end
 

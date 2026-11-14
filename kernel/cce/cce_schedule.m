@@ -62,6 +62,9 @@ components=1;
 if strcmp(parameters.quantity,'density'), components=dc^2; end
 metadata=whos('model','clusters','ensemble','schedule','parameters');
 resident=3*count*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
+
+% Include the retained first and second moments of sampled noise records
+if strcmp(parameters.method,'noise'), resident=resident+3*count*(32*nt+16); end
 peak=0;
 for k=0:numel(clusters)
     sites=[];

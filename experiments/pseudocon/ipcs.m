@@ -252,8 +252,11 @@ if (parameters.sharpen>0)&&(~any(guess))
 end
 
 % Generate Fourier derivative multipliers in units of the X grid step
-steps=(ranges([2 4 6])-ranges([1 3 5]))/(npoints-1); steps=steps/steps(1);
-[X,Y,Z]=ndgrid(fftdiff(1,npoints,steps(1)),fftdiff(1,npoints,steps(2)),fftdiff(1,npoints,steps(3)));
+steps=(ranges([2 4 6])-ranges([1 3 5]))/(npoints-1); 
+steps=steps/steps(1);
+[X,Y,Z]=ndgrid(fftdiff(1,npoints,steps(1)),...
+               fftdiff(1,npoints,steps(2)),...
+               fftdiff(1,npoints,steps(3)));
 
 % Get Laplace operator in Fourier space
 L=X.^2+Y.^2+Z.^2; 

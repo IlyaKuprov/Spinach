@@ -91,9 +91,27 @@ for event=reshape(schedule.events,1,[])
     end
 end
 
-% Embed local operators using the canonical central-then-bath tensor order
+% Bound retained segment matrices and exterior values before allocating operators
+ids=[model.central_ids sites]; dimension=prod(model.multiplicities(ids));
+events=schedule.events; segment_count=0;
+for k=1:numel(schedule.times)
+
+    % Count distinct event boundaries without retaining any dense operator
+    t=schedule.times(k); starts=schedule.positions(:,k); stops=starts;
+    for j=1:numel(events)
+        if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
+    end
+    segment_count=segment_count+numel(unique([0;t;starts(starts>0&starts<t);stops(stops>0&stops<t)]));
+end
+% Reserve sparse complex Hamiltonians, dense pulses and exterior expectations
+retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
+metadata=whos('model','sites','context','schedule','parameters');
+if retained+sum([metadata.bytes])+16*24*dimension^2>parameters.numerics.max_memory_bytes
+    error('cce_controls:memory','Retained control segments exceed numerics.max_memory_bytes.');
+end
+
+% Build the Hamiltonian metadata only after the retained-storage check
 [~,meta]=cce_hamiltonian(model,sites,struct()); ids=meta.physical_ids;
-dimension=prod(model.multiplicities(ids)); events=schedule.events;
 segments.durations=cell(size(schedule.times)); segments.hamiltonians=cell(size(schedule.times));
 segments.pulses=cell(size(schedule.times)); segments.exterior_expectations=cell(size(schedule.times));
 for t=1:numel(schedule.times)

@@ -72,7 +72,14 @@ for k=0:numel(clusters)
     db=prod(model.multiplicities(sites)); dimension=dc*db;
     if ismember(parameters.method,{'cce','mecce','noise'}), dimension=db; end
     if ismember(parameters.method,{'mecce','megcce'}), dimension=dimension^2; end
-    peak=max(peak,16*(24+numel(schedule.events))*dimension^2);
+    workspace=16*(24+numel(schedule.events))*dimension^2;
+    if isfield(schedule,'controls')&&schedule.controls
+
+        % Reserve every retained segment on each simultaneously active worker
+        segments=nt*(2+2*numel(schedule.events));
+        workspace=workspace+segments*(48*dimension^2+24*numel(model.bath_ids)+8);
+    end
+    peak=max(peak,workspace);
 end
 if resident+min([workers batch_size count])*peak>parameters.numerics.max_memory_bytes
     error('cce_schedule:memory','Raw ledger and simultaneous dense storage exceed memory budget.');

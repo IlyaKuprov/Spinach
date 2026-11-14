@@ -16,6 +16,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 - Finite drives and ideal bath/selective rotations require generalized CCE. Simultaneous finite drives are refused rather than implicitly combined.
 - Supplies piecewise segments with embedded cluster operators; exterior rotations update mean fields according to `meanfield=none|static`; static exterior ideal one-site rotations update the sampled field exactly.
 
+- The memory budget includes retained Hamiltonians, pulses and exterior expectations for every requested time and segment, before operator allocation; scheduler accounting includes each simultaneously active worker.
+
 ## Inputs and outputs
 
 ```matlab

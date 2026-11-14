@@ -14,6 +14,8 @@ Evaluate cluster/state tasks in deterministic indexed batches.
 - Runs serially by default; parallel.mode=clusters or states uses an existing pool started by create with explicit sys.parallel. The pool size and aggregate memory bounds are checked.
 - Can resume versioned checkpoints with matching physical identity. `parallel.max_tasks` provides an intentional incomplete-run checkpoint boundary.
 
+- The memory budget includes retained Hamiltonians, pulses and exterior expectations for every requested time and segment, before operator allocation; scheduler accounting includes each simultaneously active worker.
+
 ## Inputs and outputs
 
 ```matlab

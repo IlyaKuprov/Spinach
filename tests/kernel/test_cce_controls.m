@@ -88,6 +88,27 @@ for k=1:numel(mesh)
 end
 result=test_true(result,'Piecewise midpoint refinement is second order',all(waveform_errors(1:end-1)./waveform_errors(2:end)>3.8),'Piecewise midpoint refinement is second order');
 
+% Bound the retained time-by-segment matrices before compiling controls
+q=p; q.times=linspace(0,0.1,100); q.sequence=struct('name','xy8','count',8,'axis','x','target',1);
+q.numerics.max_memory_bytes=1e5; rejected=false;
+try
+    cce_controls(model,2,context,[],q);
+catch err
+    rejected=strcmp(err.identifier,'cce_controls:memory');
+end
+result=test_true(result,'Retained control segment memory cap',rejected,...
+                 'The memory cap must cover all retained Hamiltonians and pulses across requested times.');
+
+% Apply the same retained-control bound through the public scheduled driver
+q.numerics.max_memory_bytes=5e5; rejected=false;
+try
+    cce(model.spin_system,q);
+catch err
+    rejected=strcmp(err.identifier,'cce_schedule:memory');
+end
+result=test_true(result,'Scheduled retained control memory cap',rejected,...
+                 'The public driver must reserve the time-by-segment storage on active workers.');
+
 % Check literal XY8 phases and analytic UDD timestamps
 p.sequence=struct('name','xy8','count',8,'axis','x','target',1);
 s=cce_controls(model,2,[],[],p);

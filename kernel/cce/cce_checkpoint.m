@@ -10,6 +10,17 @@
 % closes a same-directory temporary before atomic POSIX replacement;
 % an existing file with different identity is never overwritten.
 %
+% Inputs:
+%   filename - MAT checkpoint path.
+%   action - read, write, or validate.
+%   state - version 1 identity, payload, task_ids, completed, records and
+%   checksum; for reading, expected identity and task_ids.
+%
+% Outputs:
+%   state - validated/read/written checkpoint state.
+%
+% See also cce_schedule.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function state=cce_checkpoint(filename,action,state)

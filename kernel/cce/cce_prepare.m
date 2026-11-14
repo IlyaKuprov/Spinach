@@ -8,6 +8,20 @@
 % Optional hamiltonian_backend is auto, direct, or stock (default auto).
 % The model stores rad/s tensors; isotope conversion is never repeated.
 %
+% Inputs:
+%   spin_system - output of create, not unconverted sys/inter.
+%   parameters - central_spins, bath_spins, assumptions (name or
+%   {name,retention}), Euler orientation in rad, interaction_cutoff in
+%   Angstrom, and numerics.atol, rtol, max_memory_bytes; optional central and
+%   hamiltonian_backend.
+%
+% Outputs:
+%   model - canonical source metadata, physical IDs and maps, local and pair
+%   interactions, central projectors when supplied, backend capability and
+%   content hash.
+%
+% See also cce_hamiltonian, cce_project.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function model=cce_prepare(spin_system,parameters)

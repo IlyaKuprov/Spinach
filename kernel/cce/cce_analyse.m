@@ -13,6 +13,18 @@
 % Invalid or nondecaying/oscillatory fitting windows are refused with
 % warnings in the returned structure, never silently deleted or clipped.
 %
+% Inputs:
+%   result - times, value and valid.
+%   parameters.analysis - fit (default false); when enabled: observable
+%   column, envelope, model, interval in seconds, positive weights,
+%   confidence and confidence_level.
+%
+% Outputs:
+%   analysis - retained data/masks, status, warnings and fit
+%   parameters/diagnostics.
+%
+% See also cce_diagnostics.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function analysis=cce_analyse(result,parameters)

@@ -14,6 +14,20 @@
 % Optional spectrum.modulation is a real column on the ORIGINAL time
 % mesh: filter=|integral y(t)exp(+i*omega*t)dt|^2, in seconds squared.
 %
+% Inputs:
+%   times - time samples in seconds.
+%   correlation - time-by-observable complex correlations.
+%   parameters.spectrum - frequency_grid (rad/s), convention=exp(+i*omega*t),
+%   sidedness=two-sided|one-sided, window=none|hann,
+%   time_domain=full|positive, weights=trapezoid|rectangle; positive-time
+%   extension additionally requires stationary=true.
+%
+% Outputs:
+%   spectrum - angular-frequency grid, transformed values and declared
+%   convention/quadrature metadata.
+%
+% See also cce_noise.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function spectrum=cce_spectrum(times,correlation,parameters)

@@ -10,6 +10,19 @@
 % Generalized values come from cce_observe; full density is also retained.
 % Static eigensystem propagation reports residual-derived forward bounds.
 %
+% Inputs:
+%   model, cluster, context, schedule, parameters - prepared model; record
+%   with id and sites (id=0, empty sites for baseline); one state context;
+%   compiled sequence; method, observable and numerics.
+%
+% Outputs:
+%   raw - cluster/state/configuration IDs, value, valid, abs_error_bound,
+%   central density where applicable, and propagation diagnostics.
+%
+% See also cce_hamiltonian, cce_observe, cce_reduce.
+% Reference: https://doi.org/10.1103/PhysRevB.78.085315
+% Reference: https://doi.org/10.1103/PRXQuantum.2.010311
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_cluster(model,cluster,context,schedule,parameters)

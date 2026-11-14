@@ -20,10 +20,20 @@
 % finite or entangling exterior pulses are explicitly refused. Conditional
 % CCE refuses central finite drive; general controls require gCCE.
 %
-% Inputs: canonical model; retained bath site IDs; cce_states context
-% (empty for schedule compilation only); compiled or empty schedule;
-% validated CCE parameters. Outputs: segment data above, and for gCCE
-% segments.raw with propagated central densities and cce_reduce fields.
+% Inputs:
+%   model, sites, context - physical model, included bath IDs and one global
+%   state assignment.
+%   schedule - compiled schedule, or [] to compile parameters.
+%   parameters - sequence/control fields, optional DEER and meanfield_radius
+%   settings; finite events specify target, placement, at, duration in
+%   seconds, axis, amplitude and detuning in rad/s.
+%
+% Outputs:
+%   segments - schedule, selected_sites, durations, hamiltonians, pulses and
+%   exterior_expectations indexed by time then segment; generalized
+%   propagation also returns raw with central densities and reducer fields.
+%
+% See also cce_sequence, cce_cluster.
 %
 % ilya.kuprov@weizmann.ac.il
 

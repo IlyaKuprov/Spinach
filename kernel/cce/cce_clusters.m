@@ -18,6 +18,19 @@
 % family_id is the exact canonical family string, not a collision-prone
 % numeric hash. context_id=0 denotes the shared unconditioned context.
 %
+% Inputs:
+%   model, graph - prepared model and physical connectivity.
+%   parameters - order, optional groups (default singleton sites), explicit
+%   group-ID clusters, and cluster_cap (default Inf); frozen partition groups
+%   are passed in by the driver.
+%
+% Outputs:
+%   clusters - ordered records with stable IDs, physical sites, order,
+%   groups, hilbert_dim, proper-subcluster references, per-order reduction
+%   powers, score, tuple_id and closure_only.
+%
+% See also cce_graph, cce_partition, cce_reduce.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function clusters=cce_clusters(model,graph,parameters)

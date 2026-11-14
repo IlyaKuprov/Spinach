@@ -8,6 +8,18 @@
 % Static exterior coherent fields are retained, not exterior dissipators.
 % Multiplicative populations are not a generally valid T1 approximation.
 %
+% Inputs:
+%   model, cluster, context, schedule, parameters - local physical/state
+%   inputs, method, ideal sequence, explicit dissipation jumps and numerical
+%   limits.
+%
+% Outputs:
+%   raw - cluster observable/density, validity and numerical error metadata
+%   for cce_reduce.
+%
+% See also cce_liouvillian, cce_observe.
+% Reference: https://doi.org/10.1103/PhysRevLett.132.250401
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_master(model,cluster,context,schedule,parameters)

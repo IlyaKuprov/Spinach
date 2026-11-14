@@ -19,6 +19,21 @@
 % follows bath_ids. gCCE retains edges between bath sites attached to
 % the same connected central register unless approximate=true.
 %
+% Inputs:
+%   model - physical IDs, central/bath IDs, multiplicities, coordinates in
+%   Angstrom and pair records (ids, real Cartesian tensor in rad/s).
+%   parameters.graph - mode; mode-specific radius (Angstrom), threshold
+%   (rad/s), or adjacency; score is coupling_norm (default), resonance
+%   (mismatch matrix and positive mismatch_scale, both rad/s), or supplied
+%   (scores matrix); optional bath_radius defaults to Inf.
+%
+% Outputs:
+%   graph - bath_ids, sparse logical adjacency, scores, pair_norm,
+%   central_mediated, approximate, omitted_bath_ids, selection_mode and
+%   requires_convergence.
+%
+% See also cce_clusters, cce_partition.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function graph=cce_graph(model,parameters)

@@ -9,6 +9,18 @@
 % reasons, time coverage and density tests are reported independently;
 % no normalization, positivity projection or sample censoring is done.
 %
+% Inputs:
+%   model - prepared physical model; raw - cell of cluster-record arrays.
+%   result - CCE value, valid mask, abs_error_bound, and optional
+%   density/sampling_standard_error.
+%   parameters - numerical tolerances and observable declarations.
+%
+% Outputs:
+%   diagnostics - numerical/conditioning, cluster, sample and density
+%   diagnostic fields.
+%
+% See also cce, cce_reduce.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function diagnostics=cce_diagnostics(model,raw,result,parameters)

@@ -4,24 +4,18 @@
 %                  partition=cce_partition(model,graph,parameters)
 %
 % Inputs:
-%     model      - canonical physical-spin metadata from cce_prepare
-%     graph      - physical bath graph from cce_graph
-%     parameters - CCE parameters; partition.mode is user, coupling, or
-%                  spatial. Empty groups default to singleton bath spins.
-%                  max_dimension bounds every group and exact bath patch.
-%                  Spatial mode requires group_count and max_rounds.
-%                  partition.adaptive defaults to false; if true, requires
-%                  patches, pilot_contexts, heldout_contexts, patch_atol,
-%                  patch_rtol, max_rounds, and max_probes. Contexts use the
-%                  fixed cce_states API. Legacy mode adaptive starts with
-%                  user groups, or singletons if no groups are supplied.
+%   model, graph - canonical model and bath connectivity.
+%   parameters.partition - mode, max_group_size, max_group_dimension, and
+%   mode-specific groups or pilot fields. order_semantics is max_groups
+%   (default), disjoint, or disjoint_inter; see the source header for pilot
+%   score and holdout fields.
 %
 % Outputs:
-%     partition  - frozen groups, dimensions, complete flag, and diagnostics
+%   partition - frozen groups and IDs, group-level graph/order metadata, and
+%   pilot/validation diagnostics.
 %
-% Exact-patch success is local validation, not a global convergence proof.
-% Disjoint is group order one; disjoint_inter includes pair-group factors.
-% Adaptive regrouping is accepted only if the same pilot objective falls.
+% See also cce_clusters, cce_graph.
+% Reference: https://doi.org/10.1103/PhysRevB.110.L220302
 %
 % ilya.kuprov@weizmann.ac.il
 

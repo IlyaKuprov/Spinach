@@ -60,6 +60,7 @@ corresponding `spinach-knowledge/interfaces/pdb_bmrb/` entries.
 | Dissipation, kinetics, equilibrium, thermalisation | [Relaxation](references/relaxation.md) |
 | Experiment adaptation, imaging, optimal control, advanced solvers | [Example recipes](references/recipes.md) |
 | Radiation damping and shared-coil feedback | [Radiation damping recipes](references/recipes.md#radiation-damping-and-shared-coil-feedback) |
+| Central-spin decoherence, CCE/gCCE, partitioned or open-system clusters | [Cluster correlation expansions](references/cce.md) |
 | Error messages, memory growth, convergence, silent wrong results | [Pitfalls](references/pitfalls.md) |
 | Executing a job, checking physics, reporting evidence | [Execution and validation](references/validation.md) |
 | Library edit, test, knowledge entry, pull request | [Development](references/development.md) |

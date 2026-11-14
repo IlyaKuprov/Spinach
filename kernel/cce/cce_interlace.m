@@ -11,11 +11,20 @@
 % configurations are unique and weights are conditional probabilities.
 % The distribution signature records assignments and weights exactly.
 %
-% Inputs: model from cce_prepare; cluster with id/sites; ensemble from
-% cce_states; schedule from cce_sequence; validated CCE parameters.
-% Outputs: raw.value/valid/abs_error_bound and conditional distribution;
-% raw.factor/factor_valid/factor_abs_error_bound are the irreducible
-% shared-K factors. interlaced.raw_only=true skips factor construction.
+% Inputs:
+%   model, cluster, ensemble, schedule, parameters - physical model, selected
+%   cluster, complete sampled ensemble, compiled sequence and interlaced
+%   settings.
+%   parameters.interlaced - max_states, reference_state (ensemble context
+%   index), optional condition_sites cell array; an optional evaluator
+%   function handle supports open-system/noise dispatch.
+%
+% Outputs:
+%   raw - conditional raw cluster observable with condition_sites and
+%   conditional-average diagnostics for consistent denominator reduction.
+%
+% See also cce_states, cce_reduce.
+% Reference: https://doi.org/10.1103/PhysRevB.86.035452
 %
 % ilya.kuprov@weizmann.ac.il
 

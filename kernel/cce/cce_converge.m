@@ -17,6 +17,18 @@
 % result is the baseline result with convergence_report and status
 % converged, limit_reached or not_converged; no physics is changed silently.
 %
+% Inputs:
+%   spin_system, parameters - physical model and ordinary CCE settings plus
+%   convergence.ladders (field and cell-row values), atol, rtol, max_work,
+%   and optional checks (cell of complete parameter structures).
+%
+% Outputs:
+%   result - baseline CCE result with convergence status, original
+%   input_parameters and convergence_report containing comparisons, work
+%   usage and acceptance metadata.
+%
+% See also cce, cce_diagnostics.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=cce_converge(spin_system,parameters)

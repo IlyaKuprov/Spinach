@@ -12,6 +12,19 @@
 % Each raw is Tr[B(t)B(0)rho]-Tr[B(t)rho]Tr[B(0)rho] when connected.
 % No stationarity, detailed balance, Gaussianity or T1 assumption is made.
 %
+% Inputs:
+%   model, cluster, context, schedule, parameters - cluster inputs;
+%   noise.ordering=ordered|symmetrized, logical connected, and terms with
+%   ordered bath support and operator matrices; optional noise.branch selects
+%   alpha or beta.
+%
+% Outputs:
+%   raw - time-dependent autocorrelation with the standard cluster IDs,
+%   validity and error fields; additive reduction is selected by method
+%   noise.
+%
+% See also cce_reduce, cce_spectrum.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_noise(model,cluster,context,schedule,parameters)

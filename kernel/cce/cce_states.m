@@ -11,6 +11,23 @@
 % state_id, configuration_id and weight. Exterior fields use these same
 % states for every cluster. No global random stream is modified.
 %
+% Inputs:
+%   model - prepared physical model.
+%   parameters.bath_state -
+%   mode=mixed_product|explicit_product|sampled|interlaced; explicit mode
+%   uses rho cells in bath-ID order. Sampled/interlaced modes require
+%   basis/probabilities (cells or the character uniform), positive integer
+%   samples, and explicit seed. central supplies the register
+%   state/projectors.
+%
+% Outputs:
+%   ensemble - central density, bath IDs, contexts, weights, assignments,
+%   mode, configuration ID and state IDs. Each context carries the same
+%   exterior assignment for all its clusters.
+%
+% See also cce_interlace, cce_cluster.
+% Reference: https://doi.org/10.1103/PhysRevB.79.115320
+%
 % ilya.kuprov@weizmann.ac.il
 
 function ensemble=cce_states(model,parameters)

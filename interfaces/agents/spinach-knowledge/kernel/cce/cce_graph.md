@@ -1,0 +1,34 @@
+# kernel/cce/cce_graph.m
+
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_graph.m)
+
+## Purpose
+
+Construct physical bath connectivity and deterministic cluster-selection scores.
+
+## Behaviour
+
+- Builds complete, distance, coupling-threshold or explicit adjacency graphs in stable bath-ID order.
+- Uses the spectral norm of the spin-operator pair interaction for coupling connectivity; generalized central-mediated connections are included when required by the method.
+- Checks explicit adjacency symmetry and a zero diagonal, and keeps disconnected vertices available to singleton clusters.
+
+## Inputs and outputs
+
+```matlab
+graph=cce_graph(model,parameters)
+```
+
+**Inputs**
+
+- `model` — physical IDs, central/bath IDs, multiplicities, coordinates in Angstrom and pair records (`ids`, real Cartesian `tensor` in rad/s).
+- `parameters.graph` — `mode`; mode-specific `radius` (Angstrom), `threshold` (rad/s), or `adjacency`; `score` is `coupling_norm` (default), `resonance` (mismatch matrix and positive mismatch_scale, both rad/s), or `supplied` (scores matrix); optional bath_radius defaults to Inf.
+
+**Outputs**
+
+- `graph` — bath_ids, sparse logical adjacency, scores, pair_norm, central_mediated, approximate, omitted_bath_ids, selection_mode and requires_convergence.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_graph.m)
+- [cce_clusters.m](cce_clusters.md)
+- [cce_partition.m](cce_partition.md)

@@ -23,6 +23,27 @@
 % uncertainty is zero and every denominator is resolved. Complete bath
 % exact-reference bypass belongs to cce.m, not this algebraic reducer.
 %
+% Inputs:
+%   raw - records with cluster_id, time-by-observable value, logical valid,
+%   and nonnegative abs_error_bound.
+%   clusters - ordered subset-closed records from cce_clusters.
+%   parameters - method, numerical tolerances; optional reducer=powers|direct
+%   (default powers), numerics.zero_policy=mask|error (default mask).
+%
+% Outputs:
+%   reduced - values, validity/error/reason arrays, by-order results,
+%   cluster/cumulant and conditioning diagnostics.
+%
+% Multiplicative convention: F(empty)=1; F(C)=L(C)/L(empty),
+% K(C)=F(C)/product(K(S), nonempty proper S subset C), and
+% L_approx=L(empty)*product(K(C), retained nonempty C).
+% For noise, K(C)=L(C)-L(empty)-sum(K(S), proper nonempty S),
+% and L_approx=L(empty)+sum(K(C)). Masks remain explicit;
+% unresolved denominators are never replaced by epsilon.
+%
+% See also cce_clusters, cce.
+% Reference: https://doi.org/10.1103/PhysRevB.78.085315
+%
 % ilya.kuprov@weizmann.ac.il
 
 function reduced=cce_reduce(raw,clusters,parameters)

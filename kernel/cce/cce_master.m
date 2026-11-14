@@ -54,6 +54,9 @@ nt=numel(schedule.times); densities=complex(zeros(d0,d0,nt)); values=complex(zer
 % Select the vector exponential-action branch without rebuilding a basis
 engine=model.spin_system; engine.bas.formalism='sphten-liouv';
 
+% Disable stock entry chopping because the CCE bound assumes full precision
+engine.tols.prop_chop=0;
+
 % Compile ideal physical controls before selecting the propagated block
 pulses=cell(1,numel(schedule.events));
 for j=1:numel(pulses), pulses{j}=pulse_matrix(schedule.events(j),meta.hamiltonian,model); end

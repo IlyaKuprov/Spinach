@@ -20,6 +20,19 @@ r=cce(s,p); expected=exp(-(rate/2+2.3i)*p.times)/2;
 result=test_close(result,'C7 numerical check',squeeze(r.density(1,2,:)),expected(:),1e-12,1e-12,'Damping coherence rate and sign.');
 result=test_close(result,'C7 numerical check',squeeze(r.density(2,2,:)),exp(-rate*p.times(:))/2,1e-12,1e-12,'Excited population decay.');
 
+% Resolve a weak dissipator below the stock generator clean-up threshold
+weak=p; weak.times=[0 1]; weak.jumps.rate=1e-5; weak.numerics.propagator='stock';
+weak.central.rho=diag([1 0]); weak.jumps.operator=[0 0;1 0];
+weak.numerics.atol=1e-8; weak.numerics.rtol=1e-8;
+small=s; small.inter.zeeman.matrix{1}=zeros(3);
+small.tols.small_matrix=1; small.tols.prop_chop=1e-4;
+clean=cce(small,weak); population_error=abs(clean.density(1,1,end)-exp(-1e-5));
+result=test_true(result,'Stock ME clean-up error covered',...
+                 population_error<=clean.abs_error_bound(end,1),...
+                 'The reported bound must cover weak dissipators below stock prop_chop.');
+result=test_close(result,'Stock ME weak damping retained',clean.density(1,1,end),exp(-1e-5),...
+                  1e-12,1e-12,'A CCE propagation budget cannot silently discard a physical jump.');
+
 % Check the dephasing convention D[sigma_z] at the declared rate
 p.jumps.operator=diag([1 -1]); r=cce(s,p);
 expected=exp(-(2*rate+2.3i)*p.times)/2;

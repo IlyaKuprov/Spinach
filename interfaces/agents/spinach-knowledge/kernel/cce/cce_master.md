@@ -18,6 +18,8 @@ Propagate open-system conditional or generalized cluster dynamics.
 
 - Explicit operator pulses target the complete ordered central register or one physical site; unsupported multi-site targets are rejected instead of ignored.
 
+- Stock propagation uses a local copy with `prop_chop=0`: generator, Taylor-term and squaring clean-up must not discard dynamics outside the reported numerical bound. The caller's tolerance policy is unchanged.
+
 ## Inputs and outputs
 
 ```matlab

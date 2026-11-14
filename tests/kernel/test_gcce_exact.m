@@ -87,8 +87,11 @@ for pure=[false true]
         mineig=min(mineig,min(actual.diagnostics.minimum_eigenvalue));
     end
 end
-result.metrics.maximum_raw_error=maximum; result.metrics.trace_error=trace_error;
-result.metrics.hermiticity_error=hermiticity; result.metrics.minimum_eigenvalue=mineig;
+metrics.maximum_raw_error=maximum; metrics.trace_error=trace_error;
+metrics.hermiticity_error=hermiticity; metrics.minimum_eigenvalue=mineig;
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

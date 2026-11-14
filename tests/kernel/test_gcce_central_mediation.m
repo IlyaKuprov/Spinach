@@ -42,8 +42,11 @@ result=test_close(result,'exact pair',second.value,reference,1e-11,1e-11,...
 difference=max(abs(first.value-second.value));
 result=test_true(result,'nonfactorization measured',difference>1e-2,...
                  'Central exchange creates a nonzero irreducible bath-pair factor.');
-result.metrics.first_order_error=difference;
-result.metrics.full_order_error=max(abs(second.value-reference));
+metrics.first_order_error=difference;
+metrics.full_order_error=max(abs(second.value-reference));
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

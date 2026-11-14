@@ -73,7 +73,10 @@ for f=1:numel(data)
     result=test_true(result,'CCEX printed curve',errors(f)<=budget,...
                      'Half the last printed unit plus measured propagation/reduction bound.');
 end
-result.metrics.maximum_errors=errors;
+metrics.maximum_errors=errors;
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

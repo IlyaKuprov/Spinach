@@ -110,10 +110,13 @@ result=test_true(result,'spin-one selective distinction',...
     norm(expm(-1i*pi*sx)-expm(-1i*pi*(a*b'+b*a')/2),'fro')>1,...
     'A full physical spin-one pi rotation is not a selective two-state gate.');
 
-result.metrics.trace_error=max(actual.diagnostics.trace_error);
-result.metrics.hermiticity_error=max(actual.diagnostics.hermiticity_error);
-result.metrics.minimum_eigenvalue=min(actual.diagnostics.minimum_eigenvalue);
-result.metrics.masked_elements=nnz(~reduced.valid);
+metrics.trace_error=max(actual.diagnostics.trace_error);
+metrics.hermiticity_error=max(actual.diagnostics.hermiticity_error);
+metrics.minimum_eigenvalue=min(actual.diagnostics.minimum_eigenvalue);
+metrics.masked_elements=nnz(~reduced.valid);
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

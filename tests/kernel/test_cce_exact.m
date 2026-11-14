@@ -93,7 +93,10 @@ for pure=[false true]
         result=test_true(result,'full order bypass',actual.exact_reference,'Independent analytic or dense reference.');
     end
 end
-result.metrics.maximum_raw_error=maximum; result.metrics.maximum_bound=max_bound;
+metrics.maximum_raw_error=maximum; metrics.maximum_bound=max_bound;
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

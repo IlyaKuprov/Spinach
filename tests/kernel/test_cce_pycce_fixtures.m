@@ -94,8 +94,11 @@ for f=1:numel(fixtures)
     result=test_close(result,'PyCCE reduction only',reduced.value,reference,...
                       rounding,rounding,'Same raw traces, independently compiled subset powers.');
 end
-result.metrics.raw_errors=raw_errors; result.metrics.final_errors=final_errors;
-result.metrics.maximum_raw_bounds=bounds;
+metrics.raw_errors=raw_errors; metrics.final_errors=final_errors;
+metrics.maximum_raw_bounds=bounds;
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

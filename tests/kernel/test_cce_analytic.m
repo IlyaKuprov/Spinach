@@ -52,8 +52,11 @@ result=test_close(result,'empty bath phase',empty.value,exp(-1i*phase*p.times(:)
 p.bath_spins=2; p.order=1; spin_system.inter.coupling.matrix{1,2}=zeros(3);
 uncoupled=cce(spin_system,p);
 result=test_close(result,'uncoupled bath',uncoupled.value,empty.value,1e-11,1e-11,'Independent analytic or dense reference.');
-result.metrics.fid_error=max(abs(fid.value-reference_fid(ha,hb,phase,p.times)));
-result.metrics.hahn_error=max(abs(echo.value-reference));
+metrics.fid_error=max(abs(fid.value-reference_fid(ha,hb,phase,p.times)));
+metrics.hahn_error=max(abs(echo.value-reference));
+
+% Report the measured metrics
+disp(metrics);
 
 end
 

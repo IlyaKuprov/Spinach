@@ -1,6 +1,6 @@
 % Evaluate CCE state/cluster tasks in deterministic indexed batches. Syntax:
 %
-%          raw=cce_schedule(model,clusters,ensemble,schedule,parameters)
+%     raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 %
 % raw is a cell per input context, containing the empty-cluster record
 % followed by cluster records in input order. Tasks execute in ascending
@@ -14,10 +14,13 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function raw=cce_schedule(model,clusters,ensemble,schedule,parameters)
+function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 
 % Validate immutable inputs and choose one outer parallel layer
 grumble(model,clusters,ensemble,schedule,parameters);
+
+% Default to the closed-system cluster evaluator
+if nargin<6, evaluator=@cce_cluster; end
 mode='serial'; batch_size=1; max_tasks=Inf; workers=1;
 if isfield(parameters,'parallel')
     if isfield(parameters.parallel,'mode'), mode=parameters.parallel.mode; end
@@ -51,8 +54,8 @@ for k=0:numel(clusters)
     sites=[];
     if k>0, sites=clusters(k).sites; end
     db=prod(model.multiplicities(sites)); dimension=dc*db;
-    if strcmp(parameters.method,'cce'), dimension=db; end
-    if strcmp(parameters.method,'lindblad'), dimension=dimension^2; end
+    if ismember(parameters.method,{'cce','mecce','noise'}), dimension=db; end
+    if ismember(parameters.method,{'mecce','megcce'}), dimension=dimension^2; end
     peak=max(peak,16*(24+numel(schedule.events))*dimension^2);
 end
 if resident+peak>parameters.numerics.max_memory_bytes
@@ -115,11 +118,11 @@ for first=1:batch_size:numel(missing)
     end
     if strcmp(mode,'serial')
         for j=1:numel(indices)
-            records{j}=cce_cluster(model,task_clusters{j},task_contexts{j},schedule,parameters);
+            records{j}=evaluator(model,task_clusters{j},task_contexts{j},schedule,parameters);
         end
     else
         parfor (j=1:numel(indices),workers)
-            records{j}=cce_cluster(model,task_clusters{j},task_contexts{j},schedule,parameters);
+            records{j}=evaluator(model,task_clusters{j},task_contexts{j},schedule,parameters);
         end
     end
     state.records(indices)=records; state.completed(indices)=true;

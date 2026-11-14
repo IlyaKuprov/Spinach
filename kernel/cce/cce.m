@@ -29,17 +29,10 @@ ensemble=cce_states(model,parameters); schedule=cce_sequence(model,parameters);
 graph=cce_graph(model,parameters); clusters=cce_clusters(model,graph,parameters);
 
 % Propagate each globally assigned bath state before ensemble reduction
-ns=numel(ensemble.contexts); all_raw=cell(1,ns); reductions=cell(1,ns);
-empty=struct('id',uint64(0),'sites',[]);
+ns=numel(ensemble.contexts); reductions=cell(1,ns);
+all_raw=cce_schedule(model,clusters,ensemble,schedule,parameters);
 full_index=find(arrayfun(@(c) isequal(sort(c.sites),sort(model.bath_ids)),clusters),1);
 if isempty(model.bath_ids), full_index=0; end
-for s=1:ns
-    records=cce_cluster(model,empty,ensemble.contexts(s),schedule,parameters);
-    for k=1:numel(clusters)
-        records(k+1)=cce_cluster(model,clusters(k),ensemble.contexts(s),schedule,parameters);
-    end
-    all_raw{s}=records;
-end
 
 % Distinguish average-of-expansions from an explicitly requested internal average
 averaging='after_expansion';
@@ -127,18 +120,8 @@ result.budget_satisfied=result.valid&...
 if strcmp(parameters.quantity,'density')
     d=ensemble.central_dimension; nt=numel(parameters.times);
     result.density=reshape(result.value.',d,d,nt);
-    result.diagnostics.trace_error=nan(nt,1);
-    result.diagnostics.hermiticity_error=nan(nt,1);
-    result.diagnostics.minimum_eigenvalue=nan(nt,1);
-    for k=1:nt
-        rho=result.density(:,:,k);
-        if all(isfinite(rho),'all')
-            result.diagnostics.trace_error(k)=abs(trace(rho)-1);
-            result.diagnostics.hermiticity_error(k)=norm(rho-rho','fro');
-            result.diagnostics.minimum_eigenvalue(k)=min(eig((rho+rho')/2));
-        end
-    end
 end
+result.diagnostics=cce_diagnostics(model,all_raw,result,parameters);
 
 end
 
@@ -174,15 +157,9 @@ end
 if strcmp(parameters.bath_state.mode,'interlaced')
     error('cce:capability','Interlaced states require cce_interlace.');
 end
-for name={'drive','relaxation','convergence','checkpoint','control','pulse_family','time_axes'}
+for name={'drive','relaxation','convergence','control','pulse_family','time_axes'}
     if isfield(parameters,name{1})&&~isempty(parameters.(name{1}))
         error('cce:capability','Requested %s extension is not available in this baseline.',name{1});
-    end
-end
-if isfield(parameters,'parallel')&&~isempty(parameters.parallel)
-    if ~isstruct(parameters.parallel)||~isfield(parameters.parallel,'mode')||...
-       ~strcmp(parameters.parallel.mode,'serial')
-        error('cce:capability','Nonserial execution requires cce_schedule.');
     end
 end
 if isfield(parameters.numerics,'precision')&&~strcmp(parameters.numerics.precision,'double')

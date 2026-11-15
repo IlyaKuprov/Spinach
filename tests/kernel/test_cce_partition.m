@@ -227,6 +227,29 @@ for mode={'partition','disjoint','disjoint_inter'}
                       ones(size(exact)),2e-12,2e-12,'Only the empty-cluster baseline remains.');
 end
 
+% Traverse unresolved density reductions until the full three-spin patch is retained
+for method={'gcce','megcce'}
+    q=choices(); q.method=method{1}; q.quantity='density'; q.rho0=diag([1 0]);
+    q.times=[0 1e-4]; q.sequence=[]; q.expansion='partition'; q.order=1;
+    q.groups={2,3,4};
+    if strcmp(method{1},'megcce')
+        q.jumps=struct('support',{},'operator',{},'rate',{}); q.numerics=rmfield(q.numerics,'propagator');
+    end
+    local_model=cce_prepare(spin_system,q); states=cce_states(local_model,q);
+    q.partition=struct('mode','user','adaptive',true,'max_dimension',8,...
+        'patch_atol',1e-10,'patch_rtol',1e-10,'max_rounds',2,'max_probes',100,...
+        'patches',{{2:4}},'pilot_configs',states.spin_configs,'heldout_configs',states.spin_configs);
+    local_graph=cce_graph(local_model,q); adapted=cce_partition(local_model,local_graph,q);
+    result=test_true(result,['Unresolved density intermediate ' method{1}],...
+                     adapted.complete&&isequal(adapted.groups,{2:4})&&...
+                     adapted.diagnostics.rounds==2&&~isempty(adapted.diagnostics.heldout_error),...
+                     'Two bounded merges must reach and validate the exact three-spin density patch.');
+    q.partition.max_rounds=1; limited=cce_partition(local_model,local_graph,q);
+    result=test_true(result,['Unresolved density round ceiling ' method{1}],...
+                     ~limited.complete&&numel(limited.groups)==2,...
+                     'An unresolved intermediate may advance but cannot be accepted.');
+end
+
 % Keep the group partition compatible with generalized observed-density dynamics
 general=choices(); general.method='gcce'; general.quantity='density';
 general.rho0=ones(2)/2;

@@ -42,3 +42,5 @@ Adaptive pilot and held-out validation use the raw complete-patch record when th
 - [cce_clusters.m](cce_clusters.md)
 - [cce_graph.m](cce_graph.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.110.L220302)
+
+Unresolved (infinite-objective) reductions may take a deterministic capacity-limited pair merge even when the objective remains infinite. Each merge reduces the number of groups, and round/probe ceilings still apply. Such an intermediate is never accepted: the selected partition must pass both pilot and held-out patch checks, including the exact-patch bypass when a full patch becomes reachable.

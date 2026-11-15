@@ -138,7 +138,8 @@ if adaptive&&complete
                 [value,candidate_errors,used,valid]=patches(candidate,p.pilot_configs,diagnostics.probes);
                 diagnostics.probes=used;
                 if ~valid, break; end
-                if value<best
+                % Allow bounded progress through unresolved intermediate reductions
+                if value<best||(isinf(value)&&isinf(best)&&~accepted)
                     best=value; selected=candidate; accepted=true; selected_errors=candidate_errors;
                 end
             end

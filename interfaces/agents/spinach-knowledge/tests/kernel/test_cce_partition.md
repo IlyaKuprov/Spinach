@@ -61,3 +61,5 @@ result=test_cce_partition()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+The `Unresolved density intermediate gcce` and `Unresolved density intermediate megcce` checks require two bounded merges from three singleton groups to an exact, pilot- and held-out-validated density patch. The matching `Unresolved density round ceiling` checks require the first, still unresolved intermediate to remain incomplete.

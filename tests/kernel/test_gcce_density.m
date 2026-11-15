@@ -14,20 +14,20 @@ sys.disable={'hygiene'}; sys.parallel={'local',1};
 inter.zeeman.matrix={zeros(3),zeros(3)}; inter.coupling.matrix=cell(2);
 spin_system=create(sys,inter); spin_system.inter.zeeman.matrix{1}(3,1)=100;
 spin_system.inter.coupling.matrix{1,2}=diag([31 43 57]);
-p.central_spins=1; p.bath_spins=2; p.method='gcce'; p.expansion='standard';
-p.quantity='density'; p.central.rho=[1 0;0 0]; p.assumptions='labframe';
+p.observed_spins=1; p.bath_spins=2; p.method='gcce'; p.expansion='standard';
+p.quantity='density'; p.rho0=[1 0;0 0]; p.assumptions='labframe';
 p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
 p.graph=struct('mode','complete','score','coupling_norm');
 p.meanfield='none'; p.times=[0 pi/200 pi/100]; p.sequence=[];
 p.bath_state=struct('mode','mixed_product');
 p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
-% Exact full-bath density must stay finite at zero central-only elements
+% Exact full-bath density must stay finite at zero observed-spin-only elements
 p.order=1; actual=cce(spin_system,p);
 result=test_true(result,'full-order bypass finite',all(actual.valid,'all'),...
                  'Exact reduced density does not require a baseline division.');
-result=test_close(result,'initial density',actual.density(:,:,1),p.central.rho,1e-12,0,...
-                  'Zero duration returns the supplied central density.');
+result=test_close(result,'initial density',actual.density(:,:,1),p.rho0,1e-12,0,...
+                  'Zero duration returns the supplied observed density.');
 result=test_true(result,'unit trace',max(actual.diagnostics.trace_error)<1e-12,...
                  'Unitary full-system propagation preserves partial-trace normalization.');
 result=test_true(result,'Hermitian',max(actual.diagnostics.hermiticity_error)<1e-12,...
@@ -37,9 +37,9 @@ result=test_true(result,'positive',min(actual.diagnostics.minimum_eigenvalue)>-1
 
 % Force a truncated family with a zero baseline and retain the raw record
 p.bath_spins=2; p.order=0; truncated=cce(spin_system,p);
-result=test_true(result,'central baseline preserved',all(isfinite(truncated.value),'all'),...
-                 'Order zero returns the direct central-only density.');
-p.order=1; p.bath_spins=2; p.central_spins=1;
+result=test_true(result,'observed baseline preserved',all(isfinite(truncated.value),'all'),...
+                 'Order zero returns the direct observed-spin-only density.');
+p.order=1; p.bath_spins=2; p.observed_spins=1;
 model=cce_prepare(spin_system,p); graph=cce_graph(model,p); clusters=cce_clusters(model,graph,p);
 records=actual.raw{1}; reduced=cce_reduce(records,clusters,p);
 result=test_true(result,'elementwise baseline zeros masked',any(~reduced.valid,'all'),...
@@ -48,22 +48,22 @@ result=test_true(result,'raw density retained',all(isfinite(records(2).value),'a
                  'Masking factors does not destroy direct raw density information.');
 
 % Reject nonpositive densities and unresolved initial scalar normalization
-bad=p; bad.central.rho=diag([1.1 -0.1]); caught=false;
+bad=p; bad.rho0=diag([1.1 -0.1]); caught=false;
 try
     cce_states(model,bad);
 catch
     caught=true;
 end
 result=test_true(result,'negative input rejected',caught,'State positivity is checked.');
-bad=p; bad.quantity='coherence'; bad.normalized=true;
-bad.central.alpha=[1;0]; bad.central.beta=[0;1]; caught=false;
+bad=p; bad.quantity='signal'; bad.normalized=true;
+bad.transition.alpha=[1;0]; bad.transition.beta=[0;1]; caught=false;
 try
-    cce_observe(bad.central.rho,bad);
+    cce_observe(bad.rho0,bad);
 catch
     caught=true;
 end
 result=test_true(result,'zero normalization rejected',caught,...
-                 'Initial zero coherence has no normalized scalar interpretation.');
+                 'Initial zero signal has no normalized scalar interpretation.');
 
 % Reproduce fixed and sampled product states without changing the global stream
 sample=p; sample.bath_state=struct('mode','sampled','samples',5,'seed',17,...
@@ -78,16 +78,16 @@ result=test_true(result,'reproducible assignments',isequal(ensemble.assignments,
                  'Explicit state IDs determine the stream independently of workers.');
 sample.bath_state.probabilities='uniform'; sample.meanfield='static';
 ensemble=cce_states(model,sample); schedule=cce_sequence(model,sample);
-small=cce_cluster(model,struct('id',0,'sites',[]),ensemble.contexts(1),schedule,sample);
-context=ensemble.contexts(1); field=model.retained{1,2}*context.expectations.';
+small=cce_cluster(model,struct('id',0,'sites',[]),ensemble.spin_configs(1),schedule,sample);
+spin_config=ensemble.spin_configs(1); field=model.retained{1,2}*spin_config.expectations.';
 x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2;
 h=100*x+field(1)*x+field(2)*y+field(3)*z;
 reference=zeros(numel(p.times),4);
 for k=1:numel(p.times)
-    u=expm(-1i*h*p.times(k)); rho=u*p.central.rho*u'; reference(k,:)=rho(:).';
+    u=expm(-1i*h*p.times(k)); rho=u*p.rho0*u'; reference(k,:)=rho(:).';
 end
 result=test_close(result,'static exterior exact',small.value,reference,1e-12,1e-12,...
-                  'Independent central-only Hamiltonian with the same exterior assignment.');
+                  'Independent observed-spin-only Hamiltonian with the same exterior assignment.');
 
 % Exercise both explicitly named sampling estimators at exact full order
 sample.quantity='density'; sample.order=1;
@@ -98,8 +98,8 @@ result=test_close(result,'full-order sampling estimators',after.value,internal.v
 result=test_true(result,'sample errors finite',all(isfinite(after.abs_error_bound),'all'),...
                  'Weighted sums retain explicit forward bounds.');
 
-% Distinguish selective qubit pulses from full spin-one rotations
-toy=model; toy.physical_ids=1; toy.central_ids=1; toy.multiplicities=3;
+% Distinguish selective selected two-level transition pulses from full spin-one rotations
+toy=model; toy.physical_ids=1; toy.observed_ids=1; toy.multiplicities=3;
 sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
                 'axis','x','angle',pi); sample.sequence=sequence;
 compiled=cce_sequence(toy,sample);
@@ -108,7 +108,7 @@ result=test_close(result,'explicit pulse timestamps',compiled.positions,p.times/
 a=[1;0;0]; b=[0;1;0]; sx=[0 1 0;1 0 1;0 1 0]/sqrt(2);
 result=test_true(result,'spin-one selective distinction',...
     norm(expm(-1i*pi*sx)-expm(-1i*pi*(a*b'+b*a')/2),'fro')>1,...
-    'A full physical spin-one pi rotation is not a selective two-state gate.');
+    'A full physical spin-one pi rotation is not a selective transition pulse.');
 
 metrics.trace_error=max(actual.diagnostics.trace_error);
 metrics.hermiticity_error=max(actual.diagnostics.hermiticity_error);

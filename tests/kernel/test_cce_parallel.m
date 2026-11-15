@@ -19,9 +19,9 @@ inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3); inter.coupling.matrix{1,2}=diag([0 0 17]);
 inter.coupling.matrix{1,3}=diag([0 0 29]);
 spin_system=create(sys,inter);
-p=struct('central_spins',1,'bath_spins',[2 3],'method','cce',...
-         'expansion','standard','quantity','coherence','times',[0 0.001 0.004],...
-         'order',2,'central',struct('alpha',[1;0],'beta',[0;1]),...
+p=struct('observed_spins',1,'bath_spins',[2 3],'method','cce',...
+         'expansion','standard','quantity','signal','times',[0 0.001 0.004],...
+         'order',2,'transition',struct('alpha',[1;0],'beta',[0;1]),...
          'assumptions','labframe','orientation',[0 0 0],'interaction_cutoff',Inf,...
          'graph',struct('mode','complete','score','coupling_norm'),...
          'meanfield','none','sequence',[],'averaging','after_expansion',...
@@ -56,11 +56,11 @@ p.parallel.mode='states'; states=cce(spin_system,p);
 result=test_close(result,'state scheduling',states.value,serial.value,0,0,...
                   'There is one outer parallel layer for either scheduling mode.');
 
-% Compare against independent analytic conditional Ising phases
+% Compare against independent analytic projected Ising phases
 assignments=serial.ensemble.assignments; magnetic=1.5-assignments;
 reference=mean(exp(-1i*(magnetic*[17;29])*2*pi.*p.times),1).';
-result=test_close(result,'analytic sampled coherence',serial.value,reference,1e-12,1e-12,...
-                  'Conditional phases follow the exact diagonal Ising Hamiltonian.');
+result=test_close(result,'analytic sampled signal',serial.value,reference,1e-12,1e-12,...
+                  'Projected phases follow the exact diagonal Ising Hamiltonian.');
 
 % Refuse oversized task ledgers and per-worker storage before propagation
 p.parallel.max_tasks=15; refused=false;
@@ -77,8 +77,8 @@ p.numerics.max_memory_bytes=2^26;
 model=cce_prepare(spin_system,p); graph=cce_graph(model,p);
 clusters=cce_clusters(model,graph,p); ensemble=cce_states(model,p);
 schedule=cce_sequence(model,p); p.parallel.mode='clusters';
-p.parallel.batch_size=2; count=numel(ensemble.contexts)*(numel(clusters)+1);
-nt=numel(schedule.times); dc=prod(model.multiplicities(model.central_ids));
+p.parallel.batch_size=2; count=numel(ensemble.spin_configs)*(numel(clusters)+1);
+nt=numel(schedule.times); dc=prod(model.multiplicities(model.observed_ids));
 metadata=whos('model','clusters','ensemble','schedule','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
 dimension=max([clusters.dimension])/dc;
@@ -95,7 +95,7 @@ end
 result=test_true(result,'Concurrent worker memory preflight',refused,...
                  'A cap fitting one workspace but not two must reject a two-worker batch before evaluation.');
 p.parallel.mode='serial'; accepted=cce_schedule(model,clusters,ensemble,schedule,p,@cce_cluster);
-result=test_true(result,'Single-worker memory preflight',numel(accepted)==numel(ensemble.contexts),...
+result=test_true(result,'Single-worker memory preflight',numel(accepted)==numel(ensemble.spin_configs),...
                  'The same cap must still admit one serial workspace.');
 fprintf('Memory cap %.0f bytes; one workspace %.0f; two-worker refusal %d.\n',...
         p.numerics.max_memory_bytes,workspace,refused);
@@ -115,12 +115,12 @@ end
 result=test_true(result,'Concurrent ME worker memory preflight',refused,...
                  'Each active ME task needs its own squared-Hilbert-space dense workspace.');
 
-% Bound full central-register construction separately from projected propagation
+% Bound full observed-observed-spin system construction separately from projected propagation
 large_sys=struct('isotopes',{repmat({'1H'},1,7)},'magnet',0,'output','hush',...
                  'disable',{{'hygiene'}},'parallel',{{'processes',2}});
-large_spin=create(large_sys,struct()); large=p; large.central_spins=1:6;
+large_spin=create(large_sys,struct()); large=p; large.observed_spins=1:6;
 large.bath_spins=7; large.order=1; large.times=[0 0.01]; large.method='cce';
-large=rmfield(large,'jumps'); large.central=struct('alpha',[1;zeros(63,1)],...
+large=rmfield(large,'jumps'); large.transition=struct('alpha',[1;zeros(63,1)],...
                                                'beta',[zeros(63,1);1]);
 large.bath_state=struct('mode','mixed_product'); large.parallel.batch_size=2;
 large.numerics.max_memory_bytes=2^28; large_model=cce_prepare(large_spin,large);
@@ -144,7 +144,7 @@ for method={'cce','mecce','noise'}
     full_workspace=16*(64*2)^2*(12+3*7);
     if strcmp(large.method,'mecce')
 
-        % Include both retained branch/spin caches and the active task cache
+        % Include both retained manifold/spin caches and the active task cache
         empty_cache=16*(3*6*64^2+2); full_cache=16*(3*7*128^2+2*2^2);
         resident=resident+3*(empty_cache+full_cache);
         full_workspace=full_workspace+full_cache;
@@ -156,22 +156,22 @@ for method={'cce','mecce','noise'}
         if ~strcmp(exception.identifier,'cce_schedule:memory'), rethrow(exception); end
         refused=true;
     end
-    result=test_true(result,['Full-register concurrent workspace ' large.method],refused,...
-                     'Two workers must reserve unprojected central-register storage as well as bath propagation.');
+    result=test_true(result,['Full-observed-spin system concurrent workspace ' large.method],refused,...
+                     'Two workers must reserve unprojected observed-observed-spin system storage as well as bath propagation.');
 
     % The same ceiling must still permit one worker and preserve its numerical result
     large.parallel.mode='serial';
     low=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
-    result=test_close(result,['Full-register serial parity ' large.method],...
+    result=test_close(result,['Full-observed-spin system serial parity ' large.method],...
                       low{1}(end).value,high{1}(end).value,0,0,...
                       'The memory guard must reject concurrency, not an individually fitting task.');
     large.parallel.mode='clusters';
-    fprintf('CCE full-register %s budget %.0f one workspace %.0f refused %d.\n',...
+    fprintf('CCE full-observed-spin system %s budget %.0f one workspace %.0f refused %d.\n',...
             large.method,large.numerics.max_memory_bytes,full_workspace,refused);
 end
 
-% Apply the caller's ceiling to full-register conditional jump construction too
-liouville=large; liouville.method='mecce'; liouville.quantity='coherence';
+% Apply the caller's ceiling to full-observed-spin system projected jump construction too
+liouville=large; liouville.method='mecce'; liouville.quantity='signal';
 liouville=rmfield(liouville,'noise');
 liouville.jumps=struct('support',1,'operator',diag([1 -1])/2,'rate',1);
 liouville.numerics.max_memory_bytes=2^28;
@@ -183,14 +183,14 @@ catch exception
     if ~strcmp(exception.identifier,'cce:memory'), rethrow(exception); end
     refused=true;
 end
-result=test_true(result,'Conditional full-register Liouvillian guard',refused,...
+result=test_true(result,'Projected full-observed-spin system Liouvillian guard',refused,...
                  'A projected 4-by-4 generator cannot hide its 128-by-128 physical jump matrices.');
-result=test_close(result,'Conditional jump independent dephasing',reference,-eye(4)/2,1e-14,1e-14,...
-                  'Opposite central Iz eigenvalues give a bath-independent coherence decay rate of one half.');
+result=test_close(result,'Projected jump independent dephasing',reference,-eye(4)/2,1e-14,1e-14,...
+                  'Opposite observed Iz eigenvalues give a bath-independent signal decay rate of one half.');
 
 % Count every observable column in closed and open-system resident records
-q=p; q.bath_state=struct('mode','mixed_product'); q.central.rho=eye(2)/2;
-q.quantity='observable'; q.operators=repmat({eye(2)},1,200);
+q=p; q.bath_state=struct('mode','mixed_product'); q.rho0=eye(2)/2;
+q.quantity='observable'; q.coil=repmat({eye(2)},1,200);
 q.times=linspace(0,1,301); q.parallel.mode='serial';
 q.numerics.max_memory_bytes=5000000; q.jumps=struct([]);
 for method={'gcce','megcce'}
@@ -203,14 +203,14 @@ for method={'gcce','megcce'}
     result=test_true(result,['observable column memory ' method{1}],refused,...
                      'The four time-by-operator records alone exceed five million bytes.');
     fprintf('R7 observable memory %s rejection %d raw minimum %d budget %d\n',...
-            method{1},refused,4*25*numel(q.times)*numel(q.operators),q.numerics.max_memory_bytes);
+            method{1},refused,4*25*numel(q.times)*numel(q.coil),q.numerics.max_memory_bytes);
 end
 
-% Retained ME branch, spin and jump operators accumulate across sampled tasks
+% Retained ME manifold, spin and jump operators accumulate across sampled tasks
 for method={'mecce','megcce'}
-    retained=struct('central_spins',1,'bath_spins',2,'order',1,...
-        'times',[0 1e-3],'method',method{1},'expansion','standard','quantity','coherence',...
-        'central',struct('alpha',[1;0],'beta',[0;1],'rho',ones(2)/2),...
+    retained=struct('observed_spins',1,'bath_spins',2,'order',1,...
+        'times',[0 1e-3],'method',method{1},'expansion','standard','quantity','signal',...
+        'transition',struct('alpha',[1;0],'beta',[0;1]),'rho0',ones(2)/2,...
         'assumptions','labframe','orientation',[0 0 0],'interaction_cutoff',Inf,...
         'graph',struct('mode','complete','score','coupling_norm'),...
         'meanfield','none','sequence',[],'averaging','after_expansion',...
@@ -256,7 +256,7 @@ for method={'mecce','megcce'}
         refused=strcmp(exception.identifier,'cce_schedule:memory');
     end
     result=test_true(result,[method{1} ' retained metadata memory'],refused,...
-                     'Every completed task retains its branch, spin and jump operator arrays.');
+                     'Every completed task retains its manifold, spin and jump operator arrays.');
     fprintf('%s retained operator payload %.0f bytes; cap %.0f; refused %d.\n',...
             method{1},payload,retained.numerics.max_memory_bytes,refused);
 end

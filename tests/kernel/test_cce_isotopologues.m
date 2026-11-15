@@ -27,8 +27,8 @@ result=test_close(result,'Complex configuration averaging occurs after each resu
 sys.isotopes={'E','1H','1H'}; sys.magnet=0; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'local',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,3); ss=create(sys,inter);
-p.central_spins=1; p.bath_spins=[2 3]; p.method='cce'; p.expansion='standard';
-p.quantity='coherence'; p.order=2; p.central.alpha=[1;0]; p.central.beta=[0;1];
+p.observed_spins=1; p.bath_spins=[2 3]; p.method='cce'; p.expansion='standard';
+p.quantity='signal'; p.order=2; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
 p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
 p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
 p.times=[0 0.001 0.003]; p.sequence=[]; p.bath_state.mode='mixed_product';

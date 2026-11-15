@@ -6,8 +6,8 @@
 % test_cce_pycce_data.json retains Stage-A inputs and complex raw traces.
 % kHz, ms, Gauss and rad/(ms Gauss) are converted explicitly to rad/s and s.
 % Alpha/beta are source eigenvectors including their relative gauge. PyCCE
-% observes the pulse-rotated central basis (and reverses Hahn branch products
-% in its conditional engine), so its one-pulse coherence is conjugated here.
+% observes the pulse-rotated observed basis (and reverses Hahn manifold products
+% in its projected engine), so its one-pulse signal is conjugated here.
 % Logical-pi PyCCE projections annihilate spectator levels; our physical
 % unitary preserves them. The discrepancy is separately measured, not hidden.
 %
@@ -29,6 +29,7 @@ for f=1:numel(fixtures)
     sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
     inter.zeeman.matrix=repmat({zeros(3)},1,nb+1); inter.coupling.matrix=cell(nb+1);
     spin_system=create(sys,inter); field=fixture.simulator.magnetic_field(:).';
+    % External PyCCE central labels map to the observed-spin Hamiltonian
     spin_system.inter.zeeman.matrix{1}(3,:)=-fixture.central.gyro*field*1000;
     D=fixture.central.D; E=fixture.central.E;
     spin_system.inter.coupling.matrix{1,1}=2*pi*1000*diag([-D/3+E -D/3-E 2*D/3]);
@@ -39,7 +40,7 @@ for f=1:numel(fixtures)
         spin_system.inter.zeeman.matrix{j+1}(3,:)=-type.gyro*field*1000;
         spin_system.inter.coupling.matrix{1,j+1}=2*pi*1000*squeeze(fixture.bath.A(j,:,:)).';
 
-        % Conventional reference CCE explicitly retains only central Sz coupling
+        % Conventional reference CCE explicitly retains only observed Sz coupling
         if strcmp(fixture.compute.method,'cce')
             spin_system.inter.coupling.matrix{1,j+1}(:,1:2)=0;
         end
@@ -53,16 +54,16 @@ for f=1:numel(fixtures)
         end
     end
 
-    % Resolve the exact central-state and selective logical-pulse convention
-    p.central_spins=1; p.bath_spins=2:nb+1; p.method=fixture.compute.method;
-    p.expansion='standard'; p.quantity='coherence'; p.order=2;
+    % Resolve the exact observed-state and selective logical-pulse convention
+    p.observed_spins=1; p.bath_spins=2:nb+1; p.method=fixture.compute.method;
+    p.expansion='standard'; p.quantity='signal'; p.order=2;
     p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
     p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
     p.bath_state=struct('mode','mixed_product'); p.times=fixture.times_ms(:).'/1000;
     p.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^29);
     a=fixture.alpha_real+1i*fixture.alpha_imag;
     b=fixture.beta_real+1i*fixture.beta_imag;
-    p.central=struct('alpha',a,'beta',b,'rho',(a+b)*(a+b)'/2);
+    p.rho0=(a+b)*(a+b)'/2; p.transition=struct('alpha',a,'beta',b);
     p.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
                       'operator',pi*(a*b'+b*a')/2);
     p.normalized=strcmp(p.method,'gcce'); actual=cce(spin_system,p);
@@ -79,9 +80,10 @@ for f=1:numel(fixtures)
         result=test_true(result,'PyCCE raw subset',discrepancy<=2*bound,...
                          'Two eigensolvers plus exact decimal input serialization bounds.');
     end
+    % Preserve external signal-column labels and the documented phase convention
     reference=fixture.coherence_real-1i*fixture.coherence_imag;
     final_errors(f)=max(abs(actual.value-reference));
-    result=test_true(result,'PyCCE final coherence',...
+    result=test_true(result,'PyCCE final signal',...
                      final_errors(f)<=2*max(actual.abs_error_bound),...
                      'Complex amplitude and phase are compared without clipping.');
 

@@ -88,16 +88,16 @@ result=test_true(result,'Deterministic spatial grouping',...
                  isequal(a,b)&&a.complete&&isequal(a.groups,{[2 3],4}),...
                  'Farthest-first seeds and objective-decreasing swaps.');
 
-% Build distinct fixed pilot and held-out exterior-state contexts
+% Build distinct fixed pilot and held-out exterior-spin configurations
 parameters.expansion='partition'; parameters.order=1; parameters.groups={2,3,4};
-ensemble=cce_states(model,parameters); held=ensemble.contexts;
+ensemble=cce_states(model,parameters); held=ensemble.spin_configs;
 held.id=uint64(9001); held.state_id=9001;
 held.bath_rho={diag([0 1]),diag([1 0]),diag([0 1])};
 held.expectations=[0 0 -0.5;0 0 0.5;0 0 -0.5];
 parameters.partition=struct('mode','user','adaptive',true,'max_dimension',8,...
                             'patch_atol',1e-10,'patch_rtol',1e-10,...
                             'max_rounds',5,'max_probes',100,'patches',{{2:4}},...
-                            'pilot_contexts',ensemble.contexts,'heldout_contexts',held);
+                            'pilot_configs',ensemble.spin_configs,'heldout_configs',held);
 a=cce_partition(model,graph,parameters);
 result=test_true(result,'Adaptive pilot and held-out gates',...
                  a.complete&&isequal(a.groups,{2:4})&&a.diagnostics.rounds>0&&...
@@ -181,15 +181,15 @@ result=test_true(result,'Fractional probe ceiling rejected',...
                  rejected(@()cce_partition(model,graph,invalid)),...
                  'Probe ceilings count whole exact evaluations.');
 
-% Validate adaptive coordinates, context sets, and tolerances before any probe
+% Validate adaptive coordinates, spin_config sets, and tolerances before any probe
 invalid=parameters; invalid.partition.adaptive=true;
 invalid.partition.patch_atol=NaN;
 result=test_true(result,'Nonfinite patch tolerance rejected',...
                  rejected(@()cce_partition(model,graph,invalid)),...
                  'NaN tolerances cannot certify a patch.');
 invalid=parameters; invalid.partition.adaptive=true;
-invalid.partition.heldout_contexts=[];
-result=test_true(result,'Empty held-out contexts rejected',...
+invalid.partition.heldout_configs=[];
+result=test_true(result,'Empty held-out spin_configs rejected',...
                  rejected(@()cce_partition(model,graph,invalid)),...
                  'Held-out validation is mandatory for adaptation.');
 invalid=parameters; invalid.groups={};
@@ -213,15 +213,15 @@ for mode={'partition','disjoint','disjoint_inter'}
                       ones(size(exact)),2e-12,2e-12,'Only the empty-cluster baseline remains.');
 end
 
-% Keep the group partition compatible with generalized central-density dynamics
+% Keep the group partition compatible with generalized observed-density dynamics
 general=choices(); general.method='gcce'; general.quantity='density';
-general.central.rho=ones(2)/2;
+general.rho0=ones(2)/2;
 general.expansion='partition'; general.order=1; general.groups={2:4};
 general.partition=struct('mode','user','max_dimension',8);
 general_result=cce(spin_system,general);
 result=test_close(result,'One-group generalized density equals dense echo',...
                   reshape(2*general_result.density(1,2,:),[],1),exact,...
-                  2e-12,2e-12,'Generalized CCE retains the complete central density.');
+                  2e-12,2e-12,'Generalized CCE retains the complete observed density.');
 
 % Apply exactly the production master-equation evaluator during patch validation
 open=choices(); open.method='mecce'; open.expansion='partition';
@@ -236,7 +236,7 @@ result=test_true(result,'Master-equation adaptive evaluator',...
 
 % Bypass singular auxiliary factors whenever the complete patch is included
 for method={'gcce','megcce'}
-    q=choices(); q.method=method{1}; q.quantity='density'; q.central.rho=diag([1 0]);
+    q=choices(); q.method=method{1}; q.quantity='density'; q.rho0=diag([1 0]);
     q.times=[0 1e-4]; q.sequence=[]; q.expansion='partition'; q.order=1;
     q.bath_spins=2; q.groups={2}; q.partition=struct('mode','user','max_dimension',2);
     if strcmp(method{1},'megcce')
@@ -247,7 +247,7 @@ for method={'gcce','megcce'}
     q.partition.adaptive=true; q.partition.patches={2};
     q.partition.patch_atol=1e-10; q.partition.patch_rtol=1e-10;
     q.partition.max_rounds=1; q.partition.max_probes=10;
-    q.partition.pilot_contexts=states.contexts; q.partition.heldout_contexts=states.contexts;
+    q.partition.pilot_configs=states.spin_configs; q.partition.heldout_configs=states.spin_configs;
     for policy={'mask','error'}
         q.numerics.zero_policy=policy{1}; accepted=false; patch_error=Inf;
         try
@@ -278,7 +278,7 @@ end
 
 function [spin_system,inter]=fixture()
 
-% Specify noncommuting central-conditioned tensors in cycles per second
+% Specify noncommuting observed-conditioned tensors in cycles per second
 sys.isotopes={'E','13C','13C','13C'}; sys.magnet=0;
 sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
 inter.zeeman.matrix={zeros(3),diag([0 0 120]),diag([0 0 180]),diag([0 0 270])};
@@ -307,11 +307,11 @@ end
 function parameters=choices()
 
 % Declare physical, state, sequence, and numerical choices explicitly
-parameters.central_spins=1; parameters.bath_spins=2:4;
+parameters.observed_spins=1; parameters.bath_spins=2:4;
 parameters.method='cce'; parameters.expansion='standard';
-parameters.quantity='coherence'; parameters.order=2;
+parameters.quantity='signal'; parameters.order=2;
 parameters.times=linspace(0,0.002,9);
-parameters.central.alpha=[1;0]; parameters.central.beta=[0;1];
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.graph.mode='complete';
 parameters.graph.score='coupling_norm'; parameters.bath_state.mode='mixed_product';
@@ -328,11 +328,11 @@ function value=dense_echo(inter,sites,times)
 
 % Assemble independent Cartesian spin-half operators in full cluster Hilbert space
 ids=[1 sites]; count=numel(ids); dim=2^count;
-pauli={[0 1;1 0]/2,[0 -1i;1i 0]/2,diag([1 -1])/2};
+spin_ops={[0 1;1 0]/2,[0 -1i;1i 0]/2,diag([1 -1])/2};
 ops=cell(count,3);
 for n=1:count
     for axis=1:3
-        ops{n,axis}=kron(kron(eye(2^(n-1)),pauli{axis}),eye(2^(count-n)));
+        ops{n,axis}=kron(kron(eye(2^(n-1)),spin_ops{axis}),eye(2^(count-n)));
     end
 end
 
@@ -351,7 +351,7 @@ for n=1:count
     end
 end
 
-% Propagate a central superposition and maximally mixed bath through a Hahn echo
+% Propagate a observed superposition and maximally mixed bath through a Hahn echo
 db=dim/2; density=kron(ones(2)/2,eye(db)/db);
 pulse=expm(-1i*pi*ops{1,1}); value=zeros(numel(times),1);
 for k=1:numel(times)

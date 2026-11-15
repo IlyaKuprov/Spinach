@@ -38,7 +38,7 @@ for f=1:numel(data)
         r=xyz(j,:)-center;
         spin_system.inter.coupling.matrix{1,j+1}=dipolar(r,gamma_e,gamma_n);
 
-        % Match the external reference's explicit conditional central Sz model
+        % Match the external reference's explicit projected observed Sz model
         spin_system.inter.coupling.matrix{1,j+1}(:,1:2)=0;
         for k=j+1:nb
             r=xyz(j,:)-xyz(k,:);
@@ -46,17 +46,17 @@ for f=1:numel(data)
         end
     end
 
-    % Use ms=+1 and ms=0 branches and a selective logical pi pulse
-    p.central_spins=1; p.bath_spins=2:nb+1; p.method='cce'; p.expansion='standard';
-    p.quantity='coherence'; p.order=fixture.order; p.central.alpha=[1;0;0];
-    p.central.beta=[0;1;0]; p.assumptions='labframe'; p.orientation=[0 0 0];
+    % Use ms=+1 and ms=0 manifolds and a selective logical pi pulse
+    p.observed_spins=1; p.bath_spins=2:nb+1; p.method='cce'; p.expansion='standard';
+    p.quantity='signal'; p.order=fixture.order; p.transition.alpha=[1;0;0];
+    p.transition.beta=[0;1;0]; p.assumptions='labframe'; p.orientation=[0 0 0];
     p.interaction_cutoff=Inf; p.graph=struct('mode','distance','radius',fixture.rdip,...
                                          'score','coupling_norm');
     p.meanfield='none'; p.times=fixture.times_ms(:).'/1000;
     p.bath_state=struct('mode','mixed_product'); p.sequence=[];
     p.numerics=struct('atol',1e-7,'rtol',1e-7,'max_memory_bytes',2^29);
     if fixture.pulses==1
-        a=p.central.alpha; b=p.central.beta;
+        a=p.transition.alpha; b=p.transition.beta;
         p.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
                           'operator',pi*(a*b'+b*a')/2);
     end

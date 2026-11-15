@@ -36,7 +36,7 @@ for n=1:numel(names)
     end
     if ~isempty(actual.density)
 
-        % Full-order finite baths must preserve central density physicality
+        % Full-order finite baths must preserve observed density physicality
         result=test_true(result,[names{n} ' trace'],...
                          max(actual.diagnostics.trace_error)<1e-8,...
                          'Reduced density matrices retain unit trace.');

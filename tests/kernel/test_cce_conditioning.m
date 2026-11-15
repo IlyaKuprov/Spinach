@@ -9,10 +9,10 @@
 
 function result=test_cce_conditioning()
 
-% Set up a path pair expansion with a negative central-vertex exponent
+% Set up a path pair expansion with a negative observed-vertex exponent
 result=new_test_result('kernel/cce_conditioning','CCE zero conditioning',...
                        'Expose unresolved ratios rather than regularise or lose phase.');
-model=struct('physical_ids',1:4,'central_ids',1,'bath_ids',2:4,...
+model=struct('physical_ids',1:4,'observed_ids',1,'bath_ids',2:4,...
              'multiplicities',[2 2 2 2]);
 adjacency=logical([0 1 0;1 0 1;0 1 0]);
 graph=struct('bath_ids',2:4,'adjacency',sparse(adjacency),'scores',double(adjacency));
@@ -59,7 +59,7 @@ raw(3).value=exp(1i*phase); raw(5).value=0.8*exp(2i*phase);
 raw(6).value=0.7*exp(-0.4i*phase);
 reduced=cce_reduce(raw,clusters,parameters); expected=0.56*exp(0.6i*phase);
 result=test_close(result,'Signed phases across logarithm cuts',reduced.value,expected,3e-14,3e-14,...
-                  'integer exponents preserve actual complex phase without branch manipulation');
+                  'integer exponents preserve actual complex phase without manifold manipulation');
 
 % Negative denominator uncertainty produces an observable error budget failure
 raw(3).abs_error_bound(:)=1e-4; reduced=cce_reduce(raw,clusters,parameters);

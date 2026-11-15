@@ -12,7 +12,7 @@ function result=test_cce_reduction()
 % Compile a nontrivial signed-power family with disconnected subsets
 result=new_test_result('kernel/cce_reduction','CCE deterministic reduction',...
                        'Compare direct factors, signed powers and additive inclusion-exclusion.');
-model=struct('physical_ids',1:5,'central_ids',1,'bath_ids',2:5,...
+model=struct('physical_ids',1:5,'observed_ids',1,'bath_ids',2:5,...
              'multiplicities',2*ones(1,5));
 adjacency=logical([0 1 0 0;1 0 1 0;0 1 0 1;0 0 1 0]);
 graph=struct('bath_ids',2:5,'adjacency',sparse(adjacency),'scores',double(adjacency));
@@ -85,10 +85,10 @@ result=test_close(result,'Additive polynomial full order',additive.value,raw(end
 result=test_close(result,'Additive quadratic saturation',additive.by_order(:,:,3),raw(end).value,3e-13,3e-13,...
                   'all connected increments above polynomial degree two cancel');
 
-% Empty-bath order zero has no artificial division by central coherence
+% Empty-bath order zero has no artificial division by observed signal
 empty=clusters([]); raw=raw(1); raw.value(:)=0;
-central=cce_reduce(raw,empty,parameters);
-result=test_true(result,'Central-only exact zero',all(central.valid,'all')&&all(central.value==0,'all'),...
+observed=cce_reduce(raw,empty,parameters);
+result=test_true(result,'observed-spin-only exact zero',all(observed.valid,'all')&&all(observed.value==0,'all'),...
                  'a direct baseline requires no artificial multiplicative normalisation');
 
 end

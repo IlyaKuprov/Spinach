@@ -1,4 +1,4 @@
-% Analytic conditional CCE limits, Hahn modulation and complex FID. Syntax:
+% Analytic projected CCE limits, Hahn modulation and complex FID. Syntax:
 %
 %                         result=test_cce_analytic()
 %
@@ -22,7 +22,7 @@ spin_system.inter.coupling.matrix{1,2}(1,3)=transverse;
 spin_system.inter.coupling.matrix{1,2}(3,3)=longitudinal;
 p=parameters(); p.times=linspace(0,0.012,81);
 
-% Compare the complex conditional FID against independent two-by-two expm
+% Compare the complex projected FID against independent two-by-two expm
 fid=cce(spin_system,p); z=diag([1 -1])/2; x=[0 1;1 0]/2;
 ha=omega*z+(longitudinal*z+transverse*x)/2;
 hb=omega*z-(longitudinal*z+transverse*x)/2;
@@ -58,7 +58,7 @@ for k=1:numel(q.times)
     ub=expm(-1i*ha*b)*expm(-1i*hb*a);
     values(k)=exp(-1i*phase*(a-b))*trace(ua*ub')/2;
 end
-result=test_close(result,'Absolute pulse dense branch reference',absolute.value,values,...
+result=test_close(result,'Absolute pulse dense manifold reference',absolute.value,values,...
                   2e-12,2e-12,'Each requested duration uses only pulses at or before its endpoint.');
 fprintf('Absolute pulse dense discrepancy %.3g.\n',max(abs(absolute.value-values)));
 
@@ -67,7 +67,7 @@ p.bath_spins=[]; p.order=0; p.sequence=[];
 empty=cce(spin_system,p);
 result=test_close(result,'empty bath phase',empty.value,exp(-1i*phase*p.times(:)),1e-11,1e-11,'Independent analytic or dense reference.');
 
-% Verify a disconnected unpolarized bath changes no central dynamics
+% Verify a disconnected unpolarized bath changes no observed dynamics
 p.bath_spins=2; p.order=1; spin_system.inter.coupling.matrix{1,2}=zeros(3);
 uncoupled=cce(spin_system,p);
 result=test_close(result,'uncoupled bath',uncoupled.value,empty.value,1e-11,1e-11,'Independent analytic or dense reference.');
@@ -81,15 +81,15 @@ end
 
 % Supply all physics choices explicitly
 function p=parameters()
-p.central_spins=1; p.bath_spins=2; p.method='cce'; p.expansion='standard';
-p.quantity='coherence'; p.order=1; p.central.alpha=[1;0]; p.central.beta=[0;1];
+p.observed_spins=1; p.bath_spins=2; p.method='cce'; p.expansion='standard';
+p.quantity='signal'; p.order=1; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
 p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
 p.graph=struct('mode','complete','score','coupling_norm');
 p.bath_state=struct('mode','mixed_product'); p.meanfield='none'; p.sequence=[];
 p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 end
 
-% Independently evaluate the analytic branch trace for metric reporting
+% Independently evaluate the analytic manifold trace for metric reporting
 function values=reference_fid(ha,hb,phase,times)
 values=zeros(numel(times),1);
 for k=1:numel(times)

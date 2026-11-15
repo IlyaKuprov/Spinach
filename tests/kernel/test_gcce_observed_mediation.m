@@ -1,13 +1,13 @@
-% Test bath-disconnected but central-mediated gCCE correlations. Syntax:
+% Test bath-disconnected but observed-mediated gCCE correlations. Syntax:
 %
-%                  result=test_gcce_central_mediation()
+%                  result=test_gcce_observed_mediation()
 %
 % ilya.kuprov@weizmann.ac.il
 
-function result=test_gcce_central_mediation()
+function result=test_gcce_observed_mediation()
 
 % Demand the mandatory counterexample to bath-only connectivity pruning
-result=new_test_result('kernel/gcce_central_mediation','Central mediated gCCE',...
+result=new_test_result('kernel/gcce_observed_mediation','Observed-spin mediated gCCE',...
                        'Two bath spins with zero direct coupling share a flip-flopping centre.');
 sys.isotopes={'1H','13C','13C'}; sys.magnet=0; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'local',1};
@@ -15,18 +15,18 @@ inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)}; inter.coupling.matrix=cell(3);
 spin_system=create(sys,inter);
 spin_system.inter.coupling.matrix{1,2}=diag([80 80 0]);
 spin_system.inter.coupling.matrix{1,3}=diag([110 110 0]);
-p.central_spins=1; p.bath_spins=[2 3]; p.method='gcce'; p.expansion='standard';
-p.quantity='coherence'; p.normalized=true; p.central.alpha=[1;0]; p.central.beta=[0;1];
-p.central.rho=ones(2)/2; p.assumptions='labframe'; p.orientation=[0 0 0];
+p.observed_spins=1; p.bath_spins=[2 3]; p.method='gcce'; p.expansion='standard';
+p.quantity='signal'; p.normalized=true; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
+p.rho0=ones(2)/2; p.assumptions='labframe'; p.orientation=[0 0 0];
 p.interaction_cutoff=Inf; p.graph=struct('mode','coupling','threshold',0,'score','coupling_norm');
 p.meanfield='none'; p.times=linspace(0,0.08,41); p.sequence=[];
 p.bath_state=struct('mode','mixed_product');
 p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
-% Compare singletons with the retained exact central-mediated pair
+% Compare singletons with the retained exact observed-mediated pair
 p.order=1; first=cce(spin_system,p); p.order=2; second=cce(spin_system,p);
 result=test_true(result,'pair retained',numel(second.clusters)==3,...
-                 'Bath-bath zero does not factorize transverse central exchange.');
+                 'Bath-bath zero does not factorize transverse observed exchange.');
 
 % Construct a separate full three-spin dense exponential reference
 x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2;
@@ -41,18 +41,18 @@ result=test_close(result,'exact pair',second.value,reference,1e-11,1e-11,...
                   'Independent full three-spin Kronecker/expm reference.');
 difference=max(abs(first.value-second.value));
 result=test_true(result,'nonfactorization measured',difference>1e-2,...
-                 'Central exchange creates a nonzero irreducible bath-pair factor.');
+                 'Observed-spin exchange creates a nonzero irreducible bath-pair factor.');
 metrics.first_order_error=difference;
 metrics.full_order_error=max(abs(second.value-reference));
 
-% Resolve two independently coupled central spins with a joint readout
+% Resolve two independently coupled observed spins with a joint readout
 sys.isotopes={'1H','1H','13C','13C'};
 inter.zeeman.matrix=repmat({zeros(3)},1,4); inter.coupling.matrix=cell(4);
 spin_system=create(sys,inter);
 spin_system.inter.coupling.matrix{1,3}=diag([0 0 2]);
 spin_system.inter.coupling.matrix{2,4}=diag([0 0 2]);
-p.central_spins=[1 2]; p.bath_spins=[3 4]; p.central=struct('rho',ones(4)/4);
-p.quantity='observable'; p.operators=kron(x,eye(2))+kron(eye(2),x);
+p.observed_spins=[1 2]; p.bath_spins=[3 4]; p.rho0=ones(4)/4; p.transition=struct();
+p.quantity='observable'; p.coil=kron(x,eye(2))+kron(eye(2),x);
 p.times=[0 1]; p.order=2; reference=cos(p.times(:));
 p.averaging='internal_then_expansion';
 

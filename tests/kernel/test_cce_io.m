@@ -25,8 +25,8 @@ for format={'mat','json','csv'}
 end
 
 % Preserve all empty container and numeric shapes in the tagged JSON envelope
-empty_model=struct('central',{{}},'empty_struct',struct([]));
-empty_model.branches=cell(0,2); empty_model.no_fields=repmat(struct(),2,1);
+empty_model=struct('observed',{{}},'empty_struct',struct([]));
+empty_model.manifolds=cell(0,2); empty_model.no_fields=repmat(struct(),2,1);
 empty_model.values=zeros(2,0,3); empty_model.flags=false(0,2);
 empty_model.integers=zeros(0,2,'uint64'); empty_model.strings=strings(0,2);
 empty_model.characters=repmat('a',0,2);

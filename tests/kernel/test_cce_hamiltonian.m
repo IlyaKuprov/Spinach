@@ -19,7 +19,7 @@ inter.coupling.matrix{2,3}=[8 -5 4;3 -7 9;1 6 13]*31;
 inter.coupling.matrix{1,3}=diag([7 9 13])*17;
 inter.coupling.matrix{2,2}=[2 1 0;1 -3 2;0 2 1]*41;
 system=create(sys,inter);
-parameters.central_spins=2; parameters.bath_spins=[3 1];
+parameters.observed_spins=2; parameters.bath_spins=[3 1];
 parameters.orientation=[0 0 0]; parameters.assumptions='labframe';
 parameters.interaction_cutoff=Inf;
 parameters.numerics=struct('atol',1e-5,'rtol',1e-12,'max_memory_bytes',1e8);
@@ -76,31 +76,31 @@ permutation=[3 1 2]; permuted_sys=sys;
 permuted_sys.isotopes=sys.isotopes(permutation);
 permuted_inter=inter; permuted_inter.zeeman.matrix=inter.zeeman.matrix(permutation);
 permuted_inter.coupling.matrix=inter.coupling.matrix(permutation,permutation);
-permuted_parameters=parameters; permuted_parameters.central_spins=3;
+permuted_parameters=parameters; permuted_parameters.observed_spins=3;
 permuted_parameters.bath_spins=[1 2];
 permuted=cce_prepare(create(permuted_sys,permuted_inter),permuted_parameters);
 H=cce_hamiltonian(permuted,[1 2],struct());
 result=test_close(result,'physical spin permutation',...
                   H,reference,meta.roundoff_bound,0,'Relabelling leaves the ordered physical Hamiltonian invariant.');
 
-% Check a central register in nonascending physical order and a proper subset
-parameters.central_spins=[3 1]; parameters.bath_spins=2;
+% Check a observed-spin system in nonascending physical order and a proper subset
+parameters.observed_spins=[3 1]; parameters.bath_spins=2;
 model=cce_prepare(system,parameters);
 [H,meta]=cce_hamiltonian(model,2,struct());
 reference=cce_hamiltonian(model,2,struct('backend','stock'));
-result=test_close(result,'multiple central spins',...
-                  H,reference,meta.roundoff_bound,0,'Product basis follows the supplied central order.');
+result=test_close(result,'multiple observed spins',...
+                  H,reference,meta.roundoff_bound,0,'Product basis follows the supplied observed order.');
 [H,meta]=cce_hamiltonian(model,[],struct());
 reference=cce_hamiltonian(model,[],struct('backend','stock'));
-result=test_close(result,'central-only subset',...
+result=test_close(result,'observed-spin-only subset',...
                   H,reference,meta.roundoff_bound,0,'Metadata slicing preserves physical indices.');
 
 % Compare exterior fields with an explicit partial expectation of the full system
-parameters.central_spins=1; parameters.bath_spins=[2 3];
+parameters.observed_spins=1; parameters.bath_spins=[2 3];
 model=cce_prepare(system,parameters);
 [full_H,full_meta]=cce_hamiltonian(model,[2 3],struct());
-context.exterior_ids=3; context.exterior_expectations=[0 0 1/2];
-[H,meta]=cce_hamiltonian(model,2,context);
+spin_config.exterior_ids=3; spin_config.exterior_expectations=[0 0 1/2];
+[H,meta]=cce_hamiltonian(model,2,spin_config);
 embedding=kron(speye(meta.dimension),[1;0]);
 reference=embedding'*full_H*embedding;
 reference=reference-trace(reference-H)*speye(meta.dimension)/meta.dimension;
@@ -145,7 +145,7 @@ parameters.assumptions='labframe';
 sys.isotopes={'E4'}; sys.magnet=0.01;
 inter=struct(); inter.giant.coeff={{zeros(3,1),zeros(5,1),[0;0;0;37;0;0;0]}};
 inter.giant.euler={{[0 0 0],[0 0 0],[0 0 0]}};
-parameters.central_spins=1; parameters.bath_spins=[];
+parameters.observed_spins=1; parameters.bath_spins=[];
 parameters.interaction_cutoff=Inf;
 model=cce_prepare(create(sys,inter),parameters);
 [H,meta]=cce_hamiltonian(model,[],struct());

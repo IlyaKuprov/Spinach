@@ -1,4 +1,4 @@
-% Independent dense branch reference for four-spin conditional CCE. Syntax:
+% Independent dense manifold reference for four-spin projected CCE. Syntax:
 %
 %                         result=test_cce_exact()
 %
@@ -7,7 +7,7 @@
 function result=test_cce_exact()
 
 % Specify independent full-Hilbert and subset comparisons
-result=new_test_result('kernel/cce_exact','CCE exact branch validation',...
+result=new_test_result('kernel/cce_exact','CCE exact manifold validation',...
                        'Four bath spins, pure/mixed states, FID/Hahn and raw subsets.');
 
 % Build a deterministic model without sharing the CCE Hamiltonian builder
@@ -25,8 +25,8 @@ for j=1:nb
         spin_system.inter.coupling.matrix{j+1,k+1}=tensor{j+1,k+1}.';
     end
 end
-p.central_spins=1; p.bath_spins=2:5; p.method='cce'; p.expansion='standard';
-p.quantity='coherence'; p.order=4; p.central.alpha=[1;0]; p.central.beta=[0;1];
+p.observed_spins=1; p.bath_spins=2:5; p.method='cce'; p.expansion='standard';
+p.quantity='signal'; p.order=4; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
 p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
 p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
 p.times=linspace(0,0.018,13); p.sequence=[];

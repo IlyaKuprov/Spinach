@@ -6,59 +6,59 @@
 function result=test_cce_interlacing()
 
 % Construct overlapping superclusters around a single bath spin
-result=new_test_result('kernel/cce_interlacing','CCE conditional interlacing',...
+result=new_test_result('kernel/cce_interlacing','CCE projected interlacing',...
                        'Check unique configurations, conditional weights and shared denominator K.');
 [model,p]=fixture(); ensemble=cce_states(model,p);
-ensemble.assignments(1,:)=[1 1 1]; ensemble.contexts(1).assignment=[1 1 1];
-ensemble.contexts(1).bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
-ensemble.contexts(1).expectations=repmat([0 0 0.5],3,1); schedule=cce_sequence(model,p);
+ensemble.assignments(1,:)=[1 1 1]; ensemble.spin_configs(1).assignment=[1 1 1];
+ensemble.spin_configs(1).bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
+ensemble.spin_configs(1).expectations=repmat([0 0 0.5],3,1); schedule=cce_sequence(model,p);
 p.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3],[2 4]}});
 cluster=struct('id',uint64(1),'sites',2); raw=cce_interlace(model,cluster,ensemble,schedule,p);
 % Reject reference states inconsistent with their declared product assignment
 rejected=false; supplied=ensemble;
-supplied.contexts(1).bath_rho{1}=eye(2)/2;
+supplied.spin_configs(1).bath_rho{1}=eye(2)/2;
 try
     cce_interlace(model,cluster,supplied,schedule,p);
 catch exception
-    rejected=strcmp(exception.identifier,'cce:context');
+    rejected=strcmp(exception.identifier,'cce:spin_config');
 end
 result=test_true(result,'Interlaced reference density consistency',rejected,...
                  'Interlacing cannot silently replace a supplied density inconsistent with its assignment.');
 
-% Reject a conflicting context assignment rather than replacing it silently
-supplied=ensemble; supplied.contexts(1).assignment=[2 1 1]; rejected=false;
+% Reject a conflicting spin_config assignment rather than replacing it silently
+supplied=ensemble; supplied.spin_configs(1).assignment=[2 1 1]; rejected=false;
 try
     cce_interlace(model,cluster,supplied,schedule,p);
 catch exception
-    rejected=strcmp(exception.identifier,'cce:context');
+    rejected=strcmp(exception.identifier,'cce:spin_config');
 end
 result=test_true(result,'Interlaced reference assignment consistency',rejected,...
-                 'A supplied context assignment must agree with the ensemble reference.');
+                 'A supplied spin_config assignment must agree with the ensemble reference.');
 
 % Reject an unsupported reference projection before averaging it away
-supplied=ensemble; supplied.contexts(1).projection=eye(2); rejected=false;
+supplied=ensemble; supplied.spin_configs(1).projection=eye(2); rejected=false;
 try
     cce_interlace(model,cluster,supplied,schedule,p);
 catch exception
-    rejected=strcmp(exception.identifier,'cce:context');
+    rejected=strcmp(exception.identifier,'cce:spin_config');
 end
-result=test_true(result,'Interlaced rejects context projection',rejected,...
+result=test_true(result,'Interlaced rejects spin_config projection',rejected,...
                  'Interlacing must reject unsupported supplied projection fields.');
 
-% Propagate a non-default central density through the selected reference context
+% Propagate a non-default observed density through the selected reference spin_config
 q=p; q.method='gcce'; q.quantity='density'; q.times=0;
-supplied=ensemble; supplied.contexts(1).central_rho=diag([0.2 0.8]);
+supplied=ensemble; supplied.spin_configs(1).rho0=diag([0.2 0.8]);
 initial=cce_interlace(model,cluster,supplied,cce_sequence(model,q),q);
-expected=supplied.contexts(1).central_rho;
-result=test_close(result,'Interlaced supplied central state',initial.value,expected(:).',...
-                  1e-12,1e-12,'The reference context central density survives the conditional bath average.');
+expected=supplied.spin_configs(1).rho0;
+result=test_close(result,'Interlaced supplied observed state',initial.value,expected(:).',...
+                  1e-12,1e-12,'The reference spin_config observed density survives the projected bath average.');
 
-% Keep the empty-cluster conditional baseline valid for an empty family
+% Keep the empty-cluster projected baseline valid for an empty family
 q=p; q.interlaced=rmfield(q.interlaced,'condition_sites'); q.order=0;
 empty_cluster=struct('id',uint64(0),'sites',[]); baseline_ok=true; baseline_error=Inf;
 try
     baseline=cce_interlace(model,empty_cluster,ensemble,schedule,q);
-    reference=ensemble.contexts(1); reference.assignment=ensemble.assignments(1,:);
+    reference=ensemble.spin_configs(1); reference.assignment=ensemble.assignments(1,:);
     reference.bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
     reference.expectations=repmat([0 0 0.5],3,1);
     direct=cce_cluster(model,empty_cluster,reference,schedule,q);
@@ -72,7 +72,7 @@ result=test_close(result,'Empty-family baseline parity',baseline_error,0,1e-12,1
                   'No conditioning sites means exactly the unconditioned reference baseline.');
 for method={'cce','gcce','mecce','megcce'}
     q.order=0; q.method=method{1}; q.jumps=struct([]);
-    q.central.rho=[1 1;1 1]/2;
+    q.rho0=[1 1;1 1]/2;
     try
         driver=cce(model.spin_system,q); driver_ok=all(isfinite(driver.value(:)));
     catch exception
@@ -88,7 +88,7 @@ expected=[1 1 1;1 1 2;1 2 1;2 1 1;2 1 2;2 2 1];
 weights=[0.7*0.2*0.6;0.7*0.2*0.4;0.7*0.8*0.6;...
          0.3*0.2*0.6;0.3*0.2*0.4;0.3*0.8*0.6]; weights=weights/sum(weights);
 result=test_true(result,'Overlapping cylinders yield six unique configurations, not eight occurrences',isequal(raw.assignments,expected),'Overlapping cylinders yield six unique configurations, not eight occurrences');
-result=test_close(result,'Conditional probabilities are physical product weights',raw.weights,weights,1e-15,0,'Conditional probabilities are physical product weights');
+result=test_close(result,'Projected probabilities are physical product weights',raw.weights,weights,1e-15,0,'Projected probabilities are physical product weights');
 
 % Independently enumerate the full bath and accept the union predicate
 value=zeros(size(raw.value)); mass=0; duplicated=zeros(size(raw.value)); occurrence_mass=0;
@@ -97,23 +97,23 @@ for a=1:2
         for c=1:2
             multiplicity=(c==1)+(b==1);
             if multiplicity==0, continue; end
-            context=ensemble.contexts(1); assignment=[a b c]; weight=1;
+            spin_config=ensemble.spin_configs(1); assignment=[a b c]; weight=1;
             for j=1:3
-                rho=zeros(2); rho(assignment(j),assignment(j))=1; context.bath_rho{j}=rho;
-                context.expectations(j,:)=[0 0 1.5-assignment(j)];
+                rho=zeros(2); rho(assignment(j),assignment(j))=1; spin_config.bath_rho{j}=rho;
+                spin_config.expectations(j,:)=[0 0 1.5-assignment(j)];
                 weight=weight*p.bath_state.probabilities{j}(assignment(j));
             end
-            item=cce_cluster(model,cluster,context,schedule,p);
+            item=cce_cluster(model,cluster,spin_config,schedule,p);
             value=value+weight*item.value; mass=mass+weight;
             duplicated=duplicated+multiplicity*weight*item.value; occurrence_mass=occurrence_mass+multiplicity*weight;
         end
     end
 end
 value=value/mass; duplicated=duplicated/occurrence_mass; difference=norm(value-duplicated);
-result=test_close(result,'Conditional raw average agrees with independent full-state enumeration',raw.value,value,1e-12,0,'Conditional raw average agrees with independent full-state enumeration');
+result=test_close(result,'Projected raw average agrees with independent full-state enumeration',raw.value,value,1e-12,0,'Projected raw average agrees with independent full-state enumeration');
 result=test_true(result,'Duplicate-occurrence weighting gives a detectably different answer',difference>1e-4,'Duplicate-occurrence weighting gives a detectably different answer');
 
-% Preserve the largest numerical residual across every conditional assignment
+% Preserve the largest numerical residual across every projected assignment
 probe=p; probe.interlaced.raw_only=true; probe.interlaced.condition_sites={[2 3 4]};
 probe.bath_state.basis={eye(2),[0 1;1 0],eye(2)};
 probe_model=model; probe_model.zeeman{2}(3,:)=[0.731 0.473 0.122];
@@ -121,13 +121,13 @@ probe_ensemble=cce_states(probe_model,probe);
 measured=cce_interlace(probe_model,cluster,probe_ensemble,schedule,probe);
 residual=0; orthogonality=0;
 for k=1:size(measured.assignments,1)
-    context=probe_ensemble.contexts(1);
+    spin_config=probe_ensemble.spin_configs(1);
     for j=1:3
         vector=probe.bath_state.basis{j}(:,measured.assignments(k,j));
-        context.bath_rho{j}=vector*vector';
-        context.expectations(j,:)=[0 0 trace(context.bath_rho{j}*diag([0.5 -0.5]))];
+        spin_config.bath_rho{j}=vector*vector';
+        spin_config.expectations(j,:)=[0 0 trace(spin_config.bath_rho{j}*diag([0.5 -0.5]))];
     end
-    item=cce_cluster(probe_model,cluster,context,schedule,probe);
+    item=cce_cluster(probe_model,cluster,spin_config,schedule,probe);
     residual=max(residual,max(item.eigen_residual));
     orthogonality=max(orthogonality,max(item.orthogonality_residual));
 end
@@ -172,28 +172,28 @@ q.bath_state.probabilities='uniform';
 reference=q; reference.bath_state=struct('mode','mixed_product'); reference=rmfield(reference,'interlaced'); reference.meanfield='none';
 exact=cce(spin_system,reference); full_bath=cce(spin_system,q);
 
-% Verify the raw full-bath value against independent conditional exponentials
+% Verify the raw full-bath value against independent projected exponentials
 x=[0 1;1 0]/2; z=diag([1 -1])/2;
 ha=kron(z,eye(2))+8*kron(x,x); hb=-kron(z,eye(2))+8*kron(x,x);
 dense=trace(expm(1i*hb*pi/2)*expm(-1i*ha*pi/2))/4;
 result=test_close(result,'Interlaced independent dense reference',full_bath.value(end),dense,...
                   1e-12,1e-12,'The full-bath bypass must reproduce a separately constructed four-dimensional trace.');
 result=test_close(result,'Interlaced full-bath zero baseline',full_bath.value,exact.value,...
-                  1e-12,1e-12,'The exact conditional full-bath average survives a zero empty-cluster baseline.');
+                  1e-12,1e-12,'The exact projected full-bath average survives a zero empty-cluster baseline.');
 result=test_true(result,'Interlaced full-bath validity',all(full_bath.valid),...
                  'A singular auxiliary ratio must not invalidate an exact full-bath value.');
-% Preserve the same bypass for raw generalized central coherence
+% Preserve the same bypass for raw generalized observed signal
 q.method='gcce'; generalized=cce(spin_system,q);
 result=test_close(result,'Generalized interlaced full-bath zero baseline',generalized.value,...
                   full_bath.value/2,1e-12,1e-12,...
-                  'Raw generalized coherence differs only by its initial amplitude of one half.');
+                  'Raw generalized signal differs only by its initial amplitude of one half.');
 fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath.value(end)),real(exact.value(end)));
 
 % Require the common result schema and diagnostics on the interlaced path
 reference=q; reference.bath_state=struct('mode','mixed_product'); reference=rmfield(reference,'interlaced'); standard=cce(spin_system,reference);
 result=test_true(result,'Interlaced common result fields',...
                  isequal(sort(fieldnames(generalized)),sort(fieldnames(standard))),...
-                 'All public driver branches must expose the same documented result fields.');
+                 'All public driver manifolds must expose the same documented result fields.');
 result=test_true(result,'Interlaced common diagnostic fields',...
                  isequal(sort(fieldnames(generalized.diagnostics)),sort(fieldnames(standard.diagnostics))),...
                  'Interlaced results must carry numerical coverage and budget diagnostics.');
@@ -236,7 +236,7 @@ for method={'mecce','megcce'}
         scale=1; if strcmp(method{1},'megcce'), scale=0.5; end
         result=test_close(result,sprintf('Analytic %s dephasing reference',method{1}),expected.value,...
                           scale*exp(-1.4*q.times(:)),2e-11,2e-11,...
-                          'A central Pauli-z jump damps coherence at twice its supplied rate.');
+                          'A observed longitudinal jump damps signal at twice its supplied rate.');
         fprintf('R5575 %s order %d error %.3g.\n',method{1},order,difference_me);
     end
 end
@@ -284,9 +284,9 @@ inter.coupling.matrix=cell(4);
 inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
 inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
 inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
-spin_system=create(sys,inter); p.central_spins=1; p.bath_spins=2:4;
-p.method='gcce'; p.expansion='standard'; p.quantity='coherence'; p.times=[0 0.2 0.4]; p.order=2;
-p.central.rho=[1 1;1 1]/2; p.central.alpha=[1;0]; p.central.beta=[0;1];
+spin_system=create(sys,inter); p.observed_spins=1; p.bath_spins=2:4;
+p.method='gcce'; p.expansion='standard'; p.quantity='signal'; p.times=[0 0.2 0.4]; p.order=2;
+p.rho0=[1 1;1 1]/2; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
 p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
 p.graph=struct('mode','complete','score','coupling_norm');
 p.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...

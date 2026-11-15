@@ -11,12 +11,12 @@ sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.output='hush';
 inter.zeeman.scalar={0,0,0}; inter.coupling.scalar=cell(3); s=create(sys,inter);
 s.inter.zeeman.matrix{2}(3,3)=1.3; s.inter.zeeman.matrix{3}(3,3)=0.7;
 s.inter.coupling.matrix{2,3}=diag([0.4 0.5 0.9]);
-p=struct('central_spins',1,'bath_spins',[2 3],'method','noise',...
+p=struct('observed_spins',1,'bath_spins',[2 3],'method','noise',...
          'quantity','autocorrelation','expansion','standard','order',2,...
          'times',linspace(0,2,31),'assumptions','labframe',...
          'orientation',[0 0 0],'interaction_cutoff',Inf,'meanfield','none');
 p.graph=struct('mode','complete'); p.bath_state=struct('mode','mixed_product');
-p.sequence=struct([]); p.central=struct('alpha',[1;0],'beta',[0;1]);
+p.sequence=struct([]); p.transition=struct('alpha',[1;0],'beta',[0;1]);
 p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',1e8);
 x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2;
 p.noise=struct('ordering','ordered','connected',true,...
@@ -32,14 +32,14 @@ result=test_close(result,'C7 numerical check',r.value,reference,1e-12,1e-12,'Ful
 exact_error=max(abs(r.value-reference));
 
 % Honour an explicitly supplied bath state independently of parameter defaults
-model=cce_prepare(s,p); state_parameters=p; state_parameters.central.rho=eye(2)/2;
-ensemble=cce_states(model,state_parameters); context=ensemble.contexts(1);
-context.central_rho=diag([0 1]); context.bath_rho={diag([0.8 0.2]),[1 1;1 1]/2};
-context.expectations=[0 0 0.3;0.5 0 0]; schedule=cce_sequence(model,p);
-cluster=struct('id',1,'sites',[2 3]); rho=kron(context.bath_rho{1},context.bath_rho{2});
+model=cce_prepare(s,p); state_parameters=p; state_parameters.rho0=eye(2)/2;
+ensemble=cce_states(model,state_parameters); spin_config=ensemble.spin_configs(1);
+spin_config.rho0=diag([0 1]); spin_config.bath_rho={diag([0.8 0.2]),[1 1;1 1]/2};
+spin_config.expectations=[0 0 0.3;0.5 0 0]; schedule=cce_sequence(model,p);
+cluster=struct('id',1,'sites',[2 3]); rho=kron(spin_config.bath_rho{1},spin_config.bath_rho{2});
 for ordering={'ordered','symmetrized'}
     q=p; q.noise.ordering=ordering{1}; q.noise.connected=true;
-    raw=cce_noise(model,cluster,context,schedule,q); supplied_reference=zeros(numel(p.times),1);
+    raw=cce_noise(model,cluster,spin_config,schedule,q); supplied_reference=zeros(numel(p.times),1);
     for k=1:numel(p.times)
         U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
         greater=trace(Bt*B*rho); lesser=trace(B*Bt*rho);
@@ -47,8 +47,8 @@ for ordering={'ordered','symmetrized'}
         else, moment=(greater+lesser)/2; end
         supplied_reference(k)=moment-trace(Bt*rho)*trace(B*rho);
     end
-    result=test_close(result,['Noise supplied context ' ordering{1}],raw.value,supplied_reference,...
-                      2e-12,2e-12,'Noise uses the context bath state and its connected reference moments.');
+    result=test_close(result,['Noise supplied spin_config ' ordering{1}],raw.value,supplied_reference,...
+                      2e-12,2e-12,'Noise uses the spin_config bath state and its connected reference moments.');
 end
 
 % Check factorization into independent connected single-spin correlations
@@ -73,7 +73,7 @@ result=test_close(result,'C7 numerical check',classical.value,repmat(0.16,numel(
 % Retain classical ensemble variance in a sampled connected correlation
 q=p; q.bath_state=struct('mode','sampled','samples',64,'seed',31,...
                         'basis','uniform','probabilities','uniform');
-q.central.rho=eye(2)/2; clean=rmfield(q,'noise'); model=cce_prepare(s,clean); ensemble=cce_states(model,clean);
+q.rho0=eye(2)/2; clean=rmfield(q,'noise'); model=cce_prepare(s,clean); ensemble=cce_states(model,clean);
 means=1.5-ensemble.assignments(:,1); expected=0.25-(ensemble.weights(:).'*means)^2;
 for mode={'after_expansion','internal_then_expansion'}
     q.averaging=mode{1}; sampled=cce(s,q);
@@ -84,7 +84,7 @@ for mode={'after_expansion','internal_then_expansion'}
     end
     result=test_close(result,['Sampled connected noise ' mode{1}],sampled.value,...
                       repmat(expected,numel(q.times),1),1e-12,1e-12,...
-                      'The mixed-state covariance includes the variance of sampled conditional means.');
+                      'The mixed-state covariance includes the variance of sampled projected means.');
 end
 % Compare time-dependent ordered and symmetrized covariances with a dense mixture
 s.inter.zeeman.matrix{2}=zeros(3); s.inter.zeeman.matrix{2}(3,1)=1.3;
@@ -107,12 +107,12 @@ fprintf('Noise full-order error %.3g; quantum ordering error %.3g\n',...
         exact_error,max(abs(ordered.value-reference)));
 
 % Refuse routing a master-equation request through the noise evaluator
-q=p; q.method='megcce'; q.central.rho=ones(2)/2;
+q=p; q.method='megcce'; q.rho0=ones(2)/2;
 clean=rmfield(q,'noise'); model=cce_prepare(s,clean); ensemble=cce_states(model,clean);
 schedule=cce_sequence(model,clean); cluster=struct('id',uint64(1),'sites',[2 3]);
 rejected=false;
 try
-    cce_noise(model,cluster,ensemble.contexts(1),schedule,q);
+    cce_noise(model,cluster,ensemble.spin_configs(1),schedule,q);
 catch exception
     rejected=ismember(exception.identifier,{'cce_noise:capability','cce:capability'});
 end
@@ -168,7 +168,7 @@ end
 % Preserve cross-site covariance of the actual finite sampled mixture
 p.bath_state=struct('mode','sampled','samples',16,'seed',31,...
                     'basis','uniform','probabilities','uniform');
-p.noise.connected=true; p.central.rho=eye(2)/2;
+p.noise.connected=true; p.rho0=eye(2)/2;
 model=cce_prepare(s,p); ensemble=cce_states(model,p);
 rho=zeros(4);
 for k=1:size(ensemble.assignments,1)

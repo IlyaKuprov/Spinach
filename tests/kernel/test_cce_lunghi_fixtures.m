@@ -25,7 +25,7 @@ for case_id=1:2
     % Read explicit positions, anisotropic gyros and frequency tensors
     name=cases{case_id}; input=jsondecode(fileread(fullfile(folder,[name '_input.json'])));
     expected=readmatrix(fullfile(folder,[name '_gcce2.csv']));
-    dims=2*input.center.s(:).'+1; central_dimension=prod(dims);
+    dims=2*input.center.s(:).'+1; observed_dimension=prod(dims);
     if dims(1)==8, isotope='51V'; else, isotope='63Cu'; end
     sys.isotopes={isotope,'E','1H','1H'}; sys.magnet=0;
     sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
@@ -35,7 +35,7 @@ for case_id=1:2
     for j=1:2, gyros{j}=squeeze(input.center.gyro(j,:,:)); end
     for j=3:4, gyros{j}=input.bath.gyro(j-2)*eye(3); end
 
-    % Match scalar nuclear and matrix central Zeeman conventions explicitly
+    % Match scalar nuclear and matrix observed Zeeman conventions explicitly
     for j=1:4
         tensor=zeros(3);
         if j==2, tensor(3,:)=1000*field*gyros{j};
@@ -56,38 +56,39 @@ for case_id=1:2
         end
     end
 
-    % Derive the logical central eigenstates and selective Hahn rotation
-    p.central_spins=[1 2]; p.bath_spins=[3 4]; p.method='gcce';
-    p.expansion='standard'; p.quantity='coherence'; p.order=2;
+    % Derive the selected observed-spin eigenstates and selective Hahn rotation
+    p.observed_spins=[1 2]; p.bath_spins=[3 4]; p.method='gcce';
+    p.expansion='standard'; p.quantity='signal'; p.order=2;
     p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
     p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
     p.bath_state.mode='mixed_product'; p.times=input.compute.times_ms(:).'*1e-3;
     p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
-    p.sequence=[]; p.central.alpha=eye(central_dimension,1);
-    p.central.beta=circshift(p.central.alpha,1);
+    p.sequence=[]; p.transition.alpha=eye(observed_dimension,1);
+    p.transition.beta=circshift(p.transition.alpha,1);
     model=cce_prepare(ss,p); [hamiltonian,~]=cce_hamiltonian(model,[],struct());
     states=jsondecode(fileread(fullfile(states_folder,[name '_states.json'])));
     a=states.alpha_real+1i*states.alpha_imag; b=states.beta_real+1i*states.beta_imag;
+    % External Hc is the source observed-spin Hamiltonian label
     source=load(fullfile(states_folder,[name '_diagnostic.mat']),'H','Hc');
-    central_error=norm(hamiltonian/(2*pi*1000)-source.Hc,'fro');
+    observed_error=norm(hamiltonian/(2*pi*1000)-source.Hc,'fro');
     matrix_scale=norm(source.Hc,'fro');
-    result=test_close(result,[name ' central source Hamiltonian'],...
+    result=test_close(result,[name ' observed source Hamiltonian'],...
                       full(hamiltonian)/(2*pi*1000)/matrix_scale,source.Hc/matrix_scale,1e-10,0,...
-                      'Explicit kHz to rad/s boundary and central Hilbert ordering.');
+                      'Explicit kHz to rad/s boundary and observed Hilbert ordering.');
     residual=max(norm(hamiltonian*a-a*(a'*hamiltonian*a)),...
                  norm(hamiltonian*b-b*(b'*hamiltonian*b)))/norm(hamiltonian,'fro');
     result=test_true(result,[name ' exported eigenstates'],residual<100*eps,...
-                     'Explicit source eigenvector phases define initial state and logical axes.');
-    p.central.alpha=a; p.central.beta=b; p.central.rho=(a+b)*(a+b)'/2;
+                     'Explicit source eigenvector phases define initial state and selected-transition axes.');
+    p.transition.alpha=a; p.transition.beta=b; p.rho0=(a+b)*(a+b)'/2;
     p.sequence=struct('type','ideal','target',[1 2],'placement','fraction','at',0.5,...
                       'operator',pi*(a*b'+b*a')/2);
     p.normalized=true; actual=cce(ss,p);
 
-    % Separate the stored source pulse from the unitary Spinach logical pulse
+    % Separate the stored source pulse from the unitary Spinach selective pulse
     [full_hamiltonian,~]=cce_hamiltonian(model,[3 4],struct());
 
-    % Permute bath-first PyCCE ordering into the central-first native basis
-    permutation=reshape(1:4*central_dimension,central_dimension,4).';
+    % Permute bath-first PyCCE ordering into the observed-first native basis
+    permutation=reshape(1:4*observed_dimension,observed_dimension,4).';
     permutation=permutation(:); reference_h=source.H(permutation,permutation);
     matrix_error=norm(full(full_hamiltonian)/(2*pi*1000)-reference_h,'fro');
     matrix_scale=norm(reference_h,'fro');
@@ -95,7 +96,7 @@ for case_id=1:2
                       full(full_hamiltonian)/(2*pi*1000)/matrix_scale,reference_h/matrix_scale,1e-10,0,...
                       'Independent PyCCE tensor compilation and explicit basis permutation.');
     fprintf('%s source matrices: absolute %.6g/%.6g kHz; relative %.6g/%.6g.\n',...
-            name,central_error,matrix_error,central_error/norm(source.Hc,'fro'),...
+            name,observed_error,matrix_error,observed_error/norm(source.Hc,'fro'),...
             matrix_error/norm(reference_h,'fro'));
 
     % Propagate source and unitary pulses with dense matrix exponentials
@@ -106,10 +107,10 @@ for case_id=1:2
     for k=1:numel(p.times)
         free=expm(-1i*full(full_hamiltonian)*p.times(k)/2);
         evolution=free*source_pulse*free; density=evolution*initial*evolution';
-        reduced=partial_trace(density,central_dimension);
+        reduced=partial_trace(density,observed_dimension);
         source(k)=2*b'*reduced*a;
         evolution=free*unitary_pulse*free; density=evolution*initial*evolution';
-        reduced=partial_trace(density,central_dimension);
+        reduced=partial_trace(density,observed_dimension);
         independent(k)=2*a'*reduced*b;
     end
     reference=expected(:,2)+1i*expected(:,3); errors(case_id)=max(abs(source-reference));
@@ -117,7 +118,7 @@ for case_id=1:2
                       'Stored source uses -i sigma_x with zero spectator block.');
     result=test_close(result,[name ' unitary CCE pulse'],actual.value,independent,1e-10,0,...
                       'Spinach uses exp(-i pi sigma_x/2), retaining spectator levels.');
-    result=test_true(result,[name ' distinct pulse semantics'],norm(source_pulse'*source_pulse-eye(4*central_dimension),'fro')>1,...
+    result=test_true(result,[name ' distinct pulse semantics'],norm(source_pulse'*source_pulse-eye(4*observed_dimension),'fro')>1,...
                      'Do not equate the source fixture pulse with a full unitary.');
 end
 disp(struct('VOTPP_error',errors(1),'Cumnt_error',errors(2)));
@@ -126,7 +127,7 @@ end
 
 function reduced=partial_trace(density,dimension)
 
-% Sum bath diagonal blocks in central-first Hilbert order
+% Sum bath diagonal blocks in observed-first Hilbert order
 reduced=zeros(dimension);
 for k=1:4, reduced=reduced+density(k:4:end,k:4:end); end
 

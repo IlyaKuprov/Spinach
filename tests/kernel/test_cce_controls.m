@@ -8,35 +8,35 @@ function result=test_cce_controls()
 % Initialise the standard harness result and a driven two-spin system
 result=new_test_result('kernel/cce_controls','CCE realistic controls',...
                        'Check finite drives, waveform refinement and named pulse schedules.');
-[model,p,ensemble]=fixture(); spin=pauli(2); x=spin.x; z=spin.z; context=ensemble.contexts(1);
+[model,p,ensemble]=fixture(); spin=pauli(2); x=spin.x; z=spin.z; spin_config=ensemble.spin_configs(1);
 p.sequence=struct('type','finite','target',1,'placement','absolute','at',0,...
                   'duration',0.1,'axis','x','amplitude',7,'detuning',3);
-s=cce_controls(model,2,context,[],p); H=cce_hamiltonian(model,2,struct());
+s=cce_controls(model,2,spin_config,[],p); H=cce_hamiltonian(model,2,struct());
 U=expm(-1i*0.1*(H+7*kron(x,eye(2))+3*kron(z,eye(2))));
-initial=kron(context.central_rho,context.bath_rho{1}); rho=U*initial*U'; expected=partial(rho);
+initial=kron(spin_config.rho0,spin_config.bath_rho{1}); rho=U*initial*U'; expected=partial(rho);
 error=norm(s.raw.density(:,:,end)-expected,'fro');
 result=test_close(result,'Finite detuned drive matches independent dense expm',s.raw.density(:,:,end),expected,1e-12,0,'Finite detuned drive matches independent dense expm');
 
-% Normalize driven observables against the supplied central state context
-q=p; q.quantity='observable'; q.operators=diag([1 2]); q.normalized=true;
-supplied_context=ensemble.contexts(1); supplied_context.central_rho=diag([0.25 0.75]);
-supplied_context.bath_rho={diag([0 1])}; supplied_context.expectations=[0 0 -0.5];
-driven=cce_controls(model,2,supplied_context,[],q);
-Hc=H+7*kron(x,eye(2))+3*kron(z,eye(2)); U=expm(-1i*Hc*0.1);
-rho=partial(U*kron(supplied_context.central_rho,supplied_context.bath_rho{1})*U');
-context_expected=[1;trace(q.operators*rho)/trace(q.operators*supplied_context.central_rho)];
-result=test_close(result,'Finite controls supplied context reference',driven.raw.value,context_expected,...
-                  2e-12,2e-12,'Both the driven state and normalization use the supplied context, not parameter rho.');
-fprintf('R13 driven context error %.17g initial %.17g\n',norm(driven.raw.value-context_expected),real(driven.raw.value(1)));
+% Normalize driven observables against the supplied observed spin configuration
+q=p; q.quantity='observable'; q.coil=diag([1 2]); q.normalized=true;
+supplied_config=ensemble.spin_configs(1); supplied_config.rho0=diag([0.25 0.75]);
+supplied_config.bath_rho={diag([0 1])}; supplied_config.expectations=[0 0 -0.5];
+driven=cce_controls(model,2,supplied_config,[],q);
+H_obs=H+7*kron(x,eye(2))+3*kron(z,eye(2)); U=expm(-1i*H_obs*0.1);
+rho=partial(U*kron(supplied_config.rho0,supplied_config.bath_rho{1})*U');
+config_expected=[1;trace(q.coil*rho)/trace(q.coil*supplied_config.rho0)];
+result=test_close(result,'Finite controls supplied spin_config reference',driven.raw.value,config_expected,...
+                  2e-12,2e-12,'Both the driven state and normalization use the supplied spin_config, not parameter rho.');
+fprintf('R13 driven spin_config error %.17g initial %.17g\n',norm(driven.raw.value-config_expected),real(driven.raw.value(1)));
 
-% Reject context reference aliases on the finite-control dispatch as well
-unsupported=supplied_context; unsupported.reference=eye(2)/2; rejected=false;
+% Reject spin_config reference aliases on the finite-control dispatch as well
+unsupported=supplied_config; unsupported.reference=eye(2)/2; rejected=false;
 try
     cce_cluster(model,struct('id',1,'sites',2),unsupported,cce_sequence(model,q),q);
 catch exception
-    rejected=strcmp(exception.identifier,'cce:context');
+    rejected=strcmp(exception.identifier,'cce:spin_config');
 end
-result=test_true(result,'Finite controls reject context reference',rejected,...
+result=test_true(result,'Finite controls reject spin_config reference',rejected,...
                  'The driven evaluator must not ignore an unsupported normalization reference.');
 
 % Preserve optional operator angles when finite controls select this compiler
@@ -45,10 +45,10 @@ ideal.axis=[]; ideal.operator=0.3*z; finite.operator=[];
 ideal.duration=[]; ideal.amplitude=[]; ideal.detuning=[];
 q=p; q.sequence=[finite ideal]; accepted=true; optional_error=Inf;
 try
-    implicit=cce_controls(model,2,context,[],q);
+    implicit=cce_controls(model,2,spin_config,[],q);
     q.sequence(1).angle=[]; q.sequence(2).angle=[];
-    empty_angle=cce_controls(model,2,context,[],q);
-    q.sequence(2).angle=1; explicit=cce_controls(model,2,context,[],q);
+    empty_angle=cce_controls(model,2,spin_config,[],q);
+    q.sequence(2).angle=1; explicit=cce_controls(model,2,spin_config,[],q);
     optional_error=max(norm(implicit.raw.value-explicit.raw.value),norm(empty_angle.raw.value-explicit.raw.value));
 catch exception
     accepted=false; fprintf('operator optional-angle exception %s\n',exception.identifier);
@@ -80,7 +80,7 @@ for method={'gcce','megcce'}
     for driven=[false true]
         if driven&&strcmp(method{1},'megcce'), continue; end
         q=p; q.method=method{1}; q.jumps=struct([]); q.quantity='observable'; q.normalized=true;
-        q.operators={1e-20*eye(2),eye(2),1e20*eye(2)};
+        q.coil={1e-20*eye(2),eye(2),1e20*eye(2)};
         if ~driven, q.sequence=[]; end
         scaled=cce(model.spin_system,q);
         result=test_close(result,[method{1} ' scaled observable driver ' num2str(driven)],...
@@ -114,7 +114,7 @@ for driven=[false true]
                      'A one-site exterior pulse has no effect when mean fields are disabled.');
     result=test_close(result,['Disjoint bath operator parity ' num2str(driven)],...
                       pulse_error,0,1e-12,1e-12,...
-                      'Operator and axis-angle pulses must agree including the central-only baseline.');
+                      'Operator and axis-angle pulses must agree including the observed-spin-only baseline.');
     fprintf('DISJOINT_PULSE driven=%d accepted=%d error=%.3e\n',driven,accepted,pulse_error);
 end
 
@@ -123,31 +123,31 @@ q=p; q.sequence=[finite ideal]; q.meanfield='static'; rejected=false;
 try
     cce(model.spin_system,q);
 catch exception
-    rejected=strcmp(exception.identifier,'cce_controls:exterior_entangled');
+    rejected=strcmp(exception.identifier,'cce_controls:exterior_correlations');
 end
 result=test_true(result,'Exterior operator static-field rejection',rejected,...
                  'The no-mean-field skip must not discard a pulse that changes exterior expectations.');
 
 % Require no-op control dispatch to preserve explicit and default normalization
-q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
-q.central.rho=ones(2)/2; q.sequence=[]; ss=model.spin_system;
+q=p; q.quantity='signal'; q.transition.alpha=[1;0]; q.transition.beta=[0;1];
+q.rho0=ones(2)/2; q.sequence=[]; ss=model.spin_system;
 for normalized=[false true]
     q.normalized=normalized; plain=cce(ss,q);
     q.sequence=struct('type','finite','target',1,'placement','absolute','at',0,...
                       'duration',0.01,'axis','x','amplitude',0,'detuning',0);
     driven=cce(ss,q);
-    result=test_close(result,'Control dispatch preserves coherence normalization',...
+    result=test_close(result,'Control dispatch preserves signal normalization',...
                       driven.value,plain.value,1e-12,1e-12,...
-                      'A zero-amplitude control must not change the requested coherence scale.');
+                      'A zero-amplitude control must not change the requested signal scale.');
     q.sequence=[];
 end
 q=rmfield(q,'normalized'); plain=cce(ss,q);
 q.sequence=struct('type','finite','target',1,'placement','absolute','at',0,...
                   'duration',0.01,'axis','x','amplitude',0,'detuning',0);
 driven=cce(ss,q);
-result=test_close(result,'Control dispatch preserves default raw coherence',...
+result=test_close(result,'Control dispatch preserves default raw signal',...
                   driven.value,plain.value,1e-12,1e-12,...
-                  'Omitting normalized must retain the same raw coherence on both dispatch paths.');
+                  'Omitting normalized must retain the same raw signal on both dispatch paths.');
 fprintf('Control normalization dispatch discrepancy %.3g.\n',max(abs(driven.value-plain.value)));
 
 % Compare named and explicit Hahn dispatch with the same physical events
@@ -158,17 +158,17 @@ q.sequence=struct('name','hahn','count',1,'axis','x','target',1);
 named_echo=cce(ss,q);
 result=test_close(result,'Named and explicit Hahn normalization',...
                   named_echo.value,explicit_echo.value,1e-12,1e-12,...
-                  'Naming the same pulse sequence must not change the default coherence scale.');
+                  'Naming the same pulse sequence must not change the default signal scale.');
 
 % Exercise the documented observable field for scalar and multiple readouts
-q.quantity='observable'; q.operators=full(z); observed=cce(ss,q);
-q.quantity='density'; q=rmfield(q,'operators'); density_result=cce(ss,q); exact=zeros(numel(q.times),2);
+q.quantity='observable'; q.coil=full(z); observed=cce(ss,q);
+q.quantity='density'; q=rmfield(q,'coil'); density_result=cce(ss,q); exact=zeros(numel(q.times),2);
 for k=1:numel(q.times)
     exact(k,:)=[trace(z*density_result.density(:,:,k)) trace(x*density_result.density(:,:,k))];
 end
 result=test_close(result,'Driven scalar operators readout',observed.value,exact(:,1),...
                   1e-12,1e-12,'The documented operators field supplies the driven observable.');
-q.quantity='observable'; q.operators={full(z),full(x)}; observed=cce(ss,q);
+q.quantity='observable'; q.coil={full(z),full(x)}; observed=cce(ss,q);
 result=test_close(result,'Driven cell operators readout',observed.value,exact,...
                   1e-12,1e-12,'Each observable has its own operator-norm error scale.');
 fprintf('Driven operators discrepancy %.3g.\n',max(abs(observed.value-exact),[],'all'));
@@ -180,22 +180,22 @@ result=test_close(result,'Public finite-control driver',reshape(integrated.value
 
 % Approach the ideal pulse with a fixed rotation angle and decreasing width
 ideal=struct('type','ideal','target',1,'placement','absolute','at',0.05,'axis','x','angle',pi);
-p.sequence=ideal; reference=cce_controls(model,2,context,[],p); errors=zeros(1,3);
+p.sequence=ideal; reference=cce_controls(model,2,spin_config,[],p); errors=zeros(1,3);
 for k=1:3
     width=10^(-k-2); p.sequence=struct('type','finite','target',1,'placement','absolute',...
         'at',0.05-width/2,'duration',width,'axis','x','amplitude',pi/width,'detuning',0);
-    s=cce_controls(model,2,context,[],p); errors(k)=norm(s.raw.density(:,:,end)-reference.raw.density(:,:,end),'fro');
+    s=cce_controls(model,2,spin_config,[],p); errors(k)=norm(s.raw.density(:,:,end)-reference.raw.density(:,:,end),'fro');
 end
 result=test_true(result,'Finite pulse approaches ideal rotation',all(diff(errors)<0)&&errors(end)<2e-5,'Finite pulse approaches ideal rotation');
 
 % Compare midpoint piecewise envelopes against a much finer independent product
-mesh=[8 16 32]; waveform_errors=zeros(size(mesh)); reference=waveform(model,context,1024);
+mesh=[8 16 32]; waveform_errors=zeros(size(mesh)); reference=waveform(model,spin_config,1024);
 for k=1:numel(mesh)
     n=mesh(k); dt=0.1/n;
     p.sequence=repmat(struct('type','finite','target',1,'placement','absolute','at',0,...
                     'duration',dt,'axis','x','amplitude',0,'detuning',0),1,n);
     for j=1:n, p.sequence(j).at=(j-1)*dt; p.sequence(j).amplitude=10*sin(pi*(j-0.5)/n); end
-    s=cce_controls(model,2,context,[],p); waveform_errors(k)=norm(s.raw.density(:,:,end)-reference,'fro');
+    s=cce_controls(model,2,spin_config,[],p); waveform_errors(k)=norm(s.raw.density(:,:,end)-reference,'fro');
 end
 result=test_true(result,'Piecewise midpoint refinement is second order',all(waveform_errors(1:end-1)./waveform_errors(2:end)>3.8),'Piecewise midpoint refinement is second order');
 
@@ -203,7 +203,7 @@ result=test_true(result,'Piecewise midpoint refinement is second order',all(wave
 q=p; q.times=linspace(0,0.1,100); q.sequence=struct('name','xy8','count',8,'axis','x','target',1);
 q.numerics.max_memory_bytes=1e5; rejected=false;
 try
-    cce_controls(model,2,context,[],q);
+    cce_controls(model,2,spin_config,[],q);
 catch err
     rejected=strcmp(err.identifier,'cce_controls:memory');
 end
@@ -230,39 +230,39 @@ result=test_close(result,'UDD timestamps',s.schedule.positions(:,end),0.1*sin(pi
 
 % Exercise time-dependent exterior mean fields and explicit finite-drive refusal
 p.meanfield='static'; p.sequence=ideal; p.sequence.target=2;
-s=cce_controls(model,[],context,[],p); field=s.exterior_expectations{end};
-result=test_close(result,'Exterior ideal pulse flips the sampled field',field{2}(1,3),-context.expectations(1,3),1e-14,0,'Exterior ideal pulse flips the sampled field');
+s=cce_controls(model,[],spin_config,[],p); field=s.exterior_expectations{end};
+result=test_close(result,'Exterior ideal pulse flips the sampled field',field{2}(1,3),-spin_config.expectations(1,3),1e-14,0,'Exterior ideal pulse flips the sampled field');
 Hbefore=s.hamiltonians{end}{2}; Hafter=s.hamiltonians{end}{3};
 result=test_true(result,'Exterior pulse changes subsequent Hamiltonian',norm(Hbefore-Hafter,'fro')>1,'Exterior pulse changes subsequent Hamiltonian');
 p.sequence=struct('type','finite','target',2,'placement','absolute','at',0,...
                   'duration',0.1,'axis','x','amplitude',7,'detuning',0);
 refused=false;
 try
-    cce_controls(model,[],context,[],p); catch exception, refused=strcmp(exception.identifier,'cce_controls:exterior_finite'); end
+    cce_controls(model,[],spin_config,[],p); catch exception, refused=strcmp(exception.identifier,'cce_controls:exterior_finite'); end
 result=test_true(result,'Finite exterior drive is refused rather than frozen',refused,'Finite exterior drive is refused rather than frozen');
 
-% Refuse finite central controls in the conditional-branch approximation
+% Refuse finite observed controls in the projected-manifold approximation
 p.meanfield='none'; p.method='cce'; p.sequence.target=1; refused=false;
 try
-    cce_controls(model,2,context,[],p); catch exception, refused=strcmp(exception.identifier,'cce_controls:conditional_drive'); end
-result=test_true(result,'Conditional finite central drive refused',refused,'General central drives need gCCE');
+    cce_controls(model,2,spin_config,[],p); catch exception, refused=strcmp(exception.identifier,'cce_controls:manifold_drive'); end
+result=test_true(result,'Projected finite observed drive refused',refused,'General observed drives need gCCE');
 
-% Verify an explicitly ordered register pulse against a dense two-spin operator
+% Verify an explicitly ordered observed-spin system pulse against a dense two-spin operator
 p.method='gcce'; p.sequence=struct('type','ideal','target',[2 1],'placement','absolute',...
     'at',0,'operator',kron(z,x),'angle',0.7);
-s=cce_controls(model,2,context,[],p); expected_pulse=expm(-1i*0.7*kron(x,z));
-result=test_close(result,'Selective register operator ordering',s.pulses{end}{1},expected_pulse,...
+s=cce_controls(model,2,spin_config,[],p); expected_pulse=expm(-1i*0.7*kron(x,z));
+result=test_close(result,'Selective observed-spin system operator ordering',s.pulses{end}{1},expected_pulse,...
                   1e-13,0,'The target tensor order is remapped to canonical physical order');
 
 % Distinguish a physical spin-one rotation from a selective two-level pulse
 sys.isotopes={'14N'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
-inter=struct(); spin_system=create(sys,inter); q=p; q.central_spins=1; q.bath_spins=[];
-q.central.rho=diag([1 0 0]); q.order=0; q.bath_state=struct('mode','mixed_product');
+inter=struct(); spin_system=create(sys,inter); q=p; q.observed_spins=1; q.bath_spins=[];
+q.rho0=diag([1 0 0]); q.order=0; q.bath_state=struct('mode','mixed_product');
 q.sequence=struct('type','ideal','target',1,'placement','absolute','at',0,'axis','x','angle',pi);
 spin_one=cce_prepare(spin_system,q); states=cce_states(spin_one,q);
-physical=cce_controls(spin_one,[],states.contexts(1),[],q);
+physical=cce_controls(spin_one,[],states.spin_configs(1),[],q);
 q.sequence.operator=[0 1 0;1 0 0;0 0 0]/2; q.sequence.axis=[];
-selective=cce_controls(spin_one,[],states.contexts(1),[],q);
+selective=cce_controls(spin_one,[],states.spin_configs(1),[],q);
 result=test_close(result,'Physical spin-one pi pulse',physical.raw.density(:,:,end),diag([0 0 1]),...
                   1e-12,0,'A full spin-one rotation maps m=+1 to m=-1');
 result=test_close(result,'Selective two-level pi pulse',selective.raw.density(:,:,end),diag([0 1 0]),...
@@ -275,8 +275,8 @@ result=test_true(result,'Physical and selective pulses differ',...
 sys=struct(); sys.magnet=0; sys.isotopes={'E'}; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'processes',1};
 inter=struct(); inter.zeeman.matrix={zeros(3)}; spin_system=create(sys,inter);
-stat.central_spins=1; stat.bath_spins=[]; stat.method='gcce'; stat.expansion='standard';
-stat.quantity='density'; stat.order=0; stat.central.rho=diag([1 0]); stat.assumptions='labframe';
+stat.observed_spins=1; stat.bath_spins=[]; stat.method='gcce'; stat.expansion='standard';
+stat.quantity='density'; stat.order=0; stat.rho0=diag([1 0]); stat.assumptions='labframe';
 stat.orientation=[0 0 0]; stat.interaction_cutoff=Inf; stat.graph=struct('mode','complete');
 stat.meanfield='none'; stat.times=[0 1]; stat.bath_state=struct('mode','mixed_product');
 stat.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
@@ -286,9 +286,9 @@ rotated=cce(spin_system,stat); stat.sequence.angle=0; unrotated=cce(spin_system,
 stat.sequence=rmfield(stat.sequence,'angle'); stat.sequence.operator=pi*[0 1;1 0]/2;
 folded=cce(spin_system,stat);
 result=test_close(result,'Static explicit generator with angle pi',rotated.density(:,:,end),diag([0 1]),...
-                  1e-12,0,'An explicit Sx generator with angle pi inverts the central population');
+                  1e-12,0,'An explicit Sx generator with angle pi inverts the observed population');
 result=test_close(result,'Static explicit generator with zero angle',unrotated.density(:,:,end),diag([1 0]),...
-                  1e-12,0,'A zero angle must leave the central state unchanged');
+                  1e-12,0,'A zero angle must leave the observed state unchanged');
 result=test_close(result,'Static angle-folded generator',folded.density(:,:,end),rotated.density(:,:,end),...
                   1e-12,0,'A missing angle defaults to one, so pi*Sx equals Sx with angle pi');
 
@@ -296,7 +296,7 @@ result=test_close(result,'Static angle-folded generator',folded.density(:,:,end)
 fprintf('controls dense error %.3g; ideal-limit errors %s; waveform errors %s\n',error,mat2str(errors,6),mat2str(waveform_errors,6));
 
 % Pulse-generator validation is unchanged by reciprocal operator-angle scaling
-[model,q,ensemble]=fixture(); context=ensemble.contexts(1); rejected=false(1,2);
+[model,q,ensemble]=fixture(); spin_config=ensemble.spin_configs(1); rejected=false(1,2);
 q.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
                   'operator',1e-20*[0 1;0 0],'angle',1e20);
 try
@@ -305,7 +305,7 @@ catch
     rejected(1)=true;
 end
 try
-    cce_controls(model,2,context,[],q);
+    cce_controls(model,2,spin_config,[],q);
 catch
     rejected(2)=true;
 end
@@ -324,19 +324,19 @@ end
 end
 
 % Independently propagate a sampled sinusoidal drive with a fine mesh
-function rho=waveform(model,context,n)
+function rho=waveform(model,spin_config,n)
 spin=pauli(2); x=spin.x; H=cce_hamiltonian(model,2,struct()); U=eye(4); dt=0.1/n;
 for j=1:n, U=expm(-1i*dt*(H+10*sin(pi*(j-0.5)/n)*kron(x,eye(2))))*U; end
-rho=partial(U*kron(context.central_rho,context.bath_rho{1})*U');
+rho=partial(U*kron(spin_config.rho0,spin_config.bath_rho{1})*U');
 end
 
-% Build a small noncommuting central-bath model in angular-frequency units
+% Build a small noncommuting observed-spin-bath model in angular-frequency units
 function [model,p,ensemble]=fixture()
 sys.isotopes={'1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
 inter.coupling.matrix=cell(2); inter.coupling.matrix{1,2}=diag([2 3 5])/(2*pi);
-spin_system=create(sys,inter); p.central_spins=1; p.bath_spins=2;
+spin_system=create(sys,inter); p.observed_spins=1; p.bath_spins=2;
 p.method='gcce'; p.expansion='standard'; p.quantity='density'; p.times=[0 0.1]; p.order=1;
-p.central.rho=[1 1;1 1]/2; p.assumptions='labframe'; p.orientation=[0 0 0];
+p.rho0=[1 1;1 1]/2; p.assumptions='labframe'; p.orientation=[0 0 0];
 p.interaction_cutoff=Inf; p.graph=struct('mode','complete','score','coupling_norm');
 p.bath_state=struct('mode','explicit_product','rho',{{diag([1 0])}});
 p.meanfield='none'; p.sequence=[]; p.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);

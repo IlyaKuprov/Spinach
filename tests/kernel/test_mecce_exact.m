@@ -4,7 +4,7 @@
 
 function result=test_mecce_exact()
 
-% Construct a central spin and two interacting bath spins
+% Construct a observed spin and two interacting bath spins
 result=new_test_result('kernel/mecce_exact','ME exact dynamics',...
                        'Zero jumps, dense Liouville full bath and correlated support.');
 sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.output='hush';
@@ -13,7 +13,7 @@ s=create(sys,inter); s.inter.zeeman.matrix{2}(3,3)=3;
 s.inter.coupling.matrix{1,2}=diag([0.7 0.4 1.1]);
 s.inter.coupling.matrix{2,3}=diag([0.3 0.5 0.9]);
 p=parameters(); p.times=linspace(0,0.8,15);
-p.central=struct('alpha',[1;0],'beta',[0;1],'rho',[1 1;1 1]/2);
+p.rho0=[1 1;1 1]/2; p.transition=struct('alpha',[1;0],'beta',[0;1]);
 p.jumps=struct('support',{},'operator',{},'rate',{});
 
 % Compare selective explicit-generator ME pulses with closed and dense evolution
@@ -26,7 +26,7 @@ result=test_close(result,'Selective operator ME pulse matches closed evolution',
                   'Zero-jump master evolution must use the same retained-site dimensions as the Hamiltonian.');
 q.method='gcce'; model=cce_prepare(s,q); H=cce_hamiltonian(model,[2 3],struct());
 spin=pauli(2); pulse=kron(eye(2),kron(expm(-1i*pi*spin.x),eye(2)));
-initial=kron(q.central.rho,eye(4)/4); pulse_error=0;
+initial=kron(q.rho0,eye(4)/4); pulse_error=0;
 for k=1:numel(q.times)
     t=q.times(k); U=expm(-1i*H*0.6*t)*pulse*expm(-1i*H*0.4*t);
     if t==0, U=eye(8); end
@@ -44,30 +44,30 @@ end
 fprintf('Selective ME pulse dense discrepancy %.3g.\n',pulse_error);
 
 % Require zero-jump trajectories to retain complex closed-system phases
-conditional_system=s; conditional_system.inter.coupling.matrix{1,2}=diag([0 0 1.1]);
-p.method='cce'; closed=cce(conditional_system,p); p.method='mecce'; opened=cce(conditional_system,p);
-result=test_close(result,'C7 numerical check',opened.value,closed.value,2e-11,2e-11,'Conditional zero jumps.');
+projected_system=s; projected_system.inter.coupling.matrix{1,2}=diag([0 0 1.1]);
+p.method='cce'; closed=cce(projected_system,p); p.method='mecce'; opened=cce(projected_system,p);
+result=test_close(result,'C7 numerical check',opened.value,closed.value,2e-11,2e-11,'Projected zero jumps.');
 p.method='gcce'; p.quantity='density'; closed=cce(s,p);
 p.method='megcce'; opened=cce(s,p);
 result=test_close(result,'C7 numerical check',opened.density,closed.density,2e-11,2e-11,'Generalized zero jumps.');
 
-% Preserve raw coherence unless normalization was explicitly requested
-q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
-q.method='gcce'; closed_coherence=cce(s,q); q.method='megcce'; raw_coherence=cce(s,q);
-result=test_close(result,'ME raw coherence default',raw_coherence.value,closed_coherence.value,...
-                  2e-11,2e-11,'An empty jump array must not normalize raw generalized coherence.');
+% Preserve raw signal unless normalization was explicitly requested
+q=p; q.quantity='signal'; q.transition.alpha=[1;0]; q.transition.beta=[0;1];
+q.method='gcce'; closed_signal=cce(s,q); q.method='megcce'; raw_signal=cce(s,q);
+result=test_close(result,'ME raw signal default',raw_signal.value,closed_signal.value,...
+                  2e-11,2e-11,'An empty jump array must not normalize raw generalized signal.');
 q.normalized=false; explicit_raw=cce(s,q);
-result=test_close(result,'ME explicit raw coherence',explicit_raw.value,closed_coherence.value,...
+result=test_close(result,'ME explicit raw signal',explicit_raw.value,closed_signal.value,...
                   2e-11,2e-11,'Explicit false and the omitted normalization option must agree.');
-q.normalized=true; normalized_coherence=cce(s,q);
-result=test_close(result,'ME explicit normalized coherence',normalized_coherence.value,...
-                  2*closed_coherence.value,2e-11,2e-11,...
-                  'Explicit normalization divides by the balanced initial coherence of one half.');
+q.normalized=true; normalised_signal=cce(s,q);
+result=test_close(result,'ME explicit normalized signal',normalised_signal.value,...
+                  2*closed_signal.value,2e-11,2e-11,...
+                  'Explicit normalization divides by the balanced initial signal of one half.');
 fprintf('R1230 closed %.16g; ME default %.16g.\n',...
-        real(closed_coherence.value(1)),real(raw_coherence.value(1)));
+        real(closed_signal.value(1)),real(raw_signal.value(1)));
 
 % Refuse a multi-site operator instead of silently applying identity
-q=p; q.method='megcce'; q.quantity='density'; q.central.rho=diag([1 0]);
+q=p; q.method='megcce'; q.quantity='density'; q.rho0=diag([1 0]);
 q.sequence=struct('type','ideal','placement','fraction','at',0.5,'target',[1 2],...
                   'operator',kron([0 1;1 0]/2,eye(2)),'angle',pi);
 rejected=false;
@@ -77,7 +77,7 @@ catch err
     rejected=strcmp(err.identifier,'cce_master:operator_target');
 end
 result=test_true(result,'ME multi-site operator rejection',rejected,...
-                 'Unsupported joint central-bath generators must fail explicitly, never act as identity.');
+                 'Unsupported joint observed-spin-bath generators must fail explicitly, never act as identity.');
 
 % Validate whole-sequence Hahn timing and a zero-duration initial state
 p.sequence=struct('type','ideal','placement','fraction','at',0.5,...
@@ -85,13 +85,13 @@ p.sequence=struct('type','ideal','placement','fraction','at',0.5,...
 p.method='gcce'; closed_echo=cce(s,p); p.method='megcce'; opened_echo=cce(s,p);
 result=test_close(result,'ME-gCCE Hahn zero jumps',opened_echo.density,closed_echo.density,...
                   2e-11,2e-11,'Physical pulse, whole-sequence clock and zero-time identity.');
-p.method='cce'; p.quantity='coherence'; closed_echo=cce(conditional_system,p);
-p.method='mecce'; opened_echo=cce(conditional_system,p);
+p.method='cce'; p.quantity='signal'; closed_echo=cce(projected_system,p);
+p.method='mecce'; opened_echo=cce(projected_system,p);
 result=test_close(result,'ME-CCE Hahn zero jumps',opened_echo.value,closed_echo.value,...
-                  2e-11,2e-11,'Conditional branch swapping retains the complex trajectory.');
+                  2e-11,2e-11,'Projected manifold swapping retains the complex trajectory.');
 p.method='megcce'; p.quantity='density'; p.sequence=struct([]);
 
-% Build an independent Pauli-product Liouville reference with bath relaxation
+% Build an independent spin-product-operator Liouville reference with bath relaxation
 x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2; e=eye(2);
 H=3*kron(e,kron(z,e))+0.7*kron(x,kron(x,e))+0.4*kron(y,kron(y,e))+...
   1.1*kron(z,kron(z,e))+0.3*kron(e,kron(x,x))+...
@@ -100,7 +100,7 @@ j=[0 1;0 0]; L=kron(e,kron(j,e)); rate=0.6;
 G=-1i*(kron(eye(8),H)-kron(H.',eye(8)))+...
   rate*(kron(conj(L),L)-(kron(eye(8),L'*L)+kron((L'*L).',eye(8)))/2);
 p.jumps=struct('support',2,'operator',j,'rate',rate); opened=cce(s,p);
-rho=kron(p.central.rho,eye(4)/4); reference=zeros(2,2,numel(p.times));
+rho=kron(p.rho0,eye(4)/4); reference=zeros(2,2,numel(p.times));
 for k=1:numel(p.times)
     evolved=reshape(expm(G*p.times(k))*rho(:),8,8);
     for a=1:2
@@ -111,16 +111,16 @@ for k=1:numel(p.times)
 end
 result=test_close(result,'C7 numerical check',opened.density,reference,2e-11,2e-11,'Independent full Liouville density.');
 
-% Validate the full conditional bath block against an independent Liouvillian
+% Validate the full projected bath block against an independent Liouvillian
 ha=H(1:4,1:4); hb=H(5:8,5:8); lb=kron(j,eye(2));
 generator=-1i*(kron(eye(4),ha)-kron(hb.',eye(4)))+...
           rate*(kron(conj(lb),lb)-(kron(eye(4),lb'*lb)+kron((lb'*lb).',eye(4)))/2);
-p.method='mecce'; p.quantity='coherence'; conditional=cce(conditional_system,p); rb=eye(4)/4;
-conditional_reference=zeros(numel(p.times),1);
+p.method='mecce'; p.quantity='signal'; projected=cce(projected_system,p); rb=eye(4)/4;
+projected_reference=zeros(numel(p.times),1);
 for k=1:numel(p.times)
-    conditional_reference(k)=trace(reshape(expm(generator*p.times(k))*rb(:),4,4));
+    projected_reference(k)=trace(reshape(expm(generator*p.times(k))*rb(:),4,4));
 end
-result=test_close(result,'Full-bath conditional ME reference',conditional.value,conditional_reference,...
+result=test_close(result,'Full-bath projected ME reference',projected.value,projected_reference,...
                   2e-11,2e-11,'Independent column-vectorized left/right Lindblad blocks.');
 p.method='megcce'; p.quantity='density';
 
@@ -145,10 +145,10 @@ p.sequence=struct([]);
 % Refuse retained jump caches that exceed a direct evaluator memory budget
 for method={'mecce','megcce'}
     budget=parameters(); budget.method=method{1}; budget.bath_spins=2; budget.order=1;
-    budget.central=struct('rho',ones(2)/2); budget.quantity='density';
+    budget.rho0=ones(2)/2; budget.transition=struct(); budget.quantity='density';
     budget.jumps=repmat(struct('support',2,'operator',[0 1;0 0],'rate',2),1,128);
     if strcmp(method{1},'mecce')
-        budget.central=struct('alpha',[1;0],'beta',[0;1],'rho',ones(2)/2); budget.quantity='coherence';
+        budget.rho0=ones(2)/2; budget.transition=struct('alpha',[1;0],'beta',[0;1]); budget.quantity='signal';
     end
     model=cce_prepare(s,budget); states=cce_states(model,budget);
     schedule=cce_sequence(model,budget); cluster=struct('id',1,'sites',2);
@@ -157,7 +157,7 @@ for method={'mecce','megcce'}
     payload=16*2*128*dimension^2;
     budget.numerics.max_memory_bytes=workspace+payload/2; refused=false;
     try
-        cce_master(model,cluster,states.contexts,schedule,budget);
+        cce_master(model,cluster,states.spin_configs,schedule,budget);
     catch exception
         refused=strcmp(exception.identifier,'cce:memory');
     end
@@ -167,8 +167,8 @@ for method={'mecce','megcce'}
             method{1},payload,budget.numerics.max_memory_bytes,refused);
 end
 
-% Compare supplied contexts independently of the parameter-level initial state
-result=context_initialization(result);
+% Compare supplied spin_configs independently of the parameter-level initial state
+result=config_initialization(result);
 
 % Refuse a split correlated jump and accept its complete ordered support
 p.jumps=struct('support',[3 2],'operator',kron(j,z),'rate',rate);
@@ -195,7 +195,7 @@ end
 
 % Declare all physical and numerical choices explicitly
 function p=parameters()
-p=struct('central_spins',1,'bath_spins',[2 3],'method','mecce','quantity','coherence',...
+p=struct('observed_spins',1,'bath_spins',[2 3],'method','mecce','quantity','signal',...
          'expansion','standard','order',2,'times',0,'assumptions','labframe',...
          'orientation',[0 0 0],'interaction_cutoff',Inf,'meanfield','none');
 p.graph=struct('mode','complete'); p.bath_state=struct('mode','mixed_product');
@@ -240,7 +240,7 @@ s.inter.coupling.matrix{6,7}=[11.591666809583273 -27.291294263188128 -23.8257671
 
 % Use the native rates and the exact whole-echo tutorial times
 p=parameters(); p.bath_spins=2:7; p.times=linspace(0,0.001,11);
-p.central=struct('alpha',[1;0],'beta',[0;1],'rho',[1 1;1 1]/2);
+p.rho0=[1 1;1 1]/2; p.transition=struct('alpha',[1;0],'beta',[0;1]);
 p.sequence=struct('type','ideal','placement','fraction','at',0.5,...
                   'target',1,'axis','x','angle',pi);
 p.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',1e9,'propagator','stock');
@@ -250,19 +250,19 @@ for k=2:7
     p.jumps(end+1)=struct('support',k,'operator',[0 0;1 0],'rate',500);
 end
 
-% Declare the pinned conventional ME reference's central-Sz projection
-conditional_system=s;
-for k=2:7, conditional_system.inter.coupling.matrix{1,k}(:,1:2)=0; end
-r=cce(conditional_system,p);
+% Declare the pinned conventional ME reference's observed-Sz projection
+projected_system=s;
+for k=2:7, projected_system.inter.coupling.matrix{1,k}(:,1:2)=0; end
+r=cce(projected_system,p);
 reference=[1.0000000000000004;0.99999923394307144;0.99999409440779452;0.99998078627671738;0.99995608154472349;0.99991725565690237;0.99986203036107879;0.99978852242935690;0.99969519766699644;0.99958082968503426;0.99944446296394518]+...
           1i*[8.0506813103672611e-17;-1.4845050358724403e-11;-3.0705481891667437e-11;-4.7507112746376136e-11;-6.5180890168568098e-11;-8.3662944693980344e-11;-1.0289507687643922e-10;-1.2282225090608725e-10;-1.4339388638076503e-10;-1.6456348260287508e-10;-1.8628754486596782e-10];
 result=test_close(result,'PyCCE reconstructed ME-CCE2',r.value,reference,5e-8,0,...
                   'Regenerated seeded coordinates, tensors, rates and Hahn sequence.');
-conditional_error=max(abs(r.value-reference));
+projected_error=max(abs(r.value-reference));
 
 % Match PyCCE run/gcce.py:116-131 pulse-rotated final readout states
 s.inter.zeeman.matrix{1}(3,3)=5282579115.0000000;
-p.method='megcce'; p.central.alpha=[0;1]; p.central.beta=[1;0];
+p.method='megcce'; p.transition.alpha=[0;1]; p.transition.beta=[1;0];
 p.normalized=true; r=cce(s,p);
 reference=[1.0000000000000020;0.99999696702632823;0.99996577952531562;0.99988384475122793;0.99978528981565296;0.99974208884696936;0.99976927314393593;0.99975844441771289;0.99954179272729826;0.99906118745487882;0.99848426483783148]+...
           1i*[-1.5501238790078434e-17;-0.0000045301957227707227;-0.000022166638316224802;-0.000022200000381094418;0.000036116963262306526;0.00012774472614107248;0.00014770063943958262;0.0000075750698896664989;-0.00023796879104827002;-0.00038050310796545583;-0.00022067377857413301];
@@ -270,65 +270,65 @@ result=test_close(result,'PyCCE reconstructed ME-gCCE2',r.value,reference,5e-8,0
                   'Final alpha/beta exchanged explicitly to match the PyCCE Hahn readout.');
 result=test_true(result,'ME tutorial validity',all(r.valid),'Conservative lab-frame arithmetic estimates remain within declared budgets.');
 fprintf('PyCCE ME-CCE2 %.3g; ME-gCCE2 %.3g; max bound %.3g\n',...
-        conditional_error,max(abs(r.value-reference)),max(r.abs_error_bound));
+        projected_error,max(abs(r.value-reference)),max(r.abs_error_bound));
 
 end
 
 % Exercise state overrides through both open and closed evaluator families
-function result=context_initialization(result)
+function result=config_initialization(result)
 
-% Build a diagonal central-bath model with an independently soluble phase
+% Build a diagonal observed-spin-bath model with an independently soluble phase
 sys.isotopes={'1H','1H'}; sys.magnet=0; sys.output='hush';
 sys.disable={'hygiene'}; sys.parallel={'processes',1};
 inter.zeeman.scalar={0,0}; inter.coupling.scalar=cell(2); spin_system=create(sys,inter);
 spin_system.inter.coupling.matrix{1,2}=diag([0 0 4]);
 p=parameters(); p.bath_spins=2; p.order=1; p.times=[0 0.1];
-p.central=struct('alpha',[1;0],'beta',[0;1],'rho',[1 1;1 1]/2);
+p.rho0=[1 1;1 1]/2; p.transition=struct('alpha',[1;0],'beta',[0;1]);
 p.jumps=struct('support',{},'operator',{},'rate',{});
 model=cce_prepare(spin_system,p); ensemble=cce_states(model,p);
-context=ensemble.contexts(1); context.central_rho=[0.25 0.2i;-0.2i 0.75];
-context.bath_rho={diag([0 1])}; context.expectations=[0 0 -0.5];
+spin_config=ensemble.spin_configs(1); spin_config.rho0=[0.25 0.2i;-0.2i 0.75];
+spin_config.bath_rho={diag([0 1])}; spin_config.expectations=[0 0 -0.5];
 cluster=struct('id',1,'sites',2); schedule=cce_sequence(model,p);
 
-% Check every generalised observable and its context-derived reference
+% Check every generalised observable and its spin_config-derived reference
 maximum=0;
 for method={'gcce','megcce'}
     p.method=method{1};
     if strcmp(p.method,'gcce'), evaluator=@cce_cluster; else, evaluator=@cce_master; end
-    for quantity={'density','coherence','observable'}
-        p.quantity=quantity{1}; p.operators=diag([1 2]);
-        if ~strcmp(p.quantity,'observable'), p=rmfield(p,'operators'); end
+    for quantity={'density','signal','observable'}
+        p.quantity=quantity{1}; p.coil=diag([1 2]);
+        if ~strcmp(p.quantity,'observable'), p=rmfield(p,'coil'); end
         for normalized=[false true]
             if strcmp(p.quantity,'density')&&normalized, continue; end
-            p.normalized=normalized; raw=evaluator(model,cluster,context,schedule,p);
+            p.normalized=normalized; raw=evaluator(model,cluster,spin_config,schedule,p);
             expected=zeros(2,numel(raw.value(1,:)));
-            observe=p; observe.central.rho=context.central_rho;
+            observe=p; observe.rho0=spin_config.rho0;
             for k=1:2
                 u=expm(1i*diag([1 -1])*p.times(k));
-                rho=u*context.central_rho*u'; expected(k,:)=cce_observe(rho,observe);
+                rho=u*spin_config.rho0*u'; expected(k,:)=cce_observe(rho,observe);
             end
 
-            % Rebinding the same context into defaults must not change uncertainty scaling
-            rebound=p; rebound.central.rho=context.central_rho;
-            matched=evaluator(model,cluster,context,schedule,rebound);
-            result=test_close(result,[p.method ' context bound ' p.quantity ' ' num2str(normalized)],...
+            % Rebinding the same spin_config into defaults must not change uncertainty scaling
+            rebound=p; rebound.rho0=spin_config.rho0;
+            matched=evaluator(model,cluster,spin_config,schedule,rebound);
+            result=test_close(result,[p.method ' spin_config bound ' p.quantity ' ' num2str(normalized)],...
                               raw.abs_error_bound,matched.abs_error_bound,0,0,...
-                              'The normalization error bound must use the same supplied context reference.');
+                              'The normalization error bound must use the same supplied spin_config reference.');
 
             % Compare the propagated values with the independent phase solution
             difference=norm(raw.value-expected,'fro'); maximum=max(maximum,difference);
-            label=sprintf('%s context %s normalized %d',p.method,p.quantity,normalized);
+            label=sprintf('%s spin_config %s normalized %d',p.method,p.quantity,normalized);
             result=test_close(result,label,raw.value,expected,2e-12,2e-12,...
-                              'Supplied central and bath densities determine evolution and normalization.');
+                              'Supplied observed and bath densities determine evolution and normalization.');
         end
     end
 end
-fprintf('R13 generalized context maximum %.17g\n',maximum);
+fprintf('R13 generalized spin_config maximum %.17g\n',maximum);
 
-% Reject unsupported context projections and references instead of ignoring them
+% Reject unsupported spin_config projections and references instead of ignoring them
 rejected=0; attempted=0;
 for method={'cce','gcce','mecce','megcce','noise'}
-    q=p; q.method=method{1}; q=rmfield(q,{'operators','normalized'}); q.quantity='coherence';
+    q=p; q.method=method{1}; q=rmfield(q,{'coil','normalized'}); q.quantity='signal';
     if strcmp(q.method,'noise')
         q.quantity='autocorrelation';
         q.noise=struct('ordering','ordered','connected',false,...
@@ -338,49 +338,49 @@ for method={'cce','gcce','mecce','megcce','noise'}
     else, evaluator=@cce_cluster;
     end
     for field={'initial_rho','projection','reference'}
-        supplied=context; supplied.(field{1})=eye(2)/2; caught=false; attempted=attempted+1;
+        supplied=spin_config; supplied.(field{1})=eye(2)/2; caught=false; attempted=attempted+1;
         try
             evaluator(model,cluster,supplied,schedule,q);
         catch exception
-            caught=strcmp(exception.identifier,'cce:context');
+            caught=strcmp(exception.identifier,'cce:spin_config');
         end
         rejected=rejected+caught;
-        result=test_true(result,[q.method ' rejects context ' field{1}],caught,...
+        result=test_true(result,[q.method ' rejects spin_config ' field{1}],caught,...
                          'Unsupported state, projection and reference overrides must not be silently discarded.');
     end
 end
-fprintf('R13 unsupported context rejections %d/%d\n',rejected,attempted);
+fprintf('R13 unsupported spin_config rejections %d/%d\n',rejected,attempted);
 
 
 % Reject an obsolete parameter reference alias on evaluator and driver paths
-q=p; q.method='gcce'; q.initial_rho=context.central_rho; rejected=false(1,2);
+q=p; q.method='gcce'; q.initial_rho=spin_config.rho0; rejected=false(1,2);
 try
-    cce_cluster(model,cluster,context,schedule,q);
+    cce_cluster(model,cluster,spin_config,schedule,q);
 catch exception
-    rejected(1)=strcmp(exception.identifier,'cce:context');
+    rejected(1)=strcmp(exception.identifier,'cce:spin_config');
 end
 try
     cce(spin_system,q);
 catch exception
-    rejected(2)=strcmp(exception.identifier,'cce:context');
+    rejected(2)=strcmp(exception.identifier,'cce:spin_config');
 end
 result=test_true(result,'Initial rho alias rejected consistently',all(rejected),...
                  'Unsupported references cannot be silently accepted by standalone helpers.');
 
-% Keep conditional branch traces independent of the central coherence amplitude
-p=rmfield(p,{'operators','normalized'}); p.quantity='coherence';
+% Keep projected manifold traces independent of the observed signal amplitude
+p=rmfield(p,{'coil','normalized'}); p.quantity='signal';
 for method={'cce','mecce'}
     p.method=method{1};
     if strcmp(p.method,'cce'), evaluator=@cce_cluster; else, evaluator=@cce_master; end
-    raw=evaluator(model,cluster,context,schedule,p);
-    result=test_close(result,[p.method ' context bath phase'],raw.value,exp(2i*p.times(:)),...
-                      2e-12,2e-12,'Conditional methods return normalized branch traces for the supplied bath state.');
+    raw=evaluator(model,cluster,spin_config,schedule,p);
+    result=test_close(result,[p.method ' spin_config bath phase'],raw.value,exp(2i*p.times(:)),...
+                      2e-12,2e-12,'Projected methods return normalized manifold traces for the supplied bath state.');
 
-    % Use explicit branch vectors rather than a cached projection
-    swapped=p; swapped.central.alpha=p.central.beta; swapped.central.beta=p.central.alpha;
-    raw=evaluator(model,cluster,context,schedule,swapped);
+    % Use explicit manifold vectors rather than a cached projection
+    swapped=p; swapped.transition.alpha=p.transition.beta; swapped.transition.beta=p.transition.alpha;
+    raw=evaluator(model,cluster,spin_config,schedule,swapped);
     result=test_close(result,[p.method ' supplied projection'],raw.value,exp(-2i*p.times(:)),...
-                      2e-12,2e-12,'Swapped user branch vectors reverse the conditional phase.');
+                      2e-12,2e-12,'Swapped user manifold vectors reverse the projected phase.');
 end
 end
 

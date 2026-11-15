@@ -11,7 +11,7 @@ result=new_test_result('kernel/cce_units','CCE canonical units',...
                        'Check signed Zeeman, scalar, dipolar and ordered-cell units.');
 
 % Define explicit model choices without invoking an interaction conversion twice
-parameters.central_spins=1; parameters.bath_spins=2;
+parameters.observed_spins=1; parameters.bath_spins=2;
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf;
 parameters.numerics=struct('atol',1e-7,'rtol',1e-12,'max_memory_bytes',1e8);

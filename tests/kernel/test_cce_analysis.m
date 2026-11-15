@@ -4,7 +4,7 @@
 
 function result=test_cce_analysis()
 
-% Fit a complex coherence through its explicitly selected magnitude envelope
+% Fit a complex signal through its explicitly selected magnitude envelope
 result=new_test_result('kernel/cce_analysis','CCE decay diagnostics',...
                        'Synthetic windows, fit assumptions and invalid/oscillatory refusal.');
 t=linspace(0,2,101)'; envelope=0.8*exp(-(t/0.7).^1.6);

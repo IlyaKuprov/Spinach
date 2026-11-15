@@ -15,9 +15,9 @@ inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3); inter.coupling.matrix{1,2}=diag([0 0 17]);
 inter.coupling.matrix{1,3}=diag([0 0 29]);
 spin_system=create(sys,inter);
-p=struct('central_spins',1,'bath_spins',[2 3],'method','cce',...
-         'expansion','standard','quantity','coherence','times',[0 0.001 0.004],...
-         'order',2,'central',struct('alpha',[1;0],'beta',[0;1]),...
+p=struct('observed_spins',1,'bath_spins',[2 3],'method','cce',...
+         'expansion','standard','quantity','signal','times',[0 0.001 0.004],...
+         'order',2,'transition',struct('alpha',[1;0],'beta',[0;1]),...
          'assumptions','labframe','orientation',[0 0 0],'interaction_cutoff',Inf,...
          'graph',struct('mode','complete','score','coupling_norm'),...
          'meanfield','none','sequence',[],'averaging','after_expansion',...
@@ -49,7 +49,7 @@ adaptive_states=cce_states(adaptive_model,adaptive);
 adaptive.partition=struct('mode','adaptive','max_dimension',4,...
     'patch_atol',1e-10,...
     'patch_rtol',1e-10,'max_rounds',2,'max_probes',100,'patches',{{[2 3]}},...
-    'pilot_contexts',adaptive_states.contexts,'heldout_contexts',adaptive_states.contexts);
+    'pilot_configs',adaptive_states.spin_configs,'heldout_configs',adaptive_states.spin_configs);
 reference=cce(spin_system,adaptive); accepted=false; discrepancy=Inf;
 adaptive.checkpoint=struct('file',fullfile(folder,'adaptive-partition.mat'),'resume',false);
 try
@@ -160,7 +160,7 @@ schedule=cce_sequence(model,plain); cluster=struct('id',1,'sites',2);
 for method={'cce','gcce','mecce','megcce','noise'}
     direct=plain; direct.method=method{1};
     if any(strcmp(direct.method,{'gcce','megcce'}))
-        direct.central.rho=ones(2)/2; direct.normalized=false;
+        direct.rho0=ones(2)/2; direct.normalized=false;
     end
     if any(strcmp(direct.method,{'mecce','megcce'}))
         direct.jumps=struct('support',2,'rate',2,'operator',[0 1;0 0]);
@@ -176,7 +176,7 @@ for method={'cce','gcce','mecce','megcce','noise'}
     direct.checkpoint=struct('file',fullfile(folder,'direct.mat'),'resume',true);
     refused=false;
     try
-        evaluator(model,cluster,ensemble.contexts(1),schedule,direct);
+        evaluator(model,cluster,ensemble.spin_configs(1),schedule,direct);
     catch exception
         refused=strcmp(exception.identifier,'cce:checkpoint');
     end
@@ -237,7 +237,7 @@ result=test_true(result,'adaptive checkpoint rejection',refused,...
 for method={'cce','gcce','mecce','megcce','noise','controls'}
     request=plain;
     if strcmp(method{1},'controls')
-        request.method='gcce'; request.central.rho=ones(2)/2;
+        request.method='gcce'; request.rho0=ones(2)/2;
         request.sequence=struct('type','finite','target',1,'placement','absolute',...
                                 'at',0,'duration',0.0005,'axis','x','amplitude',7,'detuning',3);
         request.times=[0 0.002 0.004]; request.normalized=false;
@@ -245,7 +245,7 @@ for method={'cce','gcce','mecce','megcce','noise','controls'}
         request.method=method{1};
     end
     if any(strcmp(request.method,{'gcce','megcce'}))
-        request.central.rho=ones(2)/2; request.normalized=false;
+        request.rho0=ones(2)/2; request.normalized=false;
     end
     if any(strcmp(request.method,{'mecce','megcce'}))
         request.jumps=struct('support',2,'rate',2,'operator',[0 1;0 0]);
@@ -310,7 +310,7 @@ for method={'cce','mecce','noise','controls'}
         request.noise=struct('ordering','ordered','connected',false,...
                              'terms',struct('support',2,'operator',diag([1 -1])/2));
     elseif strcmp(method{1},'controls')
-        request.method='gcce'; request.central.rho=ones(2)/2; request.normalized=false;
+        request.method='gcce'; request.rho0=ones(2)/2; request.normalized=false;
         request.sequence=struct('type','finite','target',1,'placement','absolute',...
                                 'at',0,'duration',0.0005,'axis','x','amplitude',7,'detuning',3);
         request.times=[0 0.002 0.004];

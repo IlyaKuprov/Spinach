@@ -67,6 +67,45 @@ for method={'gcce','megcce'}
     end
 end
 
+% Match disjoint one-site operator pulses across driven and ideal paths
+finite.operator=[]; finite.angle=[];
+for driven=[false true]
+    q=p; ideal=finite; ideal.type='ideal'; ideal.target=2; ideal.at=0.05;
+    ideal.duration=[]; ideal.amplitude=[]; ideal.detuning=[];
+    ideal.operator=pi*x; ideal.axis=[]; ideal.angle=[];
+    if driven
+        q.sequence=[finite ideal];
+    else
+        q.sequence=rmfield(ideal,{'amplitude','detuning'});
+    end
+    accepted=false; pulse_error=Inf;
+    try
+        operator_result=cce(model.spin_system,q);
+        q.sequence(end).operator=[]; q.sequence(end).axis='x'; q.sequence(end).angle=pi;
+        axis_result=cce(model.spin_system,q);
+        pulse_error=norm(operator_result.value(:)-axis_result.value(:));
+        accepted=all(operator_result.valid,'all');
+    catch exception
+        fprintf('DISJOINT_PULSE driven=%d error=%s\n',driven,exception.identifier);
+    end
+    result=test_true(result,['Disjoint bath operator acceptance ' num2str(driven)],accepted,...
+                     'A one-site exterior pulse has no effect when mean fields are disabled.');
+    result=test_close(result,['Disjoint bath operator parity ' num2str(driven)],...
+                      pulse_error,0,1e-12,1e-12,...
+                      'Operator and axis-angle pulses must agree including the central-only baseline.');
+    fprintf('DISJOINT_PULSE driven=%d accepted=%d error=%.3e\n',driven,accepted,pulse_error);
+end
+
+% Retain the explicit rejection when an exterior pulse can change mean fields
+q=p; q.sequence=[finite ideal]; q.meanfield='static'; rejected=false;
+try
+    cce(model.spin_system,q);
+catch exception
+    rejected=strcmp(exception.identifier,'cce_controls:exterior_entangled');
+end
+result=test_true(result,'Exterior operator static-field rejection',rejected,...
+                 'The no-mean-field skip must not discard a pulse that changes exterior expectations.');
+
 % Require no-op control dispatch to preserve explicit and default normalization
 q=p; q.quantity='coherence'; q.central.alpha=[1;0]; q.central.beta=[0;1];
 q.central.rho=ones(2)/2; q.sequence=[]; ss=model.spin_system;

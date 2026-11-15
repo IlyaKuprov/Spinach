@@ -176,6 +176,11 @@ for t=1:numel(schedule.times)
                 if ~strcmp(event.type,'ideal'), continue; end
                 exterior=intersect(event.target,setdiff(context.bath_ids,sites));
                 if isfield(event,'operator')&&~isempty(event.operator)
+                    % Omit a one-site exterior pulse only when no exterior fields are used
+                    if isscalar(event.target)&&~ismember(event.target,ids)&&...
+                       strcmp(parameters.meanfield,'none')
+                        continue;
+                    end
                     if ~isempty(exterior)
                         error('cce_controls:exterior_entangled','Exterior operator pulses require explicit dynamical sites.');
                     end

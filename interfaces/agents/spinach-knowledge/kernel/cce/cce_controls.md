@@ -44,6 +44,8 @@ segments=cce_controls(model,sites,context,schedule,parameters)
 
 - `segments` — schedule, selected_sites, durations, hamiltonians, pulses and exterior_expectations indexed by time then segment; generalized propagation also returns raw with central densities and reducer fields.
 
+A single-site ideal operator pulse wholly outside the retained cluster is skipped when `meanfield=none`, including driven central-only baselines. Exterior operator pulses remain rejected with static mean fields, and partially retained/multisite operator targets are not silently discarded.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_controls.m)

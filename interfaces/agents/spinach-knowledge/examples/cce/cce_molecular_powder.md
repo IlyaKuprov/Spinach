@@ -17,3 +17,5 @@ The returned structure is the public cce result with any printed comparison metr
 Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_molecular_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_molecular_powder.m).
 
 Uses generalized CCE with an explicit observed superposition: powder rotation creates transverse observed terms, so fixed projected manifolds are not assumed.
+
+Response aliases, by-order values and masks, numerical bounds, and raw propagation records are now aggregated over the same positive quadrature weights; numerical diagnostics and budget flags are recomputed for the powder average. Orientation-resolved absolute bounds are retained in `orientation_abs_error_bound`.

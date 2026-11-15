@@ -48,15 +48,41 @@ parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
 % Average explicit orientations with positive normalised quadrature weights
 orientations=[0 0 0;0 pi/2 0;pi/2 pi/2 0]; weights=ones(3,1)/3;
-values=complex(zeros(numel(parameters.times),3)); valid=true(size(values));
+values=complex(zeros(numel(parameters.times),3));
+valid=true(size(values)); bounds=zeros(size(values)); raw={};
 for n=1:3
 
     % Rotate all anisotropic tensors consistently before the CCE calculation
     parameters.orientation=orientations(n,:); current=cce(spin_system,parameters);
     values(:,n)=current.value; valid(:,n)=current.valid;
+    bounds(:,n)=current.abs_error_bound; raw=[raw current.raw]; %#ok<AGROW>
+    if n==1
+        result=current; result.value(:)=0; result.abs_error_bound(:)=0;
+        result.by_order(:)=0; result.by_order_error(:)=0;
+        result.elapsed_seconds=0;
+    end
+
+    % Average response arrays and numerical bounds with the same weights
+    result.value=result.value+weights(n)*current.value;
+    result.abs_error_bound=result.abs_error_bound+weights(n)*current.abs_error_bound;
+    result.by_order=result.by_order+weights(n)*current.by_order;
+    result.by_order_error=result.by_order_error+weights(n)*current.by_order_error;
+    result.valid=result.valid&current.valid;
+    result.by_order_valid=result.by_order_valid&current.by_order_valid;
+    failed=~current.by_order_valid;
+    result.by_order_reason(failed)=current.by_order_reason(failed);
+    result.elapsed_seconds=result.elapsed_seconds+current.elapsed_seconds;
 end
-result=current; result.value=values*weights; result.orientation_values=values;
-result.valid=all(valid,2);
+
+% Keep orientation-resolved values and recompute the averaged diagnostics
+result.response=result.value; result.reason=result.by_order_reason(:,:,end);
+result.orientation_values=values;
+result.orientation_abs_error_bound=bounds; result.orientation_weights=weights;
+result.orientation_valid=valid; result.orientations=orientations;
+result.raw=raw; result.budget_satisfied=result.valid&...
+    result.abs_error_bound<=parameters.numerics.atol+parameters.numerics.rtol*abs(result.value);
+model=cce_prepare(spin_system,parameters);
+result.diagnostics=cce_diagnostics(model,result.raw,result,parameters);
 fprintf('Three-axis powder illustration; not a converged material powder curve.\n');
 
 % Plot the projected complex signal

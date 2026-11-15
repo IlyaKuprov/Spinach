@@ -33,3 +33,5 @@ result=test_cce_examples()
 - [CCE application examples](../../examples/cce/)
 
 The DEER example check also excludes the pump resonance and requires an empty selected event, guarding frequency selection rather than a fixed physical target.
+
+Powder checks require response/value equality, the averaged final-order response, weighted numerical bounds, and diagnostics consistent with those averaged bounds.

@@ -32,6 +32,8 @@ partition=cce_partition(model,graph,parameters)
 
 Adaptive proper-bath patches restrict explicit adjacency, supplied scores, and resonance mismatch matrices to the patch physical-ID order before building the local graph.
 
+Adaptive pilot and held-out validation use the raw complete-patch record when that patch is present in the selected family (or the raw baseline for an empty patch). Singular auxiliary ratios therefore cannot invalidate an otherwise valid exact patch, including generalized density matrices with zero entries and either supported zero policy.
+
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_partition.m)

@@ -234,6 +234,37 @@ result=test_true(result,'Master-equation adaptive evaluator',...
                  open_partition.complete&&open_partition.diagnostics.probes==2,...
                  'Pilot and held-out probes use the same dissipative evaluator.');
 
+% Bypass singular auxiliary factors whenever the complete patch is included
+for method={'gcce','megcce'}
+    q=choices(); q.method=method{1}; q.quantity='density'; q.central.rho=diag([1 0]);
+    q.times=[0 1e-4]; q.sequence=[]; q.expansion='partition'; q.order=1;
+    q.bath_spins=2; q.groups={2}; q.partition=struct('mode','user','max_dimension',2);
+    if strcmp(method{1},'megcce')
+        q.jumps=struct('support',{},'operator',{},'rate',{}); q.numerics.propagator='stock';
+    end
+    reference=cce(spin_system,q); local_model=cce_prepare(spin_system,q);
+    states=cce_states(local_model,q);
+    q.partition.adaptive=true; q.partition.patches={2};
+    q.partition.patch_atol=1e-10; q.partition.patch_rtol=1e-10;
+    q.partition.max_rounds=1; q.partition.max_probes=10;
+    q.partition.pilot_contexts=states.contexts; q.partition.heldout_contexts=states.contexts;
+    for policy={'mask','error'}
+        q.numerics.zero_policy=policy{1}; accepted=false; patch_error=Inf;
+        try
+            probe=cce(spin_system,q); accepted=all(probe.valid,'all');
+            patch_error=norm(probe.value(:)-reference.value(:));
+        catch exception
+            fprintf('EXACT_PATCH %s %s error=%s\n',method{1},policy{1},exception.identifier);
+        end
+        result=test_true(result,['Exact adaptive zero baseline ' method{1} ' ' policy{1}],accepted,...
+                         'A full-patch density is exact even when auxiliary density entries vanish.');
+        result=test_close(result,['Exact adaptive density parity ' method{1} ' ' policy{1}],...
+                          patch_error,0,1e-12,1e-12,...
+                          'Adaptive validation must agree with the public exact-full-bath bypass.');
+        fprintf('EXACT_PATCH %s %s accepted=%d error=%.3e\n',method{1},policy{1},accepted,patch_error);
+    end
+end
+
 % Print quantitative evidence without adding nonstandard result fields
 fprintf('PARTITION_METRICS dense_error=%.3e pair_error=%.3e disjoint_error=%.3e cross_effect=%.3e adaptive_rounds=%d probes=%d heldout=%.3e\n',...
         max(abs(whole.value-exact)),max(abs(paired.value-exact)),...

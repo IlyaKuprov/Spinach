@@ -182,6 +182,7 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
         local_model=model; local_model.bath_ids=sites;
         local_graph=cce_graph(local_model,local); family=cce_clusters(local_model,local_graph,local);
         empty=struct('id',0,'sites',[]); whole=struct('id',1,'sites',sort(sites));
+        full=find(arrayfun(@(entry)isequal(sort(entry.sites),sort(sites)),family),1);
         for context=1:numel(contexts)
             if used>=p.max_probes, valid=false; objective=inf; return; end
             used=used+1; state=contexts(context);
@@ -193,7 +194,14 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
             end
 
             % Score all requested times without hiding masks or exact-zero tolerances
-            reduced=cce_reduce([baseline records],family,local);
+            % An included complete patch is exact without auxiliary denominators
+            if ~isempty(full)
+                reduced=records(full);
+            elseif isempty(sites)
+                reduced=baseline;
+            else
+                reduced=cce_reduce([baseline records],family,local);
+            end
             difference=abs(reduced.value-exact.value);
             tolerance=p.patch_atol+p.patch_rtol*abs(exact.value);
             ratio=difference./tolerance; ratio(tolerance==0&difference==0)=0;

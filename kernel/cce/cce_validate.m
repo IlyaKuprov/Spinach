@@ -5,7 +5,8 @@
 % individual helpers validate the dimensions and values they consume.
 % Unsupported state-context fields and initial_rho aliases are rejected.
 % Optional model, included bath sites and state context also validate the
-% finite mean-field radius against central and exterior coordinates.
+% finite mean-field radius against central and exterior coordinates once
+% the state context exists; control compilation checks the radius only.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -213,7 +214,8 @@ if isfield(parameters,'meanfield_radius')
     if ~isnumeric(radius)||~isreal(radius)||~isscalar(radius)||isnan(radius)||radius<0
         error('cce:parameters','parameters.meanfield_radius must be a nonnegative real scalar.');
     end
-    if nargin>1&&isfinite(radius)
+    % Defer geometry until a physical state context exists
+    if nargin==4&&~isempty(context)&&isfinite(radius)
         exterior=setdiff(context.bath_ids,sites);
         if ~isempty(exterior)&&(~isfield(model,'coordinates_A')||...
            ~isnumeric(model.coordinates_A)||~isreal(model.coordinates_A)||...

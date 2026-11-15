@@ -360,6 +360,74 @@ for method={'cce','gcce','mecce','megcce'}
     end
 end
 
+% Compile before a context exists, then validate geometry during propagation
+parameters.method='gcce'; parameters.quantity='density'; parameters.times=[0 0.01];
+parameters.sequence=struct('name','hahn','count',1,'axis','x','target',1);
+parameters.meanfield_radius=2;
+model=cce_prepare(spin_system,parameters); models={model,model};
+models{2}.coordinates_A=[0 0 0;1 0 0;3 0 0];
+for geometry=1:2
+    compiled=false;
+    try
+        events=cce_controls(models{geometry},[],[],[],parameters);
+        compiled=isscalar(events.schedule.events);
+    catch
+    end
+    result=test_true(result,sprintf('Finite-radius pre-context compilation %d',geometry),...
+                     compiled,'Control compilation requires no state or geometry; propagation does.');
+end
+
+% Exercise every route into control compilation with complete physical geometry
+spatial=spin_system; spatial.inter.coordinates={[0 0 0],[1 0 0],[3 0 0]};
+sequences={parameters.sequence,[],...
+           struct('type','finite','target',1,'placement','absolute','at',0,...
+                  'duration',0.005,'axis','x','amplitude',1,'detuning',0),...
+           struct('type','ideal','target',2,'placement','fraction','at',0.5,...
+                  'axis','z','angle',pi)};
+names={'named','deer','finite','bath'};
+for method={'cce','gcce','mecce','megcce'}
+    for control=1:numel(sequences)
+
+        % Finite drives and exterior bath rotations use the generalized evaluator
+        if control>=3&&~strcmp(method{1},'gcce'), continue; end
+        p=parameters; p.method=method{1}; p.quantity='coherence';
+        p.sequence=sequences{control};
+        if ismember(p.method,{'gcce','megcce'}), p.normalized=true; end
+        if ismember(p.method,{'mecce','megcce'})
+            p.jumps=struct('support',{},'operator',{},'rate',{});
+        end
+        if control==2
+            p.deer=struct('enabled',true,'detuning_center',0,...
+                          'halfwidth',1,'sites',2);
+            p.sequence=sequences{4}; p.sequence.target='deer';
+            if ~strcmp(p.method,'gcce')
+                p.deer.halfwidth=0; p.deer.allow_empty=true;
+            end
+        end
+        label=[p.method ' ' names{control}]; accepted=false; difference=Inf;
+        try
+            observed=cce(spatial,p); accepted=all(observed.valid,'all');
+            difference=max(abs(observed.value(:)-1));
+        catch err
+            fprintf('Finite-radius %s: %s %s\n',label,err.identifier,err.message);
+        end
+        result=test_true(result,['Finite-radius control dispatch ' label],accepted,...
+                         'Valid geometry and a finite static-field cutoff must survive compilation.');
+        result=test_close(result,['Finite-radius identity control ' label],difference,0,...
+                          1e-12,0,'An uncoupled zero-field register prepared along x retains unit coherence.');
+
+        % The same controls must still reject unavailable propagation geometry
+        rejected=false;
+        try
+            cce(spin_system,p);
+        catch err
+            rejected=strcmp(err.identifier,'cce:coordinates');
+        end
+        result=test_true(result,['Finite-radius propagation geometry ' label],rejected,...
+                         'Deferring the context-dependent check must not remove the physical prerequisite.');
+    end
+end
+
 % Keep invalid scalar radii from silently disabling or emptying the field
 for radius={NaN,-1,-Inf,[1 2],1i,'2'}
     parameters.meanfield_radius=radius{1}; rejected=false;
@@ -370,6 +438,16 @@ for radius={NaN,-1,-Inf,[1 2],1i,'2'}
     end
     result=test_true(result,'Invalid finite-radius declaration',rejected,...
                      'meanfield_radius must be a nonnegative real scalar or positive Inf.');
+
+    % Retain scalar validation even when compilation has no context
+    rejected=false;
+    try
+        cce_controls(model,[],[],[],parameters);
+    catch err
+        rejected=strcmp(err.identifier,'cce:parameters')&&contains(err.message,'meanfield_radius');
+    end
+    result=test_true(result,'Invalid pre-context radius declaration',rejected,...
+                     'Deferring geometry must not accept an invalid cutoff during compilation.');
 end
 
 end

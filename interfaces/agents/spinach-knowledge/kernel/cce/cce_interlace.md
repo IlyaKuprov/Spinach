@@ -8,6 +8,8 @@ Evaluate conditional product-state averages for interlaced CCE.
 
 ## Behaviour
 
+Checkpoint options are unsupported and rejected with `cce:checkpoint` before conditional enumeration, both directly and through `cce`. No restart protection is implied for interlaced runs.
+
 Conditional recursive evaluations retain the same actual-Hamiltonian branch-invariance checks as ordinary CCE/ME-CCE. Conditioning cannot bypass `cce:pure_dephasing` rejection.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.

@@ -33,6 +33,26 @@ if nargin==4&&~isempty(context)
     end
 end
 
+% Validate checkpoint ownership before dispatching any evaluator path
+if isfield(parameters,'checkpoint')&&~isempty(parameters.checkpoint)
+    checkpoint=parameters.checkpoint;
+    if ~isfield(checkpoint,'file')||~ischar(checkpoint.file)||...
+       ~isrow(checkpoint.file)||isempty(checkpoint.file)
+        error('cce:checkpoint','checkpoint.file must be a nonempty character row.');
+    end
+    if isfield(checkpoint,'resume')&&...
+       (~islogical(checkpoint.resume)||~isscalar(checkpoint.resume))
+        error('cce:checkpoint','checkpoint.resume must be a logical scalar.');
+    end
+    if isfield(parameters,'bath_state')&&isfield(parameters.bath_state,'mode')&&...
+       strcmp(parameters.bath_state.mode,'interlaced')
+        error('cce:checkpoint','Interlaced runs do not support checkpoints; remove parameters.checkpoint.');
+    end
+    if nargin==4&&~isempty(context)
+        error('cce:checkpoint','Direct evaluators do not own checkpoints; use cce or cce_schedule.');
+    end
+end
+
 % Reject misspelled top-level parameters consistently in standalone helpers
 known={'central_spins','bath_spins','method','expansion','quantity','times',...
        'order','central','assumptions','orientation','hamiltonian_backend',...

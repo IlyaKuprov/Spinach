@@ -8,6 +8,8 @@ Evaluate bath-noise autocorrelation for additive connected-cluster expansion.
 
 ## Behaviour
 
+Direct calls reject checkpoint options with `cce:checkpoint`; use `cce` or `cce_schedule` to own the restart ledger.
+
 A requested fixed `noise.branch` must be invariant under the actual cluster Hamiltonian; otherwise `cce:pure_dephasing` rejects the unsupported fixed-branch dynamics. The explicitly defined no-branch bath-only partial-trace model remains unchanged and does not claim full central-bath dynamics.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.

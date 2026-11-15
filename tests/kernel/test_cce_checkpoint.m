@@ -130,6 +130,176 @@ result=test_close(result,'execution-neutral restart',changed.value,uninterrupted
 fprintf('CCE checkpoint: %d tasks, 4 preserved, 12 resumed; discrepancy %.3g.\n',...
         numel(state.completed),max(abs(resumed.value-uninterrupted.value),[],'all'));
 
+% Reject unsupported checkpoint ownership before direct evaluator work
+plain=rmfield(p,{'checkpoint','parallel'}); plain.bath_state=struct('mode','mixed_product');
+model=cce_prepare(spin_system,plain); ensemble=cce_states(model,plain);
+schedule=cce_sequence(model,plain); cluster=struct('id',1,'sites',2);
+for method={'cce','gcce','mecce','megcce','noise'}
+    direct=plain; direct.method=method{1};
+    if any(strcmp(direct.method,{'gcce','megcce'}))
+        direct.central.rho=ones(2)/2; direct.normalized=false;
+    end
+    if any(strcmp(direct.method,{'mecce','megcce'}))
+        direct.jumps=struct('support',2,'rate',2,'operator',[0 1;0 0]);
+        evaluator=@cce_master;
+    elseif strcmp(direct.method,'noise')
+        direct.quantity='autocorrelation';
+        direct.noise=struct('ordering','ordered','connected',false,...
+                            'terms',struct('support',2,'operator',diag([1 -1])/2));
+        evaluator=@cce_noise;
+    else
+        evaluator=@cce_cluster;
+    end
+    direct.checkpoint=struct('file',fullfile(folder,'direct.mat'),'resume',true);
+    refused=false;
+    try
+        evaluator(model,cluster,ensemble.contexts(1),schedule,direct);
+    catch exception
+        refused=strcmp(exception.identifier,'cce:checkpoint');
+    end
+    result=test_true(result,['direct ' method{1} ' checkpoint rejection'],refused,...
+                     'Only the scheduler owns checkpoint records; direct evaluators must not ignore them.');
+end
+
+% Reject interlaced checkpoint writes and resumes at both public entry points
+interlaced=p; interlaced.bath_state.mode='interlaced';
+interlaced.interlaced=struct('max_states',16,'reference_state',1);
+model=cce_prepare(spin_system,rmfield(interlaced,'checkpoint'));
+ensemble=cce_states(model,rmfield(interlaced,'checkpoint'));
+schedule=cce_sequence(model,rmfield(interlaced,'checkpoint'));
+for resume=[false true]
+    interlaced.checkpoint=struct('file',fullfile(folder,'interlaced.mat'),'resume',resume);
+    for direct=[false true]
+        refused=false;
+        try
+            if direct
+                cce_interlace(model,cluster,ensemble,schedule,interlaced);
+            else
+                cce(spin_system,interlaced);
+            end
+        catch exception
+            refused=strcmp(exception.identifier,'cce:checkpoint');
+        end
+        result=test_true(result,sprintf('interlaced checkpoint resume=%d direct=%d',resume,direct),...
+                         refused&&~isfile(interlaced.checkpoint.file),...
+                         'Interlaced runs have no checkpoint ledger and must reject write and resume requests.');
+    end
+end
+
+% Reject malformed checkpoint requests before any physical work
+for specification={struct('file',''),struct('file','','resume',true),struct('resume',false)}
+    request=plain; request.checkpoint=specification{1}; refused=false;
+    try
+        cce(spin_system,request);
+    catch exception
+        refused=strcmp(exception.identifier,'cce:checkpoint');
+    end
+    result=test_true(result,'checkpoint filename required',refused,...
+                     'An empty or absent filename must not silently disable a requested checkpoint.');
+end
+
+% Keep adaptive convergence explicitly incompatible with a shared checkpoint
+adaptive=p; adaptive.convergence=struct('ladders',struct('field','order','values',{{1 2}}),...
+                                       'atol',1e-8,'rtol',1e-6,'max_work',3);
+refused=false;
+try
+    cce_converge(spin_system,adaptive);
+catch exception
+    refused=strcmp(exception.identifier,'cce_converge:checkpoint');
+end
+result=test_true(result,'adaptive checkpoint rejection',refused,...
+                 'Independent convergence configurations cannot share a single checkpoint ledger.');
+
+% Exercise restart identity across all scheduler evaluator and control paths
+for method={'cce','gcce','mecce','megcce','noise','controls'}
+    request=plain;
+    if strcmp(method{1},'controls')
+        request.method='gcce'; request.central.rho=ones(2)/2;
+        request.sequence=struct('type','finite','target',1,'placement','absolute',...
+                                'at',0,'duration',0.0005,'axis','x','amplitude',7,'detuning',3);
+        request.times=[0 0.002 0.004]; request.normalized=false;
+    else
+        request.method=method{1};
+    end
+    if any(strcmp(request.method,{'gcce','megcce'}))
+        request.central.rho=ones(2)/2; request.normalized=false;
+    end
+    if any(strcmp(request.method,{'mecce','megcce'}))
+        request.jumps=struct('support',2,'rate',2,'operator',[0 1;0 0]);
+    elseif strcmp(request.method,'noise')
+        request.quantity='autocorrelation';
+        request.noise=struct('ordering','ordered','connected',false,...
+                             'terms',struct('support',2,'operator',diag([1 -1])/2));
+    end
+    request.checkpoint=struct('file',fullfile(folder,[method{1} '.mat']),'resume',false);
+    request.parallel=struct('mode','serial','batch_size',2,'max_tasks',4);
+    complete=cce(spin_system,request); saved=load(request.checkpoint.file,'state');
+    partial=saved.state; partial.completed(2:end)=false; partial.records(2:end)={[]};
+    cce_checkpoint(request.checkpoint.file,'write',partial);
+    request.checkpoint.resume=true; request.parallel.mode='clusters';
+    restarted=cce(spin_system,request);
+    result=test_close(result,[method{1} ' partial serial parallel restart'],...
+                      restarted.value,complete.value,0,0,...
+                      'Changing worker scheduling must preserve the fixed-order resumed observable exactly.');
+    changed=request; changed.times=2*request.times; refused=false;
+    try
+        cce(spin_system,changed);
+    catch exception
+        refused=strcmp(exception.identifier,'cce_checkpoint:identity');
+    end
+    result=test_true(result,[method{1} ' changed configuration rejection'],refused,...
+                     'A checkpoint from another time grid cannot supply cached physical results.');
+    % Reject changes to evaluator-specific physics as well as the time grid
+    changed=request;
+    if strcmp(method{1},'controls')
+        changed.sequence.amplitude=2*request.sequence.amplitude;
+    elseif any(strcmp(method{1},{'mecce','megcce'}))
+        changed.jumps.rate=2*request.jumps.rate;
+    elseif strcmp(method{1},'noise')
+        changed.noise.terms.operator=2*request.noise.terms.operator;
+    else
+        changed.orientation=[0.2 0.3 0.4];
+    end
+    refused=false;
+    try
+        cce(spin_system,changed);
+    catch exception
+        refused=strcmp(exception.identifier,'cce_checkpoint:identity');
+    end
+    result=test_true(result,[method{1} ' changed physics rejection'],refused,...
+                     'Each evaluator-specific physical option participates in checkpoint identity.');
+
+    fprintf('R14 restart %s discrepancy %.17g raw identical %d\n',method{1},...
+            max(abs(restarted.value-complete.value),[],'all'),isequaln(restarted.raw,complete.raw));
+end
+
+% Compare successive evaluations with cold references after physical changes
+for method={'cce','mecce','noise','controls'}
+    request=plain;
+    if strcmp(method{1},'mecce')
+        request.method='mecce';
+        request.jumps=struct('support',2,'rate',2,'operator',[0 1;0 0]);
+    elseif strcmp(method{1},'noise')
+        request.method='noise'; request.quantity='autocorrelation';
+        request.noise=struct('ordering','ordered','connected',false,...
+                             'terms',struct('support',2,'operator',diag([1 -1])/2));
+    elseif strcmp(method{1},'controls')
+        request.method='gcce'; request.central.rho=ones(2)/2; request.normalized=false;
+        request.sequence=struct('type','finite','target',1,'placement','absolute',...
+                                'at',0,'duration',0.0005,'axis','x','amplitude',7,'detuning',3);
+        request.times=[0 0.002 0.004];
+    end
+    original=cce(spin_system,request); changed_system=spin_system;
+    changed_system.inter.coupling.matrix{1,2}=2*spin_system.inter.coupling.matrix{1,2};
+    warm=cce(changed_system,request); clear cce_hamiltonian;
+    cold=cce(changed_system,request);
+    result=test_close(result,[method{1} ' successive cleared-function identity'],warm.value,cold.value,0,0,...
+                      'Changing the physical model must not reuse any previous physical result.');
+    result=test_true(result,[method{1} ' physical model fingerprint'],...
+                     ~strcmp(original.model_hash,warm.model_hash),...
+                     'Different physical interactions require distinct model fingerprints.');
+end
+
 end
 
 

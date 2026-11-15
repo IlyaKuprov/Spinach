@@ -8,6 +8,8 @@ Evaluate conditional, generalized, open-system or bath-noise cluster expansions 
 
 ## Behaviour
 
+- Checkpoints are supported only through the scheduled non-interlaced driver paths (CCE, gCCE, ME and noise, including supported controls and parallel modes). Interlaced requests reject `checkpoint` explicitly before model preparation; convergence ladders reject shared checkpoints. A checkpoint request requires a nonempty character-row `file` and logical-scalar `resume` when supplied.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Compiles the physical model, graph, cluster family, states and pulse schedule; evaluates raw cluster tasks, then reduces each state realization before weighted averaging.

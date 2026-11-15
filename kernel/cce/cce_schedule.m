@@ -147,6 +147,9 @@ elseif ~isempty(filename)&&isfile(filename)
     error('cce_schedule:exists','Checkpoint exists; explicitly request resume or use another filename.');
 end
 
+% Keep scheduler-owned checkpoint options out of direct evaluator calls
+if isfield(parameters,'checkpoint'), parameters=rmfield(parameters,'checkpoint'); end
+
 % Evaluate only missing tasks and persist each bounded completed batch
 missing=find(~state.completed);
 for first=1:batch_size:numel(missing)

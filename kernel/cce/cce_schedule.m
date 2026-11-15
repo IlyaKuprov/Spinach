@@ -29,6 +29,12 @@
 
 function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 
+% Native contexts supply an explicit evaluator and nested algorithm controls
+if isfield(parameters,'cce')
+    raw=native_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
+    return
+end
+
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters);
 
@@ -242,6 +248,34 @@ if isfield(parameters,'checkpoint')
         error('cce_schedule:input','Resume requires a checkpoint filename.');
     end
 end
+end
+
+% Evaluate native tasks in deterministic configuration and cluster order
+function raw=native_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
+
+% Reject unfinished execution policies rather than silently ignoring them
+if ~isa(evaluator,'function_handle')
+    error('cce_schedule:evaluator','Native scheduling requires a registered evaluator.');
+end
+if isfield(parameters.cce,'parallel')&&...
+   ~strcmp(parameters.cce.parallel.mode,'serial')
+    error('cce_schedule:native_parallel','Native parallel scheduling is not yet available.');
+end
+if isfield(parameters.cce,'checkpoint')
+    error('cce_schedule:native_checkpoint','Native checkpointing is not yet available.');
+end
+
+% Every configuration includes the observed-spin-only reference task
+empty=struct('id',0,'sites',[]); raw=cell(size(ensemble.spin_config));
+for n=1:numel(ensemble.spin_config)
+    records=cell(1,numel(clusters)+1);
+    records{1}=evaluator(model,empty,ensemble.spin_config(n),schedule,parameters);
+    for k=1:numel(clusters)
+        records{k+1}=evaluator(model,clusters(k),ensemble.spin_config(n),schedule,parameters);
+    end
+    raw{n}=[records{:}];
+end
+
 end
 
 

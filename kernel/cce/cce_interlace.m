@@ -1,6 +1,6 @@
 % Projected product-state averages for interlaced CCE (W12). Syntax:
 %
-%       raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
+%       raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
 %
 % parameters.interlaced contains max_states (explicit enumeration budget),
 % reference_state (ensemble spin_config index), and optionally condition_sites
@@ -29,7 +29,16 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
+function raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+
+% Preserve an explicitly supplied experiment evaluator through every recursion
+if nargin<6
+    evaluator=@cce_cluster;
+    if ismember(parameters.method,{'mecce','megcce'}), evaluator=@cce_master; end
+end
+if ~isa(evaluator,'function_handle')
+    error('cce_interlace:evaluator','evaluator must be a function handle.');
+end
 
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters);
@@ -82,6 +91,7 @@ if isfield(spec,'condition_sites')
     cylinders=spec.condition_sites;
 else
     family=cce_clusters(model,cce_graph(model,parameters),parameters);
+
     % Retain the reference-assignment baseline when no clusters were kept
     if isempty(family)&&isempty(cluster.sites)
         cylinders={[]};
@@ -172,11 +182,7 @@ for k=1:numel(weights)
     end
 
     % Preserve the physical evaluator in every recursive conditional average
-    if ismember(parameters.method,{'mecce','megcce'})
-        item=cce_master(model,cluster,spin_config,schedule,parameters);
-    else
-        item=cce_cluster(model,cluster,spin_config,schedule,parameters);
-    end
+    item=evaluator(model,cluster,spin_config,schedule,parameters);
     if isempty(raw)
         raw=item; raw.value=zeros(size(item.value));
         raw.abs_error_bound=zeros(size(item.abs_error_bound));
@@ -186,6 +192,7 @@ for k=1:numel(weights)
     raw.abs_error_bound=raw.abs_error_bound+weights(k)*item.abs_error_bound;
     raw.density=raw.density+weights(k)*item.density;
     raw.valid=raw.valid&item.valid;
+
     % Preserve worst constituent residuals rather than only the first assignment
     if isfield(item,'eigen_residual')
         raw.eigen_residual=max(raw.eigen_residual,item.eigen_residual);
@@ -210,12 +217,12 @@ if (~isfield(spec,'raw_only')||~spec.raw_only)&&~isempty(cluster.sites)
     factors=cell(1,numel(subsets)); errors=factors; masks=factors;
     conditioned=parameters; conditioned.interlaced.condition_sites=cylinders;
     conditioned.interlaced.raw_only=true;
-    empty=cce_interlace(model,struct('id',0,'sites',[]),ensemble,schedule,conditioned);
+    empty=cce_interlace(model,struct('id',0,'sites',[]),ensemble,schedule,conditioned,evaluator);
     for j=1:numel(subsets)
         if isequal(subsets(j).sites,cluster.sites)
             item=raw;
         else
-            item=cce_interlace(model,subsets(j),ensemble,schedule,conditioned);
+            item=cce_interlace(model,subsets(j),ensemble,schedule,conditioned,evaluator);
         end
         denominator=empty.value; uncertainty=empty.abs_error_bound; valid=empty.valid;
         for k=1:j-1

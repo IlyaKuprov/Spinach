@@ -738,3 +738,7 @@ Native cluster compilation consumes parameters.observed and parameters.cce.bath_
 Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps and supported pairs.
 
 Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase and the actual complex initial reference. The returned state/detector are not pre-normalized: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation. Old callers remain unchanged only until the planned atomic caller cutover; no translator or compatibility adapter is introduced.
+
+## Native context and closed-system experiments
+
+Native closed-system experiments own times, transition, rho0/coil, preparation, normalized, nloops and pump selectors. Context-owned approximation, graph, order, bath state and numerical controls remain under parameters.cce. Signal normalization is experiment-owned, not a resolver default.

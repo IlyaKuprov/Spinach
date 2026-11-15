@@ -34,3 +34,7 @@ state=cce_checkpoint(filename,action,state)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_checkpoint.m)
 - [cce_schedule.m](cce_schedule.md)
+
+## Native context and closed-system experiments
+
+Native identities, when present, require experiment and capability_version. Existing physical payload hashing remains exact. Native context checkpoint execution is introduced separately.

@@ -27,6 +27,14 @@ function state=cce_checkpoint(filename,action,state)
 
 % Validate the operation before touching persistent data
 grumble(filename,action,state);
+
+% Native experiment identities must include their capability revision
+if isfield(state,'identity')&&isfield(state.identity,'experiment')&&...
+   (~isfield(state.identity,'capability_version')||...
+    ~ischar(state.identity.experiment)||~isscalar(state.identity.capability_version))
+    error('cce_checkpoint:experiment','Native identity requires experiment and capability_version.');
+end
+
 if strcmp(action,'read')
 
     % Validate stored data and compare all run identities and task IDs

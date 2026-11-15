@@ -51,3 +51,7 @@ Projected averages dispatch `cce`/`gcce` to the closed-system evaluator and `mec
 - [Method reference](https://doi.org/10.1103/PhysRevB.86.035452)
 
 The selected `reference_state` preserves its supplied observed density. Its bath IDs and pure product densities must agree with its ensemble basis assignment; an optional spin_config assignment must agree as well; inconsistent supplied bath densities are rejected before projected enumeration, rather than overwritten silently. Use explicit-product evaluation for mixed local densities.
+
+## Native context and closed-system experiments
+
+Optional sixth argument evaluator explicitly supplies the physical cluster evaluator. Every conditional subset and complete-bath recursion retains that handle and the parent conditioning cylinders. Raw value and irreducible factor remain separate fields; five-argument existing engine callers retain their prior evaluator selection.

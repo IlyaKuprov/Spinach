@@ -46,3 +46,7 @@ raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_schedule.m)
 - [cce_checkpoint.m](cce_checkpoint.md)
 - [cce_cluster.m](cce_cluster.md)
+
+## Native context and closed-system experiments
+
+Native nested parameters.cce selects deterministic native task scheduling with a required registered evaluator. The evaluator invokes the ordinary five-argument experiment signature. Every configuration includes the observed-only reference task. Native parallel and checkpoint modes fail explicitly until the next stage.

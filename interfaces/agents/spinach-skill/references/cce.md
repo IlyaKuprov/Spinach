@@ -236,3 +236,9 @@ Operator labels E, Lx, Ly, Lz, L+ and L- use physical-ID/isotope sums and cell-r
 Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps and supported pairs.
 
 Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase and the actual complex initial reference. The returned state/detector are not pre-normalized: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation. Old callers remain unchanged only until the planned atomic caller cutover; no translator or compatibility adapter is introduced.
+
+## Native context and closed-system experiments
+
+The native context takes create output, an explicit registered five-argument experiment handle, native parameters and an interaction assumption string. Physical observed spin IDs live in parameters.observed; algorithm controls live in parameters.cce. No legacy input or result wrapper is accepted.
+
+Closed-system stage: standard cluster expansion, mixed or explicit product bath states, Hilbert or Liouville generators and explicitly tagged projected branches. Dissipative, noise, sampled/interlaced context policies, partition expansions, native checkpoint/resume and density reduction are reserved for the next stage and fail explicitly here.

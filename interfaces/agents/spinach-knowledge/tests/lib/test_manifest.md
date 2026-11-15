@@ -7,3 +7,7 @@ The regression registry maps stable kernel test IDs and descriptions to test fun
 The native retained-system registrations also include kernel/clexpn_subsystem and kernel/clexpn_descriptors. These exercise the compiler, observed-first physical mappings, cache invalidation, canonical operator/state descriptors and explicit populations. Existing registrations and assertions remain unchanged.
 
 Native stage-2b registrations: kernel/clexpn_generators (generator signs, propagation and supported pairs) and kernel/clexpn_observation (actual reference, phase and detection).
+
+## Native context and closed-system experiments
+
+Registered kernel/clexpn_context and kernel/clexpn_experiments test the context, five-argument dispatch, closed-system experiments and recursive interlacing evaluator retention.

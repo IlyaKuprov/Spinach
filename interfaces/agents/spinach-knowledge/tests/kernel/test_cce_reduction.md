@@ -18,7 +18,7 @@ Checks the following named assertions in the source:
 - `All order prefixes`.
 - `Additive polynomial full order`.
 - `Additive quadratic saturation`.
-- `Central-only exact zero`.
+- `observed-spin-only exact zero`.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
 

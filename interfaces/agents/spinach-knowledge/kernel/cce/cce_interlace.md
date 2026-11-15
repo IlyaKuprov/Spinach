@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Evaluate conditional product-state averages for interlaced CCE.
+Evaluate projected product-state averages for interlaced CCE.
 
 ## Behaviour
 
-Checkpoint options are unsupported and rejected with `cce:checkpoint` before conditional enumeration, both directly and through `cce`. No restart protection is implied for interlaced runs.
+Checkpoint options are unsupported and rejected with `cce:checkpoint` before projected enumeration, both directly and through `cce`. No restart protection is implied for interlaced runs.
 
-Conditional recursive evaluations retain the same actual-Hamiltonian branch-invariance checks as ordinary CCE/ME-CCE. Conditioning cannot bypass `cce:pure_dephasing` rejection.
+Projected recursive evaluations retain the same actual-Hamiltonian manifold-invariance checks as ordinary CCE/ME-CCE. Conditioning cannot bypass `cce:population_transfer` rejection.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - An empty cluster family retains the empty-cluster baseline: its conditioning cylinder fixes the entire bath to the reference assignment.
 
 - Constructs the union of product-state cylinders associated with retained superclusters, or uses explicitly supplied condition_sites.
-- Enumerates the declared product-state space within max_states and computes conditional raw averages. Denominator subsets must reuse the numerator condition_sites.
+- Enumerates the declared product-state space within max_states and computes projected raw averages. Denominator subsets must reuse the numerator condition_sites.
 - Refuses closure beyond the enumeration budget rather than making an undeclared approximate random draw.
 
 - When a full-bath cluster is available, the public driver takes its raw conditional average directly (`raw_only=true`), including the empty-bath case. Singular auxiliary baselines do not mask an exact full-bath result; skipped lower-order prefixes are explicitly unavailable, and the final-order ledger retains the exact value with its validity/error metadata.
 
-- Conditional raw diagnostics retain the largest available eigenproblem, orthogonality and unitarity residual over all constituent assignments, not only the first assignment. Each field is optional independently; driven records need not provide static-eigensystem diagnostics.
+- Projected raw diagnostics retain the largest available eigenproblem, orthogonality and unitarity residual over all constituent assignments, not only the first assignment. Each field is optional independently; driven records need not provide static-eigensystem diagnostics.
 
 ## Inputs and outputs
 
@@ -33,13 +33,13 @@ raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
 **Inputs**
 
 - `model`, `cluster`, `ensemble`, `schedule`, `parameters` — physical model, selected cluster, complete sampled ensemble, compiled sequence and interlaced settings.
-- `parameters.interlaced` — max_states, reference_state (ensemble context index), optional condition_sites cell array; an optional evaluator function handle supports open-system/noise dispatch.
+- `parameters.interlaced` — max_states, reference_state (ensemble spin_config index), optional condition_sites cell array; an optional evaluator function handle supports open-system/noise dispatch.
 
 **Outputs**
 
 - `raw` — conditional raw cluster observable with condition_sites and conditional-average diagnostics for consistent denominator reduction.
 
-Conditional averages dispatch `cce`/`gcce` to the closed-system evaluator and `mecce`/`megcce` to the master-equation evaluator, including empty baselines, recursive subsets and the full-bath shortcut. Interlaced multiplicative reduction requires scalar coherence, not additive noise correlations.
+Projected averages dispatch `cce`/`gcce` to the closed-system evaluator and `mecce`/`megcce` to the master-equation evaluator, including empty baselines, recursive subsets and the full-bath shortcut. Interlaced multiplicative reduction requires scalar signal, not additive noise correlations.
 
 ## References
 
@@ -48,4 +48,4 @@ Conditional averages dispatch `cce`/`gcce` to the closed-system evaluator and `m
 - [cce_reduce.m](cce_reduce.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.86.035452)
 
-The selected `reference_state` preserves its supplied central density. Its bath IDs and pure product densities must agree with its ensemble basis assignment; an optional context assignment must agree as well; inconsistent supplied bath densities are rejected before conditional enumeration, rather than overwritten silently. Use explicit-product evaluation for mixed local densities.
+The selected `reference_state` preserves its supplied observed density. Its bath IDs and pure product densities must agree with its ensemble basis assignment; an optional spin_config assignment must agree as well; inconsistent supplied bath densities are rejected before projected enumeration, rather than overwritten silently. Use explicit-product evaluation for mixed local densities.

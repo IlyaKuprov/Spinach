@@ -15,7 +15,7 @@ Checks the following named assertions in the source:
 - `unit trace`.
 - `Hermitian`.
 - `positive`.
-- `central baseline preserved`.
+- `observed baseline preserved`.
 - `elementwise baseline zeros masked`.
 - `raw density retained`.
 - `negative input rejected`.

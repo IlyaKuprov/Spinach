@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Build one cluster Hamiltonian in central-register-then-bath tensor order.
+Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 
 ## Behaviour
 
-- Includes every central spin and the requested physical bath sites, including the empty-bath central baseline.
+- Includes every observed spin and the requested physical bath sites, including the empty-bath observed baseline.
 - Uses direct Cartesian operator assembly when supported; the stock path uses `kill_spin`, `basis`, `assume`, `hamiltonian` and `orientation` as a reference/fallback.
-- Applies exterior product-state mean fields from the supplied context and enforces the declared memory limit. A context backend override supports direct/reference comparisons.
+- Applies exterior product-state mean fields from the supplied spin_config and enforces the declared memory limit. A spin_config backend override supports direct/reference comparisons.
 
 ## Inputs and outputs
 
 ```matlab
-[H,meta]=cce_hamiltonian(model,sites,context)
+[H,meta]=cce_hamiltonian(model,sites,spin_config)
 ```
 
 **Inputs**
 
 - `model` — output of `cce_prepare`.
-- `sites` — physical bath IDs; `[]` selects the central baseline.
-- `context` — scalar structure with optional backend override, exterior_ids and exterior_expectations (one real Ix/Iy/Iz row per exterior ID). Exterior fields use retained model pair interactions.
+- `sites` — physical bath IDs; `[]` selects the observed baseline.
+- `spin_config` — scalar structure with optional backend override, exterior_ids and exterior_expectations (one real Ix/Iy/Iz row per exterior ID). Exterior fields use retained model pair interactions.
 
 **Outputs**
 

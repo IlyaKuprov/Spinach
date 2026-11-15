@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Evaluate conditional, generalized, open-system or bath-noise cluster expansions for a Spinach spin system.
+Evaluate projected, generalized, open-system or bath-noise cluster expansions for a Spinach spin system.
 
 ## Behaviour
 
@@ -20,7 +20,7 @@ Evaluate conditional, generalized, open-system or bath-noise cluster expansions 
 
 - Every estimator, including interlaced and partitioned calculations, uses the same result schema and `cce_diagnostics`. Density is an empty array unless requested; density-specific diagnostics are present but empty until physicality_checked is true. Interlaced prefixes use time-by-output-by-order arrays including order zero; lower prefixes skipped by an exact full-bath bypass are NaN with false masks and `not_evaluated` reasons, not invented repeated full-order values.
 
-- Sampling uncertainty is the standard error of independent sample means where available, including internal full-bath averaging. A single random draw, truncated nonlinear internal averaging, and internal connected-noise covariance report NaN rather than false zero certainty. Deterministic mixed states report zero. Full-bath interlacing is an exact enumerated conditional distribution, so has zero sampling error.
+- Sampling uncertainty is the standard error of independent sample means where available, including internal full-bath averaging. A single random draw, truncated nonlinear internal averaging, and internal connected-noise covariance report NaN rather than false zero certainty. Deterministic mixed states report zero. Full-bath interlacing is an exact enumerated projected distribution, so has zero sampling error.
 
 ## Inputs and outputs
 
@@ -35,7 +35,7 @@ result=cce(spin_system,parameters)
 
 **Outputs**
 
-- `result` — reduction values/masks/error/by-order fields plus `coherence`, `times`, `raw`, `clusters`, `graph`, `schedule`, `partition`, `ensemble`, `model_hash`, `input_parameters`, `averaging`, `method`, `exact_reference`, `elapsed_seconds`, `convergence`, `budget_satisfied`, `sampling_standard_error` and `diagnostics`; `density` is empty unless a density was requested. `value` is time-by-observable; density elements use column-major order.
+- `result` — reduction values/masks/error/by-order fields plus `signal`, `times`, `raw`, `clusters`, `graph`, `schedule`, `partition`, `ensemble`, `model_hash`, `input_parameters`, `averaging`, `method`, `exact_reference`, `elapsed_seconds`, `convergence`, `budget_satisfied`, `sampling_standard_error` and `diagnostics`; `density` is empty unless a density was requested. `value` is time-by-observable; density elements use column-major order.
 
 ## References
 
@@ -47,8 +47,10 @@ result=cce(spin_system,parameters)
 - [Method reference](https://doi.org/10.1103/PhysRevB.78.085315)
 - [Method reference](https://doi.org/10.1103/PRXQuantum.2.010311)
 
-`retain_raw=false` explicitly suppresses raw cluster arrays after diagnostics and analysis; the existing default remains retained. Nonempty jumps require ME methods; bath-noise evolution is closed-system and does not accept Lindblad jumps. State-only parameter copies remove propagation-only fields before conditional-state preparation.
+`retain_raw=false` explicitly suppresses raw cluster arrays after diagnostics and analysis; the existing default remains retained. Nonempty jumps require ME methods; bath-noise evolution is closed-system and does not accept Lindblad jumps. State-only parameter copies remove propagation-only fields before projected-state preparation.
 
 Explicit `analysis` and `spectrum` requests now run `cce_analyse` and `cce_spectrum` on the result. `convergence` remains an explicit `cce_converge` operation and is rejected by the single-run driver. Unsupported noise term weights are rejected; scale the operator itself.
 
-Initial states are specified by `central.rho` and `bath_state`; the unused `initial_rho` alias is rejected. Explicit evaluator contexts, including adaptive pilot and held-out samples, determine generalized evolution and normalization independently of these driver defaults.
+Initial states are specified by `rho0` and `bath_state`; the unused `initial_rho` alias is rejected. Explicit evaluator spin_configs, including adaptive pilot and held-out samples, determine generalized evolution and normalization independently of these driver defaults.
+
+Receiver detection uses the Spinach convention trace(coil'*rho). The initial observed-spin density is parameters.rho0; transition contains only alpha and beta. result.response is the generic alias of result.value, including density and noise outputs.

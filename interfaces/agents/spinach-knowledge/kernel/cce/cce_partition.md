@@ -23,7 +23,7 @@ partition=cce_partition(model,graph,parameters)
 **Inputs**
 
 - `model`, `graph` — canonical model and bath connectivity.
-- `parameters.partition` — `mode=user|coupling|spatial|adaptive` and `max_dimension` (group Hilbert-dimension ceiling). Spatial grouping also requires `group_count` and `max_rounds`. Adaptive mode or optional `adaptive=true` requires `patches`, `patch_atol`, `patch_rtol`, `pilot_contexts`, `heldout_contexts`, `max_rounds`, and `max_probes`.
+- `parameters.partition` — `mode=user|coupling|spatial|adaptive` and `max_dimension` (group Hilbert-dimension ceiling). Spatial grouping also requires `group_count` and `max_rounds`. Adaptive mode or optional `adaptive=true` requires `patches`, `patch_atol`, `patch_rtol`, `pilot_configs`, `heldout_configs`, `max_rounds`, and `max_probes`.
 - `parameters.groups`, `parameters.expansion`, and `parameters.order` — explicit groups and expansion-order semantics are top-level parameters, not partition fields.
 
 **Outputs**

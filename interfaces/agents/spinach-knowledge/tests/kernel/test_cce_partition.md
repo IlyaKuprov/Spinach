@@ -33,7 +33,7 @@ Checks the following named assertions in the source:
 - `Nonfinite capacity rejected`.
 - `Fractional probe ceiling rejected`.
 - `Nonfinite patch tolerance rejected`.
-- `Empty held-out contexts rejected`.
+- `Empty held-out spin_configs rejected`.
 - `Fractional spatial ceiling rejected`.
 - `Missing spatial coordinate rejected`.
 - `One-group generalized density equals dense echo`.

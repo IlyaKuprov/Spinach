@@ -14,7 +14,7 @@ Checks the following named assertions in the source:
 - `Average of products differs from product of averages`.
 - `Clock-transition static eigenstate exterior matches exact retained bath`.
 - `Omitting sampled exterior field changes clock-transition dynamics`.
-- `Central gap has zero first-order longitudinal sensitivity`.
+- `Observed-spin gap has zero first-order longitudinal sensitivity`.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
 

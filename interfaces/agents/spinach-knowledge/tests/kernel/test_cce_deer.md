@@ -39,6 +39,6 @@ result=test_cce_deer()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
-The registered test also checks seven unsupported-controls entry points, ignored nested options, conditional second-order applicability, unsupported Lindblad noise and noise weights, explicit raw suppression, and driver postprocessing parity.
+The registered test also checks seven unsupported-controls entry points, ignored nested options, projected second-order applicability, unsupported Lindblad noise and noise weights, explicit raw suppression, and driver postprocessing parity.
 
-Finite-radius compilation regressions cover missing/complete pre-context geometry, named sequences on all four coherence methods, enabled DEER compilation, generalized finite drives and bath-targeted pulses. Propagation still requires central/exterior coordinates; malformed radii remain rejected before a state context exists. Zero-field uncoupled controls retain analytically unit coherence.
+Finite-radius compilation regressions cover missing/complete pre-spin_config geometry, named sequences on all four signal methods, enabled DEER compilation, generalized finite drives and bath-targeted pulses. Propagation still requires observed/exterior coordinates; malformed radii remain rejected before a spin configuration exists. Zero-field uncoupled controls retain analytically unit signal.

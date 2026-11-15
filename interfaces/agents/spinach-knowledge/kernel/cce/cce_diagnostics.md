@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Report validity, conditioning, sampling and central-density diagnostics.
+Report validity, conditioning, sampling and observed-density diagnostics.
 
 ## Behaviour
 
@@ -14,7 +14,7 @@ Report validity, conditioning, sampling and central-density diagnostics.
 - Reports cluster cost/order information and sample statistics when available; density outputs are checked for trace, Hermiticity and minimum eigenvalue.
 - Never clips observables or projects densities to hide failed validity or physicality checks.
 
-- Density-specific diagnostic fields are always present; they are empty when no central density was requested, and `physicality_checked=false` distinguishes an unavailable check from a passed one.
+- Density-specific diagnostic fields are always present; they are empty when no observed density was requested, and `physicality_checked=false` distinguishes an unavailable check from a passed one.
 
 ## Inputs and outputs
 

@@ -2,36 +2,36 @@
 
 ## Choose the physical approximation
 
-Use `cce` for central-spin/bath dynamics when a hierarchy of small bath clusters
-is more tractable than the complete Hilbert space. Keep every central spin in
-every cluster. Conditional `method='cce'` projects the register onto explicit
-orthogonal alpha/beta states and returns branch coherence; choose `gcce` when
-central-state mixing, register density, arbitrary observables, or generalized
-controls must be propagated. A conditional projection is a modelling choice,
+Use `cce` for observed-spin/bath dynamics when a hierarchy of small bath clusters
+is more tractable than the complete Hilbert space. Keep every observed spin in
+every cluster. Projected `method='cce'` projects the observed-spin system onto explicit
+orthogonal alpha/beta states and returns manifold signal; choose `gcce` when
+observed-state mixing, observed-spin system density, arbitrary observables, or generalized
+controls must be propagated. A projected projection is a modelling choice,
 not an automatic substitute for generalized dynamics.
 
 `expansion='partition'` selects pCCE: freeze bounded physical groups, solve
 within-group interactions exactly, and expand in the number of groups. Use it
 for strongly correlated local groups; check grouping and inter-group order
 separately. `method='mecce'` and `'megcce'` add explicitly declared local
-GKSL jumps to conditional/generalized dynamics. They do not derive rates from
+GKSL jumps to projected/generalized dynamics. They do not derive rates from
 a bath or justify a universal product approximation for population T1.
 
 `method='noise'`, `quantity='autocorrelation'` uses additive connected-cluster
-subtraction rather than multiplying coherences. Declare operator ordering and
+subtraction rather than multiplying density-matrix off-diagonal elements. Declare operator ordering and
 connected subtraction before computing a spectrum.
 
 ## Reduction convention
 
 Write `L(C)` for a raw cluster observable and `L(empty)` for the shared
-central baseline. The multiplicative expansion uses `F(C)=L(C)/L(empty)`,
+observed baseline. The multiplicative expansion uses `F(C)=L(C)/L(empty)`,
 `K(C)=F(C)/product(K(S))` over nonempty proper subsets, and
 `L_approx=L(empty)*product(K(C))` over the retained family. Noise instead uses
 `K(C)=L(C)-L(empty)-sum(K(S))` and adds the connected contributions.
-Subset closure and consistent state/conditioning contexts are essential.
+Subset closure and consistent state/conditioning spin_configs are essential.
 Unresolved denominators produce explicit invalid masks, not epsilon repairs.
 
-## Minimal conditional calculation
+## Minimal projected calculation
 
 This deliberately small example checks the API and exact full-bath limit; it
 is not a converged material model. Use a clean MATLAB path containing Spinach,
@@ -45,11 +45,11 @@ inter.zeeman.scalar={0,0};
 inter.coupling.scalar=cell(2); inter.coupling.scalar{1,2}=25;
 spin_system=create(sys,inter);
 
-% Declare the register, bath and conditional observable
-p.central_spins=1; p.bath_spins=2;
+% Declare the observed-spin system, bath and projected observable
+p.observed_spins=1; p.bath_spins=2;
 p.method='cce'; p.expansion='standard';
-p.quantity='coherence'; p.order=1;
-p.central.alpha=[1;0]; p.central.beta=[0;1];
+p.quantity='signal'; p.order=1;
+p.transition.alpha=[1;0]; p.transition.beta=[0;1];
 
 % Declare the Hamiltonian, connectivity and initial bath state
 p.assumptions='labframe'; p.orientation=[0 0 0];
@@ -69,10 +69,10 @@ assert(r.exact_reference);
 ```
 
 For generalized density dynamics, set `p.method='gcce'`,
-`p.quantity='density'` and `p.central.rho` to a normalized register density
-matrix. Scalar generalized coherence/observable requests also require explicit
-`p.normalized`; `p.operators` supplies one matrix or a cell of matrices for
-`quantity='observable'`. Normalization uses `central.rho`, not the first
+`p.quantity='density'` and `p.rho0` to a normalized observed-spin system density
+matrix. Scalar generalized signal/observable requests also require explicit
+`p.normalized`; `p.coil` supplies one matrix or a cell of matrices for
+`quantity='observable'`. Normalization uses `rho0`, not the first
 requested time.
 
 ## Parameter structure: units and actual defaults
@@ -83,10 +83,11 @@ default is named below, supply the field explicitly and obey its source
 
 | Field | Meaning and units | Default/requirement |
 |---|---|---|
-| `central_spins`, `bath_spins` | Disjoint physical spin IDs in the created system | Required; register tensor order follows central IDs |
-| `method`, `expansion`, `quantity`, `order` | Method above; standard/partition; coherence/density/observable/autocorrelation; maximum cluster-group order | Required |
-| `central.alpha`, `.beta` | Normalized orthogonal register vectors | Conditional branches and coherence projection |
-| `central.rho` | Normalized Hermitian positive register density | Required for generalized dynamics; conditional branches may use the alpha/beta superposition |
+| `observed_spins`, `bath_spins` | Disjoint physical spin IDs in the created system | Required; observed-spin system tensor order follows observed IDs |
+| `method`, `expansion`, `quantity`, `order` | Method above; standard/partition; signal/density/observable/autocorrelation; maximum cluster-group order | Required |
+| `transition.alpha`, `.beta` | Normalised orthogonal column vectors in observed_spins product order | Projected manifolds and signal projection |
+| `rho0` | Normalized Hermitian positive observed-spin system density | Required for generalized dynamics; projected manifolds may use the alpha/beta superposition |
+| `coil` | Observed-spin receiver matrix or cell array; signal is trace(coil'*rho) | Required for quantity='observable'; non-Hermitian coils are supported |
 | `assumptions`, `orientation` | Stock assumption name or `{name,retention}`; three Euler angles in rad | Required |
 | `interaction_cutoff` | Physical Hamiltonian distance cutoff, Angstrom | Required, `Inf` allowed; distinct from graph and mean-field cutoffs |
 | `hamiltonian_backend` | auto/direct/stock | auto; unsupported direct models are rejected |
@@ -106,38 +107,38 @@ default is named below, supply the field explicitly and obey its source
 | `checkpoint.file`, `.resume` | MAT checkpoint path and explicit resume flag | No checkpoint when file absent/empty; resume false |
 | `analysis.fit` | Enable explicit-window envelope fit | false; fit model/window/weights/confidence must be supplied when enabled |
 
-A finite `meanfield_radius` requires finite real central and exterior coordinates;
+A finite `meanfield_radius` requires finite real observed and exterior coordinates;
 missing geometry raises `cce:coordinates`. Use a nonnegative scalar in Angstrom,
 or `Inf` for no spatial cutoff (no coordinates required).
 
-For second-order conditional projection, enable `second_order.enabled`
+For second-order projected projection, enable `second_order.enabled`
 and supply `gap_tolerance` in rad/s and `overlap_tolerance`; disabled otherwise.
 For pCCE supply `partition.mode=user|coupling|spatial|adaptive` and
 `partition.max_dimension` (the group Hilbert-dimension ceiling). Explicit
 groups belong in top-level `groups`; expansion semantics belong in top-level
 `expansion` and `order`. Spatial grouping requires `group_count` and `max_rounds`.
 Adaptive grouping uses `mode=adaptive` or `partition.adaptive=true` and requires `patches`,
-`patch_atol`, `patch_rtol`, `pilot_contexts`, `heldout_contexts`, `max_rounds`,
+`patch_atol`, `patch_rtol`, `pilot_configs`, `heldout_configs`, `max_rounds`,
 and `max_probes`; it is not an online regrouping of production samples.
 
 Interlacing uses `interlaced.max_states`, `reference_state`, and optional
 `condition_sites`. Numerator and denominator subsets must share the same
-conditional cylinder set. The helper explicitly enumerates within the budget;
+projected cylinder set. The helper explicitly enumerates within the budget;
 it does not invent an approximate sampler when the space is too large.
 
 ## Pulse and open-system conventions
 
 Ideal events declare `type='ideal'`, physical `target` IDs, axis, angle in rad,
 `placement='fraction'|'absolute'`, and `at`. Fractional placement is relative
-to each **total sequence duration**, not an interpulse delay. Conditional CCE
-accepts complete-register ideal pi swaps; arbitrary register or bath pulses
+to each **total sequence duration**, not an interpulse delay. projected CCE
+accepts complete-observed-spin system ideal pi swaps; arbitrary observed-spin system or bath pulses
 need generalized CCE. Named hahn/cpmg/xy4/xy8/udd schedules are supported by
 `cce_controls`; follow its `name,count,axis,target` contract.
 
 Finite events additionally use `duration` in seconds, `amplitude` and
 `detuning` in rad/s. They are constant rotating-frame segments; supply separate
 events for a piecewise envelope. Simultaneous finite drives, and finite or
-entangling exterior pulses, are refused. Static exterior one-site ideal
+correlation-generating exterior pulses, are refused. Static exterior one-site ideal
 rotations update the sampled field exactly.
 
 For ME-CCE, `parameters.jumps` records contain ordered physical `support`, an
@@ -150,7 +151,7 @@ as a Liouvillian.
 
 1. First reproduce the full-bath result of a small problem, independently when
    possible. The exact-reference bypass checks the same physical model, not
-   the validity of a conditional projection or a chosen bath truncation.
+   the validity of a projected projection or a chosen bath truncation.
 2. Increase order with bath, graph, state sampling and pulses fixed. Repeat
    independently for physical bath size, graph threshold/radius, cluster caps,
    Hamiltonian cutoff and exterior-field radius. For pCCE also vary grouping.
@@ -191,14 +192,14 @@ sidecar that is the round-trip authority; retain it.
 ## Source and regression routes
 
 - [CCE driver and kernel entries](../../spinach-knowledge/kernel/cce/cce.md)
-- [Independent conditional reference](../../spinach-knowledge/tests/kernel/test_cce_exact.md)
+- [Independent projected reference](../../spinach-knowledge/tests/kernel/test_cce_exact.md)
 - [Generalized density reference](../../spinach-knowledge/tests/kernel/test_gcce_density.md)
 - [Open-system reference](../../spinach-knowledge/tests/kernel/test_mecce_exact.md)
 - [Numerical conditioning](../../spinach-knowledge/tests/kernel/test_cce_conditioning.md)
 - [Convergence tests](../../spinach-knowledge/tests/kernel/test_cce_convergence.md)
 - [Import/export tests](../../spinach-knowledge/tests/kernel/test_cce_io.md)
 
-Method references: [conditional CCE](https://doi.org/10.1103/PhysRevB.78.085315),
+Method references: [projected CCE](https://doi.org/10.1103/PhysRevB.78.085315),
 [generalized CCE](https://doi.org/10.1103/PRXQuantum.2.010311),
 [pCCE](https://doi.org/10.1103/PhysRevB.110.L220302), and
 [ME-CCE](https://doi.org/10.1103/PhysRevLett.132.250401).
@@ -206,6 +207,8 @@ Method references: [conditional CCE](https://doi.org/10.1103/PhysRevB.78.085315)
 Read the local `kernel/cce/*.m` headers and `grumble` checks before extending
 these structures; the implementation is the authority for supported fields.
 
-## Supplied state contexts
+## Supplied spin configurations
 
-For direct generalized evaluator calls, `context.central_rho` overrides the parameter-level initial central density; all evaluator paths take their product bath state from `context.bath_rho`. Both static and finite-control gCCE and ME-gCCE normalize against that same context central state. Conditional CCE/ME-CCE return normalized branch traces for the supplied bath state; noise is a bath-only correlation with connected references from that bath state. Specify branch projections through `parameters.central.alpha/beta`, not extra context fields. Unsupported context fields and `parameters.initial_rho` are rejected. Interlaced references must have bath densities consistent with their basis assignments; their supplied central state is retained.
+For direct generalized evaluator calls, `spin_config.rho0` overrides the parameter-level initial observed density; all evaluator paths take their product bath state from `spin_config.bath_rho`. Both static and finite-control gCCE and ME-gCCE normalize against that same spin_config observed state. projected CCE/ME-CCE return normalized manifold traces for the supplied bath state; noise is a bath-only correlation with connected references from that bath state. Specify manifold projections through `parameters.transition.alpha/beta`, not extra spin_config fields. Unsupported spin_config fields and `parameters.initial_rho` are rejected. Interlaced references must have bath densities consistent with their basis assignments; their supplied observed state is retained.
+
+Receiver detection uses the Spinach convention trace(coil'*rho). The initial observed-spin density is parameters.rho0; transition contains only alpha and beta. result.response is the generic alias of result.value, including density and noise outputs.

@@ -10,7 +10,7 @@ Four bath spins, complex pure/mixed states and physical Hahn pulses.
 
 Checks the following named assertions in the source:
 
-- `raw full-register exact`.
+- `raw full-observed-spin system exact`.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
 

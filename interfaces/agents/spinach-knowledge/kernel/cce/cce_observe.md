@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Extract central density elements, coherence or linear observables without discarding phase.
+Extract observed density elements, signal or linear observables without discarding phase.
 
 ## Behaviour
 
@@ -12,8 +12,8 @@ Extract central density elements, coherence or linear observables without discar
 
 - Normalization uncertainty scales with each observable operator norm, so changing physical units preserves a resolved normalized value; genuinely zero references remain errors.
 
-- Flattens density matrices in MATLAB column-major order, or projects alpha/beta coherence, or evaluates the supplied operators.
-- For scalar observables, explicit `normalized` divides by the expectation in `central.rho`, not the first requested time. Unresolved normalization is not silently repaired.
+- Flattens density matrices in MATLAB column-major order, or projects alpha/beta signal, or evaluates the receiver coils using trace(coil'*rho).
+- For scalar observables, explicit `normalized` divides by the expectation in `rho0`, not the first requested time. Unresolved normalization is not silently repaired.
 
 - Operator cells are enumerated in MATLAB linear-index order regardless of their shape. Normalization tolerances and static, driven, and master-equation error bounds use that same output-column order.
 
@@ -25,8 +25,8 @@ observed=cce_observe(rho,parameters)
 
 **Inputs**
 
-- `rho` — central density array, d-by-d-by-ntime.
-- `parameters` — `quantity=density|coherence|observable`; central alpha/beta vectors or observable `operators` (matrix/cell); explicit `normalized` for scalar quantities.
+- `rho` — observed density array, d-by-d-by-ntime.
+- `parameters` — `quantity=density|signal|observable`; transition.alpha/beta vectors or receiver `coil` (matrix/cell); explicit `normalized` for scalar quantities.
 
 **Outputs**
 

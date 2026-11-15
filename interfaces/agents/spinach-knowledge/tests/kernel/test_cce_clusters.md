@@ -15,10 +15,10 @@ Checks the following named assertions in the source:
 - `Every labelled graph through four vertices`.
 - `Explicit closure and cap overrun`.
 - `Composite physical Hilbert dimension`.
-- `Conservative central-mediated edge`.
+- `Conservative observed-mediated edge`.
 - `Explicit approximate graph`.
-- `Central-mediated full-Hilbert reference`.
-- `Central mediation is not disconnected factorisation`.
+- `Observed-spin-mediated full-Hilbert reference`.
+- `Observed-spin mediation is not disconnected factorisation`.
 - `Physical operator norm`.
 - `Hamiltonian cutoff independence`.
 - `Explicit resonance score`.

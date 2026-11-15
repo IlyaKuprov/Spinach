@@ -14,8 +14,8 @@ Checks the following named assertions in the source:
 - `transpose mutation rejected`.
 - `nonsymmetric half cells`.
 - `physical spin permutation`.
-- `multiple central spins`.
-- `central-only subset`.
+- `multiple observed spins`.
+- `observed-spin-only subset`.
 - `exterior expectation`.
 - `physical distance cutoff`.
 - `cutoff omission count`.

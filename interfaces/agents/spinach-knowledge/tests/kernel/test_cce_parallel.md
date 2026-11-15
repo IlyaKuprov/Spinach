@@ -16,7 +16,7 @@ Checks the following named assertions in the source:
 - `two-worker raw identity`.
 - `two-worker reduction`.
 - `state scheduling`.
-- `analytic sampled coherence`.
+- `analytic sampled signal`.
 - `task cap`.
 - `memory cap`.
 

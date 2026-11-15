@@ -20,8 +20,8 @@ Checks the following named assertions in the source:
 - `Exterior ideal pulse flips the sampled field`.
 - `Exterior pulse changes subsequent Hamiltonian`.
 - `Finite exterior drive is refused rather than frozen`.
-- `Conditional finite central drive refused`.
-- `Selective register operator ordering`.
+- `Projected finite observed drive refused`.
+- `Selective observed-spin system operator ordering`.
 - `Physical spin-one pi pulse`.
 - `Selective two-level pi pulse`.
 - `Physical and selective pulses differ`.
@@ -49,4 +49,4 @@ result=test_cce_controls()
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
-A supplied central density and polarized bath state are checked against an independent dense finite-pulse propagator, including normalization by the context initial observable. The driven dispatch rejects unsupported context reference overrides.
+A supplied observed density and polarized bath state are checked against an independent dense finite-pulse propagator, including normalization by the spin_config initial observable. The driven dispatch rejects unsupported spin_config reference overrides.

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Check explicit states, conditional fields and resolved virtual levels.
+Check explicit states, projected fields and resolved virtual levels.
 
 ## Behaviour
 
@@ -18,7 +18,7 @@ Checks the following named assertions in the source:
 - `near-degenerate denominator rejected`.
 - `overlap guard`.
 - `gCCE correction rejected`.
-- `multiple central register`.
+- `multiple observed-spin system`.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
 
@@ -41,4 +41,4 @@ result=test_cce_projection()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_projection.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-Checks second-order mediated coupling-graph dynamics against independently constructed dense conditional Hamiltonians, and verifies that omitting induced edges requires the explicit graph approximation flag.
+Checks second-order mediated coupling-graph dynamics against independently constructed dense projected Hamiltonians, and verifies that omitting induced edges requires the explicit graph approximation flag.

@@ -10,25 +10,25 @@ Evaluate bath-noise autocorrelation for additive connected-cluster expansion.
 
 Direct calls reject checkpoint options with `cce:checkpoint`; use `cce` or `cce_schedule` to own the restart ledger.
 
-A requested fixed `noise.branch` must be invariant under the actual cluster Hamiltonian; otherwise `cce:pure_dephasing` rejects the unsupported fixed-branch dynamics. The explicitly defined no-branch bath-only partial-trace model remains unchanged and does not claim full central-bath dynamics.
+A requested fixed `noise.manifold` must be invariant under the actual cluster Hamiltonian; otherwise `cce:population_transfer` rejects the unsupported fixed-manifold dynamics. The explicitly defined no-manifold bath-only partial-trace model remains unchanged and does not claim full observed-spin-bath dynamics.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Builds the sum of noise terms completely supported inside the cluster; refuses a split multi-site term.
-- Uses a central-state-independent bath Hamiltonian, or the explicitly requested noise.branch alpha/beta projection, and applies the requested ordered or symmetrized correlation convention. Virtual-state noise corrections are refused.
-- Optional connected subtraction removes the mean-product contribution; the result retains units squared of the supplied observable operators. For sampled baths the driver averages the raw moments and means before connected subtraction under either averaging mode, preserving classical ensemble variance. Direct cluster calls return the covariance of their supplied context and retain raw moment/mean fields for ensemble combination.
+- Uses a observed-state-independent bath Hamiltonian, or the explicitly requested noise.manifold alpha/beta projection, and applies the requested ordered or symmetrized correlation convention. Virtual-state noise corrections are refused.
+- Optional connected subtraction removes the mean-product contribution; the result retains units squared of the supplied observable operators. For sampled baths the driver averages the raw moments and means before connected subtraction under either averaging mode, preserving classical ensemble variance. Direct cluster calls return the covariance of their supplied spin_config and retain raw moment/mean fields for ensemble combination.
 
 - Local noise-operator Hermiticity is checked relative to the operator norm, with no absolute unit floor.
 
 ## Inputs and outputs
 
 ```matlab
-raw=cce_noise(model,cluster,context,schedule,parameters)
+raw=cce_noise(model,cluster,spin_config,schedule,parameters)
 ```
 
 **Inputs**
 
-- `model`, `cluster`, `context`, `schedule`, `parameters` — cluster inputs; `noise.ordering=ordered|symmetrized`, logical connected, and terms with ordered bath support and operator matrices; optional noise.branch selects alpha or beta.
+- `model`, `cluster`, `spin_config`, `schedule`, `parameters` — cluster inputs; `noise.ordering=ordered|symmetrized`, logical connected, and terms with ordered bath support and operator matrices; optional noise.manifold selects alpha or beta.
 
 **Outputs**
 
@@ -44,4 +44,4 @@ Direct calls require `method='noise'` and `quantity='autocorrelation'`; other ph
 
 For unconnected noise, the cluster graph joins observable-support sites even without a bare Hamiltonian edge, retaining disconnected moment products. Sampled connected noise retains the same support edges to preserve cross-site covariance of the actual finite sampled mixture; deterministic product-state connected noise keeps the ordinary coupling graph. Both ordered and symmetrized reductions use this common graph.
 
-Noise correlations use the supplied context bath densities for both dynamics and connected first moments. The central density is not part of this bath-only observable: `noise.branch` and `parameters.central.alpha/beta` define any fixed conditional projection. Unsupported context projection or reference overrides are rejected.
+Noise correlations use the supplied spin_config bath densities for both dynamics and connected first moments. The observed density is not part of this bath-only observable: `noise.manifold` and `parameters.transition.alpha/beta` define any fixed projected projection. Unsupported spin_config projection or reference overrides are rejected.

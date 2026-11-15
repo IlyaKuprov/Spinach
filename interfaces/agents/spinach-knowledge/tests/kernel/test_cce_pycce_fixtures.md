@@ -11,7 +11,7 @@ Three fixtures, raw subsets and complex final reductions.
 Checks the following named assertions in the source:
 
 - `PyCCE raw subset`.
-- `PyCCE final coherence`.
+- `PyCCE final signal`.
 - `PyCCE reduction only`.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
@@ -35,4 +35,4 @@ result=test_cce_pycce_fixtures()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_pycce_fixtures.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-Conditional PyCCE coherence is intrinsically normalized; only the generalized fixtures request the optional generalized-observation normalization flag. All raw-trace and final-complex-coherence comparisons remain unchanged.
+Projected PyCCE signal is intrinsically normalized; only the generalized fixtures request the optional generalized-observation normalization flag. All raw-trace and final-complex-signal comparisons remain unchanged.

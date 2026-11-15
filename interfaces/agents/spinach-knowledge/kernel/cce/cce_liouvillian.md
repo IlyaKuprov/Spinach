@@ -4,17 +4,17 @@
 
 ## Purpose
 
-Build a local GKSL generator for full density or conditional coherence blocks.
+Build a local GKSL generator for full density or projected signal blocks.
 
 ## Behaviour
 
-Conditional ME evolution checks invariance of both supplied central branch subspaces under the actual cluster Hamiltonian before constructing its generator. Nonzero central-transition leakage raises `cce:pure_dephasing` and requests `megcce`; full generalized evolution is unchanged.
+Projected ME evolution checks invariance of both supplied observed manifold subspaces under the actual cluster Hamiltonian before constructing its generator. Nonzero observed-transition leakage raises `cce:population_transfer` and requests `megcce`; full generalized evolution is unchanged.
 
-- The per-call memory ceiling includes full central-register physical operators, the projected Liouvillian and both retained embedded matrices for every fully included jump, and is checked before constructing any of them.
+- The per-call memory ceiling includes full observed-spin system physical operators, the projected Liouvillian and both retained embedded matrices for every fully included jump, and is checked before constructing any of them.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
-- Conditional branch-leakage checks scale with the jump and loss-operator norms; reciprocal jump/rate rescaling cannot conceal branch-changing dynamics.
+- Projected manifold-leakage checks scale with the jump and loss-operator norms; reciprocal jump/rate rescaling cannot conceal manifold-changing dynamics.
 
 - Embeds explicitly supported jump operators in physical tensor order and uses column-major vectorization.
 - Includes nonnegative rates in inverse seconds and local cluster Hamiltonians in rad/s; incomplete correlated jump support is refused.
@@ -23,19 +23,19 @@ Conditional ME evolution checks invariance of both supplied central branch subsp
 ## Inputs and outputs
 
 ```matlab
-[G,meta]=cce_liouvillian(model,sites,context,parameters)
+[G,meta]=cce_liouvillian(model,sites,spin_config,parameters)
 ```
 
 **Inputs**
 
-- `model`, `sites`, `context`, `parameters` — prepared cluster inputs and `parameters.jumps` records with ordered support IDs, operator matrix and rate in s^-1.
+- `model`, `sites`, `spin_config`, `parameters` — prepared cluster inputs and `parameters.jumps` records with ordered support IDs, operator matrix and rate in s^-1.
 
 **Outputs**
 
-- `G` — dense GKSL generator acting on column-vectorized density/coherence blocks.
+- `G` — dense GKSL generator acting on column-vectorized density/signal blocks.
 - `meta` — tensor order, dimensions, Hamiltonians and included jump records.
 
-Conditional jumps must preserve both selected branches under the jump operator and its loss operator `J' * J`; otherwise use `megcce`, including for central registers larger than two levels.
+Projected jumps must preserve both selected manifolds under the jump operator and its loss operator `J' * J`; otherwise use `megcce`, including for observed registers larger than two levels.
 
 ## References
 

@@ -11,8 +11,8 @@ Check unique configurations, conditional weights and shared denominator K.
 Checks the following named assertions in the source:
 
 - `Overlapping cylinders yield six unique configurations, not eight occurrences`.
-- `Conditional probabilities are physical product weights`.
-- `Conditional raw average agrees with independent full-state enumeration`.
+- `Projected probabilities are physical product weights`.
+- `Projected raw average agrees with independent full-state enumeration`.
 - `Duplicate-occurrence weighting gives a detectably different answer`.
 - `Enumeration work exceeding the declared budget is refused`.
 - `Included-supercluster family generates the same K automatically`.
@@ -41,4 +41,4 @@ result=test_cce_interlacing()
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
-Reference-context tests preserve a non-default central density and reject a bath density inconsistent with the reference basis assignment, before enumeration can overwrite it.
+Reference-spin_config tests preserve a non-default observed density and reject a bath density inconsistent with the reference basis assignment, before enumeration can overwrite it.

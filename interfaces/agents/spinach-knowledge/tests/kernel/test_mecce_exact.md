@@ -13,7 +13,7 @@ Checks the following named assertions in the source:
 - `C7 numerical check`.
 - `ME-gCCE Hahn zero jumps`.
 - `ME-CCE Hahn zero jumps`.
-- `Full-bath conditional ME reference`.
+- `Full-bath projected ME reference`.
 - `Dissipative Hahn reference`.
 - `C7 contract check`.
 - `PyCCE reconstructed ME-CCE2`.
@@ -41,4 +41,4 @@ result=test_mecce_exact()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_mecce_exact.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-Supplied-context regression checks compare gCCE and ME-gCCE density, coherence and observables (raw and normalized) with an independent diagonal Hamiltonian solution. They also verify conditional bath phases and swapped user projections, and require informative rejection of unsupported context state/projection/reference aliases.
+Supplied-spin_config regression checks compare gCCE and ME-gCCE density, signal and observables (raw and normalized) with an independent diagonal Hamiltonian solution. They also verify projected bath phases and swapped user projections, and require informative rejection of unsupported spin_config state/projection/reference aliases.

@@ -1,6 +1,6 @@
-# tests/kernel/test_gcce_central_mediation.m
+# tests/kernel/test_gcce_observed_mediation.m
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_central_mediation.m)
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_observed_mediation.m)
 
 ## Purpose
 
@@ -19,7 +19,7 @@ The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tole
 ## Inputs and outputs
 
 ```matlab
-result=test_gcce_central_mediation()
+result=test_gcce_observed_mediation()
 ```
 
 **Inputs**
@@ -32,5 +32,5 @@ result=test_gcce_central_mediation()
 
 ## References
 
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_central_mediation.m)
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_observed_mediation.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)

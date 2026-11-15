@@ -212,3 +212,13 @@ these structures; the implementation is the authority for supported fields.
 For direct generalized evaluator calls, `spin_config.rho0` overrides the parameter-level initial observed density; all evaluator paths take their product bath state from `spin_config.bath_rho`. Both static and finite-control gCCE and ME-gCCE normalize against that same spin_config observed state. projected CCE/ME-CCE return normalized manifold traces for the supplied bath state; noise is a bath-only correlation with connected references from that bath state. Specify manifold projections through `parameters.transition.alpha/beta`, not extra spin_config fields. Unsupported spin_config fields and `parameters.initial_rho` are rejected. Interlaced references must have bath densities consistent with their basis assignments; their supplied observed state is retained.
 
 Receiver detection uses the Spinach convention trace(coil'*rho). The initial observed-spin density is parameters.rho0; transition contains only alpha and beta. result.response is the generic alias of result.value, including density and noise outputs.
+
+## Staged clexpn input contract
+
+Use [sys,inter,bath]=spin_bath(sys,inter,specification) to construct/append finite physical baths; sys.magnet owns the field, native input units remain authoritative, and bath.spins/spin_groups distinguish physical indices from stable candidate labels. Do not call an old wrapper from new services.
+
+[parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions) owns new-contract validation and declared defaults. Required observed/times and any transition selector are separate from cce approximation and ensemble controls. Projected evolution requires a selector; generalized-state experiments may instead supply an explicit density. It records mixed-product/no-mean-field assumptions, resolves the selector through cce_transition and flags unresolved order, accuracy and resources for the context. It never silently supplies physical populations or jump rates. The powers/direct reducer choice is separate from experiment-owned additive/multiplicative algebra.
+
+[transition,meta]=cce_transition(spin_system,parameters,assumptions) accepts ordered ms, energy levels or explicit orthonormal alpha/beta states, constructs only the observed subsystem and reports rad/s energies/gaps and eigenstate residuals. Unresolved energy-index degeneracy is rejected. Use canonical tensors without multiplying by 2*pi again.
+
+These are isolated native input services; the existing driver is still unchanged until the planned atomic cutover. Do not invent clexpn execution or experiments/cce entry points before their implementation. No compatibility switch, adapter or deprecated-field translator is provided.

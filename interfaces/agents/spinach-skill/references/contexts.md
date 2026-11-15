@@ -522,3 +522,7 @@ The derivative is composed through ordinary multiplication of three polyadics: i
 ## Single-rotor convention
 
 Use `[sqrt(2/3) 0 sqrt(1/3)]` for fixed single-rotor example axes. Keep deliberate magic-angle calibration perturbations around that nominal axis and do not replace double-rotor axes.
+
+## Cluster-expansion context boundary
+
+The new context name is clexpn, with the planned four-argument signature [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions). The current input-service stage supplies cce_options and cce_transition, not the context itself. Assumptions belong to the fourth argument; physical observed IDs and isotope channel names are distinct. New experiments will live in experiments/cce; cce_eseem retains its name because eseem already exists. Do not route the new contract through the old cce entry point or a translator.

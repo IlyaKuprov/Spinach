@@ -178,3 +178,7 @@ hashes to compare descriptors with columns removed.
 Set `op_cache`, `ham_cache`, or `prop_cache` in `sys.enable` to preserve the
 existing parallel pool's ValueStore across `create` calls. With none of these
 options enabled, `create` clears the ValueStore when reusing the pool.
+
+## Native cluster-expansion input services
+
+The staged clexpn interface uses canonical sys/inter, physical IDs in parameters.observed, descriptive transition selectors, experiment-owned controls and approximation/ensemble/reduction options in parameters.cce. Read references/cce.md and the cce_options, cce_transition and spin_bath knowledge leaves before using these services. There is no legacy translator. Existing CCE callers remain unchanged until the atomic context/experiment cutover; clexpn itself is not introduced by this input-service stage.

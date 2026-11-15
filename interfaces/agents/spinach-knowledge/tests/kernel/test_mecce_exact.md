@@ -40,3 +40,5 @@ result=test_mecce_exact()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_mecce_exact.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+Supplied-context regression checks compare gCCE and ME-gCCE density, coherence and observables (raw and normalized) with an independent diagonal Hamiltonian solution. They also verify conditional bath phases and swapped user projections, and require informative rejection of unsupported context state/projection/reference aliases.

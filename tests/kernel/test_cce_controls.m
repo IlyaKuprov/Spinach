@@ -17,6 +17,28 @@ initial=kron(context.central_rho,context.bath_rho{1}); rho=U*initial*U'; expecte
 error=norm(s.raw.density(:,:,end)-expected,'fro');
 result=test_close(result,'Finite detuned drive matches independent dense expm',s.raw.density(:,:,end),expected,1e-12,0,'Finite detuned drive matches independent dense expm');
 
+% Normalize driven observables against the supplied central state context
+q=p; q.quantity='observable'; q.operators=diag([1 2]); q.normalized=true;
+supplied_context=ensemble.contexts(1); supplied_context.central_rho=diag([0.25 0.75]);
+supplied_context.bath_rho={diag([0 1])}; supplied_context.expectations=[0 0 -0.5];
+driven=cce_controls(model,2,supplied_context,[],q);
+Hc=H+7*kron(x,eye(2))+3*kron(z,eye(2)); U=expm(-1i*Hc*0.1);
+rho=partial(U*kron(supplied_context.central_rho,supplied_context.bath_rho{1})*U');
+context_expected=[1;trace(q.operators*rho)/trace(q.operators*supplied_context.central_rho)];
+result=test_close(result,'Finite controls supplied context reference',driven.raw.value,context_expected,...
+                  2e-12,2e-12,'Both the driven state and normalization use the supplied context, not parameter rho.');
+fprintf('R13 driven context error %.17g initial %.17g\n',norm(driven.raw.value-context_expected),real(driven.raw.value(1)));
+
+% Reject context reference aliases on the finite-control dispatch as well
+unsupported=supplied_context; unsupported.reference=eye(2)/2; rejected=false;
+try
+    cce_cluster(model,struct('id',1,'sites',2),unsupported,cce_sequence(model,q),q);
+catch exception
+    rejected=strcmp(exception.identifier,'cce:context');
+end
+result=test_true(result,'Finite controls reject context reference',rejected,...
+                 'The driven evaluator must not ignore an unsupported normalization reference.');
+
 % Preserve optional operator angles when finite controls select this compiler
 finite=p.sequence; ideal=finite; ideal.type='ideal'; ideal.at=0.15;
 ideal.axis=[]; ideal.operator=0.3*z; finite.operator=[];

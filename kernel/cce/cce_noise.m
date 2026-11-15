@@ -30,7 +30,7 @@
 function raw=cce_noise(model,cluster,context,schedule,parameters)
 
 % Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
+cce_validate(parameters,model,cluster.sites,context);
 
 % Validate explicit quantum ordering and the additive observable contract
 grumble(model,cluster,context,schedule,parameters);

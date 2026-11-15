@@ -7,6 +7,7 @@
 % (cell array of physical-ID sets). Otherwise K is the union of cylinders
 % associated with included superclusters of cluster. Denominator subsets
 % MUST reuse raw.condition_sites, not their own default cylinder family.
+% The reference bath densities must agree with their basis assignment.
 % The returned raw value is the probability-weighted conditional average;
 % configurations are unique and weights are conditional probabilities.
 % The distribution signature records assignments and weights exactly.
@@ -38,6 +39,10 @@ grumble(model,cluster,ensemble,parameters);
 
 % Locate included superclusters unless a shared denominator K was supplied
 spec=parameters.interlaced; reference=ensemble.contexts(spec.reference_state);
+if isfield(reference,'assignment')&&...
+   ~isequal(reference.assignment,ensemble.assignments(spec.reference_state,:))
+    error('cce:context','Interlaced context and ensemble reference assignments must agree.');
+end
 reference.assignment=ensemble.assignments(spec.reference_state,:);
 bases=cell(size(model.bath_ids)); probabilities=bases;
 for j=1:numel(model.bath_ids)
@@ -49,6 +54,30 @@ for j=1:numel(model.bath_ids)
         probabilities{j}=parameters.bath_state.probabilities{j}(:);
     end
 end
+
+% Validate the supplied reference before replacing any enumerated bath state
+cce_validate(parameters,model,cluster.sites,reference);
+if ~isequal(reference.bath_ids,model.bath_ids)||...
+   numel(reference.assignment)~=numel(model.bath_ids)
+    error('cce:context','Interlaced reference bath IDs and assignments must match the model.');
+end
+
+% Require each reference density to represent its declared local assignment
+for j=1:numel(model.bath_ids)
+    dimension=model.multiplicities(model.bath_ids(j)); basis=bases{j};
+    index=reference.assignment(j);
+    if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
+        error('cce:context','Interlaced reference assignments must select local basis states.');
+    end
+    vector=basis(:,index);
+    if ~isequal(size(reference.bath_rho{j}),[dimension dimension])||...
+       norm(reference.bath_rho{j}-vector*vector','fro')>dimension^2*eps
+        error('cce:context',...
+              'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
+    end
+end
+
+% Resolve the cylinder family only after the reference has been validated
 if isfield(spec,'condition_sites')
     cylinders=spec.condition_sites;
 else

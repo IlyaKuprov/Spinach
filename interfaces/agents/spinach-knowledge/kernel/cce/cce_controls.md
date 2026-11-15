@@ -51,3 +51,5 @@ A single-site ideal operator pulse wholly outside the retained cluster is skippe
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_controls.m)
 - [cce_sequence.m](cce_sequence.md)
 - [cce_cluster.m](cce_cluster.md)
+
+Finite-control gCCE uses `context.central_rho` both for the propagated density and for normalized observable/coherence references, including the observable error bound. Parameter-level `central.rho` does not override a supplied context.

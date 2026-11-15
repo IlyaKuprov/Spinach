@@ -48,3 +48,5 @@ result=cce(spin_system,parameters)
 `retain_raw=false` explicitly suppresses raw cluster arrays after diagnostics and analysis; the existing default remains retained. Nonempty jumps require ME methods; bath-noise evolution is closed-system and does not accept Lindblad jumps. State-only parameter copies remove propagation-only fields before conditional-state preparation.
 
 Explicit `analysis` and `spectrum` requests now run `cce_analyse` and `cce_spectrum` on the result. `convergence` remains an explicit `cce_converge` operation and is rejected by the single-run driver. Unsupported noise term weights are rejected; scale the operator itself.
+
+Initial states are specified by `central.rho` and `bath_state`; the unused `initial_rho` alias is rejected. Explicit evaluator contexts, including adaptive pilot and held-out samples, determine generalized evolution and normalization independently of these driver defaults.

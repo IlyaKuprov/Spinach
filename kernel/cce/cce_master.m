@@ -6,6 +6,7 @@
 % ideal physical pulses; mecce controls must preserve or swap branches.
 % Finite controls require the controls extension and are refused here.
 % Static exterior coherent fields are retained, not exterior dissipators.
+% Generalized initial states and normalization use context.central_rho.
 % Multiplicative populations are not a generally valid T1 approximation.
 %
 % Inputs:
@@ -85,7 +86,7 @@ if meta.conditional
         end
     end
 else
-    rho_initial=kron(parameters.central.rho,rho_b);
+    rho_initial=kron(context.central_rho,rho_b);
 end
 
 % Evolve chronologically with the existing Spinach propagation utilities
@@ -125,7 +126,8 @@ end
 % Do not expose an uncomputed central density for conditional propagation
 if meta.conditional, densities=[]; end
 
-% Observe the central density without changing the requested normalization
+% Observe using the supplied initial state as the normalization reference
+parameters.central.rho=context.central_rho;
 if ~meta.conditional
     values=cce_observe(densities,parameters);
 end
@@ -154,7 +156,7 @@ end
 % Enforce supported controls and a valid state context
 function grumble(model,cluster,context,schedule,parameters)
 if ~isstruct(model)||~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
-   ~isstruct(context)||~all(isfield(context,{'bath_ids','bath_rho','expectations'}))||...
+   ~isstruct(context)||~all(isfield(context,{'central_rho','bath_ids','bath_rho','expectations'}))||...
    ~isstruct(schedule)||~all(isfield(schedule,{'times','events','positions'}))
     error('Prepared model, cluster, bath context and schedule are required.');
 end

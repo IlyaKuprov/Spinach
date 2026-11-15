@@ -48,3 +48,5 @@ result=test_cce_controls()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+A supplied central density and polarized bath state are checked against an independent dense finite-pulse propagator, including normalization by the context initial observable. The driven dispatch rejects unsupported context reference overrides.

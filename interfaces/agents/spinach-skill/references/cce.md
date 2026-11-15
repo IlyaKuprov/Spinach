@@ -205,3 +205,7 @@ Method references: [conditional CCE](https://doi.org/10.1103/PhysRevB.78.085315)
 
 Read the local `kernel/cce/*.m` headers and `grumble` checks before extending
 these structures; the implementation is the authority for supported fields.
+
+## Supplied state contexts
+
+For direct generalized evaluator calls, `context.central_rho` overrides the parameter-level initial central density; all evaluator paths take their product bath state from `context.bath_rho`. Both static and finite-control gCCE and ME-gCCE normalize against that same context central state. Conditional CCE/ME-CCE return normalized branch traces for the supplied bath state; noise is a bath-only correlation with connected references from that bath state. Specify branch projections through `parameters.central.alpha/beta`, not extra context fields. Unsupported context fields and `parameters.initial_rho` are rejected. Interlaced references must have bath densities consistent with their basis assignments; their supplied central state is retained.

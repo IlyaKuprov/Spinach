@@ -41,3 +41,5 @@ Direct calls require `method='noise'` and `quantity='autocorrelation'`; other ph
 - [cce_spectrum.m](cce_spectrum.md)
 
 For unconnected noise, the cluster graph joins observable-support sites even without a bare Hamiltonian edge, retaining disconnected moment products. Sampled connected noise retains the same support edges to preserve cross-site covariance of the actual finite sampled mixture; deterministic product-state connected noise keeps the ordinary coupling graph. Both ordered and symmetrized reductions use this common graph.
+
+Noise correlations use the supplied context bath densities for both dynamics and connected first moments. The central density is not part of this bath-only observable: `noise.branch` and `parameters.central.alpha/beta` define any fixed conditional projection. Unsupported context projection or reference overrides are rejected.

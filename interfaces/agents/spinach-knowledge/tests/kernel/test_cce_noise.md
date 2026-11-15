@@ -36,3 +36,5 @@ result=test_cce_noise()
 Checks sparse unconnected noise for independent polarized sites, time-dependent ordered/symmetrized moments, and connected covariance of an explicitly constructed finite sampled mixture under both averaging estimators.
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+Direct noise contexts with nontracial bath states are checked against dense ordered and symmetrized connected correlations; the initial moments come from the supplied bath state.

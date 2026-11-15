@@ -9,9 +9,50 @@ function result=test_cce_interlacing()
 result=new_test_result('kernel/cce_interlacing','CCE conditional interlacing',...
                        'Check unique configurations, conditional weights and shared denominator K.');
 [model,p]=fixture(); ensemble=cce_states(model,p);
-ensemble.assignments(1,:)=[1 1 1]; schedule=cce_sequence(model,p);
+ensemble.assignments(1,:)=[1 1 1]; ensemble.contexts(1).assignment=[1 1 1];
+ensemble.contexts(1).bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
+ensemble.contexts(1).expectations=repmat([0 0 0.5],3,1); schedule=cce_sequence(model,p);
 p.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3],[2 4]}});
 cluster=struct('id',uint64(1),'sites',2); raw=cce_interlace(model,cluster,ensemble,schedule,p);
+% Reject reference states inconsistent with their declared product assignment
+rejected=false; supplied=ensemble;
+supplied.contexts(1).bath_rho{1}=eye(2)/2;
+try
+    cce_interlace(model,cluster,supplied,schedule,p);
+catch exception
+    rejected=strcmp(exception.identifier,'cce:context');
+end
+result=test_true(result,'Interlaced reference density consistency',rejected,...
+                 'Interlacing cannot silently replace a supplied density inconsistent with its assignment.');
+
+% Reject a conflicting context assignment rather than replacing it silently
+supplied=ensemble; supplied.contexts(1).assignment=[2 1 1]; rejected=false;
+try
+    cce_interlace(model,cluster,supplied,schedule,p);
+catch exception
+    rejected=strcmp(exception.identifier,'cce:context');
+end
+result=test_true(result,'Interlaced reference assignment consistency',rejected,...
+                 'A supplied context assignment must agree with the ensemble reference.');
+
+% Reject an unsupported reference projection before averaging it away
+supplied=ensemble; supplied.contexts(1).projection=eye(2); rejected=false;
+try
+    cce_interlace(model,cluster,supplied,schedule,p);
+catch exception
+    rejected=strcmp(exception.identifier,'cce:context');
+end
+result=test_true(result,'Interlaced rejects context projection',rejected,...
+                 'Interlacing must reject unsupported supplied projection fields.');
+
+% Propagate a non-default central density through the selected reference context
+q=p; q.method='gcce'; q.quantity='density'; q.times=0;
+supplied=ensemble; supplied.contexts(1).central_rho=diag([0.2 0.8]);
+initial=cce_interlace(model,cluster,supplied,cce_sequence(model,q),q);
+expected=supplied.contexts(1).central_rho;
+result=test_close(result,'Interlaced supplied central state',initial.value,expected(:).',...
+                  1e-12,1e-12,'The reference context central density survives the conditional bath average.');
+
 % Keep the empty-cluster conditional baseline valid for an empty family
 q=p; q.interlaced=rmfield(q.interlaced,'condition_sites'); q.order=0;
 empty_cluster=struct('id',uint64(0),'sites',[]); baseline_ok=true; baseline_error=Inf;

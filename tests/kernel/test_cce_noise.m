@@ -31,6 +31,26 @@ end
 result=test_close(result,'C7 numerical check',r.value,reference,1e-12,1e-12,'Full-order additive exact reference.');
 exact_error=max(abs(r.value-reference));
 
+% Honour an explicitly supplied bath state independently of parameter defaults
+model=cce_prepare(s,p); state_parameters=p; state_parameters.central.rho=eye(2)/2;
+ensemble=cce_states(model,state_parameters); context=ensemble.contexts(1);
+context.central_rho=diag([0 1]); context.bath_rho={diag([0.8 0.2]),[1 1;1 1]/2};
+context.expectations=[0 0 0.3;0.5 0 0]; schedule=cce_sequence(model,p);
+cluster=struct('id',1,'sites',[2 3]); rho=kron(context.bath_rho{1},context.bath_rho{2});
+for ordering={'ordered','symmetrized'}
+    q=p; q.noise.ordering=ordering{1}; q.noise.connected=true;
+    raw=cce_noise(model,cluster,context,schedule,q); supplied_reference=zeros(numel(p.times),1);
+    for k=1:numel(p.times)
+        U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
+        greater=trace(Bt*B*rho); lesser=trace(B*Bt*rho);
+        if strcmp(ordering{1},'ordered'), moment=greater;
+        else, moment=(greater+lesser)/2; end
+        supplied_reference(k)=moment-trace(Bt*rho)*trace(B*rho);
+    end
+    result=test_close(result,['Noise supplied context ' ordering{1}],raw.value,supplied_reference,...
+                      2e-12,2e-12,'Noise uses the context bath state and its connected reference moments.');
+end
+
 % Check factorization into independent connected single-spin correlations
 s.inter.coupling.matrix{2,3}=zeros(3); p.order=1; first=cce(s,p);
 p.order=2; second=cce(s,p);

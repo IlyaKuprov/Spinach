@@ -33,6 +33,8 @@
 %   exterior_expectations indexed by time then segment; generalized
 %   propagation also returns raw with central densities and reducer fields.
 %
+% Generalized state propagation and normalization use context.central_rho.
+%
 % See also cce_sequence, cce_cluster.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -232,7 +234,7 @@ if strcmp(parameters.method,'gcce')
         end
         bounds(t)=16*dimension^3*eps*scale;
     end
-    observe=parameters; observe.initial_rho=context.central_rho;
+    observe=parameters; observe.central.rho=context.central_rho;
     if ~isfield(observe,'normalized'), observe.normalized=false; end
     value=cce_observe(density,observe);
     scale=ones(1,size(value,2));

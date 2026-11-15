@@ -45,3 +45,5 @@ Conditional averages dispatch `cce`/`gcce` to the closed-system evaluator and `m
 - [cce_states.m](cce_states.md)
 - [cce_reduce.m](cce_reduce.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.86.035452)
+
+The selected `reference_state` preserves its supplied central density. Its bath IDs and pure product densities must agree with its ensemble basis assignment; an optional context assignment must agree as well; inconsistent supplied bath densities are rejected before conditional enumeration, rather than overwritten silently. Use explicit-product evaluation for mixed local densities.

@@ -3,6 +3,7 @@
 %
 % This shared contract checks optional field names and method applicability;
 % individual helpers validate the dimensions and values they consume.
+% Unsupported state-context fields and initial_rho aliases are rejected.
 % Optional model, included bath sites and state context also validate the
 % finite mean-field radius against central and exterior coordinates.
 %
@@ -13,6 +14,25 @@ function cce_validate(parameters,model,sites,context)
 % Validate the public container before inspecting optional fields
 grumble(parameters);
 
+% Reject unimplemented state, projection and reference overrides explicitly
+if isfield(parameters,'initial_rho')
+    error('cce:context','parameters.initial_rho is unsupported; use central.rho or context.central_rho.');
+end
+
+% Check the canonical state-context vocabulary before any propagation
+if nargin==4&&~isempty(context)
+    if ~isstruct(context)||~isscalar(context)
+        error('cce:context','The supplied state context must be a scalar structure.');
+    end
+    known={'central_rho','bath_ids','bath_rho','expectations','state_id',...
+           'configuration_id','weight','assignment','id'};
+    unknown=setdiff(fieldnames(context),known);
+    if ~isempty(unknown)
+        error('cce:context',...
+              'Unsupported context.%s; use central_rho/bath_rho for states and parameters.central.alpha/beta for projections.',unknown{1});
+    end
+end
+
 % Reject misspelled top-level parameters consistently in standalone helpers
 known={'central_spins','bath_spins','method','expansion','quantity','times',...
        'order','central','assumptions','orientation','hamiltonian_backend',...
@@ -20,7 +40,7 @@ known={'central_spins','bath_spins','method','expansion','quantity','times',...
        'bath_state','sampling','meanfield','meanfield_radius','sequence',...
        'controls','deer','jumps','noise','spectrum','numerics','averaging',...
        'analysis','diagnostics','run','checkpoint','retain_raw','normalized',...
-       'operators','interlaced','convergence','reducer','parallel','initial_rho',...
+       'operators','interlaced','convergence','reducer','parallel',...
        'clusters','cluster_cap','second_order'};
 fields(parameters,known,'parameters');
 

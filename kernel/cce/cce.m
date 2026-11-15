@@ -52,11 +52,6 @@ function result=cce(spin_system,parameters)
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters);
 
-% Reject the helper-only initial density override at the public driver
-if isfield(parameters,'initial_rho')
-    error('cce:capability','parameters.initial_rho is helper-only; specify central.rho.');
-end
-
 % Reject conditioning controls when the driver is not performing interlacing
 if isfield(parameters,'interlaced')&&isfield(parameters,'bath_state')&&...
    ~strcmp(parameters.bath_state.mode,'interlaced')

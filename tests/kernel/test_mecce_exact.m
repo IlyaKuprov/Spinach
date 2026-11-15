@@ -142,6 +142,9 @@ for k=2:numel(p.times)
 end
 p.sequence=struct([]);
 
+% Compare supplied contexts independently of the parameter-level initial state
+result=context_initialization(result);
+
 % Refuse a split correlated jump and accept its complete ordered support
 p.jumps=struct('support',[3 2],'operator',kron(j,z),'rate',rate);
 m=cce_prepare(s,p); refused=false;
@@ -243,6 +246,115 @@ result=test_true(result,'ME tutorial validity',all(r.valid),'Conservative lab-fr
 fprintf('PyCCE ME-CCE2 %.3g; ME-gCCE2 %.3g; max bound %.3g\n',...
         conditional_error,max(abs(r.value-reference)),max(r.abs_error_bound));
 
+end
+
+% Exercise state overrides through both open and closed evaluator families
+function result=context_initialization(result)
+
+% Build a diagonal central-bath model with an independently soluble phase
+sys.isotopes={'1H','1H'}; sys.magnet=0; sys.output='hush';
+sys.disable={'hygiene'}; sys.parallel={'processes',1};
+inter.zeeman.scalar={0,0}; inter.coupling.scalar=cell(2); spin_system=create(sys,inter);
+spin_system.inter.coupling.matrix{1,2}=diag([0 0 4]);
+p=parameters(); p.bath_spins=2; p.order=1; p.times=[0 0.1];
+p.central=struct('alpha',[1;0],'beta',[0;1],'rho',[1 1;1 1]/2);
+p.jumps=struct('support',{},'operator',{},'rate',{});
+model=cce_prepare(spin_system,p); ensemble=cce_states(model,p);
+context=ensemble.contexts(1); context.central_rho=[0.25 0.2i;-0.2i 0.75];
+context.bath_rho={diag([0 1])}; context.expectations=[0 0 -0.5];
+cluster=struct('id',1,'sites',2); schedule=cce_sequence(model,p);
+
+% Check every generalised observable and its context-derived reference
+maximum=0;
+for method={'gcce','megcce'}
+    p.method=method{1};
+    if strcmp(p.method,'gcce'), evaluator=@cce_cluster; else, evaluator=@cce_master; end
+    for quantity={'density','coherence','observable'}
+        p.quantity=quantity{1}; p.operators=diag([1 2]);
+        if ~strcmp(p.quantity,'observable'), p=rmfield(p,'operators'); end
+        for normalized=[false true]
+            if strcmp(p.quantity,'density')&&normalized, continue; end
+            p.normalized=normalized; raw=evaluator(model,cluster,context,schedule,p);
+            expected=zeros(2,numel(raw.value(1,:)));
+            observe=p; observe.central.rho=context.central_rho;
+            for k=1:2
+                u=expm(1i*diag([1 -1])*p.times(k));
+                rho=u*context.central_rho*u'; expected(k,:)=cce_observe(rho,observe);
+            end
+
+            % Rebinding the same context into defaults must not change uncertainty scaling
+            rebound=p; rebound.central.rho=context.central_rho;
+            matched=evaluator(model,cluster,context,schedule,rebound);
+            result=test_close(result,[p.method ' context bound ' p.quantity ' ' num2str(normalized)],...
+                              raw.abs_error_bound,matched.abs_error_bound,0,0,...
+                              'The normalization error bound must use the same supplied context reference.');
+
+            % Compare the propagated values with the independent phase solution
+            difference=norm(raw.value-expected,'fro'); maximum=max(maximum,difference);
+            label=sprintf('%s context %s normalized %d',p.method,p.quantity,normalized);
+            result=test_close(result,label,raw.value,expected,2e-12,2e-12,...
+                              'Supplied central and bath densities determine evolution and normalization.');
+        end
+    end
+end
+fprintf('R13 generalized context maximum %.17g\n',maximum);
+
+% Reject unsupported context projections and references instead of ignoring them
+rejected=0; attempted=0;
+for method={'cce','gcce','mecce','megcce','noise'}
+    q=p; q.method=method{1}; q=rmfield(q,{'operators','normalized'}); q.quantity='coherence';
+    if strcmp(q.method,'noise')
+        q.quantity='autocorrelation';
+        q.noise=struct('ordering','ordered','connected',false,...
+                       'terms',struct('support',2,'operator',diag([0.5 -0.5])));
+        evaluator=@cce_noise;
+    elseif startsWith(q.method,'me'), evaluator=@cce_master;
+    else, evaluator=@cce_cluster;
+    end
+    for field={'initial_rho','projection','reference'}
+        supplied=context; supplied.(field{1})=eye(2)/2; caught=false; attempted=attempted+1;
+        try
+            evaluator(model,cluster,supplied,schedule,q);
+        catch exception
+            caught=strcmp(exception.identifier,'cce:context');
+        end
+        rejected=rejected+caught;
+        result=test_true(result,[q.method ' rejects context ' field{1}],caught,...
+                         'Unsupported state, projection and reference overrides must not be silently discarded.');
+    end
+end
+fprintf('R13 unsupported context rejections %d/%d\n',rejected,attempted);
+
+
+% Reject an obsolete parameter reference alias on evaluator and driver paths
+q=p; q.method='gcce'; q.initial_rho=context.central_rho; rejected=false(1,2);
+try
+    cce_cluster(model,cluster,context,schedule,q);
+catch exception
+    rejected(1)=strcmp(exception.identifier,'cce:context');
+end
+try
+    cce(spin_system,q);
+catch exception
+    rejected(2)=strcmp(exception.identifier,'cce:context');
+end
+result=test_true(result,'Initial rho alias rejected consistently',all(rejected),...
+                 'Unsupported references cannot be silently accepted by standalone helpers.');
+
+% Keep conditional branch traces independent of the central coherence amplitude
+p=rmfield(p,{'operators','normalized'}); p.quantity='coherence';
+for method={'cce','mecce'}
+    p.method=method{1};
+    if strcmp(p.method,'cce'), evaluator=@cce_cluster; else, evaluator=@cce_master; end
+    raw=evaluator(model,cluster,context,schedule,p);
+    result=test_close(result,[p.method ' context bath phase'],raw.value,exp(2i*p.times(:)),...
+                      2e-12,2e-12,'Conditional methods return normalized branch traces for the supplied bath state.');
+    % Use explicit branch vectors rather than a cached projection
+    swapped=p; swapped.central.alpha=p.central.beta; swapped.central.beta=p.central.alpha;
+    raw=evaluator(model,cluster,context,schedule,swapped);
+    result=test_close(result,[p.method ' supplied projection'],raw.value,exp(-2i*p.times(:)),...
+                      2e-12,2e-12,'Swapped user branch vectors reverse the conditional phase.');
+end
 end
 
 

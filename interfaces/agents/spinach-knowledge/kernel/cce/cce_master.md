@@ -46,3 +46,5 @@ raw=cce_master(model,cluster,context,schedule,parameters)
 - [cce_liouvillian.m](cce_liouvillian.md)
 - [cce_observe.m](cce_observe.md)
 - [Method reference](https://doi.org/10.1103/PhysRevLett.132.250401)
+
+ME-gCCE evolves `context.central_rho` and the product of the supplied `context.bath_rho` densities. The same central context state supplies the normalization reference and its uncertainty scaling; this also applies to adaptive pilot and held-out contexts. ME-CCE remains a normalized conditional branch trace, not a reconstructed central density.

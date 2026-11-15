@@ -182,3 +182,7 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 ## Native cluster-expansion input services
 
 The staged clexpn interface uses canonical sys/inter, physical IDs in parameters.observed, descriptive transition selectors, experiment-owned controls and approximation/ensemble/reduction options in parameters.cce. Read references/cce.md and the cce_options, cce_transition and spin_bath knowledge leaves before using these services. There is no legacy translator. Existing CCE callers remain unchanged until the atomic context/experiment cutover; clexpn itself is not introduced by this input-service stage.
+
+## Native retained-subsystem services
+
+Use cce_compile, cce_subsystem, cce_operator and cce_state for the native clexpn subsystem boundary; see references/cce.md. They preserve physical IDs and complete Zeeman ordering without constructing a full-bath basis. Resolve the numerical resource policy before compilation, use explicit caller-owned caches, and never translate native parameters back to the old public CCE structure.

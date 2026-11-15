@@ -526,3 +526,5 @@ Use `[sqrt(2/3) 0 sqrt(1/3)]` for fixed single-rotor example axes. Keep delibera
 ## Cluster-expansion context boundary
 
 The new context name is clexpn, with the planned four-argument signature [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions). The current input-service stage supplies cce_options and cce_transition, not the context itself. Assumptions belong to the fourth argument; physical observed IDs and isotope channel names are distinct. New experiments will live in experiments/cce; cce_eseem retains its name because eseem already exists. Do not route the new contract through the old cce entry point or a translator.
+
+The clexpn retained-system boundary is cce_compile followed by cce_subsystem. Resolve numerical tolerances and the memory budget before compilation. Do not build a full-bath basis: cce_subsystem retains observed spins first and ordered bath sites second, with explicit physical/local maps. A caller-owned cache includes model, configuration, assumptions and Zeeman representation. Native generators and observation services consume this view; the view is not a stock spin_system with fabricated basis fields.

@@ -1,0 +1,8 @@
+# cce_compile — native immutable cluster model
+Keywords: cce_compile clexpn canonical tensors physical IDs assumptions Zeeman formalism groups units
+
+`model=cce_compile(spin_system,parameters,assumptions)` accepts create output and the native cce_options contract. The caller resolves cce.numerics.atol, rtol and max_memory_bytes before compilation; this lower-level service does not invent an accuracy or resource policy. Bath IDs are parameters.cce.bath_spins, not cce.bath. An absent interaction cutoff retains the complete finite interaction model.
+
+The model retains ordered observed_ids/bath_ids, all physical_ids, multiplicities, isotope labels, groups, coordinates_A, native parameters, resolved transition, transition_meta and projectors, canonical rad/s tensors, assumptions and numerical cutoffs. It applies assume without building a whole-bath basis. Its source_hash and caller-owned subsystem cache signatures include assumptions and representation. It never converts canonical tensors a second time or resamples isotope occupancy. Occupied sites and their physical-ID groups are those already supplied by spin_bath/create.
+
+An absent basis selects zeeman-hilb. An explicit zeeman-hilb or zeeman-liouv selects that complete local representation; global basis arrays are discarded, and other formalisms fail. The implementation ports the numerical compiler algebra directly and never translates parameters into the old cce public input. Internal cce_hamiltonian can consume its retained tensor metadata. Context resource resolution and generator construction are separate services.

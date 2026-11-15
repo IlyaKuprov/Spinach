@@ -1,18 +1,18 @@
 % Builds a cluster Hamiltonian in rad/s. Syntax:
 %
-%                [H,meta]=cce_hamiltonian(model,sites,context)
+%                [H,meta]=cce_hamiltonian(model,sites,spin_config)
 %
 % model is returned by cce_prepare; sites are physical bath spin IDs.
-% Ordering is model.central_ids followed by sites, in the supplied order.
-% context is a scalar struct with optional backend (auto/direct/stock),
+% Ordering is model.observed_ids followed by sites, in the supplied order.
+% spin_config is a scalar struct with optional backend (auto/direct/stock),
 % exterior_ids and exterior_expectations (one real [Ix Iy Iz] row per ID).
 % Exterior fields use exactly the model's retained pair interactions.
 % meta reports IDs, dimensions, operators, backend and roundoff residuals.
 %
 % Inputs:
 %   model - output of cce_prepare.
-%   sites - physical bath IDs; [] selects the central baseline.
-%   context - scalar structure with optional backend override, exterior_ids
+%   sites - physical bath IDs; [] selects the observed baseline.
+%   spin_config - scalar structure with optional backend override, exterior_ids
 %   and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
 %   Exterior fields use retained model pair interactions.
 %
@@ -25,14 +25,14 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [H,meta]=cce_hamiltonian(model,sites,context)
+function [H,meta]=cce_hamiltonian(model,sites,spin_config)
 
-% Check cluster membership, context and the requested backend
-grumble(model,sites,context);
+% Check cluster membership, spin_config and the requested backend
+grumble(model,sites,spin_config);
 
 % Resolve the validated construction path
 backend=model.backend;
-if isfield(context,'backend'), backend=context.backend; end
+if isfield(spin_config,'backend'), backend=spin_config.backend; end
 if strcmp(backend,'auto')
     if model.direct_supported, backend='direct'; else, backend='stock'; end
 end
@@ -41,7 +41,7 @@ if strcmp(backend,'direct')&&~model.direct_supported
 end
 
 % Bound simultaneous dense matrices before allocating cluster operators
-ids=[model.central_ids sites]; dims=model.multiplicities(ids);
+ids=[model.observed_ids sites]; dims=model.multiplicities(ids);
 dimension=prod(dims); copies=4+3*numel(ids);
 if strcmp(backend,'stock')
 
@@ -153,7 +153,7 @@ else
     system=assume(system,model.assumptions{:});
     [H,Q]=hamiltonian(system); H=H+orientation(Q,model.orientation);
 
-    % Reorder the stock ascending physical indices into central-first order
+    % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids); sorted_dims=model.multiplicities(sorted_ids);
     [~,order]=ismember(ids,sorted_ids);
     if numel(ids)>1
@@ -165,14 +165,14 @@ else
 end
 
 % Add static exterior mean fields after the common ordering is established
-if isfield(context,'exterior_ids')
-    if ~model.direct_supported&&~isempty(context.exterior_ids)
+if isfield(spin_config,'exterior_ids')
+    if ~model.direct_supported&&~isempty(spin_config.exterior_ids)
         error('exterior mean fields require validated pair-retention semantics.');
     end
     for n=1:numel(ids)
-        for k=1:numel(context.exterior_ids)
-            field=model.retained{ids(n),context.exterior_ids(k)}*...
-                  context.exterior_expectations(k,:).';
+        for k=1:numel(spin_config.exterior_ids)
+            field=model.retained{ids(n),spin_config.exterior_ids(k)}*...
+                  spin_config.exterior_expectations(k,:).';
             for axis=1:3
                 term=field(axis)*ops{n,axis}; H=H+term;
                 sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
@@ -193,7 +193,7 @@ H=(H+H')/2;
 
 % Return ordering, operators, backend and approximation provenance
 meta.physical_ids=ids; meta.dimensions=dims; meta.dimension=dimension;
-meta.central_dimension=prod(model.multiplicities(model.central_ids));
+meta.observed_dimension=prod(model.multiplicities(model.observed_ids));
 meta.bath_dimension=prod(model.multiplicities(sites)); meta.operators=ops;
 meta.backend=backend; meta.fallback_reason=model.fallback_reason;
 meta.source_hash=model.source_hash; meta.omitted_pairs=model.omitted_pairs;
@@ -202,8 +202,8 @@ meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 end
 
 % Validate structure, IDs, and explicitly supplied exterior expectations
-function grumble(model,sites,context)
-if ~isstruct(model)||~all(isfield(model,{'source_hash','central_ids',...
+function grumble(model,sites,spin_config)
+if ~isstruct(model)||~all(isfield(model,{'source_hash','observed_ids',...
    'bath_ids','multiplicities','retained','spin_system','numerics','backend'}))
     error('model must be returned by cce_prepare.');
 end
@@ -212,21 +212,21 @@ if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
    numel(unique(sites))~=numel(sites)||~all(ismember(sites,model.bath_ids))
     error('sites must be a row of unique model bath spin IDs.');
 end
-if ~isstruct(context)||~isscalar(context)||...
-   ~all(ismember(fieldnames(context),{'backend','exterior_ids','exterior_expectations'}))
-    error('context contains unknown fields or is not a scalar structure.');
+if ~isstruct(spin_config)||~isscalar(spin_config)||...
+   ~all(ismember(fieldnames(spin_config),{'backend','exterior_ids','exterior_expectations'}))
+    error('spin_config contains unknown fields or is not a scalar structure.');
 end
-if isfield(context,'backend')&&~ismember(context.backend,{'auto','direct','stock'})
-    error('context.backend must be auto, direct, or stock.');
+if isfield(spin_config,'backend')&&~ismember(spin_config.backend,{'auto','direct','stock'})
+    error('spin_config.backend must be auto, direct, or stock.');
 end
-if xor(isfield(context,'exterior_ids'),isfield(context,'exterior_expectations'))
+if xor(isfield(spin_config,'exterior_ids'),isfield(spin_config,'exterior_expectations'))
     error('exterior_ids and exterior_expectations must be supplied together.');
 end
-if isfield(context,'exterior_ids')
-    ids=context.exterior_ids; values=context.exterior_expectations;
+if isfield(spin_config,'exterior_ids')
+    ids=spin_config.exterior_ids; values=spin_config.exterior_expectations;
     if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
        any(~isfinite(ids))||numel(unique(ids))~=numel(ids)||...
-       ~all(ismember(ids,setdiff(model.physical_ids,[model.central_ids sites])))||...
+       ~all(ismember(ids,setdiff(model.physical_ids,[model.observed_ids sites])))||...
        ~isnumeric(values)||~isreal(values)||~isequal(size(values),[numel(ids) 3])||...
        any(~isfinite(values),'all')
         error('invalid exterior IDs or expectation rows.');

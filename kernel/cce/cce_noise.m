@@ -1,21 +1,21 @@
 % Additive connected bath-noise autocorrelation for one cluster. Syntax:
 %
-%           raw=cce_noise(model,cluster,context,schedule,parameters)
+%           raw=cce_noise(model,cluster,spin_config,schedule,parameters)
 %
 % parameters.noise specifies ordering ('ordered' or 'symmetrized'),
 % connected (logical), and terms: a struct array with support (ordered
 % physical bath IDs) and operator (matrix in that tensor order). The
 % observable is the sum of included terms; a split multi-site term is
 % refused. Units are the squared units of these operators. Dynamics uses
-% only the bath Hamiltonian (normalized trace over the central register),
-% or its conditional projection when noise.branch is 'alpha' or 'beta'.
+% only the bath Hamiltonian (normalized trace over the observed-spin system),
+% or its projected projection when noise.manifold is 'alpha' or 'beta'.
 % Each raw is Tr[B(t)B(0)rho]-Tr[B(t)rho]Tr[B(0)rho] when connected.
 % No stationarity, detailed balance, Gaussianity or T1 assumption is made.
 %
 % Inputs:
-%   model, cluster, context, schedule, parameters - cluster inputs;
+%   model, cluster, spin_config, schedule, parameters - cluster inputs;
 %   noise.ordering=ordered|symmetrized, logical connected, and terms with
-%   ordered bath support and operator matrices; optional noise.branch selects
+%   ordered bath support and operator matrices; optional noise.manifold selects
 %   alpha or beta.
 %
 % Outputs:
@@ -27,32 +27,32 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function raw=cce_noise(model,cluster,context,schedule,parameters)
+function raw=cce_noise(model,cluster,spin_config,schedule,parameters)
 
 % Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters,model,cluster.sites,context);
+cce_validate(parameters,model,cluster.sites,spin_config);
 
 % Validate explicit quantum ordering and the additive observable contract
-grumble(model,cluster,context,schedule,parameters);
+grumble(model,cluster,spin_config,schedule,parameters);
 [H,~]=cce_hamiltonian(model,cluster.sites,struct('backend','auto'));
-d0=prod(model.multiplicities(model.central_ids)); db=size(H,1)/d0;
+d_obs=prod(model.multiplicities(model.observed_ids)); db=size(H,1)/d_obs;
 
-% Remove the central register without retaining mediated bath terms
-if isfield(parameters.noise,'branch')
-    branch=cce_project(model,parameters);
-    if branch.second_order_enabled
+% Remove the observed-spin system without retaining mediated bath terms
+if isfield(parameters.noise,'manifold')
+    manifold=cce_project(model,parameters);
+    if manifold.second_order_enabled
         error('cce:capability','Noise virtual-state corrections are not implemented.');
     end
-    vector=kron(branch.(parameters.noise.branch).state,eye(db)); hb=vector'*H*vector;
+    vector=kron(manifold.(parameters.noise.manifold).vector,eye(db)); hb=vector'*H*vector;
 
-    % Require the fixed central branch to be invariant under the actual Hamiltonian
+    % Require the fixed observed manifold to be invariant under the actual Hamiltonian
     if norm(H*vector-vector*hb,'fro')>size(H,1)*eps*norm(H,'fro')
-        error('cce:pure_dephasing',...
-              'The noise branch is not invariant under the cluster Hamiltonian.');
+        error('cce:population_transfer',...
+              'The noise manifold is not invariant under the cluster Hamiltonian.');
     end
 else
     hb=zeros(db);
-    for k=1:d0, hb=hb+H((k-1)*db+(1:db),(k-1)*db+(1:db))/d0; end
+    for k=1:d_obs, hb=hb+H((k-1)*db+(1:db),(k-1)*db+(1:db))/d_obs; end
 end
 
 % Embed the declared bath observable in stable physical tensor order
@@ -72,7 +72,7 @@ end
 % Form the same cluster product state as the dynamics expansion
 rho=1;
 for id=ids
-    where=find(context.bath_ids==id,1); rho=kron(rho,context.bath_rho{where});
+    where=find(spin_config.bath_ids==id,1); rho=kron(rho,spin_config.bath_rho{where});
 end
 mean_zero=trace(B*rho); nt=numel(schedule.times); values=complex(zeros(nt,1));
 mean_time=complex(zeros(nt,1)); moments=complex(zeros(nt,1));
@@ -99,12 +99,12 @@ raw=struct('cluster_id',cluster.id,'value',values,'valid',isfinite(values),...
 end
 
 % Reject ambiguous quantum correlations and unsupported controls
-function grumble(model,cluster,context,schedule,parameters)
+function grumble(model,cluster,spin_config,schedule,parameters)
 if ~isstruct(model)||~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
-   ~isstruct(context)||~all(isfield(context,{'bath_ids','bath_rho'}))||...
+   ~isstruct(spin_config)||~all(isfield(spin_config,{'bath_ids','bath_rho'}))||...
    ~isstruct(schedule)||~all(isfield(schedule,{'times','events'}))||...
    ~isstruct(parameters)||~isfield(parameters,'noise')
-    error('Prepared model, cluster, context, schedule and noise parameters are required.');
+    error('Prepared model, cluster, spin_config, schedule and noise parameters are required.');
 end
 if ~isfield(parameters,'method')||~strcmp(parameters.method,'noise')||...
    ~isfield(parameters,'quantity')||~strcmp(parameters.quantity,'autocorrelation')
@@ -116,8 +116,8 @@ if ~isstruct(noise)||~all(isfield(noise,{'ordering','connected','terms'}))||...
    ~islogical(noise.connected)||~isscalar(noise.connected)||~isstruct(noise.terms)
     error('Explicit ordering, connected flag and observable terms are required.');
 end
-if isfield(noise,'branch')&&~ismember(noise.branch,{'alpha','beta'})
-    error('noise.branch must be alpha or beta.');
+if isfield(noise,'manifold')&&~ismember(noise.manifold,{'alpha','beta'})
+    error('parameters.noise.manifold must be alpha or beta.');
 end
 if ~isempty(schedule.events)||~strcmp(parameters.meanfield,'none')
     error('cce:capability','Noise correlation currently requires FID and no exterior field.');

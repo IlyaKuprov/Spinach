@@ -1,24 +1,24 @@
 % Native Lindblad generator for column-vectorised density matrices. Syntax:
 %
-%           [G,meta]=cce_liouvillian(model,sites,context,parameters)
+%           [G,meta]=cce_liouvillian(model,sites,spin_config,parameters)
 %
-% model is returned by cce_prepare; sites lists physical bath IDs. context
+% model is returned by cce_prepare; sites lists physical bath IDs. spin_config
 % accepts cce_hamiltonian fields. parameters.method is mecce or megcce;
 % parameters.jumps is a struct array with support (ordered physical IDs),
 % operator (dimensionless matrix in that tensor order), and rate (s^-1).
-% Evolution is exp(G*t), NOT exp(-1i*G*t). Conditional blocks require
-% central-diagonal jumps; a jump split across the cluster is refused.
+% Evolution is exp(G*t), NOT exp(-1i*G*t). Projected blocks require
+% observed-diagonal jumps; a jump split across the cluster is refused.
 % Disjoint exterior jumps are omitted only without a frozen field from them;
 % evolving exterior fields are refused, not replaced by a dissipator.
 % meta supplies ordering, dimensions, Hamiltonians and jump records.
 %
 % Inputs:
-%   model, sites, context, parameters - prepared cluster inputs and
+%   model, sites, spin_config, parameters - prepared cluster inputs and
 %   dissipation.jumps records with ordered support IDs, operator matrix and
 %   rate in s^-1.
 %
 % Outputs:
-%   G - dense GKSL generator acting on column-vectorized density/coherence
+%   G - dense GKSL generator acting on column-vectorized density/signal
 %   blocks.
 %   meta - tensor order, dimensions, Hamiltonians and included jump records.
 %
@@ -27,19 +27,19 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [G,meta]=cce_liouvillian(model,sites,context,parameters)
+function [G,meta]=cce_liouvillian(model,sites,spin_config,parameters)
 
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters);
 
 % Validate dimensions, units and the explicit method
-grumble(model,sites,context,parameters);
+grumble(model,sites,spin_config,parameters);
 
 % Bound full physical operators separately from the projected Liouvillian
-ids=[model.central_ids sites]; dims=model.multiplicities(ids); d=prod(dims);
-d0=prod(model.multiplicities(model.central_ids)); db=d/d0;
-conditional=strcmp(parameters.method,'mecce');
-if conditional, n=db^2; else, n=d^2; end
+ids=[model.observed_ids sites]; dims=model.multiplicities(ids); d=prod(dims);
+d_obs=prod(model.multiplicities(model.observed_ids)); db=d/d_obs;
+projected=strcmp(parameters.method,'mecce');
+if projected, n=db^2; else, n=d^2; end
 full_workspace=(12+3*numel(ids))*d^2;
 
 % Keep every included jump pair resident while assembling subsequent terms
@@ -53,23 +53,23 @@ if 16*(full_workspace+8*n^2+2*jumps*n)+8*labels>parameters.numerics.max_memory_b
     error('cce:memory','Liouvillian construction exceeds max_memory_bytes.');
 end
 
-% Build the Hamiltonian in central-first tensor order after the allocation guard
-[H,hmeta]=cce_hamiltonian(model,sites,context);
+% Build the Hamiltonian in observed-first tensor order after the allocation guard
+[H,hmeta]=cce_hamiltonian(model,sites,spin_config);
 
-% Assemble the coherent full-density or conditional-block generator
-if conditional
-    branch=cce_project(model,parameters);
-    if branch.second_order_enabled
+% Assemble the coherent full-density or projected-block generator
+if projected
+    manifold=cce_project(model,parameters);
+    if manifold.second_order_enabled
         error('cce:capability','ME virtual-state corrections are not implemented.');
     end
-    va=kron(branch.alpha.state,eye(db)); vb=kron(branch.beta.state,eye(db));
+    va=kron(manifold.alpha.vector,eye(db)); vb=kron(manifold.beta.vector,eye(db));
     ha=va'*H*va; hb=vb'*H*vb;
 
-    % Reject central transitions omitted by conditional master evolution
+    % Reject observed transitions omitted by projected master evolution
     leakage=max(norm(H*va-va*ha,'fro'),norm(H*vb-vb*hb,'fro'));
     if leakage>size(H,1)*eps*norm(H,'fro')
-        error('cce:pure_dephasing',...
-              'Conditional states are not invariant under the cluster Hamiltonian; use megcce.');
+        error('cce:population_transfer',...
+              'Projected states are not invariant under the cluster Hamiltonian; use megcce.');
     end
     G=-1i*(kron(eye(db),ha)-kron(hb.',eye(db)));
 else
@@ -83,7 +83,7 @@ for k=1:numel(parameters.jumps)
     if jump.rate==0, continue; end
     included=ismember(jump.support,ids);
     if ~any(included)
-        if isfield(context,'exterior_ids')&&any(ismember(jump.support,context.exterior_ids))
+        if isfield(spin_config,'exterior_ids')&&any(ismember(jump.support,spin_config.exterior_ids))
             error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
         end
         continue
@@ -98,10 +98,10 @@ for k=1:numel(parameters.jumps)
     local=kron(jump.operator,eye(prod(dims(rest))));
     op=zeros(d); op(labels,labels)=local;
 
-    % Resolve a closed conditional block or refuse branch leakage
-    if conditional
-        va=kron(parameters.central.alpha,eye(db));
-        vb=kron(parameters.central.beta,eye(db));
+    % Resolve a closed projected block or refuse manifold leakage
+    if projected
+        va=kron(parameters.transition.alpha,eye(db));
+        vb=kron(parameters.transition.beta,eye(db));
         left=va'*op*va; right=vb'*op*vb;
         leakage=norm(op*va-va*left,'fro')+norm(op*vb-vb*right,'fro');
 
@@ -111,7 +111,7 @@ for k=1:numel(parameters.jumps)
                      norm(loss*vb-vb*(vb'*loss*vb),'fro');
         if leakage>100*eps*d*norm(op,'fro')||...
            loss_leakage>100*eps*d*norm(loss,'fro')
-            error('cce:jumpBranches','A branch-changing jump or loss operator requires megcce.');
+            error('cce:manifold_mixing','A manifold-changing jump or loss operator requires megcce.');
         end
     else
         left=op; right=op;
@@ -127,7 +127,7 @@ end
 
 % Return the native-generator convention and exact block identity
 meta=struct('physical_ids',ids,'dimension',d,'bath_dimension',db,...
-            'central_dimension',d0,'conditional',conditional,...
+            'observed_dimension',d_obs,'projected',projected,...
             'h_alpha',ha,'h_beta',hb,'jumps',jump_records,...
             'vectorization','column','evolution','exp(G*t)',...
             'rate_units','s^-1','hamiltonian',hmeta);
@@ -135,9 +135,9 @@ meta=struct('physical_ids',ids,'dimension',d,'bath_dimension',db,...
 end
 
 % Validate explicit jump supports, ordered matrices and nonnegative rates
-function grumble(model,sites,context,parameters)
-if ~isstruct(model)||~isfield(model,'physical_ids')||~isstruct(context)
-    error('A prepared model and scalar Hamiltonian context are required.');
+function grumble(model,sites,spin_config,parameters)
+if ~isstruct(model)||~isfield(model,'physical_ids')||~isstruct(spin_config)
+    error('A prepared model and scalar Hamiltonian spin_config are required.');
 end
 if ~isnumeric(sites)||any(~ismember(sites,model.bath_ids))||...
    numel(unique(sites))~=numel(sites)
@@ -158,7 +158,7 @@ for k=1:numel(parameters.jumps)
     if ~all(isfield(j,{'support','operator','rate'}))||...
        ~isnumeric(j.support)||isempty(j.support)||~isrow(j.support)||...
        numel(unique(j.support))~=numel(j.support)||...
-       any(~ismember(j.support,[model.central_ids model.bath_ids]))
+       any(~ismember(j.support,[model.observed_ids model.bath_ids]))
         error('Every jump requires ordered distinct physical support IDs.');
     end
     n=prod(model.multiplicities(j.support));

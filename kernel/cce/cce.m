@@ -2,17 +2,17 @@
 %
 %                       result=cce(spin_system,parameters)
 %
-% Required fields: central_spins, bath_spins, method (cce/gcce/mecce/megcce/noise), expansion
-% (standard), quantity (coherence/density/observable/autocorrelation), times (whole-sequence
-% seconds), order, central, assumptions, orientation, interaction_cutoff,
+% Required fields: observed_spins, bath_spins, method (cce/gcce/mecce/megcce/noise), expansion
+% (standard), quantity (signal/density/observable/autocorrelation), times (whole-sequence
+% seconds), order, observed, assumptions, orientation, interaction_cutoff,
 % graph, bath_state, meanfield, sequence, numerics.atol/rtol/max_memory_bytes.
 % cce_prepare, cce_graph, cce_states and cce_sequence document their schemas.
 % normalized=true divides gcce observables by the supplied initial state;
-% conditional branch coherence is intrinsically normalized. Density is not.
+% projected manifold signal is intrinsically normalized. Density is not.
 % reducer is powers (default) or direct. Sampled estimators explicitly set
 % averaging='after_expansion' or 'internal_then_expansion'.
 %
-% Outputs include complex value/coherence, per-order estimates, validity,
+% Outputs include complex value/signal, per-order estimates, validity,
 % reasons, propagated error bounds, raw clusters and exact-full-bath bypass
 % metadata. Density outputs additionally report physicality without repair.
 % Extensions fail with cce:capability until their implementations are present;
@@ -27,7 +27,7 @@
 %   choices; see the CCE recipe.
 %
 % Outputs:
-%   result - reduction values/masks/error/by-order fields plus coherence,
+%   result - reduction values/masks/error/by-order fields plus signal,
 %   times, raw, clusters, graph, schedule, partition, ensemble, model_hash,
 %   input_parameters, averaging, method, exact_reference, elapsed_seconds,
 %   convergence, budget_satisfied, sampling_standard_error and diagnostics;
@@ -101,10 +101,10 @@ if isempty(model.bath_ids), full_index=0; end
 
 % Apply W12 conditional averages before irreducible subset reduction
 if strcmp(parameters.bath_state.mode,'interlaced')
-    if ~strcmp(parameters.quantity,'coherence')
-        error('cce:interlaced','Interlaced multiplication requires scalar coherence.');
+    if ~strcmp(parameters.quantity,'signal')
+        error('cce:interlaced','Interlaced multiplication requires scalar signal.');
     end
-    empty=struct('id',uint64(0),'sites',[]); ns=numel(ensemble.contexts);
+    empty=struct('id',uint64(0),'sites',[]); ns=numel(ensemble.spin_configs);
     nt=numel(parameters.times); no=parameters.order+1;
     estimates=zeros(nt,ns); by_order=zeros(nt,1,no,ns);
     order_error=zeros(size(by_order)); order_valid=true(size(by_order));
@@ -162,7 +162,7 @@ if strcmp(parameters.bath_state.mode,'interlaced')
 else
 
 % Propagate each globally assigned bath state before ensemble reduction
-ns=numel(ensemble.contexts); reductions=cell(1,ns);
+ns=numel(ensemble.spin_configs); reductions=cell(1,ns);
 all_raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
 
 % Preserve the covariance of the sampled mixture rather than conditional covariances
@@ -269,7 +269,7 @@ result.raw=all_raw;
 end
 
 % Finalize every estimator through the same public result and diagnostic contract
-result.coherence=result.value; result.times=parameters.times;
+result.response=result.value; result.times=parameters.times;
 result.clusters=clusters; result.graph=graph; result.schedule=schedule;
 result.partition=partition;
 result.ensemble=ensemble; result.model_hash=model.source_hash;
@@ -280,10 +280,10 @@ result.elapsed_seconds=toc(started); result.convergence='not_requested';
 result.budget_satisfied=result.valid&...
     result.abs_error_bound<=parameters.numerics.atol+parameters.numerics.rtol*abs(result.value);
 
-% Diagnose a reconstructed central density without symmetrization or clipping
+% Diagnose a reconstructed observed density without symmetrization or clipping
 result.density=[];
 if strcmp(parameters.quantity,'density')
-    d=ensemble.central_dimension; nt=numel(parameters.times);
+    d=ensemble.observed_dimension; nt=numel(parameters.times);
     result.density=reshape(result.value.',d,d,nt);
 end
 result.diagnostics=cce_diagnostics(model,result.raw,result,parameters);
@@ -304,18 +304,21 @@ function grumble(spin_system,parameters)
 if ~isstruct(spin_system)||~isstruct(parameters)||~isscalar(parameters)
     error('spin_system and parameters must be scalar structures.');
 end
-required={'method','expansion','quantity','times','order','central',...
+required={'method','expansion','quantity','times','order',...
           'bath_state','meanfield','sequence','numerics'};
-if ~all(isfield(parameters,required)), error('Required CCE parameter fields are missing.'); end
+if ~all(isfield(parameters,required))||...
+   (~isfield(parameters,'transition')&&~isfield(parameters,'rho0'))
+    error('Required CCE parameter fields are missing.');
+end
 if ~ismember(parameters.method,{'cce','gcce','mecce','megcce','noise'})
     error('cce:capability','Method requires the cce_liouvillian or cce_noise extension.');
 end
 if ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter'})
     error('cce:capability','Unsupported CCE expansion.');
 end
-if ~ismember(parameters.quantity,{'coherence','density','observable','autocorrelation'})||...
-   (ismember(parameters.method,{'cce','mecce'})&&~strcmp(parameters.quantity,'coherence'))
-    error('Conditional CCE returns branch coherence; gcce also returns density and observables.');
+if ~ismember(parameters.quantity,{'signal','density','observable','autocorrelation'})||...
+   (ismember(parameters.method,{'cce','mecce'})&&~strcmp(parameters.quantity,'signal'))
+    error('Projected CCE returns the selected-transition signal; gCCE also returns the observed-spin density matrix and observables.');
 end
 if strcmp(parameters.method,'noise')&&~strcmp(parameters.quantity,'autocorrelation')
     error('noise requires quantity=autocorrelation.');

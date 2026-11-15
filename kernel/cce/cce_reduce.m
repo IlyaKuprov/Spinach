@@ -2,7 +2,7 @@
 %
 %                 reduced=cce_reduce(raw,clusters,parameters)
 %
-% raw is a vector of records with cluster_id (0 for central-only), value
+% raw is a vector of records with cluster_id (0 for observed-spin-only), value
 % (ntime by nout), abs_error_bound and valid of matching size. Every
 % family member appears exactly once; gather order is immaterial. One
 % configuration/state is reduced per call, before ensemble averaging.
@@ -34,11 +34,11 @@
 %   reduced - values, validity/error/reason arrays, by-order results,
 %   cluster/cumulant and conditioning diagnostics.
 %
-% Multiplicative convention: F(empty)=1; F(C)=L(C)/L(empty),
+% Multiplicative convention: F(empty)=1; F(C)=E(C)/E(empty),
 % K(C)=F(C)/product(K(S), nonempty proper S subset C), and
-% L_approx=L(empty)*product(K(C), retained nonempty C).
-% For noise, K(C)=L(C)-L(empty)-sum(K(S), proper nonempty S),
-% and L_approx=L(empty)+sum(K(C)). Masks remain explicit;
+% E_approx=E(empty)*product(K(C), retained nonempty C).
+% For noise, K(C)=E(C)-E(empty)-sum(K(S), proper nonempty S),
+% and E_approx=E(empty)+sum(K(C)). Masks remain explicit;
 % unresolved denominators are never replaced by epsilon.
 %
 % See also cce_clusters, cce.
@@ -98,7 +98,7 @@ for order=0:max_order
             usable(k+1)=records(k).valid(point);
         end
 
-        % Empty-bath/order-zero result is the unmodified central baseline
+        % Empty-bath/order-zero result is the unmodified observed baseline
         if isempty(active)
             values(point)=z(1); bounds(point)=eta(1); masks(point)=usable(1);
             if ~usable(1)
@@ -248,7 +248,7 @@ for k=indices
         reason='arithmetic_range'; return
     end
 
-    % Integer powers preserve complex phase without logarithm branch fixes
+    % Integer powers preserve complex phase without logarithm manifold fixes
     p=double(powers(k)); a=p*log(abs(z(k))); b=p*angle(z(k));
     increment=a-ac; updated=amplitude+increment;
     ac=(updated-amplitude)-increment; amplitude=updated;

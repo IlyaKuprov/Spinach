@@ -2,7 +2,7 @@
 %
 %             clusters=cce_clusters(model,graph,parameters)
 %
-% model supplies physical_ids, bath_ids, central_ids, multiplicities.
+% model supplies physical_ids, bath_ids, observed_ids, multiplicities.
 % graph is cce_graph output. parameters.order counts groups, not sites;
 % groups is an optional cell partition of graph.bath_ids (default single
 % sites). Non-singleton group construction belongs to cce_partition.
@@ -11,12 +11,12 @@
 % Connected families grow by graph frontiers, never a bath powerset.
 %
 % Output is sorted by (order,group IDs); proper_subsets are array indices,
-% mobius_power is signed int64, dimension includes the central register,
+% mobius_power is signed int64, dimension includes the observed-spin system,
 % and bath_dimension excludes it. Empty-cluster raw data are separate.
 % All nonempty subsets are retained, including disconnected subsets.
 % selected_counts, actual_counts and cap_overrun report closure costs;
 % family_id is the exact canonical family string, not a collision-prone
-% numeric hash. context_id=0 denotes the shared unconditioned context.
+% numeric hash. config_id=0 denotes the shared unconditioned spin_config.
 %
 % Inputs:
 %   model, graph - prepared model and physical connectivity.
@@ -177,14 +177,14 @@ end
 entry=struct('id',uint64(0),'groups',[],'sites',[],'order',0,'dimension',1,...
              'bath_dimension',1,'proper_subsets',[],'direct_children',[],...
              'mobius_power',int64(0),'connected_components',{{}},...
-             'context_id',uint64(0),'inclusion_reason','','weight',0,...
+             'config_id',uint64(0),'inclusion_reason','','weight',0,...
              'family_id',family_id,'selected_counts',selected_counts,...
              'actual_counts',actual_counts,'cap_overrun',cap_overrun);
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
-[~,central_pos]=ismember(model.central_ids,model.physical_ids);
-central_dimension=prod(model.multiplicities(central_pos));
+[~,observed_pos]=ismember(model.observed_ids,model.physical_ids);
+observed_dimension=prod(model.multiplicities(observed_pos));
 for k=1:numel(family)
 
     % Map group unions to physical Hilbert dimensions
@@ -193,7 +193,7 @@ for k=1:numel(family)
     clusters(k).id=uint64(k); clusters(k).groups=family{k};
     clusters(k).sites=sites; clusters(k).order=numel(family{k});
     clusters(k).bath_dimension=prod(model.multiplicities(positions));
-    clusters(k).dimension=central_dimension*clusters(k).bath_dimension;
+    clusters(k).dimension=observed_dimension*clusters(k).bath_dimension;
     if ~isfinite(clusters(k).dimension)||clusters(k).dimension>flintmax
         error('cce_clusters:dimension','Hilbert dimension exceeds exact double integer range.');
     end
@@ -246,11 +246,11 @@ end
 % Validate the immutable metadata and explicit combinatorial decisions
 function grumble(model,graph,parameters)
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids',...
-        'bath_ids','central_ids','multiplicities'}))||...
+        'bath_ids','observed_ids','multiplicities'}))||...
    numel(model.physical_ids)~=numel(model.multiplicities)||...
    numel(unique(model.physical_ids))~=numel(model.physical_ids)||...
-   ~all(ismember([model.central_ids model.bath_ids],model.physical_ids))||...
-   ~isempty(intersect(model.central_ids,model.bath_ids))||...
+   ~all(ismember([model.observed_ids model.bath_ids],model.physical_ids))||...
+   ~isempty(intersect(model.observed_ids,model.bath_ids))||...
    any(~isfinite(model.multiplicities))||any(model.multiplicities<1)||...
    any(model.multiplicities~=fix(model.multiplicities))
     error('cce_clusters:model','physical IDs and integer multiplicities are required.');

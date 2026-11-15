@@ -1,7 +1,7 @@
 % Compile CCE controls, selective pulses and exterior mean-field updates.
 % Syntax:
 %
-%       segments=cce_controls(model,sites,context,schedule,parameters)
+%       segments=cce_controls(model,sites,spin_config,schedule,parameters)
 %
 % Empty schedule compiles parameters.sequence, including the named ideal
 % sequences hahn/cpmg/xy4/xy8/udd (name,count,axis,target). Explicit finite
@@ -17,11 +17,11 @@
 % and exterior_expectations are indexed by time point then segment. Each
 % segment propagates its Hamiltonian for duration and then applies pulse.
 % Exterior ideal one-site rotations update the sampled mean field exactly;
-% finite or entangling exterior pulses are explicitly refused. Conditional
-% CCE refuses central finite drive; general controls require gCCE.
+% finite or correlation-generating exterior pulses are explicitly refused. Projected
+% CCE refuses observed finite drive; general controls require gCCE.
 %
 % Inputs:
-%   model, sites, context - physical model, included bath IDs and one global
+%   model, sites, spin_config - physical model, included bath IDs and one global
 %   state assignment.
 %   schedule - compiled schedule, or [] to compile parameters.
 %   parameters - sequence/control fields, optional DEER and meanfield_radius
@@ -31,21 +31,21 @@
 % Outputs:
 %   segments - schedule, selected_sites, durations, hamiltonians, pulses and
 %   exterior_expectations indexed by time then segment; generalized
-%   propagation also returns raw with central densities and reducer fields.
+%   propagation also returns raw with observed densities and reducer fields.
 %
-% Generalized state propagation and normalization use context.central_rho.
+% Generalized state propagation and normalization use spin_config.rho0.
 %
 % See also cce_sequence, cce_cluster.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function segments=cce_controls(model,sites,context,schedule,parameters)
+function segments=cce_controls(model,sites,spin_config,schedule,parameters)
 
 % Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters,model,sites,context);
+cce_validate(parameters,model,sites,spin_config);
 
 % Validate the canonical metadata and requested controls
-grumble(model,sites,context,parameters);
+grumble(model,sites,spin_config,parameters);
 
 % Compile named sequences and resolve the explicit physical event targets
 if isempty(schedule)
@@ -77,7 +77,7 @@ end
 % Publish schedule and selection even when only compilation was requested
 segments=struct('schedule',schedule,'selected_sites',{arrayfun(@(e) e.target,...
                 schedule.events,'UniformOutput',false)},'boundary_rule','strict_abs_less_than');
-if isempty(context), return; end
+if isempty(spin_config), return; end
 
 % Refuse approximations not represented by the driven generalized propagator
 if ~ismember(parameters.method,{'cce','gcce'})||~ismember(parameters.meanfield,{'none','static'})
@@ -85,19 +85,19 @@ if ~ismember(parameters.method,{'cce','gcce'})||~ismember(parameters.meanfield,{
 end
 if isfield(parameters,'second_order')&&~isempty(parameters.second_order)&&...
    (~isstruct(parameters.second_order)||~isfield(parameters.second_order,'enabled')||parameters.second_order.enabled)
-    error('cce_controls:projection','Driven controls cannot include conditional second-order corrections.');
+    error('cce_controls:projection','Driven controls cannot include projected second-order corrections.');
 end
 
-% Reject finite central drives even for a zero-duration requested sample
+% Reject finite observed drives even for a zero-duration requested sample
 for event=reshape(schedule.events,1,[])
     if strcmp(parameters.method,'cce')&&strcmp(event.type,'finite')&&...
-       any(ismember(event.target,model.central_ids))
-        error('cce_controls:conditional_drive','Finite central drives require gCCE.');
+       any(ismember(event.target,model.observed_ids))
+        error('cce_controls:manifold_drive','Finite observed drives require gCCE.');
     end
 end
 
 % Bound retained segment matrices and exterior values before allocating operators
-ids=[model.central_ids sites]; dimension=prod(model.multiplicities(ids));
+ids=[model.observed_ids sites]; dimension=prod(model.multiplicities(ids));
 events=schedule.events; segment_count=0;
 for k=1:numel(schedule.times)
 
@@ -110,7 +110,7 @@ for k=1:numel(schedule.times)
 end
 % Reserve sparse complex Hamiltonians, dense pulses and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
-metadata=whos('model','sites','context','schedule','parameters');
+metadata=whos('model','sites','spin_config','schedule','parameters');
 if retained+sum([metadata.bytes])+16*24*dimension^2>parameters.numerics.max_memory_bytes
     error('cce_controls:memory','Retained control segments exceed numerics.max_memory_bytes.');
 end
@@ -127,28 +127,28 @@ for t=1:numel(schedule.times)
         if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
     end
     boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<total)]);
-    expectations=context.expectations; states=context.bath_rho;
+    expectations=spin_config.expectations; states=spin_config.bath_rho;
     durations=zeros(1,numel(boundaries)); hamiltonians=cell(size(durations));
     pulses=cell(size(durations)); exterior_values=cell(size(durations));
     for b=1:numel(boundaries)
 
         % Build the left-limit Hamiltonian for the interval ending here
         if b==1, left=0; else, left=boundaries(b-1); end
-        right=boundaries(b); hcontext=struct();
+        right=boundaries(b); ham_config=struct();
         if strcmp(parameters.meanfield,'static')
-            outside=~ismember(context.bath_ids,sites);
+            outside=~ismember(spin_config.bath_ids,sites);
             if isfield(parameters,'meanfield_radius')&&isfinite(parameters.meanfield_radius)
-                distance=inf(size(context.bath_ids));
-                for central=model.central_ids
-                    delta=model.coordinates_A(context.bath_ids,:)-model.coordinates_A(central,:);
+                distance=inf(size(spin_config.bath_ids));
+                for observed_id=model.observed_ids
+                    delta=model.coordinates_A(spin_config.bath_ids,:)-model.coordinates_A(observed_id,:);
                     distance=min(distance,sqrt(sum(delta.^2,2)).');
                 end
                 outside=outside&distance<=parameters.meanfield_radius;
             end
-            hcontext.exterior_ids=context.bath_ids(outside);
-            hcontext.exterior_expectations=expectations(outside,:);
+            ham_config.exterior_ids=spin_config.bath_ids(outside);
+            ham_config.exterior_expectations=expectations(outside,:);
         end
-        [H,~]=cce_hamiltonian(model,sites,hcontext);
+        [H,~]=cce_hamiltonian(model,sites,ham_config);
         midpoint=(left+right)/2;
         for j=1:numel(events)
             if ~strcmp(events(j).type,'finite')||midpoint<starts(j)||midpoint>=stops(j)||right==left
@@ -158,8 +158,8 @@ for t=1:numel(schedule.times)
             if ~isempty(outside)&&strcmp(parameters.meanfield,'static')
                 error('cce_controls:exterior_finite','Finite exterior pulses require dynamical exterior spins.');
             end
-            if strcmp(parameters.method,'cce')&&any(ismember(event.target,model.central_ids))
-                error('cce_controls:conditional_drive','Finite central drives require gCCE.');
+            if strcmp(parameters.method,'cce')&&any(ismember(event.target,model.observed_ids))
+                error('cce_controls:manifold_drive','Finite observed drives require gCCE.');
             end
             axis=axis_vector(event.axis);
             for id=reshape(intersect(event.target,ids,'stable'),1,[])
@@ -176,7 +176,7 @@ for t=1:numel(schedule.times)
             for j=reshape(indices,1,[])
                 event=events(j);
                 if ~strcmp(event.type,'ideal'), continue; end
-                exterior=intersect(event.target,setdiff(context.bath_ids,sites));
+                exterior=intersect(event.target,setdiff(spin_config.bath_ids,sites));
                 if isfield(event,'operator')&&~isempty(event.operator)
                     % Omit a one-site exterior pulse only when no exterior fields are used
                     if isscalar(event.target)&&~ismember(event.target,ids)&&...
@@ -184,7 +184,7 @@ for t=1:numel(schedule.times)
                         continue;
                     end
                     if ~isempty(exterior)
-                        error('cce_controls:exterior_entangled','Exterior operator pulses require explicit dynamical sites.');
+                        error('cce_controls:exterior_correlations','Exterior operator pulses require explicit dynamical sites.');
                     end
                     P=embed_operator(event.operator,event.target,ids,model.multiplicities);
                     scale=1; if isfield(event,'angle')&&~isempty(event.angle), scale=event.angle; end
@@ -197,7 +197,7 @@ for t=1:numel(schedule.times)
                     end
                     pulse=expm(-1i*event.angle*generator)*pulse;
                     for id=reshape(exterior,1,[])
-                        pos=find(context.bath_ids==id); spin=pauli(model.multiplicities(id)); x=spin.x; y=spin.y; z=spin.z;
+                        pos=find(spin_config.bath_ids==id); spin=pauli(model.multiplicities(id)); x=spin.x; y=spin.y; z=spin.z;
                         ops={x,y,z}; P=expm(-1i*event.angle*(axis(1)*x+axis(2)*y+axis(3)*z));
                         states{pos}=P*states{pos}*P';
                         for a=1:3, expectations(pos,a)=real(trace(states{pos}*ops{a})); end
@@ -217,8 +217,8 @@ end
 % Propagate the compiled generalized Hamiltonians when requested by the engine
 if strcmp(parameters.method,'gcce')
     bath=1;
-    for id=reshape(sites,1,[]), bath=kron(bath,context.bath_rho{context.bath_ids==id}); end
-    initial=kron(context.central_rho,bath); dc=size(context.central_rho,1); db=size(bath,1);
+    for id=reshape(sites,1,[]), bath=kron(bath,spin_config.bath_rho{spin_config.bath_ids==id}); end
+    initial=kron(spin_config.rho0,bath); dc=size(spin_config.rho0,1); db=size(bath,1);
     density=zeros(dc,dc,numel(schedule.times)); bounds=zeros(numel(schedule.times),1);
     for t=1:numel(schedule.times)
         state=initial; scale=0;
@@ -234,23 +234,23 @@ if strcmp(parameters.method,'gcce')
         end
         bounds(t)=16*dimension^3*eps*scale;
     end
-    observe=parameters; observe.central.rho=context.central_rho;
+    observe=parameters; observe.rho0=spin_config.rho0;
     if ~isfield(observe,'normalized'), observe.normalized=false; end
     value=cce_observe(density,observe);
     scale=ones(1,size(value,2));
     if strcmp(parameters.quantity,'observable')
-        operators=parameters.operators;
+        operators=parameters.coil;
         if ~iscell(operators), operators={operators}; end
         scale=cellfun(@(operator) norm(operator,2),operators(:).');
     end
     if observe.normalized
         plain=observe; plain.normalized=false;
-        scale=scale./abs(cce_observe(context.central_rho,plain));
+        scale=scale./abs(cce_observe(spin_config.rho0,plain));
     end
     bounds=bounds.*scale;
     segments.raw=struct('cluster_id',uint64(0),'value',value,'valid',isfinite(value),...
                         'abs_error_bound',bounds,'density',density,'sites',sites,...
-                        'state_id',context.state_id,'configuration_id',context.configuration_id,...
+                        'state_id',spin_config.state_id,'configuration_id',spin_config.configuration_id,...
                         'eigen_residual',[],'unitarity_residual',[],...
                         'hamiltonian_backend','direct_controls');
 end
@@ -328,7 +328,7 @@ for j=1:numel(events)
 end
 end
 
-% Embed an arbitrary selective register operator in the retained tensor order
+% Embed an arbitrary selective observed-spin system operator in the retained tensor order
 function operator=embed_operator(source,targets,ids,multiplicities)
 if any(~ismember(targets,ids)), error('Selective operator targets must be retained.'); end
 positions=arrayfun(@(id) find(ids==id),targets);
@@ -362,7 +362,7 @@ for event=reshape(events,1,[])
     if ~all(isfield(event,{'type','target','placement','at'}))||...
        ~ismember(event.type,{'ideal','finite'})||~ismember(event.placement,{'fraction','absolute'})||...
        ~isnumeric(event.target)||~isreal(event.target)||numel(unique(event.target))~=numel(event.target)||...
-       any(~ismember(event.target,[model.central_ids model.bath_ids]))||...
+       any(~ismember(event.target,[model.observed_ids model.bath_ids]))||...
        ~isscalar(event.at)||~isreal(event.at)||~isfinite(event.at)||event.at<0||...
        (strcmp(event.placement,'fraction')&&event.at>1)
         error('cce_controls:event','Invalid type, target or placement.');
@@ -399,8 +399,8 @@ end
 end
 
 % Check canonical metadata and physical site IDs
-function grumble(model,sites,context,parameters)
-if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'central_ids','bath_ids','multiplicities'}))||...
+function grumble(model,sites,spin_config,parameters)
+if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'observed_ids','bath_ids','multiplicities'}))||...
    ~isnumeric(sites)||~isreal(sites)||any(~ismember(sites,model.bath_ids))||numel(unique(sites))~=numel(sites)||...
    ~isstruct(parameters)||~all(isfield(parameters,{'times','sequence','method','meanfield'}))||...
    ~isnumeric(parameters.times)||~isreal(parameters.times)||~isrow(parameters.times)||...
@@ -408,8 +408,8 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'central_ids','bath_i
    any(diff(parameters.times)<=0)
     error('cce_controls:input','Canonical model, sites and increasing times starting at zero required.');
 end
-if ~isempty(context)&&(~isstruct(context)||~all(isfield(context,{'bath_ids','bath_rho','expectations'})))
-    error('cce_controls:context','Canonical state context required.');
+if ~isempty(spin_config)&&(~isstruct(spin_config)||~all(isfield(spin_config,{'bath_ids','bath_rho','expectations'})))
+    error('cce_controls:spin_config','A canonical spin-configuration structure is required.');
 end
 end
 

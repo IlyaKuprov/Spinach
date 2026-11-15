@@ -2,7 +2,7 @@
 %
 %     raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 %
-% raw is a cell per input context, containing the empty-cluster record
+% raw is a cell per input spin_config, containing the empty-cluster record
 % followed by cluster records in input order. Tasks execute in ascending
 % configuration/state/cluster ID order; no reduction occurs on workers.
 % parallel.mode is serial (default), clusters or states. Parallel modes
@@ -20,7 +20,7 @@
 %   size.
 %
 % Outputs:
-%   raw - cell per input context, each containing the baseline record then
+%   raw - cell per input spin_config, each containing the baseline record then
 %   cluster records in input order.
 %
 % See also cce_checkpoint, cce_cluster.
@@ -58,13 +58,13 @@ if isfield(parameters,'parallel')&&isfield(parameters.parallel,'batch_size')
 end
 
 % Bound task count before allocating the ledger or any cluster operator
-ns=numel(ensemble.contexts); nc=numel(clusters)+1; count=ns*nc;
+ns=numel(ensemble.spin_configs); nc=numel(clusters)+1; count=ns*nc;
 if count>max_tasks, error('cce_schedule:tasks','Task count exceeds parallel.max_tasks.'); end
-nt=numel(schedule.times); dc=prod(model.multiplicities(model.central_ids));
+nt=numel(schedule.times); dc=prod(model.multiplicities(model.observed_ids));
 components=1;
 if strcmp(parameters.quantity,'density'), components=dc^2; end
-if strcmp(parameters.quantity,'observable')&&iscell(parameters.operators)
-    components=numel(parameters.operators);
+if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
 end
 metadata=whos('model','clusters','ensemble','schedule','parameters');
 resident=3*count*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
@@ -78,7 +78,7 @@ for k=0:numel(clusters)
 
     % Reserve unprojected Hamiltonians, spin operators and physical pulse matrices
     db=prod(model.multiplicities(sites)); dimension=dc*db;
-    copies=12+3*(numel(model.central_ids)+numel(sites))+2*numel(schedule.events);
+    copies=12+3*(numel(model.observed_ids)+numel(sites))+2*numel(schedule.events);
     if ~model.direct_supported||strcmp(model.backend,'stock')
 
         % Include the spherical components retained by the stock construction route
@@ -92,8 +92,8 @@ for k=0:numel(clusters)
     if ismember(parameters.method,{'cce','mecce','noise'}), propagated=db; end
     if ismember(parameters.method,{'mecce','megcce'})
 
-        % Retain branch, spin and included jump operators in every completed record
-        ids=[model.central_ids sites]; jumps=0; labels=0;
+        % Retain manifold, spin and included jump operators in every completed record
+        ids=[model.observed_ids sites]; jumps=0; labels=0;
         for j=1:numel(parameters.jumps)
             if all(ismember(parameters.jumps(j).support,ids))
                 jumps=jumps+1; labels=labels+numel(parameters.jumps(j).support)+1;
@@ -123,7 +123,7 @@ for s=1:ns
     for k=0:numel(clusters)
         position=position+1; id=0;
         if k>0, id=double(clusters(k).id); end
-        ids(position,:)=[ensemble.contexts(s).configuration_id ensemble.contexts(s).state_id id];
+        ids(position,:)=[ensemble.spin_configs(s).configuration_id ensemble.spin_configs(s).state_id id];
         input_index(position,:)=[s k];
     end
 end
@@ -169,26 +169,26 @@ missing=find(~state.completed);
 for first=1:batch_size:numel(missing)
     indices=missing(first:min(first+batch_size-1,numel(missing)));
     records=cell(numel(indices),1); selected=input_index(indices,:);
-    task_clusters=cell(numel(indices),1); task_contexts=cell(numel(indices),1);
+    task_clusters=cell(numel(indices),1); task_configs=cell(numel(indices),1);
     for j=1:numel(indices)
         task_clusters{j}=struct('id',uint64(0),'sites',[]);
         if selected(j,2)>0, task_clusters{j}=clusters(selected(j,2)); end
-        task_contexts{j}=ensemble.contexts(selected(j,1));
+        task_configs{j}=ensemble.spin_configs(selected(j,1));
     end
     if strcmp(mode,'serial')
         for j=1:numel(indices)
-            records{j}=evaluator(model,task_clusters{j},task_contexts{j},schedule,parameters);
+            records{j}=evaluator(model,task_clusters{j},task_configs{j},schedule,parameters);
         end
     else
         parfor (j=1:numel(indices),workers)
-            records{j}=evaluator(model,task_clusters{j},task_contexts{j},schedule,parameters); %#ok<PFBNS>
+            records{j}=evaluator(model,task_clusters{j},task_configs{j},schedule,parameters); %#ok<PFBNS>
         end
     end
     state.records(indices)=records; state.completed(indices)=true;
     if ~isempty(filename), state=cce_checkpoint(filename,'write',state); end
 end
 
-% Restore context/cluster input order for the client's fixed-order reduction
+% Restore spin_config/cluster input order for the client's fixed-order reduction
 raw=cell(1,ns);
 for s=1:ns
     indices=find(input_index(:,1)==s);
@@ -200,15 +200,15 @@ end
 
 % Reject unsupported execution fields and malformed scheduling inputs
 function grumble(model,clusters,ensemble,schedule,parameters)
-if ~isstruct(model)||~all(isfield(model,{'spin_system','multiplicities','central_ids'}))||...
+if ~isstruct(model)||~all(isfield(model,{'spin_system','multiplicities','observed_ids'}))||...
    ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
-   ~isstruct(ensemble)||~isfield(ensemble,'contexts')||isempty(ensemble.contexts)||...
+   ~isstruct(ensemble)||~isfield(ensemble,'spin_configs')||isempty(ensemble.spin_configs)||...
    ~isstruct(schedule)||~all(isfield(schedule,{'times','events'}))||...
    ~isstruct(parameters)||~all(isfield(parameters,{'numerics','quantity','method'}))||...
    ~isfield(parameters.numerics,'max_memory_bytes')||...
    ~isscalar(parameters.numerics.max_memory_bytes)||...
    ~isfinite(parameters.numerics.max_memory_bytes)||parameters.numerics.max_memory_bytes<=0
-    error('cce_schedule:input','Prepared model, clusters, contexts, schedule and memory budget required.');
+    error('cce_schedule:input','Prepared model, clusters, spin_configs, schedule and memory budget required.');
 end
 if isfield(parameters,'parallel')
     parallel=parameters.parallel;

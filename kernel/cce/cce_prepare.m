@@ -2,7 +2,7 @@
 %
 %              model=cce_prepare(spin_system,parameters)
 %
-% spin_system is returned by create. parameters supplies central_spins,
+% spin_system is returned by create. parameters supplies observed_spins,
 % bath_spins, assumptions (name or {name,retention}), orientation (rad),
 % interaction_cutoff (Angstrom), and numerics.atol/rtol/max_memory_bytes.
 % Optional hamiltonian_backend is auto, direct, or stock (default auto).
@@ -10,14 +10,14 @@
 %
 % Inputs:
 %   spin_system - output of create, not unconverted sys/inter.
-%   parameters - central_spins, bath_spins, assumptions (name or
+%   parameters - observed_spins, bath_spins, assumptions (name or
 %   {name,retention}), Euler orientation in rad, interaction_cutoff in
-%   Angstrom, and numerics.atol, rtol, max_memory_bytes; optional central and
+%   Angstrom, and numerics.atol, rtol, max_memory_bytes; optional observed and
 %   hamiltonian_backend.
 %
 % Outputs:
 %   model - canonical source metadata, physical IDs and maps, local and pair
-%   interactions, central projectors when supplied, backend capability and
+%   interactions, observed projectors when supplied, backend capability and
 %   content hash.
 %
 % See also cce_hamiltonian, cce_project.
@@ -39,17 +39,17 @@ spin_system=assume(spin_system,assumptions{:});
 
 % Copy immutable source metadata and stable physical identifiers
 model.spin_system=spin_system; model.parameters=parameters;
-model.central_projectors=struct();
-if isfield(parameters,'central')&&all(isfield(parameters.central,{'alpha','beta'}))
-    dimension=numel(parameters.central.alpha);
+model.manifold_projectors=struct();
+if isfield(parameters,'transition')&&all(isfield(parameters.transition,{'alpha','beta'}))
+    dimension=numel(parameters.transition.alpha);
     if 32*dimension^2>parameters.numerics.max_memory_bytes
-        error('central projectors exceed numerics.max_memory_bytes.');
+        error('observed projectors exceed numerics.max_memory_bytes.');
     end
-    model.central_projectors.alpha=parameters.central.alpha*parameters.central.alpha';
-    model.central_projectors.beta=parameters.central.beta*parameters.central.beta';
+    model.manifold_projectors.alpha=parameters.transition.alpha*parameters.transition.alpha';
+    model.manifold_projectors.beta=parameters.transition.beta*parameters.transition.beta';
 end
 model.physical_ids=1:spin_system.comp.nspins;
-model.central_ids=parameters.central_spins;
+model.observed_ids=parameters.observed_spins;
 model.bath_ids=parameters.bath_spins;
 model.multiplicities=spin_system.comp.mults;
 model.gamma=spin_system.inter.gammas;
@@ -216,10 +216,10 @@ end
 if ~isstruct(parameters)||~isscalar(parameters)
     error('parameters must be a scalar structure.');
 end
-required={'central_spins','bath_spins','assumptions','orientation',...
+required={'observed_spins','bath_spins','assumptions','orientation',...
           'interaction_cutoff','numerics'};
 if ~all(isfield(parameters,required)), error('missing mandatory model parameters.'); end
-for name={'central_spins','bath_spins'}
+for name={'observed_spins','bath_spins'}
     ids=parameters.(name{1});
     if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
        any(~isfinite(ids))||any(ids~=fix(ids))||any(ids<1)||...
@@ -227,28 +227,28 @@ for name={'central_spins','bath_spins'}
         error('%s must contain unique physical spin indices.',name{1});
     end
 end
-if isempty(parameters.central_spins)||...
-   ~isempty(intersect(parameters.central_spins,parameters.bath_spins))
-    error('central_spins must be nonempty and disjoint from bath_spins.');
+if isempty(parameters.observed_spins)||...
+   ~isempty(intersect(parameters.observed_spins,parameters.bath_spins))
+    error('observed_spins must be nonempty and disjoint from bath_spins.');
 end
-if isfield(parameters,'central')
-    if ~isstruct(parameters.central)||~isscalar(parameters.central)
-        error('central must be a scalar structure.');
+if isfield(parameters,'transition')
+    if ~isstruct(parameters.transition)||~isscalar(parameters.transition)
+        error('observed must be a scalar structure.');
     end
-    if xor(isfield(parameters.central,'alpha'),isfield(parameters.central,'beta'))
-        error('central.alpha and beta must be supplied together.');
+    if xor(isfield(parameters.transition,'alpha'),isfield(parameters.transition,'beta'))
+        error('transition.alpha and beta must be supplied together.');
     end
-    if isfield(parameters.central,'alpha')
-        dimension=prod(spin_system.comp.mults(parameters.central_spins));
+    if isfield(parameters.transition,'alpha')
+        dimension=prod(spin_system.comp.mults(parameters.observed_spins));
         for name={'alpha','beta'}
-            state=parameters.central.(name{1});
+            state=parameters.transition.(name{1});
             if ~isa(state,'double')||~isequal(size(state),[dimension 1])||...
                any(~isfinite(state))||abs(norm(state)-1)>dimension*eps
-                error('central vectors must be finite normalized double columns.');
+                error('observed vectors must be finite normalized double columns.');
             end
         end
-        if abs(parameters.central.alpha'*parameters.central.beta)>dimension*eps
-            error('central vectors must be orthogonal.');
+        if abs(parameters.transition.alpha'*parameters.transition.beta)>dimension*eps
+            error('observed vectors must be orthogonal.');
         end
     end
 end

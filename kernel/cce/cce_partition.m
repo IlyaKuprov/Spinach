@@ -8,7 +8,7 @@
 %   parameters.partition - mode=user|coupling|spatial|adaptive and max_dimension
 %   (maximum group Hilbert dimension). Spatial mode also requires
 %   group_count and max_rounds. Adaptive mode or optional adaptive=true requires patches,
-%   patch_atol, patch_rtol, pilot_contexts, heldout_contexts, max_rounds,
+%   patch_atol, patch_rtol, pilot_configs, heldout_configs, max_rounds,
 %   and max_probes. Explicit groups live in parameters.groups; expansion
 %   and order are top-level fields, not partition options.
 %
@@ -109,7 +109,7 @@ end
 % Run optional fixed-pilot adaptation before freezing the production partition
 adaptive=strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive);
 if adaptive&&complete
-    [objective,errors,used,valid]=patches(groups,p.pilot_contexts,0);
+    [objective,errors,used,valid]=patches(groups,p.pilot_configs,0);
     diagnostics.probes=used; diagnostics.pilot_error=errors;
     complete=valid&&objective<=1;
     for round=1:p.max_rounds
@@ -119,7 +119,7 @@ if adaptive&&complete
             for b=a+1:numel(groups)
                 if dimension([groups{a} groups{b}],ids,dims)>p.max_dimension, continue; end
                 candidate=groups; candidate{a}=sort([groups{a} groups{b}]); candidate(b)=[];
-                [value,candidate_errors,used,valid]=patches(candidate,p.pilot_contexts,diagnostics.probes);
+                [value,candidate_errors,used,valid]=patches(candidate,p.pilot_configs,diagnostics.probes);
                 diagnostics.probes=used;
                 if ~valid, break; end
                 if value<best
@@ -134,9 +134,9 @@ if adaptive&&complete
         diagnostics.pilot_error=errors; complete=objective<=1;
     end
 
-    % Require all held-out contexts to pass using the frozen pilot-selected groups
+    % Require all held-out spin_configs to pass using the frozen pilot-selected groups
     if complete
-        [held,errors,used,valid]=patches(groups,p.heldout_contexts,diagnostics.probes);
+        [held,errors,used,valid]=patches(groups,p.heldout_configs,diagnostics.probes);
         diagnostics.heldout_error=errors; diagnostics.probes=used;
         complete=valid&&held<=1;
         if ~complete, diagnostics.reason='heldout_failure_or_probe_ceiling'; end
@@ -150,7 +150,7 @@ end
 partition=struct('groups',{groups},'dimensions',cellfun(@(g)dimension(g,ids,dims),groups),...
                  'complete',complete,'diagnostics',diagnostics,'mode',p.mode);
 
-function [objective,errors,used,valid]=patches(candidate,contexts,used)
+function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
 
     % Choose the same exact evaluator and group order as production
     objective=0; errors=[]; valid=true;
@@ -187,9 +187,9 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
         local_graph=cce_graph(local_model,local); family=cce_clusters(local_model,local_graph,local);
         empty=struct('id',0,'sites',[]); whole=struct('id',1,'sites',sort(sites));
         full=find(arrayfun(@(entry)isequal(sort(entry.sites),sort(sites)),family),1);
-        for context=1:numel(contexts)
+        for spin_config=1:numel(spin_configs)
             if used>=p.max_probes, valid=false; objective=inf; return; end
-            used=used+1; state=contexts(context);
+            used=used+1; state=spin_configs(spin_config);
             baseline=evaluator(model,empty,state,schedule,q);
             exact=evaluator(model,whole,state,schedule,q);
             records=repmat(baseline,1,numel(family));
@@ -299,12 +299,12 @@ end
 
 if strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive)
     needed={'patch_atol','patch_rtol','max_rounds','max_probes','patches',...
-            'pilot_contexts','heldout_contexts'};
+            'pilot_configs','heldout_configs'};
     if ~all(isfield(p,needed))||~tolerance(p.patch_atol)||~tolerance(p.patch_rtol)||...
        ~integer(p.max_rounds,1)||~integer(p.max_probes,1)||...
-       ~iscell(p.patches)||isempty(p.patches)||~isstruct(p.pilot_contexts)||...
-       isempty(p.pilot_contexts)||~isstruct(p.heldout_contexts)||isempty(p.heldout_contexts)
-        error('Adaptive grouping requires finite bounds, patches, pilot, and held-out contexts.');
+       ~iscell(p.patches)||isempty(p.patches)||~isstruct(p.pilot_configs)||...
+       isempty(p.pilot_configs)||~isstruct(p.heldout_configs)||isempty(p.heldout_configs)
+        error('Adaptive grouping requires finite bounds, patches, pilot, and held-out spin_configs.');
     end
     for k=1:numel(p.patches)
         sites=p.patches{k};

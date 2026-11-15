@@ -8,17 +8,17 @@
 % at, and either a Hermitian generator operator, applied as the rotation
 % exp(-i*angle*operator) with angle defaulting to 1, or axis plus angle. axis is x/y/z
 % or a real normalized three-vector. Simultaneous events retain input order.
-% A selective central-register operator acts in central_ids product order;
-% axis rotations are full physical-spin rotations, not qubit rotations.
+% A selective observed-spin system operator acts in observed_ids product order;
+% axis rotations are full physical-spin rotations, not selected two-level transition rotations.
 % Finite controls are deliberately delegated to the cce_controls extension.
 %
 % Inputs:
-%   model - prepared register and bath IDs.
-%   parameters - times, sequence ([] for FID), method and central-state
+%   model - prepared observed-spin system and bath IDs.
+%   parameters - times, sequence ([] for FID), method and observed-state
 %   declarations.
 %
 % Outputs:
-%   schedule - sample times, compiled events and conditional/generalized
+%   schedule - sample times, compiled events and projected/generalized
 %   control metadata.
 %
 % See also cce_controls, cce_cluster.
@@ -52,7 +52,7 @@ if advanced
         copy=parameters; copy.sequence=schedule.events;
         copy.sequence=copy.sequence(~arrayfun(@(event)isempty(event.target),copy.sequence));
         if ~isempty(schedule.events)&&any(strcmp({schedule.events.type},'finite'))
-            error('cce_sequence:conditional_drive','Finite controls require gCCE.');
+            error('cce_sequence:manifold_drive','Finite controls require gCCE.');
         end
         % Remove both static-field options before recursive event-only compilation
         copy.meanfield='none';

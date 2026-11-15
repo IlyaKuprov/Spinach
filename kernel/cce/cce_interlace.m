@@ -1,9 +1,9 @@
-% Conditional product-state averages for interlaced CCE (W12). Syntax:
+% Projected product-state averages for interlaced CCE (W12). Syntax:
 %
 %       raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
 %
 % parameters.interlaced contains max_states (explicit enumeration budget),
-% reference_state (ensemble context index), and optionally condition_sites
+% reference_state (ensemble spin_config index), and optionally condition_sites
 % (cell array of physical-ID sets). Otherwise K is the union of cylinders
 % associated with included superclusters of cluster. Denominator subsets
 % MUST reuse raw.condition_sites, not their own default cylinder family.
@@ -16,7 +16,7 @@
 %   model, cluster, ensemble, schedule, parameters - physical model, selected
 %   cluster, complete sampled ensemble, compiled sequence and interlaced
 %   settings.
-%   parameters.interlaced - max_states, reference_state (ensemble context
+%   parameters.interlaced - max_states, reference_state (ensemble spin_config
 %   index), optional condition_sites cell array and raw_only flag. The
 %   declared method selects closed-system or master-equation propagation.
 %
@@ -38,10 +38,10 @@ cce_validate(parameters);
 grumble(model,cluster,ensemble,parameters);
 
 % Locate included superclusters unless a shared denominator K was supplied
-spec=parameters.interlaced; reference=ensemble.contexts(spec.reference_state);
+spec=parameters.interlaced; reference=ensemble.spin_configs(spec.reference_state);
 if isfield(reference,'assignment')&&...
    ~isequal(reference.assignment,ensemble.assignments(spec.reference_state,:))
-    error('cce:context','Interlaced context and ensemble reference assignments must agree.');
+    error('cce:spin_config','Interlaced spin_config and ensemble reference assignments must agree.');
 end
 reference.assignment=ensemble.assignments(spec.reference_state,:);
 bases=cell(size(model.bath_ids)); probabilities=bases;
@@ -59,7 +59,7 @@ end
 cce_validate(parameters,model,cluster.sites,reference);
 if ~isequal(reference.bath_ids,model.bath_ids)||...
    numel(reference.assignment)~=numel(model.bath_ids)
-    error('cce:context','Interlaced reference bath IDs and assignments must match the model.');
+    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
 end
 
 % Require each reference density to represent its declared local assignment
@@ -67,12 +67,12 @@ for j=1:numel(model.bath_ids)
     dimension=model.multiplicities(model.bath_ids(j)); basis=bases{j};
     index=reference.assignment(j);
     if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
-        error('cce:context','Interlaced reference assignments must select local basis states.');
+        error('cce:spin_config','Interlaced reference assignments must select local basis states.');
     end
     vector=basis(:,index);
     if ~isequal(size(reference.bath_rho{j}),[dimension dimension])||...
        norm(reference.bath_rho{j}-vector*vector','fro')>dimension^2*eps
-        error('cce:context',...
+        error('cce:spin_config',...
               'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
     end
 end
@@ -143,21 +143,21 @@ weights=weights/sum(weights); mass=exp(logmass);
 raw=[];
 for k=1:numel(weights)
     if weights(k)==0, continue; end
-    context=reference; context.assignment=assignments(k,:);
+    spin_config=reference; spin_config.assignment=assignments(k,:);
     for j=1:numel(model.bath_ids)
         vector=bases{j}(:,assignments(k,j));
-        context.bath_rho{j}=vector*vector';
+        spin_config.bath_rho{j}=vector*vector';
         spin=pauli(dimensions(j)); x=spin.x; y=spin.y; z=spin.z; operators={x,y,z};
         for a=1:3
-            context.expectations(j,a)=real(trace(context.bath_rho{j}*operators{a}));
+            spin_config.expectations(j,a)=real(trace(spin_config.bath_rho{j}*operators{a}));
         end
     end
 
     % Preserve the physical evaluator in every recursive conditional average
     if ismember(parameters.method,{'mecce','megcce'})
-        item=cce_master(model,cluster,context,schedule,parameters);
+        item=cce_master(model,cluster,spin_config,schedule,parameters);
     else
-        item=cce_cluster(model,cluster,context,schedule,parameters);
+        item=cce_cluster(model,cluster,spin_config,schedule,parameters);
     end
     if isempty(raw)
         raw=item; raw.value=zeros(size(item.value));
@@ -226,7 +226,7 @@ end
 function grumble(model,cluster,ensemble,parameters)
 if ~isstruct(model)||~all(isfield(model,{'bath_ids','multiplicities'}))||...
    ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
-   ~isstruct(ensemble)||~all(isfield(ensemble,{'contexts','assignments'}))||...
+   ~isstruct(ensemble)||~all(isfield(ensemble,{'spin_configs','assignments'}))||...
    ~isstruct(parameters)||~isfield(parameters,'interlaced')||...
    ~isfield(parameters,'bath_state')||~all(isfield(parameters.bath_state,{'basis','probabilities'}))
     error('cce_interlace:input','Canonical model, cluster, ensemble and interlaced options required.');
@@ -235,7 +235,7 @@ spec=parameters.interlaced;
 if ~isstruct(spec)||~all(isfield(spec,{'reference_state','max_states'}))||...
    ~isscalar(spec.reference_state)||~isreal(spec.reference_state)||...
    ~isfinite(spec.reference_state)||spec.reference_state<1||...
-   spec.reference_state~=fix(spec.reference_state)||spec.reference_state>numel(ensemble.contexts)||...
+   spec.reference_state~=fix(spec.reference_state)||spec.reference_state>numel(ensemble.spin_configs)||...
    ~isscalar(spec.max_states)||~isreal(spec.max_states)||~isfinite(spec.max_states)||...
    spec.max_states<1||spec.max_states~=fix(spec.max_states)
     error('cce_interlace:options','Finite positive integer reference_state and max_states required.');

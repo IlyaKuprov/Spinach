@@ -1,36 +1,36 @@
 % Reject unsupported CCE parameter fields before any evaluator dispatch.
-% Syntax: cce_validate(parameters[,model,sites,context])
+% Syntax: cce_validate(parameters[,model,sites,spin_config])
 %
 % This shared contract checks optional field names and method applicability;
 % individual helpers validate the dimensions and values they consume.
-% Unsupported state-context fields and initial_rho aliases are rejected.
-% Optional model, included bath sites and state context also validate the
-% finite mean-field radius against central and exterior coordinates once
-% the state context exists; control compilation checks the radius only.
+% Unsupported spin-configuration fields and initial_rho aliases are rejected.
+% Optional model, included bath sites and spin configuration also validate the
+% finite mean-field radius against observed and exterior coordinates once
+% the spin configuration exists; control compilation checks the radius only.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function cce_validate(parameters,model,sites,context)
+function cce_validate(parameters,model,sites,spin_config)
 
 % Validate the public container before inspecting optional fields
 grumble(parameters);
 
 % Reject unimplemented state, projection and reference overrides explicitly
 if isfield(parameters,'initial_rho')
-    error('cce:context','parameters.initial_rho is unsupported; use central.rho or context.central_rho.');
+    error('cce:spin_config','parameters.initial_rho is unsupported; use parameters.rho0 or spin_config.rho0.');
 end
 
-% Check the canonical state-context vocabulary before any propagation
-if nargin==4&&~isempty(context)
-    if ~isstruct(context)||~isscalar(context)
-        error('cce:context','The supplied state context must be a scalar structure.');
+% Check the canonical spin-configuration vocabulary before any propagation
+if nargin==4&&~isempty(spin_config)
+    if ~isstruct(spin_config)||~isscalar(spin_config)
+        error('cce:spin_config','parameters.initial_rho is unsupported; use parameters.rho0 or spin_config.rho0.');
     end
-    known={'central_rho','bath_ids','bath_rho','expectations','state_id',...
+    known={'rho0','bath_ids','bath_rho','expectations','state_id',...
            'configuration_id','weight','assignment','id'};
-    unknown=setdiff(fieldnames(context),known);
+    unknown=setdiff(fieldnames(spin_config),known);
     if ~isempty(unknown)
-        error('cce:context',...
-              'Unsupported context.%s; use central_rho/bath_rho for states and parameters.central.alpha/beta for projections.',unknown{1});
+        error('cce:spin_config',...
+              'Unsupported spin_config.%s; use rho0/bath_rho for states and parameters.transition.alpha/beta for projections.',unknown{1});
     end
 end
 
@@ -49,19 +49,19 @@ if isfield(parameters,'checkpoint')&&~isempty(parameters.checkpoint)
        strcmp(parameters.bath_state.mode,'interlaced')
         error('cce:checkpoint','Interlaced runs do not support checkpoints; remove parameters.checkpoint.');
     end
-    if nargin==4&&~isempty(context)
+    if nargin==4&&~isempty(spin_config)
         error('cce:checkpoint','Direct evaluators do not own checkpoints; use cce or cce_schedule.');
     end
 end
 
 % Reject misspelled top-level parameters consistently in standalone helpers
-known={'central_spins','bath_spins','method','expansion','quantity','times',...
-       'order','central','assumptions','orientation','hamiltonian_backend',...
+known={'observed_spins','bath_spins','method','expansion','quantity','times',...
+       'order','transition','rho0','assumptions','orientation','hamiltonian_backend',...
        'interaction_cutoff','bath_radius','graph','groups','partition',...
        'bath_state','sampling','meanfield','meanfield_radius','sequence',...
        'controls','deer','jumps','noise','spectrum','numerics','averaging',...
        'analysis','diagnostics','run','checkpoint','retain_raw','normalized',...
-       'operators','interlaced','convergence','reducer','parallel',...
+       'coil','interlaced','convergence','reducer','parallel',...
        'clusters','cluster_cap','second_order'};
 fields(parameters,known,'parameters');
 
@@ -78,7 +78,7 @@ for name={'sampling','run','diagnostics'}
 end
 
 % Check the implemented nested parameter vocabulary
-contracts={'central',{'alpha','beta','rho'};...
+contracts={'transition',{'alpha','beta'};...
            'second_order',{'enabled','gap_tolerance','overlap_tolerance'};...
            'numerics',{'atol','rtol','max_memory_bytes','precision','zero_policy','propagator'};...
            'graph',{'mode','score','radius','threshold','adjacency','scores','mismatch','mismatch_scale','approximate'};...
@@ -86,9 +86,9 @@ contracts={'central',{'alpha','beta','rho'};...
            'parallel',{'mode','batch_size','max_tasks'};...
            'deer',{'enabled','detuning_center','halfwidth','species','sites','allow_empty'};...
            'checkpoint',{'file','resume'};...
-           'noise',{'terms','connected','ordering','branch'};...
+           'noise',{'terms','connected','ordering','manifold'};...
            'interlaced',{'condition_sites','reference_state','max_states','raw_only'};...
-           'partition',{'mode','max_dimension','group_count','adaptive','patches','patch_atol','patch_rtol','pilot_contexts','heldout_contexts','max_rounds','max_probes'};...
+           'partition',{'mode','max_dimension','group_count','adaptive','patches','patch_atol','patch_rtol','pilot_configs','heldout_configs','max_rounds','max_probes'};...
            'spectrum',{'frequency_grid','convention','window','weights','sidedness','time_domain','stationary','modulation'};...
            'analysis',{'observable','envelope','fit','model','interval','weights','confidence','confidence_level'}};
 for k=1:size(contracts,1)
@@ -176,8 +176,8 @@ end
 
 % Reject fields whose physical meaning is absent from the requested method
 if isfield(parameters,'method')
-    conditional=ismember(parameters.method,{'cce','mecce'});
-    if ~conditional&&isfield(parameters,'second_order')
+    projected=ismember(parameters.method,{'cce','mecce'});
+    if ~projected&&isfield(parameters,'second_order')
         error('cce:capability','parameters.second_order requires cce or mecce.');
     end
     noise=strcmp(parameters.method,'noise');
@@ -191,7 +191,7 @@ if isfield(parameters,'method')
     if isfield(parameters,'spectrum')&&~noise
         error('cce:capability','parameters.spectrum requires method=noise.');
     end
-    if isfield(parameters,'normalized')&&parameters.normalized&&(conditional||noise)
+    if isfield(parameters,'normalized')&&parameters.normalized&&(projected||noise)
         error('cce:capability','parameters.normalized is only supported for generalized scalar observations.');
     end
 end
@@ -214,24 +214,24 @@ if isfield(parameters,'meanfield_radius')
     if ~isnumeric(radius)||~isreal(radius)||~isscalar(radius)||isnan(radius)||radius<0
         error('cce:parameters','parameters.meanfield_radius must be a nonnegative real scalar.');
     end
-    % Defer geometry until a physical state context exists
-    if nargin==4&&~isempty(context)&&isfinite(radius)
-        exterior=setdiff(context.bath_ids,sites);
+    % Defer geometry until a physical spin configuration exists
+    if nargin==4&&~isempty(spin_config)&&isfinite(radius)
+        exterior=setdiff(spin_config.bath_ids,sites);
         if ~isempty(exterior)&&(~isfield(model,'coordinates_A')||...
            ~isnumeric(model.coordinates_A)||~isreal(model.coordinates_A)||...
            size(model.coordinates_A,2)~=3||...
-           size(model.coordinates_A,1)<max([model.central_ids exterior])||...
-           any(~isfinite(model.coordinates_A([model.central_ids exterior],:)),'all'))
+           size(model.coordinates_A,1)<max([model.observed_ids exterior])||...
+           any(~isfinite(model.coordinates_A([model.observed_ids exterior],:)),'all'))
             error('cce:coordinates',...
-                  'parameters.meanfield_radius requires finite central and exterior coordinates.');
+                  'parameters.meanfield_radius requires finite observed and exterior coordinates.');
         end
     end
 end
 
 % Reject inactive top-level selectors instead of giving them no effect
-if isfield(parameters,'operators')&&isfield(parameters,'quantity')&&...
+if isfield(parameters,'coil')&&isfield(parameters,'quantity')&&...
    ~strcmp(parameters.quantity,'observable')
-    error('cce:capability','parameters.operators requires quantity=observable.');
+    error('cce:capability','parameters.coil requires quantity=observable.');
 end
 if isfield(parameters,'meanfield_radius')&&isfield(parameters,'meanfield')&&...
    ~strcmp(parameters.meanfield,'static')

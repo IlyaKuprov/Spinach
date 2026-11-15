@@ -2,7 +2,7 @@
 %
 %                  graph=cce_graph(model,parameters)
 %
-% model contains physical_ids, central_ids, bath_ids, multiplicities,
+% model contains physical_ids, observed_ids, bath_ids, multiplicities,
 % coordinates_A, and pairs: records ids,tensor, where ids is a two-element physical
 % ID row and tensor is a real Cartesian coupling in rad/s. Empty pairs
 % must be an empty struct array. Coordinates are in Angstrom.
@@ -14,13 +14,13 @@
 % bath_radius defaults to Inf. Hamiltonian cutoffs never enter here.
 %
 % graph contains bath_ids, sparse logical adjacency, scores, pair_norm,
-% central_mediated, approximate, omitted_bath_ids, selection_mode, and
+% observed_mediated, approximate, omitted_bath_ids, selection_mode, and
 % requires_convergence. Matrix ordering
 % follows bath_ids. gCCE retains edges between bath sites attached to
-% the same connected central register unless approximate=true.
+% the same connected observed-spin system unless approximate=true.
 %
 % Inputs:
-%   model - physical IDs, central/bath IDs, multiplicities, coordinates in
+%   model - physical IDs, observed/bath IDs, multiplicities, coordinates in
 %   Angstrom and pair records (ids, real Cartesian tensor in rad/s).
 %   parameters.graph - mode; mode-specific radius (Angstrom), threshold
 %   (rad/s), or adjacency; score is coupling_norm (default), resonance
@@ -29,7 +29,7 @@
 %
 % Outputs:
 %   graph - bath_ids, sparse logical adjacency, scores, pair_norm,
-%   central_mediated, approximate, omitted_bath_ids, selection_mode and
+%   observed_mediated, approximate, omitted_bath_ids, selection_mode and
 %   requires_convergence.
 %
 % See also cce_clusters, cce_partition.
@@ -46,8 +46,8 @@ grumble(model,parameters);
 
 % Locate physical sites without interpreting IDs as array subscripts
 [~,bath_pos]=ismember(model.bath_ids,model.physical_ids);
-[~,central_pos]=ismember(model.central_ids,model.physical_ids);
-ids=model.bath_ids; n=numel(ids); nc=numel(central_pos);
+[~,observed_pos]=ismember(model.observed_ids,model.physical_ids);
+ids=model.bath_ids; n=numel(ids); nc=numel(observed_pos);
 
 % Obtain physical two-spin operator norms before graph pruning
 pair_norm=zeros(n); attachments=false(n,nc);
@@ -77,9 +77,9 @@ for k=1:numel(model.pairs)
     end
     strength=norm(interaction,2);
 
-    % Accumulate bath edges and exact central attachment topology
+    % Accumulate bath edges and exact observed attachment topology
     ia=find(ids==pair.ids(1)); ib=find(ids==pair.ids(2));
-    ca=find(model.central_ids==pair.ids(1)); cb=find(model.central_ids==pair.ids(2));
+    ca=find(model.observed_ids==pair.ids(1)); cb=find(model.observed_ids==pair.ids(2));
     if ~isempty(ia)&&~isempty(ib)
         pair_norm(ia,ib)=strength; pair_norm(ib,ia)=strength;
     elseif ~isempty(ia)&&~isempty(cb)
@@ -90,7 +90,7 @@ for k=1:numel(model.pairs)
 
 end
 
-% Keep the central register joint unless state/readout factorization is proven
+% Keep the observed-spin system joint unless state/readout factorization is proven
 attached=any(attachments,2); mediated=attached&attached.';
 mediated(1:n+1:end)=false;
 
@@ -142,11 +142,11 @@ if strcmp(parameters.method,'noise')&&isfield(parameters,'noise')
     end
 end
 
-% Restrict candidate bath by distance from the union of central sites
+% Restrict candidate bath by distance from the union of observed sites
 keep=true(1,n);
 if isfield(parameters,'bath_radius')&&isfinite(parameters.bath_radius)
     distance=inf(n,1);
-    for k=central_pos
+    for k=observed_pos
         distance=min(distance,vecnorm(model.coordinates_A(bath_pos,:)-...
                                      model.coordinates_A(k,:),2,2));
     end
@@ -156,7 +156,7 @@ end
 % Return physical ordering and explicit approximation diagnostics
 graph=struct('bath_ids',ids(keep),'adjacency',sparse(adjacency(keep,keep)),...
              'scores',scores(keep,keep),'pair_norm',pair_norm(keep,keep),...
-             'central_mediated',sparse(mediated(keep,keep)),...
+             'observed_mediated',sparse(mediated(keep,keep)),...
              'approximate',approximate,'omitted_bath_ids',ids(~keep),...
              'selection_mode',parameters.graph.mode,...
              'requires_convergence',~strcmp(parameters.graph.mode,'complete')||any(~keep));
@@ -166,7 +166,7 @@ end
 % Validate shapes, physical IDs, graph semantics, and physical units
 function grumble(model,parameters)
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids',...
-        'central_ids','bath_ids','multiplicities','coordinates_A','pairs'}))
+        'observed_ids','bath_ids','multiplicities','coordinates_A','pairs'}))
     error('cce_graph:model','incomplete scalar model structure.');
 end
 ids=model.physical_ids; n=numel(model.bath_ids);
@@ -174,15 +174,15 @@ if ~isnumeric(ids)||~isreal(ids)||(~isrow(ids)&&~isempty(ids))||...
    any(~isfinite(ids))||any(ids<1)||any(ids~=fix(ids))||numel(unique(ids))~=numel(ids)
     error('cce_graph:ids','physical IDs must be distinct positive integers.');
 end
-for name={'central_ids','bath_ids'}
+for name={'observed_ids','bath_ids'}
     values=model.(name{1});
     if ~isnumeric(values)||~isreal(values)||(~isrow(values)&&~isempty(values))||...
        numel(unique(values))~=numel(values)||~all(ismember(values,ids))
-        error('cce_graph:ids','central and bath IDs must be unique physical ID rows.');
+        error('cce_graph:ids','observed and bath IDs must be unique physical ID rows.');
     end
 end
-if ~isempty(intersect(model.central_ids,model.bath_ids))||isempty(model.central_ids)
-    error('cce_graph:ids','central IDs must be nonempty and disjoint from bath IDs.');
+if ~isempty(intersect(model.observed_ids,model.bath_ids))||isempty(model.observed_ids)
+    error('cce_graph:ids','observed IDs must be nonempty and disjoint from bath IDs.');
 end
 if ~isnumeric(model.multiplicities)||~isreal(model.multiplicities)||...
    numel(model.multiplicities)~=numel(ids)||any(~isfinite(model.multiplicities))||...

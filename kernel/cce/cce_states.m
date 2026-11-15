@@ -1,4 +1,4 @@
-% Compile central and product bath states in stable physical-ID order.
+% Compile the observed-spin density matrix and product bath states in stable physical-ID order.
 % Syntax:
 %
 %                    ensemble=cce_states(model,parameters)
@@ -7,7 +7,7 @@
 % Explicit product states use bath_state.rho cells in model.bath_ids order.
 % Sampling supplies basis/probabilities cells (or the character 'uniform'),
 % samples and seed. Threefry substreams are global state IDs, not workers.
-% Each context contains central_rho, bath_ids, bath_rho, expectations,
+% Each spin_config contains rho0, bath_ids, bath_rho, expectations,
 % state_id, configuration_id and weight. Exterior fields use these same
 % states for every cluster. No global random stream is modified.
 %
@@ -17,12 +17,12 @@
 %   mode=mixed_product|explicit_product|sampled|interlaced; explicit mode
 %   uses rho cells in bath-ID order. Sampled/interlaced modes require
 %   basis/probabilities (cells or the character uniform), positive integer
-%   samples, and explicit seed. central supplies the register
+%   samples, and explicit seed. rho0 supplies the observed-spin system
 %   state/projectors.
 %
 % Outputs:
-%   ensemble - central density, bath IDs, contexts, weights, assignments,
-%   mode, configuration ID and state IDs. Each context carries the same
+%   ensemble - observed-spin density, bath IDs, spin_configs, weights, assignments,
+%   mode, configuration ID and state IDs. Each spin_config carries the same
 %   exterior assignment for all its clusters.
 %
 % See also cce_interlace, cce_cluster.
@@ -38,13 +38,13 @@ cce_validate(parameters);
 % Validate explicit physical states and sampling controls
 grumble(model,parameters);
 
-% Resolve the central state without introducing a hidden polarization
-d0=prod(model.multiplicities(model.central_ids));
-if isfield(parameters.central,'rho')
-    central=parameters.central.rho;
+% Resolve the observed-spin initial density matrix without introducing a hidden polarization
+d_obs=prod(model.multiplicities(model.observed_ids));
+if isfield(parameters,'rho0')
+    rho_obs=parameters.rho0;
 else
-    state=(parameters.central.alpha+parameters.central.beta)/sqrt(2);
-    central=state*state';
+    state=(parameters.transition.alpha+parameters.transition.beta)/sqrt(2);
+    rho_obs=state*state';
 end
 
 % Compile local densities or explicitly selected sampling distributions
@@ -77,7 +77,7 @@ if ismember(mode,{'sampled','interlaced'}), ns=parameters.bath_state.samples; en
 if isfield(parameters.bath_state,'configuration_id')
     config_id=parameters.bath_state.configuration_id;
 end
-contexts=repmat(struct('central_rho',central,'bath_ids',ids,...
+spin_configs=repmat(struct('rho0',rho_obs,'bath_ids',ids,...
                        'bath_rho',{rhos},'expectations',zeros(nb,3),...
                        'state_id',0,'configuration_id',config_id,'weight',1/ns),1,ns);
 assignments=zeros(ns,nb);
@@ -93,20 +93,20 @@ for s=1:ns
             assignments(s,j)=index;
         end
     end
-    contexts(s).bath_rho=rhos; contexts(s).state_id=s;
+    spin_configs(s).bath_rho=rhos; spin_configs(s).state_id=s;
 
     % Calculate exterior spin expectations in the local Cartesian basis
     for j=1:nb
         d=model.multiplicities(ids(j)); operators=local_spin(d);
         for a=1:3
-            contexts(s).expectations(j,a)=real(trace(rhos{j}*operators{a}));
+            spin_configs(s).expectations(j,a)=real(trace(rhos{j}*operators{a}));
         end
     end
 end
 
 % Return explicit ensemble records rather than an implicit random iterator
-ensemble=struct('central_rho',central,'central_dimension',d0,...
-                'bath_ids',ids,'contexts',contexts,'weights',[contexts.weight],...
+ensemble=struct('rho0',rho_obs,'observed_dimension',d_obs,...
+                'bath_ids',ids,'spin_configs',spin_configs,'weights',[spin_configs.weight],...
                 'assignments',assignments,'mode',mode,...
                 'configuration_id',config_id,'state_ids',1:ns);
 
@@ -133,10 +133,10 @@ end
 
 % Validate the full state specification before generating assignments
 function grumble(model,parameters)
-if ~isstruct(model)||~all(isfield(model,{'central_ids','bath_ids','multiplicities'}))||...
-   ~isstruct(parameters)||~isfield(parameters,'central')||...
+if ~isstruct(model)||~all(isfield(model,{'observed_ids','bath_ids','multiplicities'}))||...
+   ~isstruct(parameters)||(~isfield(parameters,'transition')&&~isfield(parameters,'rho0'))||...
    ~isfield(parameters,'bath_state')||~isfield(parameters.bath_state,'mode')
-    error('Canonical model, central state and bath_state.mode are required.');
+    error('Canonical model, rho_obs state and bath_state.mode are required.');
 end
 known={'mode','rho','probabilities','basis','samples','seed','configuration_id','temperature'};
 if ~isempty(setdiff(fieldnames(parameters.bath_state),known))
@@ -149,12 +149,12 @@ mode=parameters.bath_state.mode;
 if ~ismember(mode,{'mixed_product','explicit_product','sampled','interlaced'})
     error('Unknown bath state mode.');
 end
-d=prod(model.multiplicities(model.central_ids));
-if isfield(parameters.central,'rho')
-    check_density(parameters.central.rho,d);
-elseif ~all(isfield(parameters.central,{'alpha','beta'}))||...
+d=prod(model.multiplicities(model.observed_ids));
+if isfield(parameters,'rho0')
+    check_density(parameters.rho0,d);
+elseif ~all(isfield(parameters.transition,{'alpha','beta'}))||...
        ~strcmp(parameters.method,'cce')
-    error('central.rho is required except for conditional branch coherence.');
+    error('parameters.rho0 is required except for projected selected-transition signal calculations.');
 else
     cce_project(model,parameters);
 end

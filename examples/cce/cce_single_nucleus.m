@@ -1,5 +1,5 @@
 % Hahn ESEEM of one spin-half nucleus coupled to a spin-one centre.
-% The conditional 0/+1 Hamiltonians give the analytic modulation in
+% The projected 0/+1 Hamiltonians give the analytic modulation in
 % Eq. (29) of https://doi.org/10.1002/adts.202100254. Frequencies below
 % are chosen model parameters, not a material-specific fit. Syntax:
 %
@@ -13,7 +13,7 @@ function result=cce_single_nucleus()
 sys.magnet=0.01; sys.isotopes={'E3','13C'};
 sys.output='hush'; sys.parallel={'local',1};
 
-% Nuclear Zeeman frequency and conditional hyperfine components, rad/s
+% Nuclear Zeeman frequency and projected hyperfine components, rad/s
 omega=-spin('13C')*sys.magnet; apar=0.3*abs(omega);
 aper=0.6*abs(omega);
 
@@ -25,10 +25,10 @@ inter.coupling.matrix{1,2}=[0 0 aper;0 0 0;0 0 apar]/(2*pi);
 % Compile metadata without constructing a full-bath basis
 spin_system=create(sys,inter);
 
-% Conditional coherence; static explicit operators include their angle
-parameters.central_spins=1; parameters.bath_spins=2;
-parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='coherence'; parameters.order=1;
-parameters.central.alpha=[0;1;0]; parameters.central.beta=[1;0;0];
+% Projected signal; static explicit operators include their angle
+parameters.observed_spins=1; parameters.bath_spins=2;
+parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=1;
+parameters.transition.alpha=[0;1;0]; parameters.transition.beta=[1;0;0];
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
@@ -50,7 +50,7 @@ fprintf('Single-nucleus analytic Hahn maximum error: %.3g\n',result.reference_er
 % Plot the complex CCE trace and the analytic real envelope
 kfigure(); plot(1e6*result.times,real(result.value),'b-',...
                 1e6*result.times,reference,'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised coherence');
+xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
 legend('CCE1','analytic Eq. (29)'); kgrid();
 
 end

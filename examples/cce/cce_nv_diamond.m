@@ -1,4 +1,4 @@
-% Conditional NV Hahn echo for the pinned PyCCE four-nucleus numerical fixture.
+% Projected NV Hahn echo for the pinned PyCCE four-nucleus numerical fixture.
 % Source: MICCoMpy/PyCCE d74d3cb683bf3caa07231654314e554f440833b4,
 % https://doi.org/10.1002/adts.202100254. Explicit numerical fixture arrays
 % are public-interface inputs, not copied implementation source. Syntax:
@@ -28,7 +28,7 @@ inter.coupling.matrix{1,3}=1000*[46.846946007935479 41.7131493536275 20.79815289
 inter.coupling.matrix{1,4}=1000*[7.7040985952493219 -41.664463528969883 -27.802268186621028;-41.664463528969883 7.7040985952493219 27.802268186621028;-27.802268186621028 27.802268186621028 -15.408197190498676];
 inter.coupling.matrix{1,5}=1000*[14.689630582202209 -18.600579331667948 -27.874817765944968;-18.600579331667948 -13.146092067661488 13.956956441013119;-27.874817765944968 13.956956441013119 -1.5435385145407345];
 
-% Declare the reference's central-Sz conditional approximation before propagation
+% Declare the reference's observed-Sz projected approximation before propagation
 for n=2:5, inter.coupling.matrix{1,n}(:,1:2)=0; end
 
 % Explicit bath coordinates and point-dipole bath couplings in Hz
@@ -44,17 +44,17 @@ for j=1:4
 end
 spin_system=create(sys,inter);
 
-% The source qubit is mS=-1/+1; a selective static operator includes its angle
-parameters.central_spins=1; parameters.bath_spins=2:5;
+% The source selected two-level transition is mS=-1/+1; a selective static operator includes its angle
+parameters.observed_spins=1; parameters.bath_spins=2:5;
 parameters.method='cce'; parameters.expansion='standard';
-parameters.quantity='coherence'; parameters.order=2;
-parameters.central.alpha=[0 0 1].';
-parameters.central.beta=[1 0 0].';
+parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[0 0 1].';
+parameters.transition.beta=[1 0 0].';
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
 parameters.times=1e-3*[0 0.012500000000000001 0.025000000000000001 0.037500000000000006 0.050000000000000003 0.0625 0.075000000000000011 0.087500000000000008 0.10000000000000001 0.1125 0.125 0.13750000000000001 0.15000000000000002 0.16250000000000001 0.17500000000000002 0.1875 0.20000000000000001 0.21250000000000002 0.22500000000000001 0.23750000000000002 0.25 0.26250000000000001 0.27500000000000002 0.28750000000000003 0.30000000000000004 0.3125 0.32500000000000001 0.33750000000000002 0.35000000000000003 0.36250000000000004 0.375 0.38750000000000001 0.40000000000000002 0.41250000000000003 0.42500000000000004 0.4375 0.45000000000000001 0.46250000000000002 0.47500000000000003 0.48750000000000004 0.5];
-a=parameters.central.alpha; b=parameters.central.beta;
+a=parameters.transition.alpha; b=parameters.transition.beta;
 parameters.sequence=struct('type','ideal','target',1,'operator',...
                            pi*(a*b'+b*a')/2,'angle',1,...
                            'placement','fraction','at',0.5);
@@ -72,7 +72,7 @@ fprintf('Seo ensemble T2=0.796 ms,n=2.220 is not a four-nucleus target.\n');
 % Plot complex amplitude agreement without clipping or envelope fitting
 kfigure(); plot(1e3*result.times,real(result.value),'b-',...
                 1e3*result.times,real(reference),'r--');
-xlabel('total echo time / ms'); ylabel('normalised coherence');
+xlabel('total echo time / ms'); ylabel('normalised echo amplitude E(2τ)');
 legend('Spinach CCE2','pinned PyCCE fixture'); kgrid();
 
 end

@@ -16,10 +16,10 @@ spin_system=create(sys,inter);
 
 % Additive connected noise of the transverse nuclear operator
 x=[0 1;1 0]/2; omega=-spin('13C')*sys.magnet;
-parameters.central_spins=1; parameters.bath_spins=2;
+parameters.observed_spins=1; parameters.bath_spins=2;
 parameters.method='noise'; parameters.expansion='standard';
 parameters.quantity='autocorrelation'; parameters.order=1;
-parameters.central.rho=eye(2)/2; parameters.assumptions='labframe';
+parameters.rho0=eye(2)/2; parameters.assumptions='labframe';
 parameters.orientation=[0 0 0]; parameters.interaction_cutoff=Inf;
 parameters.graph=struct('mode','complete'); parameters.meanfield='none';
 parameters.times=linspace(0,10*2*pi/abs(omega),401);

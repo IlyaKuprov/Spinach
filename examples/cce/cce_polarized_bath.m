@@ -17,11 +17,11 @@ inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 12000].';
 inter.coupling.matrix{2,3}=diag([400 400 -800]);
 spin_system=create(sys,inter);
 
-% Hahn coherence at full order for the two bath spins
-parameters.central_spins=1; parameters.bath_spins=[2 3];
+% Hahn signal at full order for the two bath spins
+parameters.observed_spins=1; parameters.bath_spins=[2 3];
 parameters.method='cce'; parameters.expansion='standard';
-parameters.quantity='coherence'; parameters.order=2;
-parameters.central.alpha=[1;0]; parameters.central.beta=[0;1];
+parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete'); parameters.times=linspace(0,200e-6,21);
@@ -46,7 +46,7 @@ fprintf('Published point-centre T2: 9.06,10.30,13.77 microseconds; no toy fit.\n
 % Display finite-sample uncertainty rather than claiming exact agreement
 kfigure(); plot(1e6*result.times,real(result.value),'b-',...
                 1e6*result.times,real(exact.value),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised coherence');
+xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
 legend('64 sampled states','exhaustive product density'); kgrid();
 
 end

@@ -21,7 +21,7 @@ inter.coupling.matrix{1,2}=diag([2000 2000 -4000]);
 inter.coupling.matrix{2,3}=diag([81 81 114])*1e6;
 inter.coupling.matrix{1,3}=[0 0 0;0 0 0;400 0 200].';
 
-% Declare central-Sz projection for this conditional electron-bath model
+% Declare observed-Sz projection for this projected electron-bath model
 for n=2:numel(sys.isotopes)
     if ~isempty(inter.coupling.matrix{1,n}), inter.coupling.matrix{1,n}(:,1:2)=0; end
 end
@@ -32,10 +32,10 @@ inter=rmfield(inter,'coordinates');
 % Compile physical metadata without a full-bath basis
 spin_system=create(sys,inter);
 
-% Conditional central-spin Hahn coherence and a complete small-bath graph
-parameters.central_spins=1; parameters.bath_spins=2:3;
-parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='coherence'; parameters.order=2;
-parameters.central.alpha=[1;0]; parameters.central.beta=[0;1];
+% Projected observed-spin Hahn signal and a complete small-bath graph
+parameters.observed_spins=1; parameters.bath_spins=2:3;
+parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
@@ -56,7 +56,7 @@ fprintf('cce_p1_electron_bath: %d/%d valid values; finite-cluster demonstration.
         nnz(result.valid),numel(result.valid));
 fprintf('No P1 density/T2 claim: one explicit hyperfine-bound group.\n');
 
-% Independently assemble conditional bath Hamiltonians from input Hz tensors
+% Independently assemble projected bath Hamiltonians from input Hz tensors
 bath=parameters.bath_spins; dimensions=spin_system.comp.mults(bath);
 dimension=prod(dimensions); operators=cell(numel(bath),3);
 for j=1:numel(bath)
@@ -82,7 +82,7 @@ for j=1:numel(bath)
     end
     for a=1:3
 
-        % Conditional hyperfine difference and on-site quadratic terms
+        % Projected hyperfine difference and on-site quadratic terms
         if ~isempty(inter.coupling.matrix{1,id})
             difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
         end
@@ -116,10 +116,10 @@ end
 result.reference_error=max(abs(result.value-reference));
 fprintf('Independent dense Hahn maximum complex error: %.3g.\n',result.reference_error);
 
-% Plot the conditional complex coherence
+% Plot the projected complex signal
 kfigure(); plot(1e6*result.times,real(result.value),'b-',...
                 1e6*result.times,imag(result.value),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised coherence');
+xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

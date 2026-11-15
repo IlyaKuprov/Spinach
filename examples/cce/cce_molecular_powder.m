@@ -29,13 +29,13 @@ inter=rmfield(inter,'coordinates');
 % Compile physical metadata without a full-bath basis
 spin_system=create(sys,inter);
 
-% Generalized central-spin Hahn coherence and a complete small-bath graph
-parameters.central_spins=1; parameters.bath_spins=2:3;
-parameters.expansion='standard'; parameters.method='gcce'; parameters.quantity='coherence'; parameters.order=2;
-parameters.central.alpha=[1;0]; parameters.central.beta=[0;1];
+% Generalized observed-spin Hahn signal and a complete small-bath graph
+parameters.observed_spins=1; parameters.bath_spins=2:3;
+parameters.expansion='standard'; parameters.method='gcce'; parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
 
-% Rotated tensors mix central states, so retain their full generalized dynamics
-parameters.central.rho=ones(2)/2; parameters.normalized=true;
+% Rotated tensors mix observed states, so retain their full generalized dynamics
+parameters.rho0=ones(2)/2; parameters.normalized=true;
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
@@ -59,10 +59,10 @@ result=current; result.value=values*weights; result.orientation_values=values;
 result.valid=all(valid,2);
 fprintf('Three-axis powder illustration; not a converged material powder curve.\n');
 
-% Plot the conditional complex coherence
+% Plot the projected complex signal
 kfigure(); plot(1e6*result.times,real(result.value),'b-',...
                 1e6*result.times,imag(result.value),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised coherence');
+xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

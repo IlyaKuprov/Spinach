@@ -27,10 +27,10 @@ inter=rmfield(inter,'coordinates');
 % Compile physical metadata without a full-bath basis
 spin_system=create(sys,inter);
 
-% Conditional central-spin Hahn coherence and a complete small-bath graph
-parameters.central_spins=1; parameters.bath_spins=2:3;
-parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='coherence'; parameters.order=2;
-parameters.central.alpha=[1;0]; parameters.central.beta=[0;1];
+% Projected observed-spin Hahn signal and a complete small-bath graph
+parameters.observed_spins=1; parameters.bath_spins=2:3;
+parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
@@ -52,10 +52,10 @@ fprintf('cce_deer_bandwidth: %d/%d valid values; finite-cluster demonstration.\n
         nnz(result.valid),numel(result.valid));
 fprintf('Pump centre 0 Hz, bandwidth 200 kHz; physical site 2.\n');
 
-% Plot the conditional complex coherence
+% Plot the projected complex signal
 kfigure(); plot(1e6*result.times,real(result.value),'b-',...
                 1e6*result.times,imag(result.value),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised coherence');
+xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

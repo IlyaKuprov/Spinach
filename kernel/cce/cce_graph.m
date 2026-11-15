@@ -90,7 +90,7 @@ for k=1:numel(model.pairs)
 
 end
 
-% Keep the observed-spin system joint unless state/readout factorization is proven
+% Keep the observed-spin system joint unless state/detection factorization is proven
 attached=any(attachments,2); mediated=attached&attached.';
 mediated(1:n+1:end)=false;
 

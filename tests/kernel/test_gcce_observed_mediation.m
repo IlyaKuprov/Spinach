@@ -45,7 +45,7 @@ result=test_true(result,'nonfactorization measured',difference>1e-2,...
 metrics.first_order_error=difference;
 metrics.full_order_error=max(abs(second.value-reference));
 
-% Resolve two independently coupled observed spins with a joint readout
+% Resolve two independently coupled observed spins with joint detection
 sys.isotopes={'1H','1H','13C','13C'};
 inter.zeeman.matrix=repmat({zeros(3)},1,4); inter.coupling.matrix=cell(4);
 spin_system=create(sys,inter);
@@ -67,9 +67,9 @@ for method={'gcce','megcce'}
             p.bath_state.probabilities={ones(2,1)/2,ones(2,1)/2};
         end
         actual=cce(spin_system,p);
-        name=['joint readout ' method{1} ' ' mode{1}];
+        name=['joint detection ' method{1} ' ' mode{1}];
         result=test_close(result,name,actual.value,reference,1e-8,1e-8,...
-                          'Disconnected Hamiltonian components need not factorize a sum readout.');
+                          'Disconnected Hamiltonian components need not factorize a sum detection operator.');
         metrics.([method{1} '_' mode{1} '_joint_error'])=max(abs(actual.value-reference));
     end
     if isfield(p,'jumps'), p=rmfield(p,'jumps'); end

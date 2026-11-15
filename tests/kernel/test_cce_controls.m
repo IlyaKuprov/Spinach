@@ -85,7 +85,7 @@ for method={'gcce','megcce'}
         scaled=cce(model.spin_system,q);
         result=test_close(result,[method{1} ' scaled observable driver ' num2str(driven)],...
                           scaled.value,ones(numel(q.times),3),1e-11,1e-11,...
-                          'Operator units must not change normalized readout through any propagation path.');
+                          'Operator units must not change normalized signal through any propagation path.');
     end
 end
 
@@ -160,16 +160,16 @@ result=test_close(result,'Named and explicit Hahn normalization',...
                   named_echo.value,explicit_echo.value,1e-12,1e-12,...
                   'Naming the same pulse sequence must not change the default signal scale.');
 
-% Exercise the documented observable field for scalar and multiple readouts
+% Exercise the documented observable field for scalar and multiple detection operators
 q.quantity='observable'; q.coil=full(z); observed=cce(ss,q);
 q.quantity='density'; q=rmfield(q,'coil'); density_result=cce(ss,q); exact=zeros(numel(q.times),2);
 for k=1:numel(q.times)
     exact(k,:)=[trace(z*density_result.density(:,:,k)) trace(x*density_result.density(:,:,k))];
 end
-result=test_close(result,'Driven scalar operators readout',observed.value,exact(:,1),...
+result=test_close(result,'Driven scalar coil detection',observed.value,exact(:,1),...
                   1e-12,1e-12,'The documented operators field supplies the driven observable.');
 q.quantity='observable'; q.coil={full(z),full(x)}; observed=cce(ss,q);
-result=test_close(result,'Driven cell operators readout',observed.value,exact,...
+result=test_close(result,'Driven cell coil detection',observed.value,exact,...
                   1e-12,1e-12,'Each observable has its own operator-norm error scale.');
 fprintf('Driven operators discrepancy %.3g.\n',max(abs(observed.value-exact),[],'all'));
 

@@ -17,7 +17,7 @@ A finite `meanfield_radius` requires finite real observed and exterior coordinat
 - Ideal operator events use angle one when `angle` is omitted or empty, including alongside finite controls; axis events still require an explicit finite angle.
 
 - Signal is raw by default on every dispatch path; explicit `normalized=true` divides by the initial signal.
-- Observable readout and error bounds both use `parameters.coil`.
+- Signal detection and error bounds both use `parameters.coil`.
 - DEER species filters use the prepared model’s canonical isotope metadata.
 
 - Expands named hahn/cpmg/xy4/xy8/udd ideal sequences and explicit piecewise-constant finite drives; amplitude and detuning are angular frequencies.

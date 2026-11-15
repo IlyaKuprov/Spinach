@@ -184,7 +184,7 @@ independent=-1i*(kron(eye(8),H)-kron(H.',eye(8)))+...
             rate*(kron(conj(L),L)-(kron(eye(8),L'*L)+kron((L'*L).',eye(8)))/2);
 result=test_close(result,'C7 numerical check',G,independent,2e-12,2e-12,'Reversed support tensor ordering.');
 
-% Compare the reconstructed PyCCE six-electron ME tutorial with declared readout
+% Compare the reconstructed PyCCE six-electron ME tutorial with declared detection operator
 result=pycce_tutorial(result);
 
 % Report numerical metrics through the standard harness without extra fields
@@ -260,14 +260,14 @@ result=test_close(result,'PyCCE reconstructed ME-CCE2',r.value,reference,5e-8,0,
                   'Regenerated seeded coordinates, tensors, rates and Hahn sequence.');
 projected_error=max(abs(r.value-reference));
 
-% Match PyCCE run/gcce.py:116-131 pulse-rotated final readout states
+% Match PyCCE run/gcce.py:116-131 pulse-rotated final detection states
 s.inter.zeeman.matrix{1}(3,3)=5282579115.0000000;
 p.method='megcce'; p.transition.alpha=[0;1]; p.transition.beta=[1;0];
 p.normalized=true; r=cce(s,p);
 reference=[1.0000000000000020;0.99999696702632823;0.99996577952531562;0.99988384475122793;0.99978528981565296;0.99974208884696936;0.99976927314393593;0.99975844441771289;0.99954179272729826;0.99906118745487882;0.99848426483783148]+...
           1i*[-1.5501238790078434e-17;-0.0000045301957227707227;-0.000022166638316224802;-0.000022200000381094418;0.000036116963262306526;0.00012774472614107248;0.00014770063943958262;0.0000075750698896664989;-0.00023796879104827002;-0.00038050310796545583;-0.00022067377857413301];
 result=test_close(result,'PyCCE reconstructed ME-gCCE2',r.value,reference,5e-8,0,...
-                  'Final alpha/beta exchanged explicitly to match the PyCCE Hahn readout.');
+                  'Final alpha/beta exchanged explicitly to match the PyCCE Hahn echo detection.');
 result=test_true(result,'ME tutorial validity',all(r.valid),'Conservative lab-frame arithmetic estimates remain within declared budgets.');
 fprintf('PyCCE ME-CCE2 %.3g; ME-gCCE2 %.3g; max bound %.3g\n',...
         projected_error,max(abs(r.value-reference)),max(r.abs_error_bound));

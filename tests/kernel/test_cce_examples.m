@@ -44,6 +44,19 @@ for n=1:numel(names)
                          min(actual.diagnostics.minimum_eigenvalue)>-1e-8,...
                          'No material negative population at full bath order.');
     end
+    if strcmp(names{n},'cce_deer_bandwidth')
+
+        % Excluding the pump resonance must remove its selected pulse
+        parameters=actual.input_parameters;
+        parameters.deer.detuning_center=2*pi*1e7;
+        sys.magnet=0.01; sys.isotopes={'E','E','E'}; sys.output='hush';
+        inter.zeeman.scalar={0,0,0};
+        model=cce_prepare(create(sys,inter),parameters);
+        schedule=cce_controls(model,[],[],[],parameters);
+        result=test_true(result,'DEER example excludes pump resonance',...
+                         isempty(schedule.selected_sites{2}),...
+                         'The pump pulse must follow the documented frequency window.');
+    end
     fprintf('Example %s completed in %.3f s.\n',names{n},toc(started));
     close all;
 end

@@ -19,3 +19,5 @@ Except for the explicit pinned NV fixture and analytic identities, these are del
 Bandwidth selection uses `parameters.deer` with canonical rad/s detuning and halfwidth, explicit physical sites, and an explicit empty-selection policy; the unsupported `parameters.controls` container is not used.
 
 The 200 kHz full pump width is represented by a 100 kHz halfwidth converted once to rad/s.
+
+The pump event targets `'deer'`, so moving the pump window away from site 2 removes that pulse when `allow_empty=true`; numeric event targets are not frequency-selected.

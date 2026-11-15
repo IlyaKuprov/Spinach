@@ -31,3 +31,5 @@ result=test_cce_examples()
 
 - [Registered tests](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 - [CCE application examples](../../examples/cce/)
+
+The DEER example check also excludes the pump resonance and requires an empty selected event, guarding frequency selection rather than a fixed physical target.

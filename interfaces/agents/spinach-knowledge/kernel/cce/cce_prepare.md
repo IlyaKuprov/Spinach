@@ -8,6 +8,8 @@ Compile canonical Spinach metadata for local cluster Hamiltonians.
 
 ## Behaviour
 
+The model fingerprint includes physical parameters and Spinach composition, interactions and tolerances, but excludes checkpoint/resume, parallel scheduling, raw retention and convergence-control options. Resumed serial/parallel ME raw metadata therefore carries the same physical identity as an uninterrupted calculation.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - The physical fingerprint includes `spin_system.tols`, including Hamiltonian interaction cutoffs and stock propagation tolerances.

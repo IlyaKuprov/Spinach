@@ -148,7 +148,13 @@ for n=1:nspins
           abs(spin_system.inter.basefrqs(n));
     model.canonical_roundoff=model.canonical_roundoff+27*eps*scale;
 end
-model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,parameters});
+
+% Exclude execution-only options from the physical model fingerprint
+physical=parameters;
+for name={'parallel','checkpoint','retain_raw','convergence'}
+    if isfield(physical,name{1}), physical=rmfield(physical,name{1}); end
+end
+model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,physical});
 
 % Declare the validated direct domain rather than guessing new physics
 model.direct_supported=ismember(assumptions{1},{'labframe','nmr','esr','deer','deer-zz'});

@@ -42,6 +42,29 @@ loaded=load(filename,'state'); state=loaded.state;
 result=test_true(result,'completed bitmap',all(state.completed),...
                  'All sixteen tasks are marked complete after resume.');
 
+% Keep adaptive pilot and held-out evaluations separate from checkpoint ownership
+adaptive=rmfield(p,'checkpoint'); adaptive.order=1; adaptive.expansion='partition';
+adaptive_model=cce_prepare(spin_system,adaptive);
+adaptive_states=cce_states(adaptive_model,adaptive);
+adaptive.partition=struct('mode','adaptive','max_dimension',4,...
+    'patch_atol',1e-10,...
+    'patch_rtol',1e-10,'max_rounds',2,'max_probes',100,'patches',{{[2 3]}},...
+    'pilot_contexts',adaptive_states.contexts,'heldout_contexts',adaptive_states.contexts);
+reference=cce(spin_system,adaptive); accepted=false; discrepancy=Inf;
+adaptive.checkpoint=struct('file',fullfile(folder,'adaptive-partition.mat'),'resume',false);
+try
+    fresh=cce(spin_system,adaptive); adaptive.checkpoint.resume=true;
+    replayed=cce(spin_system,adaptive); accepted=isequaln(fresh.raw,replayed.raw);
+    discrepancy=max(abs([fresh.value-reference.value;replayed.value-reference.value]),[],'all');
+catch exception
+    if ~strcmp(exception.identifier,'cce:checkpoint'), rethrow(exception); end
+end
+result=test_true(result,'Adaptive partition checkpoint ownership',accepted,...
+                 'Pilot and held-out patches must not inherit the production checkpoint.');
+result=test_close(result,'Adaptive partition checkpoint replay',discrepancy,0,1e-13,0,...
+                  'Fresh and resumed adaptive partitions must agree with the checkpoint-free result.');
+fprintf('Adaptive checkpoint raw equality %d; discrepancy %.3g.\n',accepted,discrepancy);
+
 % Refuse cached records when any Spinach Hamiltonian tolerance changes
 changed_system=spin_system; changed_system.tols.inter_cutoff=1e6; refused=false;
 try
@@ -251,6 +274,7 @@ for method={'cce','gcce','mecce','megcce','noise','controls'}
     end
     result=test_true(result,[method{1} ' changed configuration rejection'],refused,...
                      'A checkpoint from another time grid cannot supply cached physical results.');
+
     % Reject changes to evaluator-specific physics as well as the time grid
     changed=request;
     if strcmp(method{1},'controls')

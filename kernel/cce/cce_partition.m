@@ -155,6 +155,9 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
     % Choose the same exact evaluator and group order as production
     objective=0; errors=[]; valid=true;
     q=parameters; q.groups=candidate; q.expansion='standard';
+
+    % Reserve checkpoint ownership for the production scheduler
+    if isfield(q,'checkpoint'), q=rmfield(q,'checkpoint'); end
     if strcmp(parameters.expansion,'disjoint'), q.order=1; end
     if strcmp(parameters.expansion,'disjoint_inter'), q.order=2; end
     evaluator=@cce_cluster;
@@ -171,6 +174,7 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
         local=q; local.bath_spins=sites;
         local.groups=cellfun(@(g)intersect(g,sites),candidate,'UniformOutput',false);
         local.groups=local.groups(~cellfun(@isempty,local.groups));
+
         % Restrict bath-indexed graph data in the declared physical patch order
         [~,indices]=ismember(sites,model.bath_ids);
         for field={'adjacency','scores','mismatch'}
@@ -193,8 +197,7 @@ function [objective,errors,used,valid]=patches(candidate,contexts,used)
                 records(cluster_index)=evaluator(model,family(cluster_index),state,schedule,q);
             end
 
-            % Score all requested times without hiding masks or exact-zero tolerances
-            % An included complete patch is exact without auxiliary denominators
+            % Score all times using exact complete patches without auxiliary denominators
             if ~isempty(full)
                 reduced=records(full);
             elseif isempty(sites)

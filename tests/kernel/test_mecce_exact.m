@@ -142,6 +142,20 @@ for k=2:numel(p.times)
 end
 p.sequence=struct([]);
 
+% Bound retained master-equation time records independently of Hilbert size
+budget=parameters(); budget.method='megcce'; budget.quantity='density';
+budget.rho0=ones(2)/2; budget.jumps=struct([]);
+model=cce_prepare(s,budget); states=cce_states(model,budget);
+budget.times=linspace(0,1,128); budget.numerics.max_memory_bytes=4096; refused=false;
+try
+    cce_master(model,struct('id',0,'sites',[]),states.spin_configs(1),...
+               cce_sequence(model,budget),budget);
+catch exception
+    refused=strcmp(exception.identifier,'cce_master:memory');
+end
+result=test_true(result,'Direct master output memory preflight',refused,...
+                 'Density histories must fit the byte budget even for an empty bath cluster.');
+
 % Refuse retained jump caches that exceed a direct evaluator memory budget
 for method={'mecce','megcce'}
     budget=parameters(); budget.method=method{1}; budget.bath_spins=2; budget.order=1;

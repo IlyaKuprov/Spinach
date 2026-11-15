@@ -91,6 +91,13 @@ else
 end
 if isempty(cylinders), error('cce_interlace:empty','No conditioning supercluster.'); end
 
+% Bound cylinder masks, enumeration counts and index vectors before allocation
+bytes=3*8*numel(cylinders);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_interlace:memory',...
+          'Conditioning cylinder metadata exceed numerics.max_memory_bytes.');
+end
+
 % Remove contained cylinders without changing the conditioning union
 keep=true(size(cylinders));
 for j=1:numel(cylinders)
@@ -116,8 +123,16 @@ if sum(counts)>spec.max_states
     error('cce_interlace:budget','Cylinder enumeration exceeds interlaced.max_states.');
 end
 
+% Bound assignments, a cylinder block, sorting copies and index/weight vectors
+rows=sum(counts); columns=numel(model.bath_ids);
+bytes=8*rows*(4*columns+5);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_interlace:memory',...
+          'Conditioning assignments and sorting workspace exceed numerics.max_memory_bytes.');
+end
+
 % Enumerate each cylinder around the same global assignment
-assignments=zeros(sum(counts),numel(model.bath_ids)); cursor=0;
+assignments=zeros(rows,columns); cursor=0;
 for k=1:numel(cylinders)
     positions=find(ismember(model.bath_ids,cylinders{k}));
     block=repmat(reference.assignment,counts(k),1); radix=1;
@@ -127,6 +142,9 @@ for k=1:numel(cylinders)
     end
     assignments(cursor+(1:counts(k)),:)=block; cursor=cursor+counts(k);
 end
+
+% Release the last cylinder before sorting the conditioning union
+clear block
 
 % Deduplicate overlapping cylinders before computing physical probabilities
 assignments=unique(assignments,'rows','sorted');
@@ -184,6 +202,11 @@ end
 if (~isfield(spec,'raw_only')||~spec.raw_only)&&~isempty(cluster.sites)
     family=cce_clusters(model,cce_graph(model,parameters),parameters);
     subsets=family(arrayfun(@(entry) all(ismember(entry.sites,cluster.sites)),family));
+    bytes=8*rows*(columns+1)+3*25*numel(raw.value)*numel(subsets);
+    if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+        error('cce_interlace:memory',...
+              'Conditional subset factors exceed numerics.max_memory_bytes.');
+    end
     factors=cell(1,numel(subsets)); errors=factors; masks=factors;
     conditioned=parameters; conditioned.interlaced.condition_sites=cylinders;
     conditioned.interlaced.raw_only=true;

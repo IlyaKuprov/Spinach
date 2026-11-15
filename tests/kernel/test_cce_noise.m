@@ -37,6 +37,16 @@ ensemble=cce_states(model,state_parameters); spin_config=ensemble.spin_configs(1
 spin_config.rho0=diag([0 1]); spin_config.bath_rho={diag([0.8 0.2]),[1 1;1 1]/2};
 spin_config.expectations=[0 0 0.3;0.5 0 0]; schedule=cce_sequence(model,p);
 cluster=struct('id',1,'sites',[2 3]); rho=kron(spin_config.bath_rho{1},spin_config.bath_rho{2});
+
+% Direct covariance evaluation must bound retained records, not only operators
+q=p; q.times=linspace(0,1,128); q.numerics.max_memory_bytes=4096; refused=false;
+try
+    cce_noise(model,cluster,spin_config,cce_sequence(model,q),q);
+catch exception
+    refused=strcmp(exception.identifier,'cce_noise:memory');
+end
+result=test_true(result,'Direct noise output memory preflight',refused,...
+                 'The covariance and first-moment arrays must fit the declared byte budget.');
 for ordering={'ordered','symmetrized'}
     q=p; q.noise.ordering=ordering{1}; q.noise.connected=true;
     raw=cce_noise(model,cluster,spin_config,schedule,q); supplied_reference=zeros(numel(p.times),1);

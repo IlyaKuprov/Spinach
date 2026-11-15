@@ -12,6 +12,22 @@ function result=test_cce_clusters()
 % Initialise independent exhaustive family checks
 result=new_test_result('kernel/cce_clusters','CCE graphs and subsets',...
                        'Check frontier enumeration, closure, powers and physical group costs.');
+% Check count-scaled cluster metadata before constructing the family
+budget_model=struct('physical_ids',1:7,'bath_ids',2:7,'observed_ids',1,...
+                    'multiplicities',2*ones(1,7));
+budget_graph=struct('bath_ids',2:7,'adjacency',logical(ones(6)-eye(6)),...
+                    'scores',ones(6));
+budget_parameters=struct('order',6,'expansion','standard',...
+                         'numerics',struct('max_memory_bytes',1024));
+refused=false;
+try
+    cce_clusters(budget_model,budget_graph,budget_parameters);
+catch exception
+    refused=strcmp(exception.identifier,'cce_clusters:memory');
+end
+result=test_true(result,'Cluster family memory preflight',refused,...
+                 'A group-order limit does not bound cluster records, closure copies or subset indices in bytes.');
+
 % Exercise the documented parameter-root bath radius on physical coordinates
 root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
 manual=fileread(fullfile(root,'interfaces','agents','spinach-skill','references','cce.md'));

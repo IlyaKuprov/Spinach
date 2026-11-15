@@ -56,6 +56,14 @@ elseif strcmp(parameters.expansion,'disjoint_inter')
     max_order=min(max_order,2);
 end
 
+% Bound group graph and every subsequent family before growing it
+budget=Inf;
+if isfield(parameters,'numerics')&&isfield(parameters.numerics,'max_memory_bytes')
+    budget=parameters.numerics.max_memory_bytes;
+end
+prototype={[]}; metadata=whos('prototype');
+family_bytes=metadata.bytes/numel(prototype)+8*(max_order+1); check_storage(ng);
+
 % Collapse physical graph edges and scores onto group vertices
 adjacency=false(ng); scores=zeros(ng);
 for a=1:ng
@@ -74,12 +82,14 @@ end
 % Enumerate unique connected candidates by one-vertex frontier growth
 explicit=isfield(parameters,'clusters')&&~isempty(parameters.clusters);
 if explicit
+    check_storage(numel(parameters.clusters));
     family=parameters.clusters(:);
 else
     family=cell(0,1); frontier=(1:ng).';
     for order=1:max_order
 
         % Store this order before expanding its graph frontier
+        check_storage(numel(family)+size(frontier,1));
         family=[family;mat2cell(frontier,ones(size(frontier,1),1),order)]; %#ok<AGROW>
         next=zeros(0,order+1);
         if order<max_order
@@ -89,6 +99,7 @@ else
                 neighbours=find(any(adjacency(frontier(k,:),:),1));
                 neighbours=setdiff(neighbours,frontier(k,:));
                 for vertex=neighbours
+                    check_storage(numel(family)+size(next,1)+1);
                     next(end+1,:)=sort([frontier(k,:) vertex]); %#ok<AGROW>
                 end
 
@@ -134,6 +145,7 @@ for order=max_order:-1:2
     rows=family(cellfun(@numel,family)==order);
     for k=1:numel(rows)
         for omitted=1:order
+            check_storage(numel(family)+1);
             family{end+1,1}=rows{k}([1:omitted-1 omitted+1:order]); %#ok<AGROW>
         end
     end
@@ -152,6 +164,20 @@ for k=1:numel(family)
     padded(k,1:numel(family{k})+1)=[numel(family{k}) family{k}];
 end
 [~,permutation]=sortrows(padded); family=family(permutation);
+
+% Bound decimal family signatures, including old/new concatenation copies
+physical_digits=1;
+if ~isempty(model.physical_ids)
+    physical_digits=1+floor(log10(max(model.physical_ids)));
+end
+group_digits=1;
+if ng>0, group_digits=1+floor(log10(ng)); end
+characters=(physical_digits+1)*numel(model.bath_ids)+2*ng+1+...
+           (group_digits+1)*sum(cellfun(@numel,family))+2*numel(family);
+if ~isfinite(characters)||6*characters>budget
+    error('cce_clusters:memory',...
+          'Cluster family signature exceeds numerics.max_memory_bytes.');
+end
 family_id='';
 for k=1:numel(groups)
     family_id=[family_id '[' sprintf('%u,',groups{k}) ']']; %#ok<AGROW>
@@ -180,6 +206,13 @@ entry=struct('id',uint64(0),'groups',[],'sites',[],'order',0,'dimension',1,...
              'config_id',uint64(0),'inclusion_reason','','weight',0,...
              'family_id',family_id,'selected_counts',selected_counts,...
              'actual_counts',actual_counts,'cap_overrun',cap_overrun);
+metadata=whos('entry');
+bytes=3*numel(family)*(metadata.bytes+16*numel(family)+...
+      8*(4*max_order+3*numel(model.bath_ids)));
+if ~isfinite(bytes)||bytes>budget
+    error('cce_clusters:memory',...
+          'Cluster records and subset maps exceed numerics.max_memory_bytes.');
+end
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
@@ -239,6 +272,17 @@ for k=numel(clusters):-1:1
         end
     end
     clusters(k).mobius_power=power;
+end
+
+function check_storage(count)
+
+    % Three family/sorting copies and the dense group graph
+    bytes=9*ng^2+3*count*family_bytes;
+    if ~isfinite(bytes)||bytes>budget
+        error('cce_clusters:memory',...
+              'Cluster family workspace exceeds numerics.max_memory_bytes.');
+    end
+
 end
 
 end

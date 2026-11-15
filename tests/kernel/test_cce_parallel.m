@@ -69,8 +69,13 @@ try
 result=test_true(result,'task cap',refused,'Sixteen tasks cannot fit a fifteen-task cap.');
 p.parallel.max_tasks=16; p.numerics.max_memory_bytes=2000; refused=false;
 try
-    cce(spin_system,p); catch exception, refused=strcmp(exception.identifier,'cce_schedule:memory'); end
-result=test_true(result,'memory cap',refused,'Raw storage and dense working matrices are bounded together.');
+    cce(spin_system,p);
+catch exception
+    refused=ismember(exception.identifier,{'cce_states:memory','cce_clusters:memory',...
+                                          'cce_schedule:memory'});
+end
+result=test_true(result,'memory cap',refused,...
+                 'Configuration and cluster metadata are bounded before scheduler working matrices.');
 
 % Bound all concurrently active cluster workspaces in the selected batch
 p.numerics.max_memory_bytes=2^26;

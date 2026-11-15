@@ -8,6 +8,8 @@ Propagate open-system projected or generalized cluster dynamics.
 
 ## Behaviour
 
+- Direct calls preflight retained time-dependent values, densities, validity masks and error records against `numerics.max_memory_bytes` (`cce_master:memory`), independently of the Hilbert/Liouville workspace checks.
+
 Direct calls reject checkpoint options with `cce:checkpoint`; use `cce` or `cce_schedule` to own the restart ledger.
 
 Projected master propagation inherits the actual-Hamiltonian manifold-invariance check from `cce_liouvillian`, including static exterior fields. Failure raises `cce:population_transfer`, not a silently projected result.

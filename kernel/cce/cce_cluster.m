@@ -30,6 +30,19 @@ function raw=cce_cluster(model,cluster,spin_config,schedule,parameters)
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters,model,cluster.sites,spin_config);
 
+% Bound retained time records before allocating propagation outputs
+nt=numel(schedule.times); dc=prod(model.multiplicities(model.observed_ids));
+components=1;
+if strcmp(parameters.quantity,'density'), components=dc^2; end
+if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
+end
+bytes=3*nt*(25*components+16*dc^2);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_cluster:memory',...
+          'Retained time records exceed numerics.max_memory_bytes.');
+end
+
 % Route driven generalized clusters through the local segment compiler
 if isstruct(schedule)&&isfield(schedule,'controls')&&schedule.controls
     if ~strcmp(parameters.method,'gcce')

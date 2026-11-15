@@ -30,6 +30,20 @@ cce_validate(parameters,model,cluster.sites,spin_config);
 
 % Validate the propagation contract before allocating cluster matrices
 grumble(model,cluster,spin_config,schedule,parameters);
+
+% Bound retained time records before allocating propagation outputs
+nt=numel(schedule.times); dc=prod(model.multiplicities(model.observed_ids));
+components=1;
+if strcmp(parameters.quantity,'density'), components=dc^2; end
+if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
+end
+bytes=3*nt*(25*components+16*dc^2);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_master:memory',...
+          'Retained time records exceed numerics.max_memory_bytes.');
+end
+
 sites=cluster.sites; hc=struct('backend','auto');
 
 % Retain the same static exterior assignment as closed-system clusters

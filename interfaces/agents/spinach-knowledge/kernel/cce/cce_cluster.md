@@ -8,6 +8,8 @@ Propagate one unitary projected or generalized cluster.
 
 ## Behaviour
 
+- Direct calls preflight retained time-dependent values, densities, validity masks and error records against `numerics.max_memory_bytes` (`cce_cluster:memory`), in addition to the existing propagator workspace bound.
+
 Direct calls reject checkpoint options with `cce:checkpoint`; use `cce` or `cce_schedule` to own the restart ledger.
 
 Projected propagation requires the supplied observed manifold subspaces to be invariant under the actual cluster Hamiltonian (including retained interactions and exterior fields). Nonzero leakage above dimension-scaled roundoff raises `cce:population_transfer`; use generalized dynamics or supply an explicitly projected physical model. Explicit `second_order.enabled` remains the separate observed-gap perturbation model with its existing gap/overlap checks.

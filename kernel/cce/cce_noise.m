@@ -34,6 +34,13 @@ cce_validate(parameters,model,cluster.sites,spin_config);
 
 % Validate explicit quantum ordering and the additive observable contract
 grumble(model,cluster,spin_config,schedule,parameters);
+
+% Bound covariance, first moments and validity/error records before allocation
+nt=numel(schedule.times); bytes=3*nt*(25+32)+48;
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_noise:memory',...
+          'Retained time records exceed numerics.max_memory_bytes.');
+end
 [H,~]=cce_hamiltonian(model,cluster.sites,struct('backend','auto'));
 d_obs=prod(model.multiplicities(model.observed_ids)); db=size(H,1)/d_obs;
 

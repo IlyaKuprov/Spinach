@@ -8,6 +8,8 @@ Evaluate projected, generalized, open-system or bath-noise cluster expansions fo
 
 ## Behaviour
 
+- The interlaced driver preflights sample/order summaries, raw records and retained conditioning arrays against `numerics.max_memory_bytes` before allocation (`cce:memory`); conditioning enumerations are independently bounded by `cce_interlace`.
+
 - Checkpoints are supported only through the scheduled non-interlaced driver paths (CCE, gCCE, ME and noise, including supported controls and parallel modes). Interlaced requests reject `checkpoint` explicitly before model preparation; convergence ladders reject shared checkpoints. A checkpoint request requires a nonempty character-row `file` and logical-scalar `resume` when supplied.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.

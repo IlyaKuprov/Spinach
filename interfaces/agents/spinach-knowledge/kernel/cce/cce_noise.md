@@ -8,6 +8,8 @@ Evaluate bath-noise autocorrelation for additive connected-cluster expansion.
 
 ## Behaviour
 
+- Direct calls preflight the time-count-scaled covariance, first moments, validity and error records against `numerics.max_memory_bytes` (`cce_noise:memory`).
+
 Direct calls reject checkpoint options with `cce:checkpoint`; use `cce` or `cce_schedule` to own the restart ledger.
 
 A requested fixed `noise.manifold` must be invariant under the actual cluster Hamiltonian; otherwise `cce:population_transfer` rejects the unsupported fixed-manifold dynamics. The explicitly defined no-manifold bath-only partial-trace model remains unchanged and does not claim full observed-spin-bath dynamics.

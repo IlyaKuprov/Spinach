@@ -55,6 +55,15 @@ if isempty(schedule)
     end
     events=select_events(model,events,parameters);
     validate_events(model,events);
+    bytes=3*8*numel(events)*numel(parameters.times);
+    budget=Inf;
+    if isfield(parameters,'numerics')&&isfield(parameters.numerics,'max_memory_bytes')
+        budget=parameters.numerics.max_memory_bytes;
+    end
+    if ~isfinite(bytes)||bytes>budget
+        error('cce_controls:memory',...
+              'Pulse positions and ordering arrays exceed numerics.max_memory_bytes.');
+    end
     positions=zeros(numel(events),numel(parameters.times));
     for j=1:numel(events)
         if strcmp(events(j).placement,'fraction')
@@ -110,6 +119,12 @@ for k=1:numel(schedule.times)
 end
 % Reserve sparse complex Hamiltonians, dense pulses and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
+dc=prod(model.multiplicities(model.observed_ids)); components=1;
+if strcmp(parameters.quantity,'density'), components=dc^2; end
+if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
+end
+retained=retained+3*numel(schedule.times)*(25*components+16*dc^2);
 metadata=whos('model','sites','spin_config','schedule','parameters');
 if retained+sum([metadata.bytes])+16*24*dimension^2>parameters.numerics.max_memory_bytes
     error('cce_controls:memory','Retained control segments exceed numerics.max_memory_bytes.');

@@ -77,9 +77,17 @@ if ismember(mode,{'sampled','interlaced'}), ns=parameters.bath_state.samples; en
 if isfield(parameters.bath_state,'configuration_id')
     config_id=parameters.bath_state.configuration_id;
 end
-spin_configs=repmat(struct('rho0',rho_obs,'bath_ids',ids,...
-                       'bath_rho',{rhos},'expectations',zeros(nb,3),...
-                       'state_id',0,'configuration_id',config_id,'weight',1/ns),1,ns);
+% Bound retained densities, assignments, expectations and record metadata
+prototype=struct('rho0',rho_obs,'bath_ids',ids,'bath_rho',{rhos},...
+                 'expectations',zeros(nb,3),'state_id',0,...
+                 'configuration_id',config_id,'weight',1/ns);
+metadata=whos('prototype');
+bytes=ns*(metadata.bytes+16*sum(model.multiplicities(ids).^2)+16*nb+24);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_states:memory',...
+          'Sampled configuration storage exceeds numerics.max_memory_bytes.');
+end
+spin_configs=repmat(prototype,1,ns);
 assignments=zeros(ns,nb);
 for s=1:ns
 

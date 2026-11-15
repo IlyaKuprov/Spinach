@@ -104,6 +104,20 @@ result=test_true(result,'Adaptive pilot and held-out gates',...
                  ~isempty(a.diagnostics.heldout_error),...
                  'Freeze a pilot-selected exact group before held-out testing.');
 
+% Bound diagnostics for both pilot and held-out configuration arrays
+for field={'pilot_configs','heldout_configs'}
+    q=parameters; q.numerics.max_memory_bytes=2^16;
+    q.partition.(field{1})=repmat(q.partition.(field{1}),1,4096);
+    q.partition.patch_atol=1e6; q.partition.max_probes=2; refused=false;
+    try
+        cce_partition(model,graph,q);
+    catch exception
+        refused=strcmp(exception.identifier,'cce_partition:memory');
+    end
+    result=test_true(result,['Adaptive ' field{1} ' memory preflight'],refused,...
+                     'Pilot and held-out configurations and diagnostics must fit the budget before patch evaluation.');
+end
+
 % Restrict every bath-indexed graph matrix to an ordered proper patch
 for scoring={'explicit','supplied','resonance'}
     q=parameters; q.groups={2:4}; q.partition.patches={[4 2]};

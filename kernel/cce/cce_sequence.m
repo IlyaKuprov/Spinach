@@ -68,6 +68,15 @@ grumble(model,parameters);
 
 % Resolve event positions separately at every whole-sequence duration
 events=parameters.sequence; nt=numel(parameters.times);
+bytes=3*8*numel(events)*nt;
+budget=Inf;
+if isfield(parameters,'numerics')&&isfield(parameters.numerics,'max_memory_bytes')
+    budget=parameters.numerics.max_memory_bytes;
+end
+if ~isfinite(bytes)||bytes>budget
+    error('cce_sequence:memory',...
+          'Pulse positions and ordering arrays exceed numerics.max_memory_bytes.');
+end
 positions=zeros(numel(events),nt);
 for j=1:numel(events)
     switch events(j).placement

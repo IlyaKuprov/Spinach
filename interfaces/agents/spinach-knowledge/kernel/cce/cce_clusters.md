@@ -8,6 +8,8 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 ## Behaviour
 
+- When `numerics.max_memory_bytes` is supplied, graph/frontier growth, closure/sorting copies, decimal family signatures and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Enumerates connected candidate clusters through the requested order; disconnected subsets required by retained clusters are restored for recursive reduction.

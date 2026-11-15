@@ -9,6 +9,39 @@ function result=test_cce_interlacing()
 result=new_test_result('kernel/cce_interlacing','CCE projected interlacing',...
                        'Check unique configurations, conditional weights and shared denominator K.');
 [model,p]=fixture(); ensemble=cce_states(model,p);
+
+% Refuse count-scaled storage before constructing conditioning assignments
+q=p; q.times=0; q.method='cce'; q.numerics.max_memory_bytes=1000;
+q.interlaced=struct('max_states',8,'reference_state',1,...
+                    'condition_sites',{{[2 3 4]}},'raw_only',true);
+probe=struct('id',uint64(0),'sites',[],'groups',[]); refused=false;
+try
+    cce_interlace(model,probe,ensemble,cce_sequence(model,q),q);
+catch exception
+    refused=strcmp(exception.identifier,'cce_interlace:memory');
+end
+result=test_true(result,'Conditioning union memory preflight',refused,...
+                 'The assignment union and sorting workspace must fit the byte budget, not just max_states.');
+
+% Sampling is bounded before allocating configuration records or assignments
+q=p; q.bath_state.samples=1024; q.numerics.max_memory_bytes=4096; refused=false;
+try
+    cce_states(model,q);
+catch exception
+    refused=strcmp(exception.identifier,'cce_states:memory');
+end
+result=test_true(result,'Sampled configuration memory preflight',refused,...
+                 'Direct state compilation must reject samples whose storage exceeds the byte budget.');
+
+% Direct propagation has the same output-storage contract as the scheduler
+q=p; q.times=linspace(0,1,1024); q.numerics.max_memory_bytes=4096; refused=false;
+try
+    cce_cluster(model,probe,ensemble.spin_configs(1),cce_sequence(model,q),q);
+catch exception
+    refused=strcmp(exception.identifier,'cce_cluster:memory');
+end
+result=test_true(result,'Direct cluster output memory preflight',refused,...
+                 'A short Hilbert space does not bound the number of retained time points.');
 ensemble.assignments(1,:)=[1 1 1]; ensemble.spin_configs(1).assignment=[1 1 1];
 ensemble.spin_configs(1).bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
 ensemble.spin_configs(1).expectations=repmat([0 0 0.5],3,1); schedule=cce_sequence(model,p);

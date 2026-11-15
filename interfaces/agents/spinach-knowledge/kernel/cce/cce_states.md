@@ -8,6 +8,8 @@ Compile observed-spin density matrices and product-bath states with stable physi
 
 ## Behaviour
 
+- `numerics.max_memory_bytes` is checked before allocating the sample-count-scaled configuration and assignment arrays. The bound includes local density matrices, expectations, weights, IDs and measured record metadata; exceeding it raises `cce_states:memory`.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Supports maximally mixed product states, explicit single-site density matrices, sampled product states, and interlaced sampled spin_configs.

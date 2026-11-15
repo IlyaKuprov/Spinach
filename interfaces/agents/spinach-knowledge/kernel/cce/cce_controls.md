@@ -8,6 +8,8 @@ Compile generalized controls, selective pulses and time-dependent exterior field
 
 ## Behaviour
 
+- Pulse-position and ordering arrays are checked against `numerics.max_memory_bytes`, when supplied, before allocation; driven propagation also includes retained time-dependent output records in its existing segment-storage preflight.
+
 DEER frequency windows require axial canonical lab-frame Zeeman rows at every candidate site after species/site filtering. A transverse row raises `cce_controls:deer_axial` with the physical site ID; it is never silently replaced by its longitudinal coefficient. Existing signed axial frequencies, strict boundaries, and explicit empty-selection behavior are unchanged.
 
 A finite `meanfield_radius` requires finite real observed and exterior coordinates; missing geometry raises `cce:coordinates` before distance filtering. The radius is nonnegative, and `Inf` retains the unbounded default without requiring coordinates. Included cluster sites need no coordinates for this cutoff, and an empty exterior requires no distance calculation.

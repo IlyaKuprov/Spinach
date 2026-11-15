@@ -8,6 +8,8 @@ Evaluate projected product-state averages for interlaced CCE.
 
 ## Behaviour
 
+- Before enumeration, `numerics.max_memory_bytes` bounds the conditioning assignments, cylinder block, sorting copies, index/weight vectors and conditional subset factors; exceeding it raises `cce_interlace:memory`, independently of `interlaced.max_states`.
+
 Checkpoint options are unsupported and rejected with `cce:checkpoint` before projected enumeration, both directly and through `cce`. No restart protection is implied for interlaced runs.
 
 Projected recursive evaluations retain the same actual-Hamiltonian manifold-invariance checks as ordinary CCE/ME-CCE. Conditioning cannot bypass `cce:population_transfer` rejection.

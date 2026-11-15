@@ -8,6 +8,8 @@ Compile whole-sequence sample times and ideal projected pulse events.
 
 ## Behaviour
 
+- Pulse-position and ordering arrays are checked against `numerics.max_memory_bytes`, when supplied, before allocation. Standalone schedule compilation without a numerical budget retains its existing contract.
+
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Positive absolute timestamps are accepted: each sample includes only events at or before its duration, while the zero sample always has no pulses.

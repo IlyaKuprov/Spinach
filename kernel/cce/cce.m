@@ -106,9 +106,35 @@ if strcmp(parameters.bath_state.mode,'interlaced')
     end
     empty=struct('id',uint64(0),'sites',[]); ns=numel(ensemble.spin_configs);
     nt=numel(parameters.times); no=parameters.order+1;
+    % Bound retained sample/order values, uncertainties and validity masks
+    dc=prod(model.multiplicities(model.observed_ids));
+    bytes=3*nt*ns*(25+25*no)+...
+          3*ns*(numel(clusters)+1)*(nt*(25+16*dc^2)+1024);
+    if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+        error('cce:memory',...
+              'Interlaced sample and order summaries exceed numerics.max_memory_bytes.');
+    end
     estimates=zeros(nt,ns); by_order=zeros(nt,1,no,ns);
     order_error=zeros(size(by_order)); order_valid=true(size(by_order));
     valid=true(size(estimates)); bounds=zeros(size(estimates));
+    % Retained conditioning records scale with both samples and cluster count
+    cylinders={clusters.sites};
+    if isfield(parameters.interlaced,'condition_sites')
+        cylinders=parameters.interlaced.condition_sites;
+    end
+    if isempty(cylinders), cylinders={[]}; end
+    conditioning=0;
+    for sites=cylinders
+        conditioning=conditioning+prod(model.multiplicities(sites{1}));
+    end
+    conditioning=min(conditioning,parameters.interlaced.max_states);
+    count=ns*(numel(clusters)+1);
+    if ~isempty(full_index), count=ns; end
+    retained=16*conditioning*(numel(model.bath_ids)+1)*count;
+    if ~isfinite(retained)||bytes+retained>parameters.numerics.max_memory_bytes
+        error('cce:memory',...
+              'Retained conditioning records exceed numerics.max_memory_bytes.');
+    end
     records=cell(ns,numel(clusters)+1);
     for s=1:ns
         conditioned=parameters; conditioned.interlaced.reference_state=s;

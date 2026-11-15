@@ -30,6 +30,13 @@ cce_validate(parameters);
 grumble(model,graph,parameters);
 p=parameters.partition; ids=graph.bath_ids;
 [~,positions]=ismember(ids,model.physical_ids); dims=model.multiplicities(positions);
+
+% Bound dense partition graph, edge candidates and group copies before allocation
+bytes=3*(9*numel(ids)^2+32*numel(ids)*(numel(ids)-1)/2);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_partition:memory',...
+          'Partition graph and candidate storage exceed numerics.max_memory_bytes.');
+end
 groups=num2cell(ids);
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=cellfun(@sort,parameters.groups,'UniformOutput',false);
@@ -109,6 +116,15 @@ end
 % Run optional fixed-pilot adaptation before freezing the production partition
 adaptive=strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive);
 if adaptive&&complete
+    % Both cohorts remain resident throughout pilot selection and validation
+    pilot=p.pilot_configs; heldout=p.heldout_configs;
+    metadata=whos('pilot','heldout');
+    count=min(numel(p.patches)*(numel(pilot)+numel(heldout)),p.max_probes);
+    bytes=sum([metadata.bytes])+3*8*count;
+    if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+        error('cce_partition:memory',...
+              'Pilot and held-out configurations exceed numerics.max_memory_bytes.');
+    end
     [objective,errors,used,valid]=patches(groups,p.pilot_configs,0);
     diagnostics.probes=used; diagnostics.pilot_error=errors;
     complete=valid&&objective<=1;
@@ -185,6 +201,17 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         end
         local_model=model; local_model.bath_ids=sites;
         local_graph=cce_graph(local_model,local); family=cce_clusters(local_model,local_graph,local);
+        dc=prod(model.multiplicities(model.observed_ids)); components=1;
+        if strcmp(parameters.quantity,'density'), components=dc^2; end
+        if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+            components=numel(parameters.coil);
+        end
+        bytes=3*(numel(family)+2)*...
+              (numel(schedule.times)*(25*components+16*dc^2)+1024);
+        if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+            error('cce_partition:memory',...
+                  'Patch cluster records exceed numerics.max_memory_bytes.');
+        end
         empty=struct('id',0,'sites',[]); whole=struct('id',1,'sites',sort(sites));
         full=find(arrayfun(@(entry)isequal(sort(entry.sites),sort(sites)),family),1);
         for spin_config=1:numel(spin_configs)

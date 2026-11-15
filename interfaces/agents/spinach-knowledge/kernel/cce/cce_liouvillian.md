@@ -10,7 +10,7 @@ Build a local GKSL generator for full density or conditional coherence blocks.
 
 Conditional ME evolution checks invariance of both supplied central branch subspaces under the actual cluster Hamiltonian before constructing its generator. Nonzero central-transition leakage raises `cce:pure_dephasing` and requests `megcce`; full generalized evolution is unchanged.
 
-- The per-call memory ceiling includes full central-register physical operators as well as the projected Liouvillian, and is checked before constructing either.
+- The per-call memory ceiling includes full central-register physical operators, the projected Liouvillian and both retained embedded matrices for every fully included jump, and is checked before constructing any of them.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 

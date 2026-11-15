@@ -10,6 +10,7 @@ Evaluate cluster/state tasks in deterministic indexed batches.
 
 The scheduler validates and consumes checkpoint options, then removes them before invoking direct evaluators. Only this layer owns the task ledger; direct evaluator calls reject checkpoint requests. Interlaced and adaptive-convergence checkpoint requests are unsupported and fail explicitly.
 
+- Every completed ME record reserves its retained branch Hamiltonians, embedded physical spin operators and included left/right jump matrices, multiplied by the sampled-context and ledger-copy counts. The active task also reserves this operator cache.
 - Each concurrent task reserves full central-register-times-bath Hamiltonian construction and physical pulse storage separately from projected bath Hilbert/Liouville propagation. Stock spherical-component storage is included; conditional CCE, ME-CCE and noise do not replace the construction dimension with the bath dimension.
 
 - Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.

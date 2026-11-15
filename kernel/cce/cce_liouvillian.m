@@ -41,7 +41,15 @@ d0=prod(model.multiplicities(model.central_ids)); db=d/d0;
 conditional=strcmp(parameters.method,'mecce');
 if conditional, n=db^2; else, n=d^2; end
 full_workspace=(12+3*numel(ids))*d^2;
-if 16*(full_workspace+8*n^2)>parameters.numerics.max_memory_bytes
+
+% Keep every included jump pair resident while assembling subsequent terms
+jumps=0; labels=0;
+for k=1:numel(parameters.jumps)
+    if all(ismember(parameters.jumps(k).support,ids))
+        jumps=jumps+1; labels=labels+numel(parameters.jumps(k).support)+1;
+    end
+end
+if 16*(full_workspace+8*n^2+2*jumps*n)+8*labels>parameters.numerics.max_memory_bytes
     error('cce:memory','Liouvillian construction exceeds max_memory_bytes.');
 end
 

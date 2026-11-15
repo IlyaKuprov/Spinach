@@ -142,6 +142,13 @@ for method={'cce','mecce','noise'}
     resident=3*2*(2*(25+16*64^2)+1024)+sum([metadata.bytes]);
     if strcmp(large.method,'noise'), resident=resident+3*2*(32*2+16); end
     full_workspace=16*(64*2)^2*(12+3*7);
+    if strcmp(large.method,'mecce')
+
+        % Include both retained branch/spin caches and the active task cache
+        empty_cache=16*(3*6*64^2+2); full_cache=16*(3*7*128^2+2*2^2);
+        resident=resident+3*(empty_cache+full_cache);
+        full_workspace=full_workspace+full_cache;
+    end
     large.numerics.max_memory_bytes=resident+1.5*full_workspace; refused=false;
     try
         cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
@@ -197,6 +204,61 @@ for method={'gcce','megcce'}
                      'The four time-by-operator records alone exceed five million bytes.');
     fprintf('R7 observable memory %s rejection %d raw minimum %d budget %d\n',...
             method{1},refused,4*25*numel(q.times)*numel(q.operators),q.numerics.max_memory_bytes);
+end
+
+% Retained ME branch, spin and jump operators accumulate across sampled tasks
+for method={'mecce','megcce'}
+    retained=struct('central_spins',1,'bath_spins',2,'order',1,...
+        'times',[0 1e-3],'method',method{1},'expansion','standard','quantity','coherence',...
+        'central',struct('alpha',[1;0],'beta',[0;1],'rho',ones(2)/2),...
+        'assumptions','labframe','orientation',[0 0 0],'interaction_cutoff',Inf,...
+        'graph',struct('mode','complete','score','coupling_norm'),...
+        'meanfield','none','sequence',[],'averaging','after_expansion',...
+        'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
+                            'samples',40,'seed',31),...
+        'numerics',struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8,...
+                          'zero_policy','mask'),...
+        'parallel',struct('mode','serial','max_tasks',80));
+    retained.jumps=repmat(struct('support',2,'operator',[0 1;0 0],'rate',2),1,8);
+    if strcmp(method{1},'megcce'), retained.quantity='density'; end
+    retained_model=cce_prepare(spin_system,retained);
+    retained_graph=cce_graph(retained_model,retained);
+    retained_clusters=cce_clusters(retained_model,retained_graph,retained);
+    retained_states=cce_states(retained_model,retained);
+    retained_schedule=cce_sequence(retained_model,retained);
+    records=cce_schedule(retained_model,retained_clusters,retained_states,...
+                         retained_schedule,retained,@cce_master);
+
+    % Bound the actual operator payload without counting MATLAB struct overhead
+    payload=0;
+    for state=1:numel(records)
+        for record=1:numel(records{state})
+            meta=records{state}(record).generator;
+            elements=numel(meta.h_alpha)+numel(meta.h_beta)+...
+                     sum(cellfun(@numel,meta.hamiltonian.operators),'all');
+            for jump=meta.jumps
+                elements=elements+numel(jump.left)+numel(jump.right);
+            end
+            payload=payload+16*elements;
+        end
+    end
+    metadata=whos('retained_model','retained_clusters','retained_states',...
+                  'retained_schedule','retained');
+    components=1; if strcmp(method{1},'megcce'), components=4; end
+    resident=3*80*(2*(25*components+16*2^2)+1024)+sum([metadata.bytes]);
+    dimension=4; if strcmp(method{1},'mecce'), dimension=2; end
+    workspace=16*4^2*18+16*dimension^4*24;
+    retained.numerics.max_memory_bytes=resident+workspace+payload/2; refused=false;
+    try
+        cce_schedule(retained_model,retained_clusters,retained_states,...
+                     retained_schedule,retained,@cce_master);
+    catch exception
+        refused=strcmp(exception.identifier,'cce_schedule:memory');
+    end
+    result=test_true(result,[method{1} ' retained metadata memory'],refused,...
+                     'Every completed task retains its branch, spin and jump operator arrays.');
+    fprintf('%s retained operator payload %.0f bytes; cap %.0f; refused %d.\n',...
+            method{1},payload,retained.numerics.max_memory_bytes,refused);
 end
 
 % Print the pilot timings without imposing an unjustified speedup target

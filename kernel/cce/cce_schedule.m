@@ -75,6 +75,7 @@ peak=0;
 for k=0:numel(clusters)
     sites=[];
     if k>0, sites=clusters(k).sites; end
+
     % Reserve unprojected Hamiltonians, spin operators and physical pulse matrices
     db=prod(model.multiplicities(sites)); dimension=dc*db;
     copies=12+3*(numel(model.central_ids)+numel(sites))+2*numel(schedule.events);
@@ -89,7 +90,20 @@ for k=0:numel(clusters)
     % Add the projected Hilbert or Liouville propagation workspace separately
     propagated=dimension;
     if ismember(parameters.method,{'cce','mecce','noise'}), propagated=db; end
-    if ismember(parameters.method,{'mecce','megcce'}), propagated=propagated^2; end
+    if ismember(parameters.method,{'mecce','megcce'})
+
+        % Retain branch, spin and included jump operators in every completed record
+        ids=[model.central_ids sites]; jumps=0; labels=0;
+        for j=1:numel(parameters.jumps)
+            if all(ismember(parameters.jumps(j).support,ids))
+                jumps=jumps+1; labels=labels+numel(parameters.jumps(j).support)+1;
+            end
+        end
+        retained=16*(3*numel(ids)*dimension^2+2*(1+jumps)*propagated^2)+...
+                 8*(2*numel(ids)+labels);
+        resident=resident+3*ns*retained; workspace=workspace+retained;
+        propagated=propagated^2;
+    end
     workspace=workspace+16*(24+numel(schedule.events))*propagated^2;
     if isfield(schedule,'controls')&&schedule.controls
 

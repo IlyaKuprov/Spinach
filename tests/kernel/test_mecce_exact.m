@@ -142,6 +142,31 @@ for k=2:numel(p.times)
 end
 p.sequence=struct([]);
 
+% Refuse retained jump caches that exceed a direct evaluator memory budget
+for method={'mecce','megcce'}
+    budget=parameters(); budget.method=method{1}; budget.bath_spins=2; budget.order=1;
+    budget.central=struct('rho',ones(2)/2); budget.quantity='density';
+    budget.jumps=repmat(struct('support',2,'operator',[0 1;0 0],'rate',2),1,128);
+    if strcmp(method{1},'mecce')
+        budget.central=struct('alpha',[1;0],'beta',[0;1],'rho',ones(2)/2); budget.quantity='coherence';
+    end
+    model=cce_prepare(s,budget); states=cce_states(model,budget);
+    schedule=cce_sequence(model,budget); cluster=struct('id',1,'sites',2);
+    dimension=4; if strcmp(method{1},'mecce'), dimension=2; end
+    workspace=16*(18*4^2+8*dimension^4);
+    payload=16*2*128*dimension^2;
+    budget.numerics.max_memory_bytes=workspace+payload/2; refused=false;
+    try
+        cce_master(model,cluster,states.contexts,schedule,budget);
+    catch exception
+        refused=strcmp(exception.identifier,'cce:memory');
+    end
+    result=test_true(result,[method{1} ' direct retained jump cache'],refused,...
+                     'The growing embedded jump cache must fit alongside Liouvillian construction.');
+    fprintf('%s direct jump cache %.0f bytes; cap %.0f; refused %d.\n',...
+            method{1},payload,budget.numerics.max_memory_bytes,refused);
+end
+
 % Compare supplied contexts independently of the parameter-level initial state
 result=context_initialization(result);
 
@@ -224,6 +249,7 @@ for k=2:7
     p.jumps(end+1)=struct('support',k,'operator',[0 1;0 0],'rate',500);
     p.jumps(end+1)=struct('support',k,'operator',[0 0;1 0],'rate',500);
 end
+
 % Declare the pinned conventional ME reference's central-Sz projection
 conditional_system=s;
 for k=2:7, conditional_system.inter.coupling.matrix{1,k}(:,1:2)=0; end
@@ -349,6 +375,7 @@ for method={'cce','mecce'}
     raw=evaluator(model,cluster,context,schedule,p);
     result=test_close(result,[p.method ' context bath phase'],raw.value,exp(2i*p.times(:)),...
                       2e-12,2e-12,'Conditional methods return normalized branch traces for the supplied bath state.');
+
     % Use explicit branch vectors rather than a cached projection
     swapped=p; swapped.central.alpha=p.central.beta; swapped.central.beta=p.central.alpha;
     raw=evaluator(model,cluster,context,schedule,swapped);

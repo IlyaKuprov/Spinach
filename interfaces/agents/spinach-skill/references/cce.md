@@ -260,3 +260,10 @@ Use `clexpn(...,@free_evolution,parameters,assumptions)` with generalized approx
 The already-native bath utility is `[sys,inter,bath]=spin_bath(sys,inter,specification)`, in `kernel/utilities/`; it generates/appends native isotope, Angstrom coordinate and Hz interaction tables with stable physical IDs and metadata. It has no legacy-driver dependency. Do not create a second bath service during the example migration.
 
 Preparation selectors verified for the example migration: `transition.ms=[-0.5 0.5]` for E4, `[-1 1]` for E3, `[-0.5 0.5;-0.5 0.5]` for two electrons, and `[-0.5 0.5;3.5 3.5]` for E/51V. `transition.spins` follows the observed-spin order. These select the equal two-manifold superpositions without manually assembled vectors.
+
+## Native generalized-density examples
+
+The examples gcce_sic_clock, gcce_highspin_siv and gcce_votpp use sys/inter/bas/parameters blocks and `[answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe')`. A product-ms transition selector supplies the equal coherent preparation; parameters.output is density and parameters.cce.basis carries the retained-cluster formalism. Numeric answer rows are column-major density matrices. Plot populations from diagonal columns. Independent dense references belong in test_cce_examples, not in demonstration code. Other examples and legacy entry points remain unchanged pending the atomic migration.
+### Numerical diagnostics during native example migration
+
+Preserve raw absolute error estimates and spectral residuals as well as final densities. Coherent free evolution returns these in its optional second output and reuses one eigensystem over the time grid. Complete-bath validity is not budget satisfaction: compare the error estimate against the requested absolute/relative budget separately; lower-order masks must remain unchanged. Resolve transition Hamiltonians once in compilation, using the native observed-only generator only in its supported product-ms coherent mixed-product regime. Timing comparisons must exclude generated scratch folders from both MATLAB paths and warm both paths after every switch.

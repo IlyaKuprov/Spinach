@@ -200,6 +200,44 @@ for k=1:numel(isotopes)
 end
 
 
+% Coherent diagnostics retain the original arithmetic and exact-reference masks
+sys.magnet=0; sys.isotopes={'E','1H'}; sys.output='hush';
+inter=struct(); inter.zeeman.matrix={zeros(3),zeros(3)};
+inter.coupling.matrix=cell(2); inter.coupling.matrix{1,2}=diag([1 2 3]);
+system=create(sys,inter); p=struct();
+p.observed=1; p.transition.spins=1; p.transition.ms=[0.5 -0.5]; p.times=[0 0.1];
+p.output='density'; p.cce.approximation='generalized';
+p.cce.numerics=struct('atol',1e-20,'rtol',1e-20,'max_memory_bytes',2^28);
+[~,d]=clexpn(system,@free_evolution,p,'labframe');
+model=cce_compile(system,d.parameters,'labframe');
+[stock_transition,stock_meta]=cce_transition(system,d.parameters,'labframe');
+result=test_close(result,'Compiled observed transition matches stock',...
+                  model.transition.alpha,stock_transition.alpha,0,0,...
+                  'Native observed-only preparation uses the same ordered physical state.');
+result=test_close(result,'Compiled observed energies match stock',...
+                  model.transition_meta.energies,stock_meta.energies,1e-13,1e-13,...
+                  'Independent stock Hamiltonian assembly validates the observed generator.');
+configuration=d.ensemble.spin_config; configuration=rmfield(configuration,'assignment');
+[retained,~]=cce_subsystem(model,2,configuration,[]);
+[H,R,K,pseq]=cce_generators(retained,d.parameters,[]);
+[~,aux]=free_evolution(retained,pseq,H,R,K);
+[v,e]=eig(full((H+H')/2),'vector');
+residual=norm(H*v-v.*e.','fro'); orthogonality=norm(v'*v-eye(size(H)),'fro');
+operations=12*size(H,1)^3; gamma=operations*eps/(1-operations*eps);
+bound=2*p.times(:)*(residual+pseq.cce_aux.roundoff_bound)+...
+      4*orthogonality+gamma*(1+p.times(:)*norm(H,'fro'));
+result=test_close(result,'Native coherent error bounds',aux.abs_error_bound,...
+                  repmat(bound,1,4),0,0,'The original propagation-error estimate is retained bitwise.');
+result=test_close(result,'Measured spectral residual',aux.eigen_residual,residual,...
+                  0,0,'Use the original Hamiltonian arithmetic, not a complex zero-copy.');
+result=test_true(result,'Exact-reference validity is separate from budget',...
+                   all(d.reduction.valid,'all')&&any(d.reduction.abs_error_bound>...
+                   p.cce.numerics.atol+p.cce.numerics.rtol*abs(d.reduction.value),'all'),...
+                   'A finite complete-bath density remains valid above the requested budget.');
+result=test_true(result,'Lower-order masks retain propagated errors',...
+                   any(~d.reduction.by_order_valid(:,:,1),'all'),...
+                   'The lower-order numerical budget still masks unresolved elements.');
+
 end
 
 

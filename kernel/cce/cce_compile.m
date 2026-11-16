@@ -17,7 +17,7 @@
 function model=cce_compile(spin_system,parameters,assumptions)
 
 % Validate native options without translating obsolete parameter forms
-[parameters,policy]=cce_options(spin_system,parameters,@cce_compile,assumptions);
+[parameters,~]=cce_options(spin_system,parameters,@cce_compile,assumptions);
 if ~all(isfield(parameters.cce.numerics,{'atol','rtol','max_memory_bytes'}))
     error('cce_compile:policy','Resolve atol, rtol and max_memory_bytes before compilation.');
 end
@@ -42,15 +42,6 @@ model.kind='cce_model'; model.formalism=formalism;
 model.isotopes=spin_system.comp.isotopes; model.groups={};
 if isfield(parameters.cce,'groups'), model.groups=parameters.cce.groups; end
 model.manifold_projectors=struct();
-if isfield(policy,'transition')
-    model.transition=policy.transition; model.transition_meta=policy.transition_meta;
-    dimension=numel(model.transition.alpha);
-    if 32*dimension^2>parameters.cce.numerics.max_memory_bytes
-        error('observed projectors exceed numerics.max_memory_bytes.');
-    end
-    model.manifold_projectors.alpha=model.transition.alpha*model.transition.alpha';
-    model.manifold_projectors.beta=model.transition.beta*model.transition.beta';
-end
 model.physical_ids=1:spin_system.comp.nspins;
 model.observed_ids=parameters.observed;
 model.bath_ids=parameters.cce.bath_spins;
@@ -175,6 +166,17 @@ if strcmp(model.backend,'direct')&&~model.direct_supported
     error('direct Hamiltonian is not validated for %s.',model.fallback_reason);
 end
 
+% Resolve the observed transition after compiling its native tensor model
+if isfield(parameters,'transition')
+    [model.transition,model.transition_meta]=cce_transition(model,parameters,assumptions);
+    dimension=numel(model.transition.alpha);
+    if 32*dimension^2>parameters.cce.numerics.max_memory_bytes
+        error('observed projectors exceed numerics.max_memory_bytes.');
+    end
+    model.manifold_projectors.alpha=model.transition.alpha*model.transition.alpha';
+    model.manifold_projectors.beta=model.transition.beta*model.transition.beta';
+end
+
 end
 
 % Apply the stock Cartesian retention convention to an ordered pair
@@ -210,6 +212,8 @@ switch strength
         % Leave unsupported domains for the stock backend
         tensor=zeros(3);
 end
+
+
 end
 
 

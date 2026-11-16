@@ -1,13 +1,14 @@
 % Free evolution of a retained cluster with experiment-owned detection.
 % Syntax:
 %
-%           answer=free_evolution(spin_system,parameters,H,R,K)
+%     [answer,aux]=free_evolution(spin_system,parameters,H,R,K)
 %
 % parameters.times gives elapsed times in seconds. rho0 and coil are explicit
 % observed-spin matrices, or transition selects preparation and detection.
 % preparation may contain state and detector descriptors. normalized defaults
 % to true for signals. output is signal, observable or density; density output
 % is the column-vectorised observed density, one row per elapsed time.
+% Optional aux retains coherent spectral residuals and absolute error bounds.
 % sequence is an optional finite-event array: target physical IDs, axis
 % (x/y/z or a unit vector), amplitude and detuning in rad/s, duration in
 % seconds, placement (absolute/fraction) and at (seconds/fraction). Drift
@@ -21,7 +22,7 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function answer=free_evolution(spin_system,parameters,H,R,K)
+function [answer,aux]=free_evolution(spin_system,parameters,H,R,K)
 
 % Preparation and detection belong to this experiment, not to its context
 grumble(spin_system,parameters,H,R,K);
@@ -43,9 +44,43 @@ end
 % Compile experiment-owned finite drives once for this retained subsystem
 [events,starts,drives]=finite_controls(spin_system,parameters,H);
 
+% Reuse the coherent spectrum and retain its measured numerical diagnostics
+aux=struct();
+coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
+if coherent
+    if any(~isfinite(generator),'all')||...
+       norm(generator-generator','fro')>size(generator,1)*eps(max(1,norm(generator,'fro')))
+        error('cce_evolution:hermiticity','Hilbert generators must be finite and Hermitian.');
+    end
+    [vectors,energies]=eig(full((generator+generator')/2),'vector');
+    aux.eigen_residual=norm(H*vectors-vectors.*energies.','fro');
+    aux.orthogonality_residual=norm(vectors'*vectors-eye(size(generator)),'fro');
+    aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
+    aux.backend=parameters.cce_aux.backend;
+    operations=12*size(generator,1)^3; gamma=operations*eps/(1-operations*eps);
+    bounds=2*parameters.times(:)*(aux.eigen_residual+aux.hamiltonian_bound)+...
+           4*aux.orthogonality_residual+...
+           gamma*(1+parameters.times(:)*norm(generator,'fro'));
+    if density
+        scale=ones(1,spin_system.observed_dimension^2);
+    else
+        if ~iscell(coil), detectors={coil}; else, detectors=coil; end
+        scale=cellfun(@(op)norm(op,2),detectors(:).');
+        if meta.normalized, scale=scale./abs(reference); end
+    end
+    aux.abs_error_bound=bounds.*scale;
+end
+
 % Every requested elapsed time starts from the same prepared density matrix
 for n=1:numel(parameters.times)
-    if isempty(events)
+    if coherent
+        if parameters.times(n)==0
+            rho=rho0;
+        else
+            u=vectors*diag(exp(-1i*energies*parameters.times(n)))*vectors';
+            rho=u*rho0*u';
+        end
+    elseif isempty(events)
         rho=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');
     else
         rho=driven_evolution(spin_system,generator,rho0,parameters.times(n),...

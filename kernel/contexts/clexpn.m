@@ -60,6 +60,9 @@ end
 
 % Compile immutable physical data, not a full-bath basis
 model=cce_compile(spin_system,parameters,assumptions);
+if isfield(model,'transition')
+    policy.transition=model.transition; policy.transition_meta=model.transition_meta;
+end
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
     model.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)

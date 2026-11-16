@@ -51,7 +51,7 @@ if isfield(physical,'assignment'), physical=rmfield(physical,'assignment'); end
 [spin_system,~]=cce_subsystem(model,cluster.sites,physical,[]);
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
 pulse_sequence=schedule.pulse_sequence;
-if isequal(pulse_sequence,@noise_correlation)
+if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)
     [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 else
     answer=pulse_sequence(spin_system,parameters,H,R,K);
@@ -61,7 +61,15 @@ end
 raw.cluster_id=cluster.id; raw.value=answer;
 raw.abs_error_bound=zeros(size(answer)); raw.valid=isfinite(answer);
 raw.weight=configuration.weight;
-if exist('aux','var')
+if exist('aux','var')&&isfield(aux,'abs_error_bound')
+    raw.abs_error_bound=aux.abs_error_bound;
+end
+if exist('aux','var')&&isfield(aux,'eigen_residual')
+    raw.eigen_residual=aux.eigen_residual;
+    raw.orthogonality_residual=aux.orthogonality_residual;
+    raw.hamiltonian_bound=aux.hamiltonian_bound; raw.backend=aux.backend;
+end
+if exist('aux','var')&&isfield(aux,'moment')
     raw.moment=aux.moment; raw.mean_time=aux.mean_time; raw.mean_zero=aux.mean_zero;
     raw.abs_error_bound=aux.abs_error_bound; raw.valid=aux.valid;
 end

@@ -25,3 +25,4 @@ Validate the new clexpn input ownership and resolve nonphysical defaults, withou
 This staged input service is independent of the unchanged old driver. The clexpn context and experiment registry are introduced later; no legacy translator is supplied.
 
 Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
+Transition eigensystem construction belongs to compilation, after native options validation. `cce_options` does not construct the observed Hamiltonian or return resolved transition metadata. The context still exposes the compiled transition and metadata in its policy diagnostics.

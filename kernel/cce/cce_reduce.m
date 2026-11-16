@@ -368,9 +368,13 @@ for n=1:count
     reduced.by_order_error=reduced.by_order_error+weights(n)*parts{n}.by_order_error;
     reduced.by_order_valid=reduced.by_order_valid&parts{n}.by_order_valid;
 end
-reduced.valid=reduced.valid&isfinite(reduced.value)&...
-              reduced.abs_error_bound<=options.numerics.atol+...
-              options.numerics.rtol*abs(reduced.value);
+% A finite exact reference remains valid even above the requested error budget
+reduced.valid=reduced.valid&isfinite(reduced.value);
+complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters));
+if ~complete||(isfield(parameters,'noise')&&parameters.noise.connected)
+    reduced.valid=reduced.valid&reduced.abs_error_bound<=options.numerics.atol+...
+                              options.numerics.rtol*abs(reduced.value);
+end
 reduced.reason=repmat({'ok'},size(reduced.value));
 reduced.reason(~reduced.valid)={'ensemble_invalid'};
 reduced.by_order_reason=repmat({'ok'},size(reduced.by_order));

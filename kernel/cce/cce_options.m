@@ -64,9 +64,7 @@ parameters.cce=c;
 
 % Validate resolved values and physical state ownership
 validate_options(spin_system,parameters);
-if isfield(parameters,'transition')
-    [policy.transition,policy.transition_meta]=cce_transition(spin_system,parameters,assumptions);
-elseif strcmp(c.approximation,'projected')
+if ~isfield(parameters,'transition')&&strcmp(c.approximation,'projected')
     error('cce_options:transition','Projected evolution requires an explicit transition selector.');
 end
 policy.order_requires_convergence=isempty(c.order);

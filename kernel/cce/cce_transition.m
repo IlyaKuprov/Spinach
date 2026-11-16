@@ -5,7 +5,8 @@
 %     [transition,meta]=cce_transition(spin_system,parameters,assumptions)
 %
 % Inputs:
-%   spin_system - canonical output of create; tensors already use rad/s
+%   spin_system - canonical create output or a compiled cce_model; tensors
+%                 already use rad/s
 %   parameters  - observed is a row of physical spin IDs; transition.spins
 %                 is the same ordered row. Choose exactly one selector:
 %                 ms is n-observed-by-2, levels is a 1-by-2 row of distinct
@@ -30,6 +31,12 @@
 
 function [transition,meta]=cce_transition(spin_system,parameters,assumptions)
 
+% A compiled model reuses the retained generator; ordinary callers use stock
+model=[];
+if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
+    model=spin_system; spin_system=model.spin_system;
+end
+
 % Check the selection before constructing the observed subsystem
 grumble(spin_system,parameters,assumptions);
 
@@ -39,25 +46,39 @@ selection=parameters.transition; ids=parameters.observed;
 dims=spin_system.comp.mults(ids); dimension=prod(dims);
 
 % Construct only the observed Hamiltonian in the declared physical frame
-system=spin_system;
-if isfield(system,'bas'), system=rmfield(system,'bas'); end
-system=kill_spin(system,setdiff(1:spin_system.comp.nspins,ids));
-bas.formalism='zeeman-hilb'; bas.approximation={'none'};
-system=basis(system,bas);
+angles=[0 0 0];
+if isfield(parameters,'orientation'), angles=parameters.orientation; end
 if ischar(assumptions), assumption_args={assumptions}; else, assumption_args=assumptions; end
-system=assume(system,assumption_args{:});
-if isfield(parameters,'orientation'), angles=parameters.orientation; else, angles=[0 0 0]; end
-[H,Q]=hamiltonian(system); H=full(H+orientation(Q,angles));
+native=~isempty(model)&&isfield(parameters.transition,'ms')&&...
+       strcmp(model.formalism,'zeeman-hilb')&&...
+       strcmp(model.parameters.cce.bath_state.mode,'mixed_product')&&...
+       (~isfield(model.parameters,'bath_jumps')||isempty(model.parameters.bath_jumps));
+if ~native
+    system=spin_system;
+    if isfield(system,'bas'), system=rmfield(system,'bas'); end
+    system=kill_spin(system,setdiff(1:spin_system.comp.nspins,ids));
+    bas.formalism='zeeman-hilb'; bas.approximation={'none'};
+    system=basis(system,bas);
+    system=assume(system,assumption_args{:});
+    if isfield(parameters,'orientation'), angles=parameters.orientation; else, angles=[0 0 0]; end
+    [H,Q]=hamiltonian(system); H=full(H+orientation(Q,angles));
 
-% Preserve the caller's tensor-product ordering rather than sorting spin IDs
-if numel(ids)>1
-    [~,order]=ismember(ids,sort(ids));
-    indices=reshape(1:dimension,fliplr(spin_system.comp.mults(sort(ids))));
-    indices=permute(indices,numel(ids)+1-fliplr(order));
-    indices=indices(:); H=H(indices,indices);
+    % Preserve the caller's tensor-product ordering rather than sorting spin IDs
+    if numel(ids)>1
+        [~,order]=ismember(ids,sort(ids));
+        indices=reshape(1:dimension,fliplr(spin_system.comp.mults(sort(ids))));
+        indices=permute(indices,numel(ids)+1-fliplr(order));
+        indices=indices(:); H=H(indices,indices);
+    end
+
+    % Check Hermiticity at the rounding scale of the observed Hamiltonian
+else
+    model.parameters.cce.meanfield='none'; model.formalism='zeeman-hilb';
+    config=struct('configuration_id',1,'state_id',1,'weight',1);
+    [system,~]=cce_subsystem(model,[],config,[]);
+    p=model.parameters; p.cce.approximation='generalized';
+    [H,~,~,~]=cce_generators(system,p,[]); H=full(H);
 end
-
-% Check Hermiticity at the rounding scale of the observed Hamiltonian
 tolerance=dimension*eps(max(1,norm(H,'fro')));
 if norm(H-H','fro')>tolerance
     error('cce_transition:hermiticity','The observed Hamiltonian must be Hermitian.');

@@ -98,6 +98,11 @@ for n=1:numel(names)
                     'The stock Liouville action retains its arithmetic estimate.');
         end
         reference_capture.(names{n}).diagnostics=diagnostics;
+    elseif strcmp(names{n},'cce_deer_bandwidth')
+        [answer,diagnostics]=cce_deer_bandwidth();
+        actual=diagnostics.reduction; actual.value=answer; actual.density=[];
+        [actual.reference_error,reference_capture.cce_deer_bandwidth]=...
+            cce_deer_bandwidth_reference(answer,diagnostics);
     elseif strcmp(names{n},'cce_polarized_bath')
         [answer,diagnostics]=cce_polarized_bath();
         actual=diagnostics.reduction; actual.value=answer;
@@ -141,15 +146,20 @@ for n=1:numel(names)
     if strcmp(names{n},'cce_deer_bandwidth')
 
         % Excluding the pump resonance must remove its selected pulse
-        parameters=actual.input_parameters;
-        parameters.deer.detuning_center=2*pi*1e7;
+        parameters=diagnostics.parameters; parameters.pump.center=1e7;
         sys.magnet=0.01; sys.isotopes={'E','E','E'}; sys.output='hush';
-        inter.zeeman.scalar={0,0,0};
-        model=cce_prepare(create(sys,inter),parameters);
-        schedule=cce_controls(model,[],[],[],parameters);
+        sys.parallel={'local',1}; inter=struct('zeeman',struct('scalar',{{0,0,0}}));
+        spin_system=create(sys,inter);
+        unpumped=clexpn(spin_system,@bath_pumped_hahn,parameters,'labframe');
+        parameters.pump.allow_empty=false; rejected=false;
+        try
+            clexpn(spin_system,@bath_pumped_hahn,parameters,'labframe');
+        catch exception
+            rejected=strcmp(exception.identifier,'bath_pumped_hahn:empty');
+        end
         result=test_true(result,'DEER example excludes pump resonance',...
-                         isempty(schedule.selected_sites{2}),...
-                         'The pump pulse must follow the documented frequency window.');
+                         rejected&&max(abs(unpumped-1))<1e-12,...
+                         'The native selector removes the pulse and enforces allow_empty.');
     end
     if strcmp(names{n},'cce_molecular_powder')
 
@@ -1619,6 +1629,32 @@ populations=real(answer(:,1:3:end));
 snapshot=struct('drive',drive,'duration',duration,'exact',exact,...
     'fullrho',fullrho,'h',h,'ids',ids,'populations',populations,...
     'rho0',rho0,'small',small,'t',t,'u',u,'v',v,'x',x,'y',y,'z',z);
+
+end
+
+% Check the full three-spin pump response against direct density propagation
+function [reference_error,snapshot]=cce_deer_bandwidth_reference(answer,diagnostics)
+
+% Assemble the independent Cartesian Hamiltonian from physical toy couplings
+sx=[0 1;1 0]/2; sy=[0 -1i;1i 0]/2; sz=diag([0.5 -0.5]);
+x1=kron(sx,eye(4)); x2=kron(eye(2),kron(sx,eye(2)));
+y2=kron(eye(2),kron(sy,eye(2))); z2=kron(eye(2),kron(sz,eye(2)));
+x3=kron(eye(4),sx); y3=kron(eye(4),sy); z3=kron(eye(4),sz);
+z1=kron(sz,eye(4));
+H=2*pi*(20000*z1*z2+12000*z1*z3+200*x2*x3+200*y2*y3-400*z2*z3);
+rho0=kron([0.5 0.5;0.5 0.5],eye(4)/4); detector=kron([0 1;0 0],eye(4));
+pump=expm(-1i*pi*x2); refocus=expm(-1i*pi*x1);
+reference=complex(zeros(size(answer))); times=diagnostics.parameters.times;
+
+% The pump precedes the refocusing pulse; zero time is the initial reference
+for n=1:numel(times)
+    u=expm(-1i*H*times(n)/4); v=expm(-1i*H*times(n)/2);
+    if times(n)==0, rho=rho0;
+    else, propagator=v*refocus*u*pump*u; rho=propagator*rho0*propagator'; end
+    reference(n)=conj(trace(detector'*rho)/trace(detector'*rho0));
+end
+reference_error=max(abs(answer-reference));
+snapshot=struct('reference',reference,'reference_error',reference_error);
 
 end
 

@@ -57,7 +57,8 @@ if isfield(physical,'assignment'), physical=rmfield(physical,'assignment'); end
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
 pulse_sequence=schedule.pulse_sequence;
 if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@hahn_echo)
+   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@hahn_echo)||...
+   isequal(pulse_sequence,@bath_pumped_hahn)
     [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 else
     answer=pulse_sequence(spin_system,parameters,H,R,K);

@@ -49,7 +49,67 @@ p.cce.approximation='projected'; projected=clexpn(spin_system,@hahn_echo,p,'labf
 result=test_close(result,'Projected invariant transition',projected,answer,1e-13,1e-13,...
                   'Explicit branch generators reproduce the physical echo.');
 
-% Explicit evaluator identity survives conditional subsets and full-bath paths
+% Exterior pumping follows the selected physical ensemble
+p.pump=struct('sites',2,'center',0,'halfwidth',0,...
+              'units','Hz','fraction',0.25,'allow_empty',false);
+[pumped,pump_diagnostics]=clexpn(spin_system,@bath_pumped_hahn,p,'labframe');
+result=test_close(result,'Exterior spin omitted in the empty cluster',pumped,...
+                  cos(2*pi*7*p.times(:)/4),1e-12,1e-12,...
+                  'The empty cluster omits unconditioned exterior rotations.');
+result=test_true(result,'Projected pump diagnostics retained',...
+                 isfield(pump_diagnostics.raw{1},'eigen_residual'),...
+                 'Branch spectra and arithmetic bounds accompany the signal.');
+
+% Both pulse orderings and coincident pulses have the same Ising modulation
+for fraction=[0 0.25 0.5 0.75 1]
+    varied=p; varied.pump.fraction=fraction;
+    observed=clexpn(spin_system,@bath_pumped_hahn,varied,'labframe');
+    result=test_close(result,sprintf('Pump fraction %g',fraction),observed,...
+                      cos(2*pi*7*p.times(:)*min(fraction,1-fraction)),1e-12,1e-12,...
+                      'Endpoint and coincident ideal pulses retain physical ordering.');
+end
+
+% A sampled no-field ensemble also allows selected exterior spin rotations
+sampled=p; sampled.cce.bath_state=struct('mode','sampled','basis','uniform',...
+                                       'probabilities','uniform','samples',4,'seed',19);
+[sampled_signal,sampled_diagnostics]=clexpn(spin_system,@bath_pumped_hahn,sampled,'labframe');
+assignment=[sampled_diagnostics.ensemble.spin_config.assignment];
+expected=mean(exp(-1i*2*pi*7*p.times(:)*(1.5-assignment)/2),2);
+result=test_close(result,'Sampled exterior pump ensemble',sampled_signal,expected,1e-12,1e-12,...
+                  'Conditioning is absent and completed expansions are averaged.');
+
+p.cce.meanfield='static'; failed=false;
+try
+    clexpn(spin_system,@bath_pumped_hahn,p,'labframe');
+catch exception
+    failed=strcmp(exception.identifier,'bath_pumped_hahn:exterior');
+end
+result=test_true(result,'Static exterior pumping rejected',failed,...
+                 'A fixed mean field cannot silently represent a rotated exterior spin.');
+p.cce.meanfield='none';
+for field={'center','halfwidth','fraction','units','allow_empty','sites','species'}
+    invalid=p;
+    switch field{1}
+        case 'center', invalid.pump.center=NaN;
+        case 'halfwidth', invalid.pump.halfwidth=-1;
+        case 'fraction', invalid.pump.fraction=2;
+        case 'units', invalid.pump.units='ppm';
+        case 'allow_empty', invalid.pump.allow_empty=1;
+        case 'sites', invalid.pump.sites=1;
+        case 'species', invalid.pump.species={'nonsense'};
+    end
+    failed=false;
+    try
+        clexpn(spin_system,@bath_pumped_hahn,invalid,'labframe');
+    catch exception
+        failed=startsWith(exception.identifier,'bath_pumped_hahn:')||...
+               startsWith(exception.identifier,'cce_options:');
+    end
+    result=test_true(result,['Pump validates ' field{1}],failed,...
+                     'Every physical selector field must be checked before use.');
+end
+
+% Interlaced conditioning retains the original configuration rows
 [legacy_model,q]=fixture(); ensemble=cce_states(legacy_model,q);
 q.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3]}});
 family=cce_clusters(legacy_model,cce_graph(legacy_model,q),q);

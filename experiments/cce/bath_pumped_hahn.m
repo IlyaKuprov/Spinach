@@ -1,23 +1,31 @@
 % Bath-pumped Hahn echo with an explicitly selected spectral window.
 % Syntax:
 %
-%                 E=bath_pumped_hahn(spin_system,parameters,H,R,K)
+%                 [E,aux]=bath_pumped_hahn(spin_system,parameters,H,R,K)
 %
 % parameters.times contains total sequence durations in seconds. transition
 % selects the observed two-state transition; rho0/coil or preparation may
 % override the prepared density and detector. normalized defaults to true
-% and divides by the actual detected initial reference. nloops is required
-% for CPMG. bath_pumped_hahn requires pump.center, halfwidth, units (Hz or
+% and divides by the actual detected initial reference. The pump requires
+% pump.center, halfwidth, units (Hz or
 % rad/s), fraction and allow_empty; optional sites/species restrict the bath.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
 % conventional generators or explicitly tagged projected branch generators.
 %
+% Pump center and halfwidth are finite scalars, halfwidth is nonnegative;
+% fraction is in [0,1] and allow_empty is a logical scalar. sites lists
+% distinct physical bath IDs; species is a row cell of isotope labels.
+% Exterior selected spins are omitted when cce.meanfield is none: each
+% retained cluster evolves its marginal bath state. Static conditioned
+% exterior spins cannot be pumped without time-dependent mean fields.
+% aux contains spectral/error diagnostics for coherent projected echoes.
+%
 % ilya.kuprov@weizmann.ac.il
 
-function E=bath_pumped_hahn(spin_system,parameters,H,R,K)
+function [E,aux]=bath_pumped_hahn(spin_system,parameters,H,R,K)
 
 % Preparation and detection are owned by this experiment
-grumble(spin_system,parameters,H,R,K);
+grumble(spin_system,parameters,H,R,K); aux=struct();
 if ~isfield(parameters,'normalized'), parameters.normalized=true; end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
 if ~iscell(coil), coil={coil}; end
@@ -51,17 +59,27 @@ ids=ids(abs(frequencies-factor*spec.center)<=factor*spec.halfwidth);
 if isempty(ids)&&~spec.allow_empty
     error('bath_pumped_hahn:empty','Pump window selected no bath spins.');
 end
-if isfield(parameters.cce,'meanfield')&&~strcmp(parameters.cce.meanfield,'off')&&...
+if isfield(parameters.cce,'meanfield')&&strcmp(parameters.cce.meanfield,'static')&&...
    ~all(ismember(ids,spin_system.sites))
-    error('bath_pumped_hahn:exterior','Pumping conditioned exterior spins requires the ensemble contract.');
+    error('bath_pumped_hahn:exterior','Pumping static exterior mean fields requires time-dependent conditioning.');
 end
-ids=intersect(ids,spin_system.sites,'stable'); pump_operator=zeros(dc*db);
+ids=intersect(ids,spin_system.sites,'stable');
+[fractions,order]=sort([0.5 spec.fraction]); pulse_kind=[1 2]; pulse_kind=pulse_kind(order);
+
+% Retain ordered branch propagators and their numerical error diagnostics
+if projected&&isempty(H.dissipator)&&...
+   ~isfield(parameters,'rho0')&&~isfield(parameters,'preparation')&&~isfield(parameters,'coil')
+    [E,aux]=projected_echo(spin_system,parameters,H,ids,fractions,pulse_kind,reference,meta);
+    return
+end
+
+% Embed retained bath rotations for density and coherence-block propagation
+pump_operator=zeros(dc*db);
 for id=reshape(ids,1,[])
     pump_operator=pump_operator+cce_operator(spin_system,'Lx',id);
 end
 if projected, pump_operator=pump_operator(1:db,1:db); end
 pump_rotation=expm(-1i*pi*pump_operator);
-[fractions,order]=sort([0.5 spec.fraction]); pulse_kind=[1 2]; pulse_kind=pulse_kind(order);
 
 % At zero elapsed time no control is applied, matching the reference signal
 for n=1:numel(parameters.times)
@@ -125,6 +143,99 @@ if ~isfield(parameters,'pump')||~isstruct(parameters.pump)||...
    ~all(isfield(parameters.pump,{'center','halfwidth','units','fraction','allow_empty'}))
     error('bath_pumped_hahn:pump','Supply a complete physical pump selector.');
 end
+spec=parameters.pump;
+if ~isscalar(spec)||~isnumeric(spec.center)||~isreal(spec.center)||...
+   ~isscalar(spec.center)||~isfinite(spec.center)||...
+   ~isnumeric(spec.halfwidth)||~isreal(spec.halfwidth)||...
+   ~isscalar(spec.halfwidth)||~isfinite(spec.halfwidth)||spec.halfwidth<0||...
+   ~ischar(spec.units)||~ismember(spec.units,{'Hz','rad/s'})||...
+   ~isnumeric(spec.fraction)||~isreal(spec.fraction)||...
+   ~isscalar(spec.fraction)||~isfinite(spec.fraction)||...
+   spec.fraction<0||spec.fraction>1||...
+   ~islogical(spec.allow_empty)||~isscalar(spec.allow_empty)
+    error('bath_pumped_hahn:pump','Use finite physical units, nonnegative width and a fraction in [0,1].');
+end
+if isfield(spec,'sites')&&(~isnumeric(spec.sites)||~isreal(spec.sites)||...
+   (~isempty(spec.sites)&&~isrow(spec.sites))||...
+   any(~ismember(spec.sites,spin_system.model.bath_ids))||...
+   numel(unique(spec.sites))~=numel(spec.sites))
+    error('bath_pumped_hahn:sites','Pump sites must be distinct physical bath IDs.');
+end
+if isfield(spec,'species')&&(~iscellstr(spec.species)||~isrow(spec.species)||...
+   any(~ismember(spec.species,spin_system.model.isotopes)))
+    error('bath_pumped_hahn:species','Pump species must be a row of isotope labels from the model.');
+end
+end
+
+% Propagate both invariant branches with the physical pulse projections
+function [E,aux]=projected_echo(system,parameters,H,ids,fractions,kinds,reference,meta)
+
+% Resolve both spectra once for the complete observation-time axis
+[va,ea]=eig(full((H.left+H.left')/2),'vector');
+[vb,eb]=eig(full((H.right+H.right')/2),'vector');
+ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
+oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
+residual=max(ra,rb); orthogonality=max(oa,ob); db=system.bath_dimension;
+
+% Construct the physical ideal rotations in retained spin order
+transition=system.model.transition;
+pa=kron(transition.alpha,eye(db)); pb=kron(transition.beta,eye(db));
+observed=kron((transition.alpha*transition.beta'+...
+               transition.beta*transition.alpha')/2,eye(db));
+pumped=zeros(system.dimension);
+for id=reshape(ids,1,[]), pumped=pumped+cce_operator(system,'Lx',id); end
+rotations={expm(-1i*(pi*full(observed))),expm(-1i*(pi*full(pumped)))};
+pulses={{pa'*rotations{1}*pb,pb'*rotations{1}*pa},...
+        {pa'*rotations{2}*pa,pb'*rotations{2}*pb}};
+rho_b=1;
+for id=system.sites
+    where=find(system.configuration.bath_ids==id,1);
+    rho_b=kron(rho_b,system.configuration.bath_rho{where});
+end
+E=complex(zeros(numel(parameters.times),1));
+bounds=zeros(size(E));
+
+% Match the ordered branch products and their arithmetic error estimate
+for n=1:numel(parameters.times)
+    time=parameters.times(n); ua=eye(db); ub=eye(db); swapped=false; previous=0;
+    if time~=0
+        for j=1:numel(fractions)
+            duration=(fractions(j)-previous)*time;
+            left=(va.*exp(-1i*duration*ea).')*va';
+            right=(vb.*exp(-1i*duration*eb).')*vb';
+            if swapped, ua=right*ua; ub=left*ub;
+            else, ua=left*ua; ub=right*ub; end
+            pair=pulses{kinds(j)};
+            if kinds(j)==1
+                if ~swapped, ua=pair{2}*ua; ub=pair{1}*ub;
+                else, ua=pair{1}*ua; ub=pair{2}*ub; end
+                swapped=~swapped;
+            elseif ~swapped
+                ua=pair{1}*ua; ub=pair{2}*ub;
+            else
+                ua=pair{2}*ua; ub=pair{1}*ub;
+            end
+            previous=fractions(j);
+        end
+        duration=(1-previous)*time;
+        left=(va.*exp(-1i*duration*ea).')*va';
+        right=(vb.*exp(-1i*duration*eb).')*vb';
+        if swapped, ua=right*ua; ub=left*ub;
+        else, ua=left*ua; ub=right*ub; end
+        E(n)=trace(ua*rho_b*ub');
+    else
+        E(n)=1;
+    end
+    operations=28*db^3; gamma=operations*eps/(1-operations*eps);
+    bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+12*orthogonality+...
+              gamma*(1+time*H.hamiltonian_norm);
+end
+if ~meta.normalized, E=E*reference; bounds=bounds*abs(reference); end
+aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
+           'orthogonality_residual',orthogonality,...
+           'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
+           'backend',parameters.cce_aux.backend);
+
 end
 
 

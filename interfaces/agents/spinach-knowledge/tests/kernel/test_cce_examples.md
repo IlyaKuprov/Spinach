@@ -47,3 +47,5 @@ The native polarized-bath, two-observed-centre and dissipative-bath examples ret
 The noise example uses native operator descriptors. The cosine reference and original transverse operator are retained in the example-test capture. Native noise tests compare descriptors and explicit Hermitian matrices before connected ensemble reduction and reject invalid descriptor fields.
 
 gcce_finite_drive returns native answer/diagnostics. Its independent two-spin expm propagation and frozen physical reference arrays now live in the test, not in the example.
+
+The migrated cce_deer_bandwidth example returns [answer,diagnostics]. Its independent test uses direct three-spin density-matrix expm propagation with an observed refocusing pulse and selected bath pulse. A native clexpn check moves the spectral window away, verifies the no-pump limit, and verifies allow_empty=false rejects the empty selector. No legacy parameter assembly is used for this example.

@@ -1,23 +1,11 @@
 # examples/cce/cce_deer_bandwidth.m
 
-- Signature: `result=cce_deer_bandwidth()`
+Signature: `[answer,diagnostics]=cce_deer_bandwidth()`
 
-## Purpose
+The self-contained three-electron toy system uses ordinary sys/inter input, no full-bath basis, and one call to clexpn with @bath_pumped_hahn. It is a finite-cluster demonstration, not a published material fit.
 
-Hahn echo with a frequency-selected bath pump and finite bandwidth. The example reports its finite-cluster result without claiming a published material fit.
+The observed spin is physical site 1, with transition ms=[0.5 -0.5]. The pump selects bath site 2 at zero frequency, with 100 kHz halfwidth (200 kHz full width), Hz units, fraction 0.25, and allow_empty=true. The ideal observed-spin refocusing pulse is at half the total echo duration. The projected expansion retains both bath spins at order two. Numerical tolerances remain atol=rtol=1e-8 and the memory budget is 2^28 bytes.
 
-## Spin system and sequence
+The default no-mean-field product-density ensemble omits a selected exterior spin from each retained marginal cluster, including the empty cluster. Static conditioned exterior pumping is explicitly unsupported. Changing the spectral window to select no spins removes the bath rotation when allow_empty=true.
 
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_deer_bandwidth.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_deer_bandwidth.m).
-
-Bandwidth selection uses `parameters.deer` with canonical rad/s detuning and halfwidth, explicit physical sites, and an explicit empty-selection policy; the unsupported `parameters.controls` container is not used.
-
-The 200 kHz full pump width is represented by a 100 kHz halfwidth converted once to rad/s.
-
-The pump event targets `'deer'`, so moving the pump window away from site 2 removes that pulse when `allow_empty=true`; numeric event targets are not frequency-selected.
+The first output is the natural complex echo array, and the second contains native reduction, ensemble and raw numerical diagnostics. test_cce_examples checks the result against direct three-spin density-matrix propagation; test_clexpn_context checks the analytic one-bath-spin response and pump selector validation.

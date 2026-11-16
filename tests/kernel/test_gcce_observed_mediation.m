@@ -15,17 +15,17 @@ inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)}; inter.coupling.matrix=cell(3);
 spin_system=create(sys,inter);
 spin_system.inter.coupling.matrix{1,2}=diag([80 80 0]);
 spin_system.inter.coupling.matrix{1,3}=diag([110 110 0]);
-p.observed_spins=1; p.bath_spins=[2 3]; p.method='gcce'; p.expansion='standard';
-p.quantity='signal'; p.normalized=true; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
-p.rho0=ones(2)/2; p.assumptions='labframe'; p.orientation=[0 0 0];
-p.interaction_cutoff=Inf; p.graph=struct('mode','coupling','threshold',0,'score','coupling_norm');
-p.meanfield='none'; p.times=linspace(0,0.08,41); p.sequence=[];
-p.bath_state=struct('mode','mixed_product');
-p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+p.observed=1; p.cce.bath_spins=[2 3]; p.cce.approximation='generalized'; p.cce.expansion='standard';
+p.output='signal'; p.normalized=true; p.transition.spins=1; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
+p.rho0=ones(2)/2; p.orientation=[0 0 0];
+p.cce.interaction_cutoff=Inf; p.cce.graph=struct('mode','coupling','threshold',0,'score','coupling_norm');
+p.cce.meanfield='none'; p.times=linspace(0,0.08,41);
+p.cce.bath_state=struct('mode','mixed_product');
+p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
 % Compare singletons with the retained exact observed-mediated pair
-p.order=1; first=cce(spin_system,p); p.order=2; second=cce(spin_system,p);
-result=test_true(result,'pair retained',numel(second.clusters)==3,...
+p.cce.order=1; first=clexpn(spin_system,@free_evolution,p,'labframe'); p.cce.order=2; [second,second_diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
+result=test_true(result,'pair retained',numel(second_diagnostics.clusters)==3,...
                  'Bath-bath zero does not factorize transverse observed exchange.');
 
 % Construct a separate full three-spin dense exponential reference
@@ -37,13 +37,13 @@ for k=1:numel(p.times)
     u=expm(-1i*H*p.times(k)); evolved=u*rho*u';
     reference(k)=2*trace(evolved(1:4,5:8));
 end
-result=test_close(result,'exact pair',second.value,reference,1e-11,1e-11,...
+result=test_close(result,'exact pair',second,reference,1e-11,1e-11,...
                   'Independent full three-spin Kronecker/expm reference.');
-difference=max(abs(first.value-second.value));
+difference=max(abs(first-second));
 result=test_true(result,'nonfactorization measured',difference>1e-2,...
                  'Observed-spin exchange creates a nonzero irreducible bath-pair factor.');
 metrics.first_order_error=difference;
-metrics.full_order_error=max(abs(second.value-reference));
+metrics.full_order_error=max(abs(second-reference));
 
 % Resolve two independently coupled observed spins with joint detection
 sys.isotopes={'1H','1H','13C','13C'};
@@ -51,28 +51,28 @@ inter.zeeman.matrix=repmat({zeros(3)},1,4); inter.coupling.matrix=cell(4);
 spin_system=create(sys,inter);
 spin_system.inter.coupling.matrix{1,3}=diag([0 0 2]);
 spin_system.inter.coupling.matrix{2,4}=diag([0 0 2]);
-p.observed_spins=[1 2]; p.bath_spins=[3 4]; p.rho0=ones(4)/4; p.transition=struct();
-p.quantity='observable'; p.coil=kron(x,eye(2))+kron(eye(2),x);
-p.times=[0 1]; p.order=2; reference=cos(p.times(:));
-p.averaging='internal_then_expansion';
+p.observed=[1 2]; p=rmfield(p,'transition'); p.cce.bath_spins=[3 4]; p.rho0=ones(4)/4;
+p.output='observable'; p.coil=kron(x,eye(2))+kron(eye(2),x);
+p.times=[0 1]; p.cce.order=2; reference=cos(p.times(:));
+p.cce.averaging='internal_then_expansion';
 
 % Check unitary and master-equation paths against the exact signal
 for method={'gcce','megcce'}
-    p.method=method{1};
-    if strcmp(p.method,'megcce'), p.jumps=struct([]); end
+    p.cce.approximation='generalized';
+    if strcmp(method{1},'megcce'), p.bath_jumps=struct([]); end
     for mode={'mixed_product','sampled'}
-        p.bath_state=struct('mode',mode{1});
+        p.cce.bath_state=struct('mode',mode{1});
         if strcmp(mode{1},'sampled')
-            p.bath_state.samples=4; p.bath_state.seed=11; p.bath_state.basis='uniform';
-            p.bath_state.probabilities={ones(2,1)/2,ones(2,1)/2};
+            p.cce.bath_state.samples=4; p.cce.bath_state.seed=11; p.cce.bath_state.basis='uniform';
+            p.cce.bath_state.probabilities={ones(1,2)/2,ones(1,2)/2};
         end
-        actual=cce(spin_system,p);
+        actual=clexpn(spin_system,@free_evolution,p,'labframe');
         name=['joint detection ' method{1} ' ' mode{1}];
-        result=test_close(result,name,actual.value,reference,1e-8,1e-8,...
+        result=test_close(result,name,actual,reference,1e-8,1e-8,...
                           'Disconnected Hamiltonian components need not factorize a sum detection operator.');
-        metrics.([method{1} '_' mode{1} '_joint_error'])=max(abs(actual.value-reference));
+        metrics.([method{1} '_' mode{1} '_joint_error'])=max(abs(actual-reference));
     end
-    if isfield(p,'jumps'), p=rmfield(p,'jumps'); end
+    if isfield(p,'bath_jumps'), p=rmfield(p,'bath_jumps'); end
 end
 
 % Report the measured metrics

@@ -13,3 +13,5 @@ Hahn echo also supports generalized `output='density'`, with column-vectorised o
 The optional second output carries spectral residuals, orthogonality residuals and absolute numerical error estimates for coherent projected Hahn echoes. The two invariant-branch spectra are resolved once per retained cluster. Branch propagator products preserve the physical ideal-pulse phase and the zero-time identity; no legacy driver or event-array adapter is called.
 
 Projected zero-duration Hahn propagation evaluates the retained bath density trace, preserving floating-point identity for mixed baths whose dimension is not a power of two. The six-state electron/nitrogen regression checks this exactly.
+
+The polarized two-proton example supplies sampled Zeeman-basis populations through parameters.cce.bath_state and averages after expansion. The returned signal remains separate from estimator standard error and deterministic summation bounds in diagnostics.reduction.

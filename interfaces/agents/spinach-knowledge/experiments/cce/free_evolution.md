@@ -12,3 +12,7 @@ Finite controls are owned by this experiment. `parameters.sequence` is an option
 ## Coherent numerical diagnostics
 
 The optional second output in `[answer,aux]=free_evolution(spin_system,parameters,H,R,K)` carries `abs_error_bound`, `eigen_residual`, `orthogonality_residual`, `hamiltonian_bound` and `backend` for conventional coherent free evolution. One eigensystem is reused for all requested times; each state is evaluated from the initial density, never recursively. Residuals use the original Hamiltonian, preserving real versus complex arithmetic. Finite-drive and projected branches retain their existing propagation.
+
+## Generalized Liouville density transport
+
+For density output without finite events, the zeeman-liouv path uses the stock step exponential action (or stock propagator when explicitly selected), with prop_chop=0. Its auxiliary absolute error estimate is 64*eps*dimension*(1+norm(generator,1)*time) per density element. This preserves the established master-equation numerical path and its diagnostics. Coherent Hilbert, projected, controlled, and signal-only paths retain their existing contracts.

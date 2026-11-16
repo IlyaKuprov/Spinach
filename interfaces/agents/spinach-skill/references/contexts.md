@@ -542,3 +542,9 @@ clexpn(spin_system,pulse_sequence,parameters,assumptions) follows the Spinach co
 ## Native dissipative, noise and ensemble contracts
 
 Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalized elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
+
+### Native sampled and dissipative examples
+
+Use cce_polarized_bath, gcce_two_centres, and mecce_dissipative_bath as native clexpn examples. All return [answer,diagnostics]. Specify sampled probability rows and use the 'uniform' Zeeman-basis selector instead of assembling basis matrices; select multispin transition preparation by physical-ID/ms descriptors and dissipative bath operators by 'L+'/'L-'/Cartesian descriptors. Dense/exhaustive checks belong in test_cce_examples, not the example scripts.
+
+Generalized Liouville density output without controls preserves the stock step path and its arithmetic estimate. Ensemble arithmetic summation error is distinct from estimator uncertainty. Do not delete legacy entry points yet: the bath-pump exterior-spin contract, descriptor-only noise operator input, outer orientation dispatcher, and a named scalar finite-drive experiment still need decisions before their four remaining legacy examples can satisfy the requested no-event-array/no-manual-operator form.

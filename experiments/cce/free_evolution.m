@@ -47,6 +47,18 @@ end
 % Reuse the coherent spectrum and retain its measured numerical diagnostics
 aux=struct();
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
+liouville=density&&isempty(events)&&~isstruct(H)&&...
+          strcmp(spin_system.formalism,'zeeman-liouv');
+
+% Preserve the stock density action and its arithmetic estimate
+if liouville
+    engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv';
+    engine.tols.prop_chop=0;
+    scale=ones(1,size(answer,2));
+    argument=norm(-1i*generator,1)*parameters.times(:);
+    aux.abs_error_bound=(64*eps*size(generator,1)*(1+argument))*scale;
+    aux.error_bound_kind='floating_point_estimate';
+end
 if coherent
     if any(~isfinite(generator),'all')||...
        norm(generator-generator','fro')>size(generator,1)*eps(max(1,norm(generator,'fro')))
@@ -79,6 +91,13 @@ for n=1:numel(parameters.times)
         else
             u=vectors*diag(exp(-1i*energies*parameters.times(n)))*vectors';
             rho=u*rho0*u';
+        end
+    elseif liouville
+        if isfield(parameters.cce.numerics,'propagator')&&...
+           strcmp(parameters.cce.numerics.propagator,'stock')
+            rho=propagator(engine,generator,parameters.times(n))*rho0;
+        else
+            rho=step(engine,generator,rho0,parameters.times(n));
         end
     elseif isempty(events)
         rho=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');

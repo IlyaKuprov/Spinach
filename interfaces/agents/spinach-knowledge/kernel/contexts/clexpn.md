@@ -12,3 +12,5 @@ Hahn echo also supports generalized `output='density'`, with column-vectorised o
 
 Sampled assignments use configuration-indexed Threefry substreams, preserving deterministic physical state IDs independently of worker scheduling. Density-only free evolution needs an observed initial density but no receiver operator.
 Resolved transition policy metadata is copied from the compiled model; transition construction is not repeated in options validation. Coherent free-evolution raw records preserve measured spectral residuals and absolute propagation-error estimates. Exact-reference validity and budget satisfaction are distinct.
+
+The polarized-bath, two-observed-centre, and dissipative-bath examples use native hahn_echo/free_evolution calls and return [answer,diagnostics]. Sampled probability tables are rows; the 'uniform' basis selector names the standard Zeeman basis independently of the supplied probabilities. Reduced-density columns use column-major matrix ordering. Independent dense and exhaustive reference calculations are in test_cce_examples.

@@ -1,17 +1,7 @@
 # examples/cce/mecce_dissipative_bath.m
 
-- Signature: `result=mecce_dissipative_bath()`
+Signature: [answer,diagnostics]=mecce_dissipative_bath()
 
-## Purpose
+An observed electron and one bath carbon-13 nucleus evolve under the illustrative hyperfine tensor diag([1100 900 2200]) Hz and a nuclear raising-jump dissipator with rate 3000 per second. Standard sys/inter/bas/parameters blocks select a zeeman-liouv retained basis, generalized CCE order 1, transition preparation, density output, and bath_jumps with the physical descriptor 'L+'. clexpn calls free_evolution; the example constructs no state, detector, or jump matrix.
 
-A observed spin coupled to a phenomenologically relaxing spin-half bath. The example reports its finite-cluster result without claiming a published material fit.
-
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [mecce_dissipative_bath.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/mecce_dissipative_bath.m).
+answer is 31-by-4: column-vectorized observed 2-by-2 density matrices, one row per time on 0 to 200 microseconds. The plotted signal is real(answer(:,3)). Uncontrolled generalized Liouville density propagation uses the stock exponential-action step with entry chopping disabled and transports its floating-point estimate. Independent dense Liouvillian/expm propagation and the original comparison curve remain in test_cce_examples. The supplied jump rate is phenomenological, not a microscopically derived T1.

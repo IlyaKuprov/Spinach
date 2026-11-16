@@ -61,7 +61,8 @@ for n=1:numel(names)
         result=test_true(result,[names{n} ' projected error bounds'],...
                          all(diagnostics.reduction.abs_error_bound>0),...
                          'Projected spectral error bounds must reach the reducer.');
-    elseif ismember(names{n},{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp'})
+    elseif ismember(names{n},{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp',...
+                             'gcce_two_centres','mecce_dissipative_bath'})
         [answer,diagnostics]=feval(names{n});
         actual=diagnostics.reduction; actual.times=diagnostics.parameters.times(:);
 
@@ -82,7 +83,34 @@ for n=1:numel(names)
                 [actual.reference_error,reference_capture.gcce_highspin_siv]=gcce_highspin_siv_reference(answer);
             case 'gcce_votpp'
                 [actual.reference_error,reference_capture.gcce_votpp]=gcce_votpp_reference(answer);
+            case 'gcce_two_centres'
+                [actual.reference_error,reference_capture.gcce_two_centres]=...
+                    gcce_two_centres_reference(answer,diagnostics);
+            case 'mecce_dissipative_bath'
+                [actual.reference_error,reference_capture.mecce_dissipative_bath]=...
+                    mecce_dissipative_bath_reference(answer,diagnostics);
+                result=test_true(result,'Liouville arithmetic bounds',...
+                    all(diagnostics.reduction.abs_error_bound>0,'all'),...
+                    'The stock Liouville action retains its arithmetic estimate.');
         end
+        reference_capture.(names{n}).diagnostics=diagnostics;
+    elseif strcmp(names{n},'cce_polarized_bath')
+        [answer,diagnostics]=cce_polarized_bath();
+        actual=diagnostics.reduction; actual.value=answer;
+        [actual.sampling_error,reference_capture.cce_polarized_bath]=...
+            cce_polarized_bath_reference(answer,diagnostics);
+        actual.density=[];
+        reference_capture.cce_polarized_bath.diagnostics=diagnostics;
+        parts=diagnostics.reduction.samples; weights=diagnostics.reduction.weights;
+        bound=zeros(size(answer)); magnitude=zeros(size(answer));
+        for sample=1:numel(parts)
+            bound=bound+weights(sample)*parts{sample}.abs_error_bound;
+            magnitude=magnitude+weights(sample)*abs(parts{sample}.value);
+        end
+        operations=4*numel(parts); rounding=operations*eps/(1-operations*eps);
+        result=test_close(result,'Sampled bath arithmetic bound',...
+            diagnostics.reduction.abs_error_bound,bound+rounding*magnitude,0,0,...
+            'Deterministic summation error is distinct from estimator uncertainty.');
     else
         actual=feval(names{n});
     end
@@ -1328,6 +1356,226 @@ snapshot.reference_error=reference_error;
 snapshot.full_order_error=max(abs(answer-full_result.value));
 snapshot.full_answer=full_result.value;
 snapshot.full_diagnostics=full_diagnostics;
+
+end
+
+% Independent dense reference for the migrated gcce_two_centres example
+function [reference_error,snapshot]=gcce_two_centres_reference(answer,diagnostics)
+
+% Magnet and isotopes; zero electron g isolates the model energy scales
+sys.magnet=0; sys.isotopes={'E','E','13C','13C'};
+sys.output='hush'; sys.parallel={'local',1};
+inter.zeeman.matrix=repmat({zeros(3)},1,4);
+inter.coupling.matrix=cell(4);
+
+% Standard Spinach coupling and zero-field-splitting tensors in Hz
+inter.coupling.matrix{1,2}=diag([700 500 1200]);
+inter.coupling.matrix{1,3}=diag([1700 900 2000]);
+inter.coupling.matrix{2,4}=diag([1300 800 1600]);
+inter.coupling.matrix{3,4}=diag([100 100 -200]);
+
+% Compile metadata, without a full-bath basis
+
+
+spin_system=create(sys,inter);
+
+% Generalised CCE propagates the entire observed density matrix
+parameters.observed_spins=[1 2];
+parameters.bath_spins=[3 4];
+parameters.method='gcce'; parameters.expansion='standard';
+parameters.quantity='density'; parameters.order=2;
+v=[1;0;0;1]/sqrt(2); parameters.rho0=v*v';
+parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
+parameters.interaction_cutoff=Inf; parameters.meanfield='none';
+parameters.graph=struct('mode','complete');
+parameters.times=linspace(0,200e-6,31); parameters.sequence=struct([]);
+parameters.bath_state=struct('mode','mixed_product');
+parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+
+% Run full order for the small bath, retaining all observed density-matrix off-diagonal elements
+result=diagnostics.reduction; result.value=answer;
+result.times=parameters.times(:);
+result.density=reshape(answer.',sqrt(size(answer,2)),sqrt(size(answer,2)),[]);
+result.diagnostics.trace_error=zeros(numel(parameters.times),1);
+result.diagnostics.minimum_eigenvalue=zeros(numel(parameters.times),1);
+
+% Check physicality before evaluating spin correlations
+negativity=NaN(size(result.times));
+for n=1:numel(result.times)
+
+    % Partial transpose of the second observed electron, no eigenvalue clipping
+    rho=result.density(:,:,n);
+    if all(result.valid(n,:))&&abs(trace(rho)-1)<1e-8&&...
+       norm(rho-rho','fro')<1e-8&&min(eig((rho+rho')/2))>-1e-8
+        blocks=reshape(rho,2,2,2,2);
+        partial=reshape(permute(blocks,[3 2 1 4]),4,4);
+        negativity(n)=(sum(abs(eig(partial)))-1)/2;
+    end
+end
+result.negativity=negativity;
+
+% Independently construct the full dense Hamiltonian from the input Hz tensors
+dimensions=spin_system.comp.mults; dimension=prod(dimensions);
+operators=cell(numel(dimensions),3); h=zeros(dimension);
+for j=1:numel(dimensions)
+
+    % Local angular momentum matrices and their tensor-product embeddings
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+for j=1:numel(dimensions)
+    for k=j:numel(dimensions)
+
+        % Spinach ordered pair matrices transpose into Cartesian operators
+        tensor=inter.coupling.matrix{j,k};
+        if isempty(tensor), continue; end
+        for a=1:3
+            for b=1:3
+                h=h+2*pi*tensor(b,a)*operators{j,a}*operators{k,b};
+            end
+        end
+    end
+end
+
+% Propagate an explicit product density and trace over the whole finite bath
+d_obs=size(parameters.rho0,1); db=dimension/d_obs;
+rho0=kron(parameters.rho0,eye(db)/db); reference=zeros(size(result.value));
+for n=1:numel(result.times)
+
+    % This independent calculation uses expm, not the CCE eigensolver
+    u=expm(-1i*h*result.times(n)); rho=u*rho0*u'; reduced=zeros(d_obs);
+    for k=1:db
+        ids=k:db:dimension; reduced=reduced+rho(ids,ids);
+    end
+    reference(n,:)=reduced(:).';
+end
+result.reference_error=max(abs(result.value-reference),[],'all');
+
+% Plot observed populations without silently repairing the density matrix
+populations=zeros(numel(result.times),4);
+for n=1:numel(result.times)
+
+    % Read the diagonal in the documented observed tensor-product order
+    populations(n,:)=real(diag(result.density(:,:,n))).';
+end
+
+% Preserve every frozen physical reference array
+reference_error=result.reference_error; snapshot=struct();
+snapshot.a=a;
+snapshot.b=b;
+snapshot.blocks=blocks;
+snapshot.d_obs=d_obs;
+snapshot.db=db;
+snapshot.dimension=dimension;
+snapshot.dimensions=dimensions;
+snapshot.h=h;
+snapshot.ids=ids;
+snapshot.local=local;
+snapshot.m=m;
+snapshot.negativity=negativity;
+snapshot.operators=operators;
+snapshot.partial=partial;
+snapshot.plus=plus;
+snapshot.populations=populations;
+snapshot.reduced=reduced;
+snapshot.reference=reference;
+snapshot.rho=rho;
+snapshot.rho0=rho0;
+snapshot.u=u;
+snapshot.v=v;
+end
+
+
+% Independent dense reference for the migrated mecce_dissipative_bath example
+function [reference_error,snapshot]=mecce_dissipative_bath_reference(answer,diagnostics)
+
+% Full density ME-gCCE with an explicitly supplied nuclear jump rate
+parameters.observed_spins=1; parameters.bath_spins=2;
+parameters.method='megcce'; parameters.expansion='standard';
+parameters.quantity='density'; parameters.order=1;
+v=[1;1]/sqrt(2); parameters.rho0=v*v';
+parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
+parameters.interaction_cutoff=Inf; parameters.meanfield='none';
+parameters.graph=struct('mode','complete'); parameters.times=linspace(0,200e-6,31);
+parameters.sequence=struct([]); parameters.bath_state=struct('mode','mixed_product');
+parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+jump=[0 1;0 0]; rate=3000;
+parameters.jumps=struct('support',2,'operator',jump,'rate',rate);
+
+% Propagate the reduced density with the cluster implementation
+result=diagnostics.reduction; result.value=answer;
+result.times=parameters.times(:);
+result.density=reshape(answer.',sqrt(size(answer,2)),sqrt(size(answer,2)),[]);
+result.diagnostics.trace_error=zeros(numel(parameters.times),1);
+result.diagnostics.minimum_eigenvalue=zeros(numel(parameters.times),1);
+
+% Independently construct the column-vectorised dense master equation
+x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2;
+h=2*pi*(1100*kron(x,x)+900*kron(y,y)+2200*kron(z,z));
+a=kron(eye(2),jump); q=a'*a; unit=eye(4);
+liouvillian=-1i*(kron(unit,h)-kron(h.',unit))+...
+    rate*(kron(conj(a),a)-(kron(unit,q)+kron(q.',unit))/2);
+rho0=kron(parameters.rho0,eye(2)/2); reference=zeros(size(result.value));
+for n=1:numel(result.times)
+
+    % Dense exponential followed by an explicit nuclear partial trace
+    rho=reshape(expm(liouvillian*result.times(n))*rho0(:),4,4); reduced=zeros(2);
+    for k=1:2
+
+        % Tensor order is observed electron, then bath nucleus
+        ids=k:2:4; reduced=reduced+rho(ids,ids);
+    end
+    reference(n,:)=reduced(:).';
+end
+result.reference_error=max(abs(result.value-reference),[],'all');
+
+% Display observed signal without fitting a microscopic relaxation time
+
+% Preserve every frozen physical reference array
+reference_error=result.reference_error; snapshot=struct();
+snapshot.a=a;
+snapshot.h=h;
+snapshot.ids=ids;
+snapshot.jump=jump;
+snapshot.liouvillian=liouvillian;
+snapshot.rate=rate;
+snapshot.reduced=reduced;
+snapshot.reference=reference;
+snapshot.rho=rho;
+snapshot.rho0=rho0;
+snapshot.unit=unit;
+snapshot.v=v;
+snapshot.x=x;
+snapshot.y=y;
+snapshot.z=z;
+end
+
+% Exhaustive density reference for the sampled nuclear bath
+function [sampling_error,snapshot]=cce_polarized_bath_reference(answer,diagnostics)
+
+% Standard Spinach magnet, isotope list and illustrative Hz tensors
+sys.magnet=0.01; sys.isotopes={'E','1H','1H'};
+sys.output='hush'; sys.parallel={'local',1};
+inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
+inter.coupling.matrix=cell(3);
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 12000].';
+inter.coupling.matrix{2,3}=diag([400 400 -800]);
+spin_system=create(sys,inter);
+
+% The same physical populations, averaged exhaustively rather than sampled
+parameters=diagnostics.parameters; population=[0.8;0.2];
+parameters.cce.bath_state=struct('mode','explicit_product',...
+    'rho',{{diag(population),diag(population)}});
+[exact,exact_diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+sampling_error=max(abs(answer-exact));
+snapshot=struct('population',population,'exact',exact,...
+                'exact_diagnostics',exact_diagnostics,'sampling_error',sampling_error);
 
 end
 

@@ -1,19 +1,9 @@
 # examples/cce/cce_polarized_bath.m
 
-- Signature: `result=cce_polarized_bath()`
+Signature: [answer,diagnostics]=cce_polarized_bath()
 
-## Purpose
+A two-proton illustrative bath with descending-m populations [0.8,0.2] is sampled using 64 Threefry states, seed 8800. Standard sys/inter/bas/parameters blocks call clexpn with hahn_echo, projected CCE order 2, and after-expansion averaging. The bath-state basis selector 'uniform' requests the standard Zeeman basis; the explicitly supplied probability rows are not uniform.
 
-Nuclear polarization and exhaustive versus sampled bath estimators. The example reports its finite-cluster result without claiming a published material fit.
+answer is the 21-by-1 normalized complex Hahn-echo signal on 0 to 200 microseconds. diagnostics retains the physical time axis, reduction, sampled configurations, estimator standard error, and arithmetic error bounds. The example plots the sampled signal only. Exhaustive product-density comparison and the original population array are preserved in test_cce_examples; no bath density matrices are assembled by the example.
 
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_polarized_bath.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_polarized_bath.m).
-
-Hyperfine tensors use Spinach canonical ordering with observed Sz in column three; this retains the intended bath-transverse terms without observed-state transitions.
+This is not a material-geometry reproduction or a fitted thermal-relaxation model.

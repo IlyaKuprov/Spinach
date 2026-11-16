@@ -1,11 +1,12 @@
-% Nuclear polarization and exhaustive versus sampled bath estimators.
+% Nuclear polarization with a sampled product-state bath.
 % A two-proton toy bath illustrates thermal population control; it is not
 % the molecular geometry in https://doi.org/10.1039/d6cp01591c.
-% Syntax: result=cce_polarized_bath()
+% The exhaustive reference is evaluated in test_cce_examples.
+% Syntax: [answer,diagnostics]=cce_polarized_bath()
 %
 % ilya.kuprov@weizmann.ac.il
 
-function result=cce_polarized_bath()
+function [answer,diagnostics]=cce_polarized_bath()
 
 % Standard Spinach magnet, isotope list and illustrative Hz tensors
 sys.magnet=0.01; sys.isotopes={'E','1H','1H'};
@@ -15,39 +16,30 @@ inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
 inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 12000].';
 inter.coupling.matrix{2,3}=diag([400 400 -800]);
+
+% Basis formalism for retained clusters
+bas.formalism='zeeman-hilb';
+
+% Experiment parameters
+parameters.observed=1;
+parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
+parameters.times=linspace(0,200e-6,21);
+parameters.cce.approximation='projected';
+parameters.cce.order=2;
+parameters.cce.bath_state=struct('mode','sampled','basis','uniform',...
+    'probabilities',{{[0.8 0.2],[0.8 0.2]}},'samples',64,'seed',8800);
+parameters.cce.averaging='after_expansion';
+parameters.cce.basis=bas;
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+
+% Run the named experiment in the cluster-expansion context
 spin_system=create(sys,inter);
+[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
-% Hahn signal at full order for the two bath spins
-parameters.observed_spins=1; parameters.bath_spins=[2 3];
-parameters.method='cce'; parameters.expansion='standard';
-parameters.quantity='signal'; parameters.order=2;
-parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
-parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
-parameters.interaction_cutoff=Inf; parameters.meanfield='none';
-parameters.graph=struct('mode','complete'); parameters.times=linspace(0,200e-6,21);
-parameters.sequence=struct('type','ideal','target',1,'axis','x',...
-                           'angle',pi,'placement','fraction','at',0.5);
-parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
-
-% Exhaustively average a polarized product density without sampling error
-population=[0.8;0.2]; parameters.bath_state=struct('mode','explicit_product',...
-    'rho',{{diag(population),diag(population)}});
-exact=cce(spin_system,parameters);
-
-% Sample the same distribution with deterministic Threefry state IDs
-parameters.bath_state=struct('mode','sampled','basis',{{eye(2),eye(2)}},...
-    'probabilities',{{population,population}},'samples',64,'seed',8800);
-parameters.averaging='after_expansion'; result=cce(spin_system,parameters);
-result.exhaustive=exact.value; result.sampling_error=max(abs(result.value-exact.value));
-fprintf('Polarized bath: 64-state sample/exhaustive difference %.3g.\n',...
-        result.sampling_error);
-fprintf('Published point-centre T2: 9.06,10.30,13.77 microseconds; no toy fit.\n');
-
-% Display finite-sample uncertainty rather than claiming exact agreement
-kfigure(); plot(1e6*result.times,real(result.value),'b-',...
-                1e6*result.times,real(exact.value),'r--');
+% Plot the physical observed-spin response
+kfigure(); plot(1e6*parameters.times,real(answer),'b-');
 xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
-legend('64 sampled states','exhaustive product density'); kgrid();
+legend('64 sampled states'); kgrid();
 
 end
 

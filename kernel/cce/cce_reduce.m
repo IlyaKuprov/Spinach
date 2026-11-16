@@ -368,6 +368,17 @@ for n=1:count
     reduced.by_order_error=reduced.by_order_error+weights(n)*parts{n}.by_order_error;
     reduced.by_order_valid=reduced.by_order_valid&parts{n}.by_order_valid;
 end
+
+% Retain the deterministic weighted-summation estimate separately from sampling
+if count>1
+    operations=4*count; rounding=operations*eps/(1-operations*eps);
+    magnitude=zeros(size(reduced.value));
+    for n=1:count
+        magnitude=magnitude+weights(n)*abs(parts{n}.value);
+    end
+    reduced.abs_error_bound=reduced.abs_error_bound+rounding*magnitude;
+end
+
 % A finite exact reference remains valid even above the requested error budget
 reduced.valid=reduced.valid&isfinite(reduced.value);
 complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters));

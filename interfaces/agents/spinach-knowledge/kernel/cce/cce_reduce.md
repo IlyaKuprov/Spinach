@@ -41,3 +41,7 @@ reduced=cce_reduce(raw,clusters,parameters)
 
 Native input is a cell per configuration, each holding empty and nonempty raw records with normalized weights. `after_expansion` averages complete estimates; `internal_then_expansion` averages raw records including the empty reference. Noise uses additive inclusion-exclusion; density retains elementwise multiplicative reduction and the exact full-bath override. Connected noise centres conditional moments with ensemble first moments. Interlaced irreducible factors are multiplied exactly once; a complete-bath raw record overrides singular factor arithmetic. Masks and absolute uncertainty are propagated. Truncated density positivity is not guaranteed.
 For a complete-bath exact reference, validity records finite propagated data independently of whether its absolute error estimate meets the requested budget. Lower-order masks still use propagated errors and conditioning. Test budget satisfaction separately using `abs_error_bound<=atol+rtol*abs(value)`; validity alone is not an accuracy certificate.
+
+## Weighted-ensemble arithmetic estimate
+
+When more than one native reduction is averaged, the final absolute bound also includes gamma(4*N)*sum(w_s*abs(value_s)), with gamma(q)=q*eps/(1-q*eps). This deterministic summation estimate is separate from sampling_standard_error and does not alter order-resolved estimates or the signal.
